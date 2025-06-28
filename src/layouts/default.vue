@@ -1,51 +1,15 @@
 <template>
   <div class="relative">
     <div :style="botStore.connectVisible&&[{filter: 'url(#blur)'}]">
-      <TheHeader />
+      <TheHeader/>
+       <!-- :style="signalStore.translateStyle" -->
       <div
-        class="relative flex bg-[--d-000-l-F6F6F6] gap-1px pt-1px transition-transform transition-duration-300 overflow-hidden"
-        :style="signalStore.translateStyle"
+        class="relative flex bg-[--d-000-l-F6F6F6] gap-1px pt-1px transition-transform transition-duration-300 "
+        :style="_style"
       >
-        <Draggable
-          v-if="signalStore.isLeftFixed&&signalStore.signalVisible"
-          class="[&&]:relative shrink-0"
-          :min-width="240"
-          :max-width="360"
-          :initial-width="signalStore.fixedWidth"
-          :initial-height="signalStore.winHeight-95"
-          :handles="[
-          'mr',
-          ]"
-          drag-cancel="#drag-disabled"
-          @onDragStop="signalStore.onLeftDragStop"
-          @onResizing="signalStore.onFixedResizing"
-        >
-          <Signal
-            :container-width="signalStore.fixedWidth"
-            :scroll-height="signalStore.winHeight-200"
-          />
-        </Draggable>
+      
         <slot/>
-        <Draggable
-          v-if="signalStore.isRightFixed&&signalStore.signalVisible"
-          class="[&&]:relative shrink-0"
-          :min-width="240"
-          :max-width="360"
-          :x="0"
-          :initial-width="signalStore.fixedWidth"
-          :initial-height="signalStore.winHeight-95"
-          :handles="[
-          'ml',
-          ]"
-          drag-cancel="#drag-disabled"
-          @onDragStop="signalStore.onRightDragStop"
-          @onResizing="signalStore.onFixedResizing"
-        >
-          <Signal
-            :container-width="signalStore.fixedWidth"
-            :scroll-height="signalStore.winHeight-200"
-          />
-        </Draggable>
+        
       </div>
       <TheFooter />
     </div>
@@ -86,6 +50,49 @@
         class="border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]"
       />
     </Draggable>
+    <Draggable
+      v-if="signalStore.isLeftFixed&&signalStore.signalVisible"
+      class="[&&]:relative shrink-0 left fixed! left-0 top-64px"
+      :axis="'x'"
+      :min-width="240"
+      :max-width="360"
+      :initial-width="signalStore.fixedWidth"
+      :initial-height="signalStore.winHeight-95"
+      :parent="true"
+      :handles="[
+      'mr',
+      ]"
+      drag-cancel="#drag-disabled"
+      @onDragStop="signalStore.onLeftDragStop"
+      @onResizing="signalStore.onFixedResizing"
+    >
+      <Signal
+        :container-width="signalStore.fixedWidth"
+        :scroll-height="signalStore.winHeight-200"
+      />
+    </Draggable>
+    <Draggable
+      v-if="signalStore.isRightFixed&&signalStore.signalVisible"
+      class="[&&]:relative shrink-0 right fixed! top-64px left-0"
+      :axis="'x'"
+      :x="signalStore.winWidth-signalStore.fixedWidth"
+      :min-width="240"
+      :parent="true"
+      :max-width="360"
+      :initial-width="signalStore.fixedWidth"
+      :initial-height="signalStore.winHeight-95"
+      :handles="[
+      'ml',
+      ]"
+      drag-cancel="#drag-disabled"
+      @onDragStop="signalStore.onRightDragStop"
+      @onResizing="signalStore.onFixedResizing"
+    >
+      <Signal
+        :container-width="signalStore.fixedWidth"
+        :scroll-height="signalStore.winHeight-200"
+      />
+    </Draggable>
   </div>
 </template>
 
@@ -94,6 +101,21 @@
   import TheFooter from '@/components/layouts/TheFooter.vue'
   const botStore = useBotStore()
   const signalStore = useSignalStore()
+  const _style=computed(()=>{
+    if(signalStore.signalVisible){
+      if(signalStore.isLeftFixed){
+        return {
+          paddingLeft:signalStore.fixedWidth+4+'px'
+        }
+      }else if(signalStore.isRightFixed){
+        return {
+          paddingRight:signalStore.fixedWidth+4+'px'
+        }
+      }
+       return {}
+    }
+    return {}
+  })
 </script>
 
 <style>
