@@ -17,9 +17,10 @@
         </li>
       </ul>
     </div>
-    <div claas="m-table w-100%">
-      <el-table class='mt-12px' v-loading="loading" :data="dataSource" fixed  @sort-change="handleSortChange"
-      @row-click="tableRowClick">
+    <div class="m-table w-100%">
+      <el-table
+      ref="tableRef" v-loading="loading" class='mt-12px' :data="dataSource"  fixed
+      @sort-change="handleSortChange" @row-click="tableRowClick">
         <template #empty>
           <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
             <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
@@ -44,12 +45,12 @@
               />
             <el-popover
               v-else
+              v-model:visible="visible"
               placement="bottom-start"
               popper-class="chains-table-filter"
               title=""
               :width="320"
               trigger="click"
-              v-model:visible="visible"
             >
               <template #reference>
                  <Icon
@@ -68,7 +69,7 @@
                       :placeholder="$t('attentionSearch')"
                       clearable
                       @clear="handleFilterQuery()"
-                    ></el-input>
+                    />
                   </div>
                   <div class="mt-20px flex">
                     <el-button
@@ -99,7 +100,7 @@
               class="token-info table-item_d"
               style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
             >
-              <span class="text-10px" v-if="$index < 9" style="opacity: 0">0</span>
+              <span v-if="$index < 9" class="text-10px" style="opacity: 0">0</span>
               <span class="text-10px mr-5px" style="color: #696e7c">
                 #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
               </span>
@@ -112,19 +113,17 @@
                       :'color-[&#45;&#45;d-666-l-696E7C]'} text-12px hover:color-#f45469`"
                 @click.self.stop="handleDeleteAttention(row)"
               />
-               <UserAvatar class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px"></UserAvatar>
+               <UserAvatar class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
               <div>
-              <UserRemark :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 95px" iconEditColor="#999" iconEditSize="10px" showAddressTitle @updateRemark="({remark}) => row.remark = remark" :formatAddress="
-                (address) =>
-                  address?.slice(0, 4) + '...' + address?.slice(-4)
-            "> </UserRemark>
+              <UserRemark :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 95px" iconEditColor="#999" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" @updateRemark="({remark}) => row.remark = remark"/>
                 <div class="font_10 color-icon flex-start mt_4" style="line-height: 1">
-                  <i class="iconfont icon-copy text-12px fav-icon-color" @click.stop v-copy="row.user_address"></i>
-                  <div class="media-list flex-start" v-if="row?.extra?.length > 0">
+                  <i 
+                  v-copy="row.user_address" class="iconfont icon-copy text-12px fav-icon-color" @click.stop/>
+                  <div v-if="row?.extra?.length > 0" class="media-list flex-start">
                     <template v-for="(item, index) in row?.extra" :key="index">
                       <div
-                        class="ml-5"
                         v-if="item?.tip"
+                        class="ml-5"
                         @mouseover.stop="
                           e => {
                             buttonTagRef = e.currentTarget
@@ -141,16 +140,16 @@
                             :src="require(`@/assets/images/${item.img}.png`)"
                             :alt="item.img"
                             width="10"
-                          />
+                          >
                         </span>
                       </div>
                     </template>
                   </div>
                   <template v-if="row?.signal_arr?.length > 0">
                     <div
-                      class="flex"
                       v-for="(i, index) in row.signal_arr"
                       :key="index"
+                      class="flex"
                       @mouseover.stop="
                         e => {
                           buttonTagRef = e.currentTarget
@@ -162,10 +161,10 @@
                     >
                       <el-image class="token-icon-signal-tag" :src="formatIconTag(i.tag)" lazy>
                         <template #error>
-                          <img class="token-icon-signal-tag" src="/icon-default.png" />
+                          <img class="token-icon-signal-tag" src="/icon-default.png" >
                         </template>
                         <template #placeholder>
-                          <img class="token-icon-signal-tag" src="/icon-default.png" />
+                          <img class="token-icon-signal-tag" src="/icon-default.png" >
                         </template>
                       </el-image>
                       <span
@@ -241,13 +240,13 @@
               {{row?.total_profit && row?.total_profit < 0 ? '-':''}}${{formatNumber2(Math.abs(row?.total_profit) || 0, 0)}}
             </div>
             <div class="text-12px">
-              <span :class="`color-${upColor[0]}`" v-if="row?.total_profit_ratio > 0">
+              <span v-if="row?.total_profit_ratio > 0" :class="`color-${upColor[0]}`">
                 {{ formatNumber2(row?.total_profit_ratio * 100 || 0,2) }}%
               </span>
-              <span :class="`color-${downColor[0]}`" v-else-if="row?.total_profit_ratio < 0">
+              <span v-else-if="row?.total_profit_ratio < 0" :class="`color-${downColor[0]}`">
                 {{ formatNumber2(row?.total_profit_ratio * 100 || 0,2) }}%
               </span>
-              <span class="color-text-zero" v-else>0</span>
+              <span v-else class="color-text-zero">0</span>
             </div>
           </div>
         </template>
@@ -264,13 +263,13 @@
       >
         <template #default="{ row }">
           <div :class="!row?.total_win_ratio ? 'color-text-zero' : ''">
-            <span :class="`color-${upColor[0]}`" v-if="row?.total_win_ratio > 0">
+            <span v-if="row?.total_win_ratio > 0" :class="`color-${upColor[0]}`">
               {{ formatNumber2(row?.total_win_ratio || 0, 2) }}%
             </span>
-            <span :class="`color-${downColor[0]}`" v-else-if="row?.total_win_ratio < 0">
+            <span v-else-if="row?.total_win_ratio < 0" :class="`color-${downColor[0]}`">
               {{ formatNumber2(row?.total_win_ratio || 0, 2) }}%
             </span>
-            <span class="color-text-zero" v-else>0</span>
+            <span v-else class="color-text-zero">0</span>
           </div>
         </template>
       </el-table-column>
@@ -334,20 +333,22 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="right" width="120"  sortable="custom"
+      <el-table-column
+        align="right" width="120"  sortable="custom"
         :sort-orders="['descending', 'ascending', null]" prop="last_tx_time">
         <template #header>
           <span>{{ $t('lastTxsTime1') }}</span>
           <el-popover
+            v-model:visible="visible2"
             placement="bottom"
             popper-class="chains-table-filter"
             title=""
             :width="300"
             trigger="click"
-            v-model:visible="visible2"
-          >
+            >
             <template #reference>
-              <Icon name="custom:filter" class="text-10px ml-2px"  :style="{
+              <Icon
+                  name="custom:filter" class="text-10px ml-2px"  :style="{
                   color: (conditions?.last_trade_time || conditions.sort === 'last_tx_time') ? 'var(--d-F5F5F5-l-333)' : ''
               }" @click.stop.prevent/>
             </template>
@@ -355,7 +356,8 @@
               <div class="filter-box" :class="mode">
                 <div class="text-12px font-500 text-[--d-FFF-l-333]">{{ $t('lastTxsTime1') }}</div>
                <ul class="flex flex-col font-500 text-14px text-#666666">
-                  <li v-for="(item, index) in openTimeList"  class="flex-between py-11.5px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-pointer" :key="index"  @click.stop.prevent="
+                  <li 
+                    v-for="(item, index) in openTimeList"  :key="index" class="flex-between py-11.5px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-pointer"  @click.stop.prevent="
                         filterForm.last_trade_time = item.value"
                    >
                     <span :class="[filterForm.last_trade_time == item.value?'text-[--d-F5F5F5-l-333]':'']">{{ item.text }}</span>
@@ -371,9 +373,11 @@
                   >
                     <span class="filter-title">{{ $t('sort') }}</span>
                     <div class="sort-container">
-                      <i :class="['sort-caret ascending',filterForm.sort_dir === 'asc' ? 'active' : '']"
+                      <i 
+                        :class="['sort-caret ascending',filterForm.sort_dir === 'asc' ? 'active' : '']"
                         @click.stop="handleSort(filterForm, 'asc')" />
-                      <i :class="['sort-caret descending',filterForm.sort_dir === 'desc' ? 'active' : '']"
+                      <i
+                        :class="['sort-caret descending',filterForm.sort_dir === 'desc' ? 'active' : '']"
                         @click.stop="handleSort(filterForm, 'desc')" />
                       <!-- <i name="material-symbols:arrow-drop-down"  :class="filterForm.sort_dir === 'desc' ? 'active' : ''"
                         @click.stop="handleSort(filterForm, 'desc')"/> -->
@@ -421,11 +425,11 @@
             </template>
           </el-popover>
         </template>
-        <template #default="{ row }">
+        <template #default="{ row ,$Index}">
           <div
             :style="{
               color:
-                formatTimeFromNow(row?.last_tx_time, true) <= 600
+                Number(formatTimeFromNow(row?.last_tx_time, true)) <= 600
                   ? '#FFA622'
                   : 'var(--custom-text-2-color)'
             }"
@@ -433,11 +437,11 @@
              <span v-if="!row?.last_tx_time">-</span>
             <TimerCount
                v-else-if="
-                formatTimeFromNow(row?.last_tx_time, true) < 60
+                Number(formatTimeFromNow(row?.last_tx_time, true)) < 60
               "
-              :timestamp="(60 - formatTimeFromNow(row?.last_tx_time, true)) * 1000"
-              style="--van-count-down-text-color: currentColor"
               :key="`${row.last_tx_time}${$Index}`"
+              :timestamp="(60 - Number(formatTimeFromNow(row?.last_tx_time, true))) * 1000"
+              style="--van-count-down-text-color: currentColor"
               :end-time="60"
             >
               <template #default="{ seconds }">
@@ -480,32 +484,25 @@
         </template>
       </el-table-column>
       </el-table>
-      <el-pagination class="mt-20px" v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize"
-      layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" />
+      <el-pagination 
+        v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="mt-20px"
+        layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" />
     </div>
   </div>
 
 </template>
 
 <script setup lang="ts">
-// import Monitor from '@/components/monitor/index.vue'
 import ProGroups from '../components/proGroups.vue'
 import BigNumber from 'bignumber.js'
-import { defaultPaginationParams, downColor, upColor } from '@/utils/constants'
+import { downColor, upColor } from '@/utils/constants'
 import {
-  getSymbolDefaultIcon,
-  getChainDefaultIcon,
-  formatExplorerUrl,
-  formatDate,
-  formatIconSwap,
-  isJSON,
-  formatIconTag,
-  getAddressAndChainFromId,
-  getTagTooltip,
+  formatIconTag, getTagTooltip
 } from '@/utils/index'
-import { throttle, update } from 'lodash-es'
-import { getFavoriteList2, getAttentionPageList, getUserFavoriteGroups2, changeFavoriteGroupName2 ,addFavoriteGroup2,removeFavoriteGroup2 ,moveFavoriteGroup2,deleteAttention} from '~/api/attention'
-import { watchOnce } from '@vueuse/core'
+import { throttle } from 'lodash-es'
+import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention } from '~/api/attention'
+import type { TableInstance } from 'element-plus'
+
 const { mode, lang, isDark } = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
 const { currentAddress} = storeToRefs(useFollowStore())
@@ -516,10 +513,10 @@ const { addressGroups } = storeToRefs(useFollowStore())
 const visible = ref(false)  
 const visible2 = ref(false)  
 const searchKeyword= ref('')
-const buttonTagRef = ref(null)
+const buttonTagRef = ref<EventTarget | null>(null)
 const toolTipTagVisible = ref(false)
 const toolTipTagContent = ref('')
-
+const tableRef = ref<TableInstance | null>(null)
 const conditions = reactive({
   group: 0,
   activeTab: '7d',
@@ -531,6 +528,17 @@ const conditions = reactive({
   last_tx_time_max: '',
   last_tx_time_min: '',
   last_trade_time: ''
+} as {
+  group: number
+  activeTab: string
+  isMonitor: boolean
+  user_chain: string
+  sort: string|null
+  sort_dir: string|null
+  keyword: string
+  last_tx_time_max: string|number
+  last_tx_time_min: string|number
+  last_trade_time: string|number
 })
 const pageData = ref({
   total: 10,
@@ -549,19 +557,23 @@ const openTimeList =computed(() => [
   { text: '≤14D', value: String(60 * 24 * 14 * 60) },
   { text: '≤30D', value: String(60 * 24 * 30 * 60) }
 ])
+type FilterFormType = {
+  type: string
+  last_trade_time: string
+  sort_dir: string|null
+}
+
 const filterForm = ref({
-  visible: false,
   type: 'last_trade_time',
   last_trade_time: conditions?.last_trade_time || '',
   sort_dir: conditions?.sort === 'last_trade_time' ? conditions?.sort_dir || null : null
-})
+} as FilterFormType)
 const loading = ref(false)
 const dataSource = ref([])
 onMounted(async () => {
   init()
 })
 function init() {
-  getUserFavoriteGroups()
   getTableList()
 }
 watch(() => currentAddress.value, (val) => {
@@ -569,17 +581,10 @@ watch(() => currentAddress.value, (val) => {
   getTableList()
 })
 
-watch([() => conditions, () => pageData.value.page], (val) => {
+watch([() => conditions, () => pageData.value.page], () => {
    getTableList()
 },{deep: true})
-async function getUserFavoriteGroups() {
-  // let data=[]
-  // try {
-  //  const res =await getUserFavoriteGroups2()
-  // }catch (e) {
-  //   console.log('=>(favoriteTable.vue:19) e', e)
-  // }
-}
+
 function handleConfirmEdit(currentEditGroup: number, remark:string) {
   changeFavoriteGroupName2(remark, currentEditGroup).then(() => {
     ElMessage.success(t('success'))
@@ -653,7 +658,7 @@ function tableRowClick(row: { user_address: string; user_chain: string }) {
     path: `/address/${row.user_address}/${row.user_chain}`,
   })
 }
- function safeBigNumber(value) {
+ function safeBigNumber(value:string|number) {
   try {
     // 尝试将值转换为 BigNumber
     const result = new BigNumber(value)
@@ -676,7 +681,7 @@ function handleFilterQuery(keyword: string = '') {
   // getTableList()
 }
 
-function handleDeleteAttention(item) {
+function handleDeleteAttention(item:any) {
   deleteAttention({address: currentAddress.value, user_chain: item.chain,user_address: item.user_address}).then(() => {
     ElMessage.success(t('success'))
     getTableList()
@@ -689,37 +694,34 @@ const getRowGroupChange = async (val: number, row: any) => {
   getTableList()
 }
 
-function  handleFilterConfirm(data) {
-  console.log('-------attentionHandleFilterConfirm--------', data)
+function  handleFilterConfirm(data: FilterFormType) {
   if (data.last_trade_time) {
     conditions.last_trade_time = data.last_trade_time
   }
   conditions.sort = 'last_tx_time'
   conditions.sort_dir = data.sort_dir || ''
   visible2.value = false
-  // this.getAttentionList()
+  const sortOrder = {
+    'desc': 'descending',
+    'asc': 'ascending'
+  }[data.sort_dir || ''] || null
+  tableRef.value?.sort('last_tx_time', sortOrder as string)
 }
- function attentionHandleReset(data) {
+ function attentionHandleReset(data:FilterFormType) {
   console.log('-------attentionHandleReset--------', data)
   conditions.sort_dir = ''
   conditions.sort = ''
   conditions.last_trade_time = ''
   filterForm.value.last_trade_time = ''
   visible2.value = false
+  tableRef.value?.clearSort()
   // this.getAttentionList()
 }
 
-function handleSort(val, dir='') {
+function handleSort(val:FilterFormType, dir='') {
     console.log('handleSort', val, dir)
-      // let filterFormObj = this.filterFormObj[this.activeChain]
-      // if (val.type === 'profit_percent_num') {
-      //   let profit_obj = filterFormObj?.['profit_percent_num']?.profit_obj
-      //   for (let i in profit_obj) {
-      //     profit_obj[i].sort_dir = ''
-      //   }
-      // }
     if (!dir) {
-      let sortList = ['desc', 'asc', null]
+      const sortList = ['desc', 'asc', null]
       if (!val.sort_dir) {
         val.sort_dir = sortList[0]
       } else {
@@ -734,7 +736,7 @@ function handleSort(val, dir='') {
     }
     // console.log('filterFormObj111', filterFormObj)
 }
- function handleSortChange(data) {
+ function handleSortChange(data: {prop: string, order: string}) {
   console.log('-------HandleSortChange--------', data)
   if (data.order === null) {
     conditions.sort_dir = ''
@@ -746,9 +748,9 @@ function handleSort(val, dir='') {
     } else {
       conditions.sort_dir = 'desc'
     }
-    if (data.prop === 'last_tx_time') {
-      filterForm.value.sort_dir = conditions.sort_dir
-    }
+  }
+  if (data.prop === 'last_tx_time') {
+    filterForm.value.sort_dir = conditions.sort_dir
   }
 }
 </script>
