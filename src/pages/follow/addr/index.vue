@@ -1,5 +1,5 @@
 <template>
-  <div class="w-address mt-12px flex-1">
+  <div class="w-address mt-12px flex-1 w-100%">
     <div v-if="currentAddress" class="m-header flex-between px-12px items-start">
       <pro-groups v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup"/>
       <ul class="w-operate">
@@ -17,7 +17,7 @@
         </li>
       </ul>
     </div>
-    <div claas="m-table">
+    <div claas="m-table w-100%">
       <el-table class='mt-12px' v-loading="loading" :data="dataSource" fixed  @sort-change="handleSortChange"
       @row-click="tableRowClick">
         <template #empty>
@@ -112,12 +112,12 @@
                       :'color-[&#45;&#45;d-666-l-696E7C]'} text-12px hover:color-#f45469`"
                 @click.self.stop="handleDeleteAttention(row)"
               />
-              <UserAvatar class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px"></UserAvatar>
+               <UserAvatar class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px"></UserAvatar>
               <div>
-                <UserRemark :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 95px" iconEditColor="#999" iconEditSize="10px" showAddressTitle @updateRemark="({remark}) => row.remark = remark" :formatAddress="
-                  (address) =>
-                    address?.slice(0, 4) + '...' + address?.slice(-4)
-              "> </UserRemark>
+              <UserRemark :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 95px" iconEditColor="#999" iconEditSize="10px" showAddressTitle @updateRemark="({remark}) => row.remark = remark" :formatAddress="
+                (address) =>
+                  address?.slice(0, 4) + '...' + address?.slice(-4)
+            "> </UserRemark>
                 <div class="font_10 color-icon flex-start mt_4" style="line-height: 1">
                   <i class="iconfont icon-copy text-12px fav-icon-color" @click.stop v-copy="row.user_address"></i>
                   <div class="media-list flex-start" v-if="row?.extra?.length > 0">
@@ -745,6 +745,9 @@ function handleSort(val, dir='') {
       conditions.sort_dir = 'asc'
     } else {
       conditions.sort_dir = 'desc'
+    }
+    if (data.prop === 'last_tx_time') {
+      filterForm.value.sort_dir = conditions.sort_dir
     }
   }
 }

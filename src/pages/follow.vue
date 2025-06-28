@@ -1,6 +1,6 @@
 <template>
    <div class="w-follow bg-[--d-000-l-F6F6F6] pt-4px w-100%" style="height: calc(100vh - 92px);">
-    <div class="flex flex-col bg-[--d-111-l-FFF] h-100% py-12px">
+    <div class="flex flex-col bg-[--d-111-l-FFF] h-100% py-12px w-100% overflow-auto">
       <ul class="w-tabs pl-12px">
         <li v-for="item in tabData" :key="item.path" :class="{active:route.path === item.path}"><NuxtLink :to="item.path">{{item.label}}</NuxtLink></li>
         <!-- <li :class="{active:route.path === '/follow/token'}"><NuxtLink to="/follow/token">token</NuxtLink></li>
