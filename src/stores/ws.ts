@@ -17,7 +17,9 @@ export const useWSStore = defineStore('ws', () => {
 
   // const tokenStore = useTokenStore()
 
-  const wsResult = reactive<Record<typeof WSEventType[keyof typeof WSEventType], any>>({
+  const wsResult = reactive<
+    Record<(typeof WSEventType)[keyof typeof WSEventType], any>
+  >({
     [WSEventType.TX]: null,
     [WSEventType.LIQ]: null,
     [WSEventType.KLINE]: null,
@@ -61,6 +63,8 @@ export const useWSStore = defineStore('ws', () => {
       } else if (event === WSEventType.SWITCH_MAIN_PAIR_V2) {
         // 内盘转外盘更新 pair
         useTokenStore().onSwitchMainPairV2(data)
+      } else if (event === WSEventType.PUMPSTATE) {
+        wsResult[event] = data?.msgs
       } else {
         wsResult[event] = data
       }

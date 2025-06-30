@@ -876,7 +876,7 @@ function addTokenFavorite() {
   loading.value = true
   addFavorite(id.value, evmAddress.value)
     .then(() => {
-      ElMessage.success('收藏成功！')
+      ElMessage.success(t('collected'))
       collected.value = true
       topEventBus.emit()
     })
@@ -891,7 +891,7 @@ function removeTokenFavorite() {
   loading.value = true
   removeFavorite(id.value, evmAddress.value)
     .then(() => {
-      ElMessage.success('已取消收藏！')
+      ElMessage.success(t('cancelled1'))
       collected.value = false
       topEventBus.emit()
     })

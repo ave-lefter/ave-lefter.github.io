@@ -12,7 +12,9 @@ import { JsonRpcProvider, formatUnits, parseUnits, FixedNumber } from 'ethers'
 import type {GetHotTokensResponse} from '~/api/token'
 import BigNumber from 'bignumber.js'
 import type {SearchHot} from '~/api/types/search'
-import type {ConfigType} from 'dayjs'
+import type { ConfigType } from 'dayjs'
+import { useStorage } from '@vueuse/core'
+import type { Size, SizeObj } from '~/api/types/pump'
 
 export function isJSON(str: string) {
   try {
@@ -452,13 +454,21 @@ export function getChainDefaultIconColor(chain?: string) {
   return colors?.[chain] || defaultColor
 }
 
-export function getChainDefaultIcon(chain?: string, text = '') {
+export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
   if (text) {
     const color = getChainDefaultIconColor(chain)
-    const defaultSvg = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" stroke="transparent" fill="${color}" stroke-width="0"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff">${text
+    const circle = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" stroke="transparent" fill="${color}" stroke-width="0"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff">${text
       ?.slice(0, 1)
       ?.toUpperCase?.()}</text>
     </svg>`
+    const rect = `<?xml version="1.0" standalone="no"?>
+    <svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+      <rect width="32" height="32" fill="${color}" stroke="transparent" stroke-width="0"/>
+      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff">
+        ${text?.slice(0, 1)?.toUpperCase?.()}
+      </text>
+    </svg>`
+    const defaultSvg = type === 'rect' ? rect : circle
     try {
       return (
         'data:image/svg+xml;base64,' +
@@ -475,7 +485,7 @@ export function getSymbolDefaultIcon(tokenInfo: {
   symbol?: string
   chain: string
   logo_url?: string
-}| undefined ) {
+}| undefined , type= 'circle') {
   const domain = useConfigStore().token_logo_url
   if (
     tokenInfo &&
@@ -487,7 +497,7 @@ export function getSymbolDefaultIcon(tokenInfo: {
     }
     return domain + tokenInfo.logo_url
   }
-  return getChainDefaultIcon(tokenInfo?.chain || '', tokenInfo?.symbol || '')
+  return getChainDefaultIcon(tokenInfo?.chain || '', tokenInfo?.symbol || '', type || '')
 }
 
 export function formatIconTag(src: string) {
@@ -794,4 +804,66 @@ export function formatCountdown(time: ConfigType) {
     const years = Math.floor(seconds / 31536000)
     return `${years}y`
   }
+}
+
+export function usePumpTableDataFetching(key = '') {
+  return useStorage(
+    key,
+    {
+      dev_sale_out: 0,
+      platforms: 'pump,moonshot',
+      market_cap_min: '', // 市值
+      market_cap_max: '',
+      progress_min: '', //进度
+      progress_max: '',
+      volume_u_24h_min: '', //交易额
+      volume_u_24h_max: '',
+      dev_balance_ratio_cur_min: '', //dev 持仓%
+      dev_balance_ratio_cur_max: '',
+      holders_top10_ratio_min: '', //top10 持仓%
+      holders_top10_ratio_max: '',
+      tvl_min: '',
+      tvl_max: '',
+      holder_min: '', //持有人
+      holder_max: '',
+      tx_24h_count_min: '',
+      tx_24h_count_max: '',
+      smart_money_tx_count_24h_min: '', // 聪明钱交易数 （买入数+卖出数）
+      smart_money_tx_count_24h_max: '',
+    },
+    localStorage,
+    { mergeDefaults: true }
+  )
+}
+export function getValueType(val) {
+  return Object.prototype.toString.call(val)
+}
+export function _isString(val) {
+  return getValueType(val) === '[object String]'
+}
+
+export function _isArray(val) {
+  return getValueType(val) === '[object Array]'
+}
+
+
+export function getSwapSize(type: Size):SizeObj {
+  const obj:Record<Size, SizeObj> = {
+    small: {
+      flash:'6px',
+      amm: '10px',
+      text: '10px'
+    },
+    medium: {
+      flash:'10px',
+      amm: '12px',
+      text: '12px'
+    },
+    large: {
+      flash:'12px',
+      amm: '16px',
+      text: '16px'
+    }
+  }
+  return obj[type] || ''
 }
