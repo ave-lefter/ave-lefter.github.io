@@ -9,7 +9,7 @@
           size="small"
           active-value="1"
           inactive-value="0"/>
-        <pro-tag size="small" class="cursor-pointer" @click="toggleMc=!toggleMc">Vol/MC <Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
+        <pro-tag size="small" class="cursor-pointer" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
         <el-button size="small" @click="addWallet" style="height: 20px;color: var(--d-999-l-222) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
           <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
           {{ $t('addWallet') }}
@@ -57,14 +57,14 @@
         </template>
         <template #cell-amount="{ row }">
           <span :class="getIsBuy(row)?`color-${upColor[0]}`:`color-${downColor[0]}`">
-            {{ toggleMc? row?._main_Token?.amount+row?._main_Token?.symbol: row?._main_Token.total}}
+            {{ !toggleMc? row?._main_Token?.amount+row?._main_Token?.symbol: row?._main_Token.total}}
           </span>
         </template>
         <template #header-mc>
-          <span>{{ $t('mcap') }}</span>
+          <span>{{ toggleMc? $t('price') : $t('mcap') }}</span>
         </template>
         <template #cell-mc="{ row }">
-          <span>{{ row?._mc }}</span>
+          <span>{{ toggleMc? row?._target_Token?.price: row?._mc }}</span>
         </template>
         <template #header-time>
           <span>{{ $t('time') }}</span>

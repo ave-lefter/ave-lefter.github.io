@@ -7,9 +7,7 @@
         class="relative flex bg-[--d-000-l-F6F6F6] gap-1px pt-1px transition-transform transition-duration-300 "
         :style="_style"
       >
-      
         <slot/>
-        
       </div>
       <TheFooter />
     </div>
@@ -107,7 +105,8 @@
     if(signalStore.signalVisible){
       if(signalStore.isLeftFixed){
         return {
-          paddingLeft:signalStore.fixedWidth+4+'px'
+          paddingLeft:signalStore.fixedWidth+4+'px',
+          
         }
       }else if(signalStore.isRightFixed){
         return {
