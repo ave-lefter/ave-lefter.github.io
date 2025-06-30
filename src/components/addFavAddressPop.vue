@@ -39,23 +39,11 @@
   </el-popover>
 </template>
 <script setup lang="ts">
-/**
- * @description: 关注地址组件
- * @example:
- * <el-button ref="addButtonRef" @click="onclick" >关注地址</el-button>
- * function onclick() {
- *  followStore.confirmAttention(addButtonRef.value,(form)=>{
- *    console.log('confirmAttention', form)
- *     return Promise.resolve()
- *  })
- * }
- * 
- */
+
 import type { FormInstance, FormRules } from 'element-plus'
 import {CaretBottom} from '@element-plus/icons-vue'
-import { addFavoriteGroup2 } from '~/api/attention'
+// import { addFavoriteGroup2 } from '~/api/attention'
 const { t } = useI18n()
-const followStore = useFollowStore()
 const props=defineProps({
   width:{
     type:String,
@@ -93,15 +81,14 @@ const emits = defineEmits<{
 const popoverRef=ref()
   const {addressGroups} = storeToRefs(useFollowStore())
 const {lang,token_logo_url} = storeToRefs(useGlobalStore())
-// const placeholder=computed(() => props.placeholder ?? t('placeholderPrefix') + props.label)
 
 const formRef=ref<FormInstance|undefined>()
 const form = ref({...props.formData})
 const isAdd=ref(false)
 const addGroupName=ref('')
-watch(() => form.value, (val) => {
-  console.log('watch form', val)
-}, { deep: true })
+// watch(() => form.value, (val) => {
+//   console.log('watch form', val)
+// }, { deep: true })
 
 const visible=computed({
   get: () => props.visible,
@@ -177,12 +164,6 @@ function reset() {
   addGroupName.value = ''
   form.value={...props.formData}
 }
-// function close() {
-//   unref(popoverRef)?.hide?.()
-// }
-// defineExpose({
-//   close
-// })
 </script>
 
 <style scoped lang="scss">
