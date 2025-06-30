@@ -307,6 +307,9 @@
   "enableMonitor": "İzlemeyi aç",
   "isMonitored": "İzleme ekleyip eklemeyeceği",
   "no": "HAYIR",
-  "followAddress": "Favoriler ve adresi takip edin",
-  "attentionTips": "* İzleme adresi işlevini kullanmak için bot cüzdanına giriş yapmanız gerekiyor"
+  "followAddress": "Adresi Takip Edin",
+  "attentionTips": "* İzleme adresi işlevini kullanmak için bot cüzdanına giriş yapmanız gerekiyor",
+  "walletAddress": "Cüzdan adresi",
+  "chain": "Blok zinciri",
+  "placeholderPrefix1": "Lütfen seçin"
 }

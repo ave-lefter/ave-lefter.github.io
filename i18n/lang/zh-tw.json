@@ -756,6 +756,10 @@
   "enableMonitor": "開啟監控",
   "isMonitored": "是否添加監控",
   "no": "否",
-  "followAddress": "收藏並關注地址",
-  "attentionTips": "*需要登錄bot錢包才能使用監控地址功能"
+  "followAddress": "關注地址",
+  "attentionTips": "*需要登錄bot錢包才能使用監控地址功能",
+  "walletGroup": "錢包分組",
+  "walletAddress": "錢包地址",
+  "chain": "鏈",
+  "placeholderPrefix1": "請選擇"
 }

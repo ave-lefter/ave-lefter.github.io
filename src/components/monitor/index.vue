@@ -10,7 +10,7 @@
           active-value="1"
           inactive-value="0"/>
         <pro-tag size="small" class="cursor-pointer" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
-        <el-button size="small" @click="addWallet" style="height: 20px;color: var(--d-999-l-222) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
+        <el-button ref="addButtonRef" size="small" @click="()=>addFavAddressVisible=true" style="height: 20px;color: var(--d-999-l-222) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
           <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
           {{ $t('addWallet') }}
         </el-button>
@@ -108,10 +108,11 @@
       </div>
     </div>
   </el-popover>
+  <addFavAddressPop :visible="addFavAddressVisible" :buttonRef="addButtonRef" @onConfirm="()=>addFavAddressVisible=false"/>
 </template>
 
 <script setup lang="ts">
-import { throttle } from 'lodash-es'
+import * as lodashEs from 'lodash-es'
 import BigNumber from 'bignumber.js'
 import { getHistoryMonitor} from '~/api/attention'
 import FilterType from './components/filterType.vue'
@@ -129,7 +130,9 @@ const wsStore = useWSStore()
 const aveTableRef = ref<InstanceType<typeof AveTable> | null>(null)
 const firstActivated = ref(true)
 const txType = ref([1,2])
+const addButtonRef = ref()
 const toggleMc = ref(false)
+const addFavAddressVisible = ref(false)
 const txTypeList=computed(() => {
   return [
     // { label: t('all'), value: 0 },
@@ -229,7 +232,7 @@ const mergeDataSource = (msg:any) => {
   }
 }
 
-const updateDateSource = throttle(function() {
+const updateDateSource = lodashEs.throttle(function() {
   if(!monitorVisible.value) return
   dataSource.value.splice(0, dataSource.value?.length, ...dataSourceCache.value)
 }, 500)

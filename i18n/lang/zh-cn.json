@@ -681,7 +681,7 @@
   "MC": "市值",
   "holders4": "持有人",
   "smarterTxs": "聪明钱交易数",
-  "aiSummary":"AI叙事",
+  "aiSummary": "AI叙事",
   "aiIsAnalyzing": "AI正在分析中...",
   "times": "次",
   "MaximumIncrease": "最大涨幅",
@@ -773,6 +773,10 @@
   "enableMonitor": "开启监控",
   "isMonitored": "是否添加监控",
   "no": "否",
-  "followAddress": "收藏并关注地址",
-  "attentionTips": "*需要登录bot钱包才能使用监控地址功能"
+  "followAddress": "关注地址",
+  "attentionTips": "*需要登录bot钱包才能使用监控地址功能",
+  "walletGroup": "钱包分组",
+  "walletAddress": "钱包地址",
+  "chain": "链",
+  "placeholderPrefix1": "请选择"
 }

@@ -491,6 +491,9 @@
   "enableMonitor": "Bật giám sát",
   "isMonitored": "Có nên thêm giám sát không",
   "no": "KHÔNG",
-  "followAddress": "Yêu thích và làm theo địa chỉ",
-  "attentionTips": "* Cần đăng nhập vào ví bot để sử dụng chức năng địa chỉ giám sát"
+  "followAddress": "Làm theo địa chỉ",
+  "attentionTips": "* Cần đăng nhập vào ví bot để sử dụng chức năng địa chỉ giám sát",
+  "walletAddress": "Địa chỉ ví",
+  "chain": "Chuỗi",
+  "placeholderPrefix1": "Vui lòng chọn"
 }
