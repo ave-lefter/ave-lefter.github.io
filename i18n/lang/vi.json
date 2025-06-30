@@ -480,5 +480,9 @@
   "push": "Xô",
   "copyTrade": "Copy giao dịch",
   "pauseMonitor": "Tạm dừng giám sát",
-  "enableMonitor": "Bật giám sát"
+  "enableMonitor": "Bật giám sát",
+  "isMonitored": "Có nên thêm giám sát không",
+  "no": "KHÔNG",
+  "followAddress": "Yêu thích và làm theo địa chỉ",
+  "attentionTips": "* Cần đăng nhập vào ví bot để sử dụng chức năng địa chỉ giám sát"
 }

@@ -305,5 +305,9 @@
   "addrGroup": "Grupo de endereços",
   "push": "Empurrar",
   "pauseMonitor": "PAUSE MONITORIONAMENTO",
-  "enableMonitor": "Ligue o monitoramento"
+  "enableMonitor": "Ligue o monitoramento",
+  "isMonitored": "Se deve adicionar monitoramento",
+  "no": "não",
+  "followAddress": "Favoritos e siga o endereço",
+  "attentionTips": "* Precisa fazer login na carteira de bot para usar a função de endereço de monitoramento"
 }

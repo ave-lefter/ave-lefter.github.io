@@ -93,6 +93,7 @@
         :scroll-height="signalStore.winHeight-200"
       />
     </Draggable>
+    <FavAddressPop ref="favAddressPopRef" :visible="favAddressPopVisible" :formData="attentionDetails" :button-ref="attentionTrigger || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" @onCancel="() => favAddressPopVisible = false"/>
   </div>
 </template>
 
@@ -100,6 +101,7 @@
   import TheHeader from '@/components/layouts/TheHeader.vue'
   import TheFooter from '@/components/layouts/TheFooter.vue'
   const botStore = useBotStore()
+  const {addressGroups,attentionTrigger,attentionDetails,favAddressPopVisible,handleAddAttention} = storeToRefs(useFollowStore())
   const signalStore = useSignalStore()
   const _style=computed(()=>{
     if(signalStore.signalVisible){

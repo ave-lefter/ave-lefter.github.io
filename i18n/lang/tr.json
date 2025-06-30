@@ -300,5 +300,9 @@
   "addrGroup": "Adres grubu",
   "push": "İtmek",
   "pauseMonitor": "Duraklat İzleme",
-  "enableMonitor": "İzlemeyi aç"
+  "enableMonitor": "İzlemeyi aç",
+  "isMonitored": "İzleme ekleyip eklemeyeceği",
+  "no": "HAYIR",
+  "followAddress": "Favoriler ve adresi takip edin",
+  "attentionTips": "* İzleme adresi işlevini kullanmak için bot cüzdanına giriş yapmanız gerekiyor"
 }

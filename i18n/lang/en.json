@@ -752,5 +752,9 @@
   "push": "Push",
   "copyTrade": "Copy Trade",
   "pauseMonitor": "Pause Monitor",
-  "enableMonitor": "Turn on monitoring"
+  "enableMonitor": "Turn on monitoring",
+  "isMonitored": "Whether to add monitoring",
+  "no": "No",
+  "followAddress": "Favorites and follow the address",
+  "attentionTips": "* Need to log in to the bot wallet to use the monitoring address function"
 }

@@ -754,5 +754,9 @@
   "push": "推送",
   "copyTrade": "跟单",
   "pauseMonitor": "暂停监控",
-  "enableMonitor": "开启监控"
+  "enableMonitor": "开启监控",
+  "isMonitored": "是否添加监控",
+  "no": "否",
+  "followAddress": "收藏并关注地址",
+  "attentionTips": "*需要登录bot钱包才能使用监控地址功能"
 }

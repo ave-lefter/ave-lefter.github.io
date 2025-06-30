@@ -305,5 +305,9 @@
   "addrGroup": "Grupo de direcciones",
   "push": "Empujar",
   "pauseMonitor": "Monitoreo de pausa",
-  "enableMonitor": "Encender el monitoreo"
+  "enableMonitor": "Encender el monitoreo",
+  "isMonitored": "Si agregar monitoreo",
+  "no": "No",
+  "followAddress": "Favoritos y sigue la dirección",
+  "attentionTips": "* Necesita iniciar sesión en la billetera de bot para usar la función de dirección de monitoreo"
 }

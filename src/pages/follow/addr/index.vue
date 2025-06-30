@@ -1,5 +1,7 @@
 <template>
   <div class="w-address mt-12px flex-1 w-100%">
+    <el-button ref="addButtonRef"  @click.stop.prevent="openFavPop">Default</el-button>
+    <!-- <FavPop ref="favPopRef" v-model="favDetails" :button-ref="addButtonRef || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" /> -->
     <div v-if="currentAddress" class="m-header flex-between px-12px items-start">
       <pro-groups v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup"/>
       <ul class="w-operate">
@@ -516,6 +518,7 @@ const searchKeyword= ref('')
 const buttonTagRef = ref<EventTarget | null>(null)
 const toolTipTagVisible = ref(false)
 const toolTipTagContent = ref('')
+const addButtonRef = ref()
 const tableRef = ref<TableInstance | null>(null)
 const conditions = reactive({
   group: 0,
@@ -752,6 +755,18 @@ function handleSort(val:FilterFormType, dir='') {
   if (data.prop === 'last_tx_time') {
     filterForm.value.sort_dir = conditions.sort_dir
   }
+}
+function openFavPop() {
+  // followStore.handleAddAttention=(form)=>{
+  //   console.log('handleAddAttention', form)
+  //   followStore.favAddressPopVisible = false
+  // }
+  // followStore.attentionTrigger=addButtonRef.value
+  // followStore.favAddressPopVisible = true
+  followStore.confirmAttention(addButtonRef.value,(form)=>{
+    console.log('confirmAttention', form)
+    return Promise.resolve()
+  })
 }
 </script>
 

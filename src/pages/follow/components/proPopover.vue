@@ -1,5 +1,6 @@
+<!-- 单输入框pop -->
 <template>
-  <el-popover ref="popoverRef" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" :teleported="true" popper-class="" popper-style="--el-popover-title-font-size:12px;--el-popover-title-text-color:var(--d-FFF-l-000)">
+  <el-popover ref="popoverRef" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" :teleported="true" popper-class="" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)">
     <el-form ref="formRef" :model="form" :rules="rules" @submit.prevent.stop="handleSubmit(formRef)">
       <el-form-item :prop="props.prop" :required="props.required" label-position="top" size="large" class="mb-12px!">
         <el-input v-model="form[props.prop]" :placeholder="placeholder" :maxlength="props.maxlength"/>

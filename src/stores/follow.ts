@@ -41,6 +41,12 @@ export const useFollowStore = defineStore('follow', () => {
   // const email = useLocalStorage('email', '')
   const monitorVisible = ref(false)
   const showBatchAddressDetails = ref(false)
+  const attentionTrigger=ref()
+  const favAddressPopVisible=ref(false)
+  const attentionDetails=shallowRef({
+    group_id:0,
+    is_monitored: 0
+  })
   const botStore = useBotStore()
   const walletStore = useWalletStore()
   const addressGroups = useLocalStorage<{ group_id: number; name: string; show_index: number; }[]>('addressGroups', [])
@@ -48,6 +54,17 @@ export const useFollowStore = defineStore('follow', () => {
   watch(currentAddress, (val) => {
     if(!val)addressGroups.value = []
   })
+  const handleAddAttention = ref((form: any) => {})
+  const confirmAttention = (trigger: any,callback: (form: any)=>Promise<void>)=>{
+    attentionTrigger.value = trigger
+    handleAddAttention.value = (form: any)=>{
+      console.log('confirmAttention', form)
+      callback(form).then(() => {
+          favAddressPopVisible.value = false
+      })
+    }
+    favAddressPopVisible.value = true
+  }
   return {
     addressGroups,
     monitorVisible,
@@ -64,7 +81,12 @@ export const useFollowStore = defineStore('follow', () => {
     initAddressGroups() {
       this.getUserFavoriteGroups2(currentAddress.value)
     },
+    attentionTrigger,
+    attentionDetails,
     currentAddress,
-    showBatchAddressDetails
+    showBatchAddressDetails,
+    handleAddAttention,
+    confirmAttention,
+    favAddressPopVisible
   }
 })

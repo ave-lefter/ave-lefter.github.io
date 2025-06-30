@@ -737,5 +737,9 @@
   "push": "推送",
   "copyTrade": "跟單",
   "pauseMonitor": "暫停監控",
-  "enableMonitor": "開啟監控"
+  "enableMonitor": "開啟監控",
+  "isMonitored": "是否添加監控",
+  "no": "否",
+  "followAddress": "收藏並關注地址",
+  "attentionTips": "*需要登錄bot錢包才能使用監控地址功能"
 }
