@@ -6,7 +6,7 @@
         name="custom:drag2"
         class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2]"
     />
-    <el-tabs v-model="activeName" style="--el-border-color-light:#333333" @tab-click="handleClick" class="tabs">
+    <el-tabs v-model="activeName" style="--el-border-color-light:#333333" class="tabs" @tab-change="handleClick">
       <el-tab-pane :label="$t('walletManage')" :name="0">
           <!-- <el-button size="small" :color="isDark?'#333':'#F2F2F2'" style="height: 20px;color: var(--d-999-l-222) !important; margin-left: 0px;" @click.stop.prevent="showBatchAddressDetails=true" :dark="isDark" >
               <Icon name="mingcute:new-folder-fill" class="text-12px"/>
@@ -235,7 +235,7 @@
         </template>
       </el-tab-pane>
     </el-tabs>
-    <!-- <addFavAddressPop :visible="addFavAddressVisible" :buttonRef="addButtonRef" @onConfirm="()=>addFavAddressVisible=false"/> -->
+    <addFavAddressPop :visible="addFavAddressVisible" :buttonRef="addButtonRef" @onConfirm="()=>addFavAddressVisible=false"/>
   </div>
 </template>
 
@@ -277,7 +277,7 @@ const addButtonRef = ref()
 const toggleMc = ref(false)
 const addFavAddressVisible = ref(false)
 
-const activeName=ref(1)
+const activeName=ref(0)
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const txTypeList=computed(() => {
   return [
@@ -303,8 +303,10 @@ watch(() => monitorStore.visible, (val) => {
   }
 })
 
-function handleClick(tab: any) {
-  // You can add logic here if needed, or leave empty if not used
+function handleClick(name: number) {
+  if(name===1){
+    updateDateSource()
+  }
 }
 const columns = computed(() => {
   return props.isLarge?[
