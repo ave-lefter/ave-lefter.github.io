@@ -17,6 +17,18 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  rowHeight:{
+    type: Number,
+    default: 50
+  },
+  headerHeight:{
+    type: Number,
+    default: 32
+  },
+  headerClass:{
+    type: String,
+    default: ''
+  },
   footerHeight: {
     type: Number,
     default: 0
@@ -119,8 +131,8 @@ function calculateColumnWidths() {
         ref="tableRef"
         class="el-table"
         style="--el-table-border:0;--el-bg-color:transparent;font-size: 12px;"
-        header-class="bg-[--d-222-l-F2F2F2]"
-        :header-height="32"
+        :header-class="`bg-[--d-222-l-F2F2F2] ${headerClass}`"
+        :header-height="headerHeight"
         :columns="computedColumns"
         :data="data"
         :height="height"
@@ -128,6 +140,7 @@ function calculateColumnWidths() {
         :footer-height="footerHeight"
         v-bind="attrs"
         :fixed="fixed"
+        :row-height='rowHeight'
       >
         <template v-for="(slotFn, slotName) in defaultSlots" #[slotName]="slotProps">
           <slot :name="slotName" v-bind="slotProps"/>
