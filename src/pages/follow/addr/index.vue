@@ -115,10 +115,9 @@
                       :'color-[&#45;&#45;d-666-l-696E7C]'} text-12px hover:color-#f45469`"
                 @click.self.stop="handleDeleteAttention(row)"
               />
-                {{ row.user_chain }}
-               <!-- <UserAvatar class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" /> -->
+               <UserAvatar :key="row.user_address+row.user_chain" class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
               <div>
-              <UserRemark :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 95px" iconEditColor="#999" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" @updateRemark="({remark}) => row.remark = remark"/>
+              <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 95px" iconEditColor="#999" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" @updateRemark="({remark}) => row.remark = remark"/>
                 <div class="font_10 color-icon flex-start mt_4" style="line-height: 1">
                   <i 
                   v-copy="row.user_address" class="iconfont icon-copy text-12px fav-icon-color" @click.stop/>
@@ -311,7 +310,7 @@
         align="right"
         :label="conditions.activeTab === '7d' ? $t('7dTrades') : $t('30dTrades')"
         sortable="custom"
-        :sort-orders="['desc', 'asc', null]"
+        :sort-orders="['descending', 'ascending', null]"
         prop="tx_count"
         min-width="100px"
       >
