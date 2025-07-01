@@ -106,7 +106,7 @@ const handleRemarkShow = (row: any, event: any) => {
 
 // 备注
 const handleRemarkGroup = async (row: any) => {
-  if (!remarkValue.value.trim()) return ElMessage.error(t('enterRemark'))
+  // if (!remarkValue.value.trim()) return ElMessage.error(t('enterRemark'))
   if (remarkValue.value.length > 50) return ElMessage.error(t('remarkError'))
   await updateWhaleRemark({
     remark: remarkValue.value,
@@ -199,7 +199,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <el-table class='mt-12px' height="calc(100vh - 210px)" v-loading="loading" :data="tableList" fit
+    <el-table class='mt-12px' height="calc(100vh - 210px)" v-loading="loading" row-class-name="group" :data="tableList" fit
       @sort-change="handleSortChange" @row-click="tableRowClick">
       <template #empty>
         <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
@@ -221,7 +221,7 @@ onMounted(() => {
               :chain="row.user_chain" iconSize="24px"></UserAvatar>
             <div class="ml-5px">
               <div class="flex items-center">
-                <span class="text-14px max-w-[60px] truncate">{{ row.remark }}</span>
+                <span class="text-14px max-w-[95px] truncate">{{ row.remark }}</span>
                 <!-- 备注 -->
                 <div ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
                   <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px" name="custom:remark" />
@@ -239,9 +239,11 @@ onMounted(() => {
       </el-table-column>
       <el-table-column :label="t('noteTime')" align="right">
         <template #default="{ row }">
-          <div>
-            {{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
-          </div>
+          <el-tooltip placement="right" :content="dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss')">
+            <div class="text-[#666]">
+              {{ formatTimeFromNow(row?.create_time) }}
+            </div>
+          </el-tooltip>
         </template>
       </el-table-column>
       <el-table-column :label="t('tokenBalance')" align="right">
@@ -250,7 +252,7 @@ onMounted(() => {
             <div v-if="row?.main_token_balance_amount > 0">
               {{ formatNumber2(row?.main_token_balance_amount || 0, 2) }}&nbsp;{{ row.main_token_symbol }}
             </div>
-            <div v-else>
+            <div v-else class="text-[#666]">
               0
             </div>
           </div>
@@ -262,7 +264,7 @@ onMounted(() => {
             <div v-if="row?.total_balance > 0">
               ${{ formatNumber2(row?.total_balance || 0, 1) }}
             </div>
-            <div v-else>
+            <div v-else class="text-[#666]">
               $0
             </div>
           </div>
@@ -278,7 +280,7 @@ onMounted(() => {
               {{ t('documentation') }}
             </a>
             <!-- 监控 -->
-            <div class="flex items-center mr-12px cursor-pointer group color-[#666] hover:color-[var(--d-F2F2F2-l-333)]"
+            <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"
               @click="handleMonitor(row)" v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'">
               <Icon name="custom:monitor-icon" class="text-16px mr-2px" />
               <span

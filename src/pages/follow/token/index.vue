@@ -178,7 +178,7 @@ const handleRemarkShow = (row: any, event: any) => {
 }
 // 备注
 const handleRemarkGroup = async (row: any) => {
-  if (!remarkValue.value.trim()) return ElMessage.error(t('enterRemark'))
+  // if (!remarkValue.value.trim()) return ElMessage.error(t('enterRemark'))
   if (remarkValue.value.length > 50) return ElMessage.error(t('remarkError'))
   const tokenId = row.token + '-' + row.chain
   await editTokenFavRemark(tokenId, remarkValue.value, addressValue.value)

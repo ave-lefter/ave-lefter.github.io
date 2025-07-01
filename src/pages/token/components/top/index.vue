@@ -162,8 +162,9 @@
               />
             </a>
             <a
+              v-if="aiSummary?.headline || aiSummary?.summary"
               v-tooltip.raw="{
-                content: aiSummary?.headline || aiSummary?.summary ? `<div class='max-w-[400px]'>${aiSummary.headline || aiSummary.summary}</div>` : `${$t('aiIsAnalyzing')}`,
+                content: `<div class='max-w-[400px]'>${aiSummary.headline || aiSummary.summary}</div>`,
                 props:{
                   placement:'top-start'
                 }

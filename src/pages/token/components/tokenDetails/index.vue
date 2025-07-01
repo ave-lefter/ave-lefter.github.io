@@ -6,7 +6,7 @@ import {
   type GetTokenDetailsLineResponse
 } from '~/api/token'
 import LineChart from './lineChart.vue'
-import BaseInfo from '~/pages/token/components/tokenDetails/baseInfo.vue'
+import BaseInfo from './baseInfo.vue'
 
 const tokenDetailsStore = useTokenDetailsStore()
 const symbol = computed(() => {

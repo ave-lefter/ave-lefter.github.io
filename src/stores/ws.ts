@@ -28,6 +28,7 @@ export const useWSStore = defineStore('ws', () => {
     [WSEventType.ASSET]: null,
     [WSEventType.SWITCH_MAIN_PAIR_V2]: null,
     [WSEventType.PUMPSTATE]: null,
+    [WSEventType.GOLD_SIGNAL]: null,
     [WSEventType.SIGNALSV2_PUBLIC_MONITOR]: null
   })
 
