@@ -115,7 +115,8 @@
                       :'color-[&#45;&#45;d-666-l-696E7C]'} text-12px hover:color-#f45469`"
                 @click.self.stop="handleDeleteAttention(row)"
               />
-               <UserAvatar class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
+                {{ row.user_chain }}
+               <!-- <UserAvatar class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" /> -->
               <div>
               <UserRemark :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 95px" iconEditColor="#999" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" @updateRemark="({remark}) => row.remark = remark"/>
                 <div class="font_10 color-icon flex-start mt_4" style="line-height: 1">
@@ -310,7 +311,7 @@
         align="right"
         :label="conditions.activeTab === '7d' ? $t('7dTrades') : $t('30dTrades')"
         sortable="custom"
-        :sort-orders="['descending', 'ascending', null]"
+        :sort-orders="['desc', 'asc', null]"
         prop="tx_count"
         min-width="100px"
       >
@@ -334,98 +335,95 @@
           </div>
         </template>
       </el-table-column>
-
+<!-- last_tx_time -->
       <el-table-column
-        align="right" width="120"  sortable="custom"
-        :sort-orders="['descending', 'ascending', null]" prop="last_tx_time">
+        align="right" width="130">
         <template #header>
-          <span>{{ $t('lastTxsTime1') }}</span>
-          <el-popover
-            v-model:visible="visible2"
-            placement="bottom"
-            popper-class="chains-table-filter"
-            title=""
-            :width="300"
-            trigger="click"
+          <div class="flex items-center clickable flex-end">
+            <div
+              class="flex items-center clickable flex-end"
+              style="cursor: pointer"
+              @click="handleSort(conditions,'','last_tx_time')"
             >
-            <template #reference>
-              <Icon
-                  name="custom:filter" class="text-10px ml-2px"  :style="{
-                  color: (conditions?.last_trade_time || conditions.sort === 'last_tx_time') ? 'var(--d-F5F5F5-l-333)' : ''
-              }" @click.stop.prevent/>
-            </template>
-            <template #default>
-              <div class="filter-box" :class="mode">
-                <div class="text-12px font-500 text-[--d-FFF-l-333]">{{ $t('lastTxsTime1') }}</div>
-               <ul class="flex flex-col font-500 text-14px text-#666666">
-                  <li 
-                    v-for="(item, index) in openTimeList"  :key="index" class="flex-between py-11.5px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-pointer"  @click.stop.prevent="
-                        filterForm.last_trade_time = item.value"
-                   >
-                    <span :class="[filterForm.last_trade_time == item.value?'text-[--d-F5F5F5-l-333]':'']">{{ item.text }}</span>
-                    <div class="flex-1"/>
-                    <Icon v-if="filterForm.last_trade_time == item.value" name="material-symbols:check" class="text-12px"/>
-                  </li>
-                </ul>
-                <div class="mt-11px flex-between">
-                  <div
-                    class="flex items-center clickable"
-                    style="cursor: pointer"
-                    @click="handleSort(filterForm)"
-                  >
-                    <span class="filter-title">{{ $t('sort') }}</span>
-                    <div class="sort-container">
-                      <i 
-                        :class="['sort-caret ascending',filterForm.sort_dir === 'asc' ? 'active' : '']"
-                        @click.stop="handleSort(filterForm, 'asc')" />
-                      <i
-                        :class="['sort-caret descending',filterForm.sort_dir === 'desc' ? 'active' : '']"
-                        @click.stop="handleSort(filterForm, 'desc')" />
-                      <!-- <i name="material-symbols:arrow-drop-down"  :class="filterForm.sort_dir === 'desc' ? 'active' : ''"
-                        @click.stop="handleSort(filterForm, 'desc')"/> -->
-                      <!-- <svg
-                        class="icon-svg"
-                        aria-hidden="true"
-                        :class="filterForm.sort_dir === 'asc' ? 'active' : ''"
-                        @click.stop="handleSort(filterForm, 'asc')"
-                      >
-                        <use xlink:href="#icon-sort-up"></use>
-                      </svg>
-                      <svg
-                        class="icon-svg"
-                        aria-hidden="true"
-                        :class="filterForm.sort_dir === 'desc' ? 'active' : ''"
-                        @click.stop="handleSort(filterForm, 'desc')"
-                      >
-                        <use xlink:href="#icon-sort-down"></use>
-                      </svg> -->
-                    </div>
-                  </div>
-                  <el-button
-                    size="default"
-                    style="
-                      height: 30px;
-                      min-width: 70px;
-                      --el-button-font-weight: 400;
-                      margin-left: auto;
-                    "
-                    :color="mode !== 'dark' ? '#f2f2f2' : '#333333'"
-                    @click.stop="attentionHandleReset(filterForm)"
-                  >
-                    {{ $t('reset') }}
-                  </el-button>
-                  <el-button
-                    size="default"
-                    :color="mode !== 'dark' ? '#222222' : '#f5f5f5'"
-                    style="height: 30px; min-width: 70px; --el-button-font-weight: 400"
-                    @click.stop="handleFilterConfirm(filterForm)"
-                  >
-                    {{ $t('confirm') }}
-                  </el-button>
-                </div>
+              <span class="filter-title">{{ $t('lastTxsTime1') }}</span>
+              <div class="sort-container">
+                <i 
+                  :class="['sort-caret ascending',(conditions.sort_dir === 'asc'&&conditions.sort==='last_tx_time') ? 'active' : '']"
+                  @click.stop="handleSort(conditions,'asc','last_tx_time')" />
+                <i
+                  :class="['sort-caret descending',(conditions.sort_dir === 'desc'&&conditions.sort==='last_tx_time') ? 'active' : '']"
+                  @click.stop="handleSort(conditions,'desc','last_tx_time')" />
               </div>
-            </template>
-          </el-popover>
+            </div>
+            <el-popover
+              v-model:visible="visible2"
+              placement="bottom"
+              popper-class="chains-table-filter"
+              title=""
+              :width="300"
+              trigger="click"
+              >
+              <template #reference>
+                <Icon
+                    name="custom:filter" class="text-10px inline-block"  :style="{
+                    color: (conditions?.last_trade_time) ? 'var(--d-F5F5F5-l-333)' : ''
+                }" @click.stop.prevent/>
+              </template>
+              <template #default>
+                <div class="filter-box" :class="mode">
+                  <div class="text-12px font-500 text-[--d-FFF-l-333]">{{ $t('lastTxsTime1') }}</div>
+                 <ul class="flex flex-col font-500 text-14px text-#666666">
+                    <li 
+                      v-for="(item, index) in openTimeList"  :key="index" class="flex-between py-11.5px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-pointer"  @click.stop.prevent="
+                          filterForm.last_trade_time = item.value"
+                     >
+                      <span :class="[filterForm.last_trade_time == item.value?'text-[--d-F5F5F5-l-333]':'']">{{ item.text }}</span>
+                      <div class="flex-1"/>
+                      <Icon v-if="filterForm.last_trade_time == item.value" name="material-symbols:check" class="text-12px"/>
+                    </li>
+                  </ul>
+                  <div class="mt-11px flex-between">
+                    <!-- <div
+                      class="flex items-center clickable"
+                      style="cursor: pointer"
+                      @click="handleSort(filterForm)"
+                    >
+                      <span class="filter-title">{{ $t('sort') }}</span>
+                      <div class="sort-container">
+                        <i 
+                          :class="['sort-caret ascending',filterForm.sort_dir === 'asc' ? 'active' : '']"
+                          @click.stop="handleSort(filterForm, 'asc')" />
+                        <i
+                          :class="['sort-caret descending',filterForm.sort_dir === 'desc' ? 'active' : '']"
+                          @click.stop="handleSort(filterForm, 'desc')" />
+                      </div>
+                    </div> -->
+                    <el-button
+                      size="default"
+                      style="
+                        height: 30px;
+                        min-width: 70px;
+                        --el-button-font-weight: 400;
+                        margin-left: auto;
+                      "
+                      :color="mode !== 'dark' ? '#f2f2f2' : '#333333'"
+                      @click.stop="attentionHandleReset(filterForm)"
+                    >
+                      {{ $t('reset') }}
+                    </el-button>
+                    <el-button
+                      size="default"
+                      :color="mode !== 'dark' ? '#222222' : '#f5f5f5'"
+                      style="height: 30px; min-width: 70px; --el-button-font-weight: 400"
+                      @click.stop="handleFilterConfirm(filterForm)"
+                    >
+                      {{ $t('confirm') }}
+                    </el-button>
+                  </div>
+                </div>
+              </template>
+            </el-popover>
+          </div>
         </template>
         <template #default="{ row ,$Index}">
           <div
@@ -681,7 +679,6 @@ function handleFilterQuery(keyword: string = '') {
   visible.value = false
   conditions.keyword = keyword
   searchKeyword.value = keyword
-  // getTableList()
 }
 
 function handleDeleteAttention(item:any) {
@@ -701,34 +698,33 @@ function  handleFilterConfirm(data: FilterFormType) {
   if (data.last_trade_time) {
     conditions.last_trade_time = data.last_trade_time
   }
-  conditions.sort = 'last_tx_time'
-  conditions.sort_dir = data.sort_dir || ''
+  // conditions.sort = 'last_tx_time'
+  // conditions.sort_dir = data.sort_dir || ''
   visible2.value = false
-  const sortOrder = {
-    'desc': 'descending',
-    'asc': 'ascending'
-  }[data.sort_dir || ''] || null
-  tableRef.value?.sort('last_tx_time', sortOrder as string)
+  // const sortOrder = {
+  //   'desc': 'descending',
+  //   'asc': 'ascending'
+  // }[data.sort_dir || ''] || null
+  // tableRef.value?.sort('last_tx_time', sortOrder as string)
 }
  function attentionHandleReset(data:FilterFormType) {
   console.log('-------attentionHandleReset--------', data)
-  conditions.sort_dir = ''
-  conditions.sort = ''
   conditions.last_trade_time = ''
   filterForm.value.last_trade_time = ''
   visible2.value = false
-  tableRef.value?.clearSort()
-  // this.getAttentionList()
+  // tableRef.value?.clearSort()
 }
 
-function handleSort(val:FilterFormType, dir='') {
-    console.log('handleSort', val, dir)
+function handleSort(val:any, dir='',sort:string) {
     if (!dir) {
       const sortList = ['desc', 'asc', null]
       if (!val.sort_dir) {
         val.sort_dir = sortList[0]
       } else {
         val.sort_dir = sortList[sortList.indexOf(val.sort_dir) + 1]
+      }
+      if(sort){
+        val.sort=sort
       }
       return
     }
@@ -737,9 +733,12 @@ function handleSort(val:FilterFormType, dir='') {
     } else {
       val.sort_dir = dir
     }
+    if(sort){
+      val.sort=sort
+    }
     // console.log('filterFormObj111', filterFormObj)
 }
- function handleSortChange(data: {prop: string, order: string}) {
+ function handleSortChange(data: {prop: string, order: string|null}) {
   console.log('-------HandleSortChange--------', data)
   if (data.order === null) {
     conditions.sort_dir = ''
