@@ -25,13 +25,13 @@ export const useSignalStore = defineStore('signalStore', () => {
   //   }
   // })
 
-  const translateStyle = shallowRef('0px')
+  const translateStyle = shallowRef(0)
   const onDrag = useThrottleFn((x: number) => {
     if (x <= 0) {
-      translateStyle.value = '12px'
+      translateStyle.value = 12
     } else {
       translateStyle.value =
-          x + signalBoundingRect.value.width >= winWidth.value ? '-12px' : '0px'
+          x + signalBoundingRect.value.width >= winWidth.value ? -12 : 0
     }
   }, 100, false, true)
   function onDragStop(x: number, y: number) {
@@ -42,7 +42,7 @@ export const useSignalStore = defineStore('signalStore', () => {
       isRightFixed.value = x + signalBoundingRect.value.width >= winWidth.value
     }
     setTimeout(() => {
-      translateStyle.value = '0px'
+      translateStyle.value = 0
     })
   }
 

@@ -4,8 +4,8 @@
       <TheHeader/>
        <!-- :style="signalStore.translateStyle"  translate-x-0px-->
       <div
-        :class="['relative flex bg-[--d-000-l-F6F6F6] gap-1px pt-1px transition-transform transition-duration-300',`translate-x-${signalStore.translateStyle}`]"
-        :style="_style"
+        :class="['relative flex bg-[--d-000-l-F6F6F6] gap-1px pt-1px transition-transform transition-duration-300']"
+        :style="{..._style,transform:`translateX(${signalStore.translateStyle||monitorStore.translateStyle}px)`}"
       >
         <slot/>
       </div>
@@ -123,8 +123,10 @@
     </Draggable>
     <Draggable
       v-if="monitorStore.isLeftFixed&&monitorStore.visible"
-      class="[&&]:relative shrink-0 left fixed! left-0 top-64px"
+      class="[&&]:relative shrink-0 left fixed! top-64px"
+      :style="`left:${(signalStore.isLeftFixed&&signalStore.signalVisible)?signalStore.fixedWidth+4:0}px`"
       :axis="'x'"
+      :x="0"
       :min-width="lang.indexOf('zh')>-1?280:333"
       :max-width="360"
       :initial-width="monitorStore.fixedWidth"
@@ -137,10 +139,33 @@
       @onDragStop="monitorStore.onLeftDragStop"
       @onResizing="monitorStore.onFixedResizing"
     >
-      <Monitor :scroll-height="monitorStore.monitorBoundingRect.height-40" />
+      <Monitor :scroll-height="monitorStore.winHeight-160" />
     </Draggable>
+    <template v-if="signalStore.isRightFixed&&signalStore.signalVisible">
+      <div v-if="monitorStore.isRightFixed&&monitorStore.visible" class="absolute left-0 top-0 h-100% flex z-auto select-auto" :style="{width: monitorStore.winWidth-((signalStore.isRightFixed&&signalStore.signalVisible)?signalStore.fixedWidth+4:0)+'px'}" >
+        <Draggable
+          v-if="monitorStore.isRightFixed&&monitorStore.visible"
+          class="[&&]:relative shrink-0 right fixed! top-64px left-0"
+          :axis="'x'"
+          :x="monitorStore.winWidth-monitorStore.fixedWidth-((signalStore.isRightFixed&&signalStore.signalVisible)?signalStore.fixedWidth+4:0)"
+          :min-width="lang.indexOf('zh')>-1?280:333"
+          :parent="true"
+          :max-width="360"
+          :initial-width="monitorStore.fixedWidth"
+          :initial-height="monitorStore.winHeight-95"
+          :handles="[
+          'ml',
+          ]"
+          drag-cancel="#drag-disabled"
+          @onDragStop="monitorStore.onRightDragStop"
+          @onResizing="monitorStore.onFixedResizing"
+        >
+          <Monitor :scroll-height="monitorStore.winHeight-160"/>
+        </Draggable>
+      </div>
+    </template>
     <Draggable
-      v-if="monitorStore.isRightFixed&&monitorStore.visible"
+      v-else-if="monitorStore.isRightFixed&&monitorStore.visible"
       class="[&&]:relative shrink-0 right fixed! top-64px left-0"
       :axis="'x'"
       :x="monitorStore.winWidth-monitorStore.fixedWidth"
@@ -156,7 +181,7 @@
       @onDragStop="monitorStore.onRightDragStop"
       @onResizing="monitorStore.onFixedResizing"
     >
-      <Monitor :scroll-height="monitorStore.monitorBoundingRect.height-40"/>
+      <Monitor :scroll-height="monitorStore.winHeight-160"/>
     </Draggable>
     <FavAddressPop ref="favAddressPopRef" :visible="favAddressPopVisible" :formData="attentionDetails" :button-ref="attentionTrigger || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" @onCancel="() => favAddressPopVisible = false"/>
   </div>
@@ -170,20 +195,32 @@
   const {addressGroups,attentionTrigger,attentionDetails,favAddressPopVisible,handleAddAttention} = storeToRefs(useFollowStore())
   const signalStore = useSignalStore()
   const monitorStore = useMonitorStore()
+
   const _style=computed(()=>{
-    if(signalStore.signalVisible){
-      if(signalStore.isLeftFixed){
-        return {
-          paddingLeft:signalStore.fixedWidth+4+'px',
-        }
-      }else if(signalStore.isRightFixed){
-        return {
-          paddingRight:signalStore.fixedWidth+4+'px',
+    let paddingLeft=0
+    let paddingRight=0
+    if(monitorStore.visible||signalStore.signalVisible){
+      if(signalStore.signalVisible){
+        if(signalStore.isLeftFixed){
+          paddingLeft+=signalStore.fixedWidth+4
+        }else if(signalStore.isRightFixed){
+          paddingRight+=signalStore.fixedWidth+4
         }
       }
-       return {}
+      if(monitorStore.visible){
+        if(monitorStore.isLeftFixed){
+          paddingLeft+=monitorStore.fixedWidth+4
+        }else if(monitorStore.isRightFixed){
+          paddingRight+=monitorStore.fixedWidth+4
+        }
+      }
+      return {
+        paddingLeft:paddingLeft+'px',
+        paddingRight:paddingRight+'px',
+      }
     }
-    return {
+    else{
+      return {}
     }
   })
 </script>

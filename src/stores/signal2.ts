@@ -12,18 +12,19 @@ export const useMonitorStore = defineStore('monitor', () => {
   const {width: winWidth, height: winHeight} = useWindowSize()
   const isLeftFixed = useStorage('isMonitorLeft', false)
   const isRightFixed = useStorage('isMonitorRight', false)
-  const fixedWidth = useStorage('monitorFixedWidth', 360)
+  const fixedWidth = useStorage('monitorFixedWidth', 333)
 
-  const translateStyle = shallowRef('')
+  const translateStyle = shallowRef(0)
   const onDrag = useThrottleFn((x: number) => {
     if (x <= 0) {
-      translateStyle.value = '12px'
+      translateStyle.value = 12
     } else {
       translateStyle.value =
-          x + monitorBoundingRect.value.width >= winWidth.value ? '-12px' : '0px'
+          x + monitorBoundingRect.value.width >= winWidth.value ? -12 : 0
     }
   }, 100, false, true)
   function onDragStop(x: number, y: number) {
+    console.log('onDragStop', x, y)
     monitorBoundingRect.value.x = x
     monitorBoundingRect.value.y = y
     isLeftFixed.value = x <= 0
@@ -31,7 +32,7 @@ export const useMonitorStore = defineStore('monitor', () => {
       isRightFixed.value = x + monitorBoundingRect.value.width >= winWidth.value
     }
     setTimeout(() => {
-      translateStyle.value = ''
+      translateStyle.value = 0
     })
   }
 
