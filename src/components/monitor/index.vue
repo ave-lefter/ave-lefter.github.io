@@ -18,6 +18,10 @@
           <Icon name="mingcute:new-folder-fill" class="text-12px  mr-5px"/>
           {{ $t('bulkImport') }}
         </el-button>
+         <QuickBuyInput
+          v-model="quickBuyValue"
+          size="small"
+        />
       </div>
       <div
       v-loading="loading" class="text-12px" element-loading-background="transparent">
@@ -102,7 +106,12 @@
           <span/>
         </template>
         <template #cell-operate="{ row }">
-          <span>操作</span>
+          <QuickSwap
+            :quickBuyValue="quickBuyValue"
+            :row="{...row,...{target_token:row?.target_address,token0_address:row?.from_address,token1_address:row?.to_address,symbol:row?._target_Token?.symbol}}"
+            classNames="min-w-70px h-24px!"
+            mainNameVisible
+          />
         </template>
       </AveTable>
       </div>
@@ -112,9 +121,11 @@
 </template>
 
 <script setup lang="ts">
-import * as lodashEs from 'lodash-es'
+import {throttle} from 'lodash-es'
+import {useStorage} from '@vueuse/core'
 import BigNumber from 'bignumber.js'
 import { getHistoryMonitor} from '~/api/attention'
+import QuickBuyInput from './components/quickBuyInput.vue'
 import FilterType from './components/filterType.vue'
 import { defaultPaginationParams, downColor, upColor } from '@/utils/constants'
 import type {AveTable} from '#components'
@@ -133,6 +144,8 @@ const txType = ref([1,2])
 const addButtonRef = ref()
 const toggleMc = ref(false)
 const addFavAddressVisible = ref(false)
+
+const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const txTypeList=computed(() => {
   return [
     // { label: t('all'), value: 0 },
@@ -232,7 +245,7 @@ const mergeDataSource = (msg:any) => {
   }
 }
 
-const updateDateSource = lodashEs.throttle(function() {
+const updateDateSource = throttle(function() {
   if(!monitorVisible.value) return
   dataSource.value.splice(0, dataSource.value?.length, ...dataSourceCache.value)
 }, 500)
@@ -363,21 +376,21 @@ const formateTxInfo = function(item)  {
   }
   return data
 }
-function jumpBalance(item, e) {
+function jumpBalance(row, e) {
   if (e) {
     e.stopPropagation()
   }
-  const chain = item?.chain || 'eth'
-  const address = item?._marker?.maker_address || item?.wallet_address
+  const chain = row?.chain || 'eth'
+  const address = row?._marker?.maker_address || row?.wallet_address
   if (address) {
     navigateTo(`/address/${address}/${chain}`)
   }
 }
-function jumpToken(row) {
-  // if (e) {
-  //   e.stopPropagation()
-  // }
-  const addr = row?._target_Token?.address + '-' + row.chain
+function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
+  if (e) {
+    e.stopPropagation()
+  }
+  const addr = rowData?._target_Token?.address + '-' + rowData.chain
   navigateTo(`/token/${addr}`, {replace: true})
 }
 </script>

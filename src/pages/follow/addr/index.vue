@@ -502,7 +502,7 @@ import { throttle } from 'lodash-es'
 import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention } from '~/api/attention'
 import type { TableInstance } from 'element-plus'
 
-const { mode, lang, isDark } = storeToRefs(useGlobalStore())
+const { mode, isDark } = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
 const { currentAddress} = storeToRefs(useFollowStore())
 const $router = useRouter()
