@@ -1,120 +1,132 @@
 <template>
   <el-popover ref="popoverRef" :visible="monitorVisible" :width="720" placement="top" :persistent="true" :teleported="true" popper-class="" popper-style="">
     <div class="w-content">
-      <div class="m-op flex-start gap-8px">
-        <FilterType v-model="txType" :options="txTypeList" />
-        <Icon name="icon-park-solid:volume-notice"/>
-        <el-switch
-          v-model="hasRing"
-          size="small"
-          active-value="1"
-          inactive-value="0"/>
-        <pro-tag size="small" class="cursor-pointer" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
-        <el-button ref="addButtonRef" size="small" @click="()=>addFavAddressVisible=true" style="height: 20px;color: var(--d-999-l-222) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
-          <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
-          {{ $t('addWallet') }}
-        </el-button>
-        <el-button size="small" @click.stop.prevent="showBatchAddressDetails=true" style="height: 20px;color: var(--d-999-l-222) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
-          <Icon name="mingcute:new-folder-fill" class="text-12px  mr-5px"/>
-          {{ $t('bulkImport') }}
-        </el-button>
-         <QuickBuyInput
-          v-model="quickBuyValue"
-          size="small"
-        />
-      </div>
-      <div
-      v-loading="loading" class="text-12px" element-loading-background="transparent">
-      <AveTable
-        ref="aveTableRef"
-        rowKey="id"
-        :data="dataSource"
-        :columns="columns"
-        fixed
-        :style="{
-          height:'365px'
-        }"
-        row-class='cursor-pointer'
-        :rowEventHandlers="{
-        onClick: (row:any)=>jumpToken(row)
-      }"> 
-        <template #header-wallet>
-          <span>{{ $t('wallet') }}</span>
-        </template>
-        <template #cell-wallet="{ row }">
-            <UserRemark
-              :key="row._marker.maker_address" :address="row._marker.maker_address" :chain="row.chain" :remark="row.maker_alias || ''" :showIcon="true" :teleported="true" :wallet_logo="row.wallet_logo" iconSize="24px" :formatAddress="
-                  (address) =>
-                    address?.slice(0, 4) + '...' + address?.slice(-4)
-              "
-              @updateRemark="init"
-              @click="(e) => jumpBalance(row, e)" />
-        </template>
-         <template #header-type>
-          <span>{{ $t('type') }}</span>
-        </template>
-        <template #cell-type="{ row }">
-          <pro-tag :type="row._marker.isBuy?'success':'danger'"> {{ getTxType(row) }}</pro-tag>
-        </template>
-        <template #header-amount>
-          <span>{{ $t('value') }}</span>
-        </template>
-        <template #cell-amount="{ row }">
-          <span :class="getIsBuy(row)?`color-${upColor[0]}`:`color-${downColor[0]}`">
-            {{ !toggleMc? row?._main_Token?.amount+row?._main_Token?.symbol: row?._main_Token.total}}
-          </span>
-        </template>
-        <template #header-mc>
-          <span>{{ toggleMc? $t('price') : $t('mcap') }}</span>
-        </template>
-        <template #cell-mc="{ row }">
-          <span>{{ toggleMc? row?._target_Token?.price: row?._mc }}</span>
-        </template>
-        <template #header-time>
-          <span>{{ $t('time') }}</span>
-        </template>
-        <template #cell-time="{ row }">
-          <TimerCount
-              v-if="row?.time && Number(formatTimeFromNow(row?.time, true)) < 60"
-              :key="row?.time" :timestamp="row?.time" :end-time="60">
-              <template #default="{ seconds }">
-            <span v-if="seconds < 60" class="color-#FFA622 text-12px">
-              {{ seconds }}s
-            </span>
-                <span v-else class="color-[--d-999-l-666] text-12px">
-              {{ formatTimeFromNow(row?.time) }}
-            </span>
+      <el-tabs v-model="activeName" style="--el-border-color-light:#333333" @tab-click="handleClick" class="tabs">
+        <el-tab-pane :label="$t('walletManage')" :name="0" style="flex:auto;"/>
+        <el-tab-pane :label="$t('followed')" :name="1" style="flex:auto;">
+          <div
+          v-loading="loading" class="text-12px" element-loading-background="transparent">
+          <AveTable
+            ref="aveTableRef"
+            rowKey="id"
+            :data="dataSource"
+            :columns="columns"
+            fixed
+            :style="{
+              height:'365px'
+            }"
+            row-class='cursor-pointer'
+            :rowEventHandlers="{
+            onClick: (row:any)=>jumpToken(row)
+          }"> 
+            <template #header-wallet>
+              <span>{{ $t('wallet') }}</span>
+            </template>
+            <template #cell-wallet="{ row }">
+                <UserRemark
+                  :key="row._marker.maker_address" :address="row._marker.maker_address" :chain="row.chain" :remark="row.maker_alias || ''" :showIcon="true" :teleported="true" :wallet_logo="row.wallet_logo" iconSize="24px" :formatAddress="
+                      (address) =>
+                        address?.slice(0, 4) + '...' + address?.slice(-4)
+                  "
+                  @updateRemark="init"
+                  @click="(e) => jumpBalance(row, e)" />
+            </template>
+             <template #header-type>
+              <span>{{ $t('type') }}</span>
+            </template>
+            <template #cell-type="{ row }">
+              <pro-tag :type="row._marker.isBuy?'success':'danger'"> {{ getTxType(row) }}</pro-tag>
+            </template>
+            <template #header-amount>
+              <span>{{ $t('value') }}</span>
+            </template>
+            <template #cell-amount="{ row }">
+              <span :class="getIsBuy(row)?`color-${upColor[0]}`:`color-${downColor[0]}`">
+                {{ !toggleMc? row?._main_Token?.amount+row?._main_Token?.symbol: row?._main_Token.total}}
+              </span>
+            </template>
+            <template #header-mc>
+              <span>{{ toggleMc? $t('price') : $t('mcap') }}</span>
+            </template>
+            <template #cell-mc="{ row }">
+              <span>{{ toggleMc? row?._target_Token?.price: row?._mc }}</span>
+            </template>
+            <template #header-time>
+              <span>{{ $t('time') }}</span>
+            </template>
+            <template #cell-time="{ row }">
+              <TimerCount
+                  v-if="row?.time && Number(formatTimeFromNow(row?.time, true)) < 60"
+                  :key="row?.time" :timestamp="row?.time" :end-time="60">
+                  <template #default="{ seconds }">
+                <span v-if="seconds < 60" class="color-#FFA622 text-12px">
+                  {{ seconds }}s
+                </span>
+                    <span v-else class="color-[--d-999-l-666] text-12px">
+                  {{ formatTimeFromNow(row?.time) }}
+                </span>
+                  </template>
+                </TimerCount>
+                <div v-else class="color-[--d-999-l-666] text-12px">
+                  {{ formatTimeFromNow(row?.time) }}
+                </div>
+            </template>
+            <template #header-symbol>
+              <span>{{ $t('token') }}</span>
+            </template>
+            <template #cell-symbol="{ row }">
+              <TokenImg
+              :row="{
+                logo_url: row?._target_Token?.logo_url,
+                chain: row?.chain
+              }" token-class="w-16px h-16px [&&]:mr-4px" />
+                <span>{{ row?._target_Token?.symbol }}</span>
+                <img v-if="row?.amm=='pump'"  src="https://www.iconaves.com/signals/pump_king.png" style="width:12px;height:12px">
+            </template>
+            <template #header-operate>
+              <span/>
+            </template>
+            <template #cell-operate="{ row }">
+              <QuickSwap
+                :quickBuyValue="quickBuyValue"
+                :row="{...row,...{target_token:row?.target_address,token0_address:row?.from_address,token1_address:row?.to_address,symbol:row?._target_Token?.symbol}}"
+                classNames="min-w-70px h-24px!"
+                mainNameVisible
+              />
+            </template>
+          </AveTable>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane :name="activeName">
+          <template #label>
+            <div class="m-op flex-start gap-8px">
+              <template v-if="activeName===1">
+                <FilterType v-model="txType" :options="txTypeList" />
+                <Icon name="icon-park-solid:volume-notice"/>
+                <el-switch
+                  v-model="hasRing"
+                  size="small"
+                  active-value="1"
+                  inactive-value="0"/>
+                <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
               </template>
-            </TimerCount>
-            <div v-else class="color-[--d-999-l-666] text-12px">
-              {{ formatTimeFromNow(row?.time) }}
-            </div>
-        </template>
-        <template #header-symbol>
-          <span>{{ $t('token') }}</span>
-        </template>
-        <template #cell-symbol="{ row }">
-          <TokenImg
-          :row="{
-            logo_url: row?._target_Token?.logo_url,
-            chain: row?.chain
-          }" token-class="w-16px h-16px [&&]:mr-4px" />
-            <span>{{ row?._target_Token?.symbol }}</span>
-            <img v-if="row?.amm=='pump'"  src="https://www.iconaves.com/signals/pump_king.png" style="width:12px;height:12px">
-        </template>
-        <template #header-operate>
-          <span/>
-        </template>
-        <template #cell-operate="{ row }">
-          <QuickSwap
-            :quickBuyValue="quickBuyValue"
-            :row="{...row,...{target_token:row?.target_address,token0_address:row?.from_address,token1_address:row?.to_address,symbol:row?._target_Token?.symbol}}"
-            classNames="min-w-70px h-24px!"
-            mainNameVisible
-          />
-        </template>
-      </AveTable>
-      </div>
+              <el-button ref="addButtonRef" size="small" style="height: 20px;color: var(--d-999-l-222) !important;" :color="isDark?'#333':'#F2F2F2'" @click="()=>addFavAddressVisible=true" :dark="isDark" >
+                <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
+                {{ $t('addWallet') }}
+              </el-button>
+              <el-button size="small" :color="isDark?'#333':'#F2F2F2'" style="height: 20px;color: var(--d-999-l-222) !important; margin-left: 0px;" @click.stop.prevent="showBatchAddressDetails=true" :dark="isDark" >
+                <Icon name="mingcute:new-folder-fill" class="text-12px"/>
+                {{ $t('bulkImport') }}
+              </el-button>
+              <QuickBuyInput
+                v-if="activeName===1"
+                v-model="quickBuyValue"
+                size="small"
+              />
+          </div>
+          </template>
+        </el-tab-pane>
+      </el-tabs>
     </div>
   </el-popover>
   <addFavAddressPop :visible="addFavAddressVisible" :buttonRef="addButtonRef" @onConfirm="()=>addFavAddressVisible=false"/>
@@ -145,6 +157,8 @@ const addButtonRef = ref()
 const toggleMc = ref(false)
 const addFavAddressVisible = ref(false)
 
+const size=ref('large')
+const activeName=ref(0)
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const txTypeList=computed(() => {
   return [
@@ -424,6 +438,20 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
     color: var(--d-F5F5F5-l-333);
     .cell{
       /* line-height: 1.5; */
+    }
+  }
+}
+.tabs{
+  :deep() .el-tabs__nav.is-top{
+    width:100%;
+    .el-tabs__item{
+      padding: 0 12px;
+      &:last-child{
+        flex:1;
+        padding: 0;
+        justify-content: flex-end;
+        color:inherit;
+      }
     }
   }
 }

@@ -316,5 +316,6 @@
   "attentionTips": "* Necesita iniciar sesión en la billetera de bot para usar la función de dirección de monitoreo",
   "walletAddress": "Dirección de la billetera",
   "chain": "Cadena",
-  "placeholderPrefix1": "seleccione"
+  "placeholderPrefix1": "seleccione",
+  "walletManage": "Manejo de billetera"
 }

@@ -316,5 +316,6 @@
   "attentionTips": "* Precisa fazer login na carteira de bot para usar a função de endereço de monitoramento",
   "walletAddress": "Endereço da carteira",
   "chain": "Rede",
-  "placeholderPrefix1": "Selecione"
+  "placeholderPrefix1": "Selecione",
+  "walletManage": "Managem de carteira"
 }

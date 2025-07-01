@@ -311,5 +311,6 @@
   "attentionTips": "* İzleme adresi işlevini kullanmak için bot cüzdanına giriş yapmanız gerekiyor",
   "walletAddress": "Cüzdan adresi",
   "chain": "Blok zinciri",
-  "placeholderPrefix1": "Lütfen seçin"
+  "placeholderPrefix1": "Lütfen seçin",
+  "walletManage": "Cüzdan yönet"
 }

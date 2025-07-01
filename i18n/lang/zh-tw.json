@@ -761,5 +761,6 @@
   "walletGroup": "錢包分組",
   "walletAddress": "錢包地址",
   "chain": "鏈",
-  "placeholderPrefix1": "請選擇"
+  "placeholderPrefix1": "請選擇",
+  "walletManage": "錢包管理"
 }
