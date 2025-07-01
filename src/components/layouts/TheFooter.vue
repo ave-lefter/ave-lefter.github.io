@@ -19,7 +19,7 @@
       <div
         id="monitor"
         class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit"
-        @click="monitorVisible=!monitorVisible"
+        @click="visible=!visible"
       >
         <Icon
           name="mingcute:wallet-fill"
@@ -86,7 +86,6 @@
         </a>
       </li>
     </ul>
-    <Monitor/> 
     <Batch @refresh="()=>{}"/>
   </footer>
 </template>
@@ -95,7 +94,7 @@
 import { formatDec } from '~/utils/formatNumber'
 import { getTokensPrice } from '@/api/token'
 import { upColor, downColor } from '@/utils/constants'
-const {monitorVisible} = storeToRefs(useFollowStore())
+const {visible} = storeToRefs(useMonitorStore())
 const signalStore = useSignalStore()
 const globalStore = useGlobalStore()
 const { lang } = storeToRefs(globalStore)
