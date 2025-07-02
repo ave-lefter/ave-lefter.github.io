@@ -386,8 +386,8 @@ const mergeDataSource = (msg:any) => {
       }
     }) || []
     const list = [...wsData, ...data]
-    if (list.length > 100) {
-      list?.splice?.(50)
+    if (list.length > 200) {
+      list?.splice?.(100)
     }
     dataSourceCache.value.splice(0, dataSourceCache.value?.length, ...list)
     updateDateSource()
@@ -549,7 +549,7 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
   :deep() .el-table.el-table-v2{
     --el-table-header-bg-color: transparent;
     --el-table-tr-bg-color: transparent;
-    :deep() .el-table-v2__table{
+    .el-table-v2__table{
       --el-table-border:1px solid;
     }
   }
