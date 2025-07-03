@@ -796,5 +796,6 @@
   "ranking": "排名",
   "FirstAlert": "首次信号警报",
   "FilterTips": "过滤内容为左侧实时流",
-  "allChain": "全部链"
+  "allChain": "全部链",
+  "enable": "开启"
 }

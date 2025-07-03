@@ -15,12 +15,13 @@
       </el-button> 
     </div>
     <div v-loading="loading" class="text-12px m-table" element-loading-background="transparent">
+      <!-- @scroll="onScroll" -->
       <AveTable
         ref="aveTableRef"
         rowKey="id"
         fixed
         :data="dataSource"
-        :showFooter="!!footText"
+        :showFooter="showFooter"
         :footText="footText"
         :columns="columns"
         :headerHeight="36"
@@ -90,13 +91,13 @@
                 <Icon name="material-symbols-light:notifications-rounded" class="text-15px"/> 
                 <span>{{ $t('enableMonitor') }}</span>
               </div> -->
-              <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"
+              <div class="flex items-center mr-4px cursor-pointer color-[#666]"
                 @click="">
-                <Icon name="custom:monitor-icon" class="text-16px mr-2px" />
-                <span
+                <Icon name="custom:monitor-icon" :class="['text-14px mr-2px',(row?.is_monitored === 1)&&'color-[--d-FFF-l-333]' ]" />
+                <!-- <span
                   class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
                   {{ row?.is_monitored === 1 ? t('pause') : t('openMonitor') }}
-                </span>
+                </span> -->
               </div>
               <Icon name="bx:bxs-trash-alt" class="text-13px color-#666" />
             </div>
@@ -174,6 +175,7 @@ const pageData = ref({
   pageSize: 20
 })
 const paginationParams = ref({...defaultPaginationParams,pageSize: 20})
+const showFooter=ref(false)
 const footText = computed(() => {
   if(paginationParams.value.loaded){
     return t('loading')
@@ -196,10 +198,18 @@ function filterGroup(val: number, row: any) {
 }
 function loadMore(remainDistance:number){
   console.log('loadMore remainDistance', remainDistance, paginationParams.value)
+  showFooter.value=remainDistance <= 20
   if ((remainDistance <= 20) && !(paginationParams.value.loaded || paginationParams.value.finished)) {
     getTableList()
   }
 }
+// function onScroll(scrollParams:any) {
+//   console.log('onScroll', scrollParams)
+//   // showFooter.value = scrollParams.remainDistance <= 20
+//   // if (scrollParams.remainDistance <= 20 && !(paginationParams.value.loaded || paginationParams.value.finished)) {
+//   //   getTableList()
+//   // }
+// }
 watch([() => conditions], () => {
    paginationParams.value={...defaultPaginationParams,pageSize: 20}
    getTableList()
@@ -241,10 +251,12 @@ const getTableList = throttle(function() {
     setTimeout(() => {
       loading.value = false
       paginationParams.value.loaded = false
+      showFooter.value = false
     }, 200)
   })
 }, 500)
 const getRowGroupChange = async (val: number, row: any) => {
+  paginationParams.value={...defaultPaginationParams,pageSize: 20}
   await moveFavoriteGroup2({user_chain:row.user_chain, user_address:row.user_address, group:val})
   getTableList()
 }
@@ -286,7 +298,7 @@ const columns = computed(() => {
       dataKey: 'operate',
       key: 'operate',
       align: 'right',
-      minWidth: 80,
+      minWidth: 40,
     }]
 })
 

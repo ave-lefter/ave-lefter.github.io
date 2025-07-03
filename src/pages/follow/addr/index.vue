@@ -478,7 +478,7 @@
             <a class="flex items-center"
               :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`" target="_blank">
               <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
-              {{ t('documentation') }}
+              {{ t('copyTrade') }}
             </a>
             <!-- 监控 -->
             <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"
@@ -486,7 +486,7 @@
               <Icon name="custom:monitor-icon" class="text-16px mr-2px" />
               <span
                 class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
-                {{ row?.is_monitored === 1 ? t('pause') : t('openMonitor') }}
+                {{ row?.is_monitored === 1 ? t('pause') : t('enable') }}
               </span>
             </div>
             <div class="flex items-center mr-12px color-[#666] cursor-not-allowed" v-else>
@@ -616,12 +616,16 @@ function handleConfirmEdit(currentEditGroup: number, remark:string) {
   })
 }
 function handleAddGroup(name:string) {
-   addFavoriteGroup2(name).then(() => {
-    ElMessage.success(t('success'))
-    followStore.getUserFavoriteGroups2()
-  }).catch((e) => {
-     ElMessage.error(String(e))
-  })
+   if(followStore.addressGroups.map(i=>i.name).includes(name)){
+    ElMessage.error(t('groupExistT'))
+  }else{
+    addFavoriteGroup2(name).then(() => {
+     ElMessage.success(t('success'))
+     followStore.getUserFavoriteGroups2()
+   }).catch((e) => {
+      ElMessage.error(String(e))
+   })
+  }
 }
 function handleDelGroup(groupId: number) {
   // visible.value = false

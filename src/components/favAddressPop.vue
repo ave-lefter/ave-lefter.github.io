@@ -1,11 +1,13 @@
 <template>
   <el-popover ref="popoverRef" v-model:visible="visible" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" :teleported="true" popper-class="" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" @before-leave="reset">
-    <el-form ref="formRef" :model="form" :rules="rules" @submit.prevent.stop="handleSubmit(formRef)">
+    <el-form ref="formRef" :model="form" :rules="rules" hide-required-asterisk @submit.prevent.stop="handleSubmit(formRef)">
       <el-form-item prop="group_id" required label-position="top" size="large" class="mb-20px!">
-        <el-radio-group v-model="form.group_id" class="flex flex-col items-start" style="align-items: flex-start;">
-            <el-radio :key="0" :value="0">{{ t('defaultGroup') }}</el-radio>
-            <el-radio v-for="item in followStore.addressGroups" :key="item.group_id" :value="item.group_id">{{ item.name }}</el-radio>
-        </el-radio-group>
+        <el-scrollbar height="274px">
+          <el-radio-group v-model="form.group_id" class="flex flex-col items-start w-100%" style="align-items: flex-start; ">
+              <el-radio :key="0" :value="0" class="w-100%">{{ t('defaultGroup') }}</el-radio>
+              <el-radio v-for="item in followStore.addressGroups" :key="item.group_id" :value="item.group_id" class="w-100%">{{ item.name }}</el-radio>
+          </el-radio-group>
+        </el-scrollbar>
       </el-form-item>
       <el-form-item>
         <el-button v-if="!isAdd" type="primary" class="w-100% text-12px" size="default" :icon="CirclePlusFilled" @click="isAdd = true"> {{ t('newGroup') }}</el-button>
@@ -53,8 +55,9 @@
  * }
  * 
  */
+import { CirclePlusFilled } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { CirclePlusFilled} from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { addFavoriteGroup2 } from '~/api/attention'
 const { t } = useI18n()
 const {lang} = storeToRefs(useGlobalStore())
@@ -149,14 +152,19 @@ function handleCancelEdit() {
   isAdd.value = false
 }
 function handleConfirmEdit(groupName:string) {
-  addFavoriteGroup2(groupName).then(() => {
-    ElMessage.success(t('success'))
-    followStore.getUserFavoriteGroups2()
-  }).catch((e) => {
-     ElMessage.error(String(e))
-  }).finally(() => {
-    isAdd.value = false
-  })
+  if(followStore.addressGroups.map(i=>i.name).includes(groupName)){
+    ElMessage.error(t('groupExistT'))
+  }else{
+    addFavoriteGroup2(groupName).then(() => {
+      ElMessage.success(t('success'))
+      followStore.getUserFavoriteGroups2()
+    }).catch((e) => {
+       ElMessage.error(String(e))
+    }).finally(() => {
+      isAdd.value = false
+      addGroupName.value = ''
+    })
+  }
   // emit('onConfirm', currentEditGroup.value, groupName.value)
 }
 function reset() {
@@ -198,6 +206,9 @@ function reset() {
   &:hover {
     box-shadow: 0 0 0 1px #3F80F7 inset;
   }
+}
+:deep() .el-scrollbar{
+  width:100%
 }
 </style>
 
