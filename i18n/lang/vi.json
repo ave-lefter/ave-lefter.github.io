@@ -497,5 +497,6 @@
   "walletAddress": "Địa chỉ ví",
   "chain": "Chuỗi",
   "placeholderPrefix1": "Vui lòng chọn",
-  "walletManage": "Quản lý ví"
+  "walletManage": "Quản lý ví",
+  "allChain": "Tất cả chuỗi"
 }

@@ -7,13 +7,14 @@
         class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2]"
     />
     <el-tabs v-model="activeName" style="--el-border-color-light:#333333" class="tabs" @tab-change="handleClick">
-      <el-tab-pane :label="$t('walletManage')" :name="0">
+      <el-tab-pane :label="$t('walletManage')" :name="0" lazy>
           <!-- <el-button size="small" :color="isDark?'#333':'#F2F2F2'" style="height: 20px;color: var(--d-999-l-222) !important; margin-left: 0px;" @click.stop.prevent="showBatchAddressDetails=true" :dark="isDark" >
               <Icon name="mingcute:new-folder-fill" class="text-12px"/>
               {{ $t('bulkImport') }}
             </el-button> -->
+          <WalletManage v-bind="walletManageProps"/>
       </el-tab-pane>
-      <el-tab-pane :label="$t('followed')" :name="1" >
+      <el-tab-pane :label="$t('followed')" :name="1" lazy>
         <div
           v-if="props.isLarge"
           v-loading="loading" class="text-12px m-table" element-loading-background="transparent">
@@ -25,7 +26,7 @@
             fixed
             :style="{
               height:props.scrollHeight+'px',
-              '--el-table-border':'1px solid var(--d-333-l-666)'
+              '--el-table-border':'1px solid #333'
               // height:'500px',
             }"
             headerClass="bg-transparent"
@@ -42,8 +43,8 @@
                       (address) =>
                         address?.slice(0, 4) + '...' + address?.slice(-4)
                   "
-                  @updateRemark="init"
-                  @click="(e) => jumpBalance(row, e)" />
+                  @updateRemark="init2"
+                  @click="(e: any) => jumpBalance(row, e)" />
             </template>
             <template #header-type>
               <span>{{ $t('type') }}</span>
@@ -125,7 +126,7 @@
             :style="{
               height:props.scrollHeight+'px',
               // height:'500px',
-              '--el-table-border':'1px solid var(--d-333-l-666)'
+              '--el-table-border':'1px solid #333'
             }"
             row-class='cursor-pointer'
             :rowEventHandlers="{
@@ -157,8 +158,8 @@
                         (address) =>
                           address?.slice(0, 4) + '...' + address?.slice(-4)
                     "
-                    @updateRemark="init"
-                    @click="(e) => jumpBalance(row, e)" />
+                    @updateRemark="init2"
+                    @click="(e: any) => jumpBalance(row, e)" />
                     <QuickSwap
                       :quickBuyValue="quickBuyValue"
                       :row="{...row,...{target_token:row?.target_address,token0_address:row?.from_address,token1_address:row?.to_address,symbol:row?._target_Token?.symbol}}"
@@ -240,6 +241,7 @@
 </template>
 
 <script setup lang="ts">
+import WalletManage from './walletManage.vue'
 import {throttle} from 'lodash-es'
 import {useStorage} from '@vueuse/core'
 import BigNumber from 'bignumber.js'
@@ -264,7 +266,6 @@ const props = defineProps({
   }
 })
 
-
 const dataSource = ref<any[]>([])
 const dataSourceCache = ref<any[]>([])
 const loading=ref(false)
@@ -286,6 +287,12 @@ const txTypeList=computed(() => {
     { label: t('sell'), value: 2 },
   ]
 })
+
+const walletManageProps=computed(() => {
+  return {
+    scrollHeight: props.scrollHeight,
+  }
+})
 onMounted(async () => {
   console.log('monitor mounted')
   init()
@@ -303,7 +310,7 @@ watch(() => monitorStore.visible, (val) => {
   }
 })
 
-function handleClick(name: number) {
+function handleClick(name: number|string) {
   if(name===1){
     updateDateSource()
   }
@@ -379,7 +386,7 @@ const mergeDataSource = (msg:any) => {
     const data = dataSourceCache?.value || []
     const wsData = msg?.filter?.((i: { id: any }) => {
       return !data.some(j => j.id === i.id)
-    })?.map?.(i => {
+    })?.map?.((i: any) => {
       return {
         ...i,
         ...formateTxInfo(i)
@@ -410,6 +417,9 @@ watch(()=>botStore.evmAddress, (val) => {
   }
 })
 function init() {
+  init2()
+}
+function init2() {
   if(!botStore.evmAddress) return
   loading.value = true
   getHistoryMonitor({}).then((res) => {
@@ -435,8 +445,9 @@ function init() {
   }).finally(() => {
     loading.value = false
   })
+  
 }
-function getIsBuy(item) {
+function getIsBuy(item: { position_type?: string | number; tx_type?: string | number }) {
   // console.log('item', item)
   if (item.position_type !== undefined) {
     return item.position_type === 0 || item.position_type === 1
@@ -444,17 +455,17 @@ function getIsBuy(item) {
     return item.tx_type === 0
   }
 }
-function getTxType(item) {
+function getTxType(item: { position_type?: string | number; tx_type?: string | number }) {
   if (item.position_type !== undefined) {
     const types = [t('createPosition'), t('addPosition'), t('reducePosition'), t('closePosition')]
-    return types?.[item?.position_type] || ''
+    return types?.[Number(item?.position_type)] || ''
   } else {
     const types = [t('buy'), t('sell')]
-    return types?.[item.tx_type] || ''
+    return types?.[Number(item.tx_type)] || ''
   }
 }
 
-const formateTxInfo = function(item)  {
+const formateTxInfo = function(item: { [x: string]: any; maker_address?: any; wallet_address?: any; maker_alias?: any; maker_logo?: any; maker_tags?: any; pnl_usd?: any; pnl_ratio?: any; target_mcap?: any; position_type?: string | number | undefined; tx_type?: string | number })  {
   // const {
     // from_address = '',
     // from_symbol = '',
@@ -486,7 +497,7 @@ const formateTxInfo = function(item)  {
     // target_mcap='', // 主币市值，
   // } = item
   const isBuy = getIsBuy(item)
-  const data = {
+  const data: any = {
     ...item,
     _marker: {
       maker_address: item?.maker_address || item?.wallet_address,
@@ -525,7 +536,7 @@ const formateTxInfo = function(item)  {
   }
   return data
 }
-function jumpBalance(row, e) {
+function jumpBalance(row: { chain: string; _marker: { maker_address: any }; wallet_address: any }, e: { stopPropagation: () => void }) {
   if (e) {
     e.stopPropagation()
   }
@@ -549,12 +560,20 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
   :deep() .el-table.el-table-v2{
     --el-table-header-bg-color: transparent;
     --el-table-tr-bg-color: transparent;
-    .el-table-v2__table{
+    /* .el-table-v2__table{
       --el-table-border:1px solid;
-    }
+    } */
   }
 }
 .tabs{
+  --el-color-primary:var(--d-F5F5F5-l-333);
+  --el-text-color-primary:var(--d-666-l-999);
+  :deep() .el-tabs__item:hover{
+    color:var(--d-666-l-999);
+    &.is-active{
+      color:var(--d-F5F5F5-l-333);
+    }
+  }
   :deep() .el-tabs__header{
     margin-bottom: 0;
   }

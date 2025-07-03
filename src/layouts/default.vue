@@ -101,7 +101,7 @@
       :initial-height="monitorStore.monitorBoundingRect.height"
       :x="monitorStore.monitorBoundingRect.x"
       :y="monitorStore.monitorBoundingRect.y"
-      :min-width="lang.indexOf('zh')>-1?280:333"
+      :min-width="lang.indexOf('zh')>-1?360:360"
       :min-height="160"
       :parent="true"
       :handles="[
@@ -124,11 +124,11 @@
     <Draggable
       v-if="monitorStore.isLeftFixed&&monitorStore.visible"
       class="[&&]:relative shrink-0 left fixed! top-64px"
-      :style="`left:${(signalStore.isLeftFixed&&signalStore.signalVisible)?signalStore.fixedWidth+4:0}px`"
+      :style="`left:${(signalStore.isLeftFixed&&signalStore.signalVisible)?signalStore.fixedWidth+1:0}px`"
       :axis="'x'"
       :x="0"
-      :min-width="lang.indexOf('zh')>-1?280:333"
-      :max-width="360"
+      :min-width="lang.indexOf('zh')>-1?360:360"
+      :max-width="438"
       :initial-width="monitorStore.fixedWidth"
       :initial-height="monitorStore.winHeight-95"
       :parent="true"
@@ -142,15 +142,15 @@
       <Monitor :scroll-height="monitorStore.winHeight-160" />
     </Draggable>
     <template v-if="signalStore.isRightFixed&&signalStore.signalVisible">
-      <div v-if="monitorStore.isRightFixed&&monitorStore.visible" class="absolute left-0 top-0 h-100% flex z-auto select-auto" :style="{width: monitorStore.winWidth-((signalStore.isRightFixed&&signalStore.signalVisible)?signalStore.fixedWidth+4:0)+'px'}" >
+      <div v-if="monitorStore.isRightFixed&&monitorStore.visible" class="absolute left-0 top-0 h-100% flex z-auto select-auto" :style="{width: monitorStore.winWidth-((signalStore.isRightFixed&&signalStore.signalVisible)?signalStore.fixedWidth+1:0)+'px'}" >
         <Draggable
           v-if="monitorStore.isRightFixed&&monitorStore.visible"
           class="[&&]:relative shrink-0 right fixed! top-64px left-0"
           :axis="'x'"
-          :x="monitorStore.winWidth-monitorStore.fixedWidth-((signalStore.isRightFixed&&signalStore.signalVisible)?signalStore.fixedWidth+4:0)"
-          :min-width="lang.indexOf('zh')>-1?280:333"
+          :x="monitorStore.winWidth-monitorStore.fixedWidth-((signalStore.isRightFixed&&signalStore.signalVisible)?signalStore.fixedWidth+1:0)"
+          :min-width="lang.indexOf('zh')>-1?360:360"
           :parent="true"
-          :max-width="360"
+          :max-width="438"
           :initial-width="monitorStore.fixedWidth"
           :initial-height="monitorStore.winHeight-95"
           :handles="[
@@ -169,9 +169,9 @@
       class="[&&]:relative shrink-0 right fixed! top-64px left-0"
       :axis="'x'"
       :x="monitorStore.winWidth-monitorStore.fixedWidth"
-      :min-width="lang.indexOf('zh')>-1?280:333"
+      :min-width="lang.indexOf('zh')>-1?360:360"
       :parent="true"
-      :max-width="360"
+      :max-width="438"
       :initial-width="monitorStore.fixedWidth"
       :initial-height="monitorStore.winHeight-95"
       :handles="[
@@ -202,16 +202,16 @@
     if(monitorStore.visible||signalStore.signalVisible){
       if(signalStore.signalVisible){
         if(signalStore.isLeftFixed){
-          paddingLeft+=signalStore.fixedWidth+4
+          paddingLeft+=signalStore.fixedWidth+1
         }else if(signalStore.isRightFixed){
-          paddingRight+=signalStore.fixedWidth+4
+          paddingRight+=signalStore.fixedWidth+1
         }
       }
       if(monitorStore.visible){
         if(monitorStore.isLeftFixed){
-          paddingLeft+=monitorStore.fixedWidth+4
+          paddingLeft+=monitorStore.fixedWidth+1
         }else if(monitorStore.isRightFixed){
-          paddingRight+=monitorStore.fixedWidth+4
+          paddingRight+=monitorStore.fixedWidth+1
         }
       }
       return {

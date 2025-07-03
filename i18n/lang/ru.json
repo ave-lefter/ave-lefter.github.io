@@ -497,5 +497,6 @@
   "walletAddress": "Адрес кошелька",
   "chain": "Сеть",
   "placeholderPrefix1": "Пожалуйста, выберите",
-  "walletManage": "Управление кошельком"
+  "walletManage": "Управление кошельком",
+  "allChain": "Все сети"
 }

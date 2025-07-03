@@ -793,5 +793,6 @@
   "walletAddress": "Wallet Address",
   "chain": "Chain",
   "placeholderPrefix1": "please select",
-  "walletManage": "Wallet Manage"
+  "walletManage": "Wallet Manage",
+  "allChain": "All Chains"
 }

@@ -50,18 +50,18 @@
             class="flex flex-col mb-12px"
             tag="ul"
             v-model="sortOptions"
-            v-bind="{ animation: 200}"
+            v-bind="{ animation: 300}"
             @start="drag = true"
             @end="drag = false"
             item-key="show_index"
           >
-            <transition-group type="transition" name="flip-list">
-              <li v-for="item in sortOptions" :key="item.show_index" class="flex-between px-12px py-8px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
-              >
-                <span>{{ item.name }}</span>
-                <Icon name="material-symbols:dehaze"/>
-              </li>
-            </transition-group>
+          <li v-for="item in sortOptions" :key="item.show_index" class="flex-between py-12px px-8px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
+          >
+            <span>{{ item.name }}</span>
+            <Icon name="material-symbols:dehaze" class="text-16px"/>
+          </li>
+            <!-- <transition-group type="transition" name="flip-list">
+            </transition-group> -->
           </VueDraggableNext>
           <div class="flex-between w-100%">
             <el-button style="background: var(--d-333-l-F2F2F2);--el-border:none" class="flex-1" @click.stop.prevent="()=>popoverRef2?.hide?.()">{{ $t('cancel') }}</el-button>

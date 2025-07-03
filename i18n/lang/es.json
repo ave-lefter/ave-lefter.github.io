@@ -317,5 +317,6 @@
   "walletAddress": "Dirección de la billetera",
   "chain": "Cadena",
   "placeholderPrefix1": "seleccione",
-  "walletManage": "Manejo de billetera"
+  "walletManage": "Manejo de billetera",
+  "allChain": "Todas las cadenas"
 }

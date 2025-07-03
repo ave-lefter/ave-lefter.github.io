@@ -12,7 +12,7 @@ export const useMonitorStore = defineStore('monitor', () => {
   const {width: winWidth, height: winHeight} = useWindowSize()
   const isLeftFixed = useStorage('isMonitorLeft', false)
   const isRightFixed = useStorage('isMonitorRight', false)
-  const fixedWidth = useStorage('monitorFixedWidth', 333)
+  const fixedWidth = useStorage('monitorFixedWidth', 360)
 
   const translateStyle = shallowRef(0)
   const onDrag = useThrottleFn((x: number) => {

@@ -317,5 +317,6 @@
   "walletAddress": "Endereço da carteira",
   "chain": "Rede",
   "placeholderPrefix1": "Selecione",
-  "walletManage": "Managem de carteira"
+  "walletManage": "Managem de carteira",
+  "allChain": "Todas as Redes"
 }

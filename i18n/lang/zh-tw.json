@@ -779,5 +779,6 @@
   "walletAddress": "錢包地址",
   "chain": "鏈",
   "placeholderPrefix1": "請選擇",
-  "walletManage": "錢包管理"
+  "walletManage": "錢包管理",
+  "allChain": "全部鏈"
 }

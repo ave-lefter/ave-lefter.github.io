@@ -17,6 +17,14 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  showFooter: {
+    type: Boolean,
+    default: false
+  },
+  footText: {
+    type: String,
+    default: ''
+  },
   rowHeight:{
     type: Number,
     default: 50
@@ -36,7 +44,9 @@ const props = defineProps({
   loading: Boolean,
   fixed: Boolean,
 })
-
+const emits = defineEmits<{
+  (e: 'endReached', value: number): void
+}>()
 const slots = useSlots()
 const attrs = useAttrs()
 const themeStore = useThemeStore()
@@ -141,6 +151,7 @@ function calculateColumnWidths() {
         v-bind="attrs"
         :fixed="fixed"
         :row-height='rowHeight'
+        @end-reached="remainDistance=> emits('endReached', remainDistance)"
       >
         <template v-for="(slotFn, slotName) in defaultSlots" #[slotName]="slotProps">
           <slot :name="slotName" v-bind="slotProps"/>
@@ -156,6 +167,11 @@ function calculateColumnWidths() {
             >
               {{ emptyText || t('emptyNoData') }}
             </span>
+          </div>
+        </template>
+        <template v-if="data.length >0 && showFooter" #footer>
+          <div class="text-center px-0 pt-15px pb-10px text-12px text-[#959a9f] bg-[--d-111-l-FFF] ">
+              {{ footText || t('loading') }}
           </div>
         </template>
       </ElTableV2>

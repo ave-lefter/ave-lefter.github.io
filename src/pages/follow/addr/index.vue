@@ -21,7 +21,7 @@
     </div>
     <div class="m-table w-100%">
       <el-table
-      ref="tableRef" v-loading="loading" class='mt-12px' :data="dataSource"  fixed
+      ref="tableRef" v-loading="loading" class='mt-12px' :data="dataSource"  fixed row-class-name="group"
       @sort-change="handleSortChange" @row-click="tableRowClick">
         <template #empty>
           <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
@@ -119,8 +119,12 @@
               <div>
               <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 95px" iconEditColor="#999" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" @updateRemark="({remark}) => row.remark = remark"/>
                 <div class="font_10 color-icon flex-start mt_4" style="line-height: 1">
-                  <i 
-                  v-copy="row.user_address" class="iconfont icon-copy text-12px fav-icon-color" @click.stop/>
+                  <Icon
+                    v-copy="row.user_address"
+                    name="bxs:copy"
+                    class="text-10px cursor-pointer color-[--d-666-l-999]"
+                    @click.stop.prevent
+                  />
                   <div v-if="row?.extra?.length > 0" class="media-list flex-start">
                     <template v-for="(item, index) in row?.extra" :key="index">
                       <div
@@ -468,17 +472,26 @@
           </el-select>
         </template>
       </el-table-column>
-       <el-table-column :label="t('push')" align="right" width="120">
+       <el-table-column :label="t('push')" align="right" width="150">
         <template #default="{ row }">
-          <div @click.stop>
-            <!-- <div>
-              <Icon name="material-symbols-light:notifications-rounded"/> 
-              <span>{{ $t('pauseMonitor') }}{{ $t('enableMonitor') }}</span>
-            </div> -->
-            <a class="decoration-none flex-end gap-4px" style="text-decoration: none;" :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`"  target="_blank">
-                <Icon name="mingcute:wallet-fill" class="text-12px"/> 
-                <span>{{ $t('copyTrade') }}</span>
+          <div class="flex flex-row-reverse" @click.stop>
+            <a class="flex items-center"
+              :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`" target="_blank">
+              <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
+              {{ t('documentation') }}
             </a>
+            <!-- 监控 -->
+            <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"
+              @click="handleMonitor(row)" v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'">
+              <Icon name="custom:monitor-icon" class="text-16px mr-2px" />
+              <span
+                class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
+                {{ row?.is_monitored === 1 ? t('pause') : t('openMonitor') }}
+              </span>
+            </div>
+            <div class="flex items-center mr-12px color-[#666] cursor-not-allowed" v-else>
+              <Icon name="custom:monitor-icon" class="text-16px mr-2px " />
+            </div>
           </div>
         </template>
       </el-table-column>
@@ -487,8 +500,17 @@
         v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="mt-20px"
         layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" />
     </div>
+     <el-tooltip
+      ref="tooltipRef1"
+      :visible="toolTipTagVisible"
+      :content="toolTipTagContent"
+      placement="top"
+      :popper-class="mode"
+      effect="customized"
+      :virtual-ref="buttonTagRef || undefined"
+      virtual-triggering
+    />
   </div>
-
 </template>
 
 <script setup lang="ts">
@@ -512,7 +534,7 @@ const { addressGroups } = storeToRefs(useFollowStore())
 const visible = ref(false)  
 const visible2 = ref(false)  
 const searchKeyword= ref('')
-const buttonTagRef = ref<EventTarget | null>(null)
+const buttonTagRef = ref<HTMLElement | undefined>(undefined)
 const toolTipTagVisible = ref(false)
 const toolTipTagContent = ref('')
 const addButtonRef = ref()
