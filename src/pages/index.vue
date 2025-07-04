@@ -5,7 +5,7 @@ import CategoryTabs from "./components/categoryTabs.vue";
 </script>
 
 <template>
-  <div class="flex gap-16px">
+  <div class="flex gap-16px w-full">
     <ChainsSelect/>
     <CategoryTabs/>
   </div>

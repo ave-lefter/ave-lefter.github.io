@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <el-select>
+  <el-select class="[&&]:w-120px">
     <el-option>123</el-option>
   </el-select>
 </template>
