@@ -24,12 +24,13 @@ const themeStore = useThemeStore()
 
 function getGradientBackground(history_count: number) {
   if (history_count >= 5) {
-    if (themeStore.isDark) {
-      return 'bg-[linear-gradient(273.55deg,#12B88633_1.62%,#12B88699_99.73%)]'
-    }
-    return 'bg-[linear-gradient(273.55deg,#12B886_1.62%,#12B88699_99.73%)] color-#FFF'
+    return themeStore.isDark
+      ? 'bg-[linear-gradient(287.62deg,#8B4FDD_12.05%,#12B886_87.95%)]'
+      : 'bg-[linear-gradient(260.98deg,#8B4FDD_6.85%,#12B886_85.21%)] color-#FFF'
   }
-  return 'bg-[--d-12B8861A-l-12B8862A]'
+  return themeStore.isDark
+    ? 'bg-[linear-gradient(287.62deg,#8B4FDD2A_12.05%,#12B8862A_87.95%)]'
+    : 'bg-[linear-gradient(260.98deg,#8B4FDD2A_6.85%,#12B8862A_85.21%)]'
 }
 
 const increasedOrDecreased = computed(() => {
@@ -90,10 +91,10 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
                 @click="navigateTo(`/token/${item.token}-${item.chain}`)"
               >{{ item.symbol }}</span>
               <div
+                  v-if="item.issue_platform"
                 class="mr-4px w-12px h-12px rounded-2px bg-[--d-1A1A1A-l-F2F2F2] flex items-center justify-center">
                 <img
-                  v-if="item.issue_platform"
-                  v-tooltip="item.issue_platform"
+                    v-tooltip="item.issue_platform"
                   :src="formatIconTag(item.issue_platform)"
                   width="10"
                   height="10"
@@ -198,10 +199,10 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
           class="flex items-center color-[--d-666-l-999] text-12px"
         >
           <div
-            v-tooltip="$t('FilterCurrentToken')"
+            v-tooltip="filterToken?$t('CancelFilter'):$t('FilterCurrentToken')"
             class="mr-8px w-12px h-12px rounded-2px bg-[--d-1A1A1A-l-F2F2F2] flex items-center justify-center hover:color-[--d-F5F5F5-l-333] cursor-pointer"
             :class="filterToken===item.token ? 'color-[--d-F5F5F5-l-333]':''"
-            @click="filter(filterToken?'':item.token)"
+            @click="filter(filterToken?'':item.token);"
           >
             <Icon name="custom:filter"/>
           </div>
@@ -274,7 +275,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
         <div class="flex-[2] flex items-center">
           <UserAvatar
             icon-size="24px"
-            :wallet_logo="{logo:wallet_logo}"
+            :wallet_logo="{logo:wallet_logo,name:wallet_alias}"
             :address="wallet_address"
             :chain="activeChain"
           />
@@ -284,12 +285,12 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
         </div>
         <div class="flex-[2] text-right color-#12B886">
           {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : '' }}{{ formatNumber(quote_token_amount, 2) }} {{
-            quote_token_symbol
+            quote_token_symbol.toUpperCase() === 'USDC' ? 'U' : quote_token_symbol
           }}<span class="color-[--d-999-l-666]">(${{ formatNumber(quote_token_volume, 0) }})</span>
         </div>
         <div class="flex-1 text-right" v-if="!filterToken">
             <span
-              v-if="Number(token_balance_usd)===0"
+              v-if="!token_balance_usd || Number(token_balance_usd)===0"
               class="color-#F6465D"
             >
               {{ $t('soldAll') }}

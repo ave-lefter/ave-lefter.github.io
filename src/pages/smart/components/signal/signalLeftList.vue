@@ -34,9 +34,7 @@ defineExpose({
     if (queryParams) {
       tempQueryParams.value = queryParams
     }
-    listData.value = []
-    pageParams.value.pageNO = 1
-    fetchSignalList()
+    resetAndGet()
   },
   setSelectId: (val: undefined) => {
     selectId.value = val
@@ -46,11 +44,7 @@ defineExpose({
   }
 })
 watch(() => props.activeChain, () => {
-  listData.value = []
-  pageParams.value.pageNO = 1
-  listStatus.value.finished = false
-  listStatus.value.error = false
-  fetchSignalList()
+  resetAndGet()
 })
 
 async function fetchSignalList() {
@@ -84,15 +78,28 @@ async function fetchSignalList() {
   }
 }
 
+const localStore = useLocaleStore()
+watch(() => localStore.locale, () => {
+  resetAndGet()
+})
+
+function resetAndGet() {
+  listData.value = []
+  pageParams.value.pageNO = 1
+  listStatus.value.finished = false
+  listStatus.value.error = false
+  fetchSignalList()
+}
+
 let hideTimer: number | NodeJS.Timeout
 const buttonRef = ref<null | HTMLElement>(null)
-const currentActions = shallowRef<IActionItem[]>([])
+const currentSignal = shallowRef<GetSignalV2ListResponse>({})
 
 const popVisible = shallowRef(false)
 
-function showPopover(e: MouseEvent, actions: IActionItem[]) {
+function showPopover(e: MouseEvent, item: GetSignalV2ListResponse) {
   buttonRef.value = e.currentTarget as HTMLElement | null
-  currentActions.value = actions || []
+  currentSignal.value = item
   popVisible.value = true
 }
 
@@ -146,7 +153,7 @@ function filterCallback(el: GetSignalV2ListResponse) {
 }
 
 const canDrag = shallowRef(false)
-const width = useStorage('signalLefWid', 546)
+const width = useStorage('signalLefWid', 536)
 
 function drag(e: MouseEvent) {
   let dx = e.clientX
@@ -160,7 +167,7 @@ function drag(e: MouseEvent) {
     const _width = clientX < dx
       ? width.value - (dx - clientX)
       : width.value + clientX - dx
-    if (_width >= 546 && _width <= 700) {
+    if (_width >= 536 && _width <= 700) {
       width.value = _width
     }
     dx = clientX
@@ -179,6 +186,30 @@ const emit = defineEmits(['setToken'])
 function selectSignal(id: number, token: string) {
   selectId.value = id
   emit('setToken', token)
+}
+
+const tokenDetailSStore = useTokenDetailsStore()
+
+function openTokenDetail(el: IActionItem) {
+  tokenDetailSStore.$patch({
+    drawerVisible: true,
+    tokenInfo: {
+      id: currentSignal.value.token + '-' + props.activeChain,
+      symbol: currentSignal.value.symbol,
+      logo_url: currentSignal.value.logo,
+      chain: props.activeChain,
+      address: currentSignal.value.token,
+      remark: ''
+    },
+    pairInfo: {
+      target_token: currentSignal.value.token,
+      token0_address: el.quote_token_address,
+      token0_symbol: el.quote_token_symbol,
+      token1_symbol: currentSignal.value.symbol,
+      pairAddress: ''
+    },
+    user_address: el.wallet_address
+  })
 }
 </script>
 
@@ -228,7 +259,7 @@ function selectSignal(id: number, token: string) {
           <div class="mb-22px flex justify-between">
             <div class="flex items-center gap-8px">
               <div
-                class="flex items-center gap-4px relative ml--20px p-6px h-26px color-#FFF lh-14px rounded-r-3px rounded-b-3px bg-#333"
+                  class="flex items-center gap-4px relative ml--20px p-6px h-26px color-#FFF lh-14px rounded-rt-3px rounded-rb-3px bg-#333"
               >
                 <span
                   class="absolute bottom--4px left--4px w-0 h-0 border-t-solid border-t-4px border-t-transparent border-r-4px border-r-solid border-r-transparent border-l-4px border-l-solid border-l-#333 transform-scale-x-[-1] transform-scale-y-[-1]"
@@ -238,7 +269,7 @@ function selectSignal(id: number, token: string) {
               </div>
               <div
                 class="flex items-center gap-4px px-8px py-6px rounded-4px h-26px text-12px lh-12px color-#12B886 bg-#12B8861A"
-                @mouseenter.stop="showPopover($event,filterSignalList[index].actions)"
+                @mouseenter.stop="showPopover($event,filterSignalList[index])"
                 @mouseleave.stop="scheduleHide"
               >
                 <img class="w-14px h-14px rounded-full" :src="formatIconTag(tag)" alt="">
@@ -377,7 +408,7 @@ function selectSignal(id: number, token: string) {
                 {{ $t('MaximumIncrease') }}
               </div>
               <div
-                class="p-8px min-w-67px text-center rounded-tl-2 rounded-br-[10px] text-[32px] leading-[24px] text-white font-500 bg-[linear-gradient(73.74deg,_#8B4FDD_9.69%,_#12B886_91.69%)]"
+                class="p-8px min-w-67px text-center rounded-tl-2 rounded-br-[10px] text-[32px] leading-[24px] text-white font-500 bg-#12B886"
               >
                 {{ Number(max_price_change) < 1 ? '<1' : Math.ceil(Number(max_price_change)) + 'X' }}
               </div>
@@ -510,9 +541,10 @@ function selectSignal(id: number, token: string) {
           quote_token_symbol,
           quote_token_volume,
           action_time
-        },idx) in currentActions"
+        },idx) in currentSignal.actions"
           :key="idx"
-          class="flex color-[--d-999-l-666] text-12px lh-14px"
+          class="flex color-[--d-999-l-666] text-12px lh-14px cursor-pointer"
+          @click="openTokenDetail(currentSignal.actions[idx])"
         >
           <div class="flex-[3] flex items-center">
             <span class="w-10px h-10px rounded-full bg-#37B270 mr-4px"/>

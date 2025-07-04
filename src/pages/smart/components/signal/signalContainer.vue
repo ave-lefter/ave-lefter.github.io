@@ -66,7 +66,7 @@ onMounted(() => {
 function onReset() {
   filterParams.value = {...defaultFilterParams}
   if (signalLeftList.value) {
-    signalLeftList.value.fetchSignalList()
+    signalLeftList.value.fetchSignalList({})
   }
 }
 
@@ -82,6 +82,9 @@ function updateLeftList() {
 }
 
 const wsStore = useWSStore()
+watch(() => props.activeChain, () => {
+  initWs()
+})
 
 function initWs() {
   wsStore.send({
@@ -156,7 +159,7 @@ async function updateListData() {
       }
     })
     if (signalRightList.value) {
-      signalRightList.value.updateListData(listData => updateDataCallback(listData, addressMap, ['actions', 'self_wallet_info']))
+      signalRightList.value.updateListData(listData => updateDataCallback(listData, addressMap, showResetBtn.value ? [] : ['actions', 'self_wallet_info']))
     }
     if (signalLeftList.value) {
       signalLeftList.value.updateListData(listData => updateDataCallback(listData, addressMap))
@@ -169,7 +172,7 @@ async function updateListData() {
 function updateDataCallback(
   listData: GetSignalV2ListResponse<IActionItem | IActionV3Item>[],
   addressMap: Record<string, GetSignalV2ListResponse>,
-  extraKeys?: ['actions', 'self_wallet_info']
+  extraKeys?: [] | ['actions', 'self_wallet_info']
 ) {
   return listData.map(item => {
     const updateKeys = ['mc_cur', 'holders_cur', 'top10_ratio', 'dev_ratio', 'insider_ratio', 'max_price_change', ...(extraKeys || [])] as const
@@ -288,7 +291,7 @@ onUnmounted(() => {
       width="540px"
       :class="`[--el-message-close-size:24px]`"
   >
-    <el-table :data="dialogValues.list" :height="400">
+    <el-table row-class-name="[--el-table-tr-bg-color:--d-222-l-FFF]" :data="dialogValues.list" :height="400">
       <el-table-column
           type="index"
           :label="$t('ranking')"

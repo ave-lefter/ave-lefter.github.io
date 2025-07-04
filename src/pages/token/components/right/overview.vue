@@ -33,7 +33,6 @@
         <div class="flex items-center justify-end color-[--d-999-l-666]">
           <a class="clickable color-[--d-999-l-666] hover:color-[--d-F5F5F5-l-333] text-decoration-none"  :href="formatExplorerUrl(token?.chain as string, owner, 'address')" target="_blank"> {{ formatAddress(owner) }}</a>
           <Icon v-copy="checkStore?.checkResult?.owner || token?.owner || ''" name="bxs:copy" class="ml-5px clickable" />
-          <Icon style="display: none;" name="custom:checked" />
         </div>
       </li>
       <li v-if="token?.total" class="flex justify-between mb-12px">

@@ -181,6 +181,7 @@ function attention() {
     >
       <div class="flex items-center">
         <UserAvatar
+          v-if="statistics.wallet_logo"
           :wallet_logo="statistics.wallet_logo"
           :chain="tokenDetailStore.tokenInfo!.chain"
           :address="tokenDetailStore.user_address"

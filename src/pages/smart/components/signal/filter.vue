@@ -71,7 +71,7 @@ function updateCurrentNum() {
             class="text-12px cursor-pointer"
           />
           {{ $t('filter') }}
-          <span class="w-14px h-14px rounded-2px bg-[--d-333-l-F2F2F2] color-[--d-F5F5F5-l-333] text-center lh-14px">{{
+          <span class="w-14px h-14px rounded-2px bg-#333 color-#F5F5F5 text-center lh-14px">{{
               currentFilterNum
             }}</span>
         </div>

@@ -49,8 +49,12 @@ const wsStore = useWSStore()
 watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], ({msg: _signalData}: {
   msg: GetSignalV2ListResponse
 }) => {
-  const rel = listData.value.find(el => el.token === _signalData.token && el.chain === _signalData.chain)
-  if (!rel && (!filterToken.value || filterToken.value === _signalData.token)) {
+  const index = listData.value.findIndex(el => el.token === _signalData.token && el.chain === _signalData.chain)
+  const filterTokenFlag = (!filterToken.value || filterToken.value === _signalData.token)
+  if (index === -1 && filterTokenFlag) {
+    listData.value.unshift(_signalData)
+  } else if (filterTokenFlag) {
+    listData.value.splice(index, 1)
     listData.value.unshift(_signalData)
   }
 })
@@ -137,7 +141,8 @@ function openDrawer(item: GetSignalV2ListResponse<IActionItem | IActionV3Item>) 
     <div class="flex flex-wrap gap-4px">
       <SignalRightItem
         v-for="(item,index) in listData"
-        :class="item.actions.length > 3 ? 'border-1px border-solid border-#3F80F7':''"
+        :class="item.actions.length > 3 ? 'border-#3F80F7':'hover:border-#3F80F7'"
+        class="border-1px border-solid border-transparent transition-colors transition-.3s"
         :key="index"
         :item="item"
         :filterToken="filterToken"
