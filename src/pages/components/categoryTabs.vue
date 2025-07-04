@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const activeInterval = ref()
+const props = defineProps<{
+  activeInterval: string
+}>()
+const emit = defineEmits(['update:activeInterval'])
 const intervals = computed(() => {
   return [
     {name: '1m', id: '1m'},
@@ -20,15 +23,18 @@ const intervals = computed(() => {
         {{ $t('trending') }}
       </span>
     </div>
-    <div class="flex gap-12px items-center">
-      <div class="">
-        <button v-for="(item, index) in intervals" :key="index" :class="{ active: activeInterval === item.id }"
-                @click.stop="selectInterval(item)">{{ item.name }}
+    <div class="flex gap-12px items-center text-12px">
+      <div class="p-1 rounded-1 bg-[--d-222-l-F2F2F2]">
+        <button
+            v-for="(item, index) in intervals" :key="index"
+            class="lh-16px py-2px px-8px color-[--d-F5F5F5-l-333] border-none cursor-pointer rounded-2px"
+            :class="activeInterval === item.id?'bg-[--d-111-l-FFF]':'bg-transparent'"
+            @click.stop="emit('update:activeInterval',item.id)"
+        >
+          {{ item.name }}
         </button>
-        <div class="flex items-center">
-
-        </div>
       </div>
+      <div class="flex items-center"/>
     </div>
   </div>
 </template>

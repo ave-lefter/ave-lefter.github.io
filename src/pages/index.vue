@@ -7,7 +7,9 @@ import CategoryTabs from "./components/categoryTabs.vue";
 <template>
   <div class="flex gap-16px w-full">
     <ChainsSelect/>
-    <CategoryTabs/>
+    <CategoryTabs
+        activeInterval="1m"
+    />
   </div>
 </template>
 
