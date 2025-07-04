@@ -3,7 +3,7 @@
     <el-button ref="addButtonRef"  @click.stop.prevent="openFavPop">Default</el-button>
     <!-- <FavPop ref="favPopRef" v-model="favDetails" :button-ref="addButtonRef || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" /> -->
     <div v-if="currentAddress" class="m-header flex-between px-12px items-start">
-      <pro-groups v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup"/>
+      <pro-groups v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
       <ul class="w-operate">
         <li>
            <el-checkbox v-model="conditions.isMonitor" :label="t('monitorList')" size="small" style="font-size: 12px;color:var(--d-666-l-333);z-index: 0" />
@@ -521,7 +521,7 @@ import {
   formatIconTag, getTagTooltip
 } from '@/utils/index'
 import { throttle } from 'lodash-es'
-import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention } from '~/api/attention'
+import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2} from '~/api/attention'
 import type { TableInstance } from 'element-plus'
 
 const { mode, isDark } = storeToRefs(useGlobalStore())
@@ -626,6 +626,18 @@ function handleAddGroup(name:string) {
       ElMessage.error(String(e))
    })
   }
+}
+
+function handleChangeIndex(groupIds: number[]) {
+  // visible.value = false
+  // 处理修改排序逻辑
+  console.log('修改分组排序', groupIds)
+  changeIndexFavoriteGroup2(groupIds).then(() => {
+    ElMessage.success(t('success'))
+    followStore.getUserFavoriteGroups2()
+  }).catch((e) => {
+     ElMessage.error(String(e))
+  })
 }
 function handleDelGroup(groupId: number) {
   // visible.value = false

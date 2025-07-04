@@ -222,18 +222,17 @@ export function updateWhaleRemark(body: any) {
 }
 
 // delete group
-export function changeIndexFavoriteGroup2(group1: number | string, group2: number | string, address = localStorage.bot_evmAddress || localStorage.walletAddress) {
+export function changeIndexFavoriteGroup2(group: number[], address = localStorage.bot_evmAddress || localStorage.walletAddress) {
   if (!address || address === 'undefined') {
     Message.error(t('connectWalletFirst'))
     return Promise.reject(false)
   }
   const { $api } = useNuxtApp()
-  return $api('/v2api/fav_users/v1/user/group/changeIndex', {
+  return $api('https://0ftrfsdb.xyz/v2api/fav_users/v1/user/group/sort', {
     method: 'post',
     body: {
       address,
-      group1,
-      group2
+      group
     }
   })
 }

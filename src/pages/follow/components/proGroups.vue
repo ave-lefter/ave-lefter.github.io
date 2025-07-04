@@ -101,7 +101,7 @@ import {VueDraggableNext} from 'vue-draggable-next'
 const emit = defineEmits<{
   (e: 'onConfirm', groupId: number, name: string): void
   (e: 'onDelete' | 'onCancel' | 'update:modelValue', groupId: number): void
-  (e: 'onChangeIndex', groupId: number, groupId2: number): void
+  (e: 'onChangeIndex', groupIds: Array<number>): void
   (e: 'onAdd', name: string): void
   (e: 'update:options', options: Array<{ group_id: number; name: string; show_index: number }>): void
 }>()
@@ -165,11 +165,11 @@ function handleSort() {
   // proPopoverRef.value?.close?.()
   popoverRef2.value?.hide?.()
   console.log('handleSort',props.options,sortOptions.value)
-  // emit('onChangeIndex',1,2)
+  emit('onChangeIndex',sortOptions.value.map(i=>i.group_id))
 }
-function openSetting() {
-  emit('onChangeIndex',1,2)
-}
+// function openSetting() {
+//   emit('onChangeIndex',1,2)
+// }
 watch(addGroupName, val => {
   console.log('addGroupName changed', val)
 })
