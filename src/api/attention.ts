@@ -398,4 +398,22 @@ export function favUsersPauseMonitor(data: any) {
     body: data,
   })
 }
-
+export function monitorAddresses({ group = 0, user_chain, sort = '', sort_dir = '', keyword = '', last_tx_time_max = '', last_tx_time_min = '', time_interval = '', pageSize = 100, pageNO = 1, address = localStorage.bot_evmAddress || localStorage.walletAddress }: any) {
+  const { $api } = useNuxtApp()
+  return $api('https://0ftrfsdb.xyz/v2api/fav_users/v1/user/group/monitorAddressv2', {
+   method: 'get',
+    params:{
+      group,
+      sort,
+      sort_dir,
+      keyword,
+      last_tx_time_max,
+      last_tx_time_min,
+      time_interval,
+      pageSize,
+      pageNO,
+      user_chain,
+      address
+    }
+  })
+}

@@ -72,10 +72,11 @@ export const useFollowStore = defineStore('follow', () => {
       let res: Awaited<ReturnType<typeof getUserFavoriteGroups2>> =[]
       try {
         res = await getUserFavoriteGroups2(data)
-        addressGroups.value = res
+        console.log('getUserFavoriteGroups2 res', res)
+        addressGroups.value = Array.isArray(res) ? res : []
       } catch (e) {
         console.log('=>(favoriteTable.vue:19) e', e)
-      }
+      } 
       return res
     },
     initAddressGroups() {

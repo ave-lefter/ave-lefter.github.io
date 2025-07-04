@@ -6,7 +6,7 @@
       <pro-groups v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
       <ul class="w-operate">
         <li>
-           <el-checkbox v-model="conditions.isMonitor" :label="t('monitorList')" size="small" style="font-size: 12px;color:var(--d-666-l-333);z-index: 0" />
+           <el-checkbox v-model="isMonitor" :label="t('monitorList')" size="small" style="font-size: 12px;color:var(--d-666-l-333);z-index: 0" />
         </li>
         <li class="btn">
           <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>
@@ -521,7 +521,7 @@ import {
   formatIconTag, getTagTooltip
 } from '@/utils/index'
 import { throttle } from 'lodash-es'
-import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2} from '~/api/attention'
+import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses} from '~/api/attention'
 import type { TableInstance } from 'element-plus'
 
 const { mode, isDark } = storeToRefs(useGlobalStore())
@@ -539,10 +539,10 @@ const toolTipTagVisible = ref(false)
 const toolTipTagContent = ref('')
 const addButtonRef = ref()
 const tableRef = ref<TableInstance | null>(null)
+const isMonitor=ref(false)
 const conditions = reactive({
   group: 0,
   activeTab: '7d',
-  isMonitor: false,
   user_chain: 'AllChains',
   sort: '',
   sort_dir: '',
@@ -666,8 +666,11 @@ const getTableList = throttle(function() {
     last_tx_time_max: max + 3600,
      last_tx_time_min: min
   }:{}
+  monitorAddresses({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
+    console.log('monitorAddresses res', res)
+  })
   getAttentionPageList({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
-    console.log('=>(favoriteTable.vue:64) res', res)
+    console.log('getAttentionPageList res', res)
     dataSource.value = ( res.data || []).
     map((i:any) => {
       return {

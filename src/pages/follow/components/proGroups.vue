@@ -3,35 +3,37 @@
     <li class="clickable" :class="{ active: props.modelValue === 0 }" @click.stop.prevent="emit('update:modelValue', 0)">
       <span>{{ $t('defaultGroup') }}</span>
     </li>
-    <li 
-      v-for="item in props.options" :key="item.group_id" class="clickable flex gap-2px"
-      :class="{ active: props.modelValue === item.group_id, 'px-0px!': edits[item.group_id] }"
-      @click.stop.prevent="emit('update:modelValue', item.group_id)">
-      <el-input 
-        v-if="edits[item.group_id]" v-model="groupName" style="width: 140px" size="default"
-        class="name-input">
-        <template #suffix>
+    <template v-if="props.options.length > 0">
+      <li 
+        v-for="item in props.options" :key="item.group_id" class="clickable flex gap-2px"
+        :class="{ active: props.modelValue === item.group_id, 'px-0px!': edits[item.group_id] }"
+        @click.stop.prevent="emit('update:modelValue', item.group_id)">
+        <el-input 
+          v-if="edits[item.group_id]" v-model="groupName" style="width: 140px" size="default"
+          class="name-input">
+          <template #suffix>
+            <Icon 
+              name="mynaui:x-square-solid" class="text-18px color-[var(--d-F5F5F5-l-222)] clickable"
+              @click.stop.prevent="handleCancelEdit"/>
+            <!-- <Icon v-else name="mynaui:x-square" class="text-18px color-#666"/> -->
+            <Icon 
+              name="mynaui:check-square-solid" class="text-18px color-[var(--d-F5F5F5-l-222)] clickable"
+              :class="{ 'cursor-not-allowed': !groupName }" @click.stop.prevent="groupName&&handleConfirmEdit()"/>
+            <!-- <Icon v-else name="mynaui:check-square" class="text-18px color-#666"/> -->
+          </template>
+        </el-input>
+        <template v-else>
+          <span>{{ item.name }}</span>
           <Icon 
-            name="mynaui:x-square-solid" class="text-18px color-[var(--d-F5F5F5-l-222)] clickable"
-            @click.stop.prevent="handleCancelEdit"/>
-          <!-- <Icon v-else name="mynaui:x-square" class="text-18px color-#666"/> -->
-          <Icon 
-            name="mynaui:check-square-solid" class="text-18px color-[var(--d-F5F5F5-l-222)] clickable"
-            :class="{ 'cursor-not-allowed': !groupName }" @click.stop.prevent="groupName&&handleConfirmEdit()"/>
-          <!-- <Icon v-else name="mynaui:check-square" class="text-18px color-#666"/> -->
+            :ref="(el: any) => $refs.buttonRefs[item.group_id] = el" 
+            v-click-outside="() => visible = false"
+            name="mdi:dots-vertical"
+            class="text-14px"
+            @click.stop.prevent="buttonRef = $refs.buttonRefs[item.group_id]; visible = true; currentEditGroup = item.group_id; groupName = item.name"
+             />
         </template>
-      </el-input>
-      <template v-else>
-        <span>{{ item.name }}</span>
-        <Icon 
-          :ref="(el: any) => $refs.buttonRefs[item.group_id] = el" 
-          v-click-outside="() => visible = false"
-          name="mdi:dots-vertical"
-          class="text-14px"
-          @click.stop.prevent="buttonRef = $refs.buttonRefs[item.group_id]; visible = true; currentEditGroup = item.group_id; groupName = item.name"
-           />
-      </template>
-    </li>
+      </li>
+    </template>
     <li ref="addButtonRef" class="clickable color-#3F80F7! flex gap-2px">
       <Icon name="material-symbols:add-circle" class="text-12px" />
       <span>{{ $t('newGroup') }}</span>
@@ -55,9 +57,9 @@
             @end="drag = false"
             item-key="show_index"
           >
-          <li v-for="item in sortOptions" :key="item.show_index" class="flex-between py-12px px-8px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
+          <li v-for="item in sortOptions" :key="item?.show_index" class="flex-between py-12px px-8px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
           >
-            <span>{{ item.name }}</span>
+            <span>{{ item?.name }}</span>
             <Icon name="material-symbols:dehaze" class="text-16px"/>
           </li>
             <!-- <transition-group type="transition" name="flip-list">
@@ -89,7 +91,7 @@
       </li>
     </ul>
   </el-popover>
-  <ProPopover ref="proPopoverRef" v-model="addGroupName" :button-ref="addButtonRef || {}" width="248" :label="$t('newGroup')" :placeholder="$t('groupPlaceholder')" prop="name" :title="$t('newGroup')" @onConfirm="handleAddGroup"/>
+  <ProPopover ref="proPopoverRef" v-model="addGroupName" :button-ref="addButtonRef || {}" width="248" :label="$t('newGroup')" :placeholder="$t('enterGroupName')" prop="name" :title="$t('newGroup')" @onConfirm="handleAddGroup"/>
 </template>
 
 <script setup lang="ts">
