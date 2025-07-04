@@ -167,6 +167,7 @@ const conditions = reactive({
   last_tx_time_min: string|number
   last_trade_time: string|number
 })
+const botStore = useBotStore()
 const dataSource=ref([] as Array<any>)
 const loading=ref(false)
 const pageData = ref({
@@ -187,6 +188,7 @@ const footText = computed(() => {
 })
 onMounted(() => {
   console.log('mounted walletManage',props)
+   if(!botStore.evmAddress) return
   init()
 })
 function init(){

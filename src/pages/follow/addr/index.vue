@@ -5,14 +5,15 @@
     <div v-if="currentAddress" class="m-header flex-between px-12px items-start">
       <pro-groups v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
       <ul class="w-operate">
-        <li>
+        <li v-if="evmAddress" class="flex items-center gap-2px">
            <el-checkbox v-model="isMonitor" :label="t('monitorList')" size="small" style="font-size: 12px;color:var(--d-666-l-333);z-index: 0" />
+           <span class="text-[var(--d-666-l-333)]">{{ `${monitorNum}/50` }}</span>
         </li>
         <li class="btn">
           <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>
         </li>
         <li>
-          <el-radio-group v-model="conditions.activeTab" class="m-radio-group" size="small" :fill="isDark?'#333':'#666'" :text-color="isDark?'#F5F5F5':'#FFF'" @change="()=>{}">
+          <el-radio-group v-model="conditions.time_interval" class="m-radio-group" size="small" :fill="isDark?'#333':'#666'" :text-color="isDark?'#F5F5F5':'#FFF'" @change="()=>{}">
             <el-radio-button label="7D" :value="'7d'" />
             <el-radio-button label="1M" :value="'30d'" />
           </el-radio-group>
@@ -21,7 +22,7 @@
     </div>
     <div class="m-table w-100%">
       <el-table
-      ref="tableRef" v-loading="loading" class='mt-12px' :data="dataSource"  fixed row-class-name="group"
+      ref="tableRef" v-loading="loading" class='mt-12px' :data="filterDataSource"  fixed row-class-name="group"
       @sort-change="handleSortChange" @row-click="tableRowClick">
         <template #empty>
           <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
@@ -234,7 +235,7 @@
         <!-- 30dPnL -->
       <el-table-column
         align="right"
-        :label="conditions.activeTab === '7d' ? $t('7dPnL') : $t('30dPnL')"
+        :label="conditions.time_interval === '7d' ? $t('7dPnL') : $t('30dPnL')"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         prop="total_profit"
@@ -261,7 +262,7 @@
       <!-- 30dWinRate -->
       <el-table-column
         align="right"
-        :label="conditions.activeTab === '7d' ? $t('7dWinRate') : $t('30dWinRate')"
+        :label="conditions.time_interval === '7d' ? $t('7dWinRate') : $t('30dWinRate')"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         prop="total_win_ratio"
@@ -283,7 +284,7 @@
       <!-- 30dVolume -->
       <el-table-column
         align="right"
-        :label="conditions.activeTab === '7d' ? $t('7dVolume') : $t('30dVolume')"
+        :label="conditions.time_interval === '7d' ? $t('7dVolume') : $t('30dVolume')"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         prop="tx_volume"
@@ -312,7 +313,7 @@
       <!-- 30dTrades -->
       <el-table-column
         align="right"
-        :label="conditions.activeTab === '7d' ? $t('7dTrades') : $t('30dTrades')"
+        :label="conditions.time_interval === '7d' ? $t('7dTrades') : $t('30dTrades')"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         prop="tx_count"
@@ -428,7 +429,7 @@
             </el-popover>
           </div>
         </template>
-        <template #default="{ row ,$Index}">
+        <template #default="{ row,$index}">
           <div
             :style="{
               color:
@@ -442,8 +443,8 @@
                v-else-if="
                 Number(formatTimeFromNow(row?.last_tx_time, true)) < 60
               "
-              :key="`${row.last_tx_time}${$Index}`"
-              :timestamp="(60 - Number(formatTimeFromNow(row?.last_tx_time, true))) * 1000"
+              :key="`${row.last_tx_time}${$index}`"
+              :timestamp="row.last_tx_time"
               style="--van-count-down-text-color: currentColor"
               :end-time="60"
             >
@@ -473,31 +474,35 @@
         </template>
       </el-table-column>
        <el-table-column :label="t('push')" align="right" width="150">
-        <template #default="{ row }">
+        <template #default="{ row ,$index}">
           <div class="flex flex-row-reverse" @click.stop>
-            <a class="flex items-center"
+            <a
+              class="flex items-center"
               :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`" target="_blank">
               <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
               {{ t('copyTrade') }}
             </a>
             <!-- 监控 -->
-            <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"
-              @click="handleMonitor(row)" v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'">
-              <Icon name="custom:monitor-icon" class="text-16px mr-2px" />
-              <span
-                class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
-                {{ row?.is_monitored === 1 ? t('pause') : t('enable') }}
-              </span>
-            </div>
-            <div class="flex items-center mr-12px color-[#666] cursor-not-allowed" v-else>
-              <Icon name="custom:monitor-icon" class="text-16px mr-2px " />
-            </div>
+             <template v-if="evmAddress">
+               <div
+                 v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
+                 class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]" @click="handleMonitor(row,$index)">
+                 <Icon name="custom:monitor-icon" class="text-16px mr-2px" :class="[(!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))&&'color-[var(--d-FFF-l-333)]']"/>
+                 <span
+                   class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
+                   {{ (!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))? t('pause') : t('enable') }}
+                 </span>
+               </div>
+               <div class="flex items-center mr-12px color-[#666] cursor-not-allowed" v-else>
+                 <Icon name="custom:monitor-icon" class="text-16px mr-2px " />
+               </div>
+             </template>
           </div>
         </template>
       </el-table-column>
       </el-table>
       <el-pagination 
-        v-if="dataSource?.length > 0"
+        v-if="filterDataSource?.length > 0"
         v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="mt-20px"
         layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" />
     </div>
@@ -522,15 +527,15 @@ import {
   formatIconTag, getTagTooltip
 } from '@/utils/index'
 import { throttle } from 'lodash-es'
-import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses} from '~/api/attention'
+import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor} from '~/api/attention'
 import type { TableInstance } from 'element-plus'
 
 const { mode, isDark } = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
-const { currentAddress} = storeToRefs(useFollowStore())
 const $router = useRouter()
 const { t } = useI18n()
-const { addressGroups } = storeToRefs(useFollowStore())
+const {evmAddress} = storeToRefs(useBotStore())
+const { addressGroups ,currentAddress} = storeToRefs(useFollowStore())
 // const addressGroups = ref([{ "group_id": 3763, "name": "base", "show_index": -1 }, { "group_id": 37632, "name": "base1", "show_index": 0 }, { "group_id": 37631, "name": "base2", "show_index": 1 }])
 const visible = ref(false)  
 const visible2 = ref(false)  
@@ -543,7 +548,7 @@ const tableRef = ref<TableInstance | null>(null)
 const isMonitor=ref(false)
 const conditions = reactive({
   group: 0,
-  activeTab: '7d',
+  time_interval: '7d',
   user_chain: 'AllChains',
   sort: '',
   sort_dir: '',
@@ -553,7 +558,7 @@ const conditions = reactive({
   last_trade_time: ''
 } as {
   group: number
-  activeTab: string
+  time_interval: string
   user_chain: string
   sort: string|null
   sort_dir: string|null
@@ -562,11 +567,13 @@ const conditions = reactive({
   last_tx_time_min: string|number
   last_trade_time: string|number
 })
+const monitorNum=ref(0)
 const pageData = ref({
   total: 10,
   page: 1,
   pageSize: 10
 })
+
 const openTimeList =computed(() => [
   { text:  t('all'), value: '' },
   { text: '≤10min', value: String(10 * 60) },
@@ -592,20 +599,71 @@ const filterForm = ref({
 } as FilterFormType)
 const loading = ref(false)
 const dataSource = ref([])
+const dataSource2 = ref([])
+
+const filterDataSource=computed(() => {
+  return isMonitor.value?dataSource2.value:dataSource.value
+})
 onMounted(async () => {
   init()
 })
 function init() {
   getTableList()
+  getMonitorNum()
 }
 watch(() => currentAddress.value, (val) => {
-  if(!val) return
-  getTableList()
+  if(!val) {
+    dataSource.value=[]
+    dataSource2.value=[]
+  }else{
+    getTableList()
+  }
 })
 
-watch([() => conditions, ()=>isMonitor.value,() => pageData.value.page], () => {
-   getTableList()
+watch([() => conditions, ()=>isMonitor.value,() => pageData.value.page], (value) => {
+  console.log('watch conditions', value)
+  // if(value[1]){
+  //   pageData.value={
+  //     total: 10,
+  //     page: 1,
+  //     pageSize: 10
+  //   }
+  // }else{
+  // }
+  getTableList()
 },{deep: true})
+
+function handleMonitor(row:any,index:number) {
+  if (!evmAddress.value) return ElMessage.warning(t('noBotWalletTip'))
+  if(isMonitor.value) {
+    const {id,user_address} = row
+    // 取消监控
+    const req=row.is_pause === 1?favUsersResumeMonitor:favUsersPauseMonitor
+    req({
+      uid: id,
+      address:user_address
+    }).then(() => {
+      // dataSource.value[index].is_pause = row.is_pause===0?1:0
+      getTableList()
+    }).finally(() => {
+      ElMessage.success(t('success'))
+    })
+   
+    return
+  }else{
+    const {user_address,user_chain} = row
+    if(row.is_monitored === 1) return 
+    addAddressMonitor({
+      address: user_address,
+      chain: user_chain,
+      user_address: evmAddress.value,
+    }).then(() => {
+      getTableList()
+      getMonitorNum()
+    })
+    ElMessage.success(t('success'))
+  }
+}
 
 function handleConfirmEdit(currentEditGroup: number, remark:string) {
   changeFavoriteGroupName2(remark, currentEditGroup).then(() => {
@@ -657,7 +715,11 @@ function handleDelGroup(groupId: number) {
     })
   })
 }
-
+function getMonitorNum() {
+  monitorAddresses(conditions).then((res) => {
+    monitorNum.value = res.total
+  })
+}
 const getTableList = throttle(function() {
    loading.value = true
   const max = Math.floor(new Date().getTime() / 1000)
@@ -672,7 +734,8 @@ const getTableList = throttle(function() {
   // })
   req({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
     console.log('getAttentionPageList res',isMonitor.value, res)
-    dataSource.value = ( res.data || []).
+    const tableData =isMonitor.value?dataSource2:dataSource
+    tableData.value = ( res.data || []).
     map((i:any) => {
       return {
         ...i,

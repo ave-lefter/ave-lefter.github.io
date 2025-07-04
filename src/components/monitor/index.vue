@@ -1,6 +1,4 @@
 <template>
-  <!-- <el-popover ref="popoverRef" :visible="monitorStore.visible" :width="props.isLarge?720:360" placement="top" :persistent="true" :teleported="true" popper-class="" popper-style="">
-  </el-popover> -->
   <div class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] px-12px">
     <Icon
         name="custom:drag2"
@@ -8,10 +6,6 @@
     />
     <el-tabs v-model="activeName" style="--el-border-color-light:#333333" class="tabs" @tab-change="handleClick">
       <el-tab-pane :label="$t('walletManage')" :name="0" lazy>
-          <!-- <el-button size="small" :color="isDark?'#333':'#F2F2F2'" style="height: 20px;color: var(--d-999-l-222) !important; margin-left: 0px;" @click.stop.prevent="showBatchAddressDetails=true" :dark="isDark" >
-              <Icon name="mingcute:new-folder-fill" class="text-12px"/>
-              {{ $t('bulkImport') }}
-            </el-button> -->
           <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps"/>
           <AveEmpty
             v-else
@@ -305,7 +299,7 @@ const botStore = useBotStore()
 const wsStore = useWSStore()
 const aveTableRef = ref<InstanceType<typeof AveTable> | null>(null)
 const firstActivated = ref(true)
-const txType = ref([1,2])
+const txType = ref([0,1])
 const addButtonRef = ref()
 const toggleMc = ref(false)
 const addFavAddressVisible = ref(false)
@@ -315,8 +309,8 @@ const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const txTypeList=computed(() => {
   return [
     // { label: t('all'), value: 0 },
-    { label: t('buy'), value: 1 },
-    { label: t('sell'), value: 2 },
+    { label: t('buy'), value: 0 },
+    { label: t('sell'), value: 1 },
   ]
 })
 
@@ -331,10 +325,10 @@ onMounted(async () => {
 })
 watch(() => txType.value, (val) => {
   const monitor_type:Array<'sell' | 'buy'>=[]
-  if(val.includes(1)){
+  if(val.includes(0)){
     monitor_type.push('buy')
   }
-  if(val.includes(2)){
+  if(val.includes(1)){
     monitor_type.push('sell')
   }
   batchPauseMonitor(monitor_type).then(() => {
@@ -466,7 +460,11 @@ function init() {
 function init2() {
   if(!botStore.evmAddress) return
   loading.value = true
-  getHistoryMonitor({}).then((res) => {
+  let filtered_type=''
+  if(txType.value.length!==txTypeList.value.length){
+    filtered_type=txType.value.join(',')
+  }
+  getHistoryMonitor(filtered_type?{filtered_type}:{}).then((res) => {
     let result = res || res?.data|| []
     const list: any[]=[]
     const listObj: Record<string, boolean> = {}

@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js'
 import dayjs from 'dayjs'
 import { formatNumber2 } from '~/utils/formatNumber'
 import { getRemarksDetail } from '~/api/fav'
-import { deleteAttention, updateWhaleRemark, addAttention, favUsersAddMonitor, favUsersPauseMonitor } from '~/api/attention'
+import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -72,7 +72,7 @@ const handleMonitor = async (row: any) => {
   if (!botStore.evmAddress) return ElMessage.warning(t('noBotWalletTip'))
   if (row.is_wallet_address_fav === 0) return ElMessage.warning(t('monitorError'))
   if (row?.is_monitored === 0) {
-    await favUsersAddMonitor({
+    await addAddressMonitor({
       address: row.user_address,
       app: 0,
       buy: 1,
