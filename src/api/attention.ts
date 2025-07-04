@@ -417,3 +417,17 @@ export function monitorAddresses({ group = 0, user_chain, sort = '', sort_dir = 
     }
   })
 }
+
+
+/**
+ * 批量筛选地址监控推送
+ */
+export function batchPauseMonitor(monitor_type: Array<'sell' | 'buy'>): Promise<any> {
+   const { $api } = useNuxtApp()
+  return $api('https://0ftrfsdb.xyz/v2api/fav_users/v1/user/monitor/batchPause', {
+    method: 'post',
+    body:{
+      monitor_type
+    }
+  })
+}

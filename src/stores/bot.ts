@@ -20,8 +20,9 @@ import { NATIVE_TOKEN } from '@/utils/constants'
 type AddressItem = { chain: string; address: string; price?: number; balance?: string; decimals?: number; logo_url?: string };
 
 const _refreshAccessToken = createCacheRequest(_refAcc, 3000)
-
 export const useBotStore = defineStore('bot', () => {
+   const walletStore = useWalletStore()
+
   const isSupportChains = ['eth', 'bsc', 'solana', 'base']
   const accessToken = useLocalStorage('bot_accessToken', '')
   const refreshToken = useLocalStorage('bot_refreshToken', '')
@@ -148,6 +149,7 @@ export const useBotStore = defineStore('bot', () => {
       })
   }
   function getUserInfo() {
+    walletStore.disconnectEvmWallet()
     if (accessToken.value) {
       bot_getWalletsAllChain({ chain: isSupportChains?.join(',') }).then(
         (res) => {

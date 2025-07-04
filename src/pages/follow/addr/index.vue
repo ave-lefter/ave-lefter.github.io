@@ -497,6 +497,7 @@
       </el-table-column>
       </el-table>
       <el-pagination 
+        v-if="dataSource?.length > 0"
         v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="mt-20px"
         layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" />
     </div>
@@ -553,7 +554,6 @@ const conditions = reactive({
 } as {
   group: number
   activeTab: string
-  isMonitor: boolean
   user_chain: string
   sort: string|null
   sort_dir: string|null
@@ -603,7 +603,7 @@ watch(() => currentAddress.value, (val) => {
   getTableList()
 })
 
-watch([() => conditions, () => pageData.value.page], () => {
+watch([() => conditions, ()=>isMonitor.value,() => pageData.value.page], () => {
    getTableList()
 },{deep: true})
 
@@ -666,11 +666,12 @@ const getTableList = throttle(function() {
     last_tx_time_max: max + 3600,
      last_tx_time_min: min
   }:{}
-  monitorAddresses({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
-    console.log('monitorAddresses res', res)
-  })
-  getAttentionPageList({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
-    console.log('getAttentionPageList res', res)
+  const req=isMonitor.value?monitorAddresses: getAttentionPageList
+  // monitorAddresses({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
+  //   console.log('monitorAddresses res', res)
+  // })
+  req({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
+    console.log('getAttentionPageList res',isMonitor.value, res)
     dataSource.value = ( res.data || []).
     map((i:any) => {
       return {
@@ -680,7 +681,7 @@ const getTableList = throttle(function() {
         total_txs_usd: safeBigNumber(i.total_sold_usd).plus(safeBigNumber(i.total_purchase_usd)).toString()
       }
     })
-    pageData.value.total = res.total || 10
+    pageData.value.total = res.total || 0
     pageData.value.page = res.pageNO || 1
     pageData.value.pageSize = res.pageSize || 10
   }).finally(() => { 
