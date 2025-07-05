@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import ColumnsToolbar from "./columnsToolbar.vue";
+
 const props = defineProps<{
-  activeInterval: string
+  activeInterval: string,
+  quickInputVisible: boolean,
 }>()
-const emit = defineEmits(['update:activeInterval'])
+const emit = defineEmits(['update:activeInterval', 'update:quickInputVisible'])
 const intervals = computed(() => {
   return [
     {name: '1m', id: '1m'},
@@ -12,6 +15,14 @@ const intervals = computed(() => {
     {name: '4H', id: '4H'},
     {name: '24H', id: '24H'},
   ]
+})
+const _quickInputVisible = computed({
+  get() {
+    return props.quickInputVisible
+  },
+  set(value) {
+    emit('update:quickInputVisible', value)
+  }
 })
 </script>
 
@@ -34,7 +45,14 @@ const intervals = computed(() => {
           {{ item.name }}
         </button>
       </div>
-      <div class="flex items-center"/>
+      <div class="flex items-center">
+        <el-switch class="mr-2" v-model="_quickInputVisible"></el-switch>
+        <QuickSwapSet
+            :settingsButtonVisible="false"
+            :chain="'solana'"
+        />
+        <ColumnsToolbar :activeCategory="'hot'" class="ml-10"/>
+      </div>
     </div>
   </div>
 </template>

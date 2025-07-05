@@ -92,6 +92,9 @@ importers:
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.3)
+      vue-draggable-plus:
+        specifier: ^0.6.0
+        version: 0.6.0(@types/sortablejs@1.15.8)
       vue-draggable-resizable:
         specifier: ^3.0.0
         version: 3.0.0(vue@3.5.13(typescript@5.8.3))
@@ -2530,6 +2533,9 @@ packages:
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
+
+  '@types/sortablejs@1.15.8':
+    resolution: {integrity: sha512-b79830lW+RZfwaztgs1aVPgbasJ8e7AXtZYHTELNXZPsERt4ymJdjV4OccDbHQAvHrCcFpbF78jkm0R6h/pZVg==, tarball: https://registry.npmjs.org/@types/sortablejs/-/sortablejs-1.15.8.tgz}
 
   '@types/stack-utils@2.0.3':
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==, tarball: https://registry.npmjs.org/@types/stack-utils/-/stack-utils-2.0.3.tgz}
@@ -8470,6 +8476,15 @@ packages:
   vue-devtools-stub@0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}
 
+  vue-draggable-plus@0.6.0:
+    resolution: {integrity: sha512-G5TSfHrt9tX9EjdG49InoFJbt2NYk0h3kgjgKxkFWr3ulIUays0oFObr5KZ8qzD4+QnhtALiRwIqY6qul4egqw==, tarball: https://registry.npmjs.org/vue-draggable-plus/-/vue-draggable-plus-0.6.0.tgz}
+    peerDependencies:
+      '@types/sortablejs': ^1.15.0
+      '@vue/composition-api': '*'
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+
   vue-draggable-resizable@3.0.0:
     resolution: {integrity: sha512-kABSggcXPoDB8dOTVE09ZkccxiMdNDUaLl7STTeghsFE3o+mk653iumrkmjKLfIBA/w5ZXWJmarBqoqsmWLzEg==, tarball: https://registry.npmjs.org/vue-draggable-resizable/-/vue-draggable-resizable-3.0.0.tgz}
     peerDependencies:
@@ -12082,6 +12097,8 @@ snapshots:
       '@types/node': 22.14.1
 
   '@types/resolve@1.20.2': {}
+
+  '@types/sortablejs@1.15.8': {}
 
   '@types/stack-utils@2.0.3':
     optional: true
@@ -19532,6 +19549,10 @@ snapshots:
       vue: 3.5.13(typescript@5.8.3)
 
   vue-devtools-stub@0.1.0: {}
+
+  vue-draggable-plus@0.6.0(@types/sortablejs@1.15.8):
+    dependencies:
+      '@types/sortablejs': 1.15.8
 
   vue-draggable-resizable@3.0.0(vue@3.5.13(typescript@5.8.3)):
     dependencies:

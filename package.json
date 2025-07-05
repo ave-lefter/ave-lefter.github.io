@@ -42,6 +42,7 @@
     "unocss-preset-scrollbar-hide": "^1.0.1",
     "uuid": "^11.1.0",
     "vue": "^3.5.13",
+    "vue-draggable-plus": "^0.6.0",
     "vue-draggable-resizable": "^3.0.0",
     "vue-router": "^4.5.0"
   },

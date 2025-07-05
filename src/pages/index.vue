@@ -1,7 +1,8 @@
 <script setup lang="ts">
-
 import ChainsSelect from "./components/chainsSelect.vue";
 import CategoryTabs from "./components/categoryTabs.vue";
+
+const {t} = useI18n()
 </script>
 
 <template>
@@ -9,6 +10,7 @@ import CategoryTabs from "./components/categoryTabs.vue";
     <ChainsSelect/>
     <CategoryTabs
         activeInterval="1m"
+        :quickInputVisible="false"
     />
   </div>
 </template>
