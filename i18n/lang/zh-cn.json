@@ -786,5 +786,6 @@
   "SignalTopList": "今日潜力榜单",
   "ranking": "排名",
   "FirstAlert": "首次信号警报",
-  "FilterTips": "过滤内容为左侧实时流"
+  "FilterTips": "过滤内容为左侧实时流",
+  "searchGroup": "搜索分组"
 }
