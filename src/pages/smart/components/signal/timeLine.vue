@@ -261,7 +261,7 @@ function getLevel(value: number) {
           </div>
         </div>
         <div class="py-5px table-cell vertical-mid text-right">
-          ${{ formatNumber(el.mc) }}
+          ${{ formatNumber(el.mc, 1) }}
         </div>
       </div>
     </div>

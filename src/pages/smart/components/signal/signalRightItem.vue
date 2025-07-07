@@ -121,12 +121,12 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
                   <span v-if="seconds < 60" class="color-#FFA622 text-12px">
                     {{ seconds }}s
                   </span>
-                    <span v-else class="color-[--d-999-l-666] text-12px">
+                    <span v-else class="color-[--d-666-l-999] text-12px">
                     {{ formatTimeFromNow(item.token_create_time) }}
                   </span>
                   </template>
                 </TimerCount>
-                <div v-else class="color-[--d-999-l-666] text-12px">
+                <div v-else class="color-[--d-666-l-999] text-12px">
                   {{ formatTimeFromNow(item.token_create_time) }}
                 </div>
               </div>
@@ -206,7 +206,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
           >
             <Icon name="custom:filter"/>
           </div>
-          <div 
+          <div
             class="color-[--d-999-l-666] hover:color-[--d-F5F5F5-l-333] flex items-center gap-2px"
             v-tooltip="formatDate(item.signal_time,'YYYY-MM-DD HH:mm:ss')"
           >
@@ -271,7 +271,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
         {{ $t('operate') }}
       </div>
       <div class="flex-1 text-right" v-if="!filterToken">
-        {{ $t('positions') }}
+        {{ $t('balance1') }}
       </div>
       <div class="w-40px text-right">
         {{ $t('time') }}
@@ -350,8 +350,9 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
       v-if="footer"
       class="flex justify-between"
     >
-      <div class="flex-1 flex items-center color-[--d-666-l-999] gap-16px">
-        <template v-if="item.self_wallet_info?.total_purchase_usd">
+      <div class="flex-1 flex items-center color-[--d-666-l-999] gap-6px text-12px">
+        <template
+          v-if="item.self_wallet_info?.total_purchase_usd && Number(item.self_wallet_info?.total_purchase_usd)!==0">
           {{ $t('mySwap') }}
           <el-row class="text-12px flex-1 text-center">
             <el-col :span="8">
@@ -374,7 +375,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
               :span="8"
             >
               <div class="color-[--d-666-l-999] mb-4px">
-                {{ $t('holding') }}
+                {{ $t('balance1') }}
               </div>
               <div class="color-[--d-F5F5F5-l-333]">
                 ${{ formatNumber(item.self_wallet_info?.balance || 0, 1) }}
@@ -386,7 +387,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
       <QuickSwapButton
         :quick-buy-value="quickBuyValue"
         :row="item"
-        classNames="min-w-70px ml-70px"
+        classNames="min-w-70px"
         mainNameVisible
       />
     </div>
