@@ -90,6 +90,15 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
                 class="text-16px font-500 color-[--d-F5F5F5-l-333] mr-8px cursor-pointer"
                 @click="navigateTo(`/token/${item.token}-${item.chain}`)"
               >{{ item.symbol }}</span>
+              <a
+                class="mr-4px w-12px h-12px rounded-2px bg-[--d-1A1A1A-l-F2F2F2] flex items-center justify-center text-10px [&&]:color-[--d-666-l-999]"
+                :href="`https://x.com/search?q=($${item.symbol} OR ${item.token})&src=typed_query&f=live`"
+                target="_blank"
+              >
+                <Icon
+                  name="hugeicons:search-01"
+                />
+              </a>
               <div
                   v-if="item.issue_platform"
                 class="mr-4px w-12px h-12px rounded-2px bg-[--d-1A1A1A-l-F2F2F2] flex items-center justify-center">
@@ -102,15 +111,6 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
                   alt=""
                 >
               </div>
-              <a
-                class="mr-4px w-12px h-12px rounded-2px bg-[--d-1A1A1A-l-F2F2F2] flex items-center justify-center text-10px [&&]:color-[--d-666-l-999]"
-                :href="`https://x.com/search?q=($${item.symbol} OR ${item.token})&src=typed_query&f=live`"
-                target="_blank"
-              >
-                <Icon
-                  name="hugeicons:search-01"
-                />
-              </a>
             </div>
             <div class="flex items-center color-[--d-666-l-999] gap-4px">
               <div v-tooltip="formatDate(item.token_create_time,'MM/DD HH:mm:ss')">
@@ -207,7 +207,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
             <Icon name="custom:filter"/>
           </div>
           <div
-            class="color-[--d-999-l-666] hover:color-[--d-F5F5F5-l-333] flex items-center gap-2px"
+            class="color-[--d-666-l-999] hover:color-[--d-F5F5F5-l-333] flex items-center gap-2px"
             v-tooltip="formatDate(item.signal_time,'YYYY-MM-DD HH:mm:ss')"
           >
             <Icon name="custom:clock" class="text-10px mr-2px"/>

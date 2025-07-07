@@ -89,15 +89,17 @@ const quickBuyValue = useStorage('quickBuyValue', '0.01')
     >
       <el-table row-class-name="[--el-table-tr-bg-color:--d-222-l-FFF]" :data="dialogValues.list" :height="400">
         <el-table-column
+          :width="60"
           type="index"
           :label="$t('ranking')"
-          label-class-name="text-12px color-[--d-666-l-999]"
+          label-class-name="text-12px color-[--d-666-l-999] text-center"
+          class-name="text-center!"
         >
           <template #default="{$index}">
             <img v-if="$index+1===1" src="@/assets/images/111.svg">
             <img v-else-if="$index+1===2" src="@/assets/images/222.svg">
             <img v-else-if="$index+1===3" src="@/assets/images/333.svg">
-            <div v-else class="text-12px color-[--d-666-l-999] text-center">{{ $index + 1 }}</div>
+            <div v-else class="text-12px color-[--d-666-l-999]">{{ $index + 1 }}</div>
           </template>
         </el-table-column>
         <el-table-column
@@ -122,7 +124,7 @@ const quickBuyValue = useStorage('quickBuyValue', '0.01')
           </template>
         </el-table-column>
         <el-table-column
-          width="80"
+          width="100"
           :label="$t('firstSignal')"
           label-class-name="text-12px color-[--d-666-l-999]"
         >
@@ -131,7 +133,7 @@ const quickBuyValue = useStorage('quickBuyValue', '0.01')
           </template>
         </el-table-column>
         <el-table-column
-          width="110"
+          width="100"
           :label="$t('firstMarketCap')"
           label-class-name="text-12px color-[--d-666-l-999]"
         >
@@ -140,7 +142,7 @@ const quickBuyValue = useStorage('quickBuyValue', '0.01')
           </template>
         </el-table-column>
         <el-table-column
-          width="130"
+          width="100"
           align="right"
           :label="$t('MaximumIncrease')"
           label-class-name="text-12px color-[--d-666-l-999]"

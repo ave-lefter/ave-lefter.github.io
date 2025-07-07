@@ -206,7 +206,7 @@ function getLevel(value: number) {
       @mouseenter="cancelHide"
       @mouseleave="hideDogPop"
     >
-      <div class="w-full table-row color-999 mb-6px">
+      <div class="w-full table-row color-[--d-666-l-999] mb-6px">
         <div class="table-cell">{{ $t('FirstAlert') }}</div>
         <div class="table-cell">{{ $t('Token') }}</div>
         <div class="table-cell text-right">{{ $t('MC') }}</div>

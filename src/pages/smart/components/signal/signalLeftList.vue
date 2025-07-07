@@ -323,7 +323,7 @@ function openTokenDetail(el: IActionItem) {
                 />
               </div>
               <div>
-                <div class="mb-4px flex items-center gap-4px color-[--d-666-l-999]">
+                <div class="mb-4px flex items-center gap-8px color-[--d-666-l-999]">
                   <span
                     class="text-16px font-500 color-[--d-F5F5F5-l-333]"
                     @click.stop="navigateTo(`/token/${token}-${chain}`)"
@@ -524,7 +524,7 @@ function openTokenDetail(el: IActionItem) {
               mainNameVisible
             />
           </div>
-          <div 
+          <div
             v-if="headline"
             class="flex items-center gap-8px mt-12px"
             v-tooltip="headline"
