@@ -2,13 +2,10 @@
 import {VueDraggable} from 'vue-draggable-plus'
 import {useStorage} from '@vueuse/core'
 import {cloneDeep} from 'lodash-es'
-import toolbarVector from '@/assets/images/toolbar-vector.svg'
-import toolbarVectorDark from '@/assets/images/toolbar-vector-dark.svg'
 import {getDefaultColumns, getHotOptions} from './hotRank/columnRender/hotColumusService'
 
 const {t} = useI18n()
 const dialogVisible = ref(false)
-const themeStore = useThemeStore()
 const storeColumns =  useStorage('hotUserTableColumns',getDefaultColumns(t))
 
 const props = defineProps({
@@ -18,6 +15,7 @@ const props = defineProps({
   }
 })
 
+const themeStore = useThemeStore()
 const hotOptions = computed(() => getHotOptions(t))
 
 console.log('props.activeCategory', props.activeCategory)
@@ -60,30 +58,24 @@ const handleReset = () => {
 <template>
   <div>
     <div @click="openDialog">
-      <div v-if="props.activeCategory === 'hot'" class="toolbar-vector-container">
-        <img class="toolbar-vector" :src="themeStore.isDark? toolbarVectorDark : toolbarVector" alt="">
-        <span class="toolbar-vector-title">{{ t("custom") }}</span>
+      <div
+        v-if="props.activeCategory === 'hot'"
+        class="flex items-center color-[--d-999-l-666] cursor-pointer min-w-63px">
+        <Icon
+          name="custom:order"
+          class="text-16px"
+        />
+        <span class="text-12px ml-2px">{{ t("custom") }}</span>
       </div>
     </div>
     <el-dialog v-model="dialogVisible" append-to-body :title="$t('customizeScreener')" width="820">
       <div class="content-bg">
-        <!-- <VueDraggable v-model="modelColumns" :animation="300" ghostClass="ghost">
-          <div v-for="item in modelColumns" :key="item.field || item.render" class="columns-bg"
-            :class="item.fixed ? 'columns-bg-disabled' : ''">
-            <el-checkbox v-model="item.isHide" :label="item.label" />
-            <el-icon :size="20" class="handle">
-              <Rank />
-            </el-icon>
-          </div>
-        </VueDraggable> -->
         <div class="draggable-box-bg">
           <VueDraggable v-model="modelColumns" :animation="300" ghostClass="ghost" class="draggable-list-bg">
             <template v-for="item in modelColumns" :key="item.field || item.render">
               <div v-if="item.isHide" class="draggable-columns-bg" :class="item.fixed ? 'columns-bg-disabled' : ''">
                 {{ item.label }}
-                <el-icon :size="14" class="handle">
-                  <Rank/>
-                </el-icon>
+                <Icon name="custom:handle" class="ml-2 color-[--d-666-l-999]"/>
               </div>
             </template>
           </VueDraggable>
@@ -101,9 +93,23 @@ const handleReset = () => {
             </div>
           </div>
         </div>
-        <div class="button-container">
-          <div class="confirm-button" @click="handleConfirm">{{ $t('confirm') }}</div>
-          <div class="reset-button" @click="handleReset">{{ $t('reset') }}</div>
+        <div class="flex items-center gap-20px mt-40px">
+          <el-button
+            :color="themeStore.isDark ? '#333':'#F2F2F2'"
+            class="flex-1"
+            size="large"
+            @click="handleReset"
+          >
+            {{ $t('reset') }}
+          </el-button>
+          <el-button
+            type="primary"
+            class="flex-1"
+            size="large"
+            @click="handleConfirm"
+          >
+            {{ $t('confirm') }}
+          </el-button>
         </div>
       </div>
     </el-dialog>
@@ -136,83 +142,11 @@ const handleReset = () => {
   --columns-options-list-item-color: #999;
   --columns-options-list-item-color-select: #fff;
   --columns-toolbar-vector-title-color: #fff;
-
   --columns-draggable-columns-bg: #999;
-}
-
-
-.el-dialog {
-  background: var(--columns-toolbar-button-color);
 }
 </style>
 
 <style lang="scss" scoped>
-:deep(.el-dialog) {
-  padding: 0px;
-  display: flex;
-  flex-direction: column;
-  max-height: 80vh;
-  margin: 0 auto;
-  background: var(--a-popup-bg-color);
-}
-
-:deep(.el-dialog__header) {
-  padding: 1.25rem;
-  border-bottom: 1px solid #333;
-  font-size: 1.5rem;
-  color: var(--columns-toolbar-text-color);
-  background: var(--columns-toolbar-button-color);
-  flex-shrink: 0;
-}
-
-:deep(.el-dialog__body) {
-  overflow-y: auto;
-  padding: 0;
-  flex: 1;
-}
-
-:deep(.el-dialog__close) {
-  color: var(--columns-toolbar-text-color);
-}
-
-:deep(.el-dialog__headerbtn) {
-  height: 68px;
-  width: 68px;
-}
-
-:deep(.el-dialog__headerbtn:hover) {
-  color: var(--columns-toolbar-text-color);
-
-  .el-dialog__close {
-    color: var(--columns-toolbar-text-color);
-  }
-}
-
-:deep(.el-dialog__close:hover) {
-  color: var(--columns-toolbar-text-color);
-}
-
-:deep(.el-checkbox__label) {
-  color: #999;
-}
-
-:deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
-  color: var(--columns-toolbar-checkbox-color) !important;
-}
-
-:deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-  background-color: var(--columns-toolbar-checkbox-color) !important;
-  border-color: var(--columns-toolbar-checkbox-color) !important;
-}
-
-:deep(.el-checkbox__inner:hover) {
-  border-color: var(--columns-toolbar-checkbox-color) !important;
-}
-
-:deep(.el-checkbox__input.is-checked .el-checkbox__inner::after) {
-  border-color: var(--columns-toolbar-button-color);
-}
-
 .toolbar-vector-title {
   margin-left: 0.25rem;
   font-size: 0.75rem;
@@ -369,17 +303,4 @@ const handleReset = () => {
   opacity: 0.5;
   background: #e6e6e6;
 }
-
-// .confirm-button {
-//   display: flex;
-//   height: 2.5rem;
-//   padding: 0.5rem 5rem;
-//   justify-content: center;
-//   align-items: center;
-//   border-radius: 0.375rem;
-//   background: var(--columns-toolbar-button-bg);
-//   color: var(--columns-toolbar-button-color);
-//   cursor: pointer;
-//   margin-top: 30px;
-// }
 </style>

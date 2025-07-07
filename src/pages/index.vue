@@ -28,10 +28,7 @@ async function _getTreasureConfig() {
         v-model:activeChain="activeChain"
         :list="chains"
       />
-      <CategoryTabs
-        activeInterval="1m"
-        :quickInputVisible="false"
-      />
+      <CategoryTabs/>
     </div>
     <KeepAlive>
       <component :is="components[activeTab]"

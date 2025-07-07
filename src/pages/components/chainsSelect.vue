@@ -22,6 +22,9 @@ const _activeChain = computed({
     emit('update:activeChain', value)
   }
 })
+const currentChain = computed(() => {
+  return props.list.find(el => el.chain_id === props.activeChain) || {chain_id: '-1', net_name: '', name: ''}
+})
 </script>
 
 <template>
@@ -32,6 +35,7 @@ const _activeChain = computed({
     <template #header>
       <el-input
         :placeholder="$t('searchChain')"
+        clearable
         v-model="searchKey"
       >
         <template #prefix>
@@ -40,7 +44,19 @@ const _activeChain = computed({
       </el-input>
     </template>
     <template #label>
-      abc
+      <div class="flex items-center gap-4px">
+        <template v-if="currentChain.chain_id==='-1'">
+          <Icon name="custom:chain" class="color-[--d-F5F5F5-l-333]"/>
+          {{ $t('allChain') }}
+        </template>
+        <template v-else>
+          <img
+            :src="`${configStore.token_logo_url}chain/${currentChain.net_name}.png`" alt=""
+            class="rounded-full w-16px h-16px"
+          >
+          {{ currentChain.name }}
+        </template>
+      </div>
     </template>
     <el-option
       v-for="(item,$index) in searchResult"

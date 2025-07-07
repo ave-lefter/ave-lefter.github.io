@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import {useStorage} from '@vueuse/core'
 import ColumnsToolbar from './columnsToolbar.vue'
 
-const props = defineProps<{
-  activeInterval: string,
-  quickInputVisible: boolean,
-}>()
-const emit = defineEmits(['update:activeInterval', 'update:quickInputVisible'])
+const rankCommonConditions = useStorage('rankCommon', {
+  activeInterval: '1m',
+  quickVisible: true
+})
 const {t} = useI18n()
 const intervals = computed(() => {
   return [
@@ -22,14 +22,6 @@ const tabs = computed(() => {
     {name: t('trending'), component: 'HotRank' as const, icon: 'custom:hot'}
   ]
 })
-const _quickInputVisible = computed({
-  get() {
-    return props.quickInputVisible
-  },
-  set(value) {
-    emit('update:quickInputVisible', value)
-  }
-})
 </script>
 
 <template>
@@ -38,9 +30,9 @@ const _quickInputVisible = computed({
       <span
         v-for="(item, index) in tabs"
         :key="index"
-        class="p-2 lh-16px bg-#1A1A1A cursor-pointer rounded-1"
+        class="p-2 lh-16px color-#F5F5F5 bg-#333 cursor-pointer rounded-1"
       >
-        <Icon :name="item.icon" class="mr-1"/>
+        <Icon :name="item.icon" class="mr-1 color-#FFA622"/>
         {{ item.name }}
       </span>
     </div>
@@ -49,19 +41,20 @@ const _quickInputVisible = computed({
         <button
             v-for="(item, index) in intervals" :key="index"
             class="lh-16px py-2px px-8px color-[--d-F5F5F5-l-333] border-none cursor-pointer rounded-2px"
-            :class="activeInterval === item.id?'bg-[--d-111-l-FFF]':'bg-transparent'"
-            @click.stop="emit('update:activeInterval',item.id)"
+            :class="rankCommonConditions.activeInterval === item.id?'bg-[--d-111-l-FFF]':'bg-transparent'"
+            @click.stop="rankCommonConditions.activeInterval = item.id"
         >
           {{ item.name }}
         </button>
       </div>
       <div class="flex items-center">
-        <el-switch v-model="_quickInputVisible" class="mr-2"/>
+        <el-switch v-model="rankCommonConditions.quickVisible" class="mr-2"/>
         <QuickSwapSet
+          v-if="rankCommonConditions.quickVisible"
             :settingsButtonVisible="false"
             :chain="'solana'"
         />
-        <ColumnsToolbar :activeCategory="'hot'" class="ml-10"/>
+        <ColumnsToolbar :activeCategory="'hot'" class="ml-2"/>
       </div>
     </div>
   </div>

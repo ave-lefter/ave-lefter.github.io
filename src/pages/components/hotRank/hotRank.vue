@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {useStorage} from '@vueuse/core'
 import {getDefaultColumns} from './columnRender/hotColumusService'
+import {getTreasureList} from '~/api/market'
 
 const {t} = useI18n()
 const conditions = ref({
@@ -8,9 +9,10 @@ const conditions = ref({
   sort_dir: ''
 })
 const listData = shallowRef([])
-const pageInfo = shallowRef({
+const pageInfo = ref({
   pageNO: 1,
-  pgeSize: 100
+  pageSize: 100,
+  total: 0
 })
 const loading = shallowRef(false)
 const columns = useStorage('hotUserTableColumns', getDefaultColumns(t))
@@ -22,6 +24,25 @@ function tableRowClick(row) {
   navigateTo(`/token/${row.target_token}-${row.chain}`)
 }
 
+onMounted(() => {
+  _getTreasureList()
+})
+
+async function _getTreasureList() {
+  try {
+    loading.value = true
+    const {total: _, ...rest} = pageInfo.value
+    const res = await getTreasureList({
+      category: 'hot',
+      ...rest
+    })
+    pageInfo.value.total = res.total
+    listData.value = res.data || []
+  } finally {
+    loading.value = false
+  }
+}
+
 function handleSortChange() {
 
 }
@@ -29,6 +50,7 @@ function handleSortChange() {
 
 <template>
   <el-table
+    :data="listData"
     fit stripe
     :default-sort="{
       prop: conditions.sort,
@@ -45,6 +67,17 @@ function handleSortChange() {
       <component :is="renderData[item.render]" v-if="item.isHide"/>
     </template>
   </el-table>
+  <el-pagination
+    v-model:current-page="pageInfo.pageNO"
+    v-model:page-size="pageInfo.pageSize"
+    class="mt-5px flex justify-center"
+    layout="total, prev, pager, next"
+    :total="pageInfo.total || 0"
+    :small="false"
+    :page-sizes="[20, 50, 100, 200, 300, 400]"
+    @size-change="pageInfo.pageNO=1;_getTreasureList()"
+    @current-change="_getTreasureList"
+  />
 </template>
 
 <style scoped lang="scss">
