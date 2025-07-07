@@ -73,7 +73,7 @@ export function getSignalV2List(query: {
 }): Promise<GetSignalV2ListResponse[]> {
   const {$api} = useNuxtApp()
   // 前面的是折叠的接口
-  const url = query.fold ? '/v2api/signals/v2/public/list/v2' : 'https://0ftrfsdb.xyz/v2api/signals/v2/public/list'
+  const url = query.fold ? '/v2api/signals/v2/public/list/v2' : '/v2api/signals/v2/public/list'
   return $api(url, {
     method: 'get',
     query
@@ -101,11 +101,11 @@ export interface Gold {
 /**
  * 获取信号广场时间线
  */
-export function getTimeline(chain: string): Promise<ITimeline[]> {
+export function getTimeline(chain: string, time_interval?: number): Promise<ITimeline[]> {
     const {$api} = useNuxtApp()
-    return $api('/v2api/signals/v2/timeline', {
+  return $api('/v2api/signals/v2/timeline', {
         method: 'get',
-        query: {chain}
+    query: {chain, time_interval}
     })
 }
 
@@ -155,7 +155,7 @@ export function getSignalV3List(query: {
   wallet_address?: string
 }): Promise<GetSignalV2ListResponse<IActionV3Item>[]> {
   const {$api} = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v2api/signals/v2/public/list/v3', {
+  return $api('/v2api/signals/v2/public/list/v3', {
     method: 'get',
     query
   })

@@ -66,7 +66,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
 </script>
 
 <template>
-  <div class="w-454px bg-[--d-111-l-FFF] p-12px rounded-8px flex flex-col">
+  <div class="w-375px bg-[--d-1A1A1A-l-FFF] p-12px rounded-8px flex flex-col">
     <div class="flex justify-between">
       <div class="flex flex-1 flex-col gap-12px">
         <div class="flex items-center gap-8px">
@@ -165,7 +165,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
                 ${{ formatNumber(item.mc, 1) }}
                 <Icon
                   name="material-symbols:arrow-right-alt"
-                  class="mx-12px color-#999"
+                  class="mx-6px color-#999"
                 />
               </div>
             </div>
@@ -206,8 +206,29 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
           >
             <Icon name="custom:filter"/>
           </div>
-          <Icon name="custom:clock" class="text-10px mr-2px"/>
-          {{ formatDate(item.signal_time) }}
+          <div 
+            class="color-[--d-999-l-666] hover:color-[--d-F5F5F5-l-333] flex items-center gap-2px"
+            v-tooltip="formatDate(item.signal_time,'YYYY-MM-DD HH:mm:ss')"
+          >
+            <Icon name="custom:clock" class="text-10px mr-2px"/>
+            <div>
+              <TimerCount
+                v-if="item.signal_time && Number(formatTimeFromNow(item.signal_time, true)) < 60"
+                :key="item.signal_time" :timestamp="item.signal_time" :end-time="60">
+                <template #default="{ seconds }">
+                <span v-if="seconds < 60" class="color-#FFA622 text-12px">
+                  {{ seconds }}s
+                </span>
+                  <span v-else class="text-12px">
+                  {{ formatTimeFromNow(item.signal_time) }}
+                </span>
+                </template>
+              </TimerCount>
+              <div v-else class="text-12px">
+                {{ formatTimeFromNow(item.signal_time) }}
+              </div>
+            </div>
+          </div>
         </div>
         <div
           class="flex items-center lh-24px py-4px px-8px rounded-4px"
@@ -246,13 +267,13 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
       <div class="flex-[2]">
         {{ $t('wallet') }}
       </div>
-      <div class="flex-[2] text-right">
+      <div class="w-100px text-right">
         {{ $t('operate') }}
       </div>
       <div class="flex-1 text-right" v-if="!filterToken">
         {{ $t('positions') }}
       </div>
-      <div class="flex-1 text-right">
+      <div class="w-40px text-right">
         {{ $t('time') }}
       </div>
     </div>
@@ -283,10 +304,16 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
               wallet_alias || $t('wallet')
             }}</span><span class="color-[--d-999-l-666]">(*{{ wallet_address.slice(-4) }})</span>
         </div>
-        <div class="flex-[2] text-right color-#12B886">
-          {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : '' }}{{ formatNumber(quote_token_amount, 2) }} {{
+        <div class="w-100px text-right color-#12B886">
+          {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : '' }}<span
+          class="decoration-underline decoration-dotted underline-offset-2px"
+          v-tooltip="'$'+formatNumber(quote_token_volume, 2)"
+        >
+          {{ formatNumber(quote_token_amount, 2) }} {{
             quote_token_symbol.toUpperCase() === 'USDC' ? 'U' : quote_token_symbol
-          }}<span class="color-[--d-999-l-666]">(${{ formatNumber(quote_token_volume, 0) }})</span>
+          }}
+        </span>
+          <!--<span class="color-[&#45;&#45;d-999-l-666]">(${{ formatNumber(quote_token_volume, 0) }})</span>-->
         </div>
         <div class="flex-1 text-right" v-if="!filterToken">
             <span
@@ -300,7 +327,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
           </template>
         </div>
         <div
-          class="flex-1 text-right"
+          class="w-40px text-right"
         >
             <span v-tooltip="formatDate(action_time * 1000, 'MM/DD HH:mm:ss')">{{
                 formatTimeFromNow(action_time)

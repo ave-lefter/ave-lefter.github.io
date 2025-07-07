@@ -125,7 +125,7 @@ const scrollbar = useTemplateRef('scrollbar')
 const onScroll = useThrottleFn(({scrollTop}: { scrollTop: number }) => {
   if (scrollbar.value) {
     const scrollElement = scrollbar.value.wrapRef
-    if (scrollElement && scrollElement.scrollHeight - scrollTop - (height.value - 280) < 30) {
+    if (scrollElement && scrollElement.scrollHeight - scrollTop - (height.value - 226) < 30) {
       fetchSignalList()
     }
   }
@@ -153,7 +153,9 @@ function filterCallback(el: GetSignalV2ListResponse) {
 }
 
 const canDrag = shallowRef(false)
-const width = useStorage('signalLefWid', 536)
+const {width: winWidth} = useWindowSize()
+const widthConfig = [304, 404]
+const width = useStorage('signalLefWid', winWidth.value < 1920 ? widthConfig[0] : widthConfig[1])
 
 function drag(e: MouseEvent) {
   let dx = e.clientX
@@ -167,7 +169,7 @@ function drag(e: MouseEvent) {
     const _width = clientX < dx
       ? width.value - (dx - clientX)
       : width.value + clientX - dx
-    if (_width >= 536 && _width <= 700) {
+    if (_width >= widthConfig[0] && _width <= widthConfig[1]) {
       width.value = _width
     }
     dx = clientX
@@ -184,8 +186,13 @@ const selectId = shallowRef()
 const emit = defineEmits(['setToken'])
 
 function selectSignal(id: number, token: string) {
-  selectId.value = id
-  emit('setToken', token)
+  if(selectId.value === id){
+    selectId.value = undefined
+    emit('setToken', '')
+  } else {
+    selectId.value = id
+    emit('setToken', token)
+  }
 }
 
 const tokenDetailSStore = useTokenDetailsStore()
@@ -218,7 +225,7 @@ function openTokenDetail(el: IActionItem) {
     <el-scrollbar
       ref="scrollbar"
       :style="`width:${width}px`"
-      :height="height-286"
+      :height="height-226"
       @scroll="onScroll"
     >
       <AveEmpty
@@ -247,13 +254,12 @@ function openTokenDetail(el: IActionItem) {
           first_signal_time,
           mc,
           mc_cur,
-          holders_cur,
           headline,
           id
         },index) in filterSignalList"
           :key="index"
-          class="p-16px rounded-8px bg-[--d-111-l-FFF] border-[--d-111-l-FFF] hover:bg-[--d-1A1A1A-l-F2F2F2] cursor-pointer transition-colors"
-          :class="selectId===id?'bg-[--d-1A1A1A-l-F2F2F2]':''"
+          class="p-12px  bg-[--d-111-l-FFF] border-[--d-111-l-FFF] hover:bg-[--d-222-l-F2F2F2] cursor-pointer transition-colors"
+          :class="selectId===id?'bg-[--d-222-l-F2F2F2]':''"
           @click="selectSignal(id,token)"
         >
           <div class="mb-22px flex justify-between">
@@ -321,12 +327,7 @@ function openTokenDetail(el: IActionItem) {
                   <span
                     class="text-16px font-500 color-[--d-F5F5F5-l-333]"
                     @click.stop="navigateTo(`/token/${token}-${chain}`)"
-                  >{{ symbol }}</span><span
-                  v-copy="token"
-                  class="text-12px cursor-pointer">{{
-                    token.slice(0, 4)
-                  }}...{{ token.slice(-4) }}</span>
-                  <Icon v-copy="token" name="bxs:copy" class="cursor-pointer text-12px"/>
+                  >{{ symbol }}</span>
                   <a
                     class="text-10px flex items-center justify-center"
                     :href="`https://x.com/search?q=($${symbol} OR ${token})&src=typed_query&f=live`"
@@ -347,7 +348,7 @@ function openTokenDetail(el: IActionItem) {
                     alt=""
                   >
                 </div>
-                <div class="flex items-center gap-8px">
+                <div class="flex items-center gap-4px">
                   <div v-tooltip="formatDate(token_create_time,'MM/DD HH:mm:ss')">
                     <TimerCount
                       v-if="token_create_time && Number(formatTimeFromNow(token_create_time, true)) < 60"
@@ -356,18 +357,24 @@ function openTokenDetail(el: IActionItem) {
                     <span v-if="seconds < 60" class="color-#FFA622 text-12px">
                       {{ seconds }}s
                     </span>
-                        <span v-else class="color-[--d-999-l-666] text-12px">
+                        <span v-else class="color-[--d-666-l-999] text-12px">
                       {{ formatTimeFromNow(token_create_time) }}
                     </span>
                       </template>
                     </TimerCount>
-                    <div v-else class="color-[--d-999-l-666] text-12px">
+                    <div v-else class="color-[--d-666-l-999] text-12px">
                       {{ formatTimeFromNow(token_create_time) }}
                     </div>
                   </div>
+                  <span
+                    v-copy="token"
+                    class="text-12px cursor-pointer color-[--d-666-l-999]">{{
+                      token.slice(0, 4)
+                    }}...{{ token.slice(-4) }}</span>
+                  <Icon v-copy="token" name="bxs:copy" class="cursor-pointer text-12px color-[--d-666-l-999]"/>
                   <div
                     v-if="Number(top10_ratio) > 0"
-                    class="text-10px flex items-center gap-2px color-[--d-999-l-666]"
+                    class="text-10px flex items-center gap-2px color-[--d-666-l-999]"
                     :class="{
                     'color-#F6465D':Number(top10_ratio) > 30
                 }"
@@ -378,104 +385,138 @@ function openTokenDetail(el: IActionItem) {
                     />
                     {{ formatNumber(top10_ratio || 0, 1) }}%
                   </div>
-                  <div
-                    v-if="Number(insider_ratio) > 0"
-                    class="text-10px flex items-center gap-2px color-[--d-999-l-666]"
-                    :class="{
-                    'color-#F6465D':Number(insider_ratio) > 30
-                }"
-                  >
-                    <Icon
-                      class="text-11px"
-                      name="custom:insiders"
-                    />
-                    {{ formatNumber(insider_ratio || 0, 1) }}%
-                  </div>
-                  <div
-                    v-if="Number(dev_ratio) > 0.01"
-                    class="text-10px flex items-center gap-2px color-[--d-999-l-666]"
-                  >
-                    <img
-                      src="@/assets/images/dev.png" alt=""
-                      class="w-11px h-11px">
-                    {{ formatNumber(dev_ratio || 0, 1) }}%
-                  </div>
+                  <!--  <div-->
+                  <!--    v-if="Number(insider_ratio) > 0"-->
+                  <!--    class="text-10px flex items-center gap-2px color-[&#45;&#45;d-999-l-666]"-->
+                  <!--    :class="{-->
+                  <!--    'color-#F6465D':Number(insider_ratio) > 30-->
+                  <!--}"-->
+                  <!--  >-->
+                  <!--    <Icon-->
+                  <!--      class="text-11px"-->
+                  <!--      name="custom:insiders"-->
+                  <!--    />-->
+                  <!--    {{ formatNumber(insider_ratio || 0, 1) }}%-->
+                  <!--  </div>-->
+                  <!--  <div-->
+                  <!--    v-if="Number(dev_ratio) > 0.01"-->
+                  <!--    class="text-10px flex items-center gap-2px color-[&#45;&#45;d-999-l-666]"-->
+                  <!--  >-->
+                  <!--    <img-->
+                  <!--      src="@/assets/images/dev.png" alt=""-->
+                  <!--      class="w-11px h-11px">-->
+                  <!--    {{ formatNumber(dev_ratio || 0, 1) }}%-->
+                  <!--  </div>-->
                 </div>
               </div>
             </div>
-            <div class="flex items-center gap-16px">
-              <div class="color-[--d-999-l-666] mb-4px">
+            <div>
+              <div class="color-[--d-999-l-666] mb-8px text-12px text-right">
                 {{ $t('MaximumIncrease') }}
               </div>
               <div
-                class="p-8px min-w-67px text-center rounded-tl-2 rounded-br-[10px] text-[32px] leading-[24px] text-white font-500 bg-#12B886"
+                class="py-4px px-8px min-w-67px text-center rounded-tl-2 rounded-br-[10px] text-[24px] leading-[24px] text-white font-500 bg-#12B886"
               >
                 {{ Number(max_price_change) < 1 ? '<1' : Math.ceil(Number(max_price_change)) + 'X' }}
               </div>
             </div>
           </div>
-          <div class="flex justify-between items-center text-12px lh-20px">
-            <el-row
-              class="flex-1"
-            >
-              <el-col :span="9">
-                <div class="color-[--d-666-l-999]">{{ $t('CurrentAlert') }}</div>
-                <div class="color-[--d-F5F5F5-l-333]">
+          <div class="flex justify-between items-end text-12px lh-16px">
+            <div class="flex flex-col gap-8px">
+              <div class="flex-1 flex">
+                <div class="color-[--d-666-l-999] w-80px">{{ $t('CurrentAlert') }}</div>
+                <div class="color-[--d-999-l-666]">
                   {{
                     first_signal_time
-                      ? formatDate(first_signal_time, 'YYYY/MM/DD HH:mm:ss')
+                      ? formatDate(first_signal_time, 'MM/DD HH:mm:ss')
                       : '--'
                   }}
                 </div>
-              </el-col>
-              <el-col
-                :span="11"
-                class="[&&]:flex items-center"
-              >
-                <div>
-                  <div class="color-[--d-666-l-999]">
-                    {{ $t('AlertMC') }}
-                  </div>
-                  <div class="flex items-center color-[--d-F5F5F5-l-333]">
-                    ${{ formatNumber(mc, 1) }}
-                    <Icon
-                      name="material-symbols:arrow-right-alt"
-                      class="mx-12px color-#999"
-                    />
-                  </div>
+              </div>
+              <div class="flex-1 flex">
+                <div class="color-[--d-666-l-999] w-80px">
+                  {{ $t('CurrentMC') }}
                 </div>
-                <div>
-                  <div class="color-[--d-666-l-999]">
-                    {{ $t('CurrentMC') }}
-                  </div>
-                  <div class="flex items-center gap-4px color-[--d-F5F5F5-l-333]">
+                <div class="flex items-center gap-4px color-[--d-F5F5F5-l-333]">
               <span
                 :class="{
                 'color-#12B886':Number(mc_cur)>Number(mc),
                 'color-#F6465D':Number(mc_cur)<Number(mc),
               }">${{ formatNumber(mc_cur, 1) }}</span>
-                    <img
-                      v-if="Number(mc_cur)>Number(mc)"
-                      src="@/assets/images/increase.svg"
-                      alt=""
-                    >
-                    <img
-                      v-else-if="Number(mc_cur)<Number(mc)"
-                      src="@/assets/images/decrease.svg"
-                      alt=""
-                    >
-                  </div>
+                  <img
+                    v-if="Number(mc_cur)>Number(mc)"
+                    src="@/assets/images/increase.svg"
+                    alt=""
+                  >
+                  <img
+                    v-else-if="Number(mc_cur)<Number(mc)"
+                    src="@/assets/images/decrease.svg"
+                    alt=""
+                  >
                 </div>
-              </el-col>
-              <el-col :span="4">
-                <div class="color-[--d-666-l-999]">
-                  {{ $t('holders') }}
-                </div>
-                <div class="color-[--d-F5F5F5-l-333]">
-                  {{ formatNumber(holders_cur) }}
-                </div>
-              </el-col>
-            </el-row>
+              </div>
+            </div>
+            <!--<el-row-->
+            <!--  class="flex-1"-->
+            <!--&gt;-->
+            <!--  <el-col :span="9">-->
+            <!--    <div class="color-[&#45;&#45;d-666-l-999]">{{ $t('CurrentAlert') }}</div>-->
+            <!--    <div class="color-[&#45;&#45;d-F5F5F5-l-333]">-->
+            <!--      {{-->
+            <!--        first_signal_time-->
+            <!--          ? formatDate(first_signal_time, 'YYYY/MM/DD HH:mm:ss')-->
+            <!--          : '&#45;&#45;'-->
+            <!--      }}-->
+            <!--    </div>-->
+            <!--  </el-col>-->
+            <!--  <el-col-->
+            <!--    :span="11"-->
+            <!--    class="[&&]:flex items-center"-->
+            <!--  >-->
+            <!--    <div>-->
+            <!--      <div class="color-[&#45;&#45;d-666-l-999]">-->
+            <!--        {{ $t('AlertMC') }}-->
+            <!--      </div>-->
+            <!--      <div class="flex items-center color-[&#45;&#45;d-F5F5F5-l-333]">-->
+            <!--        ${{ formatNumber(mc, 1) }}-->
+            <!--        <Icon-->
+            <!--          name="material-symbols:arrow-right-alt"-->
+            <!--          class="mx-12px color-#999"-->
+            <!--        />-->
+            <!--      </div>-->
+            <!--    </div>-->
+            <!--    <div>-->
+            <!--      <div class="color-[&#45;&#45;d-666-l-999]">-->
+            <!--        {{ $t('CurrentMC') }}-->
+            <!--      </div>-->
+            <!--      <div class="flex items-center gap-4px color-[&#45;&#45;d-F5F5F5-l-333]">-->
+            <!--  <span-->
+            <!--    :class="{-->
+            <!--    'color-#12B886':Number(mc_cur)>Number(mc),-->
+            <!--    'color-#F6465D':Number(mc_cur)<Number(mc),-->
+            <!--  }">${{ formatNumber(mc_cur, 1) }}</span>-->
+            <!--        <img-->
+            <!--          v-if="Number(mc_cur)>Number(mc)"-->
+            <!--          src="@/assets/images/increase.svg"-->
+            <!--          alt=""-->
+            <!--        >-->
+            <!--        <img-->
+            <!--          v-else-if="Number(mc_cur)<Number(mc)"-->
+            <!--          src="@/assets/images/decrease.svg"-->
+            <!--          alt=""-->
+            <!--        >-->
+            <!--      </div>-->
+            <!--    </div>-->
+            <!--  </el-col>-->
+            <!--  &lt;!&ndash;<el-col :span="4">&ndash;&gt;-->
+            <!--  &lt;!&ndash;  <div class="color-[&#45;&#45;d-666-l-999]">&ndash;&gt;-->
+            <!--  &lt;!&ndash;    {{ $t('holders') }}&ndash;&gt;-->
+            <!--  &lt;!&ndash;  </div>&ndash;&gt;-->
+            <!--  &lt;!&ndash;  <div class="color-[&#45;&#45;d-F5F5F5-l-333]">&ndash;&gt;-->
+            <!--  &lt;!&ndash;    {{ formatNumber(holders_cur) }}&ndash;&gt;-->
+            <!--  &lt;!&ndash;  </div>&ndash;&gt;-->
+            <!--  &lt;!&ndash;</el-col>&ndash;&gt;-->
+            <!--</el-row>-->
             <QuickSwapButton
               :quick-buy-value="quickBuyValue"
               :row="filterSignalList[index]"
@@ -483,8 +524,12 @@ function openTokenDetail(el: IActionItem) {
               mainNameVisible
             />
           </div>
-          <div v-if="headline" class="flex items-center gap-8px mt-12px">
-            <Icon name="custom:ai"/>
+          <div 
+            v-if="headline"
+            class="flex items-center gap-8px mt-12px"
+            v-tooltip="headline"
+           >
+            <Icon name="custom:ai" class="shrink-0"/>
             <div class="color-[--d-F5F5F5-l-333] text-12px whitespace-nowrap overflow-hidden text-ellipsis">
               {{ headline }}
             </div>
@@ -497,7 +542,7 @@ function openTokenDetail(el: IActionItem) {
       </div>
     </el-scrollbar>
     <div
-      class="mt-8px cursor-col-resize bg-[--d-333-l-F2F2F2] gap-1px hover:bg-[--d-666-l-CCC] flex flex-col items-center justify-center w-4px"
+      class="mt-8px cursor-col-resize bg-[--d-333-l-F2F2F2] gap-1px hover:bg-[--d-666-l-CCC] flex flex-col items-center justify-center w-6px"
       @mousedown.stop.prevent="drag"
     >
       <span v-for="i in 3" :key="i" class="bg-#444 w-2px h-2px rounded-full"/>

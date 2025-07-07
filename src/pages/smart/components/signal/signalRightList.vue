@@ -31,7 +31,7 @@ const scrollbar = useTemplateRef('scrollbar')
 const onScroll = useThrottleFn(({scrollTop}: { scrollTop: number }) => {
   if (scrollbar.value) {
     const scrollElement = scrollbar.value.wrapRef
-    if (scrollElement && scrollElement.scrollHeight - scrollTop - (height.value - 280) < 30) {
+    if (scrollElement && scrollElement.scrollHeight - scrollTop - (height.value - 226) < 30) {
       fetchSignalList()
     }
   }
@@ -135,14 +135,14 @@ function openDrawer(item: GetSignalV2ListResponse<IActionItem | IActionV3Item>) 
   <el-scrollbar
     ref="scrollbar"
     class="flex-1"
-    :height="height-286"
+    :height="height-226"
     @scroll="onScroll"
   >
-    <div class="flex flex-wrap gap-4px">
+    <div class="flex flex-wrap gap-2px">
       <SignalRightItem
         v-for="(item,index) in listData"
         :class="item.actions.length > 3 ? 'border-#3F80F7':'hover:border-#3F80F7'"
-        class="border-1px border-solid border-transparent transition-colors transition-.3s"
+        class="border-1px border-solid border-[--d-333-l-DDD] transition-colors transition-.3s"
         :key="index"
         :item="item"
         :filterToken="filterToken"
