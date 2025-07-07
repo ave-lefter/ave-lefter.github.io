@@ -1,10 +1,10 @@
 <template>
-  <el-popover ref="popoverRef" v-model:visible="visible" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" popper-class="" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" @before-leave="reset">
+  <el-popover ref="popoverRef" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" @before-leave="reset">
     <el-form ref="formRef" :model="form" :rules="rules" @submit.prevent.stop="handleSubmit(formRef)">
-      <el-form-item prop="user_chain" required label-position="top" size="large" class="mb-13px!">
+      <el-form-item v-loading="loading" prop="user_chain" required label-position="top" size="large" class="mb-13px!">
         <div class="flex justify-between items-center w-100%">
           <h4 class="font-500 text-12px lh-[120%] color-[var(--d-FFF-l-000)]">{{ $t('addWallet') }}</h4>
-          <el-select v-model="form.user_chain" :placeholder="t('placeholderPrefix1') + t('chain')" value-key="value" size="small" style="--el-text-color-regular:var(--d-FFF-l-000);--el-select-input-color:var(--d-FFF-l-000)" :persistent="true" :suffix-icon="CaretBottom" class="w-70px!">
+          <el-select v-model="form.user_chain" :placeholder="t('placeholderPrefix1') + t('chain')" value-key="value" size="small" style="--el-text-color-regular:var(--d-FFF-l-000);--el-select-input-color:var(--d-FFF-l-000)" :persistent="true" :suffix-icon="CaretBottom" class="w-70px!" :teleported="false">
             <template #prefix>
               <div class="h-12px inline-flex items-center">
                 <img :src="`${token_logo_url}chain/${form.user_chain?.id}.png`" class="rd-50%" width="12" lazy alt="">
@@ -67,16 +67,11 @@ const props=defineProps({
     type: String,
     default: ''
   },
-  visible: {
-    type: Boolean,
-    default: false
-  }
 })
 
 const emits = defineEmits<{
-  (e: 'onConfirm', value?: object): void
+  (e: 'onConfirm', value?: object, resetFields?: () => void,stopLoading?:()=>void): void
   (e: 'onCancel'): void
-  (e: 'update:visible', value: boolean): void
 }>()
 const popoverRef=ref()
   const {addressGroups} = storeToRefs(useFollowStore())
@@ -85,18 +80,9 @@ const {lang,token_logo_url} = storeToRefs(useGlobalStore())
 const formRef=ref<FormInstance|undefined>()
 const form = ref({...props.formData})
 const isAdd=ref(false)
+const loading=ref(false)
 const addGroupName=ref('')
-// watch(() => form.value, (val) => {
-//   console.log('watch form', val)
-// }, { deep: true })
 
-const visible=computed({
-  get: () => props.visible,
-  set: (val) => {
-    console.trace('set visible', val)
-    emits('update:visible', val)
-  }
-})
 const validateAddress = (rule: any, value: string, callback: (arg0?: Error) => void) => {
   if (value === '') {
     callback(new Error(t('cannotBeEmpty')))
@@ -136,27 +122,26 @@ const chainOptions=ref([
   {label:'BSC',value:'56',id:'bsc'},
 ])
 
-watch(()=>visible.value, (val) => {
-  console.log('visible', val)
-})
-watch(() => props.visible, (val) => {
-  console.log('props.visible', val)
-})
 function handleSubmit(formEl: FormInstance | undefined) {
   if (!formEl) return
   formEl.validate((valid, fields) => {
     if (valid) {
-      emits('onConfirm',form.value)
-      formRef.value?.resetFields()
+      loading.value = true
+      emits('onConfirm',form.value,formRef.value?.resetFields,stopLoading)
+      // formRef.value?.resetFields()
       // close()
     } else {
       console.log('error submit!', fields)
     }
   })
 }
+function stopLoading() {
+   loading.value = false
+}
 function handleCancel() {
-  emits('onConfirm')
+  emits('onCancel')
   formRef.value?.resetFields()
+  close()
 }
 function reset() {
   console.log('reset')
@@ -164,6 +149,12 @@ function reset() {
   addGroupName.value = ''
   form.value={...props.formData}
 }
+function close() {
+  unref(popoverRef)?.hide?.()
+}
+defineExpose({
+  close
+})
 </script>
 
 <style scoped lang="scss">

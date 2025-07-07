@@ -1,6 +1,6 @@
 <template>
   <div class="w-address mt-12px flex-1 w-100%">
-    <el-button ref="addButtonRef"  @click.stop.prevent="openFavPop">Default</el-button>
+    <el-button ref="addButtonRef" @click.stop.prevent="openFavPop">Default</el-button>
     <!-- <FavPop ref="favPopRef" v-model="favDetails" :button-ref="addButtonRef || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" /> -->
     <div v-if="currentAddress" class="m-header flex-between px-12px items-start">
       <pro-groups v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
@@ -535,7 +535,7 @@ const followStore = useFollowStore()
 const $router = useRouter()
 const { t } = useI18n()
 const {evmAddress} = storeToRefs(useBotStore())
-const { addressGroups ,currentAddress} = storeToRefs(useFollowStore())
+const { addressGroups ,currentAddress,attentionTrigger} = storeToRefs(useFollowStore())
 // const addressGroups = ref([{ "group_id": 3763, "name": "base", "show_index": -1 }, { "group_id": 37632, "name": "base1", "show_index": 0 }, { "group_id": 37631, "name": "base2", "show_index": 1 }])
 const visible = ref(false)  
 const visible2 = ref(false)  
@@ -544,6 +544,7 @@ const buttonTagRef = ref<HTMLElement | undefined>(undefined)
 const toolTipTagVisible = ref(false)
 const toolTipTagContent = ref('')
 const addButtonRef = ref()
+const addButtonRef2 = ref()
 const tableRef = ref<TableInstance | null>(null)
 const isMonitor=ref(false)
 const conditions = reactive({
@@ -710,6 +711,9 @@ function handleDelGroup(groupId: number) {
     removeFavoriteGroup2(groupId).then(() => {
       ElMessage.success(t('success'))
       followStore.getUserFavoriteGroups2()
+      if(conditions.group==groupId){
+        conditions.group=0
+      }
     }).catch((e) => {
        ElMessage.error(String(e))
     })
@@ -860,12 +864,6 @@ function handleSort(val:any, dir='',sort:string) {
   }
 }
 function openFavPop() {
-  // followStore.handleAddAttention=(form)=>{
-  //   console.log('handleAddAttention', form)
-  //   followStore.favAddressPopVisible = false
-  // }
-  // followStore.attentionTrigger=addButtonRef.value
-  // followStore.favAddressPopVisible = true
   followStore.confirmAttention(addButtonRef.value,(form)=>{
     console.log('confirmAttention', form)
     return Promise.resolve()

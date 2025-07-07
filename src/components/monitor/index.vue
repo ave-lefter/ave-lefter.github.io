@@ -1,27 +1,28 @@
 <template>
-  <div class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] px-12px">
+  <div class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] px-12px relative">
+    <!-- <div class="w-100% h-40px absolute pointer-events-auto z-999 drag-handle left-0"/> -->
     <Icon
         name="custom:drag2"
-        class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2]"
+        class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2] "
     />
     <el-tabs v-model="activeName" style="--el-border-color-light:#333333" class="tabs" @tab-change="handleClick">
       <el-tab-pane :label="$t('walletManage')" :name="0" lazy>
-          <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps"/>
-          <AveEmpty
-            v-else
-            :style="{height:`${props.scrollHeight-50}px`}"
-            class="overflow-hidden"
+        <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps"/>
+        <AveEmpty
+          v-else
+          :style="{height:`${props.scrollHeight-50}px`}"
+          class="overflow-hidden"
+        >
+          <span class="text-12px mt-10px">{{ $t('noBotWalletTip') }}</span>
+          <el-button
+            class="mt-10px"
+            @click="botStore.$patch({
+            connectVisible: true
+          })"
           >
-            <span class="text-12px mt-10px">{{ $t('noBotWalletTip') }}</span>
-            <el-button
-              class="mt-10px"
-              @click="botStore.$patch({
-              connectVisible: true
-            })"
-            >
-              {{ $t('connectWallet') }}
-            </el-button>
-          </AveEmpty>
+            {{ $t('connectWallet') }}
+          </el-button>
+        </AveEmpty>
       </el-tab-pane>
       <el-tab-pane :label="$t('followed')" :name="1" lazy>
         <template v-if="botStore.evmAddress" >
@@ -243,7 +244,7 @@
                 inactive-value="0"/>
               <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
             </template>
-            <el-button :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;color: var(--d-999-l-222) !important;" :color="isDark?'#333':'#F2F2F2'" @click="()=>addFavAddressVisible=true" :dark="isDark" >
+            <el-button v-if="activeName===1" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;color: var(--d-999-l-222) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
               <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
               {{ $t('addWallet') }}
             </el-button>
@@ -262,7 +263,7 @@
         </template>
       </el-tab-pane>
     </el-tabs>
-    <addFavAddressPop :visible="addFavAddressVisible" :buttonRef="addButtonRef" @onConfirm="()=>addFavAddressVisible=false"/>
+    <addFavAddressPop ref="addFavAddressPopRef" :buttonRef="addButtonRef" @onConfirm="handleConfirmAdd" />
   </div>
 </template>
 
@@ -271,7 +272,7 @@ import WalletManage from './walletManage.vue'
 import {throttle} from 'lodash-es'
 import {useStorage} from '@vueuse/core'
 import BigNumber from 'bignumber.js'
-import { getHistoryMonitor,batchPauseMonitor} from '~/api/attention'
+import { getHistoryMonitor,batchPauseMonitor,addAttention2} from '~/api/attention'
 import QuickBuyInput from './components/quickBuyInput.vue'
 import FilterType from './components/filterType.vue'
 import { defaultPaginationParams, downColor, upColor } from '@/utils/constants'
@@ -302,8 +303,7 @@ const firstActivated = ref(true)
 const txType = ref([0,1])
 const addButtonRef = ref()
 const toggleMc = ref(false)
-const addFavAddressVisible = ref(false)
-
+const addFavAddressPopRef = ref()
 const activeName=ref(0)
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const txTypeList=computed(() => {
@@ -321,6 +321,13 @@ const walletManageProps=computed(() => {
 })
 onMounted(async () => {
   console.log('monitor mounted')
+  nextTick(() => {
+    if (monitorStore.visible) {
+      const el = document.querySelector('.el-tabs__header.is-top')
+      if (el) el.className = 'el-tabs__header is-top drag-handle'
+      console.log('monitor visible', el)
+    }
+  })
   init()
 })
 watch(() => txType.value, (val) => {
@@ -353,6 +360,16 @@ function handleClick(name: number|string) {
     updateDateSource()
   }
 }
+function handleConfirmAdd(formData?: any, resetFields?: () => void, stopLoading?: () => void) {
+  addAttention2({ address:botStore.evmAddress, user_chain: formData?.user_chain?.id ,user_address:formData?.address,remark:formData?.remark,group:formData?.group_id,is_monitored:0}).then(() => {
+    // init2()
+    if (resetFields) resetFields()
+    if (stopLoading) stopLoading()
+    addFavAddressPopRef.value?.close?.()
+  }).catch((err) => {
+    console.error(err)
+  })
+} 
 const columns = computed(() => {
   return props.isLarge?[
     {

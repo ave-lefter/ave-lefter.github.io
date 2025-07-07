@@ -114,7 +114,7 @@
           'bl',
           'ml',
     ]"
-      drag-cancel="#drag-disabled,#drag-settings,#custom-filter"
+      drag-handle=".drag-handle"
       @onDragStop="monitorStore.onDragStop"
       @onResizing="monitorStore.onResizing"
       @onDrag="monitorStore.onDrag"
@@ -135,7 +135,7 @@
       :handles="[
       'mr',
       ]"
-      drag-cancel="#drag-disabled"
+      drag-handle=".drag-handle"
       @onDragStop="monitorStore.onLeftDragStop"
       @onResizing="monitorStore.onFixedResizing"
     >
@@ -156,7 +156,7 @@
           :handles="[
           'ml',
           ]"
-          drag-cancel="#drag-disabled"
+          drag-handle=".drag-handle"
           @onDragStop="monitorStore.onRightDragStop"
           @onResizing="monitorStore.onFixedResizing"
         >
@@ -177,7 +177,7 @@
       :handles="[
       'ml',
       ]"
-      drag-cancel="#drag-disabled"
+      drag-handle=".drag-handle"
       @onDragStop="monitorStore.onRightDragStop"
       @onResizing="monitorStore.onFixedResizing"
     >

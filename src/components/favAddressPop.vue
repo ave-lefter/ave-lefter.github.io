@@ -1,8 +1,8 @@
 <template>
-  <el-popover ref="popoverRef" v-model:visible="visible" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" :teleported="true" popper-class="" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" @before-leave="reset">
-    <el-form ref="formRef" :model="form" :rules="rules" hide-required-asterisk @submit.prevent.stop="handleSubmit(formRef)">
+  <el-popover ref="popoverRef" v-model:visible="visible" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" :teleported="true" popper-class="" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" @before-leave="reset"  >
+    <el-form ref="formRef" v-click-outside="()=>followStore.favAddressPopVisible=false" :model="form" :rules="rules" hide-required-asterisk @submit.prevent.stop="handleSubmit(formRef)">
       <el-form-item prop="group_id" required label-position="top" size="large" class="mb-20px!">
-        <el-scrollbar height="274px">
+        <el-scrollbar max-height="274px">
           <el-radio-group v-model="form.group_id" class="flex flex-col items-start w-100%" style="align-items: flex-start; ">
               <el-radio :key="0" :value="0" class="w-100%">{{ t('defaultGroup') }}</el-radio>
               <el-radio v-for="item in followStore.addressGroups" :key="item.group_id" :value="item.group_id" class="w-100%">{{ item.name }}</el-radio>
@@ -11,7 +11,8 @@
       </el-form-item>
       <el-form-item>
         <el-button v-if="!isAdd" type="primary" class="w-100% text-12px" size="default" :icon="CirclePlusFilled" @click="isAdd = true"> {{ t('newGroup') }}</el-button>
-        <el-input v-else v-model="addGroupName" style="width: 140px" size="default"
+        <el-input
+          v-else v-model="addGroupName" style="width: 140px" size="default"
           class="name-input">
           <template #suffix>
             <Icon 

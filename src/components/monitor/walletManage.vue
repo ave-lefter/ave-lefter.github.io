@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="flex justify-between items-center gap-8px h-54px">
-      <el-select v-model="selectGroupId"  :mode="mode" @click.stop @change="(val) => filterGroup(val, row)">
+      <el-select v-model="selectGroupId"  :mode="mode" @click.stop @change="(val) => filterGroup(val)">
         <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
         <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
       </el-select>
-      <el-button :ref="(ref)=>addButtonRef=ref"  style="height: 32px;color: var(--d-999-l-222) !important; padding: 8px 10px !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" @click="()=>addFavAddressVisible=true" >
+      <el-button ref="addButtonRef"  style="height: 32px;color: var(--d-999-l-222) !important; padding: 8px 10px !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark">
         <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
         {{ $t('addWallet') }}
       </el-button>
@@ -116,12 +116,12 @@
           </template> -->
       </AveTable>
     </div>
-     <addFavAddressPop :visible="addFavAddressVisible" :buttonRef="addButtonRef" @onConfirm="()=>addFavAddressVisible=false"/>
+     <addFavAddressPop ref="addFavAddressPopRef" :buttonRef="addButtonRef" @onConfirm="handleConfirmAdd"/>
   </div>
-</template>
+</template> 
 
 <script setup lang="ts">
-import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,getHistoryMonitor} from '~/api/attention'
+import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,getHistoryMonitor,addAttention2} from '~/api/attention'
 import { defaultPaginationParams, downColor, upColor } from '@/utils/constants'
 import { throttle } from 'lodash-es'
 const { t } = useI18n()
@@ -139,9 +139,9 @@ const chainOptions=ref([
   {label:'Solana',value:'solana',id:'solana'},
   {label:'Bsc',value:'bsc',id:'bsc'},
 ])
-const addFavAddressVisible = ref(false)
 const visible = ref(false)
 const addButtonRef = ref()
+const addFavAddressPopRef = ref()
 const selectGroupId=ref(0)
 const {currentAddress ,showBatchAddressDetails} = storeToRefs(useFollowStore())
 const conditions = reactive({
@@ -194,8 +194,18 @@ onMounted(() => {
 function init(){
   getTableList()
 }
-function filterGroup(val: number, row: any) {
-  console.log('=>(favoriteTable.vue:58) filterGroup', val, row)
+function handleConfirmAdd(formData:any,resetFields?:() => void,stopLoading?:()=>void) {
+  addAttention2({ address:botStore.evmAddress, user_chain: formData?.user_chain?.id ,user_address:formData.address,remark:formData.remark,group:formData.group_id,is_monitored:0}).then(() => {
+    // init2()
+    if(resetFields)resetFields()
+    if(stopLoading)stopLoading()
+    addFavAddressPopRef.value?.close?.()
+    getTableList()
+  }).catch((err) => {
+    console.error(err)
+  })
+} 
+function filterGroup(val: number) {
   conditions.group=val
 }
 function loadMore(remainDistance:number){

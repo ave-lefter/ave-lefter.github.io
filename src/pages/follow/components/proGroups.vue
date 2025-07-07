@@ -76,7 +76,7 @@
   <el-popover 
     ref="popoverRef" :visible="visible" :virtual-ref="buttonRef" trigger="click" title="" virtual-triggering
     popper-style="width: 86px;min-width: 86px;">
-    <ul>
+    <ul v-click-outside="() => visible = false">
       <li 
         class="font-500 text-14px lh-[100%] tracking-0px  mb-20px flex-start gap-4px clickable"
         @click.stop.prevent="handleRenameGroup">
