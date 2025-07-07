@@ -1,6 +1,6 @@
 <template>
-  <div class="w-address mt-12px flex-1 w-100%">
-    <el-button ref="addButtonRef" @click.stop.prevent="openFavPop">Default</el-button>
+  <div class="w-address mt-12px flex-1 w-100% h-[calc(100%-76px)] flex flex-col" >
+    <!-- <el-button ref="addButtonRef" @click.stop.prevent="openFavPop">Default</el-button> -->
     <!-- <FavPop ref="favPopRef" v-model="favDetails" :button-ref="addButtonRef || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" /> -->
     <div v-if="currentAddress" class="m-header flex-between px-12px items-start">
       <pro-groups v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
@@ -20,17 +20,31 @@
         </li>
       </ul>
     </div>
-    <div class="m-table w-100%">
+    <div class="m-table w-100% mt-12px flex-1 overflow-hidden">
       <el-table
-      ref="tableRef" v-loading="loading" class='mt-12px' :data="filterDataSource"  fixed row-class-name="group"
+      ref="tableRef" v-loading="loading" class='' :data="filterDataSource" table-layout="fixed" row-class-name="group" height="calc(100% - 72px)"
       @sort-change="handleSortChange" @row-click="tableRowClick">
         <template #empty>
-          <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
+          <div v-if="!loading && followStore.currentAddress" class="flex flex-col items-center justify-center py-30px">
             <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
             <img v-if="mode === 'dark'" src="@/assets/images/empty-black.svg">
             <span>{{ t('emptyNoData') }}</span>
           </div>
-          <span v-else />
+          <AveEmpty
+            v-else-if="!followStore.currentAddress"
+            :style="{height:`100%`}"
+            class="overflow-hidden"
+          >
+            <span class="text-12px mt-10px">{{ $t('noWalletTip') }}</span>
+            <el-button
+              class="mt-10px"
+              @click="botStore.$patch({
+              connectVisible: true
+            })"
+            >
+              {{ $t('connectWallet') }}
+            </el-button>
+          </AveEmpty>
         </template>
         <el-table-column :label="$t('wallet2')" width="200" fixed="left">
           <template #header>
@@ -503,7 +517,7 @@
       </el-table>
       <el-pagination 
         v-if="filterDataSource?.length > 0"
-        v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="mt-20px"
+        v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="h-72px flex justify-end items-center"
         layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" />
     </div>
      <el-tooltip
@@ -534,6 +548,7 @@ const { mode, isDark } = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
 const $router = useRouter()
 const { t } = useI18n()
+const botStore = useBotStore()
 const {evmAddress} = storeToRefs(useBotStore())
 const { addressGroups ,currentAddress,attentionTrigger} = storeToRefs(useFollowStore())
 // const addressGroups = ref([{ "group_id": 3763, "name": "base", "show_index": -1 }, { "group_id": 37632, "name": "base1", "show_index": 0 }, { "group_id": 37631, "name": "base2", "show_index": 1 }])
@@ -544,7 +559,6 @@ const buttonTagRef = ref<HTMLElement | undefined>(undefined)
 const toolTipTagVisible = ref(false)
 const toolTipTagContent = ref('')
 const addButtonRef = ref()
-const addButtonRef2 = ref()
 const tableRef = ref<TableInstance | null>(null)
 const isMonitor=ref(false)
 const conditions = reactive({
@@ -572,7 +586,7 @@ const monitorNum=ref(0)
 const pageData = ref({
   total: 10,
   page: 1,
-  pageSize: 10
+  pageSize: 50
 })
 
 const openTimeList =computed(() => [
@@ -750,7 +764,7 @@ const getTableList = throttle(function() {
     })
     pageData.value.total = res.total || 0
     pageData.value.page = res.pageNO || 1
-    pageData.value.pageSize = res.pageSize || 10
+    pageData.value.pageSize = res.pageSize || 50
   }).finally(() => { 
     loading.value = false
   })

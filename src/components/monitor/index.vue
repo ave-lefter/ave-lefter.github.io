@@ -5,7 +5,7 @@
         name="custom:drag2"
         class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2] "
     />
-    <el-tabs v-model="activeName" style="--el-border-color-light:#333333" class="tabs" @tab-change="handleClick">
+    <el-tabs v-model="activeName" style="--el-border-color-light:#333333" class="m-tabs" @tab-change="handleClick">
       <el-tab-pane :label="$t('walletManage')" :name="0" lazy>
         <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps"/>
         <AveEmpty
@@ -323,7 +323,7 @@ onMounted(async () => {
   console.log('monitor mounted')
   nextTick(() => {
     if (monitorStore.visible) {
-      const el = document.querySelector('.el-tabs__header.is-top')
+      const el = document.querySelector('.m-tabs .el-tabs__header.is-top')
       if (el) el.className = 'el-tabs__header is-top drag-handle'
       console.log('monitor visible', el)
     }
@@ -624,7 +624,7 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
     } */
   }
 }
-.tabs{
+.m-tabs{
   --el-color-primary:var(--d-F5F5F5-l-333);
   --el-text-color-primary:var(--d-666-l-999);
   :deep() .el-tabs__item:hover{
