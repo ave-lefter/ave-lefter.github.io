@@ -4,6 +4,7 @@ import {useStorage} from '@vueuse/core'
 import {cloneDeep} from 'lodash-es'
 import toolbarVector from '@/assets/images/toolbar-vector.svg'
 import toolbarVectorDark from '@/assets/images/toolbar-vector-dark.svg'
+import {getDefaultColumns, getHotOptions} from './hotRank/columnRender/hotColumusService'
 
 const {t} = useI18n()
 const dialogVisible = ref(false)

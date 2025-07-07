@@ -661,8 +661,8 @@
   "antiWhaleModifiable": "可修改大額交易限制",
   "check2": "安全檢測",
   "tax": "稅",
-  "aiSummary":"AI敘事",
-  "aiIsAnalyzing":"AI分析進行中...",
+  "aiSummary": "AI敘事",
+  "aiIsAnalyzing": "AI分析進行中...",
   "times": "次",
   "MaximumIncrease": "最大漲幅",
   "CurrentMC": "當前市值",
@@ -695,5 +695,7 @@
   "plsImport": "請導入App設定裡面的自選Code，自動同步app自選數據",
   "plsImportCorrect": "請輸入正確的code",
   "bulkProcess": "批量導入/導出",
-  "monitorList": "監控列表"
+  "monitorList": "監控列表",
+  "allChain": "全部鏈",
+  "searchChain": "搜索链"
 }

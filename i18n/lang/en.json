@@ -663,8 +663,8 @@
   "antiWhaleModifiable": "Anti whale modifiable",
   "check2": "Check",
   "tax": "Tax",
-  "aiSummary":"AI summary",
-  "aiIsAnalyzing":"AI is analyzing...",
+  "aiSummary": "AI summary",
+  "aiIsAnalyzing": "AI is analyzing...",
   "times": " times",
   "MaximumIncrease": "Max Increase",
   "CurrentMC": "Current MC",
@@ -708,5 +708,7 @@
   "monitored": "monitored",
   "noBotWalletTip": "Please connect your bot wallet to use this function",
   "monitorError": "Please pay attention to this address before using the monitoring function",
-  "signal": "Signal Plaza"
+  "signal": "Signal Plaza",
+  "allChain": "All Chains",
+  "searchChain": "Search Chains"
 }

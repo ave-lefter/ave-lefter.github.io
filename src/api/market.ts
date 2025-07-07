@@ -47,10 +47,25 @@ export interface Swap {
   show_name: string;
 }
 
-// /v3/tokens/treasure/config
-export function getTreasureConfig() {
-  return request({
+export function getTreasureConfig(): Promise<IGetTreasureConfig[]> {
+  const {$api} = useNuxtApp()
+  return $api('/v1api/v4/tokens/treasure/config', {
     method: 'get',
-    url: `/v1api/v4/tokens/treasure/config`,
+  })
+}
+
+export function getTreasureList(query) {
+  const {$api} = useNuxtApp()
+  return $api('/v1api/v4/tokens/treasure/list', {
+    method: 'get',
+    query
+  })
+}
+
+export function getMultiContractInfo(body) {
+  const {$api} = useNuxtApp()
+  return $api('/v1api/v3/tokens/multi_contract_info', {
+    method: 'post',
+    body
   })
 }

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import ColumnsToolbar from "./columnsToolbar.vue";
+import ColumnsToolbar from './columnsToolbar.vue'
 
 const props = defineProps<{
   activeInterval: string,
   quickInputVisible: boolean,
 }>()
 const emit = defineEmits(['update:activeInterval', 'update:quickInputVisible'])
+const {t} = useI18n()
 const intervals = computed(() => {
   return [
     {name: '1m', id: '1m'},
@@ -14,6 +15,11 @@ const intervals = computed(() => {
     {name: '1H', id: '1H'},
     {name: '4H', id: '4H'},
     {name: '24H', id: '24H'},
+  ]
+})
+const tabs = computed(() => {
+  return [
+    {name: t('trending'), component: 'HotRank' as const, icon: 'custom:hot'}
   ]
 })
 const _quickInputVisible = computed({
@@ -29,9 +35,13 @@ const _quickInputVisible = computed({
 <template>
   <div class="flex flex-1 justify-between">
     <div class="flex gap-2 text-12px">
-      <span class="p-2 lh-16px bg-#1A1A1A cursor-pointer rounded-1">
-        <Icon name="custom:hot" class="mr-1"/>
-        {{ $t('trending') }}
+      <span
+        v-for="(item, index) in tabs"
+        :key="index"
+        class="p-2 lh-16px bg-#1A1A1A cursor-pointer rounded-1"
+      >
+        <Icon :name="item.icon" class="mr-1"/>
+        {{ item.name }}
       </span>
     </div>
     <div class="flex gap-12px items-center text-12px">
@@ -46,7 +56,7 @@ const _quickInputVisible = computed({
         </button>
       </div>
       <div class="flex items-center">
-        <el-switch class="mr-2" v-model="_quickInputVisible"></el-switch>
+        <el-switch v-model="_quickInputVisible" class="mr-2"/>
         <QuickSwapSet
             :settingsButtonVisible="false"
             :chain="'solana'"

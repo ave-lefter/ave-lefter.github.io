@@ -257,5 +257,6 @@
   "mechanism_intro": "Ek",
   "antiWhaleModifiable": "Değiştirilebilir büyük işlem kısıtlaması",
   "tax": "Vergi",
-  "filter": "Filtre"
+  "filter": "Filtre",
+  "allChain": "Tüm zincir"
 }

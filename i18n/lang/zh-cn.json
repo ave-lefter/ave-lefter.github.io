@@ -664,8 +664,8 @@
   "antiWhaleModifiable": "可修改大额交易限制",
   "check2": "安全检测",
   "tax": "税",
-  "aiSummary":"AI叙事",
-  "aiIsAnalyzing":"AI正在分析中...",
+  "aiSummary": "AI叙事",
+  "aiIsAnalyzing": "AI正在分析中...",
   "times": "次",
   "MaximumIncrease": "最大涨幅",
   "CurrentMC": "当前市值",
@@ -710,5 +710,7 @@
   "openMonitor": "开启监控",
   "monitored": "已监控",
   "noBotWalletTip": "需要连接Bot钱包才能使用该功能",
-  "monitorError": "请先关注该地址，才能使用监控功能"
+  "monitorError": "请先关注该地址，才能使用监控功能",
+  "allChain": "全部链",
+  "searchChain": "搜索链"
 }

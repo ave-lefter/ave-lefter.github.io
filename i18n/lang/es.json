@@ -262,5 +262,6 @@
   "mechanism_intro": "Adicional",
   "antiWhaleModifiable": "Antiballena modificable",
   "tax": "Impuesto",
-  "filter": "Filtros"
+  "filter": "Filtros",
+  "allChain": "Todas las cadenas"
 }
