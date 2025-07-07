@@ -5,7 +5,7 @@
         name="custom:drag2"
         class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2] "
     />
-    <el-tabs v-model="activeName" style="--el-border-color-light:#333333" class="m-tabs" @tab-change="handleClick">
+    <el-tabs v-model="activeName" style="" class="m-tabs" @tab-change="handleClick">
       <el-tab-pane :label="$t('walletManage')" :name="0" lazy>
         <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps"/>
         <AveEmpty
@@ -625,12 +625,16 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
   }
 }
 .m-tabs{
+  --el-border-color-light:var(--d-333-l-F2F2F2);
   --el-color-primary:var(--d-F5F5F5-l-333);
   --el-text-color-primary:var(--d-666-l-999);
-  :deep() .el-tabs__item:hover{
-    color:var(--d-666-l-999);
-    &.is-active{
-      color:var(--d-F5F5F5-l-333);
+  :deep() .el-tabs__item{
+    font-weight: 400;
+    &:hover{
+      color:var(--d-666-l-999);
+      &.is-active{
+        color:var(--d-F5F5F5-l-333);
+      }
     }
   }
   :deep() .el-tabs__header{

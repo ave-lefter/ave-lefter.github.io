@@ -51,7 +51,7 @@
     </Draggable>
     <Draggable
       v-if="signalStore.isLeftFixed&&signalStore.signalVisible"
-      class="[&&]:relative shrink-0 left fixed! left-0 top-64px"
+      class="[&&]:relative shrink-0 left fixed! left-0 top-61px"
       :axis="'x'"
       :min-width="240"
       :max-width="360"
@@ -72,7 +72,7 @@
     </Draggable>
     <Draggable
       v-if="signalStore.isRightFixed&&signalStore.signalVisible"
-      class="[&&]:relative shrink-0 right fixed! top-64px left-0"
+      class="[&&]:relative shrink-0 right fixed! top-61px left-0"
       :axis="'x'"
       :x="signalStore.winWidth-signalStore.fixedWidth"
       :min-width="240"
@@ -124,7 +124,7 @@
     </Draggable>
     <Draggable
       v-if="monitorStore.isLeftFixed&&monitorStore.visible"
-      class="[&&]:relative shrink-0 left fixed! top-64px"
+      class="[&&]:relative shrink-0 left fixed! top-61px"
       :style="`left:${(signalStore.isLeftFixed&&signalStore.signalVisible)?signalStore.fixedWidth+1:0}px`"
       :axis="'x'"
       :x="0"
@@ -146,7 +146,7 @@
       <div v-if="monitorStore.isRightFixed&&monitorStore.visible" class="absolute left-0 top-0 h-100% flex z-auto select-auto" :style="{width: monitorStore.winWidth-((signalStore.isRightFixed&&signalStore.signalVisible)?signalStore.fixedWidth+1:0)+'px'}" >
         <Draggable
           v-if="monitorStore.isRightFixed&&monitorStore.visible"
-          class="[&&]:relative shrink-0 right fixed! top-64px left-0"
+          class="[&&]:relative shrink-0 right fixed! top-61px left-0"
           :axis="'x'"
           :x="monitorStore.winWidth-monitorStore.fixedWidth-((signalStore.isRightFixed&&signalStore.signalVisible)?signalStore.fixedWidth+1:0)"
           :min-width="lang.indexOf('zh')>-1?360:360"
@@ -167,7 +167,7 @@
     </template>
     <Draggable
       v-else-if="monitorStore.isRightFixed&&monitorStore.visible"
-      class="[&&]:relative shrink-0 right fixed! top-64px left-0"
+      class="[&&]:relative shrink-0 right fixed! top-61px left-0"
       :axis="'x'"
       :x="monitorStore.winWidth-monitorStore.fixedWidth"
       :min-width="lang.indexOf('zh')>-1?360:360"
