@@ -85,21 +85,21 @@
           <template #header-operate>
             <span>{{ $t('operate') }}</span>
           </template>
-          <template #cell-operate="{ row }">
+          <template #cell-operate="{ row ,rowIndex}">
             <div class="flex justify-end items-center" @click.stop>
               <!-- <div class=" color-#666 flex-end mr-2px">
                 <Icon name="material-symbols-light:notifications-rounded" class="text-15px"/> 
                 <span>{{ $t('enableMonitor') }}</span>
               </div> -->
               <div class="flex items-center mr-4px cursor-pointer color-[#666]"
-                @click="">
+                @click.stop.prevent="handleMonitor(row,rowIndex)">
                 <Icon name="custom:monitor-icon" :class="['text-14px mr-2px',(row?.is_monitored === 1)&&'color-[--d-FFF-l-333]' ]" />
                 <!-- <span
                   class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
                   {{ row?.is_monitored === 1 ? t('pause') : t('openMonitor') }}
                 </span> -->
               </div>
-              <Icon name="bx:bxs-trash-alt" class="text-13px color-#666" />
+              <Icon name="bx:bxs-trash-alt" class="text-13px color-#666" @click.stop.prevent="handleDeleteAttention(row)"/>
             </div>
          </template>
           <!-- <template #footer>
@@ -121,7 +121,7 @@
 </template> 
 
 <script setup lang="ts">
-import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,getHistoryMonitor,addAttention2} from '~/api/attention'
+import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,getHistoryMonitor,addAttention2,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor} from '~/api/attention'
 import { defaultPaginationParams, downColor, upColor } from '@/utils/constants'
 import { throttle } from 'lodash-es'
 const { t } = useI18n()
@@ -143,6 +143,7 @@ const visible = ref(false)
 const addButtonRef = ref()
 const addFavAddressPopRef = ref()
 const selectGroupId=ref(0)
+const followStore = useFollowStore()
 const {currentAddress ,showBatchAddressDetails} = storeToRefs(useFollowStore())
 const conditions = reactive({
   group: 0,
@@ -208,6 +209,55 @@ function handleConfirmAdd(formData:any,resetFields?:() => void,stopLoading?:()=>
 function filterGroup(val: number) {
   conditions.group=val
 }
+
+const handleDeleteAttention=throttle((item: any)=>{
+  deleteAttention({address: currentAddress.value, user_chain: item.chain,user_address: item.user_address}).then(() => {
+    ElMessage.success(t('success'))
+    // todo 需要刷新
+    getTableList()
+  }).catch((e) => {
+    ElMessage.error(String(e))
+  })
+},1000)
+const handleMonitor=throttle((row:any,index:number=0)=>{
+  console.log('handleMonitor', row, index)
+  if(row.is_monitored === 1) {
+    const {id,user_address} = row
+    // 取消监控
+    const req=row.is_pause === 1?favUsersResumeMonitor:favUsersPauseMonitor
+    req({
+      uid: id,
+      address:user_address
+    }).then(() => {
+      dataSource.value[index].is_monitored = row.is_monitored===0?1:0
+      // dataSource.value[index].is_pause = row.is_pause===0?1:0
+      // getTableList()
+      // followStore.shouldInitAddressPage={
+      //   num: followStore.shouldInitAddressPage.num + 1,
+      //   isSelfUpdate: false
+      // }
+      ElMessage.success(t('success'))
+    }).catch((e) => { ElMessage.error(String(e)) })
+    return
+  }else{
+    const {user_address,user_chain} = row
+    addAddressMonitor({
+      address: user_address,
+      chain: user_chain,
+      user_address: botStore.evmAddress,
+    }).then(() => {
+      dataSource.value[index].is_monitored = row.is_monitored===0?1:0
+      // getTableList()
+      ElMessage.success(t('success'))
+      // followStore.shouldInitAddressPage={
+      //   num: followStore.shouldInitAddressPage.num + 1,
+      //   isSelfUpdate: false
+      // }
+    }).catch((e) => {
+        ElMessage.error(String(e))
+    })
+  }
+},1000)
 function loadMore(remainDistance:number){
   console.log('loadMore remainDistance', remainDistance, paginationParams.value)
   showFooter.value=remainDistance <= 20

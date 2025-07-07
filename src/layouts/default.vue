@@ -5,7 +5,7 @@
           <feGaussianBlur in="SourceGraphic" stdDeviation="3" />
       </filter>
     </svg>
-    <div :style="botStore.connectVisible&&[{filter: 'url(#blur)'}]">
+    <div :style="botStore.connectVisible&&[{filter: 'url(#blur)'}]" class="w-100vw h-100vh">
       <TheHeader/>
        <!-- :style="signalStore.translateStyle"  translate-x-0px-->
       <div

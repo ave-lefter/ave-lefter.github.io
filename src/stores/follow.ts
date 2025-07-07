@@ -52,6 +52,11 @@ export const useFollowStore = defineStore('follow', () => {
   const addressGroups = useLocalStorage<{ group_id: number; name: string; show_index: number; }[]>('addressGroups', [])
   const currentAddress = computed(() =>  botStore?.evmAddress || walletStore?.address ||'')
   const favAddressPopRef=ref()
+  const shouldInitAddressPage = ref({
+    num: 0,
+    isSelfUpdate: false
+  })
+  
   watch(currentAddress, (val) => {
     if(!val)addressGroups.value = []
   })
@@ -90,6 +95,7 @@ export const useFollowStore = defineStore('follow', () => {
     handleAddAttention,
     confirmAttention,
     favAddressPopVisible,
-    favAddressPopRef
+    favAddressPopRef,
+    shouldInitAddressPage,
   }
 })

@@ -130,9 +130,9 @@
                       :'color-[&#45;&#45;d-666-l-696E7C]'} text-12px hover:color-#f45469`"
                 @click.self.stop="handleDeleteAttention(row)"
               />
-               <UserAvatar :key="row.user_address+row.user_chain" class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
+               <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
               <div>
-              <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 95px" iconEditColor="#999" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" @updateRemark="({remark}) => row.remark = remark"/>
+              <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 95px" iconEditColor="#999" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" @updateRemark="({remark}) => row.remark = remark"/>
                 <div class="font_10 color-icon flex-start mt_4" style="line-height: 1">
                   <Icon
                     v-copy="row.user_address"
@@ -452,14 +452,13 @@
                   : 'var(--custom-text-2-color)'
             }"
           >
-             <span v-if="!row?.last_tx_time">-</span>
+             <span v-if="!row?.last_tx_time" class="color-text-zero">-</span>
             <TimerCount
                v-else-if="
                 Number(formatTimeFromNow(row?.last_tx_time, true)) < 60
               "
               :key="`${row.last_tx_time}${$index}`"
               :timestamp="row.last_tx_time"
-              style="--van-count-down-text-color: currentColor"
               :end-time="60"
             >
               <template #default="{ seconds }">
@@ -487,7 +486,7 @@
           </el-select>
         </template>
       </el-table-column>
-       <el-table-column :label="t('push')" align="right" width="150">
+       <el-table-column :label="t('push')" align="right" width="150" fixed="right">
         <template #default="{ row ,$index}">
           <div class="flex flex-row-reverse" @click.stop>
             <a
@@ -518,7 +517,7 @@
       <el-pagination 
         v-if="filterDataSource?.length > 0"
         v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="h-72px flex justify-end items-center"
-        layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" />
+        layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getTableList"/>
     </div>
      <el-tooltip
       ref="tooltipRef1"
@@ -613,8 +612,8 @@ const filterForm = ref({
   sort_dir: conditions?.sort === 'last_trade_time' ? conditions?.sort_dir || null : null
 } as FilterFormType)
 const loading = ref(false)
-const dataSource = ref([])
-const dataSource2 = ref([])
+const dataSource = ref([] as Array<any>)
+const dataSource2 = ref([] as Array<any>)
 
 const filterDataSource=computed(() => {
   return isMonitor.value?dataSource2.value:dataSource.value
@@ -623,34 +622,41 @@ onMounted(async () => {
   init()
 })
 function init() {
+  pageData.value = {
+    total: 10,
+    page: 1,
+    pageSize: 50
+  }
   getTableList()
   getMonitorNum()
 }
-watch(() => currentAddress.value, (val) => {
+watch([() => currentAddress.value], (val) => {
+  console.log('watch currentAddress', val)
   if(!val) {
     dataSource.value=[]
     dataSource2.value=[]
   }else{
-    getTableList()
+    init()
   }
 })
+// watch(followStore.shouldInitAddressPage, (val) => {
+//   if(!val.isSelfUpdate){
+//     console.log('watch shouldInitAddressPage', val)
+//     init()
+//   }else{
+//     followStore.shouldInitAddressPage.isSelfUpdate=false
+//   }
+// },{deep: true})
 
-watch([() => conditions, ()=>isMonitor.value,() => pageData.value.page], (value) => {
+watch([() => conditions, ()=>isMonitor.value], (value) => {
   console.log('watch conditions', value)
-  // if(value[1]){
-  //   pageData.value={
-  //     total: 10,
-  //     page: 1,
-  //     pageSize: 10
-  //   }
-  // }else{
-  // }
-  getTableList()
+  init()
 },{deep: true})
 
-function handleMonitor(row:any,index:number) {
+const handleMonitor = throttle((row:any,index:number=0) => {
+  console.log('handleMonitor', row, index)
   if (!evmAddress.value) return ElMessage.warning(t('noBotWalletTip'))
-  if(isMonitor.value) {
+  if(isMonitor.value||(!isMonitor.value&&(row.is_monitored === 1))) {
     const {id,user_address} = row
     // 取消监控
     const req=row.is_pause === 1?favUsersResumeMonitor:favUsersPauseMonitor
@@ -658,27 +664,32 @@ function handleMonitor(row:any,index:number) {
       uid: id,
       address:user_address
     }).then(() => {
+      if(isMonitor.value){
+        dataSource2.value[index].is_pause = row.is_pause===0?1:0
+      }else{
+        dataSource.value[index].is_monitored = row.is_monitored===0?1:0
+      }
       // dataSource.value[index].is_pause = row.is_pause===0?1:0
       getTableList()
-    }).finally(() => {
       ElMessage.success(t('success'))
-    })
-   
+    }).catch((e) => { ElMessage.error(String(e)) })
     return
   }else{
     const {user_address,user_chain} = row
-    if(row.is_monitored === 1) return 
     addAddressMonitor({
       address: user_address,
       chain: user_chain,
       user_address: evmAddress.value,
     }).then(() => {
+      dataSource.value[index].is_monitored = row.is_monitored===0?1:0
       getTableList()
+      ElMessage.success(t('success'))
       getMonitorNum()
+    }).catch((e) => {
+        ElMessage.error(String(e))
     })
-    ElMessage.success(t('success'))
   }
-}
+},1000)
 
 function handleConfirmEdit(currentEditGroup: number, remark:string) {
   changeFavoriteGroupName2(remark, currentEditGroup).then(() => {
@@ -917,7 +928,7 @@ function openFavPop() {
   }
 }
 .color-text-zero {
-  color: var(--custom-text-2-color);
+  color: #666;
 }
 .fav-icon-color {
   color: var(--a-text-3-color);
