@@ -13,15 +13,16 @@
       />
 
       <el-popover
+        v-model:visible="filterForm['created_at'].visible"
         placement="bottom"
         popper-class="chains-table-filter"
         title=""
         :width="300"
         trigger="click"
-        v-model:visible="filterForm['created_at'].visible"
       >
         <template #reference>
-          <i class="iconfont icon-guolv1 text-10px ml-3" :style="{color: isActiveFilter('created_at') ? 'var(--custom-primary-color)' : ''}"></i>
+          <i class="iconfont icon-guolv1 text-10px ml-3"
+             :style="{color: isActiveFilter('created_at') ? 'var(--custom-primary-color)' : ''}"/>
         </template>
         <template #default>
           <div class="filter-box" :class="$store.state.mode">
@@ -55,7 +56,8 @@
               </el-input>
             </div>
             <div class="mt-40 flex">
-              <div class="flex clickable" v-if="false" style="cursor: pointer;" @click="handleSort(filterForm[`created_at`])">
+              <div v-if="false" class="flex clickable" style="cursor: pointer;"
+                   @click="handleSort(filterForm[`created_at`])">
                 <span class="filter-title">{{ $t('sort') }}</span>
                 <div class="chain-icon-sort-container">
                   <svg
@@ -64,7 +66,7 @@
                     :class="filterForm['created_at'].sort_dir === 'asc' ? 'active' : ''"
                     @click.stop="handleSort(filterForm['created_at'], 'asc')"
                   >
-                    <use xlink:href="#icon-sort-up"></use>
+                    <use xlink:href="#icon-sort-up"/>
                   </svg>
                   <svg
                     class="icon-svg"
@@ -72,7 +74,7 @@
                     :class="filterForm['created_at'].sort_dir === 'desc' ? 'active' : ''"
                     @click.stop="handleSort(filterForm['created_at'], 'desc')"
                   >
-                    <use xlink:href="#icon-sort-down"></use>
+                    <use xlink:href="#icon-sort-down"/>
                   </svg>
                 </div>
               </div>
@@ -103,7 +105,7 @@
           class="token-info table-item_d"
           style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
         >
-          <span class="text-10px" v-if="$index < 9" style="opacity: 0;">0</span>
+          <span v-if="$index < 9" class="text-10px" style="opacity: 0;">0</span>
           <span class="text-10px mr-5" style="color: #696E7C">
             #{{ (pageNO - 1) * pageSize + $index + 1 }}
           </span>
@@ -114,7 +116,7 @@
               collected: row.is_fav
             }"
             @click.stop.prevent="$emit('collect',row)"
-          ></i>
+          />
           <div class="icon-token-container" style="margin-right: 10px">
             <el-image class="token-icon" :src="$f.formatIcon(row, row.target_token == row.token0_address ? row.token0_symbol : row.token1_symbol)">
               <template #error>
@@ -133,7 +135,7 @@
               onerror="this.src='/icon-default.png'"
               lazy
               srcset=""
-            />
+            >
           </div>
           <div>
             <div class="flex-start">
@@ -145,7 +147,8 @@
                   row.target_token == row.token0_address ? row.token1_symbol : row.token0_symbol
                 }}
               </span>
-              <i class="iconfont icon-copy text-12px" style="color: #666;margin-left: 3px;" @click.stop.prevent v-copy="row.target_token"></i>
+              <i v-copy="row.target_token" class="iconfont icon-copy text-12px" style="color: #666;margin-left: 3px;"
+                 @click.stop.prevent/>
 
 
               <div class="flex-start" style="margin-left: 2px;">
@@ -169,27 +172,27 @@
                     :src="$f.formatIconSwap1(row.issue_platform)"
                     onerror="this.src='/icon-default.png'"
                     height="14"
-                  />
+                >
               </div>
 
               <el-tooltip
+                v-if="row?.lp_locked_percent > 0 && row?.lp_locked_percent <= 100"
                 effect="customized"
                 placement="top"
                 :popper-class="$store.state.mode"
-                v-if="row?.lp_locked_percent > 0 && row?.lp_locked_percent <= 100"
               >
                 <template #content>
                   <ul>
-                    <li class="card-list-item flex-start mb-5" v-if="row.lp_holders">
+                    <li v-if="row.lp_holders" class="card-list-item flex-start mb-5">
                       <span class="risk-message"> LP {{ $t('holders') }}: {{ row.lp_holders }} </span>
                     </li>
-                    <li class="card-list-item flex-start mb-5" v-if="row.lp_locked_percent >0">
+                    <li v-if="row.lp_locked_percent >0" class="card-list-item flex-start mb-5">
                       <span class="risk-message"> {{ $t('LPLocked') }}: {{ $f.formatNumber2(row.lp_locked_percent,0) }}% </span>
                     </li>
-                    <li class="card-list-item flex-start mb-5" v-if="row.lp_lock_platform">
+                    <li v-if="row.lp_lock_platform" class="card-list-item flex-start mb-5">
                       <span class="risk-message">{{ $t('platform') }}: {{ row.lp_lock_platform }} </span>
                     </li>
-                    <li class="card-list-item flex-start mb-5" v-if="row.lp_locked_to">
+                    <li v-if="row.lp_locked_to" class="card-list-item flex-start mb-5">
                     <span class="risk-message"> {{ $t('unlockDate') }}:  {{ $f.formatDate(row.lp_locked_to / 1000, 'YYYY-MM-DD') }} </span>
                     </li>
                   </ul>
@@ -204,7 +207,7 @@
                   indeterminate
                 >
                   <svg class="icon-suo1" aria-hidden="true">
-                    <use xlink:href="#icon-suo1"></use>
+                    <use xlink:href="#icon-suo1"/>
                   </svg>
                 </el-progress>
               </el-tooltip>
@@ -212,10 +215,10 @@
                 <template v-for="(i, index) in row.normal_tag" :key="index">
                   <el-image class="token-icon-tag" :src="$f.formatIconTag(i.tag)" lazy  @mouseover.stop="(e) => {buttonTagRef = e.currentTarget; toolTipTagVisible = true; toolTipTagContent = $t(`${i.tag}`);}"  @mouseleave.stop="(e) => (toolTipTagVisible = false)">
                     <template #error>
-                      <img class="token-icon-tag" src="/icon-default.png" lazy />
+                      <img class="token-icon-tag" src="/icon-default.png" lazy>
                     </template>
                     <template #placeholder>
-                      <img class="token-icon-tag" src="/icon-default.png" lazy />
+                      <img class="token-icon-tag" src="/icon-default.png" lazy>
                     </template>
                   </el-image>
                   <span v-if="i?.showText" :style="{color: i?.color=='green'? $store.getters.upColor[7]: $store.getters.downColor[7] }" class="text-10px ml-3">
@@ -228,7 +231,7 @@
 
 
 
-              
+
             </div>
             <div class="font_10 color-icon flex-start mt_4" style="line-height: 1;" @click.stop>
               <div :style="{color: formatColor($f.formatTimeFromNow(row?.created_at, true)), marginRight: '4px', fontSize: '11px', width: '15px'}">
@@ -238,43 +241,62 @@
                 <template v-else-if="$f.formatTimeFromNow(row?.created_at, true) >= 60">
                   {{ $f.formatTimeFromNow1(row?.created_at) }}
                 </template>
-                <van-count-down
-                  v-else-if="row?.created_at && $f.formatTimeFromNow(row?.created_at, true) < 60"
-                  :time="(60 - $f.formatTimeFromNow(row?.created_at, true)) * 1000"
-                  style="--van-count-down-text-color: currentColor"
-                >
-                  <template #default="{ total }">
-                    <template v-if="total > 0">
-                      {{ Math.floor(($f.formatTimeFromNow(row?.created_at, true) + 60 * 1000 - total) / 1000) }} s
-                    </template>
-                    <template v-else>
-                      {{ $f.formatTimeFromNow(row?.created_at) }}
-                    </template>
+                <!--<van-count-down-->
+                <!--  v-else-if="row?.created_at && $f.formatTimeFromNow(row?.created_at, true) < 60"-->
+                <!--  :time="(60 - $f.formatTimeFromNow(row?.created_at, true)) * 1000"-->
+                <!--  style="&#45;&#45;van-count-down-text-color: currentColor"-->
+                <!--&gt;-->
+                <!--  <template #default="{ total }">-->
+                <!--    <template v-if="total > 0">-->
+                <!--      {{ Math.floor(($f.formatTimeFromNow(row?.created_at, true) + 60 * 1000 - total) / 1000) }} s-->
+                <!--    </template>-->
+                <!--    <template v-else>-->
+                <!--      {{ $f.formatTimeFromNow(row?.created_at) }}-->
+                <!--    </template>-->
+                <!--  </template>-->
+                <!--</van-count-down>-->
+                <TimerCount
+                  v-if="row.created_at && Number(formatTimeFromNow(row.created_at, true)) < 60"
+                  :key="row.created_at" :timestamp="row.created_at" :end-time="60">
+                  <template #default="{ seconds }">
+                  <span v-if="seconds < 60" class="color-#FFA622 text-12px">
+                    {{ seconds }}s
+                  </span>
+                    <span v-else class="color-[--d-999-l-666] text-12px">
+                    {{ formatTimeFromNow(row.created_at) }}
+                  </span>
                   </template>
-                </van-count-down>
+                </TimerCount>
+                <div v-else class="color-[--d-999-l-666] text-12px">
+                  {{ formatTimeFromNow(row.created_at) }}
+                </div>
               </div>
 
-              <div class="media-list flex-start ml-2" v-if="row?.medias?.length >0">
+              <div v-if="row?.medias?.length >0" class="media-list flex-start ml-2">
                 <template v-for="(item, index) in row?.medias" :key="index">
-                  <div class="ml-2" v-if="item.url" @mouseover.stop="(e) => {buttonTagRef = e.currentTarget; toolTipTagVisible = true; toolTipTagContent = item.url;}"  @mouseleave.stop="(e) => (toolTipTagVisible = false)">
-                    <span class="media-item" v-if="item.name === 'QQ'">
-                      <i class="iconfont icon-QQ text-12px"></i>
+                  <div v-if="item.url" class="ml-2"
+                       @mouseover.stop="(e) => {buttonTagRef = e.currentTarget; toolTipTagVisible = true; toolTipTagContent = item.url;}"
+                       @mouseleave.stop="(e) => (toolTipTagVisible = false)">
+                    <span v-if="item.name === 'QQ'" class="media-item">
+                      <i class="iconfont icon-QQ text-12px"/>
                     </span>
 
-                    <a class="media-item" :href="item.url" target="_blank" v-else>
-                      <i class="iconfont text-12px" :class="`icon-${item.icon}`"></i>
+                    <a v-else class="media-item" :href="item.url" target="_blank">
+                      <i class="iconfont text-12px" :class="`icon-${item.icon}`"/>
                     </a>
                   </div>
                 </template>
               </div>
               <template v-if="row.signal_arr?.length > 0">
-                <div class="flex" v-for="(i, index) in row.signal_arr" :key="index" @mouseover.stop="(e) => {buttonTagRef = e.currentTarget; toolTipTagVisible = true; toolTipTagContent = $f.getTagTooltip(i);}"  @mouseleave.stop="(e) => (toolTipTagVisible = false)">
+                <div v-for="(i, index) in row.signal_arr" :key="index" class="flex"
+                     @mouseover.stop="(e) => {buttonTagRef = e.currentTarget; toolTipTagVisible = true; toolTipTagContent = $f.getTagTooltip(i);}"
+                     @mouseleave.stop="(e) => (toolTipTagVisible = false)">
                   <el-image class="token-icon-signal-tag" :src="$f.formatIconTag(i.tag)" lazy >
                     <template #error>
-                      <img class="token-icon-signal-tag" src="/icon-default.png" lazy />
+                      <img class="token-icon-signal-tag" src="/icon-default.png" lazy>
                     </template>
                     <template #placeholder>
-                      <img class="token-icon-signal-tag" src="/icon-default.png" lazy />
+                      <img class="token-icon-signal-tag" src="/icon-default.png" lazy>
                     </template>
                   </el-image>
                   <span class="ml-2" :style="{color: i.color=='green'? $store.getters.upColor[7]: $store.getters.downColor[7] }">
@@ -298,18 +320,15 @@
       effect="customized"
       :virtual-ref="buttonTagRef"
       virtual-triggering
-    >
-    </el-tooltip>
+  />
 </template>
 
 <script>
-import headSort from "@/components/headSort/index.vue";
-import { CountDown } from 'vant'
+import headSort from '@/components/headSort.vue'
 export default {
-  name: "poolPairContent",
+  name: 'PoolPairContent',
   components: {
-    headSort,
-    'van-count-down': CountDown
+    headSort
   },
   props: {
     pageNO: {
@@ -350,6 +369,7 @@ export default {
       required: true
     }
   },
+  emits: ['collect'],
   data() {
     return {
       buttonTagRef: null,
@@ -360,26 +380,25 @@ export default {
   methods: {
     // 添加来自openTimeContent的方法
     formatColor(val){
-      if(val < 3600 * 24) return '#FFA622';
-      return 'var(--a-text-2-color)';
+      if (val < 3600 * 24) return '#FFA622'
+      return 'var(--a-text-2-color)'
     },
     // 处理排序变化的方法
     handleSortChange(sortOrder) {
-      let sortDir = '';
+      let sortDir = ''
       if (sortOrder === 'ascending') {
-        sortDir = 'asc';
+        sortDir = 'asc'
       } else if (sortOrder === 'descending') {
-        sortDir = 'desc';
+        sortDir = 'desc'
       }
 
       // 更新排序方向
-      this.filterForm['created_at'].sort_dir = sortDir;
+      this.filterForm['created_at'].sort_dir = sortDir
 
       // 直接调用确认方法
-      this.handleFilterConfirm(this.filterForm['created_at']);
+      this.handleFilterConfirm(this.filterForm['created_at'])
     }
-  },
-  emits: ['collect']
+  }
 }
 </script>
 

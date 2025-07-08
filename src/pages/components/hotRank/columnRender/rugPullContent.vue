@@ -1,9 +1,9 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
   <el-table-column
+    v-if="showRugAndChips"
     align="right"
     :width="$f.getTextWidth($t('flag_rug_pull'), 50) + 50"
-    v-if="showRugAndChips"
   >
     <template #header>
       <span>{{ $t('flag_rug_pull') }}%</span>
@@ -17,15 +17,16 @@
 
       <el-popover
         v-if="false"
+        v-model:visible="filterForm['rug_pull'].visible"
         placement="bottom"
         popper-class="chains-table-filter"
         title=""
         :width="350"
         trigger="click"
-        v-model:visible="filterForm['rug_pull'].visible"
       >
         <template #reference>
-          <i class="iconfont icon-guolv1 text-10px ml-3" :style="{color: isActiveFilter('rug_pull') ? 'var(--custom-primary-color)' : ''}"></i>
+          <i class="iconfont icon-guolv1 text-10px ml-3"
+             :style="{color: isActiveFilter('rug_pull') ? 'var(--custom-primary-color)' : ''}"/>
         </template>
         <template #default>
           <div class="filter-box" :class="$store.state.mode">
@@ -35,18 +36,18 @@
                 v-model.trim.number="filterForm['rug_pull']['rug_rate'].range[0]"
                 :placeholder="$t('minor')"
                 clearable
-              ></el-input>
+              />
               <span class="ml-10 mr-10">~</span>
               <el-input
                 v-model.trim.number="filterForm['rug_pull']['rug_rate'].range[1]"
                 :placeholder="$t('max1')"
                 clearable
-              ></el-input>
+              />
             </div>
             <div class="mt-10 mb-20" style="padding: 0 10px;">
               <el-slider
-                :style="{ '--el-slider-main-bg-color': 'var(--a-slider-bg-color)'}"
                 v-model="filterForm['rug_pull']['rug_rate'].range"
+                :style="{ '--el-slider-main-bg-color': 'var(--a-slider-bg-color)'}"
                 range
                 :min="0"
                 size="small"
@@ -60,18 +61,18 @@
                 v-model.trim.number="filterForm['rug_pull']['rat_rate'].range[0]"
                 :placeholder="$t('minor')"
                 clearable
-              ></el-input>
+              />
               <span class="ml-10 mr-10">~</span>
               <el-input
                 v-model.trim.number="filterForm['rug_pull']['rat_rate'].range[1]"
                 :placeholder="$t('max1')"
                 clearable
-              ></el-input>
+              />
             </div>
             <div class="mt-10 mb-20" style="padding: 0 10px;">
               <el-slider
-                :style="{ '--el-slider-main-bg-color': 'var(--a-slider-bg-color)'}"
                 v-model="filterForm['rug_pull']['rat_rate'].range"
+                :style="{ '--el-slider-main-bg-color': 'var(--a-slider-bg-color)'}"
                 range
                 :min="0"
                 size="small"
@@ -89,7 +90,7 @@
                     :class="filterForm['rug_pull']['rug_rate'].sort_dir === 'asc' ? 'active' : ''"
                     @click.stop="handleSort(filterForm['rug_pull'], 'asc','rug_rate',['rug_rate','rat_rate'])"
                   >
-                    <use xlink:href="#icon-sort-up"></use>
+                    <use xlink:href="#icon-sort-up"/>
                   </svg>
                   <svg
                     class="icon-svg"
@@ -97,7 +98,7 @@
                     :class="filterForm['rug_pull']['rug_rate'].sort_dir === 'desc' ? 'active' : ''"
                     @click.stop="handleSort(filterForm['rug_pull'], 'desc','rug_rate',['rug_rate','rat_rate'])"
                   >
-                    <use xlink:href="#icon-sort-down"></use>
+                    <use xlink:href="#icon-sort-down"/>
                   </svg>
                 </div>
               </div>
@@ -110,7 +111,7 @@
                     :class="filterForm['rug_pull']['rat_rate'].sort_dir === 'asc' ? 'active' : ''"
                     @click.stop="handleSort(filterForm['rug_pull'], 'asc','rat_rate',['rug_rate','rat_rate'])"
                   >
-                    <use xlink:href="#icon-sort-up"></use>
+                    <use xlink:href="#icon-sort-up"/>
                   </svg>
                   <svg
                     class="icon-svg"
@@ -118,7 +119,7 @@
                     :class="filterForm['rug_pull']['rat_rate'].sort_dir === 'desc' ? 'active' : ''"
                     @click.stop="handleSort(filterForm['rug_pull'], 'desc','rat_rate',['rug_rate','rat_rate'])"
                   >
-                    <use xlink:href="#icon-sort-down"></use>
+                    <use xlink:href="#icon-sort-down"/>
                   </svg>
                 </div>
               </div>
@@ -161,11 +162,11 @@
 </template>
 
 <script>
-import RugPullPop from "../../component/rugPull.vue";
-import headSort from "@/components/headSort/index.vue";
+import RugPullPop from './rugPull.vue'
+import headSort from '@/components/headSort.vue'
 
 export default {
-  name: "rugPullContent",
+  name: 'RugPullContent',
   components: {
     RugPullPop,
     headSort
@@ -199,32 +200,32 @@ export default {
   methods:{
     getRangeList(e){
       if(e.min1){
-        this.filterForm['rug_pull']['rug_rate'].range[0] = e.min1;
+        this.filterForm['rug_pull']['rug_rate'].range[0] = e.min1
       }
       if(e.max1){
-        this.filterForm['rug_pull']['rug_rate'].range[1] = e.max1;
+        this.filterForm['rug_pull']['rug_rate'].range[1] = e.max1
       }
       if(e.min2){
-        this.filterForm['rug_pull']['rat_rate'].range[0] = e.min2;
+        this.filterForm['rug_pull']['rat_rate'].range[0] = e.min2
       }
       if(e.max2){
-        this.filterForm['rug_pull']['rat_rate'].range[1] = e.max2;
+        this.filterForm['rug_pull']['rat_rate'].range[1] = e.max2
       }
       this.handleFilterConfirm(this.filterForm['rug_pull'])
     },
     handleSortChange(sortOrder, filterItem) {
-      let sortDir = '';
+      let sortDir = ''
       if (sortOrder === 'ascending') {
-        sortDir = 'asc';
+        sortDir = 'asc'
       } else if (sortOrder === 'descending') {
-        sortDir = 'desc';
+        sortDir = 'desc'
       }
 
       // 更新排序方向
-      filterItem.sort_dir = sortDir;
+      filterItem.sort_dir = sortDir
 
       // 直接调用确认方法
-      this.handleFilterConfirm(filterItem);
+      this.handleFilterConfirm(filterItem)
     }
   }
 }

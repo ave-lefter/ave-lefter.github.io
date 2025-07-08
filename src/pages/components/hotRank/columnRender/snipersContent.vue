@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import headSort from "@/components/headSort/index.vue";
+import headSort from "@/components/headSort.vue";
 
 export default {
   name: "snipersContent",
