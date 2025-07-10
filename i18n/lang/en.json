@@ -1025,6 +1025,8 @@
   "revoke": "Cancel",
   "expiredTime": "Expiry",
   "historyLimitOrder": "Limit Order",
+  "searchGroup": "Search Group",
+  "marketCap": "C.M.Cap",
   "isMonitored": "Whether to add monitoring",
   "no": "No",
   "followAddress": "Follow Address",

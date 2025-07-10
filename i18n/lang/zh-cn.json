@@ -683,7 +683,6 @@
   "smarterTxs": "聪明钱交易数",
   "aiSummary": "AI叙事",
   "aiIsAnalyzing": "AI正在分析中...",
-  "tax": "税",
   "days2": "天",
   "bestToken2": "最佳代币",
   "profit3": "利润",
@@ -1032,6 +1031,8 @@
   "revoke": "撤销",
   "expiredTime": "过期时间",
   "historyLimitOrder": "历史挂单",
+  "searchGroup": "搜索分组",
+  "marketCap": "流通市值",
   "allChain": "全部链",
   "enable": "开启"
 }

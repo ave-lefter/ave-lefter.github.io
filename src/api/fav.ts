@@ -213,7 +213,7 @@ function getCheckFavoriteGroup(token_id: string, address: string) {
 
 function getNewFavoriteList(query: any): Promise<GetFavListResponse[]> {
   const { $api } = useNuxtApp()
-  return $api('/v1api/v4/tokens/favorite', {
+  return $api('/v2api/fav_tokens/v1/favorite/v2', {
     method: 'get',
     query
   })
@@ -224,6 +224,14 @@ function getRemarksDetail(query: any): Promise<GetFavListResponse[]> {
   return $api('/v2api/fav_remarks/v1/remarks_detail', {
     method: 'get',
     query
+  })
+}
+
+function getGroupChangeIndex(data: any): Promise<any> {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_tokens/v1/favorite/group/changeIndex/v2', {
+    method: 'post',
+    body: data
   })
 }
 
@@ -246,5 +254,6 @@ export {
   getCheckFavoriteGroup,
   getNewFavoriteList,
   getRemarksDetail,
+  getGroupChangeIndex,
 }
 export type { GetUserFavoriteGroupsResponse, GetFavListResponse }

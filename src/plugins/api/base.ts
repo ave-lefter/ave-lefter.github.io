@@ -43,7 +43,7 @@ export function onRequest({ options, request }: MyFetchContext) {
     }
     options.headers.set('Ave-Platform', 'web')
   }
-  const needAuthUrl = ['/signals/v2/public/list/v3','/v2api/fav_users/']
+  const needAuthUrl = ['/signals/v2/public/list/v3','/v2api/fav_users/', '/v2api/fav_remarks/v1/remarks_detail']
   const needAuth = needAuthUrl.some(el=>url.includes(el))
   if (needAuth) {
     const accessToken = useBotStore().accessToken

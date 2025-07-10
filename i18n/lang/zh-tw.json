@@ -1010,6 +1010,7 @@
   "revoke": "撤銷",
   "expiredTime": "过期時間",
   "historyLimitOrder": "歷史掛單",
+  "marketCap": "流通市值",
   "isMonitored": "是否添加監控",
   "no": "否",
   "followAddress": "關注地址",
