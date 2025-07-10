@@ -46,6 +46,12 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       fixed: 'left',
       render: 'poolPairContent',
     },
+    {
+      label:t('AI叙事'),
+      isHide: true,
+      field:'headline',
+      render:'headline'
+    },
     // {
     //   label: t("openTime"),
     //   isHide: true,
@@ -183,5 +189,18 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       fixed: 'right',
       render: 'quickContent',
     },
+  ]
+}
+
+export function getOpenTimeList(allText:string) {
+  return [
+    { text: allText, value: '' },
+    { text: '≤30min', value: String(30 * 60) },
+    { text: '≤1H', value: String(60 * 60) },
+    { text: '≤6H', value: String(60 * 6 * 60) },
+    { text: '≤12H', value: String(60 * 12 * 60) },
+    { text: '≤24H', value: String(60 * 24 * 60) },
+    { text: '≤1W', value: String(60 * 24 * 7 * 60)},
+    { text: '≤30D', value: String(60 * 24 * 30 * 60) }
   ]
 }

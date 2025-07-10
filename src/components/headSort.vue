@@ -1,9 +1,11 @@
 <template>
   <span class="caret-wrapper" @click="handleSort('')">
-    <i class="sort-caret ascending" :class="sortOrder === 'ascending' ? 'active' : ''"
-       @click.stop="handleSort('ascending')"></i>
-    <i class="sort-caret descending" :class="sortOrder === 'descending' ? 'active' : ''"
-       @click.stop="handleSort('descending')"></i>
+    <i
+class="sort-caret ascending" :class="sortOrder === 'ascending' ? 'active' : ''"
+       @click.stop="handleSort('ascending')"/>
+    <i
+class="sort-caret descending" :class="sortOrder === 'descending' ? 'active' : ''"
+       @click.stop="handleSort('descending')"/>
   </span>
 </template>
 
@@ -73,7 +75,7 @@ const handleSort = (sort) => {
 
   .sort-caret.ascending {
     border-bottom-color: #a8abb2;
-    top: -5px;
+    top: -2px;
   }
 
   .sort-caret.descending {

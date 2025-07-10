@@ -1,49 +1,40 @@
+<script setup lang="ts">
+const props = defineProps<{
+  sortConditions: { sort: string; sort_dir: string };
+  setSortConditions(params: { sort: string; sort_dir: string }): void;
+}>()
+function sortChange(sort_dir: string) {
+  props.setSortConditions({
+    sort: 'market_cap',
+    sort_dir: sort_dir.replace('ending', ''),
+  })
+}
+const defaultSort = computed(() => {
+  if (props.sortConditions.sort === 'market_cap') {
+    return (
+      {
+        asc: 'ascending',
+        desc: 'descending',
+      }[props.sortConditions.sort_dir] || ''
+    )
+  }
+  return ''
+})
+</script>
+
 <template>
-  <el-table-column
-    label="24h%"
-    sortable="custom"
-    :sort-orders="['descending', 'ascending', null]"
-    prop="price_change_24h"
-    width="90"
-    align="right"
-  >
+  <el-table-column label="24h%" width="90" align="right">
+    <template #header>
+      24h%<HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
+    </template>
     <template #default="{ row }">
-      <span 
-        class="ellipsis block" 
-        style="max-width: 100px;margin-left:auto;" 
-        :class="Number(row?.price_change_24h) > 0 ? 'green' : (Number(row?.price_change_24h) === 0 ? 'color-text-3' : 'red')"
+      <span
+        class="block overflow-hidden text-ellipsis whitespace-nowrap max-w-100px"
+        :class="getColorClass(row.price_change_24h)"
       >
-        {{ Number(row?.price_change_24h) > 0 ? '+' : '' }}{{ $f.formatNumberS(row.price_change_24h || 0) }}%
+        {{ Number(row.price_change_24h) > 0 ? "+" : ""
+        }}{{ formatNumber(row.price_change_24h || 0, 1) }}%
       </span>
     </template>
   </el-table-column>
 </template>
-
-<script>
-export default {
-  name: "priceChange24hContent"
-}
-</script>
-
-<style lang="scss" scoped>
-.ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.block {
-  display: block;
-}
-
-.red {
-  color: #EB2B4B;
-}
-.green {
-  color: #37B270;
-}
-
-.color-text-3 {
-  color: var(--a-text-3-color);
-}
-</style> 

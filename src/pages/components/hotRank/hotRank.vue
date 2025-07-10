@@ -1,144 +1,197 @@
 <script setup lang="ts">
-import {useStorage} from '@vueuse/core'
-import {getDefaultColumns} from './columnRender/hotColumusService'
-import {getTreasureList} from '~/api/market'
+import { useStorage } from '@vueuse/core'
+import { getDefaultColumns } from './columnRender/hotColumusService'
+import { getTreasureList } from '~/api/market'
 import {
-  poolPairHeader,
-  poolPairRow,
-  quickHeader,
+  // poolPairHeader,
+  // poolPairRow,
+  // quickHeader,
   quickContent,
-  openTimeContent,
-  dexContent,
+  // openTimeContent,
+  // dexContent,
   securityContent,
-  devContent,
-  top10PositionsContent,
-  snipersContent,
+  // devContent,
+  // top10PositionsContent,
+  // snipersContent,
   holdersContent,
   priceChange24hContent,
-  priceChange5mContent,
+  // priceChange5mContent,
   priceChangeDynamicContent,
-  markersContent,
-  priceChange1mContent,
-  volumeContent,
-  txnsContent,
+  // markersContent,
+  // priceChange1mContent,
+  // volumeContent,
+  // txnsContent,
   smarterContent,
-  rugPullContent,
+  // rugPullContent,
   liquidityContent,
   priceContent,
   mCapContent,
-  marketCapContent,
-  listTimeContent,
+  // marketCapContent,
+  // listTimeContent,
   poolPairContent,
-  insidersContentNew,
-  insidersContent
+  // insidersContentNew,
+  // insidersContent
+  Headline
 } from './columnRender/index'
+import { set } from 'lodash-es'
 
-const {t} = useI18n()
-const conditions = ref({
+const { t } = useI18n()
+
+const props = defineProps<{
+  listMapFunction(i:Record<string,any>):Record<string,any>
+}>()
+const sortConditions = ref({
   sort: '',
-  sort_dir: ''
+  sort_dir: '',
+})
+function setSortConditions(params: { sort: string; sort_dir: string }) {
+  sortConditions.value = params
+}
+const defaultFilter = {
+  created_at: {
+    created_interval:'',
+    range:[]
+  },
+}
+const filterForm = ref(defaultFilter)
+function setFilterForm<T>(path:string,val:T) {
+  set(filterForm.value,path,val)
+}
+const rankCommonConditions = useStorage('rankCommon', {
+  activeInterval: '1m',
+  quickVisible: true,
+  quickBuyValue:'0.01'
 })
 const listData = shallowRef([])
 const pageInfo = ref({
   pageNO: 1,
   pageSize: 100,
-  total: 0
+  total: 0,
 })
 const loading = shallowRef(false)
 const columns = useStorage('hotUserTableColumns', getDefaultColumns(t))
 const renderData = computed(() => {
   return {
-    txnsContent: {
-      Comp: txnsContent,
-      props: {}
-    },
-    volumeContent: {
-      Comp: volumeContent,
-      props: {}
-    },
-    priceChange1mContent: {
-      Comp: priceChange1mContent,
-      props: {}
-    },
-    markersContent: {
-      Comp: markersContent,
-      props: {}
-    },
+    // txnsContent: {
+    //   Comp: txnsContent,
+    //   props: {}
+    // },
+    // volumeContent: {
+    //   Comp: volumeContent,
+    //   props: {}
+    // },
+    // priceChange1mContent: {
+    //   Comp: priceChange1mContent,
+    //   props: {}
+    // },
+    // markersContent: {
+    //   Comp: markersContent,
+    //   props: {}
+    // },
     priceChangeDynamicContent: {
       Comp: priceChangeDynamicContent,
-      props: {}
+      props: {
+        activeInterval:rankCommonConditions.value.activeInterval,
+        sortConditions: sortConditions.value,
+        setSortConditions,
+      }
     },
-    priceChange5mContent: {
-      Comp: priceChange5mContent,
-      props: {}
-    },
+    // priceChange5mContent: {
+    //   Comp: priceChange5mContent,
+    //   props: {}
+    // },
     priceChange24hContent: {
       Comp: priceChange24hContent,
-      props: {}
+      props: {
+        sortConditions: sortConditions.value,
+        setSortConditions,
+      }
     },
-    poolPairHeader: {
-      Comp: poolPairHeader,
-      props: {}
-    },
+    // poolPairHeader: {
+    //   Comp: poolPairHeader,
+    //   props: {}
+    // },
     quickContent: {
       Comp: quickContent,
-      props: {}
+      props: {
+        quickBuyValue:rankCommonConditions.value.quickBuyValue
+      }
     },
-    openTimeContent: {
-      Comp: openTimeContent,
-      props: {}
-    },
-    dexContent: {
-      Comp: dexContent,
-      props: {}
-    },
+    // openTimeContent: {
+    //   Comp: openTimeContent,
+    //   props: {}
+    // },
+    // dexContent: {
+    //   Comp: dexContent,
+    //   props: {}
+    // },
     securityContent: {
       Comp: securityContent,
       props: {}
     },
-    insidersContentNew: {
-      Comp: insidersContentNew,
-      props: {}
-    },
-    devContent: {
-      Comp: devContent,
-      props: {}
-    },
-    top10PositionsContent: {
-      Comp: top10PositionsContent,
-      props: {}
-    },
-    snipersContent: {
-      Comp: snipersContent,
-      props: {}
-    },
+    // insidersContentNew: {
+    //   Comp: insidersContentNew,
+    //   props: {}
+    // },
+    // devContent: {
+    //   Comp: devContent,
+    //   props: {}
+    // },
+    // top10PositionsContent: {
+    //   Comp: top10PositionsContent,
+    //   props: {}
+    // },
+    // snipersContent: {
+    //   Comp: snipersContent,
+    //   props: {}
+    // },
     holdersContent: {
       Comp: holdersContent,
-      props: {}
+      props: {
+        filterForm: filterForm.value,
+        sortConditions: sortConditions.value,
+        setSortConditions,
+        setFilterForm,
+      }
     },
     smarterContent: {
       Comp: smarterContent,
-      props: {}
+      props: {
+        filterForm: filterForm.value,
+        sortConditions: sortConditions.value,
+        setSortConditions,
+        setFilterForm,
+      }
     },
-    rugPullContent: {
-      Comp: rugPullContent,
-      props: {}
-    },
+    // rugPullContent: {
+    //   Comp: rugPullContent,
+    //   props: {}
+    // },
     liquidityContent: {
       Comp: liquidityContent,
-      props: {}
+      props: {
+        filterForm: filterForm.value,
+        sortConditions: sortConditions.value,
+        setSortConditions,
+        setFilterForm,
+      }
     },
-    listTimeContent: {
-      Comp: listTimeContent,
-      props: {}
-    },
-    marketCapContent: {
-      Comp: marketCapContent,
-      props: {}
-    },
+    // listTimeContent: {
+    //   Comp: listTimeContent,
+    //   props: {}
+    // },
+    // marketCapContent: {
+    //   Comp: marketCapContent,
+    //   props: {}
+    // },
     mCapContent: {
       Comp: mCapContent,
-      props: {}
+      props: {
+        filterForm: filterForm.value,
+        sortConditions: sortConditions.value,
+        setSortConditions,
+        setFilterForm,
+      }
     },
     priceContent: {
       Comp: priceContent,
@@ -146,7 +199,17 @@ const renderData = computed(() => {
     },
     poolPairContent: {
       Comp: poolPairContent,
-      props: {}
+      props: {
+        filterForm: filterForm.value,
+        sortConditions: sortConditions.value,
+        setSortConditions,
+        setFilterForm,
+        pageNO: pageInfo.value.pageNO,
+        pageSize: pageInfo.value.pageSize,
+      },
+    },
+    headline:{
+      Comp:Headline
     }
   }
 })
@@ -162,37 +225,33 @@ onMounted(() => {
 async function _getTreasureList() {
   try {
     loading.value = true
-    const {total: _, ...rest} = pageInfo.value
+    const { total: _, ...rest } = pageInfo.value
     const res = await getTreasureList({
       category: 'hot',
-      ...rest
+      ...rest,
     })
     pageInfo.value.total = res.total
-    listData.value = res.data || []
+    listData.value = (res.data || []).map(props.listMapFunction)
   } finally {
     loading.value = false
   }
 }
 
-function handleSortChange() {
 
-}
 </script>
 
 <template>
   <el-table
+    :height="'calc(100vh - 190px)'"
     :data="listData"
-    fit stripe
-    :default-sort="{
-      prop: conditions.sort,
-      order: conditions.sort_dir ? conditions.sort_dir + 'ending' : null
-    }"
+    fit
+    header-row-class-name="[&&]:text-12px h-40px"
+    row-class-name="color-[--d-CCC-l-333]"
     @row-click="tableRowClick"
-    @handleSortChange="handleSortChange"
   >
     <template #empty>
-      <AveEmpty v-if="!loading&&listData.length===0"/>
-      <span v-else/>
+      <AveEmpty v-if="!loading && listData.length === 0" />
+      <span v-else />
     </template>
     <template v-for="item in columns" :key="item.field">
       <component
@@ -210,11 +269,16 @@ function handleSortChange() {
     :total="pageInfo.total || 0"
     :small="false"
     :page-sizes="[20, 50, 100, 200, 300, 400]"
-    @size-change="pageInfo.pageNO=1;_getTreasureList()"
+    @size-change="
+      pageInfo.pageNO = 1;
+      _getTreasureList();
+    "
     @current-change="_getTreasureList"
   />
 </template>
 
 <style scoped lang="scss">
-
+:deep(.cell) {
+  padding: 0 16px;
+}
 </style>
