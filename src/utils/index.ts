@@ -9,10 +9,12 @@ import IconUnknown from '@/assets/images/icon-unknown.png'
 import { useRemarksStore } from '~/stores/remarks'
 import Cookies from 'js-cookie'
 import { JsonRpcProvider, formatUnits, parseUnits, FixedNumber } from 'ethers'
-import type {GetHotTokensResponse} from '~/api/token'
+import type { GetHotTokensResponse } from '~/api/token'
 import BigNumber from 'bignumber.js'
 import type {SearchHot} from '~/api/types/search'
-import type {ConfigType} from 'dayjs'
+import type { ConfigType } from 'dayjs'
+import { useStorage } from '@vueuse/core'
+import type { Size, SizeObj } from '~/api/types/pump'
 
 export function isJSON(str: string) {
   try {
@@ -24,10 +26,7 @@ export function isJSON(str: string) {
   return true
 }
 
-export function formatDate(
-  val: string | number | Date,
-  dateType = 'YYYY-MM-DD HH:mm:ss'
-) {
+export function formatDate(val: string | number | Date, dateType = 'YYYY-MM-DD HH:mm:ss') {
   let dateStr: Date | null = null
   let timeStamp: number | string = 0
   let str
@@ -46,26 +45,11 @@ export function formatDate(
   }
 
   str = dateType.replace('YYYY', String(dateStr.getFullYear()))
-  str = str.replace(
-    'MM',
-    (dateStr.getMonth() + 1 < 10 ? '0' : '') + (dateStr.getMonth() + 1)
-  )
-  str = str.replace(
-    'DD',
-    (dateStr.getDate() < 10 ? '0' : '') + dateStr.getDate()
-  )
-  str = str.replace(
-    'HH',
-    (dateStr.getHours() < 10 ? '0' : '') + dateStr.getHours()
-  )
-  str = str.replace(
-    'mm',
-    (dateStr.getMinutes() < 10 ? '0' : '') + dateStr.getMinutes()
-  )
-  str = str.replace(
-    'ss',
-    (dateStr.getSeconds() < 10 ? '0' : '') + dateStr.getSeconds()
-  )
+  str = str.replace('MM', (dateStr.getMonth() + 1 < 10 ? '0' : '') + (dateStr.getMonth() + 1))
+  str = str.replace('DD', (dateStr.getDate() < 10 ? '0' : '') + dateStr.getDate())
+  str = str.replace('HH', (dateStr.getHours() < 10 ? '0' : '') + dateStr.getHours())
+  str = str.replace('mm', (dateStr.getMinutes() < 10 ? '0' : '') + dateStr.getMinutes())
+  str = str.replace('ss', (dateStr.getSeconds() < 10 ? '0' : '') + dateStr.getSeconds())
 
   return str
 }
@@ -185,19 +169,16 @@ export function formatUrl(url: string) {
   return 'https://' + url
 }
 
-export function getChainInfo(chain: string) {
+export function getChainInfo(chain: string, isChainId = false) {
   const chainConfig = useConfigStore().chainConfig
-  const chainInfo = chainConfig?.find((item) => item.net_name === chain)
+  const chainInfo = chainConfig?.find((item) => (isChainId ? item.chain_id : item.net_name) === chain)
   if (!chainInfo) {
     return {} as Record<string, any>
   }
   return chainInfo
 }
 
-export function getSwapInfo(
-  chain: string | { chain: string; amm: string },
-  amm?: string
-) {
+export function getSwapInfo(chain: string | { chain: string; amm: string }, amm?: string) {
   const chainConfig = useConfigStore().chainConfig
   if (typeof chain === 'string') {
     const chainInfo = chainConfig?.find((item) => item.net_name === chain)
@@ -215,6 +196,30 @@ export function getSwapInfo(
 }
 
 export function getTagTooltip(i: {
+  tag?: string
+  smart_money_buy_count_24h?: number
+  smart_money_sell_count_24h?: number
+}) {
+  const $t = getGlobalT()
+  if (!i.tag) {
+    if ((i.smart_money_buy_count_24h ?? 0) > 0 || (i.smart_money_sell_count_24h ?? 0) > 0) {
+      return $t('smart_money_tips', {
+        b: i.smart_money_buy_count_24h,
+        s: i.smart_money_sell_count_24h,
+      })
+    }
+    return ''
+  }
+  const tips: Record<string, string> = {
+    kol_sell: $t('kol_sell_tips'),
+    kol_buy: $t('kol_buy_tips'),
+    smarter_buy: $t('smarter_buy_tips'),
+    smarter_sell: $t('smarter_sell_tips'),
+  }
+  return tips?.[i.tag] || $t(i.tag)
+}
+
+export function getAi(i: {
   tag?: string
   smart_money_buy_count_24h?: number
   smart_money_sell_count_24h?: number
@@ -394,11 +399,7 @@ export function formatExplorerUrl(
   return `${n}/${type1}/${address}`
 }
 
-export function openBrowser(
-  url: string,
-  type: 'token' | 'address' | 'tx',
-  chain: string
-) {
+export function openBrowser(url: string, type: 'token' | 'address' | 'tx', chain: string) {
   let newUrl = url
   if (type) {
     newUrl = formatExplorerUrl(chain, url, type)
@@ -428,18 +429,23 @@ export function getChainDefaultIconColor(chain?: string) {
   return colors?.[chain] || defaultColor
 }
 
-export function getChainDefaultIcon(chain?: string, text = '') {
+export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
   if (text) {
     const color = getChainDefaultIconColor(chain)
-    const defaultSvg = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" stroke="transparent" fill="${color}" stroke-width="0"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff">${text
+    const circle = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" stroke="transparent" fill="${color}" stroke-width="0"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff">${text
       ?.slice(0, 1)
       ?.toUpperCase?.()}</text>
     </svg>`
+    const rect = `<?xml version="1.0" standalone="no"?>
+    <svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+      <rect width="32" height="32" fill="${color}" stroke="transparent" stroke-width="0"/>
+      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff">
+        ${text?.slice(0, 1)?.toUpperCase?.()}
+      </text>
+    </svg>`
+    const defaultSvg = type === 'rect' ? rect : circle
     try {
-      return (
-        'data:image/svg+xml;base64,' +
-        window.btoa(unescape(encodeURIComponent(defaultSvg)))
-      )
+      return 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(defaultSvg)))
     } catch (err) {
       console.log(err)
       return ''
@@ -451,27 +457,20 @@ export function getSymbolDefaultIcon(tokenInfo: {
   symbol?: string
   chain: string
   logo_url?: string
-}| undefined ) {
+}| undefined , type= 'circle') {
   const domain = useConfigStore().token_logo_url
-  if (
-    tokenInfo &&
-    tokenInfo.logo_url !== undefined &&
-    tokenInfo.logo_url !== ''
-  ) {
+  if (tokenInfo && tokenInfo.logo_url !== undefined && tokenInfo.logo_url !== '') {
     if (/^https?:\/\//.test(tokenInfo.logo_url)) {
       return tokenInfo.logo_url
     }
     return domain + tokenInfo.logo_url
   }
-  return getChainDefaultIcon(tokenInfo?.chain || '', tokenInfo?.symbol || '')
+  return getChainDefaultIcon(tokenInfo?.chain || '', tokenInfo?.symbol || '', type || '')
 }
 
 export function formatIconTag(src: string) {
-  const urlPrefix =
-    useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
-  return src && src !== 'unknown'
-    ? `${urlPrefix}signals/${src}.png`
-    : IconUnknown
+  const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
+  return src && src !== 'unknown' ? `${urlPrefix}signals/${src}.png` : IconUnknown
 }
 export function formatImgUrl(type: string, src: string) {
   if (!type || !src) {
@@ -511,7 +510,7 @@ export function formatIconSwap(src?: string) {
     : IconUnknown
 }
 
-export function formatNewTags(src?:string) {
+export function formatNewTags(src?: string) {
   return src && src !== 'unknown'
     ? `${useConfigStore().token_logo_url}address_portrait/${src}`
     : IconUnknown
@@ -546,22 +545,22 @@ export function verifyLogin() {
   return true
 }
 
-export function formatRemark(val = '', n = 10, suffix = '...'){
+export function formatRemark(val = '', n = 10, suffix = '...') {
   if (typeof val !== 'string') return val
   if (val.length > n) {
-    return val.slice(0,n) + suffix
+    return val.slice(0, n) + suffix
   }
   return val
 }
 
-export function getRemarkByAddress({address, chain}: {address: string, chain: string}) {
+export function getRemarkByAddress({ address, chain }: { address: string; chain: string }) {
   if (!address || !chain) {
     return ''
   }
-  return useRemarksStore().getRemarkByAddress({address, chain})
+  return useRemarksStore().getRemarkByAddress({ address, chain })
 }
 
-export function getColorClass(val: string|number) {
+export function getColorClass(val: string | number) {
   if (Number(val) > 0) {
     return 'color-#12B886'
   } else if (Number(val) < 0) {
@@ -606,7 +605,7 @@ export function getRpcProvider(chain: string) {
   }
   const RPC: Record<string, string> = {
     base: 'https://1rpc.io/base',
-    eth: 'https://rpc.mevblocker.io'
+    eth: 'https://rpc.mevblocker.io',
   }
   const rpcUrl = RPC?.[chain] || chainInfo?.rpc_url || ''
   return new JsonRpcProvider(rpcUrl, Number(chainInfo.chain_id))
@@ -627,7 +626,7 @@ export const evm_utils = {
     }
     const valueStr = String(arg?.[0] ?? '')
     return parseUnits(valueStr, decimals)
-  }
+  },
 }
 export function filterGas(num: number, chain?: string) {
   if (chain === 'bsc') {
@@ -664,7 +663,6 @@ export function addSign(val: number) {
 }
 
 export function getTextWidth(text: string, min = 0) {
-
   const canvas = document.createElement('canvas')
   const context = canvas.getContext('2d')!
   context.font = '12px DINPro-regular'
@@ -674,8 +672,7 @@ export function getTextWidth(text: string, min = 0) {
 }
 
 export function jumpTg() {
-  const inviterUrl =
-    config.inviter_url_v2 || 'https://share.ave.ai'
+  const inviterUrl = config.inviter_url_v2 || 'https://share.ave.ai'
   const text =
     useLocaleStore().locale == 'zh-cn'
       ? '我正在Ave.ai挖百倍金狗，现在注册并交易，跟我一起探寻百倍Meme。'
@@ -692,8 +689,7 @@ export function jumpTg() {
 }
 
 export function jumpX() {
-  const inviterUrl =
-    config.inviter_url_v2 || 'https://share.ave.ai'
+  const inviterUrl = config.inviter_url_v2 || 'https://share.ave.ai'
   const text =
     useLocaleStore().locale == 'zh-cn'
       ? `我正在Ave.ai挖百倍金狗，现在注册并交易，跟我一起探寻百倍Meme。
@@ -711,7 +707,7 @@ export function jumpX() {
   window.open(share_url)
 }
 
-export function scrollTabToCenter(tabsContainer: Ref<HTMLElement | null>,index: number) {
+export function scrollTabToCenter(tabsContainer: Ref<HTMLElement | null>, index: number) {
   if (!tabsContainer.value) {
     return
   }
@@ -724,8 +720,8 @@ export function scrollTabToCenter(tabsContainer: Ref<HTMLElement | null>,index: 
   const tabWidth = tab.offsetWidth
 
   container.scrollTo({
-    left: tabLeft - (containerWidth / 2) + (tabWidth / 2),
-    behavior: 'smooth'
+    left: tabLeft - containerWidth / 2 + tabWidth / 2,
+    behavior: 'smooth',
   })
 }
 
@@ -734,8 +730,11 @@ export function uuid() {
 }
 
 export function getMCap(row: GetHotTokensResponse | SearchHot) {
-  const amount = new BigNumber(row.total).minus(row.lock_amount).minus(row.burn_amount).minus(row.other_amount)
-  return amount.gt(0)? amount.multipliedBy(row.current_price_usd).toString() : '0'
+  const amount = new BigNumber(row.total)
+    .minus(row.lock_amount)
+    .minus(row.burn_amount)
+    .minus(row.other_amount)
+  return amount.gt(0) ? amount.multipliedBy(row.current_price_usd).toString() : '0'
 }
 
 export function formatCountdown(time: ConfigType) {
@@ -747,9 +746,7 @@ export function formatCountdown(time: ConfigType) {
     const minutes = Math.floor(seconds / 60)
     let remainingSeconds = seconds % 60
     remainingSeconds = Math.floor(remainingSeconds)
-    return `${minutes}min ${
-      remainingSeconds > 0 ? remainingSeconds + 's' : ''
-    }`
+    return `${minutes}min ${remainingSeconds > 0 ? remainingSeconds + 's' : ''}`
   } else if (seconds < 86400) {
     // 1d
     const hours = Math.floor(seconds / 3600)
@@ -770,4 +767,78 @@ export function formatCountdown(time: ConfigType) {
     const years = Math.floor(seconds / 31536000)
     return `${years}y`
   }
+}
+
+export function usePumpTableDataFetching(key = '') {
+  return useStorage(
+    key,
+    {
+      q: '',
+      dev_sale_out: 0,
+      platforms: 'pump,moonshot',
+      progress_min: '', //进度
+      progress_max: '',
+
+      lage: '', //代币时长
+      rage: '',
+      dev_balance_ratio_cur_min: '', //dev 持仓%
+      dev_balance_ratio_cur_max: '',
+      holder_min: '', //持有人
+      holder_max: '',
+      holders_top10_ratio_min: '', //top10 持仓%
+      holders_top10_ratio_max: '',
+      lsnip: '', //狙击人数
+      rsnip: '',
+      smart_money_tx_count_24h_min: '', // 聪明钱交易数 （买入数+卖出数）
+      smart_money_tx_count_24h_max: '',
+      lins: '', //老鼠仓
+      rins: '',
+      lkol: '', //KOL交易人数
+      rkol: '',
+      lrug: '', //跑路概率
+      rrug: '',
+
+      market_cap_min: '', // 市值
+      market_cap_max: '',
+      volume_u_24h_min: '', //交易额
+      volume_u_24h_max: '',
+      lbtx: '', //买入交易数
+      rbtx: '',
+      lstx: '', //卖出交易数
+      rstx: '',
+      has_sm: 0,
+      sm_list: []
+    },
+    localStorage,
+    { mergeDefaults: true }
+  )
+}
+export function _isString(val: any){
+  return  typeof val === 'string'
+}
+
+export function _isArray(val:any) {
+  return Array.isArray(val)
+}
+
+
+export function getSwapSize(type: Size):SizeObj {
+  const obj:Record<Size, SizeObj> = {
+    small: {
+      flash:'6px',
+      amm: '10px',
+      text: '10px'
+    },
+    medium: {
+      flash:'10px',
+      amm: '12px',
+      text: '12px'
+    },
+    large: {
+      flash:'12px',
+      amm: '16px',
+      text: '16px'
+    }
+  }
+  return obj[type] || ''
 }

@@ -124,7 +124,6 @@ function subBalanceChange() {
   })
 }
 
-
 function _getTokenInfo() {
   const id = route.params.id as string
   getTokenInfo(id).then(res => {

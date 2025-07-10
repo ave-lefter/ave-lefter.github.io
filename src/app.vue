@@ -6,6 +6,8 @@
     </NuxtLayout>
   </el-config-provider>
   <TokenDetails/>
+  <!-- 手动引入 custom:checked -->
+  <Icon style="display: none;" name="custom:checked" />
 </template>
 
 <script setup lang='ts'>
@@ -48,8 +50,14 @@
     }
     elementLocaleMap.set(val, elementLocale.value)
   }, { immediate: true })
+  const botStore = useBotStore()
+  const walletStore = useWalletStore()
+  const currentAddress = computed(() =>  botStore?.evmAddress || walletStore?.address ||'')
 
-
+  watch(currentAddress, (val) => {
+    if (!val) return
+    useFollowStore().initAddressGroups()
+  }, { immediate: true })
   // import { bot_getWalletsAllChain, bot_getWebConfig } from '@/api/bot'
   function init() {
     useConfigStore().getChainConfig()
@@ -57,6 +65,7 @@
     useBotStore().getUserInfo()
     useRemarksStore().initRemarks()
     useBotSwapStore().sendNativePriceWs()
+    useWalletStore().initWallet()
   }
 
   onBeforeMount(() => {

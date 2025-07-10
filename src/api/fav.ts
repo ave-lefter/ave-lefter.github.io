@@ -8,7 +8,7 @@ interface GetUserFavoriteGroupsResponse {
 }
 
 function getUserFavoriteGroups(address: string): Promise<GetUserFavoriteGroupsResponse[] | []> {
-  const {$api} = useNuxtApp()
+  const { $api } = useNuxtApp()
   return $api(`/v1api/v3/tokens/favorite/${address}/groups`, {
     method: 'get',
   })
@@ -42,7 +42,7 @@ interface GetFavListResponse {
 
 // Get user favorite tokens
 function getFavoriteList(group = -1, pageNO = 1, address: string): Promise<GetFavListResponse[]> {
-  const {$api} = useNuxtApp()
+  const { $api } = useNuxtApp()
   return $api('/v1api/v4/tokens/favorite', {
     method: 'get',
     query: {
@@ -57,7 +57,7 @@ function getFavoriteList(group = -1, pageNO = 1, address: string): Promise<GetFa
 
 // update user favorite tokens group
 function moveFavoriteGroup(tokenId: string, group: number, address: string) {
-  const {$api} = useNuxtApp()
+  const { $api } = useNuxtApp()
   return $api('/v1api/v3/tokens/favorite/move', {
     method: 'post',
     body: {
@@ -70,7 +70,7 @@ function moveFavoriteGroup(tokenId: string, group: number, address: string) {
 
 // change user favorite tokens
 function changeFavoritesIndex(token1: string, token2: string, group = 0, address: string) {
-  const {$api} = useNuxtApp()
+  const { $api } = useNuxtApp()
   return $api('/v1api/v3/tokens/favorite/changeIndex', {
     method: 'post',
     body: {
@@ -84,7 +84,7 @@ function changeFavoritesIndex(token1: string, token2: string, group = 0, address
 
 // set top favorite token
 function changeFavoritesTop(token: string, group = 0, address: string) {
-  const {$api} = useNuxtApp()
+  const { $api } = useNuxtApp()
   return $api('/v1api/v3/tokens/favorite/setTop', {
     method: 'post',
     body: {
@@ -97,7 +97,7 @@ function changeFavoritesTop(token: string, group = 0, address: string) {
 
 // edit remark
 function editTokenFavRemark(tokenId: string, remark: string, address: string) {
-  const {$api} = useNuxtApp()
+  const { $api } = useNuxtApp()
   return $api('/v1api/v3/tokens/favorite/editRemark', {
     method: 'post',
     body: {
@@ -109,7 +109,7 @@ function editTokenFavRemark(tokenId: string, remark: string, address: string) {
 }
 
 function changeFavoriteGroupName(name: string, group: number, address: string) {
-  const {$api} = useNuxtApp()
+  const { $api } = useNuxtApp()
   return $api('/v1api/v3/tokens/favorite/group/update', {
     method: 'post',
     body: {
@@ -121,7 +121,7 @@ function changeFavoriteGroupName(name: string, group: number, address: string) {
 }
 
 function setTopFavoriteGroup(group: number, address: string) {
-  const {$api} = useNuxtApp()
+  const { $api } = useNuxtApp()
   return $api('/v1api/v3/tokens/favorite/group/setTop', {
     method: 'post',
     body: {
@@ -132,7 +132,7 @@ function setTopFavoriteGroup(group: number, address: string) {
 }
 
 function changeIndexFavoriteGroup(group1: number, group2: number, address: string) {
-  const {$api} = useNuxtApp()
+  const { $api } = useNuxtApp()
   return $api('/v1api/v3/tokens/favorite/group/changeIndex', {
     method: 'post',
     body: {
@@ -144,7 +144,7 @@ function changeIndexFavoriteGroup(group1: number, group2: number, address: strin
 }
 
 function removeFavoriteGroup(group: number, address: string) {
-  const {$api} = useNuxtApp()
+  const { $api } = useNuxtApp()
   return $api('/v1api/v3/tokens/favorite/group/delete', {
     method: 'post',
     body: {
@@ -155,7 +155,7 @@ function removeFavoriteGroup(group: number, address: string) {
 }
 
 function addFavoriteGroup(name: string, address: string) {
-  const {$api} = useNuxtApp()
+  const { $api } = useNuxtApp()
   return $api('/v1api/v3/tokens/favorite/group/add', {
     method: 'post',
     body: {
@@ -164,7 +164,7 @@ function addFavoriteGroup(name: string, address: string) {
     }
   })
 }
-function getFavoriteCheck(token_id: string, address: string){
+function getFavoriteCheck(token_id: string, address: string) {
   const { $api } = useNuxtApp()
   return $api('/v1api/v3/tokens/checkfavoritev2', {
     method: 'get',
@@ -211,6 +211,23 @@ function getCheckFavoriteGroup(token_id: string, address: string) {
   })
 }
 
+function getNewFavoriteList(query: any): Promise<GetFavListResponse[]> {
+  const { $api } = useNuxtApp()
+  return $api('/v1api/v4/tokens/favorite', {
+    method: 'get',
+    query
+  })
+}
+
+function getRemarksDetail(query: any): Promise<GetFavListResponse[]> {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_remarks/v1/remarks_detail', {
+    method: 'get',
+    query
+  })
+}
+
+
 export {
   getUserFavoriteGroups,
   getFavoriteList,
@@ -226,6 +243,8 @@ export {
   getFavoriteCheck,
   addFavorite,
   removeFavorite,
-  getCheckFavoriteGroup
+  getCheckFavoriteGroup,
+  getNewFavoriteList,
+  getRemarksDetail,
 }
-export type {GetUserFavoriteGroupsResponse, GetFavListResponse}
+export type { GetUserFavoriteGroupsResponse, GetFavListResponse }

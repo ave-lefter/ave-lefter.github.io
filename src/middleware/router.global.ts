@@ -13,21 +13,31 @@ export default defineNuxtRouteMiddleware((to) => {
     }
   }
   const needRedirectToOld = redirectToOldUrls.find((url) => to.fullPath.includes(url))
-  if(needRedirectToOld){
+  const isBtcOrSolana = ['bsc', 'solana'].includes(to.params.chain as string)
+  if(needRedirectToOld && !isBtcOrSolana) {
     let query = ''
     const botStore = useBotStore()
     if (botStore.accessToken &&  botStore.refreshToken) {
       query = `?act=${botStore.accessToken}&ret=${botStore.refreshToken}`
     }
-    navigateTo('https://ave.ai'+to.path + query,{
-      open:{
-        target:'_blank'
+    if (to.params.chain) {
+      navigateTo('https://ave.ai'+ to.path + query,{
+        open:{
+          target:'_blank'
+        }
+      })
+      return abortNavigation()
+    } else {
+      if (botStore.accessToken && botStore.evmAddress) {
+        const path = `/address/${botStore.getWalletAddress('solana')}/solana`
+        return navigateTo(path)
       }
-    })
-    return abortNavigation()
+    }
+
   }
   if (!to.fullPath?.includes('/token')) {
     useHead({ title: 'Ave.ai' })
+    console.log('to',to)
   } else if (to.fullPath?.includes(NATIVE_TOKEN)) {
     const {chain} = getAddressAndChainFromId(to.params.id as string)
     const mainUrl = getChainInfo(chain)?.wmain_wrapper

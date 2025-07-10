@@ -285,15 +285,14 @@ function sendVerificationCode() {
 <style scoped lang='scss'>
 .w-reset {
   .title {
-    position: relative;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: flex-start;
     font-family: PingFang SC;
     font-weight: 600;
     font-size: 24px;
     line-height: 100%;
-    letter-spacing: 0%;
+    letter-spacing: 0;
     text-align: left;
     text-underline-position: from-font;
     text-decoration-skip-ink: none;

@@ -17,7 +17,9 @@ export const useWSStore = defineStore('ws', () => {
 
   // const tokenStore = useTokenStore()
 
-  const wsResult = reactive<Record<typeof WSEventType[keyof typeof WSEventType], any>>({
+  const wsResult = reactive<
+    Record<(typeof WSEventType)[keyof typeof WSEventType], any>
+  >({
     [WSEventType.TX]: null,
     [WSEventType.LIQ]: null,
     [WSEventType.KLINE]: null,
@@ -26,6 +28,7 @@ export const useWSStore = defineStore('ws', () => {
     [WSEventType.ASSET]: null,
     [WSEventType.SWITCH_MAIN_PAIR_V2]: null,
     [WSEventType.PUMPSTATE]: null,
+    [WSEventType.GOLD_SIGNAL]: null,
     [WSEventType.SIGNALSV2_PUBLIC_MONITOR]: null
   })
 
@@ -47,6 +50,8 @@ export const useWSStore = defineStore('ws', () => {
       const { event, data } = msg
       if (event === WSEventType.TGBOT) {
         wsResult[event] = data?.msg
+      } else if (event === WSEventType.MONITOR) {
+        wsResult[event] = data?.msg
       } else if (event === WSEventType.TX) {
         const tx: WSTx = data?.tx
         // 更新价格 交易数和交易额
@@ -59,6 +64,8 @@ export const useWSStore = defineStore('ws', () => {
       } else if (event === WSEventType.SWITCH_MAIN_PAIR_V2) {
         // 内盘转外盘更新 pair
         useTokenStore().onSwitchMainPairV2(data)
+      } else if (event === WSEventType.PUMPSTATE) {
+        wsResult[event] = data?.msgs
       } else {
         wsResult[event] = data
       }

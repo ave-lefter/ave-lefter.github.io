@@ -6,7 +6,7 @@ import {
   type GetTokenDetailsLineResponse
 } from '~/api/token'
 import LineChart from './lineChart.vue'
-import BaseInfo from '~/pages/token/components/tokenDetails/baseInfo.vue'
+import BaseInfo from './baseInfo.vue'
 
 const tokenDetailsStore = useTokenDetailsStore()
 const symbol = computed(() => {
@@ -178,7 +178,7 @@ async function _getTokenDetailMarks(type: string) {
               }"
               />
               <span class="text-14px ml-4px mr-4px">{{ symbol.target }}</span>
-              <span class="text-12px color-[--d-999-l-666] mr-8px">/ {{ symbol.source }}</span>
+              <span class="text-12px color-[--d-999-l-666] mr-8px" v-if="symbol.source">/ {{ symbol.source }}</span>
               <Icon
                 v-copy="tokenDetailsStore.tokenInfo?.address" name="bxs:copy"
                 class="cursor-pointer text-10px color-[--d-666-l-999]"
@@ -202,6 +202,7 @@ async function _getTokenDetailMarks(type: string) {
             class="relative h-200px mb-22px"
           >
             <LineChart
+              v-if="loadingLineChart || lineChartList.length > 0"
               v-loading="loadingLineChart"
               element-loading-background="transparent"
               :active-time="activeTime"
@@ -209,6 +210,7 @@ async function _getTokenDetailMarks(type: string) {
               :show-series="[true,true]"
               :data-list="lineChartList"
             />
+            <AveEmpty class="pt-50px" v-else/>
           </div>
 
           <BaseInfo ref="baseRef"/>

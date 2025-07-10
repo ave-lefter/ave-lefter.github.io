@@ -181,6 +181,7 @@ function attention() {
     >
       <div class="flex items-center">
         <UserAvatar
+          v-if="statistics.wallet_logo"
           :wallet_logo="statistics.wallet_logo"
           :chain="tokenDetailStore.tokenInfo!.chain"
           :address="tokenDetailStore.user_address"
@@ -277,6 +278,7 @@ function attention() {
         </div>
       </div>
       <NuxtLink
+        v-if="$route.path.indexOf('/address/') == -1"
         :to="`/address/${tokenDetailStore.user_address}/${tokenDetailStore.tokenInfo!.chain}`" class="py-7px px-8px bg-[--d-333-l-F2F2F2] rounded-4px color-[--d-F5F5F5-l-333] text-12px"
       >
         {{ $t('walletDetail') }}

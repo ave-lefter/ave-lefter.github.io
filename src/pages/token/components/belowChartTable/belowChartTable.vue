@@ -10,7 +10,7 @@ const tokenStore = useTokenStore()
 const botStore = useBotStore()
 const { t } = useI18n()
 const {token, tokenInfoExtra ,pairAddress,commonHeight} = storeToRefs(useTokenStore())
-const activeTab = shallowRef<keyof typeof components>('Transactions')
+const activeTab = shallowRef<keyof typeof components | 'Orders'>('Transactions')
 const components = {
   Transactions,
   Holders: defineAsyncComponent(() => import('./holders/index.vue')),
@@ -58,7 +58,7 @@ const tabsList = computed(() => {
 })
 
 const Component = computed(() => {
-  return components[activeTab.value]
+  return activeTab.value === 'Orders' ? OrdersTab : components[activeTab.value]
 })
 const holders= computed(()=>{
   return token?.value?.holders || 0
@@ -149,4 +149,4 @@ const comProps = computed(() => {
   --custom-br-1-color: #33353D;
 }
 </style>
-<style scoped></style>
+

@@ -21,7 +21,7 @@
       <template #prefix>
         <Icon
           class="text-20px text-[var(--d-666-l-999)]"
-          name="ep:search"
+          name="custom:search"
         />
       </template>
       <template #suffix>
@@ -73,12 +73,13 @@
           :loading="loading"
           @close="visible = false"
         />
-        <WalletTable v-else :tokens="smartTop10List || []" :loading="loading" />
+        <WalletTable v-else :tokens="smartTop10List || []" :loading="loading"  @close="visible = false" />
       </template>
       <WalletTable
         v-else-if="tabActive === 'wallet'"
         :tokens="searchResult?.wallet_list || []"
         :loading="loading"
+        @close="visible = false"
       />
       <SearchTable
         v-else
@@ -98,7 +99,10 @@ import type {SearchWalletInfo, SearchInfo } from '@/api/types/search'
 import { useDebounceFn, useLocalStorage } from '@vueuse/core'
 import { ElMessageBox, type ElInput } from 'element-plus'
 import { ProvideType } from '~/utils/constants'
-import type{ GetHotTokensResponse } from '@/api/token'
+import { getHotTokens, type GetHotTokensResponse } from '@/api/token'
+import type {IPriceV2Response} from '~/api/types/ws'
+const { hotList } = storeToRefs(useGlobalStore())
+
 const { modelValue } = defineProps({
   modelValue: Boolean,
 })
@@ -131,6 +135,8 @@ const hotTokenList = computed(() => {
   }
   return []
 })
+const wsStore = useWSStore()
+const priceV2Store = usePriceV2Store()
 onMounted(() => {
   getSmartTop10()
 })
@@ -217,6 +223,11 @@ watch(visible, (val) => {
     query.value = ''
   }
 })
+onMounted(() => {
+  if (hotList?.value?.length == 0) {
+    _getHotTokens()
+  }
+})
 function openDialog() {
   inputSearch.value?.focus()
 }
@@ -247,6 +258,41 @@ function confirm() {
     .catch(() => {
       // on cancel
     })
+}
+
+watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
+  const idToPriceMap: { [key: string]: IPriceV2Response['prices'][0] } = {}
+  val.prices.forEach((item) => {
+    idToPriceMap[item.token + '-' + item.chain] = item
+  })
+  hotList.value = hotList.value.map(el => {
+    const current = idToPriceMap[el.token + '-' + el.chain]
+    if (current) {
+      return {
+        ...el,
+        current_price_usd: current.uprice,
+        price_change: current.price_change
+      }
+    }
+    return el
+  })
+  if (hotTokens) {
+    hotTokens.setVal(hotList.value)
+  }
+})
+async function _getHotTokens() {
+  try {
+    const res = await getHotTokens()
+    hotList.value = res || []
+    if (hotTokens) {
+      hotTokens.setVal(hotList.value)
+    }
+    priceV2Store.setMultiPriceParams('trending', hotList.value.map(el => el.token + '-' + el.chain))
+    priceV2Store.sendPriceWs()
+  } catch (e) {
+    console.log('=>(trending.vue:15) e', e)
+
+  }
 }
 </script>
 

@@ -2,7 +2,7 @@
   <div class="flex">
     <span class="clickable flex" @click.stop="show = true">
       <slot name="icon">
-        <Icon class="text-14px color-[var(--d-666-l-999)] hover:color-[--d-F5F5F5-l-333]" name="tdesign:setting-1" />
+        <Icon class="text-14px color-[var(--d-999-l-666)] hover:color-[--d-F5F5F5-l-333]" name="custom:pump-setting" />
       </slot>
     </span>
     <el-dialog v-model="show" width="500px" append-to-body>

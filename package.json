@@ -14,11 +14,17 @@
     "addlang": "node ./scripts/migrate.cjs"
   },
   "dependencies": {
+    "@debox-pro/chat-widget-html": "^0.0.8",
     "@element-plus/icons-vue": "^2.3.1",
+    "@mysten/wallet-standard": "^0.16.3",
     "@solana/web3.js": "^1.98.2",
+    "@tronweb3/tronwallet-adapters": "^1.2.9",
     "@vueuse/core": "^13.1.0",
+    "@wallet-standard/app": "^1.1.0",
+    "@walletconnect/ethereum-provider": "^2.21.3",
     "arc-progress": "^1.0.0",
     "bignumber.js": "^9.3.0",
+    "bs58": "^6.0.0",
     "core-js": "^3.43.0",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
@@ -38,13 +44,16 @@
     "sass": "^1.87.0",
     "tonweb": "^0.0.66",
     "tronweb": "^6.0.3",
+    "tweetnacl-util": "^0.15.1",
     "unocss": "66.1.0-beta.12",
     "unocss-preset-scrollbar-hide": "^1.0.1",
     "uuid": "^11.1.0",
     "vue": "^3.5.13",
+    "vue-draggable-next": "^2.2.1",
     "vue-draggable-plus": "^0.6.0",
     "vue-draggable-resizable": "^3.0.0",
-    "vue-router": "^4.5.0"
+    "vue-router": "^4.5.0",
+    "web3": "^4.16.0"
   },
   "devDependencies": {
     "@element-plus/nuxt": "^1.1.1",
@@ -66,6 +75,7 @@
     "typescript": "^5.8.3",
     "unplugin-auto-import": "^19.1.2",
     "unplugin-vue-components": "^28.5.0",
-    "vite-plugin-node-polyfills": "^0.23.0"
+    "vite-plugin-node-polyfills": "^0.23.0",
+    "prettier": "^3.2.5"
   }
 }

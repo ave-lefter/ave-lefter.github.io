@@ -256,6 +256,7 @@ const props = defineProps({
     default: false,
   },
 })
+const emit = defineEmits(['close'])
 const tokens = computed(() => {
   return props.tokens
 })
@@ -273,6 +274,7 @@ function tableRowClick(row: { wallet_address: string; chain: string }) {
   $router.push({
     path: `/address/${row.wallet_address}/${row.chain}`,
   })
+  emit('close')
 }
 
 // const botStore = useBotStore()

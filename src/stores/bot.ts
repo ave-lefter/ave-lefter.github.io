@@ -252,17 +252,18 @@ export const useBotStore = defineStore('bot', () => {
         ],
         'id': 1
       }
-      // const data2 = {
-      //   'jsonrpc': '2.0',
-      //   'method': 'subscribe',
-      //   'params': [
-      //     'monitor',     // topic
-      //     userInfo.value?.tgUid, // tgUid
-      //     'web'
-      //   ],
-      //   'id': 1
-      // }
+      const data2 = {
+        'jsonrpc': '2.0',
+        'method': 'subscribe',
+        'params': [
+          'monitor',     // topic
+          userInfo.value?.tgUid, // tgUid
+          'web'
+        ],
+        'id': 1
+      }
       wsStore.send(data)
+      wsStore.send(data2)
       subscribed.value = true
     }
   }
@@ -278,15 +279,16 @@ export const useBotStore = defineStore('bot', () => {
         ],
         'id': 1
       }
-      // const data2 = {
-      //   'jsonrpc': '2.0',
-      //   'method': 'unsubscribe',
-      //   'params': [
-      //     'monitor',     // topic
-      //   ],
-      //   'id': 1
-      // }
+      const data2 = {
+        'jsonrpc': '2.0',
+        'method': 'unsubscribe',
+        'params': [
+          'monitor',     // topic
+        ],
+        'id': 1
+      }
       wsStore.send(data)
+      wsStore.send(data2)
       subscribed.value = false
     }
   }

@@ -109,7 +109,7 @@
           class="el-form-item__label icon mb-0 justify-between!"
         >
           <a
-            class="gap-8px flex items-center cursor-pointer decoration-underline color-[--d-F5F5F5-l-333]"
+            class="gap-8px flex items-center clickable underline! color-[--d-F5F5F5-l-333]"
             @click="loginType = loginType === 'password' ? 'email' : 'password'"
           >
             {{
@@ -122,7 +122,7 @@
             </el-icon> -->
           </a>
           <a
-            class="gap-8px flex items-center cursor-pointer decoration-underline color-[--d-F5F5F5-l-333]"
+            class="gap-8px flex items-center clickable underline! color-[--d-F5F5F5-l-333]"
             @click.prevent="emit('update:c-type', 'reset')"
           >
             {{ $t("startForgetPassword") }}
@@ -171,7 +171,7 @@
           {{ $t("startFooter1") }}&nbsp;
           <el-link
             type="primary"
-            :underline="false"
+            underline="never"
             class="decoration-underline!"
             :href="
               !lang?.includes?.('zh-')
@@ -182,7 +182,7 @@
             >&nbsp;{{ $t("startFooter2") }}</el-link
           >
           &nbsp;{{ $t("startFooter3") }}
-          <el-link type="primary" :underline="false" href="https://ave.ai/privacy" target="_blank" class="decoration-underline!">
+          <el-link type="primary" underline="never" href="https://ave.ai/privacy" target="_blank" class="decoration-underline!">
             &nbsp;{{ $t("startFooter4") }}</el-link
           >
         </el-checkbox>
@@ -206,6 +206,7 @@
       </li>
     </ul>
     <!-- <slot v-if="cType == 'login'" name="nav" /> -->
+    <slot />
   </div>
 </template>
 
@@ -226,7 +227,6 @@ type RuleForm = {
   agree: boolean;
 };
 
-console.log('emailRegisterAndLogin')
 const userStore = useUserStore()
 const botStore = useBotStore()
 const {mode,lang,isDark} = storeToRefs(useGlobalStore())
@@ -254,7 +254,7 @@ const disabled4 = ref(true)
 const timer = ref<ReturnType<typeof setInterval> | undefined>(undefined)
 const loginType = ref('password')
 const showRefCode = ref(false)
-const formRef = ref<FormInstance>()
+const formRef = useTemplateRef<FormInstance>('formRef')
 
 const form = reactive<RuleForm>({
   email: '',
@@ -526,7 +526,6 @@ function initGoogleLogin() {
 }
 
 onMounted(() => {
-  console.log('login mounted')
   formRef.value?.resetFields()
   loading4.value = true
   const gsiClientEl = document.querySelector('#gsiClient')

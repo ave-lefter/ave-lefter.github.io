@@ -30,8 +30,9 @@
         <ul class="tg-wallet-list_content">
           <el-scrollbar :max-height="300">
             <li
-              v-for="(item, index) in botStore?.userInfo?.addresses || []" :key="index" class="clickable"
-              @click.stop="$router.push({ name: 'Balance', params: { chain: item.chain, userAddress: item.address } }); tgWalletVisible = false">
+              v-for="(item, index) in botStore?.userInfo?.addresses || []"
+              :key="index" class="clickable"
+              @click.stop="navigateToWallet(item.address, item.chain)">
               <img :src="`${token_logo_url}chain/${item.chain}.png`" class="mr-5px border-rd-[50%]" height="32" alt="">
               <div>
                 <div class="text-16px">{{ getChainInfo(item.chain)?.name }}</div>
@@ -338,6 +339,14 @@ onMounted(() => {
   getTransferGasFee()
 })
 
+function navigateToWallet (path: string, chain:string) {
+  // if(chain === 'solana' || chain === 'bsc') {
+    path = `/address/${path}/${chain}`
+    navigateTo(path)
+  // } else {
+  //   window.open(`https://ave.ai/address/${path}/${chain}`, '_blank')
+  // }
+}
 function switchWallet(item: any) {
   // Implement wallet switching logic here, for example:
   botStore.switchWallet(item.evmAddress)

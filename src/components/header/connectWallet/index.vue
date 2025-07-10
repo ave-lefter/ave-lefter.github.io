@@ -1,120 +1,32 @@
 <template>
-  <div>
-    <el-dialog
-      v-model="dialogVisible" modal-class="dialog-connect-bg" width="500" height='630'
-      :class='["dialog-connect", mode, emailRegisterType]' append-to-body>
-      <div v-if="emailRegisterType !== 'reset'" class="w-logo">
-        <img
-          v-if="mode === 'dark'" src="@/assets/images/logo1-83.29x21.97.png" alt="logo" height="21.97"
-          loading="lazy">
-        <img v-else src="@/assets/images/logo2-83.29x21.97.png" alt="logo" height="21.97" loading="lazy">
-        <!-- <span>{{ $t('campaignTitle') }}</span> -->
-      </div>
-      <!-- <reset v-if="emailRegisterType == 'reset'" @update:c-type="(cType: string) => emailRegisterType = cType"/> -->
-      <component
-        :is="lazyComponent" v-show="emailRegisterType == 'reset'" :cType="emailRegisterType"
-        @update:c-type="(cType: string) => emailRegisterType = cType" />
-      <div v-show="emailRegisterType !== 'reset'" class='w-content'>
-        <h3 class="connect-popup-title font-500">
-          <el-icon
-            v-if="botStore.connectWalletTab !== 0" :size="35" style="color:var(--d-999-l-222);"
-            @click="botStore.connectWalletTab = 0">
-            <ArrowLeft />
-          </el-icon>
-          {{ title }}
-        </h3>
-        <div class="m-content">
-          <div>
-            <div v-show="botStore.connectWalletTab == 0" class="text-14px text-center min-h-200px">
-              <emailRegisterAndLogin
-                ref="loginForm" :cType="emailRegisterType"
-                @update:c-type="(cType) => emailRegisterType = cType">
-                <!-- <template #nav>
-                  <ul class="tabs">
-                    <li v-for="(item, index) in tabs" :key="index" class="filterArray"
-                      :class="{ active: item.value == botStore.connectWalletTab }"
-                      @click="botStore.connectWalletTab = item.value">
-                      <span>{{ item.name }}</span>
-                    </li>
-                  </ul>
-                </template> -->
-              </emailRegisterAndLogin>
-            </div>
-          </div>
-        </div>
-      </div>
-    </el-dialog>
-  </div>
+  <el-dialog v-model="botStore.connectVisible" width="500" height='630' :class="['dialog-connect', theme]" append-to-body>
+    <div :class="botStore.connectWalletTab === 1 ? 'min-h-560px' : ''">
+      <component :is="tabCom" />
+    </div>
+  </el-dialog>
 </template>
 
 <script setup lang='ts'>
-import { ref, computed, watch } from 'vue'
-import { ArrowLeft } from '@element-plus/icons-vue'
-// import CryptoJS from 'crypto-js'
-// import reset from './reset.vue'
-// import connectChainWallet from './connectChainWallet'
-import emailRegisterAndLogin from './emailRegisterAndLogin.vue'
-
-// console.log('connectWallet')
-const lazyComponent = shallowRef<Component | null>(null)
-const loadComponent = async () => {
-  const component = await import('./reset.vue')
-  lazyComponent.value = component.default
-}
+import Main from './main.vue'
+// import ExtensionWallet from './extensionWallet.vue'
+// import WatchWallet from './watchWallet.vue'
 
 const botStore = useBotStore()
-const { mode } = storeToRefs(useGlobalStore())
-const { t } = useI18n()
+const { theme } = storeToRefs(useThemeStore())
 
-const props = defineProps({
-  modelValue: Boolean
-})
-
-const emit = defineEmits(['update:modelValue'])
-// Refs
-const dialogVisible = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
-const emailRegisterType = ref('login')
-const loginForm = ref(null)
-const title = computed(() => {
-  const { connectWalletTab } = botStore
-  if (connectWalletTab == 0) {
-    if (emailRegisterType.value == 'login') {
-      return t('loginBot')
-    } else if (emailRegisterType.value == 'register') {
-      return t('registerBot')
-    } else {
-      return t('tgBotWallet')
-    }
-  } else if (connectWalletTab == 1) {
-    return t('connectChainWallet')
-  } else if (connectWalletTab == 2) {
-    return t('importAddress')
-  } else if (connectWalletTab == 3) {
-    return t('appCode')
-  } else {
-    return t('connectWallet')
+const tabCom = computed(() => {
+  const connectWalletTab = botStore.connectWalletTab as 1 | 2
+  const comments = {
+    0: Main,
+    1: defineAsyncComponent(() => import('./extensionWallet.vue')),
+    // 1: ExtensionWallet,
+    2: defineAsyncComponent(() => import('./watchWallet.vue')),
+    3: defineAsyncComponent(() => import('./appCode.vue')),
   }
+  return connectWalletTab in comments ? comments[connectWalletTab] : null
 })
 
-onMounted(() => {
-  setTimeout(() => {
-    loadComponent()
-  }, 3000)
-})
-// Watchers
-watch(() => emailRegisterType.value, (val) => {
-  if (val === 'reset') {
-    loadComponent()
-  }
-})
-watch(dialogVisible, (val) => {
-  if (!val && (emailRegisterType.value === 'reset' || emailRegisterType.value === 'register')) {
-    emailRegisterType.value = 'login'
-  }
-})
+
 </script>
 
 <style lang='scss'>
@@ -124,8 +36,8 @@ watch(dialogVisible, (val) => {
   border-radius: 15px;
   border-width: 0!important;
   min-width: 500px;
-  min-height: 500px;
-  padding: 102px 40px 40px;
+  min-height: 300px;
+  padding: 40px 40px;
   box-sizing: border-box;
   position: absolute;
   top: 50%;
@@ -135,16 +47,8 @@ watch(dialogVisible, (val) => {
   border: 1px solid #27282B;
   margin: 0;
   --el-dialog-padding-primary: 0px;
-  &.reset{
-    padding-top: 40px;
-    min-height: auto;
-    .el-dialog__headerbtn{
-      top: 33px;
-      right: 20px;
-    }
-  }
   .el-dialog__headerbtn {
-    top: 27px;
+    top: 29px;
     right: 20px;
   }
 
@@ -154,9 +58,6 @@ watch(dialogVisible, (val) => {
   }
 }
 
-.dialog-connect-bg {
-  /* opacity: 0.8; */
-}
 
 .w-selectNet-popup.el-popper {
   max-width: 420px;
@@ -164,38 +65,6 @@ watch(dialogVisible, (val) => {
 </style>
 
 <style scoped lang='scss'>
-.w-logo {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  left: 40px;
-  top: 40px;
-
-  >img {
-    margin-right: 10.15px;
-  }
-
-  >span {
-    display: flex;
-    align-items: center;
-    flex-direction: row;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 100%;
-    letter-spacing: 0%;
-    color: #999999;
-
-    &::before {
-      content: '';
-      display: inline-block;
-      width: 0.97px;
-      height: 4.85px;
-      background-color: #999999;
-      margin-right: 10.15px;
-    }
-  }
-}
 
 :deep() .el-input {
   --el-input-border-color: #444444;
@@ -231,44 +100,6 @@ watch(dialogVisible, (val) => {
 
     :deep() .el-form-item__label {
       color: var(--d-999-l-222);
-    }
-
-    .w-app {
-      :deep() .el-textarea__inner {
-        box-shadow: 0 0 0 1px #c0c4cc inset;
-      }
-    }
-
-    .w-address {
-      :deep() .el-select--large .el-select__wrapper {
-        height: 48px;
-        box-shadow: 0 0 0 1px #c0c4cc inset;
-      }
-    }
-
-    .tabs {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: nowrap;
-      width: fit-content;
-      margin: 0 auto;
-      margin-top: 40px;
-      color: #F5F5F5;
-
-      .filterArray {
-        &>span {
-          white-space: nowrap;
-          cursor: pointer;
-          text-decoration: underline;
-        }
-
-        &:not(:last-child)::after {
-          content: '|';
-          margin: 0 8px;
-          text-decoration: none;
-        }
-      }
     }
   }
 

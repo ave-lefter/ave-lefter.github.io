@@ -107,6 +107,7 @@ export default defineNuxtConfig({
     '@/plugins/tradingview.client.ts',
     '@/plugins/tooltip.client.ts',
     '@/plugins/popover.client.ts',
+    '@/plugins/dialog.client.ts',
   ],
   // unocss: {
   //   nuxtLayers: true,
@@ -154,9 +155,9 @@ export default defineNuxtConfig({
         include: ['lodash-unified'],
       }
     },
-    // optimizeDeps: {
-    //   include: ['lodash-unified'],
-    // },
+    optimizeDeps: {
+      include: ['lodash-unified'],
+    },
     build: {
       minify: 'terser',
       sourcemap: !isProd,
@@ -262,6 +263,7 @@ export default defineNuxtConfig({
           pages.splice(i, 1)
         }
       }
+      // console.log('pages', JSON.stringify(pages))
     }
   }
 })

@@ -6,6 +6,7 @@
       :wallet_logo="wallet_logo"
       :address="address"
       :chain="chain"
+      :iconSize="iconSize"
     />
     <template v-if="showAddress">
       <span
@@ -77,6 +78,7 @@ const props = defineProps({
   iconEditColor: { type: String, default: 'var(--d-666-l-999)' },
   showAddressTitle: { type: Boolean, default: false },
   iconEditSize: { type: String, default: '12px' },
+  iconSize: { type: String, default: '16px' },
   showAddress: { type: Boolean, default: true },
   maxRemarkLength: { type: Number, default: 14 },
   // eslint-disable-next-line vue/prop-name-casing

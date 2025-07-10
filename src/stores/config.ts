@@ -8,7 +8,6 @@ type GlobalConfig = Awaited<ReturnType<typeof _getGlobalConfig>>
 type ChainConfig = Awaited<ReturnType<typeof _getChainConfig>>
 
 export const useConfigStore = defineStore('config', () => {
-  const walletSignature = useLocalStorage('walletSignature', {} as Record<string, string>)
   const chainConfig = useLocalStorage('chainConfig', chains as ChainConfig)
   const globalConfig = useLocalStorage('globalConfig', configs as GlobalConfig)
 
@@ -35,7 +34,6 @@ export const useConfigStore = defineStore('config', () => {
   }
 
   return {
-    walletSignature,
     chainConfig,
     globalConfig,
     getGlobalConfig,

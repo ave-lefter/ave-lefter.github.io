@@ -30,9 +30,9 @@ export function onRequest({ options, request }: MyFetchContext) {
     if (analogDeviceId) {
       options.headers.set('ave-udid', analogDeviceId)
     }
-    const currentAccount = localStorage.getItem('currentAccount')
+    const currentAccount = localStorage.getItem('walletAddress')
     if (currentAccount) {
-      const signature = useConfigStore().walletSignature?.[currentAccount] || ''
+      const signature = useWalletStore().walletSignature?.[currentAccount] || ''
       if (signature) {
         options.headers.set('signature', signature)
       }
@@ -43,8 +43,9 @@ export function onRequest({ options, request }: MyFetchContext) {
     }
     options.headers.set('Ave-Platform', 'web')
   }
-
-  if (url?.includes('/v2api/fav_users/')) {
+  const needAuthUrl = ['/signals/v2/public/list/v3','/v2api/fav_users/']
+  const needAuth = needAuthUrl.some(el=>url.includes(el))
+  if (needAuth) {
     const accessToken = useBotStore().accessToken
     if (accessToken) {
       options.headers.set('Authorization', `Bearer ${accessToken}`)

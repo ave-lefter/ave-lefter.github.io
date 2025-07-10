@@ -63,7 +63,7 @@
         >
           <template #default="{ row }">
             <span :style="{ color: upColor[0] }">{{
-              formatNumber2(row.cumulative_purchase || 0, 2)
+                formatNumber(row.cumulative_purchase || 0, 2)
             }}</span>
           </template>
         </el-table-column>
@@ -77,7 +77,7 @@
         >
           <template #default="{ row }">
             <span :style="{ color: downColor[0] }">{{
-              formatNumber2(row.cumulative_sold || 0, 2)
+                formatNumber(row.cumulative_sold || 0, 2)
             }}</span>
           </template>
         </el-table-column>
@@ -90,7 +90,7 @@
           align="right"
         >
           <template #default="{ row }">
-            {{ formatNumber2(row.balance || 0, 2) }}
+            {{ formatNumber(row.balance || 0, 2) }}
           </template>
         </el-table-column>
 

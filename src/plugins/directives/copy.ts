@@ -2,9 +2,6 @@ import type { DirectiveBinding } from 'vue'
 import { ElMessage as Message, ElNotification as Notify } from 'element-plus'
 import { getGlobalT } from '@/utils/i18nBridge'
 
-// 定义 timer_copy 类型
-let timer_copy: ReturnType<typeof setTimeout> | null = null
-
 type DirectiveHTMLElement = HTMLElement & {
   handler: (e: Event) => void
   $value: any
@@ -52,14 +49,14 @@ const copyDirective = {
             ]),
             // center: false,
             // plain: true,
-            duration: 1500,
+            duration: 1000,
           })
         } else {
           Message({
             type: 'success',
             message: $t('copySuccess'),
             plain: true,
-            duration: 1500,
+            duration: 1000,
           })
         }
 
@@ -68,11 +65,13 @@ const copyDirective = {
           el.classList.add('color-#3F80F7')
           el.classList.add('i-custom:checked')
           el.classList.remove('i-bxs:copy')
-          timer_copy = setTimeout(() => {
-            el.classList.remove('i-custom:checked')
-            el.classList.remove('color-#3F80F7')
-            el.classList.add('i-bxs:copy')
-          }, 1500)
+          setTimeout(() => {
+            if (el?.classList) {
+              el.classList.remove('i-custom:checked')
+              el.classList.remove('color-#3F80F7')
+              el.classList.add('i-bxs:copy')
+            }
+          }, 1000)
         }
       }
 
@@ -92,10 +91,6 @@ const copyDirective = {
   unmounted(el: DirectiveHTMLElement) {
     // 解除指令时，移除事件监听器
     el.removeEventListener('click', el.handler)
-    if (timer_copy) {
-      clearTimeout(timer_copy)
-      timer_copy = null
-    }
   },
 }
 
