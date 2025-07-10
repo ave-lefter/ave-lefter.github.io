@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import type { pumpBlack } from '@/api/types/pump'
+import type{ GetHotTokensResponse } from '@/api/token'
 export const useGlobalStore = defineStore('global', () => {
   const wsStore = useWSStore()
   const localeStore = useLocaleStore()
@@ -53,12 +54,14 @@ export const useGlobalStore = defineStore('global', () => {
     avatar_isCircle: 'circle',
     isGutter: false,
     isRight: false,
-    isBlacklist: false,
-    define: [],
+    isBlacklist: true,
+    define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','cabal','insider', 'sniper', 'rug', 'kol'],
   })
 
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
+
+   const hotList = shallowRef<GetHotTokensResponse[]>([])
    function sendFooterPriceWs() {
     const data = {
       jsonrpc: '2.0',
@@ -109,6 +112,7 @@ export const useGlobalStore = defineStore('global', () => {
     footerTokensPriceIds,
     showLeft,
     pumpSetting,
-    pumpBlackList
+    pumpBlackList,
+    hotList
   }
 })

@@ -9,6 +9,7 @@ const props = defineProps({
   }
 })
 const botStore = useBotStore()
+const walletStore = useWalletStore()
 const activeTab = shallowRef<keyof typeof components>('FavoriteTable')
 const tabs = computed(() => {
   return [
@@ -49,7 +50,7 @@ const activeHeight = computed(() => {
         {{ item.name }}
       </a>
     </div>
-    <KeepAlive v-if="botStore.evmAddress">
+    <KeepAlive v-if="botStore.evmAddress||walletStore.address">
       <component
         :is="Component"
         :height="activeHeight"

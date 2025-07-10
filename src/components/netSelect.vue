@@ -42,23 +42,21 @@ function onCancel() {
 </script>
 
 <template>
-  <div
-      class="flex"
-  >
+  <div class="flex">
     <el-popover
-        ref="popoverRef"
-        v-model:visible="visible"
-        placement="bottom"
-        trigger="click"
-        :popper-style="{ padding: '20px 16px',width: 'auto', minWidth: '164px' }"
+      ref="popoverRef"
+      v-model:visible="visible"
+      placement="bottom"
+      trigger="click"
+      :popper-style="{ padding: '20px 16px',width: 'auto', minWidth: '164px' }"
     >
       <template
           #reference
       >
         <div>
           <el-button
-              size="small"
-              class="[&&]:px-3px [&&]:py-4px justify-between [--el-button-size:20px!important] [--el-button-font-weight: 400]"
+            size="small"
+            class="[&&]:px-3px [&&]:py-4px justify-between [--el-button-size:20px!important] [--el-button-font-weight: 400]"
           >
             <img
               v-for="(item, index) in displayChains"
@@ -72,35 +70,35 @@ function onCancel() {
         </div>
       </template>
       <div
-          class="py-8px color-#f5f5f5 [--el-checkbox-checked-bg-color:#000] [--el-checkbox-checked-input-border-color:#000] checkbox-container"
+          class="pb-5px color-#f5f5f5 [--el-checkbox-checked-bg-color:#000] [--el-checkbox-checked-input-border-color:#000] checkbox-container"
       >
         <el-checkbox-group
-            v-model="selectedChains"
+          v-model="selectedChains"
         >
           <el-checkbox
-              v-for="item in options" :key="item"
-              :value="item"
-              :disabled="getDisabled(item)"
-              class="custom-checkbox"
+            v-for="item in options" :key="item"
+            :value="item"
+            :disabled="getDisabled(item)"
+            class="custom-checkbox"
           >
-            {{ item }}
+            {{ getChainInfo(item)?.name || item || '' }}
           </el-checkbox>
         </el-checkbox-group>
         <div class="mt-12px flex justify-between">
           <el-button
-              size="small"
-              class="h-30px min-w-60px [--el-button-font-weight: 400]"
-              :color="isDark?'#333':'#f2f2f2'"
-              @click="onCancel"
+            size="small"
+            class="h-30px min-w-60px [--el-button-font-weight: 400]"
+            :color="isDark?'#333':'#f2f2f2'"
+            @click="onCancel"
           >
             {{ $t('cancel') }}
           </el-button>
           <el-button
-              size="small" type="primary"
-              class="h-30px min-w-60px [--el-button-font-weight: 400]"
-              :color="isDark?'#f5f5f5':'#222'"
-              :disabled="selectedChains.length === 0"
-              @click="onConfirm"
+            size="small" type="primary"
+            class="h-30px min-w-60px [--el-button-font-weight: 400]"
+            :color="isDark?'#f5f5f5':'#222'"
+            :disabled="selectedChains.length === 0"
+            @click="onConfirm"
           >
             {{ $t('confirm') }}
           </el-button>

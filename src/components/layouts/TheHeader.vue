@@ -25,7 +25,7 @@
     >
       <Icon
         class="text-16px text-[var(--d-666-l-999)]"
-        name="ep:search"
+        name="custom:search"
       />
       <span class="text-12px ml-4px text-[var(--d-666-l-999)]">
         {{ $t('enterAddress/token') }}
@@ -43,7 +43,11 @@
     >
       {{ $t('connectWallet') }}
     </el-button>
-    <ExWalletBtn v-else-if="walletStore.address" />
+    <template v-else-if="walletStore.address">
+      <Positions/>
+      <ExWalletBtn />
+    </template>
+
     <!-- <el-popover v-else placement="bottom" trigger="click">
       <template #reference>
         <el-button class="ml-10px">{{
@@ -55,7 +59,7 @@
       </div>
     </el-popover> -->
     <template v-else>
-      <positions/>
+      <Positions/>
       <wallet/>
     </template>
     <Notice/>
@@ -109,7 +113,7 @@ import dialogSearch from '@/components/header/dialogSearch.vue'
 import wallet from '@/components/header/wallet/index.vue'
 import Notice from '~/components/layouts/components/notice.vue'
 // const connectWallet = shallowRef<Component | null>(null)
-import positions from '@/components/header/positions/index.vue'
+import Positions from '@/components/header/positions/index.vue'
 import ExWalletBtn from '../header/connectWallet/exWalletBtn.vue'
 // import connectWallet from '@/components/header/connectWallet/index.vue'
 // const connectWallet = shallowRef<Component | null>(null)
@@ -125,13 +129,13 @@ const list = computed(() => {
   if (botStore.accessToken && botStore.refreshToken) {
     query = `?act=${botStore.accessToken}&ret=${botStore.refreshToken}`
   }
-  return [
-    { id: 'index', name: t('markets'), src: 'https://ave.ai/' + query ,target:'_blank'},
+  const menues = [
+    {id: 'index', name: t('markets'), src: 'https://ave.ai/' + query, target: '_blank'},
     { id: 'pump', name: t('pump1'), src: '/pump' },
-    { id: 'follow', name: t('follow'), src: '/follow' },
-    {id: 'smart', name: t('smarter2'), src: '/smart'},
-    { id: 'assets', name: t('balances'), src: 'https://ave.ai/address' + query ,target:'_blank'},
+    {id: 'smart', name: t('smarter2'), src: '/smart', target: '_self'},
+    {id: 'assets', name: t('balances'), src: '/address', target: '_self'},
   ]
+  return menues
 })
 
 const homeUrl = computed(() => {

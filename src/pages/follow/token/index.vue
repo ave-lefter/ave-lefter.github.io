@@ -428,7 +428,7 @@ onMounted(() => {
                   <a class="ml-4px"
                     :href="`https://x.com/search?q=(${row?.symbol}OR${row?.token})&src=typed_query&f=live`"
                     target="_blank" @click.stop>
-                    <Icon class="text-[--d-666-l-999] h-12px w-12px" name="ep:search" />
+                    <Icon class="text-[--d-666-l-999] h-12px w-12px" name="custom:search"/>
                   </a>
                 </div>
                 <div class="flex items-center mt-2px">

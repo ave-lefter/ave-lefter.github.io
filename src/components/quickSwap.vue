@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<{
   buttonBg?: string,
   mainNameVisible?: boolean
   classNames?: string,
-  size?: Size
+  size?: string
 }>(), {
   appendTo: '#__nuxt',
   buttonBg: 'rgba(18, 184, 134, 0.15)',

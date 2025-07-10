@@ -34,6 +34,7 @@
 import {getUserBalance} from '~/api/swap'
 
 const botStore = useBotStore()
+const walletStore = useWalletStore()
 let userIds: string[] = []
 const tableFilter = ref({
   hide_risk: 1,
@@ -73,9 +74,13 @@ watch(() => visible.value, (newValue) => {
     loadComponent()
   }
 })
-watch(() => botStore.userInfo, (newValue) => {
-  if (newValue) {
-    userIds = newValue.addresses.map(({address, chain}) => address + '-' + chain)
+watch([() => botStore.userInfo, () => walletStore.address], () => {
+  if (botStore.userInfo) {
+    userIds = botStore.userInfo.addresses.map(({address, chain}) => address + '-' + chain)
+    tableFilter.value.user_ids = userIds
+    fetchHolderNum()
+  } else if (walletStore.address) {
+    userIds = [walletStore.address + '-' + walletStore.chain]
     tableFilter.value.user_ids = userIds
     fetchHolderNum()
   }

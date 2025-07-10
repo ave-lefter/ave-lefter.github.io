@@ -9,6 +9,7 @@ import { useLocalStorage } from '@vueuse/core'
 import { BrowserProvider } from 'ethers'
 import { decodeUTF8 } from 'tweetnacl-util'
 import bs58 from 'bs58'
+import type { Wallet as SuiWallet } from '~/utils/wallet/sui'
 type TronWalletAdapter = ReturnType<typeof getTronWalletAdapters>[number]
 
 export const useWalletStore = defineStore('wallet', () => {
@@ -16,11 +17,11 @@ export const useWalletStore = defineStore('wallet', () => {
   const chain = useLocalStorage('walletChain', '')
   const walletName = useLocalStorage('walletName', '')
   const walletSignature = useLocalStorage('walletSignature', {} as Record<string, string>)
-  const provider = shallowRef<(EIP6963ProviderDetail<any>['provider'] | Wallet | TronWalletAdapter) & {disconnect?: () => void} | null>(null)
+  const provider = shallowRef<(EIP6963ProviderDetail<any>['provider'] | Wallet | TronWalletAdapter | SuiWallet) & {disconnect?: () => void} | null>(null)
   const evmWalletMap = shallowRef<EIP6963ProviderResponse>(new Map())
   const solanaWallets = shallowRef<Wallet[]>([])
   const tronWalletAdapters = shallowRef<TronWalletAdapter[]>([])
-  const suiWallets = shallowRef<Wallet[]>([])
+  const suiWallets = shallowRef<SuiWallet[]>([])
 
 
   async function getEvmWalletList() {
@@ -49,8 +50,8 @@ export const useWalletStore = defineStore('wallet', () => {
         wallets[index].provider = value.provider
       }
     }
-    return wallets?.sort((a) => {
-      if (a.provider) {
+    return wallets?.sort((a, b) => {
+      if (a.provider && !b.provider) {
         return -1
       }
       return 0
@@ -89,7 +90,7 @@ export const useWalletStore = defineStore('wallet', () => {
     }
   }
 
-  function disconnectEvmWallet() {
+  function disconnectWallet() {
     if (chain.value === 'solana') {
       (provider.value as Wallet)?.features?.['standard:disconnect']?.disconnect?.()
     }
@@ -100,6 +101,21 @@ export const useWalletStore = defineStore('wallet', () => {
     setTimeout(() => {
       provider.value = null
     }, 100)
+  }
+
+  function disconnect() {
+    if (chain.value === 'tron') {
+      (provider.value as TronWalletAdapter)?.disconnect?.()
+    }
+    address.value = ''
+    chain.value = ''
+    walletName.value = ''
+    provider.value?.disconnect?.()
+    setTimeout(() => {
+      provider.value = null
+    }, 100)
+    // 移除 bot 钱包相关
+    useBotStore().logout()
   }
 
   function _getSolanaWallets() {
@@ -120,8 +136,10 @@ export const useWalletStore = defineStore('wallet', () => {
   function signMessage(msg: string) {
     if (!provider.value) return
     if (chain.value === 'solana' || chain.value === 'sui') {
-      return (provider.value as Wallet)?.signMessage?.({
+      const _provider = (chain.value === 'solana' ? solanaWallets.value?.find(i => i.name === walletName.value) : suiWallets.value?.find(i => i.name === walletName.value)) || provider.value
+      return (_provider as Wallet)?.signMessage?.({
         message: decodeUTF8(msg),
+        account: (_provider as Wallet)?.accounts?.[0]
       }).then(async res => bs58.encode(res.signature))
     } else if (chain.value === 'tron') {
       return (provider.value as TronWalletAdapter)?.signMessage?.(msg)
@@ -131,8 +149,9 @@ export const useWalletStore = defineStore('wallet', () => {
   }
 
   function signMessageForFavorite() {
-    if (!address.value) return Promise.resolve('')
-    if (walletSignature.value[address.value]) return Promise.resolve('')
+    if (!address.value || !provider.value) return Promise.resolve('')
+    if (!isEvmChain(chain.value) && chain.value !== 'solana') return Promise.resolve('')
+    if (walletSignature.value[address.value]) return Promise.resolve(walletSignature.value[address.value])
     const msg = `Ave.ai requests ${address.value} address signature to bind favorite list`
     return signMessage(msg)?.then((res) => {
       if (res) {
@@ -148,14 +167,15 @@ export const useWalletStore = defineStore('wallet', () => {
   function initWallet() {
     // evm init
     getEvmWalletList().then(() => {
-      if (!(address.value && chain.value && isEvmChain(chain.value) && walletName.value)) {
+      const extraName = ['WatchWallet', 'appCode']
+      if (!(address.value && chain.value && isEvmChain(chain.value) && walletName.value && !extraName.includes(walletName.value))) {
         return
       }
-      if (walletName.value && provider.value) {
+      if (walletName.value && isEvmChain(chain.value)) {
         if (walletName.value.startsWith('wc:')) {
           // walletConnect(chain.value, walletName.value)
           connectEvmWallet(walletName.value, chain.value)
-        } else if (walletName.value?.startsWith?.('wc:')) {
+        } else {
           let wallet: typeof evmWallets.value[number] | null = null
           for (const [, value] of evmWalletMap.value) {
             if (value.info.name === walletName.value) {
@@ -200,7 +220,6 @@ export const useWalletStore = defineStore('wallet', () => {
     }
   }
 
-
   return {
     address,
     chain,
@@ -211,7 +230,8 @@ export const useWalletStore = defineStore('wallet', () => {
     evmWallets,
     connectEvmWallet,
     initWallet,
-    disconnectEvmWallet,
+    disconnectWallet,
+    disconnect,
     solanaWallets,
     tronWalletAdapters,
     suiWallets,

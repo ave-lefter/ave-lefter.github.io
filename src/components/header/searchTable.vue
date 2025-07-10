@@ -155,13 +155,13 @@
                     <img
                       class="token-icon"
                       :src="getChainDefaultIcon(row.chain, row.symbol)"
-                    />
+                    >
                   </template>
                   <template #placeholder>
                     <img
                       class="token-icon"
                       :src="getChainDefaultIcon(row.chain, row.symbol)"
-                    />
+                    >
                   </template>
                 </el-image>
                 <img
@@ -170,7 +170,7 @@
                   :src="`${token_logo_url}chain/${row?.chain}.png`"
                   alt=""
                   srcset=""
-                />
+                >
               </div>
               <div class="ml-8px">
                 <div class="flex-start">
@@ -378,7 +378,7 @@
                   src="@/assets/images/icon-unknown.png"
                   alt=""
                   :width="12"
-                />
+                >
                 {{ $t('unknownRisk') }}
               </template>
             </div>
@@ -388,8 +388,8 @@
     </el-scrollbar>
     <div v-if="!isLoading && !tokens?.length" class="empty">
       <div>
-        <img :src="themeStore.theme === 'light' ? emptyWhite : emptyDark" />
-        <br />
+        <img :src="themeStore.theme === 'light' ? emptyWhite : emptyDark" >
+        <br >
         <span>{{ $t('noSearchResults') }}</span>
       </div>
     </div>
@@ -399,7 +399,6 @@
 import emptyWhite from '@/assets/images/empty-white.svg'
 import emptyDark from '@/assets/images/empty-black.svg'
 import { formatNumber } from '@/utils/formatNumber'
-import dayjs from 'dayjs'
 import type { GetHotTokensResponse } from '@/api/token'
 import type { SearchHot } from '@/api/types/search'
 import { getMCap } from '~/utils'
