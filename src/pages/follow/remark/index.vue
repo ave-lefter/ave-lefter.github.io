@@ -11,6 +11,10 @@ const walletStore = useWalletStore()
 const router = useRouter()
 const { t } = useI18n()
 
+const $refs = ref({
+  buttonRefs: {} as Record<number, any>
+})
+const followStore=useFollowStore()
 const remarkValue = ref('')
 const visibleShow = ref(false)
 const coords = ref({ x: 0, y: 0 })
@@ -135,10 +139,17 @@ const handleSortChange = ({ prop, order }: any) => {
 }
 
 // 取消收藏
-const collect = async (row: any) => {
+const collect = async (row: any,index:number) => {
   if (walletStore.address && !walletStore.walletSignature[walletStore.address]) {
     await walletStore.signMessageForFavorite()
   }
+  // if(row.is_wallet_address_fav !== 1){
+  //   followStore.confirmAttention($refs.value.buttonRefs[index],(form)=>{
+  //     console.log('confirmAttention', form)
+  //     return Promise.resolve()
+  //   })
+  //   return 
+  // }
   loading.value = true
   const api = row.is_wallet_address_fav === 1 ? deleteAttention : addAttention
   api({
@@ -215,9 +226,11 @@ onMounted(() => {
             <span class="text-[#848E9C] text-12px mr-5px">
               #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
             </span>
-            <Icon name="custom:attention" :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#999]'"
-              class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row)" />
-            <UserAvatar class="mx-8px" :wallet_logo="row.wallet_logo" :address="row.user_address"
+            <Icon
+              :key="`${row.user_address}-${row.user_chain}`"
+              :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#999]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
+            <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo" :address="row.user_address"
               :chain="row.user_chain" iconSize="24px"></UserAvatar>
             <div class="ml-5px">
               <div class="flex items-center">

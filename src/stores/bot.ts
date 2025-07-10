@@ -149,7 +149,7 @@ export const useBotStore = defineStore('bot', () => {
       })
   }
   function getUserInfo() {
-    walletStore.disconnectEvmWallet()
+    walletStore.disconnectWallet()
     if (accessToken.value) {
       bot_getWalletsAllChain({ chain: isSupportChains?.join(',') }).then(
         (res) => {

@@ -628,6 +628,7 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
   --el-border-color-light:var(--d-333-l-F2F2F2);
   --el-color-primary:var(--d-F5F5F5-l-333);
   --el-text-color-primary:var(--d-666-l-999);
+  --el-tabs-header-height:44px;
   :deep() .el-tabs__item{
     font-weight: 400;
     &:hover{
