@@ -195,12 +195,12 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
 export function getOpenTimeList(allText:string) {
   return [
     { text: allText, value: '' },
-    { text: '≤30min', value: String(30 * 60) },
-    { text: '≤1H', value: String(60 * 60) },
-    { text: '≤6H', value: String(60 * 6 * 60) },
-    { text: '≤12H', value: String(60 * 12 * 60) },
-    { text: '≤24H', value: String(60 * 24 * 60) },
-    { text: '≤1W', value: String(60 * 24 * 7 * 60)},
-    { text: '≤30D', value: String(60 * 24 * 30 * 60) }
+    { text: '≤30min', value: String(0.5) },
+    { text: '≤1H', value: String(1) },
+    { text: '≤6H', value: String(6) },
+    { text: '≤12H', value: String(12) },
+    { text: '≤24H', value: String(24) },
+    { text: '≤1W', value: String(24*7)},
+    { text: '≤30D', value: String(24 * 30) }
   ]
 }

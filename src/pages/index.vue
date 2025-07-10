@@ -8,7 +8,7 @@ const components = {
   HotRank,
 }
 const activeTab = shallowRef<keyof typeof components>('HotRank')
-const activeChain = shallowRef('-1')
+const activeChain = shallowRef('AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
 
 onMounted(() => {
@@ -219,14 +219,14 @@ function getMedias(appendix: string) {
         url: formatUrl(obj.website),
       })
     if (obj?.btok)
-      arr.push({ name: 'Btok', icon: 'Btok', url: formatUrl(obj.btok) })
-    if (obj?.qq) arr.push({ name: 'QQ', icon: 'QQ', url: obj.qq })
+      arr.push({ name: 'Btok', icon: 'btok', url: formatUrl(obj.btok) })
+    if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
     if (obj?.telegram)
-      arr.push({ name: 'Telegram', icon: 'TG', url: formatUrl(obj.telegram) })
+      arr.push({ name: 'Telegram', icon: 'tg', url: formatUrl(obj.telegram) })
     if (obj?.twitter)
       arr.push({
         name: 'Twitter',
-        icon: 'twitter2',
+        icon: 'twitter',
         url: formatUrl(obj.twitter),
       })
     return arr
@@ -245,6 +245,7 @@ function getMedias(appendix: string) {
       <component 
        :is="components[activeTab]" 
        :listMapFunction="listMapFunction"
+       :activeChain="activeChain"
       />
     </KeepAlive>
   </div>

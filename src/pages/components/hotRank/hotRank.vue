@@ -31,14 +31,15 @@ import {
   poolPairContent,
   // insidersContentNew,
   // insidersContent
-  Headline
+  Headline,
 } from './columnRender/index'
 import { set } from 'lodash-es'
 
 const { t } = useI18n()
 
 const props = defineProps<{
-  listMapFunction(i:Record<string,any>):Record<string,any>
+  listMapFunction(i: Record<string, any>): Record<string, any>
+  activeChain: string
 }>()
 const sortConditions = ref({
   sort: '',
@@ -46,21 +47,23 @@ const sortConditions = ref({
 })
 function setSortConditions(params: { sort: string; sort_dir: string }) {
   sortConditions.value = params
+  pageInfo.value.pageNO = 1
+  _getTreasureList()
 }
 const defaultFilter = {
-  created_at: {
-    created_interval:'',
-    range:[]
-  },
 }
 const filterForm = ref(defaultFilter)
-function setFilterForm<T>(path:string,val:T) {
-  set(filterForm.value,path,val)
+function setFilterForm(...args:[string,string][]) {
+  args.forEach(keyVal=>{
+    set(filterForm.value,keyVal[0],keyVal[1])
+  })
+  pageInfo.value.pageNO = 1
+  _getTreasureList()
 }
 const rankCommonConditions = useStorage('rankCommon', {
   activeInterval: '1m',
   quickVisible: true,
-  quickBuyValue:'0.01'
+  quickBuyValue: '0.01',
 })
 const listData = shallowRef([])
 const pageInfo = ref({
@@ -91,10 +94,10 @@ const renderData = computed(() => {
     priceChangeDynamicContent: {
       Comp: priceChangeDynamicContent,
       props: {
-        activeInterval:rankCommonConditions.value.activeInterval,
+        activeInterval: rankCommonConditions.value.activeInterval,
         sortConditions: sortConditions.value,
         setSortConditions,
-      }
+      },
     },
     // priceChange5mContent: {
     //   Comp: priceChange5mContent,
@@ -105,7 +108,7 @@ const renderData = computed(() => {
       props: {
         sortConditions: sortConditions.value,
         setSortConditions,
-      }
+      },
     },
     // poolPairHeader: {
     //   Comp: poolPairHeader,
@@ -114,8 +117,8 @@ const renderData = computed(() => {
     quickContent: {
       Comp: quickContent,
       props: {
-        quickBuyValue:rankCommonConditions.value.quickBuyValue
-      }
+        quickBuyValue: rankCommonConditions.value.quickBuyValue,
+      },
     },
     // openTimeContent: {
     //   Comp: openTimeContent,
@@ -127,7 +130,7 @@ const renderData = computed(() => {
     // },
     securityContent: {
       Comp: securityContent,
-      props: {}
+      props: {},
     },
     // insidersContentNew: {
     //   Comp: insidersContentNew,
@@ -152,7 +155,7 @@ const renderData = computed(() => {
         sortConditions: sortConditions.value,
         setSortConditions,
         setFilterForm,
-      }
+      },
     },
     smarterContent: {
       Comp: smarterContent,
@@ -161,7 +164,7 @@ const renderData = computed(() => {
         sortConditions: sortConditions.value,
         setSortConditions,
         setFilterForm,
-      }
+      },
     },
     // rugPullContent: {
     //   Comp: rugPullContent,
@@ -174,7 +177,7 @@ const renderData = computed(() => {
         sortConditions: sortConditions.value,
         setSortConditions,
         setFilterForm,
-      }
+      },
     },
     // listTimeContent: {
     //   Comp: listTimeContent,
@@ -191,11 +194,11 @@ const renderData = computed(() => {
         sortConditions: sortConditions.value,
         setSortConditions,
         setFilterForm,
-      }
+      },
     },
     priceContent: {
       Comp: priceContent,
-      props: {}
+      props: {},
     },
     poolPairContent: {
       Comp: poolPairContent,
@@ -208,9 +211,9 @@ const renderData = computed(() => {
         pageSize: pageInfo.value.pageSize,
       },
     },
-    headline:{
-      Comp:Headline
-    }
+    headline: {
+      Comp: Headline,
+    },
   }
 })
 
@@ -221,6 +224,9 @@ function tableRowClick(row) {
 onMounted(() => {
   _getTreasureList()
 })
+watch(()=>props.activeChain,()=>{
+  _getTreasureList()
+})
 
 async function _getTreasureList() {
   try {
@@ -229,6 +235,9 @@ async function _getTreasureList() {
     const res = await getTreasureList({
       category: 'hot',
       ...rest,
+      chain:props.activeChain!=='AllChains'?props.activeChain:'',
+      ...sortConditions.value,
+      ...filterForm.value
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
@@ -236,12 +245,11 @@ async function _getTreasureList() {
     loading.value = false
   }
 }
-
-
 </script>
 
 <template>
   <el-table
+    v-loading="loading"
     :height="'calc(100vh - 190px)'"
     :data="listData"
     fit
@@ -270,8 +278,7 @@ async function _getTreasureList() {
     :small="false"
     :page-sizes="[20, 50, 100, 200, 300, 400]"
     @size-change="
-      pageInfo.pageNO = 1;
-      _getTreasureList();
+      pageInfo.pageNO = 1;_getTreasureList()
     "
     @current-change="_getTreasureList"
   />

@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { get } from 'lodash-es'
+import dayjs from 'dayjs'
 import { getOpenTimeList } from './hotColumusService'
+import RangePopover from './rangePopover.vue'
 
 const props = defineProps<{
-  filterForm: any;
-  sortConditions: { sort: string; sort_dir: string };
-  setSortConditions(params: { sort: string; sort_dir: string }): void;
-  setFilterForm<T>(path: string, val: T): void;
-  pageNO: number;
-  pageSize: number;
+  filterForm: any
+  sortConditions: { sort: string; sort_dir: string }
+  setSortConditions(params: { sort: string; sort_dir: string }): void
+  setFilterForm(...args: [string, string][]): void
+  pageNO: number
+  pageSize: number
 }>()
 
-const themeStore = useThemeStore()
 const popoverVisible = shallowRef(false)
 const defaultSort = computed(() => {
   if (props.sortConditions.sort === 'created_at') {
@@ -40,22 +40,28 @@ function getSymbol(row, shouldReverse = false) {
   return isZeroAddress ? row.token0_symbol : row.token1_symbol
 }
 function getLogoUrl(row) {
-  return row.target_token == row.token0_address
-    ? row.token0_logo_url
-    : row.token1_logo_url
+  return row.target_token == row.token0_address ? row.token0_logo_url : row.token1_logo_url
 }
 
 const { t } = useI18n()
 const openTimeList = computed(() => getOpenTimeList(t('all')))
-const rangeArr = ref<[string,string]>(['',''])
-function confirm(params?:[string,string]) {
-  if(!params){
-    props.setFilterForm('created_at.rangeArr[0]','')
-    props.setFilterForm('created_at.rangeArr[1]','')
+const isFilterHighlight = shallowRef(false)
+
+function confirm(params?: [string, string]) {
+  if (!params || !params.some(el=>!!el)) {
+    props.setFilterForm(['created_at_max', ''], ['created_at_min', ''])
+    isFilterHighlight.value = false
     return
   }
-  params.forEach((el,idx) => props.setFilterForm(`created_at.rangeArr[${idx}]`,el))
-  popoverVisible.value = false
+  if (params[1] < params[0]) {
+    ElMessage.error(t('maxGtMin'))
+    return
+  }
+  const _params = params.map((el, idx) =>{
+    return [`${{ 0: 'created_at_max', 1: 'created_at_min' }[idx]}` as string, el?dayjs().unix() - Number(el)*3600:'']
+   }) as [string,string][]
+  props.setFilterForm(..._params)
+  isFilterHighlight.value = true
 }
 </script>
 
@@ -63,75 +69,18 @@ function confirm(params?:[string,string]) {
   <el-table-column :label="$t('poolPair')" min-width="300" fixed="left">
     <template #header>
       <div class="flex items-center gap-2px">
-        <span>{{ $t("poolPair") }}</span
-        >/<span>{{ $t("openTime") }}</span>
+        <span>{{ $t('poolPair') }}</span
+        >/<span>{{ $t('openTime') }}</span>
         <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
-        <el-popover
+        <RangePopover
           v-model="popoverVisible"
-          placement="bottom"
-          title=""
           :width="300"
-          trigger="click"
-        >
-          <template #reference>
-            <Icon name="custom:filter" class="text-10px cursor-pointer" />
-          </template>
-          <template #default>
-            <div class="text-12px font-400">
-              {{ $t("openTime") }}
-            </div>
-            <ul class="mt-10px">
-              <li v-for="(item, index) in openTimeList" :key="index">
-                <a
-                  href="javascript:;"
-                  class="flex items-center justify-center text-12px leading-16px font-400 border border-solid border-[--d-333-l-F5F5F5] px-15px py-8px text-center mb-10px rounded-4px"
-                  @click.stop.prevent="
-                    setFilterForm('created_at.created_interval', item.value)
-                  "
-                >
-                  {{ item.text }}
-                </a>
-              </li>
-            </ul>
-            <div class="flex items-center mt-10px">
-              <el-input
-                v-model.trim.number="rangeArr[0]"
-                clearable
-                type="text"
-                @input="
-                  (value) => (rangeArr[0] = value.replace(/\-|[^\d.]/g, ''))
-                "
-              >
-                <template #append>h</template>
-              </el-input>
-              <span class="ml-10px mr-10px">~</span>
-              <el-input
-                v-model.trim.number="rangeArr[1]"
-                clearable
-                type="text"
-                @input="(value) => (rangeArr[1] = value.replace(/\-|[^\d.]/g, ''))"
-              >
-                <template #append>h</template>
-              </el-input>
-            </div>
-            <div class="mt-20px flex">
-              <el-button
-                class="h-30px flex-1 m-l-auto"
-                :color="themeStore.isDark ? '#333' : '#F2F2F2'"
-                @click="confirm()"
-              >
-                {{ $t("reset") }}
-              </el-button>
-              <el-button
-                type="primary"
-                class="h-30px flex-1 m-l-auto"
-                @click="confirm(rangeArr)"
-              >
-                {{ $t("confirm") }}
-              </el-button>
-            </div>
-          </template>
-        </el-popover>
+          :title="$t('opentime')"
+          :list="openTimeList"
+          :selectRangeIndex="1"
+          :isFilterHighlight="isFilterHighlight"
+          @confirm="confirm"
+        />
       </div>
     </template>
     <template #default="{ row, $index }">
@@ -154,8 +103,7 @@ function confirm(params?:[string,string]) {
           />
           <div class="flex flex-col gap-6px">
             <div class="flex items-center lh-20px">
-              <span class="text-16px">
-                {{ getSymbol(row) }}</span
+              <span class="text-16px"> {{ getSymbol(row) }}</span
               ><span class="text-10px color-[--d-666-l-999]"
                 >/
                 {{ getSymbol(row, true) }}
@@ -167,7 +115,7 @@ function confirm(params?:[string,string]) {
                 @click.self.stop
               />
               <a
-                class="ml-4px text-10px [&&]:color-[--d-666-l-999]"
+                class="ml-4px text-10px [&&]:color-[--d-666-l-999] lh-10px"
                 :href="`https://x.com/search?q=($${getSymbol(row)} OR ${row.target_token})&src=typed_query&f=live`"
                 target="_blank"
                 @click.stop
@@ -184,9 +132,7 @@ function confirm(params?:[string,string]) {
                 alt=""
               >
               <el-tooltip
-                v-if="
-                  row?.lp_locked_percent > 0 && row?.lp_locked_percent <= 100
-                "
+                v-if="row?.lp_locked_percent > 0 && row?.lp_locked_percent <= 100"
                 placement="top"
               >
                 <template #default>
@@ -199,40 +145,28 @@ function confirm(params?:[string,string]) {
                     :stroke-width="1.5"
                     indeterminate
                   >
-                    <Icon
-                      name="material-symbols:lock"
-                      class="color-[--d-666-l-999] text-10px"
-                    />
+                    <Icon name="material-symbols:lock" class="color-[--d-666-l-999] text-10px" />
                   </el-progress>
                 </template>
                 <template #content>
-                  <div v-if="row.lp_holders">
-                    LP {{ $t("holders") }}: {{ row.lp_holders }}
-                  </div>
+                  <div v-if="row.lp_holders">LP {{ $t('holders') }}: {{ row.lp_holders }}</div>
                   <div v-if="row.lp_locked_percent > 0">
-                    {{ $t("LPLocked") }}:
-                    {{ formatNumber(row.lp_locked_percent, 0) }}%
+                    {{ $t('LPLocked') }}: {{ formatNumber(row.lp_locked_percent, 0) }}%
                   </div>
                   <div v-if="row.lp_lock_platform">
-                    {{ $t("platform") }}: {{ row.lp_lock_platform }}
+                    {{ $t('platform') }}: {{ row.lp_lock_platform }}
                   </div>
                   <div v-if="row.lp_locked_to">
-                    {{ $t("unlockDate") }}:
-                    {{ formatDate(row.lp_locked_to / 1000, "YYYY-MM-DD") }}
+                    {{ $t('unlockDate') }}:
+                    {{ formatDate(row.lp_locked_to / 1000, 'YYYY-MM-DD') }}
                   </div>
                 </template>
               </el-tooltip>
             </div>
             <div class="flex items-center lh-12px">
-              <div
-                v-tooltip="formatDate(row.created_at, 'MM/DD HH:mm:ss')"
-                class="mr-8px"
-              >
+              <div v-tooltip="formatDate(row.created_at, 'MM/DD HH:mm:ss')" class="mr-8px">
                 <TimerCount
-                  v-if="
-                    row.created_at &&
-                    Number(formatTimeFromNow(row.created_at, true)) < 60
-                  "
+                  v-if="row.created_at && Number(formatTimeFromNow(row.created_at, true)) < 60"
                   :key="row.created_at"
                   :timestamp="row.created_at"
                   :end-time="60"
@@ -250,7 +184,7 @@ function confirm(params?:[string,string]) {
                   {{ formatTimeFromNow(row.created_at) }}
                 </div>
               </div>
-              <div v-if="row?.medias?.length > 0" class="flex items-center">
+              <div v-if="row?.medias?.length > 0" class="flex items-center gap-4px">
                 <template v-for="(item, index) in row?.medias" :key="index">
                   <div v-if="item.url" v-tooltip="item.url">
                     <a :href="item.url" target="_blank" @click.stop>
@@ -264,7 +198,7 @@ function confirm(params?:[string,string]) {
                   v-for="(i, index) in row.signal_arr"
                   :key="index"
                   v-tooltip="getTagTooltip(i)"
-                  class="flex items-center"
+                  class="flex items-center ml-4px"
                 >
                   <img
                     class="w-12px h-12px mr-5px"
@@ -274,9 +208,7 @@ function confirm(params?:[string,string]) {
                   >
                   <span
                     v-if="i.tag"
-                    :class="
-                      i.color === 'green' ? 'color-#12B886' : 'color-#F6465D'
-                    "
+                    :class="i.color === 'green' ? 'color-#12B886' : 'color-#F6465D'"
                     >{{ $t(i.tag) }}</span
                   >
                 </div>
