@@ -10,7 +10,7 @@
         {{ $t('addWallet') }}
       </el-button>
       <el-button  :color="isDark?'#333':'#F2F2F2'" style="height: 32px;color: var(--d-999-l-666) !important;padding: 8px 10px !important; margin-left: 0px;" @click.stop.prevent="showBatchAddressDetails=true" :dark="isDark" >
-        <Icon name="mingcute:new-folder-fill" class="text-12px"/>
+        <Icon name="mingcute:new-folder-fill" class="text-12px mr-5px"/>
         {{ $t('bulkImport') }}
       </el-button> 
     </div>
@@ -18,9 +18,9 @@
       <!-- @scroll="onScroll" -->
       <AveTable
         ref="aveTableRef"
-        rowKey="id"
+        rowKey="index"
         fixed
-        :data="dataSource"
+        :data="monitorStore.monitorList1"
         :showFooter="showFooter"
         :footText="footText"
         :columns="columns"
@@ -90,13 +90,17 @@
                 <Icon name="material-symbols-light:notifications-rounded" class="text-15px"/> 
                 <span>{{ $t('enableMonitor') }}</span>
               </div> -->
-              <div class="flex items-center mr-4px cursor-pointer color-[#666]"
+              <div
+                v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'" class="flex items-center mr-4px cursor-pointer color-[#666]"
                 @click.stop.prevent="handleMonitor(row,rowIndex)">
                 <Icon name="custom:monitor-icon" :class="['text-14px mr-2px',(row?.is_monitored === 1)&&'color-[--d-FFF-l-333]' ]" />
                 <!-- <span
                   class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
                   {{ row?.is_monitored === 1 ? t('pause') : t('openMonitor') }}
                 </span> -->
+              </div>
+              <div v-else class="flex items-center mr-4px color-[#666] cursor-not-allowed">
+                <Icon name="custom:monitor-icon" class="text-14px mr-2px" />
               </div>
               <Icon name="bx:bxs-trash-alt" class="text-13px color-#666" @click.stop.prevent="handleDeleteAttention(row)"/>
             </div>
@@ -132,6 +136,10 @@ const props=defineProps({
     type:Number,
     default:500
   },
+  updateNum:{
+    type:Number,
+    default:0
+  }
 })
 const { mode, isDark,token_logo_url } = storeToRefs(useGlobalStore())
 const chainOptions=ref([
@@ -144,6 +152,7 @@ const addButtonRef = ref()
 const addFavAddressPopRef = ref()
 const selectGroupId=ref(0)
 const followStore = useFollowStore()
+const monitorStore = useMonitorStore()
 const {currentAddress ,showBatchAddressDetails} = storeToRefs(useFollowStore())
 const conditions = reactive({
   group: 0,
@@ -187,11 +196,30 @@ const footText = computed(() => {
     return ''
   }
 })
+const shouldRenderChild = shallowRef(true)
+
+const reCreateChild = () => {
+  shouldRenderChild.value = false
+  // 确保 DOM更新
+  nextTick(() => {
+    shouldRenderChild.value = true
+  })
+}
 onMounted(() => {
   console.log('mounted walletManage',props)
    if(!botStore.evmAddress) return
+   if(monitorStore.monitorList1.length>0) return
   init()
 })
+watch(() => props.updateNum, () => {
+  paginationParams.value={...defaultPaginationParams,pageSize: 20}
+  getTableList()
+})
+// watch(() => monitorStore.monitorList1, () => {
+//   console.log('monitorStore.monitorList1', monitorStore.monitorList1)
+//   reCreateChild()
+// })
+
 function init(){
   getTableList()
 }
@@ -201,6 +229,7 @@ function handleConfirmAdd(formData:any,resetFields?:() => void,stopLoading?:()=>
     if(resetFields)resetFields()
     if(stopLoading)stopLoading()
     addFavAddressPopRef.value?.close?.()
+    paginationParams.value={...defaultPaginationParams,pageSize: 20}
     getTableList()
   }).catch((err) => {
     console.error(err)
@@ -229,8 +258,8 @@ const handleMonitor=throttle((row:any,index:number=0)=>{
       uid: id,
       address:user_address
     }).then(() => {
-      dataSource.value[index].is_monitored = row.is_monitored===0?1:0
-      // dataSource.value[index].is_pause = row.is_pause===0?1:0
+      monitorStore.monitorList1[index].is_monitored = row.is_monitored===0?1:0
+      // monitorStore.monitorList1[index].is_pause = row.is_pause===0?1:0
       // getTableList()
       // followStore.shouldInitAddressPage={
       //   num: followStore.shouldInitAddressPage.num + 1,
@@ -246,7 +275,7 @@ const handleMonitor=throttle((row:any,index:number=0)=>{
       chain: user_chain,
       user_address: botStore.evmAddress,
     }).then(() => {
-      dataSource.value[index].is_monitored = row.is_monitored===0?1:0
+      monitorStore.monitorList1[index].is_monitored = row.is_monitored===0?1:0
       // getTableList()
       ElMessage.success(t('success'))
       // followStore.shouldInitAddressPage={
@@ -286,15 +315,16 @@ const getTableList = throttle(function() {
     const data=res?.data||[] 
     if (Array.isArray(data) && data?.length > 0) {
       if(pageNO === 1) {
-        dataSource.value = data.map((i:any) => {
+        monitorStore.monitorList1 = data.map((i:any) => {
           return {
             ...i,
+            index: `${i.user_address}-${i.user_chain}`,
             group_id:conditions.group,
           }
         })
         loading.value = false
       }else{
-        dataSource.value = [...dataSource.value].concat(data.filter?.(i => dataSource.value?.every?.(j => j.index !== `${i.user_address}-${i.user_chain}`))
+        monitorStore.monitorList1 = [...monitorStore.monitorList1].concat(data.filter?.(i => monitorStore.monitorList1?.every?.(j => j.index !== `${i.user_address}-${i.user_chain}`))
             ?.map(i => ({
               ...i, index: `${i.user_address}-${i.user_chain}`, group_id:conditions.group,
             })))
@@ -305,7 +335,7 @@ const getTableList = throttle(function() {
       }
     }else{
       if(pageNO === 1) {
-        dataSource.value = []
+        monitorStore.monitorList1 = []
       }
       paginationParams.value.finished = true
     }

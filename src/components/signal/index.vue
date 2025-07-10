@@ -87,6 +87,7 @@ const isLargeScreen = computed(() => {
   return props.containerWidth >= 760
 })
 onMounted(() => {
+  console.log('signal mounted')
   if (signalStore.pageParams.pageNO === 1) {
     fetchSignalList()
   }

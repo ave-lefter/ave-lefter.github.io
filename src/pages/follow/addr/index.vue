@@ -628,8 +628,7 @@ function init() {
   getTableList()
   getMonitorNum()
 }
-watch([() => currentAddress.value], (val) => {
-  console.log('watch currentAddress', val)
+watch(() => currentAddress.value, (val) => {
   if(!val) {
     dataSource.value=[]
     dataSource2.value=[]

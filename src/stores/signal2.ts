@@ -13,7 +13,9 @@ export const useMonitorStore = defineStore('monitor', () => {
   const isLeftFixed = useStorage('isMonitorLeft', false)
   const isRightFixed = useStorage('isMonitorRight', false)
   const fixedWidth = useStorage('monitorFixedWidth', 360)
-
+  const monitorList1=ref([] as any[])
+  const monitorList2=ref([] as any[])
+  const activeName=ref(0)
   const translateStyle = shallowRef(0)
   const onDrag = useThrottleFn((x: number) => {
     if (x <= 0) {
@@ -113,6 +115,9 @@ export const useMonitorStore = defineStore('monitor', () => {
     monitorList,
     listStatus,
     pageParams,
-    updateList
+    updateList,
+    monitorList1,
+    monitorList2,
+    activeName
   }
 })
