@@ -1,5 +1,5 @@
 :root:root.dark {
-  .el-popper[role="tooltip"]:not(.el-popover) {
+  .el-popper[role="tooltip"]:not(.el-popover,.el-select__popper) {
     --el-bg-color: #333;
     --el-text-color-primary: #f2f2f2;
     border: none;
@@ -7,7 +7,7 @@
 }
 
 :root:root.light {
-  .el-popper[role="tooltip"]:not(.el-popover) {
+  .el-popper[role="tooltip"]:not(.el-popover,.el-select__popper) {
     // --el-bg-color: #ccc;
     --el-bg-color-overlay: #333;
     color: #ccc;

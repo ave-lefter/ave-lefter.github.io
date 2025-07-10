@@ -226,6 +226,8 @@
   })
 </script>
 
-<style>
-
+<style lang="scss">
+.drag-handle{
+  cursor: move;
+}
 </style>

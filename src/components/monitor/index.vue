@@ -233,7 +233,7 @@
       </el-tab-pane>
       <el-tab-pane :name="activeName">
         <template #label>
-          <div class="m-op flex-start gap-8px">
+          <div class="m-op flex-end gap-8px cursor-move w-100% h-100%">
             <template v-if="activeName===1 && props.isLarge">
               <FilterType v-model="txType" :options="txTypeList" />
               <Icon name="icon-park-solid:volume-notice"/>
@@ -244,7 +244,7 @@
                 inactive-value="0"/>
               <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
             </template>
-            <el-button v-if="activeName===1" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;color: var(--d-999-l-222) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
+            <el-button v-if="activeName===1" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;color: var(--d-999-l-666) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
               <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
               {{ $t('addWallet') }}
             </el-button>

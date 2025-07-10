@@ -5,11 +5,11 @@
         <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
         <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
       </el-select>
-      <el-button ref="addButtonRef"  style="height: 32px;color: var(--d-999-l-222) !important; padding: 8px 10px !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark">
+      <el-button ref="addButtonRef"  style="height: 32px;color: var(--d-999-l-666) !important; padding: 8px 10px !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark">
         <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
         {{ $t('addWallet') }}
       </el-button>
-      <el-button  :color="isDark?'#333':'#F2F2F2'" style="height: 32px;color: var(--d-999-l-222) !important;padding: 8px 10px !important; margin-left: 0px;" @click.stop.prevent="showBatchAddressDetails=true" :dark="isDark" >
+      <el-button  :color="isDark?'#333':'#F2F2F2'" style="height: 32px;color: var(--d-999-l-666) !important;padding: 8px 10px !important; margin-left: 0px;" @click.stop.prevent="showBatchAddressDetails=true" :dark="isDark" >
         <Icon name="mingcute:new-folder-fill" class="text-12px"/>
         {{ $t('bulkImport') }}
       </el-button> 
