@@ -37,7 +37,7 @@ interface IAddAttention2 {
 }
 
 // 用户添加关注
-export async function addAttention2({ user_chain='', user_address='', remark='', address = localStorage.bot_evmAddress, group=0, is_monitored=0, website=1, app=0, telegram=0, buy=1, sell=1 }: IAddAttention2) {
+export async function addAttention2({ user_chain='', user_address='', remark, address = localStorage.bot_evmAddress, group=0, is_monitored=0, website=1, app=0, telegram=0, buy=1, sell=1 }: IAddAttention2) {
   const { $api } = useNuxtApp()
   return $api('/v2api/fav_users/v1/user/add', {
     method: 'post',
@@ -291,7 +291,7 @@ export function changeIndexFavoriteGroup2(group: number[], address = localStorag
     return Promise.reject(false)
   }
   const { $api } = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v2api/fav_users/v1/user/group/sort', {
+  return $api('/v2api/fav_users/v1/user/group/sort', {
     method: 'post',
     body: {
       address,
@@ -346,7 +346,7 @@ export function getHistoryMonitor({pageNo=1,pageSize=50,filtered_type}:{
   filtered_type?:string
 }) {
   const { $api } = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v2api/fav_users/v1/user/historyMonitorv2',{
+  return $api('/v2api/fav_users/v1/user/historyMonitorv2',{
     method: 'get',
     params: {
       pageNo,
@@ -472,7 +472,7 @@ export function favUsersPauseMonitor({  uid, address }: { uid: string; address: 
 }
 export function monitorAddresses({ group = 0, user_chain, sort = '', sort_dir = '', keyword = '', last_tx_time_max = '', last_tx_time_min = '', time_interval = '', pageSize = 100, pageNO = 1, address = localStorage.bot_evmAddress || localStorage.walletAddress }: any) {
   const { $api } = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v2api/fav_users/v1/user/group/monitorAddressv2', {
+  return $api('/v2api/fav_users/v1/user/group/monitorAddressv2', {
    method: 'get',
     params:{
       group,
@@ -496,7 +496,7 @@ export function monitorAddresses({ group = 0, user_chain, sort = '', sort_dir = 
  */
 export function batchPauseMonitor(monitor_type: Array<'sell' | 'buy'>): Promise<any> {
    const { $api } = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v2api/fav_users/v1/user/monitor/batchPause', {
+  return $api('/v2api/fav_users/v1/user/monitor/batchPause', {
     method: 'post',
     body:{
       monitor_type

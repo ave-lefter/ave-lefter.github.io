@@ -60,13 +60,15 @@ export const useFollowStore = defineStore('follow', () => {
   watch(currentAddress, (val) => {
     if(!val)addressGroups.value = []
   })
-  const handleAddAttention = ref((form: any) => {})
+  const handleAddAttention = ref()
+  // const handleAddAttention = ref((form: any,resetFields: () => void) => {})
   const confirmAttention = (trigger: any,callback: (form: any)=>Promise<void>)=>{
     attentionTrigger.value = trigger
-    handleAddAttention.value = (form: any)=>{
+    handleAddAttention.value = (form: any,resetFields: () => void)=>{
       console.log('confirmAttention', form)
       callback(form).then(() => {
           favAddressPopVisible.value = false
+          resetFields()
       })
     }
     favAddressPopVisible.value = true

@@ -14,7 +14,7 @@ const { t } = useI18n()
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
-const followStore=useFollowStore()
+// const followStore=useFollowStore()
 const remarkValue = ref('')
 const visibleShow = ref(false)
 const coords = ref({ x: 0, y: 0 })
@@ -290,7 +290,7 @@ onMounted(() => {
             <a class="flex items-center"
               :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`" target="_blank">
               <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
-              {{ t('documentation') }}
+              {{ t('copyTrade') }}
             </a>
             <!-- 监控 -->
             <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"

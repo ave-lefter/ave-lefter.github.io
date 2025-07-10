@@ -496,20 +496,18 @@
               {{ t('copyTrade') }}
             </a>
             <!-- 监控 -->
-             <template v-if="evmAddress">
-               <div
-                 v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
-                 class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]" @click="handleMonitor(row,$index)">
-                 <Icon name="custom:monitor-icon" class="text-16px mr-2px" :class="[(!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))&&'color-[var(--d-FFF-l-333)]']"/>
-                 <span
-                   class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
-                   {{ (!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))? t('pause') : t('enable') }}
-                 </span>
-               </div>
-               <div class="flex items-center mr-12px color-[#666] cursor-not-allowed" v-else>
-                 <Icon name="custom:monitor-icon" class="text-16px mr-2px " />
-               </div>
-             </template>
+            <div
+              v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
+              class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]" @click="handleMonitor(row,$index)">
+              <Icon name="custom:monitor-icon" class="text-16px mr-2px" :class="[(!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))&&'color-[var(--d-FFF-l-333)]']"/>
+              <span
+                class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
+                {{ (!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))? t('pause') : t('enable') }}
+              </span>
+            </div>
+            <div class="flex items-center mr-12px color-[#666] cursor-not-allowed" v-else>
+              <Icon name="custom:monitor-icon" class="text-16px mr-2px " />
+            </div>
           </div>
         </template>
       </el-table-column>

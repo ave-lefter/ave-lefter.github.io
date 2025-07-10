@@ -108,12 +108,18 @@
           :sort-orders="['descending', 'ascending', null]"
           align="right"
         >
-          <template #default="{ row }">
-            <span class="color-text-2"
-              >{{ row.wallet_address?.slice(0, 2) }}...{{
-                row.wallet_address?.slice(-4)
-              }}</span
-            >
+          <template #default="{ row , $index}">
+            <div class="flex-end gap-3px">
+              <span class="color-text-2"
+                >{{ row.wallet_address?.slice(0, 2) }}...{{
+                  row.wallet_address?.slice(-4)
+                }}</span
+              >
+                <!-- :key="`${row.wallet_address}`" -->
+              <Icon
+                :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
+                :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#999]'" class="color-var(--d-999-l-666) text-14px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -123,6 +129,7 @@
 
 <script setup lang="ts">
 import { formatNumber } from '@/utils/formatNumber'
+import { deleteAttention, addAttention2 } from '~/api/attention'
 import {
   formatExplorerUrl,
   getAddressAndChainFromId,
@@ -133,6 +140,10 @@ const props = defineProps<{
   tableList: any[]
   loading?: boolean
 }>()
+
+const $refs = ref({
+  buttonRefs: {} as Record<number, any>
+})
 const tokenStore = useTokenStore()
 const route = useRoute()
 const { mode } = storeToRefs(useGlobalStore())
@@ -164,6 +175,50 @@ watch(
   { immediate: true }
 )
 
+const collect = async (row: any,index:number) => {
+  if(!useFollowStore().currentAddress){
+    useBotStore().changeConnectVisible(true)
+  }
+  if (useWalletStore().address && !useWalletStore().walletSignature[useWalletStore().address]) {
+    await useWalletStore().signMessageForFavorite()
+  }
+
+  console.log('collect',row,index)
+  if(row.is_wallet_address_fav !== 1){
+    useFollowStore().confirmAttention($refs.value.buttonRefs[index], (form) => {
+      console.log('confirmAttention', form)
+      return addAttention2({
+        address: useFollowStore().currentAddress,
+        user_address: row.wallet_address,
+        user_chain: addressAndChain.value.chain,
+        group: form.group,
+        is_monitored: form.is_monitored,
+      }).then(() => {
+        ElMessage.success(t('attention1Success'));
+        (tableDataFilter.value as Array<any>)[index].is_wallet_address_fav = 1
+        // getList()
+        return Promise.resolve()
+      }).catch((err) => {
+        return Promise.reject(err)
+      }).finally(() => {
+      })
+    })
+    return 
+  }
+  // loading.value = true
+  deleteAttention({
+    address: useFollowStore().currentAddress,
+    user_address: row.wallet_address,
+    user_chain: addressAndChain.value.chain
+  }).then(() => {
+    ElMessage.success(t('attention1Success'));
+    (tableDataFilter.value as Array<any>)[index].is_wallet_address_fav = 0
+    // getList()
+  }).catch((err) => {
+    console.log(err)
+  }).finally(() => {
+  })
+}
 const filterHandler = (value: string, row: any) => {
   return value === row?.type
 }

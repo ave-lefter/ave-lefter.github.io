@@ -2,6 +2,7 @@ import type { TokenInfo, TokenInfoExtra, WalletTokenInfo } from './types/token'
 import { getAddressAndChainFromId, getChainInfo } from '@/utils'
 import { NATIVE_TOKEN } from '@/utils/constants'
 import { createCacheRequest } from '#imports'
+import { lo } from 'element-plus/es/locale/index.mjs'
 
 // const testDomain = 'https://0ftrfsdb.xyz'
 
@@ -348,13 +349,18 @@ export function getTokenTxs(query: {
   token_id: string,
   tag_type?: string,
   maker?: string,
+  address?: string,
   time_min?: string,
   time_max?: string
 }): Promise<IGetTokenTxsResponse[]> {
+  const address=localStorage.bot_evmAddress || localStorage.walletAddress
   const {$api} = useNuxtApp()
   return $api('/v2api/token_info/v1/token/txs', {
     method: 'get',
-    query
+    query:{
+      address,
+      ...query
+    }
   })
 }
 
@@ -405,7 +411,7 @@ export interface Profile {
 
 
 // 交易历史流动性
-export async function getPairLiq(pair: string, address?: string): Promise<GetPairLiqResponse[]> {
+export async function getPairLiq(pair: string, address: string=localStorage.walletAddress||localStorage.bot_evmAddress): Promise<GetPairLiqResponse[]> {
   if (!pair || pair.length < 15) {
     return []
   }

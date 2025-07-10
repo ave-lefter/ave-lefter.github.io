@@ -35,8 +35,7 @@
         }"
         row-class='cursor-pointer group'
         :rowEventHandlers="{
-        onClick: tableRowClick
-        }"
+        onClick: ({rowData}:RowEventHandlerParams) => tableRowClick(rowData)}"
         @endReached="loadMore"
         >
           <template #header-wallet>
@@ -123,6 +122,7 @@
 <script setup lang="ts">
 import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,getHistoryMonitor,addAttention2,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor} from '~/api/attention'
 import { defaultPaginationParams, downColor, upColor } from '@/utils/constants'
+import type {RowEventHandlerParams} from 'element-plus'
 import { throttle } from 'lodash-es'
 const { t } = useI18n()
 const $router = useRouter()
@@ -323,11 +323,6 @@ const getRowGroupChange = async (val: number, row: any) => {
   getTableList()
 }
 function tableRowClick(row: { user_address: string; user_chain: string }) {
-  // $router.push({
-  //   name: 'Balance',
-  //   params: { userAddress: row.wallet_address, chain: row.chain },
-  // })
-
   $router.push({
     path: `/address/${row.user_address}/${row.user_chain}`,
   })
