@@ -1,4 +1,5 @@
 import SHA1 from 'crypto-js/sha1'
+
 type AnyFn = (...args: any[]) => any
 
 type HashMethod = 'sha1' | ((fn: AnyFn) => string)
@@ -8,6 +9,7 @@ type CacheOptions = {
   hashMethod?: HashMethod
   retryCount?: number
   retryDelay?: number
+  context?: any // 用于绑定 this
 }
 
 type CacheItem<T> = {
@@ -61,15 +63,19 @@ export function createCacheRequest<Args extends any[], Result>(
   requestFn: (...args: Args) => Promise<Result>,
   opts?: number | CacheOptions
 ) {
-  const {
-    cacheTime = typeof opts === 'number' ? opts : opts?.cacheTime ?? 1000,
-    hashMethod = typeof opts === 'object' ? opts.hashMethod : 'sha1',
-    retryCount = typeof opts === 'object' ? opts.retryCount ?? 0 : 0,
-    retryDelay = typeof opts === 'object' ? opts.retryDelay ?? 300 : 300,
-  } = {}
+  const normalizedOpts: Required<CacheOptions> = {
+    cacheTime: typeof opts === 'number' ? opts : opts?.cacheTime ?? 1000,
+    hashMethod: typeof opts === 'object' ? opts.hashMethod ?? 'sha1' : 'sha1',
+    retryCount: typeof opts === 'object' ? opts.retryCount ?? 0 : 0,
+    retryDelay: typeof opts === 'object' ? opts.retryDelay ?? 300 : 300,
+    context: typeof opts === 'object' && 'context' in opts ? opts.context : undefined,
+  }
+
+  const { cacheTime, hashMethod, retryCount, retryDelay, context } = normalizedOpts
 
   const hashFn = getHashFunction(hashMethod)
   const fnKey = hashFn(requestFn)
+  const boundRequest = context ? requestFn.bind(context) : requestFn
 
   async function cachedRequest(...params: Args): Promise<Result> {
     const now = Date.now()
@@ -83,9 +89,9 @@ export function createCacheRequest<Args extends any[], Result>(
     const pending = pendingRequests.get(cacheKey)
     if (pending) return pending
 
-    const promise = withRetry(() => requestFn(...params), retryCount, retryDelay)
+    const promise = withRetry(() => boundRequest(...params), retryCount, retryDelay)
       .then(response => {
-        cache.set(cacheKey, { timestamp: now, response })
+        cache.set(cacheKey, { timestamp: Date.now(), response })
         return response
       })
       .finally(() => {
@@ -109,3 +115,4 @@ export function createCacheRequest<Args extends any[], Result>(
 
   return cachedRequest
 }
+

@@ -8,13 +8,15 @@ import TonWeb from 'tonweb'
 import IconUnknown from '@/assets/images/icon-unknown.png'
 import { useRemarksStore } from '~/stores/remarks'
 import Cookies from 'js-cookie'
-import { JsonRpcProvider, formatUnits, parseUnits, FixedNumber } from 'ethers'
-import type { GetHotTokensResponse } from '~/api/token'
+import { JsonRpcProvider, formatUnits as ethersFormatUnits, parseUnits as ethersParseUnits, FixedNumber, Interface, type JsonFragment } from 'ethers'
+import type {GetHotTokensResponse} from '~/api/token'
 import BigNumber from 'bignumber.js'
 import type {SearchHot} from '~/api/types/search'
 import type { ConfigType } from 'dayjs'
 import { useStorage } from '@vueuse/core'
 import type { Size, SizeObj } from '~/api/types/pump'
+import FingerprintJs from '@fingerprintjs/fingerprintjs'
+export * from './wallet/utils/index'
 
 export function isJSON(str: string) {
   try {
@@ -534,10 +536,11 @@ export function getWSMessage(e: MessageEvent) {
   return null
 }
 
-export function verifyLogin() {
+export function verifyLogin(isBot=false) {
   const bottStore = useBotStore()
+  const walletStore = useWalletStore()
   const userInfo = bottStore.userInfo
-  if (!userInfo?.evmAddress) {
+  if (!userInfo?.evmAddress && (!walletStore.address || isBot)) {
     bottStore.changeConnectVisible(true)
     // 连接钱包
     return false
@@ -617,7 +620,7 @@ export const evm_utils = {
     if (!decimals) {
       return arg?.[0] || 0
     }
-    return formatUnits(...arg)
+    return ethersFormatUnits(...arg)
   },
   parseUnits: (...arg: [value: string | number | bigint, decimals?: string | number]) => {
     const decimals = Number(arg?.[1])
@@ -625,8 +628,8 @@ export const evm_utils = {
       return FixedNumber.fromString(String(arg?.[0] ?? '0')).value
     }
     const valueStr = String(arg?.[0] ?? '')
-    return parseUnits(valueStr, decimals)
-  },
+    return ethersParseUnits(valueStr, decimals)
+  }
 }
 export function filterGas(num: number, chain?: string) {
   if (chain === 'bsc') {
@@ -813,6 +816,7 @@ export function usePumpTableDataFetching(key = '') {
     { mergeDefaults: true }
   )
 }
+
 export function _isString(val: any){
   return  typeof val === 'string'
 }
@@ -841,4 +845,68 @@ export function getSwapSize(type: Size):SizeObj {
     }
   }
   return obj[type] || ''
+}
+export function sleep(time: number) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true)
+    }, time)
+  })
+}
+
+export function formatUnits(n: number | string, decimals = 0) {
+  return new BigNumber(n).div(new BigNumber(10).pow(new BigNumber(decimals || 0))).toFixed()
+}
+
+export function parseUnits(n: number | string, decimals = 0) {
+  return new BigNumber(new BigNumber(n).times(new BigNumber(10).pow(new BigNumber(decimals || 0))).toFixed(0))
+}
+
+export function getTronWeb(account: string) {
+  const tronWeb = new TronWeb({
+    fullHost: 'https://api.trongrid.io'
+  })
+  tronWeb.setAddress(account)
+  return tronWeb
+}
+
+export function getWalletTronWeb(): typeof window.tronWeb {
+  const walletStore = useWalletStore()
+  const tronWebObj: Record<string, any> = {
+    'Bitget Wallet': window.bitkeep?.tronWeb,
+    'OKX Wallet': window.okxwallet?.tronLink?.tronWeb
+  }
+  const walletName = walletStore.walletName
+  if (tronWebObj[walletName]) {
+    return tronWebObj[walletName]
+  }
+  return (walletStore.provider as any)?._wallet?.tronWeb || window.tronWeb || window.tronLink?.tronWeb
+}
+
+export function abiToJson(abi: string | string[]): JsonFragment[] {
+  const iface = new Interface(abi)
+  const abiJson = JSON.parse(iface.formatJson())
+  abiJson.forEach((i: any) => {
+    if (i.type === 'function' && !i.stateMutability) {
+      i.stateMutability = 'nonpayable'
+    }
+  })
+  return abiJson // 使用字符串字面量 "json"
+}
+
+export async function getDeviceId() {
+  if (localStorage.getItem('device_id')) {
+    return Promise.resolve(localStorage.getItem('device_id'))
+  }
+  const deviceId = await FingerprintJs.load().then((fp: any) => fp.get()).then(async (data: { visitorId: string }) => data.visitorId)
+  localStorage.setItem('device_id', deviceId)
+  return deviceId
+}
+
+export function getFeeIn(bestRoute: { fee_index?: number; feeIn?: number }, chain: string) {
+  const chains = ['bsc', 'base']
+  if (chains?.includes?.(chain)) {
+    return String(bestRoute.fee_index ?? bestRoute.feeIn ?? '100')
+  }
+  return String(bestRoute.feeIn ?? '2')
 }

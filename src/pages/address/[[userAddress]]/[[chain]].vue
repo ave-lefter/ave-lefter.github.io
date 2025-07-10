@@ -109,6 +109,7 @@ const $t = getGlobalT()
 const statisticRef = ref(null)
 const statisticsTable = ref(null)
 const themeStore = useThemeStore()
+const walletStore = useWalletStore()
 
 const options = [
   {
@@ -126,7 +127,7 @@ const options = [
 ]
 
 const isSelfAddress = computed(() => {
-  return userAddress.value === botStore.getWalletAddress(chain.value)
+  return userAddress.value === botStore.getWalletAddress(chain.value) || walletStore.address === userAddress.value
 })
 const intervalText = computed(() => {
   return options.find((item) => interval.value === item.id)?.name

@@ -137,7 +137,6 @@ const initPage = () => {
   // Initialize the page or perform any setup tasks
   getTokensPrice(ids).then((res) => {
     //WETH BTCB SOL
-    console.log('getTokensPrice',res)
     const newVal = res.map((i, index) => {
       const symbol = {WETH: 'ETH', BTCB: 'BTC', WBNB: 'BNB', SOL: 'SOL'}[i.symbol as string] || i.symbol
       return {

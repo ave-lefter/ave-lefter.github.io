@@ -173,12 +173,12 @@ async function _getTokenDetailMarks(type: string) {
             <div class="flex items-center">
               <TokenImg
                 :row="{
-                logo_url:tokenDetailsStore.tokenInfo?.logo_url,
-                chain:tokenDetailsStore.tokenInfo?.chain
+                logo_url:tokenDetailsStore.tokenInfo?.logo_url || '',
+                chain:tokenDetailsStore.tokenInfo?.chain || ''
               }"
               />
               <span class="text-14px ml-4px mr-4px">{{ symbol.target }}</span>
-              <span class="text-12px color-[--d-999-l-666] mr-8px" v-if="symbol.source">/ {{ symbol.source }}</span>
+              <span v-if="symbol.source" class="text-12px color-[--d-999-l-666] mr-8px">/ {{ symbol.source }}</span>
               <Icon
                 v-copy="tokenDetailsStore.tokenInfo?.address" name="bxs:copy"
                 class="cursor-pointer text-10px color-[--d-666-l-999]"
@@ -210,7 +210,7 @@ async function _getTokenDetailMarks(type: string) {
               :show-series="[true,true]"
               :data-list="lineChartList"
             />
-            <AveEmpty class="pt-50px" v-else/>
+            <AveEmpty v-else class="pt-50px"/>
           </div>
 
           <BaseInfo ref="baseRef"/>

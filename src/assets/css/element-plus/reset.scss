@@ -8,10 +8,10 @@
 
 :root:root.light {
   .el-popper[role="tooltip"]:not(.el-popover) {
-    // --el-bg-color: #ccc;
-    --el-bg-color-overlay: #333;
-    color: #ccc;
-    // --el-text-color-primary: #333;
+    --el-bg-color: #ccc;
+    // --el-bg-color-overlay: #333;
+    // color: #ccc;
+    --el-text-color-primary: #333;
   }
 }
 
@@ -130,10 +130,10 @@
   padding: 4px;
 }
 
-.el-select__wrapper {
-  --el-fill-color-blank: var(--d-333-l-F2F2F2);
-}
-
 .el-input.el-input {
   --el-input-bg-color: var(--d-222-l-F2F2F2);
+}
+
+.el-select__wrapper {
+  --el-fill-color-blank: var(--d-333-l-F2F2F2);
 }

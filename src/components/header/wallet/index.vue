@@ -62,7 +62,7 @@
           </div>
           <el-button
             style="width: 100%;margin-top: 8px; color: #959A9F;" size="large" color="#333333"
-            @click.stop="botStore.logout(); tgWalletVisible = false">{{ t('logout') }}</el-button>
+            @click.stop="walletStore.disconnect(); tgWalletVisible = false">{{ t('logout') }}</el-button>
         </div>
       </div>
       <div v-show="showVisible === 1" class="tg-wallet-list">
@@ -220,6 +220,7 @@ import doubleCheck from './doubleCheck.vue'
 const { mode, token_logo_url } = storeToRefs(useGlobalStore())
 const { t } = useI18n()
 const botStore = useBotStore()
+const walletStore = useWalletStore()
 // const route = useRoute()
 // const router = useRouter()
 

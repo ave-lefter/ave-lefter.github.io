@@ -9,7 +9,11 @@ import {useEventBus} from "@vueuse/core";
 import {BusEventType} from "~/utils/constants";
 
 const {t} = useI18n()
-const {evmAddress} = useBotStore()
+const botStore = useBotStore()
+const walletStore = useWalletStore()
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
 const favDialogEvent = useEventBus(BusEventType.FAV_DIALOG)
 const props = defineProps({
   list: {
@@ -44,7 +48,7 @@ async function rename(item: GetUserFavoriteGroupsResponse) {
 
 async function _changeFavoriteGroupName(name: string, id: number) {
   try {
-    await changeFavoriteGroupName(name, id, evmAddress)
+    await changeFavoriteGroupName(name, id, walletAddress.value)
     ElMessage.success(t('success'))
     props.getData()
     favDialogEvent.emit({
@@ -62,7 +66,7 @@ async function _setTopFavoriteGroup(item: GetUserFavoriteGroupsResponse, index: 
   try {
     await setTopFavoriteGroup(
       item.group_id,
-      evmAddress
+      walletAddress.value
     )
     ElMessage.success(t('success'))
     props.getData()
@@ -81,7 +85,7 @@ async function _changeIndexFavoriteGroup(item: GetUserFavoriteGroupsResponse, in
   const item1 = currentList.value[j]
   const id1 = item1.group_id
   try {
-    await changeIndexFavoriteGroup(id, id1, evmAddress)
+    await changeIndexFavoriteGroup(id, id1, walletAddress.value)
     ElMessage.success(t('success'))
     props.getData()
   } catch (e) {
@@ -98,7 +102,7 @@ async function _removeFavoriteGroup(item: GetUserFavoriteGroupsResponse) {
     customClass: '',
   })
   try {
-    await removeFavoriteGroup(item.group_id, evmAddress)
+    await removeFavoriteGroup(item.group_id, walletAddress.value)
     ElMessage.success(t('success'))
     props.getData()
     favDialogEvent.emit({

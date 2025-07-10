@@ -31,8 +31,8 @@
               :href="statistics.x_url"
               target="_blank"
             >
-              <img v-if="isDark" :width="16" src="@/assets/images/connect-x-dark.png" alt="" />
-              <img v-else :width="16" src="@/assets/images//connect-x-light.png" alt="" />
+              <img v-if="isDark" :width="16" src="@/assets/images/connect-x-dark.png" alt="" >
+              <img v-else :width="16" src="@/assets/images//connect-x-light.png" alt="" >
               {{ formatNumber(statistics.x_followers || 0, 2) }}
             </a>
             <a
@@ -60,7 +60,7 @@
             >
               <Icon name="custom:cake" class="text5 text-[--d-666-l-959A9F]" />
               <span>{{ wallet_age?.value }}</span>
-              <span>{{ wallet_age?.unit }}</span>
+              <span>{{ wallet_age?.unit || '' }}</span>
             </div>
           </div>
         </div>
@@ -84,19 +84,19 @@
       </div>
       <p class="m-0 mb-2 leading-5 text-3.5 text-[var(--d-666-l-959A9F)]">
         {{ $t('totalPnL2') }}（{{ intervalText }}）
-        <Number :value="statistics.profit" :signVisible="isUSDT">
+        <AveNumber :value="statistics.profit" :signVisible="isUSDT">
           {{ formatNumber(Math.abs((statistics.profit ?? 0) / main_token_price), 2) }}
           {{ main_token_symbol }}
-        </Number>
-        <Number :value="statistics.profit_ratio">
+        </AveNumber>
+        <AveNumber :value="statistics.profit_ratio">
           {{ formatNumber(Math.abs((statistics?.profit_ratio ?? 0) * 100), 1) }}%
-        </Number>
+        </AveNumber>
       </p>
       <p class="m-0 mb-2 leading-5 text-3.5 text-[var(--d-666-l-959A9F)]">
         {{ $t('winRate2') }}（{{ intervalText }}）
-        <Number :value="statistics.win_rate">
+        <AveNumber :value="statistics.win_rate">
           {{ formatNumber(Math.abs(statistics.win_rate ?? 0), 1) }}%
-        </Number>
+        </AveNumber>
       </p>
     </div>
     <div class="flex flex-col justify-between flex-shrink-0">
@@ -122,7 +122,7 @@
           class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[--d-222-l-FFF] text-3 leading-4 cursor-pointer rounded text-[var(--d-fff-l-333)]"
           @click="shareComponent && shareComponent.openDialog()"
         >
-          <Share ref="shareComponent" type="walletDetailTop" :statistics="statistics" :address="address" :chain="chain" />
+          <Share ref="shareComponent" type="walletDetailTop" :statistics="statistics as any" :address="address" :chain="chain" />
           {{ $t('share') }}
         </a>
       </div>
@@ -158,8 +158,7 @@ import Share from '@/components/share.vue'
 import AveEmpty from '@/components/aveEmpty.vue'
 
 import ChainToken from '@/components/chainToken.vue'
-import Number from '../components/Number.vue'
-import { verifyLogin, formatRemark } from '@/utils'
+import AveNumber from '../components/Number.vue'
 import { addAttention, deleteAttention } from '~/api/attention'
 
 const props = defineProps({
@@ -182,10 +181,11 @@ const props = defineProps({
   },
 })
 
-const $t = getGlobalT()
+const { t } = useI18n()
 
 const { address, chain, interval, intervalText } = toRefs(props)
 const botStore = useBotStore()
+const walletStore = useWalletStore()
 const themeStore = useThemeStore()
 const shareComponent = useTemplateRef<InstanceType<typeof Share>>('shareComponent')
 
@@ -216,8 +216,7 @@ const remark = ref({
   loading: false,
 })
 
-const currentAccount = ''
-const balanceAnalysis = ref({ profit: [], total_balance_without_risk: undefined })
+const balanceAnalysis = ref<Awaited<ReturnType<typeof getBalanceAnalysis>>>({ profit: [], total_balance_without_risk: undefined })
 const currencyStandard = ref('U')
 //   ...mapState([
 //     "token_user",
@@ -229,12 +228,17 @@ const currencyStandard = ref('U')
 //   ...mapGetters(["language"]),
 
 const pnl = computed(() => {
-  const { profit = [] } = balanceAnalysis.value
-  const xData = []
+  const profit: Array<{
+    time: string
+    value: string
+    negative?: boolean
+    absValue?: number
+  }> = balanceAnalysis.value.profit || []
+  const xData: any[] = []
   profit.forEach((el) => {
     xData.push(el.time)
-    el.negative = el.value < 0
-    el.absValue = Math.abs(el.value)
+    el.negative = Number(el.value) < 0
+    el.absValue = Math.abs(Number(el.value))
   })
   console.log('pnl', xData)
   return {
@@ -295,7 +299,7 @@ const pnl = computed(() => {
         barMaxWidth: 10,
         barMinHeight: 2,
         itemStyle: {
-          color: (params) => {
+          color: (params: { value: { value: number; negative: any } }) => {
             if (Math.abs(params.value?.value) > 0) {
               return params.value?.negative ? '#F6465D' : '#12B886'
             }
@@ -323,15 +327,14 @@ const addressText = computed(() => {
 })
 
 const selfAddress = computed(() => {
-  return botStore?.evmAddress || currentAccount
+  return botStore?.evmAddress || walletStore?.address || ''
 })
 
 const wallet_age = computed(() => {
-  const $t = getGlobalT()
-  const wallet_age = statistics.value.wallet_age
-  return ['--', '0'].includes(wallet_age)
-    ? { value: '--' }
-    : getDuring(wallet_age ? wallet_age * 1000 : undefined, $t)
+  const _wallet_age = (statistics.value?.wallet_age || '') as string
+  return ['--', '0'].includes(_wallet_age)
+    ? { value: '--', unit: '' }
+    : getDuring(_wallet_age ? ((Number(_wallet_age) || 0) * 1000) : undefined)
 })
 
 const total_balance = computed(() => {
@@ -341,7 +344,7 @@ const total_balance = computed(() => {
   }
   const { total_balance_without_risk } = balanceAnalysis.value
 
-  return formatNumber((total_balance_without_risk ?? 0) / main_token_price.value, {
+  return formatNumber((Number(total_balance_without_risk) || 0) / Number(main_token_price.value), {
     decimals: formatMap[chain.value],
     limit: 20,
   })
@@ -352,7 +355,7 @@ const isUSDT = computed(() => {
 })
 
 const main_token_price = computed(() => {
-  return isUSDT.value ? 1 : balanceAnalysis.value.main_token_price
+  return isUSDT.value ? 1 : Number((balanceAnalysis.value.main_token_price || 0))
 })
 
 const uSymbol = computed(() => {
@@ -363,9 +366,6 @@ const main_token_symbol = computed(() => {
   return isUSDT.value ? '' : balanceAnalysis.value.main_token_symbol
 })
 
-const chainAddress = computed(() => {
-  return [chain.value, address.value]
-})
 
 watch(
   () => props.interval,
@@ -373,8 +373,7 @@ watch(
     if (newVal) {
       onGetBalanceAnalysis()
     }
-  },
-  { immediate: true } // Remove if causing loops
+  }
 )
 
 watch(
@@ -384,8 +383,7 @@ watch(
       onGetWalletBasicInfo()
       onGetBalanceAnalysis()
     }
-  },
-  { immediate: true } // Remove if causing loops
+  }
 )
 
 onMounted(() => {
@@ -405,7 +403,7 @@ async function onGetWalletBasicInfo() {
     ...statistics.value,
     ...(res || {}),
   }
-  remark.value = res.remark || userInfo?.name
+  remark.value = res.remark || userInfo.value?.name
 }
 
 function _deleteAttention() {
@@ -415,10 +413,10 @@ function _deleteAttention() {
   deleteAttention({
     user_chain: chain.value,
     user_address: address.value,
-    address: botStore.getWalletAddress(chain.value)!,
+    address: botStore.userInfo?.evmAddress || walletStore.address,
   })
     .then(() => {
-      ElMessage.success($t('attention1Canceled'))
+      ElMessage.success(t('attention1Canceled'))
       statistics.value.is_wallet_address_fav = 0
     })
     .catch((err) => {
@@ -433,10 +431,10 @@ async function _addAttention() {
   addAttention({
     user_chain: chain.value,
     user_address: address.value,
-    address: botStore.getWalletAddress(chain.value)!,
+    address: botStore.userInfo?.evmAddress || walletStore.address,
   })
     .then(() => {
-      ElMessage.success($t('attention1Success'))
+      ElMessage.success(t('attention1Success'))
       statistics.value.is_wallet_address_fav = 1
     })
     .catch((err) => {
@@ -449,8 +447,10 @@ async function onGetBalanceAnalysis() {
     user_chain: chain.value,
     interval: interval.value,
   }
-  const res = await getBalanceAnalysis(params)
-  balanceAnalysis.value = res
+  getBalanceAnalysis(params).then((res) => {
+    balanceAnalysis.value = res
+  })
+
 }
 
 async function _bindTwitter() {
@@ -461,7 +461,14 @@ async function _bindTwitter() {
   // if (address.value && !botStore.evmAddress) {
   //   signature = await signTwitterConfirm()
   // }
-  const data = {
+  const signature = await walletStore.signMessageForFavorite()
+  const data: {
+    user_address: string
+    user_chain: string
+    origin: string
+    signature?: string
+    authorization?: string
+  } = {
     user_address: address.value,
     user_chain: chain.value,
     origin: window.location.href,
@@ -469,9 +476,9 @@ async function _bindTwitter() {
   if (botStore.accessToken) {
     data.authorization = botStore.accessToken
   }
-  // if (signature) {
-  //   data.signature = signature
-  // }
+  if (signature) {
+    data.signature = signature
+  }
   // loadingBind = true
   bindTwitter(data)
     .then((res) => {
@@ -492,20 +499,20 @@ async function _bindTwitter() {
     })
 }
 
-function getDuring(time, $t) {
+function getDuring(time?: number) {
   if (!time) return { value: '--', unit: '' } // Prevent infinite l
   const minutes = Math.abs(dayjs().diff(time, 'minute', true))
   // 单位换算表
   const thresholds = [
-    { unit: $t('min2'), limit: 60, value: minutes },
-    { unit: $t('hours'), limit: 60, value: minutes / 60 },
-    { unit: $t('days2'), limit: Infinity, value: minutes / (60 * 24) },
+    { unit: t('min2'), limit: 60, value: minutes },
+    { unit: t('hours'), limit: 60, value: minutes / 60 },
+    { unit: t('days2'), limit: Infinity, value: minutes / (60 * 24) },
   ]
   const { value, unit } = thresholds.find((t) => t.value < t.limit) || {}
-  return { value: parseInt(value), unit }
+  return { value: parseInt(String(value)), unit }
 }
 
-function mergeStatistics(data) {
+function mergeStatistics(data: any) {
   const d = {
     ...statistics.value,
     ...data,

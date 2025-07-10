@@ -10,11 +10,12 @@ type TronWalletAdapter = ReturnType<typeof getTronWalletAdapters>[number]
 
 export function getTronWalletAdapters() {
   const themeStore = useThemeStore()
+  const tpAdapter = new TokenPocketAdapter()
+  tpAdapter.url = 'https://chromewebstore.google.com/detail/tokenpocket-web3-crypto-w/mfgccjchihfkkindfppnaooecgfneiii'
   return [
     new TronLinkAdapter(),
     new OkxWalletAdapter(),
-    new TokenPocketAdapter(),
-
+    tpAdapter,
     new BitKeepAdapter(),
     new WalletConnectAdapter({
       network: 'Mainnet',

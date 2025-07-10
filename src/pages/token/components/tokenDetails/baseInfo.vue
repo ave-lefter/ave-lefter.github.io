@@ -14,7 +14,6 @@ import List from './list.vue'
 import BigNumber from 'bignumber.js'
 
 const tokenDetailStore = useTokenDetailsStore()
-const themeStore = useThemeStore()
 const botStore = useBotStore()
 const {t} = useI18n()
 const listQuery = shallowRef({
@@ -280,6 +279,7 @@ function attention() {
       <NuxtLink
         v-if="$route.path.indexOf('/address/') == -1"
         :to="`/address/${tokenDetailStore.user_address}/${tokenDetailStore.tokenInfo!.chain}`" class="py-7px px-8px bg-[--d-333-l-F2F2F2] rounded-4px color-[--d-F5F5F5-l-333] text-12px"
+        @click.stop="tokenDetailStore.drawerVisible = false"
       >
         {{ $t('walletDetail') }}
       </NuxtLink>

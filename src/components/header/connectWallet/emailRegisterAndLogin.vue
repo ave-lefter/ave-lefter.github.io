@@ -131,7 +131,7 @@
       </el-form-item>
       <el-form-item class="mb-10px!">
         <el-button
-          class="btn"
+          class="h-48px!"
           :color="'#3F80F7'"
           size="large"
           :disabled="cType == 'register' && !form.agree"
@@ -616,10 +616,6 @@ onBeforeUnmount(() => {
     font-style: 14px;
     padding-right: 0;
     margin-bottom: 0;
-  }
-
-  .btn {
-    height: 48px;
   }
 
   .el-link.el-link--primary {

@@ -99,7 +99,23 @@ export function getEventsAnalysis(params) {
 }
 
 // balance /pnl信息
-export function getBalanceAnalysis(params) {
+export function getBalanceAnalysis(params: {
+  user_address: string
+  user_chain: string
+  interval: string
+}): Promise<{
+  total_balance?: string
+  total_balance_without_risk?: string
+  total_balance_ratio?: string | number
+  main_token_price?: string
+  main_token_symbol?: string
+  main_token_balance?: string
+  profit: Array<{
+    time: string
+    value: string
+    ratio: string | number
+  }>
+}> {
   const { $api } = useNuxtApp()
   return $api('/v2api/walletinfo/v2/balance_analysis', {
     method: 'get',
@@ -135,15 +151,19 @@ export function getTokenFilterList(params) {
 }
 
 // bindTwitter
-export function bindTwitter(params) {
+export function bindTwitter(params: {
+   user_address: string
+  user_chain: string
+  origin: string
+  signature?: string
+  authorization?: string
+}) {
   const { $api } = useNuxtApp()
   return $api('/v2api/walletinfo/v2/cache_x_callback', {
     method: 'get',
     query: params,
   })
 }
-
-
 
 // 修改钱包备注
 export function setUserTokenStatus(

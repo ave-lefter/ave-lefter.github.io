@@ -43,7 +43,11 @@
     >
       {{ $t('connectWallet') }}
     </el-button>
-    <ExWalletBtn v-else-if="walletStore.address" />
+    <template v-else-if="walletStore.address">
+      <Positions/>
+      <ExWalletBtn />
+    </template>
+
     <!-- <el-popover v-else placement="bottom" trigger="click">
       <template #reference>
         <el-button class="ml-10px">{{
@@ -55,7 +59,7 @@
       </div>
     </el-popover> -->
     <template v-else>
-      <positions/>
+      <Positions/>
       <wallet/>
     </template>
     <Notice/>
@@ -109,7 +113,7 @@ import dialogSearch from '@/components/header/dialogSearch.vue'
 import wallet from '@/components/header/wallet/index.vue'
 import Notice from '~/components/layouts/components/notice.vue'
 // const connectWallet = shallowRef<Component | null>(null)
-import positions from '@/components/header/positions/index.vue'
+import Positions from '@/components/header/positions/index.vue'
 import ExWalletBtn from '../header/connectWallet/exWalletBtn.vue'
 // import connectWallet from '@/components/header/connectWallet/index.vue'
 // const connectWallet = shallowRef<Component | null>(null)

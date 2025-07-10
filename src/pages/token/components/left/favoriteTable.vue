@@ -56,6 +56,10 @@ const scrollbarHeight = computed(() => {
   return Number(props.height) - 110
 })
 const botStore = useBotStore()
+const walletStore = useWalletStore()
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
 const editVisible = shallowRef(false)
 const loading = shallowRef(false)
 const userFavoriteGroups = shallowRef<GetUserFavoriteGroupsResponse[]>([])
@@ -112,19 +116,23 @@ const sortedFavList = computed(() => {
 })
 
 onMounted(() => {
-  if (botStore.evmAddress) {
+  if (walletAddress.value) {
     _getUserFavoriteGroups()
   }
 })
-watch(() => botStore.evmAddress, () => {
+watch(() => walletAddress.value, () => {
   _getUserFavoriteGroups()
   setActiveTab(0,0)
+})
+watch(() => walletStore.walletSignature[walletStore.address], () => {
+  resetListStatus()
+  loadMoreFavorites()
 })
 
 async function _getUserFavoriteGroups() {
   try {
     loading.value = true
-    const res = await getUserFavoriteGroups(botStore.evmAddress)
+    const res = await getUserFavoriteGroups(walletAddress.value)
     userFavoriteGroups.value = [{
       group_id: 0,
       name: t('defaultGroup')
@@ -156,7 +164,7 @@ async function loadMoreFavorites() {
   try {
     listStatus.value.loading = true
     const pageNo = listStatus.value.pageNo
-    const res = await getFavoriteList(activeTab.value, pageNo, botStore.evmAddress)
+    const res = await getFavoriteList(activeTab.value, pageNo, walletAddress.value)
     if (Array.isArray(res)) {
       const list = res.map(i => ({
         ...i,

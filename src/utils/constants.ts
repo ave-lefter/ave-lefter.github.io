@@ -43,7 +43,7 @@ export const WSEventType = {
 
 export const MAX_UINT_AMOUNT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
-export const MIN_BALANCE = {
+export const MIN_BALANCE: Record<string, number> = {
   bsc: 0.002,
   arbitrum: 0.001,
   core: 0.01,

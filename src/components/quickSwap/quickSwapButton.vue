@@ -37,7 +37,7 @@ const emit = defineEmits(['submitSwap'])
 function submitBotSwap(e: MouseEvent) {
   e.stopPropagation()
   emit('submitSwap')
-  if (!verifyLogin()) {
+  if (!verifyLogin(true)) {
     return
   }
   if (loadingSwap.value) {

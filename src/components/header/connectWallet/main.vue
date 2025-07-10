@@ -21,7 +21,7 @@
     <div class="m-content">
       <div v-show="botStore.connectWalletTab === 0" class="text-14px text-center min-h-200px">
         <emailRegisterAndLogin ref="loginForm" v-model:cType="emailRegisterType">
-          <!-- <template v-if="emailRegisterType === 'login'">
+          <template v-if="emailRegisterType === 'login'">
             <button class="w-full bg-[--d-333-l-F2F2F2] h-40px flex items-center justify-center border-none mt-20px rd-6px px-12px clickable"  @click.stop="botStore.connectWalletTab = 1">
               <span class="mr-auto">{{ $t('chainWallet') }}</span>
               <img class="mr-10px" src="@/assets/images/wallet/metaMask.png"  width="20" alt="metamask" srcset="" lazy>
@@ -36,7 +36,7 @@
                 <li v-if="k !== tabs.length - 1">|</li>
               </template>
             </ul>
-          </template> -->
+          </template>
         </emailRegisterAndLogin>
       </div>
     </div>
