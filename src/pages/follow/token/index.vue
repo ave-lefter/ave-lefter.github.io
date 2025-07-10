@@ -316,9 +316,9 @@ onMounted(() => {
                 <view class="ml-4px text-14px">{{ t('delete') }}</view>
               </div>
             </div>
-            <div v-else>
+            <div v-else class="px-15px">
               <div>{{ t('rename') }}</div>
-              <el-input v-model="groupValue" :placeholder="t('enterGroupName')" class="mt-8px w-200px" />
+              <el-input v-model="groupValue" :placeholder="t('enterGroupName')" class="mt-8px w-100%" />
               <div class="flex items-center justify-between mt-12px gap-12px">
                 <div @click="editGroupPopoverRef[index]?.hide()"
                   class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[--d-333-l-0A0B0C] px-12px py-8px rounded-4px">
