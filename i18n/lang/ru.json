@@ -614,5 +614,6 @@
   "chain": "Сеть",
   "placeholderPrefix1": "Пожалуйста, выберите",
   "walletManage": "Управление кошельком",
-  "allChain": "Все сети"
+  "allChain": "Все сети",
+  "monitored": "Контролируется"
 }

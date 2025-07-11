@@ -2,7 +2,7 @@
   <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-9999">
     <div class="left">
       <NuxtLink
-        v-for="(item,index) in newData" :key="item.symbol || item.logo_url"
+        v-for="(item) in newData" :key="item.symbol || item.logo_url"
         class="color-[--d-999-l-666]  flex items-center gap-5px"
         :class="[(item?.hidden)?'':'mr-12px']"
         :to="`/token/${item.id}`"

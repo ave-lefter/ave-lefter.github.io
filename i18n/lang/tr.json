@@ -426,5 +426,6 @@
   "chain": "Blok zinciri",
   "placeholderPrefix1": "Lütfen seçin",
   "walletManage": "Cüzdan yönet",
-  "allChain": "Tüm zincir"
+  "allChain": "Tüm zincir",
+  "monitored": "İzlenmiş"
 }

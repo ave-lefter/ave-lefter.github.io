@@ -480,7 +480,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="t('addrGroup')" align="right" width="120">
+      <el-table-column v-if="!isMonitor" :label="t('addrGroup')" align="right" width="120">
         <template #default="{ row }">
           <el-select v-model="row.group_id" @click.stop @change="(val) => getRowGroupChange(val, row)">
             <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>

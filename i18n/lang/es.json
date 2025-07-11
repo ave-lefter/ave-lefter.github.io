@@ -431,5 +431,6 @@
   "chain": "Cadena",
   "placeholderPrefix1": "seleccione",
   "walletManage": "Manejo de billetera",
-  "allChain": "Todas las cadenas"
+  "allChain": "Todas las cadenas",
+  "monitored": "Monitoreado"
 }

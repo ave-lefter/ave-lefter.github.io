@@ -614,5 +614,6 @@
   "chain": "Chuỗi",
   "placeholderPrefix1": "Vui lòng chọn",
   "walletManage": "Quản lý ví",
-  "allChain": "Tất cả chuỗi"
+  "allChain": "Tất cả chuỗi",
+  "monitored": "Theo dõi"
 }

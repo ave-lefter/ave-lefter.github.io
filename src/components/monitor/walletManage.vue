@@ -178,9 +178,9 @@ const loading=ref(false)
 const pageData = ref({
   total: 10,
   page: 1,
-  pageSize: 20
+  pageSize: 50
 })
-const paginationParams = ref({...defaultPaginationParams,pageSize: 20})
+const paginationParams = ref({...defaultPaginationParams,pageSize: 50})
 const showFooter=ref(false)
 const footText = computed(() => {
   if(paginationParams.value.loaded){
@@ -207,7 +207,7 @@ onMounted(() => {
   init()
 })
 watch(() => updateNum1.value+updateNum3.value, () => {
-  paginationParams.value={...defaultPaginationParams,pageSize: 20}
+  paginationParams.value={...defaultPaginationParams,pageSize: 50}
   getTableList()
 })
 // watch(() => monitorStore.monitorList1, () => {
@@ -224,7 +224,7 @@ function handleConfirmAdd(formData:any,resetFields?:() => void,stopLoading?:()=>
     resetFields?.()
     stopLoading?.()
     addFavAddressPopRef.value?.close?.()
-    paginationParams.value={...defaultPaginationParams,pageSize: 20}
+    paginationParams.value={...defaultPaginationParams,pageSize: 50}
     getTableList()
     updateNum2.value++
   }).catch((err) => {
@@ -300,7 +300,7 @@ function loadMore(remainDistance:number){
 //   // }
 // }
 watch([() => conditions], () => {
-   paginationParams.value={...defaultPaginationParams,pageSize: 20}
+   paginationParams.value={...defaultPaginationParams,pageSize: 50}
    getTableList()
 },{deep: true})
 const getTableList = throttle(function() {
@@ -346,7 +346,7 @@ const getTableList = throttle(function() {
   })
 }, 500)
 const getRowGroupChange = async (val: number, row: any) => {
-  paginationParams.value={...defaultPaginationParams,pageSize: 20}
+  paginationParams.value={...defaultPaginationParams,pageSize: 50}
   await moveFavoriteGroup2({user_chain:row.user_chain, user_address:row.user_address, group:val})
   updateNum2.value++
   getTableList()

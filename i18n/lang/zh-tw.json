@@ -1021,5 +1021,6 @@
   "placeholderPrefix1": "請選擇",
   "walletManage": "錢包管理",
   "allChain": "全部鏈",
-  "enable": "開啟"
+  "enable": "開啟",
+  "monitored": "已監控"
 }
