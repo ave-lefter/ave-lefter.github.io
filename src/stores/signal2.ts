@@ -13,6 +13,7 @@ export const useMonitorStore = defineStore('monitor', () => {
   const isLeftFixed = useStorage('isMonitorLeft', false)
   const isRightFixed = useStorage('isMonitorRight', false)
   const fixedWidth = useStorage('monitorFixedWidth', 360)
+  const hasRing=useStorage('hasRing', false)
   const monitorList1=ref([] as any[])
   const monitorList2=ref([] as any[])
   const activeName=ref(0)
@@ -118,6 +119,7 @@ export const useMonitorStore = defineStore('monitor', () => {
     updateList,
     monitorList1,
     monitorList2,
-    activeName
+    activeName,
+    hasRing,
   }
 })

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="userAddress && chain" className="flex flex-col w-full gap-3 p-[20px] pt-[10px] bg-[var(--d-111-l-FFF)] pb-0">
+  <div v-if="userAddress && chain" className="flex flex-col w-full gap-3 p-[20px] pt-[10px] bg-[var(--d-111-l-FFF)] pb-0 overflow-y-auto" style="max-height: calc(100vh - 92px);">
     <div class="flex-between">
       <el-select
         :style="{ width: '120px' }"

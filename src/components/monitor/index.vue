@@ -25,7 +25,7 @@
             </el-button>
           </AveEmpty>
         </el-tab-pane>
-        <el-tab-pane :label="$t('followed')" :name="1" lazy>
+        <el-tab-pane :label="$t('monitored')" :name="1" lazy>
           <template v-if="botStore.evmAddress" >
             <div
               v-if="props.isLarge"
@@ -152,8 +152,7 @@
                         <el-switch
                           v-model="hasRing"
                           size="small"
-                          active-value="1"
-                          inactive-value="0"/>
+                         />
                         <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
                       </div>
                       <QuickBuyInput
@@ -241,8 +240,8 @@
                 <el-switch
                   v-model="hasRing"
                   size="small"
-                  active-value="1"
-                  inactive-value="0"/>
+                
+                  />
                 <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
               </template>
               <el-button v-if="monitorStore.activeName===1" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;color: var(--d-999-l-666) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
@@ -280,8 +279,11 @@ import FilterType from './components/filterType.vue'
 import { defaultPaginationParams, downColor, upColor } from '@/utils/constants'
 import type {AveTable} from '#components'
 const { t } = useI18n()
-const hasRing=ref(false)
+
 const monitorStore = useMonitorStore()
+const { hasRing } = storeToRefs(monitorStore)
+
+
 const {currentAddress ,showBatchAddressDetails,updateNum3} = storeToRefs(useFollowStore())
 const { isDark } = storeToRefs(useGlobalStore())
 const props = defineProps({

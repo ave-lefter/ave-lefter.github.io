@@ -286,7 +286,7 @@ const isShowDate = ref(true)
         class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2]"
     />
     <div
-        class="flex items-center pt-12px justify-between mb-16px pb-12px border-b-solid border-b-1px border-b-[--d-333-l-F5F5F5] cursor-move">
+        class="flex items-center py-11px justify-between mb-16px border-b-solid border-b-1px border-b-[--d-333-l-F5F5F5] cursor-move">
       <span class="color-[--d-FFF-l-222] text-14px">{{ $t('signal') }}</span>
       <div class="flex items-center gap-12px">
         <Filter
