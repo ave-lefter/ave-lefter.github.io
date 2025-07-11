@@ -1,5 +1,6 @@
 import { ElMessage as Message } from 'element-plus'
 import { getGlobalT } from '@/utils/i18nBridge'
+import { add } from 'lodash-es'
 const t = getGlobalT()
 // 用户取消关注
 export async function deleteAttention(body: {
@@ -35,6 +36,15 @@ interface IAddAttention2 {
   buy?: number
   sell?: number
 }
+
+export function deleteMonitor(body:{ uid: string, address: string  }){ 
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_users/v1/user/deleteMonitor',{
+    method: 'post',
+    body
+  })
+}
+
 
 // 用户添加关注
 export async function addAttention2({ user_chain='', user_address='', remark, address = localStorage.bot_evmAddress, group=0, is_monitored=0, website=1, app=0, telegram=0, buy=1, sell=1 }: IAddAttention2) {

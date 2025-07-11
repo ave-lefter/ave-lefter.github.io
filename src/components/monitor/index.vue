@@ -8,7 +8,7 @@
       />
       <el-tabs v-model="monitorStore.activeName" style="" class="m-tabs" @tab-change="handleClick">
         <el-tab-pane :label="$t('walletManage')" :name="0" lazy>
-          <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps" :updateNum="updateNum"/>
+          <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps"/>
           <AveEmpty
             v-else
             :style="{height:`${props.scrollHeight-50}px`}"
@@ -282,7 +282,7 @@ import type {AveTable} from '#components'
 const { t } = useI18n()
 const hasRing=ref(false)
 const monitorStore = useMonitorStore()
-const {currentAddress ,showBatchAddressDetails} = storeToRefs(useFollowStore())
+const {currentAddress ,showBatchAddressDetails,updateNum3} = storeToRefs(useFollowStore())
 const { isDark } = storeToRefs(useGlobalStore())
 const props = defineProps({
   scrollHeight: {
@@ -295,7 +295,6 @@ const props = defineProps({
   }
 })
 
-const updateNum=ref(0)
 const dataSource = ref<any[]>([])
 const dataSourceCache = ref<any[]>([])
 const loading=ref(false)
@@ -366,10 +365,10 @@ function handleClick(name: number|string) {
 function handleConfirmAdd(formData?: any, resetFields?: () => void, stopLoading?: () => void) {
   addAttention2({ address:botStore.evmAddress, user_chain: formData?.user_chain?.id ,user_address:formData?.address,remark:formData?.remark,group:formData?.group_id,is_monitored:0}).then(() => {
     // init2()
-    if (resetFields) resetFields()
-    if (stopLoading) stopLoading()
+    resetFields?.()
+    stopLoading?.()
     addFavAddressPopRef.value?.close?.()
-    updateNum.value++
+    updateNum3.value++
   }).catch((err) => {
     console.error(err)
   })

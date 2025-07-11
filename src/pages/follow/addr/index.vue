@@ -3,7 +3,8 @@
     <!-- <el-button ref="addButtonRef" @click.stop.prevent="openFavPop">Default</el-button> -->
     <!-- <FavPop ref="favPopRef" v-model="favDetails" :button-ref="addButtonRef || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" /> -->
     <div v-if="currentAddress" class="m-header flex-between px-12px items-start">
-      <pro-groups v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
+      <pro-groups v-if="!isMonitor" v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
+      <div v-else/>
       <ul class="w-operate">
         <li v-if="evmAddress" class="flex items-center gap-2px">
            <el-checkbox v-model="isMonitor" :label="t('monitorList')" size="small" style="font-size: 12px;color:var(--d-666-l-333);z-index: 0" />
@@ -124,6 +125,7 @@
               <!-- <a href class="mr-5px a-gray fav_address" v-if="row.is_wallet_address_fav == 1" @click.stop.prevent="handleDeleteAttention(row)">
                     <i class="attention iconfont icon-fav1 active font-12"></i> -->
               <Icon
+                 v-if="!isMonitor"
                 name="custom:attention"
                 :class="`cursor-pointer mr-8px ${row.is_wallet_address_fav == 1
                       ?'color-#f45469'
@@ -486,9 +488,9 @@
           </el-select>
         </template>
       </el-table-column>
-       <el-table-column :label="t('push')" align="right" width="150" fixed="right">
+       <el-table-column :label="t('push')" align="right" :width="!isMonitor ? 150 : 180" fixed="right">
         <template #default="{ row ,$index}">
-          <div class="flex flex-row-reverse" @click.stop>
+          <div class="flex flex-row-reverse  items-center" @click.stop>
             <a
               class="flex items-center"
               :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`" target="_blank">
@@ -496,6 +498,10 @@
               {{ t('copyTrade') }}
             </a>
             <!-- 监控 -->
+             <div v-if="isMonitor" class="color-[var(--d-F2F2F2-l-333)] mr-12px cursor-pointer flex-start" @click.stop.prevent="handleDeleteMonitor(row)">
+               <Icon  name="bx:bxs-trash-alt" class="text-13px"/>
+               {{ t('delete') }}
+             </div>
             <div
               v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
               class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]" @click="handleMonitor(row,$index)">
@@ -538,8 +544,9 @@ import {
   formatIconTag, getTagTooltip
 } from '@/utils/index'
 import { throttle } from 'lodash-es'
-import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor} from '~/api/attention'
+import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor,deleteMonitor} from '~/api/attention'
 import type { TableInstance } from 'element-plus'
+import { de } from 'element-plus/es/locale/index.mjs'
 
 const { mode, isDark } = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
@@ -547,7 +554,7 @@ const $router = useRouter()
 const { t } = useI18n()
 const botStore = useBotStore()
 const {evmAddress} = storeToRefs(useBotStore())
-const { addressGroups ,currentAddress,attentionTrigger} = storeToRefs(useFollowStore())
+const { addressGroups ,currentAddress,attentionTrigger,updateNum1,updateNum2,updateNum3} = storeToRefs(useFollowStore())
 // const addressGroups = ref([{ "group_id": 3763, "name": "base", "show_index": -1 }, { "group_id": 37632, "name": "base1", "show_index": 0 }, { "group_id": 37631, "name": "base2", "show_index": 1 }])
 const visible = ref(false)  
 const visible2 = ref(false)  
@@ -645,10 +652,22 @@ watch(() => currentAddress.value, (val) => {
 //   }
 // },{deep: true})
 
-watch([() => conditions, ()=>isMonitor.value], (value) => {
+watch([() => conditions, ()=>isMonitor.value, ()=>updateNum2.value+updateNum3.value], (value) => {
   console.log('watch conditions', value)
   init()
 },{deep: true})
+
+function handleDeleteMonitor(row:any){
+  deleteMonitor({
+    uid: row.id,
+    address: row.user_address
+  }).then(() => {
+    ElMessage.success(t('success'))
+    updateNum1.value++
+    init()
+  })
+}
+
 
 const handleMonitor = throttle((row:any,index:number=0) => {
   console.log('handleMonitor', row, index)
@@ -668,6 +687,7 @@ const handleMonitor = throttle((row:any,index:number=0) => {
       }
       // dataSource.value[index].is_pause = row.is_pause===0?1:0
       getTableList()
+      updateNum1.value++
       ElMessage.success(t('success'))
     }).catch((e) => { ElMessage.error(String(e)) })
     return
@@ -682,6 +702,7 @@ const handleMonitor = throttle((row:any,index:number=0) => {
       getTableList()
       ElMessage.success(t('success'))
       getMonitorNum()
+      updateNum1.value++
     }).catch((e) => {
         ElMessage.error(String(e))
     })
@@ -812,15 +833,17 @@ function handleFilterQuery(keyword: string = '') {
 }
 
 function handleDeleteAttention(item:any) {
-  deleteAttention({address: currentAddress.value, user_chain: item.chain,user_address: item.user_address}).then(() => {
+  deleteAttention({address: currentAddress.value, user_chain: item.user_chain,user_address: item.user_address}).then(() => {
     ElMessage.success(t('success'))
     getTableList()
+    updateNum1.value++
   }).catch((e) => {
     ElMessage.error(String(e))
   })
 }
 const getRowGroupChange = async (val: number, row: any) => {
   await moveFavoriteGroup2({user_chain:row.user_chain, user_address:row.user_address, group:val})
+  updateNum1.value++
   getTableList()
 }
 

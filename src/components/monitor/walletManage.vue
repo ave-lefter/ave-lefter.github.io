@@ -136,10 +136,6 @@ const props=defineProps({
     type:Number,
     default:500
   },
-  updateNum:{
-    type:Number,
-    default:0
-  }
 })
 const { mode, isDark,token_logo_url } = storeToRefs(useGlobalStore())
 const chainOptions=ref([
@@ -151,9 +147,8 @@ const visible = ref(false)
 const addButtonRef = ref()
 const addFavAddressPopRef = ref()
 const selectGroupId=ref(0)
-const followStore = useFollowStore()
 const monitorStore = useMonitorStore()
-const {currentAddress ,showBatchAddressDetails} = storeToRefs(useFollowStore())
+const {currentAddress ,showBatchAddressDetails, updateNum1,updateNum2,updateNum3} = storeToRefs(useFollowStore())
 const conditions = reactive({
   group: 0,
   activeTab: '7d',
@@ -211,7 +206,7 @@ onMounted(() => {
    if(monitorStore.monitorList1.length>0) return
   init()
 })
-watch(() => props.updateNum, () => {
+watch(() => updateNum1.value+updateNum3.value, () => {
   paginationParams.value={...defaultPaginationParams,pageSize: 20}
   getTableList()
 })
@@ -226,11 +221,12 @@ function init(){
 function handleConfirmAdd(formData:any,resetFields?:() => void,stopLoading?:()=>void) {
   addAttention2({ address:botStore.evmAddress, user_chain: formData?.user_chain?.id ,user_address:formData.address,remark:formData.remark,group:formData.group_id,is_monitored:0}).then(() => {
     // init2()
-    if(resetFields)resetFields()
-    if(stopLoading)stopLoading()
+    resetFields?.()
+    stopLoading?.()
     addFavAddressPopRef.value?.close?.()
     paginationParams.value={...defaultPaginationParams,pageSize: 20}
     getTableList()
+    updateNum2.value++
   }).catch((err) => {
     console.error(err)
   })
@@ -242,8 +238,8 @@ function filterGroup(val: number) {
 const handleDeleteAttention=throttle((item: any)=>{
   deleteAttention({address: currentAddress.value, user_chain: item.chain,user_address: item.user_address}).then(() => {
     ElMessage.success(t('success'))
-    // todo 需要刷新
     getTableList()
+    updateNum2.value++
   }).catch((e) => {
     ElMessage.error(String(e))
   })
@@ -265,6 +261,7 @@ const handleMonitor=throttle((row:any,index:number=0)=>{
       //   num: followStore.shouldInitAddressPage.num + 1,
       //   isSelfUpdate: false
       // }
+      updateNum2.value++
       ElMessage.success(t('success'))
     }).catch((e) => { ElMessage.error(String(e)) })
     return
@@ -282,6 +279,7 @@ const handleMonitor=throttle((row:any,index:number=0)=>{
       //   num: followStore.shouldInitAddressPage.num + 1,
       //   isSelfUpdate: false
       // }
+      updateNum2.value++
     }).catch((e) => {
         ElMessage.error(String(e))
     })
@@ -350,6 +348,7 @@ const getTableList = throttle(function() {
 const getRowGroupChange = async (val: number, row: any) => {
   paginationParams.value={...defaultPaginationParams,pageSize: 20}
   await moveFavoriteGroup2({user_chain:row.user_chain, user_address:row.user_address, group:val})
+  updateNum2.value++
   getTableList()
 }
 function tableRowClick(row: { user_address: string; user_chain: string }) {
