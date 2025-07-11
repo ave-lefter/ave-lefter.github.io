@@ -1,6 +1,6 @@
 <template>
   <el-popover ref="popoverRef" v-model:visible="visible" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" :teleported="true" popper-class="" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" @before-leave="reset"  >
-    <el-form ref="formRef" v-click-outside="()=>followStore.favAddressPopVisible=false" :model="form" :rules="rules" hide-required-asterisk @submit.prevent.stop="handleSubmit(formRef)">
+    <el-form ref="formRef" v-click-outside="()=>followStore.favAddressPopVisible=false" v-loading="loading" :model="form" :rules="rules" hide-required-asterisk @submit.prevent.stop="handleSubmit(formRef)">
       <el-form-item prop="group" required label-position="top" size="large" class="mb-20px!">
         <el-scrollbar max-height="274px">
           <el-radio-group v-model="form.group" class="flex flex-col items-start w-100%" style="align-items: flex-start; ">
@@ -69,7 +69,7 @@ const props=defineProps({
     default:'248'
   },
   formData:{
-    type: Object as PropType<{ group_id: number|string ,is_monitored?:number|string}>,
+    type: Object as PropType<{ group: number|string ,is_monitored?:number|string}>,
     required: false,
     default:()=>{
       return {
@@ -97,7 +97,7 @@ const props=defineProps({
 })
 
 const emits = defineEmits<{
-  (e: 'onConfirm', value?: object,resetFields?:()=>void): void
+  (e: 'onConfirm', value?: object,resetFields?:()=>void,stopLoading?:()=>void): void
   (e: 'onCancel'): void
   (e: 'update:visible', value: boolean): void
 }>()
@@ -114,6 +114,7 @@ const rules = computed<FormRules>(() => {
     ]
   }
 })
+const loading=ref(false)
 const formRef=ref<FormInstance|undefined>()
 const form = ref({...props.formData})
 const isAdd=ref(false)
@@ -137,7 +138,8 @@ function handleSubmit(formEl: FormInstance | undefined) {
   if (!formEl) return
   formEl.validate((valid, fields) => {
     if (valid) {
-      emits('onConfirm',form.value,formRef.value?.resetFields)
+      loading.value = true
+      emits('onConfirm',form.value,formRef.value?.resetFields,()=>loading.value=false)
       // close()
     } else {
       console.log('error submit!', fields)

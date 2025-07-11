@@ -1,7 +1,7 @@
 <template>
   <el-popover ref="popoverRef" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" @before-leave="reset">
-    <el-form ref="formRef" :model="form" :rules="rules" @submit.prevent.stop="handleSubmit(formRef)">
-      <el-form-item v-loading="loading" prop="user_chain" required label-position="top" size="large" class="mb-13px!">
+    <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" @submit.prevent.stop="handleSubmit(formRef)" >
+      <el-form-item prop="user_chain" required label-position="top" size="large" class="mb-13px!">
         <div class="flex justify-between items-center w-100%">
           <h4 class="font-500 text-12px lh-[120%] color-[var(--d-FFF-l-000)]">{{ $t('addWallet') }}</h4>
           <el-select v-model="form.user_chain" :placeholder="t('placeholderPrefix1') + t('chain')" value-key="value" size="small" style="--el-text-color-regular:var(--d-FFF-l-000);--el-select-input-color:var(--d-FFF-l-000)" :suffix-icon="CaretBottom" class="w-70px!" :teleported="false">

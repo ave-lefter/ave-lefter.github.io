@@ -95,7 +95,7 @@
     
     
      <Draggable
-      v-show="!monitorStore.isLeftFixed&&!monitorStore.isRightFixed&&monitorStore.visible"
+      v-if="!monitorStore.isLeftFixed&&!monitorStore.isRightFixed&&monitorStore.visible"
       class-name="top-0 left-0 fixed"
       :z="3"
       :initialWidth="monitorStore.monitorBoundingRect.width"

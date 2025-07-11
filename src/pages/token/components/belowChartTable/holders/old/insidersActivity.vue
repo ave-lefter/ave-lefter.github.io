@@ -116,9 +116,9 @@
                 }}</span
               >
                 <!-- :key="`${row.wallet_address}`" -->
-              <Icon
+              <!-- <Icon
                 :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
-                :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#999]'" class="color-var(--d-999-l-666) text-14px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
+                :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#999]'" class="color-var(--d-999-l-666) text-14px clickable shrink-0" @click.stop.prevent="collect(row,$index)" /> -->
             </div>
           </template>
         </el-table-column>

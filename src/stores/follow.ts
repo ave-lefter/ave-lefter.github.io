@@ -60,15 +60,17 @@ export const useFollowStore = defineStore('follow', () => {
   watch(currentAddress, (val) => {
     if(!val)addressGroups.value = []
   })
+  const loading = ref(false)
   const handleAddAttention = ref()
   // const handleAddAttention = ref((form: any,resetFields: () => void) => {})
   const confirmAttention = (trigger: any,callback: (form: any)=>Promise<void>)=>{
     attentionTrigger.value = trigger
-    handleAddAttention.value = (form: any,resetFields: () => void)=>{
+    handleAddAttention.value = (form: any,resetFields?: () => void,stopLoading?:()=>void)=>{
       console.log('confirmAttention', form)
       callback(form).then(() => {
+          stopLoading?.()
           favAddressPopVisible.value = false
-          resetFields()
+          resetFields?.()
       })
     }
     favAddressPopVisible.value = true
@@ -99,5 +101,6 @@ export const useFollowStore = defineStore('follow', () => {
     favAddressPopVisible,
     favAddressPopRef,
     shouldInitAddressPage,
+    loading
   }
 })
