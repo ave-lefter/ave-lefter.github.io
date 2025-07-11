@@ -61,7 +61,11 @@ export interface PumpObj {
   target_opening_at: number | string
   state: string
   medias: { name: string; icon: string; url: string }[]
-  name: ''
+  name: string
+  cabal_tag_count: string
+  kol_tag_count: number
+  smart_wallet_tag_count: string
+  sniper_count: string
 }
 
 interface Pair {
@@ -86,6 +90,9 @@ interface Pair {
   total: number
   tvl: number
   progress: number
+  token0_name: string
+  token1_name: string
+  name: string
 }
 export interface WSPumpObj {
   amm: string

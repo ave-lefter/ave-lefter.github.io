@@ -28,7 +28,7 @@ const props = defineProps({
     required: false,
     default: 'default',
     validator: (value: string) => {
-      return ['topHolder', 'default'].includes(value)
+      return ['topHolder', 'default','walletDetailTop'].includes(value)
     },
   },
 })
@@ -51,6 +51,9 @@ const imgList = computed(() => {
     ups,
     downs
   }
+})
+defineExpose({
+  openDialog
 })
 
 function openDialog() {
@@ -245,6 +248,21 @@ function getColorClass(val: string) {
                   {{ addSign(Number(statistics.total_profit)) }}${{
                     formatNumber(Math.abs(Number(statistics.total_profit)), 2)
                   }}
+                </ExcludeError>
+              </td>
+            </tr>
+            <tr v-if="type==='walletDetailTop'">
+              <td :style="{ width: getTextWidth($t('winRate')) + 20 + 'px' }">
+                {{ $t('winRate') }}
+              </td>
+              <td :class="getColorClass(statistics.total_win_rate)">
+                {{ console.log("statistics",statistics) }}
+                <ExcludeError
+                  :model-value="statistics.total_win_rate"
+                >
+                  {{
+                    formatNumber(Number(statistics.total_win_rate), 1)
+                  }}%
                 </ExcludeError>
               </td>
             </tr>

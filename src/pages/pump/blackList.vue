@@ -2,7 +2,7 @@
   <el-popover
       trigger="hover"
       placement="top"
-      content="黑名单列表(CA、DEV 、关键词)"
+      :content="t('backlist')"
       :width="230"
       popper-class="text-center"
     >
@@ -13,7 +13,7 @@
         style="margin-left: 0"
         @click="visible = !visible"
       >
-        <Icon name="custom:black" class="text-16px"/>
+        <Icon name="custom:pump-black" class="text-16px"/>
       </el-button>
     </template>
   </el-popover>
@@ -22,15 +22,19 @@
     width="780"
     height="590"
     :show-close="true"
-    class="search-dialog"
+    class="search-dialog custom-dialog"
     header-class="p-0!"
+    append-to-body
+    lock-scroll
+    draggable
+    :destroy-on-close="true"
     @opened="openDialog"
   >
     <template #header>
-      <span class="px-20px text-20px"> 黑名单 </span>
+      <span class="px-20px text-20px"> {{ $t('black') }} </span>
     </template>
-    <div class="content">
-      <div class="px-20px">
+    <div class="content mb-20px">
+      <div class="px-20px mt-20px">
         <el-input
           ref="inputSearch"
           v-model.trim="query"
@@ -43,7 +47,7 @@
           <template #prefix>
             <Icon
               class="text-12px text-[var(--d-F5F5F5-l-999999)]"
-              name="ep:search"
+              name="custom:search"
             />
           </template>
           <template #suffix>
@@ -61,7 +65,7 @@
             >
               <template #reference>
                 <el-button class="btn mr-8px"
-                  >添加
+                  >{{ $t('add') }}
                   <Icon
                     :name="
                       isRotate
@@ -100,31 +104,31 @@
               @click="switchItem(item)"
               >{{ item.name }}
               <template
-                v-if="list?.filter((i) => i.type == item.value)?.length > 0"
+                v-if="pumpBlackList?.filter((i) => i.type == item.value)?.length > 0"
               >
-                {{ list?.filter((i) => i.type == item.value)?.length }}
+                {{ pumpBlackList?.filter((i) => i.type == item.value)?.length }}
               </template>
             </el-button>
           </div>
 
-          <span>类型</span>
-          <span>操作</span>
+          <span>{{ $t('type') }}</span>
+          <span>{{ $t('operate') }}</span>
         </div>
 
-        <el-scrollbar v-if="list?.length > 0" height="500px" min-height="400px">
-          <ul class="content1">
+        <el-scrollbar v-if="list?.length > 0" height="400px" min-height="400px">
+          <ul class="content1 mb-20px">
             <li v-for="(row, $index) in list" :key="$index">
               <a href="" class="flex no-underline h-50px" @click.stop.prevent>
                 <div>{{ row.address }}</div>
                 <div>
-                  <template v-if="row.type == 'dev'">开发者地址</template>
-                  <template v-else-if="row.type == 'ca'">合约地址</template>
-                  <template v-else-if="row.type == 'keyword'">关键词</template>
+                  <template v-if="row.type == 'dev'">{{ $t('dev') }}</template>
+                  <template v-else-if="row.type == 'ca'">{{ $t('ca') }}</template>
+                  <template v-else-if="row.type == 'keyword'">{{ $t('keywords') }}</template>
                   <template v-else>{{ row.type }}</template>
                 </div>
                 <div class="flex-end">
                   <el-button class="btn restore" @click.stop.prevent="restore(row)"
-                    >恢复
+                    >{{ $t('remove') }}
                   </el-button>
                 </div>
               </a>
@@ -132,14 +136,14 @@
           </ul>
         </el-scrollbar>
         <AveEmpty v-else class="mt-150px" />
-        <div class="text-14px count color-[--d-666-l-999]">
-          总计<span
-            class="ml-5px"
-            :class="list?.length > 0 ? 'color-[--d-F5F5F5-l-333]' : ''"
-            >{{ list.length }}</span
-          >/500
-        </div>
       </div>
+    </div>
+    <div class="text-14px count color-[--d-666-l-999] bg-[--d-222-l-FFF] w-full px-20px py-20px">
+      {{ $t('total') }}<span
+        class="ml-5px"
+        :class="list?.length > 0 ? 'color-[--d-F5F5F5-l-333]' : ''"
+        >{{ list.length }}</span
+      >/500
     </div>
   </el-dialog>
 </template>
@@ -153,60 +157,79 @@ const { pumpBlackList } = storeToRefs(globalStore)
 const visible = shallowRef(false)
 const visible_popper = shallowRef(false)
 
-// const query = useStorage('pump', {})
 
 const query = shallowRef('')
 
 const isRotate = shallowRef(false)
 const active = shallowRef('all')
-const typeList = computed(() => {
+type TypeValue = 'all' | 'dev' | 'ca' | 'keyword'
+type TypeItem = {
+  name: string
+  value: TypeValue
+}
+const typeList = computed<TypeItem[]>(() => {
   return [
     {
-      name: '全部',
+      name: t('all'),
       value: 'all',
     },
     {
-      name: '开发者地址',
+      name: t('dev'),
       value: 'dev',
     },
     {
-      name: '合约地址',
+      name: t('ca'),
       value: 'ca',
     },
     {
-      name: '关键词',
+      name: t('keywords'),
       value: 'keyword',
     },
   ]
 })
+
 const list = computed(() => {
-  return pumpBlackList.value || []
+  const list = pumpBlackList.value?.slice() || []
+  if (active.value == 'dev') {
+    return list.filter(i => i.type == 'dev') || []
+  } else if (active.value == 'ca') {
+    return list?.filter(i => i.type == 'ca') || []
+  } else if (active.value == 'keyword') {
+    return list?.filter(i => i.type == 'keyword') || []
+  } else {
+    return list || []
+  }
 })
 
+
 function openDialog() {}
-function switchItem(item: { value: string }) {
+function switchItem(item: { value: 'all' | 'dev' | 'ca' | 'keyword' }) {
   active.value = item.value
 }
-function add(item: { value: 'ca' | 'dev' | 'keyword' }) {
+function add(item: { value:  'dev' | 'ca' | 'keyword' }) {
+  if (pumpBlackList.value?.length > 499) {
+    ElMessage.error(t('blacklistLimit'))
+    return
+  }
   if (!query.value) {
-    ElMessage.error('请输入查询参数')
+    ElMessage.error(t('plsSearchTip'))
+    return
   }
   if (item.value == 'ca' || item.value == 'dev') {
     if (
       !isValidAddress(query.value, 'solana') &&
       !isValidAddress(query.value, 'bsc')
     ) {
-      ElMessage.error('请输入正确的地址')
+      ElMessage.error(t('plsCorrectCa'))
       return
     }
   }
-
   if (pumpBlackList.value) {
     const findIndex = pumpBlackList.value?.findIndex(
-      (i) => query.value == i.address
+      (i) => query.value == i.address && i.type == item.value
     )
     if (findIndex !== -1) {
-      ElMessage.success(t('黑名单已存在'))
+      ElMessage.error(t('blacklistExists'))
     } else {
       pumpBlackList.value.push({ address: query.value, type: item.value })
     }
@@ -214,14 +237,14 @@ function add(item: { value: 'ca' | 'dev' | 'keyword' }) {
     pumpBlackList.value = [{ address: query.value, type: item.value }]
   }
 }
-function restore(item: { address: string }) {
+function restore(item: { address: string, type: string }) {
   const findIndex = pumpBlackList.value?.findIndex(
-    (i) => item.address == i.address
+    (i) => item.address == i.address && i.type == item.type
   )
   if (findIndex !== -1) {
     pumpBlackList.value.splice(findIndex, 1)
   }
-  ElMessage.success(t('已从黑名单删除'))
+  ElMessage.success(t('removedBacklist'))
 }
 </script>
 
@@ -378,7 +401,25 @@ function restore(item: { address: string }) {
 }
 .count {
   position: absolute;
-  left: 20px;
-  bottom: 20px;
+  left: 0;
+  bottom: 0;
 }
+/* 防止 el-dialog__body 撑开 dialog 本体 */
+.custom-dialog .el-dialog__body {
+  padding: 0;
+  max-height: 70vh; /* 限制最大高度 */
+  overflow: hidden; /* 避免双滚动 */
+}
+
+/* el-scrollbar 内部设置滚动区域 */
+.dialog-scrollbar {
+  height: 70vh;            /* 或你希望的最大高度 */
+  overflow: hidden;        /* el-scrollbar 控制滚动 */
+}
+
+/* 可选内容样式 */
+.dialog-content {
+  padding: 20px;
+}
+
 </style>

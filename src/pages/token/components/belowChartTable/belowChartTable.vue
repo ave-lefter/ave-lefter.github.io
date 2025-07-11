@@ -149,4 +149,4 @@ const comProps = computed(() => {
   --custom-br-1-color: #33353D;
 }
 </style>
-<style scoped></style>
+

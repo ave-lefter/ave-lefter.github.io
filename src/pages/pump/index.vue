@@ -1,6 +1,6 @@
 <template>
-  <div class="pump w-full">
-    <div class="flex-start p-x-17px border border-solid border-1 border-[--d-1A1A1A-l-FFF] py-12px">
+  <div class="pump w-full bg-[--d-1A1A1A-l-FFF]">
+    <div class="flex-start p-x-17px py-12px bg-[--d-111-l-FFF] mb-1px mt-1px">
       <el-popover
         v-model:visible="visible_platforms"
         placement="bottom-start"
@@ -119,10 +119,10 @@
         </button>
       </div>
     </div>
-    <el-row :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full bg-[--d-1A1A1A-l-FFF] pt-1px">
+    <el-row :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full bg-[--d-1A1A1A-l-FFF]">
       <el-col :span="8">
         <div class="pump-item bg-[--d-111-l-FFF]  rounded-4px" style="padding-top: 15px;">
-          <div class="pump-item_header flex-start px-10px">
+          <div class="pump-item_header flex-start px-12px">
             <img
               class="mr-5px"
               src="@/assets/images/pump/new.svg"
@@ -134,7 +134,32 @@
               <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
             </span>
 
-            <span class="bg-[--d-222-l-F2F2F2] py-4px px-10px rounded-4px mr-4px color-[--d-666-l-999] cursor-pointer ml-auto hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.new } "  @click="pump_notice[activeChain].new = !pump_notice[activeChain].new">
+            <el-input
+              ref="inputSearch"
+              v-model.trim="pump_query[activeChain].new"
+              class="search-input1 px-20px ml-auto mr-4px"
+              size="small"
+              :placeholder="$t('search')"
+              @input="(val) => pump_query[activeChain].new = val.replace(/\s/g, '')"
+            >
+              <template #prefix>
+                <Icon
+                  class="text-12px text-[var(--d-666-l-999)]"
+                  name="custom:search"
+                />
+              </template>
+              <template #suffix>
+                <Icon
+                  v-if="pump_query[activeChain].new"
+                  name="pajamas:clear"
+                  class="color-[--d-666-l-999] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  @click="pump_query[activeChain].new = ''"
+                />
+              </template>
+            </el-input>
+
+
+            <span class="bg-[--d-222-l-F2F2F2] py-4px px-10px rounded-4px mr-4px color-[--d-666-l-999] cursor-pointer  hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.new } "  @click="pump_notice[activeChain].new = !pump_notice[activeChain].new">
             <Icon
             name="icon-park-solid:volume-notice"
             class="text-12px"
@@ -156,7 +181,7 @@
       </el-col>
       <el-col :span="8">
         <div class="pump-item bg-[--d-111-l-FFF]" style="padding-top: 15px;">
-          <div class="pump-item_header flex-start px-10px rounded-4px">
+          <div class="pump-item_header flex-start px-12px rounded-4px">
             <img
               class="mr-5px"
               src="@/assets/images/pump/soon.svg"
@@ -167,7 +192,31 @@
             <span  v-show="isPausedObj.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-5px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
             </span>
-            <span class="bg-[--d-222-l-F2F2F2] py-4px px-10px rounded-4px mr-4px color-[--d-666-l-999] cursor-pointer ml-auto hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.soon } "  @click="pump_notice[activeChain].soon = !pump_notice[activeChain].soon">
+
+            <el-input
+              ref="inputSearch"
+              v-model.trim="pump_query[activeChain].soon"
+              class="search-input1 px-20px ml-auto mr-4px"
+              size="small"
+              :placeholder="$t('search')"
+              @input="(val) => pump_query[activeChain].soon = val.replace(/\s/g, '')"
+            >
+              <template #prefix>
+                <Icon
+                  class="text-12px text-[var(--d-666-l-999)]"
+                  name="custom:search"
+                />
+              </template>
+              <template #suffix>
+                <Icon
+                  v-if="pump_query[activeChain].soon"
+                  name="pajamas:clear"
+                  class="color-[--d-666-l-999] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  @click="pump_query[activeChain].soon = ''"
+                />
+              </template>
+            </el-input>
+            <span class="bg-[--d-222-l-F2F2F2] py-4px px-10px rounded-4px mr-4px color-[--d-666-l-999] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.soon } "  @click="pump_notice[activeChain].soon = !pump_notice[activeChain].soon">
               <Icon
               name="icon-park-solid:volume-notice"
               class="text-12px"
@@ -188,7 +237,7 @@
       </el-col>
       <el-col :span="8">
         <div class="pump-item bg-[--d-111-l-FFF]" style="padding-top: 15px;">
-          <div class="pump-item_header flex-start px-10px rounded-4px">
+          <div class="pump-item_header flex-start px-12px rounded-4px">
             <img
               class="mr-5px"
               src="@/assets/images/pump/graduated.svg"
@@ -199,7 +248,31 @@
             <span  v-show="isPausedObj.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-5px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
             </span>
-            <span class="bg-[--d-222-l-F2F2F2] py-4px px-10px rounded-4px mr-4px color-[--d-666-l-999] cursor-pointer ml-auto hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.graduated } "  @click="pump_notice[activeChain].graduated = !pump_notice[activeChain].graduated">
+
+            <el-input
+              ref="inputSearch"
+              v-model.trim="pump_query[activeChain].graduated"
+              class="search-input1 px-20px ml-auto mr-4px"
+              size="small"
+              :placeholder="$t('search')"
+              @input="(val) => pump_query[activeChain].graduated = val.replace(/\s/g, '')"
+            >
+              <template #prefix>
+                <Icon
+                  class="text-12px text-[var(--d-666-l-999)]"
+                  name="custom:search"
+                />
+              </template>
+              <template #suffix>
+                <Icon
+                  v-if="pump_query[activeChain].graduated"
+                  name="pajamas:clear"
+                  class="color-[--d-666-l-999] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  @click="pump_query[activeChain].graduated = ''"
+                />
+              </template>
+            </el-input>
+            <span class="bg-[--d-222-l-F2F2F2] py-4px px-10px rounded-4px mr-4px color-[--d-666-l-999] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.graduated } "  @click="pump_notice[activeChain].graduated = !pump_notice[activeChain].graduated">
               <Icon
               name="icon-park-solid:volume-notice"
               class="text-12px"
@@ -228,7 +301,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core'
+import { useStorage, useDebounceFn } from '@vueuse/core'
 import QuickSwapSet from '@/components/quickSwap/quickSwapSet.vue'
 import PumpList from './pumpList.vue'
 import Setting from './setting.vue'
@@ -244,6 +317,12 @@ import type {
 } from '@/api/types/pump'
 import { throttle } from 'lodash-es'
 import { isJSON, formatUrl, usePumpTableDataFetching } from '@/utils/index'
+const Timer = {
+  new: null,
+  soon: null,
+  graduated: null
+}
+const route = useRoute()
 const { t } = useI18n()
 const wsStore = useWSStore()
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
@@ -257,9 +336,36 @@ const { pumpSetting, token_logo_url, pumpBlackList } = storeToRefs(globalStore)
 
 const pumpConfig = shallowRef<PumpConfig[]>()
 const isRotate = ref(false)
-
-
-
+const pump_count = shallowRef({
+  solana: {
+      new: 0,
+      soon: 0,
+      graduated: 0
+    }
+    ,
+    bsc: {
+      new: 0,
+      soon: 0,
+      graduated: 0
+    }
+})
+const pump_query  = useStorage(
+  'pump_query',
+  {
+    solana: {
+      new: '',
+      soon: '',
+      graduated: ''
+    }
+    ,
+    bsc: {
+      new: '',
+      soon: '',
+      graduated: ''
+    }
+  },
+  localStorage
+)
 
 const pumpFilter_bsc_new = usePumpTableDataFetching('pumpFilter_bsc_new')
 const pumpFilter_bsc_soon = usePumpTableDataFetching('pumpFilter_bsc_soon')
@@ -275,7 +381,7 @@ const pumpFilter_solana_graduated = usePumpTableDataFetching(
 )
 const pump_solana_platforms = useStorage(
   'pump_solana_platforms',
-  ['pump', 'moonshot', 'raydium'],
+  ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk'],
   localStorage
 )
 
@@ -352,8 +458,7 @@ const list1 = computed(() => {
       (item) =>
         !pumpBlackList.value?.some(
           (i) =>
-            i.address == item.token ||
-            i.address == item.symbol
+            (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword')
         )
     )
   }
@@ -361,13 +466,12 @@ const list1 = computed(() => {
   const pumpFilter_new = localStorage.getItem(
     `pumpFilter_${activeChain.value}_new`
   )
+
   const wsList = getFilterData(list1, pumpFilter_new)
   const wsList1 = wsList?.filter(i => !list?.some(j => j.pair === i.pair))
-  if(pump_notice.value[activeChain.value].new && pumpAudio.value && wsList1.length >0) {
-    pumpAudio.value.play()
-  }
   return [...wsList1, ...list]
 })
+
 const list2 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.soon || []
   if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
@@ -375,20 +479,16 @@ const list2 = computed(() => {
       (item) =>
         !pumpBlackList.value?.some(
           (i) =>
-            i.address == item.token ||
-            i.address == item.symbol
+          (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword')
         )
     )
   }
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'soon' && i.chain === activeChain.value)
-  const pumpFilter_new = localStorage.getItem(
+  const pumpFilter_soon = localStorage.getItem(
     `pumpFilter_${activeChain.value}_soon`
   )
-  const wsList = getFilterData(list1, pumpFilter_new)
+  const wsList = getFilterData(list1, pumpFilter_soon)
   const wsList1 = wsList?.filter(i => !list?.some(j => j.pair === i.pair))
-  if(pump_notice.value[activeChain.value].soon && pumpAudio.value && wsList1.length >0) {
-    pumpAudio.value.play()
-  }
   return [...wsList1, ...list]
 })
 const list3 = computed(() => {
@@ -398,26 +498,37 @@ const list3 = computed(() => {
       (item) =>
         !pumpBlackList.value?.some(
           (i) =>
-          i.address == item.token ||
-          i.address == item.symbol
+          (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword')
         )
     )
   }
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'graduated' && i.chain === activeChain.value)
-  const pumpFilter_new = localStorage.getItem(
+  const pumpFilter_graduated= localStorage.getItem(
     `pumpFilter_${activeChain.value}_graduated`
   )
-  const wsList = getFilterData(list1, pumpFilter_new)
+  const wsList = getFilterData(list1, pumpFilter_graduated)
   const wsList1 = wsList?.filter(i => !list?.some(j => j.pair === i.pair))
-  if(pump_notice.value[activeChain.value].graduated && pumpAudio.value && wsList1.length >0) {
+  return [...wsList1, ...list]
+})
+watch(() => list1.value?.[0]?.target_token, (val) => {
+  if(pump_notice.value[activeChain.value].new && pumpAudio.value && val) {
     pumpAudio.value.play()
   }
-  return [...wsList1, ...list]
+})
+watch(() => list2.value?.[0]?.target_token, (val) => {
+  if(pump_notice.value[activeChain.value].new && pumpAudio.value && val) {
+    pumpAudio.value.play()
+  }
+})
+watch(() => list3.value?.[0]?.target_token, (val) => {
+  if(pump_notice.value[activeChain.value].new && pumpAudio.value && val) {
+    pumpAudio.value.play()
+  }
 })
 watch(pump_solana_platforms, () => {
   getPumpList()
 })
-watch(activeChain, (val) => {
+watch(activeChain, () => {
   getPumpList()
   wsTableListCache.value = []
   wsTableList.value = []
@@ -441,6 +552,45 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
     wsUpdateTableList(val)
   }
 })
+
+watch(()=>pump_query.value[activeChain.value].new, () => {
+  debouncedFetch('new')
+}, { deep: true })
+watch(()=>pump_query.value[activeChain.value].soon, () => {
+  debouncedFetch('soon')
+}, { deep: true })
+watch(()=>pump_query.value[activeChain.value].graduated, () => {
+  debouncedFetch('graduated')
+}, { deep: true })
+
+const debouncedFetch = useDebounceFn((type)=>search(type), 500)
+function search(type: string) {
+  if (type == 'new') {
+    const pumpFilter_new = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
+    const params1 = {
+      category: 'new',
+      ...(pumpFilter_new ? JSON.parse(pumpFilter_new) : ''),
+    }
+    getPump(params1, true)
+  }
+  if (type == 'soon') {
+    const pumpFilter_soon = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
+    const params2 = {
+      category: 'soon',
+      ...(pumpFilter_soon ? JSON.parse(pumpFilter_soon) : ''),
+    }
+    getPump(params2, true)
+  }
+  if (type == 'graduated') {
+    const pumpFilter_graduated = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
+    const params3 = {
+      category: 'graduated',
+      ...(pumpFilter_graduated ? JSON.parse(pumpFilter_graduated) : ''),
+    }
+    getPump(params3, true)
+  }
+}
+
 onMounted(() => {
   document.addEventListener('mousemove', mouseInsideTxs)
   getPumpConfig()
@@ -515,6 +665,9 @@ function wsUpdateTableList(wsList: WSPump[]) {
       i.pair.target_token == i.pair.token0_address
         ? i?.pair.token0_symbol
         : i?.pair.token1_symbol,
+    name:  i.target_token == i.token0_address
+          ? i?.token0_name
+          : i?.token1_name,
     logo_url:
     i.target_token == i.pair.token0_address
       ? i?.pair.token0_logo_url
@@ -573,7 +726,7 @@ function getPumpConfig() {
   })
 }
 function handlerFilterConfirm(
-  val: { progress_min: string | undefined; progress_max: string | undefined },
+  val: { progress_min: string | undefined, progress_max: string | undefined },
   type: string
 ) {
   console.log('handlerFilterConfirm', val, type)
@@ -628,8 +781,22 @@ function getPumpList(isFilter = false) {
 
 function getPump(params, isFilter = false) {
   const chain = activeChain.value
+  if (Timer[params.category]) {
+    clearTimeout(Timer[params.category])
+    Timer[params.category] = null
+  }
+
+  if ((isPausedObj.value[params.category] || route.name !== 'pump') && !isFilter) {
+    Timer[params.category] = setTimeout(() => {
+      getPump(params)
+    }, 5000)
+    return
+  }
   params.chain = chain
-  loading[chain + '-' + params.category] = true
+  if (pump_count.value[chain][params.category] === 0) {
+    loading[chain + '-' + params.category] = true
+  }
+
   if (chain === 'solana') {
     if (!pump_solana_platforms?.value?.length) {
       params.platforms = 'pump,moonshot'
@@ -640,119 +807,133 @@ function getPump(params, isFilter = false) {
     params.platforms = undefined
   }
 
+  if (pump_query.value[chain][params.category]) {
+    if (isFilter) {
+      params.q = params.q + pump_query.value[activeChain.value][params.category]
+    } else {
+      params.q =  pump_query.value[activeChain.value][params.category]
+    }
+  }
+  if (params.has_sm) {
+    params.has_sm = true
+    if (params?.sm_list?.length > 0) {
+      delete params?.sm_list
+    }
+  }
+  if (!params.has_sm && Array.isArray(params?.sm_list) && params?.sm_list?.length > 0) {
+    params.sm_list =  params?.sm_list.join(',')
+  }
+  params = Object.fromEntries(
+    Object.entries(params).filter(([_, value]) => value != null && value !== '' && Boolean(value))
+  )
   _getPumpList(params)
     .then((res) => {
       const list = (res || [])?.map?.((i) => {
-        let signal_arr = []
-        let normal_tag = []
-        if (i.dynamic_tag) {
-          const tag_arr = JSON.parse(i.dynamic_tag) || []
-          signal_arr = tag_arr?.filter((i) => i?.startsWith('signal'))
-          signal_arr = signal_arr?.map((y) => ({
-            tag:
-              y?.split('-')[5] &&
-              (y?.split('-')[1] == 'whale_sell' ||
-                y?.split('-')[1] == 'whale_buy')
-                ? `${y?.split('-')[1]}_trump`
-                : y?.split('-')[1],
-            color: y?.split('-')[2],
-            n: y?.split('-')[3],
-            timestamp: y?.split('-')[4],
-          }))
-          signal_arr?.sort((a, b) => b.timestamp - a.timestamp)
-          const kol_arr = signal_arr.filter(
-            (item, index) =>
-              signal_arr.findIndex((el) =>
-                new RegExp('^kol_.*$', 'gi').test(el.tag)
-              ) == index
-          )
-          const dev_arr = signal_arr.filter(
-            (item, index) =>
-              signal_arr.findIndex((el) =>
-                new RegExp('^dev_.*$', 'gi').test(el.tag)
-              ) == index
-          )
-          const smarter_arr = signal_arr.filter(
-            (item, index) =>
-              signal_arr.findIndex((el) =>
-                new RegExp('^smarter_.*$', 'gi').test(el?.tag)
-              ) == index
-          )
-          const whale_arr = signal_arr.filter(
-            (item, index) =>
-              signal_arr.findIndex((el) =>
-                new RegExp('^whale_.*$', 'gi').test(el.tag)
-              ) == index
-          )
-          const other_arr = signal_arr?.filter(
-            (el) =>
-              !new RegExp('^dev_|kol_|smarter_|whale_.*$', 'gi').test(el.tag)
-          )
-          signal_arr = kol_arr
-            ?.concat(dev_arr)
-            ?.concat(smarter_arr)
-            ?.concat(whale_arr)
-            ?.concat(other_arr)
-          signal_arr?.sort((a, b) => b.timestamp - a.timestamp)
-          normal_tag = tag_arr.filter((i) => !i?.startsWith('signal'))
-        }
-        // if (i.tag) {
-        //   let tag = i.tag?.split(',') || []
-        //   let tag1 = tag.filter(i=> i !=='pump' && i !=='moonshot')  || []
-        //   normal_tag = tag1.concat(normal_tag)
+        // let signal_arr = []
+        // let normal_tag = []
+        // if (i.dynamic_tag) {
+        //   const tag_arr = JSON.parse(i.dynamic_tag) || []
+        //   signal_arr = tag_arr?.filter((i) => i?.startsWith('signal'))
+        //   signal_arr = signal_arr?.map((y) => ({
+        //     tag:
+        //       y?.split('-')[5] &&
+        //       (y?.split('-')[1] == 'whale_sell' ||
+        //         y?.split('-')[1] == 'whale_buy')
+        //         ? `${y?.split('-')[1]}_trump`
+        //         : y?.split('-')[1],
+        //     color: y?.split('-')[2],
+        //     n: y?.split('-')[3],
+        //     timestamp: y?.split('-')[4],
+        //   }))
+        //   signal_arr?.sort((a, b) => b.timestamp - a.timestamp)
+        //   const kol_arr = signal_arr.filter(
+        //     (item, index) =>
+        //       signal_arr.findIndex((el) =>
+        //         new RegExp('^kol_.*$', 'gi').test(el.tag)
+        //       ) == index
+        //   )
+        //   const dev_arr = signal_arr.filter(
+        //     (item, index) =>
+        //       signal_arr.findIndex((el) =>
+        //         new RegExp('^dev_.*$', 'gi').test(el.tag)
+        //       ) == index
+        //   )
+        //   const smarter_arr = signal_arr.filter(
+        //     (item, index) =>
+        //       signal_arr.findIndex((el) =>
+        //         new RegExp('^smarter_.*$', 'gi').test(el?.tag)
+        //       ) == index
+        //   )
+        //   const whale_arr = signal_arr.filter(
+        //     (item, index) =>
+        //       signal_arr.findIndex((el) =>
+        //         new RegExp('^whale_.*$', 'gi').test(el.tag)
+        //       ) == index
+        //   )
+        //   const other_arr = signal_arr?.filter(
+        //     (el) =>
+        //       !new RegExp('^dev_|kol_|smarter_|whale_.*$', 'gi').test(el.tag)
+        //   )
+        //   signal_arr = kol_arr
+        //     ?.concat(dev_arr)
+        //     ?.concat(smarter_arr)
+        //     ?.concat(whale_arr)
+        //     ?.concat(other_arr)
+        //   signal_arr?.sort((a, b) => b.timestamp - a.timestamp)
+        //   normal_tag = tag_arr.filter((i) => !i?.startsWith('signal'))
         // }
-        normal_tag =
-          normal_tag?.map((i) => ({
-            tag: i,
-            color: 'green',
-            showText: false,
-          })) || []
+        // normal_tag =
+        //   normal_tag?.map((i) => ({
+        //     tag: i,
+        //     color: 'green',
+        //     showText: false,
+        //   })) || []
 
-        let tag_arr = []
-        if (i.tag) {
-          tag_arr = i.tag?.split(',') || []
-        }
-        const is_rug_pull =
-          signal_arr?.some((i) => new RegExp('rug_pull', 'gi').test(i?.tag)) ||
-          normal_tag?.some((i) => new RegExp('rug_pull', 'gi').test(i?.tag))
-        const is_shit_coins =
-          signal_arr?.some((i) => new RegExp('shitcoin', 'gi').test(i?.tag)) ||
-          normal_tag?.some((i) => new RegExp('shitcoin', 'gi').test(i.tag))
-        if (i.risk_score >= 100 && i.chain == 'solana') {
-          signal_arr = []
-          normal_tag = [
-            {
-              tag: 'flag_dangerous',
-              color: 'red',
-              showText: true,
-            },
-          ]
-        } else if (is_rug_pull) {
-          signal_arr = []
-          normal_tag = [
-            {
-              tag: 'flag_rug_pull',
-              color: 'red',
-              showText: true,
-            },
-          ]
-        } else if (is_shit_coins) {
-          signal_arr = []
-          normal_tag = [
-            {
-              tag: 'flag_shit_coins',
-              color: 'red',
-              showText: true,
-            },
-          ]
-        }
-        if (i.cto_flag == 1) {
-          normal_tag.unshift({
-            tag: 'cto_flag',
-            color: 'green',
-            showText: false,
-          })
-        }
+        // let tag_arr = []
+        // if (i.tag) {
+        //   tag_arr = i.tag?.split(',') || []
+        // }
+        // const is_rug_pull =
+        //   signal_arr?.some((i) => new RegExp('rug_pull', 'gi').test(i?.tag)) ||
+        //   normal_tag?.some((i) => new RegExp('rug_pull', 'gi').test(i?.tag))
+        // const is_shit_coins =
+        //   signal_arr?.some((i) => new RegExp('shitcoin', 'gi').test(i?.tag)) ||
+        //   normal_tag?.some((i) => new RegExp('shitcoin', 'gi').test(i.tag))
+        // if (i.risk_score >= 100 && i.chain == 'solana') {
+        //   signal_arr = []
+        //   normal_tag = [
+        //     {
+        //       tag: 'flag_dangerous',
+        //       color: 'red',
+        //       showText: true,
+        //     },
+        //   ]
+        // } else if (is_rug_pull) {
+        //   signal_arr = []
+        //   normal_tag = [
+        //     {
+        //       tag: 'flag_rug_pull',
+        //       color: 'red',
+        //       showText: true,
+        //     },
+        //   ]
+        // } else if (is_shit_coins) {
+        //   signal_arr = []
+        //   normal_tag = [
+        //     {
+        //       tag: 'flag_shit_coins',
+        //       color: 'red',
+        //       showText: true,
+        //     },
+        //   ]
+        // }
+        // if (i.cto_flag == 1) {
+        //   normal_tag.unshift({
+        //     tag: 'cto_flag',
+        //     color: 'green',
+        //     showText: false,
+        //   })
+        // }
         return {
           ...i,
           id: `${i.target_token}-${i.chain}`,
@@ -763,6 +944,9 @@ function getPump(params, isFilter = false) {
             i.target_token == i.token0_address
               ? i?.token0_symbol
               : i?.token1_symbol,
+          name:  i.target_token == i.token0_address
+              ? i?.token0_name
+              : i?.token1_name,
           logo_url:
             i.target_token == i.token0_address
               ? i?.token0_logo_url
@@ -782,9 +966,9 @@ function getPump(params, isFilter = false) {
               ? i.reserve0 * i.token0_price_usd * 2
               : i.reserve1 * i.token1_price_usd * 2,
           medias: getMedias(i.appendix),
-          normal_tag: normal_tag?.slice(0, 3) || [],
-          signal_arr: signal_arr?.slice(0, 1) || [],
-          tag_arr,
+          // normal_tag: normal_tag?.slice(0, 3) || [],
+          // signal_arr: signal_arr?.slice(0, 1) || [],
+          // tag_arr,
         }
       })
       fourmemeListObj[activeChain.value][params.category as CategoryKey] = list
@@ -792,10 +976,13 @@ function getPump(params, isFilter = false) {
         wsTableListCache?.value.filter?.(
           (i) => !list?.some?.((j) => j?.pair === i?.pair)
         ) || []
-      console.log('------res--------', res)
     })
     .finally(() => {
       loading[chain + '-' + params.category] = false
+      pump_count.value[chain][params.category] ++
+      Timer[params.category] = setTimeout(() => {
+            getPump(params)
+          }, 5000)
     })
 }
 function getMedias(appendix: string) {
@@ -833,32 +1020,36 @@ function getMedias(appendix: string) {
   return []
 }
 function getFilterData(list, conditions) {
-      // 筛选条件
-      // dev_sale_out: 0,
-      // market_cap_min: '', // 市值
-      // market_cap_max: '',
-      // progress_min: '', //进度
-      // progress_max: '',
-      // volume_u_24h_min: '', //交易额
-      // volume_u_24h_max: '',
-      // dev_balance_ratio_cur_min: '', //dev 持仓%
-      // dev_balance_ratio_cur_max: '',
-      // holders_top10_ratio_min: '', //top10 持仓%
-      // holders_top10_ratio_max: '',
-      // tvl_min: '',
-      // tvl_max: '',
-      // holder_min: '', //持有人
-      // holder_max: '',
-      // tx_24h_count_min: '',
-      // tx_24h_count_max: '',
-      // smart_money_tx_count_24h_min: '', // 聪明钱交易数 （买入数+卖出数）
-      // smart_money_tx_count_24h_max: ''
-
+      conditions = JSON.parse(conditions)
       return list?.filter((i) => {
         let pass = true
+        if (conditions?.q) {
+          const arr = conditions?.q.split(',')
+          pass = pass && arr?.findIndex(y=> i.target_token == y || i.name == y || i.symbol == y) !== -1
+        }
         if (conditions?.dev_sale_out) {
           pass = pass && !Number(i?.dev_balance_ratio_cur)
         }
+        if (conditions?.progress_min) {
+          pass = pass && i.progress >= Number(conditions.progress_min)
+        }
+        if (conditions?.progress_max) {
+          pass = pass && i.progress <= Number(conditions.progress_max)
+        }
+        if (conditions?.lage) {
+          pass = pass && (new Date().getTime()/1000- i.time)/60 >= Number(conditions.lage)
+        }
+        if (conditions?.rage) {
+          pass = pass && (new Date().getTime()/1000- i.time)/60 <= Number(conditions.rage)
+        }
+
+        if (conditions?.progress_min) {
+          pass = pass && i.progress >= Number(conditions.progress_min)
+        }
+        if (conditions?.progress_max) {
+          pass = pass && i.progress <= Number(conditions.progress_max)
+        }
+
         if (conditions?.market_cap_min) {
           pass = pass && i.market_cap >= Number(conditions.market_cap_min)
         }
@@ -893,12 +1084,7 @@ function getFilterData(list, conditions) {
         if (conditions?.holder_max) {
           pass = pass && (i?.holder || 0) <= Number(conditions.holder_max)
         }
-        if (conditions?.progress_min) {
-          pass = pass && i.progress >= Number(conditions.progress_min)
-        }
-        if (conditions?.progress_max) {
-          pass = pass && i.progress <= Number(conditions.progress_max)
-        }
+
         if (conditions?.volume_u_24h_min) {
           pass = pass && i.volume_u_24h >= Number(conditions.volume_u_24h_min)
         }
@@ -964,5 +1150,54 @@ function getFilterData(list, conditions) {
   justify-content: flex-start;
   font-size: 12px;
   font-weight: 500;
+}
+:deep().search-input1 {
+  background: var(--d-222-l-F2F2F2);
+  padding: 2px;
+  width: 200px;
+  border-radius: 4px;
+  border: none;
+  .el-input__wrapper {
+    background-color: transparent;
+    box-shadow: none;
+    &.is-focus {
+      box-shadow: 0 0 0 1px #3F80F7 inset;
+    }
+    .el-input__inner::placeholder {
+      color: var(--d-666-l-999);
+    }
+  }
+}
+/* 修改 hover 效果：背景色 + 字体颜色 */
+// ::v-deep(.el-checkbox) {
+//   width: 100%;
+//   &:hover {
+//     color: #409EFF;
+//     background-color: #f0f9ff;
+//     border-radius: 4px;
+//     transition: all 0.2s;
+//   }
+
+// }
+::v-deep(.el-checkbox ) {
+  .el-checkbox__label {
+    color: var(--d-666-l-999);
+  }
+  .el-checkbox__inner{
+    // border-color: var(--d-333-l-CCC);
+  }
+  .el-checkbox__input{
+    &.is-checked{
+      .el-checkbox__inner{
+        // background: var(--d-333-l-CCC);
+        // border-color: var(--d-333-l-CCC);
+      }
+      &+ .el-checkbox__label {
+        color: var(--d-F5F5F5-l-333)
+      }
+    }
+  }
+
+  color: var(--d-F5F5F5-l-333);
 }
 </style>

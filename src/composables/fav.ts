@@ -30,9 +30,10 @@ function confirmChangeName(type = 'add') {
 
 function addTokenFavoriteGroup(value: string, resolve: (value: unknown) => void, reject: () => void) {
   const {evmAddress} = useBotStore()
+  const {address} = useWalletStore()
   const {$i18n} = useNuxtApp()
   const loading = ElLoading.service()
-  addFavoriteGroup(value, evmAddress).then(() => {
+  addFavoriteGroup(value, evmAddress || address).then(() => {
     ElMessage.success($i18n.t('success'))
     resolve(true)
   }).catch(err => {

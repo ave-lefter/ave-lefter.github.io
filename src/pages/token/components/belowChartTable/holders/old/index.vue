@@ -270,7 +270,6 @@ function getTop100range() {
   loadingTop100Range.value = true
   _getTop100range(id.value)
     .then((res) => {
-      // console.log('--------------------res-----------------------------', res)
       top100range.value = Array.isArray(res) ? res?.map(i => ({
         ...i,
         date: i?.date?.slice(5)
@@ -290,7 +289,6 @@ function getTop100balance() {
   }
   _getTop100balance(paramas)
     .then((res) => {
-      console.log('--------------------res-----------------------------', res)
       top100balance.value = Array.isArray(res)
         ? res?.map((i) => ({
             ...i,
@@ -342,7 +340,6 @@ function getAllTagsStats() {
   }
   _getAllTagsStats(paramas)
     .then((res) => {
-      console.log('--------------------res-----------------------------', res)
       insidersObj.value = res
     })
     .catch(() => {})

@@ -140,10 +140,15 @@ const editHide = () => {
 const handleUpdateGroupConfirm = async (item: any, index: number) => {
   if (!groupValue.value.trim()) return ElMessage.error(t('enterGroupName'))
   if (groupValue.value.length > 20) return ElMessage.error(t('maximum10characters'))
-  await changeFavoriteGroupName(groupValue.value, item.value, addressValue.value)
-  ElMessage.success(t('success'))
-  editGroupPopoverRef.value[index]?.hide()
-  getGroupList()
+  try {
+    await changeFavoriteGroupName(groupValue.value, item.value, addressValue.value)
+    ElMessage.success(t('success'))
+    editGroupPopoverRef.value[index]?.hide()
+    getGroupList()
+  } catch (err) {
+    console.log(err)
+    // ElMessage.error(err)
+  }
 }
 
 // 处理移动分组
@@ -287,29 +292,33 @@ onMounted(() => {
     <div v-if="botStore.evmAddress || walletStore.address"
       class="flex items-center px-12px mt-12px gap-8px overflow-x-auto scrollbar-hide">
       <div v-for="(item, index) in allTabsGroup" :key="item.value"
-        class="cursor-pointer text-12px color-[--d-999-l-666] bg-[--d-15171c-l-f2f2f2] px-12px py-4px rounded-4px shrink-0 flex items-center"
+        class="cursor-pointer text-12px color-[--d-999-l-666] bg-[--d-15171c-l-f2f2f2] px-12px h-28px rounded-4px shrink-0 flex items-center"
         :class="[activeTab === item.value && 'bg-[--d-333-l-0A0B0C] color-[#F5F5F5]']"
         @click="setActiveTab(item.value)">
         {{ item.label }}
         <el-popover trigger="click" @hide="editHide" ref="editGroupPopoverRef" :width="editId ? 250 : 100"
-          popper-style="min-width: 86px;">
+          popper-style="min-width: 86px;padding: 10px 0;">
           <template #reference>
             <Icon @click.stop v-if="item.value > 0" name="custom:set-up" class="text-12px ml-2px" />
           </template>
           <div>
             <div v-if="!editId">
-              <div class="flex items-center cursor-pointer w-100px" @click.stop="handleUpdateGroup(item)">
+              <div
+                class="flex items-center cursor-pointer hover:bg-[--d-333-l-0A0B0C] hover:color-[#F5F5F5] px-10px py-5px"
+                @click.stop="handleUpdateGroup(item)">
                 <Icon name="fe:edit" class="color-#666 text-14px" />
                 <view class="ml-4px text-14px">{{ t('rename') }}</view>
               </div>
-              <div class="flex items-center cursor-pointer w-100px mt-12px" @click.stop="handleDeleteGroup(item.value)">
+              <div
+                class="flex items-center cursor-pointer hover:bg-[--d-333-l-0A0B0C] hover:color-[#F5F5F5] px-10px py-5px"
+                @click.stop="handleDeleteGroup(item.value)">
                 <Icon name="bx:bxs-trash-alt" class="text-15px color-#666" />
                 <view class="ml-4px text-14px">{{ t('delete') }}</view>
               </div>
             </div>
-            <div v-else>
+            <div v-else class="px-15px">
               <div>{{ t('rename') }}</div>
-              <el-input v-model="groupValue" :placeholder="t('enterGroupName')" class="mt-8px w-200px" />
+              <el-input v-model="groupValue" :placeholder="t('enterGroupName')" class="mt-8px w-100%" />
               <div class="flex items-center justify-between mt-12px gap-12px">
                 <div @click="editGroupPopoverRef[index]?.hide()"
                   class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[--d-333-l-0A0B0C] px-12px py-8px rounded-4px">
@@ -330,7 +339,7 @@ onMounted(() => {
         <template #reference>
           <!-- 新增 -->
           <div style="background: rgba(63, 128, 247, 0.10);" @click="editId = undefined"
-            class="cursor-pointer text-12px color-[#3F80F7] px-12px py-4px rounded-4px shrink-0 flex items-center">
+            class="cursor-pointer text-12px color-[#3F80F7] px-12px h-28px rounded-4px shrink-0 flex items-center">
             <Icon name="custom:add-icon" class="text-12px mr-2px" />
             {{ t('newGroup') }}
           </div>
@@ -354,7 +363,7 @@ onMounted(() => {
       <el-popover trigger="click" @hide="moveValue = ''" ref="moveGroupPopoverRef" :width="250">
         <template #reference>
           <div style="background: rgba(63, 128, 247, 0.10);" @click="handleMoveGroup"
-            class="cursor-pointer text-12px color-[#3F80F7] px-12px py-4px rounded-4px shrink-0 flex items-center">
+            class="cursor-pointer text-12px color-[#3F80F7] px-12px h-28px rounded-4px shrink-0 flex items-center">
             <Icon name="custom:list-icon" class="text-12px mr-2px" />
             {{ t('groupManage') }}
           </div>
@@ -386,12 +395,22 @@ onMounted(() => {
     <el-table class='mt-12px' v-loading="loading" height="calc(100vh - 250px)" :data="tableList" fit
       @sort-change="handleSortChange" @row-click="tableRowClick">
       <template #empty>
-        <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
-          <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
-          <img v-if="mode === 'dark'" src="@/assets/images/empty-black.svg">
-          <span>{{ t('emptyNoData') }}</span>
+        <div v-if="botStore.evmAddress || walletStore.address">
+          <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
+            <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
+            <img v-if="mode === 'dark'" src="@/assets/images/empty-black.svg">
+            <span>{{ t('emptyNoData') }}</span>
+          </div>
+          <span v-else />
         </div>
-        <span v-else />
+        <AveEmpty v-else>
+          <span class="text-12px mt-10px">{{ $t('noWalletTip') }}</span>
+          <el-button type="primary" class="mt-10px" @click="botStore.$patch({
+            connectVisible: true
+          })">
+            {{ $t('connectWallet') }}
+          </el-button>
+        </AveEmpty>
       </template>
 
       <el-table-column :label="t('poolPair')" min-width="160" show-overflow-tooltip>
@@ -424,8 +443,8 @@ onMounted(() => {
               <div class="ml-5px">
                 <div class="flex items-center">
                   <span class="text-13px">{{ row.symbol }}</span>
-                  <div class="text-8px text-[--d-666-l-999] ml-4px">
-                    {{ row?.token?.replace(new RegExp('(.{4})(.+)(.{4}$)'), '$1...$3') }}
+                  <div class="text-12px text-[--d-666-l-999] ml-4px">
+                    {{ `[*${row?.token?.slice(-6)}]` }}
                   </div>
                   <Icon @click.stop.prevent v-copy="row?.token" name="bxs:copy"
                     class="ml-4px clickable text-[--d-666-l-999]" />
@@ -433,7 +452,7 @@ onMounted(() => {
                   <a class="ml-4px"
                     :href="`https://x.com/search?q=(${row?.symbol}OR${row?.token})&src=typed_query&f=live`"
                     target="_blank" @click.stop>
-                    <Icon class="text-[--d-666-l-999] h-12px w-12px" name="ep:search" />
+                    <Icon class="text-[--d-666-l-999] h-12px w-12px" name="custom:search"/>
                   </a>
                 </div>
                 <div class="flex items-center mt-2px">
@@ -473,6 +492,12 @@ onMounted(() => {
           <span v-html="'$' + formatNumber2(row.current_price_usd)"></span>
         </template>
       </el-table-column>
+      <el-table-column :label="t('marketCap')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
+        prop="pool_circulating_supply" align="right">
+        <template #default="{ row }">
+          ${{ formatNumber2(row.pool_circulating_supply || 0, 2, 4, 10 ** 4) }}
+        </template>
+      </el-table-column>
       <el-table-column label="24h%" sortable="custom" :sort-orders="['descending', 'ascending', null]"
         prop="price_change_24h" align="right">
         <template #default="{ row }">
@@ -508,16 +533,17 @@ onMounted(() => {
       </el-table-column>
       <el-table-column :label="t('tokenGroup')" align="right">
         <template #default="{ row }">
-          <el-select v-model="row.group_id" popper-class="follow-select-popper" filterable @click.stop
-            @change="(val) => getRowGroupChange(val, row)">
+          <el-select v-model="row.group_id" style="width: 100px;" popper-class="follow-select-popper" filterable
+            @click.stop @change="(val) => getRowGroupChange(val, row)">
             <el-option v-for="item in allTabsGroup" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-pagination class="mt-15px" v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize"
-      layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getList" />
+    <el-pagination class="mt-15px" v-if="pageData.total > 1" v-model:current-page="pageData.page"
+      v-model:page-size="pageData.pageSize" layout="prev, pager, next, ->" :total="pageData.total"
+      :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getList" />
 
     <el-popover :visible="visibleShow" :virtual-ref="virtualRef" virtual-triggering trigger="click" :width="250">
       <div>
@@ -541,12 +567,22 @@ onMounted(() => {
 
 <style lang="scss">
 .follow-select-popper {
+  background: var(--d-222-l-FFF) !important;
+
   .el-select-dropdown {
-    background: var(--d-17191C-l-FFF);
+    background: var(--d-222-l-FFF);
+  }
+
+  .el-select__wrapper {
+    background: var(--d-222-l-FFF);
+  }
+
+  .el-select-dropdown__item.is-hovering {
+    background: var(--d-333-l-f5f7fa);
   }
 
   .el-popper__arrow::before {
-    background: var(--d-17191C-l-FFF) !important;
+    background: var(--d-222-l-FFF) !important;
   }
 }
 </style>
@@ -576,5 +612,9 @@ onMounted(() => {
 
 :deep(.el-table .caret-wrapper) {
   width: 16px;
+}
+
+:deep(.el-table) {
+  --el-table-row-hover-bg-color: var(--d-1A1A1A-l-fafafa);
 }
 </style>

@@ -3,11 +3,11 @@
     <div class="wc-qr-container flex items-center justify-center h-320px">
       <el-skeleton :loading="loading" animated>
         <template #template>
-          <el-skeleton-item variant="rect" class="w-320px! h-320px! rd-8px" />
+          <el-skeleton-item variant="rect" class="w-320px! h-320px! rd-30px" />
         </template>
       </el-skeleton>
       <!-- <img v-show="!loading" id="wc-qr-image" class="h-320px w-320px" :src="qrImgUrl" alt="qrCode"> -->
-      <canvas v-show="!loading" id="wc-qr-canvas" class="rd-8px" />
+      <canvas v-show="!loading" id="wc-qr-canvas" class="rd-30px" />
     </div>
     <div class="text-center text-14px mt-10px">Scan this QR Code with your phone</div>
     <el-divider><span class="color-[--d-999-l-666]">{{ $t('download') }} App</span></el-divider>
@@ -26,7 +26,7 @@
       </a>
     </div>
     <div v-if="walletName === 'AveWallet'" class="flex items-center justify-around">
-      <a class="text-center clickable" target="_blank" href="https://apps.apple.com/sg/app/aveai/id1645676067">
+      <a class="text-center clickable" target="_blank" href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN">
         <div class="mb-5px">
           <Icon name="simple-icons:apple" class="text-20px" />
         </div>
@@ -86,7 +86,7 @@ function drawQrCode() {
     content: props.uri,
     width: 320,
     nodeQrCodeOptions: {
-      margin: themeStore.isDark ? 2 : 1,
+      margin: themeStore.isDark ? 6 : 2,
       errorCorrectionLevel: 'H',
       color: {
         dark: '#333333', //前景色
@@ -96,7 +96,7 @@ function drawQrCode() {
     logo: {
       src: props.walletName ? (logos?.[props.walletName] || binanceLogo) : binanceLogo,
       logoRadius: 8,
-      logoSize: 0.2,
+      logoSize: 0.15,
       borderColor: '#fff',
     },
   }).then(() => {

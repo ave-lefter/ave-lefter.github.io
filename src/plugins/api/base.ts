@@ -27,10 +27,10 @@ export function onRequest({ options, request }: MyFetchContext) {
 
   if (url?.includes('/v1api/') || url.startsWith('/v2api/')) {
     const analogDeviceId = localStorage.getItem('analogDeviceId')
-    if (analogDeviceId) {
+    if (analogDeviceId && !url?.includes('/botapi')) {
       options.headers.set('ave-udid', analogDeviceId)
     }
-    const currentAccount = localStorage.getItem('walletAddress')
+    const currentAccount = useWalletStore().address
     if (currentAccount) {
       const signature = useWalletStore().walletSignature?.[currentAccount] || ''
       if (signature) {
@@ -51,18 +51,35 @@ export function onRequest({ options, request }: MyFetchContext) {
       options.headers.set('Authorization', `Bearer ${accessToken}`)
     }
   }
+  if (url?.includes('/aveswap/v1/sui')) {
+    const ave_token = localStorage.ave_token
+    if (ave_token) {
+      options.headers.set('X-Auth', ave_token)
+      options.headers.delete('lang')
+    }
+  }
 }
 
-export function onResponse({ response }: MyFetchContext) {
+export function onResponse({ response, request }: MyFetchContext) {
   // 全局响应处理
   if (!response) {
     return
   }
   const data = response._data
-  if (data?.status === 0) {
-    // return Promise.reject(data?.msg)
-    throw new Error(data?.msg)
+  if ((request as string)?.includes('/aveswap/v1/sui/')) {
+    if (data?.status === 0) {
+      response._data = data?.data || data
+      return
+    } else {
+      throw new Error(data?.msg)
+    }
+  } else {
+    if (data?.status === 0 && data?.msg !== 'Success') {
+      // return Promise.reject(data?.msg)
+      throw new Error(data?.msg)
+    }
   }
+
   if (data?.data_type === 1 && typeof(data?.data) === 'string' && data?.data) {
     response._data = JSON.parse(data?.data)
     return

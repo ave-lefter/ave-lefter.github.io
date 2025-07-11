@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang='ts'>
-import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, VisiblePlotsSet, LanguageCode, ChartingLibraryFeatureset, SubscribeBarsCallback } from '~/types/tradingview/charting_library'
+import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, VisiblePlotsSet, LanguageCode, ChartingLibraryFeatureset, SubscribeBarsCallback, LibrarySymbolInfo } from '~/types/tradingview/charting_library'
 import { getTimezone, formatDecimals, getSwapInfo, getAddressAndChainFromId, getWSMessage } from '@/utils'
 import { getKlineHistoryData } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
@@ -381,8 +381,8 @@ async function initChart() {
           const isSupportSecChains = !!(chain.value && supportSecChains?.includes?.(chain.value))
           const symbolUp = symbol.value?.toUpperCase?.() || tokenStore?.token?.symbol || '-'
           const p = Number(price || tokenStore?.price) || 0
-          const symbolInfo = {
-            symbol: symbolUp,
+          const symbolInfo: LibrarySymbolInfo = {
+            // symbol: symbolUp,
             name: symbolUp,
             ticker: symbolUp,
             description: symbolUp?.split?.('---')?.[0] || '',
@@ -390,7 +390,7 @@ async function initChart() {
             timezone: getTimezone() as Timezone,
             format: (showMarket.value ? 'volume' : 'price') as SeriesFormat,
             minmov: 1, // 最小波动
-            minmov2: 0, // 格式化复杂情况下的价格 如价格增量
+            minmove2: 0, // 格式化复杂情况下的价格 如价格增量
             pricescale: p > 0
               ? 10 ** formatDecimals(p).precision
               : 10000000000,

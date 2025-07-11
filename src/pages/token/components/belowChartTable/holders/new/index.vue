@@ -425,7 +425,6 @@ function getHoldersList(sortObj?: { sort_by: string; order: string }) {
   loadingHolders.value = true
   _getHoldersList(params)
     .then((res) => {
-      console.log('--------------------res-----------------------------', res)
       holderListObj.value[activeTab.value] = res?.holderStats || []
       aggregateStatsObj.value[activeTab.value] = res?.aggregateStats || {}
     })
