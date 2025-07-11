@@ -157,36 +157,36 @@ export interface TokenInfoExtra {
 
 
 export interface WalletTokenInfo {
-  token: string,
-  chain: 'bsc' | 'eth' | 'solana' | 'base',
-  logo_url: string,
-  symbol: string,
-  risk_level: number,
-  risk_score: number,
-  main_pair_tvl: number,
-  is_little_pool: number,
-  last_txn_time: string,
-  total_profit: string,
-  total_profit_ratio: string,
-  unrealized_profit: string,
-  unrealized_ratio: string,
-  realized_profit: string,
-  realized_ratio: string,
-  balance_amount: string,
-  balance_usd: string,
-  balance_ratio: string,
-  total_purchase_usd: string,
-  average_purchase_price_usd: string,
-  total_sold_usd: string,
-  average_sold_price_usd: string,
-  total_transfer_in_amount: string,
-  total_transfer_out_amount: string,
-  total_purchase: string,
-  total_sold: string,
-  main_token_price: string,
-  main_token_symbol: string,
-  current_price_usd: string,
-  bought: string,
+  token: string
+  chain: BotChain
+  logo_url: string
+  symbol: string
+  risk_level: number
+  risk_score: number
+  main_pair_tvl: number
+  is_little_pool: number
+  last_txn_time: string
+  total_profit: string
+  total_profit_ratio: string
+  unrealized_profit: string
+  unrealized_ratio: string
+  realized_profit: string
+  realized_ratio: string
+  balance_amount: string
+  balance_usd: string
+  balance_ratio: string
+  total_purchase_usd: string
+  average_purchase_price_usd: string
+  total_sold_usd: string
+  average_sold_price_usd: string
+  total_transfer_in_amount: string
+  total_transfer_out_amount: string
+  total_purchase: string
+  total_sold: string
+  main_token_price: string
+  main_token_symbol: string
+  current_price_usd: string
+  bought: string
   sold: string
 }
 

@@ -18,25 +18,25 @@
               <div class="relative">
                 <el-image class="w-32px h-32px rounded-full" :src="getSymbolDefaultIcon({
                   chain: row?.chain,
-                  symbol: row.swapType === 2 || row.swapType === 6 ? row?.inTokenSymbol : row.outTokenSymbol,
-                  logo_url: row.swapType === 2 || row.swapType === 6 ? row?.inTokenLogoUrl : row.outTokenLogoUrl
+                  symbol: !isBuy(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol,
+                  logo_url: !isBuy(row.swapType) ? row?.inTokenLogoUrl : row.outTokenLogoUrl
                 })">
                   <template #error>
                     <img class="w-32px h-32px"
-                      :src="getChainDefaultIcon(row?.chain, row.swapType === 2 || row.swapType === 6 ? row?.inTokenSymbol : row.outTokenSymbol)"
+                      :src="getChainDefaultIcon(row?.chain, !isBuy(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol)"
                       alt="" srcset="">
                   </template>
                   <template #placeholder>
                     <img class="w-32px h-32px"
-                      :src="getChainDefaultIcon(row?.chain, row.swapType === 2 || row.swapType === 6 ? row?.inTokenSymbol : row.outTokenSymbol)"
+                      :src="getChainDefaultIcon(row?.chain, !isBuy(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol)"
                       alt="" srcset="">
                   </template>
                 </el-image>
-                <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px"
+                <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px rd-50%"
                   :src="`${configStore.token_logo_url}chain/${row.chain}.png`" alt="" srcset="">
               </div>
             </div>
-            <span class="text-[var(--d-eaecef-l-333333)] text-13px">{{ row.swapType === 2 || row.swapType === 6 ?
+            <span class="text-[var(--d-eaecef-l-333333)] text-13px">{{ !isBuy(row.swapType) ?
               row?.inTokenSymbol :
               row.outTokenSymbol
             }}</span>
@@ -75,19 +75,19 @@
           </div>
         </template>
         <template #default="{ row }">
-          <div v-if="row.swapType === 1 || row.swapType === 5" style="background: rgba(18, 184, 134, 0.10)"
+          <div v-if="isBuy(row.swapType)" style="background: rgba(18, 184, 134, 0.10)"
             class="text-13px text-center text-[#12B886] px-5px py-2px rounded-4px">
-            {{ row.swapType === 1 ? t('market') : t('limit') }}/{{ t('buy') }}
+            {{ getSwapTypeLabel(row.swapType) }}
           </div>
-          <div v-if="row.swapType === 2 || row.swapType === 6" style="background: rgba(246, 70, 93, 0.10)"
+          <div v-else style="background: rgba(246, 70, 93, 0.10)"
             class="text-13px  text-center text-[#F6465D] px-5px py-2px rounded-4px">
-            {{ row.swapType === 2 ? t('market') : t('limit') }}/{{ t('sell') }}
+            {{ getSwapTypeLabel(row.swapType) }}
           </div>
         </template>
       </el-table-column>
       <el-table-column :label="t('price')" align="right">
         <template #default="{ row }">
-          <div class="text-[var(--d-999-l-959A9F)] text-right">${{ row?.swapType === 1 ? formatNumber(row?.outPrice ||
+          <div class="text-[var(--d-999-l-959A9F)] text-right">${{ isBuy(row.swapType) ? formatNumber(row?.outPrice ||
             0) : formatNumber(row?.inPrice || 0) }}</div>
         </template>
       </el-table-column>
@@ -108,7 +108,7 @@
         </template>
         <template #default="{ row }">
           <span class="text-[var(--d-999-l-959A9F)] text-right">
-            <template v-if="row.swapType === 2 || row.swapType === 6">
+            <template v-if="!isBuy(row.swapType)">
               {{ formatNumber(formatUnits(new BigNumber(row?.inAmount || 0).toFixed(0), row.inTokenDecimals || 0).toString(), 4) }}
               {{ row?.inTokenSymbol }}
             </template>
@@ -282,7 +282,7 @@ function jumpExplorerUrl(row: any) {
 function tableRowClick(row: any) {
   // if (!row.txHash) return
   // window.open(formatExplorerUrl(row.chain, row.txHash, 'tx'))
-  const token = row.swapType === 2 || row.swapType === 6 ? row?.inTokenAddress : row.outTokenAddress
+  const token = !isBuy(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
   if (!token) {
     return
   }
@@ -316,6 +316,30 @@ const getTxHistory = async () => {
   } finally {
     loading.value = false
   }
+}
+
+function getSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) {
+  const swapTypeMap = {
+    1: t('buy'),
+    2: t('sell'),
+    3: 'Wrap',
+    4: 'Unwrap',
+    5: `${ t('limit') }/${ t('buy') }`,
+    6: `${ t('limit') }/${ t('sell') }`,
+    7: t('followBuy'),
+    8: t('followSell'),
+    12: t('trailingStop'),
+    13: t('listingOnDex'),
+    14: t('devSell')
+  } as const
+  if (swapTypeMap[swapType]) {
+    return swapTypeMap[swapType]
+  }
+  return ''
+}
+
+function isBuy(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) {
+  return swapType === 1 || swapType === 5 || swapType === 7
 }
 
 onMounted(() => {

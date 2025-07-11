@@ -74,13 +74,15 @@ export function useBotSwap(type: number = 0) {
         tokenStore.swap.native.price = price2
         tokenStore.swap.token.price = price1
         if (isUpdateBalance) {
-          botStore.userInfo!.addresses = (botStore.userInfo?.addresses || []).map(i => {
-            if (i?.chain === tokenStore.swap.native?.chain) {
-              i.price = price2
-              i.balance = tokenStore.swap.native?.balance
-            }
-            return i
-          })
+          if (botStore.userInfo?.addresses?.length > 0) {
+             botStore.userInfo!.addresses = (botStore.userInfo?.addresses || []).map(i => {
+              if (i?.chain === tokenStore.swap.native?.chain) {
+                i.price = price2
+                i.balance = tokenStore.swap.native?.balance
+              }
+              return i
+            })
+          }
         }
         return res
       }

@@ -166,7 +166,7 @@ export default defineNuxtConfig({
           drop_console: isProd, // 移除所有 console.log
         },
       },
-    },
+    }
   },
   pwa: {
     registerType: 'autoUpdate',
@@ -248,6 +248,9 @@ export default defineNuxtConfig({
     vueI18n: './i18n.config.ts',
     bundle: {
       optimizeTranslationDirective: false
+    },
+    compilation: {
+      strictMessage: false
     }
   },
   hooks: {
