@@ -189,6 +189,44 @@ export function updateChartBackground(): void {
   }
 }
 
+export function getBarStartTime(txTimeMs: number, interval: number): number {
+  const ONE_WEEK_SEC = 604800
+  const HALF_YEAR_SEC = 15724800 // 6 个月（约 182.625 天）
+  const ONE_YEAR_SEC = 31536000  // 365 天
+
+  if (interval === ONE_WEEK_SEC) {
+    // 周线：按周一 UTC 零点
+    const date = new Date(txTimeMs)
+    const utcMidnight = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+    const day = utcMidnight.getUTCDay()
+    const diffToMonday = (day + 6) % 7
+    utcMidnight.setUTCDate(utcMidnight.getUTCDate() - diffToMonday)
+    return utcMidnight.getTime()
+  }
+
+  if (interval === HALF_YEAR_SEC) {
+    // 半年线：对齐到每年 1 月 1 日 或 7 月 1 日
+    const date = new Date(txTimeMs)
+    const year = date.getUTCFullYear()
+    const month = date.getUTCMonth() // 0-based
+    const halfYearStartMonth = month < 6 ? 0 : 6 // 0=Jan, 6=Jul
+    const barStart = new Date(Date.UTC(year, halfYearStartMonth, 1, 0, 0, 0, 0))
+    return barStart.getTime()
+  }
+
+  if (interval === ONE_YEAR_SEC) {
+    // 年线：对齐到每年 1 月 1 日
+    const date = new Date(txTimeMs)
+    const year = date.getUTCFullYear()
+    const barStart = new Date(Date.UTC(year, 0, 1, 0, 0, 0, 0))
+    return barStart.getTime()
+  }
+
+  // 默认：整除法（用于分钟、小时、日）
+  return Math.floor(txTimeMs / (interval * 1000)) * interval * 1000
+}
+
+
 
 export function buildOrUpdateLastBarFromTx(
   tx: WSTx,
@@ -211,7 +249,7 @@ export function buildOrUpdateLastBarFromTx(
   }
   const interval = typeof intervalInSeconds === 'number' ? intervalInSeconds : Number(intervalInSeconds)
 
-  const barStartTime = Math.floor(txTimeMs / (interval * 1000)) * interval * 1000
+  const barStartTime = getBarStartTime(txTimeMs, interval) // Math.floor(txTimeMs / (interval * 1000)) * interval * 1000
 
   // ✅ 时间过滤：必须 >= 当前 bar 的时间段起始时间
   if (lastBar && txTimeMs < lastBar.time) return null
