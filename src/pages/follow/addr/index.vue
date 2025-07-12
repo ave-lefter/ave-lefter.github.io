@@ -134,7 +134,7 @@
               />
                <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
               <div>
-              <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 95px" iconEditColor="#999" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" @updateRemark="({remark}) => row.remark = remark"/>
+              <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 85px" iconEditColor="#999" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" @updateRemark="({remark}) => row.remark = remark"/>
                 <div class="font_10 color-icon flex-start mt_4" style="line-height: 1">
                   <Icon
                     v-copy="row.user_address"
