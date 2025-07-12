@@ -24,7 +24,7 @@ const _activeChain = computed({
 })
 const currentChain = computed(() => {
   return (
-    props.list.find((el) => el.chain_id === props.activeChain) || {
+    props.list.find((el) => el.net_name === props.activeChain) || {
       chain_id: '-1',
       net_name: 'AllChains',
       name: '',

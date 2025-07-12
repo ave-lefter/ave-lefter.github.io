@@ -3,34 +3,20 @@ import { useStorage } from '@vueuse/core'
 import { getDefaultColumns } from './columnRender/hotColumusService'
 import { getTreasureList } from '~/api/market'
 import {
-  // poolPairHeader,
-  // poolPairRow,
-  // quickHeader,
   quickContent,
-  // openTimeContent,
-  // dexContent,
+  dexContent,
   securityContent,
-  // devContent,
-  // top10PositionsContent,
-  // snipersContent,
+  top10PositionsContent,
+  snipersContent,
   holdersContent,
-  // priceChange24hContent,
-  // priceChange5mContent,
   DynamicVolAndTxs,
-  DynamicMakers,
-  // priceChange1mContent,
-  // volumeContent,
-  // txnsContent,
+  DynamicMarkers,
   smarterContent,
-  // rugPullContent,
   liquidityContent,
   priceContent,
   mCapContent,
-  // marketCapContent,
-  // listTimeContent,
   poolPairContent,
-  // insidersContentNew,
-  // insidersContent
+  insidersContentNew,
   Headline,
   DynamicPriceChange,
 } from './columnRender/index'
@@ -39,6 +25,7 @@ import { addFavorite, removeFavorite } from '~/api/fav'
 
 const { t } = useI18n()
 const localeStore = useLocaleStore()
+const globalStore = useGlobalStore()
 
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
@@ -62,12 +49,22 @@ function setFilterForm(...args: any[]) {
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
-const rankCommonConditions = useStorage('rankCommon', {
-  activeInterval: '1m',
-  quickVisible: true,
-  quickBuyValue: '0.01',
-})
 const listData = ref<any[]>([])
+const filteredListData = computed(() => {
+  if (globalStore.pumpSetting.isBlacklist) {
+    return listData.value.filter((el) => !inBlackList(el))
+  }
+  return listData.value
+})
+function inBlackList(row) {
+  return (
+    globalStore.pumpBlackList.findIndex(
+      (i) =>
+        (i.address == row.token && i.type == 'ca') ||
+        (i.address == row.symbol && i.type == 'keyword')
+    ) !== -1
+  )
+}
 const pageInfo = ref({
   pageNO: 1,
   pageSize: 20,
@@ -77,22 +74,10 @@ const loading = shallowRef(false)
 const columns = useStorage('hotUserTableColumns', getDefaultColumns(t))
 const renderData = computed(() => {
   return {
-    // txnsContent: {
-    //   Comp: txnsContent,
-    //   props: {}
-    // },
-    // volumeContent: {
-    //   Comp: volumeContent,
-    //   props: {}
-    // },
-    // priceChange1mContent: {
-    //   Comp: priceChange1mContent,
-    //   props: {}
-    // },
-    dynamicMakers: {
-      Comp: DynamicMakers,
+    dynamicMarkers: {
+      Comp: DynamicMarkers,
       props: {
-        activeInterval: rankCommonConditions.value.activeInterval,
+        activeInterval: globalStore.rankCommon.activeInterval,
         sortConditions: sortConditions.value,
         setSortConditions,
         setFilterForm,
@@ -101,66 +86,90 @@ const renderData = computed(() => {
     volumeContent: {
       Comp: DynamicVolAndTxs,
       props: {
-        activeInterval: rankCommonConditions.value.activeInterval,
+        activeInterval: globalStore.rankCommon.activeInterval,
         sortConditions: sortConditions.value,
         setSortConditions,
         setFilterForm,
       },
     },
-    // priceChange5mContent: {
-    //   Comp: priceChange5mContent,
-    //   props: {}
-    // },
     priceChange24hContent: {
       Comp: DynamicPriceChange,
       props: {
         sortConditions: sortConditions.value,
         setSortConditions,
-        activeInterval: rankCommonConditions.value.activeInterval,
+        activeInterval: '24H',
       },
     },
-    // poolPairHeader: {
-    //   Comp: poolPairHeader,
-    //   props: {}
-    // },
+    priceChange1mContent: {
+      Comp: DynamicPriceChange,
+      props: {
+        sortConditions: sortConditions.value,
+        setSortConditions,
+        activeInterval: '1m',
+      }
+    },
+    ...(['1m', '24H'].includes(globalStore.rankCommon.activeInterval)
+      ? []
+      : [
+          {
+            priceChangeDynamicContent: {
+              Comp: DynamicPriceChange,
+              props: {
+                sortConditions: sortConditions.value,
+                setSortConditions,
+                activeInterval: globalStore.rankCommon.activeInterval,
+              },
+            },
+          },
+        ]),
     quickContent: {
       Comp: quickContent,
       props: {
-        quickBuyValue: rankCommonConditions.value.quickBuyValue,
+        quickBuyValue: globalStore.rankCommon.quickBuyValue,
       },
     },
-    // openTimeContent: {
-    //   Comp: openTimeContent,
-    //   props: {}
-    // },
-    // dexContent: {
-    //   Comp: dexContent,
-    //   props: {}
-    // },
+    dexContent: {
+      Comp: dexContent,
+      props: {
+        activeCategory: 'hot',
+      },
+    },
     securityContent: {
       Comp: securityContent,
-      props: {},
+      props: {
+        activeCategory:'hot',
+        activeChain:props.activeChain
+      },
     },
-    // insidersContentNew: {
-    //   Comp: insidersContentNew,
-    //   props: {}
-    // },
-    // devContent: {
-    //   Comp: devContent,
-    //   props: {}
-    // },
-    // top10PositionsContent: {
-    //   Comp: top10PositionsContent,
-    //   props: {}
-    // },
-    // snipersContent: {
-    //   Comp: snipersContent,
-    //   props: {}
-    // },
+    insidersContent: {
+      Comp: insidersContentNew,
+      props: {
+        activeCategory:'hot',
+        sortConditions: sortConditions.value,
+        setSortConditions,
+        setFilterForm,
+        activeChain:props.activeChain
+      },
+    },
+    top10PositionsContent: {
+      Comp: top10PositionsContent,
+      props: {
+        sortConditions: sortConditions.value,
+        setSortConditions,
+        setFilterForm,
+      },
+    },
+    snipersContent: {
+      Comp: snipersContent,
+      props: {
+        sortConditions: sortConditions.value,
+        setSortConditions,
+        setFilterForm,
+      },
+    },
     holdersContent: {
       Comp: holdersContent,
       props: {
-        filterForm: filterForm.value,
         sortConditions: sortConditions.value,
         setSortConditions,
         setFilterForm,
@@ -169,37 +178,22 @@ const renderData = computed(() => {
     smarterContent: {
       Comp: smarterContent,
       props: {
-        filterForm: filterForm.value,
         sortConditions: sortConditions.value,
         setSortConditions,
         setFilterForm,
       },
     },
-    // rugPullContent: {
-    //   Comp: rugPullContent,
-    //   props: {}
-    // },
     liquidityContent: {
       Comp: liquidityContent,
       props: {
-        filterForm: filterForm.value,
         sortConditions: sortConditions.value,
         setSortConditions,
         setFilterForm,
       },
     },
-    // listTimeContent: {
-    //   Comp: listTimeContent,
-    //   props: {}
-    // },
-    // marketCapContent: {
-    //   Comp: marketCapContent,
-    //   props: {}
-    // },
     mCapContent: {
       Comp: mCapContent,
       props: {
-        filterForm: filterForm.value,
         sortConditions: sortConditions.value,
         setSortConditions,
         setFilterForm,
@@ -215,7 +209,6 @@ const renderData = computed(() => {
     poolPairContent: {
       Comp: poolPairContent,
       props: {
-        filterForm: filterForm.value,
         sortConditions: sortConditions.value,
         setSortConditions,
         setFilterForm,
@@ -244,10 +237,10 @@ watch(
   }
 )
 
-// let timer:number
-async function _getTreasureList(shouldLoading=true) {
+let timer: number
+async function _getTreasureList(shouldLoading = true) {
   try {
-    if(shouldLoading){
+    if (shouldLoading) {
       loading.value = true
     }
     const { total: _, ...rest } = pageInfo.value
@@ -261,15 +254,19 @@ async function _getTreasureList(shouldLoading=true) {
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
-    // timer = window.setTimeout(() => {
-    //   _getTreasureList(false)
-    // }, 10000)
+    if (shouldLoading) {
+      initWs()
+    }
+    clearTimeout(timer)
+    timer = window.setTimeout(() => {
+      _getTreasureList(false)
+    }, 10000)
   } finally {
     loading.value = false
   }
 }
 onUnmounted(() => {
-  // clearTimeout(timer)
+  clearTimeout(timer)
 })
 
 const wsStore = useWSStore()
@@ -381,14 +378,14 @@ function sizeChange() {
   <el-table
     v-loading="loading"
     :height="'calc(100vh - 190px)'"
-    :data="listData"
+    :data="filteredListData"
     fit
     header-row-class-name="[&&]:text-12px h-40px"
     row-class-name="color-[--d-CCC-l-333] cursor-pointer"
     @row-click="tableRowClick"
   >
     <template #empty>
-      <AveEmpty v-if="!loading && listData.length === 0" />
+      <AveEmpty v-if="!loading && filteredListData.length === 0" />
       <span v-else />
     </template>
     <template v-for="item in columns" :key="item.key">
@@ -409,12 +406,13 @@ function sizeChange() {
     :small="false"
     :page-sizes="[20, 50, 100, 200, 300, 400]"
     @size-change="sizeChange"
-    @current-change="()=>_getTreasureList()"
+    @current-change="() => _getTreasureList()"
   />
 </template>
 
 <style scoped lang="scss">
 :deep(.cell) {
+  line-height: normal;
   padding: 0 16px;
 }
 </style>

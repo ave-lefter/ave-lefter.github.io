@@ -2,14 +2,13 @@
 import RangePopover from './rangePopover.vue'
 
 const props = defineProps<{
-  filterForm: any
   sortConditions: { sort: string; sort_dir: string }
   setSortConditions(params: { sort: string; sort_dir: string }): void
   setFilterForm(...args: [string, string][]): void
 }>()
 function sortChange(sort_dir: string) {
   props.setSortConditions({
-    sort: 'market_cap',
+    sort: sort_dir?'market_cap':'',
     sort_dir: sort_dir.replace('ending', ''),
   })
 }

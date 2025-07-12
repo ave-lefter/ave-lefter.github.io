@@ -58,6 +58,12 @@ export const useGlobalStore = defineStore('global', () => {
     define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','cabal','insider', 'sniper', 'rug', 'kol'],
   })
 
+  const rankCommon = useStorage('rankCommon',{
+    activeInterval: '24H',
+    quickVisible: true,
+    quickBuyValue: '0.01',
+  })
+
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
 
@@ -113,6 +119,7 @@ export const useGlobalStore = defineStore('global', () => {
     showLeft,
     pumpSetting,
     pumpBlackList,
-    hotList
+    hotList,
+    rankCommon
   }
 })

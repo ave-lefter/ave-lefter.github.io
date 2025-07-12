@@ -2,7 +2,6 @@
 import RangePopover from './rangePopover.vue'
 
 const props = defineProps<{
-  filterForm: any
   sortConditions: { sort: string; sort_dir: string }
   setSortConditions(params: { sort: string; sort_dir: string }): void
   setFilterForm(...args: [string, string][]): void
@@ -11,7 +10,7 @@ const props = defineProps<{
 const prefix = computed(() => `makers_${props.activeInterval.toLowerCase()}`)
 function sortChange(sort_dir: string) {
   props.setSortConditions({
-    sort: prefix.value,
+    sort: sort_dir?prefix.value:'',
     sort_dir: sort_dir.replace('ending', ''),
   })
 }
@@ -53,20 +52,30 @@ function confirm(params?: [string, string]) {
   isFilterHighlight.value = true
   popoverVisible.value = false
 }
+
+function getHoldersColor(row) {
+  return row[prefix.value] >= 1000 ? 'color-#FFA622' : ''
+}
+
+function getDetailColor(row, isBuyer) {
+  const holders = row[prefix.value]
+  if (holders < 1000) return ''
+  return isBuyer ? 'color-#12B886' : 'color-#F6465D'
+}
 </script>
 <template>
-  <el-table-column :width="getTextWidth($t('makers'), 50) + 70" align="right">
+  <el-table-column :width="getTextWidth($t('markers'), 50) + 80" align="right">
     <template #header>
       <div class="flex items-center justify-end gap-3px">
         <span
           class="lh-16px rounded-2px px-2px text-12px bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5]"
           >{{ activeInterval }}</span
-        >{{ $t('makers') }}
+        >{{ $t('markers') }}
         <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
         <RangePopover
           v-model="popoverVisible"
           :width="225"
-          :title="$t('nMakers',{ n: activeInterval })"
+          :title="$t('nMarkers', { n: activeInterval })"
           :list="openTimeList"
           :selectRangeIndex="0"
           :isFilterHighlight="isFilterHighlight"
@@ -75,12 +84,17 @@ function confirm(params?: [string, string]) {
       </div>
     </template>
     <template #default="{ row }">
-      <span
-        class="block overflow-hidden text-ellipsis whitespace-nowrap max-w-100px"
-        :class="getColorClass(row[prefix])"
-      >
-        {{ Number(row[prefix]) > 0 ? '+' : '' }}{{ formatNumber(row[prefix] || 0, 1) }}%
-      </span>
+      <div :class="getHoldersColor(row)">
+        {{ row[prefix] > 0 ? formatNumber(row[prefix] || 0, 0) : 0 }}
+      </div>
+      <div class="color-[--d-666-l-999] text-12px">
+        <span :class="getDetailColor(row, true)">
+          {{ formatNumber(row[`buyers_${activeInterval.toLowerCase()}`]||0) }}
+        </span>/
+        <span :class="getDetailColor(row, false)">
+          {{ formatNumber(row[`sellers_${activeInterval.toLowerCase()}`]||0) }}
+        </span>
+      </div>
     </template>
   </el-table-column>
 </template>

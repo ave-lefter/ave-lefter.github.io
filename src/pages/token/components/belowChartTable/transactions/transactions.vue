@@ -891,8 +891,8 @@ function resetMakerAddress() {
         </template>
       </AveTable>
       <MarkerTooltip
-        :virtual-ref="makerTooltip" :currentRow="currentRow" :addressAndChain="addressAndChain"
-        v-model="markerTooltipVisible"
+        v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
+        :addressAndChain="addressAndChain"
       >
         <template v-if="['solana', 'bsc'].includes(currentRow.chain) && currentRow.senderProfile">
           <Icon

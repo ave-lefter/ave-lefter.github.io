@@ -2,7 +2,6 @@
 import RangePopover from './rangePopover.vue'
 
 const props = defineProps<{
-  filterForm: any;
   sortConditions: { sort: string; sort_dir: string };
   setSortConditions(params: { sort: string; sort_dir: string }): void;
   setFilterForm(...args: [string, string][]): void
@@ -21,7 +20,7 @@ const defaultSort = computed(() => {
 
 function sortChange(sort_dir: string) {
   props.setSortConditions({
-    sort: 'holders',
+    sort: sort_dir?'holders':'',
     sort_dir: sort_dir.replace('ending', ''),
   })
 }

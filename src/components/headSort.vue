@@ -22,6 +22,12 @@ const emit = defineEmits(['sort-change'])
 
 const sortOrder = ref(props.defaultSort)
 
+watch(()=>props.defaultSort,(val)=>{
+  if(!val){
+    sortOrder.value = ''
+  }
+})
+
 const handleSort = (sort) => {
   if (sort) {
     if (sortOrder.value === sort) {

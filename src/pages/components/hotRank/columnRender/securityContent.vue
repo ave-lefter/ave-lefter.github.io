@@ -5,6 +5,10 @@ import phishing from '@/assets/images/rugPull/phishing.svg'
 import cabal from '@/assets/images/rugPull/cabal.svg'
 import bundle from '@/assets/images/rugPull/bundle.svg'
 
+const props = defineProps<{
+  activeCategory: string
+  activeChain: string
+}>()
 function formateMin(data) {
   if (typeof data === 'string' || typeof data === 'number') {
     const value = new BigNumber(data)
@@ -63,6 +67,11 @@ function ruggedColor(row) {
     return ''
   }
 }
+
+const runPullVisible = computed(() => {
+  const { activeChain, activeCategory } = props
+  return ['AllChains', 'solana'].includes(activeChain) && activeCategory === 'hot'
+})
 </script>
 
 <template>
@@ -99,7 +108,7 @@ function ruggedColor(row) {
         >
         {{ $t('Safe') }}
       </div>
-      <el-popover :width="247">
+      <el-popover v-if="runPullVisible" :width="247">
         <template #reference>
           <div
             class="flex items-center justify-end h-20px gap-4px mt-10px"

@@ -5,7 +5,6 @@ import RangePopover from './rangePopover.vue'
 
 const emit = defineEmits(['collect'])
 const props = defineProps<{
-  filterForm: any
   sortConditions: { sort: string; sort_dir: string }
   setSortConditions(params: { sort: string; sort_dir: string }): void
   setFilterForm(...args: [string, string][]): void
@@ -28,7 +27,7 @@ const defaultSort = computed(() => {
 
 function sortChange(sort_dir: string) {
   props.setSortConditions({
-    sort: 'created_at',
+    sort: sort_dir ? 'created_at' : '',
     sort_dir: sort_dir.replace('ending', ''),
   })
 }
@@ -98,10 +97,17 @@ function addOrRemoveBlackList(item: { token: string }, type: 'ca' | 'dev' | 'key
     globalStore.pumpBlackList = [{ address: item.token, type: type }]
   }
 }
+
+function timerCountColor(val:number) {
+  if (Number(formatTimeFromNow(val,true)) < 3600 * 24) {
+    return 'color-#FFA622'
+  }
+  return 'color-[--d-666-l-999]'
+}
 </script>
 
 <template>
-  <el-table-column :label="$t('poolPair')" min-width="300" fixed="left">
+  <el-table-column :label="$t('poolPair')" min-width="320" fixed="left">
     <template #header>
       <div class="flex items-center gap-2px">
         <span>{{ $t('poolPair') }}</span
@@ -125,13 +131,13 @@ function addOrRemoveBlackList(item: { token: string }, type: 'ca' | 'dev' | 'key
           v-if="inBlackList(row)"
           name="custom:key-invisible"
           class="text-12px absolute top-5px left-5px hidden icon"
-          @click.self.stop="addOrRemoveBlackList(row,'ca')"
+          @click.self.stop="addOrRemoveBlackList(row, 'ca')"
         />
         <Icon
           v-else
           name="custom:key-visible"
           class="text-9px absolute top-5px left-5px hidden icon"
-          @click.self.stop="addOrRemoveBlackList(row,'ca')"
+          @click.self.stop="addOrRemoveBlackList(row, 'ca')"
         />
         <span>#{{ (pageNO - 1) * pageSize + $index + 1 }}</span>
         <div class="flex items-center" @click.stop="emit('collect', $index, row)">
@@ -159,7 +165,7 @@ function addOrRemoveBlackList(item: { token: string }, type: 'ca' | 'dev' | 'key
               <TokenImg
                 :is-circle="globalStore.pumpSetting.avatar_isCircle === 'circle'"
                 chain-class="hidden"
-                token-class="w-240px h-240px rounded-8px [&&]:mr-0"
+                token-class="w-240px h-240px rounded-16px [&&]:mr-0"
                 :row="{
                   chain: row.chain,
                   symbol: getSymbol(row),
@@ -172,8 +178,7 @@ function addOrRemoveBlackList(item: { token: string }, type: 'ca' | 'dev' | 'key
             <div class="flex items-center lh-20px">
               <span class="text-16px color-[--d-CCC-l-333]"> {{ getSymbol(row) }}</span
               ><span class="text-10px color-[--d-666-l-999]"
-                >/
-                {{ getSymbol(row, true) }}
+                >/{{ getSymbol(row, true) }}
               </span>
               <Icon
                 v-copy="row.target_token"
@@ -231,7 +236,10 @@ function addOrRemoveBlackList(item: { token: string }, type: 'ca' | 'dev' | 'key
               </el-tooltip>
             </div>
             <div class="flex items-center lh-12px">
-              <div v-tooltip="formatDate(row.created_at, 'MM/DD HH:mm:ss')" class="mr-8px">
+              <div
+                v-tooltip="formatDate(row.created_at, 'MM/DD HH:mm:ss')"
+                class="mr-8px text-12px"
+              >
                 <TimerCount
                   v-if="row.created_at && Number(formatTimeFromNow(row.created_at, true)) < 60"
                   :key="row.created_at"
@@ -239,15 +247,13 @@ function addOrRemoveBlackList(item: { token: string }, type: 'ca' | 'dev' | 'key
                   :end-time="60"
                 >
                   <template #default="{ seconds }">
-                    <span v-if="seconds < 60" class="color-#FFA622 text-12px">
-                      {{ seconds }}s
-                    </span>
-                    <span v-else class="color-[--d-666-l-999] text-12px">
+                    <span v-if="seconds < 60" class="color-#FFA622"> {{ seconds }}s </span>
+                    <span v-else :class="timerCountColor(row.created_at)">
                       {{ formatTimeFromNow(row.created_at) }}
                     </span>
                   </template>
                 </TimerCount>
-                <div v-else class="color-[--d-666-l-999] text-12px">
+                <div v-else :class="timerCountColor(row.created_at)">
                   {{ formatTimeFromNow(row.created_at) }}
                 </div>
               </div>

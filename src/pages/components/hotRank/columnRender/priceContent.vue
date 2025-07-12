@@ -8,7 +8,7 @@
     </template>
     <template #default="{ row }">
       <!-- v-animation-trigger-table:animation-bg="row.current_price_usd" -->
-      <span :class="!row.current_price_usd ? 'color-#848E9C' : ''">
+      <span :class="!row.current_price_usd ? 'color-[--d-666-l-999]' : ''">
         ${{ formatNumber(row.current_price_usd, 3) }}
       </span>
     </template>
@@ -36,7 +36,7 @@ const defaultSort = computed(() => {
 
 function sortChange(sort_dir: string) {
   props.setSortConditions({
-    sort: 'current_price_usd',
+    sort: sort_dir?'current_price_usd':'',
     sort_dir: sort_dir.replace('ending', ''),
   })
 }

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 const props = defineProps<{
-  filterForm: any
   sortConditions: { sort: string; sort_dir: string }
   setSortConditions(params: { sort: string; sort_dir: string }): void
   setFilterForm(...args: any[]): void
 }>()
 const defaultSort = computed(() => {
-  if (props.sortConditions.sort === 'holders') {
+  if (props.sortConditions.sort === 'smart_money_tx_count_24h') {
     return (
       {
         asc: 'ascending',
@@ -19,7 +18,7 @@ const defaultSort = computed(() => {
 
 function sortChange(sort_dir: string) {
   props.setSortConditions({
-    sort: 'holders',
+    sort: sort_dir?'smart_money_tx_count_24h':'',
     sort_dir: sort_dir.replace('ending', ''),
   })
 }
@@ -138,7 +137,7 @@ function getParamsArr(startKey: string, endKey: string, params?: [string, string
               <el-button
                 class="h-30px flex-1 m-l-auto"
                 :color="themeStore.isDark ? '#333' : '#F2F2F2'"
-                @click="confirm()"
+                @click="buyRange=['',''];sellRange=['',''];confirm()"
               >
                 {{ $t('reset') }}
               </el-button>

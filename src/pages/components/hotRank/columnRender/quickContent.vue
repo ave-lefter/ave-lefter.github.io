@@ -7,7 +7,7 @@ defineProps<{
   <el-table-column
     :key="$t('quick')"
     :label="$t('quick')"
-    :min-width="getTextWidth(quickBuyValue, 20) + 60"
+    :min-width="getTextWidth(quickBuyValue, 20) + 70"
     align="right"
     fixed="right"
   >

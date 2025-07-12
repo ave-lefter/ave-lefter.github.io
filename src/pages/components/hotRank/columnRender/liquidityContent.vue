@@ -2,7 +2,6 @@
 import RangePopover from './rangePopover.vue'
 
 const props = defineProps<{
-  filterForm: any;
   sortConditions: { sort: string; sort_dir: string };
   setSortConditions(params: { sort: string; sort_dir: string }): void;
   setFilterForm(...args: [string, string][]): void
@@ -21,12 +20,12 @@ const defaultSort = computed(() => {
 
 function sortChange(sort_dir: string) {
   props.setSortConditions({
-    sort: 'tvl',
+    sort:sort_dir? 'tvl':'',
     sort_dir: sort_dir.replace('ending', ''),
   })
 }
 
-const isVolUSDT = shallowRef(false)
+const isVolUSDT = shallowRef(true)
 function getTarget(row, key: 'symbol' | 'value' | 'init') {
   const isZero = row.target_token === row.token0_address
   return {
@@ -95,13 +94,13 @@ function confirm(params?: [string, string]) {
     </template>
     <template #default="{ row }">
       <template v-if="isVolUSDT">
-        <div class="lh-18px mb-2px" :class="row.tvl_ratio < 0 ? 'color-#F6465D' : ''">
+        <div class="lh-18px mb-2px">
           ${{ formatNumber(row.tvl || 0,1) }}
         </div>
         <div class="lh-16px color-[--d-666-l-999] text-12px">${{ formatNumber(row.init_tvl || 0,1) }}</div>
       </template>
       <template v-else>
-        <div class="lh-18px mb-2px" :class="row.tvl_ratio < 0 ? 'color-#F6465D' : ''">
+        <div class="lh-18px mb-2px">
           {{ formatNumber(getTarget(row, "value"),1)
           }} {{ getTarget(row, "symbol") }}
         </div>

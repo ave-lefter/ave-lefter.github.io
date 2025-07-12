@@ -20,7 +20,10 @@ const props = defineProps({
     type: String,
     default: 'w-12px h-12px'
   },
-  isCircle:Boolean
+  isCircle:{
+    type:Boolean,
+    default:true
+  }
 })
 const {token_logo_url} = useConfigStore()
 const shouldAddPrefix = computed(() => {

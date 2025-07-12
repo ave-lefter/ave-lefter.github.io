@@ -203,12 +203,14 @@ async function getTokenBalance(chain: string) {
     :style="styles"
     @click="submitBotSwap"
   >
-    <Icon
+    <slot>
+      <Icon
       class="mr-4px"
       name="mynaui:lightning-solid"
-    />
-    {{ quickBuyValue || 0 }}
-    <span v-if="mainNameVisible" class="ml-5px">{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+      />
+      {{ quickBuyValue || 0 }}
+      <span v-if="mainNameVisible" class="ml-5px">{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+    </slot>
   </el-button>
   <el-dialog
     v-if="visible" v-model="visible" :title="$t('buy')"

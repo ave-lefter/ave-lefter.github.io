@@ -16,7 +16,7 @@ export function getHotOptions(t: ReturnType<typeof useI18n>['t']) {
       list: [
         'volumeContent',
         'txnsContent',
-        'dynamicMakers',
+        'dynamicMarkers',
         'priceChange1mContent',
         'priceChangeDynamicContent',
         // "priceChange5mContent",
@@ -112,10 +112,10 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       render: 'txnsContent',
     },
     {
-      title: t('makers'),
-      key: 'makers_dynamic',
+      title: t('markers'),
+      key: 'markers_dynamic',
       isVisible: true,
-      render: 'dynamicMakers',
+      render: 'dynamicMarkers',
     },
     {
       title: t('holders'),

@@ -1,14 +1,8 @@
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core'
 import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
 
 defineProps<{ activeTab: string }>()
-const rankCommonConditions = useStorage('rankCommon', {
-  activeInterval: '1m',
-  quickVisible: true,
-  quickBuyValue: '0.01',
-})
 const { t } = useI18n()
 const intervals = computed(() => {
   return [
@@ -23,6 +17,7 @@ const intervals = computed(() => {
 const tabs = computed(() => {
   return [{ name: t('trending'), component: 'HotRank' as const, icon: 'custom:hot' }]
 })
+const globalStore = useGlobalStore()
 </script>
 
 <template>
@@ -33,7 +28,7 @@ const tabs = computed(() => {
         :key="index"
         class="p-2 lh-16px color-#F5F5F5 bg-#333 cursor-pointer rounded-1"
       >
-        <Icon :name="item.icon" class="mr-1 color-#FFA622" />
+        <Icon :name="item.icon" class="mr-1 color-#FFA622 text-10px" />
         {{ item.name }}
       </span>
     </div>
@@ -44,20 +39,20 @@ const tabs = computed(() => {
           :key="index"
           class="lh-16px py-2px px-8px color-[--d-F5F5F5-l-333] border-none cursor-pointer rounded-2px"
           :class="
-            rankCommonConditions.activeInterval === item.id
+            globalStore.rankCommon.activeInterval === item.id
               ? 'bg-[--d-111-l-FFF]'
               : 'bg-transparent'
           "
-          @click.stop="rankCommonConditions.activeInterval = item.id"
+          @click.stop="globalStore.rankCommon.activeInterval = item.id"
         >
           {{ item.name }}
         </button>
       </div>
       <div class="flex items-center">
-        <el-switch v-model="rankCommonConditions.quickVisible" class="mr-2" />
+        <el-switch v-model="globalStore.rankCommon.quickVisible" class="mr-2" />
         <QuickSwapSet
-          v-if="rankCommonConditions.quickVisible"
-          v-model:quickBuyValue="rankCommonConditions.quickBuyValue"
+          v-if="globalStore.rankCommon.quickVisible"
+          v-model:quickBuyValue="globalStore.rankCommon.quickBuyValue"
           class="mr-8px"
           :settingsButtonVisible="false"
           :chain="'solana'"

@@ -16,12 +16,29 @@ const buyTxsPre = computed(() => `buys_tx_${lowerCaseInterval.value}_count`)
 const sellTxsPre = computed(() => `sells_tx_${lowerCaseInterval.value}_count`)
 function sortChange(sort_dir: string) {
   props.setSortConditions({
-    sort: volPrefix.value,
+    sort: sort_dir?volPrefix.value:'',
     sort_dir: sort_dir.replace('ending', ''),
   })
 }
 const defaultSort = computed(() => {
   if (props.sortConditions.sort === volPrefix.value) {
+    return (
+      {
+        asc: 'ascending',
+        desc: 'descending',
+      }[props.sortConditions.sort_dir] || ''
+    )
+  }
+  return ''
+})
+function txsSortChange(sort_dir: string) {
+  props.setSortConditions({
+    sort: sort_dir?txsPrefix.value:'',
+    sort_dir: sort_dir.replace('ending', ''),
+  })
+}
+const txsDefaultSort = computed(() => {
+  if (props.sortConditions.sort === txsPrefix.value) {
     return (
       {
         asc: 'ascending',
@@ -134,7 +151,7 @@ function confirm(
           :selectRangeIndex="0"
           :isFilterHighlight="isFilterHighlight"
           @confirm="volConfirm"
-        />/{{ $t('txns') }}<HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
+        />/{{ $t('txns') }}<HeadSort :defaultSort="txsDefaultSort" @sort-change="txsSortChange" />
         <RangePopover
           v-model="txsVisible"
           :width="225"
