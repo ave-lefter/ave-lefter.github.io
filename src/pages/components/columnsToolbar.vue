@@ -1,33 +1,30 @@
 <script setup>
-import {VueDraggable} from 'vue-draggable-plus'
-import {useStorage} from '@vueuse/core'
-import {cloneDeep} from 'lodash-es'
-import {getDefaultColumns, getHotOptions} from './hotRank/columnRender/hotColumusService'
+import { VueDraggable } from 'vue-draggable-plus'
+import { useStorage } from '@vueuse/core'
+import { cloneDeep } from 'lodash-es'
+import { getDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
 
-const {t} = useI18n()
+const { t } = useI18n()
 const dialogVisible = ref(false)
-const storeColumns =  useStorage('hotUserTableColumns',getDefaultColumns(t))
-
-const props = defineProps({
-  activeCategory: {
-    type: String,
-    default: ''
-  }
+const storeColumns = useStorage('hotUserTableColumns', getDefaultColumns(t))
+const globalStore = useGlobalStore()
+const hotSettings = ref({
+  avatar_isCircle:globalStore.pumpSetting.avatar_isCircle,
+  isBlacklist:globalStore.pumpSetting.isBlacklist
 })
 
 const themeStore = useThemeStore()
 const hotOptions = computed(() => getHotOptions(t))
 
-console.log('props.activeCategory', props.activeCategory)
 const initColumns = ref([])
-const modelColumns = ref(cloneDeep(storeColumns.value.filter((item) => item.isHide)))
+const modelColumns = ref(cloneDeep(storeColumns.value.filter((item) => item.isVisible)))
 console.log(modelColumns.value, 'modelColumns.value')
 
 // 当对话框打开时，更新本地列配置
 const openDialog = () => {
   dialogVisible.value = true
   initColumns.value = getDefaultColumns(t)
-  modelColumns.value = cloneDeep(storeColumns.value.filter((item) => item.isHide))
+  modelColumns.value = cloneDeep(storeColumns.value.filter((item) => item.isVisible))
 }
 
 const handleSelect = (item) => {
@@ -37,7 +34,7 @@ const handleSelect = (item) => {
   } else {
     const data = initColumns.value.find((arr) => arr.render === item)
     if (data) {
-      modelColumns.value.push(cloneDeep({...data, isHide: true}))
+      modelColumns.value.push(cloneDeep({ ...data, isVisible: true }))
     }
   }
 }
@@ -46,12 +43,18 @@ const handleSelect = (item) => {
 const handleConfirm = () => {
   dialogVisible.value = false
   storeColumns.value = cloneDeep(modelColumns.value)
+  globalStore.pumpSetting.avatar_isCircle = hotSettings.value.avatar_isCircle
+  globalStore.pumpSetting.isBlacklist = hotSettings.value.isBlacklist
 }
 
 const handleReset = () => {
   dialogVisible.value = false
   storeColumns.value = getDefaultColumns(t)
   modelColumns.value = getDefaultColumns(t)
+  hotSettings.value.avatar_isCircle='circle'
+  hotSettings.value.isBlacklist = false
+  globalStore.pumpSetting.avatar_isCircle = hotSettings.value.avatar_isCircle
+  globalStore.pumpSetting.isBlacklist = hotSettings.value.isBlacklist
 }
 </script>
 
@@ -59,55 +62,82 @@ const handleReset = () => {
   <div>
     <div @click="openDialog">
       <div
-        v-if="props.activeCategory === 'hot'"
-        class="flex items-center color-[--d-999-l-666] cursor-pointer min-w-63px">
-        <Icon
-          name="custom:order"
-          class="text-16px"
-        />
-        <span class="text-12px ml-2px">{{ t("custom") }}</span>
+        class="flex items-center color-[--d-999-l-666] cursor-pointer min-w-63px"
+      >
+        <Icon name="custom:order" class="text-16px" />
+        <span class="text-12px ml-2px">{{ t('custom') }}</span>
       </div>
     </div>
     <el-dialog v-model="dialogVisible" append-to-body :title="$t('customizeScreener')" width="820">
+      <div class="flex flex-col gap-20px pt-20px pb-20px">
+        <div class="cursor-pointer flex items-center" @click="hotSettings.avatar_isCircle = ({circle:'rect',rect:'circle'})[hotSettings.avatar_isCircle]">
+          <template v-if="hotSettings.avatar_isCircle === 'circle'">
+            <Icon name="custom:progress-circle" class="text-12px mr-8px" />
+            {{ $t('circleTokenImage') }}
+          </template>
+          <template v-else>
+            <Icon name="custom:avatar-rect" class="text-12px mr-8px" />
+            {{ $t('rectTokenImage') }}</template
+          >
+        </div>
+        <div class="cursor-pointer flex items-center" @click="hotSettings.isBlacklist = !hotSettings.isBlacklist">
+          <template v-if="hotSettings.isBlacklist">
+            <Icon name="custom:key-invisible" class="text-12px mr-8px" />
+            {{ $t('hideBlackList') }}
+          </template>
+          <template v-else>
+            <Icon name="custom:key-visible" class="text-8px mr-8px" />{{
+              $t('showBlackList')
+            }}</template
+          >
+        </div>
+      </div>
       <div class="content-bg">
         <div class="draggable-box-bg">
-          <VueDraggable v-model="modelColumns" :animation="300" ghostClass="ghost" class="draggable-list-bg">
-            <template v-for="item in modelColumns" :key="item.field || item.render">
-              <div v-if="item.isHide" class="draggable-columns-bg" :class="item.fixed ? 'columns-bg-disabled' : ''">
-                {{ item.label }}
-                <Icon name="custom:handle" class="ml-2 color-[--d-666-l-999]"/>
+          <VueDraggable
+            v-model="modelColumns"
+            :animation="300"
+            ghostClass="ghost"
+            class="draggable-list-bg"
+          >
+            <template v-for="item in modelColumns" :key="item.key || item.render">
+              <div
+                v-if="item.isVisible"
+                class="draggable-columns-bg"
+                :class="item.fixed ? 'columns-bg-disabled' : ''"
+              >
+                {{ item.title }}
+                <Icon name="custom:handle" class="ml-2 color-[--d-666-l-999]" />
               </div>
             </template>
           </VueDraggable>
         </div>
         <div v-for="(option, index) in hotOptions" :key="index" class="option-bg">
-          <div>{{ option.label }}</div>
+          <div>{{ option.title }}</div>
           <div class="options-list-bg">
             <div
               v-for="(item, i) in option.list"
               :key="i"
               class="options-list-item"
-              :class="[modelColumns.find((arr) => arr.render === item) && 'options-list-item-select']"
-              @click="handleSelect(item)">
-              {{ initColumns.find((arr) => arr.render === item)?.label }}
+              :class="[
+                modelColumns.find((arr) => arr.render === item) && 'options-list-item-select',
+              ]"
+              @click="handleSelect(item)"
+            >
+              {{ initColumns.find((arr) => arr.render === item)?.title }}
             </div>
           </div>
         </div>
         <div class="flex items-center gap-20px mt-40px">
           <el-button
-            :color="themeStore.isDark ? '#333':'#F2F2F2'"
+            :color="themeStore.isDark ? '#333' : '#F2F2F2'"
             class="flex-1"
             size="large"
             @click="handleReset"
           >
             {{ $t('reset') }}
           </el-button>
-          <el-button
-            type="primary"
-            class="flex-1"
-            size="large"
-            @click="handleConfirm"
-          >
+          <el-button type="primary" class="flex-1" size="large" @click="handleConfirm">
             {{ $t('confirm') }}
           </el-button>
         </div>
@@ -124,10 +154,10 @@ const handleReset = () => {
   --columns-toolbar-checkbox-color: #000;
   --columns-draggable-box-bg: #f2f2f2;
   --columns-options-list-item-bg: #f2f2f2;
-  --columns-options-list-item-bg-select: rgba(40, 109, 255, 0.10);
+  --columns-options-list-item-bg-select: rgba(40, 109, 255, 0.1);
   --columns-options-list-item-color: #333;
-  --columns-options-list-item-color-select: #286DFF;
-  --columns-toolbar-vector-title-color: #286DFF;
+  --columns-options-list-item-color-select: #286dff;
+  --columns-toolbar-vector-title-color: #286dff;
   --columns-draggable-columns-bg: #333;
 }
 
@@ -178,7 +208,6 @@ const handleReset = () => {
   border-radius: 0.5rem;
   border: 1px solid var(--columns-draggable-box-bg);
 
-
   .draggable-list-bg {
     display: flex;
     align-items: center;
@@ -227,9 +256,9 @@ const handleReset = () => {
     }
 
     .options-list-item-select {
-      color: #286DFF;
+      color: #286dff;
       // background: var(--columns-options-list-item-bg-select);
-      border: 1px solid #286DFF;
+      border: 1px solid #286dff;
       display: flex;
       align-items: center;
       justify-content: center;

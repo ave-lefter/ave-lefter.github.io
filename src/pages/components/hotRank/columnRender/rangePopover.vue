@@ -6,6 +6,7 @@ const props = defineProps<{
   list: { text: string; value: string }[]
   selectRangeIndex: 0 | 1
   isFilterHighlight: boolean
+  append?: string
 }>()
 
 const emit = defineEmits(['update:modelValue', 'confirm'])
@@ -24,19 +25,15 @@ function confirm(params?: [string, string]) {
     rangeArr.value = ['', '']
   }
   emit('confirm', params)
-  popoverVisible.value = false
 }
 const themeStore = useThemeStore()
-function onSelect(item:{
-    text: string;
-    value: string;
-}) {
-    if(!item.value){
-        rangeArr.value[0]=''
-        rangeArr.value[1]=''
-    } else {
-        rangeArr.value[props.selectRangeIndex] = item.value
-    }
+function onSelect(item: { text: string; value: string }) {
+  if (!item.value) {
+    rangeArr.value[0] = ''
+    rangeArr.value[1] = ''
+  } else {
+    rangeArr.value[props.selectRangeIndex] = item.value
+  }
 }
 </script>
 
@@ -80,18 +77,20 @@ function onSelect(item:{
           v-model.trim.number="rangeArr[0]"
           clearable
           type="text"
+          :placeholder="$t('min')"
           @input="(value) => (rangeArr[0] = value.replace(/\-|[^\d.]/g, ''))"
         >
-          <template #append>h</template>
+          <template v-if="append" #append>{{ append }}</template>
         </el-input>
         <span class="ml-10px mr-10px">~</span>
         <el-input
           v-model.trim.number="rangeArr[1]"
           clearable
           type="text"
+           :placeholder="$t('max')"
           @input="(value) => (rangeArr[1] = value.replace(/\-|[^\d.]/g, ''))"
         >
-          <template #append>h</template>
+          <template v-if="append" #append>{{ append }}</template>
         </el-input>
       </div>
       <div class="mt-20px flex">

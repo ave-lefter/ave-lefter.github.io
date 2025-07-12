@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core'
 import ColumnsToolbar from './columnsToolbar.vue'
+import BlackList from '../pump/blackList.vue'
 
+defineProps<{ activeTab: string }>()
 const rankCommonConditions = useStorage('rankCommon', {
   activeInterval: '1m',
   quickVisible: true,
@@ -19,9 +21,7 @@ const intervals = computed(() => {
   ]
 })
 const tabs = computed(() => {
-  return [
-    { name: t('trending'), component: 'HotRank' as const, icon: 'custom:hot' },
-  ]
+  return [{ name: t('trending'), component: 'HotRank' as const, icon: 'custom:hot' }]
 })
 </script>
 
@@ -58,10 +58,12 @@ const tabs = computed(() => {
         <QuickSwapSet
           v-if="rankCommonConditions.quickVisible"
           v-model:quickBuyValue="rankCommonConditions.quickBuyValue"
+          class="mr-8px"
           :settingsButtonVisible="false"
           :chain="'solana'"
         />
-        <ColumnsToolbar :activeCategory="'hot'" class="ml-2" />
+        <BlackList />
+        <ColumnsToolbar v-if="activeTab === 'HotRank'" />
       </div>
     </div>
   </div>

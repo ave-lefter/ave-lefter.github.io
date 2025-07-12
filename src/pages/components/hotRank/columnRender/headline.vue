@@ -3,7 +3,7 @@
     <template #default="{ row }">
      <div class="text-12px lh-16px">
       {{
-        row.headline || "$BABYLABUBU 是一个基于 BNB 链的社区驱动的memecoin。"
+        row.headline || "暂无AI叙事内容"
       }}
      </div>
     </template>
