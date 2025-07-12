@@ -31,7 +31,9 @@
         :style="{
           height:props.scrollHeight-50+'px',
           // height:'500px',
-          '--el-table-border':'1px solid #333'
+          '--el-table-border':'1px solid #333',
+          'overflow':'visible',
+          paddingBottom:!showFooter?'0px':'20px'
         }"
         row-class='cursor-pointer group'
         :rowEventHandlers="{
