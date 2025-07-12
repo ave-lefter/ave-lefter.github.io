@@ -240,7 +240,6 @@
                 <el-switch
                   v-model="hasRing"
                   size="small"
-                
                   />
                 <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
               </template>
@@ -630,9 +629,11 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
   }
 }
 .m-tabs{
-  --el-border-color-light:var(--d-333-l-F2F2F2);
-  --el-color-primary:var(--d-F5F5F5-l-333);
-  --el-text-color-primary:var(--d-666-l-999);
+  :deep() .el-tabs__header{
+    --el-border-color-light:var(--d-333-l-F2F2F2);
+    --el-color-primary:var(--d-F5F5F5-l-333);
+    --el-text-color-primary:var(--d-666-l-999);
+  }
   --el-tabs-header-height:44px;
   :deep() .el-tabs__item{
     font-weight: 400;
