@@ -21,14 +21,14 @@ const tabData=computed(()=>[
     label:t('customToken'),
     path:'/follow/token'
   },
-  {
-    label:t('watchAddress'),
-    path:'/follow/addr'
-  },
-  {
-    label:t('remarkLib'),
-    path:'/follow/remark'
-  }
+  // {
+  //   label:t('watchAddress'),
+  //   path:'/follow/addr'
+  // },
+  // {
+  //   label:t('remarkLib'),
+  //   path:'/follow/remark'
+  // }
 ])
 definePageMeta({
   layout: 'default',

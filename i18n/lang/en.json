@@ -480,6 +480,9 @@
   "totalSell": "Total Sell",
   "avgBuyPrice": " Avg Buy Price",
   "avgSellPrice": " Avg Sell Price",
+  "trades": "Trades",
+  "me": "Me",
+  "orderBook": "Order Book",
   "abnormalChips": "Abnormal Chips",
   "abnormalChipsTip": "Abnormal chip ratio has been reprocessed",
   "devAddress": "Create",
@@ -676,6 +679,7 @@
   "sniper_balance_ratio_cur_tips": "Sniper Holding Ratio: Assess the holdings of sniper addresses",
   "graduated": "Graduated",
   "MC": "MC",
+  "filters": "Filter",
   "holders4": "Holder",
   "smarterTxs": "Smarter Txs",
   "aiSummary": "AI summary",
@@ -910,6 +914,11 @@
   "sellAll": "Sell all",
   "wallet_detail_transfer_count": "Transfers Count",
   "H": "H",
+  "totalBalance": "Total Assets",
+  "balanceDetails": "Assets Details",
+  "balanceOverview": "Assets Overview",
+  "hideSmallAssets": "Hide small Assets(<$1)",
+  "showSmallAssets": "Show small Assets(<$1)",
   "migraged": "Migrated",
   "addLiquidity": "Liquidity",
   "stopLimit": "Stop Limit",
@@ -1022,5 +1031,7 @@
   "expiresInTime": "Expires {t}",
   "revoke": "Cancel",
   "expiredTime": "Expiry",
-  "historyLimitOrder": "Limit Order"
+  "historyLimitOrder": "Limit Order",
+  "searchGroup": "Search Group",
+  "marketCap": "C.M.Cap"
 }

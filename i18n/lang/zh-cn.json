@@ -484,6 +484,9 @@
   "totalSell": "总卖出",
   "avgBuyPrice": "买入成本价",
   "avgSellPrice": "卖出成本价",
+  "trades": "交易",
+  "me": "我的",
+  "orderBook": "订单簿",
   "abnormalChips": "异常筹码",
   "abnormalChipsTip": "异常筹码比例已去重处理",
   "devAddress": "发币",
@@ -683,7 +686,6 @@
   "smarterTxs": "聪明钱交易数",
   "aiSummary": "AI叙事",
   "aiIsAnalyzing": "AI正在分析中...",
-  "tax": "税",
   "days2": "天",
   "bestToken2": "最佳代币",
   "profit3": "利润",
@@ -908,6 +910,11 @@
   "Vol": "成交量",
   "sellAll": "全部卖出",
   "H": "小时",
+  "totalBalance": "资产折合",
+  "balanceDetails": "资产明细",
+  "balanceOverview": "资产总览",
+  "hideSmallAssets": "隐藏小额资产(<$1)",
+  "showSmallAssets": "显示小额资产(<$1)",
   "migraged": "迁移次数",
   "blacklistExists": "黑名单已存在",
   "removedBacklist": "已从黑名单移除",
@@ -1022,5 +1029,7 @@
   "expiresInTime": "{t}过期",
   "revoke": "撤销",
   "expiredTime": "过期时间",
-  "historyLimitOrder": "历史挂单"
+  "historyLimitOrder": "历史挂单",
+  "searchGroup": "搜索分组",
+  "marketCap": "流通市值"
 }

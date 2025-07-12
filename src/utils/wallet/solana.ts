@@ -48,7 +48,9 @@ export type Wallet = MakeOptional<ReturnType<Wallets['get']>[number], 'features'
     account?: any
   }) => Promise<{
     signature: Uint8Array
-  }>
+  } | Array<{
+    signature: Uint8Array
+  }>>
   signAndSendTransaction?: (data: {transaction: any, account?: any, chain?: string}) => Promise<{
     signature: Uint8Array
   }>

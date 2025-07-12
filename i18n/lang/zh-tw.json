@@ -482,6 +482,9 @@
   "totalSell": "總賣出",
   "avgBuyPrice": "買入成本價",
   "avgSellPrice": "賣出成本價",
+  "trades": "交易",
+  "me": "我的",
+  "orderBook": "訂單簿",
   "abnormalChips": "异常籌碼",
   "abnormalChipsTip": "异常籌碼比例已去重處理",
   "devAddress": "發幣",
@@ -897,6 +900,11 @@
   "sellAll": "全部賣出",
   "smart_money_tips": "24h內聰明錢買入{b}次,賣出{s}次",
   "H": "小時",
+  "totalBalance": "資產折合",
+  "balanceDetails": "資產明細",
+  "balanceOverview": "資產總覽",
+  "hideSmallAssets": "隱藏小額資產(<$1)",
+  "showSmallAssets": "顯示小額資產(<$1)",
   "migraged": "遷移次數",
   "addLiquidity": "加池子",
   "stopLimit": "止盈止損",
@@ -1009,5 +1017,6 @@
   "expiresInTime": "{t}過期",
   "revoke": "撤銷",
   "expiredTime": "过期時間",
-  "historyLimitOrder": "歷史掛單"
+  "historyLimitOrder": "歷史掛單",
+  "marketCap": "流通市值"
 }

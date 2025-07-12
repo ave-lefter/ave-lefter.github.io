@@ -122,7 +122,7 @@ export function getTokenSymbol(tokenId: string) {
   })
 }
 
-export function getUserSwapTokenList(): Promise<Array<{
+export function getUserSwapTokenList(address = useWalletStore().address, chain = useWalletStore().chain): Promise<Array<{
   address: string
   chain: string
   current_price_usd: number
@@ -141,9 +141,9 @@ export function getUserSwapTokenList(): Promise<Array<{
   updated_at: number
   value: number
 }>> {
-  const walletStore = useWalletStore()
-  const chain = walletStore.chain
-  const address = walletStore.address
+  // const walletStore = useWalletStore()
+  // const chain = walletStore.chain
+  // const address = walletStore.address
   if (!chain || !address) {
     return Promise.resolve([])
   }

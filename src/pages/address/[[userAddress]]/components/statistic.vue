@@ -1,5 +1,5 @@
 <template>
-  <div class="p-5 flex justify-between mr-5 flex-1 rounded-2 bg-[--d-15171C-l-F8F8F8]">
+  <div class="p-5 flex justify-between mr-5 flex-1 rounded-2 bg-[--d-111-l-F8F8F8]">
     <div>
       <div class="flex gap-6 mb-5">
         <UserAvatar
@@ -70,7 +70,7 @@
           {{ uSymbol }}{{ total_balance }} {{ main_token_symbol }}
         </strong>
 
-        <el-switch v-model="currencyStandard" inactive-value="U" :active-value="chain">
+        <el-switch v-model="currencyStandard" class="custom-switch" inactive-value="U" :active-value="chain">
           <template #active-action>
             <ChainToken :chain="chain" :width="16" />
           </template>
@@ -112,17 +112,17 @@
         </a>
         <a
           v-else
-          class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[--d-222-l-FFF] text-3 leading-4 cursor-pointer rounded text-[var(--d-fff-l-333)]"
+          class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[#3F80F7] text-3 leading-4 cursor-pointer rounded text-[#fff]"
           @click="_addAttention"
         >
           <Icon name="custom:accountplus" class="text-4" />
           {{ $t('follow') }}
         </a>
         <a
-          class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[--d-222-l-FFF] text-3 leading-4 cursor-pointer rounded text-[var(--d-fff-l-333)]"
+          class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[#3F80F7] text-3 leading-4 cursor-pointer rounded text-[#fff]"
           @click="shareComponent && shareComponent.openDialog()"
         >
-          <Share ref="shareComponent" type="walletDetailTop" :statistics="statistics as any" :address="address" :chain="chain" />
+          <Share ref="shareComponent" type="walletDetailTop" :statistics="statistics" :address="address" :chain="chain" classString="!color-[#fff]" />
           {{ $t('share') }}
         </a>
       </div>
@@ -208,7 +208,20 @@ interface Statistics {
   [key: string]: any
 }
 
-const statistics = ref<Statistics>({ wallet_logo: {} })
+// Ensure all required fields from GetTokenStatisticsResponse are present with default values
+// If GetTokenStatisticsResponse is exported from an API types file, import it here:
+
+const statistics = ref<Statistics>({
+  wallet_logo: {},
+  x_logo: '',
+  chain: '',
+  newTags: [],
+  balance_amount: 0,
+  // Add all other required fields from GetTokenStatisticsResponse with sensible defaults
+  // Example:
+  // fieldName: defaultValue,
+  // ...
+})
 
 const remark = ref({
   value: '',
@@ -218,14 +231,6 @@ const remark = ref({
 
 const balanceAnalysis = ref<Awaited<ReturnType<typeof getBalanceAnalysis>>>({ profit: [], total_balance_without_risk: undefined })
 const currencyStandard = ref('U')
-//   ...mapState([
-//     "token_user",
-//     "currentAccount",
-//     "mode",
-//     "globalConfig",
-//     "bot",
-//   ]),
-//   ...mapGetters(["language"]),
 
 const pnl = computed(() => {
   const profit: Array<{
@@ -523,3 +528,9 @@ defineExpose({
   mergeStatistics,
 })
 </script>
+<style scoped>
+.custom-switch {
+  --el-switch-off-color: var(--d-333333-l-F2F2F2);
+  --el-switch-on-color: var(--d-1F3156-l-D2E0F7);
+}
+</style>

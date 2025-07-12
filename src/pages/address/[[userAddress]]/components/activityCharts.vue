@@ -3,7 +3,7 @@
     <div class="flex justify-between mt-5 mb-2.5">
       <h2 class="summary-title text-5 leading-5 font-500 text-[var(--d-fff-l-333)]">{{ $t('walletActivity') }}</h2>
     </div>
-    <div v-loading="loading" class="activity relative p-5 rounded-2 h-[220px] bg-[--d-15171C-l-F8F8F8]">
+    <div v-loading="loading" class="activity relative p-5 rounded-2 h-[220px] bg-[--d-111-l-F8F8F8]">
       <template v-if="activity.dataset.source.length <= 0">
         <AveEmpty
           :style="{

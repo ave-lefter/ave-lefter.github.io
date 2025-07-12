@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <div :style="botStore.connectVisible&&[{filter: 'url(#blur)'}]">
+    <div :style="botStore.connectVisible&&[{filter: 'url(#blur)'}]" class="min-h-screen">
       <TheHeader />
       <div
         class="relative flex bg-[--d-000-l-F6F6F6] gap-1px pt-1px transition-transform transition-duration-300 overflow-hidden"

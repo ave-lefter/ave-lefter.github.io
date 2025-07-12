@@ -81,7 +81,20 @@ export function getWalletBasicInfo(params) {
 }
 
 // 交易分析
-export function getTxAnalysis(params) {
+export function getTxAnalysis(params: {
+  user_address: string
+  user_chain: string
+  interval: string
+}): Promise<{
+  best_token?: Array<{
+    chain: string
+    logo_url: string
+    symbol: string
+    token: string
+    total_profit: string
+    total_profit_ratio: string
+  }>
+}>{
   const { $api } = useNuxtApp()
   return $api('/v2api/walletinfo/v2/tx_analysis', {
     method: 'get',
@@ -182,3 +195,13 @@ export function setUserTokenStatus(
     }
   })
 }
+
+// 获取黑白名单
+export function getUserTokenList(address:string,chain:string) {
+  const { $api } = useNuxtApp()
+  return $api(`/v1api/v3/users/balance/token?address=${address}&chain=${chain}`, {
+    method: 'get',
+  })
+}
+
+

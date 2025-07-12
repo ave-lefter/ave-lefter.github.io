@@ -140,7 +140,11 @@ export const useWalletStore = defineStore('wallet', () => {
       return (_provider as Wallet)?.signMessage?.({
         message: decodeUTF8(msg),
         account: (_provider as Wallet)?.accounts?.[0]
-      }).then(async res => bs58.encode(res.signature))
+      }).then(async res => {
+        console.log('signMessage', res)
+        const signature = Array.isArray(res) ? res?.[0]?.signature : res?.signature
+        return bs58.encode(signature)
+      })
     } else if (chain.value === 'tron') {
       return (provider.value as TronWalletAdapter)?.signMessage?.(msg)
     } else if (isEvmChain(chain.value)) {
@@ -154,6 +158,7 @@ export const useWalletStore = defineStore('wallet', () => {
     if (walletSignature.value[address.value]) return Promise.resolve(walletSignature.value[address.value])
     const msg = `Ave.ai requests ${address.value} address signature to bind favorite list`
     return signMessage(msg)?.then((res) => {
+      console.log('res', res)
       if (res) {
         walletSignature.value[address.value] = res
         return Promise.resolve(res)

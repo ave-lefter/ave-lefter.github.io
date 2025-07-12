@@ -34,9 +34,9 @@ const rowData = ref<any>({})
 
 const loading = ref(false)
 const pageData = ref({
-  total: 10,
+  total: 0,
   page: 1,
-  pageSize: 20
+  pageSize: 50
 })
 const tableList = ref<any[]>([])
 const { mode } = storeToRefs(useGlobalStore())
@@ -84,7 +84,7 @@ const handleMonitor = async (row: any) => {
     })
   } else {
     await favUsersPauseMonitor({
-      address: row.address,
+      address: row.user_address,
       uid: row.id
     })
   }
@@ -172,6 +172,7 @@ const getList = async () => {
         total_txs_usd: safeBigNumber(i.total_sold_usd).plus(safeBigNumber(i.total_purchase_usd)).toString(),
       }))) ||
     []
+  pageData.value.total = res.total
   tableList.value = tableData
 }
 
@@ -199,15 +200,25 @@ onMounted(() => {
 
 <template>
   <div>
-    <el-table class='mt-12px' height="calc(100vh - 210px)" v-loading="loading" row-class-name="group" :data="tableList" fit
-      @sort-change="handleSortChange" @row-click="tableRowClick">
+    <el-table class='mt-12px' height="calc(100vh - 210px)" v-loading="loading" row-class-name="group" :data="tableList"
+      fit @sort-change="handleSortChange" @row-click="tableRowClick">
       <template #empty>
-        <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
-          <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
-          <img v-if="mode === 'dark'" src="@/assets/images/empty-black.svg">
-          <span>{{ t('emptyNoData') }}</span>
+        <div v-if="botStore.evmAddress || walletStore.address">
+          <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
+            <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
+            <img v-if="mode === 'dark'" src="@/assets/images/empty-black.svg">
+            <span>{{ t('emptyNoData') }}</span>
+          </div>
+          <span v-else />
         </div>
-        <span v-else />
+        <AveEmpty v-else>
+          <span class="text-12px mt-10px">{{ $t('noWalletTip') }}</span>
+          <el-button type="primary" class="mt-10px" @click="botStore.$patch({
+            connectVisible: true
+          })">
+            {{ $t('connectWallet') }}
+          </el-button>
+        </AveEmpty>
       </template>
       <el-table-column :label="t('address')" min-width="160" show-overflow-tooltip>
         <template #default="{ row, $index }">
@@ -285,7 +296,7 @@ onMounted(() => {
               <Icon name="custom:monitor-icon" class="text-16px mr-2px" />
               <span
                 class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
-                {{ row?.is_monitored === 1 ? t('pause') : t('openMonitor') }}
+                {{ row?.is_monitored === 1 ? t('pauseMonitor') : t('openMonitor') }}
               </span>
             </div>
             <div class="flex items-center mr-12px color-[#666] cursor-not-allowed" v-else>
@@ -296,13 +307,13 @@ onMounted(() => {
       </el-table-column>
     </el-table>
 
-    <el-pagination class="mt-15px" v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize"
-      layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" />
+    <el-pagination class="mt-15px" v-if="pageData.total > 1" v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize"
+      layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getList" />
 
     <el-popover :visible="visibleShow" :virtual-ref="virtualRef" virtual-triggering trigger="click" :width="250">
       <div>
         <div>{{ t('editRemark') }}</div>
-        <el-input v-model="remarkValue" maxlength="50" show-word-limit :placeholder="t('enterRemark')"
+        <el-input v-model="remarkValue" clearable maxlength="50" show-word-limit :placeholder="t('enterRemark')"
           class="mt-8px w-200px" />
         <div class="flex items-center justify-between mt-12px gap-12px">
           <div @click="visibleShow = false"
