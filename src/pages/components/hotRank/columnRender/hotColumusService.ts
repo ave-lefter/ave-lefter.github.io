@@ -3,7 +3,7 @@ export function getHotOptions(t: ReturnType<typeof useI18n>['t']) {
     {
       title: t('basicInfo'),
       list: [
-        // "openTimeContent",
+        'headline',
         'priceContent',
         'mCapContent',
         'liquidityContent',
@@ -14,8 +14,8 @@ export function getHotOptions(t: ReturnType<typeof useI18n>['t']) {
     {
       title: t('transactionInfo'),
       list: [
-        'volumeContent',
-        'txnsContent',
+        'dynamicVolAndTxs',
+        // 'txnsContent',
         'dynamicMarkers',
         'priceChange1mContent',
         'priceChangeDynamicContent',
@@ -27,7 +27,6 @@ export function getHotOptions(t: ReturnType<typeof useI18n>['t']) {
     {
       title: t('securityInfo'),
       list: [
-        // 'rugPullContent',
         'snipersContent',
         'securityContent',
         'dexContent',
@@ -87,12 +86,6 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       isVisible: true,
       render: 'liquidityContent',
     },
-    // {
-    //   title: t('flag_rug_pull'),
-    //   key: 'rug_rate',
-    //   isVisible: true,
-    //   render: 'rugPullContent',
-    // },
     {
       title: t('smarter1'),
       key: 'smart_money_buy_volume_24h',
@@ -100,17 +93,17 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       render: 'smarterContent',
     },
     {
-      title: t('volume4'),
-      key: 'volume_u_dynamic',
+      title: t('volume4')+'/'+t('txns'),
+      key: 'dynamicVolAndTxs',
       isVisible: true,
-      render: 'volumeContent',
+      render: 'dynamicVolAndTxs',
     },
-    {
-      title: t('txns'),
-      key: 'tx_dynamic_count',
-      isVisible: false,
-      render: 'txnsContent',
-    },
+    // {
+    //   title: t('txns'),
+    //   key: 'tx_dynamic_count',
+    //   isVisible: false,
+    //   render: 'txnsContent',
+    // },
     {
       title: t('markers'),
       key: 'markers_dynamic',

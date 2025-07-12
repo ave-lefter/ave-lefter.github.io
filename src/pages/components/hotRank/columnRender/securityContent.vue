@@ -70,7 +70,10 @@ function ruggedColor(row) {
 
 const runPullVisible = computed(() => {
   const { activeChain, activeCategory } = props
-  return ['AllChains', 'solana'].includes(activeChain) && activeCategory === 'hot'
+  return (
+    ['AllChains', 'solana'].includes(activeChain) &&
+    activeCategory === 'hot' 
+  )
 })
 </script>
 

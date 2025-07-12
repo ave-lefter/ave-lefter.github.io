@@ -67,7 +67,7 @@ function inBlackList(row) {
 }
 const pageInfo = ref({
   pageNO: 1,
-  pageSize: 20,
+  pageSize: 50,
   total: 0,
 })
 const loading = shallowRef(false)
@@ -83,7 +83,7 @@ const renderData = computed(() => {
         setFilterForm,
       },
     },
-    volumeContent: {
+    dynamicVolAndTxs: {
       Comp: DynamicVolAndTxs,
       props: {
         activeInterval: globalStore.rankCommon.activeInterval,
@@ -400,7 +400,7 @@ function sizeChange() {
   <el-pagination
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
-    class="mt-5px flex justify-center"
+    class="mt-5px flex justify-center color-[--d-666-l-999]"
     layout="total, prev, pager, next"
     :total="pageInfo.total || 0"
     :small="false"
