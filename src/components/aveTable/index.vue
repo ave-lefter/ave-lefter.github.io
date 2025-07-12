@@ -179,6 +179,8 @@ function calculateColumnWidths() {
   </el-auto-resizer>
 </template>
 
-<style scoped>
-
+<style scoped lang="scss">
+:deep() .el-table-v2__footer{
+  overflow: visible; 
+}
 </style>

@@ -45,25 +45,27 @@
          </li>
        </template>
        <template #default>
-        <div class="font-500 text-14px lh-[120%] tracking-0% text-[--d-FFF-l-000] ">
+        <div class="font-500 text-14px lh-[120%] tracking-0% text-[--d-FFF-l-000]">
           <div class="mb-8px text-12px lh-16px">{{ $t('groupManage') }}</div>
-         <VueDraggableNext
-            v-model="sortOptions"
-            class="flex flex-col mb-12px"
-            tag="ul"
-            v-bind="{ animation: 300}"
-            item-key="show_index"
-            @start="drag = true"
-            @end="drag = false"
-          >
-          <li v-for="item in sortOptions" :key="item?.show_index" class="flex-between py-12px px-8px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
-          >
-            <span>{{ item?.name }}</span>
-            <Icon name="material-symbols:dehaze" class="text-16px"/>
-          </li>
-            <!-- <transition-group type="transition" name="flip-list">
-            </transition-group> -->
-          </VueDraggableNext>
+          <el-scrollbar height="400px" wrap-class="mb-12px">
+              <VueDraggableNext
+                 v-model="sortOptions"
+                 class="flex flex-col"
+                 tag="ul"
+                 v-bind="{ animation: 300}"
+                 item-key="show_index"
+                 @start="drag = true"
+                 @end="drag = false"
+               >
+               <li v-for="item in sortOptions" :key="item?.show_index" class="flex-between py-12px px-8px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
+               >
+                 <span>{{ item?.name }}</span>
+                 <Icon name="material-symbols:dehaze" class="text-16px"/>
+               </li>
+                 <!-- <transition-group type="transition" name="flip-list">
+                 </transition-group> -->
+               </VueDraggableNext>
+          </el-scrollbar>
           <div class="flex-between w-100%">
             <el-button style="background: var(--d-333-l-F2F2F2);--el-border:none" class="flex-1" @click.stop.prevent="()=>popoverRef2?.hide?.()">{{ $t('cancel') }}</el-button>
             <el-button type="primary" class="flex-1" @click.stop.prevent="handleSort">{{ $t('confirm') }}</el-button>
