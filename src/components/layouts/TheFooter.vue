@@ -18,7 +18,7 @@
         </template>
         <div v-else class="mr--5px" />
       </NuxtLink>
-      <el-badge :is-dot="isDoted2" class="mr-12px">
+      <el-badge :is-dot="(!!botStore.evmAddress)&&isDoted2" class="mr-12px">
         <div
           id="monitor"
           class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit "
@@ -108,6 +108,8 @@ import { throttle } from 'lodash-es'
 const {visible,hasRing} = storeToRefs(useMonitorStore())
 const signalStore = useSignalStore()
 const globalStore = useGlobalStore()
+const botStore = useBotStore()
+
 const audioElement=ref<HTMLAudioElement|null>(null)
 const { lang } = storeToRefs(globalStore)
 const { token } = storeToRefs(useTokenStore())
@@ -210,13 +212,13 @@ watch(visible, val => {
 
 watch(() => wsStore.wsResult[WSEventType.MONITOR], () => {
   console.log('wsStore.wsResult[WSEventType.MONITOR]', wsStore.wsResult[WSEventType.MONITOR])
+  throttle(() => {
+    if(hasRing.value&&botStore.evmAddress){
+      audioElement.value?.play()
+    }
+  },1000)()
   if (!visible.value) {
     isDoted2.value = true
-    throttle(() => {
-      if(hasRing.value){
-        audioElement.value?.play()
-      }
-    },1000)()
   }
 })
 </script>

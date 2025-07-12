@@ -220,7 +220,7 @@
             :style="{height:`${props.scrollHeight-50}px`}"
             class="overflow-hidden"
           >
-            <span class="text-12px mt-10px">{{ $t('noWalletTip') }}</span>
+            <span class="text-12px mt-10px">{{ $t('noBotWalletTip') }}</span>
             <el-button
               class="mt-10px"
               @click="botStore.$patch({

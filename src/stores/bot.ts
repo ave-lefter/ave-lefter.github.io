@@ -225,6 +225,9 @@ export const useBotStore = defineStore('bot', () => {
   }
 
   function logout() {
+    if (subscribed.value) {
+      bot_unsubscribe()
+    }
     accessToken.value = ''
     refreshToken.value = ''
     evmAddress.value = ''

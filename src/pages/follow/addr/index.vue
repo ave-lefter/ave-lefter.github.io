@@ -134,7 +134,7 @@
               />
                <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
               <div>
-              <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 85px" iconEditColor="#999" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" @updateRemark="({remark}) => row.remark = remark"/>
+              <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 85px" iconEditColor="#999" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" @updateRemark="({remark}) => row.remark = remark" :priority="1"/>
                 <div class="font_10 color-icon flex-start mt_4" style="line-height: 1">
                   <Icon
                     v-copy="row.user_address"
@@ -768,7 +768,7 @@ function getMonitorNum() {
   })
 }
 const getTableList = throttle(function() {
-   loading.value = true
+  loading.value = true
   const max = Math.floor(new Date().getTime() / 1000)
   const min = safeBigNumber(max).minus(safeBigNumber(filterForm.value.last_trade_time)).toString()
   const last_trade_time= filterForm.value.last_trade_time ?{

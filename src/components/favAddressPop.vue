@@ -1,5 +1,5 @@
 <template>
-  <el-popover ref="popoverRef" v-model:visible="visible" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" :teleported="true" popper-class="" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" @before-leave="reset"  >
+  <el-popover ref="popoverRef" v-model:visible="visible" :width="props?.width" trigger="click" placement="right-end" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" :teleported="true" popper-class="" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" @before-leave="reset"  >
     <el-form ref="formRef" v-click-outside="()=>followStore.favAddressPopVisible=false" v-loading="loading" :model="form" :rules="rules" hide-required-asterisk @submit.prevent.stop="handleSubmit(formRef)">
       <el-form-item prop="group" required label-position="top" size="large" class="mb-20px!">
         <el-scrollbar max-height="274px">

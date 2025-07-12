@@ -306,7 +306,7 @@ onMounted(() => {
             <!-- 监控 -->
             <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"
               @click="handleMonitor(row)" v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'">
-              <Icon name="custom:monitor-icon" class="text-16px mr-2px" />
+              <Icon name="custom:monitor-icon" class="text-16px mr-2px" :class="[(row?.is_monitored === 1)&&'color-[var(--d-FFF-l-333)]']"/>
               <span
                 class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
                 {{ row?.is_monitored === 1 ? t('pauseMonitor') : t('openMonitor') }}

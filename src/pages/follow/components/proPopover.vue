@@ -2,8 +2,8 @@
 <template>
   <el-popover ref="popoverRef" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" :teleported="true" popper-class="" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)">
     <el-form ref="formRef" :model="form" :rules="rules" @submit.prevent.stop="handleSubmit(formRef)">
-      <el-form-item :prop="props.prop" :required="props.required" label-position="top" size="large" class="mb-12px!">
-        <el-input v-model="form[props.prop]" :placeholder="placeholder" :maxlength="props.maxlength" show-word-limit/>
+      <el-form-item :prop="props.prop" :required="props.required" label-position="top" size="large" class="mb-20px!">
+        <el-input v-model="form[props.prop]" :placeholder="placeholder" :maxlength="props.maxlength" show-word-limit clearable/>
       </el-form-item>
       <el-form-item class="mb-0px!">
         <div class="flex-between w-100%">
@@ -54,7 +54,7 @@ const props=defineProps({
   },
   maxlength:{
     type:Number,
-    default:20
+    default:50
   },
   title: {
     type: String,
