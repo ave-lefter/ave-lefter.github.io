@@ -29,6 +29,7 @@ export function getHotOptions(t: ReturnType<typeof useI18n>['t']) {
       list: [
         'snipersContent',
         'securityContent',
+        // 'runPullContent',
         'dexContent',
         'insidersContent',
       ],
@@ -169,6 +170,10 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       key: 'security',
       isVisible: true,
       render: 'securityContent',
+      children:[
+        {title:t('security'),isVisible:true,render:'securityContent'},
+        {title:t('runPull'),isVisible:true,render:'runPullContent'},
+      ]
     },
     {
       title: 'DEX',

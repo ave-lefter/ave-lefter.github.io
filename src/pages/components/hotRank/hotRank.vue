@@ -398,6 +398,7 @@ function sizeChange() {
     </template>
   </el-table>
   <el-pagination
+  v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
     class="mt-5px flex justify-center color-[--d-666-l-999]"

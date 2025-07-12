@@ -17,14 +17,14 @@ const themeStore = useThemeStore()
 const hotOptions = computed(() => getHotOptions(t))
 
 const initColumns = ref([])
-const modelColumns = ref(cloneDeep(storeColumns.value.filter((item) => item.isVisible)))
+const modelColumns = ref(cloneDeep(storeColumns.value.filter((item) =>item.children || item.isVisible)))
 console.log(modelColumns.value, 'modelColumns.value')
 
 // 当对话框打开时，更新本地列配置
 const openDialog = () => {
   dialogVisible.value = true
   initColumns.value = getDefaultColumns(t)
-  modelColumns.value = cloneDeep(storeColumns.value.filter((item) => item.isVisible))
+  modelColumns.value = cloneDeep(storeColumns.value.filter((item) => item.children || item.isVisible))
 }
 
 const handleSelect = (item) => {
@@ -55,6 +55,19 @@ const handleReset = () => {
   hotSettings.value.isBlacklist = false
   globalStore.pumpSetting.avatar_isCircle = hotSettings.value.avatar_isCircle
   globalStore.pumpSetting.isBlacklist = hotSettings.value.isBlacklist
+}
+
+function findColumnByRender(renderKey) {
+  return modelColumns.value.find((arr) => arr.render === renderKey)
+}
+
+function handleSelectChild(childItem, renderKey) {
+  childItem.isVisible = !childItem.isVisible
+  const index = modelColumns.value.findIndex((arr) => arr.render === renderKey)
+  if(index!==-1){
+    modelColumns.value[index].isVisible = 
+    modelColumns.value[index].children.some(el=>el.isVisible)
+  }
 }
 </script>
 
@@ -115,17 +128,31 @@ const handleReset = () => {
         <div v-for="(option, index) in hotOptions" :key="index" class="option-bg">
           <div>{{ option.title }}</div>
           <div class="options-list-bg">
-            <div
-              v-for="(item, i) in option.list"
-              :key="i"
-              class="options-list-item"
-              :class="[
-                modelColumns.find((arr) => arr.render === item) && 'options-list-item-select',
-              ]"
-              @click="handleSelect(item)"
-            >
-              {{ initColumns.find((arr) => arr.render === item)?.title }}
-            </div>
+            <template v-for="(item, i) in option.list" :key="i">
+              <div
+                  v-if="!findColumnByRender(item)?.children"
+                class="options-list-item"
+                :class="[
+                  modelColumns.find((arr) => arr.render === item) && 'options-list-item-select',
+                ]"
+                @click="handleSelect(item)"
+              >
+                {{ initColumns.find((arr) => arr.render === item)?.title }}
+              </div>
+                <template v-else>
+                  <div
+                  v-for="(childItem, childIdx) in findColumnByRender(item)?.children"
+                    :key="childIdx"
+                    class="options-list-item"
+                    :class="[
+                    childItem.isVisible && 'options-list-item-select',
+                  ]"
+                    @click="handleSelectChild(childItem, item)"
+                  >
+                    {{ childItem.title }}
+                  </div>
+                </template>
+              </template>
           </div>
         </div>
         <div class="flex items-center gap-20px mt-40px">
