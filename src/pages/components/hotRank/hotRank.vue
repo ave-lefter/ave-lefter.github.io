@@ -70,7 +70,7 @@ const rankCommonConditions = useStorage('rankCommon', {
 const listData = ref<any[]>([])
 const pageInfo = ref({
   pageNO: 1,
-  pageSize: 100,
+  pageSize: 20,
   total: 0,
 })
 const loading = shallowRef(false)
