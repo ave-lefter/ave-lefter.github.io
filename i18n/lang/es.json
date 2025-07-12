@@ -425,5 +425,17 @@
   "expiresInTime": "Expira {t}",
   "revoke": "Cancelar",
   "expiredTime": "Vencimiento",
-  "historyLimitOrder": "4o mini"
+  "historyLimitOrder": "4o mini",
+  "allChain": "Todas las cadenas",
+  "liquidity1": "Liquidez",
+  "smarter1": "Más Inteligentes",
+  "markers": "Marcadores",
+  "top10Positions": "Top10 %en propiedad",
+  "openTime": "Edad",
+  "nVolume": "{n} Volumen",
+  "nTxAddress": "{n} Transacciones",
+  "nMarkers": "{n} Marcadores",
+  "min": "Hace minutos",
+  "basicInfo": "Información básica",
+  "insidersPosition1": "Propiedad de internos"
 }

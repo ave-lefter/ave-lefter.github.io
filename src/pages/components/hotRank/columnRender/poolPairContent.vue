@@ -116,7 +116,7 @@ function timerCountColor(val:number) {
         <RangePopover
           v-model="popoverVisible"
           :width="300"
-          :title="$t('opentime')"
+          :title="$t('openTime')"
           :list="openTimeList"
           :selectRangeIndex="1"
           :isFilterHighlight="isFilterHighlight"

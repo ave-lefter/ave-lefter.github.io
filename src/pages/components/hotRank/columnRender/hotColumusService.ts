@@ -47,7 +47,7 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       render: 'poolPairContent'
     },
     {
-      title:t('AI叙事'),
+      title:t('aiSummary'),
       isVisible: true,
       key:'headline',
       render:'headline'

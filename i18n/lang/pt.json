@@ -425,5 +425,17 @@
   "expiresInTime": "Expira {t}",
   "revoke": "Cancelar",
   "expiredTime": "Expiração",
-  "historyLimitOrder": "Ordem de Limite"
+  "historyLimitOrder": "Ordem de Limite",
+  "allChain": "Todas as Redes",
+  "liquidity1": "Liquidez",
+  "smarter1": "Mais Inteligentes",
+  "markers": "Marcadores",
+  "top10Positions": "Top10 detém %",
+  "openTime": "Idade",
+  "nVolume": "{n} Vol",
+  "nTxAddress": "{n} Txns",
+  "nMarkers": "{n} Marcadores",
+  "min": "m atrás",
+  "basicInfo": "Informação básica",
+  "insidersPosition1": "Insiders Possuído"
 }

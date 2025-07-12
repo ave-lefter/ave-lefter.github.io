@@ -608,5 +608,20 @@
   "expiresInTime": "Hết hạn {t}",
   "revoke": "Hủy",
   "expiredTime": "Thời hạn",
-  "historyLimitOrder": "Lệnh giới hạn"
+  "historyLimitOrder": "Lệnh giới hạn",
+  "allChain": "Tất cả chuỗi",
+  "searchChain": "Tìm chuỗi",
+  "liquidity1": "Thanh khoản",
+  "smarter1": "Tiền thông minh",
+  "markers": "Số ví",
+  "top10Positions": "Top 10 nắm giữ %",
+  "openTime": "Tuổi",
+  "nVolume": "{n} khối lượng",
+  "nTxAddress": "{n} giao dịch",
+  "nMarkers": "{n} ví",
+  "min": "phút trước",
+  "smarterBuyTxns": "Giao dịch mua thông minh",
+  "smarterSellTxns": "Giao dịch bán thông minh",
+  "basicInfo": "Thông tin cơ bản",
+  "insidersPosition1": "Người trong cuộc nắm giữ"
 }

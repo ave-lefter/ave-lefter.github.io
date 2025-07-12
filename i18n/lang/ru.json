@@ -608,5 +608,20 @@
   "expiresInTime": "Истекает {t}",
   "revoke": "Отмена",
   "expiredTime": "Истечение",
-  "historyLimitOrder": "Лимитные ордера"
+  "historyLimitOrder": "Лимитные ордера",
+  "allChain": "Все сети",
+  "searchChain": "Поиск сети",
+  "liquidity1": "Ликвидность",
+  "smarter1": "Умные деньги",
+  "markers": "Маркеры",
+  "top10Positions": "Топ-10 владение%",
+  "openTime": "Возраст",
+  "nVolume": "{n} объем",
+  "nTxAddress": "{n} транзакций",
+  "nMarkers": "{n} маркеров",
+  "min": "мин назад",
+  "smarterBuyTxns": "Умные покупки",
+  "smarterSellTxns": "Умные продажи",
+  "basicInfo": "Основная информация",
+  "insidersPosition1": "Владение инсайдеров"
 }

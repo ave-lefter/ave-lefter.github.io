@@ -109,7 +109,7 @@ const runPullVisible = computed(() => {
           src="@/assets/images/zhuyi1.svg"
           alt=""
         >
-        {{ $t('Safe') }}
+        {{ $t('safe') }}
       </div>
       <el-popover v-if="runPullVisible" :width="247">
         <template #reference>
