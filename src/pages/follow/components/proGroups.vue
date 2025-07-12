@@ -240,8 +240,8 @@ ul.w-tabs {
   li {
     display: flex;
     padding: 0 8px;
-    height: 24px;
-    line-height: 24px;
+    height: 28px;
+    line-height: 28px;
     cursor: pointer;
     background-color: var(--d-1A1A1A-l-F2F2F2);
     justify-content: center;

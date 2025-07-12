@@ -547,7 +547,6 @@ const confirmBulkDelete = () => {
         /* background-color: var(--d-FFF-l-222);
         color: var(--d-222-l-FAFAFA); */
         font-size: 16px;
-        line-height: 48px;
         border-radius: 8px;
         text-align: center;
         &.black {
@@ -555,11 +554,13 @@ const confirmBulkDelete = () => {
           background-color: var(--d-222-l-FAFAFA);
           color: var(--d-FFF-l-222);
           margin-bottom: 20px;
+          line-height: 48px;
         }
         &.copy {
           background-color: #3F80F7;
           color:#F5F5F5;
           margin-top: 30px;
+          line-height: 48px;
         }
       }
     }
