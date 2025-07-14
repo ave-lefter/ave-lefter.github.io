@@ -19,6 +19,11 @@ const props = defineProps({
     type: String,
     required: true
   },
+  classString: {
+    type: String,
+    required: false,
+    default: ''
+  },
   chain: {
     type: String,
     required: true
@@ -31,6 +36,7 @@ const props = defineProps({
       return ['topHolder', 'default','walletDetailTop'].includes(value)
     },
   },
+
 })
 const dialogVisible = ref(false)
 const shareDom = templateRef('shareDom')
@@ -40,11 +46,11 @@ const localeStore = useLocaleStore()
 const configStore = useConfigStore()
 const imgList = computed(() => {
   const upShareImg = configStore.globalConfig.pc_share_image.replace(/^.*\|/, '')
-  const ups = upShareImg.split(',').map(img => {
+  const ups = upShareImg.split(',').map((img: string) => {
     return configStore.token_logo_url + 'pc_share/' + img
   })
   const downShareImg = configStore.globalConfig.pc_share_image.replace(/\|.*$/, '')
-  const downs = downShareImg.split(',').map(img => {
+  const downs = downShareImg.split(',').map((img: string) => {
     return configStore.token_logo_url + 'pc_share/' + img
   })
   return {
@@ -52,6 +58,7 @@ const imgList = computed(() => {
     downs
   }
 })
+
 defineExpose({
   openDialog
 })
@@ -133,7 +140,7 @@ function getColorClass(val: string) {
   <slot>
     <Icon
       name="custom:share"
-      class="text-12px color-[--d-999-l-666] ml-6px cursor-pointer"
+      :class="['text-12px color-[--d-999-l-666] ml-6px cursor-pointer', props.classString]"
       @click.self.stop="openDialog"
     />
   </slot>

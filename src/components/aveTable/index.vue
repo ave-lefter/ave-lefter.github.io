@@ -106,19 +106,6 @@ const computedColumns = computed(() => {
   })
 })
 
-// 获取平均宽度
-// function getAvgWidth() {
-//   let avgNum = 0
-//   const sumWidth = props.columns.reduce((prev, cur) => {
-//     if (cur.width) {
-//       return prev + cur.width
-//     } else {
-//       avgNum++
-//     }
-//     return prev
-//   }, 0)
-//   return ((elTableWidth.value - 6 - sumWidth) / avgNum) | 0
-// }
 function calculateColumnWidths() {
   const totalMinWidth = props.columns.reduce((sum, col) => sum + col.minWidth, 0)
 

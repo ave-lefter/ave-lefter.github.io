@@ -116,17 +116,19 @@ export function formatToMarks(
 }
 
 
-export function initTradingViewIntervals(currentResolution: string, isSupportSecChains: boolean): string {
+export function initTradingViewIntervals(currentResolution: string, chain: string, isSupportSecChains: boolean): string {
+  console.log('--------chain------', chain)
   const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
   const RESOLUTION_KEY = 'tv_resolution'
   const DEFAULT_LIST = ['1', '5', '15', '60', '240', '1D', '1W']
-  const SEC_LIST = ['1S', ...DEFAULT_LIST]
+  const SEC_LIST = ['1S', '5S', '15S', '30S', ...DEFAULT_LIST]
+  const Sol_LIST = ['1S', ...DEFAULT_LIST]
 
   let list: string[]
 
   const stored = localStorage.getItem(QUICK_KEY)
   if (!stored) {
-    list = isSupportSecChains ? SEC_LIST : DEFAULT_LIST
+    list = isSupportSecChains ? (chain=='solana'? Sol_LIST: SEC_LIST) : DEFAULT_LIST
     localStorage.setItem(QUICK_KEY, JSON.stringify(list))
     localStorage.setItem('tradingViewIntervalSet', 'true')
   } else {
@@ -134,14 +136,21 @@ export function initTradingViewIntervals(currentResolution: string, isSupportSec
 
     const has1S = list.includes('1S')
     const shouldHave1S = isSupportSecChains
-
-    if (shouldHave1S && !has1S) {
-      list.unshift('1S')
-      localStorage.setItem(QUICK_KEY, JSON.stringify(list))
-    } else if (!shouldHave1S && has1S) {
-      list = list.filter(i => i !== '1S')
-      localStorage.setItem(QUICK_KEY, JSON.stringify(list))
-    }
+      if (shouldHave1S && chain == 'solana' ) {
+        if (!has1S || ['5S', '15S', '30S'].some((i) => list?.includes(i))) {
+          list = list?.filter?.((i) => !i?.endsWith('S')) || []
+          list = ['1S'].concat(list)
+          localStorage.setItem(QUICK_KEY, JSON.stringify(list))
+        }
+      } else if (shouldHave1S && ['1S', '5S', '15S', '30S'].some(i => !list?.includes(i)) && chain !== 'solana') {
+        list = list?.filter?.((i) => !i?.endsWith('S')) || []
+        list = ['1S', '5S', '15S', '30S'].concat(list)
+        localStorage.setItem(QUICK_KEY, JSON.stringify(list))
+      } else if (!shouldHave1S && ['1S', '5S', '15S', '30S'].some((i) => list?.includes(i))) {
+        // list = list.filter((i) => i !== '1S')
+        list = list?.filter?.((i) => !i?.endsWith('S')) || []
+        localStorage.setItem(QUICK_KEY, JSON.stringify(list))
+      }
   }
 
   if (!list.includes(currentResolution)) {

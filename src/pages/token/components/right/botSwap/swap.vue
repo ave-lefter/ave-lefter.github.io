@@ -1179,7 +1179,7 @@ onMounted(() => {
     --el-input-border-color: transparent;
     --el-input-focus-border-color: transparent;
     --el-input-hover-border-color: transparent;
-    --el-input-bg-color: transparent;
+    // --el-input-bg-color: transparent;
     font-size: 18px;
     font-weight: 500;
     :deep() .el-input-group__append, .el-input-group__prepend {

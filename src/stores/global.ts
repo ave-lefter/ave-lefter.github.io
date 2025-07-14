@@ -60,6 +60,12 @@ export const useGlobalStore = defineStore('global', () => {
 
   const hide_risk=shallowRef(1)
   const hide_small=shallowRef(0)
+  const rankCommon = useStorage('rankCommon',{
+    activeInterval: '24h',
+    quickVisible: true,
+    quickBuyValue: '0.01',
+  })
+
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
 
@@ -117,6 +123,7 @@ export const useGlobalStore = defineStore('global', () => {
     pumpBlackList,
     hotList,
     hide_small,
-    hide_risk
+    hide_risk,
+    rankCommon
   }
 })

@@ -1,5 +1,5 @@
 // src/middleware/router.global.ts
-const redirectToOldUrls = ['/address']
+// const redirectToOldUrls = ['/address']
 export default defineNuxtRouteMiddleware((to) => {
   // console.log('to', from, to)
   if (to.fullPath?.includes('/login')) {
@@ -12,35 +12,21 @@ export default defineNuxtRouteMiddleware((to) => {
       return navigateTo(redirectUrl, { replace: true })
     }
   }
-  const needRedirectToOld = redirectToOldUrls.find((url) => to.fullPath.includes(url))
-  if (needRedirectToOld) {
-    const chain = to.params.chain as string
-    const isBtcOrSolana = ['bsc', 'solana'].includes(to.params.chain as string)
-    const botStore = useBotStore()
-    if (!chain) {
-      const walletStore = useWalletStore()
-      if (botStore.accessToken && botStore.evmAddress) {
-        const path = `/address/${botStore.getWalletAddress('solana')}/solana`
-        return navigateTo(path)
-      } else if (walletStore.address && walletStore.chain) {
-        const path = `/address/${walletStore.address}/${walletStore.chain}`
-        return navigateTo(path)
-      }
-    } else if (!isBtcOrSolana) {
-      let query = ''
-      if (botStore.accessToken &&  botStore.refreshToken) {
-        query = `?act=${botStore.accessToken}&ret=${botStore.refreshToken}`
-      }
-      if (to.params.chain) {
-        navigateTo('https://ave.ai'+ to.path + query,{
-          open:{
-            target:'_blank'
-          }
-        })
-        return abortNavigation()
-      }
-    }
-  }
+  // const needRedirectToOld = redirectToOldUrls.find((url) => to.fullPath.includes(url))
+  // if (needRedirectToOld) {
+  //   const chain = to.params.chain as string
+  //   const botStore = useBotStore()
+  //   if (!chain) {
+  //     const walletStore = useWalletStore()
+  //     if (botStore.accessToken && botStore.evmAddress) {
+  //       const path = `/address/${botStore.getWalletAddress('solana')}/solana`
+  //       return navigateTo(path)
+  //     } else if (walletStore.address && walletStore.chain) {
+  //       const path = `/address/${walletStore.address}/${walletStore.chain}`
+  //       return navigateTo(path)
+  //     }
+  //   }
+  // }
   if (!to.fullPath?.includes('/token')) {
     useHead({ title: 'Ave.ai' })
   } else if (to.fullPath?.includes(NATIVE_TOKEN)) {

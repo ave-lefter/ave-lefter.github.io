@@ -274,7 +274,7 @@ import BigNumber from 'bignumber.js'
 import { getHistoryMonitor,batchPauseMonitor,addAttention2} from '~/api/attention'
 import QuickBuyInput from './components/quickBuyInput.vue'
 import FilterType from './components/filterType.vue'
-import { defaultPaginationParams, downColor, upColor } from '@/utils/constants'
+import { downColor, upColor } from '@/utils/constants'
 import type {AveTable} from '#components'
 const { t } = useI18n()
 
@@ -433,7 +433,7 @@ const columns = computed(() => {
   ]
 })
 watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
-  console.log('ws monitor', val)
+  // console.log('ws monitor', val)
   mergeDataSource(val)
 })
 

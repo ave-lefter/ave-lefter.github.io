@@ -36,7 +36,7 @@ let isReadyLine = false
 let isHeaderReady = false
 
 const chain = computed(() => {
-  return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain
+  return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
 })
 
 const tokenAddress = computed(() => {
@@ -79,7 +79,13 @@ function switchTokenKline() {
   const val = pair.value
   if (isReady && route.name === 'token-id') {
     const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
-    resolution.value = initTradingViewIntervals(resolution.value, isSupportSecChains)
+    const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
+    const preResolutions = localStorage.getItem(QUICK_KEY)
+    resolution.value = initTradingViewIntervals(resolution.value, chain.value, isSupportSecChains)
+    const nextResolutions = localStorage.getItem(QUICK_KEY)
+    if (preResolutions !== nextResolutions) {
+        resetChart()
+    }
     if (_widget) {
       _widget?.resetCache?.()
       _widget?.activeChart?.()?.clearMarks?.()
@@ -245,7 +251,7 @@ async function initChart() {
   // console.log('widget', window.TradingView)
   const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
   // 初始化 resolutions
-  resolution.value = initTradingViewIntervals(resolution.value, isSupportSecChains)
+  resolution.value = initTradingViewIntervals(resolution.value, chain.value,isSupportSecChains)
   const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
   const widget = await waitForTradingView()
   _widget = new widget({
@@ -364,7 +370,7 @@ async function initChart() {
         // const chain = props.chain
         const isSupportSecChains = chain.value && supportSecChains.includes(chain.value)
         const configurationData = {
-          supported_resolutions: ['1S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[],
+          supported_resolutions: ['1S','5S','15S','30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[],
           supports_marks: true,
           supports_timescale_marks: true,
           supports_time: true
@@ -400,11 +406,11 @@ async function initChart() {
             has_intraday: true, // 显示商品是否具有日内（分钟）历史数据
             intraday_multipliers: ['1', '5', '15', '30', '60', '120', '240'] as ResolutionString[],
             has_seconds: isSupportSecChains,
-            seconds_multipliers: ['1'],
+            seconds_multipliers: ['1', '5', '15', '30'],
             has_daily: true,
             // has_no_volume: false, // 布尔表示商品是否拥有成交量数据
             has_weekly_and_monthly: true,
-            supported_resolutions: ['1S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
+            supported_resolutions: ['1S','5S','15S','30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
             data_status: 'streaming' as 'streaming' | 'endofday' | 'delayed_streaming',
             visible_plots_set: 'ohlcv' as VisiblePlotsSet,
             type: 'crypto',

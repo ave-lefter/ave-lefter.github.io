@@ -10,7 +10,7 @@
     <el-dialog
       v-model="visible"
       :title="t('blackManage')"
-      class="w-600px"
+      width="540px"
       @close="closeDialog"
 
     >

@@ -172,6 +172,9 @@
   "profit": "Kazanç",
   "totalBuy": "Toplam Alış",
   "totalSell": "Toplam Satış",
+  "trades": "İşlemler",
+  "me": "Ben",
+  "orderBook": "Emir Defteri",
   "download": "İndir",
   "seemsNoProblem": "Sorun görünmüyor",
   "possibleRisks": "Olası riskler",
@@ -427,5 +430,16 @@
   "placeholderPrefix1": "Lütfen seçin",
   "walletManage": "Cüzdan yönet",
   "allChain": "Tüm zincir",
-  "monitored": "İzlenmiş"
+  "monitored": "İzlenmiş",
+  "liquidity1": "Likidite",
+  "smarter1": "akıllı para",
+  "markers": "İşaretleyiciler",
+  "top10Positions": "En iyi 10 tutma yüzdesi",
+  "openTime": "Zaman",
+  "nVolume": "{n} Vol",
+  "nTxAddress": "{n} İşlemler",
+  "nMarkers": "{n} İşaretleyiciler",
+  "min": "Dakika",
+  "basicInfo": "Temel Bilgiler",
+  "insidersPosition1": "İçeridekiler"
 }

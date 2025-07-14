@@ -24,7 +24,12 @@
             <Icon name="material-symbols:arrow-forward-ios" :class="`color-[--d-FFF-l-222] text-12px`"/>
           </div>
           <el-scrollbar :height="scrollbarHeight">
-            <KLine />
+            <div :class="orderBookVisible ? 'grid grid-cols-[1fr_292px] gap-4px' : 'grid grid-cols-1 gap-4px'">
+              <div>
+                <KLine ref="klineContainer" />
+              </div>
+              <OrderBook v-model="orderBookVisible" :kline-height="klineHeight" />
+            </div>
             <BelowChartTable class="min-h-300px rounded-4px bg-[--d-000-l-F6F6F6]"/>
           </el-scrollbar>
         </div>
@@ -35,13 +40,15 @@
 </template>
 
 <script setup lang='ts'>
+import { useStorage } from '@vueuse/core'
 import { getTokenInfo, getTokenInfoExtra } from '~/api/token'
 import { useTokenStore } from '~/stores/token'
 import Top from './components/top/index.vue'
 import TokenRight from './components/right/index.vue'
-import {Left} from './components/left'
-import {BelowChartTable} from './components/belowChartTable'
+import { Left } from './components/left'
+import { BelowChartTable } from './components/belowChartTable'
 import KLine from '~/pages/token/components/kLine/index.vue'
+import {OrderBook} from './components/orderBook'
 import  { getAiSummary } from '@/api/token'
 
 definePageMeta({
@@ -71,6 +78,12 @@ const addresses = computed(() => {
 })
 const wsStore = useWSStore()
 
+// 订单簿显示状态 - 使用本地存储保持状态
+const orderBookVisible = useStorage('orderBookVisible', false)
+provide('orderBookVisible', orderBookVisible)
+
+// KLine 高度监听
+const klineHeight = useStorage('kHeight', DefaultHeight.KLINE)
 const aiSummary = shallowRef({summary:'', headline:''})
 
  function _getAiSummary() {
@@ -173,5 +186,11 @@ onBeforeRouteLeave(() => {
 </script>
 
 <style>
-
+.hide-scrollbar {
+  >.el-scrollbar {
+    .el-scrollbar__bar {
+      --at-apply: hidden;
+    }
+  }
+}
 </style>

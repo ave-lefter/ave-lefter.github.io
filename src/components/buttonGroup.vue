@@ -12,9 +12,11 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
+import type { PropType } from 'vue'
+
+defineProps({
   options: {
-    type: Array,
+    type: Array as PropType<{ id: string; name: string }[]>,
     default: () => [],
   },
   activeValue: {
@@ -25,7 +27,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:activeValue', 'change'])
 
-const click = (item) => {
+const click = (item: { id: string; name: string }) => {
   emit('update:activeValue', item.id)
   emit('change', item)
 }
@@ -36,7 +38,7 @@ const click = (item) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--a-btn-bg-1-color);
+  background: var(--d-222-l-F2F2F2);
   padding: 1px;
   border-radius: 4px;
   font-size: 12px;
@@ -55,8 +57,8 @@ const click = (item) => {
     text-align: center;
 
     &.active {
-      color: #f5f5f5;
-      background: #333;
+      background: var(--d-111-l-FFF);
+      color: var(--d-F5F5F5-l-333);
     }
   }
 }
