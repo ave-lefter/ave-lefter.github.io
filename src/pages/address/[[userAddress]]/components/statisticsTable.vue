@@ -56,8 +56,18 @@
         class="relative min-h-500px"
         infinite-scroll-distance="300"
       >
+        <RecentPnl
+          v-if="isRecentPnl"
+          :conditions="conditions_wallet"
+          :handleSortChange="handleSortChange"
+          :loading="tableData.loading"
+          :tableData="filterTableList"
+          :isSelfAddress="isSelfAddress"
+          :address="address"
+          @hideToken="refreshTokenList"
+        />
         <TokenList
-          v-if="isToken"
+          v-else-if="isToken"
           :conditions="conditions_wallet"
           :handleSortChange="handleSortChange"
           :loading="tableData.loading"
@@ -94,6 +104,7 @@
 
 <script setup>
 import TokenList from './tokenList.vue'
+import RecentPnl from './recent-pnl.vue'
 import TrendList from './trendList.vue'
 import DeployedTokenList from './deployedTokenList.vue'
 import BlackList from './blackList.vue'
@@ -112,7 +123,7 @@ const props = defineProps({
   isSelfAddress: Boolean,
 })
 
-const activeTab = ref('trend')
+const activeTab = ref('pnl')
 const tableData = ref({
   finished: false,
   error: false,
@@ -160,6 +171,7 @@ const mode = computed(() => {
 
 const tabs = computed(() => {
   const commonTabs = [
+    { title: $t('recentPnl'), id: 'pnl' },
     { title: $t('walletActivity'), id: 'trend' },
     { title: $t('holding'), id: 'token' },
   ]
@@ -172,6 +184,7 @@ const tabs = computed(() => {
   return commonTabs
 })
 
+const isRecentPnl = computed(() => activeTab.value === 'pnl')
 const isToken = computed(() => activeTab.value === 'token')
 const isTrend = computed(() => activeTab.value === 'trend')
 const chainAddress = computed(() => [props.chain, props.address])
@@ -202,7 +215,8 @@ const onConditionChange = (type) => {
 }
 
 const onLoad = () => {
-  if (isToken.value) _getWhaleTokenList()
+  if (isRecentPnl.value) _getWhaleTokenList()
+  else if (isToken.value) _getWhaleTokenList()
   else if (isTrend.value) _getWhaleTrendList()
   else _getDeployedTokens()
 }
