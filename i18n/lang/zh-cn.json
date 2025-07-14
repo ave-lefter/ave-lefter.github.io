@@ -1066,5 +1066,6 @@
   "securityInfo": "安全信息",
   "insidersPosition1": "老鼠仓持仓",
   "safe":"安全",
-  "min3":"最小"
+  "min3":"最小",
+  "blockToken":"拉黑代币"
 }
