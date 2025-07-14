@@ -69,6 +69,7 @@
 import { getTxAnalysis } from '@/api/wallet'
 import AveCharts from '@/components/charts/aveCharts.vue'
 import AveEmpty from '@/components/aveEmpty.vue'
+import { size } from 'lodash-es'
 
 const BestTokenEnum = {
   TOTAL_RATIO: 'total_profit_ratio',
@@ -121,6 +122,7 @@ type BestTokenType = {
       position: string
       color: string
       fontWeight: string
+      size:number,
       offset: [number, number]
       formatter: (params: { value: string | number }) => string
     }
@@ -157,7 +159,8 @@ const bestToken = ref<BestTokenType>({
       show: true,
       position: 'right',
       color: '#12B886',
-      fontWeight: 'bold',
+      fontWeight: 'normal',
+      size:10,
       offset: [-3, 0],
       formatter: bestTokenLabelFormatter,
     },
@@ -289,7 +292,8 @@ const bestTokenAxisLabel = computed(() => {
     color: colorMap[mode.value as keyof typeof colorMap],
     formatter: '{value}',
     show: true,
-    fontWeight: 'bold',
+    size:10,
+    fontWeight: 'normal',
   }
 })
 const profitList = computed(() => [
