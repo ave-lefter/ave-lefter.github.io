@@ -35,7 +35,7 @@ const localeStore = useLocaleStore()
       <span
         v-for="(item, index) in supportCategories"
         :key="index"
-        class="p-2 lh-16px cursor-pointer rounded-1"
+        class="p-2 lh-16px cursor-pointer rounded-1 flex items-center"
         :class="activeTab===item.category?'color-#F5F5F5 bg-#333':'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'"
       >
         <Icon :name="iconMap[item.category]" class="mr-1 color-#FFA622 text-12px" />

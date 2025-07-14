@@ -12,7 +12,7 @@ const activeChain = shallowRef('AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
 const categories = computed(()=>{
   return chains.value.find(el => el.net_name === activeChain.value)
-  ?.categories
+  ?.categories || []
 })
 
 onMounted(() => {
@@ -223,7 +223,7 @@ function getMedias(appendix: string) {
   <div class="w-full">
     <div class="flex gap-16px py-12px px-16px bg-[--d-111-l-FFF]">
       <ChainsSelect v-model:activeChain="activeChain" :list="chains" />
-      <CategoryTabs :activeTab="activeTab" :categories="categories!"/>
+      <CategoryTabs :activeTab="activeTab" :categories="categories"/>
     </div>
     <KeepAlive>
       <component
