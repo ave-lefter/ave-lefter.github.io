@@ -546,10 +546,10 @@ import {
 import { throttle } from 'lodash-es'
 import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor,deleteMonitor} from '~/api/attention'
 import type { TableInstance } from 'element-plus'
-import { de } from 'element-plus/es/locale/index.mjs'
 
 const { mode, isDark } = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
+const {addressConditions}=storeToRefs(useFollowStore())
 const $router = useRouter()
 const { t } = useI18n()
 const botStore = useBotStore()
@@ -565,27 +565,28 @@ const toolTipTagContent = ref('')
 const addButtonRef = ref()
 const tableRef = ref<TableInstance | null>(null)
 const isMonitor=ref(false)
-const conditions = reactive({
-  group: 0,
-  time_interval: '7d',
-  user_chain: 'AllChains',
-  sort: '',
-  sort_dir: '',
-  keyword: '',
-  last_tx_time_max: '',
-  last_tx_time_min: '',
-  last_trade_time: ''
-} as {
-  group: number
-  time_interval: string
-  user_chain: string
-  sort: string|null
-  sort_dir: string|null
-  keyword: string
-  last_tx_time_max: string|number
-  last_tx_time_min: string|number
-  last_trade_time: string|number
-})
+const conditions=addressConditions.value
+// const conditions = reactive({
+//   group: 0,
+//   time_interval: '7d',
+//   user_chain: 'AllChains',
+//   sort: '',
+//   sort_dir: '',
+//   keyword: '',
+//   last_tx_time_max: '',
+//   last_tx_time_min: '',
+//   last_trade_time: ''
+// } as {
+//   group: number
+//   time_interval: string
+//   user_chain: string
+//   sort: string|null
+//   sort_dir: string|null
+//   keyword: string
+//   last_tx_time_max: string|number
+//   last_tx_time_min: string|number
+//   last_trade_time: string|number
+// })
 const monitorNum=ref(0)
 const pageData = ref({
   total: 10,
@@ -613,7 +614,7 @@ type FilterFormType = {
 
 const filterForm = ref({
   type: 'last_trade_time',
-  last_trade_time: conditions?.last_trade_time || '',
+  last_trade_time: conditions.last_trade_time || '',
   sort_dir: conditions?.sort === 'last_trade_time' ? conditions?.sort_dir || null : null
 } as FilterFormType)
 const loading = ref(false)

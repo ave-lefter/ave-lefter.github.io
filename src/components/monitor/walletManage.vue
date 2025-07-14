@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="flex justify-between items-center gap-8px h-54px">
-      <el-select v-model="selectGroupId"  :mode="mode" @click.stop @change="(val) => filterGroup(val)">
+      <el-select v-model="monitorStore.selectGroupId"  :mode="mode" @click.stop @change="(val) => filterGroup(val)">
         <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
         <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
       </el-select>
@@ -130,7 +130,6 @@ import type {RowEventHandlerParams} from 'element-plus'
 import { throttle } from 'lodash-es'
 const { t } = useI18n()
 const $router = useRouter()
-const { addressGroups } = storeToRefs(useFollowStore())
 const props=defineProps({
   scrollHeight:{
     type:Number,
@@ -148,9 +147,9 @@ const addButtonRef = ref()
 const addFavAddressPopRef = ref()
 const selectGroupId=ref(0)
 const monitorStore = useMonitorStore()
-const {currentAddress ,showBatchAddressDetails, updateNum1,updateNum2,updateNum3} = storeToRefs(useFollowStore())
+const {currentAddress ,showBatchAddressDetails, updateNum1,updateNum2,updateNum3,addressGroups} = storeToRefs(useFollowStore())
 const conditions = reactive({
-  group: 0,
+  group: monitorStore.selectGroupId,
   activeTab: '7d',
   isMonitor: false,
   user_chain: 'AllChains',
@@ -232,6 +231,7 @@ function handleConfirmAdd(formData:any,resetFields?:() => void,stopLoading?:()=>
   })
 } 
 function filterGroup(val: number) {
+  console.log('filterGroup', val)
   conditions.group=val
 }
 

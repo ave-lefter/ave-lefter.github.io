@@ -1,5 +1,5 @@
-import { defineStore, storeToRefs } from 'pinia'
-import { useLocalStorage } from '@vueuse/core'
+import { defineStore } from 'pinia'
+import { useLocalStorage ,useStorage} from '@vueuse/core'
 import { getFavoriteList2 ,getAttentionPageList,getUserFavoriteGroups2} from '~/api/attention'
 // import {
 //   sendEmailCode,
@@ -75,6 +75,17 @@ export const useFollowStore = defineStore('follow', () => {
     }
     favAddressPopVisible.value = true
   }
+  const addressConditions = useStorage('addressConditions',{
+    group: 0,
+    time_interval: '7d',
+    user_chain: 'AllChains',
+    sort: '',
+    sort_dir: '',
+    keyword: '',
+    last_tx_time_max: '',
+    last_tx_time_min: '',
+    last_trade_time: ''
+  })
   return {
     addressGroups,
     monitorVisible,
@@ -103,6 +114,7 @@ export const useFollowStore = defineStore('follow', () => {
     updateNum1,
     updateNum2,
     updateNum3,
-    loading
+    loading,
+    addressConditions,
   }
 })

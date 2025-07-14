@@ -58,6 +58,8 @@ export const useGlobalStore = defineStore('global', () => {
     define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','cabal','insider', 'sniper', 'rug', 'kol'],
   })
 
+  const hide_risk=shallowRef(1)
+  const hide_small=shallowRef(0)
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
 
@@ -113,6 +115,8 @@ export const useGlobalStore = defineStore('global', () => {
     showLeft,
     pumpSetting,
     pumpBlackList,
-    hotList
+    hotList,
+    hide_small,
+    hide_risk
   }
 })

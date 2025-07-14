@@ -67,7 +67,7 @@ export const useMonitorStore = defineStore('monitor', () => {
     fixedWidth.value = width
   }
 
-  const activeChain = shallowRef('solana')
+  const selectGroupId = shallowRef(0)
 
   // token: 筛选 token
   // history_count：筛选信号数，对应值2, 5, 15
@@ -80,7 +80,6 @@ export const useMonitorStore = defineStore('monitor', () => {
     mc_curr_sign: '<'
   })
 
-  const monitorList = shallowRef<GetmonitorV2ListResponse[]>([])
   const listStatus = ref({
     loading: false,
     finished: false,
@@ -91,10 +90,21 @@ export const useMonitorStore = defineStore('monitor', () => {
     pageNO: 1,
     pageSize: 20,
   })
+  const signalStore = useSignalStore()
 
-  function updateList() {
-    triggerRef(monitorList)
-  }
+  const placement=computed(()=>{
+    if(!isLeftFixed.value&&!isRightFixed.value){
+      return 'center'
+    }else if(isLeftFixed.value){
+      return 'left'
+    }else if(signalStore.isRightFixed&&signalStore.signalVisible){
+      return 'right2'
+    } else if(isRightFixed.value){
+      return 'right'
+    } else {
+      return 'center'
+    }
+  })
 
   return {
     visible,
@@ -111,15 +121,14 @@ export const useMonitorStore = defineStore('monitor', () => {
     onFixedResizing,
     onDrag,
     translateStyle,
-    activeChain,
+    selectGroupId,
     filterParams,
-    monitorList,
     listStatus,
     pageParams,
-    updateList,
     monitorList1,
     monitorList2,
     activeName,
     hasRing,
+    placement
   }
 })

@@ -94,7 +94,7 @@
     </Draggable>
     
     
-     <Draggable
+     <!-- <Draggable
       v-if="!monitorStore.isLeftFixed&&!monitorStore.isRightFixed&&monitorStore.visible"
       class-name="top-0 left-0 fixed"
       :z="3"
@@ -183,7 +183,8 @@
       @onResizing="monitorStore.onFixedResizing"
     >
       <Monitor :scroll-height="monitorStore.winHeight-160"/>
-    </Draggable>
+    </Draggable> -->
+    <MonitorDragger v-show="monitorStore.visible"/>
     <FavAddressPop ref="favAddressPopRef" :visible="favAddressPopVisible" :button-ref="attentionTrigger || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" @onCancel="() => favAddressPopVisible = false"/>
   </div>
 </template>
@@ -192,7 +193,6 @@
   import TheHeader from '@/components/layouts/TheHeader.vue'
   import TheFooter from '@/components/layouts/TheFooter.vue'
   const botStore = useBotStore()
-  const {lang} = storeToRefs(useGlobalStore())
   const {addressGroups,attentionTrigger,favAddressPopVisible,handleAddAttention} = storeToRefs(useFollowStore())
   const signalStore = useSignalStore()
   const monitorStore = useMonitorStore()

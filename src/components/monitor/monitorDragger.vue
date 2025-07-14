@@ -1,7 +1,6 @@
 <template>
   <Draggable v-if="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing" @on-drag="drag">
-    <component :is="Monitor" v-bind="props2"/>
-      <!-- <Monitor v-bind="props2" /> -->
+    <Monitor v-bind="props2"/>
   </Draggable>
 </template>
 
@@ -21,6 +20,61 @@ watch(() => placement.value, () => {
   reload()
   reCreateChild()
 })
+// const props=computed(()=>{
+//   return {
+//   center:{
+//       className:'top-0 left-0 fixed',
+//       initialWidth:monitorStore.monitorBoundingRect.width,
+//       initialHeight:monitorStore.monitorBoundingRect.height,
+//       x:monitorStore.monitorBoundingRect.x,
+//       y:monitorStore.monitorBoundingRect.y,
+//       minWidth:360,
+//       minHeight:160,
+//       parent: true,
+//       handles:['tl','tm','tr','mr','br','bm','bl','ml'],
+//       dragHandle:'.drag-handle'
+//   },
+//   left:{
+//     className: '[&&]:relative shrink-0 left fixed! top-61px',
+//     style: `left:${(signalStore.isLeftFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0}px`,
+//     axis: 'x',
+//     x: 0,
+//     minWidth: lang.value.indexOf('zh') > -1 ? 360 : 360,
+//     maxWidth: 438,
+//     initialWidth: monitorStore.fixedWidth,
+//     initialHeight: monitorStore.winHeight - 95,
+//     parent: true,
+//     handles: ['mr'],
+//     dragHandle: '.drag-handle'
+//   },
+//   right:{
+//     className: '[&&]:relative shrink-0 right fixed! top-61px left-0',
+//     axis: 'x',
+//     x: monitorStore.winWidth - monitorStore.fixedWidth - ((signalStore.isRightFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0),
+//     y:0,
+//     minWidth: lang.value.indexOf('zh') > -1 ? 360 : 360,
+//     maxWidth: 438,
+//     initialWidth: monitorStore.fixedWidth,
+//     initialHeight: monitorStore.winHeight - 95,
+//     parent: true,
+//     handles: ['ml'],
+//     dragHandle: '.drag-handle'
+//   },
+//   right2:{
+//     className: '[&&]:relative shrink-0 right fixed! top-61px left-0 translate-y-0!',
+//     axis: 'x',
+//     x: monitorStore.winWidth - monitorStore.fixedWidth - ((signalStore.isRightFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0),
+//     minWidth: lang.value.indexOf('zh') > -1 ? 360 : 360,
+//     maxWidth: 438,
+//     initialWidth: monitorStore.fixedWidth,
+//     initialHeight: monitorStore.winHeight - 95,
+//     parent: true,
+//     handles: ['ml'],
+//     dragHandle: '.drag-handle'
+//   }
+// }
+// })
+
 const props1=computed(()=>{
   console.log('props1', placement.value)
   let data={
@@ -70,9 +124,10 @@ const props1=computed(()=>{
     }
   }else if(placement.value==='right2'){
     data = {
-      className: '[&&]:relative shrink-0 right fixed! top-61px left-0 translate-y-0!',
+      className: '[&&]:relative shrink-0 right2 fixed! top-61px left-0',
       axis: 'x',
       x: monitorStore.winWidth - monitorStore.fixedWidth - ((signalStore.isRightFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0),
+      maxX:monitorStore.winWidth - monitorStore.fixedWidth - ((signalStore.isRightFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0),
       minWidth: lang.value.indexOf('zh') > -1 ? 360 : 360,
       maxWidth: 438,
       initialWidth: monitorStore.fixedWidth,
@@ -130,7 +185,7 @@ function resizing(w: number, h: number) {
 function drag(x: number) {
   if(placement.value==='center'){
     monitorStore.onDrag(x)
-  }else{
+  } else{
     return null
   }
 }
