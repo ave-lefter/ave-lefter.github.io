@@ -8,6 +8,7 @@ import bundle from '@/assets/images/rugPull/bundle.svg'
 const props = defineProps<{
   activeCategory: string
   activeChain: string
+  childrenData:any[]
 }>()
 function formateMin(data) {
   if (typeof data === 'string' || typeof data === 'number') {
@@ -72,7 +73,7 @@ const runPullVisible = computed(() => {
   const { activeChain, activeCategory } = props
   return (
     ['AllChains', 'solana'].includes(activeChain) &&
-    activeCategory === 'hot' 
+    activeCategory === 'hot' && props.childrenData[1]?.isVisible
   )
 })
 </script>
@@ -84,7 +85,7 @@ const runPullVisible = computed(() => {
     align="right"
   >
     <template #default="{ row }">
-      <div class="flex items-center justify-end gap-4px h-18px">
+      <div v-if="childrenData[0]?.isVisible" class="flex items-center justify-end gap-4px h-18px">
         <img
           v-if="row.risk_level == -1 || row.risk_score >= 60"
           class="w-16px h-16px"

@@ -98,12 +98,13 @@ function addOrRemoveBlackList(item: { token: string }, type: 'ca' | 'dev' | 'key
   }
 }
 
-function timerCountColor(val:number) {
-  if (Number(formatTimeFromNow(val,true)) < 3600 * 24) {
+function timerCountColor(val: number) {
+  if (Number(formatTimeFromNow(val, true)) < 3600 * 24) {
     return 'color-#FFA622'
   }
   return 'color-[--d-666-l-999]'
 }
+const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'circle')
 </script>
 
 <template>
@@ -151,9 +152,9 @@ function timerCountColor(val:number) {
           <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
             <template #default>
               <TokenImg
-                :is-circle="globalStore.pumpSetting.avatar_isCircle === 'circle'"
+                :is-circle="isCircle"
                 chain-class="w-20px h-20px"
-                token-class="w-48px h-48px rounded-8px"
+                :token-class="`w-48px h-48px ${isCircle?'':'rounded-8px'}`"
                 :row="{
                   chain: row.chain,
                   symbol: getSymbol(row),
@@ -163,9 +164,9 @@ function timerCountColor(val:number) {
             </template>
             <template #content>
               <TokenImg
-                :is-circle="globalStore.pumpSetting.avatar_isCircle === 'circle'"
+                :is-circle="false"
                 chain-class="hidden"
-                token-class="w-240px h-240px rounded-16px [&&]:mr-0"
+                :token-class="`w-240px h-240px [&&]:mr-0 rounded-16px`"
                 :row="{
                   chain: row.chain,
                   symbol: getSymbol(row),
@@ -177,9 +178,7 @@ function timerCountColor(val:number) {
           <div class="flex flex-col gap-6px">
             <div class="flex items-center lh-20px">
               <span class="text-16px color-[--d-CCC-l-333]"> {{ getSymbol(row) }}</span
-              ><span class="text-10px color-[--d-666-l-999]"
-                >/{{ getSymbol(row, true) }}
-              </span>
+              ><span class="text-10px color-[--d-666-l-999]">/{{ getSymbol(row, true) }} </span>
               <Icon
                 v-copy="row.target_token"
                 name="bxs:copy"

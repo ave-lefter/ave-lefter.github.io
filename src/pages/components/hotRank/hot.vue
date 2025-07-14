@@ -125,6 +125,7 @@ const renderData = computed(() => {
       props: {
         activeCategory: 'hot',
         activeChain: props.activeChain,
+        childrenData:columns.value.find(el=>el.key ==='security')?.children || []
       },
     },
     insidersContent: {
