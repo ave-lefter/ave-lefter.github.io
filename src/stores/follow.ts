@@ -43,6 +43,7 @@ export const useFollowStore = defineStore('follow', () => {
   const showBatchAddressDetails = ref(false)
   const attentionTrigger=ref()
   const favAddressPopVisible=ref(false)
+  const favAddressChain=ref('')
   const attentionDetails=shallowRef({
     group_id:0,
     is_monitored: 0
@@ -63,8 +64,9 @@ export const useFollowStore = defineStore('follow', () => {
   const loading = ref(false)
   const handleAddAttention = ref()
   // const handleAddAttention = ref((form: any,resetFields: () => void) => {})
-  const confirmAttention = (trigger: any,callback: (form: any)=>Promise<void>)=>{
+  const confirmAttention = (trigger: any,chain: string, callback: (form: any)=>Promise<void>)=>{
     attentionTrigger.value = trigger
+    favAddressChain.value = chain
     handleAddAttention.value = (form: any,resetFields?: () => void,stopLoading?:()=>void)=>{
       console.log('confirmAttention', form)
       callback(form).then(() => {
@@ -116,5 +118,6 @@ export const useFollowStore = defineStore('follow', () => {
     updateNum3,
     loading,
     addressConditions,
+    favAddressChain
   }
 })

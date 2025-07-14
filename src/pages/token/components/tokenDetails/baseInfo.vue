@@ -180,7 +180,7 @@ const collect = async () => {
     await useWalletStore().signMessageForFavorite()
   }
   if(statistics.value.is_wallet_address_fav !== 1){
-    useFollowStore().confirmAttention(attentionTriggerRef.value, (form) => {
+    useFollowStore().confirmAttention(attentionTriggerRef.value,tokenDetailStore.tokenInfo!.chain, (form) => {
       console.log('confirmAttention', form)
       return addAttention2({
         address: useFollowStore().currentAddress,

@@ -25,7 +25,7 @@
         </el-input>
       </el-form-item>
       <el-form-item prop="is_monitored" required label-position="top" size="large" class="mb-20px!" :label="t('isMonitored')">
-        <el-radio-group v-model="form.is_monitored" class="flex flex-row" style="align-items: flex-start;" :disabled="!botStore.evmAddress">
+        <el-radio-group v-model="form.is_monitored" class="flex flex-row" style="align-items: flex-start;" :disabled="disabledMonitor">
             <el-radio :key="1" :value="1">{{ t('yes') }}</el-radio>
             <el-radio :key="0" :value="0">{{ t('no') }}</el-radio>
         </el-radio-group>
@@ -63,6 +63,13 @@ import { addFavoriteGroup2 } from '~/api/attention'
 const { t } = useI18n()
 const {lang} = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
+
+const supportChains=ref(['solana','bsc'])
+
+const disabledMonitor=computed(()=>{
+  return !supportChains.value.includes(followStore.favAddressChain) || !botStore.evmAddress
+})
+
 const props=defineProps({
   width:{
     type:String,

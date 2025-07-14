@@ -281,7 +281,7 @@ const collect = async (row: any,index:number) => {
   }
   console.log('collect',row,index)
   if(row.is_wallet_address_fav !== 1){
-    useFollowStore().confirmAttention($refs.value.buttonRefs[index], (form) => {
+    useFollowStore().confirmAttention($refs.value.buttonRefs[index],row.chain, (form) => {
       console.log('confirmAttention', form)
       return addAttention2({
         address: useFollowStore().currentAddress,
