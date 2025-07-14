@@ -135,15 +135,14 @@ function confirm(
 }
 </script>
 <template>
-  <el-table-column v-if="activeInterval" :width="getTextWidth($t('vol')+$t('txns'))+120" align="right">
+  <el-table-column v-if="activeInterval" :width="getTextWidth('VolTxns')+120" align="right">
     <template #header>
       <div class="flex items-center justify-end gap-2px">
         <span
           class="lh-16px rounded-2px px-2px text-12px bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5]"
           >{{ activeInterval }}</span
         >
-        {{ $t('vol')
-        }}<HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /><RangePopover
+        Vol<HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /><RangePopover
           v-model="volVisible"
           :width="225"
           :title="$t('nVolume', { n: activeInterval }) + '($)'"
@@ -151,7 +150,7 @@ function confirm(
           :selectRangeIndex="0"
           :isFilterHighlight="isFilterHighlight"
           @confirm="volConfirm"
-        />/{{ $t('txns') }}<HeadSort :defaultSort="txsDefaultSort" @sort-change="txsSortChange" />
+        />/Txns<HeadSort :defaultSort="txsDefaultSort" @sort-change="txsSortChange" />
         <RangePopover
           v-model="txsVisible"
           :width="225"
@@ -174,9 +173,9 @@ function confirm(
           </template>
           <template #default>
             <div class="flex justify-between color-[--d-666-l-999] text-12px lh-16px mb-8px">
-              <span>{{ activeInterval }} {{ $t('vol') }}</span>
-              <span>{{ $t('vol') }} {{ $t('buy') }}</span>
-              <span>{{ $t('vol') }} {{ $t('sell') }}</span>
+              <span class="flex-1">{{ activeInterval }} {{ $t('vol') }}</span>
+              <span class="flex-1 text-center">{{ $t('VolBuy')}}</span>
+              <span class="flex-1 text-right">{{ $t('VolSell') }}</span>
             </div>
             <div class="py-8px mx--12px px-12px bg-[--d-1A1A1A-l-F2F2F2] mb-16px">
               <div class="flex justify-between color-[--d-666-l-999] text-12px lh-16px mb-4px">
@@ -196,9 +195,9 @@ function confirm(
               </div>
             </div>
             <div class="flex justify-between color-[--d-666-l-999] text-12px lh-16px mb-8px">
-              <span>{{ $t('txns') }}</span>
-              <span>{{ $t('txns') }} {{ $t('buy') }}</span>
-              <span>{{ $t('txns') }} {{ $t('sell') }}</span>
+              <span class="flex-1">{{ $t('txns') }}</span>
+              <span class="flex-1 text-center">{{ $t('TxnsBuy') }}</span>
+              <span class="flex-1 text-right">{{ $t('TxnsSell') }}</span>
             </div>
             <div class="py-8px mx--12px px-12px bg-[--d-1A1A1A-l-F2F2F2]">
               <div class="flex justify-between color-[--d-666-l-999] text-12px lh-16px mb-4px">

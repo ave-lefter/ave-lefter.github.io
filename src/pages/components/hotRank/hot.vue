@@ -375,7 +375,7 @@ function sizeChange() {
 <template>
   <el-table
     v-loading="loading"
-    :height="'calc(100vh - 190px)'"
+    :height="'calc(100vh - 182px)'"
     :data="filteredListData"
     fit
     header-row-class-name="[&&]:text-12px h-40px"
@@ -394,7 +394,6 @@ function sizeChange() {
         @collect="collect"
       />
     </template>
-    {{ console.log('columns', columns) }}
   </el-table>
   <el-pagination
     v-if="pageInfo.total"
