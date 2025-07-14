@@ -17,13 +17,13 @@
       @sort-change="handleSortChange"
     >
       <template #empty>
-        <AveEmpty v-if="!loading && tableData.length===0" class="pt-40px"/>
+        <AveEmpty v-if="!loading && tableData.length===0" class="pt-[40px]"/>
         <span v-else/>
       </template>
       <TokenColumn
         :column-props="{
           label: $t('recentlyTrade'),
-          width: '250',
+          width: '150',
           fixed: 'left',
           sortable: 'custom',
           sortOrders: ['descending', 'ascending', null],
@@ -73,7 +73,7 @@
         sortable="custom"
       >
         <template #default="{ row }">
-          <span v-if="row?.unrealized_profit > 0" class="color-#12B886'">
+          <span v-if="row?.unrealized_profit > 0" class="color-#12B886">
             ${{ formatNumber(row?.unrealized_profit || 0, 2) }}
           </span>
           <span v-else-if="row?.unrealized_profit == 0">$0</span>
@@ -256,7 +256,7 @@ const props = defineProps({
   address: String,
 })
 
-const emit = defineEmits(['hideToken'])
+const _emit = defineEmits(['hideToken'])
 
 const hideTokenVisible = ref(false)
 const currentHideToken = ref({})

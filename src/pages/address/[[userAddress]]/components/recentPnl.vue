@@ -17,9 +17,28 @@
       @sort-change="handleSortChange"
     >
       <template #empty>
-        <AveEmpty v-if="!loading && tableData.length===0" class="pt-40px"/>
+        <AveEmpty v-if="!loading && tableData.length===0" class="pt-[40px]"/>
         <span v-else/>
       </template>
+
+      <TokenColumn
+        :column-props="{
+          label: $t('recentlyTrade'),
+          width: '150',
+          fixed: 'left',
+          sortable: 'custom',
+          sortOrders: ['descending', 'ascending', null],
+          prop: 'last_txn_time',
+        }"
+      >
+        <template v-if="isSelfAddress" #default="{ row }">
+          <Icon
+            name="bx:bxs-hide"
+            class="absolute top-0 left-0 hidden bxs-hide cursor-pointer color-#959a9f"
+            @click.self.stop="hideToken(row)"
+          />
+        </template>
+      </TokenColumn>
       <el-table-column
         :label="$t('total_profit')"
         :sort-orders="['descending', 'ascending', null]"
@@ -48,6 +67,24 @@
         </template>
       </el-table-column>
       <el-table-column
+        :label="$t('total_realized_profit')"
+        :sort-orders="['descending', 'ascending', null]"
+        align="right"
+        prop="realized_profit"
+        sortable="custom"
+      >
+        <template #default="{ row }">
+          <span v-if="row?.realized_profit > 0" class="text-#12B886">
+            ${{ formatNumber(row?.realized_profit || 0, 2) }}
+          </span>
+          <span v-else-if="row?.realized_profit == 0">$0</span>
+          <span v-else-if="row?.realized_profit == '--'">--</span>
+          <span v-else class="color-#FF646D">
+            {{ '-$' + formatNumber(Math.abs(row?.realized_profit) || 0, 2) }}
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column
         :label="$t('total_unrealized_profit')"
         :sort-orders="['descending', 'ascending', null]"
         align="right"
@@ -55,7 +92,7 @@
         sortable="custom"
       >
         <template #default="{ row }">
-          <span v-if="row?.unrealized_profit > 0" class="color-#12B886'">
+          <span v-if="row?.unrealized_profit > 0" class="color-#12B886">
             ${{ formatNumber(row?.unrealized_profit || 0, 2) }}
           </span>
           <span v-else-if="row?.unrealized_profit == 0">$0</span>

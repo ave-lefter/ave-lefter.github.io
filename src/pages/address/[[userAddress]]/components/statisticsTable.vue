@@ -93,7 +93,7 @@
         />
         <div
           :style="{ color: mode === 'light' ? '#666' : '#999' }"
-          class="mt-[-2px] mb-[5px] text-[12px] text-center"
+          class="mt-[2px] mb-[5px] py-[10px] text-[12px] text-center"
         >
           <span v-if="tableData.loading && tableData.pageNO > 1">{{ $t('loading') }}</span>
         </div>
@@ -104,7 +104,7 @@
 
 <script setup>
 import TokenList from './tokenList.vue'
-import RecentPnl from './recent-pnl.vue'
+import RecentPnl from './recentPnl.vue'
 import TrendList from './trendList.vue'
 import DeployedTokenList from './deployedTokenList.vue'
 import BlackList from './blackList.vue'
@@ -158,17 +158,13 @@ const deployedTokenQuery = ref({
   sort: 'market_cap',
   sort_dir: 'desc',
 })
-
 const deployedTokenNum = ref(0)
 const listArea = ref(null)
 const trendList = ref(null)
-
 const themeStore = useThemeStore()
-
 const mode = computed(() => {
   return themeStore.isDark ? 'dark' : 'light'
 })
-
 const tabs = computed(() => {
   const commonTabs = [
     { title: $t('recentPnl'), id: 'pnl' },
@@ -189,7 +185,7 @@ const isToken = computed(() => activeTab.value === 'token')
 const isTrend = computed(() => activeTab.value === 'trend')
 const chainAddress = computed(() => [props.chain, props.address])
 const filterTableList = computed(() => {
-  if (isToken.value) {
+  if (isToken.value || isRecentPnl.value) {
     return [...tableData.value.token]
   } else if (isTrend.value) {
     let trendList = tableData.value.trend.filter(
@@ -209,7 +205,7 @@ const filterTableList = computed(() => {
 })
 
 // Methods
-const onConditionChange = (type) => {
+const onConditionChange = () => {
   tableData.value.pageNO = 1
   _getWhaleTokenList()
 }
@@ -229,7 +225,7 @@ const switchTab = (item) => {
 const handleSortChange = ({ prop, order }) => {
   resetPageNOAndLoading()
   const sort_dir = order?.replace?.('ending', '')
-  if (isToken.value) {
+  if (isToken.value|| isRecentPnl.value) {
     conditions_wallet.value.sort = prop
     conditions_wallet.value.sort_dir = sort_dir
   } else if (isTrend.value) {
