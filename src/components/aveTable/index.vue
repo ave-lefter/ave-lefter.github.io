@@ -170,7 +170,7 @@ function calculateColumnWidths() {
           </div>
         </template>
         <template v-if="data.length >0 && showFooter" #footer>
-          <div class="text-center px-0 pt-15px pb-10px text-12px text-[#959a9f] bg-[--d-111-l-FFF] ">
+          <div class="text-center px-0 pt-15px pb-10px text-12px text-[#959a9f] bg-[--d-111-l-FFF] absolute w-100%" :class="`top-${rowHeight}px`">
               {{ footText || t('loading') }}
           </div>
         </template>
@@ -179,6 +179,8 @@ function calculateColumnWidths() {
   </el-auto-resizer>
 </template>
 
-<style scoped>
-
+<style scoped lang="scss">
+:deep() .el-table-v2__footer{
+  overflow: visible; 
+}
 </style>
