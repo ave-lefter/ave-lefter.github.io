@@ -67,8 +67,8 @@
 
 <script setup lang="ts">
 import { getTxAnalysis } from '@/api/wallet'
-// import AveCharts from '@/components/charts/aveCharts.vue'
-// import AveEmpty from '@/components/aveEmpty.vue'
+import AveCharts from '@/components/charts/aveCharts.vue'
+import AveEmpty from '@/components/aveEmpty.vue'
 
 const BestTokenEnum = {
   TOTAL_RATIO: 'total_profit_ratio',
