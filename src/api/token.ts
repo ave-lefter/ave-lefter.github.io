@@ -341,6 +341,11 @@ export interface IGetTokenTxsResponse {
   wallet_tag_v2: string;
   newTags: NewTag[];
   wallet_logo: any;
+  // MC计算所需字段
+  total?: string | number;
+  burn_amount?: number;
+  lock_amount?: number;
+  other_amount?: number;
 }
 
 // 新版交易历史
