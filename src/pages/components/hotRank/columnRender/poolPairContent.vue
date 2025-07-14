@@ -136,6 +136,7 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
         />
         <Icon
           v-else
+          v-tooltip="$t('blockToken')"
           name="custom:key-visible"
           class="text-9px absolute top-5px left-5px hidden icon"
           @click.self.stop="addOrRemoveBlackList(row, 'ca')"

@@ -1058,5 +1058,6 @@
   "securityInfo": "Security Information",
   "insidersPosition1": "Insiders Owned",
   "safe":"Safe",
-  "min3":"Min"
+  "min3":"Min",
+   "blockToken":"Add to Blacklist"
 }
