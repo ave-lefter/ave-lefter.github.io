@@ -74,7 +74,8 @@
               </template>
               <ul>
                 <li v-for="item in chainOptions" :key="item.value" class="hover:bg-[--d-333-l-F2F2F2] h-26px! flex! items-center! font-500! text-14px! lh-20px! clickable" @click.stop="conditions.user_chain=item.value;visible=false">
-                  <img :src="`${token_logo_url}chain/${item?.id}.png`" class="rd-50% mr-4px" width="16" lazy alt="">
+                  <Icon v-if="item.value=='AllChains'" name="icon-park-outline:link-one" class="text-15px mr-4px rd-50%"/>
+                  <img v-else :src="`${token_logo_url}chain/${item?.id}.png`" class="rd-50% mr-4px" width="16" lazy alt="">
                   <span>{{ item.label }}</span>
                 </li>
               </ul>
