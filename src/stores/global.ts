@@ -59,7 +59,7 @@ export const useGlobalStore = defineStore('global', () => {
   })
 
   const rankCommon = useStorage('rankCommon',{
-    activeInterval: '24H',
+    activeInterval: '24h',
     quickVisible: true,
     quickBuyValue: '0.01',
   })

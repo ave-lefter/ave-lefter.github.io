@@ -10,34 +10,17 @@ export interface IGetTreasureConfig {
 }
 
 export interface CategoryElement {
-  category: CategoryEnum;
-  name_zh_ch: CategoryEnum;
-  name_zh_tw: CategoryEnum;
-  name_en: CategoryEnum;
-  name_es: CategoryEnum;
-  name_pt: CategoryEnum;
-  name_tr: CategoryEnum;
-  name_ja: CategoryEnum;
+  category: string;
+  name_zh_ch: string;
+  name_zh_tw: string;
+  name_en: string;
+  name_es: string;
+  name_pt: string;
+  name_tr: string;
+  name_ja: string;
   is_hot: number;
-  sub_category: CategoryEnum[];
+  sub_category: string[];
   is_pump: number;
-}
-
-export interface CategoryEnum {
-  BinanceAlpha: string
-  Bonk: string
-  Cto: string
-  Four: string
-  Gainer: string
-  Hot: string
-  Inclusion: string
-  Moonshot: string
-  New: string
-  Novabits: string
-  Pump: string
-  Studio: string
-  Volume: string
-  Xstocks: string
 }
 
 export interface Swap {

@@ -76,7 +76,7 @@ function formatColor(row) {
     <template #header>
       <div class="flex items-center justify-end gap-3px">
         {{ $t('top10') }}
-        <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
+        <!-- <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /> -->
         <RangePopover
           v-model="popoverVisible"
           :width="225"

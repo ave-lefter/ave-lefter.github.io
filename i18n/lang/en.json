@@ -1057,5 +1057,6 @@
   "transactionInfo": "Transaction Information",
   "securityInfo": "Security Information",
   "insidersPosition1": "Insiders Owned",
-  "safe":"Safe"
+  "safe":"Safe",
+  "min3":"Min"
 }

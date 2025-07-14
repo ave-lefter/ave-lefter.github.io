@@ -97,7 +97,7 @@ const renderData = computed(() => {
       props: {
         sortConditions: sortConditions.value,
         setSortConditions,
-        activeInterval: '24H',
+        activeInterval: '24h',
       },
     },
     priceChange1mContent: {
@@ -108,7 +108,7 @@ const renderData = computed(() => {
         activeInterval: '1m',
       }
     },
-    ...(['1m', '24H'].includes(globalStore.rankCommon.activeInterval)
+    ...(['1m', '24h'].includes(globalStore.rankCommon.activeInterval)
       ? []
       : [
           {

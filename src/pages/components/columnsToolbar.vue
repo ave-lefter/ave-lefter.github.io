@@ -18,7 +18,6 @@ const hotOptions = computed(() => getHotOptions(t))
 
 const initColumns = ref([])
 const modelColumns = ref(cloneDeep(storeColumns.value.filter((item) =>item.children || item.isVisible)))
-console.log(modelColumns.value, 'modelColumns.value')
 
 // 当对话框打开时，更新本地列配置
 const openDialog = () => {
@@ -75,10 +74,10 @@ function handleSelectChild(childItem, renderKey) {
   <div>
     <div @click="openDialog">
       <div
-        class="flex items-center color-[--d-999-l-666] cursor-pointer min-w-63px"
+        class="flex items-center color-[--d-999-l-666] cursor-pointer"
       >
-        <Icon name="custom:order" class="text-16px" />
-        <span class="text-12px ml-2px">{{ t('custom') }}</span>
+        <Icon name="custom:order" class="text-16px shrink-0" />
+        <span class="text-12px ml-2px shrink-0">{{ t('custom') }}</span>
       </div>
     </div>
     <el-dialog v-model="dialogVisible" append-to-body :title="$t('customizeScreener')" width="820">

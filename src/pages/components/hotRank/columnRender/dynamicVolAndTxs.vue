@@ -7,7 +7,7 @@ const props = defineProps<{
   activeInterval: string
   setFilterForm(...args: [string, string][]): void
 }>()
-const lowerCaseInterval = computed(()=>props.activeInterval.toLowerCase())
+const lowerCaseInterval = computed(()=>props.activeInterval)
 const volPrefix = computed(() => `volume_u_${lowerCaseInterval.value}`)
 const buyPrefix = computed(() => `buy_volume_u_${lowerCaseInterval.value}`)
 const sellPrefix = computed(() => `sell_volume_u_${lowerCaseInterval.value}`)
@@ -135,7 +135,7 @@ function confirm(
 }
 </script>
 <template>
-  <el-table-column v-if="activeInterval" :label="`${activeInterval}%`" width="172" align="right">
+  <el-table-column v-if="activeInterval" :width="getTextWidth($t('vol')+$t('txns'))+120" align="right">
     <template #header>
       <div class="flex items-center justify-end gap-2px">
         <span

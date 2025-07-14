@@ -101,7 +101,7 @@ function getParamsArr(startKey: string, endKey: string, params?: [string, string
                 v-model.trim.number="buyRange[0]"
                 clearable
                 type="text"
-                :placeholder="$t('min')"
+                :placeholder="$t('min3')"
                 @input="(value) => (buyRange[0] = value.replace(/\-|[^\d.]/g, ''))"
               />
               <span class="ml-10px mr-10px">~</span>
@@ -121,7 +121,7 @@ function getParamsArr(startKey: string, endKey: string, params?: [string, string
                 v-model.trim.number="sellRange[0]"
                 clearable
                 type="text"
-                :placeholder="$t('min')"
+                :placeholder="$t('min3')"
                 @input="(value) => (sellRange[0] = value.replace(/\-|[^\d.]/g, ''))"
               />
               <span class="ml-10px mr-10px">~</span>

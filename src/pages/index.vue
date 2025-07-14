@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import ChainsSelect from './components/chainsSelect.vue'
 import CategoryTabs from './components/categoryTabs.vue'
-import HotRank from './components/hotRank/hotRank.vue'
+import hot from './components/hotRank/hot.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 const components = {
-  HotRank,
+  hot,
 }
-const activeTab = shallowRef<keyof typeof components>('HotRank')
+const activeTab = shallowRef<keyof typeof components>('hot')
 const activeChain = shallowRef('AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
+const categories = computed(()=>{
+  return chains.value.find(el => el.net_name === activeChain.value)
+  ?.categories
+})
 
 onMounted(() => {
   _getTreasureConfig()
@@ -217,9 +221,9 @@ function getMedias(appendix: string) {
 
 <template>
   <div class="w-full">
-    <div class="flex gap-16px py-12px px-16px">
+    <div class="flex gap-16px py-12px px-16px bg-[--d-111-l-FFF]">
       <ChainsSelect v-model:activeChain="activeChain" :list="chains" />
-      <CategoryTabs :activeTab="activeTab" />
+      <CategoryTabs :activeTab="activeTab" :categories="categories!"/>
     </div>
     <KeepAlive>
       <component

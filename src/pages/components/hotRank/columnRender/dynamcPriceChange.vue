@@ -4,7 +4,7 @@ const props = defineProps<{
   setSortConditions(params: { sort: string; sort_dir: string }): void;
   activeInterval:string
 }>()
-const prefix = computed(()=>`price_change_${props.activeInterval.toLowerCase()}`)
+const prefix = computed(()=>`price_change_${props.activeInterval}`)
 function sortChange(sort_dir: string) {
   props.setSortConditions({
     sort: sort_dir?prefix.value:'',

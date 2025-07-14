@@ -53,7 +53,7 @@ function onSelect(item: { text: string; value: string }) {
       />
     </template>
     <template #default>
-      <div class="text-12px font-400">
+      <div class="text-12px font-400 color-[--d-999-l-666]">
         {{ title }}
       </div>
       <ul class="mt-10px">
@@ -77,7 +77,7 @@ function onSelect(item: { text: string; value: string }) {
           v-model.trim.number="rangeArr[0]"
           clearable
           type="text"
-          :placeholder="$t('min')"
+          :placeholder="$t('min3')"
           @input="(value) => (rangeArr[0] = value.replace(/\-|[^\d.]/g, ''))"
         >
           <template v-if="append" #append>{{ append }}</template>

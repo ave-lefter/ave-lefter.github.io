@@ -1,35 +1,45 @@
 <script setup lang="ts">
 import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
+import type { CategoryElement } from '~/api/market'
 
-defineProps<{ activeTab: string }>()
-const { t } = useI18n()
+const props = defineProps<{ activeTab: string; categories: CategoryElement[] }>()
+// const { t } = useI18n()
 const intervals = computed(() => {
   return [
     { name: '1m', id: '1m' },
     { name: '5m', id: '5m' },
     { name: '15m', id: '15m' },
-    { name: '1H', id: '1H' },
-    { name: '4H', id: '4H' },
-    { name: '24H', id: '24H' },
+    { name: '1h', id: '1h' },
+    { name: '4h', id: '4h' },
+    { name: '24h', id: '24h' },
   ]
 })
-const tabs = computed(() => {
-  return [{ name: t('trending'), component: 'HotRank' as const, icon: 'custom:hot' }]
+const iconMap = shallowRef({
+  hot:'custom:hot'
 })
 const globalStore = useGlobalStore()
+// 由于其他榜单未上，用临时的 computed过滤
+const supportCategories = computed(() => {
+  const keys = ['hot']
+  return (props.categories||[]).filter((el) => {
+    return keys.includes(el.category)
+  })
+})
+const localeStore = useLocaleStore()
 </script>
 
 <template>
   <div class="flex flex-1 justify-between">
     <div class="flex gap-2 text-12px">
       <span
-        v-for="(item, index) in tabs"
+        v-for="(item, index) in supportCategories"
         :key="index"
-        class="p-2 lh-16px color-#F5F5F5 bg-#333 cursor-pointer rounded-1"
+        class="p-2 lh-16px cursor-pointer rounded-1"
+        :class="activeTab===item.category?'color-#F5F5F5 bg-#333':'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'"
       >
-        <Icon :name="item.icon" class="mr-1 color-#FFA622 text-10px" />
-        {{ item.name }}
+        <Icon :name="iconMap[item.category]" class="mr-1 color-#FFA622 text-12px" />
+        {{ item[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
       </span>
     </div>
     <div class="flex gap-12px items-center text-12px">
@@ -58,7 +68,7 @@ const globalStore = useGlobalStore()
           :chain="'solana'"
         />
         <BlackList />
-        <ColumnsToolbar v-if="activeTab === 'HotRank'" />
+        <ColumnsToolbar v-if="activeTab === 'hot'" />
       </div>
     </div>
   </div>

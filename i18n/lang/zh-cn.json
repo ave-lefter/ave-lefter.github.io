@@ -1055,5 +1055,6 @@
   "transactionInfo": "交易信息",
   "securityInfo": "安全信息",
   "insidersPosition1": "老鼠仓持仓",
-  "safe":"安全"
+  "safe":"安全",
+  "min3":"最小"
 }

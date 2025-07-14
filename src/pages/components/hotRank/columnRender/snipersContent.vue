@@ -62,11 +62,11 @@ function formatColor(row) {
 }
 </script>
 <template>
-  <el-table-column align="right" width="100">
+  <el-table-column align="right" :width="getTextWidth($t('snipers'))+68">
     <template #header>
       <div class="flex items-center justify-end gap-3px">
         {{ $t('snipers') }}
-        <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
+        <!-- <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /> -->
         <RangePopover
           v-model="popoverVisible"
           :width="225"

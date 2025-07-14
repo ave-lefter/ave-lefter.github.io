@@ -57,14 +57,14 @@ function confirm(params?: [string, string]) {
 </script>
 <template>
   <el-table-column
-    v-if="activeCategory === 'hot' && ['AllChains', 'bsc'].includes(activeChain)"
+    v-if="activeCategory === 'hot' && ['bsc'].includes(activeChain)"
     align="right"
     width="110"
   >
     <template #header>
       <div class="flex items-center justify-end gap-3px">
         {{ $t('insiders') }}%
-        <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
+        <!-- <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /> -->
         <RangePopover
           v-model="popoverVisible"
           :width="225"

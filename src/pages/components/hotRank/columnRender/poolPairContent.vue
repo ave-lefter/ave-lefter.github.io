@@ -107,7 +107,7 @@ function timerCountColor(val:number) {
 </script>
 
 <template>
-  <el-table-column :label="$t('poolPair')" min-width="320" fixed="left">
+  <el-table-column min-width="320" fixed="left">
     <template #header>
       <div class="flex items-center gap-2px">
         <span>{{ $t('poolPair') }}</span

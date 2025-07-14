@@ -82,11 +82,11 @@ function confirm(params?: [string, string]) {
     <template #header>
       <div class="flex items-center justify-end gap-3px">
         {{ $t("holders") }}
-        <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
+        <!-- <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /> -->
         <RangePopover
           v-model="popoverVisible"
           :width="225"
-          :title="`${$t('mCap')}($)`"
+          :title="$t('holders')"
           :list="openTimeList"
           :selectRangeIndex="1"
           :isFilterHighlight="isFilterHighlight"
