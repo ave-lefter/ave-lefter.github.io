@@ -326,7 +326,7 @@ onMounted(() => {
     <el-popover :visible="visibleShow" :virtual-ref="virtualRef" virtual-triggering trigger="click" :width="250">
       <div>
         <div>{{ t('editRemark') }}</div>
-        <el-input v-model="remarkValue" clearable maxlength="50" show-word-limit :placeholder="t('enterRemark')"
+        <el-input v-model="remarkValue" clearable maxlength="20" show-word-limit :placeholder="t('enterRemark')"
           class="mt-8px w-200px" />
         <div class="flex items-center justify-between mt-12px gap-12px">
           <div @click="visibleShow = false"

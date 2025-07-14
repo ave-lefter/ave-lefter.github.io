@@ -39,6 +39,7 @@
             <span class="text-12px mt-10px">{{ $t('noWalletTip') }}</span>
             <el-button
               class="mt-10px"
+              type="primary"
               @click="botStore.$patch({
               connectVisible: true
             })"

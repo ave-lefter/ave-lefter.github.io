@@ -301,7 +301,7 @@ const collect = async (row: any,index:number) => {
         group: form.group,
         is_monitored: form.is_monitored,
       }).then(() => {
-        ElMessage.success(t('attention1Success'));
+        ElMessage.success(t('attention1Canceled'));
         (tokens.value as Array<any>)[index].is_wallet_address_fav = 1
         // getList()
         reCreateChild()

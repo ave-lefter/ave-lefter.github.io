@@ -1055,7 +1055,7 @@ const collect = async (row: any,index:number) => {
     user_address: row.holder,
     user_chain: row.chain
   }).then(() => {
-    ElMessage.success(t('attention1Success'));
+    ElMessage.success(t('attention1Canceled'));
     (tableList.value as Array<any>)[index].is_wallet_address_fav = 0
     // getList()
   }).catch((err) => {
