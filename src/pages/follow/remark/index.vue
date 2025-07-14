@@ -74,7 +74,7 @@ watch(() => walletStore.address, (newVal) => {
 
 const handleMonitor = async (row: any) => {
   if (!botStore.evmAddress) return ElMessage.warning(t('noBotWalletTip'))
-  if (row.is_wallet_address_fav === 0) return ElMessage.warning(t('monitorError'))
+  // if (row.is_wallet_address_fav === 0) return ElMessage.warning(t('monitorError'))
   if (row?.is_monitored === 0) {
     await addAddressMonitor({
       address: row.user_address,
@@ -168,6 +168,7 @@ const collect = async (row: any,index:number) => {
 
 // 获取列表
 const getList = async () => {
+  loading.value = true 
   const res: any = await getRemarksDetail({
     address: addressValue.value,
     pageNO: pageData.value.page,
@@ -185,6 +186,7 @@ const getList = async () => {
     []
   pageData.value.total = res.total
   tableList.value = tableData
+  loading.value = false
 }
 
 function safeBigNumber(value: any) {

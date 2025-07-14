@@ -198,6 +198,8 @@ import { generateAvatarIcon, getChainInfo, isValidAddress, evm_utils as utils } 
 import { ArrowDownBold } from '@element-plus/icons-vue'
 const { mode, token_logo_url } = storeToRefs(useGlobalStore())
 const { currentAddress ,showBatchAddressDetails} = storeToRefs(useFollowStore())
+
+const {updateNum3} = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const { t } = useI18n()
 const tabActive = ref(0)
@@ -313,6 +315,7 @@ const handleBulkImportAttention = () => {
   .then((res) => {
       console.log(res)
       ElMessage.success(t('success'))
+      updateNum3.value++
       emit('refresh')
       showBatchAddressDetails.value = false
     })
@@ -434,6 +437,7 @@ const confirmBulkDelete = () => {
       ElMessage.success(t('deleteSuccess', {count: zeroBalanceList.value.length}))
       zeroBalanceAddresses.value = t('deleteSuccess', { count: zeroBalanceList.value.length })
       emit('refresh')
+      updateNum3.value++  
     })
  .catch((err) => {
       console.error('批量删除失败:', err)

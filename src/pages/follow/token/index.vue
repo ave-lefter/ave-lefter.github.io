@@ -248,6 +248,7 @@ const getRowGroupChange = async (val: number, row: any) => {
 
 // 获取列表
 const getList = async () => {
+  loading.value=true
   const res: any = await getNewFavoriteList({
     address: addressValue.value,
     group: activeTab.value,
@@ -268,6 +269,7 @@ const getList = async () => {
     []
   pageData.value.total = res.total
   tableList.value = tableData
+  loading.value=false
 }
 
 // 获取分组列表

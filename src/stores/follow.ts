@@ -72,7 +72,12 @@ export const useFollowStore = defineStore('follow', () => {
       callback(form).then(() => {
           stopLoading?.()
           favAddressPopVisible.value = false
+          updateNum3.value++
           resetFields?.()
+      }).catch((err) => {
+        ElMessage.error(String(err))
+      }).finally(() => {
+        stopLoading?.()
       })
     }
     favAddressPopVisible.value = true

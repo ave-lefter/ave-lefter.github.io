@@ -189,7 +189,7 @@ const collect = async () => {
         group: form.group,
         is_monitored: form.is_monitored,
       }).then(() => {
-        ElMessage.success(t('attention1Canceled'))
+        ElMessage.success(t('attention1Success'))
         // getList()
         _getTokenStatistics()
         return Promise.resolve()

@@ -1,7 +1,7 @@
 import { ElMessage as Message } from 'element-plus'
 import { getGlobalT } from '@/utils/i18nBridge'
-import { add } from 'lodash-es'
 const t = getGlobalT()
+
 // 用户取消关注
 export async function deleteAttention(body: {
   user_address: string, user_chain: string, address: string
@@ -10,6 +10,10 @@ export async function deleteAttention(body: {
   return $api('/v1api/v3/users/fav/deleteUser', {
     method: 'post',
     body,
+  }).then(() => {
+    const {updateNum3} = storeToRefs(useFollowStore())
+    updateNum3.value++
+    return Promise.resolve([])
   }).catch((err) => console.log(err))
 }
 

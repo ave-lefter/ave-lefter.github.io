@@ -47,6 +47,7 @@
               {{ $t('connectWallet') }}
             </el-button>
           </AveEmpty>
+          <span v-else />
         </template>
         <el-table-column :label="$t('wallet2')" width="200" fixed="left">
           <template #header>
@@ -765,6 +766,7 @@ function handleDelGroup(groupId: number) {
   })
 }
 function getMonitorNum() {
+  if(!botStore.evmAddress) return 
   monitorAddresses(conditions).then((res) => {
     monitorNum.value = res.total
   })

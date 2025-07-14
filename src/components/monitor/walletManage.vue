@@ -211,9 +211,11 @@ watch(() => updateNum1.value+updateNum3.value, () => {
   paginationParams.value={...defaultPaginationParams,pageSize: 50}
   getTableList()
 })
-// watch(() => monitorStore.monitorList1, () => {
-//   console.log('monitorStore.monitorList1', monitorStore.monitorList1)
-//   reCreateChild()
+// watch(() => monitorStore.visible, (val) => {
+//   // console.log('monitorStore.visible', monitorStore.visible)
+//   if(val){
+//     init()
+//   }
 // })
 
 function init(){

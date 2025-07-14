@@ -301,7 +301,7 @@ const collect = async (row: any,index:number) => {
         group: form.group,
         is_monitored: form.is_monitored,
       }).then(() => {
-        ElMessage.success(t('attention1Canceled'));
+        ElMessage.success(t('attention1Success'));
         (tokens.value as Array<any>)[index].is_wallet_address_fav = 1
         // getList()
         reCreateChild()
@@ -319,7 +319,7 @@ const collect = async (row: any,index:number) => {
     user_address: row.wallet_address,
     user_chain: row.chain
   }).then(() => {
-    ElMessage.success(t('attention1Success'));
+    ElMessage.success(t('attention1Canceled'));
     (tokens.value as Array<any>)[index].is_wallet_address_fav = 0
     // getList()
     reCreateChild()
