@@ -165,7 +165,7 @@ function confirm(
     </template>
     <template #default="{ row }">
       <div
-        class="flex justify-end lh-18px mb-2px hover:decoration-underline decoration-dotted color-[--d-CCC-l-333]"
+        class="flex justify-end lh-18px mb-2px decorate decoration-dotted color-[--d-CCC-l-333]"
         :class="formatColor(row[volPrefix])"
       >
         <el-popover :width="240">
@@ -231,3 +231,11 @@ function confirm(
     </template>
   </el-table-column>
 </template>
+<style scoped lang="scss">
+.hover-row {
+  overflow: hidden;
+  .decorate {
+    text-decoration-line: underline;
+  }
+}
+</style>

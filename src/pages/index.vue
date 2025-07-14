@@ -220,7 +220,7 @@ function getMedias(appendix: string) {
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="w-full [&&]:max-w-1920px mx-auto">
     <div class="flex gap-16px py-12px px-16px bg-[--d-111-l-FFF]">
       <ChainsSelect v-model:activeChain="activeChain" :list="chains" />
       <CategoryTabs :activeTab="activeTab" :categories="categories"/>

@@ -108,7 +108,7 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     {
       title: t('markers'),
       key: 'markers_dynamic',
-      isVisible: true,
+      isVisible: false,
       render: 'dynamicMarkers',
     },
     {
@@ -120,7 +120,7 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     {
       title: '1m%',
       key: 'price_change_1m',
-      isVisible: true,
+      isVisible: false,
       render: 'priceChange1mContent',
     },
     {
@@ -150,7 +150,7 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     {
       title: t('top10'),
       key: 'holders_top10_ratio',
-      isVisible: true,
+      isVisible: false,
       render: 'top10PositionsContent',
     },
     // {
