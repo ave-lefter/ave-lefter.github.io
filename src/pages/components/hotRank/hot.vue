@@ -73,7 +73,7 @@ const pageInfo = ref({
 const loading = shallowRef(false)
 const columns = useStorage('hotUserTableColumns', getDefaultColumns(t))
 const renderData = computed(() => {
-  return {
+  const result = {
     dynamicMarkers: {
       Comp: DynamicMarkers,
       props: {
@@ -106,22 +106,8 @@ const renderData = computed(() => {
         sortConditions: sortConditions.value,
         setSortConditions,
         activeInterval: '1m',
-      }
+      },
     },
-    ...(['1m', '24h'].includes(globalStore.rankCommon.activeInterval)
-      ? []
-      : [
-          {
-            priceChangeDynamicContent: {
-              Comp: DynamicPriceChange,
-              props: {
-                sortConditions: sortConditions.value,
-                setSortConditions,
-                activeInterval: globalStore.rankCommon.activeInterval,
-              },
-            },
-          },
-        ]),
     quickContent: {
       Comp: quickContent,
       props: {
@@ -137,18 +123,18 @@ const renderData = computed(() => {
     securityContent: {
       Comp: securityContent,
       props: {
-        activeCategory:'hot',
-        activeChain:props.activeChain
+        activeCategory: 'hot',
+        activeChain: props.activeChain,
       },
     },
     insidersContent: {
       Comp: insidersContentNew,
       props: {
-        activeCategory:'hot',
+        activeCategory: 'hot',
         sortConditions: sortConditions.value,
         setSortConditions,
         setFilterForm,
-        activeChain:props.activeChain
+        activeChain: props.activeChain,
       },
     },
     top10PositionsContent: {
@@ -220,6 +206,17 @@ const renderData = computed(() => {
       Comp: Headline,
     },
   }
+  if (!['1m', '24h'].includes(globalStore.rankCommon.activeInterval)) {
+    result.priceChangeDynamicContent = {
+      Comp: DynamicPriceChange,
+      props: {
+        sortConditions: sortConditions.value,
+        setSortConditions,
+        activeInterval: globalStore.rankCommon.activeInterval,
+      },
+    }
+  }
+  return result
 })
 
 function tableRowClick(row) {
@@ -396,9 +393,10 @@ function sizeChange() {
         @collect="collect"
       />
     </template>
+    {{ console.log('columns', columns) }}
   </el-table>
   <el-pagination
-  v-if="pageInfo.total"
+    v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
     class="mt-5px flex justify-center color-[--d-666-l-999]"
