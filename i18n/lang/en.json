@@ -1059,5 +1059,9 @@
   "insidersPosition1": "Insiders Owned",
   "safe":"Safe",
   "min3":"Min",
-   "blockToken":"Add to Blacklist"
+   "blockToken":"Add to Blacklist",
+   "VolBuy":"Vol Buy",
+   "VolSell":"Vol Sell",
+   "TxnsBuy":"Txns Buy",
+   "TxnsSell":"Txns Sell"
 }

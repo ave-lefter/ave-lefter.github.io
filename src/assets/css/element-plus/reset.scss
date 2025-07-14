@@ -137,3 +137,13 @@
 .el-select__wrapper {
   --el-fill-color-blank: var(--d-333-l-F2F2F2);
 }
+
+.el-pagination{
+  &.el-pagination{
+    margin-top: 0;
+    border-top:1px solid var(--d-222-l-F2F2F2);
+    background-color:var(--d-111-l-FFF);
+    --el-text-color-regular:var(--d-666-l-999);
+    --el-pagination-button-color:var(--d-666-l-999);
+  }
+}
