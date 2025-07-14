@@ -7,7 +7,7 @@ defineProps<{
   <el-table-column
     :key="$t('quick')"
     :label="$t('quick')"
-    :min-width="getTextWidth(quickBuyValue, 20) + 70"
+    :min-width="getTextWidth(quickBuyValue, 20) + 80"
     align="right"
     fixed="right"
   >
@@ -16,7 +16,8 @@ defineProps<{
         buttonBg="#12B886"
         :quickBuyValue="quickBuyValue"
         :row="row"
-        styles="--el-color-black: #fff"
+        styles="--el-color-black: #FFF;--el-button-disabled-text-color: #FFF;"
+        class-names="text-14px"
       >
         <Icon class="mr-4px" name="mynaui:lightning-solid" />
         {{ $t("buy") }}
