@@ -33,8 +33,8 @@
           >
             <template #reference>
               <Icon
-                name="mingcute:filter-2-fill"
-                class="cursor-pointer text-12px ml-3px mb-[-2px]"
+                name="custom:filter"
+                class="cursor-pointer text-10px ml-3px"
                 :class="trendQuery.block_time_min && trendQuery.block_time_max?'color-[#3F80F7]':'color-[--d-666-l-999]'"
                 @click.stop
               />
@@ -118,8 +118,8 @@
           >
             <template #reference>
               <Icon
-                name="mingcute:filter-2-fill"
-                class="cursor-pointer text-12px ml-3px mb-[-2px]"
+                name="custom:filter"
+                class="cursor-pointer text-10px ml-3px"
                 :class="!trendQuery.checkAll ? 'color-[#3F80F7]':'color-[--d-666-l-999]'"
               />
             </template>
@@ -217,8 +217,8 @@
           >
             <template #reference>
               <Icon
-                name="mingcute:filter-2-fill"
-                class="cursor-pointer text-12px ml-3px mb-[-2px]"
+                name="custom:filter"
+                class="cursor-pointer text-10px ml-3px"
                 :class="trendQuery.volume_min && trendQuery.volume_max?'color-[#3F80F7]':'color-[--d-666-l-999]'"
               />
             </template>
