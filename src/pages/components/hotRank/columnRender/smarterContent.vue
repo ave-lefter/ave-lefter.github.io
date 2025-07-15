@@ -6,12 +6,7 @@ const props = defineProps<{
 }>()
 const defaultSort = computed(() => {
   if (props.sortConditions.sort === 'smart_money_tx_count_24h') {
-    return (
-      {
-        asc: 'ascending',
-        desc: 'descending',
-      }[props.sortConditions.sort_dir] || ''
-    )
+    return props.sortConditions.sort_dir
   }
   return ''
 })
@@ -19,7 +14,7 @@ const defaultSort = computed(() => {
 function sortChange(sort_dir: string) {
   props.setSortConditions({
     sort: sort_dir?'smart_money_tx_count_24h':'',
-    sort_dir: sort_dir.replace('ending', ''),
+    sort_dir: sort_dir
   })
 }
 
@@ -76,7 +71,7 @@ function getParamsArr(startKey: string, endKey: string, params?: [string, string
   <el-table-column :key="$t('smarter1')" :label="$t('smarter1')" align="right" width="110">
     <template #header>
       <div class="flex items-center justify-end gap-3px">
-        {{ $t('smarter1') }}
+        <span class="cursor-pointer" @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')">{{ $t('smarter1') }}</span>
         <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
         <el-popover
           v-model:visible="popoverVisible"

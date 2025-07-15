@@ -11,17 +11,12 @@ const prefix = computed(() => `makers_${props.activeInterval}`)
 function sortChange(sort_dir: string) {
   props.setSortConditions({
     sort: sort_dir?prefix.value:'',
-    sort_dir: sort_dir.replace('ending', ''),
+    sort_dir: sort_dir
   })
 }
 const defaultSort = computed(() => {
   if (props.sortConditions.sort === prefix.value) {
-    return (
-      {
-        asc: 'ascending',
-        desc: 'descending',
-      }[props.sortConditions.sort_dir] || ''
-    )
+    return props.sortConditions.sort_dir
   }
   return ''
 })
@@ -67,10 +62,12 @@ function getDetailColor(row, isBuyer) {
   <el-table-column :width="getTextWidth($t('markers'), 50) + 80" align="right">
     <template #header>
       <div class="flex items-center justify-end gap-3px">
-        <span
+        <div class="cursor-pointer flex items-center gap-3px" @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')">
+          <span
           class="lh-16px rounded-2px px-2px text-12px bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5]"
           >{{ activeInterval }}</span
         >{{ $t('markers') }}
+        </div>
         <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
         <RangePopover
           v-model="popoverVisible"

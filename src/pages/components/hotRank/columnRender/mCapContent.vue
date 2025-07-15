@@ -8,18 +8,13 @@ const props = defineProps<{
 }>()
 function sortChange(sort_dir: string) {
   props.setSortConditions({
-    sort: sort_dir?'market_cap':'',
-    sort_dir: sort_dir.replace('ending', ''),
+    sort: sort_dir ? 'market_cap' : '',
+    sort_dir: sort_dir,
   })
 }
 const defaultSort = computed(() => {
   if (props.sortConditions.sort === 'market_cap') {
-    return (
-      {
-        asc: 'ascending',
-        desc: 'descending',
-      }[props.sortConditions.sort_dir] || ''
-    )
+    return props.sortConditions.sort_dir
   }
   return ''
 })
@@ -54,7 +49,7 @@ function confirm(params?: [string, string]) {
   if (!params || !params.some((el) => !!el)) {
     props.setFilterForm(['marketcap_min', ''], ['marketcap_max', ''])
     isFilterHighlight.value = false
-    popoverVisible.value=false
+    popoverVisible.value = false
     return
   }
   if (params[1] && params[0] && params[1] < params[0]) {
@@ -62,21 +57,22 @@ function confirm(params?: [string, string]) {
     return
   }
   const _params = params.map((el, idx) => {
-    return [
-      `${{ 0: 'marketcap_min', 1: 'marketcap_max' }[idx]}` as string,
-      el||'',
-    ]
+    return [`${{ 0: 'marketcap_min', 1: 'marketcap_max' }[idx]}` as string, el || '']
   }) as [string, string][]
   props.setFilterForm(..._params)
   isFilterHighlight.value = true
-  popoverVisible.value=false
+  popoverVisible.value = false
 }
 </script>
 <template>
   <el-table-column :label="$t('mCap') + '/' + $t('price')" align="right" width="140">
     <template #header>
       <div class="flex items-center justify-end gap-3px">
-        {{ $t('mCap') }}
+        <span
+          class="cursor-pointer"
+          @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')"
+          >{{ $t('mCap') }}</span
+        >
         <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
         <RangePopover
           v-model="popoverVisible"

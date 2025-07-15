@@ -17,34 +17,24 @@ const sellTxsPre = computed(() => `sells_tx_${lowerCaseInterval.value}_count`)
 function sortChange(sort_dir: string) {
   props.setSortConditions({
     sort: sort_dir?volPrefix.value:'',
-    sort_dir: sort_dir.replace('ending', ''),
+    sort_dir: sort_dir,
   })
 }
 const defaultSort = computed(() => {
   if (props.sortConditions.sort === volPrefix.value) {
-    return (
-      {
-        asc: 'ascending',
-        desc: 'descending',
-      }[props.sortConditions.sort_dir] || ''
-    )
+    return props.sortConditions.sort_dir
   }
   return ''
 })
 function txsSortChange(sort_dir: string) {
   props.setSortConditions({
     sort: sort_dir?txsPrefix.value:'',
-    sort_dir: sort_dir.replace('ending', ''),
+    sort_dir: sort_dir
   })
 }
 const txsDefaultSort = computed(() => {
   if (props.sortConditions.sort === txsPrefix.value) {
-    return (
-      {
-        asc: 'ascending',
-        desc: 'descending',
-      }[props.sortConditions.sort_dir] || ''
-    )
+    return props.sortConditions.sort_dir
   }
   return ''
 })
@@ -138,11 +128,15 @@ function confirm(
   <el-table-column v-if="activeInterval" :width="getTextWidth('VolTxns')+120" align="right">
     <template #header>
       <div class="flex items-center justify-end gap-2px">
-        <span
+        <div class="cursor-pointer flex items-center gap-3px" @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')">
+          <span
           class="lh-16px rounded-2px px-2px text-12px bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5]"
-          >{{ activeInterval }}</span
-        >
-        Vol<HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /><RangePopover
+            >{{ activeInterval }}</span
+          >
+          Vol
+        </div>
+        <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
+        <RangePopover
           v-model="volVisible"
           :width="225"
           :title="$t('nVolume', { n: activeInterval }) + '($)'"
@@ -150,7 +144,9 @@ function confirm(
           :selectRangeIndex="0"
           :isFilterHighlight="isFilterHighlight"
           @confirm="volConfirm"
-        />/Txns<HeadSort :defaultSort="txsDefaultSort" @sort-change="txsSortChange" />
+        />
+        <span class="cursor-pointer" @click="txsSortChange({ asc: '', desc: 'asc', '': 'desc' }[txsDefaultSort] || '')">/Txns</span>
+        <HeadSort :defaultSort="txsDefaultSort" @sort-change="txsSortChange" />
         <RangePopover
           v-model="txsVisible"
           :width="225"
