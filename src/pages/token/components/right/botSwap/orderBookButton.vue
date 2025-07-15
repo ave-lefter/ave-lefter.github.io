@@ -30,8 +30,8 @@ function handleClick() {
 
 <style scoped>
 .order-book-btn {
-  color: var(--primary-color);
-  background: rgba(63, 128, 247, 0.1);
+  color: #3F80F799;
+  background: #3F80F71A;
   display: flex;
   align-items: center;
   border: none;
@@ -42,7 +42,7 @@ function handleClick() {
 }
 
 .order-book-btn.active {
-  background: var(--primary-color);
-  color: #fff;
+  background: #3F80F71A;
+  color: #3F80F7;
 }
 </style>
