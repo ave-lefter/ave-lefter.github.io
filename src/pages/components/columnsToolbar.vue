@@ -1,12 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
 import { useStorage } from '@vueuse/core'
 import { cloneDeep } from 'lodash-es'
-import { getDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
 
+const props = defineProps<{
+  storageKey: string
+  getDefaultColumns: (t: ReturnType<typeof useI18n>['t']) => any
+  getOptions: (t: ReturnType<typeof useI18n>['t']) => any
+}>()
 const { t } = useI18n()
 const dialogVisible = ref(false)
-const storeColumns = useStorage('hotUserTableColumns', getDefaultColumns(t))
+const storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
 const globalStore = useGlobalStore()
 const hotSettings = ref({
   avatar_isCircle:globalStore.pumpSetting.avatar_isCircle,
@@ -14,7 +18,7 @@ const hotSettings = ref({
 })
 
 const themeStore = useThemeStore()
-const hotOptions = computed(() => getHotOptions(t))
+const hotOptions = computed(() => props.getOptions(t))
 
 const initColumns = ref([])
 const modelColumns = ref(cloneDeep(storeColumns.value.filter((item) =>item.children || item.isVisible)))
@@ -22,7 +26,7 @@ const modelColumns = ref(cloneDeep(storeColumns.value.filter((item) =>item.child
 // 当对话框打开时，更新本地列配置
 const openDialog = () => {
   dialogVisible.value = true
-  initColumns.value = getDefaultColumns(t)
+  initColumns.value = props.getDefaultColumns(t)
   modelColumns.value = cloneDeep(storeColumns.value.filter((item) => item.children || item.isVisible))
 }
 
@@ -48,19 +52,19 @@ const handleConfirm = () => {
 
 const handleReset = () => {
   dialogVisible.value = false
-  storeColumns.value = getDefaultColumns(t)
-  modelColumns.value = getDefaultColumns(t)
+  storeColumns.value = props.getDefaultColumns(t)
+  modelColumns.value = props.getDefaultColumns(t)
   hotSettings.value.avatar_isCircle='circle'
   hotSettings.value.isBlacklist = false
   globalStore.pumpSetting.avatar_isCircle = hotSettings.value.avatar_isCircle
   globalStore.pumpSetting.isBlacklist = hotSettings.value.isBlacklist
 }
 
-function findColumnByRender(renderKey) {
+function findColumnByRender(renderKey:string) {
   return modelColumns.value.find((arr) => arr.render === renderKey)
 }
 
-function handleSelectChild(childItem, renderKey) {
+function handleSelectChild(childItem, renderKey:string) {
   childItem.isVisible = !childItem.isVisible
   const index = modelColumns.value.findIndex((arr) => arr.render === renderKey)
   if(index!==-1){

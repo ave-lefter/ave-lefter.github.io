@@ -130,21 +130,21 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
       <div class="[&&]:color-[--d-666-l-999] text-12px flex items-center box">
         <Icon
           v-if="inBlackList(row)"
-          name="custom:key-invisible"
+          name="custom:invisible"
           class="text-12px absolute top-5px left-5px hidden icon"
           @click.self.stop="addOrRemoveBlackList(row, 'ca')"
         />
         <Icon
           v-else
           v-tooltip="$t('blockToken')"
-          name="custom:key-visible"
+          name="custom:visible"
           class="text-9px absolute top-5px left-5px hidden icon"
           @click.self.stop="addOrRemoveBlackList(row, 'ca')"
         />
-        <span>#{{ (pageNO - 1) * pageSize + $index + 1 }}</span>
+        <span :style="{width:Math.ceil(getTextWidth('#'+pageNO*pageSize))+'px'}" class="text-right">#{{ (pageNO - 1) * pageSize + $index + 1 }}</span>
         <div class="flex items-center" @click.stop="emit('collect', $index, row)">
           <Icon
-            name="material-symbols:kid-star"
+            name="custom:star"
             class="color-var(--d-999-l-666) text-12px cursor-pointer ml-5px mr-12px"
             :class="row.is_fav ? 'color-#ffbb19' : ''"
           />
@@ -183,23 +183,23 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
               <Icon
                 v-copy="row.target_token"
                 name="bxs:copy"
-                class="text-10px ml-8px [&&]:color-[--d-666-l-999]"
+                class="text-12px ml-8px [&&]:color-[--d-666-l-999]"
                 @click.self.stop
               />
               <a
-                class="ml-4px text-10px [&&]:color-[--d-666-l-999] lh-10px"
+                class="ml-4px [&&]:color-[--d-666-l-999] lh-10px"
                 :href="`https://x.com/search?q=($${getSymbol(row)} OR ${row.target_token})&src=typed_query&f=live`"
                 target="_blank"
                 @click.stop
               >
-                <Icon name="hugeicons:search-01" />
+                <Icon name="hugeicons:search-01" class="text-12px"/>
               </a>
               <img
                 v-if="row.issue_platform"
                 v-tooltip="row.issue_platform"
                 :src="formatIconTag(row.issue_platform)"
-                width="10"
-                height="10"
+                width="12"
+                height="12"
                 class="rounded-full ml-4px"
                 alt=""
               >
@@ -217,7 +217,7 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
                     :stroke-width="1.5"
                     indeterminate
                   >
-                    <Icon name="material-symbols:lock" class="color-[--d-666-l-999] text-10px" />
+                    <Icon name="material-symbols:lock" class="color-[--d-666-l-999] text-12px" />
                   </el-progress>
                 </template>
                 <template #content>

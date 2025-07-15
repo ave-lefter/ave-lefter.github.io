@@ -223,9 +223,9 @@ function getMedias(appendix: string) {
   <div class="w-full [&&]:max-w-1920px mx-auto">
     <div class="flex gap-16px py-12px px-16px bg-[--d-111-l-FFF]">
       <ChainsSelect v-model:activeChain="activeChain" :list="chains" />
-      <CategoryTabs :activeTab="activeTab" :categories="categories"/>
+      <CategoryTabs :key="activeTab" v-model:activeTab="activeTab" :categories="categories"/>
     </div>
-    <KeepAlive>
+    <KeepAlive :max="6">
       <component
         :is="components[activeTab]"
         :listMapFunction="listMapFunction"
