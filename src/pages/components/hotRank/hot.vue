@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core'
-import { getDefaultColumns } from './columnRender/hotColumusService'
+import { getHotDefaultColumns } from './columnRender/hotColumusService'
 import { getTreasureList } from '~/api/market'
 import {
   quickContent,
@@ -71,7 +71,7 @@ const pageInfo = ref({
   total: 0,
 })
 const loading = shallowRef(false)
-const columns = useStorage('hotUserTableColumns', getDefaultColumns(t))
+const columns = useStorage('hotUserTableColumns', getHotDefaultColumns(t))
 const renderData = computed(() => {
   const result = {
     dynamicMarkers: {

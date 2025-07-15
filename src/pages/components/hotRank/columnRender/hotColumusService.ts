@@ -37,7 +37,7 @@ export function getHotOptions(t: ReturnType<typeof useI18n>['t']) {
   ]
 }
 
-export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
+export function getHotDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
   return [
     {
       title: t('poolPair'),

@@ -2,6 +2,7 @@
 import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
 import type { CategoryElement } from '~/api/market'
+import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
 
 const props = defineProps<{ activeTab: string; categories: CategoryElement[] }>()
 // const { t } = useI18n()
@@ -15,14 +16,19 @@ const intervals = computed(() => {
     { name: '24h', id: '24h' },
   ]
 })
-const iconMap = shallowRef({
-  hot:'custom:hot'
+const configMap = shallowRef({
+  hot: {
+    icon: 'custom:hot',
+    storageKey: 'hotUserTableColumns',
+    getDefaultColumns: getHotDefaultColumns,
+    getOptions: getHotOptions,
+  },
 })
 const globalStore = useGlobalStore()
 // 由于其他榜单未上，用临时的 computed过滤
 const supportCategories = computed(() => {
   const keys = ['hot']
-  return (props.categories||[]).filter((el) => {
+  return (props.categories || []).filter((el) => {
     return keys.includes(el.category)
   })
 })
@@ -36,9 +42,13 @@ const localeStore = useLocaleStore()
         v-for="(item, index) in supportCategories"
         :key="index"
         class="p-2 lh-16px cursor-pointer rounded-1 flex items-center"
-        :class="activeTab===item.category?'color-#F5F5F5 bg-#333':'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'"
+        :class="
+          activeTab === item.category
+            ? 'color-#F5F5F5 bg-#333'
+            : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
+        "
       >
-        <Icon :name="iconMap[item.category]" class="mr-1 color-#FFA622 text-12px" />
+        <Icon :name="configMap[item.category].icon" class="mr-1 color-#FFA622 text-12px" />
         {{ item[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
       </span>
     </div>
@@ -68,7 +78,11 @@ const localeStore = useLocaleStore()
           :chain="'solana'"
         />
         <BlackList />
-        <ColumnsToolbar v-if="activeTab === 'hot'" />
+        <ColumnsToolbar 
+        :storageKey="configMap[activeTab as keyof typeof configMap].storageKey"
+        :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns"
+        :getOptions="configMap[activeTab as keyof typeof configMap].getOptions"
+        />
       </div>
     </div>
   </div>
