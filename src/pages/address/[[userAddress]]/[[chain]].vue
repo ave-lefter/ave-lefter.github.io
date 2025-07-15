@@ -170,6 +170,7 @@ import { getChainInfo } from '@/utils'
 const interval = ref('7D')
 const route = useRoute()
 const botStore = useBotStore()
+const themeStore = useThemeStore()
 const walletStore = useWalletStore()
 const chain = computed(() => {
   if (route.params.chain) {
