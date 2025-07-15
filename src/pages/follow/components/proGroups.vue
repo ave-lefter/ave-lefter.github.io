@@ -33,14 +33,14 @@
           />
       </li>
     </template>
-    <li ref="addButtonRef" class="clickable color-#3F80F7! flex gap-2px">
-      <Icon name="material-symbols:add-circle" class="text-12px" />
+    <li ref="addButtonRef" class="clickable color-#3F80F7! flex gap-2px bg-#3F80F71A!">
+      <Icon name="custom:add-icon" class="text-12px" />
       <span>{{ $t('newGroup') }}</span>
     </li>
     <el-popover ref="popoverRef2" :width="293" trigger="click">
        <template #reference>
-         <li class="clickable color-#3F80F7! flex gap-2px">
-           <Icon name="material-symbols:format-list-bulleted" class="text-12px" />
+         <li class="clickable color-#3F80F7! flex gap-2px bg-#3F80F71A!">
+           <Icon name="custom:list-icon" class="text-12px" />
            <span>{{ $t('groupManage') }}</span>
          </li>
        </template>

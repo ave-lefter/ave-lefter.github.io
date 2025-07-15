@@ -1,12 +1,12 @@
 <template>
-  <div class="w-address mt-12px flex-1 w-100% h-[calc(100%-76px)] flex flex-col" >
+  <div class="w-address flex-1 w-100% h-[calc(100%-76px)] flex flex-col" :class="{ 'mt-12px': currentAddress }">
     <div v-if="currentAddress" class="m-header flex-between px-12px items-start">
       <pro-groups v-if="!isMonitor" v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
       <div v-else/>
       <ul class="w-operate mt--40px">
         <li v-if="evmAddress" class="flex items-center gap-2px">
-           <el-checkbox v-model="isMonitor" :label="t('monitorList')" size="small" style="font-size: 12px;color:var(--d-666-l-333);z-index: 0" />
-           <span class="text-[var(--d-666-l-333)]">{{ `${monitorNum}/50` }}</span>
+           <el-checkbox v-model="isMonitor" :label="t('monitorList')" size="small" style="font-size: 12px;color:var(--d-666-l-333);z-index: 0" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]!"/>
+           <span class="text-[var(--d-666-l-333)]" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/50` }}</span>
         </li>
         <li class="btn">
           <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>
@@ -549,12 +549,11 @@ import type { TableInstance } from 'element-plus'
 
 const { mode, isDark } = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
-const {addressConditions}=storeToRefs(useFollowStore())
 const $router = useRouter()
 const { t } = useI18n()
 const botStore = useBotStore()
 const {evmAddress} = storeToRefs(useBotStore())
-const { addressGroups ,currentAddress,updateNum1,updateNum2,updateNum3} = storeToRefs(useFollowStore())
+const { addressGroups ,currentAddress,updateNum1,updateNum2,updateNum3,addressConditions} = storeToRefs(useFollowStore())
 // const addressGroups = ref([{ "group_id": 3763, "name": "base", "show_index": -1 }, { "group_id": 37632, "name": "base1", "show_index": 0 }, { "group_id": 37631, "name": "base2", "show_index": 1 }])
 const visible = ref(false)  
 const visible2 = ref(false)  

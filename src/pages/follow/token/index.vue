@@ -294,7 +294,7 @@ onMounted(() => {
     <div v-if="botStore.evmAddress || walletStore.address"
       class="flex items-center px-12px mt-12px gap-8px overflow-x-auto scrollbar-hide">
       <div v-for="(item, index) in allTabsGroup" :key="item.value"
-        class="cursor-pointer text-12px color-[--d-999-l-666] bg-[--d-15171c-l-f2f2f2] px-12px h-28px rounded-4px shrink-0 flex items-center"
+        class="cursor-pointer text-12px color-[--d-999-l-666] bg-[--d-15171c-l-f2f2f2] px-8px h-28px rounded-4px shrink-0 flex items-center font-500"
         :class="[activeTab === item.value && 'bg-[--d-333-l-0A0B0C] color-[#F5F5F5]']"
         @click="setActiveTab(item.value)">
         {{ item.label }}
