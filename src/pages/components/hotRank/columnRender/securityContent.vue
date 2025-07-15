@@ -141,7 +141,7 @@ const runPullVisible = computed(() => {
               <el-col :span="12">
                 <div class="flex items-center">
                   <img :src="item.icon" alt="" width="14" height="14" style="margin-right: 2px" >
-                  <span class="color-[--d-999-l-666]">{{ item.label }}:</span>
+                  <span class="color-[--d-999-l-666] text-12px">{{ item.label }}:</span>
                 </div>
               </el-col>
               <el-col :span="12">

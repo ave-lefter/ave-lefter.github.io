@@ -57,10 +57,10 @@ const localeStore = useLocaleStore()
         <button
           v-for="(item, index) in intervals"
           :key="index"
-          class="lh-16px py-2px px-8px color-[--d-F5F5F5-l-333] border-none cursor-pointer rounded-2px"
+          class="lh-16px py-2px px-8px color-[--d-666-l-999]  border-none cursor-pointer rounded-2px"
           :class="
             globalStore.rankCommon.activeInterval === item.id
-              ? 'bg-[--d-111-l-FFF]'
+              ? 'bg-[--d-111-l-FFF] color-[--d-F5F5F5-l-333]'
               : 'bg-transparent'
           "
           @click.stop="globalStore.rankCommon.activeInterval = item.id"
@@ -73,15 +73,16 @@ const localeStore = useLocaleStore()
         <QuickSwapSet
           v-if="globalStore.rankCommon.quickVisible"
           v-model:quickBuyValue="globalStore.rankCommon.quickBuyValue"
-          class="mr-8px"
+          class="mr-12px"
           :settingsButtonVisible="false"
           :chain="'solana'"
         />
         <BlackList />
         <ColumnsToolbar 
-        :storageKey="configMap[activeTab as keyof typeof configMap].storageKey"
-        :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns"
-        :getOptions="configMap[activeTab as keyof typeof configMap].getOptions"
+         class="ml-4px"
+          :storageKey="configMap[activeTab as keyof typeof configMap].storageKey"
+          :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns"
+          :getOptions="configMap[activeTab as keyof typeof configMap].getOptions"
         />
       </div>
     </div>

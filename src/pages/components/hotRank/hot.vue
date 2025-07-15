@@ -371,7 +371,6 @@ function sizeChange() {
   _getTreasureList()
 }
 </script>
-
 <template>
   <el-table
     v-loading="loading"
@@ -380,6 +379,7 @@ function sizeChange() {
     fit
     header-row-class-name="[&&]:text-12px h-40px"
     row-class-name="color-[--d-CCC-l-333] cursor-pointer"
+    cell-class-name="[&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
     @row-click="tableRowClick"
   >
     <template #empty>

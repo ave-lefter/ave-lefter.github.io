@@ -1042,11 +1042,12 @@
   "transactionInfo": "交易信息",
   "securityInfo": "安全信息",
   "insidersPosition1": "老鼠倉持倉",
-   "safe":"安全",
-   "min3":"最小",
-    "blockToken":"拉黑代币",
-    "VolBuy":"交易额买入",
-  "VolSell":"交易额卖出",
-  "TxnsBuy":"交易数买入",
-  "TxnsSell":"交易数卖出"
+  "safe": "安全",
+  "min3": "最小",
+  "blockToken": "拉黑代币",
+  "VolBuy": "交易额买入",
+  "VolSell": "交易额卖出",
+  "TxnsBuy": "交易数买入",
+  "TxnsSell": "交易数卖出",
+  "platform": "平台"
 }
