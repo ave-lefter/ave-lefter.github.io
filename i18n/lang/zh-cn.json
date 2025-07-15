@@ -1071,5 +1071,6 @@
   "VolBuy": "交易额买入",
   "VolSell": "交易额卖出",
   "TxnsBuy": "交易数买入",
-  "TxnsSell": "交易数卖出"
+  "TxnsSell": "交易数卖出",
+  "platform": "平台"
 }

@@ -36,7 +36,7 @@ const currentChain = computed(() => {
 <template>
   <el-select
     v-model="_activeChain"
-    class="[&&]:w-120px"
+    class="[&&]:w-120px [&&]:[--el-select-input-color:--d-F5F5F5-l-333]"
     popper-class="[--el-border-color-light:transparent]"
   >
     <template #header>
@@ -91,4 +91,7 @@ const currentChain = computed(() => {
   </el-select>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+:deep(.el-select__wrapper){
+  --el-fill-color-blank:var(--d-1A1A1A-l-F2F2F2);
+}</style>

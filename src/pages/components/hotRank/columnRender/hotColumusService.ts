@@ -37,7 +37,7 @@ export function getHotOptions(t: ReturnType<typeof useI18n>['t']) {
   ]
 }
 
-export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
+export function getHotDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
   return [
     {
       title: t('poolPair'),
@@ -52,70 +52,16 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       key:'headline',
       render:'headline'
     },
-    // {
-    //   title: t("openTime"),
-    //   isVisible: true,
-    //   render: "openTimeContent",
-    // },
-    {
-      title: t('price'),
-      key: 'current_price_usd',
-      isVisible: true,
-      render: 'priceContent',
-    },
     {
       title: t('mCap'),
       isVisible: true,
       render: 'mCapContent',
     },
-    // {
-    //   title: t('listTime'),
-    //   key: "listing_at",
-    //   isVisible: true,
-    //   render: "listTimeContent",
-    // },
-
-    // {
-    //   title: t('mCap'),
-    //   key: "market_cap",
-    //   isVisible: true,
-    //   render: "marketCapContent",
-    // },
     {
-      title: t('liquidity1') + '/' + t('initial'),
-      key: 'tvl',
+      title: t('price'),
+      key: 'current_price_usd',
       isVisible: true,
-      render: 'liquidityContent',
-    },
-    {
-      title: t('smarter1'),
-      key: 'smart_money_buy_volume_24h',
-      isVisible: true,
-      render: 'smarterContent',
-    },
-    {
-      title: t('volume4')+'/'+t('txns'),
-      key: 'dynamicVolAndTxs',
-      isVisible: true,
-      render: 'dynamicVolAndTxs',
-    },
-    // {
-    //   title: t('txns'),
-    //   key: 'tx_dynamic_count',
-    //   isVisible: false,
-    //   render: 'txnsContent',
-    // },
-    {
-      title: t('markers'),
-      key: 'markers_dynamic',
-      isVisible: false,
-      render: 'dynamicMarkers',
-    },
-    {
-      title: t('holders'),
-      key: 'holders',
-      isVisible: true,
-      render: 'holdersContent',
+      render: 'priceContent',
     },
     {
       title: '1m%',
@@ -129,12 +75,6 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       isVisible: true,
       render: 'priceChangeDynamicContent',
     },
-    // {
-    //   title: "5m%",
-    //   key: "price_change_5m",
-    //   isVisible: true,
-    //   render: "priceChange5mContent",
-    // },
     {
       title: '24h%',
       key: 'price_change_24h',
@@ -142,28 +82,40 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       render: 'priceChange24hContent',
     },
     {
-      title: t('snipers'),
-      key: 'sniper_tx_count',
-      isVisible: false,
-      render: 'snipersContent',
+      title: t('liquidity1') + '/' + t('initial'),
+      key: 'tvl',
+      isVisible: true,
+      render: 'liquidityContent',
     },
     {
-      title: t('top10'),
-      key: 'holders_top10_ratio',
-      isVisible: false,
-      render: 'top10PositionsContent',
+      title: t('volume4')+'/'+t('txns'),
+      key: 'dynamicVolAndTxs',
+      isVisible: true,
+      render: 'dynamicVolAndTxs',
     },
-    // {
-    //   title: "DEV%",
-    //   key: "dev_balance_ratio_cur",
-    //   isVisible: true,
-    //   render: "devContent",
-    // },
     {
-      title: t('insiders'),
-      key: 'insider_balance_ratio_cur',
+      title: t('markers'),
+      key: 'markers_dynamic',
       isVisible: false,
-      render: 'insidersContent',
+      render: 'dynamicMarkers',
+    },
+    {
+      title: t('holders'),
+      key: 'holders',
+      isVisible: true,
+      render: 'holdersContent',
+    },
+    {
+      title: t('smarter1'),
+      key: 'smart_money_buy_volume_24h',
+      isVisible: true,
+      render: 'smarterContent',
+    },
+    {
+      title: 'DEX',
+      key: 'dev',
+      isVisible: false,
+      render: 'dexContent',
     },
     {
       title: t('security'),
@@ -176,10 +128,22 @@ export function getDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       ]
     },
     {
-      title: 'DEX',
-      key: 'dev',
+      title: t('top10'),
+      key: 'holders_top10_ratio',
       isVisible: false,
-      render: 'dexContent',
+      render: 'top10PositionsContent',
+    },
+    {
+      title: t('snipers'),
+      key: 'sniper_tx_count',
+      isVisible: false,
+      render: 'snipersContent',
+    },
+    {
+      title: t('insiders'),
+      key: 'insider_balance_ratio_cur',
+      isVisible: false,
+      render: 'insidersContent',
     },
     {
       title: t('quick'),
