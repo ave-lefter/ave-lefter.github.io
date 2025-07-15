@@ -50,7 +50,7 @@
               </template>
               <template #cell-wallet="{ row }">
                   <UserRemark
-                    :key="row._marker.maker_address" :address="row._marker.maker_address" :chain="row.chain" :remark="row.maker_alias || ''" :showIcon="true" :teleported="true" :wallet_logo="row.maker_logo" iconSize="24px" :formatAddress="
+                    :key="row._marker.maker_address" :address="row._marker.maker_address" :chain="row.chain" :remark="row.maker_alias || ''" :showIcon="true" :teleported="true" :wallet_logo="row.maker_logo?{logo:row.maker_logo,vip_logo:'https://www.iconaves.com/address_portrait/KOL_V.png'}:{}" iconSize="24px" :formatAddress="
                         (address) =>
                           address?.slice(0, 4) + '...' + address?.slice(-4)
                     "
@@ -164,7 +164,7 @@
                 <div class="flex flex-col w-100% gap-8px">
                   <div class="flex-between">
                     <UserRemark
-                      :key="row._marker.maker_address" :address="row._marker.maker_address" :chain="row.chain" :remark="row.maker_alias || ''" :showIcon="true" :teleported="true" :wallet_logo="row.maker_logo" iconSize="24px" :formatAddress="
+                      :key="row._marker.maker_address" :address="row._marker.maker_address" :chain="row.chain" :remark="row.maker_alias || ''" :showIcon="true" :teleported="true" :wallet_logo="row.maker_logo?{logo:row.maker_logo,vip_logo:'https://www.iconaves.com/address_portrait/KOL_V.png'}:{}" iconSize="24px" :formatAddress="
                           (address) =>
                             address?.slice(0, 4) + '...' + address?.slice(-4)
                       "

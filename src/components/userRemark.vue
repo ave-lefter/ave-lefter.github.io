@@ -82,7 +82,7 @@ const props = defineProps({
   maxRemarkLength: { type: Number, default: 14 },
   // eslint-disable-next-line vue/prop-name-casing
   wallet_logo: {
-    type: Object as PropType<{ logo: string; name: string; url: string }>,
+    type: Object as PropType<{ logo?: string; name?: string; url?: string , vip_logo?: string}>,
     default: () => ({ logo: '', name: '', url: '' })
   },
   canEdit: { type: Boolean, default: true }
