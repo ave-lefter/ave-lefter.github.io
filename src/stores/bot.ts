@@ -21,7 +21,6 @@ type AddressItem = { chain: string; address: string; price?: number; balance?: s
 
 const _refreshAccessToken = createCacheRequest(_refAcc, 3000)
 export const useBotStore = defineStore('bot', () => {
-   const walletStore = useWalletStore()
 
   const isSupportChains = ['eth', 'bsc', 'solana', 'base']
   const accessToken = useLocalStorage('bot_accessToken', '')
@@ -149,7 +148,6 @@ export const useBotStore = defineStore('bot', () => {
       })
   }
   function getUserInfo() {
-    walletStore.disconnectWallet()
     if (accessToken.value) {
       bot_getWalletsAllChain({ chain: isSupportChains?.join(',') }).then(
         (res) => {

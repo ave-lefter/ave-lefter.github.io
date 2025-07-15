@@ -16,6 +16,7 @@ import {
   // getBotWallets,
 } from '@/api/bot'
 export const useUserStore = defineStore('user', () => {
+  const walletStore = useWalletStore()
   const botStore = useBotStore()
   const {
     accessToken,
@@ -50,8 +51,10 @@ export const useUserStore = defineStore('user', () => {
       refreshToken.value = res.refreshToken
       evmAddress.value = res.evmAddress
       getUserInfo()
+      
     },
     async loginEmail(data: Parameters<typeof loginEmail>[0]) {
+      walletStore.disconnect()
       const res = await loginEmail(data)
       accessToken.value = res.accessToken
       refreshToken.value = res.refreshToken
@@ -59,6 +62,7 @@ export const useUserStore = defineStore('user', () => {
       getUserInfo()
     },
     async emailCodeLogin(data: Parameters<typeof emailCodeLogin>[0]) {
+      walletStore.disconnect()
       const res = await emailCodeLogin(data)
       accessToken.value = res.accessToken
       refreshToken.value = res.refreshToken
@@ -72,6 +76,7 @@ export const useUserStore = defineStore('user', () => {
       await updateEmailPassword(data)
     },
     async loginGoogle(data: Parameters<typeof googleLogin>[0]) {
+      walletStore.disconnect()
       const res = await googleLogin(data)
       accessToken.value = res.accessToken
       refreshToken.value = res.refreshToken
