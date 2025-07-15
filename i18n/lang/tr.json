@@ -424,7 +424,7 @@
   "isMonitored": "İzleme ekleyip eklemeyeceği",
   "no": "HAYIR",
   "followAddress": "Adresi Takip Edin",
-  "attentionTips": "* İzleme adresi işlevini kullanmak için bot cüzdanına giriş yapmanız gerekiyor",
+  "attentionTips": "* İzleme adresi işlevini kullanmak için bot cüzdanına {0} olması gerekiyor",
   "walletAddress": "Cüzdan adresi",
   "chain": "Blok zinciri",
   "placeholderPrefix1": "Lütfen seçin",
@@ -441,5 +441,6 @@
   "nMarkers": "{n} İşaretleyiciler",
   "min": "Dakika",
   "basicInfo": "Temel Bilgiler",
-  "insidersPosition1": "İçeridekiler"
+  "insidersPosition1": "İçeridekiler",
+  "login": "Giriş yapmak"
 }

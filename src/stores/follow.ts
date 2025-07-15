@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useLocalStorage ,useStorage} from '@vueuse/core'
-import { getFavoriteList2 ,getAttentionPageList,getUserFavoriteGroups2} from '~/api/attention'
+import { getUserFavoriteGroups2} from '~/api/attention'
 // import {
 //   sendEmailCode,
 //   registerEmail,
@@ -92,7 +92,18 @@ export const useFollowStore = defineStore('follow', () => {
     last_tx_time_max: '',
     last_tx_time_min: '',
     last_trade_time: ''
+  } as {
+    group: number
+    time_interval: string
+    user_chain: string
+    sort: string|null
+    sort_dir: string|null
+    keyword: string
+    last_tx_time_max: string|number
+    last_tx_time_min: string|number
+    last_trade_time: string|number
   })
+
   return {
     addressGroups,
     monitorVisible,

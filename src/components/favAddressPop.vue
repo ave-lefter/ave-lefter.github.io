@@ -1,7 +1,7 @@
 <template>
   <el-popover ref="popoverRef" v-model:visible="visible" :width="props?.width" trigger="click" placement="right-end" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" :teleported="true" popper-class="w-favAddressPop" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" @before-leave="reset"  >
     <el-form ref="formRef" v-click-outside="()=>followStore.favAddressPopVisible=false" v-loading="loading" :model="form" :rules="rules" hide-required-asterisk @submit.prevent.stop="handleSubmit(formRef)">
-      <el-form-item prop="group" required label-position="top" size="large" class="mb-20px!">
+      <el-form-item prop="group" required label-position="top" size="small" class="mb-12px!">
         <el-scrollbar max-height="274px">
           <el-radio-group v-model="form.group" class="flex flex-col items-start w-100%" style="align-items: flex-start; ">
               <el-radio :key="0" :value="0" class="w-100%">{{ t('defaultGroup') }}</el-radio>
@@ -9,7 +9,7 @@
           </el-radio-group>
         </el-scrollbar>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="mb-12px!" size="small">
         <el-button v-if="!isAdd" type="primary" class="w-100% text-12px" size="default" :icon="CirclePlusFilled" @click="isAdd = true"> {{ t('newGroup') }}</el-button>
         <el-input
           v-else v-model="addGroupName" style="width: 140px" size="default"
@@ -24,21 +24,22 @@
           </template>
         </el-input>
       </el-form-item>
-      <el-form-item prop="is_monitored" required label-position="top" size="large" class="mb-20px!" :label="t('isMonitored')">
+      <el-form-item prop="is_monitored" required label-position="top" size="small" class="mb-12px!" :label="t('isMonitored')">
         <el-radio-group v-model="form.is_monitored" class="flex flex-row" style="align-items: flex-start;" :disabled="disabledMonitor">
             <el-radio :key="1" :value="1">{{ t('yes') }}</el-radio>
             <el-radio :key="0" :value="0">{{ t('no') }}</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item class="mb-0px!">
+        <span v-if="!botStore.evmAddress" class="font-500 text-12px lh-[100%] tracking-0px color-#FFA622! mb-12px" >
+          <i18n-t keypath="attentionTips" tag="label" for="login">
+            <a class="color-#3F80F7 decoration-underline cursor-pointer"  @click="botStore.changeConnectVisible(true)">{{ t('login') }}</a>
+          </i18n-t>
+        </span> 
         <div class="flex-between w-100% ">
           <el-button style="background: var(--d-333-l-F2F2F2)" class="flex-1" @click.stop.prevent="handleCancel">{{ $t('cancel') }}</el-button>
           <el-button type="primary" class="flex-1" native-type="submit">{{ $t('confirm') }}</el-button>
         </div>
-        <span v-if="!botStore.evmAddress" class="font-500 text-10px lh-[100%] tracking-0px color-#FFA622! mt-8px">
-          {{ t('attentionTips') }}
-          <a class="color-#3F80F7 ml-4px decoration-underline cursor-pointer"  @click="botStore.changeConnectVisible(true)">{{ t('login') }}</a>
-        </span>
       </el-form-item>
     </el-form>
   </el-popover>
@@ -223,10 +224,11 @@ function reset() {
 <style lang="scss">
 .w-favAddressPop{
   .el-radio{
-    color:var(--d-666-l-999)
+    color:var(--d-666-l-999);
+    --el-radio-font-weight:400
   }
   .el-radio__input.is-checked + .el-radio__label{
-    color:var(--d-F5F5F5-l-333)
+    color:var(--d-F5F5F5-l-333);
   }
 }
 </style>

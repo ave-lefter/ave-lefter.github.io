@@ -211,13 +211,13 @@ function getCheckFavoriteGroup(token_id: string, address: string) {
   })
 }
 
-function getNewFavoriteList(query: any): Promise<GetFavListResponse[]> {
+const getNewFavoriteList = createCacheRequest(function(query: any): Promise<GetFavListResponse[]> {
   const { $api } = useNuxtApp()
   return $api('/v2api/fav_tokens/v1/favorite/v2', {
     method: 'get',
     query
   })
-}
+})
 
 function getRemarksDetail(query: any): Promise<GetFavListResponse[]> {
   const { $api } = useNuxtApp()

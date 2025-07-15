@@ -429,7 +429,7 @@
   "isMonitored": "Si agregar monitoreo",
   "no": "No",
   "followAddress": "Seguir la dirección",
-  "attentionTips": "* Necesita iniciar sesión en la billetera de bot para usar la función de dirección de monitoreo",
+  "attentionTips": "* Necesidad de {0} a la billetera de bot para usar la función de dirección de monitoreo",
   "walletAddress": "Dirección de la billetera",
   "chain": "Cadena",
   "placeholderPrefix1": "seleccione",
@@ -446,5 +446,6 @@
   "nMarkers": "{n} Marcadores",
   "min": "Hace minutos",
   "basicInfo": "Información básica",
-  "insidersPosition1": "Propiedad de internos"
+  "insidersPosition1": "Propiedad de internos",
+  "login": "Acceso"
 }

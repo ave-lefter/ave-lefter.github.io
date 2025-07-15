@@ -1037,7 +1037,7 @@
   "isMonitored": "Whether to add monitoring",
   "no": "No",
   "followAddress": "Follow Address",
-  "attentionTips": "* Need to log in to the bot wallet to use the monitoring address function",
+  "attentionTips": "* Need to {0} to the bot wallet to use the monitoring address function",
   "walletGroup": "Wallet Group",
   "walletAddress": "Wallet Address",
   "chain": "Chain",
@@ -1066,11 +1066,11 @@
   "transactionInfo": "Transaction Information",
   "securityInfo": "Security Information",
   "insidersPosition1": "Insiders Owned",
-  "safe":"Safe",
-  "min3":"Min",
-   "blockToken":"Add to Blacklist",
-   "VolBuy":"Vol Buy",
-   "VolSell":"Vol Sell",
-   "TxnsBuy":"Txns Buy",
-   "TxnsSell":"Txns Sell"
+  "safe": "Safe",
+  "min3": "Min",
+  "blockToken": "Add to Blacklist",
+  "VolBuy": "Vol Buy",
+  "VolSell": "Vol Sell",
+  "TxnsBuy": "Txns Buy",
+  "TxnsSell": "Txns Sell"
 }

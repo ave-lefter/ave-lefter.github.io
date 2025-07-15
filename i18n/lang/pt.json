@@ -429,7 +429,7 @@
   "isMonitored": "Se deve adicionar monitoramento",
   "no": "não",
   "followAddress": "Siga o endereço",
-  "attentionTips": "* Precisa fazer login na carteira de bot para usar a função de endereço de monitoramento",
+  "attentionTips": "* Precisa {0} na carteira de bot para usar a função de endereço de monitoramento",
   "walletAddress": "Endereço da carteira",
   "chain": "Rede",
   "placeholderPrefix1": "Selecione",
@@ -446,5 +446,6 @@
   "nMarkers": "{n} Marcadores",
   "min": "m atrás",
   "basicInfo": "Informação básica",
-  "insidersPosition1": "Insiders Possuído"
+  "insidersPosition1": "Insiders Possuído",
+  "login": "Conecte-se"
 }

@@ -369,27 +369,15 @@ export function getHistoryMonitor({pageNo=1,pageSize=50,filtered_type}:{
     }
   })
 }
-
-
-export async function getAttentionPageList({ group = 0, user_chain, sort = '', sort_dir = '', keyword = '', last_tx_time_max = '', last_tx_time_min = '', time_interval = '', pageSize = 100, pageNO = 1, address = localStorage.bot_evmAddress || localStorage.walletAddress }: any) {
-  if (!address || address === 'undefined') {
+export const getAttentionPageList=createCacheRequest(function({ group = 0, user_chain, sort = '', sort_dir = '', keyword = '', last_tx_time_max = '', last_tx_time_min = '', time_interval = '', pageSize = 100, pageNO = 1, address = localStorage.bot_evmAddress || localStorage.walletAddress }: any){
+if (!address || address === 'undefined') {
     return Promise.resolve(null)
   }
   const { $api } = useNuxtApp()
-  // if(store.state.bot?.cancelTokenSource){
-  //   store.state.bot.cancelTokenSource.cancel('Operation canceled by the user.')
-  // }
-  // const CancelToken = axios.CancelToken
-  // const source = CancelToken.source()
-  // store.commit("setCancelTokenSource", source)
   return $api(`/v2api/fav_users/v1/allusers?address=${address}&user_chain=${user_chain}&keyword=${keyword}&sort=${sort}&sort_dir=${sort_dir}&pageSize=${pageSize}&last_tx_time_max=${last_tx_time_max}&pageNO=${pageNO}&last_tx_time_min=${last_tx_time_min}&time_interval=${time_interval}&group=${group}`, {
     method: 'get',
-    // cancelToken: source.token,
   })
-}
-
-
-
+})
 
 // 用户批量导入
 interface BulkImportAttentionItem {

@@ -1023,7 +1023,7 @@
   "isMonitored": "是否添加監控",
   "no": "否",
   "followAddress": "關注地址",
-  "attentionTips": "*需要登錄bot錢包才能使用監控地址功能",
+  "attentionTips": "*需要{0}bot錢包才能使用監控地址功能",
   "walletGroup": "錢包分組",
   "walletAddress": "錢包地址",
   "chain": "鏈",
@@ -1053,11 +1053,11 @@
   "transactionInfo": "交易信息",
   "securityInfo": "安全信息",
   "insidersPosition1": "老鼠倉持倉",
-   "safe":"安全",
-   "min3":"最小",
-    "blockToken":"拉黑代币",
-    "VolBuy":"交易额买入",
-  "VolSell":"交易额卖出",
-  "TxnsBuy":"交易数买入",
-  "TxnsSell":"交易数卖出"
+  "safe": "安全",
+  "min3": "最小",
+  "blockToken": "拉黑代币",
+  "VolBuy": "交易额买入",
+  "VolSell": "交易额卖出",
+  "TxnsBuy": "交易数买入",
+  "TxnsSell": "交易数卖出"
 }

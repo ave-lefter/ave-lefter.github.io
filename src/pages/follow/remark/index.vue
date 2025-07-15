@@ -74,8 +74,8 @@ watch(() => walletStore.address, (newVal) => {
 
 const handleMonitor = async (row: any) => {
   if (!botStore.evmAddress) return ElMessage.warning(t('noBotWalletTip'))
-  // if (row.is_wallet_address_fav === 0) return ElMessage.warning(t('monitorError'))
   if (row?.is_monitored === 0) {
+    if (row.is_wallet_address_fav === 0) return ElMessage.warning(t('monitorError'))
     await addAddressMonitor({
       address: row.user_address,
       app: 0,
@@ -160,7 +160,7 @@ const collect = async (row: any,index:number) => {
     ElMessage.success(row.is_wallet_address_fav === 1 ? t('attention1Canceled') : t('attention1Success'))
     getList()
   }).catch((err) => {
-    console.log(err)
+    ElMessage.error(String(err))
   }).finally(() => {
     loading.value = false
   })
