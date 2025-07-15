@@ -47,7 +47,7 @@
             <UserAvatar :key="row.user_address+row.user_chain" class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
             <div>
               <!-- :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" -->
-            <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 60px;font-size: 14px;color:var(--d-EAECEF-l-333)" iconEditColor="#999" iconEditSize="10px" showAddressTitle  @updateRemark="({remark}) => row.remark = remark"/>
+            <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 60px;font-size: 14px;color:var(--d-EAECEF-l-333)" iconEditColor="#999" iconEditSize="10px" showAddressTitle  @updateRemark="({remark}) => { row.remark = remark;updateNum2++}" :priority="1"/>
             </div>
          </template>
          <template #header-group>

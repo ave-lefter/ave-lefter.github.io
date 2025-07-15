@@ -6,6 +6,7 @@ import { formatNumber2 } from '~/utils/formatNumber'
 import { getRemarksDetail } from '~/api/fav'
 import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 
+const {updateNum3} = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const router = useRouter()
@@ -120,6 +121,7 @@ const handleRemarkGroup = async (row: any) => {
   })
   ElMessage.success(t('success'))
   visibleShow.value = false
+  updateNum3.value++
   getList()
 }
 
