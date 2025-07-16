@@ -23,7 +23,7 @@
       <TokenColumn
         :column-props="{
           label: $t('recentlyTrade'),
-          width: '150',
+          width: '160',
           fixed: 'left',
           sortable: 'custom',
           sortOrders: ['descending', 'ascending', null],
@@ -91,12 +91,12 @@
         sortable="custom"
       >
         <template #header>
-          <span
-              class="inline-flex items-center"
-          >{{ $t('balance1') }}<Icon
+          <span class="inline-flex items-center" >
+            {{ $t('balance1') }}
+            <Icon
               name="custom:price"
-              :class="`${isVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-F5F5F5-l-222]'} cursor-pointer ml-3px`"
-              @click.stop.prevent="isVolUSDT = !isVolUSDT"
+              :class="`${injecteIsVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-F5F5F5-l-222]'} cursor-pointer ml-3px`"
+              @click.stop.prevent="injecteIsVolUSDT=!injecteIsVolUSDT"
             />
           </span>
         </template>
@@ -104,7 +104,7 @@
           <span v-if="row?.balance_usd == 0">0</span>
           <span v-else-if="row?.balance_usd == '--'">--</span>
           <span v-else class="color-[--d-F5F5F5-l-333] flex justify-end">
-            <template v-if="!isVolUSDT">
+            <template v-if="!injecteIsVolUSDT">
               {{
                 row?.main_token_price == 0
                   ? 0
@@ -213,7 +213,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 // import { formatNumber2, formatNumberS } from '@/utils/formatNumber'
 import HideTokenDialog from './hideTokenDialog.vue'
 import TokenColumn from '@/components/tokenColumn.vue'
@@ -257,13 +257,10 @@ const props = defineProps({
 })
 
 const _emit = defineEmits(['hideToken'])
-
 const hideTokenVisible = ref(false)
 const currentHideToken = ref({})
-const isVolUSDT = shallowRef(true)
-
+const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
 const themeStore = useThemeStore()
-
 const tokenDetailSStore = useTokenDetailsStore()
 const route = useRoute()
 function jumpBalance(row) {

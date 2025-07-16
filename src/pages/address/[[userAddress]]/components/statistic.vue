@@ -69,9 +69,14 @@
         <strong class="text-6 leading-7.5 text-[var(--d-fff-l-333)]">
           {{ uSymbol }}{{ total_balance }} {{ main_token_symbol }}
         </strong>
-
-        <el-switch v-model="currencyStandard" class="custom-switch" inactive-value="U" :active-value="chain">
-          <template #active-action>
+        <el-switch
+          :model-value="injecteIsVolUSDT"
+          class="custom-switch"
+          :inactive-value="true"
+          :active-value="false"
+          @update:model-value="injecteIsVolUSDT=!injecteIsVolUSDT"
+        >
+        <template #active-action>
             <ChainToken :chain="chain" :width="16" />
           </template>
           <template #inactive-action>
@@ -84,7 +89,7 @@
       </div>
       <p class="m-0 mb-2 leading-5 text-3.5 text-[var(--d-666-l-959A9F)]">
         {{ $t('totalPnL2') }}（{{ intervalText }}）
-        <AveNumber :value="statistics.profit" :signVisible="isUSDT">
+        <AveNumber :value="statistics.profit" :signVisible="injecteIsVolUSDT">
           {{ formatNumber(Math.abs((statistics.profit ?? 0) / main_token_price), 2) }}
           {{ main_token_symbol }}
         </AveNumber>
@@ -230,7 +235,6 @@ const remark = ref({
 })
 
 const balanceAnalysis = ref<Awaited<ReturnType<typeof getBalanceAnalysis>>>({ profit: [], total_balance_without_risk: undefined })
-const currencyStandard = ref('U')
 
 const pnl = computed(() => {
   const profit: Array<{
@@ -355,22 +359,19 @@ const total_balance = computed(() => {
   })
 })
 
-const isUSDT = computed(() => {
-  return currencyStandard.value == 'U'
-})
+const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
 
 const main_token_price = computed(() => {
-  return isUSDT.value ? 1 : Number((balanceAnalysis.value.main_token_price || 0))
+  return injecteIsVolUSDT?.value ? 1 : Number((balanceAnalysis.value.main_token_price || 0))
 })
 
 const uSymbol = computed(() => {
-  return isUSDT.value ? '$' : ''
+  return injecteIsVolUSDT?.value ? '$' : ''
 })
 
 const main_token_symbol = computed(() => {
-  return isUSDT.value ? '' : balanceAnalysis.value.main_token_symbol
+  return injecteIsVolUSDT?.value ? '' : balanceAnalysis.value.main_token_symbol
 })
-
 
 watch(
   () => props.interval,

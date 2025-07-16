@@ -131,6 +131,7 @@ const tableData = ref({
   pageNO: 1,
   pageSize: 40,
   total: 0,
+  pnl: [],
   token: [],
   trend: [],
   deployedToken: [],
@@ -185,7 +186,9 @@ const isToken = computed(() => activeTab.value === 'token')
 const isTrend = computed(() => activeTab.value === 'trend')
 const chainAddress = computed(() => [props.chain, props.address])
 const filterTableList = computed(() => {
-  if (isToken.value || isRecentPnl.value) {
+  if(isRecentPnl.value){
+    return [...tableData.value.pnl]
+  } else if (isToken.value) {
     return [...tableData.value.token]
   } else if (isTrend.value) {
     let trendList = tableData.value.trend.filter(
@@ -211,7 +214,7 @@ const onConditionChange = () => {
 }
 
 const onLoad = () => {
-  if (isRecentPnl.value) _getWhaleTokenList()
+  if (isRecentPnl.value) _getWhalePnlList()
   else if (isToken.value) _getWhaleTokenList()
   else if (isTrend.value) _getWhaleTrendList()
   else _getDeployedTokens()
@@ -276,6 +279,43 @@ const _getWhaleTokenList = async () => {
     }
   } catch {
     tableData.value.token = []
+    tableData.value.error = true
+  } finally {
+    tableData.value.loading = false
+  }
+}
+
+const _getWhalePnlList = async () => {
+  tableData.value.loading = true
+  const data = {
+    user_address: props.address,
+    chain: props.chain,
+    pageNO: tableData.value.pageNO,
+    pageSize: tableData.value.pageSize,
+    sort_dir: conditions_wallet.value.sort_dir,
+    sort: conditions_wallet.value.sort,
+    is_self: props.isSelfAddress ? 1 : 0,
+    // ...(conditions_wallet.value.hide_sold === 1 && { hide_sold: 1 }),
+    // ...(conditions_wallet.value.hide_small === 1 && { hide_small: 1 }),
+  }
+
+  try {
+    const res = await getWhaleTokenList(data)
+    if (data.pageNO === 1) {
+      tableData.value.pnl = []
+    }
+    const list = Array.isArray(res) ? res : []
+    if (list?.length > 0) {
+      const a = [...tableData.value.pnl]
+      const b = list.filter((i) => a.every((j) => !(j.token === i.token && j.chain === i.chain)))
+      tableData.value.pnl = [...a, ...b]
+    }
+    tableData.value.finished = list?.length < tableData.value.pageSize
+    if (!tableData.value.finished) {
+      tableData.value.pageNO++
+    }
+  } catch {
+    tableData.value.pnl = []
     tableData.value.error = true
   } finally {
     tableData.value.loading = false
