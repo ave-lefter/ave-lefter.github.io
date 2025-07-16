@@ -133,14 +133,14 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
     <template #default="{ row, $index }">
       <div class="[&&]:color-[--d-666-l-999] text-12px flex items-center box">
         <Icon
-          v-if="inBlackList(row)"
+          v-if="!inBlackList(row)"
+          v-tooltip="$t('blockToken')"
           name="custom:invisible"
           class="text-12px absolute top-5px left-5px hidden icon"
           @click.self.stop="addOrRemoveBlackList(row, 'ca')"
         />
         <Icon
           v-else
-          v-tooltip="$t('blockToken')"
           name="custom:visible"
           class="text-9px absolute top-5px left-5px hidden icon"
           @click.self.stop="addOrRemoveBlackList(row, 'ca')"
