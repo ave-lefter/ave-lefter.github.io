@@ -62,7 +62,7 @@
           :handleSortChange="handleSortChange"
           :loading="tableData.loading"
           :tableData="filterTableList"
-          :isSelfAddress="isSelfAddress"
+          :isSelfAddress="false"
           :address="address"
           @hideToken="refreshTokenList"
         />
