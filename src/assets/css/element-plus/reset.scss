@@ -68,6 +68,10 @@
   }
 }
 
+.el-select-dropdown__item.is-hovering{
+  --el-fill-color-light:var(--d-333-l-F2F2F2);
+}
+
 .el-dialog {
   --el-bg-color: var(--d-222-l-FFF);
 }

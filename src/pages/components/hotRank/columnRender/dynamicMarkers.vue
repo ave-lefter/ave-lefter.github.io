@@ -21,10 +21,10 @@ function getDetailColor(row, isBuyer) {
     </div>
     <div class="color-[--d-666-l-999] text-12px">
       <span :class="getDetailColor(row, true)">
-        {{ formatNumber(row[`buyers_${activeInterval}`] || 0) }} </span
+        {{ formatNumber(row[`buyers_${activeInterval}`] || 0,1) }} </span
       >/
       <span :class="getDetailColor(row, false)">
-        {{ formatNumber(row[`sellers_${activeInterval}`] || 0) }}
+        {{ formatNumber(row[`sellers_${activeInterval}`] || 0,1) }}
       </span>
     </div>
   </div>

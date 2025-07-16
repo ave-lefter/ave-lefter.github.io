@@ -128,7 +128,7 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
             target="_blank"
             @click.stop
           >
-            <Icon name="hugeicons:search-01" class="text-12px" />
+            <Icon name="custom:search" class="text-12px" />
           </a>
           <img
             v-if="row.issue_platform"

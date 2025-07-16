@@ -301,7 +301,7 @@ const cellRenderer = computed(() => {
 })
 </script>
 <template>
-  <div v-loading="loading" style="height: calc(100vh - 182px)">
+  <div v-loading="loading" style="height: calc(100vh - 207px)">
     <AveTable
       :data="filteredListData"
       :columns="visibleColumns"
@@ -345,7 +345,7 @@ const cellRenderer = computed(() => {
     v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
-    class="mt-5px flex justify-center color-[--d-666-l-999]"
+    class="mt-5px py-20px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
     layout="total, prev, pager, next"
     :total="pageInfo.total || 0"
     :small="false"

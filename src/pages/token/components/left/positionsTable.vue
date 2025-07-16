@@ -7,7 +7,7 @@ import {ElNotification} from 'element-plus'
 import {formatBotGasTips} from '~/utils/bot'
 import BigNumber from 'bignumber.js'
 import {useDebounceFn, useThrottleFn} from '@vueuse/core'
-import {useWalletStore} from "~/stores/wallet";
+import {useWalletStore} from '~/stores/wallet'
 
 const {t} = useI18n()
 const wsStore = useWSStore()
@@ -67,7 +67,7 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
       // 买入信号
       const isBuy = type === '0'
       const isMainToken = token === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
-      const prevBalance = listData.value[index].balance
+      const prevBalance = listData.value[index]?.balance
       if (index > -1) {
         if (isBuy) {
           if (isMainToken) {
