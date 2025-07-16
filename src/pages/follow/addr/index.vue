@@ -1284,6 +1284,14 @@ a.trade {
 :deep() .el-table .cell{
   line-height: 22px;
 }
+:deep() .el-table .el-table__cell{
+  &:first-child>.cell{
+    padding-left: 16px;
+  }
+  &:last-child>.cell{
+    padding-right: 16px;
+  }
+}
 :deep() .el-table{
   --el-table-text-color: var(--d-CCC-l-333);
 }
