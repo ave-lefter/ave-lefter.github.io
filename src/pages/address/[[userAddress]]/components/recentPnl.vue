@@ -24,7 +24,7 @@
       <TokenColumn
         :column-props="{
           label: $t('recentlyTrade'),
-          width: '160',
+          width: '180',
           fixed: 'left',
           sortable: 'custom',
           sortOrders: ['descending', 'ascending', null],
