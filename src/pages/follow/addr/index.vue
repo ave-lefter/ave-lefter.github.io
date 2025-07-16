@@ -482,7 +482,7 @@
       </el-table-column>
       <el-table-column v-if="!isMonitor" :label="t('addrGroup')" align="right" width="120">
         <template #default="{ row }">
-          <el-select v-model="row.group_id" @click.stop @change="(val) => getRowGroupChange(val, row)">
+          <el-select v-model="row.group_id" class="[&&]:[--el-text-color-regular:var(--d-CCC-l-333)]" @click.stop @change="(val) => getRowGroupChange(val, row)">
             <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
             <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
           </el-select>
@@ -504,14 +504,15 @@
              </div>
             <div
               v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
-              class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]" @click="handleMonitor(row,$index)">
-              <Icon name="custom:monitor-icon" class="text-16px mr-2px" :class="[(!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))&&'color-[var(--d-FFF-l-333)]']"/>
+              class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-CCC-l-333)]" @click="handleMonitor(row,$index)">
+              <Icon v-if="!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 )" name="custom:monitor2-icon" class="text-13px mr-5px" :class="[(!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))&&'color-[var(--d-CCC-l-333)]']"/>
+              <Icon v-else name="custom:monitor-icon" class="text-16px mr-2px"/>
               <span
                 class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
                 {{ (!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))? t('pause') : t('enable') }}
               </span>
             </div>
-            <div class="flex items-center mr-12px color-[#666] cursor-not-allowed" v-else>
+            <div class="flex items-center mr-12px color-[var(--d-666-l-CCC)] cursor-not-allowed" v-else>
               <Icon name="custom:monitor-icon" class="text-16px mr-2px " />
             </div>
           </div>
@@ -1281,5 +1282,8 @@ a.trade {
 }
 :deep() .el-table .cell{
   line-height: 22px;
+}
+:deep() .el-table{
+  --el-table-text-color: var(--d-CCC-l-333);
 }
 </style>

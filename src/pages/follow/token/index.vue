@@ -458,7 +458,7 @@ onMounted(() => {
                   </a>
                 </div>
                 <div class="flex items-center mt-2px">
-                  <!-- <span class="text-[--d-666-l-999]">({{ '*' + row.token?.slice(-4) }})</span> -->
+                  <!-- <span class="text-[--d-CCC-l-999]">({{ '*' + row.token?.slice(-4) }})</span> -->
                   <span
                     class="text-[#3f80f7] border-[0.5px] border-solid border-[#3f80f7] rounded-4px bg-transparent text-10px px-4px max-w-[60px] truncate"
                     :title="row.remark" v-if="row.remark">{{ row.remark }}</span>
@@ -536,7 +536,7 @@ onMounted(() => {
       <el-table-column :label="t('tokenGroup')" align="right">
         <template #default="{ row }">
           <el-select v-model="row.group_id" style="width: 100px;" popper-class="follow-select-popper" filterable
-            @click.stop @change="(val) => getRowGroupChange(val, row)">
+            class="[&&]:[--el-text-color-regular:var(--d-CCC-l-333)]" @click.stop @change="(val) => getRowGroupChange(val, row)">
             <el-option v-for="item in allTabsGroup" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </template>
@@ -618,5 +618,6 @@ onMounted(() => {
 
 :deep(.el-table) {
   --el-table-row-hover-bg-color: var(--d-1A1A1A-l-fafafa);
+  --el-table-text-color: var(--d-CCC-l-333);
 }
 </style>

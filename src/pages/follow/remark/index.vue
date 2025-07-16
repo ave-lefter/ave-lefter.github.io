@@ -312,8 +312,21 @@ onMounted(() => {
               <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
               {{ t('copyTrade') }}
             </a>
+            <div
+              v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
+              class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-CCC-l-333)]" @click="handleMonitor(row)">
+              <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-13px mr-5px" :class="[(row?.is_monitored === 1)&&'color-[var(--d-CCC-l-333)]']"/>
+              <Icon v-else name="custom:monitor-icon" class="text-16px mr-2px"/>
+              <span
+                class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
+                {{ (row?.is_monitored === 1)? t('pause') : t('enable') }}
+              </span>
+            </div>
+            <div class="flex items-center mr-12px color-[var(--d-666-l-CCC)] cursor-not-allowed" v-else>
+              <Icon name="custom:monitor-icon" class="text-16px mr-2px " />
+            </div>
             <!-- 监控 -->
-            <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"
+            <!-- <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"
               @click="handleMonitor(row)" v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'">
               <Icon name="custom:monitor-icon" class="text-16px mr-2px" :class="[(row?.is_monitored === 1)&&'color-[var(--d-FFF-l-333)]']"/>
               <span
@@ -323,7 +336,7 @@ onMounted(() => {
             </div>
             <div class="flex items-center mr-12px color-[#666] cursor-not-allowed" v-else>
               <Icon name="custom:monitor-icon" class="text-16px mr-2px " />
-            </div>
+            </div> -->
           </div>
         </template>
       </el-table-column>
@@ -379,5 +392,8 @@ onMounted(() => {
 }
 :deep() .el-table .el-table__cell{
   padding: 14px 0;
+}
+:deep() .el-table{
+  --el-table-text-color: var(--d-CCC-l-333);
 }
 </style>
