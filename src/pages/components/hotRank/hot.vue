@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
 import { getHotDefaultColumns } from './columnRender/hotColumusService'
 import { getTreasureList } from '~/api/market'
@@ -8,20 +8,33 @@ import {
   securityContent,
   top10PositionsContent,
   snipersContent,
-  holdersContent,
+  HoldersContent,
+  HoldersHeader,
   DynamicVolAndTxs,
+  DynamicVolAndTxsHeader,
   DynamicMarkers,
-  smarterContent,
-  liquidityContent,
-  priceContent,
-  mCapContent,
-  poolPairContent,
-  insidersContentNew,
+  DynamicMarkersHeader,
+  SmarterContent,
+  SmarterHeader,
+  LiquidityContent,
+  LiquidityHeader,
+  PriceHeader,
+  MCapContent,
+  MCapHeader,
+  InsidersContent,
   Headline,
-  DynamicPriceChange,
+  DynamicPriceChangeHeader,
+  PoolPairHeader,
+  PoolPairContent,
+  Top10Header,
+  InsidersHeader,
+  SnipersHeader,
+  PriceContent,
+  PriceChange,
 } from './columnRender/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
+import type { RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
 const localeStore = useLocaleStore()
@@ -70,158 +83,12 @@ const pageInfo = ref({
   pageSize: 50,
   total: 0,
 })
+const isVolUSDT = shallowRef(true)
 const loading = shallowRef(false)
 const columns = useStorage('hotUserTableColumns', getHotDefaultColumns(t))
-const renderData = computed(() => {
-  const result = {
-    dynamicMarkers: {
-      Comp: DynamicMarkers,
-      props: {
-        activeInterval: globalStore.rankCommon.activeInterval,
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        setFilterForm,
-      },
-    },
-    dynamicVolAndTxs: {
-      Comp: DynamicVolAndTxs,
-      props: {
-        activeInterval: globalStore.rankCommon.activeInterval,
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        setFilterForm,
-      },
-    },
-    priceChange24hContent: {
-      Comp: DynamicPriceChange,
-      props: {
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        activeInterval: '24h',
-      },
-    },
-    priceChange1mContent: {
-      Comp: DynamicPriceChange,
-      props: {
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        activeInterval: '1m',
-      },
-    },
-    quickContent: {
-      Comp: quickContent,
-      props: {
-        quickBuyValue: globalStore.rankCommon.quickBuyValue,
-      },
-    },
-    dexContent: {
-      Comp: dexContent,
-      props: {
-        activeCategory: 'hot',
-      },
-    },
-    securityContent: {
-      Comp: securityContent,
-      props: {
-        activeCategory: 'hot',
-        activeChain: props.activeChain,
-        childrenData:columns.value.find(el=>el.key ==='security')?.children || []
-      },
-    },
-    insidersContent: {
-      Comp: insidersContentNew,
-      props: {
-        activeCategory: 'hot',
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        setFilterForm,
-        activeChain: props.activeChain,
-      },
-    },
-    top10PositionsContent: {
-      Comp: top10PositionsContent,
-      props: {
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        setFilterForm,
-      },
-    },
-    snipersContent: {
-      Comp: snipersContent,
-      props: {
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        setFilterForm,
-      },
-    },
-    holdersContent: {
-      Comp: holdersContent,
-      props: {
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        setFilterForm,
-      },
-    },
-    smarterContent: {
-      Comp: smarterContent,
-      props: {
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        setFilterForm,
-      },
-    },
-    liquidityContent: {
-      Comp: liquidityContent,
-      props: {
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        setFilterForm,
-      },
-    },
-    mCapContent: {
-      Comp: mCapContent,
-      props: {
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        setFilterForm,
-      },
-    },
-    priceContent: {
-      Comp: priceContent,
-      props: {
-        sortConditions: sortConditions.value,
-        setSortConditions,
-      },
-    },
-    poolPairContent: {
-      Comp: poolPairContent,
-      props: {
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        setFilterForm,
-        pageNO: pageInfo.value.pageNO,
-        pageSize: pageInfo.value.pageSize,
-      },
-    },
-    headline: {
-      Comp: Headline,
-    },
-  }
-  if (!['1m', '24h'].includes(globalStore.rankCommon.activeInterval)) {
-    result.priceChangeDynamicContent = {
-      Comp: DynamicPriceChange,
-      props: {
-        sortConditions: sortConditions.value,
-        setSortConditions,
-        activeInterval: globalStore.rankCommon.activeInterval,
-      },
-    }
-  }
-  return result
-})
 
-function tableRowClick(row) {
-  navigateTo(`/token/${row.target_token}-${row.chain}`)
+function tableRowClick({ rowData }: RowEventHandlerParams) {
+  navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
 }
 
 onMounted(() => {
@@ -370,36 +237,119 @@ function sizeChange() {
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
+
+const filterMap = {
+  insider_balance_ratio_cur:(el:any)=> el.isVisible && props.activeChain === 'bsc',
+  price_change_dynamic:(el:any)=> el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval),
+  quick:(el:any)=> el.isVisible && globalStore.rankCommon.quickVisible,
+}
+
+const visibleColumns = computed(() => {
+  return columns.value.filter((el) => {
+    if(filterMap[el.key as keyof typeof filterMap]){
+      return filterMap[el.key as keyof typeof filterMap](el)
+    }
+    return el.isVisible
+  })
+})
+
+const headerRenderer = computed(() => {
+  return {
+    poolPair: PoolPairHeader,
+    headline: () => t('aiSummary'),
+    mCap: MCapHeader,
+    current_price_usd: PriceHeader,
+    price_change_1m: DynamicPriceChangeHeader,
+    price_change_24h: DynamicPriceChangeHeader,
+    price_change_dynamic: DynamicPriceChangeHeader,
+    tvl: LiquidityHeader,
+    dynamicVolAndTxs: DynamicVolAndTxsHeader,
+    markers_dynamic: DynamicMarkersHeader,
+    holders: HoldersHeader,
+    smart_money_buy_volume_24h: SmarterHeader,
+    dex: () => 'DEX',
+    security: () => t('security'),
+    holders_top10_ratio: Top10Header,
+    quick: () => t('quick'),
+    insider_balance_ratio_cur: InsidersHeader,
+    sniper_tx_count: SnipersHeader,
+  }
+})
+const cellRenderer = computed(() => {
+  return {
+    poolPair: PoolPairContent,
+    headline: Headline,
+    mCap: MCapContent,
+    current_price_usd: PriceContent,
+    price_change_1m: ({ row }) => {
+      return <PriceChange row={row} activeInterval="1m" />
+    },
+    price_change_24h: ({ row }) => {
+      return <PriceChange row={row} activeInterval="24h" />
+    },
+    price_change_dynamic: ({ row }) => {
+      return <PriceChange row={row} activeInterval={globalStore.rankCommon.activeInterval} />
+    },
+    tvl: LiquidityContent,
+    dynamicVolAndTxs: DynamicVolAndTxs,
+    markers_dynamic: DynamicMarkers,
+    holders: HoldersContent,
+    smart_money_buy_volume_24h: SmarterContent,
+    dex: dexContent,
+    security: securityContent,
+    holders_top10_ratio: top10PositionsContent,
+    quick: quickContent,
+    insider_balance_ratio_cur: InsidersContent,
+    sniper_tx_count: snipersContent,
+  }
+})
 </script>
 <template>
-  <el-table
-    v-loading="loading"
-    :height="'calc(100vh - 182px)'"
-    :data="filteredListData"
-    fit
-    header-row-class-name="[&&]:text-12px h-40px"
-    row-class-name="color-[--d-CCC-l-333] cursor-pointer"
-    cell-class-name="[&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
-    @row-click="tableRowClick"
-  >
-    <template #empty>
-      <AveEmpty v-if="!loading && filteredListData.length === 0" />
-      <span v-else />
-    </template>
-    <template v-for="item in columns" :key="item.key">
-      <component
-        v-bind="renderData[item.render]?.props"
-        :is="renderData[item.render]?.Comp"
-        v-if="item.isVisible"
-        @collect="collect"
-      />
-    </template>
-  </el-table>
+  <div v-loading="loading" style="height: calc(100vh - 207px)">
+    <AveTable
+      :data="filteredListData"
+      :columns="visibleColumns"
+      :header-height="40"
+      :row-height="80"
+      fixed
+      style="--el-bg-color: var(--d-111-l-FFF);"
+      row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
+      :rowEventHandlers="{
+        onClick: tableRowClick,
+      }"
+    >
+      <template v-for="item in visibleColumns" :key="item.key" #[`header-${item.key}`]>
+        <component
+          :is="headerRenderer[item.key as keyof typeof headerRenderer]"
+          v-model:isVolUSDT="isVolUSDT"
+          :sortConditions="sortConditions"
+          :setSortConditions="setSortConditions"
+          :setFilterForm="setFilterForm"
+          :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
+        />
+      </template>
+      <template v-for="item in columns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
+        <component
+          :is="cellRenderer[item.key as keyof typeof cellRenderer]"
+          class="text-14px"
+          :isVolUSDT="isVolUSDT"
+          :row="row"
+          :rowIndex="rowIndex"
+          :pageNO="pageInfo.pageNO"
+          :pageSize="pageInfo.pageSize"
+          :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
+          :activeChain="activeChain"
+          :childrenData="item.children || []"
+          @collect="collect"
+        />
+      </template>
+    </AveTable>
+  </div>
   <el-pagination
     v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
-    class="mt-5px flex justify-center color-[--d-666-l-999]"
+    class="mt-5px py-20px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
     layout="total, prev, pager, next"
     :total="pageInfo.total || 0"
     :small="false"
@@ -410,8 +360,7 @@ function sizeChange() {
 </template>
 
 <style scoped lang="scss">
-:deep(.cell) {
-  line-height: normal;
+:deep(.el-table-v2__header-cell),:deep(.el-table-v2__row-cell) {
   padding: 0 16px;
 }
 </style>
