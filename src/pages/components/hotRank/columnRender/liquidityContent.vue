@@ -73,7 +73,7 @@ function confirm(params?: [string, string]) {
         <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
         <Icon
           name="custom:price"
-          :class="`${isVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-666]'} cursor-pointer`"
+          :class="`${isVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-F5F5F5-l-666]'} cursor-pointer`"
           @click.self="isVolUSDT = !isVolUSDT"
         />
         <RangePopover
