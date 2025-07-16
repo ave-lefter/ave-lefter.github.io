@@ -119,7 +119,7 @@
               style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
             >
               <span v-if="$index < 9" class="text-10px" style="opacity: 0">0</span>
-              <span class="text-10px mr-5px" style="color: #696e7c">
+              <span class="text-10px mr-5px font-400" style="color: #999">
                 #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
               </span>
               <!-- <a href class="mr-5px a-gray fav_address" v-if="row.is_wallet_address_fav == 1" @click.stop.prevent="handleDeleteAttention(row)">

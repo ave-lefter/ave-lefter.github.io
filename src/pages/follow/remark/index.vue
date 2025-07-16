@@ -244,7 +244,7 @@ onMounted(() => {
       <el-table-column :label="t('address')" min-width="160" show-overflow-tooltip>
         <template #default="{ row, $index }">
           <div class="flex items-center">
-            <span class="text-[#848E9C] text-12px mr-5px">
+            <span class="text-[#999] text-10px mr-5px">
               #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
             </span>
             <Icon
