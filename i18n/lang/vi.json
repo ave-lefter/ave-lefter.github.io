@@ -608,5 +608,9 @@
   "expiresInTime": "Hết hạn {t}",
   "revoke": "Hủy",
   "expiredTime": "Thời hạn",
-  "historyLimitOrder": "Lệnh giới hạn"
+  "historyLimitOrder": "Lệnh giới hạn",
+  "cowboys": "Cửu vận",
+  "kol": "KOL",
+  "30dTokenDistribution": "Phân phối token 30 ngày",
+  "smartTop3": "TOP3 Token/Khối lượng có lãi"
 }

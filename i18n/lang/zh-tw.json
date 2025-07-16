@@ -1018,5 +1018,9 @@
   "revoke": "撤銷",
   "expiredTime": "过期時間",
   "historyLimitOrder": "歷史掛單",
-  "marketCap": "流通市值"
+  "marketCap": "流通市值",
+  "cowboys": "牛人榜",
+  "kol": "KOL",
+  "30dTokenDistribution": "30d代幣盈利分佈",
+  "smartTop3": "TOP3盈利Token/金额"
 }

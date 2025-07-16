@@ -425,5 +425,7 @@
   "expiresInTime": "Expira {t}",
   "revoke": "Cancelar",
   "expiredTime": "Vencimiento",
-  "historyLimitOrder": "4o mini"
+  "historyLimitOrder": "4o mini",
+  "cowboys": "Top Traders de la billetera",
+  "kol": "KOL de la billetera"
 }

@@ -1033,5 +1033,9 @@
   "expiredTime": "Expiry",
   "historyLimitOrder": "Limit Order",
   "searchGroup": "Search Group",
-  "marketCap": "C.M.Cap"
+  "marketCap": "C.M.Cap",
+  "cowboys": "Top Traders",
+  "kol": "KOL",
+  "30dTokenDistribution": "30d Token Distribution",
+  "smartTop3": "TOP3 Profit Token/Vol"
 }

@@ -420,5 +420,7 @@
   "expiresInTime": "{t} süresi doluyor",
   "revoke": "İptal etmek",
   "expiredTime": "Son kullanma tarihi",
-  "historyLimitOrder": "Limit Emri"
+  "historyLimitOrder": "Limit Emri",
+  "cowboys": "Cüzdan Kovboyu",
+  "kol": "Cüzdan KOL"
 }

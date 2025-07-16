@@ -608,5 +608,9 @@
   "expiresInTime": "Истекает {t}",
   "revoke": "Отмена",
   "expiredTime": "Истечение",
-  "historyLimitOrder": "Лимитные ордера"
+  "historyLimitOrder": "Лимитные ордера",
+  "cowboys": "Ковбои кошелька",
+  "kol": "KOL кошелька",
+  "30dTokenDistribution": "Распределение токенов за 30д",
+  "smartTop3": "ТОП-3 прибыльных токена/объем"
 }

@@ -425,5 +425,7 @@
   "expiresInTime": "Expira {t}",
   "revoke": "Cancelar",
   "expiredTime": "Expiração",
-  "historyLimitOrder": "Ordem de Limite"
+  "historyLimitOrder": "Ordem de Limite",
+  "cowboys": "Top Traders",
+  "kol": "KOL"
 }

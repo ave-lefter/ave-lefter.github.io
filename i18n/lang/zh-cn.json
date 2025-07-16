@@ -1031,5 +1031,9 @@
   "expiredTime": "过期时间",
   "historyLimitOrder": "历史挂单",
   "searchGroup": "搜索分组",
-  "marketCap": "流通市值"
+  "marketCap": "流通市值",
+  "cowboys": "牛人榜",
+  "kol": "KOL",
+  "30dTokenDistribution": "30d代币盈利分布",
+  "smartTop3": "TOP3盈利Token/金额"
 }
