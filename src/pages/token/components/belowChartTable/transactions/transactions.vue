@@ -33,15 +33,6 @@ const tagStore = useTagStore()
 const route = useRoute()
 const aveTableRef = ref<InstanceType<typeof AveTable> | null>(null)
 const firstActivated = ref(true)
-const shouldRenderChild = shallowRef(true)
-
-const reCreateChild = () => {
-  shouldRenderChild.value = false
-  // 确保 DOM更新
-  nextTick(() => {
-    shouldRenderChild.value = true
-  })
-}
 onActivated(() => {
   if (!firstActivated.value && aveTableRef.value) {
     aveTableRef.value.scrollToTop(0)
@@ -653,7 +644,6 @@ const collect = async (row: any,index:number) => {
   console.log('collect',row,index)
   if(row.is_wallet_address_fav !== 1){
     useFollowStore().confirmAttention($refs.value.buttonRefs[index],row.chain, (form) => {
-      console.log('confirmAttention', form)
       return addAttention2({
         address: useFollowStore().currentAddress,
         user_address: row.wallet_address,
@@ -668,8 +658,7 @@ const collect = async (row: any,index:number) => {
             item['is_wallet_address_fav'] = 1
           }
         })
-        reCreateChild()
-        console.log('filterTableList',filterTableList.value)
+        triggerRef(tokenTxs)
         return Promise.resolve()
       }).catch((err) => {
         return Promise.reject(err)
@@ -690,7 +679,7 @@ const collect = async (row: any,index:number) => {
         item['is_wallet_address_fav'] = 0
       }
     })
-    reCreateChild()
+    triggerRef(tokenTxs)
   }).catch((err) => {
     console.log(err)
   }).finally(() => {

@@ -11,7 +11,7 @@ const botStore = useBotStore()
 const walletStore = useWalletStore()
 const router = useRouter()
 const { t } = useI18n()
-
+const {  isDark } = storeToRefs(useGlobalStore())
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
@@ -216,7 +216,7 @@ onMounted(() => {
 <template>
   <div>
     <el-table class='mt-12px' height="calc(100vh - 210px)" v-loading="loading" row-class-name="group" :data="tableList"
-      fit @sort-change="handleSortChange" @row-click="tableRowClick">
+      fit @sort-change="handleSortChange" @row-click="tableRowClick" size="large">
       <template #empty>
         <div v-if="botStore.evmAddress || walletStore.address">
           <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
@@ -245,19 +245,18 @@ onMounted(() => {
               :key="`${row.user_address}-${row.user_chain}`"
               :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
               :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#999]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
-            <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo" :address="row.user_address"
-              :chain="row.user_chain" iconSize="24px"></UserAvatar>
+            <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="32px"/>
             <div class="ml-5px">
               <div class="flex items-center">
-                <span class="text-14px max-w-[95px] truncate">{{ row.remark }}</span>
-                <!-- 备注 -->
+                <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 85px" :iconEditColor="isDark?'#999':'#666'" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)"/>
+                <!-- <span class="text-14px max-w-[95px] truncate">{{ row.remark }}</span>
                 <div ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
                   <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px" name="custom:remark" />
-                </div>
+                </div> -->
               </div>
               <div class="flex items-center mt-2px">
                 <Icon @click.stop.prevent v-copy="row?.user_address" name="bxs:copy"
-                  class="clickable text-[--d-666-l-999]" />
+                  class="clickable text-[--d-999-l-666]" />
                 <Icon name="custom:sun-icon" class="text-12px mx-5px" />
                 <Icon name="custom:wallet-icon" class="text-12px" />
               </div>

@@ -187,7 +187,7 @@ function sendRemarkToServer(remark: string) {
 <style scoped lang="scss">
 .remark-com {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   line-height: 1;
 
   .icon-wallet-avatar {
