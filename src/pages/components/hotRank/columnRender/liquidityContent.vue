@@ -8,12 +8,7 @@ const props = defineProps<{
 }>()
 const defaultSort = computed(() => {
   if (props.sortConditions.sort === 'tvl') {
-    return (
-      {
-        asc: 'ascending',
-        desc: 'descending',
-      }[props.sortConditions.sort_dir] || ''
-    )
+    return props.sortConditions.sort_dir
   }
   return ''
 })
@@ -21,7 +16,7 @@ const defaultSort = computed(() => {
 function sortChange(sort_dir: string) {
   props.setSortConditions({
     sort:sort_dir? 'tvl':'',
-    sort_dir: sort_dir.replace('ending', ''),
+    sort_dir: sort_dir,
   })
 }
 
@@ -74,11 +69,11 @@ function confirm(params?: [string, string]) {
   >
     <template #header>
       <div class="flex items-center justify-end gap-3px">
-        {{ $t("liquidity1") }}/{{ $t("initial") }}
+        <span class="cursor-pointer" @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')">{{ $t("liquidity1") }}/{{ $t("initial") }}</span>
         <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
         <Icon
           name="custom:price"
-          :class="`${isVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-666]'} cursor-pointer`"
+          :class="`${isVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-F5F5F5-l-666]'} cursor-pointer`"
           @click.self="isVolUSDT = !isVolUSDT"
         />
         <RangePopover

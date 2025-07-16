@@ -8,27 +8,24 @@ const prefix = computed(()=>`price_change_${props.activeInterval}`)
 function sortChange(sort_dir: string) {
   props.setSortConditions({
     sort: sort_dir?prefix.value:'',
-    sort_dir: sort_dir.replace('ending', ''),
+    sort_dir: sort_dir,
   })
 }
 const defaultSort = computed(() => {
   if (props.sortConditions.sort === prefix.value) {
-    return (
-      {
-        asc: 'ascending',
-        desc: 'descending',
-      }[props.sortConditions.sort_dir] || ''
-    )
+    return props.sortConditions.sort_dir
   }
   return ''
 })
 </script>
 
 <template>
-  <el-table-column width="100" align="right">
+  <el-table-column width="110" align="right">
     <template #header>
       <div class="flex items-center justify-end gap-3px">
-        <span class="lh-16px rounded-2px px-2px text-12px bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5]">{{ activeInterval}}</span>%
+        <div class="cursor-pointer flex items-center gap-3px" @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')">
+          <span class="lh-16px rounded-2px px-2px text-12px bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5]">{{ activeInterval}}</span>%
+        </div>
         <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
       </div>
     </template>

@@ -3,14 +3,14 @@
     <Icon
       name="custom:sort-up"
       class="text-4px mb-1px cursor-pointer"
-      :class="sortOrder==='ascending' ? 'color-[--d-F5F5F5-l-333]' : 'color-[--d-666-l-999]'"
-      @click.self.stop="handleSort('ascending')"
+      :class="sortOrder==='asc' ? 'color-[--d-F5F5F5-l-333]' : 'color-[--d-666-l-999]'"
+      @click.self.stop="handleSort('asc')"
     />
     <Icon
       name="custom:sort-up"
        class="text-4px mb-1px rotate-180 cursor-pointer"
-      :class="sortOrder==='descending' ? 'color-[--d-F5F5F5-l-333]' : 'color-[--d-666-l-999]'"
-      @click.self.stop="handleSort('descending')"
+      :class="sortOrder==='desc' ? 'color-[--d-F5F5F5-l-333]' : 'color-[--d-666-l-999]'"
+      @click.self.stop="handleSort('desc')"
     />
   </span>
 </template>
@@ -20,7 +20,7 @@ const props = defineProps({
   defaultSort: {
     type: String,
     default: '',
-    validator: (value) => ['ascending', 'descending', ''].includes(value),
+    validator: (value) => ['asc', 'desc', ''].includes(value),
   },
 })
 
@@ -33,6 +33,8 @@ watch(
   (val) => {
     if (!val) {
       sortOrder.value = ''
+    } else if(props.defaultSort !==sortOrder.value){
+      sortOrder.value = props.defaultSort
     }
   }
 )
@@ -46,9 +48,9 @@ const handleSort = (sort) => {
     }
   } else {
     if (!sortOrder.value) {
-      sortOrder.value = 'ascending'
-    } else if (sortOrder.value === 'ascending') {
-      sortOrder.value = 'descending'
+      sortOrder.value = 'asc'
+    } else if (sortOrder.value === 'asc') {
+      sortOrder.value = 'desc'
     } else {
       sortOrder.value = ''
     }

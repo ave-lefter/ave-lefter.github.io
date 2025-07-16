@@ -15,12 +15,7 @@ const props = defineProps<{
 const popoverVisible = shallowRef(false)
 const defaultSort = computed(() => {
   if (props.sortConditions.sort === 'created_at') {
-    return (
-      {
-        asc: 'ascending',
-        desc: 'descending',
-      }[props.sortConditions.sort_dir] || ''
-    )
+    return props.sortConditions.sort_dir
   }
   return ''
 })
@@ -28,7 +23,7 @@ const defaultSort = computed(() => {
 function sortChange(sort_dir: string) {
   props.setSortConditions({
     sort: sort_dir ? 'created_at' : '',
-    sort_dir: sort_dir.replace('ending', ''),
+    sort_dir: sort_dir,
   })
 }
 
@@ -108,11 +103,20 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
 </script>
 
 <template>
-  <el-table-column min-width="320" fixed="left">
+  <el-table-column :min-width="320" fixed="left">
     <template #header>
       <div class="flex items-center gap-2px">
-        <span>{{ $t('poolPair') }}</span
-        >/<span>{{ $t('openTime') }}</span>
+        <div
+          class="cursor-pointer"
+          @click="
+            sortChange(
+              { asc: '', desc: 'asc', '': 'desc' }[defaultSort] || ''
+            )
+          "
+        >
+          <span>{{ $t('poolPair') }}</span
+          >/<span>{{ $t('openTime') }}</span>
+        </div>
         <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
         <RangePopover
           v-model="popoverVisible"
@@ -141,7 +145,11 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
           class="text-9px absolute top-5px left-5px hidden icon"
           @click.self.stop="addOrRemoveBlackList(row, 'ca')"
         />
-        <span :style="{width:Math.ceil(getTextWidth('#'+pageNO*pageSize))+'px'}" class="text-right">#{{ (pageNO - 1) * pageSize + $index + 1 }}</span>
+        <span
+          :style="{ width: Math.ceil(getTextWidth('#' + pageNO * pageSize)) + 'px' }"
+          class="text-right"
+          >#{{ (pageNO - 1) * pageSize + $index + 1 }}</span
+        >
         <div class="flex items-center" @click.stop="emit('collect', $index, row)">
           <Icon
             name="custom:star"
@@ -155,7 +163,7 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
               <TokenImg
                 :is-circle="isCircle"
                 chain-class="w-20px h-20px"
-                :token-class="`w-48px h-48px ${isCircle?'':'rounded-8px'}`"
+                :token-class="`w-48px h-48px ${isCircle ? '' : 'rounded-8px'}`"
                 :row="{
                   chain: row.chain,
                   symbol: getSymbol(row),
@@ -192,7 +200,7 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
                 target="_blank"
                 @click.stop
               >
-                <Icon name="hugeicons:search-01" class="text-12px"/>
+                <Icon name="hugeicons:search-01" class="text-12px" />
               </a>
               <img
                 v-if="row.issue_platform"

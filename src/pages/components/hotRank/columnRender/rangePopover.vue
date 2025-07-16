@@ -49,7 +49,7 @@ function onSelect(item: { text: string; value: string }) {
       <Icon
         name="custom:filter"
         class="text-10px cursor-pointer"
-        :class="isFilterHighlight ? 'color-[--d-999-l-666]' : ''"
+        :class="isFilterHighlight ? 'color-[--d-F5F5F5-l-666]' : ''"
       />
     </template>
     <template #default>
