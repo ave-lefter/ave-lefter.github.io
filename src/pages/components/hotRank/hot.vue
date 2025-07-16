@@ -238,12 +238,16 @@ function sizeChange() {
   _getTreasureList()
 }
 
+const filterMap = {
+  insider_balance_ratio_cur:(el:any)=> el.isVisible && props.activeChain === 'bsc',
+  price_change_dynamic:(el:any)=> el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval),
+  quick:(el:any)=> el.isVisible && globalStore.rankCommon.quickVisible,
+}
+
 const visibleColumns = computed(() => {
   return columns.value.filter((el) => {
-    if(el.key === 'insider_balance_ratio_cur'){
-      return el.isVisible && props.activeChain === 'bsc'
-    } else if(el.key === 'price_change_dynamic'){
-      return el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval)
+    if(filterMap[el.key as keyof typeof filterMap]){
+      return filterMap[el.key as keyof typeof filterMap](el)
     }
     return el.isVisible
   })
