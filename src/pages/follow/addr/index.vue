@@ -359,9 +359,9 @@
       <el-table-column
         align="right" width="130">
         <template #header>
-          <div class="flex items-center clickable flex-end">
+          <div class="flex items-center flex-end">
             <div
-              class="flex items-center clickable flex-end"
+              class="flex items-center flex-end cursor-pointer"
               style="cursor: pointer"
               @click="handleSort(conditions,'','last_tx_time')"
             >
@@ -862,6 +862,7 @@ function  handleFilterConfirm(data: FilterFormType) {
 }
 
 function handleSort(val:any, dir='',sort:string) {
+    tableRef.value?.clearSort()
     if (!dir) {
       const sortList = ['desc', 'asc', null]
       if (!val.sort_dir) {
@@ -1262,14 +1263,14 @@ a.trade {
     position: absolute;
     left: 7px;
     &.ascending {
-      border-bottom-color: var(--el-text-color-placeholder);
+      border-bottom-color: var(--d-666-l-999);
       top: -5px;
       &.active {
         border-bottom-color: var(--d-F5F5F5-l-333);
       }
     }
     &.descending {
-      border-top-color: var(--el-text-color-placeholder);
+      border-top-color:  var(--d-666-l-999);
       bottom: -3px;
       &.active {
         border-top-color: var(--d-F5F5F5-l-333);
