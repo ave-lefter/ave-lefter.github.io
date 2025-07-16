@@ -30,15 +30,7 @@
           sortOrders: ['descending', 'ascending', null],
           prop: 'last_txn_time',
         }"
-      >
-        <template v-if="isSelfAddress" #default="{ row }">
-          <Icon
-            name="bx:bxs-hide"
-            class="absolute top-0 left-0 hidden bxs-hide cursor-pointer color-#959a9f"
-            @click.self.stop="hideToken(row)"
-          />
-        </template>
-      </TokenColumn>
+      />
       <el-table-column
         :label="$t('total_profit')"
         :sort-orders="['descending', 'ascending', null]"
