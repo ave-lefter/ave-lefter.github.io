@@ -532,6 +532,6 @@ defineExpose({
 <style scoped>
 .custom-switch {
   --el-switch-off-color: var(--d-333333-l-F2F2F2);
-  --el-switch-on-color: var(--d-1F3156-l-D2E0F7);
+  --el-switch-on-color: var(--d-666-l-ccc);
 }
 </style>

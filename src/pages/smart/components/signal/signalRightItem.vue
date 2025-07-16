@@ -294,7 +294,14 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
         @click="openTokenDetail(item.actions[$index])"
       >
         <div class="flex-[2] flex items-center">
-          <UserAvatar
+          <UserRemark :key="wallet_address" :address="wallet_address" :chain="activeChain" :remark="wallet_alias || ''" :showIcon="true" :teleported="true" :wallet_logo="{logo:wallet_logo,name:wallet_alias, url: ''}" iconSize="24px" avatar-class="mr-4px" :formatAddress="(address) => `(*${ address.slice(-4) })`" :showAddress="false">
+            <template #default="{remark}">
+              <span class="color-[--d-F5F5F5-l-333] whitespace-nowrap overflow-hidden text-ellipsis max-w-60px">{{
+                remark || $t('wallet')
+              }}</span><span class="color-[--d-999-l-666]">(*{{ wallet_address.slice(-4) }})</span>
+            </template>
+          </UserRemark>
+          <!-- <UserAvatar
             icon-size="24px"
             :wallet_logo="{logo:wallet_logo,name:wallet_alias}"
             :address="wallet_address"
@@ -302,7 +309,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
           />
           <span class="ml-4px color-[--d-F5F5F5-l-333] whitespace-nowrap overflow-hidden text-ellipsis max-w-60px">{{
               wallet_alias || $t('wallet')
-            }}</span><span class="color-[--d-999-l-666]">(*{{ wallet_address.slice(-4) }})</span>
+            }}</span><span class="color-[--d-999-l-666]">(*{{ wallet_address.slice(-4) }})</span>-->
         </div>
         <div class="w-100px text-right color-#12B886">
           {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : '' }}<span
