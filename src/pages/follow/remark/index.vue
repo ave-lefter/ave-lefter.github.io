@@ -86,15 +86,21 @@ const handleMonitor = async (row: any) => {
       telegram: 0,
       user_address: addressValue.value,
       website: 1
+    }).then(() => {
+       ElMessage.success(t('success'))
+       getList()
+    }).catch((e) => {
+      ElMessage.error(String(e))
     })
   } else {
     await favUsersPauseMonitor({
       address: row.user_address,
       uid: row.id
+    }).then(() => {
+       ElMessage.success(t('success'))
+       getList()
     })
   }
-  ElMessage.success(t('success'))
-  getList()
 }
 
 

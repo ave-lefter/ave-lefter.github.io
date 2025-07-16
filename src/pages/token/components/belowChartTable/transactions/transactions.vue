@@ -919,7 +919,6 @@ const collect = async (row: any,index:number) => {
               </div>
             </UserRemark> 
             <Icon
-              v-if="shouldRenderChild"
               :ref="(el: any) => $refs.buttonRefs[rowIndex] = el" name="custom:attention"
               :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#666]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
             <Icon

@@ -5,8 +5,8 @@
       <div v-else/>
       <ul class="w-operate mt--40px">
         <li v-if="evmAddress" class="flex items-center gap-2px">
-           <el-checkbox v-model="isMonitor" :label="t('monitorList')" size="small" style="font-size: 12px;color:var(--d-666-l-333);z-index: 0" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]!"/>
-           <span class="text-[var(--d-666-l-333)]" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/50` }}</span>
+           <el-checkbox v-model="isMonitor" :label="t('monitorList')"  style="color:var(--d-999-l-666);z-index: 0" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! lh-none! [&&]:[--el-checkbox-input-border:1px_solid_var(--d-666-l-999)]"/>
+           <span class="text-[var(--d-999-l-666)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/50` }}</span>
         </li>
         <li class="btn">
           <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>

@@ -129,7 +129,7 @@
       </div>
       <div v-else-if="tabActive === 2" class="delete part">
         <p>{{ $t('bulkDeleteDesc') }}</p>
-        <p>{{ $t('bulkDeleteExample') }}</p>
+        <p class="mb-20px!">{{ $t('bulkDeleteExample') }}</p>
         <el-select
           v-model="activeChain"
           class="chains-select"
@@ -473,17 +473,18 @@ const confirmBulkDelete = () => {
   position: fixed;
   .content {
     background-color: var(--d-222-l-FFF);
-    padding: 24px 20px;
+    padding: 20px 20px;
     .tabs {
       position: relative;
       margin-bottom: 20px;
       display: flex;
       .tab {
         cursor: pointer;
-        margin-right: 28px;
-        font-size: 16px;
-        line-height: 30px;
+        margin-right: 32px;
         color: #666;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 24px;
         &.active {
           color: var(--d-F5F5F5-l-333);
         }
@@ -507,6 +508,7 @@ const confirmBulkDelete = () => {
         color: #999;
         display: flex;
         align-items: top;
+        margin-bottom: 20px;
       }
       .chain {
         cursor: not-allowed;
@@ -586,7 +588,7 @@ textarea{
   font-weight: 300;
 }
 .chains-select {
-  margin: 20px 0;
+  margin-bottom: 20px;
   // border: 1px solid var(--a-bg-3-color);
   // --el-select-border-color-hover: transparent;
   :deep() {

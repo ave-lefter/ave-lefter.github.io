@@ -14,7 +14,9 @@
     // --el-text-color-primary: #333;
   }
 }
-
+.el-select__popper.el-popper{
+  border:0 none !important;
+}
 :root:root {
   --el-text-color-regular: var(--d-F5F5F5-l-333);
 }
@@ -67,7 +69,6 @@
     font-size: 12px;
   }
 }
-
 .el-dialog {
   --el-bg-color: var(--d-222-l-FFF);
 }
@@ -135,8 +136,11 @@
 }
 
 .el-select__wrapper {
-  --el-fill-color-blank: var(--d-333-l-F2F2F2);
+  --el-fill-color-blank: var(--d-333-l-EEE);
 }
+.el-select-dropdown__wrap{
+  --el-fill-color-light: var(--d-333-l-F5F7FA);
+  }
 
 .el-pagination{
   &.el-pagination{
