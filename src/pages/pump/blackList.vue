@@ -9,7 +9,6 @@
     <template #reference>
       <el-button
         class="btn mr-8px ml-0 gray"
-        :class="{active: pumpBlackList?.length >0}"
         style="margin-left: 0"
         @click="visible = !visible"
       >

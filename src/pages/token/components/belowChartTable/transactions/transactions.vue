@@ -5,7 +5,7 @@ import MakersFilter from './makersFilter.vue'
 import MarkerTooltip from './markerTooltip.vue'
 import UserTxsFilterHead from './userTxsFilterHead.vue'
 import type { RowEventHandlerParams } from 'element-plus'
-
+import { deleteAttention, addAttention2 } from '~/api/attention'
 import {filterLanguage} from '~/pages/token/components/kLine/utils'
 import {
   getPairLiq,
@@ -20,7 +20,9 @@ import {useThrottleFn} from '@vueuse/core'
 
 import IconUnknown from '@/assets/images/icon-unknown.png'
 import type {AveTable} from '#components'
-
+const $refs = ref({
+  buttonRefs: {} as Record<number, any>
+})
 const MAKER_SUPPORT_CHAINS = ['solana', 'bsc']
 const { t } = useI18n()
 const {totalHolders, pairAddress, token, pair, commonHeight} = storeToRefs(useTokenStore())
@@ -631,6 +633,59 @@ function resetMakerAddress() {
   tableFilter.value.markerAddress = ''
   _getTokenTxs()
 }
+
+const collect = async (row: any,index:number) => {
+  if(!useFollowStore().currentAddress){
+    useBotStore().changeConnectVisible(true)
+  }
+  if (useWalletStore().address && !useWalletStore().walletSignature[useWalletStore().address]) {
+    await useWalletStore().signMessageForFavorite()
+  }
+  console.log('collect',row,index)
+  if(row.is_wallet_address_fav !== 1){
+    useFollowStore().confirmAttention($refs.value.buttonRefs[index],row.chain, (form) => {
+      return addAttention2({
+        address: useFollowStore().currentAddress,
+        user_address: row.wallet_address,
+        user_chain: row.chain,
+        group: form.group,
+        is_monitored: form.is_monitored,
+      }).then(() => {
+        ElMessage.success(t('attention1Success'))
+        // getList()
+        filterTableList.value.forEach((item: any) => {
+          if (item.wallet_address === row.wallet_address) {
+            item['is_wallet_address_fav'] = 1
+          }
+        })
+        triggerRef(tokenTxs)
+        return Promise.resolve()
+      }).catch((err) => {
+        return Promise.reject(err)
+      })
+    })
+    return 
+  }
+  // loading.value = true
+  deleteAttention({
+    address: useFollowStore().currentAddress,
+    user_address: row.wallet_address,
+    user_chain: row.chain
+  }).then(() => {
+    ElMessage.success( t('attention1Canceled'))
+    // getList()
+    filterTableList.value.forEach((item: any) => {
+      if (item.wallet_address === row.wallet_address) {
+        item['is_wallet_address_fav'] = 0
+      }
+    })
+    triggerRef(tokenTxs)
+  }).catch((err) => {
+    console.log(err)
+  }).finally(() => {
+    // loading.value = false
+  })
+}
 </script>
 
 <template>
@@ -834,7 +889,7 @@ function resetMakerAddress() {
             v-model:visible="tableFilterVisible.markers" :modelValue="tableFilter.markerAddress"
             :chain="addressAndChain.chain" @confirm="confirmMakersFilter" />
         </template>
-        <template #cell-makers="{ row }">
+        <template #cell-makers="{ row , rowIndex}">
           <template v-if="['solana', 'bsc'].includes(row.chain) && row.senderProfile">
             <Icon
               v-if="hasNewAccount(row)"
@@ -862,7 +917,10 @@ function resetMakerAddress() {
               <div v-if="row.count && row.count > 1">
                 ({{ row.count }})
               </div>
-            </UserRemark>
+            </UserRemark> 
+            <Icon
+              :ref="(el: any) => $refs.buttonRefs[rowIndex] = el" name="custom:attention"
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#666]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
             <Icon
               name="custom:filter"
               :class="`${tableFilter.markerAddress ? 'color-[--d-999-l-666]' : 'color-[--d-666-l-999]'} cursor-pointer text-10px shrink-0`"
@@ -891,8 +949,8 @@ function resetMakerAddress() {
         </template>
       </AveTable>
       <MarkerTooltip
-        :virtual-ref="makerTooltip" :currentRow="currentRow" :addressAndChain="addressAndChain"
-        v-model="markerTooltipVisible"
+        v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
+        :addressAndChain="addressAndChain"
       >
         <template v-if="['solana', 'bsc'].includes(currentRow.chain) && currentRow.senderProfile">
           <Icon

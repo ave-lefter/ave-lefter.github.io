@@ -122,7 +122,7 @@
               </template>
             </el-table-column>
             <el-table-column :label="$t('address')" align="right">
-              <template #default="{ row }">
+              <template #default="{ row ,$index}">
                 <div class="flex-end">
                   <SignalTags
                     :tags="row.newTags"
@@ -130,6 +130,9 @@
                     :chain="row.chain"
                   />
                   <span class="ml-3px"> *{{ row.address?.slice(-6) }}</span>
+                  <Icon
+                    :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
+                    :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#999]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 mt-4px" @click.stop.prevent="collect(row,$index)" />
                   <Icon
                     name="custom:filter"
                     class="color-[--d-666-l-999] cursor-pointer text-10px ml-3px"
@@ -160,6 +163,7 @@ import { filterChartColor } from '@/utils/holders'
 import LineChart from './lineChart.vue'
 import Insiders from './insiders.vue'
 import ProfitLoss from './profitLoss.vue'
+import { deleteAttention, addAttention2 } from '~/api/attention'
 import {
   _getTop100range,
   _getTop100balance,
@@ -174,7 +178,9 @@ const { t } = useI18n()
 const { mode } = storeToRefs(useGlobalStore())
 const botStore = useBotStore()
 const checked = ref<boolean[]>([true, true, true, true, true, true, true])
-
+const $refs = ref({
+  buttonRefs: {} as Record<number, any>
+})
 const { globalConfig } = storeToRefs(useConfigStore())
 const { token, totalHolders, price } = storeToRefs(useTokenStore())
 const dialogProfitLoss = shallowRef<boolean>(false)
@@ -265,6 +271,49 @@ function init() {
   } else {
     getAllTagsStats()
   }
+}
+const collect = async (row: any,index:number) => {
+  if(!useFollowStore().currentAddress){
+    useBotStore().changeConnectVisible(true)
+  }
+  if (useWalletStore().address && !useWalletStore().walletSignature[useWalletStore().address]) {
+    await useWalletStore().signMessageForFavorite()
+  }
+  console.log('collect',row,index)
+  if(row.is_wallet_address_fav !== 1){
+    useFollowStore().confirmAttention($refs.value.buttonRefs[index],row.chain, (form) => {
+      console.log('confirmAttention', form)
+      return addAttention2({
+        address: useFollowStore().currentAddress,
+        user_address: row.address,
+        user_chain: row.chain,
+        group: form.group,
+        is_monitored: form.is_monitored,
+      }).then(() => {
+        ElMessage.success(t('attention1Success'));
+        (top100balanceC.value as Array<any>)[index].is_wallet_address_fav = 1
+        // getList()
+        return Promise.resolve()
+      }).catch((err) => {
+        return Promise.reject(err)
+      }).finally(() => {
+      })
+    })
+    return 
+  }
+  // loading.value = true
+  deleteAttention({
+    address: useFollowStore().currentAddress,
+    user_address: row.address,
+    user_chain: row.chain
+  }).then(() => {
+    ElMessage.success(t('attention1Canceled'));
+    (top100balanceC.value as Array<any>)[index].is_wallet_address_fav = 0
+    // getList()
+  }).catch((err) => {
+    console.log(err)
+  }).finally(() => {
+  })
 }
 function getTop100range() {
   loadingTop100Range.value = true

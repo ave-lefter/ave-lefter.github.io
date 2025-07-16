@@ -248,6 +248,7 @@ const getRowGroupChange = async (val: number, row: any) => {
 
 // 获取列表
 const getList = async () => {
+  loading.value=true
   const res: any = await getNewFavoriteList({
     address: addressValue.value,
     group: activeTab.value,
@@ -268,6 +269,7 @@ const getList = async () => {
     []
   pageData.value.total = res.total
   tableList.value = tableData
+  loading.value=false
 }
 
 // 获取分组列表
@@ -292,7 +294,7 @@ onMounted(() => {
     <div v-if="botStore.evmAddress || walletStore.address"
       class="flex items-center px-12px mt-12px gap-8px overflow-x-auto scrollbar-hide">
       <div v-for="(item, index) in allTabsGroup" :key="item.value"
-        class="cursor-pointer text-12px color-[--d-999-l-666] bg-[--d-15171c-l-f2f2f2] px-12px h-28px rounded-4px shrink-0 flex items-center"
+        class="cursor-pointer text-12px color-[--d-999-l-666] bg-[--d-15171c-l-f2f2f2] px-8px h-28px rounded-4px shrink-0 flex items-center font-500"
         :class="[activeTab === item.value && 'bg-[--d-333-l-0A0B0C] color-[#F5F5F5]']"
         @click="setActiveTab(item.value)">
         {{ item.label }}

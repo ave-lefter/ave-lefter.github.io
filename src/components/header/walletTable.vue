@@ -58,8 +58,12 @@
                 </span>
                 <div
                   style="display: inline-flex; align-items: center"
-                  class="mt-6px"
+                  class="mt-6px gap-8px"
                 >
+                  <Icon
+                    v-if="shouldRenderChild"
+                    :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
+                    :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#666]'" class="text-14px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
                   <UserRemark :remark="row.remark" :address="row.wallet_address" :chain="row.chain" :showAddress="false" :wallet_logo="row.wallet_logo" iconEditSize="10px"/>
                   <!-- <a
                     href=""
@@ -80,7 +84,7 @@
                   <Icon
                     v-copy="row.wallet_address"
                     name="bxs:copy"
-                    class="text-10px cursor-pointer color-[--d-666-l-999] ml-8px"
+                    class="text-10px cursor-pointer color-[--d-666-l-999]"
                     @click.stop.prevent
                   />
                   <!--  <el-tooltip
@@ -244,7 +248,7 @@ import { formatNumber } from '@/utils/formatNumber'
 import UserAvatar from '@/components/userAvatar.vue'
 import type { SearchWalletInfo } from '@/api/types/search'
 import { getRemarkByAddress } from '@/utils/index'
-
+import { deleteAttention, addAttention2 } from '~/api/attention'
 const $router = useRouter()
 const props = defineProps({
   tokens: {
@@ -256,6 +260,7 @@ const props = defineProps({
     default: false,
   },
 })
+const { t } = useI18n()
 const emit = defineEmits(['close'])
 const tokens = computed(() => {
   return props.tokens
@@ -264,7 +269,65 @@ const isLoading = computed(() => {
   return props.loading
 })
 const themeStore = useThemeStore()
+const $refs = ref({
+  buttonRefs: {} as Record<number, any>
+})
 
+const shouldRenderChild = shallowRef(true)
+
+const reCreateChild = () => {
+  shouldRenderChild.value = false
+  // 确保 DOM更新
+  nextTick(() => {
+    shouldRenderChild.value = true
+  })
+}
+const collect = async (row: any,index:number) => {
+  if(!useFollowStore().currentAddress){
+    useBotStore().changeConnectVisible(true)
+  }
+  if (useWalletStore().address && !useWalletStore().walletSignature[useWalletStore().address]) {
+    await useWalletStore().signMessageForFavorite()
+  }
+
+  console.log('collect',row,index)
+  if(row.is_wallet_address_fav !== 1){
+    useFollowStore().confirmAttention($refs.value.buttonRefs[index],row.chain, (form) => {
+      console.log('confirmAttention', form)
+      return addAttention2({
+        address: useFollowStore().currentAddress,
+        user_address: row.wallet_address,
+        user_chain: row.chain,
+        group: form.group,
+        is_monitored: form.is_monitored,
+      }).then(() => {
+        ElMessage.success(t('attention1Success'));
+        (tokens.value as Array<any>)[index].is_wallet_address_fav = 1
+        // getList()
+        reCreateChild()
+        return Promise.resolve()
+      }).catch((err) => {
+        return Promise.reject(err)
+      }).finally(() => {
+      })
+    })
+    return 
+  }
+  // loading.value = true
+  deleteAttention({
+    address: useFollowStore().currentAddress,
+    user_address: row.wallet_address,
+    user_chain: row.chain
+  }).then(() => {
+    ElMessage.success(t('attention1Canceled'));
+    (tokens.value as Array<any>)[index].is_wallet_address_fav = 0
+    // getList()
+    reCreateChild()
+  }).catch((err) => {
+    console.log(err)
+  }).finally(() => {
+  })
+}
 function tableRowClick(row: { wallet_address: string; chain: string }) {
   // $router.push({
   //   name: 'Balance',

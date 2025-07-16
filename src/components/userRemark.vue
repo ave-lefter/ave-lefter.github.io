@@ -2,7 +2,7 @@
   <div ref="target" class="remark-com" >
     <UserAvatar
       v-if="showIcon"
-      class="mr-10px"
+      :class="avatarClass"
       :wallet_logo="wallet_logo"
       :address="address"
       :chain="chain"
@@ -30,7 +30,7 @@
       </span>
     </template>
 
-    <slot />
+    <slot v-bind="{remark: walletRemark, address, chain}" />
 
     <template v-if="canEdit && targetIsVisible">
       <EditRemarkPopover
@@ -82,10 +82,11 @@ const props = defineProps({
   maxRemarkLength: { type: Number, default: 14 },
   // eslint-disable-next-line vue/prop-name-casing
   wallet_logo: {
-    type: Object as PropType<{ logo: string; name: string; url: string }>,
+    type: Object as PropType<{ logo?: string; name?: string; url?: string , vip_logo?: string}>,
     default: () => ({ logo: '', name: '', url: '' })
   },
-  canEdit: { type: Boolean, default: true }
+  canEdit: { type: Boolean, default: true },
+  avatarClass: { type: String, default: 'mr-10px' }
 })
 
 // Emits
@@ -122,6 +123,13 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   if (stop) stop()
+})
+
+const walletRemark = computed(() => {
+  const r1 = remarksStore.getRemarkByAddress({ address: props.address, chain: props.chain })
+  const r2 = props.remark
+  const r = (r1 || r2)
+  return r
 })
 
 // Computed
@@ -179,7 +187,7 @@ function sendRemarkToServer(remark: string) {
 <style scoped lang="scss">
 .remark-com {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   line-height: 1;
 
   .icon-wallet-avatar {

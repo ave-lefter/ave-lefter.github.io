@@ -1,9 +1,10 @@
 <template>
-  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-2">
-    <div class="left gap-12px">
+  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-9999">
+    <div class="left">
       <NuxtLink
-        v-for="item in newData" :key="item.symbol || item.logo_url"
+        v-for="(item) in newData" :key="item.symbol || item.logo_url"
         class="color-[--d-999-l-666]  flex items-center gap-5px"
+        :class="[(item?.hidden)?'':'mr-12px']"
         :to="`/token/${item.id}`"
       >
         <template v-if="!item?.hidden">
@@ -15,7 +16,20 @@
           <span>{{ item.symbol }}</span>
           <span :class="`color-${item.color}`">{{'$'+formatDec(item?.current_price_usd || 0, 2)}}</span>
         </template>
+        <div v-else class="mr--5px" />
       </NuxtLink>
+      <el-badge :is-dot="(!!botStore.evmAddress)&&isDoted2" class="mr-12px">
+        <div
+          id="monitor"
+          class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit "
+          @click="visible=!visible"
+        >
+          <Icon
+            name="mingcute:wallet-fill"
+          />
+          {{ $t('walletMonitor') }}
+        </div>
+      </el-badge>
       <el-badge v-if="!route.path.includes('smart')" :is-dot="isDoted">
         <div
           class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit"
@@ -28,16 +42,6 @@
         </div>
       </el-badge>
     </div>
-    <!-- <div
-      id="monitor"
-      class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit"
-      @click="monitorVisible=!monitorVisible"
-    >
-      <Icon
-        name="mingcute:wallet-fill"
-      />
-      {{ $t('walletMonitor') }}
-    </div> -->
     <ul class="right">
       <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
         <a class="border-left" target="_blank" href="https://eco.ave.ai">{{ $t('ecosystem') }}</a>
@@ -90,18 +94,23 @@
         </a>
       </li>
     </ul>
-    <Monitor/>
+    <audio ref='audioElement' controls :src='ring' style='display: none'/>
     <Batch @refresh="()=>{}"/>
   </footer>
 </template>
 
 <script setup lang='ts'>
+import ring from '@/assets/audio/ring.wav'
 import { formatDec } from '~/utils/formatNumber'
 import { getTokensPrice } from '@/api/token'
 import { upColor, downColor } from '@/utils/constants'
-const {monitorVisible} = storeToRefs(useFollowStore())
+import { throttle } from 'lodash-es'
+const {visible,hasRing} = storeToRefs(useMonitorStore())
 const signalStore = useSignalStore()
 const globalStore = useGlobalStore()
+const botStore = useBotStore()
+
+const audioElement=ref<HTMLAudioElement|null>(null)
 const { lang } = storeToRefs(globalStore)
 const { token } = storeToRefs(useTokenStore())
 const route = useRoute()
@@ -182,6 +191,7 @@ watch(()=>globalStore.footerTokensPrice, (newVal) => {
 
 const wsStore = useWSStore()
 const isDoted = shallowRef(!signalStore.signalVisible)
+const isDoted2 = shallowRef(!visible.value)
 // 点击信号广场，悬浮窗打开状态，小红点消失
 watch(() => signalStore.signalVisible, val => {
   if (val) {
@@ -191,6 +201,24 @@ watch(() => signalStore.signalVisible, val => {
 watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], () => {
   if (!signalStore.signalVisible) {
     isDoted.value = true
+  }
+})
+watch(visible, val => {
+  console.log('visible', val)
+  if (val) {
+    isDoted2.value = false
+  }
+})
+
+watch(() => wsStore.wsResult[WSEventType.MONITOR], () => {
+  console.log('wsStore.wsResult[WSEventType.MONITOR]', wsStore.wsResult[WSEventType.MONITOR])
+  throttle(() => {
+    if(hasRing.value&&botStore.evmAddress){
+      audioElement.value?.play()
+    }
+  },1000)()
+  if (!visible.value) {
+    isDoted2.value = true
   }
 })
 </script>

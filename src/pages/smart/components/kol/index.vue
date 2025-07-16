@@ -1,23 +1,22 @@
 <template>
-    <div>
+    <div class="w-full">
       <el-table
         ref="table_ref"
-        :data="tableData"
         :key="tableIndex"
-        fit
-        stripe
-        style="width: 100%"
-        class="table-container"
         v-loading="loading"
-        @row-click="tableRowClick"
-        @sort-change="handleSortChange"
+        :data="tableData"
+        :header-cell-style="{ fontSize: '12px' }"
+        fit
+        class="table-container"
         :default-sort="{
           prop: conditions.sort,
           order: conditions.sort_dir ? conditions.sort_dir + 'ending' : null
         }"
+        @row-click="tableRowClick"
+        @sort-change="handleSortChange"
       >
         <template #empty>
-          <div v-if="!loading" class="table-empty">
+          <div v-if="!loading && tableData?.length ==0" class="table-empty">
             <!-- <span>{{ $t('emptyNoData') }}</span> -->
             <AveEmpty />
           </div>
@@ -28,7 +27,7 @@
         fixed="left"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
-        prop="total_profit"
+        prop="last_trade_time"
         >
           <template #header>
             <span class="text-10px" style="opacity: 0">0</span>
@@ -72,6 +71,7 @@
                   </div>
                   <div class="mt-20px flex items-center justify-center">
                     <el-button
+                      class="flex-1"
                       size="default"
                       style="
                         height: 30px;
@@ -84,7 +84,7 @@
                       {{ $t('reset') }}
                     </el-button>
                     <el-button
-                      class="confirm"
+                      class="confirm flex-1"
                       size="default"
                       :color="mode !== 'dark' ? '#222222' : '#f5f5f5'"
                       @click.stop="handleFilterConfirm(filterForm['last_trade_time'])"
@@ -101,37 +101,69 @@
               class="token-info table-item_d"
               style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
             >
-              <span class="text-10px" v-if="$index < 9" style="opacity: 0">0</span>
-              <span class="text-10px" style="color: #696e7c">
+              <span v-if="$index < 9" style="opacity: 0" class="text-10px">0</span>
+              <span class="text-10px color-[--d-666-l-999]">
                 #{{ (pageNO - 1) * pageSize + $index + 1 }}
               </span>
-              <a href="" class="ml-4 mr-8 a-gray fav_address" v-if="row.is_wallet_address_fav == 1" @click.stop.prevent="deleteAttention(row)">
-                    <i class="attention iconfont icon-fav1 active font-12"></i>
-                    
+              <Icon
+                v-if="shouldRenderChild"
+                :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
+                :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="text-14px clickable shrink-0 mr-5px ml-8px" @click.stop.prevent="collect(row,$index)" />
 
-                  </a>
-              <a href class="ml-4 mr-8 a-gray fav_address"  v-else @click.stop.prevent="openAttention(row,$index)">
-                <i class="attention iconfont icon-fav1 font-12"></i>
-              </a>
-              <UserAvatar class="mr-10" iconSize="32px" iconChainSize="14px" :wallet_logo="{...(row?.wallet_logo || {}), url: row?.wallet_logo?.url || row?.twitter_url, logo: row?.wallet_logo?.logo || row?.avatar_url}" :address="row.wallet_address"></UserAvatar>
+              <UserAvatar class="mr-10px" iconSize="32px" iconChainSize="14px" :wallet_logo="{...(row?.wallet_logo || {}), url: row?.wallet_logo?.url || row?.twitter_url, logo: row?.wallet_logo?.logo || row?.avatar_url}" :address="row.wallet_address" />
               <div>
                 <div class="flex-start">
                   <UserRemark addressClass="token-symbol ellipsis" addressStyle="max-width: 70px" showAddressTitle :address="row.wallet_address" :chain="row.chain" :remark="row.remark || row.nickname" :wallet_logo="row.wallet_logo" :formatAddress="a=> '*' + a?.slice(-5)" @updateRemark="({remark}) => row.remark = remark"></UserRemark>
                   <img  v-if="activeTab === 'kol'" style="width: 10px; height: 10px; margin-left: 8px;" src="@/assets/images/x.png" alt="" srcset="" @click.stop="goLink1(row?.wallet_logo?.url)">
                 </div>
-                <div class="font_10 color-icon flex-start mt_4" style="line-height: 1">
+                <div class="text-10px color-icon flex-start mt-4px color-[--d-666-l-999]" style="line-height: 1">
+                  <div
+                    class="mr-5px"
+                    :style="{
+                      color:formatTimeFromNow(row?.last_trade_time, true) <= 600
+                          ? '#FFA622'
+                          : 'var(--custom-text-2-color)'
+                    }"
+                  >
+                    <template v-if="!row?.last_trade_time">-</template>
+                    <template v-else-if="formatTimeFromNow(row?.last_trade_time, true) >= 60">
+                      {{ formatTimeFromNow(row?.last_trade_time) }}
+                    </template>
+                    <TimerCount
+                      v-else-if="row?.last_trade_time && Number(formatTimeFromNow(row?.last_trade_time, true) ) < 60"
+                      :key="`${row.last_trade_time}`"
+                      :timestamp="row.last_trade_time"
+                      :end-time="60"
+                    >
+                      <template #default="{ seconds }">
+                        <span class="color-#FFA622">
+                          <template v-if="seconds < 60">
+                            {{ seconds }}s
+                          </template>
+                          <template v-else>
+                            {{ formatTimeFromNow(row.last_trade_time) }}
+                          </template>
+                        </span>
+                      </template>
+                    </TimerCount>
+                  </div>
                   {{ row.wallet_address.slice(0, 4) }}...{{ row.wallet_address.slice(-4) }}
-                  <i class="iconfont icon-copy ml-5 text-12px" @click.stop v-copy="row.wallet_address"></i>
-                  <div class="media-list flex-start" v-if="row?.extra?.length > 0">
+                  <Icon
+                    v-copy="row.wallet_address"
+                    name="bxs:copy"
+                    class="text-10px cursor-pointer color-[--d-666-l-999] ml-5px"
+                    @click.stop.prevent
+                  />
+                  <div v-if="row?.extra?.length > 0" class="media-list flex-start">
                     <template v-for="(item, index) in row?.extra" :key="index">
                       <div
-                        class="ml-5"
                         v-if="item?.tip"
+                        class="ml-5"
                         @mouseover.stop="
                           e => {
                             buttonTagRef = e.currentTarget
                             toolTipTagVisible = true
-                            toolTipTagContent = this.$t(item?.tip)
+                            toolTipTagContent = $t(item?.tip)
                           }
                         "
                         @mouseleave.stop="e => (toolTipTagVisible = false)"
@@ -188,44 +220,6 @@
             </div>
           </template>
         </el-table-column>
-
-        <el-table-column align="right" width="100">
-          <template #header>
-            <span>{{ $t('lastTxsTime1') }}</span>
-          </template>
-          <template #default="{ row }">
-            <div
-              :style="{
-                color:formatTimeFromNow(row?.last_trade_time, true) <= 600
-                    ? '#FFA622'
-                    : 'var(--custom-text-2-color)'
-              }"
-            >
-              <template v-if="!row?.last_trade_time">-</template>
-              <template v-else-if="formatTimeFromNow(row?.last_trade_time, true) >= 60">
-                {{ formatTimeFromNow(row?.last_trade_time) }}
-              </template>
-              <TimerCount
-                v-else-if="row?.last_trade_time && Number(formatTimeFromNow(row?.last_trade_time, true) ) < 60"
-                :key="`${row.last_trade_time}`"
-                :timestamp="row.last_trade_time"
-                :end-time="60"
-              >
-                <template #default="{ seconds }">
-                  <span class="color-#FFA622">
-                    <template v-if="seconds < 60">
-                      {{ seconds }}s
-                    </template>
-                    <template v-else>
-                      {{ formatTimeFromNow(row.last_trade_time) }}
-                    </template>
-                  </span>
-                </template>
-              </TimerCount>
-            </div>
-          </template>
-        </el-table-column>
-
         <el-table-column
           align="right"
           label="Pnl"
@@ -234,24 +228,120 @@
           prop="total_profit"
           min-width="100px"
         >
+        <template #header>
+          <span class="bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
+          <span>Pnl</span>
+        </template>
           <template #default="{ row }">
-            <div style="padding: 0 5px">
+            <div>
               <div :class="!row?.total_profit ? 'color-text-3' : ''">
                 ${{ row?.total_profit > 0 ? formatNumber(row?.total_profit || 0, 0) : 0 }}
               </div>
               <div class="text-12px">
-                <span class="green" v-if="row?.total_profit_rate > 0">
+                <span v-if="row?.total_profit_rate > 0" class="green">
                   {{ formatNumber(row?.total_profit_rate * 100 || 0) }}%
                 </span>
-                <span class="red" v-else-if="row?.total_profit_rate < 0">
+                <span v-else-if="row?.total_profit_rate < 0" class="red">
                   {{ formatNumber(row?.total_profit_rate * 100 || 0) }}%
                 </span>
-                <span class="color-text-3" v-else>0</span>
+                <span v-else class="color-[--d-666-l-999]">0</span>
               </div>
             </div>
           </template>
         </el-table-column>
+        <el-table-column
+          :label="$t('winRate')"
+          align="right"
+          sortable="custom"
+          :sort-orders="['descending', 'ascending', null]"
+          prop="token_profit_rate"
+          :min-width="110"
+        >
+          <template #default="{ row }">
+            <div :class="!row?.token_profit_rate ? 'color-text-3' : ''">
+              <span v-if="row?.token_profit_rate > 0" class="green">
+                {{ formatNumber(row?.token_profit_rate * 100 || 0, 2) }}%
+              </span>
+              <span v-else-if="row?.token_profit_rate < 0" class="red">
+                {{ formatNumber(row?.token_profit_rate * 100 || 0, 2) }}%
+              </span>
+              <span v-else class="color-text-3">0</span>
+            </div>
+          </template>
+        </el-table-column>
 
+        <el-table-column
+          align="right"
+          :label="$t('volume4')"
+          :min-width="180"
+        >
+        <template #header>
+          <div class="flex-end pr-7px">
+            <div
+              class="flex-end cursor-pointer select-none"
+              @click.stop="switchSort('total_volume')"
+            >
+              {{ $t('volume') }}
+              <div class="flex flex-col items-center justify-center ml-5px">
+                <i
+                  class="w-0 h-0 border-solid border-5px border-transparent cursor-pointer"
+                  :class="conditions.sort == 'total_volume' &&  conditions.sort_dir == 'asc' ? 'border-b-[--d-F5F5F5-l-333]' : 'border-b-[--d-666-l-999]'"
+                  @click.stop="switchSort('total_volume', -1)"
+                />
+                <i
+                  class="w-0 h-0 border-solid border-5px border-transparent mt-2px cursor-pointer"
+                  :class="conditions.sort == 'total_volume' &&  conditions.sort_dir == 'desc' ? 'border-t-[--d-F5F5F5-l-333]' : 'border-t-[--d-666-l-999]'"
+                  @click.stop="switchSort('total_volume', 1)"
+                />
+              </div>
+            </div>
+            <span class="ml-3px mr-3px">/</span>
+            <div
+              class="flex-end cursor-pointer select-none"
+              @click.stop="switchSort('total_trades')"
+            >
+              {{ $t('txns') }}
+              <div class="flex flex-col items-center justify-center ml-5px">
+                <i
+                  class="w-0 h-0 border-solid border-5px border-transparent cursor-pointer"
+                  :class="conditions.sort == 'total_trades' &&  conditions.sort_dir == 'asc' ? 'border-b-[--d-F5F5F5-l-333]' : 'border-b-[--d-666-l-999]'"
+                  @click.stop="switchSort('total_trades', -1)"
+                />
+                <i
+                  class="w-0 h-0 border-solid border-5px border-transparent mt-2px cursor-pointer"
+                  :class="conditions.sort == 'total_trades' &&  conditions.sort_dir == 'desc' ? 'border-t-[--d-F5F5F5-l-333]' : 'border-t-[--d-666-l-999]'"
+                  @click.stop="switchSort('total_trades', 1)"
+                />
+              </div>
+            </div>
+          </div>
+        </template>
+          <template #default="{ row ,$index}">
+            <div
+              class="flex-end"
+              :ref="(el: any) => $refs.currentBtnRef[$index] = el"
+              @mouseenter="showPopover(row, $index)"
+              @mouseleave="showPop = false"
+             >
+             <div class="hover-dot flex-end cursor-pointer">
+              <div  :class="!row?.total_volume ? 'color-[--d-666-l-999]' : ''">
+                ${{
+                  row?.total_volume > 0 ? formatNumber(row?.total_volume || 0, 2, 4, 10 ** 4) : 0
+                }}
+              </div>
+              <span class="color-#333">/</span>
+              <div  :class="!row?.total_trades ? 'color-[--d-666-l-999]' : ''">
+                {{
+                  row?.total_trades > 0 ? formatNumber(row?.total_trades || 0, 2, 4, 10 ** 4) : 0
+                }}
+              </div>
+             </div>
+            </div>
+          </template>
+        </el-table-column>
+
+
+<!--
         <el-table-column
           align="right"
           :label="$t('volume4')"
@@ -306,27 +396,7 @@
               </div>
             </div>
           </template>
-        </el-table-column>
-
-        <el-table-column
-          :label="$t('winRate')"
-          align="right"
-          sortable="custom"
-          :sort-orders="['descending', 'ascending', null]"
-          prop="token_profit_rate"
-        >
-          <template #default="{ row }">
-            <div :class="!row?.token_profit_rate ? 'color-text-3' : ''">
-              <span v-if="row?.token_profit_rate > 0" class="green">
-                {{ formatNumber(row?.token_profit_rate * 100 || 0, 2) }}%
-              </span>
-              <span v-else-if="row?.token_profit_rate < 0" class="red">
-                {{ formatNumber(row?.token_profit_rate * 100 || 0, 2) }}%
-              </span>
-              <span v-else class="color-text-3">0</span>
-            </div>
-          </template>
-        </el-table-column>
+        </el-table-column> -->
 
         <el-table-column
           align="right"
@@ -334,32 +404,39 @@
           sortable="custom"
           :sort-orders="['descending', 'ascending', null]"
           prop="rank_score"
-          min-width="80px"
+          :min-width="110"
         >
+        <template #header>
+          <span class="bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
+          <span>{{ $t('score') }}</span>
+        </template>
         <template #default="{ row }">
             {{row.rank_score?.toFixed(2) ?? 0}}
           </template>
         </el-table-column>
 
-        <el-table-column align="right" min-width="400px">
+        <el-table-column align="right" :min-width="230">
           <template #header>
-            <span>{{ $t('30dTokenDistribution') }}</span>
+            <span class="bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
+            <span>{{ $t('profit4') }}</span>
             <el-popover
+              v-model:visible="filterForm['profit_percent_num'].visible"
               placement="bottom"
               popper-class="chains-table-filter"
               title=""
-              :width="350"
+              :width="220"
               trigger="hover"
-              v-model:visible="filterForm['profit_percent_num'].visible"
               teleported
             >
               <template #reference>
-                <i
-                  class="iconfont icon-guolv1 text-10px ml-3"
-                  :style="{
-                    color: isActiveFilter('profit_percent_num') ? 'var(--custom-primary-color)' : ''
-                  }"
-                ></i>
+                <Icon
+                    id="custom-filter"
+                    name="custom:filter"
+                    class="text-10px cursor-pointer  ml-3px mr-7px"
+                    :style="{
+                      color: isActiveFilter('profit_percent_num') ? 'var(--d-F5F5F5-l-333)' : ''
+                    }"
+                  />
               </template>
               <template #default>
                 <div class="filter-box" :class="mode">
@@ -369,9 +446,10 @@
                     view-style="overflow-x: hidden"
                   >
                     <div
-                      class="mb_40"
-                      v-for="(item, key, index) in filterForm['profit_percent_num'].profit_obj"
-                      :key="index"
+
+                      v-for="(item, key) in filterForm['profit_percent_num'].profit_obj"
+                      :key="key"
+                      class="mb-16px"
                     >
                       <template v-if="item.color == 'green'">
                         <div class="filter-title flex-start">
@@ -381,8 +459,30 @@
                             style="cursor: pointer"
                             @click="handleSort(filterForm['profit_percent_num'].profit_obj[key])"
                           >
-                            <div class="chain-icon-sort-container">
-                              <svg
+                          <div class="flex flex-col items-center justify-center ml-5px">
+                            <i
+                              class="w-0 h-0 border-solid border-5px border-transparent cursor-pointer "
+                              :class="
+                                  filterForm['profit_percent_num'].profit_obj[key].sort_dir === 'asc'
+                                    ? 'border-b-[--d-F5F5F5-l-333]' : 'border-b-[--d-666-l-999]'
+                                "
+                                @click.stop="
+                                  handleSort(filterForm['profit_percent_num'].profit_obj[key], 'asc')
+                                "
+                            />
+                            <i
+                              class="w-0 h-0 border-solid border-5px border-transparent mt-2px cursor-pointer"
+                              :class="
+                                  filterForm['profit_percent_num'].profit_obj[key].sort_dir === 'desc'
+                                    ? 'border-t-[--d-F5F5F5-l-333]' : 'border-t-[--d-666-l-999]'
+                                "
+                                @click.stop="
+                                  handleSort(filterForm['profit_percent_num'].profit_obj[key], 'desc')
+                                "
+                            />
+                          </div>
+                            <div class="flex flex-col items-center justify-center ml-5px">
+                              <!-- <svg
                                 class="icon-svg"
                                 aria-hidden="true"
                                 :class="
@@ -395,8 +495,8 @@
                                 "
                               >
                                 <use xlink:href="#icon-sort-up"></use>
-                              </svg>
-                              <svg
+                              </svg> -->
+                              <!-- <svg
                                 class="icon-svg"
                                 aria-hidden="true"
                                 :class="
@@ -409,56 +509,36 @@
                                 "
                               >
                                 <use xlink:href="#icon-sort-down"></use>
-                              </svg>
+                              </svg> -->
                             </div>
                           </div>
                         </div>
-                        <div class="flex mt-10">
+                        <div class="flex mt-10px">
                           <el-input
                             v-model.trim.number="
                               filterForm['profit_percent_num'].profit_obj[key].range[0]
                             "
                             :placeholder="$t('minor')"
                             clearable
-                          ></el-input>
-                          <span class="ml-10 mr-10">~</span>
+                          />
+                          <span class="ml-10px mr-10px">~</span>
                           <el-input
                             v-model.trim.number="
                               filterForm['profit_percent_num'].profit_obj[key].range[1]
                             "
                             :placeholder="$t('max1')"
                             clearable
-                          ></el-input>
-                        </div>
-                        <!-- <div class="mt-10 mb-20" style="padding: 0 10px">
-                          <el-slider
-                            :style="{ '--el-slider-main-bg-color': 'var(--a-slider-bg-color)' }"
-                            v-model="filterForm['profit_percent_num'].profit_obj[key].range"
-                            range
-                            :min="0"
-                            size="small"
-                            :max="filterForm['profit_percent_num'].profit_obj[key].defaultRange[1]"
-                            :marks="{
-                              0: '0',
-                              [filterForm['profit_percent_num'].profit_obj[key].defaultRange[1]]:
-                                formatNumber(
-                                  [filterForm['profit_percent_num'].profit_obj[key].defaultRange[1]],
-                                  0,
-                                  4,
-                                  10 ** 4
-                                )
-                            }"
                           />
-                        </div> -->
+                        </div>
                       </template>
                     </div>
-                    <div class="mt-60 flex-end">
+                    <div class="mt-20px flex justify-center">
                       <el-button
+                        class="flex-1"
                         size="default"
                         style="
                           height: 30px;
                           min-width: 70px;
-                          margin-left: auto;
                           --el-button-font-weight: 400;
                         "
                         :color="mode !== 'dark' ? '#f2f2f2' : '#333333'"
@@ -467,9 +547,9 @@
                         {{ $t('reset') }}
                       </el-button>
                       <el-button
+                        class="confirm flex-1"
                         size="default"
                         :color="mode !== 'dark' ? '#222222' : '#f5f5f5'"
-                        style="height: 30px; min-width: 70px; --el-button-font-weight: 400"
                         @click.stop="handleFilterConfirm(filterForm['profit_percent_num'])"
                       >
                         {{ $t('confirm') }}
@@ -481,7 +561,56 @@
             </el-popover>
           </template>
           <template #default="{ row }">
-            <div style="padding: 0 5px 0 20px" class="flex-between">
+            <div class="flex-end">
+              <div class="mr-10px">
+                <div>
+                  <span class="text-12px mr-2px color-[--d-999-l-666]">
+                    {{ filterForm['profit_percent_num'].profit_obj.profit_above_900_percent_num.name }}
+                  </span>
+                  <span
+                    class="color-text-3 bg-smart"
+                    :class="row?.profit_above_900_percent_num > 0 ? `bg-${filterForm['profit_percent_num'].profit_obj.profit_above_900_percent_num.color}-1` : 'bg-gray-1'"
+                  >
+                    {{ formatNumber(row?.profit_above_900_percent_num || 0, 2) }}
+                  </span>
+                </div>
+                <div class="mt-10px">
+                  <span class="text-12px mr-2px color-[--d-999-l-666]">
+                    {{ filterForm['profit_percent_num'].profit_obj.profit_300_900_percent_num.name }}
+                  </span>
+                  <span
+                    class="color-text-3 bg-smart"
+                    :class="row?.profit_300_900_percent_num > 0 ? `bg-${filterForm['profit_percent_num'].profit_obj.profit_300_900_percent_num.color}-1` : 'bg-gray-1'"
+                  >
+                    {{ formatNumber(row?.profit_300_900_percent_num || 0, 2) }}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <div>
+                  <span class="text-12px mr-2px color-[--d-999-l-666]">
+                    {{ filterForm['profit_percent_num'].profit_obj.profit_100_300_percent_num.name }}
+                  </span>
+                  <span
+                    class="color-text-3 bg-smart"
+                    :class="row?.profit_100_300_percent_num > 0 ? `bg-${filterForm['profit_percent_num'].profit_obj.profit_100_300_percent_num.color}-1` : 'bg-gray-1'"
+                  >
+                    {{ formatNumber(row?.profit_100_300_percent_num || 0, 2) }}
+                  </span>
+                </div>
+                <div class="mt-10px">
+                  <span class="text-12px mr-2px color-[--d-999-l-666]">
+                    {{ filterForm['profit_percent_num'].profit_obj.profit_10_100_percent_num.name }}
+                  </span>
+                  <span
+                    class="color-text-3 bg-smart"
+                    :class="row?.profit_10_100_percent_num > 0 ? `bg-${filterForm['profit_percent_num'].profit_obj.profit_10_100_percent_num.color}-1` : 'bg-gray-1'"
+                  >
+                    {{ formatNumber(row?.profit_10_100_percent_num || 0, 2) }}
+                  </span>
+                </div>
+              </div>
+            <!-- <div style="padding: 0 5px 0 20px" class="flex-between">
               <div
                 v-for="(item, key) in filterForm['profit_percent_num'].profit_obj"
                 :key="key"
@@ -492,50 +621,131 @@
                 >
                   {{ formatNumber(row?.[key] || 0, 2) }}
                 </span>
-                <div class="text-12px mt_2 color-999">
+                <div class="text-12px mt-2px color-#999">
                   {{ item.name }}
                 </div>
-              </div>
+              </div> -->
             </div>
           </template>
         </el-table-column>
-        <el-table-column align="right" min-width="250px">
+
+        <el-table-column align="right" :min-width="280">
           <template #header>
-            <span>{{ $t('smartTop3') }}</span>
+            <span class="mr-7px">{{ $t('smartTop3') }}</span>
           </template>
           <template #default="{ row }">
             <div style="" class="flex-end">
               <div
-                class="ml-10"
                 v-for="(item, index) in row?.tag_items"
                 :key="index"
-                @click.stop.prevent="goLink(item, row.chain)"
+                class="ml-10px"
                 style="width: 80px"
+                @click.stop.prevent="goLink(item, row.chain)"
               >
-                <span class="ellipsis block">{{ item.symbol }}</span>
+                <!-- <span class="ellipsis block">{{ item.symbol }}</span> -->
+
+                <el-image
+                    v-tooltip="item.symbol"
+                    class="token-icon h-24px w-24px items-center cursor-pointer rounded-100%"
+                    :src="getSymbolDefaultIcon({ ...item,chain: row.chain })"
+                    preview-teleported
+                  >
+                    <template #error>
+                      <img
+                        class="token-icon h-24px w-24px text-16px color-#fff"
+                        :src="getChainDefaultIcon(row.chain, item.symbol)"
+                      >
+                    </template>
+                    <template #placeholder>
+                      <img
+                        class="token-icon h-24px w-24px text-16px color-#fff"
+                        :src="getChainDefaultIcon(row.chain, item.symbol)"
+                      >
+                    </template>
+                  </el-image>
+
                 <div class="text-12px">
-                  <span class="green" v-if="item?.volume > 0">
+                  <span v-if="item?.volume > 0" class="green">
                     ${{ formatNumber(item?.volume || 0, 2, 4, 10 ** 4) }}
                   </span>
-                  <span class="red" v-else-if="item?.volume < 0">
+                  <span v-else-if="item?.volume < 0" class="red">
                     ${{ formatNumber(item?.volume || 0, 2, 4, 10 ** 4) }}
                   </span>
-                  <span class="color-text-3" v-else>0</span>
+                  <span v-else class="color-[--d-666-l-999]">0</span>
                 </div>
               </div>
             </div>
           </template>
         </el-table-column>
-        <el-table-column align="right" width="150">
+        <el-table-column align="right" :min-width="230">
           <template #header>
-            <span>{{ $t('operation') }}</span>
+            <span class="bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
+            <span class="mr-7px">{{ $t('loss') }}</span>
+          </template>
+          <template #default="{ row }">
+            <div class="flex-end">
+              <div class="mr-10px">
+                <span class="text-12px mr-2px color-[--d-999-l-666]">
+                  {{ filterForm['profit_percent_num_lt'].profit_obj.profit_neg10_10_percent_num.name }}
+                </span>
+                <span
+                  class="color-text-3 bg-smart"
+                  :class="row?.profit_neg10_10_percent_num > 0 ? `bg-${filterForm['profit_percent_num_lt'].profit_obj.profit_neg10_10_percent_num.color}-1` : 'bg-gray-1'"
+                >
+                  {{ formatNumber(row?.profit_neg10_10_percent_num || 0, 2) }}
+                </span>
+              </div>
+              <div>
+                <div>
+                  <span class="text-12px mr-2px color-[--d-999-l-666]">
+                    {{ filterForm['profit_percent_num_lt'].profit_obj.profit_neg50_neg10_percent_num.name }}
+                  </span>
+                  <span
+                    class="color-text-3 bg-smart"
+                    :class="row?.profit_neg50_neg10_percent_num > 0 ? `bg-${filterForm['profit_percent_num_lt'].profit_obj.profit_neg50_neg10_percent_num.color}-1` : 'bg-gray-1'"
+                  >
+                    {{ formatNumber(row?.profit_neg50_neg10_percent_num || 0, 2) }}
+                  </span>
+                </div>
+                <div class="mt-10px">
+                  <span class="text-12px mr-2px color-[--d-999-l-666]">
+                    {{ filterForm['profit_percent_num_lt'].profit_obj.profit_neg100_neg50_percent_num.name }}
+                  </span>
+                  <span
+                    class="color-text-3 bg-smart"
+                    :class="row?.profit_neg100_neg50_percent_num > 0 ? `bg-${filterForm['profit_percent_num_lt'].profit_obj.profit_neg100_neg50_percent_num.color}-1` : 'bg-gray-1'"
+                  >
+                    {{ formatNumber(row?.profit_neg100_neg50_percent_num || 0, 2) }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- <div
+                v-for="(item, key) in filterForm['profit_percent_num_lt'].profit_obj"
+                :key="key"
+              >
+                <span class="text-12px mr-2px color-#999">
+                  {{ item.name }}
+                </span>
+                <span
+                  class="color-text-3 bg-smart"
+                  :class="row?.[key] > 0 ? `bg-${item.color}-1` : 'bg-gray-1'"
+                >
+                  {{ formatNumber(row?.[key] || 0, 2) }}
+                </span>
+              </div> -->
+
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column align="right" :min-width="110" fixed="right">
+          <template #header>
+            <span class="mr-7px">{{ $t('operation') }}</span>
           </template>
           <template #default="{ row }">
             <div class="flex-end" @click.stop>
               <a class="trade" :href="`https://t.me/AveSniperBot?start=fs-${row.chain}-${row.wallet_address}`"  target="_blank">
-                <svg class="svg" aria-hidden="true">
-                  <use xlink:href="#icon-telegram"></use>
-                </svg>
+                <img src="@/assets/images/tg1.png" alt="" :width="12">
                 {{ $t('copyTrade') }}
               </a>
             </div>
@@ -553,15 +763,86 @@
         effect="customized"
         :virtual-ref="buttonTagRef"
         virtual-triggering
-      ></el-tooltip>
-
-      <!-- <DialogJSX v-model:visible="attentionVisible1" @confirm="data=>addAttention(currentAttentionRow.walletAddress||currentAttentionRow.wallet_address,currentAttentionRow.chain,data)" :dialogProps="attentionDialogProps.dialogProps" :columns="attentionDialogProps.columns" :formProps="attentionDialogProps.formProps" :dataSource="{address:currentAttentionRow.wallet_address,is_monitored:disabledMonitor?0:1,group:0,monitoredTypes:['buy','sell'],sendType:['website'],user_chain:{value:currentAttentionRow.chain},remark:currentAttentionRow.remark}" @change="(data)=>attentionFormData=data"></DialogJSX> -->
+      />
+    <el-popover
+      v-model:visible="showPop"
+      :virtual-ref="$refs.currentBtnRef[currentIndex]"
+      virtual-triggering
+      trigger="hover"
+      placement="right"
+      popper-class="text-center"
+      :width="300"
+      :popper-style="{ padding: 0 , 'border-radius': '8px'}"
+    >
+      <div>
+        <div class="flex items-center justify-between text-12px px-12px py-12px">
+          <span class="color-[var(--d-666-l-999)] flex-1 text-left">{{ $t('24Volume') }}</span>
+          <span class="color-[var(--d-666-l-999)] flex-1">{{ $t('buy3') }}</span>
+          <span class="color-[var(--d-666-l-999)] flex-1 text-right">{{ $t('sell3') }}</span>
+        </div>
+        <div class="bg-[--d-1A1A1A-l-F2F2F2] px-12px py-6px">
+          <div class="flex items-center justify-between text-14px">
+            <span class="color-[var(--d-F5F5F5-l-333)] flex-1 text-left">
+                ${{ formatNumber(currentRow?.total_volume || 0, 2) }}
+            </span>
+            <span class="color-#12B886 flex-1" >
+              ${{ formatNumber(currentRow?.total_purchase || 0, 2) }}
+            </span>
+            <span class="color-#F6465D flex-1 text-right">
+              ${{ formatNumber(currentRow?.total_sold || 0, 2) }}
+            </span>
+          </div>
+          <div class="flex mb-4px">
+            <span
+              class="bg-#12B886 h-4px rounded-2px"
+              :style="{
+              width:
+                currentRow && currentRow.total_volume > 0
+                ? (currentRow.total_purchase / currentRow.total_volume * 100).toFixed(2) + '%'
+                : '0%' }"
+                />
+            <span class="flex-1 bg-#F6465D h-4px rounded-2px ml-2px" />
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-12px px-12px py-12px">
+          <span class="color-[var(--d-666-l-999)] flex-1 text-left">{{ $t('24TxAddress') }}</span>
+          <span class="color-[var(--d-666-l-999)] flex-1">{{ $t('buy3') }}</span>
+          <span class="color-[var(--d-666-l-999)] flex-1 text-right">{{ $t('sell3') }}</span>
+        </div>
+        <div class="bg-[--d-1A1A1A-l-F2F2F2] px-12px py-6px">
+          <div class="flex items-center justify-between text-14px">
+            <span class="color-[var(--d-F5F5F5-l-333)] flex-1 text-left">
+                {{ formatNumber(currentRow?.total_trades || 0,2) }}
+            </span>
+            <span class="color-#12B886 flex-1">
+              {{ formatNumber(currentRow?.buy_trades || 0,2) }}
+            </span>
+            <span class="color-#F6465D flex-1 text-right">
+              {{ formatNumber(currentRow?.sell_trades || 0,2) }}
+            </span>
+          </div>
+          <div class="flex  mb-4px">
+            <span
+              class="bg-#12B886 h-4px rounded-2px"
+              :style="{
+              width:
+                currentRow && currentRow.total_trades > 0
+                ? (currentRow.buy_trades / currentRow.total_trades * 100).toFixed(2) + '%'
+                : '0%' }"
+              />
+          <span class="flex-1 bg-#F6465D h-4px rounded-2px ml-2px" />
+          </div>
+        </div>
+      </div>
+    </el-popover>
     </div>
   </template>
 
 <script setup lang="ts">
-import { upColor, downColor} from '@/utils/constants.ts'
+import { upColor, downColor} from '@/utils/constants'
 import { useWindowSize } from '@vueuse/core'
+import { deleteAttention, addAttention2 } from '~/api/attention'
+import type { KolObj } from '@/api/types/kol'
 const props = defineProps({
     activeTab: {
       type: String,
@@ -576,10 +857,6 @@ const props = defineProps({
     tableIndex: {
       type: Number,
       default: 0
-    },
-    tableRowClick: {
-      type: Function,
-      default: () => {}
     },
     handleSortChange: {
       type: Function,
@@ -617,14 +894,12 @@ const props = defineProps({
       type: Function,
       default: () => {}
     },
-    searchChainSwap: {
-      type: Function,
-      default: () => {}
-    },
     filterForm: {
       type: Object,
       default: () => {
-        return {}
+        return {
+
+        }
       }
     },
     loading: {
@@ -637,60 +912,164 @@ const props = defineProps({
         return []
       }
     },
-    filterSwapList: {
-      type: Array,
-      default: () => {
-        return []
-      }
-    },
     activeInterval: {
       type: String,
       default: '30D'
     },
 })
-const {activeTab,searchKeyword,tableData,tableIndex, tableRowClick, handleSortChange, conditions, pageNO, pageSize,isActiveFilter, handleFilterConfirm, handleSort, handleReset, searchChainSwap, filterForm, loading,openTimeList, filterSwapList,activeInterval }= toRefs(props)
-
+const {activeTab,tableData,tableIndex, handleSortChange, conditions, pageNO, pageSize,isActiveFilter, handleFilterConfirm, handleSort, handleReset, filterForm, loading,openTimeList,activeInterval }= toRefs(props)
+const { t } = useI18n()
+const router = useRouter()
 const buttonTagRef = ref<HTMLElement | null>(null)
 const toolTipTagVisible = shallowRef(false)
 const toolTipTagContent = shallowRef('')
-const visible = shallowRef(false)
-const keyword = shallowRef('')
-const editable= ref(tableData?.value?.map(() => false))
-const remark = shallowRef('')
-const currentAttentionRow = ref({})
-const currentAttentionIndex = shallowRef(0)
-const attentionFormData = ref({
-    is_monitored: 1
-})
+
 const { height } = useWindowSize()
 const wHeight = height
-const { lang, mode} = useGlobalStore()
-const attentionVisible1 = shallowRef(false)
-const disabledMonitor = computed(() => {
-    return true
+const { mode } = useGlobalStore()
+const shouldRenderChild = shallowRef(true)
+
+const $refs = ref({
+  buttonRefs: {} as Record<number, any>,
+  currentBtnRef: {} as Record<number, any>,
 })
 const filterHeight = computed(() => wHeight.value - 200)
-const attentionDialogProps = computed(() => {
-   return ''
- })
-
-
-function updateWhaleRemark() { }
-function goLink1() { }
-function goLink() { }
-function deleteAttention() { }
-function openAttention() { }
-function addAttention() { }
 
 
 
+function goLink1 (url: string) {
+  if (url) {
+    window.open(url)
+  }
+}
+function goLink(row: {address: string}, chain: string) {
+  const routeData = router.resolve({
+    path: `/token/${row.address}-${chain}`
+  })
+  window.open(routeData.href, '_blank')
+}
+const reCreateChild = () => {
+  shouldRenderChild.value = false
+  // 确保 DOM更新
+  nextTick(() => {
+    shouldRenderChild.value = true
+  })
+}
+const collect = async (row: any,index:number) => {
+  if(!useFollowStore().currentAddress){
+    useBotStore().changeConnectVisible(true)
+  }
+  if (useWalletStore().address && !useWalletStore().walletSignature[useWalletStore().address]) {
+    await useWalletStore().signMessageForFavorite()
+  }
+  if(row.is_wallet_address_fav !== 1){
+    useFollowStore().confirmAttention($refs.value.buttonRefs[index],row.chain, (form) => {
+      console.log('confirmAttention', form)
+      return addAttention2({
+        address: useFollowStore().currentAddress,
+        user_address: row.wallet_address,
+        user_chain: row.chain,
+        group: form.group,
+        is_monitored: form.is_monitored,
+      }).then(() => {
+        ElMessage.success(t('attention1Success'));
+        (tableData.value as Array<any>)[index].is_wallet_address_fav = 1
+        reCreateChild()
+        return Promise.resolve()
+      }).catch((err) => {
+        return Promise.reject(err)
+      }).finally(() => {
+      })
+    })
+    return
+  }
+  // loading.value = true
+  deleteAttention({
+    address: useFollowStore().currentAddress,
+    user_address: row.wallet_address,
+    user_chain: row.chain
+  }).then(() => {
+    ElMessage.success(t('attention1Canceled'));
+    (tableData.value as Array<any>)[index].is_wallet_address_fav = 0
+    reCreateChild()
+  }).catch((err) => {
+    console.log(err)
+  }).finally(() => {
+  })
+}
+function tableRowClick(row:KolObj) {
+  const routeData = router.resolve({
+    path: `/address/${row.wallet_address}/${row.chain}`
+  })
+  window.open(routeData.href, '_blank')
+}
+const emit = defineEmits(['handleSortChange'])
+type SortValue = 0 | -1 | 1
+const activeSort = shallowRef<SortValue>(0)
+const sortBy = shallowRef<string>('')
 
+function getActiveClass(
+  activeSort1: SortValue,
+  sortBy1: string,
+  direction: string
+) {
+  const isEqual = activeSort.value === activeSort1 && sortBy.value === sortBy1
+  if (direction === 'descending') {
+    return isEqual ? 'border-t-[--d-F5F5F5-l-333]' : 'border-t-[--d-666-l-999]'
+  }
+  return isEqual ? 'border-b-[--d-F5F5F5-l-333]' : 'border-b-[--d-666-l-999]'
+}
+function switchSort(sortBy1: string, activeSort1?: SortValue) {
+  if (sortBy.value !== sortBy1) {
+    sortBy.value = sortBy1
+    activeSort.value = 1
+    return
+  }
+  if (activeSort1) {
+    activeSort.value = activeSort1
+  } else {
+    activeSort.value++
+  }
+  if (activeSort.value > 1) {
+    activeSort.value = -1
+  }
+  console.log('sortBy1', sortBy1, activeSort)
+  let order = null
+  if (activeSort.value == 1) {
+    order = 'descending'
+  }
+  if (activeSort.value == -1) {
+    order = 'ascending'
+  }
 
+  emit('handleSortChange', { prop: sortBy.value, order: order})
+}
+const currentIndex= shallowRef(0)
+const currentRow = ref<KolObj | null>(null)
+const showPop= shallowRef(false)
+function showPopover(row: KolObj,$index: number) {
+  showPop.value = true
+  currentIndex.value = $index
+  currentRow.value = row
+}
 </script>
 
 <style lang="scss" scoped>
 .table-container{
-  min-height: calc(100vh - 100px)
+  height: calc(100vh - 150px);
+
+}
+::v-deep(.el-table) {
+    .el-table__body {
+      tr:hover {
+        .hover-dot{
+          border-bottom: 1px dotted var(--d-CCC-l-333)
+        }
+      }
+     .cell {
+      padding-right: 19px
+     }
+    }
 }
 a.a-gray{
   color: var(--a-bg-6-color) !important;
@@ -710,29 +1089,6 @@ a.a-gray{
   height: 20px;
   margin-right: 10px;
 }
-// .trade {
-//   display: flex;
-//   align-items: center;
-//   justify-content: flex-end;
-//   a {
-//     background: var(--custom-btn-bg-color);
-//     padding: 5px 7px;
-//     border-radius: 6px;
-//     display: flex;
-//     align-items: center;
-//     font-size: 14px;
-//     color: var(--custom-text-1-color);
-//     .icon-svg {
-//       // font-size: 12px;
-//       // height: 12px;
-//       // width: 12px;
-//       margin-right: 3px;
-//     }
-//     &:hover {
-//       opacity: 0.5;
-//     }
-//   }
-// }
 .progress {
   margin-left: 3px;
   :deep().el-progress__text {
@@ -863,10 +1219,10 @@ a.a-gray{
 }
 
 .red {
-  color: '#F6465D';
+  color: #F6465D;
 }
 .green {
-  color: '#12B886';
+  color: #12B886;
 }
 
 .popper-gold {
@@ -920,8 +1276,13 @@ a.a-gray{
 
 .bg-smart {
   border-radius: 4px;
-  padding: 2px 7px;
+  padding: 0px 3px;
   display: inline-block;
+  font-size:12px;
+  min-width: 16px;
+  text-align: center;
+  height: 16px;
+  line-height: 16px;
   &.bg-red-1 {
     background: #eb2b4b;
     color: #fff;
@@ -931,7 +1292,8 @@ a.a-gray{
     color: #fff;
   }
   &.bg-gray-1 {
-    background: rgb(153, 153, 153, 0.1);
+    background: var(--d-222-l-F2F2F2);
+    color: var(--d-666-l-999);
   }
   &.bg-yellow-1 {
     color: #fff;
@@ -939,16 +1301,17 @@ a.a-gray{
   }
 }
 a.trade {
-  background: var(--custom-primary-lighter-13-color);
-  padding: 5px 7px;
-  border-radius: 6px;
-  font-size: 14px;
-  color: var(--custom-font-1-color);
-   white-space: nowrap;
-  .svg {
-    width: 14px;
-    height: 14px;
-    margin-right: 5px;
+  background:  #3F80F733;
+  padding: 1px 7px;
+  border-radius: 2px;
+  font-size: 12px;
+  color: var(--d-F5F5F5-l-333);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  img {
+    margin-right: 4px;
   }
 }
 
@@ -990,5 +1353,10 @@ ul.openTime {
   background-color:#3F80F7;
   border-color: #3F80F7;
   color:#fff;
+}
+.hover-dot{
+  &:hover {
+    border-bottom: 1px dotted var(--d-CCC-l-333)
+  }
 }
 </style>

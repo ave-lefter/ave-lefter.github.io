@@ -20,10 +20,12 @@ const props = withDefaults(defineProps<{
   buttonBg?: string,
   mainNameVisible?: boolean
   classNames?: string
+  styles?:string
 }>(), {
   appendTo: '#__nuxt',
   buttonBg: 'rgba(18, 184, 134, 0.15)',
   classNames: '',
+  styles:''
 })
 const botStore = useBotStore()
 const loadingSwap = shallowRef(false)
@@ -198,14 +200,17 @@ async function getTokenBalance(chain: string) {
     class="flex items-center [&&]:px-12px"
     :class="classNames"
     style="--el-button-hover-bg-color:#12B886;--el-button-hover-text-color:#FFF;--el-color-black: #12B886; --el-button-border-color: transparent; --el-button-hover-border-color: transparent;--el-button-disabled-text-color: #12B886;--el-button-disabled-border-color: transparent;--el-button-disabled-bg-color: #12B8861A;"
+    :style="styles"
     @click="submitBotSwap"
   >
-    <Icon
+    <slot>
+      <Icon
       class="mr-4px"
       name="mynaui:lightning-solid"
-    />
-    {{ quickBuyValue || 0 }}
-    <span v-if="mainNameVisible" class="ml-5px">{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+      />
+      {{ quickBuyValue || 0 }}
+      <span v-if="mainNameVisible" class="ml-5px">{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+    </slot>
   </el-button>
   <el-dialog
     v-if="visible" v-model="visible" :title="$t('buy')"

@@ -20,6 +20,7 @@ const smartChains = computed(() => {
   })
 })
 const activeChain = shallowRef('solana')
+const activeChain2 = shallowRef('solana')
 
 const dialogValues = ref<{
   visible: boolean
@@ -44,7 +45,6 @@ const loading = shallowRef(false)
 const tableIndex = shallowRef(0)
 const total = shallowRef(0)
 const initNum = shallowRef(0)
-const loadingEdit = shallowRef(false)
 
 const defaultConditions = ref({
   chain: 'solana',
@@ -97,18 +97,19 @@ const openTimeList = computed(() => {
     { text: '≤10min', value: String(10 * 60) },
     { text: '≤30min', value: String(30 * 60) },
     { text: '≤1H', value: String(60 * 60) },
-    { text: '≤6H', value: String(60 * 6 * 60) },
+    // { text: '≤6H', value: String(60 * 6 * 60) },
     { text: '≤12H', value: String(60 * 12 * 60) },
     { text: '≤24H', value: String(60 * 24 * 60) },
     { text: '≤7D', value: String(60 * 24 * 7 * 60) },
-    { text: '≤14D', value: String(60 * 24 * 14 * 60) },
+    // { text: '≤14D', value: String(60 * 24 * 14 * 60) },
     { text: '≤30D', value: String(60 * 24 * 30 * 60) },
   ]
-})
+}) as ComputedRef<Array<{ text: string; value: string }>>
 const tableData = computed(() => {
-  console.log('-----------tableData--------',tableDataObj?.value?.[
-      filterConditions?.value?.chain + '-' + filterConditions?.value?.category
-    ])
+  console.log(
+    '-----------tableData--------',
+    tableDataObj?.value?.[filterConditions?.value?.chain + '-' + filterConditions?.value?.category]
+  )
   return (
     tableDataObj?.value?.[
       filterConditions?.value?.chain + '-' + filterConditions?.value?.category
@@ -135,7 +136,6 @@ type TabId = (typeof tabs.value)[number]['id']
 onMounted(() => {
   init()
 })
-
 function handleTabChange(tab: TabId) {
   if (activeTab.value === tab) return
   setSignalSwitchFlag(tab, false)
@@ -166,7 +166,7 @@ function setSignalSwitchFlag(tab: TabId, $bol: boolean) {
 function handleIntervalChange(interval: string) {
   if (activeInterval.value === interval) return
   intervalFilter.value['global_interval'] = interval
-  const key = activeChain.value + '-' + activeCategory1.value
+  const key = activeChain2.value + '-' + activeCategory1.value
   if (!filterConditions.value[key]) {
     filterConditions.value[key] = {}
   }
@@ -174,7 +174,13 @@ function handleIntervalChange(interval: string) {
   getSmartList()
 }
 function init() {
+  if (filterConditions?.value) {
+    activeChain2.value = filterConditions.value.chain
+    // activeTab.value = filterConditions.value.category
+  }
   if (filterConditions?.value && filterConditions?.value?.version !== Version) {
+    activeChain2.value = 'solana'
+    // activeTab.value= 'activity'
     localStorage.removeItem('filterConditionsSmart')
     filterConditions.value = {
       chain: 'solana',
@@ -186,10 +192,11 @@ function init() {
   // this.initFilterForm()
   getSmartList()
 }
-function getSmartList() {
+function getSmartList(isSort = false) {
   // 只在数据变化时更新storage
   const currentKey = filterConditions?.value?.chain + '-' + filterConditions?.value?.category
   const conditions = filterConditions.value?.[currentKey] || ''
+  console.log('------conditions--------',currentKey)
   const data = {
     ...conditions,
     chain: filterConditions?.value.chain,
@@ -207,7 +214,7 @@ function getSmartList() {
   }
 
   // 只在没有数据时显示loading
-  if (!tableDataObj.value?.[currentKey]?.length) {
+  if (!tableDataObj.value?.[currentKey]?.length || isSort) {
     loading.value = true
   }
 
@@ -236,7 +243,7 @@ function getSmartList() {
         last_trade_time:
           i?.last_trade_time !== '1970-01-01T00:00:00Z' &&
           i?.last_trade_time !== '0001-01-01T00:00:00Z'
-            ? new Date(i?.last_trade_time).getTime()/1000
+            ? new Date(i?.last_trade_time).getTime() / 1000
             : '0',
         extra: getExtra(i.extra_info),
       }))
@@ -269,7 +276,7 @@ function initFilterForm() {
   if (!activeCategory1.value) {
     return
   }
-  const key = activeChain.value + '-' + activeCategory1.value
+  const key = activeChain2.value + '-' + activeCategory1.value
   const conditions = filterConditions?.value?.[key]
   if (!conditions) {
     filterConditions.value[key] = { ...defaultConditions.value }
@@ -334,11 +341,24 @@ function initFilterForm() {
           sort_dir:
             conditions?.sort === 'profit_100_300_percent_num' ? conditions?.sort_dir || null : null,
         },
+      },
+      sort_dir:
+        conditions?.sort === 'profit_above_900_percent_num' ||
+        conditions?.sort === 'profit_300_900_percent_num' ||
+        conditions?.sort === 'profit_100_300_percent_num' ||
+        conditions?.sort === 'profit_10_100_percent_num'
+          ? conditions?.sort_dir || null
+          : null,
+    },
 
+    profit_percent_num_lt: {
+      visible: false,
+      type: 'profit_percent_num_lt',
+      profit_obj: {
         profit_neg10_10_percent_num: {
           name: '-10%~10%',
           color: 'yellow',
-          type: 'profit_percent_num',
+          type: 'profit_percent_num_lt',
           defaultRange: [0, 500],
           range: [
             Number(conditions?.profit_neg10_10_percent_num_min || 0),
@@ -354,7 +374,7 @@ function initFilterForm() {
         profit_neg50_neg10_percent_num: {
           name: '-50%~-10%',
           color: 'red',
-          type: 'profit_percent_num',
+          type: 'profit_percent_num_lt',
           defaultRange: [0, 500],
           range: [
             Number(conditions?.profit_neg50_neg10_percent_num_min || 0),
@@ -370,7 +390,7 @@ function initFilterForm() {
         profit_neg100_neg50_percent_num: {
           name: '-100%~-50%',
           color: 'red',
-          type: 'profit_percent_num',
+          type: 'profit_percent_num_lt',
           defaultRange: [0, 500],
           range: [
             Number(conditions?.profit_neg100_neg50_percent_num_min || 0),
@@ -384,10 +404,6 @@ function initFilterForm() {
         },
       },
       sort_dir:
-        conditions?.sort === 'profit_above_900_percent_num' ||
-        conditions?.sort === 'profit_300_900_percent_num' ||
-        conditions?.sort === 'profit_100_300_percent_num' ||
-        conditions?.sort === 'profit_10_100_percent_num' ||
         conditions?.sort === 'profit_neg10_10_percent_num' ||
         conditions?.sort === 'profit_neg50_neg10_percent_num' ||
         conditions?.sort === 'profit_neg100_neg50_percent_num'
@@ -405,7 +421,7 @@ function initFilterForm() {
 }
 function isActiveFilter(prop) {
   if (!prop) return false
-  const key = activeChain.value + '-' + activeCategory1.value
+  const key = activeChain2.value + '-' + activeCategory1.value
   const conditions = filterConditions?.value?.[key] || {}
   const filterForm = filterFormObj?.value?.[key] || {}
   if (prop === 'last_trade_time') {
@@ -415,7 +431,7 @@ function isActiveFilter(prop) {
   return filterRange(prop) || filterForm?.[prop]?.sort_dir
 }
 function filterRange(prop) {
-  const key = activeChain.value + '-' + activeCategory1.value
+  const key = activeChain2.value + '-' + activeCategory1.value
   const conditions = filterConditions?.value?.[key] || {}
   const filterForm = filterFormObj?.value?.[key] || {}
   const rangeObj = {
@@ -527,19 +543,127 @@ function filterRange(prop) {
     )
   }
 }
-function handleFilterConfirm() {}
-function handleSort() {}
-function handleReset() {}
-function searchChainSwap() {}
-function tableRowClick() {}
-function handleSortChange() {}
+function handleFilterConfirm(val) {
+  // let conditions = this.filterConditions[this.activeCategory1] || {}
+  const key = activeChain2.value + '-' + activeCategory1.value
+  if (!filterConditions?.value?.[key]) {
+    filterConditions.value[key] = {}
+  }
+  if (
+    (filterConditions.value[key].sort !== val.type && val.sort_dir) ||
+    (filterConditions.value[key].sort === val.type &&
+      filterConditions.value[key].sort_dir !== val.sort_dir)
+  ) {
+    filterConditions.value[key].sort_dir = val.sort_dir || null
+    filterConditions.value[key].sort = val.type
+  }
+  // console.log(this.filterConditions[key])
+  // this.resetSort()
 
-function handleFilterQuery() {}
-function updateWhaleRemark() {}
-function deleteAttention() {}
-function addAttention() {}
+  if (val.type === 'profit_percent_num') {
+    for (const i in val.profit_obj) {
+      if (val.profit_obj[i].range[0] && val.profit_obj[i].range[1]) {
+        if (Number(val.profit_obj[i].range[0]) > Number(val.profit_obj[i].range[1])) {
+          ElMessage.error(t('maxGtMin'))
+          return
+        }
+      }
+      filterConditions.value[key][i + '_min'] = val.profit_obj[i].range[0] || ''
+      filterConditions.value[key][i + '_max'] =
+        val.profit_obj[i].range[1] >= val.profit_obj[i].defaultRange[1]
+          ? ''
+          : val.profit_obj[i].range[1] || ''
+      if (val.profit_obj[i].sort_dir) {
+        filterConditions.value[key].sort_dir = val.profit_obj[i].sort_dir
+        filterConditions.value[key].sort = i
+      }
+    }
+    console.log('---------handleFilterConfirm----------', val.profit_obj, this.filterConditions)
+  } else if (val.type === 'last_trade_time') {
+    filterConditions.value[key].last_trade_time = val.last_trade_time
+  }
+  val.visible = false
+  resetSort()
+  getSmartList()
+}
+function handleSort(val:string, dir: string) {
+  let currentForm = filterFormObj.value[activeChain2.value + '-' + activeCategory1.value]
+  if (val.type === 'profit_percent_num') {
+    const profit_obj = currentForm?.['profit_percent_num']?.profit_obj
+    for (const i in profit_obj) {
+      profit_obj[i].sort_dir = ''
+    }
+  }
+  if (!dir) {
+    const sortList = ['desc', 'asc', null]
+    if (!val.sort_dir) {
+      val.sort_dir = sortList[0]
+    } else {
+      val.sort_dir = sortList[sortList.indexOf(val.sort_dir) + 1]
+    }
+    return
+  }
+  if (val.sort_dir === dir) {
+    val.sort_dir = null
+  } else {
+    val.sort_dir = dir
+  }
 
+  if (val.type === 'profit_percent_num') {
+    const profit_obj = currentForm?.['profit_percent_num']?.profit_obj
+    for (const i in profit_obj) {
+      if (profit_obj[i].sort_dir) {
+        currentForm['profit_percent_num'].sort_dir = profit_obj[i].sort_dir
+        currentForm['profit_percent_num'].sort = i
+      }
+    }
+  }
+  filterFormObj.value[activeChain2.value + '-' + activeCategory1.value] = currentForm
+  console.log('filterFormObj111', filterFormObj)
+}
 
+function handleReset(val) {
+  val.sort_dir = null
+  if (val.type === 'last_trade_time') {
+    val.last_trade_time = ''
+  } else if (val.type === 'profit_percent_num') {
+    val.sort_dir = ''
+    for (const i in val.profit_obj) {
+      val.profit_obj[i].range = val.profit_obj[i].defaultRange
+      val.profit_obj[i].sort = ''
+      val.profit_obj[i].sort_dir = ''
+    }
+    const key = activeChain2.value + '-' + activeCategory1.value
+    filterConditions.value[key].sort_dir = '' || null
+    filterConditions.value[key].sort = ''
+
+    console.log('--1111---', val)
+  } else {
+    val.range1 = val.defaultRange
+    val.range = val.defaultRange
+  }
+  handleFilterConfirm(val)
+}
+
+function handleSortChange(row: { prop: string; order: 'ascending' | 'descending' | null }) {
+  filterConditions.value[activeChain2.value + '-' + activeCategory1.value].sort = row?.prop
+  filterConditions.value[activeChain2.value + '-' + activeCategory1.value].sort_dir =
+  row?.order?.replace?.('ending', '') || null
+  console.log('-----row-------', activeChain2.value + '-' + activeCategory1.value)
+  // resetSort()
+  getSmartList(true)
+}
+function resetSort() {
+  const key = activeChain2.value + '-' + activeCategory1.value
+  filterFormObj.value[key] = {}
+  initFilterForm()
+}
+function switchChain(chain: string) {
+  activeChain2.value = chain
+  filterConditions.value.chain = chain
+  initFilterForm()
+  getSmartList()
+}
 </script>
 
 <template>
@@ -604,8 +728,8 @@ function addAttention() {}
             v-for="{ label, value } in smartChains"
             :key="value"
             class="flex items-center justify-center gap-4px px-8px py-6px text-12px rounded-4px cursor-pointer"
-            :class="`${activeChain === value ? 'bg-[--d-111-l-FFF]' : ''}`"
-            @click="activeChain = value"
+            :class="`${activeChain2 === value ? 'bg-[--d-111-l-FFF]' : ''}`"
+            @click="switchChain(value)"
           >
             <img
               class="w-16px h-16px rounded-full"
@@ -626,27 +750,21 @@ function addAttention() {}
     <KOL
       v-else
       ref="table_p"
-      :key="filterConditions?.[activeChain + '-' + activeCategory1]?.sort + '1'"
+      :key="filterConditions?.[activeChain2 + '-' + activeCategory1]?.sort + '1'"
       :activeTab="activeTab"
       :tableData="tableData"
       :tableIndex="tableIndex"
-      :filterForm="filterFormObj[activeChain + '-' + activeCategory1]"
-      :conditions="filterConditions[activeChain + '-' + activeCategory1]"
+      :filterForm="filterFormObj[activeChain2 + '-' + activeCategory1]"
+      :conditions="filterConditions[activeChain2 + '-' + activeCategory1]"
       :isActiveFilter="isActiveFilter"
       :handleFilterConfirm="handleFilterConfirm"
       :handleSort="handleSort"
       :handleReset="handleReset"
-      :searchChainSwap="searchChainSwap"
       :loading="loading"
       :openTimeList="openTimeList"
-      :tableRowClick="tableRowClick"
       :handleSortChange="handleSortChange"
       :activeInterval="activeInterval"
-      :loadingEdit="loadingEdit"
-      @handleFilterQuery="handleFilterQuery"
-      @updateWhaleRemark="updateWhaleRemark"
-      @deleteAttention="deleteAttention"
-      @addAttention="addAttention"
+      @handleSortChange="handleSortChange"
     />
     <el-dialog
       v-model="dialogValues.visible"

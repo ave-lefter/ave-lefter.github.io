@@ -211,11 +211,16 @@ export interface Hold {
 export function _getAllTagsHoldList(params: {
   token_id: string
   type: string
+  address?: string
 }): Promise<Hold> {
   const { $api } = useNuxtApp()
+  const address=localStorage.bot_evmAddress || localStorage.walletAddress
   return $api('/v1api/v3/stats/alltags/holders', {
     method: 'get',
-    query: params,
+    query:{
+      address,
+      ...params
+    }
   })
 }
 
@@ -243,11 +248,16 @@ export interface Activity {
 export function _getAllTagsActivityList(params: {
   token_id: string
   type: string
+  address?: string
 }): Promise<Activity> {
   const { $api } = useNuxtApp()
+  const address=localStorage.bot_evmAddress || localStorage.walletAddress
   return $api('/v1api/v3/stats/alltags/activities', {
     method: 'get',
-    query: params,
+    query: {
+      address,
+      ...params
+    }
   })
 }
 

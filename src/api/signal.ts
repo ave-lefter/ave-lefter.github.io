@@ -155,7 +155,7 @@ export function getSignalV3List(query: {
   wallet_address?: string
 }): Promise<GetSignalV2ListResponse<IActionV3Item>[]> {
   const {$api} = useNuxtApp()
-  return $api('/v2api/signals/v2/public/list/v3', {
+  return $api('https://0ftrfsdb.xyz/v2api/signals/v2/public/list/v3', {
     method: 'get',
     query
   })

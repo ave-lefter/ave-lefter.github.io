@@ -25,13 +25,13 @@ export const useSignalStore = defineStore('signalStore', () => {
   //   }
   // })
 
-  const translateStyle = shallowRef('')
+  const translateStyle = shallowRef(0)
   const onDrag = useThrottleFn((x: number) => {
     if (x <= 0) {
-      translateStyle.value = 'transform:translateX(12px)'
+      translateStyle.value = 12
     } else {
       translateStyle.value =
-          x + signalBoundingRect.value.width >= winWidth.value ? 'transform:translateX(-12px)' : ''
+          x + signalBoundingRect.value.width >= winWidth.value ? -12 : 0
     }
   }, 100, false, true)
   function onDragStop(x: number, y: number) {
@@ -42,7 +42,7 @@ export const useSignalStore = defineStore('signalStore', () => {
       isRightFixed.value = x + signalBoundingRect.value.width >= winWidth.value
     }
     setTimeout(() => {
-      translateStyle.value = ''
+      translateStyle.value = 0
     })
   }
 
@@ -60,10 +60,12 @@ export const useSignalStore = defineStore('signalStore', () => {
   }
 
   function onRightDragStop(x: number, y: number) {
+    console.log('onRightDragStop', x, y)
     isRightFixed.value = Math.abs(x) < 1
     const _x = winWidth.value - fixedWidth.value + x
     if (!isRightFixed.value) {
-      signalBoundingRect.value.x = _x
+      // signalBoundingRect.value.x = _x
+      signalBoundingRect.value.x = x
       signalBoundingRect.value.y = y
     }
   }

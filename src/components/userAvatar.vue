@@ -57,8 +57,8 @@ const {
 const configStore = useConfigStore()
 
 const walletLogo = computed(() => {
-  return wallet_logo?.logo?.replace?.(/_normal/, '_400x400') ||
-    generateAvatarIcon(wallet_logo?.name || address)
+  return props.wallet_logo?.logo?.replace?.(/_normal/, '_400x400') ||
+    generateAvatarIcon(props.wallet_logo?.name || props.address || '')
 })
 
 const chainSize = computed(() => {

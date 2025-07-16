@@ -20,8 +20,8 @@ import { NATIVE_TOKEN } from '@/utils/constants'
 type AddressItem = { chain: string; address: string; price?: number; balance?: string; decimals?: number; logo_url?: string };
 
 const _refreshAccessToken = createCacheRequest(_refAcc, 3000)
-
 export const useBotStore = defineStore('bot', () => {
+
   const isSupportChains = ['eth', 'bsc', 'solana', 'base']
   const accessToken = useLocalStorage('bot_accessToken', '')
   const refreshToken = useLocalStorage('bot_refreshToken', '')
@@ -223,6 +223,9 @@ export const useBotStore = defineStore('bot', () => {
   }
 
   function logout() {
+    if (subscribed.value) {
+      bot_unsubscribe()
+    }
     accessToken.value = ''
     refreshToken.value = ''
     evmAddress.value = ''
@@ -258,7 +261,8 @@ export const useBotStore = defineStore('bot', () => {
         'params': [
           'monitor',     // topic
           userInfo.value?.tgUid, // tgUid
-          'web'
+          'web',
+          'proto'
         ],
         'id': 1
       }
