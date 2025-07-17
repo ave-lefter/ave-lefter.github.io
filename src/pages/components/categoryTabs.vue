@@ -16,13 +16,16 @@ const intervals = computed(() => {
     { name: '24h', id: '24h' },
   ]
 })
-const configMap = shallowRef({
-  hot: {
-    icon: 'custom:hot',
-    storageKey: 'hotUserTableColumns',
-    getDefaultColumns: getHotDefaultColumns,
-    getOptions: getHotOptions,
-  },
+const configMap = computed(() => {
+  return {
+    hot: {
+      icon: 'custom:hot',
+      storageKey: 'hotUserTableColumns',
+      getDefaultColumns: getHotDefaultColumns,
+      getOptions: getHotOptions,
+      class: 'color-#FFA622',
+    },
+  }
 })
 const globalStore = useGlobalStore()
 // 由于其他榜单未上，用临时的 computed过滤
@@ -48,7 +51,11 @@ const localeStore = useLocaleStore()
             : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
         "
       >
-        <Icon :name="configMap[item.category].icon" class="mr-1 color-#FFA622 text-12px" />
+        <Icon
+          :name="configMap[item.category as keyof typeof configMap].icon"
+          class="mr-1 text-12px"
+          :class="configMap[item.category as keyof typeof configMap].class"
+        />
         {{ item[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
       </span>
     </div>
@@ -57,7 +64,7 @@ const localeStore = useLocaleStore()
         <button
           v-for="(item, index) in intervals"
           :key="index"
-          class="lh-16px py-2px px-8px color-[--d-666-l-999]  border-none cursor-pointer rounded-2px"
+          class="lh-16px py-2px px-8px color-[--d-666-l-999] border-none cursor-pointer rounded-2px"
           :class="
             globalStore.rankCommon.activeInterval === item.id
               ? 'bg-[--d-111-l-FFF] color-[--d-F5F5F5-l-333]'
@@ -78,8 +85,8 @@ const localeStore = useLocaleStore()
           :chain="'solana'"
         />
         <BlackList />
-        <ColumnsToolbar 
-         class="ml-4px"
+        <ColumnsToolbar
+          class="ml-4px"
           :storageKey="configMap[activeTab as keyof typeof configMap].storageKey"
           :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns"
           :getOptions="configMap[activeTab as keyof typeof configMap].getOptions"
