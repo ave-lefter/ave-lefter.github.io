@@ -1,23 +1,24 @@
 <template>
   <div class="w-address flex-1 w-100% h-[calc(100%-76px)] flex flex-col" :class="{ 'mt-12px': currentAddress }">
+    <ul v-if="currentAddress" class="w-operate">
+      <li v-if="evmAddress" class="flex items-center gap-2px">
+          <el-checkbox v-model="isMonitor" :label="t('monitorList')"  style="color:var(--d-999-l-666);z-index: 0" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! lh-none! [&&]:[--el-checkbox-input-border:1px_solid_var(--d-666-l-999)]"/>
+          <span class="text-[var(--d-999-l-666)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/50` }}</span>
+      </li>
+      <li class="btn">
+        <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>
+      </li>
+      <li>
+        <el-radio-group v-model="conditions.time_interval" class="m-radio-group" size="small" :fill="isDark?'#333':'#666'" :text-color="isDark?'#F5F5F5':'#FFF'" @change="()=>{}">
+          <el-radio-button label="7D" :value="'7d'" />
+          <el-radio-button label="1M" :value="'30d'" />
+        </el-radio-group>
+      </li>
+    </ul>
     <div v-if="currentAddress" class="m-header flex-between px-12px items-start">
       <pro-groups v-if="!isMonitor" v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
-      <div v-else/>
-      <ul class="w-operate mt--40px">
-        <li v-if="evmAddress" class="flex items-center gap-2px">
-           <el-checkbox v-model="isMonitor" :label="t('monitorList')"  style="color:var(--d-999-l-666);z-index: 0" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! lh-none! [&&]:[--el-checkbox-input-border:1px_solid_var(--d-666-l-999)]"/>
-           <span class="text-[var(--d-999-l-666)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/50` }}</span>
-        </li>
-        <li class="btn">
-          <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>
-        </li>
-        <li>
-          <el-radio-group v-model="conditions.time_interval" class="m-radio-group" size="small" :fill="isDark?'#333':'#666'" :text-color="isDark?'#F5F5F5':'#FFF'" @change="()=>{}">
-            <el-radio-button label="7D" :value="'7d'" />
-            <el-radio-button label="1M" :value="'30d'" />
-          </el-radio-group>
-        </li>
-      </ul>
+      <!-- <div v-else/> -->
+  
     </div>
     <div class="m-table w-100% mt-12px flex-1 overflow-hidden">
       <el-table
@@ -119,8 +120,8 @@
               style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
             >
               <span v-if="$index < 9" class="text-10px" style="opacity: 0">0</span>
-              <span class="text-10px mr-5px font-400" style="color: #999">
-                #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
+              <span class="text-10px mr-5px font-400 text-[-d-666-l-999]">
+                #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }} 
               </span>
               <!-- <a href class="mr-5px a-gray fav_address" v-if="row.is_wallet_address_fav == 1" @click.stop.prevent="handleDeleteAttention(row)">
                     <i class="attention iconfont icon-fav1 active font-12"></i> -->
@@ -380,7 +381,7 @@
               placement="bottom"
               popper-class="chains-table-filter"
               title=""
-              :width="300"
+              :width="220"
               trigger="click"
               >
               <template #reference>
@@ -391,18 +392,17 @@
               </template>
               <template #default>
                 <div class="filter-box" :class="mode">
-                  <div class="text-12px font-500 text-[--d-FFF-l-333]">{{ $t('lastTxsTime1') }}</div>
-                 <ul class="flex flex-col font-500 text-14px text-#666666">
+                  <div class="text-12px font-500 text-[--d-999-l-666] mb-8px">{{ $t('lastTxsTime1') }}</div>
+                  <ul class="flex flex-col font-500 text-12px text-var(--d-E9E9E9-l-333) gap-8px">
                     <li 
-                      v-for="(item, index) in openTimeList"  :key="index" class="flex-between py-11.5px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-pointer"  @click.stop.prevent="
-                          filterForm.last_trade_time = item.value"
-                     >
-                      <span :class="[filterForm.last_trade_time == item.value?'text-[--d-F5F5F5-l-333]':'']">{{ item.text }}</span>
-                      <div class="flex-1"/>
-                      <Icon v-if="filterForm.last_trade_time == item.value" name="material-symbols:check" class="text-12px"/>
+                      v-for="(item, index) in openTimeList"  :key="index" class="flex-center hover:border-[--d-F5F5F5-l-333] cursor-pointer border-[var(--d-333-l-F2F2F2)] border-solid border h-32px border-rd-4px" :class="[filterForm.last_trade_time == item.value?'bg-[--d-333-l-F2F2F2] ':'']" @click.stop.prevent="filterForm.last_trade_time = item.value"
+                    >
+                      <span>{{ item.text }}</span>
+                      <!-- <div class="flex-1"/> -->
+                      <!-- <Icon v-if="filterForm.last_trade_time == item.value" name="material-symbols:check" class="text-12px"/> -->
                     </li>
                   </ul>
-                  <div class="mt-11px flex-between">
+                  <div class="mt-11px flex-between gap-4px">
                     <!-- <div
                       class="flex items-center clickable"
                       style="cursor: pointer"
@@ -419,12 +419,11 @@
                       </div>
                     </div> -->
                     <el-button
-                      size="default"
                       style="
                         height: 30px;
-                        min-width: 70px;
                         --el-button-font-weight: 400;
-                        margin-left: auto;
+                        flex:1;
+                        color: #999;
                       "
                       :color="mode !== 'dark' ? '#f2f2f2' : '#333333'"
                       @click.stop="attentionHandleReset(filterForm)"
@@ -432,9 +431,8 @@
                       {{ $t('reset') }}
                     </el-button>
                     <el-button
-                      size="default"
-                      :color="mode !== 'dark' ? '#222222' : '#f5f5f5'"
-                      style="height: 30px; min-width: 70px; --el-button-font-weight: 400"
+                      type="primary"
+                      style="height: 30px; --el-button-font-weight: 400; flex:1;"
                       @click.stop="handleFilterConfirm(filterForm)"
                     >
                       {{ $t('confirm') }}
@@ -480,9 +478,9 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column v-if="!isMonitor" :label="t('addrGroup')" align="right" width="120">
+      <el-table-column v-if="!isMonitor" :label="t('addrGroup')" align="right" width="160px">
         <template #default="{ row }">
-          <el-select v-model="row.group_id" class="[&&]:[--el-text-color-regular:var(--d-CCC-l-333)]" @click.stop @change="(val) => getRowGroupChange(val, row)">
+          <el-select v-model="row.group_id" class="[&&]:[--el-text-color-regular:var(--d-222-l-333)] [&&]:[--el-select-width:100px]" popper-class="w-193px" @click.stop @change="(val) => getRowGroupChange(val, row)">
             <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
             <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
           </el-select>
@@ -492,28 +490,28 @@
         <template #default="{ row ,$index}">
           <div class="flex flex-row-reverse  items-center" @click.stop>
             <a
-              class="flex items-center"
+              class="flex items-center color-[var(--d-F5F5F5-l-333)]"
               :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`" target="_blank">
               <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
               {{ t('copyTrade') }}
             </a>
             <!-- 监控 -->
-             <div v-if="isMonitor" class="color-[var(--d-F2F2F2-l-333)] mr-12px cursor-pointer flex-start" @click.stop.prevent="handleDeleteMonitor(row)">
-               <Icon  name="bx:bxs-trash-alt" class="text-13px"/>
+             <div v-if="isMonitor" class="color-[var(--d-F5F5F5-l-333)] mr-12px cursor-pointer flex-start" @click.stop.prevent="handleDeleteMonitor(row)">
+               <Icon  name="bx:bxs-trash-alt" class="text-13px mr-5px mb-1px"/>
                {{ t('delete') }}
              </div>
             <div
               v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
-              class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-CCC-l-333)]" @click="handleMonitor(row,$index)">
-              <Icon v-if="!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 )" name="custom:monitor2-icon" class="text-13px mr-5px" :class="[(!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))&&'color-[var(--d-CCC-l-333)]']"/>
-              <Icon v-else name="custom:monitor-icon" class="text-16px mr-2px"/>
+              class="flex items-center mr-12px cursor-pointer color-[var--d-666-l-CCC] group-hover:color-[var(--d-F5F5F5-l-333)]" @click="handleMonitor(row,$index)">
+              <Icon v-if="!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 )" name="custom:monitor2-icon" class="text-12px mr-5px" :class="[(!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))&&'color-[var(--d-F5F5F5-l-333)]']"/>
+              <Icon v-else name="custom:monitor-icon" class="text-15px mr-2px mb-1px"/>
               <span
                 class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
                 {{ (!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))? t('pause') : t('enable') }}
               </span>
             </div>
             <div class="flex items-center mr-12px color-[var(--d-666-l-CCC)] cursor-not-allowed" v-else>
-              <Icon name="custom:monitor-icon" class="text-16px mr-2px " />
+              <Icon name="custom:monitor-icon" class="text-15px mr-2px mb-1px" />
             </div>
           </div>
         </template>
@@ -599,11 +597,11 @@ const openTimeList =computed(() => [
   { text: '≤10min', value: String(10 * 60) },
   { text: '≤30min', value: String(30 * 60) },
   { text: '≤1H', value: String(60 * 60) },
-  { text: '≤6H', value: String(60 * 6 * 60) },
+  // { text: '≤6H', value: String(60 * 6 * 60) },
   { text: '≤12H', value: String(60 * 12 * 60) },
   { text: '≤24H', value: String(60 * 24 * 60) },
   { text: '≤7D', value: String(60 * 24 * 7 * 60) },
-  { text: '≤14D', value: String(60 * 24 * 14 * 60) },
+  // { text: '≤14D', value: String(60 * 24 * 14 * 60) },
   { text: '≤30D', value: String(60 * 24 * 30 * 60) }
 ])
 type FilterFormType = {
@@ -915,13 +913,18 @@ function openFavPop() {
   font-size: 12px;
 }
 .w-operate{
+  position: absolute;
+  top: 13px;
+  right: 0;
+  width: 50%;
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: flex-end;
   align-items: center;
   gap: 8px;
   font-weight: 500;
   font-size: 12px;
+  padding-right: 16px;
   /* border-bottom: 1px solid var(--d-222-l-EEE); */
   li.btn {
     display: flex;
