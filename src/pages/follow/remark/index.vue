@@ -221,10 +221,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <el-table class='mt-12px' :height="pageData.total > 50 ? 'calc(100vh - 215px)' : 'calc(100vh - 165px)'"
-      v-loading="loading" row-class-name="group" :data="tableList" fit @sort-change="handleSortChange"
-      @row-click="tableRowClick">
+  <div class="flex-1 h-[calc(100%-76px)] flex flex-col">
+    <el-table class='mt-12px' :height="pageData.total > 50 ? 'calc(100% - 84px)' : '100%'" v-loading="loading"
+      row-class-name="group" :data="tableList" fit @sort-change="handleSortChange" @row-click="tableRowClick">
       <template #empty>
         <div v-if="botStore.evmAddress || walletStore.address">
           <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
@@ -246,7 +245,7 @@ onMounted(() => {
       <el-table-column :label="t('address')" min-width="160" show-overflow-tooltip>
         <template #default="{ row, $index }">
           <div class="flex items-center">
-            <span class="text-[#999] text-10px mr-5px">
+            <span class="text-[--d-666-l-999] text-10px mr-5px">
               #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
             </span>
             <Icon :key="`${row.user_address}-${row.user_chain}`" :ref="(el: any) => $refs.buttonRefs[$index] = el"
@@ -351,9 +350,9 @@ onMounted(() => {
       </el-table-column>
     </el-table>
 
-    <el-pagination class="pt-20px" v-if="pageData.total > 1" v-model:current-page="pageData.page"
-      v-model:page-size="pageData.pageSize" layout="prev, pager, next, ->" :total="pageData.total"
-      :page-sizes="[10, 20, 30, 40, 50, 60]" hide-on-single-page @change="getList" />
+    <el-pagination class="h-72px flex justify-end items-center" v-if="pageData.total > 1"
+      v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" layout="prev, pager, next, ->"
+      :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" hide-on-single-page @change="getList" />
 
     <el-popover :visible="visibleShow" :virtual-ref="virtualRef" virtual-triggering trigger="click" :width="250">
       <div>
