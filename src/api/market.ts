@@ -45,6 +45,14 @@ export function getTreasureList(query) {
   })
 }
 
+export function getPriceChangeTopTokens(query?: any) {
+  const {$api} = useNuxtApp()
+  return $api('/v1api/v2/tokens/priceChange', {
+    method: 'get',
+    query
+  })
+}
+
 export function getMultiContractInfo(body) {
   const {$api} = useNuxtApp()
   return $api('/v1api/v3/tokens/multi_contract_info', {

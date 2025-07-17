@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
 import { getGainDefaultColumns } from './columnRender/gainColumnsService'
-import { getTreasureList } from '~/api/market'
+import { getPriceChangeTopTokens, getTreasureList } from '~/api/market'
 import {
   quickContent,
   dexContent,
@@ -46,8 +46,8 @@ const props = defineProps<{
 }>()
 
 const sortConditions = ref({
-  sort: '',
-  sort_dir: '',
+  sort: 'price_change_24h',
+  sort_dir: 'desc',
 })
 
 function setSortConditions(params: { sort: string; sort_dir: string }) {
@@ -118,17 +118,22 @@ async function _getTreasureList(shouldLoading = true) {
     if (shouldLoading) {
       loading.value = true
     }
+    
+    // 优先使用通用API确保分页功能正常
     const { total: _, ...rest } = pageInfo.value
     const res = await getTreasureList({
-      category: 'gain',
+      category: 'gainer',  // 修正为 'gainer'
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
       ...sortConditions.value,
       ...filterForm.value,
       self_address: walletAddress.value,
+      refresh_total: 0,  // 添加刷新总数参数
     })
+    
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
+    
     if (shouldLoading) {
       initWs()
     }
@@ -136,6 +141,28 @@ async function _getTreasureList(shouldLoading = true) {
     timer = window.setTimeout(() => {
       _getTreasureList(false)
     }, 10000)
+  } catch (error) {
+    console.error('获取涨幅榜数据失败:', error)
+    // 备选方案：使用专用API（不支持分页）
+    try {
+      const res = await getPriceChangeTopTokens()
+      const processedData = Array.isArray(res) ? res : (res.data || [])
+      
+      // 应用链筛选
+      let filteredData = processedData
+      if (props.activeChain !== 'AllChains') {
+        filteredData = processedData.filter(item => item.chain === props.activeChain)
+      }
+      
+      // 应用数据映射
+      listData.value = filteredData.map(props.listMapFunction)
+      // 专用API可能不返回total，设置一个合理的默认值
+      pageInfo.value.total = filteredData.length || 0
+    } catch (fallbackError) {
+      console.error('备选接口也失败:', fallbackError)
+      listData.value = []
+      pageInfo.value.total = 0
+    }
   } finally {
     loading.value = false
   }
@@ -149,6 +176,8 @@ const wsStore = useWSStore()
 watch(
   () => wsStore.wsResult[WSEventType.PRICE_EXTRA],
   ({ prices }) => {
+    if (!prices) return
+    
     const pricesMap = Array.isArray(prices)
       ? prices.reduce((pre, cur) => {
           pre[cur.pair + '-' + cur.chain] = cur
@@ -171,10 +200,23 @@ watch(
       }
       return el
     })
+    
+    // 应用当前排序条件
     const { sort, sort_dir } = sortConditions.value
-    const sortVal = { asc: '1', desc: '-1' }[sort_dir]
-    if (sortVal) {
-      listData.value = updateList.toSorted((a, b) => (a[sort] - b[sort]) * sortVal)
+    if (sort && sort_dir) {
+      const sortVal = { asc: 1, desc: -1 }[sort_dir] || -1
+      listData.value = updateList.toSorted((a, b) => {
+        const aVal = a[sort] || 0
+        const bVal = b[sort] || 0
+        return (bVal - aVal) * sortVal
+      })
+    } else {
+      // 默认按24小时涨幅排序
+      listData.value = updateList.sort((a, b) => {
+        const aChange = a.price_change_24h || 0
+        const bChange = b.price_change_24h || 0
+        return bChange - aChange
+      })
     }
   }
 )
@@ -186,6 +228,8 @@ function initWs() {
     params: ['price_extra'],
     id: 1,
   })
+  
+  // 订阅价格更新事件，适配涨幅榜
   const params = listData.value.map((el) => `${el.pair}-${el.chain}`)
   wsStore.send({
     jsonrpc: '2.0',

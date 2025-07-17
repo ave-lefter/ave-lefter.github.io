@@ -1,0 +1,105 @@
+name: GitHub Pages Deployment Notification
+
+on:
+  # 监听 GitHub Pages 构建完成事件
+  page_build:
+  # 监听工作流完成事件
+  workflow_run:
+    workflows: ["pages-build-deployment"]
+    types: [completed]
+
+jobs:
+  notify-deployment:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Get latest commit info
+      id: commit-info
+      run: |
+        # 设置字符编码为 UTF-8
+        export LANG=C.UTF-8
+        export LC_ALL=C.UTF-8
+        
+        # 获取最新提交信息
+        COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s" | tr '\n' ' ')
+        AUTHOR_NAME=$(git log -1 --pretty=format:"%an")
+        COMMIT_SHA=$(git rev-parse --short HEAD)
+        
+        echo "commit_message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+        echo "author_name=$AUTHOR_NAME" >> $GITHUB_OUTPUT
+        echo "commit_sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
+    
+    - name: Send deployment notification
+      run: |
+        # 设置字符编码为 UTF-8
+        export LANG=C.UTF-8
+        export LC_ALL=C.UTF-8
+        
+        # 配置飞书 webhook URLs（支持多个群组）
+        WEBHOOK_URLS_STRING="{{FEISHU_WEBHOOK_URLS}}"
+        # 将逗号分隔的字符串转换为数组
+        IFS=',' read -r -a FEISHU_WEBHOOK_URLS <<< "$WEBHOOK_URLS_STRING"
+        
+        # 获取部署信息
+        DEPLOYMENT_URL="{{DEPLOYMENT_URL}}"
+        TIMESTAMP=$(TZ='Asia/Shanghai' date +"%Y-%m-%d %H:%M:%S CST")
+        
+        # 获取提交信息
+        COMMIT_MESSAGE="${{ steps.commit-info.outputs.commit_message }}"
+        AUTHOR_NAME="${{ steps.commit-info.outputs.author_name }}"
+        
+        # 获取当前分支名称（适配 main/master 分支）
+        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        
+        # 发送通知的函数
+        send_notification() {
+          local message="$1"
+          echo "📤 发送通知到 ${#FEISHU_WEBHOOK_URLS[@]} 个飞书群组..."
+          
+          for webhook_url in "${FEISHU_WEBHOOK_URLS[@]}"; do
+            echo "📬 发送到: $webhook_url"
+            response=$(curl -X POST "$webhook_url" \
+              -H "Content-Type: application/json; charset=utf-8" \
+              -H "Accept: application/json" \
+              -d "$message" \
+              -w "%{http_code}" \
+              -s)
+            
+            if [[ $response == *"200"* ]]; then
+              echo "✅ 成功发送到: $webhook_url"
+            else
+              echo "❌ 发送失败到: $webhook_url (HTTP: $response)"
+            fi
+          done
+        }
+        
+        # 判断事件类型和状态，避免重复通知
+        if [ "${{ github.event_name }}" = "page_build" ]; then
+          # page_build 事件表示构建完成
+          echo "✅ GitHub Pages 构建完成，发送部署成功通知到飞书..."
+          SUCCESS_MESSAGE="{
+            \"msg_type\": \"text\",
+            \"content\": {
+              \"text\": \"🎉 {{PROJECT_DISPLAY_NAME}} GitHub Pages 部署成功！\\n\\n📦 项目: {{PROJECT_NAME}}\\n🌿 分支: $CURRENT_BRANCH\\n👤 作者: $AUTHOR_NAME\\n💬 提交: $COMMIT_MESSAGE\\n🔗 访问地址: $DEPLOYMENT_URL\\n✅ 完成时间: $TIMESTAMP\\n\\n👆 点击链接查看最新部署\"
+            }
+          }"
+          send_notification "$SUCCESS_MESSAGE"
+            
+        elif [ "${{ github.event_name }}" = "workflow_run" ]; then
+          # workflow_run 事件，只在失败时通知
+          if [ "${{ github.event.workflow_run.conclusion }}" = "failure" ]; then
+            echo "❌ GitHub Pages 部署失败，发送失败通知到飞书..."
+            FAILURE_MESSAGE="{
+              \"msg_type\": \"text\",
+              \"content\": {
+                \"text\": \"💥 {{PROJECT_DISPLAY_NAME}} GitHub Pages 部署失败！\\n\\n📦 项目: {{PROJECT_NAME}}\\n🌿 分支: $CURRENT_BRANCH\\n👤 作者: $AUTHOR_NAME\\n💬 提交: $COMMIT_MESSAGE\\n❌ 失败时间: $TIMESTAMP\\n\\n请检查: https://github.com/{{GITHUB_REPO}}/actions\"
+              }
+            }"
+            send_notification "$FAILURE_MESSAGE"
+          else
+            echo "ℹ️  workflow_run 事件成功，但已通过 page_build 事件通知，跳过重复通知"
+          fi
+        fi

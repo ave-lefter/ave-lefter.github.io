@@ -6,7 +6,7 @@ import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 const components = {
   hot,
-  gain,
+  gainer: gain,  // 添加 gainer 映射到 gain 组件
 }
 const activeTab = shallowRef<keyof typeof components>('hot')
 const activeChain = shallowRef('AllChains')

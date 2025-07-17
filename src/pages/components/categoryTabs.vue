@@ -36,7 +36,7 @@ const configMap = computed(() => {
       getOptions: getHotOptions,
       class: props.activeTab === 'hot' ? 'color-#FFA622' : '',
     },
-    gain: {
+    gainer: {
       icon: 'custom:gain',
       storageKey: 'gainUserTableColumns',
       getDefaultColumns: getGainDefaultColumns,
@@ -48,15 +48,16 @@ const configMap = computed(() => {
 const globalStore = useGlobalStore()
 // 由于其他榜单未上，用临时的 computed过滤
 const supportCategories = computed(() => {
-  const keys = ['hot', 'gain']
+  const keys = ['hot', 'gainer']
   const filtered = (props.categories || []).filter((el) => {
     return keys.includes(el.category)
   })
   
-  // 如果API没有返回gain类别，临时添加一个
-  if (!filtered.some(c => c.category === 'gain')) {
+  
+  // 如果API没有返回gainer类别，临时添加一个
+  if (!filtered.some(c => c.category === 'gainer')) {
     filtered.push({
-      category: 'gain',
+      category: 'gainer',
       name_zh_ch: '涨幅榜',
       name_zh_tw: '漲幅榜',
       name_en: 'Gainers',
