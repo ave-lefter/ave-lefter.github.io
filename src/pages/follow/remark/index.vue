@@ -257,7 +257,7 @@ onMounted(() => {
               @click.stop.prevent="collect(row)" />
             <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo"
               :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
-            <div class="ml-5px h-32px flex flex-col justify-between">
+            <div class="ml-5px">
               <div class="flex items-center">
                 <!-- <UserRemark :key="`${row.user_address}-${row.user_chain}`" :remark="row.remark"
                   :address="row.user_address" :chain="row.user_chain"
@@ -271,9 +271,9 @@ onMounted(() => {
               </div>
               <div class="flex items-center">
                 <Icon @click.stop.prevent v-copy="row?.user_address" name="bxs:copy"
-                  class="clickable text-[--d-666-l-999]" />
-                <Icon name="custom:sun-icon" class="text-12px mx-5px" />
-                <Icon name="custom:wallet-icon" class="text-12px" />
+                  class="clickable text-[--d-666-l-999] w-12px h-12px" />
+                <Icon name="custom:sun-icon" class="text-12px w-12px h-12px mx-5px" />
+                <Icon name="custom:wallet-icon" class="text-12px w-12px h-12px" />
               </div>
             </div>
           </div>
@@ -411,9 +411,9 @@ onMounted(() => {
   height: 40px;
 }
 
-:deep() .el-table .el-table__cell {
-  padding: 14px 0;
-}
+// :deep() .el-table .el-table__cell {
+//   padding: 14px 0;
+// }
 
 :deep() .el-table {
   --el-table-text-color: var(--d-CCC-l-333);

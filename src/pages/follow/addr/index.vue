@@ -15,10 +15,10 @@
         </el-radio-group>
       </li>
     </ul>
-    <div v-if="currentAddress" class="m-header flex-between px-12px items-start">
+    <div v-if="currentAddress" class="m-header flex-between px-16px items-start">
       <pro-groups v-if="!isMonitor" v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
       <!-- <div v-else/> -->
-  
+
     </div>
     <div class="m-table w-100% mt-12px flex-1 overflow-hidden">
       <el-table
@@ -368,7 +368,7 @@
             >
               <span class="filter-title">{{ $t('lastTxsTime1') }}</span>
               <div class="sort-container">
-                <i 
+                <i
                   :class="['sort-caret ascending',(conditions.sort_dir === 'asc'&&conditions.sort==='last_tx_time') ? 'active' : '']"
                   @click.stop="handleSort(conditions,'asc','last_tx_time')" />
                 <i
@@ -394,7 +394,7 @@
                 <div class="filter-box" :class="mode">
                   <div class="text-12px font-500 text-[--d-999-l-666] mb-8px">{{ $t('lastTxsTime1') }}</div>
                   <ul class="flex flex-col font-500 text-12px text-var(--d-E9E9E9-l-333) gap-8px">
-                    <li 
+                    <li
                       v-for="(item, index) in openTimeList"  :key="index" class="flex-center hover:border-[--d-F5F5F5-l-333] cursor-pointer border-[var(--d-333-l-F2F2F2)] border-solid border h-32px border-rd-4px" :class="[filterForm.last_trade_time == item.value?'bg-[--d-333-l-F2F2F2] ':'']" @click.stop.prevent="filterForm.last_trade_time = item.value"
                     >
                       <span>{{ item.text }}</span>
@@ -410,7 +410,7 @@
                     >
                       <span class="filter-title">{{ $t('sort') }}</span>
                       <div class="sort-container">
-                        <i 
+                        <i
                           :class="['sort-caret ascending',filterForm.sort_dir === 'asc' ? 'active' : '']"
                           @click.stop="handleSort(filterForm, 'asc')" />
                         <i
@@ -555,8 +555,8 @@ const botStore = useBotStore()
 const {evmAddress} = storeToRefs(useBotStore())
 const { addressGroups ,currentAddress,updateNum1,updateNum2,updateNum3,addressConditions} = storeToRefs(useFollowStore())
 // const addressGroups = ref([{ "group_id": 3763, "name": "base", "show_index": -1 }, { "group_id": 37632, "name": "base1", "show_index": 0 }, { "group_id": 37631, "name": "base2", "show_index": 1 }])
-const visible = ref(false)  
-const visible2 = ref(false)  
+const visible = ref(false)
+const visible2 = ref(false)
 const searchKeyword= ref('')
 const buttonTagRef = ref<HTMLElement | undefined>(undefined)
 const toolTipTagVisible = ref(false)
@@ -754,7 +754,7 @@ function handleDelGroup(groupId: number) {
   })
 }
 function getMonitorNum() {
-  if(!botStore.evmAddress) return 
+  if(!botStore.evmAddress) return
   monitorAddresses(conditions).then((res) => {
     monitorNum.value = res.total
   })
@@ -786,7 +786,7 @@ const getTableList = throttle(function() {
     pageData.value.total = res.total || 0
     pageData.value.page = res.pageNO || 1
     pageData.value.pageSize = res.pageSize || 50
-  }).finally(() => { 
+  }).finally(() => {
     loading.value = false
   })
 }, 500)

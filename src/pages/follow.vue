@@ -1,7 +1,7 @@
 <template>
   <div class="w-follow bg-[--d-222-l-F2F2F2]  flex-1 w-100%" style="height: calc(100vh - 92px);">
    <div class="flex flex-col bg-[--d-111-l-FFF] h-100% py-12px w-100%">
-     <ul class="w-tabs pl-12px">
+     <ul class="w-tabs pl-16px">
        <li v-for="item in tabData" :key="item.path" :class="{active:route.path === item.path}"><NuxtLink :to="item.path">{{item.label}}</NuxtLink></li>
      </ul>
      <NuxtPage/>
@@ -58,7 +58,7 @@ ul.w-tabs{
   /* border-bottom: 1px solid var(--d-222-l-EEE); */
   li{
     display: flex;
-    padding: 0 12px;
+    padding: 0 16px;
     height: 32px;
     line-height: 32px;
     cursor: pointer;
