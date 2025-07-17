@@ -520,7 +520,7 @@
       </el-table-column>
       </el-table>
       <el-pagination 
-        v-if="filterDataSource?.length > 10"
+        v-if="(pageData.total > 50) && shouldRenderChild"
         v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="h-72px flex justify-end items-center"
         layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getTableList"/>
     </div>
@@ -566,27 +566,15 @@ const addButtonRef = ref()
 const tableRef = ref<TableInstance | null>(null)
 const isMonitor=ref(false)
 const conditions=addressConditions.value
-// const conditions = reactive({
-//   group: 0,
-//   time_interval: '7d',
-//   user_chain: 'AllChains',
-//   sort: '',
-//   sort_dir: '',
-//   keyword: '',
-//   last_tx_time_max: '',
-//   last_tx_time_min: '',
-//   last_trade_time: ''
-// } as {
-//   group: number
-//   time_interval: string
-//   user_chain: string
-//   sort: string|null
-//   sort_dir: string|null
-//   keyword: string
-//   last_tx_time_max: string|number
-//   last_tx_time_min: string|number
-//   last_trade_time: string|number
-// })
+const shouldRenderChild = shallowRef(true)
+
+const reCreateChild = () => {
+  shouldRenderChild.value = false
+  // 确保 DOM更新
+  nextTick(() => {
+    shouldRenderChild.value = true
+  })
+}
 const monitorNum=ref(0)
 const pageData = ref({
   total: 10,
@@ -644,10 +632,14 @@ watch(() => currentAddress.value, (val) => {
     init()
   }
 })
-watch([() => conditions, ()=>isMonitor.value, ()=>updateNum2.value+updateNum3.value], (value) => {
+watch([() => conditions, ()=>updateNum2.value+updateNum3.value], (value) => {
   console.log('watch conditions', value)
   init()
 },{deep: true})
+
+watch(()=>isMonitor.value, () => {
+  reCreateChild()
+})
 
 function handleDeleteMonitor(row:any){
   deleteMonitor({
