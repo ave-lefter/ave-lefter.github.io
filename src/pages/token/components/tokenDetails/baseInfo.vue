@@ -311,7 +311,7 @@ const collect = async () => {
             <Icon
               v-copy="tokenDetailStore.user_address"
               name="bxs:copy"
-              class="cursor-pointer color-[--d-666-l-696E7C] text-10px"
+              class="cursor-pointer color-[--d-666-l-999] text-10px"
             />
             <!--<Icon-->
             <!--  name="custom:attention"-->
