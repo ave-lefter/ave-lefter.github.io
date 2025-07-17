@@ -4,13 +4,19 @@ import BigNumber from 'bignumber.js'
 import dayjs from 'dayjs'
 import { formatNumber2 } from '~/utils/formatNumber'
 import { getRemarksDetail } from '~/api/fav'
-import { deleteAttention, updateWhaleRemark, addAttentionNew, favUsersAddMonitor, favUsersPauseMonitor } from '~/api/attention'
+// import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
+import { deleteAttention, updateWhaleRemark, addAttention, addAttentionNew, addAttention2, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 
+const {updateNum3} = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const router = useRouter()
 const { t } = useI18n()
-
+const {  isDark } = storeToRefs(useGlobalStore())
+const $refs = ref({
+  buttonRefs: {} as Record<number, any>
+})
+// const followStore=useFollowStore()
 const remarkValue = ref('')
 const visibleShow = ref(false)
 const coords = ref({ x: 0, y: 0 })
@@ -70,9 +76,9 @@ watch(() => walletStore.address, (newVal) => {
 
 const handleMonitor = async (row: any) => {
   if (!botStore.evmAddress) return ElMessage.warning(t('noBotWalletTip'))
-  if (row.is_wallet_address_fav === 0) return ElMessage.warning(t('monitorError'))
   if (row?.is_monitored === 0) {
-    await favUsersAddMonitor({
+    if (row.is_wallet_address_fav === 0) return ElMessage.warning(t('monitorError'))
+    await addAddressMonitor({
       address: row.user_address,
       app: 0,
       buy: 1,
@@ -81,15 +87,21 @@ const handleMonitor = async (row: any) => {
       telegram: 0,
       user_address: addressValue.value,
       website: 1
+    }).then(() => {
+       ElMessage.success(t('success'))
+       getList()
+    }).catch((e) => {
+      ElMessage.error(String(e))
     })
   } else {
     await favUsersPauseMonitor({
       address: row.user_address,
       uid: row.id
+    }).then(() => {
+       ElMessage.success(t('success'))
+       getList()
     })
   }
-  ElMessage.success(t('success'))
-  getList()
 }
 
 
@@ -116,6 +128,7 @@ const handleRemarkGroup = async (row: any) => {
   })
   ElMessage.success(t('success'))
   visibleShow.value = false
+  updateNum3.value++
   getList()
 }
 
@@ -135,10 +148,17 @@ const handleSortChange = ({ prop, order }: any) => {
 }
 
 // 取消收藏
-const collect = async (row: any) => {
+const collect = async (row: any,index:number) => {
   if (walletStore.address && !walletStore.walletSignature[walletStore.address]) {
     await walletStore.signMessageForFavorite()
   }
+  // if(row.is_wallet_address_fav !== 1){
+  //   followStore.confirmAttention($refs.value.buttonRefs[index],(form)=>{
+  //     console.log('confirmAttention', form)
+  //     return Promise.resolve()
+  //   })
+  //   return 
+  // }
   loading.value = true
   const api = row.is_wallet_address_fav === 1 ? deleteAttention : addAttentionNew
   api({
@@ -149,7 +169,7 @@ const collect = async (row: any) => {
     ElMessage.success(row.is_wallet_address_fav === 1 ? t('attention1Canceled') : t('attention1Success'))
     getList()
   }).catch((err) => {
-    console.log(err)
+    ElMessage.error(String(err))
   }).finally(() => {
     loading.value = false
   })
@@ -157,6 +177,7 @@ const collect = async (row: any) => {
 
 // 获取列表
 const getList = async () => {
+  loading.value = true 
   const res: any = await getRemarksDetail({
     address: addressValue.value,
     pageNO: pageData.value.page,
@@ -174,6 +195,7 @@ const getList = async () => {
     []
   pageData.value.total = res.total
   tableList.value = tableData
+  loading.value = false
 }
 
 function safeBigNumber(value: any) {
@@ -223,24 +245,25 @@ onMounted(() => {
       <el-table-column :label="t('address')" min-width="160" show-overflow-tooltip>
         <template #default="{ row, $index }">
           <div class="flex items-center">
-            <span class="text-[#848E9C] text-12px mr-5px">
+            <span class="text-[#999] text-10px mr-5px">
               #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
             </span>
-            <Icon name="custom:attention" :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#999]'"
-              class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row)" />
-            <UserAvatar class="mx-8px" :wallet_logo="row.wallet_logo" :address="row.user_address"
-              :chain="row.user_chain" iconSize="24px"></UserAvatar>
-            <div class="ml-5px">
+            <Icon
+              :key="`${row.user_address}-${row.user_chain}`"
+              :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
+            <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="32px"/>
+            <div class="ml-5px h-32px flex flex-col justify-between">
               <div class="flex items-center">
-                <span class="text-14px max-w-[95px] truncate">{{ row.remark }}</span>
-                <!-- 备注 -->
+                <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 85px" :iconEditColor="isDark?'#999':'#666'" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)"/>
+                <!-- <span class="text-14px max-w-[95px] truncate">{{ row.remark }}</span>
                 <div ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
                   <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px" name="custom:remark" />
-                </div>
+                </div> -->
               </div>
-              <div class="flex items-center mt-2px">
+              <div class="flex items-center">
                 <Icon @click.stop.prevent v-copy="row?.user_address" name="bxs:copy"
-                  class="clickable text-[--d-666-l-999]" />
+                  class="clickable text-[--d-999-l-666]" />
                 <Icon name="custom:sun-icon" class="text-12px mx-5px" />
                 <Icon name="custom:wallet-icon" class="text-12px" />
               </div>
@@ -288,12 +311,25 @@ onMounted(() => {
             <a class="flex items-center"
               :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`" target="_blank">
               <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
-              {{ t('documentation') }}
+              {{ t('copyTrade') }}
             </a>
+            <div
+              v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
+              class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-CCC-l-333)]" @click="handleMonitor(row)">
+              <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-13px mr-5px" :class="[(row?.is_monitored === 1)&&'color-[var(--d-CCC-l-333)]']"/>
+              <Icon v-else name="custom:monitor-icon" class="text-16px mr-2px"/>
+              <span
+                class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
+                {{ (row?.is_monitored === 1)? t('pause') : t('enable') }}
+              </span>
+            </div>
+            <div class="flex items-center mr-12px color-[var(--d-666-l-CCC)] cursor-not-allowed" v-else>
+              <Icon name="custom:monitor-icon" class="text-16px mr-2px " />
+            </div>
             <!-- 监控 -->
-            <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"
+            <!-- <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"
               @click="handleMonitor(row)" v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'">
-              <Icon name="custom:monitor-icon" class="text-16px mr-2px" />
+              <Icon name="custom:monitor-icon" class="text-16px mr-2px" :class="[(row?.is_monitored === 1)&&'color-[var(--d-FFF-l-333)]']"/>
               <span
                 class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
                 {{ row?.is_monitored === 1 ? t('pauseMonitor') : t('openMonitor') }}
@@ -301,7 +337,7 @@ onMounted(() => {
             </div>
             <div class="flex items-center mr-12px color-[#666] cursor-not-allowed" v-else>
               <Icon name="custom:monitor-icon" class="text-16px mr-2px " />
-            </div>
+            </div> -->
           </div>
         </template>
       </el-table-column>
@@ -313,7 +349,7 @@ onMounted(() => {
     <el-popover :visible="visibleShow" :virtual-ref="virtualRef" virtual-triggering trigger="click" :width="250">
       <div>
         <div>{{ t('editRemark') }}</div>
-        <el-input v-model="remarkValue" clearable maxlength="50" show-word-limit :placeholder="t('enterRemark')"
+        <el-input v-model="remarkValue" clearable maxlength="20" show-word-limit :placeholder="t('enterRemark')"
           class="mt-8px w-200px" />
         <div class="flex items-center justify-between mt-12px gap-12px">
           <div @click="visibleShow = false"
@@ -355,5 +391,14 @@ onMounted(() => {
 
 :deep(.el-pager li) {
   border-radius: 6px;
+}
+:deep() .el-table.el-table thead .el-table__cell{
+  height: 40px;
+}
+:deep() .el-table .el-table__cell{
+  padding: 14px 0;
+}
+:deep() .el-table{
+  --el-table-text-color: var(--d-CCC-l-333);
 }
 </style>

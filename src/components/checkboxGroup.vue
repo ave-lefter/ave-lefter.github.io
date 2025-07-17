@@ -11,6 +11,7 @@
     </el-checkbox>
     <el-checkbox-group
       v-model="modelValue"  
+      :min="1"
       :class="[!props.inline?'flex flex-col':'flex flex-row']"
       @change="handleCheckedCitiesChange"
     >

@@ -102,24 +102,29 @@
           min-width="100"
           align="right"
         >
-          <template #default="{ row }">
-            <span
-              >{{ row.address?.slice(0, 2) }}...{{
-                row.address?.slice(-4)
-              }}</span
-            >
-            <a
-              v-if="chain === 'solana'"
-              class="ml-5 a-gray"
-              @click.stop.prevent="jumpBalance(row)"
-            >
-              <i class="iconfont icon-wallet1 font-12" />
-            </a>
-            <Icon
-              name="custom:filter"
-              class="color-[--d-666-l-999] cursor-pointer text-10px ml-3px"
-              @click="handlerDialogProfitLoss(row)"
-            />
+          <template #default="{ row , $index}">
+            <div class="flex-end gap-3px">
+              <span
+                >{{ row.address?.slice(0, 2) }}...{{
+                  row.address?.slice(-4)
+                }}</span
+              >
+              <a
+                v-if="chain === 'solana'"
+                class="ml-5 a-gray"
+                @click.stop.prevent="jumpBalance(row)"
+              >
+                <i class="iconfont icon-wallet1 font-12" />
+              </a>
+              <Icon
+                :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
+                :class="row.is_wallet_address_fav ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="color-var(--d-999-l-666) text-14px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
+              <Icon
+                name="custom:filter"
+                class="color-[--d-666-l-999] cursor-pointer text-10px"
+                @click="handlerDialogProfitLoss(row)"
+              />
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -134,6 +139,7 @@ import { getAddressAndChainFromId } from '@/utils/index'
 import { formatNumber } from '@/utils/formatNumber'
 import { upColor, downColor } from '@/utils/constants'
 import ProfitLoss from './profitLoss.vue'
+import { deleteAttention, addAttention2 } from '~/api/attention'
 const tokenStore = useTokenStore()
 
 const props = defineProps<{
@@ -153,7 +159,9 @@ const tableIndex = ref(0)
 const dialogProfitLoss = ref(false)
 const profitLossRef = ref()
 const tableRef = ref()
-
+const $refs = ref({
+  buttonRefs: {} as Record<number, any>
+})
 
 const isLoading = computed(() => props.loading)
 const chain = computed(
@@ -185,7 +193,49 @@ function handlerDialogProfitLoss(row: { address: string }) {
   dialogProfitLoss.value = true
   profitLossRef.value?.getUserTxs(row.address)
 }
-
+const collect = async (row: any,index:number) => {
+  if(!useFollowStore().currentAddress){
+    useBotStore().changeConnectVisible(true)
+  }
+  if (useWalletStore().address && !useWalletStore().walletSignature[useWalletStore().address]) {
+    await useWalletStore().signMessageForFavorite()
+  }
+  console.log('collect',row,index)
+  if(row.is_wallet_address_fav !== true){
+    useFollowStore().confirmAttention($refs.value.buttonRefs[index],row.chain, (form) => {
+      console.log('confirmAttention', form)
+      return addAttention2({
+        address: useFollowStore().currentAddress,
+        user_address: row.address,
+        user_chain: chain.value,
+        group: form.group,
+        is_monitored: form.is_monitored,
+      }).then(() => {
+        ElMessage.success(t('attention1Success'));
+        (tableDataFilter.value as Array<any>)[index].is_wallet_address_fav = true
+        // getList()
+        return Promise.resolve()
+      }).catch((err) => {
+        return Promise.reject(err)
+      }).finally(() => {
+      })
+    })
+    return 
+  }
+  // loading.value = true
+  deleteAttention({
+    address: useFollowStore().currentAddress,
+    user_address: row.address,
+    user_chain: chain.value
+  }).then(() => {
+    ElMessage.success(t('attention1Canceled'));
+    (tableDataFilter.value as Array<any>)[index].is_wallet_address_fav = false
+    // getList()
+  }).catch((err) => {
+    console.log(err)
+  }).finally(() => {
+  })
+}
 function sortChange({
   prop,
   order,

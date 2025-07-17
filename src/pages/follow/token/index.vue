@@ -248,6 +248,7 @@ const getRowGroupChange = async (val: number, row: any) => {
 
 // 获取列表
 const getList = async () => {
+  loading.value=true
   const res: any = await getNewFavoriteList({
     address: addressValue.value,
     group: activeTab.value,
@@ -268,6 +269,7 @@ const getList = async () => {
     []
   pageData.value.total = res.total
   tableList.value = tableData
+  loading.value=false
 }
 
 // 获取分组列表
@@ -292,7 +294,7 @@ onMounted(() => {
     <div v-if="botStore.evmAddress || walletStore.address"
       class="flex items-center px-12px mt-12px gap-8px overflow-x-auto scrollbar-hide">
       <div v-for="(item, index) in allTabsGroup" :key="item.value"
-        class="cursor-pointer text-12px color-[--d-999-l-666] bg-[--d-15171c-l-f2f2f2] px-12px h-28px rounded-4px shrink-0 flex items-center"
+        class="cursor-pointer text-12px color-[--d-999-l-666] bg-[--d-15171c-l-f2f2f2] px-8px h-28px rounded-4px shrink-0 flex items-center font-500"
         :class="[activeTab === item.value && 'bg-[--d-333-l-0A0B0C] color-[#F5F5F5]']"
         @click="setActiveTab(item.value)">
         {{ item.label }}
@@ -417,7 +419,7 @@ onMounted(() => {
         <template #default="{ row, $index }">
           <NuxtLink :to="`/token/${row.token}-${row.chain}`" @click.stop.prevent>
             <div class="flex items-center">
-              <span class="text-[#848E9C] text-12px mr-5px">
+              <span class="text-[#999] text-10px mr-5px">
                 #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
               </span>
               <Icon v-if="addressValue" name="material-symbols:kid-star"
@@ -456,7 +458,7 @@ onMounted(() => {
                   </a>
                 </div>
                 <div class="flex items-center mt-2px">
-                  <!-- <span class="text-[--d-666-l-999]">({{ '*' + row.token?.slice(-4) }})</span> -->
+                  <!-- <span class="text-[--d-CCC-l-999]">({{ '*' + row.token?.slice(-4) }})</span> -->
                   <span
                     class="text-[#3f80f7] border-[0.5px] border-solid border-[#3f80f7] rounded-4px bg-transparent text-10px px-4px max-w-[60px] truncate"
                     :title="row.remark" v-if="row.remark">{{ row.remark }}</span>
@@ -534,7 +536,7 @@ onMounted(() => {
       <el-table-column :label="t('tokenGroup')" align="right" width="170">
         <template #default="{ row }">
           <el-select v-model="row.group_id" style="width: 100px;" popper-class="follow-select-popper" filterable
-            @click.stop @change="(val) => getRowGroupChange(val, row)">
+            class="[&&]:[--el-text-color-regular:var(--d-CCC-l-333)]" @click.stop @change="(val) => getRowGroupChange(val, row)">
             <el-option v-for="item in allTabsGroup" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </template>
@@ -622,5 +624,6 @@ onMounted(() => {
 
 :deep(.el-table) {
   --el-table-row-hover-bg-color: var(--d-1A1A1A-l-fafafa);
+  --el-table-text-color: var(--d-CCC-l-333);
 }
 </style>

@@ -1,6 +1,7 @@
 import { ElMessage as Message } from 'element-plus'
 import { getGlobalT } from '@/utils/i18nBridge'
 const t = getGlobalT()
+
 // 用户取消关注
 export async function deleteAttention(body: {
   user_address: string, user_chain: string, address: string
@@ -9,6 +10,10 @@ export async function deleteAttention(body: {
   return $api('/v1api/v3/users/fav/deleteUser', {
     method: 'post',
     body,
+  }).then(() => {
+    const {updateNum3} = storeToRefs(useFollowStore())
+    updateNum3.value++
+    return Promise.resolve([])
   }).catch((err) => console.log(err))
 }
 
@@ -22,6 +27,27 @@ export async function addAttention(body: {
     body
   })
 }
+interface IAddAttention2 {
+  user_chain: string
+  user_address: string
+  remark?: string
+  address: string
+  group: number
+  is_monitored: number
+  website?: number
+  app?: number
+  telegram?: number
+  buy?: number
+  sell?: number
+}
+
+export function deleteMonitor(body:{ uid: string, address: string  }){ 
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_users/v1/user/deleteMonitor',{
+    method: 'post',
+    body
+  })
+}
 
 export async function addAttentionNew(body: {
   user_address: string, user_chain: string, remark?: string, address: string
@@ -30,6 +56,56 @@ export async function addAttentionNew(body: {
   return $api('/v2api/fav_users/v1/user/add', {
     method: 'post',
     body
+  })
+}
+
+// 用户添加关注
+export async function addAttention2({ user_chain='', user_address='', remark, address = localStorage.bot_evmAddress, group=0, is_monitored=0, website=1, app=0, telegram=0, buy=1, sell=1 }: IAddAttention2) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_users/v1/user/add', {
+    method: 'post',
+    body:{
+      //加上校验就不必放guid
+      address,
+      user_chain,
+      user_address,
+      remark,
+      group,
+      is_monitored,// 是否开启监控1、开启监控，此时header 传jwt token，后端校验该token，如果有效，再保存以下监控相关的参数
+      website,
+      app,
+      telegram,
+      buy,
+      sell
+    }
+  })
+}
+
+interface IAddAddressMonitor {
+  website?: number
+  app?: number
+  telegram?: number
+  buy?: number
+  sell?: number
+  address: string
+  user_address: string
+  chain: string
+}
+// 用户添加监控
+export function addAddressMonitor({website=1, app=0, telegram=0, buy=1, sell=1, address, user_address= localStorage.bot_evmAddress, chain}: IAddAddressMonitor) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_users/v1/user/addMonitor', {
+    method: 'post',
+    body: {
+      website,
+      app,
+      telegram,
+      buy,
+      sell,
+      address,
+      user_address,
+      chain
+    }
   })
 }
 // req=[
@@ -232,18 +308,17 @@ export function updateWhaleRemark(body: any) {
 }
 
 // delete group
-export function changeIndexFavoriteGroup2(group1: number | string, group2: number | string, address = localStorage.bot_evmAddress || localStorage.walletAddress) {
+export function changeIndexFavoriteGroup2(group: number[], address = localStorage.bot_evmAddress || localStorage.walletAddress) {
   if (!address || address === 'undefined') {
     Message.error(t('connectWalletFirst'))
     return Promise.reject(false)
   }
   const { $api } = useNuxtApp()
-  return $api('/v2api/fav_users/v1/user/group/changeIndex', {
+  return $api('/v2api/fav_users/v1/user/group/sort', {
     method: 'post',
     body: {
       address,
-      group1,
-      group2
+      group
     }
   })
 }
@@ -288,47 +363,30 @@ export function getFavUserRemarks2({ address, pageNO, pageSize, user_chain, time
 }
 
 // Get user monitorAddress
-export function getHistoryMonitor({pageNo=1,pageSize=50}) {
+export function getHistoryMonitor({pageNo=1,pageSize=50,filtered_type}:{
+  pageNo?:number,
+  pageSize?:number,
+  filtered_type?:string
+}) {
   const { $api } = useNuxtApp()
-  return $api('/v2api/fav_users/v1/user/historyMonitor',{
+  return $api('/v2api/fav_users/v1/user/historyMonitorv2',{
     method: 'get',
     params: {
       pageNo,
-      pageSize
+      pageSize,
+      filtered_type
     }
   })
 }
-
-
-
-
-
-
-export async function getAttentionPageList({ group = 0, user_chain, sort = '', sort_dir = '', keyword = '', last_tx_time_max = '', last_tx_time_min = '', time_interval = '', pageSize = 100, pageNO = 1, address = localStorage.bot_evmAddress || localStorage.walletAddress }: any) {
-  if (!address || address === 'undefined') {
+export const getAttentionPageList=createCacheRequest(function({ group = 0, user_chain, sort = '', sort_dir = '', keyword = '', last_tx_time_max = '', last_tx_time_min = '', time_interval = '', pageSize = 100, pageNO = 1, address = localStorage.bot_evmAddress || localStorage.walletAddress }: any){
+if (!address || address === 'undefined') {
     return Promise.resolve(null)
   }
   const { $api } = useNuxtApp()
-  // if(store.state.bot?.cancelTokenSource){
-  //   store.state.bot.cancelTokenSource.cancel('Operation canceled by the user.')
-  // }
-  // const CancelToken = axios.CancelToken
-  // const source = CancelToken.source()
-  // store.commit("setCancelTokenSource", source)
-  return $api(`/v2api/fav_users/v1/allusers?address=${address}&user_chain=${user_chain}&keyword=${keyword}&sort=${sort}&sort_dir=${sort_dir}&pageSize=${pageSize}&last_tx_time_max=${last_tx_time_max}&pageNO=${pageNO}&last_tx_time_min=${last_tx_time_min}&time_interval=${time_interval}&group=${group}`, {
+  return $api(`/v2api/fav_users/v1/allusers?address=${address}&user_chain=${user_chain}&keyword=${keyword}&sort=${sort}&sort_dir=${sort_dir||''}&pageSize=${pageSize}&last_tx_time_max=${last_tx_time_max}&pageNO=${pageNO}&last_tx_time_min=${last_tx_time_min}&time_interval=${time_interval}&group=${group}`, {
     method: 'get',
-    // cancelToken: source.token,
   })
-}
-
-export function favUsersAddMonitor(data: any) {
-  const { $api } = useNuxtApp()
-  return $api('/v2api/fav_users/v1/user/addMonitor', {
-    method: 'post',
-    body: data,
-  })
-}
-
+})
 
 // 用户批量导入
 interface BulkImportAttentionItem {
@@ -402,11 +460,57 @@ export function batchDeleteAddresses(body: Array<{ address: string; user_chain: 
 }
 
 
-export function favUsersPauseMonitor(data: any) {
+export function favUsersResumeMonitor({  uid, address }: { uid: string; address: string }) {
   const { $api } = useNuxtApp()
-  return $api('/v2api/fav_users/v1/user/pauseMonitor', {
+  return $api('/v2api/fav_users/v1/user/resumeMonitor', {
     method: 'post',
-    body: data,
+    body: {
+      uid,
+      address
+    }
   })
 }
 
+export function favUsersPauseMonitor({  uid, address }: { uid: string; address: string }) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_users/v1/user/pauseMonitor', {
+    method: 'post',
+    body: {
+      uid,
+      address
+    },
+  })
+}
+export function monitorAddresses({ group = 0, user_chain, sort = '', sort_dir = '', keyword = '', last_tx_time_max = '', last_tx_time_min = '', time_interval = '', pageSize = 100, pageNO = 1, address = localStorage.bot_evmAddress || localStorage.walletAddress }: any) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_users/v1/user/group/monitorAddressv2', {
+   method: 'get',
+    params:{
+      group,
+      sort,
+      sort_dir,
+      keyword,
+      last_tx_time_max,
+      last_tx_time_min,
+      time_interval,
+      pageSize,
+      pageNO,
+      user_chain,
+      address
+    }
+  })
+}
+
+
+/**
+ * 批量筛选地址监控推送
+ */
+export function batchPauseMonitor(monitor_type: Array<'sell' | 'buy'>): Promise<any> {
+   const { $api } = useNuxtApp()
+  return $api('/v2api/fav_users/v1/user/monitor/batchPause', {
+    method: 'post',
+    body:{
+      monitor_type
+    }
+  })
+}

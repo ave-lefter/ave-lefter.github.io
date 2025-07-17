@@ -7,7 +7,7 @@ import {ElNotification} from 'element-plus'
 import {formatBotGasTips} from '~/utils/bot'
 import BigNumber from 'bignumber.js'
 import {useDebounceFn, useThrottleFn} from '@vueuse/core'
-import {useWalletStore} from "~/stores/wallet";
+import {useWalletStore} from '~/stores/wallet'
 
 const {t} = useI18n()
 const wsStore = useWSStore()
@@ -16,6 +16,8 @@ const botStore = useBotStore()
 const botSwapStore = useBotSwap()
 const priceV2Store = usePriceV2Store()
 const tokenStore = useTokenStore()
+const {hide_risk, hide_small} = storeToRefs(useGlobalStore())
+
 watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
   const idToPriceMap: { [key: string]: IPriceV2Response['prices'][0] } = {}
   val.prices.forEach((item) => {
@@ -67,7 +69,7 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
       // 买入信号
       const isBuy = type === '0'
       const isMainToken = token === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
-      const prevBalance = listData.value[index].balance
+      const prevBalance = listData.value[index]?.balance
       if (index > -1) {
         if (isBuy) {
           if (isMainToken) {
@@ -169,8 +171,8 @@ watch(() => userIds.value, () => {
 })
 
 const tableFilter = ref({
-  hide_risk: 1,
-  hide_small: 0,
+  hide_risk,
+  hide_small,
   user_ids: userIds.value
 })
 const loadingSwap = ref<{ [key: string]: boolean }>({})
