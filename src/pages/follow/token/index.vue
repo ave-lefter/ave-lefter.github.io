@@ -248,7 +248,7 @@ const getRowGroupChange = async (val: number, row: any) => {
 
 // 获取列表
 const getList = async () => {
-  loading.value=true
+  loading.value = true
   const res: any = await getNewFavoriteList({
     address: addressValue.value,
     group: activeTab.value,
@@ -269,7 +269,7 @@ const getList = async () => {
     []
   pageData.value.total = res.total
   tableList.value = tableData
-  loading.value=false
+  loading.value = false
 }
 
 // 获取分组列表
@@ -290,7 +290,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <div class="flex-1 h-[calc(100%-76px)] flex flex-col">
     <div v-if="botStore.evmAddress || walletStore.address"
       class="flex items-center px-12px mt-12px gap-8px overflow-x-auto scrollbar-hide">
       <div v-for="(item, index) in allTabsGroup" :key="item.value"
@@ -341,7 +341,7 @@ onMounted(() => {
         <template #reference>
           <!-- 新增 -->
           <div style="background: rgba(63, 128, 247, 0.10);" @click="editId = undefined"
-            class="cursor-pointer text-12px color-[#3F80F7] px-12px h-28px rounded-4px shrink-0 flex items-center">
+            class="cursor-pointer text-12px color-[#3F80F7] px-8px h-28px rounded-4px shrink-0 flex items-center">
             <Icon name="custom:add-icon" class="text-12px mr-2px" />
             {{ t('newGroup') }}
           </div>
@@ -365,7 +365,7 @@ onMounted(() => {
       <el-popover trigger="click" @hide="moveValue = ''" ref="moveGroupPopoverRef" :width="250">
         <template #reference>
           <div style="background: rgba(63, 128, 247, 0.10);" @click="handleMoveGroup"
-            class="cursor-pointer text-12px color-[#3F80F7] px-12px h-28px rounded-4px shrink-0 flex items-center">
+            class="cursor-pointer text-12px color-[#3F80F7] px-8px h-28px rounded-4px shrink-0 flex items-center">
             <Icon name="custom:list-icon" class="text-12px mr-2px" />
             {{ t('groupManage') }}
           </div>
@@ -394,158 +394,161 @@ onMounted(() => {
       </el-popover>
     </div>
 
-    <el-table class='mt-12px' v-loading="loading" height="calc(100vh - 250px)" :data="tableList" fit
-      @sort-change="handleSortChange" @row-click="tableRowClick">
-      <template #empty>
-        <div v-if="botStore.evmAddress || walletStore.address">
-          <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
-            <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
-            <img v-if="mode === 'dark'" src="@/assets/images/empty-black.svg">
-            <span>{{ t('emptyNoData') }}</span>
-          </div>
-          <span v-else />
-        </div>
-        <AveEmpty v-else>
-          <span class="text-12px mt-10px">{{ $t('noWalletTip') }}</span>
-          <el-button type="primary" class="mt-10px" @click="botStore.$patch({
-            connectVisible: true
-          })">
-            {{ $t('connectWallet') }}
-          </el-button>
-        </AveEmpty>
-      </template>
-
-      <el-table-column :label="t('poolPair')" min-width="160" show-overflow-tooltip>
-        <template #default="{ row, $index }">
-          <NuxtLink :to="`/token/${row.token}-${row.chain}`" @click.stop.prevent>
-            <div class="flex items-center">
-              <span class="text-[#999] text-10px mr-5px">
-                #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
-              </span>
-              <Icon v-if="addressValue" name="material-symbols:kid-star"
-                class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 color-#ffbb19"
-                @click.stop.prevent="collect(row)" />
-              <div class="relative ml-3px">
-                <el-image class="w-32px h-32px rounded-full" :src="getSymbolDefaultIcon({
-                  chain: row?.chain,
-                  symbol: row.symbol,
-                  logo_url: row.logo_url
-                })" lazy>
-                  <template #error>
-                    <img class="w-32px h-32px rounded-full" :src="getChainDefaultIcon(row?.chain, row.symbol)" />
-                  </template>
-                  <template #placeholder>
-                    <img class="w-32px h-32px rounded-full" :src="getChainDefaultIcon(row?.chain, row.symbol)" />
-                  </template>
-                </el-image>
-                <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px"
-                  :src="`${configStore.token_logo_url}chain/${row?.chain}.png`" alt=""
-                  onerror="this.src='/icon-default.png'" srcset="" />
-              </div>
-              <div class="ml-5px">
-                <div class="flex items-center">
-                  <span class="text-13px">{{ row.symbol }}</span>
-                  <div class="text-12px text-[--d-666-l-999] ml-4px">
-                    {{ `[*${row?.token?.slice(-6)}]` }}
-                  </div>
-                  <Icon @click.stop.prevent v-copy="row?.token" name="bxs:copy"
-                    class="ml-4px clickable text-[--d-666-l-999]" />
-
-                  <a class="ml-4px"
-                    :href="`https://x.com/search?q=(${row?.symbol}OR${row?.token})&src=typed_query&f=live`"
-                    target="_blank" @click.stop>
-                    <Icon class="text-[--d-666-l-999] h-12px w-12px" name="custom:search"/>
-                  </a>
-                </div>
-                <div class="flex items-center mt-2px">
-                  <!-- <span class="text-[--d-CCC-l-999]">({{ '*' + row.token?.slice(-4) }})</span> -->
-                  <span
-                    class="text-[#3f80f7] border-[0.5px] border-solid border-[#3f80f7] rounded-4px bg-transparent text-10px px-4px max-w-[60px] truncate"
-                    :title="row.remark" v-if="row.remark">{{ row.remark }}</span>
-                  <!-- 备注 -->
-                  <div ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
-                    <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px" name="custom:remark" />
-                  </div>
-                  <a class="flex items-center" v-if="row?.twitter" v-tooltip="row?.twitter" :href="row?.twitter"
-                    target="_blank" @click.stop>
-                    <Icon :name="`custom:twitter`" class="text-[--d-666-l-999] h-14px w-14px ml-4px" />
-                  </a>
-                  <a class="flex items-center" v-if="row?.telegram" v-tooltip="row?.telegram" :href="row?.telegram"
-                    target="_blank" @click.stop>
-                    <Icon :name="`custom:tg`" class="text-[--d-666-l-999] h-14px w-14px ml-4px" />
-                  </a>
-                </div>
-              </div>
+    <div class="w-100% mt-12px flex-1 overflow-hidden">
+      <el-table v-loading="loading" :height="pageData.total > 50 ? 'calc(100% - 72px)' : '100%'" :data="tableList" fit
+        @sort-change="handleSortChange" @row-click="tableRowClick">
+        <template #empty>
+          <div v-if="botStore.evmAddress || walletStore.address">
+            <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
+              <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
+              <img v-if="mode === 'dark'" src="@/assets/images/empty-black.svg">
+              <span>{{ t('emptyNoData') }}</span>
             </div>
-          </NuxtLink>
+            <span v-else />
+          </div>
+          <AveEmpty v-else>
+            <span class="text-12px mt-10px">{{ $t('noWalletTip') }}</span>
+            <el-button type="primary" class="mt-10px" @click="botStore.$patch({
+              connectVisible: true
+            })">
+              {{ $t('connectWallet') }}
+            </el-button>
+          </AveEmpty>
         </template>
-      </el-table-column>
-      <el-table-column :label="t('holders')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
-        prop="holders" align="right">
-        <template #default="{ row }">
-          <span>
-            {{ row.holders }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="t('price')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
-        prop="current_price_usd" align="right">
-        <template #default="{ row }">
-          <span v-html="'$' + formatNumber2(row.current_price_usd)"></span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="t('marketCap')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
-        prop="pool_circulating_supply" align="right">
-        <template #default="{ row }">
-          ${{ formatNumber2(row.pool_circulating_supply || 0, 2, 4, 10 ** 4) }}
-        </template>
-      </el-table-column>
-      <el-table-column label="24h%" sortable="custom" :sort-orders="['descending', 'ascending', null]"
-        prop="price_change_24h" align="right">
-        <template #default="{ row }">
-          <span v-if="Number(row.price_change_24h || 0) > 0" class="text-[#12b886]">
-            +{{ formatNumber2(row.price_change_24h || 0, 2) }}%
-          </span>
-          <span v-else-if="Number(row.price_change_24h || 0) == 0" class="text-[#848E9C]">
-            0%
-          </span>
-          <span v-else class="text-[#ff646d]">{{ formatNumber2(row.price_change_24h || 0, 2) }}%</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="t('riskScore')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
-        prop="risk_score" align="right">
-        <template #default="{ row }">
-          <router-link :to="{ path: `/check/${row.token}-${row.chain}` }" @click.stop>
-            <ArcProgress :progress="Number(row.risk_score / 100) || 0" :width="40" :thickness="2" :big="false"
-              :height="20" :textHeight="15" :end="true" fontSize="12px" class="arc-progress"></ArcProgress>
-          </router-link>
-        </template>
-      </el-table-column>
-      <el-table-column :label="t('24Volume')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
-        prop="tx_volume_u_24h" align="right">
-        <template #default="{ row }">
-          ${{ formatNumber2(row?.tx_volume_u_24h || 0, 2, 4, 10 ** 4) }}
-        </template>
-      </el-table-column>
-      <el-table-column :label="t('24TxAddress')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
-        prop="tx_count_24h" align="right">
-        <template #default="{ row }">
-          {{ formatNumber2(row?.tx_count_24h || 0, 2, 4, 10 ** 4) }}
-        </template>
-      </el-table-column>
-      <el-table-column :label="t('tokenGroup')" align="right" width="170">
-        <template #default="{ row }">
-          <el-select v-model="row.group_id" style="width: 100px;" popper-class="follow-select-popper" filterable
-            class="[&&]:[--el-text-color-regular:var(--d-CCC-l-333)]" @click.stop @change="(val) => getRowGroupChange(val, row)">
-            <el-option v-for="item in allTabsGroup" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </template>
-      </el-table-column>
-    </el-table>
 
-    <el-pagination class="mt-15px" v-if="pageData.total > 1" v-model:current-page="pageData.page"
-      v-model:page-size="pageData.pageSize" layout="prev, pager, next, ->" :total="pageData.total"
-      :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getList" />
+        <el-table-column :label="t('poolPair')" min-width="160" show-overflow-tooltip>
+          <template #default="{ row, $index }">
+            <NuxtLink :to="`/token/${row.token}-${row.chain}`" @click.stop.prevent>
+              <div class="flex items-center">
+                <span class="text-[--d-666-l-999] text-10px mr-5px">
+                  #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
+                </span>
+                <Icon v-if="addressValue" name="material-symbols:kid-star"
+                  class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 color-#ffbb19"
+                  @click.stop.prevent="collect(row)" />
+                <div class="relative ml-3px">
+                  <el-image class="w-32px h-32px rounded-full" :src="getSymbolDefaultIcon({
+                    chain: row?.chain,
+                    symbol: row.symbol,
+                    logo_url: row.logo_url
+                  })" lazy>
+                    <template #error>
+                      <img class="w-32px h-32px rounded-full" :src="getChainDefaultIcon(row?.chain, row.symbol)" />
+                    </template>
+                    <template #placeholder>
+                      <img class="w-32px h-32px rounded-full" :src="getChainDefaultIcon(row?.chain, row.symbol)" />
+                    </template>
+                  </el-image>
+                  <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px"
+                    :src="`${configStore.token_logo_url}chain/${row?.chain}.png`" alt=""
+                    onerror="this.src='/icon-default.png'" srcset="" />
+                </div>
+                <div class="ml-5px">
+                  <div class="flex items-center">
+                    <span class="text-13px">{{ row.symbol }}</span>
+                    <div class="text-12px text-[--d-666-l-999] ml-4px">
+                      {{ `[*${row?.token?.slice(-6)}]` }}
+                    </div>
+                    <Icon @click.stop.prevent v-copy="row?.token" name="bxs:copy"
+                      class="ml-4px clickable text-[--d-666-l-999] text-12px" />
+
+                    <a class="ml-4px flex items-center"
+                      :href="`https://x.com/search?q=(${row?.symbol}OR${row?.token})&src=typed_query&f=live`"
+                      target="_blank" @click.stop>
+                      <Icon class="text-[--d-666-l-999] h-12px w-12px text-12px" name="custom:search" />
+                    </a>
+                  </div>
+                  <div class="flex items-center mt-2px">
+                    <!-- <span class="text-[--d-CCC-l-999]">({{ '*' + row.token?.slice(-4) }})</span> -->
+                    <span
+                      class="text-[#3f80f7] border-[0.5px] border-solid border-[#3f80f7] rounded-4px bg-transparent text-10px px-4px max-w-[60px] truncate"
+                      :title="row.remark" v-if="row.remark">{{ row.remark }}</span>
+                    <!-- 备注 -->
+                    <div ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
+                      <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px" name="custom:remark" />
+                    </div>
+                    <a class="flex items-center" v-if="row?.twitter" v-tooltip="row?.twitter" :href="row?.twitter"
+                      target="_blank" @click.stop>
+                      <Icon :name="`custom:twitter`" class="text-[--d-666-l-999] h-14px w-14px ml-4px" />
+                    </a>
+                    <a class="flex items-center" v-if="row?.telegram" v-tooltip="row?.telegram" :href="row?.telegram"
+                      target="_blank" @click.stop>
+                      <Icon :name="`custom:tg`" class="text-[--d-666-l-999] h-14px w-14px ml-4px" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </NuxtLink>
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('holders')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
+          prop="holders" align="right">
+          <template #default="{ row }">
+            <span>
+              {{ row.holders }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('price')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
+          prop="current_price_usd" align="right">
+          <template #default="{ row }">
+            <span v-html="'$' + formatNumber2(row.current_price_usd)"></span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('marketCap')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
+          prop="pool_circulating_supply" align="right">
+          <template #default="{ row }">
+            ${{ formatNumber2(row.pool_circulating_supply || 0, 2, 4, 10 ** 4) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="24h%" sortable="custom" :sort-orders="['descending', 'ascending', null]"
+          prop="price_change_24h" align="right">
+          <template #default="{ row }">
+            <span v-if="Number(row.price_change_24h || 0) > 0" class="text-[#12b886]">
+              +{{ formatNumber2(row.price_change_24h || 0, 2) }}%
+            </span>
+            <span v-else-if="Number(row.price_change_24h || 0) == 0" class="text-[#848E9C]">
+              0%
+            </span>
+            <span v-else class="text-[#ff646d]">{{ formatNumber2(row.price_change_24h || 0, 2) }}%</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('riskScore')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
+          prop="risk_score" align="right">
+          <template #default="{ row }">
+            <router-link :to="{ path: `/check/${row.token}-${row.chain}` }" @click.stop>
+              <ArcProgress :progress="Number(row.risk_score / 100) || 0" :width="40" :thickness="2" :big="false"
+                :height="20" :textHeight="15" :end="true" fontSize="12px" class="arc-progress"></ArcProgress>
+            </router-link>
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('24Volume')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
+          prop="tx_volume_u_24h" align="right">
+          <template #default="{ row }">
+            ${{ formatNumber2(row?.tx_volume_u_24h || 0, 2, 4, 10 ** 4) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('24TxAddress')" sortable="custom" :sort-orders="['descending', 'ascending', null]"
+          prop="tx_count_24h" align="right">
+          <template #default="{ row }">
+            {{ formatNumber2(row?.tx_count_24h || 0, 2, 4, 10 ** 4) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('tokenGroup')" align="right" width="170">
+          <template #default="{ row }">
+            <el-select v-model="row.group_id" placement="bottom-end" style="width: 100px;"
+              popper-class="follow-select-popper" filterable class="[&&]:[--el-text-color-regular:var(--d-CCC-l-333)]"
+              @click.stop @change="(val) => getRowGroupChange(val, row)">
+              <el-option v-for="item in allTabsGroup" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <el-pagination class="h-72px flex justify-end items-center" v-if="pageData.total > 1"
+        v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" layout="prev, pager, next, ->"
+        :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" hide-on-single-page @change="getList" />
+    </div>
 
     <el-popover :visible="visibleShow" :virtual-ref="virtualRef" virtual-triggering trigger="click" :width="250">
       <div>
@@ -591,6 +594,10 @@ onMounted(() => {
 </style>
 
 <style lang="scss" scoped>
+:deep(.el-table.el-table thead .el-table__cell) {
+  height: 40px;
+}
+
 :deep(.el-table .cell) {
   font-size: 12px !important;
   padding: 0 16px;
