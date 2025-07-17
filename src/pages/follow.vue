@@ -66,7 +66,6 @@ ul.w-tabs{
     background-color:var(--d-1A1A1A-l-F2F2F2);
     justify-content: center;
     align-items: center;
-    color: #666;
     border-radius: 4px;
     &.active{
       color: #f5f5f5;

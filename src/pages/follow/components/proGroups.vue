@@ -5,7 +5,7 @@
     </li>
     <template v-if="props.options.length > 0">
       <li 
-        v-for="item in props.options" :key="item.group_id" class="clickable flex gap-2px color-[var--d-999-l-666]"
+        v-for="item in props.options" :key="item.group_id" class="clickable flex gap-2px text-[var(--d-666-l-999)]"
         :class="{ active: props.modelValue === item.group_id }"
         @click.stop.prevent="emit('update:modelValue', item.group_id)">
         <!-- <el-input 
@@ -248,7 +248,6 @@ ul.w-tabs {
     background-color: var(--d-1A1A1A-l-F2F2F2);
     justify-content: center;
     align-items: center;
-    color: #666;
     border-radius: 4px;
 
     &.active {
