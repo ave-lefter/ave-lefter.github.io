@@ -535,7 +535,7 @@ onMounted(() => {
       </el-table-column>
       <el-table-column :label="t('tokenGroup')" align="right" width="170">
         <template #default="{ row }">
-          <el-select v-model="row.group_id" style="width: 100px;" popper-class="follow-select-popper" filterable
+          <el-select v-model="row.group_id" placement="bottom-end" style="width: 100px;" popper-class="follow-select-popper" filterable
             class="[&&]:[--el-text-color-regular:var(--d-CCC-l-333)]" @click.stop @change="(val) => getRowGroupChange(val, row)">
             <el-option v-for="item in allTabsGroup" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
