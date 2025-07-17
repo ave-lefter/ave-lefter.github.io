@@ -114,7 +114,7 @@
                 </span>
               </div>
             </template>
-            <div v-if="medias?.length > 0" class="flex text-10px">
+            <div v-if="medias?.length > 0" class="flex text-20px">
               <div v-for="(item, index) in medias" :key="index" class="tag-btn">
                 <template v-if="item.url">
                   <span
@@ -124,7 +124,7 @@
                   >
                     <Icon
                       :name="`custom:${item.icon}`"
-                      class="text-[--d-666-l-999] h-10px"
+                      class="text-[--d-666-l-999] text-12px"
                     />
                   </span>
                   <a
@@ -137,7 +137,7 @@
                   >
                     <Icon
                       :name="`custom:${item.icon}`"
-                      class="text-[--d-666-l-999] h-10px"
+                      class="text-[--d-666-l-999] text-12px"
                     />
                   </a>
                 </template>
@@ -146,10 +146,11 @@
             <img
               v-if="token?.launchpad"
               v-tooltip="token.launchpad"
-              class="bg-btn cursor-pointer"
+              class="rounded-100% bg-btn cursor-pointer"
               :src="formatIconTag(token.launchpad)"
               alt=""
-              :width="10"
+              :width="12"
+              style="border-radius: 100%"
             >
             <a
               class="media-item bg-btn"
@@ -158,7 +159,7 @@
             >
               <Icon
                 class="text-[--d-666-l-999] h-16px w-10px"
-                name="ep:search"
+                name="custom:search"
               />
             </a>
             <a
@@ -185,7 +186,7 @@
             <template #reference>
               <a class="w-zu flex-start bg-btn" href="" @click.stop.prevent>
                 <Icon
-                  class="text-[--d-666-l-999] h-12px"
+                  class="text-[--d-666-l-999] text-12px"
                   name="custom:groups"
                 />
                 <span class="ml-2px ellipsis block" style="max-width: 140px">
@@ -237,7 +238,7 @@
                     "
                     :color="theme !== 'dark' ? '#222222' : '#f5f5f5'"
                     @click.stop="
-                      confirmSwitchGroup(id, selectedGroup, evmAddress)
+                      confirmSwitchGroup(id, selectedGroup, walletAddress)
                     "
                   >
                     {{ $t('confirm') }}
@@ -258,7 +259,7 @@
             <template #reference>
               <a class="w-zu flex-start bg-btn" href="" @click.stop.prevent>
                 <Icon
-                  class="text-[--d-666-l-999] h-12px"
+                  class="text-[--d-666-l-999] text-12px"
                   name="custom:remark"
                 />
                 <span class="ml-2px ellipsis block" style="max-width: 140px">{{
@@ -308,6 +309,7 @@
               </div>
             </template>
           </el-popover>
+          <DeBox/>
         </div>
         <div class="text-12px font-500 flex items-center mt-4px">
           <a
@@ -682,6 +684,7 @@
 import Top50 from './top50.vue'
 import Run from './run.vue'
 import Check from './check.vue'
+import DeBox from './deBox.vue'
 import {
   getSymbolDefaultIcon,
   getChainDefaultIcon,
@@ -762,6 +765,10 @@ function handleFavDialogEvent({ tokenId, type, groupId }: IFavDialogEventArgs) {
   }
 }
 
+const walletStore = useWalletStore()
+const walletAddress = computed(() => {
+  return evmAddress.value || walletStore.address
+})
 const {
   statistics_risk_store,
   statistics_warning_store,
@@ -822,7 +829,7 @@ const chain = computed(() => {
 // console.log('-------tokenInfo---------', tokenInfo)
 // console.log('-------token---------', token)
 onMounted(() => {
-  if (evmAddress.value) {
+  if (walletAddress.value) {
     getTokenFavoriteCheck()
     getTokenUserFavoriteGroups() //获取分组数组
   }
@@ -831,7 +838,7 @@ onMounted(() => {
     getRugPull()
   }
 })
-watch(evmAddress, (val) => {
+watch(walletAddress, (val) => {
   if (val) {
     getTokenFavoriteCheck()
     getTokenUserFavoriteGroups() //获取分组数组
@@ -846,7 +853,7 @@ watch(evmAddress, (val) => {
 watch(
   () => route.params.id,
   () => {
-    if (evmAddress.value) {
+    if (walletAddress.value) {
       getTokenFavoriteCheck()
       getTokenUserFavoriteGroups() //获取分组数组
     }
@@ -860,7 +867,7 @@ const collected = shallowRef(false)
 const loading = shallowRef(false)
 
 function getTokenFavoriteCheck() {
-  getFavoriteCheck(id.value, evmAddress.value)
+  getFavoriteCheck(id.value, walletAddress.value)
     .then((res) => {
       collected.value = res?.address ? true : false
       remark.value = res?.remark || ''
@@ -875,7 +882,7 @@ function getTokenFavoriteCheck() {
 }
 function addTokenFavorite() {
   loading.value = true
-  addFavorite(id.value, evmAddress.value)
+  addFavorite(id.value, walletAddress.value)
     .then(() => {
       ElMessage.success(t('collected'))
       collected.value = true
@@ -890,7 +897,7 @@ function addTokenFavorite() {
 }
 function removeTokenFavorite() {
   loading.value = true
-  removeFavorite(id.value, evmAddress.value)
+  removeFavorite(id.value, walletAddress.value)
     .then(() => {
       ElMessage.success(t('cancelled1'))
       collected.value = false
@@ -903,8 +910,12 @@ function removeTokenFavorite() {
       loading.value = false
     })
 }
-function collect() {
-  if (evmAddress.value) {
+
+async function collect() {
+  if (walletAddress.value) {
+    if (walletStore.address) {
+      await walletStore.signMessageForFavorite()
+    }
     if (collected.value) {
       removeTokenFavorite()
     } else {
@@ -917,7 +928,7 @@ function collect() {
 async function getTokenUserFavoriteGroups() {
   try {
     loadingGroup.value = true
-    const res = await getUserFavoriteGroups(evmAddress.value)
+    const res = await getUserFavoriteGroups(walletAddress.value)
     userFavoriteGroups.value = (res || []).filter(
       (el) => !!el.name && el.type === 'token'
     )
@@ -964,14 +975,14 @@ function handleReset() {
   }
 }
 function confirmEditRemark(tokenId: string, remark2: string) {
-  if (!evmAddress.value) {
+  if (!walletAddress.value) {
     verifyLogin()
     return
   }
   if (remark2?.length > 50) {
     return ElMessage.error(t('maximum10characters'))
   }
-  editTokenFavRemark(tokenId, remark2, evmAddress.value)
+  editTokenFavRemark(tokenId, remark2, walletAddress.value)
     .then(() => {
       ElMessage.success(t('success'))
       remark.value = remark2
@@ -1172,7 +1183,6 @@ function getRugPull() {
         ...i,
         rate: Number(i.rate?.toFixed(1) || 0),
       }))
-      console.log('-----getRugPull------', rugPull.value)
     })
     .catch((err) => {
       console.log(err)

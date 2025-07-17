@@ -2,8 +2,14 @@
 import Transactions from './transactions/transactions.vue'
 import OrdersTab from './orders/index.vue'
 import OneClick from '../right/botSwap/oneClick.vue'
+import OrderBookButton from '../right/botSwap/orderBookButton.vue'
 import Bubble from './holders/new/bubble.vue'
 import { useBotStore } from '@/stores/bot'
+
+
+
+// 订单簿状态 - 通过 provide/inject 与父组件通信
+const orderBookVisible = inject<Ref<boolean>>('orderBookVisible', ref(false))
 const { globalConfig } = storeToRefs(useConfigStore())
 const route = useRoute()
 const tokenStore = useTokenStore()
@@ -16,7 +22,7 @@ const components = {
   Holders: defineAsyncComponent(() => import('./holders/index.vue')),
   LP: defineAsyncComponent(() => import('./lp/index.vue')),
   Attention: '',
-  // Orders: defineAsyncComponent(() => import('./orders/index.vue')),
+  Orders: defineAsyncComponent(() => import('./orders/index.vue')),
   MySwap: defineAsyncComponent(() => import('./mySwap/index.vue')),
 }
 const tabs = computed(() => {
@@ -48,9 +54,39 @@ watch(
   }
 )
 
+// 保存订单薄打开前的标签状态
+const previousTab = ref<keyof typeof components>('Transactions')
+
+// 监听 orderBook 显示状态变化
+watch(
+  () => orderBookVisible.value,
+  (isVisible) => {
+    console.log('🔄 订单薄状态变化:', isVisible ? '打开' : '关闭')
+    if (isVisible) {
+      // 当 orderBook 打开时，保存当前标签并切换到其他标签
+      if (activeTab.value === 'Transactions') {
+        previousTab.value = 'Transactions'
+        activeTab.value = 'Holders'
+      } else if (activeTab.value === 'Orders') {
+        previousTab.value = 'Orders'
+        activeTab.value = 'Holders'
+      }
+    } else {
+      // 当 orderBook 关闭时，恢复到之前的标签（默认为 Transactions）
+      activeTab.value = previousTab.value || 'Transactions'
+      console.log('🔄 恢复到标签:', activeTab.value)
+    }
+  },
+  { immediate: true }
+)
+
 const tabsList = computed(() => {
   return tabs.value.filter(item => {
     if (item.component === 'Orders' && !botStore?.userInfo?.evmAddress) {
+      return false
+    }
+    // 当 orderBook 显示时，隐藏 Transactions tab
+    if (item.component === 'Transactions' && orderBookVisible.value) {
       return false
     }
     return true
@@ -130,6 +166,8 @@ const comProps = computed(() => {
           </span>
         </div>
       </a>
+      <div class="flex-1" />
+      <OrderBookButton v-model="orderBookVisible" />
       <OneClick />
       <Bubble />
     </div>
@@ -149,4 +187,4 @@ const comProps = computed(() => {
   --custom-br-1-color: #33353D;
 }
 </style>
-<style scoped></style>
+

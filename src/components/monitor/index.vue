@@ -10,7 +10,7 @@
           active-value="1"
           inactive-value="0"/>
         <pro-tag size="small" class="cursor-pointer" @click="toggleMc=!toggleMc">Vol/MC <Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
-        <el-button size="small" @click="addWallet" style="height: 20px;color: var(--d-999-l-222) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
+        <el-button size="small" style="height: 20px;color: var(--d-999-l-222) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
           <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
           {{ $t('addWallet') }}
         </el-button>
@@ -33,7 +33,7 @@
         row-class='cursor-pointer'
         :rowEventHandlers="{
         onClick: (row:any)=>jumpToken(row)
-      }"> 
+      }">
         <template #header-wallet>
           <span>{{ $t('wallet') }}</span>
         </template>

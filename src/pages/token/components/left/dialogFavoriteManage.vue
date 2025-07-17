@@ -20,7 +20,11 @@ const props = defineProps({
 })
 const favDialogEvent = useEventBus(BusEventType.FAV_DIALOG)
 const {t} = useI18n()
-const {evmAddress} = useBotStore()
+const botStore = useBotStore()
+const walletStore = useWalletStore()
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
 const tokenStore = useTokenStore()
 const activeTab = shallowRef(0)
 const favoritesList = shallowRef<GetFavListResponse[]>([])
@@ -39,7 +43,7 @@ function setActiveTab(val: number) {
   resetAndGet()
 }
 
-watch(() => [evmAddress, props.visible], () => {
+watch(() => [walletAddress.value, props.visible], () => {
   resetAndGet()
 })
 
@@ -49,7 +53,7 @@ async function _getFavoriteList() {
   }
   try {
     listStatus.value.loading = true
-    const res = await getFavoriteList(activeTab.value, listStatus.value.pageNo, evmAddress)
+    const res = await getFavoriteList(activeTab.value, listStatus.value.pageNo, walletAddress.value)
     const newItems = (res || []).map(i => ({
       ...i,
       id: i.token + '-' + i.chain,
@@ -81,7 +85,7 @@ async function confirmSwitchGroup(row: GetFavListResponse, id: number) {
   try {
     const tokenId = row.token + '-' + row.chain
     await moveFavoriteGroup(
-      tokenId, id, evmAddress
+      tokenId, id, walletAddress.value
     )
     ElMessage.success(t('success'))
     resetAndGet()
@@ -104,7 +108,7 @@ async function tokenSetTop(item: GetFavListResponse, index: number) {
     await changeFavoritesTop(
       tokenId,
       activeTab.value,
-      evmAddress
+      walletAddress.value
     )
     ElMessage.success(t('success'))
     resetAndGet()
@@ -127,7 +131,7 @@ async function _changeFavoritesIndex(item: GetFavListResponse, index: number, di
   const item1 = favoritesList.value[j]
   const id1 = item1.token + '-' + item1.chain
   try {
-    await changeFavoritesIndex(id, id1, activeTab.value, evmAddress)
+    await changeFavoritesIndex(id, id1, activeTab.value, walletAddress.value)
     ElMessage.success(t('success'))
     resetAndGet()
     favDialogEvent.emit({
@@ -163,7 +167,7 @@ async function handleEditRemark(item: GetFavListResponse) {
 
 async function confirmEditRemark(remark: string, tokenId: string, item: GetFavListResponse) {
   try {
-    await editTokenFavRemark(tokenId, remark, evmAddress)
+    await editTokenFavRemark(tokenId, remark, walletAddress.value)
     item.remark = remark
     triggerRef(favoritesList)
     ElMessage.success(t('success'))

@@ -214,7 +214,7 @@ export default defineNuxtConfig({
     workbox: {
       navigateFallback: null,
       globPatterns: ['**/*.{js,css,ico,png,jpg,jpeg,svg,webp,json,woff2,otf,ttf,woff}'],
-      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 设置为 3 MiB
+      maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 设置为 3 MiB
       cleanupOutdatedCaches: true,
       runtimeCaching: [
         {

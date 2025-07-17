@@ -30,8 +30,9 @@
         <ul class="tg-wallet-list_content">
           <el-scrollbar :max-height="300">
             <li
-              v-for="(item, index) in botStore?.userInfo?.addresses || []" :key="index" class="clickable"
-              @click.stop="$router.push({ name: 'Balance', params: { chain: item.chain, userAddress: item.address } }); tgWalletVisible = false">
+              v-for="(item, index) in botStore?.userInfo?.addresses || []"
+              :key="index" class="clickable"
+              @click.stop="navigateToWallet(item.address, item.chain)">
               <img :src="`${token_logo_url}chain/${item.chain}.png`" class="mr-5px border-rd-[50%]" height="32" alt="">
               <div>
                 <div class="text-16px">{{ getChainInfo(item.chain)?.name }}</div>
@@ -61,7 +62,7 @@
           </div>
           <el-button
             style="width: 100%;margin-top: 8px; color: #959A9F;" size="large" color="#333333"
-            @click.stop="botStore.logout(); tgWalletVisible = false">{{ t('logout') }}</el-button>
+            @click.stop="walletStore.disconnect(); tgWalletVisible = false">{{ t('logout') }}</el-button>
         </div>
       </div>
       <div v-show="showVisible === 1" class="tg-wallet-list">
@@ -219,6 +220,7 @@ import doubleCheck from './doubleCheck.vue'
 const { mode, token_logo_url } = storeToRefs(useGlobalStore())
 const { t } = useI18n()
 const botStore = useBotStore()
+const walletStore = useWalletStore()
 // const route = useRoute()
 // const router = useRouter()
 
@@ -338,6 +340,14 @@ onMounted(() => {
   getTransferGasFee()
 })
 
+function navigateToWallet (path: string, chain:string) {
+  // if(chain === 'solana' || chain === 'bsc') {
+    path = `/address/${path}/${chain}`
+    navigateTo(path)
+  // } else {
+  //   window.open(`https://ave.ai/address/${path}/${chain}`, '_blank')
+  // }
+}
 function switchWallet(item: any) {
   // Implement wallet switching logic here, for example:
   botStore.switchWallet(item.evmAddress)

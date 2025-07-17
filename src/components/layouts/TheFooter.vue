@@ -1,5 +1,5 @@
 <template>
-  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-9999">
+  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-2">
     <div class="left gap-12px">
       <NuxtLink
         v-for="item in newData" :key="item.symbol || item.logo_url"
@@ -90,7 +90,7 @@
         </a>
       </li>
     </ul>
-    <Monitor/> 
+    <Monitor/>
     <Batch @refresh="()=>{}"/>
   </footer>
 </template>
@@ -137,7 +137,6 @@ const initPage = () => {
   // Initialize the page or perform any setup tasks
   getTokensPrice(ids).then((res) => {
     //WETH BTCB SOL
-    console.log('getTokensPrice',res)
     const newVal = res.map((i, index) => {
       const symbol = {WETH: 'ETH', BTCB: 'BTC', WBNB: 'BNB', SOL: 'SOL'}[i.symbol as string] || i.symbol
       return {

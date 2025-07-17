@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import {getHotTokens, type GetHotTokensResponse} from '~/api/token'
+// import {getHotTokens, type GetHotTokensResponse} from '~/api/token'
 import THead from './tHead.vue'
 import {formatNumber} from '~/utils/formatNumber'
 import TokenImg from '~/components/tokenImg.vue'
-import type {IPriceV2Response} from '~/api/types/ws'
-import {ProvideType} from '~/utils/constants'
-import {getMCap} from '~/utils'
+// import type {IPriceV2Response} from '~/api/types/ws'
+// import {ProvideType} from '~/utils/constants'
+import { getMCap } from '~/utils'
 
 defineProps({
   finalHeight: {
@@ -15,20 +15,24 @@ defineProps({
 })
 const {t} = useI18n()
 onMounted(() => {
-  _getHotTokens()
+  // _getHotTokens()
 })
 
+const { hotList } = storeToRefs(useGlobalStore())
 const sort = shallowRef({
   activeSort: 0,
   sortBy: '' as 'current_price_usd' | 'price_change' | 'mcap' | 'symbol'
 })
-const wsStore = useWSStore()
-const priceV2Store = usePriceV2Store()
-const hotTokens = inject<{
-  value: Ref<GetHotTokensResponse[]>;
-  setVal: (val: GetHotTokensResponse[]) => void
-}>(ProvideType.HOT_TOKENS)
-const listData = shallowRef<GetHotTokensResponse[]>([])
+// const wsStore = useWSStore()
+// const priceV2Store = usePriceV2Store()
+// const hotTokens = inject<{
+//   value: Ref<GetHotTokensResponse[]>;
+//   setVal: (val: GetHotTokensResponse[]) => void
+// }>(ProvideType.HOT_TOKENS)
+// const listData = shallowRef<GetHotTokensResponse[]>([])
+const listData = computed(() => {
+  return hotList.value || []
+})
 const sortedHotList = computed(() => {
   const {activeSort, sortBy} = sort.value
   if (activeSort === 0 || !sortBy) {
@@ -65,41 +69,41 @@ const columns = computed(() => {
   }]
 })
 
-watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
-  const idToPriceMap: { [key: string]: IPriceV2Response['prices'][0] } = {}
-  val.prices.forEach((item) => {
-    idToPriceMap[item.token + '-' + item.chain] = item
-  })
-  listData.value = listData.value.map(el => {
-    const current = idToPriceMap[el.token + '-' + el.chain]
-    if (current) {
-      return {
-        ...el,
-        current_price_usd: current.uprice,
-        price_change: current.price_change
-      }
-    }
-    return el
-  })
-  if (hotTokens) {
-    hotTokens.setVal(listData.value)
-  }
-})
+// watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
+//   const idToPriceMap: { [key: string]: IPriceV2Response['prices'][0] } = {}
+//   val.prices.forEach((item) => {
+//     idToPriceMap[item.token + '-' + item.chain] = item
+//   })
+//   listData.value = listData.value.map(el => {
+//     const current = idToPriceMap[el.token + '-' + el.chain]
+//     if (current) {
+//       return {
+//         ...el,
+//         current_price_usd: current.uprice,
+//         price_change: current.price_change
+//       }
+//     }
+//     return el
+//   })
+//   if (hotTokens) {
+//     hotTokens.setVal(listData.value)
+//   }
+// })
 
-async function _getHotTokens() {
-  try {
-    const res = await getHotTokens()
-    listData.value = res || []
-    if (hotTokens) {
-      hotTokens.setVal(listData.value)
-    }
-    priceV2Store.setMultiPriceParams('trending', listData.value.map(el => el.token + '-' + el.chain))
-    priceV2Store.sendPriceWs()
-  } catch (e) {
-    console.log('=>(trending.vue:15) e', e)
+// async function _getHotTokens() {
+//   try {
+//     const res = await getHotTokens()
+//     listData.value = res || []
+//     if (hotTokens) {
+//       hotTokens.setVal(listData.value)
+//     }
+//     priceV2Store.setMultiPriceParams('trending', listData.value.map(el => el.token + '-' + el.chain))
+//     priceV2Store.sendPriceWs()
+//   } catch (e) {
+//     console.log('=>(trending.vue:15) e', e)
 
-  }
-}
+//   }
+// }
 </script>
 
 <template>

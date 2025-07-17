@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<{
   buttonBg?: string,
   mainNameVisible?: boolean
   classNames?: string,
-  size?: Size
+  size?: string
 }>(), {
   appendTo: '#__nuxt',
   buttonBg: 'rgba(18, 184, 134, 0.15)',
@@ -202,7 +202,7 @@ async function getTokenBalance(chain: string) {
     :class="classNames"
     style="--el-button-hover-bg-color:rgba(18, 184, 134, 0.3);--el-color-black: #12B886; --el-button-border-color: transparent; --el-button-hover-border-color: transparent;--el-button-disabled-text-color: #12B886;--el-button-disabled-border-color: transparent;--el-button-disabled-bg-color: #12B8861A;"
     :style="{ 'font-size': getSwapSize(size as Size).text }"
-    @click="submitBotSwap"
+    @click.stop.prevent="submitBotSwap"
   >
     <Icon
     :style="{ 'font-size': getSwapSize(size as Size).flash }"

@@ -23,7 +23,8 @@
         </div>
       </div> -->
         <div class="p-15px bg-[--d-111-l-FFF] mt-1px">
-          <BotSwap />
+          <!-- <BotSwap /> -->
+          <component :is="SwapCom" />
         </div>
         <div class="p-15px pb-5px bg-[--d-111-l-FFF] mt-1px">
           <Pairs />
@@ -42,6 +43,17 @@ import PriceTabs from './priceTabs.vue'
 import Pairs from './pairs.vue'
 import Overview from './overview.vue'
 import BotSwap from './botSwap/index.vue'
+const Swap = defineAsyncComponent(() => import('./swap/index.vue'))
+
+const walletStore = useWalletStore()
+
+const SwapCom = computed(() => {
+  if (walletStore.address) {
+    return Swap
+  } else {
+    return BotSwap
+  }
+})
 const VolumeStats = defineAsyncComponent(() => import('./volumeStats.vue'))
 const tabs: { id: '5m' | '1h' | '4h' | '24h'; name: string }[] = [
   { id: '5m', name: '5M' },

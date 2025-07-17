@@ -25,7 +25,7 @@
         class="w-100% mt-15px border-transparent! bg-[rgb(63,128,247,0.16)]! color-#3F80F7! h-38px!"
         size="large"
         type="primary"
-        @click.stop="walletStore.disconnectEvmWallet()"
+        @click.stop="walletStore.disconnect()"
       >
         {{ $t('disconnect') }}
       </el-button>

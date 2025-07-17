@@ -47,7 +47,7 @@ const props = defineProps<{
 }>()
 
 const {
-  wallet_logo = { logo: '', name: '', url: '' },
+  wallet_logo = {logo: '', name: '', url: ''},
   address = '',
   chain = '',
   iconSize = '16px',

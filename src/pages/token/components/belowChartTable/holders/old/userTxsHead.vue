@@ -151,7 +151,7 @@ const profitItems = computed(() => [
   {
     label: `${t('tokenValue')}${
       tokenInfoExtra?.value?.sell_tax ?? 0 > 0
-        ? ` (-${t('sellTax1')} ${formatNumber2(
+        ? ` (-${t('sellTax1')} ${formatNumber(
             tokenInfoExtra?.value?.sell_tax || 0,
             2
           )}%)`
@@ -200,7 +200,6 @@ async function getTokenBalance() {
     if (id) {
       const { chain } = getAddressAndChainFromId(id)
       const res = await getUserBalances(id, [props.userAddress + '-' + chain])
-      console.log('----------res--------', res)
       if (res && res[0]) {
         const { value } = res[0]
         balance.value = value
