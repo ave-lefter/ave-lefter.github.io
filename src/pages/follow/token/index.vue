@@ -323,7 +323,7 @@ onMounted(() => {
               <el-input v-model="groupValue" :placeholder="t('enterGroupName')" class="mt-8px w-100%" />
               <div class="flex items-center justify-between mt-12px gap-12px">
                 <div @click="editGroupPopoverRef[index]?.hide()"
-                  class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[--d-333-l-0A0B0C] px-12px py-8px rounded-4px">
+                  class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
                   {{ t('cancel') }}
                 </div>
                 <div @click="handleUpdateGroupConfirm(item, index)"
@@ -349,10 +349,10 @@ onMounted(() => {
         <div>
           <div>{{ t('newGroup') }}</div>
           <el-input ref="addGroupInputRef" v-model="groupValue" :placeholder="t('enterGroupName')"
-            class="mt-8px w-200px" />
+            class="mt-8px w-100%" />
           <div class="flex items-center justify-between mt-12px gap-12px">
             <div @click="addGroupPopoverRef?.hide()"
-              class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[--d-333-l-0A0B0C] px-12px py-8px rounded-4px">
+              class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
               {{ t('cancel') }}
             </div>
             <div @click="handleAddGroup()"
@@ -382,7 +382,7 @@ onMounted(() => {
           </VueDraggableNext>
           <div class="flex items-center justify-between mt-12px gap-12px">
             <div @click="moveGroupPopoverRef?.hide()"
-              class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[--d-333-l-0A0B0C] px-12px py-8px rounded-4px">
+              class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
               {{ t('cancel') }}
             </div>
             <div @click="handleMoveGroupConfirm"
@@ -554,10 +554,10 @@ onMounted(() => {
       <div>
         <div>{{ t('editRemark') }}</div>
         <el-input v-model="remarkValue" clearable maxlength="50" show-word-limit :placeholder="t('enterRemark')"
-          class="mt-8px w-200px" />
+          class="mt-8px w-100%" />
         <div class="flex items-center justify-between mt-12px gap-12px">
           <div @click="visibleShow = false"
-            class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[--d-333-l-0A0B0C] px-12px py-8px rounded-4px">
+            class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
             {{ t('cancel') }}
           </div>
           <div @click="handleRemarkGroup(rowData)"

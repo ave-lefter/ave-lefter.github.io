@@ -148,7 +148,7 @@ const handleSortChange = ({ prop, order }: any) => {
 }
 
 // 取消收藏
-const collect = async (row: any, index: number) => {
+const collect = async (row: any) => {
   if (walletStore.address && !walletStore.walletSignature[walletStore.address]) {
     await walletStore.signMessageForFavorite()
   }
@@ -257,15 +257,15 @@ onMounted(() => {
               :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
             <div class="ml-5px h-32px flex flex-col justify-between">
               <div class="flex items-center">
-                <UserRemark :key="`${row.user_address}-${row.user_chain}`" :remark="row.remark"
+                <!-- <UserRemark :key="`${row.user_address}-${row.user_chain}`" :remark="row.remark"
                   :address="row.user_address" :chain="row.user_chain"
                   addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 85px"
                   :iconEditColor="isDark ? '#666' : '#999'" iconEditSize="10px" showAddressTitle
-                  :formatAddress="(address) => address?.slice(0, 4) + '...' + address?.slice(-4)" />
-                <!-- <span class="text-14px max-w-[95px] truncate">{{ row.remark }}</span>
+                  :formatAddress="(address) => address?.slice(0, 4) + '...' + address?.slice(-4)" /> -->
+                <span class="text-14px max-w-[95px] truncate">{{ row.remark }}</span>
                 <div ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
                   <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px" name="custom:remark" />
-                </div> -->
+                </div>
               </div>
               <div class="flex items-center">
                 <Icon @click.stop.prevent v-copy="row?.user_address" name="bxs:copy"
@@ -358,10 +358,10 @@ onMounted(() => {
       <div>
         <div>{{ t('editRemark') }}</div>
         <el-input v-model="remarkValue" clearable maxlength="20" show-word-limit :placeholder="t('enterRemark')"
-          class="mt-8px w-200px" />
+          class="mt-8px w-100%" />
         <div class="flex items-center justify-between mt-12px gap-12px">
           <div @click="visibleShow = false"
-            class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[--d-333-l-0A0B0C] px-12px py-8px rounded-4px">
+            class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
             {{ t('cancel') }}
           </div>
           <div @click="handleRemarkGroup(rowData)"
