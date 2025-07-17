@@ -3,9 +3,22 @@
 # 当发生错误时中止脚本
 set -e
 
-# 设置字符编码为 UTF-8
-export LANG=C.UTF-8
-export LC_ALL=C.UTF-8
+# Windows 环境下的字符编码设置
+if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ -n "$MINGW64" ]]; then
+    echo "🪟 检测到 Windows 环境，设置字符编码..."
+    export LANG=zh_CN.UTF-8
+    export LC_ALL=zh_CN.UTF-8
+    export LESSCHARSET=utf-8
+    # 设置 Git 输出编码
+    git config --global core.quotepath false
+    git config --global gui.encoding utf-8
+    git config --global i18n.commit.encoding utf-8
+    git config --global i18n.logoutputencoding utf-8
+else
+    # 设置字符编码为 UTF-8
+    export LANG=C.UTF-8
+    export LC_ALL=C.UTF-8
+fi
 
 # 配置远程仓库信息
 CONFIG_REPO_URL="git@github.com:panyongxu1002/ave_deploy-config.git"  # 替换为你的私有配置仓库
@@ -157,6 +170,25 @@ echo "📤 推送到 GitHub Pages..."
 
 # 初始化新的 git 仓库（在 dist 目录中）
 git init
+
+# 检查远程仓库的默认分支
+echo "🔍 检查远程仓库的默认分支..."
+
+# 首先添加远程仓库来检查默认分支
+git remote add origin "$GITHUB_REPO_URL"
+
+# 获取远程仓库的默认分支
+DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | cut -d' ' -f5 || echo "main")
+if [ -z "$DEFAULT_BRANCH" ]; then
+    DEFAULT_BRANCH="main"
+fi
+
+echo "🌿 远程仓库的默认分支为: $DEFAULT_BRANCH"
+
+# 设置本地默认分支为与远程一致
+git config init.defaultBranch "$DEFAULT_BRANCH"
+git checkout -b "$DEFAULT_BRANCH" 2>/dev/null || git checkout "$DEFAULT_BRANCH"
+
 git add -A
 
 # 检查是否有变更需要提交
@@ -166,17 +198,32 @@ if git diff --cached --quiet; then
     git add deploy-timestamp.txt
 fi
 
-git commit -m 'deploy'
-
-# 检查是否已有 origin 远程仓库，如果有就删除重新添加
-if git remote get-url origin >/dev/null 2>&1; then
-    echo "🔄 删除现有的 origin 远程仓库..."
-    git remote remove origin
+# 配置 Git 用户信息（如果未配置）
+if ! git config user.name >/dev/null 2>&1; then
+    git config user.name "GitHub Actions"
+fi
+if ! git config user.email >/dev/null 2>&1; then
+    git config user.email "actions@github.com"
 fi
 
-echo "➕ 添加 origin 远程仓库..."
+git commit -m 'deploy'
+
+# 先删除再重新添加远程仓库（因为之前已经添加过）
+echo "🔄 重新设置 origin 远程仓库..."
+git remote remove origin
 git remote add origin "$GITHUB_REPO_URL"
-git push -f origin main
+
+# 推送到远程仓库的默认分支
+echo "🚀 推送到远程仓库的 $DEFAULT_BRANCH 分支..."
+git push -f origin "$DEFAULT_BRANCH"
+
+# 显示推送结果
+if [ $? -eq 0 ]; then
+    echo "✅ 推送成功到 $DEFAULT_BRANCH 分支！"
+else
+    echo "❌ 推送失败！"
+    exit 1
+fi
 
 # 返回上级目录
 cd ..
