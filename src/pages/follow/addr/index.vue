@@ -85,6 +85,7 @@
                   <div class="flex mt-10px">
                     <el-input
                       v-model.trim="searchKeyword"
+                      size="large"
                       :placeholder="$t('attentionSearch')"
                       clearable
                       @clear="handleFilterQuery()"
@@ -92,10 +93,9 @@
                   </div>
                   <div class="mt-20px flex">
                     <el-button
-                      class="flex-1"
-                      size="default"
-                      :color="mode !== 'dark' ? '#222222' : '#f5f5f5'"
-                      style="height: 30px; min-width: 70px; --el-button-font-weight: 400"
+                      class="flex-1 [&&]:[--el-color-black:#333] bg-[var(--d-333-l-F2F2F2)]"
+                      :color="isDark?'#333':'#F2F2F2'"
+                      style="height: 32px; min-width: 70px; --el-button-font-weight: 400"
                       @click.stop="searchKeyword='';visible=false"
                     >
                       {{ $t('cancel') }}
@@ -103,8 +103,9 @@
                     <el-button
                       class="flex-1"
                       size="default"
+                      type="primary"
                       color="#3F80F7"
-                      style="height: 30px; min-width: 70px; --el-button-font-weight: 400"
+                      style="height: 32px; min-width: 70px; --el-button-font-weight: 400"
                       @click.stop="handleFilterQuery(searchKeyword)"
                     >
                       {{ $t('confirm') }}
@@ -1098,6 +1099,24 @@ function openFavPop() {
       opacity: 0.6;
     }
     cursor: pointer;
+  }
+  :deep() .el-input {
+    --el-input-border-color: #444444;
+    --el-input-placeholder-color: var(--d-666-l-999);
+    --el-text-color-placeholder: #999;
+    --el-input-bg-color: var(--d-333-l-F2F2F2)
+  }
+  :deep() .el-button {
+    --el-border:none;
+  }
+  :deep() .el-input__wrapper {
+    border: none;
+    border-radius: 6px;
+    box-shadow: none;
+
+    &:hover {
+      box-shadow: 0 0 0 1px #3F80F7 inset;
+    }
   }
 }
 

@@ -17,6 +17,7 @@
       :required="required"
     >
       <el-input
+        class="[&&]:[--el-fill-color-blank:var(--d-666-l-F2F2F2)]"
         v-model="form.remark"
         type="text"
         clearable
