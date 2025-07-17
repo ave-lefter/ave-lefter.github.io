@@ -21,26 +21,29 @@ const intervals = computed(() => {
     { name: '24h', id: '24h' },
   ]
 })
-const configMap = shallowRef({
-  hot: {
-    icon: 'custom:hot',
-    storageKey: 'hotUserTableColumns',
-    getDefaultColumns: getHotDefaultColumns,
-    getOptions: getHotOptions,
-    class:'color-#FFA622'
-  },
-  pump:{
-    icon: 'custom:pump',
-    storageKey: 'pumpTableColumns',
-    getDefaultColumns: getPumpDefault,
-    getOptions: getPumpOptions,
-    class:'color-#FFA622'
+const themeStore = useThemeStore()
+const configMap = computed(() => {
+  return {
+    hot: {
+      icon: 'custom:hot',
+      storageKey: 'hotUserTableColumns',
+      getDefaultColumns: getHotDefaultColumns,
+      getOptions: getHotOptions,
+      class: 'color-#FFA622',
+    },
+    pump: {
+      icon: 'custom:pump',
+      storageKey: 'pumpTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: themeStore.isDark ? '' : 'opacity-50',
+    },
   }
 })
 const globalStore = useGlobalStore()
 // 由于其他榜单未上，用临时的 computed过滤
 const supportCategories = computed(() => {
-  const keys = ['hot','pump']
+  const keys = ['hot', 'pump']
   return (props.categories || []).filter((el) => {
     return keys.includes(el.category)
   })
