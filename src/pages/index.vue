@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
-import gain from './components/gainRank/gain.vue'
+import gainer from './components/gainerRank/gainer.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 const components = {
   hot,
-  gainer: gain,  // 添加 gainer 映射到 gain 组件
+  gain: gainer,       // 保持gain映射为兼容性
+  gainer,            // 正确的gainer映射
 }
 const activeTab = shallowRef<keyof typeof components>('hot')
 const activeChain = shallowRef('AllChains')

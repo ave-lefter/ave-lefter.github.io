@@ -3,7 +3,7 @@ import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
 import type { CategoryElement, IGetTreasureConfig } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
-import { getGainDefaultColumns, getGainOptions } from './gainRank/columnRender/gainColumnsService'
+import { getGainDefaultColumns, getGainOptions } from './gainerRank/columnRender/gainColumnsService'
 import ChainsSelect from './chainsSelect.vue'
 
 const emit = defineEmits<{
@@ -41,36 +41,16 @@ const configMap = computed(() => {
       storageKey: 'gainUserTableColumns',
       getDefaultColumns: getGainDefaultColumns,
       getOptions: getGainOptions,
-      class: props.activeTab === 'gain' ? 'color-#22C55E' : '',
+      class: props.activeTab === 'gainer' ? 'color-#22C55E' : '',
     },
   }
 })
 const globalStore = useGlobalStore()
-// 由于其他榜单未上，用临时的 computed过滤
 const supportCategories = computed(() => {
-  const keys = ['hot', 'gainer']
+  const keys = ['hot', 'gain', 'gainer']
   const filtered = (props.categories || []).filter((el) => {
     return keys.includes(el.category)
   })
-  
-  
-  // 如果API没有返回gainer类别，临时添加一个
-  if (!filtered.some(c => c.category === 'gainer')) {
-    filtered.push({
-      category: 'gainer',
-      name_zh_ch: '涨幅榜',
-      name_zh_tw: '漲幅榜',
-      name_en: 'Gainers',
-      name_es: 'Ganadores',
-      name_pt: 'Ganhadores',
-      name_tr: 'Kazananlar',
-      name_ja: 'ゲイナー',
-      is_hot: 0,
-      sub_category: [],
-      is_pump: 0
-    } as CategoryElement)
-  }
-  
   return filtered
 })
 const localeStore = useLocaleStore()

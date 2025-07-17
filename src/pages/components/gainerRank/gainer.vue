@@ -103,6 +103,31 @@ onMounted(() => {
   _getTreasureList()
 })
 
+// 监听组件激活状态
+onActivated(() => {
+  console.log('涨幅榜激活')
+  isActive.value = true
+  // 延迟重新获取数据，避免快速切换时的冲突
+  setTimeout(() => {
+    if (isActive.value) {
+      _getTreasureList()
+    }
+  }, 100)
+})
+
+onDeactivated(() => {
+  console.log('涨幅榜停用')
+  isActive.value = false
+  clearTimeout(timer)
+  // 停用时取消WebSocket订阅，使用唯一ID
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: ['price_extra'],
+    id: 'gainer_rank_unsubscribe',
+  })
+})
+
 watch(
   () => [props.activeChain, localeStore.locale],
   () => {
@@ -121,15 +146,28 @@ async function _getTreasureList(shouldLoading = true) {
     
     // 优先使用通用API确保分页功能正常
     const { total: _, ...rest } = pageInfo.value
-    const res = await getTreasureList({
+
+    // 构建请求参数，只在有值时添加 chain 和 self_address
+    const requestParams: any = {
       category: 'gainer',  // 修正为 'gainer'
       ...rest,
-      chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
       ...sortConditions.value,
       ...filterForm.value,
-      self_address: walletAddress.value,
-      refresh_total: 0,  // 添加刷新总数参数
-    })
+      // refresh_total: 0,  // 添加刷新总数参数
+    }
+
+    // 只在 chain 有值时添加
+    const chainValue = props.activeChain !== 'AllChains' ? props.activeChain : ''
+    if (chainValue) {
+      requestParams.chain = chainValue
+    }
+
+    // 只在 self_address 有值时添加
+    if (walletAddress.value) {
+      requestParams.self_address = walletAddress.value
+    }
+
+    const res = await getTreasureList(requestParams)
     
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
@@ -173,9 +211,14 @@ onUnmounted(() => {
 })
 
 const wsStore = useWSStore()
+const isActive = ref(true) // 追踪组件激活状态
+
 watch(
   () => wsStore.wsResult[WSEventType.PRICE_EXTRA],
   ({ prices }) => {
+    // 只有在组件激活时才处理数据
+    if (!isActive.value) return
+    
     if (!prices) return
     
     const pricesMap = Array.isArray(prices)
@@ -222,20 +265,21 @@ watch(
 )
 
 function initWs() {
+  // 先取消之前的订阅，使用唯一ID
   wsStore.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
     params: ['price_extra'],
-    id: 1,
+    id: 'gainer_rank_unsubscribe',
   })
   
-  // 订阅价格更新事件，适配涨幅榜
+  // 重新订阅价格更新，使用唯一ID和标识符
   const params = listData.value.map((el) => `${el.pair}-${el.chain}`)
   wsStore.send({
     jsonrpc: '2.0',
     method: 'subscribe',
     params: ['price_extra', params],
-    id: 1,
+    id: 'gainer_rank_subscribe',
   })
 }
 

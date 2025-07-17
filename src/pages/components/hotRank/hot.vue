@@ -94,6 +94,31 @@ function tableRowClick({ rowData }: RowEventHandlerParams) {
 onMounted(() => {
   _getTreasureList()
 })
+
+// 监听组件激活状态
+onActivated(() => {
+  console.log('热搜榜激活')
+  isActive.value = true
+  // 延迟重新获取数据，避免快速切换时的冲突
+  setTimeout(() => {
+    if (isActive.value) {
+      _getTreasureList()
+    }
+  }, 100)
+})
+
+onDeactivated(() => {
+  console.log('热搜榜停用')
+  isActive.value = false
+  clearTimeout(timer)
+  // 停用时取消WebSocket订阅，使用唯一ID
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: ['price_extra'],
+    id: 'hot_rank_unsubscribe',
+  })
+})
 watch(
   () => [props.activeChain, localeStore.locale],
   () => {
@@ -135,9 +160,14 @@ onUnmounted(() => {
 })
 
 const wsStore = useWSStore()
+const isActive = ref(true) // 追踪组件激活状态
+
 watch(
   () => wsStore.wsResult[WSEventType.PRICE_EXTRA],
   ({ prices }) => {
+    // 只有在组件激活时才处理数据
+    if (!isActive.value) return
+    
     const pricesMap = Array.isArray(prices)
       ? prices.reduce((pre, cur) => {
           pre[cur.pair + '-' + cur.chain] = cur
@@ -168,18 +198,21 @@ watch(
   }
 )
 function initWs() {
+  // 先取消之前的订阅，使用唯一ID
   wsStore.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
     params: ['price_extra'],
-    id: 1,
+    id: 'hot_rank_unsubscribe',
   })
+  
+  // 重新订阅价格更新，使用唯一ID和标识符
   const params = listData.value.map((el) => `${el.pair}-${el.chain}`)
   wsStore.send({
     jsonrpc: '2.0',
     method: 'subscribe',
     params: ['price_extra', params],
-    id: 1,
+    id: 'hot_rank_subscribe',
   })
 }
 
