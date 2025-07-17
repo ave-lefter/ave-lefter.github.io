@@ -187,7 +187,10 @@ const isTrend = computed(() => activeTab.value === 'trend')
 const chainAddress = computed(() => [props.chain, props.address])
 const filterTableList = computed(() => {
   if(isRecentPnl.value){
-    return [...tableData.value.pnl]
+    const temp = [...tableData.value.pnl].filter(
+      (i) => NATIVE_TOKENS.findIndex((y) => y?.toLowerCase() === i.token?.toLowerCase()) === -1
+    )
+    return temp
   } else if (isToken.value) {
     return [...tableData.value.token]
   } else if (isTrend.value) {
