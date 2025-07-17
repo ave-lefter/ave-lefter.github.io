@@ -4,7 +4,8 @@ import BigNumber from 'bignumber.js'
 import dayjs from 'dayjs'
 import { formatNumber2 } from '~/utils/formatNumber'
 import { getRemarksDetail } from '~/api/fav'
-import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
+// import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
+import { deleteAttention, updateWhaleRemark, addAttention, addAttention2, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 
 const {updateNum3} = storeToRefs(useFollowStore())
 const botStore = useBotStore()
@@ -159,7 +160,7 @@ const collect = async (row: any,index:number) => {
   //   return 
   // }
   loading.value = true
-  const api = row.is_wallet_address_fav === 1 ? deleteAttention : addAttention
+  const api = row.is_wallet_address_fav === 1 ? deleteAttention : addAttentionNew
   api({
     address: addressValue.value,
     user_address: row.user_address,
@@ -366,6 +367,10 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+:deep(.el-table .cell) {
+  font-size: 12px !important;
+  padding: 0 16px;
+}
 :deep(.el-pagination) {
   justify-content: center;
 

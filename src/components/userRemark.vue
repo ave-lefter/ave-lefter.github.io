@@ -11,7 +11,7 @@
     <template v-if="showAddress">
       <span
         v-if="!!mouseoverAddress"
-        class="remark-com-address"
+        class="remark-com-address truncate max-w-42px"
         :class="addressClass"
         :style="addressStyle"
         :title="showAddressTitle ? remark2 : undefined"
@@ -21,7 +21,7 @@
       </span>
       <span
         v-else
-        class="remark-com-address"
+        class="remark-com-address truncate max-w-42px"
         :class="addressClass"
         :style="addressStyle"
         :title="showAddressTitle ? remark2 : undefined"

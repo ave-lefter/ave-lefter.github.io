@@ -46,7 +46,7 @@ const click = (item: { id: string; name: string }) => {
 
   button {
     border: none;
-    color: var(--a-text-2-color);
+    color: var(--d-666-l-999);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;

@@ -533,7 +533,7 @@ onMounted(() => {
           {{ formatNumber2(row?.tx_count_24h || 0, 2, 4, 10 ** 4) }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('tokenGroup')" align="right">
+      <el-table-column :label="t('tokenGroup')" align="right" width="170">
         <template #default="{ row }">
           <el-select v-model="row.group_id" style="width: 100px;" popper-class="follow-select-popper" filterable
             class="[&&]:[--el-text-color-regular:var(--d-CCC-l-333)]" @click.stop @change="(val) => getRowGroupChange(val, row)">
@@ -585,11 +585,17 @@ onMounted(() => {
 
   .el-popper__arrow::before {
     background: var(--d-222-l-FFF) !important;
+    display: none;
   }
 }
 </style>
 
 <style lang="scss" scoped>
+:deep(.el-table .cell) {
+  font-size: 12px !important;
+  padding: 0 16px;
+}
+
 :deep(.el-pagination) {
   justify-content: center;
 

@@ -4,6 +4,14 @@
     --el-text-color-primary: #333;
     border: none;
   }
+
+  .signal-tags-tooltip {
+    background: #333;
+  }
+  .signal-tags-tooltip .el-popper__arrow::before {
+    background: #333;
+    border: none;
+  }
 }
 
 :root:root.light {
@@ -13,6 +21,7 @@
     color: #ccc;
     // --el-text-color-primary: #333;
   }
+  
 }
 .el-select__popper.el-popper{
   border:0 none !important;
@@ -31,7 +40,7 @@
     --el-table-tr-bg-color: var(--d-111-l-FFF);
     thead{
       .el-table__cell{
-        height: 42px;
+        height: 32px;
         padding: 0;
         font-weight: 400;
       }
