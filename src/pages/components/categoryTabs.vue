@@ -3,6 +3,7 @@ import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
 import type { CategoryElement } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
+import { getPumpDefault, getPumpOptions } from './pump/columnRender/pumpColumnsService'
 
 const props = defineProps<{ activeTab: string; categories: CategoryElement[] }>()
 // const { t } = useI18n()
@@ -22,12 +23,20 @@ const configMap = shallowRef({
     storageKey: 'hotUserTableColumns',
     getDefaultColumns: getHotDefaultColumns,
     getOptions: getHotOptions,
+    class:'color-#FFA622'
   },
+  pump:{
+    icon: 'custom:pump',
+    storageKey: 'pumpTableColumns',
+    getDefaultColumns: getPumpDefault,
+    getOptions: getPumpOptions,
+    class:'color-#FFA622'
+  }
 })
 const globalStore = useGlobalStore()
 // 由于其他榜单未上，用临时的 computed过滤
 const supportCategories = computed(() => {
-  const keys = ['hot']
+  const keys = ['hot','pump']
   return (props.categories || []).filter((el) => {
     return keys.includes(el.category)
   })
@@ -48,7 +57,7 @@ const localeStore = useLocaleStore()
             : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
         "
       >
-        <Icon :name="configMap[item.category].icon" class="mr-1 color-#FFA622 text-12px" />
+        <Icon :name="configMap[item.category as keyof typeof configMap].icon" class="mr-1 text-12px" :class="configMap[item.category as keyof typeof configMap].class"/>
         {{ item[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
       </span>
     </div>

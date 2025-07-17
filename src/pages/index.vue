@@ -6,6 +6,7 @@ import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 const components = {
   hot,
+  pump:defineAsyncComponent(()=>import('./components/pump/pump.vue'))
 }
 const activeTab = shallowRef<keyof typeof components>('hot')
 const activeChain = shallowRef('AllChains')
