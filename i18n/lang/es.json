@@ -448,5 +448,6 @@
   "basicInfo": "Información básica",
   "insidersPosition1": "Propiedad de internos",
   "login": "Acceso",
-  "platform": "Plataforma"
+  "platform": "Plataforma",
+  "onlyPush": "Solo empuje"
 }

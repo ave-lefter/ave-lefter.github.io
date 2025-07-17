@@ -5,7 +5,7 @@
     </li>
     <template v-if="props.options.length > 0">
       <li 
-        v-for="item in props.options" :key="item.group_id" class="clickable flex gap-2px"
+        v-for="item in props.options" :key="item.group_id" class="clickable flex gap-2px color-[var--d-999-l-666]"
         :class="{ active: props.modelValue === item.group_id }"
         @click.stop.prevent="emit('update:modelValue', item.group_id)">
         <!-- <el-input 

@@ -633,5 +633,6 @@
   "smarterSellTxns": "Умные продажи",
   "basicInfo": "Основная информация",
   "insidersPosition1": "Владение инсайдеров",
-  "platform": "Платформа"
+  "platform": "Платформа",
+  "onlyPush": "Только толкать"
 }

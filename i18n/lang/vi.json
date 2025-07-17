@@ -633,5 +633,6 @@
   "smarterSellTxns": "Giao dịch bán thông minh",
   "basicInfo": "Thông tin cơ bản",
   "insidersPosition1": "Người trong cuộc nắm giữ",
-  "platform": "Nền tảng"
+  "platform": "Nền tảng",
+  "onlyPush": "Chỉ đẩy"
 }

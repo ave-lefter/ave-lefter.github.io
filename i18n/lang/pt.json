@@ -448,5 +448,6 @@
   "basicInfo": "Informação básica",
   "insidersPosition1": "Insiders Possuído",
   "login": "Conecte-se",
-  "platform": "Plataforma"
+  "platform": "Plataforma",
+  "onlyPush": "Apenas empurre"
 }

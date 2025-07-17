@@ -443,5 +443,6 @@
   "basicInfo": "Temel Bilgiler",
   "insidersPosition1": "İçeridekiler",
   "login": "Giriş yapmak",
-  "platform": "Platform"
+  "platform": "Platform",
+  "onlyPush": "Sadece Push"
 }

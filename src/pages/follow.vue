@@ -62,6 +62,7 @@ ul.w-tabs{
     height: 32px;
     line-height: 32px;
     cursor: pointer;
+    color:var(--d-666-l-999);
     background-color:var(--d-1A1A1A-l-F2F2F2);
     justify-content: center;
     align-items: center;
