@@ -920,7 +920,7 @@ const collect = async (row: any,index:number) => {
             </UserRemark> 
             <Icon
               :ref="(el: any) => $refs.buttonRefs[rowIndex] = el" name="custom:attention"
-              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#666]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
             <Icon
               name="custom:filter"
               :class="`${tableFilter.markerAddress ? 'color-[--d-999-l-666]' : 'color-[--d-666-l-999]'} cursor-pointer text-10px shrink-0`"

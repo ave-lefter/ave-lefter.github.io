@@ -129,17 +129,17 @@
                 name="custom:attention"
                 :class="`cursor-pointer mr-8px ${row.is_wallet_address_fav == 1
                       ?'color-#f45469'
-                      :'color-[&#45;&#45;d-666-l-696E7C]'} text-12px hover:color-#f45469`"
+                      :'color-[--d-666-l-696E7C]'} text-12px hover:color-#f45469`"
                 @click.self.stop="handleDeleteAttention(row)"
               />
                <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
               <div class="flex flex-col justify-between h-32px">
-                <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 85px" :iconEditColor="isDark?'#999':'#666'"  iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)"/>
+                <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 85px" :iconEditColor="isDark?'#666':'#999'"  iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)"/>
                 <div class="font_10 color-icon flex-start mt_4" style="line-height: 1">
                   <Icon
                     v-copy="row.user_address"
                     name="bxs:copy"
-                    class="text-10px cursor-pointer color-[--d-999-l-666]"
+                    class="text-10px cursor-pointer color-[--d-666-l-999]"
                     @click.stop.prevent
                   />
                   <div v-if="row?.extra?.length > 0" class="media-list flex-start">

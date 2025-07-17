@@ -97,7 +97,7 @@
               <span class="color-[--d-666-l-999] mr-10px">{{ $index +1 < 10? "0" : '' }}{{ $index + 1 }}</span>
               <Icon
                 :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
-                :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#999]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 mt-4px" @click.stop.prevent="collect(row,$index)" />
+                :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 mt-4px" @click.stop.prevent="collect(row,$index)" />
             </div>
             <div class="relative">
               <div class="flex-start">

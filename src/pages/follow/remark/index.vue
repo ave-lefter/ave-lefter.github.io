@@ -250,7 +250,7 @@ onMounted(() => {
             <Icon
               :key="`${row.user_address}-${row.user_chain}`"
               :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
-              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#999]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
             <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="32px"/>
             <div class="ml-5px h-32px flex flex-col justify-between">
               <div class="flex items-center">
