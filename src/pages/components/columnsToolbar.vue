@@ -10,7 +10,7 @@ const props = defineProps<{
 }>()
 const { t } = useI18n()
 const dialogVisible = ref(false)
-const storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
+let storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
 const globalStore = useGlobalStore()
 const hotSettings = ref({
   avatar_isCircle:globalStore.pumpSetting.avatar_isCircle,
@@ -26,6 +26,7 @@ const modelColumns = ref(cloneDeep(storeColumns.value.filter((item) =>item.child
 // 当对话框打开时，更新本地列配置
 const openDialog = () => {
   dialogVisible.value = true
+  storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
   initColumns.value = props.getDefaultColumns(t)
   modelColumns.value = cloneDeep(storeColumns.value.filter((item) => item.children || item.isVisible))
 }
