@@ -449,12 +449,12 @@ onMounted(() => {
                     {{ `[*${row?.token?.slice(-6)}]` }}
                   </div>
                   <Icon @click.stop.prevent v-copy="row?.token" name="bxs:copy"
-                    class="ml-4px clickable text-[--d-666-l-999]" />
+                    class="ml-4px clickable text-[--d-666-l-999] text-12px" />
 
-                  <a class="ml-4px"
+                  <a class="ml-4px flex items-center"
                     :href="`https://x.com/search?q=(${row?.symbol}OR${row?.token})&src=typed_query&f=live`"
                     target="_blank" @click.stop>
-                    <Icon class="text-[--d-666-l-999] h-12px w-12px" name="custom:search"/>
+                    <Icon class="text-[--d-666-l-999] h-12px w-12px text-12px" name="custom:search"/>
                   </a>
                 </div>
                 <div class="flex items-center mt-2px">

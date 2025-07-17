@@ -7,12 +7,12 @@ import { getRemarksDetail } from '~/api/fav'
 // import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 import { deleteAttention, updateWhaleRemark, addAttention, addAttentionNew, addAttention2, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 
-const {updateNum3} = storeToRefs(useFollowStore())
+const { updateNum3 } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const router = useRouter()
 const { t } = useI18n()
-const {  isDark } = storeToRefs(useGlobalStore())
+const { isDark } = storeToRefs(useGlobalStore())
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
@@ -88,8 +88,8 @@ const handleMonitor = async (row: any) => {
       user_address: addressValue.value,
       website: 1
     }).then(() => {
-       ElMessage.success(t('success'))
-       getList()
+      ElMessage.success(t('success'))
+      getList()
     }).catch((e) => {
       ElMessage.error(String(e))
     })
@@ -98,8 +98,8 @@ const handleMonitor = async (row: any) => {
       address: row.user_address,
       uid: row.id
     }).then(() => {
-       ElMessage.success(t('success'))
-       getList()
+      ElMessage.success(t('success'))
+      getList()
     })
   }
 }
@@ -148,7 +148,7 @@ const handleSortChange = ({ prop, order }: any) => {
 }
 
 // 取消收藏
-const collect = async (row: any,index:number) => {
+const collect = async (row: any, index: number) => {
   if (walletStore.address && !walletStore.walletSignature[walletStore.address]) {
     await walletStore.signMessageForFavorite()
   }
@@ -157,7 +157,7 @@ const collect = async (row: any,index:number) => {
   //     console.log('confirmAttention', form)
   //     return Promise.resolve()
   //   })
-  //   return 
+  //   return
   // }
   loading.value = true
   const api = row.is_wallet_address_fav === 1 ? deleteAttention : addAttentionNew
@@ -177,7 +177,7 @@ const collect = async (row: any,index:number) => {
 
 // 获取列表
 const getList = async () => {
-  loading.value = true 
+  loading.value = true
   const res: any = await getRemarksDetail({
     address: addressValue.value,
     pageNO: pageData.value.page,
@@ -248,14 +248,20 @@ onMounted(() => {
             <span class="text-[#999] text-10px mr-5px">
               #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
             </span>
-            <Icon
-              :key="`${row.user_address}-${row.user_chain}`"
-              :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
-              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
-            <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="32px"/>
+            <Icon :key="`${row.user_address}-${row.user_chain}`" :ref="(el: any) => $refs.buttonRefs[$index] = el"
+              name="custom:attention"
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'"
+              class="color-[--d-666-l-999] h-16px w-16px clickable shrink-0"
+              @click.stop.prevent="collect(row, $index)" />
+            <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo"
+              :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
             <div class="ml-5px h-32px flex flex-col justify-between">
               <div class="flex items-center">
-                <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 85px" :iconEditColor="isDark?'#999':'#666'" iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)"/>
+                <UserRemark :key="`${row.user_address}-${row.user_chain}`" :remark="row.remark"
+                  :address="row.user_address" :chain="row.user_chain"
+                  addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 85px"
+                  :iconEditColor="isDark ? '#666' : '#999'" iconEditSize="10px" showAddressTitle
+                  :formatAddress="(address) => address?.slice(0, 4) + '...' + address?.slice(-4)" />
                 <!-- <span class="text-14px max-w-[95px] truncate">{{ row.remark }}</span>
                 <div ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
                   <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px" name="custom:remark" />
@@ -263,7 +269,7 @@ onMounted(() => {
               </div>
               <div class="flex items-center">
                 <Icon @click.stop.prevent v-copy="row?.user_address" name="bxs:copy"
-                  class="clickable text-[--d-999-l-666]" />
+                  class="clickable text-[--d-666-l-999]" />
                 <Icon name="custom:sun-icon" class="text-12px mx-5px" />
                 <Icon name="custom:wallet-icon" class="text-12px" />
               </div>
@@ -313,14 +319,15 @@ onMounted(() => {
               <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
               {{ t('copyTrade') }}
             </a>
-            <div
-              v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
-              class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-CCC-l-333)]" @click="handleMonitor(row)">
-              <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-13px mr-5px" :class="[(row?.is_monitored === 1)&&'color-[var(--d-CCC-l-333)]']"/>
-              <Icon v-else name="custom:monitor-icon" class="text-16px mr-2px"/>
+            <div v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
+              class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-CCC-l-333)]"
+              @click="handleMonitor(row)">
+              <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-13px mr-5px"
+                :class="[(row?.is_monitored === 1) && 'color-[var(--d-CCC-l-333)]']" />
+              <Icon v-else name="custom:monitor-icon" class="text-16px mr-2px" />
               <span
                 class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
-                {{ (row?.is_monitored === 1)? t('pause') : t('enable') }}
+                {{ (row?.is_monitored === 1) ? t('pause') : t('enable') }}
               </span>
             </div>
             <div class="flex items-center mr-12px color-[var(--d-666-l-CCC)] cursor-not-allowed" v-else>
@@ -343,8 +350,9 @@ onMounted(() => {
       </el-table-column>
     </el-table>
 
-    <el-pagination class="mt-15px" v-if="pageData.total > 1" v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize"
-      layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getList" />
+    <el-pagination class="mt-15px" v-if="pageData.total > 1" v-model:current-page="pageData.page"
+      v-model:page-size="pageData.pageSize" layout="prev, pager, next, ->" :total="pageData.total"
+      :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getList" />
 
     <el-popover :visible="visibleShow" :virtual-ref="virtualRef" virtual-triggering trigger="click" :width="250">
       <div>
@@ -371,6 +379,7 @@ onMounted(() => {
   font-size: 12px !important;
   padding: 0 16px;
 }
+
 :deep(.el-pagination) {
   justify-content: center;
 
@@ -392,13 +401,16 @@ onMounted(() => {
 :deep(.el-pager li) {
   border-radius: 6px;
 }
-:deep() .el-table.el-table thead .el-table__cell{
+
+:deep() .el-table.el-table thead .el-table__cell {
   height: 40px;
 }
-:deep() .el-table .el-table__cell{
+
+:deep() .el-table .el-table__cell {
   padding: 14px 0;
 }
-:deep() .el-table{
+
+:deep() .el-table {
   --el-table-text-color: var(--d-CCC-l-333);
 }
 </style>
