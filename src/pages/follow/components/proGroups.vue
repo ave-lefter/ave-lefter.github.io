@@ -80,15 +80,15 @@
     popper-style="width: 86px;min-width: 86px;">
     <ul v-click-outside="() => visible = false">
       <li 
-        class="font-500 text-14px lh-[100%] tracking-0px  mb-20px flex-start gap-4px clickable"
+        class="font-500 text-12px lh-[100%] tracking-0px  mb-20px flex-start gap-4px clickable"
         @click.stop.prevent="handleRenameGroup">
-        <Icon name="fe:edit" class="color-#666 text-14px mt-3px" />
+        <Icon name="fe:edit" class="color-#666 text-14px mt-0px" />
         <span>{{ $t('rename') }}</span>
       </li>
       <li 
-        class="font-500 text-14px lh-[100%] tracking-0px clickable flex-start gap-4px"
+        class="font-500 text-12px lh-[100%] tracking-0px clickable flex-start gap-4px"
         @click.stop.prevent="handleDelGroup">
-        <Icon name="bx:bxs-trash-alt" class="text-15px color-#666 mt-3px" />
+        <Icon name="bx:bxs-trash-alt" class="text-15px color-#666 mt-0px" />
         <span>{{ $t('delete') }}</span>
       </li>
     </ul>

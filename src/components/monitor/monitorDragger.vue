@@ -23,6 +23,10 @@ watch(() => placement.value, () => {
 onMounted(()=>{
   if(monitorStore.visible){
     loadComponent()
+  }else{
+    setTimeout(() => {
+      loadComponent()
+    },3000)
   }
 })
 
@@ -38,7 +42,7 @@ const loadComponent = async () => {
   lazyComponent.value = component.default
 }
 const props1=computed(()=>{
-  console.log('props1', placement.value)
+  // console.log('props1', placement.value)
   let data={
     handles:['tl','tm','tr','mr','br','bm','bl','ml'],
     dragHandle:'.drag-handle'

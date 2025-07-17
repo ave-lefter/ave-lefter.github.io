@@ -57,6 +57,9 @@ watch(() => walletStore.walletSignature[walletStore.address], (newValue) => {
   }
 })
 
+watch(() => updateNum3.value, () => {
+  getList()
+})
 
 watch(() => botStore.evmAddress, (newVal) => {
   if (newVal) {
@@ -128,7 +131,6 @@ const handleRemarkGroup = async (row: any) => {
   })
   ElMessage.success(t('success'))
   visibleShow.value = false
-  updateNum3.value++
   getList()
 }
 
