@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="userAddress && chain "
-    className="w-full h-full bg-[--d-000-l-fff] pb-0"
+    className="w-full h-full bg-[--d-000-l-FFF] pb-0"
   >
     <div
       v-if="['bsc', 'solana'].includes(chain)"

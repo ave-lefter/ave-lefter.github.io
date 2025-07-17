@@ -39,7 +39,7 @@
           :key="key"
           class="trade-pnl-stage-item flex items-center"
         >
-          <span class="flex-shrink-0 text-3 font-500 text-[var(--d-fff-l-333)]">{{ label }}</span>
+          <span class="flex-shrink-0 text-3 font-500 text-[var(--d-FFF-l-333)]">{{ label }}</span>
           <span
             class="flex-1 text-3 text-right"
             :class="{

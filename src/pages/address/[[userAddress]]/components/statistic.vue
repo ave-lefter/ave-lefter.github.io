@@ -66,7 +66,7 @@
         </div>
       </div>
       <div class="flex gap-2 items-center mb-5 text-6 leading-7.5 font-bold">
-        <strong class="text-6 leading-7.5 text-[var(--d-fff-l-333)]">
+        <strong class="text-6 leading-7.5 text-[var(--d-FFF-l-333)]">
           {{ uSymbol }}{{ total_balance }} {{ main_token_symbol }}
         </strong>
         <el-switch
@@ -81,7 +81,7 @@
           </template>
           <template #inactive-action>
             <span
-              class="flex w-full h-full items-center justify-center text-2.5 rounded-full text-[var(--d-fff-l-333)] bg-[var(--d-666-l-fff)]"
+              class="flex w-full h-full items-center justify-center text-2.5 rounded-full text-[var(--d-FFF-l-333)] bg-[var(--d-666-l-FFF)]"
               >$</span
             >
           </template>
@@ -532,6 +532,6 @@ defineExpose({
 <style scoped>
 .custom-switch {
   --el-switch-off-color: var(--d-333333-l-F2F2F2);
-  --el-switch-on-color: var(--d-666-l-ccc);
+  --el-switch-on-color: var(--d-666-l-CCC);
 }
 </style>

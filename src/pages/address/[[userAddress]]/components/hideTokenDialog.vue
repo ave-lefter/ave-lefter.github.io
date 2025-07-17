@@ -77,7 +77,7 @@ async function confirm() {
             {{ $t('Hide') }}
           </el-button>
         </div>
-        <div class="color-[--d-fff-l-333] text-12px mt-20px">
+        <div class="color-[--d-FFF-l-333] text-12px mt-20px">
           *{{ $t('BlockTips') }}
         </div>
       </div>
