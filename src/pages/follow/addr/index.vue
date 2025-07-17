@@ -478,9 +478,10 @@
           </div>
         </template>
       </el-table-column>
+      <!-- addrGroup -->
       <el-table-column v-if="!isMonitor" :label="t('addrGroup')" align="right" width="160px">
         <template #default="{ row }">
-          <el-select v-model="row.group_id" class="[&&]:[--el-text-color-regular:var(--d-222-l-333)] [&&]:[--el-select-width:100px]" popper-class="w-193px" @click.stop @change="(val) => getRowGroupChange(val, row)">
+          <el-select v-model="row.group_id" class="[&&]:[--el-text-color-regular:var(--d-222-l-333)] [&&]:[--el-select-width:100px]" popper-class="w-193px" filterable @click.stop @change="(val) => getRowGroupChange(val, row)">
             <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
             <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
           </el-select>
