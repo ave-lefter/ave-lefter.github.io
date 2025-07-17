@@ -49,9 +49,28 @@ const globalStore = useGlobalStore()
 // 由于其他榜单未上，用临时的 computed过滤
 const supportCategories = computed(() => {
   const keys = ['hot', 'gain']
-  return (props.categories || []).filter((el) => {
+  const filtered = (props.categories || []).filter((el) => {
     return keys.includes(el.category)
   })
+  
+  // 如果API没有返回gain类别，临时添加一个
+  if (!filtered.some(c => c.category === 'gain')) {
+    filtered.push({
+      category: 'gain',
+      name_zh_ch: '涨幅榜',
+      name_zh_tw: '漲幅榜',
+      name_en: 'Gainers',
+      name_es: 'Ganadores',
+      name_pt: 'Ganhadores',
+      name_tr: 'Kazananlar',
+      name_ja: 'ゲイナー',
+      is_hot: 0,
+      sub_category: [],
+      is_pump: 0
+    } as CategoryElement)
+  }
+  
+  return filtered
 })
 const localeStore = useLocaleStore()
 </script>
@@ -81,7 +100,7 @@ const localeStore = useLocaleStore()
             class="mr-1 text-12px"
             :class="configMap[item.category as keyof typeof configMap].class"
           />
-          {{ item[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
+          {{ (item as any)[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
         </span>
       </div>
       <div class="flex gap-12px items-center text-12px">
