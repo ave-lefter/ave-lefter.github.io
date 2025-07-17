@@ -5,7 +5,7 @@ import dayjs from 'dayjs'
 import { formatNumber2 } from '~/utils/formatNumber'
 import { getRemarksDetail } from '~/api/fav'
 // import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
-import { deleteAttention, updateWhaleRemark, addAttention, addAttention2, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
+import { deleteAttention, updateWhaleRemark, addAttention, addAttentionNew, addAttention2, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 
 const {updateNum3} = storeToRefs(useFollowStore())
 const botStore = useBotStore()
