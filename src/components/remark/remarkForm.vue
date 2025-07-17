@@ -78,12 +78,12 @@ const buttonCancelColor = computed(() =>
 )
 const buttonConfirmColor = computed(() =>
   !themeStore.isDark ? '#222222' : '#f5f5f5'
-)
+) 
 
 const rules = {
   remark: [
     { required: required.value, message: `${t('remark')}${t('cannotBeEmpty')}`, trigger: 'blur' },
-    { pattern: /^(?!.*[!@#$%^&*(),.?":{}|<>])(.{2,50})$/, message: t('remarkError'), trigger: 'blur' }
+    { pattern: /^(?!.*[!@#$%^&*(),?":{}|<>])(.{2,50})$/, message: t('remarkError'), trigger: 'blur' }
   ]
 }
 

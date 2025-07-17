@@ -204,14 +204,14 @@ watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], () => {
   }
 })
 watch(visible, val => {
-  console.log('visible', val)
+  // console.log('visible', val)
   if (val) {
     isDoted2.value = false
   }
 })
 
 watch(() => wsStore.wsResult[WSEventType.MONITOR], () => {
-  console.log('wsStore.wsResult[WSEventType.MONITOR]', wsStore.wsResult[WSEventType.MONITOR])
+  // console.log('wsStore.wsResult[WSEventType.MONITOR]', wsStore.wsResult[WSEventType.MONITOR])
   throttle(() => {
     if(hasRing.value&&botStore.evmAddress){
       audioElement.value?.play()

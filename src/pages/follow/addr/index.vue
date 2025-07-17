@@ -59,7 +59,7 @@
                    :style="{
                   color: conditions.keyword ? 'var(--d-F5F5F5-l-333)' : 'var(--custom-font-8-color)'
                 }"
-                class="text-10px cursor-pointer ml-2px"
+                class="text-10px cursor-pointer ml-4px mt--2px"
                 @click.stop.prevent="handleFilterQuery()"
               />
             <el-popover
@@ -75,7 +75,7 @@
                  <Icon
                   id="custom-filter"
                   name="custom:filter"
-                  class="text-10px cursor-pointer ml-2px"
+                  class="text-10px cursor-pointer ml-4px mt--2px"
                   @click.stop.prevent="handleFilterQuery()"
                 />
               </template>
@@ -386,7 +386,7 @@
               >
               <template #reference>
                 <Icon
-                    name="custom:filter" class="text-10px inline-block"  :style="{
+                    name="custom:filter" class="text-10px inline-block mt--2px"  :style="{
                     color: (conditions?.last_trade_time) ? 'var(--d-F5F5F5-l-333)' : ''
                 }" @click.stop.prevent/>
               </template>

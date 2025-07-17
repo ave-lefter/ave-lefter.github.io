@@ -93,7 +93,7 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: 'updateRemark', payload: { address: string; remark: string; chain: string }): void
 }>()
-
+const {updateNum3}=storeToRefs(useFollowStore())
 const { t } = useI18n()
 
 const botStore = useBotStore()
@@ -168,6 +168,7 @@ function sendRemarkToServer(remark: string) {
   updateWhaleRemark(form)
     .then(() => {
       ElMessage.success(t('success'))
+      updateNum3.value++
       emit('updateRemark', {
         address: props.address!,
         remark,

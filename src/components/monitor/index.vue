@@ -322,11 +322,11 @@ const walletManageProps=computed(() => {
   }
 })
 onMounted(async () => {
-  console.log('monitor mounted')
+  // console.log('monitor mounted')
   nextTick(() => {
     const el = document.querySelector('.m-tabs .el-tabs__header.is-top')
     if (el) el.className = 'el-tabs__header is-top drag-handle'
-    console.log('monitor visible', el)
+    // console.log('monitor visible', el)
   })
   init()
 })
@@ -434,7 +434,7 @@ const columns = computed(() => {
 })
 watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
   if(monitorStore.visible&&monitorStore.activeName===1){
-    console.log('ws monitor', val)
+    // console.log('ws monitor', val)
     mergeDataSource(val)
   }
 })
@@ -499,7 +499,7 @@ function init2() {
         listObj[j.id] = true
       }
     })
-    console.log('list', list)
+    // console.log('list', list)
     dataSourceCache.value = list
     updateDateSource()
   }).catch((err) => {
