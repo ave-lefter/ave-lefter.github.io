@@ -130,6 +130,14 @@ async function _getTreasureList(shouldLoading = true) {
     loading.value = false
   }
 }
+onDeactivated(() => {
+  clearTimeout(timer)
+})
+onActivated(() => {
+  timer = window.setTimeout(() => {
+    _getTreasureList(false)
+  }, 10000)
+})
 onUnmounted(() => {
   clearTimeout(timer)
 })
@@ -239,14 +247,15 @@ function sizeChange() {
 }
 
 const filterMap = {
-  insider_balance_ratio_cur:(el:any)=> el.isVisible && props.activeChain === 'bsc',
-  price_change_dynamic:(el:any)=> el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval),
-  quick:(el:any)=> el.isVisible && globalStore.rankCommon.quickVisible,
+  insider_balance_ratio_cur: (el: any) => el.isVisible && props.activeChain === 'bsc',
+  price_change_dynamic: (el: any) =>
+    el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval),
+  quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible,
 }
 
 const visibleColumns = computed(() => {
   return columns.value.filter((el) => {
-    if(filterMap[el.key as keyof typeof filterMap]){
+    if (filterMap[el.key as keyof typeof filterMap]) {
       return filterMap[el.key as keyof typeof filterMap](el)
     }
     return el.isVisible
@@ -312,7 +321,7 @@ const cellRenderer = computed(() => {
       :header-height="40"
       :row-height="80"
       fixed
-      style="--el-bg-color: var(--d-111-l-FFF);"
+      style="--el-bg-color: var(--d-111-l-FFF)"
       row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
       :rowEventHandlers="{
         onClick: tableRowClick,
@@ -360,7 +369,8 @@ const cellRenderer = computed(() => {
 </template>
 
 <style scoped lang="scss">
-:deep(.el-table-v2__header-cell),:deep(.el-table-v2__row-cell) {
+:deep(.el-table-v2__header-cell),
+:deep(.el-table-v2__row-cell) {
   padding: 0 16px;
 }
 </style>
