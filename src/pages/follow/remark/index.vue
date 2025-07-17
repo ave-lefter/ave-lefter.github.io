@@ -378,10 +378,10 @@ onMounted(() => {
 <style lang="scss" scoped>
 :deep(.el-table.el-table thead .el-table__cell) {
   height: 40px;
+  font-size: 12px !important;
 }
 
 :deep(.el-table .cell) {
-  font-size: 12px !important;
   padding: 0 16px;
 }
 

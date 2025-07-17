@@ -666,7 +666,7 @@ const collect = async (row: any,index:number) => {
         return Promise.reject(err)
       })
     })
-    return 
+    return
   }
   // loading.value = true
   deleteAttention({
@@ -899,7 +899,7 @@ const collect = async (row: any,index:number) => {
               name="custom:new-account"
               class="mr-3px shrink-0"/>
             <Icon
-              v-if="hasClearedAccount(row)" 
+              v-if="hasClearedAccount(row)"
               v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:cleared-account" class="mr-3px shrink-0"/>
             <Icon
@@ -921,7 +921,7 @@ const collect = async (row: any,index:number) => {
               <div v-if="row.count && row.count > 1">
                 ({{ row.count }})
               </div>
-            </UserRemark> 
+            </UserRemark>
             <Icon
               :ref="(el: any) => $refs.buttonRefs[rowIndex] = el" name="custom:attention"
               :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
@@ -977,4 +977,11 @@ const collect = async (row: any,index:number) => {
   </div>
 </template>
 
-<style></style>
+<style scoped lang="scss">
+:deep(.el-table-v2__header-cell){
+  padding: 0 12px;
+}
+:deep(.el-table-v2__row-cell){
+  padding: 0 12px;
+}
+</style>
