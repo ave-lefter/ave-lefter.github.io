@@ -43,6 +43,7 @@ const globalStore = useGlobalStore()
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
+  activeSubTab: string
 }>()
 const sortConditions = ref({
   sort: '',
@@ -95,7 +96,7 @@ onMounted(() => {
   _getTreasureList()
 })
 watch(
-  () => [props.activeChain, localeStore.locale],
+  () => [props.activeChain,props.activeSubTab],
   () => {
     pageInfo.value.pageNO = 1
     _getTreasureList()
@@ -110,7 +111,7 @@ async function _getTreasureList(shouldLoading = true) {
     }
     const { total: _, ...rest } = pageInfo.value
     const res = await getTreasureList({
-      category: 'hot',
+      category: props.activeSubTab,
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
       ...sortConditions.value,
@@ -310,7 +311,7 @@ const cellRenderer = computed(() => {
 })
 </script>
 <template>
-  <div v-loading="loading" style="height: calc(100vh - 207px)">
+  <div v-loading="loading" style="height: calc(100vh - 251px)">
     <AveTable
       :data="filteredListData"
       :columns="visibleColumns"

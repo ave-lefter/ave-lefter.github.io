@@ -233,6 +233,7 @@ function getMedias(appendix: string) {
         :is="components[activeTab]"
         :listMapFunction="listMapFunction"
         :activeChain="activeChain"
+        :activeSubTab="activeSubTab"
       />
     </KeepAlive>
   </div>
