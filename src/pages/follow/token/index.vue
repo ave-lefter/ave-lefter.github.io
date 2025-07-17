@@ -292,7 +292,7 @@ onMounted(() => {
 <template>
   <div class="flex-1 h-[calc(100%-76px)] flex flex-col">
     <div v-if="botStore.evmAddress || walletStore.address"
-      class="flex items-center px-12px mt-12px gap-8px overflow-x-auto scrollbar-hide">
+      class="flex items-center px-16px mt-12px gap-8px overflow-x-auto scrollbar-hide">
       <div v-for="(item, index) in allTabsGroup" :key="item.value"
         class="cursor-pointer text-12px color-[--d-999-l-666] bg-[--d-15171c-l-f2f2f2] px-8px h-28px rounded-4px shrink-0 flex items-center font-500"
         :class="[activeTab === item.value && 'bg-[--d-333-l-0A0B0C] color-[#F5F5F5]']"
@@ -309,13 +309,13 @@ onMounted(() => {
                 class="flex items-center cursor-pointer hover:bg-[--d-333-l-0A0B0C] hover:color-[#F5F5F5] px-10px py-5px"
                 @click.stop="handleUpdateGroup(item)">
                 <Icon name="fe:edit" class="color-#666 text-14px" />
-                <view class="ml-4px text-14px">{{ t('rename') }}</view>
+                <view class="ml-4px text-12px">{{ t('rename') }}</view>
               </div>
               <div
                 class="flex items-center cursor-pointer hover:bg-[--d-333-l-0A0B0C] hover:color-[#F5F5F5] px-10px py-5px"
                 @click.stop="handleDeleteGroup(item.value)">
                 <Icon name="bx:bxs-trash-alt" class="text-15px color-#666" />
-                <view class="ml-4px text-14px">{{ t('delete') }}</view>
+                <view class="ml-4px text-12px">{{ t('delete') }}</view>
               </div>
             </div>
             <div v-else class="px-15px">

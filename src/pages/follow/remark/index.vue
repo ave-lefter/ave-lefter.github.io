@@ -269,11 +269,11 @@ onMounted(() => {
                   <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px cursor-pointer" name="custom:remark" />
                 </div>
               </div>
-              <div class="flex items-center">
+              <div class="flex items-center h-12px">
                 <Icon @click.stop.prevent v-copy="row?.user_address" name="bxs:copy"
-                  class="clickable text-[--d-666-l-999]" />
-                <Icon name="custom:sun-icon" class="text-12px mx-5px" />
-                <Icon name="custom:wallet-icon" class="text-12px" />
+                  class="clickable text-[--d-666-l-999] w-12px h-12px" />
+                <Icon name="custom:sun-icon" class="text-12px w-12px h-12px mx-5px" />
+                <Icon name="custom:wallet-icon" class="text-12px w-12px h-12px" />
               </div>
             </div>
           </div>
@@ -383,6 +383,7 @@ onMounted(() => {
 :deep(.el-table .cell) {
   font-size: 12px !important;
   padding: 0 16px;
+  overflow: visible;
 }
 
 :deep(.el-pagination) {
