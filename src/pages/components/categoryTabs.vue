@@ -4,6 +4,10 @@ import BlackList from '../pump/blackList.vue'
 import type { CategoryElement } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
 
+const emit = defineEmits<{
+  (e: 'update:activeTab', value: string): void
+}>()
+
 const props = defineProps<{ activeTab: string; categories: CategoryElement[] }>()
 // const { t } = useI18n()
 const intervals = computed(() => {
@@ -50,6 +54,7 @@ const localeStore = useLocaleStore()
             ? 'color-#F5F5F5 bg-#333'
             : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
         "
+        @click="emit('update:activeTab', item.category)"
       >
         <Icon
           :name="configMap[item.category as keyof typeof configMap].icon"
