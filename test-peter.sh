@@ -37,8 +37,8 @@ rm -rf "$TEMP_CONFIG_DIR"
 echo "📋 加载配置文件: $CONFIG_FILE_NAME"
 source "./temp-config.env"
 
-# 获取当前时间
-TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+# 获取当前时间（UTC-8 北京时间）
+TIMESTAMP=$(TZ='Asia/Shanghai' date +"%Y-%m-%d %H:%M:%S CST")
 # 获取当前分支
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 # 获取最新提交信息
@@ -49,43 +49,49 @@ AUTHOR_NAME=$(git log -1 --pretty=%an)
 # 发送开始部署通知到飞书的函数
 send_start_notification() {
     echo "📦 发送开始部署通知到飞书..."
-    curl -X POST "$FEISHU_WEBHOOK_URL" \
-        -H "Content-Type: application/json" \
-        -d "{
-            \"msg_type\": \"text\",
-            \"content\": {
-                \"text\": \"🚀 $PROJECT_DISPLAY_NAME 开始部署\\n\\n📦 项目: $PROJECT_NAME\\n🌿 分支: $BRANCH\\n👤 作者: $AUTHOR_NAME\\n💬 提交: $COMMIT_MESSAGE\\n🕐 时间: $TIMESTAMP\"
-            }
-        }" \
-        --silent --show-error || echo "⚠️  发送飞书开始通知失败"
+    for webhook_url in "${FEISHU_WEBHOOK_URLS[@]}"; do
+        curl -X POST "$webhook_url" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "{
+                \"msg_type\": \"text\",
+                \"content\": {
+                    \"text\": \"🚀 $PROJECT_DISPLAY_NAME 开始部署\\n\\n📦 项目: $PROJECT_NAME\\n🌿 分支: $BRANCH\\n👤 作者: $AUTHOR_NAME\\n💬 提交: $COMMIT_MESSAGE\\n🕐 时间: $TIMESTAMP\"
+                }
+            }" \
+            --silent --show-error || echo "⚠️  发送飞书开始通知失败: $webhook_url"
+    done
 }
 
 # 发送推送成功通知到飞书的函数
 send_push_success_notification() {
     echo "📤 发送推送成功通知到飞书..."
-    curl -X POST "$FEISHU_WEBHOOK_URL" \
-        -H "Content-Type: application/json" \
-        -d "{
-            \"msg_type\": \"text\",
-            \"content\": {
-                \"text\": \"📤 代码推送成功，GitHub Pages 正在部署...\\n\\n📦 项目: $PROJECT_NAME\\n🌿 分支: $BRANCH\\n👤 作者: $AUTHOR_NAME\\n💬 提交: $COMMIT_MESSAGE\\n⏳ 部署完成后将通过 GitHub Actions 自动发送通知\"
-            }
-        }" \
-        --silent --show-error || echo "⚠️  发送飞书推送成功通知失败"
+    for webhook_url in "${FEISHU_WEBHOOK_URLS[@]}"; do
+        curl -X POST "$webhook_url" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "{
+                \"msg_type\": \"text\",
+                \"content\": {
+                    \"text\": \"📤 代码推送成功，GitHub Pages 正在部署...\\n\\n📦 项目: $PROJECT_NAME\\n🌿 分支: $BRANCH\\n👤 作者: $AUTHOR_NAME\\n💬 提交: $COMMIT_MESSAGE\\n⏳ 部署完成后将通过 GitHub Actions 自动发送通知\"
+                }
+            }" \
+            --silent --show-error || echo "⚠️  发送飞书推送成功通知失败: $webhook_url"
+    done
 }
 
 # 发送失败通知到飞书的函数
 send_failure_notification() {
     echo "❌ 发送部署失败通知到飞书..."
-    curl -X POST "$FEISHU_WEBHOOK_URL" \
-        -H "Content-Type: application/json" \
-        -d "{
-            \"msg_type\": \"text\",
-            \"content\": {
-                \"text\": \"💥 $PROJECT_DISPLAY_NAME 构建或推送失败！\\n\\n📦 项目: $PROJECT_NAME\\n🌿 分支: $BRANCH\\n👤 作者: $AUTHOR_NAME\\n💬 提交: $COMMIT_MESSAGE\\n❌ 失败时间: $TIMESTAMP\\n\\n请检查构建日志并修复问题。\"
-            }
-        }" \
-        --silent --show-error || echo "⚠️  发送飞书失败通知失败"
+    for webhook_url in "${FEISHU_WEBHOOK_URLS[@]}"; do
+        curl -X POST "$webhook_url" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "{
+                \"msg_type\": \"text\",
+                \"content\": {
+                    \"text\": \"💥 $PROJECT_DISPLAY_NAME 构建或推送失败！\\n\\n📦 项目: $PROJECT_NAME\\n🌿 分支: $BRANCH\\n👤 作者: $AUTHOR_NAME\\n💬 提交: $COMMIT_MESSAGE\\n❌ 失败时间: $TIMESTAMP\\n\\n请检查构建日志并修复问题。\"
+                }
+            }" \
+            --silent --show-error || echo "⚠️  发送飞书失败通知失败: $webhook_url"
+    done
 }
 
 # 设置错误处理，当脚本出错时发送失败通知
@@ -122,7 +128,10 @@ if [ ! -f "$TEMPLATE_PATH" ]; then
     exit 1
 fi
 
-sed -e "s|{{FEISHU_WEBHOOK_URL}}|$FEISHU_WEBHOOK_URL|g" \
+# 将数组转换为逗号分隔的字符串用于模板
+WEBHOOK_URLS_STRING=$(IFS=','; echo "${FEISHU_WEBHOOK_URLS[*]}")
+
+sed -e "s|{{FEISHU_WEBHOOK_URLS}}|$WEBHOOK_URLS_STRING|g" \
     -e "s|{{DEPLOYMENT_URL}}|$DEPLOYMENT_URL|g" \
     -e "s|{{PROJECT_NAME}}|$PROJECT_NAME|g" \
     -e "s|{{PROJECT_DISPLAY_NAME}}|$PROJECT_DISPLAY_NAME|g" \
