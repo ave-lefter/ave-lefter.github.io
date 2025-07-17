@@ -460,11 +460,11 @@ onMounted(() => {
                   </div>
                   <div class="flex items-center mt-2px">
                     <!-- <span class="text-[--d-CCC-l-999]">({{ '*' + row.token?.slice(-4) }})</span> -->
-                    <span
-                      class="text-[#3f80f7] border-[0.5px] border-solid border-[#3f80f7] rounded-4px bg-transparent text-10px px-4px max-w-[60px] truncate"
-                      :title="row.remark" v-if="row.remark">{{ row.remark }}</span>
+                    <div
+                      class="text-[#3f80f7] border-[0.5px] border-solid border-[#3f80f7] box-border rounded-4px bg-transparent text-10px px-4px max-w-[60px] h-16px flex items-center truncate"
+                      :title="row.remark" v-if="row.remark">{{ row.remark }}</div>
                     <!-- 备注 -->
-                    <div ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
+                    <div class="flex items-center" ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
                       <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px" name="custom:remark" />
                     </div>
                     <a class="flex items-center" v-if="row?.twitter" v-tooltip="row?.twitter" :href="row?.twitter"
