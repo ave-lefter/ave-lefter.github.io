@@ -352,7 +352,7 @@ onMounted(() => {
 
     <el-pagination class="mt-15px" v-if="pageData.total > 1" v-model:current-page="pageData.page"
       v-model:page-size="pageData.pageSize" layout="prev, pager, next, ->" :total="pageData.total"
-      :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getList" />
+      :page-sizes="[10, 20, 30, 40, 50, 60]" hide-on-single-page @change="getList" />
 
     <el-popover :visible="visibleShow" :virtual-ref="virtualRef" virtual-triggering trigger="click" :width="250">
       <div>

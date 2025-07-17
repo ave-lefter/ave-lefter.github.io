@@ -248,7 +248,7 @@ const getRowGroupChange = async (val: number, row: any) => {
 
 // 获取列表
 const getList = async () => {
-  loading.value=true
+  loading.value = true
   const res: any = await getNewFavoriteList({
     address: addressValue.value,
     group: activeTab.value,
@@ -269,7 +269,7 @@ const getList = async () => {
     []
   pageData.value.total = res.total
   tableList.value = tableData
-  loading.value=false
+  loading.value = false
 }
 
 // 获取分组列表
@@ -341,7 +341,7 @@ onMounted(() => {
         <template #reference>
           <!-- 新增 -->
           <div style="background: rgba(63, 128, 247, 0.10);" @click="editId = undefined"
-            class="cursor-pointer text-12px color-[#3F80F7] px-12px h-28px rounded-4px shrink-0 flex items-center">
+            class="cursor-pointer text-12px color-[#3F80F7] px-8px h-28px rounded-4px shrink-0 flex items-center">
             <Icon name="custom:add-icon" class="text-12px mr-2px" />
             {{ t('newGroup') }}
           </div>
@@ -365,7 +365,7 @@ onMounted(() => {
       <el-popover trigger="click" @hide="moveValue = ''" ref="moveGroupPopoverRef" :width="250">
         <template #reference>
           <div style="background: rgba(63, 128, 247, 0.10);" @click="handleMoveGroup"
-            class="cursor-pointer text-12px color-[#3F80F7] px-12px h-28px rounded-4px shrink-0 flex items-center">
+            class="cursor-pointer text-12px color-[#3F80F7] px-8px h-28px rounded-4px shrink-0 flex items-center">
             <Icon name="custom:list-icon" class="text-12px mr-2px" />
             {{ t('groupManage') }}
           </div>
@@ -454,7 +454,7 @@ onMounted(() => {
                   <a class="ml-4px flex items-center"
                     :href="`https://x.com/search?q=(${row?.symbol}OR${row?.token})&src=typed_query&f=live`"
                     target="_blank" @click.stop>
-                    <Icon class="text-[--d-666-l-999] h-12px w-12px text-12px" name="custom:search"/>
+                    <Icon class="text-[--d-666-l-999] h-12px w-12px text-12px" name="custom:search" />
                   </a>
                 </div>
                 <div class="flex items-center mt-2px">
@@ -535,8 +535,9 @@ onMounted(() => {
       </el-table-column>
       <el-table-column :label="t('tokenGroup')" align="right" width="170">
         <template #default="{ row }">
-          <el-select v-model="row.group_id" placement="bottom-end" style="width: 100px;" popper-class="follow-select-popper" filterable
-            class="[&&]:[--el-text-color-regular:var(--d-CCC-l-333)]" @click.stop @change="(val) => getRowGroupChange(val, row)">
+          <el-select v-model="row.group_id" placement="bottom-end" style="width: 100px;"
+            popper-class="follow-select-popper" filterable class="[&&]:[--el-text-color-regular:var(--d-CCC-l-333)]"
+            @click.stop @change="(val) => getRowGroupChange(val, row)">
             <el-option v-for="item in allTabsGroup" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </template>
@@ -545,7 +546,7 @@ onMounted(() => {
 
     <el-pagination class="mt-15px" v-if="pageData.total > 1" v-model:current-page="pageData.page"
       v-model:page-size="pageData.pageSize" layout="prev, pager, next, ->" :total="pageData.total"
-      :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getList" />
+      :page-sizes="[10, 20, 30, 40, 50, 60]" hide-on-single-page @change="getList" />
 
     <el-popover :visible="visibleShow" :virtual-ref="virtualRef" virtual-triggering trigger="click" :width="250">
       <div>
