@@ -3,6 +3,10 @@
 # 当发生错误时中止脚本
 set -e
 
+# 设置字符编码为 UTF-8
+export LANG=C.UTF-8
+export LC_ALL=C.UTF-8
+
 # 配置远程仓库信息
 CONFIG_REPO_URL="git@github.com:panyongxu1002/ave_deploy-config.git"  # 替换为你的私有配置仓库
 CONFIG_FILE_NAME="config-a.env"  # 配置文件名，test2.sh 使用 config-a.env
@@ -43,8 +47,9 @@ TIMESTAMP=$(TZ='Asia/Shanghai' date +"%Y-%m-%d %H:%M:%S CST")
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 # 获取最新提交信息
 COMMIT_SHA=$(git rev-parse --short HEAD)
-COMMIT_MESSAGE=$(git log -1 --pretty=%B | tr '\n' ' ')
-AUTHOR_NAME=$(git log -1 --pretty=%an)
+# 获取提交信息并处理编码
+COMMIT_MESSAGE=$(git log -1 --pretty=%B | tr '\n' ' ' | iconv -f UTF-8 -t UTF-8 2>/dev/null || git log -1 --pretty=%B | tr '\n' ' ')
+AUTHOR_NAME=$(git log -1 --pretty=%an | iconv -f UTF-8 -t UTF-8 2>/dev/null || git log -1 --pretty=%an)
 
 # 发送开始部署通知到飞书的函数
 send_start_notification() {
