@@ -31,7 +31,7 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item class="mb-0px!">
-        <span v-if="!botStore.evmAddress" class="font-500 text-12px lh-[100%] tracking-0px color-#FFA622! mb-12px" >
+        <span v-if="!botStore.evmAddress" class="font-500 text-12px lh-[100%] tracking-0px color-[var--d-999-l-666]! mb-12px" >
           <i18n-t keypath="attentionTips" tag="label" for="login">
             <a class="color-#3F80F7 decoration-underline cursor-pointer"  @click="botStore.changeConnectVisible(true)">{{ t('login') }}</a>
           </i18n-t>
