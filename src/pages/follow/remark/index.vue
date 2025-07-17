@@ -314,24 +314,23 @@ onMounted(() => {
       <el-table-column :label="t('pushTitle')" align="right">
         <template #default="{ row }">
           <div class="flex flex-row-reverse" @click.stop>
-            <a class="flex items-center"
+            <a class="flex items-center color-[var(--d-F5F5F5-l-333)]"
               :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`" target="_blank">
               <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
               {{ t('copyTrade') }}
             </a>
-            <div v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
-              class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-CCC-l-333)]"
-              @click="handleMonitor(row)">
-              <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-13px mr-5px"
-                :class="[(row?.is_monitored === 1) && 'color-[var(--d-CCC-l-333)]']" />
-              <Icon v-else name="custom:monitor-icon" class="text-16px mr-2px" />
+            <div
+              v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
+              class="flex items-center mr-12px cursor-pointer color-[var--d-666-l-CCC] group-hover:color-[var(--d-F5F5F5-l-333)]" @click="handleMonitor(row)">
+              <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-12px mr-5px  mb--1px" :class="[(row?.is_monitored === 1)&&'color-[var(--d-F5F5F5-l-333)]']"/>
+              <Icon v-else name="custom:monitor-icon" class="text-15px mr-2px mb-1px"/>
               <span
                 class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
                 {{ (row?.is_monitored === 1) ? t('pause') : t('enable') }}
               </span>
             </div>
             <div class="flex items-center mr-12px color-[var(--d-666-l-CCC)] cursor-not-allowed" v-else>
-              <Icon name="custom:monitor-icon" class="text-16px mr-2px " />
+              <Icon name="custom:monitor-icon" class="text-15px mr-2px mb-1px" />
             </div>
             <!-- 监控 -->
             <!-- <div class="flex items-center mr-12px cursor-pointer color-[#666] group-hover:color-[var(--d-F2F2F2-l-333)]"

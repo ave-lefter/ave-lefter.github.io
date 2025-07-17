@@ -4,14 +4,14 @@
       <el-form-item prop="user_chain" required label-position="top" size="large" class="mb-13px!">
         <div class="flex justify-between items-center w-100%">
           <h4 class="font-500 text-12px lh-[120%] color-[var(--d-FFF-l-000)]">{{ $t('addWallet') }}</h4>
-          <el-select v-model="form.user_chain" :placeholder="t('placeholderPrefix1') + t('chain')" value-key="value" size="small" style="--el-text-color-regular:var(--d-FFF-l-000);--el-select-input-color:var(--d-FFF-l-000)" :suffix-icon="CaretBottom" class="w-70px!" :teleported="false">
+          <el-select v-model="form.user_chain" :placeholder="t('placeholderPrefix1') + t('chain')" value-key="value" size="small" style="--el-text-color-regular:var(--d-FFF-l-000);--el-select-input-color:var(--d-FFF-l-000)" :suffix-icon="CaretBottom" class="w-70px!" :teleported="false" popper-class="w-103px">
             <template #prefix>
               <div class="h-12px inline-flex items-center">
                 <img :src="`${token_logo_url}chain/${form.user_chain?.id}.png`" class="rd-50%" width="12" lazy alt="">
               </div>
             </template>
-            <el-option v-for="item in chainOptions" :key="item.value" :label="item.label" :value="item" class="h-20px! flex! items-center! font-400! text-10px! lh-20px!">
-              <img :src="`${token_logo_url}chain/${item?.id}.png`" class="rd-50% mr-4px" width="12" lazy alt="">
+            <el-option v-for="item in chainOptions" :key="item.value" :label="item.label" :value="item" class="h-26px! flex! items-center! font-500! text-14px! lh-none!">
+              <img :src="`${token_logo_url}chain/${item?.id}.png`" class="rd-50% mr-4px" width="16" lazy alt="">
               <span>{{ item.label }}</span>
             </el-option>
           </el-select>
@@ -185,7 +185,10 @@ defineExpose({
 }
 :deep() .el-select--small .el-select__wrapper{
   font-size: 10px;
-  font-weight: 400;
+  font-weight: 500;
+}
+:deep() .el-select-dropdown__list{
+  padding: 12px 0;
 }
 </style>
 

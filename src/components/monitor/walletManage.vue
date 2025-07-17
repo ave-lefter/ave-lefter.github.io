@@ -61,7 +61,7 @@
           </template>
           <template #header-chain>
             <span>{{ $t('chain') }}</span>
-            <el-popover v-model:visible="visible" popper-style="width: 120px;min-width: 120px;" trigger="click">
+            <el-popover v-model:visible="visible" popper-style="width: 103px;min-width: 103px;" trigger="click">
               <template #reference>
                   <Icon
                     id="custom-filter"
