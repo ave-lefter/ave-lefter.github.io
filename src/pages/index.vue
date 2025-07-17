@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
+import gain from './components/gainRank/gain.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 const components = {
   hot,
+  gain,
 }
 const activeTab = shallowRef<keyof typeof components>('hot')
 const activeChain = shallowRef('AllChains')
