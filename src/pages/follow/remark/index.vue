@@ -5,14 +5,14 @@ import dayjs from 'dayjs'
 import { formatNumber2 } from '~/utils/formatNumber'
 import { getRemarksDetail } from '~/api/fav'
 // import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
-import { deleteAttention, updateWhaleRemark, addAttention, addAttentionNew, addAttention2, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
+import { deleteAttention, updateWhaleRemark, addAttentionNew, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 
 const { updateNum3 } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const router = useRouter()
 const { t } = useI18n()
-const { isDark } = storeToRefs(useGlobalStore())
+// const { isDark } = storeToRefs(useGlobalStore())
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
@@ -150,7 +150,7 @@ const handleSortChange = ({ prop, order }: any) => {
 }
 
 // 取消收藏
-const collect = async (row: any, index: number) => {
+const collect = async (row: any) => {
   if (walletStore.address && !walletStore.walletSignature[walletStore.address]) {
     await walletStore.signMessageForFavorite()
   }
@@ -254,20 +254,20 @@ onMounted(() => {
               name="custom:attention"
               :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'"
               class="color-[--d-666-l-999] h-16px w-16px clickable shrink-0"
-              @click.stop.prevent="collect(row, $index)" />
+              @click.stop.prevent="collect(row)" />
             <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo"
               :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
             <div class="ml-5px h-32px flex flex-col justify-between">
               <div class="flex items-center">
-                <UserRemark :key="`${row.user_address}-${row.user_chain}`" :remark="row.remark"
+                <!-- <UserRemark :key="`${row.user_address}-${row.user_chain}`" :remark="row.remark"
                   :address="row.user_address" :chain="row.user_chain"
                   addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 85px"
                   :iconEditColor="isDark ? '#666' : '#999'" iconEditSize="10px" showAddressTitle
-                  :formatAddress="(address) => address?.slice(0, 4) + '...' + address?.slice(-4)" />
-                <!-- <span class="text-14px max-w-[95px] truncate">{{ row.remark }}</span>
+                  :formatAddress="(address) => address?.slice(0, 4) + '...' + address?.slice(-4)" /> -->
+                <span class="text-14px max-w-[95px] truncate">{{ row.remark }}</span>
                 <div ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
-                  <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px" name="custom:remark" />
-                </div> -->
+                  <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px cursor-pointer" name="custom:remark" />
+                </div>
               </div>
               <div class="flex items-center">
                 <Icon @click.stop.prevent v-copy="row?.user_address" name="bxs:copy"
@@ -359,10 +359,10 @@ onMounted(() => {
       <div>
         <div>{{ t('editRemark') }}</div>
         <el-input v-model="remarkValue" clearable maxlength="20" show-word-limit :placeholder="t('enterRemark')"
-          class="mt-8px w-200px" />
+          class="mt-8px w-100%" />
         <div class="flex items-center justify-between mt-12px gap-12px">
           <div @click="visibleShow = false"
-            class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[--d-333-l-0A0B0C] px-12px py-8px rounded-4px">
+            class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
             {{ t('cancel') }}
           </div>
           <div @click="handleRemarkGroup(rowData)"

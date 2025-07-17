@@ -323,7 +323,7 @@ onMounted(() => {
               <el-input v-model="groupValue" :placeholder="t('enterGroupName')" class="mt-8px w-100%" />
               <div class="flex items-center justify-between mt-12px gap-12px">
                 <div @click="editGroupPopoverRef[index]?.hide()"
-                  class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[--d-333-l-0A0B0C] px-12px py-8px rounded-4px">
+                  class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
                   {{ t('cancel') }}
                 </div>
                 <div @click="handleUpdateGroupConfirm(item, index)"
@@ -349,10 +349,10 @@ onMounted(() => {
         <div>
           <div>{{ t('newGroup') }}</div>
           <el-input ref="addGroupInputRef" v-model="groupValue" :placeholder="t('enterGroupName')"
-            class="mt-8px w-200px" />
+            class="mt-8px w-100%" />
           <div class="flex items-center justify-between mt-12px gap-12px">
             <div @click="addGroupPopoverRef?.hide()"
-              class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[--d-333-l-0A0B0C] px-12px py-8px rounded-4px">
+              class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
               {{ t('cancel') }}
             </div>
             <div @click="handleAddGroup()"
@@ -382,7 +382,7 @@ onMounted(() => {
           </VueDraggableNext>
           <div class="flex items-center justify-between mt-12px gap-12px">
             <div @click="moveGroupPopoverRef?.hide()"
-              class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[--d-333-l-0A0B0C] px-12px py-8px rounded-4px">
+              class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
               {{ t('cancel') }}
             </div>
             <div @click="handleMoveGroupConfirm"
@@ -460,11 +460,11 @@ onMounted(() => {
                   </div>
                   <div class="flex items-center mt-2px">
                     <!-- <span class="text-[--d-CCC-l-999]">({{ '*' + row.token?.slice(-4) }})</span> -->
-                    <span
-                      class="text-[#3f80f7] border-[0.5px] border-solid border-[#3f80f7] rounded-4px bg-transparent text-10px px-4px max-w-[60px] truncate"
-                      :title="row.remark" v-if="row.remark">{{ row.remark }}</span>
+                    <div
+                      class="text-[#3f80f7] border-[0.5px] border-solid border-[#3f80f7] box-border rounded-4px bg-transparent text-10px px-4px max-w-[60px] h-16px flex items-center truncate"
+                      :title="row.remark" v-if="row.remark">{{ row.remark }}</div>
                     <!-- 备注 -->
-                    <div ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
+                    <div class="flex items-center" ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
                       <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px" name="custom:remark" />
                     </div>
                     <a class="flex items-center" v-if="row?.twitter" v-tooltip="row?.twitter" :href="row?.twitter"
@@ -554,10 +554,10 @@ onMounted(() => {
       <div>
         <div>{{ t('editRemark') }}</div>
         <el-input v-model="remarkValue" clearable maxlength="50" show-word-limit :placeholder="t('enterRemark')"
-          class="mt-8px w-200px" />
+          class="mt-8px w-100%" />
         <div class="flex items-center justify-between mt-12px gap-12px">
           <div @click="visibleShow = false"
-            class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[--d-333-l-0A0B0C] px-12px py-8px rounded-4px">
+            class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
             {{ t('cancel') }}
           </div>
           <div @click="handleRemarkGroup(rowData)"
