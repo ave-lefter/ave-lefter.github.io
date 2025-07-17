@@ -6,7 +6,7 @@
     :model="form"
     :rules="rules"
     :labelWidth="0"
-    size="default"
+    size="large"
     autocomplete="off"
     @submit.prevent="onSubmit"
 
@@ -27,17 +27,19 @@
     </el-form-item>
 
     <el-form-item style="margin-top: 30px; margin-bottom: 0;">
-      <div style="display: flex; justify-content: flex-end; width: 100%">
+      <div style="display: flex; justify-content: flex-end; width: 100%;gap:6px;">
         <el-button
-          style="height: 30px; min-width: 70px; font-weight: 400"
+          style="height: 32px; flex: 1; font-weight: 400"
           :color="buttonCancelColor"
+          class="[&&]:[--el-color-black:#333]"
           @click="onCancel"
         >
           {{ t('cancel') }}
         </el-button>
         <el-button
           native-type="submit"
-          style="height: 30px; min-width: 70px; font-weight: 400"
+          type="primary"
+          style="height: 32px; flex: 1; font-weight: 400"
           :color="buttonConfirmColor"
         >
           {{ t('confirm') }}
@@ -77,7 +79,7 @@ const buttonCancelColor = computed(() =>
   !themeStore.isDark ? '#f2f2f2' : '#333333'
 )
 const buttonConfirmColor = computed(() =>
-  !themeStore.isDark ? '#222222' : '#f5f5f5'
+  !themeStore.isDark ? '#3F80F7' : '#3F80F7'
 ) 
 
 const rules = {
@@ -102,5 +104,22 @@ function onCancel() {
 </script>
 
 <style scoped lang="scss">
+:deep() .el-input {
+  --el-input-border-color: #444444;
+  --el-input-placeholder-color: var(--d-666-l-999);
+  --el-text-color-placeholder: #999;
+  --el-input-bg-color: var(--d-333-l-F2F2F2)
+}
+:deep() .el-button {
+  --el-border:none;
+}
+:deep() .el-input__wrapper {
+  border: none;
+  border-radius: 6px;
+  box-shadow: none;
 
+  &:hover {
+    box-shadow: 0 0 0 1px #3F80F7 inset;
+  }
+}
 </style>

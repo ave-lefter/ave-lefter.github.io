@@ -231,8 +231,13 @@
         </AveEmpty>
       </el-tab-pane>
       <el-tab-pane :name="monitorStore.activeName">
+         <template #label>
+            <div class="cursor-move w-100% h-100% drag-handle" />
+         </template>
+      </el-tab-pane>
+      <el-tab-pane :name="monitorStore.activeName">
         <template #label>
-          <div class="m-op flex-end gap-8px cursor-move w-100% h-100%">
+          <div class="m-op flex-end gap-8px w-100% h-100%">
             <template v-if="monitorStore.activeName===1 && props.isLarge">
               <FilterType v-model="txType" :options="txTypeList" />
               <Icon name="icon-park-solid:volume-notice"/>
@@ -325,7 +330,7 @@ onMounted(async () => {
   // console.log('monitor mounted')
   nextTick(() => {
     const el = document.querySelector('.m-tabs .el-tabs__header.is-top')
-    if (el) el.className = 'el-tabs__header is-top drag-handle'
+    // if (el) el.className = 'el-tabs__header is-top drag-handle'
     // console.log('monitor visible', el)
   })
   init()
