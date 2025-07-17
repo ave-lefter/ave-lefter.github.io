@@ -27,7 +27,7 @@ const configMap = computed(() => {
       storageKey: 'hotUserTableColumns',
       getDefaultColumns: getHotDefaultColumns,
       getOptions: getHotOptions,
-      class: 'color-#FFA622',
+      class: props.activeTab === 'hot' ? 'color-#FFA622' : '',
     },
   }
 })
