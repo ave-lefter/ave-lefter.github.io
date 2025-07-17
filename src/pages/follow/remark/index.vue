@@ -12,7 +12,7 @@ const botStore = useBotStore()
 const walletStore = useWalletStore()
 const router = useRouter()
 const { t } = useI18n()
-// const { isDark } = storeToRefs(useGlobalStore())
+const { isDark } = storeToRefs(useGlobalStore())
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
@@ -259,15 +259,11 @@ onMounted(() => {
               :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
             <div class="ml-5px">
               <div class="flex items-center">
-                <!-- <UserRemark :key="`${row.user_address}-${row.user_chain}`" :remark="row.remark"
+                <UserRemark :key="`${row.user_address}-${row.user_chain}`" :remark="row.remark"
                   :address="row.user_address" :chain="row.user_chain"
                   addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 85px"
                   :iconEditColor="isDark ? '#666' : '#999'" iconEditSize="10px" showAddressTitle
-                  :formatAddress="(address) => address?.slice(0, 4) + '...' + address?.slice(-4)" /> -->
-                <span class="text-14px max-w-[95px] truncate">{{ row.remark }}</span>
-                <div ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
-                  <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px cursor-pointer" name="custom:remark" />
-                </div>
+                  :formatAddress="(address) => address?.slice(0, 4) + '...' + address?.slice(-4)" />
               </div>
               <div class="flex items-center">
                 <Icon @click.stop.prevent v-copy="row?.user_address" name="bxs:copy"
