@@ -294,7 +294,7 @@ onMounted(() => {
     <div v-if="botStore.evmAddress || walletStore.address"
       class="flex items-center px-16px mt-12px gap-8px overflow-x-auto scrollbar-hide">
       <div v-for="(item, index) in allTabsGroup" :key="item.value"
-        class="cursor-pointer text-12px color-[--d-666-l-999] bg-[--d-15171c-l-f2f2f2] px-8px h-28px rounded-4px shrink-0 flex items-center font-500"
+        class="cursor-pointer text-12px color-[#666] bg-[--d-1A1A1A-l-F2F2F2] px-8px h-28px rounded-4px shrink-0 flex items-center"
         :class="[activeTab === item.value && 'bg-[--d-333-l-0A0B0C] color-[#F5F5F5]']"
         @click="setActiveTab(item.value)">
         {{ item.label }}
@@ -381,7 +381,7 @@ onMounted(() => {
                  <Icon name="custom:move-icon" class="text-16px shrink-0 ml-5px" />
                </div>
              </VueDraggableNext>
-           </el-scrollbar> 
+           </el-scrollbar>
           <div class="flex items-center justify-between mt-12px gap-12px">
             <div @click="moveGroupPopoverRef?.hide()"
               class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
@@ -598,10 +598,10 @@ onMounted(() => {
 <style lang="scss" scoped>
 :deep(.el-table.el-table thead .el-table__cell) {
   height: 40px;
+  font-size: 12px !important;
 }
 
 :deep(.el-table .cell) {
-  font-size: 12px !important;
   padding: 0 16px;
 }
 
