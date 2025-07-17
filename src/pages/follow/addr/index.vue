@@ -120,7 +120,7 @@
               style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
             >
               <span v-if="$index < 9" class="text-10px" style="opacity: 0">0</span>
-              <span class="text-10px mr-5px font-400 text-[-d-666-l-999]">
+              <span class="text-10px mr-5px font-400 text-[--d-666-l-999]">
                 #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }} 
               </span>
               <!-- <a href class="mr-5px a-gray fav_address" v-if="row.is_wallet_address_fav == 1" @click.stop.prevent="handleDeleteAttention(row)">
@@ -503,7 +503,7 @@
              </div>
             <div
               v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
-              class="flex items-center mr-12px cursor-pointer color-[var--d-666-l-CCC] group-hover:color-[var(--d-F5F5F5-l-333)]" @click="handleMonitor(row,$index)">
+              class="flex items-center mr-12px cursor-pointer color-[var(--d-999-l-666)] group-hover:color-[var(--d-F5F5F5-l-333)]" @click="handleMonitor(row,$index)">
               <Icon v-if="!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 )" name="custom:monitor2-icon" class="text-12px mr-5px" :class="[(!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))&&'color-[var(--d-F5F5F5-l-333)]']"/>
               <Icon v-else name="custom:monitor-icon" class="text-15px mr-2px mb-1px"/>
               <span

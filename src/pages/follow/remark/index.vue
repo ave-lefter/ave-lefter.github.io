@@ -323,7 +323,7 @@ onMounted(() => {
             </a>
             <div
               v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
-              class="flex items-center mr-12px cursor-pointer color-[var--d-666-l-CCC] group-hover:color-[var(--d-F5F5F5-l-333)]" @click="handleMonitor(row)">
+              class="flex items-center mr-12px cursor-pointer color-[var(--d-999-l-666)] group-hover:color-[var(--d-F5F5F5-l-333)]" @click="handleMonitor(row)">
               <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-12px mr-5px  mb--1px" :class="[(row?.is_monitored === 1)&&'color-[var(--d-F5F5F5-l-333)]']"/>
               <Icon v-else name="custom:monitor-icon" class="text-15px mr-2px mb-1px"/>
               <span
