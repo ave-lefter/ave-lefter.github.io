@@ -658,8 +658,16 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
     width:100%;
     .el-tabs__item{
       padding: 0 12px;
-      &:last-child{
+      &:nth-child(2),&:nth-child(3),&:nth-child(5){
+        flex-shrink: 0;
+        flex-grow: 0;
+        flex-basis: auto;
+      }
+      &:nth-child(4){
         flex:1;
+        padding: 0;
+      }
+      &:last-child{
         padding: 0;
         justify-content: flex-end;
         color:inherit;
