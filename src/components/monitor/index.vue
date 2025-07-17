@@ -3,7 +3,7 @@
     <!-- <div class="w-100% h-40px absolute pointer-events-auto z-999 drag-handle left-0"/> -->
     <Icon
         name="custom:drag2"
-        class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2] "
+        class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2] drag-handle"
     />
     <el-tabs v-model="monitorStore.activeName" style="" class="m-tabs" @tab-change="handleClick">
       <el-tab-pane :label="$t('walletManage')" :name="0" lazy>
