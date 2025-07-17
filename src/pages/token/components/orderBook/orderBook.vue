@@ -333,18 +333,18 @@ const tabs = computed(() => {
     label: t('all'),
     value: 'all'
   },
-  {
-    label: t('buy3'),
-    value: 'buy'
-  },
-  {
-    label: t('sell3'),
-    value: 'sell'
-  },
-  {
-    label: t('liquidity2'),
-    value: 'liquidity'
-  },
+  // {
+  //   label: t('buy3'),
+  //   value: 'buy'
+  // },
+  // {
+  //   label: t('sell3'),
+  //   value: 'sell'
+  // },
+  // {
+  //   label: t('liquidity2'),
+  //   value: 'liquidity'
+  // },
   ...arr]
 })
 
