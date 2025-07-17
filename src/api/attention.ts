@@ -49,6 +49,15 @@ export function deleteMonitor(body:{ uid: string, address: string  }){
   })
 }
 
+export async function addAttentionNew(body: {
+  user_address: string, user_chain: string, remark?: string, address: string
+}) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/fav_users/v1/user/add', {
+    method: 'post',
+    body
+  })
+}
 
 // 用户添加关注
 export async function addAttention2({ user_chain='', user_address='', remark, address = localStorage.bot_evmAddress, group=0, is_monitored=0, website=1, app=0, telegram=0, buy=1, sell=1 }: IAddAttention2) {
