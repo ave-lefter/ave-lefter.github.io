@@ -3,8 +3,6 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
       {
         title: t('basicInfo'),
         list: [
-          'headline',
-          'priceContent',
           'mCapContent',
           'liquidityContent',
           'holdersContent',
@@ -15,11 +13,9 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         title: t('transactionInfo'),
         list: [
           'dynamicVolAndTxs',
-          // 'txnsContent',
           'dynamicMarkers',
           'priceChange1mContent',
           'priceChangeDynamicContent',
-          // "priceChange5mContent",
           'priceChange24hContent',
           'smarterContent',
         ],
@@ -29,8 +25,6 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         list: [
           'snipersContent',
           'securityContent',
-          // 'runPullContent',
-          'dexContent',
           'insidersContent',
         ],
       },
@@ -48,13 +42,6 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         minWidth:320
       },
       {
-        title:t('aiSummary'),
-        isVisible: true,
-        key:'headline',
-        render:'headline',
-        minWidth:232,
-      },
-      {
         title: t('mCap'),
         isVisible: true,
         key:'mCap',
@@ -63,11 +50,11 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         align:'right'
       },
       {
-        title: t('price'),
-        key: 'current_price_usd',
+        title: t('liquidity1') + '/' + t('initial'),
+        key: 'tvl',
         isVisible: true,
-        render: 'priceContent',
-        minWidth:130,
+        render: 'liquidityContent',
+        minWidth:160,
         align:'right'
       },
       {
@@ -95,14 +82,6 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         minWidth:110,
         align:'right',
         activeInterval:'24h'
-      },
-      {
-        title: t('liquidity1') + '/' + t('initial'),
-        key: 'tvl',
-        isVisible: true,
-        render: 'liquidityContent',
-        minWidth:160,
-        align:'right'
       },
       {
         title: t('volume4')+'/'+t('txns'),
@@ -137,12 +116,12 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         align:'right'
       },
       {
-        title: 'DEX',
-        key: 'dex',
+        title: t('top10'),
+        key: 'holders_top10_ratio',
         isVisible: false,
-        render: 'dexContent',
-        minWidth:70,
-        align:'center'
+        render: 'top10PositionsContent',
+        minWidth:getTextWidth(t('top10'), 50) + 40,
+        align:'right'
       },
       {
         title: t('security'),
@@ -157,11 +136,11 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         align:'right'
       },
       {
-        title: t('top10'),
-        key: 'holders_top10_ratio',
+        title: t('insiders'),
+        key: 'insider_balance_ratio_cur',
         isVisible: false,
-        render: 'top10PositionsContent',
-        minWidth:getTextWidth(t('top10'), 50) + 40,
+        render: 'insidersContent',
+        minWidth:110,
         align:'right'
       },
       {
@@ -173,14 +152,6 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         align:'right'
       },
       {
-        title: t('insiders'),
-        key: 'insider_balance_ratio_cur',
-        isVisible: false,
-        render: 'insidersContent',
-        minWidth:110,
-        align:'right'
-      },
-      {
         title: t('quick'),
         key: 'quick',
         isVisible: true,
@@ -189,18 +160,5 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         minWidth:100,
         align:'right'
       },
-    ]
-  }
-  
-  export function getOpenTimeList(allText:string) {
-    return [
-      { text: allText, value: '' },
-      { text: '≤30min', value: String(0.5) },
-      { text: '≤1H', value: String(1) },
-      { text: '≤6H', value: String(6) },
-      { text: '≤12H', value: String(12) },
-      { text: '≤24H', value: String(24) },
-      { text: '≤1W', value: String(24*7)},
-      { text: '≤30D', value: String(24 * 30) }
     ]
   }

@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
-import type { CategoryElement } from '~/api/market'
+import type { CategoryElement, IGetTreasureConfig } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
+import ChainsSelect from './chainsSelect.vue'
 import { getPumpDefault, getPumpOptions } from './pump/columnRender/pumpColumnsService'
 
 const emit = defineEmits<{
-  (e: 'update:activeTab'|'update:activeSubTab', value: string): void
+  (e: 'update:activeTab' | 'update:activeChain' | 'update:activeSubTab', value: string): void
 }>()
 
 const props = defineProps<{
   activeTab: string
   categories: CategoryElement[]
+  chains: IGetTreasureConfig[]
+  activeChain: string
   activeSubTab: string
 }>()
 // const { t } = useI18n()
@@ -65,11 +68,13 @@ const supportCategories = computed(() => {
   })
 })
 const localeStore = useLocaleStore()
-const sub_category_list = shallowRef<Omit<CategoryElement, 'sub_category'>[]>([])
-function updateCategory(category: string, sub_category: Omit<CategoryElement, 'sub_category'>[]) {
+const sub_category_list = computed(() => {
+  return props.categories.find((el) => {
+    return el.category === props.activeTab
+  })?.sub_category || []
+})
+function updateCategory(category: string) {
   emit('update:activeTab', category)
-  sub_category_list.value = sub_category
-  triggerRef(sub_category_list)
 }
 function updateSubCategory(category: string) {
   emit('update:activeSubTab', category)
@@ -77,9 +82,14 @@ function updateSubCategory(category: string) {
 </script>
 
 <template>
-  <div class="flex flex-1 flex-col gap-12px">
+  <div class="flex gap-16px py-12px px-16px bg-[--d-111-l-FFF]">
+    <ChainsSelect
+      :activeChain="activeChain"
+      :list="chains"
+      @update:activeChain="emit('update:activeChain', $event)"
+    />
     <div class="flex flex-1 justify-between">
-      <div class="flex gap-2 text-12px">
+      <div ref="categoryRef" class="flex gap-2 text-12px">
         <span
           v-for="(item, index) in supportCategories"
           :key="index"
@@ -89,7 +99,7 @@ function updateSubCategory(category: string) {
               ? 'color-#F5F5F5 bg-#333'
               : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
           "
-          @click="updateCategory(item.category, item.sub_category || [])"
+          @click="updateCategory(item.category)"
         >
           <Icon
             :name="configMap[item.category as keyof typeof configMap].icon"
@@ -134,24 +144,28 @@ function updateSubCategory(category: string) {
         </div>
       </div>
     </div>
-    <div v-if="sub_category_list.length" class="flex items-center gap-8px text-12px ml--136px relative">
-      <div
-        v-for="item in sub_category_list"
-        :key="item.category"
-        class="p-2 lh-16px cursor-pointer rounded-1 flex items-center"
-        :class="
-          activeSubTab === item.category
-            ? 'color-#F5F5F5 bg-#333'
-            : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
-        "
-        @click="updateSubCategory(item.category)"
-      >
-        <Icon
-          :name="`custom:${item.category.replaceAll('_','-')}`"
-          class="mr-1 text-12px"
-        />
-        {{ item[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
-      </div>
+  </div>
+  <div
+    v-if="sub_category_list.length"
+    class="flex items-center gap-8px text-12px px-16px pb-12px bg-[--d-111-l-FFF]"
+  >
+    <div
+      v-for="item in sub_category_list"
+      :key="item.category"
+      class="p-2 lh-16px cursor-pointer rounded-1 flex items-center"
+      :class="
+        activeSubTab === item.category
+          ? 'color-#F5F5F5 bg-#333'
+          : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
+      "
+      @click="updateSubCategory(item.category)"
+    >
+      <Icon
+        :name="`custom:${item.category.replaceAll('_', '-')}`"
+        class="mr-1 text-12px"
+        :class="activeSubTab === item.category ? 'color-#F5F5F5' : ''"
+      />
+      {{ item[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
     </div>
   </div>
 </template>
