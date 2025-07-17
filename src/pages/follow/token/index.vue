@@ -394,7 +394,8 @@ onMounted(() => {
       </el-popover>
     </div>
 
-    <el-table class='mt-12px' v-loading="loading" height="calc(100vh - 250px)" :data="tableList" fit
+    <el-table class='mt-12px' v-loading="loading"
+      :height="pageData.total > 50 ? 'calc(100vh - 255px)' : 'calc(100vh - 205px)'" :data="tableList" fit
       @sort-change="handleSortChange" @row-click="tableRowClick">
       <template #empty>
         <div v-if="botStore.evmAddress || walletStore.address">
@@ -544,7 +545,7 @@ onMounted(() => {
       </el-table-column>
     </el-table>
 
-    <el-pagination class="mt-15px" v-if="pageData.total > 1" v-model:current-page="pageData.page"
+    <el-pagination class="pt-20px" v-if="pageData.total > 1" v-model:current-page="pageData.page"
       v-model:page-size="pageData.pageSize" layout="prev, pager, next, ->" :total="pageData.total"
       :page-sizes="[10, 20, 30, 40, 50, 60]" hide-on-single-page @change="getList" />
 
@@ -592,6 +593,10 @@ onMounted(() => {
 </style>
 
 <style lang="scss" scoped>
+:deep(.el-table.el-table thead .el-table__cell) {
+  height: 40px;
+}
+
 :deep(.el-table .cell) {
   font-size: 12px !important;
   padding: 0 16px;
