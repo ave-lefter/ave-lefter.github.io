@@ -27,7 +27,7 @@ export async function addAttentionNew(body: {
   user_address: string, user_chain: string, remark?: string, address: string
 }) {
   const { $api } = useNuxtApp()
-  return $api('/fav_users/v1/user/add', {
+  return $api('/v2api/fav_users/v1/user/add', {
     method: 'post',
     body
   })
