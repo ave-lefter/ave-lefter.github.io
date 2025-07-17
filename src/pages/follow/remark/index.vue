@@ -5,14 +5,14 @@ import dayjs from 'dayjs'
 import { formatNumber2 } from '~/utils/formatNumber'
 import { getRemarksDetail } from '~/api/fav'
 // import { deleteAttention, updateWhaleRemark, addAttention, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
-import { deleteAttention, updateWhaleRemark, addAttention, addAttentionNew, addAttention2, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
+import { deleteAttention, updateWhaleRemark, addAttentionNew, addAddressMonitor, favUsersPauseMonitor } from '~/api/attention'
 
 const { updateNum3 } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const router = useRouter()
 const { t } = useI18n()
-const { isDark } = storeToRefs(useGlobalStore())
+// const { isDark } = storeToRefs(useGlobalStore())
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
@@ -252,7 +252,7 @@ onMounted(() => {
               name="custom:attention"
               :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'"
               class="color-[--d-666-l-999] h-16px w-16px clickable shrink-0"
-              @click.stop.prevent="collect(row, $index)" />
+              @click.stop.prevent="collect(row)" />
             <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo"
               :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
             <div class="ml-5px h-32px flex flex-col justify-between">
@@ -264,7 +264,7 @@ onMounted(() => {
                   :formatAddress="(address) => address?.slice(0, 4) + '...' + address?.slice(-4)" /> -->
                 <span class="text-14px max-w-[95px] truncate">{{ row.remark }}</span>
                 <div ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
-                  <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px" name="custom:remark" />
+                  <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px cursor-pointer" name="custom:remark" />
                 </div>
               </div>
               <div class="flex items-center">
