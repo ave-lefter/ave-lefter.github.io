@@ -25,7 +25,7 @@ function inBlackList(row) {
     globalStore.pumpBlackList.findIndex(
       (i) =>
         (i.address == row.token && i.type == 'ca') ||
-        (i.address == row.symbol && i.type == 'keyword')
+        (i.address == getSymbol(row) && i.type == 'keyword')
     ) !== -1
   )
 }
