@@ -220,7 +220,6 @@ function getMedias(appendix: string) {
 <template>
   <div class="w-full [&&]:max-w-1920px mx-auto">
     <CategoryTabs
-      :key="activeTab"
       v-model:activeTab="activeTab"
       v-model:activeChain="activeChain"
       :categories="categories"

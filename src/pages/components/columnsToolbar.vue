@@ -28,6 +28,10 @@ const openDialog = () => {
   dialogVisible.value = true
   initColumns.value = props.getDefaultColumns(t)
   modelColumns.value = cloneDeep(storeColumns.value.filter((item) => item.children || item.isVisible))
+  hotSettings.value = {
+    avatar_isCircle:globalStore.pumpSetting.avatar_isCircle,
+    isBlacklist:globalStore.pumpSetting.isBlacklist
+  }
 }
 
 const handleSelect = (item) => {
