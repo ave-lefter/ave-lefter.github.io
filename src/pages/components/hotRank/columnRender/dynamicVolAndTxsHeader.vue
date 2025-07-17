@@ -79,7 +79,7 @@ function confirm(
     }
     return
   }
-  if (params[1] && params[0] && params[1] < params[0]) {
+  if (params[1] && params[0] && Number(params[1]) < Number(params[0])) {
     ElMessage.error(t('maxGtMin'))
     return
   }
