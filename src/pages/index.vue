@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ChainsSelect from './components/chainsSelect.vue'
 import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
@@ -10,9 +9,8 @@ const components = {
 const activeTab = shallowRef<keyof typeof components>('hot')
 const activeChain = shallowRef('AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
-const categories = computed(()=>{
-  return chains.value.find(el => el.net_name === activeChain.value)
-  ?.categories || []
+const categories = computed(() => {
+  return chains.value.find((el) => el.net_name === activeChain.value)?.categories || []
 })
 
 onMounted(() => {
@@ -221,10 +219,13 @@ function getMedias(appendix: string) {
 
 <template>
   <div class="w-full [&&]:max-w-1920px mx-auto">
-    <div class="flex gap-16px py-12px px-16px bg-[--d-111-l-FFF]">
-      <ChainsSelect v-model:activeChain="activeChain" :list="chains" />
-      <CategoryTabs :key="activeTab" v-model:activeTab="activeTab" :categories="categories"/>
-    </div>
+    <CategoryTabs
+      :key="activeTab"
+      v-model:activeTab="activeTab"
+      v-model:activeChain="activeChain"
+      :categories="categories"
+      :chains="chains"
+    />
     <KeepAlive :max="6">
       <component
         :is="components[activeTab]"
