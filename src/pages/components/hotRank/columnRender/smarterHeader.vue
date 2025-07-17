@@ -48,7 +48,7 @@ function getParamsArr(startKey: string, endKey: string, params?: [string, string
       [startKey, ''],
       [endKey, ''],
     ]
-  } else if (params[1] && params[0] && params[1] < params[0]) {
+  } else if (params[1] && params[0] && Number(params[1]) < Number(params[0])) {
     ElMessage.error(t('maxGtMin'))
     return false
   } else {
