@@ -519,7 +519,7 @@
       </el-table-column>
       </el-table>
       <el-pagination 
-        v-if="filterDataSource?.length > 0"
+        v-if="filterDataSource?.length > 10"
         v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="h-72px flex justify-end items-center"
         layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getTableList"/>
     </div>
