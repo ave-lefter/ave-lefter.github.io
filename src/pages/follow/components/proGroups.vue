@@ -1,6 +1,6 @@
 <template>
   <ul class="w-tabs flex-1 flex-wrap">
-    <li class="clickable" :class="{ active: props.modelValue === 0 }" @click.stop.prevent="emit('update:modelValue', 0)">
+    <li class="clickable text-[var(--d-666-l-999)]" :class="{ active: props.modelValue === 0 }" @click.stop.prevent="emit('update:modelValue', 0)">
       <span>{{ $t('defaultGroup') }}</span>
     </li>
     <template v-if="props.options.length > 0">
