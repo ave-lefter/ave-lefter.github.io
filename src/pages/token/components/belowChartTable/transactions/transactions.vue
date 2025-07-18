@@ -20,6 +20,7 @@ import {useThrottleFn} from '@vueuse/core'
 
 import IconUnknown from '@/assets/images/icon-unknown.png'
 import type {AveTable} from '#components'
+import type { content } from 'html2canvas/dist/types/css/property-descriptors/content'
 
 const MAKER_SUPPORT_CHAINS = ['solana', 'bsc']
 const { t } = useI18n()
@@ -838,13 +839,15 @@ function resetMakerAddress() {
           <template v-if="['solana', 'bsc'].includes(row.chain) && row.senderProfile">
             <Icon
               v-if="hasNewAccount(row)"
-              v-tooltip.raw="`<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`" name="custom:new-account"
+              v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' }}"
+              name="custom:new-account"
               class="mr-3px shrink-0"/>
             <Icon
-              v-if="hasClearedAccount(row)" v-tooltip.raw="`<span style='color: #EB2B4B'>${$t('sellAl')}</span>`"
+              v-if="hasClearedAccount(row)" 
+              v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:cleared-account" class="mr-3px shrink-0"/>
             <Icon
-              v-if="bigWallet(row)" v-tooltip.raw="`<span style='color: #C5842B'>${$t('whales')}</span>`"
+              v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:big" class="mr-3px shrink-0"/>
           </template>
           <SignalTags

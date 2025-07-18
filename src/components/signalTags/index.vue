@@ -8,7 +8,7 @@
       <img
         v-if="i.type?.includes('TOP') && i.type?.slice(3) <25 || Number(i.type)"
         style="pointer-events: none;"
-        :class="getTagClass(index)" :src="formatNewTags(i.icon)" alt=""
+        :class="getTagClass(index) + ' signal-tag-hover'" :src="formatNewTags(i.icon)" alt=""
         height="15">
     </template>
   </div>
@@ -84,6 +84,7 @@ function onEnter(e: { target: any }) {
     target: e.target,
     props: {
       placement: 'top',
+      'popper-class': 'signal-tags-tooltip'
     }
   })
 }

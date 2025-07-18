@@ -1,6 +1,7 @@
 <template>
   <div class="icon-wallet-avatar-container">
     <el-image
+    :key="walletLogo"
       class="icon-wallet-avatar"
       :src="walletLogo"
       :style="avatarStyle"
@@ -47,18 +48,18 @@ const props = defineProps<{
 }>()
 
 const {
-  wallet_logo = {logo: '', name: '', url: ''},
+  // wallet_logo = {logo: '', name: '', url: ''},
   address = '',
   chain = '',
   iconSize = '16px',
   iconChainSize = ''
 } = props
-
+const wallet_logo = toRef(props, 'wallet_logo')
 const configStore = useConfigStore()
 
 const walletLogo = computed(() => {
-  return wallet_logo?.logo?.replace?.(/_normal/, '_400x400') ||
-    generateAvatarIcon(wallet_logo?.name || address)
+  return (wallet_logo?.value?.logo || '')?.replace?.(/_normal/, '_400x400') ||
+    generateAvatarIcon(wallet_logo?.value?.name || address)
 })
 
 const chainSize = computed(() => {
