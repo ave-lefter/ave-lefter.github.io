@@ -535,7 +535,7 @@ const confirmBulkDelete = () => {
         width: 100%;
         height: 328px;
         padding: 16px 12px;
-        color: var(--d-FFF-l-222);
+        color: var(--d-666-l-999);
         border: 1px solid var(--d-666-l-CCC);
         border-radius: 8px;
         overflow-y: auto;
