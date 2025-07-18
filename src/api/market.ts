@@ -39,7 +39,7 @@ export function getTreasureConfig(): Promise<IGetTreasureConfig[]> {
 
 export function getTreasureList(query) {
   const {$api} = useNuxtApp()
-  return $api('/v1api/v4/tokens/treasure/list', {
+  return $api('https://0ftrfsdb.xyz/v1api/v4/tokens/treasure/list', {
     method: 'get',
     query
   })

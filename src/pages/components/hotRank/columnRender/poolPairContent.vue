@@ -81,7 +81,7 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
     <div class="flex items-center" @click.stop="emit('collect', rowIndex, row)">
       <Icon
         name="custom:star"
-        class="color-var(--d-999-l-666) text-12px cursor-pointer ml-5px mr-12px"
+        class="color-var(--d-999-l-666) text-16px cursor-pointer ml-5px mr-12px"
         :class="row.is_fav ? 'color-#ffbb19' : ''"
       />
     </div>
@@ -172,7 +172,7 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
           </el-tooltip>
         </div>
         <div class="flex items-center lh-12px">
-          <div v-tooltip="formatDate(row.created_at, 'MM/DD HH:mm:ss')" class="mr-8px text-12px">
+          <div v-tooltip="formatDate(row.created_at, 'YYYY/MM/DD HH:mm:ss')" class="mr-8px text-12px">
             <TimerCount
               v-if="row.created_at && Number(formatTimeFromNow(row.created_at, true)) < 60"
               :key="row.created_at"
