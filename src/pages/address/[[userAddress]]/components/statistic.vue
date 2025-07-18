@@ -27,7 +27,7 @@
             />
             <a
               v-if="statistics.x_url"
-              class="flex items-center justify-center ml-6 gap-1 px-2 py-1 h-6 rounded text-3 cursor-pointer text-[var(--d-fff-l-18181B)] bg-gradient-to-r from-[rgba(18,184,134,0.1)] to-[rgba(139,79,221,0.1)]"
+              class="flex items-center justify-center ml-6 gap-1 px-2 py-1 h-6 rounded text-3 cursor-pointer text-[var(--d-fff-l-18181B)] bg-gradient-to-r from-[rgba(18,184,134,0.2)] to-[rgba(139,79,221,0.2)]"
               :href="statistics.x_url"
               target="_blank"
             >
@@ -37,7 +37,7 @@
             </a>
             <a
               v-else-if="isSelfAddress"
-              class="flex items-center justify-center ml-6 gap-1 px-2 py-1 h-6 rounded text-3 cursor-pointer text-[var(--d-fff-l-18181B)] bg-gradient-to-r from-[rgba(18,184,134,0.1)] to-[rgba(139,79,221,0.1)]"
+              class="flex items-center justify-center ml-6 gap-1 px-2 py-1 h-6 rounded text-3 cursor-pointer text-[var(--d-fff-l-18181B)] bg-gradient-to-r from-[rgba(18,184,134,0.2)] to-[rgba(139,79,221,0.2)]"
               @click="_bindTwitter"
             >
               <Icon
