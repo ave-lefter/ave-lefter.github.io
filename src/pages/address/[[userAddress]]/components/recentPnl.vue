@@ -117,7 +117,7 @@
             {{ $t('balance1') }}
             <Icon
               name="custom:price"
-              :class="`${injecteIsVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-F5F5F5-l-222]'} cursor-pointer ml-3px`"
+              :class="`${injecteIsVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-222]'} cursor-pointer ml-3px`"
               @click.stop.prevent="injecteIsVolUSDT=!injecteIsVolUSDT"
             />
           </span>
