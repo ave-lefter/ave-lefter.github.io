@@ -130,7 +130,8 @@ const list = computed(() => {
     query = `?act=${botStore.accessToken}&ret=${botStore.refreshToken}`
   }
   const menues = [
-    {id: 'index', name: t('markets'), src: '/', target: '_self'},
+    // {id: 'index', name: t('markets'), src: '/', target: '_self'},
+     {id: 'index', name: t('markets'), src: 'https://ave.ai/' + query, target: '_blank'},
     { id: 'pump', name: t('pump1'), src: '/pump' },
     { id: 'follow', name: t('follow'), src: '/follow' },
     {id: 'smart', name: t('smarter2'), src: '/smart', target: '_self'},
