@@ -668,6 +668,7 @@ function handleDeleteMonitor(row:any){
     ElMessage.success(t('success'))
     updateNum1.value++
     init()
+    getMonitorNum()
   })
 }
 
@@ -704,7 +705,6 @@ const handleMonitor = throttle((row:any,index:number=0) => {
       dataSource.value[index].is_monitored = row.is_monitored===0?1:0
       getTableList()
       ElMessage.success(t('success'))
-      getMonitorNum()
       updateNum1.value++
     }).catch((e) => {
         ElMessage.error(String(e))
