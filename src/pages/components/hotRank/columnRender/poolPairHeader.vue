@@ -42,7 +42,7 @@ function confirm(params?: [string, string]) {
   const _params = params.map((el, idx) => {
     return [
       `${{ 0: 'created_at_max', 1: 'created_at_min' }[idx]}` as string,
-      el ? dayjs().unix() - Number(el) * 3600 : '',
+      el ? dayjs().unix() - Number(el) * 60 : '',
     ]
   }) as [string, string][]
   props.setFilterForm(..._params)
@@ -67,7 +67,7 @@ function confirm(params?: [string, string]) {
       :list="openTimeList"
       :selectRangeIndex="1"
       :isFilterHighlight="isFilterHighlight"
-      append="h"
+      append="min"
       @confirm="confirm"
     />
   </div>

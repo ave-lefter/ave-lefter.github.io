@@ -15,7 +15,9 @@ function getTarget(row, key: 'symbol' | 'value' | 'init') {
 
 <template>
   <div v-if="isVolUSDT">
-    <div class="lh-18px mb-2px">${{ formatNumber(row.tvl || 0, 1) }}</div>
+    <div class="lh-18px mb-2px" :class="row.tvl < row.init_tvl ? 'color-#F6465D' : ''">
+      ${{ formatNumber(row.tvl || 0, 1) }}
+    </div>
     <div class="lh-16px color-[--d-666-l-999] text-12px">
       ${{ formatNumber(row.init_tvl || 0, 1) }}
     </div>
