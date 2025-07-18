@@ -9,7 +9,7 @@
         <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>
       </li>
       <li>
-        <el-radio-group v-model="conditions.time_interval" size="small" :fill="isDark?'#111':'#fff'" :text-color="isDark?'#F5F5F5':'#333'" @change="()=>{}">
+        <el-radio-group v-model="conditions.time_interval" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#111':'#fff'" :text-color="isDark?'#F5F5F5':'#333'" @change="()=>{}">
           <el-radio-button label="7D" :value="'7d'" />
           <el-radio-button label="30D" :value="'30d'" />
         </el-radio-group>
