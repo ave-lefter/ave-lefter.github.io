@@ -7,7 +7,7 @@ import {
 } from '~/api/token'
 import {filterLanguage} from '~/pages/token/components/kLine/utils'
 import dayjs from 'dayjs'
-import {addAttention, deleteAttention} from '~/api/attention'
+import {addAttention, deleteAttention,addAttention2} from '~/api/attention'
 import ExcludeError from './excludeError.vue'
 import {addSign} from '@/utils'
 import List from './list.vue'
@@ -23,6 +23,7 @@ const listQuery = shallowRef({
   pageSize: 40,
   event_type: ''
 })
+const attentionTriggerRef=ref()
 const checkedTrend = ref(['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY'])
 const trendList = shallowRef<GetTokenDetailsListResponse[]>([])
 const filteredTrendList = computed(() => {
@@ -171,6 +172,49 @@ function attention() {
       })
   }
 }
+const collect = async () => {
+  if(!useFollowStore().currentAddress){
+    useBotStore().changeConnectVisible(true)
+  }
+  if (useWalletStore().address && !useWalletStore().walletSignature[useWalletStore().address]) {
+    await useWalletStore().signMessageForFavorite()
+  }
+  if(statistics.value.is_wallet_address_fav !== 1){
+    useFollowStore().confirmAttention(attentionTriggerRef.value,tokenDetailStore.tokenInfo!.chain, (form) => {
+      console.log('confirmAttention', form)
+      return addAttention2({
+        address: useFollowStore().currentAddress,
+        user_address: tokenDetailStore.user_address,
+        user_chain: tokenDetailStore.tokenInfo!.chain,
+        group: form.group,
+        is_monitored: form.is_monitored,
+      }).then(() => {
+        ElMessage.success(t('attention1Success'))
+        // getList()
+        _getTokenStatistics()
+        return Promise.resolve()
+      }).catch((err) => {
+        return Promise.reject(err)
+      })
+    })
+    return 
+  }
+  // loading.value = true
+  deleteAttention({
+    address: useFollowStore().currentAddress,
+    user_address: tokenDetailStore.user_address,
+    user_chain: tokenDetailStore.tokenInfo!.chain
+  }).then(() => {
+    ElMessage.success( t('attention1Canceled'))
+    // getList()
+     _getTokenStatistics()
+  }).catch((err) => {
+    console.log(err)
+  }).finally(() => {
+    // loading.value = false
+  })
+}
+
 </script>
 
 <template>
@@ -199,6 +243,9 @@ function attention() {
               address-class="max-w-95px whitespace-nowrap text-ellipsis overflow-x-hidden text-14px"
               :formatAddress="(address: string) => address.slice(0, 4) + '...' + address.slice(-4)"
             />
+            <Icon
+              ref="attentionTriggerRef" name="custom:attention"
+              :class="statistics.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect()" />
             <div v-if="statistics.newTags?.length > 0" class="ml-6px">
               <el-tooltip
                 placement="top"
@@ -264,7 +311,7 @@ function attention() {
             <Icon
               v-copy="tokenDetailStore.user_address"
               name="bxs:copy"
-              class="cursor-pointer color-[--d-666-l-696E7C] text-10px"
+              class="cursor-pointer color-[--d-666-l-999] text-10px"
             />
             <!--<Icon-->
             <!--  name="custom:attention"-->

@@ -102,7 +102,7 @@ import { ProvideType } from '~/utils/constants'
 import { getHotTokens, type GetHotTokensResponse } from '@/api/token'
 import type {IPriceV2Response} from '~/api/types/ws'
 const { hotList } = storeToRefs(useGlobalStore())
-
+const {currentAddress} =storeToRefs(useFollowStore())
 const { modelValue } = defineProps({
   modelValue: Boolean,
 })
@@ -216,6 +216,10 @@ watch(query, (newval) => {
   if (newval) {
     debouncedFetch()
   }
+})
+
+watch(() => currentAddress.value, () => {
+    getSmartTop10()
 })
 
 watch(visible, (val) => {

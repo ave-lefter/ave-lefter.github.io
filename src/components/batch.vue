@@ -19,7 +19,7 @@
       <div v-if="tabActive === 0" class="import part">
         <p>{{ $t('bulkDesc1') }}</p>
         <div class="example">
-          <div class="mr-5">{{ $t('bulkExample')}}:</div>
+          <div class="mr-5px">{{ $t('bulkExample')}}:</div>
           <div>
             <div>5meiN***8vGB:{{ $t('remark')}}1,</div>
             <div>G8oaP***eLgf:{{ $t('remark')}}2</div>
@@ -38,7 +38,7 @@
             <img
               v-if="activeChain"
               height="24"
-              class="mr-5 round"
+              class="mr-5px border-rd-[50%]"
               :src="`${token_logo_url}chain/${activeChain}.png`"
               style=""
               alt=""
@@ -55,9 +55,9 @@
               <img
                 v-if="item"
                 height="24"
-                class="mr-5 round"
+                class="mr-5px border-rd-[50%]"
+                style="border-radius: 45%;"
                 :src="`${token_logo_url}chain/${item}.png`"
-                style=""
                 alt=""
                 srcset=""
               >
@@ -94,7 +94,8 @@
             <img
               v-if="activeChain"
               height="24"
-              class="mr-5 round"
+              class="mr-5px border-rd-[50%]"
+
               :src="`${token_logo_url}chain/${activeChain}.png`"
               style=""
               alt=""
@@ -111,7 +112,7 @@
               <img
                 v-if="item"
                 height="24"
-                class="mr-5 round"
+                class="mr-5px border-rd-[50%]"
                 :src="`${token_logo_url}chain/${item}.png`"
                 style=""
                 alt=""
@@ -129,7 +130,7 @@
       </div>
       <div v-else-if="tabActive === 2" class="delete part">
         <p>{{ $t('bulkDeleteDesc') }}</p>
-        <p>{{ $t('bulkDeleteExample') }}</p>
+        <p class="mb-20px!">{{ $t('bulkDeleteExample') }}</p>
         <el-select
           v-model="activeChain"
           class="chains-select"
@@ -143,7 +144,7 @@
             <img
               v-if="activeChain"
               height="24"
-              class="mr-5 round"
+              class="mr-5px border-rd-[50%]"
               :src="`${token_logo_url}chain/${activeChain}.png`"
               style=""
               alt=""
@@ -160,7 +161,7 @@
               <img
                 v-if="item"
                 height="24"
-                class="mr-5 round"
+                class="mr-5px border-rd-[50%]"
                 :src="`${token_logo_url}chain/${item}.png`"
                 style=""
                 alt=""
@@ -172,7 +173,7 @@
         </el-select>
         <textarea v-model="zeroBalanceAddresses" class="textarea" disabled :placeholder="$t('batchPlaceHolder')"/>
         <el-button
-          class="width100 button"
+          class="width100 button mt-30px"
           block
           size="large"
           color="#3F80F7"
@@ -198,6 +199,8 @@ import { generateAvatarIcon, getChainInfo, isValidAddress, evm_utils as utils } 
 import { ArrowDownBold } from '@element-plus/icons-vue'
 const { mode, token_logo_url } = storeToRefs(useGlobalStore())
 const { currentAddress ,showBatchAddressDetails} = storeToRefs(useFollowStore())
+
+const {updateNum3} = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const { t } = useI18n()
 const tabActive = ref(0)
@@ -313,6 +316,7 @@ const handleBulkImportAttention = () => {
   .then((res) => {
       console.log(res)
       ElMessage.success(t('success'))
+      updateNum3.value++
       emit('refresh')
       showBatchAddressDetails.value = false
     })
@@ -434,6 +438,7 @@ const confirmBulkDelete = () => {
       ElMessage.success(t('deleteSuccess', {count: zeroBalanceList.value.length}))
       zeroBalanceAddresses.value = t('deleteSuccess', { count: zeroBalanceList.value.length })
       emit('refresh')
+      updateNum3.value++  
     })
  .catch((err) => {
       console.error('批量删除失败:', err)
@@ -469,17 +474,18 @@ const confirmBulkDelete = () => {
   position: fixed;
   .content {
     background-color: var(--d-222-l-FFF);
-    padding: 24px 20px;
+    padding: 20px 20px;
     .tabs {
       position: relative;
       margin-bottom: 20px;
       display: flex;
       .tab {
         cursor: pointer;
-        margin-right: 28px;
-        font-size: 16px;
-        line-height: 30px;
+        margin-right: 32px;
         color: #666;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 24px;
         &.active {
           color: var(--d-F5F5F5-l-333);
         }
@@ -503,6 +509,7 @@ const confirmBulkDelete = () => {
         color: #999;
         display: flex;
         align-items: top;
+        margin-bottom: 20px;
       }
       .chain {
         cursor: not-allowed;
@@ -547,7 +554,6 @@ const confirmBulkDelete = () => {
         /* background-color: var(--d-FFF-l-222);
         color: var(--d-222-l-FAFAFA); */
         font-size: 16px;
-        line-height: 48px;
         border-radius: 8px;
         text-align: center;
         &.black {
@@ -555,11 +561,13 @@ const confirmBulkDelete = () => {
           background-color: var(--d-222-l-FAFAFA);
           color: var(--d-FFF-l-222);
           margin-bottom: 20px;
+          line-height: 48px;
         }
         &.copy {
           background-color: #3F80F7;
           color:#F5F5F5;
           margin-top: 30px;
+          line-height: 48px;
         }
       }
     }
@@ -581,7 +589,7 @@ textarea{
   font-weight: 300;
 }
 .chains-select {
-  margin: 20px 0;
+  margin-bottom: 20px;
   // border: 1px solid var(--a-bg-3-color);
   // --el-select-border-color-hover: transparent;
   :deep() {

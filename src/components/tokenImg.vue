@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const {row} = defineProps({
+const props = defineProps({
   row: {
     type: Object as PropType<{
       chain: string;
@@ -19,32 +19,33 @@ const {row} = defineProps({
   chainClass: {
     type: String,
     default: 'w-12px h-12px'
+  },
+  isCircle:{
+    type:Boolean,
+    default:true
   }
 })
 const {token_logo_url} = useConfigStore()
 const shouldAddPrefix = computed(() => {
-  if (row.logo_url) {
-    return !row.logo_url.startsWith('http')
+  if (props.row.logo_url) {
+    return !props.row.logo_url.startsWith('http')
   }
   return false
 })
 const tokenLogoUrl = computed(() => {
-  if (row.logo_url) {
+  if (props.row.logo_url) {
     return shouldAddPrefix.value
-      ? `${token_logo_url}${row.logo_url}`
-      : row.logo_url
+      ? `${token_logo_url}${props.row.logo_url}`
+      : props.row.logo_url
   }
-  return getSymbolDefaultIcon(row)
+  return getSymbolDefaultIcon(props.row,props.isCircle?'circle':'rect')
 })
 </script>
 
 <template>
   <div class="relative">
     <el-image
-      :class="`mr-3px rounded-full  block ${tokenClass}`"
-      :style="{
-         display:'block'
-       }"
+      :class="`mr-3px ${isCircle?'rounded-full':''}  block ${tokenClass}`"
       :src="tokenLogoUrl"
     >
       <template #error>

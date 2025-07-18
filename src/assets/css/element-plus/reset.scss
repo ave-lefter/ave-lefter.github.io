@@ -1,5 +1,5 @@
 :root:root.dark {
-  .el-popper[role="tooltip"]:not(.el-popover) {
+  .el-popper[role="tooltip"]:not(.el-popover,.el-select__popper) {
     --el-bg-color: #333;
     --el-text-color-primary: #f2f2f2;
     border: none;
@@ -15,8 +15,8 @@
 }
 
 :root:root.light {
-  .el-popper[role="tooltip"]:not(.el-popover) {
-    --el-bg-color: #ccc;
+  .el-popper[role="tooltip"]:not(.el-popover,.el-select__popper) {
+     --el-bg-color: #ccc;
     // --el-bg-color-overlay: #333;
     // color: #ccc;
     --el-text-color-primary: #333;
@@ -24,6 +24,10 @@
   
 }
 
+
+.el-select__popper.el-popper{
+  border:0 none !important;
+}
 :root:root {
   --el-text-color-regular: var(--d-F5F5F5-l-333);
 }
@@ -75,6 +79,10 @@
   .el-select__wrapper {
     font-size: 12px;
   }
+}
+
+.el-select-dropdown__item.is-hovering{
+  --el-fill-color-light:var(--d-333-l-F2F2F2);
 }
 
 .el-dialog {
@@ -136,7 +144,7 @@
 }
 
 .el-select--small .el-select__wrapper.el-select__wrapper {
-  padding: 4px;
+  padding: 3px 4px;
 }
 
 .el-input.el-input {
@@ -144,5 +152,18 @@
 }
 
 .el-select__wrapper {
-  --el-fill-color-blank: var(--d-333-l-F2F2F2);
+  --el-fill-color-blank: var(--d-333-l-EEE);
+}
+.el-select-dropdown__wrap{
+  --el-fill-color-light: var(--d-333-l-F5F7FA);
+  }
+
+.el-pagination{
+  &.el-pagination{
+    margin-top: 0;
+    border-top:1px solid var(--d-222-l-F2F2F2);
+    background-color:var(--d-111-l-FFF);
+    --el-text-color-regular:var(--d-666-l-999);
+    --el-pagination-button-color:var(--d-666-l-999);
+  }
 }
