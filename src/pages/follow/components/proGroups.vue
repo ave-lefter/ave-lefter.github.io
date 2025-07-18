@@ -46,7 +46,7 @@
        </template>
        <template #default>
         <div class="font-500 text-14px lh-[120%] tracking-0% text-[--d-FFF-l-333]">
-          <div class="mb-8px text-12px lh-16px">{{ $t('groupManage') }}</div>
+          <div class="mb-8px text-14px lh-[120%]">{{ $t('groupManage') }}</div>
           <el-scrollbar wrap-class="mb-12px max-h-[400px]">
               <VueDraggableNext
                  v-model="sortOptions"
