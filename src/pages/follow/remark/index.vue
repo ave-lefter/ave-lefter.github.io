@@ -257,7 +257,7 @@ onMounted(() => {
             <UserAvatar
 :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo"
               :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
-            <div class="ml-5px">
+            <div>
               <div class="flex items-center">
                 <UserRemark
 :key="`${row.user_address}-${row.user_chain}`" :remark="row.remark"

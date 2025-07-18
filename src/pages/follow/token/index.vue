@@ -443,7 +443,7 @@ onMounted(() => {
                     :src="`${configStore.token_logo_url}chain/${row?.chain}.png`" alt=""
                     onerror="this.src='/icon-default.png'" srcset="" />
                 </div>
-                <div class="ml-5px flex flex-col lh-none justify-between h-32px">
+                <div class="ml-8px flex flex-col lh-none justify-between h-32px">
                   <div class="flex items-center">
                     <span class="text-13px">{{ row.symbol }}</span>
                     <div class="text-12px text-[--d-666-l-999] ml-4px">
@@ -641,7 +641,4 @@ onMounted(() => {
   --el-table-row-hover-bg-color: var(--d-1A1A1A-l-fafafa);
   --el-table-text-color: var(--d-CCC-l-333);
 }
- :deep() .el-table .el-table__cell {
-   padding: 10.5px 0;
- }
 </style>
