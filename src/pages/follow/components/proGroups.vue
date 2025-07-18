@@ -1,6 +1,6 @@
 <template>
   <ul class="w-tabs flex-1 flex-wrap">
-    <li class="clickable" :class="{ active: props.modelValue === 0 }" @click.stop.prevent="emit('update:modelValue', 0)">
+    <li class="clickable text-[var(--d-666-l-999)]" :class="{ active: props.modelValue === 0 }" @click.stop.prevent="emit('update:modelValue', 0)">
       <span>{{ $t('defaultGroup') }}</span>
     </li>
     <template v-if="props.options.length > 0">
@@ -33,20 +33,20 @@
           />
       </li>
     </template>
-    <li ref="addButtonRef" class="clickable color-#3F80F7! flex gap-2px bg-#3F80F71A!">
+    <li ref="addButtonRef" class="clickable color-[var(--d-999-l-666)]! flex gap-2px bg-[var(--d-222-l-F2F2F2)]!">
       <Icon name="custom:add-icon" class="text-12px" />
       <span>{{ $t('newGroup') }}</span>
     </li>
     <el-popover ref="popoverRef2" :width="320" trigger="click">
        <template #reference>
-         <li class="clickable color-#3F80F7! flex gap-2px bg-#3F80F71A!">
+         <li class="clickable color-[var(--d-999-l-666)]! flex gap-2px bg-[var(--d-222-l-F2F2F2)]!">
            <Icon name="custom:list-icon" class="text-12px" />
            <span>{{ $t('groupManage') }}</span>
          </li>
        </template>
        <template #default>
         <div class="font-500 text-14px lh-[120%] tracking-0% text-[--d-FFF-l-333]">
-          <div class="mb-8px text-12px lh-16px">{{ $t('groupManage') }}</div>
+          <div class="mb-8px text-14px lh-[120%]">{{ $t('groupManage') }}</div>
           <el-scrollbar wrap-class="mb-12px max-h-[400px]">
               <VueDraggableNext
                  v-model="sortOptions"
@@ -80,13 +80,13 @@
     popper-style="width: 86px;min-width: 86px;">
     <ul v-click-outside="() => visible = false">
       <li 
-        class="font-500 text-12px lh-[100%] tracking-0px  mb-20px flex-start gap-4px clickable"
+        class="font-400 text-12px lh-[100%] tracking-0px  mb-20px flex-start gap-4px clickable"
         @click.stop.prevent="handleRenameGroup">
         <Icon name="fe:edit" class="color-#666 text-14px mt-0px" />
         <span>{{ $t('rename') }}</span>
       </li>
       <li 
-        class="font-500 text-12px lh-[100%] tracking-0px clickable flex-start gap-4px"
+        class="font-400 text-12px lh-[100%] tracking-0px clickable flex-start gap-4px"
         @click.stop.prevent="handleDelGroup">
         <Icon name="bx:bxs-trash-alt" class="text-15px color-#666 mt-0px" />
         <span>{{ $t('delete') }}</span>

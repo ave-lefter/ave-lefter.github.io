@@ -518,8 +518,8 @@
         </template>
       </el-table-column>
       </el-table>
-      <el-pagination
-        v-if="(pageData.total > 50) && shouldRenderChild"
+      <el-pagination 
+        v-if="(pageData.total > 50) && shouldRenderChild && currentAddress"
         v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="h-72px flex justify-end items-center"
         layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getTableList"/>
     </div>
