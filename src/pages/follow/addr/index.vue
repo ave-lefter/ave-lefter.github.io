@@ -2,7 +2,7 @@
   <div class="w-address flex-1 w-100% h-[calc(100%-76px)] flex flex-col" :class="{ 'mt-12px': currentAddress }">
     <ul v-if="currentAddress" class="w-operate">
       <li v-if="evmAddress" class="flex items-center gap-2px">
-          <el-checkbox v-model="isMonitor" :label="t('onlyPush')"  style="color:var(--d-999-l-666);z-index: 0" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! lh-none! [&&]:[--el-checkbox-input-border:1px_solid_var(--d-666-l-999)]"/>
+          <el-checkbox v-model="isMonitor" :label="t('onlyPush')"  style="color:var(--d-999-l-666);z-index: 0" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! [&&]:[--el-checkbox-input-border:1px_solid_var(--d-666-l-999)]" size="large"/>
           <span class="text-[var(--d-999-l-666)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/50` }}</span>
       </li>
       <li class="btn">
@@ -18,12 +18,11 @@
     <div v-if="currentAddress" class="m-header flex-between px-16px items-start">
       <pro-groups v-if="!isMonitor" v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
       <!-- <div v-else/> -->
-
     </div>
     <div class="m-table w-100% mt-12px flex-1 overflow-hidden">
       <el-table
       ref="tableRef" v-loading="loading" class='' :data="filterDataSource" table-layout="fixed" row-class-name="group" height="calc(100% - 72px)"
-      @sort-change="handleSortChange" @row-click="tableRowClick">
+      :default-sort="defaultSort" @sort-change="handleSortChange" @row-click="tableRowClick">
         <template #empty>
           <div v-if="!loading && followStore.currentAddress" class="flex flex-col items-center justify-center py-30px">
             <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
@@ -85,6 +84,7 @@
                   <div class="flex mt-10px">
                     <el-input
                       v-model.trim="searchKeyword"
+                      size="large"
                       :placeholder="$t('attentionSearch')"
                       clearable
                       @clear="handleFilterQuery()"
@@ -92,10 +92,9 @@
                   </div>
                   <div class="mt-20px flex">
                     <el-button
-                      class="flex-1"
-                      size="default"
-                      :color="mode !== 'dark' ? '#222222' : '#f5f5f5'"
-                      style="height: 30px; min-width: 70px; --el-button-font-weight: 400"
+                      class="flex-1 [&&]:[--el-color-black:#333] bg-[var(--d-333-l-F2F2F2)]"
+                      :color="isDark?'#333':'#F2F2F2'"
+                      style="height: 32px; min-width: 70px; --el-button-font-weight: 400"
                       @click.stop="searchKeyword='';visible=false"
                     >
                       {{ $t('cancel') }}
@@ -103,8 +102,9 @@
                     <el-button
                       class="flex-1"
                       size="default"
+                      type="primary"
                       color="#3F80F7"
-                      style="height: 30px; min-width: 70px; --el-button-font-weight: 400"
+                      style="height: 32px; min-width: 70px; --el-button-font-weight: 400"
                       @click.stop="handleFilterQuery(searchKeyword)"
                     >
                       {{ $t('confirm') }}
@@ -519,7 +519,7 @@
       </el-table-column>
       </el-table>
       <el-pagination 
-        v-if="filterDataSource?.length > 10"
+        v-if="(pageData.total > 50) && shouldRenderChild"
         v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="h-72px flex justify-end items-center"
         layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getTableList"/>
     </div>
@@ -553,7 +553,7 @@ const $router = useRouter()
 const { t } = useI18n()
 const botStore = useBotStore()
 const {evmAddress} = storeToRefs(useBotStore())
-const { addressGroups ,currentAddress,updateNum1,updateNum2,updateNum3,addressConditions} = storeToRefs(useFollowStore())
+const { addressGroups ,currentAddress,updateNum1,updateNum2,updateNum3,addressConditions,addressConditions2} = storeToRefs(useFollowStore())
 // const addressGroups = ref([{ "group_id": 3763, "name": "base", "show_index": -1 }, { "group_id": 37632, "name": "base1", "show_index": 0 }, { "group_id": 37631, "name": "base2", "show_index": 1 }])
 const visible = ref(false)
 const visible2 = ref(false)
@@ -564,33 +564,38 @@ const toolTipTagContent = ref('')
 const addButtonRef = ref()
 const tableRef = ref<TableInstance | null>(null)
 const isMonitor=ref(false)
-const conditions=addressConditions.value
-// const conditions = reactive({
-//   group: 0,
-//   time_interval: '7d',
-//   user_chain: 'AllChains',
-//   sort: '',
-//   sort_dir: '',
-//   keyword: '',
-//   last_tx_time_max: '',
-//   last_tx_time_min: '',
-//   last_trade_time: ''
-// } as {
-//   group: number
-//   time_interval: string
-//   user_chain: string
-//   sort: string|null
-//   sort_dir: string|null
-//   keyword: string
-//   last_tx_time_max: string|number
-//   last_tx_time_min: string|number
-//   last_trade_time: string|number
-// })
+const conditions=computed(() => {
+  return isMonitor.value?addressConditions2.value:addressConditions.value
+})
+
+const defaultSort=computed(() => {
+  return { prop: conditions.value?.sort||'', order: conditions.value?.sort_dir==='desc'?'descending':'ascending' }
+}) as Ref<{ prop: string, order: 'descending' | 'ascending' }>
+
+const shouldRenderChild = shallowRef(true)
+
+const reCreateChild = () => {
+  shouldRenderChild.value = false
+  // 确保 DOM更新
+  nextTick(() => {
+    shouldRenderChild.value = true
+  })
+}
 const monitorNum=ref(0)
-const pageData = ref({
+
+const pageData1 = ref({
   total: 10,
   page: 1,
   pageSize: 50
+})
+const pageData2 = ref({
+  total: 10,
+  page: 1,
+  pageSize: 50
+})
+
+const pageData=computed(() => {
+  return isMonitor.value?pageData2.value:pageData1.value
 })
 
 const openTimeList =computed(() => [
@@ -613,28 +618,30 @@ type FilterFormType = {
 
 const filterForm = ref({
   type: 'last_trade_time',
-  last_trade_time: conditions.last_trade_time || '',
-  sort_dir: conditions?.sort === 'last_trade_time' ? conditions?.sort_dir || null : null
+  last_trade_time: conditions.value?.last_trade_time || '',
+  sort_dir: conditions.value?.sort === 'last_trade_time' ? conditions?.value?.sort_dir || null : null
 } as FilterFormType)
 const loading = ref(false)
 const dataSource = ref([] as Array<any>)
 const dataSource2 = ref([] as Array<any>)
 
+
 const filterDataSource=computed(() => {
   return isMonitor.value?dataSource2.value:dataSource.value
 })
+
 onMounted(async () => {
   init()
-})
-function init() {
-  pageData.value = {
-    total: 10,
-    page: 1,
-    pageSize: 50
-  }
-  getTableList()
   getMonitorNum()
+})
+
+function init() {
+  pageData.value.total = 10
+  pageData.value.page = 1
+  pageData.value.pageSize = 50
+  getTableList()
 }
+
 watch(() => currentAddress.value, (val) => {
   if(!val) {
     dataSource.value=[]
@@ -643,9 +650,14 @@ watch(() => currentAddress.value, (val) => {
     init()
   }
 })
-watch([() => conditions, ()=>isMonitor.value, ()=>updateNum2.value+updateNum3.value], (value) => {
-  console.log('watch conditions', value)
+watch([() => conditions.value, ()=>updateNum2.value+updateNum3.value,()=>isMonitor.value], (value, oldValue) => {
   init()
+  if(value[2]!==oldValue[2]){
+    nextTick(()=>{
+      tableRef.value?.clearSort()
+      tableRef.value?.sort(defaultSort.value?.prop, defaultSort.value?.order)
+    })
+  }
 },{deep: true})
 
 function handleDeleteMonitor(row:any){
@@ -745,8 +757,8 @@ function handleDelGroup(groupId: number) {
     removeFavoriteGroup2(groupId).then(() => {
       ElMessage.success(t('success'))
       followStore.getUserFavoriteGroups2()
-      if(conditions.group==groupId){
-        conditions.group=0
+      if(conditions.value.group==groupId){
+        conditions.value.group=0
       }
     }).catch((e) => {
        ElMessage.error(String(e))
@@ -760,6 +772,7 @@ function getMonitorNum() {
   })
 }
 const getTableList = throttle(function() {
+  console.log('getTableList')
   loading.value = true
   const max = Math.floor(new Date().getTime() / 1000)
   const min = safeBigNumber(max).minus(safeBigNumber(filterForm.value.last_trade_time)).toString()
@@ -771,14 +784,14 @@ const getTableList = throttle(function() {
   // monitorAddresses({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
   //   console.log('monitorAddresses res', res)
   // })
-  req({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
+  req({...conditions.value, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
     console.log('getAttentionPageList res',isMonitor.value, res)
     const tableData =isMonitor.value?dataSource2:dataSource
     tableData.value = ( res.data || []).
     map((i:any) => {
       return {
         ...i,
-        group_id:conditions.group,
+        group_id:conditions.value.group,
         total_txs: safeBigNumber(i.total_sold).plus(safeBigNumber(i.total_purchase)).toString(),
         total_txs_usd: safeBigNumber(i.total_sold_usd).plus(safeBigNumber(i.total_purchase_usd)).toString()
       }
@@ -820,7 +833,7 @@ function tableRowClick(row: { user_address: string; user_chain: string }) {
 
 function handleFilterQuery(keyword: string = '') {
   visible.value = false
-  conditions.keyword = keyword
+  conditions.value.keyword = keyword
   searchKeyword.value = keyword
 }
 
@@ -841,10 +854,10 @@ const getRowGroupChange = async (val: number, row: any) => {
 
 function  handleFilterConfirm(data: FilterFormType) {
   if (data.last_trade_time) {
-    conditions.last_trade_time = data.last_trade_time
+    conditions.value.last_trade_time = data.last_trade_time
   }
-  // conditions.sort = 'last_tx_time'
-  // conditions.sort_dir = data.sort_dir || ''
+  // conditions.value.sort = 'last_tx_time'
+  // conditions.value.sort_dir = data.sort_dir || ''
   visible2.value = false
   // const sortOrder = {
   //   'desc': 'descending',
@@ -854,7 +867,7 @@ function  handleFilterConfirm(data: FilterFormType) {
 }
  function attentionHandleReset(data:FilterFormType) {
   console.log('-------attentionHandleReset--------', data)
-  conditions.last_trade_time = ''
+  conditions.value.last_trade_time = ''
   filterForm.value.last_trade_time = ''
   visible2.value = false
   // tableRef.value?.clearSort()
@@ -887,18 +900,18 @@ function handleSort(val:any, dir='',sort:string) {
  function handleSortChange(data: {prop: string, order: string|null}) {
   console.log('-------HandleSortChange--------', data)
   if (data.order === null) {
-    conditions.sort_dir = ''
-    conditions.sort = ''
+    conditions.value.sort_dir = ''
+    conditions.value.sort = ''
   } else {
-    conditions.sort = data.prop
+    conditions.value.sort = data.prop
     if (data.order === 'ascending') {
-      conditions.sort_dir = 'asc'
+      conditions.value.sort_dir = 'asc'
     } else {
-      conditions.sort_dir = 'desc'
+      conditions.value.sort_dir = 'desc'
     }
   }
   if (data.prop === 'last_tx_time') {
-    filterForm.value.sort_dir = conditions.sort_dir
+    filterForm.value.sort_dir = conditions.value.sort_dir
   }
 }
 function openFavPop() {
@@ -927,6 +940,9 @@ function openFavPop() {
   font-size: 12px;
   padding-right: 16px;
   /* border-bottom: 1px solid var(--d-222-l-EEE); */
+  li :deep() .el-checkbox__input{
+    margin-top: 2px;
+  }
   li.btn {
     display: flex;
     padding: 0 8px;
@@ -1098,6 +1114,24 @@ function openFavPop() {
       opacity: 0.6;
     }
     cursor: pointer;
+  }
+  :deep() .el-input {
+    --el-input-border-color: #444444;
+    --el-input-placeholder-color: var(--d-666-l-999);
+    --el-text-color-placeholder: #999;
+    --el-input-bg-color: var(--d-333-l-F2F2F2)
+  }
+  :deep() .el-button {
+    --el-border:none;
+  }
+  :deep() .el-input__wrapper {
+    border: none;
+    border-radius: 6px;
+    box-shadow: none;
+
+    &:hover {
+      box-shadow: 0 0 0 1px #3F80F7 inset;
+    }
   }
 }
 

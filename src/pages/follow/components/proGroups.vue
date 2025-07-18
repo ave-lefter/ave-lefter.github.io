@@ -5,7 +5,7 @@
     </li>
     <template v-if="props.options.length > 0">
       <li 
-        v-for="item in props.options" :key="item.group_id" class="clickable flex gap-2px color-[var--d-999-l-666]"
+        v-for="item in props.options" :key="item.group_id" class="clickable flex gap-2px text-[var(--d-666-l-999)]"
         :class="{ active: props.modelValue === item.group_id }"
         @click.stop.prevent="emit('update:modelValue', item.group_id)">
         <!-- <el-input 
@@ -98,7 +98,7 @@
     popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" width="248" :teleported="false">
       <el-form ref="formRef" v-click-outside="clickOutside" :model="form" :rules="rules" @submit.prevent.stop="handleConfirmEdit(formRef)">
         <el-form-item prop="groupName" label-position="top" size="large" class="mb-20px!">
-          <el-input v-model="form.groupName" :placeholder="t('enterGroupName')" :maxlength="50" show-word-limit clearable/>
+          <el-input v-model="form.groupName"    class="[&&]:[--el-fill-color-blank:var(--d-666-l-F2F2F2)]" :placeholder="t('enterGroupName')" :maxlength="50" show-word-limit clearable />
         </el-form-item>
         <el-form-item class="mb-0px!">
           <div class="flex-between w-100%">
@@ -248,7 +248,6 @@ ul.w-tabs {
     background-color: var(--d-1A1A1A-l-F2F2F2);
     justify-content: center;
     align-items: center;
-    color: #666;
     border-radius: 4px;
 
     &.active {

@@ -38,7 +38,7 @@
             <img
               v-if="activeChain"
               height="24"
-              class="mr-5px round"
+              class="mr-5px border-rd-[50%]"
               :src="`${token_logo_url}chain/${activeChain}.png`"
               style=""
               alt=""
@@ -55,9 +55,9 @@
               <img
                 v-if="item"
                 height="24"
-                class="mr-5px round"
+                class="mr-5px border-rd-[50%]"
+                style="border-radius: 45%;"
                 :src="`${token_logo_url}chain/${item}.png`"
-                style=""
                 alt=""
                 srcset=""
               >
@@ -94,7 +94,7 @@
             <img
               v-if="activeChain"
               height="24"
-              class="mr-5px round"
+              class="mr-5px border-rd-[50%]"
 
               :src="`${token_logo_url}chain/${activeChain}.png`"
               style=""
@@ -112,7 +112,7 @@
               <img
                 v-if="item"
                 height="24"
-                class="mr-5px round"
+                class="mr-5px border-rd-[50%]"
                 :src="`${token_logo_url}chain/${item}.png`"
                 style=""
                 alt=""
@@ -144,7 +144,7 @@
             <img
               v-if="activeChain"
               height="24"
-              class="mr-5px round"
+              class="mr-5px border-rd-[50%]"
               :src="`${token_logo_url}chain/${activeChain}.png`"
               style=""
               alt=""
@@ -161,7 +161,7 @@
               <img
                 v-if="item"
                 height="24"
-                class="mr-5px round"
+                class="mr-5px border-rd-[50%]"
                 :src="`${token_logo_url}chain/${item}.png`"
                 style=""
                 alt=""

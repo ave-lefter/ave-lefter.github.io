@@ -56,9 +56,8 @@ ul.w-tabs{
   font-weight: 500;
   font-size: 14px;
   /* border-bottom: 1px solid var(--d-222-l-EEE); */
-  li{
+  >li{
     display: flex;
-    padding: 0 16px;
     height: 32px;
     line-height: 32px;
     cursor: pointer;
@@ -66,8 +65,10 @@ ul.w-tabs{
     background-color:var(--d-1A1A1A-l-F2F2F2);
     justify-content: center;
     align-items: center;
-    color: #666;
     border-radius: 4px;
+    >a{
+      padding: 0 16px;
+    }
     &.active{
       color: #f5f5f5;
       background-color:var(--d-333-l-0A0B0C);
