@@ -481,7 +481,7 @@
       <!-- addrGroup -->
       <el-table-column v-if="!isMonitor" :label="t('addrGroup')" align="right" width="160px">
         <template #default="{ row }">
-          <el-select v-model="row.group_id" class="[&&]:[--el-text-color-regular:var(--d-222-l-333)] [&&]:[--el-select-width:100px]" popper-class="w-193px" filterable @click.stop @change="(val) => getRowGroupChange(val, row)">
+          <el-select v-model="row.group_id" class="[&&]:[--el-text-color-regular:var(--d-222-l-333)] [&&]:[--el-select-width:100px]" popper-class="w-193px [&&]:[--el-bg-color-overlay:var(--d-222-l-FFF)] w-addrGroup" filterable @click.stop @change="(val) => getRowGroupChange(val, row)">
             <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
             <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
           </el-select>
@@ -914,12 +914,12 @@ function handleSort(val:any, dir='',sort:string) {
     filterForm.value.sort_dir = conditions.value.sort_dir
   }
 }
-function openFavPop() {
-  followStore.confirmAttention(addButtonRef.value,(form)=>{
-    console.log('confirmAttention', form)
-    return Promise.resolve()
-  })
-}
+  // function openFavPop() {
+  //   followStore.confirmAttention(addButtonRef.value,(form)=>{
+  //     console.log('confirmAttention', form)
+  //     return Promise.resolve()
+  //   })
+  // }
 </script>
 
 <style scoped lang="scss">
@@ -1348,6 +1348,13 @@ a.trade {
     .sort-caret{
       border-width: 4px;
     }
+  }
+}
+</style>
+<style lang="scss">
+.w-addrGroup{
+  .el-select-dropdown__item.is-selected{
+    font-weight: 400;
   }
 }
 </style>

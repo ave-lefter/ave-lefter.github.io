@@ -54,8 +54,8 @@
             <span>{{ $t('addrGroup') }}</span>
           </template>
           <template #cell-group="{ row }">
-             <el-select v-model="row.group_id" size="small" @click.stop @change="(val) => getRowGroupChange(val, row)">
-              <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
+             <el-select v-model="row.group_id" size="small" filterable popper-class="w-193px [&&]:[--el-bg-color-overlay:var(--d-222-l-FFF)] w-addrGroup" class="[&&]:[--el-text-color-regular:var(--d-222-l-333)]" @click.stop @change="(val) => getRowGroupChange(val, row)">
+              <el-option :key="0" :value="0" :label="$t('defaultGroup')" filterable/>
               <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
             </el-select>
           </template>
@@ -127,8 +127,8 @@
 </template> 
 
 <script setup lang="ts">
-import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,getHistoryMonitor,addAttention2,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor} from '~/api/attention'
-import { defaultPaginationParams, downColor, upColor } from '@/utils/constants'
+import { getAttentionPageList, moveFavoriteGroup2, deleteAttention ,addAttention2,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor} from '~/api/attention'
+import { defaultPaginationParams } from '@/utils/constants'
 import type {RowEventHandlerParams} from 'element-plus'
 import { throttle } from 'lodash-es'
 const { t } = useI18n()
