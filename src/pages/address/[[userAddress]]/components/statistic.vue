@@ -81,7 +81,7 @@
           </template>
           <template #inactive-action>
             <span
-              class="flex w-full h-full items-center justify-center text-2.5 rounded-full text-[var(--d-FFF-l-333)] bg-[var(--d-666-l-FFF)]"
+              class="flex w-full h-full items-center justify-center text-2.5 rounded-full text-[#333] bg-[var(--d-666-l-FFF)]"
               >$</span
             >
           </template>
