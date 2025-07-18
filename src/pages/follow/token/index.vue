@@ -601,7 +601,7 @@ onMounted(() => {
 }
 
 :deep(.el-table .caret-wrapper) {
-  height: 11px;
+  height: 10px;
 }
 
 :deep(.el-table.el-table thead .el-table__cell) {
