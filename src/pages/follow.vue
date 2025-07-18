@@ -53,7 +53,7 @@ ul.w-tabs{
   justify-content: flex-start;
   align-items: center;
   gap: 10px;
-  font-weight: 500;
+  // font-weight: 500;
   font-size: 14px;
   /* border-bottom: 1px solid var(--d-222-l-EEE); */
   >li{

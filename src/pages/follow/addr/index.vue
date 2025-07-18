@@ -9,7 +9,7 @@
         <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>
       </li>
       <li>
-        <el-radio-group v-model="conditions.time_interval" class="m-radio-group" size="small" :fill="isDark?'#333':'#666'" :text-color="isDark?'#F5F5F5':'#FFF'" @change="()=>{}">
+        <el-radio-group v-model="conditions.time_interval" size="small" :fill="isDark?'#111':'#fff'" :text-color="isDark?'#F5F5F5':'#333'" @change="()=>{}">
           <el-radio-button label="7D" :value="'7d'" />
           <el-radio-button label="1M" :value="'30d'" />
         </el-radio-group>
@@ -121,7 +121,7 @@
             >
               <span v-if="$index < 9" class="text-10px" style="opacity: 0">0</span>
               <span class="text-10px mr-5px font-400 text-[--d-666-l-999]">
-                #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }} 
+                #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
               </span>
               <!-- <a href class="mr-5px a-gray fav_address" v-if="row.is_wallet_address_fav == 1" @click.stop.prevent="handleDeleteAttention(row)">
                     <i class="attention iconfont icon-fav1 active font-12"></i> -->
@@ -518,7 +518,7 @@
         </template>
       </el-table-column>
       </el-table>
-      <el-pagination 
+      <el-pagination
         v-if="(pageData.total > 50) && shouldRenderChild"
         v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="h-72px flex justify-end items-center"
         layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getTableList"/>
@@ -923,6 +923,17 @@ function openFavPop() {
 </script>
 
 <style scoped lang="scss">
+:deep().el-radio-group{
+  padding: 2px;
+  background: var(--d-222-l-F2F2F2);
+  border-radius: 4px;
+  .el-radio-button__inner{
+    background: var(--d-222-l-F2F2F2);
+    border: none;
+    color: var(--d-666-l-999);
+    font-weight: 500;
+  }
+}
 .el-table{
   font-size: 12px;
 }
