@@ -641,4 +641,7 @@ onMounted(() => {
   --el-table-row-hover-bg-color: var(--d-1A1A1A-l-fafafa);
   --el-table-text-color: var(--d-CCC-l-333);
 }
+ :deep() .el-table .el-table__cell {
+   padding: 10.5px 0;
+ }
 </style>
