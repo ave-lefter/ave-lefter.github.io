@@ -37,7 +37,7 @@
       <Icon name="custom:add-icon" class="text-12px" />
       <span>{{ $t('newGroup') }}</span>
     </li>
-    <el-popover ref="popoverRef2" :width="293" trigger="click">
+    <el-popover ref="popoverRef2" :width="320" trigger="click">
        <template #reference>
          <li class="clickable color-#3F80F7! flex gap-2px bg-#3F80F71A!">
            <Icon name="custom:list-icon" class="text-12px" />
@@ -45,7 +45,7 @@
          </li>
        </template>
        <template #default>
-        <div class="font-500 text-14px lh-[120%] tracking-0% text-[--d-FFF-l-000]">
+        <div class="font-500 text-14px lh-[120%] tracking-0% text-[--d-FFF-l-333]">
           <div class="mb-8px text-12px lh-16px">{{ $t('groupManage') }}</div>
           <el-scrollbar wrap-class="mb-12px max-h-[400px]">
               <VueDraggableNext
@@ -57,10 +57,10 @@
                  @start="drag = true"
                  @end="drag = false"
                >
-               <li v-for="item in sortOptions" :key="item?.show_index" class="flex-between py-12px px-8px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
+               <li v-for="item in sortOptions" :key="item?.show_index" class="flex-between font-400 py-12px px-8px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
                >
                  <span>{{ item?.name }}</span>
-                 <Icon name="material-symbols:dehaze" class="text-16px"/>
+                 <Icon name="material-symbols:dehaze" class="text-16px text-[var(--d-666-l-999)]"/>
                </li>
                  <!-- <transition-group type="transition" name="flip-list">
                  </transition-group> -->

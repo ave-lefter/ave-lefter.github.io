@@ -362,7 +362,7 @@
         <template #header>
           <div class="flex items-center flex-end">
             <div
-              class="flex items-center flex-end cursor-pointer"
+              class="flex flex-end cursor-pointer"
               style="cursor: pointer"
               @click="handleSort(conditions,'','last_tx_time')"
             >
@@ -1288,7 +1288,7 @@ a.trade {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  height: 14px;
+  height: 10px;
   width: 24px;
   vertical-align: middle;
   cursor: pointer;
@@ -1297,7 +1297,7 @@ a.trade {
   .sort-caret {
     width: 0;
     height: 0;
-    border: solid 5px transparent;
+    border: solid 4px transparent;
     position: absolute;
     left: 7px;
     &.ascending {
@@ -1332,5 +1332,11 @@ a.trade {
 }
 :deep() .el-table{
   --el-table-text-color: var(--d-CCC-l-333);
+  .caret-wrapper{
+    height: 10px;
+    .sort-caret{
+      border-width: 4px;
+    }
+  }
 }
 </style>
