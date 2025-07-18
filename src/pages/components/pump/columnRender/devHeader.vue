@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import RangePopover from '../../hotRank/columnRender/rangePopover.vue'
+import {RangePopover} from './index'
 
 const props = defineProps<{
   sortConditions: { sort: string; sort_dir: string }

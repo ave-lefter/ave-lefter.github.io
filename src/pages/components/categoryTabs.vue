@@ -47,6 +47,48 @@ const configMap = computed(() => {
       getOptions: getPumpOptions,
       class: '',
     },
+    bonk_pump: {
+      icon: '',
+      storageKey: 'bonkPumpTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    four: {
+      icon: '',
+      storageKey: 'fourTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    bonk: {
+      icon: '',
+      storageKey: 'bonkTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    moonshot: {
+      icon: '',
+      storageKey: 'moonshotTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    Studio: {
+      icon: '',
+      storageKey: 'StudioTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    novabits: {
+      icon: '',
+      storageKey: 'novabitsTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
   }
 })
 function getPumpIcon(isPump: boolean) {
@@ -62,19 +104,24 @@ function getPumpIcon(isPump: boolean) {
 const globalStore = useGlobalStore()
 // 由于其他榜单未上，用临时的 computed过滤
 const supportCategories = computed(() => {
-  const keys = ['hot', 'pump']
+  const keys = ['hot', 'pump', 'bonk_pump', 'four', 'bonk', 'moonshot', 'Studio', 'novabits']
   return (props.categories || []).filter((el) => {
     return keys.includes(el.category)
   })
 })
 const localeStore = useLocaleStore()
 const sub_category_list = computed(() => {
-  return props.categories.find((el) => {
-    return el.category === props.activeTab
-  })?.sub_category || []
+  return (
+    props.categories.find((el) => {
+      return el.category === props.activeTab
+    })?.sub_category || []
+  )
 })
-function updateCategory(category: string) {
+function updateCategory(category: string, sub_category: CategoryElement[]) {
   emit('update:activeTab', category)
+  if (!sub_category.some((el) => el.category === props.activeSubTab)) {
+    emit('update:activeSubTab', sub_category[0]?.category || '')
+  }
 }
 function updateSubCategory(category: string) {
   emit('update:activeSubTab', category)
@@ -99,9 +146,10 @@ function updateSubCategory(category: string) {
               ? 'color-#F5F5F5 bg-#333'
               : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
           "
-          @click="updateCategory(item.category)"
+          @click="updateCategory(item.category, item.sub_category || [])"
         >
           <Icon
+            v-if="configMap[item.category as keyof typeof configMap].icon"
             :name="configMap[item.category as keyof typeof configMap].icon"
             class="mr-1 text-12px"
             :class="configMap[item.category as keyof typeof configMap].class"

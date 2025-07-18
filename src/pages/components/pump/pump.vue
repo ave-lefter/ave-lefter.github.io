@@ -34,6 +34,10 @@ import {
   Progress,
   HalfTimeHeader,
   FullHeader,
+  Snipers1mHeader,
+  Snipers1mContent,
+  LastTradeHeader,
+  LastTradeContent,
 } from './columnRender/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
@@ -159,6 +163,7 @@ watch(
       const item = pricesMap[el.pair + '-' + el.chain]
       if (item) {
         delete item.holders
+        delete item.last_trade_at
         const market_cap = !el.current_price_usd
           ? 0
           : ((el.market_cap || 0) / el.current_price_usd) * (item.uprice || 0)
@@ -256,6 +261,7 @@ const filterMap = {
   quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible,
   first_half_elapsed_time: (el: any) => el.isVisible && props.activeSubTab === 'pump_in_almost',
   second_half_elapsed_time: (el: any) => el.isVisible && props.activeSubTab === 'pump_in_almost',
+  progress:(el:any)=>el.isVisible && props.activeSubTab.includes('_in')
 }
 
 const visibleColumns = computed(() => {
@@ -289,6 +295,8 @@ const headerRenderer = computed(() => {
     progress: ProgressHeader,
     first_half_elapsed_time: HalfTimeHeader,
     second_half_elapsed_time: FullHeader,
+    rusher_tx_count: Snipers1mHeader,
+    last_trade_at: LastTradeHeader,
   }
 })
 const cellRenderer = computed(() => {
@@ -308,9 +316,7 @@ const cellRenderer = computed(() => {
     dynamicVolAndTxs: DynamicVolAndTxs,
     markers_dynamic: DynamicMarkers,
     holders: HoldersContent,
-    smart_money_buy_volume_24h: ({row})=>{
-      return <SmarterContent row={row}/>
-    },
+    smart_money_buy_volume_24h: SmarterContent,
     dex: dexContent,
     security: securityContent,
     holders_top10_ratio: top10PositionsContent,
@@ -333,6 +339,8 @@ const cellRenderer = computed(() => {
         </span>
       )
     },
+    rusher_tx_count: Snipers1mContent,
+    last_trade_at: LastTradeContent,
   }
 })
 </script>

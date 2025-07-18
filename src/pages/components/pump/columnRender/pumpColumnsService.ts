@@ -19,6 +19,7 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
           'priceChangeDynamicContent',
           'priceChange24hContent',
           'smarterContent',
+          'lastTradeAtContent'
         ],
       },
       {
@@ -28,6 +29,7 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
           'runTime1',
           'runTime2',
           'snipersContent',
+          'snipers1mContent',
           'securityContent',
           'insidersContent',
         ],
@@ -160,18 +162,6 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         align:'right'
       },
       {
-        title: t('security'),
-        key: 'security',
-        isVisible: true,
-        render: 'securityContent',
-        children:[
-          {title:t('security'),isVisible:true,render:'securityContent'},
-          {title:t('runPull'),isVisible:true,render:'runPullContent'},
-        ],
-        minWidth:getTextWidth(t('security'), 50) + 55,
-        align:'right'
-      },
-      {
         title: t('insiders'),
         key: 'insider_balance_ratio_cur',
         isVisible: false,
@@ -185,6 +175,34 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         isVisible: false,
         render: 'snipersContent',
         minWidth:getTextWidth(t('snipers')) + 68,
+        align:'right'
+      },
+      {
+        title: t('snipers_1m'),
+        key: 'rusher_tx_count',
+        isVisible: false,
+        render: 'snipers1mContent',
+        minWidth:getTextWidth(t('snipers_1m'), 50) + 50,
+        align:'right'
+      },
+      {
+        title: t('lastTxsTime1'),
+        key: 'last_trade_at',
+        isVisible: true,
+        render: 'lastTradeAtContent',
+        minWidth:getTextWidth(t('lastTxsTime1'), 50) + 50,
+        align:'right'
+      },
+      {
+        title: t('security'),
+        key: 'security',
+        isVisible: true,
+        render: 'securityContent',
+        children:[
+          {title:t('security'),isVisible:true,render:'securityContent'},
+          {title:t('runPull'),isVisible:true,render:'runPullContent'},
+        ],
+        minWidth:getTextWidth(t('security'), 50) + 55,
         align:'right'
       },
       {

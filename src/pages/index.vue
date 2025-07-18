@@ -3,9 +3,16 @@ import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
+const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
 const components = {
   hot,
-  pump: defineAsyncComponent(() => import('./components/pump/pump.vue')),
+  pump: pumpComponent,
+  bonk_pump: pumpComponent,
+  four: pumpComponent,
+  bonk: pumpComponent,
+  moonshot: pumpComponent,
+  Studio: pumpComponent,
+  novabits: pumpComponent,
 }
 const activeTab = shallowRef<keyof typeof components>('pump')
 const activeSubTab = shallowRef('pump_in_hot')
