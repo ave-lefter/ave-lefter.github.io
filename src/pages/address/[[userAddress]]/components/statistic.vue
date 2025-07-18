@@ -76,12 +76,12 @@
           :active-value="false"
           @update:model-value="injecteIsVolUSDT=!injecteIsVolUSDT"
         >
-        <template #active-action>
+          <template #active-action>
             <ChainToken :chain="chain" :width="16" />
           </template>
           <template #inactive-action>
             <span
-              class="flex w-full h-full items-center justify-center text-2.5 rounded-full text-[#333] bg-[var(--d-666-l-FFF)]"
+              class="flex w-full h-full items-center justify-center text-2.5 rounded-full text-[var(--d-FFF-l-333)] bg-[var(--d-222-l-FFF)]"
               >$</span
             >
           </template>
@@ -533,5 +533,9 @@ defineExpose({
 .custom-switch {
   --el-switch-off-color: var(--d-333333-l-F2F2F2);
   --el-switch-on-color: var(--d-666-l-CCC);
+}
+
+::v-deep .el-switch__action {
+  background-color: transparent;
 }
 </style>
