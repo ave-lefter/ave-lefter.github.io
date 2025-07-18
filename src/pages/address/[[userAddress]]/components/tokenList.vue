@@ -11,7 +11,7 @@
       fit
       style="width: 100%"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
-      cell-class-name="color-#848E9C"
+      cell-class-name="color-[--d-CCC-l-333]"
       row-class-name="cursor-pointer"
       @row-click="jumpBalance"
       @sort-change="handleSortChange"
@@ -110,7 +110,7 @@
           <div v-else>
             <span v-if="row?.balance_usd == 0">0</span>
             <span v-else-if="row?.balance_usd == '--'">--</span>
-            <span v-else class="color-[--d-F5F5F5-l-333] flex justify-end">
+            <span v-else class="flex justify-end">
               <template v-if="!injecteIsVolUSDT">
                 {{
                   row?.main_token_price == 0
@@ -139,7 +139,7 @@
         <template #default="{ row }">
           <span v-if="row?.total_purchase_usd == 0">0</span>
           <span v-else-if="row?.total_purchase_usd == '--'">--</span>
-          <span v-else class="color-[--d-F5F5F5-l-333]">
+          <span v-else>
             {{ '$' + formatNumber(row?.total_purchase_usd || 0, 2) }}
           </span>
           <span
@@ -158,7 +158,7 @@
         <template #default="{ row }">
           <span v-if="row?.total_sold_usd == 0">0</span>
           <span v-else-if="row?.total_sold_usd == '--'">--</span>
-          <span v-else class="color-[--d-F5F5F5-l-333]">
+          <span v-else>
             {{ '$' + formatNumber(row?.total_sold_usd || 0, 2) }}
           </span>
           <span

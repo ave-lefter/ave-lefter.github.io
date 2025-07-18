@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex justify-between border-b-1px border-b-solid border-b-[--d-222-l-F2F2F2] mb-20px">
+    <div class="flex justify-between border-b-1px border-b-solid border-b-[--d-222-l-F2F2F2] mb-10px mt-20px">
       <div class="flex items-center pl-10px gap-24px">
         <a
           v-for="(item, index) in tabs"
@@ -42,6 +42,7 @@
           v-model="trendQuery.hideNative"
           :false-value="0"
           :true-value="1"
+          class="color-[#666666]"
         >
           {{ $t('hideNative') }}
         </el-checkbox>
