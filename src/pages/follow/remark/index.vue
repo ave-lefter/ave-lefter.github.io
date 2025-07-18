@@ -265,7 +265,7 @@ onMounted(() => {
                   :iconEditColor="isDark ? '#666' : '#999'" iconEditSize="10px" showAddressTitle
                   :formatAddress="(address) => address?.slice(0, 4) + '...' + address?.slice(-4)" />
               </div>
-              <div class="flex items-center">
+              <div class="flex items-center mt-4px">
                 <Icon @click.stop.prevent v-copy="row?.user_address" name="bxs:copy"
                   class="clickable text-[--d-666-l-999] w-12px h-12px" />
                 <Icon name="custom:sun-icon" class="text-12px w-12px h-12px mx-5px" />

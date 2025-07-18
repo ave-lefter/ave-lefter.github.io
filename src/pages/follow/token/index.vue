@@ -340,8 +340,8 @@ onMounted(() => {
         :width="250">
         <template #reference>
           <!-- 新增 -->
-          <div style="background: rgba(63, 128, 247, 0.10);" @click="editId = undefined"
-            class="cursor-pointer text-12px color-[#3F80F7] px-8px h-28px rounded-4px shrink-0 flex items-center">
+          <div @click="editId = undefined"
+            class="cursor-pointer text-12px bg-[--d-222-l-F2F2F2] color-[--d-666-l-999] px-8px h-28px rounded-4px shrink-0 flex items-center">
             <Icon name="custom:add-icon" class="text-12px mr-2px" />
             {{ t('newGroup') }}
           </div>
@@ -364,24 +364,24 @@ onMounted(() => {
       </el-popover>
       <el-popover trigger="click" @hide="moveValue = ''" ref="moveGroupPopoverRef" :width="250">
         <template #reference>
-          <div style="background: rgba(63, 128, 247, 0.10);" @click="handleMoveGroup"
-            class="cursor-pointer text-12px color-[#3F80F7] px-8px h-28px rounded-4px shrink-0 flex items-center">
+          <div @click="handleMoveGroup"
+            class="cursor-pointer text-12px bg-[--d-222-l-F2F2F2] color-[--d-666-l-999] px-8px h-28px rounded-4px shrink-0 flex items-center">
             <Icon name="custom:list-icon" class="text-12px mr-2px" />
             {{ t('groupManage') }}
           </div>
         </template>
         <div>
-          <div>{{ t('groupManage') }}</div>
-          <el-input v-model="moveValue" class="mt-8px" :placeholder="t('searchGroup')" />
-           <el-scrollbar wrap-class="max-h-[400px]">
-             <VueDraggableNext v-model="moveList" :sort="true" ghost-class="ghost" :animation="300">
-               <div class="py-12px px-8px flex justify-between items-center hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
-                 v-for="item in moveList.filter(item => item.label.includes(moveValue))" :key="item.value">
-                 {{ item.label }}
-                 <Icon name="custom:move-icon" class="text-16px shrink-0 ml-5px" />
-               </div>
-             </VueDraggableNext>
-           </el-scrollbar>
+          <div class="mb-8px">{{ t('groupManage') }}</div>
+          <!-- <el-input v-model="moveValue" class="mt-8px" :placeholder="t('searchGroup')" /> -->
+          <el-scrollbar wrap-class="max-h-[400px]">
+            <VueDraggableNext v-model="moveList" :sort="true" ghost-class="ghost" :animation="300">
+              <div class="py-12px px-8px flex justify-between items-center hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
+                v-for="item in moveList.filter(item => item.label.includes(moveValue))" :key="item.value">
+                {{ item.label }}
+                <Icon name="custom:move-icon" class="text-16px shrink-0 ml-5px" />
+              </div>
+            </VueDraggableNext>
+          </el-scrollbar>
           <div class="flex items-center justify-between mt-12px gap-12px">
             <div @click="moveGroupPopoverRef?.hide()"
               class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
@@ -596,6 +596,14 @@ onMounted(() => {
 </style>
 
 <style lang="scss" scoped>
+:deep(.el-table .sort-caret) {
+  border: solid 4px transparent;
+}
+
+:deep(.el-table .caret-wrapper) {
+  height: 11px;
+}
+
 :deep(.el-table.el-table thead .el-table__cell) {
   height: 40px;
   font-size: 12px !important;
