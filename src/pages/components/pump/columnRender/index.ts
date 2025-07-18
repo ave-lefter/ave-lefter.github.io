@@ -1,3 +1,7 @@
 export * from '../../hotRank/columnRender'
 export {default as DevHeader} from './devHeader.vue'
 export {default as DevContent} from './devContent.vue'
+export {default as Progress} from './progress.vue'
+export {default as ProgressHeader} from './progressHeader.vue'
+export {default as HalfTimeHeader} from './halfTimeHeader.vue'
+export {default as FullHeader} from './fullHeader.vue'

@@ -25,7 +25,7 @@ const { t } = useI18n()
 
 function confirm(params?: [string, string]) {
   if (!params || !params.some((el) => !!el)) {
-    props.setFilterForm(['dev_balance_ratio_cur_min', ''], ['dev_balance_ratio_cur_max', ''])
+    props.setFilterForm(['progress_min', ''], ['progress_max', ''])
     isFilterHighlight.value = false
     popoverVisible.value = false
     return
@@ -40,7 +40,7 @@ function confirm(params?: [string, string]) {
   }
   const _params = params.map((el, idx) => {
     return [
-      `${{ 0: 'dev_balance_ratio_cur_min', 1: 'dev_balance_ratio_cur_max' }[idx]}` as string,
+      `${{ 0: 'progress_min', 1: 'progress_max' }[idx]}` as string,
       el || '',
     ]
   }) as [string, string][]
@@ -51,12 +51,12 @@ function confirm(params?: [string, string]) {
 </script>
 <template>
   <div class="flex items-center justify-end gap-3px">
-    <span class="cursor-pointer">DEV%</span>
+    <span class="cursor-pointer">{{ $t('progress') }}</span>
     <!-- <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /> -->
     <RangePopover
       v-model="popoverVisible"
       :width="225"
-      :title="$t('devPosition')+'%'"
+      :title=" $t('progress')"
       :list="[]"
       :selectRangeIndex="1"
       :isFilterHighlight="isFilterHighlight"

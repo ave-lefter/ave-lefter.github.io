@@ -18,26 +18,28 @@ import {
   SmarterHeader,
   LiquidityContent,
   LiquidityHeader,
-  PriceHeader,
   MCapContent,
   MCapHeader,
   InsidersContent,
-  Headline,
   DynamicPriceChangeHeader,
   PoolPairHeader,
   PoolPairContent,
   Top10Header,
   InsidersHeader,
   SnipersHeader,
-  PriceContent,
   PriceChange,
+  DevContent,
+  DevHeader,
+  ProgressHeader,
+  Progress,
+  HalfTimeHeader,
+  FullHeader,
 } from './columnRender/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
-const localeStore = useLocaleStore()
 const globalStore = useGlobalStore()
 
 const props = defineProps<{
@@ -96,7 +98,7 @@ onMounted(() => {
   _getTreasureList()
 })
 watch(
-  () => [props.activeChain,props.activeSubTab],
+  () => [props.activeChain, props.activeSubTab],
   () => {
     pageInfo.value.pageNO = 1
     _getTreasureList()
@@ -252,6 +254,8 @@ const filterMap = {
   price_change_dynamic: (el: any) =>
     el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval),
   quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible,
+  first_half_elapsed_time: (el: any) => el.isVisible && props.activeSubTab === 'pump_in_almost',
+  second_half_elapsed_time: (el: any) => el.isVisible && props.activeSubTab === 'pump_in_almost',
 }
 
 const visibleColumns = computed(() => {
@@ -281,6 +285,10 @@ const headerRenderer = computed(() => {
     quick: () => t('quick'),
     insider_balance_ratio_cur: InsidersHeader,
     sniper_tx_count: SnipersHeader,
+    dev_balance_ratio_cur: DevHeader,
+    progress: ProgressHeader,
+    first_half_elapsed_time: HalfTimeHeader,
+    second_half_elapsed_time: FullHeader,
   }
 })
 const cellRenderer = computed(() => {
@@ -300,13 +308,31 @@ const cellRenderer = computed(() => {
     dynamicVolAndTxs: DynamicVolAndTxs,
     markers_dynamic: DynamicMarkers,
     holders: HoldersContent,
-    smart_money_buy_volume_24h: SmarterContent,
+    smart_money_buy_volume_24h: ({row})=>{
+      return <SmarterContent row={row}/>
+    },
     dex: dexContent,
     security: securityContent,
     holders_top10_ratio: top10PositionsContent,
     quick: quickContent,
     insider_balance_ratio_cur: InsidersContent,
     sniper_tx_count: snipersContent,
+    dev_balance_ratio_cur: DevContent,
+    progress: Progress,
+    first_half_elapsed_time: ({ row }) => {
+      return (
+        <span class={!row.first_half_elapsed_time ? 'color-[--d-666-l-999]' : ''}>
+          {formatTime(row.first_half_elapsed_time || 0)}
+        </span>
+      )
+    },
+    second_half_elapsed_time: ({ row }) => {
+      return (
+        <span class={!row.second_half_elapsed_time ? 'color-[--d-666-l-999]' : ''}>
+          {formatTime(row.second_half_elapsed_time || 0)}
+        </span>
+      )
+    },
   }
 })
 </script>

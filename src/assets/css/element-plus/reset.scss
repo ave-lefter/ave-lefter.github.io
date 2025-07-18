@@ -151,3 +151,21 @@
     --el-pagination-button-color:var(--d-666-l-999);
   }
 }
+.el-slider{
+  &.el-slider{
+    --el-slider-button-size:14px;
+    --el-slider-main-bg-color:var(--d-FFF-l-333);
+  }
+  .el-slider__marks-text{
+    font-size: 12px;
+  }
+}
+
+// --el-slider-runway-bg-color: var(--el-border-color-light);
+//     --el-slider-stop-bg-color: var(--el-color-white);
+//     --el-slider-disabled-color: var(--el-text-color-placeholder);
+//     --el-slider-border-radius: 3px;
+//     --el-slider-height: 6px;
+//     --el-slider-button-size: 20px;
+//     --el-slider-button-wrapper-size: 36px;
+//     --el-slider-button-wrapper-offset: -15px;
