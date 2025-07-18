@@ -654,6 +654,7 @@ watch([() => conditions.value, ()=>updateNum2.value+updateNum3.value,()=>isMonit
   init()
   if(value[2]!==oldValue[2]){
     nextTick(()=>{
+      tableRef.value?.clearSort()
       tableRef.value?.sort(defaultSort.value?.prop, defaultSort.value?.order)
     })
   }
