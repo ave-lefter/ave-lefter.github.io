@@ -224,7 +224,7 @@ onMounted(() => {
 
 <template>
   <div class="flex-1 h-[calc(100%-76px)] flex flex-col">
-    <el-table class='mt-12px' :height="pageData.total > 50 ? 'calc(100% - 84px)' : '100%'" v-loading="loading"
+    <el-table v-loading="loading" class="mt-12px" :height="pageData.total > 50 ? 'calc(100% - 84px)' : '100%'"
       row-class-name="group" :data="tableList" fit @sort-change="handleSortChange" @row-click="tableRowClick">
       <template #empty>
         <div v-if="botStore.evmAddress || walletStore.address">
@@ -237,37 +237,39 @@ onMounted(() => {
         </div>
         <AveEmpty v-else>
           <span class="text-12px mt-10px">{{ $t('noWalletTip') }}</span>
-          <el-button type="primary" class="mt-10px" @click="botStore.$patch({
-            connectVisible: true
-          })">
+          <el-button type="primary" class="mt-10px" @click="botStore.$patch({connectVisible: true})">
             {{ $t('connectWallet') }}
           </el-button>
         </AveEmpty>
       </template>
-      <el-table-column :label="t('address')" min-width="160" show-overflow-tooltip>
+      <el-table-column :label="t('address')" min-width="160">
         <template #default="{ row, $index }">
           <div class="flex items-center">
             <span class="text-[--d-666-l-999] text-10px mr-5px">
               #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
             </span>
-            <Icon :key="`${row.user_address}-${row.user_chain}`" :ref="(el: any) => $refs.buttonRefs[$index] = el"
+            <Icon
+:key="`${row.user_address}-${row.user_chain}`" :ref="(el: any) => $refs.buttonRefs[$index] = el"
               name="custom:attention"
               :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'"
               class="color-[--d-666-l-999] h-16px w-16px clickable shrink-0"
               @click.stop.prevent="collect(row)" />
-            <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo"
+            <UserAvatar
+:key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo"
               :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
             <div class="ml-5px">
               <div class="flex items-center">
-                <UserRemark :key="`${row.user_address}-${row.user_chain}`" :remark="row.remark"
+                <UserRemark
+:key="`${row.user_address}-${row.user_chain}`" :remark="row.remark"
                   :address="row.user_address" :chain="row.user_chain"
                   addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 85px"
                   :iconEditColor="isDark ? '#666' : '#999'" iconEditSize="10px" showAddressTitle
                   :formatAddress="(address) => address?.slice(0, 4) + '...' + address?.slice(-4)" />
               </div>
               <div class="flex items-center mt-6px">
-                <Icon @click.stop.prevent v-copy="row?.user_address" name="bxs:copy"
-                  class="clickable text-[--d-666-l-999] w-12px h-12px" />
+                <Icon
+v-copy="row?.user_address" name="bxs:copy" class="clickable text-[--d-666-l-999] w-12px h-12px"
+                  @click.stop.prevent />
                 <Icon name="custom:sun-icon" class="text-12px w-12px h-12px mx-5px" />
                 <Icon name="custom:wallet-icon" class="text-12px w-12px h-12px" />
               </div>
@@ -312,7 +314,8 @@ onMounted(() => {
       <el-table-column :label="t('pushTitle')" align="right">
         <template #default="{ row }">
           <div class="flex flex-row-reverse" @click.stop>
-            <a class="flex items-center color-[var(--d-F5F5F5-l-333)]"
+            <a
+class="flex items-center color-[var(--d-F5F5F5-l-333)]"
               :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`" target="_blank">
               <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
               {{ t('copyTrade') }}
@@ -327,7 +330,7 @@ onMounted(() => {
                 {{ (row?.is_monitored === 1) ? t('pause') : t('enable') }}
               </span>
             </div>
-            <div class="flex items-center mr-12px color-[var(--d-666-l-CCC)] cursor-not-allowed" v-else>
+            <div v-else class="flex items-center mr-12px color-[var(--d-666-l-CCC)] cursor-not-allowed">
               <Icon name="custom:monitor-icon" class="text-15px mr-2px mb-1px" />
             </div>
             <!-- 监控 -->
@@ -347,22 +350,26 @@ onMounted(() => {
       </el-table-column>
     </el-table>
 
-    <el-pagination class="h-72px flex justify-end items-center" v-if="pageData.total > 1"
-      v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" layout="prev, pager, next, ->"
+    <el-pagination
+v-if="pageData.total > 1" v-model:current-page="pageData.page"
+      v-model:page-size="pageData.pageSize" class="h-72px flex justify-end items-center" layout="prev, pager, next, ->"
       :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" hide-on-single-page @change="getList" />
 
     <el-popover :visible="visibleShow" :virtual-ref="virtualRef" virtual-triggering trigger="click" :width="250">
       <div>
         <div>{{ t('editRemark') }}</div>
-        <el-input v-model="remarkValue" clearable maxlength="20" show-word-limit :placeholder="t('enterRemark')"
+        <el-input
+v-model="remarkValue" clearable maxlength="20" show-word-limit :placeholder="t('enterRemark')"
           class="mt-8px w-100%" />
         <div class="flex items-center justify-between mt-12px gap-12px">
-          <div @click="visibleShow = false"
-            class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
+          <div
+class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px"
+            @click="visibleShow = false">
             {{ t('cancel') }}
           </div>
-          <div @click="handleRemarkGroup(rowData)"
-            class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[#3F80F7] px-12px py-8px rounded-4px">
+          <div
+class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[#3F80F7] px-12px py-8px rounded-4px"
+            @click="handleRemarkGroup(rowData)">
             {{ t('confirm') }}
           </div>
         </div>

@@ -44,7 +44,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import {CaretBottom} from '@element-plus/icons-vue'
 // import { addFavoriteGroup2 } from '~/api/attention'
 const { t } = useI18n()
-const props=defineProps({
+const props = defineProps({
   width:{
     type:String,
     default:'248'
@@ -58,9 +58,9 @@ const props=defineProps({
         user_chain:  {label:'SOL',value:'solana',id:'solana'}
       }
     }
-  }, 
-  buttonRef:{
-    type:Object,
+  },
+  buttonRef: {
+    type: Object,
     required:true
   },
   title: {
@@ -104,14 +104,14 @@ const rules = computed<FormRules>(() => {
   return {
     user_chain: [{ validator: validateAddress2, trigger: 'change' }],
     address: [
-      { required: true, message: (lang.value == "zh-cn" || lang.value == "zh-tw") ? `${t('watchAddress')}${t('cannotBeEmpty')}` : `${t('watchAddress')} ${t('cannotBeEmpty')}`, trigger: ['blur'] },
-      { validator: validateAddress, trigger: "blur" },
+      { required: true, message: (lang.value == 'zh-cn' || lang.value == 'zh-tw') ? `${t('watchAddress')}${t('cannotBeEmpty')}` : `${t('watchAddress')} ${t('cannotBeEmpty')}`, trigger: ['blur'] },
+      { validator: validateAddress, trigger: 'blur' },
     ],
     group: [
-      { required: true, message: (lang.value == "zh-cn" || lang.value == "zh-tw") ? `${t('walletGroup')}${t('cannotBeEmpty')}` : `${t('walletGroup')} ${t('cannotBeEmpty')}`, trigger: ['blur','change'] },
+      { required: true, message: (lang.value == 'zh-cn' || lang.value == 'zh-tw') ? `${t('walletGroup')}${t('cannotBeEmpty')}` : `${t('walletGroup')} ${t('cannotBeEmpty')}`, trigger: ['blur','change'] },
     ],
     remark: [
-      { required: true, message: (lang.value == "zh-cn" || lang.value == "zh-tw") ? `${t('remark')}${t('cannotBeEmpty')}` : `${t('remark')} ${t('cannotBeEmpty')}`, trigger: 'blur' },
+      { required: true, message: (lang.value == 'zh-cn' || lang.value == 'zh-tw') ? `${t('remark')}${t('cannotBeEmpty')}` : `${t('remark')} ${t('cannotBeEmpty')}`, trigger: 'blur' },
       { pattern: /^(?!.*[!@#$%^&*(),.?":{}|<>])(.{2,50})$/, message: t('remarkError'), trigger: ['blur'] }
     ],
   }

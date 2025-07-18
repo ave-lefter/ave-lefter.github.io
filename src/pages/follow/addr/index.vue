@@ -2,7 +2,7 @@
   <div class="w-address flex-1 w-100% h-[calc(100%-76px)] flex flex-col" :class="{ 'mt-12px': currentAddress }">
     <ul v-if="currentAddress" class="w-operate">
       <li v-if="evmAddress" class="flex items-center gap-2px">
-          <el-checkbox v-model="isMonitor" :label="t('onlyPush')"  style="color:var(--d-999-l-666);z-index: 0" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! [&&]:[--el-checkbox-input-border:1px_solid_var(--d-666-l-999)]" size="large"/>
+          <el-checkbox v-model="isMonitor" :label="t('onlyPush')"  style="color:var(--d-999-l-666);z-index: 0;--el-checkbox-font-weight:400" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! [&&]:[--el-checkbox-input-border:1px_solid_var(--d-666-l-999)]" size="large"/>
           <span class="text-[var(--d-999-l-666)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/50` }}</span>
       </li>
       <li class="btn">
@@ -518,7 +518,7 @@
         </template>
       </el-table-column>
       </el-table>
-      <el-pagination 
+      <el-pagination
         v-if="(pageData.total > 50) && shouldRenderChild && currentAddress"
         v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="h-72px flex justify-end items-center"
         layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getTableList"/>
