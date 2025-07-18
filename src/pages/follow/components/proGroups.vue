@@ -33,13 +33,13 @@
           />
       </li>
     </template>
-    <li ref="addButtonRef" class="clickable color-#3F80F7! flex gap-2px bg-#3F80F71A!">
+    <li ref="addButtonRef" class="clickable color-[var(--d-999-l-666)]! flex gap-2px bg-[var(--d-222-l-F2F2F2)]!">
       <Icon name="custom:add-icon" class="text-12px" />
       <span>{{ $t('newGroup') }}</span>
     </li>
     <el-popover ref="popoverRef2" :width="320" trigger="click">
        <template #reference>
-         <li class="clickable color-#3F80F7! flex gap-2px bg-#3F80F71A!">
+         <li class="clickable color-[var(--d-999-l-666)]! flex gap-2px bg-[var(--d-222-l-F2F2F2)]!">
            <Icon name="custom:list-icon" class="text-12px" />
            <span>{{ $t('groupManage') }}</span>
          </li>
