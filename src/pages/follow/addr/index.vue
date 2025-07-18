@@ -784,7 +784,12 @@ const getTableList = throttle(function() {
   // monitorAddresses({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
   //   console.log('monitorAddresses res', res)
   // })
-  req({...conditions.value, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
+
+  const conditionsData = {...conditions.value}
+  if(!conditionsData.sort_dir){
+    conditionsData.sort = ''
+  }
+  req({...conditionsData, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
     console.log('getAttentionPageList res',isMonitor.value, res)
     const tableData =isMonitor.value?dataSource2:dataSource
     tableData.value = ( res.data || []).
@@ -874,6 +879,7 @@ function  handleFilterConfirm(data: FilterFormType) {
 }
 
 function handleSort(val:any, dir='',sort:string) {
+    console.log('handleSort',val,{dir},{sort})
     tableRef.value?.clearSort()
     if (!dir) {
       const sortList = ['desc', 'asc', null]
@@ -898,7 +904,7 @@ function handleSort(val:any, dir='',sort:string) {
     // console.log('filterFormObj111', filterFormObj)
 }
  function handleSortChange(data: {prop: string, order: string|null}) {
-  console.log('-------HandleSortChange--------', data)
+  console.log('-------HandleSortChange--------', data)  
   if (data.order === null) {
     conditions.value.sort_dir = ''
     conditions.value.sort = ''
