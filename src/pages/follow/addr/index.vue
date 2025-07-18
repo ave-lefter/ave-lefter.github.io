@@ -47,7 +47,7 @@
           </AveEmpty>
           <span v-else />
         </template>
-        <el-table-column :label="$t('wallet2')" width="210" fixed="left">
+        <el-table-column :label="$t('wallet2')" width="215" fixed="left">
           <template #header>
             <span class="text-10px" style="opacity: 0">0</span>
             <span>{{ $t('wallet2') }}</span>
