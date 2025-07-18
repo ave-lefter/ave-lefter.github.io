@@ -252,7 +252,7 @@ onMounted(() => {
 :key="`${row.user_address}-${row.user_chain}`" :ref="(el: any) => $refs.buttonRefs[$index] = el"
               name="custom:attention"
               :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'"
-              class="color-[--d-666-l-999] h-16px w-16px clickable shrink-0"
+              class="color-[--d-666-l-999] text-12px clickable shrink-0"
               @click.stop.prevent="collect(row)" />
             <UserAvatar
 :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo"
@@ -414,9 +414,9 @@ class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[#3F80F7] 
   height: 40px;
 }
 
-// :deep() .el-table .el-table__cell {
-//   padding: 14px 0;
-// }
+ :deep() .el-table .el-table__cell {
+   padding: 14px 0;
+ }
 
 :deep() .el-table {
   --el-table-text-color: var(--d-CCC-l-333);

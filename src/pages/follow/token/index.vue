@@ -427,7 +427,7 @@ onMounted(() => {
                   class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 color-#ffbb19"
                   @click.stop.prevent="collect(row)" />
                 <div class="relative ml-3px">
-                  <el-image class="w-32px h-32px rounded-full" :src="getSymbolDefaultIcon({
+                  <el-image class="w-32px h-32px rounded-full mt-6px" :src="getSymbolDefaultIcon({
                     chain: row?.chain,
                     symbol: row.symbol,
                     logo_url: row.logo_url
@@ -439,11 +439,11 @@ onMounted(() => {
                       <img class="w-32px h-32px rounded-full" :src="getChainDefaultIcon(row?.chain, row.symbol)" />
                     </template>
                   </el-image>
-                  <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px"
+                  <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px rounded-[50%]"
                     :src="`${configStore.token_logo_url}chain/${row?.chain}.png`" alt=""
                     onerror="this.src='/icon-default.png'" srcset="" />
                 </div>
-                <div class="ml-5px">
+                <div class="ml-5px flex flex-col lh-none justify-between h-32px">
                   <div class="flex items-center">
                     <span class="text-13px">{{ row.symbol }}</span>
                     <div class="text-12px text-[--d-666-l-999] ml-4px">
@@ -458,7 +458,7 @@ onMounted(() => {
                       <Icon class="text-[--d-666-l-999] h-12px w-12px text-12px" name="custom:search" />
                     </a>
                   </div>
-                  <div class="flex items-center mt-2px">
+                  <div class="flex items-center">
                     <!-- <span class="text-[--d-CCC-l-999]">({{ '*' + row.token?.slice(-4) }})</span> -->
                     <div
                       class="text-[#3f80f7] border-[0.5px] border-solid border-[#3f80f7] box-border rounded-4px bg-transparent text-10px px-4px max-w-[60px] h-16px flex items-center truncate"
@@ -641,4 +641,7 @@ onMounted(() => {
   --el-table-row-hover-bg-color: var(--d-1A1A1A-l-fafafa);
   --el-table-text-color: var(--d-CCC-l-333);
 }
+ :deep() .el-table .el-table__cell {
+   padding: 10.5px 0;
+ }
 </style>
