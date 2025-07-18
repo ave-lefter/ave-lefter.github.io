@@ -44,7 +44,7 @@
               row-class='cursor-pointer'
               :rowEventHandlers="{
               onClick: (row:any)=>jumpToken(row)
-            }"> 
+            }">
               <template #header-wallet>
                 <span>{{ $t('wallet') }}</span>
               </template>
@@ -142,7 +142,7 @@
               row-class='cursor-pointer'
               :rowEventHandlers="{
               onClick: (row:any)=>jumpToken(row)
-            }"> 
+            }">
               <template #header-wallet>
                   <div class="flex-between w-100%">
                     <div class="flex-start gap-8px">
@@ -179,7 +179,7 @@
                   </div>
                   <div class="flex-between">
                     <div class="flex-start gap-4px">
-                      <div>{{ getTxType(row) }}</div> 
+                      <div>{{ getTxType(row) }}</div>
                       <span :class="getIsBuy(row)?`color-${upColor[0]}`:`color-${downColor[0]}`">
                         {{ !toggleMc? row?._main_Token?.amount+row?._main_Token?.symbol: row?._main_Token.total}}
                       </span>
@@ -211,7 +211,7 @@
                   </div>
                 </div>
               </template>
-            </AveTable> 
+            </AveTable>
           </div>
         </template>
         <AveEmpty
@@ -251,7 +251,7 @@
               <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
               {{ $t('addWallet') }}
             </el-button>
-          
+
             <QuickBuyInput
               v-if="(monitorStore.activeName===1)&&isLarge"
               v-model="quickBuyValue"
@@ -267,7 +267,7 @@
         </template>
       </el-tab-pane>
     </el-tabs>
-    <addFavAddressPop ref="addFavAddressPopRef" :buttonRef="addButtonRef" @onConfirm="handleConfirmAdd" />
+    <AddFavAddressPop v-if="addButtonRef" ref="addFavAddressPopRef" :buttonRef="addButtonRef" @onConfirm="handleConfirmAdd" />
   </div>
 </template>
 
@@ -286,8 +286,7 @@ const { t } = useI18n()
 const monitorStore = useMonitorStore()
 const { hasRing } = storeToRefs(monitorStore)
 
-
-const {currentAddress ,showBatchAddressDetails,updateNum3} = storeToRefs(useFollowStore())
+const {updateNum3} = storeToRefs(useFollowStore())
 const { isDark } = storeToRefs(useGlobalStore())
 const props = defineProps({
   scrollHeight: {
@@ -311,7 +310,7 @@ const txType = ref([0,1])
 const addButtonRef = ref()
 const toggleMc = ref(false)
 const addFavAddressPopRef = ref()
-const activeName=ref(0)
+// const activeName=ref(0)
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const txTypeList=computed(() => {
   return [
@@ -329,7 +328,7 @@ const walletManageProps=computed(() => {
 onMounted(async () => {
   // console.log('monitor mounted')
   nextTick(() => {
-    const el = document.querySelector('.m-tabs .el-tabs__header.is-top')
+    // const el = document.querySelector('.m-tabs .el-tabs__header.is-top')
     // if (el) el.className = 'el-tabs__header is-top drag-handle'
     // console.log('monitor visible', el)
   })
@@ -375,7 +374,7 @@ function handleConfirmAdd(formData?: any, resetFields?: () => void, stopLoading?
   }).catch((err) => {
     console.error(err)
   })
-} 
+}
 const columns = computed(() => {
   return props.isLarge?[
     {
@@ -512,7 +511,7 @@ function init2() {
   }).finally(() => {
     loading.value = false
   })
-  
+
 }
 function getIsBuy(item: { position_type?: string | number; tx_type?: string | number }) {
   // console.log('item', item)
