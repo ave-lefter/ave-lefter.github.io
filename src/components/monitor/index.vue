@@ -1,5 +1,5 @@
 <template>
-  <div class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] px-12px relative overflow-hidden">
+  <div class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overflow-hidden">
     <!-- <div class="w-100% h-40px absolute pointer-events-auto z-999 drag-handle left-0"/> -->
     <Icon
         name="custom:drag2"
