@@ -245,7 +245,7 @@ const collect = async () => {
             />
             <Icon
               ref="attentionTriggerRef" name="custom:attention"
-              :class="statistics.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-#666'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect()" />
+              :class="statistics.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect()" />
             <div v-if="statistics.newTags?.length > 0" class="ml-6px">
               <el-tooltip
                 placement="top"
@@ -311,7 +311,7 @@ const collect = async () => {
             <Icon
               v-copy="tokenDetailStore.user_address"
               name="bxs:copy"
-              class="cursor-pointer color-[--d-666-l-696E7C] text-10px"
+              class="cursor-pointer color-[--d-666-l-999] text-10px"
             />
             <!--<Icon-->
             <!--  name="custom:attention"-->

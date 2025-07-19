@@ -1,6 +1,7 @@
 <template>
   <div class="items-center inline-flex">
-    <img src="@/assets/images/fast.svg" class="w-14px h-14px" alt="" srcset="">
+    <img v-if="themeStore.isDark" src="@/assets/images/fast.svg" class="w-14px h-14px" alt="" srcset="">
+    <img v-else src="@/assets/images/fast-dark.svg" class="w-14px h-14px" alt="" srcset="">
     <span class="ml-5px mr-5px color-[--d-999-l-666] text-12px">{{ $t('quick') }}</span>
     <el-input
       v-model.trim="quickBuyValue1"
@@ -70,7 +71,8 @@
     >
       <ul>
         <li class="text-14px mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('slippage')" name="custom:slippage"
+          <Icon
+v-tooltip="$t('slippage')" name="custom:slippage"
                 class="text-12px color-[--d-666-l-999] ml-0 mr-6px cursor-pointer"/>
           <span v-if="botSettingStore.botSettings?.[chain || '']?.[selected]?.slippage !== 'auto'">{{
               botSettingStore.botSettings?.[chain || '']?.[selected]?.slippage
@@ -78,12 +80,14 @@
           <span v-else>{{ $t('auto') }}</span>
         </li>
         <li v-if="isEvmChain(chain || '')" class="text-14px mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas"
+          <Icon
+v-tooltip="$t('estimatedGas')" name="custom:gas"
                 class="text-12px color-[--d-666-l-999] ml-0 mr-6px cursor-pointer"/>
           <span>${{ getEstimatedGas() }}</span>
         </li>
         <li v-if="chain === 'solana'" class="text-14px mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('priorityFee')" name="custom:gas"
+          <Icon
+v-tooltip="$t('priorityFee')" name="custom:gas"
                 class="text-12px color-[--d-666-l-999] mr-6px cursor-pointer ml-0"/>
           <span>{{ botPriorityFee }} SOL</span>
         </li>
@@ -108,6 +112,7 @@ import {formatBotGasTips} from '@/utils/bot'
 import {isEvmChain, getRpcProvider} from '@/utils'
 
 
+const themeStore = useThemeStore()
 const botStore = useBotStore()
 const configStore = useConfigStore()
 const botSwapStore = useBotSwapStore()

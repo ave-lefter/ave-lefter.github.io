@@ -71,14 +71,13 @@
                   </div>
                   <div class="mt-20px flex items-center justify-center">
                     <el-button
-                      class="flex-1"
+                      class="flex-1 reset"
                       size="default"
                       style="
                         height: 30px;
                         min-width: 70px;
                         --el-button-font-weight: 400;
                       "
-                      :color="mode !== 'dark' ? '#f2f2f2' : '#333333'"
                       @click.stop="handleReset(filterForm['last_trade_time'])"
                     >
                       {{ $t('reset') }}
@@ -534,14 +533,13 @@
                     </div>
                     <div class="mt-20px flex justify-center">
                       <el-button
-                        class="flex-1"
+                        class="flex-1 reset"
                         size="default"
                         style="
                           height: 30px;
                           min-width: 70px;
                           --el-button-font-weight: 400;
                         "
-                        :color="mode !== 'dark' ? '#f2f2f2' : '#333333'"
                         @click.stop="handleReset(filterForm['profit_percent_num'])"
                       >
                         {{ $t('reset') }}
@@ -564,7 +562,7 @@
             <div class="flex-end">
               <div class="mr-10px">
                 <div>
-                  <span class="text-12px mr-2px color-[--d-999-l-666]">
+                  <span class="text-12px mr-4px color-[--d-999-l-666]">
                     {{ filterForm['profit_percent_num'].profit_obj.profit_above_900_percent_num.name }}
                   </span>
                   <span
@@ -575,7 +573,7 @@
                   </span>
                 </div>
                 <div class="mt-10px">
-                  <span class="text-12px mr-2px color-[--d-999-l-666]">
+                  <span class="text-12px mr-4px color-[--d-999-l-666]">
                     {{ filterForm['profit_percent_num'].profit_obj.profit_300_900_percent_num.name }}
                   </span>
                   <span
@@ -588,7 +586,7 @@
               </div>
               <div>
                 <div>
-                  <span class="text-12px mr-2px color-[--d-999-l-666]">
+                  <span class="text-12px mr-4px color-[--d-999-l-666]">
                     {{ filterForm['profit_percent_num'].profit_obj.profit_100_300_percent_num.name }}
                   </span>
                   <span
@@ -599,7 +597,7 @@
                   </span>
                 </div>
                 <div class="mt-10px">
-                  <span class="text-12px mr-2px color-[--d-999-l-666]">
+                  <span class="text-12px mr-4px color-[--d-999-l-666]">
                     {{ filterForm['profit_percent_num'].profit_obj.profit_10_100_percent_num.name }}
                   </span>
                   <span
@@ -685,7 +683,7 @@
           <template #default="{ row }">
             <div class="flex-end">
               <div class="mr-10px">
-                <span class="text-12px mr-2px color-[--d-999-l-666]">
+                <span class="text-12px mr-4px color-[--d-999-l-666]">
                   {{ filterForm['profit_percent_num_lt'].profit_obj.profit_neg10_10_percent_num.name }}
                 </span>
                 <span
@@ -697,7 +695,7 @@
               </div>
               <div>
                 <div>
-                  <span class="text-12px mr-2px color-[--d-999-l-666]">
+                  <span class="text-12px mr-4px color-[--d-999-l-666]">
                     {{ filterForm['profit_percent_num_lt'].profit_obj.profit_neg50_neg10_percent_num.name }}
                   </span>
                   <span
@@ -708,7 +706,7 @@
                   </span>
                 </div>
                 <div class="mt-10px">
-                  <span class="text-12px mr-2px color-[--d-999-l-666]">
+                  <span class="text-12px mr-4px color-[--d-999-l-666]">
                     {{ filterForm['profit_percent_num_lt'].profit_obj.profit_neg100_neg50_percent_num.name }}
                   </span>
                   <span
@@ -1353,6 +1351,11 @@ ul.openTime {
   background-color:#3F80F7;
   border-color: #3F80F7;
   color:#fff;
+}
+.reset {
+  background-color: var(--d-333-l-F2F2F2);
+  color: var (--d-F5F5F5-l-333);
+  border-color: var(--d-333-l-F2F2F2);
 }
 .hover-dot{
   &:hover {

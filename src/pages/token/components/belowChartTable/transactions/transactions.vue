@@ -20,9 +20,11 @@ import {useThrottleFn} from '@vueuse/core'
 
 import IconUnknown from '@/assets/images/icon-unknown.png'
 import type {AveTable} from '#components'
+// import type { content } from 'html2canvas/dist/types/css/property-descriptors/content'
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
+
 const MAKER_SUPPORT_CHAINS = ['solana', 'bsc']
 const { t } = useI18n()
 const {totalHolders, pairAddress, token, pair, commonHeight} = storeToRefs(useTokenStore())
@@ -664,7 +666,7 @@ const collect = async (row: any,index:number) => {
         return Promise.reject(err)
       })
     })
-    return 
+    return
   }
   // loading.value = true
   deleteAttention({
@@ -893,13 +895,15 @@ const collect = async (row: any,index:number) => {
           <template v-if="['solana', 'bsc'].includes(row.chain) && row.senderProfile">
             <Icon
               v-if="hasNewAccount(row)"
-              v-tooltip.raw="`<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`" name="custom:new-account"
+              v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' }}"
+              name="custom:new-account"
               class="mr-3px shrink-0"/>
             <Icon
-              v-if="hasClearedAccount(row)" v-tooltip.raw="`<span style='color: #EB2B4B'>${$t('sellAl')}</span>`"
+              v-if="hasClearedAccount(row)"
+              v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:cleared-account" class="mr-3px shrink-0"/>
             <Icon
-              v-if="bigWallet(row)" v-tooltip.raw="`<span style='color: #C5842B'>${$t('whales')}</span>`"
+              v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:big" class="mr-3px shrink-0"/>
           </template>
           <SignalTags
@@ -917,10 +921,10 @@ const collect = async (row: any,index:number) => {
               <div v-if="row.count && row.count > 1">
                 ({{ row.count }})
               </div>
-            </UserRemark> 
+            </UserRemark>
             <Icon
               :ref="(el: any) => $refs.buttonRefs[rowIndex] = el" name="custom:attention"
-              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#666]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
             <Icon
               name="custom:filter"
               :class="`${tableFilter.markerAddress ? 'color-[--d-999-l-666]' : 'color-[--d-666-l-999]'} cursor-pointer text-10px shrink-0`"
@@ -973,4 +977,11 @@ const collect = async (row: any,index:number) => {
   </div>
 </template>
 
-<style></style>
+<style scoped lang="scss">
+:deep(.el-table-v2__header-cell){
+  padding: 0 12px;
+}
+:deep(.el-table-v2__row-cell){
+  padding: 0 12px;
+}
+</style>

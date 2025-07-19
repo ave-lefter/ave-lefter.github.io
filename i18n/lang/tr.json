@@ -24,7 +24,7 @@
   "edit": "Düzenle",
   "favoriteManage": "Favoriler",
   "groupManage": "Grup Yönetimi",
-  "newGroup": "Yeni Grup",
+  "newGroup": "Yeni grup",
   "rename": "Yeniden Adlandır",
   "delete": "Sil",
   "groupName": "Grup Adı",
@@ -269,9 +269,9 @@
   "check": "Kontrol Et",
   "copyTip": "Geçerli adres {address} bir sözleşme adresidir, lütfen para transferi yapmayın, aksi takdirde varlık geri alınamaz.",
   "follow": "Takip et",
-  "customToken": "Özelleştirilmiş Token",
-  "watchAddress": "İzleme Adresi",
-  "remarkLib": "Adres takma adı kütüphanesi",
+  "customToken": "Gelenek",
+  "watchAddress": "Kol saati",
+  "remarkLib": "Söz",
   "selectNetwork": "Ağı Seç",
   "selectWallet": "Cüzdan seçin",
   "detected": "Tespit Edildi",
@@ -430,7 +430,7 @@
   "walletAddress": "Cüzdan adresi",
   "chain": "Blok zinciri",
   "placeholderPrefix1": "Lütfen seçin",
-  "walletManage": "Cüzdan yönet",
+  "walletManage": "Cüzdan",
   "allChain": "Tüm zincir",
   "monitored": "İzlenmiş",
   "liquidity1": "Likidite",
@@ -445,5 +445,6 @@
   "basicInfo": "Temel Bilgiler",
   "insidersPosition1": "İçeridekiler",
   "login": "Giriş yapmak",
-  "platform": "Platform"
+  "platform": "Platform",
+  "onlyPush": "Sadece Push"
 }

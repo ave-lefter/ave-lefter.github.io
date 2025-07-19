@@ -274,9 +274,9 @@
   "check": "Verificar ",
   "copyTip": "O endereço atual {address} é um endereço de contrato. Por favor, não faça transferências, caso contrário, os ativos não poderão ser recuperados.",
   "follow": "Seguir",
-  "customToken": "Token Personalizado",
-  "watchAddress": "Endereço de Observação",
-  "remarkLib": "Endereço Alias ​​Library",
+  "customToken": "Personalizado",
+  "watchAddress": "Assistir",
+  "remarkLib": "Observação",
   "selectNetwork": "Selecione a rede ",
   "selectWallet": "Escolha a carteira",
   "detected": "Detectado",
@@ -450,5 +450,6 @@
   "basicInfo": "Informação básica",
   "insidersPosition1": "Insiders Possuído",
   "login": "Conecte-se",
-  "platform": "Plataforma"
+  "platform": "Plataforma",
+  "onlyPush": "Apenas empurre"
 }

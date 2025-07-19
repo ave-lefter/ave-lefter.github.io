@@ -2,13 +2,13 @@
   <span class="flex flex-col items-center justify-center" @click="handleSort('')">
     <Icon
       name="custom:sort-up"
-      class="text-4px mb-1px cursor-pointer"
+      class="text-4px cursor-pointer"
       :class="sortOrder==='asc' ? 'color-[--d-F5F5F5-l-333]' : 'color-[--d-666-l-999]'"
       @click.self.stop="handleSort('asc')"
     />
     <Icon
       name="custom:sort-up"
-       class="text-4px mb-1px rotate-180 cursor-pointer"
+       class="text-4px mt-1px rotate-180 cursor-pointer"
       :class="sortOrder==='desc' ? 'color-[--d-F5F5F5-l-333]' : 'color-[--d-666-l-999]'"
       @click.self.stop="handleSort('desc')"
     />

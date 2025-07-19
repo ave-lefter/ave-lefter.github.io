@@ -285,9 +285,9 @@
   "importTip": "*Importa el código para sincronizar los datos seleccionados.",
   "plsImport": "",
   "plsImportCorrect": "Por favor, introduce el código correcto",
-  "customToken": "Token Personalizado",
-  "watchAddress": "Dirección de Observación",
-  "remarkLib": "Dirección de alias biblioteca",
+  "customToken": "Costumbre",
+  "watchAddress": "Mirar",
+  "remarkLib": "Observación",
   "bulkProcess": "Importación masiva / Exportación masiva",
   "monitorList": "Lista de monitoreo",
   "walletMonitor": "Monitor de billetera",
@@ -435,7 +435,7 @@
   "walletAddress": "Dirección de la billetera",
   "chain": "Cadena",
   "placeholderPrefix1": "seleccione",
-  "walletManage": "Manejo de billetera",
+  "walletManage": "Billetera",
   "allChain": "Todas las cadenas",
   "monitored": "Monitoreado",
   "liquidity1": "Liquidez",
@@ -450,5 +450,6 @@
   "basicInfo": "Información básica",
   "insidersPosition1": "Propiedad de internos",
   "login": "Acceso",
-  "platform": "Plataforma"
+  "platform": "Plataforma",
+  "onlyPush": "Solo empuje"
 }

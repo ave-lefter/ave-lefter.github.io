@@ -63,7 +63,7 @@
                   <Icon
                     v-if="shouldRenderChild"
                     :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
-                    :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[#666]'" class="text-14px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
+                    :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="text-14px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
                   <UserRemark :remark="row.remark" :address="row.wallet_address" :chain="row.chain" :showAddress="false" :wallet_logo="row.wallet_logo" iconEditSize="10px"/>
                   <!-- <a
                     href=""

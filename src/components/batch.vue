@@ -19,7 +19,7 @@
       <div v-if="tabActive === 0" class="import part">
         <p>{{ $t('bulkDesc1') }}</p>
         <div class="example">
-          <div class="mr-5">{{ $t('bulkExample')}}:</div>
+          <div class="mr-5px">{{ $t('bulkExample')}}:</div>
           <div>
             <div>5meiN***8vGB:{{ $t('remark')}}1,</div>
             <div>G8oaP***eLgf:{{ $t('remark')}}2</div>
@@ -38,7 +38,7 @@
             <img
               v-if="activeChain"
               height="24"
-              class="mr-5 round"
+              class="mr-5px border-rd-[50%]"
               :src="`${token_logo_url}chain/${activeChain}.png`"
               style=""
               alt=""
@@ -55,9 +55,9 @@
               <img
                 v-if="item"
                 height="24"
-                class="mr-5 round"
+                class="mr-5px border-rd-[50%]"
+                style="border-radius: 45%;"
                 :src="`${token_logo_url}chain/${item}.png`"
-                style=""
                 alt=""
                 srcset=""
               >
@@ -94,7 +94,8 @@
             <img
               v-if="activeChain"
               height="24"
-              class="mr-5 round"
+              class="mr-5px border-rd-[50%]"
+
               :src="`${token_logo_url}chain/${activeChain}.png`"
               style=""
               alt=""
@@ -111,7 +112,7 @@
               <img
                 v-if="item"
                 height="24"
-                class="mr-5 round"
+                class="mr-5px border-rd-[50%]"
                 :src="`${token_logo_url}chain/${item}.png`"
                 style=""
                 alt=""
@@ -143,7 +144,7 @@
             <img
               v-if="activeChain"
               height="24"
-              class="mr-5 round"
+              class="mr-5px border-rd-[50%]"
               :src="`${token_logo_url}chain/${activeChain}.png`"
               style=""
               alt=""
@@ -160,7 +161,7 @@
               <img
                 v-if="item"
                 height="24"
-                class="mr-5 round"
+                class="mr-5px border-rd-[50%]"
                 :src="`${token_logo_url}chain/${item}.png`"
                 style=""
                 alt=""
@@ -172,7 +173,7 @@
         </el-select>
         <textarea v-model="zeroBalanceAddresses" class="textarea" disabled :placeholder="$t('batchPlaceHolder')"/>
         <el-button
-          class="width100 button"
+          class="width100 button mt-30px"
           block
           size="large"
           color="#3F80F7"
@@ -534,7 +535,7 @@ const confirmBulkDelete = () => {
         width: 100%;
         height: 328px;
         padding: 16px 12px;
-        color: var(--d-FFF-l-222);
+        color: var(--d-666-l-999);
         border: 1px solid var(--d-666-l-CCC);
         border-radius: 8px;
         overflow-y: auto;

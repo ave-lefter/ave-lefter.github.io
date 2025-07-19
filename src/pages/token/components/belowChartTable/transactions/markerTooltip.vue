@@ -103,7 +103,7 @@ async function _getTxsUserBrief() {
             :address="currentRow.wallet_address"
             :chain="currentRow.chain"
             :wallet_logo="currentRow.wallet_logo"
-            class="color-[--d-999-l-666]"
+            class="color-[--d-ccc-l-333]"
             :formatAddress="(address: string) => address.slice(0, 4) + '...' + address.slice(-4)"
           />
           <Icon v-copy="currentRow.wallet_address" name="bxs:copy"
@@ -117,9 +117,9 @@ async function _getTxsUserBrief() {
               formatNumber(userBriefData.balance_amount || 0, 3)
               }}/{{
                 formatNumber(userBriefData.history_max_balance_amount || 0, 3)
-              }})</span>${{ formatNumber(userBriefData.balance_usd || 0, 2) }}
+              }})</span > <span class="color-[--d-ccc-l-333]">${{ formatNumber(userBriefData.balance_usd || 0, 2) }}</span>
             <el-progress
-              :color="themeStore.isDark?'#F5F5F5':'#333'"
+              :color="themeStore.isDark?'#ccc':'#333'"
               :show-text="false"
               :percentage="userBriefData.ratio || 0"
               :stroke-width="4"
@@ -254,7 +254,7 @@ async function _getTxsUserBrief() {
             </NuxtLink>
           </div>
         </div>
-        <div class="flex justify-center mt-10px">
+        <div class="flex justify-center my-12px">
           <img v-if="themeStore.isDark" src="@/assets/images/aveai.svg" alt="" class="h-14px">
           <img v-else src="@/assets/images/aveai-b.svg" alt="" class="h-14px">
         </div>

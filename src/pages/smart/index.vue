@@ -703,7 +703,7 @@ function switchChain(chain: string) {
             @click="activeChain = value"
           >
             <img
-              class="w-16px h-16px rounded-full"
+              class="w-16px h-16px rounded-full opacity-70"
               :src="`${configStore.token_logo_url}chain/${value}.png`"
               alt=""
             />

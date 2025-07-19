@@ -9,10 +9,10 @@
         <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
         {{ $t('addWallet') }}
       </el-button>
-      <el-button  :color="isDark?'#333':'#F2F2F2'" style="height: 32px;color: var(--d-999-l-666) !important;padding: 8px 10px !important; margin-left: 0px;" @click.stop.prevent="showBatchAddressDetails=true" :dark="isDark" >
+      <el-button  :color="isDark?'#333':'#F2F2F2'" style="height: 32px;color: var(--d-999-l-666) !important;padding: 8px 10px !important; margin-left: 0px;" :dark="isDark" @click.stop.prevent="showBatchAddressDetails=true" >
         <Icon name="mingcute:new-folder-fill" class="text-12px mr-5px"/>
         {{ $t('bulkImport') }}
-      </el-button> 
+      </el-button>
     </div>
     <div v-loading="loading" class="text-12px m-table" element-loading-background="transparent">
       <!-- @scroll="onScroll" -->
@@ -26,7 +26,7 @@
         :columns="columns"
         :headerHeight="36"
         :rowHeight="40"
-       
+
         headerClass="bg-transparent"
         :style="{
           height:props.scrollHeight-50+'px',
@@ -54,14 +54,14 @@
             <span>{{ $t('addrGroup') }}</span>
           </template>
           <template #cell-group="{ row }">
-             <el-select v-model="row.group_id" size="small" @click.stop @change="(val) => getRowGroupChange(val, row)">
-              <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
+             <el-select v-model="row.group_id" size="small" filterable popper-class="[&&]:[--el-bg-color-overlay:var(--d-222-l-FFF)] w-addrGroup" class="[&&]:[--el-text-color-regular:var(--d-222-l-333)]" @click.stop @change="(val) => getRowGroupChange(val, row)">
+              <el-option :key="0" :value="0" :label="$t('defaultGroup')" filterable/>
               <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
             </el-select>
           </template>
           <template #header-chain>
             <span>{{ $t('chain') }}</span>
-            <el-popover v-model:visible="visible" popper-style="width: 120px;min-width: 120px;" trigger="click">
+            <el-popover v-model:visible="visible" popper-style="width: 103px;min-width: 103px;" trigger="click">
               <template #reference>
                   <Icon
                     id="custom-filter"
@@ -82,7 +82,7 @@
             </el-popover>
           </template>
           <template #cell-chain="{ row }">
-            <span class="text-12px">{{ row.user_chain }}</span>
+            <span class="text-12px">{{ getChainInfo(row.user_chain).name }}</span>
           </template>
           <template #header-operate>
             <span>{{ $t('operate') }}</span>
@@ -90,7 +90,7 @@
           <template #cell-operate="{ row ,rowIndex}">
             <div class="flex justify-end items-center" @click.stop>
               <!-- <div class=" color-#666 flex-end mr-2px">
-                <Icon name="material-symbols-light:notifications-rounded" class="text-15px"/> 
+                <Icon name="material-symbols-light:notifications-rounded" class="text-15px"/>
                 <span>{{ $t('enableMonitor') }}</span>
               </div> -->
               <div
@@ -122,13 +122,13 @@
           </template> -->
       </AveTable>
     </div>
-     <addFavAddressPop ref="addFavAddressPopRef" :buttonRef="addButtonRef" @onConfirm="handleConfirmAdd"/>
+     <AddFavAddressPop v-if="addButtonRef" ref="addFavAddressPopRef" :buttonRef="addButtonRef" @onConfirm="handleConfirmAdd"/>
   </div>
-</template> 
+</template>
 
 <script setup lang="ts">
-import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,getHistoryMonitor,addAttention2,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor} from '~/api/attention'
-import { defaultPaginationParams, downColor, upColor } from '@/utils/constants'
+import { getAttentionPageList, moveFavoriteGroup2, deleteAttention ,addAttention2,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor} from '~/api/attention'
+import { defaultPaginationParams } from '@/utils/constants'
 import type {RowEventHandlerParams} from 'element-plus'
 import { throttle } from 'lodash-es'
 const { t } = useI18n()
@@ -139,16 +139,16 @@ const props=defineProps({
     default:500
   },
 })
-const { mode, isDark,token_logo_url } = storeToRefs(useGlobalStore())
+const { mode, isDark, token_logo_url } = storeToRefs(useGlobalStore())
 const chainOptions=ref([
   {label: t('allChain'),value:'AllChains',id:'allChains'},
-  {label:'Solana',value:'solana',id:'solana'},
-  {label:'Bsc',value:'bsc',id:'bsc'},
+  {label: getChainInfo('solana')?.name, value:'solana', id:'solana'},
+  {label: getChainInfo('bsc')?.name, value:'bsc', id:'bsc'},
 ])
 const visible = ref(false)
 const addButtonRef = ref()
 const addFavAddressPopRef = ref()
-const selectGroupId=ref(0)
+// const selectGroupId=ref(0)
 const monitorStore = useMonitorStore()
 const {currentAddress ,showBatchAddressDetails, updateNum1,updateNum2,updateNum3,addressGroups} = storeToRefs(useFollowStore())
 const conditions = reactive({
@@ -175,13 +175,13 @@ const conditions = reactive({
   last_trade_time: string|number
 })
 const botStore = useBotStore()
-const dataSource=ref([] as Array<any>)
+// const dataSource=ref([] as Array<any>)
 const loading=ref(false)
-const pageData = ref({
-  total: 10,
-  page: 1,
-  pageSize: 50
-})
+// const pageData = ref({
+//   total: 10,
+//   page: 1,
+//   pageSize: 50
+// })
 const paginationParams = ref({...defaultPaginationParams,pageSize: 50})
 const showFooter=ref(false)
 const footText = computed(() => {
@@ -193,15 +193,15 @@ const footText = computed(() => {
     return ''
   }
 })
-const shouldRenderChild = shallowRef(true)
+// const shouldRenderChild = shallowRef(true)
 
-const reCreateChild = () => {
-  shouldRenderChild.value = false
-  // 确保 DOM更新
-  nextTick(() => {
-    shouldRenderChild.value = true
-  })
-}
+// const reCreateChild = () => {
+//   shouldRenderChild.value = false
+//   // 确保 DOM更新
+//   nextTick(() => {
+//     shouldRenderChild.value = true
+//   })
+// }
 onMounted(() => {
   console.log('mounted walletManage',props)
    if(!botStore.evmAddress) return
@@ -234,7 +234,7 @@ function handleConfirmAdd(formData:any,resetFields?:() => void,stopLoading?:()=>
   }).catch((err) => {
     console.error(err)
   })
-} 
+}
 function filterGroup(val: number) {
   console.log('filterGroup', val)
   conditions.group=val
@@ -315,7 +315,7 @@ const getTableList = throttle(function() {
   const pageNO = paginationParams.value.pageNO
   const pageSize = paginationParams.value.pageSize
   getAttentionPageList({...conditions, pageNO, pageSize}).then((res) => {
-    const data=res?.data||[] 
+    const data=res?.data||[]
     if (Array.isArray(data) && data?.length > 0) {
       if(pageNO === 1) {
         monitorStore.monitorList1 = data.map((i:any) => {
@@ -342,7 +342,7 @@ const getTableList = throttle(function() {
       }
       paginationParams.value.finished = true
     }
-  }).finally(() => { 
+  }).finally(() => {
     setTimeout(() => {
       loading.value = false
       paginationParams.value.loaded = false

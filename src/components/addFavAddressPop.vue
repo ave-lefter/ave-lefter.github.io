@@ -4,14 +4,14 @@
       <el-form-item prop="user_chain" required label-position="top" size="large" class="mb-13px!">
         <div class="flex justify-between items-center w-100%">
           <h4 class="font-500 text-12px lh-[120%] color-[var(--d-FFF-l-000)]">{{ $t('addWallet') }}</h4>
-          <el-select v-model="form.user_chain" :placeholder="t('placeholderPrefix1') + t('chain')" value-key="value" size="small" style="--el-text-color-regular:var(--d-FFF-l-000);--el-select-input-color:var(--d-FFF-l-000)" :suffix-icon="CaretBottom" class="w-70px!" :teleported="false">
+          <el-select v-model="form.user_chain" :placeholder="t('placeholderPrefix1') + t('chain')" value-key="value" size="small" style="--el-text-color-regular:var(--d-FFF-l-000);--el-select-input-color:var(--d-FFF-l-000)" :suffix-icon="CaretBottom" class="w-70px!" :teleported="false" popper-class="w-103px">
             <template #prefix>
               <div class="h-12px inline-flex items-center">
                 <img :src="`${token_logo_url}chain/${form.user_chain?.id}.png`" class="rd-50%" width="12" lazy alt="">
               </div>
             </template>
-            <el-option v-for="item in chainOptions" :key="item.value" :label="item.label" :value="item" class="h-20px! flex! items-center! font-400! text-10px! lh-20px!">
-              <img :src="`${token_logo_url}chain/${item?.id}.png`" class="rd-50% mr-4px" width="12" lazy alt="">
+            <el-option v-for="item in chainOptions" :key="item.value" :label="item.label" :value="item" class="h-26px! flex! items-center! font-500! text-14px! lh-none!">
+              <img :src="`${token_logo_url}chain/${item?.id}.png`" class="rd-50% mr-4px" width="16" lazy alt="">
               <span>{{ item.label }}</span>
             </el-option>
           </el-select>
@@ -44,7 +44,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import {CaretBottom} from '@element-plus/icons-vue'
 // import { addFavoriteGroup2 } from '~/api/attention'
 const { t } = useI18n()
-const props=defineProps({
+const props = defineProps({
   width:{
     type:String,
     default:'248'
@@ -58,9 +58,9 @@ const props=defineProps({
         user_chain:  {label:'SOL',value:'solana',id:'solana'}
       }
     }
-  }, 
-  buttonRef:{
-    type:Object,
+  },
+  buttonRef: {
+    type: Object,
     required:true
   },
   title: {
@@ -104,14 +104,14 @@ const rules = computed<FormRules>(() => {
   return {
     user_chain: [{ validator: validateAddress2, trigger: 'change' }],
     address: [
-      { required: true, message: (lang.value == "zh-cn" || lang.value == "zh-tw") ? `${t('watchAddress')}${t('cannotBeEmpty')}` : `${t('watchAddress')} ${t('cannotBeEmpty')}`, trigger: ['blur'] },
-      { validator: validateAddress, trigger: "blur" },
+      { required: true, message: (lang.value == 'zh-cn' || lang.value == 'zh-tw') ? `${t('watchAddress')}${t('cannotBeEmpty')}` : `${t('watchAddress')} ${t('cannotBeEmpty')}`, trigger: ['blur'] },
+      { validator: validateAddress, trigger: 'blur' },
     ],
     group: [
-      { required: true, message: (lang.value == "zh-cn" || lang.value == "zh-tw") ? `${t('walletGroup')}${t('cannotBeEmpty')}` : `${t('walletGroup')} ${t('cannotBeEmpty')}`, trigger: ['blur','change'] },
+      { required: true, message: (lang.value == 'zh-cn' || lang.value == 'zh-tw') ? `${t('walletGroup')}${t('cannotBeEmpty')}` : `${t('walletGroup')} ${t('cannotBeEmpty')}`, trigger: ['blur','change'] },
     ],
     remark: [
-      { required: true, message: (lang.value == "zh-cn" || lang.value == "zh-tw") ? `${t('remark')}${t('cannotBeEmpty')}` : `${t('remark')} ${t('cannotBeEmpty')}`, trigger: 'blur' },
+      { required: true, message: (lang.value == 'zh-cn' || lang.value == 'zh-tw') ? `${t('remark')}${t('cannotBeEmpty')}` : `${t('remark')} ${t('cannotBeEmpty')}`, trigger: 'blur' },
       { pattern: /^(?!.*[!@#$%^&*(),.?":{}|<>])(.{2,50})$/, message: t('remarkError'), trigger: ['blur'] }
     ],
   }
@@ -185,7 +185,10 @@ defineExpose({
 }
 :deep() .el-select--small .el-select__wrapper{
   font-size: 10px;
-  font-weight: 400;
+  font-weight: 500;
+}
+:deep() .el-select-dropdown__list{
+  padding: 12px 0;
 }
 </style>
 

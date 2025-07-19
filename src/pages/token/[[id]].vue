@@ -24,11 +24,11 @@
             <Icon name="material-symbols:arrow-forward-ios" :class="`color-[--d-FFF-l-222] text-12px`"/>
           </div>
           <el-scrollbar :height="scrollbarHeight">
-            <div :class="orderBookVisible ? 'grid grid-cols-[1fr_292px] gap-4px' : 'grid grid-cols-1 gap-4px'">
+            <div :class="orderBookVisible ? 'grid grid-cols-[1fr_292px] gap-1px' : 'grid grid-cols-1 gap-1px'">
               <div>
                 <KLine ref="klineContainer" />
               </div>
-              <OrderBook v-model="orderBookVisible" :kline-height="klineHeight" />
+              <OrderBook v-model="orderBookVisible" :kline-height="klineHeight + 3" />
             </div>
             <BelowChartTable class="min-h-300px rounded-4px bg-[--d-000-l-F6F6F6]"/>
           </el-scrollbar>

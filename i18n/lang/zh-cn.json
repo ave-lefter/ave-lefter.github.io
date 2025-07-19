@@ -780,9 +780,9 @@
   "signal": "信号广场",
   "poolPair": "配对",
   "tokenGroup": "代币分组",
-  "customToken": "自选币种",
-  "watchAddress": "关注地址",
-  "remarkLib": "地址别名库",
+  "customToken": "自选",
+  "watchAddress": "关注",
+  "remarkLib": "备注",
   "chainWallet": "插件钱包",
   "selectNetwork": "选择网络",
   "selectWallet": "选择钱包",
@@ -852,7 +852,7 @@
   "customize": "定制",
   "mc/vol": "市值/成交额大小",
   "sell/buy": "买卖按钮",
-  "circleTokenImage": "圆行代币图像",
+  "circleTokenImage": "圆形代币图像",
   "rectTokenImage": "方行代币图像",
   "looseColumns": "分栏宽松",
   "compactColumns": "分栏紧凑",
@@ -1078,5 +1078,6 @@
   "TxnsSell": "交易数卖出",
   "platform": "平台",
   "profit4": "盈利",
-  "loss": "亏损"
+  "loss": "亏损",
+  "onlyPush": "仅看推送"
 }

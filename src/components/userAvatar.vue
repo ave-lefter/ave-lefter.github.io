@@ -1,6 +1,7 @@
 <template>
   <div class="icon-wallet-avatar-container">
     <el-image
+    :key="walletLogo"
       class="icon-wallet-avatar"
       :src="walletLogo"
       :style="avatarStyle"
@@ -12,14 +13,14 @@
     </el-image>
 
     <img
-      v-if="wallet_logo.vip_logo"
+      v-if="wallet_logo?.vip_logo"
       class="icon-vip_logo"
-      :src="wallet_logo.vip_logo"
+      :src="wallet_logo?.vip_logo"
       alt=""
       :style="(chainStyle as any)"
     >
     <img
-      v-else-if="chain && !wallet_logo.vip_logo"
+      v-else-if="chain && !wallet_logo?.vip_logo"
       class="icon-chain"
       :src="`${configStore?.token_logo_url}chain/${chain}.png`"
       alt=""
@@ -47,13 +48,12 @@ const props = defineProps<{
 }>()
 
 const {
-  wallet_logo = {logo: '', name: '', url: ''},
+  // wallet_logo = {logo: '', name: '', url: ''},
   address = '',
   chain = '',
   iconSize = '16px',
   iconChainSize = ''
 } = props
-
 const configStore = useConfigStore()
 
 const walletLogo = computed(() => {
