@@ -39,7 +39,7 @@ const quickBuyValue = useStorage('quickBuyValue', '0.01')
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="w-full bg-[--d-111-l-FFF]">
     <div class="p-12px flex justify-between">
       <div class="flex gap-8px">
         <span class="py-8px text-14px px-12px rounded-4px bg-[--d-333-l-CCC] flex items-center justify-center">

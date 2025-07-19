@@ -1,20 +1,33 @@
 :root:root.dark {
-  .el-popper[role="tooltip"]:not(.el-popover) {
+  .el-popper[role="tooltip"]:not(.el-popover,.el-select__popper) {
     --el-bg-color: #333;
     --el-text-color-primary: #f2f2f2;
+    border: none;
+  }
+
+  .signal-tags-tooltip {
+    background: #333;
+  }
+  .signal-tags-tooltip .el-popper__arrow::before {
+    background: #333;
     border: none;
   }
 }
 
 :root:root.light {
-  .el-popper[role="tooltip"]:not(.el-popover) {
-    --el-bg-color: #ccc;
+  .el-popper[role="tooltip"]:not(.el-popover,.el-select__popper) {
+     --el-bg-color: #ccc;
     // --el-bg-color-overlay: #333;
     // color: #ccc;
     --el-text-color-primary: #333;
   }
+  
 }
 
+
+.el-select__popper.el-popper{
+  border:0 none !important;
+}
 :root:root {
   --el-text-color-regular: var(--d-F5F5F5-l-333);
 }
@@ -29,7 +42,7 @@
     --el-table-tr-bg-color: var(--d-111-l-FFF);
     thead{
       .el-table__cell{
-        height: 42px;
+        height: 32px;
         padding: 0;
         font-weight: 400;
       }
@@ -131,7 +144,7 @@
 }
 
 .el-select--small .el-select__wrapper.el-select__wrapper {
-  padding: 4px;
+  padding: 3px 4px;
 }
 
 .el-input.el-input {
@@ -139,8 +152,11 @@
 }
 
 .el-select__wrapper {
-  --el-fill-color-blank: var(--d-333-l-F2F2F2);
+  --el-fill-color-blank: var(--d-333-l-EEE);
 }
+.el-select-dropdown__wrap{
+  --el-fill-color-light: var(--d-333-l-F5F7FA);
+  }
 
 .el-pagination{
   &.el-pagination{
@@ -151,21 +167,13 @@
     --el-pagination-button-color:var(--d-666-l-999);
   }
 }
-.el-slider{
-  &.el-slider{
-    --el-slider-button-size:14px;
-    --el-slider-main-bg-color:var(--d-FFF-l-333);
+
+.el-select__popper{
+  --el-bg-color-overlay: var(--d-222-l-FFF);
+  .el-input{
+    --el-input-bg-color:var(--d-333-l-F2F2F2);
   }
-  .el-slider__marks-text{
-    font-size: 12px;
+  .el-select-dropdown__item.is-selected{
+    font-weight: normal;
   }
 }
-
-// --el-slider-runway-bg-color: var(--el-border-color-light);
-//     --el-slider-stop-bg-color: var(--el-color-white);
-//     --el-slider-disabled-color: var(--el-text-color-placeholder);
-//     --el-slider-border-radius: 3px;
-//     --el-slider-height: 6px;
-//     --el-slider-button-size: 20px;
-//     --el-slider-button-wrapper-size: 36px;
-//     --el-slider-button-wrapper-offset: -15px;

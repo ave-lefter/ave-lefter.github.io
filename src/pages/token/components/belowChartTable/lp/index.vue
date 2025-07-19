@@ -1,7 +1,7 @@
 <template>
   <div class="w-lp">
     <div  class="w-[100%]">
-      <div v-show="dataList.length > 0||loading" class="flex gap-10px items-center ml-12px">
+      <div class="flex gap-10px items-center ml-12px">
         <div class="font-400 text-12px lh-16px color-[--d-999-l-666]">{{ $t('liquidity') }}</div>
         <el-radio-group v-model="activeTime" class="m-radio-group" size="small" :fill="isDark?'#333':'#666'" :text-color="isDark?'#F5F5F5':'#FFF'" @change="init1">
           <el-radio-button label="7D" :value="7" />
@@ -30,7 +30,7 @@
               <div v-if="col.prop == 'mark'" class="flex-start gap-2px hover:color-[--d-FFF-l-000] cursor-pointer" @click.stop="tableRowClick(row)">
                 <Icon v-if="formatLock(row)" color="#B3920E" name="material-symbols:lock" />
                 <Icon v-if="row.is_contract == 1" name="iconamoon:file-document-thin"  />
-                <pro-tab v-if="Number(row?.analysis_show_creator) === 1">{{ $t('contractCreator') }}</pro-tab>
+                <pro-tag v-if="Number(row?.analysis_show_creator) === 1">{{ $t('contractCreator') }}</pro-tag>
                 <div v-tooltip="row?.mark||row?.address" class="max-w-140px whitespace-nowrap overflow-hidden text-ellipsis">{{ col.customFormatter ? col.customFormatter(row) : row[col.prop] }}</div>
               </div>
               <div v-else-if="col.prop == 'addAmt'" class="flex flex-col">

@@ -1,34 +1,53 @@
 <template>
-  <div class="w-address mt-12px flex-1">
-    <div v-if="currentAddress" class="m-header flex-between px-12px items-start">
-      <pro-groups v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup"/>
-      <ul class="w-operate">
-        <li>
-           <el-checkbox v-model="conditions.isMonitor" :label="t('monitorList')" size="small" style="font-size: 12px;color:var(--d-666-l-333);z-index: 0" />
-        </li>
-        <li class="btn">
-          <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>
-        </li>
-        <li>
-          <el-radio-group v-model="conditions.activeTab" class="m-radio-group" size="small" :fill="isDark?'#333':'#666'" :text-color="isDark?'#F5F5F5':'#FFF'" @change="()=>{}">
-            <el-radio-button label="7D" :value="'7d'" />
-            <el-radio-button label="1M" :value="'30d'" />
-          </el-radio-group>
-        </li>
-      </ul>
+  <div class="w-address flex-1 w-100% h-[calc(100%-76px)] flex flex-col" :class="{ 'mt-12px': currentAddress }">
+    <ul v-if="currentAddress" class="w-operate">
+      <li v-if="evmAddress" class="flex items-center gap-2px">
+          <el-checkbox v-model="isMonitor" :label="t('onlyPush')"  style="color:var(--d-999-l-666);z-index: 0;--el-checkbox-font-weight:400" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! [&&]:[--el-checkbox-input-border:1px_solid_var(--d-666-l-999)]" size="large"/>
+          <span class="text-[var(--d-999-l-666)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/50` }}</span>
+      </li>
+      <li class="btn">
+        <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>
+      </li>
+      <li>
+        <el-radio-group v-model="conditions.time_interval" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#111':'#fff'" :text-color="isDark?'#F5F5F5':'#333'" @change="()=>{}">
+          <el-radio-button label="7D" :value="'7d'" />
+          <el-radio-button label="30D" :value="'30d'" />
+        </el-radio-group>
+      </li>
+    </ul>
+    <div v-if="currentAddress" class="m-header flex-between px-16px items-start">
+      <pro-groups v-if="!isMonitor" v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
+      <!-- <div v-else/> -->
     </div>
-    <div claas="m-table">
-      <el-table class='mt-12px' v-loading="loading" :data="dataSource" fixed  @sort-change="handleSortChange"
-      @row-click="tableRowClick">
+    <div class="m-table w-100% mt-12px flex-1 overflow-hidden">
+      <el-table
+      ref="tableRef" v-loading="loading" class='' :data="filterDataSource" table-layout="fixed" row-class-name="group" height="calc(100% - 72px)"
+      :default-sort="defaultSort" @sort-change="handleSortChange" @row-click="tableRowClick">
         <template #empty>
-          <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
+          <div v-if="!loading && followStore.currentAddress" class="flex flex-col items-center justify-center py-30px">
             <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
             <img v-if="mode === 'dark'" src="@/assets/images/empty-black.svg">
             <span>{{ t('emptyNoData') }}</span>
           </div>
+          <AveEmpty
+            v-else-if="!followStore.currentAddress"
+            :style="{height:`100%`}"
+            class="overflow-hidden"
+          >
+            <span class="text-12px mt-10px">{{ $t('noWalletTip') }}</span>
+            <el-button
+              class="mt-10px"
+              type="primary"
+              @click="botStore.$patch({
+              connectVisible: true
+            })"
+            >
+              {{ $t('connectWallet') }}
+            </el-button>
+          </AveEmpty>
           <span v-else />
         </template>
-        <el-table-column :label="$t('wallet2')" width="200" fixed="left">
+        <el-table-column :label="$t('wallet2')" width="215" fixed="left">
           <template #header>
             <span class="text-10px" style="opacity: 0">0</span>
             <span>{{ $t('wallet2') }}</span>
@@ -39,23 +58,23 @@
                    :style="{
                   color: conditions.keyword ? 'var(--d-F5F5F5-l-333)' : 'var(--custom-font-8-color)'
                 }"
-                class="text-10px cursor-pointer ml-2px"
+                class="text-10px cursor-pointer ml-4px mt--2px"
                 @click.stop.prevent="handleFilterQuery()"
               />
             <el-popover
               v-else
+              v-model:visible="visible"
               placement="bottom-start"
               popper-class="chains-table-filter"
               title=""
               :width="320"
               trigger="click"
-              v-model:visible="visible"
             >
               <template #reference>
                  <Icon
                   id="custom-filter"
                   name="custom:filter"
-                  class="text-10px cursor-pointer ml-2px"
+                  class="text-10px cursor-pointer ml-4px mt--2px"
                   @click.stop.prevent="handleFilterQuery()"
                 />
               </template>
@@ -65,17 +84,17 @@
                   <div class="flex mt-10px">
                     <el-input
                       v-model.trim="searchKeyword"
+                      size="large"
                       :placeholder="$t('attentionSearch')"
                       clearable
                       @clear="handleFilterQuery()"
-                    ></el-input>
+                    />
                   </div>
                   <div class="mt-20px flex">
                     <el-button
-                      class="flex-1"
-                      size="default"
-                      :color="mode !== 'dark' ? '#222222' : '#f5f5f5'"
-                      style="height: 30px; min-width: 70px; --el-button-font-weight: 400"
+                      class="flex-1 [&&]:[--el-color-black:#333] bg-[var(--d-333-l-F2F2F2)]"
+                      :color="isDark?'#333':'#F2F2F2'"
+                      style="height: 32px; min-width: 70px; --el-button-font-weight: 400"
                       @click.stop="searchKeyword='';visible=false"
                     >
                       {{ $t('cancel') }}
@@ -83,8 +102,9 @@
                     <el-button
                       class="flex-1"
                       size="default"
+                      type="primary"
                       color="#3F80F7"
-                      style="height: 30px; min-width: 70px; --el-button-font-weight: 400"
+                      style="height: 32px; min-width: 70px; --el-button-font-weight: 400"
                       @click.stop="handleFilterQuery(searchKeyword)"
                     >
                       {{ $t('confirm') }}
@@ -99,32 +119,35 @@
               class="token-info table-item_d"
               style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
             >
-              <span class="text-10px" v-if="$index < 9" style="opacity: 0">0</span>
-              <span class="text-10px mr-5px" style="color: #696e7c">
+              <span v-if="$index < 9" class="text-10px" style="opacity: 0">0</span>
+              <span class="text-10px mr-5px font-400 text-[--d-666-l-999]">
                 #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
               </span>
               <!-- <a href class="mr-5px a-gray fav_address" v-if="row.is_wallet_address_fav == 1" @click.stop.prevent="handleDeleteAttention(row)">
                     <i class="attention iconfont icon-fav1 active font-12"></i> -->
               <Icon
+                 v-if="!isMonitor"
                 name="custom:attention"
                 :class="`cursor-pointer mr-8px ${row.is_wallet_address_fav == 1
                       ?'color-#f45469'
-                      :'color-[&#45;&#45;d-666-l-696E7C]'} text-12px hover:color-#f45469`"
+                      :'color-[--d-666-l-696E7C]'} text-12px hover:color-#f45469`"
                 @click.self.stop="handleDeleteAttention(row)"
               />
-              <UserAvatar class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px"></UserAvatar>
-              <div>
-                <UserRemark :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 95px" iconEditColor="#999" iconEditSize="10px" showAddressTitle @updateRemark="({remark}) => row.remark = remark" :formatAddress="
-                  (address) =>
-                    address?.slice(0, 4) + '...' + address?.slice(-4)
-              "> </UserRemark>
+               <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mr-8px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
+              <div class="flex flex-col justify-between h-32px">
+                <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 80px" :iconEditColor="isDark?'#666':'#999'"  iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)"/>
                 <div class="font_10 color-icon flex-start mt_4" style="line-height: 1">
-                  <i class="iconfont icon-copy text-12px fav-icon-color" @click.stop v-copy="row.user_address"></i>
-                  <div class="media-list flex-start" v-if="row?.extra?.length > 0">
+                  <Icon
+                    v-copy="row.user_address"
+                    name="bxs:copy"
+                    class="text-10px cursor-pointer color-[--d-666-l-999]"
+                    @click.stop.prevent
+                  />
+                  <div v-if="row?.extra?.length > 0" class="media-list flex-start">
                     <template v-for="(item, index) in row?.extra" :key="index">
                       <div
-                        class="ml-5"
                         v-if="item?.tip"
+                        class="ml-5"
                         @mouseover.stop="
                           e => {
                             buttonTagRef = e.currentTarget
@@ -141,16 +164,16 @@
                             :src="require(`@/assets/images/${item.img}.png`)"
                             :alt="item.img"
                             width="10"
-                          />
+                          >
                         </span>
                       </div>
                     </template>
                   </div>
                   <template v-if="row?.signal_arr?.length > 0">
                     <div
-                      class="flex"
                       v-for="(i, index) in row.signal_arr"
                       :key="index"
+                      class="flex"
                       @mouseover.stop="
                         e => {
                           buttonTagRef = e.currentTarget
@@ -162,10 +185,10 @@
                     >
                       <el-image class="token-icon-signal-tag" :src="formatIconTag(i.tag)" lazy>
                         <template #error>
-                          <img class="token-icon-signal-tag" src="/icon-default.png" />
+                          <img class="token-icon-signal-tag" src="/icon-default.png" >
                         </template>
                         <template #placeholder>
-                          <img class="token-icon-signal-tag" src="/icon-default.png" />
+                          <img class="token-icon-signal-tag" src="/icon-default.png" >
                         </template>
                       </el-image>
                       <span
@@ -229,7 +252,7 @@
         <!-- 30dPnL -->
       <el-table-column
         align="right"
-        :label="conditions.activeTab === '7d' ? $t('7dPnL') : $t('30dPnL')"
+        :label="conditions.time_interval === '7d' ? $t('7dPnL') : $t('30dPnL')"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         prop="total_profit"
@@ -241,13 +264,13 @@
               {{row?.total_profit && row?.total_profit < 0 ? '-':''}}${{formatNumber2(Math.abs(row?.total_profit) || 0, 0)}}
             </div>
             <div class="text-12px">
-              <span :class="`color-${upColor[0]}`" v-if="row?.total_profit_ratio > 0">
+              <span v-if="row?.total_profit_ratio > 0" :class="`color-${upColor[0]}`">
                 {{ formatNumber2(row?.total_profit_ratio * 100 || 0,2) }}%
               </span>
-              <span :class="`color-${downColor[0]}`" v-else-if="row?.total_profit_ratio < 0">
+              <span v-else-if="row?.total_profit_ratio < 0" :class="`color-${downColor[0]}`">
                 {{ formatNumber2(row?.total_profit_ratio * 100 || 0,2) }}%
               </span>
-              <span class="color-text-zero" v-else>0</span>
+              <span v-else class="color-text-zero">0</span>
             </div>
           </div>
         </template>
@@ -256,7 +279,7 @@
       <!-- 30dWinRate -->
       <el-table-column
         align="right"
-        :label="conditions.activeTab === '7d' ? $t('7dWinRate') : $t('30dWinRate')"
+        :label="conditions.time_interval === '7d' ? $t('7dWinRate') : $t('30dWinRate')"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         prop="total_win_ratio"
@@ -264,13 +287,13 @@
       >
         <template #default="{ row }">
           <div :class="!row?.total_win_ratio ? 'color-text-zero' : ''">
-            <span :class="`color-${upColor[0]}`" v-if="row?.total_win_ratio > 0">
+            <span v-if="row?.total_win_ratio > 0" :class="`color-${upColor[0]}`">
               {{ formatNumber2(row?.total_win_ratio || 0, 2) }}%
             </span>
-            <span :class="`color-${downColor[0]}`" v-else-if="row?.total_win_ratio < 0">
+            <span v-else-if="row?.total_win_ratio < 0" :class="`color-${downColor[0]}`">
               {{ formatNumber2(row?.total_win_ratio || 0, 2) }}%
             </span>
-            <span class="color-text-zero" v-else>0</span>
+            <span v-else class="color-text-zero">0</span>
           </div>
         </template>
       </el-table-column>
@@ -278,7 +301,7 @@
       <!-- 30dVolume -->
       <el-table-column
         align="right"
-        :label="conditions.activeTab === '7d' ? $t('7dVolume') : $t('30dVolume')"
+        :label="conditions.time_interval === '7d' ? $t('7dVolume') : $t('30dVolume')"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         prop="tx_volume"
@@ -307,7 +330,7 @@
       <!-- 30dTrades -->
       <el-table-column
         align="right"
-        :label="conditions.activeTab === '7d' ? $t('7dTrades') : $t('30dTrades')"
+        :label="conditions.time_interval === '7d' ? $t('7dTrades') : $t('30dTrades')"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         prop="tx_count"
@@ -333,111 +356,109 @@
           </div>
         </template>
       </el-table-column>
-
-      <el-table-column align="right" width="120"  sortable="custom"
-        :sort-orders="['descending', 'ascending', null]" prop="last_tx_time">
+<!-- last_tx_time -->
+      <el-table-column
+        align="right" width="130">
         <template #header>
-          <span>{{ $t('lastTxsTime1') }}</span>
-          <el-popover
-            placement="bottom"
-            popper-class="chains-table-filter"
-            title=""
-            :width="300"
-            trigger="click"
-            v-model:visible="visible2"
-          >
-            <template #reference>
-              <Icon name="custom:filter" class="text-10px ml-2px"  :style="{
-                  color: (conditions?.last_trade_time || conditions.sort === 'last_tx_time') ? 'var(--d-F5F5F5-l-333)' : ''
-              }" @click.stop.prevent/>
-            </template>
-            <template #default>
-              <div class="filter-box" :class="mode">
-                <div class="text-12px font-500 text-[--d-FFF-l-333]">{{ $t('lastTxsTime1') }}</div>
-               <ul class="flex flex-col font-500 text-14px text-#666666">
-                  <li v-for="(item, index) in openTimeList"  class="flex-between py-11.5px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-pointer" :key="index"  @click.stop.prevent="
-                        filterForm.last_trade_time = item.value"
-                   >
-                    <span :class="[filterForm.last_trade_time == item.value?'text-[--d-F5F5F5-l-333]':'']">{{ item.text }}</span>
-                    <div class="flex-1"/>
-                    <Icon v-if="filterForm.last_trade_time == item.value" name="material-symbols:check" class="text-12px"/>
-                  </li>
-                </ul>
-                <div class="mt-11px flex-between">
-                  <div
-                    class="flex items-center clickable"
-                    style="cursor: pointer"
-                    @click="handleSort(filterForm)"
-                  >
-                    <span class="filter-title">{{ $t('sort') }}</span>
-                    <div class="sort-container">
-                      <i :class="['sort-caret ascending',filterForm.sort_dir === 'asc' ? 'active' : '']"
-                        @click.stop="handleSort(filterForm, 'asc')" />
-                      <i :class="['sort-caret descending',filterForm.sort_dir === 'desc' ? 'active' : '']"
-                        @click.stop="handleSort(filterForm, 'desc')" />
-                      <!-- <i name="material-symbols:arrow-drop-down"  :class="filterForm.sort_dir === 'desc' ? 'active' : ''"
-                        @click.stop="handleSort(filterForm, 'desc')"/> -->
-                      <!-- <svg
-                        class="icon-svg"
-                        aria-hidden="true"
-                        :class="filterForm.sort_dir === 'asc' ? 'active' : ''"
-                        @click.stop="handleSort(filterForm, 'asc')"
-                      >
-                        <use xlink:href="#icon-sort-up"></use>
-                      </svg>
-                      <svg
-                        class="icon-svg"
-                        aria-hidden="true"
-                        :class="filterForm.sort_dir === 'desc' ? 'active' : ''"
-                        @click.stop="handleSort(filterForm, 'desc')"
-                      >
-                        <use xlink:href="#icon-sort-down"></use>
-                      </svg> -->
-                    </div>
-                  </div>
-                  <el-button
-                    size="default"
-                    style="
-                      height: 30px;
-                      min-width: 70px;
-                      --el-button-font-weight: 400;
-                      margin-left: auto;
-                    "
-                    :color="mode !== 'dark' ? '#f2f2f2' : '#333333'"
-                    @click.stop="attentionHandleReset(filterForm)"
-                  >
-                    {{ $t('reset') }}
-                  </el-button>
-                  <el-button
-                    size="default"
-                    :color="mode !== 'dark' ? '#222222' : '#f5f5f5'"
-                    style="height: 30px; min-width: 70px; --el-button-font-weight: 400"
-                    @click.stop="handleFilterConfirm(filterForm)"
-                  >
-                    {{ $t('confirm') }}
-                  </el-button>
-                </div>
+          <div class="flex items-center flex-end">
+            <div
+              class="flex flex-end cursor-pointer"
+              style="cursor: pointer"
+              @click="handleSort(conditions,'','last_tx_time')"
+            >
+              <span class="filter-title">{{ $t('lastTxsTime1') }}</span>
+              <div class="sort-container">
+                <i
+                  :class="['sort-caret ascending',(conditions.sort_dir === 'asc'&&conditions.sort==='last_tx_time') ? 'active' : '']"
+                  @click.stop="handleSort(conditions,'asc','last_tx_time')" />
+                <i
+                  :class="['sort-caret descending',(conditions.sort_dir === 'desc'&&conditions.sort==='last_tx_time') ? 'active' : '']"
+                  @click.stop="handleSort(conditions,'desc','last_tx_time')" />
               </div>
-            </template>
-          </el-popover>
+            </div>
+            <el-popover
+              v-model:visible="visible2"
+              placement="bottom"
+              popper-class="chains-table-filter"
+              title=""
+              :width="220"
+              trigger="click"
+              >
+              <template #reference>
+                <Icon
+                    name="custom:filter" class="text-10px inline-block mt--2px"  :style="{
+                    color: (conditions?.last_trade_time) ? 'var(--d-F5F5F5-l-333)' : ''
+                }" @click.stop.prevent/>
+              </template>
+              <template #default>
+                <div class="filter-box" :class="mode">
+                  <div class="text-12px font-500 text-[--d-999-l-666] mb-8px">{{ $t('lastTxsTime1') }}</div>
+                  <ul class="flex flex-col font-500 text-12px text-var(--d-E9E9E9-l-333) gap-8px">
+                    <li
+                      v-for="(item, index) in openTimeList"  :key="index" class="flex-center hover:border-[--d-F5F5F5-l-333] cursor-pointer border-[var(--d-333-l-F2F2F2)] border-solid border h-32px border-rd-4px" :class="[filterForm.last_trade_time == item.value?'bg-[--d-333-l-F2F2F2] ':'']" @click.stop.prevent="filterForm.last_trade_time = item.value"
+                    >
+                      <span>{{ item.text }}</span>
+                      <!-- <div class="flex-1"/> -->
+                      <!-- <Icon v-if="filterForm.last_trade_time == item.value" name="material-symbols:check" class="text-12px"/> -->
+                    </li>
+                  </ul>
+                  <div class="mt-11px flex-between gap-4px">
+                    <!-- <div
+                      class="flex items-center clickable"
+                      style="cursor: pointer"
+                      @click="handleSort(filterForm)"
+                    >
+                      <span class="filter-title">{{ $t('sort') }}</span>
+                      <div class="sort-container">
+                        <i
+                          :class="['sort-caret ascending',filterForm.sort_dir === 'asc' ? 'active' : '']"
+                          @click.stop="handleSort(filterForm, 'asc')" />
+                        <i
+                          :class="['sort-caret descending',filterForm.sort_dir === 'desc' ? 'active' : '']"
+                          @click.stop="handleSort(filterForm, 'desc')" />
+                      </div>
+                    </div> -->
+                    <el-button
+                      style="
+                        height: 30px;
+                        --el-button-font-weight: 400;
+                        flex:1;
+                        color: #999;
+                      "
+                      :color="mode !== 'dark' ? '#f2f2f2' : '#333333'"
+                      @click.stop="attentionHandleReset(filterForm)"
+                    >
+                      {{ $t('reset') }}
+                    </el-button>
+                    <el-button
+                      type="primary"
+                      style="height: 30px; --el-button-font-weight: 400; flex:1;"
+                      @click.stop="handleFilterConfirm(filterForm)"
+                    >
+                      {{ $t('confirm') }}
+                    </el-button>
+                  </div>
+                </div>
+              </template>
+            </el-popover>
+          </div>
         </template>
-        <template #default="{ row }">
+        <template #default="{ row,$index}">
           <div
             :style="{
               color:
-                formatTimeFromNow(row?.last_tx_time, true) <= 600
+                Number(formatTimeFromNow(row?.last_tx_time, true)) <= 600
                   ? '#FFA622'
                   : 'var(--custom-text-2-color)'
             }"
           >
-             <span v-if="!row?.last_tx_time">-</span>
+             <span v-if="!row?.last_tx_time" class="color-text-zero">-</span>
             <TimerCount
                v-else-if="
-                formatTimeFromNow(row?.last_tx_time, true) < 60
+                Number(formatTimeFromNow(row?.last_tx_time, true)) < 60
               "
-              :timestamp="(60 - formatTimeFromNow(row?.last_tx_time, true)) * 1000"
-              style="--van-count-down-text-color: currentColor"
-              :key="`${row.last_tx_time}${$Index}`"
+              :key="`${row.last_tx_time}${$index}`"
+              :timestamp="row.last_tx_time"
               :end-time="60"
             >
               <template #default="{ seconds }">
@@ -457,129 +478,240 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="t('addrGroup')" align="right" width="120">
+      <!-- addrGroup -->
+      <el-table-column v-if="!isMonitor" :label="t('addrGroup')" align="right" width="160px">
         <template #default="{ row }">
-          <el-select v-model="row.group_id" @click.stop @change="(val) => getRowGroupChange(val, row)">
+          <el-select v-model="row.group_id" class="[&&]:[--el-text-color-regular:var(--d-222-l-333)] [&&]:[--el-select-width:100px]" popper-class="w-193px [&&]:[--el-bg-color-overlay:var(--d-222-l-FFF)] w-addrGroup" filterable @click.stop @change="(val) => getRowGroupChange(val, row)">
             <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
             <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
           </el-select>
         </template>
       </el-table-column>
-       <el-table-column :label="t('push')" align="right" width="120">
-        <template #default="{ row }">
-          <div @click.stop>
-            <!-- <div>
-              <Icon name="material-symbols-light:notifications-rounded"/> 
-              <span>{{ $t('pauseMonitor') }}{{ $t('enableMonitor') }}</span>
-            </div> -->
-            <a class="decoration-none flex-end gap-4px" style="text-decoration: none;" :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`"  target="_blank">
-                <Icon name="mingcute:wallet-fill" class="text-12px"/> 
-                <span>{{ $t('copyTrade') }}</span>
+       <el-table-column :label="t('push')" align="right" :width="!isMonitor ? 150 : 180" fixed="right">
+        <template #default="{ row ,$index}">
+          <div class="flex flex-row-reverse  items-center" @click.stop>
+            <a
+              class="flex items-center color-[var(--d-F5F5F5-l-333)]"
+              :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`" target="_blank">
+              <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
+              {{ t('copyTrade') }}
             </a>
+            <!-- 监控 -->
+             <div v-if="isMonitor" class="color-[var(--d-F5F5F5-l-333)] mr-12px cursor-pointer flex-start" @click.stop.prevent="handleDeleteMonitor(row)">
+               <Icon  name="bx:bxs-trash-alt" class="text-13px mr-5px mb-1px"/>
+               {{ t('delete') }}
+             </div>
+            <div
+              v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
+              class="flex items-center mr-12px cursor-pointer color-[var(--d-999-l-666)] group-hover:color-[var(--d-F5F5F5-l-333)]" @click="handleMonitor(row,$index)">
+              <Icon v-if="!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 )" name="custom:monitor2-icon" class="text-12px mr-5px" :class="[(!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))&&'color-[var(--d-F5F5F5-l-333)]']"/>
+              <Icon v-else name="custom:monitor-icon" class="text-15px mr-2px mb-1px"/>
+              <span
+                class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
+                {{ (!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))? t('pause') : t('enable') }}
+              </span>
+            </div>
+            <div class="flex items-center mr-12px color-[var(--d-666-l-CCC)] cursor-not-allowed" v-else>
+              <Icon name="custom:monitor-icon" class="text-15px mr-2px mb-1px" />
+            </div>
           </div>
         </template>
       </el-table-column>
       </el-table>
-      <el-pagination class="mt-20px" v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize"
-      layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" />
+      <el-pagination
+        v-if="(pageData.total > 50) && shouldRenderChild && currentAddress"
+        v-model:current-page="pageData.page" v-model:page-size="pageData.pageSize" class="h-72px flex justify-end items-center"
+        layout="prev, pager, next, ->" :total="pageData.total" :page-sizes="[10, 20, 30, 40, 50, 60]" @change="getTableList"/>
     </div>
+     <el-tooltip
+      ref="tooltipRef1"
+      :visible="toolTipTagVisible"
+      :content="toolTipTagContent"
+      placement="top"
+      :popper-class="mode"
+      effect="customized"
+      :virtual-ref="buttonTagRef || undefined"
+      virtual-triggering
+    />
   </div>
-
 </template>
 
 <script setup lang="ts">
-// import Monitor from '@/components/monitor/index.vue'
 import ProGroups from '../components/proGroups.vue'
 import BigNumber from 'bignumber.js'
-import { defaultPaginationParams, downColor, upColor } from '@/utils/constants'
+import { downColor, upColor } from '@/utils/constants'
 import {
-  getSymbolDefaultIcon,
-  getChainDefaultIcon,
-  formatExplorerUrl,
-  formatDate,
-  formatIconSwap,
-  isJSON,
-  formatIconTag,
-  getAddressAndChainFromId,
-  getTagTooltip,
+  formatIconTag, getTagTooltip
 } from '@/utils/index'
-import { throttle, update } from 'lodash-es'
-import { getFavoriteList2, getAttentionPageList, getUserFavoriteGroups2, changeFavoriteGroupName2 ,addFavoriteGroup2,removeFavoriteGroup2 ,moveFavoriteGroup2,deleteAttention} from '~/api/attention'
-import { watchOnce } from '@vueuse/core'
-const { mode, lang, isDark } = storeToRefs(useGlobalStore())
+import { throttle } from 'lodash-es'
+import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor,deleteMonitor} from '~/api/attention'
+import type { TableInstance } from 'element-plus'
+
+const { mode, isDark } = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
-const { currentAddress} = storeToRefs(useFollowStore())
 const $router = useRouter()
 const { t } = useI18n()
-const { addressGroups } = storeToRefs(useFollowStore())
+const botStore = useBotStore()
+const {evmAddress} = storeToRefs(useBotStore())
+const { addressGroups ,currentAddress,updateNum1,updateNum2,updateNum3,addressConditions,addressConditions2} = storeToRefs(useFollowStore())
 // const addressGroups = ref([{ "group_id": 3763, "name": "base", "show_index": -1 }, { "group_id": 37632, "name": "base1", "show_index": 0 }, { "group_id": 37631, "name": "base2", "show_index": 1 }])
-const visible = ref(false)  
-const visible2 = ref(false)  
+const visible = ref(false)
+const visible2 = ref(false)
 const searchKeyword= ref('')
-const buttonTagRef = ref(null)
+const buttonTagRef = ref<HTMLElement | undefined>(undefined)
 const toolTipTagVisible = ref(false)
 const toolTipTagContent = ref('')
-
-const conditions = reactive({
-  group: 0,
-  activeTab: '7d',
-  isMonitor: false,
-  user_chain: 'AllChains',
-  sort: '',
-  sort_dir: '',
-  keyword: '',
-  last_tx_time_max: '',
-  last_tx_time_min: '',
-  last_trade_time: ''
+const addButtonRef = ref()
+const tableRef = ref<TableInstance | null>(null)
+const isMonitor=ref(false)
+const conditions=computed(() => {
+  return isMonitor.value?addressConditions2.value:addressConditions.value
 })
-const pageData = ref({
+
+const defaultSort=computed(() => {
+  return { prop: conditions.value?.sort||'', order: conditions.value?.sort_dir==='desc'?'descending':'ascending' }
+}) as Ref<{ prop: string, order: 'descending' | 'ascending' }>
+
+const shouldRenderChild = shallowRef(true)
+
+const reCreateChild = () => {
+  shouldRenderChild.value = false
+  // 确保 DOM更新
+  nextTick(() => {
+    shouldRenderChild.value = true
+  })
+}
+const monitorNum=ref(0)
+
+const pageData1 = ref({
   total: 10,
   page: 1,
-  pageSize: 10
+  pageSize: 50
 })
+const pageData2 = ref({
+  total: 10,
+  page: 1,
+  pageSize: 50
+})
+
+const pageData=computed(() => {
+  return isMonitor.value?pageData2.value:pageData1.value
+})
+
 const openTimeList =computed(() => [
   { text:  t('all'), value: '' },
   { text: '≤10min', value: String(10 * 60) },
   { text: '≤30min', value: String(30 * 60) },
   { text: '≤1H', value: String(60 * 60) },
-  { text: '≤6H', value: String(60 * 6 * 60) },
+  // { text: '≤6H', value: String(60 * 6 * 60) },
   { text: '≤12H', value: String(60 * 12 * 60) },
   { text: '≤24H', value: String(60 * 24 * 60) },
   { text: '≤7D', value: String(60 * 24 * 7 * 60) },
-  { text: '≤14D', value: String(60 * 24 * 14 * 60) },
+  // { text: '≤14D', value: String(60 * 24 * 14 * 60) },
   { text: '≤30D', value: String(60 * 24 * 30 * 60) }
 ])
-const filterForm = ref({
-  visible: false,
-  type: 'last_trade_time',
-  last_trade_time: conditions?.last_trade_time || '',
-  sort_dir: conditions?.sort === 'last_trade_time' ? conditions?.sort_dir || null : null
-})
-const loading = ref(false)
-const dataSource = ref([])
-onMounted(async () => {
-  init()
-})
-function init() {
-  getUserFavoriteGroups()
-  getTableList()
+type FilterFormType = {
+  type: string
+  last_trade_time: string
+  sort_dir: string|null
 }
-watch(() => currentAddress.value, (val) => {
-  if(!val) return
-  getTableList()
+
+const filterForm = ref({
+  type: 'last_trade_time',
+  last_trade_time: conditions.value?.last_trade_time || '',
+  sort_dir: conditions.value?.sort === 'last_trade_time' ? conditions?.value?.sort_dir || null : null
+} as FilterFormType)
+const loading = ref(false)
+const dataSource = ref([] as Array<any>)
+const dataSource2 = ref([] as Array<any>)
+
+
+const filterDataSource=computed(() => {
+  return isMonitor.value?dataSource2.value:dataSource.value
 })
 
-watch([() => conditions, () => pageData.value.page], (val) => {
-   getTableList()
-},{deep: true})
-async function getUserFavoriteGroups() {
-  // let data=[]
-  // try {
-  //  const res =await getUserFavoriteGroups2()
-  // }catch (e) {
-  //   console.log('=>(favoriteTable.vue:19) e', e)
-  // }
+onMounted(async () => {
+  init()
+  getMonitorNum()
+})
+
+function init() {
+  pageData.value.total = 10
+  pageData.value.page = 1
+  pageData.value.pageSize = 50
+  getTableList()
 }
+
+watch(() => currentAddress.value, (val) => {
+  if(!val) {
+    dataSource.value=[]
+    dataSource2.value=[]
+  }else{
+    init()
+  }
+})
+watch([() => conditions.value, ()=>updateNum2.value+updateNum3.value,()=>isMonitor.value], (value, oldValue) => {
+  init()
+  if(value[2]!==oldValue[2]){
+    nextTick(()=>{
+      tableRef.value?.clearSort()
+      tableRef.value?.sort(defaultSort.value?.prop, defaultSort.value?.order)
+    })
+  }
+},{deep: true})
+
+function handleDeleteMonitor(row:any){
+  deleteMonitor({
+    uid: row.id,
+    address: row.user_address
+  }).then(() => {
+    ElMessage.success(t('success'))
+    updateNum1.value++
+    init()
+    getMonitorNum()
+  })
+}
+
+
+const handleMonitor = throttle((row:any,index:number=0) => {
+  console.log('handleMonitor', row, index)
+  if (!evmAddress.value) return ElMessage.warning(t('noBotWalletTip'))
+  if(isMonitor.value||(!isMonitor.value&&(row.is_monitored === 1))) {
+    const {id,user_address} = row
+    // 取消监控
+    const req=row.is_pause === 1?favUsersResumeMonitor:favUsersPauseMonitor
+    req({
+      uid: id,
+      address:user_address
+    }).then(() => {
+      if(isMonitor.value){
+        dataSource2.value[index].is_pause = row.is_pause===0?1:0
+      }else{
+        dataSource.value[index].is_monitored = row.is_monitored===0?1:0
+      }
+      // dataSource.value[index].is_pause = row.is_pause===0?1:0
+      getTableList()
+      updateNum1.value++
+      ElMessage.success(t('success'))
+    }).catch((e) => { ElMessage.error(String(e)) })
+    return
+  }else{
+    const {user_address,user_chain} = row
+    addAddressMonitor({
+      address: user_address,
+      chain: user_chain,
+      user_address: evmAddress.value,
+    }).then(() => {
+      dataSource.value[index].is_monitored = row.is_monitored===0?1:0
+      getTableList()
+      ElMessage.success(t('success'))
+      updateNum1.value++
+    }).catch((e) => {
+        ElMessage.error(String(e))
+    })
+  }
+},1000)
+
 function handleConfirmEdit(currentEditGroup: number, remark:string) {
   changeFavoriteGroupName2(remark, currentEditGroup).then(() => {
     ElMessage.success(t('success'))
@@ -589,7 +721,23 @@ function handleConfirmEdit(currentEditGroup: number, remark:string) {
   })
 }
 function handleAddGroup(name:string) {
-   addFavoriteGroup2(name).then(() => {
+   if(followStore.addressGroups.map(i=>i.name).includes(name)){
+    ElMessage.error(t('groupExistT'))
+  }else{
+    addFavoriteGroup2(name).then(() => {
+     ElMessage.success(t('success'))
+     followStore.getUserFavoriteGroups2()
+   }).catch((e) => {
+      ElMessage.error(String(e))
+   })
+  }
+}
+
+function handleChangeIndex(groupIds: number[]) {
+  // visible.value = false
+  // 处理修改排序逻辑
+  console.log('修改分组排序', groupIds)
+  changeIndexFavoriteGroup2(groupIds).then(() => {
     ElMessage.success(t('success'))
     followStore.getUserFavoriteGroups2()
   }).catch((e) => {
@@ -609,35 +757,54 @@ function handleDelGroup(groupId: number) {
     removeFavoriteGroup2(groupId).then(() => {
       ElMessage.success(t('success'))
       followStore.getUserFavoriteGroups2()
+      if(conditions.value.group==groupId){
+        conditions.value.group=0
+      }
     }).catch((e) => {
        ElMessage.error(String(e))
     })
   })
 }
-
+function getMonitorNum() {
+  if(!botStore.evmAddress) return
+  monitorAddresses(conditions).then((res) => {
+    monitorNum.value = res.total
+  })
+}
 const getTableList = throttle(function() {
-   loading.value = true
+  console.log('getTableList')
+  loading.value = true
   const max = Math.floor(new Date().getTime() / 1000)
   const min = safeBigNumber(max).minus(safeBigNumber(filterForm.value.last_trade_time)).toString()
   const last_trade_time= filterForm.value.last_trade_time ?{
     last_tx_time_max: max + 3600,
      last_tx_time_min: min
   }:{}
-  getAttentionPageList({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
-    console.log('=>(favoriteTable.vue:64) res', res)
-    dataSource.value = ( res.data || []).
+  const req=isMonitor.value?monitorAddresses: getAttentionPageList
+  // monitorAddresses({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
+  //   console.log('monitorAddresses res', res)
+  // })
+
+  const conditionsData = {...conditions.value}
+  if(!conditionsData.sort_dir){
+    conditionsData.sort = ''
+  }
+  req({...conditionsData, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
+    console.log('getAttentionPageList res',isMonitor.value, res)
+    const tableData =isMonitor.value?dataSource2:dataSource
+    tableData.value = ( res.data || []).
     map((i:any) => {
       return {
         ...i,
-        group_id:conditions.group,
+        group_id:conditions.value.group,
         total_txs: safeBigNumber(i.total_sold).plus(safeBigNumber(i.total_purchase)).toString(),
         total_txs_usd: safeBigNumber(i.total_sold_usd).plus(safeBigNumber(i.total_purchase_usd)).toString()
       }
     })
-    pageData.value.total = res.total || 10
+    pageData.value.total = res.total || 0
     pageData.value.page = res.pageNO || 1
-    pageData.value.pageSize = res.pageSize || 10
-  }).finally(() => { 
+    pageData.value.pageSize = res.pageSize || 50
+  }).finally(() => {
     loading.value = false
   })
 }, 500)
@@ -653,7 +820,7 @@ function tableRowClick(row: { user_address: string; user_chain: string }) {
     path: `/address/${row.user_address}/${row.user_chain}`,
   })
 }
- function safeBigNumber(value) {
+ function safeBigNumber(value:string|number) {
   try {
     // 尝试将值转换为 BigNumber
     const result = new BigNumber(value)
@@ -671,59 +838,58 @@ function tableRowClick(row: { user_address: string; user_chain: string }) {
 
 function handleFilterQuery(keyword: string = '') {
   visible.value = false
-  conditions.keyword = keyword
+  conditions.value.keyword = keyword
   searchKeyword.value = keyword
-  // getTableList()
 }
 
-function handleDeleteAttention(item) {
-  deleteAttention({address: currentAddress.value, user_chain: item.chain,user_address: item.user_address}).then(() => {
+function handleDeleteAttention(item:any) {
+  deleteAttention({address: currentAddress.value, user_chain: item.user_chain,user_address: item.user_address}).then(() => {
     ElMessage.success(t('success'))
     getTableList()
+    updateNum1.value++
   }).catch((e) => {
     ElMessage.error(String(e))
   })
 }
 const getRowGroupChange = async (val: number, row: any) => {
   await moveFavoriteGroup2({user_chain:row.user_chain, user_address:row.user_address, group:val})
+  updateNum1.value++
   getTableList()
 }
 
-function  handleFilterConfirm(data) {
-  console.log('-------attentionHandleFilterConfirm--------', data)
+function  handleFilterConfirm(data: FilterFormType) {
   if (data.last_trade_time) {
-    conditions.last_trade_time = data.last_trade_time
+    conditions.value.last_trade_time = data.last_trade_time
   }
-  conditions.sort = 'last_tx_time'
-  conditions.sort_dir = data.sort_dir || ''
+  // conditions.value.sort = 'last_tx_time'
+  // conditions.value.sort_dir = data.sort_dir || ''
   visible2.value = false
-  // this.getAttentionList()
+  // const sortOrder = {
+  //   'desc': 'descending',
+  //   'asc': 'ascending'
+  // }[data.sort_dir || ''] || null
+  // tableRef.value?.sort('last_tx_time', sortOrder as string)
 }
- function attentionHandleReset(data) {
+ function attentionHandleReset(data:FilterFormType) {
   console.log('-------attentionHandleReset--------', data)
-  conditions.sort_dir = ''
-  conditions.sort = ''
-  conditions.last_trade_time = ''
+  conditions.value.last_trade_time = ''
   filterForm.value.last_trade_time = ''
   visible2.value = false
-  // this.getAttentionList()
+  // tableRef.value?.clearSort()
 }
 
-function handleSort(val, dir='') {
-    console.log('handleSort', val, dir)
-      // let filterFormObj = this.filterFormObj[this.activeChain]
-      // if (val.type === 'profit_percent_num') {
-      //   let profit_obj = filterFormObj?.['profit_percent_num']?.profit_obj
-      //   for (let i in profit_obj) {
-      //     profit_obj[i].sort_dir = ''
-      //   }
-      // }
+function handleSort(val:any, dir='',sort:string) {
+    console.log('handleSort',val,{dir},{sort})
+    tableRef.value?.clearSort()
     if (!dir) {
-      let sortList = ['desc', 'asc', null]
+      const sortList = ['desc', 'asc', null]
       if (!val.sort_dir) {
         val.sort_dir = sortList[0]
       } else {
         val.sort_dir = sortList[sortList.indexOf(val.sort_dir) + 1]
+      }
+      if(sort){
+        val.sort=sort
       }
       return
     }
@@ -732,37 +898,68 @@ function handleSort(val, dir='') {
     } else {
       val.sort_dir = dir
     }
+    if(sort){
+      val.sort=sort
+    }
     // console.log('filterFormObj111', filterFormObj)
 }
- function handleSortChange(data) {
-  console.log('-------HandleSortChange--------', data)
+ function handleSortChange(data: {prop: string, order: string|null}) {
+  console.log('-------HandleSortChange--------', data)  
   if (data.order === null) {
-    conditions.sort_dir = ''
-    conditions.sort = ''
+    conditions.value.sort_dir = ''
+    conditions.value.sort = ''
   } else {
-    conditions.sort = data.prop
+    conditions.value.sort = data.prop
     if (data.order === 'ascending') {
-      conditions.sort_dir = 'asc'
+      conditions.value.sort_dir = 'asc'
     } else {
-      conditions.sort_dir = 'desc'
+      conditions.value.sort_dir = 'desc'
     }
   }
+  if (data.prop === 'last_tx_time') {
+    filterForm.value.sort_dir = conditions.value.sort_dir
+  }
 }
+  // function openFavPop() {
+  //   followStore.confirmAttention(addButtonRef.value,(form)=>{
+  //     console.log('confirmAttention', form)
+  //     return Promise.resolve()
+  //   })
+  // }
 </script>
 
 <style scoped lang="scss">
+:deep().el-radio-group{
+  padding: 2px;
+  background: var(--d-222-l-F2F2F2);
+  border-radius: 4px;
+  .el-radio-button__inner{
+    background: var(--d-222-l-F2F2F2);
+    border: none;
+    color: var(--d-666-l-999);
+    font-weight: 500;
+  }
+}
 .el-table{
   font-size: 12px;
 }
 .w-operate{
+  position: absolute;
+  top: 13px;
+  right: 0;
+  width: 50%;
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: flex-end;
   align-items: center;
   gap: 8px;
   font-weight: 500;
   font-size: 12px;
+  padding-right: 16px;
   /* border-bottom: 1px solid var(--d-222-l-EEE); */
+  li :deep() .el-checkbox__input{
+    margin-top: 2px;
+  }
   li.btn {
     display: flex;
     padding: 0 8px;
@@ -782,7 +979,7 @@ function handleSort(val, dir='') {
   }
 }
 .color-text-zero {
-  color: var(--custom-text-2-color);
+  color: #666;
 }
 .fav-icon-color {
   color: var(--a-text-3-color);
@@ -934,6 +1131,24 @@ function handleSort(val, dir='') {
       opacity: 0.6;
     }
     cursor: pointer;
+  }
+  :deep() .el-input {
+    --el-input-border-color: #444444;
+    --el-input-placeholder-color: var(--d-666-l-999);
+    --el-text-color-placeholder: #999;
+    --el-input-bg-color: var(--d-333-l-F2F2F2)
+  }
+  :deep() .el-button {
+    --el-border:none;
+  }
+  :deep() .el-input__wrapper {
+    border: none;
+    border-radius: 6px;
+    box-shadow: none;
+
+    &:hover {
+      box-shadow: 0 0 0 1px #3F80F7 inset;
+    }
   }
 }
 
@@ -1090,7 +1305,7 @@ a.trade {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  height: 14px;
+  height: 10px;
   width: 24px;
   vertical-align: middle;
   cursor: pointer;
@@ -1099,23 +1314,53 @@ a.trade {
   .sort-caret {
     width: 0;
     height: 0;
-    border: solid 5px transparent;
+    border: solid 4px transparent;
     position: absolute;
     left: 7px;
     &.ascending {
-      border-bottom-color: var(--el-text-color-placeholder);
+      border-bottom-color: var(--d-666-l-999);
       top: -5px;
       &.active {
         border-bottom-color: var(--d-F5F5F5-l-333);
       }
     }
     &.descending {
-      border-top-color: var(--el-text-color-placeholder);
+      border-top-color:  var(--d-666-l-999);
       bottom: -3px;
       &.active {
         border-top-color: var(--d-F5F5F5-l-333);
       }
     }
+  }
+}
+:deep() .el-table.el-table thead .el-table__cell{
+  height: 40px;
+}
+:deep() .el-table .cell{
+  line-height: 22px;
+}
+:deep() .el-table .el-table__cell{
+  &:first-child>.cell{
+    padding-left: 16px;
+  }
+  &:last-child>.cell{
+    padding-right: 16px;
+  }
+}
+:deep() .el-table{
+  --el-table-text-color: var(--d-CCC-l-333);
+  .caret-wrapper{
+    height: 10px;
+    .sort-caret{
+      border-width: 4px;
+    }
+  }
+}
+</style>
+<style lang="scss">
+.w-addrGroup{
+  .el-select-dropdown__item.is-selected{
+    font-weight: 400;
   }
 }
 </style>

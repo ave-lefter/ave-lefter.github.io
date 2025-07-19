@@ -25,7 +25,7 @@ function inBlackList(row) {
     globalStore.pumpBlackList.findIndex(
       (i) =>
         (i.address == row.token && i.type == 'ca') ||
-        (i.address == row.symbol && i.type == 'keyword')
+        (i.address == getSymbol(row) && i.type == 'keyword')
     ) !== -1
   )
 }
@@ -81,7 +81,7 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
     <div class="flex items-center" @click.stop="emit('collect', rowIndex, row)">
       <Icon
         name="custom:star"
-        class="color-var(--d-999-l-666) text-12px cursor-pointer ml-5px mr-12px"
+        class="color-var(--d-999-l-666) text-16px cursor-pointer ml-5px mr-12px"
         :class="row.is_fav ? 'color-#ffbb19' : ''"
       />
     </div>
@@ -172,7 +172,7 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
           </el-tooltip>
         </div>
         <div class="flex items-center lh-12px">
-          <div v-tooltip="formatDate(row.created_at, 'MM/DD HH:mm:ss')" class="mr-8px text-12px">
+          <div v-tooltip="formatDate(row.created_at, 'YYYY/MM/DD HH:mm:ss')" class="mr-8px text-12px">
             <TimerCount
               v-if="row.created_at && Number(formatTimeFromNow(row.created_at, true)) < 60"
               :key="row.created_at"
@@ -186,14 +186,14 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
                 </span>
               </template>
             </TimerCount>
-            <div v-else :class="timerCountColor(row.created_at)">
-              {{ formatTimeFromNow(row.created_at) }}
+            <div v-else :class="row.created_at?timerCountColor(row.created_at):''">
+              {{row.created_at? formatTimeFromNow(row.created_at):'-' }}
             </div>
           </div>
           <div v-if="row?.medias?.length > 0" class="flex items-center gap-4px">
             <template v-for="(item, index) in row?.medias" :key="index">
               <div v-if="item.url" v-tooltip="item.url">
-                <a :href="item.url" target="_blank" @click.stop>
+                <a class="flex items-center" :href="item.url" target="_blank" @click.stop>
                   <Icon :name="`custom:${item.icon}`" />
                 </a>
               </div>

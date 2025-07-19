@@ -1,107 +1,127 @@
 <template>
   <ul class="w-tabs flex-1 flex-wrap">
-    <li class="clickable" :class="{ active: props.modelValue === 0 }" @click.stop.prevent="emit('update:modelValue', 0)">
+    <li class="clickable text-[var(--d-666-l-999)]" :class="{ active: props.modelValue === 0 }" @click.stop.prevent="emit('update:modelValue', 0)">
       <span>{{ $t('defaultGroup') }}</span>
     </li>
-    <li 
-      v-for="item in props.options" :key="item.group_id" class="clickable flex gap-2px"
-      :class="{ active: props.modelValue === item.group_id, 'px-0px!': edits[item.group_id] }"
-      @click.stop.prevent="emit('update:modelValue', item.group_id)">
-      <el-input 
-        v-if="edits[item.group_id]" v-model="groupName" style="width: 140px" size="default"
-        class="name-input">
-        <template #suffix>
-          <Icon 
-            name="mynaui:x-square-solid" class="text-18px color-[var(--d-F5F5F5-l-222)] clickable"
-            @click.stop.prevent="handleCancelEdit"/>
-          <!-- <Icon v-else name="mynaui:x-square" class="text-18px color-#666"/> -->
-          <Icon 
-            name="mynaui:check-square-solid" class="text-18px color-[var(--d-F5F5F5-l-222)] clickable"
-            :class="{ 'cursor-not-allowed': !groupName }" @click.stop.prevent="groupName&&handleConfirmEdit()"/>
-          <!-- <Icon v-else name="mynaui:check-square" class="text-18px color-#666"/> -->
-        </template>
-      </el-input>
-      <template v-else>
+    <template v-if="props.options.length > 0">
+      <li
+        v-for="item in props.options" :key="item.group_id" class="clickable flex gap-2px text-[var(--d-666-l-999)]"
+        :class="{ active: props.modelValue === item.group_id }"
+        @click.stop.prevent="emit('update:modelValue', item.group_id)">
+        <!-- <el-input
+          v-if="edits[item.group_id]" v-model="groupName" style="width: 140px" size="default"
+          class="name-input">
+          <template #suffix>
+            <Icon
+              name="mynaui:x-square-solid" class="text-18px color-[var(--d-F5F5F5-l-222)] clickable"
+              @click.stop.prevent="handleCancelEdit"/>
+            <Icon v-else name="mynaui:x-square" class="text-18px color-#666"/>
+            <Icon
+              name="mynaui:check-square-solid" class="text-18px color-[var(--d-F5F5F5-l-222)] clickable"
+              :class="{ 'cursor-not-allowed': !groupName }" @click.stop.prevent="groupName&&handleConfirmEdit()"/>
+            <Icon v-else name="mynaui:check-square" class="text-18px color-#666"/>
+          </template>
+        </el-input> -->
+          <!-- v-click-outside="() => visible = false" -->
+
         <span>{{ item.name }}</span>
-        <Icon 
-          :ref="(el: any) => $refs.buttonRefs[item.group_id] = el" 
-          v-click-outside="() => visible = false"
+        <Icon
+          :ref="(el: any) => $refs.buttonRefs[item.group_id] = el"
           name="mdi:dots-vertical"
           class="text-14px"
-          @click.stop.prevent="buttonRef = $refs.buttonRefs[item.group_id]; visible = true; currentEditGroup = item.group_id; groupName = item.name"
-           />
-      </template>
-    </li>
-    <li ref="addButtonRef" class="clickable color-#3F80F7! flex gap-2px">
-      <Icon name="material-symbols:add-circle" class="text-12px" />
+          @click.stop.prevent="buttonRef = $refs.buttonRefs[item.group_id]; visible = true; currentEditGroup = item.group_id; form.groupName = item.name"
+          />
+      </li>
+    </template>
+    <li ref="addButtonRef" class="clickable color-[var(--d-999-l-666)]! flex gap-2px bg-[var(--d-222-l-F2F2F2)]!">
+      <Icon name="custom:add-icon" class="text-12px" />
       <span>{{ $t('newGroup') }}</span>
     </li>
-    <el-popover :width="293" trigger="click" ref="popoverRef2">
+    <el-popover ref="popoverRef2" :width="320" trigger="click" @after-leave="handleSortClose">
        <template #reference>
-         <li class="clickable color-#3F80F7! flex gap-2px">
-           <Icon name="material-symbols:format-list-bulleted" class="text-12px" />
+         <li class="clickable color-[var(--d-999-l-666)]! flex gap-2px bg-[var(--d-222-l-F2F2F2)]!">
+           <Icon name="custom:list-icon" class="text-12px" />
            <span>{{ $t('groupManage') }}</span>
          </li>
        </template>
        <template #default>
-        <div class="font-500 text-14px lh-[120%] tracking-0% text-[--d-FFF-l-000] ">
-          <div class="mb-8px text-12px lh-16px">{{ $t('groupManage') }}</div>
-         <VueDraggableNext
-            class="flex flex-col mb-12px"
-            tag="ul"
-            v-model="sortOptions"
-            v-bind="{ animation: 200}"
-            @start="drag = true"
-            @end="drag = false"
-            item-key="show_index"
-          >
-            <transition-group type="transition" name="flip-list">
-              <li v-for="item in sortOptions" :key="item.show_index" class="flex-between px-12px py-8px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
-              >
-                <span>{{ item.name }}</span>
-                <Icon name="material-symbols:dehaze"/>
-              </li>
-            </transition-group>
-          </VueDraggableNext>
+        <div class="font-500 text-14px lh-[120%] tracking-0% text-[--d-FFF-l-333]">
+          <div class="mb-8px text-14px lh-[120%]">{{ $t('groupManage') }}</div>
+          <el-scrollbar wrap-class="mb-12px max-h-[400px]">
+              <VueDraggableNext
+                 v-model="sortOptions"
+                 class="flex flex-col"
+                 tag="ul"
+                 v-bind="{ animation: 300}"
+                 item-key="show_index"
+                 @start="drag = true"
+                 @end="drag = false"
+               >
+               <li v-for="item in sortOptions" :key="item?.show_index" class="flex-between font-400 py-12px px-8px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
+               >
+                 <span>{{ item?.name }}</span>
+                 <Icon name="material-symbols:dehaze" class="text-16px text-[var(--d-666-l-999)]"/>
+               </li>
+                 <!-- <transition-group type="transition" name="flip-list">
+                 </transition-group> -->
+               </VueDraggableNext>
+          </el-scrollbar>
           <div class="flex-between w-100%">
-            <el-button style="background: var(--d-333-l-F2F2F2);--el-border:none" class="flex-1" @click.stop.prevent="()=>popoverRef2?.hide?.()">{{ $t('cancel') }}</el-button>
-            <el-button type="primary" class="flex-1" @click.stop.prevent="handleSort">{{ $t('confirm') }}</el-button>
+            <el-button :color="!isDark?'#f2f2f2' : '#333333'"  class="flex-1" @click.stop.prevent="()=>popoverRef2?.hide?.()">{{ $t('cancel') }}</el-button>
+            <el-button type="primary" class="flex-1" color="#3F80F7" @click.stop.prevent="handleSort">{{ $t('confirm') }}</el-button>
           </div>
         </div>
        </template>
     </el-popover>
   </ul>
-  <el-popover 
-    ref="popoverRef" :visible="visible" :virtual-ref="buttonRef" trigger="click" title="" virtual-triggering
+  <!-- --el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000) -->
+  <el-popover
+    :visible="visible" :virtual-ref="buttonRef" trigger="click" title="" virtual-triggering
     popper-style="width: 86px;min-width: 86px;">
-    <ul>
-      <li 
-        class="font-500 text-14px lh-[100%] tracking-0px  mb-20px flex-start gap-4px clickable"
+    <ul v-click-outside="() => visible = false">
+      <li
+        class="font-400 text-12px lh-[100%] tracking-0px  mb-20px flex-start gap-4px clickable"
         @click.stop.prevent="handleRenameGroup">
-        <Icon name="fe:edit" class="color-#666 text-14px mt-3px" />
+        <Icon name="fe:edit" class="color-#666 text-14px mt-0px" />
         <span>{{ $t('rename') }}</span>
       </li>
-      <li 
-        class="font-500 text-14px lh-[100%] tracking-0px clickable flex-start gap-4px"
+      <li
+        class="font-400 text-12px lh-[100%] tracking-0px clickable flex-start gap-4px"
         @click.stop.prevent="handleDelGroup">
-        <Icon name="bx:bxs-trash-alt" class="text-15px color-#666 mt-3px" />
+        <Icon name="bx:bxs-trash-alt" class="text-15px color-#666 mt-0px" />
         <span>{{ $t('delete') }}</span>
       </li>
     </ul>
   </el-popover>
-  <ProPopover ref="proPopoverRef" v-model="addGroupName" :button-ref="addButtonRef || {}" width="248" :label="$t('newGroup')" :placeholder="$t('groupPlaceholder')" prop="name" :title="$t('newGroup')" @onConfirm="handleAddGroup"/>
+  <el-popover
+    :visible="edits[currentEditGroup]" :virtual-ref="buttonRef" trigger="click" :title="$t('rename')" virtual-triggering
+    popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" width="248" :teleported="false">
+      <el-form ref="formRef" v-click-outside="clickOutside" :model="form" :rules="rules" @submit.prevent.stop="handleConfirmEdit(formRef)">
+        <el-form-item prop="groupName" label-position="top" size="large" class="mb-20px!">
+          <el-input v-model="form.groupName"    class="[&&]:[--el-fill-color-blank:var(--d-666-l-F2F2F2)]" :placeholder="t('enterGroupName')" :maxlength="50" show-word-limit clearable />
+        </el-form-item>
+        <el-form-item class="mb-0px!">
+          <div class="flex-between w-100%">
+            <el-button :color="!isDark?'#f2f2f2' : '#333333'" class="flex-1" @click.stop.prevent="handleCancelEdit">{{ $t('cancel') }}</el-button>
+            <el-button type="primary" color="#3F80F7"  class="flex-1" native-type="submit">{{ $t('confirm') }}</el-button>
+          </div>
+        </el-form-item>
+      </el-form>
+  </el-popover>
+  <ProPopover ref="proPopoverRef" v-model="addGroupName" :button-ref="addButtonRef || {}" width="248" :label="$t('newGroup')" :placeholder="$t('enterGroupName')" prop="name" :title="$t('newGroup')" @onConfirm="handleAddGroup"/>
 </template>
 
 <script setup lang="ts">
-import { ClickOutside as vClickOutside } from 'element-plus'
 import ProPopover from './proPopover.vue'
 import {VueDraggableNext} from 'vue-draggable-next'
+import type { FormInstance, FormRules } from 'element-plus'
 
-
+const { t } = useI18n()
+const {lang,isDark} = storeToRefs(useGlobalStore())
 const emit = defineEmits<{
   (e: 'onConfirm', groupId: number, name: string): void
   (e: 'onDelete' | 'onCancel' | 'update:modelValue', groupId: number): void
-  (e: 'onChangeIndex', groupId: number, groupId2: number): void
+  (e: 'onChangeIndex', groupIds: Array<number>): void
   (e: 'onAdd', name: string): void
   (e: 'update:options', options: Array<{ group_id: number; name: string; show_index: number }>): void
 }>()
@@ -127,7 +147,17 @@ const sortOptions = ref(props.options)
 watch(() => props.options, (val) => {
   sortOptions.value = val
 })
-const groupName = ref('')
+const formRef=ref<FormInstance|undefined>()
+const form = reactive({
+  groupName: ''
+})
+const rules = computed<FormRules>(() => {
+  return {
+    groupName: [
+      { required: true, message: t('groupName') + (lang.value.indexOf('zh') > -1 ? '' : '&nbsp;') + t('cannotBeEmpty'), trigger: 'change' },
+    ]
+  }
+})
 const addGroupName = ref('')
 const edits = ref<Record<number, boolean>>({})
 const currentEditGroup = ref()
@@ -135,10 +165,21 @@ const visible = ref(false)
 const buttonRef = ref()
 const addButtonRef = ref()
 const proPopoverRef = ref()
-const popoverRef = ref()
 const popoverRef2 = ref()
 
 const drag=ref(false)
+
+watch(() => edits.value, (val) => {
+  console.log('edits changed', val)
+},{deep:true})
+
+function handleSortClose() {
+  sortOptions.value = props.options
+}
+function clickOutside() {
+  visible.value = false
+  edits.value[currentEditGroup.value] = false
+}
 function handleRenameGroup() {
   edits.value[currentEditGroup.value] = true
   nextTick(() => {
@@ -149,10 +190,22 @@ function handleCancelEdit() {
   edits.value[currentEditGroup.value] = false
   emit('onCancel', currentEditGroup.value)
 }
-function handleConfirmEdit() {
-  edits.value[currentEditGroup.value] = false
-  emit('onConfirm', currentEditGroup.value, groupName.value)
+function handleConfirmEdit(formEl: FormInstance | undefined) {
+  if (!formEl) return
+  formEl.validate((valid, fields) => {
+    if (valid) {
+      emit('onConfirm', currentEditGroup.value, form.groupName)
+      formRef.value?.resetFields()
+      edits.value[currentEditGroup.value] = false
+    } else {
+      console.log('error submit!', fields)
+    }
+  })
 }
+// function handleConfirmEdit() {
+//   edits.value[currentEditGroup.value] = false
+//   emit('onConfirm', currentEditGroup.value, form.groupName)
+// }
 function handleDelGroup() {
   emit('onDelete', currentEditGroup.value)
 }
@@ -165,11 +218,11 @@ function handleSort() {
   // proPopoverRef.value?.close?.()
   popoverRef2.value?.hide?.()
   console.log('handleSort',props.options,sortOptions.value)
-  // emit('onChangeIndex',1,2)
+  emit('onChangeIndex',sortOptions.value.map(i=>i.group_id))
 }
-function openSetting() {
-  emit('onChangeIndex',1,2)
-}
+// function openSetting() {
+//   emit('onChangeIndex',1,2)
+// }
 watch(addGroupName, val => {
   console.log('addGroupName changed', val)
 })
@@ -185,20 +238,19 @@ ul.w-tabs {
   justify-content: flex-start;
   align-items: center;
   gap: 8px;
-  font-weight: 500;
+  // font-weight: 500;
   font-size: 12px;
 
   /* border-bottom: 1px solid var(--d-222-l-EEE); */
   li {
     display: flex;
     padding: 0 8px;
-    height: 24px;
-    line-height: 24px;
+    height: 28px;
+    line-height: 28px;
     cursor: pointer;
     background-color: var(--d-1A1A1A-l-F2F2F2);
     justify-content: center;
     align-items: center;
-    color: #666;
     border-radius: 4px;
 
     &.active {
@@ -213,6 +265,26 @@ ul.w-tabs {
 .no-move {
   transition: transform 0s;
 }
+.el-popover__reference {
+  margin-bottom: 10px;
+}
+:deep() .el-input {
+  --el-input-border-color: #444444;
+  --el-input-placeholder-color: var(--d-666-l-999);
+  --el-text-color-placeholder: #999;
+  --el-input-bg-color: var(--d-333-l-F2F2F2)
+}
+:deep() .el-button {
+  --el-border:none;
+}
+:deep() .el-input__wrapper {
+  border: none;
+  border-radius: 6px;
+  box-shadow: none;
 
+  &:hover {
+    box-shadow: 0 0 0 1px #3F80F7 inset;
+  }
+}
 </style>
 

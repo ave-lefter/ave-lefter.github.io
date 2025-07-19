@@ -1,21 +1,12 @@
 <template>
-  <el-popover
-      trigger="hover"
-      placement="top"
-      :content="t('backlist')"
-      :width="230"
-      popper-class="text-center"
-    >
-    <template #reference>
-      <el-button
-        class="btn mr-8px ml-0 gray"
-        style="margin-left: 0"
-        @click="visible = !visible"
-      >
-        <Icon name="custom:pump-black" class="text-16px"/>
-      </el-button>
-    </template>
-  </el-popover>
+  <el-button
+    v-tooltip="t('backlist')"
+    class="btn mr-8px ml-0 gray"
+    style="margin-left: 0"
+    @click="visible = !visible"
+  >
+    <Icon name="custom:pump-black" class="text-16px"/>
+  </el-button>
   <el-dialog
     v-model="visible"
     width="780"

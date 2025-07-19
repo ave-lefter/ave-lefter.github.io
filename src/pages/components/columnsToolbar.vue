@@ -60,7 +60,7 @@ const handleReset = () => {
   storeColumns.value = props.getDefaultColumns(t)
   modelColumns.value = props.getDefaultColumns(t)
   hotSettings.value.avatar_isCircle='circle'
-  hotSettings.value.isBlacklist = false
+  hotSettings.value.isBlacklist = true
   globalStore.pumpSetting.avatar_isCircle = hotSettings.value.avatar_isCircle
   globalStore.pumpSetting.isBlacklist = hotSettings.value.isBlacklist
 }
