@@ -706,6 +706,7 @@ const handleMonitor = throttle((row:any,index:number=0) => {
       getTableList()
       ElMessage.success(t('success'))
       updateNum1.value++
+      getMonitorNum()
     }).catch((e) => {
         ElMessage.error(String(e))
     })
