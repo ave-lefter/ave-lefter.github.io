@@ -147,7 +147,7 @@ const loading = shallowRef(false)
 function getSmartTop10() {
   const data = {
     chain: 'solana',
-    self_address: botStore.evmAddress ? botStore.evmAddress : undefined,
+    self_address: useFollowStore().currentAddress,
   }
   _getSmartTop10(data)
     .then((res) => {
@@ -163,7 +163,7 @@ function tokenSearch() {
   return
   const data = {
     query: query.value,
-    self_address: botStore.evmAddress ? botStore.evmAddress : undefined,
+    self_address: useFollowStore().currentAddress,
   }
   setHistoryList(query.value)
   loading.value = true
