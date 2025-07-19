@@ -144,8 +144,8 @@ function calculateColumnWidths() {
           <slot :name="slotName" v-bind="slotProps"/>
         </template>
         <!--如果没有自定义空样式则使用默认值-->
-        <template v-if="!defaultSlots.empty && !loading" #empty>
-          <div class="h-full flex flex-col items-center justify-center pt-100px">
+        <template v-if="!defaultSlots.empty" #empty>
+          <div v-if="!loading" class="h-full flex flex-col items-center justify-center pt-100px">
             <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
             <img v-else src="@/assets/images/empty-black.svg" alt="">
             <span
@@ -155,6 +155,7 @@ function calculateColumnWidths() {
               {{ emptyText || t('emptyNoData') }}
             </span>
           </div>
+          <span v-else/>
         </template>
         <template v-if="data.length >0 && showFooter" #footer>
           <div class="text-center px-0 pt-15px pb-10px text-12px text-[#959a9f] bg-[--d-111-l-FFF] absolute w-100%" :class="`top-${rowHeight}px`">

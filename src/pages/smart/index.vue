@@ -578,7 +578,6 @@ function handleFilterConfirm(val) {
         filterConditions.value[key].sort = i
       }
     }
-    console.log('---------handleFilterConfirm----------', val.profit_obj, this.filterConditions)
   } else if (val.type === 'last_trade_time') {
     filterConditions.value[key].last_trade_time = val.last_trade_time
   }
@@ -703,7 +702,7 @@ function switchChain(chain: string) {
             @click="activeChain = value"
           >
             <img
-              class="w-16px h-16px rounded-full opacity-70"
+              class="w-16px h-16px rounded-full opacity-60"
               :src="`${configStore.token_logo_url}chain/${value}.png`"
               alt=""
             />
@@ -732,7 +731,7 @@ function switchChain(chain: string) {
             @click="switchChain(value)"
           >
             <img
-              class="w-16px h-16px rounded-full"
+              class="w-16px h-16px rounded-full opacity-60"
               :src="`${configStore.token_logo_url}chain/${value}.png`"
               alt=""
             />

@@ -23,7 +23,7 @@
           <span v-else />
         </template>
         <el-table-column
-        width="220"
+        width="225"
         fixed="left"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
@@ -46,7 +46,7 @@
                     name="custom:filter"
                     class="text-10px cursor-pointer  ml-3px"
                     :style="{
-                      color: isActiveFilter('last_trade_time') ? 'var(--d-F5F5F5-l-333)' : ''
+                      color: isActiveFilter('last_trade_time') ? 'var(--d-999-l-666)' : ''
                     }"
                     @click.stop.prevent
                   />
@@ -272,7 +272,7 @@
         <el-table-column
           align="right"
           :label="$t('volume4')"
-          :min-width="180"
+          :min-width="150"
         >
         <template #header>
           <div class="flex-end pr-7px">
@@ -280,7 +280,7 @@
               class="flex-end cursor-pointer select-none"
               @click.stop="switchSort('total_volume')"
             >
-              {{ $t('volume') }}
+              {{ $t('vol') }}
               <div class="flex flex-col items-center justify-center ml-5px">
                 <i
                   class="w-0 h-0 border-solid border-5px border-transparent cursor-pointer"
@@ -299,7 +299,7 @@
               class="flex-end cursor-pointer select-none"
               @click.stop="switchSort('total_trades')"
             >
-              {{ $t('txns') }}
+              {{ $t('Txs') }}
               <div class="flex flex-col items-center justify-center ml-5px">
                 <i
                   class="w-0 h-0 border-solid border-5px border-transparent cursor-pointer"
@@ -322,18 +322,17 @@
               @mouseenter="showPopover(row, $index)"
               @mouseleave="showPop = false"
              >
-             <div class="hover-dot flex-end cursor-pointer">
-              <div  :class="!row?.total_volume ? 'color-[--d-666-l-999]' : ''">
+             <div class="cursor-pointer">
+              <div  class="hover-dot" :class="!row?.total_volume ? 'color-[--d-666-l-999]' : ''">
                 ${{
-                  row?.total_volume > 0 ? formatNumber(row?.total_volume || 0, 2, 4, 10 ** 4) : 0
+                  row?.total_volume > 0 ? formatNumber(row?.total_volume || 0, 2) : 0
                 }}
               </div>
-              <span class="color-#333">/</span>
-              <div  :class="!row?.total_trades ? 'color-[--d-666-l-999]' : ''">
+              <span class="hover-dot" :class="!row?.total_trades ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-666]'">
                 {{
-                  row?.total_trades > 0 ? formatNumber(row?.total_trades || 0, 2, 4, 10 ** 4) : 0
+                  row?.total_trades > 0 ? formatNumber(row?.total_trades || 0, 2) : 0
                 }}
-              </div>
+              </span>
              </div>
             </div>
           </template>
@@ -403,7 +402,7 @@
           sortable="custom"
           :sort-orders="['descending', 'ascending', null]"
           prop="rank_score"
-          :min-width="110"
+          :min-width="100"
         >
         <template #header>
           <span class="bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
@@ -414,7 +413,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column align="right" :min-width="230">
+        <el-table-column align="right" :min-width="200">
           <template #header>
             <span class="bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
             <span>{{ $t('profit4') }}</span>
@@ -433,7 +432,7 @@
                     name="custom:filter"
                     class="text-10px cursor-pointer  ml-3px mr-7px"
                     :style="{
-                      color: isActiveFilter('profit_percent_num') ? 'var(--d-F5F5F5-l-333)' : ''
+                      color: isActiveFilter('profit_percent_num') ? 'var(--d-999-l-666)' : ''
                     }"
                   />
               </template>
@@ -560,8 +559,8 @@
           </template>
           <template #default="{ row }">
             <div class="flex-end">
-              <div class="mr-10px">
-                <div>
+              <div class="mr-40px">
+                <div class="flex-end">
                   <span class="text-12px mr-4px color-[--d-999-l-666]">
                     {{ filterForm['profit_percent_num'].profit_obj.profit_above_900_percent_num.name }}
                   </span>
@@ -572,7 +571,7 @@
                     {{ formatNumber(row?.profit_above_900_percent_num || 0, 2) }}
                   </span>
                 </div>
-                <div class="mt-10px">
+                <div class="mt-10px flex-end">
                   <span class="text-12px mr-4px color-[--d-999-l-666]">
                     {{ filterForm['profit_percent_num'].profit_obj.profit_300_900_percent_num.name }}
                   </span>
@@ -585,7 +584,7 @@
                 </div>
               </div>
               <div>
-                <div>
+                <div class="flex-end">
                   <span class="text-12px mr-4px color-[--d-999-l-666]">
                     {{ filterForm['profit_percent_num'].profit_obj.profit_100_300_percent_num.name }}
                   </span>
@@ -596,7 +595,7 @@
                     {{ formatNumber(row?.profit_100_300_percent_num || 0, 2) }}
                   </span>
                 </div>
-                <div class="mt-10px">
+                <div class="mt-10px flex-end">
                   <span class="text-12px mr-4px color-[--d-999-l-666]">
                     {{ filterForm['profit_percent_num'].profit_obj.profit_10_100_percent_num.name }}
                   </span>
@@ -627,7 +626,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column align="right" :min-width="280">
+        <el-table-column align="right" :min-width="250">
           <template #header>
             <span class="mr-7px">{{ $t('smartTop3') }}</span>
           </template>
@@ -636,8 +635,8 @@
               <div
                 v-for="(item, index) in row?.tag_items"
                 :key="index"
-                class="ml-10px"
-                style="width: 80px"
+                class="ml-10px flex flex-col items-center min-w-60px"
+
                 @click.stop.prevent="goLink(item, row.chain)"
               >
                 <!-- <span class="ellipsis block">{{ item.symbol }}</span> -->
@@ -681,8 +680,8 @@
             <span class="mr-7px">{{ $t('loss') }}</span>
           </template>
           <template #default="{ row }">
-            <div class="flex-end">
-              <div class="mr-10px">
+            <div class="flex-end" style="align-items: baseline;">
+              <div class="mr-40px flex-end">
                 <span class="text-12px mr-4px color-[--d-999-l-666]">
                   {{ filterForm['profit_percent_num_lt'].profit_obj.profit_neg10_10_percent_num.name }}
                 </span>
@@ -694,7 +693,7 @@
                 </span>
               </div>
               <div>
-                <div>
+                <div class="flex-end">
                   <span class="text-12px mr-4px color-[--d-999-l-666]">
                     {{ filterForm['profit_percent_num_lt'].profit_obj.profit_neg50_neg10_percent_num.name }}
                   </span>
@@ -705,7 +704,7 @@
                     {{ formatNumber(row?.profit_neg50_neg10_percent_num || 0, 2) }}
                   </span>
                 </div>
-                <div class="mt-10px">
+                <div class="mt-10px flex-end">
                   <span class="text-12px mr-4px color-[--d-999-l-666]">
                     {{ filterForm['profit_percent_num_lt'].profit_obj.profit_neg100_neg50_percent_num.name }}
                   </span>
@@ -766,7 +765,7 @@
       v-model:visible="showPop"
       :virtual-ref="$refs.currentBtnRef[currentIndex]"
       virtual-triggering
-      trigger="hover"
+      trigger="contextmenu"
       placement="right"
       popper-class="text-center"
       :width="300"
@@ -1064,9 +1063,10 @@ function showPopover(row: KolObj,$index: number) {
           border-bottom: 1px dotted var(--d-CCC-l-333)
         }
       }
-     .cell {
-      padding-right: 19px
-     }
+      .cell {
+        padding-right: 19px;
+        color: var(--d-CCC-l-333);
+      }
     }
 }
 a.a-gray{
@@ -1283,18 +1283,18 @@ a.a-gray{
   line-height: 16px;
   &.bg-red-1 {
     background: #eb2b4b;
-    color: #fff;
+    color: #CCC;
   }
   &.bg-green-1 {
     background: #37b270;
-    color: #fff;
+    color: #CCC;
   }
   &.bg-gray-1 {
     background: var(--d-222-l-F2F2F2);
     color: var(--d-666-l-999);
   }
   &.bg-yellow-1 {
-    color: #fff;
+    color: #CCC;
     background: #ffa622;
   }
 }

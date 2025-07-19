@@ -21,7 +21,7 @@
     // color: #ccc;
     --el-text-color-primary: #333;
   }
-  
+
 }
 
 
@@ -139,6 +139,7 @@
 }
 
 .el-checkbox{
+  --el-text-color-regular: var(--d-666-l-999);
   --el-checkbox-font-weight: 400;
   --el-checkbox-text-color:#000;
 }
@@ -165,5 +166,15 @@
     background-color:var(--d-111-l-FFF);
     --el-text-color-regular:var(--d-666-l-999);
     --el-pagination-button-color:var(--d-666-l-999);
+  }
+}
+
+.el-select__popper{
+  --el-bg-color-overlay: var(--d-222-l-FFF);
+  .el-input{
+    --el-input-bg-color:var(--d-333-l-F2F2F2);
+  }
+  .el-select-dropdown__item.is-selected{
+    font-weight: normal;
   }
 }

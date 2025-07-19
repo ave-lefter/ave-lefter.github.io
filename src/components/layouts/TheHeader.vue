@@ -125,13 +125,13 @@ const route = useRoute()
 const langStore = useLocaleStore()
 const {t } = useI18n()
 const list = computed(() => {
-  let query = ''
-  if (botStore.accessToken && botStore.refreshToken) {
-    query = `?act=${botStore.accessToken}&ret=${botStore.refreshToken}`
-  }
+  // let query = ''
+  // if (botStore.accessToken && botStore.refreshToken) {
+  //   query = `?act=${botStore.accessToken}&ret=${botStore.refreshToken}`
+  // }
   const menues = [
-    // {id: 'index', name: t('markets'), src: '/', target: '_self'},
-    {id: 'index', name: t('markets'), src: 'https://ave.ai/' + query, target: '_blank'},
+    {id: 'index', name: t('markets'), src: '/', target: '_self'},
+    // {id: 'index', name: t('markets'), src: 'https://ave.ai/' + query, target: '_blank'},
     { id: 'pump', name: t('pump1'), src: '/pump' },
     { id: 'follow', name: t('follow'), src: '/follow' },
     {id: 'smart', name: t('smarter2'), src: '/smart', target: '_self'},

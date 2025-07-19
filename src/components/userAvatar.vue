@@ -8,7 +8,7 @@
       :width="iconSize"
     >
       <template #error>
-        <img class="icon-wallet-avatar" :src="generateAvatarIcon(wallet_logo?.name || address)" :style="avatarStyle">
+        <img class="icon-wallet-avatar" :src="generateAvatarIcon(wallet_logo?.name || address || '')" :style="avatarStyle">
       </template>
     </el-image>
 
@@ -49,15 +49,16 @@ const props = defineProps<{
 
 const {
   // wallet_logo = {logo: '', name: '', url: ''},
-  address = '',
+  // address = '',
   chain = '',
   iconSize = '16px',
   iconChainSize = ''
 } = props
+// const wallet_logo = toRef(props, 'wallet_logo')
 const configStore = useConfigStore()
 
 const walletLogo = computed(() => {
-  return props.wallet_logo?.logo?.replace?.(/_normal/, '_400x400') ||
+  return (props.wallet_logo?.logo || '')?.replace?.(/_normal/, '_400x400') ||
     generateAvatarIcon(props.wallet_logo?.name || props.address || '')
 })
 
