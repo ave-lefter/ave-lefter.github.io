@@ -1043,6 +1043,10 @@
   "historyLimitOrder": "历史挂单",
   "searchGroup": "搜索分组",
   "marketCap": "流通市值",
+  "cowboys": "牛人榜",
+  "kol": "KOL",
+  "30dTokenDistribution": "30d代币盈利分布",
+  "smartTop3": "TOP3盈利Token/金额",
   "allChain": "全部链",
   "enable": "开启",
   "searchChain": "搜索链",
@@ -1074,5 +1078,7 @@
   "TxnsBuy": "交易数买入",
   "TxnsSell": "交易数卖出",
   "platform": "平台",
+  "profit4": "盈利",
+  "loss": "亏损",
   "onlyPush": "仅看推送"
 }

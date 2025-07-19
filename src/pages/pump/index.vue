@@ -26,7 +26,7 @@
                   ? 'radix-icons:triangle-up'
                   : 'radix-icons:triangle-down'
               "
-              class="text-16px"
+              class="text-16px color-[--d-F5F5F5-l-333]"
             />
           </el-button>
         </template>

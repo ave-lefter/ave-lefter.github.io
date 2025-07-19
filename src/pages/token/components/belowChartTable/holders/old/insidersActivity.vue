@@ -186,18 +186,16 @@ const collect = async (row: any,index:number) => {
   console.log('collect',row,index)
   if(row.is_wallet_address_fav !== 1){
     useFollowStore().confirmAttention($refs.value.buttonRefs[index],row.chain, (form) => {
-      console.log('confirmAttention', form)
       return addAttention2({
         address: useFollowStore().currentAddress,
         user_address: row.wallet_address,
         user_chain: addressAndChain.value.chain,
         group: form.group,
         is_monitored: form.is_monitored,
-      }).then(() => {
-        ElMessage.success(t('attention1Success'));
+      }).then((res) => {
         (tableDataFilter.value as Array<any>)[index].is_wallet_address_fav = 1
         // getList()
-        return Promise.resolve()
+        return Promise.resolve(res)
       }).catch((err) => {
         return Promise.reject(err)
       }).finally(() => {

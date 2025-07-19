@@ -8,7 +8,7 @@
       :width="iconSize"
     >
       <template #error>
-        <img class="icon-wallet-avatar" :src="generateAvatarIcon(wallet_logo?.name || address)" :style="avatarStyle">
+        <img class="icon-wallet-avatar" :src="generateAvatarIcon(wallet_logo?.name || address || '')" :style="avatarStyle">
       </template>
     </el-image>
 

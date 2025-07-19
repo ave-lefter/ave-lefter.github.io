@@ -1021,6 +1021,10 @@
   "expiredTime": "过期時間",
   "historyLimitOrder": "歷史掛單",
   "marketCap": "流通市值",
+  "cowboys": "牛人榜",
+  "kol": "KOL",
+  "30dTokenDistribution": "30d代幣盈利分佈",
+  "smartTop3": "TOP3盈利Token/金额",
   "isMonitored": "是否添加監控",
   "no": "否",
   "followAddress": "關注地址",
@@ -1062,5 +1066,7 @@
   "TxnsBuy": "交易数买入",
   "TxnsSell": "交易数卖出",
   "platform": "平台",
+  "profit4": "盈利",
+  "loss": "亏损",
   "onlyPush": "僅看推送"
 }

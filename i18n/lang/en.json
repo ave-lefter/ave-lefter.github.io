@@ -421,7 +421,7 @@
   "checkRemark": "The contract detection is only unilateral, and some new Pixiu may not be detected. \nNeed to combine more dimensions to analyze, such as K-line trend, position changes, capital flow, etc.",
   "connectWalletFirst": "Please connect your wallet first",
   "audit1": "AUDIT",
-  "vol": "VOL",
+  "vol": "Vol",
   "unknownRisk": "Unknown Risk",
   "oneClick": "One Click",
   "buy1": "Buy",
@@ -1035,6 +1035,10 @@
   "historyLimitOrder": "Limit Order",
   "searchGroup": "Search Group",
   "marketCap": "C.M.Cap",
+  "cowboys": "Top Traders",
+  "kol": "KOL",
+  "30dTokenDistribution": "30d Token Distribution",
+  "smartTop3": "TOP3 Profit Token/Vol",
   "isMonitored": "Whether to add monitoring",
   "no": "No",
   "followAddress": "Follow Address",
@@ -1075,5 +1079,7 @@
   "TxnsBuy": "Txns Buy",
   "TxnsSell": "Txns Sell",
   "platform": "Platform",
+  "profit4": "Profit",
+  "loss": "Loss",
   "onlyPush": "Only Push"
 }
