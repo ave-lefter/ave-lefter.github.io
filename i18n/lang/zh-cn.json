@@ -1073,5 +1073,9 @@
   "TxnsBuy": "交易数买入",
   "TxnsSell": "交易数卖出",
   "platform": "平台",
-  "onlyPush": "仅看推送"
+  "onlyPush": "仅看推送",
+  "runTime1": "1/2耗时",
+  "runTime2": "2/2耗时",
+  "snipers_1m": "开盘人数",
+  "devPosition": "DEV持仓"
 }

@@ -43,6 +43,8 @@ const globalStore = useGlobalStore()
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
+  activeSubTab?: string
+  activeTab?:string
 }>()
 const sortConditions = ref({
   sort: '',

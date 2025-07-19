@@ -1074,5 +1074,9 @@
   "TxnsBuy": "Txns Buy",
   "TxnsSell": "Txns Sell",
   "platform": "Platform",
-  "onlyPush": "Only Push"
+  "onlyPush": "Only Push",
+  "runTime1": "1/2 Cost",
+  "runTime2": "2/2 Cost",
+  "snipers_1m": "Snipers[1m]",
+  "devPosition": "DEV Owned"
 }

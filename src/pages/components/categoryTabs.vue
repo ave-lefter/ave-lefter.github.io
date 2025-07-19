@@ -209,6 +209,7 @@ function updateSubCategory(category: string) {
       @click="updateSubCategory(item.category)"
     >
       <Icon
+        v-if="isPump"
         :name="`custom:${item.category.replaceAll('_', '-')}`"
         class="mr-1 text-12px"
         :class="activeSubTab === item.category ? 'color-#F5F5F5' : ''"

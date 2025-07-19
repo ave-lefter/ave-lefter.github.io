@@ -22,11 +22,11 @@ function sortChange(sort_dir: string) {
 <template>
   <div class="flex items-center gap-2px">
     <div
-      class="cursor-pointer flex gap-2px"
+      class="cursor-pointer flex gap-2px items-center"
       @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')"
     >
-      <img src="@/assets/images/market/2-2.png" height="12" alt="">{{ 
-      $t('runTime1') }}
+      <img src="@/assets/images/market/2-2.png" width="20" alt="">{{ 
+      $t('runTime2') }}
     </div>
     <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
   </div>
