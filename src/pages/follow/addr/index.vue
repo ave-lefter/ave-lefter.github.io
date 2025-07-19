@@ -47,7 +47,7 @@
           </AveEmpty>
           <span v-else />
         </template>
-        <el-table-column :label="$t('wallet2')" width="210" fixed="left">
+        <el-table-column :label="$t('wallet2')" width="215" fixed="left">
           <template #header>
             <span class="text-10px" style="opacity: 0">0</span>
             <span>{{ $t('wallet2') }}</span>
@@ -135,7 +135,7 @@
               />
                <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mr-8px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
               <div class="flex flex-col justify-between h-32px">
-                <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 85px" :iconEditColor="isDark?'#666':'#999'"  iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)"/>
+                <UserRemark :key="`${row.user_address}-${row.user_chain}`"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 80px" :iconEditColor="isDark?'#666':'#999'"  iconEditSize="10px" showAddressTitle :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)"/>
                 <div class="font_10 color-icon flex-start mt_4" style="line-height: 1">
                   <Icon
                     v-copy="row.user_address"
@@ -784,7 +784,12 @@ const getTableList = throttle(function() {
   // monitorAddresses({...conditions, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
   //   console.log('monitorAddresses res', res)
   // })
-  req({...conditions.value, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
+
+  const conditionsData = {...conditions.value}
+  if(!conditionsData.sort_dir){
+    conditionsData.sort = ''
+  }
+  req({...conditionsData, pageNO: pageData.value.page, pageSize: pageData.value.pageSize, ...last_trade_time}).then((res) => {
     console.log('getAttentionPageList res',isMonitor.value, res)
     const tableData =isMonitor.value?dataSource2:dataSource
     tableData.value = ( res.data || []).
@@ -874,6 +879,7 @@ function  handleFilterConfirm(data: FilterFormType) {
 }
 
 function handleSort(val:any, dir='',sort:string) {
+    console.log('handleSort',val,{dir},{sort})
     tableRef.value?.clearSort()
     if (!dir) {
       const sortList = ['desc', 'asc', null]
@@ -898,7 +904,7 @@ function handleSort(val:any, dir='',sort:string) {
     // console.log('filterFormObj111', filterFormObj)
 }
  function handleSortChange(data: {prop: string, order: string|null}) {
-  console.log('-------HandleSortChange--------', data)
+  console.log('-------HandleSortChange--------', data)  
   if (data.order === null) {
     conditions.value.sort_dir = ''
     conditions.value.sort = ''

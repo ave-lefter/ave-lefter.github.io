@@ -10,7 +10,7 @@
         </el-scrollbar>
       </el-form-item>
       <el-form-item class="mb-12px!" size="small">
-        <el-button v-if="!isAdd" type="primary" class="w-100% text-12px" size="default" :icon="CirclePlusFilled" @click="isAdd = true"> {{ t('newGroup') }}</el-button>
+        <el-button v-if="!isAdd" type="primary" class="w-100% text-12px" size="default" color="#3F80F7" :icon="CirclePlusFilled" @click="isAdd = true"> {{ t('newGroup') }}</el-button>
         <el-input
           v-else v-model="addGroupName" style="width: 140px" size="default"
           class="name-input">
@@ -37,8 +37,8 @@
           </i18n-t>
         </span> 
         <div class="flex-between w-100% ">
-          <el-button style="background: var(--d-333-l-F2F2F2)" class="flex-1" @click.stop.prevent="handleCancel">{{ $t('cancel') }}</el-button>
-          <el-button type="primary" class="flex-1" native-type="submit">{{ $t('confirm') }}</el-button>
+          <el-button :color="!isDark?'#f2f2f2' : '#333333'" class="flex-1" @click.stop.prevent="handleCancel">{{ $t('cancel') }}</el-button>
+          <el-button type="primary" class="flex-1" native-type="submit"  color="#3F80F7">{{ $t('confirm') }}</el-button>
         </div>
       </el-form-item>
     </el-form>
@@ -62,7 +62,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { addFavoriteGroup2 } from '~/api/attention'
 const { t } = useI18n()
-const {lang} = storeToRefs(useGlobalStore())
+const {lang,isDark} = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
 
 const supportChains=ref(['solana','bsc'])

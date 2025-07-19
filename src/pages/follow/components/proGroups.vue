@@ -37,7 +37,7 @@
       <Icon name="custom:add-icon" class="text-12px" />
       <span>{{ $t('newGroup') }}</span>
     </li>
-    <el-popover ref="popoverRef2" :width="320" trigger="click">
+    <el-popover ref="popoverRef2" :width="320" trigger="click" @after-leave="handleSortClose">
        <template #reference>
          <li class="clickable color-[var(--d-999-l-666)]! flex gap-2px bg-[var(--d-222-l-F2F2F2)]!">
            <Icon name="custom:list-icon" class="text-12px" />
@@ -67,8 +67,8 @@
                </VueDraggableNext>
           </el-scrollbar>
           <div class="flex-between w-100%">
-            <el-button style="background: var(--d-333-l-F2F2F2);--el-border:none" class="flex-1" @click.stop.prevent="()=>popoverRef2?.hide?.()">{{ $t('cancel') }}</el-button>
-            <el-button type="primary" class="flex-1" @click.stop.prevent="handleSort">{{ $t('confirm') }}</el-button>
+            <el-button :color="!isDark?'#f2f2f2' : '#333333'"  class="flex-1" @click.stop.prevent="()=>popoverRef2?.hide?.()">{{ $t('cancel') }}</el-button>
+            <el-button type="primary" class="flex-1" color="#3F80F7" @click.stop.prevent="handleSort">{{ $t('confirm') }}</el-button>
           </div>
         </div>
        </template>
@@ -102,8 +102,8 @@
         </el-form-item>
         <el-form-item class="mb-0px!">
           <div class="flex-between w-100%">
-            <el-button style="background: var(--d-333-l-F2F2F2)" class="flex-1" @click.stop.prevent="handleCancelEdit">{{ $t('cancel') }}</el-button>
-            <el-button type="primary" class="flex-1" native-type="submit">{{ $t('confirm') }}</el-button>
+            <el-button :color="!isDark?'#f2f2f2' : '#333333'" class="flex-1" @click.stop.prevent="handleCancelEdit">{{ $t('cancel') }}</el-button>
+            <el-button type="primary" color="#3F80F7"  class="flex-1" native-type="submit">{{ $t('confirm') }}</el-button>
           </div>
         </el-form-item>
       </el-form>
@@ -117,7 +117,7 @@ import {VueDraggableNext} from 'vue-draggable-next'
 import type { FormInstance, FormRules } from 'element-plus'
 
 const { t } = useI18n()
-const {lang} = storeToRefs(useGlobalStore())
+const {lang,isDark} = storeToRefs(useGlobalStore())
 const emit = defineEmits<{
   (e: 'onConfirm', groupId: number, name: string): void
   (e: 'onDelete' | 'onCancel' | 'update:modelValue', groupId: number): void
@@ -173,6 +173,9 @@ watch(() => edits.value, (val) => {
   console.log('edits changed', val)
 },{deep:true})
 
+function handleSortClose() {
+  sortOptions.value = props.options
+}
 function clickOutside() {
   visible.value = false
   edits.value[currentEditGroup.value] = false

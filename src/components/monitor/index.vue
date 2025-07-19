@@ -1,5 +1,5 @@
 <template>
-  <div class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] px-12px relative overflow-hidden">
+  <div class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overflow-hidden">
     <!-- <div class="w-100% h-40px absolute pointer-events-auto z-999 drag-handle left-0"/> -->
     <Icon
         name="custom:drag2"
@@ -243,6 +243,7 @@
               <Icon name="icon-park-solid:volume-notice"/>
               <el-switch
                 v-model="hasRing"
+                class="[&&]:[--el-switch-on-color:#3F80F7]"
                 size="small"
                 />
               <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
