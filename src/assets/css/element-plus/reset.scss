@@ -168,3 +168,13 @@
     --el-pagination-button-color:var(--d-666-l-999);
   }
 }
+
+.el-select__popper{
+  --el-bg-color-overlay: var(--d-222-l-FFF);
+  .el-input{
+    --el-input-bg-color:var(--d-333-l-F2F2F2);
+  }
+  .el-select-dropdown__item.is-selected{
+    font-weight: normal;
+  }
+}

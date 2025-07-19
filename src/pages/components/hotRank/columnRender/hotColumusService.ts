@@ -55,6 +55,14 @@ export function getHotDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       minWidth:232,
     },
     {
+      title: t('smarter1'),
+      key: 'smart_money_buy_volume_24h',
+      isVisible: true,
+      render: 'smarterContent',
+      minWidth:110,
+      align:'right'
+    },
+    {
       title: t('mCap'),
       isVisible: true,
       key:'mCap',
@@ -129,14 +137,6 @@ export function getHotDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       align:'right'
     },
     {
-      title: t('smarter1'),
-      key: 'smart_money_buy_volume_24h',
-      isVisible: true,
-      render: 'smarterContent',
-      minWidth:110,
-      align:'right'
-    },
-    {
       title: 'DEX',
       key: 'dex',
       isVisible: false,
@@ -195,12 +195,12 @@ export function getHotDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
 export function getOpenTimeList(allText:string) {
   return [
     { text: allText, value: '' },
-    { text: '≤30min', value: String(0.5) },
-    { text: '≤1H', value: String(1) },
-    { text: '≤6H', value: String(6) },
-    { text: '≤12H', value: String(12) },
-    { text: '≤24H', value: String(24) },
-    { text: '≤1W', value: String(24*7)},
-    { text: '≤30D', value: String(24 * 30) }
+    { text: '≤30min', value: String(30) },
+    { text: '≤1H', value: String(60) },
+    { text: '≤6H', value: String(360) },
+    { text: '≤12H', value: String(720) },
+    { text: '≤24H', value: String(1440) },
+    { text: '≤1W', value: String(10080) },
+    { text: '≤30D', value: String(43200) }
   ]
 }

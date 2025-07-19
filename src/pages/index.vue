@@ -3,13 +3,6 @@ import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
-// 将首页跳转回 token 页
-definePageMeta({
-  middleware: defineNuxtRouteMiddleware(() => {
-    return navigateTo('/token/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599-eth', { replace: true })
-  })
-})
-
 const components = {
   hot,
 }
