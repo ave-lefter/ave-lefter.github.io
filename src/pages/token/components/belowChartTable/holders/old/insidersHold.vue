@@ -210,11 +210,10 @@ const collect = async (row: any,index:number) => {
         user_chain: chain.value,
         group: form.group,
         is_monitored: form.is_monitored,
-      }).then(() => {
-        ElMessage.success(t('attention1Success'));
+      }).then((res) => {
         (tableDataFilter.value as Array<any>)[index].is_wallet_address_fav = true
         // getList()
-        return Promise.resolve()
+        return Promise.resolve(res)
       }).catch((err) => {
         return Promise.reject(err)
       }).finally(() => {

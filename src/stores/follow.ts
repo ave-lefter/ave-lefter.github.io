@@ -57,19 +57,25 @@ export const useFollowStore = defineStore('follow', () => {
   const updateNum1=ref(0)
   const updateNum2=ref(0)
   const updateNum3=ref(0)
-  
+  const {t} = useI18n()
   watch(currentAddress, (val) => {
     if(!val)addressGroups.value = []
   })
   const loading = ref(false)
   const handleAddAttention = ref()
   // const handleAddAttention = ref((form: any,resetFields: () => void) => {})
-  const confirmAttention = (trigger: any,chain: string, callback: (form: any)=>Promise<void>)=>{
+  const confirmAttention = (trigger: any,chain: string, callback: (form: any)=>Promise<any>)=>{
     attentionTrigger.value = trigger
     favAddressChain.value = chain
     handleAddAttention.value = (form: any,resetFields?: () => void,stopLoading?:()=>void)=>{
       console.log('confirmAttention', form)
-      callback(form).then(() => {
+      callback(form).then((res) => {
+          console.log('confirmAttention', res)
+          if(res){
+            ElMessage.warning(String(res))
+          }else{
+            ElMessage.success(t('attention1Success'))
+          }
           stopLoading?.()
           favAddressPopVisible.value = false
           updateNum3.value++
