@@ -9,11 +9,11 @@ type LocaleType = ReturnType<typeof useI18n>['locale']['value']
 export const useLocaleStore = defineStore('locale', () => {
   const router = useRouter()
   const route = useRoute()
-  const { language, ...restQuery } = route.query
+  const { lang, ...restQuery } = route.query
   const locale = useLocalStorage('language','en') as RemovableRef<LocaleType>
-
+  const _lang = lang
   async function setLanguage(lang: LocaleType) {
-    if (language) {
+    if (_lang) {
       router.replace({
         name: route.name as string,
         params: route.params,
