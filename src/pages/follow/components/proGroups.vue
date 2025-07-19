@@ -37,7 +37,7 @@
       <Icon name="custom:add-icon" class="text-12px" />
       <span>{{ $t('newGroup') }}</span>
     </li>
-    <el-popover ref="popoverRef2" :width="320" trigger="click">
+    <el-popover ref="popoverRef2" :width="320" trigger="click" @after-leave="handleSortClose">
        <template #reference>
          <li class="clickable color-[var(--d-999-l-666)]! flex gap-2px bg-[var(--d-222-l-F2F2F2)]!">
            <Icon name="custom:list-icon" class="text-12px" />
@@ -173,6 +173,9 @@ watch(() => edits.value, (val) => {
   console.log('edits changed', val)
 },{deep:true})
 
+function handleSortClose() {
+  sortOptions.value = props.options
+}
 function clickOutside() {
   visible.value = false
   edits.value[currentEditGroup.value] = false
