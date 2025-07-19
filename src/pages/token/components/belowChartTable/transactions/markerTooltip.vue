@@ -103,7 +103,7 @@ async function _getTxsUserBrief() {
             :address="currentRow.wallet_address"
             :chain="currentRow.chain"
             :wallet_logo="currentRow.wallet_logo"
-            class="color-[--d-ccc-l-333]"
+            class="color-[--d-CCC-l-333]"
             :formatAddress="(address: string) => address.slice(0, 4) + '...' + address.slice(-4)"
           />
           <Icon v-copy="currentRow.wallet_address" name="bxs:copy"
@@ -117,7 +117,7 @@ async function _getTxsUserBrief() {
               formatNumber(userBriefData.balance_amount || 0, 3)
               }}/{{
                 formatNumber(userBriefData.history_max_balance_amount || 0, 3)
-              }})</span > <span class="color-[--d-ccc-l-333]">${{ formatNumber(userBriefData.balance_usd || 0, 2) }}</span>
+              }})</span > <span class="color-[--d-CCC-l-333]">${{ formatNumber(userBriefData.balance_usd || 0, 2) }}</span>
             <el-progress
               :color="themeStore.isDark?'#ccc':'#333'"
               :show-text="false"
