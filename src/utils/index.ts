@@ -16,6 +16,7 @@ import type { ConfigType } from 'dayjs'
 import { useStorage } from '@vueuse/core'
 import type { Size, SizeObj } from '~/api/types/pump'
 import FingerprintJs from '@fingerprintjs/fingerprintjs'
+import { UniChainsV4 } from './wallet/utils/abi'
 export * from './wallet/utils/index'
 
 export function isJSON(str: string) {
@@ -910,7 +911,7 @@ export async function getDeviceId() {
 }
 
 export function getFeeIn(bestRoute: { fee_index?: number; feeIn?: number }, chain: string) {
-  const chains = ['bsc', 'base']
+  const chains = UniChainsV4
   if (chains?.includes?.(chain)) {
     return String(bestRoute.fee_index ?? bestRoute.feeIn ?? '100')
   }
