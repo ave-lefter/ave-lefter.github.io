@@ -186,14 +186,14 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
                 </span>
               </template>
             </TimerCount>
-            <div v-else :class="timerCountColor(row.created_at)">
-              {{ formatTimeFromNow(row.created_at) }}
+            <div v-else :class="row.created_at?timerCountColor(row.created_at):''">
+              {{row.created_at? formatTimeFromNow(row.created_at):'-' }}
             </div>
           </div>
           <div v-if="row?.medias?.length > 0" class="flex items-center gap-4px">
             <template v-for="(item, index) in row?.medias" :key="index">
               <div v-if="item.url" v-tooltip="item.url">
-                <a :href="item.url" target="_blank" @click.stop>
+                <a class="flex items-center" :href="item.url" target="_blank" @click.stop>
                   <Icon :name="`custom:${item.icon}`" />
                 </a>
               </div>

@@ -177,6 +177,14 @@ onBeforeMount(() => {
 
 onUnmounted(() => {
   tokenStore?.reset?.()
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: [
+      'asset'
+    ],
+    id: 1
+  })
 })
 
 onBeforeRouteLeave(() => {
