@@ -140,6 +140,12 @@ onActivated(() => {
 })
 onUnmounted(() => {
   clearTimeout(timer)
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: ['price_extra'],
+    id: 1,
+  })
 })
 
 const wsStore = useWSStore()
@@ -338,7 +344,7 @@ const cellRenderer = computed(() => {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
         />
       </template>
-      <template v-for="item in columns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
+      <template v-for="item in visibleColumns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
         <component
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"

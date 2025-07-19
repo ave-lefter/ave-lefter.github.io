@@ -50,6 +50,7 @@ const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
   activeSubTab: string
+  activeTab: string
 }>()
 const sortConditions = ref({
   sort: '',
@@ -92,7 +93,15 @@ const pageInfo = ref({
 })
 const isVolUSDT = shallowRef(true)
 const loading = shallowRef(false)
-const columns = useStorage('pumpTableColumns', getPumpDefault(t))
+const storageKey = computed(()=>{
+  return props.activeTab + 'TableColumns'
+})
+let columns = useStorage(storageKey.value, getPumpDefault(t))
+watch(()=>props.activeTab,()=>{
+  columns = useStorage(storageKey.value, getPumpDefault(t))
+},{
+  immediate:true
+})
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
@@ -147,6 +156,12 @@ onActivated(() => {
 })
 onUnmounted(() => {
   clearTimeout(timer)
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: ['price_extra'],
+    id: 1,
+  })
 })
 
 const wsStore = useWSStore()
@@ -224,7 +239,7 @@ function removeTokenFavorite(row, index: number) {
   removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
     .then(() => {
       ElMessage.success(t('cancelled1'))
-      listData.value[index].is_fav = false
+      row.is_fav = false
     })
     .catch((err) => {
       console.log(err)
@@ -239,7 +254,7 @@ function addTokenFavorite(row, index: number) {
   addFavorite(`${row.token}-${row.chain}`, walletAddress.value, 0)
     .then(() => {
       ElMessage.success(t('collected'))
-      listData.value[index].is_fav = true
+      row.is_fav = true
     })
     .catch((err) => {
       console.log(err)
@@ -368,7 +383,7 @@ const cellRenderer = computed(() => {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
         />
       </template>
-      <template v-for="item in columns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
+      <template v-for="item in visibleColumns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
         <component
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"

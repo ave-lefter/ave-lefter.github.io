@@ -14,7 +14,7 @@ const components = {
   Studio: pumpComponent,
   novabits: pumpComponent,
 }
-const activeTab = shallowRef<keyof typeof components>('pump')
+const activeTab = shallowRef<keyof typeof components>('hot')
 const activeSubTab = shallowRef('pump_in_hot')
 const activeChain = shallowRef('AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
@@ -240,6 +240,7 @@ function getMedias(appendix: string) {
         :is="components[activeTab]"
         :listMapFunction="listMapFunction"
         :activeChain="activeChain"
+        :activeTab="activeTab"
         :activeSubTab="activeSubTab"
       />
     </KeepAlive>

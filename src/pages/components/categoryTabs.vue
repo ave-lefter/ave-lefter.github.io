@@ -49,7 +49,7 @@ const configMap = computed(() => {
     },
     bonk_pump: {
       icon: '',
-      storageKey: 'bonkPumpTableColumns',
+      storageKey: 'bonk_pumpTableColumns',
       getDefaultColumns: getPumpDefault,
       getOptions: getPumpOptions,
       class: '',
@@ -135,12 +135,12 @@ function updateSubCategory(category: string) {
       :list="chains"
       @update:activeChain="emit('update:activeChain', $event)"
     />
-    <div class="flex flex-1 justify-between">
-      <div ref="categoryRef" class="flex gap-2 text-12px">
+    <div class="flex flex-1 gap-16px justify-between">
+      <div ref="categoryRef" class="flex gap-2 text-12px flex-1 overflow-x-auto">
         <span
           v-for="(item, index) in supportCategories"
           :key="index"
-          class="p-2 lh-16px cursor-pointer rounded-1 flex items-center"
+          class="p-2 lh-16px cursor-pointer rounded-1 flex items-center shrink-0"
           :class="
             activeTab === item.category
               ? 'color-#F5F5F5 bg-#333'

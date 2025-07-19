@@ -48,6 +48,14 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         minWidth:320
       },
       {
+        title: t('smarter1'),
+        key: 'smart_money_buy_volume_24h',
+        isVisible: true,
+        render: 'smarterContent',
+        minWidth:110,
+        align:'right'
+      },
+      {
         title: t('mCap'),
         isVisible: true,
         key:'mCap',
@@ -135,14 +143,6 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         isVisible: true,
         render: 'runTime2',
         minWidth:getTextWidth(t('runTime2'),50)+60,
-        align:'right'
-      },
-      {
-        title: t('smarter1'),
-        key: 'smart_money_buy_volume_24h',
-        isVisible: true,
-        render: 'smarterContent',
-        minWidth:110,
         align:'right'
       },
       {
