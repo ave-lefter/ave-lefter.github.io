@@ -35,10 +35,14 @@ import {getUserBalance} from '~/api/swap'
 
 const botStore = useBotStore()
 const walletStore = useWalletStore()
+const {hide_small,hide_risk} = storeToRefs(useGlobalStore())
+
 let userIds: string[] = []
+
+
 const tableFilter = ref({
-  hide_risk: 1,
-  hide_small: 0,
+  hide_risk,
+  hide_small,
   user_ids: userIds
 })
 const visible=ref(false)

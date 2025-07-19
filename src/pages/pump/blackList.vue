@@ -9,7 +9,6 @@
     <template #reference>
       <el-button
         class="btn mr-8px ml-0 gray"
-        :class="{active: pumpBlackList?.length >0}"
         style="margin-left: 0"
         @click="visible = !visible"
       >
@@ -62,6 +61,7 @@
               v-model:visible="visible_popper"
               placement="bottom-start"
               trigger="hover"
+              popper-class="[&&]:[--el-popover-padding:12px_0_12px_0]"
             >
               <template #reference>
                 <el-button class="btn mr-8px"

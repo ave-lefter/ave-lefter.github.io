@@ -2,7 +2,6 @@
   --primary-color: #3F80F7;
   --color-red-500: #F6465D;
   --color-teal-300: #12B886;
-  --color-red-500: #F6465D;
   &.dark {
     // 规范：颜色相同省略为 3 位，所有都用大写
     --d-333-l-ECECEC: #333;
@@ -75,6 +74,8 @@
     --d-12B8861A-l-12B8862A: #12B8861A;
     --d-F2F2F2-l-333: #F2F2F2;
     --d-15171C-l-F8F8F8: #15171C;
+    --d-CCC-l-333: #CCC;
+    --d-CCC-l-F5F5F5: #CCC;
     --d-666-l-D8D8D8: #666666;
     --d-333333-l-F2F2F2:#333333;
     --d-17191C-l-FFF: #17191C;
@@ -84,6 +85,13 @@
     --d-000-l-FFF: #000;
     //switch on color
     --d-666-l-CCC:#666;
+    --d-1F3156-l-D2E0F7:#1F3156;
+    --d-F5F5F5-l-666: #F5F5F5;
+    --d-222-l-F6F6F6: #222;
+    --d-333-l-EEE: #333;
+    --d-333-l-F5F7FA: #333;
+    --d-666-l-ccc:#666;
+    --d-E9E9E9-l-333: #E9E9E9;
   }
 
   &.light {
@@ -155,6 +163,8 @@
     --d-333-l-CCC: #CCC;
     --d-333-l-999: #999;
     --d-12B8861A-l-12B8862A: #12B8862A;
+    --d-CCC-l-333: #333;
+    --d-CCC-l-F5F5F5: #F5F5F5;
     --d-F2F2F2-l-333: #333;
     --d-15171C-l-F8F8F8: #F8F8F8;
     --d-666-l-D8D8D8: #d8d8d8;
@@ -165,8 +175,14 @@
     --d-111-l-F8F8F8: #F8F8F8;
     --d-000-l-FFF: #fff;
     --d-1F3156-l-D2E0F7:#D2E0F7;
+    --d-F5F5F5-l-666: #666;
+    --d-222-l-F6F6F6: #F6F6F6;
+    --d-333-l-EEE: #EEE;
+    --d-333-l-F5F7FA: #F5F7FA;
     //switch on color
     --d-666-l-CCC:#CCC;
+    --d-666-l-ccc:#ccc;
+    --d-E9E9E9-l-333: #333;
   }
 }
 

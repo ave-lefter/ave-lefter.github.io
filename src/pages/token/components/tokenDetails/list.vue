@@ -146,7 +146,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
           <template #reference>
             <Icon
               name="custom:filter"
-              :class="`${checkedTrend.length>0?'color-[--d-F5F5F5-l-222]':'color-[--d-666-l-999]'} cursor-pointer text-10px`"
+              :class="`${checkedTrend.length>0?'color-[--d-999-l-666]':'color-[--d-666-l-999]'} cursor-pointer text-10px`"
             />
           </template>
           <template #default>
@@ -184,7 +184,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
         <span>{{ $t('swapPrice') }}</span>
         <Icon
           name="custom:price"
-          :class="`${isVolUSDT?'color-[--d-F5F5F5-l-222]' : 'color-#666'} cursor-pointer`"
+          :class="`${isVolUSDT?'color-[--d-999-l-666]' : 'color-[--d-666-l-999]'} cursor-pointer`"
           @click.self="isVolUSDT=!isVolUSDT"
         />
       </div>

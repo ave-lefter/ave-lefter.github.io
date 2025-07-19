@@ -201,7 +201,7 @@
       </li>
       <li>
         <el-button class="inline-block w-[100%]" :color="isDark ? '#333' : '#F2F2F2'" @click.stop="botStore.tgLogin()"
-          ><img src="@/assets/images/tgIcon.svg" width="20" height="20" >
+          ><img src="@/assets/images/tgIcon.svg" width="20" height="20" class="mt--3px">
         </el-button>
       </li>
     </ul>
