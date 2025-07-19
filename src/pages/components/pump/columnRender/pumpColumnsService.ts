@@ -3,6 +3,7 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
       {
         title: t('basicInfo'),
         list: [
+          'headline',
           'mCapContent',
           'liquidityContent',
           'holdersContent',
@@ -46,6 +47,13 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         fixed: 'left',
         render: 'poolPairContent',
         minWidth:320
+      },
+      {
+        title:t('aiSummary'),
+        isVisible: true,
+        key:'headline',
+        render:'headline',
+        minWidth:232,
       },
       {
         title: t('smarter1'),

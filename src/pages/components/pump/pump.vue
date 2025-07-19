@@ -38,6 +38,7 @@ import {
   Snipers1mContent,
   LastTradeHeader,
   LastTradeContent,
+  Headline,
 } from './columnRender/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
@@ -276,7 +277,8 @@ const filterMap = {
   quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible,
   first_half_elapsed_time: (el: any) => el.isVisible && props.activeSubTab === 'pump_in_almost',
   second_half_elapsed_time: (el: any) => el.isVisible && props.activeSubTab === 'pump_in_almost',
-  progress:(el:any)=>el.isVisible && props.activeSubTab.includes('_in')
+  progress:(el:any)=>el.isVisible && props.activeSubTab.includes('_in'),
+  headline:(el:any)=>el.isVisible && props.activeSubTab.includes('_out')
 }
 
 const visibleColumns = computed(() => {
@@ -291,6 +293,7 @@ const visibleColumns = computed(() => {
 const headerRenderer = computed(() => {
   return {
     poolPair: PoolPairHeader,
+    headline: () => t('aiSummary'),
     mCap: MCapHeader,
     price_change_1m: DynamicPriceChangeHeader,
     price_change_24h: DynamicPriceChangeHeader,
@@ -317,6 +320,7 @@ const headerRenderer = computed(() => {
 const cellRenderer = computed(() => {
   return {
     poolPair: PoolPairContent,
+    headline: Headline,
     mCap: MCapContent,
     price_change_1m: ({ row }) => {
       return <PriceChange row={row} activeInterval="1m" />
