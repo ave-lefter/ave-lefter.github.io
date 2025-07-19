@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="flex justify-between border-b-1px border-b-solid border-b-[--d-222-l-F2F2F2] mb-10px mt-20px">
-      <div class="flex items-center pl-10px gap-24px">
+      <div class="flex items-center gap-24px">
         <a
           v-for="(item, index) in tabs"
           :key="index"
-          :class="`text-14px pb-10px cursor-pointer flex items-center decoration-none lh-20px text-center color-[--d-666-l-999] b-b-solid b-b-3px ${activeTab === item.id ? 'color-[--d-F5F5F5-l-222] b-b-[--d-F5F5F5-l-333]' : 'b-b-transparent'}`"
+          :class="`text-16px pb-10px cursor-pointer flex items-center decoration-none lh-20px text-center color-[--d-666-l-999] b-b-solid b-b-3px ${activeTab === item.id ? 'color-[--d-F5F5F5-l-222] b-b-[--d-F5F5F5-l-333]' : 'b-b-transparent'}`"
           @click.stop.prevent="switchTab(item)"
         >
           {{ item.title }}
