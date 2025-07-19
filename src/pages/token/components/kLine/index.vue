@@ -59,6 +59,8 @@ const amm = computed(() => {
   return tokenStore?.pair?.amm || ''
 })
 
+let loading = false
+
 watch(() => route.params.id, (val) => {
   if (!val) return
   if (_widget?.activeChart()) {
@@ -79,13 +81,13 @@ function switchTokenKline() {
   const val = pair.value
   if (isReady && route.name === 'token-id') {
     const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
-    const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
-    const preResolutions = localStorage.getItem(QUICK_KEY)
+    // const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
+    // const preResolutions = localStorage.getItem(QUICK_KEY)
     resolution.value = initTradingViewIntervals(resolution.value, chain.value, isSupportSecChains)
-    const nextResolutions = localStorage.getItem(QUICK_KEY)
-    if (preResolutions !== nextResolutions) {
-        resetChart()
-    }
+    // const nextResolutions = localStorage.getItem(QUICK_KEY)
+    // if (preResolutions !== nextResolutions) {
+    //     resetChart()
+    // }
     if (_widget) {
       _widget?.resetCache?.()
       _widget?.activeChart?.()?.clearMarks?.()
@@ -447,6 +449,7 @@ async function initChart() {
             from,
             to: firstDataRequest ? 0 : Math.max(to, firstBarTime || 0)
           }
+          loading = true
           getKlineHistoryData(params).then(res => {
             const bars1 = res?.kline_data || []
             const bars = bars1?.map?.(i => ({
@@ -473,6 +476,8 @@ async function initChart() {
             setTimeout(() => {
               useEventBus('klineDataReady').emit()
             }, 10)
+          }).finally(() => {
+            loading = false
           })
           // if (firstDataRequest) {
           //   getKlineHistoryData(params).then(res => {
@@ -613,7 +618,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsSto
     if (event === 'tx') {
       const tx: WSTx = data?.tx
       const interval = switchResolution(resolution)
-      if (tx.pair_address === pair.value && !tx?.tx_type) {
+      if (tx.pair_address === pair.value && !tx?.tx_type && !loading) {
         const t = token.value?.replace?.(/-.*$/, '')
         const newBar1 = buildOrUpdateLastBarFromTx(tx, t, lastBar, interval)
         if (newBar1) {

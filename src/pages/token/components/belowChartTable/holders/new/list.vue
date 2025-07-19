@@ -93,8 +93,12 @@
         </template>
         <template #default="{ row, $index }">
           <div class="flex items-baseline ">
-
-            <span class="color-[--d-666-l-999] mr-10px">{{ $index +1 < 10? "0" : '' }}{{ $index + 1 }}</span>
+            <div class="flex-start">
+              <span class="color-[--d-666-l-999] mr-10px">{{ $index +1 < 10? "0" : '' }}{{ $index + 1 }}</span>
+              <Icon
+                :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
+                :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 mt-4px" @click.stop.prevent="collect(row,$index)" />
+            </div>
             <div class="relative">
               <div class="flex-start">
                 <div
@@ -929,6 +933,7 @@
 </template>
 
 <script setup lang="ts">
+import { deleteAttention, addAttention2 } from '~/api/attention'
 import BigNumber from 'bignumber.js'
 import { getChainInfo, formatDate, getAddressAndChainFromId, getTextWidth } from '@/utils/index'
 
@@ -963,7 +968,9 @@ const { tableList, loading } = toRefs(props)
 const { mode } = storeToRefs(useGlobalStore())
 const { token, price,pair } = storeToRefs(useTokenStore())
 const tokenDetailSStore = useTokenDetailsStore()
-
+const $refs = ref({
+  buttonRefs: {} as Record<number, any>
+})
 const { t } = useI18n()
 const route = useRoute()
 const isShowBalance = shallowRef(false)
@@ -1012,6 +1019,52 @@ function tableRowClick(rowData: {holder: string, remark: string}) {
     user_address: rowData.holder
   })
 }
+
+const collect = async (row: any,index:number) => {
+  if(!useFollowStore().currentAddress){
+    useBotStore().changeConnectVisible(true)
+  }
+  if (useWalletStore().address && !useWalletStore().walletSignature[useWalletStore().address]) {
+    await useWalletStore().signMessageForFavorite()
+  }
+  console.log('collect',row,index)
+  if(row.is_wallet_address_fav !== 1){
+    useFollowStore().confirmAttention($refs.value.buttonRefs[index],row.chain, (form) => {
+      console.log('confirmAttention', form)
+      return addAttention2({
+        address: useFollowStore().currentAddress,
+        user_address: row.holder,
+        user_chain: row.chain,
+        group: form.group,
+        is_monitored: form.is_monitored,
+      }).then(() => {
+        ElMessage.success(t('attention1Success'));
+        (tableList.value as Array<any>)[index].is_wallet_address_fav = 1
+        // getList()
+        return Promise.resolve()
+      }).catch((err) => {
+        return Promise.reject(err)
+      }).finally(() => {
+      })
+    })
+    return 
+  }
+  // loading.value = true
+  deleteAttention({
+    address: useFollowStore().currentAddress,
+    user_address: row.holder,
+    user_chain: row.chain
+  }).then(() => {
+    ElMessage.success(t('attention1Canceled'));
+    (tableList.value as Array<any>)[index].is_wallet_address_fav = 0
+    // getList()
+  }).catch((err) => {
+    console.log(err)
+  }).finally(() => {
+  })
+}
+
+
 function formatUnrealizedProfit(
   row: { bought?: number, sold?: number, avg_purchase_price?: number },
   price = 0

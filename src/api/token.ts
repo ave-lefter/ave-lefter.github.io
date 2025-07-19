@@ -341,6 +341,11 @@ export interface IGetTokenTxsResponse {
   wallet_tag_v2: string;
   newTags: NewTag[];
   wallet_logo: any;
+  // MC计算所需字段
+  total?: string | number;
+  burn_amount?: number;
+  lock_amount?: number;
+  other_amount?: number;
 }
 
 // 新版交易历史
@@ -348,13 +353,18 @@ export function getTokenTxs(query: {
   token_id: string,
   tag_type?: string,
   maker?: string,
+  address?: string,
   time_min?: string,
   time_max?: string
 }): Promise<IGetTokenTxsResponse[]> {
+  const address=localStorage.bot_evmAddress || localStorage.walletAddress
   const {$api} = useNuxtApp()
   return $api('/v2api/token_info/v1/token/txs', {
     method: 'get',
-    query
+    query:{
+      address,
+      ...query
+    }
   })
 }
 
@@ -405,7 +415,7 @@ export interface Profile {
 
 
 // 交易历史流动性
-export async function getPairLiq(pair: string, address?: string): Promise<GetPairLiqResponse[]> {
+export async function getPairLiq(pair: string, address: string=localStorage.walletAddress||localStorage.bot_evmAddress): Promise<GetPairLiqResponse[]> {
   if (!pair || pair.length < 15) {
     return []
   }

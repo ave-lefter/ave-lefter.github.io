@@ -16,6 +16,8 @@ const botStore = useBotStore()
 const botSwapStore = useBotSwap()
 const priceV2Store = usePriceV2Store()
 const tokenStore = useTokenStore()
+const {hide_risk, hide_small} = storeToRefs(useGlobalStore())
+
 watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
   const idToPriceMap: { [key: string]: IPriceV2Response['prices'][0] } = {}
   val.prices.forEach((item) => {
@@ -193,8 +195,8 @@ watch(() => userIds.value, () => {
 })
 
 const tableFilter = ref({
-  hide_risk: 1,
-  hide_small: 0,
+  hide_risk,
+  hide_small,
   user_ids: userIds.value
 })
 const loadingSwap = ref<{ [key: string]: boolean }>({})

@@ -190,7 +190,7 @@ export function formatNumber2(n: string | number, decimals = 4, l = 4, unit: num
 }
 
 export function formatNumber(n: string | number, config: { decimals?: number; l?: number; limit?: number } | number = {}) {
-  let config1: { decimals?: number; l?: number; limit?: number } = {}
+  let config1 = config
   if (typeof config === 'number') {
     config1 = {
       decimals: config,

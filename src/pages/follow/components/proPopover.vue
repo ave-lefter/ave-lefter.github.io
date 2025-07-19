@@ -1,13 +1,14 @@
+<!-- 单输入框pop -->
 <template>
-  <el-popover ref="popoverRef" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" :teleported="true" popper-class="" popper-style="--el-popover-title-font-size:12px;--el-popover-title-text-color:var(--d-FFF-l-000)">
+  <el-popover ref="popoverRef" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" :teleported="true" popper-class="" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)">
     <el-form ref="formRef" :model="form" :rules="rules" @submit.prevent.stop="handleSubmit(formRef)">
-      <el-form-item :prop="props.prop" :required="props.required" label-position="top" size="large" class="mb-12px!">
-        <el-input v-model="form[props.prop]" :placeholder="placeholder" :maxlength="props.maxlength"/>
+      <el-form-item :prop="props.prop" :required="props.required" label-position="top" size="large" class="mb-20px!">
+        <el-input v-model="form[props.prop]" :placeholder="placeholder" :maxlength="props.maxlength" show-word-limit clearable/>
       </el-form-item>
       <el-form-item class="mb-0px!">
         <div class="flex-between w-100%">
-          <el-button style="background: var(--d-333-l-F2F2F2)" class="flex-1" @click.stop.prevent="handleCancel">{{ $t('cancel') }}</el-button>
-          <el-button type="primary" class="flex-1" native-type="submit">{{ $t('confirm') }}</el-button>
+          <el-button class="flex-1" :color="!isDark?'#f2f2f2' : '#333333'" @click.stop.prevent="handleCancel">{{ $t('cancel') }}</el-button>
+          <el-button type="primary" class="flex-1" native-type="submit" color="#3F80F7">{{ $t('confirm') }}</el-button>
         </div>
       </el-form-item>
     </el-form>
@@ -53,7 +54,7 @@ const props=defineProps({
   },
   maxlength:{
     type:Number,
-    default:20
+    default:50
   },
   title: {
     type: String,
@@ -66,7 +67,7 @@ const emits = defineEmits<{
   (e: 'onConfirm', value?: string): void
   (e: 'onCancel'): void
 }>()
-
+const {isDark} = storeToRefs(useGlobalStore())
 const popoverRef=ref()
 const placeholder=computed(() => props.placeholder ?? t('placeholderPrefix') + props.label)
 
