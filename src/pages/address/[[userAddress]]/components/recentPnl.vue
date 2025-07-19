@@ -66,7 +66,7 @@
         sortable="custom"
       >
         <template #default="{ row }">
-          <div v-if="row.balance_amount > 0 && row?.total_purchase > 0 && row?.total_sold == 0" class="color-#12B886 text-11px">
+          <div v-if="row.balance_amount > 0 && row?.total_purchase > 0 && row?.total_sold == 0" class="color-#12B886">
             {{$t('holding')}}
           </div>
           <div v-else>
@@ -89,7 +89,7 @@
         sortable="custom"
       >
         <template #default="{ row }">
-          <div v-if="row?.unrealized_profit == 0 && row.balance_amount == 0" class="color-#FF646D text-11px">
+          <div v-if="row?.unrealized_profit == 0 && row.balance_amount == 0" class="color-#FF646D text-12px">
             {{$t('sellAl')}}
           </div>
           <div v-else>
@@ -123,7 +123,7 @@
           </span>
         </template>
         <template #default="{ row }">
-          <div v-if="row.balance_amount == 0 && row.total_sold > 0" class="color-#FF646D text-11px">{{$t('sellAl')}}</div>
+          <div v-if="row.balance_amount == 0 && row.total_sold > 0" class="color-#FF646D text-12px">{{$t('sellAl')}}</div>
           <div v-else>
             <span v-if="row?.balance_usd == 0">0</span>
             <span v-else-if="row?.balance_usd == '--'">--</span>
