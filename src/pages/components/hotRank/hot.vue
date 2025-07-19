@@ -105,6 +105,7 @@ watch(
 let timer: number
 async function _getTreasureList(shouldLoading = true) {
   try {
+    clearTimeout(timer)
     if (shouldLoading) {
       loading.value = true
     }
@@ -122,7 +123,6 @@ async function _getTreasureList(shouldLoading = true) {
     if (shouldLoading) {
       initWs()
     }
-    clearTimeout(timer)
     timer = window.setTimeout(() => {
       _getTreasureList(false)
     }, 10000)
@@ -208,7 +208,7 @@ function removeTokenFavorite(row, index: number) {
   removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
     .then(() => {
       ElMessage.success(t('cancelled1'))
-      listData.value[index].is_fav = false
+      row.is_fav = false
     })
     .catch((err) => {
       console.log(err)
@@ -223,7 +223,7 @@ function addTokenFavorite(row, index: number) {
   addFavorite(`${row.token}-${row.chain}`, walletAddress.value, 0)
     .then(() => {
       ElMessage.success(t('collected'))
-      listData.value[index].is_fav = true
+      row.is_fav = true
     })
     .catch((err) => {
       console.log(err)
