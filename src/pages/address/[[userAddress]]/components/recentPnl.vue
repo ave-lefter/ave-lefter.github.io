@@ -20,6 +20,7 @@
         <AveEmpty v-if="!loading && tableData.length===0" class="pt-[40px]"/>
         <span v-else/>
       </template>
+
       <TokenColumn
         :column-props="{
           label: $t('recentlyTrade'),
@@ -29,15 +30,7 @@
           sortOrders: ['descending', 'ascending', null],
           prop: 'last_txn_time',
         }"
-      >
-        <template v-if="isSelfAddress" #default="{ row }">
-          <Icon
-            name="bx:bxs-hide"
-            class="absolute top-0 left-0 hidden bxs-hide cursor-pointer color-#959a9f"
-            @click.self.stop="hideToken(row)"
-          />
-        </template>
-      </TokenColumn>
+      />
       <el-table-column
         :label="$t('total_profit')"
         :sort-orders="['descending', 'ascending', null]"
@@ -66,6 +59,29 @@
         </template>
       </el-table-column>
       <el-table-column
+        :label="$t('total_realized_profit')"
+        :sort-orders="['descending', 'ascending', null]"
+        align="right"
+        prop="realized_profit"
+        sortable="custom"
+      >
+        <template #default="{ row }">
+          <div v-if="row.balance_amount > 0 && row?.total_purchase > 0 && row?.total_sold == 0" class="color-#12B886">
+            {{$t('holding')}}
+          </div>
+          <div v-else>
+             <span v-if="row?.realized_profit > 0" class="text-#12B886">
+            ${{ formatNumber(row?.realized_profit || 0, 2) }}
+          </span>
+          <span v-else-if="row?.realized_profit == 0">$0</span>
+          <span v-else-if="row?.realized_profit == '--'">--</span>
+          <span v-else class="color-#FF646D">
+            {{ '-$' + formatNumber(Math.abs(row?.realized_profit) || 0, 2) }}
+          </span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
         :label="$t('total_unrealized_profit')"
         :sort-orders="['descending', 'ascending', null]"
         align="right"
@@ -88,6 +104,7 @@
           </div>
         </template>
       </el-table-column>
+
       <el-table-column
         :label="$t('balance1')"
         :sort-orders="['descending', 'ascending', null]"
@@ -198,7 +215,9 @@
           <span v-else class="color-#12B886">
             {{ formatNumber(row?.total_purchase || 0, 2) }}
           </span>
+
           <span :style="{ color: themeStore.isDark ?  '#666666':'#D8D8D8'  }">/</span>
+
           <template v-if="row?.total_sold == 0">0</template>
           <template v-else-if="row?.total_sold == '--'">--</template>
           <span v-else class="color-#FF646D">
@@ -221,10 +240,9 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 // import { formatNumber2, formatNumberS } from '@/utils/formatNumber'
 import HideTokenDialog from './hideTokenDialog.vue'
-import TokenColumn from '@/components/tokenColumn.vue'
 import AveEmpty from '@/components/aveEmpty.vue'
 import Share from '@/components/share.vue'
 const props = defineProps({
@@ -264,11 +282,15 @@ const props = defineProps({
   address: String,
 })
 
-const _emit = defineEmits(['hideToken'])
+const emit = defineEmits(['hideToken'])
+
 const hideTokenVisible = ref(false)
 const currentHideToken = ref({})
+
 const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
+
 const themeStore = useThemeStore()
+
 const tokenDetailSStore = useTokenDetailsStore()
 const route = useRoute()
 function jumpBalance(row) {

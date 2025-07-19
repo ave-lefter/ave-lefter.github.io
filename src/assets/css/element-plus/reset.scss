@@ -21,7 +21,7 @@
     // color: #ccc;
     --el-text-color-primary: #333;
   }
-  
+
 }
 
 
@@ -139,6 +139,7 @@
 }
 
 .el-checkbox{
+  --el-text-color-regular: var(--d-666-l-999);
   --el-checkbox-font-weight: 400;
   --el-checkbox-text-color:#000;
 }
