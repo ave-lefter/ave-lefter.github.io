@@ -538,4 +538,7 @@ defineExpose({
 ::v-deep .el-switch__action {
   background-color: transparent;
 }
+::v-deep .max-w-42px{
+  max-width: 200px !important;
+}
 </style>
