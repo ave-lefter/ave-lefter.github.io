@@ -55,6 +55,14 @@ export function getHotDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       minWidth:232,
     },
     {
+      title: t('smarter1'),
+      key: 'smart_money_buy_volume_24h',
+      isVisible: true,
+      render: 'smarterContent',
+      minWidth:110,
+      align:'right'
+    },
+    {
       title: t('mCap'),
       isVisible: true,
       key:'mCap',
@@ -126,14 +134,6 @@ export function getHotDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       isVisible: true,
       render: 'holdersContent',
       minWidth:getTextWidth(t('holders'), 50) + 50,
-      align:'right'
-    },
-    {
-      title: t('smarter1'),
-      key: 'smart_money_buy_volume_24h',
-      isVisible: true,
-      render: 'smarterContent',
-      minWidth:110,
       align:'right'
     },
     {
