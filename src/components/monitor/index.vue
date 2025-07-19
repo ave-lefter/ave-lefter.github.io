@@ -243,6 +243,7 @@
               <Icon name="icon-park-solid:volume-notice"/>
               <el-switch
                 v-model="hasRing"
+                class="[&&]:[--el-switch-on-color:#3F80F7]"
                 size="small"
                 />
               <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
