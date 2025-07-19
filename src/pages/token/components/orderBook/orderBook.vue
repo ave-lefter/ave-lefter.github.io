@@ -137,6 +137,7 @@
                   :tags="(row.newTags||[]).map((el: any)=> tagStore.matchTag(el.type))"
                   :walletAddress="row.wallet_address" :chain="row.chain"
                 />
+
                 <UserRemark
                   :remark="row.remark"
                   :address="row.wallet_address"
@@ -144,7 +145,7 @@
                   :chain="row.chain"
                   :wallet_logo="row.wallet_logo"
                   :format-address="(address: string) => '*' + address?.slice(-4)"
-                  class="color-[--d-999-l-666]"
+                  class="color-[--d-999-l-666] truncate max-w-42px"
                   :mouseoverAddress="e => openMarkerTooltip(row, e)"
                   :canEdit="false"
                   @update-remark="updateRemark"

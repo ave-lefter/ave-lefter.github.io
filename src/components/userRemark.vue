@@ -11,7 +11,7 @@
     <template v-if="showAddress">
       <span
         v-if="!!mouseoverAddress"
-        class="remark-com-address truncate max-w-42px"
+        class="remark-com-address"
         :class="addressClass"
         :style="addressStyle"
         :title="showAddressTitle ? remark2 : undefined"
@@ -21,7 +21,7 @@
       </span>
       <span
         v-else
-        class="remark-com-address truncate max-w-42px"
+        class="remark-com-address"
         :class="addressClass"
         :style="addressStyle"
         :title="showAddressTitle ? remark2 : undefined"
@@ -84,7 +84,7 @@ const props = defineProps({
   // eslint-disable-next-line vue/prop-name-casing
   wallet_logo: {
     type: Object as PropType<{ logo?: string; name?: string; url?: string , vip_logo?: string}>,
-    default: () => ({ logo: '', name: '', url: '' })
+    default: () => ({ logo: '', name: '', url: '', vip_logo: '' })
   },
   canEdit: { type: Boolean, default: true },
   avatarClass: { type: String, default: 'mr-10px' }
