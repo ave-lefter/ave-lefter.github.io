@@ -454,7 +454,7 @@ export const SunPump_Router_ABI = [
   'function tokenWhiteList(address) view returns (bool)'
 ]
 
-export const UniChainsV4 = ['base', 'bsc']
+export const UniChainsV4 = ['base', 'bsc', 'eth']
 
 export function getQuoteABI(chain: string) {
   if (UniChainsV4?.includes(chain)) {
