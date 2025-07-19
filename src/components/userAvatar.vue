@@ -13,14 +13,14 @@
     </el-image>
 
     <img
-      v-if="wallet_logo.vip_logo"
+      v-if="wallet_logo?.vip_logo"
       class="icon-vip_logo"
-      :src="wallet_logo.vip_logo"
+      :src="wallet_logo?.vip_logo"
       alt=""
       :style="(chainStyle as any)"
     >
     <img
-      v-else-if="chain && !wallet_logo.vip_logo"
+      v-else-if="chain && !wallet_logo?.vip_logo"
       class="icon-chain"
       :src="`${configStore?.token_logo_url}chain/${chain}.png`"
       alt=""
