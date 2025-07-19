@@ -328,7 +328,7 @@
                   row?.total_volume > 0 ? formatNumber(row?.total_volume || 0, 2) : 0
                 }}
               </div>
-              <span class="hover-dot" :class="!row?.total_trades ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-666]'">
+              <span class="hover-dot text-12px" :class="!row?.total_trades ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-666]'">
                 {{
                   row?.total_trades > 0 ? formatNumber(row?.total_trades || 0, 2) : 0
                 }}
@@ -402,7 +402,7 @@
           sortable="custom"
           :sort-orders="['descending', 'ascending', null]"
           prop="rank_score"
-          :min-width="100"
+          :min-width="110"
         >
         <template #header>
           <span class="bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
@@ -628,7 +628,7 @@
 
         <el-table-column align="right" :min-width="250">
           <template #header>
-            <span class="mr-7px">{{ $t('smartTop3') }}</span>
+            <span class="mr-10px">{{ $t('smartTop3') }}</span>
           </template>
           <template #default="{ row }">
             <div style="" class="flex-end">
@@ -1282,18 +1282,18 @@ a.a-gray{
   line-height: 16px;
   &.bg-red-1 {
     background: #eb2b4b;
-    color: #CCC;
+    color: #F5F5F5;
   }
   &.bg-green-1 {
-    background: #37b270;
-    color: #CCC;
+    background: #12976F;
+    color: #F5F5F5;
   }
   &.bg-gray-1 {
     background: var(--d-222-l-F2F2F2);
     color: var(--d-666-l-999);
   }
   &.bg-yellow-1 {
-    color: #CCC;
+    color: #F5F5F5;
     background: #ffa622;
   }
 }

@@ -71,7 +71,7 @@ export const useFollowStore = defineStore('follow', () => {
       console.log('confirmAttention', form)
       callback(form).then((res) => {
           console.log('confirmAttention', res)
-          if(res){
+          if(typeof res === 'string'){
             ElMessage.warning(String(res))
           }else{
             ElMessage.success(t('attention1Success'))
