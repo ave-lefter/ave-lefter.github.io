@@ -1,6 +1,6 @@
 import {useStorage, useThrottleFn, useWindowSize} from '@vueuse/core'
 // import type {GetmonitorV2ListResponse} from '~/api/monitor'
-
+import { defaultPaginationParams } from '@/utils/constants'
 export const useMonitorStore = defineStore('monitor', () => {
   const visible = useStorage('monitorVisible', false)
   const monitorBoundingRect = useStorage('monitorBoundingRect', {
@@ -14,8 +14,8 @@ export const useMonitorStore = defineStore('monitor', () => {
   const isRightFixed = useStorage('isMonitorRight', false)
   const fixedWidth = useStorage('monitorFixedWidth', 360)
   const hasRing=useStorage('hasRing', false)
-  const monitorList1=ref([] as any[])
-  const monitorList2=ref([] as any[])
+  const monitorList1=shallowRef([] as any[])
+  const monitorList2=shallowRef([] as any[])
   const activeName=ref(0)
   const translateStyle = shallowRef(0)
   const onDrag = useThrottleFn((x: number) => {
@@ -66,9 +66,10 @@ export const useMonitorStore = defineStore('monitor', () => {
   function onFixedResizing(width: number) {
     fixedWidth.value = width
   }
-
+  const user_chain=shallowRef('AllChains')
+  const txType=shallowRef([0,1])
   const selectGroupId = shallowRef(0)
-
+  const paginationParams= ref({...defaultPaginationParams,pageSize: 50})
   // token: 筛选 token
   // history_count：筛选信号数，对应值2, 5, 15
   // 市值：mc_curr，市值过滤，
@@ -126,9 +127,12 @@ export const useMonitorStore = defineStore('monitor', () => {
     listStatus,
     pageParams,
     monitorList1,
+    user_chain,
     monitorList2,
     activeName,
     hasRing,
-    placement
+    placement,
+    paginationParams,
+    txType
   }
 })

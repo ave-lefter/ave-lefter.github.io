@@ -5,7 +5,7 @@
         name="custom:drag2"
         class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2] drag-handle"
     />
-    <el-tabs v-model="monitorStore.activeName" style="" class="m-tabs" @tab-change="handleClick">
+    <el-tabs v-model="activeName" style="" class="m-tabs" @tab-change="handleClick">
       <el-tab-pane :label="$t('walletManage')" :name="0" lazy>
         <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps"/>
         <AveEmpty
@@ -230,15 +230,15 @@
           </el-button>
         </AveEmpty>
       </el-tab-pane>
-      <el-tab-pane :name="monitorStore.activeName">
+      <el-tab-pane :name="activeName">
          <template #label>
             <div class="cursor-move w-100% h-100% drag-handle" />
          </template>
       </el-tab-pane>
-      <el-tab-pane :name="monitorStore.activeName">
+      <el-tab-pane :name="activeName">
         <template #label>
           <div class="m-op flex-end gap-8px w-100% h-100%">
-            <template v-if="monitorStore.activeName===1 && props.isLarge">
+            <template v-if="activeName===1 && props.isLarge">
               <FilterType v-model="txType" :options="txTypeList" />
               <Icon name="icon-park-solid:volume-notice"/>
               <el-switch
@@ -248,13 +248,13 @@
                 />
               <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
             </template>
-            <el-button v-if="(monitorStore.activeName===1) && botStore.evmAddress" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;color: var(--d-999-l-666) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
+            <el-button v-if="(activeName===1) && botStore.evmAddress" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;color: var(--d-999-l-666) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
               <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
               {{ $t('addWallet') }}
             </el-button>
 
             <QuickBuyInput
-              v-if="(monitorStore.activeName===1)&&isLarge"
+              v-if="(activeName===1)&&isLarge"
               v-model="quickBuyValue"
               size="small"
             />
@@ -262,7 +262,7 @@
             <Icon
               name="custom:close"
               class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-333]"
-              @click.self="monitorStore.visible=false"
+              @click.self="visible=false"
             />
         </div>
         </template>
@@ -284,8 +284,7 @@ import { downColor, upColor } from '@/utils/constants'
 import type {AveTable} from '#components'
 const { t } = useI18n()
 
-const monitorStore = useMonitorStore()
-const { hasRing } = storeToRefs(monitorStore)
+const { hasRing ,monitorList2:dataSourceCache,visible,activeName,txType} = storeToRefs(useMonitorStore())
 
 const {updateNum3} = storeToRefs(useFollowStore())
 const { isDark } = storeToRefs(useGlobalStore())
@@ -301,17 +300,17 @@ const props = defineProps({
 })
 
 const dataSource = ref<any[]>([])
-const dataSourceCache = ref<any[]>([])
+// const dataSourceCache = monitorList2
 const loading=ref(false)
 const botStore = useBotStore()
 const wsStore = useWSStore()
 const aveTableRef = ref<InstanceType<typeof AveTable> | null>(null)
 const firstActivated = ref(true)
-const txType = ref([0,1])
+// const txType = ref([0,1])
 const addButtonRef = ref()
 const toggleMc = ref(false)
 const addFavAddressPopRef = ref()
-// const activeName=ref(0)
+// const activeName.value=ref(0)
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const txTypeList=computed(() => {
   return [
@@ -347,9 +346,9 @@ watch(() => txType.value, (val) => {
     init2()
   })
 })
-watch(() => monitorStore.visible, (val) => {
+watch(() => visible.value, (val) => {
   if(!val) return
-  if(monitorStore.activeName===1){
+  if(activeName.value===1){
     updateDateSource()
     nextTick(() => {
       if (!firstActivated.value && aveTableRef.value) {
@@ -439,7 +438,7 @@ const columns = computed(() => {
 })
 watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
   mergeDataSource(val)
-  if(monitorStore.visible&&(monitorStore.activeName===1)){
+  if(visible.value&&(activeName.value===1)){
     updateDateSource()
   }
 })
@@ -460,11 +459,12 @@ const mergeDataSource = (msg:any) => {
       list?.splice?.(100)
     }
     dataSourceCache.value.splice(0, dataSourceCache.value?.length, ...list)
+    console.log('dataSourceCache', dataSourceCache.value?.length)
   }
 }
 
 const updateDateSource = throttle(function() {
-  if(!monitorStore.visible||(monitorStore.activeName!==1)) return
+  if(!visible.value||(activeName.value!==1)) return
   dataSource.value.splice(0, dataSource.value?.length, ...dataSourceCache.value)
 }, 500)
 
@@ -504,7 +504,9 @@ function init2() {
       }
     })
     // console.log('list', list)
-    dataSourceCache.value = list
+    dataSourceCache.value = list.filter(i => {
+      return txType.value.includes(i.tx_type )
+    })  
     updateDateSource()
   }).catch((err) => {
     console.error(err)
