@@ -1088,5 +1088,8 @@
   "botTips4": "4. 无需绑定插件钱包，无需记忆复杂的助记词🔥",
   "botTips5": "5. Ave Bot支持多账户管理🔥",
   "botTips6": "6. 公链无缝切换，支持多条主流公链🔥",
-  "startExperience": "开始体验"
+  "startExperience": "开始体验",
+  "Announcement": "公告通知",
+  "back": "返回",
+  "complete": "完成"
 }

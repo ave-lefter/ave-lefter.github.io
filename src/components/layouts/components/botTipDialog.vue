@@ -10,30 +10,18 @@
   >
     <!--    初始弹窗  -->
     <div v-if="newUserNoticeVisible" style="text-align: center">
-      <div class="flex-center" style="font-size: 24px; color: var(--a-text-5-color)">
+      <div class="flex-center text-24px">
         <img src="@/assets/images/avedex_mobile_logo.png" height="40" alt="" lazy >
-        <span class="ml-10 font-600">Ave.ai</span>
+        <span class="ml-10px font-600 color-[--d-FFF-l-333]">Ave.ai</span>
       </div>
       <div
-        style="
-          text-align: center;
-          font-size: 28px;
-          font-weight: 600;
-          color: var(--a-text-5-color);
-          margin-top: 30px;
-        "
-      >
+        class="text-center text-28px font-600 color-[--d-FFF-l-333] mt-30px"
+       >
         {{ $t('botTipsTitle') }}
       </div>
       <ul
-        style="
-          font-size: 16px;
-          font-weight: 500;
-          margin-top: 30px;
-          line-height: 40px;
-          text-align: left;
-        "
-        :style="{ color: mode === 'dark' ? '#f5f5f5' : '#666666' }"
+        class="text-16px font-500 mt-30px lh-[40px] text-left"
+        :style="{ color: isDark ? '#f5f5f5' : '#666666' }"
       >
         <li>{{ $t('botTips1') }}</li>
         <li>{{ $t('botTips2') }}</li>
@@ -50,19 +38,19 @@
       </ul>
     </div>
     <!--    新公告弹窗  -->
-    <div v-else-if="!isLatestExperienced" class="d-f5f5f5-l-222">
+    <div v-else-if="!isLatestExperienced" class="color-[--d-FFF-l-333]">
       <template v-if="!isMediaType">
-        <strong class="flex-center bell flex-center font-20">
+        <strong class="flex items-center justify-center bell text-20px">
           {{ $t('Announcement') }}
         </strong>
-        <h2 class="title font-28 mb-24">
+        <h2 class="title text-28px mb-24px">
           {{ latestNotice.title }}
         </h2>
-        <div class="my-0 lh-1.5" v-html="latestNotice.content" />
+        <div class="my-0 lh-[1.5]" v-html="latestNotice.content" />
       </template>
       <Swiper
         v-else
-        class="mb-20"
+        class="mb-20px"
         :slides-per-view="1"
         :space-between="8"
         :pagination="{ clickable: true }"
@@ -73,18 +61,18 @@
         <SwiperSlide v-for="({ title, media, desc }, idx) in mediaArr" :key="idx">
           <video
             v-if="supportMediaType.some((el) => media.endsWith(el))"
-            class="video mb-20 loading"
+            class="rounded-16px mb-20px loading"
             width="100%"
             :src="media"
             autoplay
             muted
             loop
           />
-          <img v-else class="video mb-20" width="100%" :src="media" alt="" >
-          <h2 v-if="title" class="title mb_8 text-center">
+          <img v-else class="rounded-16px mb-20px" width="100%" :src="media" alt="" >
+          <h2 v-if="title" class="title mb-8px text-center">
             {{ title }}
           </h2>
-          <p v-if="desc" class="mb-20 mt-0 text-center color-999">
+          <p v-if="desc" class="mb-20px mt-0 text-center color-#999">
             {{ desc }}
           </p>
         </SwiperSlide>
@@ -100,30 +88,30 @@
     </div>
     <!--    底部按钮区域   -->
     <!--媒体类型公告-->
-    <div v-if="isFunctionNoticeAndMediaType" class="py-20 flex-between">
-      <span v-show="swiperActiveIdx === 0" class="color-999 font-14 flex-start"
-        ><img class="mr-4" src="@/assets/images/rocket.svg" >Ave.ai有更新啦</span
+    <div v-if="isFunctionNoticeAndMediaType" class="py-20px flex items-center justify-between">
+      <span v-show="swiperActiveIdx === 0" class="color-#999 text-14px flex items-center"
+        ><img class="mr-4px" src="@/assets/images/rocket.svg" >Ave.ai有更新啦</span
       >
       <el-button
         v-show="swiperActiveIdx !== 0"
-        :style="{ '--el-color-black': '#999', width: '120px' }"
-        :color="mode === 'dark' ? '#333' : '#F5F5F5'"
+        :style="{ '--el-button-text-color': '#999', width: '120px' }"
+        :color="isDark ? '#333' : '#F5F5F5'"
         @click="prev"
       >
         {{ $t('back') }}
       </el-button>
       <div>
-        <div class="mb-5 flex-center" style="color: var(--a-text-5-color)">
+        <div class="mb-5px flex items-center justify-center">
           <img src="@/assets/images/avedex_mobile_logo.png" height="21" alt="" lazy >
-          <span class="ml-5 font-600 font-14">Ave.ai</span>
+          <span class="ml-5px font-600 text-14px color-[--d-FFF-l-333]">Ave.ai</span>
         </div>
-        <div class="font-12 color-999">
+        <div class="text-12px color-#999">
           {{ $t('campaignTitle') }}
         </div>
       </div>
       <el-button
-        :style="{ '--el-color-black': 'var(--d-333-l-fff)', width: '120px' }"
-        :color="mode === 'dark' ? '#F5F5F5' : '#333'"
+        :style="{ '--el-button-text-color': 'var(--d-333-l-FFF)', width: '120px' }"
+        :color="isDark ? '#F5F5F5' : '#333'"
         @click="next"
       >
         {{ isLastSwiper ? $t('complete') : $t('next') }}
@@ -132,7 +120,7 @@
     <!--文本类型的公告-->
     <div v-else class="text-center">
       <el-button
-        :color="mode === 'dark' ? '#f5f5f5' : '#222222'"
+        :color="isDark ? '#F5F5F5' : '#222222'"
         style="max-width: 80%; width: 340px; margin-top: 70px"
         size="large"
         @click.stop="startExperience"
@@ -140,11 +128,11 @@
         {{ $t('startExperience') }}
       </el-button>
       <div v-if="!newUserNoticeVisible && !isLatestExperienced">
-        <div class="mt-30 mb-10 flex-center" style="color: var(--a-text-5-color)">
+        <div class="mt-30px mb-10px flex items-center justify-center" style="color: var(--a-text-5-color)">
           <img src="@/assets/images/avedex_mobile_logo.png" height="21" alt="" lazy >
-          <span class="ml-10 font-600 font-14">Ave.ai</span>
+          <span class="ml-10px font-600 text-14px">Ave.ai</span>
         </div>
-        <div class="font-12 color-999">
+        <div class="text-12px color-#999">
           {{ $t('campaignTitle') }}
         </div>
       </div>
@@ -170,7 +158,7 @@ const loading = ref(false)
 
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
-const { latestNotice, mode } = storeToRefs(globalStore)
+const { latestNotice, isDark } = storeToRefs(globalStore)
 
 const isLatestExperienced = computed(() => {
   return (
@@ -184,6 +172,7 @@ const isMediaType = computed(() => {
   try {
     return JSON.parse(latestNotice.value.media).some((el: any) => el.media)
   } catch {
+    console.log(latestNotice.value.media, 'latestNotice.value.media')
     return false
   }
 })
@@ -243,11 +232,6 @@ watch(()=>[newUserNoticeVisible.value,isLatestExperienced.value],()=>{
   dialogVisible.value = newUserNoticeVisible.value || !isLatestExperienced.value
 })
 </script>
-<style lang="scss" scoped>
-.video {
-  border-radius: 16px;
-}
-</style>
 <style lang="scss">
 .dialog-bot-tips.el-dialog {
   --el-dialog-width: 500px;
@@ -261,7 +245,7 @@ watch(()=>[newUserNoticeVisible.value,isLatestExperienced.value],()=>{
   --swiper-pagination-bullet-horizontal-gap: 8px;
   --swiper-pagination-bullet-inactive-color: var(--d-333-l-D8D8DC);
   --swiper-pagination-bullet-inactive-opacity: 1;
-  --swiper-pagination-color: var(--d-fff-l-333);
+  --swiper-pagination-color: var(--d-FFF-l-333);
 
   .swiper-pagination-bullets.swiper-pagination-horizontal {
     bottom: 0;
@@ -277,12 +261,8 @@ watch(()=>[newUserNoticeVisible.value,isLatestExperienced.value],()=>{
     width: 42px;
     height: 42px;
     border-radius: 16px;
-    background: var(--d-fff-l-f5f5f5) url(~@/assets/images/bell2.svg) center center no-repeat;
+    background: var(--d-FFF-l-F5F5F5) url(@/assets/images/bell2.svg) center center no-repeat;
   }
-}
-
-.d-f5f5f5-l-222 {
-  color: var(--d-f5f5f5-l-222);
 }
 
 .modal-layer {
@@ -290,7 +270,7 @@ watch(()=>[newUserNoticeVisible.value,isLatestExperienced.value],()=>{
 }
 
 .loading {
-  background: url('~@/assets/images/loading.webp') center center no-repeat;
+  background: url('@/assets/images/loading.webp') center center no-repeat;
   background-size: 100px 100px;
 }
 </style>
