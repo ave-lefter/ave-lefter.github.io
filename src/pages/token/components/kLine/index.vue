@@ -1,5 +1,5 @@
 <template>
-  <div class="watermark relative" :style="{height: `${kHeight}px`}">
+  <div class="relative" :style="{height: `${kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
   </div>
   <div
@@ -15,7 +15,7 @@ import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, 
 import { getTimezone, formatDecimals, getSwapInfo, getAddressAndChainFromId, getWSMessage } from '@/utils'
 import { getKlineHistoryData } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
-import { switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, buildOrUpdateLastBarFromTx, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine } from './utils'
+import { switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, buildOrUpdateLastBarFromTx, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark } from './utils'
 import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
 import type { WSTx, KLineBar } from './types'
 import BigNumber from 'bignumber.js'
@@ -573,6 +573,7 @@ async function initChart() {
     }
   })
   updateChartBackground()
+
   _widget.onChartReady(() => {
     isReady = true
     isReadyLine = true
@@ -584,6 +585,7 @@ async function initChart() {
       _widget?.applyOverrides?.({ 'scalesProperties.textColor': '#333' })
     }
 
+
     _widget?.activeChart?.()?.onIntervalChanged().subscribe(null, interval => {
       if (resolution.value !== interval) {
         resolution.value = interval
@@ -591,9 +593,10 @@ async function initChart() {
         _widget?.resetCache?.()
       }
     })
+
+    setWatermark(_widget)
+
     subscribePriceMove()
-
-
     createStudy()
   })
 

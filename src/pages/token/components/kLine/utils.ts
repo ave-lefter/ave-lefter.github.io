@@ -790,3 +790,30 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
   }
 }
 
+export function setWatermark(_widget: IChartingLibraryWidget | null) {
+  const _watermark = _widget?.watermark?.()
+  _watermark?.color().setValue('#BCBED220')
+  _watermark?.setContentProvider(() => {
+    return [
+      {
+        /**
+         * Text to be displayed.
+         */
+        text: 'AVE.AI',
+        /**
+         * Font size to be used (defined in pixels).
+         */
+        fontSize: 70,
+        /**
+         * Line height (defined in pixels).
+         */
+        lineHeight: 1,
+        /**
+         * Vertical offset distance (defined in pixels).
+         */
+        vertOffset: 1,
+    }]
+  })
+  _watermark?.visibility().setValue(true)
+}
+
