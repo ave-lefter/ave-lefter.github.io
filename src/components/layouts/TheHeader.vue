@@ -106,6 +106,7 @@
     <dialog-search v-model="dialogVisible_search" />
     <!-- <component :is="connectWalletCom" v-model="botStore.connectVisible" /> -->
     <ConnectWalletCom />
+    <BotTipDialog/>
   </header>
 </template>
 <script lang="ts" setup>
@@ -115,6 +116,7 @@ import Notice from '~/components/layouts/components/notice.vue'
 // const connectWallet = shallowRef<Component | null>(null)
 import Positions from '@/components/header/positions/index.vue'
 import ExWalletBtn from '../header/connectWallet/exWalletBtn.vue'
+import BotTipDialog from './components/botTipDialog.vue'
 // import connectWallet from '@/components/header/connectWallet/index.vue'
 // const connectWallet = shallowRef<Component | null>(null)
 const { locales } = useI18n()

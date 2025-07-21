@@ -1080,5 +1080,13 @@
   "platform": "平台",
   "profit4": "盈利",
   "loss": "亏损",
-  "onlyPush": "仅看推送"
+  "onlyPush": "仅看推送",
+  "botTipsTitle": "Ave.ai现已支持Bot钱包登录!",
+  "botTips1": "1. 大幅减少交易步骤，一键快速交易🔥",
+  "botTips2": "2. 交易手续费低至 0.65%🔥",
+  "botTips3": "3. 最高五级返佣，60%永久返佣（向管理员申请）",
+  "botTips4": "4. 无需绑定插件钱包，无需记忆复杂的助记词🔥",
+  "botTips5": "5. Ave Bot支持多账户管理🔥",
+  "botTips6": "6. 公链无缝切换，支持多条主流公链🔥",
+  "startExperience": "开始体验"
 }
