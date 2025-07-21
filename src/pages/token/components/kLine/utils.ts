@@ -792,7 +792,7 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
 
 export function setWatermark(_widget: IChartingLibraryWidget | null) {
   const _watermark = _widget?.watermark?.()
-  _watermark?.color().setValue('#BCBED220')
+  _watermark?.color().setValue('#BCBED219')
   _watermark?.setContentProvider(() => {
     return [
       {
@@ -803,7 +803,7 @@ export function setWatermark(_widget: IChartingLibraryWidget | null) {
         /**
          * Font size to be used (defined in pixels).
          */
-        fontSize: 70,
+        fontSize: 60,
         /**
          * Line height (defined in pixels).
          */

@@ -180,8 +180,7 @@ function saveStudy() {
 // 创建指标
 function createStudy() {
   if (_widget?.activeChart) {
-    // let studies = storage.get('tradingViewStudies')
-    const studies: Array<{ name: string }> = JSON.parse(localStorage.getItem('tradingViewStudies') || '[]')
+    const studies: Array<{ name: string }> = JSON.parse(localStorage.tradingViewStudies || '[]')
     studies.forEach(i => {
       _widget?.activeChart?.().createStudy(i.name, false, false)
     })
@@ -577,15 +576,11 @@ async function initChart() {
   _widget.onChartReady(() => {
     isReady = true
     isReadyLine = true
-    // 保存指标
-    saveStudy()
     if (themeStore.isDark) {
       _widget?.applyOverrides?.({ 'scalesProperties.textColor': '#d5d5d5' })
     } else {
       _widget?.applyOverrides?.({ 'scalesProperties.textColor': '#333' })
     }
-
-
     _widget?.activeChart?.()?.onIntervalChanged().subscribe(null, interval => {
       if (resolution.value !== interval) {
         resolution.value = interval
@@ -595,8 +590,8 @@ async function initChart() {
     })
 
     setWatermark(_widget)
-
     subscribePriceMove()
+    // 从缓存中读取数据并创建指标
     createStudy()
   })
 
@@ -605,11 +600,28 @@ async function initChart() {
     isHeaderReady = true
     createHeaderButton()
   })
+
   // onMarkClick
   _widget?.subscribe('onMarkClick', (markId) => {
     console.log('markId', markId)
   })
+
+  subscribeStudyEvent()
+
 }
+
+let isUnload = false
+function subscribeStudyEvent() {
+  _widget?.subscribe('study_event', (_id,  type) => {
+    if ((type === 'create' || type === 'remove') && !isUnload) {
+      saveStudy()
+    }
+  })
+  window.onbeforeunload = () => {
+    isUnload = true
+  }
+}
+
 
 function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsStore.getWSInstance()) {
   ws?.onmessage(e => {
@@ -697,8 +709,8 @@ const { resetAvgPriceLineId } = useAvgPriceLine(() => _widget, () => isReadyLine
 useBotLimitLine(() => _widget, () => isReadyLine, showMarket)
 
 
-onBeforeMount(() => {
-  // _getTotalHolders()
+onBeforeUnmount(() => {
+  isUnload = true
 })
 
 onMounted(() => {
