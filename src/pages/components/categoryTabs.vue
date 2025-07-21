@@ -162,14 +162,20 @@ const sub_category_list = computed(() => {
     })?.sub_category || []
   )
 })
-function updateCategory(category: string, sub_category: CategoryElement[]) {
+const categoryRef = useTemplateRef('categoryRef')
+function updateCategory(category: string, sub_category: CategoryElement[],index:number) {
   emit('update:activeTab', category)
   if (!sub_category.some((el) => el.category === props.activeSubTab)) {
     emit('update:activeSubTab', sub_category[0]?.category || '')
   }
+  scrollTabToCenter(categoryRef,index)
 }
 function updateSubCategory(category: string) {
   emit('update:activeSubTab', category)
+}
+function updateActiveChain(chain: string) {
+  emit('update:activeChain', chain)
+  emit('update:activeTab','hot')
 }
 </script>
 
@@ -178,7 +184,7 @@ function updateSubCategory(category: string) {
     <ChainsSelect
       :activeChain="activeChain"
       :list="chains"
-      @update:activeChain="emit('update:activeChain', $event)"
+      @update:activeChain="updateActiveChain"
     />
     <div class="flex flex-1 gap-16px justify-between">
       <div ref="categoryRef" class="flex gap-2 text-12px flex-1 overflow-x-auto">
@@ -191,7 +197,7 @@ function updateSubCategory(category: string) {
               ? 'color-#F5F5F5 bg-#333'
               : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
           "
-          @click="updateCategory(item.category, item.sub_category || [])"
+          @click="updateCategory(item.category, item.sub_category || [],index)"
         >
           <Icon
             v-if="configMap[item.category as keyof typeof configMap].icon"
