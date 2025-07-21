@@ -1,6 +1,6 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
-import { getHotDefaultColumns } from './columnRender/hotColumusService'
+import { getActivityDefaultColumns } from './columnRender/columusService'
 import { getTreasureList } from '~/api/market'
 import {
   quickContent,
@@ -18,33 +18,28 @@ import {
   SmarterHeader,
   LiquidityContent,
   LiquidityHeader,
-  PriceHeader,
   MCapContent,
   MCapHeader,
-  InsidersContent,
-  Headline,
   DynamicPriceChangeHeader,
   PoolPairHeader,
   PoolPairContent,
   Top10Header,
-  InsidersHeader,
   SnipersHeader,
-  PriceContent,
   PriceChange,
+  Headline,
 } from './columnRender/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
-const localeStore = useLocaleStore()
 const globalStore = useGlobalStore()
 
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
-  activeSubTab?: string
-  activeTab?:string
+  activeSubTab: string
+  activeTab: string
 }>()
 const sortConditions = ref({
   sort: '',
@@ -72,11 +67,11 @@ const filteredListData = computed(() => {
   return listData.value
 })
 function inBlackList(row) {
-  const symbol = row.token0_address === row.target_token ? row.token0_symbol : row.token1_symbol
   return (
     globalStore.pumpBlackList.findIndex(
       (i) =>
-        (i.address == row.token && i.type == 'ca') || (i.address == symbol && i.type == 'keyword')
+        (i.address == row.token && i.type == 'ca') ||
+        (i.address == row.symbol && i.type == 'keyword')
     ) !== -1
   )
 }
@@ -87,7 +82,15 @@ const pageInfo = ref({
 })
 const isVolUSDT = shallowRef(true)
 const loading = shallowRef(false)
-const columns = useStorage('hotUserTableColumns', getHotDefaultColumns(t))
+const storageKey = computed(()=>{
+  return props.activeTab + 'TableColumns'
+})
+let columns = useStorage(storageKey.value, getActivityDefaultColumns(t))
+watch(()=>props.activeTab,()=>{
+  columns = useStorage(storageKey.value, getActivityDefaultColumns(t))
+},{
+  immediate:true
+})
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
@@ -108,7 +111,7 @@ onUnmounted(() => {
   clearTimeout(timer)
 })
 watch(
-  () => [props.activeChain, localeStore.locale],
+  () => [props.activeChain, props.activeTab],
   () => {
     pageInfo.value.pageNO = 1
     _getTreasureList()
@@ -118,13 +121,12 @@ watch(
 let timer: number
 async function _getTreasureList(shouldLoading = true) {
   try {
-    clearTimeout(timer)
     if (shouldLoading) {
       loading.value = true
     }
     const { total: _, ...rest } = pageInfo.value
     const res = await getTreasureList({
-      category: 'hot',
+      category: props.activeTab,
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
       ...sortConditions.value,
@@ -136,6 +138,7 @@ async function _getTreasureList(shouldLoading = true) {
     if (shouldLoading) {
       initWs()
     }
+    clearTimeout(timer)
     timer = window.setTimeout(() => {
       _getTreasureList(false)
     }, 10000)
@@ -143,23 +146,6 @@ async function _getTreasureList(shouldLoading = true) {
     loading.value = false
   }
 }
-onDeactivated(() => {
-  clearTimeout(timer)
-})
-onActivated(() => {
-  timer = window.setTimeout(() => {
-    _getTreasureList(false)
-  }, 10000)
-})
-onUnmounted(() => {
-  clearTimeout(timer)
-  wsStore.send({
-    jsonrpc: '2.0',
-    method: 'unsubscribe',
-    params: ['price_extra'],
-    id: 1,
-  })
-})
 
 const wsStore = useWSStore()
 watch(
@@ -175,6 +161,7 @@ watch(
       const item = pricesMap[el.pair + '-' + el.chain]
       if (item) {
         delete item.holders
+        delete item.last_trade_at
         const market_cap = !el.current_price_usd
           ? 0
           : ((el.market_cap || 0) / el.current_price_usd) * (item.uprice || 0)
@@ -266,7 +253,6 @@ function sizeChange() {
 }
 
 const filterMap = {
-  insider_balance_ratio_cur: (el: any) => el.isVisible && props.activeChain === 'bsc',
   price_change_dynamic: (el: any) =>
     el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval),
   quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible,
@@ -286,7 +272,6 @@ const headerRenderer = computed(() => {
     poolPair: PoolPairHeader,
     headline: () => t('aiSummary'),
     mCap: MCapHeader,
-    current_price_usd: PriceHeader,
     price_change_1m: DynamicPriceChangeHeader,
     price_change_24h: DynamicPriceChangeHeader,
     price_change_dynamic: DynamicPriceChangeHeader,
@@ -299,7 +284,6 @@ const headerRenderer = computed(() => {
     security: () => t('security'),
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
-    insider_balance_ratio_cur: InsidersHeader,
     sniper_tx_count: SnipersHeader,
   }
 })
@@ -308,7 +292,6 @@ const cellRenderer = computed(() => {
     poolPair: PoolPairContent,
     headline: Headline,
     mCap: MCapContent,
-    current_price_usd: PriceContent,
     price_change_1m: ({ row }) => {
       return <PriceChange row={row} activeInterval="1m" />
     },
@@ -327,15 +310,13 @@ const cellRenderer = computed(() => {
     security: securityContent,
     holders_top10_ratio: top10PositionsContent,
     quick: quickContent,
-    insider_balance_ratio_cur: InsidersContent,
-    sniper_tx_count: snipersContent,
+    sniper_tx_count: snipersContent
   }
 })
 </script>
 <template>
   <div v-loading="loading" style="height: calc(100vh - 207px)">
     <AveTable
-    :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
@@ -368,7 +349,6 @@ const cellRenderer = computed(() => {
           :pageSize="pageInfo.pageSize"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
           :activeChain="activeChain"
-          :childrenData="item.children || []"
           @collect="collect"
         />
       </template>

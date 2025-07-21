@@ -5,6 +5,10 @@ import type { CategoryElement, IGetTreasureConfig } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
 import ChainsSelect from './chainsSelect.vue'
 import { getPumpDefault, getPumpOptions } from './pump/columnRender/pumpColumnsService'
+import {
+  getActivityDefaultColumns,
+  getActivityOptions,
+} from './activity/columnRender/columusService'
 
 const emit = defineEmits<{
   (e: 'update:activeTab' | 'update:activeChain' | 'update:activeSubTab', value: string): void
@@ -89,6 +93,34 @@ const configMap = computed(() => {
       getOptions: getPumpOptions,
       class: '',
     },
+    binance_alpha: {
+      icon: '',
+      storageKey: 'binance_alphaTableColumns',
+      getDefaultColumns: getActivityDefaultColumns,
+      getOptions: getActivityOptions,
+      class: '',
+    },
+    cto: {
+      icon: '',
+      storageKey: 'ctoTableColumns',
+      getDefaultColumns: getActivityDefaultColumns,
+      getOptions: getActivityOptions,
+      class: '',
+    },
+    xstocks: {
+      icon: '',
+      storageKey: 'xstocksTableColumns',
+      getDefaultColumns: getActivityDefaultColumns,
+      getOptions: getActivityOptions,
+      class: '',
+    },
+    volume:{
+      icon:'',
+      storageKey:'volumeTableColumns',
+      getDefaultColumns:getActivityDefaultColumns,
+      getOptions:getActivityOptions,
+      class:''
+    }
   }
 })
 function getPumpIcon(isPump: boolean) {
@@ -104,7 +136,20 @@ function getPumpIcon(isPump: boolean) {
 const globalStore = useGlobalStore()
 // 由于其他榜单未上，用临时的 computed过滤
 const supportCategories = computed(() => {
-  const keys = ['hot', 'pump', 'bonk_pump', 'four', 'bonk', 'moonshot', 'Studio', 'novabits']
+  const keys = [
+    'hot',
+    'pump',
+    'bonk_pump',
+    'four',
+    'bonk',
+    'moonshot',
+    'Studio',
+    'novabits',
+    'binance_alpha',
+    'cto',
+    'xstocks',
+    'volume'
+  ]
   return (props.categories || []).filter((el) => {
     return keys.includes(el.category)
   })
