@@ -40,14 +40,14 @@
         class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--d-222-l-F2F2F2] px-2px py-2px">
 
         <button
-          v-for="item in ['s1', 's2', 's3']"
+          v-for="item in (['s1', 's2', 's3'] as const)"
           :id="item"
           :key="item"
           :ref="setBtnRef"
           class="color-[--d-666-l-999] cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center"
           :class="`${item === botSettingStore.botSettings?.[chain]?.selected?'color-[--d-F5F5F5-l-333] bg-[--d-111-l-FFF]':'bg-transparent'}`"
           type="button"
-          @click.stop="botSettingStore.botSettings[chain].selected = item"
+          @click.stop="botSettingStore.botSettings[chain]!.selected = item"
           @mouseenter="showPopover(item)"
           @mouseleave="visible = false"
 
@@ -71,29 +71,23 @@
     >
       <ul>
         <li class="text-14px mt-4px mb-4px flex-start">
-          <Icon
-v-tooltip="$t('slippage')" name="custom:slippage"
-                class="text-12px color-[--d-666-l-999] ml-0 mr-6px cursor-pointer"/>
-          <span v-if="botSettingStore.botSettings?.[chain || '']?.[selected]?.slippage !== 'auto'">{{
+          <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-12px color-[--d-666-l-999] ml-0 mr-6px cursor-pointer"/>
+          <span v-if="botSettingStore.botSettings?.[chain]?.[selected]?.slippage !== 'auto'">{{
               botSettingStore.botSettings?.[chain || '']?.[selected]?.slippage
             }}%</span>
           <span v-else>{{ $t('auto') }}</span>
         </li>
         <li v-if="isEvmChain(chain || '')" class="text-14px mt-4px mb-4px flex-start">
-          <Icon
-v-tooltip="$t('estimatedGas')" name="custom:gas"
-                class="text-12px color-[--d-666-l-999] ml-0 mr-6px cursor-pointer"/>
+          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="text-12px color-[--d-666-l-999] ml-0 mr-6px cursor-pointer"/>
           <span>${{ getEstimatedGas() }}</span>
         </li>
         <li v-if="chain === 'solana'" class="text-14px mt-4px mb-4px flex-start">
-          <Icon
-v-tooltip="$t('priorityFee')" name="custom:gas"
-                class="text-12px color-[--d-666-l-999] mr-6px cursor-pointer ml-0"/>
+          <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-12px color-[--d-666-l-999] mr-6px cursor-pointer ml-0"/>
           <span>{{ botPriorityFee }} SOL</span>
         </li>
         <li class="text-14px mt-4px mb-4px flex-start">
           <span class="mr-4px color-[--d-666-l-999] text-14px">{{ $t('autoSellHalf') }}</span>
-          {{  botSettingStore.botSettings?.[chain]?.[selected]?.autoSell ? $t('on') : $t('off') }}
+          {{  botSettingStore.autoSellConfigs?.autoSell ? $t('on') : $t('off') }}
         </li>
 
         <li class="text-14px mt-4px mb-4px flex-start">
@@ -110,6 +104,7 @@ import BigNumber from 'bignumber.js'
 import SlippageSet from '~/pages/token/components/right/botSwap/slippageSet.vue'
 import {formatBotGasTips} from '@/utils/bot'
 import {isEvmChain, getRpcProvider} from '@/utils'
+import type { BotChain, BotSettingKey } from '~/utils/types'
 
 
 const themeStore = useThemeStore()
@@ -120,7 +115,7 @@ const botSettingStore = useBotSettingStore()
 const tokenStore = useTokenStore()
 const emit = defineEmits(['update:quickBuyValue'])
 const props = withDefaults(defineProps<{
-  chain: string
+  chain: BotChain
   quickBuyValue?: string
   showQuickAmount?: boolean
 }>(), {
@@ -129,7 +124,7 @@ const props = withDefaults(defineProps<{
 const gasPrice = shallowRef(0)
 
 const visible = ref(false)
-const selected = ref('s1')
+const selected = ref<BotSettingKey>('s1')
 const btnRefs = ref<Record<string, HTMLElement | null>>({})
 const currentBtnRef = ref<HTMLElement | null>(null)
 
@@ -161,9 +156,7 @@ const quickBuyValue1 = computed({
 function handleBlurBuyValue(value: string) {
   const decimals = 4
   const v = value
-  const v1 = new BigNumber(v || 0)
-      .toFixed()
-      .match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals || 18}})?`))[0]
+  const v1 = new BigNumber(v || 0)?.toFixed?.().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals || 18}})?`))?.[0] || ''
   if (String(v) !== String(v1)) {
     if (v === '') {
       quickBuyValue1.value = ''
@@ -181,7 +174,7 @@ function setBtnRef(el: HTMLElement | null) {
   }
 }
 
-function showPopover(item: string) {
+function showPopover(item: BotSettingKey) {
   selected.value = item
   currentBtnRef.value = btnRefs.value[item] || null
   visible.value = true

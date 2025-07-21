@@ -1,5 +1,5 @@
 <template>
-  <SlippageSet :key="chain" :canSetAuto="true" :chain="chain" :setting="botSettings[chain]">
+  <SlippageSet :key="chain" :canSetAuto="true" :chain="chain" :setting="botSettings[chain as 'eth']">
     <template #icon>
       <slot name="icon"/>
     </template>
