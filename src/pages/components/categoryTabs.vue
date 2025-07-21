@@ -37,7 +37,7 @@ const configMap = computed(() => {
       class: props.activeTab === 'hot' ? 'color-#FFA622' : '',
     },
     gainer: {
-      icon: 'custom:gain',
+      icon: 'custom:gainer', 
       storageKey: 'gainUserTableColumns',
       getDefaultColumns: getGainDefaultColumns,
       getOptions: getGainOptions,
@@ -47,7 +47,7 @@ const configMap = computed(() => {
 })
 const globalStore = useGlobalStore()
 const supportCategories = computed(() => {
-  const keys = ['hot', 'gain', 'gainer']
+  const keys = ['hot', 'gainer']
   const filtered = (props.categories || []).filter((el) => {
     return keys.includes(el.category)
   })

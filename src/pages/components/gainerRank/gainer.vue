@@ -107,7 +107,6 @@ onMounted(() => {
 onActivated(() => {
   console.log('涨幅榜激活')
   isActive.value = true
-  // 延迟重新获取数据，避免快速切换时的冲突
   setTimeout(() => {
     if (isActive.value) {
       _getTreasureList()
@@ -119,7 +118,6 @@ onDeactivated(() => {
   console.log('涨幅榜停用')
   isActive.value = false
   clearTimeout(timer)
-  // 停用时取消WebSocket订阅，使用唯一ID
   wsStore.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
@@ -181,7 +179,6 @@ async function _getTreasureList(shouldLoading = true) {
     }, 10000)
   } catch (error) {
     console.error('获取涨幅榜数据失败:', error)
-    // 备选方案：使用专用API（不支持分页）
     try {
       const res = await getPriceChangeTopTokens()
       const processedData = Array.isArray(res) ? res : (res.data || [])
@@ -192,9 +189,7 @@ async function _getTreasureList(shouldLoading = true) {
         filteredData = processedData.filter(item => item.chain === props.activeChain)
       }
       
-      // 应用数据映射
       listData.value = filteredData.map(props.listMapFunction)
-      // 专用API可能不返回total，设置一个合理的默认值
       pageInfo.value.total = filteredData.length || 0
     } catch (fallbackError) {
       console.error('备选接口也失败:', fallbackError)
@@ -211,7 +206,7 @@ onUnmounted(() => {
 })
 
 const wsStore = useWSStore()
-const isActive = ref(true) // 追踪组件激活状态
+const isActive = ref(true)
 
 watch(
   () => wsStore.wsResult[WSEventType.PRICE_EXTRA],
