@@ -2,7 +2,6 @@ import type { TokenInfo, TokenInfoExtra, WalletTokenInfo } from './types/token'
 import { getAddressAndChainFromId, getChainInfo } from '@/utils'
 import { NATIVE_TOKEN } from '@/utils/constants'
 import { createCacheRequest } from '#imports'
-import { lo } from 'element-plus/es/locale/index.mjs'
 
 // const testDomain = 'https://0ftrfsdb.xyz'
 

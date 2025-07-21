@@ -54,8 +54,8 @@ const isTxsHighlight = shallowRef(false)
 const { t } = useI18n()
 
 function volConfirm(params?: [string, string]) {
-  confirm(`${volPrefix.value}_min`, `${volPrefix.value}_max`, params, () => {
-    isFilterHighlight.value = false
+  confirm(`${volPrefix.value}_min`, `${volPrefix.value}_max`, params, (isHighlight: boolean) => {
+    isFilterHighlight.value = isHighlight
     volVisible.value = false
   })
 }

@@ -81,13 +81,13 @@ function switchTokenKline() {
   const val = pair.value
   if (isReady && route.name === 'token-id') {
     const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
-    const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
-    const preResolutions = localStorage.getItem(QUICK_KEY)
+    // const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
+    // const preResolutions = localStorage.getItem(QUICK_KEY)
     resolution.value = initTradingViewIntervals(resolution.value, chain.value, isSupportSecChains)
-    const nextResolutions = localStorage.getItem(QUICK_KEY)
-    if (preResolutions !== nextResolutions) {
-        resetChart()
-    }
+    // const nextResolutions = localStorage.getItem(QUICK_KEY)
+    // if (preResolutions !== nextResolutions) {
+    //     resetChart()
+    // }
     if (_widget) {
       _widget?.resetCache?.()
       _widget?.activeChart?.()?.clearMarks?.()
