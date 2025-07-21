@@ -4,7 +4,7 @@ import hot from './components/hotRank/hot.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 const components = {
-  hot,
+  hot
 }
 const activeTab = shallowRef<keyof typeof components>('hot')
 const activeChain = shallowRef('AllChains')
