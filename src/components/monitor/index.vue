@@ -438,9 +438,9 @@ const columns = computed(() => {
   ]
 })
 watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
-  if(monitorStore.visible&&monitorStore.activeName===1){
-    // console.log('ws monitor', val)
-    mergeDataSource(val)
+  mergeDataSource(val)
+  if(monitorStore.visible&&(monitorStore.activeName===1)){
+    updateDateSource()
   }
 })
 
@@ -460,7 +460,6 @@ const mergeDataSource = (msg:any) => {
       list?.splice?.(100)
     }
     dataSourceCache.value.splice(0, dataSourceCache.value?.length, ...list)
-    updateDateSource()
   }
 }
 
