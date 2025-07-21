@@ -362,8 +362,8 @@ const isShowDate = ref(true)
         />
       </div>
       <el-scrollbar
-          ref="scrollbar"
-        v-if="!isLargeScreen"
+          v-if="!isLargeScreen"
+        ref="scrollbar"
         style="margin-right: -12px;padding-right: 12px;"
         :height="scrollHeight"
           @scroll="onScroll"

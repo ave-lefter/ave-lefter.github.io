@@ -573,7 +573,7 @@ export function getColorClass(val: string | number) {
   if (Number(val) > 0) {
     return 'color-#12B886'
   } else if (Number(val) < 0) {
-    return 'color-#FF646D'
+    return 'color-#F6465D'
   } else {
     return 'color-[--d-666-l-999]'
   }
