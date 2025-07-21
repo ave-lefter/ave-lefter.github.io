@@ -270,7 +270,7 @@ watch(()=>[newUserNoticeVisible.value,isLatestExperienced.value],()=>{
 }
 
 .loading {
-  background: url('@/assets/images/loading.webp') center center no-repeat;
+  background: url(@/assets/images/loading.webp) center center no-repeat;
   background-size: 100px 100px;
 }
 </style>
