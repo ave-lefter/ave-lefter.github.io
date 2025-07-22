@@ -311,7 +311,7 @@
           </el-popover>
           <DeBox/>
         </div>
-        <div class="text-12px font-500 flex items-center mt-4px">
+        <div class="text-12px flex items-center mt-4px">
           <a
             v-if="token?.token !== '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'"
             class="hover:color-[--d-F5F5F5-l-333] leading-12px font-500"
@@ -539,7 +539,10 @@
           priceChange > 0 ? `color-${upColor[0]}` : `color-${downColor[0]}`
         "
         >{{ priceChange > 0 ? '+' : ''
-        }}{{ formatNumber(priceChange, 2) }}%</span
+        }}{{ formatNumber(priceChange, {
+          decimals: 2,
+          limit: 10,
+        }) }}%</span
       >
     </div>
 

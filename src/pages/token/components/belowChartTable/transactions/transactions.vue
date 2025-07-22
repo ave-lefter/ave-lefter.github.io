@@ -87,6 +87,7 @@ const ignoreWs = computed(() => {
 const isHoverTable = shallowRef(false)
 
 const isLiquidity = computed(() => activeTab.value === 'liquidity')
+const txsContainer = useTemplateRef('txs-container')
 const columns = computed(() => {
   const visible = token.value?.chain === 'solana' && !isLiquidity.value
   return [{ key: 'time', dataKey: 'time', title: t('time'), minWidth: 80 },
@@ -690,7 +691,7 @@ const collect = async (row: any,index:number) => {
 </script>
 
 <template>
-  <div class="transactions">
+  <div ref="txs-container" class="transactions">
     <div class="px-12px mb-10px flex justify-between">
       <div
         ref="tabsContainer"
@@ -757,7 +758,7 @@ const collect = async (row: any,index:number) => {
               :name="`${tableView.isShowDate ? 'custom:calendar' : 'custom:countdown'}`"
               class="color-[--d-666-l-999] cursor-pointer" @click.self="tableView.isShowDate = !tableView.isShowDate" />
             <TableDateFilter
-              v-model:visible="tableFilterVisible.timestamp" :modelValue="tableFilter.timestamp"
+              v-model:visible="tableFilterVisible.timestamp" :modelValue="tableFilter.timestamp" :boundary="txsContainer || undefined"
               @confirm="onTimestampConfirm" />
           </div>
         </template>
