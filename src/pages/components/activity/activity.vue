@@ -103,6 +103,7 @@ onDeactivated(() => {
   clearTimeout(timer)
 })
 onActivated(() => {
+  clearTimeout(timer)
   timer = window.setTimeout(() => {
     _getTreasureList(false)
   }, 10000)
@@ -317,6 +318,7 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" style="height: calc(100vh - 207px)">
     <AveTable
+      :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"

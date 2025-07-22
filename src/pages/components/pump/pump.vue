@@ -108,9 +108,6 @@ function tableRowClick({ rowData }: RowEventHandlerParams) {
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
 }
 
-onMounted(() => {
-  _getTreasureList()
-})
 watch(
   () => [props.activeChain, props.activeSubTab],
   () => {
@@ -147,22 +144,17 @@ async function _getTreasureList(shouldLoading = true) {
     loading.value = false
   }
 }
+onMounted(() => {
+  _getTreasureList()
+})
 onDeactivated(() => {
   clearTimeout(timer)
 })
 onActivated(() => {
+  clearTimeout(timer)
   timer = window.setTimeout(() => {
     _getTreasureList(false)
   }, 10000)
-})
-onUnmounted(() => {
-  clearTimeout(timer)
-  wsStore.send({
-    jsonrpc: '2.0',
-    method: 'unsubscribe',
-    params: ['price_extra'],
-    id: 1,
-  })
 })
 
 const wsStore = useWSStore()
@@ -366,10 +358,11 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" style="height: calc(100vh - 251px)">
     <AveTable
+      :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
-      :row-height="80"
+      :row-height="81"
       fixed
       style="--el-bg-color: var(--d-111-l-FFF)"
       row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"

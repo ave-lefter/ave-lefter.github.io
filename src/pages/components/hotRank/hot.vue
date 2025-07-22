@@ -44,7 +44,7 @@ const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
   activeSubTab?: string
-  activeTab?:string
+  activeTab?: string
 }>()
 const sortConditions = ref({
   sort: '',
@@ -93,20 +93,27 @@ function tableRowClick({ rowData }: RowEventHandlerParams) {
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
 }
 
+const mounted = shallowRef(false)
 onMounted(() => {
+  setTimeout(()=>{
+    mounted.value = true
+  },20)
   _getTreasureList()
+})
+onActivated(() => {
+  if(!mounted.value){
+    return
+  }
+  clearTimeout(timer)
+  _getTreasureList(false)
 })
 onDeactivated(() => {
   clearTimeout(timer)
 })
-onActivated(() => {
-  timer = window.setTimeout(() => {
-    _getTreasureList(false)
-  }, 10000)
-})
 onUnmounted(() => {
   clearTimeout(timer)
 })
+
 watch(
   () => [props.activeChain, localeStore.locale],
   () => {
@@ -119,6 +126,9 @@ let timer: number
 async function _getTreasureList(shouldLoading = true) {
   try {
     clearTimeout(timer)
+    if (props.activeTab !== 'hot') {
+      return
+    }
     if (shouldLoading) {
       loading.value = true
     }
@@ -143,23 +153,6 @@ async function _getTreasureList(shouldLoading = true) {
     loading.value = false
   }
 }
-onDeactivated(() => {
-  clearTimeout(timer)
-})
-onActivated(() => {
-  timer = window.setTimeout(() => {
-    _getTreasureList(false)
-  }, 10000)
-})
-onUnmounted(() => {
-  clearTimeout(timer)
-  wsStore.send({
-    jsonrpc: '2.0',
-    method: 'unsubscribe',
-    params: ['price_extra'],
-    id: 1,
-  })
-})
 
 const wsStore = useWSStore()
 watch(
@@ -335,7 +328,7 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" style="height: calc(100vh - 207px)">
     <AveTable
-    :loading="loading"
+      :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
@@ -357,7 +350,11 @@ const cellRenderer = computed(() => {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
         />
       </template>
-      <template v-for="item in visibleColumns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
+      <template
+        v-for="item in visibleColumns"
+        :key="item.key"
+        #[`cell-${item.key}`]="{ row, rowIndex }"
+      >
         <component
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"
