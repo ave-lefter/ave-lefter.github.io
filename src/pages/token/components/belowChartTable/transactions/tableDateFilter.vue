@@ -22,7 +22,7 @@ const filterTime = ref([])
 <template>
   <el-popover
     v-model:visible="computedVisible"
-    placement="bottom-start"
+    placement="bottom"
     :width="420"
     trigger="click"
     teleported

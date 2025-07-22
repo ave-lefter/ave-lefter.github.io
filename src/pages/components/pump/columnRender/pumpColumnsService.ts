@@ -39,6 +39,7 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
   }
   
   export function getPumpDefault(t: ReturnType<typeof useI18n>['t']) {
+    console.log(getTextWidth(t('snipers_1m'), 50) + 70,'minw')
     return [
       {
         title: t('poolPair'),
@@ -190,7 +191,7 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         key: 'rusher_tx_count',
         isVisible: false,
         render: 'snipers1mContent',
-        minWidth:getTextWidth(t('snipers_1m'), 50) + 50,
+        minWidth:getTextWidth(t('snipers_1m'), 50) + 60,
         align:'right'
       },
       {
