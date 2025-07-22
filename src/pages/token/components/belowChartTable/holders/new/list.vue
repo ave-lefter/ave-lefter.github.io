@@ -239,7 +239,7 @@
             <span>{{ $t('ratio')}}/{{ isShowBalance ? $t('bal') : $t('amount') }}</span>
             <img
               v-show="isShowBalance"
-              class="clickable ml-3"
+              class="clickable ml-3px"
               src="@/assets/images/ratio.svg"
               height="12"
               alt=""
@@ -248,7 +248,7 @@
             >
             <img
               v-show="!isShowBalance"
-              class="clickable ml-3"
+              class="clickable ml-3px"
               src="@/assets/images/amount.svg"
               height="12"
               alt=""
@@ -1046,7 +1046,7 @@ const collect = async (row: any,index:number) => {
       }).finally(() => {
       })
     })
-    return 
+    return
   }
   // loading.value = true
   deleteAttention({

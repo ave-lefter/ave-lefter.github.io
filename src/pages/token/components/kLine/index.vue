@@ -21,6 +21,7 @@ import type { WSTx, KLineBar } from './types'
 import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
 import {DefaultHeight} from '~/utils/constants'
+import { TW_STUDY } from './constant'
 
 const tokenStore = useTokenStore()
 const botStore = useBotStore()
@@ -173,14 +174,14 @@ function resetChart() {
 function saveStudy() {
   if (_widget?.activeChart) {
     const studies = _widget?.activeChart?.().getAllStudies()
-    localStorage.setItem('tradingViewStudies', JSON.stringify(studies.filter(i => i.name !== 'Volume')))
+    localStorage.setItem(TW_STUDY, JSON.stringify(studies.filter(i => i.name !== 'Volume')))
   }
 }
 
 // 创建指标
 function createStudy() {
   if (_widget?.activeChart) {
-    const studies: Array<{ name: string }> = JSON.parse(localStorage.tradingViewStudies || '[]')
+    const studies: Array<{ name: string }> = JSON.parse(localStorage?.[TW_STUDY] || '[]')
     studies.forEach(i => {
       _widget?.activeChart?.().createStudy(i.name, false, false)
     })
@@ -263,7 +264,7 @@ async function initChart() {
     interval: resolution.value as any,
     theme: themeStore.theme,
     container: 'tv_chart_container',
-    library_path: `${urlPrefix}charting_library-29.2.0/charting_library/`,
+    library_path: `${urlPrefix}charting_library-29.4.0/charting_library/`,
     locale: formatLang(localeStore.locale) as LanguageCode,
     disabled_features: [
       'header_symbol_search',
