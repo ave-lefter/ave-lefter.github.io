@@ -7,8 +7,8 @@
       </el-form-item>
       <el-form-item class="mb-0px!">
         <div class="flex-between w-100%">
-          <el-button style="background: var(--d-333-l-F2F2F2)" class="flex-1" @click.stop.prevent="handleCancel">{{ $t('cancel') }}</el-button>
-          <el-button type="primary" class="flex-1" native-type="submit">{{ $t('confirm') }}</el-button>
+          <el-button class="flex-1" :color="!isDark?'#f2f2f2' : '#333333'" @click.stop.prevent="handleCancel">{{ $t('cancel') }}</el-button>
+          <el-button type="primary" class="flex-1" native-type="submit" color="#3F80F7">{{ $t('confirm') }}</el-button>
         </div>
       </el-form-item>
     </el-form>
@@ -67,7 +67,7 @@ const emits = defineEmits<{
   (e: 'onConfirm', value?: string): void
   (e: 'onCancel'): void
 }>()
-
+const {isDark} = storeToRefs(useGlobalStore())
 const popoverRef=ref()
 const placeholder=computed(() => props.placeholder ?? t('placeholderPrefix') + props.label)
 

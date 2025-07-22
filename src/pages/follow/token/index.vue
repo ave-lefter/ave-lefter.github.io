@@ -294,7 +294,7 @@ onMounted(() => {
     <div v-if="botStore.evmAddress || walletStore.address"
       class="flex items-center px-16px mt-12px gap-8px overflow-x-auto scrollbar-hide">
       <div v-for="(item, index) in allTabsGroup" :key="item.value"
-        class="cursor-pointer text-12px color-[#666] bg-[--d-1A1A1A-l-F2F2F2] px-8px h-28px rounded-4px shrink-0 flex items-center"
+        class="cursor-pointer text-12px color-[--d-666-l-999] bg-[--d-1A1A1A-l-F2F2F2] px-8px h-28px rounded-4px shrink-0 flex items-center"
         :class="[activeTab === item.value && 'bg-[--d-333-l-0A0B0C] color-[#F5F5F5]']"
         @click="setActiveTab(item.value)">
         {{ item.label }}
@@ -305,17 +305,15 @@ onMounted(() => {
           </template>
           <div>
             <div v-if="!editId">
-              <div
-                class="flex items-center cursor-pointer hover:bg-[--d-333-l-0A0B0C] hover:color-[#F5F5F5] px-10px py-5px"
+              <div class="flex items-center cursor-pointer hover:bg-[--d-333-l-FFF] px-10px py-5px"
                 @click.stop="handleUpdateGroup(item)">
-                <Icon name="fe:edit" class="color-#666 text-14px" />
-                <view class="ml-4px text-12px">{{ t('rename') }}</view>
+                <Icon name="fe:edit" class="color-[--d-666-l-999] text-16px" />
+                <view class="ml-4px text-12px text-[--d-F5F5F5-l-333]">{{ t('rename') }}</view>
               </div>
-              <div
-                class="flex items-center cursor-pointer hover:bg-[--d-333-l-0A0B0C] hover:color-[#F5F5F5] px-10px py-5px"
+              <div class="flex items-center cursor-pointer hover:bg-[--d-333-l-FFF] px-10px py-5px"
                 @click.stop="handleDeleteGroup(item.value)">
-                <Icon name="bx:bxs-trash-alt" class="text-15px color-#666" />
-                <view class="ml-4px text-12px">{{ t('delete') }}</view>
+                <Icon name="bx:bxs-trash-alt" class="text-16px color-[--d-666-l-999]" />
+                <view class="ml-4px text-12px text-[--d-F5F5F5-l-333]">{{ t('delete') }}</view>
               </div>
             </div>
             <div v-else class="px-15px">
@@ -340,8 +338,8 @@ onMounted(() => {
         :width="250">
         <template #reference>
           <!-- 新增 -->
-          <div style="background: rgba(63, 128, 247, 0.10);" @click="editId = undefined"
-            class="cursor-pointer text-12px color-[#3F80F7] px-8px h-28px rounded-4px shrink-0 flex items-center">
+          <div @click="editId = undefined"
+            class="cursor-pointer text-12px bg-[--d-222-l-F2F2F2] color-[--d-999-l-666] px-8px h-28px rounded-4px shrink-0 flex items-center">
             <Icon name="custom:add-icon" class="text-12px mr-2px" />
             {{ t('newGroup') }}
           </div>
@@ -364,24 +362,24 @@ onMounted(() => {
       </el-popover>
       <el-popover trigger="click" @hide="moveValue = ''" ref="moveGroupPopoverRef" :width="250">
         <template #reference>
-          <div style="background: rgba(63, 128, 247, 0.10);" @click="handleMoveGroup"
-            class="cursor-pointer text-12px color-[#3F80F7] px-8px h-28px rounded-4px shrink-0 flex items-center">
+          <div @click="handleMoveGroup"
+            class="cursor-pointer text-12px bg-[--d-222-l-F2F2F2] color-[--d-999-l-666] px-8px h-28px rounded-4px shrink-0 flex items-center">
             <Icon name="custom:list-icon" class="text-12px mr-2px" />
             {{ t('groupManage') }}
           </div>
         </template>
         <div>
-          <div>{{ t('groupManage') }}</div>
-          <el-input v-model="moveValue" class="mt-8px" :placeholder="t('searchGroup')" />
-           <el-scrollbar wrap-class="max-h-[400px]">
-             <VueDraggableNext v-model="moveList" :sort="true" ghost-class="ghost" :animation="300">
-               <div class="py-12px px-8px flex justify-between items-center hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
-                 v-for="item in moveList.filter(item => item.label.includes(moveValue))" :key="item.value">
-                 {{ item.label }}
-                 <Icon name="custom:move-icon" class="text-16px shrink-0 ml-5px" />
-               </div>
-             </VueDraggableNext>
-           </el-scrollbar>
+          <div class="mb-8px">{{ t('groupManage') }}</div>
+          <!-- <el-input v-model="moveValue" class="mt-8px" :placeholder="t('searchGroup')" /> -->
+          <el-scrollbar wrap-class="max-h-[400px]">
+            <VueDraggableNext v-model="moveList" :sort="true" ghost-class="ghost" :animation="300">
+              <div class="py-12px px-8px flex justify-between items-center hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
+                v-for="item in moveList.filter(item => item.label.includes(moveValue))" :key="item.value">
+                {{ item.label }}
+                <Icon name="custom:move-icon" class="text-16px shrink-0 ml-5px" />
+              </div>
+            </VueDraggableNext>
+          </el-scrollbar>
           <div class="flex items-center justify-between mt-12px gap-12px">
             <div @click="moveGroupPopoverRef?.hide()"
               class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
@@ -429,7 +427,7 @@ onMounted(() => {
                   class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 color-#ffbb19"
                   @click.stop.prevent="collect(row)" />
                 <div class="relative ml-3px">
-                  <el-image class="w-32px h-32px rounded-full" :src="getSymbolDefaultIcon({
+                  <el-image class="w-32px h-32px rounded-full mt-6px" :src="getSymbolDefaultIcon({
                     chain: row?.chain,
                     symbol: row.symbol,
                     logo_url: row.logo_url
@@ -441,11 +439,11 @@ onMounted(() => {
                       <img class="w-32px h-32px rounded-full" :src="getChainDefaultIcon(row?.chain, row.symbol)" />
                     </template>
                   </el-image>
-                  <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px"
+                  <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px rounded-[50%]"
                     :src="`${configStore.token_logo_url}chain/${row?.chain}.png`" alt=""
                     onerror="this.src='/icon-default.png'" srcset="" />
                 </div>
-                <div class="ml-5px">
+                <div class="ml-8px flex flex-col lh-none justify-between h-32px">
                   <div class="flex items-center">
                     <span class="text-13px">{{ row.symbol }}</span>
                     <div class="text-12px text-[--d-666-l-999] ml-4px">
@@ -460,7 +458,7 @@ onMounted(() => {
                       <Icon class="text-[--d-666-l-999] h-12px w-12px text-12px" name="custom:search" />
                     </a>
                   </div>
-                  <div class="flex items-center mt-2px">
+                  <div class="flex items-center">
                     <!-- <span class="text-[--d-CCC-l-999]">({{ '*' + row.token?.slice(-4) }})</span> -->
                     <div
                       class="text-[#3f80f7] border-[0.5px] border-solid border-[#3f80f7] box-border rounded-4px bg-transparent text-10px px-4px max-w-[60px] h-16px flex items-center truncate"
@@ -596,6 +594,14 @@ onMounted(() => {
 </style>
 
 <style lang="scss" scoped>
+:deep(.el-table .sort-caret) {
+  border: solid 4px transparent;
+}
+
+:deep(.el-table .caret-wrapper) {
+  height: 10px;
+}
+
 :deep(.el-table.el-table thead .el-table__cell) {
   height: 40px;
   font-size: 12px !important;

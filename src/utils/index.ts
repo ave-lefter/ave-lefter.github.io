@@ -142,7 +142,13 @@ export function formatTime(time: number | string) {
   if (time < 3600 * 24) {
     return `${Math.floor(time / 3600)}h`
   }
-  return `${Math.floor(time / 3600 / 24)}d`
+  if (time < 3600 * 24 * 30) {
+    return `${Math.floor(time / 3600 / 24)}d`
+  }
+  if (time < 3600 * 24 * 30 * 12) {
+    return `${Math.floor(time / 3600 / 24 / 30 )}M`
+  }
+  return `${Math.floor(time / 3600 / 24 / 30 / 12)}y`
 }
 
 export function formatTimeFromNow(val: number | string, isNum = false) {

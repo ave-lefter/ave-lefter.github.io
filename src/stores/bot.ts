@@ -261,8 +261,7 @@ export const useBotStore = defineStore('bot', () => {
         'params': [
           'monitor',     // topic
           userInfo.value?.tgUid, // tgUid
-          'web',
-          'proto'
+          'web'
         ],
         'id': 1
       }

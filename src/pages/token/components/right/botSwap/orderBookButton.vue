@@ -1,6 +1,6 @@
 <template>
   <button
-    class="order-book-btn ml-auto clickable"
+    class="order-book-btn mr--12px clickable"
     :class="{ 'active': modelValue }"
     @click.stop="handleClick"
   >

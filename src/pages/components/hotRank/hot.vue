@@ -130,6 +130,7 @@ watch(
 let timer: number
 async function _getTreasureList(shouldLoading = true) {
   try {
+    clearTimeout(timer)
     if (shouldLoading) {
       loading.value = true
     }
@@ -147,7 +148,6 @@ async function _getTreasureList(shouldLoading = true) {
     if (shouldLoading) {
       initWs()
     }
-    clearTimeout(timer)
     timer = window.setTimeout(() => {
       _getTreasureList(false)
     }, 10000)
@@ -241,7 +241,7 @@ function removeTokenFavorite(row, index: number) {
   removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
     .then(() => {
       ElMessage.success(t('cancelled1'))
-      listData.value[index].is_fav = false
+      row.is_fav = false
     })
     .catch((err) => {
       console.log(err)
@@ -256,7 +256,7 @@ function addTokenFavorite(row, index: number) {
   addFavorite(`${row.token}-${row.chain}`, walletAddress.value, 0)
     .then(() => {
       ElMessage.success(t('collected'))
-      listData.value[index].is_fav = true
+      row.is_fav = true
     })
     .catch((err) => {
       console.log(err)
@@ -341,10 +341,11 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" style="height: calc(100vh - 207px)">
     <AveTable
+    :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
-      :row-height="80"
+      :row-height="81"
       fixed
       style="--el-bg-color: var(--d-111-l-FFF)"
       row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
