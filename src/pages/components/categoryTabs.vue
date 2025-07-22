@@ -187,7 +187,7 @@ function updateActiveChain(chain: string) {
       @update:activeChain="updateActiveChain"
     />
     <div class="flex flex-1 gap-16px justify-between">
-      <div ref="categoryRef" class="flex gap-2 text-12px flex-1 overflow-x-auto">
+      <div ref="categoryRef" class="flex gap-2 text-12px flex-1 overflow-x-auto scrollbar-hide">
         <span
           v-for="(item, index) in supportCategories"
           :key="index"
