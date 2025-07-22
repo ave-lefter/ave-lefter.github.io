@@ -17,28 +17,28 @@
                 <el-image
                   class="w-32px h-32px rounded-full" :src="getSymbolDefaultIcon({
                   chain: row?.chain,
-                  symbol: row.swapType === 2 || row.swapType === 6 ? row?.inTokenSymbol : row.outTokenSymbol,
-                  logo_url: row.swapType === 2 || row.swapType === 6 ? row?.inTokenLogoUrl : row.outTokenLogoUrl
+                  symbol: !isBuy(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol,
+                  logo_url: !isBuy(row.swapType) ? row?.inTokenLogoUrl : row.outTokenLogoUrl
                 })">
                   <template #error>
                     <img
                       class="w-32px h-32px"
-                      :src="getChainDefaultIcon(row?.chain, !row?.isBuy ? row?.inTokenSymbol : row.outTokenSymbol)"
+                      :src="getChainDefaultIcon(row?.chain, !isBuy(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol)"
                       alt="" srcset="">
                   </template>
                   <template #placeholder>
                     <img
                       class="w-32px h-32px"
-                      :src="getChainDefaultIcon(row?.chain, !row?.isBuy ? row?.inTokenSymbol : row.outTokenSymbol)"
+                      :src="getChainDefaultIcon(row?.chain, !isBuy(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol)"
                       alt="" srcset="">
                   </template>
                 </el-image>
                 <img
-                  v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px"
+                  v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px rd-50%"
                   :src="`${configStore.token_logo_url}chain/${row.chain}.png`" alt="" srcset="">
               </div>
             </div>
-            <span class="text-[var(--d-eaecef-l-333333)] text-13px">{{ row.swapType === 2 || row.swapType === 6 ?
+            <span class="text-[var(--d-eaecef-l-333333)] text-13px">{{ !isBuy(row.swapType) ?
               row?.inTokenSymbol :
               row.outTokenSymbol
             }}</span>
@@ -71,11 +71,11 @@
           </div>
         </template>
         <template #default="{ row }">
-          <div v-if="row.swapType === 6" class="text-13px text-[#F6465D] text-center px-5px py-2px  rounded-4px" style="background: rgba(246, 70, 93, 0.10)">
-            {{ t('limit') }}/{{ t('sell') }}
+          <div v-if="!isBuy(row.swapType)" class="text-13px text-[#F6465D] text-center px-5px py-2px  rounded-4px" style="background: rgba(246, 70, 93, 0.10)">
+            {{ getSwapTypeLabel(row.swapType) }}
           </div>
-          <div v-if="row.swapType === 5" class="text-13px text-[#12B886] text-center px-5px py-2px rounded-4px" style="background: rgba(18, 184, 134, 0.10)">
-            {{ t('limit') }}/{{ t('buy') }}
+          <div v-else class="text-13px text-[#12B886] text-center px-5px py-2px rounded-4px" style="background: rgba(18, 184, 134, 0.10)">
+            {{ getSwapTypeLabel(row.swapType) }}
           </div>
         </template>
       </el-table-column>
@@ -84,12 +84,13 @@
           <span>{{ t('price') }}</span>
         </template>
         <template #default="{ row }">
-          <span class="text-[var(--d-999-l-959A9F)]">${{ formatNumber(row?.PriceLimit || 0) }}</span>
+          <span v-if="row.swapType !== 13 && row.swapType !== 14" class="text-[--d-999-l-959A9F]">${{ formatNumber(row?.PriceLimit || 0) }}</span>
+          <span v-else>--</span>
         </template>
       </el-table-column>
       <el-table-column :label="t('volume4')" align="right">
         <template #default="{ row }">
-          <span class="text-[var(--d-999-l-959A9F)]">${{ formatNumber(Number(row?.inValue) || 0, 2) }}</span>
+          <span class="text-[--d-999-l-959A9F]">${{ formatNumber(Number(row?.inValue) || 0, 2) }}</span>
         </template>
       </el-table-column>
 
@@ -100,7 +101,7 @@
         <template #default="{ row }">
           <span class="text-[var(--d-999-l-959A9F)]">
             <span class="text-[var(--d-999-l-959A9F)] text-right">
-              <template v-if="row.swapType === 2 || row.swapType === 6">
+              <template v-if="!isBuy(row.swapType)">
                 {{ !!Number(row?.inAmount) ? formatNumber(formatUnits(new BigNumber(row?.inAmount || 0).toFixed(0),
                   row.inTokenDecimals || 0) as string, 4) : '--'
                 }}
@@ -174,6 +175,7 @@ import { formatNumber } from '~/utils/formatNumber'
 import { bot_getUserPendingTx, bot_cancelLimitOrdersByBatch } from '@/api/token'
 import { evm_utils } from '@/utils'
 import { ref } from 'vue'
+import { useEventBus } from '@vueuse/core'
 
 const { formatUnits } = evm_utils
 const props = defineProps({
@@ -203,7 +205,8 @@ const filterConditions = ref({
   statusType: ['waiting', 'confirmed', 'error', 'cancelled', 'sent']
 })
 
-const txOrder = ref([])
+type GetUserPendingTxRes = Awaited<ReturnType<typeof bot_getUserPendingTx>>
+const txOrder = ref<GetUserPendingTxRes>([])
 const loading = ref(false)
 // const isUnit = ref(true)
 
@@ -214,6 +217,36 @@ const tableHeight = computed(() => {
 watch([() => props.currentToken, () => botStore.userInfo?.evmAddress || ''], () => {
   getUserPendingTx()
 })
+
+useEventBus<string>('updateLimitOrder').on(chain => {
+  if (chain === props.chain) {
+    getUserPendingTx()
+  }
+})
+
+function getSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) {
+  const swapTypeMap = {
+    1: t('buy'),
+    2: t('sell'),
+    3: 'Wrap',
+    4: 'Unwrap',
+    5: `${ t('limit') }/${ t('buy') }`,
+    6: `${ t('limit') }/${ t('sell') }`,
+    7: t('followBuy'),
+    8: t('followSell'),
+    12: t('trailingStop'),
+    13: t('listingOnDex'),
+    14: t('devSell')
+  } as const
+  if (swapTypeMap[swapType]) {
+    return swapTypeMap[swapType]
+  }
+  return ''
+}
+
+function isBuy(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) {
+  return swapType === 1 || swapType === 5 || swapType === 7
+}
 
 function handleCancelOrder(row: any) {
   ElMessageBox.confirm(t('botCancelOrder'), '', {
@@ -227,11 +260,12 @@ function handleCancelOrder(row: any) {
         batchId: row.batchId
       })
       getUserPendingTx()
+      useEventBus<string>('updateKlineLimitLine').emit()
     }).catch(() => { })
 }
 
 const handleTokenClick = (row: any) => {
-  const token = row.swapType === 2 || row.swapType === 6 ? row?.inTokenAddress : row.outTokenAddress
+  const token = !isBuy(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
   if (!token) {
     return
   }
@@ -260,7 +294,7 @@ function handleTypeCommand(command: string) {
 // }
 
 function tableRowClick(row: any) {
-  const token = row.swapType === 2 || row.swapType === 6 ? row?.inTokenAddress : row.outTokenAddress
+  const token = !isBuy(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
   if (!token) {
     return
   }
@@ -286,10 +320,10 @@ const getUserPendingTx = async (chainValue?: string) => {
     txOrder.value = res || []
     if (filterConditions.value.swapType.length === 1) {
       if (filterConditions.value.swapType[0] === 'buy') {
-        txOrder.value = txOrder.value.filter((item: any) => item.swapType === 5)
+        txOrder.value = txOrder.value.filter((item: any) => isBuy(item.swapType))
       }
       if (filterConditions.value.swapType[0] === 'sell') {
-        txOrder.value = txOrder.value.filter((item: any) => item.swapType === 6)
+        txOrder.value = txOrder.value.filter((item: any) => !isBuy(item.swapType))
       }
     }
     tokenStore.registrationNum = txOrder.value.length

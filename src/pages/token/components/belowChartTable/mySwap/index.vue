@@ -12,9 +12,11 @@ const walletStore = useWalletStore()
 const { t } = useI18n()
 const tokenStore = useTokenStore()
 const route = useRoute()
+const wsStore = useWSStore()
 
 const unifiedRef = ref()
-const activeTab = ref('solana')
+const _chain = getAddressAndChainFromId(route.params.id as string)?.chain
+const activeTab = ref(_chain || 'solana')
 const botOrderOnlyCurrentToken = useSessionStorage('mySwapBotOrderOnlyCurrentToken', true)
 const walletTxData = ref<any>()
 const tabs = computed(() => {
@@ -127,14 +129,13 @@ const getWalletTxData = async () => {
   }
   const txInfo = await bot_getUserWalletTxInfo(params)
   walletTxData.value = txInfo[0]
-  console.log(txInfo, 'txInfo')
 }
 
-let timer: any
+let timer: null | ReturnType<typeof setInterval> = null
 let lastUpdateTime = 0
 const maxUpdateNum = 15
 
-watch([() => tokenStore.placeOrderSuccess], () => {
+watch([() => wsStore.wsResult?.tgbot], () => {
   const chain = getAddressAndChainFromId(String(route.params.id))?.chain
   if (tabs.value.find(i => i?.chain === chain)) {
     activeTab.value = chain
@@ -144,8 +145,10 @@ watch([() => tokenStore.placeOrderSuccess], () => {
   if (!timer) {
     timer = setInterval(() => {
       if (lastUpdateTime >= maxUpdateNum) {
-        clearInterval(timer)
-        timer = null
+        if (timer) {
+          clearInterval(timer)
+          timer = null
+        }
         lastUpdateTime = 0
         return
       }
@@ -158,16 +161,18 @@ watch([() => tokenStore.placeOrderSuccess], () => {
 })
 
 watch([() => route.params.id], () => {
-  const chain = String(route.params.id).split('-')[1]
+  const chain = getAddressAndChainFromId(String(route.params.id))?.chain
   if (tabs.value.find(i => i?.chain === chain)) {
     activeTab.value = chain
   }
-  getWalletTxData()
-  unifiedRef.value?.getTxHistory()
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
 })
 
 onMounted(() => {
-  const chain = String(route.params.id).split('-')[1]
+  const chain = getAddressAndChainFromId(String(route.params.id))?.chain
   if (tabs.value.find(i => i?.chain === chain)) {
     activeTab.value = chain
   }

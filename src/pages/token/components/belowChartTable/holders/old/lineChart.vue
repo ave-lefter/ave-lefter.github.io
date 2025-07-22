@@ -17,6 +17,7 @@
   import { TitleComponent, TooltipComponent, GridComponent, LegendComponent } from 'echarts/components'
   import { LineChart } from 'echarts/charts'
   import { CanvasRenderer } from 'echarts/renderers'
+  import type { BotChain } from '~/utils/types'
 
   // 注册所需的组件和渲染器
   echarts.use([TitleComponent, TooltipComponent, GridComponent, LegendComponent, LineChart, CanvasRenderer])
@@ -63,7 +64,7 @@
     const { chain } = getAddressAndChainFromId(route.params.id as string) || token?.value?.chain || ''
     const c =
     globalConfig.value?.chains_support_data_analysis_insider_sniper_V3
-    const supportTags = c?.[chain as 'eth' | 'base' | 'bsc' | 'solana'] || []
+    const supportTags = c?.[chain as BotChain] || []
 
     if (supportTags) {
       arr = supportTags.map((i: any, index: number) => ({
