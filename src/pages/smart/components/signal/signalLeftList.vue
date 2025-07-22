@@ -555,7 +555,7 @@ function openTokenDetail(el: IActionItem) {
     :offset="8"
     :virtual-ref="buttonRef"
     :visible="popVisible"
-    popper-class="[--el-bg-color-overlay:--d-1A1A1A-l-FFF] max-h-200px [&&]:[--el-popover-padding:0]"
+    popper-class="[--el-bg-color-overlay:--d-1A1A1A-l-FFF] max-h-200px [&&]:[--el-popover-padding:0] overflow-y-auto"
     virtual-triggering
     append-to-body
   >

@@ -15,10 +15,19 @@ defineProps<{
 
 const emit = defineEmits(['onDragStop', 'onResizing', 'onDrag'])
 const klineRef = shallowRef<HTMLElement | null>(null)
+
 onMounted(() => {
   setTimeout(() => {
     klineRef.value = document.getElementById('tv_chart_container')!
   }, 20)
+})
+const route = useRoute()
+watch(()=>route.path,()=>{
+  if(route.path.includes('/token/')){
+    setTimeout(() => {
+      klineRef.value = document.getElementById('tv_chart_container')!
+    }, 20)
+  }
 })
 
 function onDragStop(x: number, y: number) {

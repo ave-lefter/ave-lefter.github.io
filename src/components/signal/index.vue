@@ -411,7 +411,7 @@ function cancelHide() {
       :width="320"
       :virtual-ref="buttonRef"
       :visible="popVisible"
-      popper-class="[--el-bg-color-overlay:--d-1A1A1A-l-FFF] max-h-200px [&&]:[--el-popover-padding:0]"
+      popper-class="[--el-bg-color-overlay:--d-1A1A1A-l-FFF] max-h-200px [&&]:[--el-popover-padding:0] overflow-y-auto"
       virtual-triggering
       append-to-body
     >
@@ -421,10 +421,10 @@ function cancelHide() {
         @mouseleave="hidePopover"
       >
         <div class="flex color-[--d-666-l-999] text-12px mb-8px">
-          <div class="flex-[3]">
+          <div class="flex-1">
             {{ $t('wallet') }}
           </div>
-          <div class="flex-[4]">
+          <div class="flex-1">
             {{ $t('operate') }}
           </div>
           <div class="w-40px flex items-center justify-end gap-4px">
@@ -448,14 +448,14 @@ function cancelHide() {
             :key="idx"
             class="flex color-[--d-999-l-666] text-12px lh-14px"
           >
-            <div class="flex-[3] flex items-center">
+            <div class="flex-1 flex items-center">
               <span class="w-10px h-10px rounded-full bg-#37B270 mr-4px"/>
               <span class="color-[--d-F5F5F5-l-333] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px">{{
                   wallet_alias || $t('wallet')
                 }}</span>
               <span class="color-[--d-999-l-666]">(*{{ wallet_address.slice(-4) }})</span>
             </div>
-            <div class="flex-[4] color-#12B886">
+            <div class="flex-1 color-#12B886">
               {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : '' }}{{ formatNumber(quote_token_amount, 2) }} {{
                 quote_token_symbol
               }}<span class="color-[--d-999-l-666]">(${{ formatNumber(quote_token_volume, 0) }})</span>
