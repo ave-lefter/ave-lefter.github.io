@@ -652,8 +652,7 @@ const collect = async (row: any,index:number) => {
         user_chain: row.chain,
         group: form.group,
         is_monitored: form.is_monitored,
-      }).then(() => {
-        ElMessage.success(t('attention1Success'))
+      }).then((res) => {
         // getList()
         filterTableList.value.forEach((item: any) => {
           if (item.wallet_address === row.wallet_address) {
@@ -661,7 +660,7 @@ const collect = async (row: any,index:number) => {
           }
         })
         triggerRef(tokenTxs)
-        return Promise.resolve()
+        return Promise.resolve(res)
       }).catch((err) => {
         return Promise.reject(err)
       })

@@ -238,7 +238,7 @@ useEventBus<string>('botTopUp').on((val) => {
 interface WithdrawFormData {
   amount: string
   address: string
-  chain: 'solana' | 'eth' | 'bsc' | 'base'
+  chain: BotChain
   memo?: string
 }
 const withdrawForm = reactive<WithdrawFormData>({

@@ -1,9 +1,10 @@
 // import { getGlobalT } from '@/utils/i18nBridge'
-import type { Mark, ChartingLibraryWidgetConstructor, IChartingLibraryWidget, EntityId } from '~/types/tradingview/charting_library'
+import type { Mark, ChartingLibraryWidgetConstructor, IChartingLibraryWidget, EntityId, DrawingEventType } from '~/types/tradingview/charting_library'
 import { formatNumber, formatDec } from '@/utils/formatNumber'
 import type { WSTx, KLineBar  } from './types'
 import { useDocumentVisibility, useEventBus } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
+import { bot_getUserPendingTx, bot_cancelLimitOrdersByBatch } from '~/api/token'
 
 export const supportSecChains = ['solana', 'bsc', 'eth', 'base', 'tron']
 
@@ -117,7 +118,6 @@ export function formatToMarks(
 
 
 export function initTradingViewIntervals(currentResolution: string, chain: string, isSupportSecChains: boolean): string {
-  console.log('--------chain------', chain)
   const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
   const RESOLUTION_KEY = 'tv_resolution'
   const DEFAULT_LIST = ['1', '5', '15', '60', '240', '1D', '1W']
@@ -481,20 +481,26 @@ export function useAvgPriceLine(getWidget: () => IChartingLibraryWidget | null, 
 
   useEventBus<number>('updateAvgPrice').on(createAvgPriceLinePoll)
 
-  let time = 0
+  let avgPriceToken = 0  // 表示当前有效轮询的 token
+  const MAX_RETRY = 5
+  const INTERVAL = 2000
+
   async function createAvgPriceLinePoll(price: number) {
-    if (time > 5) {
-      time = 0
-      return
-    }
-    const isReady = getIsReady()
-    if (isReady) {
-      createAvgPriceLine(price)
-      time = 0
-    } else {
-      await sleep(2000)
-      createAvgPriceLinePoll(price)
-      time += 1
+    const myToken = ++avgPriceToken  // 当前调用的唯一标识
+    let retry = 0
+
+    while (retry <= MAX_RETRY) {
+      // 被后续调用覆盖，直接退出
+      if (myToken !== avgPriceToken) return
+
+      const isReady = getIsReady()
+      if (isReady) {
+        createAvgPriceLine(price)
+        return
+      }
+
+      await sleep(INTERVAL)
+      retry++
     }
   }
 
@@ -503,5 +509,311 @@ export function useAvgPriceLine(getWidget: () => IChartingLibraryWidget | null, 
       lineId = '' as EntityId
     }
   }
+}
+
+export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, getIsReady: () => boolean, showMarket: Ref<boolean>) {
+  const route = useRoute()
+  const tokenStore = useTokenStore()
+  const botStore = useBotStore()
+  const wsStore = useWSStore()
+  const token = computed(() => {
+    return route.params.id as string
+  })
+
+  const chain = computed(() => {
+    return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
+  })
+
+  const tokenAddress = computed(() => {
+    return getAddressAndChainFromId(token.value)?.address || tokenStore?.token?.token
+  })
+
+  function getSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14 | -1) {
+    // const swapTypeMap = {
+    //   1: t('buy'),
+    //   2: t('sell'),
+    //   3: 'Wrap',
+    //   4: 'Unwrap',
+    //   5: t('limitBuy1'),
+    //   6: t('limitSell1'),
+    //   7: t('followBuy'),
+    //   8: t('followSell'),
+    //   12: t('trailingStop'),
+    //   13: t('listingOnDex'),
+    //   14: t('devSell'),
+    //   '-1': t('trailingStop')
+    // } as const
+    // if (swapTypeMap[swapType]) {
+    //   return swapTypeMap[swapType]
+    // }
+    if (swapType === 1 || swapType === 5 || swapType === 7) {
+      return t('limitBuy1')
+    }
+    return t('limitSell1')
+  }
+
+
+  type GetUserPendingTxRes = Awaited<ReturnType<typeof bot_getUserPendingTx>>
+  const limitTxs = ref<GetUserPendingTxRes>([])
+  const textShapeMap: Map<EntityId, GetUserPendingTxRes[number]> = new Map()
+
+  function getData(isFirst = true) {
+    if (!chain.value || !tokenAddress.value || !botStore.accessToken) return
+    bot_getUserPendingTx({
+      chain: chain.value,
+      token: tokenAddress.value || '',
+      walletAddress: botStore.userInfo?.addresses?.find(el => el.chain === chain.value)?.address || ''
+    }).then(async res => {
+      const res1 = res?.filter?.(i => (i.swapType !== 13 && i.swapType !== 14)) || []
+      if (res1.length === limitTxs.value.length && isFirst) {
+        await sleep(2000)
+        getData(false)
+      }
+      limitTxs.value = res1
+      createLimitPriceLinePoll(res1)
+    })
+  }
+
+  let priceLimitLineIds: EntityId[] = []
+  let priceLimitLineIds2: EntityId[] = []
+  let isCreating = false
+  const { t } = useI18n()
+  // 创建 限价价格线
+  async function createLimitPriceLine(priceList1: GetUserPendingTxRes) {
+    const _widget = getWidget()
+    const chart = _widget?.activeChart?.()
+    if (!_widget || !chart) return
+    let priceList = priceList1?.map(i => {
+      return {
+        ...i,
+        price: Number(i?.PriceLimit || 0)
+      }
+    })
+    if (showMarket.value) {
+      priceList = priceList1.map(i => {
+        return {
+          ...i,
+          price: new BigNumber(i.PriceLimit).times(useTokenStore().circulation || '0')?.toNumber()
+        }
+      })
+    }
+    if (priceLimitLineIds.length > 0) {
+      priceLimitLineIds.forEach(priceLimitLineId => {
+        const line = chart?.getShapeById?.(priceLimitLineId)
+        if (line) {
+          chart?.removeEntity?.(priceLimitLineId)
+        }
+      })
+      priceLimitLineIds = []
+    }
+    if (priceLimitLineIds2.length > 0) {
+      priceLimitLineIds2.forEach(priceLimitLineId => {
+        const line = chart?.getShapeById?.(priceLimitLineId)
+        if (line) {
+          chart?.removeEntity?.(priceLimitLineId)
+        }
+      })
+      priceLimitLineIds2 = []
+      textShapeMap.clear()
+    }
+    if (isCreating) return
+    isCreating = true
+    priceList.forEach(async (item) => {
+      const priceLimitLineId = await chart?.createShape?.(
+        { price: item.price, time: 0 }, // 水平线的起始位置
+        {
+          shape: 'horizontal_line',
+          lock: true,
+          disableSelection: true, // 允许选中
+          disableSave: true,
+          disableUndo: true,
+          text: getSwapTypeLabel(item.swapType as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) || t('limitSell1'),
+          overrides: {
+            linecolor: '#FF6838',  // 线的颜色
+            linewidth: 1,          // 线的粗细
+            linestyle: 2,     // 线的样式：0表示实线，1表示虚线 2 长虚线
+            textcolor: '#FF6838',
+            showLabel: true,
+            horzLabelsAlign: 'right',
+            vertLabelsAlign: 'bottom',
+            bold: true,
+            fontSize: 12,
+          }
+        }
+      )
+      priceLimitLineIds.push(priceLimitLineId)
+      const line = chart?.getShapeById?.(priceLimitLineId)
+      if (!line) return
+      // line?.setProperties?.({
+      //   textcolor: '#FF6838',
+      //   showLabel: true,
+      //   horzLabelsAlign: 'right',
+      //   vertLabelsAlign: 'bottom',
+      //   bold: true,
+      //   fontSize: 12,
+      //   // italic: true,
+      // })
+
+      const priceLimitLineId2 = await chart?.createShape?.(
+        { price: item.price, time: Math.floor(Date.now() / 1000) }, // 水平线的起始位置
+        {
+          shape: 'text',
+          lock: true,
+          disableSelection: true, // 允许选中
+          disableSave: true,
+          disableUndo: true,
+          text: t('cancel'),
+          overrides: {
+            borderColor: '#F6465D',
+            color: '#F6465D',
+            fontsize: 12,
+            horzLabelsAlign: 'right',
+            vertLabelsAlign: 'bottom',
+            bold: false,
+            textcolor: '#F6465D',
+            borderWidth: 1,
+            drawBorder: true,
+            showLabel: false
+          }
+        }
+      )
+      priceLimitLineIds2.push(priceLimitLineId2)
+      const line2 = chart?.getShapeById?.(priceLimitLineId2)
+      if (!line2) return
+      textShapeMap.set(priceLimitLineId2, item)
+      // line2?.setProperties?.({
+      //   textcolor: '#F6465D',
+      //   showLabel: false,
+      //   horzLabelsAlign: 'right',
+      //   vertLabelsAlign: 'bottom',
+      //   bold: false,
+      //   fontsize: 12,
+      //   borderWidth: 1,
+      //   drawBorder: true,
+      //    horzTextAlign: 'right'
+      //   // italic: true,
+      // })
+      // console.log('line2', line2.getProperties())
+
+    })
+    isCreating = false
+  }
+
+  let latestToken = 0           // 递增的版本号
+  const MAX_RETRY = 5           // 最多轮询次数
+  const INTERVAL = 2_000        // 轮询间隔（毫秒）
+  async function createLimitPriceLinePoll(priceList: GetUserPendingTxRes) {
+     const myToken = ++latestToken      // 取到“属于我自己”的版本号
+    let retry = 0
+
+    while (retry <= MAX_RETRY) {
+      // 若我已不是最新调用，放弃执行
+      if (myToken !== latestToken) break
+
+      if (getIsReady()) {
+        createLimitPriceLine(priceList)
+        subscribeLimitPriceLineRemove()
+        break
+      }
+
+      await sleep(INTERVAL)
+      retry++
+    }
+  }
+
+  function subscribeLimitPriceLineRemove() {
+     const _widget = getWidget()
+     if (!_widget) return
+     _widget.unsubscribe('drawing_event', handlerLimitPriceLineRemove)
+     _widget.subscribe('drawing_event', handlerLimitPriceLineRemove)
+  }
+
+  function handlerLimitPriceLineRemove(id: EntityId, type: DrawingEventType) {
+    if (type === 'click' && textShapeMap.has(id)) {
+      const item = textShapeMap.get(id)
+      if (item) {
+        console.log('取消订单', item)
+        handleCancelOrder(item)
+      }
+    }
+  }
+
+  function handleCancelOrder(row: GetUserPendingTxRes[number]) {
+    ElMessageBox.confirm(t('botCancelOrder'), '', {
+      confirmButtonText: t('confirm'),
+      cancelButtonText: t('cancel')
+    })
+      .then(async () => {
+        console.log(row)
+        await bot_cancelLimitOrdersByBatch({
+          chain: row.chain,
+          batchId: row.batchId
+        })
+        getData()
+        useEventBus<string>('updateLimitOrder').emit(row.chain)
+      }).catch(() => { })
+  }
+
+  useEventBus<string>('updateKlineLimitLine').on(() => {
+    getData()
+  })
+
+  let Timer: ReturnType<typeof setTimeout> | null = null
+  watch([chain, tokenAddress, () => botStore?.userInfo?.evmAddress], () => {
+    if (Timer) {
+      clearTimeout(Timer)
+      Timer = null
+    }
+    Timer = setTimeout(() => {
+      getData()
+    }, 2000)
+  })
+
+  watch([() => tokenStore.placeOrderSuccess, () => wsStore.wsResult?.tgbot], () => {
+    if (Timer) {
+      clearTimeout(Timer)
+      Timer = null
+    }
+    Timer = setTimeout(() => {
+      getData()
+    }, 2000)
+  })
+
+
+  onMounted(() => {
+    getData()
+  })
+
+  return {
+    limitTxs,
+    getData
+  }
+}
+
+export function setWatermark(_widget: IChartingLibraryWidget | null) {
+  const _watermark = _widget?.watermark?.()
+  _watermark?.color().setValue('#BCBED219')
+  _watermark?.setContentProvider(() => {
+    return [
+      {
+        /**
+         * Text to be displayed.
+         */
+        text: 'AVE.AI',
+        /**
+         * Font size to be used (defined in pixels).
+         */
+        fontSize: 60,
+        /**
+         * Line height (defined in pixels).
+         */
+        lineHeight: 1,
+        /**
+         * Vertical offset distance (defined in pixels).
+         */
+        vertOffset: 1,
+    }]
+  })
+  _watermark?.visibility().setValue(true)
 }
 

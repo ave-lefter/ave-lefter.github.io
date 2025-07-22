@@ -8,19 +8,19 @@
       :width="iconSize"
     >
       <template #error>
-        <img class="icon-wallet-avatar" :src="generateAvatarIcon(wallet_logo?.name || address)" :style="avatarStyle">
+        <img class="icon-wallet-avatar" :src="generateAvatarIcon(wallet_logo?.name || address || '')" :style="avatarStyle">
       </template>
     </el-image>
 
     <img
-      v-if="wallet_logo.vip_logo"
+      v-if="wallet_logo?.vip_logo"
       class="icon-vip_logo"
-      :src="wallet_logo.vip_logo"
+      :src="wallet_logo?.vip_logo"
       alt=""
       :style="(chainStyle as any)"
     >
     <img
-      v-else-if="chain && !wallet_logo.vip_logo"
+      v-else-if="chain && !wallet_logo?.vip_logo"
       class="icon-chain"
       :src="`${configStore?.token_logo_url}chain/${chain}.png`"
       alt=""
@@ -49,17 +49,17 @@ const props = defineProps<{
 
 const {
   // wallet_logo = {logo: '', name: '', url: ''},
-  address = '',
+  // address = '',
   chain = '',
   iconSize = '16px',
   iconChainSize = ''
 } = props
-const wallet_logo = toRef(props, 'wallet_logo')
+// const wallet_logo = toRef(props, 'wallet_logo')
 const configStore = useConfigStore()
 
 const walletLogo = computed(() => {
-  return (wallet_logo?.value?.logo || '')?.replace?.(/_normal/, '_400x400') ||
-    generateAvatarIcon(wallet_logo?.value?.name || address)
+  return (props.wallet_logo?.logo || '')?.replace?.(/_normal/, '_400x400') ||
+    generateAvatarIcon(props.wallet_logo?.name || props.address || '')
 })
 
 const chainSize = computed(() => {

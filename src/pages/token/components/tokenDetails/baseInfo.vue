@@ -188,11 +188,10 @@ const collect = async () => {
         user_chain: tokenDetailStore.tokenInfo!.chain,
         group: form.group,
         is_monitored: form.is_monitored,
-      }).then(() => {
-        ElMessage.success(t('attention1Success'))
+      }).then((res) => {
         // getList()
         _getTokenStatistics()
-        return Promise.resolve()
+        return Promise.resolve(res)
       }).catch((err) => {
         return Promise.reject(err)
       })

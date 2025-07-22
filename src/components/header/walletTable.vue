@@ -63,7 +63,7 @@
                   <Icon
                     v-if="shouldRenderChild"
                     :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
-                    :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="text-14px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
+                    :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="text-11px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
                   <UserRemark :remark="row.remark" :address="row.wallet_address" :chain="row.chain" :showAddress="false" :wallet_logo="row.wallet_logo" iconEditSize="10px"/>
                   <!-- <a
                     href=""
@@ -300,18 +300,17 @@ const collect = async (row: any,index:number) => {
         user_chain: row.chain,
         group: form.group,
         is_monitored: form.is_monitored,
-      }).then(() => {
-        ElMessage.success(t('attention1Success'));
+      }).then((res) => {
         (tokens.value as Array<any>)[index].is_wallet_address_fav = 1
         // getList()
         reCreateChild()
-        return Promise.resolve()
+        return Promise.resolve(res)
       }).catch((err) => {
         return Promise.reject(err)
       }).finally(() => {
       })
     })
-    return 
+    return
   }
   // loading.value = true
   deleteAttention({

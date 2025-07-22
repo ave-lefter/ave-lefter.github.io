@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie'
 import BigNumber from 'bignumber.js'
+import type { BotChain } from '~/utils/types'
 
 export function login(data: {
   username?: string
@@ -610,7 +611,7 @@ export function bot_createEvmLimitTx(params: {
 //     "autoGas": 2; // 0: 关闭, 1: 低速， 2：中速， 3：高速
 // }
 export function bot_createSafeTransferTx(params: {
-  chain: 'eth' | 'base' | 'bsc' | 'solana'
+  chain: BotChain
   creatorAddress: string
   tokenAddress: string
   tgUid: string
@@ -639,7 +640,7 @@ export function bot_createSafeTransferTx(params: {
 // url: /swap/getTransferGasFee GET
 // 校验：双token
 // 请求参数: chain -> 当前支持 eth, base, bsc
-export function bot_getTransferGasFee(params: { chain: 'eth' | 'base' | 'bsc' | 'solana'} | undefined) {
+export function bot_getTransferGasFee(params: { chain: BotChain} | undefined) {
   const { $api } = useNuxtApp()
   return $api('/botapi/swap/getTransferGasFee', {
     method: 'get',

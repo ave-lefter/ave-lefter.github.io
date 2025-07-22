@@ -35,11 +35,12 @@ const activeTab = shallowRef<'buy' | 'sell'>('buy')
 const swapType = shallowRef<'limit' | 'market'>('market')
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
+const wsStore = useWSStore()
 
 const { getTokenBalance } = useBotSwap()
 
 const chain = computed(() => {
-  return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as string
+  return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as BotChain
 })
 
 const tabs = computed<Array<{ value: 'buy' | 'sell', name: string }>>(() => {
@@ -51,7 +52,7 @@ const tabs = computed<Array<{ value: 'buy' | 'sell', name: string }>>(() => {
 
 const tabs1 = computed(() => {
   const botSetting = (botSettingStore?.botSettings?.[chain.value] || {}) as typeof botSettingStore.botSettings.solana
-  const list = botSetting?.[botSetting.selected as 's1' | 's2' | 's3']?.buyValueList || ['0.02', '0.05', '0.1', '0.5']
+  const list = botSetting?.[botSetting.selected]?.buyValueList || ['0.02', '0.05', '0.1', '0.5']
   return list.map(i => {
     return {
       name: i,
@@ -62,7 +63,7 @@ const tabs1 = computed(() => {
 
 const tabs2 = computed(() => {
   const botSetting = (botSettingStore?.botSettings?.[chain.value] || {}) as typeof botSettingStore.botSettings.solana
-  const list = botSetting?.[botSetting.selected as 's1' | 's2' | 's3']?.sellPerList || ['25', '50', '75', '100']
+  const list = botSetting?.[botSetting.selected]?.sellPerList || ['25', '50', '75', '100']
   return list.map(i => {
     return {
       name: i + '%',
@@ -89,8 +90,8 @@ const walletAddress = computed(() => {
   return botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
 })
 
-watch([walletAddress, () => route.params?.id], (val) => {
-  if (!val) return
+watch([walletAddress, () => route.params?.id, () => wsStore.wsResult?.tgbot], () => {
+  if (!walletAddress.value) return
   getTokenBalance()
 })
 

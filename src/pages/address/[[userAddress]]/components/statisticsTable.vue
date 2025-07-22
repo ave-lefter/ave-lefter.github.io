@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="flex justify-between border-b-1px border-b-solid border-b-[--d-222-l-F2F2F2] mb-20px">
-      <div class="flex items-center pl-10px gap-24px">
+    <div class="flex justify-between border-b-1px border-b-solid border-b-[--d-222-l-F2F2F2] mb-10px mt-20px">
+      <div class="flex items-center gap-24px">
         <a
           v-for="(item, index) in tabs"
           :key="index"
-          :class="`text-14px pb-10px cursor-pointer flex items-center decoration-none lh-20px text-center color-[--d-666-l-999] b-b-solid b-b-3px ${activeTab === item.id ? 'color-[--d-F5F5F5-l-222] b-b-[--d-F5F5F5-l-333]' : 'b-b-transparent'}`"
+          :class="`text-16px pb-10px cursor-pointer flex items-center decoration-none lh-20px text-center color-[--d-666-l-999] b-b-solid b-b-3px ${activeTab === item.id ? 'color-[--d-F5F5F5-l-222] b-b-[--d-F5F5F5-l-333]' : 'b-b-transparent'}`"
           @click.stop.prevent="switchTab(item)"
         >
           {{ item.title }}
@@ -42,6 +42,7 @@
           v-model="trendQuery.hideNative"
           :false-value="0"
           :true-value="1"
+          class="color-[#666666]"
         >
           {{ $t('hideNative') }}
         </el-checkbox>
@@ -56,8 +57,18 @@
         class="relative min-h-500px"
         infinite-scroll-distance="300"
       >
+        <RecentPnl
+          v-if="isRecentPnl"
+          :conditions="conditions_wallet"
+          :handleSortChange="handleSortChange"
+          :loading="tableData.loading"
+          :tableData="filterTableList"
+          :isSelfAddress="false"
+          :address="address"
+          @hideToken="refreshTokenList"
+        />
         <TokenList
-          v-if="isToken"
+          v-else-if="isToken"
           :conditions="conditions_wallet"
           :handleSortChange="handleSortChange"
           :loading="tableData.loading"
@@ -83,7 +94,7 @@
         />
         <div
           :style="{ color: mode === 'light' ? '#666' : '#999' }"
-          class="mt-[-2px] mb-[5px] text-[12px] text-center"
+          class="mt-[2px] mb-[5px] py-[10px] text-[12px] text-center"
         >
           <span v-if="tableData.loading && tableData.pageNO > 1">{{ $t('loading') }}</span>
         </div>
@@ -94,6 +105,7 @@
 
 <script setup>
 import TokenList from './tokenList.vue'
+import RecentPnl from './recentPnl.vue'
 import TrendList from './trendList.vue'
 import DeployedTokenList from './deployedTokenList.vue'
 import BlackList from './blackList.vue'
@@ -112,7 +124,7 @@ const props = defineProps({
   isSelfAddress: Boolean,
 })
 
-const activeTab = ref('trend')
+const activeTab = ref('pnl')
 const tableData = ref({
   finished: false,
   error: false,
@@ -120,6 +132,7 @@ const tableData = ref({
   pageNO: 1,
   pageSize: 40,
   total: 0,
+  pnl: [],
   token: [],
   trend: [],
   deployedToken: [],
@@ -147,19 +160,16 @@ const deployedTokenQuery = ref({
   sort: 'market_cap',
   sort_dir: 'desc',
 })
-
 const deployedTokenNum = ref(0)
 const listArea = ref(null)
 const trendList = ref(null)
-
 const themeStore = useThemeStore()
-
 const mode = computed(() => {
   return themeStore.isDark ? 'dark' : 'light'
 })
-
 const tabs = computed(() => {
   const commonTabs = [
+    { title: $t('recentPnl'), id: 'pnl' },
     { title: $t('walletActivity'), id: 'trend' },
     { title: $t('holding'), id: 'token' },
   ]
@@ -172,11 +182,17 @@ const tabs = computed(() => {
   return commonTabs
 })
 
+const isRecentPnl = computed(() => activeTab.value === 'pnl')
 const isToken = computed(() => activeTab.value === 'token')
 const isTrend = computed(() => activeTab.value === 'trend')
 const chainAddress = computed(() => [props.chain, props.address])
 const filterTableList = computed(() => {
-  if (isToken.value) {
+  if(isRecentPnl.value){
+    const temp = [...tableData.value.pnl].filter(
+      (i) => NATIVE_TOKENS.findIndex((y) => y?.toLowerCase() === i.token?.toLowerCase()) === -1
+    )
+    return temp
+  } else if (isToken.value) {
     return [...tableData.value.token]
   } else if (isTrend.value) {
     let trendList = tableData.value.trend.filter(
@@ -196,13 +212,14 @@ const filterTableList = computed(() => {
 })
 
 // Methods
-const onConditionChange = (type) => {
+const onConditionChange = () => {
   tableData.value.pageNO = 1
   _getWhaleTokenList()
 }
 
 const onLoad = () => {
-  if (isToken.value) _getWhaleTokenList()
+  if (isRecentPnl.value) _getWhalePnlList()
+  else if (isToken.value) _getWhaleTokenList()
   else if (isTrend.value) _getWhaleTrendList()
   else _getDeployedTokens()
 }
@@ -215,7 +232,7 @@ const switchTab = (item) => {
 const handleSortChange = ({ prop, order }) => {
   resetPageNOAndLoading()
   const sort_dir = order?.replace?.('ending', '')
-  if (isToken.value) {
+  if (isToken.value|| isRecentPnl.value) {
     conditions_wallet.value.sort = prop
     conditions_wallet.value.sort_dir = sort_dir
   } else if (isTrend.value) {
@@ -266,6 +283,43 @@ const _getWhaleTokenList = async () => {
     }
   } catch {
     tableData.value.token = []
+    tableData.value.error = true
+  } finally {
+    tableData.value.loading = false
+  }
+}
+
+const _getWhalePnlList = async () => {
+  tableData.value.loading = true
+  const data = {
+    user_address: props.address,
+    chain: props.chain,
+    pageNO: tableData.value.pageNO,
+    pageSize: tableData.value.pageSize,
+    sort_dir: conditions_wallet.value.sort_dir,
+    sort: conditions_wallet.value.sort,
+    is_self: props.isSelfAddress ? 1 : 0,
+    // ...(conditions_wallet.value.hide_sold === 1 && { hide_sold: 1 }),
+    // ...(conditions_wallet.value.hide_small === 1 && { hide_small: 1 }),
+  }
+
+  try {
+    const res = await getWhaleTokenList(data)
+    if (data.pageNO === 1) {
+      tableData.value.pnl = []
+    }
+    const list = Array.isArray(res) ? res : []
+    if (list?.length > 0) {
+      const a = [...tableData.value.pnl]
+      const b = list.filter((i) => a.every((j) => !(j.token === i.token && j.chain === i.chain)))
+      tableData.value.pnl = [...a, ...b]
+    }
+    tableData.value.finished = list?.length < tableData.value.pageSize
+    if (!tableData.value.finished) {
+      tableData.value.pageNO++
+    }
+  } catch {
+    tableData.value.pnl = []
     tableData.value.error = true
   } finally {
     tableData.value.loading = false
