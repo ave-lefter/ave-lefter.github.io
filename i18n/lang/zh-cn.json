@@ -343,6 +343,7 @@
   "transferCanNotPause1": "交易无法暂停",
   "has_malicious_code": "合约可能包含恶意代码",
   "has_sell_max_limit": "有可修改的最大卖出限制",
+  "is_low_liquidity": "池子不足",
   "tradingCoolDown": "有交易冷却机制，可以限制两次交易之间的最短时间",
   "noTradingCoolDown": "无交易冷却机制",
   "tradeLq": "机制介绍",
