@@ -19,7 +19,7 @@ export function getGainOptions(t: ReturnType<typeof useI18n>['t']) {
         'dynamicVolAndTxs',
         'dynamicMarkers',
         'priceChange1mContent',
-        'priceChangeDynamicContent',
+        'priceChange15mContent',
         'priceChange24hContent',
         'smarterContent',
       ],
@@ -30,7 +30,6 @@ export function getGainOptions(t: ReturnType<typeof useI18n>['t']) {
         'snipersContent',
         'securityContent',
         'dexContent',
-        'insidersContent',
       ],
     },
   ]
