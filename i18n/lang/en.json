@@ -340,6 +340,7 @@
   "transferCanNotPause1": "Transaction cannot be paused",
   "has_malicious_code": "contains some malicious code",
   "has_sell_max_limit": "contains a modifiable max sell limit",
+  "is_low_liquidity": "Not enough liquidity",
   "tradingCoolDown": "Has trading-cool-down mechanism that can limit the minimum time between two transactions",
   "noTradingCoolDown": "No trading-cool-down mechanism",
   "tradeLq": "Mechanism Introduction",
