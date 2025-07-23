@@ -146,7 +146,7 @@ const comProps = computed(() => {
         <div v-if="item.component == 'Orders'" class="w-1px h-20px bg-[var(--custom-br-1-color)] mr-20px mb-8px"/>
         <div
           :class="`b-b-solid b-b-2px pb-12px flex-start ${activeTab === item.component ? ' b-b-[--d-F5F5F5-l-333]' : 'b-b-transparent'}`">
-          {{ item.name }}
+          <strong>{{ item.name }}</strong>
           <span v-if="item.component === 'Orders'">({{ tokenStore.registrationNum }})</span>
           <span v-if="item.component === 'LP'" class="flex-start">
             ({{ pairHolders }})
