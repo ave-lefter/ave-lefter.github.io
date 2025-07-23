@@ -177,6 +177,11 @@ function updateActiveChain(chain: string) {
   emit('update:activeChain', chain)
   emit('update:activeTab','hot')
 }
+const botStore = useBotStore()
+const walletStore = useWalletStore()
+const isSupportedChain = computed(()=>{
+  return !walletStore.address && (props.activeChain==='AllChains' || botStore.isSupportChains.includes(props.activeChain))
+})
 </script>
 
 <template>
@@ -225,13 +230,13 @@ function updateActiveChain(chain: string) {
           </button>
         </div>
         <div class="flex items-center">
-          <el-switch v-model="globalStore.rankCommon.quickVisible" class="mr-2" />
+          <el-switch v-if="isSupportedChain" v-model="globalStore.rankCommon.quickVisible" class="mr-2" />
           <QuickSwapSet
-            v-if="globalStore.rankCommon.quickVisible"
+            v-if="globalStore.rankCommon.quickVisible&&isSupportedChain"
             v-model:quickBuyValue="globalStore.rankCommon.quickBuyValue"
             class="mr-12px"
             :settingsButtonVisible="false"
-            :chain="'solana'"
+            :chain="activeChain==='AllChains'?'':activeChain"
           />
           <BlackList />
           <ColumnsToolbar

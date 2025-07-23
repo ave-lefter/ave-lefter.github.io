@@ -262,7 +262,7 @@ const filterMap = {
   insider_balance_ratio_cur: (el: any) => el.isVisible && props.activeChain === 'bsc',
   price_change_dynamic: (el: any) =>
     el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval),
-  quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible,
+  quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible && !walletStore.address,
 }
 
 const visibleColumns = computed(() => {

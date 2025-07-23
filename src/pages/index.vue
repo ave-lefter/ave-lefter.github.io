@@ -3,6 +3,8 @@ import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
+import { v4 as uuidv4 } from 'uuid'
+
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
 const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
 const components = {
@@ -173,6 +175,7 @@ function listMapFunction(i: Record<string, any>) {
   }
   return {
     ...i,
+    rowKey:uuidv4(),
     id: `${i.target_token}-${i.chain}`,
     pair_id: `${i.pair}-${i.chain}`,
     token: i.target_token,
