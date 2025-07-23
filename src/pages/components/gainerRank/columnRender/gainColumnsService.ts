@@ -53,6 +53,14 @@ export function getGainDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       minWidth: 232,
     },
     {
+      title: t('smarter1'),
+      key: 'smart_money_buy_volume_24h',
+      isVisible: true,
+      render: 'smarterContent',
+      minWidth: 110,
+      align: 'right'
+    },
+    {
       title: t('mCap'),
       isVisible: true,
       key: 'mCap',
@@ -79,7 +87,7 @@ export function getGainDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     {
       title: '1m%',
       key: 'price_change_1m',
-      isVisible: true,
+      isVisible: false,
       render: 'priceChange1mContent',
       minWidth: 110,
       align: 'right',
@@ -88,7 +96,7 @@ export function getGainDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     {
       title: '15m%',
       key: 'price_change_15m',
-      isVisible: true,
+      isVisible: false,
       render: 'priceChange15mContent',
       minWidth: 110,
       align: 'right',
@@ -114,7 +122,7 @@ export function getGainDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     {
       title: t('markers'),
       key: 'markers_dynamic',
-      isVisible: true,
+      isVisible: false,
       render: 'dynamicMarkers',
       minWidth: getTextWidth(t('markers'), 50) + 80,
       align: 'right'
@@ -125,14 +133,6 @@ export function getGainDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       isVisible: true,
       render: 'holdersContent',
       minWidth: getTextWidth(t('holders'), 50) + 50,
-      align: 'right'
-    },
-    {
-      title: t('smarter1'),
-      key: 'smart_money_buy_volume_24h',
-      isVisible: true,
-      render: 'smarterContent',
-      minWidth: 110,
       align: 'right'
     },
     {
@@ -166,7 +166,7 @@ export function getGainDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     {
       title: 'DEX',
       key: 'dex',
-      isVisible: true,
+      isVisible: false,
       render: 'dexContent',
       minWidth: 70,
       align: 'center'
