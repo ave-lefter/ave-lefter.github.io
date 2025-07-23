@@ -3,13 +3,13 @@ export function getInclusionOptions(t: ReturnType<typeof useI18n>['t']) {
       {
         title: t('basicInfo'),
         list: [
-          // 'headline',
+          'headline',
           'priceContent',
           'mCapContent',
           'liquidityContent',
           'holdersContent',
           'top10PositionsContent',
-          'devContent'
+          // 'devContent'
         ],
       },
       {
@@ -21,7 +21,7 @@ export function getInclusionOptions(t: ReturnType<typeof useI18n>['t']) {
           'priceChangeDynamicContent',
           'priceChange24hContent',
           'smarterContent',
-          // 'lastTradeAtContent'
+          'lastTradeAtContent'
         ],
       },
       {
@@ -31,9 +31,9 @@ export function getInclusionOptions(t: ReturnType<typeof useI18n>['t']) {
           // 'runTime1',
           // 'runTime2',
           'snipersContent',
-          'snipers1mContent',
-          'securityContent',
-          'insidersContent',
+          // 'snipers1mContent',
+          // 'securityContent',
+          // 'insidersContent',
         ],
       },
     ]
@@ -50,13 +50,21 @@ export function getInclusionDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       render: 'poolPairContent',
       minWidth:320
     },
-    // {
-    //   title:t('aiSummary'),
-    //   isVisible: true,
-    //   key:'headline',
-    //   render:'headline',
-    //   minWidth:232,
-    // },
+    {
+      title:t('aiSummary'),
+      isVisible: true,
+      key:'headline',
+      render:'headline',
+      minWidth:232,
+    },
+    {
+      title: t('lastTxsTime1'),
+      key: 'last_trade_at',
+      isVisible: true,
+      render: 'lastTradeAtContent',
+      minWidth:getTextWidth(t('lastTxsTime1'), 50) + 50,
+      align:'right'
+    },
     {
       title: t('mCap'),
       isVisible: true,
@@ -163,23 +171,7 @@ export function getInclusionDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     //   minWidth:getTextWidth(t('runTime2'),50)+60,
     //   align:'right'
     // },
-    {
-      title: t('snipers'),
-      key: 'sniper_tx_count',
-      isVisible: false,
-      render: 'snipersContent',
-      minWidth:getTextWidth(t('snipers')) + 68,
-      align:'right'
-    },
-    {
-      title: t('snipers_1m'),
-      key: 'rusher_tx_count',
-      isVisible: false,
-      render: 'snipers1mContent',
-      minWidth:getTextWidth(t('snipers_1m'), 50) + 60,
-      align:'right'
-    },
-    {
+     {
       title: t('top10'),
       key: 'holders_top10_ratio',
       isVisible: false,
@@ -188,42 +180,52 @@ export function getInclusionDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       align:'right'
     },
     {
-      title:'DEV%',
-      key:'dev_balance_ratio_cur',
-      isVisible:false,
-      render:'devContent',
-      minWidth:78,
-      align:'right'
-    },
-    {
-      title: t('insiders'),
-      key: 'insider_balance_ratio_cur',
+      title: t('snipers'),
+      key: 'sniper_tx_count',
       isVisible: false,
-      render: 'insidersContent',
-      minWidth:110,
+      render: 'snipersContent',
+      minWidth:getTextWidth(t('snipers')) + 68,
       align:'right'
     },
-  
     // {
-    //   title: t('lastTxsTime1'),
-    //   key: 'last_trade_at',
-    //   isVisible: true,
-    //   render: 'lastTradeAtContent',
-    //   minWidth:getTextWidth(t('lastTxsTime1'), 50) + 50,
+    //   title: t('snipers_1m'),
+    //   key: 'rusher_tx_count',
+    //   isVisible: false,
+    //   render: 'snipers1mContent',
+    //   minWidth:getTextWidth(t('snipers_1m'), 50) + 60,
     //   align:'right'
     // },
-    {
-      title: t('security'),
-      key: 'security',
-      isVisible: true,
-      render: 'securityContent',
-      children:[
-        {title:t('security'),isVisible:true,render:'securityContent'},
-        {title:t('runPull'),isVisible:true,render:'runPullContent'},
-      ],
-      minWidth:getTextWidth(t('security'), 50) + 55,
-      align:'right'
-    },
+   
+    // {
+    //   title:'DEV%',
+    //   key:'dev_balance_ratio_cur',
+    //   isVisible:false,
+    //   render:'devContent',
+    //   minWidth:78,
+    //   align:'right'
+    // },
+    // {
+    //   title: t('insiders'),
+    //   key: 'insider_balance_ratio_cur',
+    //   isVisible: false,
+    //   render: 'insidersContent',
+    //   minWidth:110,
+    //   align:'right'
+    // },
+  
+   
+    // {
+    //   title: t('security'),
+    //   key: 'security',
+    //   isVisible: true,
+    //   render: 'securityContent',
+    //   children:[
+    //     {title:t('security'),isVisible:true,render:'securityContent'},
+    //     {title:t('runPull'),isVisible:true,render:'runPullContent'},
+    //   ],
+    //   minWidth:getTextWidth(t('security'), 50) + 55,
+    //   align:'right'
+    // },
     {
       title: t('quick'),
       key: 'quick',

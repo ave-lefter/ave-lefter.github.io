@@ -275,7 +275,7 @@ const filterMap = {
   // first_half_elapsed_time: (el: any) => el.isVisible && props.activeTab === 'pump_in_almost',
   // second_half_elapsed_time: (el: any) => el.isVisible && props.activeTab === 'pump_in_almost',
   // progress:(el:any)=>el.isVisible && props.activeTab.includes('_in'),
-  // headline:(el:any)=>el.isVisible && props.activeTab.includes('_out')
+  headline:(el:any)=>el.isVisible 
 }
 
 const visibleColumns = computed(() => {
@@ -290,7 +290,7 @@ const visibleColumns = computed(() => {
 const headerRenderer = computed(() => {
   return {
     poolPair: PoolPairHeader,
-    // headline: () => t('aiSummary'),
+    headline: () => t('aiSummary'),
     current_price_usd: PriceHeader,
     mCap: MCapHeader,
     price_change_1m: DynamicPriceChangeHeader,
@@ -312,13 +312,13 @@ const headerRenderer = computed(() => {
     // first_half_elapsed_time: HalfTimeHeader,
     // second_half_elapsed_time: FullHeader,
     rusher_tx_count: Snipers1mHeader,
-    // last_trade_at: LastTradeHeader,
+    last_trade_at: LastTradeHeader,
   }
 })
 const cellRenderer = computed(() => {
   return {
     poolPair: PoolPairContent,
-    // headline: Headline,
+    headline: Headline,
     mCap: MCapContent,
     current_price_usd: PriceContent,
     price_change_1m: ({ row }) => {
@@ -358,7 +358,7 @@ const cellRenderer = computed(() => {
     //   )
     // },
     rusher_tx_count: Snipers1mContent,
-    // last_trade_at: LastTradeContent,
+    last_trade_at: LastTradeContent,
   }
 })
 </script>
