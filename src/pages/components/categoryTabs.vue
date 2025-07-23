@@ -47,11 +47,11 @@ const configMap = computed(() => {
       class: isHot.value ? 'color-#FFA622' : '',
     },
     new: {
-      icon: 'custom:hot',
+      icon: 'custom:new',
       storageKey: 'newTableColumns',
       getDefaultColumns: getNewDefaultColumns,
       getOptions: getNewOptions,
-      class: isNew.value ? 'color-#FFA622' : '',
+      class: isNew.value ? 'color-#85E12F' : '',
     },
     pump: {
       icon: getPumpIcon(isPump.value),

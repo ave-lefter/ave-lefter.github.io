@@ -4,6 +4,7 @@ import { getNewDefaultColumns } from './columnRender/newColumnsService'
 import { getTreasureList } from '~/api/market'
 import {
   PriceContent,
+  PriceHeader,
   quickContent,
   dexContent,
   securityContent,
@@ -290,7 +291,7 @@ const headerRenderer = computed(() => {
   return {
     poolPair: PoolPairHeader,
     // headline: () => t('aiSummary'),
-    // current_price_usd: PriceHeader,
+    current_price_usd: PriceHeader,
     mCap: MCapHeader,
     price_change_1m: DynamicPriceChangeHeader,
     price_change_24h: DynamicPriceChangeHeader,
@@ -319,7 +320,7 @@ const cellRenderer = computed(() => {
     poolPair: PoolPairContent,
     // headline: Headline,
     mCap: MCapContent,
-    // current_price_usd: PriceContent,
+    current_price_usd: PriceContent,
     price_change_1m: ({ row }) => {
       return <PriceChange row={row} activeInterval="1m" />
     },

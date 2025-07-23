@@ -4,7 +4,7 @@ export function getNewOptions(t: ReturnType<typeof useI18n>['t']) {
         title: t('basicInfo'),
         list: [
           // 'headline',
-          // 'priceContent',
+          'priceContent',
           'mCapContent',
           'liquidityContent',
           'holdersContent',
@@ -58,14 +58,6 @@ export function getNewDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     //   minWidth:232,
     // },
     {
-      title: t('smarter1'),
-      key: 'smart_money_buy_volume_24h',
-      isVisible: true,
-      render: 'smarterContent',
-      minWidth:110,
-      align:'right'
-    },
-    {
       title: t('mCap'),
       isVisible: true,
       key:'mCap',
@@ -81,14 +73,14 @@ export function getNewDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       minWidth:160,
       align:'right'
     },
-    // {
-    //   title: t('price'),
-    //   key: 'current_price_usd',
-    //   isVisible: true,
-    //   render: 'priceContent',
-    //   minWidth:130,
-    //   align:'right'
-    // },
+    {
+      title: t('price'),
+      key: 'current_price_usd',
+      isVisible: true,
+      render: 'priceContent',
+      minWidth:130,
+      align:'right'
+    },
     {
       title: '1m%',
       key: 'price_change_1m',
@@ -137,6 +129,14 @@ export function getNewDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       isVisible: true,
       render: 'holdersContent',
       minWidth:getTextWidth(t('holders'), 50) + 50,
+      align:'right'
+    },
+    {
+      title: t('smarter1'),
+      key: 'smart_money_buy_volume_24h',
+      isVisible: true,
+      render: 'smarterContent',
+      minWidth:110,
       align:'right'
     },
     // {
