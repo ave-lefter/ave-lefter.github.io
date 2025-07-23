@@ -61,7 +61,7 @@ const previousTab = ref<keyof typeof components>('Transactions')
 watch(
   () => orderBookVisible.value,
   (isVisible) => {
-    console.log('🔄 订单薄状态变化:', isVisible ? '打开' : '关闭')
+    // console.log('🔄 订单薄状态变化:', isVisible ? '打开' : '关闭')
     if (isVisible) {
       // 当 orderBook 打开时，保存当前标签并切换到其他标签
       if (activeTab.value === 'Transactions') {
@@ -74,7 +74,7 @@ watch(
     } else {
       // 当 orderBook 关闭时，恢复到之前的标签（默认为 Transactions）
       activeTab.value = previousTab.value || 'Transactions'
-      console.log('🔄 恢复到标签:', activeTab.value)
+      // console.log('🔄 恢复到标签:', activeTab.value)
     }
   },
   { immediate: true }
@@ -141,7 +141,7 @@ const comProps = computed(() => {
     <div class="flex items-center px-12px gap-20px border-b-1px border-b-solid border-b-#FFFFFF08 mb-12px">
       <a
         v-for="(item) in tabsList" :key="item.component" href="javascript:;"
-         :class="`flex items-center decoration-none text-12px lh-20px text-center color-[--d-666-l-999] ${activeTab === item.component ? 'color-[--d-F5F5F5-l-222] b-b-[--d-F5F5F5-l-333]' : 'b-b-transparent'}`"
+         :class="`flex items-center decoration-none text-12px lh-20px text-center color-[--d-666-l-999] ${activeTab === item.component ? 'color-[--d-F5F5F5-l-222] b-b-[--d-F5F5F5-l-333] font-500' : 'b-b-transparent'}`"
         @click="activeTab = item.component">
         <div v-if="item.component == 'Orders'" class="w-1px h-20px bg-[var(--custom-br-1-color)] mr-20px mb-8px"/>
         <div
@@ -173,7 +173,7 @@ const comProps = computed(() => {
     </div>
     <OrdersTab v-show="activeTab === 'Orders'" :currentActiveTab="activeTab"/>
     <KeepAlive v-show="activeTab !== 'Orders'">
-      <component :is="Component" v-bind="comProps"/>
+      <component :is="Component" v-bind="comProps" :currentActiveTab="activeTab" />
     </KeepAlive>
   </div>
 </template>

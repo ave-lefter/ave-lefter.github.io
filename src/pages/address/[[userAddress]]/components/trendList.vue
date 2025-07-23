@@ -6,13 +6,13 @@
       :data="tableData"
       fit
       style="width: 100%"
-      cell-class-name="color-[--d-F5F5F5-l-222]"
+      cell-class-name="color-[--d-CCC-l-333]"
       row-class-name="cursor-pointer"
       header-row-class-name="text-12px"
       @row-click="jumpTokenDetail"
     >
       <template #empty>
-        <AveEmpty v-if="!loading && tableData.length===0" class="pt-40px"/>
+        <AveEmpty v-if="!loading && tableData.length===0" class="[pt-40px]"/>
         <span v-else/>
       </template>
       <TokenColumn
@@ -41,10 +41,10 @@
             </template>
             <template #default>
               <div class="filter-box" :class="mode">
-                <div class="text-14px font-400 color-[--d-F5F5F5-l-333]">
+                <div class="text-14px font-400">
                   {{ $t('filterByDate') }}
                 </div>
-                <div class="flex text-12px mt-10px color-[--d-999-l-666]">
+                <div class="flex text-12px mt-10px">
                   <span style="flex: 1.2">{{ $t('startTime') }}</span>
                   <span class="flex-1">{{ $t('endTime2') }}</span>
                 </div>

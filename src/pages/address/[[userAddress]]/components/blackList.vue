@@ -60,9 +60,9 @@
               </template>
             </el-table-column>
 
-            <el-table-column min-width="60" header-align="right" :label="t('operation')">
+            <el-table-column min-width="60" :label="t('operation')">
               <template #default="{ row }">
-                <div class="flex justify-end">
+                <div class="">
                   <el-button
                     class="recover-btn"
                     size="small"

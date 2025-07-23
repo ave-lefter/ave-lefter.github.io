@@ -421,6 +421,8 @@
   "revoke": "İptal etmek",
   "expiredTime": "Son kullanma tarihi",
   "historyLimitOrder": "Limit Emri",
+  "cowboys": "Cüzdan Kovboyu",
+  "kol": "Cüzdan KOL",
   "isMonitored": "İzleme ekleyip eklemeyeceği",
   "no": "HAYIR",
   "followAddress": "Adresi Takip Edin",
@@ -444,5 +446,6 @@
   "insidersPosition1": "İçeridekiler",
   "login": "Giriş yapmak",
   "platform": "Platform",
-  "onlyPush": "Sadece Push"
+  "onlyPush": "Sadece Push",
+  "complete": "Tamamla"
 }

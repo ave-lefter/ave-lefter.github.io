@@ -239,7 +239,7 @@
             <span>{{ $t('ratio')}}/{{ isShowBalance ? $t('bal') : $t('amount') }}</span>
             <img
               v-show="isShowBalance"
-              class="clickable ml-3"
+              class="clickable ml-3px"
               src="@/assets/images/ratio.svg"
               height="12"
               alt=""
@@ -248,7 +248,7 @@
             >
             <img
               v-show="!isShowBalance"
-              class="clickable ml-3"
+              class="clickable ml-3px"
               src="@/assets/images/amount.svg"
               height="12"
               alt=""
@@ -1037,17 +1037,16 @@ const collect = async (row: any,index:number) => {
         user_chain: row.chain,
         group: form.group,
         is_monitored: form.is_monitored,
-      }).then(() => {
-        ElMessage.success(t('attention1Success'));
+      }).then((res) => {
         (tableList.value as Array<any>)[index].is_wallet_address_fav = 1
         // getList()
-        return Promise.resolve()
+        return Promise.resolve(res)
       }).catch((err) => {
         return Promise.reject(err)
       }).finally(() => {
       })
     })
-    return 
+    return
   }
   // loading.value = true
   deleteAttention({

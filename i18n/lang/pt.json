@@ -426,6 +426,8 @@
   "revoke": "Cancelar",
   "expiredTime": "Expiração",
   "historyLimitOrder": "Ordem de Limite",
+  "cowboys": "Top Traders",
+  "kol": "KOL",
   "isMonitored": "Se deve adicionar monitoramento",
   "no": "não",
   "followAddress": "Siga o endereço",
@@ -449,5 +451,6 @@
   "insidersPosition1": "Insiders Possuído",
   "login": "Conecte-se",
   "platform": "Plataforma",
-  "onlyPush": "Apenas empurre"
+  "onlyPush": "Apenas empurre",
+  "complete": "Completo"
 }

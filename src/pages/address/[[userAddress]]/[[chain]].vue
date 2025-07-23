@@ -167,6 +167,9 @@ import PageBlank from './components/pageBlank.vue'
 import PageOther from './components/pageOther.vue'
 import { getChainInfo } from '@/utils'
 
+const isVolUSDT = ref(true)
+provide('isVolUSDT', isVolUSDT)
+
 const interval = ref('7D')
 const route = useRoute()
 const botStore = useBotStore()

@@ -17,6 +17,7 @@ const tokenStore = useTokenStore()
 const botStore = useBotStore()
 const { t } = useI18n()
 const route = useRoute()
+const wsStore = useWSStore()
 
 const unifiedRef = ref<any>()
 const activeTab = ref('solana')
@@ -76,7 +77,7 @@ watch(() => props.currentActiveTab, () => {
   }
 })
 
-watch([() => route.params.id, () => tokenStore.placeOrderUpdate, () => tokenStore.placeOrderSuccess], () => {
+watch([() => route.params.id, () => wsStore.wsResult?.tgbot], () => {
   const chain = String(route.params.id).split('-')[1]
   if (tabs.value.find(i => i?.chain === chain)) {
     activeTab.value = chain
@@ -98,9 +99,7 @@ onMounted(() => {
   <div>
     <div class="px-12px mb-10px flex justify-between">
       <div class="flex items-center whitespace-nowrap w-[80%] overflow-x-auto scrollbar-hide">
-        <a v-for="(item) in tabs" :key="item.chain" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-999-l-666] px-12px py-4px rounded-4px
-          ${activeTab === item.chain ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333]' : ''}`"
-          @click="setActiveTab(item.chain)">
+        <a v-for="(item) in tabs" :key="item.chain" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-999-l-666] px-12px py-4px rounded-4px ${activeTab === item.chain ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333]' : ''}`" @click="setActiveTab(item.chain)">
           {{ getChainInfo(item.chain).name }}
         </a>
       </div>

@@ -846,17 +846,41 @@ export async function bot_getUserTxHistory1(query: {
   })
 }
 
-export async function bot_getUserPendingTx(query: {
+export const bot_getUserPendingTx = createCacheRequest(async function(query: {
   chain: string;
   token: string;
   walletAddress: string;
-}) {
+}): Promise<Array<{
+  id: number
+  createTime: string
+  updateTime: string
+  status: string
+  tgUid: string
+  batchId: string
+  chain: string
+  swapType: number
+  creatorAddress: string
+  inTokenAddress: string
+  inTokenDecimals: number
+  inTokenSymbol: string
+  outTokenAddress: string
+  outTokenDecimals: number
+  outTokenSymbol: string
+  inTokenLogoUrl: string
+  outTokenLogoUrl: string
+  inValue: string
+  inPrice: string
+  inAmount: string
+  PriceLimit: string
+  expireAt: number
+}>> {
   const { $api } = useNuxtApp()
+  if (!query.walletAddress) return []
   return $api('/botapi/swap/getUserPendingTx', {
     method: 'get',
     query,
   })
-}
+}, 1500)
 
 export function bot_cancelLimitOrdersByBatch(params: any) {
   const { $api } = useNuxtApp()

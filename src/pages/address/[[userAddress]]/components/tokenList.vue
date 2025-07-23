@@ -11,19 +11,19 @@
       fit
       style="width: 100%"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
-      cell-class-name="color-#848E9C"
+      cell-class-name="color-[--d-CCC-l-333]"
       row-class-name="cursor-pointer"
       @row-click="jumpBalance"
       @sort-change="handleSortChange"
     >
       <template #empty>
-        <AveEmpty v-if="!loading && tableData.length===0" class="pt-40px"/>
+        <AveEmpty v-if="!loading && tableData.length===0" class="pt-[40px]"/>
         <span v-else/>
       </template>
       <TokenColumn
         :column-props="{
           label: $t('recentlyTrade'),
-          width: '250',
+          width: '180',
           fixed: 'left',
           sortable: 'custom',
           sortOrders: ['descending', 'ascending', null],
@@ -73,14 +73,19 @@
         sortable="custom"
       >
         <template #default="{ row }">
-          <span v-if="row?.unrealized_profit > 0" class="color-#12B886'">
-            ${{ formatNumber(row?.unrealized_profit || 0, 2) }}
-          </span>
-          <span v-else-if="row?.unrealized_profit == 0">$0</span>
-          <span v-else-if="row?.unrealized_profit == '--'">--</span>
-          <span v-else class="color-#FF646D">
-            {{ '-$' + formatNumber(Math.abs(row?.unrealized_profit) || 0, 2) }}
-          </span>
+          <div v-if="row?.unrealized_profit == 0 && row.balance_amount == 0" class="color-#FF646D text-12px">
+            {{$t('sellAl')}}
+          </div>
+          <div v-else>
+            <span v-if="row?.unrealized_profit > 0" class="color-#12B886">
+              ${{ formatNumber(row?.unrealized_profit || 0, 2) }}
+            </span>
+            <span v-else-if="row?.unrealized_profit == 0">$0</span>
+            <span v-else-if="row?.unrealized_profit == '--'">--</span>
+            <span v-else class="color-#FF646D">
+              {{ '-$' + formatNumber(Math.abs(row?.unrealized_profit) || 0, 2) }}
+            </span>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -91,47 +96,50 @@
         sortable="custom"
       >
         <template #header>
-          <span
-              class="inline-flex items-center"
-          >{{ $t('balance1') }}<Icon
+          <span class="inline-flex items-center" >
+            {{ $t('balance1') }}
+            <Icon
               name="custom:price"
-              :class="`${isVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-F5F5F5-l-222]'} cursor-pointer ml-3px`"
-              @click.stop.prevent="isVolUSDT = !isVolUSDT"
+              :class="`${injecteIsVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-222]'} cursor-pointer ml-3px`"
+              @click.stop.prevent="injecteIsVolUSDT=!injecteIsVolUSDT"
             />
           </span>
         </template>
         <template #default="{ row }">
-          <span v-if="row?.balance_usd == 0">0</span>
-          <span v-else-if="row?.balance_usd == '--'">--</span>
-          <span v-else class="color-[--d-F5F5F5-l-333] flex justify-end">
-            <template v-if="!isVolUSDT">
-              {{
-                row?.main_token_price == 0
-                  ? 0
-                  : formatNumber(row?.balance_usd / row?.main_token_price || 0, 2)
-              }}
-              <span class="text-12px color-[--d-999-l-666] ml-3px">{{ row?.main_token_symbol }}</span>
-            </template>
-            <template v-else>
-              {{ '$' + formatNumber(row?.balance_usd || 0, 2) }}
-            </template>
-          </span>
-          <span
-              class="block text-12px lh-17px"
-          >
-            <template v-if="row?.balance_amount == 0">0</template>
-            <template v-else-if="row?.balance_amount == '--'">--</template>
-            <template v-else>
-              {{ formatNumber(row?.balance_amount || 0, 2) }}
-            </template>
-          </span>
+          <div v-if="row.balance_amount == 0 && row.total_sold > 0" class="color-#FF646D text-12px">{{$t('sellAl')}}</div>
+          <div v-else>
+            <span v-if="row?.balance_usd == 0">0</span>
+            <span v-else-if="row?.balance_usd == '--'">--</span>
+            <span v-else class="flex justify-end">
+              <template v-if="!injecteIsVolUSDT">
+                {{
+                  row?.main_token_price == 0
+                    ? 0
+                    : formatNumber(row?.balance_usd / row?.main_token_price || 0, 2)
+                }}
+                <span class="text-12px color-[--d-999-l-666] ml-3px">{{ row?.main_token_symbol }}</span>
+              </template>
+              <template v-else>
+                {{ '$' + formatNumber(row?.balance_usd || 0, 2) }}
+              </template>
+            </span>
+            <span
+                class="block text-12px lh-17px"
+            >
+              <template v-if="row?.balance_amount == 0">0</template>
+              <template v-else-if="row?.balance_amount == '--'">--</template>
+              <template v-else>
+                {{ formatNumber(row?.balance_amount || 0, 2) }}
+              </template>
+            </span>
+          </div>
         </template>
       </el-table-column>
       <el-table-column :label="$t('wallet_detail_total_buy_avg')" align="right">
         <template #default="{ row }">
           <span v-if="row?.total_purchase_usd == 0">0</span>
           <span v-else-if="row?.total_purchase_usd == '--'">--</span>
-          <span v-else class="color-[--d-F5F5F5-l-333]">
+          <span v-else>
             {{ '$' + formatNumber(row?.total_purchase_usd || 0, 2) }}
           </span>
           <span
@@ -150,7 +158,7 @@
         <template #default="{ row }">
           <span v-if="row?.total_sold_usd == 0">0</span>
           <span v-else-if="row?.total_sold_usd == '--'">--</span>
-          <span v-else class="color-[--d-F5F5F5-l-333]">
+          <span v-else>
             {{ '$' + formatNumber(row?.total_sold_usd || 0, 2) }}
           </span>
           <span
@@ -213,7 +221,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 // import { formatNumber2, formatNumberS } from '@/utils/formatNumber'
 import HideTokenDialog from './hideTokenDialog.vue'
 import TokenColumn from '@/components/tokenColumn.vue'
@@ -256,14 +264,11 @@ const props = defineProps({
   address: String,
 })
 
-const emit = defineEmits(['hideToken'])
-
+const _emit = defineEmits(['hideToken'])
 const hideTokenVisible = ref(false)
 const currentHideToken = ref({})
-const isVolUSDT = shallowRef(true)
-
+const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
 const themeStore = useThemeStore()
-
 const tokenDetailSStore = useTokenDetailsStore()
 const route = useRoute()
 function jumpBalance(row) {

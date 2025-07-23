@@ -6,21 +6,21 @@
     header-class="!mb-5"
   >
     <template #header>
-      <span class="pnl-title text-[var(--d-fff-l-333)]">{{ $t('pnlDetail') }}</span>
+      <span class="pnl-title text-[var(--d-FFF-l-333)]">{{ $t('pnlDetail') }}</span>
     </template>
     <el-divider class="!m-0 !mb-5 !border-t-[--d-33353D-l-F5F5F5]" />
     <div>
       <div class="pnl-row flex justify-between px-5 text-3.5 leading-5 mb-3">
         <span class="pnl-row-name text-[#959a9f]">{{ $t('Txs') }}</span>
-        <span class="pnl-row-value text-[var(--d-fff-l-333)]">{{ eventsDetail.txns }}</span>
+        <span class="pnl-row-value text-[var(--d-FFF-l-333)]">{{ eventsDetail.txns }}</span>
       </div>
       <div class="pnl-row flex justify-between px-5 text-3.5 leading-5 mb-3">
         <span class="pnl-row-name text-[#959a9f]">{{ $t('Vol') }}</span>
-        <span class="pnl-row-value text-[var(--d-fff-l-333)]">${{ volume }}</span>
+        <span class="pnl-row-value text-[var(--d-FFF-l-333)]">${{ volume }}</span>
       </div>
       <div class="pnl-row flex justify-between px-5 text-3.5 leading-5 mb-3">
         <span class="pnl-row-name text-[#959a9f]">{{ $t('time') }}</span>
-        <span class="pnl-row-value text-[var(--d-fff-l-333)]">{{ time }}</span>
+        <span class="pnl-row-value text-[var(--d-FFF-l-333)]">{{ time }}</span>
       </div>
       <div
         v-infinite-scroll="onLoad"

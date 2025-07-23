@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="flex justify-between items-center gap-8px h-54px">
-      <el-select v-model="monitorStore.selectGroupId"  :mode="mode" @click.stop @change="(val) => filterGroup(val)">
+      <el-select v-model="selectGroupId"  :mode="mode" @click.stop @change="(val) => filterGroup(val)">
         <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
         <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
       </el-select>
@@ -20,7 +20,7 @@
         ref="aveTableRef"
         rowKey="index"
         fixed
-        :data="monitorStore.monitorList1"
+        :data="monitorList1"
         :showFooter="showFooter"
         :footText="footText"
         :columns="columns"
@@ -73,7 +73,7 @@
                   />
               </template>
               <ul>
-                <li v-for="item in chainOptions" :key="item.value" class="hover:bg-[--d-333-l-F2F2F2] h-26px! flex! items-center! font-500! text-14px! lh-20px! clickable" @click.stop="conditions.user_chain=item.value;visible=false">
+                <li v-for="item in chainOptions" :key="item.value" class="hover:bg-[--d-333-l-F2F2F2] h-26px! flex! items-center! font-500! text-14px! lh-20px! clickable" @click.stop="conditions.user_chain=item.value;user_chain=item.value;visible=false">
                   <Icon v-if="item.value=='AllChains'" name="icon-park-outline:link-one" class="text-15px mr-4px rd-50%"/>
                   <img v-else :src="`${token_logo_url}chain/${item?.id}.png`" class="rd-50% mr-4px" width="16" lazy alt="">
                   <span>{{ item.label }}</span>
@@ -149,13 +149,13 @@ const visible = ref(false)
 const addButtonRef = ref()
 const addFavAddressPopRef = ref()
 // const selectGroupId=ref(0)
-const monitorStore = useMonitorStore()
+const {selectGroupId,paginationParams,user_chain,monitorList1} = storeToRefs(useMonitorStore())
 const {currentAddress ,showBatchAddressDetails, updateNum1,updateNum2,updateNum3,addressGroups} = storeToRefs(useFollowStore())
 const conditions = reactive({
-  group: monitorStore.selectGroupId,
+  group: selectGroupId.value,
   activeTab: '7d',
   isMonitor: false,
-  user_chain: 'AllChains',
+  user_chain:user_chain.value,
   sort: '',
   sort_dir: '',
   keyword: '',
@@ -182,7 +182,7 @@ const loading=ref(false)
 //   page: 1,
 //   pageSize: 50
 // })
-const paginationParams = ref({...defaultPaginationParams,pageSize: 50})
+// const paginationParams = monitorStore.paginationParams
 const showFooter=ref(false)
 const footText = computed(() => {
   if(paginationParams.value.loaded){
@@ -203,9 +203,9 @@ const footText = computed(() => {
 //   })
 // }
 onMounted(() => {
-  console.log('mounted walletManage',props)
+  console.log('mounted walletManage',conditions)
    if(!botStore.evmAddress) return
-   if(monitorStore.monitorList1.length>0) return
+   if(monitorList1.value.length>0) return
   init()
 })
 watch(() => updateNum1.value+updateNum3.value, () => {
@@ -259,8 +259,8 @@ const handleMonitor=throttle((row:any,index:number=0)=>{
       uid: id,
       address:user_address
     }).then(() => {
-      monitorStore.monitorList1[index].is_monitored = row.is_monitored===0?1:0
-      // monitorStore.monitorList1[index].is_pause = row.is_pause===0?1:0
+      monitorList1.value[index].is_monitored = row.is_monitored===0?1:0
+      // monitorList1.value[index].is_pause = row.is_pause===0?1:0
       // getTableList()
       // followStore.shouldInitAddressPage={
       //   num: followStore.shouldInitAddressPage.num + 1,
@@ -277,7 +277,7 @@ const handleMonitor=throttle((row:any,index:number=0)=>{
       chain: user_chain,
       user_address: botStore.evmAddress,
     }).then(() => {
-      monitorStore.monitorList1[index].is_monitored = row.is_monitored===0?1:0
+      monitorList1.value[index].is_monitored = row.is_monitored===0?1:0
       // getTableList()
       ElMessage.success(t('success'))
       // followStore.shouldInitAddressPage={
@@ -318,7 +318,7 @@ const getTableList = throttle(function() {
     const data=res?.data||[]
     if (Array.isArray(data) && data?.length > 0) {
       if(pageNO === 1) {
-        monitorStore.monitorList1 = data.map((i:any) => {
+        monitorList1.value = data.map((i:any) => {
           return {
             ...i,
             index: `${i.user_address}-${i.user_chain}`,
@@ -327,7 +327,7 @@ const getTableList = throttle(function() {
         })
         loading.value = false
       }else{
-        monitorStore.monitorList1 = [...monitorStore.monitorList1].concat(data.filter?.(i => monitorStore.monitorList1?.every?.(j => j.index !== `${i.user_address}-${i.user_chain}`))
+        monitorList1.value = [...monitorList1.value].concat(data.filter?.(i => monitorList1.value?.every?.(j => j.index !== `${i.user_address}-${i.user_chain}`))
             ?.map(i => ({
               ...i, index: `${i.user_address}-${i.user_chain}`, group_id:conditions.group,
             })))
@@ -338,7 +338,7 @@ const getTableList = throttle(function() {
       }
     }else{
       if(pageNO === 1) {
-        monitorStore.monitorList1 = []
+        monitorList1.value = []
       }
       paginationParams.value.finished = true
     }

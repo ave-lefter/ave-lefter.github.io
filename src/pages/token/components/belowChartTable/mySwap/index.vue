@@ -12,9 +12,11 @@ const walletStore = useWalletStore()
 const { t } = useI18n()
 const tokenStore = useTokenStore()
 const route = useRoute()
+const wsStore = useWSStore()
 
 const unifiedRef = ref()
-const activeTab = ref('solana')
+const _chain = getAddressAndChainFromId(route.params.id as string)?.chain
+const activeTab = ref(_chain || 'solana')
 const botOrderOnlyCurrentToken = useSessionStorage('mySwapBotOrderOnlyCurrentToken', true)
 const walletTxData = ref<any>()
 const tabs = computed(() => {
@@ -127,14 +129,13 @@ const getWalletTxData = async () => {
   }
   const txInfo = await bot_getUserWalletTxInfo(params)
   walletTxData.value = txInfo[0]
-  console.log(txInfo, 'txInfo')
 }
 
-let timer: any
+let timer: null | ReturnType<typeof setInterval> = null
 let lastUpdateTime = 0
 const maxUpdateNum = 15
 
-watch([() => tokenStore.placeOrderSuccess], () => {
+watch([() => wsStore.wsResult?.tgbot], () => {
   const chain = getAddressAndChainFromId(String(route.params.id))?.chain
   if (tabs.value.find(i => i?.chain === chain)) {
     activeTab.value = chain
@@ -144,8 +145,10 @@ watch([() => tokenStore.placeOrderSuccess], () => {
   if (!timer) {
     timer = setInterval(() => {
       if (lastUpdateTime >= maxUpdateNum) {
-        clearInterval(timer)
-        timer = null
+        if (timer) {
+          clearInterval(timer)
+          timer = null
+        }
         lastUpdateTime = 0
         return
       }
@@ -158,16 +161,18 @@ watch([() => tokenStore.placeOrderSuccess], () => {
 })
 
 watch([() => route.params.id], () => {
-  const chain = String(route.params.id).split('-')[1]
+  const chain = getAddressAndChainFromId(String(route.params.id))?.chain
   if (tabs.value.find(i => i?.chain === chain)) {
     activeTab.value = chain
   }
-  getWalletTxData()
-  unifiedRef.value?.getTxHistory()
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
 })
 
 onMounted(() => {
-  const chain = String(route.params.id).split('-')[1]
+  const chain = getAddressAndChainFromId(String(route.params.id))?.chain
   if (tabs.value.find(i => i?.chain === chain)) {
     activeTab.value = chain
   }
@@ -199,7 +204,7 @@ onMounted(() => {
     <!-- 顶部交易统计区域 -->
     <div class="transaction-stats">
       <div class="stat-item">
-        <div class="stat-label text-[var(--d-666-l-999)]">{{ t('balance1') }}</div>
+        <div class="stat-label text-[--d-666-l-999]">{{ t('balance1') }}</div>
         <div class="stat-value table-field-text text-[var(--d-999-l-959A9F)]">${{ formatNumber(balance, 2) }}</div>
         <div class="stat-change table-field-text text-[var(--d-999-l-959A9F)]">
           {{ formatNumber(walletTxData?.balance_amount || 0, 4) }} {{ tokenSymbol }}
@@ -209,7 +214,7 @@ onMounted(() => {
         </div>
       </div>
       <div class="stat-item">
-        <div class="stat-label text-[var(--d-666-l-999)]">{{ t('totalProfit') }}</div>
+        <div class="stat-label text-[--d-666-l-999]">{{ t('totalProfit') }}</div>
         <div class="stat-value table-field-text text-[var(--d-999-l-959A9F)]" :style="{ color: totalProfit >= 0 ? '#12B886' : '#ff646d' }">
           {{ totalProfit >= 0 ? '+' : '-' }}${{ removeLeadingMinus(formatNumber(totalProfit, 2)) }}
         </div>
@@ -218,7 +223,7 @@ onMounted(() => {
         </div>
       </div>
       <div class="stat-item">
-        <div class="stat-label text-[var(--d-666-l-999)]">{{ t('realizedProfit') }}</div>
+        <div class="stat-label text-[--d-666-l-999]">{{ t('realizedProfit') }}</div>
         <div class="stat-value table-field-text text-[var(--d-999-l-959A9F)]" :style="{ color: realizedProfit >= 0 ? '#12B886' : '#ff646d' }">
           {{ realizedProfit >= 0 ? '+' : '-' }}${{ removeLeadingMinus(formatNumber(realizedProfit, 2)) }}
         </div>
@@ -227,25 +232,25 @@ onMounted(() => {
         </div>
       </div>
       <div class="stat-item">
-        <div class="stat-label text-[var(--d-666-l-999)]">{{ t('unrealizedProfit') }}</div>
-        <div class="stat-value table-field-text text-[var(--d-999-l-959A9F)]" :style="{ color: unrealizedProfit >= 0 ? '#12B886' : '#ff646d' }">
+        <div class="stat-label text-[--d-666-l-999]">{{ t('unrealizedProfit') }}</div>
+        <div class="stat-value table-field-text text-[--d-999-l-959A9F]" :style="{ color: unrealizedProfit >= 0 ? '#12B886' : '#ff646d' }">
           {{ unrealizedProfit >= 0 ? '+' : '-' }}${{ removeLeadingMinus(formatNumber(unrealizedProfit, 2)) }}
         </div>
-        <div class="stat-change text-[var(--d-999-l-959A9F)]" :style="{ color: unrealizedProfitPercentage >= 0 ? '#12B886' : '#ff646d' }">
+        <div class="stat-change text-[--d-999-l-959A9F]" :style="{ color: unrealizedProfitPercentage >= 0 ? '#12B886' : '#ff646d' }">
           {{ unrealizedProfitPercentage >= 0 ? '+' : '' }}{{ formatNumber(unrealizedProfitPercentage, 2) }}%
         </div>
       </div>
       <div class="stat-item">
-        <div class="stat-label text-[var(--d-666-l-999)]">{{ t('buyPriceWithSlash') }}</div>
-        <div class="stat-value token-amount table-field-text text-[var(--d-999-l-959A9F)]">{{ buyTokenAmount }} {{
+        <div class="stat-label text-[--d-666-l-999]">{{ t('buyPriceWithSlash') }}</div>
+        <div class="stat-value table-field-text text-[--d-999-l-959A9F]">{{ buyTokenAmount }} {{
           tokenSymbol }}</div>
-        <div class="stat-change table-field-text text-[var(--d-999-l-959A9F)]">{{ buyUsdAmount }}</div>
+        <div class="stat-change table-field-text text-[--d-999-l-959A9F]">{{ buyUsdAmount }}</div>
       </div>
       <div class="stat-item">
-        <div class="stat-label text-[var(--d-666-l-999)]">{{ t('sellPriceWithSlash') }}</div>
-        <div class="stat-value token-amount table-field-text text-[var(--d-999-l-959A9F)]">{{ sellTokenAmount }} {{
+        <div class="stat-label text-[--d-666-l-999]">{{ t('sellPriceWithSlash') }}</div>
+        <div class="stat-value table-field-text text-[--d-999-l-959A9F]">{{ sellTokenAmount }} {{
           tokenSymbol }}</div>
-        <div class="stat-change table-field-text text-[var(--d-999-l-959A9F)]">{{ sellUsdAmount }}</div>
+        <div class="stat-change table-field-text text-[--d-999-l-959A9F]">{{ sellUsdAmount }}</div>
       </div>
     </div>
 

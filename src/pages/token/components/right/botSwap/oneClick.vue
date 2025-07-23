@@ -10,9 +10,9 @@
           <span>{{ $t('oneClick') }}</span>
           <div class="tabs-1 ml-5px">
             <button
-              v-for="item in ['s1', 's2', 's3']" :key="item"
+              v-for="item in (['s1', 's2', 's3'] as const)" :key="item"
               :class="{ 'active': item === botSettings?.[chain]?.selected }" type="button"
-              @click.stop="botSettings[chain as string]!.selected = item">{{ item.toUpperCase() }}</button>
+              @click.stop="botSettings[chain]!.selected = item">{{ item.toUpperCase() }}</button>
           </div>
           <SlippageSetMarket :chain="chain" />
         </div>
@@ -29,7 +29,7 @@
         </div>
         <div class="mt-10px tabs">
           <el-button
-            v-for="(item, $index) in botSettings?.[chain as string]![selected as 's1' | 's2' | 's3']?.buyValueList"
+            v-for="(item, $index) in botSettings?.[chain]![selected]?.buyValueList"
             :key="$index" class="one-click-button green clickable" :loading="loadingSwapBuy[$index]"
             :disabled="loadingSwapBuy[$index]" @click.stop.prevent="submitBotSwap(item, 'buy', $index)">{{
               !loadingSwapBuy[$index] ? item : '' }}</el-button>
@@ -42,7 +42,7 @@
         </div>
         <div class="mt-10px tabs">
           <el-button
-            v-for="(item, $index) in botSettings?.[chain as string]![selected as 's1' | 's2' | 's3']?.sellPerList"
+            v-for="(item, $index) in botSettings?.[chain]![selected]?.sellPerList"
             :key="$index" class="one-click-button red clickable" :loading="loadingSwapSell[$index]"
             :disabled="loadingSwapSell[$index]" @click.stop.prevent="handleSellAmount(item, $index)">{{
               !loadingSwapSell[$index] ? item + '%' : ''
@@ -66,6 +66,8 @@ import { useBotSwap } from '~/composables/botSwap'
 import { bot_createSolTx, bot_createSwapEvmTx } from '@/api/bot'
 import RefreshBalance from './refreshBalance.vue'
 import SlippageSetMarket from './slippageSetMarket.vue'
+import type { BotChain, BotSettingKey } from '~/utils/types'
+
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
 const botSettingStore = useBotSettingStore()
@@ -81,7 +83,7 @@ const visible = useLocalStorage('oneClickVisible', false)
 const { getTokenBalance, checkApproveAndApprove } = useBotSwap()
 
 const chain = computed(() => {
-  return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as string
+  return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as BotChain
 })
 
 const selected = computed(() => {
@@ -90,7 +92,7 @@ const selected = computed(() => {
 
 
 function getChain() {
-  return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) || ''
+  return ((getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) || '') as BotChain
 }
 
 
@@ -138,7 +140,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
   if (chain === 'solana') {
     const botSettings = botSettingStore.botSettings?.solana
-    const selected = botSettings?.selected as 's1' | 's2' | 's3'
+    const selected = botSettings?.selected as BotSettingKey
     const botSetting = botSettings?.[selected]
     const mev = botSetting?.mev
     const slippage = botSetting?.slippage || '9'
@@ -161,9 +163,13 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       swapType: (isBuy ? 1 : 2) as 1 | 2,
       isPrivate: mev || false,
       priorityFee: botPriorityFee, // botPriorityFee
-      autoSell: isBuy ? botSetting?.autoSell || false : false,
       slippage: slippage !== 'auto' ? Number(new BigNumber(slippage || '9').times(100).toFixed(0)) : 900,
-      autoSlippage: slippage === 'auto'
+      autoSlippage: slippage === 'auto',
+      autoSell: isBuy ? botSettingStore.autoSellConfig_autoSell || false : false,
+      autoSellConfig: botSettingStore?.autoSellConfig,
+      autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
+      autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
+      autoSellPriorityFee: botPriorityFee
     }
     bot_createSolTx(data).then(res => {
       if (res) {
@@ -221,8 +227,8 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
     })
   } else if (isEvmChain(chain)) {
     const botSettings = botSettingStore.botSettings?.[chain]
-    const selected = botSettings?.selected
-    const botSetting = botSettings?.[selected as 's1' | 's2' | 's3']
+    const selected = botSettings?.selected as BotSettingKey
+    const botSetting = botSettings?.[selected]
     const mev = botSetting?.mev
     const slippage = botSetting?.slippage || '9'
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
@@ -243,10 +249,14 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       contractType: 0 as 0 | 1,
       isPrivate: mev || false,
       gasTip: gasTip,
-      autoSell: isBuy ? botSetting?.autoSell || false : false,
       preApprove: true,
       slippage: slippage !== 'auto' ? Number(new BigNumber(slippage || '9').times(100).toFixed(0)) : 900,
-      autoSlippage: slippage === 'auto'
+      autoSlippage: slippage === 'auto',
+      autoSell: isBuy ? botSettingStore.autoSellConfig_autoSell || false : false,
+      autoSellConfig: botSettingStore?.autoSellConfig,
+      autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
+      autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
+      autoSellPriorityFee: gasTip
     }
     bot_createSwapEvmTx(data).then(res => {
       if (res) {
