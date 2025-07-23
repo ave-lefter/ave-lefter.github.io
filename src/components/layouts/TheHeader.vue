@@ -32,6 +32,7 @@
       </span>
     </a>
     <div class="flex-1" />
+    <ClipboardToken />
     <el-button
       v-if="!botStore.evmAddress && !walletStore.address"
       text
@@ -117,6 +118,7 @@ import Notice from '~/components/layouts/components/notice.vue'
 import Positions from '@/components/header/positions/index.vue'
 import ExWalletBtn from '../header/connectWallet/exWalletBtn.vue'
 import BotTipDialog from './components/botTipDialog.vue'
+import ClipboardToken from './components/clipboardToken.vue'
 // import connectWallet from '@/components/header/connectWallet/index.vue'
 // const connectWallet = shallowRef<Component | null>(null)
 const { locales } = useI18n()
