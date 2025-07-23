@@ -1,8 +1,9 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
-import { getHotDefaultColumns } from './columnRender/hotColumusService'
+import { getNewDefaultColumns } from './columnRender/newColumnsService'
 import { getTreasureList } from '~/api/market'
 import {
+  PriceContent,
   quickContent,
   dexContent,
   securityContent,
@@ -18,31 +19,40 @@ import {
   SmarterHeader,
   LiquidityContent,
   LiquidityHeader,
-  PriceHeader,
   MCapContent,
   MCapHeader,
   InsidersContent,
-  Headline,
   DynamicPriceChangeHeader,
   PoolPairHeader,
   PoolPairContent,
   Top10Header,
   InsidersHeader,
   SnipersHeader,
-  PriceContent,
   PriceChange,
+  DevContent,
+  DevHeader,
+  ProgressHeader,
+  Progress,
+  HalfTimeHeader,
+  FullHeader,
+  Snipers1mHeader,
+  Snipers1mContent,
+  LastTradeHeader,
+  LastTradeContent,
+  Headline,
 } from './columnRender/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
-const localeStore = useLocaleStore()
 const globalStore = useGlobalStore()
 
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
+  activeSubTab: string
+  activeTab: string
 }>()
 const sortConditions = ref({
   sort: '',
@@ -64,17 +74,19 @@ function setFilterForm(...args: any[]) {
 }
 const listData = ref<any[]>([])
 const filteredListData = computed(() => {
+  // todo
   if (globalStore.pumpSetting.isBlacklist) {
     return listData.value.filter((el) => !inBlackList(el))
   }
   return listData.value
 })
 function inBlackList(row) {
-  const symbol = row.token0_address === row.target_token ? row.token0_symbol : row.token1_symbol
   return (
+    // todo
     globalStore.pumpBlackList.findIndex(
       (i) =>
-        (i.address == row.token && i.type == 'ca') || (i.address == symbol && i.type == 'keyword')
+        (i.address == row.token && i.type == 'ca') ||
+        (i.address == row.symbol && i.type == 'keyword')
     ) !== -1
   )
 }
@@ -85,17 +97,23 @@ const pageInfo = ref({
 })
 const isVolUSDT = shallowRef(true)
 const loading = shallowRef(false)
-const columns = useStorage('hotUserTableColumns', getHotDefaultColumns(t))
+const storageKey = computed(()=>{
+  return props.activeTab + 'TableColumns'
+})
+let columns = useStorage(storageKey.value, getNewDefaultColumns(t))
+watch(()=>props.activeTab,()=>{
+  columns = useStorage(storageKey.value, getNewDefaultColumns(t))
+  console.log('watch new',columns,storageKey)
+},{
+  immediate:true
+})
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
 }
 
-onMounted(() => {
-  _getTreasureList()
-})
 watch(
-  () => [props.activeChain, localeStore.locale],
+  () => [props.activeChain, props.activeTab],
   () => {
     pageInfo.value.pageNO = 1
     _getTreasureList()
@@ -105,13 +123,12 @@ watch(
 let timer: number
 async function _getTreasureList(shouldLoading = true) {
   try {
-    clearTimeout(timer)
     if (shouldLoading) {
       loading.value = true
     }
     const { total: _, ...rest } = pageInfo.value
     const res = await getTreasureList({
-      category: 'hot',
+      category: props.activeTab,
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
       ...sortConditions.value,
@@ -123,6 +140,7 @@ async function _getTreasureList(shouldLoading = true) {
     if (shouldLoading) {
       initWs()
     }
+    clearTimeout(timer)
     timer = window.setTimeout(() => {
       _getTreasureList(false)
     }, 10000)
@@ -130,8 +148,17 @@ async function _getTreasureList(shouldLoading = true) {
     loading.value = false
   }
 }
-onUnmounted(() => {
+onMounted(() => {
+  _getTreasureList()
+})
+onDeactivated(() => {
   clearTimeout(timer)
+})
+onActivated(() => {
+  clearTimeout(timer)
+  timer = window.setTimeout(() => {
+    _getTreasureList(false)
+  }, 10000)
 })
 
 const wsStore = useWSStore()
@@ -148,6 +175,7 @@ watch(
       const item = pricesMap[el.pair + '-' + el.chain]
       if (item) {
         delete item.holders
+        delete item.last_trade_at
         const market_cap = !el.current_price_usd
           ? 0
           : ((el.market_cap || 0) / el.current_price_usd) * (item.uprice || 0)
@@ -243,6 +271,10 @@ const filterMap = {
   price_change_dynamic: (el: any) =>
     el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval),
   quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible,
+  // first_half_elapsed_time: (el: any) => el.isVisible && props.activeTab === 'pump_in_almost',
+  // second_half_elapsed_time: (el: any) => el.isVisible && props.activeTab === 'pump_in_almost',
+  // progress:(el:any)=>el.isVisible && props.activeTab.includes('_in'),
+  // headline:(el:any)=>el.isVisible && props.activeTab.includes('_out')
 }
 
 const visibleColumns = computed(() => {
@@ -257,9 +289,9 @@ const visibleColumns = computed(() => {
 const headerRenderer = computed(() => {
   return {
     poolPair: PoolPairHeader,
-    headline: () => t('aiSummary'),
+    // headline: () => t('aiSummary'),
+    // current_price_usd: PriceHeader,
     mCap: MCapHeader,
-    current_price_usd: PriceHeader,
     price_change_1m: DynamicPriceChangeHeader,
     price_change_24h: DynamicPriceChangeHeader,
     price_change_dynamic: DynamicPriceChangeHeader,
@@ -274,14 +306,20 @@ const headerRenderer = computed(() => {
     quick: () => t('quick'),
     insider_balance_ratio_cur: InsidersHeader,
     sniper_tx_count: SnipersHeader,
+    dev_balance_ratio_cur: DevHeader,
+    // progress: ProgressHeader,
+    // first_half_elapsed_time: HalfTimeHeader,
+    // second_half_elapsed_time: FullHeader,
+    rusher_tx_count: Snipers1mHeader,
+    // last_trade_at: LastTradeHeader,
   }
 })
 const cellRenderer = computed(() => {
   return {
     poolPair: PoolPairContent,
-    headline: Headline,
+    // headline: Headline,
     mCap: MCapContent,
-    current_price_usd: PriceContent,
+    // current_price_usd: PriceContent,
     price_change_1m: ({ row }) => {
       return <PriceChange row={row} activeInterval="1m" />
     },
@@ -302,13 +340,31 @@ const cellRenderer = computed(() => {
     quick: quickContent,
     insider_balance_ratio_cur: InsidersContent,
     sniper_tx_count: snipersContent,
+    dev_balance_ratio_cur: DevContent,
+    // progress: Progress,
+    // first_half_elapsed_time: ({ row }) => {
+    //   return (
+    //     <span class={!row.first_half_elapsed_time ? 'color-[--d-666-l-999]' : ''}>
+    //       {formatTime(row.first_half_elapsed_time || 0)}
+    //     </span>
+    //   )
+    // },
+    // second_half_elapsed_time: ({ row }) => {
+    //   return (
+    //     <span class={!row.second_half_elapsed_time ? 'color-[--d-666-l-999]' : ''}>
+    //       {formatTime(row.second_half_elapsed_time || 0)}
+    //     </span>
+    //   )
+    // },
+    rusher_tx_count: Snipers1mContent,
+    // last_trade_at: LastTradeContent,
   }
 })
 </script>
 <template>
-  <div v-loading="loading" style="height: calc(100vh - 207px)">
+  <div v-loading="loading" style="height: calc(100vh - 251px)">
     <AveTable
-    :loading="loading"
+      :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
@@ -330,7 +386,7 @@ const cellRenderer = computed(() => {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
         />
       </template>
-      <template v-for="item in columns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
+      <template v-for="item in visibleColumns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
         <component
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"

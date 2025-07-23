@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
+import newRank from './components/newRank/new.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
 const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
 const components = {
+  new: newRank,
   hot,
   pump: pumpComponent,
   bonk_pump: pumpComponent,

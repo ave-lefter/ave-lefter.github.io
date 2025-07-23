@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import RangePopover from './rangePopover.vue'
+import {RangePopover} from './index'
 
 const props = defineProps<{
   sortConditions: { sort: string; sort_dir: string }
@@ -7,31 +7,31 @@ const props = defineProps<{
   setFilterForm(...args: [string, string][]): void
 }>()
 
-function sortChange(sort_dir: string) {
-  props.setSortConditions({
-    sort: sort_dir ? 'market_cap' : '',
-    sort_dir: sort_dir,
-  })
-}
-const defaultSort = computed(() => {
-  if (props.sortConditions.sort === 'market_cap') {
-    return props.sortConditions.sort_dir
-  }
-  return ''
-})
+// function sortChange(sort_dir: string) {
+//   props.setSortConditions({
+//     sort: sort_dir ? 'dev_balance_ratio_cur' : '',
+//     sort_dir: sort_dir,
+//   })
+// }
+// const defaultSort = computed(() => {
+//   if (props.sortConditions.sort === 'dev_balance_ratio_cur') {
+//     return props.sortConditions.sort_dir
+//   }
+//   return ''
+// })
 const popoverVisible = shallowRef(false)
-const openTimeList = shallowRef([
-  { text: '> $100K', value: '100000' },
-  { text: '> $300K', value: '300000' },
-  { text: '> $1M', value: '1000000' },
-])
 const isFilterHighlight = shallowRef(false)
 const { t } = useI18n()
+
 function confirm(params?: [string, string]) {
   if (!params || !params.some((el) => !!el)) {
-    props.setFilterForm(['marketcap_min', ''], ['marketcap_max', ''])
+    props.setFilterForm(['progress_min', ''], ['progress_max', ''])
     isFilterHighlight.value = false
     popoverVisible.value = false
+    return
+  }
+  if (params[1] && Number(params[1]) > 100) {
+    ElMessage.error(t('maxGt100'))
     return
   }
   if (params[1] && params[0] && Number(params[1]) < Number(params[0])) {
@@ -39,7 +39,10 @@ function confirm(params?: [string, string]) {
     return
   }
   const _params = params.map((el, idx) => {
-    return [`${{ 0: 'marketcap_min', 1: 'marketcap_max' }[idx]}` as string, el || '']
+    return [
+      `${{ 0: 'progress_min', 1: 'progress_max' }[idx]}` as string,
+      el || '',
+    ]
   }) as [string, string][]
   props.setFilterForm(..._params)
   isFilterHighlight.value = true
@@ -48,18 +51,14 @@ function confirm(params?: [string, string]) {
 </script>
 <template>
   <div class="flex items-center justify-end gap-3px">
-    <span
-      class="cursor-pointer"
-      @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')"
-      >{{ $t('mCap') }}</span
-    >
-    <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
+    <span class="cursor-pointer">{{ $t('progress') }}</span>
+    <!-- <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /> -->
     <RangePopover
       v-model="popoverVisible"
       :width="225"
-      :title="`${$t('mCap')}($)`"
-      :list="openTimeList"
-      :selectRangeIndex="0"
+      :title=" $t('progress')"
+      :list="[]"
+      :selectRangeIndex="1"
       :isFilterHighlight="isFilterHighlight"
       @confirm="confirm"
     />

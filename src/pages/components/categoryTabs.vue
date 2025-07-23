@@ -3,6 +3,7 @@ import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
 import type { CategoryElement, IGetTreasureConfig } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
+import { getNewDefaultColumns, getNewOptions } from './newRank/columnRender/newColumnsService'
 import ChainsSelect from './chainsSelect.vue'
 import { getPumpDefault, getPumpOptions } from './pump/columnRender/pumpColumnsService'
 import {
@@ -35,6 +36,7 @@ const intervals = computed(() => {
 const themeStore = useThemeStore()
 const isHot = computed(() => props.activeTab === 'hot')
 const isPump = computed(() => props.activeTab === 'pump')
+const isNew = computed(() => props.activeTab === 'new')
 const configMap = computed(() => {
   return {
     hot: {
@@ -43,6 +45,13 @@ const configMap = computed(() => {
       getDefaultColumns: getHotDefaultColumns,
       getOptions: getHotOptions,
       class: isHot.value ? 'color-#FFA622' : '',
+    },
+    new: {
+      icon: 'custom:hot',
+      storageKey: 'newTableColumns',
+      getDefaultColumns: getNewDefaultColumns,
+      getOptions: getNewOptions,
+      class: isNew.value ? 'color-#FFA622' : '',
     },
     pump: {
       icon: getPumpIcon(isPump.value),
@@ -138,6 +147,7 @@ const globalStore = useGlobalStore()
 const supportCategories = computed(() => {
   const keys = [
     'hot',
+    'new',
     'pump',
     'bonk_pump',
     'four',
