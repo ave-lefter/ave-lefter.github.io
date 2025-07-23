@@ -191,27 +191,19 @@
                     {{ $t('highRisk') }}
                   </span>
                   <template v-if="row?.hot_rank">
-                    <svg
-                      v-for="(item, index) in row?.hot_rank"
-                      :key="index"
-                      class="icon-svg"
-                      aria-hidden="true"
-                      style="margin-left: 3px; width: 12px"
-                    >
-                      <use xlink:href="#icon-huoyan" />
-                    </svg>
+                    <Icon v-for="(_, index) in row?.hot_rank" :key="index" class="text-12px ml-3px" name="custom:fire" />
                   </template>
                   <img
                     v-if="row.launchpad"
                     v-tooltip="row.launchpad"
-                    class="ml-5px"
+                    class="ml-5px rd-50%"
                     :src="formatIconTag(row.launchpad)"
                     alt=""
                     :width="10"
                   >
                 </div>
-                <div class="text-12px color-text-2 mt-3px flex-start" style="align-items:end">
-                  <div v-if="row.opening_at" class="mr-5px text-10px" >
+                <div class="text-12px mt-3px flex-start">
+                  <div v-if="row.opening_at" class="mr-5px" >
                     <TimerCount
                       v-if="
                         !isShowDate &&
@@ -233,7 +225,7 @@
                         </span>
                       </template>
                     </TimerCount>
-                    <span v-else :class=" Number(formatTimeFromNow(row.opening_at, true )) <= 600 ? 'color-#FFA622' : ''">
+                    <span v-else :class="Number(formatTimeFromNow(row.opening_at, true )) <= 600 ? 'color-#FFA622' : ''">
                       {{
                         isShowDate
                           ? formatDate(row.opening_at, 'HH:mm:ss')

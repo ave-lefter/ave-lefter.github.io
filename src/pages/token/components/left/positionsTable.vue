@@ -8,6 +8,7 @@ import {formatBotGasTips} from '~/utils/bot'
 import BigNumber from 'bignumber.js'
 import {useDebounceFn, useThrottleFn} from '@vueuse/core'
 import {useWalletStore} from '~/stores/wallet'
+import type { BotChain, BotSettingKey } from '~/utils/types'
 
 const {t} = useI18n()
 const wsStore = useWSStore()
@@ -382,8 +383,8 @@ function beforeSubmitSwap(balance: number, row: GetUserBalanceResponse & { index
 async function submitSwap(balance: number, row: GetUserBalanceResponse & { index: string }) {
   const isSolana = row.chain === 'solana'
   const {botSettings} = botSettingStore
-  const selected = botSettings?.[row.chain]?.selected as 's1' | 's2' | 's3'
-  const currentBotSetting = botSettings?.[row.chain]?.[selected]
+  const selected = botSettings?.[row.chain as BotChain]?.selected
+  const currentBotSetting = botSettings?.[row.chain as BotChain]?.[selected as BotSettingKey]
   if (isSolana && currentBotSetting?.mev) {
     if (!await botStore.getBundleAvailable()) {
       loadingSwap.value[row.index] = false

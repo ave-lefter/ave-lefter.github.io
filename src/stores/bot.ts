@@ -184,7 +184,7 @@ export const useBotStore = defineStore('bot', () => {
       )
     }
   }
-  function getWebConfig(chain = '') {
+  function getWebConfig(chain: BotChain | '' = '') {
     if (accessToken.value) {
       return bot_getWebConfig(chain).then((res) => {
         let botSettings = useBotSettingStore().botSettings
@@ -193,7 +193,7 @@ export const useBotStore = defineStore('bot', () => {
         } else {
           botSettings = deepMerge(botSettings, res)
         }
-        return botSettings.value
+        return botSettings
       })
     }
   }

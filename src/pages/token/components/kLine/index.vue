@@ -1,5 +1,5 @@
 <template>
-  <div class="watermark relative" :style="{height: `${kHeight}px`}">
+  <div class="relative" :style="{height: `${kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
   </div>
   <div
@@ -15,12 +15,13 @@ import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, 
 import { getTimezone, formatDecimals, getSwapInfo, getAddressAndChainFromId, getWSMessage } from '@/utils'
 import { getKlineHistoryData } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
-import { switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, buildOrUpdateLastBarFromTx, waitForTradingView, useLimitPriceLine, useAvgPriceLine } from './utils'
+import { switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, buildOrUpdateLastBarFromTx, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark } from './utils'
 import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
 import type { WSTx, KLineBar } from './types'
 import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
 import {DefaultHeight} from '~/utils/constants'
+import { TW_STUDY } from './constant'
 
 const tokenStore = useTokenStore()
 const botStore = useBotStore()
@@ -173,15 +174,14 @@ function resetChart() {
 function saveStudy() {
   if (_widget?.activeChart) {
     const studies = _widget?.activeChart?.().getAllStudies()
-    localStorage.setItem('tradingViewStudies', JSON.stringify(studies.filter(i => i.name !== 'Volume')))
+    localStorage.setItem(TW_STUDY, JSON.stringify(studies.filter(i => i.name !== 'Volume')))
   }
 }
 
 // 创建指标
 function createStudy() {
   if (_widget?.activeChart) {
-    // let studies = storage.get('tradingViewStudies')
-    const studies: Array<{ name: string }> = JSON.parse(localStorage.getItem('tradingViewStudies') || '[]')
+    const studies: Array<{ name: string }> = JSON.parse(localStorage?.[TW_STUDY] || '[]')
     studies.forEach(i => {
       _widget?.activeChart?.().createStudy(i.name, false, false)
     })
@@ -264,7 +264,7 @@ async function initChart() {
     interval: resolution.value as any,
     theme: themeStore.theme,
     container: 'tv_chart_container',
-    library_path: `${urlPrefix}charting_library-29.2.0/charting_library/`,
+    library_path: `${urlPrefix}charting_library-29.4.0/charting_library/`,
     locale: formatLang(localeStore.locale) as LanguageCode,
     disabled_features: [
       'header_symbol_search',
@@ -372,7 +372,7 @@ async function initChart() {
         // const chain = props.chain
         const isSupportSecChains = chain.value && supportSecChains.includes(chain.value)
         const configurationData = {
-          supported_resolutions: ['1S','5S','15S','30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[],
+          supported_resolutions: ['1S','1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[],
           supports_marks: true,
           supports_timescale_marks: true,
           supports_time: true
@@ -412,7 +412,7 @@ async function initChart() {
             has_daily: true,
             // has_no_volume: false, // 布尔表示商品是否拥有成交量数据
             has_weekly_and_monthly: true,
-            supported_resolutions: ['1S','5S','15S','30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
+            supported_resolutions: ['1S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
             data_status: 'streaming' as 'streaming' | 'endofday' | 'delayed_streaming',
             visible_plots_set: 'ohlcv' as VisiblePlotsSet,
             type: 'crypto',
@@ -573,17 +573,15 @@ async function initChart() {
     }
   })
   updateChartBackground()
+
   _widget.onChartReady(() => {
     isReady = true
     isReadyLine = true
-    // 保存指标
-    saveStudy()
     if (themeStore.isDark) {
       _widget?.applyOverrides?.({ 'scalesProperties.textColor': '#d5d5d5' })
     } else {
       _widget?.applyOverrides?.({ 'scalesProperties.textColor': '#333' })
     }
-
     _widget?.activeChart?.()?.onIntervalChanged().subscribe(null, interval => {
       if (resolution.value !== interval) {
         resolution.value = interval
@@ -591,9 +589,10 @@ async function initChart() {
         _widget?.resetCache?.()
       }
     })
+
+    setWatermark(_widget)
     subscribePriceMove()
-
-
+    // 从缓存中读取数据并创建指标
     createStudy()
   })
 
@@ -602,11 +601,28 @@ async function initChart() {
     isHeaderReady = true
     createHeaderButton()
   })
+
   // onMarkClick
   _widget?.subscribe('onMarkClick', (markId) => {
     console.log('markId', markId)
   })
+
+  subscribeStudyEvent()
+
 }
+
+let isUnload = false
+function subscribeStudyEvent() {
+  _widget?.subscribe('study_event', (_id,  type) => {
+    if ((type === 'create' || type === 'remove') && !isUnload) {
+      saveStudy()
+    }
+  })
+  window.onbeforeunload = () => {
+    isUnload = true
+  }
+}
+
 
 function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsStore.getWSInstance()) {
   ws?.onmessage(e => {
@@ -691,10 +707,11 @@ function drag(e: MouseEvent) {
 const { resetLimitPriceLineId, subscribePriceMove } = useLimitPriceLine(() => _widget, () => isReadyLine, showMarket)
 
 const { resetAvgPriceLineId } = useAvgPriceLine(() => _widget, () => isReadyLine, showMarket)
+useBotLimitLine(() => _widget, () => isReadyLine, showMarket)
 
 
-onBeforeMount(() => {
-  // _getTotalHolders()
+onBeforeUnmount(() => {
+  isUnload = true
 })
 
 onMounted(() => {
