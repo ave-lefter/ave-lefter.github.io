@@ -452,5 +452,9 @@
   "login": "Conecte-se",
   "platform": "Plataforma",
   "onlyPush": "Apenas empurre",
+  "runTime1": "1/2 Custo",
+  "runTime2": "2/2 Custo",
+  "snipers_1m": "Snipers [1m]",
+  "devPosition": "DEV Possuído",
   "complete": "Completo"
 }
