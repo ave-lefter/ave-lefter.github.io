@@ -23,8 +23,16 @@ export function getAnnounces() {
   })
 }
 
+export interface ILatestNotice{
+  time:     number;
+  title:    string;
+  content:  string;
+  media:    string;
+  platform: string;
+  is_show:  boolean;
+}
 // 获取最新消息
-export function getLatest() {
+export function getLatest():Promise<ILatestNotice> {
   const {$api} = useNuxtApp()
   return $api('/v1api/v2/announces/latest', {
     method: 'get',

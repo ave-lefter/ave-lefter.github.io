@@ -141,7 +141,7 @@ const comProps = computed(() => {
     <div class="flex items-center px-12px gap-20px border-b-1px border-b-solid border-b-#FFFFFF08 mb-12px">
       <a
         v-for="(item) in tabsList" :key="item.component" href="javascript:;"
-         :class="`flex items-center decoration-none text-12px lh-20px text-center color-[--d-666-l-999] ${activeTab === item.component ? 'color-[--d-F5F5F5-l-222] b-b-[--d-F5F5F5-l-333]' : 'b-b-transparent'}`"
+         :class="`flex items-center decoration-none text-12px lh-20px text-center color-[--d-666-l-999] ${activeTab === item.component ? 'color-[--d-F5F5F5-l-222] b-b-[--d-F5F5F5-l-333] font-500' : 'b-b-transparent'}`"
         @click="activeTab = item.component">
         <div v-if="item.component == 'Orders'" class="w-1px h-20px bg-[var(--custom-br-1-color)] mr-20px mb-8px"/>
         <div

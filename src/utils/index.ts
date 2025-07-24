@@ -544,11 +544,11 @@ export function getWSMessage(e: MessageEvent) {
 }
 
 export function verifyLogin(isBot=false) {
-  const bottStore = useBotStore()
+  const botStore = useBotStore()
   const walletStore = useWalletStore()
-  const userInfo = bottStore.userInfo
+  const userInfo = botStore.userInfo
   if (!userInfo?.evmAddress && (!walletStore.address || isBot)) {
-    bottStore.changeConnectVisible(true)
+    botStore.changeConnectVisible(true)
     // 连接钱包
     return false
   }

@@ -9,8 +9,9 @@
     <template #reference>
       <div
         class="bg-[var(--d-222-l-F2F2F2)] rounded-4px p-8px ml-8px h-32px flex items-center"
+        @click.stop="visitSysNotice"
       >
-        <el-badge class="h-20px" color="#F6465D">
+        <el-badge :is-dot="limitOrderUnRead||!isLatestExperienced" class="h-20px" color="#F6465D">
           <Icon
             class="text-20px text-[--d-999-l-666] cursor-pointer"
             name="material-symbols:notifications"
@@ -122,7 +123,7 @@ import AveEmpty from '@/components/aveEmpty.vue'
 import {useStorage} from '@vueuse/core'
 import {evm_utils} from '@/utils'
 import BigNumber from 'bignumber.js'
-import {getAnnounces} from '~/api/user'
+import {getAnnounces, getLatest} from '~/api/user'
 import {getCompletedLimitTx, type IGetMarketCompletedLimitResponse} from '~/api/bot'
 
 const NOTICE_FILTER_TIME = 1744460716
@@ -141,7 +142,7 @@ interface ICompletedLimitTx extends IGetMarketCompletedLimitResponse {
 
 type ActiveTab = keyof typeof ACTIVE_ENUM
 
-// const lastExperienceTime = useStorage('lastExperienceTime', 0, localStorage)
+const lastExperienceTime = useStorage('lastExperienceTime', 0, localStorage)
 const themeStore = useThemeStore()
 const wsStore = useWSStore()
 const botStore = useBotStore()
@@ -152,15 +153,15 @@ const activeTab = ref<ActiveTab>('notice')
 const announceList = ref<any[]>([])
 const completedLimitTx = shallowRef<ICompletedLimitTx[]>([])
 
-// const latestNotice = ref([])
-// const limitOrderUnRead = computed(() => completedLimitTx.value?.some(i => visitedTime.value < (i.blockTime || (i.batchId) / 1000)))
+const globalStore = useGlobalStore()
+const limitOrderUnRead = computed(() => completedLimitTx.value?.some(i => visitedTime.value < (i.blockTime || Number(i.batchId) / 1000)))
 const isLimitOrder = computed(() => activeTab.value === ACTIVE_ENUM.limitOrder)
 const isBotLogin = computed(() => botStore.userInfo && botStore.userInfo.name)
-// const isLatestExperienced = computed(() => {
-//   return !latestNotice.value.time
-//     || latestNotice.value.time <= NOTICE_FILTER_TIME
-//     || String(lastExperienceTime.value) === String(latestNotice.value.time)
-// })
+const isLatestExperienced = computed(() => {
+  return !globalStore.latestNotice.time
+    || globalStore.latestNotice.time <= NOTICE_FILTER_TIME
+    || String(lastExperienceTime.value) === String(globalStore.latestNotice.time)
+})
 
 watch(visible, (val) => {
   if (!val) {
@@ -184,6 +185,7 @@ watch(() => botStore.evmAddress, () => {
 
 onMounted(() => {
   getNoticeList()
+  getLatestNotice()
 })
 
 async function _getCompletedLimitTx() {
@@ -232,7 +234,12 @@ async function getNoticeList() {
   }
 }
 
-// function visitSysNotice() {
-//   lastExperienceTime.value = latestNotice.value.time
-// }
+async function getLatestNotice() {
+  const res = await getLatest()
+  globalStore.latestNotice = res
+}
+
+function visitSysNotice() {
+  lastExperienceTime.value = globalStore.latestNotice.time
+}
 </script>

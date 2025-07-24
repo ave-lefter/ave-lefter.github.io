@@ -642,5 +642,14 @@
   "runTime1": "1/2 chi phí",
   "runTime2": "2/2 chi phí",
   "snipers_1m": "Người săn [1p]",
-  "devPosition": "DEV nắm giữ"
+  "devPosition": "DEV nắm giữ",
+  "botTipsTitle": "Ave.ai đã hỗ trợ đăng nhập ví Bot!",
+  "botTips1": "1. Giao dịch một chạm ít bước hơn🔥",
+  "botTips2": "2. Phí chỉ 0.65%🔥",
+  "botTips3": "3. Lên đến 5 cấp hoa hồng vĩnh viễn 60% (cần phê duyệt)🔥",
+  "botTips4": "4. Không cần ví plugin hay cụm từ phức tạp🔥",
+  "botTips5": "5. Quản lý nhiều tài khoản:",
+  "botTips6": "6. Chuyển đổi chuỗi liền mạch🔥",
+  "startExperience": "Bắt đầu trải nghiệm",
+  "complete": "Hoàn thành"
 }

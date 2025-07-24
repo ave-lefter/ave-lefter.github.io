@@ -108,7 +108,6 @@ import {formatBotGasTips} from '@/utils/bot'
 import {isEvmChain, getRpcProvider} from '@/utils'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 
-
 const themeStore = useThemeStore()
 const botStore = useBotStore()
 const configStore = useConfigStore()

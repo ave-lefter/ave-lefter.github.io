@@ -202,7 +202,7 @@
                     :width="10"
                   >
                 </div>
-                <div class="text-12px color-text-2 mt-3px flex-start" style="align-items:end">
+                <div class="text-12px mt-3px flex-start">
                   <div v-if="row.opening_at" class="mr-5px" >
                     <TimerCount
                       v-if="

@@ -503,9 +503,8 @@ function init2() {
         listObj[j.id] = true
       }
     })
-    // console.log('list', list)
     dataSourceCache.value = list.filter(i => {
-      return txType.value.includes(i.tx_type )
+      return txType.value.includes(i.tx_type)
     })  
     updateDateSource()
   }).catch((err) => {
@@ -576,10 +575,10 @@ const formateTxInfo = function(item: { [x: string]: any; maker_address?: any; wa
     },
     _profit: item?.pnl_usd=='--'?'--':'$' + formatNumber2(Math.abs(item?.pnl_usd || 0) || 0, 2),
     _profit_ratio: item?.pnl_usd=='--'?'--':formatNumber2((item?.pnl_ratio || 0) * 100 || 0 ,2, 4, 4)+'%',
-    _mc: '$'+formatNumberS(item?.target_mcap || 0,{
+    _mc: Number(item?.target_mcap)?('$'+formatNumberS(item?.target_mcap || 0,{
       decimals:0,
       limit:3
-    }),
+    })):'--',
     _type: getTxType(item),
     _rise: item?.pnl_usd=='--'? true: item?.pnl_usd >= 0
   }
