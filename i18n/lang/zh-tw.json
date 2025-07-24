@@ -1112,5 +1112,7 @@
   "addStopLoss": "添加止損",
   "followBuy": "跟單買入",
   "followSell": "跟單賣出",
-  "devSell": "DEV賣出跟賣"
+  "devSell": "DEV賣出跟賣",
+  "DbCheckGg": "使用谷歌驗證器",
+  "DbCheckContentTitle3": "步驟 3："
 }
