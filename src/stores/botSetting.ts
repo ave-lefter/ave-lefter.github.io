@@ -66,6 +66,15 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     autoSellConfig_migrated: null as {open: boolean, priceChange?: number, sellRatio?: number, type: 'migrated', isUp?: boolean} | null
   })
 
+  const clipboardQuickInput = useLocalStorage<{
+    [key in typeof chains[number]]?: string
+  }>('bot_clipboardQuickInput', {
+    base: '',
+    eth: '',
+    bsc: '',
+    solana: ''
+  })
+
   const autoSellConfig = computed(() => {
     const c: Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default' | 'trailing' | 'migrated' | 'devsell', isUp?: boolean}> = autoSellConfigs.value.isAutoSellConfig ? (autoSellConfigs.value.autoSellConfig?.filter?.(i => i.priceChange && i.sellRatio && i.open) || []) : []
     const c1 = autoSellConfigs.value.autoSellConfig_devsell
@@ -122,6 +131,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     botSettings,
     autoSellConfigs,
     autoSellConfig,
-    autoSellConfig_autoSell
+    autoSellConfig_autoSell,
+    clipboardQuickInput
   }
 })

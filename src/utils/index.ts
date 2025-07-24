@@ -544,11 +544,11 @@ export function getWSMessage(e: MessageEvent) {
 }
 
 export function verifyLogin(isBot=false) {
-  const bottStore = useBotStore()
+  const botStore = useBotStore()
   const walletStore = useWalletStore()
-  const userInfo = bottStore.userInfo
+  const userInfo = botStore.userInfo
   if (!userInfo?.evmAddress && (!walletStore.address || isBot)) {
-    bottStore.changeConnectVisible(true)
+    botStore.changeConnectVisible(true)
     // 连接钱包
     return false
   }
@@ -574,7 +574,7 @@ export function getColorClass(val: string | number) {
   if (Number(val) > 0) {
     return 'color-#12B886'
   } else if (Number(val) < 0) {
-    return 'color-#FF646D'
+    return 'color-#F6465D'
   } else {
     return 'color-[--d-666-l-999]'
   }

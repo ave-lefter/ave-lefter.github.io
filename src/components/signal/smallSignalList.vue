@@ -71,23 +71,24 @@ const botStore = useBotStore()
             ${{ formatNumber(mc, 1) }}
           </span>
           <span class="ml-8px">24h</span>
-          <span class="ml-4px"
-                :class="getColorClass(price_change_24h)"
+          <span
+          class="ml-4px"    
+          :class="getColorClass(price_change_24h)"
           >{{ addSign(price_change_24h) }}{{ formatNumber(Math.abs(price_change_24h), 2) }}%</span>
         </div>
         <TimerCount
           v-if="signal_time && Number(formatTimeFromNow(signal_time, true)) < 60"
           :key="signal_time" :timestamp="signal_time" :end-time="60">
           <template #default="{ seconds }">
-              <span v-if="seconds < 60" class="color-#FFA622 text-12px">
+              <span v-if="seconds < 60" v-tooltip="formatDate(signal_time,'MM/DD HH:mm:ss')" class="color-#FFA622 text-12px">
                 {{ seconds }}s
               </span>
-            <span v-else class="color-[--d-999-l-666] text-12px">
+            <span v-else v-tooltip="formatDate(signal_time,'MM/DD HH:mm:ss')" class="color-[--d-999-l-666] text-12px">
                 {{ formatTimeFromNow(signal_time) }}
               </span>
           </template>
         </TimerCount>
-        <span v-else class="color-[--d-999-l-666] text-12px">
+        <span v-else v-tooltip="formatDate(signal_time,'MM/DD HH:mm:ss')" class="color-[--d-999-l-666] text-12px">
             {{ formatTimeFromNow(signal_time) }}
         </span>
       </div>

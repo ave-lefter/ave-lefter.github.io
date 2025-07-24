@@ -5,6 +5,7 @@ import type { WSTx, KLineBar  } from './types'
 import { useDocumentVisibility, useEventBus } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
 import { bot_getUserPendingTx, bot_cancelLimitOrdersByBatch } from '~/api/token'
+import { RESOLUTION_KEY, QUICK_KEY } from './constant'
 
 export const supportSecChains = ['solana', 'bsc', 'eth', 'base', 'tron']
 
@@ -118,8 +119,8 @@ export function formatToMarks(
 
 
 export function initTradingViewIntervals(currentResolution: string, chain: string, isSupportSecChains: boolean): string {
-  const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
-  const RESOLUTION_KEY = 'tv_resolution'
+  // const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
+  // const RESOLUTION_KEY = 'tv_resolution'
   const DEFAULT_LIST = ['1', '5', '15', '60', '240', '1D', '1W']
   const SEC_LIST = ['1S', '5S', '15S', '30S', ...DEFAULT_LIST]
   const Sol_LIST = ['1S', ...DEFAULT_LIST]
@@ -792,7 +793,7 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
 
 export function setWatermark(_widget: IChartingLibraryWidget | null) {
   const _watermark = _widget?.watermark?.()
-  _watermark?.color().setValue('#BCBED220')
+  _watermark?.color().setValue('#BCBED219')
   _watermark?.setContentProvider(() => {
     return [
       {
@@ -803,7 +804,7 @@ export function setWatermark(_widget: IChartingLibraryWidget | null) {
         /**
          * Font size to be used (defined in pixels).
          */
-        fontSize: 70,
+        fontSize: 60,
         /**
          * Line height (defined in pixels).
          */

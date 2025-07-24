@@ -24,6 +24,7 @@
       >
       <template #prefix>
         <img
+          v-if="chain"
           class="rounded-full w-14px h-14px mr-4px!"
           :src="`${configStore.token_logo_url}chain/${chain}.png`"
           alt=""
@@ -33,7 +34,7 @@
       </template>
     </el-input>
     <div
-      v-if="chain && botStore.isSupportChains.includes(chain)"
+      v-if="isQuickSupported&&settingsButtonVisible"
       class="ml-20px flex justify-end items-center text-12px">
       <span class="color-[--d-999-l-666] mr-5px">{{ $t('default') }}</span>
       <div
@@ -57,6 +58,7 @@
       </div>
     </div>
     <SlippageSet
+      v-if="isQuickSupported"
       class="ml-12px"
       :chain="chain"
       :setting="botSettingStore?.botSettings[chain]"
@@ -106,7 +108,6 @@ import {formatBotGasTips} from '@/utils/bot'
 import {isEvmChain, getRpcProvider} from '@/utils'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 
-
 const themeStore = useThemeStore()
 const botStore = useBotStore()
 const configStore = useConfigStore()
@@ -118,6 +119,7 @@ const props = withDefaults(defineProps<{
   chain: BotChain
   quickBuyValue?: string
   showQuickAmount?: boolean
+  settingsButtonVisible?:boolean
 }>(), {
   quickBuyValue: '0.01'
 })
@@ -128,6 +130,9 @@ const selected = ref<BotSettingKey>('s1')
 const btnRefs = ref<Record<string, HTMLElement | null>>({})
 const currentBtnRef = ref<HTMLElement | null>(null)
 
+const isQuickSupported = computed(()=>{
+  return props.chain && botStore.isSupportChains.includes(props.chain)
+})
 const botPriorityFee = computed(() => {
   const chain = props.chain
   if (!botStore.isSupportChains.includes(chain)) {

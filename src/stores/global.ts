@@ -4,6 +4,7 @@ import type { pumpBlack } from '@/api/types/pump'
 import { _getFollowsNum } from '@/api/follow'
 
 import type{ GetHotTokensResponse } from '@/api/token'
+import type { ILatestNotice } from '~/api/user'
 export const useGlobalStore = defineStore('global', () => {
   const wsStore = useWSStore()
   const localeStore = useLocaleStore()
@@ -67,6 +68,7 @@ export const useGlobalStore = defineStore('global', () => {
     quickVisible: true,
     quickBuyValue: '0.01',
   })
+  const latestNotice = shallowRef<ILatestNotice>({})
 
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
@@ -152,6 +154,7 @@ export const useGlobalStore = defineStore('global', () => {
     hide_risk,
     rankCommon,
     headFollowsNum,
-    getFollowsNum
+    getFollowsNum,
+    latestNotice
   }
 })

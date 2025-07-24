@@ -12,7 +12,7 @@
     <el-input
       ref="inputSearch"
       v-model.trim="query"
-      class="search-input px-20px "
+      class="search-input search-input2 px-20px"
       :placeholder="$t('enterAddress/token')"
       clearable
       autofocus

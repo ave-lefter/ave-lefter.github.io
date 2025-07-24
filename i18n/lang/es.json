@@ -452,5 +452,10 @@
   "login": "Acceso",
   "platform": "Plataforma",
   "onlyPush": "Solo empuje",
-  "balance": "Activos"
+  "balance": "Activos",
+  "runTime1": "1/2 Costo",
+  "runTime2": "2/2 Costo",
+  "snipers_1m": "Francotiradores[1m]",
+  "devPosition": "En Propiedad por DEV",
+  "complete": "Completar"
 }
