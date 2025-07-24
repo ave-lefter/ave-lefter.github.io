@@ -186,16 +186,20 @@
     </Draggable> -->
     <MonitorDragger v-show="monitorStore.visible"/>
     <FavAddressPop ref="favAddressPopRef" :visible="favAddressPopVisible" :button-ref="attentionTrigger || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" @onCancel="() => favAddressPopVisible = false"/>
+    <PnlTracker v-if="globalStore.pnlTrackerVisible"/>
   </div>
 </template>
 
 <script setup lang='ts'>
   import TheHeader from '@/components/layouts/TheHeader.vue'
   import TheFooter from '@/components/layouts/TheFooter.vue'
+  const PnlTracker  = defineAsyncComponent(()=>import('./components/pnlTracker.vue'))
+
   const botStore = useBotStore()
   const {addressGroups,attentionTrigger,favAddressPopVisible,handleAddAttention} = storeToRefs(useFollowStore())
   const signalStore = useSignalStore()
   const monitorStore = useMonitorStore()
+  const globalStore = useGlobalStore()
 
   const _style=computed(()=>{
     let paddingLeft=0

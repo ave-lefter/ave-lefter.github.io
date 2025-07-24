@@ -100,6 +100,7 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
 //   },20000)
 // })
 watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
+  console.log('=>(positionsTable.vue:103) (val)', (val))
   // 处理 token 交易
   if (val.swap) {
     const token = ((val.swap.token === 'So11111111111111111111111111111111111111112')
