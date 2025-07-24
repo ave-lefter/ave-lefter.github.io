@@ -1113,6 +1113,7 @@
   "followBuy": "跟單買入",
   "followSell": "跟單賣出",
   "devSell": "DEV賣出跟賣",
+  "balance": "金額",
   "buyAmountMustG0": "買入數量必須大於0",
   "quickBuyclipboard": "剪切板快捷買入"
 }

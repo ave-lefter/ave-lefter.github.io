@@ -15,13 +15,14 @@ const route = useRoute()
 const tokenStore = useTokenStore()
 const botStore = useBotStore()
 const { t } = useI18n()
+const globalStore = useGlobalStore()
 const {token, tokenInfoExtra ,pairAddress,commonHeight} = storeToRefs(useTokenStore())
 const activeTab = shallowRef<keyof typeof components | 'Orders'>('Transactions')
 const components = {
   Transactions,
   Holders: defineAsyncComponent(() => import('./holders/index.vue')),
   LP: defineAsyncComponent(() => import('./lp/index.vue')),
-  Attention: '',
+  Attention: defineAsyncComponent(() => import('./attention/index.vue')),
   Orders: defineAsyncComponent(() => import('./orders/index.vue')),
   MySwap: defineAsyncComponent(() => import('./mySwap/index.vue')),
 }
@@ -30,10 +31,26 @@ const tabs = computed(() => {
   { name: t('transactions'), component: 'Transactions' as const },
   { name: t('holders'), component: 'Holders' as const },
   { name: 'LP', component: 'LP' as const },
-  // { name: t('attention1'), component: 'Attention' as const },
+  { name: t('attention1') +`(${globalStore.headFollowsNum.all})`, component: 'Attention' as const },
   { name: t('orders'), component: 'Orders' as const },
   { name: t('mySwap'), component: 'MySwap' as const },
   ]
+})
+const id = computed(() => {
+  return route.params?.id as string
+})
+watch(id, () => {
+  globalStore.getFollowsNum()
+})
+watch(() => useFollowStore().currentAddress, (val) => {
+  if (val) {
+    globalStore.getFollowsNum()
+  } else {
+    globalStore.headFollowsNum = {
+      all: 0,
+      subAll: 0
+    }
+  }
 })
 
 watch(
@@ -133,6 +150,9 @@ const comProps = computed(() => {
     Orders: {},
     MySwap: {},
   }[activeTab.value] || {}
+})
+onMounted(() => {
+  globalStore.getFollowsNum()
 })
 </script>
 

@@ -1126,6 +1126,7 @@
   "followBuy": "Follow Buy",
   "followSell": "Follow Sell",
   "devSell": "DEV sells and sells",
+  "balance": "Assets",
   "buyAmountMustG0": "The buy amount must be greater than 0",
   "quickBuyclipboard": "Clipboard Quick Buy"
 }
