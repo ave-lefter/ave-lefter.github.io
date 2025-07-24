@@ -105,10 +105,12 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (priceData) => {
     )
     
     if (priceUpdate) {
+      const newPrice = priceUpdate.uprice
       return {
         ...token,
-        current_price_usd: priceUpdate.uprice,
-        price_change_24h: priceUpdate.price_change
+        current_price_usd: newPrice,
+        price_change_24h: priceUpdate.price_change,
+        pool_circulating_supply: (token.total - token.lock_amount - token.burn_amount - token.other_amount) * newPrice
       }
     }
     return token
