@@ -146,7 +146,7 @@ const supportCategories = computed(() => {
     'Studio',
     'novabits',
     'binance_alpha',
-    'cto',
+    // 'cto',
     'xstocks',
     'volume'
   ]

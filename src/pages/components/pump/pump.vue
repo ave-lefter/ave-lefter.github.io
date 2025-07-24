@@ -100,6 +100,11 @@ const storageKey = computed(()=>{
 let columns = useStorage(storageKey.value, getPumpDefault(t))
 watch(()=>props.activeTab,()=>{
   columns = useStorage(storageKey.value, getPumpDefault(t))
+  sortConditions.value.sort = ''
+  sortConditions.value.sort_dir = ''
+  filterForm.value = {}
+  pageInfo.value.pageNO = 1
+  _getTreasureList()
 },{
   immediate:true
 })
@@ -373,7 +378,8 @@ const cellRenderer = computed(() => {
     >
       <template v-for="item in visibleColumns" :key="item.key" #[`header-${item.key}`]>
         <component
-          :is="headerRenderer[item.key as keyof typeof headerRenderer]"
+        :is="headerRenderer[item.key as keyof typeof headerRenderer]"
+          :key="activeTab"
           v-model:isVolUSDT="isVolUSDT"
           :sortConditions="sortConditions"
           :setSortConditions="setSortConditions"
