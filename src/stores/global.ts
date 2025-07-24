@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import type { pumpBlack } from '@/api/types/pump'
+import { _getFollowsNum } from '@/api/follow'
+
 import type{ GetHotTokensResponse } from '@/api/token'
 export const useGlobalStore = defineStore('global', () => {
   const wsStore = useWSStore()
@@ -87,6 +89,7 @@ export const useGlobalStore = defineStore('global', () => {
     wsStore.send(data1)
   }
 
+
   function onmessageFooterPrice(data: any) {
     const prices = data?.prices as { token: string, chain: string, uprice: number, price_change: number }[]
     footerTokensPrice.value = footerTokensPrice.value?.map?.(
@@ -108,7 +111,30 @@ export const useGlobalStore = defineStore('global', () => {
       }
     )
   }
-   const footerTokensPriceIds = computed(() => footerTokensPrice.value?.map(i => i.id))
+  const footerTokensPriceIds = computed(() => footerTokensPrice.value?.map(i => i.id))
+
+  const headFollowsNum = ref<{ all: number,soldAll: number }>({ all: 0,soldAll: 0})
+  const id = computed(() => {
+    return useRoute().params?.id as string
+  })
+  function getFollowsNum() {
+    if (!useFollowStore().currentAddress) {
+      return
+    }
+    const params = {
+      token_id: id.value,
+      self_address: useFollowStore().currentAddress,
+    }
+    _getFollowsNum(params).then((res) => {
+      headFollowsNum.value = res
+    }).catch(() => {
+      headFollowsNum.value = {
+        all: 0,
+        soldAll: 0,
+      }
+    })
+  }
+
   return {
     lang: computed(() => localeStore.locale),
     token_logo_url: computed(() => configStore.token_logo_url),
@@ -124,6 +150,8 @@ export const useGlobalStore = defineStore('global', () => {
     hotList,
     hide_small,
     hide_risk,
-    rankCommon
+    rankCommon,
+    headFollowsNum,
+    getFollowsNum
   }
 })

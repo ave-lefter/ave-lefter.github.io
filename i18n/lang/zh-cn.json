@@ -1108,5 +1108,6 @@
   "addStopLoss": "添加止损",
   "followBuy": "跟单买入",
   "followSell": "跟单卖出",
-  "devSell": "DEV卖出跟卖"
+  "devSell": "DEV卖出跟卖",
+  "balance": "金额"
 }

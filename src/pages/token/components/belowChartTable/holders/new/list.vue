@@ -33,7 +33,7 @@
           <span>{{ $t('wallet2') }}</span>
           <i
             v-if="searchKeyword"
-            class="iconfont icon-fitter1 text-10px ml-3 clickable"
+            class="iconfont icon-fitter1 text-10px ml-3px clickable"
             :style="{
               color: searchKeyword
                 ? 'var(--a-btn-bg-2-color)'
@@ -52,7 +52,7 @@
           >
             <template #reference>
               <i
-                class="iconfont icon-fitter1 text-10px ml-3 clickable"
+                class="iconfont icon-fitter1 text-10px ml-3px clickable"
                 :style="{
                   color: searchKeyword
                     ? 'var(--a-btn-bg-2-color)'
@@ -239,7 +239,7 @@
             <span>{{ $t('ratio')}}/{{ isShowBalance ? $t('bal') : $t('amount') }}</span>
             <img
               v-show="isShowBalance"
-              class="clickable ml-3"
+              class="clickable ml-3px"
               src="@/assets/images/ratio.svg"
               height="12"
               alt=""
@@ -248,7 +248,7 @@
             >
             <img
               v-show="!isShowBalance"
-              class="clickable ml-3"
+              class="clickable ml-3px"
               src="@/assets/images/amount.svg"
               height="12"
               alt=""
@@ -961,6 +961,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  isAttention: {
+    type: Boolean,
+    default: false,
+  }
 })
 const $emit = defineEmits(['filterAddress', 'handleSortChange', 'filterOriginAddress'])
 defineExpose({ sort,clearSort })
@@ -972,6 +976,7 @@ const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
 const { t } = useI18n()
+const globalStore = useGlobalStore()
 const route = useRoute()
 const isShowBalance = shallowRef(false)
 const visible = shallowRef(false)
@@ -1028,7 +1033,7 @@ const collect = async (row: any,index:number) => {
     await useWalletStore().signMessageForFavorite()
   }
   console.log('collect',row,index)
-  if(row.is_wallet_address_fav !== 1){
+  if(row.is_wallet_address_fav !== 1 && !props.isAttention){
     useFollowStore().confirmAttention($refs.value.buttonRefs[index],row.chain, (form) => {
       console.log('confirmAttention', form)
       return addAttention2({
@@ -1038,6 +1043,7 @@ const collect = async (row: any,index:number) => {
         group: form.group,
         is_monitored: form.is_monitored,
       }).then((res) => {
+        globalStore.getFollowsNum();
         (tableList.value as Array<any>)[index].is_wallet_address_fav = 1
         // getList()
         return Promise.resolve(res)
@@ -1046,7 +1052,7 @@ const collect = async (row: any,index:number) => {
       }).finally(() => {
       })
     })
-    return 
+    return
   }
   // loading.value = true
   deleteAttention({
@@ -1054,8 +1060,13 @@ const collect = async (row: any,index:number) => {
     user_address: row.holder,
     user_chain: row.chain
   }).then(() => {
+    globalStore.getFollowsNum()
     ElMessage.success(t('attention1Canceled'));
     (tableList.value as Array<any>)[index].is_wallet_address_fav = 0
+      // console.log('------deleteAttention---------', tableList.value[index])
+      // if (props.isAttention) {
+      //   (tableList.value as Array<any>)[index].value?.splice(index, 1)
+      // }
     // getList()
   }).catch((err) => {
     console.log(err)
@@ -1100,6 +1111,10 @@ function clearSort() {
 <style lang="scss" scoped>
   :deep(.el-table) {
     font-size: 12px;
+    .caret-wrapper{
+      margin-right: -7px;
+      margin-left: -3px;
+    }
     td {
       &.bg-12B8861A {
         background: var(--d-0C111C-l-E9F0FF);

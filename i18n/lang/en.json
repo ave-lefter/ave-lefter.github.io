@@ -1109,5 +1109,6 @@
   "addStopLoss": "Add Stop Loss",
   "followBuy": "Follow Buy",
   "followSell": "Follow Sell",
-  "devSell": "DEV sells and sells"
+  "devSell": "DEV sells and sells",
+  "balance": "Assets"
 }

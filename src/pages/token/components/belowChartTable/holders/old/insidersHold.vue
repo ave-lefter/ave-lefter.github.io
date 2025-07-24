@@ -153,7 +153,7 @@ const props = defineProps<{
 const route = useRoute()
 const { t } = useI18n()
 const { mode } = storeToRefs(useGlobalStore())
-
+const globalStore = useGlobalStore()
 const tableDataFilter = ref<any[]>([])
 const tableIndex = ref(0)
 const dialogProfitLoss = ref(false)
@@ -211,6 +211,7 @@ const collect = async (row: any,index:number) => {
         group: form.group,
         is_monitored: form.is_monitored,
       }).then((res) => {
+        globalStore.getFollowsNum();
         (tableDataFilter.value as Array<any>)[index].is_wallet_address_fav = true
         // getList()
         return Promise.resolve(res)
@@ -219,7 +220,7 @@ const collect = async (row: any,index:number) => {
       }).finally(() => {
       })
     })
-    return 
+    return
   }
   // loading.value = true
   deleteAttention({
@@ -227,6 +228,7 @@ const collect = async (row: any,index:number) => {
     user_address: row.address,
     user_chain: chain.value
   }).then(() => {
+    globalStore.getFollowsNum()
     ElMessage.success(t('attention1Canceled'));
     (tableDataFilter.value as Array<any>)[index].is_wallet_address_fav = false
     // getList()
