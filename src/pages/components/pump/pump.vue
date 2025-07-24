@@ -121,6 +121,12 @@ watch(
   }
 )
 
+const walletStore = useWalletStore()
+const botStore = useBotStore()
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
+
 let timer: number
 async function _getTreasureList(shouldLoading = true) {
   try {
@@ -212,11 +218,6 @@ function initWs() {
   })
 }
 
-const walletStore = useWalletStore()
-const botStore = useBotStore()
-const walletAddress = computed(() => {
-  return botStore.evmAddress || walletStore.address
-})
 async function collect(index: number, row) {
   if (walletAddress.value) {
     if (walletStore.address) {
