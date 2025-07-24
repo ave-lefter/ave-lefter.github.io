@@ -32,8 +32,10 @@ export default defineNuxtRouteMiddleware((to) => {
   } else if (to.fullPath?.includes(NATIVE_TOKEN)) {
     const {chain} = getAddressAndChainFromId(to.params.id as string)
     const mainUrl = getChainInfo(chain)?.wmain_wrapper
+    debugger
     if (mainUrl) {
       return navigateTo(`/token/${mainUrl}-${chain}`, {replace: true})
     }
+
   }
 })
