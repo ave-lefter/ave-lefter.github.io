@@ -2,7 +2,7 @@
   <div class="flex">
     <span class="clickable flex" @click.stop="show = true">
       <slot name="icon">
-        <Icon class="text-14px color-[var(--d-999-l-666)] hover:color-[--d-F5F5F5-l-333]" name="custom:pump-setting" />
+        <Icon class="text-14px color-[--d-999-l-666] hover:color-[--d-F5F5F5-l-333] icon-bot-setting" name="custom:pump-setting" />
       </slot>
     </span>
     <el-dialog v-model="show" width="500px" append-to-body>
@@ -14,6 +14,27 @@
       </template>
       <el-form class="popup-content" @submit.prevent="confirmSubmit">
         <div v-show="settingTab === 0">
+          <div v-if="showClipboardSet" class="mb-20px pb-20px b-b-solid b-b-[--d-333-l-F2F2F2] b-b-1">
+            <div class="flex items-center mb-15px">
+              <Icon v-if="themeStore.isDark" name="custom:flash-d" class="text-14px" />
+              <Icon v-else name="custom:flash-l" class="text-14px" />
+              <span class="ml-5px mr-auto">{{ $t('quickBuyclipboard') }}</span>
+              <div class="flex items-center justify-end text-12px color-#999 clickable" @click.stop="clipboardQuickInput[chain] = ''">
+                <Icon
+                  name="custom:refresh-left"
+                  class="ml-5px clickable text-14px mr-3px"
+                />
+                <span>{{ $t('reset') }}</span>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <img v-if="chain" class="w-16px h-16x mr-5px rd-50%" :src="`${configStore.token_logo_url}chain/${chain}.png`" alt="" srcset="">
+              <span class="mr-auto font-500">{{  getChainInfo(chain)?.name || ''  }}</span>
+              <el-input v-model="clipboardQuickInput[chain]" class="input-swap input-number flex-auto! max-w-150px clipped-input rd-8px!" inputmode="decimal" clearable placeholder="0.0" @update:model-value="value => {clipboardQuickInput[chain] = value?.replace?.(/\-|[^\d.]/g, '')}" @blur="handleBlurBuyValue1(clipboardQuickInput[chain] || '')">
+                <template #append><span class="color-#999">{{ getChainInfo(chain)?.main_name }}</span></template>
+              </el-input>
+            </div>
+          </div>
           <div class="setting-list mb-10px rounded-4px">
             <button v-for="item in ['s1', 's2', 's3']" :key="item" :class="{'active': item === botSetting.selected}" type="button" @click.stop="botSetting.selected = item">{{ item.toUpperCase() }}</button>
           </div>
@@ -294,20 +315,23 @@ import BigNumber from 'bignumber.js'
 import { formatBotGasTips } from '@/utils/bot'
 import { cloneDeep } from 'lodash-es'
 import { ElMessageBox } from 'element-plus'
-import type { BotSettingKey } from '~/utils/types'
+import type { BotChain, BotSettingKey } from '~/utils/types'
 
 const props = defineProps({
   canSetAuto: { type: Boolean, default: true },
-  chain: { type: String, default: '' },
+  chain: { type: String as PropType<BotChain>, default: '' },
   setting: { type: Object, default: () => ({}) },
   isAutoSell: { type: Boolean, default: true },
-  showQuickAmount: { type: Boolean, default: true }
+  showQuickAmount: { type: Boolean, default: true },
+  showClipboardSet: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['update:slippage', 'onSubmit'])
 
 const { t } = useI18n()
 const botSwapStore = useBotSwapStore()
+const themeStore = useThemeStore()
+const configStore = useConfigStore()
 
 const slippageList = [5, 9, 20]
 // 获取 uuid
@@ -323,6 +347,7 @@ const { autoSellConfigs, loadAutoSellConfigs, saveAutoSellConfigs } = useAutoSel
 const selected = computed(() => botSetting.value.selected)
 
 const settingTab = ref(0)
+const clipboardQuickInput = ref(cloneDeep(botSettingStore.clipboardQuickInput))
 
 // const slippageValue = ref<number | undefined>()
 // const customSlippage = ref<number | undefined>()
@@ -336,6 +361,7 @@ watch(show, (val) => {
     botSetting.value[selected].slippageValue = s === 'auto' ? undefined : Number(s)
     botSetting.value[selected].customSlippage = s === 'auto' || slippageList.includes(Number(s)) ? undefined : Number(s)
     loadAutoSellConfigs()
+    clipboardQuickInput.value = cloneDeep(botSettingStore.clipboardQuickInput)
   }
 })
 
@@ -422,6 +448,7 @@ function confirmSubmit() {
       }
     }
   }
+  botSettingStore.clipboardQuickInput = cloneDeep(clipboardQuickInput.value)
   emit('onSubmit', setting)
   saveAutoSellConfigs()
   show.value = false
@@ -465,6 +492,21 @@ function handleBlurBuyValue(index: number) {
       botSetting.value[selected].buyValueList[index] = '0'
     } else {
       botSetting.value[selected].buyValueList[index] = v1
+    }
+  }
+}
+
+function handleBlurBuyValue1(value: string) {
+  const decimals = 4
+  const v = value
+  const v1 = new BigNumber(v || 0)?.toFixed?.().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals || 18}})?`))?.[0] || ''
+  if (String(v) !== String(v1)) {
+    if (v === '') {
+      clipboardQuickInput.value[props.chain] = ''
+    } else if (Number(v1) === 0) {
+      clipboardQuickInput.value[props.chain] = '0'
+    } else {
+      clipboardQuickInput.value[props.chain] = v1
     }
   }
 }
@@ -692,6 +734,11 @@ function addStopLoss() {
     .el-select__selected-item {
       text-align: right;
     }
+  }
+}
+.clipped-input {
+  :deep(.el-input-group__append) {
+    padding: 0 8px;
   }
 }
 </style>
