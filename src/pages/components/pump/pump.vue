@@ -128,13 +128,14 @@ async function _getTreasureList(shouldLoading = true) {
       loading.value = true
     }
     const { total: _, ...rest } = pageInfo.value
+    const _walletAddress = useBotStore().evmAddress || useWalletStore().address || ''
     const res = await getTreasureList({
       category: props.activeSubTab,
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
       ...sortConditions.value,
       ...filterForm.value,
-      self_address: walletAddress.value,
+      self_address: _walletAddress,
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
