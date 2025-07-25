@@ -19,7 +19,7 @@ export function getGainOptions(t: ReturnType<typeof useI18n>['t']) {
         'dynamicVolAndTxs',
         'dynamicMarkers',
         'priceChange1mContent',
-        'priceChange15mContent',
+        'priceChangeDynamicContent',
         'priceChange24hContent',
         'smarterContent',
       ],
@@ -101,6 +101,14 @@ export function getGainDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       minWidth: 110,
       align: 'right',
       activeInterval: '15m'
+    },
+    {
+      title: t('specifiedTimeInterval'),
+      key: 'price_change_dynamic',
+      isVisible: true,
+      render: 'priceChangeDynamicContent',
+      minWidth: 110,
+      align: 'right'
     },
     {
       title: '24h%',

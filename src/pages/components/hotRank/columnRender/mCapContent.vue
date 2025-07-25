@@ -3,7 +3,7 @@ defineProps<{
   row: any
 }>()
 function getMarketCapColor(row) {
-  if (!row?.market_cap) return 'color-#848E9C'
+  if (!row?.market_cap) return 'color-[--d-666-l-999]'
 
   const marketCap = row.market_cap
   const tokenAge = getTokenAge(row?.created_at)
