@@ -4,12 +4,27 @@ import hot from './components/hotRank/hot.vue'
 import gainer from './components/gainerRank/gainer.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
+import { v4 as uuidv4 } from 'uuid'
+
+const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
+const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
 const components = {
   hot,
-  gain: gainer,       // 保持gain映射为兼容性
-  gainer,            // 正确的gainer映射
+  gainer,
+  pump: pumpComponent,
+  bonk_pump: pumpComponent,
+  four: pumpComponent,
+  bonk: pumpComponent,
+  moonshot: pumpComponent,
+  Studio: pumpComponent,
+  novabits: pumpComponent,
+  binance_alpha: activityComponent,
+  cto: activityComponent,
+  xstocks: activityComponent,
+  volume: activityComponent,
 }
 const activeTab = shallowRef<keyof typeof components>('hot')
+const activeSubTab = shallowRef('pump_in_hot')
 const activeChain = shallowRef('AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
 const categories = computed(() => {
@@ -162,6 +177,7 @@ function listMapFunction(i: Record<string, any>) {
   }
   return {
     ...i,
+    rowKey:uuidv4(),
     id: `${i.target_token}-${i.chain}`,
     pair_id: `${i.pair}-${i.chain}`,
     token: i.target_token,
@@ -223,6 +239,7 @@ function getMedias(appendix: string) {
 <template>
   <div class="w-full [&&]:max-w-1920px mx-auto">
     <CategoryTabs
+      v-model:activeSubTab="activeSubTab"
       v-model:activeTab="activeTab"
       v-model:activeChain="activeChain"
       :categories="categories"
@@ -233,6 +250,8 @@ function getMedias(appendix: string) {
         :is="components[activeTab]"
         :listMapFunction="listMapFunction"
         :activeChain="activeChain"
+        :activeTab="activeTab"
+        :activeSubTab="activeSubTab"
       />
     </KeepAlive>
   </div>

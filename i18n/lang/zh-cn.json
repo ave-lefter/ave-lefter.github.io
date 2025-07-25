@@ -1079,6 +1079,10 @@
   "TxnsBuy": "交易数买入",
   "TxnsSell": "交易数卖出",
   "platform": "平台",
+  "runTime1": "1/2耗时",
+  "runTime2": "2/2耗时",
+  "snipers_1m": "开盘人数",
+  "devPosition": "DEV持仓",
   "profit4": "盈利",
   "loss": "亏损",
   "onlyPush": "仅看推送",
@@ -1120,5 +1124,8 @@
   "addStopLoss": "添加止损",
   "followBuy": "跟单买入",
   "followSell": "跟单卖出",
-  "devSell": "DEV卖出跟卖"
+  "devSell": "DEV卖出跟卖",
+  "balance": "金额",
+  "buyAmountMustG0": "买入数量必须大于0",
+  "quickBuyclipboard": "剪切板快捷买入"
 }

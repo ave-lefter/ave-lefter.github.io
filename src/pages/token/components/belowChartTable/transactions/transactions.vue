@@ -21,6 +21,7 @@ import {useThrottleFn} from '@vueuse/core'
 import IconUnknown from '@/assets/images/icon-unknown.png'
 import type {AveTable} from '#components'
 // import type { content } from 'html2canvas/dist/types/css/property-descriptors/content'
+const globalStore = useGlobalStore()
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
@@ -71,10 +72,10 @@ const tabs = computed(() => {
     label: t('sell3'),
     value: 'sell'
   },
-  // {
-  //   label: t('followed'),
-  //   value: '-100'
-  // },
+  {
+    label: t('followed')+ `(${globalStore.headFollowsNum.all})`,
+    value: '-100'
+  },
   {
     label: t('liquidity2'),
     value: 'liquidity'
@@ -655,6 +656,7 @@ const collect = async (row: any,index:number) => {
         is_monitored: form.is_monitored,
       }).then((res) => {
         // getList()
+        globalStore.getFollowsNum()
         filterTableList.value.forEach((item: any) => {
           if (item.wallet_address === row.wallet_address) {
             item['is_wallet_address_fav'] = 1
@@ -674,6 +676,7 @@ const collect = async (row: any,index:number) => {
     user_address: row.wallet_address,
     user_chain: row.chain
   }).then(() => {
+    globalStore.getFollowsNum()
     ElMessage.success( t('attention1Canceled'))
     // getList()
     filterTableList.value.forEach((item: any) => {

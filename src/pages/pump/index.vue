@@ -93,6 +93,7 @@
       <QuickSwapSet
         v-model:quickBuyValue="quickBuyValue"
         :chain="activeChain"
+        :settingsButtonVisible="true"
       />
       <div class="flex-1" />
       <Setting :chain="activeChain"/>
@@ -804,7 +805,7 @@ function getPump(params, isFilter = false) {
       params.platforms = pump_solana_platforms.value?.join(',')
     }
   } else {
-    params.platforms = undefined
+    params.platforms = 'fourmeme'
   }
 
   if (pump_query.value[chain][params.category]) {

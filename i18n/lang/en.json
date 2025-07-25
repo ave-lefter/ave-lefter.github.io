@@ -1080,6 +1080,10 @@
   "TxnsBuy": "Txns Buy",
   "TxnsSell": "Txns Sell",
   "platform": "Platform",
+  "runTime1": "1/2 Cost",
+  "runTime2": "2/2 Cost",
+  "snipers_1m": "Snipers[1m]",
+  "devPosition": "DEV Owned",
   "profit4": "Profit",
   "loss": "Loss",
   "onlyPush": "Only Push",
@@ -1121,5 +1125,8 @@
   "addStopLoss": "Add Stop Loss",
   "followBuy": "Follow Buy",
   "followSell": "Follow Sell",
-  "devSell": "DEV sells and sells"
+  "devSell": "DEV sells and sells",
+  "balance": "Assets",
+  "buyAmountMustG0": "The buy amount must be greater than 0",
+  "quickBuyclipboard": "Clipboard Quick Buy"
 }

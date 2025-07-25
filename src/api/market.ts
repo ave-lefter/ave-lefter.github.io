@@ -19,7 +19,7 @@ export interface CategoryElement {
   name_tr: string;
   name_ja: string;
   is_hot: number;
-  sub_category: string[];
+  sub_category?: Omit<CategoryElement,'sub_category'>[];
   is_pump: number;
 }
 

@@ -36,6 +36,33 @@ const mcOptions = shallowRef([
   {label: '<$10M', value: 1e7},
 ])
 const themeStore = useThemeStore()
+
+const currentFilterNum = shallowRef(0)
+function onConfirm() {
+  filterVisible.value = false
+  emit('onConfirm', tempFilterParams.value)
+  updateCurrentNum()
+}
+
+function onReset() {
+  filterVisible.value = false
+  emit('onReset')
+  currentFilterNum.value = 0
+}
+onMounted(() => {
+  tempFilterParams.value = {...props.filterParams}
+  updateCurrentNum()
+})
+
+function updateCurrentNum() {
+  currentFilterNum.value = Object.keys(tempFilterParams.value)
+    .reduce((prev, curKey) => {
+      if (curKey !== 'mc_curr_sign' && tempFilterParams.value[curKey as keyof typeof tempFilterParams.value]) {
+        return prev + 1
+      }
+      return prev
+    }, 0)
+}
 </script>
 
 <template>
@@ -47,11 +74,16 @@ const themeStore = useThemeStore()
       :width="308"
     >
       <template #reference>
-        <Icon
+        <div class="flex items-center gap-4px text-12px mr-8px">
+          <Icon
           id="custom-filter"
           name="custom:filter"
-          class="mr-8px text-12px cursor-pointer"
+          class="text-12px cursor-pointer"
         />
+          <span v-if="currentFilterNum>0" class="w-14px h-14px rounded-2px bg-#333 color-#F5F5F5 text-center lh-14px">{{
+                currentFilterNum
+          }}</span>
+        </div>
       </template>
       <template #default>
         <div class="mb-12px text-16px color-[--d-F5F5F5-l-333]">
@@ -115,14 +147,14 @@ const themeStore = useThemeStore()
           <el-button
             class="h-32px flex-1 m-l-auto"
             :color="themeStore.isDark ? '#333':'#F2F2F2'"
-            @click="filterVisible=false;emit('onReset')"
+            @click="onReset"
           >
             {{ $t('reset') }}
           </el-button>
           <el-button
             type="primary"
             class="h-32px flex-1 m-l-auto"
-            @click="filterVisible=false;emit('onConfirm',tempFilterParams)"
+            @click="onConfirm"
           >
             {{ $t('confirm') }}
           </el-button>
