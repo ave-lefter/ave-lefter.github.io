@@ -793,7 +793,7 @@
   "plsImport": "Please import the self-selected Code in the App settings to automatically synchronize the app's self-selected data.",
   "plsImportCorrect": "Please enter the correct code",
   "removeFavGroupTips2": "Deleting the group will move its addresses to the default group. Continue?",
-  "bulkProcess": "Bulk Import / Export / / Delete",
+  "bulkProcess": "Bulk Import / Export / Delete",
   "monitorList": "Monitoring List",
   "noteTime": "Note time",
   "pushTitle": "Push",
