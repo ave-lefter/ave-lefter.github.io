@@ -43,6 +43,7 @@ const globalStore = useGlobalStore()
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
+  activeTab?: string
 }>()
 
 const sortConditions = ref({
@@ -107,6 +108,8 @@ onMounted(() => {
 onActivated(() => {
   console.log('涨幅榜激活')
   isActive.value = true
+  filterForm.value = {}
+  pageInfo.value.pageNO = 1
   setTimeout(() => {
     if (isActive.value) {
       _getTreasureList()
@@ -138,6 +141,10 @@ let timer: number
 
 async function _getTreasureList(shouldLoading = true) {
   try {
+    clearTimeout(timer)
+    if (props.activeTab !== 'gainer') {
+      return
+    }
     if (shouldLoading) {
       loading.value = true
     }
