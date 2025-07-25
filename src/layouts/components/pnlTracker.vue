@@ -44,8 +44,8 @@ const pnlSettingVisible = ref(false)
           <Icon name="custom:pump-setting" class="cursor-pointer text-12px color-#FFFFFF99" @click.self="pnlSettingVisible = true"/>
           <Icon name="custom:history-fill" class="cursor-pointer text-16px color-#FFFFFF99" @click.self="pnlHistoryVisible = true"/>
         </div>
-        <div>
-          <Icon name="custom:reset2" class="cursor-pointer text-16px color-#FFFFFF99" />
+        <div class="flex items-center gap-12px">
+          <Icon name="custom:reset2" class="cursor-pointer text-12px color-#FFFFFF99" />
           <Icon name="material-symbols:close" class="cursor-pointer text-16px color-#FFFFFF99" />
         </div>
       </div>

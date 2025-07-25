@@ -57,22 +57,56 @@ function onConfirm() {
           {{ $t('UploadTips') }}
         </div>
       </el-upload>
-      <div class="text-gray-400 text-xs mb-3">推荐的宽高比 4:1 和1MB文件大小</div>
+      <div class="color-[--d-666-l-999] text-12px mt-2 mb-24px">推荐的宽高比 4:1 和1MB文件大小</div>
     </div>
 
-    <div class="font-bold my-4">背景设置</div>
-    <div class="flex items-center my-3">
-      <span>模糊</span>
-      <el-slider v-model="blur" :min="0" :max="20" :step="1" class="flex-1 mx-4" />
-      <el-input v-model="blur" class="w-15" size="small" suffix-icon="el-icon-px">px</el-input>
-    </div>
-    <div class="flex items-center my-3">
-      <span>不透明度</span>
-      <el-slider v-model="opacity" :min="0" :max="100" :step="1" class="flex-1 mx-4" />
-      <el-input v-model="opacity" class="w-15" size="small" suffix-icon="el-icon-percent"
-        >%</el-input
+    <div class="color-[--d-F5F5F5-l-333] lh-20px mb-16px">背景设置</div>
+    <div class="flex items-center justify-between mb-16px">
+      <span class="text-12px color-[--d-CCC-l-333]">模糊</span>
+      <el-input
+        v-model.number="blur"
+        class="w-54px [--el-input-height:28px] text-12px [--el-input-icon-color:--d-CCC-l-333] [--el-input-border-color:--d-333-l-F2F2F2]"
       >
+        <template #suffix>px</template>
+      </el-input>
     </div>
+    <el-slider
+      v-model="blur"
+      :min="0"
+      :max="20"
+      :step="1"
+      :marks="{
+        0: '0',
+        5: '5',
+        10: '10',
+        15: '15',
+        20: '20',
+      }"
+      class="[&&]:[--el-slider-button-size:8px] [--el-color-white:#3F80F7] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] mx-4px"
+    />
+    <div class="flex items-center justify-between mt-32px mb-16px">
+      <span class="text-12px color-[--d-CCC-l-333]">不透明度</span>
+      <el-input
+        v-model.number="opacity"
+        class="w-54px [--el-input-height:28px] text-12px [--el-input-icon-color:--d-CCC-l-333] [--el-input-border-color:--d-333-l-F2F2F2]"
+      >
+        <template #suffix>px</template>
+      </el-input>
+    </div>
+    <el-slider
+      v-model="blur"
+      :min="0"
+      :max="20"
+      :step="1"
+      :marks="{
+        0: '0',
+        5: '5',
+        10: '10',
+        15: '15',
+        20: '20',
+      }"
+      class="[&&]:[--el-slider-button-size:8px] [--el-color-white:#3F80F7] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] mx-4px"
+    />
 
     <div class="flex items-center justify-between my-3">
       <span>SOL 和 USD互换</span>
@@ -96,5 +130,18 @@ function onConfirm() {
       --el-upload-dragger-padding-horizontal: 15px;
     }
   }
+}
+:deep{
+  .el-slider__stop{
+      height: 4px;
+      top:-1px;
+      --el-slider-stop-bg-color:var(--d-666-l-999);
+      --el-border-radius-circle:1px;
+    }
+    .el-slider__marks-text{
+      font-size: 12px;
+      color: var(--d-666-l-999);
+      margin-top: 6px;
+    }
 }
 </style>
