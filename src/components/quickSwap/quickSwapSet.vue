@@ -121,7 +121,8 @@ const props = withDefaults(defineProps<{
   showQuickAmount?: boolean
   settingsButtonVisible?:boolean
 }>(), {
-  quickBuyValue: '0.01'
+  quickBuyValue: '0.01',
+  settingsButtonVisible:true
 })
 const gasPrice = shallowRef(0)
 

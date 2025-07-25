@@ -121,6 +121,12 @@ watch(
   }
 )
 
+const walletStore = useWalletStore()
+const botStore = useBotStore()
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
+
 let timer: number
 async function _getTreasureList(shouldLoading = true) {
   try {
@@ -128,14 +134,13 @@ async function _getTreasureList(shouldLoading = true) {
       loading.value = true
     }
     const { total: _, ...rest } = pageInfo.value
-    const _walletAddress = useBotStore().evmAddress || useWalletStore().address || ''
     const res = await getTreasureList({
       category: props.activeSubTab,
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
       ...sortConditions.value,
       ...filterForm.value,
-      self_address: _walletAddress,
+      self_address: walletAddress.value,
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
@@ -213,11 +218,6 @@ function initWs() {
   })
 }
 
-const walletStore = useWalletStore()
-const botStore = useBotStore()
-const walletAddress = computed(() => {
-  return botStore.evmAddress || walletStore.address
-})
 async function collect(index: number, row) {
   if (walletAddress.value) {
     if (walletStore.address) {
