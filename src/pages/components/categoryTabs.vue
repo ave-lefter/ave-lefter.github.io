@@ -3,6 +3,8 @@ import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
 import type { CategoryElement, IGetTreasureConfig } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
+import { getNewDefaultColumns, getNewOptions } from './newRank/columnRender/newColumnsService'
+import { getInclusionDefaultColumns, getInclusionOptions } from './inclusionRank/columnRender/inclusionColumnsService'
 import ChainsSelect from './chainsSelect.vue'
 import { getPumpDefault, getPumpOptions } from './pump/columnRender/pumpColumnsService'
 import {
@@ -35,6 +37,8 @@ const intervals = computed(() => {
 const themeStore = useThemeStore()
 const isHot = computed(() => props.activeTab === 'hot')
 const isPump = computed(() => props.activeTab === 'pump')
+const isNew = computed(() => props.activeTab === 'new')
+const isInclusion = computed(() => props.activeTab === 'inclusion')
 const configMap = computed(() => {
   return {
     hot: {
@@ -43,6 +47,13 @@ const configMap = computed(() => {
       getDefaultColumns: getHotDefaultColumns,
       getOptions: getHotOptions,
       class: isHot.value ? 'color-#FFA622' : '',
+    },
+    new: {
+      icon: 'custom:new',
+      storageKey: 'newTableColumns',
+      getDefaultColumns: getNewDefaultColumns,
+      getOptions: getNewOptions,
+      class: isNew.value ? 'color-#85E12F' : '',
     },
     pump: {
       icon: getPumpIcon(isPump.value),
@@ -93,6 +104,13 @@ const configMap = computed(() => {
       getOptions: getPumpOptions,
       class: '',
     },
+    inclusion: {
+      icon: 'custom:inclusion',
+      storageKey: 'inclusionTableColumns',
+      getDefaultColumns: getInclusionDefaultColumns,
+      getOptions: getInclusionOptions,
+      class: isInclusion.value ? 'color-#B43BFF' : '',
+    },
     binance_alpha: {
       icon: '',
       storageKey: 'binance_alphaTableColumns',
@@ -138,6 +156,7 @@ const globalStore = useGlobalStore()
 const supportCategories = computed(() => {
   const keys = [
     'hot',
+    'new',
     'pump',
     'bonk_pump',
     'four',
@@ -145,6 +164,7 @@ const supportCategories = computed(() => {
     'moonshot',
     'Studio',
     'novabits',
+    'inclusion',
     'binance_alpha',
     // 'cto',
     'xstocks',

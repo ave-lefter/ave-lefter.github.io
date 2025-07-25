@@ -1125,6 +1125,8 @@
   "followBuy": "跟单买入",
   "followSell": "跟单卖出",
   "devSell": "DEV卖出跟卖",
+  "DbCheckGg": "使用谷歌验证器",
+  "DbCheckContentTitle3": "步骤 3：",
   "balance": "金额",
   "buyAmountMustG0": "买入数量必须大于0",
   "quickBuyclipboard": "剪切板快捷买入"
