@@ -140,7 +140,7 @@ async function _getTreasureList(shouldLoading = true) {
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
       ...sortConditions.value,
       ...filterForm.value,
-      self_address: walletAddress,
+      self_address: walletAddress.value,
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
