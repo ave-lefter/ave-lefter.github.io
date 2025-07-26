@@ -1,25 +1,48 @@
 <script setup lang="ts">
+import pnlImg from '@/assets/images/pnl.png'
+const emit = defineEmits(['confirm', 'reset'])
 const visible = defineModel<boolean>('visible')
-const blur = ref(0)
-const opacity = ref(100)
-const solUsdSwitch = ref(false)
-const showU = ref(true)
+const pnlSetting = defineModel<any>('pnlSetting')
 
-function beforeUpload(file) {
+const defaultSettings = {
+  chain: 'solana',
+  background: pnlImg,
+  blur: 0,
+  opacity: 100,
+  solUsdSwitch: false,
+  showU: true,
+}
+const settings = ref(pnlSetting.value || {...defaultSettings})
+watch(visible, () => {
+  if (visible.value) {
+    settings.value = pnlSetting.value || {...defaultSettings}
+  }
+})
+const themeStore = useThemeStore()
+const supportChains = ['solana', 'bsc']
+
+function beforeUpload(file: File) {
+  if (file.size > 200 * 1024) {
+    ElMessage.error('图片大小不能超过0.2MB')
+    return false
+  }
   // 这里可以加图片大小/比例校验
   return true
 }
 function resetBg() {
-  // 重置背景图片逻辑
+  settings.value.background = pnlImg
 }
 function onReset() {
-  blur.value = 0
-  opacity.value = 100
-  solUsdSwitch.value = false
-  showU.value = true
+  settings.value.blur = 0
+  settings.value.opacity = 100
+  settings.value.solUsdSwitch = false
+  settings.value.showU = true
   resetBg()
+  visible.value = false
+  pnlSetting.value = {...defaultSettings}
 }
 function onConfirm() {
+  pnlSetting.value = {...settings.value}
   // 提交逻辑
   visible.value = false
 }
@@ -34,12 +57,26 @@ function onConfirm() {
     class="pnl-setting-dialog"
   >
     <div class="mx--20px border-t-1px border-t-solid border-[--d-333-l-F2F2F2]" />
+    <div class="flex pt-20px items-center justify-between">
+      <span class="color-[--d-CCC-l-333] text-12px">选择链</span>
+      <div class="flex items-ceter gap-4px px-4px py-2px rounded-4px bg-[--d-333-l-F2F2F2]">
+        <div
+          v-for="chain in supportChains"
+          :key="chain"
+          class="cursor-pointer rounded-4px px-4px py-2px"
+          :class="settings.chain === chain ? 'bg-[--d-111-l-FFF]' : ''"
+          @click="settings.chain = chain"
+        >
+          <ChainToken :chain="chain" :width="16" />
+        </div>
+      </div>
+    </div>
     <div class="pt-20px">
       <div class="flex justify-between color-[--d-CCC-l-333] text-12px lh-18px mb-16px">
-        <span>{{ $t('BackPic') }}</span>
-        <div class="flex items-center gap-4px">
+        <span>背景图片</span>
+        <div class="flex items-center gap-4px cursor-pointer" @click="resetBg">
           <Icon name="custom:refresh-left" />
-          {{ $t('ResetBackPic') }}
+          重置背景
         </div>
       </div>
       <el-upload
@@ -50,28 +87,43 @@ function onConfirm() {
         :limit="1"
         :before-upload="beforeUpload"
       >
-        <div class="flex justify-center mb-6px">
-          <Icon name="custom:upload-cloud" class="text-24px color-[--d-CCC-l-333]" />
-        </div>
-        <div class="color-[--d-999-l-666] text-12px lh-18px text-center">
-          {{ $t('UploadTips') }}
+        <div
+          class="w-320px h-80px bg-cover flex flex-col items-center justify-center group/item"
+          :style="settings.background ? 'background-image:url(' + settings.background + ')' : ''"
+        >
+          <div
+            class="flex justify-center mb-6px transition-all duration-300 group-hover/item:opacity-100"
+            :class="
+              settings.background ? 'opacity-0 color-[--d-F5F5F5-l-333]' : 'color-[--d-CCC-l-333]'
+            "
+          >
+            <Icon name="custom:upload-cloud" class="text-24px" />
+          </div>
+          <div
+            class="text-12px lh-18px text-center transition-all duration-300 group-hover/item:opacity-100"
+            :class="
+              settings.background ? 'opacity-0 color-[--d-F5F5F5-l-333]' : 'color-[--d-999-l-666]'
+            "
+          >
+            拖放图片到这里或点击选择文件
+          </div>
         </div>
       </el-upload>
       <div class="color-[--d-666-l-999] text-12px mt-2 mb-24px">推荐的宽高比 4:1 和1MB文件大小</div>
     </div>
 
-    <div class="color-[--d-F5F5F5-l-333] lh-20px mb-16px">背景设置</div>
+    <div class="color-[--d-CCC-l-333] lh-20px mb-16px">背景设置</div>
     <div class="flex items-center justify-between mb-16px">
       <span class="text-12px color-[--d-CCC-l-333]">模糊</span>
       <el-input
-        v-model.number="blur"
+        v-model.number="settings.blur"
         class="w-54px [--el-input-height:28px] text-12px [--el-input-icon-color:--d-CCC-l-333] [--el-input-border-color:--d-333-l-F2F2F2]"
       >
         <template #suffix>px</template>
       </el-input>
     </div>
     <el-slider
-      v-model="blur"
+      v-model="settings.blur"
       :min="0"
       :max="20"
       :step="1"
@@ -87,39 +139,49 @@ function onConfirm() {
     <div class="flex items-center justify-between mt-32px mb-16px">
       <span class="text-12px color-[--d-CCC-l-333]">不透明度</span>
       <el-input
-        v-model.number="opacity"
+        v-model.number="settings.opacity"
         class="w-54px [--el-input-height:28px] text-12px [--el-input-icon-color:--d-CCC-l-333] [--el-input-border-color:--d-333-l-F2F2F2]"
       >
-        <template #suffix>px</template>
+        <template #suffix>%</template>
       </el-input>
     </div>
     <el-slider
-      v-model="blur"
+      v-model="settings.opacity"
       :min="0"
-      :max="20"
+      :max="100"
       :step="1"
       :marks="{
         0: '0',
-        5: '5',
-        10: '10',
-        15: '15',
-        20: '20',
+        25: '25',
+        50: '50',
+        75: '75',
+        100: '100',
       }"
       class="[&&]:[--el-slider-button-size:8px] [--el-color-white:#3F80F7] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] mx-4px"
     />
 
-    <div class="flex items-center justify-between my-3">
-      <span>SOL 和 USD互换</span>
-      <el-switch v-model="solUsdSwitch" />
+    <div class="flex items-center justify-between mt-40px">
+      <span class="color-[--d-CCC-l-333] text-12px">SOL 和 USD互换 </span>
+      <el-switch v-model="settings.solUsdSwitch" class="[&&]:h-20px" />
     </div>
-    <div class="flex items-center justify-between my-3">
-      <span>显示U本位</span>
-      <el-switch v-model="showU" />
+    <div class="flex items-center justify-between mt-24px">
+      <span class="color-[--d-CCC-l-333] text-12px">显示U本位</span>
+      <el-switch v-model="settings.showU" class="[&&]:h-20px" />
     </div>
 
     <template #footer>
-      <el-button @click="onReset">重置</el-button>
-      <el-button type="primary" @click="onConfirm">完成</el-button>
+      <div class="flex">
+        <el-button
+          class="h-30px flex-1 m-l-auto"
+          :color="themeStore.isDark ? '#333' : '#F2F2F2'"
+          @click="onReset"
+        >
+          {{ $t('reset') }}
+        </el-button>
+        <el-button type="primary" class="h-30px flex-1 m-l-auto" @click="onConfirm">
+          {{ $t('confirm') }}
+        </el-button>
+      </div>
     </template>
   </el-dialog>
 </template>
@@ -127,21 +189,25 @@ function onConfirm() {
 .upload {
   :deep {
     .el-upload {
-      --el-upload-dragger-padding-horizontal: 15px;
+      --el-upload-dragger-padding-horizontal: 0;
+      --el-upload-dragger-padding-vertical: 0;
+    }
+    .el-upload-dragger {
+      border: 0 none;
     }
   }
 }
-:deep{
-  .el-slider__stop{
-      height: 4px;
-      top:-1px;
-      --el-slider-stop-bg-color:var(--d-666-l-999);
-      --el-border-radius-circle:1px;
-    }
-    .el-slider__marks-text{
-      font-size: 12px;
-      color: var(--d-666-l-999);
-      margin-top: 6px;
-    }
+:deep {
+  .el-slider__stop {
+    height: 4px;
+    top: -1px;
+    --el-slider-stop-bg-color: var(--d-666-l-999);
+    --el-border-radius-circle: 1px;
+  }
+  .el-slider__marks-text {
+    font-size: 12px;
+    color: var(--d-666-l-999);
+    margin-top: 6px;
+  }
 }
 </style>
