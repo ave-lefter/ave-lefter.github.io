@@ -654,5 +654,7 @@
   "startExperience": "Bắt đầu trải nghiệm",
   "complete": "Hoàn thành",
   "DbCheckGg": "Dùng Google Authenticator",
-  "DbCheckContentTitle3": "Bước 3:"
+  "DbCheckContentTitle3": "Bước 3:",
+  "myFavoriteChain": "Chuỗi yêu thích",
+  "unDelete": "Không thể xóa"
 }

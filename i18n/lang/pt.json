@@ -457,5 +457,7 @@
   "runTime2": "2/2 Custo",
   "snipers_1m": "Snipers [1m]",
   "devPosition": "DEV Possuído",
-  "complete": "Completo"
+  "complete": "Completo",
+  "myFavoriteChain": "Minha rede favorita",
+  "unDelete": "Não pode excluir"
 }
