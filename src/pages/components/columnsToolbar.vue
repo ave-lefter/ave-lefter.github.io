@@ -158,7 +158,7 @@ function handleSelectChild(childItem, renderKey:string) {
                   ]"
                     @click="handleSelectChild(childItem, item)"
                   >
-                    {{ childItem.title }}
+                  {{ initColumns.find((arr) => arr.render === item)?.children?.[childIdx]?.title }}
                   </div>
                 </template>
               </template>
