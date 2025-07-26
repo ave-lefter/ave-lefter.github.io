@@ -421,7 +421,7 @@ const cellRenderer = computed(() => {
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
-      :row-height="80"
+      :row-height="81"
       fixed
       style="--el-bg-color: var(--d-111-l-FFF)"
       row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
