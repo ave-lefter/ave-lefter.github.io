@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
+import gainer from './components/gainerRank/gainer.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 import { v4 as uuidv4 } from 'uuid'
@@ -9,6 +10,7 @@ const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.
 const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
 const components = {
   hot,
+  gainer,
   pump: pumpComponent,
   bonk_pump: pumpComponent,
   four: pumpComponent,

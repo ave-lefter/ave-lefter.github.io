@@ -3,6 +3,7 @@ import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
 import type { CategoryElement, IGetTreasureConfig } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
+import { getGainDefaultColumns, getGainOptions } from './gainerRank/columnRender/gainColumnsService'
 import ChainsSelect from './chainsSelect.vue'
 import { getPumpDefault, getPumpOptions } from './pump/columnRender/pumpColumnsService'
 import {
@@ -43,6 +44,13 @@ const configMap = computed(() => {
       getDefaultColumns: getHotDefaultColumns,
       getOptions: getHotOptions,
       class: isHot.value ? 'color-#FFA622' : '',
+    },
+    gainer: {
+      icon: 'custom:gainer', 
+      storageKey: 'gainUserTableColumns',
+      getDefaultColumns: getGainDefaultColumns,
+      getOptions: getGainOptions,
+      class: props.activeTab === 'gainer' ? 'color-#22C55E' : '',
     },
     pump: {
       icon: getPumpIcon(isPump.value),
@@ -134,10 +142,10 @@ function getPumpIcon(isPump: boolean) {
   }
 }
 const globalStore = useGlobalStore()
-// 由于其他榜单未上，用临时的 computed过滤
 const supportCategories = computed(() => {
   const keys = [
     'hot',
+    'gainer',
     'pump',
     'bonk_pump',
     'four',
@@ -210,7 +218,7 @@ const isSupportedChain = computed(()=>{
             class="mr-1 text-12px"
             :class="configMap[item.category as keyof typeof configMap].class"
           />
-          {{ item[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
+          {{ (item as any)[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
         </span>
       </div>
       <div class="flex gap-12px items-center text-12px">
