@@ -58,11 +58,11 @@ export function getInclusionDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       minWidth:232,
     },
     {
-      title: t('lastTxsTime1'),
-      key: 'last_trade_at',
+      title: t('smarter1'),
+      key: 'smart_money_buy_volume_24h',
       isVisible: true,
-      render: 'lastTradeAtContent',
-      minWidth:getTextWidth(t('lastTxsTime1'), 50) + 50,
+      render: 'smarterContent',
+      minWidth:110,
       align:'right'
     },
     {
@@ -140,11 +140,11 @@ export function getInclusionDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       align:'right'
     },
     {
-      title: t('smarter1'),
-      key: 'smart_money_buy_volume_24h',
+      title: t('lastTxsTime1'),
+      key: 'last_trade_at',
       isVisible: true,
-      render: 'smarterContent',
-      minWidth:110,
+      render: 'lastTradeAtContent',
+      minWidth:getTextWidth(t('lastTxsTime1'), 50) + 50,
       align:'right'
     },
     // {

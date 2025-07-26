@@ -32,16 +32,12 @@ import {
   PriceChange,
   DevContent,
   DevHeader,
-  ProgressHeader,
-  Progress,
-  HalfTimeHeader,
-  FullHeader,
   Snipers1mHeader,
   Snipers1mContent,
   LastTradeHeader,
   LastTradeContent,
   Headline,
-} from './columnRender/index'
+} from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
