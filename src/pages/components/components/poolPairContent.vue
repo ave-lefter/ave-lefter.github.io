@@ -158,7 +158,7 @@ const created_at_unix = computed(() => {
                 :stroke-width="1.5"
                 indeterminate
               >
-                <Icon name="material-symbols:lock" class="color-[--d-666-l-999] text-12px" />
+                <Icon name="material-symbols:lock" class="color-[--d-666-l-999] text-8px" />
               </el-progress>
             </template>
             <template #content>

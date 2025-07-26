@@ -248,7 +248,7 @@ function restore(item: { address: string, type: string }) {
   button {
     border: none;
     // font-size: 14px;
-    background: var(--d-333333-l-DDDDDD);
+    background: var(--d-333-l-F2F2F2);
     color: var(--d-999-l-666);
     letter-spacing: 0;
     font-weight: 400;
