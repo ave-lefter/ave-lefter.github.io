@@ -3,6 +3,8 @@ import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
 import type { CategoryElement, IGetTreasureConfig } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
+import { getNewDefaultColumns, getNewOptions } from './newRank/columnRender/newColumnsService'
+import { getInclusionDefaultColumns, getInclusionOptions } from './inclusionRank/columnRender/inclusionColumnsService'
 import { getGainDefaultColumns, getGainOptions } from './gainerRank/columnRender/gainColumnsService'
 import ChainsSelect from './chainsSelect.vue'
 import { getPumpDefault, getPumpOptions } from './pump/columnRender/pumpColumnsService'
@@ -36,6 +38,8 @@ const intervals = computed(() => {
 const themeStore = useThemeStore()
 const isHot = computed(() => props.activeTab === 'hot')
 const isPump = computed(() => props.activeTab === 'pump')
+const isNew = computed(() => props.activeTab === 'new')
+const isInclusion = computed(() => props.activeTab === 'inclusion')
 const configMap = computed(() => {
   return {
     hot: {
@@ -45,8 +49,15 @@ const configMap = computed(() => {
       getOptions: getHotOptions,
       class: isHot.value ? 'color-#FFA622' : '',
     },
+    new: {
+      icon: 'custom:new',
+      storageKey: 'newTableColumns',
+      getDefaultColumns: getNewDefaultColumns,
+      getOptions: getNewOptions,
+      class: isNew.value ? 'color-#85E12F' : '',
+    },
     gainer: {
-      icon: 'custom:gainer', 
+      icon: 'custom:gainer',
       storageKey: 'gainUserTableColumns',
       getDefaultColumns: getGainDefaultColumns,
       getOptions: getGainOptions,
@@ -101,6 +112,13 @@ const configMap = computed(() => {
       getOptions: getPumpOptions,
       class: '',
     },
+    inclusion: {
+      icon: 'custom:inclusion',
+      storageKey: 'inclusionTableColumns',
+      getDefaultColumns: getInclusionDefaultColumns,
+      getOptions: getInclusionOptions,
+      class: isInclusion.value ? 'color-#B43BFF' : '',
+    },
     binance_alpha: {
       icon: '',
       storageKey: 'binance_alphaTableColumns',
@@ -131,6 +149,26 @@ const configMap = computed(() => {
     }
   }
 })
+
+
+
+watch(()=>props.activeChain, () => {
+  const index=props.categories.findIndex((i) => {
+    return i.category === props.activeTab
+  })
+  if(index>-1){
+    if(props.categories[index] && props.categories[index].sub_category && props.categories[index].sub_category.length > 0){
+      const index2=props.categories?.[index]?.sub_category?.findIndex((i) => {
+        return i.category === props.activeSubTab
+      })
+      if(index2<=-1){
+        emit('update:activeTab','hot')
+      }
+    }
+  }else{
+    emit('update:activeTab','hot')
+  }
+})
 function getPumpIcon(isPump: boolean) {
   if (isPump) {
     return 'custom:pump-active'
@@ -145,6 +183,7 @@ const globalStore = useGlobalStore()
 const supportCategories = computed(() => {
   const keys = [
     'hot',
+    'new',
     'gainer',
     'pump',
     'bonk_pump',
@@ -153,6 +192,7 @@ const supportCategories = computed(() => {
     'moonshot',
     'Studio',
     'novabits',
+    'inclusion',
     'binance_alpha',
     // 'cto',
     'xstocks',
@@ -183,7 +223,7 @@ function updateSubCategory(category: string) {
 }
 function updateActiveChain(chain: string) {
   emit('update:activeChain', chain)
-  emit('update:activeTab','hot')
+  // emit('update:activeTab','hot')
 }
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -244,7 +284,7 @@ const isSupportedChain = computed(()=>{
             v-model:quickBuyValue="globalStore.rankCommon.quickBuyValue"
             class="mr-12px"
             :settingsButtonVisible="false"
-            :chain="activeChain==='AllChains'?'':activeChain"
+            :chain="(activeChain==='AllChains'?'':activeChain)"
           />
           <BlackList />
           <ColumnsToolbar

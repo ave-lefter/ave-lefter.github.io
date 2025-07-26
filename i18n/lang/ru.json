@@ -639,11 +639,11 @@
   "insidersPosition1": "Владение инсайдеров",
   "platform": "Платформа",
   "onlyPush": "Только толкать",
-  "balance": "Активы",
   "runTime1": "1/2 стоимость",
   "runTime2": "2/2 стоимость",
   "snipers_1m": "Снайперы [1м]",
   "devPosition": "Владение DEV",
+  "balance": "Активы",
   "botTipsTitle": "Ave.ai теперь поддерживает вход через Bot кошелек!",
   "botTips1": "1. Торговля в один клик меньше шагов🔥",
   "botTips2": "2. Комиссия всего 0.65%🔥",
@@ -652,5 +652,7 @@
   "botTips5": "5. Управление несколькими аккаунтами:",
   "botTips6": "6. Бесшовное переключение сетей🔥",
   "startExperience": "Начать",
-  "complete": "Завершено"
+  "complete": "Завершено",
+  "DbCheckGg": "Использовать Google Authenticator",
+  "DbCheckContentTitle3": "Шаг 3:"
 }

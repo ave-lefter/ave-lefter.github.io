@@ -39,7 +39,7 @@ import {
   LastTradeHeader,
   LastTradeContent,
   Headline,
-} from './columnRender/index'
+} from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'

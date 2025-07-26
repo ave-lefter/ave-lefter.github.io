@@ -639,11 +639,11 @@
   "insidersPosition1": "Người trong cuộc nắm giữ",
   "platform": "Nền tảng",
   "onlyPush": "Chỉ đẩy",
-  "balance": "Tài sản",
   "runTime1": "1/2 chi phí",
   "runTime2": "2/2 chi phí",
   "snipers_1m": "Người săn [1p]",
   "devPosition": "DEV nắm giữ",
+  "balance": "Tài sản",
   "botTipsTitle": "Ave.ai đã hỗ trợ đăng nhập ví Bot!",
   "botTips1": "1. Giao dịch một chạm ít bước hơn🔥",
   "botTips2": "2. Phí chỉ 0.65%🔥",
@@ -652,5 +652,7 @@
   "botTips5": "5. Quản lý nhiều tài khoản:",
   "botTips6": "6. Chuyển đổi chuỗi liền mạch🔥",
   "startExperience": "Bắt đầu trải nghiệm",
-  "complete": "Hoàn thành"
+  "complete": "Hoàn thành",
+  "DbCheckGg": "Dùng Google Authenticator",
+  "DbCheckContentTitle3": "Bước 3:"
 }

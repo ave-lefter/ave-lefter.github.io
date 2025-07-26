@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
+import newRank from './components/newRank/new.vue'
+import inclusionRank from './components/inclusionRank/inclusion.vue'
 import gainer from './components/gainerRank/gainer.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
@@ -9,6 +11,8 @@ import { v4 as uuidv4 } from 'uuid'
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
 const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
 const components = {
+  new: newRank,
+  inclusion:inclusionRank,
   hot,
   gainer,
   pump: pumpComponent,
