@@ -44,6 +44,7 @@ const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
   activeTab?: string
+  activeSubTab?: string
 }>()
 
 const sortConditions = ref({
