@@ -3,6 +3,7 @@ import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
 import newRank from './components/newRank/new.vue'
 import inclusionRank from './components/inclusionRank/inclusion.vue'
+import gainer from './components/gainerRank/gainer.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 import { v4 as uuidv4 } from 'uuid'
@@ -13,6 +14,7 @@ const components = {
   new: newRank,
   inclusion:inclusionRank,
   hot,
+  gainer,
   pump: pumpComponent,
   bonk_pump: pumpComponent,
   four: pumpComponent,

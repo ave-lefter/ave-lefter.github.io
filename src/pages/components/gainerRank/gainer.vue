@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
-import { getHotDefaultColumns } from './columnRender/hotColumusService'
-import { getTreasureList } from '~/api/market'
+import { getGainDefaultColumns } from './columnRender/gainColumnsService'
+import { getPriceChangeTopTokens, getTreasureList } from '~/api/market'
 import {
   quickContent,
   dexContent,
@@ -31,7 +31,7 @@ import {
   SnipersHeader,
   PriceContent,
   PriceChange,
-} from '../components/index'
+} from '../hotRank/columnRender/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
@@ -43,20 +43,24 @@ const globalStore = useGlobalStore()
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
-  activeSubTab?: string
   activeTab?: string
+  activeSubTab?: string
 }>()
+
 const sortConditions = ref({
-  sort: '',
-  sort_dir: '',
+  sort: 'price_change_24h',
+  sort_dir: 'desc',
 })
+
 function setSortConditions(params: { sort: string; sort_dir: string }) {
   sortConditions.value = params
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
+
 const defaultFilter = {}
 const filterForm = ref(defaultFilter)
+
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
     set(filterForm.value, keyVal[0], keyVal[1])
@@ -64,6 +68,7 @@ function setFilterForm(...args: any[]) {
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
+
 const listData = ref<any[]>([])
 const filteredListData = computed(() => {
   if (globalStore.pumpSetting.isBlacklist) {
@@ -71,6 +76,7 @@ const filteredListData = computed(() => {
   }
   return listData.value
 })
+
 function inBlackList(row) {
   const symbol = row.token0_address === row.target_token ? row.token0_symbol : row.token1_symbol
   return (
@@ -80,32 +86,31 @@ function inBlackList(row) {
     ) !== -1
   )
 }
+
 const pageInfo = ref({
   pageNO: 1,
   pageSize: 50,
   total: 0,
 })
+
 const isVolUSDT = shallowRef(true)
 const loading = shallowRef(false)
-const columns = useStorage('hotUserTableColumns', getHotDefaultColumns(t))
+const columns = useStorage('gainUserTableColumns', getGainDefaultColumns(t))
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
 }
 
-const mounted = shallowRef(false)
 onMounted(() => {
-  setTimeout(()=>{
-    mounted.value = true
-  },20)
   _getTreasureList()
 })
 
 // 监听组件激活状态
 onActivated(() => {
-  console.log('热搜榜激活')
+  console.log('涨幅榜激活')
   isActive.value = true
-  // 延迟重新获取数据，避免快速切换时的冲突
+  filterForm.value = {}
+  pageInfo.value.pageNO = 1
   setTimeout(() => {
     if (isActive.value) {
       _getTreasureList()
@@ -114,29 +119,15 @@ onActivated(() => {
 })
 
 onDeactivated(() => {
-  console.log('热搜榜停用')
+  console.log('涨幅榜停用')
   isActive.value = false
   clearTimeout(timer)
-  // 停用时取消WebSocket订阅，使用唯一ID
   wsStore.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
     params: ['price_extra'],
-    id: 'hot_rank_unsubscribe',
+    id: 'gainer_rank_unsubscribe',
   })
-})
-onActivated(() => {
-  if(!mounted.value){
-    return
-  }
-  clearTimeout(timer)
-  _getTreasureList(false)
-})
-onDeactivated(() => {
-  clearTimeout(timer)
-})
-onUnmounted(() => {
-  clearTimeout(timer)
 })
 
 watch(
@@ -148,45 +139,90 @@ watch(
 )
 
 let timer: number
+
 async function _getTreasureList(shouldLoading = true) {
   try {
     clearTimeout(timer)
-    if (props.activeTab !== 'hot') {
+    if (props.activeTab !== 'gainer') {
       return
     }
     if (shouldLoading) {
       loading.value = true
     }
+    
+    // 优先使用通用API确保分页功能正常
     const { total: _, ...rest } = pageInfo.value
-    const res = await getTreasureList({
-      category: 'hot',
+
+    // 构建请求参数，只在有值时添加 chain 和 self_address
+    const requestParams: any = {
+      category: 'gainer',  // 修正为 'gainer'
       ...rest,
-      chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
       ...sortConditions.value,
       ...filterForm.value,
-      self_address: walletAddress.value,
-    })
+      // refresh_total: 0,  // 添加刷新总数参数
+    }
+
+    // 只在 chain 有值时添加
+    const chainValue = props.activeChain !== 'AllChains' ? props.activeChain : ''
+    if (chainValue) {
+      requestParams.chain = chainValue
+    }
+
+    // 只在 self_address 有值时添加
+    if (walletAddress.value) {
+      requestParams.self_address = walletAddress.value
+    }
+
+    const res = await getTreasureList(requestParams)
+    
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
+    
     if (shouldLoading) {
       initWs()
     }
+    clearTimeout(timer)
     timer = window.setTimeout(() => {
       _getTreasureList(false)
     }, 10000)
+  } catch (error) {
+    console.error('获取涨幅榜数据失败:', error)
+    try {
+      const res = await getPriceChangeTopTokens()
+      const processedData = Array.isArray(res) ? res : (res.data || [])
+      
+      // 应用链筛选
+      let filteredData = processedData
+      if (props.activeChain !== 'AllChains') {
+        filteredData = processedData.filter(item => item.chain === props.activeChain)
+      }
+      
+      listData.value = filteredData.map(props.listMapFunction)
+      pageInfo.value.total = filteredData.length || 0
+    } catch (fallbackError) {
+      console.error('备选接口也失败:', fallbackError)
+      listData.value = []
+      pageInfo.value.total = 0
+    }
   } finally {
     loading.value = false
   }
 }
 
+onUnmounted(() => {
+  clearTimeout(timer)
+})
+
 const wsStore = useWSStore()
-const isActive = ref(true) // 追踪组件激活状态
+const isActive = ref(true)
 
 watch(
   () => wsStore.wsResult[WSEventType.PRICE_EXTRA],
   ({ prices }) => {
     // 只有在组件激活时才处理数据
     if (!isActive.value) return
+    
+    if (!prices) return
     
     const pricesMap = Array.isArray(prices)
       ? prices.reduce((pre, cur) => {
@@ -210,20 +246,34 @@ watch(
       }
       return el
     })
+    
+    // 应用当前排序条件
     const { sort, sort_dir } = sortConditions.value
-    const sortVal = { asc: '1', desc: '-1' }[sort_dir]
-    if (sortVal) {
-      listData.value = updateList.toSorted((a, b) => (a[sort] - b[sort]) * sortVal)
+    if (sort && sort_dir) {
+      const sortVal = { asc: 1, desc: -1 }[sort_dir] || -1
+      listData.value = updateList.toSorted((a, b) => {
+        const aVal = a[sort] || 0
+        const bVal = b[sort] || 0
+        return (bVal - aVal) * sortVal
+      })
+    } else {
+      // 默认按24小时涨幅排序
+      listData.value = updateList.sort((a, b) => {
+        const aChange = a.price_change_24h || 0
+        const bChange = b.price_change_24h || 0
+        return bChange - aChange
+      })
     }
   }
 )
+
 function initWs() {
   // 先取消之前的订阅，使用唯一ID
   wsStore.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
     params: ['price_extra'],
-    id: 'hot_rank_unsubscribe',
+    id: 'gainer_rank_unsubscribe',
   })
   
   // 重新订阅价格更新，使用唯一ID和标识符
@@ -232,7 +282,7 @@ function initWs() {
     jsonrpc: '2.0',
     method: 'subscribe',
     params: ['price_extra', params],
-    id: 'hot_rank_subscribe',
+    id: 'gainer_rank_subscribe',
   })
 }
 
@@ -241,6 +291,7 @@ const botStore = useBotStore()
 const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
+
 async function collect(index: number, row) {
   if (walletAddress.value) {
     if (walletStore.address) {
@@ -261,7 +312,7 @@ function removeTokenFavorite(row, index: number) {
   removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
     .then(() => {
       ElMessage.success(t('cancelled1'))
-      row.is_fav = false
+      listData.value[index].is_fav = false
     })
     .catch((err) => {
       console.log(err)
@@ -276,7 +327,7 @@ function addTokenFavorite(row, index: number) {
   addFavorite(`${row.token}-${row.chain}`, walletAddress.value, 0)
     .then(() => {
       ElMessage.success(t('collected'))
-      row.is_fav = true
+      listData.value[index].is_fav = true
     })
     .catch((err) => {
       console.log(err)
@@ -314,6 +365,7 @@ const headerRenderer = computed(() => {
     mCap: MCapHeader,
     current_price_usd: PriceHeader,
     price_change_1m: DynamicPriceChangeHeader,
+    price_change_15m: DynamicPriceChangeHeader,
     price_change_24h: DynamicPriceChangeHeader,
     price_change_dynamic: DynamicPriceChangeHeader,
     tvl: LiquidityHeader,
@@ -329,6 +381,7 @@ const headerRenderer = computed(() => {
     sniper_tx_count: SnipersHeader,
   }
 })
+
 const cellRenderer = computed(() => {
   return {
     poolPair: PoolPairContent,
@@ -337,6 +390,9 @@ const cellRenderer = computed(() => {
     current_price_usd: PriceContent,
     price_change_1m: ({ row }) => {
       return <PriceChange row={row} activeInterval="1m" />
+    },
+    price_change_15m: ({ row }) => {
+      return <PriceChange row={row} activeInterval="15m" />
     },
     price_change_24h: ({ row }) => {
       return <PriceChange row={row} activeInterval="24h" />
@@ -358,14 +414,14 @@ const cellRenderer = computed(() => {
   }
 })
 </script>
+
 <template>
   <div v-loading="loading" style="height: calc(100vh - 207px)">
     <AveTable
-      :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
-      :row-height="81"
+      :row-height="80"
       fixed
       style="--el-bg-color: var(--d-111-l-FFF)"
       row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
@@ -383,11 +439,7 @@ const cellRenderer = computed(() => {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
         />
       </template>
-      <template
-        v-for="item in visibleColumns"
-        :key="item.key"
-        #[`cell-${item.key}`]="{ row, rowIndex }"
-      >
+      <template v-for="item in columns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
         <component
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"
