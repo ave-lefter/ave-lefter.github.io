@@ -26,13 +26,18 @@
          v-model:userIds="tableFilter.user_ids"
         @update:user-ids="handleChange"
        />
+      <BlackList
+        :chain="walletStore.chain"
+        :address="botStore.evmAddress||walletStore.address"
+        @addWhite="()=>{}"
+      />
    </div>
   </component>
 </template>
 
 <script setup lang='ts'>
 import {getUserBalance} from '~/api/swap'
-
+import BlackList from './blackList.vue'
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const {hide_small,hide_risk} = storeToRefs(useGlobalStore())

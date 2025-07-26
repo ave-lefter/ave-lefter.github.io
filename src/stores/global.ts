@@ -68,6 +68,7 @@ export const useGlobalStore = defineStore('global', () => {
 
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
+  const holderBlackList = useStorage<Array<pumpBlack>>('holderBlackList', [])
 
    const hotList = shallowRef<GetHotTokensResponse[]>([])
    function sendFooterPriceWs() {
@@ -121,6 +122,7 @@ export const useGlobalStore = defineStore('global', () => {
     showLeft,
     pumpSetting,
     pumpBlackList,
+    holderBlackList,
     hotList,
     hide_small,
     hide_risk,
