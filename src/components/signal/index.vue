@@ -180,7 +180,7 @@ async function updateListData() {
       }
     })
     signalStore.signalList = signalStore.signalList.map(item => {
-      const updateKeys = ['mc_cur', 'holders_cur', 'top10_ratio', 'dev_ratio', 'insider_ratio', 'max_price_change'] as const
+      const updateKeys = ['mc_cur', 'holders_cur', 'top10_ratio', 'dev_ratio', 'insider_ratio', 'max_price_change','price_change_24h'] as const
       const matchedNewData = addressMap[item.token + item.chain]
       if (matchedNewData) {
         const result = {} as Record<string, GetSignalV2ListResponse>
@@ -362,8 +362,8 @@ const isShowDate = ref(true)
         />
       </div>
       <el-scrollbar
-          ref="scrollbar"
-        v-if="!isLargeScreen"
+          v-if="!isLargeScreen"
+        ref="scrollbar"
         style="margin-right: -12px;padding-right: 12px;"
         :height="scrollHeight"
           @scroll="onScroll"

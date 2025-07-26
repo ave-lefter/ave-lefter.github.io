@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import pnlImg from '@/assets/images/pnl.png'
-const emit = defineEmits(['confirm', 'reset'])
 const visible = defineModel<boolean>('visible')
 const pnlSetting = defineModel<any>('pnlSetting')
 
@@ -12,10 +11,10 @@ const defaultSettings = {
   solUsdSwitch: false,
   showU: true,
 }
-const settings = ref(pnlSetting.value || {...defaultSettings})
+const settings = ref(pnlSetting.value ? { ...pnlSetting.value } : { ...defaultSettings })
 watch(visible, () => {
   if (visible.value) {
-    settings.value = pnlSetting.value || {...defaultSettings}
+    settings.value = pnlSetting.value ? { ...pnlSetting.value } : { ...defaultSettings }
   }
 })
 const themeStore = useThemeStore()
@@ -33,16 +32,11 @@ function resetBg() {
   settings.value.background = pnlImg
 }
 function onReset() {
-  settings.value.blur = 0
-  settings.value.opacity = 100
-  settings.value.solUsdSwitch = false
-  settings.value.showU = true
-  resetBg()
+  pnlSetting.value = { ...defaultSettings }
   visible.value = false
-  pnlSetting.value = {...defaultSettings}
 }
 function onConfirm() {
-  pnlSetting.value = {...settings.value}
+  pnlSetting.value = { ...settings.value }
   // 提交逻辑
   visible.value = false
 }
@@ -162,11 +156,19 @@ function onConfirm() {
 
     <div class="flex items-center justify-between mt-40px">
       <span class="color-[--d-CCC-l-333] text-12px">SOL 和 USD互换 </span>
-      <el-switch v-model="settings.solUsdSwitch" class="[&&]:h-20px" />
+      <el-switch
+        v-model="settings.solUsdSwitch"
+        class="[&&]:h-20px"
+        @change="settings.showU = false"
+      />
     </div>
     <div class="flex items-center justify-between mt-24px">
       <span class="color-[--d-CCC-l-333] text-12px">显示U本位</span>
-      <el-switch v-model="settings.showU" class="[&&]:h-20px" />
+      <el-switch
+        v-model="settings.showU"
+        class="[&&]:h-20px"
+        @change="settings.solUsdSwitch = false"
+      />
     </div>
 
     <template #footer>
