@@ -128,7 +128,7 @@ function handleSelectChild(childItem, renderKey:string) {
                 class="draggable-columns-bg"
                 :class="item.fixed ? 'columns-bg-disabled' : ''"
               >
-                {{ item.title }}
+              {{ initColumns.find((arr) => arr.render === item.render)?.title  }}
                 <Icon name="custom:handle" class="ml-2 color-[--d-666-l-999]" />
               </div>
             </template>
