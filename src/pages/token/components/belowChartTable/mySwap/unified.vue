@@ -121,7 +121,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="t('status')" align="right">
+      <el-table-column v-if="isBotWallet" :label="t('status')" align="right">
         <template #header>
           <div class="flex flex-row-reverse">
             <div class="flex items-center">
@@ -170,7 +170,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="t('operate')" align="right">
+      <el-table-column v-if="isBotWallet" :label="t('operate')" align="right">
         <template #default="{ row }">
           <div class="flex items-center flex-row-reverse">
             <Icon name="custom:browser" class="text-16px  ml-8px clickable color-[--d-999-l-666]"
@@ -189,7 +189,7 @@
 import BigNumber from 'bignumber.js'
 import { formatDate, getSymbolDefaultIcon, getChainDefaultIcon, formatExplorerUrl } from '~/utils'
 import { formatNumber } from '~/utils/formatNumber'
-import { bot_getUserTxHistory1 } from '@/api/token'
+import { bot_getUserTxHistory1, wallet_getOrders } from '@/api/token'
 import share from './share.vue'
 import { evm_utils } from '@/utils'
 
@@ -214,19 +214,25 @@ const props = defineProps({
 
 // const tokenStore = useTokenStore()
 const botStore = useBotStore()
+const walletStore = useWalletStore()
 const route = useRoute()
 const router = useRouter()
 const { mode } = storeToRefs(useGlobalStore())
 const tokenStore = useTokenStore()
 const { t } = useI18n()
 const configStore = useConfigStore()
+
+// 钱包类型判断
+const isBotWallet = computed(() => {
+  return !!botStore?.userInfo?.evmAddress
+})
 const filterConditions = ref<any>({
   isLimit: undefined,
   isBuy: undefined,
   statusType: ''
 })
 
-const txHistory = ref([])
+const txHistory = ref<any[]>([])
 const loading = ref(false)
 
 const tableHeight = computed(() => {
@@ -292,27 +298,63 @@ function tableRowClick(row: any) {
 const getTxHistory = async () => {
   loading.value = true
   try {
-    const res = await bot_getUserTxHistory1({
-      page: 0,
-      pageSize: 1000,
-      chain: props.chain,
-      walletAddress: props.userAddress,
-      token: props.currentToken ? String(route.params.id).split('-')[0] : '',
-      timeSort: true,
-      tradeVolumeSort: false,
-      isSuccess: false,
-      status: filterConditions.value.statusType,
-      isLimit: filterConditions.value.isLimit,
-      isBuy: filterConditions.value.isBuy,
-      tgUid: botStore?.userInfo?.tgUid,
-      minTradeVolume: 0,
-      maxTradeVolume: 100000
-    })
-    console.log(res, 'res')
-
-    txHistory.value = res || []
+    console.log('=== 钱包类型检测 ===')
+    console.log('isBotWallet:', isBotWallet.value)
+    console.log('botStore.userInfo:', botStore?.userInfo)
+    console.log('walletStore.address:', walletStore?.address)
+    console.log('props.userAddress:', props.userAddress)
+    console.log('props.chain:', props.chain)
+    
+    if (isBotWallet.value) {
+      // Bot钱包使用原接口
+      console.log('=== 使用 Bot 钱包接口 ===')
+      const res = await bot_getUserTxHistory1({
+        page: 0,
+        pageSize: 1000,
+        chain: props.chain,
+        walletAddress: props.userAddress,
+        token: props.currentToken ? String(route.params.id).split('-')[0] : '',
+        timeSort: true,
+        tradeVolumeSort: false,
+        isSuccess: false,
+        status: filterConditions.value.statusType,
+        isLimit: filterConditions.value.isLimit,
+        isBuy: filterConditions.value.isBuy,
+        tgUid: botStore?.userInfo?.tgUid,
+        minTradeVolume: 0,
+        maxTradeVolume: 100000
+      })
+      console.log('Bot钱包响应:', res)
+      txHistory.value = res || []
+    } else {
+      // 链钱包使用新接口
+      console.log('=== 使用链钱包接口 ===')
+      const tokenAddress = props.currentToken ? String(route.params.id).split('-')[0] : ''
+      console.log('请求参数:', {
+        chain: props.chain,
+        creatorAddress: props.userAddress,
+        token: tokenAddress,
+        mode: 1,
+        onlySuccess: false,
+        pageSize: 1000,
+        pageNo: 1
+      })
+      
+      const res = await wallet_getOrders({
+        chain: props.chain,
+        creatorAddress: props.userAddress,
+        token: tokenAddress,
+        mode: 1, // 历史交易
+        onlySuccess: false,
+        pageSize: 1000,
+        pageNo: 1
+      })
+      console.log('链钱包响应:', res)
+      // 将链钱包数据映射为表格格式
+      txHistory.value = res.list?.map(mapWalletOrderToTableRow) || []
+    }
   } catch (error) {
-    console.error('Error fetching transaction history:', error)
+    console.error('获取交易历史错误:', error)
   } finally {
     loading.value = false
   }
@@ -340,6 +382,35 @@ function getSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14
 
 function isBuy(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) {
   return swapType === 1 || swapType === 5 || swapType === 7
+}
+
+// 将链钱包数据映射为bot钱包表格格式
+function mapWalletOrderToTableRow(order: any) {
+  const outputAmount = order.outputAmount || 0
+  const inAmount = order.inAmount || 0
+  
+  return {
+    chain: props.chain,
+    swapType: order.swapType,
+    inTokenSymbol: order.inToken,
+    outTokenSymbol: order.outToken,
+    inTokenLogoUrl: order.inLogoUrl,
+    outTokenLogoUrl: order.outLogoUrl,
+    inTokenAddress: order.inTokenAddress,
+    outTokenAddress: order.outTokenAddress,
+    inTokenDecimals: order.inDecimals,
+    outTokenDecimals: order.outDecimals,
+    inPrice: order.inPrice || 0,
+    outPrice: order.outPrice || 0,
+    inValue: inAmount * (order.inPrice || 0),
+    outValue: outputAmount * (order.outPrice || 0),
+    inAmount: inAmount * Math.pow(10, order.inDecimals || 0),
+    outAmount: outputAmount * Math.pow(10, order.outDecimals || 0),
+    createTime: order.createTime,
+    txHash: order.txHash,
+    status: order.status,
+    errorLog: order.errorLog || ''
+  }
 }
 
 onMounted(() => {
