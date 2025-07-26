@@ -141,6 +141,26 @@ const configMap = computed(() => {
     }
   }
 })
+
+
+
+watch(()=>props.activeChain, () => {
+  const index=props.categories.findIndex((i) => {
+    return i.category === props.activeTab
+  })
+  if(index>-1){
+    if(props.categories[index] && props.categories[index].sub_category && props.categories[index].sub_category.length > 0){
+      const index2=props.categories?.[index]?.sub_category?.findIndex((i) => {
+        return i.category === props.activeSubTab
+      })
+      if(index2<=-1){
+        emit('update:activeTab','hot')
+      }
+    }
+  }else{
+    emit('update:activeTab','hot')
+  }
+})
 function getPumpIcon(isPump: boolean) {
   if (isPump) {
     return 'custom:pump-active'
@@ -195,7 +215,7 @@ function updateSubCategory(category: string) {
 }
 function updateActiveChain(chain: string) {
   emit('update:activeChain', chain)
-  emit('update:activeTab','hot')
+  // emit('update:activeTab','hot')
 }
 const botStore = useBotStore()
 const walletStore = useWalletStore()
