@@ -119,7 +119,7 @@ const created_at_unix = computed(() => {
       </el-tooltip>
       <div class="flex flex-col gap-6px">
         <div class="flex items-center lh-20px">
-          <span class="text-16px color-[--d-CCC-l-333]"> {{ getSymbol(row) }}</span
+          <span class="text-16px color-[--d-CCC-l-333] max-w-88px truncate"> {{ getSymbol(row) }}</span
           ><span class="text-10px color-[--d-666-l-999]">/{{ getSymbol(row, true) }} </span>
           <Icon
             v-copy="row.target_token"

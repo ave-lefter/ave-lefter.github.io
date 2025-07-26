@@ -46,6 +46,11 @@ import type { RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
 const globalStore = useGlobalStore()
+const walletStore = useWalletStore()
+const botStore = useBotStore()
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
 
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
@@ -120,12 +125,6 @@ watch(
     _getTreasureList()
   }
 )
-
-const walletStore = useWalletStore()
-const botStore = useBotStore()
-const walletAddress = computed(() => {
-  return botStore.evmAddress || walletStore.address
-})
 
 let timer: number
 async function _getTreasureList(shouldLoading = true) {
