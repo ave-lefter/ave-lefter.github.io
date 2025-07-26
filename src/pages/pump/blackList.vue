@@ -72,7 +72,7 @@
                   <li
                     v-for="(item, $index) in typeList?.slice(1)"
                     :key="$index"
-                    class="px-12px py-12px w-100% cursor-pointer hover:bg-[--d-333333-l-DDDDDD]"
+                    class="px-12px py-12px w-100% cursor-pointer hover:bg-[--d-333-l-F5F5F5]"
                     @click="add(item)"
                   >
                     {{ item.name }}
