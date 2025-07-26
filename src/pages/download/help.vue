@@ -1,15 +1,15 @@
 <template>
   <main class="relative w-full max-w-[1920px] mx-auto">
-    <section class="max-w-[1200px] mx-auto pt-[170px] pb-[170px]">
-      <header class="text-center mb-[174px]">
-        <h1 class="text-4xl font-medium mb-5">Android 系统安装教程</h1>
+    <section class="max-w-[1200px] mx-auto pt-[120px]">
+      <header class="text-center mb-[80px]">
+        <h1 class="text-4xl font-medium mb-[-16px]">Android 系统安装教程</h1>
         <div class="flex items-center justify-center">
           <div class="w-[368px] h-px bg-[#1e41ea]"/>
           <div class="w-[392px]"/>
           <div class="w-[368px] h-px bg-[#1e41ea]"/>
         </div>
       </header>
-      <div class="flex justify-center gap-10 mb-[132px]">
+      <div class="flex justify-center gap-10 mb-[120px]">
         <div class="w-[360px] bg-[#191a1a] rounded-xl p-6">
           <h2 class="text-3xl font-black text-[#1e41ea] mb-4">1.</h2>
           <p class="text-base">
@@ -26,31 +26,31 @@
         </div>
       </div>
       <section>
-        <header class="text-center mb-[206px]">
-          <h2 class="text-4xl font-medium mb-5">iOS 安装教程</h2>
+        <header class="text-center mb-[66px]">
+          <h2 class="text-4xl font-medium mb-[-16px]">IOS 安装教程</h2>
           <div class="flex items-center justify-center">
             <div class="w-[448px] h-px bg-[#1e41ea]"/>
             <div class="w-[232px]"/>
             <div class="w-[448px] h-px bg-[#1e41ea]"/>
           </div>
         </header>
-        <div class="mb-[162px]">
+        <div class="mb-[62px]">
           <h3
             class="bg-[#191a1a] text-base text-center w-[92px] py-1.5 rounded-[18px] mx-auto mb-6"
           >
             第一步
           </h3>
-          <p class="text-sm text-center mb-[103px]">
+          <p class="text-sm text-center">
             Ave目前上架美国、澳大利亚以及香港地区AppStore，下载Ave app需要对应地区的Apple ID
           </p>
         </div>
-        <div class="mb-[59px]">
+        <div class="mb-[20px]">
           <h3
             class="bg-[#191a1a] text-base text-center w-[92px] py-1.5 rounded-[18px] mx-auto mb-6"
           >
             第二步
           </h3>
-          <p class="text-sm text-center mb-[62px]">在 App Store 切换 Apple ID。</p>
+          <p class="text-sm text-center mb-[32px]">在 App Store 切换 Apple ID。</p>
           <div class="flex justify-center gap-[53px]">
             <div class="w-[327px]">
               <p class="text-sm mb-7">
@@ -87,13 +87,13 @@
             </div>
           </div>
         </div>
-        <div>
+        <div class="mt-20 mb-30">
           <h3
             class="bg-[#191a1a] text-base text-center w-[92px] py-1.5 rounded-[18px] mx-auto mb-6"
           >
             第三步
           </h3>
-          <p class="text-sm text-center mb-[62px]">安装 App</p>
+          <p class="text-sm text-center mb-[22px]">安装 App</p>
           <div class="flex justify-center gap-[53px]">
             <div class="w-[327px]">
               <p class="text-sm mb-[47px]">

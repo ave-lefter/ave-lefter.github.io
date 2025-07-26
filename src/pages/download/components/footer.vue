@@ -3,20 +3,20 @@
     <div class="container mx-auto px-4 text-left">
       <h2 class="text-5xl font-bold mb-8 text-center">下载Ave.ai APP</h2>
       <div class="flex justify-center items-center mb-[40px]">
-        <a href="#" class="text-sm font-medium flex items-center">
+        <NuxtLink to="/download/help" class="text-sm font-medium flex items-center">
           <img
             src="https://c.animaapp.com/mdi5x5j31K7D2j/img/frame.svg"
             alt=""
             class="w-5 h-5 mr-2"
-          />
+          >
           APP下载安装教程
-        </a>
+        </NuxtLink>
       </div>
       <div class="flex justify-center gap-20 font-normal mb-12">
         <div class="w-[15%]">
           <h3 class="text-sm mb-2">IOS</h3>
           <a
-            href="#"
+            href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN"
             class="bg-[#161926] mb-8 text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
           >
             <svg
@@ -37,7 +37,7 @@
             <span>App Store</span>
           </a>
           <a
-            href="#"
+            href="https://testflight.apple.com/join/BZ3XHS5f"
             class="bg-[#161926] text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
           >
             <img
@@ -51,7 +51,7 @@
         <div class="w-[15%]">
           <h3 class="text-sm mb-2">Android</h3>
           <a
-            href="#"
+            href="https://play.google.com/store/apps/details?id=ai.ave.platform"
             class="bg-[#161926] mb-8 text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
           >
             <img
@@ -62,7 +62,7 @@
             <span>Google Play</span>
           </a>
           <a
-            href="#"
+            href="https://ossaveai.com/oss/app/ave.ai.apk"
             class="bg-[#161926] text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
           >
             <img
@@ -76,7 +76,7 @@
         <div class="w-[15%]">
           <h3 class="text-sm mb-2 font-normal">桌面端应用下载</h3>
           <a
-            href="#"
+            href="https://ossaveai.com/oss/app/avedex-mac.dmg.zip"
             class="bg-[#161926] mb-8 text-sm text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
           >
             <svg
@@ -97,7 +97,7 @@
             <span>Mac OS</span>
           </a>
           <a
-            href="#"
+            href="https://ossaveai.com/oss/app/ave.ai-win64.exe"
             class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
           >
             <svg
@@ -123,10 +123,10 @@
           />
         </div>
       </div>
-      <div class="text-center">
+      <div class="text-center mb-20">
         <a
-          href="#"
-          class="bg-gradient-to-r from-[#0054e1] to-[#8860ff] text-white py-3 px-8 rounded-full inline-flex items-center hover:opacity-90 transition duration-300"
+          :href="1 ? 'https://t.me/ave_community_cn':'https://t.me/ave_community_cn'"
+          class="bg-gradient-to-r from-[#0054e1] to-[#8860ff] text-white py-3 px-22 rounded-full inline-flex items-center hover:opacity-90 transition duration-300"
         >
           <img src="@/assets/images/download/vector-1.svg" alt="Telegram" class="w-5 h-5 mr-2" />
           加入Ave.ai Telegram群组
