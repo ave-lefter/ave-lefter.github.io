@@ -1,130 +1,132 @@
 <template>
   <main class="container mx-auto w-full px-4 text-base">
     <section
-      class="hero flex items-center mt-[40]"
+      class="hero flex items-center pt-[60px]"
     >
       <div class="w-[55%] overflow-hidden" ata-aos="fade-left">
-        <img class="w-[130%] block ml-[-100px] mt[-40px]"  src="@/assets/images/download/mask-group.png">
+        <img class="w-[110%] block mt[-40px]"  src="@/assets/images/download/mask-group.png">
       </div>
       <div class="container mx-auto px-4 w-[45%]" ata-aos="fade-right">
         <div class="max-w-2xl">
-          <h1 class="text-5xl font-bold mb-4 mt-10">下载Ave.ai APP</h1>
-          <p class="text-xl text-[#b7bdc6] mb-8">安全、专业、最快、最全的去中心化聚合交易平台</p>
-          <div class="grid grid-cols-3 gap-8">
-            <div>
+          <h1 class="text-5xl font-bold mb-4 mt-10">{{$t("downloadAve")}}</h1>
+          <p class="text-base text-[#b7bdc6] mb-10">{{ $t('downloadSubtitle') }}</p>
+
+          <div class="grid grid-cols-24 gap-8">
+            <div class="col-span-11 ">
               <h2 class="text-base mb-2">IOS</h2>
-              <a
-                href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN"
-                class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
-              >
-                <svg class="w-6 h-6 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M17.1148 13.405C17.084 8.86378 19.6359 8.74626 19.7506 8.67351C18.3152 6.57498 16.0824 6.24481 15.2877 6.21403C13.3878 6.02097 11.5803 7.31086 10.615 7.31086C9.65245 7.31086 8.1639 6.21123 6.5886 6.23921C4.51805 6.26999 2.60698 7.43957 1.53813 9.29467C-0.613561 13.0301 0.986919 18.5618 3.08545 21.5893C4.10953 23.0722 5.33228 24.7371 6.93835 24.6783C8.48287 24.6167 9.06766 23.6766 10.9368 23.6766C12.8058 23.6766 13.3291 24.6783 14.9659 24.6447C16.628 24.614 17.6828 23.1338 18.6985 21.6452C19.8765 19.9244 20.3606 18.3435 20.3885 18.2596C20.3522 18.2428 17.1456 16.4325 17.112 13.405H17.1148Z" fill="white"/>
-                  <path d="M10.4521 6.37108C10.4521 3.00224 13.183 0.268555 16.5547 0.268555C16.5547 3.64019 13.821 6.37108 10.4521 6.37108Z" fill="white"/>
-                </svg>
-                <span>App Store</span>
-              </a>
+              <div class="grid grid-cols-2 gap-4">
+                <a
+                  href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN"
+                  class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
+                >
+                  <svg class="w-6 h-6 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.1148 13.405C17.084 8.86378 19.6359 8.74626 19.7506 8.67351C18.3152 6.57498 16.0824 6.24481 15.2877 6.21403C13.3878 6.02097 11.5803 7.31086 10.615 7.31086C9.65245 7.31086 8.1639 6.21123 6.5886 6.23921C4.51805 6.26999 2.60698 7.43957 1.53813 9.29467C-0.613561 13.0301 0.986919 18.5618 3.08545 21.5893C4.10953 23.0722 5.33228 24.7371 6.93835 24.6783C8.48287 24.6167 9.06766 23.6766 10.9368 23.6766C12.8058 23.6766 13.3291 24.6783 14.9659 24.6447C16.628 24.614 17.6828 23.1338 18.6985 21.6452C19.8765 19.9244 20.3606 18.3435 20.3885 18.2596C20.3522 18.2428 17.1456 16.4325 17.112 13.405H17.1148Z" fill="white"/>
+                    <path d="M10.4521 6.37108C10.4521 3.00224 13.183 0.268555 16.5547 0.268555C16.5547 3.64019 13.821 6.37108 10.4521 6.37108Z" fill="white"/>
+                  </svg>
+                  <span>App Store</span>
+                </a>
+                <a
+                  href="https://testflight.apple.com/join/BZ3XHS5f"
+                  class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
+                >
+                  <img
+                    src="@/assets/images/download/vector-9.svg"
+                    alt="TestFlight"
+                    class="w-5 h-5 mr-2"
+                  >
+                  <span>TestFlight</span>
+                </a>
+              </div>
+
+              <h2 class="text-base mb-2 mt-4">Android</h2>
+              <div class="grid grid-cols-2 gap-4 ">
+                <a
+                  href="https://play.google.com/store/apps/details?id=ai.ave.platform"
+                  class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
+                >
+                  <img
+                    src="@/assets/images/download/frame-1.svg"
+                    alt="Google Play"
+                    class="w-5 h-5 mr-2"
+                  >
+                  <span>Google Play</span>
+                </a>
+                <a
+                  href="https://ossaveai.com/oss/app/ave.ai.apk"
+                  class="bg-[#161926] text-white text-sm flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
+                >
+                  <img
+                    src="@/assets/images/download/vector-6.svg"
+                    alt="Android APK"
+                    class="w-5 h-5 mr-2"
+                  >
+                  <span>Android APK</span>
+                </a>
+              </div>
+              <h2 class="text-base mb-2 font-normal mt-4">{{$t('deskApp')}}</h2>
+              <div class="grid grid-cols-2 gap-4">
+                <a
+                  href="https://ossaveai.com/oss/app/avedex-mac.dmg.zip"
+                  class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
+                >
+                  <svg class="w-6 h-6 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.1148 13.405C17.084 8.86378 19.6359 8.74626 19.7506 8.67351C18.3152 6.57498 16.0824 6.24481 15.2877 6.21403C13.3878 6.02097 11.5803 7.31086 10.615 7.31086C9.65245 7.31086 8.1639 6.21123 6.5886 6.23921C4.51805 6.26999 2.60698 7.43957 1.53813 9.29467C-0.613561 13.0301 0.986919 18.5618 3.08545 21.5893C4.10953 23.0722 5.33228 24.7371 6.93835 24.6783C8.48287 24.6167 9.06766 23.6766 10.9368 23.6766C12.8058 23.6766 13.3291 24.6783 14.9659 24.6447C16.628 24.614 17.6828 23.1338 18.6985 21.6452C19.8765 19.9244 20.3606 18.3435 20.3885 18.2596C20.3522 18.2428 17.1456 16.4325 17.112 13.405H17.1148Z" fill="white"/>
+                    <path d="M10.4521 6.37108C10.4521 3.00224 13.183 0.268555 16.5547 0.268555C16.5547 3.64019 13.821 6.37108 10.4521 6.37108Z" fill="white"/>
+                  </svg>
+                  <span>Mac OS</span>
+                </a>
+                <a
+                  href="https://ossaveai.com/oss/app/ave.ai-win64.exe"
+                  class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+                >
+                  <svg
+                    class="w-5 h-5 mr-2"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M0.107422 0.524414H9.14133V9.55514H0.107422V0.524414ZM10.1302 0.524414H19.1641V9.55514H10.1302V0.524414ZM0.107422 10.5471H9.14133V19.5811H0.107422V10.5471ZM10.1302 10.5471H19.1641V19.5811H10.1302"
+                      fill="white"
+                    />
+                  </svg>
+                  <span>Windows</span>
+                </a>
+              </div>
             </div>
-            <div>
-              <h2 class="text-base mb-2">Android</h2>
-              <a
-                href="https://play.google.com/store/apps/details?id=ai.ave.platform"
-                class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
+            <div class="col-span-11 pl-3">
+              <h2 class="text-base mb-2">{{ $t('downloadByScanCode') }}</h2>
+              <img
+                src="@/assets/images/download/1-1040045937-171-85-3-1000342829-2aa8d298ea104cbef30a3b8a5e449fd-1.png"
+                alt="QR Code"
+                class="w-32 h-32 bg-white p-2 rounded-lg"
               >
+              <NuxtLink to="/download/help" class="flex items-center mt-20 text-xs hover:underline">
                 <img
-                  src="@/assets/images/download/frame-1.svg"
-                  alt="Google Play"
+                  src="@/assets/images/download/frame-4.svg"
+                  alt="Tutorial"
                   class="w-5 h-5 mr-2"
                 >
-                <span>Google Play</span>
-              </a>
+                {{ $t('appFaq') }}
+              </NuxtLink>
             </div>
-            <div>
-              <h2 class="text-base mb-2">桌面端应用下载</h2>
-              <a
-                href="https://ossaveai.com/oss/app/avedex-mac.dmg.zip"
-                class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
-              >
-                <svg class="w-6 h-6 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M17.1148 13.405C17.084 8.86378 19.6359 8.74626 19.7506 8.67351C18.3152 6.57498 16.0824 6.24481 15.2877 6.21403C13.3878 6.02097 11.5803 7.31086 10.615 7.31086C9.65245 7.31086 8.1639 6.21123 6.5886 6.23921C4.51805 6.26999 2.60698 7.43957 1.53813 9.29467C-0.613561 13.0301 0.986919 18.5618 3.08545 21.5893C4.10953 23.0722 5.33228 24.7371 6.93835 24.6783C8.48287 24.6167 9.06766 23.6766 10.9368 23.6766C12.8058 23.6766 13.3291 24.6783 14.9659 24.6447C16.628 24.614 17.6828 23.1338 18.6985 21.6452C19.8765 19.9244 20.3606 18.3435 20.3885 18.2596C20.3522 18.2428 17.1456 16.4325 17.112 13.405H17.1148Z" fill="white"/>
-                  <path d="M10.4521 6.37108C10.4521 3.00224 13.183 0.268555 16.5547 0.268555C16.5547 3.64019 13.821 6.37108 10.4521 6.37108Z" fill="white"/>
-                </svg>
-                <span>Mac OS</span>
-              </a>
-            </div>
-          </div>
-          <div class="mt-8 grid grid-cols-3 gap-8">
-            <a
-              href="https://testflight.apple.com/join/BZ3XHS5f"
-              class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
-            >
-              <img
-                src="@/assets/images/download/vector-9.svg"
-                alt="TestFlight"
-                class="w-5 h-5 mr-2"
-              >
-              <span>TestFlight</span>
-            </a>
-            <a
-              href="https://ossaveai.com/oss/app/ave.ai.apk"
-              class="bg-[#161926] text-white text-sm flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
-            >
-              <img
-                src="@/assets/images/download/vector-6.svg"
-                alt="Android APK"
-                class="w-5 h-5 mr-2"
-              >
-              <span>Android APK</span>
-            </a>
-            <a
-            href="https://ossaveai.com/oss/app/ave.ai-win64.exe"
-            class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
-          >
-            <svg
-              class="w-5 h-5 mr-2"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M0.107422 0.524414H9.14133V9.55514H0.107422V0.524414ZM10.1302 0.524414H19.1641V9.55514H10.1302V0.524414ZM0.107422 10.5471H9.14133V19.5811H0.107422V10.5471ZM10.1302 10.5471H19.1641V19.5811H10.1302"
-                fill="white"
-              />
-            </svg>
-            <span>Windows</span>
-          </a>
-          </div>
-          <div class="mt-8">
-            <h2 class="text-base mb-2">扫码下载</h2>
-            <img
-              src="@/assets/images/download/1-1040045937-171-85-3-1000342829-2aa8d298ea104cbef30a3b8a5e449fd-1.png"
-              alt="QR Code"
-              class="w-32 h-32 bg-white p-2 rounded-lg"
-            >
-            <NuxtLink to="/download/help" class="flex items-center mt-2 text-sm hover:underline">
-              <img
-                src="@/assets/images/download/frame-4.svg"
-                alt="Tutorial"
-                class="w-5 h-5 mr-2"
-              >
-              APP下载安装教程
-            </NuxtLink>
           </div>
         </div>
       </div>
     </section>
 
     <section class="features py-16 pb-8">
-      <div class="container mx-auto px-2 text-center">
+      <div class="container mx-auto text-center">
         <div class="grid grid-cols-3 gap-10">
           <div data-aos="fade-right" class="bg-gradient-to-br from-[#0b1a4b] from-0% via-black via-70% to-black to-100% rounded-lg p-12 pt-16 pb-0 relative">
-            <div 
+            <div
               data-aos="fade-right"
               data-aos-delay="100"
               data-aos-duration="100"
             >
-              <h2 class="text-xl font-bold mb-4">全链榜单,金狗就在其中！</h2>
-              <p class="text-xs mb-11">
-                实时监控热门新盘、聪明钱买入、爆拉涨幅榜， 不抢先一步，就只能追高补仓！
+              <h2 class="text-xl font-bold mb-4">{{ $t("glodDogTitle") }}</h2>
+              <p class="text-xs mb-11 h-47px overflow-hidden">
+                {{ $t("glodDogSubTitle") }}
               </p>
             </div>
             <div class="h-320px overflow-hidden rounded-t-lg">
@@ -145,30 +147,29 @@
                   alt="AI Icon"
                 >
                 <div class="text-left">
-                  <h3 class="font-bold">AI叙事分析</h3>
-                  <p class="text-xs m-0">AI智能分析代币背景</p>
+                  <h3 class="font-bold">{{ $t("glodDesTitle") }}</h3>
+                  <p class="text-xs m-0">{{ $t("glodDesSubtitle") }}</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div data-aos="fade-up" class="bg-gradient-to-br from-[#1d40ea] to-[#855ffe] rounded-lg p-12 pt-16 pb-0 relative">
-            <div 
+            <div
               data-aos="fade-down"
               data-aos-delay="200"
               data-aos-duration="200"
             >
-              <h2 class="text-xl font-bold mb-4 mt-[-]">信号广场已经开启金狗猎场！</h2>
-              <p class="text-xs mb-11">
-                KOL、巨鲸、聪明钱正在扫盘，链上异动信号实时触发。
-                下一只爆发的金狗，可能就在你犹豫的这一秒！
+              <h2 class="text-xl font-bold mb-4">{{ $t("signTitle") }}</h2>
+              <p class="text-xs mb-11 h-47px overflow-hidden">
+                {{ $t("signSubTitle") }}
               </p>
             </div>
             <div class="h-320px overflow-hidden rounded-t-lg">
               <img
                 src="@/assets/images/download/image-6-1.png"
                 alt="Feature 2"
-                class="w-full rounded-lg"
+                class="w-full rounded-lg mb-[-2px]"
               >
             </div>
             <div
@@ -182,26 +183,26 @@
                   class="bg-white w-12 h-12 bg-opacity-50 rounded-full p-2 mr-2"
                 >
                 <div class="text-left">
-                  <h3 class="font-bold">信号广场</h3>
-                  <p class="text-xs m-0">AI智捕全网金狗信号</p>
+                  <h3 class="font-bold">{{ $t("signDesTitle") }}</h3>
+                  <p class="text-xs m-0">{{ $t("signDesSubtitle") }}</p>
                 </div>
               </div>
             </div>
           </div>
           <div data-aos="fade-left" class="bg-gradient-to-l from-[#0b1a4b] to-black rounded-lg p-12 pt-16 pb-0 relative">
-            <div 
-              data-aos="fade-up" 
+            <div
+              data-aos="fade-up"
               data-aos-delay="300"
               data-aos-duration="300"
             >
-              <h2 class="text-xl font-bold mb-4">AI合约检测，风险预警</h2>
-              <p class="text-xs mb-11 h-34px">大幅提高异常合约识别能力，精确提取问题代码片段</p>
+              <h2 class="text-xl font-bold mb-4">{{ $t("tokenTitle") }}</h2>
+              <p class="text-xs mb-11 h-47px overflow-hidden">{{ $t("tokenSubTitle") }}</p>
             </div>
-            <div class="h-320px overflow-hidden rounded-lg">
+            <div class="h-320px overflow-hidden">
               <img
                 src="@/assets/images/download/image-6-2.png"
                 alt="Feature 3"
-                class="w-full"
+                class="w-full rounded-lg"
               >
             </div>
             <div
@@ -215,8 +216,8 @@
                   <path d="M13.78 11.5597L13.8298 11.6886L16.9831 19.9366L17.0866 20.2081H15.2126L15.1647 20.0763L14.4616 18.1398H11.2878L10.5847 20.0763L10.5368 20.2081H8.6618L8.7663 19.9366L11.9196 11.6886L11.9684 11.5597H13.78ZM11.8366 16.631H13.9128L12.8796 13.7413L11.8366 16.631Z" fill="white" stroke="white" stroke-width="0.4"/>
                 </svg>
                 <div class="text-left">
-                  <h3 class="font-bold text-lg">AI合约检测</h3>
-                  <p class="text-xs m-0">AI检测识别异常合约</p>
+                  <h3 class="font-bold text-lg">{{ $t("tokenDesTitle") }}</h3>
+                  <p class="text-xs m-0">{{ $t("tokenDesSubtitle") }}</p>
                 </div>
               </div>
             </div>
@@ -224,14 +225,15 @@
         </div>
       </div>
     </section>
-    <section class="safety-speed bg-black py-16 pt-0 pb-8">
+
+    <section class="py-16 pt-0 pb-8 mt-8">
       <div class="container mx-auto px-4">
-        <div class="bg-gradient-to-tr from-[#0b1a4b] to-black rounded-2xl p-12 pb-0 pr-0 flex items-center">
+        <div class="bg-gradient-to-tr from-[#0b1a4b] to-black rounded-2xl p-12 pb-0 pr-0 flex">
           <div class="w-[70%]">
             <div data-aos="fade-down">
-              <h2 class="text-3xl font-bold mb-4">交易更安全 & 反应更快</h2>
-              <p class="text-sm mb-8">
-                链上透明锁仓，安全保障每一笔交易<br />跟随聪明钱布局，用秒级速度抓住行情起点！
+              <h2 class="text-3xl font-bold mb-4 mt-6">{{ $t('safeTitle') }}</h2>
+              <p class="text-sm mb-18">
+                {{ $t('safeDes') }}
               </p>
             </div>
             <div class="grid grid-cols-3 gap-4">
@@ -275,40 +277,43 @@
     <section class="trading py-16 pb-4">
       <div class="container mx-auto px-4">
         <div data-aos="zoom-in-up" class="bg-gradient-to-r from-[#1e41ea] to-[#8860ff] rounded-2xl p-12 pb-0">
-          <h2 data-aos="zoom-in-down" class="text-3xl font-bold mb-8">一键买卖，直达链上</h2>
+          <h2 data-aos="zoom-in-down" class="text-3xl font-bold mb-8">{{ $t('buyAndSell') }}</h2>
           <div data-aos="fade-in-down" class="bg-gradient-to-br from-[#0b1a4b] to-black rounded-t-lg  p-8 ">
             <div class="grid grid-cols-3 gap-8 text-center">
-              <div>
-                <h3 class="text-base font-normal mb-4">市价 / 限价秒切换，聚合最优路径</h3>
+              <div
+                data-aos="fade-up"
+                data-aos-delay="300"
+                data-aos-duration="300"
+              >
+                <h3 class="text-base font-normal mb-4">{{ $t('buyAndSellTitle1') }}</h3>
                 <img
                   src="@/assets/images/download/image-6-3.png"
                   alt="Trading Feature 1"
                   class="w-full rounded-lg"
-                  data-aos="fade-up"
-                  data-aos-delay="300"
-                  data-aos-duration="300"
                 >
               </div>
-              <div>
-                <h3 class="text-base font-normal mb-4">支持一键买入 / 卖出，撮合直连 Aveswap</h3>
+              <div
+                data-aos="fade-up"
+                data-aos-delay="600"
+                data-aos-duration="600"
+              >
+                <h3 class="text-base font-normal mb-4">{{ $t('buyAndSellTitle2') }}</h3>
                 <img
                   src="@/assets/images/download/image-7.png"
                   alt="Trading Feature 2"
                   class="w-full rounded-lg"
-                  data-aos="fade-up"
-                  data-aos-delay="600"
-                  data-aos-duration="600"
                 >
               </div>
-              <div>
-                <h3 class="text-base font-normal mb-4">全链透明，锁仓 / 滑点 / 费用清晰可见</h3>
+              <div
+                data-aos="fade-up"
+                data-aos-delay="1000"
+                data-aos-duration="1000"
+              >
+                <h3 class="text-base font-normal mb-4">{{ $t('buyAndSellTitle3') }}</h3>
                 <img
                   src="@/assets/images/download/image-8-1.png"
                   alt="Trading Feature 3"
                   class="w-full rounded-lg"
-                  data-aos="fade-up"
-                  data-aos-delay="1000"
-                  data-aos-duration="1000"
                 >
               </div>
             </div>
@@ -321,8 +326,8 @@
         <div class="grid grid-cols-2 gap-8">
           <div class="bg-gradient-to-br from-[#0b1a4b] to-black rounded-lg p-8 pb-0 text-center" data-aos="fade-left">
             <div ata-aos="fade-down">
-              <h2 class="text-3xl font-bold mb-4 mt-8">钱包洞察 ，真实盈亏，一目了然</h2>
-              <p class="text-sm font-light mb-8">多维解析资金轨迹，洞察链上资金的真实意图。</p>
+              <h2 class="text-3xl font-bold mb-4 mt-8">{{ $t('walletTitle') }}</h2>
+              <p class="text-sm font-light mb-8">{{ $t('walletDes') }}</p>
             </div>
             <div class="h-445px overflow-hidden mx-80px">
               <img
@@ -337,8 +342,8 @@
           </div>
           <div class="bg-gradient-to-br from-[#0b1a4b] to-black rounded-lg p-8 pb-0 text-center" data-aos="fade-right">
             <div ata-aos="fade-down">
-              <h2 class="text-3xl font-bold mb-4 mt-8">多维钱包体系，解锁链上所有可能</h2>
-              <p class="text-sm font-light mb-8">多账户形态自由切换，重构链上身份的管理方式与交互体验</p>
+              <h2 class="text-3xl font-bold mb-4 mt-8">{{ $t('walletTitle2') }}</h2>
+              <p class="text-sm font-light mb-8">{{ $t('walletDes2') }}</p>
             </div>
             <div class="flex justify-center space-x-4 mb-8 text-center">
               <img
@@ -410,8 +415,8 @@
           data-aos="zoom-in-down"
           class="bg-gradient-to-br from-[#0b1a4b] from-0% via-black via-70% to-black to-100% rounded-lg p-12 border-1 border-solid border-[#222B56] rounded-2xl"
         >
-          <h2 class="text-3xl font-bold text-center mb-4 mt-4" data-aos="fade-down">多维画像标签，直观掌握地址行为偏好</h2>
-          <p class="text-lg text-center mb-12" data-aos="fade-zoom-in">交易风格、买卖模式、标签分类一目了然</p>
+          <h2 class="text-3xl font-bold text-center mb-4 mt-4" data-aos="fade-down">{{ $t('tagTitle') }}</h2>
+          <p class="text-lg text-center mb-12" data-aos="fade-zoom-in">{{ $t('tagDes') }}</p>
           <div class="grid grid-cols-10 gap-8 text-sm" data-aos="fade-up">
             <div class="text-center">
               <img
@@ -633,11 +638,10 @@
   </main>
 </template>
 <script setup>
-// import { KinesisContainer, KinesisElement} from "vue-kinesis"
   import Footer from './components/footer'
   import AOS from 'aos'
-  import 'aos/dist/aos.css';
-  
+  import 'aos/dist/aos.css'
+
   onMounted(() => {
     AOS.init({
       offset: 220,

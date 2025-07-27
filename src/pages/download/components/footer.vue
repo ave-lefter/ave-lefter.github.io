@@ -1,7 +1,7 @@
 <template>
   <footer class="bg-black py-16">
     <div class="container mx-auto px-4 text-left">
-      <h2 class="text-5xl font-bold mb-8 text-center">下载Ave.ai APP</h2>
+      <h2 class="text-5xl font-bold mb-8 text-center">{{ $t("downloadAve") }}</h2>
       <div class="flex justify-center items-center mb-[40px]">
         <NuxtLink to="/download/help" class="text-sm font-medium flex items-center">
           <img
@@ -9,7 +9,7 @@
             alt=""
             class="w-5 h-5 mr-2"
           >
-          APP下载安装教程
+          {{ $t("appFaq") }}
         </NuxtLink>
       </div>
       <div class="flex justify-center gap-20 font-normal mb-12">
@@ -44,7 +44,7 @@
               src="@/assets/images/download/vector-9.svg"
               alt="TestFlight"
               class="w-5 h-5 mr-2"
-            />
+            >
             <span>TestFlight</span>
           </a>
         </div>
@@ -58,7 +58,7 @@
               src="@/assets/images/download/frame-1.svg"
               alt="Google Play"
               class="w-5 h-5 mr-2"
-            />
+            >
             <span>Google Play</span>
           </a>
           <a
@@ -69,12 +69,12 @@
               src="@/assets/images/download/vector-6.svg"
               alt="Android APK"
               class="w-5 h-5 mr-2"
-            />
+            >
             <span>Android APK</span>
           </a>
         </div>
         <div class="w-[15%]">
-          <h3 class="text-sm mb-2 font-normal">桌面端应用下载</h3>
+          <h3 class="text-sm mb-2 font-normal">{{ $t('deskApp') }}</h3>
           <a
             href="https://ossaveai.com/oss/app/avedex-mac.dmg.zip"
             class="bg-[#161926] mb-8 text-sm text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
@@ -115,12 +115,12 @@
           </a>
         </div>
         <div class="w-[15%]">
-          <span class="text-xs mb-2 block">扫码下载</span>
+          <span class="text-xs mb-2 block">{{ $t('downloadByScanCode') }}</span>
           <img
             src="@/assets/images/download/1-1040045937-171-85-3-1000342829-2aa8d298ea104cbef30a3b8a5e449fd-1.png"
             alt="QR Code"
             class="w-32 h-32 bg-white p-2 rounded-lg mx-auto"
-          />
+          >
         </div>
       </div>
       <div class="text-center mb-20">
@@ -128,8 +128,8 @@
           :href="1 ? 'https://t.me/ave_community_cn':'https://t.me/ave_community_cn'"
           class="bg-gradient-to-r from-[#0054e1] to-[#8860ff] text-white py-3 px-22 rounded-full inline-flex items-center hover:opacity-90 transition duration-300"
         >
-          <img src="@/assets/images/download/vector-1.svg" alt="Telegram" class="w-5 h-5 mr-2" />
-          加入Ave.ai Telegram群组
+          <img src="@/assets/images/download/vector-1.svg" alt="Telegram" class="w-5 h-5 mr-2">
+          {{ $t('joinTelegram') }}
         </a>
       </div>
     </div>

@@ -1121,5 +1121,43 @@
   "addStopLoss": "Add Stop Loss",
   "followBuy": "Follow Buy",
   "followSell": "Follow Sell",
-  "devSell": "DEV sells and sells"
+  "devSell": "DEV sells and sells",
+
+  "downloadAve": "Download Ave.ai APP",
+  "downloadSubtitle": "Secure, Professional, Fastest, and Most Comprehensive Decentralized Aggregated Trading Platform",
+  "downloadByScanCode": "Scan to download",
+  "appFaq": "Download & installation tutorial",
+  "deskApp": "Desktop App",
+
+  "glodDogTitle": "Cross-Chain Leaderboard. Moonshots Start Here.",
+  "glodDogSubTitle": "Real-time tracking of trending launches, smart money buys, and top gainers.Don’t be late — front-run the next pump.",
+  "glodDesTitle": "AI Narrative Analysis",
+  "glodDesSubtitle": "AI-Powered Token Background Analytics",
+
+  "signTitle": "Signal Arena is Live — Start Hunting GoldDogs!",
+  "signSubTitle": "KOLs, whales, and smart money are scanning the market. On-chain signals fire in real time.Your next 100x moonshot might hit this very second.",
+  "signDesTitle": "Signal Plaza",
+  "signDesSubtitle": "AI-Scouted Alpha Signals Across Chains",
+
+  "tokenTitle": "AI Contract Scanning & Risk Alerts",
+  "tokenSubTitle": "Enhanced detection of abnormal smart contracts.Pinpoint the exact risky code segments with precision.",
+  "tokenDesTitle": "AI Contract",
+  "tokenDesSubtitle": "AI-Powered Anomaly Contract Detection",
+
+  "safeTitle": "Safer Trades & Faster Reactions",
+  "safeDes": "On-chain transparent locking ensures every trade is secured. Follow smart money moves and seize market momentum in seconds.",
+
+  "buyAndSell": "一键买卖，直达链上",
+  "buyAndSellTitle1": "市价 / 限价秒切换，聚合最优路径",
+  "buyAndSellTitle2": "支持一键买入 / 卖出，撮合直连 Aveswap",
+  "buyAndSellTitle3": "全链透明，锁仓 / 滑点 / 费用清晰可见",
+
+  "walletTitle": "Wallet Deep Dive — Real P&L, Fully Revealed",
+  "walletDes": "Multi-dimensional fund flow analysis to uncover the true intentions behind every on-chain move.",
+  "walletTitle2": "Multi-Dimensional Wallet System — Unlock Every On-Chain Possibility",
+  "walletDes2": "Seamlessly switch between multiple account states.Redefine identity management and interaction on-chain.",
+
+  "tagTitle": "Multi-Dimensional Address Profiling — Visualize Behavioral Bias at a Glance",
+  "tagDes": "Trading styles, buy/sell patterns, and address tags — all instantly classified and easy to understand.",
+  "joinTelegram": "Join Ave.ai Telegram"
 }

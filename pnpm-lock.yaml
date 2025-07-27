@@ -150,8 +150,8 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0(vue@3.5.13(typescript@5.8.3))
       vue-kinesis:
-        specifier: ^1.3.3
-        version: 1.3.3(vue@3.5.13(typescript@5.8.3))
+        specifier: ^2.0.5
+        version: 2.0.5(vue@3.5.13(typescript@5.8.3))
       vue-router:
         specifier: ^4.5.0
         version: 4.5.0(vue@3.5.13(typescript@5.8.3))
@@ -9767,11 +9767,11 @@ packages:
     peerDependencies:
       vue: ^3.0.0
 
-  vue-kinesis@1.3.3:
-    resolution: {integrity: sha512-tahIm1+OU2EVUx6b23GV4WNZCuK55Zroiw6Ijl32JxMHrImXLlhAXEDjZx26FXGBy1N3TM7bOaO3YQfAPxG2pw==}
+  vue-kinesis@2.0.5:
+    resolution: {integrity: sha512-uO2lG9A/L4I9KvyJuUzAkAWqd37In/kWxQ6rZ3/heJZ8+7rHAbBO5Knz6xG+cpO+9Q4cYurxXsPfWM6e7X9E3Q==}
     engines: {node: '>=10'}
     peerDependencies:
-      vue: ^2.6.11
+      vue: ^3.0.0
 
   vue-router@4.5.0:
     resolution: {integrity: sha512-HDuk+PuH5monfNuY+ct49mNmkCRK4xJAV9Ts4z9UFc4rzdDnxQLyCMGGc8pKhZhHTVzfanpNwB/lwqevcBwI4w==}
@@ -23646,7 +23646,7 @@ snapshots:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.13(typescript@5.8.3)
 
-  vue-kinesis@1.3.3(vue@3.5.13(typescript@5.8.3)):
+  vue-kinesis@2.0.5(vue@3.5.13(typescript@5.8.3)):
     dependencies:
       vue: 3.5.13(typescript@5.8.3)
 
