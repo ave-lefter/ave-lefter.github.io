@@ -23,7 +23,7 @@
       <div class="flex mr-20px items-center gap-20px mb-20px border-b-solid border-b-1px border-b-[--d-333-l-F2F2F2]">
         <a
           href="javascript:;"
-          :class="`decoration-none text-14px lh-16px pb-12px text-center color-[--d-999-l-666] b-b-solid b-b-1px
+          :class="`decoration-none text-14px lh-16px pb-12px text-center color-[--d-999-l-666] b-b-solid b-b-2px
          ${!isLimitOrder ? 'color-[--d-E9E9E9-l-222] b-b-[--d-F5F5F5-l-333]':'b-b-transparent'}`"
           @click="activeTab = 'notice'"
         >
@@ -32,7 +32,7 @@
         <a
           v-show="isBotLogin && completedLimitTx.length > 0"
           href="javascript:;"
-          :class="`decoration-none text-14px lh-16px pb-12px text-center color-[--d-999-l-666] b-b-solid b-b-1px
+          :class="`decoration-none text-14px lh-16px pb-12px text-center color-[--d-999-l-666] b-b-solid b-b-2px
          ${isLimitOrder ? 'color-[--d-E9E9E9-l-222] b-b-[--d-F5F5F5-l-333]':'b-b-transparent'}`"
           @click.stop="handleVisible"
           @click="activeTab='limitOrder'"

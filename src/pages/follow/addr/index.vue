@@ -215,7 +215,7 @@
           sortable="custom"
           :sort-orders="['descending', 'ascending', null]"
           prop="main_token_balance_amount"
-          min-width="100px"
+          width="130"
         >
           <template #default="{ row }">
             <div style="padding: 0 5px">
@@ -236,7 +236,7 @@
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         prop="total_balance"
-        min-width="100px"
+        width="130"
       >
         <template #default="{ row }">
           <div style="padding: 0 5px">
@@ -487,7 +487,8 @@
           </el-select>
         </template>
       </el-table-column>
-       <el-table-column :label="t('push')" align="right" :width="!isMonitor ? 150 : 180" fixed="right">
+
+       <el-table-column :label="t('push')" align="right" :width="!isMonitor ? 180 : 250" fixed="right">
         <template #default="{ row ,$index}">
           <div class="flex flex-row-reverse  items-center" @click.stop>
             <a

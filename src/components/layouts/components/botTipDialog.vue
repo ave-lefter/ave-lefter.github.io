@@ -149,7 +149,8 @@ const NOTICE_FILTER_TIME = 1744460716
 const modules = [Pagination]
 const supportMediaType = ['.mp4', '.mov', '.webm', '.ogg']
 
-const newUserNoticeVisible = useStorage('bot_tips_dialogVisible', true, localStorage)
+// const newUserNoticeVisible = useStorage('bot_tips_dialogVisible', true, localStorage)
+const newUserNoticeVisible = shallowRef(false)
 const lastExperienceTime = useStorage('lastExperienceTime', 0, localStorage)
 const dialogVisible = ref(false)
 const swiperActiveIdx = ref(0)
@@ -228,8 +229,8 @@ watch(newUserNoticeVisible, (val) => {
   }
 })
 
-watch(()=>[newUserNoticeVisible.value,isLatestExperienced.value],()=>{
-  dialogVisible.value = newUserNoticeVisible.value || !isLatestExperienced.value
+watch(()=>[isLatestExperienced.value],()=>{
+  dialogVisible.value = !isLatestExperienced.value
 })
 </script>
 <style lang="scss">

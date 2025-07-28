@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import dayjs from 'dayjs'
+
 const emit = defineEmits(['collect'])
 const { t } = useI18n()
-defineProps<{
+const props = defineProps<{
   pageNO: number
   pageSize: number
   row: any
@@ -56,6 +58,9 @@ function timerCountColor(val: number) {
   return 'color-[--d-666-l-999]'
 }
 const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'circle')
+const created_at_unix = computed(() => {
+  return dayjs(props.row.created_at).unix()
+})
 </script>
 
 <template>
@@ -114,7 +119,7 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
       </el-tooltip>
       <div class="flex flex-col gap-6px">
         <div class="flex items-center lh-20px">
-          <span class="text-16px color-[--d-CCC-l-333]"> {{ getSymbol(row) }}</span
+          <span class="text-16px color-[--d-CCC-l-333] max-w-88px truncate"> {{ getSymbol(row) }}</span
           ><span class="text-10px color-[--d-666-l-999]">/{{ getSymbol(row, true) }} </span>
           <Icon
             v-copy="row.target_token"
@@ -153,7 +158,7 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
                 :stroke-width="1.5"
                 indeterminate
               >
-                <Icon name="material-symbols:lock" class="color-[--d-666-l-999] text-12px" />
+                <Icon name="material-symbols:lock" class="color-[--d-666-l-999] text-8px" />
               </el-progress>
             </template>
             <template #content>
@@ -172,22 +177,25 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
           </el-tooltip>
         </div>
         <div class="flex items-center lh-12px">
-          <div v-tooltip="formatDate(row.created_at, 'YYYY/MM/DD HH:mm:ss')" class="mr-8px text-12px">
+          <div
+            v-tooltip="formatDate(row.created_at, 'YYYY/MM/DD HH:mm:ss')"
+            class="mr-8px text-12px"
+          >
             <TimerCount
-              v-if="row.created_at && Number(formatTimeFromNow(row.created_at, true)) < 60"
-              :key="row.created_at"
-              :timestamp="row.created_at"
+              v-if="row.created_at && Number(formatTimeFromNow(created_at_unix, true)) < 60"
+              :key="created_at_unix"
+              :timestamp="created_at_unix"
               :end-time="60"
             >
               <template #default="{ seconds }">
                 <span v-if="seconds < 60" class="color-#FFA622"> {{ seconds }}s </span>
-                <span v-else :class="timerCountColor(row.created_at)">
-                  {{ formatTimeFromNow(row.created_at) }}
+                <span v-else :class="timerCountColor(created_at_unix)">
+                  {{ formatTimeFromNow(created_at_unix) }}
                 </span>
               </template>
             </TimerCount>
-            <div v-else :class="row.created_at?timerCountColor(row.created_at):''">
-              {{row.created_at? formatTimeFromNow(row.created_at):'-' }}
+            <div v-else :class="created_at_unix ? timerCountColor(created_at_unix) : ''">
+              {{ created_at_unix ? formatTimeFromNow(created_at_unix) : '-' }}
             </div>
           </div>
           <div v-if="row?.medias?.length > 0" class="flex items-center gap-4px">

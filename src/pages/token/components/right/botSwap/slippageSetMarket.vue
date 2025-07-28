@@ -1,5 +1,5 @@
 <template>
-  <SlippageSet :key="chain" :canSetAuto="true" :chain="chain" :setting="botSettings[chain as 'eth']">
+  <SlippageSet :key="chain" :canSetAuto="true" :chain="chain" :showClipboardSet="showClipboardSet" :setting="botSettings[chain]">
     <template #icon>
       <slot name="icon"/>
     </template>
@@ -7,15 +7,20 @@
 </template>
 <script setup lang="ts">
 import SlippageSet from './slippageSet.vue'
+import type { BotChain } from '~/utils/types'
 
 defineProps({
   chain: {
-    type: String,
+    type: String as PropType<BotChain>,
     default: ''
+  },
+  showClipboardSet: {
+    type: Boolean,
+    default: false
   }
 })
 const botSettingStore = useBotSettingStore()
-const { botSettings } =  storeToRefs(botSettingStore)
+const { botSettings } = storeToRefs(botSettingStore)
 
 </script>
 

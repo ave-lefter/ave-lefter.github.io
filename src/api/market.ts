@@ -19,7 +19,7 @@ export interface CategoryElement {
   name_tr: string;
   name_ja: string;
   is_hot: number;
-  sub_category: string[];
+  sub_category?: Omit<CategoryElement,'sub_category'>[];
   is_pump: number;
 }
 
@@ -40,6 +40,14 @@ export function getTreasureConfig(): Promise<IGetTreasureConfig[]> {
 export function getTreasureList(query) {
   const {$api} = useNuxtApp()
   return $api('/v1api/v4/tokens/treasure/list', {
+    method: 'get',
+    query
+  })
+}
+
+export function getPriceChangeTopTokens(query?: any) {
+  const {$api} = useNuxtApp()
+  return $api('/v1api/v2/tokens/priceChange', {
     method: 'get',
     query
   })

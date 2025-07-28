@@ -253,6 +253,7 @@ const currentActions = shallowRef<IActionItem[]>([])
 const popVisible = shallowRef(false)
 
 function showPopover(e: MouseEvent, actions: IActionItem[]) {
+  cancelHide()
   buttonRef.value = e.currentTarget as HTMLElement | null
   currentActions.value = actions || []
   popVisible.value = true
@@ -273,7 +274,7 @@ function cancelHide() {
   clearTimeout(hideTimer)
 }
 
-const isShowDate = ref(true)
+// const isShowDate = ref(true)
 
 </script>
 
@@ -407,30 +408,31 @@ const isShowDate = ref(true)
 
     <!--  actions -->
     <el-popover
-      :width="390"
+      :width="320"
       :virtual-ref="buttonRef"
       :visible="popVisible"
-      popper-class="[--el-bg-color-overlay:--d-1A1A1A-l-FFF] max-h-200px"
+      popper-class="[--el-bg-color-overlay:--d-1A1A1A-l-FFF] max-h-200px [&&]:[--el-popover-padding:0] overflow-y-auto"
       virtual-triggering
       append-to-body
     >
       <div
+        class="p-12px"
         @mouseenter="cancelHide"
         @mouseleave="hidePopover"
       >
         <div class="flex color-[--d-666-l-999] text-12px mb-8px">
-          <div class="flex-[3]">
+          <div class="flex-1">
             {{ $t('wallet') }}
           </div>
-          <div class="flex-[4]">
+          <div class="flex-1">
             {{ $t('operate') }}
           </div>
-          <div class="flex-[2] flex items-center justify-end gap-4px">
+          <div class="w-40px flex items-center justify-end gap-4px">
             {{ $t('time') }}
-            <Icon
+            <!-- <Icon
               :name="`${isShowDate ? 'custom:calendar' : 'custom:countdown'}`"
               class="color-[--d-666-l-999] cursor-pointer" @click.self="isShowDate = !isShowDate"
-            />
+            /> -->
           </div>
         </div>
         <div class="flex flex-col gap-12px">
@@ -446,25 +448,26 @@ const isShowDate = ref(true)
             :key="idx"
             class="flex color-[--d-999-l-666] text-12px lh-14px"
           >
-            <div class="flex-[3] flex items-center">
+            <div class="flex-1 flex items-center">
               <span class="w-10px h-10px rounded-full bg-#37B270 mr-4px"/>
-              <span class="color-[--d-F5F5F5-l-333] whitespace-nowrap overflow-hidden text-ellipsis max-w-60px">{{
+              <span class="color-[--d-F5F5F5-l-333] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px">{{
                   wallet_alias || $t('wallet')
                 }}</span>
               <span class="color-[--d-999-l-666]">(*{{ wallet_address.slice(-4) }})</span>
             </div>
-            <div class="flex-[4] color-#12B886">
+            <div class="flex-1 color-#12B886">
               {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : '' }}{{ formatNumber(quote_token_amount, 2) }} {{
                 quote_token_symbol
               }}<span class="color-[--d-999-l-666]">(${{ formatNumber(quote_token_volume, 0) }})</span>
             </div>
-            <div class="flex-[2] flex justify-end">
-              <template v-if="isShowDate">
+            <div class="w-40px flex justify-end">
+              <!-- <template v-if="isShowDate">
                 {{ formatDate(action_time * 1000, 'MM/DD HH:mm:ss') }}
               </template>
               <template v-else>
                 {{ dayjs(action_time * 1000).fromNow() }}
-              </template>
+              </template> -->
+              {{ formatTimeFromNow(action_time) }}
             </div>
           </div>
         </div>
