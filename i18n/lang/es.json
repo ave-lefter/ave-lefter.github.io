@@ -457,5 +457,9 @@
   "runTime2": "2/2 Costo",
   "snipers_1m": "Francotiradores[1m]",
   "devPosition": "En Propiedad por DEV",
-  "complete": "Completar"
+  "complete": "Completar",
+  "deposit2": "Depósito",
+  "myWallet1": "Mi billetera",
+  "notBound": "No atado",
+  "bounded": "Vínculo"
 }

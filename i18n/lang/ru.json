@@ -654,5 +654,9 @@
   "startExperience": "Начать",
   "complete": "Завершено",
   "DbCheckGg": "Использовать Google Authenticator",
-  "DbCheckContentTitle3": "Шаг 3:"
+  "DbCheckContentTitle3": "Шаг 3:",
+  "myWallet1": "Мой кошелек",
+  "deposit2": "Депозитный",
+  "notBound": "Не связан",
+  "bounded": "Бенс"
 }

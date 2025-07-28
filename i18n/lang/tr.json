@@ -452,5 +452,9 @@
   "runTime2": "2/2 Maliyet",
   "snipers_1m": "Snipers[1d]",
   "devPosition": "Sahip Olunan Geliştirici",
-  "complete": "Tamamla"
+  "complete": "Tamamla",
+  "deposit2": "Yatırmak",
+  "myWallet1": "Cüzdanım",
+  "notBound": "Bağlı değil",
+  "bounded": "Kabuklu"
 }

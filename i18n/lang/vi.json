@@ -654,5 +654,9 @@
   "startExperience": "Bắt đầu trải nghiệm",
   "complete": "Hoàn thành",
   "DbCheckGg": "Dùng Google Authenticator",
-  "DbCheckContentTitle3": "Bước 3:"
+  "DbCheckContentTitle3": "Bước 3:",
+  "myWallet1": "Ví của tôi",
+  "deposit2": "Tiền gửi",
+  "notBound": "Không bị ràng buộc",
+  "bounded": "Binding"
 }

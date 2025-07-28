@@ -53,17 +53,72 @@
           </el-scrollbar>
         </ul>
         <div style="flex: 1;" />
-        <div class="tg-wallet-list_footer">
-          <div style="display: flex;">
-            <el-button style="flex: 1;" size="large" color="#333333" @click.stop="showVisible = 2">{{ t('deposit')
-            }}</el-button>
-            <el-button style="flex: 1; margin-left: 8px;" size="large" color="#333333" @click.stop="showVisible = 3">{{
-              t('withdraw') }}</el-button>
-          </div>
-          <el-button
-            style="width: 100%;margin-top: 8px; color: #959A9F;" size="large" color="#333333"
-            @click.stop="walletStore.disconnect(); tgWalletVisible = false">{{ t('logout') }}</el-button>
-        </div>
+        <ul class="tg-wallet-list_footer flex flex-col gap-10px">
+          <li class="flex justify-between h-40px px-20px clickable">
+            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+              <Icon name="custom:wallet2" class="text-16px"/>
+              <span class="font-500 text-14px">{{ t('myWallet1') }}</span>
+            </div>
+            <div class="color-#999 flex items-center gap-4px">
+              <span class="font-500 text-12px">
+                {{ botStore?.userInfo?.name || '' }}
+              </span>
+              <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px"/>
+            </div>
+          </li>
+          <li class="flex justify-between h-40px px-20px clickable" @click.stop="showVisible = 2">
+            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+              <Icon name="custom:download" class="text-16px"/>
+              <span class="font-500 text-14px">{{ t('deposit2') }}</span>
+            </div>
+            <div class="color-#999 flex items-center gap-4px">
+              <span class="font-500 text-12px">
+              </span>
+              <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px"/>
+            </div>
+          </li>
+          <li class="flex justify-between h-40px px-20px clickable" @click.stop="showVisible = 3">
+            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+              <Icon name="custom:upload" class="text-16px"/>
+              <span class="font-500 text-14px">{{ t('withdraw') }}</span>
+            </div>
+            <div class="color-#999 flex items-center gap-4px">
+              <span class="font-500 text-12px">
+              </span>
+              <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px"/>
+            </div>
+          </li>
+          <li class="flex justify-between h-40px px-20px clickable">
+            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+              <Icon name="custom:shield-check" class="text-16px"/>
+              <span class="font-500 text-14px">{{ t('safe') }}</span>
+            </div>
+            <div class="color-#999 flex items-center gap-4px">
+              <span class="font-500 text-12px flex items-center color-#FFBE3C gap-8px">
+                <template v-if="authInfo?.emailAddress && authInfo?.authSetting">
+                  <Icon name="mingcute:check-circle-fill" class="text-17px color-#12B886 mt-1px"/>
+                   <!-- <Icon name="custom:check-circle" class="text-14px color-#12B886"/>  -->
+                  <span>{{ t('bounded') }}</span>
+                </template>
+                <template v-else>
+                  <Icon name="mingcute:warning-fill" class="text-17px mt-1px"/>
+                  <!-- <Icon name="custom:exclamation-circle" class="text-14px"/>-->
+                  <span>{{ t('notBound') }}</span>
+                </template>
+              </span>
+              <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px"/>
+            </div>
+          </li>
+          <li class="flex justify-between h-40px px-20px clickable" @click.stop="walletStore.disconnect(); tgWalletVisible = false">
+            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+              <Icon name="custom:log-out" class="text-16px"/>
+              <span class="font-500 text-14px">{{ t('logout') }}</span>
+            </div>
+            <div class="color-#999 flex items-center gap-4px">
+              <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px"/>
+            </div>
+          </li>
+        </ul>
       </div>
       <div v-show="showVisible === 1" class="tg-wallet-list">
         <div class="flex-start text-16px tg-wallet-list_title">
@@ -217,6 +272,8 @@ import { throttle } from 'lodash-es'
 import QrCodeWithLogo from 'qr-code-with-logo'
 import doubleCheck from './doubleCheck.vue'
 
+
+const { authInfo } =storeToRefs(useUserStore())
 const { mode, token_logo_url } = storeToRefs(useGlobalStore())
 const { t } = useI18n()
 const botStore = useBotStore()
@@ -584,7 +641,8 @@ function handleMax() {
   }
 
   .tg-wallet-list_footer {
-    padding: 20px;
+    padding-top: 10px;
+    padding-bottom: 24px;
   }
 
   .chains-select {

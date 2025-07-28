@@ -10,12 +10,12 @@
       <div class="m-content">
         <ul v-if="step === 0" class="checkType">
           <h4>{{ $t('DbCheckTitle1') }}</h4>
-          <!-- <li @click="(step = 1) && (checkType = 'google')">
-                        <span><img src="@/assets/images/checkLogo2.svg" alt="" width="14" lazy>{{ $t('DbCheckGg') }}</span>
-                        <el-icon size="24" class="clickable">
-                            <Right />
-                        </el-icon>
-                    </li> -->
+          <li @click="(step = 1) && (checkType = 'google')">
+              <span><img src="@/assets/images/checkLogo2.svg" alt="" width="14" lazy>{{ $t('DbCheckGg') }}</span>
+              <el-icon size="24" class="clickable">
+                  <Right />
+              </el-icon>
+          </li>
           <li @click="(step = 1) && (checkType = 'email')">
             <!-- mode === 'light' -->
             <span>

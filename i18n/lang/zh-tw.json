@@ -1117,5 +1117,9 @@
   "DbCheckContentTitle3": "步驟 3：",
   "balance": "金額",
   "buyAmountMustG0": "買入數量必須大於0",
-  "quickBuyclipboard": "剪切板快捷買入"
+  "quickBuyclipboard": "剪切板快捷買入",
+  "myWallet1": "我的錢包",
+  "deposit2": "儲值",
+  "notBound": "未綁定",
+  "bounded": "已綁定"
 }
