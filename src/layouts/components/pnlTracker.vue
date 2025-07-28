@@ -24,26 +24,30 @@ const pnlSetting = useStorage('pnl-setting', {
 })
 const currentPrice = computed(() => {
   return (
-    globalStore.footerTokensPrice.find((el) => el.token === getChainInfo(pnlSetting.value.chain).wmain_wrapper)
-      ?.current_price_usd || 0
+    globalStore.footerTokensPrice.find(
+      (el) => el.token === getChainInfo(pnlSetting.value.chain).wmain_wrapper
+    )?.current_price_usd || 0
   )
 })
 const pnlData = useStorage('pnlData', {
   solana: {
     initBalance: '0',
     balance: '0',
-    historyList: [],
+    historyList: [] as any[],
   },
   bsc: {
     initBalance: '0',
     balance: '0',
-    historyList: [],
+    historyList: [] as any[],
   },
 })
-watch(()=>pnlSetting.value.chain,(val)=>{
-  pnlData.value[val as keyof typeof pnlData.value].historyList = []
-  setTokenBalance(val, true)
-})
+watch(
+  () => pnlSetting.value.chain,
+  (val) => {
+    pnlData.value[val as keyof typeof pnlData.value].historyList = []
+    setTokenBalance(val, true)
+  }
+)
 const currentChainData = computed(() => {
   return pnlData.value[pnlSetting.value.chain as keyof typeof pnlData.value]
 })
@@ -59,23 +63,6 @@ const currentRatio = computed(() => {
 
 const supportChains = ['solana', 'bsc']
 const wsStore = useWSStore()
-// {
-//     "client_address": "DBXf1WHHFF9DKpN4EwsofqZorcmgZEVdZdDuHwm7oY2H",
-//     "event": "asset",
-//     "swap": {
-//         "type": "0",
-//         "chain": "solana",
-//         "token": "So11111111111111111111111111111111111111112",
-//         "token_name": "SOL",
-//         "logo_url": "token_icon/solana/So11111111111111111111111111111111111111112.png",
-//         "time": 1753511090,
-//         "rule_id": 2,
-//         "amount": "0.0109386",
-//         "amm": "raydiumcpmm",
-//         "eth_price": "-0.0109",
-//         "price": "186.05904"
-//     }
-// }
 watch(
   () => wsStore.wsResult[WSEventType.ASSET],
   async (val: IAssetResponse) => {
@@ -83,35 +70,41 @@ watch(
     const isSolSwap = val.swap && val.swap.token === SOLANA_NATIVE_TOKEN
     // 处理转账或者 bsc 链
     const isBscSwapOrTransfer = val.transfer && val.transfer.token === NATIVE_TOKEN
-    if(isSolSwap || isBscSwapOrTransfer){
+    if (isSolSwap || isBscSwapOrTransfer) {
+      console.log(val, 'val')
       const { type, time, chain } = (val.swap || val.transfer)!
       const isBuy = type === '0'
       const prevBalance = currentChainData.value.balance
       const balance = await setTokenBalance(chain, false)
-      pnlData.value[chain as keyof typeof pnlData.value].historyList.unshift({
+      const historyList = pnlData.value[chain as keyof typeof pnlData.value].historyList.slice()
+      historyList.unshift({
         isBuy,
         amount: Number(balance) - Number(prevBalance),
         time,
         balance,
       })
+      const shouldSlice = historyList.length > 50
+      pnlData.value[chain as keyof typeof pnlData.value].historyList = shouldSlice
+        ? historyList.slice(0, 50)
+        : historyList
     }
-  //   if (val.swap && val.swap.token === 'So11111111111111111111111111111111111111112') {
-      // const { type, time, chain } = val.swap
-      // const isBuy = type === '0'
-      // const prevBalance = currentChainData.value.balance
-      // const balance = await setTokenBalance(val.swap.chain, false)
-      // pnlData.value[chain as keyof typeof pnlData.value].historyList.unshift({
-      //   isBuy,
-      //   amount: Number(balance) - Number(prevBalance),
-      //   time,
-      //   balance,
-      // })
-  //   }
-  //   // 处理转账或者 bsc 链
-  //  else if (val.transfer && val.transfer.token === getNativeToken(pnlSetting.value.chain)) {
-  //     const { type, amount, time, chain } = val.transfer
-  //     transfer({ type, amount, time, chain })
-  //   }
+    //   if (val.swap && val.swap.token === 'So11111111111111111111111111111111111111112') {
+    // const { type, time, chain } = val.swap
+    // const isBuy = type === '0'
+    // const prevBalance = currentChainData.value.balance
+    // const balance = await setTokenBalance(val.swap.chain, false)
+    // pnlData.value[chain as keyof typeof pnlData.value].historyList.unshift({
+    //   isBuy,
+    //   amount: Number(balance) - Number(prevBalance),
+    //   time,
+    //   balance,
+    // })
+    //   }
+    //   // 处理转账或者 bsc 链
+    //  else if (val.transfer && val.transfer.token === getNativeToken(pnlSetting.value.chain)) {
+    //     const { type, amount, time, chain } = val.transfer
+    //     transfer({ type, amount, time, chain })
+    //   }
   }
 )
 // function transfer(params: { type: string; amount: string; time: number; chain: string }) {
@@ -213,6 +206,11 @@ function getColorClass(val: string | number) {
     return 'color-[--d-F5F5F5-l-333]'
   }
 }
+
+function resetPnl() {
+  pnlData.value[pnlSetting.value.chain as keyof typeof pnlData.value].historyList = []
+  setTokenBalance(pnlSetting.value.chain, true)
+}
 </script>
 
 <template>
@@ -244,11 +242,13 @@ function getColorClass(val: string | number) {
           class="flex items-center gap-12px opacity-0 group-hover/item:opacity-100 transition-all duration-300"
         >
           <Icon
+            v-tooltip="'设置'"
             name="custom:pump-setting"
             class="cursor-pointer text-12px color-#FFFFFF99"
             @click.self="pnlSettingVisible = true"
           />
           <Icon
+            v-tooltip="'历史记录'"
             name="custom:history-fill"
             class="cursor-pointer text-16px color-#FFFFFF99"
             @click.self="pnlHistoryVisible = true"
@@ -257,8 +257,17 @@ function getColorClass(val: string | number) {
         <div
           class="flex items-center gap-12px opacity-0 group-hover/item:opacity-100 transition-all duration-300"
         >
-          <Icon name="custom:reset2" class="cursor-pointer text-12px color-#FFFFFF99" />
-          <Icon name="material-symbols:close" class="cursor-pointer text-16px color-#FFFFFF99" />
+          <Icon
+            v-tooltip="'重新设定初始余额'"
+            name="custom:reset2"
+            class="cursor-pointer text-12px color-#FFFFFF99"
+            @click.self="resetPnl"
+          />
+          <Icon
+            name="material-symbols:close"
+            class="cursor-pointer text-16px color-#FFFFFF99"
+            @click.self="globalStore.pnlTrackerVisible = false"
+          />
         </div>
       </div>
       <div class="mt--26px flex-1 flex items-center justify-center">
@@ -353,6 +362,7 @@ function getColorClass(val: string | number) {
   <PnlSetting v-model:visible="pnlSettingVisible" v-model:pnlSetting="pnlSetting" />
   <PnlHistory
     v-model:visible="pnlHistoryVisible"
+    :chain="pnlSetting.chain"
     :list="currentChainData.historyList"
     :getColorClass="getColorClass"
   />

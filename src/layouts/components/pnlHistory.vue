@@ -3,6 +3,7 @@ const visible = defineModel<boolean>('visible')
 defineProps<{
   list: any[]
   getColorClass: (val: string | number) => string
+  chain: string
 }>()
 </script>
 
@@ -22,7 +23,7 @@ defineProps<{
       >
         <div class="flex flex-col gap-8px">
           <span class="color-[--d-F5F5F5-l-333] font-500 text-16px lh-20px"
-            >{{ formatNumber(balance, 3) }} SOL</span
+            >{{ formatNumber(balance, 3) }} {{ getChainInfo(chain)?.main_name }}</span
           >
           <div class="color-[--d-666-l-999] text-12px lh-16px">
             {{ formatDate(time, 'YYYY/MM/DD HH:mm:ss') }}
@@ -30,11 +31,15 @@ defineProps<{
         </div>
         <div class="flex gap-8px items-center">
           <span class="font-500 text-16px lh-20px" :class="getColorClass(amount)">
-            {{ addSign(amount) }}{{ formatNumber(Math.abs(amount), 3) }} SOL
+            {{ addSign(amount) }}{{ formatNumber(Math.abs(amount), 3) }}
+            {{ getChainInfo(chain)?.main_name }}
           </span>
           <!-- <Icon name="ic:baseline-delete"/> -->
         </div>
       </div>
+      <ave-empty v-if="list.length === 0" class="pt-100px">
+        <span class="color-[--d-666-l-999] text-12px lh-16px mt-10px">暂无交易记录</span>
+      </ave-empty>
     </el-scrollbar>
   </el-dialog>
 </template>
