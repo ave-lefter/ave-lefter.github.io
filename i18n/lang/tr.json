@@ -452,5 +452,7 @@
   "runTime2": "2/2 Maliyet",
   "snipers_1m": "Snipers[1d]",
   "devPosition": "Sahip Olunan Geliştirici",
-  "complete": "Tamamla"
+  "complete": "Tamamla",
+  "myFavoriteChain": "Favori zincirim",
+  "unDelete": "Silinemiyor"
 }

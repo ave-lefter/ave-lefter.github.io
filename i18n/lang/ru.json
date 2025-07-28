@@ -654,5 +654,7 @@
   "startExperience": "Начать",
   "complete": "Завершено",
   "DbCheckGg": "Использовать Google Authenticator",
-  "DbCheckContentTitle3": "Шаг 3:"
+  "DbCheckContentTitle3": "Шаг 3:",
+  "myFavoriteChain": "Избранные сети",
+  "unDelete": "Нельзя удалить"
 }

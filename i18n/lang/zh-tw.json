@@ -1117,5 +1117,8 @@
   "DbCheckContentTitle3": "步驟 3：",
   "balance": "金額",
   "buyAmountMustG0": "買入數量必須大於0",
-  "quickBuyclipboard": "剪切板快捷買入"
+  "quickBuyclipboard": "剪切板快捷買入",
+  "addChain": "添加鏈",
+  "myFavoriteChain": "我關注的鏈",
+  "unDelete": "不能删除"
 }
