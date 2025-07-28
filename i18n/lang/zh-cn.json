@@ -1158,5 +1158,26 @@
 
   "tagTitle":"多维画像标签，直观掌握地址行为偏好",
   "tagDes":"交易风格、买卖模式、标签分类一目了然",
-  "joinTelegram":"加入Ave.ai Telegram群组"
+  "joinTelegram":"加入Ave.ai Telegram群组",
+
+  "Gem": "金狗",
+  "Smarters": "潜力榜",
+  "BigBuy":"大额买入",
+  "Rug":"抽地毯",
+  "Shitcoin":"Shitcoin",
+  "Dump":"暴跌",
+  "Pump":"暴涨",
+  "HighTurnover": "高换手",
+  "BigSell":"大额卖出",
+  "SmartMoney":"Smart Money",
+  "DEV":"DEV",
+  "Insiders":"老鼠仓",
+  "Snipers":"Snipers",
+  "TOP10":"KOL",
+  "Cabal":"阴谋集团",
+  "Whale":"大户",
+  "FreshWallet":"新开户",
+  "Bundle":"捆绑地址",
+  "Exit":" 清仓 ",
+  "Phishing":"钓鱼钱包"
 }

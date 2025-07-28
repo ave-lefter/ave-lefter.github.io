@@ -1147,10 +1147,10 @@
   "safeTitle": "Safer Trades & Faster Reactions",
   "safeDes": "On-chain transparent locking ensures every trade is secured. Follow smart money moves and seize market momentum in seconds.",
 
-  "buyAndSell": "一键买卖，直达链上",
-  "buyAndSellTitle1": "市价 / 限价秒切换，聚合最优路径",
-  "buyAndSellTitle2": "支持一键买入 / 卖出，撮合直连 Aveswap",
-  "buyAndSellTitle3": "全链透明，锁仓 / 滑点 / 费用清晰可见",
+  "buyAndSell": "One-Click Trading, Straight On-Chain",
+  "buyAndSellTitle1": "Instant market/limit switching with optimal route aggregation",
+  "buyAndSellTitle2": "Support one-click buy/sell via direct integration with Aveswap",
+  "buyAndSellTitle3": "Full-chain transparency — clear lock, slippage, and fee display",
 
   "walletTitle": "Wallet Deep Dive — Real P&L, Fully Revealed",
   "walletDes": "Multi-dimensional fund flow analysis to uncover the true intentions behind every on-chain move.",
@@ -1159,5 +1159,26 @@
 
   "tagTitle": "Multi-Dimensional Address Profiling — Visualize Behavioral Bias at a Glance",
   "tagDes": "Trading styles, buy/sell patterns, and address tags — all instantly classified and easy to understand.",
-  "joinTelegram": "Join Ave.ai Telegram"
+  "joinTelegram": "Join Ave.ai Telegram",
+
+  "Gem": "Gem",
+  "Smarters": "Smarters",
+  "BigBuy":"BigBuy",
+  "Rug":"Rug",
+  "Shitcoin":"Shitcoin",
+  "Dump":"Dump",
+  "Pump":"Pump",
+  "HighTurnover": "High Turnover",
+  "BigSell":"Big Sell",
+  "SmartMoney":"Smart Money",
+  "DEV":"DEV",
+  "Insiders":"Insiders",
+  "Snipers":"Snipers",
+  "TOP10":"KOL",
+  "Cabal":"Cabal",
+  "Whale":"Whale",
+  "FreshWallet":"Fresh Wallet",
+  "Bundle":"Bundle",
+  "Exit":" Exit ",
+  "Phishing":"Phishing"
 }
