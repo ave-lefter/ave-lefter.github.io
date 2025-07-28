@@ -71,7 +71,6 @@ watch(
     // 处理转账或者 bsc 链
     const isBscSwapOrTransfer = val.transfer && val.transfer.token === NATIVE_TOKEN
     if (isSolSwap || isBscSwapOrTransfer) {
-      console.log(val, 'val')
       const { type, time, chain } = (val.swap || val.transfer)!
       const isBuy = type === '0'
       const prevBalance = currentChainData.value.balance
@@ -242,13 +241,13 @@ function resetPnl() {
           class="flex items-center gap-12px opacity-0 group-hover/item:opacity-100 transition-all duration-300"
         >
           <Icon
-            v-tooltip="'设置'"
+            v-tooltip="$t('setting')"
             name="custom:pump-setting"
             class="cursor-pointer text-12px color-#FFFFFF99"
             @click.self="pnlSettingVisible = true"
           />
           <Icon
-            v-tooltip="'历史记录'"
+            v-tooltip="$t('history')"
             name="custom:history-fill"
             class="cursor-pointer text-16px color-#FFFFFF99"
             @click.self="pnlHistoryVisible = true"
@@ -258,7 +257,7 @@ function resetPnl() {
           class="flex items-center gap-12px opacity-0 group-hover/item:opacity-100 transition-all duration-300"
         >
           <Icon
-            v-tooltip="'重新设定初始余额'"
+            v-tooltip="$t('reset')"
             name="custom:reset2"
             class="cursor-pointer text-12px color-#FFFFFF99"
             @click.self="resetPnl"
@@ -272,7 +271,9 @@ function resetPnl() {
       </div>
       <div class="mt--26px flex-1 flex items-center justify-center">
         <div v-if="!botStore.evmAddress" class="text-center">
-          <div class="color-[--d-999-l-666] text-12px lh-18px mb-12px">你还没有登录AVE.AI</div>
+          <div class="color-[--d-999-l-666] text-12px lh-18px mb-12px">
+            {{ $t('notLogin') }}
+          </div>
           <el-button
             size="small"
             class="[--el-button-border-color:--d-F5F5F5-l-333] [--el-button-hover-text-color:--d-F5F5F5-l-333] [--el-button-hover-border-color:--d-F5F5F5-l-333] [--el-button-hover-bg-color:transparent]"

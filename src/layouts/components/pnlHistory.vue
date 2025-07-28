@@ -10,6 +10,7 @@ defineProps<{
 <template>
   <el-dialog
     v-model="visible"
+    align-center
     :title="$t('PnlHistory')"
     width="420px"
     :close-on-click-modal="false"
@@ -38,7 +39,7 @@ defineProps<{
         </div>
       </div>
       <ave-empty v-if="list.length === 0" class="pt-100px">
-        <span class="color-[--d-666-l-999] text-12px lh-16px mt-10px">暂无交易记录</span>
+        <span class="color-[--d-666-l-999] text-12px lh-16px mt-10px">{{ $t('noHistory') }}</span>
       </ave-empty>
     </el-scrollbar>
   </el-dialog>
