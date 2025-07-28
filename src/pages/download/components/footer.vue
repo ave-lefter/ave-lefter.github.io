@@ -125,7 +125,7 @@
       </div>
       <div class="text-center mb-20">
         <a
-          :href="useLocaleStore().locale == 'zh-cn' ? 'https://t.me/ave_community_cn':'https://t.me/ave_community_cn'"
+          :href="useLocaleStore().locale == 'zh-cn' ? 'https://t.me/ave_community_cn':'https://t.me/aveai_english'"
           class="bg-gradient-to-r from-[#0054e1] to-[#8860ff] text-white py-3 px-22 rounded-full inline-flex items-center hover:opacity-90 transition duration-300"
         >
           <img src="@/assets/images/download/vector-1.svg" alt="Telegram" class="w-5 h-5 mr-2">

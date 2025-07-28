@@ -1127,6 +1127,7 @@
   "downloadByScanCode":"扫码下载",
   "appFaq":"APP下载安装教程",
   "deskApp":"桌面端应用下载",
+  "moreOptions": "更多选项",
 
   "glodDogTitle":"全链榜单,金狗就在其中！",
   "glodDogSubTitle":"实时监控热门新盘、聪明钱买入、爆拉涨幅榜， 不抢先一步，就只能追高补仓！",
@@ -1179,5 +1180,26 @@
   "FreshWallet":"新开户",
   "Bundle":"捆绑地址",
   "Exit":" 清仓 ",
-  "Phishing":"钓鱼钱包"
+  "Phishing":"钓鱼钱包",
+
+  "help":"帮助",
+  "Android":"Android",
+  "Ios":"IOS",
+  "click":"请点击",
+  "tutor":"系统安装教程",
+  "helpTip1":"安装包，下载完成后按照系统引导安装即可。",
+  "helpTip2":"当您在安装或使用过程中遇到任何问题，请点击",
+  "contactUs":"联系客服",
+  "step1":"第一步",
+  "setp2":"第二步",
+  "setp3":"第三步",
+  "step1Tip1":"Ave目前上架美国、澳大利亚以及香港地区AppStore，下载Ave app需要对应地区的Apple ID",
+  "step2Tip1":"在 App Store 切换 Apple ID",
+  "step2Title":"打开",
+  "step2Tip2":"App Store 应用，点击右上角的头像，退出登录",
+  "step2Tip3":"使用已上架地区的 Apple ID 登录",
+  "step2Tip4":" 如果提示'无法登录'，可能是您近期切换账号过于频繁。您可以更换 ID,或者几小时后重试。如果 ID 被锁定，则需要进行验证或更换 ID 后再试。",
+  "setp3Title":"安装 App",
+  "setp3Tip1":"登录成功后，会自动跳转至 ID 对应地区的 App Store。在 App Store中搜索“Ave”，点击“GET”即可开始安装。",
+  "setp3Tip2":"回到主页，打开 Ave App。"
 }

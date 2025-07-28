@@ -1123,6 +1123,7 @@
   "followSell": "Follow Sell",
   "devSell": "DEV sells and sells",
 
+  "moreOptions": "More options",
   "downloadAve": "Download Ave.ai APP",
   "downloadSubtitle": "Secure, Professional, Fastest, and Most Comprehensive Decentralized Aggregated Trading Platform",
   "downloadByScanCode": "Scan to download",
@@ -1180,5 +1181,26 @@
   "FreshWallet":"Fresh Wallet",
   "Bundle":"Bundle",
   "Exit":" Exit ",
-  "Phishing":"Phishing"
+  "Phishing":"Phishing",
+
+  "help":"Help",
+  "Android":"Android",
+  "Ios":"IOS",
+  "click":"Click",
+  "tutor":"Guide",
+  "helpTip1":"to download the installation package. Once the download is complete, follow the system prompts to finish the installation.",
+  "helpTip2":" If you encounter any issues during installation or usage, click Help ",
+  "contactUs":"to join the official support group.",
+  "step1":"Step 1",
+  "setp2":"Step 2",
+  "step3":"Step 3",
+  "step1Tip1":"Currently, Ave is not available on the Chinese mainland App Store. To download the Ave app, you’ll need to switch to a supported Apple ID region.",
+  "step2Tip1":"Switch Apple ID in the App Store.",
+  "step2Title":"Open",
+  "step2Tip2":"the App Store, tap the avatar icon in the top right corner, and sign out.",
+  "step2Tip3":"Sign in with an Apple ID registered in a supported region.",
+  "step2Tip4":" If login fails, it might be due to device restrictions or security settings. Try logging in from the device settings directly. If the ID is locked, you may need to unlock it in the Apple ID settings.",
+  "step3Title":"Install the app.",
+  "step3Tip1":"Once signed in, the App Store will automatically switch regions. Search for “Ave” in the App Store and tap Get to install.",
+  "step3Tip2":"After installation, return to the home screen and open the Ave app."
 }
