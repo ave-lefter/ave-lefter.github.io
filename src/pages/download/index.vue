@@ -417,7 +417,7 @@
         >
           <h2 class="text-3xl font-bold text-center mb-4 mt-4" data-aos="fade-down">{{ $t('tagTitle') }}</h2>
           <p class="text-lg text-center mb-12" data-aos="fade-zoom-in">{{ $t('tagDes') }}</p>
-          <div class="grid grid-cols-10 gap-8 text-sm" data-aos="fade-up">
+          <div class="grid grid-cols-10 gap-7 text-sm" data-aos="fade-up">
             <div class="text-center">
               <img
                 src="@/assets/images/download/-------1.svg"
