@@ -178,6 +178,15 @@ async function _getTreasureList(shouldLoading = true) {
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
     
+    console.log('API数据加载完成:', {
+      total: res.total,
+      count: listData.value.length,
+      sort: sortConditions.value,
+      firstItem: listData.value[0]?.pair,
+      firstPrice: listData.value[0]?.current_price_usd,
+      firstChange: listData.value[0]?.price_change_24h
+    })
+    
     if (shouldLoading) {
       initWs()
     }
@@ -224,25 +233,38 @@ watch(
     
     if (!prices) return
     
+    console.log('WebSocket价格更新:', prices.length, '个币种')
+    
     const pricesMap = Array.isArray(prices)
       ? prices.reduce((pre, cur) => {
           pre[cur.pair + '-' + cur.chain] = cur
           return pre
         }, {})
       : {}
+    
+    // 使用相同的数据处理流程
     const updateList = listData.value.map((el) => {
       const item = pricesMap[el.pair + '-' + el.chain]
       if (item) {
-        delete item.holders
-        const market_cap = !el.current_price_usd
-          ? 0
-          : ((el.market_cap || 0) / el.current_price_usd) * (item.uprice || 0)
-        return {
+        // 创建更新后的原始数据对象
+        const updatedRawData = {
           ...el,
-          market_cap: market_cap,
           current_price_usd: item.uprice,
-          ...item,
+          price_change_1m: item.price_change_1m,
+          price_change_15m: item.price_change_15m,
+          price_change_24h: item.price_change_24h,
+          volume_24h: item.volume_24h,
+          volume_1h: item.volume_1h,
+          volume_15m: item.volume_15m,
+          volume_1m: item.volume_1m,
+          // 重新计算市值
+          market_cap: !el.current_price_usd
+            ? 0
+            : ((el.market_cap || 0) / el.current_price_usd) * (item.uprice || 0),
         }
+        
+        // 应用相同的数据处理函数确保一致性
+        return props.listMapFunction(updatedRawData)
       }
       return el
     })
@@ -252,17 +274,19 @@ watch(
     if (sort && sort_dir) {
       const sortVal = { asc: 1, desc: -1 }[sort_dir] || -1
       listData.value = updateList.toSorted((a, b) => {
-        const aVal = a[sort] || 0
-        const bVal = b[sort] || 0
+        const aVal = Number(a[sort]) || 0
+        const bVal = Number(b[sort]) || 0
         return (bVal - aVal) * sortVal
       })
+      console.log('应用排序:', sort, sort_dir, '更新后条数:', listData.value.length)
     } else {
-      // 默认按24小时涨幅排序
+      // 默认按24小时涨幅排序（降序）
       listData.value = updateList.sort((a, b) => {
-        const aChange = a.price_change_24h || 0
-        const bChange = b.price_change_24h || 0
+        const aChange = Number(a.price_change_24h) || 0
+        const bChange = Number(b.price_change_24h) || 0
         return bChange - aChange
       })
+      console.log('应用默认排序(24h涨幅)，更新后条数:', listData.value.length)
     }
   }
 )
