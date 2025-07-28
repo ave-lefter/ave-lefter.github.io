@@ -1145,5 +1145,6 @@
   "noHistory": "No history",
   "PnlSetting": "PnL Setting",
   "PnlTracker": "PnL Tracker",
-  "PnlHistory": "PnL History"
+  "PnlHistory": "PnL History",
+  "max200KB": "Image size cannot exceed 0.2MB"
 }

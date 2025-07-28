@@ -3,6 +3,7 @@ import pnlImg from '@/assets/images/pnl.png'
 const visible = defineModel<boolean>('visible')
 const pnlSetting = defineModel<any>('pnlSetting')
 
+const { t } = useI18n()
 const defaultSettings = {
   chain: 'solana',
   background: pnlImg,
@@ -22,7 +23,7 @@ const supportChains = ['solana', 'bsc']
 
 function beforeUpload(file: File) {
   if (file.size > 200 * 1024) {
-    ElMessage.error('图片大小不能超过0.2MB')
+    ElMessage.error(t('max200KB'))
     return false
   }
   // 这里可以加图片大小/比例校验
@@ -87,17 +88,20 @@ function onConfirm() {
           :style="settings.background ? 'background-image:url(' + settings.background + ')' : ''"
         >
           <div
-            class="flex justify-center mb-6px transition-all duration-300 group-hover/item:opacity-100"
+            class="hidden absolute top-0 left-0 w-full h-full bg-black/40 group-hover/item:block"
+          />
+          <div
+            class="flex relative justify-center mb-6px transition-all duration-300 group-hover/item:opacity-100"
             :class="
-              settings.background ? 'opacity-0 color-[--d-F5F5F5-l-333]' : 'color-[--d-CCC-l-333]'
+              settings.background ? 'opacity-0 color-#F5F5F5' : 'color-[--d-CCC-l-333]'
             "
           >
             <Icon name="custom:upload-cloud" class="text-24px" />
           </div>
           <div
-            class="text-12px lh-18px text-center transition-all duration-300 group-hover/item:opacity-100"
+            class="text-12px relative lh-18px text-center transition-all duration-300 group-hover/item:opacity-100"
             :class="
-              settings.background ? 'opacity-0 color-[--d-F5F5F5-l-333]' : 'color-[--d-999-l-666]'
+              settings.background ? 'opacity-0 color-#F5F5F5' : 'color-[--d-999-l-666]'
             "
           >
             {{ $t('uploadImage') }}
@@ -158,7 +162,9 @@ function onConfirm() {
     />
 
     <div class="flex items-center justify-between mt-40px">
-      <span class="color-[--d-CCC-l-333] text-12px">{{ getChainInfo(settings.chain)?.main_name }}{{ $t('solUsdSwitch') }}</span>
+      <span class="color-[--d-CCC-l-333] text-12px"
+        >{{ getChainInfo(settings.chain)?.main_name }}{{ $t('solUsdSwitch') }}</span
+      >
       <el-switch
         v-model="settings.solUsdSwitch"
         class="[&&]:h-20px"

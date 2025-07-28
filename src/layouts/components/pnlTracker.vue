@@ -202,7 +202,7 @@ function getColorClass(val: string | number) {
   } else if (Number(val) < 0) {
     return 'color-#FF646D'
   } else {
-    return 'color-[--d-F5F5F5-l-333]'
+    return 'color-#F5F5F5'
   }
 }
 
@@ -284,7 +284,7 @@ function resetPnl() {
         <div class="flex flex-1">
           <div class="flex-1 flex flex-col items-center">
             <div
-              class="color-[--d-F5F5F5-l-333] font-bold mb-2px flex items-center gap-4px"
+              class="color-#F5F5F5 font-bold mb-2px flex items-center gap-4px"
               :style="{
                 fontSize: 16 * scale + 'px',
                 lineHeight: 20 * scale + 'px',
@@ -299,7 +299,7 @@ function resetPnl() {
             </div>
             <span
               v-if="pnlSetting.showU"
-              class="color-[--d-F5F5F5-l-333] mb-2px"
+              class="color-#F5F5F5 mb-2px"
               :style="{
                 fontSize: 10 * scale + 'px',
                 lineHeight: 12 * scale + 'px',
@@ -319,7 +319,7 @@ function resetPnl() {
           </div>
           <div class="flex-1 flex flex-col items-center">
             <div
-              class="color-[--d-F5F5F5-l-333] font-bold mb-2px flex items-center gap-4px"
+              class="color-#F5F5F5 font-bold mb-2px flex items-center gap-4px"
               :style="{
                 fontSize: 16 * scale + 'px',
                 lineHeight: 20 * scale + 'px',

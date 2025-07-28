@@ -1142,7 +1142,8 @@
   "solUsdSwitch": "和USD互换",
   "showU": "显示U本位",
   "noHistory": "暂无交易记录",
-  "PnlSetting": "PnL设置",
-  "PnlTracker":"PnL跟踪器",
-  "PnlHistory":"PnL历史"
+  "PnlSetting": "盈亏设置",
+  "PnlTracker":"盈亏追踪器",
+  "PnlHistory":"盈亏历史",
+  "max200KB":"图片大小不能超过0.2MB"
 }
