@@ -43,7 +43,7 @@
           />
         </div>
         <RangePopover
-          v-if="isCanFilter && activeSort !== 0 && sortBy === 'pool_size'"
+          v-if="isCanFilter"
           v-model="popoverVisible"
           :width="225"
           :title="`${$t('liquidity1')}($)`"
