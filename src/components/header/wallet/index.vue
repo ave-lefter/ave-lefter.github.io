@@ -55,7 +55,7 @@
         <div style="flex: 1;" />
         <ul class="tg-wallet-list_footer flex flex-col gap-10px">
           <li class="flex justify-between h-40px px-20px clickable">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px" @click.stop="showVisible = 1">
               <Icon name="custom:wallet2" class="text-16px"/>
               <span class="font-500 text-14px">{{ t('myWallet1') }}</span>
             </div>

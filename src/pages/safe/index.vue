@@ -52,7 +52,7 @@
     </template>
     <template v-else-if="step !== 0 && checkType === 'google'">
       <div class="flex justify-center gap-40px">
-        <div class="w-420px">
+        <div :class="lang?.includes?.('zh') ? 'w-420px' : 'w-500px'">
           <Steps class="mb-40px" :active="bindGoogleAuthStep" :dataSource="[t('bindGoogleAuthStep1'), t('bindGoogleAuthStep2'), t('bindGoogleAuthStep3')]"/>
           <template v-if="step === 1">
             <div class="color-[--d-F5F5F5-l-333] font-400 text-12px mb-40px">
