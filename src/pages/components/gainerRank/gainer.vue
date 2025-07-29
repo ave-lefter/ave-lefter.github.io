@@ -70,6 +70,10 @@ function setFilterForm(...args: any[]) {
 }
 
 const listData = ref<any[]>([])
+
+// 添加缓存系统，参考老项目的 tableDataObj 实现
+const tableDataCache = reactive<Record<string, { data: any[], total: number, timestamp: number }>>({})
+
 const filteredListData = computed(() => {
   if (globalStore.pumpSetting.isBlacklist) {
     return listData.value.filter((el) => !inBlackList(el))
@@ -111,11 +115,31 @@ onActivated(() => {
   isActive.value = true
   filterForm.value = {}
   pageInfo.value.pageNO = 1
-  setTimeout(() => {
-    if (isActive.value) {
-      _getTreasureList()
-    }
-  }, 100)
+  
+  // 检查缓存，优化激活时的体验
+  const cacheKey = getCacheKey()
+  const cachedData = tableDataCache[cacheKey]
+  
+  if (cachedData && (Date.now() - cachedData.timestamp) < 10000) {
+    // 如果有10秒内的缓存数据，立即显示
+    console.log('组件激活使用缓存数据:', cacheKey)
+    listData.value = cachedData.data
+    pageInfo.value.total = cachedData.total
+    
+    // 异步更新数据，不显示loading
+    setTimeout(() => {
+      if (isActive.value) {
+        _getTreasureList(false)
+      }
+    }, 100)
+  } else {
+    // 无缓存或缓存过期，正常加载
+    setTimeout(() => {
+      if (isActive.value) {
+        _getTreasureList()
+      }
+    }, 100)
+  }
 })
 
 onDeactivated(() => {
@@ -130,11 +154,37 @@ onDeactivated(() => {
   })
 })
 
+// 获取缓存键
+function getCacheKey() {
+  const chain = props.activeChain !== 'AllChains' ? props.activeChain : 'AllChains'
+  return `${chain}-gainer`
+}
+
+// 跟踪当前刷新的ID，参考老项目的refreshId机制
+const refreshId = ref('')
+
 watch(
   () => [props.activeChain, localeStore.locale],
   () => {
-    pageInfo.value.pageNO = 1
-    _getTreasureList()
+    const cacheKey = getCacheKey()
+    const cachedData = tableDataCache[cacheKey]
+    
+    // 参考老项目的逻辑：如果缓存存在且时间不超过30秒，直接使用缓存
+    if (cachedData && (Date.now() - cachedData.timestamp) < 30000) {
+      console.log('链切换使用缓存数据:', cacheKey)
+      listData.value = cachedData.data
+      pageInfo.value.total = cachedData.total
+      pageInfo.value.pageNO = 1
+      
+      // 异步刷新数据，但不显示loading
+      setTimeout(() => {
+        _getTreasureList(false)
+      }, 100)
+    } else {
+      // 缓存不存在或过期，正常加载
+      pageInfo.value.pageNO = 1
+      _getTreasureList()
+    }
   }
 )
 
@@ -146,6 +196,24 @@ async function _getTreasureList(shouldLoading = true) {
     if (props.activeTab !== 'gainer') {
       return
     }
+    
+    const cacheKey = getCacheKey()
+    const currentRefreshId = cacheKey
+    
+    // 检查缓存，如果存在且不是首次加载，先显示缓存数据
+    const cachedData = tableDataCache[cacheKey]
+    if (cachedData && !shouldLoading) {
+      // 显示缓存数据，避免loading状态
+      listData.value = cachedData.data
+      pageInfo.value.total = cachedData.total
+      console.log('使用缓存数据:', {
+        cacheKey,
+        total: cachedData.total,
+        count: cachedData.data.length,
+        timestamp: new Date(cachedData.timestamp).toLocaleTimeString()
+      })
+    }
+    
     if (shouldLoading) {
       loading.value = true
     }
@@ -153,13 +221,19 @@ async function _getTreasureList(shouldLoading = true) {
     // 优先使用通用API确保分页功能正常
     const { total: _, ...rest } = pageInfo.value
 
-    // 构建请求参数，只在有值时添加 chain 和 self_address
+    // 构建请求参数
     const requestParams: any = {
-      category: 'gainer',  // 修正为 'gainer'
+      category: 'gainer',
       ...rest,
       ...sortConditions.value,
       ...filterForm.value,
-      // refresh_total: 0,  // 添加刷新总数参数
+    }
+
+    // 实现refresh_total机制 - 参考老项目的逻辑
+    if (currentRefreshId === refreshId.value && pageInfo.value.total > 0) {
+      requestParams.refresh_total = 0  // 不更新总数
+    } else {
+      refreshId.value = currentRefreshId  // 更新refreshId
     }
 
     // 只在 chain 有值时添加
@@ -175,16 +249,30 @@ async function _getTreasureList(shouldLoading = true) {
 
     const res = await getTreasureList(requestParams)
     
-    pageInfo.value.total = res.total
-    listData.value = (res.data || []).map(props.listMapFunction)
+    // 根据refresh_total参数决定是否更新总数
+    if (requestParams.refresh_total !== 0) {
+      pageInfo.value.total = res.total
+    }
+    
+    const processedData = (res.data || []).map(props.listMapFunction)
+    listData.value = processedData
+    
+    // 更新缓存
+    tableDataCache[cacheKey] = {
+      data: processedData,
+      total: res.total,
+      timestamp: Date.now()
+    }
     
     console.log('API数据加载完成:', {
+      cacheKey,
       total: res.total,
-      count: listData.value.length,
+      count: processedData.length,
+      refreshTotal: requestParams.refresh_total,
       sort: sortConditions.value,
-      firstItem: listData.value[0]?.pair,
-      firstPrice: listData.value[0]?.current_price_usd,
-      firstChange: listData.value[0]?.price_change_24h
+      firstItem: processedData[0]?.pair,
+      firstPrice: processedData[0]?.current_price_usd,
+      firstChange: processedData[0]?.price_change_24h
     })
     
     if (shouldLoading) {
@@ -229,7 +317,7 @@ watch(
   () => wsStore.wsResult[WSEventType.PRICE_EXTRA],
   ({ prices }) => {
     // 只有在组件激活时才处理数据
-    if (!isActive.value) return
+    if (!isActive.value || !listData.value.length) return
     
     if (!prices) return
     
@@ -242,29 +330,26 @@ watch(
         }, {})
       : {}
     
-    // 使用相同的数据处理流程
+    // 限制WebSocket更新范围，只更新价格相关字段，避免与API数据冲突
     const updateList = listData.value.map((el) => {
       const item = pricesMap[el.pair + '-' + el.chain]
       if (item) {
-        // 创建更新后的原始数据对象
-        const updatedRawData = {
+        // 只更新价格相关字段，保持其他数据不变
+        return {
           ...el,
           current_price_usd: item.uprice,
           price_change_1m: item.price_change_1m,
-          price_change_15m: item.price_change_15m,
+          price_change_15m: item.price_change_15m, 
           price_change_24h: item.price_change_24h,
           volume_24h: item.volume_24h,
           volume_1h: item.volume_1h,
           volume_15m: item.volume_15m,
           volume_1m: item.volume_1m,
-          // 重新计算市值
-          market_cap: !el.current_price_usd
-            ? 0
-            : ((el.market_cap || 0) / el.current_price_usd) * (item.uprice || 0),
+          // 重新计算市值 - 使用安全的计算方式
+          market_cap: el.current_price_usd && item.uprice
+            ? ((el.market_cap || 0) / el.current_price_usd) * item.uprice
+            : el.market_cap,
         }
-        
-        // 应用相同的数据处理函数确保一致性
-        return props.listMapFunction(updatedRawData)
       }
       return el
     })
@@ -278,7 +363,7 @@ watch(
         const bVal = Number(b[sort]) || 0
         return (bVal - aVal) * sortVal
       })
-      console.log('应用排序:', sort, sort_dir, '更新后条数:', listData.value.length)
+      console.log('WebSocket更新应用排序:', sort, sort_dir, '更新后条数:', listData.value.length)
     } else {
       // 默认按24小时涨幅排序（降序）
       listData.value = updateList.sort((a, b) => {
@@ -286,7 +371,14 @@ watch(
         const bChange = Number(b.price_change_24h) || 0
         return bChange - aChange
       })
-      console.log('应用默认排序(24h涨幅)，更新后条数:', listData.value.length)
+      console.log('WebSocket更新应用默认排序(24h涨幅)，更新后条数:', listData.value.length)
+    }
+    
+    // 同时更新缓存中的数据，保持一致性
+    const cacheKey = getCacheKey()
+    if (tableDataCache[cacheKey]) {
+      tableDataCache[cacheKey].data = [...listData.value]
+      // 不更新timestamp，保持缓存的时间戳作为API更新时间的标记
     }
   }
 )
