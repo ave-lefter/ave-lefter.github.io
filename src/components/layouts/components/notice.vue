@@ -183,6 +183,13 @@ watch(() => botStore.evmAddress, () => {
   immediate: true
 })
 
+watch(() => useLocaleStore().locale, () => {
+  getNoticeList()
+  if (botStore.evmAddress) {
+    _getCompletedLimitTx()
+  }
+})
+
 onMounted(() => {
   getNoticeList()
   getLatestNotice()
