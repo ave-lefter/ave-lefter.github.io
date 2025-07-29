@@ -1199,7 +1199,7 @@
   "step2Tip2":"App Store 应用，点击右上角的头像，退出登录",
   "step2Tip3":"使用已上架地区的 Apple ID 登录",
   "step2Tip4":" 如果提示'无法登录'，可能是您近期切换账号过于频繁。您可以更换 ID,或者几小时后重试。如果 ID 被锁定，则需要进行验证或更换 ID 后再试。",
-  "setp3Title":"安装 App",
-  "setp3Tip1":"登录成功后，会自动跳转至 ID 对应地区的 App Store。在 App Store中搜索“Ave”，点击“GET”即可开始安装。",
-  "setp3Tip2":"回到主页，打开 Ave App。"
+  "step3Title":"安装 App",
+  "step3Tip1":"登录成功后，会自动跳转至 ID 对应地区的 App Store。在 App Store中搜索“Ave”，点击“GET”即可开始安装。",
+  "step3Tip2":"回到主页，打开 Ave App。"
 }
