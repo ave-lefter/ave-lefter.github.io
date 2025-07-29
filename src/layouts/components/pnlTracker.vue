@@ -12,7 +12,7 @@ const pnlBoundingRect = useStorage('pnlBoundingRect', {
   width: 480,
   height: 120,
   x: 250,
-  y: -38,
+  y: 250,
 })
 const pnlSetting = useStorage('pnl-setting', {
   chain: 'solana',
@@ -214,8 +214,7 @@ function resetPnl() {
 
 <template>
   <Draggable
-    class-name="top-0 left-0 fixed draggable"
-    :z="3"
+    class-name="top-0 left-0 fixed draggable z-10000!"
     :initialWidth="pnlBoundingRect.width"
     :initial-height="pnlBoundingRect.height"
     :x="pnlBoundingRect.x"
@@ -260,7 +259,7 @@ function resetPnl() {
             v-tooltip="$t('reset')"
             name="custom:reset2"
             class="cursor-pointer text-12px color-#FFFFFF99"
-            @click.self="resetPnl"
+            @dblclick.self="resetPnl"
           />
           <Icon
             name="material-symbols:close"

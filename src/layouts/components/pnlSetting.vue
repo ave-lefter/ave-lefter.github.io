@@ -46,6 +46,7 @@ function onConfirm() {
 <template>
   <el-dialog
     v-model="visible"
+    :z-index="10001"
     align-center
     :title="$t('PnlSetting')"
     width="360px"
@@ -83,28 +84,52 @@ function onConfirm() {
         :limit="1"
         :before-upload="beforeUpload"
       >
-        <div
-          class="w-320px h-80px bg-cover flex flex-col items-center justify-center group/item"
-          :style="settings.background ? 'background-image:url(' + settings.background + ')' : ''"
-        >
-          <div
-            class="hidden absolute top-0 left-0 w-full h-full bg-black/40 group-hover/item:block"
-          />
-          <div
-            class="flex relative justify-center mb-6px transition-all duration-300 group-hover/item:opacity-100"
-            :class="
-              settings.background ? 'opacity-0 color-#F5F5F5' : 'color-[--d-CCC-l-333]'
-            "
+        <div class="w-320px h-80px bg-cover flex items-center">
+          <img
+            :src="settings.background"
+            alt="background"
+            class="absolute top-0 left-0 w-full h-full object-cover"
+            :style="{
+              filter: `blur(${settings.blur}px) opacity(${settings.opacity}%)`,
+            }"
           >
-            <Icon name="custom:upload-cloud" class="text-24px" />
+          <div class="relative flex-1 flex flex-col items-center">
+            <div class="color-#F5F5F5 font-bold mb-2px flex items-center gap-4px text-16px lh-20px">
+              <ChainToken :chain="settings.chain" :width="16" />
+              {{ settings.solUsdSwitch ? '$1.29' : 1.29 }}
+            </div>
+            <span v-if="settings.showU" class="color-#F5F5F5 mb-2px text-12px lh-16px">
+              $1.29
+            </span>
+            <div class="color-[--d-999-l-666] text-12px lh-16px">
+              {{ $t('balance1') }}
+            </div>
+          </div>
+          <div class="relative flex-1 flex flex-col items-center">
+            <div class="color-#F5F5F5 font-bold mb-2px flex items-center gap-4px text-16px lh-20px">
+              <ChainToken :chain="settings.chain" :width="16" />
+              <span class="color-#12B886"> +{{ settings.solUsdSwitch ? '$1.29' : '1.29' }} </span>
+            </div>
+            <span v-if="settings.showU" class="mb-2px text-12px lh-16px color-#12B886">
+              +$1.29
+            </span>
+            <div class="color-#12B886 text-12px lh-16px">+100%</div>
           </div>
           <div
-            class="text-12px relative lh-18px text-center transition-all duration-300 group-hover/item:opacity-100"
-            :class="
-              settings.background ? 'opacity-0 color-#F5F5F5' : 'color-[--d-999-l-666]'
-            "
+            class="opacity-0 hover:opacity-100 absolute top-0 left-0 w-full h-full bg-black/40 flex flex-col items-center justify-center"
           >
-            {{ $t('uploadImage') }}
+            <div
+              class="flex relative justify-center mb-6px"
+              :class="settings.background ? 'color-#F5F5F5' : 'color-[--d-CCC-l-333]'"
+            >
+              <Icon name="custom:upload-cloud" class="text-24px" />
+            </div>
+            <div
+              class="text-12px relative lh-18px text-center"
+              :class="settings.background ? 'color-#F5F5F5' : 'color-[--d-999-l-666]'"
+            >
+              {{ $t('uploadImage') }}
+            </div>
           </div>
         </div>
       </el-upload>
