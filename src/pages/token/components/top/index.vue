@@ -175,6 +175,55 @@
                 </span>
               </div>
             </template>
+            <div v-if="medias?.length > 0" class="flex text-20px">
+              <div v-for="(item, index) in medias" :key="index" class="tag-btn">
+                <template v-if="item.url">
+                  <span
+                    v-if="item.name === 'QQ'"
+                    v-tooltip="item.url"
+                    class="bg-btn"
+                  >
+                    <Icon
+                      :name="`custom:${item.icon}`"
+                      class="text-[--d-666-l-999] text-12px"
+                    />
+                  </span>
+                  <XPopup v-else-if="item.icon === 'twitter'" :tokenId="(route.params.id as string)" :type="tokenStore.twitterType">
+                    <a
+                      :href="item.url"
+                      target="_blank"
+                      class="bg-btn"
+                      @click.stop
+                    >
+                      <XIcon
+                        v-if="[1, 2, 3].includes(tokenStore.twitterType)"
+                        :type="tokenStore.twitterType"
+                        class="text-12px"
+                      />
+                      <Icon
+                        v-else
+                        :name="`custom:${item.icon}`"
+                        class="text-[--d-666-l-999] text-12px"
+                      />
+                    </a>
+                  </XPopup>
+
+                  <a
+                    v-else
+                    v-tooltip="item.url"
+                    :href="item.url"
+                    target="_blank"
+                    class="bg-btn"
+                    @click.stop
+                  >
+                    <Icon
+                      :name="`custom:${item.icon}`"
+                      class="text-[--d-666-l-999] text-12px"
+                    />
+                  </a>
+                </template>
+              </div>
+            </div>
             <img
               v-if="token?.launchpad"
               v-tooltip="token.launchpad"
@@ -711,6 +760,8 @@ import Top50 from './top50.vue'
 import Run from './run.vue'
 import Check from './check.vue'
 import DeBox from './deBox.vue'
+import XPopup from '~/components/xPopup/index.vue'
+import XIcon from '~/components/xPopup/xIcon.vue'
 import {
   getSymbolDefaultIcon,
   getChainDefaultIcon,

@@ -1,5 +1,5 @@
 <template>
-  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-9999">
+  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-33">
     <div class="left relative">
       <NuxtLink
         v-if="showPrice"
@@ -101,7 +101,7 @@
         <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
           <a target="_blank" class="hover:decoration-underline" href="/privacy.html">{{ $t('privacyPolicy') }}</a>
         </li>
-        
+
       </ul>
       </el-popover>
       <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] mr-8px">

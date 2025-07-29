@@ -2,6 +2,7 @@
 import type {GetSignalV2ListResponse, IActionItem, IActionV3Item} from '~/api/signal'
 import QuickSwapButton from '~/components/quickSwap/quickSwapButton.vue'
 import UserAvatar from '~/components/userAvatar.vue'
+import XIcon from '~/components/xPopup/xIcon.vue'
 
 const props = withDefaults(defineProps<{
   footer?: boolean,
@@ -136,13 +137,20 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
                   item.token.slice(0, 4)
                 }}...{{ item.token.slice(-4) }}</span>
               <Icon v-copy="item.token" name="bxs:copy" class="cursor-pointer text-12px"/>
-              <a
-                :href="item.twitter_url"
-                target="_blank"
-                class="mr-4px w-12px h-12px rounded-2px bg-[--d-1A1A1A-l-F2F2F2] flex items-center justify-center"
-              >
-                <Icon name="custom:twitter" class="text-10px"/>
-              </a>
+              <XPopup v-if="item.twitter_url" :tokenId="item.token + '-' + item.chain" :type="item.twitter_type">
+                <a
+                  :href="item.twitter_url"
+                  target="_blank"
+                  class="mr-4px w-12px h-12px rounded-2px bg-[--d-1A1A1A-l-F2F2F2] flex items-center justify-center clickable"
+                >
+                   <XIcon
+                      v-if="[1, 2, 3].includes(item.twitter_type)"
+                      :type="item.twitter_type"
+                      class="text-12px"
+                    />
+                  <Icon v-else name="custom:twitter" class="text-10px"/>
+                </a>
+              </XPopup>
             </div>
           </div>
         </div>
