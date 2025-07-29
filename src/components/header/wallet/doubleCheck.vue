@@ -402,15 +402,15 @@ async function setChainQr() {
 }
 
 function back() {
-  if (step.value === 0) {
-    emit('update:showVisible', 3)
-  } else if (step.value === 1) {
-    if (timer.value && !email.value) {
-      resetCountdown()
-    }
-    step.value = 0
-  }
-  resetFields()
+  // if (step.value === 0) {
+  //   emit('update:showVisible', 3)
+  // } else if (step.value === 1) {
+  //   if (timer.value && !email.value) {
+  //     resetCountdown()
+  //   }
+  //   step.value = 0
+  // }
+  // resetFields()
 }
 
 function submitForm() {

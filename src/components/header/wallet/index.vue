@@ -88,7 +88,7 @@
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px"/>
             </div>
           </li>
-          <li class="flex justify-between h-40px px-20px clickable">
+          <li class="flex justify-between h-40px px-20px clickable" @click="router.push('/safe');tgWalletVisible = false">
             <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
               <Icon name="custom:shield-check" class="text-16px"/>
               <span class="font-500 text-14px">{{ t('safe') }}</span>
@@ -98,7 +98,7 @@
                 <template v-if="authInfo?.emailAddress && authInfo?.authSetting">
                   <Icon name="mingcute:check-circle-fill" class="text-17px color-#12B886 mt-1px"/>
                    <!-- <Icon name="custom:check-circle" class="text-14px color-#12B886"/>  -->
-                  <span>{{ t('bounded') }}</span>
+                  <span class="color-#12B886">{{ t('bounded') }}</span>
                 </template>
                 <template v-else>
                   <Icon name="mingcute:warning-fill" class="text-17px mt-1px"/>
@@ -191,7 +191,7 @@
           </el-icon>
           <span class="ml-5px">{{ t('withdraw') }}</span>
         </div>
-        <el-form
+        <el-form v-if="authInfo?.emailAddress && authInfo?.authSetting && !authInfo?.transferStatus"
           ref="withdrawFormRef" :model="withdrawForm" :rules="rules" hide-required-asterisk
           class="tg-wallet-list_content" size="large" @submit.prevent="handleWithdraw">
           <div style="padding: 15px 20px 20px;">
@@ -248,7 +248,18 @@
               }}</el-button>
           </div>
         </el-form>
-
+        <div v-else-if="!(authInfo?.emailAddress && authInfo?.authSetting)" class="px-20px py-102px text-center">
+          <Icon name="custom:shield-user-line" class="text-72px"/>
+          <div class="font-500 text-14px lh-100% color-[--d-F5F5F5-l-333] mb-8px">{{ t('2faT1') }}</div>
+          <div class="font-400 text-12px lh-16px color-#999 mb-30px">{{ t('2faP1') }}</div>
+          <el-button type="primary" class="w-full" size="large" @click="router.push('/safe');tgWalletVisible = false">{{ t('bindNow') }}</el-button>
+        </div>
+        <div v-else-if="(authInfo?.emailAddress && authInfo?.authSetting) && authInfo?.transferStatus" class="px-20px py-102px text-center">
+          <Icon name="custom:shield-user-line2" class="text-72px"/>
+          <div class="font-500 text-14px lh-100% color-[--d-F5F5F5-l-333] mb-8px">{{ t('2faT2') }}</div>
+          <div class="font-400 text-12px lh-16px color-#999 mb-30px">{{ t('2faP1') }}</div>
+          <el-button type="primary" class="w-full" size="large" disabled>{{ t('cooling') }}</el-button>
+        </div>
       </div>
       <double-check
         v-if="showVisible === 4" v-model:showVisible="showVisible" :visible="tgWalletVisible"
@@ -279,7 +290,7 @@ const { t } = useI18n()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 // const route = useRoute()
-// const router = useRouter()
+const router = useRouter()
 
 const tgWalletVisible = ref(false)
 const showVisible = ref(0)
