@@ -33,8 +33,6 @@
     </a>
     <div class="flex-1" />
 
-
-
     <el-button
       v-if="!botStore.evmAddress && !walletStore.address"
       text
@@ -132,7 +130,7 @@
             </a>
             <div class="flex justify-between items-center">
               <a
-                href="https://ave.ai/download"
+                href="/download"
                 target="_blank"
                 class="inline-flex h-8 px-6 justify-center items-center text-white text-sm font-medium no-underline rounded bg-[#3F80F7] min-w-[140px] mx-auto"
               >
