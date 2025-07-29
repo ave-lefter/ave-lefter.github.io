@@ -1162,5 +1162,17 @@
   "2faT1": "Only after completing the dual-factor authentication (2FA) binding can you withdraw cash",
   "2faP1": "Enabling two-factor authentication (2FA) will protect your account and funds from security, and it is expected to take effect 12 hours after the initial binding, and withdrawals are prohibited during this period.",
   "2faT2": "Completed binding and waited for effect",
-  "cooling": "Cooling"
+  "cooling": "Cooling",
+  "googleAuth": "Google Verification",
+  "emailAuth": "Email Verification",
+  "emailAuthPlaceholder": "Please enter the verification code",
+  "googleAuthPlaceholder": "Please enter a 6-digit verification code",
+  "toAddress": "Receiving address",
+  "fromAddress": "Payment Address",
+  "gasFee": "Miner's Fee",
+  "network": "Network",
+  "txHash1": "Transaction hash",
+  "blockHeight": "Block height",
+  "withdrawAgain": "Withdraw Again",
+  "trading": "trading"
 }

@@ -191,7 +191,7 @@
           </el-icon>
           <span class="ml-5px">{{ t('withdraw') }}</span>
         </div>
-        <el-form v-if="authInfo?.emailAddress && authInfo?.authSetting && !authInfo?.transferStatus"
+        <el-form v-if="authInfo?.emailAddress && authInfo?.authSetting && authInfo?.transferStatus"
           ref="withdrawFormRef" :model="withdrawForm" :rules="rules" hide-required-asterisk
           class="tg-wallet-list_content" size="large" @submit.prevent="handleWithdraw">
           <div style="padding: 15px 20px 20px;">
@@ -230,7 +230,7 @@
                 inputmode="decimal" clearable placeholder="0.00"
                 @input="value => withdrawForm.amount = value.replace(/\-|[^\d.]/g, '')">
                 <template #suffix>
-                  <span class="color-text-1">{{ getChainInfo(withdrawForm.chain)?.main_name }}</span>
+                  <span class="color-[--d-F5F5F5-l-333]">{{ getChainInfo(withdrawForm.chain)?.main_name }}</span>
                 </template>
               </el-input>
               <div
@@ -244,18 +244,18 @@
             </el-form-item>
             <el-button
               native-type="submit" style="width: 100%; margin-top: 25px" size="large"
-              :color="mode === 'dark' ? '#f5f5f5' : '#333333'" :loading="loadingWithdraw">{{ t('withdraw')
+              type="primary" :loading="loadingWithdraw">{{ t('withdraw')
               }}</el-button>
           </div>
         </el-form>
         <div v-else-if="!(authInfo?.emailAddress && authInfo?.authSetting)" class="px-20px py-102px text-center">
-          <Icon name="custom:shield-user-line" class="text-72px"/>
+          <Icon name="custom:shield-user-line" class="text-72px color-[--d-FCFDFF-l-999] mb-16px"/>
           <div class="font-500 text-14px lh-100% color-[--d-F5F5F5-l-333] mb-8px">{{ t('2faT1') }}</div>
           <div class="font-400 text-12px lh-16px color-#999 mb-30px">{{ t('2faP1') }}</div>
           <el-button type="primary" class="w-full" size="large" @click="router.push('/safe');tgWalletVisible = false">{{ t('bindNow') }}</el-button>
         </div>
-        <div v-else-if="(authInfo?.emailAddress && authInfo?.authSetting) && authInfo?.transferStatus" class="px-20px py-102px text-center">
-          <Icon name="custom:shield-user-line2" class="text-72px"/>
+        <div v-else-if="(authInfo?.emailAddress && authInfo?.authSetting) && !authInfo?.transferStatus" class="px-20px py-102px text-center">
+          <Icon name="custom:shield-user-line2" class="text-72px color-[--d-FCFDFF-l-999] mb-16px"/>
           <div class="font-500 text-14px lh-100% color-[--d-F5F5F5-l-333] mb-8px">{{ t('2faT2') }}</div>
           <div class="font-400 text-12px lh-16px color-#999 mb-30px">{{ t('2faP1') }}</div>
           <el-button type="primary" class="w-full" size="large" disabled>{{ t('cooling') }}</el-button>
@@ -265,6 +265,58 @@
         v-if="showVisible === 4" v-model:showVisible="showVisible" :visible="tgWalletVisible"
         @action="handleWithdraw2" @update:emailCode="(code: string) => emailCode = code"
         @update:authCode="(code: string) => authCode = code" />
+      <div v-show="showVisible === 5" class="tg-wallet-list">
+        <div class="flex-start text-20px tg-wallet-list_title">
+          <el-icon size="24" class="clickable" @click.stop="showVisible = 0">
+            <Back />
+          </el-icon>
+          <span class="ml-5px">{{ t('withdraw') }}</span>
+        </div>
+        <div class="p-20px">
+          <div>
+            <div class="mb-8px h-48px w-48px rounded-[45%] bg-[--d-333-l-F2F2F2] flex-center mx-auto">
+              <el-button v-if="withdrawStatus===0" type="primary" loading text class="[&&]:[--el-mask-color-extra-light:transparent] h-48px w-48px p-0"></el-button>
+              <Icon v-else-if="withdrawStatus===1" name="custom:success"  class="text-16px"/>
+              <Icon v-else name="custom:fail"  class="text-18px"/>
+            </div>
+            <div class="mb-8px font-500 text-14px lh-[100%] tracking-0px text-center">{{ withdrawResult }}</div>
+            <div class="mb-24px font-500 text-20px lh-24px tracking-0px text-center"> 
+              -{{ formatNumber(withdrawForm.amount, 5) }} {{ getChainInfo(withdrawForm.chain)?.main_name }}
+            </div>
+            <ul class="flex flex-col gap-20px mb-30px">
+              <li class="flex-between">
+                <div>{{ t('toAddress') }}</div>
+                <div>{{ billObj.creatorAddress?billObj.creatorAddress?.slice(0, 13) + '...' + billObj.creatorAddress?.slice(-11):'--' }}<Icon v-copy="billObj.creatorAddress" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop /></div>
+              </li>
+              <li class="flex-between">
+                <div>{{ t('fromAddress') }}</div>
+                <div>{{ billObj.transferTo?billObj.transferTo?.slice(0, 13) + '...' + billObj.transferTo?.slice(-11):'--' }}<Icon v-copy="billObj.transferTo" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop /></div>
+              </li>
+              <li class="flex-between">
+                <div>{{ t('gasFee') }}</div>
+                <div>{{ gasFeeVal||'--' }} {{ getChainInfo(withdrawForm.chain)?.main_name }}</div>
+              </li>
+              <li class="flex-between">
+                <div>{{ t('network') }}</div>
+                <div class="flex-end"><img :src="`${token_logo_url}chain/${billObj.chain}.png`" class="rd-50% mr-4px" width="14" lazy alt="">{{ billObj.chain&&getChainInfo(billObj.chain)?.name }}</div>
+              </li> 
+              <li class="flex-between">
+                <div>{{ t('txHash1') }}</div>
+                <div>{{ billObj.txHash?billObj.txHash?.slice(0, 13) + '...' + billObj.txHash?.slice(-11):'--' }}<Icon v-copy="billObj.txHash" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop /></div>
+              </li>
+              <li class="flex-between">
+                <div>{{ t('blockHeight') }}</div>
+                <div>{{ billObj.blockNumber||'--' }}</div>
+              </li>
+              <li class="flex-between">
+                <div>{{ t('time') }}</div>
+                <div>{{ billObj.createTime?formatDate(billObj.createTime, 'YYYY-MM-DD HH:mm:ss'):'--' }}</div>
+              </li>
+            </ul>
+            <el-button class="w-full" size="large" :color="isDark?'#333333':'#F2F2F2'" @click="showVisible = 0">{{ t('withdrawAgain') }}</el-button>
+          </div>
+        </div>
+      </div>
     </div>
   </el-popover>
 </template>
@@ -282,10 +334,10 @@ import { ElMessage, ElMessageBox, ElNotification as ElNotify, type FormInstance 
 import { throttle } from 'lodash-es'
 import QrCodeWithLogo from 'qr-code-with-logo'
 import doubleCheck from './doubleCheck.vue'
-
+// import { getTokensPrice } from '@/api/token'
 
 const { authInfo } =storeToRefs(useUserStore())
-const { mode, token_logo_url } = storeToRefs(useGlobalStore())
+const { mode, token_logo_url ,isDark} = storeToRefs(useGlobalStore())
 const { t } = useI18n()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -326,7 +378,46 @@ const gasFeeObj = ref<{ [key: string]: number }>({
   bsc: 21000000000000,
   base: 452549454000
 })
+const gasFeeVal = ref(0)
 
+const withdrawStatus = ref(0)
+
+const withdrawResult = computed(() => {
+  return [t('trading'),t('tradeSuccess'), t('tradeFail')][withdrawStatus.value]
+})
+const billObj=ref({} as {
+  id?: number,
+  createTime?: string,
+  updateTime?: string,
+  status?: string,
+  batchId?: string,
+  chain?: string,
+  evmAddress?: string,
+  creatorAddress?: string,
+  transferTo?: string,
+  tokenAddress?: string,
+  tokenDecimals?: number,
+  tokenName?: string,
+  tokenSymbol?: string,
+  tgUid?: string,
+  txData?: string,
+  txValue?: string,
+  txGasFeeCap?: string,
+  txGasTipCap?: string,
+  txGasLimit?: number,
+  txToAddress?: string,
+  txNonce?: number,
+  txExtraGas?: number,
+  transferAmount?: string,
+  txSubscriptionId?: string,
+  txHash?: string,
+  blockNumber?: number,
+  blockTime?: number,
+  errorLog?: string,
+  botHost?: string,
+  txGasUsed?: string,
+  ipAddress?: string
+})
 const depositChainInfo = computed(() => {
   return botStore?.userInfo?.addresses?.find?.(i => i?.chain === depositChain.value)
 })
@@ -370,6 +461,9 @@ watch(tgWalletVisible, () => {
   showVisible.value = 0
   emailCode.value = ''
   authCode.value = ''
+  withdrawStatus.value = 0
+  gasFeeVal.value = 0
+  billObj.value = {}
 })
 
 watch(() => depositChainInfo.value?.chain, () => {
@@ -464,7 +558,7 @@ function handleWithdraw() {
       if (withdrawForm?.chain === 'solana') {
         gasFee = gasFee.plus('0.002')
       }
-
+      gasFeeVal.value = gasFee.toNumber()
       const balance = new BigNumber(withdrawChainInfo.value?.balance || 0)
       if (balance.lt(gasFee)) {
         ElMessage.error(t('transferInsufficientBalance', { s: getChainInfo(withdrawForm.chain)?.main_name }))
@@ -506,7 +600,6 @@ function handleWithdraw2() {
         gasTip: 0,
         source: 'web' as const
       }
-
       ElMessageBox.confirm(
         t('confirmWithdraw', {
           amount: amount,
@@ -523,10 +616,13 @@ function handleWithdraw2() {
         loadingWithdraw.value = true
         bot_createSafeTransferTx(data).then(res => {
           if (res) {
+            billObj.value = res?.[0]
             let Timer: ReturnType<typeof setTimeout> | null = setTimeout(() => {
-              ElNotify({ title: 'Success', type: 'success', message: t('withdrawSubmitted') })
+              // ElNotify({ title: 'Success', type: 'success', message: t('withdrawSubmitted') })
+              showVisible.value = 5
+              withdrawStatus.value = 0
             }, 500)
-            tgWalletVisible.value = false
+            // tgWalletVisible.value = false
             loadingWithdraw.value = false
             const unwatch = watch(() => useWSStore().wsResult?.tgbot, (subscribeResult) => {
               const batchId = subscribeResult.batchId
@@ -536,12 +632,15 @@ function handleWithdraw2() {
                   Timer = null
                 }
                 if (subscribeResult?.success) {
-                  ElNotify({ title: 'Success', type: 'success', message: t('withdrawSuccess') })
+                  billObj.value.txHash=subscribeResult.txHash
+                  withdrawStatus.value = 1
+                  // ElNotify({ title: 'Success', type: 'success', message: t('withdrawSuccess') })
                   unwatch()
                   setTimeout(() => {
                     botStore.getUserAllChainBalance()
                   }, 1000)
                 } else {
+                  withdrawStatus.value = 2
                   ElNotify({ title: 'Error', type: 'error', message: formatBotError(subscribeResult.failMessage) || 'Withdraw failed' })
                   unwatch()
                 }
@@ -549,6 +648,7 @@ function handleWithdraw2() {
             })
           }
         }).catch(err => {
+          withdrawStatus.value = 2
           emailCode.value = ''
           authCode.value = ''
           handleBotError(err || 'Withdraw failed')

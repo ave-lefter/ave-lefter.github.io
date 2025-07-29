@@ -686,5 +686,17 @@
   "2faT1": "Chỉ sau khi hoàn thành ràng buộc xác thực nhân tố kép (2FA), bạn mới có thể rút tiền mặt",
   "2faP1": "Kích hoạt xác thực hai yếu tố (2FA) sẽ bảo vệ tài khoản và tiền của bạn khỏi bảo mật và dự kiến sẽ có hiệu lực 12 giờ sau khi ràng buộc ban đầu và việc rút tiền bị cấm trong giai đoạn này.",
   "2faT2": "Hoàn thành ràng buộc và chờ đợi hiệu lực",
-  "cooling": "Làm mát"
+  "cooling": "Làm mát",
+  "googleAuth": "Xác minh Google",
+  "emailAuth": "Xác minh email",
+  "emailAuthPlaceholder": "Vui lòng nhập mã xác minh",
+  "googleAuthPlaceholder": "Vui lòng nhập mã xác minh 6 chữ số",
+  "toAddress": "Nhận địa chỉ",
+  "fromAddress": "Địa chỉ thanh toán",
+  "gasFee": "Phí khai thác",
+  "network": "mạng",
+  "txHash1": "Băm giao dịch",
+  "blockHeight": "Chiều cao khối",
+  "withdrawAgain": "Rút lại",
+  "trading": "giao dịch"
 }

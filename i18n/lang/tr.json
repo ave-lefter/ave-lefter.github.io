@@ -484,5 +484,17 @@
   "2faT1": "Yalnızca çift faktörlü kimlik doğrulama (2FA) bağlamasını tamamladıktan sonra nakit çekebilirsiniz",
   "2faP1": "İki faktörlü kimlik doğrulamanın (2FA) etkinleştirilmesi, hesabınızı ve fonlarınızı güvenlikten koruyacaktır ve ilk bağlanmadan 12 saat sonra yürürlüğe girmesi beklenmektedir ve bu dönemde para çekme işlemleri yasaktır.",
   "2faT2": "Tamamlanmış bağlama ve etki bekledi",
-  "cooling": "Soğutma"
+  "cooling": "Soğutma",
+  "googleAuth": "Google Doğrulama",
+  "emailAuth": "E -posta Doğrulama",
+  "emailAuthPlaceholder": "Lütfen doğrulama kodunu girin",
+  "googleAuthPlaceholder": "Lütfen 6 haneli bir doğrulama kodu girin",
+  "toAddress": "Alıcı adres",
+  "fromAddress": "Ödeme adresi",
+  "gasFee": "Madenci ücreti",
+  "network": "ağ",
+  "txHash1": "İşlem karma",
+  "blockHeight": "Blok yüksekliği",
+  "withdrawAgain": "Tekrar geri çekil",
+  "trading": "ticaret"
 }

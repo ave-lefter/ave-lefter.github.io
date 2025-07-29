@@ -489,5 +489,17 @@
   "2faT1": "Somente após a conclusão da autenticação de fator duplo (2FA), você pode retirar dinheiro",
   "2faP1": "A ativação da autenticação de dois fatores (2FA) protegerá sua conta e fundos da segurança, e espera-se que entre em vigor 12 horas após a ligação inicial, e os retiradas são proibidos durante esse período.",
   "2faT2": "Ligação completa e esperou pelo efeito",
-  "cooling": "Resfriamento"
+  "cooling": "Resfriamento",
+  "googleAuth": "Verificação do Google",
+  "emailAuth": "Verificação de email",
+  "emailAuthPlaceholder": "Por favor, insira o código de verificação",
+  "googleAuthPlaceholder": "Por favor, insira um código de verificação de 6 dígitos",
+  "toAddress": "Endereço de recebimento",
+  "fromAddress": "Endereço de pagamento",
+  "gasFee": "Taxa do mineiro",
+  "network": "rede",
+  "txHash1": "Hash de transação",
+  "blockHeight": "Altura do bloco",
+  "withdrawAgain": "Retire novamente",
+  "trading": "negociação"
 }

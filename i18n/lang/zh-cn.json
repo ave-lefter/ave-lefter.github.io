@@ -1161,5 +1161,17 @@
   "2faT1": "完成双重认证(2FA)绑定后，才能进行提现",
   "2faP1": "启用双重身份验证（2FA）将保护您的账户和资金安全，初次绑定后预计 12小时 生效，在此期间禁止提币。",
   "2faT2": "已完成绑定，待生效",
-  "cooling": "冷却中"
+  "cooling": "冷却中",
+  "googleAuth": "谷歌验证",
+  "emailAuth": "邮箱验证",
+  "emailAuthPlaceholder": "请输入验证码",
+  "googleAuthPlaceholder": "请输入6位数验证码",
+  "toAddress": "收款地址",
+  "fromAddress": "付款地址",
+  "gasFee": "矿工费",
+  "network": "网络",
+  "txHash1": "交易哈希",
+  "blockHeight": "区块高度",
+  "withdrawAgain": "再转一笔",
+  "trading": "交易中"
 }
