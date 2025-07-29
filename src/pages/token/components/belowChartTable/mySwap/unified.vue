@@ -8,6 +8,10 @@
           <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
           <img v-if="mode === 'dark'" src="@/assets/images/empty-black.svg">
           <span>{{ t('emptyNoData') }}</span>
+          <!-- 调试信息 -->
+          <div style="color: red; font-size: 12px; margin-top: 10px;">
+            调试: txHistory长度={{ txHistory?.length || 0 }}, loading={{ loading }}
+          </div>
         </div>
         <span v-else />
       </template>
@@ -349,9 +353,43 @@ const getTxHistory = async () => {
         pageSize: 1000,
         pageNo: 1
       })
-      console.log('链钱包响应:', res)
+      console.log('=== 链钱包API调试 ===')
+      console.log('请求URL: /aveswap/v1/swap/getOrders')
+      console.log('请求参数:', {
+        chain: props.chain,
+        creatorAddress: props.userAddress,
+        token: tokenAddress,
+        mode: 1,
+        onlySuccess: false,
+        pageSize: 1000,
+        pageNo: 1
+      })
+      console.log('API完整响应:', res)
+      console.log('响应状态:', res?.status)
+      console.log('响应消息:', res?.msg)
+      console.log('数据列表:', res?.data?.list)
+      console.log('列表长度:', res?.data?.list?.length || 0)
+      
       // 将链钱包数据映射为表格格式
-      txHistory.value = res.list?.map(mapWalletOrderToTableRow) || []
+      const rawList = res?.data?.list || res?.list || []
+      console.log('提取的原始列表:', rawList)
+      
+      if (rawList.length > 0) {
+        console.log('第一条原始数据示例:', rawList[0])
+        const mappedData = rawList.map(mapWalletOrderToTableRow)
+        console.log('映射后数据:', mappedData)
+        console.log('映射后数据长度:', mappedData.length)
+        if (mappedData.length > 0) {
+          console.log('第一条映射后数据示例:', mappedData[0])
+        }
+        txHistory.value = mappedData
+      } else {
+        console.log('原始列表为空，设置空数组')
+        txHistory.value = []
+      }
+      
+      console.log('最终txHistory.value:', txHistory.value)
+      console.log('最终txHistory长度:', txHistory.value?.length || 0)
     }
   } catch (error) {
     console.error('获取交易历史错误:', error)
@@ -386,8 +424,20 @@ function isBuy(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) {
 
 // 将链钱包数据映射为bot钱包表格格式
 function mapWalletOrderToTableRow(order: any) {
-  const outputAmount = order.outputAmount || 0
-  const inAmount = order.inAmount || 0
+  // 正确转换字符串为数字，API返回的已经是最小单位，无需再乘decimals
+  const outputAmount = parseFloat(order.outputAmount || '0')
+  const inAmount = parseFloat(order.inAmount || '0')
+  const inPrice = parseFloat(order.inPrice || '0')
+  const outPrice = parseFloat(order.outPrice || '0')
+  
+  console.log('=== 数据映射调试 ===')
+  console.log('原始数据:', { 
+    inAmount: order.inAmount, 
+    outputAmount: order.outputAmount,
+    inPrice: order.inPrice,
+    outPrice: order.outPrice
+  })
+  console.log('转换后:', { inAmount, outputAmount, inPrice, outPrice })
   
   return {
     chain: props.chain,
@@ -400,12 +450,13 @@ function mapWalletOrderToTableRow(order: any) {
     outTokenAddress: order.outTokenAddress,
     inTokenDecimals: order.inDecimals,
     outTokenDecimals: order.outDecimals,
-    inPrice: order.inPrice || 0,
-    outPrice: order.outPrice || 0,
-    inValue: inAmount * (order.inPrice || 0),
-    outValue: outputAmount * (order.outPrice || 0),
-    inAmount: inAmount * Math.pow(10, order.inDecimals || 0),
-    outAmount: outputAmount * Math.pow(10, order.outDecimals || 0),
+    inPrice: inPrice,
+    outPrice: outPrice,
+    inValue: inAmount * inPrice,
+    outValue: outputAmount * outPrice,
+    // API返回的金额已经是最小单位，直接使用
+    inAmount: inAmount,
+    outAmount: outputAmount,
     createTime: order.createTime,
     txHash: order.txHash,
     status: order.status,
@@ -417,7 +468,7 @@ onMounted(() => {
   getTxHistory()
 })
 defineExpose({
-  getTxHistory
+  getTxHistory,
 })
 </script>
 
