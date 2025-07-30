@@ -1146,5 +1146,6 @@
   "PnlSetting": "PnL Setting",
   "PnlTracker": "PnL Tracker",
   "PnlHistory": "PnL History",
-  "max200KB": "Image size cannot exceed 0.2MB"
+  "max200KB": "Image size cannot exceed 0.2MB",
+  "dbClickReset": "Double click to reset"
 }

@@ -1145,5 +1145,6 @@
   "PnlSetting": "盈亏设置",
   "PnlTracker":"盈亏追踪",
   "PnlHistory":"盈亏历史",
-  "max200KB":"图片大小不能超过0.2MB"
+  "max200KB":"图片大小不能超过0.2MB",
+  "dbClickReset": "双击重置"
 }

@@ -256,7 +256,7 @@ function resetPnl() {
           class="flex items-center gap-12px opacity-0 group-hover/item:opacity-100 transition-all duration-300"
         >
           <Icon
-            v-tooltip="$t('reset')"
+            v-tooltip="$t('dbClickReset')"
             name="custom:reset2"
             class="cursor-pointer text-12px color-#FFFFFF99"
             @dblclick.self="resetPnl"

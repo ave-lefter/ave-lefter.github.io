@@ -1133,5 +1133,6 @@
   "PnlSetting": "盈虧設置",
   "PnlTracker": "盈虧追蹤器",
   "PnlHistory": "盈虧歷史",
-  "max200KB": "圖片大小不能超過0.2MB"
+  "max200KB": "圖片大小不能超過0.2MB",
+  "dbClickReset": "雙擊重置"
 }
