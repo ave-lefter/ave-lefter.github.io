@@ -3,7 +3,7 @@ import { filterLanguage } from './utils'
 import { useLocalStorage, type RemovableRef } from '@vueuse/core'
 import type { IChartingLibraryWidget, Mark } from '~/types/tradingview/charting_library'
 import { getUserKlineTxTags, getKlineProfilingTags } from '@/api/token'
-import type { WSTx } from './types'
+import type { SimpleWSTx, WSTx } from './types'
 
 type TradeSide = {
   amount: number
@@ -251,30 +251,30 @@ ${formatDate(entry.time, 'YYYY-MM-DD HH:mm')}
     interval,
     user
   }: {
-    tx: WSTx
+    tx: SimpleWSTx
     interval: number
     user: string
   }, _widget: IChartingLibraryWidget | null) {
     const token = tokenStore?.token?.token
     const chain = tokenStore?.token?.chain
     const pair = tokenStore?.pairAddress
-    if (!((token === tx.from_address || token === tx.to_address) && tx.wallet_address === user)) return
-    const type =  tokenStore?.token?.token === tx.to_address ? 'buy' : 'sell'
+    if (!((token === tx.target) && tx.maker === user)) return
+    const type = tx.direction
     const result: TradeData =  {
       time: tx.time,
     }
     if (type === 'buy') {
       result['buy'] = {
-        amount: Number(tx?.to_amount || 0),
+        amount: Number(tx?.target_amt || 0),
         txns: 1,
-        volume: Number(tx?.to_price_usd || 0 ) * Number(tx?.to_amount || 0)
+        volume: Number(tx?.price_u || 0 ) * Number(tx?.target_amt || 0)
       }
     }
     if (type === 'sell') {
       result['sell'] = {
-        amount: Number(tx?.from_amount || 0),
+        amount: Number(tx?.target_amt || 0),
         txns: 1,
-        volume: Number(tx?.from_price_usd || 0 ) * Number(tx?.from_amount || 0)
+        volume: Number(tx?.price_u || 0 ) * Number(tx?.target_amt || 0)
       }
     }
     marksMap.forEach((item, k) => {

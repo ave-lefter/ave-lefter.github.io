@@ -17,7 +17,7 @@ import { getKlineHistoryData } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
 import { switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, buildOrUpdateLastBarFromTx, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark } from './utils'
 import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
-import type { WSTx, KLineBar } from './types'
+import type { WSTx, KLineBar, SimpleWSTx } from './types'
 import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
 import {DefaultHeight} from '~/utils/constants'
@@ -513,9 +513,16 @@ async function initChart() {
         }
         const { address, chain } = getAddressAndChainFromId(token.value)
         const params = [
-          'multi_tx',
-          address,
-          chain
+          'simple_tx',
+          {
+            tks: [
+              {
+                ch: chain,
+                tk: address
+              }
+            ],
+            rt: 'json'
+          }
         ]
         const data = {
           jsonrpc: '2.0',
@@ -634,10 +641,10 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsSto
       return
     }
     const { event, data } = msg
-    if (event === 'tx') {
-      const tx: WSTx = data?.tx
+    if (event === 'simple_tx') {
+      const tx: SimpleWSTx = data?.msg
       const interval = switchResolution(resolution)
-      if (tx.pair_address === pair.value && !tx?.tx_type && !loading) {
+      if (tx.pair === pair.value && !loading) {
         const t = token.value?.replace?.(/-.*$/, '')
         const newBar1 = buildOrUpdateLastBarFromTx(tx, t, lastBar, interval)
         if (newBar1) {

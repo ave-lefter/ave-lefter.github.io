@@ -4,7 +4,7 @@ import WS, { type WSOptions } from '@/utils/ws'
 import { getBestApiDomain } from '@/plugins/api/getApiDomain'
 import { getWSMessage } from '@/utils'
 import { updatePriceFromTx } from '@/utils/txUpdate'
-import type { WSTx } from '~/pages/token/components/kLine/types'
+import type { SimpleWSTx, WSTx } from '~/pages/token/components/kLine/types'
 import { WSEventType } from '~/utils/constants'
 
 export const useWSStore = defineStore('ws', () => {
@@ -30,7 +30,8 @@ export const useWSStore = defineStore('ws', () => {
     [WSEventType.PUMPSTATE]: null,
     [WSEventType.GOLD_SIGNAL]: null,
     [WSEventType.SIGNALSV2_PUBLIC_MONITOR]: null,
-    [WSEventType.PRICE_EXTRA]:null
+    [WSEventType.PRICE_EXTRA]: null,
+    [WSEventType.SIMPLE_TX]: null
   })
 
   // 将 createWebSocket 重命名为 init
@@ -53,8 +54,8 @@ export const useWSStore = defineStore('ws', () => {
         wsResult[event] = data?.msg
       } else if (event === WSEventType.MONITOR) {
         wsResult[event] = data?.msg
-      } else if (event === WSEventType.TX) {
-        const tx: WSTx = data?.tx
+      } else if (event === WSEventType.SIMPLE_TX) {
+        const tx: SimpleWSTx = data?.msg
         // 更新价格 交易数和交易额
         updatePriceFromTx(tx)
         wsResult[event] = data

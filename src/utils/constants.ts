@@ -39,6 +39,7 @@ export const WSEventType = {
   GOLD_SIGNAL: 'gold_signal',
   SIGNALSV2_PUBLIC_MONITOR: 'signalsv2_public_monitor',
   PUBLIC_PORTRAIT: 'public_portrait',
+  SIMPLE_TX: 'simple_tx'
 }
 
 export const MAX_UINT_AMOUNT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'

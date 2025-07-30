@@ -20,6 +20,8 @@ import {useThrottleFn} from '@vueuse/core'
 
 import IconUnknown from '@/assets/images/icon-unknown.png'
 import type {AveTable} from '#components'
+import type { SimpleWSTx } from '../../kLine/types'
+import BigNumber from 'bignumber.js'
 // import type { content } from 'html2canvas/dist/types/css/property-descriptors/content'
 const globalStore = useGlobalStore()
 const $refs = ref({
@@ -273,24 +275,27 @@ function resetCache() {
   wsLiqCache.value.length = 0
 }
 
-watch(() => wsStore.wsResult[WSEventType.TX], data => {
+watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
   if (!data || listStatus.value.loadingTxs || ignoreWs.value) {
     return
   }
-  const {wallet_address, from_address, to_address} = data.tx
+  const simpleWSTx = data.msg as SimpleWSTx
+  const {maker, target} = simpleWSTx
   // 不是当前币种的数据
-  if (from_address !== realAddress.value && to_address !== realAddress.value) {
+  if (target !== realAddress.value) {
     return
   }
-  txCount.value[wallet_address] = (txCount.value[wallet_address] || 0) + 1
-  const { topN, wallet_tag } = getWalletTag(data.tx)
+  txCount.value[maker] = (txCount.value[maker] || 0) + 1
+  const { topN, wallet_tag } = getWalletTag(data.msg)
   const item = {
-    ...data.tx,
+    chain: addressAndChain.value.chain,
+    ...simpleWSTx,
     topN, wallet_tag,
-    senderProfile: JSON.parse(data.tx.profile || '{}'),
-    count: txCount.value[wallet_address],
-    time: Math.min(Math.floor(Date.now() / 1000), data.tx.time),
-    uuid: uuid()
+    count: txCount.value[maker],
+    time: Math.min(Math.floor(Date.now() / 1000), simpleWSTx.time),
+    uuid: uuid(),
+    wallet_address: maker,
+    transaction: simpleWSTx.txhash
   }
   wsPairCache.value.unshift(item)
   if (!isPausedTxs.value) {
@@ -440,7 +445,10 @@ async function _getPairLiq() {
   }
 }
 
-function isBuy(row: GetPairLiqResponse | IGetTokenTxsResponse) {
+function isBuy(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) {
+  if ('direction' in row) {
+    return row.direction === 'buy'
+  }
   if ('from_address' in row) {
     if (
       row.from_address &&
@@ -471,9 +479,12 @@ function getRowColor(row: GetPairLiqResponse | IGetTokenTxsResponse) {
   return isBuy(row) ? 'color-#12B886' : 'color-#FF646D'
 }
 
-function getPrice(row: GetPairLiqResponse | IGetTokenTxsResponse, isShowToken = false) {
+function getPrice(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, isShowToken = false) {
   // route.params。id 同步更改，而接口异步请求，此时更新该值变成了 0
   const tokenAddress = realAddress.value
+  if ('direction' in row) {
+    return row.price_u
+  }
   if ('from_address' in row) {
     if (
       row.from_address &&
@@ -504,7 +515,10 @@ function getPrice(row: GetPairLiqResponse | IGetTokenTxsResponse, isShowToken = 
   return 0
 }
 
-function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse, needPrice = false, isVolUSDT = false) {
+function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, needPrice = false, isVolUSDT = false) {
+  if ('direction' in row) {
+    return Number(row.target_amt || 0)
+  }
   if ('from_address' in row) {
     if (
       row.from_address &&
@@ -531,7 +545,10 @@ function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse, needPrice = f
   return 0
 }
 
-function hasNewAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse) & { senderProfile?: Profile }) {
+function hasNewAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
+  if ('direction' in row) {
+    return row.direction === 'buy' && new BigNumber(row.maker_bal).eq(row.target_amt)
+  }
   if (row?.newTags?.some?.(i => i?.type === '8')) {
     return false
   }
@@ -544,7 +561,10 @@ function hasNewAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse) & { send
   }
 }
 
-function hasClearedAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse) & { senderProfile?: Profile }) {
+function hasClearedAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
+  if ('direction' in row) {
+    return row.direction === 'sell' && new BigNumber(row.maker_bal).eq(0)
+  }
   if (isBuy(row) || row.newTags?.some?.(i => i?.type === '8')) {
     return false
   }
@@ -557,7 +577,10 @@ function hasClearedAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse) & { 
   }
 }
 
-function bigWallet(row: (GetPairLiqResponse | IGetTokenTxsResponse) & { senderProfile?: Profile }) {
+function bigWallet(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
+  if ('maker_eth' in row) {
+    return Number(row.maker_eth || 0) >= 50
+  }
   if (row?.newTags?.some?.(i => i.type === '8')) {
     return false
   }
@@ -920,7 +943,7 @@ const collect = async (row: any,index:number) => {
             :chain="addressAndChain.chain" @confirm="confirmMakersFilter" />
         </template>
         <template #cell-makers="{ row , rowIndex}">
-          <template v-if="['solana', 'bsc'].includes(row.chain) && row.senderProfile">
+          <template v-if="['solana', 'bsc'].includes(row.chain)  && (row.senderProfile || row.maker_bal)">
             <Icon
               v-if="hasNewAccount(row)"
               v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' }}"
@@ -931,6 +954,7 @@ const collect = async (row: any,index:number) => {
               v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:cleared-account" class="mr-3px shrink-0"/>
             <Icon
+              v-if="bigWallet(row)"
               v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:big" class="mr-3px shrink-0"/>
           </template>
@@ -984,7 +1008,7 @@ const collect = async (row: any,index:number) => {
         v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
         :addressAndChain="addressAndChain"
       >
-        <template v-if="['solana', 'bsc'].includes(currentRow.chain) && currentRow.senderProfile">
+        <template v-if="['solana', 'bsc'].includes(currentRow.chain) && (currentRow.senderProfile || currentRow.maker_bal)">
           <Icon
             v-if="hasNewAccount(currentRow)"
             v-tooltip.raw="`<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`" name="custom:new-account"
