@@ -650,6 +650,18 @@ export function bot_getTransferGasFee(params: { chain: BotChain} | undefined) {
   })
 }
 
+// 功能说明：查询转账交易状态
+// url: /swap/getTransfer GET
+// 行为：根据链，batchId，查询交易结果
+// 校验：校验 access token
+export function bot_getTransfer(params: { chain: BotChain,batchId: string|number} | undefined) {
+  const { $api } = useNuxtApp()
+  return $api('/botapi/swap/getTransfer', {
+    method: 'get',
+    query: params
+  })
+}
+
 export interface IGetMarketCompletedLimitResponse {
   id: number;
   status: string;
