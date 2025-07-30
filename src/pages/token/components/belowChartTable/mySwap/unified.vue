@@ -240,6 +240,10 @@ const currentChain = computed(() => {
   }
 })
 
+const currentTokenAddress = computed(() => {
+  return props.currentToken ? String(route.params.id).split('-')[0] : ''
+})
+
 const filterConditions = ref<any>({
   isLimit: undefined,
   isBuy: undefined,
@@ -253,43 +257,30 @@ const tableHeight = computed(() => {
   return Math.max(tokenStore.commonHeight - 360, 450)
 })
 
-// const isUnit = ref(true)
 
 // 验证链和地址格式是否匹配
 function validateChainAddress(chain: string, address: string) {
   if (!chain || !address) {
-    console.warn('链或地址为空:', { chain, address })
     return false
   }
   
   // 验证地址格式与链匹配
   if (chain === 'solana') {
     const isValid = address.length > 30 && !address.startsWith('0x')
-    if (!isValid) {
-      console.warn('Solana地址格式不正确:', address)
-    }
     return isValid
   } else if (['bsc', 'ethereum', 'polygon', 'arbitrum', 'base'].includes(chain)) {
     const isValid = address.startsWith('0x') && address.length === 42
-    if (!isValid) {
-      console.warn('EVM地址格式不正确:', address)
-    }
     return isValid
   }
   
-  // 其他链暂时返回true
   return true
 }
 
-watch([() => currentChain.value, () => props.userAddress, () => props.currentToken], ([newChain, newAddress, newCurrentToken]) => {
-
-  
+watch([() => currentChain.value, () => props.userAddress, () => props.currentToken, () => route.params.id], ([newChain, newAddress]) => {
   if (validateChainAddress(newChain, newAddress)) {
     nextTick(() => {
       getTxHistory()
     })
-  } else {
-    console.warn('链和地址格式不匹配，跳过API调用:', { chain: newChain, address: newAddress })
   }
 }, { immediate: true })
 
@@ -359,7 +350,7 @@ const getTxHistory = async () => {
         pageSize: 1000,
         chain: apiChain,
         walletAddress: props.userAddress,
-        token: props.currentToken ? String(route.params.id).split('-')[0] : '',
+        token: currentTokenAddress.value,
         timeSort: true,
         tradeVolumeSort: false,
         isSuccess: false,
@@ -373,7 +364,7 @@ const getTxHistory = async () => {
       txHistory.value = res || []
     } else {
       // 链钱包使用新接口
-      const tokenAddress = props.currentToken ? String(route.params.id).split('-')[0] : ''
+      const tokenAddress = currentTokenAddress.value
       
       const res = await wallet_getOrders({
         chain: apiChain,
