@@ -7,7 +7,7 @@
         <div class="w-[55%]" ata-aos="fade-left">
           <img
             class="w-[115%] block mt[-65px]"
-            :src="getImgUrlBylang('/_nuxt/assets/images/download/mask-group-en.jpg')"
+            :src="getImgUrlBylang('/download/mask-group-en.jpg')"
           >
         </div>
         <div class="container mx-auto w-[45%]" ata-aos="fade-right">
@@ -33,7 +33,7 @@
                     class="bg-[#161926] text-sm text-white flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <img
-                      src="@/assets/images/download/vector-9.svg"
+                      src="/download/vector-9.svg"
                       alt="TestFlight"
                       class="w-5 h-5 mr-2"
                     >
@@ -49,7 +49,7 @@
                     class="bg-[#161926] text-sm text-white flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <img
-                      src="@/assets/images/download/frame-1.svg"
+                      src="/download/frame-1.svg"
                       alt="Google Play"
                       class="w-5 h-5 mr-2"
                     >
@@ -60,7 +60,7 @@
                     class="bg-[#161926] text-white text-sm flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <img
-                      src="@/assets/images/download/vector-6.svg"
+                      src="/download/vector-6.svg"
                       alt="Android APK"
                       class="w-5 h-5 mr-2"
                     >
@@ -104,13 +104,13 @@
             <div class="col-span-11 mt-5">
               <h2 class="text-base mb-2">{{ $t('downloadByScanCode') }}</h2>
               <img
-                src="@/assets/images/download/1-1040045937-171-85-3-1000342829-2aa8d298ea104cbef30a3b8a5e449fd-1.png"
+                src="/download/1-1040045937-171-85-3-1000342829-2aa8d298ea104cbef30a3b8a5e449fd-1.png"
                 alt="QR Code"
                 class="w-26 h-26 bg-white rounded-lg"
               >
               <NuxtLink to="/download/help" class="flex items-center mt-2 text-xs hover:underline">
                 <img
-                  src="@/assets/images/download/frame-4.svg"
+                  src="/download/frame-4.svg"
                   alt="Tutorial"
                   class="w-5 h-5 mr-2"
                 >
@@ -136,7 +136,7 @@
               </div>
               <div class="h-320px overflow-hidden rounded-t-lg">
                 <img
-                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-6-en.png')"
+                  :src="getImgUrlBylang('/download/image-6-en.png')"
                   alt="Feature 1"
                   class="w-full rounded-lg"
                 >
@@ -148,7 +148,7 @@
                 <div class="flex items-cente">
                   <img
                     class="bg-white w-11 h-11 rounded-full bg-opacity-10 mr-2"
-                    src="@/assets/images/download/union.svg"
+                    src="/download/union.svg"
                     alt="AI Icon"
                   >
                   <div class="text-left">
@@ -172,7 +172,7 @@
               </div>
               <div class="h-320px overflow-hidden rounded-t-lg">
                 <img
-                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-6-1-en.png')"
+                  :src="getImgUrlBylang('/download/image-6-1-en.png')"
                   alt="Feature 2"
                   class="w-full rounded-lg mb-[-2px]"
                 >
@@ -183,7 +183,7 @@
               >
                 <div class="flex items-center">
                   <img
-                    src="@/assets/images/download/vector-18.svg"
+                    src="/download/vector-18.svg"
                     alt="Signal Icon"
                     class="bg-white w-11 h-11 bg-opacity-10 rounded-full mr-2"
                   >
@@ -205,7 +205,7 @@
               </div>
               <div class="h-320px overflow-hidden">
                 <img
-                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-6-2-en.png')"
+                  :src="getImgUrlBylang('/download/image-6-2-en.png')"
                   alt="Feature 3"
                   class="w-full rounded-lg"
                 >
@@ -217,7 +217,7 @@
                 <div class="flex items-center">
                   <img
                     class="bg-white w-11 h-11 bg-opacity-10 rounded-full mr-2"
-                    src="@/assets/images/download/token.svg"
+                    src="/download/token.svg"
                     alt="AI Icon"
                   >
                   <div class="text-left">
@@ -243,21 +243,21 @@
               </div>
               <div class="grid grid-cols-3 gap-4">
                 <img
-                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-4-en.png')"
+                  :src="getImgUrlBylang('/download/image-4-en.png')"
                   alt="Safety Feature 1"
                   class="rounded-lg w-full origin-center rotate-15 mt-[10px] block"
                   data-aos-duration="500"
                   data-aos="fade-up"
                 >
                 <img
-                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-8-en.png')"
+                  :src="getImgUrlBylang('/download/image-8-en.png')"
                   alt="Safety Feature 2"
                   class="rounded-lg w-full origin-bottom rotate-12 mt-[-20px] block"
                   data-aos="fade-in-up"
                   data-aos-duration="1000"
                 >
                 <img
-                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-4-1-en.png')"
+                  :src="getImgUrlBylang('/download/image-4-1-en.png')"
                   alt="Safety Feature 3"
                   class="rounded-lg w-full origin-center rotate-13 mt-[10px] block"
                   data-aos="fade-up"
@@ -268,7 +268,7 @@
             <div class="w-[30%] p-l-18">
               <div class="h-380px overflow-hidden ">
                 <img
-                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-2-en.png')"
+                  :src="getImgUrlBylang('/download/image-2-en.png')"
                   alt="App Screenshot"
                   class="w-full rounded-t-lg"
                   data-aos="fade-right"
@@ -292,7 +292,7 @@
                 >
                   <h3 class="text-base font-normal mb-4">{{ $t('buyAndSellTitle1') }}</h3>
                   <img
-                    :src="getImgUrlBylang('/_nuxt/assets/images/download/image-6-3-en.png')"
+                    :src="getImgUrlBylang('/download/image-6-3-en.png')"
                     alt="Trading Feature 1"
                     class="w-full rounded-lg"
                   >
@@ -304,7 +304,7 @@
                 >
                   <h3 class="text-base font-normal mb-4">{{ $t('buyAndSellTitle2') }}</h3>
                   <img
-                    :src="getImgUrlBylang('/_nuxt/assets/images/download/image-7-en.png')"
+                    :src="getImgUrlBylang('/download/image-7-en.png')"
                     alt="Trading Feature 2"
                     class="w-full rounded-lg"
                   >
@@ -316,7 +316,7 @@
                 >
                   <h3 class="text-base font-normal mb-4">{{ $t('buyAndSellTitle3') }}</h3>
                   <img
-                    :src="getImgUrlBylang('/_nuxt/assets/images/download/image-8-1-en.png')"
+                    :src="getImgUrlBylang('/download/image-8-1-en.png')"
                     alt="Trading Feature 3"
                     class="w-full rounded-lg"
                   >
@@ -336,7 +336,7 @@
               </div>
               <div class="h-445px overflow-hidden mx-90px">
                 <img
-                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-6-4-en.png')"
+                  :src="getImgUrlBylang('/download/image-6-4-en.png')"
                   alt="Wallet Insights"
                   class="w-full rounded-lg"
                   data-aos="fade-down"
@@ -352,42 +352,42 @@
               </div>
               <div class="flex justify-center space-x-4 mb-8 text-center">
                 <img
-                  src="@/assets/images/download/image.png"
+                  src="/download/image.png"
                   alt="Wallet 1"
                   class="w-10 h-10 rounded-full"
                   data-aos="fade-up"
                   data-aos-duration="50"
                 >
                 <img
-                  src="@/assets/images/download/image-1.png"
+                  src="/download/image-1.png"
                   alt="Wallet 2"
                   class="w-10 h-10 rounded-full"
                   data-aos="fade-up"
                   data-aos-duration="100"
                 >
                 <img
-                  src="@/assets/images/download/image-3.png"
+                  src="/download/image-3.png"
                   alt="Wallet 3"
                   class="w-10 h-10 rounded-full"
                   data-aos="fade-up"
                   data-aos-duration="150"
                 >
                 <img
-                  src="@/assets/images/download/image-5.png"
+                  src="/download/image-5.png"
                   alt="Wallet 4"
                   class="w-10 h-10 rounded-full"
                   data-aos="fade-up"
                   data-aos-duration="200"
                 >
                 <img
-                  src="@/assets/images/download/image-9.png"
+                  src="/download/image-9.png"
                   alt="Wallet 5"
                   class="w-10 h-10 rounded-full"
                   data-aos="fade-up"
                   data-aos-duration="250"
                 >
                 <img
-                  src="@/assets/images/download/image-10.png"
+                  src="/download/image-10.png"
                   alt="Wallet 6"
                   class="w-10 h-10 rounded-full"
                   data-aos="fade-up"
@@ -401,7 +401,7 @@
               </div>
               <div class="h-370px overflow-hidden mx-60px">
                 <img
-                  :src="getImgUrlBylang('/_nuxt/assets/images/download/frame-1912056040-en.svg')"
+                  :src="getImgUrlBylang('/download/frame-1912056040-en.svg')"
                   alt="Wallet System"
                   class="w-full"
                   data-aos="fade-down"
@@ -424,7 +424,7 @@
             <div class="grid grid-cols-10 gap-7 text-sm" data-aos="fade-up">
               <div class="text-center">
                 <img
-                  src="@/assets/images/download/-------1.svg"
+                  src="/download/-------1.svg"
                   alt="金狗"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -432,7 +432,7 @@
               </div>
               <div class="text-center">
                 <img
-                  src="@/assets/images/download/------1-1.svg"
+                  src="/download/------1-1.svg"
                   alt="潜力榜"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -440,7 +440,7 @@
               </div>
               <div class="text-center">
                 <img
-                  src="@/assets/images/download/fill-1-1.svg"
+                  src="/download/fill-1-1.svg"
                   alt="大额买入"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -448,7 +448,7 @@
               </div>
               <div class="text-center">
                 <img
-                  src="@/assets/images/download/---5.svg"
+                  src="/download/---5.svg"
                   alt="抽地毯"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -468,7 +468,7 @@
               </div>
               <div class="text-center">
                 <img
-                  src="@/assets/images/download/---4.svg"
+                  src="/download/---4.svg"
                   alt="暴跌"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -476,7 +476,7 @@
               </div>
               <div class="text-center">
                 <img
-                  src="@/assets/images/download/---3.svg"
+                  src="/download/---3.svg"
                   alt="暴涨"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -484,7 +484,7 @@
               </div>
               <div class="text-center">
                 <img
-                  src="@/assets/images/download/---6.svg"
+                  src="/download/---6.svg"
                   alt="高换手"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -492,7 +492,7 @@
               </div>
               <div class="text-center">
                 <img
-                  src="@/assets/images/download/fill-1-1.svg"
+                  src="/download/fill-1-1.svg"
                   alt="大额买入"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -646,14 +646,6 @@
   import Footer from './components/footer'
   import AOS from 'aos'
   import 'aos/dist/aos.css'
-
-  const getImgUrlBylang = (url)=>{
-    if(useLocaleStore().locale == 'en'){
-      return url
-    }
-    url = url.replace('-en.', '.')
-    return url
-  }
   onMounted(() => {
     AOS.init({
       offset: 150,
@@ -665,6 +657,13 @@
       anchorPlacement: 'top-bottom',
     })
   })
+  const getImgUrlBylang = (url)=>{
+    if(useLocaleStore().locale == 'en'){
+      return url
+    }
+    url = url.replace('-en.', '.')
+    return url
+  }
 </script>
 <style scoped lang="scss">
 </style>

@@ -122,20 +122,19 @@
               class="flex items-center no-underline mb-4 hover:opacity-100"
             >
               <img
-                src="@/assets/images/download/frame-1.svg"
+                src="/download/frame-1.svg"
                 alt="Google Play"
                 class="w-5 h-5 mr-2"
               >
               <span class="text-[var(--a-text-1-color)] text-base leading-5">Google Play</span>
             </a>
             <div class="flex justify-between items-center">
-              <a
-                href="/download"
-                target="_blank"
-                class="inline-flex h-8 px-6 justify-center items-center text-white text-sm font-medium no-underline rounded bg-[#3F80F7] min-w-[140px] mx-auto"
-              >
-                {{ $t('moreOptions') || 'More Options' }}
-              </a>
+               <NuxtLink
+                  to="/download"
+                  class="inline-flex h-8 px-6 justify-center items-center text-white text-sm font-medium no-underline rounded bg-[#3F80F7] min-w-[140px] mx-auto"
+                >
+                 {{ $t('moreOptions') || 'More Options' }}
+                </NuxtLink>
             </div>
           </div>
         </div>
