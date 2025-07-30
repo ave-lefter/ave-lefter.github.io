@@ -110,15 +110,17 @@ export function getTimeline(chain: string, time_interval?: number): Promise<ITim
 }
 
 export interface ITopSignal {
-  first_signal_time: number;
-  last_signal_time: number;
-  max_price_change: string;
-  history_count: number;
-  token: string;
-  chain: string;
-  day_high_price: string;
+  symbol:             string;
+  logo_url:           string;
+  first_signal_time:  number;
+  last_signal_time:   number;
+  max_price_change:   string;
+  history_count:      number;
+  token:              string;
+  chain:              string;
+  day_high_price:     string;
   first_signal_price: string;
-  first_signal_mc: string;
+  first_signal_mc:    string;
 }
 
 /**

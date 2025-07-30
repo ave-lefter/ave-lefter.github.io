@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useStorage } from '@vueuse/core'
 import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
 import newRank from './components/newRank/new.vue'
@@ -27,9 +28,9 @@ const components = {
   xstocks: activityComponent,
   volume: activityComponent,
 }
-const activeTab = shallowRef<keyof typeof components>('hot')
-const activeSubTab = shallowRef('pump_in_hot')
-const activeChain = shallowRef('AllChains')
+const activeTab = useStorage<keyof typeof components>('rankActiveTab', 'hot')
+const activeSubTab = useStorage('rankSubTab','pump_in_hot')
+const activeChain = useStorage('rankChain', 'AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
 const categories = computed(() => {
   return chains.value.find((el) => el.net_name === activeChain.value)?.categories || []

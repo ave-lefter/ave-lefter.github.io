@@ -120,13 +120,15 @@ const activeCategory1 = computed(() => filterConditions.value.category)
 const activeInterval = computed(() => intervalFilter?.value['global_interval'] || '7D')
 
 async function setDialogVisible() {
-  dialogValues.value.visible = true
-  dialogValues.value.loading = true
-  try {
-    const res = await getTopSignal()
-    dialogValues.value.list = res || []
-  } finally {
-    dialogValues.value.loading = false
+  dialogValues.value.visible = !dialogValues.value.visible
+  if(dialogValues.value.visible && dialogValues.value.list.length === 0){
+    dialogValues.value.loading = true
+    try {
+      const res = await getTopSignal()
+      dialogValues.value.list = res || []
+    } finally {
+      dialogValues.value.loading = false
+    }
   }
 }
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
@@ -586,7 +588,7 @@ function handleFilterConfirm(val) {
   getSmartList()
 }
 function handleSort(val:string, dir: string) {
-  let currentForm = filterFormObj.value[activeChain2.value + '-' + activeCategory1.value]
+  const currentForm = filterFormObj.value[activeChain2.value + '-' + activeCategory1.value]
   if (val.type === 'profit_percent_num') {
     const profit_obj = currentForm?.['profit_percent_num']?.profit_obj
     for (const i in profit_obj) {
@@ -705,7 +707,7 @@ function switchChain(chain: string) {
               class="w-16px h-16px rounded-full opacity-60"
               :src="`${configStore.token_logo_url}chain/${value}.png`"
               alt=""
-            />
+            >
             {{ label }}
           </div>
         </div>
@@ -734,7 +736,7 @@ function switchChain(chain: string) {
               class="w-16px h-16px rounded-full opacity-60"
               :src="`${configStore.token_logo_url}chain/${value}.png`"
               alt=""
-            />
+            >
             {{ label }}
           </div>
         </div>
@@ -745,6 +747,8 @@ function switchChain(chain: string) {
       v-if="activeTab == 'activity'"
       :activeChain="activeChain"
       :quickBuyValue="quickBuyValue"
+      :dialogValues="dialogValues"
+      @close="dialogValues.visible = false"
     />
     <KOL
       v-else
@@ -765,88 +769,6 @@ function switchChain(chain: string) {
       :activeInterval="activeInterval"
       @handleSortChange="handleSortChange"
     />
-    <el-dialog
-      v-model="dialogValues.visible"
-      :title="$t('SignalTopList')"
-      append-to-body
-      width="540px"
-      :class="`[--el-message-close-size:24px]`"
-    >
-      <el-table
-        row-class-name="[--el-table-tr-bg-color:--d-222-l-FFF]"
-        :data="dialogValues.list"
-        :height="400"
-      >
-        <el-table-column
-          :width="60"
-          type="index"
-          :label="$t('ranking')"
-          label-class-name="text-12px color-[--d-666-l-999] text-center"
-          class-name="text-center!"
-        >
-          <template #default="{ $index }">
-            <img v-if="$index + 1 === 1" src="@/assets/images/111.svg" />
-            <img v-else-if="$index + 1 === 2" src="@/assets/images/222.svg" />
-            <img v-else-if="$index + 1 === 3" src="@/assets/images/333.svg" />
-            <div v-else class="text-12px color-[--d-666-l-999]">{{ $index + 1 }}</div>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('token')" label-class-name="text-12px color-[--d-666-l-999]">
-          <template #default="{ row }">
-            <div
-              class="flex items-center text-12px gap-8px cursor-pointer"
-              @click="navigateTo(`/token/${row.token}-${row.chain}`)"
-            >
-              <TokenImg
-                chain-class="hidden"
-                :row="{
-                  chain: row.chain,
-                  symbol: row.symbol,
-                  logo_url: row.logo_url,
-                }"
-              />
-              <span class="shrink-0 whitespace-nowrap text-ellipsis overflow-hidden max-w-80px">{{
-                row.symbol
-              }}</span>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          width="100"
-          :label="$t('firstSignal')"
-          label-class-name="text-12px color-[--d-666-l-999]"
-        >
-          <template #default="{ row }">
-            <span class="color-[--d-FFF-l-222] text-12px">{{
-              formatDate(row.first_signal_time, 'HH:mm:ss')
-            }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          width="100"
-          :label="$t('firstMarketCap')"
-          label-class-name="text-12px color-[--d-666-l-999]"
-        >
-          <template #default="{ row }">
-            <span class="color-[--d-FFF-l-222] text-12px">
-              ${{ formatNumber(row.first_signal_mc, 2) }}</span
-            >
-          </template>
-        </el-table-column>
-        <el-table-column
-          width="100"
-          align="right"
-          :label="$t('MaximumIncrease')"
-          label-class-name="text-12px color-[--d-666-l-999]"
-        >
-          <template #default="{ row }">
-            <div class="text-20px text-right color-#12B886">
-              {{ parseInt(row.max_price_change) }}x
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-dialog>
   </div>
 </template>
 

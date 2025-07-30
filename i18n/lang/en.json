@@ -1133,5 +1133,8 @@
   "quickBuyclipboard": "Clipboard Quick Buy",
   "addChain": "Add Chain",
   "myFavoriteChain": "My favorite chain",
-  "unDelete": "Can't delete"
+  "unDelete": "Can't delete",
+  "firstSignal2": "1st Sig",
+  "firstMarketCap2": "MC{'@'}Entry",
+  "MaximumIncrease2": "Peak %"
 }
