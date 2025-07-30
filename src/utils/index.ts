@@ -927,3 +927,29 @@ export function getFeeIn(bestRoute: { fee_index?: number; feeIn?: number }, chai
   }
   return String(bestRoute.feeIn ?? '2')
 }
+
+export function setRefCodeToCookie() {
+  // 设置到一级域名下并设置过期时间为永不过期
+  const domain = location.hostname
+  const queryString = location.search
+  const params = new URLSearchParams(queryString)
+  const ref = params.get('ref') || params.get('code') || Cookies.get('refCode') || ''
+  // category utm_source eid pid
+  // let category = params.get('category') || ''
+  const utm_source = params.get('utm_source') || ''
+  const eid = params.get('eid') || ''
+  const pid = params.get('pid') || ''
+  if (ref) {
+    // 设计过期时间为 12 小时
+    document.cookie = `refCode=${ref};domain=${domain};path=/;expires=${new Date(Date.now() + 12 * 60 * 60 * 1000).toUTCString()}`
+  }
+  if (utm_source || eid || pid || ref) {
+      Cookies.set('refInfo', JSON.stringify({
+        utm_source,
+        eid,
+        pid,
+        code: ref,
+        // id: id
+      }), { expires: 0.5 })
+  }
+}
