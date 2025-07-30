@@ -910,8 +910,8 @@ export async function wallet_getOrders(query: {
   token?: string
   mode: number // 0: 当前委托, 1: 历史交易
   onlySuccess?: boolean
-  pageSize: number
-  pageNo: number
+  pageSize?: number
+  pageNo?: number
 }): Promise<WalletOrdersResponse> {
   const { $api } = useNuxtApp()
   return $api('/aveswap/v1/swap/getOrders', {

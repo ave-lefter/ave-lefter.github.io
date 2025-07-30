@@ -381,8 +381,8 @@ const getTxHistory = async () => {
         token: tokenAddress,
         mode: 1, // 历史交易
         onlySuccess: false,
-        pageSize: 1000,
-        pageNo: 1
+        // pageSize: 1000,
+        // pageNo: 1
       })
       
       const rawList = res?.data?.list || []
@@ -446,8 +446,8 @@ function mapWalletOrderToTableRow(order: any) {
     outTokenDecimals: order.outDecimals,
     inPrice: inPrice,
     outPrice: outPrice,
-    inValue: inAmount * inPrice,
-    outValue: outputAmount * outPrice,
+    inValue: inAmount * inPrice / (10 **  order.inDecimals),
+    outValue: outputAmount * outPrice / (10 **  order.inDecimals),
     inAmount: inAmount,
     outAmount: outputAmount,
     createTime: order.createTime,
