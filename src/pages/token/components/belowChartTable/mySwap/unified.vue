@@ -8,10 +8,6 @@
           <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
           <img v-if="mode === 'dark'" src="@/assets/images/empty-black.svg">
           <span>{{ t('emptyNoData') }}</span>
-          <!-- 调试信息 -->
-          <div style="color: red; font-size: 12px; margin-top: 10px;">
-            调试: txHistory长度={{ txHistory?.length || 0 }}, loading={{ loading }}
-          </div>
         </div>
         <span v-else />
       </template>
