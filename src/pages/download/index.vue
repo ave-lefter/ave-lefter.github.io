@@ -2,25 +2,27 @@
   <div class="w-full h-full bg-[#000]! color-white!">
     <main class="container mx-auto w-full px-4 text-base">
       <section
-        class="hero flex items-center pt-[80px]"
+        class="hero flex items-center pt-[40px]"
       >
-        <div class="w-[55%] overflow-hidden" ata-aos="fade-left">
-          <img class="w-[105%] block mt[-52px]"  src="@/assets/images/download/mask-group.jpg">
+        <div class="w-[55%]" ata-aos="fade-left">
+          <img
+            class="w-[115%] block mt[-65px]"
+            :src="getImgUrlBylang('/_nuxt/assets/images/download/mask-group-en.jpg')"
+          >
         </div>
-        <div class="container mx-auto px-4 w-[45%]" ata-aos="fade-right">
+        <div class="container mx-auto w-[45%]" ata-aos="fade-right">
           <div class="max-w-2xl">
-            <h1 class="text-5xl font-bold mb-4 mt-10">{{$t("downloadAve")}}</h1>
-            <p class="text-base text-[#b7bdc6] mb-10">{{ $t('downloadSubtitle') }}</p>
-
+            <h1 class="text-5xl font-bold mb-1 mt-10 ml-[-2px]">{{$t("downloadAve")}}</h1>
+            <p class="text-sm text-[#b7bdc6] mb-6">{{ $t('downloadSubtitle') }}</p>
             <div class="grid grid-cols-24 gap-8">
-              <div class="col-span-11 ">
+              <div class="col-span-6 ">
                 <h2 class="text-base mb-2">IOS</h2>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid gap-4">
                   <a
                     href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
-                    <svg class="w-6 h-6 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-5 h-5 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M17.1148 13.405C17.084 8.86378 19.6359 8.74626 19.7506 8.67351C18.3152 6.57498 16.0824 6.24481 15.2877 6.21403C13.3878 6.02097 11.5803 7.31086 10.615 7.31086C9.65245 7.31086 8.1639 6.21123 6.5886 6.23921C4.51805 6.26999 2.60698 7.43957 1.53813 9.29467C-0.613561 13.0301 0.986919 18.5618 3.08545 21.5893C4.10953 23.0722 5.33228 24.7371 6.93835 24.6783C8.48287 24.6167 9.06766 23.6766 10.9368 23.6766C12.8058 23.6766 13.3291 24.6783 14.9659 24.6447C16.628 24.614 17.6828 23.1338 18.6985 21.6452C19.8765 19.9244 20.3606 18.3435 20.3885 18.2596C20.3522 18.2428 17.1456 16.4325 17.112 13.405H17.1148Z" fill="white"/>
                       <path d="M10.4521 6.37108C10.4521 3.00224 13.183 0.268555 16.5547 0.268555C16.5547 3.64019 13.821 6.37108 10.4521 6.37108Z" fill="white"/>
                     </svg>
@@ -28,7 +30,7 @@
                   </a>
                   <a
                     href="https://testflight.apple.com/join/BZ3XHS5f"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <img
                       src="@/assets/images/download/vector-9.svg"
@@ -38,12 +40,13 @@
                     <span>TestFlight</span>
                   </a>
                 </div>
-
-                <h2 class="text-base mb-2 mt-4">Android</h2>
-                <div class="grid grid-cols-2 gap-4 ">
+              </div>
+              <div class="col-span-6 ">
+                <h2 class="text-base mb-2">Android</h2>
+                <div class="grid gap-4 ">
                   <a
                     href="https://play.google.com/store/apps/details?id=ai.ave.platform"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <img
                       src="@/assets/images/download/frame-1.svg"
@@ -54,7 +57,7 @@
                   </a>
                   <a
                     href="https://ossaveai.com/oss/app/ave.ai.apk"
-                    class="bg-[#161926] text-white text-sm flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="bg-[#161926] text-white text-sm flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <img
                       src="@/assets/images/download/vector-6.svg"
@@ -64,13 +67,15 @@
                     <span>Android APK</span>
                   </a>
                 </div>
-                <h2 class="text-base mb-2 font-normal mt-4">{{$t('deskApp')}}</h2>
-                <div class="grid grid-cols-2 gap-4">
+              </div>
+              <div class="col-span-6">
+                <h2 class="text-base mb-2 font-normal">{{$t('deskApp')}}</h2>
+                <div class="grid gap-4">
                   <a
                     href="https://ossaveai.com/oss/app/avedex-mac.dmg.zip"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-4 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
-                    <svg class="w-6 h-6 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-5 h-5 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M17.1148 13.405C17.084 8.86378 19.6359 8.74626 19.7506 8.67351C18.3152 6.57498 16.0824 6.24481 15.2877 6.21403C13.3878 6.02097 11.5803 7.31086 10.615 7.31086C9.65245 7.31086 8.1639 6.21123 6.5886 6.23921C4.51805 6.26999 2.60698 7.43957 1.53813 9.29467C-0.613561 13.0301 0.986919 18.5618 3.08545 21.5893C4.10953 23.0722 5.33228 24.7371 6.93835 24.6783C8.48287 24.6167 9.06766 23.6766 10.9368 23.6766C12.8058 23.6766 13.3291 24.6783 14.9659 24.6447C16.628 24.614 17.6828 23.1338 18.6985 21.6452C19.8765 19.9244 20.3606 18.3435 20.3885 18.2596C20.3522 18.2428 17.1456 16.4325 17.112 13.405H17.1148Z" fill="white"/>
                       <path d="M10.4521 6.37108C10.4521 3.00224 13.183 0.268555 16.5547 0.268555C16.5547 3.64019 13.821 6.37108 10.4521 6.37108Z" fill="white"/>
                     </svg>
@@ -78,7 +83,7 @@
                   </a>
                   <a
                     href="https://ossaveai.com/oss/app/ave.ai-win64.exe"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <svg
                       class="w-5 h-5 mr-2"
@@ -95,27 +100,26 @@
                   </a>
                 </div>
               </div>
-              <div class="col-span-11 pl-3">
-                <h2 class="text-base mb-2">{{ $t('downloadByScanCode') }}</h2>
+            </div>
+            <div class="col-span-11 mt-5">
+              <h2 class="text-base mb-2">{{ $t('downloadByScanCode') }}</h2>
+              <img
+                src="@/assets/images/download/1-1040045937-171-85-3-1000342829-2aa8d298ea104cbef30a3b8a5e449fd-1.png"
+                alt="QR Code"
+                class="w-26 h-26 bg-white rounded-lg"
+              >
+              <NuxtLink to="/download/help" class="flex items-center mt-2 text-xs hover:underline">
                 <img
-                  src="@/assets/images/download/1-1040045937-171-85-3-1000342829-2aa8d298ea104cbef30a3b8a5e449fd-1.png"
-                  alt="QR Code"
-                  class="w-32 h-32 bg-white p-2 rounded-lg"
+                  src="@/assets/images/download/frame-4.svg"
+                  alt="Tutorial"
+                  class="w-5 h-5 mr-2"
                 >
-                <NuxtLink to="/download/help" class="flex items-center mt-20 text-xs hover:underline">
-                  <img
-                    src="@/assets/images/download/frame-4.svg"
-                    alt="Tutorial"
-                    class="w-5 h-5 mr-2"
-                  >
-                  {{ $t('appFaq') }}
-                </NuxtLink>
-              </div>
+                {{ $t('appFaq') }}
+              </NuxtLink>
             </div>
           </div>
         </div>
       </section>
-
       <section class="features py-16 pb-8">
         <div class="container mx-auto text-center">
           <div class="grid grid-cols-3 gap-10">
@@ -132,7 +136,7 @@
               </div>
               <div class="h-320px overflow-hidden rounded-t-lg">
                 <img
-                  src="@/assets/images/download/image-6.png"
+                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-6-en.png')"
                   alt="Feature 1"
                   class="w-full rounded-lg"
                 >
@@ -168,7 +172,7 @@
               </div>
               <div class="h-320px overflow-hidden rounded-t-lg">
                 <img
-                  src="@/assets/images/download/image-6-1.png"
+                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-6-1-en.png')"
                   alt="Feature 2"
                   class="w-full rounded-lg mb-[-2px]"
                 >
@@ -201,7 +205,7 @@
               </div>
               <div class="h-320px overflow-hidden">
                 <img
-                  src="@/assets/images/download/image-6-2.png"
+                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-6-2-en.png')"
                   alt="Feature 3"
                   class="w-full rounded-lg"
                 >
@@ -228,7 +232,7 @@
       </section>
 
       <section class="py-16 pt-0 pb-8 mt-8">
-        <div class="container mx-auto px-4">
+        <div class="container mx-auto px-3">
           <div class="bg-gradient-to-tr from-[#0b1a4b] to-black rounded-2xl p-12 pb-0 pr-0 flex">
             <div class="w-[70%]">
               <div data-aos="fade-down">
@@ -239,21 +243,21 @@
               </div>
               <div class="grid grid-cols-3 gap-4">
                 <img
-                  src="@/assets/images/download/image-4.png"
+                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-4-en.png')"
                   alt="Safety Feature 1"
                   class="rounded-lg w-full origin-center rotate-15 mt-[10px] block"
                   data-aos-duration="500"
                   data-aos="fade-up"
                 >
                 <img
-                  src="@/assets/images/download/image-8.png"
+                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-8-en.png')"
                   alt="Safety Feature 2"
                   class="rounded-lg w-full origin-bottom rotate-12 mt-[-20px] block"
                   data-aos="fade-in-up"
                   data-aos-duration="1000"
                 >
                 <img
-                  src="@/assets/images/download/image-4-1.png"
+                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-4-1-en.png')"
                   alt="Safety Feature 3"
                   class="rounded-lg w-full origin-center rotate-13 mt-[10px] block"
                   data-aos="fade-up"
@@ -264,7 +268,7 @@
             <div class="w-[30%] p-l-18">
               <div class="h-380px overflow-hidden ">
                 <img
-                  src="@/assets/images/download/image-2.png"
+                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-2-en.png')"
                   alt="App Screenshot"
                   class="w-full rounded-t-lg"
                   data-aos="fade-right"
@@ -288,7 +292,7 @@
                 >
                   <h3 class="text-base font-normal mb-4">{{ $t('buyAndSellTitle1') }}</h3>
                   <img
-                    src="@/assets/images/download/image-6-3.png"
+                    :src="getImgUrlBylang('/_nuxt/assets/images/download/image-6-3-en.png')"
                     alt="Trading Feature 1"
                     class="w-full rounded-lg"
                   >
@@ -300,7 +304,7 @@
                 >
                   <h3 class="text-base font-normal mb-4">{{ $t('buyAndSellTitle2') }}</h3>
                   <img
-                    src="@/assets/images/download/image-7.png"
+                    :src="getImgUrlBylang('/_nuxt/assets/images/download/image-7-en.png')"
                     alt="Trading Feature 2"
                     class="w-full rounded-lg"
                   >
@@ -312,7 +316,7 @@
                 >
                   <h3 class="text-base font-normal mb-4">{{ $t('buyAndSellTitle3') }}</h3>
                   <img
-                    src="@/assets/images/download/image-8-1.png"
+                    :src="getImgUrlBylang('/_nuxt/assets/images/download/image-8-1-en.png')"
                     alt="Trading Feature 3"
                     class="w-full rounded-lg"
                   >
@@ -330,9 +334,9 @@
                 <h2 class="text-3xl font-bold mb-4 mt-8">{{ $t('walletTitle') }}</h2>
                 <p class="text-sm font-light mb-8">{{ $t('walletDes') }}</p>
               </div>
-              <div class="h-445px overflow-hidden mx-80px">
+              <div class="h-445px overflow-hidden mx-90px">
                 <img
-                  src="@/assets/images/download/image-6-4.png"
+                  :src="getImgUrlBylang('/_nuxt/assets/images/download/image-6-4-en.png')"
                   alt="Wallet Insights"
                   class="w-full rounded-lg"
                   data-aos="fade-down"
@@ -395,9 +399,9 @@
                   130+
                 </div>
               </div>
-              <div class="h-360px overflow-hidden mx-60px">
+              <div class="h-370px overflow-hidden mx-60px">
                 <img
-                  src="@/assets/images/download/frame-1912056040.svg"
+                  :src="getImgUrlBylang('/_nuxt/assets/images/download/frame-1912056040-en.svg')"
                   alt="Wallet System"
                   class="w-full"
                   data-aos="fade-down"
@@ -405,7 +409,6 @@
                   data-aos-duration="1000"
                 >
               </div>
-
             </div>
           </div>
         </div>
@@ -644,6 +647,13 @@
   import AOS from 'aos'
   import 'aos/dist/aos.css'
 
+  const getImgUrlBylang = (url)=>{
+    if(useLocaleStore().locale == 'en'){
+      return url
+    }
+    url = url.replace('-en.', '.')
+    return url
+  }
   onMounted(() => {
     AOS.init({
       offset: 150,
