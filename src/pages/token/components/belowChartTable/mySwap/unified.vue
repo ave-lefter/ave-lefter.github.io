@@ -381,8 +381,8 @@ const getTxHistory = async () => {
         token: tokenAddress,
         mode: 1, // 历史交易
         onlySuccess: false,
-        // pageSize: 1000,
-        // pageNo: 1
+        pageSize: 100,
+        pageNo: 1
       })
       
       const rawList = res?.data?.list || []
