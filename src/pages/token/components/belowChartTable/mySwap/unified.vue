@@ -197,7 +197,7 @@ import { bot_getUserTxHistory1, wallet_getOrders } from '@/api/token'
 import share from './share.vue'
 import { evm_utils } from '@/utils'
 
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 
 const { formatUnits } = evm_utils
 
@@ -230,6 +230,16 @@ const configStore = useConfigStore()
 const isBotWallet = computed(() => {
   return !!botStore?.userInfo?.evmAddress
 })
+
+// 根据钱包类型确定使用的链参数
+const currentChain = computed(() => {
+  if (isBotWallet.value) {
+    return props.chain
+  } else {
+    return walletStore.chain
+  }
+})
+
 const filterConditions = ref<any>({
   isLimit: undefined,
   isBuy: undefined,
@@ -245,9 +255,43 @@ const tableHeight = computed(() => {
 
 // const isUnit = ref(true)
 
-watch([() => props.chain, () => props.currentToken], () => {
-  getTxHistory()
-})
+// 验证链和地址格式是否匹配
+function validateChainAddress(chain: string, address: string) {
+  if (!chain || !address) {
+    console.warn('链或地址为空:', { chain, address })
+    return false
+  }
+  
+  // 验证地址格式与链匹配
+  if (chain === 'solana') {
+    const isValid = address.length > 30 && !address.startsWith('0x')
+    if (!isValid) {
+      console.warn('Solana地址格式不正确:', address)
+    }
+    return isValid
+  } else if (['bsc', 'ethereum', 'polygon', 'arbitrum', 'base'].includes(chain)) {
+    const isValid = address.startsWith('0x') && address.length === 42
+    if (!isValid) {
+      console.warn('EVM地址格式不正确:', address)
+    }
+    return isValid
+  }
+  
+  // 其他链暂时返回true
+  return true
+}
+
+watch([() => currentChain.value, () => props.userAddress, () => props.currentToken], ([newChain, newAddress, newCurrentToken]) => {
+
+  
+  if (validateChainAddress(newChain, newAddress)) {
+    nextTick(() => {
+      getTxHistory()
+    })
+  } else {
+    console.warn('链和地址格式不匹配，跳过API调用:', { chain: newChain, address: newAddress })
+  }
+}, { immediate: true })
 
 function handleTypeCommand(command: string) {
   if (command === 'all') {
@@ -302,20 +346,18 @@ function tableRowClick(row: any) {
 const getTxHistory = async () => {
   loading.value = true
   try {
-    console.log('=== 钱包类型检测 ===')
-    console.log('isBotWallet:', isBotWallet.value)
-    console.log('botStore.userInfo:', botStore?.userInfo)
-    console.log('walletStore.address:', walletStore?.address)
-    console.log('props.userAddress:', props.userAddress)
-    console.log('props.chain:', props.chain)
-    
+    const apiChain = currentChain.value
+    if (!validateChainAddress(apiChain, props.userAddress)) {
+      loading.value = false
+      return
+    }
+        
     if (isBotWallet.value) {
       // Bot钱包使用原接口
-      console.log('=== 使用 Bot 钱包接口 ===')
       const res = await bot_getUserTxHistory1({
         page: 0,
         pageSize: 1000,
-        chain: props.chain,
+        chain: apiChain,
         walletAddress: props.userAddress,
         token: props.currentToken ? String(route.params.id).split('-')[0] : '',
         timeSort: true,
@@ -328,24 +370,13 @@ const getTxHistory = async () => {
         minTradeVolume: 0,
         maxTradeVolume: 100000
       })
-      console.log('Bot钱包响应:', res)
       txHistory.value = res || []
     } else {
       // 链钱包使用新接口
-      console.log('=== 使用链钱包接口 ===')
       const tokenAddress = props.currentToken ? String(route.params.id).split('-')[0] : ''
-      console.log('请求参数:', {
-        chain: props.chain,
-        creatorAddress: props.userAddress,
-        token: tokenAddress,
-        mode: 1,
-        onlySuccess: false,
-        pageSize: 1000,
-        pageNo: 1
-      })
       
       const res = await wallet_getOrders({
-        chain: props.chain,
+        chain: apiChain,
         creatorAddress: props.userAddress,
         token: tokenAddress,
         mode: 1, // 历史交易
@@ -353,42 +384,16 @@ const getTxHistory = async () => {
         pageSize: 1000,
         pageNo: 1
       })
-      console.log('=== 链钱包API调试 ===')
-      console.log('请求URL: /aveswap/v1/swap/getOrders')
-      console.log('请求参数:', {
-        chain: props.chain,
-        creatorAddress: props.userAddress,
-        token: tokenAddress,
-        mode: 1,
-        onlySuccess: false,
-        pageSize: 1000,
-        pageNo: 1
-      })
-      console.log('API完整响应:', res)
-      console.log('响应状态:', res?.status)
-      console.log('响应消息:', res?.msg)
-      console.log('数据列表:', res?.data?.list)
-      console.log('列表长度:', res?.data?.list?.length || 0)
       
-      // 将链钱包数据映射为表格格式
-      const rawList = res?.data?.list || res?.list || []
-      console.log('提取的原始列表:', rawList)
+      const rawList = res?.data?.list || []
       
       if (rawList.length > 0) {
-        console.log('第一条原始数据示例:', rawList[0])
         const mappedData = rawList.map(mapWalletOrderToTableRow)
-        console.log('映射后数据:', mappedData)
-        console.log('映射后数据长度:', mappedData.length)
-        if (mappedData.length > 0) {
-          console.log('第一条映射后数据示例:', mappedData[0])
-        }
         txHistory.value = mappedData
       } else {
-        console.log('原始列表为空，设置空数组')
         txHistory.value = []
       }
       
-      console.log('最终txHistory.value:', txHistory.value)
       console.log('最终txHistory长度:', txHistory.value?.length || 0)
     }
   } catch (error) {
@@ -424,23 +429,12 @@ function isBuy(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) {
 
 // 将链钱包数据映射为bot钱包表格格式
 function mapWalletOrderToTableRow(order: any) {
-  // 正确转换字符串为数字，API返回的已经是最小单位，无需再乘decimals
   const outputAmount = parseFloat(order.outputAmount || '0')
   const inAmount = parseFloat(order.inAmount || '0')
   const inPrice = parseFloat(order.inPrice || '0')
   const outPrice = parseFloat(order.outPrice || '0')
-  
-  console.log('=== 数据映射调试 ===')
-  console.log('原始数据:', { 
-    inAmount: order.inAmount, 
-    outputAmount: order.outputAmount,
-    inPrice: order.inPrice,
-    outPrice: order.outPrice
-  })
-  console.log('转换后:', { inAmount, outputAmount, inPrice, outPrice })
-  
   return {
-    chain: props.chain,
+    chain: currentChain.value,
     swapType: order.swapType,
     inTokenSymbol: order.inToken,
     outTokenSymbol: order.outToken,
@@ -454,7 +448,6 @@ function mapWalletOrderToTableRow(order: any) {
     outPrice: outPrice,
     inValue: inAmount * inPrice,
     outValue: outputAmount * outPrice,
-    // API返回的金额已经是最小单位，直接使用
     inAmount: inAmount,
     outAmount: outputAmount,
     createTime: order.createTime,
@@ -469,6 +462,9 @@ onMounted(() => {
 })
 defineExpose({
   getTxHistory,
+  refreshData: () => {
+    getTxHistory()
+  }
 })
 </script>
 
@@ -492,34 +488,4 @@ defineExpose({
   color: #286DFF !important;
   font-weight: bold;
 }
-
-// :deep(.el-table) {
-//   --el-table-tr-bg-color: var(--d-0a0b0d-l-fff);
-//   --el-table-bg-color: var(--d-0a0b0d-l-fff);
-//   --el-table-text-color: var(--d-222-l-F2F2F2);
-//   --el-table-header-bg-color: var(--d-17191C-l-F2F2F2);
-//   --el-fill-color-lighter: var(--d-0a0b0d-l-fff);
-//   --el-table-header-text-color: var(--d-999-l-666);
-//   --el-table-border-color: var(--d-33353D-l-f5f5f5);
-//   --el-table-row-hover-bg-color: var(--d-333333-l-eaecef);
-//   background: var(--d-0a0b0d-l-fff);
-//   --el-bg-color: var(--d-0a0b0d-l-fff);
-//   --el-table-border: 0.5px solid var(--d-33353D-l-f5f5f5);
-//   font-size: 13px;
-
-//   th {
-//     padding: 6px 0;
-//     border-bottom: none !important;
-//     height: 32px;
-
-//     &.el-table__cell.is-leaf {
-//       border-bottom: none;
-//     }
-
-//     .cell {
-//       font-weight: 400;
-//       font-size: 12px;
-//     }
-//   }
-// }
 </style>

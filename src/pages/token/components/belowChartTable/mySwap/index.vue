@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, nextTick, onActivated } from 'vue'
 import { useBotStore } from '@/stores/bot'
 import { getChainInfo } from '@/utils'
 import unified from './unified.vue'
 import { bot_getUserWalletTxInfo } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
 import { useSessionStorage } from '@vueuse/core'
+
+// const props = defineProps({
+//   currentActiveTab: {
+//     type: String,
+//     default: ''
+//   }
+// })
 
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -100,11 +107,9 @@ const userAddress = computed(() => {
 
 function setActiveTab(val: string) {
   activeTab.value = val
-  getWalletTxData()
-}
-
-function toggleCurrentToken() {
-  botOrderOnlyCurrentToken.value = !botOrderOnlyCurrentToken.value
+  nextTick(() => {
+    getWalletTxData()
+  })
 }
 
 // 定义移除字符串开头负号的函数
@@ -171,12 +176,24 @@ watch([() => route.params.id], () => {
   }
 })
 
+function refreshData() {
+  getWalletTxData()
+  
+  if (unifiedRef.value) {
+    unifiedRef.value.getTxHistory()
+  }
+}
+
 onMounted(() => {
   const chain = getAddressAndChainFromId(String(route.params.id))?.chain
   if (tabs.value.find(i => i?.chain === chain)) {
     activeTab.value = chain
   }
   getWalletTxData()
+})
+
+onActivated(() => {
+   refreshData()
 })
 </script>
 
@@ -195,7 +212,7 @@ onMounted(() => {
       <!-- 链钱包显示当前链名称 -->
       <div v-else class="flex items-center">
         <span class="text-12px text-[--d-999-l-666] px-12px py-4px">
-          {{ getChainInfo(walletStore.chain || activeTab).name }}
+          <!-- {{ getChainInfo(walletStore.chain || activeTab).name }} -->
         </span>
       </div>
       
