@@ -495,6 +495,13 @@ onBeforeUnmount(() => {
                       target="_blank" @click.stop>
                       <Icon class="text-[--d-666-l-999] h-12px w-12px text-12px" name="custom:search" />
                     </a>
+                    <img
+                      v-if="row.issue_platform"
+                      v-tooltip="row.issue_platform"
+                      class="ml-4px w-10px h-10px"
+                      :src="formatIconTag(row.issue_platform)"
+                      alt=""
+                    >
                   </div>
                   <div class="flex items-center">
                     <!-- <span class="text-[--d-CCC-l-999]">({{ '*' + row.token?.slice(-4) }})</span> -->

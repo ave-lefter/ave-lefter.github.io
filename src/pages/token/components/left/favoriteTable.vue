@@ -289,7 +289,16 @@ function resetListStatus() {
             <div class="flex items-center flex-1">
               <TokenImg class="mr-8px" :row="row" token-class="w-24px h-24px" />
               <div class="flex flex-col items-start">
-                <span class="text-12px">{{ row.symbol }}</span>
+                <span class="text-12px flex items-center">
+                  {{ row.symbol }}
+                  <img
+                    v-if="row.issue_platform"
+                    v-tooltip="row.issue_platform"
+                    class="ml-5px w-10px h-10px"
+                    :src="formatIconTag(row.issue_platform)"
+                    alt=""
+                  >
+                </span>
                 <span
                   v-if="row.remark"
                   class="mt-2px border-solid border-0.5px border-#286dff color-#286dff rounded-4px text-10px px-4px py-1px overflow-hidden text-ellipsis whitespace-nowrap max-w-100px"
