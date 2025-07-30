@@ -9,10 +9,10 @@ defineProps<{
   }
 }>()
 const flexColumns = [
-  'flex-[3]',
-  'flex-[1.2] text-right',
-  'flex-[1.2] text-right',
-  'flex-[1.2] text-right',
+  'flex-1',
+  'w-64px text-right',
+  'w-72px text-right',
+  'w-60px text-right',
 ]
 const emit = defineEmits(['close'])
 </script>
@@ -63,7 +63,7 @@ const emit = defineEmits(['close'])
                 logo_url: row.logo_url,
               }"
             />
-            <span class="shrink-0 truncate max-w-70px">{{ row.symbol }}</span>
+            <span class="shrink-0 truncate max-w-68px">{{ row.symbol }}</span>
           </div>
         </div>
         <div class="color-[--d-999-l-666] text-12px" :class="flexColumns[1]">
