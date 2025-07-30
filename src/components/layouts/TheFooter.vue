@@ -1,23 +1,41 @@
 <template>
   <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-9999">
-    <div class="left">
+    <div class="left relative">
       <NuxtLink
-        v-for="(item) in newData" :key="item.symbol || item.logo_url"
-        class="color-[--d-999-l-666]  flex items-center gap-5px"
-        :class="[(item?.hidden)?'':'mr-12px']"
-        :to="`/token/${item.id}`"
+        v-if="showPrice"
+        class="flex items-center gap-5px mr-4px"
+        :to="`/token/${showPrice.id}`"
       >
-        <template v-if="!item?.hidden">
-          <TokenImg
-          :row="{
-            logo_url: item.logo_url,
-            chain: ''
-          }" token-class="w-16px h-16px [&&]:mr-0" />
-          <span>{{ item.symbol }}</span>
-          <span :class="`color-${item.color}`">{{'$'+formatDec(item?.current_price_usd || 0, 2)}}</span>
-        </template>
-        <div v-else class="mr--5px" />
+        <TokenImg
+        :row="{
+          logo_url: showPrice.logo_url,
+          chain: ''
+        }" token-class="w-16px h-16px [&&]:mr-0" />
+        <span class="color-[--d-999-l-666]">{{ showPrice.symbol }}</span>
+        <span :class="`color-${showPrice.color}`">{{'$'+formatDec(showPrice?.current_price_usd || 0, 2)}}</span>
       </NuxtLink>
+       <el-popover popper-style="padding: 12px;min-width: 132px" width="132" placement="top" :teleported="false">
+        <template #reference>
+          <Icon name="custom:set-up" class="text-12px ml-2px color-#666" />
+        </template>
+        <div class="flex items-start justify-center flex-col text-12px gap-16px">
+          <NuxtLink
+            v-for="(item) in showPrice2" :key="item.symbol || item.logo_url"
+            class="flex items-center gap-5px h-16px"
+            style="display: flex;"
+            :to="`/token/${item.id}`"
+          >
+            <TokenImg
+            class="flex"
+            :row="{
+              logo_url: item.logo_url,
+              chain: ''
+            }" token-class="w-16px h-16px [&&]:mr-0" />
+            <span class="color-[--d-999-l-666]">{{ item.symbol }}</span>
+            <span :class="`color-${item.color}`">{{'$'+formatDec(item?.current_price_usd || 0, 2)}}</span>
+          </NuxtLink>
+        </div>
+      </el-popover>
       <el-badge :is-dot="(!!botStore.evmAddress)&&isDoted2" class="mr-12px">
         <div
           id="monitor"
@@ -43,37 +61,44 @@
       </el-badge>
     </div>
     <ul class="right">
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-        <a class="border-left" target="_blank" href="https://eco.ave.ai">{{ $t('ecosystem') }}</a>
-      </li>
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-        <a target="_blank" href="https://cloud.ave.ai">API</a>
-      </li>
-      <li class="bg-[--d-999-l-666] w-1px h-8px" />
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-        <a
-          class="border-left" target="_blank" :href="lang?.includes?.('zh')
-            ? 'https://doc.ave.ai/cn/mian-ze-shen-ming'
-            : 'https://doc.ave.ai/disclaimers'
-          ">
-          {{ $t('disclaimers') }}
-        </a>
-      </li>
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-        <a target="_blank" href="/privacy.html">{{ $t('privacyPolicy') }}</a>
-      </li>
-      <li class="bg-[--d-999-l-666] w-1px h-8px" />
-      <li class="color-[--d-999-l-666]">
-        <span class="partners">{{ $t('partners') }}</span>
-      </li>
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-        <a target="_blank" href="https://www.tradingview.com/" class="flex-center">
-          <Icon name="simple-icons:tradingview" class="text-18px mr-2px" />TradingView
-          <!-- <img v-if="isDark" src="@/assets/images/tradingView-dark.svg" alt="" height="12" />
-          <img v-else src="@/assets/images/tradingView-light.svg" alt="" height="12" /> -->
-        </a>
-      </li>
-      <li class="bg-[--d-999-l-666] w-1px h-8px" />
+        <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] flex items-center gap-2px">
+          <img
+            src="@/assets/images/avedex_mobile_logo.png"
+            class="h-14px"
+            height="14" alt=""
+            srcset=""
+          >
+          <a target="_blank" href="https://cloud.ave.ai">API</a>
+        </li>
+       <el-popover popper-style="padding: 12px;min-width: 107px" width="107" placement="top" :teleported="false">
+        <template #reference>
+           <Icon name="custom:set-up" class="text-12px ml-2px color-#666" />
+        </template>
+        <ul class="flex items-start justify-center flex-col text-12px gap-16px font-500">
+          <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+            <a class="hover:decoration-underline" target="_blank" href="https://eco.ave.ai">{{ $t('ecosystem') }}</a>
+          </li>
+          <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+            <a
+              class="hover:decoration-underline" target="_blank" :href="lang?.includes?.('zh')
+                ? 'https://doc.ave.ai/cn/mian-ze-shen-ming'
+                : 'https://doc.ave.ai/disclaimers'
+              ">
+              {{ $t('disclaimers') }}
+            </a>
+          </li>
+          <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+            <a target="_blank" class="hover:decoration-underline" href="/privacy.html">{{ $t('privacyPolicy') }}</a>
+          </li>
+          <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+            <a target="_blank" href="https://www.tradingview.com/" class="flex-center hover:decoration-underline">
+              <Icon name="simple-icons:tradingview" class="text-18px mr-2px" />TradingView
+              <!-- <img v-if="isDark" src="@/assets/images/tradingView-dark.svg" alt="" height="12" />
+              <img v-else src="@/assets/images/tradingView-light.svg" alt="" height="12" /> -->
+            </a>
+          </li>
+        </ul>
+      </el-popover>
       <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
         <a
           target="_blank" :href="lang?.includes?.('zh') ? 'https://x.com/aveai_info' : 'https://x.com/AveaiGlobal'"
@@ -101,10 +126,10 @@
 
 <script setup lang='ts'>
 import ring from '@/assets/audio/ring.wav'
+import { cloneDeep, throttle  } from 'lodash-es'
 import { formatDec } from '~/utils/formatNumber'
 import { getTokensPrice } from '@/api/token'
 import { upColor, downColor } from '@/utils/constants'
-import { throttle } from 'lodash-es'
 const {visible,hasRing} = storeToRefs(useMonitorStore())
 const signalStore = useSignalStore()
 const globalStore = useGlobalStore()
@@ -173,6 +198,35 @@ const newData = computed(() => {
     }
     return item
   })
+})
+
+const showPrice = computed(() => {
+  if(addressAndChain.value.chain === 'bsc'){
+    return data.value[2]
+  } else if(addressAndChain.value.chain === 'solana'){
+    return data.value[3]
+  } else if(addressAndChain.value.chain === 'eth' || addressAndChain.value.chain === 'base'){
+    return data.value[1]
+  } else {
+    return data.value[3]
+  }
+})
+
+const showPrice2 = computed(() => {
+  const val=cloneDeep(data.value)
+  if(addressAndChain.value.chain === 'bsc'){
+    val.splice(2, 1)
+    return val
+  } else if(addressAndChain.value.chain === 'solana'){
+    val.splice(3, 1)
+    return val
+  } else if(addressAndChain.value.chain === 'eth' || addressAndChain.value.chain === 'base'){
+    val.splice(1, 1)
+    return val
+  } else {
+    val.splice(3, 1)
+    return val
+  }
 })
 
 watch(()=>globalStore.footerTokensPrice, (newVal) => {
