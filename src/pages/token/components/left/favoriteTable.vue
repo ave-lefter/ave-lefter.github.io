@@ -142,6 +142,7 @@ watch(
   }
 )
 
+const arrowVisible = ref(false)
 async function _getUserFavoriteGroups() {
   try {
     loading.value = true
@@ -152,6 +153,9 @@ async function _getUserFavoriteGroups() {
         name: t('defaultGroup'),
       },
     ].concat((res || []).filter((el) => !!el.name))
+    setTimeout(()=>{
+     arrowVisible.value = Number(tabsContainer.value?.offsetWidth) > 212
+    })
   } catch (e) {
     console.log('=>(favoriteTable.vue:19) e', e)
   } finally {
@@ -168,6 +172,13 @@ onMounted(() => {
 })
 
 const tabsContainer = ref<HTMLElement | null>(null)
+// const arrowVisible = computed(()=>{
+//   if(!tabsContainer.value) return false
+//   const containerWidth = tabsContainer.value.offsetWidth
+//   const childrenWidth = userFavoriteGroups.value.reduce((acc, _,index) => acc + (tabsContainer.value.children[index]).offsetWidth, 0)
+//   console.log(tabsContainer.value.offsetWidth,'xxxxx',childrenWidth,tabsContainer.value.children.length)
+//   return childrenWidth > containerWidth
+// })
 function setActiveTab(groupId: number, index: number) {
   activeTab.value = groupId
   resetListStatus()
@@ -226,7 +237,8 @@ function resetListStatus() {
 <template>
   <div v-loading="listStatus.pageNo === 1 && listStatus.loading">
     <div class="flex items-center justify-between pr-15px pl-12px mt-10px">
-      <span class="w-20px h-20px rounded-2px color-[--d-666-l-999] hover:color-[--d-FFF-l-333] bg-[--d-111-l-FFF] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,-200)">
+      <div class="flex items-center min-w-0">
+        <span v-show="arrowVisible" class="w-20px h-20px rounded-2px color-[--d-666-l-999] hover:color-[--d-FFF-l-333] bg-[--d-111-l-FFF] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,-200)">
         <Icon name="material-symbols:arrow-back-ios-new-rounded" />
       </span>
       <div
@@ -248,9 +260,10 @@ function resetListStatus() {
           {{ item.name }}
         </span>
       </div>
-      <span class="mr-4px w-20px h-20px rounded-2px color-[--d-666-l-999] hover:color-[--d-FFF-l-333] bg-[--d-111-l-FFF] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,200)">
+      <span v-show="arrowVisible" class="mr-4px w-20px h-20px rounded-2px color-[--d-666-l-999] hover:color-[--d-FFF-l-333] bg-[--d-111-l-FFF] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,200)">
         <Icon name="material-symbols:arrow-forward-ios-rounded"/>
       </span>
+      </div>
       <Icon
         name="custom:remark"
         class="shrink-0 text-12px mr-0 cursor-pointer color-#80838b hover:color-#286DFF"

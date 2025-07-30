@@ -15,7 +15,7 @@ const botStore = useBotStore()
 <template>
   <div class="flex flex-col gap-12px">
     <div
-      v-for="({chain,logo,symbol,id,token,issue_platform,mc,signal_time,price_change_24h},index) in signalList"
+      v-for="({chain,logo,symbol,id,token,issue_platform,mc_cur,signal_time,price_change_24h},index) in signalList"
       :key="id"
       class="pb-12px border-b-1px border-b-solid border-b-[--d-1A1A1A-l-F2F2F2] cursor-pointer"
       @click="navigateTo(`/token/${token}-${chain}`)"
@@ -68,7 +68,7 @@ const botStore = useBotStore()
         <div class="flex color-[--d-666-l-999] text-12px">
           {{ $t('mCap') }}
           <span class="color-[--d-F5F5F5-l-333] ml-4px">
-            ${{ formatNumber(mc, 1) }}
+            ${{ formatNumber(mc_cur, 1) }}
           </span>
           <span class="ml-8px">24h</span>
           <span

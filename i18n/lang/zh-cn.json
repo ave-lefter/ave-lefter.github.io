@@ -1132,5 +1132,8 @@
   "quickBuyclipboard": "剪切板快捷买入",
   "addChain": "添加链",
   "myFavoriteChain": "我关注的链",
-  "unDelete": "不能删除"
+  "unDelete": "不能删除",
+  "firstSignal2": "首次信号",
+  "firstMarketCap2": "首次市值",
+  "MaximumIncrease2": "最大涨幅"
 }
