@@ -214,7 +214,7 @@ function getCheckFavoriteGroup(token_id: string, address: string) {
 
 const getNewFavoriteList = createCacheRequest(function(query: any): Promise<GetFavListResponse[]> {
   const { $api } = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v2api/fav_tokens/v1/favorite/v2', {
+  return $api('/v2api/fav_tokens/v1/favorite/v2', {
     method: 'get',
     query
   })
