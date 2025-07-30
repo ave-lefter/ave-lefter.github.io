@@ -61,52 +61,57 @@
       </el-badge>
     </div>
     <ul class="right">
-        <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] flex items-center gap-2px">
-          <img
-            src="@/assets/images/avedex_mobile_logo.png"
-            class="h-14px"
-            height="14" alt=""
-            srcset=""
-          >
-          <a target="_blank" href="https://cloud.ave.ai">API</a>
-        </li>
-       <el-popover popper-style="padding: 12px;min-width: 107px" width="107" placement="top" :teleported="false">
-        <template #reference>
-           <Icon name="custom:set-up" class="text-12px ml-2px color-#666" />
-        </template>
-        <ul class="flex items-start justify-center flex-col text-12px gap-16px font-500">
-          <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-            <a class="hover:decoration-underline" target="_blank" href="https://eco.ave.ai">{{ $t('ecosystem') }}</a>
-          </li>
-          <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-            <a
-              class="hover:decoration-underline" target="_blank" :href="lang?.includes?.('zh')
-                ? 'https://doc.ave.ai/cn/mian-ze-shen-ming'
-                : 'https://doc.ave.ai/disclaimers'
-              ">
-              {{ $t('disclaimers') }}
-            </a>
-          </li>
-          <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-            <a target="_blank" class="hover:decoration-underline" href="/privacy.html">{{ $t('privacyPolicy') }}</a>
-          </li>
-          <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-            <a target="_blank" href="https://www.tradingview.com/" class="flex-center hover:decoration-underline">
-              <Icon name="simple-icons:tradingview" class="text-18px mr-2px" />TradingView
-              <!-- <img v-if="isDark" src="@/assets/images/tradingView-dark.svg" alt="" height="12" />
-              <img v-else src="@/assets/images/tradingView-light.svg" alt="" height="12" /> -->
-            </a>
-          </li>
-        </ul>
-      </el-popover>
       <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+        <a target="_blank" href="https://www.tradingview.com/" class="flex-center">
+          <Icon name="simple-icons:tradingview" class="text-18px mr-2px" />TradingView
+          <!-- <img v-if="isDark" src="@/assets/images/tradingView-dark.svg" alt="" height="12" />
+          <img v-else src="@/assets/images/tradingView-light.svg" alt="" height="12" /> -->
+        </a>
+      </li>
+      <li>
+      <a target="_blank" href="https://gopluslabs.io">
+        <img src="@/assets/images/goPlus-logo.png" alt="" height="25" lazy />
+      </a>
+      </li>
+      <li>
+      <a target="_blank" class="flex-center" href="https://www.btok.com">
+        <img src="@/assets/images/btok-logo.png" alt="" height="16" lazy />
+      </a>
+      </li>
+      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] flex items-center gap-2px">
+      <a target="_blank" href="https://cloud.ave.ai">API</a>
+      </li>
+      <el-popover popper-style="padding: 12px;min-width: 107px" width="107" placement="top" :teleported="false">
+      <template #reference>
+          <Icon name="custom:set-up" class="text-12px ml-2px color-#666" />
+      </template>
+      <ul class="flex items-start justify-center flex-col text-12px gap-16px font-500">
+        <!-- <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+          <a class="hover:decoration-underline" target="_blank" href="https://eco.ave.ai">{{ $t('ecosystem') }}</a>
+        </li> -->
+        <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+          <a
+            class="hover:decoration-underline" target="_blank" :href="lang?.includes?.('zh')
+              ? 'https://doc.ave.ai/cn/mian-ze-shen-ming'
+              : 'https://doc.ave.ai/disclaimers'
+            ">
+            {{ $t('disclaimers') }}
+          </a>
+        </li>
+        <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+          <a target="_blank" class="hover:decoration-underline" href="/privacy.html">{{ $t('privacyPolicy') }}</a>
+        </li>
+        
+      </ul>
+      </el-popover>
+      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] mr-8px">
         <a
           target="_blank" :href="lang?.includes?.('zh') ? 'https://x.com/aveai_info' : 'https://x.com/AveaiGlobal'"
           class="flex-center">
           <Icon name="bi:twitter-x" class="text-16px" />
         </a>
       </li>
-      <li class="color-[--d-999-l-666] hover:color-#3F80F7">
+      <li class="color-[--d-999-l-666] hover:color-#3F80F7 mr-8px">
         <a
           target="_blank" :href="lang?.includes?.('zh') ? 'https://x.com/aveai_info' : 'https://x.com/AveaiGlobal'"
           class="flex-center">
@@ -297,7 +302,7 @@ watch(() => wsStore.wsResult[WSEventType.MONITOR], () => {
   .right {
     flex: auto;
     display: flex;
-    gap: 12px;
+    gap: 8px;
     justify-content: flex-end;
     align-items: center;
   }
