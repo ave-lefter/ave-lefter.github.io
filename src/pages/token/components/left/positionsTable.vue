@@ -10,6 +10,7 @@ import {useDebounceFn, useThrottleFn} from '@vueuse/core'
 import {useWalletStore} from '~/stores/wallet'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 
+const {updateHolderNum}= storeToRefs(useUserStore())
 const {t} = useI18n()
 const wsStore = useWSStore()
 const botSettingStore = useBotSettingStore()
@@ -56,6 +57,11 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
     return el
   })
   triggerRef(listData)
+})
+
+watch(()=>updateHolderNum.value, () => {
+  resetStatus()
+  getDataOnResize()
 })
 // onMounted(()=>{
 //   setTimeout(()=>{
