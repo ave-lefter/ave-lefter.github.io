@@ -1,19 +1,19 @@
 <template>
   <div class="w-full h-full bg-[#000]! color-white!">
-    <main class="container mx-auto w-full px-4 text-base">
+    <main class="container mx-auto w-full text-base">
       <section
         class="hero flex items-center pt-[40px]"
       >
         <div class="w-[55%]" ata-aos="fade-left">
           <img
-            class="w-[115%] block mt[-65px]"
+            class="w-[120%] block mt[-55px] ml-[-30px]"
             :src="getImgUrlBylang('/download/mask-group-en.jpg')"
           >
         </div>
         <div class="container mx-auto w-[45%]" ata-aos="fade-right">
           <div class="max-w-2xl">
             <h1 class="text-5xl font-bold mb-1 mt-10 ml-[-2px]">{{$t("downloadAve")}}</h1>
-            <p class="text-sm text-[#b7bdc6] mb-6">{{ $t('downloadSubtitle') }}</p>
+            <p class="text-sm text-[#b7bdc6] mb-3">{{ $t('downloadSubtitle') }}</p>
             <div class="grid grid-cols-24 gap-8">
               <div class="col-span-6 ">
                 <h2 class="text-base mb-2">IOS</h2>
@@ -101,12 +101,12 @@
                 </div>
               </div>
             </div>
-            <div class="col-span-11 mt-5">
+            <div class="col-span-11 mt-3">
               <h2 class="text-base mb-2">{{ $t('downloadByScanCode') }}</h2>
               <img
                 src="/download/1-1040045937-171-85-3-1000342829-2aa8d298ea104cbef30a3b8a5e449fd-1.png"
                 alt="QR Code"
-                class="w-26 h-26 bg-white rounded-lg"
+                class="w-28 h-28 bg-white p-1 rounded-lg"
               >
               <NuxtLink to="/download/help" class="flex items-center mt-2 text-xs hover:underline">
                 <img
@@ -130,11 +130,11 @@
                 data-aos-duration="100"
               >
                 <h2 class="text-xl font-bold mb-4">{{ $t("glodDogTitle") }}</h2>
-                <p class="text-xs mb-11 h-47px overflow-hidden">
+                <p class="text-xs mb-8 h-47px overflow-hidden">
                   {{ $t("glodDogSubTitle") }}
                 </p>
               </div>
-              <div class="h-320px overflow-hidden rounded-t-lg">
+              <div class="h-340px overflow-hidden rounded-t-lg">
                 <img
                   :src="getImgUrlBylang('/download/image-6-en.png')"
                   alt="Feature 1"
@@ -166,11 +166,11 @@
                 data-aos-duration="200"
               >
                 <h2 class="text-xl font-bold mb-4">{{ $t("signTitle") }}</h2>
-                <p class="text-xs mb-11 h-47px overflow-hidden">
+                <p class="text-xs mb-8 h-47px overflow-hidden">
                   {{ $t("signSubTitle") }}
                 </p>
               </div>
-              <div class="h-320px overflow-hidden rounded-t-lg">
+              <div class="h-340px overflow-hidden rounded-t-lg">
                 <img
                   :src="getImgUrlBylang('/download/image-6-1-en.png')"
                   alt="Feature 2"
@@ -201,9 +201,9 @@
                 data-aos-duration="300"
               >
                 <h2 class="text-xl font-bold mb-4">{{ $t("tokenTitle") }}</h2>
-                <p class="text-xs mb-11 h-47px overflow-hidden">{{ $t("tokenSubTitle") }}</p>
+                <p class="text-xs mb-8 h-47px overflow-hidden">{{ $t("tokenSubTitle") }}</p>
               </div>
-              <div class="h-320px overflow-hidden">
+              <div class="h-340px overflow-hidden">
                 <img
                   :src="getImgUrlBylang('/download/image-6-2-en.png')"
                   alt="Feature 3"
@@ -334,7 +334,7 @@
                 <h2 class="text-3xl font-bold mb-4 mt-8">{{ $t('walletTitle') }}</h2>
                 <p class="text-sm font-light mb-8">{{ $t('walletDes') }}</p>
               </div>
-              <div class="h-445px overflow-hidden mx-90px">
+              <div class="h-445px w-[65%] mx-auto overflow-hidden">
                 <img
                   :src="getImgUrlBylang('/download/image-6-4-en.png')"
                   alt="Wallet Insights"
@@ -399,7 +399,7 @@
                   130+
                 </div>
               </div>
-              <div class="h-370px overflow-hidden mx-60px">
+              <div class="h-370px overflow-hidden w-[75%] mx-auto">
                 <img
                   :src="getImgUrlBylang('/download/frame-1912056040-en.svg')"
                   alt="Wallet System"
@@ -648,8 +648,8 @@
   import 'aos/dist/aos.css'
   onMounted(() => {
     AOS.init({
-      offset: 150,
-      delay: 150,
+      offset: 50,
+      delay: 50,
       duration: 400,
       easing: 'ease',
       once: false,
