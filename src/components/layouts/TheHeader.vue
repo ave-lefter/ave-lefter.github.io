@@ -32,6 +32,18 @@
       </span>
     </a>
     <div class="flex-1" />
+    <el-button
+      text
+      type=""
+      bg
+      color="bg-[var(--d-222-l-F2F2F2)]"
+      class="ml-10px rounded-4px text-[var(--d-F5F5F5-l-333)]!"
+      @click="toReferrer"
+    >
+      <img v-show="showAnimation" src="@/assets/images/refer.gif" height="20" alt="">
+      <img v-show="!showAnimation" src="@/assets/images/refer.png" height="20" alt="">
+      <span style="word-break: keep-all">{{ $t('refer') }}</span>
+    </el-button>
     <ClipboardToken />
     <el-button
       v-if="!botStore.evmAddress && !walletStore.address"
@@ -165,7 +177,17 @@ const ConnectWalletCom = defineAsyncComponent(() => import('@/components/header/
 const openConnect = () => {
   botStore.changeConnectVisible(true)
 }
+const showAnimation = ref(false)
+onMounted(()=>{
+  showAnimation.value = true
+  setTimeout(()=>{
+    showAnimation.value = false
+  },10000)
+})
 
+function toReferrer() {
+  window.open('/referral')
+}
 </script>
 <style lang="scss" scoped>
 header {
