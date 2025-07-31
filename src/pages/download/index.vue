@@ -20,7 +20,7 @@
                 <div class="grid gap-4">
                   <a
                     href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <svg class="w-5 h-5 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M17.1148 13.405C17.084 8.86378 19.6359 8.74626 19.7506 8.67351C18.3152 6.57498 16.0824 6.24481 15.2877 6.21403C13.3878 6.02097 11.5803 7.31086 10.615 7.31086C9.65245 7.31086 8.1639 6.21123 6.5886 6.23921C4.51805 6.26999 2.60698 7.43957 1.53813 9.29467C-0.613561 13.0301 0.986919 18.5618 3.08545 21.5893C4.10953 23.0722 5.33228 24.7371 6.93835 24.6783C8.48287 24.6167 9.06766 23.6766 10.9368 23.6766C12.8058 23.6766 13.3291 24.6783 14.9659 24.6447C16.628 24.614 17.6828 23.1338 18.6985 21.6452C19.8765 19.9244 20.3606 18.3435 20.3885 18.2596C20.3522 18.2428 17.1456 16.4325 17.112 13.405H17.1148Z" fill="white"/>
@@ -30,7 +30,7 @@
                   </a>
                   <a
                     href="https://testflight.apple.com/join/BZ3XHS5f"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <img
                       src="/download/vector-9.svg"
@@ -46,7 +46,7 @@
                 <div class="grid gap-4 ">
                   <a
                     href="https://play.google.com/store/apps/details?id=ai.ave.platform"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <img
                       src="/download/frame-1.svg"
@@ -57,7 +57,7 @@
                   </a>
                   <a
                     href="https://ossaveai.com/oss/app/ave.ai.apk"
-                    class="bg-[#161926] text-white text-sm flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="bg-[#161926] text-white text-sm flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <img
                       src="/download/vector-6.svg"
@@ -73,7 +73,7 @@
                 <div class="grid gap-4">
                   <a
                     href="https://ossaveai.com/oss/app/avedex-mac.dmg.zip"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <svg class="w-5 h-5 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M17.1148 13.405C17.084 8.86378 19.6359 8.74626 19.7506 8.67351C18.3152 6.57498 16.0824 6.24481 15.2877 6.21403C13.3878 6.02097 11.5803 7.31086 10.615 7.31086C9.65245 7.31086 8.1639 6.21123 6.5886 6.23921C4.51805 6.26999 2.60698 7.43957 1.53813 9.29467C-0.613561 13.0301 0.986919 18.5618 3.08545 21.5893C4.10953 23.0722 5.33228 24.7371 6.93835 24.6783C8.48287 24.6167 9.06766 23.6766 10.9368 23.6766C12.8058 23.6766 13.3291 24.6783 14.9659 24.6447C16.628 24.614 17.6828 23.1338 18.6985 21.6452C19.8765 19.9244 20.3606 18.3435 20.3885 18.2596C20.3522 18.2428 17.1456 16.4325 17.112 13.405H17.1148Z" fill="white"/>
@@ -83,7 +83,7 @@
                   </a>
                   <a
                     href="https://ossaveai.com/oss/app/ave.ai-win64.exe"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-2 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <svg
                       class="w-5 h-5 mr-2"
@@ -424,7 +424,7 @@
             <div class="grid grid-cols-10 gap-7 text-sm" data-aos="fade-up">
               <div class="text-center">
                 <img
-                  src="/download/-------1.svg"
+                  src="/download/gen.svg"
                   alt="金狗"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -432,7 +432,7 @@
               </div>
               <div class="text-center">
                 <img
-                  src="/download/------1-1.svg"
+                  src="/download/smarters.svg"
                   alt="潜力榜"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -448,7 +448,7 @@
               </div>
               <div class="text-center">
                 <img
-                  src="/download/---5.svg"
+                  src="/download/rug.svg"
                   alt="抽地毯"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -468,7 +468,7 @@
               </div>
               <div class="text-center">
                 <img
-                  src="/download/---4.svg"
+                  src="/download/dump.svg"
                   alt="暴跌"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -476,7 +476,7 @@
               </div>
               <div class="text-center">
                 <img
-                  src="/download/---3.svg"
+                  src="/download/pump.svg"
                   alt="暴涨"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
@@ -484,7 +484,7 @@
               </div>
               <div class="text-center">
                 <img
-                  src="/download/---6.svg"
+                  src="/download/6.svg"
                   alt="高换手"
                   class="w-12 h-12 mx-auto mb-4 block"
                 >
