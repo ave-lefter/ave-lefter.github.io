@@ -87,15 +87,15 @@ const botStore = useBotStore()
                 v-if="token_create_time && Number(formatTimeFromNow(token_create_time, true)) < 60"
                 :key="token_create_time" :timestamp="token_create_time" :end-time="60">
                 <template #default="{ seconds }">
-                  <span v-if="seconds < 60" class="color-#FFA622 text-12px">
+                  <span v-if="seconds < 60" v-tooltip="formatDate(token_create_time,'MM/DD HH:mm:ss')" class="color-#FFA622 text-12px">
                     {{ seconds }}s
                   </span>
-                  <span v-else class="color-[--d-999-l-666] text-12px">
+                  <span v-else v-tooltip="formatDate(token_create_time,'MM/DD HH:mm:ss')" class="color-[--d-999-l-666] text-12px">
                     {{ formatTimeFromNow(token_create_time) }}
                   </span>
                 </template>
               </TimerCount>
-              <div v-else class="color-[--d-999-l-666] text-12px">
+              <div v-else v-tooltip="formatDate(token_create_time,'MM/DD HH:mm:ss')" class="color-[--d-999-l-666] text-12px">
                 {{ formatTimeFromNow(token_create_time) }}
               </div>
               <div
@@ -159,15 +159,15 @@ const botStore = useBotStore()
               v-if="first_signal_time && Number(formatTimeFromNow(first_signal_time, true)) < 60"
               :key="first_signal_time" :timestamp="first_signal_time" :end-time="60">
               <template #default="{ seconds }">
-                <span v-if="seconds < 60" class="color-#FFA622">
+                <span v-if="seconds < 60" v-tooltip="formatDate(first_signal_time,'MM/DD HH:mm:ss')" class="color-#FFA622">
                   {{ seconds }}s
                 </span>
-                <span v-else class="color-[--d-999-l-666]">
+                <span v-else v-tooltip="formatDate(first_signal_time,'MM/DD HH:mm:ss')" class="color-[--d-999-l-666]">
                 {{ formatTimeFromNow(first_signal_time) }}
               </span>
               </template>
             </TimerCount>
-            <span v-else class="color-[--d-999-l-666]">
+            <span v-else v-tooltip="formatDate(first_signal_time,'MM/DD HH:mm:ss')" class="color-[--d-999-l-666]">
             {{ formatTimeFromNow(first_signal_time) }}
             </span>
           </el-col>
@@ -183,7 +183,8 @@ const botStore = useBotStore()
             <div class="mb-4px">
               {{ $t('currentMarketCap') }}
             </div>
-            <div class="flex items-center justify-center gap-6px"
+            <div
+class="flex items-center justify-center gap-6px"
                  :class="{
                   'color-#F6465D':Number(mc_cur)<Number(mc),
                   'color-#12B886':Number(mc_cur)>Number(mc)

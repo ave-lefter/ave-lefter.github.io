@@ -1,20 +1,36 @@
 <script setup lang="ts">
+import { useStorage } from '@vueuse/core'
 import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
+import newRank from './components/newRank/new.vue'
+import inclusionRank from './components/inclusionRank/inclusion.vue'
+import gainer from './components/gainerRank/gainer.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
-// 将首页跳转回 token 页
-definePageMeta({
-  middleware: defineNuxtRouteMiddleware(() => {
-    return navigateTo('/token/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599-eth', { replace: true })
-  })
-})
+import { v4 as uuidv4 } from 'uuid'
 
+const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
+const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
 const components = {
+  new: newRank,
+  inclusion:inclusionRank,
   hot,
+  gainer,
+  pump: pumpComponent,
+  bonk_pump: pumpComponent,
+  four: pumpComponent,
+  bonk: pumpComponent,
+  moonshot: pumpComponent,
+  Studio: pumpComponent,
+  novabits: pumpComponent,
+  binance_alpha: activityComponent,
+  cto: activityComponent,
+  xstocks: activityComponent,
+  volume: activityComponent,
 }
-const activeTab = shallowRef<keyof typeof components>('hot')
-const activeChain = shallowRef('AllChains')
+const activeTab = useStorage<keyof typeof components>('rankActiveTab', 'hot')
+const activeSubTab = useStorage('rankSubTab','pump_in_hot')
+const activeChain = useStorage('rankChain', 'AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
 const categories = computed(() => {
   return chains.value.find((el) => el.net_name === activeChain.value)?.categories || []
@@ -166,6 +182,7 @@ function listMapFunction(i: Record<string, any>) {
   }
   return {
     ...i,
+    rowKey:uuidv4(),
     id: `${i.target_token}-${i.chain}`,
     pair_id: `${i.pair}-${i.chain}`,
     token: i.target_token,
@@ -227,6 +244,7 @@ function getMedias(appendix: string) {
 <template>
   <div class="w-full [&&]:max-w-1920px mx-auto">
     <CategoryTabs
+      v-model:activeSubTab="activeSubTab"
       v-model:activeTab="activeTab"
       v-model:activeChain="activeChain"
       :categories="categories"
@@ -237,6 +255,8 @@ function getMedias(appendix: string) {
         :is="components[activeTab]"
         :listMapFunction="listMapFunction"
         :activeChain="activeChain"
+        :activeTab="activeTab"
+        :activeSubTab="activeSubTab"
       />
     </KeepAlive>
   </div>

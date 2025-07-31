@@ -54,8 +54,8 @@ const isTxsHighlight = shallowRef(false)
 const { t } = useI18n()
 
 function volConfirm(params?: [string, string]) {
-  confirm(`${volPrefix.value}_min`, `${volPrefix.value}_max`, params, () => {
-    isFilterHighlight.value = false
+  confirm(`${volPrefix.value}_min`, `${volPrefix.value}_max`, params, (isHighlight: boolean) => {
+    isFilterHighlight.value = isHighlight
     volVisible.value = false
   })
 }
@@ -99,7 +99,7 @@ function confirm(
       @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')"
     >
       <span
-        class="lh-16px rounded-2px px-2px text-12px bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5]"
+        class="lh-16px rounded-2px px-2px text-12px bg-[--d-333-l-FFF] color-[--d-CCC-l-333]"
         >{{ activeInterval }}</span
       >
       Vol

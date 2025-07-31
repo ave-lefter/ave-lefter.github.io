@@ -5,6 +5,10 @@ const props = defineProps({
   modelValue: {
     type: Array,
     default: () => []
+  },
+  boundary: {
+    type: HTMLElement,
+    default: undefined
   }
 })
 const emit = defineEmits(['update:visible', 'confirm', 'reset'])
@@ -28,6 +32,7 @@ const filterTime = ref([])
     teleported
     popper-style="max-width: 420px;--el-text-color-primary:--d-666-l-999"
     popper-class="transaction-popover"
+    :popper-options="{ modifiers: [{ name: 'preventOverflow', options: { boundary: boundary, padding: 0 } }] }"
   >
     <template #reference>
       <Icon

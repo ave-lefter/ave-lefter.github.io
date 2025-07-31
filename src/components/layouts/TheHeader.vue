@@ -32,6 +32,7 @@
       </span>
     </a>
     <div class="flex-1" />
+    <ClipboardToken />
     <el-button
       v-if="!botStore.evmAddress && !walletStore.address"
       text
@@ -106,6 +107,7 @@
     <dialog-search v-model="dialogVisible_search" />
     <!-- <component :is="connectWalletCom" v-model="botStore.connectVisible" /> -->
     <ConnectWalletCom />
+    <BotTipDialog/>
   </header>
 </template>
 <script lang="ts" setup>
@@ -115,6 +117,8 @@ import Notice from '~/components/layouts/components/notice.vue'
 // const connectWallet = shallowRef<Component | null>(null)
 import Positions from '@/components/header/positions/index.vue'
 import ExWalletBtn from '../header/connectWallet/exWalletBtn.vue'
+import BotTipDialog from './components/botTipDialog.vue'
+import ClipboardToken from './components/clipboardToken.vue'
 // import connectWallet from '@/components/header/connectWallet/index.vue'
 // const connectWallet = shallowRef<Component | null>(null)
 const { locales } = useI18n()
@@ -125,13 +129,13 @@ const route = useRoute()
 const langStore = useLocaleStore()
 const {t } = useI18n()
 const list = computed(() => {
-  let query = ''
-  if (botStore.accessToken && botStore.refreshToken) {
-    query = `?act=${botStore.accessToken}&ret=${botStore.refreshToken}`
-  }
+  // let query = ''
+  // if (botStore.accessToken && botStore.refreshToken) {
+  //   query = `?act=${botStore.accessToken}&ret=${botStore.refreshToken}`
+  // }
   const menues = [
-    // {id: 'index', name: t('markets'), src: '/', target: '_self'},
-    {id: 'index', name: t('markets'), src: 'https://ave.ai/' + query, target: '_blank'},
+    {id: 'index', name: t('markets'), src: '/', target: '_self'},
+    // {id: 'index', name: t('markets'), src: 'https://ave.ai/' + query, target: '_blank'},
     { id: 'pump', name: t('pump1'), src: '/pump' },
     { id: 'follow', name: t('follow'), src: '/follow' },
     {id: 'smart', name: t('smarter2'), src: '/smart', target: '_self'},

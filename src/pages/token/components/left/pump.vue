@@ -27,15 +27,15 @@ const sort = ref({
 const isVolUSDT = ref(true)
 const tabList = computed(()=>{
   return [{
-    label: t('NewPairs'),
+    label: t('new1'),
     value: 'pump_in_new',
     progressVisible: true
   }, {
-    label: t('FinalStretch'),
+    label: t('soon'),
     value: 'pump_in_almost',
     progressVisible: true
   }, {
-    label: t('Migrated'),
+    label: t('graduated'),
     value: 'pump_out_new',
     progressVisible: false
   },

@@ -426,6 +426,8 @@
   "revoke": "Cancelar",
   "expiredTime": "Expiração",
   "historyLimitOrder": "Ordem de Limite",
+  "cowboys": "Top Traders",
+  "kol": "KOL",
   "isMonitored": "Se deve adicionar monitoramento",
   "no": "não",
   "followAddress": "Siga o endereço",
@@ -449,5 +451,13 @@
   "insidersPosition1": "Insiders Possuído",
   "login": "Conecte-se",
   "platform": "Plataforma",
-  "onlyPush": "Apenas empurre"
+  "onlyPush": "Apenas empurre",
+  "balance": "Ativo",
+  "runTime1": "1/2 Custo",
+  "runTime2": "2/2 Custo",
+  "snipers_1m": "Snipers [1m]",
+  "devPosition": "DEV Possuído",
+  "complete": "Completo",
+  "myFavoriteChain": "Minha rede favorita",
+  "unDelete": "Não pode excluir"
 }

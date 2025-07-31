@@ -21,6 +21,7 @@ import {useThrottleFn} from '@vueuse/core'
 import IconUnknown from '@/assets/images/icon-unknown.png'
 import type {AveTable} from '#components'
 // import type { content } from 'html2canvas/dist/types/css/property-descriptors/content'
+const globalStore = useGlobalStore()
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
@@ -71,10 +72,10 @@ const tabs = computed(() => {
     label: t('sell3'),
     value: 'sell'
   },
-  // {
-  //   label: t('followed'),
-  //   value: '-100'
-  // },
+  {
+    label: t('followed')+ `(${globalStore.headFollowsNum.all})`,
+    value: '-100'
+  },
   {
     label: t('liquidity2'),
     value: 'liquidity'
@@ -87,6 +88,7 @@ const ignoreWs = computed(() => {
 const isHoverTable = shallowRef(false)
 
 const isLiquidity = computed(() => activeTab.value === 'liquidity')
+const txsContainer = useTemplateRef('txs-container')
 const columns = computed(() => {
   const visible = token.value?.chain === 'solana' && !isLiquidity.value
   return [{ key: 'time', dataKey: 'time', title: t('time'), minWidth: 80 },
@@ -652,16 +654,16 @@ const collect = async (row: any,index:number) => {
         user_chain: row.chain,
         group: form.group,
         is_monitored: form.is_monitored,
-      }).then(() => {
-        ElMessage.success(t('attention1Success'))
+      }).then((res) => {
         // getList()
+        globalStore.getFollowsNum()
         filterTableList.value.forEach((item: any) => {
           if (item.wallet_address === row.wallet_address) {
             item['is_wallet_address_fav'] = 1
           }
         })
         triggerRef(tokenTxs)
-        return Promise.resolve()
+        return Promise.resolve(res)
       }).catch((err) => {
         return Promise.reject(err)
       })
@@ -674,6 +676,7 @@ const collect = async (row: any,index:number) => {
     user_address: row.wallet_address,
     user_chain: row.chain
   }).then(() => {
+    globalStore.getFollowsNum()
     ElMessage.success( t('attention1Canceled'))
     // getList()
     filterTableList.value.forEach((item: any) => {
@@ -691,7 +694,7 @@ const collect = async (row: any,index:number) => {
 </script>
 
 <template>
-  <div class="transactions">
+  <div ref="txs-container" class="transactions">
     <div class="px-12px mb-10px flex justify-between">
       <div
         ref="tabsContainer"
@@ -758,7 +761,7 @@ const collect = async (row: any,index:number) => {
               :name="`${tableView.isShowDate ? 'custom:calendar' : 'custom:countdown'}`"
               class="color-[--d-666-l-999] cursor-pointer" @click.self="tableView.isShowDate = !tableView.isShowDate" />
             <TableDateFilter
-              v-model:visible="tableFilterVisible.timestamp" :modelValue="tableFilter.timestamp"
+              v-model:visible="tableFilterVisible.timestamp" :modelValue="tableFilter.timestamp" :boundary="txsContainer || undefined"
               @confirm="onTimestampConfirm" />
           </div>
         </template>

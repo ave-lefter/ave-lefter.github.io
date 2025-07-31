@@ -15,13 +15,14 @@ const route = useRoute()
 const tokenStore = useTokenStore()
 const botStore = useBotStore()
 const { t } = useI18n()
+const globalStore = useGlobalStore()
 const {token, tokenInfoExtra ,pairAddress,commonHeight} = storeToRefs(useTokenStore())
 const activeTab = shallowRef<keyof typeof components | 'Orders'>('Transactions')
 const components = {
   Transactions,
   Holders: defineAsyncComponent(() => import('./holders/index.vue')),
   LP: defineAsyncComponent(() => import('./lp/index.vue')),
-  Attention: '',
+  Attention: defineAsyncComponent(() => import('./attention/index.vue')),
   Orders: defineAsyncComponent(() => import('./orders/index.vue')),
   MySwap: defineAsyncComponent(() => import('./mySwap/index.vue')),
 }
@@ -30,10 +31,26 @@ const tabs = computed(() => {
   { name: t('transactions'), component: 'Transactions' as const },
   { name: t('holders'), component: 'Holders' as const },
   { name: 'LP', component: 'LP' as const },
-  // { name: t('attention1'), component: 'Attention' as const },
+  { name: t('attention1') +`(${globalStore.headFollowsNum.all})`, component: 'Attention' as const },
   { name: t('orders'), component: 'Orders' as const },
   { name: t('mySwap'), component: 'MySwap' as const },
   ]
+})
+const id = computed(() => {
+  return route.params?.id as string
+})
+watch(id, () => {
+  globalStore.getFollowsNum()
+})
+watch(() => useFollowStore().currentAddress, (val) => {
+  if (val) {
+    globalStore.getFollowsNum()
+  } else {
+    globalStore.headFollowsNum = {
+      all: 0,
+      subAll: 0
+    }
+  }
 })
 
 watch(
@@ -61,7 +78,7 @@ const previousTab = ref<keyof typeof components>('Transactions')
 watch(
   () => orderBookVisible.value,
   (isVisible) => {
-    console.log('🔄 订单薄状态变化:', isVisible ? '打开' : '关闭')
+    // console.log('🔄 订单薄状态变化:', isVisible ? '打开' : '关闭')
     if (isVisible) {
       // 当 orderBook 打开时，保存当前标签并切换到其他标签
       if (activeTab.value === 'Transactions') {
@@ -74,7 +91,7 @@ watch(
     } else {
       // 当 orderBook 关闭时，恢复到之前的标签（默认为 Transactions）
       activeTab.value = previousTab.value || 'Transactions'
-      console.log('🔄 恢复到标签:', activeTab.value)
+      // console.log('🔄 恢复到标签:', activeTab.value)
     }
   },
   { immediate: true }
@@ -134,6 +151,9 @@ const comProps = computed(() => {
     MySwap: {},
   }[activeTab.value] || {}
 })
+onMounted(() => {
+  globalStore.getFollowsNum()
+})
 </script>
 
 <template>
@@ -141,12 +161,12 @@ const comProps = computed(() => {
     <div class="flex items-center px-12px gap-20px border-b-1px border-b-solid border-b-#FFFFFF08 mb-12px">
       <a
         v-for="(item) in tabsList" :key="item.component" href="javascript:;"
-         :class="`flex items-center decoration-none text-12px lh-20px text-center color-[--d-666-l-999] ${activeTab === item.component ? 'color-[--d-F5F5F5-l-222] b-b-[--d-F5F5F5-l-333]' : 'b-b-transparent'}`"
+         :class="`flex items-center decoration-none text-12px lh-20px text-center color-[--d-666-l-999] ${activeTab === item.component ? 'color-[--d-F5F5F5-l-222] b-b-[--d-F5F5F5-l-333] font-500' : 'b-b-transparent'}`"
         @click="activeTab = item.component">
         <div v-if="item.component == 'Orders'" class="w-1px h-20px bg-[var(--custom-br-1-color)] mr-20px mb-8px"/>
         <div
           :class="`b-b-solid b-b-2px pb-12px flex-start ${activeTab === item.component ? ' b-b-[--d-F5F5F5-l-333]' : 'b-b-transparent'}`">
-          {{ item.name }}
+          <strong>{{ item.name }}</strong>
           <span v-if="item.component === 'Orders'">({{ tokenStore.registrationNum }})</span>
           <span v-if="item.component === 'LP'" class="flex-start">
             ({{ pairHolders }})
@@ -173,7 +193,7 @@ const comProps = computed(() => {
     </div>
     <OrdersTab v-show="activeTab === 'Orders'" :currentActiveTab="activeTab"/>
     <KeepAlive v-show="activeTab !== 'Orders'">
-      <component :is="Component" v-bind="comProps"/>
+      <component :is="Component" v-bind="comProps" :currentActiveTab="activeTab" />
     </KeepAlive>
   </div>
 </template>

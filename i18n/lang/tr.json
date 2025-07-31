@@ -421,6 +421,8 @@
   "revoke": "İptal etmek",
   "expiredTime": "Son kullanma tarihi",
   "historyLimitOrder": "Limit Emri",
+  "cowboys": "Cüzdan Kovboyu",
+  "kol": "Cüzdan KOL",
   "isMonitored": "İzleme ekleyip eklemeyeceği",
   "no": "HAYIR",
   "followAddress": "Adresi Takip Edin",
@@ -444,5 +446,13 @@
   "insidersPosition1": "İçeridekiler",
   "login": "Giriş yapmak",
   "platform": "Platform",
-  "onlyPush": "Sadece Push"
+  "onlyPush": "Sadece Push",
+  "balance": "Bakiye",
+  "runTime1": "1/2 Maliyet",
+  "runTime2": "2/2 Maliyet",
+  "snipers_1m": "Snipers[1d]",
+  "devPosition": "Sahip Olunan Geliştirici",
+  "complete": "Tamamla",
+  "myFavoriteChain": "Favori zincirim",
+  "unDelete": "Silinemiyor"
 }

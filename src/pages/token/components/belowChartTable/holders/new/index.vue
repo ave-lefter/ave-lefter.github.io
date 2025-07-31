@@ -85,7 +85,21 @@
       </li>
       <li>
         <div>{{ $t('soldAll') }}/{{ $t('all') }}</div>
-        <div>
+        <div v-if="activeTab == '-100'">
+          <span
+            :class="!Number(globalStore.headFollowsNum.soldAll || 0) ? 'color-text-2' : ''"
+          >
+            {{ formatNumber(globalStore.headFollowsNum.soldAll || 0, 2) }}
+          </span>
+          <span class="color-text-2">/</span>
+          <span
+            :class="!Number(globalStore.headFollowsNum?.all || 0) ? 'color-text-2' : ''"
+          >
+            {{ formatNumber(globalStore.headFollowsNum?.all || 0, 2) }}
+          </span>
+        </div>
+
+        <div v-else>
           <span
             :class="!Number(aggregateStats?.soldAll || 0) ? 'color-text-2' : ''"
           >
@@ -98,6 +112,7 @@
             {{ formatNumber(aggregateStats?.all || 0, 2) }}
           </span>
         </div>
+
       </li>
       <li>
         <div>{{ $t('totalPnL') }}</div>
@@ -230,7 +245,8 @@ const { price, totalHolders} = storeToRefs(useTokenStore())
 const route = useRoute()
 const botStore = useBotStore()
 const { t } = useI18n()
-const activeTab = shallowRef<'all' | 'buy' |'sell' | 'buy24h' | 'sell24h'>('all')
+const activeTab = shallowRef<'all' | 'buy' |'sell' | 'buy24h' | 'sell24h' | '-100'>('all')
+const globalStore = useGlobalStore()
 
 const searchKeyword = shallowRef('')
 const loadingHolders = shallowRef(false)
@@ -243,7 +259,6 @@ const aggregateStatsObj = ref<Record<string, AggregateStats>>({})
 const searchOriginKeyword = shallowRef('')
 const searchOriginType = shallowRef('')
 const holdersRef = useTemplateRef('holdersRef')
-
 const tabs = computed(() => {
   const arr: Array<{ label: string; value: string }> = []
   if (Array.isArray(totalHolders.value)) {
@@ -262,6 +277,10 @@ const tabs = computed(() => {
     {
       label: t('all'),
       value: 'all',
+    },
+    {
+      label: t('followed')+`(${globalStore.headFollowsNum.all  - globalStore.headFollowsNum.soldAll })`,
+      value: '-100',
     },
     {
       label: t('topGainer'),
@@ -311,16 +330,16 @@ const aggregateStats = computed(
   () => aggregateStatsObj?.value?.[activeTab.value] || {}
 )
 const totalProfit = computed(() => {
+
   return holderList.value
     ?.reduce((p, row) => {
       const amount = Math.max((row?.bought || 0) - (row?.sold || 0), 0)
-      const c = new BigNumber(
-        price?.value || 0 - (row?.avg_purchase_price || 0)
-      ).times(amount)
+      const c = new BigNumber((price.value || 0) - (row?.avg_purchase_price || 0)).times(amount)
       return c.plus(p)
     }, new BigNumber('0'))
     ?.toFixed(0)
 })
+
 // const addressAndChain = computed(() => {
 //   const id = route.params.id as string
 //   if (id) {

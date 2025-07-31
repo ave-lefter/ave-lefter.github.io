@@ -426,6 +426,8 @@
   "revoke": "Cancelar",
   "expiredTime": "Vencimiento",
   "historyLimitOrder": "4o mini",
+  "cowboys": "Top Traders de la billetera",
+  "kol": "KOL de la billetera",
   "isMonitored": "Si agregar monitoreo",
   "no": "No",
   "followAddress": "Seguir la dirección",
@@ -449,5 +451,13 @@
   "insidersPosition1": "Propiedad de internos",
   "login": "Acceso",
   "platform": "Plataforma",
-  "onlyPush": "Solo empuje"
+  "onlyPush": "Solo empuje",
+  "balance": "Activos",
+  "runTime1": "1/2 Costo",
+  "runTime2": "2/2 Costo",
+  "snipers_1m": "Francotiradores[1m]",
+  "devPosition": "En Propiedad por DEV",
+  "complete": "Completar",
+  "myFavoriteChain": "Mi cadena favorita",
+  "unDelete": "No se puede eliminar"
 }

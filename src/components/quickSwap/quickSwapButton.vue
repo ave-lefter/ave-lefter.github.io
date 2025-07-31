@@ -4,12 +4,13 @@ import {ElNotification} from 'element-plus'
 import {useStorage} from '@vueuse/core'
 import {bot_createSolTx, bot_createSwapEvmTx, bot_getTokenBalance} from '~/api/bot'
 import {formatBotGasTips} from '~/utils/bot'
+import type { BotChain, BotSettingKey } from '~/utils/types'
 
 const {t} = useI18n()
 const props = withDefaults(defineProps<{
   quickBuyValue: string
   row: {
-    chain: string
+    chain: BotChain
     symbol?: string
     target_token?: string
     token0_address?: string
@@ -88,7 +89,7 @@ async function submitSwap(amount: string) {
   const {chain} = props.row
   const isSolana = chain === 'solana'
   const {botSettings} = botSettingStore
-  const selected = botSettings?.[chain]?.selected as 's1' | 's2' | 's3'
+  const selected = botSettings?.[chain]?.selected as BotSettingKey
   const currentBotSetting = botSettings?.[chain]?.[selected]
   if (isSolana && currentBotSetting?.mev) {
     if (!await botStore.getBundleAvailable()) {
@@ -132,7 +133,11 @@ async function submitSwap(amount: string) {
     isPrivate: currentBotSetting?.mev || false,
     slippage: slippage !== 'auto'
       ? Number(new BigNumber(slippage || '9').times(100).toFixed(0)) : 900,
-    autoSell: currentBotSetting?.autoSell || false
+    autoSell: botSettingStore.autoSellConfig_autoSell || false,
+    autoSellConfig: botSettingStore?.autoSellConfig,
+    autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
+    autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
+    autoSellPriorityFee: isSolana ? data.priorityFee : data.gasTip
   }
   const tx = isSolana ? bot_createSolTx(data) : bot_createSwapEvmTx(data)
   tx.then(res => handleTxSuccess(res, data.batchId))

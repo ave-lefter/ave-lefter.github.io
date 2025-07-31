@@ -3,10 +3,18 @@ import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
 import type { CategoryElement, IGetTreasureConfig } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
+import { getNewDefaultColumns, getNewOptions } from './newRank/columnRender/newColumnsService'
+import { getInclusionDefaultColumns, getInclusionOptions } from './inclusionRank/columnRender/inclusionColumnsService'
+import { getGainDefaultColumns, getGainOptions } from './gainerRank/columnRender/gainColumnsService'
 import ChainsSelect from './chainsSelect.vue'
+import { getPumpDefault, getPumpOptions } from './pump/columnRender/pumpColumnsService'
+import {
+  getActivityDefaultColumns,
+  getActivityOptions,
+} from './activity/columnRender/columusService'
 
 const emit = defineEmits<{
-  (e: 'update:activeTab' | 'update:activeChain', value: string): void
+  (e: 'update:activeTab' | 'update:activeChain' | 'update:activeSubTab', value: string): void
 }>()
 
 const props = defineProps<{
@@ -14,6 +22,7 @@ const props = defineProps<{
   categories: CategoryElement[]
   chains: IGetTreasureConfig[]
   activeChain: string
+  activeSubTab: string
 }>()
 // const { t } = useI18n()
 const intervals = computed(() => {
@@ -26,6 +35,11 @@ const intervals = computed(() => {
     { name: '24h', id: '24h' },
   ]
 })
+const themeStore = useThemeStore()
+const isHot = computed(() => props.activeTab === 'hot')
+const isPump = computed(() => props.activeTab === 'pump')
+const isNew = computed(() => props.activeTab === 'new')
+const isInclusion = computed(() => props.activeTab === 'inclusion')
 const configMap = computed(() => {
   return {
     hot: {
@@ -33,19 +47,189 @@ const configMap = computed(() => {
       storageKey: 'hotUserTableColumns',
       getDefaultColumns: getHotDefaultColumns,
       getOptions: getHotOptions,
-      class: props.activeTab === 'hot' ? 'color-#FFA622' : '',
+      class: isHot.value ? 'color-#FFA622' : '',
     },
+    new: {
+      icon: 'custom:new',
+      storageKey: 'newTableColumns',
+      getDefaultColumns: getNewDefaultColumns,
+      getOptions: getNewOptions,
+      class: isNew.value ? 'color-#85E12F' : '',
+    },
+    gainer: {
+      icon: 'custom:gainer',
+      storageKey: 'gainUserTableColumns',
+      getDefaultColumns: getGainDefaultColumns,
+      getOptions: getGainOptions,
+      class: props.activeTab === 'gainer' ? 'color-#22C55E' : '',
+    },
+    pump: {
+      icon: getPumpIcon(isPump.value),
+      storageKey: 'pumpTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    bonk_pump: {
+      icon: '',
+      storageKey: 'bonk_pumpTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    four: {
+      icon: '',
+      storageKey: 'fourTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    bonk: {
+      icon: '',
+      storageKey: 'bonkTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    moonshot: {
+      icon: '',
+      storageKey: 'moonshotTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    Studio: {
+      icon: '',
+      storageKey: 'StudioTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    novabits: {
+      icon: '',
+      storageKey: 'novabitsTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    inclusion: {
+      icon: 'custom:inclusion',
+      storageKey: 'inclusionTableColumns',
+      getDefaultColumns: getInclusionDefaultColumns,
+      getOptions: getInclusionOptions,
+      class: isInclusion.value ? 'color-#B43BFF' : '',
+    },
+    binance_alpha: {
+      icon: '',
+      storageKey: 'binance_alphaTableColumns',
+      getDefaultColumns: getActivityDefaultColumns,
+      getOptions: getActivityOptions,
+      class: '',
+    },
+    cto: {
+      icon: '',
+      storageKey: 'ctoTableColumns',
+      getDefaultColumns: getActivityDefaultColumns,
+      getOptions: getActivityOptions,
+      class: '',
+    },
+    xstocks: {
+      icon: '',
+      storageKey: 'xstocksTableColumns',
+      getDefaultColumns: getActivityDefaultColumns,
+      getOptions: getActivityOptions,
+      class: '',
+    },
+    volume:{
+      icon:'',
+      storageKey:'volumeTableColumns',
+      getDefaultColumns:getActivityDefaultColumns,
+      getOptions:getActivityOptions,
+      class:''
+    }
   }
 })
+
+
+
+watch(()=>props.activeChain, () => {
+  const index=props.categories.findIndex((i) => {
+    return i.category === props.activeTab
+  })
+  if(index>-1){
+    if(props.categories[index] && props.categories[index].sub_category && props.categories[index].sub_category.length > 0){
+      const index2=props.categories?.[index]?.sub_category?.findIndex((i) => {
+        return i.category === props.activeSubTab
+      })
+      if(index2<=-1){
+        emit('update:activeTab','hot')
+      }
+    }
+  }else{
+    emit('update:activeTab','hot')
+  }
+})
+function getPumpIcon(isPump: boolean) {
+  if (isPump) {
+    return 'custom:pump-active'
+  }
+  if (themeStore.isDark) {
+    return 'custom:pump'
+  } else {
+    return 'custom:pump-white'
+  }
+}
 const globalStore = useGlobalStore()
-// 由于其他榜单未上，用临时的 computed过滤
 const supportCategories = computed(() => {
-  const keys = ['hot']
+  const keys = [
+    'hot',
+    'new',
+    'gainer',
+    'pump',
+    'bonk_pump',
+    'four',
+    'bonk',
+    'moonshot',
+    'Studio',
+    'novabits',
+    'inclusion',
+    'binance_alpha',
+    // 'cto',
+    'xstocks',
+    'volume'
+  ]
   return (props.categories || []).filter((el) => {
     return keys.includes(el.category)
   })
 })
 const localeStore = useLocaleStore()
+const sub_category_list = computed(() => {
+  return (
+    props.categories.find((el) => {
+      return el.category === props.activeTab
+    })?.sub_category || []
+  )
+})
+const categoryRef = useTemplateRef('categoryRef')
+function updateCategory(category: string, sub_category: CategoryElement[],index:number) {
+  emit('update:activeTab', category)
+  if (!sub_category.some((el) => el.category === props.activeSubTab)) {
+    emit('update:activeSubTab', sub_category[0]?.category || '')
+  }
+  scrollTabToCenter(categoryRef,index)
+}
+function updateSubCategory(category: string) {
+  emit('update:activeSubTab', category)
+}
+function updateActiveChain(chain: string) {
+  emit('update:activeChain', chain)
+  // emit('update:activeTab','hot')
+}
+const botStore = useBotStore()
+const walletStore = useWalletStore()
+const isSupportedChain = computed(()=>{
+  return !walletStore.address && (props.activeChain==='AllChains' || botStore.isSupportChains.includes(props.activeChain))
+})
 </script>
 
 <template>
@@ -53,27 +237,28 @@ const localeStore = useLocaleStore()
     <ChainsSelect
       :activeChain="activeChain"
       :list="chains"
-      @update:activeChain="emit('update:activeChain', $event)"
+      @update:activeChain="updateActiveChain"
     />
-    <div class="flex flex-1 justify-between">
-      <div class="flex gap-2 text-12px">
+    <div class="flex flex-1 gap-16px justify-between">
+      <div ref="categoryRef" class="flex gap-2 text-12px flex-1 overflow-x-auto scrollbar-hide">
         <span
           v-for="(item, index) in supportCategories"
           :key="index"
-          class="p-2 lh-16px cursor-pointer rounded-1 flex items-center"
+          class="p-2 lh-16px cursor-pointer rounded-1 flex items-center shrink-0"
           :class="
             activeTab === item.category
               ? 'color-#F5F5F5 bg-#333'
               : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
           "
-          @click="emit('update:activeTab', item.category)"
+          @click="updateCategory(item.category, item.sub_category || [],index)"
         >
           <Icon
+            v-if="configMap[item.category as keyof typeof configMap].icon"
             :name="configMap[item.category as keyof typeof configMap].icon"
             class="mr-1 text-12px"
             :class="configMap[item.category as keyof typeof configMap].class"
           />
-          {{ item[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
+          {{ (item as any)[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
         </span>
       </div>
       <div class="flex gap-12px items-center text-12px">
@@ -93,13 +278,13 @@ const localeStore = useLocaleStore()
           </button>
         </div>
         <div class="flex items-center">
-          <el-switch v-model="globalStore.rankCommon.quickVisible" class="mr-2" />
+          <el-switch v-if="isSupportedChain" v-model="globalStore.rankCommon.quickVisible" class="mr-2" />
           <QuickSwapSet
-            v-if="globalStore.rankCommon.quickVisible"
+            v-if="globalStore.rankCommon.quickVisible&&isSupportedChain"
             v-model:quickBuyValue="globalStore.rankCommon.quickBuyValue"
             class="mr-12px"
             :settingsButtonVisible="false"
-            :chain="'solana'"
+            :chain="(activeChain==='AllChains'?'':activeChain)"
           />
           <BlackList />
           <ColumnsToolbar
@@ -110,6 +295,30 @@ const localeStore = useLocaleStore()
           />
         </div>
       </div>
+    </div>
+  </div>
+  <div
+    v-if="sub_category_list.length"
+    class="flex items-center gap-8px text-12px px-16px pb-12px bg-[--d-111-l-FFF]"
+  >
+    <div
+      v-for="item in sub_category_list"
+      :key="item.category"
+      class="p-2 lh-16px cursor-pointer rounded-1 flex items-center"
+      :class="
+        activeSubTab === item.category
+          ? 'color-#F5F5F5 bg-#333'
+          : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
+      "
+      @click="updateSubCategory(item.category)"
+    >
+      <Icon
+        v-if="isPump"
+        :name="`custom:${item.category.replaceAll('_', '-')}`"
+        class="mr-1 text-12px"
+        :class="activeSubTab === item.category ? 'color-#F5F5F5' : ''"
+      />
+      {{ item[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
     </div>
   </div>
 </template>

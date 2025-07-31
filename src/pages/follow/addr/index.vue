@@ -1,5 +1,5 @@
 <template>
-  <div class="w-address flex-1 w-100% h-[calc(100%-76px)] flex flex-col" :class="{ 'mt-12px': currentAddress }">
+  <div class="w-address flex-1 w-100% h-[calc(100%-76px)] flex flex-col relative" :class="{ 'mt-12px': currentAddress }">
     <ul v-if="currentAddress" class="w-operate">
       <li v-if="evmAddress" class="flex items-center gap-2px">
           <el-checkbox v-model="isMonitor" :label="t('onlyPush')"  style="color:var(--d-999-l-666);z-index: 0;--el-checkbox-font-weight:400" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! [&&]:[--el-checkbox-input-border:1px_solid_var(--d-666-l-999)]" size="large"/>
@@ -215,7 +215,7 @@
           sortable="custom"
           :sort-orders="['descending', 'ascending', null]"
           prop="main_token_balance_amount"
-          min-width="100px"
+          width="130"
         >
           <template #default="{ row }">
             <div style="padding: 0 5px">
@@ -236,7 +236,7 @@
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         prop="total_balance"
-        min-width="100px"
+        width="130"
       >
         <template #default="{ row }">
           <div style="padding: 0 5px">
@@ -487,7 +487,8 @@
           </el-select>
         </template>
       </el-table-column>
-       <el-table-column :label="t('push')" align="right" :width="!isMonitor ? 150 : 180" fixed="right">
+
+       <el-table-column :label="t('push')" align="right" :width="!isMonitor ? 180 : 250" fixed="right">
         <template #default="{ row ,$index}">
           <div class="flex flex-row-reverse  items-center" @click.stop>
             <a
@@ -946,7 +947,7 @@ function handleSort(val:any, dir='',sort:string) {
 }
 .w-operate{
   position: absolute;
-  top: 13px;
+  top: -53px;
   right: 0;
   width: 50%;
   display: flex;

@@ -16,6 +16,7 @@ import type { ConfigType } from 'dayjs'
 import { useStorage } from '@vueuse/core'
 import type { Size, SizeObj } from '~/api/types/pump'
 import FingerprintJs from '@fingerprintjs/fingerprintjs'
+import { UniChainsV4 } from './wallet/utils/abi'
 export * from './wallet/utils/index'
 
 export function isJSON(str: string) {
@@ -142,7 +143,13 @@ export function formatTime(time: number | string) {
   if (time < 3600 * 24) {
     return `${Math.floor(time / 3600)}h`
   }
-  return `${Math.floor(time / 3600 / 24)}d`
+  if (time < 3600 * 24 * 30) {
+    return `${Math.floor(time / 3600 / 24)}d`
+  }
+  if (time < 3600 * 24 * 30 * 12) {
+    return `${Math.floor(time / 3600 / 24 / 30 )}M`
+  }
+  return `${Math.floor(time / 3600 / 24 / 30 / 12)}y`
 }
 
 export function formatTimeFromNow(val: number | string, isNum = false) {
@@ -537,11 +544,11 @@ export function getWSMessage(e: MessageEvent) {
 }
 
 export function verifyLogin(isBot=false) {
-  const bottStore = useBotStore()
+  const botStore = useBotStore()
   const walletStore = useWalletStore()
-  const userInfo = bottStore.userInfo
+  const userInfo = botStore.userInfo
   if (!userInfo?.evmAddress && (!walletStore.address || isBot)) {
-    bottStore.changeConnectVisible(true)
+    botStore.changeConnectVisible(true)
     // 连接钱包
     return false
   }
@@ -567,7 +574,7 @@ export function getColorClass(val: string | number) {
   if (Number(val) > 0) {
     return 'color-#12B886'
   } else if (Number(val) < 0) {
-    return 'color-#FF646D'
+    return 'color-#F6465D'
   } else {
     return 'color-[--d-666-l-999]'
   }
@@ -724,6 +731,16 @@ export function scrollTabToCenter(tabsContainer: Ref<HTMLElement | null>, index:
 
   container.scrollTo({
     left: tabLeft - containerWidth / 2 + tabWidth / 2,
+    behavior: 'smooth',
+  })
+}
+
+export function scrollElement(tabsContainer: HTMLElement | null, scrollValue: number) {
+  if (!tabsContainer) {
+    return
+  }
+  tabsContainer.scrollTo({
+    left: tabsContainer.scrollLeft + scrollValue,
     behavior: 'smooth',
   })
 }
@@ -904,9 +921,35 @@ export async function getDeviceId() {
 }
 
 export function getFeeIn(bestRoute: { fee_index?: number; feeIn?: number }, chain: string) {
-  const chains = ['bsc', 'base']
+  const chains = UniChainsV4
   if (chains?.includes?.(chain)) {
     return String(bestRoute.fee_index ?? bestRoute.feeIn ?? '100')
   }
   return String(bestRoute.feeIn ?? '2')
+}
+
+export function setRefCodeToCookie() {
+  // 设置到一级域名下并设置过期时间为永不过期
+  const domain = location.hostname
+  const queryString = location.search
+  const params = new URLSearchParams(queryString)
+  const ref = params.get('ref') || params.get('code') || Cookies.get('refCode') || ''
+  // category utm_source eid pid
+  // let category = params.get('category') || ''
+  const utm_source = params.get('utm_source') || ''
+  const eid = params.get('eid') || ''
+  const pid = params.get('pid') || ''
+  if (ref) {
+    // 设计过期时间为 12 小时
+    document.cookie = `refCode=${ref};domain=${domain};path=/;expires=${new Date(Date.now() + 12 * 60 * 60 * 1000).toUTCString()}`
+  }
+  if (utm_source || eid || pid || ref) {
+      Cookies.set('refInfo', JSON.stringify({
+        utm_source,
+        eid,
+        pid,
+        code: ref,
+        // id: id
+      }), { expires: 0.5 })
+  }
 }

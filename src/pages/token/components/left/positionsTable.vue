@@ -8,6 +8,7 @@ import {formatBotGasTips} from '~/utils/bot'
 import BigNumber from 'bignumber.js'
 import {useDebounceFn, useThrottleFn} from '@vueuse/core'
 import {useWalletStore} from '~/stores/wallet'
+import type { BotChain, BotSettingKey } from '~/utils/types'
 
 const {t} = useI18n()
 const wsStore = useWSStore()
@@ -56,6 +57,48 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
   })
   triggerRef(listData)
 })
+// onMounted(()=>{
+//   setTimeout(()=>{
+//     wsStore.wsResult[WSEventType.ASSET] = {
+//     'client_address': '0xb42db0711f6c04d5c55951ef2b075fbe3ec7c4d0',
+//     'event': 'asset',
+//     'swap': {
+//         'type': '0',
+//         'chain': 'bsc',
+//         'token': '0x55d398326f99059ff775485246999027b3197955',
+//         'token_name': 'USDT',
+//         'logo_url': 'token_icon/bsc/0x55d398326f99059ff775485246999027b3197955_1743508127.png',
+//         'time': 1752885447,
+//         'rule_id': 2,
+//         'amount': '0.72224',
+//         'amm': 'cakev2',
+//         'eth_price': '-0.001',
+//         'price': '1'
+//     }
+// }
+//   },10000)
+
+
+//   setTimeout(()=>{
+//     wsStore.wsResult[WSEventType.ASSET] = {
+//     'client_address': '0xb42db0711f6c04d5c55951ef2b075fbe3ec7c4d0',
+//     'event': 'asset',
+//     'swap': {
+//         'type': '0',
+//         'chain': 'bsc',
+//         'token': '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c',
+//         'token_name': 'WBNB',
+//         'logo_url': 'token_icon/bsc/0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c.png',
+//         'time': 1752885963,
+//         'rule_id': 2,
+//         'amount': '0.0019823',
+//         'amm': 'cakev2',
+//         'eth_price': '-0.002',
+//         'price': '728.58285'
+//     }
+// }
+//   },20000)
+// })
 watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
   // 处理 token 交易
   if (val.swap) {
@@ -63,34 +106,11 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
       || (val.swap.token === NATIVE_TOKEN))
       ? NATIVE_TOKEN : val.swap.token
     const chain = val.swap.chain
-    const type = val.swap.type
     if (token && chain) {
-      const index = listData.value.findIndex(i => i.token === token && i.chain === chain)
-      // 买入信号
-      const isBuy = type === '0'
-      const isMainToken = token === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
-      const prevBalance = listData.value[index]?.balance
-      if (index > -1) {
-        if (isBuy) {
-          if (isMainToken) {
-            getTokenBalance(token, chain)
-          } else {
-            listData.value[index].balance = Number(prevBalance) + Number(val.swap.amount)
-            triggerRef(listData)
-          }
-        } else {
-          if (isMainToken) {
-            getTokenBalance(token, chain)
-            //   卖出所有直接删除数据
-          } else if (Number(prevBalance) === Number(val.swap.amount)) {
-            listData.value.splice(index, 1)
-            triggerRef(listData)
-          } else {
-            listData.value[index].balance = Number(prevBalance) - Number(val.swap.amount)
-            triggerRef(listData)
-          }
-        }
-      }
+      setTimeout(()=>{
+        resetStatus()
+        getDataOnResize()
+      },5000)
     }
     //   处理转账
   } else if (val.transfer) {
@@ -109,6 +129,11 @@ watch(() => wsStore.wsResult[WSEventType.ASSET], (val: IAssetResponse) => {
         indexObj.balance = newBalance.toString()
         indexObj.balance_usd = newBalanceUsd.toNumber()
         triggerRef(listData)
+      } else {
+        setTimeout(()=>{
+          resetStatus()
+          getDataOnResize()
+        },5000)
       }
     }
   }
@@ -358,8 +383,8 @@ function beforeSubmitSwap(balance: number, row: GetUserBalanceResponse & { index
 async function submitSwap(balance: number, row: GetUserBalanceResponse & { index: string }) {
   const isSolana = row.chain === 'solana'
   const {botSettings} = botSettingStore
-  const selected = botSettings?.[row.chain]?.selected as 's1' | 's2' | 's3'
-  const currentBotSetting = botSettings?.[row.chain]?.[selected]
+  const selected = botSettings?.[row.chain as BotChain]?.selected
+  const currentBotSetting = botSettings?.[row.chain as BotChain]?.[selected as BotSettingKey]
   if (isSolana && currentBotSetting?.mev) {
     if (!await botStore.getBundleAvailable()) {
       loadingSwap.value[row.index] = false

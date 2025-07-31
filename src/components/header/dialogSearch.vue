@@ -12,7 +12,7 @@
     <el-input
       ref="inputSearch"
       v-model.trim="query"
-      class="search-input px-20px "
+      class="search-input search-input2 px-20px"
       :placeholder="$t('enterAddress/token')"
       clearable
       autofocus
@@ -20,7 +20,7 @@
     >
       <template #prefix>
         <Icon
-          class="text-20px text-[var(--d-666-l-999)]"
+          class="text-20px text-[--d-666-l-999]"
           name="custom:search"
         />
       </template>
@@ -81,12 +81,18 @@
         :loading="loading"
         @close="visible = false"
       />
-      <SearchTable
-        v-else
-        :tokens="searchResult?.token_list?.slice?.(0, 200) || []"
-        :loading="loading"
-        @close="visible = false"
-      />
+      <template v-else>
+        <ChainTabs v-model:chain="activeChain" />
+        <SearchTable
+          isCanFilter
+          :tokens="searchResult?.token_list?.slice?.(0, 200) || []"
+          :loading="loading"
+          @close="visible = false"
+          @filter="handleFilter"
+          @sortChange="handleSortChange"
+        />
+      </template>
+
     </div>
   </el-dialog>
 </template>
@@ -101,13 +107,15 @@ import { ElMessageBox, type ElInput } from 'element-plus'
 import { ProvideType } from '~/utils/constants'
 import { getHotTokens, type GetHotTokensResponse } from '@/api/token'
 import type {IPriceV2Response} from '~/api/types/ws'
+import ChainTabs from './chainTabs/index.vue'
 const { hotList } = storeToRefs(useGlobalStore())
 const {currentAddress} =storeToRefs(useFollowStore())
 const { modelValue } = defineProps({
   modelValue: Boolean,
 })
+
 const $emit = defineEmits(['update:modelValue'])
-const i18n = useI18n()
+const { t } = useI18n()
 const themeStore = useThemeStore()
 const visible = computed({
   get() {
@@ -117,13 +125,20 @@ const visible = computed({
     $emit('update:modelValue', value)
   },
 })
+const query = shallowRef('')
 const tabActive = shallowRef('token')
 const inputSearch = useTemplateRef<HTMLElement | null>('inputSearch')
 const tabs = computed(() => {
   return [
-    { id: 'token', name: i18n.t('popularSearches') },
-    { id: 'wallet', name: i18n.t('wallet') },
+    { id: 'token', name: query.value ? t('token') : t('popularSearches') },
+    { id: 'wallet', name: t('wallet') },
   ]
+})
+const activeChain = ref('')
+const minPool = useLocalStorage('search_minPool', '')
+const searchSort = useLocalStorage('search_sort', {
+  sort: '',
+  sort_dir: '',
 })
 const hotTokens = inject<{
   value: Ref<GetHotTokensResponse[]>;
@@ -137,17 +152,13 @@ const hotTokenList = computed(() => {
 })
 const wsStore = useWSStore()
 const priceV2Store = usePriceV2Store()
-onMounted(() => {
-  getSmartTop10()
-})
 
-const botStore = useBotStore()
 const smartTop10List = shallowRef<Array<SearchWalletInfo>>([])
 const loading = shallowRef(false)
 function getSmartTop10() {
   const data = {
     chain: 'solana',
-    self_address: botStore.evmAddress ? botStore.evmAddress : undefined,
+    self_address: useFollowStore().currentAddress,
   }
   _getSmartTop10(data)
     .then((res) => {
@@ -156,14 +167,17 @@ function getSmartTop10() {
     .catch()
     .finally(() => {})
 }
-const query = shallowRef('')
 const searchResult = shallowRef<SearchInfo | null>(null)
 function tokenSearch() {
   if(!query.value)
   return
   const data = {
     query: query.value,
-    self_address: botStore.evmAddress ? botStore.evmAddress : undefined,
+    self_address: useFollowStore().currentAddress,
+    chain: activeChain.value,
+    min_pool: minPool.value || undefined,
+    sort: searchSort.value.sort || undefined,
+    sort_dir: searchSort.value.sort_dir || undefined,
   }
   setHistoryList(query.value)
   loading.value = true
@@ -214,22 +228,53 @@ watch(query, (newval) => {
     return
   }
   if (newval) {
+    activeChain.value = ''
+    // searchSort.value = {
+    //   sort: '',
+    //   sort_dir: '',
+    // }
     debouncedFetch()
   }
 })
 
+watch(activeChain, () => {
+  tokenSearch()
+})
+
+function handleFilter(val: string) {
+  minPool.value = val
+  tokenSearch()
+}
+
+function handleSortChange({prop, order}: {prop: string, order: -1 | 0 | 1}) {
+  const props = ['pool_size', 'tx_volume_u_24h']
+  if (props.includes(prop)) {
+    if (order !== 0) {
+      searchSort.value.sort = prop
+      searchSort.value.sort_dir = order === 1 ? 'desc' : 'asc'
+    } else {
+      searchSort.value.sort = ''
+      searchSort.value.sort_dir = ''
+    }
+    tokenSearch()
+  } else {
+    searchSort.value.sort = ''
+    searchSort.value.sort_dir = ''
+  }
+}
+
 watch(() => currentAddress.value, () => {
-    getSmartTop10()
+  getSmartTop10()
 })
 
 watch(visible, (val) => {
   if (val) {
     query.value = ''
-  }
-})
-onMounted(() => {
-  if (hotList?.value?.length == 0) {
-    _getHotTokens()
+    activeChain.value = ''
+    // searchSort.value = {
+    //   sort: '',
+    //   sort_dir: '',
+    // }
   }
 })
 function openDialog() {
@@ -251,9 +296,9 @@ function setHistoryList(history: string) {
   }
 }
 function confirm() {
-  ElMessageBox.confirm(i18n.t('whetherToClearHistory'), i18n.t('tips'), {
-    confirmButtonText: i18n.t('confirm'),
-    cancelButtonText: i18n.t('cancel'),
+  ElMessageBox.confirm(t('whetherToClearHistory'), t('tips'), {
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
     customClass: themeStore.theme,
   })
     .then(() => {
@@ -298,6 +343,13 @@ async function _getHotTokens() {
 
   }
 }
+
+onMounted(() => {
+  getSmartTop10()
+  if (hotList?.value?.length == 0) {
+    _getHotTokens()
+  }
+})
 </script>
 
 <style lang="scss" scoped>

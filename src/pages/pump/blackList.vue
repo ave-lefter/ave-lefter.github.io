@@ -1,21 +1,12 @@
 <template>
-  <el-popover
-      trigger="hover"
-      placement="top"
-      :content="t('backlist')"
-      :width="230"
-      popper-class="text-center"
-    >
-    <template #reference>
-      <el-button
-        class="btn mr-8px ml-0 gray"
-        style="margin-left: 0"
-        @click="visible = !visible"
-      >
-        <Icon name="custom:pump-black" class="text-16px"/>
-      </el-button>
-    </template>
-  </el-popover>
+  <el-button
+    v-tooltip="t('backlist')"
+    class="btn mr-8px ml-0 gray"
+    style="margin-left: 0"
+    @click="visible = !visible"
+  >
+    <Icon name="custom:pump-black" class="text-16px"/>
+  </el-button>
   <el-dialog
     v-model="visible"
     width="780"
@@ -81,7 +72,7 @@
                   <li
                     v-for="(item, $index) in typeList?.slice(1)"
                     :key="$index"
-                    class="px-12px py-12px w-100% cursor-pointer hover:bg-[--d-333333-l-DDDDDD]"
+                    class="px-12px py-12px w-100% cursor-pointer hover:bg-[--d-333-l-F5F5F5]"
                     @click="add(item)"
                   >
                     {{ item.name }}
@@ -257,7 +248,7 @@ function restore(item: { address: string, type: string }) {
   button {
     border: none;
     // font-size: 14px;
-    background: var(--d-333333-l-DDDDDD);
+    background: var(--d-333-l-F2F2F2);
     color: var(--d-999-l-666);
     letter-spacing: 0;
     font-weight: 400;

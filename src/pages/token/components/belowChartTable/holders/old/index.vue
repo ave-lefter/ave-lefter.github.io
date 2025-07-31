@@ -181,6 +181,7 @@ const checked = ref<boolean[]>([true, true, true, true, true, true, true])
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
+const globalStore = useGlobalStore()
 const { globalConfig } = storeToRefs(useConfigStore())
 const { token, totalHolders, price } = storeToRefs(useTokenStore())
 const dialogProfitLoss = shallowRef<boolean>(false)
@@ -289,17 +290,17 @@ const collect = async (row: any,index:number) => {
         user_chain: row.chain,
         group: form.group,
         is_monitored: form.is_monitored,
-      }).then(() => {
-        ElMessage.success(t('attention1Success'));
+      }).then((res) => {
+        globalStore.getFollowsNum();
         (top100balanceC.value as Array<any>)[index].is_wallet_address_fav = 1
         // getList()
-        return Promise.resolve()
+        return Promise.resolve(res)
       }).catch((err) => {
         return Promise.reject(err)
       }).finally(() => {
       })
     })
-    return 
+    return
   }
   // loading.value = true
   deleteAttention({
@@ -307,6 +308,7 @@ const collect = async (row: any,index:number) => {
     user_address: row.address,
     user_chain: row.chain
   }).then(() => {
+    globalStore.getFollowsNum()
     ElMessage.success(t('attention1Canceled'));
     (top100balanceC.value as Array<any>)[index].is_wallet_address_fav = 0
     // getList()

@@ -6,12 +6,13 @@ import {bot_createSolTx, bot_createSwapEvmTx, bot_getTokenBalance} from '~/api/b
 import { formatBotGasTips } from '~/utils/bot'
 import type { Size } from '~/api/types/pump'
 import { getSwapSize } from '@/utils/index'
+import type { BotChain, BotSettingKey } from '~/utils/types'
 
 const {t} = useI18n()
 const props = withDefaults(defineProps<{
   quickBuyValue: string
   row: {
-    chain: string
+    chain: BotChain
     symbol?: string
     target_token?: string
     token0_address?: string
@@ -23,11 +24,13 @@ const props = withDefaults(defineProps<{
   mainNameVisible?: boolean
   classNames?: string,
   size?: string
+  buttonType?: number
 }>(), {
   appendTo: '#__nuxt',
   buttonBg: 'rgba(18, 184, 134, 0.15)',
   classNames: '',
-  size: 'medium'
+  size: 'medium',
+  buttonType: 0
 })
 const botStore = useBotStore()
 const loadingSwap = shallowRef(false)
@@ -44,6 +47,10 @@ function submitBotSwap() {
   if (loadingSwap.value) {
     return
   }
+  if (props.buttonType === 1 && new BigNumber(props.quickBuyValue || 0).lte(0)) {
+    ElMessage({ type: 'error', plain: true, message: t('buyAmountMustG0'), duration: 1000 })
+    return
+  }
   if (new BigNumber(props.quickBuyValue || 0).lte(0)) {
     ElNotification({title: 'Error', type: 'error', message: t('amountMustG0')})
     return
@@ -54,7 +61,7 @@ function submitBotSwap() {
     m: getChainInfo(props.row.chain)?.main_name || '',
     s: row.symbol || (row.target_token == row.token0_address ? row.token0_symbol : row.token1_symbol)
   })
-  if (noReminderQuickBuy.value) {
+  if (noReminderQuickBuy.value || props.buttonType === 1) {
     beforeSubmitSwap()
   } else {
     visible.value = true
@@ -89,7 +96,7 @@ async function submitSwap(amount: string) {
   const {chain} = props.row
   const isSolana = chain === 'solana'
   const {botSettings} = botSettingStore
-  const selected = botSettings?.[chain]?.selected as 's1' | 's2' | 's3'
+  const selected = botSettings?.[chain]?.selected as BotSettingKey
   const currentBotSetting = botSettings?.[chain]?.[selected]
   if (isSolana && currentBotSetting?.mev) {
     if (!await botStore.getBundleAvailable()) {
@@ -133,7 +140,11 @@ async function submitSwap(amount: string) {
     isPrivate: currentBotSetting?.mev || false,
     slippage: slippage !== 'auto'
       ? Number(new BigNumber(slippage || '9').times(100).toFixed(0)) : 900,
-    autoSell: currentBotSetting?.autoSell || false
+    autoSell: botSettingStore.autoSellConfig_autoSell || false,
+    autoSellConfig: botSettingStore?.autoSellConfig,
+    autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
+    autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
+    autoSellPriorityFee: isSolana ? data.priorityFee : data.gasTip
   }
   const tx = isSolana ? bot_createSolTx(data) : bot_createSwapEvmTx(data)
   tx.then(res => handleTxSuccess(res, data.batchId))
@@ -194,7 +205,8 @@ async function getTokenBalance(chain: string) {
 </script>
 
 <template>
-  <el-button
+  <template v-if="buttonType === 0">
+    <el-button
     :disabled="!Number(quickBuyValue)"
     :loading="loadingSwap"
     :color="buttonBg"
@@ -242,6 +254,26 @@ async function getTokenBalance(chain: string) {
       </el-button>
     </template>
   </el-dialog>
+  </template>
+  <el-button
+    v-else
+    :loading="loadingSwap"
+    :color="buttonBg"
+    class="flex items-center [&&]:px-4px"
+    :class="classNames"
+    style="--el-button-hover-bg-color:rgba(18, 184, 134, 0.3);--el-color-black: #12B886; --el-button-border-color: transparent; --el-button-hover-border-color: transparent;--el-button-disabled-text-color: #12B886;--el-button-disabled-border-color: transparent;--el-button-disabled-bg-color: #12B8861A;"
+    :style="{ 'font-size': getSwapSize(size as Size).text }"
+    @click.stop.prevent="submitBotSwap"
+  >
+    <Icon
+      v-show="!loadingSwap"
+      class="mr-4px text-12px"
+      name="mynaui:lightning-solid"
+    />
+    {{ Number(quickBuyValue) ? (quickBuyValue || 0) : $t('buy') }}
+    <span v-if="mainNameVisible && Number(quickBuyValue)" class="ml-5px" >{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+  </el-button>
+
 </template>
 
 <style scoped lang="scss">

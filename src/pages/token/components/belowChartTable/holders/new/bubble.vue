@@ -12,7 +12,7 @@
     width="860"
     height="600"
     class="search-dialog"
-    header-class="p-0!"
+    header-class="p-0! pl-20px! p-0!"
     :title="$t('holderBubble')"
     @opened="openDialog"
 

@@ -14,7 +14,7 @@
           @mouseleave="showPop = false"
 
         >
-          <div>
+          <div class="mr-12px">
             <Icon  v-if="pumpBlackList?.findIndex(i=> (i.address == row.token && i.type=='ca' || i.address == row.symbol && i.type=='keyword')) !==-1"  name="custom:key-invisible" class="text-10px eye" @click.stop="addOrRemoveBlaclList(row,'ca')"/>
             <Icon v-else name="custom:key-visible" class="text-8px eye" @click.stop="addOrRemoveBlaclList(row,'ca')"/>
             <div class="token-logo">
@@ -744,7 +744,7 @@ function showPopover(item: {progress: string, id: string, issue_platform: string
     }
   }
   .token-logo {
-    margin-right: 12px;
+    // margin-right: 12px;
     width: 64px;
     height: 64px;
     position: relative;

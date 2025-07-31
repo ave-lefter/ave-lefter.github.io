@@ -1827,6 +1827,9 @@ function formatRisk(checkResult?: Check) {
       a.push([0, t('has_burned_lp')])
     }
   }
+  if (checkResult.is_low_liquidity === 1) {
+    a.push([1, t('is_low_liquidity')])
+  }
   const b = a.sort((a, b) => b[0] - a[0])
   return b
 }
