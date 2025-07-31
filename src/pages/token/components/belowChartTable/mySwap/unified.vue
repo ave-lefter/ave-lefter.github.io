@@ -199,7 +199,6 @@
 
       <el-table-column :label="t('operate')" align="right">
         <template #default="{ row }">
-          {{ row }}
           <div class="flex items-center flex-row-reverse">
             <Icon name="custom:browser" class="text-16px  ml-8px clickable color-[--d-999-l-666]"
               @click.stop.prevent="jumpExplorerUrl(row)" />
