@@ -49,7 +49,7 @@
           <div class="flex flex-row-reverse">
             <div class="flex items-center">
               <div>{{ t('type') }}</div>
-              <el-dropdown trigger="click" @command="handleTypeCommand">
+              <el-dropdown trigger="click" v-if="isBotWallet" @command="handleTypeCommand">
                 <Icon name="custom:filter"
                   :class="[filterConditions?.isBuy >= 0 && filterConditions?.isLimit >= 0 && 'color-#286DFF']"
                   class=" color-[--d-666-l-999] cursor-pointer text-10px" />
@@ -107,14 +107,28 @@
             class="iconify i-custom:b text-10px ml-3px color-[--d-666-l-999] cursor-pointer text-12px"></span> -->
         </template>
         <template #default="{ row }">
-          <span class="text-[var(--d-999-l-959A9F)] text-right">
+          <span class="text-[var(--d-999-l-959A9F)] text-right" v-if="isBotWallet">
             <template v-if="!isBuy(row.swapType)">
-              {{ formatNumber(formatUnits(new BigNumber(row?.inAmount || 0).toFixed(0), row.inTokenDecimals || 0).toString(), 4) }}
+              {{ formatNumber(formatUnits(new BigNumber(row?.inAmount || 0).toFixed(0), row.inTokenDecimals ||
+                0).toString(), 4) }}
               {{ row?.inTokenSymbol }}
             </template>
             <template v-else>
-              {{ formatNumber(formatUnits(new BigNumber(row?.outAmount || 0).toFixed(0), row.outTokenDecimals || 0).toString(), 4)
+              {{ formatNumber(formatUnits(new BigNumber(row?.outAmount || 0).toFixed(0), row.outTokenDecimals ||
+                0).toString(), 4)
               }}
+              {{ row?.outTokenSymbol }}
+            </template>
+          </span>
+          <span class="text-[var(--d-999-l-959A9F)] text-right" v-else>
+            <template v-if="!isBuy(row.swapType)">
+              {{ row.status === 'cancelled' ? '0' : formatNumber(formatUnits(new BigNumber(row?.inAmount ||
+                0).toFixed(0), row.inTokenDecimals || 0).toString(), 4) }}
+              {{ row?.inTokenSymbol }}
+            </template>
+            <template v-else>
+              {{ row.status === 'cancelled' ? '0' : formatNumber(formatUnits(new BigNumber(row?.outAmount ||
+                0).toFixed(0), row.outTokenDecimals || 0).toString(), 4) }}
               {{ row?.outTokenSymbol }}
             </template>
           </span>
@@ -259,7 +273,7 @@ function validateChainAddress(chain: string, address: string) {
   if (!chain || !address) {
     return false
   }
-  
+
   // 验证地址格式与链匹配
   if (chain === 'solana') {
     const isValid = address.length > 30 && !address.startsWith('0x')
@@ -268,7 +282,7 @@ function validateChainAddress(chain: string, address: string) {
     const isValid = address.startsWith('0x') && address.length === 42
     return isValid
   }
-  
+
   return true
 }
 
@@ -321,13 +335,16 @@ function jumpExplorerUrl(row: any) {
 }
 
 function tableRowClick(row: any) {
-  // if (!row.txHash) return
-  // window.open(formatExplorerUrl(row.chain, row.txHash, 'tx'))
-  const token = !isBuy(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
-  if (!token) {
-    return
+  if (isBotWallet.value) {
+    const token = !isBuy(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
+    if (!token) {
+      return
+    }
+    router.push(`/token/${token}-${row.chain}`)
+  } else {
+    if (!row.txHash) return
+    window.open(formatExplorerUrl(row.chain, row.txHash, 'tx'))
   }
-  router.push(`/token/${token}-${row.chain}`)
 }
 
 const getTxHistory = async () => {
@@ -338,7 +355,7 @@ const getTxHistory = async () => {
       loading.value = false
       return
     }
-        
+
     if (isBotWallet.value) {
       // Bot钱包使用原接口
       const res = await bot_getUserTxHistory1({
@@ -361,7 +378,7 @@ const getTxHistory = async () => {
     } else {
       // 链钱包使用新接口
       const tokenAddress = currentTokenAddress.value
-      
+
       const res = await wallet_getOrders({
         chain: apiChain,
         creatorAddress: props.userAddress,
@@ -369,18 +386,18 @@ const getTxHistory = async () => {
         mode: 1, // 历史交易
         onlySuccess: false,
         pageSize: 100,
-        pageNo: 1
+        pageNo: 1,
       })
-      
+
       const rawList = res?.data?.list || []
-      
+
       if (rawList.length > 0) {
         const mappedData = rawList.map(mapWalletOrderToTableRow)
         txHistory.value = mappedData
       } else {
         txHistory.value = []
       }
-      
+
       console.log('最终txHistory长度:', txHistory.value?.length || 0)
     }
   } catch (error) {
@@ -394,10 +411,10 @@ function getSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14
   const swapTypeMap = {
     1: t('buy'),
     2: t('sell'),
-    3: 'Wrap',
-    4: 'Unwrap',
-    5: `${ t('limit') }/${ t('buy') }`,
-    6: `${ t('limit') }/${ t('sell') }`,
+    3: t('limitBuy1'),
+    4: t('limitSell1'),
+    5: `${t('limit')}/${t('buy')}`,
+    6: `${t('limit')}/${t('sell')}`,
     7: t('followBuy'),
     8: t('followSell'),
     12: t('trailingStop'),
@@ -433,8 +450,8 @@ function mapWalletOrderToTableRow(order: any) {
     outTokenDecimals: order.outDecimals,
     inPrice: inPrice,
     outPrice: outPrice,
-    inValue: inAmount * inPrice / (10 **  order.inDecimals),
-    outValue: outputAmount * outPrice / (10 **  order.inDecimals),
+    inValue: inAmount * inPrice / (10 ** order.inDecimals),
+    outValue: outputAmount * outPrice / (10 ** order.inDecimals),
     inAmount: inAmount,
     outAmount: outputAmount,
     createTime: order.createTime,

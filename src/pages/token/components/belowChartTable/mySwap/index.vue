@@ -174,11 +174,12 @@ watch([() => route.params.id], () => {
     clearInterval(timer)
     timer = null
   }
+  refreshData()
 })
 
 function refreshData() {
   getWalletTxData()
-  
+
   if (unifiedRef.value) {
     unifiedRef.value.getTxHistory()
   }
@@ -215,7 +216,7 @@ onActivated(() => {
           <!-- {{ getChainInfo(walletStore.chain || activeTab).name }} -->
         </span>
       </div>
-      
+
       <div class="flex items-center gap-3">
         <el-checkbox v-model="botOrderOnlyCurrentToken" :label="t('currentToken')" size="small" style="font-size: 12px;color:var(--d-666-l-333)" />
       </div>
