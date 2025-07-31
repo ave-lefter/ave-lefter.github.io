@@ -40,8 +40,10 @@ export const useUserStore = defineStore('user', () => {
   } = storeToRefs(botStore)
   const { getUserInfo } = botStore
   const email = useLocalStorage('email', '')
+  const updateHolderNum=ref(0)
   return {
     email,
+    updateHolderNum,
     async sendEmailCode(data: Parameters<typeof sendEmailCode>[0]) {
       return await sendEmailCode(data)
     },

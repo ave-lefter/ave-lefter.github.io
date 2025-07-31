@@ -81,7 +81,7 @@
           v-if="result.total"
           v-model:current-page="query.pageNo"
           v-model:page-size="query.pageSize"
-          class="pagination-box mx-auto"
+          class="pagination-box mx-auto bg-[--d-222-l-FFF]! border-t-none!"
           layout="total, prev, pager, next"
           :total="result.total"
           hide-on-single-page
@@ -99,10 +99,12 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
-import { getTokenFilterList, setUserTokenStatus } from '@/api/wallet'
+import { getTokenFilterList2, setUserTokenStatus } from '@/api/wallet'
 
 const { t } = useI18n()
-const { holderBlackList } = storeToRefs(useGlobalStore())
+const botStore = useBotStore()
+const walletStore = useWalletStore()
+const {updateHolderNum}= storeToRefs(useUserStore())
 const router = useRouter()
 const route = useRoute()
 const configStore = useConfigStore()
@@ -110,8 +112,10 @@ const s3BaseUrl = configStore.token_logo_url
 
 // Props
 const props = defineProps({
-  chain: String,
-  address: String,
+  userIds: {
+    type: Array,
+    default: () => []
+  }
 })
 
 // Emits
@@ -139,12 +143,12 @@ const showBlackList = () => {
 }
 
 const getBlackList = async () => {
+  console.log('getBlackList', props.userIds)
   try {
     result.value.loading = true
-    const res = await getTokenFilterList({
+    const res = await getTokenFilterList2({
       ...query.value,
-      chain: props.chain,
-      address: props.address,
+      user_ids: props.userIds,
     })
     result.value.list = res?.data || []
     result.value.total = res?.total || 0
@@ -175,6 +179,9 @@ const jumpToTokenDetail = ({ token, chain }) => {
 }
 
 const addWhiteList = async ({ token, chain }) => {
+
+  const address=chain==='solana'?(botStore.getWalletAddress('solana') || walletStore.address):(botStore.evmAddress || walletStore.address)
+  console.log('addWhiteList', token, address, chain)
   try {
     updateRowLoading(token, true)
     await setUserTokenStatus(
@@ -182,11 +189,12 @@ const addWhiteList = async ({ token, chain }) => {
         token,
         type: 'whitelist',
       },
-      props.address,
+      address,
       chain
     )
     await getBlackList()
     emit('addWhite')
+    updateHolderNum.value++
     ElMessage.success(t('success'))
   } catch (error) {
     console.error('Error adding to whitelist:', error)

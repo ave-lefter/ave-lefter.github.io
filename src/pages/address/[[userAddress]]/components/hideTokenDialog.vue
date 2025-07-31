@@ -10,7 +10,7 @@ const props = defineProps({
   modelValue: Boolean,
   self_address: String
 })
-
+const {updateHolderNum}= storeToRefs(useUserStore())
 const themeStore = useThemeStore()
 const emit = defineEmits(['update:modelValue', 'hideToken'])
 const loading = ref(false)
@@ -34,6 +34,7 @@ async function confirm() {
     ElMessage.success(t('success'))
     hideTokenVisible.value = false
     emit('hideToken')
+    updateHolderNum.value++
   } catch (e) {
     console.log('=>(tokenList.vue:742) e', e)
   } finally {

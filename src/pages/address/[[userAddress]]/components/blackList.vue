@@ -81,7 +81,7 @@
           v-if="result.total"
           v-model:current-page="query.pageNo"
           v-model:page-size="query.pageSize"
-          class="pagination-box mx-auto"
+          class="pagination-box mx-auto bg-[--d-222-l-FFF]! border-t-none!"
           layout="total, prev, pager, next"
           :total="result.total"
           hide-on-single-page
@@ -102,7 +102,7 @@ import { ElMessage } from 'element-plus'
 import { getTokenFilterList, setUserTokenStatus } from '@/api/wallet'
 
 const { t } = useI18n()
-
+const {updateHolderNum}= storeToRefs(useUserStore())
 const router = useRouter()
 const route = useRoute()
 const configStore = useConfigStore()
@@ -187,6 +187,7 @@ const addWhiteList = async ({ token, chain }) => {
     )
     await getBlackList()
     emit('addWhite')
+    updateHolderNum.value++
     ElMessage.success(t('success'))
   } catch (error) {
     console.error('Error adding to whitelist:', error)

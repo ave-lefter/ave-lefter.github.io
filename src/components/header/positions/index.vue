@@ -4,34 +4,35 @@
     <span>{{ $t('positions') }}</span>
   </div>
   <component :is="lazyComponent" v-model="visible" :tableFilter="tableFilter">
-    <div class="flex justify-between items-center pt-0 pb-0 pl-0 pr-15px w-320px">
-     <el-checkbox
-         v-model="tableFilter['hide_risk']"
-         class="h-24px"
-         :style="{
-           marginRight:0
-         }"
-         size="small" :true-value="1" :false-value="0"
-       >
-         {{ $t('hideRiskTokenShort') }}
-       </el-checkbox>
-       <el-checkbox
-         v-model="tableFilter['hide_small']"
-         size="small" :true-value="1" :false-value="0"
-       >
-         {{ $t('hideSmallAssets1') + '<1USD' }}
-       </el-checkbox>
-       <NetSelect
-         v-if="botStore.evmAddress"
-         v-model:userIds="tableFilter.user_ids"
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-30px pt-0 pb-0 pl-0 pr-15px">
+        <el-checkbox
+          v-model="tableFilter['hide_risk']"
+          class="h-24px"
+          :style="{
+            marginRight:0
+          }"
+          size="small" :true-value="1" :false-value="0"
+        >
+          {{ $t('hideRiskTokenShort') }}
+        </el-checkbox>
+        <el-checkbox
+          v-model="tableFilter['hide_small']"
+          size="small" :true-value="1" :false-value="0"
+        >
+          {{ $t('hideSmallAssets1') + '<1USD' }}
+        </el-checkbox>
+        <NetSelect
+          v-if="botStore.evmAddress"
+          v-model:userIds="tableFilter.user_ids"
         @update:user-ids="handleChange"
-       />
+        />
+      </div>
       <BlackList
-        :chain="walletStore.chain"
-        :address="botStore.evmAddress||walletStore.address"
+        :userIds="tableFilter.user_ids"
         @addWhite="()=>{}"
       />
-   </div>
+    </div>
   </component>
 </template>
 
@@ -41,7 +42,7 @@ import BlackList from './blackList.vue'
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const {hide_small,hide_risk} = storeToRefs(useGlobalStore())
-
+const {updateHolderNum}= storeToRefs(useUserStore())
 let userIds: string[] = []
 
 
@@ -73,6 +74,10 @@ function handleChange(newUserIds: string[]) {
   tableFilter.value.user_ids = newUserIds
 }
 
+
+watch(()=>updateHolderNum.value, () => {
+  fetchHolderNum()
+})
 watch(tableFilter, () => {
   // console.log('tableFilter changed', val)
   fetchHolderNum()
