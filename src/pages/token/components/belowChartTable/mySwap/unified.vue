@@ -75,14 +75,27 @@
           </div>
         </template>
         <template #default="{ row }">
-          <div v-if="isBuy(row.swapType)" style="background: rgba(18, 184, 134, 0.10)"
-            class="text-13px text-center text-[#12B886] px-5px py-2px rounded-4px">
-            {{ getSwapTypeLabel(row.swapType) }}
-          </div>
-          <div v-else style="background: rgba(246, 70, 93, 0.10)"
-            class="text-13px  text-center text-[#F6465D] px-5px py-2px rounded-4px">
-            {{ getSwapTypeLabel(row.swapType) }}
-          </div>
+          <template v-if="isBotWallet">
+              <div v-if="isBuy(row.swapType)" style="background: rgba(18, 184, 134, 0.10)"
+              class="text-13px text-center text-[#12B886] px-5px py-2px rounded-4px">
+              {{ getSwapTypeLabel(row.swapType) }}
+            </div>
+            <div v-else style="background: rgba(246, 70, 93, 0.10)"
+              class="text-13px  text-center text-[#F6465D] px-5px py-2px rounded-4px">
+              {{ getSwapTypeLabel(row.swapType) }}
+            </div>
+          </template>
+          <template v-if="!isBotWallet">
+              <div v-if="isBuyChain(row.swapType)" style="background: rgba(18, 184, 134, 0.10)"
+              class="text-13px text-center text-[#12B886] px-5px py-2px rounded-4px">
+              {{ getChianSwapTypeLabel(row.swapType) }}
+            </div>
+            <div v-else style="background: rgba(246, 70, 93, 0.10)"
+              class="text-13px  text-center text-[#F6465D] px-5px py-2px rounded-4px">
+              {{ getChianSwapTypeLabel(row.swapType) }}
+            </div>
+          </template>
+          
         </template>
       </el-table-column>
       <el-table-column :label="t('price')" align="right">
@@ -184,13 +197,14 @@
         </template>
       </el-table-column>
 
-      <el-table-column v-if="isBotWallet" :label="t('operate')" align="right">
+      <el-table-column :label="t('operate')" align="right">
         <template #default="{ row }">
+          {{ row }}
           <div class="flex items-center flex-row-reverse">
             <Icon name="custom:browser" class="text-16px  ml-8px clickable color-[--d-999-l-666]"
               @click.stop.prevent="jumpExplorerUrl(row)" />
             <template v-if="row.status == 'confirmed' && row.swapType === 2 && row.chain === 'solana'">
-              <share :statistics="row" :address="props.userAddress" :chain="row.chain" />
+              <share :statistics="row" :address="isBotWallet ? props.userAddress : row.userAddress" :chain="row.chain" />
             </template>
           </div>
         </template>
@@ -335,16 +349,11 @@ function jumpExplorerUrl(row: any) {
 }
 
 function tableRowClick(row: any) {
-  if (isBotWallet.value) {
     const token = !isBuy(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
     if (!token) {
       return
     }
     router.push(`/token/${token}-${row.chain}`)
-  } else {
-    if (!row.txHash) return
-    window.open(formatExplorerUrl(row.chain, row.txHash, 'tx'))
-  }
 }
 
 const getTxHistory = async () => {
@@ -411,8 +420,8 @@ function getSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14
   const swapTypeMap = {
     1: t('buy'),
     2: t('sell'),
-    3: t('limitBuy1'),
-    4: t('limitSell1'),
+    3: 'Wrap',
+    4: 'Unwrap',
     5: `${t('limit')}/${t('buy')}`,
     6: `${t('limit')}/${t('sell')}`,
     7: t('followBuy'),
@@ -427,8 +436,27 @@ function getSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14
   return ''
 }
 
+function getChianSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 ) {
+  const swapTypeMap = {
+    1: t('buy'),
+    2: t('sell'),
+    3: t('limitBuy1'),
+    4: t('limitSell1'),
+    5: 'Wrap',
+    6: 'Unwrap',
+  } as const
+  if (swapTypeMap[swapType]) {
+    return swapTypeMap[swapType]
+  }
+  return ''
+}
+
 function isBuy(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) {
   return swapType === 1 || swapType === 5 || swapType === 7
+}
+
+function isBuyChain(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) {
+  return swapType === 1 || swapType === 3 || swapType === 5 || swapType === 7
 }
 
 // 将链钱包数据映射为bot钱包表格格式
@@ -457,6 +485,7 @@ function mapWalletOrderToTableRow(order: any) {
     createTime: order.createTime,
     txHash: order.txHash,
     status: order.status,
+    userAddress: order.creatorAddress,
     errorLog: order.errorLog || ''
   }
 }
