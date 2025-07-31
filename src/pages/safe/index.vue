@@ -610,7 +610,8 @@ onMounted(async () => {
 })
 
 function goToTg() {
-  window.open('https://t.me/ave_community_cn', '_blank')
+  const url = lang.value.includes('zh') ?'https://t.me/ave_community_cn':'https://t.me/aveai_english'
+  window.open(url, '_blank')
 }
 </script>
 <style lang="scss" scoped>
