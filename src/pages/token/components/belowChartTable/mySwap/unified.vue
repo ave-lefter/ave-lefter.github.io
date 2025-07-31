@@ -12,7 +12,7 @@
         <span v-else />
       </template>
       <el-table-column :label="t('token')" align="left">
-        <template #default="{ row }">
+        <template #default="{ row }" v-if="isBotWallet"> 
           <div class="flex items-center justify-start">
             <div class="icon-token-container mr-5px">
               <div class="relative">
@@ -37,6 +37,36 @@
               </div>
             </div>
             <span class="text-[var(--d-eaecef-l-333333)] text-13px">{{ !isBuy(row.swapType) ?
+              row?.inTokenSymbol :
+              row.outTokenSymbol
+            }}</span>
+          </div>
+        </template>
+         <template #default="{ row }" v-else> 
+          <div class="flex items-center justify-start">
+            <div class="icon-token-container mr-5px">
+              <div class="relative">
+                <el-image class="w-32px h-32px rounded-full" :src="getSymbolDefaultIcon({
+                  chain: row?.chain,
+                  symbol: !isBuyChain(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol,
+                  logo_url: !isBuyChain(row.swapType) ? row?.inTokenLogoUrl : row.outTokenLogoUrl
+                })">
+                  <template #error>
+                    <img class="w-32px h-32px"
+                      :src="getChainDefaultIcon(row?.chain, !isBuyChain(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol)"
+                      alt="" srcset="">
+                  </template>
+                  <template #placeholder>
+                    <img class="w-32px h-32px"
+                      :src="getChainDefaultIcon(row?.chain, !isBuyChain(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol)"
+                      alt="" srcset="">
+                  </template>
+                </el-image>
+                <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px rd-50%"
+                  :src="`${configStore.token_logo_url}chain/${row.chain}.png`" alt="" srcset="">
+              </div>
+            </div>
+            <span class="text-[var(--d-eaecef-l-333333)] text-13px">{{ !isBuyChain(row.swapType) ?
               row?.inTokenSymbol :
               row.outTokenSymbol
             }}</span>
@@ -99,8 +129,12 @@
         </template>
       </el-table-column>
       <el-table-column :label="t('price')" align="right">
-        <template #default="{ row }">
+        <template #default="{ row }" v-if="isBotWallet">
           <div class="text-[var(--d-999-l-959A9F)] text-right">${{ isBuy(row.swapType) ? formatNumber(row?.outPrice ||
+            0) : formatNumber(row?.inPrice || 0) }}</div>
+        </template>
+        <template #default="{ row }" v-else>
+          <div class="text-[var(--d-999-l-959A9F)] text-right">${{ isBuyChain(row.swapType) ? formatNumber(row?.outPrice ||
             0) : formatNumber(row?.inPrice || 0) }}</div>
         </template>
       </el-table-column>
@@ -134,7 +168,7 @@
             </template>
           </span>
           <span class="text-[var(--d-999-l-959A9F)] text-right" v-else>
-            <template v-if="!isBuy(row.swapType)">
+            <template v-if="!isBuyChain(row.swapType)">
               {{ row.status === 'cancelled' ? '0' : formatNumber(formatUnits(new BigNumber(row?.inAmount ||
                 0).toFixed(0), row.inTokenDecimals || 0).toString(), 4) }}
               {{ row?.inTokenSymbol }}
