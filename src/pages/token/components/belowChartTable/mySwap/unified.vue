@@ -382,12 +382,18 @@ function jumpExplorerUrl(row: any) {
 }
 
 function tableRowClick(row: any) {
-    const token = !isBuy(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
+    let token 
+    if(isBotWallet.value) {
+      token = !isBuy(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
+    } else {
+      token = !isBuyChain(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
+    }
     if (!token) {
       return
     }
     router.push(`/token/${token}-${row.chain}`)
 }
+
 
 const getTxHistory = async () => {
   loading.value = true
