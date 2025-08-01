@@ -331,7 +331,7 @@
           <div class="grid grid-cols-2 gap-8">
             <div class="bg-gradient-to-br from-[#0b1a4b] to-black rounded-lg p-8 pb-0 text-center" data-aos="fade-left">
               <div ata-aos="fade-down">
-                <h2 class="text-3xl font-bold mb-4 mt-8">{{ $t('walletTitle') }}</h2>
+                <h2 class="text-3xl font-bold mb-4 mt-8">{{ $t('walletTitle') }}<br>{{ $t('walletTitle1') }}</h2>
                 <p class="text-sm font-light mb-8">{{ $t('walletDes') }}</p>
               </div>
               <div class="h-455px w-[365px] mx-auto overflow-hidden">
