@@ -142,8 +142,10 @@
                 >
               </div>
               <div
-                data-aos="fade-in-down"
-                class="absolute bottom-[70px] left-[-5px] h-[60px] bg-gradient-to-r from-[#26e5b200] via-[#5096ff] to-[#a358ff] p-4 pt-2 rounded-xl backdrop-blur"
+                data-aos="flip-down"
+                data-aos-delay="300"
+                data-aos-duration="400"
+                class="absolute bottom-[60px] left-[-5px] h-[60px] bg-gradient-to-r from-[#26e5b200] via-[#5096ff] to-[#a358ff] p-3 pt-2 rounded-xl backdrop-blur"
               >
                 <div class="flex items-cente">
                   <img
@@ -152,19 +154,19 @@
                     alt="AI Icon"
                   >
                   <div class="text-left">
-                    <h3 class="font-bold px-5">{{ $t("glodDesTitle") }}</h3>
-                    <p class="text-xs m-0 px-5">{{ $t("glodDesSubtitle") }}</p>
+                    <h3 class="font-bold">{{ $t("glodDesTitle") }}</h3>
+                    <p class="text-xs m-0">{{ $t("glodDesSubtitle") }}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div data-aos="fade-up" class="bg-gradient-to-br from-[#1d40ea] to-[#855ffe] rounded-lg p-12 pt-16 pb-0 relative">
-              <div
-                data-aos="fade-down"
-                data-aos-delay="200"
-                data-aos-duration="200"
-              >
+            <div
+              data-aos="fade-down"
+              data-aos-delay="200"
+              data-aos-duration="200" class="bg-gradient-to-br from-[#1d40ea] to-[#855ffe] rounded-lg p-12 pt-16 pb-0 relative"
+            >
+              <div>
                 <h2 class="text-xl font-bold mb-4  px-5">{{ $t("signTitle") }}</h2>
                 <p class="text-xs mb-8 h-47px overflow-hidden">
                   {{ $t("signSubTitle") }}
@@ -178,8 +180,10 @@
                 >
               </div>
               <div
-                data-aos="flip-left"
-                class="absolute bottom-[70px] left-[-20px] h-[65px] bg-gradient-to-r from-[#1f8bea] to-[#caad57] p-4 pt-2 rounded-xl backdrop-blur"
+                data-aos="flip-down"
+                data-aos-delay="600"
+                data-aos-duration="800"
+                class="absolute bottom-[80px] left-[-20px] h-[65px] bg-gradient-to-r from-[#1f8bea] to-[#caad57] p-2 pt-3 rounded-xl backdrop-blur"
               >
                 <div class="flex items-center">
                   <img
@@ -212,7 +216,9 @@
               </div>
               <div
                 data-aos="flip-right"
-                class="absolute bottom-[70px] left-[-20px] h-[65px] bg-gradient-to-r from-[#0095ff] to-[#3bffb0] p-4 pt-2 rounded-xl backdrop-blur"
+                data-aos-delay="1000"
+                data-aos-duration="1200"
+                class="absolute bottom-[50px] left-[-20px] h-[65px] bg-gradient-to-r from-[#0095ff] to-[#3bffb0] p-2 pt-3 rounded-xl backdrop-blur"
               >
                 <div class="flex items-center">
                   <img
