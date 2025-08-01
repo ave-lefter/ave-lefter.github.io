@@ -693,10 +693,11 @@ const getTransferGasFee = throttle(function () {
   })
 }, 500, { leading: true, trailing: true })
 
-function handleMax() {
+ async function  handleMax() {
+  console.log('handleMax')
   const decimals = withdrawChainInfo.value?.decimals || 18
   if (!gasFeeObj.value[withdrawForm.chain] || 0) {
-    getTransferGasFee().catch(console.log)
+    await getTransferGasFee().catch(console.log)
   }
   let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals)
   if (withdrawForm?.chain === 'solana') {
