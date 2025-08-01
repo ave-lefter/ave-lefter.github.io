@@ -280,7 +280,7 @@
               </li>
               <li class="flex-between">
                 <div>{{ t('gasFee') }}</div>
-                <div>{{ gasFeeVal || '--' }} {{ getChainInfo(withdrawForm.chain)?.main_name }}(${{
+                <div>{{ formatNumber((gasFeeVal) || 0, 8) || '--' }} {{ getChainInfo(withdrawForm.chain)?.main_name }}(${{
                    formatNumber((gasFeeVal*(withdrawChainInfo?.price||0)) || 0, 4) ||'--' }})</div>
               </li>
               <li class="flex-between">
@@ -469,10 +469,10 @@ watch(showVisible, (val) => {
   } else if (val === 3) {
     withdrawFormRef.value?.resetFields?.()
   }
-  bot_getTransfer({
-    chain:'solana',
-    batchId:1753859256515
-  })
+  // bot_getTransfer({
+  //   chain:'solana',
+  //   batchId:1753859256515
+  // })
 })
 
 // watch(() => store.state.bot.topUp.key, (val) => {
