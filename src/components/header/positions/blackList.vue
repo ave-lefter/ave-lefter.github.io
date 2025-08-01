@@ -29,7 +29,7 @@
         </el-input>
 
         <div class="relative">
-          <el-table v-loading="result.loading" :data="result.list"  row-class-name="!bg-[var(--el-bg-color)]" style="height: 283px;">
+          <el-table  v-loading="result.loading" :data="result.list" row-class-name="!bg-[var(--el-bg-color)]" style="height: 283px;">
             <template #empty>
               <div v-if="!result.loading" class="text-12px flex flex-col items-center justify-center h-250px">
                 <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
@@ -38,6 +38,7 @@
               </div>
               <div v-else class="text-12px"/>
             </template>
+
             <el-table-column :label="t('name')">
               <template #default="{ row }">
                 <div class="flex items-center" @click="jumpToTokenDetail(row)">
@@ -101,10 +102,11 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useThrottleFn } from '@vueuse/core'
-import { getTokenFilterList, setUserTokenStatus } from '@/api/wallet'
+import { getTokenFilterList2, setUserTokenStatus } from '@/api/wallet'
 
 const { t } = useI18n()
-
+const botStore = useBotStore()
+const walletStore = useWalletStore()
 const {updateHolderNum}= storeToRefs(useUserStore())
 const router = useRouter()
 const route = useRoute()
@@ -114,8 +116,10 @@ const s3BaseUrl = configStore.token_logo_url
 
 // Props
 const props = defineProps({
-  chain: String,
-  address: String,
+  userIds: {
+    type: Array,
+    default: () => []
+  }
 })
 
 // Emits
@@ -142,13 +146,13 @@ const showBlackList = () => {
   getBlackList()
 }
 
-const getBlackList = useThrottleFn(async () => {
+const getBlackList = useThrottleFn(async()=>{
+  console.log('getBlackList', props.userIds)
   try {
     result.value.loading = true
-    const res = await getTokenFilterList({
+    const res = await getTokenFilterList2({
       ...query.value,
-      chain: props.chain,
-      address: props.address,
+      user_ids: props.userIds,
     })
     result.value.list = res?.data || []
     result.value.total = res?.total || 0
@@ -158,7 +162,7 @@ const getBlackList = useThrottleFn(async () => {
   } finally {
     result.value.loading = false
   }
-}, 500)
+},500)
 
 const closeDialog = () => {
   result.value.list = []
@@ -179,6 +183,9 @@ const jumpToTokenDetail = ({ token, chain }) => {
 }
 
 const addWhiteList = async ({ token, chain }) => {
+
+  const address=chain==='solana'?(botStore.getWalletAddress('solana') || walletStore.address):(botStore.evmAddress || walletStore.address)
+  console.log('addWhiteList', token, address, chain)
   try {
     updateRowLoading(token, true)
     await setUserTokenStatus(
@@ -186,7 +193,7 @@ const addWhiteList = async ({ token, chain }) => {
         token,
         type: 'whitelist',
       },
-      props.address,
+      address,
       chain
     )
     await getBlackList()
@@ -195,7 +202,7 @@ const addWhiteList = async ({ token, chain }) => {
     ElMessage.success(t('success'))
   } catch (error) {
     console.error('Error adding to whitelist:', error)
-    ElMessage.error(t('error'))
+    ElMessage.error(String(error))
   } finally {
     updateRowLoading(token, false)
   }
