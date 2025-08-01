@@ -3,7 +3,7 @@ import THead from '~/pages/token/components/left/tHead.vue'
 import type {GetSignalV2ListResponse} from '~/api/signal'
 import dayjs from 'dayjs'
 import BigNumber from 'bignumber.js'
-import {useThrottleFn} from "@vueuse/core";
+import {useThrottleFn} from '@vueuse/core'
 
 const props = defineProps<{
   signalList: Array<GetSignalV2ListResponse>
@@ -116,14 +116,28 @@ const onScroll = useThrottleFn(({scrollTop}: { scrollTop: number }) => {
         >
           <div class="flex">
             <div class="flex-[2.5] flex items-center gap-8px">
-              <TokenImg
-                token-class="w-32px h-32px"
-                :row="{
-                      chain,
-                      logo_url:logo,
-                      symbol
-                   }"
-              />
+              <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+                  <template #default>
+                    <TokenImg
+                      token-class="w-32px h-32px"
+                      :row="{
+                        chain,
+                        logo_url:logo,
+                        symbol
+                    }"
+                    />
+                  </template>
+                  <template #content>
+                    <TokenImg
+                      token-class="w-240px h-240px [&&]:mr-0 rounded-16px"
+                      :row="{
+                        chain,
+                        logo_url:logo,
+                        symbol
+                    }"
+                    />
+                  </template>
+              </el-tooltip>
               <div class="flex flex-col gap-4px">
                 <div class="flex items-center gap-8px">
               <span class="font-500 color-[--d-F5F5F5-l-333] text-16px overflow-hidden text-ellipsis cursor-pointer"
@@ -162,15 +176,15 @@ const onScroll = useThrottleFn(({scrollTop}: { scrollTop: number }) => {
                     v-if="token_create_time && Number(formatTimeFromNow(token_create_time, true)) < 60"
                     :key="token_create_time" :timestamp="token_create_time" :end-time="60">
                     <template #default="{ seconds }">
-                  <span v-if="seconds < 60" class="color-#FFA622 text-12px">
+                  <span v-if="seconds < 60" v-tooltip="formatDate(token_create_time,'MM/DD HH:mm:ss')" class="color-#FFA622 text-12px">
                     {{ seconds }}s
                   </span>
-                      <span v-else class="color-[--d-999-l-666] text-12px">
+                      <span v-else v-tooltip="formatDate(token_create_time,'MM/DD HH:mm:ss')" class="color-[--d-999-l-666] text-12px">
                     {{ formatTimeFromNow(token_create_time) }}
                   </span>
                     </template>
                   </TimerCount>
-                  <div v-else class="color-[--d-999-l-666] text-12px">
+                  <div v-else v-tooltip="formatDate(token_create_time,'MM/DD HH:mm:ss')" class="color-[--d-999-l-666] text-12px">
                     {{ formatTimeFromNow(token_create_time) }}
                   </div>
                   <div
@@ -216,15 +230,15 @@ const onScroll = useThrottleFn(({scrollTop}: { scrollTop: number }) => {
                 v-if="first_signal_time && Number(formatTimeFromNow(first_signal_time, true)) < 60"
                 :key="first_signal_time" :timestamp="first_signal_time" :end-time="60">
                 <template #default="{ seconds }">
-                <span v-if="seconds < 60" class="color-#FFA622">
+                <span v-if="seconds < 60" v-tooltip="formatDate(first_signal_time,'MM/DD HH:mm:ss')" class="color-#FFA622">
                   {{ seconds }}s
                 </span>
-                  <span v-else class="color-[--d-999-l-666]">
+                  <span v-else v-tooltip="formatDate(first_signal_time,'MM/DD HH:mm:ss')" class="color-[--d-999-l-666]">
                 {{ formatTimeFromNow(first_signal_time) }}
               </span>
                 </template>
               </TimerCount>
-              <span v-else class="color-[--d-999-l-666]">
+              <span v-else v-tooltip="formatDate(first_signal_time,'MM/DD HH:mm:ss')" class="color-[--d-999-l-666]">
             {{ formatTimeFromNow(first_signal_time) }}
           </span>
             </div>

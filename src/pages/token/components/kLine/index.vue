@@ -173,7 +173,8 @@ function resetChart() {
 
 function saveStudy() {
   if (_widget?.activeChart) {
-    const studies = _widget?.activeChart?.().getAllStudies()
+    let studies = _widget?.activeChart?.().getAllStudies() || []
+    studies = studies.filter((item, index) => studies.findIndex(i => i.name === item.name) === index)
     localStorage.setItem(TW_STUDY, JSON.stringify(studies.filter(i => i.name !== 'Volume')))
   }
 }
@@ -181,16 +182,18 @@ function saveStudy() {
 // 创建指标
 function createStudy() {
   if (_widget?.activeChart) {
-    const studies: Array<{ name: string }> = JSON.parse(localStorage?.[TW_STUDY] || '[]')
+    let studies: Array<{ name: string, id: string }> = JSON.parse(localStorage?.[TW_STUDY] || '[]')
+    studies = studies.filter((item, index) => studies.findIndex(i => i.name === item.name) === index)
     studies.forEach(i => {
       _widget?.activeChart?.().createStudy(i.name, false, false)
     })
-    if (localStorage['tradingview.chart.favoriteLibraryIndicators']) {
-      const indicators: Array<string> = JSON.parse(localStorage['tradingview.chart.favoriteLibraryIndicators'])
-      indicators.forEach(i => {
-        _widget?.activeChart?.().createStudy(i, false, false)
-      })
-    }
+    // if (localStorage['tradingview.chart.favoriteLibraryIndicators']) {
+    //   let indicators: Array<string> = JSON.parse(localStorage['tradingview.chart.favoriteLibraryIndicators'])
+    //   indicators = indicators.filter((item) => !studies.some?.(i => i.name === item))
+    //   indicators.forEach(i => {
+    //     _widget?.activeChart?.().createStudy(i, false, false)
+    //   })
+    // }
     // this.createPositionPriceLine()
     // this.createMigratePriceLine()
   }

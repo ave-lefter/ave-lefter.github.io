@@ -1,36 +1,37 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-import { getOpenTimeList } from './hotColumusService'
 import RangePopover from './rangePopover.vue'
 
-const { t } = useI18n()
 const props = defineProps<{
   sortConditions: { sort: string; sort_dir: string }
   setSortConditions(params: { sort: string; sort_dir: string }): void
   setFilterForm(...args: [string, string][]): void
+  activeInterval: string
 }>()
-
-const popoverVisible = shallowRef(false)
+const prefix = computed(() => `makers_${props.activeInterval}`)
+function sortChange(sort_dir: string) {
+  props.setSortConditions({
+    sort: sort_dir ? prefix.value : '',
+    sort_dir: sort_dir,
+  })
+}
 const defaultSort = computed(() => {
-  if (props.sortConditions.sort === 'created_at') {
+  if (props.sortConditions.sort === prefix.value) {
     return props.sortConditions.sort_dir
   }
   return ''
 })
 
-function sortChange(sort_dir: string) {
-  props.setSortConditions({
-    sort: sort_dir ? 'created_at' : '',
-    sort_dir: sort_dir,
-  })
-}
-const openTimeList = computed(() => getOpenTimeList(t('all')))
-
+const popoverVisible = shallowRef(false)
+const openTimeList = shallowRef([
+  { text: '> 300', value: '300' },
+  { text: '> 500', value: '500' },
+  { text: '> 1000', value: '1000' },
+])
 const isFilterHighlight = shallowRef(false)
-
+const { t } = useI18n()
 function confirm(params?: [string, string]) {
   if (!params || !params.some((el) => !!el)) {
-    props.setFilterForm(['created_at_max', ''], ['created_at_min', ''])
+    props.setFilterForm([prefix.value + '_min', ''], [prefix.value + '_max', ''])
     isFilterHighlight.value = false
     popoverVisible.value = false
     return
@@ -40,10 +41,7 @@ function confirm(params?: [string, string]) {
     return
   }
   const _params = params.map((el, idx) => {
-    return [
-      `${{ 0: 'created_at_max', 1: 'created_at_min' }[idx]}` as string,
-      el ? dayjs().unix() - Number(el) * 60 : '',
-    ]
+    return [`${{ 0: prefix.value + '_min', 1: prefix.value + '_max' }[idx]}` as string, el || '']
   }) as [string, string][]
   props.setFilterForm(..._params)
   isFilterHighlight.value = true
@@ -51,23 +49,24 @@ function confirm(params?: [string, string]) {
 }
 </script>
 <template>
-  <div class="flex items-center gap-2px">
+  <div class="flex items-center justify-end gap-3px">
     <div
-      class="cursor-pointer"
+      class="cursor-pointer flex items-center gap-3px"
       @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')"
     >
-      <span>{{ $t('poolPair') }}</span
-      >/<span>{{ $t('openTime') }}</span>
+      <span
+        class="lh-16px rounded-2px px-2px text-12px bg-[--d-333-l-FFF] color-[--d-CCC-l-333]"
+        >{{ activeInterval }}</span
+      >{{ $t('markers') }}
     </div>
     <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
     <RangePopover
       v-model="popoverVisible"
-      :width="300"
-      :title="$t('openTime')"
+      :width="225"
+      :title="$t('nMarkers', { n: activeInterval })"
       :list="openTimeList"
-      :selectRangeIndex="1"
+      :selectRangeIndex="0"
       :isFilterHighlight="isFilterHighlight"
-      append="min"
       @confirm="confirm"
     />
   </div>

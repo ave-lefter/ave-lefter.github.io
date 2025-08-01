@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
 import { cloneDeep } from 'lodash-es'
 import { VueDraggableNext } from 'vue-draggable-next'
 import { formatNumber2 } from '~/utils/formatNumber'
 import { getChainDefaultIcon } from '~/utils'
 import ArcProgress from '~/components/arcProgress.vue'
 import { getNewFavoriteList, getUserFavoriteGroups, removeFavorite, removeFavoriteGroup, addFavoriteGroup, changeFavoriteGroupName, moveFavoriteGroup, editTokenFavRemark, getGroupChangeIndex } from '~/api/fav'
+import { WSEventType } from '~/utils/constants'
 
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const configStore = useConfigStore()
+const priceV2Store = usePriceV2Store()
+const wsStore = useWSStore()
 const router = useRouter()
 const { t } = useI18n()
 const activeTab = ref(0)
@@ -90,6 +93,29 @@ watch(() => walletStore.address, (newVal) => {
     tabsGroup.value = []
   }
 })
+
+// 监听 WebSocket 价格更新
+watch(() => wsStore.wsResult[WSEventType.PRICEV2], (priceData) => {
+  if (!priceData?.prices || !tableList.value.length) return
+  
+  // 更新表格数据中的价格信息
+  tableList.value = tableList.value.map(token => {
+    const priceUpdate = priceData.prices.find((p: any) => 
+      p.token === token.token && p.chain === token.chain
+    )
+    
+    if (priceUpdate) {
+      const newPrice = priceUpdate.uprice
+      return {
+        ...token,
+        current_price_usd: newPrice,
+        price_change_24h: priceUpdate.price_change,
+        pool_circulating_supply: (token.total - token.lock_amount - token.burn_amount - token.other_amount) * newPrice
+      }
+    }
+    return token
+  })
+}, { deep: true })
 
 // 选择分组
 const setActiveTab = (val: number) => {
@@ -269,6 +295,12 @@ const getList = async () => {
     []
   pageData.value.total = res.total
   tableList.value = tableData
+  
+  // 设置价格订阅
+  const tokenIds = tableData.map(item => item.id)
+  priceV2Store.setMultiPriceParams('favorite', tokenIds)
+  priceV2Store.sendPriceWs()
+  
   loading.value = false
 }
 
@@ -286,6 +318,12 @@ onMounted(() => {
   if (!botStore.evmAddress && !walletStore.address) return
   getList()
   getGroupList()
+})
+
+// 组件销毁时清理订阅
+onBeforeUnmount(() => {
+  priceV2Store.setMultiPriceParams('favorite', [])
+  priceV2Store.sendPriceWs()
 })
 </script>
 
@@ -457,6 +495,13 @@ onMounted(() => {
                       target="_blank" @click.stop>
                       <Icon class="text-[--d-666-l-999] h-12px w-12px text-12px" name="custom:search" />
                     </a>
+                    <img
+                      v-if="row.issue_platform"
+                      v-tooltip="row.issue_platform"
+                      class="ml-4px w-10px h-10px"
+                      :src="formatIconTag(row.issue_platform)"
+                      alt=""
+                    >
                   </div>
                   <div class="flex items-center">
                     <!-- <span class="text-[--d-CCC-l-999]">({{ '*' + row.token?.slice(-4) }})</span> -->

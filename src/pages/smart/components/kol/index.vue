@@ -228,7 +228,7 @@
           min-width="100px"
         >
         <template #header>
-          <span class="bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
+          <span class="bg-[--d-333-l-FFF] color-[--d-CCC-l-333] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
           <span>Pnl</span>
         </template>
           <template #default="{ row }">
@@ -405,7 +405,7 @@
           :min-width="110"
         >
         <template #header>
-          <span class="bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
+          <span class="bg-[--d-333-l-FFF] color-[--d-CCC-l-333] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
           <span>{{ $t('score') }}</span>
         </template>
         <template #default="{ row }">
@@ -415,7 +415,7 @@
 
         <el-table-column align="right" :min-width="200">
           <template #header>
-            <span class="bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
+            <span class="bg-[--d-333-l-FFF] color-[--d-CCC-l-333] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
             <span>{{ $t('profit4') }}</span>
             <el-popover
               v-model:visible="filterForm['profit_percent_num'].visible"
@@ -676,7 +676,7 @@
         </el-table-column>
         <el-table-column align="right" :min-width="230">
           <template #header>
-            <span class="bg-[--d-333-l-999] color-[--d-CCC-l-F5F5F5] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
+            <span class="bg-[--d-333-l-FFF] color-[--d-CCC-l-333] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
             <span class="mr-7px">{{ $t('loss') }}</span>
           </template>
           <template #default="{ row }">

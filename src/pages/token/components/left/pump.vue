@@ -27,15 +27,15 @@ const sort = ref({
 const isVolUSDT = ref(true)
 const tabList = computed(()=>{
   return [{
-    label: t('NewPairs'),
+    label: t('new1'),
     value: 'pump_in_new',
     progressVisible: true
   }, {
-    label: t('FinalStretch'),
+    label: t('soon'),
     value: 'pump_in_almost',
     progressVisible: true
   }, {
-    label: t('Migrated'),
+    label: t('graduated'),
     value: 'pump_out_new',
     progressVisible: false
   },
@@ -325,13 +325,28 @@ function getTargetToken(row: GetHomePumpListResponse) {
         @mouseleave="setPausedStatus(false)"
       >
         <div class="flex-[2] flex items-center">
-          <TokenImg
-            :row="{
-            chain:row.chain,
-            logo_url:getTargetToken(row).logo,
-            symbol:getTargetToken(row).symbol,
-          }"
-          />
+          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+            <template #default>
+              <TokenImg
+                :row="{
+                chain:row.chain,
+                logo_url:getTargetToken(row).logo,
+                symbol:getTargetToken(row).symbol,
+              }"
+              />
+            </template>
+            <template #content>
+              <TokenImg
+                :row="{
+                  chain:row.chain,
+                  logo_url:getTargetToken(row).logo,
+                  symbol:getTargetToken(row).symbol,
+                }"
+               chain-class="hidden" 
+               token-class="w-240px h-240px [&&]:mr-0 rounded-16px" />
+            </template>
+          </el-tooltip>
+          
           <div class="ml-6px">
             <div
               class="flex items-center color-[--d-F5F5F5-l-333] max-w-80px overflow-hidden whitespace-nowrap">

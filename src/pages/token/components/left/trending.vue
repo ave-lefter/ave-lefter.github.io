@@ -123,9 +123,14 @@ const columns = computed(() => {
         :to="`/token/${row.token}-${row.chain}`"
       >
         <div class="flex-1 flex items-center">
-          <TokenImg
-            :row="row"
-          />
+          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+            <template #default>
+              <TokenImg :row="row"/>
+            </template>
+            <template #content>
+              <TokenImg :row="row" chain-class="hidden" token-class="w-240px h-240px [&&]:mr-0 rounded-16px" />
+            </template>
+          </el-tooltip>
           <div class="ml-6px">
             <div class="flex items-center">
               <span class="color-[--d-F5F5F5-l-333] max-w-80px overflow-hidden text-ellipsis whitespace-nowrap">{{
@@ -133,10 +138,10 @@ const columns = computed(() => {
                 }}</span>
               <img
                 v-if="row.launchpad"
-                class="ml-2px w-10px h-10px"
+                v-tooltip="row.launchpad"
+                class="ml-5px w-10px h-10px"
                 :src="formatIconTag(row.launchpad)"
                 alt=""
-                v-tooltip="row.launchpad"
               >
               <Icon
                 v-if="row.risk_score > 55"
@@ -157,7 +162,7 @@ const columns = computed(() => {
             <template v-if="Number(row.current_price_usd) === 0">0</template>
             <template v-else-if="row.current_price_usd === '--'">--</template>
             <template v-else>
-              ${{ formatNumber(row.current_price_usd, 2) }}
+              ${{ formatNumber(row.current_price_usd, 4) }}
             </template>
           </div>
           <div :class="getColorClass(row.price_change)">

@@ -25,7 +25,6 @@
     .el-input__wrapper {
       background-color: transparent;
       border-bottom: 1px solid var(--d-333-l-ECECEC);
-      padding-left: 0;
       box-shadow: none;
       & :hover {
         box-shadow: none;
@@ -33,6 +32,9 @@
       .el-input__inner::placeholder {
         color: var(--d-666-l-999);
       }
+    }
+    &.search-input2  .el-input__wrapper {
+      padding-left: 0;
     }
   }
 }

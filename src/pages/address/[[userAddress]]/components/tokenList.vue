@@ -216,7 +216,7 @@
       v-model="hideTokenVisible"
       :row="currentHideToken"
       :self_address="address"
-      @hideToken="$emit('hideToken')"
+      @hideToken="()=>{}"
     />
   </div>
 </template>

@@ -452,5 +452,12 @@
   "login": "Conecte-se",
   "platform": "Plataforma",
   "onlyPush": "Apenas empurre",
-  "complete": "Completo"
+  "balance": "Ativo",
+  "runTime1": "1/2 Custo",
+  "runTime2": "2/2 Custo",
+  "snipers_1m": "Snipers [1m]",
+  "devPosition": "DEV Possuído",
+  "complete": "Completo",
+  "myFavoriteChain": "Minha rede favorita",
+  "unDelete": "Não pode excluir"
 }

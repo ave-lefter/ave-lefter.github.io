@@ -25,23 +25,33 @@
       </div>
       <div
         class="flex-end cursor-pointer select-none"
-        @click.stop="switchSort('mcap')"
+        @click.stop="switchSort('pool_size')"
       >
         {{ $t('mCap') + '/' + $t('pool') }}
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
-            ${getActiveClass(-1, 'mcap', 'b')}
+            ${getActiveClass(-1, 'pool_size', 'b')}
             `"
-            @click.stop="switchSort('mcap', -1)"
+            @click.stop="switchSort('pool_size', -1)"
           />
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer
-            ${getActiveClass(1, 'mcap', 't')}
+            ${getActiveClass(1, 'pool_size', 't')}
             `"
-            @click.stop="switchSort('mcap', 1)"
+            @click.stop="switchSort('pool_size', 1)"
           />
         </div>
+        <RangePopover
+          v-if="isCanFilter"
+          v-model="popoverVisible"
+          :width="225"
+          :title="`${$t('liquidity1')}($)`"
+          :list="openTimeList"
+          :selectRangeIndex="0"
+          :isFilterHighlight="isFilterHighlight"
+          @confirm="confirm"
+        />
       </div>
       <div
         class="flex-end cursor-pointer select-none"
@@ -133,10 +143,10 @@
     >
       <ul class="content">
         <li v-for="(row, $index) in tokens1" :key="$index">
-          <a
-            href=""
+          <NuxtLink
+            :to="`/token/${row.token}-${row.chain}`"
             class="flex no-underline h-50p"
-            @click.stop.prevent="tableRowClick(row.token + '-' + row.chain)"
+            @click.stop="$emit('close')"
           >
             <div class="text-12px">
               {{ $index < 9 ? '0' + Number($index + 1) : $index + 1 }}
@@ -374,7 +384,7 @@
                 {{ $t('unknownRisk') }}
               </template>
             </div>
-          </a>
+          </NuxtLink>
         </li>
       </ul>
     </el-scrollbar>
@@ -393,6 +403,7 @@ import emptyDark from '@/assets/images/empty-black.svg'
 import { formatNumber } from '@/utils/formatNumber'
 import type { GetHotTokensResponse } from '@/api/token'
 import type { SearchHot } from '@/api/types/search'
+import RangePopover from './rangePopover.vue'
 import { getMCap } from '~/utils'
 import {
   getSymbolDefaultIcon,
@@ -410,16 +421,38 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isCanFilter: {
+    type: Boolean,
+    default: false,
+  }
 })
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'filter', 'sortChange'])
 const $router = useRouter()
 const { token_logo_url } = useConfigStore()
 
 type SortValue = 0 | -1 | 1
 const activeSort = shallowRef<SortValue>(0)
 const sortBy = shallowRef<string>('')
-const isPrice = shallowRef<boolean>(true)
 const isShowDate = shallowRef<boolean>(false)
+const popoverVisible = shallowRef(false)
+const openTimeList = shallowRef([
+  { text: '> $100', value: '100' },
+  { text: '> $1000', value: '1000' },
+  { text: '> $10K', value: '10000' },
+  { text: '> $100K', value: '100000' },
+])
+const isFilterHighlight = shallowRef(false)
+function confirm(params?: [string, string]) {
+  if (!params || !params.some((el) => !!el)) {
+    isFilterHighlight.value = false
+    popoverVisible.value = false
+    emit('filter', '')
+    return
+  }
+  isFilterHighlight.value = true
+  popoverVisible.value = false
+  emit('filter', params[0])
+}
 
 const tokens1 = computed(() => {
   const list = props.tokens?.slice(0)
@@ -447,7 +480,7 @@ function tableRowClick(id: string) {
   })
   emit('close')
 }
-const isShowHighRisk = shallowRef(true)
+
 
 function getActiveClass(
   activeSort1: SortValue,
@@ -464,6 +497,7 @@ function switchSort(sortBy1: string, activeSort1?: SortValue) {
   if (sortBy.value !== sortBy1) {
     sortBy.value = sortBy1
     activeSort.value = 1
+    emit('sortChange', { prop: sortBy.value, order: activeSort.value })
     return
   }
   // if (activeSort1) {
@@ -474,6 +508,7 @@ function switchSort(sortBy1: string, activeSort1?: SortValue) {
   if (activeSort.value > 1) {
     activeSort.value = -1
   }
+  emit('sortChange', { prop: sortBy.value, order: activeSort.value })
 }
 </script>
 <style lang="scss" scoped>
