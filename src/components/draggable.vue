@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import VueDraggableResizable from 'vue-draggable-resizable'
+import VueDraggableResizable from './vue-draggable-resizeable/index.vue'
 import {useThrottleFn} from '@vueuse/core'
 
 defineProps<{
@@ -76,7 +76,7 @@ function onDrag(x: number, y: number) {
 </template>
 
 <style lang="scss">
-@import "vue-draggable-resizable/style.css";
+@import "@/components/vue-draggable-resizeable/index.css";
 
 .handle {
   display: block !important;
