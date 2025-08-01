@@ -266,16 +266,16 @@
             <ul class="flex flex-col gap-20px mb-30px">
               <li class="flex-between">
                 <div>{{ t('toAddress') }}</div>
-                <div>{{ billObj.creatorAddress ?billObj.creatorAddress?.slice(0, 13) + '...' +
-                  billObj.creatorAddress?.slice(-11):'--' }}
-                  <Icon v-copy="billObj.creatorAddress" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
+                <div>{{ billObj.transferTo ?billObj.transferTo?.slice(0, 13) + '...' +
+                  billObj.transferTo?.slice(-11):'--' }}
+                  <Icon v-copy="billObj.transferTo" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
               </li>
               <li class="flex-between">
                 <div>{{ t('fromAddress') }}</div>
-                <div>{{ billObj.transferTo ?billObj.transferTo?.slice(0, 13) + '...' +
-                  billObj.transferTo?.slice(-11):'--' }}
-                  <Icon v-copy="billObj.transferTo" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
+                <div>{{ billObj.creatorAddress ?billObj.creatorAddress?.slice(0, 13) + '...' +
+                  billObj.creatorAddress?.slice(-11):'--' }}
+                  <Icon v-copy="billObj.creatorAddress" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
               </li>
               <li class="flex-between">
