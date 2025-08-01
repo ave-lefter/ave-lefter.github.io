@@ -6,14 +6,14 @@
       >
         <div class="w-[55%]" ata-aos="fade-left">
           <img
-            class="w-[120%] block mt[-55px] ml-[-30px]"
+            class="w-[120%] block mt[-55px] ml-[0px]"
             :src="getImgUrlBylang('/download/mask-group-en.jpg')"
           >
         </div>
         <div class="container mx-auto w-[45%]" ata-aos="fade-right">
           <div class="max-w-2xl">
-            <h1 class="text-5xl font-bold mb-1 mt-10 ml-[-2px]">{{$t("downloadAve")}}</h1>
-            <p class="text-sm text-[#b7bdc6] mb-3">{{ $t('downloadSubtitle') }}</p>
+            <h1 class="text-5xl font-bold mb-2  ml-[-2px]">{{$t("downloadAve")}}</h1>
+            <p class="text-sm text-[#b7bdc6] mb-6">{{ $t('downloadSubtitle') }}</p>
             <div class="grid grid-cols-24 gap-8">
               <div class="col-span-6 ">
                 <h2 class="text-base mb-2">IOS</h2>
@@ -101,12 +101,12 @@
                 </div>
               </div>
             </div>
-            <div class="col-span-11 mt-3">
+            <div class="col-span-11 mt-8">
               <h2 class="text-base mb-2">{{ $t('downloadByScanCode') }}</h2>
               <img
                 src="/download/1-1040045937-171-85-3-1000342829-2aa8d298ea104cbef30a3b8a5e449fd-1.png"
                 alt="QR Code"
-                class="w-28 h-28 bg-white p-1 rounded-lg"
+                class="w-32 h-32 bg-white p-1 rounded-lg"
               >
               <NuxtLink to="/download/help" class="flex items-center mt-2 text-xs hover:underline">
                 <img
@@ -134,7 +134,7 @@
                   {{ $t("glodDogSubTitle") }}
                 </p>
               </div>
-              <div class="h-340px overflow-hidden rounded-t-lg">
+              <div class="h-400px overflow-hidden rounded-t-lg px-5">
                 <img
                   :src="getImgUrlBylang('/download/image-6-en.png')"
                   alt="Feature 1"
@@ -152,8 +152,8 @@
                     alt="AI Icon"
                   >
                   <div class="text-left">
-                    <h3 class="font-bold">{{ $t("glodDesTitle") }}</h3>
-                    <p class="text-xs m-0">{{ $t("glodDesSubtitle") }}</p>
+                    <h3 class="font-bold px-5">{{ $t("glodDesTitle") }}</h3>
+                    <p class="text-xs m-0 px-5">{{ $t("glodDesSubtitle") }}</p>
                   </div>
                 </div>
               </div>
@@ -165,12 +165,12 @@
                 data-aos-delay="200"
                 data-aos-duration="200"
               >
-                <h2 class="text-xl font-bold mb-4">{{ $t("signTitle") }}</h2>
+                <h2 class="text-xl font-bold mb-4  px-5">{{ $t("signTitle") }}</h2>
                 <p class="text-xs mb-8 h-47px overflow-hidden">
                   {{ $t("signSubTitle") }}
                 </p>
               </div>
-              <div class="h-340px overflow-hidden rounded-t-lg">
+              <div class="h-400px overflow-hidden rounded-t-lg px-5">
                 <img
                   :src="getImgUrlBylang('/download/image-6-1-en.png')"
                   alt="Feature 2"
@@ -200,10 +200,10 @@
                 data-aos-delay="300"
                 data-aos-duration="300"
               >
-                <h2 class="text-xl font-bold mb-4">{{ $t("tokenTitle") }}</h2>
-                <p class="text-xs mb-8 h-47px overflow-hidden">{{ $t("tokenSubTitle") }}</p>
+                <h2 class="text-xl font-bold mb-4 px-5" >{{ $t("tokenTitle") }}<br>{{ $t("tokenTitle1") }}</h2>
+                <p class="text-xs mb-8 h-47px overflow-hidden px-2">{{ $t("tokenSubTitle") }}</p>
               </div>
-              <div class="h-340px overflow-hidden">
+              <div class="h-400px overflow-hidden">
                 <img
                   :src="getImgUrlBylang('/download/image-6-2-en.png')"
                   alt="Feature 3"
@@ -212,7 +212,7 @@
               </div>
               <div
                 data-aos="flip-right"
-                class="absolute bottom-[120px] left-[-20px] h-[65px] bg-gradient-to-r from-[#0095ff] to-[#3bffb0] p-4 pt-2 rounded-xl backdrop-blur"
+                class="absolute bottom-[70px] left-[-20px] h-[65px] bg-gradient-to-r from-[#0095ff] to-[#3bffb0] p-4 pt-2 rounded-xl backdrop-blur"
               >
                 <div class="flex items-center">
                   <img
@@ -221,7 +221,7 @@
                     alt="AI Icon"
                   >
                   <div class="text-left">
-                    <h3 class="font-bold text-lg">{{ $t("tokenDesTitle") }}</h3>
+                    <h3 class="font-bold">{{ $t("tokenDesTitle") }}</h3>
                     <p class="text-xs m-0">{{ $t("tokenDesSubtitle") }}</p>
                   </div>
                 </div>
@@ -231,12 +231,12 @@
         </div>
       </section>
 
-      <section class="py-16 pt-0 pb-8 mt-8">
+      <section class="py-16 pt-0 pb-8">
         <div class="container mx-auto px-3">
           <div class="bg-gradient-to-tr from-[#0b1a4b] to-black rounded-2xl p-12 pb-0 pr-0 flex">
-            <div class="w-[70%]">
+            <div class="w-[75%] mt-6">
               <div data-aos="fade-down">
-                <h2 class="text-3xl font-bold mb-4 mt-6">{{ $t('safeTitle') }}</h2>
+                <h2 class="text-3xl font-bold mb-6 mt-8">{{ $t('safeTitle') }}</h2>
                 <p class="text-sm mb-18">
                   {{ $t('safeDes') }}
                 </p>
@@ -245,7 +245,7 @@
                 <img
                   :src="getImgUrlBylang('/download/image-4-en.png')"
                   alt="Safety Feature 1"
-                  class="rounded-lg w-full origin-center rotate-15 mt-[10px] block"
+                  class="rounded-lg w-full origin-center rotate-15 mt-[20px] block"
                   data-aos-duration="500"
                   data-aos="fade-up"
                 >
@@ -259,14 +259,14 @@
                 <img
                   :src="getImgUrlBylang('/download/image-4-1-en.png')"
                   alt="Safety Feature 3"
-                  class="rounded-lg w-full origin-center rotate-13 mt-[10px] block"
+                  class="rounded-lg w-full origin-center rotate-13 mt-[20px] block"
                   data-aos="fade-up"
                   data-aos-duration="1500"
                 >
               </div>
             </div>
-            <div class="w-[30%] p-l-18">
-              <div class="h-380px overflow-hidden ">
+            <div class="w-[25%]">
+              <div class="h-430px w-[300px] overflow-hidden pl-10">
                 <img
                   :src="getImgUrlBylang('/download/image-2-en.png')"
                   alt="App Screenshot"
@@ -282,7 +282,7 @@
       <section class="trading py-16 pb-4">
         <div class="container mx-auto px-4">
           <div data-aos="zoom-in-up" class="bg-gradient-to-r from-[#1e41ea] to-[#8860ff] rounded-2xl p-12 pb-0">
-            <h2 data-aos="zoom-in-down" class="text-3xl font-bold mb-8">{{ $t('buyAndSell') }}</h2>
+            <h2 data-aos="zoom-in-down" class="text-3xl font-bold mb-10">{{ $t('buyAndSell') }}</h2>
             <div data-aos="fade-in-down" class="bg-gradient-to-br from-[#0b1a4b] to-black rounded-t-lg  p-8 ">
               <div class="grid grid-cols-3 gap-8 text-center">
                 <div
@@ -334,7 +334,7 @@
                 <h2 class="text-3xl font-bold mb-4 mt-8">{{ $t('walletTitle') }}</h2>
                 <p class="text-sm font-light mb-8">{{ $t('walletDes') }}</p>
               </div>
-              <div class="h-445px w-[65%] mx-auto overflow-hidden">
+              <div class="h-455px w-[365px] mx-auto overflow-hidden">
                 <img
                   :src="getImgUrlBylang('/download/image-6-4-en.png')"
                   alt="Wallet Insights"
@@ -399,7 +399,7 @@
                   130+
                 </div>
               </div>
-              <div class="h-370px overflow-hidden w-[75%] mx-auto">
+              <div class="h-400px overflow-hidden w-[440px] mx-auto">
                 <img
                   :src="getImgUrlBylang('/download/frame-1912056040-en.svg')"
                   alt="Wallet System"
@@ -417,10 +417,10 @@
         <div class="container mx-auto px-4">
           <div
             data-aos="zoom-in-down"
-            class="bg-gradient-to-br from-[#0b1a4b] from-0% via-black via-70% to-black to-100% rounded-lg p-12 border-1 border-solid border-[#222B56] rounded-2xl"
+            class="bg-gradient-to-br from-[#0b1a4b] from-0% via-black via-70% to-black to-100% rounded-lg p-12 pb-25 border-1 border-solid border-[#1A1A1A] rounded-2xl"
           >
-            <h2 class="text-3xl font-bold text-center mb-4 mt-4" data-aos="fade-down">{{ $t('tagTitle') }}</h2>
-            <p class="text-lg text-center mb-12" data-aos="fade-zoom-in">{{ $t('tagDes') }}</p>
+            <h2 class="text-3xl font-bold text-center mb-4 mt-6" data-aos="fade-down">{{ $t('tagTitle') }}</h2>
+            <p class="text-base text-center mb-12" data-aos="fade-zoom-in">{{ $t('tagDes') }}</p>
             <div class="grid grid-cols-10 gap-7 text-sm" data-aos="fade-up">
               <div class="text-center">
                 <img

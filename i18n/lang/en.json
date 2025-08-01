@@ -1140,7 +1140,8 @@
   "signDesTitle": "Signal Plaza",
   "signDesSubtitle": "AI-Scouted Alpha Signals Across Chains",
 
-  "tokenTitle": "AI Contract Scanning & Risk Alerts",
+  "tokenTitle": "AI Contract Scanning ",
+  "tokenTitle1": " & Risk Alerts",
   "tokenSubTitle": "Enhanced detection of abnormal smart contracts.Pinpoint the exact risky code segments with precision.",
   "tokenDesTitle": "AI Contract",
   "tokenDesSubtitle": "AI-Powered Anomaly Contract Detection",
