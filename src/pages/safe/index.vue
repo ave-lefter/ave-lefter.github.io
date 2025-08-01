@@ -22,7 +22,8 @@
             </div>
           </div>
           <div class="flex items-center gap-8px">
-            <el-button v-if="!authInfo.emailAddress" type="primary" class="h-36px w-151px" @click="(step = 1) && (checkType = 'email')">{{ t('bindNow') }}</el-button>
+            <div v-if="JSON.stringify(authInfo)==='{}'"/>
+            <el-button v-else-if="!authInfo.emailAddress" type="primary" class="h-36px w-151px" @click="(step = 1) && (checkType = 'email')">{{ t('bindNow') }}</el-button>
             <template v-else>
               <Icon name="mingcute:check-circle-fill" class="text-17px color-#12B886 mt-1px"/>
               <span class="font-400 text-15px lh-22px tracking-0px">{{ desensitizeEmail(authInfo.emailAddress) }}</span>
@@ -40,7 +41,8 @@
             </div>
           </div>
           <div class="flex items-center gap-8px">
-            <el-button v-if="!authInfo.authSetting" type="primary" class="h-36px w-151px" @click="(step = 1) && (checkType = 'google')">{{ t('bindNow') }}</el-button>
+            <div v-if="JSON.stringify(authInfo)==='{}'"/>
+            <el-button v-else-if="!authInfo.authSetting" type="primary" class="h-36px w-151px" @click="(step = 1) && (checkType = 'google')">{{ t('bindNow') }}</el-button>
             <template v-else>
               <Icon name="mingcute:check-circle-fill" class="text-17px color-#12B886 mt-1px"/>
               <span class="font-400 text-15px lh-22px tracking-0px">{{ t('bounded') }}</span>
@@ -118,7 +120,7 @@
               <div class="mb-40px text-12px font-400 color-[--d-F5F5F5-l-333]">{{ t('bindGoogleAuthStep3P1') }}</div>
               <el-form-item label="" prop="authCode" class="mb-40px!">
                 <el-input
-                  class="h-48px font-500 text-16px" v-model="googleAuth.authCode" :autocomplete="'new-authCode' + Math.random()"
+                  v-model="googleAuth.authCode" class="h-48px font-500 text-16px" :autocomplete="'new-authCode' + Math.random()"
                   :placeholder="t('authCode')" name="authCodeField" />
               </el-form-item>
               <el-form-item >
@@ -180,7 +182,8 @@
           <el-checkbox v-model="form.agree" class="text-[#999] w-[100%] [&&]:[--el-checkbox-checked-text-color:#999]">
             <div class="flex items-center font-400 text-12px text-[#999]">
               {{ t("startFooter1") }}&nbsp;
-              <a class="color-#3F80F7"
+              <a
+                class="color-#3F80F7"
                 type="primary" :href="!lang?.includes?.('zh')
                 ? 'https://doc.ave.ai/cn/yong-hu-xie-yi'
                 : 'https://doc.ave.ai/ave.ai-user-agreement'
@@ -223,20 +226,19 @@
 </template>
 
 <script setup lang="ts">
-import { Back, Right } from '@element-plus/icons-vue'
-import { ElNotification, type FormInstance, type FormRules } from 'element-plus'
+import { Back } from '@element-plus/icons-vue'
+import type { FormInstance, FormRules } from 'element-plus'
 import { setGoogleAuth as setAuth, bot_getUserInfoByGuid as getUserInfoByGuid, confirmAuthSetting } from '@/api/bot'
 import Cookies from 'js-cookie'
 import sha256 from 'crypto-js/sha256'
 import QrCodeWithLogo from 'qr-code-with-logo'
 import Steps from './components/steps.vue'
 import { ElMessage } from 'element-plus'
-import { ro } from 'element-plus/es/locale/index.mjs'
 
 const { t } = useI18n()
 const { authInfo } =storeToRefs(useUserStore())
 const dialogVisible=ref(false)
-const { mode, lang } = storeToRefs(useGlobalStore())
+const { lang } = storeToRefs(useGlobalStore())
 const { isDark } = useThemeStore()
 const userStore = useUserStore()
 const {evmAddress} = storeToRefs(useBotStore())
@@ -290,9 +292,6 @@ const form = ref({
   agree: false
 })
 
-const form2 = ref({
-  verificationCode: '',
-})
 const title = computed(() => {
   return step.value === 0
     ? t('safeCenter')
@@ -315,15 +314,6 @@ const desc = computed(() => {
 const googleAuthRef = ref<FormInstance>()
 const formRef = ref<FormInstance>()
 const formRef2 = ref<FormInstance>()
-
-const showEmail = computed(() => {
-  return email.value && desensitizeEmail(email.value)
-})
-
-// function desensitizeEmail(email) {
-//     // Implement your email desensitization logic here
-//     return email // Placeholder, replace with actual implementation
-// }
 
 const rules = computed<FormRules>(() => {
   return {
@@ -453,15 +443,6 @@ async function setChainQr() {
   })
 }
 
-function back() {
- if(step.value === 1) {
-    if (timer.value && !email.value) {
-      resetCountdown()
-    }
-    step.value = 0
-  }
-  resetFields()
-}
 
 function submitForm() {
   const currentLanguage = lang.value.indexOf('zh') > -1 ? 'cn' : 'en'
