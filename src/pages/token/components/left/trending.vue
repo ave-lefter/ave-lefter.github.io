@@ -123,9 +123,14 @@ const columns = computed(() => {
         :to="`/token/${row.token}-${row.chain}`"
       >
         <div class="flex-1 flex items-center">
-          <TokenImg
-            :row="row"
-          />
+          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+            <template #default>
+              <TokenImg :row="row"/>
+            </template>
+            <template #content>
+              <TokenImg :row="row" chain-class="hidden" token-class="w-240px h-240px [&&]:mr-0 rounded-16px" />
+            </template>
+          </el-tooltip>
           <div class="ml-6px">
             <div class="flex items-center">
               <span class="color-[--d-F5F5F5-l-333] max-w-80px overflow-hidden text-ellipsis whitespace-nowrap">{{

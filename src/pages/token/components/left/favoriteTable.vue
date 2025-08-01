@@ -287,7 +287,15 @@ function resetListStatus() {
             :to="`/token/${row.token}-${row.chain}`"
           >
             <div class="flex items-center flex-1">
-              <TokenImg class="mr-8px" :row="row" token-class="w-24px h-24px" />
+              <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+                <template #default>
+                  <TokenImg class="mr-8px" :row="row"/>
+                </template>
+                <template #content>
+                  <TokenImg :row="row" chain-class="hidden" token-class="w-240px h-240px [&&]:mr-0 rounded-16px" />
+                </template>
+              </el-tooltip>
+              
               <div class="flex flex-col items-start">
                 <span class="text-12px flex items-center">
                   {{ row.symbol }}
