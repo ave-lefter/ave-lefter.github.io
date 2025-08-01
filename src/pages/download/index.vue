@@ -16,7 +16,7 @@
             <p class="text-sm text-[#b7bdc6] mb-6">{{ $t('downloadSubtitle') }}</p>
             <div class="grid grid-cols-24 gap-8">
               <div class="col-span-6 ">
-                <h2 class="text-base mb-2">IOS</h2>
+                <h2 class="text-base mb-2">iOS</h2>
                 <div class="grid gap-4">
                   <a
                     href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN"
@@ -142,7 +142,7 @@
                 >
               </div>
               <div
-                data-aos="flip-down"
+                data-aos="fade-down"
                 data-aos-delay="300"
                 data-aos-duration="400"
                 class="absolute bottom-[60px] left-[-5px] h-[60px] bg-gradient-to-r from-[#26e5b200] via-[#5096ff] to-[#a358ff] p-3 pt-2 rounded-xl backdrop-blur"
@@ -180,7 +180,7 @@
                 >
               </div>
               <div
-                data-aos="flip-down"
+                data-aos="fade-up"
                 data-aos-delay="600"
                 data-aos-duration="800"
                 class="absolute bottom-[80px] left-[-20px] h-[65px] bg-gradient-to-r from-[#1f8bea] to-[#caad57] p-2 pt-3 rounded-xl backdrop-blur"
@@ -215,7 +215,7 @@
                 >
               </div>
               <div
-                data-aos="flip-right"
+                data-aos="fade-down"
                 data-aos-delay="1000"
                 data-aos-duration="1200"
                 class="absolute bottom-[50px] left-[-20px] h-[65px] bg-gradient-to-r from-[#0095ff] to-[#3bffb0] p-2 pt-3 rounded-xl backdrop-blur"

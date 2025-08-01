@@ -14,7 +14,7 @@
       </div>
       <div class="flex justify-center gap-20 font-normal mb-12">
         <div class="w-[15%]">
-          <h3 class="text-sm mb-2">IOS</h3>
+          <h3 class="text-sm mb-2">iOS</h3>
           <a
             href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN"
             class="bg-[#161926] mb-8 text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
