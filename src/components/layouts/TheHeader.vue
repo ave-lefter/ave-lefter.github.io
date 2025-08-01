@@ -32,18 +32,14 @@
       </span>
     </a>
     <div class="flex-1" />
-    <el-button
-      text
-      type=""
-      bg
-      color="bg-[var(--d-222-l-F2F2F2)]"
-      class="ml-10px rounded-4px text-[var(--d-F5F5F5-l-333)]!"
+    <div
+    class="ml-10px bg-[var(--d-222-l-F2F2F2)] rounded-4px p-8px h-32px flex items-center text-14px cursor-pointer hover:opacity-80"
       @click="toReferrer"
     >
       <img v-show="showAnimation" src="@/assets/images/refer.gif" height="20" alt="">
       <img v-show="!showAnimation" src="@/assets/images/refer.png" height="20" alt="">
       <span style="word-break: keep-all">{{ $t('refer') }}</span>
-    </el-button>
+    </div>
     <ClipboardToken />
     <el-button
       v-if="!botStore.evmAddress && !walletStore.address"
@@ -51,7 +47,7 @@
       type=""
       bg
       color="bg-[var(--d-222-l-F2F2F2)]"
-      class="ml-10px  rounded-4px text-[var(--d-F5F5F5-l-333)]!"
+      class="ml-10px  rounded-4px text-[var(--d-F5F5F5-l-333)]! [&&]:[--el-fill-color-light:--d-222-l-F2F2F2]"
       @click="openConnect"
     >
       {{ $t('connectWallet') }}
