@@ -40,7 +40,7 @@ export function getUserBalance(
     hide_small = 0
   }): Promise<{ data: GetUserBalanceResponse[] ; total: number ;pageNo: number; pageSize: number }> {
   const { $api } = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v2api_zihoe/user_balance/v1/swap/balance', {
+  return $api('/v2api/user_balance/v1/swap/balance', {
     method: 'post',
     body: {
       user_ids, //钱包ID
