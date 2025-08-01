@@ -102,7 +102,14 @@
         <Icon name="custom:ai" class="text-12px"/> {{ $t('aiSummary') }}
       </div>
       <div class="text-12px color-[--d-999-l-666] token-description">
-         {{aiSummary?.summary || aiSummary?.headline ? aiSummary.summary || aiSummary.headline: $t('aiIsAnalyzing')}}
+         <template v-if="!headlineArr">
+          {{aiSummary?.summary || aiSummary?.headline ? aiSummary?.summary || aiSummary?.headline: $t('aiIsAnalyzing')}}
+         </template>
+         <template v-else>
+          <div v-for="item in headlineArr" :key="item">
+            {{ item }}
+          </div>
+         </template>
       </div>
     </div>
   </div>
@@ -148,6 +155,11 @@ const effectiveTotal = computed(() => {
 function formatAddress(address: string) {
   return address.slice(0, 6) + '...' + address.slice(-4)
 }
+
+const headlineArr = computed(() => {
+  const ai = aiSummary?.value?.summary || aiSummary?.value?.headline || ''
+  return ai.match(/(\d\..*)/g)
+})
 
 // const medias = computed(() => {
 //   return [

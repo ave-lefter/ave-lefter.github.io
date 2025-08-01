@@ -43,14 +43,28 @@ const botStore = useBotStore()
     >
       <div class="flex justify-between">
         <div class="flex items-center gap-8px">
-          <TokenImg
-            token-class="w-32px h-32px"
-            :row="{
-              chain,
-              logo_url:logo,
-              symbol
-           }"
-          />
+          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+            <template #default>
+              <TokenImg
+                token-class="w-32px h-32px"
+                :row="{
+                  chain,
+                  logo_url:logo,
+                  symbol
+              }"
+              />
+            </template>
+            <template #content>
+              <TokenImg
+                token-class="w-240px h-240px [&&]:mr-0 rounded-16px"
+                :row="{
+                  chain,
+                  logo_url:logo,
+                  symbol
+              }"
+              />
+            </template>
+         </el-tooltip>
           <div class="flex flex-col gap-4px">
             <div class="flex items-center gap-8px">
               <span class="font-500 color-[--d-F5F5F5-l-333] text-16px cursor-pointer"
