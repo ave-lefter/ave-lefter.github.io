@@ -71,7 +71,6 @@ function setFilterForm(...args: any[]) {
 
 const listData = ref<any[]>([])
 
-// 添加缓存系统，参考老项目的 tableDataObj 实现
 const tableDataCache = reactive<Record<string, { data: any[], total: number, timestamp: number }>>({})
 
 const filteredListData = computed(() => {
