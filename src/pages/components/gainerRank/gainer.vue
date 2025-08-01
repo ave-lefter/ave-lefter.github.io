@@ -70,6 +70,9 @@ function setFilterForm(...args: any[]) {
 }
 
 const listData = ref<any[]>([])
+
+const tableDataCache = reactive<Record<string, { data: any[], total: number, timestamp: number }>>({})
+
 const filteredListData = computed(() => {
   if (globalStore.pumpSetting.isBlacklist) {
     return listData.value.filter((el) => !inBlackList(el))
@@ -111,15 +114,29 @@ onActivated(() => {
   isActive.value = true
   filterForm.value = {}
   pageInfo.value.pageNO = 1
-  setTimeout(() => {
-    if (isActive.value) {
-      _getTreasureList()
-    }
-  }, 100)
+  
+  const cacheKey = getCacheKey()
+  const cachedData = tableDataCache[cacheKey]
+  
+  if (cachedData && (Date.now() - cachedData.timestamp) < 10000) {
+    listData.value = cachedData.data
+    pageInfo.value.total = cachedData.total
+    
+    setTimeout(() => {
+      if (isActive.value) {
+        _getTreasureList(false)
+      }
+    }, 100)
+  } else {
+    setTimeout(() => {
+      if (isActive.value) {
+        _getTreasureList()
+      }
+    }, 100)
+  }
 })
 
 onDeactivated(() => {
-  console.log('涨幅榜停用')
   isActive.value = false
   clearTimeout(timer)
   wsStore.send({
@@ -130,11 +147,32 @@ onDeactivated(() => {
   })
 })
 
+// 获取缓存键
+function getCacheKey() {
+  const chain = props.activeChain !== 'AllChains' ? props.activeChain : 'AllChains'
+  return `${chain}-gainer`
+}
+
+const refreshId = ref('')
+
 watch(
   () => [props.activeChain, localeStore.locale],
   () => {
-    pageInfo.value.pageNO = 1
-    _getTreasureList()
+    const cacheKey = getCacheKey()
+    const cachedData = tableDataCache[cacheKey]
+    
+    if (cachedData && (Date.now() - cachedData.timestamp) < 30000) {
+      listData.value = cachedData.data
+      pageInfo.value.total = cachedData.total
+      pageInfo.value.pageNO = 1
+      
+      setTimeout(() => {
+        _getTreasureList(false)
+      }, 100)
+    } else {
+      pageInfo.value.pageNO = 1
+      _getTreasureList()
+    }
   }
 )
 
@@ -146,37 +184,59 @@ async function _getTreasureList(shouldLoading = true) {
     if (props.activeTab !== 'gainer') {
       return
     }
+    
+    const cacheKey = getCacheKey()
+    const currentRefreshId = cacheKey
+    
+    const cachedData = tableDataCache[cacheKey]
+    if (cachedData && !shouldLoading) {
+      listData.value = cachedData.data
+      pageInfo.value.total = cachedData.total
+    }
+    
     if (shouldLoading) {
       loading.value = true
     }
     
-    // 优先使用通用API确保分页功能正常
     const { total: _, ...rest } = pageInfo.value
 
-    // 构建请求参数，只在有值时添加 chain 和 self_address
     const requestParams: any = {
-      category: 'gainer',  // 修正为 'gainer'
+      category: 'gainer',
       ...rest,
       ...sortConditions.value,
       ...filterForm.value,
-      // refresh_total: 0,  // 添加刷新总数参数
     }
 
-    // 只在 chain 有值时添加
+    if (currentRefreshId === refreshId.value && pageInfo.value.total > 0) {
+      requestParams.refresh_total = 0  
+    } else {
+      refreshId.value = currentRefreshId 
+    }
+
     const chainValue = props.activeChain !== 'AllChains' ? props.activeChain : ''
     if (chainValue) {
       requestParams.chain = chainValue
     }
 
-    // 只在 self_address 有值时添加
     if (walletAddress.value) {
       requestParams.self_address = walletAddress.value
     }
 
     const res = await getTreasureList(requestParams)
     
-    pageInfo.value.total = res.total
-    listData.value = (res.data || []).map(props.listMapFunction)
+    if (requestParams.refresh_total !== 0) {
+      pageInfo.value.total = res.total
+    }
+    
+    const processedData = (res.data || []).map(props.listMapFunction)
+    listData.value = processedData
+    
+    // 更新缓存
+    tableDataCache[cacheKey] = {
+      data: processedData,
+      total: res.total,
+      timestamp: Date.now()
+    }
     
     if (shouldLoading) {
       initWs()
@@ -219,10 +279,11 @@ const isActive = ref(true)
 watch(
   () => wsStore.wsResult[WSEventType.PRICE_EXTRA],
   ({ prices }) => {
-    // 只有在组件激活时才处理数据
-    if (!isActive.value) return
+    if (!isActive.value || !listData.value.length) return
     
     if (!prices) return
+    
+    console.log('WebSocket价格更新:', prices.length, '个币种')
     
     const pricesMap = Array.isArray(prices)
       ? prices.reduce((pre, cur) => {
@@ -230,18 +291,24 @@ watch(
           return pre
         }, {})
       : {}
+    
     const updateList = listData.value.map((el) => {
       const item = pricesMap[el.pair + '-' + el.chain]
       if (item) {
-        delete item.holders
-        const market_cap = !el.current_price_usd
-          ? 0
-          : ((el.market_cap || 0) / el.current_price_usd) * (item.uprice || 0)
+        // 只更新价格相关字段，保持其他数据不变
         return {
           ...el,
-          market_cap: market_cap,
           current_price_usd: item.uprice,
-          ...item,
+          price_change_1m: item.price_change_1m,
+          price_change_15m: item.price_change_15m, 
+          price_change_24h: item.price_change_24h,
+          volume_24h: item.volume_24h,
+          volume_1h: item.volume_1h,
+          volume_15m: item.volume_15m,
+          volume_1m: item.volume_1m,
+          market_cap: el.current_price_usd && item.uprice
+            ? ((el.market_cap || 0) / el.current_price_usd) * item.uprice
+            : el.market_cap,
         }
       }
       return el
@@ -252,17 +319,24 @@ watch(
     if (sort && sort_dir) {
       const sortVal = { asc: 1, desc: -1 }[sort_dir] || -1
       listData.value = updateList.toSorted((a, b) => {
-        const aVal = a[sort] || 0
-        const bVal = b[sort] || 0
+        const aVal = Number(a[sort]) || 0
+        const bVal = Number(b[sort]) || 0
         return (bVal - aVal) * sortVal
       })
     } else {
-      // 默认按24小时涨幅排序
+      // 默认按24小时涨幅排序（降序）
       listData.value = updateList.sort((a, b) => {
-        const aChange = a.price_change_24h || 0
-        const bChange = b.price_change_24h || 0
+        const aChange = Number(a.price_change_24h) || 0
+        const bChange = Number(b.price_change_24h) || 0
         return bChange - aChange
       })
+    }
+    
+    // 同时更新缓存中的数据，保持一致性
+    const cacheKey = getCacheKey()
+    if (tableDataCache[cacheKey]) {
+      tableDataCache[cacheKey].data = [...listData.value]
+      // 不更新timestamp，保持缓存的时间戳作为API更新时间的标记
     }
   }
 )
@@ -416,7 +490,7 @@ const cellRenderer = computed(() => {
 </script>
 
 <template>
-  <div v-loading="loading" style="height: calc(100vh - 207px)">
+  <div v-loading="loading" style="height: calc(100vh - 185px)">
     <AveTable
       :data="filteredListData"
       :columns="visibleColumns"
@@ -460,7 +534,7 @@ const cellRenderer = computed(() => {
     v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
-    class="mt-5px py-20px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
+    class="mt-5px py-9px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
     layout="total, prev, pager, next"
     :total="pageInfo.total || 0"
     :small="false"

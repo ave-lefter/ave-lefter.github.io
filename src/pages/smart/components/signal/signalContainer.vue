@@ -6,13 +6,21 @@ import {
   type GetSignalV2ListResponse,
   getSignalV3List,
   type IActionItem, type IActionV3Item,
+  type ITopSignal,
 } from '~/api/signal'
 import SignalLeftList from './signalLeftList.vue'
 import SignalRightList from './signalRightList.vue'
+import SignalTopList from './signalTopList.vue'
 
+const emit = defineEmits(['close'])
 const props = defineProps<{
   activeChain: string
   quickBuyValue: string
+  dialogValues: {
+    visible: boolean
+    loading: boolean
+    list:ITopSignal[]
+  }
 }>()
 const localeStore = useLocaleStore()
 // token: 筛选 token
@@ -230,6 +238,10 @@ onUnmounted(() => {
     />
   </div>
   <div class="flex pt-4px bg-[--d-222-l-F2F2F2]">
+    <SignalTopList
+    :dialogValues="dialogValues"
+    @close="emit('close')"
+    />
     <SignalLeftList
       ref="signalLeftList"
       :activeChain="activeChain"

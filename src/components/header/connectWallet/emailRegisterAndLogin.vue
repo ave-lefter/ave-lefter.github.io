@@ -668,6 +668,10 @@ onBeforeUnmount(() => {
     flex-wrap: nowrap;
     >li{
       flex: 1;
+    
+    }
+    :deep() .el-button.is-loading:before {
+      background-color: transparent;
     }
     .googleLoading {
       display: inline-block;

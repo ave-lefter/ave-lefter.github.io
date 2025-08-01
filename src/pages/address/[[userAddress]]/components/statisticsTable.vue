@@ -164,6 +164,7 @@ const deployedTokenNum = ref(0)
 const listArea = ref(null)
 const trendList = ref(null)
 const themeStore = useThemeStore()
+const {updateHolderNum}= storeToRefs(useUserStore())
 const mode = computed(() => {
   return themeStore.isDark ? 'dark' : 'light'
 })
@@ -210,6 +211,13 @@ const filterTableList = computed(() => {
     return [...tableData.value.deployedToken]
   }
 })
+
+watch(()=>updateHolderNum.value, () => {
+  if(isToken.value){
+    refreshTokenList()
+  }
+})
+
 
 // Methods
 const onConditionChange = () => {

@@ -51,7 +51,7 @@ export function onRequest({ options, request }: MyFetchContext) {
       options.headers.set('Authorization', `Bearer ${accessToken}`)
     }
   }
-  if (url?.includes('/aveswap/v1/sui')) {
+  if (url?.includes('/aveswap/v1/')) {
     const ave_token = localStorage.ave_token
     if (ave_token) {
       options.headers.set('X-Auth', ave_token)

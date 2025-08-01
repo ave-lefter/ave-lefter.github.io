@@ -1,3 +1,4 @@
+import { createCacheRequest } from '#imports'
 export interface IGetTreasureConfig {
   chain_id: string;
   name: string;
@@ -30,12 +31,12 @@ export interface Swap {
   show_name: string;
 }
 
-export function getTreasureConfig(): Promise<IGetTreasureConfig[]> {
+export const getTreasureConfig = createCacheRequest(function(): Promise<IGetTreasureConfig[]> {
   const {$api} = useNuxtApp()
   return $api('/v1api/v4/tokens/treasure/config', {
     method: 'get',
   })
-}
+}, 2000)
 
 export function getTreasureList(query) {
   const {$api} = useNuxtApp()

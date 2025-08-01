@@ -12,7 +12,7 @@
         <span v-else />
       </template>
       <el-table-column :label="t('token')" align="left">
-        <template #default="{ row }">
+        <template #default="{ row }" v-if="isBotWallet"> 
           <div class="flex items-center justify-start">
             <div class="icon-token-container mr-5px">
               <div class="relative">
@@ -42,6 +42,36 @@
             }}</span>
           </div>
         </template>
+         <template #default="{ row }" v-else> 
+          <div class="flex items-center justify-start">
+            <div class="icon-token-container mr-5px">
+              <div class="relative">
+                <el-image class="w-32px h-32px rounded-full" :src="getSymbolDefaultIcon({
+                  chain: row?.chain,
+                  symbol: !isBuyChain(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol,
+                  logo_url: !isBuyChain(row.swapType) ? row?.inTokenLogoUrl : row.outTokenLogoUrl
+                })">
+                  <template #error>
+                    <img class="w-32px h-32px"
+                      :src="getChainDefaultIcon(row?.chain, !isBuyChain(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol)"
+                      alt="" srcset="">
+                  </template>
+                  <template #placeholder>
+                    <img class="w-32px h-32px"
+                      :src="getChainDefaultIcon(row?.chain, !isBuyChain(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol)"
+                      alt="" srcset="">
+                  </template>
+                </el-image>
+                <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px rd-50%"
+                  :src="`${configStore.token_logo_url}chain/${row.chain}.png`" alt="" srcset="">
+              </div>
+            </div>
+            <span class="text-[var(--d-eaecef-l-333333)] text-13px">{{ !isBuyChain(row.swapType) ?
+              row?.inTokenSymbol :
+              row.outTokenSymbol
+            }}</span>
+          </div>
+        </template>
       </el-table-column>
 
       <el-table-column :label="t('type')" align="right" prop="isBuy">
@@ -49,7 +79,7 @@
           <div class="flex flex-row-reverse">
             <div class="flex items-center">
               <div>{{ t('type') }}</div>
-              <el-dropdown trigger="click" @command="handleTypeCommand">
+              <el-dropdown trigger="click" v-if="isBotWallet" @command="handleTypeCommand">
                 <Icon name="custom:filter"
                   :class="[filterConditions?.isBuy >= 0 && filterConditions?.isLimit >= 0 && 'color-#286DFF']"
                   class=" color-[--d-666-l-999] cursor-pointer text-10px" />
@@ -75,19 +105,36 @@
           </div>
         </template>
         <template #default="{ row }">
-          <div v-if="isBuy(row.swapType)" style="background: rgba(18, 184, 134, 0.10)"
-            class="text-13px text-center text-[#12B886] px-5px py-2px rounded-4px">
-            {{ getSwapTypeLabel(row.swapType) }}
-          </div>
-          <div v-else style="background: rgba(246, 70, 93, 0.10)"
-            class="text-13px  text-center text-[#F6465D] px-5px py-2px rounded-4px">
-            {{ getSwapTypeLabel(row.swapType) }}
-          </div>
+          <template v-if="isBotWallet">
+              <div v-if="isBuy(row.swapType)" style="background: rgba(18, 184, 134, 0.10)"
+              class="text-13px text-center text-[#12B886] px-5px py-2px rounded-4px">
+              {{ getSwapTypeLabel(row.swapType) }}
+            </div>
+            <div v-else style="background: rgba(246, 70, 93, 0.10)"
+              class="text-13px  text-center text-[#F6465D] px-5px py-2px rounded-4px">
+              {{ getSwapTypeLabel(row.swapType) }}
+            </div>
+          </template>
+          <template v-if="!isBotWallet">
+              <div v-if="isBuyChain(row.swapType)" style="background: rgba(18, 184, 134, 0.10)"
+              class="text-13px text-center text-[#12B886] px-5px py-2px rounded-4px">
+              {{ getChianSwapTypeLabel(row.swapType) }}
+            </div>
+            <div v-else style="background: rgba(246, 70, 93, 0.10)"
+              class="text-13px  text-center text-[#F6465D] px-5px py-2px rounded-4px">
+              {{ getChianSwapTypeLabel(row.swapType) }}
+            </div>
+          </template>
+          
         </template>
       </el-table-column>
       <el-table-column :label="t('price')" align="right">
-        <template #default="{ row }">
+        <template #default="{ row }" v-if="isBotWallet">
           <div class="text-[var(--d-999-l-959A9F)] text-right">${{ isBuy(row.swapType) ? formatNumber(row?.outPrice ||
+            0) : formatNumber(row?.inPrice || 0) }}</div>
+        </template>
+        <template #default="{ row }" v-else>
+          <div class="text-[var(--d-999-l-959A9F)] text-right">${{ isBuyChain(row.swapType) ? formatNumber(row?.outPrice ||
             0) : formatNumber(row?.inPrice || 0) }}</div>
         </template>
       </el-table-column>
@@ -107,21 +154,35 @@
             class="iconify i-custom:b text-10px ml-3px color-[--d-666-l-999] cursor-pointer text-12px"></span> -->
         </template>
         <template #default="{ row }">
-          <span class="text-[var(--d-999-l-959A9F)] text-right">
+          <span class="text-[var(--d-999-l-959A9F)] text-right" v-if="isBotWallet">
             <template v-if="!isBuy(row.swapType)">
-              {{ formatNumber(formatUnits(new BigNumber(row?.inAmount || 0).toFixed(0), row.inTokenDecimals || 0).toString(), 4) }}
+              {{ formatNumber(formatUnits(new BigNumber(row?.inAmount || 0).toFixed(0), row.inTokenDecimals ||
+                0).toString(), 4) }}
               {{ row?.inTokenSymbol }}
             </template>
             <template v-else>
-              {{ formatNumber(formatUnits(new BigNumber(row?.outAmount || 0).toFixed(0), row.outTokenDecimals || 0).toString(), 4)
+              {{ formatNumber(formatUnits(new BigNumber(row?.outAmount || 0).toFixed(0), row.outTokenDecimals ||
+                0).toString(), 4)
               }}
+              {{ row?.outTokenSymbol }}
+            </template>
+          </span>
+          <span class="text-[var(--d-999-l-959A9F)] text-right" v-else>
+            <template v-if="!isBuyChain(row.swapType)">
+              {{ row.status === 'cancelled' ? '0' : formatNumber(formatUnits(new BigNumber(row?.inAmount ||
+                0).toFixed(0), row.inTokenDecimals || 0).toString(), 4) }}
+              {{ row?.inTokenSymbol }}
+            </template>
+            <template v-else>
+              {{ row.status === 'cancelled' ? '0' : formatNumber(formatUnits(new BigNumber(row?.outAmount ||
+                0).toFixed(0), row.outTokenDecimals || 0).toString(), 4) }}
               {{ row?.outTokenSymbol }}
             </template>
           </span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="t('status')" align="right">
+      <el-table-column v-if="isBotWallet" :label="t('status')" align="right">
         <template #header>
           <div class="flex flex-row-reverse">
             <div class="flex items-center">
@@ -176,7 +237,7 @@
             <Icon name="custom:browser" class="text-16px  ml-8px clickable color-[--d-999-l-666]"
               @click.stop.prevent="jumpExplorerUrl(row)" />
             <template v-if="row.status == 'confirmed' && row.swapType === 2 && row.chain === 'solana'">
-              <share :statistics="row" :address="props.userAddress" :chain="row.chain" />
+              <share :statistics="row" :address="isBotWallet ? props.userAddress : row.userAddress" :chain="row.chain" />
             </template>
           </div>
         </template>
@@ -189,11 +250,11 @@
 import BigNumber from 'bignumber.js'
 import { formatDate, getSymbolDefaultIcon, getChainDefaultIcon, formatExplorerUrl } from '~/utils'
 import { formatNumber } from '~/utils/formatNumber'
-import { bot_getUserTxHistory1 } from '@/api/token'
+import { bot_getUserTxHistory1, wallet_getOrders } from '@/api/token'
 import share from './share.vue'
 import { evm_utils } from '@/utils'
 
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 
 const { formatUnits } = evm_utils
 
@@ -214,30 +275,71 @@ const props = defineProps({
 
 // const tokenStore = useTokenStore()
 const botStore = useBotStore()
+const walletStore = useWalletStore()
 const route = useRoute()
 const router = useRouter()
 const { mode } = storeToRefs(useGlobalStore())
 const tokenStore = useTokenStore()
 const { t } = useI18n()
 const configStore = useConfigStore()
+
+// 钱包类型判断
+const isBotWallet = computed(() => {
+  return !!botStore?.userInfo?.evmAddress
+})
+
+// 根据钱包类型确定使用的链参数
+const currentChain = computed(() => {
+  if (isBotWallet.value) {
+    return props.chain
+  } else {
+    return walletStore.chain
+  }
+})
+
+const currentTokenAddress = computed(() => {
+  return props.currentToken ? String(route.params.id).split('-')[0] : ''
+})
+
 const filterConditions = ref<any>({
   isLimit: undefined,
   isBuy: undefined,
   statusType: ''
 })
 
-const txHistory = ref([])
+const txHistory = ref<any[]>([])
 const loading = ref(false)
 
 const tableHeight = computed(() => {
   return Math.max(tokenStore.commonHeight - 360, 450)
 })
 
-// const isUnit = ref(true)
 
-watch([() => props.chain, () => props.currentToken], () => {
-  getTxHistory()
-})
+// 验证链和地址格式是否匹配
+function validateChainAddress(chain: string, address: string) {
+  if (!chain || !address) {
+    return false
+  }
+
+  // 验证地址格式与链匹配
+  if (chain === 'solana') {
+    const isValid = address.length > 30 && !address.startsWith('0x')
+    return isValid
+  } else if (['bsc', 'ethereum', 'polygon', 'arbitrum', 'base'].includes(chain)) {
+    const isValid = address.startsWith('0x') && address.length === 42
+    return isValid
+  }
+
+  return true
+}
+
+watch([() => currentChain.value, () => props.userAddress, () => props.currentToken, () => route.params.id], ([newChain, newAddress]) => {
+  if (validateChainAddress(newChain, newAddress)) {
+    nextTick(() => {
+      getTxHistory()
+    })
+  }
+}, { immediate: true })
 
 function handleTypeCommand(command: string) {
   if (command === 'all') {
@@ -280,39 +382,74 @@ function jumpExplorerUrl(row: any) {
 }
 
 function tableRowClick(row: any) {
-  // if (!row.txHash) return
-  // window.open(formatExplorerUrl(row.chain, row.txHash, 'tx'))
-  const token = !isBuy(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
-  if (!token) {
-    return
-  }
-  router.push(`/token/${token}-${row.chain}`)
+    let token 
+    if(isBotWallet.value) {
+      token = !isBuy(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
+    } else {
+      token = !isBuyChain(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
+    }
+    if (!token) {
+      return
+    }
+    router.push(`/token/${token}-${row.chain}`)
 }
+
 
 const getTxHistory = async () => {
   loading.value = true
   try {
-    const res = await bot_getUserTxHistory1({
-      page: 0,
-      pageSize: 1000,
-      chain: props.chain,
-      walletAddress: props.userAddress,
-      token: props.currentToken ? String(route.params.id).split('-')[0] : '',
-      timeSort: true,
-      tradeVolumeSort: false,
-      isSuccess: false,
-      status: filterConditions.value.statusType,
-      isLimit: filterConditions.value.isLimit,
-      isBuy: filterConditions.value.isBuy,
-      tgUid: botStore?.userInfo?.tgUid,
-      minTradeVolume: 0,
-      maxTradeVolume: 100000
-    })
-    console.log(res, 'res')
+    const apiChain = currentChain.value
+    if (!validateChainAddress(apiChain, props.userAddress)) {
+      loading.value = false
+      return
+    }
 
-    txHistory.value = res || []
+    if (isBotWallet.value) {
+      // Bot钱包使用原接口
+      const res = await bot_getUserTxHistory1({
+        page: 0,
+        pageSize: 1000,
+        chain: apiChain,
+        walletAddress: props.userAddress,
+        token: currentTokenAddress.value,
+        timeSort: true,
+        tradeVolumeSort: false,
+        isSuccess: false,
+        status: filterConditions.value.statusType,
+        isLimit: filterConditions.value.isLimit,
+        isBuy: filterConditions.value.isBuy,
+        tgUid: botStore?.userInfo?.tgUid,
+        minTradeVolume: 0,
+        maxTradeVolume: 100000
+      })
+      txHistory.value = res || []
+    } else {
+      // 链钱包使用新接口
+      const tokenAddress = currentTokenAddress.value
+
+      const res = await wallet_getOrders({
+        chain: apiChain,
+        creatorAddress: props.userAddress,
+        token: tokenAddress,
+        mode: 1, // 历史交易
+        onlySuccess: false,
+        pageSize: 100,
+        pageNo: 1,
+      })
+
+      const rawList = res?.data?.list || []
+
+      if (rawList.length > 0) {
+        const mappedData = rawList.map(mapWalletOrderToTableRow)
+        txHistory.value = mappedData
+      } else {
+        txHistory.value = []
+      }
+
+      console.log('最终txHistory长度:', txHistory.value?.length || 0)
+    }
   } catch (error) {
-    console.error('Error fetching transaction history:', error)
+    console.error('获取交易历史错误:', error)
   } finally {
     loading.value = false
   }
@@ -324,8 +461,8 @@ function getSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14
     2: t('sell'),
     3: 'Wrap',
     4: 'Unwrap',
-    5: `${ t('limit') }/${ t('buy') }`,
-    6: `${ t('limit') }/${ t('sell') }`,
+    5: `${t('limit')}/${t('buy')}`,
+    6: `${t('limit')}/${t('sell')}`,
     7: t('followBuy'),
     8: t('followSell'),
     12: t('trailingStop'),
@@ -338,15 +475,68 @@ function getSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14
   return ''
 }
 
+function getChianSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 ) {
+  const swapTypeMap = {
+    1: t('buy'),
+    2: t('sell'),
+    3: t('limitBuy1'),
+    4: t('limitSell1'),
+    5: 'Wrap',
+    6: 'Unwrap',
+  } as const
+  if (swapTypeMap[swapType]) {
+    return swapTypeMap[swapType]
+  }
+  return ''
+}
+
 function isBuy(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) {
   return swapType === 1 || swapType === 5 || swapType === 7
+}
+
+function isBuyChain(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) {
+  return swapType === 1 || swapType === 3 || swapType === 5 || swapType === 7
+}
+
+// 将链钱包数据映射为bot钱包表格格式
+function mapWalletOrderToTableRow(order: any) {
+  const outputAmount = parseFloat(order.outputAmount || '0')
+  const inAmount = parseFloat(order.inAmount || '0')
+  const inPrice = parseFloat(order.inPrice || '0')
+  const outPrice = parseFloat(order.outPrice || '0')
+  return {
+    chain: currentChain.value,
+    swapType: order.swapType,
+    inTokenSymbol: order.inToken,
+    outTokenSymbol: order.outToken,
+    inTokenLogoUrl: order.inLogoUrl,
+    outTokenLogoUrl: order.outLogoUrl,
+    inTokenAddress: order.inTokenAddress,
+    outTokenAddress: order.outTokenAddress,
+    inTokenDecimals: order.inDecimals,
+    outTokenDecimals: order.outDecimals,
+    inPrice: inPrice,
+    outPrice: outPrice,
+    inValue: inAmount * inPrice / (10 ** order.inDecimals),
+    outValue: outputAmount * outPrice / (10 ** order.inDecimals),
+    inAmount: inAmount,
+    outAmount: outputAmount,
+    createTime: order.createTime,
+    txHash: order.txHash,
+    status: order.status,
+    userAddress: order.creatorAddress,
+    errorLog: order.errorLog || ''
+  }
 }
 
 onMounted(() => {
   getTxHistory()
 })
 defineExpose({
-  getTxHistory
+  getTxHistory,
+  refreshData: () => {
+    getTxHistory()
+  }
 })
 </script>
 
@@ -370,34 +560,4 @@ defineExpose({
   color: #286DFF !important;
   font-weight: bold;
 }
-
-// :deep(.el-table) {
-//   --el-table-tr-bg-color: var(--d-0a0b0d-l-fff);
-//   --el-table-bg-color: var(--d-0a0b0d-l-fff);
-//   --el-table-text-color: var(--d-222-l-F2F2F2);
-//   --el-table-header-bg-color: var(--d-17191C-l-F2F2F2);
-//   --el-fill-color-lighter: var(--d-0a0b0d-l-fff);
-//   --el-table-header-text-color: var(--d-999-l-666);
-//   --el-table-border-color: var(--d-33353D-l-f5f5f5);
-//   --el-table-row-hover-bg-color: var(--d-333333-l-eaecef);
-//   background: var(--d-0a0b0d-l-fff);
-//   --el-bg-color: var(--d-0a0b0d-l-fff);
-//   --el-table-border: 0.5px solid var(--d-33353D-l-f5f5f5);
-//   font-size: 13px;
-
-//   th {
-//     padding: 6px 0;
-//     border-bottom: none !important;
-//     height: 32px;
-
-//     &.el-table__cell.is-leaf {
-//       border-bottom: none;
-//     }
-
-//     .cell {
-//       font-weight: 400;
-//       font-size: 12px;
-//     }
-//   }
-// }
 </style>
