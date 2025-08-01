@@ -183,6 +183,7 @@ const self_address = computed(() => {
 })
 
 watch(()=>updateHolderNum.value, () => {
+  paginationParams.value={...defaultPaginationParams}
   fetchTable()
 })
 

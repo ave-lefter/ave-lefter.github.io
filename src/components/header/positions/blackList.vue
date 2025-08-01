@@ -29,11 +29,14 @@
         </el-input>
 
         <div class="relative">
-          <el-table :data="result.list" row-class-name="!bg-[var(--el-bg-color)]" :loading="result.loading">
+          <el-table  v-loading="result.loading" :data="result.list" row-class-name="!bg-[var(--el-bg-color)]" style="height: 283px;">
             <template #empty>
-              <div v-if="!result.loading" class="text-12px">
-                {{ t('emptyNoData') }}
+              <div v-if="!result.loading" class="text-12px flex flex-col items-center justify-center h-250px">
+                <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
+                <img v-if="mode === 'dark'" src="@/assets/images/empty-black.svg">
+                <span>{{ t('emptyNoData') }}</span>
               </div>
+              <div v-else class="text-12px"/>
             </template>
 
             <el-table-column :label="t('name')">
@@ -98,7 +101,7 @@
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-
+import { useThrottleFn } from '@vueuse/core'
 import { getTokenFilterList2, setUserTokenStatus } from '@/api/wallet'
 
 const { t } = useI18n()
@@ -107,6 +110,7 @@ const walletStore = useWalletStore()
 const {updateHolderNum}= storeToRefs(useUserStore())
 const router = useRouter()
 const route = useRoute()
+const {mode} = useGlobalStore()
 const configStore = useConfigStore()
 const s3BaseUrl = configStore.token_logo_url
 
@@ -142,7 +146,7 @@ const showBlackList = () => {
   getBlackList()
 }
 
-const getBlackList = async () => {
+const getBlackList = useThrottleFn(async()=>{
   console.log('getBlackList', props.userIds)
   try {
     result.value.loading = true
@@ -158,7 +162,7 @@ const getBlackList = async () => {
   } finally {
     result.value.loading = false
   }
-}
+},500)
 
 const closeDialog = () => {
   result.value.list = []

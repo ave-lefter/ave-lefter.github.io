@@ -166,7 +166,7 @@ export function getTokenFilterList(params) {
 // 顶部持仓获取黑白名单
 export function getTokenFilterList2(params) {
   const { $api } = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v1api_zihoe/v3/users/balance/tokenfilterv3', {
+  return $api('/v1api/v3/users/balance/tokenfilterv3', {
     method: 'post',
     body: params,
   })
