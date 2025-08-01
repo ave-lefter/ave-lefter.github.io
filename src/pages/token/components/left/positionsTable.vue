@@ -465,11 +465,10 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string) {
         tokenStore.placeOrderSuccess++
         if (subscribeResult?.txList?.[0]?.success) {
           ElNotification({type: 'success', message: t('tradeSuccess')})
-          unwatch()
         } else {
           handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-          unwatch()
         }
+        unwatch()
         loadingSwap.value[tokenId] = false
       }
     })
