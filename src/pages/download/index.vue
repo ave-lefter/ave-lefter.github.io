@@ -145,7 +145,7 @@
                 data-aos="fade-down"
                 data-aos-delay="300"
                 data-aos-duration="400"
-                class="absolute bottom-[60px] left-[-5px] h-[60px] bg-gradient-to-r from-[#26e5b200] via-[#5096ff] to-[#a358ff] p-3 pt-2 rounded-xl backdrop-blur"
+                class="absolute bottom-[60px] left-[-5px] h-[65px] bg-gradient-to-r from-[#26e5b200] via-[#5096ff] to-[#a358ff] p-2 pt-3 rounded-xl backdrop-blur"
               >
                 <div class="flex items-cente">
                   <img
