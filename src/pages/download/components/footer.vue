@@ -18,7 +18,8 @@
           <a
             href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN"
             target="_blank"
-            class="bg-[#161926] mb-8 text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+            class="download-btn bg-[#161926] mb-8 text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+            @click.stop.prevent="trackRefDownload('IOS AppStore', $event)"
           >
             <svg
               class="w-6 h-6 mr-2"
@@ -40,7 +41,8 @@
           <a
             href="https://testflight.apple.com/join/BZ3XHS5f"
             target="_blank"
-            class="bg-[#161926] text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+            class="download-btn bg-[#161926] text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+            @click.stop.prevent="trackRefDownload('IOS Testflight', $event)"
           >
             <img
               src="/download/vector-9.svg"
@@ -55,7 +57,8 @@
           <a
             href="https://play.google.com/store/apps/details?id=ai.ave.platform"
             target="_blank"
-            class="bg-[#161926] mb-8 text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+            class="download-btn bg-[#161926] mb-8 text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+            @click.stop.prevent="trackRefDownload('Android googlePlay', $event)"
           >
             <img
               src="/download/frame-1.svg"
@@ -66,7 +69,8 @@
           </a>
           <a
             href="https://ossaveai.com/oss/app/ave.ai.apk"
-            class="bg-[#161926] text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+            class="download-btn bg-[#161926] text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+            @click.stop.prevent="trackRefDownload('Android apk', $event)"
           >
             <img
               src="/download/vector-6.svg"
@@ -80,7 +84,8 @@
           <h3 class="text-sm mb-2 font-normal">{{ $t('deskApp') }}</h3>
           <a
             href="https://ossaveai.com/oss/app/avedex-mac.dmg.zip"
-            class="bg-[#161926] mb-8 text-sm text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+            class="download-btn bg-[#161926] mb-8 text-sm text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+            @click.stop.prevent="trackRefDownload('MacOS dmg', $event)"
           >
             <svg
               class="w-6 h-6 mr-2"
@@ -101,7 +106,8 @@
           </a>
           <a
             href="https://ossaveai.com/oss/app/ave.ai-win64.exe"
-            class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+            class="download-btn bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
+            @click.stop.prevent="trackRefDownload('Windows win64 app', $event)"
           >
             <svg
               class="w-5 h-5 mr-2"
@@ -139,3 +145,28 @@
     </div>
   </footer>
 </template>
+<script setup lang="ts">
+import { trackRef } from '~/api/tracking'
+
+  function trackRefDownload(platform: string, e1: MouseEvent) {
+    const e = e1 as MouseEvent & { target: HTMLAnchorElement }
+    if (e?.target?.href) {
+      e.preventDefault()
+      trackRef({
+        category: 'download',
+        extra: platform + ' (pro.ave.ai)'
+      }).finally(() => {
+        if (e?.target?.target === '_blank') {
+          window.open(e.target.href)
+        } else {
+          window.location.href = e?.target?.href || ''
+        }
+      })
+    }
+  }
+</script>
+<style scoped lang="scss">
+.download-btn  * {
+  pointer-events: none;
+}
+</style>

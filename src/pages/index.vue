@@ -8,6 +8,7 @@ import gainer from './components/gainerRank/gainer.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 import { v4 as uuidv4 } from 'uuid'
+import { trackRef } from '~/api/tracking'
 
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
 const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
@@ -38,6 +39,7 @@ const categories = computed(() => {
 
 onMounted(() => {
   _getTreasureConfig()
+  trackRef({category: 'view', extra: 'home(pro.ave.ai)'})
 })
 const wsStore = useWSStore()
 // 把榜单的订阅取消掉
@@ -63,15 +65,15 @@ function listMapFunction(i: Record<string, any>) {
     ;(progress_obj[`progress_buys_tx_${t}_count`] =
       i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`] > 0
         ? (i[`buys_tx_${t}_count`] / (i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`])) * 100
-        : 0),
+        : 0);
       (progress_obj[`progress_sells_tx_${t}_count`] =
         i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`] > 0
           ? (i[`sells_tx_${t}_count`] / (i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`])) * 100
-          : 0),
+          : 0);
       (progress_obj[`progress_buy_volume_u_${t}`] =
         i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`] > 0
           ? (i[`buy_volume_u_${t}`] / (i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`])) * 100
-          : 0),
+          : 0);
       (progress_obj[`progress_sell_volume_u_${t}`] =
         i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`] > 0
           ? (i[`sell_volume_u_${t}`] / (i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`])) * 100
