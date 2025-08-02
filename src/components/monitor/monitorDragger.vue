@@ -1,5 +1,5 @@
 <template>
-  <Draggable v-if="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing" @on-drag="drag">
+  <Draggable :shouldRenderChild="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing" @on-drag="drag">
     <!-- <Monitor v-bind="props2"/> -->
     <component :is="lazyComponent" v-bind="props2"/>
   </Draggable>
