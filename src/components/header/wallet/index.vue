@@ -552,6 +552,8 @@ function handleWithdraw() {
       let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals).plus(withdrawForm.amount || 0)
       if (withdrawForm?.chain === 'solana') {
         gasFee = gasFee.plus('0.002')
+      }else{
+        gasFee = new BigNumber(0)
       }
       gasFeeVal.value = gasFee.toNumber()
       const balance = new BigNumber(withdrawChainInfo.value?.balance || 0)
@@ -696,12 +698,14 @@ const getTransferGasFee = throttle(function () {
  async function  handleMax() {
   console.log('handleMax')
   const decimals = withdrawChainInfo.value?.decimals || 18
-  if (!gasFeeObj.value[withdrawForm.chain] || 0) {
+  if ((!gasFeeObj.value[withdrawForm.chain]) && withdrawForm.chain ==='solana') {
     await getTransferGasFee().catch(console.log)
   }
   let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals)
   if (withdrawForm?.chain === 'solana') {
     gasFee = gasFee.plus('0.002')
+  } else{
+    gasFee = new BigNumber(0)
   }
   const balance = new BigNumber(withdrawChainInfo.value?.balance || 0)
   if (balance.lt(gasFee)) {

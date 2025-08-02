@@ -748,7 +748,7 @@
   "gasFee": "Плата за шахтер",
   "network": "сеть",
   "txHash1": "Транзакционная хеш",
-  "blockHeight": "Высота блока",
+  "blockHeight": "Блокировать",
   "withdrawAgain": "Снова уйти",
   "trading": "торговля"
 }

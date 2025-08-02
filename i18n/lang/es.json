@@ -501,7 +501,7 @@
   "gasFee": "Tarifa del minero",
   "network": "red",
   "txHash1": "Hachís",
-  "blockHeight": "Altura de bloque",
+  "blockHeight": "Bloquear",
   "withdrawAgain": "Retirarse de nuevo",
   "trading": "comercio"
 }

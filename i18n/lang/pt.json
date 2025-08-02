@@ -501,7 +501,7 @@
   "gasFee": "Taxa do mineiro",
   "network": "rede",
   "txHash1": "Hash de transação",
-  "blockHeight": "Altura do bloco",
+  "blockHeight": "Bloquear",
   "withdrawAgain": "Retire novamente",
   "trading": "negociação"
 }

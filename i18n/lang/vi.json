@@ -748,7 +748,7 @@
   "gasFee": "Phí khai thác",
   "network": "mạng",
   "txHash1": "Băm giao dịch",
-  "blockHeight": "Chiều cao khối",
+  "blockHeight": "Khối",
   "withdrawAgain": "Rút lại",
   "trading": "giao dịch"
 }
