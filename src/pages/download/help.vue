@@ -14,7 +14,7 @@
           <div class="w-[360px] bg-[#191a1a] rounded-xl p-6">
             <h2 class="text-3xl font-black text-[#1e41ea] mb-4">1.</h2>
             <p class="text-base">
-              {{ $t("click") }} "<a href='https://ossaveai.com/oss/app/ave.ai.apk' class="text-#1e41ea!">{{ $t("Android") }}</a>"
+              {{ $t("click") }} "<a href='https://ossaveai.com/oss/app/ave.ai.apk' class="text-#1e41ea!" @click.stop.prevent="trackRefDownload('Android apk', $event)">{{ $t("Android") }}</a>"
               {{ $t("helpTip1") }}
             </p>
           </div>
@@ -122,13 +122,30 @@
   </div>
 </template>
 
-<script setup>
-  import Footer from './components/footer'
+<script setup lang="ts">
+  import Footer from './components/footer.vue'
+  import { trackRef } from '~/api/tracking'
   // import WOW from 'wowjs'
   // import 'animate.css'
   // onMounted(() => {
   //   new WOW.default().init()
   // })
+  function trackRefDownload(platform: string, e1: MouseEvent) {
+    const e = e1 as MouseEvent & { target: HTMLAnchorElement }
+    if (e?.target?.href) {
+      e.preventDefault()
+      trackRef({
+        category: 'download',
+        extra: platform + ' (pro.ave.ai)'
+      }).finally(() => {
+        if (e?.target?.target === '_blank') {
+          window.open(e.target.href)
+        } else {
+          window.location.href = e?.target?.href || ''
+        }
+      })
+    }
+  }
 </script>
 
 <style scoped lang="scss">

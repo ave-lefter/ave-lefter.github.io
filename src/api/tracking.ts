@@ -77,10 +77,6 @@ export function updateTransaction(data: any) {
 //     ]
 // }
 
-function getDeviceId() {
-  return FingerprintJs.load().then((fp) => fp.get()).then(async data => data.visitorId)
-}
-
 async function getDeviceInfo() {
   // if (localStorage.getItem('device_info')) {
   //   return Promise.resolve(JSON.parse(localStorage.getItem('device_info')))
