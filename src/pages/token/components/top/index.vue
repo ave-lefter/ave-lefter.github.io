@@ -39,34 +39,56 @@
       @click="collect"
     />
     <div class="token-info ml-16px flex items-center color-[--d-666-l-999]">
-      <div
-        v-if="getSymbolDefaultIcon(token)"
-        class="icon-token-container relative"
-      >
-        <el-image
-          class="token-icon rounded-100%"
-          :src="getSymbolDefaultIcon(token)"
-          lazy
-        >
-          <template #error>
-            <img
-              class="token-icon"
-              :src="getChainDefaultIcon(token?.chain, token?.symbol)"
+      <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" >
+        <template #content>
+          <el-image
+            class="token-icon  h-228px w-228px items-center"
+            :src="getSymbolDefaultIcon(token)"
+            lazy
+          >
+            <template #error>
+              <img
+                class="token-icon h-228px w-228px"
+                :src="getChainDefaultIcon(token?.chain, token?.symbol)"
+              >
+            </template>
+            <template #placeholder>
+              <img
+                class="token-icon h-228px w-228px"
+                :src="getChainDefaultIcon(token?.chain, token?.symbol)"
+              >
+            </template>
+          </el-image>
+        </template>
+          <div
+            v-if="getSymbolDefaultIcon(token)"
+            class="icon-token-container relative"
+          >
+          <el-image
+              class="token-icon rounded-100%"
+              :src="getSymbolDefaultIcon(token)"
+              lazy
             >
-          </template>
-          <template #placeholder>
+              <template #error>
+                <img
+                  class="token-icon"
+                  :src="getChainDefaultIcon(token?.chain, token?.symbol)"
+                >
+              </template>
+              <template #placeholder>
+                <img
+                  class="token-icon"
+                  :src="getChainDefaultIcon(token?.chain, token?.symbol)"
+                >
+              </template>
+            </el-image>
             <img
-              class="token-icon"
-              :src="getChainDefaultIcon(token?.chain, token?.symbol)"
+              v-if="token?.chain"
+              class="icon-symbol rounded-100%"
+              :src="`${token_logo_url}chain/${token?.chain}.png`"
             >
-          </template>
-        </el-image>
-        <img
-          v-if="token?.chain"
-          class="icon-symbol rounded-100%"
-          :src="`${token_logo_url}chain/${token?.chain}.png`"
-        >
-      </div>
+          </div>
+      </el-tooltip>
       <div class="ml-8px">
         <div class="flex items-center">
           <span
@@ -331,8 +353,9 @@
             v-if="pair"
             v-tooltip="formatDate(pair?.created_at)"
             class="ml-5px hover:color-[--d-F5F5F5-l-333] leading-12px font-400 mr-8px"
-            >{{ dayjs(pair?.created_at * 1000).fromNow() }}</span
-          >
+            >
+            {{ formatTimeFromNow(pair?.created_at) }}
+            </span>
           <div
             v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0"
             class="flex-start bg-btn"
@@ -455,13 +478,13 @@
                   pair?.smart_money_sell_count_24h || 0,
               })
             "
-            class="minor flex-end color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn"
+            class="minor flex-end color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px"
           >
             <Icon
               class="text-[--d-666-l-999] h-12px w-12px mr-2px"
               name="custom:smart"
             />
-            <span class="mr-2px">{{ $t('smarter') }}</span>
+            <span class="mr-2px text-10px">{{ $t('smarter') }}</span>
             <span
               :style="{
                 color:

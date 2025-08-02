@@ -16,7 +16,7 @@
         width="64"
         height="64"
         :stroke="isDark ? '#333333' : '#F2F2F2'"
-        stroke-width="4"
+        stroke-width="2"
         fill="none"
         rx="4"
         ry="4"
@@ -31,7 +31,7 @@
         width="64"
         height="64"
         :stroke="color"
-        stroke-width="4"
+        stroke-width="2"
         fill="none"
         stroke-linecap="round"
         stroke-dasharray="256"
@@ -53,7 +53,7 @@
         v-if="progress > 0"
         x="0"
         y="0"
-        :width="progress"
+        :width="width"
         height="12"
         rx="6"
         :fill="color"
@@ -71,9 +71,9 @@
       <circle
         cx="36"
         cy="36"
-        r="33"
+        r="32"
         :stroke="isDark ? '#333333' : '#F2F2F2'"
-        stroke-width="4"
+        stroke-width="2"
         fill="none"
       />
       <circle
@@ -81,12 +81,12 @@
         class="progress"
         cx="36"
         cy="36"
-        r="33"
+        r="32"
         :stroke="color"
-        stroke-width="4"
+        stroke-width="2"
         fill="none"
         stroke-linecap="round"
-        stroke-dasharray="201"
+        stroke-dasharray="200"
         :stroke-dashoffset="dashoffset"
       />
     </svg>
@@ -103,7 +103,7 @@
         v-if="progress > 0"
         x="0"
         y="0"
-        :width="progress"
+        :width="width"
         height="12"
         rx="6"
         :fill="color"
@@ -131,7 +131,10 @@ const props = defineProps({
 
 // 计算 stroke-dashoffset
 const dashoffset = computed(() => {
-  return 201 * (1 - (props.progress || 0) / 100)
+  return 200 * (1 - (props.progress || 0) / 100)
+})
+const width = computed(() => {
+  return 200 *  (props.progress || 0)/ 100
 })
 </script>
 
