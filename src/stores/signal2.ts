@@ -98,8 +98,6 @@ export const useMonitorStore = defineStore('monitor', () => {
       return 'center'
     }else if(isLeftFixed.value){
       return 'left'
-    }else if(signalStore.isRightFixed&&signalStore.signalVisible){
-      return 'right2'
     } else if(isRightFixed.value){
       return 'right'
     } else {

@@ -88,20 +88,6 @@ const props1=computed(()=>{
       handles: ['ml'],
       dragHandle: '.drag-handle'
     }
-  }else if(placement.value==='right2'){
-    data = {
-      className: '[&&]:relative shrink-0 right2 fixed! top-61px left-0',
-      axis: 'x',
-      x: monitorStore.winWidth - monitorStore.fixedWidth - ((signalStore.isRightFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0),
-      maxX:monitorStore.winWidth - monitorStore.fixedWidth - ((signalStore.isRightFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0),
-      minWidth: lang.value.indexOf('zh') > -1 ? 360 : 360,
-      maxWidth: 438,
-      initialWidth: monitorStore.fixedWidth,
-      initialHeight: monitorStore.winHeight - 95,
-      parent: true,
-      handles: ['ml'],
-      dragHandle: '.drag-handle'
-    }
   }
   return data
 })
