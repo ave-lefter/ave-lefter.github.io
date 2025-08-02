@@ -711,12 +711,11 @@ async function submitBotSwap() {
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
-              unwatch()
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-              unwatch()
-              loadingSwap.value = false
             }
+            unwatch()
+            loadingSwap.value = false
           }
         })
       }
@@ -787,12 +786,11 @@ async function submitBotSwap() {
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
-              unwatch()
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-              unwatch()
-              loadingSwap.value = false
             }
+            unwatch()
+            loadingSwap.value = false
           }
         })
       }
@@ -886,12 +884,11 @@ function submitBotLimit() {
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
-              unwatch()
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-              unwatch()
-              loadingSwap.value = false
             }
+            unwatch()
+            loadingSwap.value = false
           }
         })
       }
@@ -949,12 +946,11 @@ function submitBotLimit() {
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
-              unwatch()
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-              unwatch()
-              loadingSwap.value = false
             }
+            unwatch()
+            loadingSwap.value = false
           }
         })
       }

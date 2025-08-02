@@ -25,6 +25,11 @@ const props = defineProps({
   }
 })
 const botStore = useBotStore()
+
+// 钱包类型判断
+const isBotWallet = computed(() => {
+  return !!botStore?.userInfo?.evmAddress
+})
 const dialogVisible = ref(false)
 const shareDom = templateRef('shareDom')
 const bgImg = ref('')
@@ -179,8 +184,8 @@ function getRandom(min: number, max: number) {
           }}</span>
         </div>
         <span class="mt-5px text-[#666] block">
-          {{ botStore?.userInfo?.evmAddress?.slice(0, 6) + '...' +
-            botStore?.userInfo?.evmAddress?.slice(-6) }}
+          {{ (isBotWallet ? botStore?.userInfo?.evmAddress : props.address)?.slice(0, 6) + '...' +
+            (isBotWallet ? botStore?.userInfo?.evmAddress : props.address)?.slice(-6) }}
         </span>
         <div class="mt-15px">
           <span class="text-[#999]">{{ $t('RIO') }}</span>

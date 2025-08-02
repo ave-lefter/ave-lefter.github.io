@@ -846,6 +846,83 @@ export async function bot_getUserTxHistory1(query: {
   })
 }
 
+// 链钱包交易历史接口类型定义
+export interface WalletOrderItem {
+  id: number
+  createTime: string
+  updateTime: string
+  status: string
+  creatorAddress: string
+  swapType: number
+  inToken: string
+  outToken: string
+  inLogoUrl: string
+  outLogoUrl: string
+  inTokenAddress: string
+  outTokenAddress: string
+  inDecimals: number
+  outDecimals: number
+  txContent: string
+  slippage: number
+  minReturn: number
+  txHash: string
+  inAmount: number
+  estimateOut: number
+  outputAmount: number
+  inPrice: number
+  outPrice: number
+  blockNumber: number
+  blockTime: number
+  errorLog: string
+  priorityFee: number
+  amm: string
+  useBundle: boolean
+  bundleTip: number
+  bundleId: string
+  pair: string
+  createPrice: number
+  moonToken: string
+  traceId: string
+  quoteTokenPrice: string
+  limitPrice?: number
+  limitJupId?: string
+  filledInAmount?: number
+  expiredAt?: string
+  cancelTxHash?: string
+  cancelTime?: number
+  filledTxs?: string[]
+}
+
+export interface WalletOrdersResponse {
+  data: {
+    total: number
+    pageSize: number
+    pageNo: number
+    list: WalletOrderItem[]
+  }
+}
+
+// 链钱包交易历史查询接口
+export async function wallet_getOrders(query: {
+  chain: string
+  orderId?: number
+  creatorAddress: string
+  token?: string
+  mode: number // 0: 当前委托, 1: 历史交易
+  onlySuccess?: boolean
+  pageSize?: number
+  pageNo?: number
+}): Promise<WalletOrdersResponse> {
+  const { $api } = useNuxtApp()
+  return $api('/aveswap/v1/swap/getOrders', {
+    method: 'post',
+    body: {
+      orderId: 0,
+      ...query
+    }
+  })
+}
+
 export const bot_getUserPendingTx = createCacheRequest(async function(query: {
   chain: string;
   token: string;
