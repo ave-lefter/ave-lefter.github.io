@@ -121,8 +121,6 @@ function dragStop(x: number, y: number) {
     monitorStore.onLeftDragStop(x,y)
   }else if(placement.value==='right'){
     monitorStore.onRightDragStop(x,y)
-  }else if(placement.value==='right2'){
-    monitorStore.onRightDragStop(x,y)
   }else{
     monitorStore.onDragStop(x,y)
   }
