@@ -62,6 +62,10 @@ export default {
   replace: true,
   name: 'VueDraggableResizable',
   props: {
+    shouldRenderChild:{
+      type: Boolean,
+      default: true
+    },
     className: {
       type: String,
       default: 'vdr'
@@ -381,6 +385,18 @@ export default {
       }
 
       this.changeHeight(val)
+    },
+    shouldRenderChild() {
+      const [width, height] = getComputedSize(this.$el)
+      this.left= this.x
+      this.top= this.y
+      this.aspectFactor = (this.w !== 'auto' ? this.w : width) / (this.h !== 'auto' ? this.h : height)
+
+      this.width = this.w !== 'auto' ? this.w : width
+      this.height = this.h !== 'auto' ? this.h : height
+
+      this.right = this.parentWidth - this.width - this.left
+      this.bottom = this.parentHeight - this.height - this.top
     }
   },
 

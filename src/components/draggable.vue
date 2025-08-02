@@ -2,7 +2,8 @@
 import VueDraggableResizable from './vue-draggable-resizeable/index.vue'
 import {useThrottleFn} from '@vueuse/core'
 
-defineProps<{
+
+withDefaults(defineProps<{
   initialWidth: number
   initialHeight?: number
   minWidth: number
@@ -11,7 +12,10 @@ defineProps<{
   maxHeight?: number
   parent?: boolean
   handles: string[]
-}>()
+  shouldRenderChild?: boolean
+}>(), {
+ shouldRenderChild: true
+})
 
 const emit = defineEmits(['onDragStop', 'onResizing', 'onDrag'])
 const klineRef = shallowRef<HTMLElement | null>(null)
@@ -58,6 +62,7 @@ function onDrag(x: number, y: number) {
 <template>
   <VueDraggableResizable
     class-name-dragging="opacity-90 z-10!"
+    :shouldRenderChild="shouldRenderChild"
     :w="initialWidth"
     :h="initialHeight"
     :min-width="minWidth"
