@@ -9,14 +9,14 @@
       <TheHeader/>
        <!-- :style="signalStore.translateStyle"  translate-x-0px-->
       <div
-        :class="['relative flex bg-[--d-000-l-F6F6F6] gap-1px pt-1px transition-transform transition-duration-300 overflow-hidden',]"
+        :class="['relative flex bg-[--d-000-l-F6F6F6] gap-1px pt-1px transition-transform transition-duration-300 overflow-hidden']"
         :style="{..._style,transform:`translateX(${signalStore.translateStyle||monitorStore.translateStyle}px)`}"
       >
         <slot/>
       </div>
       <TheFooter />
     </div>
-   
+
     <Draggable
       v-if="!signalStore.isLeftFixed&&!signalStore.isRightFixed&&signalStore.signalVisible"
       class-name="top-0 left-0 fixed"
@@ -92,8 +92,8 @@
         :scroll-height="signalStore.winHeight-200"
       />
     </Draggable>
-    
-    
+
+
      <!-- <Draggable
       v-if="!monitorStore.isLeftFixed&&!monitorStore.isRightFixed&&monitorStore.visible"
       class-name="top-0 left-0 fixed"

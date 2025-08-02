@@ -73,6 +73,7 @@
     </template>
 
     <el-popover
+      v-model:visible="appDownloadVisible"
       placement="bottom-end"
       :width="350"
       trigger="click"
@@ -140,6 +141,7 @@
                <NuxtLink
                   to="/download"
                   class="inline-flex h-8 px-6 justify-center items-center text-white text-sm font-medium no-underline rounded bg-[#3F80F7] min-w-[140px] mx-auto"
+                  @click.stop="appDownloadVisible = false"
                 >
                  {{ $t('moreOptions') || 'More Options' }}
                 </NuxtLink>

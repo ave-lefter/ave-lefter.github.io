@@ -3,7 +3,7 @@
     <div class="container mx-auto px-4 text-left">
       <h2 class="text-5xl font-bold mb-8 text-center">{{ $t("downloadAve") }}</h2>
       <div class="flex justify-center items-center mb-[40px]">
-        <NuxtLink to="/download/help" class="text-sm font-medium flex items-center">
+        <NuxtLink v-show="$route.name === 'download'" to="/download/help" class="text-sm font-medium flex items-center">
           <img
             src="https://c.animaapp.com/mdi5x5j31K7D2j/img/frame.svg"
             alt=""
@@ -17,6 +17,7 @@
           <h3 class="text-sm mb-2">iOS</h3>
           <a
             href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN"
+            target="_blank"
             class="bg-[#161926] mb-8 text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
           >
             <svg
@@ -38,6 +39,7 @@
           </a>
           <a
             href="https://testflight.apple.com/join/BZ3XHS5f"
+            target="_blank"
             class="bg-[#161926] text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
           >
             <img
@@ -52,6 +54,7 @@
           <h3 class="text-sm mb-2">Android</h3>
           <a
             href="https://play.google.com/store/apps/details?id=ai.ave.platform"
+            target="_blank"
             class="bg-[#161926] mb-8 text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
           >
             <img
@@ -126,6 +129,7 @@
       <div class="text-center mb-20">
         <a
           :href="useLocaleStore().locale == 'zh-cn' ? 'https://t.me/ave_community_cn':'https://t.me/aveai_english'"
+          target="_blank"
           class="bg-gradient-to-r from-[#0054e1] to-[#8860ff] text-white py-3 px-20 rounded-full inline-flex items-center hover:opacity-90 transition duration-300"
         >
           <img src="/download/vector-1.svg" alt="Telegram" class="w-5 h-5 mr-2">

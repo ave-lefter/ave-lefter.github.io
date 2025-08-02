@@ -14,16 +14,14 @@
           <div class="w-[360px] bg-[#191a1a] rounded-xl p-6">
             <h2 class="text-3xl font-black text-[#1e41ea] mb-4">1.</h2>
             <p class="text-base">
-              {{ $t("click") }} "<a href='https://ossaveai.com/oss/app/ave.ai.apk' class="text-[#1e41ea]">{{ $t("Android") }}</a>"
+              {{ $t("click") }} "<a href='https://ossaveai.com/oss/app/ave.ai.apk' class="text-#1e41ea!">{{ $t("Android") }}</a>"
               {{ $t("helpTip1") }}
             </p>
           </div>
           <div class="w-[360px] bg-[#191a1a] rounded-xl p-6">
             <h2 class="text-3xl font-black text-[#1e41ea] mb-4">2.</h2>
             <p class="text-base">
-              {{ $t("helpTip2") }} "
-              <a
-              :href="useLocaleStore().locale == 'zh-cn' ? 'https://t.me/ave_community_cn':'https://t.me/aveai_english'" class="text-[#1e41ea]">{{$t("help")}}</a>"
+              {{ $t("helpTip2") }} "<a :href="useLocaleStore().locale == 'zh-cn' ? 'https://t.me/ave_community_cn':'https://t.me/aveai_english'" target="_blank" class="text-#1e41ea!">{{$t("help")}}</a>"
               {{$t("contactUs")}}。
             </p>
           </div>

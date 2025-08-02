@@ -20,6 +20,7 @@
                 <div class="grid gap-4">
                   <a
                     href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN"
+                    target="_blank"
                     class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <svg class="w-5 h-5 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -30,6 +31,7 @@
                   </a>
                   <a
                     href="https://testflight.apple.com/join/BZ3XHS5f"
+                    target="_blank"
                     class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <img
@@ -46,6 +48,7 @@
                 <div class="grid gap-4 ">
                   <a
                     href="https://play.google.com/store/apps/details?id=ai.ave.platform"
+                    target="_blank"
                     class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
                   >
                     <img
@@ -653,15 +656,17 @@
   import AOS from 'aos'
   import 'aos/dist/aos.css'
   onMounted(() => {
-    AOS.init({
-      offset: 50,
-      delay: 50,
-      duration: 400,
-      easing: 'ease',
-      once: false,
-      mirror: false,
-      anchorPlacement: 'top-bottom',
-    })
+    setTimeout(() => {
+      AOS.init({
+        offset: 50,
+        delay: 50,
+        duration: 400,
+        easing: 'ease',
+        once: false,
+        mirror: false,
+        anchorPlacement: 'top-bottom',
+      })
+    }, 10)
   })
   const getImgUrlBylang = (url)=>{
     if(useLocaleStore().locale == 'en'){
