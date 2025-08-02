@@ -36,6 +36,10 @@
           </NuxtLink>
         </div>
       </el-popover>
+      <div class="flex items-center gap-4px color-[--d-999-l-666] mx-12px cursor-pointer hover:color-inherit">
+        <Icon name="custom:pump-icon"/>
+        {{ $t('pump1') }}
+      </div>
       <el-badge :is-dot="(!!botStore.evmAddress)&&isDoted2" class="mr-12px">
         <div
           id="monitor"
@@ -70,12 +74,12 @@
       </li>
       <li>
       <a target="_blank" href="https://gopluslabs.io">
-        <img src="@/assets/images/goPlus-logo.png" alt="" height="25" lazy />
+        <img src="@/assets/images/goPlus-logo.png" alt="" height="25" lazy >
       </a>
       </li>
       <li>
       <a target="_blank" class="flex-center" href="https://www.btok.com">
-        <img src="@/assets/images/btok-logo.png" alt="" height="16" lazy />
+        <img src="@/assets/images/btok-logo.png" alt="" height="16" lazy >
       </a>
       </li>
       <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] flex items-center gap-2px">
