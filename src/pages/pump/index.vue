@@ -740,6 +740,19 @@ onMounted(() => {
 
 onUnmounted(()=>{
   document.removeEventListener('mousemove', mouseInsideTxs)
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: ['pumpstate'],
+    id: 1,
+  })
+  for (const key in Timer) {
+    const timerKey = key as keyof typeof Timer
+    if (Timer[timerKey]) {
+      clearTimeout(Timer[timerKey])
+      Timer[timerKey] = null
+    }
+  }
 })
 
 const mouseInsideTxs = throttle(function (event) {
