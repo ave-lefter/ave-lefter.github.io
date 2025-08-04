@@ -756,7 +756,8 @@ const tabs = computed(() => {
   }
 }
 .border{
-  border-bottom: 1px solid var(--d-333-l-ECECEC)
+  border: none;
+  border-bottom: 1px solid var(--d-333-l-ECECEC);
 }
 :deep().el-form-item__label{
   color: var(--d-666-l-999);
