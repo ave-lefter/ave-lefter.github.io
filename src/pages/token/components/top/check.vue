@@ -1096,7 +1096,7 @@
                     >
                     <template v-if="i?.type == 'address'">
                       <span
-                        v-if="i?.value == evmAddress"
+                        v-if="i?.value == useFollowStore().currentAddress"
                         class="color-777e90"
                         style="color: #f6465d"
                       >
@@ -1386,7 +1386,6 @@ const showRiskList = shallowRef(false)
 const buy_tax_list_show = shallowRef(true)
 const sell_tax_list_show = shallowRef(true)
 // const activeTab = shallowRef(1)
-const { evmAddress } = storeToRefs(useBotStore())
 
 const riskStatus: Record<number, string> = {
   0: 'normal1',
@@ -1624,7 +1623,7 @@ watch(statistics_unknown, (val) => {
 onMounted(() => {
   getVote()
 })
-watch(evmAddress, () => {
+watch(()=>useFollowStore().currentAddress, () => {
   getVote()
 })
 function formatRisk(checkResult?: Check) {
@@ -1940,10 +1939,8 @@ function formatVoteP(checkResult: Check | null) {
 }
 
 function voteSupport() {
-  const user = evmAddress.value
-  if (!user) {
-    ElMessage.error(t('connectWalletFirst'))
-    return
+  if(!useFollowStore().currentAddress){
+        useBotStore().changeConnectVisible(true)
   }
   if (checkResult?.value?.my_vote !== 0) {
     ElMessage.error(t('voted'))
@@ -1952,7 +1949,7 @@ function voteSupport() {
   const support = () => {
     const tokenId = route.params.id as string
     loadingVote.value = true
-    _voteSupport(tokenId, user)
+    _voteSupport(tokenId, useFollowStore().currentAddress)
       .then(() => {
         if (checkResult?.value?.my_vote === 0) {
           ElMessage.success(t('voteSuccess'))
@@ -1962,7 +1959,7 @@ function voteSupport() {
         getVote()
       })
       .catch((err) => {
-        ElMessage.error(err)
+        ElMessage.error(err.message || err)
       })
       .finally(() => {
         loadingVote.value = false
@@ -1979,10 +1976,8 @@ function voteSupport() {
     .catch(() => {})
 }
 function voteAgainst() {
-      const user = evmAddress.value
-      if (!user) {
-        ElMessage.error(t('connectWalletFirst'))
-        return
+      if(!useFollowStore().currentAddress){
+        useBotStore().changeConnectVisible(true)
       }
       if (checkResult?.value?.my_vote !== 0) {
         ElMessage.error(t('voted'))
@@ -1992,7 +1987,7 @@ function voteAgainst() {
       const against = () => {
         const tokenId = route.params.id as string
         loadingVote.value = true
-        _voteAgainst(tokenId, user)
+        _voteAgainst(tokenId, useFollowStore().currentAddress)
           .then(() => {
             if (checkResult?.value?.my_vote === 0) {
               ElMessage.success(t('voteSuccess'))
@@ -2002,7 +1997,7 @@ function voteAgainst() {
             getVote()
           })
           .catch(err => {
-            ElMessage.error(err)
+            ElMessage.error(err.message || err)
           })
           .finally(() => {
             loadingVote.value = false
@@ -2019,9 +2014,9 @@ function voteAgainst() {
         .catch(() => {})
     }
 function getVote() {
-  if (!(visible.value && evmAddress.value)) return
+  if (!(visible.value && useFollowStore().currentAddress)) return
   const tokenId = route.params.id as string
-  _getVote(tokenId, evmAddress.value).then(res => {
+  _getVote(tokenId, useFollowStore().currentAddress).then(res => {
       Object.keys(res).forEach(i => {
         if (checkResult.value) {
             checkResult.value[i as keyof Check] = res[i]

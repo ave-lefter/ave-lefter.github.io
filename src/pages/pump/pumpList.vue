@@ -634,12 +634,12 @@
       popper-class="text-center"
     >
       <span class="color-#12B886">
-        <!-- <template v-if="isOut">
+        <template v-if="isOut">
           {{ selected }}
         </template>
-        <template v-else> -->
+        <template v-else>
            {{ $t('progress') }}:{{ formatNumber(selected, 2) }}%
-          <!-- </template> -->
+          </template>
       </span>
     </el-popover>
   </div>
@@ -738,7 +738,7 @@ function setBtnRef(el: HTMLElement | null) {
 function showPopover(item: { progress: string; id: string; issue_platform: string }) {
   // if (!isOut.value) {
   console.log('-----[item.id--', item.id)
-  selected.value = item.progress || ''
+  selected.value = isOut.value ? item.issue_platform || '' : item.progress || ''
   currentBtnRef.value = btnRefs.value[item.id] || null
   console.log('-----currentBtnRef.value ---', currentBtnRef.value)
   showPop.value = true
