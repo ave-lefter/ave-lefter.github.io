@@ -124,6 +124,8 @@ let lastBar: null | {
   volume: number
 } = null
 
+let lastPairPrice = 0
+
 // const LLJEFFY_#_240
 const listenerGuidMap = new Map()
 
@@ -164,6 +166,7 @@ function resetChart() {
   isReadyLine = false
   isHeaderReady = false
   lastBar = null
+  lastPairPrice = 0
   resetLimitPriceLineId()
   resetAvgPriceLineId()
   _widget?.remove?.()
@@ -438,6 +441,7 @@ async function initChart() {
           if (firstDataRequest) {
             noData = false
             lastBar = null
+            lastPairPrice = 0
           } else {
             if (noData) {
               onResult([], { noData: true })
@@ -466,6 +470,7 @@ async function initChart() {
             klinePair.value = res?.pair || ''
             if (firstDataRequest) {
               lastBar = bars1?.[bars1?.length - 1] || null
+              lastPairPrice = Number(lastBar?.close || 0)
               if (lastBar) {
                 lastBar.time = lastBar.time * 1000
               }
@@ -644,8 +649,18 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsSto
     if (event === 'simple_tx') {
       const tx: SimpleWSTx = data?.msg
       const interval = switchResolution(resolution)
-      if (tx.pair === pair.value && !loading) {
-        const t = token.value?.replace?.(/-.*$/, '')
+      const t = getAddressAndChainFromId(route.params.id as string)?.address
+      if (tx.target === t && !loading) {
+        if (tx.pair === pair.value) {
+          lastPairPrice = Number(tx?.price_u || 0)
+        }
+        if (tx.pair !== pair.value) {
+          const price = Number(tx?.price_u || 0)
+          if (!lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
+            return
+          }
+        }
+        tokenStore.tokenPrice = Number(tx?.price_u || 0)
         const newBar1 = buildOrUpdateLastBarFromTx(tx, t, lastBar, interval)
         if (newBar1) {
           lastBar = {...newBar1}

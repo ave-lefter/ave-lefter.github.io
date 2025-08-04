@@ -5,13 +5,13 @@ import type { Profile } from '~/api/token'
 export function updatePriceFromTx(tx: SimpleWSTx) {
   const tokenStore = useTokenStore()
   if (tx.target !== tokenStore.token?.token) return
-  const isBuy = tx.direction === 'buy'
-  const price = Number(tx.price_u || 0)
-  if (tx.pair === tokenStore.pairAddress) {
-    if (price) {
-      tokenStore.tokenPrice = price
-    }
-  }
+  // const isBuy = tx.direction === 'buy'
+  // const price = Number(tx.price_u || 0)
+  // if (tx.pair === tokenStore.pairAddress) {
+  //   if (price) {
+  //     tokenStore.tokenPrice = price
+  //   }
+  // }
 
   const token = tokenStore.token?.token
   tokenStore?.pairs?.forEach(pair => {
