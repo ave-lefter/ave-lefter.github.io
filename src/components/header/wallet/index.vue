@@ -253,7 +253,7 @@
         </div>
         <div class="p-20px">
           <div>
-            <div class="mb-8px h-48px w-48px rounded-[45%] bg-[--d-333-l-F2F2F2] flex-center mx-auto">
+            <div class="mb-8px h-48px w-48px rounded-[50%] bg-[--d-333-l-F2F2F2] flex-center mx-auto">
               <el-button v-if="withdrawStatus === 0" type="primary" loading text
                 class="[&&]:[--el-mask-color-extra-light:transparent] h-48px w-48px p-0"></el-button>
               <Icon v-else-if="withdrawStatus === 1" name="custom:success" class="text-16px" />
