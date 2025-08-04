@@ -10,7 +10,7 @@
        <!-- :style="signalStore.translateStyle"  translate-x-0px-->
       <div
         :class="['relative flex bg-[--d-000-l-F6F6F6] gap-1px pt-1px transition-transform transition-duration-300 overflow-hidden',]"
-        :style="{..._style,transform:`translateX(${signalStore.translateStyle||monitorStore.translateStyle}px)`}"
+        :style="{..._style,transform:`translateX(${signalStore.translateStyle||monitorStore.translateStyle||dragPumpStore.translateStyle}px)`}"
       >
         <slot/>
       </div>
@@ -185,6 +185,7 @@
       <Monitor :scroll-height="monitorStore.winHeight-160"/>
     </Draggable> -->
     <MonitorDragger v-show="monitorStore.visible"/>
+    <DragPump v-show="dragPumpStore.visible"/>
     <FavAddressPop ref="favAddressPopRef" :visible="favAddressPopVisible" :button-ref="attentionTrigger || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" @onCancel="() => favAddressPopVisible = false"/>
   </div>
 </template>
@@ -196,7 +197,7 @@
   const {addressGroups,attentionTrigger,favAddressPopVisible,handleAddAttention} = storeToRefs(useFollowStore())
   const signalStore = useSignalStore()
   const monitorStore = useMonitorStore()
-
+  const dragPumpStore = usePumpStore()
   const _style=computed(()=>{
     let paddingLeft=0
     let paddingRight=0
