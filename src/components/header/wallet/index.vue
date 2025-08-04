@@ -265,41 +265,41 @@
             </div>
             <ul class="flex flex-col gap-20px mb-30px">
               <li class="flex-between">
-                <div>{{ t('toAddress') }}</div>
+                <div class="color-[--d-666-l-999]">{{ t('toAddress') }}</div>
                 <div>{{ billObj.transferTo ?billObj.transferTo?.slice(0, 13) + '...' +
                   billObj.transferTo?.slice(-11):'--' }}
                   <Icon v-copy="billObj.transferTo" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
               </li>
               <li class="flex-between">
-                <div>{{ t('fromAddress') }}</div>
+                <div class="color-[--d-666-l-999]">{{ t('fromAddress') }}</div>
                 <div>{{ billObj.creatorAddress ?billObj.creatorAddress?.slice(0, 13) + '...' +
                   billObj.creatorAddress?.slice(-11):'--' }}
                   <Icon v-copy="billObj.creatorAddress" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
               </li>
               <li class="flex-between">
-                <div>{{ t('gasFee') }}</div>
+                <div class="color-[--d-666-l-999]">{{ t('gasFee') }}</div>
                 <div>{{ formatNumber((gasFeeVal) || 0, 8) || '--' }} {{ getChainInfo(withdrawForm.chain)?.main_name }}(${{
                    formatNumber((gasFeeVal*(withdrawChainInfo?.price||0)) || 0, 4) ||'--' }})</div>
               </li>
               <li class="flex-between">
-                <div>{{ t('network') }}</div>
+                <div class="color-[--d-666-l-999]">{{ t('network') }}</div>
                 <div class="flex-end"><img :src="`${token_logo_url}chain/${billObj.chain}.png`" class="rd-50% mr-4px"
                     width="14" lazy alt="">{{ billObj.chain &&getChainInfo(billObj.chain)?.name }}</div>
               </li>
               <li class="flex-between">
-                <div>{{ t('txHash1') }}</div>
+                <div class="color-[--d-666-l-999]">{{ t('txHash1') }}</div>
                 <div>{{ billObj.txHash ?billObj.txHash?.slice(0, 13) + '...' + billObj.txHash?.slice(-11):'--' }}
                   <Icon v-copy="billObj.txHash" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
               </li>
               <li class="flex-between">
-                <div>{{ t('blockHeight') }}</div>
+                <div class="color-[--d-666-l-999]">{{ t('blockHeight') }}</div>
                 <div>{{ billObj.blockNumber||'--' }}</div>
               </li>
               <li class="flex-between">
-                <div>{{ t('time') }}</div>
+                <div class="color-[--d-666-l-999]">{{ t('time') }}</div>
                 <div>{{ billObj.createTime ?formatDate(billObj.createTime, 'YYYY-MM-DD HH:mm:ss'):'--' }}</div>
               </li>
             </ul>
