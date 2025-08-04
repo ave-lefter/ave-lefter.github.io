@@ -70,7 +70,7 @@
                       <span class="color-[--d-FCFDFF-l-333] font-500 text-14px">App Store</span>  
                     </div>
                   </template>
-                  <img src="@/assets/images/2faAppleQRCode.png" alt="" class="mx-auto w-180px h-180px block">
+                  <img src="@/assets/images/2faAppleQRCode.png" alt="" class="mx-auto w-188px h-188px block">
               </el-popover>
               <el-popover width="200px" popper-class="h-200px flex items-center justify-center" placement="bottom">
                   <template #reference>
@@ -79,7 +79,7 @@
                       <span class="color-[--d-FCFDFF-l-333] font-500 text-14px">Google Play</span>
                     </div>
                   </template>
-                  <img src="@/assets/images/2faGoogleQRCode.png" alt="" class="mx-auto w-180px h-180px block">
+                  <img src="@/assets/images/2faGoogleQRCode.png" alt="" class="mx-auto w-188px h-188px block">
               </el-popover>
             </div>
             <el-button type="primary" class="w-full" size="large" @click="step = 1.1">{{ t('next') }}</el-button>

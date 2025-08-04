@@ -1229,5 +1229,6 @@
   "txHash1": "交易哈希",
   "blockHeight": "区块高度",
   "withdrawAgain": "再转一笔",
-  "trading": "交易中"
+  "trading": "交易中",
+  "withdrawTip": "需预留0.002，以确保钱包功能正常使用"
 }

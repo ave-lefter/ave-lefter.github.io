@@ -215,12 +215,14 @@
               </el-input>
               <div class="text-12px color-[--d-999-l-959A9F] text-right"
                 style="width: 100%; line-height: 1; margin-top: 5px;position: absolute; right: 0; top: 100%;">
-                <span class="clickable" @click.stop="handleMax">{{ t('balance1') }}: {{
+                <span>{{ t('balance1') }}: {{
                   formatNumber(withdrawChainInfo?.balance || 0, 5) }} {{
                   getChainInfo(withdrawForm.chain)?.main_name
                   }}</span>
+                <span class="text-12px font-400 color-#3F80F7 clickable ml-10px" @click.stop="handleMax">{{ t('max') }}</span>
               </div>
             </el-form-item>
+            <div class="font-400 text-12px lh-[100%] color-#FFBE3C text-center mt-45px">{{ t('withdrawTip') }}</div>
             <el-button native-type="submit" style="width: 100%; margin-top: 25px" size="large" type="primary"
               :loading="loadingWithdraw">{{ t('withdraw')
               }}</el-button>

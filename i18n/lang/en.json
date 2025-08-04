@@ -1230,5 +1230,6 @@
   "txHash1": "Transaction Hash",
   "blockHeight": "Block",
   "withdrawAgain": "Withdraw Again",
-  "trading": "trading"
+  "trading": "trading",
+  "withdrawTip": "0.002 is required to ensure the normal use of the wallet function"
 }

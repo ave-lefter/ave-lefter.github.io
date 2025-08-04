@@ -750,5 +750,6 @@
   "txHash1": "Băm giao dịch",
   "blockHeight": "Khối",
   "withdrawAgain": "Rút lại",
-  "trading": "giao dịch"
+  "trading": "giao dịch",
+  "withdrawTip": "Cần có 0,002 để đảm bảo việc sử dụng chức năng ví bình thường"
 }

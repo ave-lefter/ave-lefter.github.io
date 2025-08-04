@@ -503,5 +503,6 @@
   "txHash1": "Hachís",
   "blockHeight": "Bloquear",
   "withdrawAgain": "Retirarse de nuevo",
-  "trading": "comercio"
+  "trading": "comercio",
+  "withdrawTip": "0.002 es necesario para garantizar el uso normal de la función de la billetera"
 }

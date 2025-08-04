@@ -503,5 +503,6 @@
   "txHash1": "Hash de transação",
   "blockHeight": "Bloquear",
   "withdrawAgain": "Retire novamente",
-  "trading": "negociação"
+  "trading": "negociação",
+  "withdrawTip": "0,002 é necessário para garantir o uso normal da função da carteira"
 }

@@ -498,5 +498,6 @@
   "txHash1": "İşlem karma",
   "blockHeight": "Engellemek",
   "withdrawAgain": "Tekrar geri çekil",
-  "trading": "ticaret"
+  "trading": "ticaret",
+  "withdrawTip": "Cüzdan fonksiyonunun normal kullanımını sağlamak için 0.002 gereklidir"
 }
