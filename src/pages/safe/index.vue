@@ -57,29 +57,29 @@
         <div :class="lang?.includes?.('zh') ? 'w-420px' : 'w-500px'">
           <Steps class="mb-40px" :active="bindGoogleAuthStep" :dataSource="[t('bindGoogleAuthStep1'), t('bindGoogleAuthStep2'), t('bindGoogleAuthStep3')]"/>
           <template v-if="step === 1">
-            <div class="color-[--d-F5F5F5-l-333] font-400 text-12px mb-40px">
+            <div class="color-[--d-F5F5F5-l-333] font-400 text-14px mb-40px">
               <div class="mb-8px">{{ t('bindGoogleAuthStep1P1') }}</div>
               <div>{{ t('bindGoogleAuthStep1P2') }}</div>
             </div>
             <img src="@/assets/images/googleAuth.svg" alt="" class="mx-auto w-100px h-100px block mb-40px">
             <div class="flex justify-between w-100% mb-40px">
-              <el-popover width="200px" popper-class="h-180px flex items-center justify-center" placement="bottom">
+              <el-popover width="200px" popper-class="h-200px flex items-center justify-center" placement="bottom">
                   <template #reference>
                     <div class="flex items-center justify-center gap-4px w-200px h-48px border-rd-8px bg-[--d-222-l-F2F2F2] clickable">
                       <Icon name="custom:apple" class="text-30px color-[--d-FFF-l-333]"/>
                       <span class="color-[--d-FCFDFF-l-333] font-500 text-14px">App Store</span>  
                     </div>
                   </template>
-                  <img src="@/assets/images/2faAppleQRCode.png" alt="" class="mx-auto w-120px h-120px block">
+                  <img src="@/assets/images/2faAppleQRCode.png" alt="" class="mx-auto w-180px h-180px block">
               </el-popover>
-              <el-popover width="200px" popper-class="h-180px flex items-center justify-center" placement="bottom">
+              <el-popover width="200px" popper-class="h-200px flex items-center justify-center" placement="bottom">
                   <template #reference>
                     <div class="flex items-center justify-center gap-4px w-200px h-48px border-rd-8px bg-[--d-222-l-F2F2F2] clickable">
                       <Icon name="custom:google-play" class="text-24px"/>
                       <span class="color-[--d-FCFDFF-l-333] font-500 text-14px">Google Play</span>
                     </div>
                   </template>
-                  <img src="@/assets/images/2faGoogleQRCode.png" alt="" class="mx-auto w-120px h-120px block">
+                  <img src="@/assets/images/2faGoogleQRCode.png" alt="" class="mx-auto w-180px h-180px block">
               </el-popover>
             </div>
             <el-button type="primary" class="w-full" size="large" @click="step = 1.1">{{ t('next') }}</el-button>
