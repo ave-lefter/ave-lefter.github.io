@@ -1,6 +1,6 @@
 <template>
   <div class="mt-20px mb-30px">
-    <el-scrollbar v-loading="loading" height="calc(100vh - 215px)">
+    <el-scrollbar v-loading="loading" :height="scrollHeight">
       <ul v-if="tableList?.length > 0" class="pump-item_list">
         <li
           v-for="row in tableList"
