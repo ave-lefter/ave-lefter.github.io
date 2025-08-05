@@ -10,7 +10,6 @@ const signalStore = useSignalStore()
 const monitorStore = useMonitorStore()
 const dragPumpStore = usePumpStore()
 const {placement}=storeToRefs(dragPumpStore)
-const {lang} = storeToRefs(useGlobalStore())
 const key=ref(0)
 
 const reload = () => {
@@ -114,8 +113,7 @@ const props2=computed(()=>{
   if(placement.value==='center'){
     data={
       class:'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]',
-      scrollHeight:dragPumpStore.boundingRect.height-40, 
-      isLarge:dragPumpStore.boundingRect.width>720
+      scrollHeight:dragPumpStore.boundingRect.height-140,
     }
   }else{
      data={

@@ -1,15 +1,15 @@
 <template>
   <div class="mt-20px mb-30px">
-    <el-scrollbar v-loading="loading" height="calc(100vh - 215px)">
+    <el-scrollbar v-loading="loading" :height="scrollHeight">
       <ul v-if="tableList?.length >0" class="pump-item_list">
         <li
           v-for="row in tableList"
           :id="row?.target_token + '-' + row?.chain"
           :key="row?.pair + '-' + row?.chain"
+          :ref="setBtnRef"
           class="pump-item_item relative"
           @click.stop="tableRowClick(row)"
           @contextmenu="handleContextMenu($event, row)"
-          :ref="setBtnRef"
           @mouseenter="showPopover(row)"
           @mouseleave="showPop = false"
 
@@ -23,13 +23,13 @@
                   <img
                     class="token-icon h-32px text-16px color-#fff"
                     :src="getChainDefaultIcon(row.chain, row.symbol)"
-                  />
+                  >
                 </template>
                 <template #placeholder>
                   <img
                     class="token-icon h-32px text-16px color-#fff"
                     :src="getChainDefaultIcon(row.chain, row.symbol)"
-                  />
+                  >
                 </template>
               </el-image>
               <Progress
@@ -49,13 +49,13 @@
                       <img
                         class="token-icon h-228px w-228px text-16px color-#fff"
                         :src="getChainDefaultIcon(row.chain, row.symbol)"
-                      />
+                      >
                     </template>
                     <template #placeholder>
                       <img
                         class="token-icon h-228px w-228px text-16px color-#fff"
                         :src="getChainDefaultIcon(row.chain, row.symbol)"
-                      />
+                      >
                     </template>
                   </el-image>
                 </template>
@@ -244,7 +244,7 @@
                 </div>
 
 
-              <div class="flex-end mt-4px" v-if="pumpSetting?.define?.some(i=> i=== 'mcap')">
+              <div v-if="pumpSetting?.define?.some(i=> i=== 'mcap')" class="flex-end mt-4px">
                   <div class="color-[--d-666-l-999] mr-5px" :style="{ 'font-size': pumpSetting.fontSize_mc }">MC</div>
                   <span
                   :style="{ 'font-size': pumpSetting.fontSize_mc }"
@@ -577,7 +577,7 @@
                   class="mr-5px"
                   alt=""
                   srcset=""
-                />
+                >
                 <span>Migrating...</span>
               </div>
               <QuickSwap :quickBuyValue="quickBuyValue" :row="row" :size="pumpSetting.size_swap"/>
@@ -643,6 +643,14 @@ const props = defineProps({
     type: Boolean,
     default: () => false,
   },
+  scrollHeight:{
+    type:[String,Number],
+    default:'calc(100vh - 215px)'
+  },
+  isInPopup:{
+    type:Boolean,
+    default:false
+  }
 })
 
 
@@ -703,10 +711,10 @@ function setBtnRef(el: HTMLElement | null) {
 }
 function showPopover(item: {progress: string, id: string, issue_platform: string}) {
   // if (!isOut.value) {
-    console.log('-----[item.id--',item.id)
+    // console.log('-----[item.id--',item.id)
     selected.value = isOut.value? item.issue_platform  || '' : item.progress || ''
     currentBtnRef.value = btnRefs.value[item.id] || null
-    console.log('-----currentBtnRef.value ---',currentBtnRef.value )
+    // console.log('-----currentBtnRef.value ---',currentBtnRef.value )
     showPop.value = true
   // }
 }

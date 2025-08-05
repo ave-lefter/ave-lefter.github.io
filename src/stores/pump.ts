@@ -1,5 +1,5 @@
 import { useStorage, useThrottleFn, useWindowSize } from '@vueuse/core'
-import type { ChainKey, PumpConfig } from '~/api/types/pump'
+import type { ChainKey, PumpConfig, PumpObj } from '~/api/types/pump'
 import { _getPumpConfig, _getPumpList } from '@/api/pump'
 
 export const usePumpStore = defineStore('pumpStore', () => {
@@ -76,17 +76,6 @@ export const usePumpStore = defineStore('pumpStore', () => {
         }
     })
 
-    const listStatus = ref({
-        loading: false,
-        finished: false,
-        error: false
-    })
-
-    const pageParams = shallowRef({
-        pageNO: 1,
-        pageSize: 20,
-    })
-
     const pumpConfig = shallowRef<PumpConfig[]>([])
 
     function getPumpConfig() {
@@ -104,6 +93,39 @@ export const usePumpStore = defineStore('pumpStore', () => {
         'solana',
         sessionStorage
     )
+    const pump_query  = useStorage(
+        'pump_query',
+        {
+          solana: {
+            new: '',
+            soon: '',
+            graduated: ''
+          }
+          ,
+          bsc: {
+            new: '',
+            soon: '',
+            graduated: ''
+          }
+        }
+      )
+      const pump_notice = useStorage(
+        'pump_notice',
+        {
+          solana: {
+            new: false,
+            soon: false,
+            graduated: false
+          }
+          ,
+          bsc: {
+            new: false,
+            soon: false,
+            graduated: false
+          }
+        }
+      )
+    const listData = shallowRef<PumpObj[]>([])
 
     return {
         visible,
@@ -121,11 +143,12 @@ export const usePumpStore = defineStore('pumpStore', () => {
         onRightDragStop,
         onFixedResizing,
         placement,
-        listStatus,
-        pageParams,
         pumpConfig,
         getPumpConfig,
         pump_solana_platforms,
-        activeChain
+        activeChain,
+        pump_query,
+        listData,
+        pump_notice
     }
 })

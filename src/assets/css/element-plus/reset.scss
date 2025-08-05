@@ -178,3 +178,13 @@
     font-weight: normal;
   }
 }
+
+.small-select{
+  .el-select-dropdown__item{
+    padding: 0;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    font-size: 12px;
+  }
+}
