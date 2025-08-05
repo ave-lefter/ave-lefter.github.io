@@ -5,7 +5,7 @@
           <Icon v-if="Number(active)>(index+1)" name="material-symbols:check" class="text-12px color-#FFF" />
           <span v-else>{{ index+1 }}</span>
       </div>
-      <div class="font-400 text-14px color-[--d-666-l-999] font-Inter" :class="{'color-[--d-F5F5F5-l-333]':active===index+1}">{{ item }}</div>
+      <div class="font-400 text-14px color-[--d-666-l-999]" :class="{'color-[--d-F5F5F5-l-333]':Number(active)>=index+1}">{{ item }}</div>
       <div v-if="index !== dataSource.length-1" class="flex items-center justify-center w-52px">
         <Icon name="material-symbols:chevron-right-rounded" class="text-18px mr--5px color-[--d-666-l-999]"/>
       </div>
