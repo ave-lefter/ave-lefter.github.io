@@ -292,7 +292,7 @@
               </li>
               <li class="flex-between">
                 <div class="color-[--d-666-l-999]">{{ t('txHash1') }}</div>
-                <div>{{ billObj.txHash ?billObj.txHash?.slice(0, 13) + '...' + billObj.txHash?.slice(-11):'--' }}
+                <div class="clickable" @click.stop="queryHash">{{ billObj.txHash ?billObj.txHash?.slice(0, 13) + '...' + billObj.txHash?.slice(-11):'--' }}
                   <Icon v-copy="billObj.txHash" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
               </li>
@@ -499,6 +499,18 @@ onMounted(() => {
   getTransferGasFee()
 })
 
+function queryHash(){
+  const chain = billObj.value.chain 
+  if (chain === 'solana') {
+    window.open(`https://solscan.io/tx/${billObj.value.txHash}`, '_blank')
+  } else if (chain === 'bsc') {
+    window.open(`https://bscscan.com/tx/${billObj.value.txHash}`, '_blank')
+  } else if (chain === 'eth') {
+    window.open(`https://etherscan.io/tx/${billObj.value.txHash}`, '_blank')
+  } else if (chain === 'base') {
+    window.open(`https://basescan.org/tx/${billObj.value.txHash}`, '_blank')
+  }
+}
 function navigateToWallet(path: string, chain: string) {
   // if(chain === 'solana' || chain === 'bsc') {
   path = `/address/${path}/${chain}`
