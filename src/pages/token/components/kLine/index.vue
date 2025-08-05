@@ -20,7 +20,7 @@ import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStor
 import type { WSTx, KLineBar, SimpleWSTx } from './types'
 import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
-import {DefaultHeight} from '~/utils/constants'
+import {DefaultHeight, WSSimpleTxChain} from '~/utils/constants'
 import { TW_STUDY } from './constant'
 
 const tokenStore = useTokenStore()
@@ -517,7 +517,13 @@ async function initChart() {
           return
         }
         const { address, chain } = getAddressAndChainFromId(token.value)
-        const params = [
+        let params: [string, string | { tks: { ch: string, tk: string }[], rt: string }, string?] = [
+          'multi_tx',
+          address,
+          chain
+        ]
+        if (WSSimpleTxChain.includes(chain)) {
+          params = [
           'simple_tx',
           {
             tks: [
@@ -529,6 +535,8 @@ async function initChart() {
             rt: 'json'
           }
         ]
+        }
+
         const data = {
           jsonrpc: '2.0',
           method: 'subscribe',
@@ -646,21 +654,29 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsSto
       return
     }
     const { event, data } = msg
-    if (event === 'simple_tx') {
-      const tx: SimpleWSTx = data?.msg
+    if (event === WSEventType.SIMPLE_TX || event === WSEventType.TX) {
+      const tx: SimpleWSTx | WSTx = data?.msg
       const interval = switchResolution(resolution)
       const t = getAddressAndChainFromId(route.params.id as string)?.address
-      if (tx.target === t && !loading) {
-        if (tx.pair === pair.value) {
-          lastPairPrice = Number(tx?.price_u || 0)
+      let target = ''
+      if ('target' in tx) {
+        target = tx.target
+      } else {
+        target = ([tx.from_address, tx.to_address].find(i => i === t)) || ''
+      }
+      if (target === t && !loading) {
+        const _pair = 'pair' in tx ? tx.pair : tx.pair_address
+        const _price = 'price_u' in tx ? Number(tx.price_u || 0) : Number(tx.from_address?.toLowerCase?.() === tokenStore.token?.token?.toLowerCase?.() ? tx.from_price_usd : tx.to_price_usd) || 0
+        if (_pair === pair.value) {
+          lastPairPrice = _price
         }
-        if (tx.pair !== pair.value) {
-          const price = Number(tx?.price_u || 0)
+        if (_pair !== pair.value) {
+          const price = _price
           if (!lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
             return
           }
         }
-        tokenStore.tokenPrice = Number(tx?.price_u || 0)
+        tokenStore.tokenPrice = _price
         const newBar1 = buildOrUpdateLastBarFromTx(tx, t, lastBar, interval)
         if (newBar1) {
           lastBar = {...newBar1}

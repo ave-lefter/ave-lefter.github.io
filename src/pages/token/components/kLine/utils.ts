@@ -1,7 +1,7 @@
 // import { getGlobalT } from '@/utils/i18nBridge'
 import type { Mark, ChartingLibraryWidgetConstructor, IChartingLibraryWidget, EntityId, DrawingEventType } from '~/types/tradingview/charting_library'
 import { formatNumber, formatDec } from '@/utils/formatNumber'
-import type {  KLineBar, SimpleWSTx } from './types'
+import type {  KLineBar, SimpleWSTx, WSTx } from './types'
 import { useDocumentVisibility, useEventBus } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
 import { bot_getUserPendingTx, bot_cancelLimitOrdersByBatch } from '~/api/token'
@@ -232,7 +232,7 @@ export function getBarStartTime(txTimeMs: number, interval: number): number {
 
 
 export function buildOrUpdateLastBarFromTx(
-  tx: SimpleWSTx,
+  tx: SimpleWSTx | WSTx,
   tokenAddress: string,
   lastBar: KLineBar | null,
   intervalInSeconds: number | string
@@ -241,12 +241,25 @@ export function buildOrUpdateLastBarFromTx(
   const txTimeMs = tx.time * 1000
 
   let price: number, volume: number
-  if (tx.target.toLowerCase() === address) {
-    price = parseFloat(tx.price_u)
-    volume = parseFloat(new BigNumber(tx.price_u || 0).times(tx.target_amt || 0).toFixed())
+  if ('target' in tx) {
+    if (tx.target.toLowerCase() === address) {
+      price = parseFloat(tx.price_u)
+      volume = parseFloat(new BigNumber(tx.price_u || 0).times(tx.target_amt || 0).toFixed())
+    } else {
+      return null
+    }
   } else {
-    return null
+    if (tx.from_address.toLowerCase() === address) {
+      price = parseFloat(tx.from_price_usd)
+      volume = parseFloat(tx.amount_usd)
+    } else if (tx.to_address.toLowerCase() === address) {
+      price = parseFloat(tx.to_price_usd)
+      volume = parseFloat(tx.amount_usd)
+    } else {
+      return null // 与该 token 无关
+    }
   }
+
   // if (tx.from_address.toLowerCase() === address) {
   //   price = parseFloat(tx.from_price_usd)
   //   volume = parseFloat(tx.amount_usd)

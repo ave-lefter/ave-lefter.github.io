@@ -54,6 +54,11 @@ export const useWSStore = defineStore('ws', () => {
         wsResult[event] = data?.msg
       } else if (event === WSEventType.MONITOR) {
         wsResult[event] = data?.msg
+      } else if (event === WSEventType.TX) {
+        const tx: WSTx = data?.tx
+        // 更新价格 交易数和交易额
+        updatePriceFromTx(tx)
+        wsResult[event] = data
       } else if (event === WSEventType.SIMPLE_TX) {
         const tx: SimpleWSTx = data?.msg
         // 更新价格 交易数和交易额

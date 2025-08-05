@@ -200,7 +200,7 @@ const tableFilterVisible = ref({
 })
 const makerTooltip = ref()
 const markerTooltipVisible = shallowRef(false)
-const currentRow = shallowRef<IGetTokenTxsResponse & { senderProfile: Profile }>({} as any)
+const currentRow = shallowRef<IGetTokenTxsResponse & { senderProfile: Profile, maker_bal?: number }>({} as any)
 const isPausedTxs = computed(() => {
   return isHoverTable.value
     || tokenDetailSStore.drawerVisible
@@ -275,6 +275,31 @@ function resetCache() {
   wsLiqCache.value.length = 0
 }
 
+watch(() => wsStore.wsResult[WSEventType.TX], data => {
+  if (!data || listStatus.value.loadingTxs || ignoreWs.value) {
+    return
+  }
+  const {wallet_address, from_address, to_address} = data.tx
+  // 不是当前币种的数据
+  if (from_address !== realAddress.value && to_address !== realAddress.value) {
+    return
+  }
+  txCount.value[wallet_address] = (txCount.value[wallet_address] || 0) + 1
+  const { topN, wallet_tag } = getWalletTag(data.tx)
+  const item = {
+    ...data.tx,
+    topN, wallet_tag,
+    senderProfile: JSON.parse(data.tx.profile || '{}'),
+    count: txCount.value[wallet_address],
+    time: Math.min(Math.floor(Date.now() / 1000), data.tx.time),
+    uuid: uuid()
+  }
+  wsPairCache.value.unshift(item)
+  if (!isPausedTxs.value) {
+    updatePairTxs()
+  }
+})
+
 watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
   if (!data || listStatus.value.loadingTxs || ignoreWs.value) {
     return
@@ -288,20 +313,23 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
   txCount.value[maker] = (txCount.value[maker] || 0) + 1
   const { topN, wallet_tag } = getWalletTag(data.msg)
   const item = {
-    chain: addressAndChain.value.chain,
     ...simpleWSTx,
     topN, wallet_tag,
     count: txCount.value[maker],
     time: Math.min(Math.floor(Date.now() / 1000), simpleWSTx.time),
     uuid: uuid(),
     wallet_address: maker,
-    transaction: simpleWSTx.txhash
+    transaction: simpleWSTx.txhash,
+    senderProfile: {
+      solTotalHolding: simpleWSTx.maker_eth
+    }
   }
-  wsPairCache.value.unshift(item)
+  wsPairCache.value.unshift(item as any)
   if (!isPausedTxs.value) {
     updatePairTxs()
   }
 })
+
 watch(() => wsStore.wsResult[WSEventType.LIQ], data => {
   if (!data || listStatus.value.loadingLiq || !['all', 'liquidity'].includes(activeTab.value)) {
     return
@@ -517,7 +545,10 @@ function getPrice(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, i
 
 function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, needPrice = false, isVolUSDT = false) {
   if ('direction' in row) {
-    return Number(row.target_amt || 0)
+    return Number(row.target_amt || 0) * (
+        needPrice ? Number(isVolUSDT ? row.price_u : row.price_m)
+          : 1
+      )
   }
   if ('from_address' in row) {
     if (

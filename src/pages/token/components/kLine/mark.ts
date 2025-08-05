@@ -251,30 +251,52 @@ ${formatDate(entry.time, 'YYYY-MM-DD HH:mm')}
     interval,
     user
   }: {
-    tx: SimpleWSTx
+    tx: SimpleWSTx | WSTx
     interval: number
     user: string
   }, _widget: IChartingLibraryWidget | null) {
     const token = tokenStore?.token?.token
     const chain = tokenStore?.token?.chain
     const pair = tokenStore?.pairAddress
-    if (!((token === tx.target) && tx.maker === user)) return
-    const type = tx.direction
     const result: TradeData =  {
       time: tx.time,
     }
-    if (type === 'buy') {
-      result['buy'] = {
-        amount: Number(tx?.target_amt || 0),
-        txns: 1,
-        volume: Number(tx?.price_u || 0 ) * Number(tx?.target_amt || 0)
+    if ('maker' in tx) {
+      if (!((token === tx.target) && tx.maker === user)) return
+      const type = tx.direction
+      if (type === 'buy') {
+        result['buy'] = {
+          amount: Number(tx?.target_amt || 0),
+          txns: 1,
+          volume: Number(tx?.price_u || 0 ) * Number(tx?.target_amt || 0)
+        }
       }
-    }
-    if (type === 'sell') {
-      result['sell'] = {
-        amount: Number(tx?.target_amt || 0),
-        txns: 1,
-        volume: Number(tx?.price_u || 0 ) * Number(tx?.target_amt || 0)
+      if (type === 'sell') {
+        result['sell'] = {
+          amount: Number(tx?.target_amt || 0),
+          txns: 1,
+          volume: Number(tx?.price_u || 0 ) * Number(tx?.target_amt || 0)
+        }
+      }
+    } else {
+      if (!((token === tx.from_address || token === tx.to_address) && tx.wallet_address === user)) return
+      const type =  tokenStore?.token?.token === tx.to_address ? 'buy' : 'sell'
+      const result: TradeData =  {
+        time: tx.time,
+      }
+      if (type === 'buy') {
+        result['buy'] = {
+          amount: Number(tx?.to_amount || 0),
+          txns: 1,
+          volume: Number(tx?.to_price_usd || 0 ) * Number(tx?.to_amount || 0)
+        }
+      }
+      if (type === 'sell') {
+        result['sell'] = {
+          amount: Number(tx?.from_amount || 0),
+          txns: 1,
+          volume: Number(tx?.from_price_usd || 0 ) * Number(tx?.from_amount || 0)
+        }
       }
     }
     marksMap.forEach((item, k) => {
