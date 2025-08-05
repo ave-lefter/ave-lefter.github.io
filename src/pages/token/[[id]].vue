@@ -193,7 +193,7 @@ onBeforeRouteLeave(() => {
 })
 </script>
 
-<style>
+<style scoped>
 .hide-scrollbar {
   >.el-scrollbar {
     .el-scrollbar__bar {
