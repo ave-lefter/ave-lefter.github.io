@@ -251,8 +251,13 @@ function getPumpParams(oldParams, isFilter: boolean) {
 
 <template>
   <div class="w-full h-full bg-[--d-111-l-FFF] p-12px">
-    <div class="flex justify-between mb-16px">
+    <Icon
+        name="custom:drag2"
+        class="absolute top-4px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2] drag-handle"
+    />
+    <div class="flex mb-16px">
       <PlatformSelect />
+      <div class="flex-1 mt--12px mb--16px drag-handle"/>
       <div class="flex items-center">
         <Setting :chain="pumpStore.activeChain">
           <template #default="{ visible }">
@@ -277,7 +282,7 @@ function getPumpParams(oldParams, isFilter: boolean) {
       </div>
     </div>
     <div
-      class="flex justify-between pb-8px border-b-1px border-b-solid border-b-[--d-222-l-F2F2F2] mb-12px"
+      class="flex pb-8px border-b-1px border-b-solid border-b-[--d-222-l-F2F2F2] mb-12px"
     >
       <div class="flex items-center gap-8px">
         <span
@@ -291,6 +296,7 @@ function getPumpParams(oldParams, isFilter: boolean) {
           {{ item.label }}
         </span>
       </div>
+      <div class="flex-1 drag-handle mb--8px"/>
       <div class="flex items-center gap-8px">
         <div class="flex items-ceter gap-4px p-2px rounded-4px bg-[--d-333-l-F2F2F2]">
           <div
@@ -305,7 +311,7 @@ function getPumpParams(oldParams, isFilter: boolean) {
         </div>
       </div>
     </div>
-    <div class="flex justify-between mb-12px">
+    <div class="flex mb-12px">
       <div class="flex items-center gap-8px">
         <signal-quick-buy-input
           v-model="quickBuyValue"
@@ -335,6 +341,7 @@ function getPumpParams(oldParams, isFilter: boolean) {
           <Icon name="icon-park-solid:volume-notice" class="text-12px" />
         </div>
       </div>
+      <div class="flex-1 drag-handle mt--12px"/>
       <div class="flex items-center gap-8px">
         <el-input
           ref="inputSearch"

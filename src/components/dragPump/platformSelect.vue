@@ -23,7 +23,7 @@ const platformsList = computed(() => {
   <el-popover v-model:visible="visible_platforms" placement="bottom-start" trigger="click">
     <template #reference>
       <div
-        class="bg-[--d-222-l-F2F2F2] rounded-4px px-8px py-2px flex items-center text-12px cursor-pointer"
+        class="bg-[--d-222-l-F2F2F2] rounded-4px px-8px py-2px flex items-center text-12px cursor-pointer drag-cancel"
       >
         <el-image
           class="mr-5px rounded w-14px"
