@@ -100,6 +100,45 @@
           }}</span>
           <div class="flex items-center justify-start">
             <img v-if="(token?.risk_level??0) < 0" class="bg-btn" src="@/assets/images/fengxian.png" :width="12">
+            <div v-if="medias?.length > 0" class="flex text-20px">
+              <div v-for="(item, index) in medias" :key="index" class="tag-btn">
+                <template v-if="item.url">
+                  <span
+                    v-if="item.name === 'QQ'"
+                    v-tooltip="item.url"
+                    class="bg-btn"
+                  >
+                    <Icon
+                      :name="`custom:${item.icon}`"
+                      class="text-[--d-666-l-999] text-12px"
+                    />
+                  </span>
+                  <a
+                    v-else
+                    v-tooltip="item.url"
+                    :href="item.url"
+                    target="_blank"
+                    class="bg-btn"
+                    @click.stop
+                  >
+                    <Icon
+                      :name="`custom:${item.icon}`"
+                      class="text-[--d-666-l-999] text-12px"
+                    />
+                  </a>
+                </template>
+              </div>
+            </div>
+            <a
+              class="media-item bg-btn"
+              :href="`https://x.com/search?q=($${token?.symbol} OR ${token?.token})&src=typed_query&f=live`"
+              target="_blank"
+            >
+              <Icon
+                class="text-[--d-666-l-999] h-16px w-10px"
+                name="custom:search"
+              />
+            </a>
             <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
               <div
                 v-for="(i, index) in getTags(pair)?.normal_tag"
@@ -136,35 +175,6 @@
                 </span>
               </div>
             </template>
-            <div v-if="medias?.length > 0" class="flex text-20px">
-              <div v-for="(item, index) in medias" :key="index" class="tag-btn">
-                <template v-if="item.url">
-                  <span
-                    v-if="item.name === 'QQ'"
-                    v-tooltip="item.url"
-                    class="bg-btn"
-                  >
-                    <Icon
-                      :name="`custom:${item.icon}`"
-                      class="text-[--d-666-l-999] text-12px"
-                    />
-                  </span>
-                  <a
-                    v-else
-                    v-tooltip="item.url"
-                    :href="item.url"
-                    target="_blank"
-                    class="bg-btn"
-                    @click.stop
-                  >
-                    <Icon
-                      :name="`custom:${item.icon}`"
-                      class="text-[--d-666-l-999] text-12px"
-                    />
-                  </a>
-                </template>
-              </div>
-            </div>
             <img
               v-if="token?.launchpad"
               v-tooltip="token.launchpad"
@@ -174,16 +184,6 @@
               :width="12"
               style="border-radius: 100%"
             >
-            <a
-              class="media-item bg-btn"
-              :href="`https://x.com/search?q=($${token?.symbol} OR ${token?.token})&src=typed_query&f=live`"
-              target="_blank"
-            >
-              <Icon
-                class="text-[--d-666-l-999] h-16px w-10px"
-                name="custom:search"
-              />
-            </a>
             <a
               v-if="aiSummary?.headline || aiSummary?.summary"
               v-tooltip.raw="{
@@ -196,6 +196,7 @@
               <Icon name="custom:ai" class="text-14px"/>
             </a>
           </div>
+          <DeBox/>
           <el-popover
             v-if="collected"
             v-model:visible="editableGroup"
@@ -331,7 +332,6 @@
               </div>
             </template>
           </el-popover>
-          <DeBox/>
         </div>
         <div class="text-12px flex items-center mt-4px">
           <a
