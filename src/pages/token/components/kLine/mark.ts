@@ -198,7 +198,7 @@ export function useKlineMarks() {
         // position: isBuy ? 'below' : 'above',
         borderWidth: 0,
         text: getMarkTooltipContent(entry, type, name),
-        showLabelWhenImageLoaded: false
+        showLabelWhenImageLoaded: false,
       })
     }
 

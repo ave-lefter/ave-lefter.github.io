@@ -25,6 +25,7 @@ import { TW_STUDY } from './constant'
 
 const tokenStore = useTokenStore()
 const botStore = useBotStore()
+const tokenDetailsStore = useTokenDetailsStore()
 const route = useRoute()
 const token = computed(() => {
   return route.params.id as string
@@ -607,7 +608,28 @@ async function initChart() {
 
   // onMarkClick
   _widget?.subscribe('onMarkClick', (markId) => {
-    console.log('markId', markId)
+    const {token,symbol,logo_url,chain} = tokenStore.tokenInfo?.token||{}
+    const {target_token,token0_address,token0_symbol,token1_symbol,pair} = tokenStore.pair || {}
+    const $patchParams = {
+      drawerVisible:true,
+      tokenInfo:{
+        id:route.params.id as string,
+        symbol,
+        logo_url,
+        chain,
+        address:token
+      },
+      pairInfo:{
+        target_token,
+        token0_address,
+        token0_symbol,
+        token1_symbol,
+        pairAddress:pair
+      },
+      user_address:user.value
+    }
+    tokenDetailsStore.$patch($patchParams)
+    console.log('markId',markId)
   })
 
   subscribeStudyEvent()
