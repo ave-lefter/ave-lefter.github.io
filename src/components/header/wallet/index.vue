@@ -230,7 +230,7 @@
         </el-form>
         <div v-else-if="!(authInfo?.emailAddress && authInfo?.authSetting)" class="px-20px py-102px text-center">
           <Icon name="custom:shield-user-line" class="text-72px color-[--d-FCFDFF-l-999] mb-16px" />
-          <div class="font-500 text-14px lh-100% color-[--d-F5F5F5-l-333] mb-8px">{{ t('2faT1') }}</div>
+          <div class="font-500 text-14px lh-18px color-[--d-F5F5F5-l-333] mb-8px">{{ t('2faT1') }}</div>
           <div class="font-400 text-12px lh-16px color-#999 mb-30px">{{ t('2faP1') }}</div>
           <el-button type="primary" class="w-full" size="large" @click="router.push('/safe');tgWalletVisible = false">{{
             t('bindNow') }}</el-button>
@@ -238,7 +238,7 @@
         <div v-else-if="(authInfo?.emailAddress && authInfo?.authSetting) && !authInfo?.transferStatus"
           class="px-20px py-102px text-center">
           <Icon name="custom:shield-user-line2" class="text-72px color-[--d-FCFDFF-l-999] mb-16px" />
-          <div class="font-500 text-14px lh-100% color-[--d-F5F5F5-l-333] mb-8px">{{ t('2faT2') }}</div>
+          <div class="font-500 text-14px lh-18px color-[--d-F5F5F5-l-333] mb-8px">{{ t('2faT2') }}</div>
           <div class="font-400 text-12px lh-16px color-#999 mb-30px">{{ t('2faP1') }}</div>
           <el-button type="primary" class="w-full" size="large" disabled>{{ t('cooling') }}</el-button>
         </div>

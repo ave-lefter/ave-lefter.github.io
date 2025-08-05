@@ -84,17 +84,18 @@
             </div>
             <el-button type="primary" class="w-full" size="large" @click="step = 1.1">{{ t('next') }}</el-button>
           </template>
-          <div v-show="step === 1.1" v-loading="loading3" :element-loading-background="isDark ? 'rgba(19, 23, 34 0.2)' : 'rgba(255, 255, 255, 0.2)'">
-            <div class="color-[--d-F5F5F5-l-333] font-400 text-12px mb-40px">{{ t('bindGoogleAuthStep2P1') }}</div>
-            <el-skeleton :loading="loading4" animated :throttle="500">
+          <div v-show="step === 1.1" :element-loading-background="isDark ? 'rgba(19, 23, 34 0.2)' : 'rgba(255, 255, 255, 0.2)'">
+            <div class="color-[--d-F5F5F5-l-333] font-400 text-14px  mb-40px">{{ t('bindGoogleAuthStep2P1') }}</div>
+            <el-skeleton :loading="loading3" animated :throttle="500">
               <template #template>
-                <el-skeleton-item variant="image" class="w-120px h-120px mb-40px" />
+                <el-skeleton-item variant="image" class="w-120px h-120px mb-40px mx-auto" />
                 <el-skeleton-item variant="h1" class="w-[100%] h-48px mb-20px" />
                 <el-skeleton-item variant="h1" class="w-[100%] h-48px mb-20px" />
+                <el-skeleton-item variant="h1" class="w-[100%] h-40px mb-20px" />
               </template>
               <template #default />
             </el-skeleton>
-            <div v-show="!loading4">
+            <div v-show="!loading3">
               <canvas id="qr-google-canvas" class="mx-auto w-120px h-120px block mb-40px"/>
               <el-input v-model="googleAuthName" disabled size="large" class="h-48px font-500 text-16px mb-20px">
                 <template #suffix>
@@ -117,7 +118,7 @@
             <el-form
               ref="googleAuthRef" :model="googleAuth" :rules="rules" label-width="0" autocomplete="off"
               size="large" @submit.prevent>
-              <div class="mb-40px text-12px font-400 color-[--d-F5F5F5-l-333]">{{ t('bindGoogleAuthStep3P1') }}</div>
+              <div class="mb-40px text-14px font-400 color-[--d-F5F5F5-l-333]">{{ t('bindGoogleAuthStep3P1') }}</div>
               <el-form-item label="" prop="authCode" class="mb-40px!">
                 <el-input
                   v-model="googleAuth.authCode" class="h-48px font-500 text-16px" :autocomplete="'new-authCode' + Math.random()"
@@ -392,9 +393,9 @@ function initGoogleAuth() {
   loading3.value = true
   googleAuth.value.authSetting = null
   getUserInfoByGuid(googleAuth.value.tgUid).then(res => {
-    loading3.value = false
+    // loading3.value = false
     if (!res?.authSetting) {
-      loading4.value = true
+      // loading3.value = true
       googleAuth.value.authSetting = false
       setAuth(googleAuth.value.tgUid).then(res => {
         if (res) {
@@ -406,11 +407,10 @@ function initGoogleAuth() {
             }
           }
           setChainQr()
-        } else {
-          loading4.value = false
         }
+        loading3.value = false
       }).catch(() => {
-        loading4.value = false
+        loading3.value = false
       })
     } else {
       googleAuth.value.authSetting = true
