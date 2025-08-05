@@ -713,7 +713,7 @@
   "bounded": "Binding",
   "safeCenter": "Trung tâm an toàn",
   "safeDsc": "Để đảm bảo an toàn cho tài khoản và tiền của bạn, vui lòng hoàn thành hai chứng nhận an toàn sau đây ngay lập tức.",
-  "2fa": "Xác minh hai yếu tố (2FA)",
+  "2fa": "Xác thực hai yếu tố （2FA",
   "emailVerification": "Xác minh email",
   "emailVerificationDsc": "Liên kết địa chỉ email của bạn để bảo vệ tài khoản và giao dịch của bạn",
   "bindNow": "Ràng buộc ngay bây giờ",

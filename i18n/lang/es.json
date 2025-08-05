@@ -466,7 +466,7 @@
   "bounded": "Vínculo",
   "safeCenter": "Centro de seguridad",
   "safeDsc": "Para garantizar la seguridad de su cuenta y fondos, complete las siguientes dos certificaciones de seguridad de inmediato.",
-  "2fa": "Verificación de dos factores (2FA)",
+  "2fa": "Autenticación de dos factores （2fa)",
   "emailVerification": "Verificación por correo electrónico",
   "emailVerificationDsc": "Atrae su dirección de correo electrónico para proteger su cuenta y transacciones",
   "bindNow": "Atar ahora",
