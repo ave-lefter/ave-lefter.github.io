@@ -703,10 +703,14 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
   let latestToken = 0           // 递增的版本号
   const MAX_RETRY = 5           // 最多轮询次数
   const INTERVAL = 2_000        // 轮询间隔（毫秒）
+  // 封装原子操作获取token
+  const getNextToken = () => {
+    latestToken += 1
+    return latestToken
+  }
   async function createLimitPriceLinePoll(priceList: GetUserPendingTxRes) {
-     const myToken = ++latestToken      // 取到“属于我自己”的版本号
+    const myToken = getNextToken()      // 取到“属于我自己”的版本号
     let retry = 0
-
     while (retry <= MAX_RETRY) {
       // 若我已不是最新调用，放弃执行
       if (myToken !== latestToken) break
@@ -714,6 +718,7 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
       if (getIsReady()) {
         createLimitPriceLine(priceList)
         subscribeLimitPriceLineRemove()
+        retry = 0
         break
       }
 
@@ -759,26 +764,25 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
     getData()
   })
 
-  let Timer: ReturnType<typeof setTimeout> | null = null
-  watch([chain, tokenAddress, () => botStore?.userInfo?.evmAddress], () => {
+  function getDataTimer(interval = 500) {
     if (Timer) {
       clearTimeout(Timer)
       Timer = null
     }
     Timer = setTimeout(() => {
       getData()
-    }, 2000)
+    }, interval)
+  }
+
+  let Timer: ReturnType<typeof setTimeout> | null = null
+  watch([chain, tokenAddress, () => botStore?.userInfo?.evmAddress, () => tokenStore.placeOrderUpdate, () => wsStore.wsResult?.tgbot], () => {
+    getDataTimer(500)
   })
 
-  watch([() => tokenStore.placeOrderSuccess, () => wsStore.wsResult?.tgbot], () => {
-    if (Timer) {
-      clearTimeout(Timer)
-      Timer = null
-    }
-    Timer = setTimeout(() => {
-      getData()
-    }, 2000)
+  watch(() => tokenStore.placeOrderSuccess, () => {
+    getDataTimer(2000)
   })
+
 
 
   onMounted(() => {
