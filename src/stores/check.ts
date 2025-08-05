@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { _getContractCheckResult, type Check, type PairHoldersRank} from '@/api/check'
 
 export const useCheckStore = defineStore('check', () => {
-  const checkResult = shallowRef<null | Check>(null)
+  const checkResult = ref<null | Check>(null)
   const showResult = shallowRef(false)
   const progress = shallowRef(0)
   const hasLpLock = shallowRef(false)

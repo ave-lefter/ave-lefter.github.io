@@ -188,7 +188,7 @@ export function _voteSupport(
   user_address: string
 ) {
   const { $api } = useNuxtApp()
-  return $api('/v1api/v2/tokens/${token_id}/vote/support', {
+  return $api(`/v1api/v2/tokens/${token_id}/vote/support`, {
     method: 'post',
     body: {
       user_address: user_address,
@@ -198,7 +198,7 @@ export function _voteSupport(
 
 export function _voteAgainst(token_id: string, user_address: string) {
   const { $api } = useNuxtApp()
-  return $api('/v1api/v2/tokens/${token_id}/vote/against', {
+  return $api(`/v1api/v2/tokens/${token_id}/vote/against`, {
     method: 'post',
     body: {
       user_address: user_address,
