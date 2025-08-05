@@ -81,7 +81,7 @@
       <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] flex items-center gap-2px">
       <a target="_blank" href="https://cloud.ave.ai">API</a>
       </li>
-      <el-popover popper-style="padding: 12px;min-width: 107px" width="107" placement="top" :teleported="false">
+      <el-popover popper-style="padding: 12px;min-width: 50px;width:auto"  placement="top" :teleported="false">
       <template #reference>
           <Icon name="custom:set-up" class="text-12px ml-2px color-#666" />
       </template>
@@ -113,7 +113,7 @@
       </li>
       <li class="color-[--d-999-l-666] hover:color-#3F80F7 mr-8px">
         <a
-          target="_blank" :href="lang?.includes?.('zh') ? 'https://x.com/aveai_info' : 'https://x.com/AveaiGlobal'"
+          target="_blank" :href="lang?.includes?.('zh') ? 'https://t.me/ave_community_cn' : 'https://t.me/aveai_english'"
           class="flex-center">
           <Icon name="lineicons:telegram-original" class="text-19px" />
         </a>
