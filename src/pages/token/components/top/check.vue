@@ -2049,7 +2049,7 @@ function getVote() {
             checkResult.value[i as keyof Check] = res[i]
         }
       })
-
+      console.log('-------checkResult---',checkResult)
   })
 }
 // const checkResult1 = computed(() => {
