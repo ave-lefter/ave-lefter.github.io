@@ -59,7 +59,7 @@
           <template v-if="step === 1">
             <div class="color-[--d-F5F5F5-l-333] font-400 text-14px mb-40px">
               <div class="mb-8px">{{ t('bindGoogleAuthStep1P1') }}</div>
-              <div>{{ t('bindGoogleAuthStep1P2') }}</div>
+              <div class="lh-20px">{{ t('bindGoogleAuthStep1P2') }}</div>
             </div>
             <img src="@/assets/images/googleAuth.svg" alt="" class="mx-auto w-100px h-100px block mb-40px">
             <div class="flex justify-between w-100% mb-40px">
@@ -85,7 +85,7 @@
             <el-button type="primary" class="w-full" size="large" @click="step = 1.1">{{ t('next') }}</el-button>
           </template>
           <div v-show="step === 1.1" :element-loading-background="isDark ? 'rgba(19, 23, 34 0.2)' : 'rgba(255, 255, 255, 0.2)'">
-            <div class="color-[--d-F5F5F5-l-333] font-400 text-14px  mb-40px">{{ t('bindGoogleAuthStep2P1') }}</div>
+            <div class="color-[--d-F5F5F5-l-333] font-400 text-14px  mb-40px lh-20px">{{ t('bindGoogleAuthStep2P1') }}</div>
             <el-skeleton :loading="loading3" animated :throttle="500">
               <template #template>
                 <el-skeleton-item variant="image" class="w-120px h-120px mb-40px mx-auto" />
@@ -118,7 +118,7 @@
             <el-form
               ref="googleAuthRef" :model="googleAuth" :rules="rules" label-width="0" autocomplete="off"
               size="large" @submit.prevent>
-              <div class="mb-40px text-14px font-400 color-[--d-F5F5F5-l-333]">{{ t('bindGoogleAuthStep3P1') }}</div>
+              <div class="mb-40px text-14px font-400 color-[--d-F5F5F5-l-333] lh-20px">{{ t('bindGoogleAuthStep3P1') }}</div>
               <el-form-item label="" prop="authCode" class="mb-40px!">
                 <el-input
                   v-model="googleAuth.authCode" class="h-48px font-500 text-16px" :autocomplete="'new-authCode' + Math.random()"
