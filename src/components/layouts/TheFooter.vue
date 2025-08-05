@@ -113,7 +113,7 @@
       </li>
       <li class="color-[--d-999-l-666] hover:color-#3F80F7 mr-8px">
         <a
-          target="_blank" :href="lang?.includes?.('zh') ? 'https://x.com/aveai_info' : 'https://x.com/AveaiGlobal'"
+          target="_blank" :href="lang?.includes?.('zh') ? 'https://t.me/ave_community_cn' : 'https://t.me/aveai_english'"
           class="flex-center">
           <Icon name="lineicons:telegram-original" class="text-19px" />
         </a>
