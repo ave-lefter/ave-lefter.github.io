@@ -1096,7 +1096,7 @@
                     >
                     <template v-if="i?.type == 'address'">
                       <span
-                        v-if="i?.value == evmAddress"
+                        v-if="i?.value == useFollowStore().currentAddress || i?.value == userAddress"
                         class="color-777e90"
                         style="color: #f6465d"
                       >
@@ -1291,7 +1291,7 @@
                     name="garden:thumbs-up-fill-12"
                     :style="{
                       color:
-                        (checkResult?.vote_support ?? 0) > 0 ? '#12B886' : '#e1e1e1',
+                        (checkResult?.my_vote ?? 0) > 0 ? '#12B886' : '#e1e1e1',
                     }"
                   />
                   <span class="thumbs-label">
@@ -1335,7 +1335,7 @@
                   class="iconfont icon-fandui icon-thumbs"
                   :style="{ color: checkResult.my_vote < 0 ? '#F6465D' : '#e1e1e1' }"
                 ></i> -->
-                  <Icon name="garden:thumbs-down-fill-12" :style="{ color: (checkResult?.vote_against ?? 0) > 0 ? '#F6465D' : '#e1e1e1'}"
+                  <Icon name="garden:thumbs-down-fill-12" :style="{ color: (checkResult?.my_vote ?? 0) < 0 ? '#F6465D' : '#e1e1e1'}"
                   />
                   <span class="thumbs-label">
                     {{ $t('against') }}({{ checkResult?.vote_against || 0 }})
@@ -1372,6 +1372,9 @@ import {
 import { formatNumber } from '@/utils/formatNumber'
 import { filterGas, formatExplorerUrl, formatDate } from '@/utils/index'
 import { ElMessageBox, ElMessage } from 'element-plus'
+const tokenStore = useTokenStore()
+const botStore = useBotStore()
+const walletStore = useWalletStore()
 
 const { checkResult, showResult, hasLpLock , progress} = storeToRefs(useCheckStore())
 const checkStore  = useCheckStore()
@@ -1386,7 +1389,6 @@ const showRiskList = shallowRef(false)
 const buy_tax_list_show = shallowRef(true)
 const sell_tax_list_show = shallowRef(true)
 // const activeTab = shallowRef(1)
-const { evmAddress } = storeToRefs(useBotStore())
 
 const riskStatus: Record<number, string> = {
   0: 'normal1',
@@ -1612,6 +1614,23 @@ const statistics_warning = computed(() => {
   }
   return checkResult?.value?.audit_pass_by ? 0 : num
 })
+const chain = computed(() => {
+  const routeParams = getAddressAndChainFromId(route.params.id as string)
+  const chain = routeParams?.chain || tokenStore.token?.chain || ''
+  return chain
+})
+const userAddress = computed(() => {
+  if(botStore.evmAddress){
+  const obj =  botStore.userInfo?.addresses?.find(i=> i.chain ==chain.value)
+    if (obj) {
+      return obj.address
+    } else {
+      return botStore?.evmAddress
+    }
+  } else {
+    return  walletStore?.address || ''
+  }
+})
 watch(statistics_risk, (val) => {
   checkStore.statistics_risk_store =  val
 })
@@ -1621,10 +1640,16 @@ watch(statistics_warning, (val) => {
 watch(statistics_unknown, (val) => {
   checkStore.statistics_unknown_store =  val
 })
+watch(()=>visible.value, (val) => {
+  if (val) {
+    getVote()
+  }
+})
+
 onMounted(() => {
   getVote()
 })
-watch(evmAddress, () => {
+watch(()=>useFollowStore().currentAddress, () => {
   getVote()
 })
 function formatRisk(checkResult?: Check) {
@@ -1940,10 +1965,8 @@ function formatVoteP(checkResult: Check | null) {
 }
 
 function voteSupport() {
-  const user = evmAddress.value
-  if (!user) {
-    ElMessage.error(t('connectWalletFirst'))
-    return
+  if(!useFollowStore().currentAddress){
+        useBotStore().changeConnectVisible(true)
   }
   if (checkResult?.value?.my_vote !== 0) {
     ElMessage.error(t('voted'))
@@ -1952,7 +1975,7 @@ function voteSupport() {
   const support = () => {
     const tokenId = route.params.id as string
     loadingVote.value = true
-    _voteSupport(tokenId, user)
+    _voteSupport(tokenId, userAddress.value)
       .then(() => {
         if (checkResult?.value?.my_vote === 0) {
           ElMessage.success(t('voteSuccess'))
@@ -1962,7 +1985,7 @@ function voteSupport() {
         getVote()
       })
       .catch((err) => {
-        ElMessage.error(err)
+        ElMessage.error(err.message || err)
       })
       .finally(() => {
         loadingVote.value = false
@@ -1979,10 +2002,8 @@ function voteSupport() {
     .catch(() => {})
 }
 function voteAgainst() {
-      const user = evmAddress.value
-      if (!user) {
-        ElMessage.error(t('connectWalletFirst'))
-        return
+      if(!useFollowStore().currentAddress){
+        useBotStore().changeConnectVisible(true)
       }
       if (checkResult?.value?.my_vote !== 0) {
         ElMessage.error(t('voted'))
@@ -1992,7 +2013,7 @@ function voteAgainst() {
       const against = () => {
         const tokenId = route.params.id as string
         loadingVote.value = true
-        _voteAgainst(tokenId, user)
+        _voteAgainst(tokenId, userAddress.value)
           .then(() => {
             if (checkResult?.value?.my_vote === 0) {
               ElMessage.success(t('voteSuccess'))
@@ -2002,7 +2023,7 @@ function voteAgainst() {
             getVote()
           })
           .catch(err => {
-            ElMessage.error(err)
+            ElMessage.error(err.message || err)
           })
           .finally(() => {
             loadingVote.value = false
@@ -2019,22 +2040,22 @@ function voteAgainst() {
         .catch(() => {})
     }
 function getVote() {
-  if (!(visible.value && evmAddress.value)) return
+  if (!(visible.value && useFollowStore().currentAddress)) return
   const tokenId = route.params.id as string
-  _getVote(tokenId, evmAddress.value).then(res => {
+  _getVote(tokenId, userAddress.value).then(res => {
+    console.log('--------_getVote-----',res)
       Object.keys(res).forEach(i => {
         if (checkResult.value) {
             checkResult.value[i as keyof Check] = res[i]
         }
       })
-
+      console.log('-------checkResult---',checkResult)
   })
 }
 // const checkResult1 = computed(() => {
 //   console.log('checkResult',checkResult.value)
 //   return checkResult.value
 // })
-onMounted(() => {})
 </script>
 
 <style lang="scss" scoped>

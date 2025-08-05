@@ -166,16 +166,14 @@
           <el-form-item>
             <div style="display: flex; width: 100%" class="mt-30px">
               <el-button
-                style="height: 30px; min-width: 60px; --el-button-font-weight: 400; background: var(--d-333333-l-DDDDDD); border: none"
-                :color="isDark? '#222222' : '#f5f5f5'"
                 class="flex-1"
+                style="height: 30px; min-width: 60px; --el-button-font-weight: 400; background: var(--d-333333-l-DDDDDD); border: none;color: #f5f5f5"
                 @click="reset"
               >
                 {{ $t('reset') }}
               </el-button>
               <el-button
-                :color="isDark? '#222222' : '#f5f5f5'"
-                style="height: 30px; min-width: 60px; --el-button-font-weight: 400; background:#3F80F7"
+                style="height: 30px; min-width: 60px; --el-button-font-weight: 400; background:#3F80F7; color: #f5f5f5"
                 type="primary"
                 class="flex-1"
                 @click="handleConfirm"
@@ -731,7 +729,7 @@ const tabs = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--d-333333-l-eaecef);
+  background: var(--d-333-l-F2F2F2);
   padding: 4px;
   border-radius: 4px;
   font-size: 12px;
@@ -762,7 +760,8 @@ const tabs = computed(() => {
   }
 }
 .border{
-  border-bottom: 1px solid var(--d-333-l-ECECEC)
+  border: none;
+  border-bottom: 1px solid var(--d-333-l-ECECEC);
 }
 :deep().el-form-item__label{
   color: var(--d-666-l-999);
@@ -773,6 +772,7 @@ const tabs = computed(() => {
 }
 :deep().el-input {
   .el-input__wrapper {
+    background: transparent;
     .el-input__inner::placeholder {
       color: var(--d-666-l-999);
     }

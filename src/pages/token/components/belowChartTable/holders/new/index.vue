@@ -282,14 +282,14 @@ const tabs = computed(() => {
       label: t('followed')+`(${globalStore.headFollowsNum.all  - globalStore.headFollowsNum.soldAll })`,
       value: '-100',
     },
-    {
-      label: t('topGainer'),
-      value: 'sell',
-    },
-    {
-      label: t('topLoser'),
-      value: 'buy',
-    },
+    // {
+    //   label: t('topGainer'),
+    //   value: 'sell',
+    // },
+    // {
+    //   label: t('topLoser'),
+    //   value: 'buy',
+    // },
     {
       label: t('24hBuyers'),
       value: 'buy24h',

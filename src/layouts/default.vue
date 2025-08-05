@@ -16,7 +16,7 @@
       </div>
       <TheFooter />
     </div>
-   
+
     <Draggable
       v-if="!signalStore.isLeftFixed&&!signalStore.isRightFixed&&signalStore.signalVisible"
       class-name="top-0 left-0 fixed"
@@ -92,8 +92,8 @@
         :scroll-height="signalStore.winHeight-200"
       />
     </Draggable>
-    
-    
+
+
      <!-- <Draggable
       v-if="!monitorStore.isLeftFixed&&!monitorStore.isRightFixed&&monitorStore.visible"
       class-name="top-0 left-0 fixed"

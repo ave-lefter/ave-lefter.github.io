@@ -978,3 +978,28 @@ export function getMedias(appendix: string,t:ReturnType<typeof useI18n>['t']) {
   }
   return []
 }
+// type PlatformType = 'pump' | 'bonk' | 'moonshot' | 'raydium' | 'believe' | 'jupstudio' | 'moon_new' | 'cookingcity'
+// const pumpColorMap: Record<PlatformType, string> = {
+//   pump: '#55D592',
+//   bonk: '#FF5E1F',
+//   moonshot: '#DFFF17',
+//   raydium: '#FDB32C',
+//   believe: '#00E043',
+//   jupstudio: '#FEB069',
+//   moon_new: '#FF75FF',
+//   cookingcity: '#6C416F',
+// }
+type PlatformType = 'pump.fun' | 'letsbonk.fun' | 'dexscreener.com' | 'raydium.io' | 'believe.app' | 'jup.ag' | 'moonshot.com' | 'cookingcity'
+const pumpColorMap: Record<PlatformType, string> = {
+  'pump.fun': '#55D592',
+  'letsbonk.fun': '#FF5E1F',
+  'dexscreener.com': '#DFFF17',
+  'raydium.io': '#FDB32C',
+  'believe.app': '#00E043',
+  'jup.ag': '#FEB069',
+  'moonshot.com': '#FF75FF',
+  cookingcity: '#6C416F',
+}
+export function getPumpColor(platform: string): string {
+  return pumpColorMap[platform as PlatformType] || '#FFA622'
+}
