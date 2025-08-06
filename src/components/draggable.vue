@@ -129,9 +129,8 @@ function onDrag(x: number, y: number) {
   user-select: none;
   cursor: col-resize;
 }
-.leftDragger{
-  .handle-mr{
-    display: flex!important;
+.left-drag .handle-mr,.right-drag .handle-ml{
+  display: flex!important;
     align-items: center;
     justify-content: center;
     flex-direction: column;
@@ -145,9 +144,13 @@ function onDrag(x: number, y: number) {
     &:hover{
       background: var(--d-666-l-CCC);
     }
-  }
 }
-
+.left-drag .handle-mr{
+  right: 0;
+}
+.right-drag .handle-ml{
+  left: 0;
+}
 .handle-mr {
   right: -2px;
 }

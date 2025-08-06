@@ -1,5 +1,7 @@
 <template>
-  <Draggable :shouldRenderChild="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing" @on-drag="drag">
+  <Draggable 
+  :class="{ 'left-drag': monitorStore.isLeftFixed, 'right-drag': monitorStore.isRightFixed }"
+  :shouldRenderChild="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing" @on-drag="drag">
     <!-- <Monitor v-bind="props2"/> -->
     <component :is="lazyComponent" v-bind="props2"/>
   </Draggable>

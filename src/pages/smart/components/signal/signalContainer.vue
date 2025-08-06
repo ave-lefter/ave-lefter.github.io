@@ -41,11 +41,9 @@ const showResetBtn = shallowRef(false)
 const signalLeftList = useTemplateRef<InstanceType<typeof SignalLeftList>>('signalLeftList')
 const signalRightList = useTemplateRef<InstanceType<typeof SignalRightList>>('signalRightList')
 
-const signalStore = useSignalStore()
 onMounted(() => {
   initWs()
   updateLeftList()
-  signalStore.signalVisible = false
 })
 
 function onReset() {

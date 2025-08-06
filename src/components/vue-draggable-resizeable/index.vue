@@ -381,6 +381,7 @@ export default {
       }
 
       if (this.parent) {
+        this.checkParentSize()
         this.bounds = this.calcResizeLimits()
       }
 

@@ -17,7 +17,7 @@
       <TheFooter />
     </div>
 
-    <Draggable
+    <!-- <Draggable
       v-if="!signalStore.isLeftFixed&&!signalStore.isRightFixed&&signalStore.signalVisible"
       class-name="top-0 left-0 fixed"
       :z="3"
@@ -91,7 +91,7 @@
         :container-width="signalStore.fixedWidth"
         :scroll-height="signalStore.winHeight-200"
       />
-    </Draggable>
+    </Draggable> -->
 
 
      <!-- <Draggable
@@ -184,8 +184,9 @@
     >
       <Monitor :scroll-height="monitorStore.winHeight-160"/>
     </Draggable> -->
+    <SignalDraggable v-if="!signalStore.shouldHide"/>
     <MonitorDragger v-show="monitorStore.visible"/>
-    <DragPump v-show="dragPumpStore.visible"/>
+    <DragPump v-show="dragPumpStore.visible && !dragPumpStore.shouldHide"/>
     <FavAddressPop ref="favAddressPopRef" :visible="favAddressPopVisible" :button-ref="attentionTrigger || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" @onCancel="() => favAddressPopVisible = false"/>
   </div>
 </template>
@@ -193,6 +194,7 @@
 <script setup lang='ts'>
   import TheHeader from '@/components/layouts/TheHeader.vue'
   import TheFooter from '@/components/layouts/TheFooter.vue'
+  import SignalDraggable from '~/components/signal/signalDraggable.vue'
   const botStore = useBotStore()
   const {addressGroups,attentionTrigger,favAddressPopVisible,handleAddAttention} = storeToRefs(useFollowStore())
   const signalStore = useSignalStore()
@@ -201,7 +203,7 @@
   const _style=computed(()=>{
     let paddingLeft=0
     let paddingRight=0
-    if(signalStore.signalVisible){
+    if(signalStore.signalVisible && !signalStore.shouldHide){
       if(signalStore.isLeftFixed){
         paddingLeft+=signalStore.fixedWidth+1
       }else if(signalStore.isRightFixed){
@@ -209,7 +211,8 @@
       }
     }
     ;[monitorStore,dragPumpStore].forEach(storeItem=>{
-      if(storeItem.visible){
+      // 不存在 shouldHide 属性或者 shouldHide 为 false
+      if(storeItem.visible && (!('shouldHide' in storeItem) || !storeItem.shouldHide)){
         if(storeItem.isLeftFixed){
           paddingLeft+=storeItem.fixedWidth+1
         }else if(storeItem.isRightFixed){

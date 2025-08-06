@@ -3,6 +3,10 @@ import type { ChainKey, PumpConfig, PumpObj } from '~/api/types/pump'
 import { _getPumpConfig, _getPumpList } from '@/api/pump'
 
 export const usePumpStore = defineStore('pumpStore', () => {
+    const route = useRoute()
+    const shouldHide = computed(()=>{
+      return route.path.includes('/pump')
+    })
     const visible = useStorage('dragPumpVisible', false)
     const boundingRect = useStorage('dragPumpBoundingRect', {
         width: 480,
@@ -149,6 +153,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
         activeChain,
         pump_query,
         listData,
-        pump_notice
+        pump_notice,
+        shouldHide
     }
 })

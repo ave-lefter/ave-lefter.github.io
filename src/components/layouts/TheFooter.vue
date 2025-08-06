@@ -36,14 +36,15 @@
           </NuxtLink>
         </div>
       </el-popover>
-      <div class="flex items-center gap-4px color-[--d-999-l-666] mx-12px cursor-pointer hover:color-inherit" @click="dragPumpStore.visible=!dragPumpStore.visible">
+      <div class="flex items-center gap-4px color-[--d-999-l-666] mx-12px cursor-pointer hover:color-inherit" :class="{'color-inherit':dragPumpStore.visible}" @click="dragPumpStore.visible=!dragPumpStore.visible">
         <Icon name="custom:pump-icon"/>
         {{ $t('pump1') }}
       </div>
       <el-badge :is-dot="(!!botStore.evmAddress)&&isDoted2" class="mr-12px">
         <div
           id="monitor"
-          class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit "
+          class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit"
+          :class="{'color-inherit':visible}" 
           @click="visible=!visible"
         >
           <Icon
@@ -52,10 +53,11 @@
           {{ $t('walletMonitor') }}
         </div>
       </el-badge>
-      <el-badge v-if="!route.path.includes('smart')" :is-dot="isDoted">
+      <el-badge :is-dot="isDoted">
         <div
           class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit"
-             @click="signalStore.signalVisible=!signalStore.signalVisible"
+          :class="{'color-inherit':signalStore.signalVisible}" 
+          @click="signalStore.signalVisible=!signalStore.signalVisible"
         >
           <Icon
             name="ri:signal-tower-fill"

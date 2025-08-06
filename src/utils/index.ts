@@ -1003,3 +1003,20 @@ const pumpColorMap: Record<PlatformType, string> = {
 export function getPumpColor(platform: string): string {
   return pumpColorMap[platform as PlatformType] || '#FFA622'
 }
+
+export function requestTimeout(interval: number, callback: () => void) {
+  const timerId = { id: null }
+  let lastCallTime = performance.now()
+  const request = () => {
+    timerId.id = requestAnimationFrame(() => {
+      if (performance.now() - lastCallTime < interval) {
+        request()
+      } else {
+        lastCallTime = performance.now()
+        callback()
+      }
+    })
+  }
+  request()
+  return timerId
+}

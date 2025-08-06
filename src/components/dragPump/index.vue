@@ -1,6 +1,6 @@
 <template>
   <Draggable
-:class="{ leftDragger: dragPumpStore.isLeftFixed, rightDragger: dragPumpStore.isRightFixed }"
+:class="{ 'left-drag': dragPumpStore.isLeftFixed, 'right-drag': dragPumpStore.isRightFixed }"
     :shouldRenderChild="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing"
     @on-drag="drag">
     <!-- <Monitor v-bind="props2"/> -->
@@ -49,7 +49,7 @@ const dragConstant = computed(() => {
   return {
     minWidth: 360,
     minHeight: 160,
-    maxWidth: 480,
+    maxWidth: 600,
     initialHeight: dragPumpStore.winHeight - 95,
     centerScrollHeight: dragPumpStore.boundingRect.height - 140,
     otherScrollHeight: dragPumpStore.winHeight - 230,

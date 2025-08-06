@@ -11,7 +11,7 @@
           @click.stop="tableRowClick(row)"
           @contextmenu="handleContextMenu($event, row)"
           @mouseenter="showPopover(row)"
-          @mouseleave="showPop = false"
+          @mouseleave="hidePopover"
         >
           <div class="mr-12px">
             <Icon
@@ -667,10 +667,6 @@ const props = defineProps({
     type: String,
     default: () => '',
   },
-  isPaused: {
-    type: Boolean,
-    default: () => false,
-  },
   loading: {
     type: Boolean,
     default: () => false,
@@ -699,6 +695,7 @@ const router = useRouter()
 const { token_logo_url } = useConfigStore()
 const globalStore = useGlobalStore()
 const { isDark, pumpSetting, pumpBlackList } = storeToRefs(globalStore)
+const isPaused = defineModel<boolean>('isPaused')
 const { t } = useI18n()
 
 function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: string }) {
@@ -745,12 +742,17 @@ function setBtnRef(el: HTMLElement | null) {
 }
 function showPopover(item: { progress: string; id: string; issue_platform: string }) {
   // if (!isOut.value) {
-  console.log('-----[item.id--', item.id)
+  // console.log('-----[item.id--', item.id)
   selected.value = isOut.value ? item.issue_platform || '' : item.progress || ''
   currentBtnRef.value = btnRefs.value[item.id] || null
-  console.log('-----currentBtnRef.value ---', currentBtnRef.value)
+  // console.log('-----currentBtnRef.value ---', currentBtnRef.value)
   showPop.value = true
+  isPaused.value = true
   // }
+}
+function hidePopover() {
+  showPop.value = false
+  isPaused.value = false
 }
 </script>
 
