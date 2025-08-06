@@ -201,28 +201,28 @@
   const _style=computed(()=>{
     let paddingLeft=0
     let paddingRight=0
-    if(monitorStore.visible||signalStore.signalVisible){
-      if(signalStore.signalVisible){
-        if(signalStore.isLeftFixed){
-          paddingLeft+=signalStore.fixedWidth+1
-        }else if(signalStore.isRightFixed){
-          paddingRight+=signalStore.fixedWidth+1
-        }
-      }
-      if(monitorStore.visible){
-        if(monitorStore.isLeftFixed){
-          paddingLeft+=monitorStore.fixedWidth+1
-        }else if(monitorStore.isRightFixed){
-          paddingRight+=monitorStore.fixedWidth+1
-        }
-      }
-      return {
-        paddingLeft:paddingLeft+'px',
-        paddingRight:paddingRight+'px',
+    if(signalStore.signalVisible){
+      if(signalStore.isLeftFixed){
+        paddingLeft+=signalStore.fixedWidth+1
+      }else if(signalStore.isRightFixed){
+        paddingRight+=signalStore.fixedWidth+1
       }
     }
-    else{
+    ;[monitorStore,dragPumpStore].forEach(storeItem=>{
+      if(storeItem.visible){
+        if(storeItem.isLeftFixed){
+          paddingLeft+=storeItem.fixedWidth+1
+        }else if(storeItem.isRightFixed){
+          paddingRight+=storeItem.fixedWidth+1
+        }
+      }
+    })
+    if(paddingLeft===0&&paddingRight===0){
       return {}
+    }
+    return {
+      paddingLeft:paddingLeft+'px',
+      paddingRight:paddingRight+'px',
     }
   })
 </script>

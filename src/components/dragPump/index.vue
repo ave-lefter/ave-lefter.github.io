@@ -1,7 +1,10 @@
 <template>
-  <Draggable :shouldRenderChild="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing" @on-drag="drag">
+  <Draggable
+:class="{ leftDragger: dragPumpStore.isLeftFixed, rightDragger: dragPumpStore.isRightFixed }"
+    :shouldRenderChild="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing"
+    @on-drag="drag">
     <!-- <Monitor v-bind="props2"/> -->
-    <component :is="lazyComponent" v-bind="props2"/>
+    <component :is="lazyComponent" v-bind="props2" />
   </Draggable>
 </template>
 
@@ -9,8 +12,8 @@
 const signalStore = useSignalStore()
 const monitorStore = useMonitorStore()
 const dragPumpStore = usePumpStore()
-const {placement}=storeToRefs(dragPumpStore)
-const key=ref(0)
+const { placement } = storeToRefs(dragPumpStore)
+const key = ref(0)
 
 const reload = () => {
   key.value++
@@ -20,20 +23,20 @@ watch(() => placement.value, () => {
   reCreateChild()
 })
 
-onMounted(()=>{
+onMounted(() => {
   dragPumpStore.getPumpConfig()
-  if(dragPumpStore.visible){
+  if (dragPumpStore.visible) {
     loadComponent()
-  }else{
+  } else {
     setTimeout(() => {
       loadComponent()
-    },3000)
+    }, 3000)
   }
 })
 
 
 watch(() => dragPumpStore.visible, () => {
-  if(dragPumpStore.visible){
+  if (dragPumpStore.visible) {
     loadComponent()
   }
 })
@@ -42,42 +45,52 @@ const loadComponent = async () => {
   const component = await import('./pumpPop.vue')
   lazyComponent.value = component.default
 }
-const props1=computed(()=>{
+const dragConstant = computed(() => {
+  return {
+    minWidth: 360,
+    minHeight: 160,
+    maxWidth: 480,
+    initialHeight: dragPumpStore.winHeight - 95,
+    centerScrollHeight: dragPumpStore.boundingRect.height - 140,
+    otherScrollHeight: dragPumpStore.winHeight - 230,
+  }
+})
+const props1 = computed(() => {
   const placementData = {
-    center:{
-      className:'top-0 left-0 fixed',
-      initialWidth:dragPumpStore.boundingRect.width,
-      initialHeight:dragPumpStore.boundingRect.height,
-      x:dragPumpStore.boundingRect.x,
-      y:dragPumpStore.boundingRect.y,
-      minWidth:360,
-      minHeight:160,
-      parent:true,
-      handles:['tl','tm','tr','mr','br','bm','bl','ml'],
-      dragHandle:'.drag-handle'
+    center: {
+      className: 'top-0 left-0 fixed',
+      initialWidth: dragPumpStore.boundingRect.width,
+      initialHeight: dragPumpStore.boundingRect.height,
+      x: dragPumpStore.boundingRect.x,
+      y: dragPumpStore.boundingRect.y,
+      minWidth: dragConstant.value.minWidth,
+      minHeight: dragConstant.value.minHeight,
+      parent: true,
+      handles: ['tl', 'tm', 'tr', 'mr', 'br', 'bm', 'bl', 'ml'],
+      dragHandle: '.drag-handle'
     },
-    left:{
+    left: {
       className: '[&&]:relative shrink-0 left fixed! top-61px',
       style: `left:${getLeftVal('left')}px`,
       axis: 'x',
       x: 0,
-      minWidth:360,
-      maxWidth: 438,
+      minWidth: dragConstant.value.minWidth,
+      maxWidth: dragConstant.value.maxWidth,
       initialWidth: dragPumpStore.fixedWidth,
-      initialHeight: dragPumpStore.winHeight - 95,
+      initialHeight: dragConstant.value.initialHeight,
       parent: true,
       handles: ['mr'],
       dragHandle: '.drag-handle'
     },
-    right:{
+    right: {
       className: '[&&]:relative shrink-0 right fixed! top-61px left-0',
-      style: `left:${getLeftVal('right')}px`,
       axis: 'x',
-      x: 0,
-      minWidth:360,
-      maxWidth: 438,
+      x: dragPumpStore.winWidth - dragPumpStore.fixedWidth - getLeftVal('right'),
+      y: 0,
+      minWidth: dragConstant.value.minWidth,
+      maxWidth: dragConstant.value.maxWidth,
       initialWidth: dragPumpStore.fixedWidth,
-      initialHeight: dragPumpStore.winHeight - 95,
+      initialHeight: dragConstant.value.initialHeight,
       parent: true,
       handles: ['ml'],
       dragHandle: '.drag-handle'
@@ -86,13 +99,13 @@ const props1=computed(()=>{
   return placementData[placement.value]
 })
 
-function getLeftVal(direction:'left'|'right') {
+function getLeftVal(direction: 'left' | 'right') {
   let val = 0
   const attribute = direction === 'left' ? 'isLeftFixed' : 'isRightFixed'
-  if(signalStore[attribute] && signalStore.signalVisible){
+  if (signalStore[attribute] && signalStore.signalVisible) {
     val += signalStore.fixedWidth
   }
-  if(monitorStore[attribute] && monitorStore.visible){
+  if (monitorStore[attribute] && monitorStore.visible) {
     val += monitorStore.fixedWidth
   }
   return val + 1
@@ -108,40 +121,40 @@ const reCreateChild = () => {
   })
 }
 
-const props2=computed(()=>{
-  let data={} as any
-  if(placement.value==='center'){
-    data={
-      class:'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]',
-      scrollHeight:dragPumpStore.boundingRect.height-140,
+const props2 = computed(() => {
+  let data = {} as any
+  if (placement.value === 'center') {
+    data = {
+      class: 'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]',
+      scrollHeight: dragConstant.value.centerScrollHeight,
     }
-  }else{
-     data={
-      scrollHeight:dragPumpStore.winHeight-160,
+  } else {
+    data = {
+      scrollHeight: dragConstant.value.otherScrollHeight,
     }
   }
   return data
 })
 function dragStop(x: number, y: number) {
-  if(placement.value==='left'){
-    dragPumpStore.onLeftDragStop(x,y)
-  }else if(placement.value==='right'){
-    dragPumpStore.onRightDragStop(x,y)
-  }else{
-    dragPumpStore.onDragStop(x,y)
+  if (placement.value === 'left') {
+    dragPumpStore.onLeftDragStop(x, y)
+  } else if (placement.value === 'right') {
+    dragPumpStore.onRightDragStop(x, y)
+  } else {
+    dragPumpStore.onDragStop(x, y)
   }
 }
 function resizing(w: number, h: number) {
-  if(placement.value==='center'){
-    dragPumpStore.onResizing(w,h)
-  }else {
+  if (placement.value === 'center') {
+    dragPumpStore.onResizing(w, h)
+  } else {
     dragPumpStore.onFixedResizing(w)
   }
 }
 function drag(x: number) {
-  if(placement.value==='center'){
+  if (placement.value === 'center') {
     dragPumpStore.onDrag(x)
-  } else{
+  } else {
     return null
   }
 }

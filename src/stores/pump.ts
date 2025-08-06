@@ -5,8 +5,8 @@ import { _getPumpConfig, _getPumpList } from '@/api/pump'
 export const usePumpStore = defineStore('pumpStore', () => {
     const visible = useStorage('dragPumpVisible', false)
     const boundingRect = useStorage('dragPumpBoundingRect', {
-        width: 360,
-        height: 500,
+        width: 480,
+        height: 700,
         x: 100,
         y: 100
     })
