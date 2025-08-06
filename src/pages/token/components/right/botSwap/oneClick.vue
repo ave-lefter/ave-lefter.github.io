@@ -1,5 +1,5 @@
 <template>
-  <button v-show="botStore.isSupportChains?.includes(chain)" class="one-click-btn mr--12px clickable" :class="{ 'active': visible }" @click.stop="visible = !visible">
+  <button v-show="botStore.isSupportChains?.includes(chain)" class="one-click-btn clickable" :class="{ 'active': visible }" @click.stop="visible = !visible">
     <Icon name="ion:flash" />
     <span class="ml-5px">{{ $t('oneClick') }}</span>
   </button>

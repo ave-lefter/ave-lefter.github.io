@@ -1,7 +1,7 @@
 <template>
   <a
     v-if="['solana', 'bsc']?.includes(chain)"
-    class="bubble"
+    class="bubble ml--12px"
     href=""
     @click.stop.prevent="show_bubble = !show_bubble"
   >
