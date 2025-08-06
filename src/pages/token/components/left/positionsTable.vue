@@ -17,6 +17,7 @@ const botSettingStore = useBotSettingStore()
 const botStore = useBotStore()
 const botSwapStore = useBotSwap()
 const priceV2Store = usePriceV2Store()
+const walletStore = useWalletStore()
 const tokenStore = useTokenStore()
 const {hide_risk, hide_small} = storeToRefs(useGlobalStore())
 
@@ -186,15 +187,21 @@ function resetStatus() {
   listStatus.value.finished = false
 }
 
-const walletStore = useWalletStore()
+const isEvmChainWallet = computed(() => {
+  return getChainInfo(walletStore.chain)?.vm_type === 'evm'
+})
 
 const userIds = computed(() => {
   if (botStore.userInfo) {
     return botStore.userInfo.addresses.map(({address, chain}) => address + '-' + chain)
-  } else if (walletStore.address) {
-    return [walletStore.address + '-' + walletStore.chain]
+  } else {
+     if (walletStore.address && isEvmChainWallet.value && (walletStore.walletName!=='WatchWallet')) {
+      return [walletStore.address + '-' + 'bsc', walletStore.address + '-' + 'base', walletStore.address + '-' + 'eth']
+    }
+    else {
+      return [walletStore.address + '-' + walletStore.chain]
+    }
   }
-  return []
 })
 
 watch(() => userIds.value, () => {
@@ -496,7 +503,7 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string) {
         {{ $t('hideSmallAssets1') + '<1USD' }}
       </el-checkbox>
       <NetSelect
-        v-if="botStore.evmAddress"
+        v-if="botStore.evmAddress||(walletStore.address && isEvmChainWallet && (walletStore.walletName!=='WatchWallet'))"
         v-model:userIds="tableFilter.user_ids"
         @update:user-ids="resetStatus();_getUserBalance()"
       />
