@@ -289,7 +289,7 @@ function jumpBalance(row) {
       token1_symbol: '',
       pairAddress: '',
     },
-    user_address: route.params.userAddress,
+    user_address: route.params.userAddress as string || useBotStore().getWalletAddress(row.chain),
   })
 }
 

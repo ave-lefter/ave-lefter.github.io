@@ -170,7 +170,7 @@ async function _getTokenDetailMarks(type: string) {
       >
         <div class="py-24px px-20px min-h-full">
           <div class="justify-between flex">
-            <div class="flex items-center">
+            <div class="flex items-center cursor-pointer" @click="navigateTo(`/token/${tokenDetailsStore.tokenInfo?.id}`)">
               <TokenImg
                 :row="{
                 logo_url:tokenDetailsStore.tokenInfo?.logo_url || '',
