@@ -159,6 +159,8 @@ function init() {
   // wsStore.onmessageTxUpdateToken()
   tokenStore._getTotalHolders()
   tagStore.getTagArr()
+  tokenStore.twitterType = 0
+  tokenStore.getXType(route.params.id as string)
 }
 
 watch(() => route.params.id, () => {

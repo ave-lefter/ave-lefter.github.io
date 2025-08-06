@@ -191,11 +191,41 @@
                     "
                     class="flex text-12px"
                   >
-                    <div v-for="(item, $index) in row?.medias" :key="$index" class="tag-btn">
+                    <div
+                      v-for="(item, $index) in row?.medias"
+                      :key="$index"
+                      class="tag-btn"
+                    >
                       <template v-if="item.url">
-                        <span v-if="item.name === 'QQ'" v-tooltip="item.url" class="bg-btn mr-8px">
-                          <Icon :name="`custom:${item.icon}`" class="text-[--d-666-l-999] h-12px" />
+                        <span
+                          v-if="item.name === 'QQ'"
+                          v-tooltip="item.url"
+                          class="bg-btn mr-8px"
+                        >
+                          <Icon
+                            :name="`custom:${item.icon}`"
+                            class="text-[--d-666-l-999] h-12px"
+                          />
                         </span>
+                        <XPopup v-else-if="item.icon === 'twitter'" :tokenId="((row.token + '-' + row.chain) as string)" :type="row.twitter_type">
+                        <a
+                          :href="item.url"
+                          target="_blank"
+                          class="bg-btn"
+                          @click.stop
+                        >
+                          <XIcon
+                            v-if="[1, 2, 3].includes(row.twitter_type)"
+                            :type="row.twitter_type"
+                            class="text-12px"
+                          />
+                          <Icon
+                            v-else
+                            :name="`custom:${item.icon}`"
+                            class="text-[--d-666-l-999] text-12px"
+                          />
+                        </a>
+                      </XPopup>
                         <a
                           v-else
                           v-tooltip="item.url"
@@ -204,7 +234,10 @@
                           class="bg-btn mr-8px"
                           @click.stop
                         >
-                          <Icon :name="`custom:${item.icon}`" class="text-[--d-666-l-999] h-12px" />
+                          <Icon
+                            :name="`custom:${item.icon}`"
+                            class="text-[--d-666-l-999] h-12px"
+                          />
                         </a>
                       </template>
                     </div>
@@ -496,7 +529,7 @@
                 v-tooltip="$t('dev_balance_ratio_cur_tips')"
                 class="flex mr-5px bg-btn"
               >
-                <img src="@/assets/images/pump/dev.png" class="mr-2px h-10px" />
+                <img src="@/assets/images/pump/dev.png" class="mr-2px h-10px" >
                 <span
                   :style="{
                     color:
@@ -572,14 +605,14 @@
                   src="@/assets/images/cabal.svg"
                   :width="11"
                   alt=""
-                />
+                >
                 <img
                   v-else
                   class="mr-2px"
                   :src="`${token_logo_url}address_portrait/Cabal11.png`"
                   :width="11"
                   alt=""
-                />
+                >
                 <span class="color-[--d-999-l-666]">{{
                   formatNumber(
                     Number(row?.cabal_tag_count) > 0.001 ? row?.cabal_tag_count || 0 : 0,
@@ -610,7 +643,7 @@
                     class="mr-5px"
                     alt=""
                     srcset=""
-                  />
+                  >
                   <span>Migrating...</span>
                 </div>
                 <QuickSwap
@@ -658,6 +691,7 @@ import { formatNumber } from '@/utils/formatNumber'
 // import { upColor } from '@/utils/constants'
 import { Icon } from '#components'
 import type { PumpObj } from '@/api/types/pump'
+import XIcon from '~/components/xPopup/xIcon.vue'
 const props = defineProps({
   tableList: {
     type: Array<PumpObj>,
@@ -735,13 +769,13 @@ function setBtnRef(el: HTMLElement | null) {
     // console.log('-------el?.id----',el?.id)
   }
 }
-function showPopover(item: { progress: string; id: string; issue_platform: string }) {
+function showPopover(item: { progress: number; id: string; issue_platform: string }) {
   // if (!isOut.value) {
-  console.log('-----[item.id--', item.id)
-  selected.value = isOut.value ? item.issue_platform || '' : item.progress || ''
-  currentBtnRef.value = btnRefs.value[item.id] || null
-  console.log('-----currentBtnRef.value ---', currentBtnRef.value)
-  showPop.value = true
+    // console.log('-----[item.id--',item.id)
+    selected.value = isOut.value? (item.issue_platform  || '') : String(item.progress || '')
+    currentBtnRef.value = btnRefs.value[item.id] || null
+    // console.log('-----currentBtnRef.value ---',currentBtnRef.value )
+    showPop.value = true
   // }
 }
 </script>

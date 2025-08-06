@@ -1268,5 +1268,11 @@
   "inviteCodeUpdate": "邀请码升级",
   "chainWalletNotRefer": "全新邀请码暂不支持链钱包，请切换 Bot 钱包登录<div style=\"margin-top: 12px\">为什么选择Bot钱包？</div>🚀 全平台支持：App、TG Bot、Web、H5 一码通用，跨平台享受返佣！<br>🔥 丝滑邀请：分享邀请链接，轻松社媒注册，丝滑建立邀请关系！<br>💰 渠道返佣：升级邀请码，可申请渠道返佣，分享更多收益！<br>🌐 数据看板：清晰了解分佣来源，实时查看每一笔收益和转化！",
   "loginNow": "立即登录",
-  "refer": "邀请返佣"
+  "refer": "邀请返佣",
+  "accountNotFound": "账号不存在",
+  "youCanNotSeeThisAccount": "您查找的账号不存在",
+  "communityNotFound": "社区不存在",
+  "youCanNotSeeThisCommunity": "您查找的社区不存在",
+  "tweetNotFound": "推文不存在",
+  "youCanNotSeeThisTweet": "你查找的推文不存在"
 }

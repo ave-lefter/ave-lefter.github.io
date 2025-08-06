@@ -1269,5 +1269,11 @@
   "inviteCodeUpdate": "Referral Code Upgrade",
   "chainWalletNotRefer": "The new referral code does not support Crypto Wallet. Please log in with social media instead.<div style=\"margin-top: 12px\">Why choose Bot wallet? \n</div>🚀 Multi-Platform Support: App, Telegram Bot, Web, and H5 all use the same code. Enjoy cross-platform commission rewards! \n<br>🔥 Seamless Invites: Share your invite link and register easily through social media. Build connections smoothly!\n<br>💰 Channel Commissions: Upgrade your invite code to earn channel commissions. Share more and earn more!\n<br>🌐 Dashboard: See where your commissions come from and track every earning and conversion in real time.",
   "loginNow": "Login Now",
-  "refer": "Refer"
+  "refer": "Refer",
+  "accountNotFound": "The account does not exist",
+  "youCanNotSeeThisAccount": "The account you are looking for does not exist",
+  "communityNotFound": "The community does not exist",
+  "youCanNotSeeThisCommunity": "The community you are looking for does not exist",
+  "tweetNotFound": "The tweet do not exist",
+  "youCanNotSeeThisTweet": "The tweet you are looking for does not exist"
 }
