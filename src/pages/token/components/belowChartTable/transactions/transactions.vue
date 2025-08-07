@@ -895,7 +895,7 @@ const collect = async (row: any,index:number) => {
               ${{ formatNumber(getAmount(row, true, true), 2) }}
             </template>
             <template v-else>
-              ${{ formatNumber(getAmount(row, true, false), 3) }}
+              {{ formatNumber(getAmount(row, true, false), 3) }}
               <span class="color-[--d-999-l-666]">
                 &nbsp;{{ getChainInfo(row.chain)?.main_name }}
               </span>
