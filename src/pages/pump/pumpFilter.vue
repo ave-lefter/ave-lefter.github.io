@@ -2,11 +2,12 @@
   <el-popover
       v-model:visible="visible"
       placement="bottom"
-      popper-class="w-pumpFilter popper"
+      popper-class="w-pumpFilter popper new-popover"
       title=""
       :width="398"
       trigger="click"
       popper-style="padding: 10px"
+      append-to-body
     >
       <template #reference>
         <div :class="['filter-btn', { active: visible }, filterNumber > 0 ? 'hight': '']">
@@ -166,7 +167,7 @@
             <div style="display: flex; width: 100%" class="mt-30px">
               <el-button
                 class="flex-1"
-                style="height: 30px; min-width: 60px; --el-button-font-weight: 400; background: var(--d-333333-l-DDDDDD); border: none;color: #f5f5f5"
+                style="height: 30px; min-width: 60px; --el-button-font-weight: 400; background: var(--d-151A22-l-E8F1FF); border: none;color: #f5f5f5"
                 @click="reset"
               >
                 {{ $t('reset') }}
@@ -677,8 +678,8 @@ const tabs = computed(() => {
   justify-content: center;
   padding: 5px 8px;
   cursor: pointer;
-  color: var(--d-666-l-999);
-  background: var(--d-222-l-F2F2F2);
+  color: var(--d-566275-l-8CA0C3);
+  background: var(--d-151A22-l-E8F1FF);
   border-radius: 4px;
   font-size: 12px;
   line-height: 14px;
@@ -702,7 +703,7 @@ const tabs = computed(() => {
     width: 14px;
     height: 14px;
     text-align: center;
-    background-color: var(--d-666-l-999);
+    background-color: var(--d-566275-l-8CA0C3);
     color: var(--d-F5F5F5-l-333);
     margin-left: 4px;
     font-size: 10px;
@@ -725,7 +726,7 @@ const tabs = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--d-333-l-F2F2F2);
+  background: var(--d-151A22-l-E8F1FF);
   padding: 4px;
   border-radius: 4px;
   font-size: 12px;
@@ -734,7 +735,7 @@ const tabs = computed(() => {
   button {
     border: none;
     // font-size: 14px;
-    color: var(--d-999-l-666);
+    color: var(--d-566275-l-8CA0C3);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;
@@ -760,17 +761,24 @@ const tabs = computed(() => {
   border-bottom: 1px solid var(--d-333-l-ECECEC);
 }
 :deep().el-form-item__label{
-  color: var(--d-666-l-999);
+  color: var(--d-566275-l-8CA0C3);
 
 }
 :deep().el-checkbox__label{
-  color: var(--d-666-l-999);
+  color: var(--d-566275-l-8CA0C3);
 }
-:deep().el-input {
+:deep().el-input.el-input {
+  --el-input-bg-color: var(--d-566275-l-8CA0C3);
+  --el-input-border-color: var(--d-566275-l-8CA0C3);
+  --el-input-border-radius: 4px;
   .el-input__wrapper {
     background: transparent;
+    &.is-focus {
+      border-color: var(--d-F5F5F5-l-0B0D12); /* 蓝色 */
+      box-shadow: 0 0 0 1px var(--d-F5F5F5-l-0B0D12) inset;
+    }
     .el-input__inner::placeholder {
-      color: var(--d-666-l-999);
+      color: var(--d-566275-l-8CA0C3);
     }
   }
 }

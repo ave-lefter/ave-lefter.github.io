@@ -4,7 +4,7 @@
     :popper-style="`--el-popover-padding: 0; --el-bg-color-overlay: ${mode === 'dark' ? '#222222' : '#ffffff'}`">
     <template #reference>
       <div
-        class="flex text-12px clickable-btn text-[--d-E9E9E9-l-222] h-32px cursor-pointer flex items-center bg-[--d-222-l-F2F2F2] border-rd-4px px-10px py-0 min-w-80px  ml-8px">
+        class="flex text-12px clickable-btn text-[--d-E9E9E9-l-222] h-32px cursor-pointer flex items-center bg-[--d-141721-l-E8F1FF] border-rd-4px px-10px py-0 min-w-80px  ml-8px">
         <img
           class="border-rd-[50%] mr-5px" height="16" :src="generateAvatarIcon(botStore?.userInfo?.name || '')"
           alt="">

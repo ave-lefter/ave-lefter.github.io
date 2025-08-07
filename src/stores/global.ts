@@ -49,6 +49,7 @@ export const useGlobalStore = defineStore('global', () => {
     isGutter: boolean
     isRight: boolean
     isBlacklist: boolean
+    show_search: boolean
     define: string[]
   }>('pumpSetting', {
     fontSize_mc: '12px',
@@ -58,7 +59,8 @@ export const useGlobalStore = defineStore('global', () => {
     isGutter: false,
     isRight: false,
     isBlacklist: true,
-    define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','cabal','insider', 'sniper', 'rug', 'kol'],
+    show_search: true,
+    define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','cabal','insider', 'sniper', 'rug', 'kol', 'markers'],
   })
 
   const hide_risk=shallowRef(1)

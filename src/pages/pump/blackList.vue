@@ -12,7 +12,7 @@
     width="780"
     height="590"
     :show-close="true"
-    class="search-dialog custom-dialog"
+    class="search-dialog custom-dialog new-dialog"
     header-class="p-0!"
     append-to-body
     lock-scroll
@@ -44,15 +44,15 @@
             <Icon
               v-if="query"
               name="pajamas:clear"
-              class="color-[--d-666-l-999] text-12px hover:opacity-70% cursor-pointer mr-10px"
+              class="color-[--d-566275-l-8CA0C3] text-12px hover:opacity-70% cursor-pointer mr-10px"
               @click="query = ''"
             />
 
             <el-popover
               v-model:visible="visible_popper"
               placement="bottom-start"
-              trigger="hover"
-              popper-class="[&&]:[--el-popover-padding:12px_0_12px_0]"
+              trigger="click"
+              popper-class="[&&]:[--el-popover-padding:12px_0_12px_0] new-popover"
             >
               <template #reference>
                 <el-button class="btn mr-8px"
@@ -72,7 +72,7 @@
                   <li
                     v-for="(item, $index) in typeList?.slice(1)"
                     :key="$index"
-                    class="px-12px py-12px w-100% cursor-pointer hover:bg-[--d-333-l-F5F5F5]"
+                    class="px-12px py-12px w-100% cursor-pointer hover:bg-[--d-151A22-l-E8F1FF]"
                     @click="add(item)"
                   >
                     {{ item.name }}
@@ -129,7 +129,7 @@
         <AveEmpty v-else class="mt-150px" />
       </div>
     </div>
-    <div class="text-14px count color-[--d-666-l-999] bg-[--d-222-l-FFF] w-full px-20px py-20px">
+    <div class="text-14px count color-[--d-566275-l-8CA0C3] bg-[--d-0B0D12-l-F6F9FF] w-full px-20px py-20px">
       {{ $t('total') }}<span
         class="ml-5px"
         :class="list?.length > 0 ? 'color-[--d-F5F5F5-l-333]' : ''"
@@ -248,8 +248,8 @@ function restore(item: { address: string, type: string }) {
   button {
     border: none;
     // font-size: 14px;
-    background: var(--d-333-l-F2F2F2);
-    color: var(--d-999-l-666);
+    background: var(--d-151A22-l-E8F1FF);
+    color: var(--d-8CA0C3-l-566275);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;
@@ -273,7 +273,7 @@ function restore(item: { address: string, type: string }) {
 }
 .btn {
   border: none;
-  background: var(--d-222-l-F2F2F2);
+  background: var(--d-0B0D12-l-F6F9FF);
   padding: 7px 8px;
   border-radius: 4px;
   display: flex;
@@ -284,13 +284,13 @@ function restore(item: { address: string, type: string }) {
   color: var(--d-F5F5F5-l-333);
   height: 28px;
   &.gray {
-    color: var(--d-999-l-666);
+    color: var(--d-8CA0C3-l-566275);
     &.active,&:hover {
       color: var(--d-F5F5F5-l-333);
     }
   }
   &.restore {
-    background: var(--d-333333-l-DDDDDD);
+    background: var(--d-151A22-l-E8F1FF);
     &:hover {
       color: #fff;
       background: #3f80f7;
@@ -298,21 +298,27 @@ function restore(item: { address: string, type: string }) {
   }
 }
 .content {
-  border-top: 1px solid var(--d-333333-l-F2F2F2);
+  border-top: 1px solid var(--d-151A22-l-E8F1FF);
   margin-top: 20px;
 }
-.search-input {
-  background: var(--d-333333-l-F2F2F2);
+.search-dialog.el-dialog {
+  .search-input {
+  background: var(--d-151A22-l-E8F1FF);
   padding: 0;
-
   border-radius: 4px;
+  :deep().el-input__wrapper {
+    border-bottom: 1px solid var(--d-151A22-l-E8F1FF);
+    .el-input__inner::placeholder {
+      color: var(--d-566275-l-8CA0C3);
+    }
+  }
 }
-
+}
 .history {
   margin-top: 10px;
   min-height: 400px;
   .top {
-    color: var(--d-666-l-999);
+    color: var(--d-566275-l-8CA0C3);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -336,7 +342,7 @@ function restore(item: { address: string, type: string }) {
     li {
       padding: 0 20px;
       &:hover {
-        background-color: var(--d-2A2A2A-l-F2F2F2);
+        background-color: var(--d-151A22-l-E8F1FF);
         .btn.restore {
           color: #fff;
           background: #3f80f7;
@@ -346,7 +352,7 @@ function restore(item: { address: string, type: string }) {
 
     li > a:hover {
       text-decoration: none;
-      background-color: var(--d-2A2A2A-l-F2F2F2);
+      background-color: var(--d-151A22-l-E8F1FF);
       color: var(--a-text-1-color);
       opacity: 1;
     }
