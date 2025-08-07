@@ -36,6 +36,8 @@ const tagStore = useTagStore()
 const route = useRoute()
 const aveTableRef = ref<InstanceType<typeof AveTable> | null>(null)
 const firstActivated = ref(true)
+const followStore = useFollowStore()
+const themeStore = useThemeStore()
 onActivated(() => {
   if (!firstActivated.value && aveTableRef.value) {
     aveTableRef.value.scrollToTop(0)
@@ -73,7 +75,7 @@ const tabs = computed(() => {
     value: 'sell'
   },
   {
-    label: t('followed')+ `(${globalStore.headFollowsNum.all})`,
+    label: t('followed')+ `(${(globalStore.headFollowsNum.all)})`,
     value: '-100'
   },
   {
@@ -232,6 +234,12 @@ watch(() => route.params.id, val => {
   immediate: true
 })
 
+watch(() => followStore.currentAddress, () => {
+  if (activeTab.value === '-100') {
+    _getTokenTxs()
+  }
+})
+
 useVisibilityChange(() => {
   resetCache()
   _getTokenTxs()
@@ -365,6 +373,11 @@ async function _getTokenTxs() {
       token_id: route.params.id as string,
       tag_type,
       maker: tableFilter.value.markerAddress
+    }
+    if (tag_type === '-100' && !followStore.currentAddress) {
+      tokenTxs.value = []
+      listStatus.value.loadingTxs = false
+      return
     }
     const res = await getTokenTxs(getPairTxsParams)
     realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
@@ -581,8 +594,8 @@ function goBrowser(row: IGetTokenTxsResponse) {
 const tabsContainer = ref<HTMLElement | null>(null)
 function setActiveTab(val: string,index:number) {
   activeTab.value = val
-  if (val === '-100' && !botStore.evmAddress) {
-    throw new Error('')
+  if (val === '-100' && !followStore.currentAddress) {
+    return
   }
   txCount.value = {}
   tableFilter.value.tag_type = val
@@ -754,6 +767,18 @@ const collect = async (row: any,index:number) => {
         onMouseleave:()=>isHoverTable=false,
         onClick: onRowClick
       }">
+        <template  #empty>
+          <div v-if="!(listStatus.loadingTxs || listStatus.loadingLiq)" class="h-full flex flex-col items-center justify-center pt-100px">
+            <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
+            <img v-else src="@/assets/images/empty-black.svg" alt="">
+            <span
+              class="mt-10px color-[--d-666-l-999]"
+            >
+              {{ t('emptyNoData') }}
+            </span>
+          </div>
+          <span v-else/>
+        </template>
         <template #header-time>
           <div class="flex items-center gap-2px">
             <span>{{ $t('time') }}</span>
