@@ -651,7 +651,7 @@
                 </li>
                 <li v-if="checkResult?.mechanism_intro" class="card-list-item">
                   <span  style="word-break: keep-all">{{ $t('mechanism_intro') }}</span>
-                  <span class="indent" v-html="checkResult?.mechanism_intro?.replace?.(/\n/g, '<br/>')"/>
+                  <span class="" v-html="checkResult?.mechanism_intro?.replace?.(/\n/g, '<br/>')"/>
                 </li>
               </ul>
             </div>
