@@ -594,9 +594,9 @@ function goBrowser(row: IGetTokenTxsResponse) {
 const tabsContainer = ref<HTMLElement | null>(null)
 function setActiveTab(val: string,index:number) {
   activeTab.value = val
-  if (val === '-100' && !followStore.currentAddress) {
-    return
-  }
+  // if (val === '-100' && !followStore.currentAddress) {
+  //   return
+  // }
   txCount.value = {}
   tableFilter.value.tag_type = val
   if (val !== 'liquidity') {
