@@ -380,6 +380,9 @@ watch(activeTab, (val) => {
   } else if (val === 'buy24h' || val === 'sell24h') {
     const prop = val === 'buy24h' ? 'bought_usd' : 'sold_usd'
     holdersRef?.value?.sort(prop, 'descending')
+  } else if(val === '-100' && !selfAddress.value) {
+    // 没有登录不调用已关注接口
+    resetFollowedData()
   } else {
     const sort = holderListSortObj?.value[val] || {}
     if (sort.sort_by && sort.order) {
@@ -394,8 +397,17 @@ onMounted(() => {
   getHoldersList()
 })
 onActivated(() => {
+  if(activeTab.value === '-100' && !selfAddress.value) {
+     // 没有登录不调用已关注接口
+     resetFollowedData()
+    return
+  }
   getHoldersList()
 })
+function resetFollowedData() {
+  holderListObj.value['-100'] = []
+  aggregateStatsObj.value['-100'] = {}
+}
 function setActiveTab(val: typeof activeTab.value) {
   activeTab.value = val
 }
