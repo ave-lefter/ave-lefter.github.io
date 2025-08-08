@@ -38,7 +38,7 @@ export const getTreasureConfig = createCacheRequest(function(): Promise<IGetTrea
   })
 }, 2000)
 
-export function getTreasureList(query) {
+export function getTreasureList(query: Record<string, any>) {
   const {$api} = useNuxtApp()
   return $api('/v1api/v4/tokens/treasure/list', {
     method: 'get',

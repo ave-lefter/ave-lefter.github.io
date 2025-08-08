@@ -14,15 +14,25 @@ import { getTokensPrice  } from '@/api/token'
 import { createCacheRequest } from '@/utils/cacheRequest'
 import { tgLogin } from '@/utils/bot'
 import { useBotSettingStore } from './botSetting'
-import { deepMerge, evm_utils as utils } from '@/utils'
+import { deepMerge, evm_utils as utils ,getChainInfo } from '@/utils'
 import { NATIVE_TOKEN } from '@/utils/constants'
 
 type AddressItem = { chain: string; address: string; price?: number; balance?: string; decimals?: number; logo_url?: string };
 
 const _refreshAccessToken = createCacheRequest(_refAcc, 3000)
 export const useBotStore = defineStore('bot', () => {
-
+  const walletStore = useWalletStore()
+  const configStore = useConfigStore()
   const isSupportChains = ['eth', 'bsc', 'solana', 'base']
+  const isSupportEvmChains = computed(() => {
+    const chainConfig = configStore.chainConfig
+    const isEvmChainWallet = getChainInfo(walletStore.chain)?.vm_type === 'evm'
+    if(isEvmChainWallet) {
+      return chainConfig?.filter((item) => item.vm_type === 'evm')?.map(item=>item.net_name)
+    } else{
+      return []
+    }
+  })
   const accessToken = useLocalStorage('bot_accessToken', '')
   const refreshToken = useLocalStorage('bot_refreshToken', '')
   const evmAddress = useLocalStorage('bot_evmAddress', '')
@@ -315,6 +325,7 @@ export const useBotStore = defineStore('bot', () => {
     getWebConfig,
     updateWebConfig,
     isSupportChains,
+    isSupportEvmChains,
     getWalletAddress,
     changeConnectVisible,
     connectWalletTab,

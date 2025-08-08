@@ -1,44 +1,68 @@
 <template>
   <div class="mt-20px mb-30px">
     <el-scrollbar v-loading="loading" height="calc(100vh - 215px)">
-      <ul v-if="tableList?.length >0" class="pump-item_list">
+      <ul v-if="tableList?.length > 0" class="pump-item_list">
         <li
           v-for="row in tableList"
           :id="row?.target_token + '-' + row?.chain"
           :key="row?.pair + '-' + row?.chain"
+          :ref="setBtnRef"
           class="pump-item_item relative"
           @click.stop="tableRowClick(row)"
           @contextmenu="handleContextMenu($event, row)"
-          :ref="setBtnRef"
           @mouseenter="showPopover(row)"
           @mouseleave="showPop = false"
-
         >
           <div class="mr-12px">
-            <Icon  v-if="pumpBlackList?.findIndex(i=> (i.address == row.token && i.type=='ca' || i.address == row.symbol && i.type=='keyword')) !==-1"  name="custom:key-invisible" class="text-10px eye" @click.stop="addOrRemoveBlaclList(row,'ca')"/>
-            <Icon v-else name="custom:key-visible" class="text-8px eye" @click.stop="addOrRemoveBlaclList(row,'ca')"/>
+            <Icon
+              v-if="
+                pumpBlackList?.findIndex(
+                  (i) =>
+                    (i.address == row.token && i.type == 'ca') ||
+                    (i.address == row.symbol && i.type == 'keyword')
+                ) !== -1
+              "
+              name="custom:key-invisible"
+              class="text-10px eye"
+              @click.stop="addOrRemoveBlaclList(row, 'ca')"
+            />
+            <Icon
+              v-else
+              name="custom:key-visible"
+              class="text-8px eye"
+              @click.stop="addOrRemoveBlaclList(row, 'ca')"
+            />
             <div class="token-logo">
-              <el-image class="token-icon" :src="getSymbolDefaultIcon(row, pumpSetting.avatar_isCircle=='rect'? 'rect' :'circle')" :style="{ 'border-radius': pumpSetting.avatar_isCircle=='circle' ? '100%' : '0'}">
+              <el-image
+                class="token-icon"
+                :src="
+                  getSymbolDefaultIcon(
+                    row,
+                    pumpSetting.avatar_isCircle == 'rect' ? 'rect' : 'circle'
+                  )
+                "
+                :style="{ 'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '0' }"
+              >
                 <template #error>
                   <img
                     class="token-icon h-32px text-16px color-#fff"
                     :src="getChainDefaultIcon(row.chain, row.symbol)"
-                  />
+                  >
                 </template>
                 <template #placeholder>
                   <img
                     class="token-icon h-32px text-16px color-#fff"
                     :src="getChainDefaultIcon(row.chain, row.symbol)"
-                  />
+                  >
                 </template>
               </el-image>
               <Progress
-                v-if="!isOut"
                 class="token-progress"
-                :class="pumpSetting.Progress_isCircle=='horizontal' ? 'horizontal' :'circle'"
+                :color="getPumpColor(row.issue_platform)"
+                :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'horizontal' : 'circle'"
                 :progress="row.progress"
               />
-              <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+              <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" >
                 <template #content>
                   <el-image
                     class="token-icon h-228px w-228px items-center"
@@ -49,13 +73,13 @@
                       <img
                         class="token-icon h-228px w-228px text-16px color-#fff"
                         :src="getChainDefaultIcon(row.chain, row.symbol)"
-                      />
+                      >
                     </template>
                     <template #placeholder>
                       <img
                         class="token-icon h-228px w-228px text-16px color-#fff"
                         :src="getChainDefaultIcon(row.chain, row.symbol)"
-                      />
+                      >
                     </template>
                   </el-image>
                 </template>
@@ -67,70 +91,44 @@
                   class="token-mark clickable"
                   @click.stop
                 >
-                  <Icon
-                    class="text-16px text-[var(--d-999-l-666)]"
-                    name="custom:search"
-                  />
+                  <Icon class="text-16px text-[var(--d-999-l-666)]" name="custom:search" />
                 </a>
               </el-tooltip>
               <el-image
                 v-if="row.amm"
                 v-tooltip="row.amm"
-                class="mr-5px rounded-100% bg-[--d-1A1A1A-l-FFF]  chain"
-                style="
-                  position: absolute;
-                  width: 14px;
-                  height: 14px;
-                  bottom: 0;
-                  right: 0;
-                "
+                class="mr-5px rounded-100% bg-[--d-1A1A1A-l-FFF] chain"
+                style="position: absolute; width: 14px; height: 14px; bottom: 0; right: 0"
                 :src="`${token_logo_url}swap/${row.amm}.jpeg`"
               />
 
               <el-image
                 v-if="row.issue_platform && isOut"
                 v-tooltip="row.issue_platform"
-                class="ml-5px rounded-100% bg-[--d-1A1A1A-l-FFF]  chain"
-                style="
-                  position: absolute;
-                  width: 14px;
-                  height: 14px;
-                  bottom: 0;
-                  left: 0;
-                "
+                class="ml-5px rounded-100% bg-[--d-1A1A1A-l-FFF] chain"
+                style="position: absolute; width: 14px; height: 14px; bottom: 0; left: 0"
                 :src="formatIconTag(row.issue_platform)"
               />
               <Icon
                 v-if="row.issue_platform && isOut"
                 class="color-#4FD58F"
                 name="line-md:pause-to-play-filled-transition"
-                style="
-                  position: absolute;
-                  bottom: 0;
-                  left: 24px;
-                  font-size: 16px;
-                "
+                style="position: absolute; bottom: 0; left: 24px; font-size: 16px"
               />
             </div>
             <div
               class="time"
-              :class="pumpSetting.Progress_isCircle=='horizontal'? 'mt-15px': 'mt-5px'"
+              :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-15px' : 'mt-5px'"
               :style="{
                 color:
-                  Number(
-                    formatTimeFromNow(row?.created_at || row?.time, true)
-                  ) <= 600
+                  Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
                     ? '#FFA622'
                     : '',
               }"
             >
               <template v-if="!(row?.created_at || row?.time)"> - </template>
               <template
-                v-else-if="
-                  Number(
-                    formatTimeFromNow(row?.created_at || row?.time, true)
-                  ) >= 60
-                "
+                v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
               >
                 {{ formatTimeFromNow(row?.created_at || row?.time) }}
               </template>
@@ -145,16 +143,17 @@
                 </template>
               </van-count-down> -->
               <TimerCount
-                v-else-if="(row?.created_at || row?.time) && Number(formatTimeFromNow(row?.created_at || row?.time, true) ) < 60"
+                v-else-if="
+                  (row?.created_at || row?.time) &&
+                  Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
+                "
                 :key="`${row.created_at}`"
                 :timestamp="row.created_at"
                 :end-time="60"
               >
                 <template #default="{ seconds }">
                   <span class="color-#FFA622">
-                    <template v-if="seconds < 60">
-                      {{ seconds }}s
-                    </template>
+                    <template v-if="seconds < 60"> {{ seconds }}s </template>
                     <template v-else>
                       {{ formatTimeFromNow(row.created_at) }}
                     </template>
@@ -165,221 +164,148 @@
           </div>
 
           <div class="flex-1">
-            <div class="flex-start" style="align-items:flex-start">
-              <div class="flex-start">
-                <span class="text-18px font-500 mr-5px symbol-ellipsis ellipsis-auto block">{{ row.symbol }}</span>
-                <span v-if="pumpSetting?.define?.some(i=> i=== 'name')" class="text-10px font-500 mr-5px color-[--d-666-l-999] symbol-ellipsis ellipsis-auto block">{{ row.name }}</span>
-                <Icon
-                  v-copy="row.token"
-                  name="bxs:copy"
-                  class="text-10px ml-2px cursor-pointer color-[--d-666-l-999] ml-4px"
-                  @click.stop.prevent
-                />
-              </div>
-              <div
-                style="margin-left: auto; flex-wrap: wrap"
-                class="text-12px"
-              >
-                <!-- <div class="mr-5 color-text-4">Liq</div>
-                <div class="text-12px color-text-10">{{ formatNumber((row?.target_token === row?.token0_address ? row?.reserve1 : row?.reserve0) || 0, { decimals: 1 }) }} {{ row?.target_token === row?.token0_address ? row?.token1_symbol : row?.token0_symbol }}</div>
-                <div class="color-[--d-666-l-999]"  style="margin: 0 2px;">|</div> -->
-                <div class="flex-end">
-                  <template v-if="pumpSetting?.define?.some(i=> i=== 'vol')">
-                    <!-- <div
-                      v-if="pumpSetting?.define?.some(i=> i=== 'mcap')"
-                      :style="{ color: isDark ? '#333333' : '#d9d9d9' }"
-                      style="margin: 0 2px"
-                    >
-                      |
-                    </div> -->
-                    <div class="mr-5px color-[--d-666-l-999]" :style="{ 'font-size': pumpSetting.fontSize_mc }">V</div>
-                    <div
-                      :class="
-                        !row?.volume_u_24h
-                          ? 'color-[--d-666-l-999]'
-                          : 'color-[--d-999-l-666]'
-                      "
-                      :style="{ 'font-size': pumpSetting.fontSize_mc }"
-                    >
-                      ${{ formatNumber(row?.volume_u_24h || 0, 2) }}
-                    </div>
-                  </template>
-
-                    <template v-if="pumpSetting?.define?.some(i=> i=== 'txs')">
-                      <div
-                        :style="{ color: isDark ? '#333333' : '#d9d9d9' }"
-                        style="margin: 0 2px"
-                      >
-                        |
-                      </div>
-                      <div class="mr-5px color-[--d-666-l-999]">Txs</div>
-                      <div
-                        :class="
-                          !row?.tx_24h_count
-                            ? 'color-[--d-666-l-999]'
-                            : 'color-[--d-999-l-666]'
-                        "
-                      >
-                        {{ formatNumber(row?.tx_24h_count || 0, 2) }}
-                      </div>
-                  </template>
-                  <template v-if="pumpSetting?.define?.some(i=> i=== 'holder')">
-                    <div
-                      :style="{ color: isDark ? '#333333' : '#d9d9d9' }"
-                      style="margin: 0 2px"
-                    >
-                      |
-                    </div>
-                    <div class="mr-5px color-[--d-666-l-999]">H</div>
-                    <div v-if="row?.holders > 800" style="color: #ffa622">
-                      {{ formatNumber(row.holders || 0, 2) }}
-                    </div>
-                    <div
-                      v-else
-                      class="color-[--d-999-l-666]"
-                    >
-                      {{ formatNumber(row.holders || 0, 2) }}
-                    </div>
-                  </template>
+            <div class="flex-start">
+              <div>
+                <div class="flex-start">
+                  <span class="text-18px font-500 mr-5px symbol-ellipsis ellipsis-auto block">{{
+                    row.symbol
+                  }}</span>
+                  <span
+                    v-if="pumpSetting?.define?.some((i) => i === 'name')"
+                    class="name text-10px font-500 mr-5px color-[--d-666-l-999] symbol-ellipsis ellipsis-auto block"
+                    >{{ row.name }}</span
+                  >
                 </div>
 
-
-              <div class="flex-end mt-4px" v-if="pumpSetting?.define?.some(i=> i=== 'mcap')">
-                  <div class="color-[--d-666-l-999] mr-5px" :style="{ 'font-size': pumpSetting.fontSize_mc }">MC</div>
-                  <span
-                  :style="{ 'font-size': pumpSetting.fontSize_mc }"
-                    :class="
-                      !row.market_cap ? 'color-[--d-666-l-999]' : 'color-#FFA622'
+                <div class="flex-start text-12px mt-5px">
+                  <span class="color-[--d-666-l-999]">{{ row.token?.slice(0,4)+'...'+ row.token?.slice(-4)}}</span>
+                  <Icon
+                    v-copy="row.token"
+                    name="bxs:copy"
+                    class="text-10px ml-2px cursor-pointer color-[--d-666-l-999] ml-4px mr-8px"
+                    @click.stop.prevent
+                  />
+                  <div
+                    v-if="
+                      row?.medias?.length > 0 && pumpSetting?.define?.some((i) => i === 'media')
                     "
-                    >${{ formatNumber(row.market_cap || 0, 2) }}</span
+                    class="flex text-12px"
                   >
-                </div>
-              </div>
-            </div>
-
-            <div class="flex-start text-12px">
-              <!-- <span v-if="!isOut" style="color: #FFA622">{{ formatNumber(row?.progress || 0,1) }}%</span> -->
-              <!-- <template v-if="row.tag_arr?.length > 0">
-                <template v-for="(i, index) in row.tag_arr" :key="index">
-                  <el-image
-                    v-tooltip="$t(`${i}`)"
-                    class="token-icon-tag"
-                    :src="formatIconTag(i)"
-                    lazy
+                    <div
+                      v-for="(item, $index) in row?.medias"
+                      :key="$index"
+                      class="tag-btn"
+                    >
+                      <template v-if="item.url">
+                        <span
+                          v-if="item.name === 'QQ'"
+                          v-tooltip="item.url"
+                          class="bg-btn mr-8px"
+                        >
+                          <Icon
+                            :name="`custom:${item.icon}`"
+                            class="text-[--d-666-l-999] h-12px"
+                          />
+                        </span>
+                        <XPopup v-else-if="item.icon === 'twitter'" :tokenId="((row.token + '-' + row.chain) as string)" :type="row.twitter_type">
+                        <a
+                          :href="item.url"
+                          target="_blank"
+                          class="bg-btn"
+                          @click.stop
+                        >
+                          <XIcon
+                            v-if="[1, 2, 3].includes(row.twitter_type)"
+                            :type="row.twitter_type"
+                            class="text-12px"
+                          />
+                          <Icon
+                            v-else
+                            :name="`custom:${item.icon}`"
+                            class="text-[--d-666-l-999] text-12px"
+                          />
+                        </a>
+                      </XPopup>
+                        <a
+                          v-else
+                          v-tooltip="item.url"
+                          :href="item.url"
+                          target="_blank"
+                          class="bg-btn mr-8px"
+                          @click.stop
+                        >
+                          <Icon
+                            :name="`custom:${item.icon}`"
+                            class="text-[--d-666-l-999] h-12px"
+                          />
+                        </a>
+                      </template>
+                    </div>
+                  </div>
+                  <a
+                    class="media-item bg-btn"
+                    :href="`https://x.com/search?q=($${row?.symbol} OR ${row?.token})&src=typed_query&f=live`"
+                    target="_blank"
                   >
-                    <template #error>
-                      <img class="token-icon-tag" src="/icon-default.png" />
-                    </template>
-                    <template #placeholder>
-                      <img class="token-icon-tag" src="/icon-default.png" />
-                    </template>
-                  </el-image>
-                  <span
-                    v-if="i?.showText"
+                    <Icon class="text-[--d-666-l-999] h-16px w-12px" name="custom:search" />
+                  </a>
+                  <div
+                    v-show="pumpSetting?.define?.some((i) => i === 'rug')"
+                    v-tooltip="$t('rug_rate_tips')"
+                    class="flex mr-5px items-center bg-btn"
                     :style="{
-                      color: i?.color == 'green' ? '#12b886' : '#F6465D',
+                      color: row?.rug_rate > 60 ? '#F6465D' : 'var(--d-999-l-666)',
                     }"
-                    class="text-12px ml-3"
-                    >{{ $t(i?.tag) }}
-                  </span>
-                </template>
-              </template> -->
-              <div v-if="row?.medias?.length > 0 && pumpSetting?.define?.some(i=> i=== 'media')" class="flex text-12px">
-                <div
-                  v-for="(item, $index) in row?.medias"
-                  :key="$index"
-                  class="tag-btn"
-                >
-                  <template v-if="item.url">
-                    <span
-                      v-if="item.name === 'QQ'"
-                      v-tooltip="item.url"
-                      class="bg-btn mr-8px"
-                    >
-                      <Icon
-                        :name="`custom:${item.icon}`"
-                        class="text-[--d-666-l-999] h-12px"
-                      />
-                    </span>
-                    <a
-                      v-else
-                      v-tooltip="item.url"
-                      :href="item.url"
-                      target="_blank"
-                      class="bg-btn mr-8px"
-                      @click.stop
-                    >
-                      <Icon
-                        :name="`custom:${item.icon}`"
-                        class="text-[--d-666-l-999] h-12px"
-                      />
-                    </a>
-                  </template>
-                </div>
-              </div>
-              <a
-                class="media-item bg-btn"
-                :href="`https://x.com/search?q=($${row?.symbol} OR ${row?.token})&src=typed_query&f=live`"
-                target="_blank"
-              >
-                <Icon
-                  class="text-[--d-666-l-999] h-16px w-12px"
-                  name="custom:search"
-                />
-              </a>
-              <div
-                v-show="pumpSetting?.define?.some(i=> i=== 'rug')"
-                v-tooltip="$t('rug_rate_tips')"
-                class="flex mr-5px items-center bg-btn"
-                :style="{
-                  color: row?.rug_rate > 60 ? '#F6465D' : 'var(--d-999-l-666)',
-                }"
-              >
-                <Icon
-                  class="iconfont icon-rug mr-2px text-10px vertical-middle"
-                  name="custom:rug"
-                  :style="{
-                    color:
-                      row?.rug_rate > 60 ? '#F6465D' : 'var(--d-666-l-999)',
-                  }"
-                />
-                <span>{{
-                  row.rug_rate == -1
-                    ? $t('unKnown1')
-                    : formatNumber(row?.rug_rate || 0, 2) + '%'
-                }}</span>
-              </div>
-              <div
-                v-show="pumpSetting?.define?.some(i=> i=== 'kol')"
-                v-tooltip="`KOL`"
-                class="flex mr-5px items-center bg-btn color-[--d-999-l-666]"
-              >
-                <Icon
-                  class="iconfont icon-rug mr-2px text-10px vertical-middle"
-                  name="custom:kol"
-                  :style="{
-                    color:
-                      row?.kol_tag_count > 0 ? '#1C9BEF' : 'var(--d-666-l-999)',
-                  }"
-                />
-                <span class="color-[--d-999-l-666]">{{ formatNumber(row?.kol_tag_count || 0, 2) }}</span>
-              </div>
-              <div
-                v-show="pumpSetting?.define?.some(i=> i=== 'smart')"
-                v-tooltip="$t('smarter')"
-                class="flex mr-5px items-center bg-btn color-#12B886"
-              >
-                <Icon
-                  class="iconfont icon-rug mr-2px text-10px vertical-middle"
-                  name="custom:wallet"
-                  :style="{
-                    color:
-                      Number(row?.smart_wallet_tag_count || 0) > 0 ? '#12B886' : 'var(--d-666-l-999)',
-                  }"
-                />
-                <span class="color-[--d-999-l-666]">{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
-              </div>
-              <!-- <div
+                  >
+                    <Icon
+                      class="iconfont icon-rug mr-2px text-10px vertical-middle"
+                      name="custom:rug"
+                      :style="{
+                        color: row?.rug_rate > 60 ? '#F6465D' : 'var(--d-666-l-999)',
+                      }"
+                    />
+                    <span>{{
+                      row.rug_rate == -1
+                        ? $t('unKnown1')
+                        : formatNumber(row?.rug_rate || 0, 2) + '%'
+                    }}</span>
+                  </div>
+                  <div
+                    v-show="pumpSetting?.define?.some((i) => i === 'kol')"
+                    v-tooltip="`KOL`"
+                    class="flex mr-5px items-center bg-btn color-[--d-999-l-666]"
+                  >
+                    <Icon
+                      class="iconfont icon-rug mr-2px text-10px vertical-middle"
+                      name="custom:kol"
+                      :style="{
+                        color: row?.kol_tag_count > 0 ? '#1C9BEF' : 'var(--d-666-l-999)',
+                      }"
+                    />
+                    <span class="color-[--d-999-l-666]">{{
+                      formatNumber(row?.kol_tag_count || 0, 2)
+                    }}</span>
+                  </div>
+                  <div
+                    v-show="pumpSetting?.define?.some((i) => i === 'smart')"
+                    v-tooltip="$t('smarter')"
+                    class="flex mr-5px items-center bg-btn color-#12B886"
+                  >
+                    <Icon
+                      class="iconfont icon-rug mr-2px text-10px vertical-middle"
+                      name="custom:wallet"
+                      :style="{
+                        color:
+                          Number(row?.smart_wallet_tag_count || 0) > 0
+                            ? '#12B886'
+                            : 'var(--d-666-l-999)',
+                      }"
+                    />
+                    <span class="color-[--d-999-l-666]">{{
+                      formatNumber(row?.smart_wallet_tag_count || 0, 2)
+                    }}</span>
+                  </div>
+                  <!-- <div
                 v-show="pumpSetting?.define?.some(i=> i=== 'migraged')"
                 v-tooltip="$t('migraged')"
                 class="flex mr-5px items-center bg-btn"
@@ -390,7 +316,7 @@
                 />
                 <span class="color-[--d-999-l-666]">0</span>
               </div> -->
-              <!-- <template v-if="row.normal_tag?.length > 0">
+                  <!-- <template v-if="row.normal_tag?.length > 0">
                 <div class="bg-btn" v-for="(i, index) in row.normal_tag" :key="index">
                   <el-image
                     v-tooltip="$t(`${i.tag}`)
@@ -415,7 +341,7 @@
                   </span>
                 </div>
               </template> -->
-              <!-- <template v-if="row.signal_arr?.length > 0">
+                  <!-- <template v-if="row.signal_arr?.length > 0">
                 <div
                   v-for="(i, index) in row.signal_arr"
                   :key="index"
@@ -450,10 +376,132 @@
                   </span>
                 </div>
               </template> -->
+                </div>
+              </div>
+
+              <div style="margin-left: auto; flex-wrap: wrap" class="text-12px">
+                <!-- <div class="mr-5 color-text-4">Liq</div>
+                <div class="text-12px color-text-10">{{ formatNumber((row?.target_token === row?.token0_address ? row?.reserve1 : row?.reserve0) || 0, { decimals: 1 }) }} {{ row?.target_token === row?.token0_address ? row?.token1_symbol : row?.token0_symbol }}</div>
+                <div class="color-[--d-666-l-999]"  style="margin: 0 2px;">|</div> -->
+                <div class="flex-end">
+                  <template v-if="pumpSetting?.define?.some((i) => i === 'mcap') && width < 1024">
+                    <div
+                      class="color-[--d-666-l-999] mr-5px"
+                      :style="{ 'font-size': pumpSetting.fontSize_mc }"
+                    >
+                      MC
+                    </div>
+                    <span
+                      class="mr-5px"
+                      :style="{ 'font-size': pumpSetting.fontSize_mc }"
+                      :class="!row.market_cap ? 'color-[--d-666-l-999]' : 'color-#FFA622'"
+                      >${{ formatNumber(row.market_cap || 0, 2) }}</span
+                    >
+                  </template>
+                  <template v-if="pumpSetting?.define?.some((i) => i === 'vol') && width < 1024">
+                    <!-- <div
+                        v-if="pumpSetting?.define?.some(i=> i=== 'mcap')"
+                        :style="{ color: isDark ? '#333333' : '#d9d9d9' }"
+                        style="margin: 0 2px"
+                      >
+                        |
+                      </div> -->
+                    <div
+                      class="mr-5px color-[--d-666-l-999]"
+                      :style="{ 'font-size': pumpSetting.fontSize_mc }"
+                    >
+                      V
+                    </div>
+                    <div
+                      class="mr-5px"
+                      :class="
+                        !row?.volume_u_24h ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-666]'
+                      "
+                      :style="{ 'font-size': pumpSetting.fontSize_mc }"
+                    >
+                      ${{ formatNumber(row?.volume_u_24h || 0, 2) }}
+                    </div>
+                  </template>
+
+                  <template v-if="pumpSetting?.define?.some((i) => i === 'txs')">
+                    <!-- <div
+                        v-if="pumpSetting?.define?.some(i=> i=== 'mcap')"
+                        :style="{ color: isDark ? '#333333' : '#d9d9d9' }"
+                        style="margin: 0 2px"
+                      >
+                        |
+                      </div> -->
+                    <div class="mr-5px color-[--d-666-l-999]">Txs</div>
+                    <div
+                      class="mr-5px"
+                      :class="
+                        !row?.tx_24h_count ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-666]'
+                      "
+                    >
+                      {{ formatNumber(row?.tx_24h_count || 0, 2) }}
+                    </div>
+                  </template>
+                  <template v-if="pumpSetting?.define?.some((i) => i === 'holder')">
+                    <!-- <div
+                      :style="{ color: isDark ? '#333333' : '#d9d9d9' }"
+                      style="margin: 0 2px"
+                    >
+                      |
+                    </div> -->
+                    <div class="mr-5px color-[--d-666-l-999]">H</div>
+                    <div v-if="row?.holders > 800" class="mr-5px" style="color: #ffa622">
+                      {{ formatNumber(row.holders || 0, 2) }}
+                    </div>
+                    <div v-else class="color-[--d-999-l-666] mr-5px">
+                      {{ formatNumber(row.holders || 0, 2) }}
+                    </div>
+                  </template>
+                </div>
+
+                <div v-if="width > 1024" class="flex-end mt-12px">
+                  <template v-if="pumpSetting?.define?.some((i) => i === 'mcap')">
+                    <div
+                      class="color-[--d-666-l-999] mr-5px"
+                      :style="{ 'font-size': pumpSetting.fontSize_mc }"
+                    >
+                      MC
+                    </div>
+                    <span
+                      class="mr-5px"
+                      :style="{ 'font-size': pumpSetting.fontSize_mc }"
+                      :class="!row.market_cap ? 'color-[--d-666-l-999]' : 'color-#FFA622'"
+                      >${{ formatNumber(row.market_cap || 0, 2) }}</span
+                    >
+                  </template>
+                  <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
+                    <!-- <div
+                        v-if="pumpSetting?.define?.some(i=> i=== 'mcap')"
+                        :style="{ color: isDark ? '#333333' : '#d9d9d9' }"
+                        style="margin: 0 2px"
+                      >
+                        |
+                      </div> -->
+                    <div
+                      class="mr-5px color-[--d-666-l-999]"
+                      :style="{ 'font-size': pumpSetting.fontSize_mc }"
+                    >
+                      V
+                    </div>
+                    <div
+                      :class="
+                        !row?.volume_u_24h ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-666]'
+                      "
+                      :style="{ 'font-size': pumpSetting.fontSize_mc }"
+                    >
+                      ${{ formatNumber(row?.volume_u_24h || 0, 2) }}
+                    </div>
+                  </template>
+                </div>
+              </div>
             </div>
-            <div class="flex-start text-12px" style="width: 100%">
+            <div class="flex-start text-12px mt-12px" style="width: 100%">
               <div
-                v-show="pumpSetting?.define?.some(i=> i=== 'top')"
+                v-show="pumpSetting?.define?.some((i) => i === 'top')"
                 v-tooltip="$t('holders_top10_ratio_tips')"
                 class="flex-start mr-5px bg-btn"
               >
@@ -461,24 +509,23 @@
                   class="iconfont icon-TOP text-10px mr-2px"
                   name="custom:top"
                   :style="{
-                    color:
-                      Number(row?.holders_top10_ratio) > 30
-                        ? '#F6465D'
-                        : 'var(--d-666-l-999)',
+                    color: Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : 'var(--d-666-l-999)',
                   }"
                 />
                 <span
                   :style="{
-                    color:
-                      Number(row?.holders_top10_ratio) > 30
-                        ? '#F6465D'
-                        : 'var(--d-999-l-666)',
+                    color: Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : 'var(--d-999-l-666)',
                   }"
-                  >{{ formatNumber(Number(row?.holders_top10_ratio)> 0.001 ? row?.holders_top10_ratio || 0 : 0, 1) }}%</span
+                  >{{
+                    formatNumber(
+                      Number(row?.holders_top10_ratio) > 0.001 ? row?.holders_top10_ratio || 0 : 0,
+                      1
+                    )
+                  }}%</span
                 >
               </div>
               <div
-                v-show="pumpSetting?.define?.some(i=> i=== 'dev')"
+                v-show="pumpSetting?.define?.some((i) => i === 'dev')"
                 v-tooltip="$t('dev_balance_ratio_cur_tips')"
                 class="flex mr-5px bg-btn"
               >
@@ -486,15 +533,20 @@
                 <span
                   :style="{
                     color:
-                      Number(row?.dev_balance_ratio_cur) > 10
-                        ? '#F6465D'
-                        : 'var(--d-999-l-666)',
+                      Number(row?.dev_balance_ratio_cur) > 10 ? '#F6465D' : 'var(--d-999-l-666)',
                   }"
-                  >{{ formatNumber(Number(row?.dev_balance_ratio_cur)> 0.001 ? row?.dev_balance_ratio_cur || 0 : 0, 2) }}%</span
+                  >{{
+                    formatNumber(
+                      Number(row?.dev_balance_ratio_cur) > 0.001
+                        ? row?.dev_balance_ratio_cur || 0
+                        : 0,
+                      2
+                    )
+                  }}%</span
                 >
               </div>
               <div
-                v-show="pumpSetting?.define?.some(i=> i=== 'insider')"
+                v-show="pumpSetting?.define?.some((i) => i === 'insider')"
                 v-tooltip="$t('insider_balance_ratio_cur_tips')"
                 class="flex mr-5px bg-btn"
               >
@@ -516,12 +568,17 @@
                         : 'var(--d-999-l-666)',
                   }"
                   >{{
-                    formatNumber(Number(row?.insider_balance_ratio_cur)> 0.001 ? row?.insider_balance_ratio_cur || 0 : 0, 2)
+                    formatNumber(
+                      Number(row?.insider_balance_ratio_cur) > 0.001
+                        ? row?.insider_balance_ratio_cur || 0
+                        : 0,
+                      2
+                    )
                   }}%</span
                 >
               </div>
               <div
-                v-show="pumpSetting?.define?.some(i=> i=== 'sniper')"
+                v-show="pumpSetting?.define?.some((i) => i === 'sniper')"
                 v-tooltip="$t('snipers')"
                 class="flex mr-5px bg-btn"
               >
@@ -529,64 +586,77 @@
                   class="iconfont icon-gun text-10px mr-2px"
                   name="custom:gun"
                   :style="{
-                    color:
-                      Number(row?.sniper_count) > 30
-                        ? '#1296DB'
-                        : 'var(--d-666-l-999)',
+                    color: Number(row?.sniper_count) > 30 ? '#1296DB' : 'var(--d-666-l-999)',
                   }"
                 />
-                <span
-                class="color-[--d-999-l-666]"
-                  >{{
-                    formatNumber(Number(row?.sniper_count)> 0.001 ? row?.sniper_count || 0: 0, 2)
-                  }}</span
-                >
+                <span class="color-[--d-999-l-666]">{{
+                  formatNumber(Number(row?.sniper_count) > 0.001 ? row?.sniper_count || 0 : 0, 2)
+                }}</span>
               </div>
 
               <div
-                v-show="pumpSetting?.define?.some(i=> i=== 'cabal')"
+                v-show="pumpSetting?.define?.some((i) => i === 'cabal')"
                 v-tooltip="$t('cabal')"
                 class="flex mr-5px bg-btn"
               >
-                <img  v-if="Number(row?.cabal_tag_count) > 0" class="mr-2px" src="@/assets/images/cabal.svg" :width="11" alt="" >
-                <img  v-else class="mr-2px" :src="`${token_logo_url}address_portrait/Cabal11.png`" :width="11" alt="">
-                <span class="color-[--d-999-l-666]">{{
-                    formatNumber(Number(row?.cabal_tag_count)> 0.001 ?  row?.cabal_tag_count || 0 : 0, 2)
-                  }}</span
+                <img
+                  v-if="Number(row?.cabal_tag_count) > 0"
+                  class="mr-2px"
+                  src="@/assets/images/cabal.svg"
+                  :width="11"
+                  alt=""
                 >
+                <img
+                  v-else
+                  class="mr-2px"
+                  :src="`${token_logo_url}address_portrait/Cabal11.png`"
+                  :width="11"
+                  alt=""
+                >
+                <span class="color-[--d-999-l-666]">{{
+                  formatNumber(
+                    Number(row?.cabal_tag_count) > 0.001 ? row?.cabal_tag_count || 0 : 0,
+                    2
+                  )
+                }}</span>
               </div>
               <div class="flex-1" />
-
-              <div
-                v-if="row?.state === 'migrating'"
-                style="
-                  margin-left: auto;
-                  color: #ffa622;
-                  background: #ffa6221a;
-                  font-size: 12px;
-                  font-weight: 400;
-                  border-radius: 4px;
-                  padding: 6px 8px;
-                  display: flex;
-                  align-items: center;
-                "
-              >
-                <img
-                  src="@/assets/images/pump/migrating.svg"
-                  height="12"
-                  class="mr-5px"
-                  alt=""
-                  srcset=""
+              <div class="btns-swap">
+                <div
+                  v-if="row?.state === 'migrating'"
+                  style="
+                    margin-left: auto;
+                    color: #ffa622;
+                    background: #ffa6221a;
+                    font-size: 12px;
+                    font-weight: 400;
+                    border-radius: 4px;
+                    padding: 9px 8px;
+                    display: flex;
+                    margin-right: 5px;
+                    align-items: center;
+                  "
+                >
+                  <img
+                    src="@/assets/images/pump/migrating.svg"
+                    height="12"
+                    class="mr-5px"
+                    alt=""
+                    srcset=""
+                  >
+                  <span>Migrating...</span>
+                </div>
+                <QuickSwap
+                  :quickBuyValue="quickBuyValue"
+                  :row="row"
+                  :size="pumpSetting.size_swap"
                 />
-                <span>Migrating...</span>
               </div>
-              <QuickSwap :quickBuyValue="quickBuyValue" :row="row" :size="pumpSetting.size_swap"/>
             </div>
-
           </div>
         </li>
       </ul>
-      <AveEmpty v-if="tableList?.length ==0 && !loading" class="mt-200px" />
+      <AveEmpty v-if="tableList?.length == 0 && !loading" class="mt-200px" />
     </el-scrollbar>
     <el-popover
       v-model:visible="showPop"
@@ -596,22 +666,21 @@
       placement="top"
       popper-class="text-center"
     >
-
-      <span class="color-#12B886" >
+      <span class="color-#12B886">
         <template v-if="isOut">
           {{ selected }}
         </template>
         <template v-else>
-          {{ $t('progress') }}:{{ formatNumber(selected,2)}}%
-        </template>
-        </span>
+           {{ $t('progress') }}:{{ formatNumber(selected, 2) }}%
+          </template>
+      </span>
     </el-popover>
-
   </div>
 </template>
 
 <script setup lang="ts">
 import Progress from './progress.vue'
+import { useWindowSize } from '@vueuse/core'
 import {
   getSymbolDefaultIcon,
   getChainDefaultIcon,
@@ -622,6 +691,7 @@ import { formatNumber } from '@/utils/formatNumber'
 // import { upColor } from '@/utils/constants'
 import { Icon } from '#components'
 import type { PumpObj } from '@/api/types/pump'
+import XIcon from '~/components/xPopup/xIcon.vue'
 const props = defineProps({
   tableList: {
     type: Array<PumpObj>,
@@ -645,7 +715,7 @@ const props = defineProps({
   },
 })
 
-
+const { width } = useWindowSize()
 const showPop = ref(false)
 const selected = ref('')
 const btnRefs = ref<Record<string, HTMLElement | null>>({})
@@ -657,33 +727,31 @@ const globalStore = useGlobalStore()
 const { isDark, pumpSetting, pumpBlackList } = storeToRefs(globalStore)
 const { t } = useI18n()
 
-
-
-function handleContextMenu(e: MouseEvent, row: { target_token: string, chain: string }) {
+function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: string }) {
   if (pumpSetting.value.isRight) {
     e.preventDefault()
     const url = router.resolve({
       name: 'token-id',
-      params: { id: row.target_token + '-' + row.chain }
+      params: { id: row.target_token + '-' + row.chain },
     }).href
     window.open(url, '_blank')
   }
 }
 
-function tableRowClick(row: { target_token: string, chain: string }) {
-    router.push({
+function tableRowClick(row: { target_token: string; chain: string }) {
+  router.push({
     name: 'token-id',
-    params: { id: row.target_token + '-' + row.chain  }
+    params: { id: row.target_token + '-' + row.chain },
   })
 }
-function addOrRemoveBlaclList(item: {token: string},type:  'ca' | 'dev' | 'keyword') {
+function addOrRemoveBlaclList(item: { token: string }, type: 'ca' | 'dev' | 'keyword') {
   if (pumpBlackList.value?.length > 499) {
     ElMessage.error(t('blacklistLimit'))
     return
   }
   if (pumpBlackList.value) {
     const findIndex = pumpBlackList.value?.findIndex(
-      (i) => item.token == i.address && i.type =='ca'
+      (i) => item.token == i.address && i.type == 'ca'
     )
     if (findIndex !== -1) {
       pumpBlackList.value.splice(findIndex, 1)
@@ -701,12 +769,12 @@ function setBtnRef(el: HTMLElement | null) {
     // console.log('-------el?.id----',el?.id)
   }
 }
-function showPopover(item: {progress: string, id: string, issue_platform: string}) {
+function showPopover(item: { progress: number; id: string; issue_platform: string }) {
   // if (!isOut.value) {
-    console.log('-----[item.id--',item.id)
-    selected.value = isOut.value? item.issue_platform  || '' : item.progress || ''
+    // console.log('-----[item.id--',item.id)
+    selected.value = isOut.value? (item.issue_platform  || '') : String(item.progress || '')
     currentBtnRef.value = btnRefs.value[item.id] || null
-    console.log('-----currentBtnRef.value ---',currentBtnRef.value )
+    // console.log('-----currentBtnRef.value ---',currentBtnRef.value )
     showPop.value = true
   // }
 }
@@ -721,26 +789,39 @@ function showPopover(item: {progress: string, id: string, issue_platform: string
   .color-text-10 {
     color: var(--a-text-10-color);
   }
+  @media (min-width: 1024px) and (max-width: 1280px) {
+    .btns-swap {
+      display: none;
+    }
+    .name {
+      display: none;
+    }
+  }
   .pump-item_item {
     min-height: 100px;
     cursor: pointer;
     display: flex;
     align-items: center;
     color: var(--a-text-1-color);
-    padding:20px 12px;
+    padding: 20px 12px;
+    border-bottom: 1px solid var(--d-222-l-F2F2F2);
+
     &:hover {
       background-color: var(--d-1A1A1A-l-F2F2F2);
-    .eye{
-        color:#959A9F;
+      .btns-swap {
+        display: block;
+      }
+      .eye {
+        color: #959a9f;
         visibility: visible;
+      }
     }
-    }
-    .eye{
+    .eye {
       position: absolute;
       visibility: hidden;
       left: 5px;
       top: 5px;
-      color:var(--d-666-l-999)
+      color: var(--d-666-l-999);
     }
   }
   .token-logo {
@@ -750,9 +831,10 @@ function showPopover(item: {progress: string, id: string, issue_platform: string
     position: relative;
     display: flex;
     align-items: center;
+    justify-content: center;
     .token-icon {
-      width: 64px;
-      height: 64px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       background: var(--custom-bg-6-color);
       display: flex;
@@ -807,7 +889,6 @@ function showPopover(item: {progress: string, id: string, issue_platform: string
         // font-weight: 800;
         // font-size: 24px;
       }
-
     }
   }
   .token-icon-signal-tag {
@@ -834,8 +915,8 @@ function showPopover(item: {progress: string, id: string, issue_platform: string
   }
 }
 .bg-btn {
-  --uno: bg-[--d-1A1A1A-l-F2F2F2] rounded-2px mr-4px flex items-center
-    justify-center h-16px min-w-16px p-2px;
+  --uno: bg-[--d-1A1A1A-l-F2F2F2] rounded-2px mr-4px flex items-center justify-center h-16px
+    min-w-16px p-2px;
 }
 .time {
   color: #959a9f;
@@ -847,18 +928,22 @@ function showPopover(item: {progress: string, id: string, issue_platform: string
   }
 }
 @media (max-width: 1920px) {
-  .symbol-ellipsis{
-    max-width: 100px
+  .symbol-ellipsis {
+    max-width: 100px;
   }
 }
 @media (min-width: 1920px) {
-  .symbol-ellipsis{
-    max-width: 200px
+  .symbol-ellipsis {
+    max-width: 200px;
   }
 }
 .ellipsis-auto {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+.btns-swap {
+  position: absolute;
+  right: 12px;
 }
 </style>

@@ -39,6 +39,7 @@ export const WSEventType = {
   GOLD_SIGNAL: 'gold_signal',
   SIGNALSV2_PUBLIC_MONITOR: 'signalsv2_public_monitor',
   PUBLIC_PORTRAIT: 'public_portrait',
+  SIMPLE_TX: 'simple_tx'
 }
 
 export const MAX_UINT_AMOUNT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
@@ -108,3 +109,5 @@ export const DefaultHeight = {
   TOPLEFT: window.innerHeight / 2,
   KLINE: window.innerHeight / 2
 }
+
+export const WSSimpleTxChain = ['core','arbitrum','optimism','avalanche','blast','polygon','alveychain','apchain','bitgert','cronos','cube','cvn','dogechain','drac','dojo','eos','etc','ethg','ftm','tron','aptos','fsc','mantle','mbkv2','eni','abstract','xlayer','chronoschain','marschain','xone','hyperevm','juchain','babylon','berachain','base','aia','eth','bsc','zchains','arbitrumnova','astar','aurora','metachain','b2network','bitlayer','bitonenetwork','boat','bouncebit','callisto','celo','seiv2','qom','cyber','sui','apechain','matchain','slerfchain','morph','gravity','xrpl','hyperliquid','genesys','sonic','nervosutxo','fusion','opbnb','tbc','unichain','mud','merlin','bevm','bitchain','bitrock','depass','ete','ton','solana']

@@ -995,7 +995,7 @@ const addressAndChain = computed(() => {
   }
 })
 const tableHeight = computed(() => {
-  return Math.max(tokenStore.commonHeight-250, 450)
+  return Math.max(tokenStore.commonHeight-265, 450)
 })
 function tableRowClick(rowData: {holder: string, remark: string}) {
   console.log('----------rowData----------',rowData)

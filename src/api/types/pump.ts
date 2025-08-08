@@ -66,6 +66,7 @@ export interface PumpObj {
   kol_tag_count: number
   smart_wallet_tag_count: string
   sniper_count: string
+  twitter_type: 0 | 1 | 2 | 3
 }
 
 interface Pair {

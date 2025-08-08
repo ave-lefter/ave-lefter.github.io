@@ -73,7 +73,7 @@ function redirectIfMobile() {
     } else if (path === '/meme') {
       location.replace('https://meme_team.ave.ai')
     } else {
-      location.replace(`${location.protocol}//m.${location.host}${path}${location.search}`)
+      location.replace(`${location.protocol}//m.${location.host.replace('pro.', '')}${path}${location.search}`)
     }
   }
 }

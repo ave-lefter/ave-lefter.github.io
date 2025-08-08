@@ -120,17 +120,52 @@
         </button>
       </div>
     </div>
-    <el-row :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full bg-[--d-1A1A1A-l-FFF]">
-      <el-col :span="8">
+    <el-row  :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full bg-[--d-1A1A1A-l-FFF]">
+      <el-col v-if="single('new')" :span=" width > 1024 ? 8 : 24">
         <div class="pump-item bg-[--d-111-l-FFF]  rounded-4px" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px">
-            <img
-              class="mr-5px"
-              src="@/assets/images/pump/new.svg"
-              width="24"
-              alt=""
-            >
-            <span>{{ $t('new1') }}</span>
+            <template v-if="width > 1024">
+              <img
+                class="mr-5px"
+                src="@/assets/images/pump/new.svg"
+                width="24"
+                alt=""
+              >
+              <span class="color-[--d-F5F5F5-l-333]">{{ $t('new1') }}</span>
+            </template>
+            <div v-else class="tabs single" >
+              <button
+                v-for="item in tabsList"
+                :key="item.id"
+                :class="{ active: item.id === activeTab}"
+                class="flex-start"
+                type="button"
+                @click.stop="activeTab = item.id"
+              >
+                <img
+                  v-if="item.id == 'new'"
+                  class="mr-5px"
+                  src="@/assets/images/pump/new.svg"
+                  width="24"
+                  alt=""
+                >
+                <img
+                  v-if="item.id == 'soon'"
+                  class="mr-5px"
+                  src="@/assets/images/pump/soon.svg"
+                  width="24"
+                  alt=""
+                >
+                <img
+                  v-if="item.id == 'graduated'"
+                  class="mr-5px"
+                  src="@/assets/images/pump/graduated.svg"
+                  width="24"
+                  alt=""
+                >
+                <span>{{ item.name || '' }}</span>
+              </button>
+            </div>
             <span  v-show="isPausedObj.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-5px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
             </span>
@@ -180,16 +215,51 @@
           />
         </div>
       </el-col>
-      <el-col :span="8">
+      <el-col v-if="single('soon')" :span=" width > 1024 ? 8 : 24">
         <div class="pump-item bg-[--d-111-l-FFF]" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px rounded-4px">
-            <img
-              class="mr-5px"
-              src="@/assets/images/pump/soon.svg"
-              width="24"
-              alt=""
-            />
-            <span>{{ $t('soon') }}</span>
+            <template v-if="width > 1024">
+              <img
+                class="mr-5px"
+                src="@/assets/images/pump/soon.svg"
+                width="24"
+                alt=""
+              >
+              <span class="color-[--d-F5F5F5-l-333]">{{ $t('soon') }}</span>
+            </template>
+            <div v-else class="tabs single" >
+              <button
+                v-for="item in tabsList"
+                :key="item.id"
+                :class="{ active: item.id === activeTab}"
+                class="flex-start"
+                type="button"
+                @click.stop="activeTab = item.id"
+              >
+                <img
+                  v-if="item.id == 'new'"
+                  class="mr-5px"
+                  src="@/assets/images/pump/new.svg"
+                  width="24"
+                  alt=""
+                >
+                <img
+                  v-if="item.id == 'soon'"
+                  class="mr-5px"
+                  src="@/assets/images/pump/soon.svg"
+                  width="24"
+                  alt=""
+                >
+                <img
+                  v-if="item.id == 'graduated'"
+                  class="mr-5px"
+                  src="@/assets/images/pump/graduated.svg"
+                  width="24"
+                  alt=""
+                >
+                <span>{{ item.name || '' }}</span>
+              </button>
+            </div>
             <span  v-show="isPausedObj.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-5px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
             </span>
@@ -236,16 +306,52 @@
           />
         </div>
       </el-col>
-      <el-col :span="8">
+      <el-col v-if="single('graduated')" :span=" width > 1024 ? 8 : 24">
         <div class="pump-item bg-[--d-111-l-FFF]" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px rounded-4px">
-            <img
-              class="mr-5px"
-              src="@/assets/images/pump/graduated.svg"
-              width="24"
-              alt=""
-            />
-            <span>{{ $t('graduated') }}</span>
+            <template v-if="width > 1024">
+              <img
+                class="mr-5px"
+                src="@/assets/images/pump/graduated.svg"
+                width="24"
+                alt=""
+              />
+              <span class="color-[--d-F5F5F5-l-333]">{{ $t('graduated') }}</span>
+            </template>
+            <div v-else class="tabs single" >
+              <button
+                v-for="item in tabsList"
+                :key="item.id"
+                :class="{ active: item.id === activeTab}"
+                class="flex-start"
+                type="button"
+                @click.stop="activeTab = item.id"
+              >
+                <img
+                  v-if="item.id == 'new'"
+                  class="mr-5px"
+                  src="@/assets/images/pump/new.svg"
+                  width="24"
+                  alt=""
+                >
+                <img
+                  v-if="item.id == 'soon'"
+                  class="mr-5px"
+                  src="@/assets/images/pump/soon.svg"
+                  width="24"
+                  alt=""
+                >
+                <img
+                  v-if="item.id == 'graduated'"
+                  class="mr-5px"
+                  src="@/assets/images/pump/graduated.svg"
+                  width="24"
+                  alt=""
+                >
+                <span>{{ item.name || '' }}</span>
+              </button>
+            </div>
+
             <span  v-show="isPausedObj.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-5px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
             </span>
@@ -302,7 +408,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage, useDebounceFn } from '@vueuse/core'
+import { useStorage, useDebounceFn, useWindowSize } from '@vueuse/core'
 import QuickSwapSet from '@/components/quickSwap/quickSwapSet.vue'
 import PumpList from './pumpList.vue'
 import Setting from './setting.vue'
@@ -323,6 +429,9 @@ const Timer = {
   soon: null,
   graduated: null
 }
+const { width } = useWindowSize()
+console.log('-----width-------',width)
+const activeTab = shallowRef('new')
 const route = useRoute()
 const { t } = useI18n()
 const wsStore = useWSStore()
@@ -437,7 +546,6 @@ const isPausedObj = ref({
 
 const wsTableListCache = ref<PumpObj[]>([])
 const wsTableList = ref<PumpObj[]>([])
-
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
   return (
@@ -451,6 +559,22 @@ const platforms = computed(() => {
     return pump_solana_platforms?.value?.join(',')
   } else {
   return 'fourmeme'}
+})
+const tabsList = computed(() => {
+  return [
+    {
+      name: t('new1'),
+      id: 'new'
+    },
+    {
+      name: t('soon'),
+      id: 'soon'
+    },
+    {
+      name: t('graduated'),
+      id: 'graduated'
+    }
+  ]
 })
 const list1 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.new || []
@@ -616,6 +740,19 @@ onMounted(() => {
 
 onUnmounted(()=>{
   document.removeEventListener('mousemove', mouseInsideTxs)
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: ['pumpstate'],
+    id: 1,
+  })
+  for (const key in Timer) {
+    const timerKey = key as keyof typeof Timer
+    if (Timer[timerKey]) {
+      clearTimeout(Timer[timerKey])
+      Timer[timerKey] = null
+    }
+  }
 })
 
 const mouseInsideTxs = throttle(function (event) {
@@ -751,7 +888,17 @@ function handlerFilterConfirm(
   }
   getPump({ ...params, ...val }, true)
 }
-
+function single(type: string) {
+  if (width.value < 1024) {
+    if (type == activeTab.value) {
+      return true
+    } else {
+      return false
+    }
+  } else {
+    return true
+  }
+}
 function getPumpList(isFilter = false) {
   const pumpFilter_new = localStorage.getItem(
     `pumpFilter_${activeChain.value}_new`
@@ -1120,6 +1267,38 @@ function getFilterData(list, conditions) {
   border-radius: 4px;
   font-size: 12px;
   height: 28px;
+  &.single {
+    background: transparent;
+    border-radius: 0px;
+    button {
+    border: none;
+
+    // font-size: 14px;
+    color: var(--d-999-l-666);
+    letter-spacing: 0;
+    font-weight: 400;
+    cursor: pointer;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    min-width: 36px;
+    padding: 5px 10px;
+    text-align: center;
+    opacity: 0.7;
+    font-weight: 500;
+    font-style: Medium;
+    font-size: 18px;
+    line-height: 28px;
+    letter-spacing: 0px;
+
+    &.active {
+      // color: var(--custom-font-4-color);
+      color: var(--d-F5F5F5-l-333);
+      background: var(--d-222-l-F2F2F2);
+      opacity: 1;
+    }
+  }
+  }
 
   button {
     border: none;

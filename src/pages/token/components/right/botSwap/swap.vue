@@ -711,12 +711,11 @@ async function submitBotSwap() {
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
-              unwatch()
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-              unwatch()
-              loadingSwap.value = false
             }
+            unwatch()
+            loadingSwap.value = false
           }
         })
       }
@@ -787,12 +786,11 @@ async function submitBotSwap() {
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
-              unwatch()
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-              unwatch()
-              loadingSwap.value = false
             }
+            unwatch()
+            loadingSwap.value = false
           }
         })
       }
@@ -862,6 +860,7 @@ function submitBotLimit() {
         let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
           // this.$store.state.bot.limitHistoryUpdate++
           tokenStore.placeOrderUpdate++
+          priceLimit.value = ''
           ElNotification({ type: 'success', message: t('limitSubmitted') })
           //  if (!['myBotPosition', 'botLimitOrder']?.includes(this.$store.state.tabActive)) {
           //   this.$store.state.tabActive = 'botLimitOrder'
@@ -886,12 +885,11 @@ function submitBotLimit() {
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
-              unwatch()
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-              unwatch()
-              loadingSwap.value = false
             }
+            unwatch()
+            loadingSwap.value = false
           }
         })
       }
@@ -932,6 +930,7 @@ function submitBotLimit() {
       if (res) {
         let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
           tokenStore.placeOrderUpdate++
+          priceLimit.value = ''
           ElNotification({ type: 'success', message: t('limitSubmitted') })
           loadingSwap.value = false
           amountToken.value = ''
@@ -949,12 +948,11 @@ function submitBotLimit() {
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
-              unwatch()
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-              unwatch()
-              loadingSwap.value = false
             }
+            unwatch()
+            loadingSwap.value = false
           }
         })
       }
