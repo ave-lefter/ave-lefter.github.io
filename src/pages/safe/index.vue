@@ -367,6 +367,7 @@ function confirmAuth() {
                   : 'Binding Successful')
               step.value = 0
               authInfo.value.authSetting = true
+              authInfo.value.transferStatus = true
               googleAuth.value.authSetting = true
               // emit('update:authCode', googleAuth.value.authCode)
               // emit('action')
