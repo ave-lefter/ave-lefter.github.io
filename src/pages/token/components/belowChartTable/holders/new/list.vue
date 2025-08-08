@@ -773,7 +773,7 @@
               </template>
             </template>
           </van-count-down> -->
-          <span class="text-[--d-666-l-999]">
+          <span v-tooltip="formatDate(row.last_txn_time, 'YYYY-MM-DD HH:mm:ss')" class="text-[--d-666-l-999]">
             {{
               row.last_txn_time
                 ? dayjs(new Date(row.last_txn_time).getTime()).fromNow()
