@@ -459,7 +459,7 @@ const mergeDataSource = (msg:any) => {
       list?.splice?.(100)
     }
     dataSourceCache.value.splice(0, dataSourceCache.value?.length, ...list)
-    console.log('dataSourceCache', dataSourceCache.value?.length)
+    // console.log('dataSourceCache', dataSourceCache.value?.length)
   }
 }
 
