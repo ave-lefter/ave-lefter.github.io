@@ -997,9 +997,11 @@ const addressAndChain = computed(() => {
 const tableHeight = computed(() => {
   return Math.max(tokenStore.commonHeight-265, 450)
 })
-function tableRowClick(rowData: {holder: string, remark: string}) {
-  console.log('----------rowData----------',rowData)
+function tableRowClick(rowData: {holder: string, remark: string,chain:string,txHash:string}) {
   if (!token.value) {
+    return
+  }
+  if(!SupportFullDataChain.includes(token.value.chain)){
     return
   }
   const { symbol, logo_url, chain, token: _token } = token.value
