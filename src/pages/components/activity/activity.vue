@@ -262,7 +262,7 @@ function sizeChange() {
 const filterMap = {
   price_change_dynamic: (el: any) =>
     el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval),
-  quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible && !walletStore.address,
+  quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible,
 }
 
 const visibleColumns = computed(() => {

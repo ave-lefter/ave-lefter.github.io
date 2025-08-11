@@ -1101,13 +1101,15 @@ export async function quoteFourMeme({from_token, to_token, amountIn, amountOut}:
       }
       return TokenManagerHelperV2.tryBuy(token, amountOut || '0', amountIn || '0').then(async res => {
         console.log('bug result', amountOut || '0', amountIn || '0', res)
+        let { tokenManager, quote, estimatedAmount, estimatedCost, estimatedFee, fundRequirement, fundAsParameter } = res
+        let res1 = { tokenManager, quote, estimatedAmount, estimatedCost, estimatedFee, fundRequirement, fundAsParameter }
         if (amountIn) {
           if (Number(res?.estimatedAmount) === 0) {
             return Promise.reject($i18n.t('fourMemeBuyError'))
           }
-          return {...res, amountOut: res?.estimatedAmount.toString()}
+          return {...res1, amountOut: res?.estimatedAmount.toString()}
         } else {
-          return {...res, amountIn: res?.fundRequirement.toString()}
+          return {...res1, amountIn: res?.fundRequirement.toString()}
         }
       })
     } else {
@@ -1115,7 +1117,9 @@ export async function quoteFourMeme({from_token, to_token, amountIn, amountOut}:
       console.log('sell', token, amountIn || '0')
       return TokenManagerHelperV2.trySell(token, amountIn || '0').then(async res => {
         console.log('sell result', res)
-        return {...res, amountOut: res?.funds.toString()}
+        let {tokenManager, quote, funds, fee} = res
+        let res1 = {tokenManager, quote, funds, fee}
+        return {...res1, amountOut: res?.funds.toString()}
       }).catch(err => {
         console.log('err', err.message)
         if (err?.message?.includes('reverted with panic code 17')) {

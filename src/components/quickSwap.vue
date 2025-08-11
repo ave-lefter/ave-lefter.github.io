@@ -7,6 +7,8 @@ import { formatBotGasTips } from '~/utils/bot'
 import type { Size } from '~/api/types/pump'
 import { getSwapSize } from '@/utils/index'
 import type { BotChain, BotSettingKey } from '~/utils/types'
+import useWalletSwap from './quickSwap/wallet'
+const { walletSwap, loadingWalletSwap } = useWalletSwap()
 
 const {t} = useI18n()
 const props = withDefaults(defineProps<{
@@ -70,8 +72,18 @@ function submitBotSwap() {
 
 const nativeToken = shallowRef()
 const botSettingStore = useBotSettingStore()
+const walletStore = useWalletStore()
+
+async function beforeWalletSwap() {
+  const amount = (new BigNumber(props.quickBuyValue || 0)).toFixed()
+  walletSwap(amount, props.row as any)
+}
 
 async function beforeSubmitSwap() {
+  if (walletStore.provider && walletStore.address && !botStore.evmAddress) {
+    beforeWalletSwap()
+    return
+  }
   visible.value = false
   const {chain} = props.row
   loadingSwap.value = true
@@ -207,7 +219,7 @@ async function getTokenBalance(chain: string) {
   <template v-if="buttonType === 0">
     <el-button
     :disabled="!Number(quickBuyValue)"
-    :loading="loadingSwap"
+    :loading="loadingSwap || loadingWalletSwap"
     :color="buttonBg"
     class="flex items-center [&&]:px-12px"
     :class="classNames"
@@ -216,6 +228,7 @@ async function getTokenBalance(chain: string) {
     @click.stop.prevent="submitBotSwap"
   >
     <Icon
+    v-if="!(loadingSwap || loadingWalletSwap)"
     :style="{ 'font-size': getSwapSize(size as Size).flash }"
       class="mr-4px"
       name="mynaui:lightning-solid"
@@ -256,7 +269,7 @@ async function getTokenBalance(chain: string) {
   </template>
   <el-button
     v-else
-    :loading="loadingSwap"
+    :loading="loadingSwap || loadingWalletSwap"
     :color="buttonBg"
     class="flex items-center [&&]:px-4px"
     :class="classNames"
