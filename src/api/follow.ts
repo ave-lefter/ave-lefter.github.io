@@ -114,7 +114,7 @@ export async function _getAttentionListOld(params: any): Promise<AddAttentionOld
 //获取关注数
 export async function _getFollowsNum(params: any): Promise<{ all: number, soldAll: number}> {
   const { $api } = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v1api/v3/stats/follows/aggregatestates', {
+  return $api('/v1api/v3/stats/follows/aggregatestates', {
     method: 'get',
     params,
   })
