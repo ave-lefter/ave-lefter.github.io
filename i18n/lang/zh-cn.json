@@ -1319,5 +1319,6 @@
   "blockHeight": "区块高度",
   "withdrawAgain": "再转一笔",
   "trading": "交易中",
-  "withdrawTip": "需预留0.002，以确保钱包功能正常使用"
+  "withdrawTip": "需预留0.002，以确保钱包功能正常使用",
+  "soldAllTips":"关注地址若曾与老币交互，可能造成数值存在一定偏差。"
 }
