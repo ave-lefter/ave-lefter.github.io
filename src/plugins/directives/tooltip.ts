@@ -34,6 +34,7 @@ interface TooltipController {
     }
   }) => void
   hide: () => void
+  getCurrentId: () => string | null
 }
 
 function resolveTooltip(el: HTMLElementDirective): TooltipController | undefined {
@@ -65,6 +66,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
 
     const raw = binding.modifiers?.raw ?? false
     const value = binding.value
+    el.setAttribute('data-tooltip-id', uuid())
 
     el.__tooltipHandlers = {
       showTooltip: () => {
@@ -158,7 +160,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
 
   unmounted(el) {
     const tooltip = resolveTooltip(el)
-    if (tooltip) {
+    if (tooltip && tooltip.getCurrentId() === el.getAttribute('data-tooltip-id')) {
       tooltip.hide()
     }
     const { onMouseEnter, onMouseLeave } = el.__tooltipHandlers || {}

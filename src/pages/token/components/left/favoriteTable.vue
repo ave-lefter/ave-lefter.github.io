@@ -302,7 +302,7 @@ function resetListStatus() {
                   <img
                     v-if="row.issue_platform"
                     v-tooltip="row.issue_platform"
-                    class="ml-5px w-10px h-10px"
+                    class="ml-5px w-10px h-10px rounded-full"
                     :src="formatIconTag(row.issue_platform)"
                     alt=""
                   >
