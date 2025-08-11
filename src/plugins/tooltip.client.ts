@@ -26,7 +26,6 @@ export interface TooltipInstance {
   hide: () => void
   destroy: () => void
   getId: () => string // 新增：获取实例ID
-  getCurrentId: () => string | null
 }
 
 export interface Measurable {
@@ -40,7 +39,6 @@ function createTooltipInstance(appContext: App['_context'], id: string): Tooltip
   const content = shallowRef<TooltipContent | null>(null)
   const triggerRef = shallowRef<HTMLElement | null>(null)
   const tooltipProps = shallowRef<Record<string, any>>({})
-  const currentId = ref<string | null>(null)
   let container: HTMLDivElement | null = null
   let vnode: ReturnType<typeof h> | null = null
 
@@ -106,7 +104,6 @@ function createTooltipInstance(appContext: App['_context'], id: string): Tooltip
       triggerRef.value = target
       content.value = c
       tooltipProps.value = props
-      currentId.value = target.getAttribute('data-tooltip-id')
 
       nextTick(() => {
         if (!triggerRef.value || !triggerRef.value.parentNode) {
@@ -119,7 +116,6 @@ function createTooltipInstance(appContext: App['_context'], id: string): Tooltip
     },
     hide() {
       visible.value = false
-      currentId.value = null
     },
     destroy() {
       if (vnode && container) {
@@ -135,9 +131,6 @@ function createTooltipInstance(appContext: App['_context'], id: string): Tooltip
     },
     getId() { // 新增：返回实例ID
       return id
-    },
-    getCurrentId() {
-      return currentId.value
     }
   }
 

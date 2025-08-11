@@ -8,6 +8,7 @@ interface HTMLElementDirective extends HTMLElement {
     showTooltip: () => void
   }
   __lastTooltipValue?: TooltipValue
+  visible?: boolean
 }
 
 type TooltipValue =
@@ -34,7 +35,6 @@ interface TooltipController {
     }
   }) => void
   hide: () => void
-  getCurrentId: () => string | null
 }
 
 function resolveTooltip(el: HTMLElementDirective): TooltipController | undefined {
@@ -66,7 +66,6 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
 
     const raw = binding.modifiers?.raw ?? false
     const value = binding.value
-    el.setAttribute('data-tooltip-id', uuid())
 
     el.__tooltipHandlers = {
       showTooltip: () => {
@@ -94,6 +93,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
             ...props,
           },
         })
+        el.visible = true
       },
       onMouseEnter: (e: MouseEvent) => {
         e.stopPropagation()
@@ -102,6 +102,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
       onMouseLeave: (e: MouseEvent) => {
         e.stopPropagation()
         tooltip.hide()
+        el.visible = false
       }
     }
     el.onmouseenter = el.__tooltipHandlers.onMouseEnter
@@ -143,6 +144,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
               ...props,
             },
           })
+          el.visible = true
         },
         onMouseEnter: (e: MouseEvent) => {
           e.stopPropagation()
@@ -151,6 +153,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
         onMouseLeave: (e: MouseEvent) => {
           e.stopPropagation()
           tooltip.hide()
+          el.visible = false
         }
       }
       el.onmouseenter = el.__tooltipHandlers.onMouseEnter
@@ -160,7 +163,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
 
   unmounted(el) {
     const tooltip = resolveTooltip(el)
-    if (tooltip && tooltip.getCurrentId() === el.getAttribute('data-tooltip-id')) {
+    if (tooltip && el.visible) {
       tooltip.hide()
     }
     const { onMouseEnter, onMouseLeave } = el.__tooltipHandlers || {}
