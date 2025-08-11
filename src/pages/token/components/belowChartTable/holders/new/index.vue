@@ -84,7 +84,7 @@
         </div>
       </li>
       <li>
-        <div>{{ $t('soldAll') }}/{{ $t('all') }}</div>
+        <div class="flex items-center justify-center">{{ $t('soldAll') }}/{{ $t('all') }}<Icon v-tooltip="$t('soldAllTips')" name="material-symbols:help-outline" class="ml-4px"/></div>
         <div v-if="activeTab == '-100'">
           <span
             :class="!Number(globalStore.headFollowsNum.soldAll || 0) ? 'color-text-2' : ''"

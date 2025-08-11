@@ -1320,5 +1320,6 @@
   "blockHeight": "Block",
   "withdrawAgain": "Withdraw Again",
   "trading": "trading",
-  "withdrawTip": "0.002 is required to ensure the normal use of the wallet function"
+  "withdrawTip": "0.002 is required to ensure the normal use of the wallet function",
+  "soldAllTips":"The follow address may have interacted with old coins, resulting in some deviations in the value."
 }
