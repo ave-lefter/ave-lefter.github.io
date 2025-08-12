@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div v-if="(result?.total<=0) && (walletStore.walletName === 'WatchWallet')"/>
+  <div v-else>
     <span
       class="flex items-center text-14px cursor-pointer color-[--d-FFF-l-333]"
       @click="showBlackList"
@@ -63,7 +64,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column min-width="60" :label="t('operation')">
+            <el-table-column min-width="70" :label="t('operation')">
               <template #default="{ row }">
                 <div class="">
                   <el-button
@@ -145,6 +146,12 @@ const showBlackList = () => {
   visible.value = true
   getBlackList()
 }
+
+onMounted(() => {
+  if(walletStore.walletName==='WatchWallet'){
+    getBlackList()
+  }
+})
 
 const getBlackList = useThrottleFn(async()=>{
   console.log('getBlackList', props.userIds)

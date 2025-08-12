@@ -32,6 +32,7 @@
             <template v-if="col?.prop === 'token'">
               <div class="flex items-center clickable flex-nowrap relative">
                 <Icon
+                  v-if="walletStore.walletName!=='WatchWallet'"
                   name="bx:bxs-hide"
                   class=" bxs-hide cursor-pointer color-#959a9f overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out"
                   @click.self.stop="hideToken(row)"

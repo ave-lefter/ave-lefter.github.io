@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import XIcon from '~/components/xPopup/xIcon.vue'
 
 const emit = defineEmits(['collect'])
 const { t } = useI18n()
@@ -200,7 +201,17 @@ const created_at_unix = computed(() => {
           </div>
           <div v-if="row?.medias?.length > 0" class="flex items-center gap-4px">
             <template v-for="(item, index) in row?.medias" :key="index">
-              <div v-if="item.url" v-tooltip="item.url">
+              <XPopup v-if="item.icon === 'twitter'" :tokenId="((row.token + '-' + row.chain) as string)" :type="row.twitter_type">
+
+                <a class="flex items-center" :href="item.url" target="_blank" @click.stop>
+                  <XIcon
+                    v-if="[1, 2, 3].includes(row.twitter_type)"
+                    :type="row.twitter_type"
+                  />
+                  <Icon v-else :name="`custom:${item.icon}`" />
+                </a>
+              </XPopup>
+              <div v-else-if="item.url" v-tooltip="item.url">
                 <a class="flex items-center" :href="item.url" target="_blank" @click.stop>
                   <Icon :name="`custom:${item.icon}`" />
                 </a>

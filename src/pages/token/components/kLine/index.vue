@@ -17,10 +17,10 @@ import { getKlineHistoryData } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
 import { switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, buildOrUpdateLastBarFromTx, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark } from './utils'
 import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
-import type { WSTx, KLineBar } from './types'
+import type { WSTx, KLineBar, SimpleWSTx } from './types'
 import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
-import {DefaultHeight} from '~/utils/constants'
+import {DefaultHeight, WSSimpleTxChain} from '~/utils/constants'
 import { TW_STUDY } from './constant'
 
 const tokenStore = useTokenStore()
@@ -124,6 +124,8 @@ let lastBar: null | {
   volume: number
 } = null
 
+let lastPairPrice = 0
+
 // const LLJEFFY_#_240
 const listenerGuidMap = new Map()
 
@@ -164,6 +166,7 @@ function resetChart() {
   isReadyLine = false
   isHeaderReady = false
   lastBar = null
+  lastPairPrice = 0
   resetLimitPriceLineId()
   resetAvgPriceLineId()
   _widget?.remove?.()
@@ -438,6 +441,7 @@ async function initChart() {
           if (firstDataRequest) {
             noData = false
             lastBar = null
+            lastPairPrice = 0
           } else {
             if (noData) {
               onResult([], { noData: true })
@@ -466,6 +470,7 @@ async function initChart() {
             klinePair.value = res?.pair || ''
             if (firstDataRequest) {
               lastBar = bars1?.[bars1?.length - 1] || null
+              lastPairPrice = Number(lastBar?.close || 0)
               if (lastBar) {
                 lastBar.time = lastBar.time * 1000
               }
@@ -512,11 +517,26 @@ async function initChart() {
           return
         }
         const { address, chain } = getAddressAndChainFromId(token.value)
-        const params = [
+        let params: [string, string | { tks: { ch: string, tk: string }[], rt: string }, string?] = [
           'multi_tx',
           address,
           chain
         ]
+        if (WSSimpleTxChain.includes(chain)) {
+          params = [
+          'simple_tx',
+          {
+            tks: [
+              {
+                ch: chain,
+                tk: address
+              }
+            ],
+            rt: 'json'
+          }
+        ]
+        }
+
         const data = {
           jsonrpc: '2.0',
           method: 'subscribe',
@@ -634,11 +654,29 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsSto
       return
     }
     const { event, data } = msg
-    if (event === 'tx') {
-      const tx: WSTx = data?.tx
+    if (event === WSEventType.SIMPLE_TX || event === WSEventType.TX) {
+      const tx: SimpleWSTx | WSTx = data?.msg
       const interval = switchResolution(resolution)
-      if (tx.pair_address === pair.value && !tx?.tx_type && !loading) {
-        const t = token.value?.replace?.(/-.*$/, '')
+      const t = getAddressAndChainFromId(route.params.id as string)?.address
+      let target = ''
+      if ('target' in tx) {
+        target = tx.target
+      } else {
+        target = ([tx.from_address, tx.to_address].find(i => i === t)) || ''
+      }
+      if (target === t && !loading) {
+        const _pair = 'pair' in tx ? tx.pair : tx.pair_address
+        const _price = 'price_u' in tx ? Number(tx.price_u || 0) : Number(tx.from_address?.toLowerCase?.() === tokenStore.token?.token?.toLowerCase?.() ? tx.from_price_usd : tx.to_price_usd) || 0
+        if (_pair === pair.value) {
+          lastPairPrice = _price
+        }
+        if (_pair !== pair.value) {
+          const price = _price
+          if (!lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
+            return
+          }
+        }
+        tokenStore.tokenPrice = _price
         const newBar1 = buildOrUpdateLastBarFromTx(tx, t, lastBar, interval)
         if (newBar1) {
           lastBar = {...newBar1}

@@ -39,34 +39,56 @@
       @click="collect"
     />
     <div class="token-info ml-16px flex items-center color-[--d-666-l-999]">
-      <div
-        v-if="getSymbolDefaultIcon(token)"
-        class="icon-token-container relative"
-      >
-        <el-image
-          class="token-icon rounded-100%"
-          :src="getSymbolDefaultIcon(token)"
-          lazy
-        >
-          <template #error>
-            <img
-              class="token-icon"
-              :src="getChainDefaultIcon(token?.chain, token?.symbol)"
+      <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" >
+        <template #content>
+          <el-image
+            class="token-icon  h-228px w-228px items-center"
+            :src="getSymbolDefaultIcon(token)"
+            lazy
+          >
+            <template #error>
+              <img
+                class="token-icon h-228px w-228px"
+                :src="getChainDefaultIcon(token?.chain, token?.symbol)"
+              >
+            </template>
+            <template #placeholder>
+              <img
+                class="token-icon h-228px w-228px"
+                :src="getChainDefaultIcon(token?.chain, token?.symbol)"
+              >
+            </template>
+          </el-image>
+        </template>
+          <div
+            v-if="getSymbolDefaultIcon(token)"
+            class="icon-token-container relative"
+          >
+          <el-image
+              class="token-icon rounded-100%"
+              :src="getSymbolDefaultIcon(token)"
+              lazy
             >
-          </template>
-          <template #placeholder>
+              <template #error>
+                <img
+                  class="token-icon"
+                  :src="getChainDefaultIcon(token?.chain, token?.symbol)"
+                >
+              </template>
+              <template #placeholder>
+                <img
+                  class="token-icon"
+                  :src="getChainDefaultIcon(token?.chain, token?.symbol)"
+                >
+              </template>
+            </el-image>
             <img
-              class="token-icon"
-              :src="getChainDefaultIcon(token?.chain, token?.symbol)"
+              v-if="token?.chain"
+              class="icon-symbol rounded-100%"
+              :src="`${token_logo_url}chain/${token?.chain}.png`"
             >
-          </template>
-        </el-image>
-        <img
-          v-if="token?.chain"
-          class="icon-symbol rounded-100%"
-          :src="`${token_logo_url}chain/${token?.chain}.png`"
-        >
-      </div>
+          </div>
+      </el-tooltip>
       <div class="ml-8px">
         <div class="flex items-center">
           <span
@@ -78,6 +100,45 @@
           }}</span>
           <div class="flex items-center justify-start">
             <img v-if="(token?.risk_level??0) < 0" class="bg-btn" src="@/assets/images/fengxian.png" :width="12">
+            <div v-if="medias?.length > 0" class="flex text-20px">
+              <div v-for="(item, index) in medias" :key="index" class="tag-btn">
+                <template v-if="item.url">
+                  <span
+                    v-if="item.name === 'QQ'"
+                    v-tooltip="item.url"
+                    class="bg-btn"
+                  >
+                    <Icon
+                      :name="`custom:${item.icon}`"
+                      class="text-[--d-666-l-999] text-12px"
+                    />
+                  </span>
+                  <a
+                    v-else
+                    v-tooltip="item.url"
+                    :href="item.url"
+                    target="_blank"
+                    class="bg-btn"
+                    @click.stop
+                  >
+                    <Icon
+                      :name="`custom:${item.icon}`"
+                      class="text-[--d-666-l-999] text-12px"
+                    />
+                  </a>
+                </template>
+              </div>
+            </div>
+            <a
+              class="media-item bg-btn"
+              :href="`https://x.com/search?q=($${token?.symbol} OR ${token?.token})&src=typed_query&f=live`"
+              target="_blank"
+            >
+              <Icon
+                class="text-[--d-666-l-999] h-16px w-10px"
+                name="custom:search"
+              />
+            </a>
             <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
               <div
                 v-for="(i, index) in getTags(pair)?.normal_tag"
@@ -127,6 +188,26 @@
                       class="text-[--d-666-l-999] text-12px"
                     />
                   </span>
+                  <XPopup v-else-if="item.icon === 'twitter'" :tokenId="(route.params.id as string)" :type="tokenStore.twitterType">
+                    <a
+                      :href="item.url"
+                      target="_blank"
+                      class="bg-btn"
+                      @click.stop
+                    >
+                      <XIcon
+                        v-if="[1, 2, 3].includes(tokenStore.twitterType)"
+                        :type="tokenStore.twitterType"
+                        class="text-12px"
+                      />
+                      <Icon
+                        v-else
+                        :name="`custom:${item.icon}`"
+                        class="text-[--d-666-l-999] text-12px"
+                      />
+                    </a>
+                  </XPopup>
+
                   <a
                     v-else
                     v-tooltip="item.url"
@@ -153,16 +234,6 @@
               style="border-radius: 100%"
             >
             <a
-              class="media-item bg-btn"
-              :href="`https://x.com/search?q=($${token?.symbol} OR ${token?.token})&src=typed_query&f=live`"
-              target="_blank"
-            >
-              <Icon
-                class="text-[--d-666-l-999] h-16px w-10px"
-                name="custom:search"
-              />
-            </a>
-            <a
               v-if="aiSummary?.headline || aiSummary?.summary"
               v-tooltip.raw="{
                 content: `<div class='max-w-[400px]'>${aiSummary.headline || aiSummary.summary}</div>`,
@@ -174,6 +245,7 @@
               <Icon name="custom:ai" class="text-14px"/>
             </a>
           </div>
+          <DeBox/>
           <el-popover
             v-if="collected"
             v-model:visible="editableGroup"
@@ -309,7 +381,6 @@
               </div>
             </template>
           </el-popover>
-          <DeBox/>
         </div>
         <div class="text-12px flex items-center mt-4px">
           <a
@@ -331,8 +402,9 @@
             v-if="pair"
             v-tooltip="formatDate(pair?.created_at)"
             class="ml-5px hover:color-[--d-F5F5F5-l-333] leading-12px font-400 mr-8px"
-            >{{ dayjs(pair?.created_at * 1000).fromNow() }}</span
-          >
+            >
+            {{ formatTimeFromNow(pair?.created_at) }}
+            </span>
           <div
             v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0"
             class="flex-start bg-btn"
@@ -455,13 +527,13 @@
                   pair?.smart_money_sell_count_24h || 0,
               })
             "
-            class="minor flex-end color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn"
+            class="minor flex-end color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px"
           >
             <Icon
               class="text-[--d-666-l-999] h-12px w-12px mr-2px"
               name="custom:smart"
             />
-            <span class="mr-2px">{{ $t('smarter') }}</span>
+            <span class="mr-2px text-10px">{{ $t('smarter') }}</span>
             <span
               :style="{
                 color:
@@ -688,6 +760,8 @@ import Top50 from './top50.vue'
 import Run from './run.vue'
 import Check from './check.vue'
 import DeBox from './deBox.vue'
+import XPopup from '~/components/xPopup/index.vue'
+import XIcon from '~/components/xPopup/xIcon.vue'
 import {
   getSymbolDefaultIcon,
   getChainDefaultIcon,

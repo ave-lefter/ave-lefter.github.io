@@ -21,7 +21,8 @@
                   <a
                     href="https://apps.apple.com/us/app/ave-pro/id6741381461?l=zh-Hans-CN"
                     target="_blank"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="download-btn bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    @click.stop.prevent="trackRefDownload('IOS AppStore', $event)"
                   >
                     <svg class="w-5 h-5 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M17.1148 13.405C17.084 8.86378 19.6359 8.74626 19.7506 8.67351C18.3152 6.57498 16.0824 6.24481 15.2877 6.21403C13.3878 6.02097 11.5803 7.31086 10.615 7.31086C9.65245 7.31086 8.1639 6.21123 6.5886 6.23921C4.51805 6.26999 2.60698 7.43957 1.53813 9.29467C-0.613561 13.0301 0.986919 18.5618 3.08545 21.5893C4.10953 23.0722 5.33228 24.7371 6.93835 24.6783C8.48287 24.6167 9.06766 23.6766 10.9368 23.6766C12.8058 23.6766 13.3291 24.6783 14.9659 24.6447C16.628 24.614 17.6828 23.1338 18.6985 21.6452C19.8765 19.9244 20.3606 18.3435 20.3885 18.2596C20.3522 18.2428 17.1456 16.4325 17.112 13.405H17.1148Z" fill="white"/>
@@ -32,7 +33,8 @@
                   <a
                     href="https://testflight.apple.com/join/BZ3XHS5f"
                     target="_blank"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="download-btn bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    @click.stop.prevent="trackRefDownload('IOS Testflight', $event)"
                   >
                     <img
                       src="/download/vector-9.svg"
@@ -49,7 +51,8 @@
                   <a
                     href="https://play.google.com/store/apps/details?id=ai.ave.platform"
                     target="_blank"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="download-btn bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    @click.stop.prevent="trackRefDownload('Android googlePlay', $event)"
                   >
                     <img
                       src="/download/frame-1.svg"
@@ -60,7 +63,8 @@
                   </a>
                   <a
                     href="https://ossaveai.com/oss/app/ave.ai.apk"
-                    class="bg-[#161926] text-white text-sm flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="download-btn bg-[#161926] text-white text-sm flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    @click.stop.prevent="trackRefDownload('Android apk', $event)"
                   >
                     <img
                       src="/download/vector-6.svg"
@@ -76,7 +80,8 @@
                 <div class="grid gap-4">
                   <a
                     href="https://ossaveai.com/oss/app/avedex-mac.dmg.zip"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="download-btn bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    @click.stop.prevent="trackRefDownload('MacOS dmg', $event)"
                   >
                     <svg class="w-5 h-5 mr-2" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M17.1148 13.405C17.084 8.86378 19.6359 8.74626 19.7506 8.67351C18.3152 6.57498 16.0824 6.24481 15.2877 6.21403C13.3878 6.02097 11.5803 7.31086 10.615 7.31086C9.65245 7.31086 8.1639 6.21123 6.5886 6.23921C4.51805 6.26999 2.60698 7.43957 1.53813 9.29467C-0.613561 13.0301 0.986919 18.5618 3.08545 21.5893C4.10953 23.0722 5.33228 24.7371 6.93835 24.6783C8.48287 24.6167 9.06766 23.6766 10.9368 23.6766C12.8058 23.6766 13.3291 24.6783 14.9659 24.6447C16.628 24.614 17.6828 23.1338 18.6985 21.6452C19.8765 19.9244 20.3606 18.3435 20.3885 18.2596C20.3522 18.2428 17.1456 16.4325 17.112 13.405H17.1148Z" fill="white"/>
@@ -86,7 +91,8 @@
                   </a>
                   <a
                     href="https://ossaveai.com/oss/app/ave.ai-win64.exe"
-                    class="bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    class="download-btn bg-[#161926] text-sm text-white flex items-center justify-center py-3 px-3 rounded-lg hover:bg-opacity-80 transition duration-300"
+                    @click.stop.prevent="trackRefDownload('Windows win64 app', $event)"
                   >
                     <svg
                       class="w-5 h-5 mr-2"
@@ -651,10 +657,37 @@
     </main>
   </div>
 </template>
-<script setup>
-  import Footer from './components/footer'
+<script setup lang="ts">
+  import Footer from './components/footer.vue'
   import AOS from 'aos'
   import 'aos/dist/aos.css'
+  import { trackRef } from '~/api/tracking'
+  const getImgUrlBylang = (url: string)=>{
+    if(useLocaleStore().locale == 'en'){
+      return url
+    }
+    url = url.replace('-en.', '.')
+    return url
+  }
+
+
+  function trackRefDownload(platform: string, e1: MouseEvent) {
+    const e = e1 as MouseEvent & { target: HTMLAnchorElement }
+    if (e?.target?.href) {
+      e.preventDefault()
+      trackRef({
+        category: 'download',
+        extra: platform + ' (pro.ave.ai)'
+      }).finally(() => {
+        if (e?.target?.target === '_blank') {
+          window.open(e.target.href)
+        } else {
+          window.location.href = e?.target?.href || ''
+        }
+      })
+    }
+  }
+
   onMounted(() => {
     setTimeout(() => {
       AOS.init({
@@ -667,14 +700,12 @@
         anchorPlacement: 'top-bottom',
       })
     }, 10)
+
+    trackRef({category: 'view', extra: 'download(pro.ave.ai)'})
   })
-  const getImgUrlBylang = (url)=>{
-    if(useLocaleStore().locale == 'en'){
-      return url
-    }
-    url = url.replace('-en.', '.')
-    return url
-  }
 </script>
 <style scoped lang="scss">
+.download-btn  * {
+  pointer-events: none;
+}
 </style>

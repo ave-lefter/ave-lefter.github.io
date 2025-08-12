@@ -2,7 +2,8 @@
   <header
     class="w-full bg-[var(--d-111-l-FFF)] flex items-center justify-between p-x-17px h-60px"
   >
-    <a :href="homeUrl" target="_blank" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></a>
+    <NuxtLink to="/" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></NuxtLink>
+    <!-- <a :href="homeUrl" target="_blank" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></a> -->
     <!-- <ul class="menu ml-20px">
       <li v-for="(item, $index) in list" :key="$index">
         <a :href="item.src" target="_blank" :class="{ active: item.id == route?.name }">
