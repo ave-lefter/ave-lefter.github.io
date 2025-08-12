@@ -112,9 +112,9 @@ export const useTokenStore = defineStore('token', () => {
     pairAddress.value = ''
   }
 
-  function _getTotalHolders() {
-    if (!route.params.id) return
-    getTotalHolders(route.params.id as string).then(res => {
+  function _getTotalHolders(tokenId: string) {
+    if (!tokenId) return
+    getTotalHolders(tokenId).then(res => {
       totalHolders.value = Array.isArray(res) ? res : []
       triggerRef(totalHolders)
     })
