@@ -75,6 +75,9 @@ export const useBotStore = defineStore('bot', () => {
     }
     const res = await bot_getUserInfoByGuid(userInfo.value?.tgUid)
     useUserStore().email = res.emailAddress
+    useUserStore().authInfo= {
+      ...res
+    }
     return res
   }
 
