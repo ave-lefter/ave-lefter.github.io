@@ -322,11 +322,11 @@ export const useSwapStore = defineStore('swap', () => {
         } else {
           isERC314.value = false
         }
-        if (pairInfo?.amm === 'moonshot') {
-          isMoonshot.value = true
-        } else {
-          isMoonshot.value = false
-        }
+        // if (pairInfo?.amm === 'moonshot') {
+        //   isMoonshot.value = true
+        // } else {
+        //   isMoonshot.value = false
+        // }
         if (pairInfo?.amm?.includes('fourmeme')) {
           isFourMeme.value = true
         } else {

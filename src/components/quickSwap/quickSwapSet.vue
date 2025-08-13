@@ -34,7 +34,7 @@
       </template>
     </el-input>
     <div
-      v-if="isQuickSupported&&settingsButtonVisible"
+      v-if="isQuickSupported&&settingsButtonVisible1"
       class="ml-20px flex justify-end items-center text-12px">
       <span class="color-[--d-999-l-666] mr-5px">{{ $t('default') }}</span>
       <div
@@ -114,6 +114,7 @@ const configStore = useConfigStore()
 const botSwapStore = useBotSwapStore()
 const botSettingStore = useBotSettingStore()
 const tokenStore = useTokenStore()
+const walletStore = useWalletStore()
 const emit = defineEmits(['update:quickBuyValue'])
 const props = withDefaults(defineProps<{
   chain: BotChain
@@ -131,8 +132,15 @@ const selected = ref<BotSettingKey>('s1')
 const btnRefs = ref<Record<string, HTMLElement | null>>({})
 const currentBtnRef = ref<HTMLElement | null>(null)
 
+const isWallet = computed(() => {
+  return (walletStore.provider && walletStore.address && !botStore.evmAddress)
+})
 const isQuickSupported = computed(()=>{
-  return props.chain && botStore.isSupportChains.includes(props.chain)
+  return props.chain && botStore.isSupportChains.includes(props.chain) && !isWallet.value
+})
+
+const settingsButtonVisible1 = computed(() => {
+  return props.settingsButtonVisible && !isWallet.value
 })
 const botPriorityFee = computed(() => {
   const chain = props.chain
