@@ -5,6 +5,7 @@ import { useBotStore } from '@/stores/bot'
 import { getChainInfo } from '@/utils'
 import unified from './unified.vue'
 import { cancelAllLimitOrdersByGuid } from '@/api/token'
+import { useEventBus } from '@vueuse/core'
 
 const props = defineProps({
   currentActiveTab: {
@@ -62,6 +63,7 @@ function toggleCancelAll() {
         chain: activeTab.value,
       })
       unifiedRef.value.getUserPendingTx()
+      useEventBus<string>('updateKlineLimitLine').emit()
     }).catch(() => { })
 }
 

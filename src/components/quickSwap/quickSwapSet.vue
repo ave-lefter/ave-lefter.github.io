@@ -1,14 +1,14 @@
 <template>
   <div class="items-center inline-flex">
-    <img v-if="themeStore.isDark" src="@/assets/images/fast.svg" class="w-14px h-14px" alt="" srcset="">
-    <img v-else src="@/assets/images/fast-dark.svg" class="w-14px h-14px" alt="" srcset="">
-    <span class="ml-5px mr-5px color-[--d-999-l-666] text-12px">{{ $t('quick') }}</span>
+    <img v-if="themeStore.isDark" src="@/assets/images/fast.png" class="w-14px h-14px" alt="" srcset="">
+    <img v-else src="@/assets/images/fast-dark.png" class="w-14px h-14px" alt="" srcset="">
+    <span class="ml-5px mr-5px color-[--d-566275-l-8CA0C3] text-12px">{{ $t('quick') }}</span>
     <el-input
       v-model.trim="quickBuyValue1"
       style="
-          background: var(--d-222-l-F2F2F2);
-          --el-input-bg-color: var(--d-222-l-F2F2F2);
-          --el-input-border-color: var(--d-222-l-F2F2F2);
+          background: var(--d-151A22-l-E8F1FF);
+          --el-input-bg-color: var(--d-151A22-l-E8F1FF);
+          --el-input-border-color: var(--d-151A22-l-E8F1FF);
           border-radius: 4px;
           width: 88px;
           height: 28px;
@@ -36,17 +36,17 @@
     <div
       v-if="isQuickSupported&&settingsButtonVisible"
       class="ml-20px flex justify-end items-center text-12px">
-      <span class="color-[--d-999-l-666] mr-5px">{{ $t('default') }}</span>
+      <span class="color-[--d-566275-l-8CA0C3] mr-5px">{{ $t('default') }}</span>
       <div
-        class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--d-222-l-F2F2F2] px-2px py-2px">
+        class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--d-151A22-l-E8F1FF] px-2px py-2px">
 
         <button
           v-for="item in (['s1', 's2', 's3'] as const)"
           :id="item"
           :key="item"
           :ref="setBtnRef"
-          class="color-[--d-666-l-999] cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center"
-          :class="`${item === botSettingStore.botSettings?.[chain]?.selected?'color-[--d-F5F5F5-l-333] bg-[--d-111-l-FFF]':'bg-transparent'}`"
+          class="color-[--d-8CA0C3-l-566275] cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center"
+          :class="`${item === botSettingStore.botSettings?.[chain]?.selected?'color-[--d-F5F5F5-l-0B0D12] bg-[--d-000-l-FFF]':'bg-transparent'}`"
           type="button"
           @click.stop="botSettingStore.botSettings[chain]!.selected = item"
           @mouseenter="showPopover(item)"
@@ -66,6 +66,7 @@
     />
     <el-popover
       v-model:visible="visible"
+      popper-class="new-popover"
       :virtual-ref="currentBtnRef"
       virtual-triggering
       trigger="contextmenu"
@@ -73,27 +74,27 @@
     >
       <ul>
         <li class="text-14px mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-12px color-[--d-666-l-999] ml-0 mr-6px cursor-pointer"/>
+          <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-12px color-[--d-8CA0C3-l-566275] ml-0 mr-6px cursor-pointer"/>
           <span v-if="botSettingStore.botSettings?.[chain]?.[selected]?.slippage !== 'auto'">{{
               botSettingStore.botSettings?.[chain || '']?.[selected]?.slippage
             }}%</span>
           <span v-else>{{ $t('auto') }}</span>
         </li>
         <li v-if="isEvmChain(chain || '')" class="text-14px mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="text-12px color-[--d-666-l-999] ml-0 mr-6px cursor-pointer"/>
+          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="text-12px color-[--d-8CA0C3-l-566275] ml-0 mr-6px cursor-pointer"/>
           <span>${{ getEstimatedGas() }}</span>
         </li>
         <li v-if="chain === 'solana'" class="text-14px mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-12px color-[--d-666-l-999] mr-6px cursor-pointer ml-0"/>
+          <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-12px color-[--d-8CA0C3-l-566275] mr-6px cursor-pointer ml-0"/>
           <span>{{ botPriorityFee }} SOL</span>
         </li>
         <li class="text-14px mt-4px mb-4px flex-start">
-          <span class="mr-4px color-[--d-666-l-999] text-14px">{{ $t('autoSellHalf') }}</span>
+          <span class="mr-4px color-[--d-8CA0C3-l-566275] text-14px">{{ $t('autoSellHalf') }}</span>
           {{  botSettingStore.autoSellConfigs?.autoSell ? $t('on') : $t('off') }}
         </li>
 
         <li class="text-14px mt-4px mb-4px flex-start">
-          <span class="mr-4px color-[--d-666-l-999] text-14px">{{ $t('mev') }}</span>
+          <span class="mr-4px color-[--d-8CA0C3-l-566275] text-14px">{{ $t('mev') }}</span>
           {{  botSettingStore.botSettings?.[chain]?.[selected]?.mev ? $t('on')  : $t('off') }}
         </li>
 

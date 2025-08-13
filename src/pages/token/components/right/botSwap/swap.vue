@@ -860,6 +860,7 @@ function submitBotLimit() {
         let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
           // this.$store.state.bot.limitHistoryUpdate++
           tokenStore.placeOrderUpdate++
+          priceLimit.value = ''
           ElNotification({ type: 'success', message: t('limitSubmitted') })
           //  if (!['myBotPosition', 'botLimitOrder']?.includes(this.$store.state.tabActive)) {
           //   this.$store.state.tabActive = 'botLimitOrder'
@@ -929,6 +930,7 @@ function submitBotLimit() {
       if (res) {
         let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
           tokenStore.placeOrderUpdate++
+          priceLimit.value = ''
           ElNotification({ type: 'success', message: t('limitSubmitted') })
           loadingSwap.value = false
           amountToken.value = ''

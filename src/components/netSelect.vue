@@ -9,18 +9,26 @@ defineProps({
   }
 })
 const {userInfo} = storeToRefs(useBotStore())
-const {isSupportChains} = useBotStore()
+const { address } = storeToRefs(useWalletStore())
+const {isSupportEvmChains,evmAddress} = storeToRefs(useBotStore())
 const visible = shallowRef(false)
-const options = shallowRef(isSupportChains)
-const selectedChains = shallowRef<string[]>([...isSupportChains])
+const options = computed(() => {
+  return evmAddress.value?useBotStore().isSupportChains:isSupportEvmChains.value
+})
+const selectedChains = shallowRef<string[]>([])
 
 const {isDark} = storeToRefs(useThemeStore())
 const displayChains = computed(() => {
   return selectedChains.value.slice(0, 2)
 })
 
+onMounted(() => {
+  nextTick(() => {
+    selectedChains.value = evmAddress.value ? ['eth', 'bsc', 'solana', 'base'] : ['bsc', 'base', 'eth']
+  })
+})
 function getDisabled(val: string) {
-  return selectedChains.value.length <= 1 && selectedChains.value.includes(val)
+  return selectedChains.value.length >= 5 && !selectedChains.value.includes(val)
 }
 
 function onConfirm() {
@@ -32,10 +40,16 @@ function onConfirm() {
       }
     })
     emit('update:userIds', arr)
+  }else{
+    const arr =selectedChains.value.map(i => address.value + '-' + i)
+    emit('update:userIds', arr)
   }
   visible.value = false
 }
 
+/**
+ * Cancel the net select popover.
+ */
 function onCancel() {
   visible.value = false
 }
@@ -72,18 +86,20 @@ function onCancel() {
       <div
           class="pb-5px color-#f5f5f5 [--el-checkbox-checked-bg-color:#000] [--el-checkbox-checked-input-border-color:#000] checkbox-container"
       >
-        <el-checkbox-group
-          v-model="selectedChains"
-        >
-          <el-checkbox
-            v-for="item in options" :key="item"
-            :value="item"
-            :disabled="getDisabled(item)"
-            class="custom-checkbox"
+        <el-scrollbar height="130px">
+          <el-checkbox-group
+            v-model="selectedChains"
           >
-            {{ getChainInfo(item)?.name || item || '' }}
-          </el-checkbox>
-        </el-checkbox-group>
+            <el-checkbox
+              v-for="item in options" :key="item"
+              :value="item"
+              :disabled="getDisabled(item)"
+              class="custom-checkbox"
+            >
+              {{ getChainInfo(item)?.name || item || '' }}
+            </el-checkbox>
+          </el-checkbox-group>
+        </el-scrollbar>
         <div class="mt-12px flex justify-between">
           <el-button
             size="small"

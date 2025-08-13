@@ -39,3 +39,24 @@ export interface KLineBar {
   close: number
   volume: number
 }
+
+export type SimpleWSTx = {
+  txhash: string
+  time: number
+  amm: string
+  pair: string
+  target: string
+  direction: 'buy' | 'sell' | 'addLp' | 'removeLp' | 'collectFee' | 'burnLp'
+  target_amt: string
+  base_amt: string
+  price_u: string
+  price_m: string
+  reserve0: string
+  reserve1: string
+  liquidity: string
+  maker: string
+  maker_type: number
+  maker_bal: string
+  maker_eth: string
+  chain: string
+}

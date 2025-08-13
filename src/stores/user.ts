@@ -40,9 +40,18 @@ export const useUserStore = defineStore('user', () => {
   } = storeToRefs(botStore)
   const { getUserInfo } = botStore
   const email = useLocalStorage('email', '')
+  const authInfo = shallowRef({} as {
+    guid: string
+    emailAddress: string // 已绑定的email address
+    authSetting: boolean //  已绑定google验证器, false -> 未绑定google验证器
+    ref1Guid: string // 上游分佣绑定信息
+    name: string // 钱包名
+    transferStatus: boolean // 转账状态(是否在12小时冻结期)
+  })
   const updateHolderNum=ref(0)
   return {
     email,
+    authInfo,
     updateHolderNum,
     async sendEmailCode(data: Parameters<typeof sendEmailCode>[0]) {
       return await sendEmailCode(data)

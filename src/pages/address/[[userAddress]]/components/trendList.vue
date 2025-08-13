@@ -446,7 +446,7 @@ function jumpTokenDetail(row) {
       token1_symbol: row.token1_symbol,
       pairAddress: '',
     },
-    user_address: route.params.userAddress
+    user_address: route.params.userAddress || useBotStore().getWalletAddress(row.chain)
   })
 }
 

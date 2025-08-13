@@ -84,7 +84,7 @@
         </div>
       </li>
       <li>
-        <div>{{ $t('soldAll') }}/{{ $t('all') }}</div>
+        <div class="flex items-center justify-center">{{ $t('soldAll') }}/{{ $t('all') }}<Icon v-tooltip="$t('soldAllTips')" name="material-symbols:help-outline" class="ml-4px"/></div>
         <div v-if="activeTab == '-100'">
           <span
             :class="!Number(globalStore.headFollowsNum.soldAll || 0) ? 'color-text-2' : ''"
@@ -244,6 +244,7 @@ const holderListSortObj = useLocalStorage('holderListSortObj', {
 const { price, totalHolders} = storeToRefs(useTokenStore())
 const route = useRoute()
 const botStore = useBotStore()
+const walletStore = useWalletStore()
 const { t } = useI18n()
 const activeTab = shallowRef<'all' | 'buy' |'sell' | 'buy24h' | 'sell24h' | '-100'>('all')
 const globalStore = useGlobalStore()
@@ -253,6 +254,7 @@ const loadingHolders = shallowRef(false)
 
 const holderListObj = ref<Record<string, HolderStat[]>>({})
 const aggregateStatsObj = ref<Record<string, AggregateStats>>({})
+const selfAddress = computed(() => botStore.evmAddress || walletStore.address)
 
   // const show_bubble = shallowRef(false)
 
@@ -273,13 +275,14 @@ const tabs = computed(() => {
       }
     })
   }
+  const followedNum = globalStore.headFollowsNum.all  - globalStore.headFollowsNum.soldAll
   return [
     {
       label: t('all'),
       value: 'all',
     },
     {
-      label: t('followed')+`(${globalStore.headFollowsNum.all  - globalStore.headFollowsNum.soldAll })`,
+      label: t('followed')+`(${Number.isNaN(followedNum)?'0':followedNum})`,
       value: '-100',
     },
     // {
@@ -377,6 +380,9 @@ watch(activeTab, (val) => {
   } else if (val === 'buy24h' || val === 'sell24h') {
     const prop = val === 'buy24h' ? 'bought_usd' : 'sold_usd'
     holdersRef?.value?.sort(prop, 'descending')
+  } else if(val === '-100' && !selfAddress.value) {
+    // 没有登录不调用已关注接口
+    resetFollowedData()
   } else {
     const sort = holderListSortObj?.value[val] || {}
     if (sort.sort_by && sort.order) {
@@ -391,8 +397,17 @@ onMounted(() => {
   getHoldersList()
 })
 onActivated(() => {
+  if(activeTab.value === '-100' && !selfAddress.value) {
+     // 没有登录不调用已关注接口
+     resetFollowedData()
+    return
+  }
   getHoldersList()
 })
+function resetFollowedData() {
+  holderListObj.value['-100'] = []
+  aggregateStatsObj.value['-100'] = {}
+}
 function setActiveTab(val: typeof activeTab.value) {
   activeTab.value = val
 }
@@ -427,7 +442,7 @@ function getHoldersList(sortObj?: { sort_by: string; order: string }) {
   const params = {
     token_id: id.value,
     tag_type: tag_type,
-    self_address: botStore.evmAddress,
+    self_address:  selfAddress.value,
     ...sort,
     recent:
       activeTab.value === 'buy24h' || activeTab.value === 'sell24h'

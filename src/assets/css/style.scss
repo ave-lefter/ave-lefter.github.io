@@ -200,3 +200,16 @@ debox-chat-widget {
 
   }
 }
+
+.x--tooltip.x--tooltip.x--tooltip {
+  border-radius: 8px;
+  background: #101A2B;
+  padding: 0;
+  overflow: hidden;
+  max-height: 500px;
+  overflow-y: auto;
+}
+.new-dialog.el-dialog, .new-popover.el-popover.el-popper{
+  background: var(--d-0B0D12-l-F6F9FF);
+  box-shadow: 0px 2px 10px 0px #FFFFFF0D;
+}

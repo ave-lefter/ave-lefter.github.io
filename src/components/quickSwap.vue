@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<{
   appendTo: '#__nuxt',
   buttonBg: 'rgba(18, 184, 134, 0.15)',
   classNames: '',
-  size: 'medium',
+  size: '14px',
   buttonType: 0
 })
 const botStore = useBotStore()
@@ -212,11 +212,11 @@ async function getTokenBalance(chain: string) {
     class="flex items-center [&&]:px-12px"
     :class="classNames"
     style="--el-button-hover-bg-color:rgba(18, 184, 134, 0.3);--el-color-black: #12B886; --el-button-border-color: transparent; --el-button-hover-border-color: transparent;--el-button-disabled-text-color: #12B886;--el-button-disabled-border-color: transparent;--el-button-disabled-bg-color: #12B8861A;"
-    :style="{ 'font-size': getSwapSize(size as Size).text }"
+    :style="{ 'font-size': size }"
     @click.stop.prevent="submitBotSwap"
   >
     <Icon
-    :style="{ 'font-size': getSwapSize(size as Size).flash }"
+    :style="{ 'font-size': size }"
       class="mr-4px"
       name="mynaui:lightning-solid"
     />
