@@ -119,11 +119,11 @@ export default function useWalletSwap() {
       loading.value = true
       const res = await getSolanaPumpInfo(row.token)
       let isPump = false
-      if (res?.completed === false) {
-        isPump = true
-      } else {
-        isPump = false
-      }
+      // if (res?.completed === false) {
+      //   isPump = true
+      // } else {
+      //   isPump = false
+      // }
 
       // const isMoonshot = row.amm === 'moonshot'
       const isMoonshot = false

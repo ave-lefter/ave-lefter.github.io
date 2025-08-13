@@ -377,7 +377,7 @@ export const useSwapStore = defineStore('swap', () => {
       if (token && chain === 'solana') {
         getSolanaPumpInfo(token).then(res => {
           if (res?.completed === false) {
-            isPump.value = true
+            // isPump.value = true
             if (token2.value.address !== 'So11111111111111111111111111111111111111112' && tokens.value?.length > 0) {
               const _token2 = {...tokens.value?.slice()?.find(i => i.address === 'So11111111111111111111111111111111111111112')}
               token2.value = {..._token2} as typeof token2.value
