@@ -139,7 +139,7 @@ const columns = computed(() => {
               <img
                 v-if="row.launchpad"
                 v-tooltip="row.launchpad"
-                class="ml-5px w-10px h-10px"
+                class="ml-5px w-10px h-10px rounded-full"
                 :src="formatIconTag(row.launchpad)"
                 alt=""
               >

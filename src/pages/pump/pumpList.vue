@@ -75,13 +75,13 @@
                       <img
                         class="token-icon h-32px text-16px color-#fff"
                         :src="getChainDefaultIcon(row.chain, row.symbol)"
-                      />
+                      >
                     </template>
                     <template #placeholder>
                       <img
                         class="token-icon h-32px text-16px color-#fff"
                         :src="getChainDefaultIcon(row.chain, row.symbol)"
-                      />
+                      >
                     </template>
                   </el-image>
                   <Progress
@@ -105,13 +105,13 @@
                           <img
                             class="token-icon h-228px w-228px text-16px color-#fff"
                             :src="getChainDefaultIcon(row.chain, row.symbol)"
-                          />
+                          >
                         </template>
                         <template #placeholder>
                           <img
                             class="token-icon h-228px w-228px text-16px color-#fff"
                             :src="getChainDefaultIcon(row.chain, row.symbol)"
-                          />
+                          >
                         </template>
                       </el-image>
                     </template>
@@ -596,7 +596,7 @@
                     class="mr-5px"
                     alt=""
                     srcset=""
-                  />
+                  >
                   <span>Migrating...</span>
                 </div>
                 <QuickSwap
@@ -670,7 +670,6 @@ const props = defineProps({
   },
 })
 
-// const { width } = useWindowSize()
 const showPop = ref(false)
 const selected = ref('')
 const btnRefs = ref<Record<string, HTMLElement | null>>({})

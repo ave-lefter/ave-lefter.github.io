@@ -8,6 +8,7 @@ interface HTMLElementDirective extends HTMLElement {
     showTooltip: () => void
   }
   __lastTooltipValue?: TooltipValue
+  visible?: boolean
 }
 
 type TooltipValue =
@@ -92,6 +93,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
             ...props,
           },
         })
+        el.visible = true
       },
       onMouseEnter: (e: MouseEvent) => {
         e.stopPropagation()
@@ -100,6 +102,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
       onMouseLeave: (e: MouseEvent) => {
         e.stopPropagation()
         tooltip.hide()
+        el.visible = false
       }
     }
     el.onmouseenter = el.__tooltipHandlers.onMouseEnter
@@ -141,6 +144,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
               ...props,
             },
           })
+          el.visible = true
         },
         onMouseEnter: (e: MouseEvent) => {
           e.stopPropagation()
@@ -149,6 +153,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
         onMouseLeave: (e: MouseEvent) => {
           e.stopPropagation()
           tooltip.hide()
+          el.visible = false
         }
       }
       el.onmouseenter = el.__tooltipHandlers.onMouseEnter
@@ -157,10 +162,10 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
   },
 
   unmounted(el) {
-    // const tooltip = resolveTooltip(el)
-    // if (tooltip) {
-    //   tooltip.hide()
-    // }
+    const tooltip = resolveTooltip(el)
+    if (tooltip && el.visible) {
+      tooltip.hide()
+    }
     const { onMouseEnter, onMouseLeave } = el.__tooltipHandlers || {}
     if (onMouseEnter) el.removeEventListener('mouseenter', onMouseEnter)
     if (onMouseLeave) el.removeEventListener('mouseleave', onMouseLeave)
