@@ -11,7 +11,7 @@
           @click.stop="tableRowClick(row)"
           @contextmenu="handleContextMenu($event, row)"
           @mouseenter="showPopover(row)"
-          @mouseleave="showPop = false"
+          @mouseleave="hidePopover"
         >
           <div class="flex-between w-full">
             <div class="flex-start items-start">
@@ -684,6 +684,8 @@ const router = useRouter()
 const { token_logo_url } = useConfigStore()
 const globalStore = useGlobalStore()
 const { pumpSetting, pumpBlackList, lang } = storeToRefs(globalStore)
+const isPaused = defineModel<boolean>('isPaused')
+
 const { t } = useI18n()
 const { $createTooltip } = useNuxtApp()
 const $tooltip = $createTooltip('bubble--tooltip')
@@ -739,7 +741,13 @@ function showPopover(item: { progress: number; id: string; issue_platform: strin
   currentBtnRef.value = btnRefs.value[item.id] || null
   // console.log('-----currentBtnRef.value ---',currentBtnRef.value )
   showPop.value = true
+  isPaused.value = true
   // }
+}
+
+function hidePopover() {
+  showPop.value = false
+  isPaused.value = false
 }
 
 function summaryList(summary: string): string[] {
