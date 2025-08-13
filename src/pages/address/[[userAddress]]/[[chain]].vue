@@ -1,5 +1,5 @@
 <template>
-  <div v-if="userAddress && chain" className="flex flex-col w-full gap-3 p-[20px] pt-[10px] bg-[var(--d-111-l-FFF)] pb-0 overflow-y-auto" style="max-height: calc(100vh - 92px);">
+  <div v-if="userAddress && chain" ref="scrollRef" className="flex flex-col w-full gap-3 p-[20px] pt-[10px] bg-[var(--d-111-l-FFF)] pb-0 overflow-y-auto" style="max-height: calc(100vh - 92px);">
     <div class="flex-between">
       <el-select
         :style="{ width: '120px' }"
@@ -73,7 +73,7 @@
     />
   </div>
 
-  <div v-else class="flex flex-col w-full h-full p-[10%] bg-[var(--d-111-l-FFF)] items-center pb-0">
+  <div v-else ref="scrollRef" class="flex flex-col w-full h-full p-[10%] bg-[var(--d-111-l-FFF)] items-center pb-0">
     <div
       v-if="['bsc', 'solana'].includes(chain)"
       className="flex flex-col w-full gap-3 p-[20px] pt-[10px] pb-0"
@@ -157,6 +157,7 @@
     />
   </div>
   <PageBlank v-else />
+  <Top @click="scrollToTop"/>
 </template>
 <script setup>
 import Statistic from './components/statistic.vue'
@@ -171,6 +172,7 @@ const isVolUSDT = ref(true)
 provide('isVolUSDT', isVolUSDT)
 
 const interval = ref('7D')
+const scrollRef = useTemplateRef('scrollRef')
 const route = useRoute()
 const botStore = useBotStore()
 const themeStore = useThemeStore()
@@ -246,6 +248,13 @@ watch(() => botStore.getWalletAddress('solana'), (address, old) => {
     }
   }
 )
+
+function scrollToTop() {
+  scrollRef.value.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
 
 // Watchers
 // watch(

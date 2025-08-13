@@ -182,6 +182,19 @@ onMounted(() => {
 onUnmounted(() => {
   cancelAnimationFrame(timer)
 })
+
+const topListRef = useTemplateRef<InstanceType<typeof SignalTopList>>('topListRef')
+function scrollToTop() {
+  if(topListRef.value){
+    topListRef.value.setScrollTop(0)
+  }
+  if(signalLeftList.value){
+    signalLeftList.value.setScrollTop(0)
+  }
+  if(signalRightList.value){
+    signalRightList.value.setScrollTop(0)
+  }
+}
 </script>
 
 <template>
@@ -239,6 +252,7 @@ onUnmounted(() => {
   </div>
   <div class="flex pt-4px bg-[--d-222-l-F2F2F2]">
     <SignalTopList
+    ref="topListRef"
     :dialogValues="dialogValues"
     @close="emit('close')"
     />
@@ -255,6 +269,7 @@ onUnmounted(() => {
       @setResetBtn="setResetBtn"
     />
   </div>
+  <Top @click="scrollToTop"/>
 </template>
 
 <style scoped lang="scss">

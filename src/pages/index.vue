@@ -9,6 +9,7 @@ import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 import { v4 as uuidv4 } from 'uuid'
 import { trackRef } from '~/api/tracking'
+import Top from '~/components/top.vue'
 
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
 const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
@@ -255,6 +256,7 @@ function getMedias(appendix: string) {
     <KeepAlive :max="6">
       <component
         :is="components[activeTab]"
+        ref="dynamicComponentRef"
         :listMapFunction="listMapFunction"
         :activeChain="activeChain"
         :activeTab="activeTab"

@@ -359,10 +359,17 @@ const cellRenderer = computed(() => {
     last_trade_at: LastTradeContent,
   }
 })
+const tableRef = useTemplateRef('tableRef')
+function scrollToTop() {
+  if (tableRef.value) {
+    tableRef.value.scrollToTop(0)
+  }
+}
 </script>
 <template>
   <div v-loading="loading" style="height: calc(100vh - 229px)">
     <AveTable
+      ref="tableRef"
       row-key="rowKey"
       :loading="loading"
       :data="filteredListData"
@@ -416,6 +423,7 @@ const cellRenderer = computed(() => {
     @size-change="sizeChange"
     @current-change="() => _getTreasureList()"
   />
+  <Top @click="scrollToTop" />
 </template>
 
 <style scoped lang="scss">
