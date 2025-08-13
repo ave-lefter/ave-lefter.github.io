@@ -13,7 +13,7 @@
           @mouseenter="showPopover(row)"
           @mouseleave="hidePopover"
         >
-          <div class="flex-between w-full">
+          <div class="w-full relative">
             <div class="flex-start items-start">
               <div class="mr-12px relative">
                 <div class="black-container ">
@@ -815,6 +815,14 @@ function showBubbleTooltip(row:PumpObj, e:MouseEvent) {
         background-color: var(--d-151A22-l-E8F1FF);
       }
     }
+    .pump-right {
+      // box-shadow: -2px 0px 4px 0px #00000099;
+      background: #0b0d12;
+      position: absolute;
+      right: 0;
+      top: -9px;
+      padding:0px 12px;
+    }
     .black-container {
       position: absolute;
       visibility: hidden;
@@ -933,14 +941,9 @@ function showBubbleTooltip(row:PumpObj, e:MouseEvent) {
     border-radius: 100%;
   }
 }
-@media (max-width: 1920px) and (min-width: 1024px) {
-  .pump-right {
-    box-shadow: -2px 0px 4px 0px #00000099;
-    background: #0b0d12;
-    position: absolute;
-    right: 0;
-    padding: 15px 12px;
-  }
+@media (max-width: 1920px) {
+
+
 }
 @media (max-width: 1920px) {
   .symbol-ellipsis {

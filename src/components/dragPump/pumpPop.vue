@@ -395,7 +395,7 @@ function getFilterData(list, conditions) {
 
 <template>
   <div
-    class="w-full h-full bg-[--d-111-l-FFF] p-12px"
+    class="w-full h-full bg-[--d-0B0D12-l-F6F9FF] p-12px"
     :class="{'pr-16px':pumpStore.isLeftFixed,'pl-16px':pumpStore.isRightFixed}"
   >
     <Icon name="custom:drag2" class="absolute top-4px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2] drag-handle" />
