@@ -817,7 +817,7 @@ function showBubbleTooltip(row:PumpObj, e:MouseEvent) {
     }
     .pump-right {
       // box-shadow: -2px 0px 4px 0px #00000099;
-      background: #0b0d12;
+      background: var(--d-0B0D12-l-F6F9FF);
       position: absolute;
       right: 0;
       top: -9px;
