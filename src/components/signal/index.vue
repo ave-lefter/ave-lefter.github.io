@@ -8,7 +8,6 @@ import QuickBuyInput from '~/components/signal/quickBuyInput.vue'
 import SmallSignalList from '~/components/signal/smallSignalList.vue'
 import MiddleSignalList from '~/components/signal/middleSignalList.vue'
 import LargeSignalList from '~/components/signal/largeSignalList.vue'
-import dayjs from 'dayjs'
 
 const props = defineProps<{
   containerWidth: number

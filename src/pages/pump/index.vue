@@ -316,7 +316,7 @@
                 src="@/assets/images/pump/graduated.svg"
                 width="24"
                 alt=""
-              />
+              >
               <span class="color-[--d-F5F5F5-l-333]">{{ $t('graduated') }}</span>
             </template>
             <div v-else class="tabs single" >

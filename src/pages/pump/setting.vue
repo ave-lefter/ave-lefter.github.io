@@ -8,13 +8,15 @@
     :teleported="false"
   >
     <template #reference>
-      <el-button class="btn mr-8px h-28px" :class="{ active: isExit }">
+      <slot :visible="visible">
+        <el-button class="btn mr-8px h-28px" :class="{ active: isExit }">
         <Icon name="custom:customized" class="text-13px mr-4px" /> {{ $t('customize') }}
         <Icon
           :name="isRotate ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
           class="text-16px ml-4px"
         />
       </el-button>
+      </slot>
     </template>
     <template #default>
       <div>

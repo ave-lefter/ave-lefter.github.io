@@ -1,6 +1,6 @@
 <template>
   <div class="mt-20px mb-30px">
-    <el-scrollbar v-loading="loading" height="calc(100vh - 215px)">
+    <el-scrollbar v-loading="loading" :height="scrollHeight">
       <ul v-if="tableList?.length > 0" class="pump-item_list">
         <li
           v-for="row in tableList"
@@ -11,9 +11,9 @@
           @click.stop="tableRowClick(row)"
           @contextmenu="handleContextMenu($event, row)"
           @mouseenter="showPopover(row)"
-          @mouseleave="showPop = false"
+          @mouseleave="hidePopover"
         >
-          <div class="flex-between w-full">
+          <div class="w-full relative">
             <div class="flex-start items-start">
               <div class="mr-12px relative">
                 <div class="black-container ">
@@ -668,6 +668,10 @@ const props = defineProps({
     type: Boolean,
     default: () => false,
   },
+  scrollHeight:{
+    type:[String,Number],
+    default:'calc(100vh - 215px)'
+  }
 })
 
 const showPop = ref(false)
@@ -679,6 +683,8 @@ const router = useRouter()
 const { token_logo_url } = useConfigStore()
 const globalStore = useGlobalStore()
 const { pumpSetting, pumpBlackList, lang } = storeToRefs(globalStore)
+const isPaused = defineModel<boolean>('isPaused')
+
 const { t } = useI18n()
 const { $createTooltip } = useNuxtApp()
 const $tooltip = $createTooltip('bubble--tooltip')
@@ -734,7 +740,13 @@ function showPopover(item: { progress: number; id: string; issue_platform: strin
   currentBtnRef.value = btnRefs.value[item.id] || null
   // console.log('-----currentBtnRef.value ---',currentBtnRef.value )
   showPop.value = true
+  isPaused.value = true
   // }
+}
+
+function hidePopover() {
+  showPop.value = false
+  isPaused.value = false
 }
 
 function summaryList(summary: string): string[] {
@@ -801,6 +813,14 @@ function showBubbleTooltip(row:PumpObj, e:MouseEvent) {
         box-shadow: none;
         background-color: var(--d-151A22-l-E8F1FF);
       }
+    }
+    .pump-right {
+      // box-shadow: -2px 0px 4px 0px #00000099;
+      background: var(--d-0B0D12-l-F6F9FF);
+      position: absolute;
+      right: 0;
+      top: -9px;
+      padding:0px 12px;
     }
     .black-container {
       position: absolute;
@@ -920,14 +940,9 @@ function showBubbleTooltip(row:PumpObj, e:MouseEvent) {
     border-radius: 100%;
   }
 }
-@media (max-width: 1920px) and (min-width: 1024px) {
-  .pump-right {
-    box-shadow: -2px 0px 4px 0px #00000099;
-    background: #0b0d12;
-    position: absolute;
-    right: 0;
-    padding: 15px 12px;
-  }
+@media (max-width: 1920px) {
+
+
 }
 @media (max-width: 1920px) {
   .symbol-ellipsis {

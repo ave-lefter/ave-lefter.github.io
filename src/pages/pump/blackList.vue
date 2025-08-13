@@ -2,10 +2,11 @@
   <el-button
     v-tooltip="t('backlist')"
     class="btn mr-8px ml-0 gray"
+    :class="buttonClass"
     style="margin-left: 0"
     @click="visible = !visible"
   >
-    <Icon name="custom:pump-black" class="text-16px"/>
+    <Icon name="custom:pump-black" :class="referenceClass"/>
   </el-button>
   <el-dialog
     v-model="visible"
@@ -149,6 +150,13 @@ const visible = shallowRef(false)
 const visible_popper = shallowRef(false)
 
 
+withDefaults(defineProps<{
+  buttonClass?: string
+  referenceClass?: string
+}>(),{
+  buttonClass: '',
+  referenceClass: 'text-16px'
+})
 const query = shallowRef('')
 
 const isRotate = shallowRef(false)

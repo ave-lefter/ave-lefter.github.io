@@ -133,8 +133,8 @@
   --el-border-color-light: transparent;
 }
 .new-popover.el-popover.el-popover {
-  --el-popover-bg-color: var(--d-0B0D12-l-F6F9FF);
-  --el-bg-color-overlay: var(--d-0B0D12-l-F6F9FF);
+  --el-popover-bg-color: var(--d-151A22-l-FFFFFF);
+  --el-bg-color-overlay: var(--d-151A22-l-FFFFFF);
   --el-popover-border-color: transparent;
   --el-border-color-light: transparent;
 }
@@ -182,5 +182,15 @@
   }
   .el-select-dropdown__item.is-selected{
     font-weight: normal;
+  }
+}
+
+.small-select{
+  .el-select-dropdown__item{
+    padding: 0;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    font-size: 12px;
   }
 }

@@ -14,9 +14,10 @@
           <Icon
             id="custom-filter"
             name="custom:filter"
-            class="mr-3px text-10px cursor-pointer"
+            class="text-10px cursor-pointer"
+            :class="!hideReferenceText?'mr-3px':''"
           />
-          <span>{{ $t('filter') }}</span>
+          <span v-if="!hideReferenceText">{{ $t('filter') }}</span>
           <span v-if="filterNumber > 0" class="filter-number">{{ filterNumber }}</span>
         </div>
       </template>
@@ -140,7 +141,7 @@
                   v-model="form[column.prop]"
                   :disabled="form.has_sm ==1"
                     >
-                      <el-checkbox class="mt-20px" v-for="(item,$index) in column.list" :key="$index" :value="item.url">
+                      <el-checkbox v-for="(item,$index) in column.list" :key="$index" class="mt-20px" :value="item.url">
                         {{ item.name }}
                       </el-checkbox>
                   </el-checkbox-group>
@@ -194,6 +195,9 @@ const props = defineProps({
     storage: {
       type: String,
       default: 'pumpFilter_bsc_new'
+    },
+    hideReferenceText:{
+      type:Boolean
     }
 })
 const emit = defineEmits(['update:filterData'])

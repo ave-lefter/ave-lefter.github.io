@@ -1,5 +1,7 @@
 <template>
-  <Draggable v-if="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing" @on-drag="drag">
+  <Draggable 
+  :class="{ 'left-drag': monitorStore.isLeftFixed, 'right-drag': monitorStore.isRightFixed }"
+  :shouldRenderChild="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing" @on-drag="drag">
     <!-- <Monitor v-bind="props2"/> -->
     <component :is="lazyComponent" v-bind="props2"/>
   </Draggable>
@@ -88,20 +90,6 @@ const props1=computed(()=>{
       handles: ['ml'],
       dragHandle: '.drag-handle'
     }
-  }else if(placement.value==='right2'){
-    data = {
-      className: '[&&]:relative shrink-0 right2 fixed! top-61px left-0',
-      axis: 'x',
-      x: monitorStore.winWidth - monitorStore.fixedWidth - ((signalStore.isRightFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0),
-      maxX:monitorStore.winWidth - monitorStore.fixedWidth - ((signalStore.isRightFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0),
-      minWidth: lang.value.indexOf('zh') > -1 ? 360 : 360,
-      maxWidth: 438,
-      initialWidth: monitorStore.fixedWidth,
-      initialHeight: monitorStore.winHeight - 95,
-      parent: true,
-      handles: ['ml'],
-      dragHandle: '.drag-handle'
-    }
   }
   return data
 })
@@ -134,8 +122,6 @@ function dragStop(x: number, y: number) {
   if(placement.value==='left'){
     monitorStore.onLeftDragStop(x,y)
   }else if(placement.value==='right'){
-    monitorStore.onRightDragStop(x,y)
-  }else if(placement.value==='right2'){
     monitorStore.onRightDragStop(x,y)
   }else{
     monitorStore.onDragStop(x,y)

@@ -2,7 +2,8 @@
 import VueDraggableResizable from './vue-draggable-resizeable/index.vue'
 import {useThrottleFn} from '@vueuse/core'
 
-defineProps<{
+
+withDefaults(defineProps<{
   initialWidth: number
   initialHeight?: number
   minWidth: number
@@ -11,7 +12,10 @@ defineProps<{
   maxHeight?: number
   parent?: boolean
   handles: string[]
-}>()
+  shouldRenderChild?: boolean
+}>(), {
+ shouldRenderChild: true
+})
 
 const emit = defineEmits(['onDragStop', 'onResizing', 'onDrag'])
 const klineRef = shallowRef<HTMLElement | null>(null)
@@ -58,6 +62,7 @@ function onDrag(x: number, y: number) {
 <template>
   <VueDraggableResizable
     class-name-dragging="opacity-90 z-10!"
+    :shouldRenderChild="shouldRenderChild"
     :w="initialWidth"
     :h="initialHeight"
     :min-width="minWidth"
@@ -72,6 +77,9 @@ function onDrag(x: number, y: number) {
     @resizeStop="onResizeStop"
   >
     <slot/>
+    <template #mr>
+      <span v-for="i in 3" :key="i" class="bg-#444 w-2px h-2px rounded-full"/>
+    </template>
   </VueDraggableResizable>
 </template>
 
@@ -121,7 +129,28 @@ function onDrag(x: number, y: number) {
   user-select: none;
   cursor: col-resize;
 }
-
+.left-drag .handle-mr,.right-drag .handle-ml{
+  display: flex!important;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 4px;
+    border:0 none;
+    opacity: 1;
+    top:0;
+    height: 100%;
+    gap:1px;
+    background: var(--d-333-l-F2F2F2);
+    &:hover{
+      background: var(--d-666-l-CCC);
+    }
+}
+.left-drag .handle-mr{
+  right: 0;
+}
+.right-drag .handle-ml{
+  left: 0;
+}
 .handle-mr {
   right: -2px;
 }
