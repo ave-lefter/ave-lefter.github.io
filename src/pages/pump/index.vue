@@ -159,7 +159,7 @@
               </button>
             </div>
             <span  v-show="isPausedObj.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
-              <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
+              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
             <el-input
@@ -252,7 +252,7 @@
               </button>
             </div>
             <span  v-show="isPausedObj.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
-              <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
+              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
             <el-input
@@ -346,7 +346,7 @@
             </div>
 
             <span  v-show="isPausedObj.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
-              <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
+              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
             <el-input
@@ -1325,6 +1325,7 @@ function getFilterData(list, conditions) {
   justify-content: flex-start;
   font-size: 12px;
   font-weight: 500;
+  color:var(--d-F5F5F5-l-111);
 }
 :deep().search-input1 {
   background: var(--d-151A22-l-E8F1FF);

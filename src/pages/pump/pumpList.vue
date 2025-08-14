@@ -256,7 +256,7 @@
                     class="text-12px cursor-pointer color-[--d-566275-l-8CA0C3] ml-4px"
                     @click.stop.prevent
                   />
-                  <div class="color-#252B34" style="margin: 0 8px">|</div>
+                  <div class="color-[--d-252B34-l-E8F1FF]" style="margin: 0 8px">|</div>
                   <div
                     v-if="
                       row?.medias?.length > 0 && pumpSetting?.define?.some((i) => i === 'media')
@@ -317,7 +317,7 @@
                   >
                     <Icon class="text-[--d-8CA0C3-l-566275] h-12px w-12px" name="custom:search" />
                   </a>
-                  <div class="color-#252B34" style="margin: 0 8px">|</div>
+                  <div class="color-[--d-252B34-l-E8F1FF]" style="margin: 0 8px">|</div>
                   <div
                     v-show="pumpSetting?.define?.some((i) => i === 'holder')"
                     v-tooltip="$t(`holders`)"
@@ -342,7 +342,7 @@
                     class="flex mr-8px items-center"
                   >
                     <Icon
-                      class="iconfont icon-rug mr-4px text-14px vertical-middle color-[--d-566275-l-8CA0C3]"
+                      class="iconfont icon-rug mr-4px text-14px vertical-middle color-[--d-566275-l-8CA0C3] hover:color-#3F80F7"
                       name="custom:wallets"
                     />
                     <span class="color-[--d-F5F5F5-l-111]">{{
@@ -376,7 +376,7 @@
                 <span class="color-[--d-999-l-666]">0</span>
               </div> -->
                 </div>
-                <div class="flex-start text-12px mt-16px">
+                <div class="flex-start text-12px mt-16px relative z-1">
                   <div
                     v-show="pumpSetting?.define?.some((i) => i === 'top')"
                     class="flex-start mr-8px bg-btn"
@@ -525,7 +525,7 @@
                     class="flex mr-5px items-center bg-btn color-#12B886"
                   >
                     <Icon
-                      class="iconfont icon-rug mr-2px text-12px vertical-middle"
+                      class="iconfont icon-rug mr-2px text-12px vertical-middle "
                       name="custom:wallet"
                     />
                     <span>{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
@@ -538,7 +538,7 @@
                 v-if="
                   (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
                 "
-                class="flex-end text-12px mt-5px"
+                class="flex-end text-12px mt-5px pr-12px"
                 :class="pumpSetting.fontSize_mc =='12px'? 'mb-10px' : 'mb-5px'"
               >
                 <template v-if="isSoon && row.progress > 99">
@@ -565,7 +565,7 @@
                       MC
                     </div>
                     <span
-                      class="mr-5px color-#FFA622"
+                      class="color-#FFA622"
                       :style="{ 'font-size': pumpSetting.fontSize_mc }"
                       >${{ formatNumber(row.market_cap || 0, 2) }}</span
                     >
@@ -577,22 +577,22 @@
                   pumpSetting?.define?.some((i) => i === 'vol') ||
                   pumpSetting?.define?.some((i) => i === 'txs')
                 "
-                class="flex-end text-12px"
+                class="flex-end text-12px pr-12px"
               >
                 <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
                   <div class="mr-5px color-[--d-566275-l-8CA0C3]">V</div>
-                  <div class="mr-5px color-[--d-F5F5F5-l-111]">
+                  <div class="color-[--d-F5F5F5-l-111]">
                     ${{ formatNumber(row?.volume_u_24h || 0, 2) }}
                   </div>
                 </template>
                 <template v-if="pumpSetting?.define?.some((i) => i === 'txs')">
-                  <div class="mr-5px color-[--d-566275-l-8CA0C3]">Txs</div>
-                  <div class="mr-5px color-[--d-F5F5F5-l-111]">
+                  <div class="mr-5px color-[--d-566275-l-8CA0C3] ml-5px">Txs</div>
+                  <div class="color-[--d-F5F5F5-l-111]">
                     {{ formatNumber(row?.tx_24h_count || 0, 2) }}
                   </div>
                 </template>
               </div>
-              <div class="btns-swap flex-end mt-15px">
+              <div class="btns-swap flex-end mt-15px pr-12px">
                 <div
                   v-if="row?.state === 'migrating'"
                   style="
@@ -818,7 +818,7 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
     display: flex;
     align-items: center;
     color: var(--a-text-1-color);
-    padding: 15px 12px 11px;
+    padding: 15px 0 11px 12px;
     border-top: 1px solid var(--d-151A22-l-E8F1FF);
     &:hover {
       background-color: var(--d-151A22-l-E8F1FF);
@@ -829,6 +829,10 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
       .pump-right {
         box-shadow: none;
         background-color: var(--d-151A22-l-E8F1FF);
+        .btns-swap{
+          visibility: visible;
+          background-color: var(--d-151A22-l-E8F1FF);
+        }
       }
     }
     .pump-right {
@@ -836,8 +840,13 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
       background: var(--d-0B0D12-l-F6F9FF);
       position: absolute;
       right: 0;
-      bottom: 6px;
-      padding: 0px 12px;
+      bottom: 2px;
+      padding-left: 12px;
+      .btns-swap{
+        background-color: var(--d-0B0D12-l-F6F9FF);
+        position: relative;
+        z-index:2;
+      }
     }
     .black-container {
       position: absolute;
@@ -957,7 +966,12 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
     border-radius: 100%;
   }
 }
-@media (max-width: 1920px) {
+@media (max-width: 1449px) and (min-width: 1025px) {
+  .btns-swap{
+    visibility: hidden;
+    position: relative;
+    z-index:2;
+  }
 }
 @media (max-width: 1920px) {
   .symbol-ellipsis {

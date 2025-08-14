@@ -81,7 +81,9 @@
       <ul class="item border pb-20px">
         <li @click="pumpSetting.show_search = !pumpSetting.show_search">
           <template v-if="pumpSetting.show_search">
-            <Icon name="custom:show-search" class="text-12px mr-8px" />
+            <!-- <Icon name="custom:show-search" class="text-12px mr-8px" /> -->
+            <img v-if="isDark" src="@/assets/icons/show-search-dark.svg" alt="" class="mr-8px" :width="12">
+            <img v-else src="@/assets/icons/show-search-light.svg" alt="" class="mr-8px" :width="12">
             {{ $t('hideSearch') }}
           </template>
           <template v-else>
@@ -168,7 +170,7 @@ const { t } = useI18n()
 const visible = shallowRef(false)
 const isRotate = shallowRef(false)
 const globalStore = useGlobalStore()
-const { pumpSetting, token_logo_url } = storeToRefs(globalStore)
+const { pumpSetting, token_logo_url, isDark } = storeToRefs(globalStore)
 const defineFontsize = useLocalStorage('defineFontsize', 14)
 const activeFontSize = useLocalStorage('activeFontSize','medium')
 

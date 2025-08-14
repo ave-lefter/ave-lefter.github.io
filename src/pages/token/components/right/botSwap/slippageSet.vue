@@ -2,7 +2,7 @@
   <div class="flex">
     <span class="clickable flex" @click.stop="show = true">
       <slot name="icon">
-        <Icon class="text-14px color-[--d-566275-l-8CA0C3] hover:color-[--d-F5F5F5-l-333] icon-bot-setting" name="custom:pump-setting" />
+        <Icon class="text-14px color-[--d-8CA0C3-l-566275] hover:color-[--d-F5F5F5-l-333] icon-bot-setting" name="custom:pump-setting" />
       </slot>
     </span>
     <el-dialog class="new-dialog" v-model="show" width="500px" append-to-body>
@@ -429,7 +429,7 @@ function confirmSubmit() {
     } else {
       setting[selected].slippage = String(slippageValue)
     };
-    ['s1', 's2', 's3'].forEach((s) => {
+    ['p1', 'p2', 'p3'].forEach((s) => {
       Reflect.deleteProperty(setting[s as BotSettingKey], 'slippageValue')
       Reflect.deleteProperty(setting[s as BotSettingKey], 'customSlippage')
     })
