@@ -71,6 +71,7 @@ const defaultConditions = ref({
   profit_neg100_neg50_percent_num_max: '', // -100%—-50%币数 最大值
   last_trade_time_min: '', // 最近交易时间最小值（时间戳）
   last_trade_time_max: '', // 最近交易时间最大值（时间戳）
+  keyword: '',
 })
 const filterFormObj = ref({})
 
@@ -418,6 +419,12 @@ function initFilterForm() {
       last_trade_time: conditions?.last_trade_time || '',
       sort_dir: conditions?.sort === 'last_trade_time' ? conditions?.sort_dir || null : null,
     },
+    keyword: {
+      visible: false,
+      type: 'keyword',
+      keyword: conditions?.keyword || '',
+      sort_dir: conditions?.sort === 'keyword' ? conditions?.sort_dir || null : null,
+    },
   }
   filterFormObj.value[key] = filterForm
 }
@@ -428,6 +435,9 @@ function isActiveFilter(prop) {
   const filterForm = filterFormObj?.value?.[key] || {}
   if (prop === 'last_trade_time') {
     return conditions.last_trade_time && conditions.last_trade_time !== ''
+  }
+  if (prop === 'keyword') {
+    return conditions.keyword && conditions.keyword !== ''
   }
   console.log('filterForm', filterForm)
   return filterRange(prop) || filterForm?.[prop]?.sort_dir
@@ -488,7 +498,9 @@ function filterRange(prop) {
   }
   const range = rangeObj[prop]
   // let len = range?.length
-
+  if(prop === 'keyword') {
+    return conditions.keyword && conditions.keyword !== ''
+  }
   if (prop == 'profit_percent_num') {
     console.log('------ggg-----------', range[0], conditions, filterForm[prop])
     //  return !(len?.every(i=> (!conditions[range[i]] || conditions[range[i]] === filterForm[prop].defaultRange[i])))
@@ -582,6 +594,8 @@ function handleFilterConfirm(val) {
     }
   } else if (val.type === 'last_trade_time') {
     filterConditions.value[key].last_trade_time = val.last_trade_time
+  } else if (val.type === 'keyword') {
+    filterConditions.value[key].keyword = val.keyword
   }
   val.visible = false
   resetSort()
@@ -639,6 +653,8 @@ function handleReset(val) {
     filterConditions.value[key].sort = ''
 
     console.log('--1111---', val)
+  } else if (val.type === 'keyword') {
+    val.keyword = ''
   } else {
     val.range1 = val.defaultRange
     val.range = val.defaultRange

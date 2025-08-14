@@ -33,6 +33,52 @@
             <span class="text-10px" style="opacity: 0">0</span>
             <span>{{ $t('wallet2')+'/'+ $t('lastTxsTime1') }}</span>
             <el-popover
+              v-model:visible="filterForm['keyword'].visible"
+              placement="bottom"
+              popper-class="chains-table-filter"
+              title=""
+              :width="220"
+              trigger="click"
+            >
+              <template #reference>
+                <Icon
+                    id="custom-search"
+                    name="custom:search"
+                    class="text-12px w-12px h-12px cursor-pointer ml-3px"
+                    :style="{
+                      color: isActiveFilter('keyword') ? 'var(--d-999-l-666)' : ''
+                    }"
+                    @click.stop.prevent
+                  />
+              </template>
+              <template #default>
+                <div class="text-14px text-[var(--d-fff-l-333)]">{{$t('searchKol')}}</div>
+                <el-input class="mt-8px" v-model="filterForm['keyword'].keyword" :placeholder="$t('searchKolPlaceholder')" clearable />
+                <div class="mt-12px flex items-center justify-center">
+                    <el-button
+                      class="flex-1 reset"
+                      size="default"
+                      style="
+                        height: 30px;
+                        min-width: 70px;
+                        --el-button-font-weight: 400;
+                      "
+                      @click.stop="handleReset(filterForm['keyword'])"
+                    >
+                      {{ $t('cancel') }}
+                    </el-button>
+                    <el-button
+                      class="confirm flex-1"
+                      size="default"
+                      :color="mode !== 'dark' ? '#222222' : '#f5f5f5'"
+                      @click.stop="handleFilterConfirm(filterForm['keyword'])"
+                    >
+                      {{ $t('confirm') }}
+                    </el-button>
+                  </div>
+              </template>
+            </el-popover>
+            <el-popover
               v-model:visible="filterForm['last_trade_time'].visible"
               placement="bottom"
               popper-class="chains-table-filter"
@@ -1051,6 +1097,12 @@ function showPopover(row: KolObj,$index: number) {
 </script>
 
 <style lang="scss" scoped>
+:deep(.el-table-fixed-column--left){
+  .cell{
+    display: flex;
+    align-items: center;
+  }
+}
 .table-container{
   height: calc(100vh - 150px);
 
