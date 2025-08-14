@@ -363,7 +363,6 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" style="height: calc(100vh - 229px)">
     <AveTable
-      ref="tableRef"
       row-key="rowKey"
       :loading="loading"
       :data="filteredListData"
