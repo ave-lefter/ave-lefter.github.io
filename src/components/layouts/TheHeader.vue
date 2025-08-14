@@ -46,9 +46,9 @@
       v-if="!botStore.evmAddress && !walletStore.address"
       text
       type=""
-      bg
+
       color="bg-[var(--d-141721-l-E8F1FF)]"
-      class="ml-10px  rounded-4px text-[var(--d-F5F5F5-l-333)]! [&&]:[--el-fill-color-light:--d-141721-l-E8F1FF]"
+      class="ml-10px bg-[var(--d-141721-l-E8F1FF)] rounded-4px text-[var(--d-F5F5F5-l-333)]!  btn"
       @click="openConnect"
     >
       {{ $t('connectWallet') }}
@@ -84,7 +84,7 @@
         <el-button
 
           color="bg-[var(--d-141721-l-E8F1FF)]"
-          class="bg-[var(--d-141721-l-E8F1FF)] border-0! ml-10px  rounded-4px text-[var(--d-F5F5F5-l-333)]! cursor-pointer">
+          class="bg-[var(--d-141721-l-E8F1FF)] border-0! ml-10px  rounded-4px text-[var(--d-F5F5F5-l-333)]! cursor-pointer btn">
           <span>APP</span>
         </el-button>
       </template>
@@ -286,6 +286,13 @@ header {
         background: #3f80f71a;
         color: #3f80f7;
       }
+    }
+  }
+  .btn{
+    background: var(--d-141721-l-E8F1FF);
+    &:hover {
+      background: var(--d-141721-l-E8F1FF);
+      opacity: 0.8;
     }
   }
 }

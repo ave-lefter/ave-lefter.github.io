@@ -10,7 +10,7 @@
           <span>{{ $t('oneClick') }}</span>
           <div class="tabs-1 ml-5px">
             <button
-              v-for="item in (['s1', 's2', 's3'] as const)" :key="item"
+              v-for="item in (['p1', 'p2', 'p3'] as const)" :key="item"
               :class="{ 'active': item === botSettings?.[chain]?.selected }" type="button"
               @click.stop="botSettings[chain]!.selected = item">{{ item.toUpperCase() }}</button>
           </div>

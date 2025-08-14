@@ -14,7 +14,7 @@
       </template>
       <el-form class="popup-content" @submit.prevent="confirmSubmit">
         <div v-show="settingTab === 0">
-          <div v-if="showClipboardSet" class="mb-20px pb-20px b-b-solid b-b-[--d-151A22-l-E8F1FF] b-b-1">
+          <div v-if="showClipboardSet" class="mb-20px pb-20px b-b-solid b-b-[--d-252E3C-l-E8F1FF] b-b-1">
             <div class="flex items-center mb-15px">
               <Icon v-if="themeStore.isDark" name="custom:flash-d" class="text-14px" />
               <Icon v-else name="custom:flash-l" class="text-14px" />
@@ -36,12 +36,12 @@
             </div>
           </div>
           <div class="setting-list mb-10px rounded-4px">
-            <button v-for="item in ['s1', 's2', 's3']" :key="item" :class="{'active': item === botSetting.selected}" type="button" @click.stop="botSetting.selected = item">{{ item.toUpperCase() }}</button>
+            <button v-for="item in ['p1', 'p2', 'p3']" :key="item" :class="{'active': item === botSetting.selected}" type="button" @click.stop="botSetting.selected = item">{{ item.toUpperCase() }}</button>
           </div>
           <div class="color-[--d-566275-l-8CA0C3]">
             {{$t('setTips')}}
           </div>
-          <div class="flex items-center justify-between color-[--d-566275-l-8CA0C3]">
+          <div class="flex items-center justify-between color-[--d-8CA0C3-l-566275]">
             <span>{{ $t('slippage') }}</span>
             <Icon class="text-15px color-#80838B ml-5px clickable mr-auto" name="material-symbols:help-rounded" @click.stop="openSlippageTips" />
             <el-checkbox v-if="canSetAuto" v-model="isAuto" :label="$t('autoSlippage')" size="large" style="--el-checkbox-text-color: var(--d-566275-l-8CA0C3)" />
@@ -65,7 +65,7 @@
                 <div class="slippage-input">
                   <el-input-number
                     v-model="botSetting[selected].customSlippage"
-                    class="bg-[--d-151A22-l-E8F1FF] rounded-4px"
+                    class="bg-[--d-252E3C-l-E8F1FF] rounded-4px"
                     name="slippage"
                     type="number"
                     :placeholder="$t('custom')"
@@ -89,7 +89,7 @@
             <span v-if="botSetting[selected].slippageValue !== undefined && Number(botSetting[selected].slippageValue) <= 0.1" class="tip">{{ $t('slippageTip1') }}</span>
           </div>
           <div v-if="isCanMev" class="slippage-label mt-15px">
-            <span class="mr-auto">{{ $t('protection') }}</span>
+            <span class="mr-auto color-[--d-8CA0C3-l-566275]">{{ $t('protection') }}</span>
             <el-switch
               v-model="botSetting[selected].mev"
               size="small"
@@ -99,7 +99,7 @@
               @change="onProtectionChange"
             />
           </div>
-          <div class="slippage-label mt-15px">
+          <div class="slippage-label mt-15px color-[--d-8CA0C3-l-566275]">
             <span>{{ chain === 'solana' ? $t('priorityFee') : $t('extraGas') }}</span>
           </div>
           <div :key="botSetting[selected].mev" class="mt-10px">
@@ -429,7 +429,7 @@ function confirmSubmit() {
     } else {
       setting[selected].slippage = String(slippageValue)
     };
-    ['s1', 's2', 's3'].forEach((s) => {
+    ['p1', 'p2', 'p3'].forEach((s) => {
       Reflect.deleteProperty(setting[s as BotSettingKey], 'slippageValue')
       Reflect.deleteProperty(setting[s as BotSettingKey], 'customSlippage')
     })
@@ -587,8 +587,8 @@ function addStopLoss() {
     }
   }
   .radio-item {
-    border: 1px solid var(--d-151A22-l-E8F1FF);
-    background: var(--d-151A22-l-E8F1FF);
+    border: 1px solid var(--d-252E3C-l-E8F1FF);
+    background: var(--d-252E3C-l-E8F1FF);
     border-radius: 8px;
     min-width: 86px;
     font-size: 14px;
@@ -609,7 +609,7 @@ function addStopLoss() {
 }
 .slippage-label {
   font-size: 14px;
-  color: var(--d-566275-l-8CA0C3);
+  color: var(--d-8CA0C3-l-566275);
   letter-spacing: 0;
   text-align: center;
   font-weight: 400;
@@ -634,10 +634,10 @@ function addStopLoss() {
     opacity: 0.5;
   }
   &:deep() .el-input__wrapper, &:deep() .el-input__inner {
-    background-color: var(--d-151A22-l-E8F1FF);
+    background-color: var(--d-252E3C-l-E8F1FF);
   }
   &:deep() .el-input-number__decrease, &:deep() .el-input-number__increase {
-    background-color: var(--d-151A22-l-E8F1FF);
+    background-color: var(--d-252E3C-l-E8F1FF);
   }
   .input {
     font-size: 14px;
@@ -666,16 +666,16 @@ function addStopLoss() {
 .input-swap {
   display: flex;
   align-items: center;
-  background: var(--d-151A22-l-E8F1FF);
+  background: var(--d-252E3C-l-E8F1FF);
   border-radius: 4px;
   height: 32px;
-  --el-fill-color-light: var(--d-151A22-l-E8F1FF);
+  --el-fill-color-light: var(--d-252E3C-l-E8F1FF);
 }
 .input-number {
   flex: 1;
-  background: var(--d-151A22-l-E8F1FF);
-  --el-input-bg-color: var(--d-151A22-l-E8F1FF);
-  --el-input-border-color: var(--d-151A22-l-E8F1FF);
+  background: var(--d-252E3C-l-E8F1FF);
+  --el-input-bg-color: var(--d-252E3C-l-E8F1FF);
+  --el-input-border-color: var(--d-252E3C-l-E8F1FF);
   border-radius: 4px;
 }
 .slippage-input {
@@ -693,7 +693,7 @@ function addStopLoss() {
 .setting-list {
   display: flex;
   justify-content: space-between;
-  background: var(--d-151A22-l-E8F1FF);
+  background: var(--d-252E3C-l-E8F1FF);
   // color: var(--d-566275-l-8CA0C3);
   padding: 2px;
   button {
@@ -720,7 +720,7 @@ function addStopLoss() {
   flex: 1;
   :deep(.el-input) {
     height: 36px;
-    --el-input-bg-color: var(--d-151A22-l-E8F1FF);
+    --el-input-bg-color: var(--d-252E3C-l-E8F1FF);
     --el-input-border-color: transparent;
     --el-input-hover-border-color: transparent;
     --el-input-focus-border-color: transparent;
@@ -743,5 +743,8 @@ function addStopLoss() {
 }
 :deep(.el-input__inner::placeholder) {
   color: var(--d-566275-l-8CA0C3);
+}
+:deep(.el-checkbox__inner){
+  border-color: var(--d-252E3C-l-E8F1FF);
 }
 </style>

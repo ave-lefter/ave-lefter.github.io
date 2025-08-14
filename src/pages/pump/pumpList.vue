@@ -16,46 +16,53 @@
           <div class="w-full relative">
             <div class="flex-start items-start">
               <div class="mr-12px relative">
-                <div class="black-container ">
-                  <span class="bg-[--d-000-l-FFF] px-2px py-2px color-[--d-566275-l-8CA0C3] block hover:color-[--d-8CA0C3-l-566275] w-16px h-16px flex items-center justify-center">
+                <div class="black-container">
+                  <span
+                    v-tooltip="$t('BlackListToken')"
+                    class="bg-[--d-000-l-FFF] px-2px py-2px color-[--d-566275-l-8CA0C3] block hover:color-[--d-8CA0C3-l-566275] w-16px h-16px flex items-center justify-center"
+                  >
                     <Icon
-                    v-if="
-                      pumpBlackList?.findIndex(
-                        (i) =>
-                          (i.address == row.token && i.type == 'ca') ||
-                          (i.address == row.symbol && i.type == 'keyword')
-                      ) !== -1
-                    "
-                    name="custom:key-invisible"
-                    class="text-12px"
-                    @click.stop="addOrRemoveBlaclList(row, 'ca')"
-                  />
-                  <Icon
-                    v-else
-                    name="custom:key-visible"
-                    class="text-12px"
-                    @click.stop="addOrRemoveBlaclList(row, 'ca')"
-                  />
-                  </span>
-                  <span class="bg-[--d-000-l-FFF] px-2px py-2px color-[--d-566275-l-8CA0C3] block mt-5px hover:color-[--d-8CA0C3-l-566275] w-16px h-16px flex items-center justify-center">
+                      v-if="
+                        pumpBlackList?.findIndex(
+                          (i) =>
+                            (i.address == row.token && i.type == 'ca') ||
+                            (i.address == row.symbol && i.type == 'keyword')
+                        ) !== -1
+                      "
+                      name="custom:key-visible"
+                      class="text-12px"
+                      @click.stop="addOrRemoveBlaclList(row, 'ca')"
+                    />
                     <Icon
-                    v-if="
-                      pumpBlackList?.findIndex(
-                        (i) =>(i.address == row.token && i.type == 'dev')
-                      ) !== -1
-                    "
-                    name="custom:dev-invisible"
-                    class="text-12px"
-                    @click.stop="addOrRemoveBlaclList(row, 'dev')"
-                  />
-                  <Icon
-                    v-else
-                    name="custom:dev"
-                    class="text-12px"
-                    @click.stop="addOrRemoveBlaclList(row, 'dev')"
-                  />
-                  </span>
+                      v-else
+                      name="custom:key-invisible"
 
+                      class="text-12px"
+                      @click.stop="addOrRemoveBlaclList(row, 'ca')"
+                    />
+                  </span>
+                  <span
+                    v-tooltip="$t('BlackListDev')"
+                    class="bg-[--d-000-l-FFF] px-2px py-2px color-[--d-566275-l-8CA0C3] block mt-5px hover:color-[--d-8CA0C3-l-566275] w-16px h-16px flex items-center justify-center"
+                  >
+                    <Icon
+                      v-if="
+                        pumpBlackList?.findIndex(
+                          (i) => i.address == row.token && i.type == 'dev'
+                        ) !== -1
+                      "
+                      name="custom:dev"
+                      class="text-12px"
+                      @click.stop="addOrRemoveBlaclList(row, 'dev')"
+                    />
+                    <Icon
+                      v-else
+
+                      name="custom:dev-invisible"
+                      class="text-12px"
+                      @click.stop="addOrRemoveBlaclList(row, 'dev')"
+                    />
+                  </span>
                 </div>
                 <div class="token-logo">
                   <el-image
@@ -75,13 +82,13 @@
                       <img
                         class="token-icon h-32px text-16px color-#fff"
                         :src="getChainDefaultIcon(row.chain, row.symbol)"
-                      >
+                      />
                     </template>
                     <template #placeholder>
                       <img
                         class="token-icon h-32px text-16px color-#fff"
                         :src="getChainDefaultIcon(row.chain, row.symbol)"
-                      >
+                      />
                     </template>
                   </el-image>
                   <Progress
@@ -95,9 +102,12 @@
                     placement="bottom-start"
                     :show-arrow="false"
                   >
-                    <template #content>
+                    <template #content
+                      >>
                       <el-image
-                        class="token-icon h-228px w-228px items-center"
+                        class="token-icon max-w-228px max-h-228px w-228px flex items-center justify-center"
+                        style="display: flex"
+                        fit="cover"
                         :src="getSymbolDefaultIcon(row)"
                         preview-teleported
                       >
@@ -105,13 +115,13 @@
                           <img
                             class="token-icon h-228px w-228px text-16px color-#fff"
                             :src="getChainDefaultIcon(row.chain, row.symbol)"
-                          >
+                          />
                         </template>
                         <template #placeholder>
                           <img
                             class="token-icon h-228px w-228px text-16px color-#fff"
                             :src="getChainDefaultIcon(row.chain, row.symbol)"
-                          >
+                          />
                         </template>
                       </el-image>
                     </template>
@@ -120,7 +130,7 @@
                         getSymbolDefaultIcon(row)
                       )}`"
                       target="_blank"
-                      class="token-mark clickable "
+                      class="token-mark clickable"
                       @click.stop
                     >
                       <Icon class="text-16px text-#fff" name="custom:search" />
@@ -131,7 +141,7 @@
                     v-tooltip="row.amm"
                     class="mr-5px rounded-100% bg-[--d-151A22-l-E8F1FF] chain border border-[#55D592] border-solid border-[1px]"
                     :style="{
-                      'border-color': getPumpColor(row.issue_platform)
+                      'border-color': getPumpColor(row.issue_platform),
                     }"
                     style="
                       position: absolute;
@@ -143,7 +153,7 @@
                     :src="`${token_logo_url}swap/${row.amm}.jpeg`"
                   />
 
-                  <el-image
+                  <!-- <el-image
                     v-if="row.issue_platform && isOut"
                     v-tooltip="row.issue_platform"
                     class="ml-5px rounded-100% bg-[--d-151A22-l-E8F1FF] chain border border-[#55D592] border-solid border-[1px]"
@@ -158,7 +168,7 @@
                     class="color-#4FD58F"
                     name="line-md:pause-to-play-filled-transition"
                     style="position: absolute; bottom: -7px; left: 20px; font-size: 16px"
-                  />
+                  /> -->
                 </div>
                 <div
                   v-tooltip="formatDate(row?.created_at || row?.time)"
@@ -175,7 +185,12 @@
                   <template
                     v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
                   >
-                    {{ formatCountdown(Number(row?.created_at)  * 1000 || Number(row?.time) * 1000) }}
+                    {{
+                      formatCountdown(
+                        Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
+                        false
+                      )
+                    }}
                   </template>
                   <TimerCount
                     v-else-if="
@@ -213,7 +228,7 @@
                         lang == 'zh-cn' || lang == 'zh-tw'
                           ? row?.summary_cn || ''
                           : row?.summary || ''
-                      )?.length
+                      )?.length && isOut
                     "
                     v-tooltip.raw="{
                       content: buildTooltipContent(
@@ -231,7 +246,7 @@
                   </a>
                 </div>
 
-                <div class="flex-start text-12px mt-0px">
+                <div class="flex-start text-12px mt-4px">
                   <span class="color-[--d-566275-l-8CA0C3]">{{
                     row.token?.slice(0, 4) + '...' + row.token?.slice(-4)
                   }}</span>
@@ -241,14 +256,14 @@
                     class="text-12px cursor-pointer color-[--d-566275-l-8CA0C3] ml-4px"
                     @click.stop.prevent
                   />
-                  <div class="color-#252B34"  style="margin: 0 8px;">|</div>
+                  <div class="color-#252B34" style="margin: 0 8px">|</div>
                   <div
                     v-if="
                       row?.medias?.length > 0 && pumpSetting?.define?.some((i) => i === 'media')
                     "
                     class="flex text-12px"
                   >
-                    <div v-for="(item, $index) in row?.medias" :key="$index" >
+                    <div v-for="(item, $index) in row?.medias" :key="$index">
                       <template v-if="item.url">
                         <span v-if="item.name === 'QQ'" v-tooltip="item.url" class="mr-8px">
                           <Icon
@@ -261,7 +276,12 @@
                           :tokenId="(row.token + '-' + row.chain) as string"
                           :type="row.twitter_type"
                         >
-                          <a :href="item.url" target="_blank"  class="mr-8px h-12px block leading-12px" @click.stop>
+                          <a
+                            :href="item.url"
+                            target="_blank"
+                            class="mr-8px h-12px block leading-12px"
+                            @click.stop
+                          >
                             <XIcon
                               v-if="[1, 2, 3].includes(row.twitter_type)"
                               :type="row.twitter_type"
@@ -279,7 +299,7 @@
                           v-tooltip="item.url"
                           :href="item.url"
                           target="_blank"
-                          class="  h-12px mr-8px block leading-12px"
+                          class="h-12px mr-8px block leading-12px"
                           @click.stop
                         >
                           <Icon
@@ -291,13 +311,13 @@
                     </div>
                   </div>
                   <a
-                    class="media-item h-12px  block leading-12px"
+                    class="media-item h-12px block leading-12px"
                     :href="`https://x.com/search?q=($${row?.symbol} OR ${row?.token})&src=typed_query&f=live`"
                     target="_blank"
                   >
                     <Icon class="text-[--d-8CA0C3-l-566275] h-12px w-12px" name="custom:search" />
                   </a>
-                  <div class="color-#252B34"  style="margin: 0 8px">|</div>
+                  <div class="color-#252B34" style="margin: 0 8px">|</div>
                   <div
                     v-show="pumpSetting?.define?.some((i) => i === 'holder')"
                     v-tooltip="$t(`holders`)"
@@ -314,7 +334,7 @@
                   <div
                     v-show="pumpSetting?.define?.some((i) => i === 'markers')"
                     v-tooltip.raw="{
-                      content: `<div class='max-w-[400px]'>${$t('buy1')}/${$t('sell1')} <span class='color-#12B886'>${formatNumber(row?.buyers_24h || 0, 2)}</span>/<span class='color-#F6465D'>${formatNumber(row?.sellers_24h || 0, 2)}</span></div>`,
+                      content: `<div class='max-w-[400px] color-[--d-8CA0C3-l-566275]'>${$t('buy1')}/${$t('sell1')}: <span class='color-#12B886'>${formatNumber(row?.buyers_24h || 0, 2)}</span><span class='color-[--d-566275-l-8CA0C3]'>/</span><span class='color-#F6465D'>${formatNumber(row?.sellers_24h || 0, 2)}</span></div>`,
                       props: {
                         placement: 'top-start',
                       },
@@ -358,9 +378,9 @@
                 </div>
                 <div class="flex-start text-12px mt-16px">
                   <div
-                  v-show="pumpSetting?.define?.some((i) => i === 'top')"
-                  class="flex-start mr-8px bg-btn"
-                  @mouseover.stop="e => showBubbleTooltip(row,e)"
+                    v-show="pumpSetting?.define?.some((i) => i === 'top')"
+                    class="flex-start mr-8px bg-btn"
+                    @mouseover.stop="(e) => showBubbleTooltip(row, e)"
                   >
                     <Icon
                       class="iconfont icon-TOP text-12px mr-4px"
@@ -502,10 +522,7 @@
                   <div
                     v-show="pumpSetting?.define?.some((i) => i === 'smart')"
                     v-tooltip="$t('smarter')"
-                    class="flex mr-5px items-center bg-btn"
-                    :style="{
-                      color: Number(row?.smart_wallet_tag_count || 0) > 0 ? '#F6465D' : '#12B886',
-                    }"
+                    class="flex mr-5px items-center bg-btn color-#12B886"
                   >
                     <Icon
                       class="iconfont icon-rug mr-2px text-12px vertical-middle"
@@ -519,11 +536,12 @@
             <div class="pump-right">
               <div
                 v-if="
-                  (isSoon && row.progress > 90) || pumpSetting?.define?.some((i) => i === 'mcap')
+                  (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
                 "
-                class="flex-end text-12px mt-5px mb-5px"
+                class="flex-end text-12px mt-5px"
+                :class="pumpSetting.fontSize_mc =='12px'? 'mb-10px' : 'mb-5px'"
               >
-                <template v-if="isSoon && row.progress > 90">
+                <template v-if="isSoon && row.progress > 99">
                   <el-image
                     v-if="row.issue_platform"
                     v-tooltip="row.issue_platform"
@@ -559,7 +577,7 @@
                   pumpSetting?.define?.some((i) => i === 'vol') ||
                   pumpSetting?.define?.some((i) => i === 'txs')
                 "
-                class="flex-end text-12px mb-15px"
+                class="flex-end text-12px"
               >
                 <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
                   <div class="mr-5px color-[--d-566275-l-8CA0C3]">V</div>
@@ -574,7 +592,7 @@
                   </div>
                 </template>
               </div>
-              <div class="btns-swap flex-end">
+              <div class="btns-swap flex-end mt-15px">
                 <div
                   v-if="row?.state === 'migrating'"
                   style="
@@ -596,7 +614,7 @@
                     class="mr-5px"
                     alt=""
                     srcset=""
-                  >
+                  />
                   <span>Migrating...</span>
                 </div>
                 <QuickSwap
@@ -632,7 +650,6 @@
 <script setup lang="ts">
 import Progress from './progress.vue'
 import ArrowAnimation from './arrowAnimation.vue'
-import { useWindowSize } from '@vueuse/core'
 import {
   getSymbolDefaultIcon,
   getChainDefaultIcon,
@@ -668,10 +685,10 @@ const props = defineProps({
     type: Boolean,
     default: () => false,
   },
-  scrollHeight:{
-    type:[String,Number],
-    default:'calc(100vh - 215px)'
-  }
+  scrollHeight: {
+    type: [String, Number],
+    default: 'calc(100vh - 215px)',
+  },
 })
 
 const showPop = ref(false)
@@ -763,26 +780,26 @@ function buildTooltipContent(summary: string): string {
   `
     : ''
 }
-function showBubbleTooltip(row:PumpObj, e:MouseEvent) {
+function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
   $tooltip.show({
-      content: `<iframe
+    content: `<iframe
                   style='width:400px; height:400px;  border:none; overflow: hidden;'
                   src='https://app.insightx.network/bubblemaps/${row.chain === 'bsc' ? 56 : row.chain}/${row.target_token}'
                   allow='clipboard-write'
                 ></iframe>`,
-      target: e.target as HTMLElement,
-      props: {
-        showArrow: false,
-        rawContent: true,
-        placement: 'bottom',
-        trigger: 'hover',
-        'popper-class': 'x--tooltip',
-        'onUpdate:visible': (v: boolean) => {
-          if (v) return
-          $tooltip.hide()
-        }
-      }
-    })
+    target: e.target as HTMLElement,
+    props: {
+      showArrow: false,
+      rawContent: true,
+      placement: 'bottom',
+      trigger: 'hover',
+      'popper-class': 'x--tooltip',
+      'onUpdate:visible': (v: boolean) => {
+        if (v) return
+        $tooltip.hide()
+      },
+    },
+  })
 }
 </script>
 
@@ -801,8 +818,8 @@ function showBubbleTooltip(row:PumpObj, e:MouseEvent) {
     display: flex;
     align-items: center;
     color: var(--a-text-1-color);
-    padding: 20px 12px;
-    border-bottom: 1px solid var(--d-151A22-l-E8F1FF);
+    padding: 15px 12px 11px;
+    border-top: 1px solid var(--d-151A22-l-E8F1FF);
     &:hover {
       background-color: var(--d-151A22-l-E8F1FF);
       .black-container {
@@ -819,8 +836,8 @@ function showBubbleTooltip(row:PumpObj, e:MouseEvent) {
       background: var(--d-0B0D12-l-F6F9FF);
       position: absolute;
       right: 0;
-      top: -9px;
-      padding:0px 12px;
+      bottom: 6px;
+      padding: 0px 12px;
     }
     .black-container {
       position: absolute;
@@ -889,7 +906,7 @@ function showBubbleTooltip(row:PumpObj, e:MouseEvent) {
       inset: 0;
       // border-radius: 50%;
       &:hover {
-        background:#00000099;
+        background: #00000099;
         .iconify {
           color: #f5f5f5;
           opacity: 1;
@@ -927,9 +944,9 @@ function showBubbleTooltip(row:PumpObj, e:MouseEvent) {
   }
 }
 .bg-btn {
-  --uno:  rounded-2px mr-4px flex items-center justify-center h-20px
-    min-w-16px p-2px;
-    border: 0.5px solid var(--d-151A22-l-E8F1FF)
+  --uno: rounded-2px mr-4px flex items-center justify-center min-w-16px p-4px;
+  border: 0.5px solid var(--d-151A22-l-E8F1FF);
+  background: var(--d-0B0D12-l-F6F9FF);
 }
 .time {
   color: #959a9f;
@@ -941,8 +958,6 @@ function showBubbleTooltip(row:PumpObj, e:MouseEvent) {
   }
 }
 @media (max-width: 1920px) {
-
-
 }
 @media (max-width: 1920px) {
   .symbol-ellipsis {

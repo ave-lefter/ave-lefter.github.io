@@ -42,7 +42,9 @@
       <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" >
         <template #content>
           <el-image
-            class="token-icon  h-228px w-228px items-center"
+            class="token-icon items-center max-w-228px max-h-228px w-228px flex items-center justify-center"
+            style="display: flex"
+            fit="cover"
             :src="getSymbolDefaultIcon(token)"
             lazy
           >

@@ -70,7 +70,6 @@
           <div class="slider-wrapper">
             <el-slider
               v-model="defineFontsize"
-              :disabled="activeFontSize== 'small' || activeFontSize== 'medium'  ||  activeFontSize== 'large'"
               :min="14"
               :max="24"
               :step="1"
@@ -79,16 +78,16 @@
           </div>
         </div>
       </div>
-      <ul class="item border-b border-##333333 pb-20px">
+      <ul class="item border pb-20px">
         <li @click="pumpSetting.show_search = !pumpSetting.show_search">
           <template v-if="pumpSetting.show_search">
             <Icon name="custom:show-search" class="text-12px mr-8px" />
-            {{ $t('showSearch') }}
+            {{ $t('hideSearch') }}
           </template>
           <template v-else>
-            <Icon name="custom:search" class="text-12px mr-8px" />{{
-              $t('hideSearch')
-            }}</template
+            <Icon name="custom:search" class="text-12px mr-8px" />
+            {{ $t('showSearch') }}
+            </template
           >
         </li>
         <li @click="switchProgress">
@@ -102,43 +101,43 @@
         <li @click="switchAvatar">
           <template v-if="pumpSetting.avatar_isCircle == 'circle'">
             <Icon name="custom:progress-circle" class="text-12px mr-8px" />
-            {{ $t('circleTokenImage') }}
+            {{ $t('rectTokenImage') }}
           </template>
           <template v-else>
             <Icon name="custom:avatar-rect" class="text-12px mr-8px" />
-            {{ $t('rectTokenImage') }}</template
+            {{ $t('circleTokenImage') }}
+          </template
           >
         </li>
         <li @click="pumpSetting.isGutter = !pumpSetting.isGutter">
           <template v-if="pumpSetting.isGutter">
             <Icon name="custom:gutter-big" class="text-12px mr-8px" />
-            {{ $t('looseColumns') }}
+            {{ $t('compactColumns') }}
           </template>
           <template v-else>
-            <Icon name="custom:gutter-small" class="text-12px mr-8px" />{{
-              $t('compactColumns')
-            }}</template
+            <Icon name="custom:gutter-small" class="text-12px mr-8px" />
+            {{ $t('looseColumns') }}
+            </template
           >
         </li>
         <li @click="pumpSetting.isRight = !pumpSetting.isRight">
           <Icon name="custom:right-key" class="text-12px mr-8px" />
-          <template v-if="pumpSetting.isRight"> {{ $t('newTabRightClick') }} </template>
-          <template v-else>{{ $t('noNewTabRightClick') }}</template>
+          <template v-if="pumpSetting.isRight">{{ $t('noNewTabRightClick') }}</template>
+          <template v-else>{{ $t('newTabRightClick') }}</template>
         </li>
         <li @click="pumpSetting.isBlacklist = !pumpSetting.isBlacklist">
           <template v-if="pumpSetting.isBlacklist">
             <Icon name="custom:key-invisible" class="text-12px mr-8px" />
-            {{ $t('hideBlackList') }}
+            {{ $t('showBlackList') }}
           </template>
           <template v-else>
-            <Icon name="custom:key-visible" class="text-8px mr-8px" />{{
-              $t('showBlackList')
-            }}</template
-          >
+            <Icon name="custom:key-visible" class="text-8px mr-8px" />
+            {{ $t('hideBlackList') }}
+            </template>
         </li>
       </ul>
-      <div>
-        <span class="text-12px color-[--d-566275-l-8CA0C3]">{{ $t('defineCard') }}</span>
+      <div class="mt-20px">
+        <span class="text-12px color-[--d-8CA0C3-l-566275]">{{ $t('defineCard') }}</span>
         <div class="tabs define mt-10px">
           <el-button
             v-for="(item, index) in defineList"
@@ -176,11 +175,11 @@ const activeFontSize = useLocalStorage('activeFontSize','medium')
 const list_mc = computed(() => {
   return [
     {
-      size: '14px',
+      size: '12px',
       name: t('convention'),
     },
     {
-      size: '18px',
+      size: '16px',
       name: t('large'),
     },
   ]
@@ -223,7 +222,7 @@ const defineList = computed(() => {
     { name: t('runPull'), id: 'rug' },
     { name: t('insiders'), id: 'insider' },
     { name: t('sniper'), id: 'sniper' },
-    { name: t('cabal'), id: 'cabal' },
+    // { name: t('cabal'), id: 'cabal' },
     { name: t('markers'), id: 'markers' },
     // { name: t('migraged'), id: 'migraged' },
   ]
@@ -242,6 +241,9 @@ const isExit = computed(() => {
 
 
 watch(defineFontsize, (newval) => {
+  if (newval) {
+    activeFontSize.value = 'define'
+  }
   if (activeFontSize.value == 'define') {
     pumpSetting.value.size_swap =(newval + 'px')
   }
@@ -290,22 +292,22 @@ function formatTooltip(val: number) {
     gap: 8px;
     justify-content: flex-start;
     button {
-      border: 1px solid var(--d-151A22-l-E8F1FF);
+      border: 1px solid var(--d-252E3C-l-E8F1FF);
       background: transparent;
       color: var(--d-566275-l-8CA0C3);
       margin-left: 0;
       padding: 4px;
       &.active {
       color: var(--d-8CA0C3-l-566275);
-      background: var(--d-151A22-l-E8F1FF);
+      background: var(--d-252E3C-l-E8F1FF);
     }
     }
   }
 
   button {
-    border: 1px solid var(--d-151A22-l-E8F1FF);
+    border: 1px solid var(--d-252E3C-l-E8F1FF);
     // font-size: 14px;
-    color: var(--d-8CA0C3-l-566275);
+    color: var(--d-566275-l-8CA0C3);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;
@@ -321,11 +323,11 @@ function formatTooltip(val: number) {
     //   margin-left: 8px;
     // }
     &.active {
-      color: var(--d-F5F5F5-l-333);
-      background: var(--d-151A22-l-E8F1FF);
+      color: var(--d-F5F5F5-l-111);
+      background: var(--d-252E3C-l-E8F1FF);
     }
     .swap {
-      background: #12b8861a;
+      background: #12B8861A;
       border-radius: 4px;
       padding: 5px;
       color: #12b886;
@@ -352,6 +354,10 @@ function formatTooltip(val: number) {
   }
 }
 .item {
+  &.border {
+    border-top: 1px solid var(--d-252E3C-l-E8F1FF);
+    border-bottom: 1px solid var(--d-252E3C-l-E8F1FF);
+  }
   li {
     color: var(--d-F5F5F5-l-0B0D12);
     margin-top: 20px;
@@ -374,7 +380,7 @@ function formatTooltip(val: number) {
   /* 3. 修改轨道未选部分颜色 */
   :deep(.el-slider__runway) {
     height: 2px;
-    background-color: var(--d-151A22-l-E8F1FF);
+    background-color: #3F80F733;
   }
 
   /* 4. 修改滑块（圆点）颜色和大小 */
