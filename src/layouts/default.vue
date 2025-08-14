@@ -186,16 +186,19 @@
     </Draggable> -->
     <MonitorDragger v-show="monitorStore.visible"/>
     <FavAddressPop ref="favAddressPopRef" :visible="favAddressPopVisible" :button-ref="attentionTrigger || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" @onCancel="() => favAddressPopVisible = false"/>
+    <Top v-if="topVisible" @click="scrollToTop"/>
   </div>
 </template>
 
 <script setup lang='ts'>
   import TheHeader from '@/components/layouts/TheHeader.vue'
   import TheFooter from '@/components/layouts/TheFooter.vue'
+import { useEventBus } from '@vueuse/core'
   const botStore = useBotStore()
   const {addressGroups,attentionTrigger,favAddressPopVisible,handleAddAttention} = storeToRefs(useFollowStore())
   const signalStore = useSignalStore()
   const monitorStore = useMonitorStore()
+  const route = useRoute()
 
   const _style=computed(()=>{
     let paddingLeft=0
@@ -224,6 +227,15 @@
       return {}
     }
   })
+
+  const topVisible = computed(()=>{
+   return ['/smart','/address'].some(url=>route.fullPath.includes(url)) 
+  })
+
+  const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
+  function scrollToTop() {
+    scrollTopEvent.emit()
+  }
 </script>
 
 <style lang="scss">

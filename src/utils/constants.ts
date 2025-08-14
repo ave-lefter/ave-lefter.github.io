@@ -90,6 +90,7 @@ export const BusEventType = {
   TOP_FAV_CHANGE: 'top-favorite-change',
   FAV_DIALOG: 'fav-dialog',
   // LEFT_DRAG: 'left-drag',
+  SCROLL_TO_TOP: 'scroll-to-top',
 }
 
 export const ProvideType = {

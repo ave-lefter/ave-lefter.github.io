@@ -230,6 +230,16 @@ const walletStore = useWalletStore()
 const isSupportedChain = computed(()=>{
   return (props.activeChain==='AllChains' || botStore.isSupportChains.includes(props.activeChain))
 })
+watch(()=>props.categories,()=>{
+  setTimeout(()=>{
+    const index = supportCategories.value.findIndex((el) => {
+      return el.category === props.activeTab
+    })
+    if (index > -1) {
+      scrollTabToCenter(categoryRef, index)
+    }
+  },20)
+})
 </script>
 
 <template>

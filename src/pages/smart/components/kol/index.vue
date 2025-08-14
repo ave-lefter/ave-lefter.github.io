@@ -1,7 +1,7 @@
 <template>
     <div class="w-full">
       <el-table
-        ref="table_ref"
+        ref="tableRef"
         :key="tableIndex"
         v-loading="loading"
         :data="tableData"
@@ -112,7 +112,7 @@
               <UserAvatar class="mr-10px" iconSize="32px" iconChainSize="14px" :wallet_logo="{...(row?.wallet_logo || {}), url: row?.wallet_logo?.url || row?.twitter_url, logo: row?.wallet_logo?.logo || row?.avatar_url}" :address="row.wallet_address" />
               <div>
                 <div class="flex-start">
-                  <UserRemark addressClass="token-symbol ellipsis" addressStyle="max-width: 70px" showAddressTitle :address="row.wallet_address" :chain="row.chain" :remark="row.remark || row.nickname" :wallet_logo="row.wallet_logo" :formatAddress="a=> '*' + a?.slice(-5)" @updateRemark="({remark}) => row.remark = remark"></UserRemark>
+                  <UserRemark addressClass="token-symbol ellipsis" addressStyle="max-width: 70px" showAddressTitle :address="row.wallet_address" :chain="row.chain" :remark="row.remark || row.nickname" :wallet_logo="row.wallet_logo" :formatAddress="a=> '*' + a?.slice(-5)" @updateRemark="({remark}) => row.remark = remark"/>
                   <img  v-if="activeTab === 'kol'" style="width: 10px; height: 10px; margin-left: 8px;" src="@/assets/images/x.png" alt="" srcset="" @click.stop="goLink1(row?.wallet_logo?.url)">
                 </div>
                 <div class="text-10px color-icon flex-start mt-4px color-[--d-666-l-999]" style="line-height: 1">
@@ -174,16 +174,16 @@
                             :src="require(`@/assets/images/${item.img}.png`)"
                             :alt="item.img"
                             width="10"
-                          />
+                          >
                         </span>
                       </div>
                     </template>
                   </div>
                   <template v-if="row.signal_arr?.length > 0">
                     <div
-                      class="flex"
                       v-for="(i, index) in row.signal_arr"
                       :key="index"
+                      class="flex"
                       @mouseover.stop="
                         e => {
                           buttonTagRef = e.currentTarget
@@ -195,10 +195,10 @@
                     >
                       <el-image class="token-icon-signal-tag" :src="$f.formatIconTag(i.tag)" lazy>
                         <template #error>
-                          <img class="token-icon-signal-tag" src="/icon-default.png" />
+                          <img class="token-icon-signal-tag" src="/icon-default.png" >
                         </template>
                         <template #placeholder>
-                          <img class="token-icon-signal-tag" src="/icon-default.png" />
+                          <img class="token-icon-signal-tag" src="/icon-default.png" >
                         </template>
                       </el-image>
                       <span
@@ -317,8 +317,8 @@
         </template>
           <template #default="{ row ,$index}">
             <div
-              class="flex-end"
               :ref="(el: any) => $refs.currentBtnRef[$index] = el"
+              class="flex-end"
               @mouseenter="showPopover(row, $index)"
               @mouseleave="showPop = false"
              >
@@ -837,7 +837,7 @@
 
 <script setup lang="ts">
 import { upColor, downColor} from '@/utils/constants'
-import { useWindowSize } from '@vueuse/core'
+import { useEventBus, useWindowSize } from '@vueuse/core'
 import { deleteAttention, addAttention2 } from '~/api/attention'
 import type { KolObj } from '@/api/types/kol'
 const props = defineProps({
@@ -1047,6 +1047,20 @@ function showPopover(row: KolObj,$index: number) {
   showPop.value = true
   currentIndex.value = $index
   currentRow.value = row
+}
+const tableRef = useTemplateRef('tableRef')
+const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
+scrollTopEvent.on(scrollToTop)
+onUnmounted(()=>{
+  scrollTopEvent.off(scrollToTop)
+})
+function scrollToTop() {
+  if (tableRef.value) {
+    tableRef.value.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    })
+  }
 }
 </script>
 

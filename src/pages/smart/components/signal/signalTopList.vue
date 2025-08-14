@@ -8,6 +8,17 @@ defineProps<{
     list: ITopSignal[]
   }
 }>()
+const scrollRef = useTemplateRef('scrollRef')
+defineExpose({
+  setScrollTop(scrollTop: number){
+    if(scrollRef.value){
+      scrollRef.value.scrollTo({
+        top: scrollTop,
+        behavior: 'smooth'
+      })
+    }
+  }
+})
 const flexColumns = [
   'flex-1',
   'w-64px text-right',
@@ -38,7 +49,7 @@ const emit = defineEmits(['close'])
         {{ $t('MaximumIncrease2') }}
       </span>
     </div>
-    <el-scrollbar height="calc(100vh - 302px)" class="mx--12px px-12px">
+    <el-scrollbar ref="scrollRef" height="calc(100vh - 302px)" class="mx--12px px-12px">
       <div
         v-for="(row, $index) in dialogValues.list"
         :key="row.token"
