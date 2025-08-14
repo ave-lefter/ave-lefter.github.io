@@ -407,7 +407,7 @@ function getFilterData(list, conditions) {
           <template #default="{ visible }">
             <div
 v-tooltip="$t('customize')"
-              class="flex items-center gap-4px mr-8px text-12px bg-[--d-222-l-F2F2F2] color-[--d-999-l-666] hover:color-[--d-F5F5F5-l-333] px-4px py-2px rounded-4px cursor-pointer">
+              class="flex items-center gap-4px mr-8px text-12px bg-[--d-151A22-l-E8F1FF] color-[--d-999-l-666] hover:color-[--d-F5F5F5-l-333] px-4px py-2px rounded-4px cursor-pointer">
               <Icon name="custom:customized" class="text-13px" />
               <Icon :name="visible ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'" class="text-16px" />
             </div>
@@ -422,14 +422,14 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
     <div class="flex pb-8px border-b-1px border-b-solid border-b-[--d-222-l-F2F2F2] mb-12px">
       <div class="flex items-center gap-8px">
         <span
-          v-for="(item, index) in tabList" :key="index" :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-999-l-666] px-4px py-2px rounded-4px cursor-pointer ${activeTab === item.value ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333]' : ''
+          v-for="(item, index) in tabList" :key="index" :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-999-l-666] px-4px py-2px rounded-4px cursor-pointer ${activeTab === item.value ? 'bg-[--d-151A22-l-E8F1FF] color-[--d-F5F5F5-l-333]' : ''
           }`" @click="setActiveTab(item.value)">
           {{ item.label }}
         </span>
       </div>
       <div class="flex-1 drag-handle mb--8px" />
       <div class="flex items-center gap-8px">
-        <div class="flex items-ceter gap-4px p-2px rounded-4px bg-[--d-333-l-F2F2F2]">
+        <div class="flex items-ceter gap-4px p-2px rounded-4px bg-[--d-151A22-l-E8F1FF]">
           <div
             v-for="(item, idx) in pumpStore.pumpConfig" :key="idx" class="cursor-pointer rounded-4px p-1px"
             :class="pumpStore.activeChain === item.chain ? 'bg-[--d-111-l-FFF]' : ''"
@@ -441,14 +441,15 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
     </div>
     <div class="flex mb-12px">
       <div class="flex items-center gap-8px">
-        <signal-quick-buy-input v-model="quickBuyValue" size="small" class="[--el-border-color:transparent]" />
+        <signal-quick-buy-input v-model="quickBuyValue" size="small" class="[--el-border-color:transparent]" style="--el-input-bg-color:var(--d-151A22-l-E8F1FF)" />
         <el-select
           v-model="botSettingStore.botSettings[pumpStore.activeChain]!.selected" fit-input-width size="small"
-          :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px]" popper-class="small-select">
+          :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px]" popper-class="small-select"
+        >
           <el-option v-for="item in ['s1', 's2', 's3']" :key="item" :value="item" :label="item" />
         </el-select>
         <div
-          class="w-20px h-20px flex items-center justify-center bg-[--d-222-l-F2F2F2] rounded-4px color-[--d-666-l-999] cursor-pointer hover:color-[--d-F5F5F5-l-333]"
+          class="w-20px h-20px flex items-center justify-center bg-[--d-151A22-l-E8F1FF] rounded-4px color-[--d-566275-l-8CA0C3] cursor-pointer hover:color-[--d-F5F5F5-l-333]"
           :class="{
             'color-[--d-F5F5F5-l-333]': pumpStore.pump_notice[pumpStore.activeChain][activeTab],
           }" @click="
@@ -465,7 +466,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
       <div class="flex items-center gap-8px">
         <el-input
 ref="inputSearch" v-model.trim="pumpStore.pump_query[pumpStore.activeChain][activeTab]"
-          class="w-90px [--el-input-border-color:--d-222-l-F2F2F2]" size="small" :placeholder="$t('search')" @input="
+          class="w-90px [--el-input-border-color:--d-222-l-F2F2F2] [--el-input-bg-color:--d-151A22-l-E8F1FF]!" size="small" :placeholder="$t('search')" @input="
             (val) =>
               (pumpStore.pump_query[pumpStore.activeChain][activeTab] = val.replace(/\s/g, ''))
           ">
@@ -504,7 +505,7 @@ v-if="pumpStore.pump_query[pumpStore.activeChain][activeTab]" name="pajamas:clea
   .el-select--small .el-select__wrapper {
     padding: 2px 4px;
     min-height: 20px;
-    --el-fill-color-blank: var(--d-222-l-F2F2F2);
+    --el-fill-color-blank: var(--d-151A22-l-E8F1FF);
   }
 
   .el-input__prefix-inner> :last-child {
