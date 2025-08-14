@@ -17,7 +17,7 @@
         </div>
         <div>
           <div class="flex items-center">
-            <span class="token-symbol ellipsis text-sm mr-0.75">
+            <span class="token-symbol ellipsis text-sm mr-4px">
               {{ row.symbol }}
             </span>
             <span v-if="row.last_txn_time&&row.last_txn_time!='--'" v-tooltip="formatDate(row.last_txn_time,'YYYY-MM-DD HH:mm:ss')" class="text-xs color-[--d-666-l-999]">{{ formatTimeFromNow(row.last_txn_time,false,true) }}</span>
