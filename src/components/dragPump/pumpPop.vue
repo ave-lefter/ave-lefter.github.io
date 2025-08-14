@@ -407,7 +407,7 @@ function getFilterData(list, conditions) {
           <template #default="{ visible }">
             <div
 v-tooltip="$t('customize')"
-              class="flex items-center gap-4px mr-8px text-12px bg-[--d-151A22-l-E8F1FF] color-[--d-999-l-666] hover:color-[--d-F5F5F5-l-333] px-4px py-2px rounded-4px cursor-pointer">
+              class="flex items-center gap-4px mr-8px text-12px bg-[--d-151A22-l-E8F1FF] color-[--d-8CA0C3-l-566275] hover:color-[--d-F5F5F5-l-333] px-4px py-2px rounded-4px cursor-pointer">
               <Icon name="custom:customized" class="text-13px" />
               <Icon :name="visible ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'" class="text-16px" />
             </div>
@@ -422,7 +422,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
     <div class="flex pb-8px border-b-1px border-b-solid border-b-[--d-222-l-F2F2F2] mb-12px">
       <div class="flex items-center gap-8px">
         <span
-          v-for="(item, index) in tabList" :key="index" :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-999-l-666] px-4px py-2px rounded-4px cursor-pointer ${activeTab === item.value ? 'bg-[--d-151A22-l-E8F1FF] color-[--d-F5F5F5-l-333]' : ''
+          v-for="(item, index) in tabList" :key="index" :class="`decoration-none shrink-0 text-14px lh-20px text-center color-[--d-566275-l-8CA0C3] px-8px py-4px rounded-4px cursor-pointer ${activeTab === item.value ? 'bg-[--d-151A22-l-E8F1FF] color-[--d-F5F5F5-l-333]' : ''
           }`" @click="setActiveTab(item.value)">
           {{ item.label }}
         </span>
@@ -441,7 +441,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
     </div>
     <div class="flex mb-12px">
       <div class="flex items-center gap-8px">
-        <signal-quick-buy-input v-model="quickBuyValue" size="small" class="[--el-border-color:transparent]" style="--el-input-bg-color:var(--d-151A22-l-E8F1FF)" />
+        <signal-quick-buy-input v-model="quickBuyValue" size="small" class="[--el-border-color:transparent]" style="--el-input-bg-color:var(--d-151A22-l-E8F1FF);--el-text-color-regular:var(--d-8CA0C3-l-566275);--el-input-icon-color:var(--d-8CA0C3-l-566275)" />
         <el-select
           v-model="botSettingStore.botSettings[pumpStore.activeChain]!.selected" fit-input-width size="small"
           :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px]" popper-class="small-select"
@@ -466,7 +466,9 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
       <div class="flex items-center gap-8px">
         <el-input
 ref="inputSearch" v-model.trim="pumpStore.pump_query[pumpStore.activeChain][activeTab]"
-          class="w-90px [--el-input-border-color:--d-222-l-F2F2F2] [--el-input-bg-color:--d-151A22-l-E8F1FF]!" size="small" :placeholder="$t('search')" @input="
+          class="w-90px [--el-input-border-color:--d-222-l-F2F2F2]" size="small" :placeholder="$t('search')" 
+          style="--el-input-bg-color:var(--d-151A22-l-E8F1FF);--el-text-color-regular:var(--d-566275-l-8CA0C3)"
+          @input="
             (val) =>
               (pumpStore.pump_query[pumpStore.activeChain][activeTab] = val.replace(/\s/g, ''))
           ">
