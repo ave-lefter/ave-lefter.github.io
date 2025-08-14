@@ -12,7 +12,7 @@
       </el-tabs>
       <div v-if="botStore?.userInfo?.evmAddress && botStore?.isSupportChains?.includes(chain)" class="inline-flex items-center absolute top-50% right-0 transform -translate-y-1/2">
         <div class="tabs-1 mr-5px">
-          <button v-for="item in ['s1', 's2', 's3']" :key="item" :class="{'active': item === botSettingStore?.botSettings?.[chain]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item)">{{ item.toUpperCase() }}</button>
+          <button v-for="item in ['p1', 'p2', 'p3']" :key="item" :class="{'active': item === botSettingStore?.botSettings?.[chain]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item)">{{ item.toUpperCase() }}</button>
         </div>
         <SlippageSet :canSetAuto="true" :isAutoSell="swapType === 'market'" :chain="tokenStore.tokenInfo?.token?.chain" :setting="botSettingStore?.botSettings[chain]"/>
       </div>

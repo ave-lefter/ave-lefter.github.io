@@ -95,9 +95,11 @@
                     placement="bottom-start"
                     :show-arrow="false"
                   >
-                    <template #content>
+                    <template #content>>
                       <el-image
-                        class="token-icon h-228px w-228px items-center"
+                        class="token-icon max-w-228px max-h-228px w-228px flex items-center justify-center"
+                        style="display: flex"
+                        fit="cover"
                         :src="getSymbolDefaultIcon(row)"
                         preview-teleported
                       >
@@ -143,7 +145,7 @@
                     :src="`${token_logo_url}swap/${row.amm}.jpeg`"
                   />
 
-                  <el-image
+                  <!-- <el-image
                     v-if="row.issue_platform && isOut"
                     v-tooltip="row.issue_platform"
                     class="ml-5px rounded-100% bg-[--d-151A22-l-E8F1FF] chain border border-[#55D592] border-solid border-[1px]"
@@ -158,7 +160,7 @@
                     class="color-#4FD58F"
                     name="line-md:pause-to-play-filled-transition"
                     style="position: absolute; bottom: -7px; left: 20px; font-size: 16px"
-                  />
+                  /> -->
                 </div>
                 <div
                   v-tooltip="formatDate(row?.created_at || row?.time)"
@@ -175,7 +177,7 @@
                   <template
                     v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
                   >
-                    {{ formatCountdown(Number(row?.created_at)  * 1000 || Number(row?.time) * 1000) }}
+                    {{ formatCountdown(Number(row?.created_at)  * 1000 || Number(row?.time) * 1000, false) }}
                   </template>
                   <TimerCount
                     v-else-if="
@@ -213,7 +215,7 @@
                         lang == 'zh-cn' || lang == 'zh-tw'
                           ? row?.summary_cn || ''
                           : row?.summary || ''
-                      )?.length
+                      )?.length && isOut
                     "
                     v-tooltip.raw="{
                       content: buildTooltipContent(
@@ -502,10 +504,7 @@
                   <div
                     v-show="pumpSetting?.define?.some((i) => i === 'smart')"
                     v-tooltip="$t('smarter')"
-                    class="flex mr-5px items-center bg-btn"
-                    :style="{
-                      color: Number(row?.smart_wallet_tag_count || 0) > 0 ? '#F6465D' : '#12B886',
-                    }"
+                    class="flex mr-5px items-center bg-btn color-#12B886"
                   >
                     <Icon
                       class="iconfont icon-rug mr-2px text-12px vertical-middle"
@@ -519,11 +518,11 @@
             <div class="pump-right">
               <div
                 v-if="
-                  (isSoon && row.progress > 90) || pumpSetting?.define?.some((i) => i === 'mcap')
+                  (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
                 "
                 class="flex-end text-12px mt-5px mb-5px"
               >
-                <template v-if="isSoon && row.progress > 90">
+                <template v-if="isSoon && row.progress > 99">
                   <el-image
                     v-if="row.issue_platform"
                     v-tooltip="row.issue_platform"
@@ -632,7 +631,6 @@
 <script setup lang="ts">
 import Progress from './progress.vue'
 import ArrowAnimation from './arrowAnimation.vue'
-import { useWindowSize } from '@vueuse/core'
 import {
   getSymbolDefaultIcon,
   getChainDefaultIcon,
@@ -802,7 +800,7 @@ function showBubbleTooltip(row:PumpObj, e:MouseEvent) {
     align-items: center;
     color: var(--a-text-1-color);
     padding: 20px 12px;
-    border-bottom: 1px solid var(--d-151A22-l-E8F1FF);
+    border-top: 1px solid var(--d-151A22-l-E8F1FF);
     &:hover {
       background-color: var(--d-151A22-l-E8F1FF);
       .black-container {
