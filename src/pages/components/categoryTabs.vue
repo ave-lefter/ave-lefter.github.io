@@ -228,7 +228,7 @@ function updateActiveChain(chain: string) {
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const isSupportedChain = computed(()=>{
-  return !walletStore.address && (props.activeChain==='AllChains' || botStore.isSupportChains.includes(props.activeChain))
+  return (props.activeChain==='AllChains' || botStore.isSupportChains.includes(props.activeChain))
 })
 </script>
 
