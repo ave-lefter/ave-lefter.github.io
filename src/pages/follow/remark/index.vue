@@ -135,7 +135,7 @@ const handleRemarkGroup = async (row: any) => {
 }
 
 const tableRowClick = (row: any) => {
-  router.push(`/address/${row.user_address}-${row.user_chain}`)
+  router.push(`/address/${row.user_address}/${row.user_chain}`)
 }
 
 // 处理表格排序
