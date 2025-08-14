@@ -17,7 +17,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     const { width: winWidth, height: winHeight } = useWindowSize()
     const isLeftFixed = useStorage('isDragPumpLeft', false)
     const isRightFixed = useStorage('isDragPumpRight', false)
-    const fixedWidth = useStorage('dragPumpFixedWidth', 360)
+    const fixedWidth = useStorage('dragPumpFixedWidth', 480)
     const translateStyle = shallowRef(0)
 
     const onDrag = useThrottleFn((x: number) => {
