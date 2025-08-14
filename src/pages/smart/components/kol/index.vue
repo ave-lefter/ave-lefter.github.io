@@ -832,13 +832,12 @@
         </div>
       </div>
     </el-popover>
-    <Top @click="scrollToTop"/>
     </div>
   </template>
 
 <script setup lang="ts">
 import { upColor, downColor} from '@/utils/constants'
-import { useWindowSize } from '@vueuse/core'
+import { useEventBus, useWindowSize } from '@vueuse/core'
 import { deleteAttention, addAttention2 } from '~/api/attention'
 import type { KolObj } from '@/api/types/kol'
 const props = defineProps({
@@ -1050,6 +1049,11 @@ function showPopover(row: KolObj,$index: number) {
   currentRow.value = row
 }
 const tableRef = useTemplateRef('tableRef')
+const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
+scrollTopEvent.on(scrollToTop)
+onUnmounted(()=>{
+  scrollTopEvent.off(scrollToTop)
+})
 function scrollToTop() {
   if (tableRef.value) {
     tableRef.value.scrollTo({

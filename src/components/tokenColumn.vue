@@ -20,7 +20,7 @@
             <span class="token-symbol ellipsis text-sm mr-0.75">
               {{ row.symbol }}
             </span>
-            <span v-if="row.last_txn_time" v-tooltip="formatDate(row.last_txn_time,'YYYY-MM-DD HH:mm:ss')" class="text-xs color-[--d-666-l-999]">{{ formatTimeFromNow(row.last_txn_time) }}</span>
+            <span v-if="row.last_txn_time" v-tooltip="formatDate(row.last_txn_time,'YYYY-MM-DD HH:mm:ss')" class="text-xs color-[--d-666-l-999]">{{ formatTimeFromNow(row.last_txn_time,false,true) }}</span>
             <Icon
               v-if="row.risk_score > 55 || row.risk_level < 0"
               name="mynaui:danger-triangle"

@@ -157,7 +157,6 @@
     />
   </div>
   <PageBlank v-else />
-  <Top @click="scrollToTop"/>
 </template>
 <script setup>
 import Statistic from './components/statistic.vue'
@@ -167,6 +166,7 @@ import ActivityCharts from './components/activityCharts.vue'
 import PageBlank from './components/pageBlank.vue'
 import PageOther from './components/pageOther.vue'
 import { getChainInfo } from '@/utils'
+import { useEventBus } from '@vueuse/core'
 
 const isVolUSDT = ref(true)
 provide('isVolUSDT', isVolUSDT)
@@ -248,7 +248,11 @@ watch(() => botStore.getWalletAddress('solana'), (address, old) => {
     }
   }
 )
-
+const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
+scrollTopEvent.on(scrollToTop)
+onUnmounted(()=>{
+  scrollTopEvent.off(scrollToTop)
+})
 function scrollToTop() {
   scrollRef.value.scrollTo({
     top: 0,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TimeLine from './timeLine.vue'
-import {useStorage} from '@vueuse/core'
+import {useEventBus, useStorage} from '@vueuse/core'
 import Filter from './filter.vue'
 import {
   type GetSignalV2ListResponse,
@@ -184,6 +184,11 @@ onUnmounted(() => {
 })
 
 const topListRef = useTemplateRef<InstanceType<typeof SignalTopList>>('topListRef')
+const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
+scrollTopEvent.on(scrollToTop)
+onUnmounted(()=>{
+  scrollTopEvent.off(scrollToTop)
+})
 function scrollToTop() {
   if(topListRef.value){
     topListRef.value.setScrollTop(0)
@@ -269,7 +274,6 @@ function scrollToTop() {
       @setResetBtn="setResetBtn"
     />
   </div>
-  <Top @click="scrollToTop"/>
 </template>
 
 <style scoped lang="scss">

@@ -487,13 +487,6 @@ const cellRenderer = computed(() => {
     sniper_tx_count: snipersContent,
   }
 })
-
-const tableRef = useTemplateRef('tableRef')
-function scrollToTop() {
-  if (tableRef.value) {
-    tableRef.value.scrollToTop(0)
-  }
-}
 </script>
 
 <template>
@@ -550,7 +543,6 @@ function scrollToTop() {
     @size-change="sizeChange"
     @current-change="() => _getTreasureList()"
   />
-  <Top @click="scrollToTop" />
 </template>
 
 <style scoped lang="scss">
