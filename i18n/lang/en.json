@@ -1323,5 +1323,5 @@
   "withdrawTip": "0.002 is required to ensure the normal use of the wallet function",
   "soldAllTips":"The follow address may have interacted with old coins, resulting in some deviations in the value.",
   "searchKol": "Search KOL",
-  "searchKolPlaceholder": "Please enter the KOL nickname or address"
+  "searchKolPlaceholder": "Please enter the KOL address"
 }

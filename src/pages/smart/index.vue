@@ -251,6 +251,11 @@ function getSmartList(isSort = false) {
         extra: getExtra(i.extra_info),
       }))
       tableDataObj.value[currentKey] = tableData
+      if(activeTab.value === 'kol'){
+        const key = activeChain2.value + '-' + activeCategory1.value
+        filterConditions.value[key].keyword = ''
+        filterFormObj.value[key].keyword.keyword = ''
+      }
     })
     .catch(() => {
       if (!filterConditions.value?.chain && !filterConditions.value?.category) {
@@ -435,9 +440,6 @@ function isActiveFilter(prop) {
   const filterForm = filterFormObj?.value?.[key] || {}
   if (prop === 'last_trade_time') {
     return conditions.last_trade_time && conditions.last_trade_time !== ''
-  }
-  if (prop === 'keyword') {
-    return conditions.keyword && conditions.keyword !== ''
   }
   console.log('filterForm', filterForm)
   return filterRange(prop) || filterForm?.[prop]?.sort_dir

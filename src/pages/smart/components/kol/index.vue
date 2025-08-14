@@ -33,6 +33,7 @@
             <span class="text-10px" style="opacity: 0">0</span>
             <span>{{ $t('wallet2')+'/'+ $t('lastTxsTime1') }}</span>
             <el-popover
+              v-if="activeTab === 'kol'"
               v-model:visible="filterForm['keyword'].visible"
               placement="bottom"
               popper-class="chains-table-filter"
@@ -45,9 +46,6 @@
                     id="custom-search"
                     name="custom:search"
                     class="text-12px w-12px h-12px cursor-pointer ml-3px"
-                    :style="{
-                      color: isActiveFilter('keyword') ? 'var(--d-999-l-666)' : ''
-                    }"
                     @click.stop.prevent
                   />
               </template>
