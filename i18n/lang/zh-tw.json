@@ -1307,5 +1307,7 @@
   "withdrawAgain": "再轉一筆",
   "trading": "交易中",
   "withdrawTip": "需預留0.002，以確保錢包功能正常使用",
-  "soldAllTips":"關注地址若曾與老幣交互，可能造成數值存在一定偏差。"
+  "soldAllTips":"關注地址若曾與老幣交互，可能造成數值存在一定偏差。",
+  "searchKol": "搜尋KOL",
+  "searchKolPlaceholder": "請輸入KOL地址"
 }
