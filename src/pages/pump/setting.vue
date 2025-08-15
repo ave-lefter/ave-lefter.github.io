@@ -290,7 +290,7 @@ function formatTooltip(val: number) {
     gap: 8px;
     justify-content: flex-start;
     button {
-      border: 1px solid var(--d-151A22-l-E8F1FF);
+      border: 1px solid var(--d-252E3C-l-E8F1FF);
       background: transparent;
       color: var(--d-566275-l-8CA0C3);
       margin-left: 0;

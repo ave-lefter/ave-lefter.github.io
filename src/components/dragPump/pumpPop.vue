@@ -444,9 +444,8 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
         <signal-quick-buy-input v-model="quickBuyValue" size="small" class="[--el-border-color:transparent]" style="--el-input-bg-color:var(--d-151A22-l-E8F1FF);--el-text-color-regular:var(--d-8CA0C3-l-566275);--el-input-icon-color:var(--d-8CA0C3-l-566275)" />
         <el-select
           v-model="botSettingStore.botSettings[pumpStore.activeChain]!.selected" fit-input-width size="small"
-          :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px]" popper-class="small-select"
-        >
-          <el-option v-for="item in ['s1', 's2', 's3']" :key="item" :value="item" :label="item" />
+          :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px]" popper-class="small-select">
+          <el-option v-for="item in ['p1', 'p2', 'p3']" :key="item" :value="item" :label="item" />
         </el-select>
         <div
           class="w-20px h-20px flex items-center justify-center bg-[--d-151A22-l-E8F1FF] rounded-4px color-[--d-566275-l-8CA0C3] cursor-pointer hover:color-[--d-F5F5F5-l-333]"

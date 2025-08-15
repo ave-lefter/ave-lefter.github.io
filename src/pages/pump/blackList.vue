@@ -281,7 +281,7 @@ function restore(item: { address: string, type: string }) {
 }
 .btn {
   border: none;
-  background: var(--d-0B0D12-l-F6F9FF);
+  background: var(--d-151A22-l-E8F1FF);
   padding: 7px 8px;
   border-radius: 4px;
   display: flex;

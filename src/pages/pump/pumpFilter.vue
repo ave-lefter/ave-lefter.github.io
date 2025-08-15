@@ -28,7 +28,7 @@
           ref="formRef"
           class="hide-scrollbar"
           :model="form"
-          label-width="auto"
+    
           autocomplete="off"
           label-position="left"
           size="small"
@@ -363,7 +363,7 @@ const tabs = computed(() => {
           ],
           placeholder: [t('minor'), t('max1')],
           type: 'inputRange',
-          suffix: 'TXs',
+          suffix: '',
           tab: 'tag'
         },
 

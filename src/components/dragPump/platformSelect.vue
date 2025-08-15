@@ -28,7 +28,7 @@ const platformsList = computed(() => {
         <el-image
           v-if="platformsList[0]"
           class="mr-5px rounded w-14px"
-          :src="`${token_logo_url}${platformsList[0].platform_icon?.replace('/signals/', 'signals/')}`"
+          :src="`${token_logo_url}${platformsList[0]?.platform_icon?.replace('/signals/', 'signals/')}`"
         />
         <span v-if="platformsList[0]">{{ platformsList[0].platform_show }}</span>
         <Icon

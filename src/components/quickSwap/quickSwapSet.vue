@@ -2,7 +2,7 @@
   <div class="items-center inline-flex">
     <img v-if="themeStore.isDark" src="@/assets/images/fast.png" class="w-14px h-14px" alt="" srcset="">
     <img v-else src="@/assets/images/fast-dark.png" class="w-14px h-14px" alt="" srcset="">
-    <span class="ml-5px mr-5px color-[--d-566275-l-8CA0C3] text-12px">{{ $t('quick') }}</span>
+    <span class="ml-5px mr-5px color-[--d-8CA0C3-l-566275] text-12px">{{ $t('quick') }}</span>
     <el-input
       v-model.trim="quickBuyValue1"
       style="
@@ -36,17 +36,17 @@
     <div
       v-if="isQuickSupported&&settingsButtonVisible"
       class="ml-20px flex justify-end items-center text-12px">
-      <span class="color-[--d-566275-l-8CA0C3] mr-5px">{{ $t('default') }}</span>
+      <span class="color-[--d-8CA0C3-l-566275] mr-5px">{{ $t('default') }}</span>
       <div
         class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--d-151A22-l-E8F1FF] px-2px py-2px">
 
         <button
-          v-for="item in (['s1', 's2', 's3'] as const)"
+          v-for="item in (['p1', 'p2', 'p3'] as const)"
           :id="item"
           :key="item"
           :ref="setBtnRef"
           class="color-[--d-8CA0C3-l-566275] cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center"
-          :class="`${item === botSettingStore.botSettings?.[chain]?.selected?'color-[--d-F5F5F5-l-0B0D12] bg-[--d-000-l-FFF]':'bg-transparent'}`"
+          :class="`${item === botSettingStore.botSettings?.[chain]?.selected?'color-[--d-F5F5F5-l-0B0D12] bg-[--d-252E3C-l-FFF]':'bg-transparent'}`"
           type="button"
           @click.stop="botSettingStore.botSettings[chain]!.selected = item"
           @mouseenter="showPopover(item)"

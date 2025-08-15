@@ -55,12 +55,12 @@ export const useGlobalStore = defineStore('global', () => {
     fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
-    avatar_isCircle: 'circle',
+    avatar_isCircle: 'rect',
     isGutter: false,
     isRight: false,
     isBlacklist: true,
     show_search: true,
-    define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','cabal','insider', 'sniper', 'rug', 'kol', 'markers'],
+    define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','insider', 'sniper', 'rug', 'kol', 'markers'],
   })
 
   const hide_risk=shallowRef(1)

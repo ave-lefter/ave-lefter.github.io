@@ -757,7 +757,7 @@ export function getMCap(row: GetHotTokensResponse | SearchHot) {
   return amount.gt(0) ? amount.multipliedBy(row.current_price_usd).toString() : '0'
 }
 
-export function formatCountdown(time: ConfigType) {
+export function formatCountdown(time: ConfigType, isSecond = true) {
   const seconds = Math.abs(dayjs(time).diff(dayjs(), 's'))
   if (seconds < 60) {
     return `${seconds}s`
@@ -766,7 +766,8 @@ export function formatCountdown(time: ConfigType) {
     const minutes = Math.floor(seconds / 60)
     let remainingSeconds = seconds % 60
     remainingSeconds = Math.floor(remainingSeconds)
-    return `${minutes}min ${remainingSeconds > 0 ? remainingSeconds + 's' : ''}`
+
+    return `${minutes}min ${remainingSeconds > 0 && isSecond ? remainingSeconds + 's' : ''}`
   } else if (seconds < 86400) {
     // 1d
     const hours = Math.floor(seconds / 3600)

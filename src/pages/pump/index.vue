@@ -31,15 +31,6 @@
           </el-button>
         </template>
         <template #default>
-          <!-- <el-checkbox
-            v-model="checkAll"
-            class="width_100"
-            size="large"
-            :indeterminate="isIndeterminate"
-            @change="handleCheckAllChange"
-          >
-            {{ $t('all') }}
-          </el-checkbox> -->
           <template v-for="item in pumpConfig" :key="item.chain">
             <template v-if="item.chain === activeChain">
               <div v-if="item.platforms?.length <= 1" class="pump-platforms">
@@ -1318,7 +1309,7 @@ function getFilterData(list, conditions) {
     &.active {
       // color: var(--custom-font-4-color);
       color: var(--d-F5F5F5-l-333);
-      background: var(--d-111-l-FFF);
+      background: var(--d-252E3C-l-FFF);
     }
   }
 }
