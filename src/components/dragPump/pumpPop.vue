@@ -445,7 +445,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
         <el-select
           v-model="botSettingStore.botSettings[pumpStore.activeChain]!.selected" fit-input-width size="small"
           :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px]" popper-class="small-select">
-          <el-option v-for="item in ['p1', 'p2', 'p3']" :key="item" :value="item" :label="item" />
+          <el-option v-for="item in BotSettingsArr" :key="item.value" :value="item.value" :label="item.label" />
         </el-select>
         <div
           class="w-20px h-20px flex items-center justify-center bg-[--d-222-l-F2F2F2] rounded-4px color-[--d-666-l-999] cursor-pointer hover:color-[--d-F5F5F5-l-333]"
