@@ -4,6 +4,7 @@
       <el-popover
         v-model:visible="visible_platforms"
         placement="bottom-start"
+        popper-class="new-popover"
         trigger="click"
       >
         <template #reference>
@@ -157,7 +158,7 @@
                 <span>{{ item.name || '' }}</span>
               </button>
             </div>
-            <span  v-show="isPausedObj.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-5px flex items-center justify-center w-26px h-26px">
+            <span  v-show="isPausedObj.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
             </span>
             <span class="flex-1" />
@@ -250,7 +251,7 @@
                 <span>{{ item.name || '' }}</span>
               </button>
             </div>
-            <span  v-show="isPausedObj.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-5px flex items-center justify-center w-26px h-26px">
+            <span  v-show="isPausedObj.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
             </span>
             <span class="flex-1" />
@@ -344,7 +345,7 @@
               </button>
             </div>
 
-            <span  v-show="isPausedObj.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-5px flex items-center justify-center w-26px h-26px">
+            <span  v-show="isPausedObj.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
             </span>
             <span class="flex-1" />
@@ -484,7 +485,7 @@ const pumpFilter_solana_graduated = usePumpTableDataFetching(
 )
 const pump_solana_platforms = useStorage(
   'pump_solana_platforms',
-  ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk'],
+  ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk', 'bags'],
   localStorage
 )
 
@@ -541,6 +542,7 @@ const wsTableListCache = ref<PumpObj[]>([])
 const wsTableList = ref<PumpObj[]>([])
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
+  console.log('----list--------',platforms.value)
   return (
     list?.[0]?.platforms?.filter((i) =>
       platforms?.value.includes(i.platform)
@@ -1355,10 +1357,10 @@ function getFilterData(list, conditions) {
 // }
 ::v-deep(.el-checkbox ) {
   .el-checkbox__label {
-    color: var(--d-666-l-999);
+    color: var(--d-566275-l-8CA0C3);
   }
   .el-checkbox__inner{
-    // border-color: var(--d-333-l-CCC);
+    border-color: var(--d-252E3C-l-E8F1FF);
   }
   .el-checkbox__input{
     &.is-checked{
@@ -1376,6 +1378,7 @@ function getFilterData(list, conditions) {
 }
 .pump-item{
   background: var(--d-0B0D12-l-F6F9FF);
-  border: 1px solid var(--d-151A22-l-E8F1FF)
+  border: 1px solid var(--d-151A22-l-E8F1FF);
+  border-radius: 4px;
 }
 </style>

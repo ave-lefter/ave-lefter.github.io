@@ -73,7 +73,7 @@
                   <li
                     v-for="(item, $index) in typeList?.slice(1)"
                     :key="$index"
-                    class="px-12px py-12px w-100% cursor-pointer hover:bg-[--d-151A22-l-E8F1FF]"
+                    class="px-12px py-12px w-100% cursor-pointer hover:bg-[--d-252E3C-l-E8F1FF]"
                     @click="add(item)"
                   >
                     {{ item.name }}
@@ -130,10 +130,10 @@
         <AveEmpty v-else class="mt-150px" />
       </div>
     </div>
-    <div class="text-14px count color-[--d-566275-l-8CA0C3] bg-[--d-0B0D12-l-F6F9FF] w-full px-20px py-20px">
+    <div class="text-14px count color-[--d-566275-l-8CA0C3]  w-full px-20px py-20px">
       {{ $t('total') }}<span
         class="ml-5px"
-        :class="list?.length > 0 ? 'color-[--d-F5F5F5-l-333]' : ''"
+        :class="list?.length > 0 ? 'color-[--d-F5F5F5-l-111]' : ''"
         >{{ list.length }}</span
       >/500
     </div>
@@ -256,7 +256,7 @@ function restore(item: { address: string, type: string }) {
   button {
     border: none;
     // font-size: 14px;
-    background: var(--d-151A22-l-E8F1FF);
+    background: var(--d-252E3C-l-E8F1FF);
     color: var(--d-8CA0C3-l-566275);
     letter-spacing: 0;
     font-weight: 400;
@@ -298,7 +298,7 @@ function restore(item: { address: string, type: string }) {
     }
   }
   &.restore {
-    background: var(--d-151A22-l-E8F1FF);
+    background: var(--d-252E3C-l-E8F1FF);
     &:hover {
       color: #fff;
       background: #3f80f7;
@@ -306,16 +306,16 @@ function restore(item: { address: string, type: string }) {
   }
 }
 .content {
-  border-top: 1px solid var(--d-151A22-l-E8F1FF);
+  border-top: 1px solid var(--d-252E3C-l-E8F1FF);
   margin-top: 20px;
 }
 .search-dialog.el-dialog {
   .search-input {
-  background: var(--d-151A22-l-E8F1FF);
+  background: var(--d-252E3C-l-E8F1FF);
   padding: 0;
   border-radius: 4px;
   :deep().el-input__wrapper {
-    border-bottom: 1px solid var(--d-151A22-l-E8F1FF);
+    border-bottom: 1px solid var(--d-252E3C-l-E8F1FF);
     .el-input__inner::placeholder {
       color: var(--d-566275-l-8CA0C3);
     }
@@ -350,7 +350,7 @@ function restore(item: { address: string, type: string }) {
     li {
       padding: 0 20px;
       &:hover {
-        background-color: var(--d-151A22-l-E8F1FF);
+        background-color: var(--d-252E3C-l-E8F1FF);
         .btn.restore {
           color: #fff;
           background: #3f80f7;
@@ -360,7 +360,7 @@ function restore(item: { address: string, type: string }) {
 
     li > a:hover {
       text-decoration: none;
-      background-color: var(--d-151A22-l-E8F1FF);
+      background-color: var(--d-252E3C-l-E8F1FF);
       color: var(--a-text-1-color);
       opacity: 1;
     }

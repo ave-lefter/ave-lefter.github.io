@@ -30,7 +30,7 @@ const platformsList = computed(() => {
           class="mr-5px rounded w-14px"
           :src="`${token_logo_url}${platformsList[0]?.platform_icon?.replace('/signals/', 'signals/')}`"
         />
-        <span v-if="platformsList[0]">{{ platformsList[0].platform_show }}</span>
+        <span>{{ platformsList[0]?.platform_show }}</span>
         <Icon
           :name="visible_platforms ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
           class="text-16px color-[--d-F5F5F5-l-333]"

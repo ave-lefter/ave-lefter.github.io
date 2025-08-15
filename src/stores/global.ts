@@ -56,7 +56,7 @@ export const useGlobalStore = defineStore('global', () => {
     size_swap: '12px',
     Progress_isCircle: 'circle',
     avatar_isCircle: 'rect',
-    isGutter: false,
+    isGutter: true,
     isRight: false,
     isBlacklist: true,
     show_search: true,
