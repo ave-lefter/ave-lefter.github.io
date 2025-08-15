@@ -90,7 +90,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
 
     const pump_solana_platforms = useStorage(
         'pump_solana_platforms',
-        ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk']
+        ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk','bags']
     )
     const activeChain = useStorage<ChainKey>(
         'pump_activeChain',
