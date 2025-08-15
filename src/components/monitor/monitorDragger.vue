@@ -60,7 +60,8 @@ const props1=computed(()=>{
       minHeight:160,
       parent: true,
       handles:['tl','tm','tr','mr','br','bm','bl','ml'],
-      dragHandle:'.drag-handle'
+      dragHandle:'.drag-handle',
+      z:1
     }
   }else if(placement.value==='left'){
     data={
