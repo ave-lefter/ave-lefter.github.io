@@ -106,7 +106,8 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val: WSPump[]) => {
   if (Array.isArray(val)) {
     const rTime = Date.now()
     const list = val
-    .filter(el=>el.state === activeTab.value)
+    .filter(el=> el.state === activeTab.value)
+    .filter(el => el.chain === pumpStore.activeChain)
     .map(i => ({
       ...i,
       ...i.pair,
