@@ -36,7 +36,7 @@
             </div>
           </div>
           <div class="setting-list mb-10px rounded-4px">
-            <button v-for="item in ['p1', 'p2', 'p3']" :key="item" :class="{'active': item === botSetting.selected}" type="button" @click.stop="botSetting.selected = item">{{ item.toUpperCase() }}</button>
+            <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSetting.selected}" type="button" @click.stop="botSetting.selected = item.value">{{ item.label }}</button>
           </div>
           <div class="color-[--d-566275-l-8CA0C3]">
             {{$t('setTips')}}
@@ -429,7 +429,7 @@ function confirmSubmit() {
     } else {
       setting[selected].slippage = String(slippageValue)
     };
-    ['p1', 'p2', 'p3'].forEach((s) => {
+    ['s1', 's2', 's3'].forEach((s) => {
       Reflect.deleteProperty(setting[s as BotSettingKey], 'slippageValue')
       Reflect.deleteProperty(setting[s as BotSettingKey], 'customSlippage')
     })

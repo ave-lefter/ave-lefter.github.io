@@ -41,19 +41,19 @@
         class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--d-151A22-l-E8F1FF] px-2px py-2px">
 
         <button
-          v-for="item in (['p1', 'p2', 'p3'] as const)"
-          :id="item"
-          :key="item"
+          v-for="item in BotSettingsArr"
+          :id="item.value"
+          :key="item.value"
           :ref="setBtnRef"
           class="color-[--d-8CA0C3-l-566275] cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center"
-          :class="`${item === botSettingStore.botSettings?.[chain]?.selected?'color-[--d-F5F5F5-l-0B0D12] bg-[--d-252E3C-l-FFF]':'bg-transparent'}`"
+          :class="`${item.value === botSettingStore.botSettings?.[chain]?.selected?'color-[--d-F5F5F5-l-0B0D12] bg-[--d-252E3C-l-FFF]':'bg-transparent'}`"
           type="button"
-          @click.stop="botSettingStore.botSettings[chain]!.selected = item"
-          @mouseenter="showPopover(item)"
+          @click.stop="botSettingStore.botSettings[chain]!.selected = item.value"
+          @mouseenter="showPopover(item.value)"
           @mouseleave="visible = false"
 
         >
-          {{ item.toUpperCase() }}
+          {{ item.label }}
         </button>
       </div>
     </div>
