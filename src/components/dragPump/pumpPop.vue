@@ -439,7 +439,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
         </div>
       </div>
     </div>
-    <div class="flex mb-12px">
+    <div class="flex justify-between mb-12px">
       <div class="flex items-center gap-8px">
         <signal-quick-buy-input v-model="quickBuyValue" size="small" class="[--el-border-color:transparent]" style="--el-input-bg-color:var(--d-151A22-l-E8F1FF);--el-text-color-regular:var(--d-8CA0C3-l-566275);--el-input-icon-color:var(--d-8CA0C3-l-566275)" />
         <el-select
@@ -461,7 +461,6 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
           <Icon name="custom:stop"/>
         </div>
       </div>
-      <div class="flex-1 drag-handle mt--12px" />
       <div class="flex items-center gap-8px">
         <el-input
 ref="inputSearch" v-model.trim="pumpStore.pump_query[pumpStore.activeChain][activeTab]"
