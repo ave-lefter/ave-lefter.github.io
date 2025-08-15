@@ -423,4 +423,22 @@ const cellRenderer = computed(() => {
 :deep(.el-table-v2__row-cell) {
   padding: 0 16px;
 }
+// :deep(.el-table-v2__row){
+//   position: relative;
+//   &:first-child{
+//     &:before{
+//       content: none;
+//     }
+//   }
+//   &:before{
+//     z-index: 1;
+//     content: '';
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     width: 100%;
+//     height: 100%;
+//     background-color: rgba($color: #000000, $alpha: .8);
+//   }
+// }
 </style>

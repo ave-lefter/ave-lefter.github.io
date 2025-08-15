@@ -62,6 +62,10 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
 const created_at_unix = computed(() => {
   return dayjs(props.row.created_at).unix()
 })
+
+function showKline(e:PointerEvent & {target:HTMLElement}) {
+  console.dir(e.target.offsetParent?.getBoundingClientRect())
+}
 </script>
 
 <template>
@@ -176,6 +180,10 @@ const created_at_unix = computed(() => {
               </div>
             </template>
           </el-tooltip>
+          <Icon
+          name="custom:kline" class="text-12px ml-4px color-#566275 hover:color-#8CA0C3" 
+          @click.self.stop="showKline"
+          />
         </div>
         <div class="flex items-center lh-12px">
           <div
