@@ -429,7 +429,7 @@ function confirmSubmit() {
     } else {
       setting[selected].slippage = String(slippageValue)
     };
-    ['p1', 'p2', 'p3'].forEach((s) => {
+    ['s1', 's2', 's3'].forEach((s) => {
       Reflect.deleteProperty(setting[s as BotSettingKey], 'slippageValue')
       Reflect.deleteProperty(setting[s as BotSettingKey], 'customSlippage')
     })
