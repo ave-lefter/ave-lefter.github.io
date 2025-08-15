@@ -246,7 +246,7 @@
                   </a>
                 </div>
 
-                <div class="flex-start text-12px mt-4px">
+                <div class="flex-start text-12px mt-5px">
                   <span class="color-[--d-566275-l-8CA0C3]">{{
                     row.token?.slice(0, 4) + '...' + row.token?.slice(-4)
                   }}</span>
@@ -256,7 +256,7 @@
                     class="text-12px cursor-pointer color-[--d-566275-l-8CA0C3] ml-4px"
                     @click.stop.prevent
                   />
-                  <div class="color-[--d-252B34-l-E8F1FF]" style="margin: 0 8px">|</div>
+                  <div class="color-[--d-252B34-l-CAD6EC]" style="margin: 0 8px">|</div>
                   <div
                     v-if="
                       row?.medias?.length > 0 && pumpSetting?.define?.some((i) => i === 'media')
@@ -317,7 +317,7 @@
                   >
                     <Icon class="text-[--d-8CA0C3-l-566275] h-12px w-12px" name="custom:search" />
                   </a>
-                  <div class="color-[--d-252B34-l-E8F1FF]" style="margin: 0 8px">|</div>
+                  <div class="color-[--d-252B34-l-CAD6EC]" style="margin: 0 8px">|</div>
                   <div
                     v-show="pumpSetting?.define?.some((i) => i === 'holder')"
                     v-tooltip="$t(`holders`)"
@@ -836,7 +836,7 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
       background: var(--d-0B0D12-l-F6F9FF);
       position: absolute;
       right: 0;
-      bottom: 2px;
+      bottom: 4px;
       padding-left: 12px;
       .btns-swap{
         background-color: var(--d-0B0D12-l-F6F9FF);
@@ -962,11 +962,9 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
     border-radius: 100%;
   }
 }
-@media (max-width: 1449px) and (min-width: 1025px) {
+@media (max-width: 1680px) and (min-width: 1025px) {
   .btns-swap{
     visibility: hidden;
-    position: relative;
-    z-index:2;
   }
 }
 @media (max-width: 1920px) {

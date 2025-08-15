@@ -28,7 +28,7 @@
           ref="formRef"
           class="hide-scrollbar"
           :model="form"
-    
+
           autocomplete="off"
           label-position="left"
           size="small"
@@ -783,9 +783,12 @@ const tabs = computed(() => {
     }
   .el-input__wrapper {
     background: transparent;
+    &:hover {
+      box-shadow: 0 0 0 1px #3F80F7 inset;
+    }
     &.is-focus {
-      border-color: var(--d-F5F5F5-l-0B0D12); /* 蓝色 */
-      box-shadow: 0 0 0 1px var(--d-F5F5F5-l-0B0D12) inset;
+      border-color: #3F80F7; /* 蓝色 */
+      box-shadow: 0 0 0 1px #3F80F7 inset;
     }
     .el-input__suffix{
       color: var(--d-566275-l-8CA0C3)
