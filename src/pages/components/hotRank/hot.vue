@@ -122,7 +122,7 @@ onDeactivated(() => {
     jsonrpc: '2.0',
     method: 'unsubscribe',
     params: ['price_extra'],
-    id: 'hot_rank_unsubscribe',
+    id: 1,
   })
 })
 onActivated(() => {
@@ -214,6 +214,8 @@ watch(
     const sortVal = { asc: '1', desc: '-1' }[sort_dir]
     if (sortVal) {
       listData.value = updateList.toSorted((a, b) => (a[sort] - b[sort]) * sortVal)
+    } else {
+      listData.value = updateList
     }
   }
 )
@@ -223,7 +225,7 @@ function initWs() {
     jsonrpc: '2.0',
     method: 'unsubscribe',
     params: ['price_extra'],
-    id: 'hot_rank_unsubscribe',
+    id: 1,
   })
 
   // 重新订阅价格更新，使用唯一ID和标识符
@@ -232,7 +234,7 @@ function initWs() {
     jsonrpc: '2.0',
     method: 'subscribe',
     params: ['price_extra', params],
-    id: 'hot_rank_subscribe',
+    id: 1,
   })
 }
 
