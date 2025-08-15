@@ -47,8 +47,8 @@ const loadComponent = async () => {
 }
 const dragConstant = computed(() => {
   return {
-    minWidth: 360,
-    minHeight: 160,
+    minWidth: 480,
+    minHeight: 262,
     maxWidth: 600,
     initialHeight: dragPumpStore.winHeight - 95,
     centerScrollHeight: dragPumpStore.boundingRect.height - 140,

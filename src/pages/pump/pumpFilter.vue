@@ -28,7 +28,7 @@
           ref="formRef"
           class="hide-scrollbar"
           :model="form"
-          label-width="auto"
+    
           autocomplete="off"
           label-position="left"
           size="small"

@@ -23,13 +23,20 @@ const platformsList = computed(() => {
   <el-popover v-model:visible="visible_platforms" placement="bottom-start" trigger="click">
     <template #reference>
       <div
-        class="bg-[--d-222-l-F2F2F2] rounded-4px px-8px py-2px flex items-center text-12px cursor-pointer drag-cancel"
+        class="bg-[--d-151A22-l-E8F1FF] rounded-4px px-8px py-2px flex items-center text-12px cursor-pointer drag-cancel"
       >
-        <el-image
-          class="mr-5px rounded w-14px"
-          :src="`${token_logo_url}${platformsList[0]?.platform_icon?.replace('/signals/', 'signals/')}`"
-        />
-        <span>{{ platformsList[0]?.platform_show }}</span>
+          <template v-for="(i, $index) in platformsList" :key="$index">
+            <el-image
+              class="mr-5px rounded w-14px"
+              :src="`${token_logo_url}${i.platform_icon?.replace(
+                '/signals/',
+                'signals/'
+              )}`"
+            />
+            <span v-if="platformsList?.length == 1">{{
+              i.platform_show
+            }}</span>
+          </template>
         <Icon
           :name="visible_platforms ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
           class="text-16px color-[--d-F5F5F5-l-333]"

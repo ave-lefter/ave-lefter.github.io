@@ -82,13 +82,13 @@
                       <img
                         class="token-icon h-32px text-16px color-#fff"
                         :src="getChainDefaultIcon(row.chain, row.symbol)"
-                      />
+                      >
                     </template>
                     <template #placeholder>
                       <img
                         class="token-icon h-32px text-16px color-#fff"
                         :src="getChainDefaultIcon(row.chain, row.symbol)"
-                      />
+                      >
                     </template>
                   </el-image>
                   <Progress
@@ -103,7 +103,7 @@
                     :show-arrow="false"
                   >
                     <template #content
-                      >>
+                      >
                       <el-image
                         class="token-icon max-w-228px max-h-228px w-228px flex items-center justify-center"
                         style="display: flex"
@@ -115,13 +115,13 @@
                           <img
                             class="token-icon h-228px w-228px text-16px color-#fff"
                             :src="getChainDefaultIcon(row.chain, row.symbol)"
-                          />
+                          >
                         </template>
                         <template #placeholder>
                           <img
                             class="token-icon h-228px w-228px text-16px color-#fff"
                             :src="getChainDefaultIcon(row.chain, row.symbol)"
-                          />
+                          >
                         </template>
                       </el-image>
                     </template>
@@ -614,7 +614,7 @@
                     class="mr-5px"
                     alt=""
                     srcset=""
-                  />
+                  >
                   <span>Migrating...</span>
                 </div>
                 <QuickSwap
@@ -668,10 +668,6 @@ const props = defineProps({
   quickBuyValue: {
     type: String,
     default: () => '',
-  },
-  isPaused: {
-    type: Boolean,
-    default: () => false,
   },
   loading: {
     type: Boolean,
