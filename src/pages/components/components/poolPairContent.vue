@@ -2,7 +2,7 @@
 import dayjs from 'dayjs'
 import XIcon from '~/components/xPopup/xIcon.vue'
 
-const emit = defineEmits(['collect'])
+const emit = defineEmits(['collect','toggleKline'])
 const { t } = useI18n()
 const props = defineProps<{
   pageNO: number
@@ -63,8 +63,8 @@ const created_at_unix = computed(() => {
   return dayjs(props.row.created_at).unix()
 })
 
-function showKline(e:PointerEvent & {target:HTMLElement}) {
-  console.dir(e.target.offsetParent?.getBoundingClientRect())
+function toggleKline() {
+  emit('toggleKline')
 }
 </script>
 
@@ -182,7 +182,7 @@ function showKline(e:PointerEvent & {target:HTMLElement}) {
           </el-tooltip>
           <Icon
           name="custom:kline" class="text-12px ml-4px color-#566275 hover:color-#8CA0C3" 
-          @click.self.stop="showKline"
+          @click.self.stop="toggleKline"
           />
         </div>
         <div class="flex items-center lh-12px">
