@@ -241,6 +241,8 @@ const botStore = useBotStore()
 const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
+const {klineRow,toggleKline,getRowClass} = useRankKline(walletAddress)
+
 async function collect(index: number, row) {
   if (walletAddress.value) {
     if (walletStore.address) {
@@ -368,7 +370,7 @@ const cellRenderer = computed(() => {
       :row-height="81"
       fixed
       style="--el-bg-color: var(--d-111-l-FFF)"
-      row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
+      :rowClass="getRowClass"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"
@@ -392,6 +394,7 @@ const cellRenderer = computed(() => {
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"
           :isVolUSDT="isVolUSDT"
+          :activeKline="klineRow.id === row.id"
           :row="row"
           :rowIndex="rowIndex"
           :pageNO="pageInfo.pageNO"
@@ -400,6 +403,7 @@ const cellRenderer = computed(() => {
           :activeChain="activeChain"
           :childrenData="item.children || []"
           @collect="collect"
+          @toggleKline="row=>toggleKline(row,columns)"
         />
       </template>
     </AveTable>
@@ -423,22 +427,18 @@ const cellRenderer = computed(() => {
 :deep(.el-table-v2__row-cell) {
   padding: 0 16px;
 }
-// :deep(.el-table-v2__row){
-//   position: relative;
-//   &:first-child{
-//     &:before{
-//       content: none;
-//     }
-//   }
-//   &:before{
-//     z-index: 1;
-//     content: '';
-//     position: absolute;
-//     top: 0;
-//     left: 0;
-//     width: 100%;
-//     height: 100%;
-//     background-color: rgba($color: #000000, $alpha: .8);
-//   }
-// }
+:deep{
+  .row-disabled{
+    &:before{
+      z-index: 1;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba($color: #000000, $alpha: .8);
+    }
+  }
+}
 </style>

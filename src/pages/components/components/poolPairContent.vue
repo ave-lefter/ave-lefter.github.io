@@ -9,6 +9,7 @@ const props = defineProps<{
   pageSize: number
   row: any
   rowIndex: number
+  activeKline:boolean
 }>()
 
 function getSymbol(row, shouldReverse = false) {
@@ -64,7 +65,7 @@ const created_at_unix = computed(() => {
 })
 
 function toggleKline() {
-  emit('toggleKline')
+  emit('toggleKline',props.row)
 }
 </script>
 
@@ -181,7 +182,8 @@ function toggleKline() {
             </template>
           </el-tooltip>
           <Icon
-          name="custom:kline" class="text-12px ml-4px color-#566275 hover:color-#8CA0C3" 
+          name="custom:kline" class="text-12px ml-4px hover:color-#8CA0C3" 
+          :class="activeKline ? 'color-#8CA0C3' : 'color-#566275'"
           @click.self.stop="toggleKline"
           />
         </div>
