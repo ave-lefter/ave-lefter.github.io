@@ -241,7 +241,7 @@ const botStore = useBotStore()
 const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
-const {klineRow,toggleKline,getRowClass} = useRankKline(walletAddress)
+const rankKlineStore = useRankKlineStore()
 
 async function collect(index: number, row) {
   if (walletAddress.value) {
@@ -370,7 +370,7 @@ const cellRenderer = computed(() => {
       :row-height="81"
       fixed
       style="--el-bg-color: var(--d-111-l-FFF)"
-      :rowClass="getRowClass"
+      :rowClass="rankKlineStore.getRowClass"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"
@@ -394,7 +394,7 @@ const cellRenderer = computed(() => {
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"
           :isVolUSDT="isVolUSDT"
-          :activeKline="klineRow.id === row.id"
+          :activeKline="rankKlineStore.klineRow.id === row.id"
           :row="row"
           :rowIndex="rowIndex"
           :pageNO="pageInfo.pageNO"
@@ -403,7 +403,7 @@ const cellRenderer = computed(() => {
           :activeChain="activeChain"
           :childrenData="item.children || []"
           @collect="collect"
-          @toggleKline="row=>toggleKline(row,columns)"
+          @toggleKline="row=>rankKlineStore.toggleKline(row,columns)"
         />
       </template>
     </AveTable>

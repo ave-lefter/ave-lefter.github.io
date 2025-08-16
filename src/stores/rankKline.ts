@@ -1,20 +1,25 @@
 import type { RowClassNameGetter } from 'element-plus'
-import { getFavoriteCheck } from '~/api/fav'
-import { getTokenInfo } from '~/api/token'
-import type { TokenInfo } from '~/api/types/token'
+import { getFavoriteCheck, getUserFavoriteGroups, type GetUserFavoriteGroupsResponse } from '~/api/fav'
+import { getTokenInfo, getTokenInfoExtra } from '~/api/token'
+import type { TokenInfo, TokenInfoExtra } from '~/api/types/token'
 
-export function useRankKline(walletAddress:ComputedRef<string>) {
+export const useRankKlineStore = defineStore('rankKline',()=>{
     // ref
     const klineRow = ref({})
     const tokenInfo = ref<null | TokenInfo>(null)
+    const tokenInfoExtra = ref<null | TokenInfoExtra>(null)
+    const userFavoriteGroups = shallowRef<GetUserFavoriteGroupsResponse[]>([])
     const collected = shallowRef(false)
     const remark = shallowRef('')
     const remark2 = shallowRef('')
     const groupId = shallowRef(0)
     const selectedGroup = shallowRef(0)
-
+    const walletStore = useWalletStore()
+    const botStore = useBotStore()
     // computed
-    const token = computed(()=> tokenInfo.value?.token)
+    const walletAddress = computed(() => {
+      return botStore.evmAddress || walletStore.address
+    })
 
     function toggleKline(row,columns) {
         if(klineRow.value.id === row.id){
@@ -35,14 +40,29 @@ export function useRankKline(walletAddress:ComputedRef<string>) {
         getTokenInfo(tokenId).then(res=>{
             tokenInfo.value = res
         })
+        getTokenInfoExtra(tokenId).then(res=>{
+            tokenInfoExtra.value = res
+        })
         // 备注、自选、自选分组
         if(walletAddress.value){
-            getTokenFavoriteCheck(tokenId,walletAddress.value)
+            getTokenFavoriteCheck(tokenId)
+            getTokenUserFavoriteGroups()
         }
     }
 
-    function getTokenFavoriteCheck(tokenId:string,walletAddress:string) {
-        getFavoriteCheck(tokenId,walletAddress)
+    async function getTokenUserFavoriteGroups() {
+        try {
+          const res = await getUserFavoriteGroups(walletAddress.value)
+          userFavoriteGroups.value = (res || []).filter(
+            (el) => !!el.name && el.type === 'token'
+          )
+        } catch (e) {
+          console.log('=>(favoriteTable.vue:19) e', e)
+        }
+      }
+
+    function getTokenFavoriteCheck(tokenId:string) {
+        getFavoriteCheck(tokenId,walletAddress.value)
           .then((res) => {
             collected.value = res?.address ? true : false
             remark.value = res?.remark || ''
@@ -69,6 +89,14 @@ export function useRankKline(walletAddress:ComputedRef<string>) {
     return {
         klineRow,
         toggleKline,
-        getRowClass
+        getRowClass,
+        tokenInfo,
+        tokenInfoExtra,
+        userFavoriteGroups,
+        collected,
+        remark,
+        remark2,
+        groupId,
+        selectedGroup
     }
-}
+})
