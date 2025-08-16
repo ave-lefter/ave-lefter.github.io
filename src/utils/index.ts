@@ -124,7 +124,7 @@ export function getAddressAndChainFromId(id: string, type: number = 0) {
 }
 
 // 传去 时间长度 返回 格式化的时间
-export function formatTime(time: number | string) {
+export function formatTime(time: number | string,isMaxDayUnit=false) {
   if (!time) {
     return 0
   }
@@ -143,7 +143,7 @@ export function formatTime(time: number | string) {
   if (time < 3600 * 24) {
     return `${Math.floor(time / 3600)}h`
   }
-  if (time < 3600 * 24 * 30) {
+  if (time < 3600 * 24 * 30 || isMaxDayUnit) {
     return `${Math.floor(time / 3600 / 24)}d`
   }
   if (time < 3600 * 24 * 30 * 12) {
@@ -152,7 +152,7 @@ export function formatTime(time: number | string) {
   return `${Math.floor(time / 3600 / 24 / 30 / 12)}y`
 }
 
-export function formatTimeFromNow(val: number | string, isNum = false) {
+export function formatTimeFromNow(val: number | string, isNum = false,isMaxDayUnit=false) {
   let timeStamp: number | string = Number(Number(val) * 1000)
   if (!timeStamp) {
     timeStamp = val
@@ -165,7 +165,7 @@ export function formatTimeFromNow(val: number | string, isNum = false) {
   if (isNum) {
     return time
   }
-  return formatTime(time)
+  return formatTime(time,isMaxDayUnit)
 }
 
 export function formatUrl(url: string) {

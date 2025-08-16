@@ -1312,5 +1312,7 @@
   "withdrawTip": "需預留0.002，以確保錢包功能正常使用",
   "soldAllTips": "關注地址若曾與老幣交互，可能造成數值存在一定偏差。",
   "BlackListToken": "拉黑代幣",
-  "BlackListDev": "拉黑DEV"
+  "BlackListDev": "拉黑DEV",
+  "searchKol": "搜尋KOL",
+  "searchKolPlaceholder": "請輸入KOL地址"
 }

@@ -122,7 +122,7 @@ onDeactivated(() => {
     jsonrpc: '2.0',
     method: 'unsubscribe',
     params: ['price_extra'],
-    id: 'hot_rank_unsubscribe',
+    id: 1,
   })
 })
 onActivated(() => {
@@ -187,7 +187,7 @@ watch(
   ({ prices }) => {
     // 只有在组件激活时才处理数据
     if (!isActive.value) return
-    
+
     const pricesMap = Array.isArray(prices)
       ? prices.reduce((pre, cur) => {
           pre[cur.pair + '-' + cur.chain] = cur
@@ -214,6 +214,8 @@ watch(
     const sortVal = { asc: '1', desc: '-1' }[sort_dir]
     if (sortVal) {
       listData.value = updateList.toSorted((a, b) => (a[sort] - b[sort]) * sortVal)
+    } else {
+      listData.value = updateList
     }
   }
 )
@@ -223,16 +225,16 @@ function initWs() {
     jsonrpc: '2.0',
     method: 'unsubscribe',
     params: ['price_extra'],
-    id: 'hot_rank_unsubscribe',
+    id: 1,
   })
-  
+
   // 重新订阅价格更新，使用唯一ID和标识符
   const params = listData.value.map((el) => `${el.pair}-${el.chain}`)
   wsStore.send({
     jsonrpc: '2.0',
     method: 'subscribe',
     params: ['price_extra', params],
-    id: 'hot_rank_subscribe',
+    id: 1,
   })
 }
 
@@ -295,7 +297,7 @@ const filterMap = {
   insider_balance_ratio_cur: (el: any) => el.isVisible && props.activeChain === 'bsc',
   price_change_dynamic: (el: any) =>
     el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval),
-  quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible && !walletStore.address,
+  quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible,
 }
 
 const visibleColumns = computed(() => {
