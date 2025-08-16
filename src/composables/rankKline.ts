@@ -4,6 +4,7 @@ import { getTokenInfo } from '~/api/token'
 import type { TokenInfo } from '~/api/types/token'
 
 export function useRankKline(walletAddress:ComputedRef<string>) {
+    // ref
     const klineRow = ref({})
     const tokenInfo = ref<null | TokenInfo>(null)
     const collected = shallowRef(false)
@@ -11,6 +12,9 @@ export function useRankKline(walletAddress:ComputedRef<string>) {
     const remark2 = shallowRef('')
     const groupId = shallowRef(0)
     const selectedGroup = shallowRef(0)
+
+    // computed
+    const token = computed(()=> tokenInfo.value?.token)
 
     function toggleKline(row,columns) {
         if(klineRow.value.id === row.id){
@@ -26,8 +30,7 @@ export function useRankKline(walletAddress:ComputedRef<string>) {
     }
 
     function getData(row) {
-        const token = row.token
-        const tokenId = token.token + '-' + token.chain
+        const tokenId = row.token + '-' + row.chain
         // 先调用 tokenInfo 接口
         getTokenInfo(tokenId).then(res=>{
             tokenInfo.value = res
