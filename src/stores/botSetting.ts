@@ -34,9 +34,9 @@ export const useBotSettingStore = defineStore('botSetting', () => {
   const settings: {
     [key in typeof chains[number]]?: {
       selected: BotSettingKey
-      p1: Setting
-      p2: Setting
-      p3: Setting
+      s1: Setting
+      s2: Setting
+      s3: Setting
     }
   } = {
   }
@@ -46,10 +46,10 @@ export const useBotSettingStore = defineStore('botSetting', () => {
       s.buyValueList = ['0.01', '0.02', '0.5', '1']
     }
     settings[chain] = {
-      selected: 'p1',
-      p1: s,
-      p2: s,
-      p3: s
+      selected: 's1',
+      s1: s,
+      s2: s,
+      s3: s
     }
   })
   const botSettings = useLocalStorage('bot_settings_v3', settings, { mergeDefaults: (storageValue, defaults) => deepMerge(defaults, storageValue) })
