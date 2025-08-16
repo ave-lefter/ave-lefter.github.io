@@ -2,6 +2,10 @@ import {useStorage, useThrottleFn, useWindowSize} from '@vueuse/core'
 import type {GetSignalV2ListResponse} from '~/api/signal'
 
 export const useSignalStore = defineStore('signalStore', () => {
+  const route = useRoute()
+  const shouldHide = computed(()=>{
+    return route.path.includes('/smart')
+  })
   const signalVisible = useStorage('signalVisible', false)
   const signalBoundingRect = useStorage('signalBoundingRect', {
     width: 360,
@@ -60,7 +64,6 @@ export const useSignalStore = defineStore('signalStore', () => {
   }
 
   function onRightDragStop(x: number, y: number) {
-    console.log('onRightDragStop', x, y)
     isRightFixed.value = Math.abs(x) < 1
     const _x = winWidth.value - fixedWidth.value + x
     if (!isRightFixed.value) {
@@ -123,6 +126,7 @@ export const useSignalStore = defineStore('signalStore', () => {
     signalList,
     listStatus,
     pageParams,
-    updateList
+    updateList,
+    shouldHide
   }
 })

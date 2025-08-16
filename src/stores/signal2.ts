@@ -91,15 +91,13 @@ export const useMonitorStore = defineStore('monitor', () => {
     pageNO: 1,
     pageSize: 20,
   })
-  const signalStore = useSignalStore()
+  // const signalStore = useSignalStore()
 
   const placement=computed(()=>{
     if(!isLeftFixed.value&&!isRightFixed.value){
       return 'center'
     }else if(isLeftFixed.value){
       return 'left'
-    }else if(signalStore.isRightFixed&&signalStore.signalVisible){
-      return 'right2'
     } else if(isRightFixed.value){
       return 'right'
     } else {

@@ -2,20 +2,22 @@
   <el-popover
       v-model:visible="visible"
       placement="bottom"
-      popper-class="w-pumpFilter popper"
+      popper-class="w-pumpFilter popper new-popover"
       title=""
       :width="398"
       trigger="click"
       popper-style="padding: 10px"
+      append-to-body
     >
       <template #reference>
         <div :class="['filter-btn', { active: visible }, filterNumber > 0 ? 'hight': '']">
           <Icon
             id="custom-filter"
             name="custom:filter"
-            class="mr-3px text-10px cursor-pointer"
+            class="text-10px cursor-pointer"
+            :class="!hideReferenceText?'mr-3px':''"
           />
-          <span>{{ $t('filter') }}</span>
+          <span v-if="!hideReferenceText">{{ $t('filter') }}</span>
           <span v-if="filterNumber > 0" class="filter-number">{{ filterNumber }}</span>
         </div>
       </template>
@@ -139,7 +141,7 @@
                   v-model="form[column.prop]"
                   :disabled="form.has_sm ==1"
                     >
-                      <el-checkbox class="mt-20px" v-for="(item,$index) in column.list" :key="$index" :value="item.url">
+                      <el-checkbox v-for="(item,$index) in column.list" :key="$index" class="mt-20px" :value="item.url">
                         {{ item.name }}
                       </el-checkbox>
                   </el-checkbox-group>
@@ -166,7 +168,7 @@
             <div style="display: flex; width: 100%" class="mt-30px">
               <el-button
                 class="flex-1"
-                style="height: 30px; min-width: 60px; --el-button-font-weight: 400; background: var(--d-333333-l-DDDDDD); border: none;color: #f5f5f5"
+                style="height: 30px; min-width: 60px; --el-button-font-weight: 400; background: #252B34; border: none;color: #f5f5f5"
                 @click="reset"
               >
                 {{ $t('reset') }}
@@ -193,6 +195,9 @@ const props = defineProps({
     storage: {
       type: String,
       default: 'pumpFilter_bsc_new'
+    },
+    hideReferenceText:{
+      type:Boolean
     }
 })
 const emit = defineEmits(['update:filterData'])
@@ -358,7 +363,7 @@ const tabs = computed(() => {
           ],
           placeholder: [t('minor'), t('max1')],
           type: 'inputRange',
-          suffix: 'TXs',
+          suffix: '',
           tab: 'tag'
         },
 
@@ -677,8 +682,8 @@ const tabs = computed(() => {
   justify-content: center;
   padding: 5px 8px;
   cursor: pointer;
-  color: var(--d-666-l-999);
-  background: var(--d-222-l-F2F2F2);
+  color: var(--d-566275-l-8CA0C3);
+  background: var(--d-151A22-l-E8F1FF);
   border-radius: 4px;
   font-size: 12px;
   line-height: 14px;
@@ -702,7 +707,7 @@ const tabs = computed(() => {
     width: 14px;
     height: 14px;
     text-align: center;
-    background-color: var(--d-666-l-999);
+    background-color: var(--d-566275-l-8CA0C3);
     color: var(--d-F5F5F5-l-333);
     margin-left: 4px;
     font-size: 10px;
@@ -725,7 +730,7 @@ const tabs = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--d-333-l-F2F2F2);
+  background: var(--d-252E3C-l-E8F1FF);
   padding: 4px;
   border-radius: 4px;
   font-size: 12px;
@@ -734,12 +739,12 @@ const tabs = computed(() => {
   button {
     border: none;
     // font-size: 14px;
-    color: var(--d-999-l-666);
+    color: var(--d-566275-l-8CA0C3);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;
     border-radius: 4px;
-    border: 1ox solid var(--d-333333-l-F2F2F2);
+    border: 1ox solid var(--d-566275-l-8CA0C3);
     background: transparent;
     min-width: 36px;
     padding: 6px 6px;
@@ -749,29 +754,49 @@ const tabs = computed(() => {
     align-items: center;
     justify-content: center;
     &.active {
-      // color: var(--custom-font-4-color);
-      color: var(--d-F5F5F5-l-333);
-      background: var(--d-111-l-FFF);
+      color: var(--d-F5F5F5-l-111);
+      background: var(--d-151A22-l-FFFFFF);
     }
   }
 }
 .border{
   border: none;
-  border-bottom: 1px solid var(--d-333-l-ECECEC);
+  border-bottom: 1px solid var(--d-252E3C-l-E8F1FF);
 }
 :deep().el-form-item__label{
-  color: var(--d-666-l-999);
+  color: var(--d-8CA0C3-l-566275);
+
+}
+:deep().el-checkbox__inner{
+  border-color: var(--d-252E3C-l-E8F1FF);
 
 }
 :deep().el-checkbox__label{
-  color: var(--d-666-l-999);
+  color: var(--d-566275-l-8CA0C3);
 }
-:deep().el-input {
+:deep().el-input.el-input {
+  --el-input-bg-color: var(--d-252E3C-l-E8F1FF);
+  --el-input-border-color: var(--d-252E3C-l-E8F1FF);
+  --el-input-border-radius: 4px;
+  .el-checkbox__inner{
+      border-color: var(--d-252E3C-l-E8F1FF);
+    }
   .el-input__wrapper {
     background: transparent;
+    &:hover {
+      box-shadow: 0 0 0 1px #3F80F7 inset;
+    }
+    &.is-focus {
+      border-color: #3F80F7; /* 蓝色 */
+      box-shadow: 0 0 0 1px #3F80F7 inset;
+    }
+    .el-input__suffix{
+      color: var(--d-566275-l-8CA0C3)
+    }
     .el-input__inner::placeholder {
-      color: var(--d-666-l-999);
+      color: var(--d-566275-l-8CA0C3);
     }
   }
 }
+
 </style>

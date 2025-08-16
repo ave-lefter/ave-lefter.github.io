@@ -8,12 +8,12 @@
   >
     <template #reference>
       <div
-        class="bg-[var(--d-222-l-F2F2F2)] rounded-4px p-8px ml-8px h-32px flex items-center"
+        class="bg-[var(--d-141721-l-E8F1FF)] rounded-4px p-8px ml-8px h-32px flex items-center"
         @click.stop="visitSysNotice"
       >
         <el-badge :is-dot="limitOrderUnRead||!isLatestExperienced" class="h-20px" color="#F6465D">
           <Icon
-            class="text-20px text-[--d-999-l-666] cursor-pointer"
+            class="text-20px text-#8CA0C3 cursor-pointer"
             name="material-symbols:notifications"
           />
         </el-badge>
