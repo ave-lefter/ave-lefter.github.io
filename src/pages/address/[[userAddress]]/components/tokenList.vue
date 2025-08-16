@@ -22,7 +22,7 @@
       </template>
       <TokenColumn
         :column-props="{
-          label: $t('recentlyTrade'),
+          label: $t('walletToken')+'/'+$t('recentlyTrade'),
           width: '180',
           fixed: 'left',
           sortable: 'custom',

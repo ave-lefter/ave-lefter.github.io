@@ -44,7 +44,6 @@
     <ClipboardToken />
     <el-button
       v-if="!botStore.evmAddress && !walletStore.address"
-      text
       type=""
 
       color="bg-[var(--d-141721-l-E8F1FF)]"
@@ -290,6 +289,7 @@ header {
   }
   .btn{
     background: var(--d-141721-l-E8F1FF);
+    border:0 none;
     &:hover {
       background: var(--d-141721-l-E8F1FF);
       opacity: 0.8;

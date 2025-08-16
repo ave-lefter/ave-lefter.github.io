@@ -255,6 +255,7 @@ function getMedias(appendix: string) {
     <KeepAlive :max="6">
       <component
         :is="components[activeTab]"
+        ref="dynamicComponentRef"
         :listMapFunction="listMapFunction"
         :activeChain="activeChain"
         :activeTab="activeTab"

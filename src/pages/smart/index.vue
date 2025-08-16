@@ -46,6 +46,9 @@ const tableIndex = shallowRef(0)
 const total = shallowRef(0)
 const initNum = shallowRef(0)
 
+// 内存存储搜索关键词，键格式：${chain}-${category}
+const searchKeywords = ref({})
+
 const defaultConditions = ref({
   chain: 'solana',
   category: 'cowboys',
@@ -71,6 +74,7 @@ const defaultConditions = ref({
   profit_neg100_neg50_percent_num_max: '', // -100%—-50%币数 最大值
   last_trade_time_min: '', // 最近交易时间最小值（时间戳）
   last_trade_time_max: '', // 最近交易时间最大值（时间戳）
+  keyword: '',
 })
 const filterFormObj = ref({})
 
@@ -143,6 +147,9 @@ function handleTabChange(tab: TabId) {
   setSignalSwitchFlag(tab, false)
   activeTab.value = tab
 
+  // 切换标签时清空所有搜索状态
+  searchKeywords.value = {}
+
   // 更新过滤条件
   if (tab === 'activity') {
     filterConditions.value.category = 'activity'
@@ -176,6 +183,9 @@ function handleIntervalChange(interval: string) {
   getSmartList()
 }
 function init() {
+  // 页面初始化时清空所有搜索状态
+  searchKeywords.value = {}
+  
   if (filterConditions?.value) {
     activeChain2.value = filterConditions.value.chain
     // activeTab.value = filterConditions.value.category
@@ -191,6 +201,7 @@ function init() {
       version: Version,
     }
   }
+  
   // this.initFilterForm()
   getSmartList()
 }
@@ -207,6 +218,8 @@ function getSmartList(isSort = false) {
       : '',
     self_address: botStore?.evmAddress || walletStore.address,
     interval: activeInterval.value || '30D',
+    // 从内存状态获取搜索关键词
+    keyword: searchKeywords.value[currentKey] || '',
   }
 
   // 根据不同的category设置不同的默认排序参数
@@ -418,6 +431,12 @@ function initFilterForm() {
       last_trade_time: conditions?.last_trade_time || '',
       sort_dir: conditions?.sort === 'last_trade_time' ? conditions?.sort_dir || null : null,
     },
+    keyword: {
+      visible: false,
+      type: 'keyword',
+      keyword: searchKeywords.value[key] || '',  // 从内存状态获取keyword
+      sort_dir: conditions?.sort === 'keyword' ? conditions?.sort_dir || null : null,
+    },
   }
   filterFormObj.value[key] = filterForm
 }
@@ -488,7 +507,10 @@ function filterRange(prop) {
   }
   const range = rangeObj[prop]
   // let len = range?.length
-
+  if(prop === 'keyword') {
+    // 从内存状态检查搜索关键词是否激活
+    return searchKeywords.value[key] && searchKeywords.value[key] !== ''
+  }
   if (prop == 'profit_percent_num') {
     console.log('------ggg-----------', range[0], conditions, filterForm[prop])
     //  return !(len?.every(i=> (!conditions[range[i]] || conditions[range[i]] === filterForm[prop].defaultRange[i])))
@@ -582,6 +604,9 @@ function handleFilterConfirm(val) {
     }
   } else if (val.type === 'last_trade_time') {
     filterConditions.value[key].last_trade_time = val.last_trade_time
+  } else if (val.type === 'keyword') {
+    // 将搜索关键词存储到内存而不是持久化存储
+    searchKeywords.value[key] = val.keyword
   }
   val.visible = false
   resetSort()
@@ -639,6 +664,11 @@ function handleReset(val) {
     filterConditions.value[key].sort = ''
 
     console.log('--1111---', val)
+  } else if (val.type === 'keyword') {
+    val.keyword = ''
+    // 同时清空内存中的搜索状态
+    const key = activeChain2.value + '-' + activeCategory1.value
+    searchKeywords.value[key] = ''
   } else {
     val.range1 = val.defaultRange
     val.range = val.defaultRange
@@ -662,6 +692,10 @@ function resetSort() {
 function switchChain(chain: string) {
   activeChain2.value = chain
   filterConditions.value.chain = chain
+  
+  // 切换链时清空所有搜索状态
+  searchKeywords.value = {}
+  
   initFilterForm()
   getSmartList()
 }

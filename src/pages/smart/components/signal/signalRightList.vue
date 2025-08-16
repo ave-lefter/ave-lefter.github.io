@@ -112,6 +112,14 @@ defineExpose({
   },
   updateListData(callback: (p: GetSignalV2ListResponse<IActionItem | IActionV3Item>[]) => GetSignalV2ListResponse<IActionItem | IActionV3Item>[]) {
     listData.value = callback(listData.value)
+  },
+  setScrollTop(scrollTop: number){
+    if(scrollbar.value){
+      scrollbar.value.scrollTo({
+        top: scrollTop,
+        behavior: 'smooth'
+      })
+    }
   }
 })
 
@@ -141,9 +149,9 @@ function openDrawer(item: GetSignalV2ListResponse<IActionItem | IActionV3Item>) 
     <div class="flex flex-wrap gap-2px">
       <SignalRightItem
         v-for="(item,index) in listData"
+        :key="index"
         :class="item.actions.length > 3 ? 'border-#3F80F7':'hover:border-#3F80F7'"
         class="border-1px border-solid border-[--d-333-l-DDD] transition-colors transition-.3s"
-        :key="index"
         :item="item"
         :filterToken="filterToken"
         :filter="filter"

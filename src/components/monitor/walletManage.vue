@@ -96,14 +96,14 @@
               <div
                 v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'" class="flex items-center mr-4px cursor-pointer color-[#666]"
                 @click.stop.prevent="handleMonitor(row,rowIndex)">
-                <Icon name="custom:monitor-icon" :class="['text-14px mr-2px',(row?.is_monitored === 1)&&'color-[--d-FFF-l-333]' ]" />
+                <Icon name="custom:monitor-icon" class="text-14px mr-2px color-[var(--d-CCC-l-666)] group-hover:color-#3F80F7" />
                 <!-- <span
                   class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
                   {{ row?.is_monitored === 1 ? t('pause') : t('openMonitor') }}
                 </span> -->
               </div>
-              <div v-else class="flex items-center mr-4px color-[#666] cursor-not-allowed">
-                <Icon name="custom:monitor-icon" class="text-14px mr-2px" />
+              <div v-else class="flex items-center mr-4px cursor-not-allowed">
+                <Icon name="custom:monitor-icon" class="text-14px mr-2px color-[var(--d-666-l-CCC)]" />
               </div>
               <Icon name="bx:bxs-trash-alt" class="text-13px color-#666" @click.stop.prevent="handleDeleteAttention(row)"/>
             </div>
