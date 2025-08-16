@@ -112,3 +112,19 @@ export const DefaultHeight = {
 }
 
 export const WSSimpleTxChain = ['core','arbitrum','optimism','avalanche','blast','polygon','alveychain','apchain','bitgert','cronos','cube','cvn','dogechain','drac','dojo','eos','etc','ethg','ftm','tron','aptos','fsc','mantle','mbkv2','eni','abstract','xlayer','chronoschain','marschain','xone','hyperevm','juchain','babylon','berachain','base','aia','eth','bsc','zchains','arbitrumnova','astar','aurora','metachain','b2network','bitlayer','bitonenetwork','boat','bouncebit','callisto','celo','seiv2','qom','cyber','sui','apechain','matchain','slerfchain','morph','gravity','xrpl','hyperliquid','genesys','sonic','nervosutxo','fusion','opbnb','tbc','unichain','mud','merlin','bevm','bitchain','bitrock','depass','ete','ton','solana']
+
+
+export const BotSettingsArr = [
+  {
+    value: 's1',
+    label: 'P1',
+  },
+  {
+    value: 's2',
+    label: 'P2',
+  },
+  {
+    value: 's3',
+    label: 'P3',
+  }
+] as const

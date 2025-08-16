@@ -67,6 +67,11 @@ export interface PumpObj {
   smart_wallet_tag_count: string
   sniper_count: string
   twitter_type: 0 | 1 | 2 | 3
+  makers_24h: number
+  summary_cn?: string
+  summary?: string
+  buyers_24h?: number
+  sellers_24h?: number
 }
 
 interface Pair {

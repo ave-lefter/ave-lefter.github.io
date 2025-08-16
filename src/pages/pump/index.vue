@@ -1,9 +1,10 @@
 <template>
-  <div class="pump w-full bg-[--d-1A1A1A-l-FFF]">
-    <div class="flex-start p-x-17px py-12px bg-[--d-111-l-FFF] mb-1px mt-1px">
+  <div class="pump w-full bg-[--d-000-l-FFF]">
+    <div class="flex-start p-x-17px py-12px bg-[--d-000-l-FFF] mb-1px mt-1px">
       <el-popover
         v-model:visible="visible_platforms"
         placement="bottom-start"
+        popper-class="new-popover"
         trigger="click"
       >
         <template #reference>
@@ -31,15 +32,6 @@
           </el-button>
         </template>
         <template #default>
-          <!-- <el-checkbox
-            v-model="checkAll"
-            class="width_100"
-            size="large"
-            :indeterminate="isIndeterminate"
-            @change="handleCheckAllChange"
-          >
-            {{ $t('all') }}
-          </el-checkbox> -->
           <template v-for="item in pumpConfig" :key="item.chain">
             <template v-if="item.chain === activeChain">
               <div v-if="item.platforms?.length <= 1" class="pump-platforms">
@@ -120,9 +112,9 @@
         </button>
       </div>
     </div>
-    <el-row  :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full bg-[--d-1A1A1A-l-FFF]">
+    <el-row  :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full px-16px">
       <el-col v-if="single('new')" :span=" width > 1024 ? 8 : 24">
-        <div class="pump-item bg-[--d-111-l-FFF]  rounded-4px" style="padding-top: 15px;">
+        <div class="pump-item  rounded-4px" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px">
             <template v-if="width > 1024">
               <img
@@ -166,21 +158,22 @@
                 <span>{{ item.name || '' }}</span>
               </button>
             </div>
-            <span  v-show="isPausedObj.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-5px flex items-center justify-center w-26px h-26px">
-              <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
+            <span  v-show="isPausedObj.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
-
+            <span class="flex-1" />
             <el-input
+              v-if="pumpSetting?.show_search"
               ref="inputSearch"
               v-model.trim="pump_query[activeChain].new"
-              class="search-input1 px-20px ml-auto mr-4px"
+              class="search-input1 px-20px mr-4px"
               size="small"
               :placeholder="$t('search')"
               @input="(val) => pump_query[activeChain].new = val.replace(/\s/g, '')"
             >
               <template #prefix>
                 <Icon
-                  class="text-12px text-[var(--d-666-l-999)]"
+                  class="text-12px text-[var(--d-566275-l-8CA0C3)]"
                   name="custom:search"
                 />
               </template>
@@ -188,14 +181,12 @@
                 <Icon
                   v-if="pump_query[activeChain].new"
                   name="pajamas:clear"
-                  class="color-[--d-666-l-999] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  class="color-[--d-566275-l-8CA0C3] text-12px hover:opacity-70% cursor-pointer mr-10px"
                   @click="pump_query[activeChain].new = ''"
                 />
               </template>
             </el-input>
-
-
-            <span class="bg-[--d-222-l-F2F2F2] py-4px px-10px rounded-4px mr-4px color-[--d-666-l-999] cursor-pointer  hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.new } "  @click="pump_notice[activeChain].new = !pump_notice[activeChain].new">
+            <span class="bg-[--d-151A22-l-E8F1FF] py-4px px-10px rounded-4px mr-4px color-[--d-566275-l-8CA0C3] cursor-pointer  hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.new } "  @click="pump_notice[activeChain].new = !pump_notice[activeChain].new">
             <Icon
             name="icon-park-solid:volume-notice"
             class="text-12px"
@@ -216,7 +207,7 @@
         </div>
       </el-col>
       <el-col v-if="single('soon')" :span=" width > 1024 ? 8 : 24">
-        <div class="pump-item bg-[--d-111-l-FFF]" style="padding-top: 15px;">
+        <div class="pump-item" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <img
@@ -260,21 +251,22 @@
                 <span>{{ item.name || '' }}</span>
               </button>
             </div>
-            <span  v-show="isPausedObj.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-5px flex items-center justify-center w-26px h-26px">
-              <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
+            <span  v-show="isPausedObj.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
-
+            <span class="flex-1" />
             <el-input
+              v-if="pumpSetting?.show_search"
               ref="inputSearch"
               v-model.trim="pump_query[activeChain].soon"
-              class="search-input1 px-20px ml-auto mr-4px"
+              class="search-input1 px-20px mr-4px"
               size="small"
               :placeholder="$t('search')"
               @input="(val) => pump_query[activeChain].soon = val.replace(/\s/g, '')"
             >
               <template #prefix>
                 <Icon
-                  class="text-12px text-[var(--d-666-l-999)]"
+                  class="text-12px text-[var(--d-566275-l-8CA0C3)]"
                   name="custom:search"
                 />
               </template>
@@ -282,12 +274,12 @@
                 <Icon
                   v-if="pump_query[activeChain].soon"
                   name="pajamas:clear"
-                  class="color-[--d-666-l-999] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  class="color-[--d-566275-l-8CA0C39] text-12px hover:opacity-70% cursor-pointer mr-10px"
                   @click="pump_query[activeChain].soon = ''"
                 />
               </template>
             </el-input>
-            <span class="bg-[--d-222-l-F2F2F2] py-4px px-10px rounded-4px mr-4px color-[--d-666-l-999] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.soon } "  @click="pump_notice[activeChain].soon = !pump_notice[activeChain].soon">
+            <span class="bg-[--d-151A22-l-E8F1FF] py-4px px-10px rounded-4px mr-4px color-[--d-566275-l-8CA0C3] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.soon } "  @click="pump_notice[activeChain].soon = !pump_notice[activeChain].soon">
               <Icon
               name="icon-park-solid:volume-notice"
               class="text-12px"
@@ -303,11 +295,12 @@
             :tableList="list2 || []"
             :quickBuyValue="quickBuyValue"
             :loading="loading[activeChain + '-' + 'soon']"
+            isSoon
           />
         </div>
       </el-col>
       <el-col v-if="single('graduated')" :span=" width > 1024 ? 8 : 24">
-        <div class="pump-item bg-[--d-111-l-FFF]" style="padding-top: 15px;">
+        <div class="pump-item" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
               <img
@@ -315,7 +308,7 @@
                 src="@/assets/images/pump/graduated.svg"
                 width="24"
                 alt=""
-              />
+              >
               <span class="color-[--d-F5F5F5-l-333]">{{ $t('graduated') }}</span>
             </template>
             <div v-else class="tabs single" >
@@ -352,21 +345,22 @@
               </button>
             </div>
 
-            <span  v-show="isPausedObj.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-5px flex items-center justify-center w-26px h-26px">
-              <Icon name="custom:stop" class="color-#FFA622 text-12px"/>
+            <span  v-show="isPausedObj.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+              <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
-
+            <span class="flex-1" />
             <el-input
+              v-if="pumpSetting?.show_search"
               ref="inputSearch"
               v-model.trim="pump_query[activeChain].graduated"
-              class="search-input1 px-20px ml-auto mr-4px"
+              class="search-input1 px-20px mr-4px"
               size="small"
               :placeholder="$t('search')"
               @input="(val) => pump_query[activeChain].graduated = val.replace(/\s/g, '')"
             >
               <template #prefix>
                 <Icon
-                  class="text-12px text-[var(--d-666-l-999)]"
+                  class="text-12px text-[var(--d-566275-l-8CA0C3)]"
                   name="custom:search"
                 />
               </template>
@@ -374,12 +368,12 @@
                 <Icon
                   v-if="pump_query[activeChain].graduated"
                   name="pajamas:clear"
-                  class="color-[--d-666-l-999] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  class="color-[--d-566275-l-8CA0C3] text-12px hover:opacity-70% cursor-pointer mr-10px"
                   @click="pump_query[activeChain].graduated = ''"
                 />
               </template>
             </el-input>
-            <span class="bg-[--d-222-l-F2F2F2] py-4px px-10px rounded-4px mr-4px color-[--d-666-l-999] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.graduated } "  @click="pump_notice[activeChain].graduated = !pump_notice[activeChain].graduated">
+            <span class="bg-[--d-151A22-l-E8F1FF] py-4px px-10px rounded-4px mr-4px color-[--d-566275-l-8CA0C3] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.graduated } "  @click="pump_notice[activeChain].graduated = !pump_notice[activeChain].graduated">
               <Icon
               name="icon-park-solid:volume-notice"
               class="text-12px"
@@ -491,7 +485,7 @@ const pumpFilter_solana_graduated = usePumpTableDataFetching(
 )
 const pump_solana_platforms = useStorage(
   'pump_solana_platforms',
-  ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk'],
+  ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk', 'bags'],
   localStorage
 )
 
@@ -548,6 +542,7 @@ const wsTableListCache = ref<PumpObj[]>([])
 const wsTableList = ref<PumpObj[]>([])
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
+  console.log('----list--------',platforms.value)
   return (
     list?.[0]?.platforms?.filter((i) =>
       platforms?.value.includes(i.platform)
@@ -583,7 +578,7 @@ const list1 = computed(() => {
       (item) =>
         !pumpBlackList.value?.some(
           (i) =>
-            (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword')
+            (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
         )
     )
   }
@@ -604,7 +599,7 @@ const list2 = computed(() => {
       (item) =>
         !pumpBlackList.value?.some(
           (i) =>
-          (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword')
+          (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
         )
     )
   }
@@ -623,7 +618,7 @@ const list3 = computed(() => {
       (item) =>
         !pumpBlackList.value?.some(
           (i) =>
-          (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword')
+          (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
         )
     )
   }
@@ -1262,7 +1257,7 @@ function getFilterData(list, conditions) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--d-333333-l-eaecef);
+  background: var(--d-151A22-l-E8F1FF);
   padding: 1px;
   border-radius: 4px;
   font-size: 12px;
@@ -1274,7 +1269,7 @@ function getFilterData(list, conditions) {
     border: none;
 
     // font-size: 14px;
-    color: var(--d-999-l-666);
+    color: var(--d-566275-l-8CA0C3);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;
@@ -1294,7 +1289,7 @@ function getFilterData(list, conditions) {
     &.active {
       // color: var(--custom-font-4-color);
       color: var(--d-F5F5F5-l-333);
-      background: var(--d-222-l-F2F2F2);
+      background: var(--d-151A22-l-E8F1FF);
       opacity: 1;
     }
   }
@@ -1316,13 +1311,13 @@ function getFilterData(list, conditions) {
     &.active {
       // color: var(--custom-font-4-color);
       color: var(--d-F5F5F5-l-333);
-      background: var(--d-111-l-FFF);
+      background: var(--d-252E3C-l-FFF);
     }
   }
 }
 .btn {
   border: none;
-  background: var(--d-222-l-F2F2F2);
+  background: var(--d-151A22-l-E8F1FF);
   padding: 7px 8px;
   border-radius: 4px;
   display: flex;
@@ -1330,21 +1325,26 @@ function getFilterData(list, conditions) {
   justify-content: flex-start;
   font-size: 12px;
   font-weight: 500;
+  color:var(--d-F5F5F5-l-111);
 }
 :deep().search-input1 {
-  background: var(--d-222-l-F2F2F2);
-  padding: 2px;
+  background: var(--d-151A22-l-E8F1FF);
+  padding: 1px;
   width: 200px;
   border-radius: 4px;
   border: none;
   .el-input__wrapper {
     background-color: transparent;
     box-shadow: none;
+    &:hover {
+      box-shadow: 0 0 0 1px #3F80F7 inset;
+    }
     &.is-focus {
+      border-color: #3F80F7; /* 蓝色 */
       box-shadow: 0 0 0 1px #3F80F7 inset;
     }
     .el-input__inner::placeholder {
-      color: var(--d-666-l-999);
+      color: var(--d-566275-l-8CA0C3);
     }
   }
 }
@@ -1361,10 +1361,10 @@ function getFilterData(list, conditions) {
 // }
 ::v-deep(.el-checkbox ) {
   .el-checkbox__label {
-    color: var(--d-666-l-999);
+    color: var(--d-566275-l-8CA0C3);
   }
   .el-checkbox__inner{
-    // border-color: var(--d-333-l-CCC);
+    border-color: var(--d-252E3C-l-E8F1FF);
   }
   .el-checkbox__input{
     &.is-checked{
@@ -1379,5 +1379,10 @@ function getFilterData(list, conditions) {
   }
 
   color: var(--d-F5F5F5-l-333);
+}
+.pump-item{
+  background: var(--d-0B0D12-l-F6F9FF);
+  border: 1px solid var(--d-151A22-l-E8F1FF);
+  border-radius: 4px;
 }
 </style>

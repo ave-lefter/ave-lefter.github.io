@@ -1,7 +1,5 @@
 <template>
   <div>
-
-
   <template v-if="pumpSetting.avatar_isCircle == 'rect'">
     <svg
       v-if="pumpSetting.Progress_isCircle =='circle'"
@@ -15,7 +13,7 @@
         y="4"
         width="64"
         height="64"
-        :stroke="isDark ? '#333333' : '#F2F2F2'"
+        :stroke="bgColor"
         stroke-width="2"
         fill="none"
         rx="4"
@@ -47,7 +45,7 @@
         width="200"
         height="12"
         rx="6"
-        :fill="isDark ? '#333333' : '#F2F2F2'"
+        :fill="bgColor"
       />
       <rect
         v-if="progress > 0"
@@ -72,7 +70,7 @@
         cx="36"
         cy="36"
         r="32"
-        :stroke="isDark ? '#333333' : '#F2F2F2'"
+        :stroke="bgColor"
         stroke-width="2"
         fill="none"
       />
@@ -97,7 +95,7 @@
         width="200"
         height="12"
         rx="6"
-        :fill="isDark ? '#333333' : '#F2F2F2'"
+        :fill="bgColor"
       />
       <rect
         v-if="progress > 0"
@@ -116,7 +114,7 @@
 
 <script setup lang="ts">
 const globalStore = useGlobalStore()
-const { isDark, pumpSetting } = storeToRefs(globalStore)
+const { pumpSetting } = storeToRefs(globalStore)
 
 const props = defineProps({
   progress: {
@@ -136,6 +134,15 @@ const dashoffset = computed(() => {
 const width = computed(() => {
   return 200 *  (props.progress || 0)/ 100
 })
+const bgColor = computed(() => {
+  return hexToRgba(props.color, 0.3)
+})
+function hexToRgba(hex: string, alpha = 1) {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
 </script>
 
 <style scoped>

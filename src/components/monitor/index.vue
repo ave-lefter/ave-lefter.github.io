@@ -1,5 +1,8 @@
 <template>
-  <div class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overflow-hidden">
+  <div
+class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overflow-hidden"
+  :class="{'pr-10px!':isLeftFixed,'pl-10px!':isRightFixed}"
+  >
     <!-- <div class="w-100% h-40px absolute pointer-events-auto z-999 drag-handle left-0"/> -->
     <Icon
         name="custom:drag2"
@@ -284,7 +287,7 @@ import { downColor, upColor } from '@/utils/constants'
 import type {AveTable} from '#components'
 const { t } = useI18n()
 
-const { hasRing ,monitorList2:dataSourceCache,visible,activeName,txType} = storeToRefs(useMonitorStore())
+const { hasRing ,monitorList2:dataSourceCache,visible,activeName,txType,isLeftFixed,isRightFixed} = storeToRefs(useMonitorStore())
 
 const {updateNum3} = storeToRefs(useFollowStore())
 const { isDark } = storeToRefs(useGlobalStore())
