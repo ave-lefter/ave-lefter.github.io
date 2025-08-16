@@ -47,7 +47,8 @@ const filterBlackList = computed(() => {
         !pumpBlackList.some(
           (i) =>
             (i.address == item.token && i.type == 'ca') ||
-            (i.address == item.symbol && i.type == 'keyword')
+            (i.address == item.symbol && i.type == 'keyword')|| 
+            (i.address == item.token  && i.type=='dev')
         )
     )
   }
