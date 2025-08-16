@@ -361,6 +361,9 @@ const cellRenderer = computed(() => {
     sniper_tx_count: snipersContent,
   }
 })
+const Row = ({ cells, rowData }) => {
+  
+}
 </script>
 <template>
   <div v-loading="loading" style="height: calc(100vh - 185px)">
@@ -405,9 +408,12 @@ const cellRenderer = computed(() => {
           :activeChain="activeChain"
           :childrenData="item.children || []"
           @collect="collect"
-          @toggleKline="row=>rankKlineStore.toggleKline(row,columns)"
+          @toggleKline="(row,rowIndex)=>rankKlineStore.toggleKline(row,rowIndex,columns,listData)"
         />
       </template>
+      <template #row="rowProps">
+      <Row v-bind="rowProps" />
+    </template>
     </AveTable>
   </div>
   <el-pagination

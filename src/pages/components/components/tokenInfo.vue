@@ -1,12 +1,178 @@
 <script setup lang="ts">
-const rankKlineStore = useRankKlineStore()
-const token = computed(()=>rankKlineStore.tokenInfo?.token)
-const appendix = computed(() => {
+import type { Pair } from '~/api/types/token'
+import XIcon from '~/components/xPopup/xIcon.vue'
+
+const {t} = useI18n()
+const themeStore = useThemeStore()
+const loadingGroupEdit = ref(false)
+const {token,pair,klineRow,twitterType,collected,editableGroup,currentGroup,selectedGroup,userFavoriteGroups,groupId,editableRemark,remark,remark2,tokenInfoExtra} = storeToRefs(useRankKlineStore())
+const medias = computed(() => {
   if (token.value?.appendix && isJSON(token.value?.appendix)) {
-    return JSON.parse(token.value?.appendix)
+    return getMedias(JSON.parse(token.value?.appendix),t)
   }
-  return {}
+  return []
 })
+
+function getTags(i: Pair) {
+  type Signal = {
+    tag: string
+    color: string
+    n: string
+    timestamp: number
+  }
+  type Normal = {
+    tag: string
+    color: string
+    showText?: boolean
+  }
+  let signal_arr: Array<Signal> = []
+  let normal_tag: Array<Normal> = []
+  let normal_str: Array<string> = []
+  if (i?.dynamic_tag) {
+    const tag_arr = JSON.parse(i?.dynamic_tag) || []
+    const signal_str = tag_arr?.filter((i: string) => i?.startsWith('signal'))
+    signal_arr = signal_str?.map((y: string) => ({
+      tag:
+        y?.split('-')[5] &&
+        (y?.split('-')[1] == 'whale_sell' || y?.split('-')[1] == 'whale_buy')
+          ? `${y?.split('-')[1]}_trump`
+          : y?.split('-')[1],
+      color: y?.split('-')[2],
+      n: y?.split('-')[3],
+      timestamp: y?.split('-')[4],
+    }))
+    signal_arr?.sort((a, b) => b.timestamp - a.timestamp)
+    const kol_arr = signal_arr.filter(
+      (item, index) =>
+        signal_arr.findIndex((el) =>
+          new RegExp('^kol_.*$', 'gi').test(el.tag)
+        ) == index
+    )
+    const dev_arr = signal_arr.filter(
+      (item, index) =>
+        signal_arr.findIndex((el) =>
+          new RegExp('^dev_.*$', 'gi').test(el.tag)
+        ) == index
+    )
+    const smarter_arr = signal_arr.filter(
+      (item, index) =>
+        signal_arr.findIndex((el) =>
+          new RegExp('^smarter_.*$', 'gi').test(el?.tag)
+        ) == index
+    )
+    const whale_arr = signal_arr.filter(
+      (item, index) =>
+        signal_arr.findIndex((el) =>
+          new RegExp('^whale_.*$', 'gi').test(el.tag)
+        ) == index
+    )
+    const other_arr = signal_arr?.filter(
+      (el) => !new RegExp('^dev_|kol_|smarter_|whale_.*$', 'gi').test(el.tag)
+    )
+    signal_arr = kol_arr
+      ?.concat(dev_arr)
+      ?.concat(smarter_arr)
+      ?.concat(whale_arr)
+      ?.concat(other_arr)
+    signal_arr?.sort((a, b) => b.timestamp - a.timestamp)
+    normal_str = tag_arr.filter((i: string) => !i?.startsWith('signal'))
+  }
+  // if (i?.tag) {
+  //   const tag = i.tag?.split(',') || []
+  //   const tag1 = tag.filter((i) => i !== 'pump' && i !== 'moonshot') || []
+  //   normal_str = tag1.concat(normal_str)
+  // }
+  normal_tag =
+    normal_str?.map((i) => ({
+      tag: i,
+      color: 'green',
+      showText: false,
+    })) || []
+  const is_rug_pull =
+    signal_arr?.some((i) => new RegExp('rug_pull', 'gi').test(i?.tag)) ||
+    normal_tag?.some((i) => new RegExp('rug_pull', 'gi').test(i?.tag))
+  const is_shit_coins =
+    signal_arr?.some((i) => new RegExp('shitcoin', 'gi').test(i?.tag)) ||
+    normal_tag?.some((i) => new RegExp('shitcoin', 'gi').test(i.tag))
+  if ((i?.risk_score ?? 0) >= 100 && i?.chain == 'solana') {
+    i.lp_locked_percent = 0
+    signal_arr = []
+    normal_tag = [
+      {
+        tag: 'flag_dangerous',
+        color: 'red',
+        showText: true,
+      },
+    ]
+  } else if (is_rug_pull) {
+    i.lp_locked_percent = 0
+    signal_arr = []
+    normal_tag = [
+      {
+        tag: 'flag_rug_pull',
+        color: 'red',
+        showText: true,
+      },
+    ]
+  } else if (is_shit_coins) {
+    i.lp_locked_percent = 0
+    signal_arr = []
+    normal_tag = [
+      {
+        tag: 'flag_shit_coins',
+        color: 'red',
+        showText: true,
+      },
+    ]
+  }
+
+  if (token?.value?.tag) {
+    const tagti = token?.value?.tag?.split(',') || []
+    const tag_t = tagti?.filter((i) => i !== '' && i !== 'newcommunity')
+    const tag_t1: Array<Normal> = tag_t?.map((i) => ({
+      tag: i,
+      color: 'green',
+      showText: false,
+    }))
+    normal_tag = tag_t1.concat(normal_tag)
+  }
+  const extra_tag = token?.value?.tag?.split(',') || []
+  const newcommunity = extra_tag?.includes?.('newcommunity')
+  // if(extra_tag?.length >0){
+  //   extra_tag = extra_tag?.map(i => ({
+  //     tag: i,
+  //     color: 'green',
+  //     showText: false
+  //   }))
+  //   if (normal_tag?.length > 0) {
+  //     normal_tag = normal_tag?.concat(extra_tag)
+  //   } else {
+  //     normal_tag = extra_tag
+  //   }
+  // }
+  if (token?.value?.cto_flag == 1 || newcommunity) {
+    normal_tag.unshift({
+      tag: 'cto_flag',
+      color: 'green',
+      showText: false,
+    })
+  }
+  return {
+    normal_tag,
+    signal_arr,
+  }
+}
+
+function handleReset() {
+  if (editableGroup.value) {
+    editableGroup.value = false
+    selectedGroup.value = groupId.value
+  }
+  if (editableRemark.value) {
+    editableRemark.value = false
+    remark2.value = remark.value
+  }
+}
 </script>
 
 <template>
@@ -47,7 +213,7 @@ const appendix = computed(() => {
           <div class="flex items-center justify-start">
             <img v-if="(token?.risk_level??0) < 0" class="bg-btn" src="@/assets/images/fengxian.png" :width="12">
             <div v-if="medias?.length > 0" class="flex text-20px">
-              <div v-for="(item, index) in medias" :key="index" class="tag-btn">
+              <div v-for="(item, index) in medias" :key="index">
                 <template v-if="item.url">
                   <span
                     v-if="item.name === 'QQ'"
@@ -76,7 +242,7 @@ const appendix = computed(() => {
               </div>
             </div>
             <a
-              class="media-item bg-btn"
+              class="bg-btn"
               :href="`https://x.com/search?q=($${token?.symbol} OR ${token?.token})&src=typed_query&f=live`"
               target="_blank"
             >
@@ -89,23 +255,23 @@ const appendix = computed(() => {
               <div
                 v-for="(i, index) in getTags(pair)?.normal_tag"
                 :key="index"
-                class="bg-btn flex h-16px tag-btn"
+                class="bg-btn flex h-16px"
               >
                 <el-image
                   v-tooltip="$t(`${i.tag}`)"
-                  class="token-icon-tag cursor-pointer h-100%"
+                  class="cursor-pointer h-100%"
                   :src="formatIconTag(i.tag)"
                   lazy
                 >
                   <template #error>
                     <img
-                      class="token-icon-tag h-16px"
+                      class="h-16px"
                       src="/icon-default.png"
                     >
                   </template>
                   <template #placeholder>
                     <img
-                      class="token-icon-tag h-16px"
+                      class="h-16px"
                       src="/icon-default.png"
                     >
                   </template>
@@ -122,7 +288,7 @@ const appendix = computed(() => {
               </div>
             </template>
             <div v-if="medias?.length > 0" class="flex text-20px">
-              <div v-for="(item, index) in medias" :key="index" class="tag-btn">
+              <div v-for="(item, index) in medias" :key="index">
                 <template v-if="item.url">
                   <span
                     v-if="item.name === 'QQ'"
@@ -134,7 +300,7 @@ const appendix = computed(() => {
                       class="text-[--d-666-l-999] text-12px"
                     />
                   </span>
-                  <XPopup v-else-if="item.icon === 'twitter'" :tokenId="(route.params.id as string)" :type="tokenStore.twitterType">
+                  <XPopup v-else-if="item.icon === 'twitter'" :tokenId="klineRow.id" :type="twitterType">
                     <a
                       :href="item.url"
                       target="_blank"
@@ -142,8 +308,8 @@ const appendix = computed(() => {
                       @click.stop
                     >
                       <XIcon
-                        v-if="[1, 2, 3].includes(tokenStore.twitterType)"
-                        :type="tokenStore.twitterType"
+                        v-if="[1, 2, 3].includes(twitterType)"
+                        :type="twitterType"
                         class="text-12px"
                       />
                       <Icon
@@ -180,14 +346,7 @@ const appendix = computed(() => {
               style="border-radius: 100%"
             >
             <a
-              v-if="aiSummary?.headline || aiSummary?.summary"
-              v-tooltip.raw="{
-                content: `<div class='max-w-[400px]'>${aiSummary.headline || aiSummary.summary}</div>`,
-                props:{
-                  placement:'top-start'
-                }
-              }"
-              class="media-item bg-btn clickable">
+              class="bg-btn clickable">
               <Icon name="custom:ai" class="text-14px"/>
             </a>
           </div>
@@ -196,13 +355,12 @@ const appendix = computed(() => {
             v-if="collected"
             v-model:visible="editableGroup"
             placement="bottom"
-            popper-class="chains-table-filter"
             title=""
             :width="200"
             trigger="click"
           >
             <template #reference>
-              <a class="w-zu flex-start bg-btn" href="" @click.stop.prevent>
+              <a class="flex-start bg-btn" href="" @click.stop.prevent>
                 <Icon
                   class="text-[--d-666-l-999] text-12px"
                   name="custom:groups"
@@ -218,7 +376,6 @@ const appendix = computed(() => {
                 <div class="flex mt-10px">
                   <el-select
                     v-model="selectedGroup"
-                    class="select3"
                     :placeholder="$t('pleaseSelectGroup')"
                     :teleported="false"
                   >
@@ -240,7 +397,7 @@ const appendix = computed(() => {
                       min-width: 70px;
                       --el-button-font-weight: 400;
                     "
-                    :color="theme !== 'dark' ? '#f2f2f2' : '#333333'"
+                    :color="themeStore.isDark ? '#f2f2f2' : '#333333'"
                     @click.stop="handleReset()"
                   >
                     {{ $t('cancel') }}
@@ -254,10 +411,8 @@ const appendix = computed(() => {
                       min-width: 70px;
                       --el-button-font-weight: 400;
                     "
-                    :color="theme !== 'dark' ? '#222222' : '#f5f5f5'"
-                    @click.stop="
-                      confirmSwitchGroup(id, selectedGroup, walletAddress)
-                    "
+                    :color="themeStore.isDark ? '#222222' : '#f5f5f5'"
+                    @click.stop="confirmSwitchGroup"
                   >
                     {{ $t('confirm') }}
                   </el-button>
@@ -305,7 +460,7 @@ const appendix = computed(() => {
                       margin-left: auto;
                       --el-button-font-weight: 400;
                     "
-                    :color="theme !== 'dark' ? '#f2f2f2' : '#333333'"
+                    :color="themeStore.isDark ? '#f2f2f2' : '#333333'"
                     @click.stop="handleReset()"
                   >
                     {{ $t('cancel') }}
@@ -313,7 +468,7 @@ const appendix = computed(() => {
                   <el-button
                     class="flex-1"
                     size="default"
-                    :color="theme !== 'dark' ? '#222222' : '#f5f5f5'"
+                    :color="themeStore.isDark ? '#222222' : '#f5f5f5'"
                     style="
                       height: 30px;
                       min-width: 70px;
@@ -358,14 +513,14 @@ const appendix = computed(() => {
             <span>{{ $t('tax') }}:</span>
             <span
             v-if="(tokenInfoExtra?.buy_tax??0) > 0"
-              class="text-12px tax-text"
+              class="text-12px"
               :style="{ color: upColor[0] }"
             >
               {{ formatNumber(tokenInfoExtra?.buy_tax ||0, 1) }}%
             </span>
             <span
               v-if="(tokenInfoExtra?.sell_tax??0) > 0"
-              class="text-12px tax-text ml-4px"
+              class="text-12px ml-4px"
               :style="{ color: downColor[0] }"
             >
               {{ formatNumber(tokenInfoExtra?.sell_tax ||0, 1) }}%
@@ -384,19 +539,19 @@ const appendix = computed(() => {
               class="flex bg-btn signal pointer mr-4px text-10px"
             >
               <el-image
-                class="token-icon-signal-tag h-10px"
+                class="h-10px"
                 :src="formatIconTag(i.tag)"
                 lazy
               >
                 <template #error>
                   <img
-                    class="token-icon-signal-tag h-16px"
+                    class="h-16px"
                     src="/icon-default.png"
                   >
                 </template>
                 <template #placeholder>
                   <img
-                    class="token-icon-signal-tag h-16px"
+                    class="h-16px"
                     src="/icon-default.png"
                   >
                 </template>
@@ -473,7 +628,7 @@ const appendix = computed(() => {
                   pair?.smart_money_sell_count_24h || 0,
               })
             "
-            class="minor flex-end color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px"
+            class="minor flex-end color-text-2 signal cursor-pointer mr-4px bg-btn text-10px"
           >
             <Icon
               class="text-[--d-666-l-999] h-12px w-12px mr-2px"
@@ -505,3 +660,10 @@ const appendix = computed(() => {
       </div>
    </div>
 </template>
+
+<style scoped lang="scss">
+.bg-btn {
+  --uno: bg-[--d-222-l-F2F2F2] rounded-2px mr-4px flex items-center
+    justify-center h-16px min-w-16px p-2px;
+}
+</style>
