@@ -29,7 +29,7 @@ export interface GetUserBalanceResponse {
   risk_score: number
 }
 
-export function getUserBalance(
+export const getUserBalance = createCacheRequest(function(
   {
     pageNO = 1,
     pageSize = 10,
@@ -52,7 +52,7 @@ export function getUserBalance(
       hide_small  //是否隐藏小额。 大于0时:balance_usd > hide_small; 其他：不参与过滤
     }
   })
-}
+}, 1000)
 
 
 // query swap token
