@@ -836,12 +836,12 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
       background: var(--d-0B0D12-l-F6F9FF);
       position: absolute;
       right: 0;
-      bottom: 2px;
+      bottom: 6px;
       padding-left: 12px;
       .btns-swap{
         background-color: var(--d-0B0D12-l-F6F9FF);
         position: relative;
-        z-index:2;
+        z-index:1;
       }
     }
     .black-container {
