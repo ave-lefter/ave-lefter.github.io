@@ -141,6 +141,7 @@ export const useSwapStore = defineStore('swap', () => {
   const isFourMeme = ref(false)
   const isFlap = ref(false)
   const isSunPump = ref(0)
+  const isDyorswapfun = ref(false)
   const amm = ref('')
 
   const limitSolanaPriceU = ref<number | string>(0)
@@ -165,7 +166,7 @@ export const useSwapStore = defineStore('swap', () => {
         }).sort((a) => (a.token === NATIVE_TOKEN ? -1 : 1))
       }
       const isSameToken = token1.value.address === token2.value.address
-      const isSpecialCase = (isERC314.value || isFourMeme.value || isFlap.value || isSunPump.value > 0) && token2.value.address !== NATIVE_TOKEN
+      const isSpecialCase = (isERC314.value || isFourMeme.value || isFlap.value || isSunPump.value > 0 || isDyorswapfun.value) && token2.value.address !== NATIVE_TOKEN
       const isSolanaPumpCase = (isPump.value || isMoonshot.value) && chain === 'solana' && token2.value.address === 'So11111111111111111111111111111111111111112'
       const isSui = chain === 'sui' && (token2.value.address !== '0x2::sui::SUI' && token2.value.address !== NATIVE_TOKEN)
       if ((!token2.value.address || isSameToken || token2.value.chain !== chain || isSpecialCase || isSolanaPumpCase || isSui) && tokens.value.length > 0) {
@@ -176,7 +177,7 @@ export const useSwapStore = defineStore('swap', () => {
         if (token1.value.address === token.address) {
           token = index === 0 ? (tokens.value[1] ?? tokens.value[0]) : tokens.value[0]
         }
-        if (isERC314.value || isPump.value || isMoonshot.value || isFourMeme.value || isFlap.value || isSunPump.value > 0 || isSui) {
+        if (isERC314.value || isPump.value || isMoonshot.value || isFourMeme.value || isFlap.value || isSunPump.value > 0 || isSui || isDyorswapfun.value) {
           const token = tokens.value?.slice?.().find(i => (i.address === NATIVE_TOKEN || i.address === 'So11111111111111111111111111111111111111112' || i.address === '0x2::sui::SUI'))
           if (token) {
             token2.value = {...(token as typeof token2.value)}
@@ -308,7 +309,7 @@ export const useSwapStore = defineStore('swap', () => {
         }
         const pairInfo = res?.pairs?.[0]
         const pair = pairInfo?.pair
-        if (pair && pairInfo?.amm !== 'moonshot' && !pairInfo?.amm?.includes('fourmeme') && pairInfo?.amm !== 'flapswap' && pairInfo?.amm !== 'sunpump' && (pairInfo?.target_token === pair || new RegExp(pairInfo?.target_token, 'i').test(pair))) {
+        if (pair && pairInfo?.amm !== 'moonshot' && !pairInfo?.amm?.includes('fourmeme') && pairInfo?.amm !== 'flapswap' && pairInfo?.amm !== 'sunpump' && pairInfo?.amm !== 'dyorswapfun' && (pairInfo?.target_token === pair || new RegExp(pairInfo?.target_token, 'i').test(pair))) {
           isERC314.value = true
           if (token2.value.address !== NATIVE_TOKEN && tokens.value?.length > 0) {
             const _token2 = {...tokens.value?.slice()?.find(i => i.address === NATIVE_TOKEN)}
@@ -331,6 +332,11 @@ export const useSwapStore = defineStore('swap', () => {
           isFourMeme.value = true
         } else {
           isFourMeme.value = false
+        }
+        if (pairInfo?.amm === 'dyorswapfun' && pairInfo?.chain === 'xlayer') {
+          isDyorswapfun.value = true
+        } else {
+          isDyorswapfun.value = false
         }
         if (pairInfo?.amm === 'flapswap') {
           isFlap.value = true
@@ -450,6 +456,7 @@ export const useSwapStore = defineStore('swap', () => {
     isMoonshot,
     isERC314,
     isSunPump,
+    isDyorswapfun,
     userBalanceTokens,
     getTokenDetails: _getTokenDetails,
     getToken2Info: _getToken2Info,
