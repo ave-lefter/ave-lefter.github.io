@@ -253,7 +253,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
             ${{ formatNumber(row.token_price_u || 0, 2) }}
           </template>
           <template v-else>
-            {{ formatNumber(Number(row.token_price_u) / Number(row.main_token_price) || 0, 2) }}
+            {{ Number(row.main_token_price) === 0 ? '-' : formatNumber(Number(row.token_price_u) / Number(row.main_token_price) || 0, 2) }}
             <span class="color-[--d-666-l-999]">{{ row.main_token_symbol }}</span>
           </template>
         </div>
@@ -261,8 +261,8 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
       <!--<div class="flex items-center w-50px text-right"/>-->
     </div>
     <AveEmpty
-      class="pt-50px"
       v-if="!loading && tableList.length === 0"
+      class="pt-50px"
     />
   </div>
 </template>

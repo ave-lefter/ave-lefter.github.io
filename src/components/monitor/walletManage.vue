@@ -5,11 +5,11 @@
         <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
         <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
       </el-select>
-      <el-button ref="addButtonRef"  style="height: 32px;color: var(--d-999-l-666) !important; padding: 8px 10px !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark">
+      <el-button ref="addButtonRef"  style="height: 32px;color: var(--d-999-l-666) !important; padding: 8px 10px !important;font-size: 12px;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark">
         <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
         {{ $t('addWallet') }}
       </el-button>
-      <el-button  :color="isDark?'#333':'#F2F2F2'" style="height: 32px;color: var(--d-999-l-666) !important;padding: 8px 10px !important; margin-left: 0px;" :dark="isDark" @click.stop.prevent="showBatchAddressDetails=true" >
+      <el-button  :color="isDark?'#333':'#F2F2F2'" style="height: 32px;color: var(--d-999-l-666) !important;padding: 8px 10px !important; margin-left: 0px;font-size: 12px;" :dark="isDark" @click.stop.prevent="showBatchAddressDetails=true" >
         <Icon name="mingcute:new-folder-fill" class="text-12px mr-5px"/>
         {{ $t('bulkImport') }}
       </el-button>
@@ -94,7 +94,8 @@
                 <span>{{ $t('enableMonitor') }}</span>
               </div> -->
               <div
-                v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'" class="flex items-center mr-4px cursor-pointer color-[#666]"
+                v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
+                class="flex items-center mr-4px cursor-pointer color-[#666]"
                 @click.stop.prevent="handleMonitor(row,rowIndex)">
                 <Icon name="custom:monitor-icon" :class="['text-14px mr-2px',(row?.is_monitored === 1)&&'color-[--d-FFF-l-333]' ]" />
                 <!-- <span
@@ -140,11 +141,19 @@ const props=defineProps({
   },
 })
 const { mode, isDark, token_logo_url } = storeToRefs(useGlobalStore())
-const chainOptions=ref([
-  {label: t('allChain'),value:'AllChains',id:'allChains'},
-  {label: getChainInfo('solana')?.name, value:'solana', id:'solana'},
-  {label: getChainInfo('bsc')?.name, value:'bsc', id:'bsc'},
-])
+const chainOptions=computed(()=>{
+  return [
+    {label: t('allChain'),value:'AllChains',id:'allChains'},
+    ...SupportFullDataChain.map(el=>{
+      const chainInfo = getChainInfo(el)
+      return {
+        label:el==='solana' ? 'SOL' : chainInfo.net_name.toUpperCase(),
+        value:chainInfo.net_name,
+        id:chainInfo.net_name
+      }
+    })
+  ]
+})
 const visible = ref(false)
 const addButtonRef = ref()
 const addFavAddressPopRef = ref()

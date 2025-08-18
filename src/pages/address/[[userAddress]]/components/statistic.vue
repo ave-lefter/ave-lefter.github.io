@@ -346,20 +346,22 @@ const wallet_age = computed(() => {
     : getDuring(_wallet_age ? ((Number(_wallet_age) || 0) * 1000) : undefined)
 })
 
+const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
+
 const total_balance = computed(() => {
   const formatMap: Record<string, number> = {
     solana: 2,
     bsc: 4,
+    eth: 4,
+    base: 4,
   }
   const { total_balance_without_risk } = balanceAnalysis.value
 
   return formatNumber((Number(total_balance_without_risk) || 0) / Number(main_token_price.value), {
-    decimals: formatMap[chain.value],
+    decimals: injecteIsVolUSDT?.value ? 4 : formatMap[chain.value],
     limit: 20,
   })
 })
-
-const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
 
 const main_token_price = computed(() => {
   return injecteIsVolUSDT?.value ? 1 : Number((balanceAnalysis.value.main_token_price || 0))
