@@ -65,7 +65,7 @@ const created_at_unix = computed(() => {
 })
 
 function toggleKline() {
-  emit('toggleKline',props.row,props.rowIndex)
+  emit('toggleKline',props.row)
 }
 </script>
 

@@ -23,7 +23,10 @@ import { useKlineMarks } from './mark'
 import {DefaultHeight, WSSimpleTxChain} from '~/utils/constants'
 import { TW_STUDY } from './constant'
 
-const tokenStore = useTokenStore()
+const props = defineProps<{
+  isRank?:boolean
+}>()
+const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const botStore = useBotStore()
 const route = useRoute()
 const token = computed(() => {

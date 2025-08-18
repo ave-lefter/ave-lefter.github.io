@@ -33,16 +33,12 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
         : userFavoriteGroups.value?.find((i) => i.group_id == groupId.value)?.name
     })
 
-    function toggleKline(row,rowIndex,columns,listData) {
-        const klineIndex = listData.findIndex(el => el.isKline)
+    function toggleKline(row,columns) {
         if(klineRow.value.id === row.id){
             klineRow.value = {}
             columns[0].fixed='left'
             columns[columns.length-1].fixed='right'
         } else {
-            listData.splice(rowIndex,1,{
-              isKline:true
-            })
             klineRow.value = row
             columns[0].fixed = ''
             columns[columns.length-1].fixed=''
@@ -102,20 +98,9 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
           .finally(() => {})
       }
 
-    function getRowClass({rowData}:Parameters<RowClassNameGetter<any>>[0]) {
-        const commonClass = 'color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]'
-        if(klineRow.value.id && rowData.id !== klineRow.value.id){
-            return 'row-disabled '+commonClass
-        } else {
-            return commonClass
-        }
-        
-    }
-
     return {
         klineRow,
         toggleKline,
-        getRowClass,
         tokenInfo,
         tokenInfoExtra,
         userFavoriteGroups,

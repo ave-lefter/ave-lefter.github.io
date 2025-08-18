@@ -176,7 +176,7 @@ function handleReset() {
 </script>
 
 <template>
-   <div class="flex items-center color-[--d-666-l-999]">
+   <div class="flex items-center color-[--d-666-l-999] px-16px py-12px">
     <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
         <template #default>
           <TokenImg

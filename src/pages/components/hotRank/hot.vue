@@ -31,14 +31,16 @@ import {
   SnipersHeader,
   PriceContent,
   PriceChange,
+  TokenPage,
 } from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
-import type { RowEventHandlerParams } from 'element-plus'
+import type { RowClassNameGetter, RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
 const localeStore = useLocaleStore()
 const globalStore = useGlobalStore()
+const rankKlineStore = useRankKlineStore()
 
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
@@ -66,10 +68,19 @@ function setFilterForm(...args: any[]) {
 }
 const listData = ref<any[]>([])
 const filteredListData = computed(() => {
+  let result = [...listData.value]
   if (globalStore.pumpSetting.isBlacklist) {
-    return listData.value.filter((el) => !inBlackList(el))
+    result = result.filter((el) => !inBlackList(el))
   }
-  return listData.value
+  if(rankKlineStore.klineRow.id){
+    const index = result.findIndex(el => el.id === rankKlineStore.klineRow.id)
+    if(index !== -1){
+      result.splice(index+1,0,{
+        isKline:true
+      })
+    }
+  }
+  return result
 })
 function inBlackList(row) {
   const symbol = row.token0_address === row.target_token ? row.token0_symbol : row.token1_symbol
@@ -90,6 +101,9 @@ const loading = shallowRef(false)
 const columns = useStorage('hotUserTableColumns', getHotDefaultColumns(t))
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
+  if(rowData.isKline){
+    return
+  }
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
 }
 
@@ -243,7 +257,6 @@ const botStore = useBotStore()
 const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
-const rankKlineStore = useRankKlineStore()
 
 async function collect(index: number, row) {
   if (walletAddress.value) {
@@ -362,7 +375,19 @@ const cellRenderer = computed(() => {
   }
 })
 const Row = ({ cells, rowData }) => {
-  
+  if(rowData.isKline){
+    return <TokenPage/>
+  }
+  return cells
+}
+
+function getRowClass({rowData}:Parameters<RowClassNameGetter<any>>[0]) {
+    const commonClass = `color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)] ${rowData.isKline ? 'h-360px' : 'h-81px'}`
+    if(rankKlineStore.klineRow.id && rowData.id !== rankKlineStore.klineRow.id && !rowData.isKline){
+        return 'row-disabled '+commonClass
+    } else {
+        return commonClass
+    }
 }
 </script>
 <template>
@@ -372,10 +397,10 @@ const Row = ({ cells, rowData }) => {
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
-      :row-height="81"
+      :estimated-row-height="81"
       fixed
       style="--el-bg-color: var(--d-111-l-FFF)"
-      :rowClass="rankKlineStore.getRowClass"
+      :rowClass="getRowClass"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"
@@ -408,10 +433,10 @@ const Row = ({ cells, rowData }) => {
           :activeChain="activeChain"
           :childrenData="item.children || []"
           @collect="collect"
-          @toggleKline="(row,rowIndex)=>rankKlineStore.toggleKline(row,rowIndex,columns,listData)"
+          @toggleKline="(row)=>rankKlineStore.toggleKline(row,columns)"
         />
       </template>
-      <template #row="rowProps">
+      <template #row="{style,...rowProps}">
       <Row v-bind="rowProps" />
     </template>
     </AveTable>
