@@ -1,8 +1,9 @@
 <template>
-  <div class="relative" :style="{height: `${kHeight}px`}">
+  <div class="relative" :style="{height: `${isRank ? 294 : kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
   </div>
   <div
+    v-if="!isRank"
     class="w-full cursor-row-resize bg-[--d-222-l-F2F2F2] gap-1px hover:bg-[--d-666-l-CCC] flex items-center justify-center h-4px"
     @mousedown.stop.prevent="drag"
   >

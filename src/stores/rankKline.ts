@@ -32,6 +32,7 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
         ? t('defaultGroup')
         : userFavoriteGroups.value?.find((i) => i.group_id == groupId.value)?.name
     })
+    const pairAddress = computed(()=>pair.value?.pair)
 
     function toggleKline(row,columns) {
         if(klineRow.value.id === row.id){
@@ -114,6 +115,7 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
         twitterType,
         currentGroup,
         editableGroup,
-        editableRemark
+        editableRemark,
+        pairAddress
     }
 })
