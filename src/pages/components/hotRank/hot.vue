@@ -48,6 +48,7 @@ const props = defineProps<{
   activeSubTab?: string
   activeTab?: string
 }>()
+const aveTableRef = useTemplateRef('aveTableRef')
 const sortConditions = ref({
   sort: '',
   sort_dir: '',
@@ -113,15 +114,11 @@ onMounted(() => {
     mounted.value = true
   },20)
   _getTreasureList()
-  window.addEventListener('beforeunload',resetKline)
 })
 
-function resetKline() {
-  if(rankKlineStore.klineRow.id){
-    rankKlineStore.toggleKline(rankKlineStore.klineRow,columns.value)
-  }
-  window.removeEventListener('beforeunload',resetKline)
-}
+onUnmounted(() => {
+  clearTimeout(timer)
+})
 
 // 监听组件激活状态
 onActivated(() => {
@@ -133,12 +130,21 @@ onActivated(() => {
       _getTreasureList()
     }
   }, 100)
+  window.addEventListener('beforeunload',resetKline)
 })
+
+function resetKline() {
+  if(rankKlineStore.klineRow.id){
+    toggleKline(rankKlineStore.klineRow)
+  }
+  window.removeEventListener('beforeunload',resetKline)
+}
 
 onDeactivated(() => {
   console.log('热搜榜停用')
   isActive.value = false
   clearTimeout(timer)
+  resetKline()
   // 停用时取消WebSocket订阅，使用唯一ID
   wsStore.send({
     jsonrpc: '2.0',
@@ -147,19 +153,16 @@ onDeactivated(() => {
     id: 1,
   })
 })
-onActivated(() => {
-  if(!mounted.value){
-    return
-  }
-  clearTimeout(timer)
-  _getTreasureList(false)
-})
-onDeactivated(() => {
-  clearTimeout(timer)
-})
-onUnmounted(() => {
-  clearTimeout(timer)
-})
+// onActivated(() => {
+//   if(!mounted.value){
+//     return
+//   }
+//   clearTimeout(timer)
+//   _getTreasureList(false)
+// })
+// onDeactivated(() => {
+//   clearTimeout(timer)
+// })
 
 watch(
   () => [props.activeChain, localeStore.locale],
@@ -209,6 +212,10 @@ watch(
   ({ prices }) => {
     // 只有在组件激活时才处理数据
     if (!isActive.value) return
+    // k 线出现的时候不处理数据
+    if(rankKlineStore.klineRow.id){
+      return
+    }
 
     const pricesMap = Array.isArray(prices)
       ? prices.reduce((pre, cur) => {
@@ -397,10 +404,40 @@ function getRowClass({rowData}:Parameters<RowClassNameGetter<any>>[0]) {
         return commonClass
     }
 }
+
+function toggleKline(row) {
+    if(rankKlineStore.klineRow.id === row.id){
+      const rowIndex = filteredListData.value.findIndex(el => el.isKline)
+      rankKlineStore.klineRow = {}
+        columns.value[0].fixed='left'
+        // columns.value[columns.value.length-1].fixed='right'
+        _getTreasureList(false)
+        setTimeout(()=>{
+          if(rowIndex !== -1 && aveTableRef.value){
+            aveTableRef.value.scrollToTop((rowIndex-1)*81)
+          }
+        })
+    } else {
+      rankKlineStore.klineRow = row
+        columns.value[0].fixed = ''
+        // columns.value[columns.value.length-1].fixed=''
+        rankKlineStore.getData(row)
+        clearTimeout(timer)
+        setTimeout(()=>{
+          if(aveTableRef.value){
+            const rowIndex = filteredListData.value.findIndex(el => el.isKline)
+            if(rowIndex!==-1){
+              aveTableRef.value.scrollToTop((rowIndex-1)*81)
+            }
+          }
+        },100)
+    }
+}
 </script>
 <template>
   <div v-loading="loading" style="height: calc(100vh - 185px)">
     <AveTable
+      ref="aveTableRef"
       :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
@@ -441,7 +478,7 @@ function getRowClass({rowData}:Parameters<RowClassNameGetter<any>>[0]) {
           :activeChain="activeChain"
           :childrenData="item.children || []"
           @collect="collect"
-          @toggleKline="(row)=>rankKlineStore.toggleKline(row,columns)"
+          @toggleKline="toggleKline"
         />
       </template>
       <template #row="{style,...rowProps}">

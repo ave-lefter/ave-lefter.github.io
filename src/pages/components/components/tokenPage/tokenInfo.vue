@@ -11,6 +11,7 @@ const modeList = [
     {icon:'custom:qrcode',value:Mode.grid,class:'mr-2px'},
     {icon:'custom:bread',value:Mode.list,class:'text-12px'}
 ]
+provide('aiSummary',{})
 </script>
 <template>
   <div class="w-334px borer-left-solid border-left-1px border-left-[--d-1A1A1A-l-F2F2F2] p-12px">

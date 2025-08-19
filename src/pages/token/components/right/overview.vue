@@ -90,14 +90,14 @@
         <span class="color-[--d-999-l-666]">{{ pair?.created_at ? formatDate(pair?.created_at) : '-' }}</span>
       </li>
     </ul> -->
-    <div>
+    <div v-if="!isRank">
       <div  v-if="intro" class="text-14px mb-12px color-[--d-666-l-999]">{{ $t('currencyOverview') }}</div>
       <div class="text-12px color-[--d-999-l-666] token-description">
         <span v-html="showAll ? intro : intro?.slice(0, 250)" />
         <button v-if="intro?.length > 250" class="text-12px color-#3F80F7 bg-transparent outline-none border-none clickable" @click.stop="showAll = !showAll" >{{ !showAll ? $t('more') : $t('expand') }}</button>
       </div>
     </div>
-    <div>
+    <div v-if="!isRank">
       <div class="text-14px mt-12px mb-2px color-[--d-666-l-999]">
         <Icon name="custom:ai" class="text-12px"/> {{ $t('aiSummary') }}
       </div>

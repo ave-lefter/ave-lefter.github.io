@@ -47,19 +47,6 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
       return new BigNumber(price.value || 0).times(circulation.value || 0).toFixed() || '0'
     })
 
-    function toggleKline(row,columns) {
-        if(klineRow.value.id === row.id){
-            klineRow.value = {}
-            columns[0].fixed='left'
-            columns[columns.length-1].fixed='right'
-        } else {
-            klineRow.value = row
-            columns[0].fixed = ''
-            columns[columns.length-1].fixed=''
-            getData(row)
-        }
-    }
-
     function getData(row) {
         const tokenId = row.id
         // 先调用 tokenInfo 接口
@@ -115,7 +102,6 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
 
     return {
         klineRow,
-        toggleKline,
         tokenInfo,
         tokenInfoExtra,
         userFavoriteGroups,
@@ -134,6 +120,7 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
         tokenPrice,
         price,
         circulation,
-        marketCap
+        marketCap,
+        getData
     }
 })
