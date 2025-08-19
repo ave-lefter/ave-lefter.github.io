@@ -1,8 +1,8 @@
-import type { RowClassNameGetter } from 'element-plus'
 import { getFavoriteCheck, getUserFavoriteGroups, type GetUserFavoriteGroupsResponse } from '~/api/fav'
 import { getTokenInfo, getTokenInfoExtra } from '~/api/token'
 import type { TokenInfo, TokenInfoExtra } from '~/api/types/token'
 import { getXType } from '~/api/x'
+import BigNumber from 'bignumber.js'
 
 export const useRankKlineStore = defineStore('rankKline',()=>{
     // ref
@@ -21,7 +21,9 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
     const walletStore = useWalletStore()
     const botStore = useBotStore()
     const {t} = useI18n()
+    const tokenPrice = shallowRef(0)
     // computed
+    const price = computed(() => tokenPrice.value || token.value?.current_price_usd)
     const walletAddress = computed(() => {
       return botStore.evmAddress || walletStore.address
     })
@@ -33,6 +35,17 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
         : userFavoriteGroups.value?.find((i) => i.group_id == groupId.value)?.name
     })
     const pairAddress = computed(()=>pair.value?.pair)
+    const circulation = computed(() => {
+      const circulation = new BigNumber(token.value?.total || 0)
+        .minus(token.value?.lock_amount_dec || 0)
+        .minus(token.value?.other_amount_dec || 0)
+        .minus(token.value?.burn_amount_dec || 0)
+      return circulation.lt(0) ? new BigNumber(0) : circulation
+    })
+  
+    const marketCap = computed(() => {
+      return new BigNumber(price.value || 0).times(circulation.value || 0).toFixed() || '0'
+    })
 
     function toggleKline(row,columns) {
         if(klineRow.value.id === row.id){
@@ -62,12 +75,13 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
             getTokenFavoriteCheck(tokenId)
             getTokenUserFavoriteGroups()
         }
+
+        useCheckStore().getContractCheckResult(tokenId, walletAddress.value)
     }
 
     function _getXType(tokenId:string) {
       getXType(tokenId).then(res => {
         twitterType.value = res.type || 0
-        console.log('twitterType', twitterType.value)
       }).catch(() => {
         twitterType.value = 0
       })
@@ -116,6 +130,10 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
         currentGroup,
         editableGroup,
         editableRemark,
-        pairAddress
+        pairAddress,
+        tokenPrice,
+        price,
+        circulation,
+        marketCap
     }
 })

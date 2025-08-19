@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-16px py-12px color-#999">{{ $t('tokenInfo') }} </div>
+    <div v-if="!isRank" class="text-16px py-12px color-#999">{{ $t('tokenInfo') }} </div>
     <ul class="text-12px mt-10px">
       <li class="flex justify-between mb-12px">
         <span class="color-[--d-666-l-999]">{{ $t('name') }}</span>
@@ -120,7 +120,10 @@ import { formatDate, formatExplorerUrl, isJSON } from '@/utils/index'
 import { useTokenStore } from '~/stores/token'
 import BigNumber from 'bignumber.js'
 const aiSummary = inject<{summary: string, headline: string }>('aiSummary')
-const tokenStore = useTokenStore()
+const props = defineProps<{
+  isRank?:boolean
+}>()
+const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const checkStore = useCheckStore()
 const pair = computed(() => tokenStore.pair)
 const token = computed(() => tokenStore.token)

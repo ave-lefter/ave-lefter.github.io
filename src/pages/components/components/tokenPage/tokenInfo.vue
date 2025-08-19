@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core'
+import GridInfo from './gridInfo.vue'
+import Overview from '~/pages/token/components/right/overview.vue'
 const Mode = {
     grid:'grid',
     list:'list'
@@ -20,5 +22,7 @@ const modeList = [
             </div>
         </div>
     </div>
+    <GridInfo v-if="mode === Mode.grid"/>
+    <Overview v-if="mode === Mode.list" isRank/>
   </div>
 </template>

@@ -7,10 +7,7 @@ const themeStore = useThemeStore()
 const loadingGroupEdit = ref(false)
 const {token,pair,klineRow,twitterType,collected,editableGroup,currentGroup,selectedGroup,userFavoriteGroups,groupId,editableRemark,remark,remark2,tokenInfoExtra} = storeToRefs(useRankKlineStore())
 const medias = computed(() => {
-  if (token.value?.appendix && isJSON(token.value?.appendix)) {
-    return getMedias(JSON.parse(token.value?.appendix),t)
-  }
-  return []
+  return getMedias(token.value?.appendix,t)
 })
 
 function getTags(i: Pair) {
@@ -211,6 +208,7 @@ function handleReset() {
             token?.name
           }}</span>
           <div class="flex items-center justify-start">
+            {{ console.log("medias",medias) }}
             <img v-if="(token?.risk_level??0) < 0" class="bg-btn" src="@/assets/images/fengxian.png" :width="12">
             <div v-if="medias?.length > 0" class="flex text-20px">
               <div v-for="(item, index) in medias" :key="index">
@@ -350,7 +348,6 @@ function handleReset() {
               <Icon name="custom:ai" class="text-14px"/>
             </a>
           </div>
-          <DeBox/>
           <el-popover
             v-if="collected"
             v-model:visible="editableGroup"
@@ -655,7 +652,6 @@ function handleReset() {
               {{ formatNumber(pair?.smart_money_sell_count_24h || 0, 0) }}
             </span>
           </div>
-          <top50 />
         </div>
       </div>
    </div>

@@ -382,7 +382,7 @@ const Row = ({ cells, rowData }) => {
 }
 
 function getRowClass({rowData}:Parameters<RowClassNameGetter<any>>[0]) {
-    const commonClass = `color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)] ${rowData.isKline ? 'h-360px [--el-table-row-hover-bg-color:transparent]' : 'h-81px'}`
+    const commonClass = `color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)] ${rowData.isKline ? 'h-360px [--el-table-row-hover-bg-color:transparent] overflow-visible!' : 'h-81px'}`
     if(rankKlineStore.klineRow.id && rowData.id !== rankKlineStore.klineRow.id && !rowData.isKline){
         return 'row-disabled '+commonClass
     } else {

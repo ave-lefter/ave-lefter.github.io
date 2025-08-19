@@ -1,5 +1,5 @@
 <template>
-  <div class="relative" :style="{height: `${isRank ? 294 : kHeight}px`}">
+  <div class="relative" :style="{height: `${isRank ? 290 : kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
   </div>
   <div
@@ -31,7 +31,7 @@ const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const botStore = useBotStore()
 const route = useRoute()
 const token = computed(() => {
-  return route.params.id as string
+  return props.isRank ? tokenStore.klineRow?.id : route.params.id as string
 })
 
 const klinePair = ref('')
@@ -66,7 +66,7 @@ const amm = computed(() => {
 
 let loading = false
 
-watch(() => route.params.id, (val) => {
+watch(() => token.value, (val) => {
   if (!val) return
   if (_widget?.activeChart()) {
     _widget?.activeChart()?.removeAllShapes?.()
@@ -96,7 +96,7 @@ function switchTokenKline() {
     if (_widget) {
       _widget?.resetCache?.()
       _widget?.activeChart?.()?.clearMarks?.()
-      _widget?.setSymbol?.(symbol.value + '---' + route.params.id + val, resolution.value as ResolutionString, () => {
+      _widget?.setSymbol?.(symbol.value + '---' + token.value + val, resolution.value as ResolutionString, () => {
         isReadyLine = true
         // createHeaderButton()
       })
@@ -456,7 +456,7 @@ async function initChart() {
           const params = {
             interval: interval,
             pair_id: pair.value + '-' + chain.value,
-            token_id: pair.value ? undefined : route.params.id as string,
+            token_id: pair.value ? undefined : token.value,
             from,
             to: firstDataRequest ? 0 : Math.max(to, firstBarTime || 0)
           }
@@ -661,7 +661,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsSto
     if (event === WSEventType.SIMPLE_TX || event === WSEventType.TX) {
       const tx: SimpleWSTx | WSTx = data?.msg
       const interval = switchResolution(resolution)
-      const t = getAddressAndChainFromId(route.params.id as string)?.address
+      const t = getAddressAndChainFromId(token.value)?.address
       let target = ''
       if ('target' in tx) {
         target = tx.target
