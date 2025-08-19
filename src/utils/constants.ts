@@ -96,7 +96,7 @@ export const BusEventType = {
 export const ProvideType = {
   HOT_TOKENS: 'hot-tokens',
 }
-export const SupportFullDataChain = ['solana', 'bsc']
+export const SupportFullDataChain = ['solana', 'bsc','eth']
 
 export const defaultPaginationParams = {
   pageNO: 1,

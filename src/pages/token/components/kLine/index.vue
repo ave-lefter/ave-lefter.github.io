@@ -306,11 +306,15 @@ async function initChart() {
         return {
           format: (price) => {
             if (showMarket.value) {
-              return formatNumber(price, 2)
+              return formatNumber(price, {
+                decimals: 2,
+                locale: 'en'
+              })
             }
             return String(formatNumber(price, {
               decimals: 4,
-              limit: 6
+              limit: 6,
+              locale: 'en'
             }))
           },
         }

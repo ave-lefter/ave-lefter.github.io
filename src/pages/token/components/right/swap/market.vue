@@ -67,7 +67,7 @@
       :disabled="(priceImpactV && priceImpactV?.gt?.(0.4)) || !checkAmount() || !fromAmount || !toAmount"
       native-type="submit"
     >
-      <span v-if="Number(swapStore.fromToken.balance) === 0 || Number(swapStore.fromToken.balance) < Number(fromAmount) || walletStore.address === '' || ((swapStore.isERC314 || swapStore.isFourMeme || swapStore.isFlap || swapStore.isSunPump > 0) && swapStore.token2.address !== NATIVE_TOKEN) || ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112') ">
+      <span v-if="Number(swapStore.fromToken.balance) === 0 || Number(swapStore.fromToken.balance) < Number(fromAmount) || walletStore.address === '' || ((swapStore.isERC314 || swapStore.isFourMeme || swapStore.isFlap || swapStore.isSunPump > 0 || swapStore.isDyorswapfun) && swapStore.token2.address !== NATIVE_TOKEN) || ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112') ">
         {{ checkAmountMessage() }}
       </span>
       <span v-else-if="priceImpactV && priceImpactV?.gt?.(0.4)">
@@ -95,7 +95,7 @@
           <span>${{ getAvgPrice() }}</span>
         </div>
       </li>
-      <li v-show="(fromAmount && toAmount)">
+      <li v-show="(fromAmount && toAmount) && !swapStore.isDyorswapfun">
         <div class="swap-label_item-left">
           <span>{{ $t('priceImpact') }}</span>
           <i
@@ -170,7 +170,7 @@ import SelectRouter from './selectRouter.vue'
 import ConfirmSwap from './confirmSwap.vue'
 import { formatNumber } from '@/utils/formatNumber'
 import BigNumber from 'bignumber.js'
-import { allowance, quoteBestRouterV2, quoteSunPump, quoteFourMeme, quoteERC314, ERC314Swap, sunPumpSwap, fourMemeSwap, swapV2, getNativeTokenPrice, approve, getSuiQuote, buildSuiTx } from '~/api/swap'
+import { allowance, quoteBestRouterV2, quoteSunPump, quoteFourMeme, quoteERC314, ERC314Swap, sunPumpSwap, fourMemeSwap, swapV2, getNativeTokenPrice, approve, getSuiQuote, buildSuiTx, quoteDyorswapfunPump, dyorswapfunPumpSwap } from '~/api/swap'
 import { MIN_BALANCE, SwapContracts } from '@/utils/wallet/utils/constants'
 import { useSwapStore } from '~/stores/swap'
 import { ElMessageBox } from '#imports'
@@ -401,6 +401,7 @@ const swapQuoteInfo = ref<{
   isFourMeme?: boolean
   isSunPump?: number
   isERC314?: boolean
+  isDyorswapfun?: boolean
   toWrapper?: number
 }>({
   fromToken: {
@@ -449,7 +450,7 @@ const isOnlyGetAmountsOut = computed(() => {
   const ammList = ['viridian', 'aerodrome', 'flapswap']
   const isFourMemeOnlyGetAmountsOut = tokenStore?.pairs?.[0]?.amm && ['fourmeme', 'fourmemev2']?.includes(tokenStore?.pairs?.[0]?.amm)
   const isOneWaySwap = tokenStore?.pairs?.[0]?.amm && ammList.includes(tokenStore?.pairs?.[0]?.amm)
-  return swapStore.chain === 'ton' || swapStore.chain === 'sui' || isOneWaySwap || isFourMemeOnlyGetAmountsOut || false
+  return swapStore.chain === 'ton' || swapStore.chain === 'sui' || isOneWaySwap || isFourMemeOnlyGetAmountsOut || swapStore.isDyorswapfun || false
 })
 
 const countdownSeconds = 15
@@ -528,6 +529,9 @@ function getAllowance() {
     let spender = swapStore.isFourMeme ? swapQuoteInfo.value?.quoteResult?.tokenManager : getSwapContract(chain)
     const sunPumpRouter = ['', 'TTfvyrAz86hbZk5iDpKD78pqLGgi8C7AAw', 'TZFs5ch1R1C4mmjwrrmZqeqbUgGpxY1yWB'][swapStore.isSunPump]
     spender = sunPumpRouter ? sunPumpRouter : spender
+    if (chain === 'xlayer' && swapStore.isDyorswapfun) {
+      spender = '0xfd947a61e2c54413031ddb1f754dbe0e696efa09'
+    }
     loadingAllowance.value = true
     allowance(swapStore.fromToken.address, spender).then(res => {
       swapStore.allowance = res.toString()
@@ -659,6 +663,14 @@ async function dealGetQuoteInfo(isAmount: boolean, chain: string) {
         return
       }
     }
+
+    if (chain === 'xlayer') {
+      const isPumpCanSwap = !(swapStore.isDyorswapfun && swapStore.token2.address !== NATIVE_TOKEN && swapStore.token2.chain === 'xlayer')
+      if (!isPumpCanSwap) {
+        return
+      }
+    }
+
     quoteLoading.value = true
     const params = {
       from_token: swapStore.fromToken.address,
@@ -715,6 +727,42 @@ async function dealGetQuoteInfo(isAmount: boolean, chain: string) {
       return
     }
 
+    if (swapStore.isDyorswapfun) {
+      try {
+        const [token1Id, token2Id] = [swapStore.fromToken?.address + '-' + swapStore.fromToken?.chain, swapStore.toToken?.address + '-' + swapStore.toToken?.chain]
+        const prices = await getTokensPrice([token1Id, token2Id])
+        const from_price = prices?.[0]?.current_price_usd || 0
+        const to_price = prices?.[1]?.current_price_usd || 0
+        const res = quoteDyorswapfunPump({...params, from_price, to_price, pairs: (swapStore.baseToken?.pairs || [])}, chain)
+        toAmount.value = formatUnits(res || '0', swapStore.toToken?.decimals)
+        swapRouterPath.value = [
+          {
+            symbol: swapStore.fromToken?.symbol,
+            nextAmm: 'dyorswapfun'
+          },
+          {
+            symbol: swapStore.toToken?.symbol,
+            nextAmm: ''
+          }
+        ]
+        swapQuoteInfo.value.fromAmount = parseUnits(fromAmount.value, swapStore.fromToken?.decimals).toFixed(0)
+        swapQuoteInfo.value.toAmount = parseUnits(toAmount.value, swapStore.toToken?.decimals).toFixed(0)
+        swapQuoteInfo.value.fromToken = {...swapStore.fromToken, amount: swapQuoteInfo.value.fromAmount}
+        swapQuoteInfo.value.toToken = {...swapStore.toToken, amount: swapQuoteInfo.value.toAmount}
+        // swapQuoteInfo.value.quoteResult = {...res}
+        swapQuoteInfo.value.isAmountOut = !isAmount
+        swapQuoteInfo.value.isDyorswapfun = true
+        getAllowance()
+        swapQuoteInfo.value.from_price = from_price
+        swapQuoteInfo.value.to_price = to_price
+        quoteLoading.value = false
+      } catch (err) {
+        quoteLoading.value = false
+        handleError(err)
+      }
+      return
+    }
+
     if (chain === 'tron' && swapStore.isSunPump > 0) {
       try {
         const res = await quoteSunPump({...params, isSunPump: swapStore.isSunPump}, chain)
@@ -756,7 +804,7 @@ async function dealGetQuoteInfo(isAmount: boolean, chain: string) {
     }
 
     const pairs = swapStore.baseToken?.pairs
-    if (pairs?.[0]?.target_token === pairs?.[0]?.pair && pairs?.[0]?.pair) {
+    if (pairs?.[0]?.target_token === pairs?.[0]?.pair && pairs?.[0]?.pair && chain !== 'xlayer') {
       const res = await quoteERC314(params, chain)
       console.log('res', res)
       if (res) {
@@ -1014,7 +1062,7 @@ function checkAmount() {
   }
   const fromTokenBalance = swapStore.fromToken.balance || 0
   const isPump = ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112')
-  const isBscPump = (swapStore.isFourMeme || swapStore.isFlap) && swapStore.token2.address !== NATIVE_TOKEN
+  const isBscPump = (swapStore.isFourMeme || swapStore.isFlap || swapStore.isDyorswapfun) && swapStore.token2.address !== NATIVE_TOKEN
   const isTronPump = swapStore.isSunPump > 0 && swapStore.token2.address !== NATIVE_TOKEN
   return !(
     Number(fromTokenBalance) === 0 ||
@@ -1057,6 +1105,16 @@ function getSwapGas() {
         swapSubmitInfo.value = {...res, isERC314: true}
         swapInfo.value = res.swapInfo
         swapInfo.value.gasValue = res.gasValue
+        swapInfo.value.swapRouterPath = swapRouterPath.value
+      }).catch(err => {
+        handleError(err)
+      })
+    } else if (swapQuoteInfo.value?.isDyorswapfun) {
+      dyorswapfunPumpSwap(swapQuoteInfo.value as any, slippage.value).then(async (res) => {
+        swapSubmitInfo.value = {...res, isDyorswapfun: true}
+        swapInfo.value = res.swapInfo as any
+        swapInfo.value.gasValue = res.gasValue
+        console.log('gasValue', res.gasValue)
         swapInfo.value.swapRouterPath = swapRouterPath.value
       }).catch(err => {
         handleError(err)
@@ -1333,6 +1391,9 @@ async function _approve() {
   let spender = swapStore.isFourMeme ? swapQuoteInfo.value?.quoteResult?.tokenManager : getSwapContract(chain.value)
   const sunPumpRouter = ['', 'TTfvyrAz86hbZk5iDpKD78pqLGgi8C7AAw', 'TZFs5ch1R1C4mmjwrrmZqeqbUgGpxY1yWB'][swapStore.isSunPump]
   spender = sunPumpRouter ? sunPumpRouter : spender
+  if (walletStore.chain  === 'xlayer' && swapStore.isDyorswapfun) {
+    spender = '0xfd947a61e2c54413031ddb1f754dbe0e696efa09'
+  }
   approve(swapStore.fromToken.address, spender).then(res => {
     return res.wait()
   })
@@ -1351,7 +1412,7 @@ async function _approve() {
 function checkAmountMessage() {
   const fromTokenBalance = swapStore.fromToken.balance || 0
   const isPump = ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112')
-  const isBscPump = (swapStore.isFourMeme || swapStore.isFlap) && swapStore.token2.address !== NATIVE_TOKEN
+  const isBscPump = (swapStore.isFourMeme || swapStore.isFlap || swapStore.isDyorswapfun) && swapStore.token2.address !== NATIVE_TOKEN
   const isTronPump = swapStore.isSunPump > 0 && swapStore.token2.address !== NATIVE_TOKEN
   const walletAddress = walletStore.address
   if (!walletAddress) {
@@ -1457,6 +1518,24 @@ function getSwapTx(isOpenSwap = true) {
       swapSubmitInfo.value = {...res, isERC314: true}
       swapInfo.value = res.swapInfo
       swapInfo.value.gasValue = res.gasValue
+      swapInfo.value.swapRouterPath = swapRouterPath.value
+      loadingSwap.value = false
+      if (isOpenSwap) {
+        dialogVisibleSwap.value = true
+      }
+    }).catch(err => {
+      loadingSwap.value = false
+      handleError(err)
+    })
+    _getNativeTokenPrice()
+    _getGasPrice()
+  } else if (swapQuoteInfo.value?.isDyorswapfun) {
+    loadingSwap.value = true
+    dyorswapfunPumpSwap(swapQuoteInfo.value as any, slippage.value).then(async (res) => {
+      swapSubmitInfo.value = {...res, isDyorswapfun: true}
+      swapInfo.value = res?.swapInfo as typeof swapInfo.value
+      swapInfo.value.gasValue = res?.gasValue || '0'
+      console.log('gasValue', res.gasValue)
       swapInfo.value.swapRouterPath = swapRouterPath.value
       loadingSwap.value = false
       if (isOpenSwap) {
