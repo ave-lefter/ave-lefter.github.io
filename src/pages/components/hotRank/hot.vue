@@ -113,7 +113,15 @@ onMounted(() => {
     mounted.value = true
   },20)
   _getTreasureList()
+  window.addEventListener('beforeunload',resetKline)
 })
+
+function resetKline() {
+  if(rankKlineStore.klineRow.id){
+    rankKlineStore.toggleKline(rankKlineStore.klineRow,columns.value)
+  }
+  window.removeEventListener('beforeunload',resetKline)
+}
 
 // 监听组件激活状态
 onActivated(() => {
