@@ -504,5 +504,10 @@
   "blockHeight": "Bloquear",
   "withdrawAgain": "Retirarse de nuevo",
   "trading": "comercio",
-  "withdrawTip": "0.002 es necesario para garantizar el uso normal de la función de la billetera"
+  "withdrawTip": "0.002 es necesario para garantizar el uso normal de la función de la billetera",
+  "holdersNum": "Número de monedas mantenidas",
+  "holdersAnalysis": "Análisis de titulares",
+  "holdersNumTotal": "Titulares Total",
+  "holdersTotalChange": "Cambio de titulares",
+  "holdersChange": "Cambio de titulares"
 }

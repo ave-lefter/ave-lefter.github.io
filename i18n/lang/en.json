@@ -1126,48 +1126,39 @@
   "followBuy": "Follow Buy",
   "followSell": "Follow Sell",
   "devSell": "DEV sells and sells",
-
   "moreOptions": "More options",
   "downloadAve": "Download Ave.ai APP",
   "downloadSubtitle": "Secure,Professional,Fastest, Decentralized Aggregated Trading Platform",
   "downloadByScanCode": "Scan to download",
   "appFaq": "Installation tutorial",
   "deskApp": "Desktop App",
-
   "glodDogTitle": "Cross-Chain Leaderboard. Moonshots Start Here.",
   "glodDogSubTitle": "Real-time tracking of trending launches, smart money buys, and top gainers.Don’t be late — front-run the next pump.",
   "glodDesTitle": "AI Narrative Analysis",
   "glodDesSubtitle": "AI-Powered Token Background Analytics",
-
   "signTitle": "Signal Arena is Live — Start Hunting GoldDogs!",
   "signSubTitle": "KOLs, whales, and smart money are scanning the market. On-chain signals fire in real time.Your next 100x moonshot might hit this very second.",
   "signDesTitle": "Signal Plaza",
   "signDesSubtitle": "AI-Scouted Alpha Signals Across Chains",
-
   "tokenTitle": "AI Contract Scanning ",
   "tokenTitle1": " & Risk Alerts",
   "tokenSubTitle": "Enhanced detection of abnormal smart contracts.Pinpoint the exact risky code segments with precision.",
   "tokenDesTitle": "AI Contract",
   "tokenDesSubtitle": "AI-Powered Anomaly Contract Detection",
-
   "safeTitle": "Safer Trades & Faster Reactions",
   "safeDes": "On-chain transparent locking ensures every trade is secured. Follow smart money moves and seize market momentum in seconds.",
-
   "buyAndSell": "One-Click Trading, Straight On-Chain",
   "buyAndSellTitle1": "Instant market/limit switching with optimal route aggregation",
   "buyAndSellTitle2": "Support one-click buy/sell via direct integration with Aveswap",
   "buyAndSellTitle3": "Full-chain transparency — clear lock, slippage, and fee display",
-
   "walletTitle": "Wallet Deep Dive Real P&L",
   "walletTitle1": "Fully Revealed",
   "walletDes": "Multi-dimensional fund flow analysis to uncover the true intentions behind every on-chain move.",
   "walletTitle2": "Multi-Dimensional Wallet System — Unlock Every On-Chain Possibility",
   "walletDes2": "Seamlessly switch between multiple account states.Redefine identity management and interaction on-chain.",
-
   "tagTitle": "Multi-Dimensional Address Profiling — Visualize Behavioral Bias at a Glance",
   "tagDes": "Trading styles, buy/sell patterns, and address tags — all instantly classified and easy to understand.",
   "joinTelegram": "Join Ave.ai Telegram",
-
   "Gem": "Gem",
   "Smarters": "Smarters",
   "BigBuy": "BigBuy",
@@ -1188,7 +1179,6 @@
   "Bundle": "Bundle",
   "Exit": " Exit ",
   "Phishing": "Phishing",
-
   "help": "Help",
   "Android": "Android",
   "Ios": "IOS",
@@ -1328,5 +1318,10 @@
   "BlackListToken": "BlackList of Token",
   "BlackListDev": "BlackList of Dev",
   "searchKol": "Search KOL",
-  "searchKolPlaceholder": "Please enter the KOL address"
+  "searchKolPlaceholder": "Please enter the KOL address",
+  "holdersNum": "Holders Num",
+  "holdersAnalysis": "Holders Analysis",
+  "holdersNumTotal": "Holders Total",
+  "holdersTotalChange": "Holders Change",
+  "holdersChange": "Holders Change"
 }
