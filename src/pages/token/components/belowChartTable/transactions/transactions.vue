@@ -28,7 +28,7 @@ const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
 
-const MAKER_SUPPORT_CHAINS = ['solana', 'bsc']
+// const MAKER_SUPPORT_CHAINS = ['solana', 'bsc']
 const { t } = useI18n()
 const {totalHolders, pairAddress, token, pair, commonHeight} = storeToRefs(useTokenStore())
 const tokenDetailSStore = useTokenDetailsStore()
@@ -630,7 +630,7 @@ function getGradient(row: IGetTokenTxsResponse) {
 }
 
 function openMarkerTooltip(row: IGetTokenTxsResponse & { senderProfile: Profile }, e: MouseEvent) {
-  if (row && MAKER_SUPPORT_CHAINS.includes(row.chain)) {
+  if (row && SupportFullDataChain.includes(row.chain)) {
     makerTooltip.value = e.currentTarget
     if (currentRow.value?.wallet_address === row.wallet_address) {
       return

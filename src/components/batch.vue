@@ -46,7 +46,7 @@
             >
           </template>
           <el-option
-            v-for="item in ['solana', 'bsc']"
+            v-for="item in SupportFullDataChain"
             :key="item"
             :label="getChainInfo(item)?.name"
             :value="item"
@@ -103,7 +103,7 @@
             >
           </template>
           <el-option
-            v-for="item in ['solana', 'bsc']"
+            v-for="item in SupportFullDataChain"
             :key="item"
             :label="getChainInfo(item)?.name"
             :value="item"
@@ -152,7 +152,7 @@
             >
           </template>
           <el-option
-            v-for="item in ['solana', 'bsc']"
+            v-for="item in SupportFullDataChain"
             :key="item"
             :label="getChainInfo(item)?.name"
             :value="item"
@@ -251,7 +251,7 @@ watch(tabActive, (val) => {
 const copyToClipboard = async () => {
   try {
     await navigator.clipboard.writeText(exportStr.value)
-    ElMessage.success(t('copy')+" "+t('success'))
+    ElMessage.success(t('copy')+' '+t('success'))
   } catch (err) {
     console.error('copy failed:', err)
   }
@@ -261,7 +261,7 @@ const getClipboardContent = async () => {
   try {
     const text = await navigator.clipboard.readText()
     importStr.value = text
-    ElMessage.success(t('paste')+" "+t('success'))
+    ElMessage.success(t('paste')+' '+t('success'))
     validateInput()
   } catch (err) {
     console.error('paste failed:', err)

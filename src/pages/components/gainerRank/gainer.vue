@@ -114,14 +114,14 @@ onActivated(() => {
   isActive.value = true
   filterForm.value = {}
   pageInfo.value.pageNO = 1
-  
+
   const cacheKey = getCacheKey()
   const cachedData = tableDataCache[cacheKey]
-  
+
   if (cachedData && (Date.now() - cachedData.timestamp) < 10000) {
     listData.value = cachedData.data
     pageInfo.value.total = cachedData.total
-    
+
     setTimeout(() => {
       if (isActive.value) {
         _getTreasureList(false)
@@ -160,12 +160,12 @@ watch(
   () => {
     const cacheKey = getCacheKey()
     const cachedData = tableDataCache[cacheKey]
-    
+
     if (cachedData && (Date.now() - cachedData.timestamp) < 30000) {
       listData.value = cachedData.data
       pageInfo.value.total = cachedData.total
       pageInfo.value.pageNO = 1
-      
+
       setTimeout(() => {
         _getTreasureList(false)
       }, 100)
@@ -184,20 +184,20 @@ async function _getTreasureList(shouldLoading = true) {
     if (props.activeTab !== 'gainer') {
       return
     }
-    
+
     const cacheKey = getCacheKey()
     const currentRefreshId = cacheKey
-    
+
     const cachedData = tableDataCache[cacheKey]
     if (cachedData && !shouldLoading) {
       listData.value = cachedData.data
       pageInfo.value.total = cachedData.total
     }
-    
+
     if (shouldLoading) {
       loading.value = true
     }
-    
+
     const { total: _, ...rest } = pageInfo.value
 
     const requestParams: any = {
@@ -208,9 +208,9 @@ async function _getTreasureList(shouldLoading = true) {
     }
 
     if (currentRefreshId === refreshId.value && pageInfo.value.total > 0) {
-      requestParams.refresh_total = 0  
+      requestParams.refresh_total = 0
     } else {
-      refreshId.value = currentRefreshId 
+      refreshId.value = currentRefreshId
     }
 
     const chainValue = props.activeChain !== 'AllChains' ? props.activeChain : ''
@@ -223,21 +223,21 @@ async function _getTreasureList(shouldLoading = true) {
     }
 
     const res = await getTreasureList(requestParams)
-    
+
     if (requestParams.refresh_total !== 0) {
       pageInfo.value.total = res.total
     }
-    
+
     const processedData = (res.data || []).map(props.listMapFunction)
     listData.value = processedData
-    
+
     // 更新缓存
     tableDataCache[cacheKey] = {
       data: processedData,
       total: res.total,
       timestamp: Date.now()
     }
-    
+
     if (shouldLoading) {
       initWs()
     }
@@ -250,13 +250,13 @@ async function _getTreasureList(shouldLoading = true) {
     try {
       const res = await getPriceChangeTopTokens()
       const processedData = Array.isArray(res) ? res : (res.data || [])
-      
+
       // 应用链筛选
       let filteredData = processedData
       if (props.activeChain !== 'AllChains') {
         filteredData = processedData.filter(item => item.chain === props.activeChain)
       }
-      
+
       listData.value = filteredData.map(props.listMapFunction)
       pageInfo.value.total = filteredData.length || 0
     } catch (fallbackError) {
@@ -280,18 +280,18 @@ watch(
   () => wsStore.wsResult[WSEventType.PRICE_EXTRA],
   ({ prices }) => {
     if (!isActive.value || !listData.value.length) return
-    
+
     if (!prices) return
-    
+
     console.log('WebSocket价格更新:', prices.length, '个币种')
-    
+
     const pricesMap = Array.isArray(prices)
       ? prices.reduce((pre, cur) => {
           pre[cur.pair + '-' + cur.chain] = cur
           return pre
         }, {})
       : {}
-    
+
     const updateList = listData.value.map((el) => {
       const item = pricesMap[el.pair + '-' + el.chain]
       if (item) {
@@ -300,7 +300,7 @@ watch(
           ...el,
           current_price_usd: item.uprice,
           price_change_1m: item.price_change_1m,
-          price_change_15m: item.price_change_15m, 
+          price_change_15m: item.price_change_15m,
           price_change_24h: item.price_change_24h,
           volume_24h: item.volume_24h,
           volume_1h: item.volume_1h,
@@ -313,7 +313,7 @@ watch(
       }
       return el
     })
-    
+
     // 应用当前排序条件
     const { sort, sort_dir } = sortConditions.value
     if (sort && sort_dir) {
@@ -331,7 +331,7 @@ watch(
         return bChange - aChange
       })
     }
-    
+
     // 同时更新缓存中的数据，保持一致性
     const cacheKey = getCacheKey()
     if (tableDataCache[cacheKey]) {
@@ -349,7 +349,7 @@ function initWs() {
     params: ['price_extra'],
     id: 1,
   })
-  
+
   // 重新订阅价格更新，使用唯一ID和标识符
   const params = listData.value.map((el) => `${el.pair}-${el.chain}`)
   wsStore.send({
@@ -420,7 +420,7 @@ const filterMap = {
   insider_balance_ratio_cur: (el: any) => el.isVisible && props.activeChain === 'bsc',
   price_change_dynamic: (el: any) =>
     el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval),
-  quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible && !walletStore.address,
+  quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible,
 }
 
 const visibleColumns = computed(() => {

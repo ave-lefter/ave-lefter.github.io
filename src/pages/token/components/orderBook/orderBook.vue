@@ -150,6 +150,10 @@
                   :canEdit="false"
                   @update-remark="updateRemark"
                 />
+                <!-- 添加交易次数显示 -->
+                <div v-if="row.count && row.count > 1" class="color-[--d-999-l-666] text-xs ml-2px whitespace-nowrap">
+                  ({{ row.count }})
+                </div>
               </div>
             </div>
 

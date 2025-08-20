@@ -5,7 +5,7 @@
     trigger="click"
   >
     <template #reference>
-      <button class="text-12px bg-[--d-222-l-F2F2F2] rounded-4px p-8px ml-8px h-32px flex items-center clickable color-[--d-F5F5F5-l-333] border-none">
+      <button class="text-12px bg-[--d-141721-l-E8F1FF] rounded-4px p-8px ml-8px h-32px flex items-center clickable color-[--d-F5F5F5-l-333] border-none">
         <img height="24" class="mr-5px rd-50%" :src="`${configStore.token_logo_url}chain/${walletStore.chain}.png`" :alt="walletStore.chain" onerror="this.src='/icon-default.png'">
         <span>{{ currentAccountSplit }}</span>
       </button>

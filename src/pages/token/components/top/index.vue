@@ -42,7 +42,9 @@
       <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" >
         <template #content>
           <el-image
-            class="token-icon  h-228px w-228px items-center"
+            class="token-icon items-center max-w-228px max-h-228px w-228px flex items-center justify-center"
+            style="display: flex"
+            fit="cover"
             :src="getSymbolDefaultIcon(token)"
             lazy
           >
@@ -100,6 +102,35 @@
           }}</span>
           <div class="flex items-center justify-start">
             <img v-if="(token?.risk_level??0) < 0" class="bg-btn" src="@/assets/images/fengxian.png" :width="12">
+            <!-- <div v-if="medias?.length > 0" class="flex text-20px">
+              <div v-for="(item, index) in medias" :key="index" class="tag-btn">
+                <template v-if="item.url">
+                  <span
+                    v-if="item.name === 'QQ'"
+                    v-tooltip="item.url"
+                    class="bg-btn"
+                  >
+                    <Icon
+                      :name="`custom:${item.icon}`"
+                      class="text-[--d-666-l-999] text-12px"
+                    />
+                  </span>
+                  <a
+                    v-else
+                    v-tooltip="item.url"
+                    :href="item.url"
+                    target="_blank"
+                    class="bg-btn"
+                    @click.stop
+                  >
+                    <Icon
+                      :name="`custom:${item.icon}`"
+                      class="text-[--d-666-l-999] text-12px"
+                    />
+                  </a>
+                </template>
+              </div>
+            </div> -->
             <div v-if="medias?.length > 0" class="flex text-20px">
               <div v-for="(item, index) in medias" :key="index" class="tag-btn">
                 <template v-if="item.url">
@@ -113,6 +144,26 @@
                       class="text-[--d-666-l-999] text-12px"
                     />
                   </span>
+                  <XPopup v-else-if="item.icon === 'twitter'" :tokenId="(route.params.id as string)" :type="tokenStore.twitterType">
+                    <a
+                      :href="item.url"
+                      target="_blank"
+                      class="bg-btn"
+                      @click.stop
+                    >
+                      <XIcon
+                        v-if="[1, 2, 3].includes(tokenStore.twitterType)"
+                        :type="tokenStore.twitterType"
+                        class="text-12px"
+                      />
+                      <Icon
+                        v-else
+                        :name="`custom:${item.icon}`"
+                        class="text-[--d-666-l-999] text-12px"
+                      />
+                    </a>
+                  </XPopup>
+
                   <a
                     v-else
                     v-tooltip="item.url"
@@ -175,55 +226,6 @@
                 </span>
               </div>
             </template>
-            <div v-if="medias?.length > 0" class="flex text-20px">
-              <div v-for="(item, index) in medias" :key="index" class="tag-btn">
-                <template v-if="item.url">
-                  <span
-                    v-if="item.name === 'QQ'"
-                    v-tooltip="item.url"
-                    class="bg-btn"
-                  >
-                    <Icon
-                      :name="`custom:${item.icon}`"
-                      class="text-[--d-666-l-999] text-12px"
-                    />
-                  </span>
-                  <XPopup v-else-if="item.icon === 'twitter'" :tokenId="(route.params.id as string)" :type="tokenStore.twitterType">
-                    <a
-                      :href="item.url"
-                      target="_blank"
-                      class="bg-btn"
-                      @click.stop
-                    >
-                      <XIcon
-                        v-if="[1, 2, 3].includes(tokenStore.twitterType)"
-                        :type="tokenStore.twitterType"
-                        class="text-12px"
-                      />
-                      <Icon
-                        v-else
-                        :name="`custom:${item.icon}`"
-                        class="text-[--d-666-l-999] text-12px"
-                      />
-                    </a>
-                  </XPopup>
-
-                  <a
-                    v-else
-                    v-tooltip="item.url"
-                    :href="item.url"
-                    target="_blank"
-                    class="bg-btn"
-                    @click.stop
-                  >
-                    <Icon
-                      :name="`custom:${item.icon}`"
-                      class="text-[--d-666-l-999] text-12px"
-                    />
-                  </a>
-                </template>
-              </div>
-            </div>
             <img
               v-if="token?.launchpad"
               v-tooltip="token.launchpad"

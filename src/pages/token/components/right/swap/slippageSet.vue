@@ -17,7 +17,7 @@
           <el-icon
             :size="15"
             color="#80838B"
-            style="cursor: pointer; margin-left: 5px"
+            style="cursor: pointer; margin-left: 5px;margin-right: auto;"
             @click.stop="openSlippageTips"
           >
             <QuestionFilled />

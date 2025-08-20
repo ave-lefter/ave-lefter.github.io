@@ -228,7 +228,17 @@ function updateActiveChain(chain: string) {
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const isSupportedChain = computed(()=>{
-  return !walletStore.address && (props.activeChain==='AllChains' || botStore.isSupportChains.includes(props.activeChain))
+  return (props.activeChain==='AllChains' || botStore.isSupportChains.includes(props.activeChain))
+})
+watch(()=>props.categories,()=>{
+  setTimeout(()=>{
+    const index = supportCategories.value.findIndex((el) => {
+      return el.category === props.activeTab
+    })
+    if (index > -1) {
+      scrollTabToCenter(categoryRef, index)
+    }
+  },20)
 })
 </script>
 

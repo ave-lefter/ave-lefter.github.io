@@ -1,5 +1,5 @@
 <template>
-  <div v-if="userAddress && chain" className="flex flex-col w-full gap-3 p-[20px] pt-[10px] bg-[var(--d-111-l-FFF)] pb-0 overflow-y-auto" style="max-height: calc(100vh - 92px);">
+  <div v-if="userAddress && chain" ref="scrollRef" className="flex flex-col w-full gap-3 p-[20px] pt-[10px] bg-[var(--d-111-l-FFF)] pb-0 overflow-y-auto" style="max-height: calc(100vh - 92px);">
     <div class="flex-between">
       <el-select
         :style="{ width: '120px' }"
@@ -19,7 +19,7 @@
           :label="getChainInfo(_chain)?.name"
           :value="_chain"
         >
-          <div class="flex-center" style="gap: 4px">
+          <div class="flex-start" style="gap: 4px">
             <ChainToken :chain="_chain" :width="16"/>
             {{ getChainInfo(_chain)?.name }}
           </div>
@@ -73,7 +73,7 @@
     />
   </div>
 
-  <div v-else class="flex flex-col w-full h-full p-[10%] bg-[var(--d-111-l-FFF)] items-center pb-0">
+  <div v-else ref="scrollRef" class="flex flex-col w-full h-full p-[10%] bg-[var(--d-111-l-FFF)] items-center pb-0">
     <div
       v-if="['bsc', 'solana'].includes(chain)"
       className="flex flex-col w-full gap-3 p-[20px] pt-[10px] pb-0"
@@ -166,11 +166,13 @@ import ActivityCharts from './components/activityCharts.vue'
 import PageBlank from './components/pageBlank.vue'
 import PageOther from './components/pageOther.vue'
 import { getChainInfo } from '@/utils'
+import { useEventBus } from '@vueuse/core'
 
 const isVolUSDT = ref(true)
 provide('isVolUSDT', isVolUSDT)
 
 const interval = ref('7D')
+const scrollRef = useTemplateRef('scrollRef')
 const route = useRoute()
 const botStore = useBotStore()
 const themeStore = useThemeStore()
@@ -218,10 +220,9 @@ const intervalText = computed(() => {
   return options.find((item) => interval.value === item.id)?.name
 })
 const smartChains = computed(() => {
-  const chainIds = ['solana', 'bsc']
   // 如果是自己的钱包地址且为 bot 钱包那么展示所有的链，链钱包后面再改
   if (botStore.evmAddress && isSelfAddress.value) {
-    const botChains = botStore.userInfo?.addresses?.filter?.((el) => chainIds.includes(el.chain))
+    const botChains = botStore.userInfo?.addresses?.filter?.((el) => SupportFullDataChain.includes(el.chain))
     if (botChains && botChains.length > 0) {
       return botChains
     }
@@ -246,6 +247,17 @@ watch(() => botStore.getWalletAddress('solana'), (address, old) => {
     }
   }
 )
+const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
+scrollTopEvent.on(scrollToTop)
+onUnmounted(()=>{
+  scrollTopEvent.off(scrollToTop)
+})
+function scrollToTop() {
+  scrollRef.value.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
 
 // Watchers
 // watch(
