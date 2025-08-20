@@ -104,8 +104,16 @@
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>
           </li>
-          <li class="flex justify-between h-40px px-20px clickable"
-            @click.stop="walletStore.disconnect(); tgWalletVisible = false">
+          <li class="flex justify-between h-40px px-20px clickable" @click.stop="$router.push('/solana-rent-recovery');tgWalletVisible = false">
+            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+              <Icon name="custom:sack-dollar" class="text-16px" />
+              <span class="font-500 text-14px">{{ t('rentRecovery') }}</span>
+            </div>
+            <div class="color-#999 flex items-center gap-4px">
+              <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
+            </div>
+          </li>
+          <li class="flex justify-between h-40px px-20px clickable" @click.stop="walletStore.disconnect(); tgWalletVisible = false">
             <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
               <Icon name="custom:log-out" class="text-16px" />
               <span class="font-500 text-14px">{{ t('logout') }}</span>
