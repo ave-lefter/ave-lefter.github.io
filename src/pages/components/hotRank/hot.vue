@@ -434,12 +434,14 @@ function toggleKline(row) {
 }
 
 function resetColumns(needClear:boolean) {
+  const quickIndex= columns.value.findIndex(el => el.key === 'quick')
   if(needClear){
     columns.value[0].fixed=''
-    columns.value[columns.value.length-1].fixed=''
+    columns.value[quickIndex].fixed=''
   } else {
     columns.value[0].fixed='left'
-    columns.value[columns.value.length-1].fixed='right'
+    columns.value[quickIndex].fixed='right'
+    localStorage.setItem('hotUserTableColumns',JSON.stringify(columns.value))
   }
 }
 </script>
