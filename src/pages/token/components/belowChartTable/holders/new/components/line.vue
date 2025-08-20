@@ -130,11 +130,17 @@ const init = () => {
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: mode.value  === 'light' ? '#F5F5F5' : '#17191C',
+      backgroundColor: mode.value  === 'light' ? '#F2F2F2' : '#333',
       textStyle: {
-        fontSize: 10,
-        color: '#959A9F',
+        fontSize: 12,
+        color: mode.value  === 'light' ? '#666' : '#999',
         fontFamily: 'Poppins'
+      },
+      padding: [6, 8],
+      axisPointer: {
+        label: {
+          show: false
+        }
       },
       borderWidth: 0,
       // valueFormatter: value => '$'+formatNumber2(value || 0, 2), // 替换为实际的格式化函数
@@ -142,7 +148,7 @@ const init = () => {
         console.log('tooltip', params)
         let result = params[0].name + '<br>' // 标题
         params.forEach(item => {
-          result += `${item.marker} ${item.seriesName}: <span style="color:${mode.value  === 'light' ? '#17191C' : '#F5F5F5'}">${formatNumber(item.value||0,4)}</span><br>`// 每行内容
+          result += `<div style="display:flex;align-items:center;width:100%; gap:8px"><div>${item.marker} ${item.seriesName}</div><span style="color:${mode.value  === 'light' ? '#333' : '#F5F5F5'}">${formatNumber(item.value||0,4)}</span><br></div>`// 每行内容
         })
         return result
       },
@@ -211,7 +217,7 @@ const init = () => {
       splitLine: {
         lineStyle: {
           type: "dashed",
-          color: mode.value  === 'light' ? '#666' : '#333',
+          color: mode.value  === 'light' ? '#F5F5F5' : '#333',
         },
         show: true
       },

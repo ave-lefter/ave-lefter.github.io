@@ -37,19 +37,19 @@ const option = computed(() => [
   {
     k: 1,
     color: '#3F80F7',
-    label: 'Top10', // 替换为实际的翻译逻辑
+    label: 'TOP 10', // 替换为实际的翻译逻辑
     value: 'value1',
   },
   {
     k: 2,
     color: '#12B886',
-    label: 'Top50', // 替换为实际的翻译逻辑
+    label: 'TOP 50', // 替换为实际的翻译逻辑
     value: 'value2',
   },
   {
     k: 3,
     color: '#8D47E7',
-    label: 'Top100', // 替换为实际的翻译逻辑
+    label: 'TOP 100', // 替换为实际的翻译逻辑
     value: 'value3',
   }
 ])
@@ -120,18 +120,24 @@ const init = () => {
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: mode.value  === 'light' ? '#F5F5F5' : '#17191C',
+      backgroundColor: mode.value  === 'light' ? '#F2F2F2' : '#333',
       textStyle: {
-        fontSize: 10,
-        color: '#959A9F',
+        fontSize: 12,
+        color: mode.value  === 'light' ? '#666' : '#999',
         fontFamily: 'Poppins'
+      },
+      padding: [6, 8],
+      axisPointer: {
+        label: {
+          show: false
+        }
       },
       borderWidth: 0,
       formatter: function (params) {
         console.log('formatter',params)
-        let result = params[0].name + '<br>' // 标题
+        let result = `${params[0].name}<br>` // 标题
         params.reverse().forEach(item => {
-          result += `${item.marker} ${item.seriesName}: <span style="color:${mode.value  === 'light' ? '#17191C' : '#F5F5F5'}">${formatNumber(item.data.ratio||0,2)}(${formatNumber(Math.abs(Number(item.data.ratio) * 100), 2)}%)</span><br>`// 每行内容
+          result += `<div style="display:flex;align-items:center;"><div style="width:75px">${item.marker} ${item.seriesName}</div><div style="color:${mode.value  === 'light' ? '#333' : '#F5F5F5'};flex:1;text-align:right">${formatNumber(item.data.ratio||0,2)}(${formatNumber(Math.abs(Number(item.data.ratio) * 100), 2)}%)</div><br></div>`// 每行内容
         })
         return result
       },
@@ -201,7 +207,7 @@ const init = () => {
       splitLine: {
         lineStyle: {
           type: "dashed",
-          color: mode.value  === 'light' ? '#666' : '#333',
+          color: mode.value  === 'light' ? '#F5F5F5' : '#333',
         },
         show: true
       },

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="['solana', 'bsc']?.includes(addressAndChain.chain)" class="w-lineLight h-52px w-100% px-10px border-b-1px border-b-solid border-b-[--d-FFFFFF08-l-33333308] mb-12px" :class="isHidden && 'h-0px! border-b-0px p-0px!'">
+  <div v-if="['solana', 'bsc']?.includes(addressAndChain.chain)" class="w-lineLight h-52px w-100% px-10px border-b-1px border-b-solid border-b-[--d-1A1A1A-l-F2F2F2] mb-12px" :class="isHidden && 'h-0px! border-b-0px p-0px!'">
     <ul v-if="!isHidden" class="flex gap-24px">
       <li class="flex gap-8px">
         <div class="clickable" @click.stop="popVisible = true">
@@ -132,11 +132,11 @@ function init2() {
   getHoldersTokenHoldersLight(addressAndChain.value.address, addressAndChain.value.chain,topN.value).then(res => {
     console.log('getHoldersTokenHoldersLight', res)
     if(res.token_holder_ratio && res.token_holder_ratio.length){
-      holdersAvg.value = res.token_holder_ratio[res.token_holder_ratio.length-1]?.top100_ratio
+      holdersAvg.value = res.token_holder_ratio[res.token_holder_ratio.length-1]?.top100_ratio || res.token_holder_ratio[res.token_holder_ratio.length-1]?.top10_ratio
       dataList2.value = res.token_holder_ratio.map(i=>{
         return {
           ...i,
-          value1: i.top100_ratio
+          value1: i.top100_ratio || i.top10_ratio 
         }
       })
     }else{

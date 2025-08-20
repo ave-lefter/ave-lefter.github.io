@@ -21,16 +21,16 @@
         />
         <div class="flex flex-col justify-between ml-8px h-40px">
           <div class="flex items-center gap-8px h-20px">
-            <span class="font-500 text-16px lh-20px tracking-0px">{{ token?.symbol }}</span>
+            <span class="font-500 text-16px lh-20px tracking-0px color-[--d-F5F5F5-l-333]">{{ token?.symbol }}</span>
             <span class="font-500 text-10px lh-20px tracking-0px color-[--d-666-l-999]">{{ addressAndChain?.address?.replace(new RegExp('(.{4})(.+)(.{4}$)'), '$1...$3')  }}</span>
-            <Icon
+            <Icon 
               v-copy="addressAndChain?.address" name="bxs:copy"
               class="cursor-pointer text-10px color-[--d-666-l-999]"
             />
           </div>
           <div class="flex items-center gap-4px h-14px justify-start"> 
             <span class="font-500 text-10px lh-20px tracking-0px color-[--d-666-l-999]">{{ $t('holdersNumTotal') }}</span>
-            <span class="font-400 text-12px lh-14px tracking-0px">{{ formatNumber(holdersNum,4) }}</span>
+            <span class="font-400 text-12px lh-14px tracking-0px color-[--d-F5F5F5-l-333]">{{ formatNumber(holdersNum,4) }}</span>
           </div>
         </div>
         <!-- <span v-if="symbol.source" class="text-12px color-[--d-999-l-666] mr-8px">/ {{ symbol.source }}</span> -->
