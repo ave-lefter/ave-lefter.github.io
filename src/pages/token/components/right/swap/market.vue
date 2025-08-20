@@ -67,7 +67,7 @@
       :disabled="(priceImpactV && priceImpactV?.gt?.(0.4)) || !checkAmount() || !fromAmount || !toAmount"
       native-type="submit"
     >
-      <span v-if="Number(swapStore.fromToken.balance) === 0 || Number(swapStore.fromToken.balance) < Number(fromAmount) || walletStore.address === '' || ((swapStore.isERC314 || swapStore.isFourMeme || swapStore.isFlap || swapStore.isSunPump > 0 || swapStore.isDyorswapfun) && swapStore.token2.address !== NATIVE_TOKEN) || ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112') ">
+      <span v-if="Number(swapStore.fromToken.balance) === 0 || Number(swapStore.fromToken.balance) < Number(fromAmount) || walletStore.address === '' || ((swapStore.isERC314 || swapStore.isFourMeme || swapStore.isFlap || swapStore.isSunPump > 0 || swapStore.isDyorswapfun || swapStore.isXflapswap) && swapStore.token2.address !== NATIVE_TOKEN) || ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112') ">
         {{ checkAmountMessage() }}
       </span>
       <span v-else-if="priceImpactV && priceImpactV?.gt?.(0.4)">
@@ -170,7 +170,7 @@ import SelectRouter from './selectRouter.vue'
 import ConfirmSwap from './confirmSwap.vue'
 import { formatNumber } from '@/utils/formatNumber'
 import BigNumber from 'bignumber.js'
-import { allowance, quoteBestRouterV2, quoteSunPump, quoteFourMeme, quoteERC314, ERC314Swap, sunPumpSwap, fourMemeSwap, swapV2, getNativeTokenPrice, approve, getSuiQuote, buildSuiTx, quoteDyorswapfunPump, dyorswapfunPumpSwap } from '~/api/swap'
+import { allowance, quoteBestRouterV2, quoteSunPump, quoteFourMeme, quoteERC314, ERC314Swap, sunPumpSwap, fourMemeSwap, swapV2, getNativeTokenPrice, approve, getSuiQuote, buildSuiTx, quoteDyorswapfunPump, dyorswapfunPumpSwap, quoteXFlap, xFlapSwap } from '~/api/swap'
 import { MIN_BALANCE, SwapContracts } from '@/utils/wallet/utils/constants'
 import { useSwapStore } from '~/stores/swap'
 import { ElMessageBox } from '#imports'
@@ -309,8 +309,8 @@ const priceImpactV = computed(() => {
     return new BigNumber(priceImpactSui.value || 0)
   }
   const routerPath = swapQuoteInfo.value.routerPath
-  const fromToken = routerPath?.length > 0 ? routerPath?.[0] : null
-  const toToken = routerPath?.length > 0 ? routerPath?.[routerPath.length - 1] : null
+  const fromToken = routerPath?.length > 0 ? routerPath?.[0] : (swapQuoteInfo.value.fromToken || null)
+  const toToken = routerPath?.length > 0 ? routerPath?.[routerPath.length - 1] : (swapQuoteInfo.value.toToken || null)
   if (fromToken && toToken) {
     const fromPrice = swapQuoteInfo.value.from_price || 0
     const toPrice = swapQuoteInfo.value.to_price || 0
@@ -402,6 +402,7 @@ const swapQuoteInfo = ref<{
   isSunPump?: number
   isERC314?: boolean
   isDyorswapfun?: boolean
+  isXflapswap?: boolean
   toWrapper?: number
 }>({
   fromToken: {
@@ -450,7 +451,7 @@ const isOnlyGetAmountsOut = computed(() => {
   const ammList = ['viridian', 'aerodrome', 'flapswap']
   const isFourMemeOnlyGetAmountsOut = tokenStore?.pairs?.[0]?.amm && ['fourmeme', 'fourmemev2']?.includes(tokenStore?.pairs?.[0]?.amm)
   const isOneWaySwap = tokenStore?.pairs?.[0]?.amm && ammList.includes(tokenStore?.pairs?.[0]?.amm)
-  return swapStore.chain === 'ton' || swapStore.chain === 'sui' || isOneWaySwap || isFourMemeOnlyGetAmountsOut || swapStore.isDyorswapfun || false
+  return swapStore.chain === 'ton' || swapStore.chain === 'sui' || isOneWaySwap || isFourMemeOnlyGetAmountsOut || swapStore.isDyorswapfun || swapStore.isXflapswap
 })
 
 const countdownSeconds = 15
@@ -531,6 +532,9 @@ function getAllowance() {
     spender = sunPumpRouter ? sunPumpRouter : spender
     if (chain === 'xlayer' && swapStore.isDyorswapfun) {
       spender = '0xfd947a61e2c54413031ddb1f754dbe0e696efa09'
+    }
+    if (chain === 'xlayer' && swapStore.isXflapswap) {
+      spender = '0xb30d8c4216e1f21f27444d2ffaee3ad577808678'
     }
     loadingAllowance.value = true
     allowance(swapStore.fromToken.address, spender).then(res => {
@@ -665,7 +669,7 @@ async function dealGetQuoteInfo(isAmount: boolean, chain: string) {
     }
 
     if (chain === 'xlayer') {
-      const isPumpCanSwap = !(swapStore.isDyorswapfun && swapStore.token2.address !== NATIVE_TOKEN && swapStore.token2.chain === 'xlayer')
+      const isPumpCanSwap = !((swapStore.isDyorswapfun || swapStore.isXflapswap) && swapStore.token2.address !== NATIVE_TOKEN && swapStore.token2.chain === 'xlayer')
       if (!isPumpCanSwap) {
         return
       }
@@ -755,6 +759,46 @@ async function dealGetQuoteInfo(isAmount: boolean, chain: string) {
         getAllowance()
         swapQuoteInfo.value.from_price = from_price
         swapQuoteInfo.value.to_price = to_price
+        quoteLoading.value = false
+      } catch (err) {
+        quoteLoading.value = false
+        handleError(err)
+      }
+      return
+    }
+
+    if (swapStore.isXflapswap) {
+      try {
+        const res = await quoteXFlap(params, chain)
+        if (isAmount) {
+          toAmount.value = formatUnits(res?.toString() || '0', swapStore.toToken?.decimals)
+        } else {
+          fromAmount.value = formatUnits(res?.toString() || '0', swapStore.fromToken?.decimals)
+        }
+        swapRouterPath.value = [
+          {
+            symbol: swapStore.fromToken?.symbol,
+            nextAmm: 'xflapswap'
+          },
+          {
+            symbol: swapStore.toToken?.symbol,
+            nextAmm: ''
+          }
+        ]
+        swapQuoteInfo.value.fromAmount = parseUnits(fromAmount.value, swapStore.fromToken?.decimals).toFixed(0)
+        swapQuoteInfo.value.toAmount = parseUnits(toAmount.value, swapStore.toToken?.decimals).toFixed(0)
+        swapQuoteInfo.value.fromToken = {...swapStore.fromToken, amount: swapQuoteInfo.value.fromAmount}
+        swapQuoteInfo.value.toToken = {...swapStore.toToken, amount: swapQuoteInfo.value.toAmount}
+        swapQuoteInfo.value.quoteResult = {...res}
+        swapQuoteInfo.value.isAmountOut = !isAmount
+        swapQuoteInfo.value.isXflapswap = true
+        getAllowance()
+        const [token1Id, token2Id] = [swapStore.fromToken?.address + '-' + swapStore.fromToken?.chain, swapStore.toToken?.address + '-' + swapStore.toToken?.chain]
+        getTokensPrice([token1Id, token2Id]).then(async res => {
+          swapQuoteInfo.value.from_price = res?.[0]?.current_price_usd || 0
+          swapQuoteInfo.value.to_price = res?.[1]?.current_price_usd || 0
+          swapQuoteInfo.value.isXflapswap = true
+        })
         quoteLoading.value = false
       } catch (err) {
         quoteLoading.value = false
@@ -1062,7 +1106,7 @@ function checkAmount() {
   }
   const fromTokenBalance = swapStore.fromToken.balance || 0
   const isPump = ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112')
-  const isBscPump = (swapStore.isFourMeme || swapStore.isFlap || swapStore.isDyorswapfun) && swapStore.token2.address !== NATIVE_TOKEN
+  const isBscPump = (swapStore.isFourMeme || swapStore.isFlap || swapStore.isDyorswapfun || swapStore.isXflapswap) && swapStore.token2.address !== NATIVE_TOKEN
   const isTronPump = swapStore.isSunPump > 0 && swapStore.token2.address !== NATIVE_TOKEN
   return !(
     Number(fromTokenBalance) === 0 ||
@@ -1117,6 +1161,15 @@ function getSwapGas() {
         console.log('gasValue', res.gasValue)
         swapInfo.value.swapRouterPath = swapRouterPath.value
       }).catch(err => {
+        handleError(err)
+      })
+    } else if (swapQuoteInfo.value?.isXflapswap) {
+      xFlapSwap(swapQuoteInfo.value as any, slippage.value).then(async (res: any) => {
+        swapSubmitInfo.value = {...res, isXflapswap: true}
+        swapInfo.value = res.swapInfo
+        swapInfo.value.gasValue = res.gasValue
+        swapInfo.value.swapRouterPath = swapRouterPath.value
+      }).catch((err: any) => {
         handleError(err)
       })
     } else if (swapQuoteInfo.value?.routerPath?.length > 0) {
@@ -1394,6 +1447,10 @@ async function _approve() {
   if (walletStore.chain  === 'xlayer' && swapStore.isDyorswapfun) {
     spender = '0xfd947a61e2c54413031ddb1f754dbe0e696efa09'
   }
+  if (walletStore.chain  === 'xlayer' && swapStore.isXflapswap) {
+    spender = '0xb30d8c4216e1f21f27444d2ffaee3ad577808678'
+  }
+
   approve(swapStore.fromToken.address, spender).then(res => {
     return res.wait()
   })
@@ -1412,7 +1469,7 @@ async function _approve() {
 function checkAmountMessage() {
   const fromTokenBalance = swapStore.fromToken.balance || 0
   const isPump = ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112')
-  const isBscPump = (swapStore.isFourMeme || swapStore.isFlap || swapStore.isDyorswapfun) && swapStore.token2.address !== NATIVE_TOKEN
+  const isBscPump = (swapStore.isFourMeme || swapStore.isFlap || swapStore.isDyorswapfun || swapStore.isXflapswap) && swapStore.token2.address !== NATIVE_TOKEN
   const isTronPump = swapStore.isSunPump > 0 && swapStore.token2.address !== NATIVE_TOKEN
   const walletAddress = walletStore.address
   if (!walletAddress) {
@@ -1536,6 +1593,23 @@ function getSwapTx(isOpenSwap = true) {
       swapInfo.value = res?.swapInfo as typeof swapInfo.value
       swapInfo.value.gasValue = res?.gasValue || '0'
       console.log('gasValue', res.gasValue)
+      swapInfo.value.swapRouterPath = swapRouterPath.value
+      loadingSwap.value = false
+      if (isOpenSwap) {
+        dialogVisibleSwap.value = true
+      }
+    }).catch(err => {
+      loadingSwap.value = false
+      handleError(err)
+    })
+    _getNativeTokenPrice()
+    _getGasPrice()
+  } else if (swapQuoteInfo.value?.isXflapswap) {
+    loadingSwap.value = true
+    xFlapSwap(swapQuoteInfo.value as any, slippage.value).then(async (res) => {
+      swapSubmitInfo.value = {...res, isXflapswap: true}
+      swapInfo.value = res?.swapInfo as typeof swapInfo.value
+      swapInfo.value.gasValue = res?.gasValue || '0'
       swapInfo.value.swapRouterPath = swapRouterPath.value
       loadingSwap.value = false
       if (isOpenSwap) {
