@@ -1054,6 +1054,7 @@
   "liquidity1": "池子",
   "smarter1": "聪明钱",
   "markers": "钱包数",
+  "24hMarkers": "24h钱包数",
   "specifiedTimeInterval": "指定时间区间%",
   "top10": "Top10",
   "customizeScreener": "自定义榜单",

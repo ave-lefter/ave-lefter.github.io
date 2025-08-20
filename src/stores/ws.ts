@@ -17,9 +17,7 @@ export const useWSStore = defineStore('ws', () => {
 
   // const tokenStore = useTokenStore()
 
-  const wsResult = reactive<
-    Record<(typeof WSEventType)[keyof typeof WSEventType], any>
-  >({
+  const wsResult = reactive<Record<(typeof WSEventType)[keyof typeof WSEventType], any>>({
     [WSEventType.TX]: null,
     [WSEventType.LIQ]: null,
     [WSEventType.KLINE]: null,
@@ -28,10 +26,11 @@ export const useWSStore = defineStore('ws', () => {
     [WSEventType.ASSET]: null,
     [WSEventType.SWITCH_MAIN_PAIR_V2]: null,
     [WSEventType.PUMPSTATE]: null,
+    [WSEventType.TOKEN_UPDATED]: null,
     [WSEventType.GOLD_SIGNAL]: null,
     [WSEventType.SIGNALSV2_PUBLIC_MONITOR]: null,
     [WSEventType.PRICE_EXTRA]: null,
-    [WSEventType.SIMPLE_TX]: null
+    [WSEventType.SIMPLE_TX]: null,
   })
 
   // 将 createWebSocket 重命名为 init
@@ -73,6 +72,8 @@ export const useWSStore = defineStore('ws', () => {
         useTokenStore().onSwitchMainPairV2(data)
       } else if (event === WSEventType.PUMPSTATE) {
         wsResult[event] = data?.msgs
+      } else if (event === WSEventType.TOKEN_UPDATED) {
+        wsResult[event] = data?.msg
       } else {
         wsResult[event] = data
       }

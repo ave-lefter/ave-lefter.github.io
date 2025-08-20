@@ -32,6 +32,7 @@ export const WSEventType = {
   PRICE_GAINER: 'price-gainer',
   PRICE_EXTRA: 'price_extra',
   PUMPSTATE: 'pumpstate',
+  TOKEN_UPDATED: 'token_updated',
   PRICEV2: 'pricev2',
   TGBOT: 'tgbot',
   ASSET: 'asset',
