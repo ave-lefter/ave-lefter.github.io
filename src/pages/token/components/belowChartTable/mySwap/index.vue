@@ -147,6 +147,9 @@ watch([() => wsStore.wsResult?.tgbot], () => {
   }
   getWalletTxData()
   unifiedRef.value?.getTxHistory()
+  setTimeout(() => {
+    unifiedRef.value?.getTxHistory()
+  }, 3000)
   if (!timer) {
     timer = setInterval(() => {
       if (lastUpdateTime >= maxUpdateNum) {
@@ -223,7 +226,7 @@ onActivated(() => {
     </div>
 
     <!-- 顶部交易统计区域 -->
-    <div class="transaction-stats">
+    <div v-if="activeTab !== 'xlayer'" class="transaction-stats">
       <div class="stat-item">
         <div class="stat-label text-[--d-666-l-999]">{{ t('balance1') }}</div>
         <div class="stat-value table-field-text text-[var(--d-999-l-959A9F)]">${{ formatNumber(balance, 2) }}</div>
