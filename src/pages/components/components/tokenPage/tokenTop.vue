@@ -173,7 +173,7 @@ function handleReset() {
 </script>
 
 <template>
-   <div class="flex items-center color-[--d-666-l-999] px-16px py-12px">
+   <div class="flex items-center color-[--d-566275-l-8CA0C3] px-16px py-12px">
     <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
         <template #default>
           <TokenImg
@@ -617,7 +617,7 @@ function handleReset() {
 
 <style scoped lang="scss">
 .bg-btn {
-  --uno: bg-[--d-222-l-F2F2F2] rounded-2px mr-4px flex items-center
+  --uno: bg-[--d-151A22-l-E8F1FF] rounded-2px mr-4px flex items-center
     justify-center h-16px min-w-16px p-2px;
 }
 </style>
