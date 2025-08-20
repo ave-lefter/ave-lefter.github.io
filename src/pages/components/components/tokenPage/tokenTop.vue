@@ -274,25 +274,13 @@ function handleReset() {
                 :key="index"
                 class="bg-btn flex h-16px tag-btn"
               >
-                <el-image
+                <img
                   v-tooltip="$t(`${i.tag}`)"
-                  class="token-icon-tag cursor-pointer h-100%"
+                  class="cursor-pointer h-100%"
                   :src="formatIconTag(i.tag)"
+                  onerror="this.src='/icon-default.png'"
                   lazy
                 >
-                  <template #error>
-                    <img
-                      class="token-icon-tag h-16px"
-                      src="/icon-default.png"
-                    >
-                  </template>
-                  <template #placeholder>
-                    <img
-                      class="token-icon-tag h-16px"
-                      src="/icon-default.png"
-                    >
-                  </template>
-                </el-image>
                 <span
                   v-if="i?.showText"
                   :style="{

@@ -10,6 +10,7 @@ const props = defineProps<{
   row: any
   rowIndex: number
   activeKline:boolean
+  enableKline:boolean
 }>()
 
 function getSymbol(row, shouldReverse = false) {
@@ -182,9 +183,11 @@ function toggleKline() {
             </template>
           </el-tooltip>
           <Icon
-          name="custom:kline" class="text-12px ml-4px hover:color-#8CA0C3" 
-          :class="activeKline ? 'color-#8CA0C3' : 'color-#566275'"
-          @click.self.stop="toggleKline"
+            v-if="enableKline"
+            v-tooltip="$t('kline')"
+            name="custom:kline" class="text-12px ml-4px hover:color-#8CA0C3" 
+            :class="activeKline ? 'color-#8CA0C3' : 'color-#566275'"
+            @click.self.stop="toggleKline"
           />
         </div>
         <div class="flex items-center lh-12px">

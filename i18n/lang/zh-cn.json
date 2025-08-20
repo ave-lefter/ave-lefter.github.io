@@ -1327,5 +1327,6 @@
   "BlackListToken": "拉黑代币",
   "BlackListDev": "拉黑DEV",
   "searchKol": "搜索KOL",
-  "searchKolPlaceholder": "请输入KOL地址"
+  "searchKolPlaceholder": "请输入KOL地址",
+  "kline":"显示K线"
 }

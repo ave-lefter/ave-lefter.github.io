@@ -20,7 +20,7 @@ function formatAddress(address: string) {
 }
 </script>
 <template>
-    <div class="py-12px justify-between flex flex-wrap gap-y-12px">
+    <div class="py-12px flex flex-wrap gap-12px">
         <div class="w-94px py-8px flex justify-center items-center flex-col rounded-4px bg-[--d-151A22-l-E8F1FF]">
             <span class="color-[--d-8CA0C3-l-566275] mb-6px">{{ token?.name || '-' }}</span>
             <span class="color-[--d-566275-l-8CA0C3]">{{ $t('name') }}</span>

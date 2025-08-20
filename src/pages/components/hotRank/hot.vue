@@ -108,13 +108,13 @@ function tableRowClick({ rowData }: RowEventHandlerParams) {
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
 }
 
-const mounted = shallowRef(false)
-onMounted(() => {
-  setTimeout(()=>{
-    mounted.value = true
-  },20)
-  _getTreasureList()
-})
+// const mounted = shallowRef(false)
+// onMounted(() => {
+//   setTimeout(()=>{
+//     mounted.value = true
+//   },20)
+//   _getTreasureList()
+// })
 
 onUnmounted(() => {
   clearTimeout(timer)
@@ -124,6 +124,7 @@ onUnmounted(() => {
 onActivated(() => {
   console.log('热搜榜激活')
   isActive.value = true
+  resetColumns(false)
   // 延迟重新获取数据，避免快速切换时的冲突
   setTimeout(() => {
     if (isActive.value) {
@@ -409,8 +410,7 @@ function toggleKline(row) {
     if(rankKlineStore.klineRow.id === row.id){
       const rowIndex = filteredListData.value.findIndex(el => el.isKline)
       rankKlineStore.klineRow = {}
-        columns.value[0].fixed='left'
-        // columns.value[columns.value.length-1].fixed='right'
+        resetColumns(false)
         _getTreasureList(false)
         setTimeout(()=>{
           if(rowIndex !== -1 && aveTableRef.value){
@@ -419,8 +419,7 @@ function toggleKline(row) {
         })
     } else {
       rankKlineStore.klineRow = row
-        columns.value[0].fixed = ''
-        // columns.value[columns.value.length-1].fixed=''
+        resetColumns(true)
         rankKlineStore.getData(row)
         clearTimeout(timer)
         setTimeout(()=>{
@@ -432,6 +431,16 @@ function toggleKline(row) {
           }
         },100)
     }
+}
+
+function resetColumns(needClear:boolean) {
+  if(needClear){
+    columns.value[0].fixed=''
+    columns.value[columns.value.length-1].fixed=''
+  } else {
+    columns.value[0].fixed='left'
+    columns.value[columns.value.length-1].fixed='right'
+  }
 }
 </script>
 <template>
@@ -469,6 +478,7 @@ function toggleKline(row) {
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"
           :isVolUSDT="isVolUSDT"
+          :enableKline="activeTab === 'hot'"
           :activeKline="rankKlineStore.klineRow.id === row.id"
           :row="row"
           :rowIndex="rowIndex"
@@ -482,8 +492,8 @@ function toggleKline(row) {
         />
       </template>
       <template #row="{style,...rowProps}">
-      <Row v-bind="rowProps" />
-    </template>
+        <Row v-bind="rowProps" />
+      </template>
     </AveTable>
   </div>
   <el-pagination
@@ -503,19 +513,13 @@ function toggleKline(row) {
 <style scoped lang="scss">
 :deep(.el-table-v2__header-cell),
 :deep(.el-table-v2__row-cell) {
-  padding: 0 16px;
+  @apply px-16px;
 }
 :deep{
   .row-disabled{
+    --el-table-border:1px solid #1A1A1A;
     &:before{
-      z-index: 1;
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba($color: #000000, $alpha: .8);
+      --uno:content-[''] absolute top-0 left-0 w-full bottom-0 bg-black/80 z-1;
     }
   }
 }

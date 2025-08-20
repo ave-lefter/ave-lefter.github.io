@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js'
 
 export const useRankKlineStore = defineStore('rankKline',()=>{
     // ref
-    const klineRow = ref({})
+    const klineRow = ref<Record<string,any>>({})
     const tokenInfo = ref<null | TokenInfo>(null)
     const tokenInfoExtra = ref<null | TokenInfoExtra>(null)
     const userFavoriteGroups = shallowRef<GetUserFavoriteGroupsResponse[]>([])

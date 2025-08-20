@@ -14,7 +14,7 @@ const modeList = [
 provide('aiSummary',{})
 </script>
 <template>
-  <div class="w-334px borer-left-solid border-left-1px border-left-[--d-1A1A1A-l-F2F2F2] p-12px">
+  <div class="w-334px borer-l-solid border-l-1px border-l-[--d-1A1A1A-l-F2F2F2] p-12px token-info">
     <div class="flex items-center justify-between text-16px font-500 color-[--d-8CA0C3-l-566275] pb-12px border-b-solid border-b-1px border-b-[--d-151A22-l-E8F1FF]">
         {{$t('tokenInfo')}}
         <div class="flex items-stretch justify-center bg-[--d-151A22-l-E8F1FF] p-2px rounded-4px">
@@ -27,3 +27,10 @@ provide('aiSummary',{})
     <Overview v-if="mode === Mode.list" isRank/>
   </div>
 </template>
+
+<style scoped lang="scss">
+.token-info {
+    --d-666-l-999: var(--d-566275-l-8CA0C3);
+    --d-999-l-666: var(--d-8CA0C3-l-566275);
+}
+</style>
