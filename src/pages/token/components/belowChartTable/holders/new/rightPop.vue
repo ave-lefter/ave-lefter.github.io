@@ -49,8 +49,8 @@
       </div>
     </div>
     <div class="px-20px py-20px">
-      <Line v-if="dataList1.length > 0||loading1" class="w-440px h-210px relative" :dataList="dataList1" :loading="loading1" :showSeries="[false]"  :showLeft="false"/>
-      <Line2 v-if="dataList2.length > 0" class="w-440px h-210px relative" :dataList="dataList2" :loading="loading2" :showSeries="[true,true,true]"  :showLeft="showLeft"/>
+      <Line v-if="dataList1.length > 0||loading1" class="w-440px h-210px relative mb-40px!" :dataList="dataList1" :loading="loading1" :showSeries="[false]"  :showLeft="false"/>
+      <Line2 v-if="dataList2.length > 0" class="w-440px h-210px relative" :dataList="dataList2" :activeTime="activeTime" :loading="loading2" :showSeries="[true,true,true]"  :showLeft="showLeft"/>
     </div>
   </el-drawer>
 </template>
@@ -130,7 +130,7 @@ function switchTimeTab(item: string) {
 }
 const init = () => {
   init1()
-  // init2()
+  init2()
   // showLeft.value=!showLeft.value
   // setTimeout(() => {
   //   // init1()
@@ -152,9 +152,11 @@ function init1() {
           time: formatDate(new Date(Number(i?.time)*1000).getTime() , 'MM-DD HH:mm'),
         }
       })
+    }else{
+      dataList1.value = []
     }
   }).finally(() => {
-      loading1.value = false
+    loading1.value = false
   }).catch((err: any) => {
     console.error(err)
     dataList1.value = []
@@ -164,14 +166,19 @@ function init2() {
   loading2.value = true
   getHoldersTokenTopHoldersRatio(addressAndChain.value.address, addressAndChain.value.chain,activeTime.value).then(res => {
     console.log('getHoldersTokenTopHoldersRatio', res)
-    // if(res.token_holder_ratio && res.token_holder_ratio.length){
-    //   dataList2.value = res.token_holder_ratio.map(i=>{
-    //     return {
-    //       ...i,
-    //       value1: i.top100_ratio
-    //     }
-    //   })
-    // }
+    if(Array.isArray(res) && res.length){
+      dataList2.value = res.map(i=>{
+        return {
+          ...i,
+          value3: i.top100_ratio,
+          value2: i.top50_ratio,
+          value1: i.top10_ratio,
+          time: formatDate(new Date(Number(i?.time)*1000).getTime() , 'MM-DD HH:mm'),
+        }
+      })
+    }else{
+      dataList2.value = []
+    }
   }).finally(() => {
       loading2.value = false
     }).catch((err: any) => {

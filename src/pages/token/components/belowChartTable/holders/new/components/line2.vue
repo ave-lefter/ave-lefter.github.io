@@ -18,6 +18,10 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  activeTime:{
+    type: String,
+    default: '1m'
+  },
   loading: Boolean,
   showLeft: Boolean
 })
@@ -56,6 +60,7 @@ const series = computed(() =>
   option.value.map(i => ({
     name: i.label,
     type: 'line',
+    smooth: true,
     z: 1,
     symbol: 'none',
     itemStyle: {
@@ -69,7 +74,12 @@ const series = computed(() =>
       focus: 'series'
     },
     areaStyle: i.areaStyle,
-    data: props.dataList.map(j => j[i.value])
+    data: props.dataList.map(j=>{
+      return {
+        value:j.holders_count*j[i.value],
+        ratio:j[i.value]
+      }
+    })
   }))
 )
 
@@ -89,24 +99,24 @@ const init = () => {
   })
 
   const chartOption = {
-    // legend: {
-    //   show: false,
-    //   bottom: 0,
-    //   itemWidth: 10,
-    //   itemHeight: 10,
-    //   icon: 'circle',
-    //   textStyle: {
-    //     color: '#787B86',
-    //     fontSize: 12
-    //   }
-    // },
+    legend: {
+      show: true,
+      right: 0,
+      itemWidth: 10,
+      itemHeight: 10,
+      icon: 'circle',
+      textStyle: {
+        color: '#787B86',
+        fontSize: 12
+      }
+    },
     title: {
       textStyle: {
         color: mode.value  === 'light' ? '#333' : '#F5F5F5',
         fontSize : 16,
         fontFamily: 'Poppins'
       },
-      text: t('holdersChange'), // 替换为实际的翻译逻辑
+      text: t('holdersChange2',{n:props.activeTime}), // 替换为实际的翻译逻辑
     },
     tooltip: {
       trigger: 'axis',
@@ -117,11 +127,11 @@ const init = () => {
         fontFamily: 'Poppins'
       },
       borderWidth: 0,
-      // valueFormatter: value => '$'+formatNumber2(value || 0, 2), // 替换为实际的格式化函数
       formatter: function (params) {
+        console.log('formatter',params)
         let result = params[0].name + '<br>' // 标题
-        params.forEach(item => {
-          result += `${item.marker} ${item.seriesName}: <span style="color:${mode.value  === 'light' ? '#17191C' : '#F5F5F5'}">${formatNumber(item.value||0,4)}</span><br>`// 每行内容
+        params.reverse().forEach(item => {
+          result += `${item.marker} ${item.seriesName}: <span style="color:${mode.value  === 'light' ? '#17191C' : '#F5F5F5'}">${formatNumber(item.data.ratio||0,2)}(${formatNumber(Math.abs(Number(item.data.ratio) * 100), 2)}%)</span><br>`// 每行内容
         })
         return result
       },
@@ -184,7 +194,8 @@ const init = () => {
         color: mode.value  === 'light' ? '#999' : '#666',
         fontFamily: 'Poppins',
         formatter:  function (value) {
-            return formatNumber(value, 4)
+          // console.log('yAxis formatter',value)
+          return formatNumber(value,2)
         }
       },
       splitLine: {
@@ -269,9 +280,9 @@ watch(()=>props.showLeft, (val) => {
 // Lifecycle
 onMounted(() => {
   init()
+  console.log('mounted',series.value)
 })
 </script>
-
 <style scoped lang="scss">
 .chart-container {
   margin: 0;

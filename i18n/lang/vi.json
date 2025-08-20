@@ -756,5 +756,6 @@
   "holdersAnalysis": "Phân tích người nắm giữ",
   "holdersNumTotal": "Chủ sở hữu tổng số",
   "holdersTotalChange": "Người nắm giữ thay đổi",
-  "holdersChange": "Người nắm giữ thay đổi"
+  "holdersChange": "Người nắm giữ thay đổi",
+  "holdersChange2": "Người giữ changs trong {n}"
 }

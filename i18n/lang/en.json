@@ -1323,5 +1323,6 @@
   "holdersAnalysis": "Holders Analysis",
   "holdersNumTotal": "Holders Total",
   "holdersTotalChange": "Holders Change",
-  "holdersChange": "Holders Change"
+  "holdersChange": "Holders Change",
+  "holdersChange2": "Holder Changs in {n}"
 }

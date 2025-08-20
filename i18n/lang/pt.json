@@ -509,5 +509,6 @@
   "holdersAnalysis": "Análise dos titulares",
   "holdersNumTotal": "Totals Total",
   "holdersTotalChange": "Os titulares mudam",
-  "holdersChange": "Os titulares mudam"
+  "holdersChange": "Os titulares mudam",
+  "holdersChange2": "Holder Changs em {n}"
 }

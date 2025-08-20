@@ -1322,5 +1322,6 @@
   "holdersAnalysis": "持币地址分析",
   "holdersNumTotal": "总持币地址数",
   "holdersTotalChange": "持币地址数变化",
-  "holdersChange": "持币地址数变化"
+  "holdersChange": "持币地址数变化",
+  "holdersChange2": "{n}内持币变化"
 }

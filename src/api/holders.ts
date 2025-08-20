@@ -352,7 +352,9 @@ export function getHoldersTokenCountInterval(token: string, chain: string,interv
 
 export function getHoldersTokenTopHoldersRatio(token: string, chain: string,interval: number|string): Promise<{
   time: string|number;
-  holders_count: string|number;
+  top10_ratio: string|number;
+  top50_ratio: string|number;
+  top100_ratio: string|number;
 }[]> {
   const {$api} = useNuxtApp()
   return $api('https://0ftrfsdb.xyz/v2api/holders/v1/token/top_holders/ratio', {

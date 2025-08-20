@@ -1,6 +1,6 @@
 <template>
   <div class="holderInfo">
-    <LineContent v-if="['solana', 'bsc']?.includes(chain)" class="mb-12px"/>
+    <LineContent/>
     <div class="px-12px mb-10px flex justify-between">
       <div
         class="flex items-center whitespace-nowrap overflow-x-auto scrollbar-hide tab-width w-100%"

@@ -504,5 +504,6 @@
   "holdersAnalysis": "Sahipler Analizi",
   "holdersNumTotal": "Sahipler Toplam",
   "holdersTotalChange": "Sahipler değişir",
-  "holdersChange": "Sahipler değişir"
+  "holdersChange": "Sahipler değişir",
+  "holdersChange2": "{N}"
 }
