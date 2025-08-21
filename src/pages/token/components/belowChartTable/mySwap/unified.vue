@@ -437,15 +437,19 @@ const getTxHistory = async () => {
         pageNo: 1,
       })
 
+      console.log('链钱包 - API响应:', res)
       const rawList = res?.data?.list || []
+      console.log('原始数据列表长度:', rawList.length)
 
       if (rawList.length > 0) {
         const mappedData = rawList.map(mapWalletOrderToTableRow)
+        console.log('映射后数据:', mappedData)
         txHistory.value = mappedData
       } else {
         txHistory.value = []
       }
 
+      console.log('最终txHistory:', txHistory.value)
       console.log('最终txHistory长度:', txHistory.value?.length || 0)
     }
   } catch (error) {
@@ -517,10 +521,10 @@ function mapWalletOrderToTableRow(order: any) {
     outTokenDecimals: order.outDecimals,
     inPrice: inPrice,
     outPrice: outPrice,
-    inValue: inAmount * inPrice / (10 ** order.inDecimals),
-    outValue: outputAmount * outPrice / (10 ** order.inDecimals),
-    inAmount: inAmount,
-    outAmount: outputAmount,
+    inValue: inAmount * inPrice / Math.pow(10, order.inDecimals || 0),
+    outValue: outputAmount * outPrice / Math.pow(10, order.outDecimals || 0),
+    inAmount: inAmount.toString(),
+    outAmount: outputAmount.toString(),
     createTime: order.createTime,
     txHash: order.txHash,
     status: order.status,
