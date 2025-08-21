@@ -231,7 +231,7 @@
                 <span class="text-12px font-400 color-#3F80F7 clickable ml-10px" @click.stop="handleMax">{{ t('max') }}</span>
               </div>
             </el-form-item>
-            <div class="font-400 text-12px lh-[100%] color-#FFBE3C text-center mt-45px">{{ t('withdrawTip') }}</div>
+            <!-- <div class="font-400 text-12px lh-[100%] color-#FFBE3C text-center mt-45px">{{ t('withdrawTip') }}</div> -->
             <el-button native-type="submit" style="width: 100%; margin-top: 25px" size="large" type="primary"
               :loading="loadingWithdraw">{{ t('withdraw')
               }}</el-button>
