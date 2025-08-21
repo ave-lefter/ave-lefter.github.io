@@ -2,6 +2,34 @@
   --primary-color: #3F80F7;
   --color-red-500: #F6465D;
   --color-teal-300: #12B886;
+  // 主要文字
+  --main-text:var(--d-F5F5F5-l-111);
+  // 次要文字
+  --secondary-text:var(--d-8CA0C3-l-566275);
+  // 第三文字
+  --third-text:var(--d-566275-l-8CA0C3);
+  // 图标插画颜色
+  --icon-color:var(--d-383F4B-l-CAD6EC);
+  // 主要背景
+  --main-bg:var(--d-000-l-FFF);
+  // 次要背景
+  --secondary-bg:var(--d-0B0D12-l-F6F9FF);
+  // 主页面列表悬浮色
+  --main-list-hover:var(--d-151A22-l-E8F1FF);
+  // 主页面输入框和按钮背景色
+  --main-input-button-bg:var(--d-151A22-l-E8F1FF);
+  // 弹窗背景
+  --dialog-bg:var(--d-151A22-l-FFF);
+  // 主页面分割线
+  --main-divider:var(--d-151A22-l-E8F1FF);
+  // 主页面分割线
+  --dialog-divider:var(--d-252E3C-l-E8F1FF);
+  // 弹窗选中色&输入框&边框
+  --border:var(--d-252E3C-l-D9E8FF);
+  // 白色
+  --white:#F5F5F5;
+  // 反色
+  --reverse-color:var(--d-111-l-F5F5F5);
   &.dark {
     // 规范：颜色相同省略为 3 位，所有都用大写
     --d-333-l-ECECEC: #333;
@@ -110,6 +138,8 @@
     --d-252B34-l-E8F1FF: #252B34;
     --d-151A22-l-FFF: #151A22;
     --d-CCC-l-666: #CCC;
+    --d-252E3C-l-D9E8FF: #252E3C;
+    --d-111-l-F5F5F5: #111;
   }
 
   &.light {
@@ -219,6 +249,8 @@
     --d-252B34-l-E8F1FF: #E8F1FF;
     --d-151A22-l-FFF: #FFF;
     --d-CCC-l-666: #666;
+    --d-252E3C-l-D9E8FF: #D9E8FF;
+    --d-111-l-F5F5F5: #F5F5F5;
   }
 }
 
