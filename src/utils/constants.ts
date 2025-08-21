@@ -128,3 +128,34 @@ export const BotSettingsArr = [
     label: 'P3',
   }
 ] as const
+
+export const audioList = [
+  '',
+  'Bell',
+  'Cheer',
+  'Coins',
+  'Handgun',
+  'Kaching',
+  'Nice',
+  'Pop',
+  'Shotgun',
+  'Sonumi',
+  'Yes',
+  'Alipay',
+  'Wechat',
+]
+
+export const audioNameToResource = {
+  Bell: 'Bell',
+  Cheer: 'Cheer',
+  Coins: 'Coins',
+  Handgun: 'Handgun',
+  Kaching: 'Kaching',
+  Nice: 'Nice',
+  Pop: 'Pop',
+  Shotgun: 'Shotgun',
+  Sonumi: 'Sonumi',
+  Yes: 'Yes',
+  Alipay: 'Alipay',
+  Wechat: 'Wechat',
+}

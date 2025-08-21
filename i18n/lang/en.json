@@ -1339,5 +1339,12 @@
   "closeAccountsSuccess": "Recycling of rent successfully",
   "loadingCloseAccount": "Close your account and recycle your rent, please wait...",
   "noticeSettings": "Notice Settings",
-  "audioSettings": "Audio Settings"
+  "audioSettings": "Audio Settings",
+  "close":"Close",
+  "followMonitor":"Follow Monitor",
+  "tradeSound":"Trade Sound",
+  "buySound":"Buy Sound",
+  "sellSound":"Sell Sound",
+  "tradeNotice":"Trade Notice",
+  "volume2":"Volume"
 }

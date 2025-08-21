@@ -1338,5 +1338,12 @@
   "closeAccountsSuccess": "回收租金成功",
   "loadingCloseAccount": "正在关闭账户并回收租金，请稍候...",
   "noticeSettings": "通知设置",
-  "audioSettings": "声音设置"
+  "audioSettings": "声音设置",
+  "close": "关闭",
+  "followMonitor": "关注监控",
+  "tradeSound": "交易声音",
+  "buySound": "买入声音",
+  "sellSound": "卖出声音",
+  "tradeNotice": "交易通知",
+  "volume2": "音量"
 }
