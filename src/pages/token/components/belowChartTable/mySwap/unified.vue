@@ -437,20 +437,15 @@ const getTxHistory = async () => {
         pageNo: 1,
       })
 
-      console.log('链钱包 - API响应:', res)
       const rawList = res?.data?.list || []
-      console.log('原始数据列表长度:', rawList.length)
 
       if (rawList.length > 0) {
         const mappedData = rawList.map(mapWalletOrderToTableRow)
-        console.log('映射后数据:', mappedData)
         txHistory.value = mappedData
       } else {
         txHistory.value = []
       }
 
-      console.log('最终txHistory:', txHistory.value)
-      console.log('最终txHistory长度:', txHistory.value?.length || 0)
     }
   } catch (error) {
     console.error('获取交易历史错误:', error)
