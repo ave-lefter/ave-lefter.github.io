@@ -312,7 +312,7 @@ export function getHoldersTokenCountLight(token: string, chain: string): Promise
   }>
 }> {
   const {$api} = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v2api/holders/v1/token/count/light', {
+  return $api('/v2api/holders/v1/token/count/light', {
     method: 'get',
     query: {
       token, chain
@@ -330,7 +330,7 @@ export function getHoldersTokenHoldersLight(token: string, chain: string,top_n: 
   }>
 }> {
   const {$api} = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v2api/holders/v1/token/holders/light', {
+  return $api('/v2api/holders/v1/token/holders/light', {
     method: 'get',
     query: {
       token, chain, top_n
@@ -343,7 +343,7 @@ export function getHoldersTokenCountInterval(token: string, chain: string,interv
   holders_count: string|number;
 }[]> {
   const {$api} = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v2api/holders/v1/token/count/interval', {
+  return $api('/v2api/holders/v1/token/count/interval', {
     method: 'get',
     query: {
       token, chain, interval
@@ -358,7 +358,7 @@ export function getHoldersTokenTopHoldersRatio(token: string, chain: string,inte
   top100_ratio: string|number;
 }[]> {
   const {$api} = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v2api/holders/v1/token/top_holders/ratio', {
+  return $api('/v2api/holders/v1/token/top_holders/ratio', {
     method: 'get',
     query: {
       token, chain, interval
