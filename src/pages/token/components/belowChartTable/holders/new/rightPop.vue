@@ -7,7 +7,7 @@
       <div class="flex items-center">
         <Icon
           name="material-symbols:kid-star"
-          class="color-[--d-999-l-666] h-16px w-16px clickable mr-12px"
+          class="color-[--d-666-l-999] h-16px w-16px clickable mr-12px"
           :class="collected ? 'color-#ffbb19' : ''"
           @click="collect"
         />
@@ -66,7 +66,7 @@ import {
   getHoldersTokenTopHoldersRatio,
 } from '@/api/holders'
 import { useEventBus } from '@vueuse/core'
-
+import { replaceNegOne } from '../utils'
 import Line from './components/line.vue'
 import Line2 from './components/line2.vue'
 const emits = defineEmits<{
@@ -84,6 +84,10 @@ const props = defineProps({
   holdersNum: {
     type: Number,
     default: 0
+  },
+  activeTime: {
+    type: String,
+    default: '1m'
   }
 })
 const showLeft= shallowRef<boolean>(false)
@@ -94,11 +98,13 @@ const timeList = computed(() => [
   {name: '1h', id: '1h'},
   {name: '4h', id: '4h'},
 ])
-const activeTime = shallowRef<string>('1m')
-const loading1= ref<boolean>(false)
-const dataList1 = ref<any[]>([])
-const loading2= ref<boolean>(false)
-const dataList2 = ref<any[]>([])
+
+const activeTime = shallowRef<string>(props.activeTime)
+
+const loading1= shallowRef<boolean>(false)
+const dataList1 = shallowRef<any[]>([])
+const loading2= shallowRef<boolean>(false)
+const dataList2 = shallowRef<any[]>([])
 const {token} = storeToRefs(useTokenStore())
 const { evmAddress } = storeToRefs(useBotStore())
 const walletStore = useWalletStore()
@@ -111,6 +117,17 @@ const addressAndChain = computed(() => {
     address: token.value?.token || '',
     chain: token.value?.chain || '',
   }
+})
+// const activeTime = computed({
+//   get() {
+//     return props.activeTime
+//   },
+//   set(value) {
+//     emits('update:activeTime', value)
+//   },
+// })
+watch(() => props.activeTime, (val) => {
+  activeTime.value = val
 })
 
 const visible = computed({
@@ -142,10 +159,11 @@ const init = () => {
 function init1() {
   loading1.value = true
   getHoldersTokenCountInterval(addressAndChain.value.address, addressAndChain.value.chain,activeTime.value).then(res => {
-    console.log('getHoldersTokenCountInterval', res)
-    loading1.value = false
-    if(Array.isArray(res) && res.length){
-      dataList1.value = res.map(i=>{
+    const arr = res || []
+    if(arr.length){
+      replaceNegOne(arr,'holders_count')
+      // console.log('getHoldersTokenCountInterval', arr)
+      dataList1.value = arr.map(i=>{
         return {
           ...i,
           value1: i.holders_count,
@@ -165,9 +183,13 @@ function init1() {
 function init2() {
   loading2.value = true
   getHoldersTokenTopHoldersRatio(addressAndChain.value.address, addressAndChain.value.chain,activeTime.value).then(res => {
-    console.log('getHoldersTokenTopHoldersRatio', res)
-    if(Array.isArray(res) && res.length){
-      dataList2.value = res.map(i=>{
+    const arr = res || []
+    if(arr.length){
+      replaceNegOne(arr,'holders_count')
+      replaceNegOne(arr,'top100_ratio')
+      replaceNegOne(arr,'top50_ratio')
+      replaceNegOne(arr,'top10_ratio')
+      dataList2.value = arr.map(i=>{
         return {
           ...i,
           value3: i.top100_ratio,

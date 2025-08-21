@@ -77,7 +77,9 @@ const series = computed(() =>
     name: i.label,
     type: 'line',
     z: 1,
-    symbol: 'none',
+    // symbol: 'none',
+    smooth: true, 
+    symbolSize: 1,
     itemStyle: {
       color: i.color
     },
@@ -124,7 +126,8 @@ const init = () => {
       textStyle: {
         color: mode.value  === 'light' ? '#333' : '#F5F5F5',
         fontSize : 16,
-        fontFamily: 'Poppins'
+        fontFamily: 'Poppins',
+        fontWeight:500
       },
       text: t('holdersChange'), // 替换为实际的翻译逻辑
     },
@@ -162,7 +165,7 @@ const init = () => {
       containLabel: true,
       tooltip: {
         axisPointer: {
-          type: 'cross'
+          type: 'line'
         }
       }
     },

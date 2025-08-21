@@ -326,6 +326,7 @@ export function getHoldersTokenHoldersLight(token: string, chain: string,top_n: 
     time: string|number;
     top100_ratio?: string|number;
     top10_ratio?: string|number;
+    top_n_ratio?: string|number;
   }>
 }> {
   const {$api} = useNuxtApp()

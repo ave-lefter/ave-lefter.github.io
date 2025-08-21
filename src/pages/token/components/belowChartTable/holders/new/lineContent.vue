@@ -1,8 +1,8 @@
 <template>
   <div v-if="['solana', 'bsc']?.includes(addressAndChain.chain)" class="w-lineLight h-52px w-100% px-10px border-b-1px border-b-solid border-b-[--d-1A1A1A-l-F2F2F2] mb-12px" :class="isHidden && 'h-0px! border-b-0px p-0px!'">
     <ul v-if="!isHidden" class="flex gap-24px">
-      <li class="flex gap-8px">
-        <div class="clickable" @click.stop="popVisible = true">
+      <li class="flex gap-8px" @click.stop="popVisible = true">
+        <div class="clickable">
           <div class="font-400 text-12px lh-16px tracking-0px color-[--d-666-l-999] mb-4px flex items-center">
             {{ t('holdersNum') }}{{ holders1M?'(1m)':'(1h)' }}
             <Icon name="material-symbols:chevron-right-rounded" class="ml-4px text-14px"/>
@@ -11,8 +11,8 @@
         </div>
         <lineS  class="w-120px h-40px" :dataList="dataList1" :loading="loading1" :showSeries="[false, false]"  :showLeft="showLeft1" />
       </li>
-      <li class="flex gap-8px">
-        <div class="clickable" @click.stop="popVisible = true">
+      <li class="flex gap-8px"  @click.stop="popVisible = true">
+        <div class="clickable">
           <div class="font-400 text-12px lh-16px tracking-0px color-[--d-666-l-999] mb-4px flex items-center">
             <span class="w-38px">
               Top{{topN}}
@@ -31,7 +31,7 @@
     <div :class="['bg-[--d-222-l-F2F2F2] w-20px h-12px flex items-center justify-center mx-auto cursor-pointer transition-all duration-0.4s', isHidden && 'rotate-z-180 origin-center']" @click="isHidden = !isHidden">
       <Icon name="material-symbols:keyboard-arrow-up" class="color-[--d-CCC-l-333]"/>
     </div>
-    <RightPop v-if="popVisible" v-model="popVisible" :holdersNum="Number(holdersNum)"/>
+    <RightPop v-if="popVisible" v-model="popVisible" :holdersNum="Number(holdersNum)" :activeTime="holders1M?'1m':'1h'"/>
   </div>
   <div v-else/>
 </template>
@@ -44,7 +44,9 @@ import {
   getHoldersTokenCountLight,
   getHoldersTokenHoldersLight,
 } from '@/api/holders'
-import {  throttle  } from 'lodash-es'
+
+import { replaceNegOne } from '../utils'
+
 const { t } = useI18n()
 const route = useRoute()
 // const id = computed(() => route.params.id as string)
@@ -103,10 +105,12 @@ function _getHoldersTokenCountLight(){
   loading1.value = true
   getHoldersTokenCountLight(addressAndChain.value.address, addressAndChain.value.chain).then(res => {
     console.log('getHoldersTokenCountLight', res)
-    if(res.token_count_data && res.token_count_data.length){
-      holdersNum.value = res.token_count_data[res.token_count_data.length-1]?.holders_count
+    const arr = res?.token_count_data || []
+    if(arr.length){
+      replaceNegOne(arr,'holders_count')
+      holdersNum.value = arr[arr.length-1]?.holders_count === -1 ? 0 : arr[arr.length-1]?.holders_count
       holders1M.value = new Date().getTime() - res.create_time * 1000 <  12 * 60 * 60 * 1000
-      dataList1.value = res.token_count_data.map(i=>{
+      dataList1.value = arr.map(i=>{
         return {
           ...i,
           value1: i.holders_count
@@ -130,13 +134,17 @@ function init2() {
   if(!['solana', 'bsc']?.includes(addressAndChain.value?.chain)) return 
   loading2.value = true
   getHoldersTokenHoldersLight(addressAndChain.value.address, addressAndChain.value.chain,topN.value).then(res => {
-    console.log('getHoldersTokenHoldersLight', res)
-    if(res.token_holder_ratio && res.token_holder_ratio.length){
-      holdersAvg.value = res.token_holder_ratio[res.token_holder_ratio.length-1]?.top100_ratio || res.token_holder_ratio[res.token_holder_ratio.length-1]?.top10_ratio
-      dataList2.value = res.token_holder_ratio.map(i=>{
+    // console.log('getHoldersTokenHoldersLight', res)
+    const arr = res?.token_holder_ratio || []
+    // top_n_ratio
+    if(arr.length){
+      replaceNegOne(arr,'top_n_ratio')
+      console.log('getHoldersTokenHoldersLight', arr)
+      holdersAvg.value =  arr[arr.length-1]?.top_n_ratio === -1 ? 0 : arr[arr.length-1]?.top_n_ratio
+      dataList2.value = arr.map(i=>{
         return {
           ...i,
-          value1: i.top100_ratio || i.top10_ratio 
+          value1: Number(i.top_n_ratio)*10**8
         }
       })
     }else{
