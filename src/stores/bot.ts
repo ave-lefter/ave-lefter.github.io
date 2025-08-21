@@ -23,7 +23,7 @@ const _refreshAccessToken = createCacheRequest(_refAcc, 3000)
 export const useBotStore = defineStore('bot', () => {
   const walletStore = useWalletStore()
   const configStore = useConfigStore()
-  const isSupportChains = ['eth', 'bsc', 'solana', 'base']
+  const isSupportChains = ['eth', 'bsc', 'solana', 'base', 'xlayer'] as const
   const isSupportEvmChains = computed(() => {
     const chainConfig = configStore.chainConfig
     const isEvmChainWallet = getChainInfo(walletStore.chain)?.vm_type === 'evm'
