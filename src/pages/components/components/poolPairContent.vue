@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import XIcon from '~/components/xPopup/xIcon.vue'
 
 const emit = defineEmits(['collect','toggleKline'])
+const rankKlineStore = useRankKlineStore()
 const { t } = useI18n()
 const props = defineProps<{
   pageNO: number
@@ -33,6 +34,13 @@ function inBlackList(row) {
         (i.address == getSymbol(row) && i.type == 'keyword')
     ) !== -1
   )
+}
+
+function blockToken(row) {
+  addOrRemoveBlackList(row, 'ca')
+  if(row.id === rankKlineStore.klineRow.id){
+    toggleKline()
+  }
 }
 
 function addOrRemoveBlackList(item: { token: string }, type: 'ca' | 'dev' | 'keyword') {
@@ -77,7 +85,7 @@ function toggleKline() {
       v-tooltip="$t('blockToken')"
       name="custom:invisible"
       class="text-12px absolute top-5px left-5px hidden icon"
-      @click.self.stop="addOrRemoveBlackList(row, 'ca')"
+      @click.self.stop="blockToken(row)"
     />
     <Icon
       v-else
@@ -184,7 +192,7 @@ function toggleKline() {
           </el-tooltip>
           <Icon
             v-if="enableKline"
-            v-tooltip="$t('kline')"
+            v-tooltip="!activeKline?$t('kline'):$t('hidekline')"
             name="custom:kline" class="text-12px ml-4px hover:color-#8CA0C3" 
             :class="activeKline ? 'color-#8CA0C3' : 'color-#566275'"
             @click.self.stop="toggleKline"

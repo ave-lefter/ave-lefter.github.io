@@ -104,6 +104,9 @@ const columns = useStorage('hotUserTableColumns', getHotDefaultColumns(t))
 function tableRowClick({ rowData }: RowEventHandlerParams) {
   if(rowData.isKline){
     return
+  } else if(rowData.id !== rankKlineStore.klineRow.id){
+    toggleKline(rankKlineStore.klineRow.id)
+    return
   }
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
 }

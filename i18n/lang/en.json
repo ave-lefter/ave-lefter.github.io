@@ -1329,5 +1329,6 @@
   "BlackListDev": "BlackList of Dev",
   "searchKol": "Search KOL",
   "searchKolPlaceholder": "Please enter the KOL address",
-  "kline":"Show Kline"
+  "kline":"Show Kline",
+  "hidekline":"Hide Kline"
 }

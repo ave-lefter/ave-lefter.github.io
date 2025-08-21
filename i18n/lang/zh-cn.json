@@ -1328,5 +1328,6 @@
   "BlackListDev": "拉黑DEV",
   "searchKol": "搜索KOL",
   "searchKolPlaceholder": "请输入KOL地址",
-  "kline":"显示K线"
+  "kline":"显示K线",
+  "hidekline":"隐藏K线"
 }

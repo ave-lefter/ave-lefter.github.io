@@ -301,10 +301,6 @@ function handleReset() {
               :width="12"
               style="border-radius: 100%"
             >
-            <a
-              class="bg-btn clickable">
-              <Icon name="custom:ai" class="text-14px"/>
-            </a>
           </div>
           <el-popover
             v-if="collected"

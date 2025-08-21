@@ -59,7 +59,7 @@ function formatAddress(address: string) {
               owner ? formatAddress(owner) : '-' }}</a>
                 <Icon v-copy="owner" name="bxs:copy" class="ml-5px clickable color-[--d-566275-l-8CA0C3]" />
             </div>
-            <span class="color-[--d-566275-l-8CA0C3]">{{ $t('pair') }}</span>
+            <span class="color-[--d-566275-l-8CA0C3]">{{ $t('contractOwner') }}</span>
         </div>
         <div v-if="tokenStore.tokenInfoExtra?.amount_24" class="w-94px py-8px flex justify-center items-center flex-col rounded-4px bg-[--d-151A22-l-E8F1FF]">
             <span class="color-[--d-8CA0C3-l-566275] mb-6px">{{ formatNumber(tokenStore.tokenInfoExtra?.amount_24/tokenStore.circulation*100 || 0, 2) }}%</span>
