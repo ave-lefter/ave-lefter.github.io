@@ -35,19 +35,26 @@ const option = computed(() => [
     color: '#286DFF',
     label: t('addressCount'), // 替换为实际的翻译逻辑
     value: 'value1',
-    // areaStyle: {
-    //   opacity: 0.8,
-    //   color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    //     {
-    //       offset: 0,
-    //       color: '#12B886'
-    //     },
-    //     {
-    //       offset: 1,
-    //       color: '#0A0B0D'
-    //     }
-    //   ])
-    // },
+    areaStyle: {
+        color: {
+          type: 'linear',
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            {
+              offset: 0,
+              color: 'rgb(40, 109, 255, 0.9)' // 0% 处的颜色
+            },
+            {
+              offset: 1,
+              color:  mode.value  === 'light' ? '#fff' : 'rgb(23, 25, 28)' // 100% 处的颜色
+            }
+          ],
+          globalCoord: false // 缺省为 false
+        }
+    },
   },
   // {
   //   k: 2,
@@ -127,7 +134,7 @@ const init = () => {
         color: mode.value  === 'light' ? '#333' : '#F5F5F5',
         fontSize : 16,
         fontFamily: 'Poppins',
-        fontWeight:500
+        fontWeight:400
       },
       text: t('holdersChange'), // 替换为实际的翻译逻辑
     },

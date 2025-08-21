@@ -1,5 +1,5 @@
 <template>
-  <div v-if="['solana', 'bsc']?.includes(addressAndChain.chain)" class="w-lineLight h-52px w-100% px-10px border-b-1px border-b-solid border-b-[--d-1A1A1A-l-F2F2F2] mb-12px" :class="isHidden && 'h-0px! border-b-0px p-0px!'">
+  <div v-if="['solana']?.includes(addressAndChain.chain)" class="w-lineLight h-52px w-100% px-10px border-b-1px border-b-solid border-b-[--d-1A1A1A-l-F2F2F2] mb-12px" :class="isHidden && 'h-0px! border-b-0px p-0px!'">
     <ul v-if="!isHidden" class="flex gap-24px">
       <li class="flex gap-8px" @click.stop="popVisible = true">
         <div class="clickable">
@@ -87,7 +87,7 @@ const addressAndChain = computed(() => {
 const isInitialized = shallowRef(false) // 用于控制初始化
 
 function init1() {
-  if(!['solana', 'bsc']?.includes(addressAndChain.value?.chain)) return 
+  if(!['solana']?.includes(addressAndChain.value?.chain)) return 
   _getHoldersTokenCountLight()
   if(!holders1M.value){
     if(timer){
@@ -131,7 +131,7 @@ function _getHoldersTokenCountLight(){
   })
 }
 function init2() {
-  if(!['solana', 'bsc']?.includes(addressAndChain.value?.chain)) return 
+  if(!['solana']?.includes(addressAndChain.value?.chain)) return 
   loading2.value = true
   getHoldersTokenHoldersLight(addressAndChain.value.address, addressAndChain.value.chain,topN.value).then(res => {
     // console.log('getHoldersTokenHoldersLight', res)

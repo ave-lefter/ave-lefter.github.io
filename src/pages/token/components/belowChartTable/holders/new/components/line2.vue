@@ -116,7 +116,7 @@ const init = () => {
         color: mode.value  === 'light' ? '#333' : '#F5F5F5',
         fontSize : 16,
         fontFamily: 'Poppins',
-        fontWeight:500
+        fontWeight:400
       },
       text: t('holdersChange2',{n:props.activeTime}), // 替换为实际的翻译逻辑
     },
