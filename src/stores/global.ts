@@ -71,7 +71,20 @@ export const useGlobalStore = defineStore('global', () => {
     quickBuyValue: '0.01',
   })
   const latestNotice = shallowRef<ILatestNotice>({})
-
+  const audioSettings = useStorage('audioSettings',{
+    active:'',
+    notice:{
+      // @todos
+    },
+    audio:{
+      signal:'',
+      monitor:'',
+      marketBuy:'',
+      marketSell:'',
+      limit:'',
+      volume:''
+    }
+  })
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
   const holderBlackList = useStorage<Array<pumpBlack>>('holderBlackList', [])
@@ -159,6 +172,7 @@ export const useGlobalStore = defineStore('global', () => {
     rankCommon,
     headFollowsNum,
     getFollowsNum,
-    latestNotice
+    latestNotice,
+    audioSettings
   }
 })

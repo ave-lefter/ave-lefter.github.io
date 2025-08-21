@@ -1336,5 +1336,7 @@
   "submit": "提交",
   "availableRent": "可领取的租金",
   "closeAccountsSuccess": "回收租金成功",
-  "loadingCloseAccount": "正在关闭账户并回收租金，请稍候..."
+  "loadingCloseAccount": "正在关闭账户并回收租金，请稍候...",
+  "noticeSettings": "通知设置",
+  "audioSettings": "声音设置"
 }

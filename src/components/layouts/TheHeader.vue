@@ -149,7 +149,15 @@
         </div>
       </div>
     </el-popover>
-
+    <div
+      class="bg-[var(--d-141721-l-E8F1FF)] rounded-4px p-8px ml-8px h-32px flex items-center cursor-pointer hover:opacity-80"
+      @click="globalStore.audioSettings.active = 'notice'"
+    >
+      <Icon
+        class="text-20px text-#8CA0C3"
+        name="custom:alert"
+      />
+    </div>
     <Notice/>
     <el-dropdown
       trigger="click"
@@ -195,6 +203,7 @@
     <!-- <component :is="connectWalletCom" v-model="botStore.connectVisible" /> -->
     <ConnectWalletCom />
     <BotTipDialog/>
+    <AudioSettings/>
   </header>
 </template>
 <script lang="ts" setup>
@@ -206,6 +215,7 @@ import Positions from '@/components/header/positions/index.vue'
 import ExWalletBtn from '../header/connectWallet/exWalletBtn.vue'
 import BotTipDialog from './components/botTipDialog.vue'
 import ClipboardToken from './components/clipboardToken.vue'
+import AudioSettings from './components/audioSettings.vue'
 // import connectWallet from '@/components/header/connectWallet/index.vue'
 // const connectWallet = shallowRef<Component | null>(null)
 const { locales } = useI18n()
@@ -215,6 +225,7 @@ const walletStore = useWalletStore()
 const route = useRoute()
 const langStore = useLocaleStore()
 const {t } = useI18n()
+const globalStore = useGlobalStore()
 const  appDownloadVisible = shallowRef(false)
 const list = computed(() => {
   // let query = ''

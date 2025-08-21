@@ -1337,5 +1337,7 @@
   "submit": "Submit",
   "availableRent": "Available Rent",
   "closeAccountsSuccess": "Recycling of rent successfully",
-  "loadingCloseAccount": "Close your account and recycle your rent, please wait..."
+  "loadingCloseAccount": "Close your account and recycle your rent, please wait...",
+  "noticeSettings": "Notice Settings",
+  "audioSettings": "Audio Settings"
 }
