@@ -102,9 +102,10 @@ const loading = shallowRef(false)
 const columns = useStorage('hotUserTableColumns', getHotDefaultColumns(t))
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
+  const {klineRow:{id}} = rankKlineStore
   if(rowData.isKline){
     return
-  } else if(rowData.id !== rankKlineStore.klineRow.id){
+  } else if(id && rowData.id !== id){
     toggleKline(rankKlineStore.klineRow)
     return
   }
@@ -185,6 +186,9 @@ async function _getTreasureList(shouldLoading = true) {
     }
     if (shouldLoading) {
       loading.value = true
+      if(rankKlineStore.klineRow.id){
+        toggleKline(rankKlineStore.klineRow)
+      }
     }
     const { total: _, ...rest } = pageInfo.value
     const res = await getTreasureList({
