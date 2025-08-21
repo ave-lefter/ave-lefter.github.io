@@ -1126,48 +1126,39 @@
   "followBuy": "跟单买入",
   "followSell": "跟单卖出",
   "devSell": "DEV卖出跟卖",
-
   "downloadAve": "下载Ave.ai APP",
   "downloadSubtitle": "安全、专业、最快、最全的去中心化聚合交易平台",
   "downloadByScanCode": "扫码下载",
   "appFaq": "下载安装教程",
   "deskApp": "桌面端应用下载",
   "moreOptions": "更多选项",
-
   "glodDogTitle": "全链榜单,金狗就在其中！",
   "glodDogSubTitle": "实时监控热门新盘、聪明钱买入、爆拉涨幅榜， 不抢先一步，就只能追高补仓！",
   "glodDesTitle": "AI叙事分析",
   "glodDesSubtitle": "AI智能分析代币背景",
-
   "signTitle": "信号广场已经开启金狗猎场！",
   "signSubTitle": "KOL、巨鲸、聪明钱正在扫盘，链上异动信号实时触发。 下一只爆发的金狗，可能就在你犹豫的这一秒！",
   "signDesTitle": "信号广场",
   "signDesSubtitle": "AI智捕全网金狗信号",
-
   "tokenTitle": "AI合约检测，风险预警！",
   "tokenTitle1": "",
   "tokenSubTitle": "大幅提高异常合约识别能力，精确提取问题代码片段",
   "tokenDesTitle": "AI合约检测",
   "tokenDesSubtitle": "AI检测识别异常合约",
-
   "safeTitle": "交易更安全 & 反应更快",
   "safeDes": "链上透明锁仓，安全保障每一笔交易,跟随聪明钱布局，用秒级速度抓住行情起点！",
-
   "buyAndSell": "一键买卖，直达链上",
   "buyAndSellTitle1": "市价 / 限价秒切换，聚合最优路径",
   "buyAndSellTitle2": "支持一键买入 / 卖出，撮合直连 Aveswap",
   "buyAndSellTitle3": "全链透明，锁仓 / 滑点 / 费用清晰可见",
-
   "walletTitle": "钱包洞察 ，真实盈亏，一目了然",
   "walletTitle1": "",
   "walletDes": "多维解析资金轨迹，洞察链上资金的真实意图",
   "walletTitle2": "多维钱包体系，解锁链上所有可能",
   "walletDes2": "多账户形态自由切换，重构链上身份的管理方式与交互体验",
-
   "tagTitle": "多维画像标签，直观掌握地址行为偏好",
   "tagDes": "交易风格、买卖模式、标签分类一目了然",
   "joinTelegram": "加入Ave.ai Telegram群组",
-
   "Gem": "金狗",
   "Smarters": "潜力榜",
   "BigBuy": "大额买入",
@@ -1188,7 +1179,6 @@
   "Bundle": "捆绑地址",
   "Exit": " 清仓 ",
   "Phishing": "钓鱼钱包",
-
   "help": "帮助",
   "Android": "Android",
   "Ios": "iOS",
@@ -1328,5 +1318,24 @@
   "BlackListToken": "拉黑代币",
   "BlackListDev": "拉黑DEV",
   "searchKol": "搜索KOL",
-  "searchKolPlaceholder": "请输入KOL地址"
+  "searchKolPlaceholder": "请输入KOL地址",
+  "rentRecovery": "租金回收",
+  "rentRecoveryDesc": "快速回收租金，提升资产管理效率",
+  "recyclableTokens": "可回收租金的代币账户总数",
+  "question": "常见问题",
+  "question1Title": "1. Solana 账户租金是什么？",
+  "question1Content": "在 Solana 网络，每个代币和 NFT 都有独立的账户，这些账户需存入一定数量的 SOL 作为租金才能正常使用。",
+  "question2Title": "2. 如何回收账户租金？",
+  "question2Content": "如需关闭 Solana 账户，请先清空账户内所有剩余的代币或 NFT。关闭后，用作租金的 SOL 将退还给你。",
+  "question3Title": "3. 如何了解 Solana 更多信息？",
+  "question3Content": "请查看 ",
+  "question3Content2": "Solana 官方文档",
+  "selectClosedTokenAccount": "选择关闭的代币账户",
+  "selectedToken": "已选择的代币账户：",
+  "limitRent": "最多选择20个",
+  "selectAll": "选择全部",
+  "submit": "提交",
+  "availableRent": "可领取的租金",
+  "closeAccountsSuccess": "回收租金成功",
+  "loadingCloseAccount": "正在关闭账户并回收租金，请稍候..."
 }

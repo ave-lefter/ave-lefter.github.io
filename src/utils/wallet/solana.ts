@@ -1,18 +1,19 @@
 import { getWallets, type Wallets } from '@wallet-standard/app'
 // import { WalletAccount } from '@wallet-standard/base'
-import { Connection, PublicKey, VersionedTransaction, AddressLookupTableAccount, TransactionMessage, Transaction, type Signer } from '@solana/web3.js'
+import { Connection, PublicKey, VersionedTransaction, AddressLookupTableAccount, TransactionMessage, Transaction, type Signer, VersionedMessage } from '@solana/web3.js'
 import { getBestApiDomain } from '~/plugins/api/getApiDomain'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { getTokensPrice } from '@/api/token'
 import { getRaydiumReferralTokenAccountPubKey, getSolanaPumpSwapTx, getSolanaMoonshotSwapQuote, quoteSolanaRaydiumSwap, getReferralTokenAccountPubKey } from './utils/solana'
 import { getSolanaSwapQuote, getSolanaSwapTransaction } from '@/api/swap/solana'
 import BigNumber from 'bignumber.js'
+import { bot_createSolCloseAccountsTx, createSolCloseAccountsTx } from '~/api/solana-rent'
 // import bs58 from 'bs58'
 
 type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 type Features = {
   'standard:connect': {
-    connect: () => Promise<{accounts: Array<{ address: string }>}>
+    connect: () => Promise<{ accounts: Array<{ address: string }> }>
   },
   'standard:events': {
     on: (event: 'change' | 'disconnect' | 'accountsChanged' | 'networkChanged', callback: (event: { accounts?: { address: string }[]; chains?: string[] }) => void) => void
@@ -21,14 +22,14 @@ type Features = {
     disconnect: () => Promise<void>
   },
   'solana:signAndSendTransaction': {
-    signAndSendTransaction: (data: {transaction: any, account?: any, chain?: string, options?: {maxRetries?: number, preflightCommitment?: string}}) => Promise<[{
+    signAndSendTransaction: (data: { transaction: any, account?: any, chain?: string, options?: { maxRetries?: number, preflightCommitment?: string } }) => Promise<[{
       signature: Uint8Array | string
     }] | {
       signature: Uint8Array | string
     }>
   },
   'solana:signTransaction': {
-    signTransaction: (data: {transaction: any, account?: any, chain?: string}) => Promise<Array<{ signedTransaction: Uint8Array }> | { signedTransaction: Uint8Array }>
+    signTransaction: (data: { transaction: any, account?: any, chain?: string }) => Promise<Array<{ signedTransaction: Uint8Array }> | { signedTransaction: Uint8Array }>
   },
   'solana:signMessage': {
     signMessage: (msg: {
@@ -51,7 +52,7 @@ export type Wallet = MakeOptional<ReturnType<Wallets['get']>[number], 'features'
   } | Array<{
     signature: Uint8Array
   }>>
-  signAndSendTransaction?: (data: {transaction: any, account?: any, chain?: string}) => Promise<{
+  signAndSendTransaction?: (data: { transaction: any, account?: any, chain?: string }) => Promise<{
     signature: Uint8Array
   }>
 
@@ -97,9 +98,9 @@ export const DefaultSolanaWallets: Wallet[] = [
 
 
 export function getSolanaWallets() {
-  const wallets= getWallets().get().filter(i => {
+  const wallets = getWallets().get().filter(i => {
     return i.chains?.includes('solana:mainnet') && i.name !== 'Trust'
-  }) as  Array<Wallet>
+  }) as Array<Wallet>
   DefaultSolanaWallets.forEach((i) => {
     const index = wallets.findIndex(j => j.name === i.name)
     if (index < 0) {
@@ -108,7 +109,7 @@ export function getSolanaWallets() {
   })
   return wallets.sort((a, b) => {
     if (a.features && b.features) {
-      return DefaultSolanaWallets.findIndex(i => i.name === b.name) -  DefaultSolanaWallets.findIndex(i => i.name === a.name)
+      return DefaultSolanaWallets.findIndex(i => i.name === b.name) - DefaultSolanaWallets.findIndex(i => i.name === a.name)
     }
     return 0
   })
@@ -146,15 +147,19 @@ export function connectSolanaWallet(wallet: Wallet) {
       walletStore.provider = wallet
       walletStore.walletName = wallet.name
       return Promise.resolve(res)
-   })
+    })
   } else if (wallet.url) {
     window.open(wallet.url, '_blank')
   }
   return Promise.resolve(false)
 }
 
-export const getSolanaConnection = () => {
-  return new Connection(`${getBestApiDomain()}/ave_nodes/rpc/solana/sendFastSwapTx`, { commitment: 'confirmed', wsEndpoint: 'wss://solana.twnodes.com' })
+export function getSolanaConnection() {
+  let domain = getBestApiDomain()
+  if (domain === 'https://0ftrfsdb.xyz') {
+    domain = 'https://mayeas023.com'
+  }
+  return new Connection(`${domain}/ave_nodes/rpc/solana/sendFastSwapTx`, { commitment: 'confirmed', wsEndpoint: 'wss://solana.twnodes.com' })
 }
 
 // export const connection = new Connection(`${getBestApiDomain()}/ave_nodes/rpc/solana/sendFastSwapTx`, { commitment: 'confirmed', wsEndpoint: 'wss://solana.twnodes.com' })
@@ -223,7 +228,7 @@ export async function getSolanaTokensBalance(user1 = useWalletStore().address): 
 
 
 
-export async function configureAndSendCurrentTransaction (
+export async function configureAndSendCurrentTransaction(
   transaction: VersionedTransaction | Transaction,
   baseSinger?: string | Signer
 ) {
@@ -242,7 +247,7 @@ export async function configureAndSendCurrentTransaction (
   if (transaction instanceof Transaction) {
     transaction.feePayer = new PublicKey(walletStore.address)
     transaction.recentBlockhash = hashInfo.blockhash
-  } else if(transaction instanceof VersionedTransaction) {
+  } else if (transaction instanceof VersionedTransaction) {
     transaction.message.recentBlockhash = hashInfo.blockhash
   }
   if (baseSinger && typeof baseSinger !== 'string') {
@@ -260,9 +265,9 @@ export async function quoteSolanaPumpSwap(params: { inputMint: string; outputMin
     feeBps: '50',
     feeAccount: referralTokenAccount
   }
-  const feeConfigObj = referralTokenAccount ? {feeConfig} : {}
+  const feeConfigObj = referralTokenAccount ? { feeConfig } : {}
   const mint = [params.inputMint, params.outputMint].find(m => m !== 'So11111111111111111111111111111111111111112')
-  const isExactOut =  params?.swapMode === 'ExactOut'
+  const isExactOut = params?.swapMode === 'ExactOut'
   const swapTransaction = await getSolanaPumpSwapTx({
     mint,
     amount: params.amount,
@@ -292,7 +297,7 @@ export async function quoteSolanaPumpSwap(params: { inputMint: string; outputMin
           state: AddressLookupTableAccount.deserialize(await connection.getAccountInfo(lookup.accountKey).then((res: any) => res?.data)),
         })
       }))
-    const message = TransactionMessage.decompile(transaction.message,{addressLookupTableAccounts: addressLookupTableAccounts})
+    const message = TransactionMessage.decompile(transaction.message, { addressLookupTableAccounts: addressLookupTableAccounts })
     message.instructions.unshift(transactionInstruction)
     transaction.message = message.compileToV0Message(addressLookupTableAccounts)
   }
@@ -302,8 +307,8 @@ export async function quoteSolanaPumpSwap(params: { inputMint: string; outputMin
   const decimals = !isExactOut ? outputDecimals : inputDecimals
   return {
     routeInfo: {
-      amountOut: {amount: new BigNumber(swapTransaction?.amountOut).div(10 ** decimals)},
-      minAmountOut: {amount: new BigNumber(swapTransaction?.amountOut).times(new BigNumber(params.slippageBps || 200).plus(10000)).div(100000).div(10 ** decimals)},
+      amountOut: { amount: new BigNumber(swapTransaction?.amountOut).div(10 ** decimals) },
+      minAmountOut: { amount: new BigNumber(swapTransaction?.amountOut).times(new BigNumber(params.slippageBps || 200).plus(10000)).div(100000).div(10 ** decimals) },
       priceImpact: new BigNumber(swapTransaction?.priceImpact || 0).div(100).toFixed(4),
       isExactOut: isExactOut
     },
@@ -357,9 +362,9 @@ export async function getSolanaSwapQuoteTransaction(params: any) {
 }
 
 function connectionGetParsedTransaction(hash: string) {
-  const connection1 = new Connection('https://aveai-main841-0dae.mainnet.rpcpool.com/4cc401ba-89fd-4546-bac5-478b919e05ae', { commitment: 'confirmed'})
-  return connection1.getParsedTransaction(hash, {maxSupportedTransactionVersion: 10}).catch(() => {
-    return getSolanaConnection().getParsedTransaction(hash, {maxSupportedTransactionVersion: 10})
+  const connection1 = new Connection('https://aveai-main841-0dae.mainnet.rpcpool.com/4cc401ba-89fd-4546-bac5-478b919e05ae', { commitment: 'confirmed' })
+  return connection1.getParsedTransaction(hash, { maxSupportedTransactionVersion: 10 }).catch(() => {
+    return getSolanaConnection().getParsedTransaction(hash, { maxSupportedTransactionVersion: 10 })
   })
 }
 
@@ -435,7 +440,8 @@ export async function sendSolanaSwapTransaction(quoteResponse: { transaction?: a
   const fromPubkey = new PublicKey(currentAccount)
   const mint = quoteResponse?.swapMode !== 'ExactIn' ? quoteResponse.inputMint : quoteResponse.outputMint
   const { referralTokenAccountPubKey, referralTokenAccount } = await getReferralTokenAccountPubKey(mint)
-  const params: any = {userPublicKey: fromPubkey.toString(), quoteResponse, dynamicComputeUnitLimit: true,
+  const params: any = {
+    userPublicKey: fromPubkey.toString(), quoteResponse, dynamicComputeUnitLimit: true,
     prioritizationFeeLamports: {
       autoMultiplier: 1,
       // priorityLevelWithMaxLamports: {"priorityLevel": "veryHigh", "maxLamports": 2123423}
@@ -508,7 +514,7 @@ async function signAndSend(tx: VersionedTransaction | Transaction): Promise<stri
     transaction: serialized,
     account: wallet?.accounts?.[0] || '',
     chain: 'solana:mainnet'
-  }).then(async(res) => {
+  }).then(async (res) => {
     const signedTransaction = Array.isArray(res) ? res?.[0]?.signedTransaction : res?.signedTransaction
     // VersionedTransaction.deserialize(msg)
     const signatureTx = VersionedTransaction.deserialize(signedTransaction)
@@ -517,9 +523,9 @@ async function signAndSend(tx: VersionedTransaction | Transaction): Promise<stri
   }) || Promise.resolve('')
 }
 
-async function sendRawTransaction (signedTx: Parameters<Connection['sendRawTransaction']>[0]) {
-  const connection1 = new Connection('https://aveai-main841-0dae.mainnet.rpcpool.com/4cc401ba-89fd-4546-bac5-478b919e05ae', { commitment: 'confirmed'})
-  const connection2 = new Connection(`${getBestApiDomain()}/ave_nodes/rpc/solana/sendFastSwapTx`, { commitment: 'confirmed'})
+async function sendRawTransaction(signedTx: Parameters<Connection['sendRawTransaction']>[0]) {
+  const connection1 = new Connection('https://aveai-main841-0dae.mainnet.rpcpool.com/4cc401ba-89fd-4546-bac5-478b919e05ae', { commitment: 'confirmed' })
+  const connection2 = new Connection(`${getBestApiDomain()}/ave_nodes/rpc/solana/sendFastSwapTx`, { commitment: 'confirmed' })
   const connections = [
     connection1,
     // connection2,
@@ -538,5 +544,147 @@ async function sendRawTransaction (signedTx: Parameters<Connection['sendRawTrans
   )
 
   return signature
+}
+
+
+
+async function getLatestTxHashFromAddress(address: string) {
+  return getSolanaConnection().getSignaturesForAddress(new PublicKey(address), { limit: 1 }).then(async res => {
+    console.log('res', res)
+    return res?.[0]?.signature || ''
+  })
+}
+
+export async function signAndSendCloseAccountsTx({ closeAccounts }: { closeAccounts: Array<{ mint: string, tokenAccount: string }> }) {
+  const botStore = useBotStore()
+  const walletStore = useWalletStore()
+  const _botAddress = botStore?.userInfo?.addresses?.find(i => i.chain === 'solana')?.address
+  if (_botAddress) {
+    // let preTxHash = await getLatestTxHashFromAddress(_botAddress)
+    let _batchId = Date.now().toString()
+    const wsStore = useWSStore()
+    return bot_createSolCloseAccountsTx({
+      batchId: _batchId,
+      creatorAddress: _botAddress,
+      tgUid: botStore?.userInfo?.tgUid || '',
+      closeAccounts: closeAccounts
+    }).then(async res => {
+      let hash = res.txHash
+      // if (!hash) {
+      //   await sleep(1000)
+      // }
+      return {
+        hash: hash,
+        wait: () => {
+          return new Promise((resolve, reject) => {
+            const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
+              const batchId = subscribeResult.batchId
+              if (batchId === _batchId) {
+                unwatch()
+                if (subscribeResult?.success) {
+                  resolve(subscribeResult?.txHash || true)
+                } else {
+                  reject(subscribeResult?.failMessage || 'close account error')
+                  // handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
+                }
+              }
+            })
+          })
+        }
+      }
+    })
+  }
+  return createSolCloseAccountsTx({
+    creatorAddress: walletStore?.address,
+    closeAccounts: closeAccounts
+  }).then(res => {
+    console.log('res', res)
+    let transactionBuf = Buffer.from(res.txContent, 'base64')
+    let transactionMessage = VersionedMessage.deserialize(transactionBuf as unknown as Uint8Array)
+    let transaction = new VersionedTransaction(transactionMessage)
+    return configureAndSendCurrentTransaction(transaction).then(async hash => {
+      return {
+        hash: hash,
+        wait: () => confirmTransaction(hash)
+      }
+    })
+  })
+}
+
+async function confirmLatestTransaction(preTxhash: string, address: string) {
+  // let connection = new Connection('https://aveai-main841-0dae.mainnet.rpcpool.com/4cc401ba-89fd-4546-bac5-478b919e05ae', { commitment: 'confirmed'})
+  let Timer: null | ReturnType<typeof setTimeout> = null
+  let time = 0
+  function _getLatestTxHashFromAddress() {
+    return new Promise((resolve, reject) => {
+      if (time >= 60) {
+        if (Timer) {
+          clearTimeout(Timer)
+          Timer = null
+        }
+        reject('Timeout')
+        return
+      }
+      try {
+        getLatestTxHashFromAddress(address).then(res => {
+          if (res) {
+            if (res !== preTxhash) {
+              resolve(res)
+            } else {
+              if (Timer) {
+                clearTimeout(Timer)
+                Timer = null
+              }
+              reject('Swap fail')
+            }
+          } else {
+            if (Timer) {
+              clearTimeout(Timer)
+              Timer = null
+            }
+            Timer = setTimeout(async () => {
+              time += 2
+              try {
+                let res = await _getLatestTxHashFromAddress()
+                resolve(res)
+              } catch (err) {
+                if (Timer) {
+                  clearTimeout(Timer)
+                  Timer = null
+                }
+                reject(err)
+              }
+            }, 2000)
+          }
+        })
+      } catch (err) {
+        if (Timer) {
+          clearTimeout(Timer)
+          Timer = null
+        }
+        reject(err)
+      }
+    })
+  }
+  await sleep(2000)
+  return _getLatestTxHashFromAddress()
+}
+
+export async function getSOLBalance(_walletAddress = '') {
+  if (!_walletAddress) {
+    return {
+      symbol: 'SOL',
+      balance: '0',
+      decimals: 9
+    }
+  }
+  let accountKey = new PublicKey(_walletAddress)
+  const connection = getSolanaConnection()
+  let balance = await connection.getBalance(accountKey)
+  return {
+    symbol: 'SOL',
+    balance: new BigNumber(balance).shiftedBy(-9).toFixed(),
+    decimals: 9
+  }
 }
 
