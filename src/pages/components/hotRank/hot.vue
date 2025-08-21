@@ -105,7 +105,7 @@ function tableRowClick({ rowData }: RowEventHandlerParams) {
   if(rowData.isKline){
     return
   } else if(rowData.id !== rankKlineStore.klineRow.id){
-    toggleKline(rankKlineStore.klineRow.id)
+    toggleKline(rankKlineStore.klineRow)
     return
   }
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
@@ -409,7 +409,7 @@ function getRowClass({rowData}:Parameters<RowClassNameGetter<any>>[0]) {
     }
 }
 
-function toggleKline(row) {
+function toggleKline(row:Record<string,any>) {
     if(rankKlineStore.klineRow.id === row.id){
       const rowIndex = filteredListData.value.findIndex(el => el.isKline)
       rankKlineStore.klineRow = {}
