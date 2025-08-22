@@ -83,19 +83,20 @@ function reset() {
         <Icon
           name="custom:filter"
           class="text-10px cursor-pointer"
-          :class="isFilterHighlight ? 'color-[--d-999-l-666]' : ''"
+          :class="isFilterHighlight ? 'color-[--secondary-text]' : ''"
         />
       </template>
       <template #default>
-        <div class="color-[--d-999-l-666] text-12px lh-12px">
+        <div class="color-[--secondary-text] text-12px lh-12px">
           {{ $t('smarterBuyTxns') }}
         </div>
-        <div class="flex items-center mt-8px mb-20px">
+        <div class="flex items-center mt-8px mb-20px [--el-font-size-base:12px]">
           <el-input
             v-model.trim.number="buyRange[0]"
             clearable
             type="text"
             :placeholder="$t('min3')"
+             style="--el-input-border-color:var(--border)"
             @input="(value) => (buyRange[0] = value.replace(/\-|[^\d.]/g, ''))"
           />
           <span class="ml-10px mr-10px">~</span>
@@ -104,18 +105,20 @@ function reset() {
             clearable
             type="text"
             :placeholder="$t('max')"
+             style="--el-input-border-color:var(--border)"
             @input="(value) => (buyRange[1] = value.replace(/\-|[^\d.]/g, ''))"
           />
         </div>
         <div class="color-[--d-999-l-666] text-12px lh-12px">
           {{ $t('smarterSellTxns') }}
         </div>
-        <div class="flex items-center mt-8px">
+        <div class="flex items-center mt-8px [--el-font-size-base:12px]">
           <el-input
             v-model.trim.number="sellRange[0]"
             clearable
             type="text"
             :placeholder="$t('min3')"
+             style="--el-input-border-color:var(--border)"
             @input="(value) => (sellRange[0] = value.replace(/\-|[^\d.]/g, ''))"
           />
           <span class="ml-10px mr-10px">~</span>
@@ -124,13 +127,14 @@ function reset() {
             clearable
             type="text"
             :placeholder="$t('max')"
+             style="--el-input-border-color:var(--border)"
             @input="(value) => (sellRange[1] = value.replace(/\-|[^\d.]/g, ''))"
           />
         </div>
         <div class="mt-20px flex">
           <el-button
             class="h-30px flex-1 m-l-auto"
-            :color="themeStore.isDark ? '#333' : '#F2F2F2'"
+            color="var(--border)"
             @click="reset"
           >
             {{ $t('reset') }}

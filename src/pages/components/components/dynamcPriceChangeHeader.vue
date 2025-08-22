@@ -26,7 +26,7 @@ const defaultSort = computed(() => {
       @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')"
     >
       <span
-        class="lh-16px rounded-2px px-2px text-12px bg-[--d-333-l-FFF] color-[--d-CCC-l-333]"
+        class="lh-16px rounded-2px px-2px text-12px bg-[--border] color-[--secondary-text]"
         >{{ activeInterval }}</span
       >%
     </div>

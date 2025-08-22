@@ -22,21 +22,18 @@
 
 }
 
-.el-select__popper.el-popper{
-  border:0 none !important;
-}
 :root:root {
   --el-text-color-regular: var(--d-F5F5F5-l-333);
 }
 
 .el-table {
   &.el-table {
-    --el-table-header-bg-color: var(--d-222-l-F2F2F2);
+    --el-table-header-bg-color: var(--main-list-hover);
     --el-table-border: 0 none;
-    --el-table-text-color: var(--d-F2F2F2-l-333);
-    --el-table-header-text-color: var(--d-666-l-999);
-    --el-table-row-hover-bg-color: var(--d-1A1A1A-l-F2F2F2);
-    --el-table-tr-bg-color: var(--d-111-l-FFF);
+    --el-table-text-color: var(--secondary-text);
+    --el-table-header-text-color: var(--secondary-text);
+    --el-table-row-hover-bg-color: var(--main-input-button-bg);
+    --el-table-tr-bg-color: var(--secondary-bg);
     thead{
       .el-table__cell{
         height: 32px;
@@ -45,16 +42,16 @@
       }
     }
     .descending .sort-caret.descending{
-      border-top-color: var(--d-F5F5F5-l-333);
+      border-top-color: var(--main-text);
     }
     .ascending .sort-caret.ascending{
-      border-bottom-color: var(--d-F5F5F5-l-333);
+      border-bottom-color: var(--main-text);
     }
     .sort-caret.ascending {
-      border-bottom-color: var(--d-666-l-999);
+      border-bottom-color: var(--third-text);
     }
     .sort-caret.descending{
-      border-top-color: var(--d-666-l-999);
+      border-top-color: var(--third-text);
     }
   }
 
@@ -67,52 +64,66 @@
   }
 }
 
-.el-select {
+.el-select.el-select {
   --el-border-color: transparent;
   --el-border-color-hover: transparent;
-  --el-fill-color-blank: var(--d-FFFFFF0D-l-F2F2F2);
-  --el-text-color-regular: var(--d-F5F5F5-l-333);
-  --el-table-text-color: var(--d-F5F5F5-l-333);
+  // 输入框背景色
+  --el-fill-color-blank: var(--main-input-button-bg);
+  // --el-text-color-regular: var(--d-F5F5F5-l-333);
+  // --el-table-text-color: var(--d-F5F5F5-l-333);
+   // 右侧 Icon
+   --el-select-input-color:var(--main-text);
   .el-select__wrapper {
     font-size: 12px;
   }
-}
-
-.el-select-dropdown__item.is-hovering{
-  --el-fill-color-light:var(--d-333-l-F2F2F2);
 }
 
 .el-select--small .el-select__wrapper.el-select__wrapper {
   padding: 3px 4px;
 }
 
-.el-select__wrapper {
-  --el-fill-color-blank: var(--d-333-l-EEE);
-}
-.el-select-dropdown__wrap{
-  --el-fill-color-light: var(--d-333-l-F5F7FA);
+// .el-select__wrapper {
+//   --el-fill-color-blank: var(--d-333-l-EEE);
+// }
+// .el-select-dropdown__wrap{
+//   --el-fill-color-light: var(--d-333-l-F5F7FA);
+// }
+
+.el-select__popper.el-popper{
+  border:0 none !important;
 }
 
 .el-select__popper{
-  --el-bg-color-overlay: var(--d-222-l-FFF);
-  .el-input{
-    --el-input-bg-color:var(--d-333-l-F2F2F2);
+  // 下拉选择框背景色
+  --el-bg-color-overlay: var(--dialog-bg);
+  --el-border-color-light:transparent;
+  // 选择框中的输入框
+  .el-input.el-input{
+    --el-input-bg-color:var(--border);
+    --el-input-border-color: var(--border);
+    --el-input-hover-border-color:var(--primary-color);
+  }
+  .el-select-dropdown__item{
+    padding: 0 12px;
   }
   .el-select-dropdown__item.is-selected{
     font-weight: normal;
   }
-}
-
-.new-select{
-  --el-text-color-placeholder:var(--d-FFF-l-111);
-}
-
-.new-select-popper{
-  --el-bg-color-overlay: var(--d-151A22-l-FFF);
   .el-select-dropdown__item.is-hovering{
-    --el-fill-color-light:var(--d-252E3C-l-E8F1FF);
+    --el-fill-color-light:var(--border);
   }
 }
+
+// .new-select{
+//   --el-text-color-placeholder:var(--d-FFF-l-111);
+// }
+
+// .new-select-popper{
+//   --el-bg-color-overlay: var(--d-151A22-l-FFF);
+//   .el-select-dropdown__item.is-hovering{
+//     --el-fill-color-light:var(--d-252E3C-l-E8F1FF);
+//   }
+// }
 
 .small-select{
   .el-select-dropdown__item{
@@ -125,16 +136,16 @@
 }
 
 .el-dialog {
-  --el-bg-color: var(--d-222-l-FFF);
+  --el-bg-color: var(--dialog-bg);
 }
 .el-dialog__header {
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   .el-dialog__headerbtn {
     --el-message-close-size: 24px;
     top: 10px;
     right: 5px;
     .el-dialog__close {
-      --el-color-info: var(--d-F5F5F5-l-333);
+      --el-color-info: var(--main-text);
     }
   }
 }
@@ -161,27 +172,27 @@
 .el-table-v2__header-cell {
   &.el-table-v2__header-cell {
     font-weight: normal;
-    color: var(--d-666-l-999);
+    color: var(--third-text);
   }
 }
 
 .el-popover.el-popover, .el-dropdown__popper.el-popper {
-  --el-popover-bg-color: var(--d-222-l-FFF);
-  --el-bg-color-overlay: var(--d-222-l-FFF);
+  --el-popover-bg-color: var(--dialog-bg);
+  --el-bg-color-overlay: var(--dialog-bg);
   --el-popover-border-color: transparent;
   --el-border-color-light: transparent;
 }
-.new-popover.el-popover.el-popover {
-  --el-popover-bg-color: var(--d-151A22-l-FFFFFF);
-  --el-bg-color-overlay: var(--d-151A22-l-FFFFFF);
-  --el-popover-border-color: transparent;
-  --el-border-color-light: transparent;
-}
+// .new-popover.el-popover.el-popover {
+//   --el-popover-bg-color: var(--d-151A22-l-FFFFFF);
+//   --el-bg-color-overlay: var(--d-151A22-l-FFFFFF);
+//   --el-popover-border-color: transparent;
+//   --el-border-color-light: transparent;
+// }
 
-.el-dropdown__popper.el-popper {
-  --el-bg-color-overlay: var(--d-222-l-FFF);
-  --el-border-color-light: transparent;
-}
+// .el-dropdown__popper.el-popper {
+//   --el-bg-color-overlay: var(--d-222-l-FFF);
+//   --el-border-color-light: transparent;
+// }
 
 .el-checkbox{
   --el-text-color-regular: var(--d-666-l-999);
@@ -190,15 +201,23 @@
 }
 
 .el-input.el-input {
-  --el-input-bg-color: var(--d-222-l-F2F2F2);
+  // 输入框背景色
+  --el-input-bg-color: var(--main-input-button-bg);
+  // 输入框边框色
+  --el-input-border-color: var(--main-input-button-bg);
+  // 输入框 hover 边框
+  --el-input-hover-border-color:var(--primary-color);
+  // 输入框文字
+  --el-text-color-regular:var(--third-text);
 }
 
 .el-pagination{
   &.el-pagination{
     margin-top: 0;
-    border-top:1px solid var(--d-222-l-F2F2F2);
-    background-color:var(--d-111-l-FFF);
-    --el-text-color-regular:var(--d-666-l-999);
-    --el-pagination-button-color:var(--d-666-l-999);
+    border-top:1px solid var(--main-list-hover);
+    background-color:var(--secondary-bg);
+    --el-text-color-regular:var(--third-text);
+    --el-pagination-button-color:var(--third-text);
+    --el-pagination-bg-color:transparent;
   }
 }

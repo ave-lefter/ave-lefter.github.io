@@ -2,14 +2,14 @@
   <div class="items-center inline-flex">
     <img v-if="themeStore.isDark" src="@/assets/images/fast.png" class="w-14px h-14px" alt="" srcset="">
     <img v-else src="@/assets/images/fast-dark.png" class="w-14px h-14px" alt="" srcset="">
-    <span class="ml-5px mr-5px color-[--d-8CA0C3-l-566275] text-12px">{{ $t('quick') }}</span>
+    <span class="ml-5px mr-5px color-[--secondary-text] text-12px">{{ $t('quick') }}</span>
     <el-input
       v-model.trim="quickBuyValue1"
       style="
-          background: var(--d-151A22-l-E8F1FF);
-          --el-input-bg-color: var(--d-151A22-l-E8F1FF);
-          --el-input-border-color: var(--d-151A22-l-E8F1FF);
-          --el-input-hover-border-color: #3F80F7;
+          /* background: var(--d-151A22-l-E8F1FF); */
+          /* --el-input-bg-color: var(--d-151A22-l-E8F1FF); */
+          /* --el-input-border-color: var(--d-151A22-l-E8F1FF);
+          --el-input-hover-border-color: #3F80F7; */
           border-radius: 4px;
           width: 88px;
           height: 28px;

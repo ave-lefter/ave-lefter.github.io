@@ -1,7 +1,8 @@
 :root {
   --primary-color: #3F80F7;
-  --color-red-500: #F6465D;
-  --color-teal-300: #12B886;
+  --down-color: #F6465D;
+  --up-color: #12B886;
+  --yellow:#FFA622;
   // 主要文字
   --main-text:var(--d-F5F5F5-l-111);
   // 次要文字
@@ -22,8 +23,10 @@
   --dialog-bg:var(--d-151A22-l-FFF);
   // 主页面分割线
   --main-divider:var(--d-151A22-l-E8F1FF);
-  // 主页面分割线
+  // 弹窗分割线
   --dialog-divider:var(--d-252E3C-l-E8F1FF);
+  // 主页 Tab 选中色
+  --tab-active-bg:var(--d-252E3C-l-566275);
   // 弹窗选中色&输入框&边框
   --border:var(--d-252E3C-l-D9E8FF);
   // 白色
@@ -140,6 +143,8 @@
     --d-CCC-l-666: #CCC;
     --d-252E3C-l-D9E8FF: #252E3C;
     --d-111-l-F5F5F5: #111;
+    --d-566275-l-252E3C: #566275;
+    --d-252E3C-l-566275: #252E3C;
   }
 
   &.light {
@@ -251,6 +256,8 @@
     --d-CCC-l-666: #666;
     --d-252E3C-l-D9E8FF: #D9E8FF;
     --d-111-l-F5F5F5: #F5F5F5;
+    --d-566275-l-252E3C: #252E3C;
+    --d-252E3C-l-566275: #566275;
   }
 }
 

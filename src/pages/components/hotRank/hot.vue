@@ -370,7 +370,7 @@ const cellRenderer = computed(() => {
       :row-height="81"
       fixed
       style="--el-bg-color: var(--d-111-l-FFF)"
-      row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
+      row-class="cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)]"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"

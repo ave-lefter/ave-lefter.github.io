@@ -8,10 +8,10 @@ const globalStore = useGlobalStore()
 <template>
   <div class="flex justify-end">
     <QuickSwapButton
-      buttonBg="#12B886"
+      buttonBg="var(--up-color)"
       :quickBuyValue="globalStore.rankCommon.quickBuyValue"
       :row="row"
-      styles="--el-color-black: #FFF;--el-button-disabled-text-color: #FFF;"
+      styles="--el-color-black: var(--main-text);--el-button-disabled-text-color: var(--main-text);"
       class-names="text-14px w-59px h-28px"
     >
       <template #default="{loading}">

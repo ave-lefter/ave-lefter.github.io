@@ -2,10 +2,10 @@
   <div class="flex">
     <span class="clickable flex" @click.stop="show = true">
       <slot name="icon">
-        <Icon class="text-14px color-[--d-8CA0C3-l-566275] hover:color-[--d-F5F5F5-l-333] icon-bot-setting" name="custom:pump-setting" />
+        <Icon class="text-14px color-[--secondary-text] hover:color-[--main-text] icon-bot-setting" name="custom:pump-setting" />
       </slot>
     </span>
-    <el-dialog class="new-dialog" v-model="show" width="500px" append-to-body>
+    <el-dialog v-model="show" class="new-dialog" width="500px" append-to-body>
       <template #header>
         <div class="text-20px mb-10px font-400">
           <button class="border-none bg-transparent clickable color-[--d-566275-l-8CA0C3] px-0" :class="{'color-[--d-F5F5F5-l-333]!': settingTab === 0}" @click.stop="settingTab = 0">{{ $t('basicSetting') }}</button>

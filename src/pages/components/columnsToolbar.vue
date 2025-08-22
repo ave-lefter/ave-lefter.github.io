@@ -84,7 +84,7 @@ function handleSelectChild(childItem, renderKey:string) {
   <div>
     <div @click="openDialog">
       <div
-        class="flex items-center color-[--d-999-l-666] cursor-pointer"
+        class="flex items-center color-[--secondary-text] hover:color-[--main-text] cursor-pointer"
       >
         <Icon name="custom:order" class="text-16px shrink-0" />
         <span class="text-12px ml-2px shrink-0">{{ t('custom') }}</span>
