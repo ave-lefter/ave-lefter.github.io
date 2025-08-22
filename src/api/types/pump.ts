@@ -4,7 +4,7 @@ interface Platform {
   platform_icon: string
 }
 export interface PumpConfig {
-  chain: string
+  chain: ChainKey
   chain_show: string
   platforms: Platform[]
 }
@@ -89,10 +89,12 @@ interface Pair {
   token0_decimal: number
   token0_price_usd: number
   token0_symbol: string
+  token0_logo_url: string
   token1_address: string
   token1_decimal: number
   token1_price_usd: number
   token1_symbol: string
+  token1_logo_url: string
   total: number
   tvl: number
   progress: number

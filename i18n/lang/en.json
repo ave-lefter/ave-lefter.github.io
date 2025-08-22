@@ -1364,5 +1364,10 @@
   "holdersTotalChange": "Holders Change",
   "holdersChange": "Holders Change",
   "holdersChange2": "Holder Changs in {n}",
-  "countdown2Opening": "Countdown to Opening"
+  "countdown2Opening": "Countdown to Opening",
+  "autoSell": "Auto Sell",
+  "TP": "TP",
+  "SL": "SL",
+  "autoSellStrategy": "Auto Sell Strategy",
+  "noAutoSell": "Advanced selling strategy has not been set yet"
 }

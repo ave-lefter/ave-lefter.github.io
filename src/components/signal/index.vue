@@ -355,6 +355,7 @@ function cancelHide() {
           @onConfirm="val=>{signalStore.filterParams={...val};resetAndGet();}"
           @onReset="resetFilterParams"
         />
+        <AutoSellSetting class="ml-auto h-22px!" :chain="(signalStore.activeChain as BotChain)" />
         <QuickBuyInput
           v-model="quickBuyValue"
           size="small"

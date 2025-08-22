@@ -178,6 +178,11 @@
   --el-border-color-light: transparent;
 }
 
+.new-popover.el-tooltip {
+  --el-text-color-primary: var(--d-151A22-l-FFFFFF) !important;
+  box-shadow: 0px 2px 10px 0px var(--d-17191E-l-D1D4D9);
+}
+
 .el-dropdown__popper.el-popper {
   --el-bg-color-overlay: var(--d-222-l-FFF);
   --el-border-color-light: transparent;
