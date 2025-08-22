@@ -1307,6 +1307,8 @@
   "BlackListDev": "拉黑DEV",
   "searchKol": "搜尋KOL",
   "searchKolPlaceholder": "請輸入KOL地址",
+  "kline":"顯示K線",
+  "hidekline":"隱藏K線",
   "rentRecovery": "租金回收",
   "rentRecoveryDesc": "快速回收租金，提升資產管理效率",
   "recyclableTokens": "可回收租金的代幣賬戶總數",

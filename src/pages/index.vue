@@ -213,7 +213,7 @@ function listMapFunction(i: Record<string, any>) {
     medias: getMedias(i.appendix),
     ...progress_obj,
     normal_tag: normal_tag?.slice(0, 3) || [],
-    signal_arr: signal_arr?.slice(0, 1) || [],
+    signal_arr: signal_arr?.slice(0, 1) || []
   }
 }
 

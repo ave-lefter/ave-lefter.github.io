@@ -1320,6 +1320,8 @@
   "BlackListDev": "BlackList of Dev",
   "searchKol": "Search KOL",
   "searchKolPlaceholder": "Please enter the KOL address",
+  "kline":"Show Kline",
+  "hidekline":"Hide Kline",
   "rentRecovery": "Rent Recovery",
   "rentRecoveryDesc": "Quickly recover rent and improve asset management efficiency",
   "recyclableTokens": "Total number of token accounts that can recycle rent",

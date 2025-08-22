@@ -26,10 +26,10 @@ const modelColumns = ref(cloneDeep(storeColumns.value.filter((item) =>item.child
 // 当对话框打开时，更新本地列配置
 const openDialog = () => {
   dialogVisible.value = true
-  console.log('storeColumns', props.storageKey)
   storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
   initColumns.value = props.getDefaultColumns(t)
   modelColumns.value = cloneDeep(storeColumns.value.filter((item) => item.children || item.isVisible))
+  console.log(storeColumns.value)
   hotSettings.value = {
     avatar_isCircle:globalStore.pumpSetting.avatar_isCircle,
     isBlacklist:globalStore.pumpSetting.isBlacklist
