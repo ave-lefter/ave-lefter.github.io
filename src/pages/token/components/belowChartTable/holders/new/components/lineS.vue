@@ -1,6 +1,6 @@
 <template>
   <div class="chart-container">
-    <div :id="chartId" :style="{ height: '245px', width: '100%' }" />
+    <div :id="chartId" :style="{ height: '100%', width: '100%' }" />
   </div>
 </template>
 
@@ -32,42 +32,49 @@ const chartId = ref(`chart-${uuidv4()}`)
 const option = computed(() => [
   {
     k: 1,
-    color: '#12B886',
+    color: '#3F80F7',
     label: t('add'), // 替换为实际的翻译逻辑
-    value: 'addliquidity_total',
+    value: 'value1',
     areaStyle: {
-      opacity: 0.8,
-      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        {
-          offset: 0,
-          color: '#12B886'
-        },
-        {
-          offset: 1,
-          color: '#0A0B0D'
+        color: {
+          type: 'linear',
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            {
+              offset: 0,
+              color: 'rgb(40, 109, 255, 0.9)' // 0% 处的颜色
+            },
+            {
+              offset: 1,
+              color:  mode.value  === 'light' ? '#fff' : 'rgb(23, 25, 28)' // 100% 处的颜色
+            }
+          ],
+          globalCoord: false // 缺省为 false
         }
-      ])
     },
   },
-  {
-    k: 2,
-    color: '#F6465D',
-    label: t('remove'), // 替换为实际的翻译逻辑
-    value: 'removeliquidity_total',
-    areaStyle: {
-      opacity: 0.8,
-      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        {
-          offset: 0,
-          color: '#F6465D'
-        },
-        {
-          offset: 1,
-          color: '#0A0B0D'
-        }
-      ])
-    },
-  }
+  // {
+  //   k: 2,
+  //   color: '#F6465D',
+  //   label: t('remove'), // 替换为实际的翻译逻辑
+  //   value: 'removeliquidity_total',
+  //   areaStyle: {
+  //     opacity: 0.8,
+  //     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+  //       {
+  //         offset: 0,
+  //         color: '#F6465D'
+  //       },
+  //       {
+  //         offset: 1,
+  //         color: '#0A0B0D'
+  //       }
+  //     ])
+  //   },
+  // }
 ])
 
 const dataX = computed(() => props.dataList.map(i => i.time))
@@ -75,9 +82,7 @@ const dataX = computed(() => props.dataList.map(i => i.time))
 const series = computed(() =>
   option.value.map(i => ({
     name: i.label,
-    symbol: 'none',
-    type: 'bar',
-    barWidth:'10',
+    type: 'line',
     z: 1,
     symbol: 'none',
     itemStyle: {
@@ -112,7 +117,7 @@ const init = () => {
 
   const chartOption = {
     legend: {
-      show: true,
+      show: false,
       bottom: 0,
       itemWidth: 10,
       itemHeight: 10,
@@ -124,55 +129,50 @@ const init = () => {
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: mode.value  === 'light' ? '#F2F2F2' : '#333',
+      backgroundColor: mode.value  === 'light' ? '#F5F5F5' : '#17191C',
       textStyle: {
-        color: mode.value  === 'light' ? '#666' : '#999',
-        fontFamily: 'Poppins',
-        fontSize: 12
-      },
-      padding: [6, 8],
-      axisPointer: {
-        label: {
-          show: false
-        }
+        fontSize: 10,
+        color: '#959A9F',
+        fontFamily: 'Poppins'
       },
       borderWidth: 0,
       // valueFormatter: value => '$'+formatNumber2(value || 0, 2), // 替换为实际的格式化函数
       formatter: function (params) {
         let result = params[0].name + '<br>' // 标题
         params.forEach(item => {
-          result += `<div style="display:flex;align-items:center;"><div style="min-width:60px">${item.marker} ${item.seriesName}</div><span style="color:${mode.value === 'light' ? '#17191C' : '#F5F5F5'};flex:1;text-align:right">${formatNumber(item.value || 0, 2)}</span><br></div>`// 每行内容
+          result += `${item.marker} ${item.seriesName}: <span style="color:${mode.value  === 'light' ? '#17191C' : '#F5F5F5'}">${formatNumber2(item.value || 0, 2)}</span><br>`// 每行内容
         })
         return result
       },
       appendToBody: true
     },
     grid: {
-      left: '20',
-      right: '20',
-      top: '20',
-      bottom: '40',
-      containLabel: true,
+      left: '0',
+      right: '0',
+      top: '0',
+      bottom: '0',
+      // containLabel: true,
       tooltip: {
+        show: false,
         axisPointer: {
-          type: 'line'
+          type: 'cross'
         }
       }
     },
     xAxis: {
       type: 'category',
       data: dataX.value,
-      boundaryGap: ['0', '20'],
-      // boundaryGap: false,
+      boundaryGap: false,
       splitLine: {
         show: false
       },
+      show:false,
       axisTick: {
-        show: true
+        show: false
       },
       axisLabel: {
         color: mode.value  === 'light' ? '#999' : '#666',
-        fontFamily: 'Poppins'
+        fontFamily: 'Poppins',
       },
       nameTextStyle: {
         fontSize: 12
@@ -187,6 +187,7 @@ const init = () => {
       type: 'value',
       position: 'right',
       name: '',
+      show:false,
       nameTextStyle: {
         fontSize: 12
       },
@@ -199,12 +200,12 @@ const init = () => {
       axisLabel: {
         color: mode.value  === 'light' ? '#999' : '#666',
         fontFamily: 'Poppins',
-        formatter: '{value}'
+        formatter: '{value}',
       },
       splitLine: {
         show: false
       },
-      min: value => parseInt(value.min * 0.95),
+      min: value => parseInt(value.min * 1),
       max: value => Math.ceil(value.max)
     },
     series: series.value
