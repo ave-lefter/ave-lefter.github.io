@@ -48,8 +48,8 @@ const props = defineProps<{
 }>()
 
 const sortConditions = ref({
-  sort: 'price_change_24h',
-  sort_dir: 'desc',
+  sort: '',
+  sort_dir: '',
 })
 
 function setSortConditions(params: { sort: string; sort_dir: string }) {
