@@ -12,7 +12,7 @@
         <span v-else />
       </template>
       <el-table-column :label="t('token')" align="left">
-        <template #default="{ row }" v-if="isBotWallet"> 
+        <template #default="{ row }" v-if="isBotWallet">
           <div class="flex items-center justify-start">
             <div class="icon-token-container mr-5px">
               <div class="relative">
@@ -42,7 +42,7 @@
             }}</span>
           </div>
         </template>
-         <template #default="{ row }" v-else> 
+         <template #default="{ row }" v-else>
           <div class="flex items-center justify-start">
             <div class="icon-token-container mr-5px">
               <div class="relative">
@@ -125,7 +125,7 @@
               {{ getChianSwapTypeLabel(row.swapType) }}
             </div>
           </template>
-          
+
         </template>
       </el-table-column>
       <el-table-column :label="t('price')" align="right">
@@ -382,7 +382,7 @@ function jumpExplorerUrl(row: any) {
 }
 
 function tableRowClick(row: any) {
-    let token 
+    let token
     if(isBotWallet.value) {
       token = !isBuy(row.swapType) ? row?.inTokenAddress : row.outTokenAddress
     } else {

@@ -484,8 +484,8 @@ const pumpFilter_solana_graduated = usePumpTableDataFetching(
   'pumpFilter_solana_graduated'
 )
 const pump_solana_platforms = useStorage(
-  'pump_solana_platforms',
-  ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk', 'bags'],
+  'pump_solana_platforms1',
+  ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk', 'bags', 'heaven'],
   localStorage
 )
 

@@ -515,10 +515,21 @@ export function bot_createSwapEvmTx(params: {
   isPrivate: boolean
   gasTip: number
   autoSell?: boolean
+  chain: string
+  autoSellConfig?: {
+    open: boolean;
+    priceChange?: number | undefined;
+    sellRatio?: number | undefined;
+    type: 'default' | 'devsell' | 'trailing' | 'migrated'
+  }[]
   slippage: number
 }) {
   const { $api } = useNuxtApp()
   const botStore = useBotStore()
+  if (params.chain === 'xlayer') {
+    params.autoSell = false
+    params.autoSellConfig = []
+  }
   return $api('/botapi/swap/createSwapEvmTx', {
     method: 'post',
     body: {

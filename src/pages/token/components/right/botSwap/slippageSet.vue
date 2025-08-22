@@ -9,7 +9,7 @@
       <template #header>
         <div class="text-20px mb-10px font-400">
           <button class="border-none bg-transparent clickable color-[--d-566275-l-8CA0C3] px-0" :class="{'color-[--d-F5F5F5-l-333]!': settingTab === 0}" @click.stop="settingTab = 0">{{ $t('basicSetting') }}</button>
-          <button class="border-none bg-transparent clickable color-[--d-566275-l-8CA0C3] px-0 ml-24px" :class="{'color-[--d-F5F5F5-l-333]!': settingTab === 1}" @click.stop="settingTab = 1">{{ $t('autoSellSetting') }}</button>
+          <button v-if="chain !== 'xlayer'" class="border-none bg-transparent clickable color-[--d-566275-l-8CA0C3] px-0 ml-24px" :class="{'color-[--d-F5F5F5-l-333]!': settingTab === 1}" @click.stop="settingTab = 1">{{ $t('autoSellSetting') }}</button>
         </div>
       </template>
       <el-form class="popup-content" @submit.prevent="confirmSubmit">
@@ -354,6 +354,9 @@ const clipboardQuickInput = ref(cloneDeep(botSettingStore.clipboardQuickInput))
 
 watch(show, (val) => {
   if (val) {
+    if (props.chain === 'xlayer') {
+      settingTab.value = 0
+    }
     const selected = botSetting.value.selected
     botSetting.value = cloneDeep(props.setting ?? {})
     const s = botSetting.value[selected]?.slippage ?? 9

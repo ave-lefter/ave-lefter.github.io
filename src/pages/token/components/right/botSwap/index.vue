@@ -1,6 +1,6 @@
 <template>
   <div class="bot-swap-container">
-    <Holding />
+    <Holding v-if="chain !== 'xlayer'" />
     <div class="tabs">
       <button v-for="(item, index) in tabs" :key="index" class="tab-item" :class="{ active: item.value === activeTab, [`tab-${item.value}`]: true }" type="button" @click="activeTab = item.value">
         <span>{{ item.name }}</span>
@@ -14,7 +14,7 @@
         <div class="tabs-1 mr-5px">
           <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)">{{ item.label }}</button>
         </div>
-        <SlippageSet :canSetAuto="true" :isAutoSell="swapType === 'market'" :chain="tokenStore.tokenInfo?.token?.chain" :setting="botSettingStore?.botSettings[chain]"/>
+        <SlippageSet :canSetAuto="true" :isAutoSell="swapType === 'market'" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"/>
       </div>
     </div>
     <Swap :activeTab="activeTab" :swapType="swapType" :tabs1="tabs1" :tabs2="tabs2" @getTokenBalance="getTokenBalance"/>
@@ -73,10 +73,22 @@ const tabs2 = computed(() => {
 })
 
 const types = computed(() => {
+  const chain = getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain
+  if (chain === 'xlayer') {
+    return [
+      { value: 'market', name: t('swapT') },
+    ] as const
+  }
   return [
     { value: 'market', name: t('swapT') },
     { value: 'limit', name: t('limitT') },
-  ]
+  ] as const
+})
+
+watch(types, (val) => {
+  if (val.every(i => i.value !== swapType.value)) {
+    swapType.value = val[0].value
+  }
 })
 
 function onSelectBotSwapSet(item: string) {
