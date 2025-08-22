@@ -29,7 +29,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     isAutoSellConfig: false,
     //  autoSellConfig: [] as Array<{open: boolean, priceChange: number, sellRatio: number, type: 'default' | 'trailing' | 'migrated' | 'devsell', isUp?: boolean}>,
   }
-  const chains = ['solana', 'eth', 'bsc', 'base'] as const
+  const chains = useBotStore().isSupportChains
   type Setting = typeof defaultSettings
   const settings: {
     [key in typeof chains[number]]?: {

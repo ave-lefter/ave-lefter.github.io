@@ -24,7 +24,7 @@ const displayChains = computed(() => {
 
 onMounted(() => {
   nextTick(() => {
-    selectedChains.value = evmAddress.value ? ['eth', 'bsc', 'solana', 'base'] : ['bsc', 'base', 'eth']
+    selectedChains.value = evmAddress.value ? ['eth', 'bsc', 'solana', 'base', 'xlayer'] : ['bsc', 'base', 'eth', 'xlayer']
   })
 })
 function getDisabled(val: string) {

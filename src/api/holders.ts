@@ -303,3 +303,65 @@ export function _getUserTxs(params: {
     query: params,
   })
 }
+
+export function getHoldersTokenCountLight(token: string, chain: string): Promise<{
+  create_time: number;
+  token_count_data: Array<{
+    time: string|number;
+    holders_count: string|number;
+  }>
+}> {
+  const {$api} = useNuxtApp()
+  return $api('/v2api/holders/v1/token/count/light', {
+    method: 'get',
+    query: {
+      token, chain
+    }
+  })
+}
+
+export function getHoldersTokenHoldersLight(token: string, chain: string,top_n: number|string): Promise<{
+  create_time: string|number;
+  token_holder_ratio: Array<{
+    time: string|number;
+    top100_ratio?: string|number;
+    top10_ratio?: string|number;
+    top_n_ratio?: string|number;
+  }>
+}> {
+  const {$api} = useNuxtApp()
+  return $api('/v2api/holders/v1/token/holders/light', {
+    method: 'get',
+    query: {
+      token, chain, top_n
+    }
+  })
+}
+
+export function getHoldersTokenCountInterval(token: string, chain: string,interval: number|string): Promise<{
+  time: string|number;
+  holders_count: string|number;
+}[]> {
+  const {$api} = useNuxtApp()
+  return $api('/v2api/holders/v1/token/count/interval', {
+    method: 'get',
+    query: {
+      token, chain, interval
+    }
+  })
+}
+
+export function getHoldersTokenTopHoldersRatio(token: string, chain: string,interval: number|string): Promise<{
+  time: string|number;
+  top10_ratio: string|number;
+  top50_ratio: string|number;
+  top100_ratio: string|number;
+}[]> {
+  const {$api} = useNuxtApp()
+  return $api('/v2api/holders/v1/token/top_holders/ratio', {
+    method: 'get',
+    query: {
+      token, chain, interval
+    }
+  })
+}

@@ -1,6 +1,6 @@
 <template>
   <div class="chart-container">
-    <div :id="chartId" :style="{ height: '245px', width: '100%' }" />
+    <div :id="chartId" class="w-440px h-210px " />
   </div>
 </template>
 
@@ -18,6 +18,10 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  activeTime:{
+    type: String,
+    default: '1m'
+  },
   loading: Boolean,
   showLeft: Boolean
 })
@@ -32,41 +36,21 @@ const chartId = ref(`chart-${uuidv4()}`)
 const option = computed(() => [
   {
     k: 1,
-    color: '#12B886',
-    label: t('add'), // 替换为实际的翻译逻辑
-    value: 'addliquidity_total',
-    areaStyle: {
-      opacity: 0.8,
-      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        {
-          offset: 0,
-          color: '#12B886'
-        },
-        {
-          offset: 1,
-          color: '#0A0B0D'
-        }
-      ])
-    },
+    color: '#3F80F7',
+    label: 'TOP 10', // 替换为实际的翻译逻辑
+    value: 'value1',
   },
   {
     k: 2,
-    color: '#F6465D',
-    label: t('remove'), // 替换为实际的翻译逻辑
-    value: 'removeliquidity_total',
-    areaStyle: {
-      opacity: 0.8,
-      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        {
-          offset: 0,
-          color: '#F6465D'
-        },
-        {
-          offset: 1,
-          color: '#0A0B0D'
-        }
-      ])
-    },
+    color: '#12B886',
+    label: 'TOP 50', // 替换为实际的翻译逻辑
+    value: 'value2',
+  },
+  {
+    k: 3,
+    color: '#8D47E7',
+    label: 'TOP 100', // 替换为实际的翻译逻辑
+    value: 'value3',
   }
 ])
 
@@ -75,11 +59,11 @@ const dataX = computed(() => props.dataList.map(i => i.time))
 const series = computed(() =>
   option.value.map(i => ({
     name: i.label,
-    symbol: 'none',
-    type: 'bar',
-    barWidth:'10',
+    type: 'line',
+    smooth: true,
     z: 1,
-    symbol: 'none',
+    // symbol: 'none',
+    symbolSize: 1,
     itemStyle: {
       color: i.color
     },
@@ -91,7 +75,12 @@ const series = computed(() =>
       focus: 'series'
     },
     areaStyle: i.areaStyle,
-    data: props.dataList.map(j => j[i.value])
+    data: props.dataList.map(j=>{
+      return {
+        value:j.holders_count*j[i.value],
+        ratio:j[i.value]
+      }
+    })
   }))
 )
 
@@ -113,7 +102,7 @@ const init = () => {
   const chartOption = {
     legend: {
       show: true,
-      bottom: 0,
+      right: 0,
       itemWidth: 10,
       itemHeight: 10,
       icon: 'circle',
@@ -122,13 +111,22 @@ const init = () => {
         fontSize: 12
       }
     },
+    title: {
+      textStyle: {
+        color: mode.value  === 'light' ? '#333' : '#F5F5F5',
+        fontSize : 16,
+        fontFamily: 'Poppins',
+        fontWeight:400
+      },
+      text: t('holdersChange2',{n:props.activeTime}), // 替换为实际的翻译逻辑
+    },
     tooltip: {
       trigger: 'axis',
       backgroundColor: mode.value  === 'light' ? '#F2F2F2' : '#333',
       textStyle: {
+        fontSize: 12,
         color: mode.value  === 'light' ? '#666' : '#999',
-        fontFamily: 'Poppins',
-        fontSize: 12
+        fontFamily: 'Poppins'
       },
       padding: [6, 8],
       axisPointer: {
@@ -137,11 +135,11 @@ const init = () => {
         }
       },
       borderWidth: 0,
-      // valueFormatter: value => '$'+formatNumber2(value || 0, 2), // 替换为实际的格式化函数
       formatter: function (params) {
-        let result = params[0].name + '<br>' // 标题
-        params.forEach(item => {
-          result += `<div style="display:flex;align-items:center;"><div style="min-width:60px">${item.marker} ${item.seriesName}</div><span style="color:${mode.value === 'light' ? '#17191C' : '#F5F5F5'};flex:1;text-align:right">${formatNumber(item.value || 0, 2)}</span><br></div>`// 每行内容
+        console.log('formatter',params)
+        let result = `${params[0].name}<br>` // 标题
+        params.reverse().forEach(item => {
+          result += `<div style="display:flex;align-items:center;"><div style="width:75px">${item.marker} ${item.seriesName}</div><div style="color:${mode.value  === 'light' ? '#333' : '#F5F5F5'};flex:1;text-align:right">${formatNumber(item.data.value||0,2)}(${formatNumber(Math.abs(Number(item.data.ratio) * 100), 2)}%)</div><br></div>`// 每行内容
         })
         return result
       },
@@ -150,8 +148,8 @@ const init = () => {
     grid: {
       left: '20',
       right: '20',
-      top: '20',
-      bottom: '40',
+      top: '40',
+      bottom: '20',
       containLabel: true,
       tooltip: {
         axisPointer: {
@@ -160,27 +158,31 @@ const init = () => {
       }
     },
     xAxis: {
-      type: 'category',
-      data: dataX.value,
-      boundaryGap: ['0', '20'],
-      // boundaryGap: false,
+     type: 'category',
+     data: dataX.value,
+     boundaryGap: ['0', '20'],
       splitLine: {
         show: false
       },
       axisTick: {
-        show: true
+        show: false
       },
       axisLabel: {
         color: mode.value  === 'light' ? '#999' : '#666',
-        fontFamily: 'Poppins'
+        fontFamily: 'Poppins',
+        formatter:  function (value) {
+          const [date, time] = value.split(' ')
+          return `${time}\n${date}`
+        }
       },
       nameTextStyle: {
         fontSize: 12
       },
       axisLine: {
-        lineStyle: {
-          color: '#1c1c1c'
-        }
+        show: false,
+        // lineStyle: {
+        //   color: '#1c1c1c'
+        // }
       }
     },
     yAxis: {
@@ -199,12 +201,19 @@ const init = () => {
       axisLabel: {
         color: mode.value  === 'light' ? '#999' : '#666',
         fontFamily: 'Poppins',
-        formatter: '{value}'
+        formatter:  function (value) {
+          // console.log('yAxis formatter',value)
+          return formatNumber(value,2)
+        }
       },
       splitLine: {
-        show: false
+        lineStyle: {
+          type: "dashed",
+          color: mode.value  === 'light' ? '#F5F5F5' : '#333',
+        },
+        show: true
       },
-      min: value => parseInt(value.min * 0.95),
+      min: value => parseInt(value.min * 1),
       max: value => Math.ceil(value.max)
     },
     series: series.value
@@ -279,9 +288,9 @@ watch(()=>props.showLeft, (val) => {
 // Lifecycle
 onMounted(() => {
   init()
+  console.log('mounted',series.value)
 })
 </script>
-
 <style scoped lang="scss">
 .chart-container {
   margin: 0;
