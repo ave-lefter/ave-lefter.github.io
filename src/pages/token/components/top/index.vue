@@ -793,12 +793,12 @@ import {
   type IFavDialogEventArgs,
 } from '@/utils/constants'
 import { formatNumber } from '@/utils/formatNumber'
-import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
 import { useEventBus } from '@vueuse/core'
 import { verifyLogin } from '@/utils'
 const { token_logo_url } = useConfigStore()
 const tokenStore = useTokenStore()
+const {collected} = storeToRefs(useTokenStore())
 const { evmAddress } = storeToRefs(useBotStore())
 const { theme } = useThemeStore()
 const { t } = useI18n()
@@ -942,7 +942,7 @@ watch(
     }
   }
 )
-const collected = shallowRef(false)
+// const collected = shallowRef(false)
 const loading = shallowRef(false)
 
 function getTokenFavoriteCheck() {

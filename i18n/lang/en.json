@@ -1337,5 +1337,11 @@
   "submit": "Submit",
   "availableRent": "Available Rent",
   "closeAccountsSuccess": "Recycling of rent successfully",
-  "loadingCloseAccount": "Close your account and recycle your rent, please wait..."
+  "loadingCloseAccount": "Close your account and recycle your rent, please wait...",
+  "holdersNum": "Holders Num",
+  "holdersAnalysis": "Holders Analysis",
+  "holdersNumTotal": "Holders Total",
+  "holdersTotalChange": "Holders Change",
+  "holdersChange": "Holders Change",
+  "holdersChange2": "Holder Changs in {n}"
 }
