@@ -1325,5 +1325,11 @@
   "submit": "提交",
   "availableRent": "可領取的租金",
   "closeAccountsSuccess": "回收租金成功",
-  "loadingCloseAccount": "正在關閉賬戶並回收租金，請稍候..."
+  "loadingCloseAccount": "正在關閉賬戶並回收租金，請稍候...",
+  "holdersNum": "持幣地址數",
+  "holdersAnalysis": "持幣地址分析",
+  "holdersNumTotal": "總持幣地址數",
+  "holdersTotalChange": "持幣地址數變化",
+  "holdersChange": "持币地址数变化",
+  "holdersChange2": "{n}內持幣變化"
 }

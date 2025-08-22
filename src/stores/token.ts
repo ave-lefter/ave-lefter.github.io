@@ -29,6 +29,8 @@ export const useTokenStore = defineStore('token', () => {
     'tokenWarningNotice',
     {}
   )
+  const collected = shallowRef(false)
+
   const token = computed(() => tokenInfo.value?.token)
   const pairs = computed(() => tokenInfo.value?.pairs)
   const pairAddress = useSessionStorage('token_pairAddress', '')
@@ -278,6 +280,7 @@ export const useTokenStore = defineStore('token', () => {
     centerTopHeight,
     commonHeight,
     twitterType,
+    collected,
     getXType: _getXType
   }
 })

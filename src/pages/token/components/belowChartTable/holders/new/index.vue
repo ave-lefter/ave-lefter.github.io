@@ -1,5 +1,6 @@
 <template>
   <div class="holderInfo">
+    <LineContent/>
     <div class="px-12px mb-10px flex justify-between">
       <div
         class="flex items-center whitespace-nowrap overflow-x-auto scrollbar-hide tab-width w-100%"
@@ -219,6 +220,7 @@ import {
 } from '@/api/holders'
 import { useLocalStorage } from '@vueuse/core'
 import List from './list.vue'
+import LineContent from './lineContent.vue'
 const holderListSortObj = useLocalStorage('holderListSortObj', {
   all: {
     sort_by: '',
@@ -242,6 +244,8 @@ const holderListSortObj = useLocalStorage('holderListSortObj', {
   },
 })
 const { price, totalHolders} = storeToRefs(useTokenStore())
+const {token} = storeToRefs(useTokenStore())
+
 const route = useRoute()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -343,22 +347,22 @@ const totalProfit = computed(() => {
     ?.toFixed(0)
 })
 
-// const addressAndChain = computed(() => {
-//   const id = route.params.id as string
-//   if (id) {
-//     return getAddressAndChainFromId(id)
-//   }
-//   return {
-//     address: token.value?.token || '',
-//     chain: token.value?.chain || '',
-//   }
-// })
+const addressAndChain = computed(() => {
+  const id = route.params.id as string
+  if (id) {
+    return getAddressAndChainFromId(id)
+  }
+  return {
+    address: token.value?.token || '',
+    chain: token.value?.chain || '',
+  }
+})
 // const tokenAddress= computed(()=>{
 //   return addressAndChain.value?.address
 // })
-// const chain= computed(()=>{
-//   return addressAndChain.value?.chain
-// })
+const chain= computed(()=>{
+  return addressAndChain.value?.chain
+})
 watch(
   () => id.value,
   (newId) => {
