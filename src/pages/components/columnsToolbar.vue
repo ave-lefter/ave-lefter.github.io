@@ -43,7 +43,10 @@ const handleSelect = (item) => {
   } else {
     const data = initColumns.value.find((arr) => arr.render === item)
     if (data) {
-      modelColumns.value.push(cloneDeep({ ...data, isVisible: true }))
+      const quickIndex = modelColumns.value.findIndex(el=>el.key==='quick')
+      if(quickIndex!==-1){
+        modelColumns.value.splice(quickIndex,0,{ ...data, isVisible: true })
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="flex-between">
-      <div v-if="!isRank" class="text-16px py-12px color-#999">
+    <div v-if="!isRank" class="flex-between">
+      <div class="text-16px py-12px color-#999">
         {{ $t('tokenInfo') }}
       </div>
       <div class="tabs">
@@ -135,7 +135,7 @@ const tokenInfoExtra = computed(() => tokenStore.tokenInfoExtra)
 const localeStore = useLocaleStore()
 // const { t } = useI18n()
 const showAll = ref(false)
-const active = shallowRef('grid')
+const active = shallowRef(props.isRank ? 'col' : 'grid')
 const tabs = [
   { id: 'grid', icon: 'grid', name: 'grid' },
   { id: 'col', icon: 'col', name: 'col' }
