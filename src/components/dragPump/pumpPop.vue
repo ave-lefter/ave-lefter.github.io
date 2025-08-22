@@ -47,7 +47,7 @@ const filterBlackList = computed(() => {
         !pumpBlackList.some(
           (i) =>
             (i.address == item.token && i.type == 'ca') ||
-            (i.address == item.symbol && i.type == 'keyword')|| 
+            (i.address == item.symbol && i.type == 'keyword')||
             (i.address == item.token  && i.type=='dev')
         )
     )
@@ -62,6 +62,7 @@ const setActiveTab = (value: (typeof tabList.value)[number]['value']) => {
   activeTab.value = value
 }
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
+const logoList = ref<{logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
 watch(
   () => pumpStore.visible,
   (val) => {
@@ -103,6 +104,25 @@ watch(() => pumpStore.pump_query[pumpStore.activeChain][activeTab.value], () => 
   debouncedSearch()
 }, { deep: true })
 
+watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
+  if (val) {
+    const rTime = Date.now()
+    const obj = { ...val, rTime: rTime }
+    logoList.value = logoList?.value?.filter?.(i => i.token !== obj.token && rTime - (i.rTime || 0) <= 16000)
+    logoList.value.unshift(obj)
+    pumpStore.listData = pumpStore.listData?.map(i => {
+      if (val.token == i.target_token) {
+        return {
+          ...i,
+          logo_url: val.logo_url,
+          name: val.name,
+          symbol: val.symbol
+        }
+      }
+      return i
+    })
+  }
+})
 watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val: WSPump[]) => {
   if (Array.isArray(val)) {
     const rTime = Date.now()
@@ -202,12 +222,27 @@ function getPump(params: Record<string, any>, isFilter = false) {
   _getPumpList(finalParams)
     .then((res) => {
       pumpStore.listData = (res || []).map?.(pumpMapFunction)
+      if (logoList?.value?.length > 0 && pumpStore.listData?.length > 0) {
+        pumpStore.listData = pumpStore.listData.map(i => {
+          const obj = logoList.value?.find(y => y.token == i.target_token)
+          if (obj) {
+            return {
+              ...i,
+              logo_url: obj?.logo_url,
+              name: obj?.name,
+              symbol: obj?.symbol
+            }
+          } else {
+            return i
+          }
+        })
+      }
     })
     .finally(() => {
       loading.value = false
-      timer = requestTimeout(5000, () => {
-        updatePump(finalParams)
-      })
+      // timer = requestTimeout(5000, () => {
+      //   updatePump(finalParams)
+      // })
     })
 }
 
@@ -466,7 +501,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
       <div class="flex items-center gap-8px">
         <el-input
 ref="inputSearch" v-model.trim="pumpStore.pump_query[pumpStore.activeChain][activeTab]"
-          class="w-90px [--el-input-border-color:--d-222-l-F2F2F2]" size="small" :placeholder="$t('search')" 
+          class="w-90px [--el-input-border-color:--d-222-l-F2F2F2]" size="small" :placeholder="$t('search')"
           style="--el-input-bg-color:var(--d-151A22-l-E8F1FF);--el-text-color-regular:var(--d-566275-l-8CA0C3)"
           @input="
             (val) =>
