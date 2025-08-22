@@ -29,7 +29,7 @@ export interface GetUserBalanceResponse {
   risk_score: number
 }
 
-export function getUserBalance(
+export const getUserBalance = createCacheRequest(function(
   {
     pageNO = 1,
     pageSize = 10,
@@ -52,7 +52,7 @@ export function getUserBalance(
       hide_small  //是否隐藏小额。 大于0时:balance_usd > hide_small; 其他：不参与过滤
     }
   })
-}
+}, 1000)
 
 
 // query swap token
@@ -1661,5 +1661,62 @@ export async function dyorswapfunPumpSwap({fromToken, toToken, fromAmount}: { fr
       },
       isDyorswapfun: true
     }
+  }
+}
+
+
+function getXFlapSwapContract() {
+  const zeroAddress = '0x0000000000000000000000000000000000000000' as const
+  const address = '0xb30d8c4216e1f21f27444d2ffaee3ad577808678' as const
+  const abi = [
+    "function quoteExactInput(tuple(address inputToken, address outputToken, uint256 inputAmount) params) returns (uint256 outputAmount)",
+    "function swapExactInput(tuple(address inputToken, address outputToken, uint256 inputAmount, uint256 minOutputAmount, bytes permitData) params) payable returns (uint256 outputAmount)",
+    "function getTokenV3(address token) view returns (tuple(uint8 status, uint256 reserve, uint256 circulatingSupply, uint256 price, uint8 tokenVersion, uint256 r, uint256 dexSupplyThresh, address quoteTokenAddress, bool nativeToQuoteSwapEnabled) state)"
+  ] as const
+  return {
+    address,
+    abi,
+    zeroAddress
+  }
+}
+
+export function quoteXFlap({from_token, to_token, amountIn}: { from_token: string; to_token: string; amountIn: string }, chain = useWalletStore().chain) {
+  let { _provider } = getProvider(chain)
+  // xflapswap
+  const { address, abi, zeroAddress } = getXFlapSwapContract()
+  const contract = new Contract(address, abi, _provider)
+  return contract.quoteExactInput.staticCall({inputToken: from_token === NATIVE_TOKEN ? zeroAddress : from_token, outputToken: to_token === NATIVE_TOKEN ? zeroAddress : to_token, inputAmount: amountIn})
+}
+
+export async function xFlapSwap({fromToken, toToken, fromAmount}: { fromToken: any; toToken: any; fromAmount: string }, slippage: number | string,  chain = useWalletStore().chain) {
+  let signer = await getSigner()
+  // xflapswap
+  let amountIn = fromToken.amount
+  let amountOut = toToken.amount
+  const { address, abi, zeroAddress } = getXFlapSwapContract()
+
+  let amountOutMin = new BigNumber(amountOut).times(new BigNumber('10000').minus(new BigNumber(parseInt((Number(slippage) * 100).toString())))).div('10000').toFixed(0)
+  const contract = new Contract(address, abi, signer)
+  let inputToken = fromToken.address === NATIVE_TOKEN ? zeroAddress : fromToken.address
+  let outputToken = toToken.address === NATIVE_TOKEN ? zeroAddress : toToken.address
+  let params = {inputToken: inputToken, outputToken: outputToken, inputAmount: amountIn, minOutputAmount: amountOutMin, permitData: '0x' }
+
+  let gas = await contract.swapExactInput.estimateGas(params, { value: inputToken === zeroAddress ? fromAmount : '0'})
+
+  let gasLimit = new BigNumber(gas.toString()).times('10').toFixed(0)
+  return {
+    swap: () => contract.swapExactInput(params, { value: inputToken === zeroAddress ? fromAmount : '0', gasLimit }),
+    swapCallStatic: () => contract.swapExactInput.staticCall(params, { value: inputToken === zeroAddress ? fromAmount : '0' }),
+    gasValue: gasLimit.toString(),
+    swapInfo: {
+      fromToken: fromToken,
+      toToken: toToken,
+      fromAmount: formatUnits(fromAmount, fromToken.decimals),
+      toAmount: formatUnits(toToken.amount, toToken.decimals),
+      fromTokenAmount: fromAmount,
+      toTokenAmount: toToken.amount,
+      isAmountOut: false
+    },
+    isXflapswap: true
   }
 }

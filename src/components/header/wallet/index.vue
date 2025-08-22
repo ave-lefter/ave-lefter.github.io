@@ -104,8 +104,16 @@
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>
           </li>
-          <li class="flex justify-between h-40px px-20px clickable"
-            @click.stop="walletStore.disconnect(); tgWalletVisible = false">
+          <li class="flex justify-between h-40px px-20px clickable" @click.stop="$router.push('/solana-rent-recovery');tgWalletVisible = false">
+            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+              <Icon name="custom:sack-dollar" class="text-16px" />
+              <span class="font-500 text-14px">{{ t('rentRecovery') }}</span>
+            </div>
+            <div class="color-#999 flex items-center gap-4px">
+              <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
+            </div>
+          </li>
+          <li class="flex justify-between h-40px px-20px clickable" @click.stop="walletStore.disconnect(); tgWalletVisible = false">
             <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
               <Icon name="custom:log-out" class="text-16px" />
               <span class="font-500 text-14px">{{ t('logout') }}</span>
@@ -223,7 +231,7 @@
                 <span class="text-12px font-400 color-#3F80F7 clickable ml-10px" @click.stop="handleMax">{{ t('max') }}</span>
               </div>
             </el-form-item>
-            <div class="font-400 text-12px lh-[100%] color-#FFBE3C text-center mt-45px">{{ t('withdrawTip') }}</div>
+            <!-- <div class="font-400 text-12px lh-[100%] color-#FFBE3C text-center mt-45px">{{ t('withdrawTip') }}</div> -->
             <el-button native-type="submit" style="width: 100%; margin-top: 25px" size="large" type="primary"
               :loading="loadingWithdraw">{{ t('withdraw')
               }}</el-button>

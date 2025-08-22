@@ -9,6 +9,10 @@ defineProps({
   strokeWidth: {
     type: Number,
     default: 3
+  },
+  color: {
+    type: String,
+    default: 'var(--el-color-primary)'
   }
 })
 </script>
@@ -23,6 +27,7 @@ defineProps({
   --el-loading-spinner-size: 1em;
   .path {
     stroke-width: v-bind(strokeWidth);
+    stroke: v-bind(color);
   }
 }
 
