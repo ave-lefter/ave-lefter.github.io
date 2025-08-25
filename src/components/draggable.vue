@@ -78,7 +78,6 @@ function onDrag(x: number, y: number) {
     @resizing="onResizing"
     @resizeStop="onResizeStop"
   >
-  {{ console.log('z',z) }}
     <slot/>
     <template #mr>
       <span v-for="i in 3" :key="i" class="bg-#444 w-2px h-2px rounded-full"/>

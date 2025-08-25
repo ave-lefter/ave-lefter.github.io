@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="flex-between">
+    <div v-if="!isRank" class="flex-between">
       <div class="text-16px py-12px color-#999">
         {{ $t('tokenInfo') }}
       </div>
       <div class="tabs">
-        <span class="item" v-for="item in tabs" :key="item.id" @click.stop="active = item.id" :class="{ active: item.id == active}">
+        <span v-for="item in tabs" :key="item.id" class="item" :class="{ active: item.id == active}" @click.stop="active = item.id">
         <Icon
           :name="`custom:${item.icon}`"
         />
@@ -93,14 +93,14 @@
         </template>
       </template> -->
     </ul>
-    <div :class="{ bg: active=='grid'}" v-if="intro">
+    <div v-if="!isRank && intro" :class="{ bg: active=='grid'}">
       <div  v-if="intro" class="text-14px mb-12px color-[--d-666-l-999]">{{ $t('currencyOverview') }}</div>
       <div class="text-12px color-[--d-999-l-666] token-description">
         <span v-html="showAll ? intro : intro?.slice(0, 250)" />
         <button v-if="intro?.length > 250" class="text-12px color-#3F80F7 bg-transparent outline-none border-none clickable" @click.stop="showAll = !showAll" >{{ !showAll ? $t('more') : $t('expand') }}</button>
       </div>
     </div>
-    <div :class="{ bg: active=='grid'}">
+    <div v-if="!isRank" :class="{ bg: active=='grid'}">
       <div class="text-14px mb-2px color-[--d-666-l-999] flex-start" :class="active =='grid' ? 'mt-0px': 'mt-12px'">
         <Icon name="custom:ai" class="text-12px"/> {{ $t('aiSummary') }}
       </div>
@@ -123,7 +123,10 @@ import { formatDate, formatExplorerUrl, isJSON } from '@/utils/index'
 import { useTokenStore } from '~/stores/token'
 import BigNumber from 'bignumber.js'
 const aiSummary = inject<{summary: string, headline: string }>('aiSummary')
-const tokenStore = useTokenStore()
+const props = defineProps<{
+  isRank?:boolean
+}>()
+const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const checkStore = useCheckStore()
 const pair = computed(() => tokenStore.pair)
 const token = computed(() => tokenStore.token)
@@ -132,7 +135,7 @@ const tokenInfoExtra = computed(() => tokenStore.tokenInfoExtra)
 const localeStore = useLocaleStore()
 // const { t } = useI18n()
 const showAll = ref(false)
-const active = shallowRef('grid')
+const active = shallowRef(props.isRank ? 'col' : 'grid')
 const tabs = [
   { id: 'grid', icon: 'grid', name: 'grid' },
   { id: 'col', icon: 'col', name: 'col' }

@@ -42,4 +42,5 @@ export { default as Snipers1mContent } from './snipers1m.vue'
 export { default as Snipers1mHeader } from './snipers1mHeader.vue'
 export { default as SnipersContent } from './snipersContent.vue'
 export { default as Top10PositionsContent } from './top10PositionsContent.vue'
+export { default as TokenPage } from './tokenPage/tokenPage.vue'
 

@@ -955,7 +955,7 @@ export function setRefCodeToCookie() {
   }
 }
 
-export function getMedias(appendix: string,t:ReturnType<typeof useI18n>['t']) {
+export function getMedias(appendix: string | undefined,t:ReturnType<typeof useI18n>['t']) {
   if (!appendix) return []
   if (isJSON(appendix)) {
     const obj = JSON.parse(appendix)

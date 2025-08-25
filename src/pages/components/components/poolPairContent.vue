@@ -2,13 +2,16 @@
 import dayjs from 'dayjs'
 import XIcon from '~/components/xPopup/xIcon.vue'
 
-const emit = defineEmits(['collect'])
+const emit = defineEmits(['collect','toggleKline'])
+const rankKlineStore = useRankKlineStore()
 const { t } = useI18n()
 const props = defineProps<{
   pageNO: number
   pageSize: number
   row: any
   rowIndex: number
+  activeKline:boolean
+  enableKline:boolean
 }>()
 
 function getSymbol(row, shouldReverse = false) {
@@ -31,6 +34,13 @@ function inBlackList(row) {
         (i.address == getSymbol(row) && i.type == 'keyword')
     ) !== -1
   )
+}
+
+function blockToken(row) {
+  addOrRemoveBlackList(row, 'ca')
+  if(row.id === rankKlineStore.klineRow.id){
+    toggleKline()
+  }
 }
 
 function addOrRemoveBlackList(item: { token: string }, type: 'ca' | 'dev' | 'keyword') {
@@ -62,6 +72,10 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
 const created_at_unix = computed(() => {
   return dayjs(props.row.created_at).unix()
 })
+
+function toggleKline() {
+  emit('toggleKline',props.row)
+}
 </script>
 
 <template>
@@ -178,6 +192,13 @@ const created_at_unix = computed(() => {
               </div>
             </template>
           </el-tooltip>
+          <Icon
+            v-if="enableKline"
+            v-tooltip="!activeKline?$t('kline'):$t('hidekline')"
+            name="custom:kline" class="text-12px ml-4px hover:color-#8CA0C3" 
+            :class="activeKline ? 'color-#8CA0C3' : 'color-#566275'"
+            @click.self.stop="toggleKline"
+          />
         </div>
         <div class="flex items-center lh-12px">
           <div

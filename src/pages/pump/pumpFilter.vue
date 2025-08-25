@@ -242,6 +242,8 @@ const { t } = useI18n()
   rbtx: '',
   lstx: '', //卖出交易数
   rstx: '',
+  lmks: '', //24h 钱包数
+  rmks: '',
   sm_list: [],
   has_sm: 0
 }
@@ -281,6 +283,8 @@ const { t } = useI18n()
   rbtx: '',
   lstx: '', //卖出交易数
   rstx: '',
+  lmks: '', //卖出交易数
+  rmks: '',
   sm_list: [],
   has_sm: 0
 
@@ -429,8 +433,14 @@ const tabs = computed(() => {
           placeholder: [t('minor'), t('max1')],
           type: 'inputRange',
           tab: 'market'
-      },
-
+        },
+        {
+          label: `${t('24hMarkers')}`,
+          prop: ['lmks', 'rmks'],
+          placeholder: [t('minor'), t('max1')],
+          type: 'inputRange',
+          tab: 'market'
+        },
         {
           label: 'media',
           prop: 'sm_list',
@@ -535,6 +545,13 @@ const tabs = computed(() => {
     if (filterList.includes('lstx') && filterList.includes('rstx')) {
       // 任选其一删除，这里以删除 'lage' 为例
       const index = filterList.indexOf('rstx')
+      if (index !== -1) {
+        filterList.splice(index, 1)
+      }
+    }
+    if (filterList.includes('lmks') && filterList.includes('rmks')) {
+      // 任选其一删除，这里以删除 'lage' 为例
+      const index = filterList.indexOf('lmks')
       if (index !== -1) {
         filterList.splice(index, 1)
       }
