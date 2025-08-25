@@ -48,6 +48,9 @@ watch(
     setTokenBalance(val, true)
   }
 )
+const noInitBalance = computed(()=>{
+  return currentChainData.value.initBalance === '0'
+})
 const currentChainData = computed(() => {
   return pnlData.value[pnlSetting.value.chain as keyof typeof pnlData.value]
 })
@@ -177,7 +180,11 @@ function login() {
   botStore.changeConnectVisible(true)
 }
 onMounted(() => {
-  setTokenBalance('solana', currentChainData.value.initBalance === '0')
+  setTokenBalance('solana', noInitBalance.value)
+})
+
+watch(()=>botStore.evmAddress,()=>{
+  setTokenBalance('solana', noInitBalance.value)
 })
 
 async function setTokenBalance(chain: string, init = false) {
