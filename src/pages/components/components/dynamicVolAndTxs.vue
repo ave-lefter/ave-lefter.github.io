@@ -18,7 +18,7 @@ function formatColor(val, activeInterval = lowerCaseInterval.value) {
   if (activeInterval === '24h') {
     if (val >= 10000000) return 'color-[--yellow]' // 黄色: >= 10M
     if (val >= 1000000) return 'color-[--main-text]' // 白色: >= 1M
-    return 'color-[--third-text]' // 灰色: < 1M
+    return 'color-[--secondary-text]' // 灰色: < 1M
   }
 
   // 其他时间区间的逻辑保持不变
@@ -38,7 +38,7 @@ function formatColor(val, activeInterval = lowerCaseInterval.value) {
     if (val > 1666667) return 'color-[--yellow]'
   }
 
-  return ''
+  return 'color-[--secondary-text]'
 }
 </script>
 <template>
@@ -56,7 +56,7 @@ function formatColor(val, activeInterval = lowerCaseInterval.value) {
             <span class="flex-1 text-right">{{ $t('VolSell') }}</span>
           </div>
           <div class="py-8px mx--12px px-12px mb-16px">
-            <div class="flex justify-between color-[--third-text] text-12px lh-16px mb-4px">
+            <div class="flex justify-between text-12px lh-16px mb-4px">
               <span class="color-[--secondary-text]">${{ formatNumber(row[volPrefix], 2) }}</span>
               <span class="color-[--up-color]">${{ formatNumber(row[buyPrefix], 2) }}</span>
               <span class="color-[--down-color]">${{ formatNumber(row[sellPrefix], 2) }}</span>
@@ -78,8 +78,8 @@ function formatColor(val, activeInterval = lowerCaseInterval.value) {
             <span class="flex-1 text-right">{{ $t('TxnsSell') }}</span>
           </div>
           <div class="py-8px mx--12px px-12px">
-            <div class="flex justify-between color-[--third-text] text-12px lh-16px mb-4px">
-              <span class="color-[--d-CCC-l-333]">{{ formatNumber(row[txsPrefix], 2) }}</span>
+            <div class="flex justify-between text-12px lh-16px mb-4px">
+              <span class="color-[--secondary-text]">{{ formatNumber(row[txsPrefix], 2) }}</span>
               <span class="color-[--up-color]">{{ formatNumber(row[buyTxsPre], 2) }}</span>
               <span class="color-[--down-color]">{{ formatNumber(row[sellTxsPre], 2) }}</span>
             </div>

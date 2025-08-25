@@ -292,9 +292,9 @@ function restore(item: { address: string, type: string }) {
   color: var(--d-F5F5F5-l-333);
   height: 28px;
   &.gray {
-    color: var(--d-8CA0C3-l-566275);
+    color: var(--secondary-text);
     &.active,&:hover {
-      color: var(--d-F5F5F5-l-333);
+      color: var(--main-text);
     }
   }
   &.restore {

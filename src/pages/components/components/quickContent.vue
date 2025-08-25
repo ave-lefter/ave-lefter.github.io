@@ -11,7 +11,7 @@ const globalStore = useGlobalStore()
       buttonBg="var(--up-color)"
       :quickBuyValue="globalStore.rankCommon.quickBuyValue"
       :row="row"
-      styles="--el-color-black: var(--main-text);--el-button-disabled-text-color: var(--main-text);"
+      styles="--el-color-black: var(--white);--el-button-disabled-text-color: var(--white);"
       class-names="text-14px w-59px h-28px"
     >
       <template #default="{loading}">

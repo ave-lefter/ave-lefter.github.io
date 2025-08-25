@@ -138,8 +138,14 @@
 .el-dialog {
   --el-bg-color: var(--dialog-bg);
 }
+.el-dialog__body{
+  --el-text-color-regular:var(--main-text);
+}
 .el-dialog__header {
   color: var(--main-text);
+  .el-dialog__title{
+    --el-text-color-primary:var(--main-text);
+  }
   .el-dialog__headerbtn {
     --el-message-close-size: 24px;
     top: 10px;
