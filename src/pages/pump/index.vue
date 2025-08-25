@@ -484,8 +484,8 @@ const pumpFilter_solana_graduated = usePumpTableDataFetching(
   'pumpFilter_solana_graduated'
 )
 const pump_solana_platforms = useStorage(
-  'pump_solana_platforms',
-  ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk', 'bags'],
+  'pump_solana_platforms1',
+  ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk', 'bags', 'heaven'],
   localStorage
 )
 
@@ -540,6 +540,8 @@ const isPausedObj = ref({
 
 const wsTableListCache = ref<PumpObj[]>([])
 const wsTableList = ref<PumpObj[]>([])
+const logoList = ref<{logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
+
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
   console.log('----list--------',platforms.value)
@@ -589,7 +591,23 @@ const list1 = computed(() => {
 
   const wsList = getFilterData(list1, pumpFilter_new)
   const wsList1 = wsList?.filter(i => !list?.some(j => j.pair === i.pair))
-  return [...wsList1, ...list]
+  let filterList = [...wsList1, ...list]
+  if (logoList?.value?.length > 0 && filterList?.length > 0) {
+    filterList = filterList.map(i => {
+      const obj = logoList.value?.find(y => y.token == i.target_token)
+      if (obj) {
+        return {
+          ...i,
+          logo_url: obj?.logo_url,
+          name: obj?.name,
+          symbol: obj?.symbol
+        }
+      } else {
+        return i
+      }
+    })
+  }
+  return filterList
 })
 
 const list2 = computed(() => {
@@ -609,7 +627,23 @@ const list2 = computed(() => {
   )
   const wsList = getFilterData(list1, pumpFilter_soon)
   const wsList1 = wsList?.filter(i => !list?.some(j => j.pair === i.pair))
-  return [...wsList1, ...list]
+  let filterList = [...wsList1, ...list]
+  if (logoList?.value?.length > 0 && filterList?.length > 0) {
+    filterList = filterList.map(i => {
+      const obj = logoList.value?.find(y => y.token == i.target_token)
+      if (obj) {
+        return {
+          ...i,
+          logo_url: obj?.logo_url,
+          name: obj?.name,
+          symbol: obj?.symbol
+        }
+      } else {
+        return i
+      }
+    })
+  }
+  return filterList
 })
 const list3 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.graduated || []
@@ -628,7 +662,23 @@ const list3 = computed(() => {
   )
   const wsList = getFilterData(list1, pumpFilter_graduated)
   const wsList1 = wsList?.filter(i => !list?.some(j => j.pair === i.pair))
-  return [...wsList1, ...list]
+  let filterList = [...wsList1, ...list]
+  if (logoList?.value?.length > 0 && filterList?.length > 0) {
+    filterList = filterList.map(i => {
+      const obj = logoList.value?.find(y => y.token == i.target_token)
+      if (obj) {
+        return {
+          ...i,
+          logo_url: obj?.logo_url,
+          name: obj?.name,
+          symbol: obj?.symbol
+        }
+      } else {
+        return i
+      }
+    })
+  }
+  return filterList
 })
 watch(() => list1.value?.[0]?.target_token, (val) => {
   if(pump_notice.value[activeChain.value].new && pumpAudio.value && val) {
@@ -672,7 +722,14 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
     wsUpdateTableList(val)
   }
 })
-
+watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
+  if (val) {
+    const rTime = Date.now()
+    const obj = { ...val, rTime: rTime }
+    logoList.value = logoList?.value?.filter?.(i => i.token !== obj.token && rTime - (i.rTime || 0) <= 16000)
+    logoList.value.unshift(obj)
+  }
+})
 watch(()=>pump_query.value[activeChain.value].new, () => {
   debouncedFetch('new')
 }, { deep: true })
@@ -782,31 +839,71 @@ function getMouseInsideElement(event:any, element:any) {
       mouseY <= rect.bottom
     )
 }
+// function wsUpdateBaseInfo(obj: { logo_url: string, name: string, token: string, symbol: string , rTime: number}) {
+//   wsTableList.value = wsTableList.value?.map(i => {
+//     if (obj.token == i.target_token) {
+//       return {
+//         ...i,
+//         logo_url: obj.logo_url,
+//         name: obj.name,
+//         symbol: obj.symbol
+//       }
+//     }
+//     return i
+//   })
+//   wsTableListCache.value = wsTableListCache.value?.map(i => {
+//     if (obj.token == i.target_token) {
+//       return {
+//         ...i,
+//         logo_url: obj.logo_url,
+//         name: obj.name,
+//         symbol: obj.symbol
+//       }
+//     }
+//     return i
+//   })
+//   const c = ['new', 'soon', 'graduated']
+//   c.forEach((i) => {
+//     fourmemeListObj[activeChain.value][i] = fourmemeListObj?.[activeChain.value][i]?.map((j) => {
+//       if (obj.token == j.target_token) {
+//         return {
+//           ...j,
+//           logo_url: obj.logo_url,
+//           name: obj.name,
+//           symbol: obj.symbol
+//         }
+//       }
+//       return {
+//         ...j,
+//       }
+//     })
+//   })
+// }
 function wsUpdateTableList(wsList: WSPump[]) {
       const c = ['new', 'soon', 'graduated']
       if (!wsList?.length) return
       const rTime = Date.now()
-  const list = wsList?.map?.(i => ({
-    ...i,
-    ...i.pair,
-    rTime: rTime,
-    id: `${i.pair.target_token}-${i.chain}`,
-    pair_id: `${i.pair.pair}-${i.chain}`,
-    token: i.pair.target_token,
-    progress: Number(i.progress || 0),
-    symbol:
-      i.pair.target_token == i.pair.token0_address
-        ? i?.pair.token0_symbol
-        : i?.pair.token1_symbol,
-    name:  i.target_token == i.token0_address
-          ? i?.token0_name
-          : i?.token1_name,
-    logo_url:
-    i.target_token == i.pair.token0_address
-      ? i?.pair.token0_logo_url
-      : i?.pair.token1_logo_url,
+      const list = wsList?.map?.(i => ({
+        ...i,
+        ...i.pair,
+        rTime: rTime,
+        id: `${i.pair.target_token}-${i.chain}`,
+        pair_id: `${i.pair.pair}-${i.chain}`,
+        token: i.pair.target_token,
+        progress: Number(i.progress || 0),
+        symbol:
+          i.pair.target_token == i.pair.token0_address
+            ? i?.pair.token0_symbol
+            : i?.pair.token1_symbol,
+        name:  i.target_token == i.token0_address
+              ? i?.token0_name
+              : i?.token1_name,
+        logo_url:
+        i.target_token == i.pair.token0_address
+          ? i?.pair.token0_logo_url
+          : i?.pair.token1_logo_url,
 
-  }))
+      }))
       const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address) && rTime - (i.rTime || 0) <= 15000)
       wsTableListCache.value = [...list, ...(wsTableList1 || [])]
       // let wsTime = this.wsTableListCache?.time || 0
@@ -831,7 +928,7 @@ function wsUpdateTableList(wsList: WSPump[]) {
       }
       if (isPausedObj?.value?.graduated) {
         // list1 = list1?.filter?.(i => i.state !== 'graduated')
-        list1 = [...list1?.filter?.(i => i.state !== 'graduated'), ...list2?.filter?.(i => i.state === 'graduated')]
+        list1 = [...list1?.filter?.(i => i.state !== 'graduated' && i.state !== 'migrated'), ...list2?.filter?.(i => i.state === 'graduated' || i.state === 'migrated' )]
       }
       wsTableList.value = [...list1]
 
@@ -1118,7 +1215,7 @@ function getPump(params, isFilter = false) {
       wsTableListCache.value =
         wsTableListCache?.value.filter?.(
           (i) => !list?.some?.((j) => j?.pair === i?.pair)
-        ) || []
+      ) || []
     })
     .finally(() => {
       loading[chain + '-' + params.category] = false
@@ -1246,7 +1343,6 @@ function getFilterData(list, conditions) {
         if (conditions?.smart_money_tx_count_24h_max) {
           pass = pass && ((i.smart_money_sell_count_24h || 0) + (i?.smart_money_buy_count || 0)) <= Number(conditions.smart_money_tx_count_24h_max)
         }
-
         return pass
       })
     }
