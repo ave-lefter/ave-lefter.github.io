@@ -663,7 +663,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsSto
     }
     const { event, data } = msg
     if (event === WSEventType.SIMPLE_TX || event === WSEventType.TX) {
-      const tx: SimpleWSTx | WSTx = data?.msg
+      const tx: SimpleWSTx | WSTx = data?.msg || data?.tx
       const interval = switchResolution(resolution)
       const t = getAddressAndChainFromId(token.value)?.address
       let target = ''
