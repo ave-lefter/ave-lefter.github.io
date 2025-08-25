@@ -10,7 +10,6 @@ defineProps<{
 <template>
   <el-dialog
   v-model="visible"
-    :z-index="10001"
     align-center
     :title="$t('PnlHistory')"
     width="420px"

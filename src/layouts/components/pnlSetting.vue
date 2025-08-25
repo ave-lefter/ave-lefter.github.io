@@ -2,7 +2,7 @@
 import pnlImg from '@/assets/images/pnl.png'
 const visible = defineModel<boolean>('visible')
 const pnlSetting = defineModel<any>('pnlSetting')
-
+const uploadRef = useTemplateRef('uploadRef')
 const { t } = useI18n()
 const defaultSettings = {
   chain: 'solana',
@@ -15,6 +15,9 @@ const defaultSettings = {
 const settings = ref(pnlSetting.value ? { ...pnlSetting.value } : { ...defaultSettings })
 watch(visible, () => {
   if (visible.value) {
+   if(uploadRef.value){
+    uploadRef.value.clearFiles()
+   }
     settings.value = pnlSetting.value ? { ...pnlSetting.value } : { ...defaultSettings }
   }
 })
@@ -28,8 +31,10 @@ function beforeUpload(file: File) {
   }
   return true
 }
-function onSuccess(params:type) {
-  
+function onSuccess(response:{data:{filename:string,url:string}}) {
+  if(response.data.url){
+    settings.value.background = response.data.url
+  }
 }
 function onReset() {
   pnlSetting.value = { ...defaultSettings }
@@ -45,7 +50,6 @@ function onConfirm() {
 <template>
   <el-dialog
     v-model="visible"
-    :z-index="10001"
     align-center
     :title="$t('PnlSetting')"
     width="360px"
@@ -76,6 +80,7 @@ function onConfirm() {
         </div>
       </div>
       <el-upload
+      ref="uploadRef"
         action='https://0ftrfsdb.xyz/v2api/token/v1/upload/pnl_background'
         name="image"
         :headers="{
@@ -87,7 +92,7 @@ function onConfirm() {
         :show-file-list="false"
         :limit="1"
         :before-upload="beforeUpload"
-        onSuccess="onSuccess"
+        :onSuccess="onSuccess"
       >
         <div class="w-320px h-80px bg-cover flex items-center">
           <img
