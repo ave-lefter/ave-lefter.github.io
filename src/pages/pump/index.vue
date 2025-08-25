@@ -1,6 +1,6 @@
 <template>
-  <div class="pump w-full bg-[--d-000-l-FFF]">
-    <div class="flex-start p-x-17px py-12px bg-[--d-000-l-FFF] mb-1px mt-1px">
+  <div class="pump w-full bg-[--main-bg]">
+    <div class="flex-start p-x-17px py-12px bg-[--main-bg] mb-1px mt-1px">
       <el-popover
         v-model:visible="visible_platforms"
         placement="bottom-start"
@@ -27,7 +27,7 @@
                   ? 'radix-icons:triangle-up'
                   : 'radix-icons:triangle-down'
               "
-              class="text-16px color-[--d-F5F5F5-l-333]"
+              class="text-16px color-[--main-text]"
             />
           </el-button>
         </template>
@@ -1413,7 +1413,7 @@ function getFilterData(list, conditions) {
 }
 .btn {
   border: none;
-  background: var(--d-151A22-l-E8F1FF);
+  background: var(--main-input-button-bg);
   padding: 7px 8px;
   border-radius: 4px;
   display: flex;
@@ -1421,7 +1421,7 @@ function getFilterData(list, conditions) {
   justify-content: flex-start;
   font-size: 12px;
   font-weight: 500;
-  color:var(--d-F5F5F5-l-111);
+  color:var(--main-text);
 }
 :deep().search-input1 {
   background: var(--d-151A22-l-E8F1FF);
