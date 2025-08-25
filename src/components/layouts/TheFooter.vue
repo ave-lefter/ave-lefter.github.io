@@ -1,5 +1,5 @@
 <template>
-  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-9999">
+  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-1000">
     <div class="left">
       <NuxtLink
         v-for="(item) in newData" :key="item.symbol || item.logo_url"

@@ -214,7 +214,7 @@ function resetPnl() {
 
 <template>
   <Draggable
-    class-name="top-0 left-0 fixed draggable z-10000!"
+    class-name="top-0 left-0 fixed draggable z-1000!"
     :initialWidth="pnlBoundingRect.width"
     :initial-height="pnlBoundingRect.height"
     :x="pnlBoundingRect.x"
@@ -280,7 +280,7 @@ function resetPnl() {
             >{{ $t('login') }}</el-button
           >
         </div>
-        <div class="flex flex-1">
+        <div v-else class="flex flex-1">
           <div class="flex-1 flex flex-col items-center">
             <div
               class="color-#F5F5F5 font-bold mb-2px flex items-center gap-4px"

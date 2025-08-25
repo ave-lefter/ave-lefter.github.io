@@ -26,11 +26,10 @@ function beforeUpload(file: File) {
     ElMessage.error(t('max200KB'))
     return false
   }
-  // 这里可以加图片大小/比例校验
   return true
 }
-function resetBg() {
-  settings.value.background = pnlImg
+function onSuccess(params:type) {
+  
 }
 function onReset() {
   pnlSetting.value = { ...defaultSettings }
@@ -77,12 +76,18 @@ function onConfirm() {
         </div>
       </div>
       <el-upload
+        action='https://0ftrfsdb.xyz/v2api/token/v1/upload/pnl_background'
+        name="image"
+        :headers="{
+          Authorization:`Bearer ${useBotStore().accessToken}`
+        }"
         class="[--el-fill-color-blank:--d-333-l-F2F2F2] [--el-border-color:--d-333-l-F2F2F2] [--el-color-primary:--d-333-l-F2F2F2] upload"
         accept=".png,.jpg,.jpeg,.webp"
         drag
         :show-file-list="false"
         :limit="1"
         :before-upload="beforeUpload"
+        onSuccess="onSuccess"
       >
         <div class="w-320px h-80px bg-cover flex items-center">
           <img
