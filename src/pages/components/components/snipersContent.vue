@@ -9,7 +9,7 @@ function formatColor(row) {
     return 'color-[--down-color]'
   }
   // <30显示白色
-  return ''
+  return 'color-[--secondary-text]'
 }
 </script>
 <template>

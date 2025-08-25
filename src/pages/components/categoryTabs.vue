@@ -309,7 +309,7 @@ watch(()=>props.categories,()=>{
   </div>
   <div
     v-if="sub_category_list.length"
-    class="flex items-center gap-8px text-12px px-16px pb-12px bg-[--d-111-l-FFF]"
+    class="flex items-center gap-8px text-12px px-16px pb-12px bg-[--main-bg]"
   >
     <div
       v-for="item in sub_category_list"
@@ -317,8 +317,8 @@ watch(()=>props.categories,()=>{
       class="p-2 lh-16px cursor-pointer rounded-1 flex items-center"
       :class="
         activeSubTab === item.category
-          ? 'color-#F5F5F5 bg-#333'
-          : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
+           ? 'color-[--white] bg-[--tab-active-bg]'
+              : 'bg-[--main-input-button-bg] color-[--third-text]'
       "
       @click="updateSubCategory(item.category)"
     >
@@ -326,7 +326,7 @@ watch(()=>props.categories,()=>{
         v-if="isPump"
         :name="`custom:${item.category.replaceAll('_', '-')}`"
         class="mr-1 text-12px"
-        :class="activeSubTab === item.category ? 'color-#F5F5F5' : ''"
+        :class="activeSubTab === item.category ? 'color-[--white]' : ''"
       />
       {{ item[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
     </div>

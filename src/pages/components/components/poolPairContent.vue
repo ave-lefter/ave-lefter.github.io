@@ -10,8 +10,8 @@ const props = defineProps<{
   pageSize: number
   row: any
   rowIndex: number
-  activeKline:boolean
-  enableKline:boolean
+  activeKline?:boolean
+  enableKline?:boolean
 }>()
 
 function getSymbol(row, shouldReverse = false) {

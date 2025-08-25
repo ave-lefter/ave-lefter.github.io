@@ -3,6 +3,8 @@
   --down-color: #F6465D;
   --up-color: #12B886;
   --yellow:#FFA622;
+  --x-blue:#009EF7;
+  --pump-green:#55D592;
   // 主要文字
   --main-text:var(--d-F5F5F5-l-111);
   // 次要文字
@@ -33,6 +35,12 @@
   --white:#F5F5F5;
   // 反色
   --reverse-color:var(--d-111-l-F5F5F5);
+  // 灰色按钮悬浮色
+  --gray-button-hover:var(--d-212936-l-C3D1E5);
+  // 蓝色按钮悬浮色
+  --blue-button-hover:#3973DE;
+  // 弹窗 Tab 选中色
+  --dialog-tab-active:var(--d-383F4B-l-FFF);
   &.dark {
     // 规范：颜色相同省略为 3 位，所有都用大写
     --d-333-l-ECECEC: #333;
@@ -148,6 +156,8 @@
     --d-0B0D12-l-FFF: #0B0D12;
     --d-FFF-l-111: #FFF;
     --d-FFFFFF08-l-33333308: #FFFFFF08;
+    --d-212936-l-C3D1E5: #212936;
+    --d-383F4B-l-FFF: #383F4B;
   }
 
   &.light {
@@ -264,6 +274,8 @@
     --d-0B0D12-l-FFF: #FFF;
     --d-FFF-l-111: #111;
     --d-FFFFFF08-l-33333308: #33333308;
+    --d-212936-l-C3D1E5: #C3D1E5;
+    --d-383F4B-l-FFF: #FFF;
   }
 }
 
