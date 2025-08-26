@@ -12,7 +12,7 @@ const defaultSettings = {
   solUsdSwitch: false,
   showU: true,
 }
-const settings = ref(pnlSetting.value ? { ...pnlSetting.value } : { ...defaultSettings })
+const settings = ref<typeof defaultSettings>(pnlSetting.value ? { ...pnlSetting.value } : { ...defaultSettings })
 watch(visible, () => {
   if (visible.value) {
    if(uploadRef.value){
@@ -44,6 +44,9 @@ function onConfirm() {
   pnlSetting.value = { ...settings.value }
   // 提交逻辑
   visible.value = false
+}
+function resetBg() {
+  settings.value.background = pnlImg
 }
 </script>
 
