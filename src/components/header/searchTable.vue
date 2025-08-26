@@ -220,7 +220,7 @@
                         row.opening_at &&
                         Number(formatTimeFromNow(row.opening_at, true)) < 60
                       "
-                      :key="`${row.opening_at}${$Index}`"
+                      :key="`${row.opening_at}${$index}`"
                       :timestamp="row.opening_at"
                       :end-time="60"
                     >
@@ -321,7 +321,7 @@
               />
               </div> -->
             </template>
-            <div v-else class="flex-end">
+            <div v-else class="flex-end" style="flex:2">
               <!-- <count-down
                 v-if="showTime"
                 class="count-down mt-8"
@@ -360,29 +360,27 @@
                   </span>
                 </template>
               </count-down> -->
-
-              <TimerCount
-                v-if="row.opening_at > 0"
-                :key="`${row.opening_at}${$Index}`"
-                :timestamp="row.opening_at"
-                :end-time="60"
-              >
-                <template #default="{ formattedData }">
-                  <span class="color-[--d-999-l-666]">
-                    {{ formattedData.days }}D {{ formattedData.hours }}H
-                    {{ formattedData.minutes }}M {{ formattedData.seconds }}S
-                  </span>
-                </template>
-              </TimerCount>
-              <template v-else>
-                <img
-                  class="mr-5px"
-                  src="@/assets/images/icon-unknown.png"
-                  alt=""
-                  :width="12"
+              <div class="flex-end" v-if="row.opening_at > 0">
+                <span class="color-[--d-F5F5F5-l-111] text-12px mr-24px">{{ $t('countdown2Opening') }}</span>
+                <TimerCount
+                  :key="`${row.opening_at}${$index}`"
+                  :timestamp="row.opening_at"
+                  :end-time="0"
+                  @done="emit('done')"
                 >
+                  <template #default="{ formattedData }">
+                    <div class="color-[--d-F5F5F5-l-111] text-13px flex-end">
+                      <span class="bg-[--d-252E3C-l-D9E8FF] py-4px px-6px radius-4px">{{ (formattedData.days<10? '0': '') + formattedData.days }}D</span>
+                      <span class="bg-[--d-252E3C-l-D9E8FF] py-4px px-6px ml-12px radius-4px">{{  (formattedData.hours < 10? '0': '') + formattedData.hours }}H</span>
+                      <span class="bg-[--d-252E3C-l-D9E8FF] py-4px px-6px ml-12px radius-4px">{{  (formattedData.minutes < 10? '0': '') +formattedData.minutes }}M</span>
+                      <span class="bg-[--d-252E3C-l-D9E8FF] py-4px px-6px ml-12px radius-4px">{{ (formattedData.seconds < 10? '0': '') + formattedData.seconds }}S</span>
+                    </div>
+                  </template>
+                </TimerCount>
+              </div>
+              <div class="bg-[--d-252E3C-l-D9E8FF]  py-3px px-6px radius-4px color-[--d-8CA0C3-l-566275] text-12px" v-else>
                 {{ $t('unknownRisk') }}
-              </template>
+              </div>
             </div>
           </NuxtLink>
         </li>
@@ -426,7 +424,7 @@ const props = defineProps({
     default: false,
   }
 })
-const emit = defineEmits(['close', 'filter', 'sortChange'])
+const emit = defineEmits(['close', 'filter', 'sortChange', 'done'])
 const $router = useRouter()
 const { token_logo_url } = useConfigStore()
 
