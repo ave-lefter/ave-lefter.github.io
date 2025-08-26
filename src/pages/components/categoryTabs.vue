@@ -47,7 +47,7 @@ const configMap = computed(() => {
       storageKey: 'hotUserTableColumns',
       getDefaultColumns: getHotDefaultColumns,
       getOptions: getHotOptions,
-      class: isHot.value ? 'color-#FFA622' : '',
+      class: isHot.value ? 'color-[--yellow]' : '',
     },
     new: {
       icon: 'custom:new',
@@ -257,7 +257,7 @@ watch(()=>props.categories,()=>{
           class="p-2 lh-16px cursor-pointer rounded-1 flex items-center shrink-0"
           :class="
             activeTab === item.category
-              ? 'color-[--white] bg-[--tab-active-bg]'
+              ? 'color-[--white] bg-[--primary-color]'
               : 'bg-[--main-input-button-bg] color-[--third-text]'
           "
           @click="updateCategory(item.category, item.sub_category || [],index)"

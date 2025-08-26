@@ -328,7 +328,7 @@ function cancelHide() {
           v-if="isLargeScreen"
           v-model="quickBuyValue"
           size="small"
-          class="[--el-border-color:transparent]"
+          class="[--el-border-color:transparent] shrink-0"
         />
         <SlippageSet
           id="drag-settings"
@@ -447,7 +447,7 @@ function cancelHide() {
             class="flex color-[--secondary-text] text-12px lh-14px"
           >
             <div class="flex-1 flex items-center">
-              <span class="w-10px h-10px rounded-full bg-#37B270 mr-4px"/>
+              <span class="w-10px h-10px rounded-full bg-[--signal-green] mr-4px"/>
               <span class="color-[--main-text] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px">{{
                   wallet_alias || $t('wallet')
                 }}</span>
