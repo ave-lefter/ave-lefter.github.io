@@ -1,6 +1,7 @@
 <template>
   <div class="relative" :style="{height: `${isRank ? 290 : kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
+    <UnknownRisk  @refresh="refresh"/>
   </div>
   <div
     v-if="!isRank"
@@ -23,6 +24,7 @@ import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
 import {DefaultHeight, WSSimpleTxChain} from '~/utils/constants'
 import { TW_STUDY } from './constant'
+import UnknownRisk from './unknownRisk.vue'
 
 const props = defineProps<{
   isRank?:boolean
@@ -790,6 +792,11 @@ onMounted(() => {
     _widget?.activeChart?.().resetData?.()
   })
 })
+const emit = defineEmits(['refresh'])
+function refresh() {
+  emit('refresh')
+  resetChart()
+}
 
 </script>
 

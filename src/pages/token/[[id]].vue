@@ -26,7 +26,7 @@
           <el-scrollbar :height="scrollbarHeight">
             <div :class="orderBookVisible ? 'grid grid-cols-[1fr_292px] gap-1px' : 'grid grid-cols-1 gap-1px'">
               <div>
-                <KLine ref="klineContainer" />
+                <KLine ref="klineContainer" @refresh="refresh"/>
               </div>
               <OrderBook v-model="orderBookVisible" :kline-height="klineHeight + 3" />
             </div>
@@ -193,6 +193,10 @@ onBeforeRouteLeave(() => {
   wsStore.getWSInstance()?.offMessage(['tx_update_token', 'kline', 'price'])
   document.removeEventListener('visibilitychange', visibilitychangeFn)
 })
+
+function refresh() {
+  init()
+}
 </script>
 
 <style scoped>
