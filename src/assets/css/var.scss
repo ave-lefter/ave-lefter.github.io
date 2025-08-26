@@ -22,8 +22,8 @@
   // 主页列表标题栏背景
   --main-list-header-bg:var(--d-151A22-l-E8F1FF);
   // 主页面列表悬浮色
-  --main-list-hover:var(--d-12161D-l-ECF3FF);
-  // 主页面输入框&按钮背景色
+  --main-list-hover:var(--d-151A22-l-E8F1FF);
+  // 主页面输入框和按钮背景色
   --main-input-button-bg:var(--d-12161D-l-ECF3FF);
   // 弹窗背景
   --dialog-bg:var(--d-151A22-l-FFF);
@@ -167,6 +167,8 @@
     --d-383F4B-l-CAD6EC: #383F4B;
     --d-12161D-l-ECF3FF: #12161D;
     --d-252E3C-l-D9E8FF: #252E3C;
+    --d-383F4B-l-CAD6EC: #383F4B;
+    --d-12161D-l-ECF3FF: #12161D;
   }
 
   &.light {
@@ -288,6 +290,8 @@
     --d-383F4B-l-CAD6EC: #CAD6EC;
     --d-12161D-l-ECF3FF: #ECF3FF;
     --d-252E3C-l-D9E8FF: #D9E8FF;
+    --d-383F4B-l-CAD6EC: #CAD6EC;
+    --d-12161D-l-ECF3FF: #ECF3FF;
   }
 }
 
