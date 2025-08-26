@@ -134,7 +134,6 @@ function reset() {
         <div class="mt-20px flex">
           <el-button
             class="h-30px flex-1 m-l-auto"
-            color="var(--border)"
             @click="reset"
           >
             {{ $t('reset') }}

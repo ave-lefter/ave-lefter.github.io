@@ -169,14 +169,13 @@ function handleSelectChild(childItem, renderKey:string) {
         </div>
         <div class="flex items-center gap-20px mt-40px">
           <el-button
-            color="var(--border)"
-            class="flex-1 [--el-color-white:--main-text]"
+            class="flex-1"
             size="large"
             @click="handleReset"
           >
             {{ $t('reset') }}
           </el-button>
-          <el-button type="primary" class="flex-1 [--el-color-white:--white]" size="large" @click="handleConfirm">
+          <el-button type="primary" class="flex-1" size="large" @click="handleConfirm">
             {{ $t('confirm') }}
           </el-button>
         </div>
