@@ -306,9 +306,9 @@ const onScroll = useThrottleFn(({scrollTop}: { scrollTop: number }) => {
                   )
                 }}</span>
             </div>
-            <div v-if="headline" class="flex-[4] flex items-center gap-8px mt-12px">
+            <div v-if="headline" class="flex-[4] flex items-center gap-8px mt-12px min-w-0">
               <Icon name="custom:ai"/>
-              <div class="color-[--third-text] text-12px whitespace-nowrap overflow-hidden text-ellipsis">
+              <div class="color-[--main-text] text-12px whitespace-nowrap overflow-hidden text-ellipsis">
                 {{ headline }}
               </div>
             </div>

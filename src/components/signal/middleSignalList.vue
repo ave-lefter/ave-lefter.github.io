@@ -240,7 +240,7 @@ class="flex items-center justify-center gap-6px"
           {{ dayjs(signal_time * 1000).fromNow() }}
         </div>
         <div
-          class="color-[--secondary-text] mx-4px cursor-pointer decoration-underline decoration-dotted"
+          class="color-[--main-text] mx-4px cursor-pointer decoration-underline decoration-dotted"
           @mouseenter.stop="showPop($event,signalList[index].actions)"
           @mouseleave.stop="hidePop"
         >
