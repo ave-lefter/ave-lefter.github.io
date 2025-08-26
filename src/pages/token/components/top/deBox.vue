@@ -172,7 +172,7 @@ function toggle() {
     align-items: center;
     justify-content: center;
     border-radius: 2px;
-    background-color: var(--d-222-l-F2F2F2);
+    background-color: var(--main-input-button-bg);
     padding: 2px;
 }
 </style>

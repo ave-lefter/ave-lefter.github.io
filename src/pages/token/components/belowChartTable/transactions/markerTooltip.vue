@@ -107,13 +107,13 @@ async function _getTxsUserBrief() {
             :formatAddress="(address: string) => address.slice(0, 4) + '...' + address.slice(-4)"
           />
           <Icon v-copy="currentRow.wallet_address" name="bxs:copy"
-                class="cursor-pointer color-[--d-666-l-999] text-10px"/>
+                class="cursor-pointer color-[--third-text] text-10px"/>
           <slot/>
         </div>
         <div class="flex justify-between">
-          <span class="color-[--d-999-l-666]">{{ $t('position1') }}:</span>
+          <span class="color-[--secondary-text]">{{ $t('position1') }}:</span>
           <div>
-            <span class="color-[--d-666-l-999]">({{
+            <span class="color-[--third-text]">({{
               formatNumber(userBriefData.balance_amount || 0, 3)
               }}/{{
                 formatNumber(userBriefData.history_max_balance_amount || 0, 3)
@@ -127,7 +127,7 @@ async function _getTxsUserBrief() {
           </div>
         </div>
         <div class="flex justify-between">
-          <span class="color-[--d-999-l-666]">{{ $t('profit2') }}:</span>
+          <span class="color-[--secondary-text]">{{ $t('profit2') }}:</span>
           <span :class="`${getColorClass(userBriefData.total_profit)}`">
             <template v-if="userBriefData.total_profit==='0'">--</template>
             <template v-else>
@@ -138,7 +138,7 @@ async function _getTxsUserBrief() {
           </span>
         </div>
         <div class="flex justify-between">
-          <span class="color-[--d-999-l-666]">{{ $t('unrealized_profit') }}:</span>
+          <span class="color-[--secondary-text]">{{ $t('unrealized_profit') }}:</span>
           <span :class="`${getColorClass(userBriefData.unrealized_profit)}`">
             <template v-if="userBriefData.unrealized_profit==='0'">--</template>
             <template v-else>
@@ -149,13 +149,13 @@ async function _getTxsUserBrief() {
           </span>
         </div>
         <div class="flex justify-between whitespace-nowrap">
-          <span class="color-[--d-999-l-666]">{{ $t('totalBuy2') }}
+          <span class="color-[--secondary-text]">{{ $t('totalBuy2') }}
           <template
             v-if="userBriefData.total_purchase!=='--'&&Number.parseFloat(userBriefData.total_purchase)!==0">
             ({{ userBriefData.total_purchase }})
           </template>:</span>
           <span>
-             <span class="color-[--d-666-l-999] mr-10px">{{
+             <span class="color-[--third-text] mr-10px">{{
                  userBriefData.total_purchase_amount
                    ? formatNumber(userBriefData.total_purchase_amount, 2)
                    : '--'
@@ -166,13 +166,13 @@ async function _getTxsUserBrief() {
          </span>
         </div>
         <div class="flex justify-between whitespace-nowrap">
-          <span class="color-[--d-999-l-666]">{{ $t('totalSell2') }}
+          <span class="color-[--secondary-text]">{{ $t('totalSell2') }}
           <template
             v-if="userBriefData.total_sold!=='--'&&Number.parseFloat(userBriefData.total_sold)!==0">
             ({{ userBriefData.total_sold }})
           </template>:</span>
           <span>
-             <span class="color-[--d-666-l-999] mr-10px">{{
+             <span class="color-[--third-text] mr-10px">{{
                  userBriefData.total_sold_amount
                    ? formatNumber(userBriefData.total_sold_amount, 2)
                    : '--'
@@ -187,11 +187,11 @@ async function _getTxsUserBrief() {
           style="margin:0"
         />
         <div class="flex justify-between">
-          <span class="color-[--d-999-l-666]">7D {{ $t('winRate2') }}:</span>
+          <span class="color-[--secondary-text]">7D {{ $t('winRate2') }}:</span>
           <span class="color-#12B886">{{ formatNumber(userBriefData.win_ratio, 1) }}%</span>
         </div>
         <div class="flex justify-between">
-          <span class="color-[--d-999-l-666]">7D {{ $t('profit2') }}:</span>
+          <span class="color-[--secondary-text]">7D {{ $t('profit2') }}:</span>
           <span :class="`${getColorClass(userBriefData.profit)}`">
             <template v-if="userBriefData.profit==='0'">--</template>
             <template v-else-if="userBriefData.profit<0">-</template>${{
@@ -200,11 +200,11 @@ async function _getTxsUserBrief() {
           </span>
         </div>
         <div class="flex justify-between">
-          <span class="color-[--d-999-l-666]">7D {{ $t('token') }}:</span>
-          <span class="color-[--d-666-l-999]">{{ formatNumber(userBriefData.token_txns) }}</span>
+          <span class="color-[--secondary-text]">7D {{ $t('token') }}:</span>
+          <span class="color-[--third-text]">{{ formatNumber(userBriefData.token_txns) }}</span>
         </div>
         <div class="flex justify-between">
-          <span class="color-[--d-999-l-666]">{{ $t('walletAge') }}:</span>
+          <span class="color-[--secondary-text]">{{ $t('walletAge') }}:</span>
           <TimerCount
             v-if="userBriefData.wallet_age && Number(formatTimeFromNow(userBriefData.wallet_age,true)) < 60"
             :key="userBriefData.wallet_age"
@@ -212,7 +212,7 @@ async function _getTxsUserBrief() {
             :end-time="60"
           >
             <template #default="{seconds}">
-              <span class="color-[--d-666-l-999]">
+              <span class="color-[--third-text]">
                 <template v-if="seconds<60">
                   {{ seconds }}{{ $t('ss') }}
                 </template>
@@ -222,7 +222,7 @@ async function _getTxsUserBrief() {
               </span>
             </template>
           </TimerCount>
-          <span class="color-[--d-666-l-999]" v-else>
+          <span class="color-[--third-text]" v-else>
             {{
               !!Number(userBriefData.wallet_age || 0)
                 ? dayjs(userBriefData.wallet_age * 1000).fromNow()
@@ -235,12 +235,12 @@ async function _getTxsUserBrief() {
           style="margin:0"
         />
         <div v-if="userBriefData.top3_blue_chip?.length > 0">
-          <div class="color-[--d-999-l-666] lh-16px mb-8px">TOP3 {{ $t('blueChips') }}:</div>
+          <div class="color-[--secondary-text] lh-16px mb-8px">TOP3 {{ $t('blueChips') }}:</div>
           <div class="flex-wrap flex items-center gap-x-20px gap-y-6px">
             <NuxtLink
               v-for="(item) in userBriefData.top3_blue_chip"
               :key="item.token"
-              class="flex items-center [&&]:color-[--d-999-l-666]"
+              class="flex items-center [&&]:color-[--secondary-text]"
               :to="`/token/${item.token}-${item.chain}`"
               @click.self="visible=false"
             >
@@ -248,7 +248,7 @@ async function _getTxsUserBrief() {
                 :row="{
                   logo_url: item.logoUrl,
                 }"
-                token-class="w-16px h-16px [&&]:mr-0 color-[--d-999-l-666]"
+                token-class="w-16px h-16px [&&]:mr-0 color-[--secondary-text]"
               />
               <span class="ml-4px">{{ item.symbol }}</span>
             </NuxtLink>

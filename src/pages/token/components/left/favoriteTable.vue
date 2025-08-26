@@ -238,7 +238,7 @@ function resetListStatus() {
   <div v-loading="listStatus.pageNo === 1 && listStatus.loading">
     <div class="flex items-center justify-between pr-15px pl-12px mt-10px">
       <div class="flex items-center min-w-0">
-        <span v-show="arrowVisible" class="w-20px h-20px rounded-2px color-[--d-666-l-999] hover:color-[--d-FFF-l-333] bg-[--d-111-l-FFF] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,-200)">
+        <span v-show="arrowVisible" class="w-20px h-20px rounded-2px color-[--d-666-l-999] hover:color-[--d-FFF-l-333] bg-[--secondary-bg] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,-200)">
         <Icon name="material-symbols:arrow-back-ios-new-rounded" />
       </span>
       <div
@@ -260,7 +260,7 @@ function resetListStatus() {
           {{ item.name }}
         </span>
       </div>
-      <span v-show="arrowVisible" class="mr-4px w-20px h-20px rounded-2px color-[--d-666-l-999] hover:color-[--d-FFF-l-333] bg-[--d-111-l-FFF] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,200)">
+      <span v-show="arrowVisible" class="mr-4px w-20px h-20px rounded-2px color-[--d-666-l-999] hover:color-[--d-FFF-l-333] bg-[--secondary-bg] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,200)">
         <Icon name="material-symbols:arrow-forward-ios-rounded"/>
       </span>
       </div>
@@ -295,7 +295,7 @@ function resetListStatus() {
                   <TokenImg :row="row" chain-class="hidden" token-class="w-240px h-240px [&&]:mr-0 rounded-16px" />
                 </template>
               </el-tooltip>
-              
+
               <div class="flex flex-col items-start">
                 <span class="text-12px flex items-center">
                   {{ row.symbol }}

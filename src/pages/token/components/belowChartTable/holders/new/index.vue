@@ -12,10 +12,10 @@
           :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-666-l-999] px-12px py-4px rounded-4px
          ${
            activeTab === item.value
-             ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333]'
+             ? 'bg-[--d-222-l-F2F2F2] color-[--main-text]'
              : ''
          }`"
-          @click="setActiveTab(item.value as typeof activeTab.value)"
+          @click="setActiveTab(item.value as typeof activeTab)"
         >
           {{ item.label }}
         </a>

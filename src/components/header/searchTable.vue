@@ -256,7 +256,7 @@
             <template v-if="Number(row.current_price_usd) > 0">
               <div
                 :class="
-                  row.tx_volume_u_24h > 0 ? 'color-[--d-F5F5F5-l-333]' : ''
+                  row.tx_volume_u_24h > 0 ? 'color-[--main-text]' : ''
                 "
               >
                 ${{ formatNumber(row?.tx_volume_u_24h || 0, 2) }}
@@ -264,7 +264,7 @@
               <div>
                 <span
                   :class="
-                    Number(getMCap(row)) > 0 ? 'color-[--d-F5F5F5-l-333]' : ''
+                    Number(getMCap(row)) > 0 ? 'color-[--main-text]' : ''
                   "
                   >${{ formatNumber(getMCap(row) || 0, 2) }}</span
                 >
@@ -276,7 +276,7 @@
                 <span
                   :class="
                     Number(row.current_price_usd) > 0
-                      ? 'color-[--d-F5F5F5-l-333]'
+                      ? 'color-[--main-text]'
                       : ''
                   "
                   >${{ formatNumber(row.current_price_usd || 0) }}</span
@@ -489,9 +489,9 @@ function getActiveClass(
 ) {
   const isEqual = activeSort.value === activeSort1 && sortBy.value === sortBy1
   if (direction === 't') {
-    return isEqual ? 'border-t-[--d-F5F5F5-l-333]' : 'border-t-[--d-666-l-999]'
+    return isEqual ? 'border-t-[--main-text]' : 'border-t-[--d-666-l-999]'
   }
-  return isEqual ? 'border-b-[--d-F5F5F5-l-333]' : 'border-b-[--d-666-l-999]'
+  return isEqual ? 'border-b-[--main-text]' : 'border-b-[--d-666-l-999]'
 }
 function switchSort(sortBy1: string, activeSort1?: SortValue) {
   if (sortBy.value !== sortBy1) {
@@ -591,7 +591,7 @@ function switchSort(sortBy1: string, activeSort1?: SortValue) {
         display: inline-block;
         word-break: break-all;
         padding: 0;
-        color: var(--d-F5F5F5-l-333);
+        color: var(--main-text);
         font-size: 14px;
       }
       .icon-collect {

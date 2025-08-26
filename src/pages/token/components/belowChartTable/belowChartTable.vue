@@ -157,7 +157,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-[--d-111-l-FFF] rounded-2px text-14px pt-12px flex-1">
+  <div class="bg-[--secondary-bg] rounded-2px text-14px pt-12px flex-1">
     <div class="flex items-center px-12px gap-20px border-b-1px border-b-solid border-b-#FFFFFF08 mb-12px">
       <a
         v-for="(item) in tabsList" :key="item.component" href="javascript:;"

@@ -33,7 +33,7 @@ const Component = computed(() => {
 </script>
 
 <template>
-  <div class="bg-[--d-111-l-FFF] rounded-2px text-14px pt-10px flex-1 flex flex-col">
+  <div class="bg-[--secondary-bg] rounded-2px text-14px pt-10px flex-1 flex flex-col">
     <div class="flex items-center px-12px gap-20px border-b-#FFFFFF08">
       <a
         v-for="(item) in tabs"

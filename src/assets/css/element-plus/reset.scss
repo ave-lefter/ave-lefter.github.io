@@ -34,6 +34,7 @@
     --el-table-header-text-color: var(--secondary-text);
     --el-table-row-hover-bg-color: var(--main-input-button-bg);
     --el-table-tr-bg-color: var(--secondary-bg);
+    --el-table-bg-color: var(--secondary-bg);
     thead{
       .el-table__cell{
         height: 32px;
@@ -244,4 +245,8 @@
     --el-pagination-button-color:var(--third-text);
     --el-pagination-bg-color:transparent;
   }
+}
+
+.el-date-editor.el-date-editor {
+  --el-border-color: var(--border)
 }

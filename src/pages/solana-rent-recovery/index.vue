@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-[--d-111-l-FFF] w-full flex justify-center h-[calc(100vh-92px)] overflow-y-auto">
+  <div class="bg-[--secondary-bg] w-full flex justify-center h-[calc(100vh-92px)] overflow-y-auto">
     <div class="py-40px">
-      <h3 class="text-24px color-[--d-F5F5F5-l-333] font-500">Solana {{ $t('rentRecovery') }}</h3>
+      <h3 class="text-24px color-[--main-text] font-500">Solana {{ $t('rentRecovery') }}</h3>
       <div class="mt-6px color-#999 text-12px">{{ $t('rentRecoveryDesc') }}</div>
       <div class="flex justify-center mt-20px pb-20px">
         <div class="w-678px max-w-50vw mr-42px">
@@ -16,7 +16,7 @@
           <div class="mt-20px mb-10px color-#999 text-14px">{{ $t('selectClosedTokenAccount') }}</div>
           <div class="text-14px b b-solid b-[--d-222-l-F2F2F2] p-12px rd-8px min-h-400px h-[calc(100vh-492px)] max-h-600px overflow-y-auto relative">
             <div class="color-#9CA3AF flex items-center absolute top-12px left-12px">
-              <span class="color-[--d-F5F5F5-l-333]">{{ $t('selectedToken') }}</span>
+              <span class="color-[--main-text]">{{ $t('selectedToken') }}</span>
               <span :class="checkedResult?.length > 0 ? 'color-#3F80F7' : ''">{{ checkedResult?.length || 0 }}</span>/<span>{{ list?.length || 0 }}</span><span class="text-12px ml-2px">({{ t('limitRent') }})</span>
             </div>
             <div class="h-16px mb-15px" />
@@ -218,8 +218,8 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 :deep() {
-  --el-checkbox-text-color: var(--d-F5F5F5-l-333);
-  --el-checkbox-checked-text-color: var(--d-F5F5F5-l-333);
+  --el-checkbox-text-color: var(--main-text);
+  --el-checkbox-checked-text-color: var(--main-text);
   --el-checkbox-font-weight: 400;
 }
 </style>
