@@ -41,13 +41,6 @@ const pnlData = useStorage('pnlData', {
     historyList: [] as any[],
   },
 })
-watch(
-  () => pnlSetting.value.chain,
-  (val) => {
-    pnlData.value[val as keyof typeof pnlData.value].historyList = []
-    setTokenBalance(val, true)
-  }
-)
 const noInitBalance = computed(()=>{
   return currentChainData.value.initBalance === '0'
 })
@@ -138,12 +131,20 @@ const addresses = computed(() => {
 watch(
   () => addresses.value,
   () => {
+    resetPnl()
     if (addresses.value?.length) {
       subBalanceChange()
     }
   },
   {
     immediate: true,
+  }
+)
+watch(
+  () => pnlSetting.value.chain,
+  (val) => {
+    pnlData.value[val as keyof typeof pnlData.value].historyList = []
+    setTokenBalance(val, true)
   }
 )
 function subBalanceChange() {
@@ -180,10 +181,6 @@ function login() {
   botStore.changeConnectVisible(true)
 }
 onMounted(() => {
-  setTokenBalance('solana', noInitBalance.value)
-})
-
-watch(()=>botStore.evmAddress,()=>{
   setTokenBalance('solana', noInitBalance.value)
 })
 
