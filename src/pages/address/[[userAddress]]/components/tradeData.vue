@@ -43,8 +43,8 @@
           <span
             class="flex-1 text-3 text-right"
             :class="{
-              'text-[var(--color-teal-300)]': !negative,
-              'text-[var(--color-red-500)]': negative,
+              'text-[var(--up-color)]': !negative,
+              'text-[var(--down-color)]': negative,
             }"
           >
             {{ txAnalysis.profit_range?.[key] }} ({{ getProfitRatio(key) }})
@@ -420,7 +420,7 @@ onMounted(() => {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background-color: var(--color-teal-300)
+    background-color: var(--up-color)
 }
 .trade-pnl-stage-item:nth-child(2):before {
   opacity: 0.6;
@@ -430,9 +430,9 @@ onMounted(() => {
 }
 .trade-pnl-stage-item:nth-child(4):before {
   opacity: 0.6;
-  background-color: var(--color-red-500);
+  background-color: var(--down-color);
 }
 .trade-pnl-stage-item:nth-child(5):before {
-  background-color: var(--color-red-500);
+  background-color: var(--down-color);
 }
 </style>

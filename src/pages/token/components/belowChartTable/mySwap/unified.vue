@@ -212,7 +212,7 @@
           <div class="text-[var(--d-999-l-959A9F)] text-right truncate">
             <span v-if="row.status === 'confirmed'">{{ t('completed')
             }}</span>
-            <span v-else-if="row.status === 'error'" style="color: var(--color-red-500);word-break: break-all;">{{
+            <span v-else-if="row.status === 'error'" style="color: var(--down-color);word-break: break-all;">{{
               t('failed') }}<template v-if="row?.errorLog">({{ formatBotError(row?.errorLog) }})</template></span>
             <span v-else-if="row.status === 'cancelled'">{{ t('cancelled1')
             }}</span>
