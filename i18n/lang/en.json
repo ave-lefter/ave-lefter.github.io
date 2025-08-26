@@ -1320,8 +1320,8 @@
   "BlackListDev": "BlackList of Dev",
   "searchKol": "Search KOL",
   "searchKolPlaceholder": "Please enter the KOL address",
-  "kline":"Show Kline",
-  "hidekline":"Hide Kline",
+  "kline": "Show Kline",
+  "hidekline": "Hide Kline",
   "rentRecovery": "Rent Recovery",
   "rentRecoveryDesc": "Quickly recover rent and improve asset management efficiency",
   "recyclableTokens": "Total number of token accounts that can recycle rent",
@@ -1346,5 +1346,6 @@
   "holdersNumTotal": "Holders Total",
   "holdersTotalChange": "Holders Change",
   "holdersChange": "Holders Change",
-  "holdersChange2": "Holder Changs in {n}"
+  "holdersChange2": "Holder Changs in {n}",
+  "countdown2Opening": "Countdown to Opening"
 }

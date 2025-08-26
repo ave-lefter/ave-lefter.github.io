@@ -1,5 +1,5 @@
 <template>
-  <div v-if="modelValue" class="bg-[--d-111-l-FFF] relative rounded-2px text-14px pt-12px flex flex-col overflow-hidden" :style="{ height: `${klineHeight || 200}px` }">
+  <div v-if="modelValue" class="bg-[--secondary-bg] relative rounded-2px text-14px pt-12px flex flex-col overflow-hidden" :style="{ height: `${klineHeight || 200}px` }">
     <!-- 筛选标签 -->
     <div class="mx-12px pb-8px flex border-b-1px border-b-solid border-b-[#f2f2f2] dark:border-b-[#222]">
       <div
@@ -38,7 +38,7 @@
         <div class="grid grid-cols-[1fr_1fr_62px_30px] gap-20px mt-8px mb-4px text-12px color-[--d-666-l-999]">
           <div class="text-left flex items-center gap-2px text-nowrap">
             {{ tableView.isAmount ? t('swapPrice') : t('MC') }}
-            
+
             <el-button
               class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
               @click="tableView.isAmount = !tableView.isAmount"
@@ -50,7 +50,7 @@
                 <path d="M9.02589 2.99465C9.33125 3.60428 9.5 4.2861 9.5 5.00802C9.5 7.48663 7.48304 9.5 5 9.5C2.51696 9.5 0.5 7.48663 0.5 5.00802C0.5 2.52941 2.50893 0.516043 5 0.516043V5.31283L9.02589 2.99465ZM5.64286 0.5V4.14171L8.69643 2.38503C7.99732 1.39037 6.90446 0.684492 5.64286 0.5Z" fill="currentColor"/>
               </svg>
             </el-button>
-            
+
           </div>
           <div class="text-right text-nowrap">
             <div class="flex items-center justify-end gap-2px">
@@ -99,7 +99,7 @@
 
             <!-- Price -->
             <div class="text-right text-nowrap color-[--d-999-l-666]">
-              <div :class="getRowColor(row)" class="font-medium">    
+              <div :class="getRowColor(row)" class="font-medium">
                 <template v-if="tableView.isVolUSDT">
                   <!-- USDT 2位小数 -->
                   ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
@@ -110,7 +110,7 @@
                   <span class="color-[--d-999-l-666]">
                     {{ getChainInfo(row.chain)?.main_name }}
                   </span>
-                </template>              
+                </template>
               </div>
             </div>
 
@@ -162,8 +162,8 @@
               <div class="color-[--d-666-l-999]">
                 <TimerCount
                   v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
-                  :key="`${row.time}${index}`" 
-                  :timestamp="row.time" 
+                  :key="`${row.time}${index}`"
+                  :timestamp="row.time"
                   :end-time="60"
                 >
                   <template #default="{ seconds }">
@@ -199,9 +199,9 @@
       class="absolute bottom-0 h-24px w-100% flex justify-center color-[#FFA622]"
       :class="isPausedTxs? 'bg-[#F2F2F2] dark:bg-[#1A1A1A]': ''"
     >
-        
 
-      <div 
+
+      <div
         v-show="isPausedTxs"
         class="flex items-center gap-4px"
       >
@@ -603,18 +603,18 @@ function getAmount(row: IGetTokenTxsResponse, needPrice = false, isVolUSDT = fal
 // 新增：固定小数位格式化方法
 function formatFixedDecimals(value: number, decimals: number): string {
   if (isNaN(value) || value === 0) return '0.00'
-  
+
   // 使用 toFixed 确保固定小数位数
   const fixed = value.toFixed(decimals)
-  
+
   // 移除末尾的零（但保留至少一位小数）
   const trimmed = fixed.replace(/\.?0+$/, '')
-  
+
   // 如果没有小数点，根据需要添加
   if (decimals > 0 && !trimmed.includes('.')) {
     return trimmed + '.00'
   }
-  
+
   return trimmed
 }
 

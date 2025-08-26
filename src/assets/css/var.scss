@@ -19,10 +19,12 @@
   --main-bg:var(--d-000-l-FFF);
   // 次要背景
   --secondary-bg:var(--d-0B0D12-l-F6F9FF);
+  // 主页列表标题栏背景
+  --main-list-header-bg:var(--d-151A22-l-E8F1FF);
   // 主页面列表悬浮色
   --main-list-hover:var(--d-151A22-l-E8F1FF);
   // 主页面输入框和按钮背景色
-  --main-input-button-bg:var(--d-151A22-l-E8F1FF);
+  --main-input-button-bg:var(--d-12161D-l-ECF3FF);
   // 弹窗背景
   --dialog-bg:var(--d-151A22-l-FFF);
   // 主页面分割线
@@ -30,7 +32,7 @@
   // 弹窗分割线
   --dialog-divider:var(--d-252E3C-l-E8F1FF);
   // 主页 Tab 选中色
-  --tab-active-bg:var(--d-252E3C-l-566275);
+  --tab-active-bg:var(--d-252E3C-l-FFF);
   // 弹窗选中色&输入框&边框
   --border:var(--d-252E3C-l-D9E8FF);
   // 白色
@@ -145,7 +147,6 @@
     --d-F5F5F5-l-0B0D12: #F5F5F5;
     --d-FCFDFF-l-333: #FCFDFF;
     --d-FCFDFF-l-999: #FCFDFF;
-    --d-151A22-l-FFFFFF: #151A22;
     --d-17191E-l-D1D4D9: #17191E;
     --d-252E3C-l-FFF: #252E3C;
     --d-252E3C-l-E8F1FF: #252E3C;
@@ -162,6 +163,7 @@
     --d-FFFFFF08-l-33333308: #FFFFFF08;
     --d-212936-l-C3D1E5: #212936;
     --d-383F4B-l-FFF: #383F4B;
+    --d-383F4B-l-CAD6EC: #383F4B;
     --d-12161D-l-ECF3FF: #12161D;
   }
 
@@ -264,7 +266,6 @@
     --d-F5F5F5-l-0B0D12: #0B0D12;
     --d-FCFDFF-l-333: #333;
     --d-FCFDFF-l-999: #999;
-    --d-151A22-l-FFFFFF: #FFF;
     --d-17191E-l-D1D4D9: #D1D4D9;
     --d-252E3C-l-FFF: #FFF;
     --d-252E3C-l-E8F1FF: #E8F1FF;
@@ -281,6 +282,7 @@
     --d-FFFFFF08-l-33333308: #33333308;
     --d-212936-l-C3D1E5: #C3D1E5;
     --d-383F4B-l-FFF: #FFF;
+    --d-383F4B-l-CAD6EC: #CAD6EC;
     --d-12161D-l-ECF3FF: #ECF3FF;
   }
 }

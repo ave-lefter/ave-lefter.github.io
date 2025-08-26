@@ -1,5 +1,5 @@
 <template>
-  <div class="w-safe bg-[--d-111-l-FFF] flex-1 w-100% px-200px pt-40px" style="height: calc(100vh - 92px)">
+  <div class="w-safe bg-[--secondary-bg] flex-1 w-100% px-200px pt-40px" style="height: calc(100vh - 92px)">
     <div v-if="step !== 0" class="flex-start text-20px mb-22px">
       <el-icon size="12" class="clickable" @click="step=0">
         <Back />
@@ -67,7 +67,7 @@
                   <template #reference>
                     <div class="flex items-center justify-center gap-4px w-200px h-48px border-rd-8px bg-[--d-222-l-F2F2F2] clickable">
                       <Icon name="custom:apple" class="text-30px color-[--d-FFF-l-333]"/>
-                      <span class="color-[--d-FCFDFF-l-333] font-500 text-14px">App Store</span>  
+                      <span class="color-[--d-FCFDFF-l-333] font-500 text-14px">App Store</span>
                     </div>
                   </template>
                   <img src="@/assets/images/2faAppleQRCode.png" alt="" class="mx-auto w-188px h-188px block">
@@ -144,7 +144,7 @@
       </div>
     </template>
     <template v-else-if="step === 1 && checkType === 'email'">
-      <el-form 
+      <el-form
         ref="formRef" class="w-420px mx-auto" :model="form" :rules="rules" label-width="0" autocomplete="off"
         size="large" label-position="top" hide-required-asterisk @submit.prevent="submitForm">
         <el-form-item :label="t('startEmail')" prop="email">

@@ -49,7 +49,7 @@
         <div style="flex: 1;" />
         <ul class="tg-wallet-list_footer flex flex-col gap-10px">
           <li class="flex justify-between h-40px px-20px clickable">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px" @click.stop="showVisible = 1">
+            <div class="color-[--main-text] flex items-center gap-8px" @click.stop="showVisible = 1">
               <Icon name="custom:wallet2" class="text-16px" />
               <span class="font-500 text-14px">{{ t('myWallet1') }}</span>
             </div>
@@ -61,7 +61,7 @@
             </div>
           </li>
           <li class="flex justify-between h-40px px-20px clickable" @click.stop="showVisible = 2">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+            <div class="color-[--main-text] flex items-center gap-8px">
               <Icon name="custom:download" class="text-16px" />
               <span class="font-500 text-14px">{{ t('deposit2') }}</span>
             </div>
@@ -72,7 +72,7 @@
             </div>
           </li>
           <li class="flex justify-between h-40px px-20px clickable" @click.stop="showVisible = 3">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+            <div class="color-[--main-text] flex items-center gap-8px">
               <Icon name="custom:upload" class="text-16px" />
               <span class="font-500 text-14px">{{ t('withdraw') }}</span>
             </div>
@@ -84,7 +84,7 @@
           </li>
           <li class="flex justify-between h-40px px-20px clickable"
             @click="router.push('/safe');tgWalletVisible = false">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+            <div class="color-[--main-text] flex items-center gap-8px">
               <Icon name="custom:shield-check" class="text-16px" />
               <span class="font-500 text-14px">{{ t('safe') }}</span>
             </div>
@@ -105,7 +105,7 @@
             </div>
           </li>
           <li class="flex justify-between h-40px px-20px clickable" @click.stop="$router.push('/solana-rent-recovery');tgWalletVisible = false">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+            <div class="color-[--main-text] flex items-center gap-8px">
               <Icon name="custom:sack-dollar" class="text-16px" />
               <span class="font-500 text-14px">{{ t('rentRecovery') }}</span>
             </div>
@@ -114,7 +114,7 @@
             </div>
           </li>
           <li class="flex justify-between h-40px px-20px clickable" @click.stop="walletStore.disconnect(); tgWalletVisible = false">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+            <div class="color-[--main-text] flex items-center gap-8px">
               <Icon name="custom:log-out" class="text-16px" />
               <span class="font-500 text-14px">{{ t('logout') }}</span>
             </div>
@@ -219,7 +219,7 @@
                 inputmode="decimal" clearable placeholder="0.00"
                 @input="value => withdrawForm.amount = value.replace(/\-|[^\d.]/g, '')">
                 <template #suffix>
-                  <span class="color-[--d-F5F5F5-l-333]">{{ getChainInfo(withdrawForm.chain)?.main_name }}</span>
+                  <span class="color-[--main-text]">{{ getChainInfo(withdrawForm.chain)?.main_name }}</span>
                 </template>
               </el-input>
               <div class="text-12px color-[--d-999-l-959A9F] text-right"
@@ -239,7 +239,7 @@
         </el-form>
         <div v-else-if="!(authInfo?.emailAddress && authInfo?.authSetting)" class="px-20px py-102px text-center">
           <Icon name="custom:shield-user-line" class="text-72px color-[--d-FCFDFF-l-999] mb-16px" />
-          <div class="font-500 text-14px lh-18px color-[--d-F5F5F5-l-333] mb-8px">{{ t('2faT1') }}</div>
+          <div class="font-500 text-14px lh-18px color-[--main-text] mb-8px">{{ t('2faT1') }}</div>
           <div class="font-400 text-12px lh-16px color-#999 mb-30px">{{ t('2faP1') }}</div>
           <el-button type="primary" class="w-full" size="large" @click="router.push('/safe');tgWalletVisible = false">{{
             t('bindNow') }}</el-button>
@@ -247,7 +247,7 @@
         <div v-else-if="(authInfo?.emailAddress && authInfo?.authSetting) && !authInfo?.transferStatus"
           class="px-20px py-102px text-center">
           <Icon name="custom:shield-user-line2" class="text-72px color-[--d-FCFDFF-l-999] mb-16px" />
-          <div class="font-500 text-14px lh-18px color-[--d-F5F5F5-l-333] mb-8px">{{ t('2faT2') }}</div>
+          <div class="font-500 text-14px lh-18px color-[--main-text] mb-8px">{{ t('2faT2') }}</div>
           <div class="font-400 text-12px lh-16px color-#999 mb-30px">{{ t('2faP1') }}</div>
           <el-button type="primary" class="w-full" size="large" disabled>{{ t('cooling') }}</el-button>
         </div>

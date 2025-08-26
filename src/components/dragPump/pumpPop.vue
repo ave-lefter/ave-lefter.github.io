@@ -469,7 +469,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
         <div class="flex items-ceter gap-4px p-2px rounded-4px bg-[--d-151A22-l-E8F1FF]">
           <div
             v-for="(item, idx) in pumpStore.pumpConfig" :key="idx" class="cursor-pointer rounded-4px p-1px"
-            :class="pumpStore.activeChain === item.chain ? 'bg-[--d-111-l-FFF]' : ''"
+            :class="pumpStore.activeChain === item.chain ? 'bg-[--secondary-bg]' : ''"
             @click="pumpStore.activeChain = item.chain as ChainKey">
             <ChainToken :chain="item.chain" :width="16" />
           </div>

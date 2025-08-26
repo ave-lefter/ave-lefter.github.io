@@ -1,6 +1,6 @@
 <template>
   <div
-class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overflow-hidden"
+class="w-monitor w-100% h-100% bg-[--secondary-bg] pl-12px pr-6px relative overflow-hidden"
   :class="{'pr-10px!':isLeftFixed,'pl-10px!':isRightFixed}"
   >
     <!-- <div class="w-100% h-40px absolute pointer-events-auto z-999 drag-handle left-0"/> -->
@@ -508,7 +508,7 @@ function init2() {
     })
     dataSourceCache.value = list.filter(i => {
       return txType.value.includes(i.tx_type)
-    })  
+    })
     updateDateSource()
   }).catch((err) => {
     console.error(err)

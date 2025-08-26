@@ -209,7 +209,7 @@
                   </div>
                   <div @click.stop>
                     <div class="flex-start">
-                      <span class="token-symbol ellipsis color-[--d-F5F5F5-l-333]">
+                      <span class="token-symbol ellipsis color-[--main-text]">
                         {{ row.Symbol }}
                       </span>
                       <!-- <i

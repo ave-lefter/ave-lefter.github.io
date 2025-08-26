@@ -772,7 +772,7 @@ const tabs = computed(() => {
     justify-content: center;
     &.active {
       color: var(--d-F5F5F5-l-111);
-      background: var(--d-151A22-l-FFFFFF);
+      background: var(--d-151A22-l-FFF);
     }
   }
 }

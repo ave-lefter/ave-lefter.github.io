@@ -37,7 +37,7 @@ const activeHeight = computed(() => {
 <template>
   <div
     :style="`height: ${Math.max(height,0)}px;`"
-    :class="`color-[var(--d-F5F5F5-l-333)] bg-[--d-111-l-FFF] rounded-2px text-14px overflow-hidden
+    :class="`color-[--main-text] bg-[--secondary-bg] rounded-2px text-14px overflow-hidden
     `">
     <div class="pt-10px flex items-center px-12px gap-20px border-b-solid border-b-1px border-b-#FFFFFF08">
       <a

@@ -109,7 +109,7 @@
           class="el-form-item__label icon mb-0 justify-between!"
         >
           <a
-            class="gap-8px flex items-center clickable underline! color-[--d-F5F5F5-l-333]"
+            class="gap-8px flex items-center clickable underline! color-[--main-text]"
             @click="loginType = loginType === 'password' ? 'email' : 'password'"
           >
             {{
@@ -122,7 +122,7 @@
             </el-icon> -->
           </a>
           <a
-            class="gap-8px flex items-center clickable underline! color-[--d-F5F5F5-l-333]"
+            class="gap-8px flex items-center clickable underline! color-[--main-text]"
             @click.prevent="emit('update:c-type', 'reset')"
           >
             {{ $t("startForgetPassword") }}
@@ -668,7 +668,7 @@ onBeforeUnmount(() => {
     flex-wrap: nowrap;
     >li{
       flex: 1;
-    
+
     }
     :deep() .el-button.is-loading:before {
       background-color: transparent;

@@ -29,7 +29,7 @@
 
                @click.stop.prevent="visible = true"
             >
-              <Icon class="text-10px color-[--d-666-l-999]" name="material-symbols:lock" />
+              <Icon class="text-10px color-[--third-text]" name="material-symbols:lock" />
             </el-progress>
           </div>
           <NuxtLink class="main" :to="'/token/' + (item.target_token === item.token0_address ? item.token1_address : item.token0_address) + '-' + item.chain " > {{ item.target_token === item.token0_address ? item.token1_symbol : item.token0_symbol }}</NuxtLink>
@@ -72,7 +72,7 @@
   </table>
   <div v-if="(pairs?.length || 0) > 1" class="collapse-button">
     <button @click.stop.prevent="show = !show">
-      <Icon name="solar:alt-arrow-down-line-duotone" :class="show ? 'collapse' : 'expand'" class="text-20px font-bold color-[--d-666-l-999]" />
+      <Icon name="solar:alt-arrow-down-line-duotone" :class="show ? 'collapse' : 'expand'" class="text-20px font-bold color-[--third-text]" />
     </button>
   </div>
   <el-dialog v-model="visible" width="600px" :title="'LP ' + $t('holdersDetail')" append-to-body>
@@ -107,12 +107,12 @@ const pairs = computed(() => {
   line-height: 1.5;
   border-spacing: 0 2px;
   margin-left: -15px;
-  color: var(--d-666-l-999);
+  color: var(--third-text);
   border-collapse: collapse;
   th {
     text-align: center;
     font-size: 12px;
-    color: var(--d-666-l-999);
+    color: var(--third-text);
     letter-spacing: 0;
     font-weight: 400;
   }
@@ -143,14 +143,15 @@ const pairs = computed(() => {
     }
     .main {
       text-decoration: none;
-      color: var(--d-666-l-999);
+      color: var(--third-text);
     }
     &.active {
       td {
-        background: var(--d-151517-l-F6F6F6);
+        background: var(--main-list-hover);
+        // background: var(--tab-active-bg);
       }
       .main {
-        color: var(--d-F5F5F5-l-333);
+        color: var(--main-text);
         &.red{
           color:#F6465D
         }
@@ -170,7 +171,7 @@ const pairs = computed(() => {
 }
 .collapse-button {
   font-size: 16px;
-  color: var(--d-666-l-999);
+  color: var(--third-text);
   line-height: 1;
   padding: 0;
   text-align: center;

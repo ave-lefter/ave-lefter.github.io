@@ -2,7 +2,7 @@
   <div class="flex">
     <span class="clickable flex" @click.stop="show = true">
       <slot name="icon">
-        <Icon class="text-14px color-[--secondary-text] hover:color-[--main-text] icon-bot-setting" name="custom:pump-setting" />
+        <Icon class="text-14px color-[--third-text] hover:color-[--main-text] icon-bot-setting" name="custom:pump-setting" />
       </slot>
     </span>
     <el-dialog v-model="show" class="new-dialog" width="500px" append-to-body>

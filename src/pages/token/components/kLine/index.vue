@@ -1,10 +1,11 @@
 <template>
   <div class="relative" :style="{height: `${isRank ? 290 : kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
+    <UnknownRisk  @refresh="refresh"/>
   </div>
   <div
     v-if="!isRank"
-    class="w-full cursor-row-resize bg-[--d-222-l-F2F2F2] gap-1px hover:bg-[--d-666-l-CCC] flex items-center justify-center h-4px"
+    class="w-full cursor-row-resize bg-[--border] gap-1px hover:bg-[--d-666-l-CCC] flex items-center justify-center h-4px"
     @mousedown.stop.prevent="drag"
   >
     <span v-for="i in 4" :key="i" class="bg-#444 w-2px h-2px rounded-full"/>
@@ -23,6 +24,7 @@ import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
 import {DefaultHeight, WSSimpleTxChain} from '~/utils/constants'
 import { TW_STUDY } from './constant'
+import UnknownRisk from './unknownRisk.vue'
 
 const props = defineProps<{
   isRank?:boolean
@@ -143,10 +145,11 @@ const showMarket = useLocalStorage('tv_showMarket', false)
 watch(() => themeStore.theme, (val) => {
   if (_widget) {
     _widget?.changeTheme(val).then(() => {
+      setIframeCssVar()
       _widget?.applyOverrides?.({
         'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
         'paneProperties.backgroundType': 'solid',
-        'paneProperties.background': themeStore.isDark ? '#111' : '#fff',
+        'paneProperties.background': themeStore.isDark ? '#0B0D12' : '#F6F9FF',
       })
     })
   }
@@ -296,7 +299,7 @@ async function initChart() {
     timezone: getTimezone() as Timezone,
     time_frames: [],
     loading_screen: {
-      backgroundColor: themeStore.isDark ? '#111' : '#fff',
+      backgroundColor: themeStore.isDark ? '#0B0D12' : '#F6F9FF',
       foregroundColor: '#3F80F7'
     },
     custom_css_url: `${location.origin}/tv_custom.css`,
@@ -326,7 +329,8 @@ async function initChart() {
       // "scalesProperties.lineColor": '#333',
       'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
       'paneProperties.backgroundType': 'solid',
-      'paneProperties.background': themeStore.isDark ? '#111' : '#fff',
+      // --d-0B0D12-l-F6F9FF
+      'paneProperties.background': themeStore.isDark ? '#0B0D12' : '#F6F9FF',
       'paneProperties.vertGridProperties.style': 2,
       // "paneProperties.vertGridProperties.color": style.grid,
       // "paneProperties.horzGridProperties.style": 2,
@@ -625,6 +629,12 @@ async function initChart() {
     subscribePriceMove()
     // 从缓存中读取数据并创建指标
     createStudy()
+    setIframeCssVar()
+    _widget?.applyOverrides?.({
+      'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
+      'paneProperties.backgroundType': 'solid',
+      'paneProperties.background': themeStore.isDark ? '#0B0D12' : '#F6F9FF',
+    })
   })
 
   _widget?.headerReady().then(() => {
@@ -663,7 +673,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsSto
     }
     const { event, data } = msg
     if (event === WSEventType.SIMPLE_TX || event === WSEventType.TX) {
-      const tx: SimpleWSTx | WSTx = data?.msg
+      const tx: SimpleWSTx | WSTx = data?.msg || data?.tx
       const interval = switchResolution(resolution)
       const t = getAddressAndChainFromId(token.value)?.address
       let target = ''
@@ -759,6 +769,18 @@ const { resetAvgPriceLineId } = useAvgPriceLine(() => _widget, () => isReadyLine
 useBotLimitLine(() => _widget, () => isReadyLine, showMarket)
 
 
+function setIframeCssVar() {
+  const iframe = document.querySelector('#tv_chart_container iframe') as HTMLIFrameElement
+  const iframeRoot = iframe?.contentWindow?.document.documentElement
+  if (!iframeRoot) {
+    console.error('无法获取 iframe 内部的根元素')
+    return
+  }
+  // 给 iframe 内部设置 CSS 变量
+  iframeRoot.style.setProperty('--secondary-bg', themeStore.isDark ? '#0B0D12' : '#F6F9FF')
+}
+
+
 onBeforeUnmount(() => {
   isUnload = true
 })
@@ -770,6 +792,11 @@ onMounted(() => {
     _widget?.activeChart?.().resetData?.()
   })
 })
+const emit = defineEmits(['refresh'])
+function refresh() {
+  emit('refresh')
+  resetChart()
+}
 
 </script>
 

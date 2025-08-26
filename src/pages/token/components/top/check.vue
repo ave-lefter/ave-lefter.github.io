@@ -6,7 +6,7 @@
     :size="430"
     class="draw-right"
   >
-    <div class="check-container bg-[--d-222-l-FFF] color-[--d-F5F5F5-l-333]">
+    <div class="check-container bg-[--d-222-l-FFF] color-[--main-text]">
       <div class="flex items-center justify-between text-20px p-20px sticky top-0 bg-[--d-222-l-FFF] z-1">
         <span>{{ $t('check2') }}</span>
         <Icon name="ri:close-large-fill" class="clickable" @click.stop="visible = false" />
@@ -132,7 +132,7 @@
                       width="12px"
                       alt=""
                     >
-                    <span :class="item[0] > 1 ? 'color-[--d-F5F5F5-l-333] ml-5px' : 'color-[--d-999-l-666] ml-5px'">{{ item[1] }}</span>
+                    <span :class="item[0] > 1 ? 'color-[--main-text] ml-5px' : 'color-[--d-999-l-666] ml-5px'">{{ item[1] }}</span>
                   </li>
                 </template>
               </ul>
@@ -2195,7 +2195,7 @@ function getVote() {
   display: flex;
   justify-content: space-between;
   padding: 10px 0 0;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   // align-items: center;
   font-size: 12px;
   .label {
@@ -2674,10 +2674,10 @@ function getVote() {
     padding: 4px 0;
     display: inline-block;
     &:hover {
-      color: var(--d-F5F5F5-l-333);
+      color: var(--main-text);
     }
     &.active {
-      color: var(--d-F5F5F5-l-333);
+      color: var(--main-text);
       border-bottom: 2px solid #3f80f7;
     }
   }
@@ -2690,7 +2690,7 @@ function getVote() {
     border-collapse: collapse;
     width: 100%;
     font-size: 12px;
-    color: var(--d-F5F5F5-l-333);
+    color: var(--main-text);
     background-color: var(--d-333-l-F2F2F2);
     letter-spacing: 0;
     font-weight: 400;
