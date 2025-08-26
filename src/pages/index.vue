@@ -28,6 +28,7 @@ const components = {
   cto: activityComponent,
   xstocks: activityComponent,
   volume: activityComponent,
+  heaven_pump: pumpComponent,
 }
 const activeTab = useStorage<keyof typeof components>('rankActiveTab', 'hot')
 const activeSubTab = useStorage('rankSubTab','pump_in_hot')
