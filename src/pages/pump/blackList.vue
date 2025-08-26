@@ -37,7 +37,7 @@
         >
           <template #prefix>
             <Icon
-              class="text-12px text-[var(--d-F5F5F5-l-999999)]"
+              class="text-12px text-[--third-text]"
               name="custom:search"
             />
           </template>
@@ -45,7 +45,7 @@
             <Icon
               v-if="query"
               name="pajamas:clear"
-              class="color-[--d-566275-l-8CA0C3] text-12px hover:opacity-70% cursor-pointer mr-10px"
+              class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
               @click="query = ''"
             />
 
@@ -73,7 +73,7 @@
                   <li
                     v-for="(item, $index) in typeList?.slice(1)"
                     :key="$index"
-                    class="px-12px py-12px w-100% cursor-pointer hover:bg-[--d-252E3C-l-E8F1FF]"
+                    class="px-12px py-12px w-100% cursor-pointer hover:bg-[--border]"
                     @click="add(item)"
                   >
                     {{ item.name }}
@@ -127,13 +127,17 @@
             </li>
           </ul>
         </el-scrollbar>
-        <AveEmpty v-else class="mt-150px" />
+        <div v-else class="mt-150px flex items-center justify-center flex-col" >
+          <img v-if="isDark" src="@/assets/images/balck_blackList_empty.svg" alt="" width="61px">
+          <img v-else src="@/assets/images/light_blackList_empty.svg" alt=""  width="61px">
+          <span class="block text-12px color-[--third-text] mt-6px">{{ $t('emptyNoData') }}</span>
+        </div>
       </div>
     </div>
-    <div class="text-14px count color-[--d-566275-l-8CA0C3]  w-full px-20px py-20px">
+    <div class="text-14px count color-[--third-text]  w-full px-20px py-20px">
       {{ $t('total') }}<span
         class="ml-5px"
-        :class="list?.length > 0 ? 'color-[--d-F5F5F5-l-111]' : ''"
+        :class="list?.length > 0 ? 'color-[--main-text]' : ''"
         >{{ list.length }}</span
       >/500
     </div>
@@ -145,7 +149,7 @@ import { ElMessage } from 'element-plus'
 import { isValidAddress } from '@/utils'
 const { t } = useI18n()
 const globalStore = useGlobalStore()
-const { pumpBlackList } = storeToRefs(globalStore)
+const { pumpBlackList, isDark } = storeToRefs(globalStore)
 const visible = shallowRef(false)
 const visible_popper = shallowRef(false)
 
@@ -256,13 +260,14 @@ function restore(item: { address: string, type: string }) {
   button {
     border: none;
     // font-size: 14px;
-    background: var(--d-252E3C-l-E8F1FF);
-    color: var(--d-8CA0C3-l-566275);
+    background: var(--dialog-bg);
+    color: var(--third-text);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;
     border-radius: 4px;
-    padding: 14px;
+    padding: 4px 10px;
+    height: 20px;
     text-align: center;
     & + button {
       margin-left: 8px;
@@ -281,7 +286,7 @@ function restore(item: { address: string, type: string }) {
 }
 .btn {
   border: none;
-  background: var(--d-151A22-l-E8F1FF);
+  background: var(--dialog-bg);
   padding: 7px 8px;
   border-radius: 4px;
   display: flex;
@@ -289,7 +294,7 @@ function restore(item: { address: string, type: string }) {
   justify-content: flex-start;
   font-size: 12px;
   font-weight: 500;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   height: 28px;
   &.gray {
     color: var(--secondary-text);
@@ -298,7 +303,7 @@ function restore(item: { address: string, type: string }) {
     }
   }
   &.restore {
-    background: var(--d-252E3C-l-E8F1FF);
+    background: var(--border);
     &:hover {
       color: #fff;
       background: #3f80f7;
@@ -306,18 +311,18 @@ function restore(item: { address: string, type: string }) {
   }
 }
 .content {
-  border-top: 1px solid var(--d-252E3C-l-E8F1FF);
+  border-top: 1px solid var(--border);
   margin-top: 20px;
 }
 .search-dialog.el-dialog {
   .search-input {
-  background: var(--d-252E3C-l-E8F1FF);
+  background: var(--border);
   padding: 0;
   border-radius: 4px;
   :deep().el-input__wrapper {
-    border-bottom: 1px solid var(--d-252E3C-l-E8F1FF);
+    border-bottom: 1px solid var(--border);
     .el-input__inner::placeholder {
-      color: var(--d-566275-l-8CA0C3);
+      color: var(--third-text);
     }
   }
 }
@@ -326,7 +331,7 @@ function restore(item: { address: string, type: string }) {
   margin-top: 10px;
   min-height: 400px;
   .top {
-    color: var(--d-566275-l-8CA0C3);
+    color: var(--third-text);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -349,8 +354,9 @@ function restore(item: { address: string, type: string }) {
   .content1 {
     li {
       padding: 0 20px;
+      border-bottom: 1px solid var(--border);
       &:hover {
-        background-color: var(--d-252E3C-l-E8F1FF);
+        background-color: var(--border);
         .btn.restore {
           color: #fff;
           background: #3f80f7;
@@ -360,8 +366,7 @@ function restore(item: { address: string, type: string }) {
 
     li > a:hover {
       text-decoration: none;
-      background-color: var(--d-252E3C-l-E8F1FF);
-      color: var(--a-text-1-color);
+      background-color: var(--border);
       opacity: 1;
     }
     li:nth-child(1) .flex {
@@ -391,7 +396,6 @@ function restore(item: { address: string, type: string }) {
       }
     }
     > span {
-      color: var(--custom-font-1-color);
       &.green {
         color: #12b886;
       }
@@ -399,9 +403,6 @@ function restore(item: { address: string, type: string }) {
         color: #ff646d;
       }
     }
-  }
-  li > a {
-    color: var(--a-text-1-color);
   }
 }
 .count {

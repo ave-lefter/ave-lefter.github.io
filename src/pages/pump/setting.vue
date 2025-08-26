@@ -20,7 +20,7 @@
     </template>
     <template #default>
       <div>
-        <span class="text-12px color-[--d-8CA0C3-l-566275]">{{ $t('mc/vol') }}</span>
+        <span class="text-12px color-[--secondary-text]">{{ $t('mc/vol') }}</span>
         <div class="tabs mt-10px">
           <button
             v-for="item in list_mc"
@@ -36,8 +36,8 @@
         </div>
       </div>
 
-      <div class="mt-20px border-b border-##333333 pb-20px">
-        <span class="text-12px color-[--d-8CA0C3-l-566275]">{{ $t('sell/buy') }}</span>
+      <div class="mt-20px border-b border-[--dialog-divider] pb-20px">
+        <span class="text-12px color-[--secondary-text]">{{ $t('sell/buy') }}</span>
         <div class="tabs flex-wrap mt-10px">
           <button
             v-for="item in list_swap"
@@ -139,7 +139,7 @@
         </li>
       </ul>
       <div class="mt-20px">
-        <span class="text-12px color-[--d-8CA0C3-l-566275]">{{ $t('defineCard') }}</span>
+        <span class="text-12px color-[--secondary-text]">{{ $t('defineCard') }}</span>
         <div class="tabs define mt-10px">
           <el-button
             v-for="(item, index) in defineList"
@@ -294,22 +294,22 @@ function formatTooltip(val: number) {
     gap: 8px;
     justify-content: flex-start;
     button {
-      border: 1px solid var(--d-252E3C-l-E8F1FF);
+      border: 1px solid var(--border);
       background: transparent;
-      color: var(--d-566275-l-8CA0C3);
+      color: var(--third-text);
       margin-left: 0;
       padding: 4px;
       &.active {
-      color: var(--d-8CA0C3-l-566275);
-      background: var(--d-252E3C-l-E8F1FF);
+      color: var(--secondary-text);
+      background: var(--border);
     }
     }
   }
 
   button {
-    border: 1px solid var(--d-252E3C-l-E8F1FF);
+    border: 1px solid var(--border);
     // font-size: 14px;
-    color: var(--d-566275-l-8CA0C3);
+    color: var(--third-text);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;
@@ -325,8 +325,8 @@ function formatTooltip(val: number) {
     //   margin-left: 8px;
     // }
     &.active {
-      color: var(--d-F5F5F5-l-111);
-      background: var(--d-252E3C-l-E8F1FF);
+      color: var(--main-text);
+      background: var(--border);
     }
     .swap {
       background: #12B8861A;
@@ -341,7 +341,7 @@ function formatTooltip(val: number) {
 }
 .btn {
   border: none;
-  background: var(--d-151A22-l-E8F1FF);
+  background: var(--main-input-button-bg);
   padding: 3px 8px;
   border-radius: 4px;
   display: flex;
@@ -349,19 +349,19 @@ function formatTooltip(val: number) {
   justify-content: flex-start;
   font-size: 12px;
   font-weight: 500;
-  color: var(--d-8CA0C3-l-566275);
+  color: var(--secondary-text);
   &.active,
   &:hover {
-    color: var(--d-F5F5F5-l-333);
+    color: var(--main-text);
   }
 }
 .item {
   &.border {
-    border-top: 1px solid var(--d-252E3C-l-E8F1FF);
-    border-bottom: 1px solid var(--d-252E3C-l-E8F1FF);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
   }
   li {
-    color: var(--d-F5F5F5-l-0B0D12);
+    color: var(--main-text);
     margin-top: 20px;
     cursor: pointer;
     display: flex;

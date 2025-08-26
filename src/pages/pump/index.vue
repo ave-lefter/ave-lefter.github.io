@@ -106,6 +106,7 @@
               border-radius: 50%;
               margin-right: 5px;
             "
+            :class="{'opacity-30': item.chain !== activeChain}"
             :src="`${token_logo_url}chain/${item.chain}.png`"
           />
           <span>{{ item.chain_show || '' }}</span>
@@ -173,7 +174,7 @@
             >
               <template #prefix>
                 <Icon
-                  class="text-12px text-[var(--d-566275-l-8CA0C3)]"
+                  class="text-12px text-[var(--third-text)]"
                   name="custom:search"
                 />
               </template>
@@ -181,12 +182,12 @@
                 <Icon
                   v-if="pump_query[activeChain].new"
                   name="pajamas:clear"
-                  class="color-[--d-566275-l-8CA0C3] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
                   @click="pump_query[activeChain].new = ''"
                 />
               </template>
             </el-input>
-            <span class="bg-[--d-151A22-l-E8F1FF] py-4px px-10px rounded-4px mr-4px color-[--d-566275-l-8CA0C3] cursor-pointer  hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.new } "  @click="pump_notice[activeChain].new = !pump_notice[activeChain].new">
+            <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer  hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.new } "  @click="pump_notice[activeChain].new = !pump_notice[activeChain].new">
             <Icon
             name="icon-park-solid:volume-notice"
             class="text-12px"
@@ -266,7 +267,7 @@
             >
               <template #prefix>
                 <Icon
-                  class="text-12px text-[var(--d-566275-l-8CA0C3)]"
+                  class="text-12px text-[var(--third-text)]"
                   name="custom:search"
                 />
               </template>
@@ -274,12 +275,12 @@
                 <Icon
                   v-if="pump_query[activeChain].soon"
                   name="pajamas:clear"
-                  class="color-[--d-566275-l-8CA0C39] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  class="color-[--third-text9] text-12px hover:opacity-70% cursor-pointer mr-10px"
                   @click="pump_query[activeChain].soon = ''"
                 />
               </template>
             </el-input>
-            <span class="bg-[--d-151A22-l-E8F1FF] py-4px px-10px rounded-4px mr-4px color-[--d-566275-l-8CA0C3] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.soon } "  @click="pump_notice[activeChain].soon = !pump_notice[activeChain].soon">
+            <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.soon } "  @click="pump_notice[activeChain].soon = !pump_notice[activeChain].soon">
               <Icon
               name="icon-park-solid:volume-notice"
               class="text-12px"
@@ -360,7 +361,7 @@
             >
               <template #prefix>
                 <Icon
-                  class="text-12px text-[var(--d-566275-l-8CA0C3)]"
+                  class="text-12px text-[var(--third-text)]"
                   name="custom:search"
                 />
               </template>
@@ -368,12 +369,12 @@
                 <Icon
                   v-if="pump_query[activeChain].graduated"
                   name="pajamas:clear"
-                  class="color-[--d-566275-l-8CA0C3] text-12px hover:opacity-70% cursor-pointer mr-10px"
+                  class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
                   @click="pump_query[activeChain].graduated = ''"
                 />
               </template>
             </el-input>
-            <span class="bg-[--d-151A22-l-E8F1FF] py-4px px-10px rounded-4px mr-4px color-[--d-566275-l-8CA0C3] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.graduated } "  @click="pump_notice[activeChain].graduated = !pump_notice[activeChain].graduated">
+            <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.graduated } "  @click="pump_notice[activeChain].graduated = !pump_notice[activeChain].graduated">
               <Icon
               name="icon-park-solid:volume-notice"
               class="text-12px"
@@ -418,6 +419,7 @@ import type {
 } from '@/api/types/pump'
 import { throttle } from 'lodash-es'
 import { isJSON, formatUrl, usePumpTableDataFetching } from '@/utils/index'
+import type { opacity } from 'html2canvas/dist/types/css/property-descriptors/opacity'
 const Timer = {
   new: null,
   soon: null,
@@ -1353,7 +1355,7 @@ function getFilterData(list, conditions) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--d-151A22-l-E8F1FF);
+  background: var(--main-input-button-bg);
   padding: 1px;
   border-radius: 4px;
   font-size: 12px;
@@ -1365,7 +1367,7 @@ function getFilterData(list, conditions) {
     border: none;
 
     // font-size: 14px;
-    color: var(--d-566275-l-8CA0C3);
+    color: var(--third-text);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;
@@ -1383,9 +1385,8 @@ function getFilterData(list, conditions) {
     letter-spacing: 0px;
 
     &.active {
-      // color: var(--custom-font-4-color);
-      color: var(--d-F5F5F5-l-333);
-      background: var(--d-151A22-l-E8F1FF);
+      color: var(--main-text);
+      background: var(--tab-active-bg);
       opacity: 1;
     }
   }
@@ -1393,21 +1394,19 @@ function getFilterData(list, conditions) {
 
   button {
     border: none;
-    // font-size: 14px;
-    color: var(--d-999-l-666);
+    color: var(--third-text);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;
     border-radius: 4px;
-    border: 1ox solid var(--d-333333-l-F2F2F2);
+    border: none;
     background: transparent;
     min-width: 36px;
     padding: 5px 10px;
     text-align: center;
     &.active {
-      // color: var(--custom-font-4-color);
-      color: var(--d-F5F5F5-l-333);
-      background: var(--d-252E3C-l-FFF);
+      color: var(--main-text);
+      background: var(--tab-active-bg);
     }
   }
 }
@@ -1424,7 +1423,7 @@ function getFilterData(list, conditions) {
   color:var(--main-text);
 }
 :deep().search-input1 {
-  background: var(--d-151A22-l-E8F1FF);
+  background: var(--main-input-button-bg);
   padding: 1px;
   width: 200px;
   border-radius: 4px;
@@ -1439,8 +1438,11 @@ function getFilterData(list, conditions) {
       border-color: #3F80F7; /* 蓝色 */
       box-shadow: 0 0 0 1px #3F80F7 inset;
     }
-    .el-input__inner::placeholder {
-      color: var(--d-566275-l-8CA0C3);
+    .el-input__inner{
+      color: var(--main-text);
+      &::placeholder {
+        color: var(--third-text);
+      }
     }
   }
 }
@@ -1457,10 +1459,10 @@ function getFilterData(list, conditions) {
 // }
 ::v-deep(.el-checkbox ) {
   .el-checkbox__label {
-    color: var(--d-566275-l-8CA0C3);
+    color: var(--third-text);
   }
   .el-checkbox__inner{
-    border-color: var(--d-252E3C-l-E8F1FF);
+    border-color: var(--border);
   }
   .el-checkbox__input{
     &.is-checked{
@@ -1469,16 +1471,16 @@ function getFilterData(list, conditions) {
         // border-color: var(--d-333-l-CCC);
       }
       &+ .el-checkbox__label {
-        color: var(--d-F5F5F5-l-333)
+        color: var(--main-text)
       }
     }
   }
 
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
 }
 .pump-item{
-  background: var(--d-0B0D12-l-F6F9FF);
-  border: 1px solid var(--d-151A22-l-E8F1FF);
+  background: var(--secondary-bg);
+  border: 1px solid var(--main-input-button-bg);
   border-radius: 4px;
 }
 </style>
