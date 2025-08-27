@@ -1,4 +1,5 @@
 export const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+export const SOLANA_NATIVE_TOKEN = 'So11111111111111111111111111111111111111112'
 
 export function getNativeToken(chain: string) {
   return ({
