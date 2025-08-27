@@ -14,10 +14,6 @@
         <span class="color-[--d-999-l-666]">{{ showPrice.symbol }}</span>
         <span :class="`color-${showPrice.color}`">{{'$'+formatDec(showPrice?.current_price_usd || 0, 2)}}</span>
       </NuxtLink>
-      <div class="flex items-center mr-12px color-[--d-999-l-666] gap-4px cursor-pointer" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
-        <Icon name="custom:chart" class="text-12px" />
-        {{ $t('PnlTracker') }}
-      </div>
        <el-popover popper-style="padding: 12px;min-width: 132px" width="132" placement="top" :teleported="false">
         <template #reference>
           <Icon name="custom:set-up" class="text-12px ml-2px color-#666" />
@@ -43,6 +39,10 @@
       <div class="flex items-center gap-4px color-[--d-999-l-666] mx-12px cursor-pointer hover:color-inherit" :class="{'color-inherit':dragPumpStore.visible}" @click="dragPumpStore.visible=!dragPumpStore.visible">
         <Icon name="custom:pump-icon"/>
         {{ $t('pump1') }}
+      </div>
+      <div class="flex items-center mr-12px color-[--d-999-l-666] gap-4px cursor-pointer" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
+        <Icon name="custom:chart" class="text-12px" />
+        {{ $t('PnlTracker') }}
       </div>
       <el-badge :is-dot="(!!botStore.evmAddress)&&isDoted2" class="mr-12px">
         <div

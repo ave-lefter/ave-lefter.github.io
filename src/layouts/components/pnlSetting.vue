@@ -10,7 +10,7 @@ const defaultSettings = {
   blur: 0,
   opacity: 100,
   solUsdSwitch: false,
-  showU: true,
+  showU: false,
 }
 const settings = ref<typeof defaultSettings>(pnlSetting.value ? { ...pnlSetting.value } : { ...defaultSettings })
 watch(visible, () => {
