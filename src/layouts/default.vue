@@ -186,7 +186,7 @@
     </Draggable> -->
     <SignalDraggable v-if="!signalStore.shouldHide"/>
     <MonitorDragger v-show="monitorStore.visible"/>
-    <DragPump v-show="dragPumpStore.visible && !dragPumpStore.shouldHide"/>
+    <DragPump v-show="dragPumpStore.visible&&!dragPumpStore.shouldHide"/>
     <FavAddressPop ref="favAddressPopRef" :visible="favAddressPopVisible" :button-ref="attentionTrigger || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" @onCancel="() => favAddressPopVisible = false"/>
     <Top v-if="topVisible" @click="scrollToTop"/>
   </div>
