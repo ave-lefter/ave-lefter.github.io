@@ -49,8 +49,7 @@
             <div class="flex items-center">
               <div>{{ t('type') }}</div>
               <el-dropdown trigger="click" @command="handleTypeCommand">
-                <Icon name="custom:filter" :class="[filterConditions.swapType?.length === 1 && 'color-#286DFF']"
-                  class="color-[--d-666-l-999] cursor-pointer text-10px" />
+                <Icon name="custom:filter" :class="[filterConditions.swapType?.length === 1 && 'color-#286DFF']" class="color-[--third-text] cursor-pointer text-10px" />
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item command="all">{{ t('all') }}</el-dropdown-item>
@@ -82,14 +81,14 @@
           <span>{{ t('price') }}</span>
         </template>
         <template #default="{ row }">
-          <span v-if="row.swapType !== 13 && row.swapType !== 14" class="text-[--d-999-l-959A9F]">${{
+          <span v-if="row.swapType !== 13 && row.swapType !== 14" class="text-[--secondary-text]">${{
             formatNumber(row?.PriceLimit || 0) }}</span>
           <span v-else>--</span>
         </template>
       </el-table-column>
       <el-table-column :label="t('volume4')" align="right">
         <template #default="{ row }">
-          <span class="text-[--d-999-l-959A9F]">${{ formatNumber(Number(row?.inValue) || 0, 2) }}</span>
+          <span class="text-[--secondary-text]">${{ formatNumber(Number(row?.inValue) || 0, 2) }}</span>
         </template>
       </el-table-column>
 
@@ -98,8 +97,8 @@
           <span>{{ t('amountB') }}</span>
         </template>
         <template #default="{ row }">
-          <span class="text-[var(--d-999-l-959A9F)]">
-            <span class="text-[var(--d-999-l-959A9F)] text-right">
+          <span class="text-[--secondary-text]">
+            <span class="text-[--secondary-text] text-right">
               <template v-if="!isBuy(row.swapType)">
                 {{ !!Number(row?.inAmount) ? formatNumber(formatUnits(new BigNumber(row?.inAmount || 0).toFixed(0),
                   row.inTokenDecimals || 0) as string, 4) : '--'
@@ -133,22 +132,22 @@
   </el-dropdown> -->
         </template>
         <template #default="{ row }">
-          <span v-if="row.status === 'confirmed'" class="text-[var(--d-999-l-959A9F)]">{{ t('completed') }}</span>
-          <span v-else-if="row.status === 'cancelled'" class="text-[var(--d-999-l-959A9F)]">{{ t('cancelled1') }}</span>
-          <span v-else-if="row.status === 'sent'" class="text-[var(--d-999-l-959A9F)]">{{ t('sent') }}</span>
-          <span v-else-if="row.status === 'waiting'" class="text-[var(--d-999-l-959A9F)]">{{ t('pendingOrder') }}</span>
+          <span v-if="row.status === 'confirmed'" class="text-[--secondary-text]">{{ t('completed') }}</span>
+          <span v-else-if="row.status === 'cancelled'" class="text-[--secondary-text]">{{ t('cancelled1') }}</span>
+          <span v-else-if="row.status === 'sent'" class="text-[--secondary-text]">{{ t('sent') }}</span>
+          <span v-else-if="row.status === 'waiting'" class="text-[--secondary-text]">{{ t('pendingOrder') }}</span>
         </template>
       </el-table-column>
 
       <el-table-column :label="t('CreateTime')" align="right">
         <template #default="{ row }">
-          <span class="color-[--d-999-l-666]">{{ formatDate(row.createTime, 'YYYY/MM/DD HH:mm') }}</span>
+          <span class="color-[--third-text]">{{ formatDate(row.createTime, 'YYYY/MM/DD HH:mm') }}</span>
         </template>
       </el-table-column>
 
       <el-table-column :label="t('ExpirationTime')" align="right">
         <template #default="{ row }">
-          <span class="color-[--d-999-l-666]">{{ formatDate(new Date(row.createTime).getTime() + 7 * 24 * 60 * 60 *
+          <span class="color-[--third-text]">{{ formatDate(new Date(row.createTime).getTime() + 7 * 24 * 60 * 60 *
             1000,
             'YYYY/MM/DD HH:mm') }}</span>
         </template>

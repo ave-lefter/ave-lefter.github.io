@@ -9,10 +9,10 @@
           v-for="item in tabs"
           :key="item.value"
           href="javascript:;"
-          :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-666-l-999] px-12px py-4px rounded-4px
+          :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--third-text] px-12px py-4px rounded-4px
          ${
            activeTab === item.value
-             ? 'bg-[--d-222-l-F2F2F2] color-[--main-text]'
+             ? 'bg-[--tab-active-bg] color-[--main-text]'
              : ''
          }`"
           @click="setActiveTab(item.value as typeof activeTab)"

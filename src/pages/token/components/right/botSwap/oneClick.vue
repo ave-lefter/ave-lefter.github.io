@@ -468,7 +468,7 @@ onUnmounted(() => {
 .fixed-one-click {
   position: fixed;
   z-index: 3;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   font-size: 12px;
   background: var(--d-222-l-F2F2F2);
   border-radius: 8px;
@@ -538,7 +538,7 @@ onUnmounted(() => {
 
       &.active {
         // color: var(--custom-font-4-color);
-        color: var(--d-F5F5F5-l-333);
+        color: var(--main-text);
         background: var(--d-333-l-FFF);
       }
     }

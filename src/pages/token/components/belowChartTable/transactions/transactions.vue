@@ -769,7 +769,7 @@ const collect = async (row: any,index:number) => {
       >
         <a
           v-for="(item,index) in tabs" :key="item.value" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--third-text] px-12px py-4px rounded-4px
-         ${activeTab === item.value ? 'bg-[--d-222-l-F2F2F2] color-[--main-text]' : ''}`"
+         ${activeTab === item.value ? 'bg-[--border] color-[--main-text]' : ''}`"
           @click="setActiveTab(item.value,index)">
           {{ item.label }}
         </a>
@@ -786,7 +786,7 @@ const collect = async (row: any,index:number) => {
         {{ $t('loading') }}
       </div>
       <template v-else>
-        <div class="lh-20px text-13px py-6px bg-#3F80F71A text-center mb-12px flex justify-center">
+        <div class="lh-20px text-13px py-6px bg-#3F80F71A text-center mb-12px flex justify-center text-[--third-text]">
           <div
             v-html="$t('filterTip', {
             address: `<span class='color-#3F80F7'>&nbsp;${tableFilter.markerAddress.slice(0, 4)}...${tableFilter.markerAddress.slice(-4)}&nbsp;</span>`,

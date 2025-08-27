@@ -6,7 +6,7 @@
     :size="430"
     class="draw-right"
   >
-    <div class="pop-right bg-[--d-222-l-FFF] h-100vh px-20px">
+    <div class="pop-right bg-[--dialog-bg] color-[--main-text] h-100vh px-20px">
       <div
         class="content"
         style="max-width: 450px; overflow-x: hidden;overflow-y: auto;height: 100vh;"
@@ -17,12 +17,11 @@
               <span class="text-16px font-500">{{
                 $t('flag_rug_pull')
               }}</span>
-              <a href="" class="color-#999 text-20px" @click.stop.prevent="$emit('update:modelValue', false)">
+              <a href="" class="color-[--secondary-text] text-20px" @click.stop.prevent="$emit('update:modelValue', false)">
                 <!-- <i class="iconfont icon-_28-Arrows1 font-20px"></i> -->
                 <Icon
-                  class=" text-20px ml-5px"
+                  class="text-20px ml-5px color-[--secondary-text] cursor-pointer"
                   name="custom:back"
-                  color="#999"
                 />
               </a>
             </div>
@@ -32,12 +31,11 @@
                   formatNumber(rugPull?.all_tag_rate || 0, 1)
                 }}%
               </span>
-              <el-tooltip  placement="top">
+              <el-tooltip popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!" placement="top">
                 <template #content>{{ $t('abnormalChipsTip') }}</template>
                 <Icon
-                  class=" text-14px ml-5px"
+                  class="text-14px ml-5px color-[--secondary-text] cursor-pointer"
                   name="mi:circle-warning"
-                  color="#959a9f"
                 />
               </el-tooltip>
             </div>
@@ -50,7 +48,7 @@
               >
                 <div class="item flex-start flex items-center justify-start">
                   <span
-                    class="flex-start color-#999 text-12px"
+                    class="flex-start color-[--secondary-text] text-12px"
                     style="width: 66px"
                   >
                     <img
@@ -104,11 +102,11 @@
                 </template>
               </span>
               <div v-if="rugPull?.dev" class="flex-end">
-                <span class="color-#999 text-12px">{{ $t('devAddress') }}：</span>
-                <NuxtLink :to="`/address/${rugPull?.dev}/${chain}`" class="color-#999 text-12px underline">
+                <span class="color-[--secondary-text] text-12px">{{ $t('devAddress') }}：</span>
+                <NuxtLink :to="`/address/${rugPull?.dev}/${chain}`" class="color-[--secondary-text] text-12px underline">
                   {{ rugPull?.dev?.slice(0, 4) + '...' + rugPull?.dev?.slice(-4) }}
                 </NuxtLink>
-                <Icon v-copy="rugPull?.dev" name="bxs:copy" class="text-12px ml-2px cursor-pointer color-#999" @click.stop.prevent/>
+                <Icon v-copy="rugPull?.dev" name="bxs:copy" class="text-12px ml-2px cursor-pointer color-[--secondary-text]" @click.stop.prevent/>
               </div>
             </div>
             <div class="top">
@@ -128,7 +126,7 @@
                 ></i> -->
                 <Icon
                   :name="`${isShowDate?'custom:calendar':'custom:countdown'}`"
-                  class="color-[--d-666-l-999] cursor-pointer ml-2px"
+                  class="color-[--third-text] cursor-pointer ml-2px"
                   @click.self="isShowDate=!isShowDate"
                 />
               </div>
@@ -217,13 +215,13 @@
                         @click.stop.prevent
                         v-copy="row.Token"
                       ></i> -->
-                      <Icon v-copy="row.Token" name="bxs:copy" class="text-12px ml-2px cursor-pointer" @click.stop.prevent/>
+                      <Icon v-copy="row.Token" name="bxs:copy" class="text-12px ml-2px cursor-pointer color-[--third-text]" @click.stop.prevent/>
                       <a
-                        class="media-item ml-2 font_10"
+                        class="media-item ml-2px text-10px"
                         :href="`https://x.com/search?q=($${row.Symbol} OR ${row.token})&src=typed_query&f=live`"
                         target="_blank"
                       >
-                        <i class="iconfont icon-search font_10"/>
+                        <i class="iconfont icon-search text-10px"/>
                       </a>
                       <div
                         v-if="row?.medias?.length > 0"
@@ -243,7 +241,7 @@
                               <!-- <i class="iconfont icon-QQ text-12px"></i> -->
                               <Icon
                                 :name="`custom:${item.icon}`"
-                                class="text-[--d-666-l-999] h-12px w-12px"
+                                class="text-[--third-text] h-12px w-12px"
                               />
                             </span>
 
@@ -259,7 +257,7 @@
                               ></i> -->
                               <Icon
                                 :name="`custom:${item.icon}`"
-                                class="text-[--d-666-l-999] h-12px w-12px"
+                                class="text-[--third-text] h-12px w-12px"
                               />
                             </a>
                           </div>
@@ -293,20 +291,17 @@
                 </span>
                 <div class="flex-end">
                   <a
-                    class="a-gray font-16"
+                    class="a-gray"
                     href=""
                     @click.stop.prevent="goLink(row)"
                   >
-                    <i class="iconfont icon-a-sol-dark font-16"/>
+                    <i class="iconfont icon-a-sol-dark"/>
                   </a>
                 </div>
               </li>
             </ul>
             <div
-              class="text-12px tc width100 text-center"
-              :style="{
-                color: themeStore.theme === 'light' ? '#666' : '#999',
-              }"
+              class="text-12px tc width100 text-center color-[--third-text]"
             >
               <span v-if="loadingRun && pageNO > 1">{{ $t('loading') }}</span>
               <span
@@ -540,11 +535,11 @@ onMounted(() => {
 </script>
 <style lang="scss" scoped>
 .run {
-  color: var(--custom-font-1-color);
+  // color: var(--custom-font-1-color);
   font-family: PingFang SC;
   .top {
     // background: var(--custom-table-th-bg-color);
-    color: var(--d-666-l-999);
+    color: var(--third-text);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -580,7 +575,7 @@ onMounted(() => {
   }
   .content {
     padding-bottom: 10px;
-    color: #959a9f;
+    color: var(--secondary-text);
     // font-weight: 400;
     font-size: 11px;
     > .flex {
@@ -594,9 +589,6 @@ onMounted(() => {
         // justify-content: center;
         // color: var(--custom-text-2-color);
         padding: 12px 0px;
-        &:first-child {
-          // align-items: flex-start;
-        }
         &:last-child {
           padding-right: 0px;
         }
@@ -654,15 +646,11 @@ onMounted(() => {
     }
   }
 }
-.icon-copy {
-  color: var(--custom-text-2-color);
-}
 .pop-right {
-  background: var(--d-222-l-FFF);
   .right-container {
     padding-top: 0;
     border-radius: 0;
-    background: var(--d-222-l-FFF);;
+    // background: var(--d-222-l-FFF);
     min-height: auto;
     // overflow-y: scroll;
     // overflow-x: hidden;
@@ -675,7 +663,12 @@ onMounted(() => {
   position: sticky;
   top: 0px;
   padding-top: 20px;
-  background: var(--d-222-l-FFF);
+  background: var(--dialog-bg);
   z-index: 2;
+}
+.run-progress-bar {
+  :deep() .el-progress-bar__outer {
+    --el-border-color-lighter: var(--dialog-divider);
+  }
 }
 </style>

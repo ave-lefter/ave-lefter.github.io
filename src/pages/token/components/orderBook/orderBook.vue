@@ -12,7 +12,7 @@
           :class="[
             'shrink-0 text-12px px-12px py-4px rounded-4px border-none cursor-pointer',
             activeTab === tab.value
-              ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333] dark:color-#ccc'
+              ? 'bg-[--d-222-l-F2F2F2] color-[--main-text] dark:color-#ccc'
               : 'bg-transparent color-[--d-666-l-999]'
           ]"
           @click="setActiveTab(tab.value, index)"

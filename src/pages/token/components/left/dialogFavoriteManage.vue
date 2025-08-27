@@ -187,8 +187,8 @@ async function confirmEditRemark(remark: string, tokenId: string, item: GetFavLi
       <a
         v-for="(item,index) in list"
         :key="index" href="javascript:;"
-        :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-999-l-666] px-12px py-4px rounded-4px
-         ${activeTab===item.group_id ? 'bg-[--d-333-l-F2F2F2] color-[--d-F5F5F5-l-333]':''}`"
+        :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--third-text] px-12px py-4px rounded-4px
+         ${activeTab===item.group_id ? 'bg-[--border] color-[--main-text]':''}`"
         @click="setActiveTab(item.group_id)"
       >
         {{ item.name }}
@@ -220,7 +220,7 @@ async function confirmEditRemark(remark: string, tokenId: string, item: GetFavLi
               class="mr-8px"
               :row="row"
             />
-            <span class="[&&]:color-[--d-F5F5F5-l-333]">{{ row.symbol }}</span>
+            <span class="[&&]:color-[--main-text]">{{ row.symbol }}</span>
           </div>
         </template>
       </el-table-column>
@@ -229,6 +229,7 @@ async function confirmEditRemark(remark: string, tokenId: string, item: GetFavLi
         <template #default="{ row }">
           <el-select
             v-model="row.activeGroup"
+            class="[&&]:[--el-fill-color-blank:--border]"
             :placeholder="$t('pleaseSelectGroup')"
             @change="confirmSwitchGroup(row, $event)"
           >
@@ -278,7 +279,7 @@ async function confirmEditRemark(remark: string, tokenId: string, item: GetFavLi
       <el-table-column :label="$t('operate')" align="left">
         <template #default="{ row }">
           <span
-            class="cursor-pointer color-[var(--d-F5F5F5-l-333)]"
+            class="cursor-pointer color-[--main-text]"
             @click.stop.prevent="handleEditRemark(row)">
             {{ $t('edit') }}
           </span>
@@ -293,6 +294,16 @@ async function confirmEditRemark(remark: string, tokenId: string, item: GetFavLi
   </div>
 </template>
 
-<style scoped>
-
+<style scoped lang="scss">
+#table_fav {
+  --el-table-header-bg-color: transparent;
+  --el-table-tr-bg-color:transparent;
+  --el-table-border: 0 none;
+  --el-table-text-color: var(--main-text);
+  --el-table-row-hover-bg-color:var(--dialog-list-hover);
+  --el-table-bg-color: transparent;
+  :deep() .el-table__header-wrapper {
+    font-size: 12px;
+  }
+}
 </style>

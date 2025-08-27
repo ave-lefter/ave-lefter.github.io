@@ -196,7 +196,7 @@ const collect = async () => {
         return Promise.reject(err)
       })
     })
-    return 
+    return
   }
   // loading.value = true
   deleteAttention({
@@ -231,7 +231,7 @@ const collect = async () => {
           iconChainSize="14px"
           class="rounded-full"
         />
-        <div class="ml-6px color-[--d-F5F5F5-l-333]">
+        <div class="ml-6px color-[--main-text]">
           <div class="flex items-center gap-6px mb-3px">
             <UserRemark
               showAddressTitle
@@ -324,7 +324,7 @@ const collect = async () => {
       </div>
       <NuxtLink
         v-if="$route.path.indexOf('/address/') == -1"
-        :to="`/address/${tokenDetailStore.user_address}/${tokenDetailStore.tokenInfo!.chain}`" class="py-7px px-8px bg-[--d-333-l-F2F2F2] rounded-4px color-[--d-F5F5F5-l-333] text-12px"
+        :to="`/address/${tokenDetailStore.user_address}/${tokenDetailStore.tokenInfo!.chain}`" class="py-7px px-8px bg-[--d-333-l-F2F2F2] rounded-4px color-[--main-text] text-12px"
         @click.stop="tokenDetailStore.drawerVisible = false"
       >
         {{ $t('walletDetail') }}
@@ -357,7 +357,7 @@ const collect = async () => {
       </div>
       <div class="flex-1 flex flex-col">
         <span class="color-[--d-666-l-999] text-12px lh-16px mb-4px">{{ $t('walletTotalBalance') }}</span>
-        <div class="flex text-16px lh-24px items-center color-[--d-F5F5F5-l-333]"
+        <div class="flex text-16px lh-24px items-center color-[--main-text]"
         >
           <ExcludeError
             :model-value="statistics.balance_amount">

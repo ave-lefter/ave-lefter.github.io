@@ -44,12 +44,12 @@
           <el-tooltip
             v-if="list[0]?.tag == 'early'"
             placement="top"
+            popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!"
           >
             <template #content>{{ t('top50TitleTip') }}</template>
             <Icon
-              class=" text-14px ml-5px mt-2px"
+              class="text-14px ml-5px mt-2px color-[--third-text] cursor-pointer"
               name="mi:circle-warning"
-              color="#959a9f"
             />
           </el-tooltip>
         </div>
@@ -140,7 +140,7 @@
           >
           <span class="ml-5px font-14">Ave.ai</span>
         </div>
-        <span class="mt_5px block" style="font-size: 10px; color: #959a9f">
+        <span class="mt-5px block text-10px color-[--secondary-text]">
           {{ t('campaignTitle') }}
         </span>
       </div>

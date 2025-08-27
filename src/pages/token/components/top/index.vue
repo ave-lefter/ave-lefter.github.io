@@ -294,7 +294,7 @@
                       min-width: 70px;
                       --el-button-font-weight: 400;
                     "
-                    :color="theme !== 'dark' ? '#f2f2f2' : '#333333'"
+                    color="var(--border)"
                     @click.stop="handleReset()"
                   >
                     {{ $t('cancel') }}
@@ -308,7 +308,7 @@
                       min-width: 70px;
                       --el-button-font-weight: 400;
                     "
-                    :color="theme !== 'dark' ? '#222222' : '#f5f5f5'"
+                    type="primary"
                     @click.stop="
                       confirmSwitchGroup(id, selectedGroup, walletAddress)
                     "
@@ -359,7 +359,7 @@
                       margin-left: auto;
                       --el-button-font-weight: 400;
                     "
-                    :color="theme !== 'dark' ? '#f2f2f2' : '#333333'"
+                   color="var(--border)"
                     @click.stop="handleReset()"
                   >
                     {{ $t('cancel') }}
@@ -367,7 +367,7 @@
                   <el-button
                     class="flex-1"
                     size="default"
-                    :color="theme !== 'dark' ? '#222222' : '#f5f5f5'"
+                    type="primary"
                     style="
                       height: 30px;
                       min-width: 70px;
@@ -740,7 +740,7 @@
           color:
             (rugPull?.rates?.rugged_rate ?? 0) > 60
               ? '#F6465D'
-              : 'var(--d-999-l-666)',
+              : 'var(--secondary-text)',
         }"
       >
         <Icon name="custom:rug" class="text-12px mr-2px" />

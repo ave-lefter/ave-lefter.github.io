@@ -2,9 +2,9 @@
   <div class="holderInfoOld px-12px">
     <el-row :gutter="10">
       <el-col :span="24">
-        <div class="title text-12px color-[--d-FFF-l-000]">
+        <div class="title text-12px color-[--main-text]">
           {{ $t('holdersDetail') }}
-          <span class="color-[--d-666-l-999]">({{ $t('excludeNullAndPoll') }})</span>
+          <span class="color-[--third-text]">({{ $t('excludeNullAndPoll') }})</span>
         </div>
         <div class="checkbox-container checkbox-old mt-10px">
           <el-checkbox v-model="checked[0]" class="checkbox-FFCC00">
@@ -33,7 +33,7 @@
       </el-col>
       <el-col :span="24">
         <div class="title flex items-center justify-between mt-20px mb-10px">
-          <span class="text-12px color-[--d-FFF-l-000]">{{
+          <span class="text-12px color-[--main-text]">{{
             $t('mainChip')
           }}</span>
           <div class="tabs">
@@ -57,7 +57,7 @@
             ref="tableRef"
             v-loading="loadingTop100Balance"
             class="mt-15px"
-            cell-class-name="color-[--d-999-l-666] text-12px"
+            cell-class-name="text-12px"
             :data="top100balanceC"
             fit
             :height="tableHeight"
@@ -132,10 +132,10 @@
                   <span class="ml-3px"> *{{ row.address?.slice(-6) }}</span>
                   <Icon
                     :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
-                    :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 ml-3px" @click.stop.prevent="collect(row,$index)" />
+                    :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--third-text]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 ml-3px" @click.stop.prevent="collect(row,$index)" />
                   <Icon
                     name="custom:filter"
-                    class="color-[--d-666-l-999] cursor-pointer text-10px ml-3px"
+                    class="color-[--third-text] cursor-pointer text-10px ml-3px"
                     @click="handlerDialogProfitLoss(row)"
                   />
                 </div>
@@ -417,8 +417,8 @@ function handlerDialogProfitLoss(row: { address: string }) {
     padding: 4px 12px;
     cursor: pointer;
     &.active {
-      color: var(--d-F5F5F5-l-333);
-      background-color: var(--d-222-l-F2F2F2);
+      color: var(--main-text);
+      background-color: var(--border);
     }
     & ~ .tab-item {
       margin-left: 5px;

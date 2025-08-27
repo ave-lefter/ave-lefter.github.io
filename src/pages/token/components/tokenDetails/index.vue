@@ -163,7 +163,7 @@ async function _getTokenDetailMarks(type: string) {
     style="--el-drawer-bg-color:transparent"
   >
     <div
-      class="absolute left-0 right-0 top-0 bottom-0 z-3012 bg-[--d-222-l-FFF] rounded-tl-10px rounded-bl-10px flex flex-col"
+      class="absolute left-0 right-0 top-0 bottom-0 z-3012 bg-[--dialog-bg] rounded-tl-10px rounded-bl-10px flex flex-col"
     >
       <div
         class="flex-1 max-w-480px overflow-y-auto overflow-x-hidden"
@@ -190,7 +190,7 @@ async function _getTokenDetailMarks(type: string) {
               <span
                 v-for="(item, index) in timeList"
                 :key="index"
-                :class="`px-14px py-4px text-12px hover:opacity-80 cursor-pointer ${item.id===activeTime? 'color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2]':''}`"
+                :class="`px-14px py-4px text-12px hover:opacity-80 cursor-pointer ${item.id===activeTime? 'color-[--main-text] bg-[--d-333-l-F2F2F2]':''}`"
                 @click="switchTimeTab(item.id)"
               >
                 {{ item.name }}

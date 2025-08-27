@@ -81,7 +81,7 @@ function onBlur(index: number) {
       <div class="flex mt-10px">
         <el-button
           class="h-30px flex-1 m-l-auto"
-          :color="isDark ? '#333':'#F2F2F2'"
+          color="var(--border)"
           @click="filterArray.length=0;emit('confirm')"
         >
           {{ $t('reset') }}

@@ -23,7 +23,7 @@
 }
 
 :root:root {
-  --el-text-color-regular: var(--d-F5F5F5-l-333);
+  --el-text-color-regular: var(--main-text);
 }
 
 .el-table {
@@ -31,7 +31,7 @@
     --el-table-header-bg-color: var(--table-title-bg);
     --el-table-border: 0 none;
     --el-table-text-color: var(--secondary-text);
-    --el-table-header-text-color: var(--secondary-text);
+    --el-table-header-text-color: var(--third-text);
     --el-table-row-hover-bg-color: var(--main-input-button-bg);
     --el-table-tr-bg-color: var(--secondary-bg);
     --el-table-bg-color: var(--secondary-bg);
@@ -76,6 +76,17 @@
    --el-select-input-color:var(--main-text);
   .el-select__wrapper {
     font-size: 12px;
+  }
+}
+
+.el-dialog, .el-tooltip, .el-popover {
+  .el-select.el-select {
+    --el-fill-color-blank: var(--border);
+  }
+  .el-input.el-input {
+    --el-input-bg-color: var(--border);
+    --el-input-border-color: var(--border);
+    --el-input-hover-border-color: var(--primary-color);
   }
 }
 
@@ -226,7 +237,7 @@
 // }
 
 .el-checkbox{
-  --el-text-color-regular: var(--d-666-l-999);
+  --el-text-color-regular: var(--third-text);
   --el-checkbox-font-weight: 400;
   --el-checkbox-text-color:#000;
 }
@@ -239,7 +250,7 @@
   // 输入框 hover 边框
   --el-input-hover-border-color:var(--primary-color);
   // 输入框文字
-  --el-text-color-regular:var(--third-text);
+  --el-text-color-regular:var(--main-text);
 }
 
 .el-pagination{
@@ -255,4 +266,12 @@
 
 .el-date-editor.el-date-editor {
   --el-border-color: var(--border)
+}
+
+.el-table__empty-text {
+  --el-text-color-secondary: var(--third-text);
+}
+
+.el-input .el-input__inner::placeholder {
+  color: var(--third-text);
 }

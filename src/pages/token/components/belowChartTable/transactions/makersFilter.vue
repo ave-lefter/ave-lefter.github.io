@@ -46,6 +46,7 @@ watch(() => props.modelValue, () => {
       <div class="flex">
         <el-input
           v-model.trim="tempAddress"
+          style="--el-input-bg-color: var(--dialog-list-hover);"
           :placeholder="$t('enterAddress')"
           clearable
         />
@@ -54,7 +55,7 @@ watch(() => props.modelValue, () => {
         v-if="evmAddress"
         class="h-30px mt-20px w-full"
         size="default"
-        :color="isDark ? '#333':'#F2F2F2'"
+        color="var(--border)"
         @click="tempAddress=getWalletAddress(chain)||''"
       >
         {{ $t('filterWallet') }}
@@ -62,7 +63,7 @@ watch(() => props.modelValue, () => {
       <div class="flex mt-20px">
         <el-button
           class="h-30px flex-1 m-l-auto"
-          :color="isDark ? '#333':'#F2F2F2'"
+          color="var(--border)"
           @click="tempAddress='';emit('confirm')"
         >
           {{ $t('reset') }}

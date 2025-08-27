@@ -2226,10 +2226,10 @@ watch([() => swapStore.fromToken.address, () => swapStore.toToken.address], () =
         padding: 0 10px;
         --el-text-color-primary: var(--d-999-l-666);
         &.is-active {
-          color: var(--d-F5F5F5-l-333);
+          color: var(--main-text);
         }
         &:hover {
-          color: var(--d-F5F5F5-l-333);
+          color: var(--main-text);
           cursor: pointer;
         }
       }
@@ -2238,7 +2238,7 @@ watch([() => swapStore.fromToken.address, () => swapStore.toToken.address], () =
       }
       .el-tabs__active-bar {
         height: 2px;
-        background-color: var(--d-F5F5F5-l-333);
+        background-color: var(--main-text);
       }
       .el-tabs__nav-wrap::after {
         height: 0.5px;
@@ -2318,7 +2318,7 @@ watch([() => swapStore.fromToken.address, () => swapStore.toToken.address], () =
       }
       > :nth-child(2) {
         // color: #333333;
-        color: var(--d-F5F5F5-l-333);
+        color: var(--main-text);
       }
     }
     .swap-label_item-left {
@@ -2380,7 +2380,7 @@ watch([() => swapStore.fromToken.address, () => swapStore.toToken.address], () =
     padding: 0 5px;
     border: none;
     // color: #333;
-    color: var(--d-F5F5F5-l-333);
+    color: var(--main-text);
     &:disabled {
       color: #999;
     }
@@ -2393,7 +2393,7 @@ watch([() => swapStore.fromToken.address, () => swapStore.toToken.address], () =
     --van-cell-horizontal-padding: 5px;
     --van-cell-background-color: transparent;
     --van-cell-font-size: 14px;
-    --van-field-input-text-color: var(--d-F5F5F5-l-333);
+    --van-field-input-text-color: var(--main-text);
     :deep() .van-field__control {
       padding: 0 5px;
     }
@@ -2415,7 +2415,7 @@ watch([() => swapStore.fromToken.address, () => swapStore.toToken.address], () =
       border: none;
       cursor: pointer;
       &.active {
-        color: var(--d-F5F5F5-l-333);
+        color: var(--main-text);
       }
     }
   }

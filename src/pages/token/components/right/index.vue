@@ -8,7 +8,7 @@
             <VolumeStats v-if="tabActive === item.id" :tabActive="item.id" :tabActiveName="item.name" />
           </template>
         </div>
-        <!-- <div class="flex items-center justify-around color-[--d-F5F5F5-l-333] p-15px bg-[--secondary-bg] mt-4px">
+        <!-- <div class="flex items-center justify-around color-[--main-text] p-15px bg-[--secondary-bg] mt-4px">
         <div class="text-center">
           <div class="text-14px mb-5px">${{ formatNumber(token?.open_price || 0, 3) }}</div>
           <div class="text-12px color-[--d-666-l-999]">{{ $t('openPrice') }}</div>

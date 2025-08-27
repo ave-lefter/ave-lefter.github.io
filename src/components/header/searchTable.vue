@@ -212,7 +212,7 @@
                     :width="10"
                   >
                 </div>
-                <div class="text-12px mt-3px flex-start">
+                <div class="text-12px mt-3px flex-start color-[--third-text]">
                   <div v-if="row.opening_at" class="mr-5px" >
                     <TimerCount
                       v-if="
@@ -243,11 +243,11 @@
                       }}
                     </span>
                   </div>
-                  {{ row.token?.slice(0, 4) + '...' + row.token?.slice(-4) }}
+                  <span class="color-[--third-text]">{{ row.token?.slice(0, 4) + '...' + row.token?.slice(-4) }}</span>
                   <Icon
                     v-copy="row.token"
                     name="bxs:copy"
-                    class="text-10px ml-2px cursor-pointer color-[--d-666-l-999] ml-4px"
+                    class="text-10px ml-2px cursor-pointer color-[--third-text] ml-4px"
                     @click.stop.prevent
                   />
                 </div>
@@ -268,7 +268,7 @@
                   "
                   >${{ formatNumber(getMCap(row) || 0, 2) }}</span
                 >
-                <div class="text-12px mt-3px">
+                <div class="text-12px mt-3px color-[--third-text]">
                   ${{ formatNumber(row?.pool_size || 0, 2) }}
                 </div>
               </div>
@@ -487,9 +487,9 @@ function getActiveClass(
 ) {
   const isEqual = activeSort.value === activeSort1 && sortBy.value === sortBy1
   if (direction === 't') {
-    return isEqual ? 'border-t-[--main-text]' : 'border-t-[--d-666-l-999]'
+    return isEqual ? 'border-t-[--main-text]' : 'border-t-[--third-text]'
   }
-  return isEqual ? 'border-b-[--main-text]' : 'border-b-[--d-666-l-999]'
+  return isEqual ? 'border-b-[--main-text]' : 'border-b-[--third-text]'
 }
 function switchSort(sortBy1: string, activeSort1?: SortValue) {
   if (sortBy.value !== sortBy1) {
@@ -513,9 +513,9 @@ function switchSort(sortBy1: string, activeSort1?: SortValue) {
 .histrory {
   font-size: 12px;
   padding-bottom: 10px;
-  color: var(--d-999-l-666);
+  color: var(--secondary-text);
   .empty {
-    color: var(--d-999-l-666);
+    color: var(--third-text);
     height: 500px;
     display: flex;
     align-items: center;
@@ -529,7 +529,7 @@ function switchSort(sortBy1: string, activeSort1?: SortValue) {
     }
   }
   .top {
-    color: var(--d-666-l-999);
+    color: var(--third-text);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -575,7 +575,7 @@ function switchSort(sortBy1: string, activeSort1?: SortValue) {
     li {
       padding: 0 20px;
       &:hover {
-        background-color: var(--d-2A2A2A-l-F2F2F2);
+        background-color: var(--border);
       }
     }
     .token-info {
@@ -642,7 +642,7 @@ function switchSort(sortBy1: string, activeSort1?: SortValue) {
     }
     a:hover {
       text-decoration: none;
-      background-color: var(--d-2A2A2A-l-F2F2F2);
+      background-color: var(--border);
       opacity: 1;
     }
     li:nth-child(1) .flex {

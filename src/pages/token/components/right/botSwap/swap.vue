@@ -25,7 +25,7 @@
     <template v-else-if="activeTab === 'sell'">
       <el-input v-model="amountToken" clearable class="input-number mt-10px" size="large"  input-style="text-align:right"  placeholder="0.0" @update:model-value="value => {amountToken = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
         <template #prepend>
-          <span class="text-12px color-[--d-999-l-666]">{{ $t('amount') }}</span>
+          <span class="text-12px color-[--secondary-text]">{{ $t('amount') }}</span>
         </template>
         <template #append>
            <span class="text-12px color-[--main-text]">{{ tokenInfo?.symbol  }}</span>
@@ -45,7 +45,7 @@
     <template v-if="swapType === 'limit'">
       <el-input v-model="priceLimit" placeholder="0.0" size="large"  clearable class="input-number mt-10px" input-style="text-align:right" @update:model-value="value => priceLimit = value?.replace?.(/\-|[^\d.]/g, '')">
         <template #prepend>
-          <span class="text-12px color-[--d-999-l-666]">{{ isPriceLimit ? $t('price') : 'MC' }}</span>
+          <span class="text-12px color-[--secondary-text]">{{ isPriceLimit ? $t('price') : 'MC' }}</span>
           <Icon name="iconamoon:synchronize-fill" class="clickable ml-5px text-12px color-[--main-text]" @click.stop="isPriceLimit = !isPriceLimit"/>
         </template>
         <template #append>
@@ -64,7 +64,7 @@
             <div class="w-10px" />
           </template>
           <template #suffix>
-            <div class="text-14px color-#959A9F pr-5px">%</div>
+            <div class="text-14px color-[--third-text] pr-5px">%</div>
           </template>
         </el-input>
       </div>
@@ -1295,7 +1295,7 @@ onMounted(() => {
         display: flex;
         justify-content: space-between;
         font-size: 12px;
-        color: #959A9F;
+        color: var(--third-text);
         // margin-top: 5px;
         margin: 8px -5px 0 -5px;
         > span {

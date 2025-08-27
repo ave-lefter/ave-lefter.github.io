@@ -25,10 +25,10 @@
       @click.stop.prevent="dialogVisible_search = !dialogVisible_search"
     >
       <Icon
-        class="text-16px text-[--secondary-text]"
+        class="text-16px text-[--third-text]"
         name="custom:search"
       />
-      <span class="text-12px ml-4px text-[--secondary-text]">
+      <span class="text-12px ml-4px text-[--third-text]">
         {{ $t('enterAddress/token') }}
       </span>
     </a>

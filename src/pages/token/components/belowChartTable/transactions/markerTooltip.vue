@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {getTxsUserBrief} from '~/api/token'
-import {BigNumber} from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import dayjs from 'dayjs'
 
 const emit = defineEmits(['update:modelValue'])
@@ -76,7 +76,7 @@ async function _getTxsUserBrief() {
     virtual-triggering
     trigger="hover"
     raw-content
-    popper-class="[&&]:p-12px [&&]:[--el-text-color-primary:--d-222-l-FFF]!"
+    popper-class="[&&]:p-12px [&&]:[--el-text-color-primary:--dialog-bg]!"
     style="--el-text-color-primary:var(--d-222-l-FFF)"
   >
     <template #content>
@@ -89,7 +89,7 @@ async function _getTxsUserBrief() {
           <el-skeleton-item v-for="i in 10" :key="i" variant="p" style="width: 100%"/>
         </template>
       </el-skeleton>
-      <div v-else class="flex flex-col gap-6px w-210px color-[--d-F5F5F5-l-333]">
+      <div v-else class="flex flex-col gap-6px w-210px color-[--main-text]">
         <div class="flex gap-6px items-center">
           <UserAvatar
             class="relative"
@@ -106,8 +106,7 @@ async function _getTxsUserBrief() {
             class="color-[--d-CCC-l-333]"
             :formatAddress="(address: string) => address.slice(0, 4) + '...' + address.slice(-4)"
           />
-          <Icon v-copy="currentRow.wallet_address" name="bxs:copy"
-                class="cursor-pointer color-[--third-text] text-10px"/>
+          <Icon v-copy="currentRow.wallet_address" name="bxs:copy" class="cursor-pointer color-[--third-text] text-10px"/>
           <slot/>
         </div>
         <div class="flex justify-between">
@@ -117,9 +116,9 @@ async function _getTxsUserBrief() {
               formatNumber(userBriefData.balance_amount || 0, 3)
               }}/{{
                 formatNumber(userBriefData.history_max_balance_amount || 0, 3)
-              }})</span > <span class="color-[--d-CCC-l-333]">${{ formatNumber(userBriefData.balance_usd || 0, 2) }}</span>
+              }})</span > <span class="color-[--main-text]">${{ formatNumber(userBriefData.balance_usd || 0, 2) }}</span>
             <el-progress
-              :color="themeStore.isDark?'#ccc':'#333'"
+              color="var(--main-text)"
               :show-text="false"
               :percentage="userBriefData.ratio || 0"
               :stroke-width="4"
@@ -183,7 +182,7 @@ async function _getTxsUserBrief() {
          </span>
         </div>
         <el-divider
-          class="[--el-border-color:var(--d-333-l-F2F2F2)]"
+          class="[--el-border-color:--dialog-divider]"
           style="margin:0"
         />
         <div class="flex justify-between">
@@ -222,7 +221,7 @@ async function _getTxsUserBrief() {
               </span>
             </template>
           </TimerCount>
-          <span class="color-[--third-text]" v-else>
+          <span v-else class="color-[--third-text]">
             {{
               !!Number(userBriefData.wallet_age || 0)
                 ? dayjs(userBriefData.wallet_age * 1000).fromNow()
@@ -231,7 +230,7 @@ async function _getTxsUserBrief() {
           </span>
         </div>
         <el-divider
-          class="[--el-border-color:var(--d-333-l-F2F2F2)]"
+          class="[--el-border-color:--dialog-divider]"
           style="margin:0"
         />
         <div v-if="userBriefData.top3_blue_chip?.length > 0">

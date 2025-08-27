@@ -1,7 +1,7 @@
 <template>
   <div class="history">
     <el-scrollbar v-if="searchTokens?.length > 0" v-loading="loading" height="calc(60vh - 50px)">
-      <ul class="content color-[--d-F5F5F5-l-333]">
+      <ul class="content color-[--main-text]">
         <li v-for="(row, $index) in searchTokens" :key="$index"  :class="{ disabled: disabledToken === row.address }" class="flex justify-between px-5px py-8px clickable"  @click.stop.prevent="tableRowClick(row)">
           <div class="token-info">
             <TokenImg class="mr-5px" :row="row" />
@@ -21,7 +21,7 @@
             </div>
           </div>
           <div v-if="(row.amount || 0) > 0 || (row.value || 0) > 0" class="flex flex-col text-right">
-            <span class="color-[--d-F5F5F5-l-333] py-2px" v-html="row.amount || row.value ? formatNumber(row?.amount || row?.value || '') : ''" />
+            <span class="color-[--main-text] py-2px" v-html="row.amount || row.value ? formatNumber(row?.amount || row?.value || '') : ''" />
             <span
               class="color-#999"
               v-html="
@@ -178,7 +178,7 @@ function tableRowClick(item: typeof props.searchTokens[number]) {
     //   }
     // }
     span {
-      // color: var(--d-F5F5F5-l-333);
+      // color: var(--main-text);
       &.green {
         color: #12b886;
       }
