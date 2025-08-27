@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="flex justify-between items-center gap-8px h-54px">
-      <el-select v-model="selectGroupId"  :mode="mode" @click.stop @change="(val) => filterGroup(val)">
+      <el-select v-model="selectGroupId" style="--el-fill-color-blank:var(--dialog-list-hover)"  :mode="mode" @click.stop @change="(val) => filterGroup(val)">
         <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
         <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
       </el-select>

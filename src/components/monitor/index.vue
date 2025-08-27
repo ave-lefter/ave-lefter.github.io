@@ -1,12 +1,12 @@
 <template>
   <div
-class="w-monitor w-100% h-100% bg-[--secondary-bg] pl-12px pr-6px relative overflow-hidden"
+class="w-monitor w-100% h-100% bg-[--dialog-bg] pl-12px pr-6px relative overflow-hidden"
   :class="{'pr-10px!':isLeftFixed,'pl-10px!':isRightFixed}"
   >
     <!-- <div class="w-100% h-40px absolute pointer-events-auto z-999 drag-handle left-0"/> -->
     <Icon
         name="custom:drag2"
-        class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2] drag-handle"
+        class="absolute top-3px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle"
     />
     <el-tabs v-model="activeName" style="" class="m-tabs" @tab-change="handleClick">
       <el-tab-pane :label="$t('walletManage')" :name="0" lazy>
@@ -16,8 +16,9 @@ class="w-monitor w-100% h-100% bg-[--secondary-bg] pl-12px pr-6px relative overf
           :style="{height:`${props.scrollHeight-50}px`}"
           class="overflow-hidden"
         >
-          <span class="text-12px mt-10px">{{ $t('noBotWalletTip') }}</span>
+          <span class="text-12px mt-10px color-[--third-text]">{{ $t('noBotWalletTip') }}</span>
           <el-button
+            type="primary"
             class="mt-10px"
             @click="botStore.$patch({
             connectVisible: true
@@ -40,10 +41,10 @@ class="w-monitor w-100% h-100% bg-[--secondary-bg] pl-12px pr-6px relative overf
               fixed
               :style="{
                 height:props.scrollHeight+'px',
-                '--el-table-border':'1px solid #333'
+                // '--el-table-border':'1px solid var(--dialog-list-hover)',
+                // '--el-table-bg-color':'transparent'
                 // height:'500px',
               }"
-              headerClass="bg-transparent"
               row-class='cursor-pointer'
               :rowEventHandlers="{
               onClick: (row:any)=>jumpToken(row)
@@ -150,7 +151,7 @@ class="w-monitor w-100% h-100% bg-[--secondary-bg] pl-12px pr-6px relative overf
                   <div class="flex-between w-100%">
                     <div class="flex-start gap-8px">
                       <FilterType v-model="txType" :options="txTypeList" />
-                      <Icon name="icon-park-solid:volume-notice" :style="`color:var(--d-F5F5F5-l-333)`"/>
+                      <Icon name="icon-park-solid:volume-notice" class="color-[--secondary-text]"/>
                       <el-switch
                         v-model="hasRing"
                         size="small"
@@ -246,12 +247,12 @@ class="w-monitor w-100% h-100% bg-[--secondary-bg] pl-12px pr-6px relative overf
               <Icon name="icon-park-solid:volume-notice"/>
               <el-switch
                 v-model="hasRing"
-                class="[&&]:[--el-switch-on-color:#3F80F7]"
+                class="[&&]:[--el-switch-on-color:--primary-color]"
                 size="small"
                 />
               <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
             </template>
-            <el-button v-if="(activeName===1) && botStore.evmAddress" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;color: var(--d-999-l-666) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
+            <el-button v-if="(activeName===1) && botStore.evmAddress" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;color: var(--secondary-text);"  :dark="isDark" >
               <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
               {{ $t('addWallet') }}
             </el-button>
@@ -261,10 +262,10 @@ class="w-monitor w-100% h-100% bg-[--secondary-bg] pl-12px pr-6px relative overf
               v-model="quickBuyValue"
               size="small"
             />
-            <Icon class="text-14px color-[var(--d-999-l-666)] hover:color-[--d-F5F5F5-l-333] cursor-pointer" name="custom:pump-setting" @click.stop.prevent="navigateTo('/follow/addr', {replace: true})"/>
+            <Icon class="text-14px color-[--secondary-text] hover:color-[--main-text] cursor-pointer" name="custom:pump-setting" @click.stop.prevent="navigateTo('/follow/addr', {replace: true})"/>
             <Icon
               name="custom:close"
-              class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-333]"
+              class="text-14px shrink-0 cursor-pointer color-[--main-text]"
               @click.self="visible=false"
             />
         </div>
@@ -628,8 +629,9 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
 <style scoped lang="scss">
 .m-table {
   :deep() .el-table.el-table-v2{
-    --el-table-header-bg-color: transparent;
-    --el-table-tr-bg-color: transparent;
+    --el-table-header-bg-color: var(--dialog-bg);
+    --el-table-tr-bg-color: var(--dialog-bg);
+    --el-table-bg-color:var(--dialog-bg);
     /* .el-table-v2__table{
       --el-table-border:1px solid;
     } */
@@ -637,17 +639,17 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
 }
 .m-tabs{
   :deep() .el-tabs__header{
-    --el-border-color-light:var(--d-333-l-F2F2F2);
-    --el-color-primary:var(--d-F5F5F5-l-333);
-    --el-text-color-primary:var(--d-666-l-999);
+    --el-border-color-light:var(--dialog-list-hover);
+    --el-color-primary:var(--main-text);
+    --el-text-color-primary:var(--third-text);
   }
   --el-tabs-header-height:44px;
   :deep() .el-tabs__item{
     font-weight: 400;
     &:hover{
-      color:var(--d-666-l-999);
+      color:var(--third-text);
       &.is-active{
-        color:var(--d-F5F5F5-l-333);
+        color:var(--main-text);
       }
     }
   }

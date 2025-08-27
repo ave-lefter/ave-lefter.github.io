@@ -108,7 +108,7 @@ const props2=computed(()=>{
   let data={} as any
   if(placement.value==='center'){
     data={
-      class:'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]',
+      class:'rounded-8px shadow-[0_5px_10px_0_#0000001A]',
       scrollHeight:monitorStore.monitorBoundingRect.height-40, 
       isLarge:monitorStore.monitorBoundingRect.width>720
     }
