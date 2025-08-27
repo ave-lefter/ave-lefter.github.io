@@ -1,7 +1,11 @@
 <template>
   <div class="items-center inline-flex">
-    <img v-if="themeStore.isDark" src="@/assets/images/fast.png" class="w-14px h-14px" alt="" srcset="">
-    <img v-else src="@/assets/images/fast-dark.png" class="w-14px h-14px" alt="" srcset="">
+    <span class="w-14px h-14px bg-[--secondary-text] rounded-full flex items-center justify-center">
+      <Icon
+        class="color-[--main-bg] text-10px"
+        name="mynaui:lightning-solid"
+      />
+    </span>
     <span class="ml-5px mr-5px color-[--secondary-text] text-12px">{{ $t('quick') }}</span>
     <el-input
       v-model.trim="quickBuyValue1"
@@ -10,6 +14,7 @@
           /* --el-input-bg-color: var(--d-151A22-l-E8F1FF); */
           /* --el-input-border-color: var(--d-151A22-l-E8F1FF);
           --el-input-hover-border-color: #3F80F7; */
+          --el-input-text-color: var(--main-text);
           border-radius: 4px;
           width: 88px;
           height: 28px;
@@ -37,17 +42,17 @@
     <div
       v-if="isQuickSupported&&settingsButtonVisible1"
       class="ml-20px flex justify-end items-center text-12px">
-      <span class="color-[--d-8CA0C3-l-566275] mr-5px">{{ $t('default') }}</span>
+      <span class="color-[--secondary-text] mr-5px">{{ $t('default') }}</span>
       <div
-        class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--d-151A22-l-E8F1FF] px-2px py-2px">
+        class="flex items-center justify-between p-1px rounded-4px text-12px h-28px bg-[--main-input-button-bg] px-2px py-2px">
 
         <button
           v-for="item in BotSettingsArr"
           :id="item.value"
           :key="item.value"
           :ref="setBtnRef"
-          class="color-[--d-8CA0C3-l-566275] cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center"
-          :class="`${item.value === botSettingStore.botSettings?.[chain]?.selected?'color-[--d-F5F5F5-l-0B0D12] bg-[--d-252E3C-l-FFF]':'bg-transparent'}`"
+          class="cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center"
+          :class="`${item.value === botSettingStore.botSettings?.[chain]?.selected?'color-[--main-text] bg-[--tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
           type="button"
           @click.stop="botSettingStore.botSettings[chain]!.selected = item.value"
           @mouseenter="showPopover(item.value)"
@@ -75,27 +80,27 @@
     >
       <ul>
         <li class="text-14px mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-12px color-[--d-566275-l-8CA0C3] ml-0 mr-6px cursor-pointer"/>
+          <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-12px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
           <span v-if="botSettingStore.botSettings?.[chain]?.[selected]?.slippage !== 'auto'">{{
               botSettingStore.botSettings?.[chain || '']?.[selected]?.slippage
             }}%</span>
           <span v-else>{{ $t('auto') }}</span>
         </li>
         <li v-if="isEvmChain(chain || '')" class="text-14px mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="text-12px color-[--d-566275-l-8CA0C3] ml-0 mr-6px cursor-pointer"/>
+          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="text-12px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
           <span>${{ getEstimatedGas() }}</span>
         </li>
         <li v-if="chain === 'solana'" class="text-14px mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-12px color-[--d-566275-l-8CA0C3] mr-6px cursor-pointer ml-0"/>
+          <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-12px color-[--third-text] mr-6px cursor-pointer ml-0"/>
           <span>{{ botPriorityFee }} SOL</span>
         </li>
         <li class="text-14px mt-4px mb-4px flex-start">
-          <span class="mr-4px color-[--d-566275-l-8CA0C3] text-14px">{{ $t('autoSellHalf') }}</span>
+          <span class="mr-4px color-[--third-text] text-14px">{{ $t('autoSellHalf') }}</span>
           {{  botSettingStore.autoSellConfigs?.autoSell ? $t('on') : $t('off') }}
         </li>
 
         <li class="text-14px mt-4px mb-4px flex-start">
-          <span class="mr-4px color-[--d-566275-l-8CA0C3] text-14px">{{ $t('mev') }}</span>
+          <span class="mr-4px color-[--third-text] text-14px">{{ $t('mev') }}</span>
           {{  botSettingStore.botSettings?.[chain]?.[selected]?.mev ? $t('on')  : $t('off') }}
         </li>
 
