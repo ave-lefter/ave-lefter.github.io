@@ -90,6 +90,7 @@
       <div class="flex-1" />
       <Setting :chain="activeChain"/>
       <BlackList />
+      <AutoSellSetting :chain="activeChain" />
       <div class="tabs">
         <button
           v-for="item in pumpConfig"
@@ -418,6 +419,7 @@ import type {
 } from '@/api/types/pump'
 import { throttle } from 'lodash-es'
 import { isJSON, formatUrl, usePumpTableDataFetching } from '@/utils/index'
+import AutoSellSetting from '@/components/autoSellSetting/index.vue'
 const Timer = {
   new: null,
   soon: null,
@@ -445,13 +447,12 @@ const pump_count = shallowRef({
       new: 0,
       soon: 0,
       graduated: 0
-    }
-    ,
-    bsc: {
-      new: 0,
-      soon: 0,
-      graduated: 0
-    }
+    },
+  bsc: {
+    new: 0,
+    soon: 0,
+    graduated: 0
+  }
 })
 const pump_query  = useStorage(
   'pump_query',
@@ -589,8 +590,8 @@ const list1 = computed(() => {
     `pumpFilter_${activeChain.value}_new`
   )
 
-  const wsList = getFilterData(list1, pumpFilter_new)
-  const wsList1 = wsList?.filter(i => !list?.some(j => j.pair === i.pair))
+const wsList = getFilterData(list1, pumpFilter_new)
+  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list]
   if (logoList?.value?.length > 0 && filterList?.length > 0) {
     filterList = filterList.map(i => {
@@ -626,26 +627,26 @@ const list2 = computed(() => {
     `pumpFilter_${activeChain.value}_soon`
   )
   const wsList = getFilterData(list1, pumpFilter_soon)
-  const wsList1 = wsList?.filter(i => !list?.some(j => j.pair === i.pair))
-  let filterList = [...wsList1, ...list]
-  if (logoList?.value?.length > 0 && filterList?.length > 0) {
-    filterList = filterList.map(i => {
-      const obj = logoList.value?.find(y => y.token == i.target_token)
-      if (obj) {
-        return {
-          ...i,
-          logo_url: obj?.logo_url,
-          name: obj?.name,
-          symbol: obj?.symbol
+  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
+    let filterList = [...wsList1, ...list]
+    if (logoList?.value?.length > 0 && filterList?.length > 0) {
+      filterList = filterList.map(i => {
+        const obj = logoList.value?.find(y => y.token == i.target_token)
+        if (obj) {
+          return {
+            ...i,
+            logo_url: obj?.logo_url,
+            name: obj?.name,
+            symbol: obj?.symbol
+          }
+        } else {
+          return i
         }
-      } else {
-        return i
-      }
-    })
-  }
-  return filterList
-})
-const list3 = computed(() => {
+      })
+    }
+    return filterList
+  })
+  const list3 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.graduated || []
   if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
     list = list.filter(
@@ -661,25 +662,25 @@ const list3 = computed(() => {
     `pumpFilter_${activeChain.value}_graduated`
   )
   const wsList = getFilterData(list1, pumpFilter_graduated)
-  const wsList1 = wsList?.filter(i => !list?.some(j => j.pair === i.pair))
-  let filterList = [...wsList1, ...list]
-  if (logoList?.value?.length > 0 && filterList?.length > 0) {
-    filterList = filterList.map(i => {
-      const obj = logoList.value?.find(y => y.token == i.target_token)
-      if (obj) {
-        return {
-          ...i,
-          logo_url: obj?.logo_url,
-          name: obj?.name,
-          symbol: obj?.symbol
+  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
+    let filterList = [...wsList1, ...list]
+    if (logoList?.value?.length > 0 && filterList?.length > 0) {
+      filterList = filterList.map(i => {
+        const obj = logoList.value?.find(y => y.token == i.target_token)
+        if (obj) {
+          return {
+            ...i,
+            logo_url: obj?.logo_url,
+            name: obj?.name,
+            symbol: obj?.symbol
+          }
+        } else {
+          return i
         }
-      } else {
-        return i
-      }
-    })
-  }
-  return filterList
-})
+      })
+    }
+    return filterList
+  })
 watch(() => list1.value?.[0]?.target_token, (val) => {
   if(pump_notice.value[activeChain.value].new && pumpAudio.value && val) {
     pumpAudio.value.play()

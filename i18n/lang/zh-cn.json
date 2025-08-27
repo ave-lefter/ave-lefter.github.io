@@ -1363,5 +1363,10 @@
   "holdersTotalChange": "持币地址数变化",
   "holdersChange": "持币地址数变化",
   "holdersChange2": "{n}内持币变化",
-  "countdown2Opening": "距离开盘倒计时"
+  "countdown2Opening": "距离开盘倒计时",
+  "autoSell": "自动卖出",
+  "TP": "止盈",
+  "SL": "止损",
+  "autoSellStrategy": "自动卖出策略",
+  "noAutoSell": "暂未设置高级卖出策略"
 }

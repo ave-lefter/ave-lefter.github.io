@@ -323,7 +323,8 @@ const props = defineProps({
   setting: { type: Object, default: () => ({}) },
   isAutoSell: { type: Boolean, default: true },
   showQuickAmount: { type: Boolean, default: true },
-  showClipboardSet: { type: Boolean, default: false }
+  showClipboardSet: { type: Boolean, default: false },
+  showAutoSell: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['update:slippage', 'onSubmit'])
@@ -356,6 +357,8 @@ watch(show, (val) => {
   if (val) {
     if (props.chain === 'xlayer') {
       settingTab.value = 0
+    } else if (props.showAutoSell) {
+      settingTab.value = 1
     }
     const selected = botSetting.value.selected
     botSetting.value = cloneDeep(props.setting ?? {})

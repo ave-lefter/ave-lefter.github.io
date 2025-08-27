@@ -4,6 +4,7 @@ import KOL from './components/kol/index.vue'
 import { getTopSignal, type ITopSignal } from '~/api/signal'
 import { _getKolList, _getSmartList } from '@/api/kol'
 import { useLocalStorage, useStorage } from '@vueuse/core'
+import type { ChainKey } from '~/api/types/pump'
 const Version = 1
 const { t } = useI18n()
 
@@ -19,8 +20,8 @@ const smartChains = computed(() => {
     }
   })
 })
-const activeChain = shallowRef('solana')
-const activeChain2 = shallowRef('solana')
+const activeChain = shallowRef<ChainKey>('solana')
+const activeChain2 = shallowRef<ChainKey>('solana')
 
 const dialogValues = ref<{
   visible: boolean
@@ -185,7 +186,7 @@ function handleIntervalChange(interval: string) {
 function init() {
   // 页面初始化时清空所有搜索状态
   searchKeywords.value = {}
-  
+
   if (filterConditions?.value) {
     activeChain2.value = filterConditions.value.chain
     // activeTab.value = filterConditions.value.category
@@ -201,7 +202,7 @@ function init() {
       version: Version,
     }
   }
-  
+
   // this.initFilterForm()
   getSmartList()
 }
@@ -692,10 +693,10 @@ function resetSort() {
 function switchChain(chain: string) {
   activeChain2.value = chain
   filterConditions.value.chain = chain
-  
+
   // 切换链时清空所有搜索状态
   searchKeywords.value = {}
-  
+
   initFilterForm()
   getSmartList()
 }
@@ -728,6 +729,7 @@ function switchChain(chain: string) {
             style="margin-left: 20px"
             :showQuickAmount="false"
           />
+          <AutoSellSetting class="ml-20px" :chain="activeChain" />
         </div>
         <div class="p-2px rounded-4px bg-[--d-333-l-F2F2F2] flex">
           <div
