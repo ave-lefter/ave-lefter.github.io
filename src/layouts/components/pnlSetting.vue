@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import pnlImg from '@/assets/images/pnl.png'
+import { getBestApiDomain } from '~/plugins/api/getApiDomain'
 const visible = defineModel<boolean>('visible')
 const pnlSetting = defineModel<any>('pnlSetting')
 const uploadRef = useTemplateRef('uploadRef')
 const { t } = useI18n()
+
+const baseURL = getBestApiDomain()
 const defaultSettings = {
   chain: 'solana',
   background: pnlImg,
@@ -84,7 +87,7 @@ function resetBg() {
       </div>
       <el-upload
       ref="uploadRef"
-        action='https://0ftrfsdb.xyz/v2api/token/v1/upload/pnl_background'
+        :action='`${baseURL}/v2api/token/v1/upload/pnl_background`'
         name="image"
         :headers="{
           Authorization:`Bearer ${useBotStore().accessToken}`
