@@ -71,7 +71,7 @@ class="w-monitor w-100% h-100% bg-[--dialog-bg] pl-12px pr-6px relative overflow
                 <span>{{ $t('value') }}</span>
               </template>
               <template #cell-amount="{ row }">
-                <span :class="getIsBuy(row)?`color-${upColor[0]}`:`color-${downColor[0]}`">
+                <span :class="getIsBuy(row)?`color-[--up-color]`:`color-[--down-color]}`">
                   {{ !toggleMc? row?._main_Token?.amount+row?._main_Token?.symbol: row?._main_Token.total}}
                 </span>
               </template>
@@ -89,15 +89,15 @@ class="w-monitor w-100% h-100% bg-[--dialog-bg] pl-12px pr-6px relative overflow
                     v-if="row?.time && Number(formatTimeFromNow(row?.time, true)) < 60"
                     :key="row?.time" :timestamp="row?.time" :end-time="60">
                     <template #default="{ seconds }">
-                  <span v-if="seconds < 60" class="color-#FFA622 text-12px">
+                  <span v-if="seconds < 60" class="color-[--yellow] text-12px">
                     {{ seconds }}s
                   </span>
-                      <span v-else class="color-[--d-999-l-666] text-12px">
+                      <span v-else class="color-[--third-text] text-12px">
                     {{ formatTimeFromNow(row?.time) }}
                   </span>
                     </template>
                   </TimerCount>
-                  <div v-else class="color-[--d-999-l-666] text-12px">
+                  <div v-else class="color-[--third-text] text-12px">
                     {{ formatTimeFromNow(row?.time) }}
                   </div>
               </template>
@@ -183,8 +183,8 @@ class="w-monitor w-100% h-100% bg-[--dialog-bg] pl-12px pr-6px relative overflow
                   </div>
                   <div class="flex-between">
                     <div class="flex-start gap-4px">
-                      <div>{{ getTxType(row) }}</div>
-                      <span :class="getIsBuy(row)?`color-${upColor[0]}`:`color-${downColor[0]}`">
+                      <div class="color-[--third-text]">{{ getTxType(row) }}</div>
+                      <span :class="getIsBuy(row)?`color-[--up-color]}`:`color-[--down-color]}`">
                         {{ !toggleMc? row?._main_Token?.amount+row?._main_Token?.symbol: row?._main_Token.total}}
                       </span>
                       <TokenImg
@@ -192,24 +192,24 @@ class="w-monitor w-100% h-100% bg-[--dialog-bg] pl-12px pr-6px relative overflow
                           logo_url: row?._target_Token?.logo_url,
                           chain: row?.chain
                         }" token-class="w-16px h-16px [&&]:mr-4px" />
-                          <span>{{ row?._target_Token?.symbol }}</span>
+                          <span class="color-[--main-text]">{{ row?._target_Token?.symbol }}</span>
                           <img v-if="row?.amm=='pump'"  src="https://www.iconaves.com/signals/pump_king.png" style="width:12px;height:12px">
-                      <span class="color-[var(--d-666-l-999)]">{{ toggleMc? $t('price') : $t('mcap') }}</span>
-                      <span>{{ toggleMc? row?._target_Token?.price: row?._mc }}</span>
+                      <span class="color-[--third-text]">{{ toggleMc? $t('price') : $t('mcap') }}</span>
+                      <span class="color-[--main-text]">{{ toggleMc? row?._target_Token?.price: row?._mc }}</span>
                     </div>
                     <TimerCount
                       v-if="row?.time && Number(formatTimeFromNow(row?.time, true)) < 60"
                       :key="row?.time" :timestamp="row?.time" :end-time="60">
                       <template #default="{ seconds }">
-                    <span v-if="seconds < 60" class="color-#FFA622 text-12px">
+                    <span v-if="seconds < 60" class="color-[--yellow] text-12px">
                       {{ seconds }}s
                     </span>
-                        <span v-else class="color-[--d-999-l-666] text-12px">
+                        <span v-else class="color-[--third-text] text-12px">
                       {{ formatTimeFromNow(row?.time) }}
                     </span>
                       </template>
                     </TimerCount>
-                    <div v-else class="color-[--d-999-l-666] text-12px">
+                    <div v-else class="color-[--third-text] text-12px">
                       {{ formatTimeFromNow(row?.time) }}
                     </div>
                   </div>

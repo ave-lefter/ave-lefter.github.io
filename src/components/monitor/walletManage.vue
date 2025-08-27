@@ -56,8 +56,8 @@
           </template>
           <template #cell-group="{ row }">
              <el-select v-model="row.group_id" size="small" :suffix-icon="SuffixIcon" filterable popper-class="[&&]:[--el-bg-color-overlay:var(--d-222-l-FFF)] w-addrGroup" class="[&&]:[--el-text-color-regular:--main-text] [&&]:[--el-fill-color-blank:--dialog-list-hover]" @click.stop @change="(val) => getRowGroupChange(val, row)">
-              <el-option :key="0" :value="0" :label="$t('defaultGroup')" filterable/>
-              <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
+              <el-option :key="0" :value="0" :label="$t('defaultGroup')" filterable class="[&&]:h-20px [&&]:lh-20px"/>
+              <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" class="[&&]:h-20px [&&]:lh-20px"/>
             </el-select>
           </template>
           <template #header-chain>
