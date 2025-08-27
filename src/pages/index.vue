@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useStorage } from '@vueuse/core'
 import CategoryTabs from './components/categoryTabs.vue'
 import hot from './components/hotRank/hot.vue'
 import newRank from './components/newRank/new.vue'
@@ -7,6 +8,7 @@ import gainer from './components/gainerRank/gainer.vue'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 import { v4 as uuidv4 } from 'uuid'
+import { trackRef } from '~/api/tracking'
 
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
 const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
@@ -26,10 +28,11 @@ const components = {
   cto: activityComponent,
   xstocks: activityComponent,
   volume: activityComponent,
+  heaven_pump: pumpComponent,
 }
-const activeTab = shallowRef<keyof typeof components>('hot')
-const activeSubTab = shallowRef('pump_in_hot')
-const activeChain = shallowRef('AllChains')
+const activeTab = useStorage<keyof typeof components>('rankActiveTab', 'hot')
+const activeSubTab = useStorage('rankSubTab','pump_in_hot')
+const activeChain = useStorage('rankChain', 'AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
 const categories = computed(() => {
   return chains.value.find((el) => el.net_name === activeChain.value)?.categories || []
@@ -37,6 +40,7 @@ const categories = computed(() => {
 
 onMounted(() => {
   _getTreasureConfig()
+  trackRef({category: 'view', extra: 'home(pro.ave.ai)'})
 })
 const wsStore = useWSStore()
 // 把榜单的订阅取消掉
@@ -62,15 +66,15 @@ function listMapFunction(i: Record<string, any>) {
     ;(progress_obj[`progress_buys_tx_${t}_count`] =
       i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`] > 0
         ? (i[`buys_tx_${t}_count`] / (i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`])) * 100
-        : 0),
+        : 0);
       (progress_obj[`progress_sells_tx_${t}_count`] =
         i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`] > 0
           ? (i[`sells_tx_${t}_count`] / (i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`])) * 100
-          : 0),
+          : 0);
       (progress_obj[`progress_buy_volume_u_${t}`] =
         i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`] > 0
           ? (i[`buy_volume_u_${t}`] / (i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`])) * 100
-          : 0),
+          : 0);
       (progress_obj[`progress_sell_volume_u_${t}`] =
         i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`] > 0
           ? (i[`sell_volume_u_${t}`] / (i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`])) * 100
@@ -210,7 +214,7 @@ function listMapFunction(i: Record<string, any>) {
     medias: getMedias(i.appendix),
     ...progress_obj,
     normal_tag: normal_tag?.slice(0, 3) || [],
-    signal_arr: signal_arr?.slice(0, 1) || [],
+    signal_arr: signal_arr?.slice(0, 1) || []
   }
 }
 
@@ -252,6 +256,7 @@ function getMedias(appendix: string) {
     <KeepAlive :max="6">
       <component
         :is="components[activeTab]"
+        ref="dynamicComponentRef"
         :listMapFunction="listMapFunction"
         :activeChain="activeChain"
         :activeTab="activeTab"

@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div v-if="(result?.total<=0) && (walletStore.walletName === 'WatchWallet')"/>
+  <div v-else>
     <span
       class="flex items-center text-14px cursor-pointer color-[--d-FFF-l-333]"
       @click="showBlackList"
@@ -29,13 +30,15 @@
         </el-input>
 
         <div class="relative">
-          <el-table :data="result.list" row-class-name="!bg-[var(--el-bg-color)]" :loading="result.loading">
+          <el-table v-loading="result.loading" :data="result.list"  row-class-name="!bg-[var(--el-bg-color)]" style="height: 283px;">
             <template #empty>
-              <div v-if="!result.loading" class="text-12px">
-                {{ t('emptyNoData') }}
+              <div v-if="!result.loading" class="text-12px flex flex-col items-center justify-center h-250px">
+                <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
+                <img v-if="mode === 'dark'" src="@/assets/images/empty-black.svg">
+                <span>{{ t('emptyNoData') }}</span>
               </div>
+              <div v-else class="text-12px"/>
             </template>
-
             <el-table-column :label="t('name')">
               <template #default="{ row }">
                 <div class="flex items-center" @click="jumpToTokenDetail(row)">
@@ -60,7 +63,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column min-width="60" :label="t('operation')">
+            <el-table-column min-width="70" :label="t('operation')">
               <template #default="{ row }">
                 <div class="">
                   <el-button
@@ -81,7 +84,7 @@
           v-if="result.total"
           v-model:current-page="query.pageNo"
           v-model:page-size="query.pageSize"
-          class="pagination-box mx-auto"
+          class="pagination-box mx-auto bg-[--d-222-l-FFF]! border-t-none!"
           layout="total, prev, pager, next"
           :total="result.total"
           hide-on-single-page
@@ -98,13 +101,16 @@
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-
+import { useThrottleFn } from '@vueuse/core'
 import { getTokenFilterList, setUserTokenStatus } from '@/api/wallet'
 
 const { t } = useI18n()
 
+const {updateHolderNum}= storeToRefs(useUserStore())
 const router = useRouter()
 const route = useRoute()
+const walletStore = useWalletStore()
+const {mode} = useGlobalStore()
 const configStore = useConfigStore()
 const s3BaseUrl = configStore.token_logo_url
 
@@ -138,7 +144,12 @@ const showBlackList = () => {
   getBlackList()
 }
 
-const getBlackList = async () => {
+onMounted(() => {
+  if(walletStore.walletName==='WatchWallet'){
+    getBlackList()
+  }
+})
+const getBlackList = useThrottleFn(async () => {
   try {
     result.value.loading = true
     const res = await getTokenFilterList({
@@ -154,7 +165,7 @@ const getBlackList = async () => {
   } finally {
     result.value.loading = false
   }
-}
+}, 500)
 
 const closeDialog = () => {
   result.value.list = []
@@ -187,6 +198,7 @@ const addWhiteList = async ({ token, chain }) => {
     )
     await getBlackList()
     emit('addWhite')
+    updateHolderNum.value++
     ElMessage.success(t('success'))
   } catch (error) {
     console.error('Error adding to whitelist:', error)

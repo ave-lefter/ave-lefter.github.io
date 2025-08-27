@@ -1,6 +1,9 @@
 <template>
-  <Draggable v-if="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing" @on-drag="drag">
+  <Draggable 
+  :class="{ 'left-drag': monitorStore.isLeftFixed, 'right-drag': monitorStore.isRightFixed }"
+  :shouldRenderChild="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing" @on-drag="drag">
     <!-- <Monitor v-bind="props2"/> -->
+    <!-- {{ dragStore.leftWidth.signal }}{{ dragStore.leftWidth.monitor }} {{ dragStore.leftWidth.pump }} -->
     <component :is="lazyComponent" v-bind="props2"/>
   </Draggable>
 </template>
@@ -8,6 +11,7 @@
 <script setup lang="ts">
 const signalStore = useSignalStore()
 const monitorStore = useMonitorStore()
+const dragStore = useDragStore()
 const {placement}=storeToRefs(monitorStore)
 const {lang} = storeToRefs(useGlobalStore())
 const key=ref(0)
@@ -58,12 +62,13 @@ const props1=computed(()=>{
       minHeight:160,
       parent: true,
       handles:['tl','tm','tr','mr','br','bm','bl','ml'],
-      dragHandle:'.drag-handle'
+      dragHandle:'.drag-handle',
+      z:1
     }
   }else if(placement.value==='left'){
     data={
       className: '[&&]:relative shrink-0 left fixed! top-61px',
-      style: `left:${(signalStore.isLeftFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0}px`,
+      style: `left:${dragStore.leftWidth.monitor}px`,
       axis: 'x',
       x: 0,
       minWidth: lang.value.indexOf('zh') > -1 ? 360 : 360,
@@ -78,22 +83,8 @@ const props1=computed(()=>{
     data = {
       className: '[&&]:relative shrink-0 right fixed! top-61px left-0',
       axis: 'x',
-      x: monitorStore.winWidth - monitorStore.fixedWidth - ((signalStore.isRightFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0),
+      x: dragStore.rightWidth.monitor,
       y:0,
-      minWidth: lang.value.indexOf('zh') > -1 ? 360 : 360,
-      maxWidth: 438,
-      initialWidth: monitorStore.fixedWidth,
-      initialHeight: monitorStore.winHeight - 95,
-      parent: true,
-      handles: ['ml'],
-      dragHandle: '.drag-handle'
-    }
-  }else if(placement.value==='right2'){
-    data = {
-      className: '[&&]:relative shrink-0 right2 fixed! top-61px left-0',
-      axis: 'x',
-      x: monitorStore.winWidth - monitorStore.fixedWidth - ((signalStore.isRightFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0),
-      maxX:monitorStore.winWidth - monitorStore.fixedWidth - ((signalStore.isRightFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0),
       minWidth: lang.value.indexOf('zh') > -1 ? 360 : 360,
       maxWidth: 438,
       initialWidth: monitorStore.fixedWidth,
@@ -134,8 +125,6 @@ function dragStop(x: number, y: number) {
   if(placement.value==='left'){
     monitorStore.onLeftDragStop(x,y)
   }else if(placement.value==='right'){
-    monitorStore.onRightDragStop(x,y)
-  }else if(placement.value==='right2'){
     monitorStore.onRightDragStop(x,y)
   }else{
     monitorStore.onDragStop(x,y)

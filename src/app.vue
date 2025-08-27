@@ -16,6 +16,7 @@
   import en from 'element-plus/es/locale/lang/en'
   import type {GetHotTokensResponse} from '~/api/token'
   import {ProvideType} from '~/utils/constants'
+  import { setRefCodeToCookie } from './utils'
   const elementLocale = shallowRef(en)
 
   const elementLocaleMap: Map<string, typeof en> = new Map()
@@ -66,6 +67,7 @@
     useRemarksStore().initRemarks()
     useBotSwapStore().sendNativePriceWs()
     useWalletStore().initWallet()
+    setRefCodeToCookie()
   }
 
   onBeforeMount(() => {

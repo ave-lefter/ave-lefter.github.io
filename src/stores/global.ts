@@ -49,16 +49,18 @@ export const useGlobalStore = defineStore('global', () => {
     isGutter: boolean
     isRight: boolean
     isBlacklist: boolean
+    show_search: boolean
     define: string[]
   }>('pumpSetting', {
     fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
-    avatar_isCircle: 'circle',
-    isGutter: false,
+    avatar_isCircle: 'rect',
+    isGutter: true,
     isRight: false,
     isBlacklist: true,
-    define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','cabal','insider', 'sniper', 'rug', 'kol'],
+    show_search: true,
+    define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','insider', 'sniper', 'rug', 'kol', 'markers'],
   })
 
   const hide_risk=shallowRef(1)
@@ -72,6 +74,7 @@ export const useGlobalStore = defineStore('global', () => {
   const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
+  const holderBlackList = useStorage<Array<pumpBlack>>('holderBlackList', [])
 
    const hotList = shallowRef<GetHotTokensResponse[]>([])
    function sendFooterPriceWs() {
@@ -149,6 +152,7 @@ export const useGlobalStore = defineStore('global', () => {
     showLeft,
     pumpSetting,
     pumpBlackList,
+    holderBlackList,
     hotList,
     hide_small,
     hide_risk,

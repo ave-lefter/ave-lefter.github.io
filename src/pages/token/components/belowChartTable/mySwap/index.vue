@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, nextTick, onActivated } from 'vue'
 import { useBotStore } from '@/stores/bot'
 import { getChainInfo } from '@/utils'
 import unified from './unified.vue'
 import { bot_getUserWalletTxInfo } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
 import { useSessionStorage } from '@vueuse/core'
+
+// const props = defineProps({
+//   currentActiveTab: {
+//     type: String,
+//     default: ''
+//   }
+// })
 
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -16,7 +23,7 @@ const wsStore = useWSStore()
 
 const unifiedRef = ref()
 const _chain = getAddressAndChainFromId(route.params.id as string)?.chain
-const activeTab = ref(_chain || 'solana')
+const activeTab = ref(_chain || walletStore.chain || 'solana')
 const botOrderOnlyCurrentToken = useSessionStorage('mySwapBotOrderOnlyCurrentToken', true)
 const walletTxData = ref<any>()
 const tabs = computed(() => {
@@ -100,11 +107,9 @@ const userAddress = computed(() => {
 
 function setActiveTab(val: string) {
   activeTab.value = val
-  getWalletTxData()
-}
-
-function toggleCurrentToken() {
-  botOrderOnlyCurrentToken.value = !botOrderOnlyCurrentToken.value
+  nextTick(() => {
+    getWalletTxData()
+  })
 }
 
 // 定义移除字符串开头负号的函数
@@ -142,6 +147,9 @@ watch([() => wsStore.wsResult?.tgbot], () => {
   }
   getWalletTxData()
   unifiedRef.value?.getTxHistory()
+  setTimeout(() => {
+    unifiedRef.value?.getTxHistory()
+  }, 3000)
   if (!timer) {
     timer = setInterval(() => {
       if (lastUpdateTime >= maxUpdateNum) {
@@ -169,7 +177,16 @@ watch([() => route.params.id], () => {
     clearInterval(timer)
     timer = null
   }
+  refreshData()
 })
+
+function refreshData() {
+  getWalletTxData()
+
+  if (unifiedRef.value) {
+    unifiedRef.value.getTxHistory()
+  }
+}
 
 onMounted(() => {
   const chain = getAddressAndChainFromId(String(route.params.id))?.chain
@@ -178,12 +195,17 @@ onMounted(() => {
   }
   getWalletTxData()
 })
+
+onActivated(() => {
+   refreshData()
+})
 </script>
 
 <template>
   <div>
-    <div v-if="botStore?.userInfo?.evmAddress" class="px-12px mb-10px flex justify-between">
-      <div class="flex items-center whitespace-nowrap w-[80%] overflow-x-auto scrollbar-hide">
+    <div v-if="botStore?.userInfo?.evmAddress || walletStore.address" class="px-12px mb-10px flex justify-between">
+      <!-- Bot钱包显示链选择器 -->
+      <div v-if="botStore?.userInfo?.evmAddress" class="flex items-center whitespace-nowrap w-[80%] overflow-x-auto scrollbar-hide">
         <a
           v-for="(item) in tabs" :key="item.chain" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-999-l-666] px-12px py-4px rounded-4px
           ${activeTab === item.chain ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333]' : ''}`"
@@ -191,18 +213,20 @@ onMounted(() => {
           {{ getChainInfo(item.chain).name }}
         </a>
       </div>
+      <!-- 链钱包显示当前链名称 -->
+      <div v-else class="flex items-center">
+        <span class="text-12px text-[--d-999-l-666] px-12px py-4px">
+          <!-- {{ getChainInfo(walletStore.chain || activeTab).name }} -->
+        </span>
+      </div>
+
       <div class="flex items-center gap-3">
         <el-checkbox v-model="botOrderOnlyCurrentToken" :label="t('currentToken')" size="small" style="font-size: 12px;color:var(--d-666-l-333)" />
-        <!-- <button
-          class="h-6 text-xs rounded border-0 px-2.5 cursor-pointer bg-[rgba(63,128,247,0.10)] text-[#3F80F7] whitespace-nowrap"
-          :class="[botOrderOnlyCurrentToken && '!bg-[#3F80F7] !text-white']" @click="toggleCurrentToken">
-          {{ t('currentToken') }}
-        </button> -->
       </div>
     </div>
 
     <!-- 顶部交易统计区域 -->
-    <div class="transaction-stats">
+    <div v-if="activeTab !== 'xlayer'" class="transaction-stats">
       <div class="stat-item">
         <div class="stat-label text-[--d-666-l-999]">{{ t('balance1') }}</div>
         <div class="stat-value table-field-text text-[var(--d-999-l-959A9F)]">${{ formatNumber(balance, 2) }}</div>
@@ -254,7 +278,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <unified v-if="botStore?.userInfo?.evmAddress" ref="unifiedRef" :chain="activeTab" :currentToken="botOrderOnlyCurrentToken" :userAddress="userAddress || ''" />
+    <unified v-if="botStore?.userInfo?.evmAddress || walletStore.address" ref="unifiedRef" :chain="activeTab" :currentToken="botOrderOnlyCurrentToken" :userAddress="userAddress || ''" />
   </div>
 </template>
 

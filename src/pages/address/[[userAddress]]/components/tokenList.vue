@@ -22,7 +22,7 @@
       </template>
       <TokenColumn
         :column-props="{
-          label: $t('recentlyTrade'),
+          label: $t('walletToken')+'/'+$t('recentlyTrade'),
           width: '180',
           fixed: 'left',
           sortable: 'custom',
@@ -30,7 +30,7 @@
           prop: 'last_txn_time',
         }"
       >
-        <template v-if="isSelfAddress" #default="{ row }">
+        <template v-if="isSelfAddress && (walletStore.walletName!=='WatchWallet')" #default="{ row }">
           <Icon
             name="bx:bxs-hide"
             class="absolute top-0 left-0 hidden bxs-hide cursor-pointer color-#959a9f"
@@ -216,7 +216,7 @@
       v-model="hideTokenVisible"
       :row="currentHideToken"
       :self_address="address"
-      @hideToken="$emit('hideToken')"
+      @hideToken="()=>{}"
     />
   </div>
 </template>
@@ -269,6 +269,7 @@ const hideTokenVisible = ref(false)
 const currentHideToken = ref({})
 const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
 const themeStore = useThemeStore()
+const walletStore = useWalletStore()
 const tokenDetailSStore = useTokenDetailsStore()
 const route = useRoute()
 function jumpBalance(row) {
@@ -289,7 +290,7 @@ function jumpBalance(row) {
       token1_symbol: '',
       pairAddress: '',
     },
-    user_address: route.params.userAddress,
+    user_address: route.params.userAddress as string || useBotStore().getWalletAddress(row.chain),
   })
 }
 

@@ -20,12 +20,12 @@ const activeTab = shallowRef<keyof typeof components>('Trending')
 const tabs = computed(()=>{
     return [
     {name: t('trending'), component: 'Trending' as const},
-    {name: 'Pump', component: 'Pump' as const},
+    // {name: 'Pump', component: 'Pump' as const},
   ]
 })
 const components = {
   Trending,
-  Pump: defineAsyncComponent(() => import('./pump.vue'))
+  // Pump: defineAsyncComponent(() => import('./pump.vue'))
 }
 const Component = computed(() => {
   return components[activeTab.value]

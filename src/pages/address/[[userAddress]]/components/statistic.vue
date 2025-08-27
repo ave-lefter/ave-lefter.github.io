@@ -13,7 +13,7 @@
           iconSize="60px"
         />
         <div>
-          <div class="flex items-start mb-1.5">
+          <div class="flex items-center mb-1.5">
             <UserRemark
               :key="address"
               class="gap-1.5 text-6 leading-7.5 text-[var(--a-text-5-color)]"
@@ -93,7 +93,7 @@
           {{ formatNumber(Math.abs((statistics.profit ?? 0) / main_token_price), 2) }}
           {{ main_token_symbol }}
         </AveNumber>
-        <AveNumber :value="statistics.profit_ratio">
+        <AveNumber :value="statistics.profit_ratio" class="ml-1">
           {{ formatNumber(Math.abs((statistics?.profit_ratio ?? 0) * 100), 1) }}%
         </AveNumber>
       </p>
@@ -346,20 +346,22 @@ const wallet_age = computed(() => {
     : getDuring(_wallet_age ? ((Number(_wallet_age) || 0) * 1000) : undefined)
 })
 
+const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
+
 const total_balance = computed(() => {
   const formatMap: Record<string, number> = {
     solana: 2,
     bsc: 4,
+    eth: 4,
+    base: 4,
   }
   const { total_balance_without_risk } = balanceAnalysis.value
 
   return formatNumber((Number(total_balance_without_risk) || 0) / Number(main_token_price.value), {
-    decimals: formatMap[chain.value],
+    decimals: injecteIsVolUSDT?.value ? 4 : formatMap[chain.value],
     limit: 20,
   })
 })
-
-const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
 
 const main_token_price = computed(() => {
   return injecteIsVolUSDT?.value ? 1 : Number((balanceAnalysis.value.main_token_price || 0))

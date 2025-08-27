@@ -41,6 +41,14 @@ defineExpose({
   },
   updateListData(callback: (p: GetSignalV2ListResponse<IActionItem | IActionV3Item>[]) => GetSignalV2ListResponse<IActionItem | IActionV3Item>[]) {
     listData.value = callback(listData.value)
+  },
+  setScrollTop(scrollTop: number){
+    if(scrollbar.value){
+      scrollbar.value.scrollTo({
+        top: scrollTop,
+        behavior: 'smooth'
+      })
+    }
   }
 })
 watch(() => props.activeChain, () => {

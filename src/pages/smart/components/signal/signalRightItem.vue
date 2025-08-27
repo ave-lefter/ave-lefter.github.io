@@ -2,6 +2,7 @@
 import type {GetSignalV2ListResponse, IActionItem, IActionV3Item} from '~/api/signal'
 import QuickSwapButton from '~/components/quickSwap/quickSwapButton.vue'
 import UserAvatar from '~/components/userAvatar.vue'
+import XIcon from '~/components/xPopup/xIcon.vue'
 
 const props = withDefaults(defineProps<{
   footer?: boolean,
@@ -87,7 +88,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
           <div>
             <div class="flex mb-2px items-center">
               <span
-                class="text-16px font-500 color-[--d-F5F5F5-l-333] mr-8px cursor-pointer"
+                class="text-16px font-500 color-[--d-F5F5F5-l-333] mr-8px cursor-pointer max-w-140px truncate"
                 @click="navigateTo(`/token/${item.token}-${item.chain}`)"
               >{{ item.symbol }}</span>
               <a
@@ -136,13 +137,20 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
                   item.token.slice(0, 4)
                 }}...{{ item.token.slice(-4) }}</span>
               <Icon v-copy="item.token" name="bxs:copy" class="cursor-pointer text-12px"/>
-              <a
-                :href="item.twitter_url"
-                target="_blank"
-                class="mr-4px w-12px h-12px rounded-2px bg-[--d-1A1A1A-l-F2F2F2] flex items-center justify-center"
-              >
-                <Icon name="custom:twitter" class="text-10px"/>
-              </a>
+              <XPopup v-if="item.twitter_url" :tokenId="item.token + '-' + item.chain" :type="item.twitter_type">
+                <a
+                  :href="item.twitter_url"
+                  target="_blank"
+                  class="mr-4px w-12px h-12px rounded-2px bg-[--d-1A1A1A-l-F2F2F2] flex items-center justify-center clickable"
+                >
+                   <XIcon
+                      v-if="[1, 2, 3].includes(item.twitter_type)"
+                      :type="item.twitter_type"
+                      class="text-12px"
+                    />
+                  <Icon v-else name="custom:twitter" class="text-10px"/>
+                </a>
+              </XPopup>
             </div>
           </div>
         </div>
@@ -207,8 +215,8 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
             <Icon name="custom:filter"/>
           </div>
           <div
-            class="color-[--d-666-l-999] hover:color-[--d-F5F5F5-l-333] flex items-center gap-2px"
             v-tooltip="formatDate(item.signal_time,'YYYY-MM-DD HH:mm:ss')"
+            class="color-[--d-666-l-999] hover:color-[--d-F5F5F5-l-333] flex items-center gap-2px"
           >
             <Icon name="custom:clock" class="text-10px mr-2px"/>
             <div>
@@ -270,7 +278,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
       <div class="w-100px text-right">
         {{ $t('operate') }}
       </div>
-      <div class="flex-1 text-right" v-if="!filterToken">
+      <div v-if="!filterToken" class="flex-1 text-right">
         {{ $t('balance1') }}
       </div>
       <div class="w-40px text-right">
@@ -313,8 +321,8 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
         </div>
         <div class="w-100px text-right color-#12B886">
           {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : '' }}<span
-          class="decoration-underline decoration-dotted underline-offset-2px"
           v-tooltip="'$'+formatNumber(quote_token_volume, 2)"
+          class="decoration-underline decoration-dotted underline-offset-2px"
         >
           {{ formatNumber(quote_token_amount, 2) }} {{
             quote_token_symbol.toUpperCase() === 'USDC' ? 'U' : quote_token_symbol
@@ -322,7 +330,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
         </span>
           <!--<span class="color-[&#45;&#45;d-999-l-666]">(${{ formatNumber(quote_token_volume, 0) }})</span>-->
         </div>
-        <div class="flex-1 text-right" v-if="!filterToken">
+        <div v-if="!filterToken" class="flex-1 text-right">
             <span
               v-if="!token_balance_usd || Number(token_balance_usd)===0"
               class="color-#F6465D"

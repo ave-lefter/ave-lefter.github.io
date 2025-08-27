@@ -2,8 +2,7 @@
   <el-dialog v-model="dialogVisible" class="dialog-position" :title="$t('myPosition1')" width="680" append-to-body>
     <slot/>
     <el-table
-      class="table-position w-100%" :data="dataSource" :height="400" @row-click="tableRowClick
-      ">
+      class="table-position w-100%" :data="dataSource" :height="400" @row-click="tableRowClick" row-class-name="group">
       <template #empty>
         <div v-if="!paginationParams.loaded" class="flex flex-col items-center justify-center py-30px">
           <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
@@ -31,9 +30,15 @@
         <template #default="{ row }">
           <div>
             <template v-if="col?.prop === 'token'">
-              <div class="flex items-center gap-8px clickable flex-nowrap">
-                <TokenImg :row="row" class="w-24px h-24px" />
-                <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-90px">{{ row?.symbol }}</div>
+              <div class="flex items-center clickable flex-nowrap relative">
+                <Icon
+                  v-if="walletStore.walletName!=='WatchWallet'"
+                  name="bx:bxs-hide"
+                  class=" bxs-hide cursor-pointer color-#959a9f overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out"
+                  @click.self.stop="hideToken(row)"
+                />
+                <TokenImg :row="row" class="w-24px h-24px mr-8px" />
+                <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-90px mr-8px">{{ row?.symbol }}</div>
                 <Icon
                     v-if="row.risk_score > 55 || row.risk_level < 0"
                     name="custom:danger"
@@ -62,10 +67,17 @@
           <div v-else-if="paginationParams.finished && dataSource?.length > 0" class="text-center px-0 pt-15px pb-10px text-12px text-[#959a9f]">{{ $t('noMore') }}</div>
       </template>
     </el-table>
+    <HideTokenDialog
+      v-model="hideTokenVisible"
+      :row="currentHideToken"
+      :self_address="self_address"
+      @hideToken="()=>{}"
+    />
   </el-dialog>
 </template>
 
 <script setup lang="ts">
+import HideTokenDialog from '../../../pages/address/[[userAddress]]/components/hideTokenDialog.vue'
 import TokenImg from '@/components/tokenImg.vue'
 import { defaultPaginationParams, downColor, upColor } from '@/utils/constants'
 import { QuestionFilled } from '@element-plus/icons-vue'
@@ -74,6 +86,10 @@ import { getUserBalance, type GetUserBalanceResponse } from '~/api/swap'
 const { mode } = storeToRefs(useGlobalStore())
 const { t } = useI18n()
 const $router = useRouter()
+
+const botStore = useBotStore()
+const walletStore = useWalletStore()
+const {updateHolderNum}= storeToRefs(useUserStore())
 const columns = computed(() => {
   return [
     {
@@ -147,7 +163,10 @@ const props = defineProps({
     })
   },
 })
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue','hideToken'])
+
+const hideTokenVisible = ref(false)
+const currentHideToken = ref({} as any)
 
 const paginationParams = ref({...defaultPaginationParams})
 
@@ -155,6 +174,25 @@ const dialogVisible = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
 })
+
+const self_address = computed(() => {
+  if (currentHideToken.value?.chain !== 'solana') {
+    return botStore.evmAddress || walletStore.address
+  } else {
+    return botStore.getWalletAddress('solana') || walletStore.address
+  }
+})
+
+watch(()=>updateHolderNum.value, () => {
+  paginationParams.value={...defaultPaginationParams}
+  fetchTable()
+})
+
+function hideToken(row:any) {
+  hideTokenVisible.value = true
+  currentHideToken.value = row
+}
+
 function tableRowClick(row: rowProps) {
   $router.push({
     name: 'token-id',
@@ -247,6 +285,10 @@ onMounted(() => {
   :deep() .cell{
     padding: 0;
   }
-
+}
+.hover-row {
+  .bxs-hide {
+    display: block;
+  }
 }
 </style>

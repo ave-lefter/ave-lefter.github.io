@@ -13,7 +13,8 @@ const route = useRoute()
 const isNew = computed(() => {
   const { chain } = getAddressAndChainFromId(route.params?.id, 0)
 
-  return SupportFullDataChain?.includes(chain)
+  return SupportFullDataChain.includes(chain)
+  // return ['solana', 'bsc','eth'].includes(chain)
 })
 </script>
 

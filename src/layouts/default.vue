@@ -10,14 +10,14 @@
        <!-- :style="signalStore.translateStyle"  translate-x-0px-->
       <div
         :class="['relative flex bg-[--d-000-l-F6F6F6] gap-1px pt-1px transition-transform transition-duration-300 overflow-hidden',]"
-        :style="{..._style,transform:`translateX(${signalStore.translateStyle||monitorStore.translateStyle}px)`}"
+        :style="{..._style,transform:`translateX(${signalStore.translateStyle||monitorStore.translateStyle||dragPumpStore.translateStyle}px)`}"
       >
         <slot/>
       </div>
       <TheFooter />
     </div>
-   
-    <Draggable
+
+    <!-- <Draggable
       v-if="!signalStore.isLeftFixed&&!signalStore.isRightFixed&&signalStore.signalVisible"
       class-name="top-0 left-0 fixed"
       :z="3"
@@ -91,9 +91,9 @@
         :container-width="signalStore.fixedWidth"
         :scroll-height="signalStore.winHeight-200"
       />
-    </Draggable>
-    
-    
+    </Draggable> -->
+
+
      <!-- <Draggable
       v-if="!monitorStore.isLeftFixed&&!monitorStore.isRightFixed&&monitorStore.visible"
       class-name="top-0 left-0 fixed"
@@ -184,50 +184,67 @@
     >
       <Monitor :scroll-height="monitorStore.winHeight-160"/>
     </Draggable> -->
+    <SignalDraggable v-if="!signalStore.shouldHide"/>
     <MonitorDragger v-show="monitorStore.visible"/>
+    <DragPump v-show="dragPumpStore.visible&&!dragPumpStore.shouldHide"/>
     <FavAddressPop ref="favAddressPopRef" :visible="favAddressPopVisible" :button-ref="attentionTrigger || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" @onCancel="() => favAddressPopVisible = false"/>
     <PnlTracker v-if="globalStore.pnlTrackerVisible"/>
+    <Top v-if="topVisible" @click="scrollToTop"/>
   </div>
 </template>
 
 <script setup lang='ts'>
   import TheHeader from '@/components/layouts/TheHeader.vue'
   import TheFooter from '@/components/layouts/TheFooter.vue'
-  const PnlTracker  = defineAsyncComponent(()=>import('./components/pnlTracker.vue'))
 
+  import SignalDraggable from '~/components/signal/signalDraggable.vue'
+import { useEventBus } from '@vueuse/core'
+  const PnlTracker  = defineAsyncComponent(()=>import('./components/pnlTracker.vue'))
   const botStore = useBotStore()
   const {addressGroups,attentionTrigger,favAddressPopVisible,handleAddAttention} = storeToRefs(useFollowStore())
   const signalStore = useSignalStore()
   const monitorStore = useMonitorStore()
   const globalStore = useGlobalStore()
+  const dragPumpStore = usePumpStore()
+  const route = useRoute()
 
   const _style=computed(()=>{
     let paddingLeft=0
     let paddingRight=0
-    if(monitorStore.visible||signalStore.signalVisible){
-      if(signalStore.signalVisible){
-        if(signalStore.isLeftFixed){
-          paddingLeft+=signalStore.fixedWidth+1
-        }else if(signalStore.isRightFixed){
-          paddingRight+=signalStore.fixedWidth+1
-        }
-      }
-      if(monitorStore.visible){
-        if(monitorStore.isLeftFixed){
-          paddingLeft+=monitorStore.fixedWidth+1
-        }else if(monitorStore.isRightFixed){
-          paddingRight+=monitorStore.fixedWidth+1
-        }
-      }
-      return {
-        paddingLeft:paddingLeft+'px',
-        paddingRight:paddingRight+'px',
+    if(signalStore.signalVisible && !signalStore.shouldHide){
+      if(signalStore.isLeftFixed){
+        paddingLeft+=signalStore.fixedWidth+1
+      }else if(signalStore.isRightFixed){
+        paddingRight+=signalStore.fixedWidth+1
       }
     }
-    else{
+    ;[monitorStore,dragPumpStore].forEach(storeItem=>{
+      // 不存在 shouldHide 属性或者 shouldHide 为 false
+      if(storeItem.visible && (!('shouldHide' in storeItem) || !storeItem.shouldHide)){
+        if(storeItem.isLeftFixed){
+          paddingLeft+=storeItem.fixedWidth+1
+        }else if(storeItem.isRightFixed){
+          paddingRight+=storeItem.fixedWidth+1
+        }
+      }
+    })
+    if(paddingLeft===0&&paddingRight===0){
       return {}
     }
+    return {
+      paddingLeft:paddingLeft+'px',
+      paddingRight:paddingRight+'px',
+    }
   })
+
+  const topVisible = computed(()=>{
+   return ['/smart','/address'].some(url=>route.fullPath.includes(url)) 
+  })
+
+  const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
+  function scrollToTop() {
+    scrollTopEvent.emit()
+  }
 </script>
 
 <style lang="scss">

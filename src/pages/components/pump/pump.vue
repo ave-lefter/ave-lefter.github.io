@@ -271,7 +271,7 @@ const filterMap = {
   insider_balance_ratio_cur: (el: any) => el.isVisible && props.activeChain === 'bsc',
   price_change_dynamic: (el: any) =>
     el.isVisible && !['1m', '24h'].includes(globalStore.rankCommon.activeInterval),
-  quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible && !walletStore.address,
+  quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible,
   first_half_elapsed_time: (el: any) => el.isVisible && props.activeSubTab === 'pump_in_almost',
   second_half_elapsed_time: (el: any) => el.isVisible && props.activeSubTab === 'pump_in_almost',
   progress:(el:any)=>el.isVisible && props.activeSubTab.includes('_in'),
@@ -361,7 +361,7 @@ const cellRenderer = computed(() => {
 })
 </script>
 <template>
-  <div v-loading="loading" style="height: calc(100vh - 251px)">
+  <div v-loading="loading" style="height: calc(100vh - 229px)">
     <AveTable
       row-key="rowKey"
       :loading="loading"
@@ -408,7 +408,7 @@ const cellRenderer = computed(() => {
     v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
-    class="mt-5px py-20px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
+    class="mt-5px py-9px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
     layout="total, prev, pager, next"
     :total="pageInfo.total || 0"
     :small="false"

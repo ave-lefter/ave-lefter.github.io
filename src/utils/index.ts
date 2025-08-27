@@ -124,7 +124,7 @@ export function getAddressAndChainFromId(id: string, type: number = 0) {
 }
 
 // 传去 时间长度 返回 格式化的时间
-export function formatTime(time: number | string) {
+export function formatTime(time: number | string,isMaxDayUnit=false) {
   if (!time) {
     return 0
   }
@@ -143,7 +143,7 @@ export function formatTime(time: number | string) {
   if (time < 3600 * 24) {
     return `${Math.floor(time / 3600)}h`
   }
-  if (time < 3600 * 24 * 30) {
+  if (time < 3600 * 24 * 30 || isMaxDayUnit) {
     return `${Math.floor(time / 3600 / 24)}d`
   }
   if (time < 3600 * 24 * 30 * 12) {
@@ -152,7 +152,7 @@ export function formatTime(time: number | string) {
   return `${Math.floor(time / 3600 / 24 / 30 / 12)}y`
 }
 
-export function formatTimeFromNow(val: number | string, isNum = false) {
+export function formatTimeFromNow(val: number | string, isNum = false,isMaxDayUnit=false) {
   let timeStamp: number | string = Number(Number(val) * 1000)
   if (!timeStamp) {
     timeStamp = val
@@ -165,7 +165,7 @@ export function formatTimeFromNow(val: number | string, isNum = false) {
   if (isNum) {
     return time
   }
-  return formatTime(time)
+  return formatTime(time,isMaxDayUnit)
 }
 
 export function formatUrl(url: string) {
@@ -456,7 +456,7 @@ export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
     try {
       return 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(defaultSvg)))
     } catch (err) {
-      console.log(err)
+      // console.log(err)
       return ''
     }
   }
@@ -735,6 +735,16 @@ export function scrollTabToCenter(tabsContainer: Ref<HTMLElement | null>, index:
   })
 }
 
+export function scrollElement(tabsContainer: HTMLElement | null, scrollValue: number) {
+  if (!tabsContainer) {
+    return
+  }
+  tabsContainer.scrollTo({
+    left: tabsContainer.scrollLeft + scrollValue,
+    behavior: 'smooth',
+  })
+}
+
 export function uuid() {
   return Math.random().toString(36).slice(-8) + Date.now()
 }
@@ -747,7 +757,7 @@ export function getMCap(row: GetHotTokensResponse | SearchHot) {
   return amount.gt(0) ? amount.multipliedBy(row.current_price_usd).toString() : '0'
 }
 
-export function formatCountdown(time: ConfigType) {
+export function formatCountdown(time: ConfigType, isSecond = true) {
   const seconds = Math.abs(dayjs(time).diff(dayjs(), 's'))
   if (seconds < 60) {
     return `${seconds}s`
@@ -756,7 +766,8 @@ export function formatCountdown(time: ConfigType) {
     const minutes = Math.floor(seconds / 60)
     let remainingSeconds = seconds % 60
     remainingSeconds = Math.floor(remainingSeconds)
-    return `${minutes}min ${remainingSeconds > 0 ? remainingSeconds + 's' : ''}`
+
+    return `${minutes}min ${remainingSeconds > 0 && isSecond ? remainingSeconds + 's' : ''}`
   } else if (seconds < 86400) {
     // 1d
     const hours = Math.floor(seconds / 3600)
@@ -916,4 +927,97 @@ export function getFeeIn(bestRoute: { fee_index?: number; feeIn?: number }, chai
     return String(bestRoute.fee_index ?? bestRoute.feeIn ?? '100')
   }
   return String(bestRoute.feeIn ?? '2')
+}
+
+export function setRefCodeToCookie() {
+  // 设置到一级域名下并设置过期时间为永不过期
+  const domain = location.hostname
+  const queryString = location.search
+  const params = new URLSearchParams(queryString)
+  const ref = params.get('ref') || params.get('code') || Cookies.get('refCode') || ''
+  // category utm_source eid pid
+  // let category = params.get('category') || ''
+  const utm_source = params.get('utm_source') || ''
+  const eid = params.get('eid') || ''
+  const pid = params.get('pid') || ''
+  if (ref) {
+    // 设计过期时间为 12 小时
+    document.cookie = `refCode=${ref};domain=${domain};path=/;expires=${new Date(Date.now() + 12 * 60 * 60 * 1000).toUTCString()}`
+  }
+  if (utm_source || eid || pid || ref) {
+      Cookies.set('refInfo', JSON.stringify({
+        utm_source,
+        eid,
+        pid,
+        code: ref,
+        // id: id
+      }), { expires: 0.5 })
+  }
+}
+
+export function getMedias(appendix: string | undefined,t:ReturnType<typeof useI18n>['t']) {
+  if (!appendix) return []
+  if (isJSON(appendix)) {
+    const obj = JSON.parse(appendix)
+    const arr = []
+    if (obj?.website)
+      arr.push({
+        name: t('website'),
+        icon: 'web',
+        url: formatUrl(obj.website),
+      })
+    if (obj?.btok) arr.push({ name: 'Btok', icon: 'btok', url: formatUrl(obj.btok) })
+    if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
+    if (obj?.telegram) arr.push({ name: 'Telegram', icon: 'tg', url: formatUrl(obj.telegram) })
+    if (obj?.twitter)
+      arr.push({
+        name: 'Twitter',
+        icon: 'twitter',
+        url: formatUrl(obj.twitter),
+      })
+    return arr
+  }
+  return []
+}
+// type PlatformType = 'pump' | 'bonk' | 'moonshot' | 'raydium' | 'believe' | 'jupstudio' | 'moon_new' | 'cookingcity'
+// const pumpColorMap: Record<PlatformType, string> = {
+//   pump: '#55D592',
+//   bonk: '#FF5E1F',
+//   moonshot: '#DFFF17',
+//   raydium: '#FDB32C',
+//   believe: '#00E043',
+//   jupstudio: '#FEB069',
+//   moon_new: '#FF75FF',
+//   cookingcity: '#6C416F',
+// }
+type PlatformType = 'pump.fun' | 'letsbonk.fun' | 'dexscreener.com' | 'raydium.io' | 'believe.app' | 'jup.ag' | 'moonshot.com' | 'cookingcity'
+const pumpColorMap: Record<PlatformType, string> = {
+  'pump.fun': '#55D592',
+  'letsbonk.fun': '#FF5E1F',
+  'dexscreener.com': '#DFFF17',
+  'raydium.io': '#FDB32C',
+  'believe.app': '#00E043',
+  'jup.ag': '#FEB069',
+  'moonshot.com': '#FF75FF',
+  cookingcity: '#6C416F',
+}
+export function getPumpColor(platform: string): string {
+  return pumpColorMap[platform as PlatformType] || '#FFA622'
+}
+
+export function requestTimeout(interval: number, callback: () => void) {
+  const timerId = { id: null }
+  let lastCallTime = performance.now()
+  const request = () => {
+    timerId.id = requestAnimationFrame(() => {
+      if (performance.now() - lastCallTime < interval) {
+        request()
+      } else {
+        lastCallTime = performance.now()
+        callback()
+      }
+    })
+  }
+  request()
+  return timerId
 }

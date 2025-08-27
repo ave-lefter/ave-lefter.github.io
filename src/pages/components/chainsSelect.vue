@@ -36,7 +36,7 @@ const currentChain = computed(() => {
 <template>
   <el-select
     v-model="_activeChain"
-    class="[&&]:w-120px [&&]:[--el-select-input-color:--d-F5F5F5-l-333]"
+    class="[&&]:w-120px shrink-0 [&&]:[--el-select-input-color:--d-F5F5F5-l-333]"
     popper-class="[--el-border-color-light:transparent]"
   >
     <template #header>

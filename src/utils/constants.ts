@@ -33,6 +33,7 @@ export const WSEventType = {
   PRICE_GAINER: 'price-gainer',
   PRICE_EXTRA: 'price_extra',
   PUMPSTATE: 'pumpstate',
+  TOKEN_UPDATED: 'token_updated',
   PRICEV2: 'pricev2',
   TGBOT: 'tgbot',
   ASSET: 'asset',
@@ -40,6 +41,7 @@ export const WSEventType = {
   GOLD_SIGNAL: 'gold_signal',
   SIGNALSV2_PUBLIC_MONITOR: 'signalsv2_public_monitor',
   PUBLIC_PORTRAIT: 'public_portrait',
+  SIMPLE_TX: 'simple_tx'
 }
 
 export const MAX_UINT_AMOUNT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
@@ -90,12 +92,13 @@ export const BusEventType = {
   TOP_FAV_CHANGE: 'top-favorite-change',
   FAV_DIALOG: 'fav-dialog',
   // LEFT_DRAG: 'left-drag',
+  SCROLL_TO_TOP: 'scroll-to-top',
 }
 
 export const ProvideType = {
   HOT_TOKENS: 'hot-tokens',
 }
-export const SupportFullDataChain = ['solana', 'bsc']
+export const SupportFullDataChain = ['solana', 'bsc','eth']
 
 export const defaultPaginationParams = {
   pageNO: 1,
@@ -109,3 +112,21 @@ export const DefaultHeight = {
   TOPLEFT: window.innerHeight / 2,
   KLINE: window.innerHeight / 2
 }
+
+export const WSSimpleTxChain = ['core','arbitrum','optimism','avalanche','blast','polygon','alveychain','apchain','bitgert','cronos','cube','cvn','dogechain','drac','dojo','eos','etc','ethg','ftm','tron','aptos','fsc','mantle','mbkv2','eni','abstract','xlayer','chronoschain','marschain','xone','hyperevm','juchain','babylon','berachain','base','aia','eth','bsc','zchains','arbitrumnova','astar','aurora','metachain','b2network','bitlayer','bitonenetwork','boat','bouncebit','callisto','celo','seiv2','qom','cyber','sui','apechain','matchain','slerfchain','morph','gravity','xrpl','hyperliquid','genesys','sonic','nervosutxo','fusion','opbnb','tbc','unichain','mud','merlin','bevm','bitchain','bitrock','depass','ete','ton','solana']
+
+
+export const BotSettingsArr = [
+  {
+    value: 's1',
+    label: 'P1',
+  },
+  {
+    value: 's2',
+    label: 'P2',
+  },
+  {
+    value: 's3',
+    label: 'P3',
+  }
+] as const

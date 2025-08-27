@@ -46,6 +46,9 @@ const tableIndex = shallowRef(0)
 const total = shallowRef(0)
 const initNum = shallowRef(0)
 
+// 内存存储搜索关键词，键格式：${chain}-${category}
+const searchKeywords = ref({})
+
 const defaultConditions = ref({
   chain: 'solana',
   category: 'cowboys',
@@ -71,6 +74,7 @@ const defaultConditions = ref({
   profit_neg100_neg50_percent_num_max: '', // -100%—-50%币数 最大值
   last_trade_time_min: '', // 最近交易时间最小值（时间戳）
   last_trade_time_max: '', // 最近交易时间最大值（时间戳）
+  keyword: '',
 })
 const filterFormObj = ref({})
 
@@ -120,13 +124,15 @@ const activeCategory1 = computed(() => filterConditions.value.category)
 const activeInterval = computed(() => intervalFilter?.value['global_interval'] || '7D')
 
 async function setDialogVisible() {
-  dialogValues.value.visible = true
-  dialogValues.value.loading = true
-  try {
-    const res = await getTopSignal()
-    dialogValues.value.list = res || []
-  } finally {
-    dialogValues.value.loading = false
+  dialogValues.value.visible = !dialogValues.value.visible
+  if(dialogValues.value.visible && dialogValues.value.list.length === 0){
+    dialogValues.value.loading = true
+    try {
+      const res = await getTopSignal()
+      dialogValues.value.list = res || []
+    } finally {
+      dialogValues.value.loading = false
+    }
   }
 }
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
@@ -140,6 +146,9 @@ function handleTabChange(tab: TabId) {
   if (activeTab.value === tab) return
   setSignalSwitchFlag(tab, false)
   activeTab.value = tab
+
+  // 切换标签时清空所有搜索状态
+  searchKeywords.value = {}
 
   // 更新过滤条件
   if (tab === 'activity') {
@@ -174,6 +183,9 @@ function handleIntervalChange(interval: string) {
   getSmartList()
 }
 function init() {
+  // 页面初始化时清空所有搜索状态
+  searchKeywords.value = {}
+  
   if (filterConditions?.value) {
     activeChain2.value = filterConditions.value.chain
     // activeTab.value = filterConditions.value.category
@@ -189,6 +201,7 @@ function init() {
       version: Version,
     }
   }
+  
   // this.initFilterForm()
   getSmartList()
 }
@@ -205,6 +218,8 @@ function getSmartList(isSort = false) {
       : '',
     self_address: botStore?.evmAddress || walletStore.address,
     interval: activeInterval.value || '30D',
+    // 从内存状态获取搜索关键词
+    keyword: searchKeywords.value[currentKey] || '',
   }
 
   // 根据不同的category设置不同的默认排序参数
@@ -416,6 +431,12 @@ function initFilterForm() {
       last_trade_time: conditions?.last_trade_time || '',
       sort_dir: conditions?.sort === 'last_trade_time' ? conditions?.sort_dir || null : null,
     },
+    keyword: {
+      visible: false,
+      type: 'keyword',
+      keyword: searchKeywords.value[key] || '',  // 从内存状态获取keyword
+      sort_dir: conditions?.sort === 'keyword' ? conditions?.sort_dir || null : null,
+    },
   }
   filterFormObj.value[key] = filterForm
 }
@@ -486,7 +507,10 @@ function filterRange(prop) {
   }
   const range = rangeObj[prop]
   // let len = range?.length
-
+  if(prop === 'keyword') {
+    // 从内存状态检查搜索关键词是否激活
+    return searchKeywords.value[key] && searchKeywords.value[key] !== ''
+  }
   if (prop == 'profit_percent_num') {
     console.log('------ggg-----------', range[0], conditions, filterForm[prop])
     //  return !(len?.every(i=> (!conditions[range[i]] || conditions[range[i]] === filterForm[prop].defaultRange[i])))
@@ -580,13 +604,16 @@ function handleFilterConfirm(val) {
     }
   } else if (val.type === 'last_trade_time') {
     filterConditions.value[key].last_trade_time = val.last_trade_time
+  } else if (val.type === 'keyword') {
+    // 将搜索关键词存储到内存而不是持久化存储
+    searchKeywords.value[key] = val.keyword
   }
   val.visible = false
   resetSort()
   getSmartList()
 }
 function handleSort(val:string, dir: string) {
-  let currentForm = filterFormObj.value[activeChain2.value + '-' + activeCategory1.value]
+  const currentForm = filterFormObj.value[activeChain2.value + '-' + activeCategory1.value]
   if (val.type === 'profit_percent_num') {
     const profit_obj = currentForm?.['profit_percent_num']?.profit_obj
     for (const i in profit_obj) {
@@ -637,6 +664,11 @@ function handleReset(val) {
     filterConditions.value[key].sort = ''
 
     console.log('--1111---', val)
+  } else if (val.type === 'keyword') {
+    val.keyword = ''
+    // 同时清空内存中的搜索状态
+    const key = activeChain2.value + '-' + activeCategory1.value
+    searchKeywords.value[key] = ''
   } else {
     val.range1 = val.defaultRange
     val.range = val.defaultRange
@@ -660,6 +692,10 @@ function resetSort() {
 function switchChain(chain: string) {
   activeChain2.value = chain
   filterConditions.value.chain = chain
+  
+  // 切换链时清空所有搜索状态
+  searchKeywords.value = {}
+  
   initFilterForm()
   getSmartList()
 }
@@ -705,7 +741,7 @@ function switchChain(chain: string) {
               class="w-16px h-16px rounded-full opacity-60"
               :src="`${configStore.token_logo_url}chain/${value}.png`"
               alt=""
-            />
+            >
             {{ label }}
           </div>
         </div>
@@ -734,7 +770,7 @@ function switchChain(chain: string) {
               class="w-16px h-16px rounded-full opacity-60"
               :src="`${configStore.token_logo_url}chain/${value}.png`"
               alt=""
-            />
+            >
             {{ label }}
           </div>
         </div>
@@ -745,6 +781,8 @@ function switchChain(chain: string) {
       v-if="activeTab == 'activity'"
       :activeChain="activeChain"
       :quickBuyValue="quickBuyValue"
+      :dialogValues="dialogValues"
+      @close="dialogValues.visible = false"
     />
     <KOL
       v-else
@@ -765,88 +803,6 @@ function switchChain(chain: string) {
       :activeInterval="activeInterval"
       @handleSortChange="handleSortChange"
     />
-    <el-dialog
-      v-model="dialogValues.visible"
-      :title="$t('SignalTopList')"
-      append-to-body
-      width="540px"
-      :class="`[--el-message-close-size:24px]`"
-    >
-      <el-table
-        row-class-name="[--el-table-tr-bg-color:--d-222-l-FFF]"
-        :data="dialogValues.list"
-        :height="400"
-      >
-        <el-table-column
-          :width="60"
-          type="index"
-          :label="$t('ranking')"
-          label-class-name="text-12px color-[--d-666-l-999] text-center"
-          class-name="text-center!"
-        >
-          <template #default="{ $index }">
-            <img v-if="$index + 1 === 1" src="@/assets/images/111.svg" />
-            <img v-else-if="$index + 1 === 2" src="@/assets/images/222.svg" />
-            <img v-else-if="$index + 1 === 3" src="@/assets/images/333.svg" />
-            <div v-else class="text-12px color-[--d-666-l-999]">{{ $index + 1 }}</div>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('token')" label-class-name="text-12px color-[--d-666-l-999]">
-          <template #default="{ row }">
-            <div
-              class="flex items-center text-12px gap-8px cursor-pointer"
-              @click="navigateTo(`/token/${row.token}-${row.chain}`)"
-            >
-              <TokenImg
-                chain-class="hidden"
-                :row="{
-                  chain: row.chain,
-                  symbol: row.symbol,
-                  logo_url: row.logo_url,
-                }"
-              />
-              <span class="shrink-0 whitespace-nowrap text-ellipsis overflow-hidden max-w-80px">{{
-                row.symbol
-              }}</span>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          width="100"
-          :label="$t('firstSignal')"
-          label-class-name="text-12px color-[--d-666-l-999]"
-        >
-          <template #default="{ row }">
-            <span class="color-[--d-FFF-l-222] text-12px">{{
-              formatDate(row.first_signal_time, 'HH:mm:ss')
-            }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          width="100"
-          :label="$t('firstMarketCap')"
-          label-class-name="text-12px color-[--d-666-l-999]"
-        >
-          <template #default="{ row }">
-            <span class="color-[--d-FFF-l-222] text-12px">
-              ${{ formatNumber(row.first_signal_mc, 2) }}</span
-            >
-          </template>
-        </el-table-column>
-        <el-table-column
-          width="100"
-          align="right"
-          :label="$t('MaximumIncrease')"
-          label-class-name="text-12px color-[--d-666-l-999]"
-        >
-          <template #default="{ row }">
-            <div class="text-20px text-right color-#12B886">
-              {{ parseInt(row.max_price_change) }}x
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-dialog>
   </div>
 </template>
 

@@ -5,6 +5,7 @@ import {useStorage} from '@vueuse/core'
 import {bot_createSolTx, bot_createSwapEvmTx, bot_getTokenBalance} from '~/api/bot'
 import {formatBotGasTips} from '~/utils/bot'
 import type { BotChain, BotSettingKey } from '~/utils/types'
+import useWalletSwap from './wallet'
 
 const {t} = useI18n()
 const props = withDefaults(defineProps<{
@@ -33,12 +34,14 @@ const loadingSwap = shallowRef(false)
 const visible = shallowRef(false)
 const message = shallowRef('')
 const noReminderQuickBuy = useStorage('noReminderQuickBuy', false)
+const { walletSwap, loadingWalletSwap } = useWalletSwap()
+const walletStore = useWalletStore()
 const emit = defineEmits(['submitSwap'])
 
 function submitBotSwap(e: MouseEvent) {
   e.stopPropagation()
   emit('submitSwap')
-  if (!verifyLogin(true)) {
+  if (!verifyLogin()) {
     return
   }
   if (loadingSwap.value) {
@@ -66,6 +69,10 @@ const botSettingStore = useBotSettingStore()
 
 async function beforeSubmitSwap() {
   visible.value = false
+  if (walletStore.provider && walletStore.address && !botStore.evmAddress) {
+    beforeWalletSwap()
+    return
+  }
   const {chain} = props.row
   loadingSwap.value = true
   await getTokenBalance(chain)
@@ -83,6 +90,11 @@ async function beforeSubmitSwap() {
     return
   }
   submitSwap(amount!)
+}
+
+async function beforeWalletSwap() {
+  const amount = (new BigNumber(props.quickBuyValue || 0)).toFixed()
+  walletSwap(amount, props.row as any)
 }
 
 async function submitSwap(amount: string) {
@@ -167,11 +179,10 @@ function handleTxSuccess(res: any, _batchId: string) {
         tokenStore.placeOrderSuccess++
         if (subscribeResult?.txList?.[0]?.success) {
           ElNotification({type: 'success', message: t('tradeSuccess')})
-          unwatch()
         } else {
           handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-          unwatch()
         }
+        unwatch()
         loadingSwap.value = false
       }
     })
@@ -200,7 +211,7 @@ async function getTokenBalance(chain: string) {
 <template>
   <el-button
     :disabled="!Number(quickBuyValue)"
-    :loading="loadingSwap"
+    :loading="loadingSwap || loadingWalletSwap"
     :color="buttonBg"
     class="flex items-center [&&]:px-12px"
     :class="classNames"
@@ -208,8 +219,9 @@ async function getTokenBalance(chain: string) {
     :style="styles"
     @click="submitBotSwap"
   >
-    <slot>
+    <slot v-bind="{loading: loadingSwap || loadingWalletSwap}">
       <Icon
+      v-if="!(loadingSwap || loadingWalletSwap)"
       class="mr-4px"
       name="mynaui:lightning-solid"
       />

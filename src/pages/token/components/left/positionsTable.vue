@@ -10,12 +10,14 @@ import {useDebounceFn, useThrottleFn} from '@vueuse/core'
 import {useWalletStore} from '~/stores/wallet'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 
+const {updateHolderNum}= storeToRefs(useUserStore())
 const {t} = useI18n()
 const wsStore = useWSStore()
 const botSettingStore = useBotSettingStore()
 const botStore = useBotStore()
 const botSwapStore = useBotSwap()
 const priceV2Store = usePriceV2Store()
+const walletStore = useWalletStore()
 const tokenStore = useTokenStore()
 const {hide_risk, hide_small} = storeToRefs(useGlobalStore())
 
@@ -56,6 +58,11 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
     return el
   })
   triggerRef(listData)
+})
+
+watch(()=>updateHolderNum.value, () => {
+  resetStatus()
+  getDataOnResize()
 })
 // onMounted(()=>{
 //   setTimeout(()=>{
@@ -180,15 +187,21 @@ function resetStatus() {
   listStatus.value.finished = false
 }
 
-const walletStore = useWalletStore()
+const isEvmChainWallet = computed(() => {
+  return getChainInfo(walletStore.chain)?.vm_type === 'evm'
+})
 
 const userIds = computed(() => {
   if (botStore.userInfo) {
     return botStore.userInfo.addresses.map(({address, chain}) => address + '-' + chain)
-  } else if (walletStore.address) {
-    return [walletStore.address + '-' + walletStore.chain]
+  } else {
+     if (walletStore.address && isEvmChainWallet.value && (walletStore.walletName!=='WatchWallet')) {
+      return [walletStore.address + '-' + 'bsc', walletStore.address + '-' + 'base', walletStore.address + '-' + 'eth']
+    }
+    else {
+      return [walletStore.address + '-' + walletStore.chain]
+    }
   }
-  return []
 })
 
 watch(() => userIds.value, () => {
@@ -459,11 +472,10 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string) {
         tokenStore.placeOrderSuccess++
         if (subscribeResult?.txList?.[0]?.success) {
           ElNotification({type: 'success', message: t('tradeSuccess')})
-          unwatch()
         } else {
           handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-          unwatch()
         }
+        unwatch()
         loadingSwap.value[tokenId] = false
       }
     })
@@ -491,7 +503,7 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string) {
         {{ $t('hideSmallAssets1') + '<1USD' }}
       </el-checkbox>
       <NetSelect
-        v-if="botStore.evmAddress"
+        v-if="botStore.evmAddress||(walletStore.address && isEvmChainWallet && (walletStore.walletName!=='WatchWallet'))"
         v-model:userIds="tableFilter.user_ids"
         @update:user-ids="resetStatus();_getUserBalance()"
       />
@@ -518,9 +530,14 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string) {
             :to="`/token/${row.index}`"
           >
             <div class="flex-[1.5] flex items-center">
-              <TokenImg
-                :row="row"
-              />
+              <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+                <template #default>
+                  <TokenImg :row="row"/>
+                </template>
+                <template #content>
+                  <TokenImg :row="row" chain-class="hidden" token-class="w-240px h-240px [&&]:mr-0 rounded-16px" />
+                </template>
+              </el-tooltip>
               <div class="ml-6px">
                 <div class="flex">
                   <span class="color-[var(--d-F5F5F5-l-333)]">{{ row.symbol }}</span>

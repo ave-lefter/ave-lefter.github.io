@@ -190,7 +190,7 @@ function getLevel(value: number) {
       {{ formatDate(timeline.data.time || 0, 'MM-DD HH:mm') }}
     </div>
     <div class="text-12px">
-      {{ $t('volume') }}：${{ formatNumber(timeline.data.volume) }}
+      {{ $t('volume') }}：${{ formatNumber(timeline.data.volume,1) }}
     </div>
   </el-popover>
   <el-popover

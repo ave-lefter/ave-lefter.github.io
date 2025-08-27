@@ -1,31 +1,54 @@
 <template>
-  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-1000">
-    <div class="left">
+  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-33">
+    <div class="left relative">
       <NuxtLink
-        v-for="(item) in newData" :key="item.symbol || item.logo_url"
-        class="color-[--d-999-l-666]  flex items-center gap-5px"
-        :class="[(item?.hidden)?'':'mr-12px']"
-        :to="`/token/${item.id}`"
+        v-if="showPrice"
+        class="flex items-center gap-5px mr-4px"
+        :to="`/token/${showPrice.id}`"
       >
-        <template v-if="!item?.hidden">
-          <TokenImg
-          :row="{
-            logo_url: item.logo_url,
-            chain: ''
-          }" token-class="w-16px h-16px [&&]:mr-0" />
-          <span>{{ item.symbol }}</span>
-          <span :class="`color-${item.color}`">{{'$'+formatDec(item?.current_price_usd || 0, 2)}}</span>
-        </template>
-        <div v-else class="mr--5px" />
+        <TokenImg
+        :row="{
+          logo_url: showPrice.logo_url,
+          chain: ''
+        }" token-class="w-16px h-16px [&&]:mr-0" />
+        <span class="color-[--d-999-l-666]">{{ showPrice.symbol }}</span>
+        <span :class="`color-${showPrice.color}`">{{'$'+formatDec(showPrice?.current_price_usd || 0, 2)}}</span>
       </NuxtLink>
       <div class="flex items-center mr-12px color-[--d-999-l-666] gap-4px cursor-pointer" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
         <Icon name="custom:chart" class="text-12px" />
         {{ $t('PnlTracker') }}
       </div>
+       <el-popover popper-style="padding: 12px;min-width: 132px" width="132" placement="top" :teleported="false">
+        <template #reference>
+          <Icon name="custom:set-up" class="text-12px ml-2px color-#666" />
+        </template>
+        <div class="flex items-start justify-center flex-col text-12px gap-16px">
+          <NuxtLink
+            v-for="(item) in showPrice2" :key="item.symbol || item.logo_url"
+            class="flex items-center gap-5px h-16px"
+            style="display: flex;"
+            :to="`/token/${item.id}`"
+          >
+            <TokenImg
+            class="flex"
+            :row="{
+              logo_url: item.logo_url,
+              chain: ''
+            }" token-class="w-16px h-16px [&&]:mr-0" />
+            <span class="color-[--d-999-l-666]">{{ item.symbol }}</span>
+            <span :class="`color-${item.color}`">{{'$'+formatDec(item?.current_price_usd || 0, 2)}}</span>
+          </NuxtLink>
+        </div>
+      </el-popover>
+      <div class="flex items-center gap-4px color-[--d-999-l-666] mx-12px cursor-pointer hover:color-inherit" :class="{'color-inherit':dragPumpStore.visible}" @click="dragPumpStore.visible=!dragPumpStore.visible">
+        <Icon name="custom:pump-icon"/>
+        {{ $t('pump1') }}
+      </div>
       <el-badge :is-dot="(!!botStore.evmAddress)&&isDoted2" class="mr-12px">
         <div
           id="monitor"
-          class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit "
+          class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit"
+          :class="{'color-inherit':visible}" 
           @click="visible=!visible"
         >
           <Icon
@@ -34,10 +57,11 @@
           {{ $t('walletMonitor') }}
         </div>
       </el-badge>
-      <el-badge v-if="!route.path.includes('smart')" :is-dot="isDoted">
+      <el-badge :is-dot="isDoted">
         <div
           class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit"
-             @click="signalStore.signalVisible=!signalStore.signalVisible"
+          :class="{'color-inherit':signalStore.signalVisible}" 
+          @click="signalStore.signalVisible=!signalStore.signalVisible"
         >
           <Icon
             name="ri:signal-tower-fill"
@@ -48,46 +72,58 @@
     </div>
     <ul class="right">
       <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-        <a class="border-left" target="_blank" href="https://eco.ave.ai">{{ $t('ecosystem') }}</a>
-      </li>
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-        <a target="_blank" href="https://cloud.ave.ai">API</a>
-      </li>
-      <li class="bg-[--d-999-l-666] w-1px h-8px" />
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-        <a
-          class="border-left" target="_blank" :href="lang?.includes?.('zh')
-            ? 'https://doc.ave.ai/cn/mian-ze-shen-ming'
-            : 'https://doc.ave.ai/disclaimers'
-          ">
-          {{ $t('disclaimers') }}
-        </a>
-      </li>
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
-        <a target="_blank" href="/privacy.html">{{ $t('privacyPolicy') }}</a>
-      </li>
-      <li class="bg-[--d-999-l-666] w-1px h-8px" />
-      <li class="color-[--d-999-l-666]">
-        <span class="partners">{{ $t('partners') }}</span>
-      </li>
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
         <a target="_blank" href="https://www.tradingview.com/" class="flex-center">
           <Icon name="simple-icons:tradingview" class="text-18px mr-2px" />TradingView
           <!-- <img v-if="isDark" src="@/assets/images/tradingView-dark.svg" alt="" height="12" />
           <img v-else src="@/assets/images/tradingView-light.svg" alt="" height="12" /> -->
         </a>
       </li>
-      <li class="bg-[--d-999-l-666] w-1px h-8px" />
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+      <li>
+      <a target="_blank" href="https://gopluslabs.io">
+        <img src="@/assets/images/goPlus-logo.png" alt="" height="25" lazy >
+      </a>
+      </li>
+      <li>
+      <a target="_blank" class="flex-center" href="https://www.btok.com">
+        <img src="@/assets/images/btok-logo.png" alt="" height="16" lazy >
+      </a>
+      </li>
+      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] flex items-center gap-2px">
+      <a target="_blank" href="https://cloud.ave.ai">API</a>
+      </li>
+      <el-popover popper-style="padding: 12px;min-width: 50px;width:auto"  placement="top" :teleported="false">
+      <template #reference>
+          <Icon name="custom:set-up" class="text-12px ml-2px color-#666" />
+      </template>
+      <ul class="flex items-start justify-center flex-col text-12px gap-16px font-500">
+        <!-- <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+          <a class="hover:decoration-underline" target="_blank" href="https://eco.ave.ai">{{ $t('ecosystem') }}</a>
+        </li> -->
+        <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+          <a
+            class="hover:decoration-underline" target="_blank" :href="lang?.includes?.('zh')
+              ? 'https://doc.ave.ai/cn/mian-ze-shen-ming'
+              : 'https://doc.ave.ai/disclaimers'
+            ">
+            {{ $t('disclaimers') }}
+          </a>
+        </li>
+        <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+          <a target="_blank" class="hover:decoration-underline" href="/privacy.html">{{ $t('privacyPolicy') }}</a>
+        </li>
+
+      </ul>
+      </el-popover>
+      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] mr-8px">
         <a
           target="_blank" :href="lang?.includes?.('zh') ? 'https://x.com/aveai_info' : 'https://x.com/AveaiGlobal'"
           class="flex-center">
           <Icon name="bi:twitter-x" class="text-16px" />
         </a>
       </li>
-      <li class="color-[--d-999-l-666] hover:color-#3F80F7">
+      <li class="color-[--d-999-l-666] hover:color-#3F80F7 mr-8px">
         <a
-          target="_blank" :href="lang?.includes?.('zh') ? 'https://x.com/aveai_info' : 'https://x.com/AveaiGlobal'"
+          target="_blank" :href="lang?.includes?.('zh') ? 'https://t.me/ave_community_cn' : 'https://t.me/aveai_english'"
           class="flex-center">
           <Icon name="lineicons:telegram-original" class="text-19px" />
         </a>
@@ -105,14 +141,15 @@
 
 <script setup lang='ts'>
 import ring from '@/assets/audio/ring.wav'
+import { cloneDeep, throttle  } from 'lodash-es'
 import { formatDec } from '~/utils/formatNumber'
 import { getTokensPrice } from '@/api/token'
 import { upColor, downColor } from '@/utils/constants'
-import { throttle } from 'lodash-es'
 const {visible,hasRing} = storeToRefs(useMonitorStore())
 const signalStore = useSignalStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
+const dragPumpStore = usePumpStore()
 
 const audioElement=ref<HTMLAudioElement|null>(null)
 const { lang } = storeToRefs(globalStore)
@@ -177,6 +214,35 @@ const newData = computed(() => {
     }
     return item
   })
+})
+
+const showPrice = computed(() => {
+  if(addressAndChain.value.chain === 'bsc'){
+    return data.value[2]
+  } else if(addressAndChain.value.chain === 'solana'){
+    return data.value[3]
+  } else if(addressAndChain.value.chain === 'eth' || addressAndChain.value.chain === 'base'){
+    return data.value[1]
+  } else {
+    return data.value[3]
+  }
+})
+
+const showPrice2 = computed(() => {
+  const val=cloneDeep(data.value)
+  if(addressAndChain.value.chain === 'bsc'){
+    val.splice(2, 1)
+    return val
+  } else if(addressAndChain.value.chain === 'solana'){
+    val.splice(3, 1)
+    return val
+  } else if(addressAndChain.value.chain === 'eth' || addressAndChain.value.chain === 'base'){
+    val.splice(1, 1)
+    return val
+  } else {
+    val.splice(3, 1)
+    return val
+  }
 })
 
 watch(()=>globalStore.footerTokensPrice, (newVal) => {
@@ -247,7 +313,7 @@ watch(() => wsStore.wsResult[WSEventType.MONITOR], () => {
   .right {
     flex: auto;
     display: flex;
-    gap: 12px;
+    gap: 8px;
     justify-content: flex-end;
     align-items: center;
   }

@@ -2,7 +2,9 @@ import { BrowserProvider, JsonRpcProvider, type Eip1193Provider } from 'ethers'
 import { Contract } from 'ethcall'
 import { SwapContracts, SwapContracts1, SwapContracts2, SwapContracts3, FeeAddress, FeeAddress1, FeeChainsRegExp } from './constants'
 import { ElMessageBox, ElMessage } from '#imports'
+import BigNumber from 'bignumber.js'
 export { Provider as MultiProvider } from 'ethcall'
+
 
 export function getProvider(chain: string) {
   const chainInfo = getChainInfo(chain)
@@ -209,7 +211,7 @@ export function handleError(err: any, type = '') {
   } else if (
     (err?.code === -32603 && err?.data) ||
     (err?.message && err?.message?.includes?.('-32603')) ||
-    (err?.message && !err?.code)
+    (err?.message)
   ) {
     const walletStore = useWalletStore()
     const mainName = getChainInfo(walletStore.chain).main_name || ''
@@ -316,12 +318,8 @@ export async function getGasPrice(chain: string) {
   }
   const { _provider } = getProvider(chain)
   return _provider?.getFeeData().then(res => {
-    if (res) {
-      // gasPrice.value = new BigNumber(res.gasPrice || 0).toNumber()
-      return new BigNumber(res.gasPrice || 0).toNumber()
-    }
-    return 0
-  }).catch(async() => {
+    return new BigNumber(res.gasPrice?.toString() || 0).toNumber()
+  }).catch(async err => {
     return 0
   })
 }

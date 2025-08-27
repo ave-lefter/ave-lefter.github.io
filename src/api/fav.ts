@@ -38,6 +38,7 @@ interface GetFavListResponse {
   tx_count_24h: number;
   pool_size: number;
   remark?: string;
+  issue_platform?:string
 }
 
 // Get user favorite tokens

@@ -4,39 +4,45 @@
     <span>{{ $t('positions') }}</span>
   </div>
   <component :is="lazyComponent" v-model="visible" :tableFilter="tableFilter">
-    <div class="flex justify-between items-center pt-0 pb-0 pl-0 pr-15px w-320px">
-     <el-checkbox
-         v-model="tableFilter['hide_risk']"
-         class="h-24px"
-         :style="{
-           marginRight:0
-         }"
-         size="small" :true-value="1" :false-value="0"
-       >
-         {{ $t('hideRiskTokenShort') }}
-       </el-checkbox>
-       <el-checkbox
-         v-model="tableFilter['hide_small']"
-         size="small" :true-value="1" :false-value="0"
-       >
-         {{ $t('hideSmallAssets1') + '<1USD' }}
-       </el-checkbox>
-       <NetSelect
-         v-if="botStore.evmAddress"
-         v-model:userIds="tableFilter.user_ids"
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-30px pt-0 pb-0 pl-0 pr-15px">
+        <el-checkbox
+          v-model="tableFilter['hide_risk']"
+          class="h-24px"
+          :style="{
+            marginRight:0
+          }"
+          size="small" :true-value="1" :false-value="0"
+        >
+          {{ $t('hideRiskTokenShort') }}
+        </el-checkbox>
+        <el-checkbox
+          v-model="tableFilter['hide_small']"
+          size="small" :true-value="1" :false-value="0"
+        >
+          {{ $t('hideSmallAssets1') + '<1USD' }}
+        </el-checkbox>
+        <NetSelect
+          v-if="botStore.evmAddress||(walletStore.address && isEvmChainWallet && (walletStore.walletName!=='WatchWallet'))"
+          v-model:userIds="tableFilter.user_ids"
         @update:user-ids="handleChange"
-       />
-   </div>
+        />
+      </div>
+      <BlackList
+        :userIds="tableFilter.user_ids"
+        @addWhite="()=>{}"
+      />
+    </div>
   </component>
 </template>
 
 <script setup lang='ts'>
 import {getUserBalance} from '~/api/swap'
-
+import BlackList from './blackList.vue'
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const {hide_small,hide_risk} = storeToRefs(useGlobalStore())
-
+const {updateHolderNum}= storeToRefs(useUserStore())
 let userIds: string[] = []
 
 
@@ -68,6 +74,13 @@ function handleChange(newUserIds: string[]) {
   tableFilter.value.user_ids = newUserIds
 }
 
+const isEvmChainWallet = computed(() => {
+  return getChainInfo(walletStore.chain)?.vm_type === 'evm'
+})
+
+watch(()=>updateHolderNum.value, () => {
+  fetchHolderNum()
+})
 watch(tableFilter, () => {
   // console.log('tableFilter changed', val)
   fetchHolderNum()
@@ -78,14 +91,20 @@ watch(() => visible.value, (newValue) => {
     loadComponent()
   }
 })
-watch([() => botStore.userInfo, () => walletStore.address], () => {
+watch([() => botStore.userInfo, () => walletStore.address, () => walletStore.chain], () => {
+  console.log('userInfo changed', botStore.userInfo)
   if (botStore.userInfo) {
     userIds = botStore.userInfo.addresses.map(({address, chain}) => address + '-' + chain)
     tableFilter.value.user_ids = userIds
-    fetchHolderNum()
-  } else if (walletStore.address) {
-    userIds = [walletStore.address + '-' + walletStore.chain]
-    tableFilter.value.user_ids = userIds
+  } else{
+    if (walletStore.address && isEvmChainWallet.value && (walletStore.walletName!=='WatchWallet')) {
+      userIds = [walletStore.address + '-' + 'bsc', walletStore.address + '-' + 'base', walletStore.address + '-' + 'eth']
+      tableFilter.value.user_ids = userIds
+    }
+    else {
+      userIds = [walletStore.address + '-' + walletStore.chain]
+      tableFilter.value.user_ids = userIds
+    }
     fetchHolderNum()
   }
 }, { immediate: true })
@@ -101,7 +120,7 @@ onMounted(() => {
   color: var(--d-E9E9E9-l-222);
   height: 32px;
   cursor: pointer;
-  background: var(--d-222-l-F2F2F2);
+  background: var(--d-141721-l-E8F1FF);
   border-radius: 4px;
   padding: 0 10px;
   min-width: 60px;

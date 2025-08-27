@@ -1,6 +1,7 @@
 <template>
   <div>
-    <el-table v-loading="loading && !txOrder?.length" :data="txOrder" fit stripe :height="tableHeight" style="width: 100%" @row-click="tableRowClick">
+    <el-table v-loading="loading && !txOrder?.length" :data="txOrder" fit stripe :height="tableHeight"
+      style="width: 100%" @row-click="tableRowClick">
       <template #empty>
         <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
           <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
@@ -14,27 +15,23 @@
           <div class="flex items-center justify-start" @click="handleTokenClick(row)">
             <div class="icon-token-container mr-5px">
               <div class="relative">
-                <el-image
-                  class="w-32px h-32px rounded-full" :src="getSymbolDefaultIcon({
+                <el-image class="w-32px h-32px rounded-full" :src="getSymbolDefaultIcon({
                   chain: row?.chain,
                   symbol: !isBuy(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol,
                   logo_url: !isBuy(row.swapType) ? row?.inTokenLogoUrl : row.outTokenLogoUrl
                 })">
                   <template #error>
-                    <img
-                      class="w-32px h-32px"
+                    <img class="w-32px h-32px"
                       :src="getChainDefaultIcon(row?.chain, !isBuy(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol)"
                       alt="" srcset="">
                   </template>
                   <template #placeholder>
-                    <img
-                      class="w-32px h-32px"
+                    <img class="w-32px h-32px"
                       :src="getChainDefaultIcon(row?.chain, !isBuy(row.swapType) ? row?.inTokenSymbol : row.outTokenSymbol)"
                       alt="" srcset="">
                   </template>
                 </el-image>
-                <img
-                  v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px rd-50%"
+                <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px rd-50%"
                   :src="`${configStore.token_logo_url}chain/${row.chain}.png`" alt="" srcset="">
               </div>
             </div>
@@ -52,8 +49,7 @@
             <div class="flex items-center">
               <div>{{ t('type') }}</div>
               <el-dropdown trigger="click" @command="handleTypeCommand">
-                <Icon
-                  name="custom:filter" :class="[filterConditions.swapType?.length === 1 && 'color-#286DFF']"
+                <Icon name="custom:filter" :class="[filterConditions.swapType?.length === 1 && 'color-#286DFF']"
                   class="color-[--d-666-l-999] cursor-pointer text-10px" />
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -71,10 +67,12 @@
           </div>
         </template>
         <template #default="{ row }">
-          <div v-if="!isBuy(row.swapType)" class="text-13px text-[#F6465D] text-center px-5px py-2px  rounded-4px" style="background: rgba(246, 70, 93, 0.10)">
+          <div v-if="!isBuy(row.swapType)" class="text-13px text-[#F6465D] text-center px-5px py-2px  rounded-4px"
+            style="background: rgba(246, 70, 93, 0.10)">
             {{ getSwapTypeLabel(row.swapType) }}
           </div>
-          <div v-else class="text-13px text-[#12B886] text-center px-5px py-2px rounded-4px" style="background: rgba(18, 184, 134, 0.10)">
+          <div v-else class="text-13px text-[#12B886] text-center px-5px py-2px rounded-4px"
+            style="background: rgba(18, 184, 134, 0.10)">
             {{ getSwapTypeLabel(row.swapType) }}
           </div>
         </template>
@@ -84,7 +82,8 @@
           <span>{{ t('price') }}</span>
         </template>
         <template #default="{ row }">
-          <span v-if="row.swapType !== 13 && row.swapType !== 14" class="text-[--d-999-l-959A9F]">${{ formatNumber(row?.PriceLimit || 0) }}</span>
+          <span v-if="row.swapType !== 13 && row.swapType !== 14" class="text-[--d-999-l-959A9F]">${{
+            formatNumber(row?.PriceLimit || 0) }}</span>
           <span v-else>--</span>
         </template>
       </el-table-column>
@@ -156,7 +155,8 @@
       </el-table-column>
       <el-table-column :label="t('operate')" align="right">
         <template #default="{ row }">
-          <div v-if="row.status === 'waiting'" class="text-[#F6465D] text-14px cursor-pointer" @click.stop="handleCancelOrder(row)">
+          <div v-if="row.status === 'waiting'" class="text-[#F6465D] text-14px cursor-pointer"
+            @click.stop="handleCancelOrder(row)">
             {{ t('cancel') }}
           </div>
           <div v-else>
@@ -228,10 +228,10 @@ function getSwapTypeLabel(swapType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14
   const swapTypeMap = {
     1: t('buy'),
     2: t('sell'),
-    3: 'Wrap',
-    4: 'Unwrap',
-    5: `${ t('limit') }/${ t('buy') }`,
-    6: `${ t('limit') }/${ t('sell') }`,
+    3: t('limitBuy1'),
+    4: t('limitSell1'),
+    5: `${t('limit')}/${t('buy')}`,
+    6: `${t('limit')}/${t('sell')}`,
     7: t('followBuy'),
     8: t('followSell'),
     12: t('trailingStop'),
@@ -389,5 +389,4 @@ defineExpose({
 //       font-size: 12px;
 //     }
 //   }
-// }
-</style>
+// }</style>

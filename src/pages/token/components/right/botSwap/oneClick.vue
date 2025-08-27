@@ -1,5 +1,5 @@
 <template>
-  <button v-show="botStore.isSupportChains?.includes(chain)" class="one-click-btn mr--12px clickable" :class="{ 'active': visible }" @click.stop="visible = !visible">
+  <button v-show="botStore.isSupportChains?.includes(chain)" class="one-click-btn clickable" :class="{ 'active': visible }" @click.stop="visible = !visible">
     <Icon name="ion:flash" />
     <span class="ml-5px">{{ $t('oneClick') }}</span>
   </button>
@@ -10,9 +10,9 @@
           <span>{{ $t('oneClick') }}</span>
           <div class="tabs-1 ml-5px">
             <button
-              v-for="item in (['s1', 's2', 's3'] as const)" :key="item"
-              :class="{ 'active': item === botSettings?.[chain]?.selected }" type="button"
-              @click.stop="botSettings[chain]!.selected = item">{{ item.toUpperCase() }}</button>
+              v-for="item in BotSettingsArr" :key="item.value"
+              :class="{ 'active': item.value === botSettings?.[chain]?.selected }" type="button"
+              @click.stop="botSettings[chain]!.selected = item.value">{{ item.label }}</button>
           </div>
           <SlippageSetMarket :chain="chain" />
         </div>
@@ -195,25 +195,18 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
-              unwatch()
-              setTimeout(() => {
-                getTokenBalance()
-
-              }, 1000)
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-              unwatch()
-              if (isBuy) {
-                loadingSwapBuy.value[index] = false
-              } else {
-                loadingSwapSell.value[index] = false
-              }
-              setTimeout(() => {
-                // this.getTokenDetails()
-                getTokenBalance()
-                // this.$store.state.bot.historyUpdate++
-              }, 1000)
             }
+            unwatch()
+            if (isBuy) {
+              loadingSwapBuy.value[index] = false
+            } else {
+              loadingSwapSell.value[index] = false
+            }
+            setTimeout(() => {
+              getTokenBalance()
+            }, 1000)
           }
         })
       }
@@ -290,11 +283,11 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
               unwatch()
-              if (isBuy) {
-                loadingSwapBuy.value[index] = false
-              } else {
-                loadingSwapSell.value[index] = false
-              }
+            }
+            if (isBuy) {
+              loadingSwapBuy.value[index] = false
+            } else {
+              loadingSwapSell.value[index] = false
             }
           }
         })

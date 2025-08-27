@@ -163,6 +163,15 @@ export function getTokenFilterList(params) {
   })
 }
 
+// 顶部持仓获取黑白名单
+export function getTokenFilterList2(params) {
+  const { $api } = useNuxtApp()
+  return $api('/v1api/v3/users/balance/tokenfilterv3', {
+    method: 'post',
+    body: params,
+  })
+}
+
 // bindTwitter
 export function bindTwitter(params: {
    user_address: string
