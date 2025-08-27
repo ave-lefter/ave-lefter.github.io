@@ -34,8 +34,9 @@
 </template>
 
 <script setup>
+const  props = defineProps(['isRank'])
 const emit = defineEmits(['refresh'])
-const tokenStore = useTokenStore()
+const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const price = computed(() => {
   return tokenStore.price
 })
