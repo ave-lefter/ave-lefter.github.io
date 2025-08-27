@@ -20,7 +20,7 @@ const pnlSetting = useStorage('pnl-setting', {
   blur: 0,
   opacity: 100,
   solUsdSwitch: false,
-  showU: true,
+  showU:false,
 })
 const currentPrice = computed(() => {
   return (

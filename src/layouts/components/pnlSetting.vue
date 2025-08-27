@@ -7,6 +7,7 @@ const uploadRef = useTemplateRef('uploadRef')
 const { t } = useI18n()
 
 const baseURL = getBestApiDomain()
+const XAuth = localStorage.ave_token
 const defaultSettings = {
   chain: 'solana',
   background: pnlImg,
@@ -90,7 +91,8 @@ function resetBg() {
         :action='`${baseURL}/v2api/token/v1/upload/pnl_background`'
         name="image"
         :headers="{
-          Authorization:`Bearer ${useBotStore().accessToken}`
+          Authorization:`Bearer ${useBotStore().accessToken}`,
+          'X-Auth':XAuth
         }"
         class="[--el-fill-color-blank:--d-333-l-F2F2F2] [--el-border-color:--d-333-l-F2F2F2] [--el-color-primary:--d-333-l-F2F2F2] upload"
         accept=".png,.jpg,.jpeg,.webp"
