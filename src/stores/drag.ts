@@ -1,4 +1,4 @@
-import {useStorage, useThrottleFn, useWindowSize} from '@vueuse/core'
+import {useStorage} from '@vueuse/core'
 export const useDragStore = defineStore('drag', () => {
   const signalStore = useSignalStore()
   const monitorStore = useMonitorStore()
@@ -72,6 +72,14 @@ export const useDragStore = defineStore('drag', () => {
       signal: signalStore.signalVisible
     }
   })
+  // (!('shouldHide' in storeItem) || !storeItem.shouldHide)
+  const shouldHide = computed(() => {
+    return {
+      monitor: false,
+      pump: pumpStore.shouldHide,
+      signal: signalStore.shouldHide
+    }
+  })
   const leftWidth = computed(() => {
     const index1 =leftArr.value.findIndex(el => el === 'signal')
     const index2 =leftArr.value.findIndex(el => el === 'monitor')
@@ -81,13 +89,13 @@ export const useDragStore = defineStore('drag', () => {
     let signal=0
     leftArr.value.forEach((el, index) => {
       if(index<index1){
-        signal += (visible.value[el]&&isLeftFixed.value[el]) ? fixedWidth.value[el]+1 : 0
+        signal += (visible.value[el]&&isLeftFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 : 0
       }
       if(index<index2){
-        monitor += (visible.value[el]&&isLeftFixed.value[el]) ? fixedWidth.value[el]+1 : 0
+        monitor += (visible.value[el]&&isLeftFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 : 0
       }
       if(index<index3){
-        pump += (visible.value[el]&&isLeftFixed.value[el]) ? fixedWidth.value[el]+1 :0
+        pump += (visible.value[el]&&isLeftFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 :0
       }
     })
     return {
@@ -105,13 +113,13 @@ export const useDragStore = defineStore('drag', () => {
     let signal=0
     rightArr.value.forEach((el, index) => {
       if(index<index1){
-        signal += (visible.value[el]&&isRightFixed.value[el]) ? fixedWidth.value[el]+1 : 0
+        signal += (visible.value[el]&&isRightFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 : 0
       }
       if(index<index2){
-        monitor += (visible.value[el]&&isRightFixed.value[el]) ? fixedWidth.value[el]+1 : 0
+        monitor += (visible.value[el]&&isRightFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 : 0
       }
       if(index<index3){
-        pump += (visible.value[el]&&isRightFixed.value[el]) ? fixedWidth.value[el]+1 : 0
+        pump += (visible.value[el]&&isRightFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 : 0
       }
     })
     console.log('rightWidth', monitor, pump, signal)
