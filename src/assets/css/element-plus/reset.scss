@@ -19,7 +19,6 @@
    --el-bg-color: var(--secondary-text);
     --el-text-color-primary: var(--dialog-bg);
   }
-
 }
 
 :root:root {
@@ -166,6 +165,12 @@
     --el-button-hover-text-color:var(--main-text);
     --el-button-hover-bg-color:var(--gray-button-hover);
     --el-button-hover-border-color:var(--gray-button-hover);
+  }
+  &.dialog-button{
+    --el-button-bg-color:var(--dialog-list-hover);
+    --el-button-border-color:var(--dialog-list-hover);
+    --el-button-hover-bg-color:var(--dialog-list-hover);
+    --el-button-hover-border-color:var(--dialog-list-hover);
   }
   &.el-button--primary{
     --el-color-white:var(--white);
