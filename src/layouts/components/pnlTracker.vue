@@ -130,8 +130,10 @@ const addresses = computed(() => {
 })
 watch(
   () => addresses.value,
-  () => {
-    resetPnl()
+  (newVal,oldVal) => {
+    if(oldVal?.length === 0 && newVal.length > 0){
+      resetPnl()
+    }
     if (addresses.value?.length) {
       subBalanceChange()
     }
