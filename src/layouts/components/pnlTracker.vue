@@ -65,7 +65,8 @@ watch(
     // Solana 是两个 swap 推送
     const isSolSwap = val.swap && val.swap.token === SOLANA_NATIVE_TOKEN
     // 处理转账或者 bsc 链
-    const isBscSwapOrTransfer = val.transfer && val.transfer.token === NATIVE_TOKEN
+    const isBscSwapOrTransfer = val.transfer && val.transfer.token === NATIVE_TOKEN && val.transfer.chain === 'bsc'
+    console.log(val)
     if (isSolSwap || isBscSwapOrTransfer) {
       const { type, time, chain } = (val.swap || val.transfer)!
       const isBuy = type === '0'
