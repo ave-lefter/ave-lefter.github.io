@@ -2,24 +2,24 @@
   <div class="flex">
     <span class="clickable flex" @click.stop="show = true">
       <slot name="icon">
-        <Icon class="text-14px color-[--d-999-l-666] hover:color-[--d-F5F5F5-l-333] icon-bot-setting" name="custom:pump-setting" />
+        <Icon class="text-14px color-[--d-8CA0C3-l-566275] hover:color-[--d-F5F5F5-l-333] icon-bot-setting" name="custom:pump-setting" />
       </slot>
     </span>
-    <el-dialog v-model="show" width="500px" append-to-body>
+    <el-dialog class="new-dialog" v-model="show" width="500px" append-to-body>
       <template #header>
         <div class="text-20px mb-10px font-400">
-          <button class="border-none bg-transparent clickable color-[--d-666-l-999] px-0" :class="{'color-[--d-F5F5F5-l-333]!': settingTab === 0}" @click.stop="settingTab = 0">{{ $t('basicSetting') }}</button>
-          <button class="border-none bg-transparent clickable color-[--d-666-l-999] px-0 ml-24px" :class="{'color-[--d-F5F5F5-l-333]!': settingTab === 1}" @click.stop="settingTab = 1">{{ $t('autoSellSetting') }}</button>
+          <button class="border-none bg-transparent clickable color-[--d-566275-l-8CA0C3] px-0" :class="{'color-[--d-F5F5F5-l-333]!': settingTab === 0}" @click.stop="settingTab = 0">{{ $t('basicSetting') }}</button>
+          <button v-if="chain !== 'xlayer'" class="border-none bg-transparent clickable color-[--d-566275-l-8CA0C3] px-0 ml-24px" :class="{'color-[--d-F5F5F5-l-333]!': settingTab === 1}" @click.stop="settingTab = 1">{{ $t('autoSellSetting') }}</button>
         </div>
       </template>
       <el-form class="popup-content" @submit.prevent="confirmSubmit">
         <div v-show="settingTab === 0">
-          <div v-if="showClipboardSet" class="mb-20px pb-20px b-b-solid b-b-[--d-333-l-F2F2F2] b-b-1">
+          <div v-if="showClipboardSet" class="mb-20px pb-20px b-b-solid b-b-[--d-252E3C-l-E8F1FF] b-b-1">
             <div class="flex items-center mb-15px">
               <Icon v-if="themeStore.isDark" name="custom:flash-d" class="text-14px" />
               <Icon v-else name="custom:flash-l" class="text-14px" />
               <span class="ml-5px mr-auto">{{ $t('quickBuyclipboard') }}</span>
-              <div class="flex items-center justify-end text-12px color-#999 clickable" @click.stop="clipboardQuickInput[chain] = ''">
+              <div class="flex items-center justify-end text-12px color-[--d-566275-l-8CA0C3] clickable" @click.stop="clipboardQuickInput[chain] = ''">
                 <Icon
                   name="custom:refresh-left"
                   class="ml-5px clickable text-14px mr-3px"
@@ -31,20 +31,20 @@
               <img v-if="chain" class="w-16px h-16x mr-5px rd-50%" :src="`${configStore.token_logo_url}chain/${chain}.png`" alt="" srcset="">
               <span class="mr-auto font-500">{{  getChainInfo(chain)?.name || ''  }}</span>
               <el-input v-model="clipboardQuickInput[chain]" class="input-swap input-number flex-auto! max-w-150px clipped-input rd-8px!" inputmode="decimal" clearable placeholder="0.0" @update:model-value="value => {clipboardQuickInput[chain] = value?.replace?.(/\-|[^\d.]/g, '')}" @blur="handleBlurBuyValue1(clipboardQuickInput[chain] || '')">
-                <template #append><span class="color-#999">{{ getChainInfo(chain)?.main_name }}</span></template>
+                <template #append><span class="color-[--d-566275-l-8CA0C3]">{{ getChainInfo(chain)?.main_name }}</span></template>
               </el-input>
             </div>
           </div>
           <div class="setting-list mb-10px rounded-4px">
-            <button v-for="item in ['s1', 's2', 's3']" :key="item" :class="{'active': item === botSetting.selected}" type="button" @click.stop="botSetting.selected = item">{{ item.toUpperCase() }}</button>
+            <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSetting.selected}" type="button" @click.stop="botSetting.selected = item.value">{{ item.label }}</button>
           </div>
-          <div class="color-#999">
+          <div class="color-[--d-566275-l-8CA0C3]">
             {{$t('setTips')}}
           </div>
-          <div class="flex items-center justify-between color-#999">
+          <div class="flex items-center justify-between color-[--d-8CA0C3-l-566275]">
             <span>{{ $t('slippage') }}</span>
             <Icon class="text-15px color-#80838B ml-5px clickable mr-auto" name="material-symbols:help-rounded" @click.stop="openSlippageTips" />
-            <el-checkbox v-if="canSetAuto" v-model="isAuto" :label="$t('autoSlippage')" size="large" style="--el-checkbox-text-color: #999999" />
+            <el-checkbox v-if="canSetAuto" v-model="isAuto" :label="$t('autoSlippage')" size="large" style="--el-checkbox-text-color: var(--d-566275-l-8CA0C3)" />
           </div>
           <div class="mt-10px">
             <el-row :gutter="10">
@@ -65,7 +65,7 @@
                 <div class="slippage-input">
                   <el-input-number
                     v-model="botSetting[selected].customSlippage"
-                    class="bg-[--d-333-l-F2F2F2] rounded-4px"
+                    class="bg-[--d-252E3C-l-E8F1FF] rounded-4px"
                     name="slippage"
                     type="number"
                     :placeholder="$t('custom')"
@@ -89,7 +89,7 @@
             <span v-if="botSetting[selected].slippageValue !== undefined && Number(botSetting[selected].slippageValue) <= 0.1" class="tip">{{ $t('slippageTip1') }}</span>
           </div>
           <div v-if="isCanMev" class="slippage-label mt-15px">
-            <span class="mr-auto">{{ $t('protection') }}</span>
+            <span class="mr-auto color-[--d-8CA0C3-l-566275]">{{ $t('protection') }}</span>
             <el-switch
               v-model="botSetting[selected].mev"
               size="small"
@@ -99,7 +99,7 @@
               @change="onProtectionChange"
             />
           </div>
-          <div class="slippage-label mt-15px">
+          <div class="slippage-label mt-15px color-[--d-8CA0C3-l-566275]">
             <span>{{ chain === 'solana' ? $t('priorityFee') : $t('extraGas') }}</span>
           </div>
           <div :key="botSetting[selected].mev" class="mt-10px">
@@ -123,7 +123,7 @@
           </div>
           <div class="input-swap mt-10px">
             <el-input v-model="botSetting[selected].gas[botSetting[selected].mev ? 0 : 1].customFee" class="input-number" inputmode="decimal" clearable :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')" @update:model-value="watchCusTomPriorityFee"  @blur="handleBlurFee" >
-              <template #append><span class="color-#999">{{ chain === 'solana' ? 'SOL' : 'GWEI' }}</span></template>
+              <template #append><span class="color-[--d-566275-l-8CA0C3]">{{ chain === 'solana' ? 'SOL' : 'GWEI' }}</span></template>
             </el-input>
           </div>
           <div v-if="showQuickAmount" class="mt-20px">
@@ -177,7 +177,7 @@
           <div v-show="autoSellConfigs.isAutoSellConfig_devsell" class="flex items-center gap-20px mt-5px">
             <el-select v-model="autoSellConfigs.autoSellConfig_devsell!.priceChange" placeholder="--" class="input-number-limit" size="default">
               <template #prefix>
-                <div class="inline-flex items-center text-12px color-[--d-666-l-999]"><span>{{ $t('DEVSEll') }}</span><span class="text-18px mt--3px">≥</span></div>
+                <div class="inline-flex items-center text-12px color-[--d-566275-l-8CA0C3]"><span>{{ $t('DEVSEll') }}</span><span class="text-18px mt--3px">≥</span></div>
               </template>
               <el-option
                 v-for="item in [0, 25, 50]"
@@ -188,10 +188,10 @@
             </el-select>
             <el-input-number v-model="autoSellConfigs.autoSellConfig_devsell!.sellRatio" class="input-number-limit" :min="1" :max="100" :controls="false" placeholder="--">
               <template #prefix>
-                <span class="text-12px color-[--d-666-l-999]">{{ $t('sellRatio') }}</span>
+                <span class="text-12px color-[--d-566275-l-8CA0C3]">{{ $t('sellRatio') }}</span>
               </template>
               <template #suffix>
-                <span class="color-[--d-666-l-999]">%</span>
+                <span class="color-[--d-566275-l-8CA0C3]">%</span>
               </template>
             </el-input-number>
           </div>
@@ -208,18 +208,18 @@
           <div v-show="autoSellConfigs.isAutoSellConfig_trailing" class="flex items-center gap-20px mt-5px">
             <el-input-number v-model="autoSellConfigs.autoSellConfig_trailing!.priceChange" class="input-number-limit" :min="1" :controls="false" placeholder="--">
               <template #prefix>
-                <span class="text-12px color-[--d-666-l-999]">{{ $t('pullback') }}</span>
+                <span class="text-12px color-[--d-566275-l-8CA0C3]">{{ $t('pullback') }}</span>
               </template>
               <template #suffix>
-                <span class="color-[--d-666-l-999]">%</span>
+                <span class="color-[--d-566275-l-8CA0C3]">%</span>
               </template>
             </el-input-number>
             <el-input-number v-model="autoSellConfigs.autoSellConfig_trailing!.sellRatio" class="input-number-limit" :min="1" :max="100" :controls="false" placeholder="--">
               <template #prefix>
-                <span class="text-12px color-[--d-666-l-999]">{{ $t('sellRatio') }}</span>
+                <span class="text-12px color-[--d-566275-l-8CA0C3]">{{ $t('sellRatio') }}</span>
               </template>
               <template #suffix>
-                <span class="color-[--d-666-l-999]">%</span>
+                <span class="color-[--d-566275-l-8CA0C3]">%</span>
               </template>
             </el-input-number>
           </div>
@@ -236,10 +236,10 @@
           <div v-show="autoSellConfigs.isAutoSellConfig_migrated" class="flex items-center gap-20px mt-5px">
             <el-input-number v-model="autoSellConfigs.autoSellConfig_migrated!.sellRatio" class="input-number-limit" :min="1" :max="100" :controls="false" placeholder="--">
               <template #prefix>
-                <span class="text-12px color-[--d-666-l-999]">{{ $t('sellRatio') }}</span>
+                <span class="text-12px color-[--d-566275-l-8CA0C3]">{{ $t('sellRatio') }}</span>
               </template>
               <template #suffix>
-                <span class="color-[--d-666-l-999]">%</span>
+                <span class="color-[--d-566275-l-8CA0C3]">%</span>
               </template>
             </el-input-number>
           </div>
@@ -262,22 +262,22 @@
                   <div class="flex items-center">
                     <Icon v-if="item.isUp" name="ri:arrow-up-long-fill" class="color-#12B886" />
                     <Icon v-else name="ri:arrow-down-long-fill" class="color-#F6465D" />
-                    <span class="text-12px color-[--d-666-l-999]">{{ item.isUp ? $t('rise') : $t('fall') }}</span>
+                    <span class="text-12px color-[--d-566275-l-8CA0C3]">{{ item.isUp ? $t('rise') : $t('fall') }}</span>
                   </div>
                 </template>
                 <template #suffix>
-                  <span class="color-[--d-666-l-999]">%</span>
+                  <span class="color-[--d-566275-l-8CA0C3]">%</span>
                 </template>
               </el-input-number>
               <el-input-number v-model="item.sellRatio" class="input-number-limit" :min="1" :max="100" :controls="false" placeholder="--">
                 <template #prefix>
-                  <span class="text-12px color-[--d-666-l-999]">{{ $t('sell') }}</span>
+                  <span class="text-12px color-[--d-566275-l-8CA0C3]">{{ $t('sell') }}</span>
                 </template>
                 <template #suffix>
-                  <span class="color-[--d-666-l-999]">%</span>
+                  <span class="color-[--d-566275-l-8CA0C3]">%</span>
                 </template>
               </el-input-number>
-              <Icon class="text-16px ml-5px clickable color-[--d-666-l-999]" name="bx:bxs-trash-alt" @click.stop="autoSellConfigs.autoSellConfig.splice(index, 1)" />
+              <Icon class="text-16px ml-5px clickable color-[--d-566275-l-8CA0C3]" name="bx:bxs-trash-alt" @click.stop="autoSellConfigs.autoSellConfig.splice(index, 1)" />
             </li>
             <li class="flex gap-8px items-center text-14px mt-20px">
               <button class="flex-1 h-44px flex items-center justify-center clickable bg-#12B8861A color-#12B886 border-none rd-8px disabled:op-50 disabled:cursor-not-allowed" type="button" :disabled="autoSellConfigs.autoSellConfig?.length >= 5" @click.stop="addStopProfit">
@@ -323,7 +323,8 @@ const props = defineProps({
   setting: { type: Object, default: () => ({}) },
   isAutoSell: { type: Boolean, default: true },
   showQuickAmount: { type: Boolean, default: true },
-  showClipboardSet: { type: Boolean, default: false }
+  showClipboardSet: { type: Boolean, default: false },
+  showAutoSell: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['update:slippage', 'onSubmit'])
@@ -354,6 +355,11 @@ const clipboardQuickInput = ref(cloneDeep(botSettingStore.clipboardQuickInput))
 
 watch(show, (val) => {
   if (val) {
+    if (props.chain === 'xlayer') {
+      settingTab.value = 0
+    } else if (props.showAutoSell) {
+      settingTab.value = 1
+    }
     const selected = botSetting.value.selected
     botSetting.value = cloneDeep(props.setting ?? {})
     const s = botSetting.value[selected]?.slippage ?? 9
@@ -587,12 +593,12 @@ function addStopLoss() {
     }
   }
   .radio-item {
-    border: 1px solid var(--d-333-l-F2F2F2);
-    background: var(--d-333-l-F2F2F2);
+    border: 1px solid var(--d-252E3C-l-E8F1FF);
+    background: var(--d-252E3C-l-E8F1FF);
     border-radius: 8px;
     min-width: 86px;
     font-size: 14px;
-    color: #999999;
+    color: var(--d-566275-l-8CA0C3);
     letter-spacing: 0;
     font-weight: 400;
     text-align: center;
@@ -609,7 +615,7 @@ function addStopLoss() {
 }
 .slippage-label {
   font-size: 14px;
-  color: #999999;
+  color: var(--d-8CA0C3-l-566275);
   letter-spacing: 0;
   text-align: center;
   font-weight: 400;
@@ -634,10 +640,10 @@ function addStopLoss() {
     opacity: 0.5;
   }
   &:deep() .el-input__wrapper, &:deep() .el-input__inner {
-    background-color: var(--d-333-l-F2F2F2);
+    background-color: var(--d-252E3C-l-E8F1FF);
   }
   &:deep() .el-input-number__decrease, &:deep() .el-input-number__increase {
-    background-color: var(--d-333-l-F2F2F2);
+    background-color: var(--d-252E3C-l-E8F1FF);
   }
   .input {
     font-size: 14px;
@@ -666,16 +672,16 @@ function addStopLoss() {
 .input-swap {
   display: flex;
   align-items: center;
-  background: var(--d-333-l-F2F2F2);
+  background: var(--d-252E3C-l-E8F1FF);
   border-radius: 4px;
   height: 32px;
-  --el-fill-color-light: var(--d-333-l-F2F2F2);
+  --el-fill-color-light: var(--d-252E3C-l-E8F1FF);
 }
 .input-number {
   flex: 1;
-  background: var(--d-333-l-F2F2F2);
-  --el-input-bg-color: var(--d-333-l-F2F2F2);
-  --el-input-border-color: var(--d-333-l-F2F2F2);
+  background: var(--d-252E3C-l-E8F1FF);
+  --el-input-bg-color: var(--d-252E3C-l-E8F1FF);
+  --el-input-border-color: var(--d-252E3C-l-E8F1FF);
   border-radius: 4px;
 }
 .slippage-input {
@@ -693,11 +699,11 @@ function addStopLoss() {
 .setting-list {
   display: flex;
   justify-content: space-between;
-  background: var(--d-333-l-F2F2F2);
-  // color: var(--d-666-l-999);
+  background: var(--d-252E3C-l-E8F1FF);
+  // color: var(--d-566275-l-8CA0C3);
   padding: 2px;
   button {
-    color: var(--d-666-l-999);
+    color: var(--d-566275-l-8CA0C3);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -720,7 +726,7 @@ function addStopLoss() {
   flex: 1;
   :deep(.el-input) {
     height: 36px;
-    --el-input-bg-color: var(--d-333-l-F2F2F2);
+    --el-input-bg-color: var(--d-252E3C-l-E8F1FF);
     --el-input-border-color: transparent;
     --el-input-hover-border-color: transparent;
     --el-input-focus-border-color: transparent;
@@ -740,5 +746,11 @@ function addStopLoss() {
   :deep(.el-input-group__append) {
     padding: 0 8px;
   }
+}
+:deep(.el-input__inner::placeholder) {
+  color: var(--d-566275-l-8CA0C3);
+}
+:deep(.el-checkbox__inner){
+  border-color: var(--d-252E3C-l-E8F1FF);
 }
 </style>

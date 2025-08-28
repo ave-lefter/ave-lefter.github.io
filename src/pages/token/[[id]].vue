@@ -26,7 +26,7 @@
           <el-scrollbar :height="scrollbarHeight">
             <div :class="orderBookVisible ? 'grid grid-cols-[1fr_292px] gap-1px' : 'grid grid-cols-1 gap-1px'">
               <div>
-                <KLine ref="klineContainer" />
+                <KLine ref="klineContainer" @refresh="refresh"/>
               </div>
               <OrderBook v-model="orderBookVisible" :kline-height="klineHeight + 3" />
             </div>
@@ -157,7 +157,7 @@ function init() {
   _getTokenInfo()
   _getTokenInfoExtra()
   // wsStore.onmessageTxUpdateToken()
-  tokenStore._getTotalHolders()
+  tokenStore._getTotalHolders(route.params.id as string)
   tagStore.getTagArr()
   tokenStore.twitterType = 0
   tokenStore.getXType(route.params.id as string)
@@ -193,6 +193,10 @@ onBeforeRouteLeave(() => {
   wsStore.getWSInstance()?.offMessage(['tx_update_token', 'kline', 'price'])
   document.removeEventListener('visibilitychange', visibilitychangeFn)
 })
+
+function refresh() {
+  init()
+}
 </script>
 
 <style scoped>

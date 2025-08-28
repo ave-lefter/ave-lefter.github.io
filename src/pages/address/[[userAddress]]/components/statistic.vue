@@ -13,7 +13,7 @@
           iconSize="60px"
         />
         <div>
-          <div class="flex items-start mb-1.5">
+          <div class="flex items-center mb-1.5">
             <UserRemark
               :key="address"
               class="gap-1.5 text-6 leading-7.5 text-[var(--a-text-5-color)]"
@@ -93,7 +93,7 @@
           {{ formatNumber(Math.abs((statistics.profit ?? 0) / main_token_price), 2) }}
           {{ main_token_symbol }}
         </AveNumber>
-        <AveNumber :value="statistics.profit_ratio">
+        <AveNumber :value="statistics.profit_ratio" class="ml-1">
           {{ formatNumber(Math.abs((statistics?.profit_ratio ?? 0) * 100), 1) }}%
         </AveNumber>
       </p>

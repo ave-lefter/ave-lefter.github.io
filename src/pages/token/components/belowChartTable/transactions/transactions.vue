@@ -474,7 +474,7 @@ async function _getPairLiq() {
 }
 
 function isBuy(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) {
-  if ('direction' in row) {
+  if ('direction' in row && 'target' in row) {
     return row.direction === 'buy'
   }
   if ('from_address' in row) {
@@ -510,7 +510,7 @@ function getRowColor(row: GetPairLiqResponse | IGetTokenTxsResponse) {
 function getPrice(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, isShowToken = false) {
   // route.params。id 同步更改，而接口异步请求，此时更新该值变成了 0
   const tokenAddress = realAddress.value
-  if ('direction' in row) {
+  if ('direction' in row && 'target' in row) {
     return row.price_u
   }
   if ('from_address' in row) {
@@ -544,7 +544,7 @@ function getPrice(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, i
 }
 
 function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, needPrice = false, isVolUSDT = false) {
-  if ('direction' in row) {
+  if ('direction' in row && 'target' in row) {
     return Number(row.target_amt || 0) * (
         needPrice ? Number(isVolUSDT ? row.price_u : row.price_m)
           : 1
@@ -577,7 +577,7 @@ function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, 
 }
 
 function hasNewAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
-  if ('direction' in row) {
+  if ('direction' in row && 'target' in row) {
     return row.direction === 'buy' && new BigNumber(row.maker_bal).eq(row.target_amt)
   }
   if (row?.newTags?.some?.(i => i?.type === '8')) {
@@ -593,7 +593,7 @@ function hasNewAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleW
 }
 
 function hasClearedAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
-  if ('direction' in row) {
+  if ('direction' in row && 'target' in row) {
     return row.direction === 'sell' && new BigNumber(row.maker_bal).eq(0)
   }
   if (isBuy(row) || row.newTags?.some?.(i => i?.type === '8')) {

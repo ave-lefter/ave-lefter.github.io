@@ -49,16 +49,18 @@ export const useGlobalStore = defineStore('global', () => {
     isGutter: boolean
     isRight: boolean
     isBlacklist: boolean
+    show_search: boolean
     define: string[]
   }>('pumpSetting', {
     fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
-    avatar_isCircle: 'circle',
-    isGutter: false,
+    avatar_isCircle: 'rect',
+    isGutter: true,
     isRight: false,
     isBlacklist: true,
-    define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','cabal','insider', 'sniper', 'rug', 'kol'],
+    show_search: true,
+    define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','insider', 'sniper', 'rug', 'kol', 'markers'],
   })
 
   const hide_risk=shallowRef(1)
@@ -69,7 +71,7 @@ export const useGlobalStore = defineStore('global', () => {
     quickBuyValue: '0.01',
   })
   const latestNotice = shallowRef<ILatestNotice>({})
-
+  const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
   const holderBlackList = useStorage<Array<pumpBlack>>('holderBlackList', [])
@@ -157,6 +159,7 @@ export const useGlobalStore = defineStore('global', () => {
     rankCommon,
     headFollowsNum,
     getFollowsNum,
-    latestNotice
+    latestNotice,
+    pnlTrackerVisible
   }
 })

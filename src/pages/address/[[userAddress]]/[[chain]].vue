@@ -1,5 +1,5 @@
 <template>
-  <div v-if="userAddress && chain" className="flex flex-col w-full gap-3 p-[20px] pt-[10px] bg-[var(--d-111-l-FFF)] pb-0 overflow-y-auto" style="max-height: calc(100vh - 92px);">
+  <div v-if="userAddress && chain && SupportFullDataChain.includes(chain)" ref="scrollRef" className="flex flex-col w-full gap-3 p-[20px] pt-[10px] bg-[var(--d-111-l-FFF)] pb-0 overflow-y-auto" style="max-height: calc(100vh - 92px);">
     <div class="flex-between">
       <el-select
         :style="{ width: '120px' }"
@@ -73,85 +73,8 @@
     />
   </div>
 
-  <div v-else class="flex flex-col w-full h-full p-[10%] bg-[var(--d-111-l-FFF)] items-center pb-0">
-    <div
-      v-if="['bsc', 'solana'].includes(chain)"
-      className="flex flex-col w-full gap-3 p-[20px] pt-[10px] pb-0"
-    >
-      <div class="flex-between">
-        <el-select
-          :style="{ width: '120px' }"
-          :model-value="chain"
-          @update:model-value="
-            (val) => {
-              navigateTo(`/address/${botStore.getWalletAddress(val)}/${val}`)
-            }
-          "
-        >
-          <template #prefix>
-            <ChainToken :chain="chain" :width="16" />
-          </template>
-          <el-option
-            v-for="{ chain: _chain } in smartChains"
-            :key="_chain"
-            :label="getChainInfo(_chain)?.name"
-            :value="_chain"
-          >
-            <div class="flex-center" style="gap: 4px">
-              <ChainToken :chain="_chain" :width="16" />
-              {{ getChainInfo(_chain)?.name }}
-            </div>
-          </el-option>
-        </el-select>
-        <!-- <el-radio-group
-          v-model="interval"
-          class="m-radio-group"
-          size="small"
-          :fill="themeStore.isDark ? '#333' : '#ccc'"
-          :text-color="themeStore.isDark ? '#F5F5F5' : '#FFF'"
-          @change="(v) => console.log('v', v)"
-        >
-          <el-radio-button
-            v-for="option in options"
-            :key="option.id"
-            v-model="interval"
-            :label="option.name"
-            :value="option.id"
-          />
-        </el-radio-group> -->
-        <ButtonGroup
-          v-model:active-value="interval"
-          class="mt--5px"
-          :options="options"
-        />
-      </div>
-      <div class="flex align-stretch">
-        <Statistic
-          ref="statisticRef"
-          :isSelfAddress="isSelfAddress"
-          :address="userAddress"
-          :chain="chain"
-          :interval="interval"
-          :intervalText="intervalText"
-        />
-        <TradeData
-          :interval="interval"
-          :intervalText="intervalText"
-          :address="userAddress"
-          :chain="chain"
-          @txAnalysisChange="txAnalysisChange"
-        />
-      </div>
-      <ActivityCharts :interval="interval" :address="userAddress" :chain="chain" />
-      <StatisticsTable
-        ref="statisticsTable"
-        :address="userAddress"
-        :chain="chain"
-        :isSelfAddress="isSelfAddress"
-      />
-    </div>
+  <div v-else-if="userAddress && chain" ref="scrollRef" class="flex flex-col w-full h-full bg-[var(--d-111-l-FFF)] items-center pb-0">
     <PageOther
-      v-else
       :address="userAddress"
       :chain="chain"
     />
@@ -166,11 +89,13 @@ import ActivityCharts from './components/activityCharts.vue'
 import PageBlank from './components/pageBlank.vue'
 import PageOther from './components/pageOther.vue'
 import { getChainInfo } from '@/utils'
+import { useEventBus } from '@vueuse/core'
 
 const isVolUSDT = ref(true)
 provide('isVolUSDT', isVolUSDT)
 
 const interval = ref('7D')
+const scrollRef = useTemplateRef('scrollRef')
 const route = useRoute()
 const botStore = useBotStore()
 const themeStore = useThemeStore()
@@ -245,6 +170,17 @@ watch(() => botStore.getWalletAddress('solana'), (address, old) => {
     }
   }
 )
+const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
+scrollTopEvent.on(scrollToTop)
+onUnmounted(()=>{
+  scrollTopEvent.off(scrollToTop)
+})
+function scrollToTop() {
+  scrollRef.value.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
 
 // Watchers
 // watch(

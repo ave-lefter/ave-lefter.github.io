@@ -26,10 +26,10 @@ const modelColumns = ref(cloneDeep(storeColumns.value.filter((item) =>item.child
 // 当对话框打开时，更新本地列配置
 const openDialog = () => {
   dialogVisible.value = true
-  console.log('storeColumns', props.storageKey)
   storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
   initColumns.value = props.getDefaultColumns(t)
   modelColumns.value = cloneDeep(storeColumns.value.filter((item) => item.children || item.isVisible))
+  console.log(storeColumns.value)
   hotSettings.value = {
     avatar_isCircle:globalStore.pumpSetting.avatar_isCircle,
     isBlacklist:globalStore.pumpSetting.isBlacklist
@@ -43,7 +43,10 @@ const handleSelect = (item) => {
   } else {
     const data = initColumns.value.find((arr) => arr.render === item)
     if (data) {
-      modelColumns.value.push(cloneDeep({ ...data, isVisible: true }))
+      const quickIndex = modelColumns.value.findIndex(el=>el.key==='quick')
+      if(quickIndex!==-1){
+        modelColumns.value.splice(quickIndex,0,{ ...data, isVisible: true })
+      }
     }
   }
 }

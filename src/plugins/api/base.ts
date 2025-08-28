@@ -74,10 +74,15 @@ export function onResponse({ response, request }: MyFetchContext) {
       throw new Error(data?.msg)
     }
   } else {
-    if (data?.status === 0 && data?.msg !== 'Success') {
+    if (data?.status <= 0 && data?.msg !== 'Success') {
       // return Promise.reject(data?.msg)
       throw new Error(data?.msg)
     }
+  }
+
+  if (data?.status === 0 && data?.msg === 'Success' && data?.data) {
+    response._data = data?.data
+    return
   }
 
   if (data?.data_type === 1 && typeof(data?.data) === 'string' && data?.data) {

@@ -29,7 +29,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     isAutoSellConfig: false,
     //  autoSellConfig: [] as Array<{open: boolean, priceChange: number, sellRatio: number, type: 'default' | 'trailing' | 'migrated' | 'devsell', isUp?: boolean}>,
   }
-  const chains = ['solana', 'eth', 'bsc', 'base'] as const
+  const chains = useBotStore().isSupportChains
   type Setting = typeof defaultSettings
   const settings: {
     [key in typeof chains[number]]?: {
@@ -57,7 +57,22 @@ export const useBotSettingStore = defineStore('botSetting', () => {
   const autoSellConfigs = useLocalStorage('bot_autoSellConfigs', {
     autoSell: false,
     isAutoSellConfig: false,
-    autoSellConfig: [] as Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default', isUp?: boolean}>,
+    autoSellConfig: [
+      {
+        open: true,
+        priceChange: 10000,
+        sellRatio: 5000,
+        type: 'default',
+        isUp: true
+      },
+      {
+        open: true,
+        priceChange: -5000,
+        sellRatio: 10000,
+        type: "default",
+        isUp: false
+      }
+    ] as Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default', isUp?: boolean}>,
     isAutoSellConfig_devsell: false,
     autoSellConfig_devsell: null as {open: boolean, priceChange?: number, sellRatio?: number, type: 'devsell', isUp?: boolean} | null,
     isAutoSellConfig_trailing: false,

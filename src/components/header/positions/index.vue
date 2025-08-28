@@ -120,7 +120,7 @@ onMounted(() => {
   color: var(--d-E9E9E9-l-222);
   height: 32px;
   cursor: pointer;
-  background: var(--d-222-l-F2F2F2);
+  background: var(--d-141721-l-E8F1FF);
   border-radius: 4px;
   padding: 0 10px;
   min-width: 60px;

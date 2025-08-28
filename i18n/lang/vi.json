@@ -751,5 +751,11 @@
   "blockHeight": "Khối",
   "withdrawAgain": "Rút lại",
   "trading": "giao dịch",
-  "withdrawTip": "Cần có 0,002 để đảm bảo việc sử dụng chức năng ví bình thường"
+  "withdrawTip": "Cần có 0,002 để đảm bảo việc sử dụng chức năng ví bình thường",
+  "holdersNum": "Số lượng tiền được giữ",
+  "holdersAnalysis": "Phân tích người nắm giữ",
+  "holdersNumTotal": "Chủ sở hữu tổng số",
+  "holdersTotalChange": "Người nắm giữ thay đổi",
+  "holdersChange": "Người nắm giữ thay đổi",
+  "holdersChange2": "Người giữ changs trong {n}"
 }
