@@ -190,6 +190,7 @@
     <FavAddressPop ref="favAddressPopRef" :visible="favAddressPopVisible" :button-ref="attentionTrigger || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" @onCancel="() => favAddressPopVisible = false"/>
     <PnlTracker v-if="globalStore.pnlTrackerVisible"/>
     <Top v-if="topVisible" @click="scrollToTop"/>
+    <Banner/>
   </div>
 </template>
 
@@ -238,7 +239,7 @@ import { useEventBus } from '@vueuse/core'
   })
 
   const topVisible = computed(()=>{
-   return ['/smart','/address'].some(url=>route.fullPath.includes(url)) 
+   return ['/smart','/address'].some(url=>route.fullPath.includes(url))
   })
 
   const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
