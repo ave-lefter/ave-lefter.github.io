@@ -456,7 +456,7 @@ export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
     try {
       return 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(defaultSvg)))
     } catch (err) {
-      // console.log(err)
+      console.log(err, chain,text)
       return ''
     }
   }
@@ -572,11 +572,11 @@ export function getRemarkByAddress({ address, chain }: { address: string; chain:
 
 export function getColorClass(val: string | number) {
   if (Number(val) > 0) {
-    return 'color-#12B886'
+    return 'color-[--up-color]'
   } else if (Number(val) < 0) {
-    return 'color-#F6465D'
+    return 'color-[--down-color]'
   } else {
-    return 'color-[--d-666-l-999]'
+    return 'color-[--third-text]'
   }
 }
 export function desensitizeEmail(email: string) {
@@ -1020,4 +1020,8 @@ export function requestTimeout(interval: number, callback: () => void) {
   }
   request()
   return timerId
+}
+
+export function getCssVariable(key: string) {
+  return getComputedStyle(document.documentElement).getPropertyValue(key)
 }

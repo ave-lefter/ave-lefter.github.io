@@ -768,8 +768,8 @@ const collect = async (row: any,index:number) => {
         class="flex items-center whitespace-nowrap w-[80%] overflow-x-auto scrollbar-hide"
       >
         <a
-          v-for="(item,index) in tabs" :key="item.value" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-666-l-999] px-12px py-4px rounded-4px
-         ${activeTab === item.value ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333]' : ''}`"
+          v-for="(item,index) in tabs" :key="item.value" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
+         ${activeTab === item.value ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
           @click="setActiveTab(item.value,index)">
           {{ item.label }}
         </a>
@@ -786,7 +786,7 @@ const collect = async (row: any,index:number) => {
         {{ $t('loading') }}
       </div>
       <template v-else>
-        <div class="lh-20px text-13px py-6px bg-#3F80F71A text-center mb-12px flex justify-center">
+        <div class="lh-20px text-13px py-6px bg-#3F80F71A text-center mb-12px flex justify-center text-[--third-text]">
           <div
             v-html="$t('filterTip', {
             address: `<span class='color-#3F80F7'>&nbsp;${tableFilter.markerAddress.slice(0, 4)}...${tableFilter.markerAddress.slice(-4)}&nbsp;</span>`,
@@ -826,7 +826,7 @@ const collect = async (row: any,index:number) => {
             <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
             <img v-else src="@/assets/images/empty-black.svg" alt="">
             <span
-              class="mt-10px color-[--d-666-l-999]"
+              class="mt-10px color-[--third-text]"
             >
               {{ t('emptyNoData') }}
             </span>
@@ -838,7 +838,7 @@ const collect = async (row: any,index:number) => {
             <span>{{ $t('time') }}</span>
             <Icon
               :name="`${tableView.isShowDate ? 'custom:calendar' : 'custom:countdown'}`"
-              class="color-[--d-666-l-999] cursor-pointer" @click.self="tableView.isShowDate = !tableView.isShowDate" />
+              class="color-[--third-text] cursor-pointer" @click.self="tableView.isShowDate = !tableView.isShowDate" />
             <TableDateFilter
               v-model:visible="tableFilterVisible.timestamp" :modelValue="tableFilter.timestamp" :boundary="txsContainer || undefined"
               @confirm="onTimestampConfirm" />
@@ -849,7 +849,7 @@ const collect = async (row: any,index:number) => {
             v-if="!tableView.isShowDate && row.time && Number(formatTimeFromNow(row.time, true)) < 60"
             :key="`${row.time}${rowIndex}`" :timestamp="row.time" :end-time="60">
             <template #default="{ seconds }">
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 <template v-if="seconds < 60">
                   {{ seconds }}s
                 </template>
@@ -859,7 +859,7 @@ const collect = async (row: any,index:number) => {
               </span>
             </template>
           </TimerCount>
-          <span v-else class="color-[--d-999-l-666]">
+          <span v-else class="color-[--secondary-text]">
             {{
               tableView.isShowDate
                 ? formatDate(row.time, 'HH:mm:ss')
@@ -916,13 +916,13 @@ const collect = async (row: any,index:number) => {
           <div v-else>
             <div :class="getRowColor(row)">
               {{ formatNumber(row.amount0 || 0) }}
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 {{ row.token0_symbol }}
               </span>
             </div>
             <div :class="getRowColor(row)">
               {{ formatNumber(row.amount1 || 0) }}
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 {{ row.token1_symbol }}
               </span>
             </div>
@@ -933,7 +933,7 @@ const collect = async (row: any,index:number) => {
             <span>{{ $t('amountU') }}</span>
             <Icon
               name="custom:price"
-              :class="`${tableView.isVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-666]'} cursor-pointer`"
+              :class="`${tableView.isVolUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer`"
               @click.self="tableView.isVolUSDT = !tableView.isVolUSDT" />
             <VolFilter
               v-model:visible="tableFilterVisible.amountU" :modelValue="tableFilter.amountU"
@@ -950,7 +950,7 @@ const collect = async (row: any,index:number) => {
             </template>
             <template v-else>
               {{ formatNumber(getAmount(row, true, false), 3) }}
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 &nbsp;{{ getChainInfo(row.chain)?.main_name }}
               </span>
             </template>
@@ -961,7 +961,7 @@ const collect = async (row: any,index:number) => {
             </template>
             <template v-else>
               {{ formatNumber(row.amount0 * row.token0_price_eth + row.amount1 * row.token1_price_eth, 2) }}
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 {{ getChainInfo(row.chain)?.main_name }}
               </span>
             </template>
@@ -998,7 +998,7 @@ const collect = async (row: any,index:number) => {
               :address="row.wallet_address"
               :maxRemarkLength="8"
               :chain="row.chain"
-              :wallet_logo="row.wallet_logo" class="color-[--d-999-l-666]"
+              :wallet_logo="row.wallet_logo" class="color-[--secondary-text]"
               :mouseoverAddress="e => openMarkerTooltip(row, e)"
             >
               <div v-if="row.count && row.count > 1">
@@ -1007,15 +1007,15 @@ const collect = async (row: any,index:number) => {
             </UserRemark>
             <Icon
               :ref="(el: any) => $refs.buttonRefs[rowIndex] = el" name="custom:attention"
-              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--third-text]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
             <Icon
               name="custom:filter"
-              :class="`${tableFilter.markerAddress ? 'color-[--d-999-l-666]' : 'color-[--d-666-l-999]'} cursor-pointer text-10px shrink-0`"
+              :class="`${tableFilter.markerAddress ? 'color-[--secondary-text]' : 'color-[--third-text]'} cursor-pointer text-10px shrink-0`"
               @click.self.stop="setMakerAddress(row.wallet_address)" />
           </div>
         </template>
         <template #cell-SOLBalance="{ row }">
-          <span v-if="row.senderProfile" class="color-[--d-999-l-666]">
+          <span v-if="row.senderProfile" class="color-[--secondary-text]">
             {{ formatNumber(row.senderProfile?.solTotalHolding || 0, 2) }}
           </span>
         </template>
@@ -1030,7 +1030,7 @@ const collect = async (row: any,index:number) => {
               class="w-16px h-16px cursor-pointer rounded-full"
               :src="formatIconSwap(row.amm)" alt="" @click.stop.self="goBrowser(row)">
             <Icon
-              name="custom:browser" class="text-16px color-[--d-666-l-999] cursor-pointer"
+              name="custom:browser" class="text-16px color-[--third-text] cursor-pointer"
               @click.stop.self="goBrowser(row)" />
           </div>
         </template>

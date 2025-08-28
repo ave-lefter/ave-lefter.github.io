@@ -65,12 +65,12 @@ const types = computed(() => {
       font-size: 12px;
       padding: 0 10px;
       font-weight: 400;
-      --el-text-color-primary: var(--d-999-l-666);
+      --el-text-color-primary: var(--third-text);
       &.is-active {
-        color: var(--d-F5F5F5-l-333);
+        color: var(--main-text);
       }
       &:hover {
-        color: var(--d-F5F5F5-l-333);
+        color: var(--main-text);
         cursor: pointer;
       }
     }
@@ -79,7 +79,7 @@ const types = computed(() => {
     }
     .el-tabs__active-bar {
       height: 2px;
-      background-color: var(--d-F5F5F5-l-333);
+      background-color: var(--main-text);
     }
     .el-tabs__nav-wrap::after {
       height: 0.5px;

@@ -17,15 +17,15 @@
           <SlippageSetMarket :chain="chain" />
         </div>
         <Icon
-          class="text-14px clickable color-[--d-999-l-666] clickable" name="ri:close-large-fill"
+          class="text-14px clickable color-[--main-text] clickable" name="ri:close-large-fill"
           @click.stop="visible = false" />
       </div>
       <div class="content">
         <div class="flex-between mt-10px">
           <span class="">{{ $t('buy1') }}</span>
-          <span class="color-#999 ml-auto">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.native?.balance || 0)
+          <span class="color-[--secondary-text] ml-auto">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.native?.balance || 0)
             }}&nbsp;{{ getChainInfo(chain)?.main_name }}</span>
-          <RefreshBalance class="color-#999" :type="0" />
+          <RefreshBalance class="color-[--secondary-text]" :type="0" />
         </div>
         <div class="mt-10px tabs">
           <el-button
@@ -36,9 +36,9 @@
         </div>
         <div class="flex-between mt-15px">
           <span class="">{{ $t('sell1') }}</span>
-          <span class="color-#999 ml-auto">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.token?.balance || 0)
+          <span class="color-[--secondary-text] ml-auto">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.token?.balance || 0)
             }}&nbsp;{{ tokenStore.token?.symbol || '' }}</span>
-          <RefreshBalance class="color-#999" :type="1" />
+          <RefreshBalance class="color-[--secondary-text]" :type="1" />
         </div>
         <div class="mt-10px tabs">
           <el-button
@@ -468,9 +468,9 @@ onUnmounted(() => {
 .fixed-one-click {
   position: fixed;
   z-index: 3;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   font-size: 12px;
-  background: var(--d-222-l-F2F2F2);
+  background: var(--dialog-bg);
   border-radius: 8px;
   min-width: 240px;
   padding: 12px;
@@ -526,7 +526,7 @@ onUnmounted(() => {
 
     button {
       border: none;
-      color: var(--d-999-l-666);
+      color: var(--secondary-text);
       letter-spacing: 0;
       font-weight: 400;
       cursor: pointer;
@@ -538,8 +538,8 @@ onUnmounted(() => {
 
       &.active {
         // color: var(--custom-font-4-color);
-        color: var(--d-F5F5F5-l-333);
-        background: var(--d-333-l-FFF);
+        color: var(--main-text);
+        background: var(--border);
       }
     }
   }

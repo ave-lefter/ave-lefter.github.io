@@ -2,7 +2,7 @@
   <div v-if="(result?.total<=0) && (walletStore.walletName === 'WatchWallet')"/>
   <div v-else>
     <span
-      class="flex items-center text-14px cursor-pointer color-[--d-FFF-l-333]"
+      class="flex items-center text-14px cursor-pointer color-[--main-text]"
       @click="showBlackList"
     >
       <Icon name="custom:black" class="mr-4px" />
@@ -18,19 +18,20 @@
       <div class="flex flex-col gap-10px pt-0">
         <el-input
           v-model="query.q"
-          class="!text-12px"
+          class="!text-12px [&&]:[--el-input-bg-color:--border]"
           :placeholder="t('searchContractORName')"
+          size="large"
           clearable
           @clear="getBlackList"
           @keyup.enter="getBlackList"
         >
           <template #prefix>
-            <Icon class="text-16px text-[var(--d-666-l-999)]" name="ep:search" />
+            <Icon class="text-16px text-[--third-text]" name="ep:search" />
           </template>
         </el-input>
 
         <div class="relative">
-          <el-table  v-loading="result.loading" :data="result.list" row-class-name="!bg-[var(--el-bg-color)]" style="height: 283px;">
+          <el-table  v-loading="result.loading" class="table-blacklist" :data="result.list" row-class-name="!bg-[var(--el-bg-color)]" style="height: 283px;">
             <template #empty>
               <div v-if="!result.loading" class="text-12px flex flex-col items-center justify-center h-250px">
                 <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
@@ -85,7 +86,7 @@
           v-if="result.total"
           v-model:current-page="query.pageNo"
           v-model:page-size="query.pageSize"
-          class="pagination-box mx-auto bg-[--d-222-l-FFF]! border-t-none!"
+          class="pagination-box mx-auto bg-[--dialog-bg]! border-t-none!"
           layout="total, prev, pager, next"
           :total="result.total"
           hide-on-single-page
@@ -223,6 +224,16 @@ const updateRowLoading = (token, isLoading) => {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+.table-blacklist {
+  --el-table-header-bg-color: transparent;
+  --el-table-tr-bg-color:transparent;
+  --el-table-border: 0 none;
+  --el-table-text-color: var(--main-text);
+  --el-table-row-hover-bg-color:var(--border);
+  --el-table-bg-color: transparent;
+  :deep() .el-table__header-wrapper {
+    font-size: 12px;
+  }
+}
 </style>

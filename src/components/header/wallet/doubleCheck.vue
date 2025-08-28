@@ -17,9 +17,7 @@
               :placeholder="$t('emailAuthPlaceholder')" name="new-verificationCode2">
               <template #suffix>
                 <el-button
-                  class="countdownBtn" link :disabled="disabledCountdownBtn" :loading="loading2" :style="{
-                  color: '#3F80F7',
-                }" @click="sendVerificationCode">
+                  class="countdownBtn" link :disabled="disabledCountdownBtn" :loading="loading2" type="primary" @click="sendVerificationCode">
                   {{
                     isCounting ? `${count}${$t("SS")}` : $t("startCountDown")
                   }}</el-button>
@@ -404,13 +402,13 @@ onMounted(() => {
 <style scoped lang='scss'>
 .w-check {
   min-height: 488px;
-  color: var(--d-E9E9E9-l-222);
+  // color: var(--d-E9E9E9-l-222);
   display: flex;
   flex-direction: column;
 
   .tg-wallet-list_title {
     padding: 20px;
-    border-bottom: 0.5px solid var(--d-33353D-l-F5F5F5);
+    border-bottom: 0.5px solid var(--border);
   }
 
   .w-content {
@@ -484,9 +482,9 @@ onMounted(() => {
             }
 
             .el-input {
-              background: var(--d-333-l-F2F2F2);
-              --el-input-bg-color: var(--d-333-l-F2F2F2);
-              --el-input-border-color: var(--d-333-l-F2F2F2);
+              // background: var(--d-333-l-F2F2F2);
+              // --el-input-bg-color: var(--d-333-l-F2F2F2);
+              // --el-input-border-color: var(--d-333-l-F2F2F2);
               border-radius: 8px;
               --el-input-height: 48px;
               margin-bottom: 10px;
@@ -500,9 +498,9 @@ onMounted(() => {
       }
 
       .el-input {
-        background: var(--d-333-l-F2F2F2);
-        --el-input-bg-color: var(--d-333-l-F2F2F2);
-        --el-input-border-color: var(--d-333-l-F2F2F2);
+        // background: var(--d-333-l-F2F2F2);
+        // --el-input-bg-color: var(--d-333-l-F2F2F2);
+        // --el-input-border-color: var(--d-333-l-F2F2F2);
         border-radius: 8px;
         --el-input-height: 48px;
       }
@@ -587,6 +585,22 @@ onMounted(() => {
 
         :deep() .el-checkbox__inner:hover {
           border-color: var(--d-EAECEF-l-333);
+        }
+      }
+    }
+  }
+
+  .countdownBtn {
+    &.el-button.is-link {
+      font-weight: 400;
+      background: transparent;
+      --el-mask-color-extra-light: transparent;
+
+      &.is-disabled {
+        color: var(--main-text);
+
+        &:hover {
+           color: var(--main-text);
         }
       }
     }

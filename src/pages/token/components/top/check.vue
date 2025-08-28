@@ -6,8 +6,8 @@
     :size="430"
     class="draw-right"
   >
-    <div class="check-container bg-[--d-222-l-FFF] color-[--d-F5F5F5-l-333]">
-      <div class="flex items-center justify-between text-20px p-20px sticky top-0 bg-[--d-222-l-FFF] z-1">
+    <div class="check-container bg-[--dialog-bg] color-[--main-text]">
+      <div class="flex items-center justify-between text-20px p-20px sticky top-0 bg-[--dialog-bg] z-1">
         <span>{{ $t('check2') }}</span>
         <Icon name="ri:close-large-fill" class="clickable" @click.stop="visible = false" />
       </div>
@@ -112,7 +112,7 @@
                           width="12px"
                           alt=""
                         >
-                        <span class="color-[--d-999-l-666] ml-5px">{{ item[1] }}</span>
+                        <span class="color-[--secondary-text] ml-5px">{{ item[1] }}</span>
                       </div>
                   </li>
                   <li
@@ -132,7 +132,7 @@
                       width="12px"
                       alt=""
                     >
-                    <span :class="item[0] > 1 ? 'color-[--d-F5F5F5-l-333] ml-5px' : 'color-[--d-999-l-666] ml-5px'">{{ item[1] }}</span>
+                    <span :class="item[0] > 1 ? 'color-[--main-text] ml-5px' : 'color-[--secondary-text] ml-5px'">{{ item[1] }}</span>
                   </li>
                 </template>
               </ul>
@@ -144,7 +144,7 @@
                 @click.stop.prevent="showRiskList = !showRiskList"
               >
                 <Icon
-                  class="text-24px color-[--d-666-l-999]"
+                  class="text-24px color-[--third-text]"
                   :name="
                     showRiskList
                       ? 'material-symbols:keyboard-arrow-up'
@@ -194,7 +194,7 @@
                           <use xlink:href="#icon-shouqi1"></use>
                         </svg> -->
                         <Icon
-                          class="text-20px color-[--d-999-l-666]"
+                          class="text-20px color-[--secondary-text]"
                           :name="
                             buy_tax_list_show
                               ? 'material-symbols:keyboard-arrow-up'
@@ -357,7 +357,7 @@
                         "
                       >
                         <Icon
-                          class="text-20px color-[--d-999-l-666]"
+                          class="text-20px color-[--secondary-text]"
                           :name="
                             sell_tax_list_show
                               ? 'material-symbols:keyboard-arrow-up'
@@ -764,7 +764,7 @@
                     </a>
                     <div class="flex items-center">
                       <span>{{ formatNumber(item.quantity || 0, 2) }}</span>
-                      <span v-if="checkResult?.total && item?.quantity" class="color-[--d-666-l-999]">
+                      <span v-if="checkResult?.total && item?.quantity" class="color-[--third-text]">
                         ({{
                           formatNumber(
                             Number(item?.quantity) * 100 /
@@ -912,7 +912,7 @@
                           (checkResult?.pair_total && item?.quantity) ||
                           item?.percent
                         "
-                        class="color-[--d-666-l-999]"
+                        class="color-[--third-text]"
                       >
                         ({{
                           item.percent && Number(item?.percent)
@@ -1165,7 +1165,7 @@
                 <tbody>
                   <tr>
                     <td>
-                      <span class="block color-[--d-666-l-999]">{{
+                      <span class="block color-[--third-text]">{{
                         $t('simulateHolders')
                       }}</span>
                       <span class="block">
@@ -1177,7 +1177,7 @@
                       </span>
                     </td>
                     <td>
-                      <span class="block color-[--d-666-l-999]">{{
+                      <span class="block color-[--third-text]">{{
                         $t('sellSuccessful')
                       }}</span>
                       <span class="block">
@@ -1190,7 +1190,7 @@
                     </td>
                     <td>
                       <span
-                        class="block color-[--d-666-l-999]"
+                        class="block color-[--third-text]"
                         :class="{
                           failedBg:
                             (checkResult?.holder_analysis?.sell_failure ?? 0) >
@@ -1216,7 +1216,7 @@
                     </td>
                     <td>
                       <span
-                        class="block color-[--d-666-l-999]"
+                        class="block color-[--third-text]"
                         :class="{
                           balanceBg:
                             (checkResult?.holder_analysis
@@ -1237,13 +1237,13 @@
                   </tr>
                   <tr>
                     <td>
-                      <span class="color-[--d-666-l-999]">{{ $t('sellSlippage') }}</span>
+                      <span class="color-[--third-text]">{{ $t('sellSlippage') }}</span>
                     </td>
                     <td colspan="3" class="tl">
                       <span
                         :class="{ avgBg: checkResult?.avg_tax_too_high == 1 }"
                       >
-                        <span class="color-[--d-666-l-999]">{{ $t('averageTax') }}</span>
+                        <span class="color-[--third-text]">{{ $t('averageTax') }}</span>
                         &nbsp;{{
                           formatNumber(
                             checkResult?.holder_analysis?.average_tax || 0
@@ -1257,11 +1257,11 @@
                         class="flex-start"
                       >
                         <span>
-                          <span class="color-[--d-666-l-999]">{{ $t('slippage1') }}</span>
+                          <span class="color-[--third-text]">{{ $t('slippage1') }}</span>
                           &nbsp;{{ formatNumber(item?.tax) }}%
                         </span>
                         <span>
-                          <span class="color-[--d-666-l-999]">{{
+                          <span class="color-[--third-text]">{{
                             $t('addressCount')
                           }}</span>
                           &nbsp;{{ item?.count }}
@@ -1291,7 +1291,7 @@
                     name="garden:thumbs-up-fill-12"
                     :style="{
                       color:
-                        (checkResult?.my_vote ?? 0) > 0 ? '#12B886' : '#e1e1e1',
+                        (checkResult?.my_vote ?? 0) > 0 ? '#12B886' : 'var(--secondary-text)',
                     }"
                   />
                   <span class="thumbs-label">
@@ -1335,7 +1335,7 @@
                   class="iconfont icon-fandui icon-thumbs"
                   :style="{ color: checkResult.my_vote < 0 ? '#F6465D' : '#e1e1e1' }"
                 ></i> -->
-                  <Icon name="garden:thumbs-down-fill-12" :style="{ color: (checkResult?.my_vote ?? 0) < 0 ? '#F6465D' : '#e1e1e1'}"
+                  <Icon name="garden:thumbs-down-fill-12" :style="{ color: (checkResult?.my_vote ?? 0) < 0 ? '#F6465D' : 'var(--secondary-text)'}"
                   />
                   <span class="thumbs-label">
                     {{ $t('against') }}({{ checkResult?.vote_against || 0 }})
@@ -2151,7 +2151,7 @@ function getVote() {
   margin: 0 0 10px 0;
   padding: 10px 10px;
   &.basic {
-    background: var(--d-333-l-F2F2F2);
+    background: var(--dialog-list-hover);
     // border: 1px solid var(--d-282e35-l-e5e5e5);
     border-radius: 4px;
     // .card-list-item > :nth-child(1) {
@@ -2195,13 +2195,13 @@ function getVote() {
   display: flex;
   justify-content: space-between;
   padding: 10px 0 0;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   // align-items: center;
   font-size: 12px;
   .label {
     margin-right: 10px;
     font-weight: 400;
-    color: var(--d-666-l-999);
+    color: var(--third-text);
   }
   .value {
     font-weight: 500;
@@ -2209,7 +2209,7 @@ function getVote() {
   .range-text {
     font-size: 12px;
     margin-right: 5px;
-    color: var(--d-999-l-666);
+    color: var(--secondary-text);
   }
   .range {
     width: 35%;
@@ -2254,13 +2254,13 @@ function getVote() {
   }
 
   &.holder-item {
-    color: var(--d-999-l-666);
+    color: var(--secondary-text);
     > :nth-child(1) {
-      color: var(--d-666-l-999);
+      color: var(--third-text);
     }
   }
   > :nth-child(1) {
-    color: var(--d-999-l-666);
+    color: var(--secondary-text);
   }
   > :nth-child(2) {
     text-align: left;
@@ -2342,8 +2342,6 @@ function getVote() {
   align-items: center;
   padding: 10px 30px 0px 30px;
   cursor: pointer;
-  .label {
-  }
   img {
     width: 60px;
     margin: 15px 0 5px 0;
@@ -2417,8 +2415,8 @@ function getVote() {
   }
 }
 .table-lock {
-  color: var(--d-999-l-666);
-  background: var(--d-333-l-F2F2F2);
+  color: var(--secondary-text);
+  background: var(--dialog-list-hover);
   border-radius: 4px;
   width: 100%;
   font-size: 12px;
@@ -2426,7 +2424,7 @@ function getVote() {
   td,
   th {
     text-align: left;
-    color: var(--d-666-l-999);
+    color: var(--third-text);
     &:nth-child(2),
     &:nth-child(3),
     &:nth-child(4) {
@@ -2463,7 +2461,7 @@ function getVote() {
 
   .thumbs-label {
     font-size: 12px;
-    color: var(--d-999-l-666);
+    color: var(--secondary-text);
     line-height: 20px;
     font-weight: 400;
     margin-top: 5px;
@@ -2674,10 +2672,10 @@ function getVote() {
     padding: 4px 0;
     display: inline-block;
     &:hover {
-      color: var(--d-F5F5F5-l-333);
+      color: var(--main-text);
     }
     &.active {
-      color: var(--d-F5F5F5-l-333);
+      color: var(--main-text);
       border-bottom: 2px solid #3f80f7;
     }
   }
@@ -2690,7 +2688,7 @@ function getVote() {
     border-collapse: collapse;
     width: 100%;
     font-size: 12px;
-    color: var(--d-F5F5F5-l-333);
+    color: var(--main-text);
     background-color: var(--d-333-l-F2F2F2);
     letter-spacing: 0;
     font-weight: 400;

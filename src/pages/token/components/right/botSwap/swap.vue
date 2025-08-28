@@ -3,17 +3,17 @@
     <template v-if="activeTab === 'buy'">
       <el-input v-model="amountNative" placeholder="0.0" size="large"  clearable class="input-number mt-10px" input-style="text-align:right"  @update:model-value="value => {amountNative = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('buy')}">
         <template #prepend>
-          <span class="text-12px color-[--d-999-l-666]">{{ $t('amount') }}</span>
+          <span class="text-12px color-[--secondary-text]">{{ $t('amount') }}</span>
         </template>
         <template #append>
           <img :src="tokenStore.swap.native?.logo_url || `${configStore.token_logo_url}token_icon/${chain}/${getChainInfo(chain || '').wmain_wrapper || ''}.png`" class="rd-50%" height="20"  alt="" srcset="" >
         </template>
       </el-input>
       <div class="flex items-center mt-10px text-12px" >
-        <span class="color-[--d-F5F5F5-l-333]">≈{{  formatNumber(amountNativeOut || 0) }} {{ tokenInfo?.symbol }}</span>
-        <div class="clickable ml-auto color-[--d-666-l-999]" @click.stop="handleMax(tokenStore.swap.native?.balance || 0, 'buy')">{{ $t('balance1') }}: <span>{{ formatNumber(tokenStore.swap.native?.balance || 0) }}</span> {{ getChainInfo(tokenInfo?.chain || '')?.main_name }}
+        <span class="color-[--main-text]">≈{{  formatNumber(amountNativeOut || 0) }} {{ tokenInfo?.symbol }}</span>
+        <div class="clickable ml-auto color-[--third-text]" @click.stop="handleMax(tokenStore.swap.native?.balance || 0, 'buy')">{{ $t('balance1') }}: <span>{{ formatNumber(tokenStore.swap.native?.balance || 0) }}</span> {{ getChainInfo(tokenInfo?.chain || '')?.main_name }}
         </div>
-        <RefreshBalance class="color-[--d-666-l-999]" :type="0"/>
+        <RefreshBalance class="color-[--third-text]" :type="0"/>
       </div>
       <div class="tabs mt-10px">
         <button v-for="(item, index) in tabs1" :key="index" class="tab-item" type="button"  @click.stop="handleAmount(item, 'buy')">
@@ -25,16 +25,16 @@
     <template v-else-if="activeTab === 'sell'">
       <el-input v-model="amountToken" clearable class="input-number mt-10px" size="large"  input-style="text-align:right"  placeholder="0.0" @update:model-value="value => {amountToken = value?.replace?.(/\-|[^\d.]/g, '');watchAmount('sell')}">
         <template #prepend>
-          <span class="text-12px color-[--d-999-l-666]">{{ $t('amount') }}</span>
+          <span class="text-12px color-[--secondary-text]">{{ $t('amount') }}</span>
         </template>
         <template #append>
-           <span class="text-12px color-[--d-F5F5F5-l-333]">{{ tokenInfo?.symbol  }}</span>
+           <span class="text-12px color-[--main-text]">{{ tokenInfo?.symbol  }}</span>
         </template>
       </el-input>
       <div class="flex items-center mt-10px text-12px">
-        <span class="color-[--d-F5F5F5-l-333]">≈{{ formatNumber(amountTokenOut || 0) }} {{ getChainInfo(chain || '')?.main_name }}</span>
-        <span class="clickable ml-auto color-[--d-666-l-999]" @click.stop="handleMax(tokenStore.swap.token?.balance || 0, 'sell')">{{ $t('balance1') }}: <span >{{ formatNumber(tokenStore.swap.token?.balance || 0) }}</span> {{ tokenInfo?.symbol }}</span>
-        <RefreshBalance class="color-[--d-666-l-999]" :type="1"/>
+        <span class="color-[--main-text]">≈{{ formatNumber(amountTokenOut || 0) }} {{ getChainInfo(chain || '')?.main_name }}</span>
+        <span class="clickable ml-auto color-[--third-text]" @click.stop="handleMax(tokenStore.swap.token?.balance || 0, 'sell')">{{ $t('balance1') }}: <span >{{ formatNumber(tokenStore.swap.token?.balance || 0) }}</span> {{ tokenInfo?.symbol }}</span>
+        <RefreshBalance class="color-[--third-text]" :type="1"/>
       </div>
       <div class="tabs mt-10px">
         <button v-for="(item, index) in tabs2" :key="index" class="tab-item" type="button" @click.stop="handleAmount(item, 'sell')">
@@ -45,11 +45,11 @@
     <template v-if="swapType === 'limit'">
       <el-input v-model="priceLimit" placeholder="0.0" size="large"  clearable class="input-number mt-10px" input-style="text-align:right" @update:model-value="value => priceLimit = value?.replace?.(/\-|[^\d.]/g, '')">
         <template #prepend>
-          <span class="text-12px color-[--d-999-l-666]">{{ isPriceLimit ? $t('price') : 'MC' }}</span>
-          <Icon name="iconamoon:synchronize-fill" class="clickable ml-5px text-12px color-[--d-F5F5F5-l-333]" @click.stop="isPriceLimit = !isPriceLimit"/>
+          <span class="text-12px color-[--secondary-text]">{{ isPriceLimit ? $t('price') : 'MC' }}</span>
+          <Icon name="iconamoon:synchronize-fill" class="clickable ml-5px text-12px color-[--main-text]" @click.stop="isPriceLimit = !isPriceLimit"/>
         </template>
         <template #append>
-          <span class="text-12px color-[--d-F5F5F5-l-333]">$</span>
+          <span class="text-12px color-[--main-text]">$</span>
         </template>
       </el-input>
       <div class="slider-swap" :class="activeTab">
@@ -64,7 +64,7 @@
             <div class="w-10px" />
           </template>
           <template #suffix>
-            <div class="text-14px color-#959A9F pr-5px">%</div>
+            <div class="text-14px color-[--third-text] pr-5px">%</div>
           </template>
         </el-input>
       </div>
@@ -95,9 +95,9 @@
       >
         {{ checkAmountMessage() || (activeTab === 'buy' ? $t('buy') : $t('sell')) }}
       </el-button>
-      <div class="mt-10px flex items-center text-11px color-[--d-F5F5F5-l-333]">
+      <div class="mt-10px flex items-center text-11px color-[--main-text]">
         <template v-if="botSettings[chain || ''] && isCanMev">
-          <span class=" color-[--d-666-l-999] mr-4px cursor-pointer">{{ $t('mev') }}</span>
+          <span class=" color-[--third-text] mr-4px cursor-pointer">{{ $t('mev') }}</span>
           <el-switch
             v-if="chain === 'solana'"
             v-model="botSettings.solana![botSettings.solana!.selected]!.mev"
@@ -114,19 +114,19 @@
             size="small"
           />
         </template>
-        <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-12px color-[--d-666-l-999] mr-4px cursor-pointer" />
+        <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-12px color-[--third-text] mr-4px cursor-pointer" />
         <span v-if="botSettings?.[chain || '']?.[selected]?.slippage !== 'auto'">{{ botSettings?.[chain || '']?.[selected]?.slippage }}%</span>
         <span v-else>{{ $t('auto') }}</span>
         <template v-if="isEvmChain(chain || '')">
-          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="text-12px color-[--d-666-l-999] ml-auto mr-4px cursor-pointer" />
+          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="text-12px color-[--third-text] ml-auto mr-4px cursor-pointer" />
           <span>${{ getEstimatedGas() }}</span>
         </template>
         <template v-if="chain === 'solana'">
-          <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-12px color-[--d-666-l-999] ml-auto mr-4px cursor-pointer" />
+          <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-12px color-[--third-text] ml-auto mr-4px cursor-pointer" />
           <span>{{ botPriorityFee }} SOL</span>
         </template>
         <template v-if="activeTab === 'buy' && swapType === 'market' && chain !== 'xlayer' && botSettings?.[chain || '']">
-          <span class="mr-4px ml-auto color-[--d-666-l-999]">{{ $t('autoSellHalf') }}</span>
+          <span class="mr-4px ml-auto color-[--third-text]">{{ $t('autoSellHalf') }}</span>
           <el-switch
             v-model="botSettingStore.autoSellConfigs.autoSell"
             size="small"
@@ -136,7 +136,7 @@
       </div>
       <!-- <ul class="swap-label">
         <li v-if="activeTab === 'buy' && swapType === 'market' && botSettings?.[chain || '']" class="slippage-container">
-          <span class="mr-auto color-[--d-666-l-999]">{{ $t('autoSellHalf') }}</span>
+          <span class="mr-auto color-[--third-text]">{{ $t('autoSellHalf') }}</span>
           <el-switch
             v-model="botSettings[chain as string]![botSettings[chain as string]!.selected as 's1' | 's2' | 's3'].autoSell"
             size="small"
@@ -144,15 +144,15 @@
           />
         </li>
         <li v-if="chain === 'solana'" class="slippage-container">
-          <span class="mr-auto color-[--d-666-l-999]">{{ $t('priorityFee') }}</span>
+          <span class="mr-auto color-[--third-text]">{{ $t('priorityFee') }}</span>
           <span>{{ botPriorityFee }} SOL</span>
         </li>
         <li v-else-if="isEvmChain(chain || '')" class="slippage-container">
-          <span class="mr-auto color-[--d-666-l-999]">{{ $t('extraGas') }}</span>
+          <span class="mr-auto color-[--third-text]">{{ $t('extraGas') }}</span>
           <span>{{ botPriorityFee }} GWEI</span>
         </li>
         <li v-show="isEvmChain(chain || '') && (fromAmount && toAmount) && Number(getEstimatedGas())">
-          <div class="mr-auto color-[--d-666-l-999]">
+          <div class="mr-auto color-[--third-text]">
             {{ $t('estimatedGas') }}
           </div>
           <div>
@@ -160,12 +160,12 @@
           </div>
         </li>
         <li class="slippage-container">
-          <span class="mr-auto color-[--d-666-l-999]">{{ $t('slippage') }}</span>
+          <span class="mr-auto color-[--third-text]">{{ $t('slippage') }}</span>
           <span v-if="botSettings?.[chain || '']?.[selected]?.slippage !== 'auto'">{{ botSettings?.[chain || '']?.[selected]?.slippage }}%</span>
           <span v-else>{{ $t('auto') }}</span>
         </li>
         <li v-if="botSettings[chain || ''] && isCanMev" class="slippage-container">
-          <span class="mr-auto color-[--d-666-l-999]">{{ $t('protection') }}</span>
+          <span class="mr-auto color-[--third-text]">{{ $t('protection') }}</span>
           <el-switch
             v-if="chain === 'solana'"
             v-model="botSettings.solana![botSettings.solana!.selected as 's1' | 's2' | 's3']!.mev"
@@ -1109,9 +1109,9 @@ onMounted(() => {
       align-items: center;
       flex: 1;
       border-radius: 4px;
-      background: var(--d-222-l-F2F2F2);
+      background: var(--main-input-button-bg);
       cursor: pointer;
-      color: var(--d-999-l-666);
+      color: var(--secondary-text);
       & + .tab-item {
         margin-left: 10px;
       }
@@ -1135,57 +1135,17 @@ onMounted(() => {
         line-height: 1;
       }
       &:hover {
-        background: var(--d-333-l-DDD);
-        color: var(--d-F5F5F5-l-333);
+        background: var(--border);
+        color: var(--main-text);
       }
       &:active {
         opacity: 0.5;
       }
     }
   }
-  .select-box {
-    position: relative;
-    .btn-set {
-      color: var(--custom-text-2-color);
-      position: absolute;
-      top: 50%;
-      right: 0;
-      transform: translateY(-40%);
-      &:hover {
-        color: var(--custom-text-1-color);
-      }
-    }
-  }
-  .select-tabs {
-    :deep() {
-      --el-border-color-light: var(--custom-br-1-color);
-      .el-tabs__item {
-        font-size: 12px;
-        padding: 0 10px;
-        --el-text-color-primary: var(--custom-text-tab-color);
-        &.is-active {
-          color: var(--custom-text-1-color);
-        }
-        &:hover {
-          color: var(--custom-text-1-color);
-          cursor: pointer;
-        }
-      }
-      .el-tabs__header {
-        margin-bottom: 0;
-      }
-      .el-tabs__active-bar {
-        height: 2px;
-        background-color: var(--custom-text-1-color);
-      }
-      .el-tabs__nav-wrap::after {
-        height: 0.5px;
-      }
-    }
-  }
   .input-number {
-    --el-fill-color-light: var(--d-222-l-F2F2F2);
-    --el-input-bg-color: var(--d-222-l-F2F2F2);
+    --el-fill-color-light: var(--main-input-button-bg);
+    --el-input-bg-color: var(--main-input-button-bg);
     --el-input-border-color: transparent;
     --el-input-focus-border-color: transparent;
     --el-input-hover-border-color: transparent;
@@ -1196,7 +1156,7 @@ onMounted(() => {
       padding: 0 10px;
     }
     :deep() .el-input-group__prepend {
-      --el-fill-color-light: var(--d-333-l-DDD);
+      --el-fill-color-light: var(--border);
       min-width: 70px;
       padding: 0 12px;
     }
@@ -1210,26 +1170,11 @@ onMounted(() => {
     border-radius: 6px;
     margin-top: 20px;
     width: 100%;
-    // --el-button-text-color: var(--d-F5F5F5-l-333) !important;
-    // --el-button-hover-text-color: var(--d-F5F5F5-l-333) !important;
+    // --el-button-text-color: var(--main-text) !important;
+    // --el-button-hover-text-color: var(--main-text) !important;
     --el-color-black: #F5F5F5;
   }
 
-  .slippage-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 11px;
-    // color: #696E7C;
-    color: var(--custom-text-2-1-color);
-    letter-spacing: 0;
-    font-weight: 400;
-    margin-top: 10px;
-    .iconfont {
-      margin-left: 5px;
-      cursor: pointer;
-    }
-  }
   .swap-label {
     font-size: 11px;
     color: #696E7C;
@@ -1245,7 +1190,7 @@ onMounted(() => {
       }
       > :nth-child(2) {
         // color: #333333;
-        color: var(--d-F5F5F5-l-333);
+        color: var(--main-text);
       }
     }
     .swap-label_item-left {
@@ -1322,7 +1267,7 @@ onMounted(() => {
       }
       .el-slider__marks-text {
         font-size: 12px;
-        color: #959A9F;
+        color: var(--secondary-text);
         &:nth-child(1) {
           transform: translateX(-25%);
         }
@@ -1350,7 +1295,7 @@ onMounted(() => {
         display: flex;
         justify-content: space-between;
         font-size: 12px;
-        color: #959A9F;
+        color: var(--third-text);
         // margin-top: 5px;
         margin: 8px -5px 0 -5px;
         > span {

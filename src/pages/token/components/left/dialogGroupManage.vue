@@ -128,7 +128,7 @@ async function _confirmChangeName() {
       v-loading="loading"
       :data="currentList"
       height="325px"
-      class="[--el-font-size-base:12px]"
+      class="[--el-font-size-base:12px] table-fav-group"
     >
       <template #empty>
         <AveEmpty/>
@@ -179,7 +179,7 @@ async function _confirmChangeName() {
     </el-table>
     <span
       class="mt-20px cursor-pointer px-26px py-12px text-14px font-500 radius-6px block text-center
-        color-[--d-F5F5F5-l-333] bg-[--d-3F80F7-l-EAECEF] hover:opacity-80
+        color-[--main-text] bg-[--d-3F80F7-l-EAECEF] hover:opacity-80
       "
       @click="_confirmChangeName">
       {{ t('newGroup') }}
@@ -187,6 +187,17 @@ async function _confirmChangeName() {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+.table-fav-group {
+  --el-table-header-bg-color: transparent;
+  --el-table-tr-bg-color:transparent;
+  --el-table-border: 0 none;
+  --el-table-text-color: var(--main-text);
+  --el-table-row-hover-bg-color:var(--dialog-list-hover);
+  --el-table-bg-color: transparent;
+  :deep() .el-table__header-wrapper {
+    font-size: 12px;
+  }
+}
 
 </style>

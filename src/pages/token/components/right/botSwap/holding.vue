@@ -1,5 +1,5 @@
 <template>
-  <div v-if="(Number(walletTokenInfo?.balance_usd || 0) > 0 && Number(tokenStore.swap?.token?.balance || 0) > 0) || isShow" class="max-h-54px flex items-start justify-between color-[--d-F5F5F5-l-333] text-center bg-[--d-222-l-F2F2F2] mb-12px py-10px rd-4px">
+  <div v-if="(Number(walletTokenInfo?.balance_usd || 0) > 0 && Number(tokenStore.swap?.token?.balance || 0) > 0) || isShow" class="max-h-54px flex items-start justify-between color-[--main-text] text-center bg-[--d-222-l-F2F2F2] mb-12px py-10px rd-4px">
     <div class="flex-1">
       <div class="text-11px color-[--d-666-l-999]">{{ $t('bought') }}</div>
       <div class="text-12px mt-5px color-#12B886">${{ formatNumber(walletTokenInfo?.total_purchase_usd || 0, 2) }}</div>

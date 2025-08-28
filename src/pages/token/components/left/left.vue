@@ -44,7 +44,7 @@ function drag(e: MouseEvent) {
     <div class="relative">
       <TopLeftTable :height="topLeftHeight"/>
       <div
-        class="w-full cursor-row-resize bg-[--d-222-l-F2F2F2] gap-1px hover:bg-[--d-666-l-CCC] flex items-center justify-center h-4px"
+        class="w-full cursor-row-resize bg-[--border] gap-1px hover:bg-[--d-666-l-CCC] flex items-center justify-center h-4px"
         @mousedown.stop.prevent="drag"
       >
         <span v-for="i in 4" :key="i" class="bg-#444 w-2px h-2px rounded-full"/>

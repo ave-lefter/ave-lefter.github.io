@@ -12,7 +12,7 @@
         <span v-else />
       </template>
       <el-table-column :label="t('token')" align="left">
-        <template #default="{ row }" v-if="isBotWallet">
+        <template v-if="isBotWallet" #default="{ row }">
           <div class="flex items-center justify-start">
             <div class="icon-token-container mr-5px">
               <div class="relative">
@@ -42,7 +42,7 @@
             }}</span>
           </div>
         </template>
-         <template #default="{ row }" v-else>
+         <template v-else #default="{ row }">
           <div class="flex items-center justify-start">
             <div class="icon-token-container mr-5px">
               <div class="relative">
@@ -79,10 +79,10 @@
           <div class="flex flex-row-reverse">
             <div class="flex items-center">
               <div>{{ t('type') }}</div>
-              <el-dropdown trigger="click" v-if="isBotWallet" @command="handleTypeCommand">
+              <el-dropdown v-if="isBotWallet" trigger="click" @command="handleTypeCommand">
                 <Icon name="custom:filter"
                   :class="[filterConditions?.isBuy >= 0 && filterConditions?.isLimit >= 0 && 'color-#286DFF']"
-                  class=" color-[--d-666-l-999] cursor-pointer text-10px" />
+                  class="color-[--third-text] cursor-pointer text-10px" />
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item command="all">{{ t('all') }}</el-dropdown-item>
@@ -129,18 +129,18 @@
         </template>
       </el-table-column>
       <el-table-column :label="t('price')" align="right">
-        <template #default="{ row }" v-if="isBotWallet">
-          <div class="text-[var(--d-999-l-959A9F)] text-right">${{ isBuy(row.swapType) ? formatNumber(row?.outPrice ||
+        <template v-if="isBotWallet" #default="{ row }">
+          <div class="text-[--secondary-text] text-right">${{ isBuy(row.swapType) ? formatNumber(row?.outPrice ||
             0) : formatNumber(row?.inPrice || 0) }}</div>
         </template>
         <template #default="{ row }" v-else>
-          <div class="text-[var(--d-999-l-959A9F)] text-right">${{ isBuyChain(row.swapType) ? formatNumber(row?.outPrice ||
+          <div class="text-[--secondary-text] text-right">${{ isBuyChain(row.swapType) ? formatNumber(row?.outPrice ||
             0) : formatNumber(row?.inPrice || 0) }}</div>
         </template>
       </el-table-column>
       <el-table-column :label="t('volume4')" align="right">
         <template #default="{ row }">
-          <div class="text-[var(--d-999-l-959A9F)] text-right">${{ formatNumber(Number(row?.inValue) || row?.outValue ||
+          <div class="text-[--secondary-text] text-right">${{ formatNumber(Number(row?.inValue) || row?.outValue ||
             0, 2) }}</div>
         </template>
       </el-table-column>
@@ -154,7 +154,7 @@
             class="iconify i-custom:b text-10px ml-3px color-[--d-666-l-999] cursor-pointer text-12px"></span> -->
         </template>
         <template #default="{ row }">
-          <span class="text-[var(--d-999-l-959A9F)] text-right" v-if="isBotWallet">
+          <span v-if="isBotWallet" class="text-[--secondary-text] text-right">
             <template v-if="!isBuy(row.swapType)">
               {{ formatNumber(formatUnits(new BigNumber(row?.inAmount || 0).toFixed(0), row.inTokenDecimals ||
                 0).toString(), 4) }}
@@ -167,7 +167,7 @@
               {{ row?.outTokenSymbol }}
             </template>
           </span>
-          <span class="text-[var(--d-999-l-959A9F)] text-right" v-else>
+          <span v-else class="text-[--secondary-text] text-right">
             <template v-if="!isBuyChain(row.swapType)">
               {{ row.status === 'cancelled' ? '0' : formatNumber(formatUnits(new BigNumber(row?.inAmount ||
                 0).toFixed(0), row.inTokenDecimals || 0).toString(), 4) }}
@@ -189,7 +189,7 @@
               <div>{{ t('status') }}</div>
               <el-dropdown trigger="click" @command="handleStatusCommand">
                 <Icon name="custom:filter" :class="[filterConditions.statusType && 'color-#286DFF']"
-                  class="color-[--d-666-l-999] cursor-pointer text-10px" />
+                  class="color-[--third-text] cursor-pointer text-10px" />
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item command="all">{{ t('all') }}</el-dropdown-item>
@@ -209,10 +209,10 @@
           </div>
         </template>
         <template #default="{ row }">
-          <div class="text-[var(--d-999-l-959A9F)] text-right truncate">
+          <div class="text-[--secondary-text] text-right truncate">
             <span v-if="row.status === 'confirmed'">{{ t('completed')
             }}</span>
-            <span v-else-if="row.status === 'error'" style="color: var(--color-red-500);word-break: break-all;">{{
+            <span v-else-if="row.status === 'error'" style="color: var(--down-color);word-break: break-all;">{{
               t('failed') }}<template v-if="row?.errorLog">({{ formatBotError(row?.errorLog) }})</template></span>
             <span v-else-if="row.status === 'cancelled'">{{ t('cancelled1')
             }}</span>
@@ -226,7 +226,7 @@
 
       <el-table-column :label="t('CreateTime')" align="right">
         <template #default="{ row }">
-          <span class="text-[var(--d-999-l-959A9F)] text-right">{{ formatDate(row.createTime, 'YYYY/MM/DD HH:mm')
+          <span class="text-[--secondary-text] text-right">{{ formatDate(row.createTime, 'YYYY/MM/DD HH:mm')
           }}</span>
         </template>
       </el-table-column>
@@ -234,7 +234,7 @@
       <el-table-column :label="t('operate')" align="right">
         <template #default="{ row }">
           <div class="flex items-center flex-row-reverse">
-            <Icon name="custom:browser" class="text-16px  ml-8px clickable color-[--d-999-l-666]"
+            <Icon name="custom:browser" class="text-16px  ml-8px clickable color-[--third-text]"
               @click.stop.prevent="jumpExplorerUrl(row)" />
             <template v-if="row.status == 'confirmed' && row.swapType === 2 && row.chain === 'solana'">
               <share :statistics="row" :address="isBotWallet ? props.userAddress : row.userAddress" :chain="row.chain" />

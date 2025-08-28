@@ -1,6 +1,6 @@
 <template>
-  <el-drawer  v-model="visible" class="bg-[--d-222-l-FFF]! rounded-tl-10px rounded-bl-10px border-none" :size="480" append-to-body :with-header="false">
-    <div class="h-70px flex items-center px-20px font-500 text-20px lh-30px tracking-0% color-[--d-F5F5F5-l-333] border-b-1px border-b-solid border-b-[--d-333-l-F5F5F5]">
+  <el-drawer  v-model="visible" class="bg-[--dialog-bg]! rounded-tl-10px rounded-bl-10px border-none" :size="480" append-to-body :with-header="false">
+    <div class="h-70px flex items-center px-20px font-500 text-20px lh-30px tracking-0% color-[--main-text] border-b-1px border-b-solid border-b-[--d-333-l-F5F5F5]">
       {{ $t('holdersAnalysis') }}
     </div>
     <div class="justify-between flex items-center h-80px px-20px">
@@ -12,7 +12,7 @@
           @click="collect"
         />
         <TokenImg
-          tokenClass='w-40px h-40px' 
+          tokenClass='w-40px h-40px'
           chainClass="w-20px h-20px bottom--2px! right--2px!"
           :row="{
           logo_url:token?.logo_url || '',
@@ -21,16 +21,16 @@
         />
         <div class="flex flex-col justify-between ml-8px h-40px">
           <div class="flex items-center gap-8px h-20px">
-            <span class="font-500 text-16px lh-20px tracking-0px color-[--d-F5F5F5-l-333]">{{ token?.symbol }}</span>
+            <span class="font-500 text-16px lh-20px tracking-0px color-[--main-text]">{{ token?.symbol }}</span>
             <span class="font-500 text-10px lh-20px tracking-0px color-[--d-666-l-999]">{{ addressAndChain?.address?.replace(new RegExp('(.{4})(.+)(.{4}$)'), '$1...$3')  }}</span>
-            <Icon 
+            <Icon
               v-copy="addressAndChain?.address" name="bxs:copy"
               class="cursor-pointer text-10px color-[--d-666-l-999]"
             />
           </div>
-          <div class="flex items-center gap-4px h-14px justify-start"> 
+          <div class="flex items-center gap-4px h-14px justify-start">
             <span class="font-500 text-10px lh-20px tracking-0px color-[--d-666-l-999]">{{ $t('holdersNumTotal') }}</span>
-            <span class="font-400 text-12px lh-14px tracking-0px color-[--d-F5F5F5-l-333]">{{ formatNumber(holdersNum,4) }}</span>
+            <span class="font-400 text-12px lh-14px tracking-0px color-[--main-text]">{{ formatNumber(holdersNum,4) }}</span>
           </div>
         </div>
         <!-- <span v-if="symbol.source" class="text-12px color-[--d-999-l-666] mr-8px">/ {{ symbol.source }}</span> -->
@@ -41,7 +41,7 @@
         <span
           v-for="(item, index) in timeList"
           :key="index"
-          :class="`px-14px py-4px text-12px hover:opacity-80 cursor-pointer ${item.id===activeTime? 'color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2]':''}`"
+          :class="`px-14px py-4px text-12px hover:opacity-80 cursor-pointer ${item.id===activeTime? 'color-[--main-text] bg-[--d-333-l-F2F2F2]':''}`"
           @click="switchTimeTab(item.id)"
         >
           {{ item.name }}
@@ -111,7 +111,7 @@ const walletStore = useWalletStore()
 const addressAndChain = computed(() => {
   const id = route.params.id as string
   if (id) {
-    return getAddressAndChainFromId(id) 
+    return getAddressAndChainFromId(id)
   }
   return {
     address: token.value?.token || '',

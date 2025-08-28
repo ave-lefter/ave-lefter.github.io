@@ -103,12 +103,12 @@ const markPoint = computed(() => {
         show: true
       },
       tooltip: {
-        backgroundColor: !themeStore.isDark ? '#F5F5F5' : '#131722',
+        backgroundColor: 'var(--dialog-bg)',
         trigger: 'item',
         borderWidth: 0,
         textStyle: {
           fontSize: 10,
-          color: !themeStore.isDark ? '#131722' : '#fff'
+          color: 'var(--secondary-text)'
         },
         confine: true,
         formatter: () => {
@@ -261,12 +261,12 @@ function init() {
       show: false
     },
     tooltip: {
-      backgroundColor: !themeStore.isDark ? '#F5F5F5' : '#131722',
+      backgroundColor: 'var(--dialog-bg)',
       trigger: 'axis',
       borderWidth: 0,
       textStyle: {
         fontSize: 10,
-        color: !themeStore.isDark ? '#131722' : '#fff'
+        color: 'var(--secondary-text)'
       },
       valueFormatter: (value: number) => '$' + formatNumber(value || 0, 2),
       appendToBody: true
@@ -289,7 +289,7 @@ function init() {
         show: false
       },
       axisLabel: {
-        color: '#696E7C',
+        color: !themeStore.isDark ? '#8ca0c3' : '#566275',
         fontFamily: 'Outfit-Medium',
         formatter:(value:string)=>{
            return value.split(' ').join('\n')
@@ -318,7 +318,7 @@ function init() {
         show: false
       },
       axisLabel: {
-        color: '#696E7C',
+        color: !themeStore.isDark ? '#8ca0c3' : '#566275',
         fontFamily: 'Outfit-Medium',
         formatter: '{value}'
       },

@@ -10,9 +10,9 @@ const last_trade_at_unix = computed(() => {
 })
 function getColor() {
   if (Number(formatTimeFromNow(last_trade_at_unix.value || 0, true)) <= 600) {
-    return 'color-#FFA622'
+    return 'color-[--yellow]'
   }
-  return 'color-[--d-666-l-999]'
+  return 'color-[--secondary-text]'
 }
 </script>
 <template>
@@ -26,7 +26,7 @@ function getColor() {
         <span>
           <template v-if="seconds < 60"> {{ seconds }}s </template>
           <template v-else>
-            {{ formatTimeFromNow(last_trade_at_unix) }}
+            {{  formatTimeFromNow(last_trade_at_unix) }}
           </template>
         </span>
       </template>

@@ -341,6 +341,7 @@ function handleReset() {
                 </div>
                 <div class="mt-20px flex-center">
                   <el-button
+                    :key="themeStore.theme"
                     class="flex-1"
                     size="default"
                     style="
@@ -348,7 +349,7 @@ function handleReset() {
                       min-width: 70px;
                       --el-button-font-weight: 400;
                     "
-                    :color="themeStore.isDark ? '#f2f2f2' : '#333333'"
+                    color="var(--border)"
                     @click.stop="handleReset()"
                   >
                     {{ $t('cancel') }}
@@ -362,7 +363,7 @@ function handleReset() {
                       min-width: 70px;
                       --el-button-font-weight: 400;
                     "
-                    :color="themeStore.isDark ? '#222222' : '#f5f5f5'"
+                    type="primary"
                     @click.stop="confirmSwitchGroup"
                   >
                     {{ $t('confirm') }}
