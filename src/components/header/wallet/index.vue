@@ -1,15 +1,13 @@
 <template>
-  <el-popover v-model:visible="tgWalletVisible" placement="bottom-end" :width="360" trigger="click"
-    :popper-style="`--el-popover-padding: 0; --el-bg-color-overlay: ${mode === 'dark' ? '#222222' : '#ffffff'}`">
+  <el-popover v-model:visible="tgWalletVisible" placement="bottom-end" :width="360" trigger="click" popper-style="--el-popover-padding: 0;">
     <template #reference>
       <div
-        class="flex text-12px clickable-btn text-[--d-E9E9E9-l-222] h-32px cursor-pointer flex items-center bg-[--d-141721-l-E8F1FF] border-rd-4px px-10px py-0 min-w-80px  ml-8px">
+        class="flex text-12px clickable-btn color-[--main-text] h-32px cursor-pointer flex items-center border-rd-4px px-10px py-0 min-w-80px  ml-8px">
         <img
           class="border-rd-[50%] mr-5px" height="16" :src="generateAvatarIcon(botStore?.userInfo?.name || '')"
           alt="">
         <span>{{ botStore?.userInfo?.name || '' }}</span>
-        <Icon name="mdi:menu-down"
-          :class="['font-size-28px cursor-pointer ml--5px transition-all duration-0.4s', !!tgWalletVisible && 'rotate-z-180 origin-center']" />
+        <Icon name="mdi:menu-down" :class="['font-size-28px cursor-pointer ml--5px transition-all duration-0.4s', !!tgWalletVisible && 'rotate-z-180 origin-center']" />
       </div>
     </template>
     <div class="tg-wallet-container">
@@ -19,18 +17,16 @@
             <img style="border-radius: 50%;margin-right: 5px;" height="40"
               :src="generateAvatarIcon(botStore?.userInfo?.name || '')" alt="">
             <span style="margin-right: 8px;">{{ botStore?.userInfo?.name || '' }}</span>
-            <Icon name="mdi:menu-down"
-              :class="['font-size-28px cursor-pointer ml--5px transition-all duration-0.4s']" />
+            <Icon name="mdi:menu-down" :class="['font-size-28px cursor-pointer ml--5px transition-all duration-0.4s']" />
           </div>
         </div>
         <ul class="tg-wallet-list_content">
           <el-scrollbar :max-height="300">
-            <li v-for="(item, index) in botStore?.userInfo?.addresses || []" :key="index" class="clickable"
-              @click.stop="navigateToWallet(item.address, item.chain)">
+            <li v-for="(item, index) in botStore?.userInfo?.addresses || []" :key="index" class="clickable" @click.stop="navigateToWallet(item.address, item.chain)">
               <img :src="`${token_logo_url}chain/${item.chain}.png`" class="mr-5px border-rd-[50%]" height="32" alt="">
               <div>
                 <div class="text-16px">{{ getChainInfo(item.chain)?.name }}</div>
-                <div class="text-12px color-[--d-999-l-959A9F] mt-5px">
+                <div class="text-12px color-[--secondary-text] mt-5px">
                   <span>{{ item.address?.replace?.(new RegExp('(.{6})(.+)(.{4})'), '$1...$3') }}</span>
                   <Icon v-copy="item.address" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
@@ -38,7 +34,7 @@
               <div class="text-right" style="margin-left: auto;">
                 <div class="text-14px">{{ formatNumber(item?.balance || 0, 5) }} {{
                   getChainInfo(item.chain)?.main_name }}</div>
-                <div class="text-12px color-[--d-999-l-959A9F] mt-5px ">$ {{ formatNumber((item?.price || 0) *
+                <div class="text-12px color-[--secondary-text] mt-5px ">$ {{ formatNumber((item?.price || 0) *
                   Number(item?.balance
                     ||
                     0), 1) }}</div>
@@ -53,7 +49,7 @@
               <Icon name="custom:wallet2" class="text-16px" />
               <span class="font-500 text-14px">{{ t('myWallet1') }}</span>
             </div>
-            <div class="color-#999 flex items-center gap-4px">
+            <div class="color-[--secondary-text] flex items-center gap-4px">
               <span class="font-500 text-12px">
                 {{ botStore?.userInfo?.name || '' }}
               </span>
@@ -65,7 +61,7 @@
               <Icon name="custom:download" class="text-16px" />
               <span class="font-500 text-14px">{{ t('deposit2') }}</span>
             </div>
-            <div class="color-#999 flex items-center gap-4px">
+            <div class="color-[--secondary-text] flex items-center gap-4px">
               <span class="font-500 text-12px">
               </span>
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
@@ -76,7 +72,7 @@
               <Icon name="custom:upload" class="text-16px" />
               <span class="font-500 text-14px">{{ t('withdraw') }}</span>
             </div>
-            <div class="color-#999 flex items-center gap-4px">
+            <div class="color-[--secondary-text] flex items-center gap-4px">
               <span class="font-500 text-12px">
               </span>
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
@@ -88,7 +84,7 @@
               <Icon name="custom:shield-check" class="text-16px" />
               <span class="font-500 text-14px">{{ t('safe') }}</span>
             </div>
-            <div class="color-#999 flex items-center gap-4px">
+            <div class="color-[--secondary-text] flex items-center gap-4px">
               <span class="font-500 text-12px flex items-center color-#FFBE3C gap-8px">
                 <template v-if="authInfo?.emailAddress && authInfo?.authSetting">
                   <Icon name="mingcute:check-circle-fill" class="text-17px color-#12B886 mt-1px" />
@@ -109,7 +105,7 @@
               <Icon name="custom:sack-dollar" class="text-16px" />
               <span class="font-500 text-14px">{{ t('rentRecovery') }}</span>
             </div>
-            <div class="color-#999 flex items-center gap-4px">
+            <div class="color-[--secondary-text] flex items-center gap-4px">
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>
           </li>
@@ -118,7 +114,7 @@
               <Icon name="custom:log-out" class="text-16px" />
               <span class="font-500 text-14px">{{ t('logout') }}</span>
             </div>
-            <div class="color-#999 flex items-center gap-4px">
+            <div class="color-[--secondary-text] flex items-center gap-4px">
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>
           </li>
@@ -169,11 +165,9 @@
             </el-select>
             <div class="flex-center mt-30px flex-col">
               <canvas id="qr-chain-canvas" />
-              <div class="text-12px"
-                style="display: flex; align-items: center; word-break: break-all; line-height: 1.2; padding: 20px 20px 40px; color: var(--d-999-l-222);">
+              <div class="text-12px color-[--secondary-text]" style="display: flex; align-items: center; word-break: break-all; line-height: 1.2; padding: 20px 20px 40px;">
                 <span>{{ depositChainInfo?.address || '' }}</span>
-                <Icon v-if="depositChainInfo?.address" v-copy="depositChainInfo?.address" name="bxs:copy"
-                  class="ml-5px mb--1px clickable" @click.stop />
+                <Icon v-if="depositChainInfo?.address" v-copy="depositChainInfo?.address" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
               </div>
             </div>
           </div>
@@ -210,19 +204,19 @@
             </el-form-item>
             <el-form-item :label="t('plsEnterAddress')" label-position="top" prop="address">
               <el-input v-model="withdrawForm.address"
-                style="background: var( --d-333-l-F2F2F2); --el-input-bg-color: var( --d-333-l-F2F2F2); --el-input-border-color: var( --d-333-l-F2F2F2); border-radius: 4px;--el-input-height:48px;"
+                style="border-radius: 4px;--el-input-height:48px;"
                 clearable placeholder="" />
             </el-form-item>
             <el-form-item :label="t('plsEnterAmount')" label-position="top" prop="amount">
               <el-input v-model="withdrawForm.amount"
-                style="background: var( --d-333-l-F2F2F2); --el-input-bg-color: var( --d-333-l-F2F2F2); --el-input-border-color: var( --d-333-l-F2F2F2); border-radius: 4px;--el-input-height:48px;"
+                style="border-radius: 4px;--el-input-height:48px;"
                 inputmode="decimal" clearable placeholder="0.00"
                 @input="value => withdrawForm.amount = value.replace(/\-|[^\d.]/g, '')">
                 <template #suffix>
                   <span class="color-[--main-text]">{{ getChainInfo(withdrawForm.chain)?.main_name }}</span>
                 </template>
               </el-input>
-              <div class="text-12px color-[--d-999-l-959A9F] text-right"
+              <div class="text-12px color-[--secondary-text] text-right"
                 style="width: 100%; line-height: 1; margin-top: 5px;position: absolute; right: 0; top: 100%;">
                 <span>{{ t('balance1') }}: {{
                   formatNumber(withdrawChainInfo?.balance || 0, 5) }} {{
@@ -240,7 +234,7 @@
         <div v-else-if="!(authInfo?.emailAddress && authInfo?.authSetting)" class="px-20px py-102px text-center">
           <Icon name="custom:shield-user-line" class="text-72px color-[--d-FCFDFF-l-999] mb-16px" />
           <div class="font-500 text-14px lh-18px color-[--main-text] mb-8px">{{ t('2faT1') }}</div>
-          <div class="font-400 text-12px lh-16px color-#999 mb-30px">{{ t('2faP1') }}</div>
+          <div class="font-400 text-12px lh-16px color-[--secondary-text] mb-30px">{{ t('2faP1') }}</div>
           <el-button type="primary" class="w-full" size="large" @click="router.push('/safe');tgWalletVisible = false">{{
             t('bindNow') }}</el-button>
         </div>
@@ -248,7 +242,7 @@
           class="px-20px py-102px text-center">
           <Icon name="custom:shield-user-line2" class="text-72px color-[--d-FCFDFF-l-999] mb-16px" />
           <div class="font-500 text-14px lh-18px color-[--main-text] mb-8px">{{ t('2faT2') }}</div>
-          <div class="font-400 text-12px lh-16px color-#999 mb-30px">{{ t('2faP1') }}</div>
+          <div class="font-400 text-12px lh-16px color-[--secondary-text] mb-30px">{{ t('2faP1') }}</div>
           <el-button type="primary" class="w-full" size="large" disabled>{{ t('cooling') }}</el-button>
         </div>
       </div>
@@ -264,9 +258,8 @@
         </div>
         <div class="p-20px">
           <div>
-            <div class="mb-8px h-48px w-48px rounded-[50%] bg-[--d-333-l-F2F2F2] flex-center mx-auto">
-              <el-button v-if="withdrawStatus === 0" type="primary" loading text
-                class="[&&]:[--el-mask-color-extra-light:transparent] h-48px w-48px p-0"></el-button>
+            <div class="mb-8px h-48px w-48px rounded-[50%] bg-[--border] flex-center mx-auto">
+              <el-button v-if="withdrawStatus === 0" type="primary" loading text class="[&&]:[--el-mask-color-extra-light:transparent] h-48px w-48px p-0"></el-button>
               <Icon v-else-if="withdrawStatus === 1" name="custom:success" class="text-16px" />
               <Icon v-else name="custom:fail" class="text-18px" />
             </div>
@@ -276,45 +269,45 @@
             </div>
             <ul class="flex flex-col gap-20px mb-30px">
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('toAddress') }}</div>
+                <div class="color-[--secondary-text]">{{ t('toAddress') }}</div>
                 <div>{{ billObj.transferTo ?billObj.transferTo?.slice(0, 13) + '...' +
                   billObj.transferTo?.slice(-11):'--' }}
                   <Icon v-copy="billObj.transferTo" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
               </li>
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('fromAddress') }}</div>
+                <div class="color-[--secondary-text]">{{ t('fromAddress') }}</div>
                 <div>{{ billObj.creatorAddress ?billObj.creatorAddress?.slice(0, 13) + '...' +
                   billObj.creatorAddress?.slice(-11):'--' }}
                   <Icon v-copy="billObj.creatorAddress" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
               </li>
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('gasFee') }}</div>
+                <div class="color-[--secondary-text]">{{ t('gasFee') }}</div>
                 <div>{{ formatNumber((gasFeeVal) || 0, 8) || '--' }} {{ getChainInfo(withdrawForm.chain)?.main_name }}(${{
                    formatNumber((gasFeeVal*(withdrawChainInfo?.price||0)) || 0, 4) ||'--' }})</div>
               </li>
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('network') }}</div>
+                <div class="color-[--secondary-text]">{{ t('network') }}</div>
                 <div class="flex-end"><img :src="`${token_logo_url}chain/${billObj.chain}.png`" class="rd-50% mr-4px"
                     width="14" lazy alt="">{{ billObj.chain &&getChainInfo(billObj.chain)?.name }}</div>
               </li>
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('txHash1') }}</div>
+                <div class="color-[--secondary-text]">{{ t('txHash1') }}</div>
                 <div class="clickable" @click.stop="queryHash">{{ billObj.txHash ?billObj.txHash?.slice(0, 13) + '...' + billObj.txHash?.slice(-11):'--' }}
                   <Icon v-copy="billObj.txHash" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
               </li>
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('blockHeight') }}</div>
+                <div class="color-[--secondary-text]">{{ t('blockHeight') }}</div>
                 <div>{{ billObj.blockNumber||'--' }}</div>
               </li>
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('time') }}</div>
+                <div class="color-[--secondary-text]">{{ t('time') }}</div>
                 <div>{{ billObj.createTime ?formatDate(billObj.createTime, 'YYYY-MM-DD HH:mm:ss'):'--' }}</div>
               </li>
             </ul>
-            <el-button class="w-full" size="large" :color="isDark ? '#333333' :'#F2F2F2'" @click="showVisible = 0">{{
+            <el-button :key="Number(isDark)" class="w-full" size="large" color="var(--border)" @click="showVisible = 0">{{
               t('withdrawAgain') }}</el-button>
           </div>
         </div>
@@ -765,13 +758,13 @@ const getTransferGasFee = throttle(function () {
 
 .tg-wallet-list {
   min-height: 400px;
-  color: var(--d-E9E9E9-l-222);
+  color: var(--main-text);
   display: flex;
   flex-direction: column;
 
   .tg-wallet-list_title {
     padding: 20px;
-    border-bottom: 0.5px solid var(--d-33353D-l-F5F5F5);
+    border-bottom: 0.5px solid var(--border);
   }
 
   .tg-wallet-list_content {
@@ -783,11 +776,11 @@ const getTransferGasFee = throttle(function () {
       cursor: pointer;
 
       &:hover {
-        background: var(--d-333-l-F2F2F2);
+        background: var(--border);
       }
 
       &.active {
-        background: var(--d-333-l-F2F2F2);
+        background: var(--border);
       }
     }
   }
@@ -803,14 +796,14 @@ const getTransferGasFee = throttle(function () {
     :deep() {
       .el-select__wrapper.el-select__wrapper {
         box-shadow: none;
-        background: var(--d-333-l-F2F2F2);
+        // background: var(--d-333-l-F2F2F2);
         min-height: 48px;
       }
 
       .el-select-dropdown__item {
         padding: 0 32px 0 15px;
         height: 48px;
-        --el-fill-color-lighter: var(--d-333-l-F2F2F2);
+        // --el-fill-color-lighter: var(--d-333-l-F2F2F2);
       }
     }
   }
@@ -818,7 +811,7 @@ const getTransferGasFee = throttle(function () {
   .go-wallet-route {
     margin-left: auto;
     font-size: 14px;
-    color: #999999;
+    color: var(--secondary-text);
 
     &:hover {
       color: var(--d-FFF-l-000);

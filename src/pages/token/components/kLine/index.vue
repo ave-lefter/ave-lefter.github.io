@@ -149,7 +149,7 @@ watch(() => themeStore.theme, (val) => {
       _widget?.applyOverrides?.({
         'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
         'paneProperties.backgroundType': 'solid',
-        'paneProperties.background': themeStore.isDark ? '#0B0D12' : '#F6F9FF',
+        'paneProperties.background': getCssVariable('--secondary-bg'),
       })
     })
   }
@@ -398,6 +398,7 @@ async function initChart() {
         if (!isSupportSecChains) {
           configurationData.supported_resolutions = ['1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[]
         }
+        setIframeCssVar()
 
         setTimeout(() => callback(configurationData), 50)
       },
@@ -629,11 +630,10 @@ async function initChart() {
     subscribePriceMove()
     // 从缓存中读取数据并创建指标
     createStudy()
-    setIframeCssVar()
     _widget?.applyOverrides?.({
       'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
       'paneProperties.backgroundType': 'solid',
-      'paneProperties.background': themeStore.isDark ? '#0B0D12' : '#F6F9FF',
+      'paneProperties.background': getCssVariable('--secondary-bg'),
     })
   })
 
@@ -777,7 +777,7 @@ function setIframeCssVar() {
     return
   }
   // 给 iframe 内部设置 CSS 变量
-  iframeRoot.style.setProperty('--secondary-bg', themeStore.isDark ? '#0B0D12' : '#F6F9FF')
+  iframeRoot.style.setProperty('--secondary-bg', getCssVariable('--secondary-bg'))
 }
 
 

@@ -1076,7 +1076,7 @@ onMounted(() => {
     padding: 1px;
     font-size: 12px;
     .tab-item {
-      border: 1px solid var(--d-333-l-F5F5F5);
+      border: 1px solid var(--border);
       display: flex;
       padding: 7px 0;
       justify-content: center;
@@ -1085,7 +1085,7 @@ onMounted(() => {
       border-radius: 4px;
       background: transparent;
       cursor: pointer;
-      color: var(--d-999-l-666);
+      color: var(--third-text);
       & + .tab-item {
         margin-left: 10px;
       }
@@ -1115,11 +1115,11 @@ onMounted(() => {
 
   .select-tabs {
     :deep() {
-      --el-border-color-light: var(--d-333-l-F5F5F5);
+      --el-border-color-light: var(--border);
       .el-tabs__item {
         font-size: 12px;
         padding: 0 10px;
-        --el-text-color-primary: var(--d-999-l-666);
+        --el-text-color-primary: var(--third-text);
         &.is-active {
           color: var(--main-text);
         }
@@ -1142,7 +1142,7 @@ onMounted(() => {
   }
 
   .card-container {
-    border: 1px solid var(--d-333-l-F5F5F5);
+    border: 1px solid var(--border);
     border-radius: 6px 6px 0 0;
     padding: 5px 8px;
     &.bottom {
@@ -1150,7 +1150,7 @@ onMounted(() => {
     }
     .s-text {
       font-size: 12px;
-      color: #999;
+      color: var(--third-text);
       letter-spacing: 0;
       font-weight: 400;
     }
@@ -1189,7 +1189,7 @@ onMounted(() => {
     align-items: center;
     justify-content: space-between;
     font-size: 12px;
-    color: var(--d-999-l-666);
+    color: var(--third-text);
     letter-spacing: 0;
     font-weight: 400;
     margin-top: 10px;
@@ -1200,7 +1200,7 @@ onMounted(() => {
   }
   .swap-label {
     font-size: 12px;
-    color: var(--d-999-l-666);
+    color: var(--third-text);
     letter-spacing: 0;
     font-weight: 400;
     li {

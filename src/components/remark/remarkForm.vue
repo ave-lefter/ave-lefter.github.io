@@ -30,6 +30,7 @@
     <el-form-item style="margin-top: 30px; margin-bottom: 0;">
       <div style="display: flex; justify-content: flex-end; width: 100%;gap:6px;">
         <el-button
+          :key="themeStore.theme"
           style="height: 32px; flex: 1; font-weight: 400"
           color="var(--border)"
           class="[&&]:[--el-color-black:#333]"

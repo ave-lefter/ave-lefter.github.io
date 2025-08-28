@@ -29,7 +29,7 @@
         >
           <img :src="`${configStore.token_logo_url}chain/${item.net_name}.png`" class="rd-50% mr-5px" width="32" lazy alt="">
           <span>{{ item.name || '' }}</span>
-          <span class="ml-auto color-[--d-666-l-999] text-12px">{{ item.description || '' }}</span>
+          <span class="ml-auto color-[--third-text] text-12px">{{ item.description || '' }}</span>
         </el-option>
       </el-select>
     </el-form-item>
@@ -39,7 +39,7 @@
     <el-form-item prop="" class="text-center mb-5px!">
       <div class="" style="width: 100%; text-align: center; margin-top: 30px;">
         <el-button
-          :color="themeStore.isDark?'#F5F5F5':'#222222'"
+          type="primary"
           style="width: 100%; border-radius: 8px; height: 48px;" native-type="submit" size="large">
           {{ $t('confirm') }}
         </el-button>
@@ -109,6 +109,6 @@ function importAddress() {
 
 <style lang="scss" scoped>
 .form-container :deep() .el-form-item__label {
-  --at-apply: text-14px color-[--d-666-l-999];
+  --at-apply: text-14px color-[--third-text];
 }
 </style>

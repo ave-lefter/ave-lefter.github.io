@@ -287,6 +287,7 @@
                 </div>
                 <div class="mt-20px flex-center">
                   <el-button
+                    :key="themeStore.theme"
                     class="flex-1"
                     size="default"
                     style="
@@ -351,6 +352,7 @@
                 </div>
                 <div class="mt-20px flex-center">
                   <el-button
+                    :key="themeStore.theme"
                     class="flex-1"
                     size="default"
                     style="
@@ -740,7 +742,7 @@
           color:
             (rugPull?.rates?.rugged_rate ?? 0) > 60
               ? '#F6465D'
-              : 'var(--secondary-text)',
+              : 'var(--third-text)',
         }"
       >
         <Icon name="custom:rug" class="text-12px mr-2px" />
@@ -798,7 +800,7 @@ const { token_logo_url } = useConfigStore()
 const tokenStore = useTokenStore()
 const {collected} = storeToRefs(useTokenStore())
 const { evmAddress } = storeToRefs(useBotStore())
-const { theme } = useThemeStore()
+const themeStore = useThemeStore()
 const { t } = useI18n()
 const route = useRoute()
 const { mode } = storeToRefs(useGlobalStore())

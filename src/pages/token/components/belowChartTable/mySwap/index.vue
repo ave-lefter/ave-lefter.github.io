@@ -207,8 +207,8 @@ onActivated(() => {
       <!-- Bot钱包显示链选择器 -->
       <div v-if="botStore?.userInfo?.evmAddress" class="flex items-center whitespace-nowrap w-[80%] overflow-x-auto scrollbar-hide">
         <a
-          v-for="(item) in tabs" :key="item.chain" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--third-text] px-12px py-4px rounded-4px
-          ${activeTab === item.chain ? 'bg-[--border] color-[--main-text]' : ''}`"
+          v-for="(item) in tabs" :key="item.chain" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
+          ${activeTab === item.chain ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
           @click="setActiveTab(item.chain)">
           {{ getChainInfo(item.chain).name }}
         </a>

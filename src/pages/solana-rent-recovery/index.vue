@@ -2,19 +2,19 @@
   <div class="bg-[--secondary-bg] w-full flex justify-center h-[calc(100vh-92px)] overflow-y-auto">
     <div class="py-40px">
       <h3 class="text-24px color-[--main-text] font-500">Solana {{ $t('rentRecovery') }}</h3>
-      <div class="mt-6px color-#999 text-12px">{{ $t('rentRecoveryDesc') }}</div>
+      <div class="mt-6px color-[--secondary-text] text-12px">{{ $t('rentRecoveryDesc') }}</div>
       <div class="flex justify-center mt-20px pb-20px">
         <div class="w-678px max-w-50vw mr-42px">
           <div class="flex items-center gap-8px">
-            <div class="text-14px b b-solid b-[--d-222-l-F2F2F2] h-44px px-12px flex items-center rd-8px flex-1">
+            <div class="text-14px b b-solid b-[--main-divider] h-44px px-12px flex items-center rd-8px flex-1">
               <span>SOL {{ $t('balance1') }}: {{ formatNumber2(SOLBalance, 3) }} SOL</span>
             </div>
-            <div class="text-14px b b-solid b-[--d-222-l-F2F2F2] h-44px px-12px flex items-center rd-8px flex-1">
+            <div class="text-14px b b-solid b-[--main-divider] h-44px px-12px flex items-center rd-8px flex-1">
               <span>{{ $t('recyclableTokens') }}: {{ list?.length || 0 }}</span>
             </div>
           </div>
-          <div class="mt-20px mb-10px color-#999 text-14px">{{ $t('selectClosedTokenAccount') }}</div>
-          <div class="text-14px b b-solid b-[--d-222-l-F2F2F2] p-12px rd-8px min-h-400px h-[calc(100vh-492px)] max-h-600px overflow-y-auto relative">
+          <div class="mt-20px mb-10px color-[--secondary-text] text-14px">{{ $t('selectClosedTokenAccount') }}</div>
+          <div class="text-14px b b-solid b-[--main-divider] p-12px rd-8px min-h-400px h-[calc(100vh-492px)] max-h-600px overflow-y-auto relative">
             <div class="color-#9CA3AF flex items-center absolute top-12px left-12px">
               <span class="color-[--main-text]">{{ $t('selectedToken') }}</span>
               <span :class="checkedResult?.length > 0 ? 'color-#3F80F7' : ''">{{ checkedResult?.length || 0 }}</span>/<span>{{ list?.length || 0 }}</span><span class="text-12px ml-2px">({{ t('limitRent') }})</span>
@@ -33,27 +33,27 @@
               </el-checkbox-group>
             </div>
           </div>
-          <div class="text-14px color-#999 mt-20px mb-10px mt-20px">{{ $t('availableRent') }}</div>
-          <div class="b b-solid b-[--d-222-l-F2F2F2] h-44px px-12px flex items-center rd-8px">
+          <div class="text-14px color-[--secondary-text] mt-20px mb-10px mt-20px">{{ $t('availableRent') }}</div>
+          <div class="b b-solid b-[--main-divider] h-44px px-12px flex items-center rd-8px">
             <img class="w-24px mr-8px" src="../../assets/images/solana.png" alt="" srcset="">
             <span>{{ formatNumber2(checkedSolCloseRefund, 3) }} SOL</span>
           </div>
           <div class="flex items-center mt-20px">
-            <el-button :color="themeStore.isDark ? '#222222' : '#f2f2f2'" class="flex-1 mr-15px! max-h-40px rd-8px!" size="large" @click.stop="checkedResult = []">{{
+            <el-button :key="themeStore.theme" color="var('--border')" class="flex-1 mr-15px! max-h-40px rd-8px!" size="large" @click.stop="checkedResult = []">{{
               $t('reset') }}</el-button>
             <el-button
               type="primary" class="flex-1 max-h-40px rd-8px!"  size="large"  :loading="loading" :disabled="!checkedResult.length || !walletAddress"
               @click.stop="_createSolCloseAccountsTx">{{ $t('submit') }}</el-button>
           </div>
         </div>
-        <div class="w-500px pl-42px b-l b-l-solid b-l-[--d-222-l-F2F2F2] lh-20px">
+        <div class="w-500px pl-42px b-l b-l-solid b-l-[--main-divider] lh-20px">
           <h2 class="text-20px font-500 mb-10px">{{ $t('question') }}</h2>
           <h3 class="text-14px font-500 mb-8px">{{ $t('question1Title') }}</h3>
-          <div class="text-14px font-400 color-#666 mb-20px">{{ $t('question1Content') }}</div>
+          <div class="text-14px font-400 color-[--third-text] mb-20px">{{ $t('question1Content') }}</div>
           <h3 class="text-14px font-500 mb-8px">{{ $t('question2Title') }}</h3>
-          <div class="text-14px font-400 color-#666 mb-20px">{{ $t('question2Content') }}</div>
+          <div class="text-14px font-400 color-[--third-text] mb-20px">{{ $t('question2Content') }}</div>
           <h3 class="text-14px font-500 mb-8px">{{ $t('question3Title') }}</h3>
-          <div class="text-14px font-400 color-#666">{{ $t('question3Content') }} <a
+          <div class="text-14px font-400 color-[--third-text]">{{ $t('question3Content') }} <a
               href="https://solana.com/zh/docs/core/accounts" target="_blank" class="underline clickable">{{
                 $t('question3Content2') }}</a></div>
         </div>
@@ -227,6 +227,6 @@ onMounted(() => {
 .loading-close-account.el-message.el-message--info {
   // border-width: 0;
   // --el-message-bg-color: #333;
-  --el-message-text-color: var(--d-999-l-666);
+  --el-message-text-color: var(--secondary-text);
 }
 </style>

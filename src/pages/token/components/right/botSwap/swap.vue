@@ -1267,7 +1267,7 @@ onMounted(() => {
       }
       .el-slider__marks-text {
         font-size: 12px;
-        color: #959A9F;
+        color: var(--secondary-text);
         &:nth-child(1) {
           transform: translateX(-25%);
         }

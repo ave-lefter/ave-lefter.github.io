@@ -37,14 +37,14 @@
           <Icon name="custom:wallet2" class="text-16px" />
           <span class="text-14px">{{ $t('myWallet1') }}</span>
         </div>
-        <div class="color-#999 flex items-center gap-4px">
+        <div class="color-[--secondary-text] flex items-center gap-4px">
           <span class="text-12px">
             {{ currentAccountSplit || '' }}
           </span>
           <Icon
             v-copy="walletStore.address"
             name="bxs:copy"
-            class="text-12px clickable color-#999"
+            class="text-12px clickable color-[--secondary-text]"
             @click.stop.prevent
           />
           <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
@@ -55,7 +55,7 @@
           <Icon name="custom:sack-dollar" class="text-16px" />
           <span class="text-14px">{{ $t('rentRecovery') }}</span>
         </div>
-        <div class="color-#999 flex items-center gap-4px">
+        <div class="color-[--secondary-text] flex items-center gap-4px">
           <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
         </div>
       </li>
@@ -64,7 +64,7 @@
           <Icon name="custom:log-out" class="text-16px" />
           <span class="text-14px">{{ $t('disconnect') }}</span>
         </div>
-        <div class="color-#999 flex items-center gap-4px">
+        <div class="color-[--secondary-text] flex items-center gap-4px">
           <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
         </div>
       </li>

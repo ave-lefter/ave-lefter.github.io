@@ -756,5 +756,6 @@
   "holdersNumTotal": "Держатели всего",
   "holdersTotalChange": "Держатели меняются",
   "holdersChange": "Держатели меняются",
-  "holdersChange2": "Держатель Чангс в {n}"
+  "holdersChange2": "Держатель Чангс в {n}",
+  "lockAmount": "Сумма блокировки"
 }

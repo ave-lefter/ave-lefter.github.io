@@ -410,7 +410,7 @@ function handlerDialogProfitLoss(row: { address: string }) {
   .tab-item {
     border-radius: 4px;
     font-size: 12px;
-    color: #787b86;
+    color: var(--third-text);
     letter-spacing: 0;
     line-height: 16px;
     font-weight: 400;

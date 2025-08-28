@@ -906,7 +906,7 @@ function handleSort(val:any, dir='',sort:string) {
     // console.log('filterFormObj111', filterFormObj)
 }
  function handleSortChange(data: {prop: string, order: string|null}) {
-  console.log('-------HandleSortChange--------', data)  
+  console.log('-------HandleSortChange--------', data)
   if (data.order === null) {
     conditions.value.sort_dir = ''
     conditions.value.sort = ''
@@ -1102,7 +1102,7 @@ function handleSort(val:any, dir='',sort:string) {
 }
 
 .filter-box {
-  color: var(--custom-text-1-color);
+  color: var(--main-text);
   .filter-title {
     font-size: 12px;
     color: var(--a-text-2-color);

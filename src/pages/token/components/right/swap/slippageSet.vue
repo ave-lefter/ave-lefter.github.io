@@ -4,8 +4,8 @@
       <span v-if="canSetAuto" class="mr-5px color-[--main-text]">
         {{ slippage === 'auto' ? $t('autoSlippage') : $t('manualSlippage') }}({{ slippage === 'auto' ? autoSlippage : slippage }}%)
       </span>
-      <span v-else style="color: var(--custom-text-1-color);">{{ slippage }}%</span>
-      <Icon class="ml-5px clickable" name=tdesign:setting-1 @click.stop="show = true" />
+      <span v-else class="mr-5px">{{ slippage }}%</span>
+      <Icon class="clickable" name=tdesign:setting-1 @click.stop="show = true" />
     </div>
     <el-dialog v-model="show" width="500px" append-to-body>
       <template #header>

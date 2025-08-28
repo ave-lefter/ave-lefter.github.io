@@ -61,6 +61,7 @@ async function confirm() {
         </div>
         <div class="flex items-center">
           <el-button
+            :key="themeStore.theme"
             color="var(--border)"
             size="default"
             class="flex-1 h-40px"

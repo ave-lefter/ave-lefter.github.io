@@ -9,11 +9,11 @@
           v-for="item in tabs"
           :key="item.value"
           href="javascript:;"
-          :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--third-text] px-12px py-4px rounded-4px
+          :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
          ${
            activeTab === item.value
              ? 'bg-[--tab-active-bg] color-[--main-text]'
-             : ''
+             : 'color-[--third-text]'
          }`"
           @click="setActiveTab(item.value as typeof activeTab)"
         >
@@ -501,7 +501,7 @@ function filterOriginAddress(row:{ address: string, type: string }) {
     text-align: center;
     > :first-child {
       font-size: 12px;
-      color: #959a9f;
+      color: var(--secondary-text);
       letter-spacing: 0;
       font-weight: 400;
     }
@@ -514,7 +514,7 @@ function filterOriginAddress(row:{ address: string, type: string }) {
       margin-top: 5px;
     }
     .color-text-2 {
-      color: #959a9f;
+      color: var(--secondary-text);
     }
     .color-\#12B886 {
       color: #12b886;

@@ -341,6 +341,7 @@ function handleReset() {
                 </div>
                 <div class="mt-20px flex-center">
                   <el-button
+                    :key="themeStore.theme"
                     class="flex-1"
                     size="default"
                     style="

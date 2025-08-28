@@ -65,7 +65,7 @@ const types = computed(() => {
       font-size: 12px;
       padding: 0 10px;
       font-weight: 400;
-      --el-text-color-primary: var(--d-999-l-666);
+      --el-text-color-primary: var(--third-text);
       &.is-active {
         color: var(--main-text);
       }

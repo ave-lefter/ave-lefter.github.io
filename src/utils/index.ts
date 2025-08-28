@@ -1021,3 +1021,7 @@ export function requestTimeout(interval: number, callback: () => void) {
   request()
   return timerId
 }
+
+export function getCssVariable(key: string) {
+  return getComputedStyle(document.documentElement).getPropertyValue(key)
+}

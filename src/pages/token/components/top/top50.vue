@@ -229,7 +229,7 @@ function getEarlyholders() {
 <style lang="scss" scoped>
 .top50 {
   font-size: 12px;
-  color: var(--custom-text-2-color);
+  // color: var(--custom-text-2-color);
   display: flex;
   background: var(--custom-bg-7-color);
   border-radius: 2px;

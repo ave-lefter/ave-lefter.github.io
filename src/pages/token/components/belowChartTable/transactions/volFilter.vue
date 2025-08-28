@@ -19,6 +19,7 @@ const computedVisible = computed({
 })
 const filterArray = ref<(undefined | number)[]>([])
 const isActive = computed(() => props.modelValue.filter(el => !!el).length > 0)
+const themeStore = useThemeStore()
 
 function onBlur(index: number) {
   const min = Number(filterArray.value[0])
@@ -80,6 +81,7 @@ function onBlur(index: number) {
       </div>
       <div class="flex mt-10px">
         <el-button
+          :key="themeStore.theme"
           class="h-30px flex-1 m-l-auto"
           color="var(--border)"
           @click="filterArray.length=0;emit('confirm')"

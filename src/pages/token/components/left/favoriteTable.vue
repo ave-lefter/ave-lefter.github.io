@@ -238,7 +238,7 @@ function resetListStatus() {
   <div v-loading="listStatus.pageNo === 1 && listStatus.loading">
     <div class="flex items-center justify-between pr-15px pl-12px mt-10px">
       <div class="flex items-center min-w-0">
-        <span v-show="arrowVisible" class="w-20px h-20px rounded-2px color-[--d-666-l-999] hover:color-[--d-FFF-l-333] bg-[--secondary-bg] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,-200)">
+        <span v-show="arrowVisible" class="w-20px h-20px rounded-2px color-[--third-text] hover:color-[--d-FFF-l-333] bg-[--secondary-bg] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,-200)">
         <Icon name="material-symbols:arrow-back-ios-new-rounded" />
       </span>
       <div
@@ -246,7 +246,7 @@ function resetListStatus() {
         class="flex items-center gap-10px whitespace-nowrap overflow-x-auto overflow-y-hidden scrollbar-hide"
       >
         <span
-          :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--third-text] px-4px py-2px rounded-4px cursor-pointer ${activeTab === 0 ? 'bg-[--border] color-[--main-text]' : ''}`"
+          :class="`decoration-none shrink-0 text-12px lh-16px text-center px-4px py-2px rounded-4px cursor-pointer ${activeTab === 0 ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
           @click="setActiveTab(0, 0)"
         >
           {{ $t('defaultGroup') }}
@@ -254,13 +254,13 @@ function resetListStatus() {
         <span
           v-for="(item, index) in userFavoriteGroups.slice(1)"
           :key="index"
-          :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--third-text] px-4px py-2px rounded-4px cursor-pointer ${activeTab === item.group_id ? 'bg-[--border] color-[--main-text]' : ''}`"
+          :class="`decoration-none shrink-0 text-12px lh-16px text-center px-4px py-2px rounded-4px cursor-pointer ${activeTab === item.group_id ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
           @click="setActiveTab(item.group_id, index + 1)"
         >
           {{ item.name }}
         </span>
       </div>
-      <span v-show="arrowVisible" class="mr-4px w-20px h-20px rounded-2px color-[--third-text] hover:color-[--d-FFF-l-333] bg-[--secondary-bg] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,200)">
+      <span v-show="arrowVisible" class="mr-4px w-20px h-20px rounded-2px color-[--third-text] hover:color-[--main-text] bg-[--secondary-bg] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,200)">
         <Icon name="material-symbols:arrow-forward-ios-rounded"/>
       </span>
       </div>

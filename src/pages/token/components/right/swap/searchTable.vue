@@ -2,7 +2,7 @@
   <div class="history">
     <el-scrollbar v-if="searchTokens?.length > 0" v-loading="loading" height="calc(60vh - 50px)">
       <ul class="content color-[--main-text]">
-        <li v-for="(row, $index) in searchTokens" :key="$index"  :class="{ disabled: disabledToken === row.address }" class="flex justify-between px-5px py-8px clickable"  @click.stop.prevent="tableRowClick(row)">
+        <li v-for="(row, $index) in searchTokens" :key="$index"  :class="{ disabled: disabledToken === row.address }" class="flex justify-between px-5px py-8px clickable hover:bg-[--border]"  @click.stop.prevent="tableRowClick(row)">
           <div class="token-info">
             <TokenImg class="mr-5px" :row="row" />
             <div class="flex-column">
@@ -14,7 +14,7 @@
               </div>
               <span
                 v-if="!row?.tags && row.address !== NATIVE_TOKEN"
-                class="px-5px py-0 color-#999"
+                class="px-5px py-0 color-[--third-text]"
               >
                 {{ row.token?.slice(0, 4) }}**{{ row.token?.slice(-4) }}
               </span>
@@ -23,7 +23,7 @@
           <div v-if="(row.amount || 0) > 0 || (row.value || 0) > 0" class="flex flex-col text-right">
             <span class="color-[--main-text] py-2px" v-html="row.amount || row.value ? formatNumber(row?.amount || row?.value || '') : ''" />
             <span
-              class="color-#999"
+              class="color-[--third-text]"
               v-html="
                 `$ ${formatNumber(
                   (row.current_price_usd || row.price || 0) * (row?.amount || row?.value || 0)
@@ -114,7 +114,7 @@ function tableRowClick(item: typeof props.searchTokens[number]) {
         padding: 2px 5px;
       }
       .token-network {
-        border: 1px solid var(--d-333-l-F5F5F5);
+        border: 1px solid var(--border);
         border-radius: 10px;
         font-size: 12px;
         color: #999;
@@ -146,7 +146,7 @@ function tableRowClick(item: typeof props.searchTokens[number]) {
     }
     li:not(.disabled):hover {
       text-decoration: none;
-      background-color: var(--d-1A1A1A-l-F2F2F2);
+      background-color: var(--border);
       opacity: 1;
     }
     li.disabled {
