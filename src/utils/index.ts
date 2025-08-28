@@ -1006,7 +1006,7 @@ export function getPumpColor(platform: string): string {
 }
 
 export function requestTimeout(interval: number, callback: () => void) {
-  const timerId = { id: null }
+  const timerId: { id: number | null } = { id: null }
   let lastCallTime = performance.now()
   const request = () => {
     timerId.id = requestAnimationFrame(() => {
