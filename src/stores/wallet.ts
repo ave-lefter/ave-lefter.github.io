@@ -137,7 +137,8 @@ export const useWalletStore = defineStore('wallet', () => {
     if (!provider.value) return
     if (chain.value === 'solana' || chain.value === 'sui') {
       const _provider = (chain.value === 'solana' ? solanaWallets.value?.find(i => i.name === walletName.value) : suiWallets.value?.find(i => i.name === walletName.value)) || provider.value
-      return (_provider as Wallet)?.signMessage?.({
+      const signMessage = (_provider as Wallet)?.signMessage || (_provider as Wallet)?.features?.['solana:signMessage']?.signMessage
+      return signMessage?.({
         message: decodeUTF8(msg),
         account: (_provider as Wallet)?.accounts?.[0]
       }).then(async res => {
