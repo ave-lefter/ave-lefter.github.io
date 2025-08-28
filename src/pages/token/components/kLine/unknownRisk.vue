@@ -1,6 +1,6 @@
 <template>
-  <div class="time" v-if="!price">
-    <div class="text-center" v-if="opening_at > 0">
+  <div v-if="!price" class="time">
+    <div v-if="opening_at > 0" class="text-center">
       <span class="color-[--d-F5F5F5-l-111] text-14px mb-12px block">{{
         $t('countdown2Opening')
       }}</span>
@@ -27,15 +27,16 @@
         </template>
       </TimerCount>
     </div>
-    <div class="flex items-center bg-[--d-151A22-l-E8F1FF] py-8px px-24px radius-4px" v-else>
+    <div v-else class="flex items-center bg-[--d-151A22-l-E8F1FF] py-8px px-24px radius-4px">
       <span class="color-[--d-8CA0C3-l-566275] text-36px">{{ $t('unknownRisk') }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
+const  props = defineProps(['isRank'])
 const emit = defineEmits(['refresh'])
-const tokenStore = useTokenStore()
+const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const price = computed(() => {
   return tokenStore.price
 })

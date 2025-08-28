@@ -106,6 +106,17 @@ export const useSignalStore = defineStore('signalStore', () => {
     triggerRef(signalList)
   }
 
+  const placement=computed(()=>{
+    if(!isLeftFixed.value&&!isRightFixed.value){
+      return 'center'
+    }else if(isLeftFixed.value){
+      return 'left'
+    } else if(isRightFixed.value){
+      return 'right'
+    } else {
+      return 'center'
+    }
+  })
   return {
     signalVisible,
     signalBoundingRect,
@@ -127,6 +138,7 @@ export const useSignalStore = defineStore('signalStore', () => {
     listStatus,
     pageParams,
     updateList,
-    shouldHide
+    shouldHide,
+    placement
   }
 })

@@ -71,7 +71,7 @@ export const useGlobalStore = defineStore('global', () => {
     quickBuyValue: '0.01',
   })
   const latestNotice = shallowRef<ILatestNotice>({})
-
+  const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
   const holderBlackList = useStorage<Array<pumpBlack>>('holderBlackList', [])
@@ -159,6 +159,7 @@ export const useGlobalStore = defineStore('global', () => {
     rankCommon,
     headFollowsNum,
     getFollowsNum,
-    latestNotice
+    latestNotice,
+    pnlTrackerVisible
   }
 })

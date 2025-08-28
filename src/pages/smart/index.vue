@@ -4,6 +4,7 @@ import KOL from './components/kol/index.vue'
 import { getTopSignal, type ITopSignal } from '~/api/signal'
 import { _getKolList, _getSmartList } from '@/api/kol'
 import { useLocalStorage, useStorage } from '@vueuse/core'
+import type { ChainKey } from '~/api/types/pump'
 const Version = 1
 const { t } = useI18n()
 
@@ -19,8 +20,8 @@ const smartChains = computed(() => {
     }
   })
 })
-const activeChain = shallowRef('solana')
-const activeChain2 = shallowRef('solana')
+const activeChain = shallowRef<ChainKey>('solana')
+const activeChain2 = shallowRef<ChainKey>('solana')
 
 const dialogValues = ref<{
   visible: boolean
@@ -728,6 +729,7 @@ function switchChain(chain: string) {
             style="margin-left: 20px"
             :showQuickAmount="false"
           />
+          <AutoSellSetting class="ml-20px" :chain="activeChain" />
         </div>
         <div class="p-2px rounded-4px bg-[--d-333-l-F2F2F2] flex">
           <div
