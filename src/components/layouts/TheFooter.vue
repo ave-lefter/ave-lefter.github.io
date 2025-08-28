@@ -40,7 +40,7 @@
         <Icon name="custom:pump-icon"/>
         {{ $t('pump1') }}
       </div>
-      <div class="flex items-center mr-12px color-[--d-999-l-666] gap-4px cursor-pointer" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
+      <div class="flex items-center mr-12px color-[--secondary-text] gap-4px cursor-pointer hover:color-[--main-text]" :class="{'color-[--main-text]':globalStore.pnlTrackerVisible}" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
         <Icon name="custom:chart" class="text-12px" />
         {{ $t('PnlTracker') }}
       </div>
