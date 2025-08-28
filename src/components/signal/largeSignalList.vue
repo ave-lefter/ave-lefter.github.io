@@ -140,7 +140,8 @@ const onScroll = useThrottleFn(({scrollTop}: { scrollTop: number }) => {
               </el-tooltip>
               <div class="flex flex-col gap-4px">
                 <div class="flex items-center gap-8px">
-              <span class="font-500 color-[--main-text] text-16px overflow-hidden text-ellipsis cursor-pointer"
+              <span
+class="font-500 color-[--main-text] text-16px overflow-hidden text-ellipsis cursor-pointer max-w-120px"
               >{{
                   symbol
                 }}</span>

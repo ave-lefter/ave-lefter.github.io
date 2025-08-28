@@ -67,7 +67,7 @@ const botStore = useBotStore()
          </el-tooltip>
           <div class="flex flex-col gap-4px">
             <div class="flex items-center gap-8px">
-              <span class="font-500 color-[--main-text] text-16px cursor-pointer"
+              <span class="font-500 color-[--main-text] text-16px cursor-pointer max-w-140px truncate"
               >{{ symbol }}</span>
               <div class="flex items-center gap-4px text-10px color-[--third-text]">
                 <Icon

@@ -40,6 +40,10 @@
         <Icon name="custom:pump-icon"/>
         {{ $t('pump1') }}
       </div>
+      <div class="flex items-center mr-12px color-[--d-999-l-666] gap-4px cursor-pointer" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
+        <Icon name="custom:chart" class="text-12px" />
+        {{ $t('PnlTracker') }}
+      </div>
       <el-badge :is-dot="(!!botStore.evmAddress)&&isDoted2" class="mr-12px">
         <div
           id="monitor"

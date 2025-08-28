@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const signalStore = useSignalStore()
+const dragStore = useDragStore()
+
 </script>
 <template>
     <Draggable
@@ -25,6 +27,7 @@ v-if="!signalStore.isLeftFixed && !signalStore.isRightFixed && signalStore.signa
     <Draggable
 v-if="signalStore.isLeftFixed && signalStore.signalVisible"
         class="[&&]:relative shrink-0 left fixed! left-0 top-61px left-drag" :axis="'x'" :min-width="240" :max-width="360"
+        :style="`left:${dragStore.leftWidth.signal}px`"
         :initial-width="signalStore.fixedWidth" :initial-height="signalStore.winHeight - 95" :parent="true" :handles="[
             'mr',
         ]" drag-cancel="#drag-disabled" @onDragStop="signalStore.onLeftDragStop"
@@ -34,7 +37,7 @@ v-if="signalStore.isLeftFixed && signalStore.signalVisible"
     <Draggable
 v-if="signalStore.isRightFixed && signalStore.signalVisible"
         class="[&&]:relative shrink-0 right fixed! top-61px left-0 right-drag" :axis="'x'"
-        :x="signalStore.winWidth - signalStore.fixedWidth" :min-width="240" :parent="true" :max-width="360"
+        :x="dragStore.rightWidth.signal" :min-width="240" :parent="true" :max-width="360"
         :initial-width="signalStore.fixedWidth" :initial-height="signalStore.winHeight - 95" :handles="[
             'ml',
         ]" drag-cancel="#drag-disabled" @onDragStop="signalStore.onRightDragStop"

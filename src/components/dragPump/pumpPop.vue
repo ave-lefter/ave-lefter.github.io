@@ -499,8 +499,9 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
         </div>
       </div>
       <div class="flex items-center gap-8px">
+        <AutoSellSetting :chain="pumpStore.activeChain" />
         <el-input
-ref="inputSearch" v-model.trim="pumpStore.pump_query[pumpStore.activeChain][activeTab]"
+          ref="inputSearch" v-model.trim="pumpStore.pump_query[pumpStore.activeChain][activeTab]"
           class="w-90px [--el-input-border-color:--d-222-l-F2F2F2]" size="small" :placeholder="$t('search')"
           style="--el-input-bg-color:var(--d-151A22-l-E8F1FF);--el-text-color-regular:var(--d-566275-l-8CA0C3)"
           @input="
