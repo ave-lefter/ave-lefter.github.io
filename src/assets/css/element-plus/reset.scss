@@ -275,3 +275,7 @@
 .el-input .el-input__inner::placeholder {
   color: var(--third-text);
 }
+
+.el-switch{
+  --el-border-color:var(--icon-color);
+}

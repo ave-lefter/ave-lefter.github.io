@@ -432,7 +432,7 @@ function getFilterData(list, conditions) {
 
 <template>
   <div
-    class="w-full h-full bg-[--d-0B0D12-l-F6F9FF] p-12px"
+    class="w-full h-full bg-[--secondary-bg] p-12px"
     :class="{'pr-16px':pumpStore.isLeftFixed,'pl-16px':pumpStore.isRightFixed}"
   >
     <Icon name="custom:drag2" class="absolute top-4px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle" />
@@ -456,20 +456,20 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
           @click.self="pumpStore.visible = false" />
       </div>
     </div>
-    <div class="flex pb-8px border-b-1px border-b-solid border-b-[--border] mb-12px">
+    <div class="flex pb-8px border-b-1px border-b-solid border-b-[--main-input-button-bg] mb-12px">
       <div class="flex items-center gap-8px">
         <span
-          v-for="(item, index) in tabList" :key="index" :class="`decoration-none shrink-0 text-14px lh-20px text-center color-[--d-566275-l-8CA0C3] px-8px py-4px rounded-4px cursor-pointer ${activeTab === item.value ? 'bg-[--d-151A22-l-E8F1FF] color-[--d-F5F5F5-l-333]' : ''
+          v-for="(item, index) in tabList" :key="index" :class="`decoration-none shrink-0 text-14px lh-20px text-center color-[--third-text] px-8px py-4px rounded-4px cursor-pointer ${activeTab === item.value ? 'bg-[--tab-active-bg] color-[--main-text]' : ''
           }`" @click="setActiveTab(item.value)">
           {{ item.label }}
         </span>
       </div>
       <div class="flex-1 drag-handle mb--8px" />
       <div class="flex items-center gap-8px">
-        <div class="flex items-ceter gap-4px p-2px rounded-4px bg-[--d-151A22-l-E8F1FF]">
+        <div class="flex items-ceter gap-4px p-2px rounded-4px bg-[--main-input-button-bg]">
           <div
             v-for="(item, idx) in pumpStore.pumpConfig" :key="idx" class="cursor-pointer rounded-4px p-1px"
-            :class="pumpStore.activeChain === item.chain ? 'bg-[--secondary-bg]' : ''"
+            :class="pumpStore.activeChain === item.chain ? 'bg-[--tab-active-bg]' : ''"
             @click="pumpStore.activeChain = item.chain as ChainKey">
             <ChainToken :chain="item.chain" :width="16" />
           </div>

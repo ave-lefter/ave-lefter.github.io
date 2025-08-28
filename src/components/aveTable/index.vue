@@ -158,7 +158,7 @@ function calculateColumnWidths() {
           <span v-else/>
         </template>
         <template v-if="data.length >0 && showFooter" #footer>
-          <div class="text-center px-0 pt-15px pb-10px text-12px text-[#959a9f] bg-[--secondary-bg] absolute w-100%" :class="`top-${rowHeight}px`">
+          <div class="text-center px-0 pt-15px pb-10px text-12px text-[--third-text] absolute w-100%" :class="`top-${rowHeight}px`">
               {{ footText || t('loading') }}
           </div>
         </template>

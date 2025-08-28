@@ -1,6 +1,6 @@
 <template>
   <div
-class="w-monitor w-100% h-100% bg-[--dialog-bg] pl-12px pr-6px relative overflow-hidden"
+class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overflow-hidden"
   :class="{'pr-10px!':isLeftFixed,'pl-10px!':isRightFixed}"
   >
     <!-- <div class="w-100% h-40px absolute pointer-events-auto z-999 drag-handle left-0"/> -->
@@ -184,7 +184,7 @@ class="w-monitor w-100% h-100% bg-[--dialog-bg] pl-12px pr-6px relative overflow
                   <div class="flex-between">
                     <div class="flex-start gap-4px">
                       <div class="color-[--third-text]">{{ getTxType(row) }}</div>
-                      <span :class="getIsBuy(row)?`color-[--up-color]}`:`color-[--down-color]}`">
+                      <span :class="getIsBuy(row)?`color-[--up-color]`:`color-[--down-color]`">
                         {{ !toggleMc? row?._main_Token?.amount+row?._main_Token?.symbol: row?._main_Token.total}}
                       </span>
                       <TokenImg
@@ -629,9 +629,9 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
 <style scoped lang="scss">
 .m-table {
   :deep() .el-table.el-table-v2{
-    --el-table-header-bg-color: var(--dialog-bg);
-    --el-table-tr-bg-color: var(--dialog-bg);
-    --el-table-bg-color:var(--dialog-bg);
+    --el-table-header-bg-color: transparent;
+    --el-table-tr-bg-color: transparent;
+    --el-table-bg-color:transparent;
     /* .el-table-v2__table{
       --el-table-border:1px solid;
     } */
