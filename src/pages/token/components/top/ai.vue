@@ -67,7 +67,7 @@
               >
             </div>
             <div>
-              <span class="risk-message">
+              <span class="risk-message" :style="{ color: i?.risk_level == -3 ? 'var(--d-F5F5F5-l-333)' : 'var(--d-999-l-666)'}">
                 {{ isZh ? i.name_zh || '' : i.name_en || '' }}
                 {{ i?.risk_removed === 1 ? `(${$t('riskRemoved')})` : '' }}
               </span>
