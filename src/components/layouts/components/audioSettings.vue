@@ -57,6 +57,7 @@ v-model="globalStore.audioSettings.audio.volume" :min="0" :max="100" :step="1" :
                     100: '100',
                 }"
                     class="[&&]:[--el-slider-button-size:8px] [--el-color-white:#3F80F7] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] mx-4px" />
+                <el-button type="primary" class="w-full mt-70px">{{ $t('complete') }}</el-button>
             </div>
         </template>
     </el-dialog>
