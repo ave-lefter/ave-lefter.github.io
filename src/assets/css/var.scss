@@ -10,9 +10,9 @@
   // 一级文字
   --main-text:var(--d-F5F5F5-l-111);
   // 二级文字
-  --secondary-text:var(--d-8CA0C3-l-566275);
+  --secondary-text:var(--d-C3C9D2-l-566275);
   // 三级文字
-  --third-text:var(--d-566275-l-8CA0C3);
+  --third-text:var(--d-566275-l-B1BBCB);
   // 图标插画颜色
   --icon-color:var(--d-383F4B-l-CAD6EC);
   // 主要背景
@@ -171,6 +171,8 @@
     --d-12161D-l-ECF3FF: #12161D;
     --d-202834-l-E8F1FF: #202834;
     --d-252E3C-l-D9E8FF: #252E3C;
+    --d-C3C9D2-l-566275: #C3C9D2;
+    --d-566275-l-B1BBCB: #566275;
   }
 
   &.light {
@@ -292,6 +294,8 @@
     --d-12161D-l-ECF3FF: #ECF3FF;
     --d-202834-l-E8F1FF: #E8F1FF;
     --d-252E3C-l-D9E8FF: #D9E8FF;
+    --d-C3C9D2-l-566275: #566275;
+    --d-566275-l-B1BBCB: #B1BBCB;
   }
 }
 

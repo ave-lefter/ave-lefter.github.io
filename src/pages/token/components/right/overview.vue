@@ -12,7 +12,7 @@
         </span>
       </div>
     </div>
-    <ul class="text-12px mt-10px" :class="{ active: active=='grid'}">
+    <ul class="text-12px" :class="{ active: active=='grid'}">
       <li class="flex justify-between mb-12px">
         <span class="color-[--third-text]">{{ $t('name') }}</span>
         <span class="color-[--secondary-text] ellipsis" :class="active =='grid' ? 'max-w-75px' : 'max-w-200px'">{{ token?.name || '-' }}</span>
@@ -101,8 +101,8 @@
       </div>
     </div>
     <div v-if="!isRank" :class="{ bg: active=='grid'}">
-      <div class="text-14px mb-2px color-[--third-text] flex-start" :class="active =='grid' ? 'mt-0px': 'mt-12px'">
-        <Icon name="custom:ai" class="text-12px"/> {{ $t('aiSummary') }}
+      <div class="text-14px color-[--third-text] flex items-center justify-start mb-12px">
+        <Icon name="custom:ai" class="text-12px mr-5px"/> <span>{{ $t('aiSummary') }}</span>
       </div>
       <div class="text-12px color-[--secondary-text] token-description">
          <template v-if="!headlineArr">
