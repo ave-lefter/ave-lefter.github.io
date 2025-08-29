@@ -177,6 +177,14 @@ watch(
   }
 )
 
+watch(()=>pageInfo.value.pageNO,()=>{
+  if(aveTableRef.value){
+    setTimeout(()=>{
+      aveTableRef.value.scrollToTop(0)
+    },20)
+  }
+})
+
 let timer: number
 async function _getTreasureList(shouldLoading = true) {
   try {
