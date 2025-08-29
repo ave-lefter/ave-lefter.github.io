@@ -5,10 +5,10 @@
   </div>
   <div
     v-if="!isRank"
-    class="w-full cursor-row-resize bg-[--border] gap-1px hover:bg-[--d-666-l-CCC] flex items-center justify-center h-4px"
+    class="w-full cursor-row-resize bg-[--border] gap-1px hover:bg-[--third-text] flex items-center justify-center h-4px"
     @mousedown.stop.prevent="drag"
   >
-    <span v-for="i in 4" :key="i" class="bg-#444 w-2px h-2px rounded-full"/>
+    <span v-for="i in 4" :key="i" class="bg-[--icon-color] w-2px h-2px rounded-full"/>
   </div>
 </template>
 

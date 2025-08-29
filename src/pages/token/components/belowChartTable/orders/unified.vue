@@ -121,7 +121,7 @@
         <template #header>
           <span>{{ t('status') }}</span>
           <!-- <el-dropdown trigger="click" @command="handleStatusCommand">
-            <i class="iconify i-custom:filter text-10px color-[--d-666-l-999] cursor-pointer text-10px"></i>
+            <i class="iconify i-custom:filter text-10px color-[--third-text] cursor-pointer text-10px"></i>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="全部">全部</el-dropdown-item>

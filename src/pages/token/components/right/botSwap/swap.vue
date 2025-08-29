@@ -1196,7 +1196,7 @@ onMounted(() => {
     .swap-label_item-left {
       display: flex;
       align-items: center;
-      color: var(--d-666-l-999);
+      color: var(--third-text);
     }
   }
   .connect-wallet-btn {

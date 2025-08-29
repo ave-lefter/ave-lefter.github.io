@@ -149,9 +149,9 @@
         <template #header>
           <span>{{ t('amount1') }}</span>
           <!-- <span @click="isUnit = !isUnit"
-            class="iconify i-custom:u text-10px ml-3px color-[--d-666-l-999] cursor-pointer text-12px"></span>
+            class="iconify i-custom:u text-10px ml-3px color-[--third-text] cursor-pointer text-12px"></span>
           <span @click="isUnit = !isUnit"
-            class="iconify i-custom:b text-10px ml-3px color-[--d-666-l-999] cursor-pointer text-12px"></span> -->
+            class="iconify i-custom:b text-10px ml-3px color-[--third-text] cursor-pointer text-12px"></span> -->
         </template>
         <template #default="{ row }">
           <span v-if="isBotWallet" class="text-[--secondary-text] text-right">

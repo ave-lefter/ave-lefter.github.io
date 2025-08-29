@@ -397,7 +397,7 @@ function init2() {
     font-size: 12px;
     line-height: 16px;
     letter-spacing: 0px;
-    // color: var(--d-666-l-999);
+    // color: var(--third-text);
   }
 
   :deep() td {

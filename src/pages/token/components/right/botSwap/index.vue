@@ -235,7 +235,7 @@ onMounted(() => {
       height: 20px;
       text-align: center;
       &.active {
-        background: var(--secondary-bg);
+        background: var(--tab-active-bg);
         color: var(--main-text);
       }
     }

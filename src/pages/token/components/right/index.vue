@@ -11,15 +11,15 @@
         <!-- <div class="flex items-center justify-around color-[--main-text] p-15px bg-[--secondary-bg] mt-4px">
         <div class="text-center">
           <div class="text-14px mb-5px">${{ formatNumber(token?.open_price || 0, 3) }}</div>
-          <div class="text-12px color-[--d-666-l-999]">{{ $t('openPrice') }}</div>
+          <div class="text-12px color-[--third-text]">{{ $t('openPrice') }}</div>
         </div>
         <div class="text-center">
           <div class="text-14px mb-5px">{{ tokenStore.circulation?.gt?.(0) ? (formatNumber(((tokenStore?.tokenInfoExtra?.amount_24 || 0) / Number(tokenStore?.circulation.toFixed())) * 100 || 0, 2) + '%') : '-' }}</div>
-          <div class="text-12px color-[--d-666-l-999]">{{ $t('24Exchange') }}</div>
+          <div class="text-12px color-[--third-text]">{{ $t('24Exchange') }}</div>
         </div>
         <div class="text-center">
           <div class="text-14px mb-5px">-</div>
-          <div class="text-12px color-[--d-666-l-999]">DEV</div>
+          <div class="text-12px color-[--third-text]">DEV</div>
         </div>
       </div> -->
         <div class="p-15px bg-[--secondary-bg] mt-1px">

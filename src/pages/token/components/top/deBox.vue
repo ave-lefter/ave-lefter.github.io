@@ -9,7 +9,7 @@
       >
       <Icon
         name="custom:debox"
-        class="color-[--d-666-l-999] text-12px"
+        class="color-[--third-text] text-12px"
         :class="show? 'color-#21c161': ''"
       />
       <!-- <img v-if="show" src="@/assets/images/debox_on.svg" alt="" width="16px">

@@ -30,7 +30,7 @@ const filterTime = ref([])
     :width="420"
     trigger="click"
     teleported
-    popper-style="max-width: 420px;--el-text-color-primary:--d-666-l-999"
+    popper-style="max-width: 420px;--el-text-color-primary:--third-text"
     popper-class="transaction-popover"
     :popper-options="{ modifiers: [{ name: 'preventOverflow', options: { boundary: boundary, padding: 0 } }] }"
   >
