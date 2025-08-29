@@ -36,19 +36,19 @@
           </NuxtLink>
         </div>
       </el-popover>
-      <div class="flex items-center gap-4px color-[--secondary-text] mx-12px cursor-pointer hover:color-[--main-text]" :class="{'color-[--main-text]':dragPumpStore.visible}" @click="dragPumpStore.visible=!dragPumpStore.visible">
+      <div class="flex items-center gap-4px mx-12px cursor-pointer hover:color-[--main-text]" :class="dragPumpStore.visible?'color-[--main-text]':'color-[--secondary-text]'" @click="dragPumpStore.visible=!dragPumpStore.visible">
         <Icon name="custom:pump-icon"/>
         {{ $t('pump1') }}
       </div>
-      <div class="flex items-center mr-12px color-[--secondary-text] gap-4px cursor-pointer hover:color-[--main-text]" :class="{'color-[--main-text]':globalStore.pnlTrackerVisible}" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
+      <div class="flex items-center mr-12px gap-4px cursor-pointer hover:color-[--main-text]" :class="globalStore.pnlTrackerVisible?'color-[--main-text]':'color-[--secondary-text]'" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
         <Icon name="custom:chart" class="text-12px" />
         {{ $t('PnlTracker') }}
       </div>
       <el-badge :is-dot="(!!botStore.evmAddress)&&isDoted2" class="mr-12px">
         <div
           id="monitor"
-          class="flex items-center color-[--secondary-text] gap-4px cursor-pointer hover:color-[--main-text]"
-          :class="{'color-[--main-text]':visible}" 
+          class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
+          :class="visible?'color-[--main-text]':'color-[--secondary-text]'" 
           @click="visible=!visible"
         >
           <Icon
@@ -59,8 +59,8 @@
       </el-badge>
       <el-badge :is-dot="isDoted">
         <div
-          class="flex items-center color-[--secondary-text] gap-4px cursor-pointer hover:color-[--main-text]"
-          :class="{'color-[--main-text]':signalStore.signalVisible}" 
+          class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
+          :class="signalStore.signalVisible?'color-[--main-text]':'color-[--secondary-text]'" 
           @click="signalStore.signalVisible=!signalStore.signalVisible"
         >
           <Icon

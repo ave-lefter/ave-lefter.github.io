@@ -459,7 +459,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
     <div class="flex pb-8px border-b-1px border-b-solid border-b-[--main-input-button-bg] mb-12px">
       <div class="flex items-center gap-8px">
         <span
-          v-for="(item, index) in tabList" :key="index" :class="`decoration-none shrink-0 text-14px lh-20px text-center color-[--third-text] px-8px py-4px rounded-4px cursor-pointer ${activeTab === item.value ? 'bg-[--tab-active-bg] color-[--main-text]' : ''
+          v-for="(item, index) in tabList" :key="index" :class="`decoration-none shrink-0 text-14px lh-20px text-center px-8px py-4px rounded-4px cursor-pointer ${activeTab === item.value ? 'bg-[--tab-active-bg] color-[--main-text]' : 'color-[--third-text]'
           }`" @click="setActiveTab(item.value)">
           {{ item.label }}
         </span>
