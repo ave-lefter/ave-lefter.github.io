@@ -1,7 +1,7 @@
 <template>
   <div class="relative" :style="{height: `${isRank ? 290 : kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
-    <UnknownRisk  @refresh="refresh" :isRank="isRank" />
+    <UnknownRisk v-show="isReady" :isRank="isRank" @refresh="refresh" />
   </div>
   <div
     v-if="!isRank"
@@ -33,12 +33,12 @@ const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const botStore = useBotStore()
 const route = useRoute()
 const token = computed(() => {
-  return props.isRank ? tokenStore.klineRow?.id : route.params.id as string
+  return (props.isRank && 'klineRow' in tokenStore) ? tokenStore.klineRow?.id : route.params.id as string
 })
 
 const klinePair = ref('')
 
-let isReady = false
+const isReady = ref(false)
 let isReadyLine = false
 let isHeaderReady = false
 
@@ -86,7 +86,7 @@ function switchTokenKline() {
   resetLimitPriceLineId()
   resetAvgPriceLineId()
   const val = pair.value
-  if (isReady && route.name === 'token-id') {
+  if (isReady.value && route.name === 'token-id') {
     const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
     // const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
     // const preResolutions = localStorage.getItem(QUICK_KEY)
@@ -109,7 +109,7 @@ function switchTokenKline() {
 }
 
 watch(user, () => {
-  if (isReady && route.name === 'token-id') {
+  if (isReady.value && route.name === 'token-id') {
     _widget?.activeChart?.()?.clearMarks?.()
     _widget?.activeChart?.()?.refreshMarks?.()
   }
@@ -251,7 +251,7 @@ function createToggleButton() {
 const { createMarkButton, getMarks, marksTabs, wsTxUpdateMarks } = useKlineMarks()
 
 watch(marksTabs, () => {
-  if (!isReady) return
+  if (!isReady.value) return
   createHeaderButton()
 })
 
@@ -608,7 +608,7 @@ async function initChart() {
   updateChartBackground()
 
   _widget.onChartReady(() => {
-    isReady = true
+    isReady.value = true
     isReadyLine = true
     if (themeStore.isDark) {
       _widget?.applyOverrides?.({ 'scalesProperties.textColor': '#d5d5d5' })
