@@ -1369,5 +1369,15 @@
   "TP": "TP",
   "SL": "SL",
   "autoSellStrategy": "Auto Sell Strategy",
-  "noAutoSell": "Advanced selling strategy has not been set yet"
+  "noAutoSell": "Advanced selling strategy has not been set yet",
+  "AI": "AI Check",
+  "AIRiskCheck": "AI Risk Check",
+  "AIOverview": "AI Overview",
+  "AITax": "AI Tax",
+  "AIAdmin": "AI Admin",
+  "Renounced": "Renounced",
+  "TransferTax": "Transfer Tax",
+  "MaxTxAmount": "Max Tx Amount",
+  "MaxWalletAmount": "Max Wallet Amount",
+  "riskRemoved": "Risk Removed"
 }
