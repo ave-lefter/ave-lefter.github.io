@@ -63,7 +63,8 @@ const props = defineProps({
 
 const { t } = useI18n()
 // const store = useStore()
-
+const globalStore = useGlobalStore()
+const { isDark } = storeToRefs(globalStore)
 const id = 'progress-container' + '-' + uuidv4()
 const arcProgress = ref<any>(null)
 
@@ -118,7 +119,7 @@ const init = () => {
     fillColor: getColor(props.progress),
     customText: props.big
       ? [{ text: t('riskAssessment'), size: '14px', color: '#aaa', x: w.value, y: 120 }]
-      : [{ text: '', size: '12px', color: '#aaa', x: w.value, y: 0 }],
+      : [{ text: t('riskAssessment'), size: '12px', color: isDark.value ? '#566275': '#A9B0BC', x: w.value, y: 70 }],
     lineCap: 'round',
   })
 }

@@ -209,7 +209,7 @@ debox-chat-widget {
   max-height: 500px;
   overflow-y: auto;
 }
-.new-dialog.el-dialog, .new-popover.el-popover.el-popper{
+.new-dialog.el-dialog, .new-popover.el-popover.el-popper, .el-drawer.draw-right{
   background: var(--dialog-bg);
   box-shadow: 0px 2px 10px 0px var(--d-17191E-l-D1D4D9);
 
