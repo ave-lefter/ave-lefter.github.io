@@ -49,7 +49,7 @@ function switchTab(val: TabItem) {
     padding: 1px;
     font-size: 12px;
     .tab-item {
-      border: 1px solid var(--d-333-l-F5F5F5);
+      border: 1px solid var(--border);
       display: flex;
       padding: 7px 0;
       justify-content: center;
@@ -59,7 +59,7 @@ function switchTab(val: TabItem) {
       background: transparent;
       // border: none;
       cursor: pointer;
-      color: var(--d-999-l-666);
+      color: var(--third-text);
       & + .tab-item {
         margin-left: 10px;
       }

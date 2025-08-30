@@ -267,7 +267,7 @@ function openTokenDetail(el: IActionItem) {
           id
         },index) in filterSignalList"
           :key="index"
-          class="p-12px  bg-[--d-111-l-FFF] border-[--d-111-l-FFF] hover:bg-[--d-222-l-F2F2F2] cursor-pointer transition-colors"
+          class="p-12px  bg-[--secondary-bg] border-[--d-111-l-FFF] hover:bg-[--d-222-l-F2F2F2] cursor-pointer transition-colors"
           :class="selectId===id?'bg-[--d-222-l-F2F2F2]':''"
           @click="selectSignal(id,token)"
         >

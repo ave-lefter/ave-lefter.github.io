@@ -12,7 +12,7 @@
         </button>
       </div>
     </el-scrollbar>
-    <button class="h-24px flex items-center item-chain-btn clickable color-[--d-CCC-l-333]! op-100! text-12px ml-8px mt-15px mb-8px" @click.stop="visible = true">
+    <button class="h-24px flex items-center item-chain-btn clickable color-[--main-text]! op-100! text-12px ml-8px mt-15px mb-8px" @click.stop="visible = true">
       <Icon name="custom:add-icon" class="text-12px mr-4px" />
       <span class="break-keep whitespace-nowrap">{{ t('addChain') }}</span>
     </button>
@@ -55,8 +55,8 @@ function setChain(chain: string, _index?: number) {
 
 <style scoped lang="scss">
   .item-chain-btn {
-    color: var(--d-F5F5F5-l-333);
-    background: var(--d-333-l-F2F2F2);
+    color: var(--main-text);
+    background: var(--border);
     border: none;
     padding: 5px 8px;
     border-radius: 4px;

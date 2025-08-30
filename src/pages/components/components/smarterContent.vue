@@ -15,16 +15,16 @@ function shouldShowContent(row) {
 
 <template>
   <div>
-    <div v-if="shouldShowContent(row)" class="flex justify-end gap-2px color-[--d-666-l-999]">
-      <span :class="row.smart_money_buy_count_24h > 0 ? 'color-#12B886' : ''">
+    <div v-if="shouldShowContent(row)" class="flex justify-end gap-2px">
+      <span :class="row.smart_money_buy_count_24h > 0 ? 'color-[--up-color]' : ''">
         {{
           formatNumber(row.smart_money_buy_count_24h || 0, {
             decimals: 0,
             limit: 20,
           })
         }} </span
-      ><span class="color-[--d-333-l-F5F5F5]">/</span>
-      <span :class="row.smart_money_sell_count_24h > 0 ? 'color-#F6465D' : ''">
+      ><span class="color-[--third-text]">/</span>
+      <span :class="row.smart_money_sell_count_24h > 0 ? 'color-[--down-color]' : ''">
         {{
           formatNumber(row.smart_money_sell_count_24h || 0, {
             decimals: 0,
@@ -33,6 +33,6 @@ function shouldShowContent(row) {
         }}
       </span>
     </div>
-    <div v-else class="color-[--d-666-l-999]">-</div>
+    <div v-else>-</div>
   </div>
 </template>

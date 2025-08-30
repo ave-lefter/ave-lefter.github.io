@@ -14,7 +14,7 @@
         <div :class="tabActive!== 0? 'tab' : 'tab active'" @click="tabActive = 0">{{ $t('bulkImport') }}</div>
         <div :class="tabActive!== 1? 'tab' : 'tab active'" @click="() => { tabActive = 1; handleBulkExportAttention() }">{{ $t('bulkExport') }}</div>
         <div :class="tabActive!== 2? 'tab' : 'tab active'" @click="tabActive = 2">{{ $t('bulkDelete') }}</div>
-        <Icon name="line-md:close" class="text-20px" @click="showBatchAddressDetails = false"/>
+        <Icon name="line-md:close" class="text-20px color-[--main-text]" @click="showBatchAddressDetails = false"/>
       </div>
       <div v-if="tabActive === 0" class="import part">
         <p>{{ $t('bulkDesc1') }}</p>
@@ -27,12 +27,12 @@
         </div>
         <el-select
           v-model="activeChain"
-          class="chains-select"
+          class="chains-select [&&]:[--el-fill-color-blank:--border]"
           placeholder="Select"
           size="large"
           style="width: 100%"
           :teleported="false"
-          :suffix-icon="ArrowDownBold"
+          :suffix-icon="SuffixIcon"
         >
           <template #prefix>
             <img
@@ -72,7 +72,7 @@
           class="width100 button"
           block
           size="large"
-          color="#3F80F7"
+          type="primary"
           :disabled="!isValid"
           :loading="loading"
           @click.stop="handleBulkImportAttention"
@@ -83,12 +83,12 @@
       <div v-else-if="tabActive === 1" class="export part">
         <el-select
           v-model="activeChain"
-          class="chains-select"
+          class="chains-select [&&]:[--el-fill-color-blank:--border]"
           placeholder="Select"
           size="large"
           style="width: 100%"
           :teleported="false"
-          :suffix-icon="ArrowDownBold"
+          :suffix-icon="SuffixIcon"
         >
           <template #prefix>
             <img
@@ -133,12 +133,12 @@
         <p class="mb-20px!">{{ $t('bulkDeleteExample') }}</p>
         <el-select
           v-model="activeChain"
-          class="chains-select"
+          class="chains-select [&&]:[--el-fill-color-blank:--border]"
           placeholder="Select"
           size="large"
           style="width: 100%"
           :teleported="false"
-          :suffix-icon="ArrowDownBold"
+          :suffix-icon="SuffixIcon"
         >
           <template #prefix>
             <img
@@ -197,6 +197,7 @@ import {
 import { ElMessage } from 'element-plus'
 import { generateAvatarIcon, getChainInfo, isValidAddress, evm_utils as utils } from '@/utils'
 import { ArrowDownBold } from '@element-plus/icons-vue'
+import SuffixIcon from './suffixIcon.vue'
 const { mode, token_logo_url } = storeToRefs(useGlobalStore())
 const { currentAddress ,showBatchAddressDetails} = storeToRefs(useFollowStore())
 
@@ -473,7 +474,7 @@ const confirmBulkDelete = () => {
 .pop-right{
   position: fixed;
   .content {
-    background-color: var(--d-222-l-FFF);
+    background-color: var(--dialog-bg);
     padding: 20px 20px;
     .tabs {
       position: relative;
@@ -482,12 +483,12 @@ const confirmBulkDelete = () => {
       .tab {
         cursor: pointer;
         margin-right: 32px;
-        color: #666;
+        color: var(--third-text);
         font-weight: 500;
         font-size: 16px;
         line-height: 24px;
         &.active {
-          color: var(--d-F5F5F5-l-333);
+          color: var(--main-text);
         }
       }
       .iconify{
@@ -502,11 +503,11 @@ const confirmBulkDelete = () => {
       p{
         margin-bottom: 10px;
         font-size: 12px;
-        color: #999;
+        color: var(--secondary-text);
       }
       .example {
         font-size: 12px;
-        color: #999;
+        color: var(--secondary-text);
         display: flex;
         align-items: top;
         margin-bottom: 20px;
@@ -532,19 +533,23 @@ const confirmBulkDelete = () => {
         }
       }
       .textarea {
+        outline: none;
         width: 100%;
         height: 328px;
         padding: 16px 12px;
-        color: var(--d-666-l-999);
-        border: 1px solid var(--d-666-l-CCC);
+        color: var(--third-text);
+        border: 1px solid var(--dialog-divider);
         border-radius: 8px;
         overflow-y: auto;
         margin-bottom: 5px;
         background-color: transparent;
+        &::placeholder{
+          color: var(--third-text);
+        }
       }
       .error-message {
         height: 25px;
-        color: #F45469;
+        color: var(--down-color);
         font-size: 12px;
       }
       .button {
@@ -557,17 +562,26 @@ const confirmBulkDelete = () => {
         border-radius: 8px;
         text-align: center;
         &.black {
-          border:1px solid rgba(68, 68, 68, 1);
-          background-color: var(--d-222-l-FAFAFA);
-          color: var(--d-FFF-l-222);
+          border:1px solid var(--border);
+          background-color: var(--border);
+          color: var(--main-text);
           margin-bottom: 20px;
           line-height: 48px;
+          &:hover{
+            border-color:var(--gray-button-hover);
+            background-color:var(--gray-button-hover);
+          }
         }
         &.copy {
-          background-color: #3F80F7;
-          color:#F5F5F5;
+          background-color: var(--primary-color);
+          border-color: var(--primary-color);
+          color: var(--main-text);
           margin-top: 30px;
           line-height: 48px;
+          &:hover{
+            background-color:var(--primary-button-hover);
+            border-color:var(--primary-button-hover);
+          }
         }
       }
     }

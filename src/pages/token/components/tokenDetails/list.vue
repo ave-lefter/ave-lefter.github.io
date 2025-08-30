@@ -125,13 +125,13 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
 <template>
   <div class="min-h-400px">
     <div
-      class="flex justify-between items-center py-8px text-12px border-b-0.5px border-b-solid border-b-[--d-333-l-F2F2F2] color-[--d-666-l-999] h-32px"
+      class="flex justify-between items-center py-8px text-12px border-b-0.5px border-b-solid border-b-[--border] color-[--third-text] h-32px"
     >
       <div class="flex items-center flex-[2] gap-3px">
         <span>{{ $t('time') }}</span>
         <Icon
           :name="`${isShowDate?'custom:calendar':'custom:countdown'}`"
-          class="color-[--d-666-l-999] cursor-pointer"
+          class="color-[--third-text] cursor-pointer"
           @click.self="isShowDate=!isShowDate"
         />
       </div>
@@ -146,7 +146,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
           <template #reference>
             <Icon
               name="custom:filter"
-              :class="`${checkedTrend.length>0?'color-[--d-999-l-666]':'color-[--d-666-l-999]'} cursor-pointer text-10px`"
+              :class="`${checkedTrend.length>0?'color-[--secondary-text]':'color-[--third-text]'} cursor-pointer text-10px`"
             />
           </template>
           <template #default>
@@ -184,7 +184,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
         <span>{{ $t('swapPrice') }}</span>
         <Icon
           name="custom:price"
-          :class="`${isVolUSDT?'color-[--d-999-l-666]' : 'color-[--d-666-l-999]'} cursor-pointer`"
+          :class="`${isVolUSDT?'color-[--secondary-text]' : 'color-[--third-text]'} cursor-pointer`"
           @click.self="isVolUSDT=!isVolUSDT"
         />
       </div>
@@ -192,7 +192,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
     </div>
     <div
       v-for="(row, $index) in tableList" :key="$index"
-      class="text-13px flex h-40px items-center border-b-solid border-b-0.5px border-b-[--d-333-l-F2F2F2] hover:bg-[var(--d-222-l-F2F2F2)] cursor-pointer"
+      class="text-13px flex h-40px items-center border-b-solid border-b-0.5px border-b-[--border] hover:bg-[--dialog-list-hover] cursor-pointer"
       @click="tableRowClick(row)"
     >
       <div class="flex items-center flex-[2]">
@@ -203,7 +203,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
           :end-time="60"
         >
           <template #default="{seconds}">
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 <template v-if="seconds<60">
                   {{ seconds }}{{ $t('ss') }}
                 </template>
@@ -213,7 +213,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
               </span>
           </template>
         </TimerCount>
-        <span v-else class="color-[--d-999-l-666]">
+        <span v-else class="color-[--secondary-text]">
             {{
             isShowDate
               ? formatDate(row.block_time, 'HH:mm:ss')
@@ -233,11 +233,11 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
         <div v-if="['ADD_LIQUIDITY','REMOVE_LIQUIDITY'].includes(row.event_type)">
           <div>
             {{ formatNumber(row.amount || 0, 2) }}
-            <span class="color-[--d-666-l-999]">{{ row.symbol }}</span>
+            <span class="color-[--secondary-text]">{{ row.symbol }}</span>
           </div>
           <div>
             {{ formatNumber(row.token1_amount || 0, 2) }}
-            <span class="color-[--d-666-l-999]">{{ row.token1_symbol }}</span>
+            <span class="color-[--secondary-text]">{{ row.token1_symbol }}</span>
           </div>
         </div>
         <div v-else>
@@ -254,7 +254,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
           </template>
           <template v-else>
             {{ Number(row.main_token_price) === 0 ? '-' : formatNumber(Number(row.token_price_u) / Number(row.main_token_price) || 0, 2) }}
-            <span class="color-[--d-666-l-999]">{{ row.main_token_symbol }}</span>
+            <span class="color-[--secondary-text]">{{ row.main_token_symbol }}</span>
           </template>
         </div>
       </div>

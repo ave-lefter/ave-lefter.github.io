@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import BigNumber from 'bignumber.js'
-import insiders from '@/assets/images/rugPull/insiders.svg'
-import phishing from '@/assets/images/rugPull/phishing.svg'
-import cabal from '@/assets/images/rugPull/cabal.svg'
-import bundle from '@/assets/images/rugPull/bundle.svg'
+import insidersWhite from '@/assets/images/rugPull/insiders-white.svg'
+import insidersBlack from '@/assets/images/rugPull/insiders-black.svg'
+import phishingWhite from '@/assets/images/rugPull/phishing-white.svg'
+import phishingBlack from '@/assets/images/rugPull/phishing-black.svg'
+import cabalWhite from '@/assets/images/rugPull/cabal-white.svg'
+import cabalBlack from '@/assets/images/rugPull/cabal-black.svg'
+import bundleWhite from '@/assets/images/rugPull/bundle-white.svg'
+import bundleBlack from '@/assets/images/rugPull/bundle-black.svg'
 
 const props = defineProps<{
   activeChain: string
   childrenData: any[]
   row: any
 }>()
+const themeStore = useThemeStore()
 function formateMin(data) {
   if (typeof data === 'string' || typeof data === 'number') {
     const value = new BigNumber(data)
@@ -27,22 +32,22 @@ const { t } = useI18n()
 function getProgressData(row) {
   return [
     {
-      icon: insiders,
+      icon: themeStore.isDark ? insidersWhite : insidersBlack,
       label: t('insiders'),
       rate: row.rat_rate,
     },
     {
-      icon: phishing,
+      icon: themeStore.isDark ? phishingWhite : phishingBlack,
       label: t('phishing1'),
       rate: row.phishing_rate,
     },
     {
-      icon: cabal,
+      icon: themeStore.isDark ? cabalWhite : cabalBlack,
       label: t('cabal'),
       rate: row.cluster_rate,
     },
     {
-      icon: bundle,
+      icon: themeStore.isDark ? bundleWhite : bundleBlack,
       label: t('bundle1'),
       rate: row.boulder_rate,
     },
@@ -58,9 +63,9 @@ function ruggedColor(row) {
       return ''
     } else if (value.lte(10) && value.gt(2)) {
       // 2< x <=10
-      return 'color-#FFA622'
+      return 'color-[--yellow]'
     } else if (value.gt(10)) {
-      return 'color-#F6465D'
+      return 'color-[--down-color]'
     } else {
       return ''
     }
@@ -76,6 +81,15 @@ const runPullVisible = computed(() => {
     props.childrenData[1]?.isVisible
   )
 })
+
+function getRugColor(val) {
+  if(val === 0){
+    return 'color-[--third-text]'
+  } else if(val > 60){
+    return 'color-[--down-color]'
+  }
+  return 'color-[--main-text]'
+}
 </script>
 
 <template>
@@ -111,7 +125,7 @@ const runPullVisible = computed(() => {
       <template #reference>
         <div
           class="flex items-center justify-end h-20px gap-4px mt-10px"
-          :class="row.rug_rate > 60 ? 'color-#F6465D' : 'color-[--d-999-l-666]'"
+          :class="getRugColor(row.rug_rate)"
         >
           <Icon name="custom:rug" class="text-12px" />
           {{ row.rug_rate == -1 ? $t('unKnown1') : formatNumber(row.rug_rate || 0, 2) + '%' }}
@@ -120,7 +134,7 @@ const runPullVisible = computed(() => {
       <template #default>
         <el-row align="middle" class="mb-16px">
           <el-col :span="24">
-            <div class="lh-20px">
+            <div class="lh-20px color-[--secondary-text]">
               <span>{{ $t('abnormalChips') }}&nbsp;:&nbsp;</span>
               <span />
               <span
@@ -134,7 +148,7 @@ const runPullVisible = computed(() => {
             <el-col :span="12">
               <div class="flex items-center">
                 <img :src="item.icon" alt="" width="14" height="14" style="margin-right: 2px" >
-                <span class="color-[--d-999-l-666] text-12px">{{ item.label }}:</span>
+                <span class="color-[--main-text] text-12px">{{ item.label }}:</span>
               </div>
             </el-col>
             <el-col :span="12">
@@ -142,7 +156,7 @@ const runPullVisible = computed(() => {
                 <el-progress
                   :percentage="item.rate || 0"
                   :stroke-width="4"
-                  color="#F6465D"
+                  color="[--down-color]"
                   :show-text="false"
                   style="width: 70px"
                 />
@@ -153,7 +167,7 @@ const runPullVisible = computed(() => {
             </el-col>
           </el-row>
         </template>
-        <div v-if="row.total" class="flex items-center color-[--d-CCC-l-333]">
+        <div v-if="row.total" class="flex items-center color-[--secondary-text]">
           {{ $t('runPullHistory') }}&nbsp;:&nbsp;<span>
             <span :class="ruggedColor(row)">{{ formatNumber(row.rugged || 0, 0) }}</span
             >/{{ formatNumber(row.total || 0, 0) }}

@@ -23,7 +23,7 @@
             class="flex no-underline h-50px"
             @click.stop.prevent="tableRowClick(row)"
           >
-            <span class="color-[--d-999-l-666] text-12px" style="width: 40px; flex: none">
+            <span class="color-[--secondary-text] text-12px" style="width: 40px; flex: none">
               {{ $index < 9 ? '0' + Number($index + 1) : $index + 1 }}
             </span>
             <div class="token-info">
@@ -63,7 +63,7 @@
                   <Icon
                     v-if="shouldRenderChild"
                     :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
-                    :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="text-11px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
+                    :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--third-text]'" class="text-11px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
                   <UserRemark :remark="row.remark" :address="row.wallet_address" :chain="row.chain" :showAddress="false" :wallet_logo="row.wallet_logo" iconEditSize="10px"/>
                   <!-- <a
                     href=""
@@ -84,7 +84,7 @@
                   <Icon
                     v-copy="row.wallet_address"
                     name="bxs:copy"
-                    class="text-10px cursor-pointer color-[--d-666-l-999]"
+                    class="text-10px cursor-pointer color-[--third-text]"
                     @click.stop.prevent
                   />
                   <!--  <el-tooltip
@@ -148,14 +148,14 @@
                 </div>
               </div>
             </div>
-            <div class="color-[--d-999-l-666]">
+            <div class="color-[--secondary-text]">
               {{formatNumber((Number(row.main_token_balance_amount) || 0),2)}} {{ row.main_token_symbol }}
             </div>
             <div style="margin-left: 5px; text-align: right">
               <div
                 :style="{
                   color: !row?.total_profit
-                    ? '#666'
+                    ? 'var(--third-text)'
                     : row?.total_profit > 0
                     ? '#12B886'
                     : '#F6465D',
@@ -166,7 +166,7 @@
               <div
                 :style="{
                   color: !row?.total_profit_rate
-                    ? '#666'
+                    ? 'var(--third-text)'
                     : row?.total_profit_rate > 0
                     ? '#12B886'
                     : '#F6465D',
@@ -218,7 +218,7 @@
             <div
               :style="{
                 color: !row?.total_win_ratio
-                  ? '#666'
+                  ? 'var(--third-text)'
                   : Number(row?.total_win_ratio) > 0
                   ? '#12B886'
                   : '#F6465D',
@@ -382,7 +382,7 @@ function tableRowClick(row: { wallet_address: string; chain: string }) {
     }
   }
   .top {
-    color: var(--d-666-l-999);
+    color: var(--third-text);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -421,7 +421,7 @@ function tableRowClick(row: { wallet_address: string; chain: string }) {
     li {
       padding: 0 20px;
       &:hover {
-        background-color: var(--d-2A2A2A-l-F2F2F2);
+        background-color: var(--border);
       }
     }
     .token-info {
@@ -478,8 +478,8 @@ function tableRowClick(row: { wallet_address: string; chain: string }) {
     }
     li > a:hover {
       text-decoration: none;
-      background-color: var(--d-2A2A2A-l-F2F2F2);
-      color: var(--a-text-1-color);
+      background-color: var(--border);
+      color: var(--main-text);
       opacity: 1;
     }
     li:nth-child(1) .flex {

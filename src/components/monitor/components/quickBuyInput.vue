@@ -49,7 +49,7 @@ function handleBlurBuyValue() {
     :size="size"
     clearable
     placeholder="0"
-    class="[--el-fill-color-blank:--d-222-l-FFF] [--el-component-size-small:22px] [&&]:[--el-input-width:88px] [--el-text-color-regular:--d-999-l-666] [--el-input-icon-color:--d-999-l-666] [--el-text-color-placeholder:--d-999-l-666] [--el-border-color:transparent]"
+    class="[&&]:[--el-input-bg-color:--dialog-list-hover] [--el-component-size-small:22px] [&&]:[--el-input-width:88px] [--el-text-color-regular:--secondary-text] [--el-input-icon-color:--secondary-text] [--el-text-color-placeholder:--secondary-text] [--el-border-color:transparent]"
     @input="handleInput"
     @blur="handleBlurBuyValue"
   >
