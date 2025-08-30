@@ -161,7 +161,7 @@ onMounted(() => {
     <div class="flex items-center px-12px gap-20px border-b-1px border-b-solid border-b-#FFFFFF08 mb-12px">
       <a
         v-for="(item) in tabsList" :key="item.component" href="javascript:;"
-         :class="`flex items-center decoration-none text-12px lh-20px text-center color-[--third-text] ${activeTab === item.component ? 'color-[--main-text] b-b-[--main-text] font-500' : 'b-b-transparent'}`"
+         :class="`flex items-center decoration-none text-12px lh-20px text-center ${activeTab === item.component ? 'color-[--main-text] b-b-[--main-text] font-500' : 'b-b-transparent color-[--third-text]'}`"
         @click="activeTab = item.component">
         <div v-if="item.component == 'Orders'" class="w-1px h-20px bg-[var(--custom-br-1-color)] mr-20px mb-8px"/>
         <div

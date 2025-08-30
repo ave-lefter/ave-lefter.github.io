@@ -23,8 +23,8 @@
       <div class="flex mr-20px items-center gap-20px mb-20px border-b-solid border-b-1px border-b-[--dialog-divider]">
         <a
           href="javascript:;"
-          :class="`decoration-none text-14px lh-16px pb-12px text-center color-[--third-text] b-b-solid b-b-2px
-         ${!isLimitOrder ? 'color-[--main-text] b-b-[--main-text]':'b-b-transparent'}`"
+          :class="`decoration-none text-14px lh-16px pb-12px text-center b-b-solid b-b-2px
+         ${!isLimitOrder ? 'color-[--main-text] b-b-[--main-text]':'b-b-transparent color-[--third-text]'}`"
           @click="activeTab = 'notice'"
         >
           {{ $t('notice') }}
@@ -32,8 +32,8 @@
         <a
           v-show="isBotLogin && completedLimitTx.length > 0"
           href="javascript:;"
-          :class="`decoration-none text-14px lh-16px pb-12px text-center color-[--third-text] b-b-solid b-b-2px
-         ${isLimitOrder ? 'color-[--main-text] b-b-[--main-text]':'b-b-transparent'}`"
+          :class="`decoration-none text-14px lh-16px pb-12px text-center b-b-solid b-b-2px
+         ${isLimitOrder ? 'color-[--main-text] b-b-[--main-text]':'b-b-transparent color-[--third-text]'}`"
           @click.stop="handleVisible"
           @click="activeTab='limitOrder'"
         >
