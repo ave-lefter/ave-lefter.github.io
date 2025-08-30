@@ -266,7 +266,7 @@ watch(()=>props.categories,()=>{
           :class="
             activeTab === item.category
               ? 'color-[--white] bg-[--primary-color]'
-              : 'bg-[--main-input-button-bg] color-[--third-text]'
+              : 'bg-[--main-input-button-bg] color-[--secondary-text]'
           "
           @click="updateCategory(item.category, item.sub_category || [],index)"
         >
@@ -288,7 +288,7 @@ watch(()=>props.categories,()=>{
             :class="
               globalStore.rankCommon.activeInterval === item.id
                 ? 'bg-[--border] color-[--main-text]'
-                : 'bg-transparent color-[--third-text]'
+                : 'bg-transparent color-[--secondary-text]'
             "
             @click.stop="globalStore.rankCommon.activeInterval = item.id"
           >
@@ -326,7 +326,7 @@ watch(()=>props.categories,()=>{
       :class="
         activeSubTab === item.category
            ? 'color-[--white] bg-[--primary-color]'
-              : 'bg-[--main-input-button-bg] color-[--third-text]'
+              : 'bg-[--main-input-button-bg] color-[--secondary-text]'
       "
       @click="updateSubCategory(item.category)"
     >
