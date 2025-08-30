@@ -894,12 +894,10 @@ export interface WalletOrderItem {
 }
 
 export interface WalletOrdersResponse {
-  data: {
-    total: number
-    pageSize: number
-    pageNo: number
-    list: WalletOrderItem[]
-  }
+  total: number
+  pageSize: number
+  pageNo: number
+  list: WalletOrderItem[]
 }
 
 // 链钱包交易历史查询接口
