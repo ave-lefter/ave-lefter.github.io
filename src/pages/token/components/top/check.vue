@@ -39,8 +39,9 @@
                   </div>
                   <arc-progress
                     :progress="progress"
-                    :width="100"
-                    :thickness="5"
+                    :width="140"
+                    :height="80"
+                    :thickness="7"
                     :big="false"
                     class="arc-progress"
                     fontSize="24px"
@@ -68,28 +69,28 @@
               <div class="item1">
                 <img
                   v-if="riskAIList?.filter(i=> Number(i?.risk_level) == -3)?.length >0"
-                  :width="12"
+                  :height="16"
                   src="@/assets/images/risk-gaoliang.svg"
                 >
-                <img v-else :width="12" src="@/assets/images/risk.svg" >
+                <img v-else :height="16" src="@/assets/images/risk.svg" >
                 <span class="num">{{ riskAIList?.filter(i=> Number(i?.risk_level) == -3)?.length || 0 }}</span>
               </div>
               <div class="item1">
                 <img
                   v-if="riskAIList.filter(i=>Number(i?.risk_level) == -2)?.length >0"
                   src="@/assets/images/yichang1-gaoliang.svg"
-                  :width="12"
+                  :height="16"
                 >
-                <img v-else :width="12" src="@/assets/images/yichang1.svg" >
+                <img v-else :height="16" src="@/assets/images/yichang1.svg" >
                 <span class="num">{{ riskAIList.filter(i=>Number(i?.risk_level) == -2)?.length }}</span>
               </div>
               <div class="item1">
                 <img
                   v-if="riskAIList.filter(i=> Number(i?.risk_level) !== -1)?.length >0"
-                  :width="12"
+                  :height="16"
                   src="@/assets/images/zhuyi1-gaoliang.svg"
                 >
-                <img v-else :width="12" src="@/assets/images/zhuyi1.svg" >
+                <img v-else :height="16" src="@/assets/images/zhuyi1.svg" >
                 <span class="num">{{ riskAIList.filter(i=> Number(i?.risk_level) == -1)?.length }}</span>
               </div>
             </div>
@@ -97,10 +98,10 @@
               <div class="item1">
                 <img
                   v-if="statistics_risk"
-                  :width="12"
+                  :height="16"
                   src="@/assets/images/risk-gaoliang.svg"
                 >
-                <img v-else :width="12" src="@/assets/images/risk.svg" >
+                <img v-else :height="16" src="@/assets/images/risk.svg" >
 
                 <span class="num">{{ statistics_risk || 0 }}</span>
               </div>
@@ -108,18 +109,18 @@
                 <img
                   v-if="statistics_warning"
                   src="@/assets/images/yichang1-gaoliang.svg"
-                  :width="12"
+                  :height="16"
                 >
-                <img v-else :width="12" src="@/assets/images/yichang1.svg" >
+                <img v-else :height="16" src="@/assets/images/yichang1.svg" >
                 <span class="num">{{ statistics_warning }}</span>
               </div>
               <div class="item1">
                 <img
                   v-if="statistics_unknown"
-                  :width="12"
+                  :height="16"
                   src="@/assets/images/zhuyi1-gaoliang.svg"
                 >
-                <img v-else :width="12" src="@/assets/images/zhuyi1.svg" >
+                <img v-else :height="16" src="@/assets/images/zhuyi1.svg" >
                 <span class="num">{{ statistics_unknown }}</span>
               </div>
             </div>
@@ -2694,8 +2695,8 @@ function getVote() {
         margin-left: 4px;
       }
       &.num {
-        font-size: 14px;
-        color: var(--custom-font-5-color);
+        font-size: 16px;
+        color: var(--secondary-text);
         letter-spacing: 0;
         line-height: 24px;
         font-weight: 500;
