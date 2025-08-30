@@ -81,7 +81,7 @@ function onSelect(item: { text: string; value: string }) {
           style="--el-input-border-color:var(--border);"
           @input="(value) => (rangeArr[0] = value.replace(/\-|[^\d.]/g, ''))"
         >
-          <template v-if="append" #append>{{ append }}</template>
+          <template v-if="append" #suffix>{{ append }}</template>
         </el-input>
         <span class="ml-10px mr-10px text-12px color-[--main-text]">~</span>
         <el-input
@@ -92,7 +92,7 @@ function onSelect(item: { text: string; value: string }) {
            style="--el-input-border-color:var(--border)"
           @input="(value) => (rangeArr[1] = value.replace(/\-|[^\d.]/g, ''))"
         >
-          <template v-if="append" #append>{{ append }}</template>
+          <template v-if="append" #suffix>{{ append }}</template>
         </el-input>
       </div>
       <div class="mt-20px flex">
