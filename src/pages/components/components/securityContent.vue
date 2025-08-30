@@ -81,6 +81,15 @@ const runPullVisible = computed(() => {
     props.childrenData[1]?.isVisible
   )
 })
+
+function getRugColor(val) {
+  if(val === 0){
+    return 'color-[--third-text]'
+  } else if(val > 60){
+    return 'color-[--down-color]'
+  }
+  return 'color-[--main-text]'
+}
 </script>
 
 <template>
@@ -115,8 +124,8 @@ const runPullVisible = computed(() => {
     <el-popover v-if="runPullVisible" :width="247">
       <template #reference>
         <div
-          class="color-[--main-text] flex items-center justify-end h-20px gap-4px mt-10px"
-          :class="row.rug_rate > 60 ? 'color-[--down-color]' : ''"
+          class="flex items-center justify-end h-20px gap-4px mt-10px"
+          :class="getRugColor(row.rug_rate)"
         >
           <Icon name="custom:rug" class="text-12px" />
           {{ row.rug_rate == -1 ? $t('unKnown1') : formatNumber(row.rug_rate || 0, 2) + '%' }}
