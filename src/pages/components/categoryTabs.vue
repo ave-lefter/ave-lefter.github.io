@@ -265,7 +265,7 @@ watch(()=>props.categories,()=>{
           class="p-2 lh-16px cursor-pointer rounded-1 flex items-center shrink-0"
           :class="
             activeTab === item.category
-              ? 'color-[--main-text] bg-[--primary-color]'
+              ? 'color-[--white] bg-[--primary-color]'
               : 'bg-[--main-input-button-bg] color-[--third-text]'
           "
           @click="updateCategory(item.category, item.sub_category || [],index)"
