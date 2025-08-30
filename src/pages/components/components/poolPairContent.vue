@@ -195,8 +195,8 @@ function toggleKline() {
           <Icon
             v-if="enableKline"
             v-tooltip="!activeKline?$t('kline'):$t('hidekline')"
-            name="custom:kline" class="text-12px ml-4px hover:color-#8CA0C3" 
-            :class="activeKline ? 'color-#8CA0C3' : 'color-#566275'"
+            name="custom:kline" class="text-12px ml-4px hover:color-[--secondary-text]" 
+            :class="activeKline ? 'color-[--secondary-text]' : 'color-[--third-text]'"
             @click.self.stop="toggleKline"
           />
         </div>
