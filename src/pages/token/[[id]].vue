@@ -124,7 +124,7 @@ function dragOrderBook(e: MouseEvent) {
       ? orderBookWidth.value + (dx - clientX)
       : orderBookWidth.value - (clientX - dx)
       
-    if (_orderBookWidth >= 200 && _orderBookWidth <= 500) {
+    if (_orderBookWidth >= 292 && _orderBookWidth <= 500) {
       orderBookWidth.value = _orderBookWidth
     }
     dx = clientX
