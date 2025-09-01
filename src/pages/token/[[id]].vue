@@ -1,5 +1,5 @@
 <template>
-  <div class="flex bg-[--d-000-l-F6F6F6] gap-1px flex min-w-0 w-full" style="min-height: calc(100vh - 92px);">
+  <div class="flex bg-[--main-divider] gap-1px flex min-w-0 w-full" style="min-height: calc(100vh - 92px);">
     <div class="flex-1 min-w-0">
       <Top/>
       <div class="flex gap-1px">
@@ -11,7 +11,7 @@
         <div class="flex-1 hide-scrollbar min-w-0 relative">
           <div
             v-show="globalStore.showLeft"
-            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left--14px hover:w-30px hover:left--34px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
+            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left--11px hover:w-30px hover:left--31px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
             @click="globalStore.$patch({showLeft:false})"
           >
             <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px"/>
