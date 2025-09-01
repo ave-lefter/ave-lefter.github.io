@@ -156,6 +156,63 @@ export function getKlineHistoryData(data: {
   })
 }
 
+// 通过 token 获取 K 线历史数据
+export function getTokenKlineHistory(data: {
+  token_id?: string
+  interval: string
+  from: number
+  to: number
+}): Promise<{
+  kline_data: Array<{
+    close: number
+    high: number
+    low: number
+    open: number
+    tag: string
+    time: number
+    volume: number
+  }>
+  pair?: string
+}> {
+  const [token, chain] = getAddressAndChainFromId(data?.token_id || '', 1)
+  if (!token || !chain) {
+    return Promise.resolve({
+      kline_data: []
+    })
+  }
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token_info/v1/token/kline', {
+    method: 'get',
+    query: {
+      token: token || '',
+      chain: chain || '',
+      interval: data.interval,
+      from: data.from,
+      to: data.to,
+      category: 'u',
+      limit_count: 300
+    }
+  }).then(async(res) => {
+    return {
+      kline_data: (res?.kline_data || []).map((i: { t: number; o: number; h: number; l: number; c: number; vol: number; tag: string }) => ({
+        time: i.t,
+        open: i.o,
+        high: i.h,
+        low: i.l,
+        close: i.c,
+        volume: i.vol,
+        tag: i.tag
+      })),
+      pair: res?.pair || ''
+    }
+  }).catch(async () => {
+    return {
+      kline_data: [],
+      pair: ''
+    }
+  })
+}
+
 // 画像描点接口 用户交易
 export function getUserKlineTxTags(data: {
   interval: string

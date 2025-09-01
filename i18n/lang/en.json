@@ -1448,5 +1448,6 @@
   "continue": "Continue",
   "lastChance": "Please save the mnemonic words properly. Once closed, they will not be able to be viewed again.",
   "saved": "Saved",
-  "startSwap": "Start Swap"
+  "startSwap": "Start Swap",
+  "allPairsTips": "Aggregation mode: Displays the accumulated results of the number and initial value of the token in all pools, which is different from the data of a single pool."
 }
