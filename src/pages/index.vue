@@ -266,4 +266,10 @@ function getMedias(appendix: string) {
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+:deep {
+  .el-table-v2__left,.el-table-v2__right{
+    --el-bg-color:var(--main-bg);
+  }
+}
+</style>
