@@ -24,9 +24,20 @@
             <Icon name="material-symbols:arrow-forward-ios" :class="`color-[--d-FFF-l-222] text-12px`"/>
           </div>
           <el-scrollbar :height="scrollbarHeight">
-            <div :class="orderBookVisible ? 'grid grid-cols-[1fr_292px] gap-1px' : 'grid grid-cols-1 gap-1px'">
+            <div 
+              :class="orderBookVisible ? 'grid gap-1px' : 'grid grid-cols-1 gap-1px'"
+              :style="orderBookVisible ? { gridTemplateColumns: `1fr 4px ${orderBookWidth}px` } : {}"
+            >
               <div>
                 <KLine ref="klineContainer" @refresh="refresh"/>
+              </div>
+              <!-- 订单簿拖动条 -->
+              <div
+                v-if="orderBookVisible"
+                class="cursor-col-resize bg-[--d-222-l-F2F2F2] hover:bg-[--d-666-l-CCC] flex flex-col items-center justify-center gap-1px w-4px"
+                @mousedown.stop.prevent="dragOrderBook"
+              >
+                <span v-for="i in 4" :key="i" class="bg-[--d-444-l-999] w-2px h-2px rounded-full"/>
               </div>
               <OrderBook v-model="orderBookVisible" :kline-height="klineHeight + 3" />
             </div>
@@ -84,7 +95,52 @@ provide('orderBookVisible', orderBookVisible)
 
 // KLine 高度监听
 const klineHeight = useStorage('kHeight', DefaultHeight.KLINE)
+// 订单簿宽度管理
+const orderBookWidth = useStorage('orderBookWidth', 292)
 const aiSummary = shallowRef({summary:'', headline:''})
+
+// 订单簿拖动功能
+let isDraggingOrderBook = false
+function dragOrderBook(e: MouseEvent) {
+  let dx = e.clientX
+  isDraggingOrderBook = true
+  document.onmousemove = e => {
+    if (!isDraggingOrderBook) {
+      return
+    }
+    // 添加边界检查，防止拖拽越界
+    if (e.clientX > window.innerWidth) {
+      isDraggingOrderBook = false
+      return
+    }
+    // 禁用图表指针事件，提升拖拽流畅度
+    const chartContainer = document.getElementById('tv_chart_container')
+    if (chartContainer) {
+      chartContainer.style.pointerEvents = 'none'
+    }
+    
+    const { clientX } = e
+    const _orderBookWidth = clientX < dx
+      ? orderBookWidth.value + (dx - clientX)
+      : orderBookWidth.value - (clientX - dx)
+      
+    if (_orderBookWidth >= 200 && _orderBookWidth <= 500) {
+      orderBookWidth.value = _orderBookWidth
+    }
+    dx = clientX
+  }
+  document.onmouseup = () => {
+    // 恢复图表指针事件
+    const chartContainer = document.getElementById('tv_chart_container')
+    if (chartContainer) {
+      chartContainer.style.pointerEvents = 'auto'
+    }
+    isDraggingOrderBook = false
+    document.onmousemove = null
+    document.onmouseup = null
+  }
+  return false
+}
 
  function _getAiSummary() {
   const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
