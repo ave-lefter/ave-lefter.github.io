@@ -127,7 +127,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
     <div
       class="flex justify-between items-center py-8px text-12px border-b-0.5px border-b-solid border-b-[--d-333-l-F2F2F2] color-[--d-666-l-999] h-32px"
     >
-      <div class="flex items-center flex-[2] gap-3px">
+      <div class="flex items-center w-120px gap-3px">
         <span>{{ $t('time') }}</span>
         <Icon
           :name="`${isShowDate?'custom:calendar':'custom:countdown'}`"
@@ -195,7 +195,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
       class="text-13px flex h-40px items-center border-b-solid border-b-0.5px border-b-[--d-333-l-F2F2F2] hover:bg-[var(--d-222-l-F2F2F2)] cursor-pointer"
       @click="tableRowClick(row)"
     >
-      <div class="flex items-center flex-[2]">
+      <div class="flex items-center w-120px">
         <TimerCount
           v-if="!isShowDate && row.block_time && Number(formatTimeFromNow(row.block_time,true)) < 60"
           :key="row.block_time"
@@ -216,7 +216,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
         <span v-else class="color-[--d-999-l-666]">
             {{
             isShowDate
-              ? formatDate(row.block_time, 'HH:mm:ss')
+              ? formatDate(row.block_time, 'MM/DD HH:mm:ss')
               : dayjs(row.block_time * 1000).fromNow()
           }}
           </span>
@@ -250,7 +250,7 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
         </div>
         <div v-else>
           <template v-if="isVolUSDT">
-            ${{ formatNumber(row.token_price_u || 0, 2) }}
+            ${{ formatNumber(row.token_price_u || 0, 3) }}
           </template>
           <template v-else>
             {{ Number(row.main_token_price) === 0 ? '-' : formatNumber(Number(row.token_price_u) / Number(row.main_token_price) || 0, 2) }}
