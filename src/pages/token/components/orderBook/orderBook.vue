@@ -35,7 +35,7 @@
     <div class="px-12px">
       <div v-loading="listStatus.loadingTxs" class="text-12px">
         <!-- 表格头部 -->
-        <div class="grid grid-cols-[1fr_1fr_62px_30px] gap-20px mt-8px mb-4px text-12px color-[--d-666-l-999]">
+        <div class="grid grid-cols-[60px_minmax(56px,1fr)_62px_30px] gap-20px mt-8px mb-4px text-12px color-[--d-666-l-999]">
           <div class="text-left flex items-center gap-2px text-nowrap">
             {{ tableView.isAmount ? t('swapPrice') : t('MC') }}
             
@@ -80,7 +80,7 @@
           <div
             v-for="(row, index) in filterTableList"
             :key="index"
-            class="grid grid-cols-[1fr_1fr_62px_30px] gap-20px py-4px hover:bg-[rgba(255,255,255,.02)] cursor-pointer"
+            class="grid grid-cols-[60px_minmax(56px,1fr)_62px_30px] gap-20px py-4px hover:bg-[rgba(255,255,255,.02)] cursor-pointer"
             @mouseenter="isPausedTxs = true"
             @mouseleave="isPausedTxs = false"
             @click="onRowClick({ rowData: row} as any)"
@@ -98,8 +98,13 @@
             </div>
 
             <!-- Price -->
-            <div class="text-right text-nowrap color-[--d-999-l-666]">
-              <div :class="getRowColor(row)" class="font-medium">    
+            <div class="relative text-right text-nowrap color-[--d-999-l-666]">
+              <div
+                class="absolute left-0 top-0 bottom-0 opacity-15 pointer-events-none"
+                :class="getGradient(row)"
+                :style="{ width: getAmountBarWidth(row) }"
+              />
+              <div :class="getRowColor(row)" class="relative font-medium">    
                 <template v-if="tableView.isVolUSDT">
                   <!-- USDT 2位小数 -->
                   ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
@@ -145,7 +150,7 @@
                   :chain="row.chain"
                   :wallet_logo="row.wallet_logo"
                   :format-address="(address: string) => '*' + address?.slice(-4)"
-                  class="color-[--d-999-l-666] truncate max-w-42px"
+                  class="color-[--d-999-l-666] truncate min-w-0"
                   :mouseoverAddress="e => openMarkerTooltip(row, e)"
                   :canEdit="false"
                   @update-remark="updateRemark"
@@ -252,7 +257,7 @@ import { storeToRefs } from 'pinia'
 import { useTokenStore } from '~/stores/token'
 import { useWSStore } from '~/stores/ws'
 import { getTokenTxs, type IGetTokenTxsResponse } from '~/api/token'
-import { getAddressAndChainFromId, formatTimeFromNow, getWSMessage, uuid } from '~/utils'
+import { getAddressAndChainFromId, formatTimeFromNow, getWSMessage, uuid, getChainInfo } from '~/utils'
 import { useRoute } from 'vue-router'
 import { filterLanguage } from '~/pages/token/components/kLine/utils'
 import { WSEventType } from '~/utils/constants'
@@ -261,6 +266,7 @@ import UserRemark from '~/components/userRemark.vue'
 import MarkerTooltip from '../belowChartTable/transactions/markerTooltip.vue'
 import { ElScrollbar, type RowEventHandlerParams } from 'element-plus'
 const tokenStore = useTokenStore()
+const themeStore = useThemeStore()
 
 const MAKER_SUPPORT_CHAINS = ['solana', 'bsc']
 
@@ -598,6 +604,24 @@ function getAmount(row: IGetTokenTxsResponse, needPrice = false, isVolUSDT = fal
   }
 
   return 0
+}
+
+// 渐变背景（与 transactions.vue 同步逻辑）
+function getGradient(row: IGetTokenTxsResponse) {
+  const str = `${themeStore.isDark}-${isBuy(row)}`
+  const map: Record<string, string> = {
+    'true-true': 'bg-[linear-gradient(270deg,#111_0%,#12654C_70%,#12B886_100%)]',
+    'true-false': 'bg-[linear-gradient(270deg,#111_0%,#7F2A36_70%,#F6465D_100%)]',
+    'false-false': 'bg-[linear-gradient(270deg,#FFF_0%,#88DBC3_70%,#12B886_100%)]',
+    'false-true': 'bg-[linear-gradient(270deg,#FFF_0%,#FBA2AE_70%,#F6465D_100%)]',
+  }
+  return map[str]
+}
+
+function getAmountBarWidth(row: IGetTokenTxsResponse) {
+  const vol = getAmount(row, true, true)
+  const width = Math.min(vol / 20, 100)
+  return `${width}%`
 }
 
 // 新增：固定小数位格式化方法
