@@ -35,6 +35,7 @@ import {
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
+import dayjs from 'dayjs'
 
 const { t } = useI18n()
 const localeStore = useLocaleStore()
@@ -193,12 +194,18 @@ async function _getTreasureList(shouldLoading = true) {
     }
 
     const { total: _, ...rest } = pageInfo.value
+    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
+      if(prev[cur]){
+        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+      }
+      return prev
+    },{...rankConditions.value.gainer.filter})
 
     const requestParams: any = {
       category: 'gainer',
       ...rest,
       ...rankConditions.value.gainer.sort,
-      ...rankConditions.value.gainer.filter,
+      ...finalFilter,
     }
 
     if (currentRefreshId === refreshId.value && pageInfo.value.total > 0) {

@@ -71,6 +71,7 @@ export const useGlobalStore = defineStore('global', () => {
     quickBuyValue: '0.01',
   })
   const rankActiveTab = useStorage('rankActiveTab', 'hot')
+  // pump 和活动榜单动态插入
   const rankConditions = useStorage<Record<string, { sort: { sort: string; sort_dir: string }, filter: Record<string, any> }>>('rankCache',{
     hot:{
       sort:{

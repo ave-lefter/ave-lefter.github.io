@@ -21,7 +21,15 @@ const popoverVisible = computed({
   },
 })
 
-const rangeArr = ref<[string, string]>([globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.[`${props.sortKey}_min`] || '', globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.[`${props.sortKey}_max`] || ''])
+const setupFilter = globalStore.rankConditions[globalStore.rankActiveTab]?.filter
+const defaultRangeArr = computed(()=>{
+  const arr = [setupFilter?.[`${props.sortKey}_min`] || '', setupFilter?.[`${props.sortKey}_max`] || '']
+  if(props.sortKey === 'created_at'){
+    return arr.reverse()
+  }
+  return arr
+})
+const rangeArr = ref<[string, string]>(defaultRangeArr.value)
 function confirm(params?: [string, string]) {
   if (!params) {
     rangeArr.value = ['', '']

@@ -35,6 +35,7 @@ import {
 } from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
+import dayjs from 'dayjs'
 import type { RowClassNameGetter, RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
@@ -198,12 +199,18 @@ async function _getTreasureList(shouldLoading = true) {
       }
     }
     const { total: _, ...rest } = pageInfo.value
+    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
+      if(prev[cur]){
+        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+      }
+      return prev
+    },{...rankConditions.value.hot.filter})
     const res = await getTreasureList({
       category: 'hot',
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
       ...rankConditions.value.hot.sort,
-      ...rankConditions.value.hot.filter,
+      ...finalFilter,
       self_address: walletAddress.value,
     })
     pageInfo.value.total = res.total
