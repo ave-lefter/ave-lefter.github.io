@@ -96,49 +96,58 @@ provide('orderBookVisible', orderBookVisible)
 // KLine 高度监听
 const klineHeight = useStorage('kHeight', DefaultHeight.KLINE)
 // 订单簿宽度管理
-const orderBookWidth = useStorage('orderBookWidth', 292)
+const DEFAULT_ORDERBOOK_WIDTH = 292
+const MAX_ORDERBOOK_WIDTH = 500
+const orderBookWidth = useStorage('orderBookWidth', DEFAULT_ORDERBOOK_WIDTH)
 const aiSummary = shallowRef({summary:'', headline:''})
 
-// 订单簿拖动功能
+// 订单簿拖动功能（更丝滑、可控制）
 let isDraggingOrderBook = false
 function dragOrderBook(e: MouseEvent) {
-  let dx = e.clientX
+  e.preventDefault()
+  let lastX = e.clientX
   isDraggingOrderBook = true
-  document.onmousemove = e => {
-    if (!isDraggingOrderBook) {
-      return
-    }
-    // 添加边界检查，防止拖拽越界
-    if (e.clientX > window.innerWidth) {
-      isDraggingOrderBook = false
-      return
-    }
-    // 禁用图表指针事件，提升拖拽流畅度
-    const chartContainer = document.getElementById('tv_chart_container')
-    if (chartContainer) {
-      chartContainer.style.pointerEvents = 'none'
-    }
-    
-    const { clientX } = e
-    const _orderBookWidth = clientX < dx
-      ? orderBookWidth.value + (dx - clientX)
-      : orderBookWidth.value - (clientX - dx)
-      
-    if (_orderBookWidth >= 292 && _orderBookWidth <= 500) {
-      orderBookWidth.value = _orderBookWidth
-    }
-    dx = clientX
+
+  // 禁用图表交互，设置全局光标与禁选中，提升体验
+  const chartContainer = document.getElementById('tv_chart_container')
+  chartContainer && (chartContainer.style.pointerEvents = 'none')
+  const prevCursor = document.body.style.cursor
+  const prevUserSelect = document.body.style.userSelect
+  document.body.style.cursor = 'col-resize'
+  document.body.style.userSelect = 'none'
+
+  let framePending = false
+  let pendingX = lastX
+
+  const onMove = (ev: MouseEvent) => {
+    if (!isDraggingOrderBook) return
+    pendingX = ev.clientX
+    if (framePending) return
+    framePending = true
+    requestAnimationFrame(() => {
+      const clientX = pendingX
+      const delta = lastX - clientX // 向左拖变宽，向右拖变窄
+      const next = orderBookWidth.value + delta
+      orderBookWidth.value = Math.min(
+        MAX_ORDERBOOK_WIDTH,
+        Math.max(DEFAULT_ORDERBOOK_WIDTH, next)
+      )
+      lastX = clientX
+      framePending = false
+    })
   }
-  document.onmouseup = () => {
-    // 恢复图表指针事件
-    const chartContainer = document.getElementById('tv_chart_container')
-    if (chartContainer) {
-      chartContainer.style.pointerEvents = 'auto'
-    }
+
+  const onUp = () => {
     isDraggingOrderBook = false
-    document.onmousemove = null
-    document.onmouseup = null
+    window.removeEventListener('mousemove', onMove)
+    window.removeEventListener('mouseup', onUp)
+    chartContainer && (chartContainer.style.pointerEvents = 'auto')
+    document.body.style.cursor = prevCursor
+    document.body.style.userSelect = prevUserSelect
   }
+
+  window.addEventListener('mousemove', onMove)
+  window.addEventListener('mouseup', onUp, { once: true })
   return false
 }
 

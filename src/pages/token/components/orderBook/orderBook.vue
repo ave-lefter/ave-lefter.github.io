@@ -100,7 +100,7 @@
             <!-- Price -->
             <div class="relative text-right text-nowrap color-[--d-999-l-666]">
               <div
-                class="absolute left-0 top-0 bottom-0 opacity-15 pointer-events-none"
+                class="absolute right-0 top-0 bottom-0 opacity-15 pointer-events-none"
                 :class="getGradient(row)"
                 :style="{ width: getAmountBarWidth(row) }"
               />
