@@ -79,111 +79,116 @@
           <div
             v-for="(row, index) in filterTableList"
             :key="index"
-            class="grid grid-cols-[60px_minmax(56px,1fr)_62px_30px] gap-20px py-4px hover:bg-[rgba(255,255,255,.02)] cursor-pointer"
+            class="relative overflow-hidden cursor-pointer"
             @mouseenter="isPausedTxs = true"
             @mouseleave="isPausedTxs = false"
             @click="onRowClick({ rowData: row} as any)"
           >
-            <!-- Amount -->
-            <div class="text-left text-nowrap">
-              <div class="color-[--d-999-l-666]">
-                <template v-if="tableView.isAmount">
-                  ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
-                </template>
-                <template v-else>
-                  ${{ formatNumber(getMcPrice(row), { decimals:2 }) }}
-                </template>
-              </div>
-            </div>
-
-            <!-- Price -->
-            <div class="relative text-right text-nowrap color-[--d-999-l-666]">
-              <div
-                class="absolute right-0 top-0 bottom-0 opacity-15 pointer-events-none"
-                :class="getGradient(row)"
-                :style="{ width: getAmountBarWidth(row) }"
-              />
-              <div :class="getRowColor(row)" class="relative font-medium">    
-                <template v-if="tableView.isVolUSDT">
-                  <!-- USDT 2位小数 -->
-                  ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
-                </template>
-                <template v-else>
-                  <!-- 纯纯的保留 3 位小数 -->
-                  ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
-                  <span class="color-[--d-999-l-666]">
-                    {{ getChainInfo(row.chain)?.main_name }}
-                  </span>
-                </template>
-              </div>
-            </div>
-
-            <!-- Trader -->
-            <div class="text-right">
-              <div class="flex items-center justify-end">
-                <template v-if="['solana', 'bsc'].includes(row.chain) && row.senderProfile">
-                  <Icon
-                    v-if="hasNewAccount(row)"
-                    v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                    name="custom:new-account"
-                    class="w-12px h-12px mr-2px  shrink-0 icon-hover"/>
-                  <Icon
-                    v-if="hasClearedAccount(row)"
-                    v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                    name="custom:cleared-account" class="w-12px h-12px mr-2px  shrink-0 icon-hover"/>
-                  <Icon
-                    v-if="bigWallet(row)"
-                    v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                    name="custom:big" class="w-12px h-12px mr-2px  shrink-0 icon-hover"/>
-                </template>
-                <SignalTags
-                  tagClass="mr-3px"
-                  :tags="(row.newTags||[]).map((el: any)=> tagStore.matchTag(el.type))"
-                  :walletAddress="row.wallet_address" :chain="row.chain"
-                />
-
-                <UserRemark
-                  :remark="row.remark"
-                  :address="row.wallet_address"
-                  :show-address="!(row?.newTags?.length > 1)"
-                  :chain="row.chain"
-                  :wallet_logo="row.wallet_logo"
-                  :format-address="(address: string) => '*' + address?.slice(-4)"
-                  class="color-[--d-999-l-666] truncate min-w-0"
-                  :mouseoverAddress="e => openMarkerTooltip(row, e)"
-                  :canEdit="false"
-                  @update-remark="updateRemark"
-                />
-                <!-- 添加交易次数显示 -->
-                <div v-if="row.count && row.count > 1" class="color-[--d-999-l-666] text-xs ml-2px whitespace-nowrap">
-                  ({{ row.count }})
+            <!-- 整行渐变背景 -->
+            <div 
+              class="absolute inset-0 opacity-15 pointer-events-none transition-transform duration-300 ease-out"
+              :class="getFullRowGradient(row)"
+              :style="{ transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'right' }"
+            />
+            
+            <!-- 表格内容 -->
+            <div class="grid grid-cols-[60px_minmax(56px,1fr)_62px_30px] gap-20px py-4px hover:bg-[rgba(255,255,255,.02)] relative z-10">
+              <!-- Amount -->
+              <div class="text-left text-nowrap">
+                <div class="color-[--d-999-l-666]">
+                  <template v-if="tableView.isAmount">
+                    ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
+                  </template>
+                  <template v-else>
+                    ${{ formatNumber(getMcPrice(row), { decimals:2 }) }}
+                  </template>
                 </div>
               </div>
-            </div>
 
-            <!-- Time -->
-            <div class="text-right">
-              <div class="color-[--d-666-l-999]">
-                <TimerCount
-                  v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
-                  :key="`${row.time}${index}`"
-                  :timestamp="row.time"
-                  :end-time="60"
-                >
-                  <template #default="{ seconds }">
-                    <span class="color-[--d-666-l-999]">
-                      <template v-if="seconds < 60">
-                        {{ seconds }}s
-                      </template>
-                      <template v-else>
-                        {{ formatTimeFromNow(row.time) }}
-                      </template>
+              <!-- Price -->
+              <div class="text-right text-nowrap color-[--d-999-l-666]">
+                <div :class="getRowColor(row)" class="font-medium">    
+                  <template v-if="tableView.isVolUSDT">
+                    <!-- USDT 2位小数 -->
+                    ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
+                  </template>
+                  <template v-else>
+                    <!-- 纯纯的保留 3 位小数 -->
+                    ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
+                    <span class="color-[--d-999-l-666]">
+                      {{ getChainInfo(row.chain)?.main_name }}
                     </span>
                   </template>
-                </TimerCount>
-                <span v-else class="color-[--d-666-l-999]">
-                  {{ formatTimeFromNow(row.time) }}
-                </span>
+                </div>
+              </div>
+
+              <!-- Trader -->
+              <div class="text-right">
+                <div class="flex items-center justify-end">
+                  <template v-if="['solana', 'bsc'].includes(row.chain) && row.senderProfile">
+                    <Icon
+                      v-if="hasNewAccount(row)"
+                      v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                      name="custom:new-account"
+                      class="w-12px h-12px mr-2px  shrink-0 icon-hover"/>
+                    <Icon
+                      v-if="hasClearedAccount(row)"
+                      v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                      name="custom:cleared-account" class="w-12px h-12px mr-2px  shrink-0 icon-hover"/>
+                    <Icon
+                      v-if="bigWallet(row)"
+                      v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                      name="custom:big" class="w-12px h-12px mr-2px  shrink-0 icon-hover"/>
+                  </template>
+                  <SignalTags
+                    tagClass="mr-3px"
+                    :tags="(row.newTags||[]).map((el: any)=> tagStore.matchTag(el.type))"
+                    :walletAddress="row.wallet_address" :chain="row.chain"
+                  />
+
+                  <UserRemark
+                    :remark="row.remark"
+                    :address="row.wallet_address"
+                    :show-address="!(row?.newTags?.length > 1)"
+                    :chain="row.chain"
+                    :wallet_logo="row.wallet_logo"
+                    :format-address="(address: string) => '*' + address?.slice(-4)"
+                    class="color-[--d-999-l-666] truncate min-w-0"
+                    :mouseoverAddress="e => openMarkerTooltip(row, e)"
+                    :canEdit="false"
+                    @update-remark="updateRemark"
+                  />
+                  <!-- 添加交易次数显示 -->
+                  <div v-if="row.count && row.count > 1" class="color-[--d-999-l-666] text-xs ml-2px whitespace-nowrap">
+                    ({{ row.count }})
+                  </div>
+                </div>
+              </div>
+
+              <!-- Time -->
+              <div class="text-right">
+                <div class="color-[--d-666-l-999]">
+                  <TimerCount
+                    v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
+                    :key="`${row.time}${index}`"
+                    :timestamp="row.time"
+                    :end-time="60"
+                  >
+                    <template #default="{ seconds }">
+                      <span class="color-[--d-666-l-999]">
+                        <template v-if="seconds < 60">
+                          {{ seconds }}s
+                        </template>
+                        <template v-else>
+                          {{ formatTimeFromNow(row.time) }}
+                        </template>
+                      </span>
+                    </template>
+                  </TimerCount>
+                  <span v-else class="color-[--d-666-l-999]">
+                    {{ formatTimeFromNow(row.time) }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -255,7 +260,7 @@ import { computed, ref, shallowRef, watch, onMounted, onUnmounted, triggerRef } 
 import { storeToRefs } from 'pinia'
 import { useTokenStore } from '~/stores/token'
 import { useWSStore } from '~/stores/ws'
-import { getAddressAndChainFromId, formatTimeFromNow, getWSMessage, uuid, getChainInfo } from '~/utils'
+import { getAddressAndChainFromId, formatTimeFromNow, uuid, getChainInfo } from '~/utils'
 import { getTokenTxs, type GetPairLiqResponse, type IGetTokenTxsResponse } from '~/api/token'
 import { useRoute } from 'vue-router'
 import { filterLanguage } from '~/pages/token/components/kLine/utils'
@@ -643,23 +648,24 @@ function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, 
   return 0
 }
 
-// 渐变背景（与 transactions.vue 同步逻辑）
-function getGradient(row: IGetTokenTxsResponse) {
+// 整行渐变背景（优化版本）
+function getFullRowGradient(row: ExtendedTxResponse) {
   const str = `${themeStore.isDark}-${isBuy(row)}`
   const map: Record<string, string> = {
-    'true-true': 'bg-[linear-gradient(270deg,#111_0%,#12654C_70%,#12B886_100%)]',
-    'true-false': 'bg-[linear-gradient(270deg,#111_0%,#7F2A36_70%,#F6465D_100%)]',
-    'false-false': 'bg-[linear-gradient(270deg,#FFF_0%,#88DBC3_70%,#12B886_100%)]',
-    'false-true': 'bg-[linear-gradient(270deg,#FFF_0%,#FBA2AE_70%,#F6465D_100%)]',
+    'true-true': 'bg-[linear-gradient(270deg,transparent_0%,#12654C_40%,#12B886_100%)]',
+    'true-false': 'bg-[linear-gradient(270deg,transparent_0%,#7F2A36_40%,#F6465D_100%)]',
+    'false-false': 'bg-[linear-gradient(270deg,transparent_0%,#88DBC3_40%,#12B886_100%)]',
+    'false-true': 'bg-[linear-gradient(270deg,transparent_0%,#FBA2AE_40%,#F6465D_100%)]',
   }
-  return map[str]
+  return map[str] || map['true-true']
 }
 
-function getAmountBarWidth(row: IGetTokenTxsResponse) {
+function getAmountBarWidthPercent(row: ExtendedTxResponse) {
   const vol = getAmount(row, true, true)
-  const width = Math.min(vol / 20, 100)
-  return `${width}%`
+  const width = Math.min(vol / 20, 100) / 100
+  return width.toFixed(3)
 }
+
 
 // 新增：固定小数位格式化方法
 function formatFixedDecimals(value: number, decimals: number): string {
@@ -1026,5 +1032,34 @@ const updatetokenTxs = useThrottleFn(() => {
   &.active {
     color: #3F80F7;
   }
+}
+
+/* 整行渐变背景动画样式 */
+.transition-transform {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* 新交易进入动画 */
+@keyframes slideInRight {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(var(--final-scale, 1));
+    opacity: 0.15;
+  }
+}
+
+/* 渐变条展开动画 */
+.gradient-enter {
+  animation: slideInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* 性能优化：GPU 加速 */
+.absolute[class*="bg-[linear-gradient"] {
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 </style>
