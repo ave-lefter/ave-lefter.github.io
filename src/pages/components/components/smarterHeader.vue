@@ -4,6 +4,8 @@ const props = defineProps<{
   setSortConditions(params: { sort: string; sort_dir: string }): void
   setFilterForm(...args: any[]): void
 }>()
+
+const globalStore = useGlobalStore()
 const defaultSort = computed(() => {
   if (props.sortConditions.sort === 'smart_money_tx_count_24h') {
     return props.sortConditions.sort_dir
@@ -19,10 +21,13 @@ function sortChange(sort_dir: string) {
 }
 
 const popoverVisible = shallowRef(false)
-const isFilterHighlight = shallowRef(false)
+// setup时获取
+const setupFilter = globalStore.rankConditions[globalStore.rankActiveTab]?.filter
+const isFilterHighlight = shallowRef(!!setupFilter?.smart_money_buy_count_24h_min || !!setupFilter?.smart_money_buy_count_24h_max || !!setupFilter?.smart_money_sell_count_24h_min || !!setupFilter?.smart_money_sell_count_24h_max)
+
 const themeStore = useThemeStore()
-const buyRange = ref(['', ''])
-const sellRange = ref(['', ''])
+const buyRange = ref([setupFilter?.smart_money_buy_count_24h_min || '', setupFilter?.smart_money_buy_count_24h_max || ''])
+const sellRange = ref([setupFilter?.smart_money_sell_count_24h_min || '', setupFilter?.smart_money_sell_count_24h_max || ''])
 
 const { t } = useI18n()
 function confirm(params1?: [string, string], params2?: [string, string]) {

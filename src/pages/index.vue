@@ -30,7 +30,8 @@ const components = {
   volume: activityComponent,
   heaven_pump: pumpComponent,
 }
-const activeTab = useStorage<keyof typeof components>('rankActiveTab', 'hot')
+const globalStore = useGlobalStore()
+const activeTab = storeToRefs(globalStore).rankActiveTab
 const activeSubTab = useStorage('rankSubTab','pump_in_hot')
 const activeChain = useStorage('rankChain', 'AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])

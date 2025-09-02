@@ -10,9 +10,10 @@ const props = defineProps<{
   setFilterForm(...args: [string, string][]): void
 }>()
 
+const sortKey = 'created_at'
 const popoverVisible = shallowRef(false)
 const defaultSort = computed(() => {
-  if (props.sortConditions.sort === 'created_at') {
+  if (props.sortConditions.sort === sortKey) {
     return props.sortConditions.sort_dir
   }
   return ''
@@ -20,7 +21,7 @@ const defaultSort = computed(() => {
 
 function sortChange(sort_dir: string) {
   props.setSortConditions({
-    sort: sort_dir ? 'created_at' : '',
+    sort: sort_dir ? sortKey : '',
     sort_dir: sort_dir,
   })
 }
@@ -62,6 +63,7 @@ function confirm(params?: [string, string]) {
     <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
     <RangePopover
       v-model="popoverVisible"
+      :sortKey="sortKey"
       :width="300"
       :title="$t('openTime')"
       :list="openTimeList"

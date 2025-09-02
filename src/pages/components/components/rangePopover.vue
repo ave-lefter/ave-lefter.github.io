@@ -7,8 +7,10 @@ const props = defineProps<{
   selectRangeIndex: 0 | 1
   isFilterHighlight: boolean
   append?: string
+  sortKey?:string
 }>()
 
+const globalStore = useGlobalStore()
 const emit = defineEmits(['update:modelValue', 'confirm'])
 const popoverVisible = computed({
   get() {
@@ -19,7 +21,7 @@ const popoverVisible = computed({
   },
 })
 
-const rangeArr = ref<[string, string]>(['', ''])
+const rangeArr = ref<[string, string]>([globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.[`${props.sortKey}_min`] || '', globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.[`${props.sortKey}_max`] || ''])
 function confirm(params?: [string, string]) {
   if (!params) {
     rangeArr.value = ['', '']

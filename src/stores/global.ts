@@ -70,6 +70,38 @@ export const useGlobalStore = defineStore('global', () => {
     quickVisible: true,
     quickBuyValue: '0.01',
   })
+  const rankActiveTab = useStorage('rankActiveTab', 'hot')
+  const rankConditions = useStorage<Record<string, { sort: { sort: string; sort_dir: string }, filter: Record<string, any> }>>('rankCache',{
+    hot:{
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    },
+    new:{
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    },
+    gainer:{
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    },
+    inclusion:{
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    }
+  })
+
   const latestNotice = shallowRef<ILatestNotice>({})
   const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)
 
@@ -160,6 +192,8 @@ export const useGlobalStore = defineStore('global', () => {
     headFollowsNum,
     getFollowsNum,
     latestNotice,
-    pnlTrackerVisible
+    pnlTrackerVisible,
+    rankConditions,
+    rankActiveTab
   }
 })

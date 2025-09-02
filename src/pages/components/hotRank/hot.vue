@@ -49,20 +49,16 @@ const props = defineProps<{
   activeTab?: string
 }>()
 const aveTableRef = useTemplateRef('aveTableRef')
-const sortConditions = ref({
-  sort: '',
-  sort_dir: '',
-})
+const {rankConditions} = storeToRefs(globalStore)
 function setSortConditions(params: { sort: string; sort_dir: string }) {
-  sortConditions.value = params
+  rankConditions.value.hot.sort = params
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
-const defaultFilter = {}
-const filterForm = ref(defaultFilter)
+
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(filterForm.value, keyVal[0], keyVal[1])
+    set(rankConditions.value.hot.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -136,6 +132,9 @@ onActivated(() => {
     }
   }, 100)
   window.addEventListener('beforeunload',resetKline)
+  if(aveTableRef.value){
+    aveTableRef.value.scrollToLeft(0)
+  }
 })
 
 function resetKline() {
@@ -203,8 +202,8 @@ async function _getTreasureList(shouldLoading = true) {
       category: 'hot',
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
-      ...sortConditions.value,
-      ...filterForm.value,
+      ...rankConditions.value.hot.sort,
+      ...rankConditions.value.hot.filter,
       self_address: walletAddress.value,
     })
     pageInfo.value.total = res.total
@@ -255,7 +254,7 @@ watch(
       }
       return el
     })
-    const { sort, sort_dir } = sortConditions.value
+    const { sort, sort_dir } = rankConditions.value.hot.sort
     const sortVal = { asc: '1', desc: '-1' }[sort_dir]
     if (sortVal) {
       listData.value = updateList.toSorted((a, b) => (a[sort] - b[sort]) * sortVal)
@@ -480,7 +479,7 @@ function resetColumns(needClear:boolean) {
         <component
           :is="headerRenderer[item.key as keyof typeof headerRenderer]"
           v-model:isVolUSDT="isVolUSDT"
-          :sortConditions="sortConditions"
+          :sortConditions="rankConditions.hot.sort"
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
