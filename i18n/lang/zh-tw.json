@@ -1356,5 +1356,15 @@
   "TP": "止盈",
   "SL": "止損",
   "autoSellStrategy": "自動賣出策略",
-  "noAutoSell": "暫未設置高級賣出策略"
+  "noAutoSell": "暫未設置高級賣出策略",
+  "AI": "AI檢測",
+  "AIRiskCheck": "AI風險檢測",
+  "AIOverview": "AI概括",
+  "AITax": "AI稅收檢測",
+  "AIAdmin": "AI許可權識別",
+  "Renounced": "已棄權",
+  "TransferTax": "轉帳稅",
+  "MaxTxAmount": "單筆tx最大量",
+  "MaxWalletAmount": "單錢包最大量",
+  "riskRemoved": "已解除"
 }
