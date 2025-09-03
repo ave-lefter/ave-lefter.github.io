@@ -236,10 +236,11 @@
 //   --el-border-color-light: transparent;
 // }
 
-.el-checkbox{
+.el-checkbox.el-checkbox {
   --el-text-color-regular: var(--third-text);
   --el-checkbox-font-weight: 400;
-  --el-checkbox-text-color:#000;
+  // --el-checkbox-text-color:#000;
+  --el-checkbox-input-border: 1px solid var(--icon-color);
 }
 
 .el-input.el-input {

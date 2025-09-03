@@ -277,7 +277,7 @@ header {
       text-decoration: none;
 
       &.active {
-        background: #3f80f71a;
+        background: var(--main-input-button-bg);
         color: var(--primary-color);
       }
     }
