@@ -119,15 +119,15 @@ export const useGlobalStore = defineStore('global', () => {
   const footerTokensPriceIds = computed(() => footerTokensPrice.value?.map(i => i.id))
 
   const headFollowsNum = ref<{ all: number,soldAll: number }>({ all: 0,soldAll: 0})
-  const id = computed(() => {
-    return useRoute().params?.id as string
-  })
+  // const id = computed(() => {
+  //   return useRoute().params?.id as string
+  // })
   function getFollowsNum() {
     if (!useFollowStore().currentAddress) {
       return
     }
     const params = {
-      token_id: id.value,
+      token_id: useRoute().params?.id,
       self_address: useFollowStore().currentAddress,
     }
     _getFollowsNum(params).then((res) => {
