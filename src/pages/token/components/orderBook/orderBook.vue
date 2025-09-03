@@ -35,8 +35,8 @@
     <div class="px-12px">
       <div v-loading="listStatus.loadingTxs" class="text-12px">
         <!-- 表格头部 -->
-        <div class="grid grid-cols-[60px_minmax(56px,1fr)_62px_30px] gap-20px mt-8px mb-4px text-12px color-[--d-666-l-999]">
-          <div class="text-left flex items-center gap-2px text-nowrap">
+        <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] gap-10px mt-8px mb-4px text-12px color-[--d-666-l-999]">
+          <div class="text-left flex items-center gap-2px text-nowrap min-w-0">
             {{ tableView.isAmount ? t('swapPrice') : t('MC') }}
             <el-button
               class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
@@ -51,7 +51,7 @@
             </el-button>
 
           </div>
-          <div class="text-right text-nowrap">
+          <div class="text-right text-nowrap min-w-0">
             <div class="flex items-center justify-end gap-2px">
               <span>{{ t('amountU').slice(0,3) }}</span>
               <el-button
@@ -67,8 +67,8 @@
               </el-button>
             </div>
           </div>
-          <div class="text-right">{{ t('makers') }}</div>
-          <div class="text-right">{{ t('time') }}</div>
+          <div class="text-right min-w-0">{{ t('makers') }}</div>
+          <div class="text-right min-w-0">{{ t('time') }}</div>
         </div>
 
         <!-- 表格内容 -->
@@ -92,55 +92,64 @@
             />
             
             <!-- 表格内容 -->
-            <div class="grid grid-cols-[60px_minmax(56px,1fr)_62px_30px] gap-20px py-4px hover:bg-[rgba(255,255,255,.02)] relative z-10">
+            <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] gap-10px hover:bg-[rgba(255,255,255,.02)] relative z-10">
               <!-- Amount -->
-              <div class="text-left text-nowrap">
+              <div class="text-left text-nowrap min-w-0 overflow-visible">
                 <div class="color-[--d-999-l-666]">
                   <template v-if="tableView.isAmount">
-                    ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
+                    <span>
+                      ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
+                    </span>
                   </template>
                   <template v-else>
-                    ${{ formatNumber(getMcPrice(row), { decimals:2 }) }}
+                    <span>
+                      ${{ formatNumber(getMcPrice(row), { decimals:2 }) }}
+                    </span>
                   </template>
                 </div>
               </div>
 
               <!-- Price -->
-              <div class="text-right text-nowrap color-[--d-999-l-666]">
-                <div :class="getRowColor(row)" class="font-medium">    
+              <div class="text-right text-nowrap min-w-0">
+                <div :class="getRowColor(row)" class="font-medium truncate">    
                   <template v-if="tableView.isVolUSDT">
-                    <!-- USDT 2位小数 -->
-                    ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
+                    <span>
+                      ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
+                    </span>
                   </template>
                   <template v-else>
-                    <!-- 纯纯的保留 3 位小数 -->
-                    ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
-                    <span class="color-[--d-999-l-666]">
-                      {{ getChainInfo(row.chain)?.main_name }}
+                    <span>
+                      ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
+                      <span class="color-[--d-999-l-666] hidden sm:inline">
+                        {{ getChainInfo(row.chain)?.main_name }}
+                      </span>
                     </span>
                   </template>
                 </div>
               </div>
 
               <!-- Trader -->
-              <div class="text-right">
-                <div class="flex items-center justify-end">
-                  <template v-if="['solana', 'bsc'].includes(row.chain) && row.senderProfile">
+              <div class="text-right overflow-hidden min-w-0">
+                <div class="flex items-center justify-end min-w-0">
+                  <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(row.chain) && row.senderProfile">
                     <Icon
                       v-if="hasNewAccount(row)"
                       v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
                       name="custom:new-account"
-                      class="w-12px h-12px mr-2px  shrink-0 icon-hover"/>
+                      class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block"/>
                     <Icon
                       v-if="hasClearedAccount(row)"
                       v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                      name="custom:cleared-account" class="w-12px h-12px mr-2px  shrink-0 icon-hover"/>
+                      name="custom:cleared-account" 
+                      class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block"/>
                     <Icon
                       v-if="bigWallet(row)"
                       v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                      name="custom:big" class="w-12px h-12px mr-2px  shrink-0 icon-hover"/>
+                      name="custom:big" 
+                      class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block"/>
                   </template>
                   <SignalTags
+                    v-if="windowWidth >= 480"
                     tagClass="mr-3px"
                     :tags="(row.newTags||[]).map((el: any)=> tagStore.matchTag(el.type))"
                     :walletAddress="row.wallet_address" :chain="row.chain"
@@ -152,13 +161,13 @@
                     :show-address="!(row?.newTags?.length > 1)"
                     :chain="row.chain"
                     :wallet_logo="row.wallet_logo"
-                    :format-address="(address: string) => '*' + address?.slice(-4)"
-                    class="color-[--d-999-l-666] truncate min-w-0"
+                    addressClass="inline-block truncate max-w-full"
+                    :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
+                    class="color-[--d-999-l-666] truncate min-w-0 text-xs sm:text-sm"
                     :mouseoverAddress="e => openMarkerTooltip(row, e)"
                     :canEdit="false"
                     @update-remark="updateRemark"
                   />
-                  <!-- 添加交易次数显示 -->
                   <div v-if="row.count && row.count > 1" class="color-[--d-999-l-666] text-xs ml-2px whitespace-nowrap">
                     ({{ row.count }})
                   </div>
@@ -166,7 +175,7 @@
               </div>
 
               <!-- Time -->
-              <div class="text-right">
+              <div class="text-right min-w-0">
                 <div class="color-[--d-666-l-999]">
                   <TimerCount
                     v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
@@ -685,6 +694,19 @@ function formatFixedDecimals(value: number, decimals: number): string {
   return trimmed
 }
 
+const windowWidth = ref(window.innerWidth)
+const updateWidth = () => {
+  windowWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+  window.addEventListener('resize', updateWidth)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateWidth)
+})
+
 // 新增函数：获取成交价格
 function getTransactionPrice(row: IGetTokenTxsResponse | SimpleWSTx, isVolUSDT = false) {
   // 使用 realAddress 确保地址匹配的准确性
@@ -1061,5 +1083,82 @@ const updatetokenTxs = useThrottleFn(() => {
 .absolute[class*="bg-[linear-gradient"] {
   transform: translateZ(0);
   backface-visibility: hidden;
+}
+
+/* 响应式表格布局 */
+@media (max-width: 479px) {
+  .grid.grid-cols-\[minmax\(50px\,1fr\)_minmax\(100px\,3fr\)_minmax\(80px\,2fr\)_minmax\(40px\,0\.8fr\)\] {
+    grid-template-columns: minmax(40px, 0.8fr) minmax(100px, 3.5fr) minmax(60px, 1.5fr) minmax(30px, 0.7fr);
+  }
+}
+
+@media (min-width: 480px) and (max-width: 767px) {
+  .grid.grid-cols-\[minmax\(50px\,1fr\)_minmax\(100px\,3fr\)_minmax\(80px\,2fr\)_minmax\(40px\,0\.8fr\)\] {
+    grid-template-columns: minmax(45px, 0.8fr) minmax(100px, 3.2fr) minmax(80px, 1.8fr) minmax(35px, 0.7fr);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .grid.grid-cols-\[minmax\(50px\,1fr\)_minmax\(100px\,3fr\)_minmax\(80px\,2fr\)_minmax\(40px\,0\.8fr\)\] {
+    grid-template-columns: minmax(50px, 1fr) minmax(100px, 3fr) minmax(80px, 2fr) minmax(40px, 0.8fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .grid.grid-cols-\[minmax\(50px\,1fr\)_minmax\(100px\,3fr\)_minmax\(80px\,2fr\)_minmax\(40px\,0\.8fr\)\] {
+    grid-template-columns: minmax(60px, 1.2fr) minmax(120px, 3fr) minmax(100px, 2.5fr) minmax(45px, 1fr);
+  }
+}
+
+.grid {
+  transition: grid-template-columns 0.3s ease;
+  contain: layout style;
+  will-change: grid-template-columns;
+}
+
+.relative.overflow-hidden.cursor-pointer {
+  contain: layout;
+  will-change: auto;
+}
+
+.text-nowrap {
+  contain: layout;
+}
+
+@media (hover: none) and (max-width: 768px) {
+  .relative.overflow-hidden.cursor-pointer {
+    min-height: 44px;
+  }
+  
+  .text-right .flex.items-center.justify-end {
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+}
+
+@media (max-width: 479px) {
+  .text-12px {
+    font-size: 11px;
+  }
+  
+  .gap-20px {
+    gap: 8px;
+  }
+  
+  .py-4px {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+}
+
+@media (min-width: 480px) and (max-width: 767px) {
+  .truncate.min-w-0 {
+    max-width: 60px;
+  }
+  
+  .w-12px.h-12px {
+    width: 11px;
+    height: 11px;
+  }
 }
 </style>
