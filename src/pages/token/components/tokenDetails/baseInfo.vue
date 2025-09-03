@@ -16,6 +16,7 @@ import BigNumber from 'bignumber.js'
 const tokenDetailStore = useTokenDetailsStore()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
+const globalStore = useGlobalStore()
 const {t} = useI18n()
 const listQuery = shallowRef({
   pageNO: 1,
@@ -191,6 +192,7 @@ const collect = async () => {
         group: form.group,
         is_monitored: form.is_monitored,
       }).then((res) => {
+        globalStore.getFollowsNum()
         // getList()
         _getTokenStatistics()
         return Promise.resolve(res)
@@ -206,6 +208,7 @@ const collect = async () => {
     user_address: tokenDetailStore.user_address,
     user_chain: tokenDetailStore.tokenInfo!.chain
   }).then(() => {
+    globalStore.getFollowsNum()
     ElMessage.success( t('attention1Canceled'))
     // getList()
      _getTokenStatistics()
