@@ -15,6 +15,8 @@ import BigNumber from 'bignumber.js'
 
 const tokenDetailStore = useTokenDetailsStore()
 const botStore = useBotStore()
+const walletStore = useWalletStore()
+const globalStore = useGlobalStore()
 const {t} = useI18n()
 const listQuery = shallowRef({
   pageNO: 1,
@@ -34,6 +36,7 @@ const filteredTrendList = computed(() => {
   ).filter(i => NATIVE_TOKENS.findIndex(y => y?.toLowerCase() == i.token?.toLowerCase()) == -1)
 
 })
+const walletAddress = computed(() => botStore.evmAddress || walletStore.address)
 const listStatus = ref({
   loading: false,
   finished: false,
@@ -72,7 +75,7 @@ function _getTokenStatistics() {
   const {chain, address} = tokenDetailStore.tokenInfo!
   const data = {
     user_address: tokenDetailStore.user_address,
-    self_address: botStore.evmAddress,
+    self_address: walletAddress.value,
     token: address,
     chain
   }
@@ -189,6 +192,7 @@ const collect = async () => {
         group: form.group,
         is_monitored: form.is_monitored,
       }).then((res) => {
+        globalStore.getFollowsNum()
         // getList()
         _getTokenStatistics()
         return Promise.resolve(res)
@@ -204,6 +208,7 @@ const collect = async () => {
     user_address: tokenDetailStore.user_address,
     user_chain: tokenDetailStore.tokenInfo!.chain
   }).then(() => {
+    globalStore.getFollowsNum()
     ElMessage.success( t('attention1Canceled'))
     // getList()
      _getTokenStatistics()
