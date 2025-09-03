@@ -35,7 +35,7 @@
     <div class="px-12px">
       <div v-loading="listStatus.loadingTxs" class="text-12px">
         <!-- 表格头部 -->
-        <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] gap-20px text-center mt-8px mb-4px text-12px color-[--d-666-l-999]">
+        <div class="grid grid-cols-[minmax(0px,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] items-center gap-20px  mt-8px mb-4px text-12px color-[--d-666-l-999]">
           <div class="text-left flex items-center gap-2px text-nowrap min-w-0">
             {{ tableView.isAmount ? t('swapPrice') : t('MC') }}
             <el-button
@@ -86,13 +86,13 @@
           >
             <!-- 整行渐变背景 -->
             <div 
-              class="absolute inset-0 opacity-15 pointer-events-none transition-transform duration-300 ease-out"
+              class="absolute inset-0 opacity-15 pointer-events-none"
               :class="getFullRowGradient(row)"
               :style="{ transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'right' }"
             />
             
             <!-- 表格内容 -->
-            <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] gap-20px py-4px text-center justify-center hover:bg-[rgba(255,255,255,.02)] relative z-10">
+            <div class="grid grid-cols-[minmax(0px,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] items-center gap-20px py-4px hover:bg-[rgba(255,255,255,.02)] relative z-10">
               <!-- Amount -->
               <div class="text-left text-nowrap min-w-0 overflow-visible">
                 <div class="color-[--d-999-l-666]">
@@ -1056,34 +1056,7 @@ const updatetokenTxs = useThrottleFn(() => {
   }
 }
 
-/* 整行渐变背景动画样式 */
-.transition-transform {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
-}
 
-/* 新交易进入动画 */
-@keyframes slideInRight {
-  from {
-    transform: scaleX(0);
-    opacity: 0;
-  }
-  to {
-    transform: scaleX(var(--final-scale, 1));
-    opacity: 0.15;
-  }
-}
-
-/* 渐变条展开动画 */
-.gradient-enter {
-  animation: slideInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-/* 性能优化：GPU 加速 */
-.absolute[class*="bg-[linear-gradient"] {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
 
 /* 响应式表格布局 */
 @media (max-width: 479px) {
