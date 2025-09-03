@@ -245,31 +245,28 @@ function getMedias(appendix: string) {
 </script>
 
 <template>
-  <div class="w-full [&&]:max-w-1920px mx-auto">
-    <CategoryTabs
-      v-model:activeSubTab="activeSubTab"
-      v-model:activeTab="activeTab"
-      v-model:activeChain="activeChain"
-      :categories="categories"
-      :chains="chains"
-    />
-    <KeepAlive :max="6">
-      <component
-        :is="components[activeTab]"
-        ref="dynamicComponentRef"
-        :listMapFunction="listMapFunction"
-        :activeChain="activeChain"
-        :activeTab="activeTab"
-        :activeSubTab="activeSubTab"
+  <div class="w-full bg-[--main-bg]">
+    <div class="[&&]:max-w-1920px mx-auto">
+      <CategoryTabs
+        v-model:activeSubTab="activeSubTab"
+        v-model:activeTab="activeTab"
+        v-model:activeChain="activeChain"
+        :categories="categories"
+        :chains="chains"
       />
-    </KeepAlive>
+      <KeepAlive :max="6">
+        <component
+          :is="components[activeTab]"
+          ref="dynamicComponentRef"
+          :listMapFunction="listMapFunction"
+          :activeChain="activeChain"
+          :activeTab="activeTab"
+          :activeSubTab="activeSubTab"
+        />
+      </KeepAlive>
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-:deep {
-  .el-table-v2__left,.el-table-v2__right{
-    --el-bg-color:var(--main-bg);
-  }
-}
 </style>
