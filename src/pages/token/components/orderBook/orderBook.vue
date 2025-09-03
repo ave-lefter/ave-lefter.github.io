@@ -35,7 +35,7 @@
     <div class="px-12px">
       <div v-loading="listStatus.loadingTxs" class="text-12px">
         <!-- 表格头部 -->
-        <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] gap-10px mt-8px mb-4px text-12px color-[--d-666-l-999]">
+        <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] gap-20px text-center mt-8px mb-4px text-12px color-[--d-666-l-999]">
           <div class="text-left flex items-center gap-2px text-nowrap min-w-0">
             {{ tableView.isAmount ? t('swapPrice') : t('MC') }}
             <el-button
@@ -92,7 +92,7 @@
             />
             
             <!-- 表格内容 -->
-            <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] gap-10px hover:bg-[rgba(255,255,255,.02)] relative z-10">
+            <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] gap-20px py-4px text-center justify-center hover:bg-[rgba(255,255,255,.02)] relative z-10">
               <!-- Amount -->
               <div class="text-left text-nowrap min-w-0 overflow-visible">
                 <div class="color-[--d-999-l-666]">
