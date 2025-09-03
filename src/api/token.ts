@@ -226,7 +226,13 @@ export function getKlineProfilingTags(data: {
   })
 }
 
-export interface GetKlineProfilingTagsV2Item{
+export interface IGetKlineProfilingTagsV2Item{
+  sell?: IBuySellData[]
+  buy?: IBuySellData[]
+  time: number
+}
+
+export interface IBuySellData{
   amount: number
   // 交易次数
   txns: number
@@ -243,11 +249,7 @@ export function getKlineProfilingTagsV2(data:{
   to: number
   type: string
   pair_id: string
-}):Promise<{
-  sell?: GetKlineProfilingTagsV2Item[]
-  buy?: GetKlineProfilingTagsV2Item[]
-  time: number
-}[]>{
+}):Promise<IGetKlineProfilingTagsV2Item[]>{
   if (!data?.pair_id) {
     return Promise.resolve([])
   }

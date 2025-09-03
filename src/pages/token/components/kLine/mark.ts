@@ -2,9 +2,8 @@
 import { filterLanguage } from './utils'
 import { useLocalStorage, type RemovableRef } from '@vueuse/core'
 import type { IChartingLibraryWidget, Mark } from '~/types/tradingview/charting_library'
-import { getUserKlineTxTags, getKlineProfilingTagsV2, type GetKlineProfilingTagsV2Item } from '@/api/token'
+import { getUserKlineTxTags, getKlineProfilingTagsV2, type IGetKlineProfilingTagsV2Item, type IBuySellData } from '@/api/token'
 import type { WSTx } from './types'
-import type { WalletLogo } from '~/api/types/kol'
 
 type TradeSide = {
   amount: number
@@ -16,6 +15,14 @@ type TradeData = {
   time: number
   buy?: TradeSide
   sell?: TradeSide
+}
+
+type TFormatTxsParams = {
+  urlPrefix:string
+  data: IBuySellData[]
+  side: 'buy' | 'sell'
+  type: number | string
+  name:string
 }
 
 export function useKlineMarks() {
@@ -75,11 +82,14 @@ export function useKlineMarks() {
     })
     headerBtns.push(btn)
   }
-
+  // “我的”
   const marksMap: Map<string, TradeData[]> = new Map()
+  // 画像打点
+  const profilingMarksCache: Map<string, Mark[]> = new Map()
 
   watch(() => tokenStore.token?.token, () => {
     marksMap.clear()
+    profilingMarksCache.clear()
   })
 
 
@@ -99,6 +109,11 @@ export function useKlineMarks() {
         const res = marksMap.get(id)
         const marks = formatToMarks(res || [], interval, v.id, v.name)
         onDataCallback(marks || [])
+        return
+      }
+      if(profilingMarksCache.has(id) && markTabsChecked.value?.[v.id]) {
+        const marks = profilingMarksCache.get(id)!
+        onDataCallback(marks)
         return
       }
       if (v.id === 'trade' && markTabsChecked.value?.[v.id]) {
@@ -122,21 +137,99 @@ export function useKlineMarks() {
           pair_id: pair + '-' + chain,
           type: v.id
         }).then(res => {
-          const originlist = (res || []).reduce((prev,cur)=>{
-            return prev.concat(cur.buy || []).concat(cur.sell || [])
-          },[] as {
-            amount: number
-            txns: number
-            volume: number
-            wallet_address:string
-            wallet_logo:WalletLogo
-          }[])
-          const marks = formatToMarks(originlist, interval, v.id, v.name)
-          marksMap.set(id, originlist)
+          const marks = formatProfilingToMarks(res || [], interval, v.id, v.name)
+          profilingMarksCache.set(id, marks)
           onDataCallback(marks || [])
         })
       }
     })
+  }
+
+  function formatProfilingToMarks(
+    data: IGetKlineProfilingTagsV2Item[],
+    interval: number | string,
+    type: keyof typeof markTabsChecked.value,
+    name: string
+  ) {
+    const result: Mark[] = []
+    const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
+    // const interval1 = Number(interval)
+    for(const item of data){
+      // const bucketTime = Math.floor(item.time / interval1) * interval1
+      const buyArr = formatTxsArr({
+        urlPrefix,
+        data: item.buy || [],
+        side: 'buy',
+        type,
+        name
+      })
+      const sellArr = formatTxsArr({
+        urlPrefix,
+        data: item.sell || [],
+        side: 'sell',
+        type,
+        name
+      })
+      result.push(...buyArr, ...sellArr)
+    }
+    return result
+  }
+
+  function formatTxsArr({
+    data,
+    side,
+    type,
+    urlPrefix,
+    name
+  }:TFormatTxsParams) {
+    return data.map(el=>{
+      const isBuy = side === 'buy'
+      let imageUrl = isBuy
+      ? `${urlPrefix}signals/marks/mark-buy-${type}.png`
+      : `${urlPrefix}signals/marks/mark-sell-${type}.png`
+      if(el.wallet_logo?.logo && el.wallet_logo.logo.includes('.webp')){
+        imageUrl = el.wallet_logo.logo
+      }
+
+      return {
+        id: `${el.tx_time}-${side}-${type}`,
+        time: el.tx_time,
+        color: { background: 'transparent', border: 'transparent' },
+        imageUrl,
+        label: side === 'buy' ? 'B' : 'S',
+        labelFontColor: '#fff',
+        minSize: 20,
+        hoveredBorderWidth: 0,
+        borderWidth: 0,
+        text:getTooltipTxt(name, type, el, isBuy),
+        showLabelWhenImageLoaded: false,
+        user_address:el.wallet_address
+      }
+    })
+  }
+
+  function getTooltipTxt(name:string, type:number|string, el:IBuySellData,isBuy:boolean) {
+    const swapType = isBuy ? t('bought') : t('sold')
+    const formatedName = name?.replace(/\(.*\)$/, '')
+    // 处理聪明钱
+    if(Number(type) === 30) {
+      const swapType = isBuy ? t('netInflow') : t('netOutflow')
+      const flowText = isBuy ? t('inflow') : t('outflow')
+      const AvgTxt = isBuy ? t('campaignBuyAvg') : t('campaignSellAvg')
+      return `${formatedName} ${swapType}
+        ${flowText}: ${formatNumber(el.volume, 2)}(${formatNumber(el.txns, 0)})
+        ${AvgTxt}: $${formatNumber(el.volume / (el.amount || 1), 4)}
+        ${swapType}: ${formatNumber(el.volume, 2)}
+        ${formatDate(el.tx_time, 'YYYY-MM-DD HH:mm')}
+      `
+    }
+    return `${el.wallet_logo?.name || `${formatedName}`} ${swapType}
+        ${t('amountB')}: ${formatNumber(el.amount, 2)}
+        ${t('amountU')}: $${formatNumber(el.volume, 2)}
+        ${t('price')}: $${formatNumber(el.volume / (el.amount || 1), 4)}
+        ${t('Txs')}: ${formatNumber(el.txns)}
+        ${formatDate(el.tx_time, 'YYYY-MM-DD HH:mm')}
+        `
   }
 
   function formatToMarks(
@@ -300,7 +393,8 @@ ${formatDate(entry.time, 'YYYY-MM-DD HH:mm')}
     markTabsChecked,
     createMarkButton,
     getMarks,
-    wsTxUpdateMarks
+    wsTxUpdateMarks,
+    profilingMarksCache
   }
 }
 

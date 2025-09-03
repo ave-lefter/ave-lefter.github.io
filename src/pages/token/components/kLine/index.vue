@@ -240,7 +240,7 @@ function createToggleButton() {
 }
 
 
-const { createMarkButton, getMarks, marksTabs, wsTxUpdateMarks } = useKlineMarks()
+const { createMarkButton, getMarks, marksTabs, wsTxUpdateMarks,profilingMarksCache } = useKlineMarks()
 
 watch(marksTabs, () => {
   if (!isReady) return
@@ -610,6 +610,15 @@ async function initChart() {
   _widget?.subscribe('onMarkClick', (markId) => {
     const {token,symbol,logo_url,chain} = tokenStore.tokenInfo?.token||{}
     const {target_token,token0_address,token0_symbol,token1_symbol,pair} = tokenStore.pair || {}
+    
+    let user_address = user.value
+    for(const [,markArr] of profilingMarksCache){
+     const addr = markArr.find(el => el.id === markId)?.user_address
+     if(addr){
+      user_address = addr
+      break
+     }
+    }
     const $patchParams = {
       drawerVisible:true,
       tokenInfo:{
@@ -626,10 +635,9 @@ async function initChart() {
         token1_symbol,
         pairAddress:pair
       },
-      user_address:user.value
+      user_address
     }
     tokenDetailsStore.$patch($patchParams)
-    console.log('markId',markId)
   })
 
   subscribeStudyEvent()
