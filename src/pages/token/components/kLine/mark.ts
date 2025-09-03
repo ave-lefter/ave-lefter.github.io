@@ -2,8 +2,9 @@
 import { filterLanguage } from './utils'
 import { useLocalStorage, type RemovableRef } from '@vueuse/core'
 import type { IChartingLibraryWidget, Mark } from '~/types/tradingview/charting_library'
-import { getUserKlineTxTags, getKlineProfilingTags } from '@/api/token'
+import { getUserKlineTxTags, getKlineProfilingTagsV2, type GetKlineProfilingTagsV2Item } from '@/api/token'
 import type { WSTx } from './types'
+import type { WalletLogo } from '~/api/types/kol'
 
 type TradeSide = {
   amount: number
@@ -114,15 +115,24 @@ export function useKlineMarks() {
           onDataCallback(marks || [])
         })
       } else if (markTabsChecked.value?.[v.id]) {
-        getKlineProfilingTags({
+        getKlineProfilingTagsV2({
           from,
           to,
           interval,
-          pair: pair + '-' + chain,
+          pair_id: pair + '-' + chain,
           type: v.id
         }).then(res => {
-          const marks = formatToMarks(res, interval, v.id, v.name)
-          marksMap.set(id, res || [])
+          const originlist = (res || []).reduce((prev,cur)=>{
+            return prev.concat(cur.buy || []).concat(cur.sell || [])
+          },[] as {
+            amount: number
+            txns: number
+            volume: number
+            wallet_address:string
+            wallet_logo:WalletLogo
+          }[])
+          const marks = formatToMarks(originlist, interval, v.id, v.name)
+          marksMap.set(id, originlist)
           onDataCallback(marks || [])
         })
       }

@@ -226,6 +226,42 @@ export function getKlineProfilingTags(data: {
   })
 }
 
+export interface GetKlineProfilingTagsV2Item{
+  amount: number
+  // 交易次数
+  txns: number
+  // 交易额
+  volume: number
+  wallet_address:string
+  wallet_logo:WalletLogo
+  tx_time:number
+}
+// 获取 kline 画像
+export function getKlineProfilingTagsV2(data:{
+  interval: string
+  from: number
+  to: number
+  type: string
+  pair_id: string
+}):Promise<{
+  sell?: GetKlineProfilingTagsV2Item[]
+  buy?: GetKlineProfilingTagsV2Item[]
+  time: number
+}[]>{
+  if (!data?.pair_id) {
+    return Promise.resolve([])
+  }
+  const { $api } = useNuxtApp()
+  return $api('https://0ftrfsdb.xyz/v2api/token_info/v1/kline/profiling_tags', {
+    method: 'get',
+    query: {
+      ...data,
+    }
+  }).catch(() => {
+    return Promise.resolve([])
+  })
+}
+
 export interface GetHotTokensResponse {
   token: string;
   chain: string;
