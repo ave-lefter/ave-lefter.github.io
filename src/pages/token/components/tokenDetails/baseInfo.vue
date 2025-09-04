@@ -16,6 +16,7 @@ import BigNumber from 'bignumber.js'
 const tokenDetailStore = useTokenDetailsStore()
 const botStore = useBotStore()
 const {t} = useI18n()
+const route = useRoute()
 const listQuery = shallowRef({
   pageNO: 1,
   max_block_number: 0,
@@ -27,11 +28,17 @@ const attentionTriggerRef=ref()
 const checkedTrend = ref(['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY'])
 const trendList = shallowRef<GetTokenDetailsListResponse[]>([])
 const filteredTrendList = computed(() => {
+  const {address} = getAddressAndChainFromId(route.params.id as string)
   return trendList.value.filter(
     i =>
       (i.is_target && (i.event_type == 'swap_buy' || i.event_type == 'swap_sell')) ||
       !(i.event_type == 'swap_buy' || i.event_type == 'swap_sell')
-  ).filter(i => NATIVE_TOKENS.findIndex(y => y?.toLowerCase() == i.token?.toLowerCase()) == -1)
+  ).filter(i => {
+    return NATIVE_TOKENS.findIndex(y => {
+      // 当前不是主币那么才过滤
+      return y?.toLowerCase() != address?.toLowerCase() && y?.toLowerCase() == i.token?.toLowerCase()
+    }) == -1
+  })
 
 })
 const listStatus = ref({
@@ -108,6 +115,7 @@ function _getTokenDetailsList() {
   }
   getTokenDetailsList(data)
     .then(res => {
+      console.log(res,'res')
       const list = Array.isArray(res) ? res : []
       const arr = list.map(i => {
         let event_type = i.event_type
