@@ -150,6 +150,7 @@
             :searchOriginKeyword="searchOriginKeyword"
             :searchOriginType="searchOriginType"
             @handleSortChange="handleSortChange"
+            @filterAddress="filterAddress"
             @filterOriginAddress="filterOriginAddress"
           />
           <!-- <el-tooltip
@@ -261,7 +262,7 @@ const aggregateStatsObj = ref<Record<string, AggregateStats>>({})
 const selfAddress = computed(() => botStore.evmAddress || walletStore.address)
 
   // const show_bubble = shallowRef(false)
-
+const keyword =ref('')
 const searchOriginKeyword = shallowRef('')
 const searchOriginType = shallowRef('')
 const holdersRef = useTemplateRef('holdersRef')
@@ -447,6 +448,7 @@ function getHoldersList(sortObj?: { sort_by: string; order: string }) {
     token_id: id.value,
     tag_type: tag_type,
     self_address:  selfAddress.value,
+    keyword: keyword.value || undefined,
     ...sort,
     recent:
       activeTab.value === 'buy24h' || activeTab.value === 'sell24h'
@@ -484,6 +486,10 @@ function filterOriginAddress(row:{ address: string, type: string }) {
     searchOriginKeyword.value = row.address || ''
     searchOriginType.value = row.type || ''
   }
+}
+function filterAddress(val: string) {
+  keyword.value = val
+  getHoldersList()
 }
 </script>
 <style lang="scss" scoped>
