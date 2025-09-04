@@ -138,9 +138,11 @@ export function useKlineMarks() {
           pair_id: pair + '-' + chain,
           type: v.id
         }).then(res => {
-          const marks = formatProfilingToMarks(res || [], interval, v.id, v.name)
-          profilingMarksCache.set(id, marks)
-          onDataCallback(marks || [])
+          if(Array.isArray(res)){
+            const marks = formatProfilingToMarks(res || [], interval, v.id, v.name)
+            profilingMarksCache.set(id, marks)
+            onDataCallback(marks || [])
+          }
         })
       }
     })
