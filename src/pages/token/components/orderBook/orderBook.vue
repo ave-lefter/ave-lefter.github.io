@@ -1,31 +1,21 @@
 <template>
-  <div v-if="modelValue" class="bg-[--d-111-l-FFF] relative rounded-2px text-14px pt-12px flex flex-col overflow-hidden" :style="{ height: `${klineHeight || 200}px` }">
+  <div v-if="modelValue"
+    class="bg-[--d-0B0D12-l-F6F9FF] relative rounded-2px text-14px pt-12px flex flex-col overflow-hidden"
+    :style="{ height: `${klineHeight || 200}px` }">
     <!-- 筛选标签 -->
     <div class="mx-12px pb-8px flex border-b-1px border-b-solid border-b-[#f2f2f2] dark:border-b-[#222]">
-      <div
-        ref="tabsContainer"
-        class="flex-1 flex items-center whitespace-nowrap overflow-x-auto scrollbar-hide"
-      >
-        <button
-          v-for="(tab, index) in tabs"
-          :key="tab.value"
-          :class="[
-            'shrink-0 text-12px px-12px py-4px rounded-4px border-none cursor-pointer',
-            activeTab === tab.value
-              ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333] dark:color-#ccc'
-              : 'bg-transparent color-[--d-666-l-999]'
-          ]"
-          @click="setActiveTab(tab.value, index)"
-        >
+      <div ref="tabsContainer" class="flex-1 flex items-center whitespace-nowrap overflow-x-auto scrollbar-hide">
+        <button v-for="(tab, index) in tabs" :key="tab.value" :class="[
+          'shrink-0 text-12px px-12px py-4px rounded-4px border-none cursor-pointer',
+          activeTab === tab.value
+            ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333] dark:color-#ccc'
+            : 'bg-transparent color-[--d-666-l-999]'
+        ]" @click="setActiveTab(tab.value, index)">
           {{ tab.label }}
         </button>
       </div>
-      <button
-        v-if="botStore?.userInfo?.name"
-        class="me-btn shrink-0 flex items-center gap-4px sticky right-0 "
-        :class="{ 'active': isMeActive }"
-        @click="toggleClickMe"
-      >
+      <button v-if="botStore?.userInfo?.name" class="me-btn shrink-0 flex items-center gap-4px sticky right-0 "
+        :class="{ 'active': isMeActive }" @click="toggleClickMe">
         <Icon name="i-tdesign:user-filled" class="text-md" />
         <span>{{ t('me') }}</span>
       </button>
@@ -35,177 +25,165 @@
     <div class="px-12px">
       <div v-loading="listStatus.loadingTxs" class="text-12px">
         <!-- 表格头部 -->
-        <div class="grid grid-cols-[minmax(0px,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] items-center gap-20px  mt-8px mb-4px text-12px color-[--d-666-l-999]">
-          <div class="text-left flex items-center gap-2px text-nowrap min-w-0">
-            {{ tableView.isAmount ? t('swapPrice') : t('MC') }}
-            <el-button
-              class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
-              @click="tableView.isAmount = !tableView.isAmount"
-            >
-              <svg v-if="tableView.isAmount" width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" class="color-[--d-666-l-999]">
-                <path d="M5 0C2.23884 0 0 2.23884 0 5C0 7.76116 2.23884 10 5 10C7.76116 10 10 7.76116 10 5C10 2.23884 7.76116 0 5 0ZM5.24889 7.42411L5.25112 7.7779C5.25112 7.82701 5.21094 7.8683 5.16183 7.8683H4.84486C4.79576 7.8683 4.75558 7.82812 4.75558 7.77902V7.42857C3.76451 7.35491 3.29799 6.79017 3.24777 6.17634C3.24331 6.12388 3.2846 6.07924 3.33706 6.07924H3.85268C3.89621 6.07924 3.93415 6.11049 3.94085 6.1529C3.99777 6.5067 4.27344 6.7712 4.76785 6.83705V5.24442L4.49219 5.17411C3.90848 5.0346 3.35268 4.67076 3.35268 3.9163C3.35268 3.10268 3.97098 2.66518 4.76116 2.58817V2.21986C4.76116 2.17076 4.80134 2.13058 4.85045 2.13058H5.16406C5.21317 2.13058 5.25334 2.17076 5.25334 2.21986V2.58482C6.01786 2.66183 6.59152 3.10826 6.65848 3.80357C6.66406 3.85603 6.62276 3.90179 6.56919 3.90179H6.06808C6.02343 3.90179 5.98549 3.8683 5.97991 3.82478C5.93527 3.49888 5.67411 3.23326 5.24889 3.17522V4.6741L5.53237 4.73996C6.25558 4.91852 6.74777 5.26451 6.74777 6.03907C6.74777 6.87947 6.12277 7.34822 5.24889 7.42411ZM4.04688 3.86496C4.04688 4.14843 4.2221 4.36831 4.59933 4.50446C4.65179 4.52567 4.70424 4.54241 4.76674 4.56026V3.17634C4.35491 3.2288 4.04688 3.45982 4.04688 3.86496ZM5.34709 5.37388C5.31585 5.36718 5.2846 5.35938 5.24889 5.34933V6.84152C5.72433 6.79911 6.05246 6.53795 6.05246 6.10044C6.05246 5.75782 5.875 5.53459 5.34709 5.37388Z" fill="currentColor"/>
-              </svg>
-              <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" class="color-[--d-666-l-999]">
-                <path d="M9.02589 2.99465C9.33125 3.60428 9.5 4.2861 9.5 5.00802C9.5 7.48663 7.48304 9.5 5 9.5C2.51696 9.5 0.5 7.48663 0.5 5.00802C0.5 2.52941 2.50893 0.516043 5 0.516043V5.31283L9.02589 2.99465ZM5.64286 0.5V4.14171L8.69643 2.38503C7.99732 1.39037 6.90446 0.684492 5.64286 0.5Z" fill="currentColor"/>
-              </svg>
-            </el-button>
-
+        <div
+          class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px mt-8px mb-4px text-12px color-[--d-566275-l-A9B0BC]">
+          <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px">
+            <div class="min-w-0 text-left">{{ t('time') }}</div>
+            <div class="text-right text-nowrap min-w-0">
+              <div class="flex items-center justify-end gap-2px">
+                <span>{{ t('amountU').slice(0, 3) }}</span>
+                <el-button class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
+                  @click="tableView.isVolUSDT = !tableView.isVolUSDT">
+                  <svg v-if="tableView.isVolUSDT" width="10" height="10" viewBox="0 0 10 10" fill="none"
+                    xmlns="http://www.w3.org/2000/svg" class="color-[--d-566275-l-A9B0BC]">
+                    <path
+                      d="M5 0C2.23884 0 0 2.23884 0 5C0 7.76116 2.23884 10 5 10C7.76116 10 10 7.76116 10 5C10 2.23884 7.76116 0 5 0ZM5.24889 7.42411L5.25112 7.7779C5.25112 7.82701 5.21094 7.8683 5.16183 7.8683H4.84486C4.79576 7.8683 4.75558 7.82812 4.75558 7.77902V7.42857C3.76451 7.35491 3.29799 6.79017 3.24777 6.17634C3.24331 6.12388 3.2846 6.07924 3.33706 6.07924H3.85268C3.89621 6.07924 3.93415 6.11049 3.94085 6.1529C3.99777 6.5067 4.27344 6.7712 4.76785 6.83705V5.24442L4.49219 5.17411C3.90848 5.0346 3.35268 4.67076 3.35268 3.9163C3.35268 3.10268 3.97098 2.66518 4.76116 2.58817V2.21986C4.76116 2.17076 4.80134 2.13058 4.85045 2.13058H5.16406C5.21317 2.13058 5.25334 2.17076 5.25334 2.21986V2.58482C6.01786 2.66183 6.59152 3.10826 6.65848 3.80357C6.66406 3.85603 6.62276 3.90179 6.56919 3.90179H6.06808C6.02343 3.90179 5.98549 3.8683 5.97991 3.82478C5.93527 3.49888 5.67411 3.23326 5.24889 3.17522V4.6741L5.53237 4.73996C6.25558 4.91852 6.74777 5.26451 6.74777 6.03907C6.74777 6.87947 6.12277 7.34822 5.24889 7.42411ZM4.04688 3.86496C4.04688 4.14843 4.2221 4.36831 4.59933 4.50446C4.65179 4.52567 4.70424 4.54241 4.76674 4.56026V3.17634C4.35491 3.2288 4.04688 3.45982 4.04688 3.86496ZM5.34709 5.37388C5.31585 5.36718 5.2846 5.35938 5.24889 5.34933V6.84152C5.72433 6.79911 6.05246 6.53795 6.05246 6.10044C6.05246 5.75782 5.875 5.53459 5.34709 5.37388Z"
+                      fill="currentColor" />
+                  </svg>
+                  <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    class="color-[--d-566275-l-A9B0BC]">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                      d="M5 0C7.757 0 10 2.243 10 5C10 7.757 7.757 10 5 10C2.243 10 0 7.757 0 5C0 2.243 2.243 0 5 0ZM5.1 3C4.78 3 4.484 3.114 4.256 3.342L3.342 4.256C3.114 4.484 3 4.78 3 5.1C2.9953 5.41628 3.11864 5.72103 3.342 5.945L4.256 6.858C4.484 7.087 4.78 7.2 5.1 7.2C5.41434 7.19485 5.71531 7.07268 5.945 6.858L6.858 5.945C7.087 5.717 7.201 5.42 7.201 5.1C7.201 4.781 7.087 4.484 6.858 4.256L5.945 3.342C5.717 3.114 5.42 3 5.1 3ZM5.1 3.64C5.23799 3.64449 5.369 3.70176 5.466 3.8L6.379 4.712C6.48602 4.80272 6.54509 4.93783 6.539 5.078C6.53426 5.21564 6.477 5.34624 6.379 5.443L5.465 6.356C5.26 6.539 4.918 6.539 4.735 6.356L3.822 5.443C3.708 5.352 3.662 5.215 3.662 5.078C3.66649 4.94001 3.72376 4.80901 3.822 4.712L4.735 3.8C4.82551 3.69326 4.96018 3.63423 5.1 3.64Z"
+                      fill="currentColor" />
+                  </svg>
+                </el-button>
+              </div>
+            </div>
           </div>
-          <div class="text-right text-nowrap min-w-0">
-            <div class="flex items-center justify-end gap-2px">
-              <span>{{ t('amountU').slice(0,3) }}</span>
-              <el-button
-                class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
-                @click="tableView.isVolUSDT = !tableView.isVolUSDT"
-              >
-                <svg v-if="tableView.isVolUSDT" width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" class="color-[--d-666-l-999]">
-                  <path d="M5 0C2.23884 0 0 2.23884 0 5C0 7.76116 2.23884 10 5 10C7.76116 10 10 7.76116 10 5C10 2.23884 7.76116 0 5 0ZM5.24889 7.42411L5.25112 7.7779C5.25112 7.82701 5.21094 7.8683 5.16183 7.8683H4.84486C4.79576 7.8683 4.75558 7.82812 4.75558 7.77902V7.42857C3.76451 7.35491 3.29799 6.79017 3.24777 6.17634C3.24331 6.12388 3.2846 6.07924 3.33706 6.07924H3.85268C3.89621 6.07924 3.93415 6.11049 3.94085 6.1529C3.99777 6.5067 4.27344 6.7712 4.76785 6.83705V5.24442L4.49219 5.17411C3.90848 5.0346 3.35268 4.67076 3.35268 3.9163C3.35268 3.10268 3.97098 2.66518 4.76116 2.58817V2.21986C4.76116 2.17076 4.80134 2.13058 4.85045 2.13058H5.16406C5.21317 2.13058 5.25334 2.17076 5.25334 2.21986V2.58482C6.01786 2.66183 6.59152 3.10826 6.65848 3.80357C6.66406 3.85603 6.62276 3.90179 6.56919 3.90179H6.06808C6.02343 3.90179 5.98549 3.8683 5.97991 3.82478C5.93527 3.49888 5.67411 3.23326 5.24889 3.17522V4.6741L5.53237 4.73996C6.25558 4.91852 6.74777 5.26451 6.74777 6.03907C6.74777 6.87947 6.12277 7.34822 5.24889 7.42411ZM4.04688 3.86496C4.04688 4.14843 4.2221 4.36831 4.59933 4.50446C4.65179 4.52567 4.70424 4.54241 4.76674 4.56026V3.17634C4.35491 3.2288 4.04688 3.45982 4.04688 3.86496ZM5.34709 5.37388C5.31585 5.36718 5.2846 5.35938 5.24889 5.34933V6.84152C5.72433 6.79911 6.05246 6.53795 6.05246 6.10044C6.05246 5.75782 5.875 5.53459 5.34709 5.37388Z" fill="currentColor"/>
+          <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px">
+            <div class="flex items-center justify-end gap-2px text-nowrap min-w-0">
+              {{ tableView.isAmount ? t('swapPrice') : t('MC') }}
+              <el-button class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
+                @click="tableView.isAmount = !tableView.isAmount">
+                <svg v-if="tableView.isAmount" width="10" height="10" viewBox="0 0 10 10" fill="none"
+                  xmlns="http://www.w3.org/2000/svg" class="color-[--d-566275-l-A9B0BC]">
+                  <path
+                    d="M5 0C2.23884 0 0 2.23884 0 5C0 7.76116 2.23884 10 5 10C7.76116 10 10 7.76116 10 5C10 2.23884 7.76116 0 5 0ZM5.24889 7.42411L5.25112 7.7779C5.25112 7.82701 5.21094 7.8683 5.16183 7.8683H4.84486C4.79576 7.8683 4.75558 7.82812 4.75558 7.77902V7.42857C3.76451 7.35491 3.29799 6.79017 3.24777 6.17634C3.24331 6.12388 3.2846 6.07924 3.33706 6.07924H3.85268C3.89621 6.07924 3.93415 6.11049 3.94085 6.1529C3.99777 6.5067 4.27344 6.7712 4.76785 6.83705V5.24442L4.49219 5.17411C3.90848 5.0346 3.35268 4.67076 3.35268 3.9163C3.35268 3.10268 3.97098 2.66518 4.76116 2.58817V2.21986C4.76116 2.17076 4.80134 2.13058 4.85045 2.13058H5.16406C5.21317 2.13058 5.25334 2.17076 5.25334 2.21986V2.58482C6.01786 2.66183 6.59152 3.10826 6.65848 3.80357C6.66406 3.85603 6.62276 3.90179 6.56919 3.90179H6.06808C6.02343 3.90179 5.98549 3.8683 5.97991 3.82478C5.93527 3.49888 5.67411 3.23326 5.24889 3.17522V4.6741L5.53237 4.73996C6.25558 4.91852 6.74777 5.26451 6.74777 6.03907C6.74777 6.87947 6.12277 7.34822 5.24889 7.42411ZM4.04688 3.86496C4.04688 4.14843 4.2221 4.36831 4.59933 4.50446C4.65179 4.52567 4.70424 4.54241 4.76674 4.56026V3.17634C4.35491 3.2288 4.04688 3.45982 4.04688 3.86496ZM5.34709 5.37388C5.31585 5.36718 5.2846 5.35938 5.24889 5.34933V6.84152C5.72433 6.79911 6.05246 6.53795 6.05246 6.10044C6.05246 5.75782 5.875 5.53459 5.34709 5.37388Z"
+                    fill="currentColor" />
                 </svg>
-                <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" class="color-[--d-666-l-999]">
-                  <path fill-rule="evenodd" clip-rule="evenodd" d="M5 0C7.757 0 10 2.243 10 5C10 7.757 7.757 10 5 10C2.243 10 0 7.757 0 5C0 2.243 2.243 0 5 0ZM5.1 3C4.78 3 4.484 3.114 4.256 3.342L3.342 4.256C3.114 4.484 3 4.78 3 5.1C2.9953 5.41628 3.11864 5.72103 3.342 5.945L4.256 6.858C4.484 7.087 4.78 7.2 5.1 7.2C5.41434 7.19485 5.71531 7.07268 5.945 6.858L6.858 5.945C7.087 5.717 7.201 5.42 7.201 5.1C7.201 4.781 7.087 4.484 6.858 4.256L5.945 3.342C5.717 3.114 5.42 3 5.1 3ZM5.1 3.64C5.23799 3.64449 5.369 3.70176 5.466 3.8L6.379 4.712C6.48602 4.80272 6.54509 4.93783 6.539 5.078C6.53426 5.21564 6.477 5.34624 6.379 5.443L5.465 6.356C5.26 6.539 4.918 6.539 4.735 6.356L3.822 5.443C3.708 5.352 3.662 5.215 3.662 5.078C3.66649 4.94001 3.72376 4.80901 3.822 4.712L4.735 3.8C4.82551 3.69326 4.96018 3.63423 5.1 3.64Z" fill="currentColor"/>
+                <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"
+                  class="color-[--d-566275-l-A9B0BC]">
+                  <path
+                    d="M9.02589 2.99465C9.33125 3.60428 9.5 4.2861 9.5 5.00802C9.5 7.48663 7.48304 9.5 5 9.5C2.51696 9.5 0.5 7.48663 0.5 5.00802C0.5 2.52941 2.50893 0.516043 5 0.516043V5.31283L9.02589 2.99465ZM5.64286 0.5V4.14171L8.69643 2.38503C7.99732 1.39037 6.90446 0.684492 5.64286 0.5Z"
+                    fill="currentColor" />
                 </svg>
               </el-button>
             </div>
+            <div class="text-right min-w-0">{{ t('makers') }}</div>
           </div>
-          <div class="text-right min-w-0">{{ t('makers') }}</div>
-          <div class="text-right min-w-0">{{ t('time') }}</div>
         </div>
 
         <!-- 表格内容 -->
-        <el-scrollbar
-          style="margin-right: -12px;padding-right: 12px;"
-          :height="`${(klineHeight ?? 200) - 75}px`"
-        >
-          <div
-            v-for="(row, index) in filterTableList"
-            :key="index"
-            class="relative overflow-hidden cursor-pointer"
-            @mouseenter="isPausedTxs = true"
-            @mouseleave="isPausedTxs = false"
-            @click="onRowClick({ rowData: row} as any)"
-          >
-            <!-- 整行渐变背景 -->
-            <div 
-              class="absolute inset-0 opacity-15 pointer-events-none"
-              :class="getFullRowGradient(row)"
-              :style="{ transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'right' }"
-            />
-            
+        <el-scrollbar style="margin-right: -12px;padding-right: 12px;" :height="`${(klineHeight ?? 200) - 75}px`">
+          <div v-for="(row, index) in filterTableList" :key="index"
+            class="relative overflow-hidden cursor-pointer mt-1px first:mt-0" @mouseenter="isPausedTxs = true"
+            @mouseleave="isPausedTxs = false" @click="onRowClick({ rowData: row } as any)">
+
             <!-- 表格内容 -->
-            <div class="grid grid-cols-[minmax(0px,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)] items-center gap-20px py-4px hover:bg-[rgba(255,255,255,.02)] relative z-10">
-              <!-- Amount -->
-              <div class="text-left text-nowrap min-w-0 overflow-visible">
-                <div class="color-[--d-999-l-666]">
-                  <template v-if="tableView.isAmount">
-                    <span>
-                      ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
-                    </span>
-                  </template>
-                  <template v-else>
-                    <span>
-                      ${{ formatNumber(getMcPrice(row), { decimals:2 }) }}
-                    </span>
-                  </template>
-                </div>
-              </div>
+            <div
+              class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10">
+              <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
+                <!-- 整行渐变背景 -->
+                <div class="absolute inset-0 pointer-events-none"
+                  :style="{ backgroundColor: getFullRowGradient(row), transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'left' }" />
 
-              <!-- Price -->
-              <div class="text-right text-nowrap min-w-0">
-                <div :class="getRowColor(row)" class="font-medium truncate">    
-                  <template v-if="tableView.isVolUSDT">
-                    <span>
-                      ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
+                <!-- Time -->
+                <div class="text-left min-w-0">
+                  <div class="color-[--d-566275-l-A9B0BC]">
+                    <TimerCount v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
+                      :key="`${row.time}${index}`" :timestamp="row.time" :end-time="60">
+                      <template #default="{ seconds }">
+                        <span class="color-[--d-566275-l-A9B0BC]">
+                          <template v-if="seconds < 60">
+                            {{ seconds }}s
+                          </template>
+                          <template v-else>
+                            {{ formatTimeFromNow(row.time) }}
+                          </template>
+                        </span>
+                      </template>
+                    </TimerCount>
+                    <span v-else class="color-[--d-566275-l-A9B0BC]">
+                      {{ formatTimeFromNow(row.time) }}
                     </span>
-                  </template>
-                  <template v-else>
-                    <span>
-                      ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
-                      <span class="color-[--d-999-l-666] hidden sm:inline">
-                        {{ getChainInfo(row.chain)?.main_name }}
+                  </div>
+                </div>
+
+                <!-- Amount -->
+                <div class="text-right text-nowrap min-w-0">
+                  <div :class="getRowColor(row)" class="font-medium truncate">
+                    <template v-if="tableView.isVolUSDT">
+                      <span>
+                        ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
                       </span>
-                    </span>
-                  </template>
-                </div>
-              </div>
-
-              <!-- Trader -->
-              <div class="text-right overflow-hidden min-w-0">
-                <div class="flex items-center justify-end min-w-0">
-                  <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(row.chain) && row.senderProfile">
-                    <Icon
-                      v-if="hasNewAccount(row)"
-                      v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                      name="custom:new-account"
-                      class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block"/>
-                    <Icon
-                      v-if="hasClearedAccount(row)"
-                      v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                      name="custom:cleared-account" 
-                      class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block"/>
-                    <Icon
-                      v-if="bigWallet(row)"
-                      v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                      name="custom:big" 
-                      class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block"/>
-                  </template>
-                  <SignalTags
-                    v-if="windowWidth >= 480"
-                    tagClass="mr-3px"
-                    :tags="(row.newTags||[]).map((el: any)=> tagStore.matchTag(el.type))"
-                    :walletAddress="row.wallet_address" :chain="row.chain"
-                  />
-
-                  <UserRemark
-                    :remark="row.remark"
-                    :address="row.wallet_address"
-                    :show-address="!(row?.newTags?.length > 1)"
-                    :chain="row.chain"
-                    :wallet_logo="row.wallet_logo"
-                    addressClass="inline-block truncate max-w-full"
-                    :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
-                    class="color-[--d-999-l-666] truncate min-w-0 text-xs sm:text-sm"
-                    :mouseoverAddress="e => openMarkerTooltip(row, e)"
-                    :canEdit="false"
-                    @update-remark="updateRemark"
-                  />
-                  <div v-if="row.count && row.count > 1" class="color-[--d-999-l-666] text-xs ml-2px whitespace-nowrap">
-                    ({{ row.count }})
+                    </template>
+                    <template v-else>
+                      <span>
+                        ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
+                        <span class="color-[--d-566275-l-A9B0BC] hidden sm:inline">
+                          {{ getChainInfo(row.chain)?.main_name }}
+                        </span>
+                      </span>
+                    </template>
                   </div>
                 </div>
               </div>
 
-              <!-- Time -->
-              <div class="text-right min-w-0">
-                <div class="color-[--d-666-l-999]">
-                  <TimerCount
-                    v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
-                    :key="`${row.time}${index}`"
-                    :timestamp="row.time"
-                    :end-time="60"
-                  >
-                    <template #default="{ seconds }">
-                      <span class="color-[--d-666-l-999]">
-                        <template v-if="seconds < 60">
-                          {{ seconds }}s
-                        </template>
-                        <template v-else>
-                          {{ formatTimeFromNow(row.time) }}
-                        </template>
+              <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px">
+                <!-- Price -->
+                <div class="text-right text-nowrap min-w-0 overflow-visible">
+                  <div class="color-[--d-A9B0BC-l-566275]">
+                    <template v-if="tableView.isAmount">
+                      <span>
+                        ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
                       </span>
                     </template>
-                  </TimerCount>
-                  <span v-else class="color-[--d-666-l-999]">
-                    {{ formatTimeFromNow(row.time) }}
-                  </span>
+                    <template v-else>
+                      <span>
+                        ${{ formatNumber(getMcPrice(row), { decimals: 2 }) }}
+                      </span>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- Trader -->
+                <div class="text-right overflow-hidden min-w-0">
+                  <div class="flex items-center justify-end min-w-0">
+                    <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(row.chain) && row.senderProfile">
+                      <Icon v-if="hasNewAccount(row)"
+                        v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                        name="custom:new-account" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                      <Icon v-if="hasClearedAccount(row)"
+                        v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                        name="custom:cleared-account"
+                        class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                      <Icon v-if="bigWallet(row)"
+                        v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                        name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                    </template>
+                    <SignalTags v-if="windowWidth >= 480" tagClass="mr-3px"
+                      :tags="(row.newTags || []).map((el: any) => tagStore.matchTag(el.type))"
+                      :walletAddress="row.wallet_address" :chain="row.chain" />
+
+                    <UserRemark :remark="row.remark" :address="row.wallet_address"
+                      :show-address="!(row?.newTags?.length > 1)" :chain="row.chain" :wallet_logo="row.wallet_logo"
+                      addressClass="inline-block truncate max-w-full"
+                      :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
+                      class="color-[--d-A9B0BC-l-566275] truncate min-w-0 text-xs sm:text-sm"
+                      :mouseoverAddress="e => openMarkerTooltip(row, e)" :canEdit="false"
+                      @update-remark="updateRemark" />
+                    <div v-if="row.count && row.count > 1"
+                      class="color-[--d-A9B0BC-l-566275] text-xs ml-2px whitespace-nowrap">
+                      ({{ row.count }})
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <template v-if="filterTableList.length === 0 && !listStatus.loadingTxs">
-            <div
-              class="h-full flex flex-col items-center justify-center "
-              :style="{ height: `${(klineHeight ?? 200) - 105}px` }"
-            >
+            <div class="h-full flex flex-col items-center justify-center "
+              :style="{ height: `${(klineHeight ?? 200) - 105}px` }">
               <img src="@/assets/images/empty-black.svg" alt="">
             </div>
           </template>
@@ -213,53 +191,31 @@
       </div>
     </div>
     <!-- status -->
-    <div
-      class="absolute bottom-0 h-24px w-100% flex justify-center color-[#FFA622]"
-      :class="isPausedTxs? 'bg-[#F2F2F2] dark:bg-[#1A1A1A]': ''"
-    >
+    <div class="absolute bottom-0 h-24px w-100% flex justify-center color-[#FFA622]"
+      :class="isPausedTxs ? 'bg-[#F2F2F2] dark:bg-[#1A1A1A]' : ''">
 
 
-      <div
-        v-show="isPausedTxs"
-        class="flex items-center gap-4px"
-      >
+      <div v-show="isPausedTxs" class="flex items-center gap-4px">
         <Icon name="custom:stop" class="text-lg" />
         <span class="text-xs">{{ t('paused') }}</span>
       </div>
     </div>
     <!-- MarkerTooltip -->
-    <MarkerTooltip
-      v-model="markerTooltipVisible"
-      :virtual-ref="makerTooltip"
-      :currentRow="currentRow"
-      :addressAndChain="addressAndChain"
-    >
+    <MarkerTooltip v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
+      :addressAndChain="addressAndChain">
       <template v-if="currentRow.senderProfile">
-        <Icon
-          v-if="hasNewAccount(currentRow)"
+        <Icon v-if="hasNewAccount(currentRow)"
           v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
-          name="custom:new-account"
-          class="icon-hover"
-        />
-        <Icon
-          v-if="hasClearedAccount(currentRow)"
+          name="custom:new-account" class="icon-hover" />
+        <Icon v-if="hasClearedAccount(currentRow)"
           v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
-          name="custom:cleared-account"
-          class="icon-hover"
-        />
-        <Icon
-          v-if="bigWallet(currentRow)"
+          name="custom:cleared-account" class="icon-hover" />
+        <Icon v-if="bigWallet(currentRow)"
           v-tooltip="{ content: `<span style='color: #C5842B'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
-          name="custom:big"
-          class="icon-hover"
-        />
+          name="custom:big" class="icon-hover" />
       </template>
-      <SignalTags
-        tagClass="mr-3px"
-        :tags="currentRow.newTags"
-        :walletAddress="currentRow.wallet_address"
-        :chain="currentRow.chain"
-      />
+      <SignalTags tagClass="mr-3px" :tags="currentRow.newTags" :walletAddress="currentRow.wallet_address"
+        :chain="currentRow.chain" />
     </MarkerTooltip>
   </div>
 </template>
@@ -627,9 +583,9 @@ function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, 
 
   if ('direction' in row && 'target' in row) {
     return Number(row.target_amt || 0) * (
-        needPrice ? Number(isVolUSDT ? row.price_u : row.price_m)
-          : 1
-      )
+      needPrice ? Number(isVolUSDT ? row.price_u : row.price_m)
+        : 1
+    )
   }
   if ('from_address' in row) {
     if (
@@ -660,11 +616,17 @@ function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, 
 // 整行渐变背景（优化版本）
 function getFullRowGradient(row: ExtendedTxResponse) {
   const str = `${themeStore.isDark}-${isBuy(row)}`
+  // const map: Record<string, string> = {
+  //   'true-true': 'bg-[linear-gradient(270deg,transparent_0%,#12654C_40%,#12B886_100%)]',
+  //   'true-false': 'bg-[linear-gradient(270deg,transparent_0%,#7F2A36_40%,#F6465D_100%)]',
+  //   'false-false': 'bg-[linear-gradient(270deg,transparent_0%,#88DBC3_40%,#12B886_100%)]',
+  //   'false-true': 'bg-[linear-gradient(270deg,transparent_0%,#FBA2AE_40%,#F6465D_100%)]',
+  // }
   const map: Record<string, string> = {
-    'true-true': 'bg-[linear-gradient(270deg,transparent_0%,#12654C_40%,#12B886_100%)]',
-    'true-false': 'bg-[linear-gradient(270deg,transparent_0%,#7F2A36_40%,#F6465D_100%)]',
-    'false-false': 'bg-[linear-gradient(270deg,transparent_0%,#88DBC3_40%,#12B886_100%)]',
-    'false-true': 'bg-[linear-gradient(270deg,transparent_0%,#FBA2AE_40%,#F6465D_100%)]',
+    'true-true': 'rgba(18, 184, 134, 0.10)',
+    'true-false': 'rgba(246, 70, 93, 0.10)',
+    'false-false': 'rgba(18, 184, 134, 0.10)',
+    'false-true': 'rgba(246, 70, 93, 0.10)',
   }
   return map[str] || map['true-true']
 }
@@ -723,13 +685,13 @@ function getTransactionPrice(row: IGetTokenTxsResponse | SimpleWSTx, isVolUSDT =
   }
 
   if (row.from_address &&
-      tokenAddress.toLowerCase?.() === row.from_address?.toLowerCase?.()) {
+    tokenAddress.toLowerCase?.() === row.from_address?.toLowerCase?.()) {
     // 卖出：使用 from_price_usd 或 from_price_eth
     return Number(isVolUSDT ? row.from_price_usd : row.from_price_eth) || 0
   }
 
   if (row.to_address &&
-      tokenAddress.toLowerCase?.() === row.to_address?.toLowerCase?.()) {
+    tokenAddress.toLowerCase?.() === row.to_address?.toLowerCase?.()) {
     // 买入：使用 to_price_usd 或 to_price_eth
     return Number(isVolUSDT ? row.to_price_usd : row.to_price_eth) || 0
   }
@@ -794,7 +756,7 @@ function toggleClickMe() {
 }
 
 
-function onRowClick({rowData}: RowEventHandlerParams) {
+function onRowClick({ rowData }: RowEventHandlerParams) {
 
   if (!token.value) {
     return
@@ -908,15 +870,15 @@ watch(() => wsStore.wsResult[WSEventType.TX], data => {
   if (!data || listStatus.value.loadingTxs) {
     return
   }
-  const {wallet_address, from_address, to_address} = data.tx
+  const { wallet_address, from_address, to_address } = data.tx
   // 不是当前币种的数据
   if (from_address !== realAddress.value && to_address !== realAddress.value) {
     return
   }
 
-// 检查是否已存在相同的交易（防重复）
+  // 检查是否已存在相同的交易（防重复）
   const existingTx = wsPairCache.value.find(tx =>
-    (('transaction' in tx && tx.transaction === data.tx.transaction &&
+  (('transaction' in tx && tx.transaction === data.tx.transaction &&
     tx.wallet_address === wallet_address))
   )
   if (existingTx) {
@@ -944,7 +906,7 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
     return
   }
   const simpleWSTx = data.msg as SimpleWSTx
-  const {maker, target} = simpleWSTx
+  const { maker, target } = simpleWSTx
   // 不是当前币种的数据
   if (target !== realAddress.value) {
     return
@@ -1019,7 +981,7 @@ const updatetokenTxs = useThrottleFn(() => {
   // 去重处理：检查新数据是否已存在于tokenTxs中
   const newTxs = wsPairCache.value.filter(newTx =>
     !tokenTxs.value.some(existingTx =>
-      ('transaction' in existingTx && 'transaction' in newTx && existingTx.transaction === newTx.transaction &&
+    ('transaction' in existingTx && 'transaction' in newTx && existingTx.transaction === newTx.transaction &&
       existingTx.wallet_address === newTx.wallet_address)
     )
   )
@@ -1102,7 +1064,7 @@ const updatetokenTxs = useThrottleFn(() => {
   .relative.overflow-hidden.cursor-pointer {
     min-height: 44px;
   }
-  
+
   .text-right .flex.items-center.justify-end {
     flex-wrap: wrap;
     gap: 2px;
@@ -1113,11 +1075,11 @@ const updatetokenTxs = useThrottleFn(() => {
   .text-12px {
     font-size: 11px;
   }
-  
+
   .gap-20px {
     gap: 8px;
   }
-  
+
   .py-4px {
     padding-top: 2px;
     padding-bottom: 2px;
@@ -1128,7 +1090,7 @@ const updatetokenTxs = useThrottleFn(() => {
   .truncate.min-w-0 {
     max-width: 60px;
   }
-  
+
   .w-12px.h-12px {
     width: 11px;
     height: 11px;
