@@ -18,7 +18,7 @@
   // 主要背景
   --main-bg:var(--d-000-l-FFF);
   // 次要背景
-  --secondary-bg:var(--d-101115-l-F6F9FF);
+  --secondary-bg:var(--d-0A0506-l-F6F9FF);
   // 主页列表标题栏背景
   --main-list-header-bg:var(--d-151A22-l-E8F1FF);
   // 主页面列表悬浮色
@@ -178,6 +178,7 @@
     --d-C3CAD8-l-404753: #C3CAD8;
     --d-7C8BA2-l-9FA6B5: #7C8BA2;
     --d-101115-l-F6F9FF: #101115;
+    --d-0A0506-l-F6F9FF: #0A0506;
   }
 
   &.light {
@@ -306,6 +307,7 @@
     --d-C3CAD8-l-404753: #404753;
     --d-7C8BA2-l-9FA6B5: #9FA6B5;
     --d-101115-l-F6F9FF: #F6F9FF;
+    --d-0A0506-l-F6F9FF: #F6F9FF;
   }
 }
 
