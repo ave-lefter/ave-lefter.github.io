@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TimeLine from './timeLine.vue'
-import {useStorage} from '@vueuse/core'
+import {useEventBus, useStorage} from '@vueuse/core'
 import Filter from './filter.vue'
 import {
   type GetSignalV2ListResponse,
@@ -41,11 +41,9 @@ const showResetBtn = shallowRef(false)
 const signalLeftList = useTemplateRef<InstanceType<typeof SignalLeftList>>('signalLeftList')
 const signalRightList = useTemplateRef<InstanceType<typeof SignalRightList>>('signalRightList')
 
-const signalStore = useSignalStore()
 onMounted(() => {
   initWs()
   updateLeftList()
-  signalStore.signalVisible = false
 })
 
 function onReset() {
@@ -182,6 +180,24 @@ onMounted(() => {
 onUnmounted(() => {
   cancelAnimationFrame(timer)
 })
+
+const topListRef = useTemplateRef<InstanceType<typeof SignalTopList>>('topListRef')
+const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
+scrollTopEvent.on(scrollToTop)
+onUnmounted(()=>{
+  scrollTopEvent.off(scrollToTop)
+})
+function scrollToTop() {
+  if(topListRef.value){
+    topListRef.value.setScrollTop(0)
+  }
+  if(signalLeftList.value){
+    signalLeftList.value.setScrollTop(0)
+  }
+  if(signalRightList.value){
+    signalRightList.value.setScrollTop(0)
+  }
+}
 </script>
 
 <template>
@@ -239,6 +255,7 @@ onUnmounted(() => {
   </div>
   <div class="flex pt-4px bg-[--d-222-l-F2F2F2]">
     <SignalTopList
+    ref="topListRef"
     :dialogValues="dialogValues"
     @close="emit('close')"
     />

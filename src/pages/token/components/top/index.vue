@@ -100,6 +100,35 @@
           }}</span>
           <div class="flex items-center justify-start">
             <img v-if="(token?.risk_level??0) < 0" class="bg-btn" src="@/assets/images/fengxian.png" :width="12">
+            <!-- <div v-if="medias?.length > 0" class="flex text-20px">
+              <div v-for="(item, index) in medias" :key="index" class="tag-btn">
+                <template v-if="item.url">
+                  <span
+                    v-if="item.name === 'QQ'"
+                    v-tooltip="item.url"
+                    class="bg-btn"
+                  >
+                    <Icon
+                      :name="`custom:${item.icon}`"
+                      class="text-[--d-666-l-999] text-12px"
+                    />
+                  </span>
+                  <a
+                    v-else
+                    v-tooltip="item.url"
+                    :href="item.url"
+                    target="_blank"
+                    class="bg-btn"
+                    @click.stop
+                  >
+                    <Icon
+                      :name="`custom:${item.icon}`"
+                      class="text-[--d-666-l-999] text-12px"
+                    />
+                  </a>
+                </template>
+              </div>
+            </div> -->
             <div v-if="medias?.length > 0" class="flex text-20px">
               <div v-for="(item, index) in medias" :key="index" class="tag-btn">
                 <template v-if="item.url">
@@ -113,6 +142,26 @@
                       class="text-[--d-666-l-999] text-12px"
                     />
                   </span>
+                  <XPopup v-else-if="item.icon === 'twitter'" :tokenId="(route.params.id as string)" :type="tokenStore.twitterType">
+                    <a
+                      :href="item.url"
+                      target="_blank"
+                      class="bg-btn"
+                      @click.stop
+                    >
+                      <XIcon
+                        v-if="[1, 2, 3].includes(tokenStore.twitterType)"
+                        :type="tokenStore.twitterType"
+                        class="text-12px"
+                      />
+                      <Icon
+                        v-else
+                        :name="`custom:${item.icon}`"
+                        class="text-[--d-666-l-999] text-12px"
+                      />
+                    </a>
+                  </XPopup>
+
                   <a
                     v-else
                     v-tooltip="item.url"
@@ -711,6 +760,8 @@ import Top50 from './top50.vue'
 import Run from './run.vue'
 import Check from './check.vue'
 import DeBox from './deBox.vue'
+import XPopup from '~/components/xPopup/index.vue'
+import XIcon from '~/components/xPopup/xIcon.vue'
 import {
   getSymbolDefaultIcon,
   getChainDefaultIcon,
@@ -740,12 +791,12 @@ import {
   type IFavDialogEventArgs,
 } from '@/utils/constants'
 import { formatNumber } from '@/utils/formatNumber'
-import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
 import { useEventBus } from '@vueuse/core'
 import { verifyLogin } from '@/utils'
 const { token_logo_url } = useConfigStore()
 const tokenStore = useTokenStore()
+const {collected} = storeToRefs(useTokenStore())
 const { evmAddress } = storeToRefs(useBotStore())
 const { theme } = useThemeStore()
 const { t } = useI18n()
@@ -889,7 +940,7 @@ watch(
     }
   }
 )
-const collected = shallowRef(false)
+// const collected = shallowRef(false)
 const loading = shallowRef(false)
 
 function getTokenFavoriteCheck() {

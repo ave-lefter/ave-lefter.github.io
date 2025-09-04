@@ -112,6 +112,13 @@ const configMap = computed(() => {
       getOptions: getPumpOptions,
       class: '',
     },
+    heaven_pump:{
+      icon:'',
+      storageKey:'heaven_pumpTableColumns',
+      getDefaultColumns:getPumpDefault,
+      getOptions:getPumpOptions,
+      class:''
+    },
     inclusion: {
       icon: 'custom:inclusion',
       storageKey: 'inclusionTableColumns',
@@ -196,7 +203,8 @@ const supportCategories = computed(() => {
     'binance_alpha',
     // 'cto',
     'xstocks',
-    'volume'
+    'volume',
+    'heaven_pump'
   ]
   return (props.categories || []).filter((el) => {
     return keys.includes(el.category)
@@ -228,7 +236,17 @@ function updateActiveChain(chain: string) {
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const isSupportedChain = computed(()=>{
-  return !walletStore.address && (props.activeChain==='AllChains' || botStore.isSupportChains.includes(props.activeChain))
+  return (props.activeChain==='AllChains' || botStore.isSupportChains.includes(props.activeChain))
+})
+watch(()=>props.categories,()=>{
+  setTimeout(()=>{
+    const index = supportCategories.value.findIndex((el) => {
+      return el.category === props.activeTab
+    })
+    if (index > -1) {
+      scrollTabToCenter(categoryRef, index)
+    }
+  },20)
 })
 </script>
 

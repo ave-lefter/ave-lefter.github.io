@@ -861,7 +861,7 @@ export const bot_getUserWalletTxInfo = createCacheRequest(async function(query: 
   })
 }, 2000)
 
-export async function bot_getUserTxHistory1(query: {
+export const bot_getUserTxHistory1 = createCacheRequest(async function (query: {
   page: number;
   pageSize: number;
   chain: string;
@@ -882,7 +882,7 @@ export async function bot_getUserTxHistory1(query: {
     method: 'get',
     query,
   })
-}
+}, 500)
 
 // 链钱包交易历史接口类型定义
 export interface WalletOrderItem {
@@ -932,12 +932,10 @@ export interface WalletOrderItem {
 }
 
 export interface WalletOrdersResponse {
-  data: {
-    total: number
-    pageSize: number
-    pageNo: number
-    list: WalletOrderItem[]
-  }
+  total: number
+  pageSize: number
+  pageNo: number
+  list: WalletOrderItem[]
 }
 
 // 链钱包交易历史查询接口

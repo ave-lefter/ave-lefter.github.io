@@ -1,5 +1,5 @@
 <template>
-  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-9999">
+  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-33">
     <div class="left relative">
       <NuxtLink
         v-if="showPrice"
@@ -36,10 +36,19 @@
           </NuxtLink>
         </div>
       </el-popover>
+      <div class="flex items-center gap-4px color-[--d-999-l-666] mx-12px cursor-pointer hover:color-inherit" :class="{'color-inherit':dragPumpStore.visible}" @click="dragPumpStore.visible=!dragPumpStore.visible">
+        <Icon name="custom:pump-icon"/>
+        {{ $t('pump1') }}
+      </div>
+      <div class="flex items-center mr-12px color-[--d-999-l-666] gap-4px cursor-pointer" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
+        <Icon name="custom:chart" class="text-12px" />
+        {{ $t('PnlTracker') }}
+      </div>
       <el-badge :is-dot="(!!botStore.evmAddress)&&isDoted2" class="mr-12px">
         <div
           id="monitor"
-          class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit "
+          class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit"
+          :class="{'color-inherit':visible}" 
           @click="visible=!visible"
         >
           <Icon
@@ -48,10 +57,11 @@
           {{ $t('walletMonitor') }}
         </div>
       </el-badge>
-      <el-badge v-if="!route.path.includes('smart')" :is-dot="isDoted">
+      <el-badge :is-dot="isDoted">
         <div
           class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit"
-             @click="signalStore.signalVisible=!signalStore.signalVisible"
+          :class="{'color-inherit':signalStore.signalVisible}" 
+          @click="signalStore.signalVisible=!signalStore.signalVisible"
         >
           <Icon
             name="ri:signal-tower-fill"
@@ -70,18 +80,18 @@
       </li>
       <li>
       <a target="_blank" href="https://gopluslabs.io">
-        <img src="@/assets/images/goPlus-logo.png" alt="" height="25" lazy />
+        <img src="@/assets/images/goPlus-logo.png" alt="" height="25" lazy >
       </a>
       </li>
       <li>
       <a target="_blank" class="flex-center" href="https://www.btok.com">
-        <img src="@/assets/images/btok-logo.png" alt="" height="16" lazy />
+        <img src="@/assets/images/btok-logo.png" alt="" height="16" lazy >
       </a>
       </li>
       <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] flex items-center gap-2px">
       <a target="_blank" href="https://cloud.ave.ai">API</a>
       </li>
-      <el-popover popper-style="padding: 12px;min-width: 107px" width="107" placement="top" :teleported="false">
+      <el-popover popper-style="padding: 12px;min-width: 50px;width:auto"  placement="top" :teleported="false">
       <template #reference>
           <Icon name="custom:set-up" class="text-12px ml-2px color-#666" />
       </template>
@@ -101,7 +111,7 @@
         <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
           <a target="_blank" class="hover:decoration-underline" href="/privacy.html">{{ $t('privacyPolicy') }}</a>
         </li>
-        
+
       </ul>
       </el-popover>
       <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] mr-8px">
@@ -113,7 +123,7 @@
       </li>
       <li class="color-[--d-999-l-666] hover:color-#3F80F7 mr-8px">
         <a
-          target="_blank" :href="lang?.includes?.('zh') ? 'https://x.com/aveai_info' : 'https://x.com/AveaiGlobal'"
+          target="_blank" :href="lang?.includes?.('zh') ? 'https://t.me/ave_community_cn' : 'https://t.me/aveai_english'"
           class="flex-center">
           <Icon name="lineicons:telegram-original" class="text-19px" />
         </a>
@@ -139,6 +149,7 @@ const {visible,hasRing} = storeToRefs(useMonitorStore())
 const signalStore = useSignalStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
+const dragPumpStore = usePumpStore()
 
 const audioElement=ref<HTMLAudioElement|null>(null)
 const { lang } = storeToRefs(globalStore)

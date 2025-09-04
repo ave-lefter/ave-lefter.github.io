@@ -1,5 +1,5 @@
 <template>
-  <div v-if="Number(walletTokenInfo?.balance_usd || 0) > 0 && Number(tokenStore.swap?.token?.balance || 0) > 0" class="max-h-54px flex items-start justify-between color-[--d-F5F5F5-l-333] text-center bg-[--d-222-l-F2F2F2] mb-12px py-10px rd-4px">
+  <div v-if="(Number(walletTokenInfo?.balance_usd || 0) > 0 && Number(tokenStore.swap?.token?.balance || 0) > 0) || isShow" class="max-h-54px flex items-start justify-between color-[--d-F5F5F5-l-333] text-center bg-[--d-222-l-F2F2F2] mb-12px py-10px rd-4px">
     <div class="flex-1">
       <div class="text-11px color-[--d-666-l-999]">{{ $t('bought') }}</div>
       <div class="text-12px mt-5px color-#12B886">${{ formatNumber(walletTokenInfo?.total_purchase_usd || 0, 2) }}</div>
@@ -40,6 +40,7 @@ import { bot_getAddressAllBalances } from '@/api/bot'
 const route = useRoute()
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
+const isShow = ref(false)
 const userAddress = computed(() => {
   const [token, chain] = getAddressAndChainFromId(route.params?.id as string, 1)
   if (!token || !chain) {
@@ -49,12 +50,15 @@ const userAddress = computed(() => {
 })
 
 watch(userAddress, (val) => {
+  isShow.value = false
   if (val) {
     avgPrice.value = 0
     getWalletTxData()
     _bot_getAddressAllBalances()
   }
 })
+
+
 
 const walletTokenInfo = ref<WalletTokenInfo | null>(null)
 async function getWalletTxData() {
@@ -78,8 +82,11 @@ async function getWalletTxData() {
   }
   return bot_getUserWalletTxInfo(params).then(async res => {
     walletTokenInfo.value = res?.[0] || null
-    const avgPrice = Number(res?.[0]?.balance_amount) > 0 ? Number(res?.[0]?.average_purchase_price_usd || 0) : 0
-    useEventBus('updateAvgPrice').emit(avgPrice)
+    // const avgPrice = Number(res?.[0]?.balance_amount) > 0 ? Number(res?.[0]?.average_purchase_price_usd || 0) : 0
+    // useEventBus('updateAvgPrice').emit(avgPrice)
+    if (Number(walletTokenInfo.value?.balance_usd || 0) > 0) {
+      isShow.value = false
+    }
     return res
   }).catch(async () => {
     walletTokenInfo.value = null
@@ -102,11 +109,11 @@ async function _bot_getAddressAllBalances() {
     chains: chain,
     pinToken: route.params?.id as string
   }
-  if (!Number(tokenStore.swap.token?.balance || 0)) {
-    avgPrice.value = 0
-    useEventBus('updateAvgPrice').emit(0)
-    return
-  }
+  // if (!Number(tokenStore.swap.token?.balance || 0)) {
+  //   avgPrice.value = 0
+  //   useEventBus('updateAvgPrice').emit(0)
+  //   return
+  // }
   return bot_getAddressAllBalances(params).then(async res => {
     if (!res?.[0]?.value || res?.[0]?.value > 0 && res?.[0]?.token !== token) {
       avgPrice.value = 0
@@ -125,13 +132,16 @@ async function _bot_getAddressAllBalances() {
 
 
 watch(() => route.params.id, () => {
+  isShow.value = false
   avgPrice.value = 0
   getWalletTxData()
   _bot_getAddressAllBalances()
 })
 
 watch(() => tokenStore.placeOrderSuccess, () => {
+  isShow.value = true
   getWalletTxDataPoll()
+  _bot_getAddressAllBalances()
 })
 
 // watch(() => tokenStore.pairAddress, (val) => {

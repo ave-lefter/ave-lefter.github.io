@@ -28,6 +28,7 @@ const components = {
   cto: activityComponent,
   xstocks: activityComponent,
   volume: activityComponent,
+  heaven_pump: pumpComponent,
 }
 const activeTab = useStorage<keyof typeof components>('rankActiveTab', 'hot')
 const activeSubTab = useStorage('rankSubTab','pump_in_hot')
@@ -213,7 +214,7 @@ function listMapFunction(i: Record<string, any>) {
     medias: getMedias(i.appendix),
     ...progress_obj,
     normal_tag: normal_tag?.slice(0, 3) || [],
-    signal_arr: signal_arr?.slice(0, 1) || [],
+    signal_arr: signal_arr?.slice(0, 1) || []
   }
 }
 
@@ -255,6 +256,7 @@ function getMedias(appendix: string) {
     <KeepAlive :max="6">
       <component
         :is="components[activeTab]"
+        ref="dynamicComponentRef"
         :listMapFunction="listMapFunction"
         :activeChain="activeChain"
         :activeTab="activeTab"

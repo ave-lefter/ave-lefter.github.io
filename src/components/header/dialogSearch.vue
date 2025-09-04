@@ -72,6 +72,7 @@
           :tokens="hotTokenList.slice(0, 200) || []"
           :loading="loading"
           @close="visible = false"
+          @done="done"
         />
         <WalletTable v-else :tokens="smartTop10List || []" :loading="loading"  @close="visible = false" />
       </template>
@@ -90,6 +91,7 @@
           @close="visible = false"
           @filter="handleFilter"
           @sortChange="handleSortChange"
+          @done="done"
         />
       </template>
 
@@ -188,7 +190,7 @@ function tokenSearch() {
         token_list: res?.token_list?.map?.((i) => {
           return {
             ...i,
-            id: i.token + '-' + i.chain,
+            id: i.token + '-' + i.chain
           }
         }),
         wallet_list:  res?.wallet_list?.map?.((i) => {
@@ -350,6 +352,15 @@ onMounted(() => {
     _getHotTokens()
   }
 })
+function done() {
+  if (tabActive.value === 'token') {
+    if (query) {
+      tokenSearch()
+    } else {
+      _getHotTokens()
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -69,7 +69,7 @@
         </el-input>
       </div>
     </template>
-    <AutoSellSet v-if="activeTab === 'buy' && swapType==='market'" class="mt-15px" />
+    <AutoSellSet v-if="activeTab === 'buy' && swapType==='market' && chain !== 'xlayer'" class="mt-15px" />
     <template v-if="isSupportSwap">
       <el-button v-if="!isApprove" :color="swapButtonColor" class="submit-btn" native-type="button" :loading="loadingApprove || loadingSwap || loadingAllowance" :disabled="Number(fromToken.balance) < Number(fromAmount)" @click.stop="approve">{{ Number(fromToken.balance) === 0 || Number(fromToken.balance) < Number(fromAmount) ? (checkAmountMessage() || $t('approve')) : $t('approve') }}</el-button>
 
@@ -101,6 +101,7 @@
           <el-switch
             v-if="chain === 'solana'"
             v-model="botSettings.solana![botSettings.solana!.selected]!.mev"
+            class="mr-auto"
             style="--el-switch-on-color: #3c6cf6;zoom: 0.9;height: 14px;"
             size="small"
             :before-change="solanaMevBeforeChange"
@@ -108,11 +109,12 @@
           <el-switch
             v-else-if="isEvmChain(chain || '')"
             v-model="botSettings[chain]![botSettings[chain]!.selected].mev"
+            class="mr-auto"
             style="--el-switch-on-color: #3c6cf6;zoom: 0.9;height: 14px"
             size="small"
           />
         </template>
-        <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-12px color-[--d-666-l-999] ml-auto mr-4px cursor-pointer" />
+        <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-12px color-[--d-666-l-999] mr-4px cursor-pointer" />
         <span v-if="botSettings?.[chain || '']?.[selected]?.slippage !== 'auto'">{{ botSettings?.[chain || '']?.[selected]?.slippage }}%</span>
         <span v-else>{{ $t('auto') }}</span>
         <template v-if="isEvmChain(chain || '')">
@@ -123,7 +125,7 @@
           <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-12px color-[--d-666-l-999] ml-auto mr-4px cursor-pointer" />
           <span>{{ botPriorityFee }} SOL</span>
         </template>
-        <template v-if="activeTab === 'buy' && swapType === 'market' && botSettings?.[chain || '']">
+        <template v-if="activeTab === 'buy' && swapType === 'market' && chain !== 'xlayer' && botSettings?.[chain || '']">
           <span class="mr-4px ml-auto color-[--d-666-l-999]">{{ $t('autoSellHalf') }}</span>
           <el-switch
             v-model="botSettingStore.autoSellConfigs.autoSell"
@@ -860,6 +862,7 @@ function submitBotLimit() {
         let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
           // this.$store.state.bot.limitHistoryUpdate++
           tokenStore.placeOrderUpdate++
+          priceLimit.value = ''
           ElNotification({ type: 'success', message: t('limitSubmitted') })
           //  if (!['myBotPosition', 'botLimitOrder']?.includes(this.$store.state.tabActive)) {
           //   this.$store.state.tabActive = 'botLimitOrder'
@@ -929,6 +932,7 @@ function submitBotLimit() {
       if (res) {
         let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
           tokenStore.placeOrderUpdate++
+          priceLimit.value = ''
           ElNotification({ type: 'success', message: t('limitSubmitted') })
           loadingSwap.value = false
           amountToken.value = ''

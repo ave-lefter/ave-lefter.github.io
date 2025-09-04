@@ -38,14 +38,14 @@ function formatNum(num: string | number, decimals = Infinity, groupSeparator = '
 }
 
 
-function formatNumUnit(n: number | string, decimals = 3, unit = 1000000000) {
+function formatNumUnit(n: number | string, decimals = 3, unit = 1000000000, _locale?: string) {
   let n1 = Number(n) || 0
   let pre = ''
   if (n1 < 0) {
     pre = '-'
     n1 = -n1
   }
-  const locale = localStorage.getItem('language')
+  const locale = _locale || localStorage.getItem('language')
   if (locale === 'zh-cn') {
     if (n1 >= 10 ** 28) {
       return new BigNumber(n1).toPrecision(decimals + 1)
@@ -176,7 +176,7 @@ export function formatNumberS(n: string | number, config: any = {}) {
   return formatNumber2(n, decimals, l, unit)
 }
 
-export function formatNumber2(n: string | number, decimals = 4, l = 4, unit: number = 0) {
+export function formatNumber2(n: string | number, decimals = 4, l = 4, unit: number = 0, _locale?: string) {
   const n1 = Number(n)
   if (
     !isNaN(n1) &&
@@ -186,10 +186,10 @@ export function formatNumber2(n: string | number, decimals = 4, l = 4, unit: num
   ) {
     return '0'
   }
-  return formatNumShort(formatNumUnit(n, decimals, unit), l)
+  return formatNumShort(formatNumUnit(n, decimals, unit, _locale), l)
 }
 
-export function formatNumber(n: string | number, config: { decimals?: number; l?: number; limit?: number } | number = {}) {
+export function formatNumber(n: string | number, config: { decimals?: number; l?: number; limit?: number, locale?: string } | number = {}) {
   let config1 = config
   if (typeof config === 'number') {
     config1 = {
@@ -202,6 +202,6 @@ export function formatNumber(n: string | number, config: { decimals?: number; l?
   const l = config1?.l || 4
   const limit = config1?.limit
   const unit = limit ? 10 ** limit : 10000
-  return formatNumber2(n, decimals, l, unit)
+  return formatNumber2(n, decimals, l, unit, config1?.locale)
 }
 

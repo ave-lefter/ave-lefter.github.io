@@ -83,6 +83,12 @@ importers:
       ethers:
         specifier: ^6.14.1
         version: 6.14.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      highlight.js:
+        specifier: ^11.11.1
+        version: 11.11.1
+      highlightjs-solidity:
+        specifier: ^2.0.6
+        version: 2.0.6
       html2canvas:
         specifier: ^1.4.1
         version: 1.4.1
@@ -6036,6 +6042,13 @@ packages:
 
   hey-listen@1.0.8:
     resolution: {integrity: sha512-COpmrF2NOg4TBWUJ5UVyaCU2A88wEMkUPK4hNqyCkqHbxT92BbvfjoSozkAIIm6XhicGlJHhFdullInrdhwU8Q==}
+
+  highlight.js@11.11.1:
+    resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
+    engines: {node: '>=12.0.0'}
+
+  highlightjs-solidity@2.0.6:
+    resolution: {integrity: sha512-DySXWfQghjm2l6a/flF+cteroJqD4gI8GSdL4PtvxZSsAHie8m3yVe2JFoRg03ROKT6hp2Lc/BxXkqerNmtQYg==}
 
   hmac-drbg@1.0.1:
     resolution: {integrity: sha512-Tti3gMqLdZfhOQY1Mzf/AanLiqh1WTiJgEj26ZuYQ9fbkLomzGchCws4FyrSd4VkpBfiNhaE1On+lOz894jvXg==}
@@ -19062,6 +19075,10 @@ snapshots:
     optional: true
 
   hey-listen@1.0.8: {}
+
+  highlight.js@11.11.1: {}
+
+  highlightjs-solidity@2.0.6: {}
 
   hmac-drbg@1.0.1:
     dependencies:

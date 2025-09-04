@@ -3,12 +3,15 @@
     v-model="visible"
     append-to-body
     :with-header="false"
-    :size="430"
+    :size="480"
     class="draw-right"
   >
     <div class="check-container bg-[--d-222-l-FFF] color-[--d-F5F5F5-l-333]">
       <div class="flex items-center justify-between text-20px p-20px sticky top-0 bg-[--d-222-l-FFF] z-1">
-        <span>{{ $t('check2') }}</span>
+        <div v-if="checkResult?.ai_report" class="flex-start">
+          <img src="@/assets/images/AI.svg" alt="" :width="20" class="mr-5px">{{ $t('AI') }}
+        </div>
+        <span v-else>{{ $t('check2') }}</span>
         <Icon name="ri:close-large-fill" class="clickable" @click.stop="visible = false" />
       </div>
       <div class="check-content">
@@ -61,7 +64,36 @@
             </div>
           </el-col>
           <el-col :span="24">
-            <div class="risk-statics">
+            <div v-if="checkResult?.ai_report" class="risk-statics">
+              <div class="item1">
+                <img
+                  v-if="riskAIList?.filter(i=> Number(i?.risk_level) == -3)?.length >0"
+                  :width="12"
+                  src="@/assets/images/risk-gaoliang.svg"
+                >
+                <img v-else :width="12" src="@/assets/images/risk.svg" >
+                <span class="num">{{ riskAIList?.filter(i=> Number(i?.risk_level) == -3)?.length || 0 }}</span>
+              </div>
+              <div class="item1">
+                <img
+                  v-if="riskAIList.filter(i=>Number(i?.risk_level) == -2)?.length >0"
+                  src="@/assets/images/yichang1-gaoliang.svg"
+                  :width="12"
+                >
+                <img v-else :width="12" src="@/assets/images/yichang1.svg" >
+                <span class="num">{{ riskAIList.filter(i=>Number(i?.risk_level) == -2)?.length }}</span>
+              </div>
+              <div class="item1">
+                <img
+                  v-if="riskAIList.filter(i=> Number(i?.risk_level) !== -1)?.length >0"
+                  :width="12"
+                  src="@/assets/images/zhuyi1-gaoliang.svg"
+                >
+                <img v-else :width="12" src="@/assets/images/zhuyi1.svg" >
+                <span class="num">{{ riskAIList.filter(i=> Number(i?.risk_level) == -1)?.length }}</span>
+              </div>
+            </div>
+            <div v-else class="risk-statics">
               <div class="item1">
                 <img
                   v-if="statistics_risk"
@@ -92,7 +124,7 @@
               </div>
             </div>
           </el-col>
-          <el-col :span="24">
+          <el-col :span="24" v-if="!checkResult?.ai_report">
             <div class="card card1">
               <ul>
                 <template
@@ -651,13 +683,16 @@
                 </li>
                 <li v-if="checkResult?.mechanism_intro" class="card-list-item">
                   <span  style="word-break: keep-all">{{ $t('mechanism_intro') }}</span>
-                  <span class="indent" v-html="checkResult?.mechanism_intro?.replace?.(/\n/g, '<br/>')"/>
+                  <span class="" v-html="checkResult?.mechanism_intro?.replace?.(/\n/g, '<br/>')"/>
                 </li>
               </ul>
             </div>
           </el-col>
+          <el-col :span="24" v-if="checkResult?.ai_report">
+            <AI  :obj="checkResult?.ai_report" :riskList="riskAIList"></AI>
+          </el-col>
           <el-col :span="24">
-            <div class="text-12px">
+            <div class="text-14px mt-10px">
               {{ list?.[0]?.name }}({{ formatNumber(checkResult?.holders || 0)}})
             </div>
             <div class="card card1">
@@ -811,7 +846,7 @@
                 {{ $t('remark') }}: {{ holder_remark }}
               </div>
             </div>
-            <div class="text-12px">
+            <div class="text-14px">
               {{ list?.[1]?.name }}({{
                 formatNumber(checkResult?.pair_holders || 0)
               }})
@@ -1160,7 +1195,7 @@
           </el-col>
           <el-col v-if="checkResult?.holder_analysis" :span="24">
             <div class="card card1 simulate">
-              <span class="text-12px">{{ $t('simulate') }}</span>
+              <span class="text-14px">{{ $t('simulate') }}</span>
               <table class="rd-4px">
                 <tbody>
                   <tr>
@@ -1284,7 +1319,7 @@
           </el-col>
           <el-col>
             <div class="card card1">
-              <h3 class="text-12px">{{ $t('communityTrust') }}</h3>
+              <h3 class="text-14px">{{ $t('communityTrust') }}</h3>
               <div class="community-container mt-20px">
                 <div class="thumbs-container" @click.stop="voteSupport">
                   <Icon
@@ -1372,6 +1407,7 @@ import {
 import { formatNumber } from '@/utils/formatNumber'
 import { filterGas, formatExplorerUrl, formatDate } from '@/utils/index'
 import { ElMessageBox, ElMessage } from 'element-plus'
+import AI from './ai.vue'
 const tokenStore = useTokenStore()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -1416,6 +1452,14 @@ const visible = computed({
   set(value) {
     $emit('update:modelValue', value)
   },
+})
+const riskAIList = computed(() => {
+  let list = checkResult.value?.ai_report?.risk || []
+  list = list?.map((i: any) => ({
+    ...i,
+    risk_level: i.risk_removed == 1 ? '1' : i?.risk_level,
+  }))
+  return list
 })
 const hasNoAdmin = computed(() => {
   return (
@@ -2423,6 +2467,7 @@ function getVote() {
   width: 100%;
   font-size: 12px;
   padding: 5px;
+  margin: 5px 0;
   td,
   th {
     text-align: left;
@@ -2629,7 +2674,7 @@ function getVote() {
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  margin-bottom: 0;
+  margin-bottom: 10px;
   margin-top: 10px;
   .item1 {
     display: flex;

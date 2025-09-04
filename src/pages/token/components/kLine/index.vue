@@ -1,8 +1,10 @@
 <template>
-  <div class="relative" :style="{height: `${kHeight}px`}">
+  <div class="relative" :style="{height: `${isRank ? 290 : kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
+    <UnknownRisk v-show="isReady" :isRank="isRank" @refresh="refresh" />
   </div>
   <div
+    v-if="!isRank"
     class="w-full cursor-row-resize bg-[--d-222-l-F2F2F2] gap-1px hover:bg-[--d-666-l-CCC] flex items-center justify-center h-4px"
     @mousedown.stop.prevent="drag"
   >
@@ -17,23 +19,27 @@ import { getKlineHistoryData } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
 import { switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, buildOrUpdateLastBarFromTx, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark } from './utils'
 import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
-import type { WSTx, KLineBar } from './types'
+import type { WSTx, KLineBar, SimpleWSTx } from './types'
 import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
-import {DefaultHeight} from '~/utils/constants'
+import {DefaultHeight, WSSimpleTxChain} from '~/utils/constants'
 import { TW_STUDY } from './constant'
+import UnknownRisk from './unknownRisk.vue'
 
-const tokenStore = useTokenStore()
+const props = defineProps<{
+  isRank?:boolean
+}>()
+const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const botStore = useBotStore()
 const tokenDetailsStore = useTokenDetailsStore()
 const route = useRoute()
 const token = computed(() => {
-  return route.params.id as string
+  return (props.isRank && 'klineRow' in tokenStore) ? tokenStore.klineRow?.id : route.params.id as string
 })
 
 const klinePair = ref('')
 
-let isReady = false
+const isReady = ref(false)
 let isReadyLine = false
 let isHeaderReady = false
 
@@ -63,7 +69,7 @@ const amm = computed(() => {
 
 let loading = false
 
-watch(() => route.params.id, (val) => {
+watch(() => token.value, (val) => {
   if (!val) return
   if (_widget?.activeChart()) {
     _widget?.activeChart()?.removeAllShapes?.()
@@ -81,7 +87,7 @@ function switchTokenKline() {
   resetLimitPriceLineId()
   resetAvgPriceLineId()
   const val = pair.value
-  if (isReady && route.name === 'token-id') {
+  if (isReady.value && route.name === 'token-id') {
     const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
     // const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
     // const preResolutions = localStorage.getItem(QUICK_KEY)
@@ -93,7 +99,7 @@ function switchTokenKline() {
     if (_widget) {
       _widget?.resetCache?.()
       _widget?.activeChart?.()?.clearMarks?.()
-      _widget?.setSymbol?.(symbol.value + '---' + route.params.id + val, resolution.value as ResolutionString, () => {
+      _widget?.setSymbol?.(symbol.value + '---' + token.value + val, resolution.value as ResolutionString, () => {
         isReadyLine = true
         // createHeaderButton()
       })
@@ -104,7 +110,7 @@ function switchTokenKline() {
 }
 
 watch(user, () => {
-  if (isReady && route.name === 'token-id') {
+  if (isReady.value && route.name === 'token-id') {
     _widget?.activeChart?.()?.clearMarks?.()
     _widget?.activeChart?.()?.refreshMarks?.()
   }
@@ -124,6 +130,8 @@ let lastBar: null | {
   time: number
   volume: number
 } = null
+
+let lastPairPrice = 0
 
 // const LLJEFFY_#_240
 const listenerGuidMap = new Map()
@@ -165,6 +173,7 @@ function resetChart() {
   isReadyLine = false
   isHeaderReady = false
   lastBar = null
+  lastPairPrice = 0
   resetLimitPriceLineId()
   resetAvgPriceLineId()
   _widget?.remove?.()
@@ -243,7 +252,7 @@ function createToggleButton() {
 const { createMarkButton, getMarks, marksTabs, wsTxUpdateMarks,profilingMarksCache } = useKlineMarks()
 
 watch(marksTabs, () => {
-  if (!isReady) return
+  if (!isReady.value) return
   createHeaderButton()
 })
 
@@ -300,11 +309,15 @@ async function initChart() {
         return {
           format: (price) => {
             if (showMarket.value) {
-              return formatNumber(price, 2)
+              return formatNumber(price, {
+                decimals: 2,
+                locale: 'en'
+              })
             }
             return String(formatNumber(price, {
               decimals: 4,
-              limit: 6
+              limit: 6,
+              locale: 'en'
             }))
           },
         }
@@ -439,6 +452,7 @@ async function initChart() {
           if (firstDataRequest) {
             noData = false
             lastBar = null
+            lastPairPrice = 0
           } else {
             if (noData) {
               onResult([], { noData: true })
@@ -449,7 +463,7 @@ async function initChart() {
           const params = {
             interval: interval,
             pair_id: pair.value + '-' + chain.value,
-            token_id: pair.value ? undefined : route.params.id as string,
+            token_id: pair.value ? undefined : token.value,
             from,
             to: firstDataRequest ? 0 : Math.max(to, firstBarTime || 0)
           }
@@ -467,6 +481,7 @@ async function initChart() {
             klinePair.value = res?.pair || ''
             if (firstDataRequest) {
               lastBar = bars1?.[bars1?.length - 1] || null
+              lastPairPrice = Number(lastBar?.close || 0)
               if (lastBar) {
                 lastBar.time = lastBar.time * 1000
               }
@@ -513,11 +528,26 @@ async function initChart() {
           return
         }
         const { address, chain } = getAddressAndChainFromId(token.value)
-        const params = [
+        let params: [string, string | { tks: { ch: string, tk: string }[], rt: string }, string?] = [
           'multi_tx',
           address,
           chain
         ]
+        if (WSSimpleTxChain.includes(chain)) {
+          params = [
+          'simple_tx',
+          {
+            tks: [
+              {
+                ch: chain,
+                tk: address
+              }
+            ],
+            rt: 'json'
+          }
+        ]
+        }
+
         const data = {
           jsonrpc: '2.0',
           method: 'subscribe',
@@ -579,7 +609,7 @@ async function initChart() {
   updateChartBackground()
 
   _widget.onChartReady(() => {
-    isReady = true
+    isReady.value = true
     isReadyLine = true
     if (themeStore.isDark) {
       _widget?.applyOverrides?.({ 'scalesProperties.textColor': '#d5d5d5' })
@@ -664,11 +694,29 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsSto
       return
     }
     const { event, data } = msg
-    if (event === 'tx') {
-      const tx: WSTx = data?.tx
+    if (event === WSEventType.SIMPLE_TX || event === WSEventType.TX) {
+      const tx: SimpleWSTx | WSTx = data?.msg || data?.tx
       const interval = switchResolution(resolution)
-      if (tx.pair_address === pair.value && !tx?.tx_type && !loading) {
-        const t = token.value?.replace?.(/-.*$/, '')
+      const t = getAddressAndChainFromId(token.value)?.address
+      let target = ''
+      if ('target' in tx) {
+        target = tx.target
+      } else {
+        target = ([tx.from_address, tx.to_address].find(i => i === t)) || ''
+      }
+      if (target === t && !loading) {
+        const _pair = 'pair' in tx ? tx.pair : tx.pair_address
+        const _price = 'price_u' in tx ? Number(tx.price_u || 0) : Number(tx.from_address?.toLowerCase?.() === tokenStore.token?.token?.toLowerCase?.() ? tx.from_price_usd : tx.to_price_usd) || 0
+        if (_pair === pair.value) {
+          lastPairPrice = _price
+        }
+        if (_pair !== pair.value) {
+          const price = _price
+          if (!lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
+            return
+          }
+        }
+        tokenStore.tokenPrice = _price
         const newBar1 = buildOrUpdateLastBarFromTx(tx, t, lastBar, interval)
         if (newBar1) {
           lastBar = {...newBar1}
@@ -754,6 +802,11 @@ onMounted(() => {
     _widget?.activeChart?.().resetData?.()
   })
 })
+const emit = defineEmits(['refresh'])
+function refresh() {
+  emit('refresh')
+  resetChart()
+}
 
 </script>
 

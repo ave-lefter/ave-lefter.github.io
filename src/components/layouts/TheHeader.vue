@@ -1,8 +1,9 @@
 <template>
   <header
-    class="w-full bg-[var(--d-111-l-FFF)] flex items-center justify-between p-x-17px h-60px"
+    class="w-full bg-[--d-000-l-FFF] flex items-center justify-between p-x-17px h-60px"
   >
-    <a :href="homeUrl" target="_blank" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></a>
+    <NuxtLink to="/" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></NuxtLink>
+    <!-- <a :href="homeUrl" target="_blank" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></a> -->
     <!-- <ul class="menu ml-20px">
       <li v-for="(item, $index) in list" :key="$index">
         <a :href="item.src" target="_blank" :class="{ active: item.id == route?.name }">
@@ -19,21 +20,21 @@
     </ul>
     <div class="flex-1" />
     <a
-      class="bg-[var(--d-222-l-F2F2F2)] rounded-4px p-8px ml-8px h-32px w-320px flex items-center no-underline"
+      class="bg-[--d-141721-l-E8F1FF] rounded-4px p-8px ml-8px h-32px w-320px flex items-center no-underline"
       href=""
       @click.stop.prevent="dialogVisible_search = !dialogVisible_search"
     >
       <Icon
-        class="text-16px text-[var(--d-666-l-999)]"
+        class="text-16px text-[--d-566275-l-8CA0C3]"
         name="custom:search"
       />
-      <span class="text-12px ml-4px text-[var(--d-666-l-999)]">
+      <span class="text-12px ml-4px text-[--d-566275-l-8CA0C3]">
         {{ $t('enterAddress/token') }}
       </span>
     </a>
     <div class="flex-1" />
     <div
-    class="ml-10px bg-[var(--d-222-l-F2F2F2)] rounded-4px p-8px h-32px flex items-center text-14px cursor-pointer hover:opacity-80"
+    class="ml-10px bg-[var(--d-141721-l-E8F1FF)] rounded-4px p-8px h-32px flex items-center text-14px cursor-pointer hover:opacity-80"
       @click="toReferrer"
     >
       <img v-show="showAnimation" src="@/assets/images/refer.gif" height="20" alt="">
@@ -43,11 +44,10 @@
     <ClipboardToken />
     <el-button
       v-if="!botStore.evmAddress && !walletStore.address"
-      text
       type=""
-      bg
-      color="bg-[var(--d-222-l-F2F2F2)]"
-      class="ml-10px  rounded-4px text-[var(--d-F5F5F5-l-333)]! [&&]:[--el-fill-color-light:--d-222-l-F2F2F2]"
+
+      color="bg-[var(--d-141721-l-E8F1FF)]"
+      class="ml-10px bg-[var(--d-141721-l-E8F1FF)] rounded-4px text-[var(--d-F5F5F5-l-333)]!  btn"
       @click="openConnect"
     >
       {{ $t('connectWallet') }}
@@ -81,10 +81,9 @@
     >
       <template #reference>
         <el-button
-          bg
-          text
-          color="bg-[var(--d-222-l-F2F2F2)]"
-          class="bg-[var(--d-222-l-F2F2F2)] border-0! ml-10px  rounded-4px text-[var(--d-F5F5F5-l-333)]! cursor-pointer">
+
+          color="bg-[var(--d-141721-l-E8F1FF)]"
+          class="bg-[var(--d-141721-l-E8F1FF)] border-0! ml-10px  rounded-4px text-[var(--d-F5F5F5-l-333)]! cursor-pointer btn">
           <span>APP</span>
         </el-button>
       </template>
@@ -159,13 +158,13 @@
       @command="langStore.setLanguage"
     >
       <a
-        class="bg-[var(--d-222-l-F2F2F2)] rounded-4px p-8px ml-8px h-32px flex items-center"
+        class="bg-[var(--d-141721-l-E8F1FF)] rounded-4px p-8px ml-8px h-32px flex items-center"
         href=""
         popper-class="dropdown-lang"
         @click.stop.prevent
       >
         <Icon
-          class="text-20px text-[--d-999-l-666]"
+          class="text-20px text-#8CA0C3"
           name="material-symbols:language"
         />
       </a>
@@ -183,12 +182,12 @@
       </template>
     </el-dropdown>
     <a
-      class="bg-[var(--d-222-l-F2F2F2)] rounded-4px p-8px ml-8px h-32px flex items-center"
+      class="bg-[var(--d-141721-l-E8F1FF)] rounded-4px p-8px ml-8px h-32px flex items-center"
       href=""
       @click.stop.prevent="themeStore.toggleTheme()"
     >
       <Icon
-        class="text-20px text-[--d-999-l-666]"
+        class="text-20px text-#8CA0C3"
         :name="themeStore.isDark ? 'custom:dark' : 'custom:light'"
       />
     </a>
@@ -278,7 +277,7 @@ header {
       text-align: center;
       padding: 4px 8px;
       border-radius: 8px;
-      color: #999999;
+      color: var(--d-566275-l-8CA0C3);
       margin-right: 8px;
       text-decoration: none;
 
@@ -286,6 +285,14 @@ header {
         background: #3f80f71a;
         color: #3f80f7;
       }
+    }
+  }
+  .btn{
+    background: var(--d-141721-l-E8F1FF);
+    border:0 none;
+    &:hover {
+      background: var(--d-141721-l-E8F1FF);
+      opacity: 0.8;
     }
   }
 }

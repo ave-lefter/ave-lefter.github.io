@@ -220,7 +220,9 @@ export function bot_getUserInfoByGuid(guid: string): Promise<{
   guid: string
   emailAddress: string // 已绑定的email address
   authSetting: boolean //  已绑定google验证器, false -> 未绑定google验证器
-  ref1Guid?: string // 上游分佣绑定信息
+  ref1Guid: string // 上游分佣绑定信息
+  name: string // 钱包名
+  transferStatus: boolean // 转账状态(是否在12小时冻结期)
 }> {
   const { $api } = useNuxtApp()
   return $api('/botapi/user/getUserInfoByGuid', {
@@ -513,10 +515,21 @@ export function bot_createSwapEvmTx(params: {
   isPrivate: boolean
   gasTip: number
   autoSell?: boolean
+  chain: string
+  autoSellConfig?: {
+    open: boolean;
+    priceChange?: number | undefined;
+    sellRatio?: number | undefined;
+    type: 'default' | 'devsell' | 'trailing' | 'migrated'
+  }[]
   slippage: number
 }) {
   const { $api } = useNuxtApp()
   const botStore = useBotStore()
+  if (params.chain === 'xlayer') {
+    params.autoSell = false
+    params.autoSellConfig = []
+  }
   return $api('/botapi/swap/createSwapEvmTx', {
     method: 'post',
     body: {
@@ -643,6 +656,18 @@ export function bot_createSafeTransferTx(params: {
 export function bot_getTransferGasFee(params: { chain: BotChain} | undefined) {
   const { $api } = useNuxtApp()
   return $api('/botapi/swap/getTransferGasFee', {
+    method: 'get',
+    query: params
+  })
+}
+
+// 功能说明：查询转账交易状态
+// url: /swap/getTransfer GET
+// 行为：根据链，batchId，查询交易结果
+// 校验：校验 access token
+export function bot_getTransfer(params: { chain: BotChain,batchId: string|number} | undefined) {
+  const { $api } = useNuxtApp()
+  return $api('/botapi/swap/getTransfer', {
     method: 'get',
     query: params
   })

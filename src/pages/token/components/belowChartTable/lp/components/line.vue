@@ -124,18 +124,24 @@ const init = () => {
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: mode.value  === 'light' ? '#F5F5F5' : '#17191C',
+      backgroundColor: mode.value  === 'light' ? '#F2F2F2' : '#333',
       textStyle: {
-        fontSize: 10,
-        color: '#959A9F',
-        fontFamily: 'Poppins'
+        color: mode.value  === 'light' ? '#666' : '#999',
+        fontFamily: 'Poppins',
+        fontSize: 12
+      },
+      padding: [6, 8],
+      axisPointer: {
+        label: {
+          show: false
+        }
       },
       borderWidth: 0,
       // valueFormatter: value => '$'+formatNumber2(value || 0, 2), // 替换为实际的格式化函数
       formatter: function (params) {
         let result = params[0].name + '<br>' // 标题
         params.forEach(item => {
-          result += `${item.marker} ${item.seriesName}: <span style="color:${mode.value === 'light' ? '#17191C' : '#F5F5F5'}">${formatNumber(item.value || 0, 2)}</span><br>`// 每行内容
+          result += `<div style="display:flex;align-items:center;"><div style="min-width:60px">${item.marker} ${item.seriesName}</div><span style="color:${mode.value === 'light' ? '#17191C' : '#F5F5F5'};flex:1;text-align:right">${formatNumber(item.value || 0, 2)}</span><br></div>`// 每行内容
         })
         return result
       },
@@ -149,7 +155,7 @@ const init = () => {
       containLabel: true,
       tooltip: {
         axisPointer: {
-          type: 'cross'
+          type: 'line'
         }
       }
     },

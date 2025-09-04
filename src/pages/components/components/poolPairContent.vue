@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import XIcon from '~/components/xPopup/xIcon.vue'
 
-const emit = defineEmits(['collect'])
+const emit = defineEmits(['collect','toggleKline'])
+const rankKlineStore = useRankKlineStore()
 const { t } = useI18n()
 const props = defineProps<{
   pageNO: number
   pageSize: number
   row: any
   rowIndex: number
+  activeKline:boolean
+  enableKline:boolean
 }>()
 
 function getSymbol(row, shouldReverse = false) {
@@ -30,6 +34,13 @@ function inBlackList(row) {
         (i.address == getSymbol(row) && i.type == 'keyword')
     ) !== -1
   )
+}
+
+function blockToken(row) {
+  addOrRemoveBlackList(row, 'ca')
+  if(row.id === rankKlineStore.klineRow.id){
+    toggleKline()
+  }
 }
 
 function addOrRemoveBlackList(item: { token: string }, type: 'ca' | 'dev' | 'keyword') {
@@ -61,6 +72,10 @@ const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'cir
 const created_at_unix = computed(() => {
   return dayjs(props.row.created_at).unix()
 })
+
+function toggleKline() {
+  emit('toggleKline',props.row)
+}
 </script>
 
 <template>
@@ -70,7 +85,7 @@ const created_at_unix = computed(() => {
       v-tooltip="$t('blockToken')"
       name="custom:invisible"
       class="text-12px absolute top-5px left-5px hidden icon"
-      @click.self.stop="addOrRemoveBlackList(row, 'ca')"
+      @click.self.stop="blockToken(row)"
     />
     <Icon
       v-else
@@ -175,6 +190,13 @@ const created_at_unix = computed(() => {
               </div>
             </template>
           </el-tooltip>
+          <Icon
+            v-if="enableKline"
+            v-tooltip="!activeKline?$t('kline'):$t('hidekline')"
+            name="custom:kline" class="text-12px ml-4px hover:color-#8CA0C3" 
+            :class="activeKline ? 'color-#8CA0C3' : 'color-#566275'"
+            @click.self.stop="toggleKline"
+          />
         </div>
         <div class="flex items-center lh-12px">
           <div
@@ -200,7 +222,17 @@ const created_at_unix = computed(() => {
           </div>
           <div v-if="row?.medias?.length > 0" class="flex items-center gap-4px">
             <template v-for="(item, index) in row?.medias" :key="index">
-              <div v-if="item.url" v-tooltip="item.url">
+              <XPopup v-if="item.icon === 'twitter'" :tokenId="((row.token + '-' + row.chain) as string)" :type="row.twitter_type">
+
+                <a class="flex items-center" :href="item.url" target="_blank" @click.stop>
+                  <XIcon
+                    v-if="[1, 2, 3].includes(row.twitter_type)"
+                    :type="row.twitter_type"
+                  />
+                  <Icon v-else :name="`custom:${item.icon}`" />
+                </a>
+              </XPopup>
+              <div v-else-if="item.url" v-tooltip="item.url">
                 <a class="flex items-center" :href="item.url" target="_blank" @click.stop>
                   <Icon :name="`custom:${item.icon}`" />
                 </a>

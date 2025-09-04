@@ -117,10 +117,16 @@ const rules = computed<FormRules>(() => {
   }
 })
 
-const chainOptions=ref([
-  {label:'SOL',value:'solana',id:'solana'},
-  {label:'BSC',value:'56',id:'bsc'},
-])
+const chainOptions=computed(()=>{
+ return SupportFullDataChain.map(el=>{
+    const chainInfo = getChainInfo(el)
+    return {
+      label:el==='solana' ? 'SOL' : chainInfo.net_name.toUpperCase(),
+      value:chainInfo.chain_id,
+      id:chainInfo.net_name
+    }
+  })
+})
 
 function handleSubmit(formEl: FormInstance | undefined) {
   if (!formEl) return

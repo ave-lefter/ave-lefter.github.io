@@ -7,6 +7,7 @@ import type { GetTotalHoldersResponse} from '~/api/stats'
 import {getTotalHolders} from '~/api/stats'
 import { ElMessage } from 'element-plus'
 import {DefaultHeight} from '~/utils/constants'
+import { getXType } from '~/api/x'
 
 type Token = {
   chain?: string
@@ -22,11 +23,14 @@ export const useTokenStore = defineStore('token', () => {
   const route = useRoute()
   const tokenInfo = ref<null | TokenInfo>(null)
   const tokenInfoExtra = shallowRef<null | TokenInfoExtra>(null)
+  const twitterType = ref<0 | 1 | 2 | 3>(0)
   const { $i18n } = useNuxtApp()
   const tokenWarningObj = useLocalStorage<Record<string, boolean>>(
     'tokenWarningNotice',
     {}
   )
+  const collected = shallowRef(false)
+
   const token = computed(() => tokenInfo.value?.token)
   const pairs = computed(() => tokenInfo.value?.pairs)
   const pairAddress = useSessionStorage('token_pairAddress', '')
@@ -110,9 +114,9 @@ export const useTokenStore = defineStore('token', () => {
     pairAddress.value = ''
   }
 
-  function _getTotalHolders() {
-    if (!route.params.id) return
-    getTotalHolders(route.params.id as string).then(res => {
+  function _getTotalHolders(tokenId: string) {
+    if (!tokenId) return
+    getTotalHolders(tokenId).then(res => {
       totalHolders.value = Array.isArray(res) ? res : []
       triggerRef(totalHolders)
     })
@@ -240,6 +244,15 @@ export const useTokenStore = defineStore('token', () => {
     }
   }
 
+  function _getXType(id?: string) {
+    getXType(id || route.params.id as string).then(res => {
+      twitterType.value = res.type || 0
+      console.log('twitterType', twitterType.value)
+    }).catch(() => {
+      twitterType.value = 0
+    })
+  }
+
   return {
     tokenInfo,
     tokenInfoExtra,
@@ -265,7 +278,10 @@ export const useTokenStore = defineStore('token', () => {
     warningStatus,
     tokenWarningObj,
     centerTopHeight,
-    commonHeight
+    commonHeight,
+    twitterType,
+    collected,
+    getXType: _getXType
   }
 })
 
