@@ -4,8 +4,6 @@ import {ElNotification} from 'element-plus'
 import {useStorage} from '@vueuse/core'
 import {bot_createSolTx, bot_createSwapEvmTx, bot_getTokenBalance} from '~/api/bot'
 import { formatBotGasTips } from '~/utils/bot'
-import type { Size } from '~/api/types/pump'
-import { getSwapSize } from '@/utils/index'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import useWalletSwap from './quickSwap/wallet'
 const { walletSwap, loadingWalletSwap } = useWalletSwap()
@@ -39,7 +37,7 @@ const loadingSwap = shallowRef(false)
 const visible = shallowRef(false)
 const message = shallowRef('')
 const noReminderQuickBuy = useStorage('noReminderQuickBuy', false)
-const emit = defineEmits(['submitSwap'])
+const emit = defineEmits(['submitSwap','jump'])
 
 function submitBotSwap() {
   emit('submitSwap')
@@ -168,7 +166,6 @@ async function submitSwap(amount: string) {
 
 const tokenStore = useTokenStore()
 const wsStore = useWSStore()
-
 function handleTxSuccess(res: any, _batchId: string) {
   if (res) {
     let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
@@ -185,7 +182,8 @@ function handleTxSuccess(res: any, _batchId: string) {
         }
         tokenStore.placeOrderSuccess++
         if (subscribeResult?.txList?.[0]?.success) {
-          ElNotification({type: 'success', message: t('tradeSuccess')})
+          ElNotification({ type: 'success', message: t('tradeSuccess') })
+          emit('jump')
         } else {
           handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
         }
@@ -274,7 +272,7 @@ async function getTokenBalance(chain: string) {
     class="flex items-center [&&]:px-4px"
     :class="classNames"
     style="--el-button-hover-bg-color:rgba(18, 184, 134, 0.3);--el-color-black: #12B886; --el-button-border-color: transparent; --el-button-hover-border-color: transparent;--el-button-disabled-text-color: #12B886;--el-button-disabled-border-color: transparent;--el-button-disabled-bg-color: #12B8861A;"
-    :style="{ 'font-size': getSwapSize(size as Size).text }"
+    :style="{ 'font-size': size }"
     @click.stop.prevent="submitBotSwap"
   >
     <Icon

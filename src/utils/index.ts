@@ -846,19 +846,20 @@ export function _isArray(val:any) {
 
 export function getSwapSize(type: Size):SizeObj {
   const obj:Record<Size, SizeObj> = {
-    small: {
+    mini: {
       flash:'6px',
-      amm: '10px',
       text: '10px'
+    },
+    small: {
+      flash:'8px',
+      text: '12px'
     },
     medium: {
       flash:'10px',
-      amm: '12px',
-      text: '12px'
+      text: '14px'
     },
     large: {
       flash:'12px',
-      amm: '16px',
       text: '16px'
     }
   }
@@ -979,18 +980,25 @@ export function getMedias(appendix: string | undefined,t:ReturnType<typeof useI1
   }
   return []
 }
-// type PlatformType = 'pump' | 'bonk' | 'moonshot' | 'raydium' | 'believe' | 'jupstudio' | 'moon_new' | 'cookingcity'
-// const pumpColorMap: Record<PlatformType, string> = {
-//   pump: '#55D592',
-//   bonk: '#FF5E1F',
-//   moonshot: '#DFFF17',
-//   raydium: '#FDB32C',
-//   believe: '#00E043',
-//   jupstudio: '#FEB069',
-//   moon_new: '#FF75FF',
-//   cookingcity: '#6C416F',
-// }
-type PlatformType = 'pump.fun' | 'letsbonk.fun' | 'dexscreener.com' | 'raydium.io' | 'believe.app' | 'jup.ag' | 'moonshot.com' | 'cookingcity'
+type PlatformsType = 'pump' | 'bonk' | 'moonshot' | 'raydium' | 'believe' | 'jupstudio' | 'moon_new' | 'cookingcity'| 'fourmeme' | 'bags' | 'heaven'
+const pumpColorsMap: Record<PlatformsType, string> = {
+  pump: '#55D592',
+  bonk: '#FF5E1F',
+  moonshot: '#DFFF17',
+  raydium: '#FDB32C',
+  believe: '#00E043',
+  jupstudio: '#FEB069',
+  moon_new: '#FF75FF',
+  cookingcity: '#6C416F',
+  fourmeme: '#6C416F',
+  bags: '#2ff86f',
+  heaven: '#906f3e',
+}
+export function getBgColor(platform: string): string {
+  return pumpColorsMap[platform as PlatformsType] || '#FFA622'
+}
+
+type PlatformType = 'pump.fun' | 'letsbonk.fun' | 'dexscreener.com' | 'raydium.io' | 'believe.app' | 'jup.ag' | 'moonshot.com' | 'cookingcity' | 'fourmeme'
 const pumpColorMap: Record<PlatformType, string> = {
   'pump.fun': '#55D592',
   'letsbonk.fun': '#FF5E1F',
@@ -1000,6 +1008,7 @@ const pumpColorMap: Record<PlatformType, string> = {
   'jup.ag': '#FEB069',
   'moonshot.com': '#FF75FF',
   cookingcity: '#6C416F',
+  fourmeme: '#6C416F',
 }
 export function getPumpColor(platform: string): string {
   return pumpColorMap[platform as PlatformType] || '#FFA622'

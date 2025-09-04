@@ -12,6 +12,7 @@
           @contextmenu="handleContextMenu($event, row)"
           @mouseenter="showPopover(row)"
           @mouseleave="hidePopover"
+          :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform] : '' }"
         >
           <div class="w-full relative">
             <div class="flex-start items-start">
@@ -327,7 +328,7 @@
                       class="iconfont icon-rug mr-4px text-14px vertical-middle color-[--third-text]"
                       name="custom:holders"
                     />
-                    <span class="color-[---main-text]">{{
+                    <span class="color-[---main-text]" :style="{ color: getDataColor('holders',row.holders) }">{{
                       formatNumber(row?.holders || 0, 2)
                     }}</span>
                   </div>
@@ -533,7 +534,7 @@
                 </div>
               </div>
             </div>
-            <div class="pump-right">
+            <div class="pump-right" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform] : '', 'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 2px 10px 0px #12B886': '0px 2px 10px 0px var(--border)') : ''}">
               <div
                 v-if="
                   (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
@@ -565,8 +566,7 @@
                       MC
                     </div>
                     <span
-                      class="color-#FFA622"
-                      :style="{ 'font-size': pumpSetting.fontSize_mc }"
+                      :style="{ 'font-size': pumpSetting.fontSize_mc, color: getDataColor('mc',row.market_cap) }"
                       >${{ formatNumber(row.market_cap || 0, 2) }}</span
                     >
                   </template>
@@ -581,7 +581,7 @@
               >
                 <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
                   <div class="mr-5px color-[--third-text]">V</div>
-                  <div class="color-[---main-text]">
+                  <div class="color-[---main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h) }">
                     ${{ formatNumber(row?.volume_u_24h || 0, 2) }}
                   </div>
                 </template>
@@ -592,7 +592,7 @@
                   </div>
                 </template>
               </div>
-              <div class="btns-swap flex-end mt-15px pr-12px">
+              <div class="btns-swap flex-end mt-15px pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform] : '' }">
                 <div
                   v-if="row?.state === 'migrating'"
                   style="
@@ -618,9 +618,11 @@
                   <span>Migrating...</span>
                 </div>
                 <QuickSwap
+                  v-if="parseInt(pumpSetting?.size_swap|| '0') > 0"
                   :quickBuyValue="quickBuyValue"
                   :row="row"
                   :size="pumpSetting.size_swap"
+                  @jump="jump(row)"
                 />
               </div>
             </div>
@@ -685,13 +687,17 @@ const props = defineProps({
     type: [String, Number],
     default: 'calc(100vh - 215px)',
   },
+  type: {
+    type: String,
+    default: () => '',
+  },
 })
 
 const showPop = ref(false)
 const selected = ref('')
 const btnRefs = ref<Record<string, HTMLElement | null>>({})
 const currentBtnRef = ref<HTMLElement | null>(null)
-const { tableList, quickBuyValue, loading, isOut, isSoon } = toRefs(props)
+const { tableList, quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
 const router = useRouter()
 const { token_logo_url } = useConfigStore()
 const globalStore = useGlobalStore()
@@ -797,6 +803,55 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
     },
   })
 }
+function getDataColor(type: string, num: number) {
+  if (type === 'mc') {
+    const middleSize = pumpSetting.value.data?.mc?.middleSize ?? 0
+    const minSize = pumpSetting.value.data?.mc?.minSize ?? 0
+    if (Number(num) > middleSize) {
+      return pumpSetting.value.data?.mc?.maxColor || ''
+    } else if (Number(num) > minSize) {
+      return pumpSetting.value.data?.mc?.middleColor || ''
+    } else {
+      return pumpSetting.value.data?.mc?.minColor || ''
+    }
+  }
+  if (type === 'vol') {
+    const middleSize = pumpSetting.value.data?.vol?.middleSize ?? 0
+    const minSize = pumpSetting.value.data?.vol?.minSize ?? 0
+    if (Number(num) > middleSize) {
+      return pumpSetting.value.data?.vol?.maxColor || ''
+    } else if (Number(num) > minSize) {
+      return pumpSetting.value.data?.vol?.middleColor || ''
+    } else {
+      return pumpSetting.value.data?.vol?.minColor || ''
+    }
+  }
+  if (type === 'holders') {
+    const middleSize = pumpSetting.value.data?.holders?.middleSize ?? 0
+    const minSize = pumpSetting.value.data?.holders?.minSize ?? 0
+    if (Number(num) > middleSize) {
+      return pumpSetting.value.data?.holders?.maxColor || ''
+    } else if (Number(num) > minSize) {
+      return pumpSetting.value.data?.holders?.middleColor || ''
+    } else {
+      return pumpSetting.value.data?.holders?.minColor || ''
+    }
+  }
+}
+function jump (row: { target_token: string; chain: string }) {
+  if (pumpSetting.value.jump == 'open') {
+  router.push({
+    name: 'token-id',
+    params: { id: row.target_token + '-' + row.chain },
+  })
+  } else  if(pumpSetting.value.jump == 'open_jump'){
+    const routeData = router.resolve({
+      name: 'token-id',
+      params: { id: row.target_token + '-' + row.chain },
+    })
+    window.open(routeData.href, '_blank')
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -809,6 +864,7 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
     align-items: center;
     padding: 15px 0 11px 12px;
     border-top: 1px solid var(--main-input-button-bg);
+    border-radius: 4px;
     &:hover {
       background-color: var(--main-list-hover);
       .black-container {
@@ -823,14 +879,22 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
           background-color: var(--main-list-hover);
         }
       }
+      .bg-btn {
+        border: 0.5px solid var(--main-input-button-bg);
+        background: var(--secondary-bg);
+      }
     }
     .pump-right {
       // box-shadow: -2px 0px 4px 0px #00000099;
       background: var(--secondary-bg);
+      min-width: 160px;
       position: absolute;
       right: 0;
-      bottom: 6px;
+      bottom: -2px;
       padding-left: 12px;
+      padding-bottom: 5px;
+      border: 1px solid;
+
       .btns-swap{
         background-color: var(--secondary-bg);
         position: relative;
@@ -943,8 +1007,6 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
 }
 .bg-btn {
   --uno: rounded-2px mr-4px flex items-center justify-center min-w-16px p-4px;
-  border: 0.5px solid var(--main-input-button-bg);
-  background: var(--secondary-bg);
 }
 .time {
   color: #959a9f;
