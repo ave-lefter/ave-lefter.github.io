@@ -23,6 +23,7 @@ type TFormatTxsParams = {
   side: 'buy' | 'sell'
   type: number | string
   name:string
+  bucketTime:number
 }
 
 export function useKlineMarks() {
@@ -151,28 +152,30 @@ export function useKlineMarks() {
     type: keyof typeof markTabsChecked.value,
     name: string
   ) {
-    const result: Mark[] = []
+    const result: (Mark & { tx_time: number,user_address:string })[] = []
     const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
-    // const interval1 = Number(interval)
+    const interval1 = Number(interval)
     for(const item of data){
-      // const bucketTime = Math.floor(item.time / interval1) * interval1
+      const bucketTime = Math.floor(item.time / interval1) * interval1
       const buyArr = formatTxsArr({
         urlPrefix,
         data: item.buy || [],
         side: 'buy',
         type,
-        name
+        name,
+        bucketTime
       })
       const sellArr = formatTxsArr({
         urlPrefix,
         data: item.sell || [],
         side: 'sell',
         type,
-        name
+        name,
+        bucketTime
       })
       result.push(...buyArr, ...sellArr)
     }
-    return result
+    return result.sort((a, b) => a.tx_time - b.tx_time)
   }
 
   function formatTxsArr({
@@ -180,7 +183,8 @@ export function useKlineMarks() {
     side,
     type,
     urlPrefix,
-    name
+    name,
+    bucketTime
   }:TFormatTxsParams) {
     return data.map(el=>{
       const isBuy = side === 'buy'
@@ -193,7 +197,7 @@ export function useKlineMarks() {
 
       return {
         id: `${el.tx_time}-${side}-${type}`,
-        time: el.tx_time,
+        time: bucketTime,
         color: { background: 'transparent', border: 'transparent' },
         imageUrl,
         label: side === 'buy' ? 'B' : 'S',
@@ -201,14 +205,15 @@ export function useKlineMarks() {
         minSize: 20,
         hoveredBorderWidth: 0,
         borderWidth: 0,
-        text:getTooltipTxt(name, type, el, isBuy),
+        text:getTooltipTxt(name, type, el, isBuy,bucketTime),
         showLabelWhenImageLoaded: false,
-        user_address:el.wallet_address
+        user_address:el.wallet_address,
+        tx_time:el.tx_time
       }
     })
   }
 
-  function getTooltipTxt(name:string, type:number|string, el:IBuySellData,isBuy:boolean) {
+  function getTooltipTxt(name:string, type:number|string, el:IBuySellData,isBuy:boolean,bucketTime:number) {
     const swapType = isBuy ? t('bought') : t('sold')
     const formatedName = name?.replace(/\(.*\)$/, '')
     // 处理聪明钱
@@ -220,7 +225,7 @@ export function useKlineMarks() {
         ${flowText}: ${formatNumber(el.volume, 2)}(${formatNumber(el.txns, 0)})
         ${AvgTxt}: $${formatNumber(el.volume / (el.amount || 1), 4)}
         ${swapType}: ${formatNumber(el.volume, 2)}
-        ${formatDate(el.tx_time, 'YYYY-MM-DD HH:mm')}
+        ${formatDate(bucketTime, 'YYYY-MM-DD HH:mm')}
       `
     }
     return `${el.wallet_logo?.name || `${formatedName}`} ${swapType}
@@ -228,7 +233,7 @@ export function useKlineMarks() {
         ${t('amountU')}: $${formatNumber(el.volume, 2)}
         ${t('price')}: $${formatNumber(el.volume / (el.amount || 1), 4)}
         ${t('Txs')}: ${formatNumber(el.txns)}
-        ${formatDate(el.tx_time, 'YYYY-MM-DD HH:mm')}
+        ${formatDate(bucketTime, 'YYYY-MM-DD HH:mm')}
         `
   }
 
