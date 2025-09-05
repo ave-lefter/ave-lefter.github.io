@@ -200,7 +200,7 @@ export function useKlineMarks() {
       let borderColor = 'transparent'
       let borderWidth = 0
       if(isKOL){
-        borderWidth = 2
+        borderWidth = 4
         if(isBuy){
           borderColor = '#12B886'
         }else {
