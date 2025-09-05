@@ -33,7 +33,14 @@ const filteredTrendList = computed(() => {
     i =>
       (i.is_target && (i.event_type == 'swap_buy' || i.event_type == 'swap_sell')) ||
       !(i.event_type == 'swap_buy' || i.event_type == 'swap_sell')
-  ).filter(i => NATIVE_TOKENS.findIndex(y => y?.toLowerCase() == i.token?.toLowerCase()) == -1)
+  ).filter(el=>{
+    const nativeTokens = NATIVE_TOKENS.map(native => native.toLowerCase())
+    // 当前查看的是主币的持币详情
+    const isNativeTokenDetail = tokenDetailStore.tokenInfo ? nativeTokens.includes(tokenDetailStore.tokenInfo.address.toLowerCase()) :false
+    //  当前列表项中是主币
+    const isMainToken = NATIVE_TOKENS.includes(el.token.toLowerCase())
+    return (isNativeTokenDetail && isMainToken) || (!isNativeTokenDetail && !isMainToken)
+  })
 
 })
 const walletAddress = computed(() => botStore.evmAddress || walletStore.address)
