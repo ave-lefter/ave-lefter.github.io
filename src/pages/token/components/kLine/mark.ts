@@ -177,7 +177,7 @@ export function useKlineMarks() {
       })
       result.push(...buyArr, ...sellArr)
     }
-    return result.sort((a, b) => a.tx_time - b.tx_time)
+    return result
   }
 
   function formatTxsArr({
@@ -190,23 +190,34 @@ export function useKlineMarks() {
   }:TFormatTxsParams) {
     return data.map(el=>{
       const isBuy = side === 'buy'
+      const isKOL = type === '31'
       let imageUrl = isBuy
       ? `${urlPrefix}signals/marks/mark-buy-${type}.png`
       : `${urlPrefix}signals/marks/mark-sell-${type}.png`
       if(el.wallet_logo?.logo && el.wallet_logo.logo.includes('.webp')){
         imageUrl = el.wallet_logo.logo
       }
+      let borderColor = 'transparent'
+      let borderWidth = 0
+      if(isKOL){
+        borderWidth = 2
+        if(isBuy){
+          borderColor = '#12B886'
+        }else {
+          borderColor = '#F6465D'
+        }
+      }
 
       return {
         id: `${el.tx_time}-${side}-${type}`,
         time: bucketTime,
-        color: { background: 'transparent', border: 'transparent' },
+        color: { background: 'transparent', border: borderColor },
         imageUrl,
-        label: side === 'buy' ? 'B' : 'S',
+        label: isBuy ? 'B' : 'S',
         labelFontColor: '#fff',
         minSize: 20,
-        hoveredBorderWidth: 0,
-        borderWidth: 0,
+        hoveredBorderWidth: borderWidth,
+        borderWidth: borderWidth,
         text:getTooltipTxt(name, type, el, isBuy,bucketTime),
         showLabelWhenImageLoaded: false,
         user_address:el.wallet_address,
