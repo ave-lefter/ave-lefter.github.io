@@ -16,6 +16,7 @@ export function onRequest({ options, request }: MyFetchContext) {
   }
   // headers.lang = language
   options.headers.set('lang', language)
+  options.headers.set('lang-zone', localStorage.getItem('language') || 'en')
 
   const url = request as string
   // 请求头 authorization
