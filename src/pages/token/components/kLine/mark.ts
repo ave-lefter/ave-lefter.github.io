@@ -200,7 +200,7 @@ export function useKlineMarks() {
       let borderColor = 'transparent'
       let borderWidth = 0
       if(isKOL){
-        borderWidth = 4
+        borderWidth = 2
         if(isBuy){
           borderColor = '#12B886'
         }else {
@@ -215,7 +215,7 @@ export function useKlineMarks() {
         imageUrl,
         label: isBuy ? 'B' : 'S',
         labelFontColor: '#fff',
-        minSize: 20,
+        minSize: el.volume >= 2000 ? 30 : 25,
         hoveredBorderWidth: borderWidth,
         borderWidth: borderWidth,
         text:getTooltipTxt(name, type, el, isBuy,bucketTime),
