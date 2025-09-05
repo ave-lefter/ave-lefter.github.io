@@ -116,9 +116,9 @@ function setActiveTab(val: string) {
 const removeLeadingMinus = (str: string) => str.startsWith('-') ? str.slice(1) : str
 
 const getWalletTxData = async () => {
-  const supportedChains = ['solana', 'bsc']
+  // const supportedChains = ['solana', 'bsc']
   const chain = walletStore.address ? walletStore.chain : activeTab.value
-  if (!supportedChains.includes(chain)) {
+  if (!SupportFullDataChain.includes(chain)) {
     walletTxData.value = null
     return
   }
