@@ -6,7 +6,7 @@
       :data="tableData"
       fit
       style="width: 100%"
-      cell-class-name="color-[--d-CCC-l-333]"
+      cell-class-name="color-[--secondary-text]"
       row-class-name="cursor-pointer"
       header-row-class-name="text-12px"
       @row-click="jumpTokenDetail"
@@ -29,13 +29,13 @@
             v-model:visible="filterForm.time.visible"
             :width="430"
             trigger="click"
-            popper-style="--el-text-color-primary:--d-666-l-999"
+            popper-style="--el-text-color-primary:--third-text"
           >
             <template #reference>
               <Icon
                 name="custom:filter"
                 class="cursor-pointer text-10px ml-3px"
-                :class="trendQuery.block_time_min && trendQuery.block_time_max?'color-[#3F80F7]':'color-[--d-666-l-999]'"
+                :class="trendQuery.block_time_min && trendQuery.block_time_max?'color-[--primary-color]':'color-[--third-text] hover:color-[--secondary-text]'"
                 @click.stop
               />
             </template>
@@ -66,16 +66,16 @@
                     <div class="flex flex-col items-center justify-center ml-5px">
                       <i
                           :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer ${
-                            filterForm.time.sort_dir === 'asc' ? 'border-b-[--b-F5F5F5-l-333]'
-                              : 'border-b-[--d-666-l-999]'
+                            filterForm.time.sort_dir === 'asc' ? 'border-b-[--main-text]'
+                              : 'border-b-[--third-text]'
                           }
                           `"
                           @click.stop="localSortChange('block_time', 'asc')"
                       />
                       <i
                           :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer ${
-                             filterForm.time.sort_dir === 'desc' ? 'border-t-[--d-F5F5F5-l-333]'
-                              : 'border-t-[--d-666-l-999]'
+                             filterForm.time.sort_dir === 'desc' ? 'border-t-[--main-text]'
+                              : 'border-t-[--third-text]'
                           }
                             `"
                           @click.stop="localSortChange('block_time', 'desc')"
@@ -84,7 +84,6 @@
                   </div>
                   <el-button
                       class="h-30px m-l-auto min-w-70px"
-                      :color="themeStore.isDark ? '#333':'#F2F2F2'"
                     @click.stop="resetTime"
                   >
                     {{ $t('reset') }}
@@ -102,7 +101,7 @@
           </el-popover>
         </template>
         <template #default="{ row }">
-          <span class="color-[--d-666-l-999]">
+          <span class="color-[--third-text]">
             {{ formatDate(row.block_time, 'YYYY-MM-DD HH:mm:ss') }}
           </span>
         </template>
@@ -120,7 +119,7 @@
               <Icon
                 name="custom:filter"
                 class="cursor-pointer text-10px ml-3px"
-                :class="!trendQuery.checkAll ? 'color-[#3F80F7]':'color-[--d-666-l-999]'"
+                :class="!trendQuery.checkAll ? 'color-[--primary-color]':'color-[--third-text]'"
               />
             </template>
             <template #default>
@@ -151,7 +150,6 @@
                 <el-button
                   size="default"
                   class="h-30px flex-1"
-                  :color="themeStore.isDark ? '#333':'#F2F2F2'"
                   @click.stop="filterForm.type.visible = false"
                 >
                   {{ $t('cancel') }}
@@ -181,7 +179,7 @@
 
       <el-table-column align="right" :label="$t('price')">
         <template #default="{ row }">
-          <span class="color-[--d-666-l-999]">
+          <span class="color-[--third-text]">
             ${{ row?.token_price_u > 0 ? formatNumber(row?.token_price_u || 0, 2) : 0 }}
           </span>
         </template>
@@ -219,7 +217,7 @@
               <Icon
                 name="custom:filter"
                 class="cursor-pointer text-10px ml-3px"
-                :class="trendQuery.volume_min && trendQuery.volume_max?'color-[#3F80F7]':'color-[--d-666-l-999]'"
+                :class="trendQuery.volume_min && trendQuery.volume_max?'color-[--primary-color]':'color-[--third-text]'"
               />
             </template>
             <template #default>
@@ -239,7 +237,6 @@
               </div>
               <div class="mt-10px flex">
                 <el-button
-                    :color="themeStore.isDark ? '#333':'#F2F2F2'"
                     class="h-30px m-l-auto min-w-70px flex-1"
                   @click="resetPrice"
                   >{{ $t('reset') }}
@@ -263,7 +260,7 @@
           <a class="ml-5 a-gray font-16" href="javascript:;">
             <Icon
               name="custom:browser"
-              class="text-16px color-[--d-666-l-999] cursor-pointer"
+              class="text-16px color-[--third-text] cursor-pointer"
               @click.stop.self="goLink(row)"
             />
           </a>

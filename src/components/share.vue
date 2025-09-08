@@ -127,11 +127,11 @@ function getRandom(min: number, max: number) {
 
 function getColorClass(val: string) {
   if (Number(val) > 0) {
-    return 'color-#12b886!'
+    return 'color-[--up-color]!'
   } else if (Number(val) < 0) {
-    return 'color-#ff646d!'
+    return 'color-[--down-color]!'
   } else {
-    return 'color-#848E9C!'
+    return 'color-[--third-text]!'
   }
 }
 </script>

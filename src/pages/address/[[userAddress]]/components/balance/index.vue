@@ -1,12 +1,12 @@
 <template>
   <div class="">
     <div class="w-full px-20px font-500 text-16px">
-      <div class=" my-10px mb-0">{{ $t('balanceOverview') }}</div>
+      <div class=" my-10px mb-0 color-[--main-text]">{{ $t('balanceOverview') }}</div>
       <div class="mb-10px">
         <label
           v-if="isHide"
           for="showSmallAssets"
-          class="block text-12px text-#848e9c mt-20px hover:cursor-pointer"
+          class="block text-12px color-[--primary-color] mt-20px hover:cursor-pointer"
         >
           <input
             id="showSmallAssets"
@@ -21,7 +21,7 @@
         <label
           v-else
           for="hideSmallAssets"
-          class="block text-12px text-#848e9c mt-20px cursor-pointer"
+          class="block text-12px color-[--third-text] mt-20px cursor-pointer"
         >
           <input
             id="hideSmallAssets"
@@ -67,7 +67,7 @@ input[type='checkbox']::after {
 input[type='checkbox']:checked::after {
   color: #eaecef;
   content: '✓';
-  background-color: #3f80f7;
+  background-color: var(--primary-color);
   border-radius: 0;
 }
 </style>

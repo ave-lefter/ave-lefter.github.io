@@ -51,18 +51,18 @@ async function confirm() {
       class="dialog !w-540px text-12px"
     >
       <div>
-        <label class="color-[--d-333-l-f5f5f5] leading-18px ">{{ $t('TokenName') }}</label>
+        <div class="h-1px bg-[--dialog-divider] mx--20px mb-20px"/>
+        <label class="color-[--main-text] leading-18px ">{{ $t('TokenName') }}</label>
         <div class="mt-10px mb-20px p-10px h-36px rounded-4px color-[--third-text] bg-[--border]">
           {{ row.symbol }}
         </div>
-        <label class="color-[--d-333-l-f5f5f5] leading-18px">{{ $t('ContractAddress') }}</label>
+        <label class="color-[--main-text] leading-18px">{{ $t('ContractAddress') }}</label>
         <div class="mt-10px mb-20px p-10px h-36px rounded-4px color-[--third-text] bg-[--border]">
           {{ row.token }}
         </div>
         <div class="flex items-center">
           <el-button
             :key="themeStore.theme"
-            color="var(--border)"
             size="default"
             class="flex-1 h-40px"
             @click.stop="hideTokenVisible=false">
@@ -78,7 +78,7 @@ async function confirm() {
             {{ $t('Hide') }}
           </el-button>
         </div>
-        <div class="color-#FFA622 text-12px mt-20px">
+        <div class="color-[--yellow] text-12px mt-20px">
           *{{ $t('BlockTips') }}
         </div>
       </div>
