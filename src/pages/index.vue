@@ -30,6 +30,8 @@ const components = {
   volume: activityComponent,
   heaven_pump: pumpComponent,
 }
+const walletStore = useWalletStore()
+const botStore = useBotStore()
 const activeTab = useStorage<keyof typeof components>('rankActiveTab', 'hot')
 const activeSubTab = useStorage('rankSubTab','pump_in_hot')
 const activeChain = useStorage('rankChain', 'AllChains')
@@ -37,9 +39,13 @@ const chains = shallowRef<IGetTreasureConfig[]>([])
 const categories = computed(() => {
   return chains.value.find((el) => el.net_name === activeChain.value)?.categories || []
 })
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
 
 onMounted(() => {
   _getTreasureConfig()
+  useGlobalStore().getUserFavoriteGroups(walletAddress.value)
   trackRef({category: 'view', extra: 'home(pro.ave.ai)'})
 })
 const wsStore = useWSStore()

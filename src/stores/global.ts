@@ -5,6 +5,7 @@ import { _getFollowsNum } from '@/api/follow'
 
 import type{ GetHotTokensResponse } from '@/api/token'
 import type { ILatestNotice } from '~/api/user'
+import { getUserFavoriteGroups, type GetUserFavoriteGroupsResponse } from '~/api/fav'
 export const useGlobalStore = defineStore('global', () => {
   const wsStore = useWSStore()
   const localeStore = useLocaleStore()
@@ -71,6 +72,7 @@ export const useGlobalStore = defineStore('global', () => {
     quickBuyValue: '0.01',
   })
   const latestNotice = shallowRef<ILatestNotice>({})
+  const userFavoriteGroups = shallowRef<GetUserFavoriteGroupsResponse[]>([])
   const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
@@ -140,6 +142,12 @@ export const useGlobalStore = defineStore('global', () => {
     })
   }
 
+  function _getUserFavoriteGroups(walletAddress:string) {
+    getUserFavoriteGroups(walletAddress).then((res) => {
+      userFavoriteGroups.value = (res || []).filter((el) => !!el.name)
+    })
+  }
+
   return {
     lang: computed(() => localeStore.locale),
     token_logo_url: computed(() => configStore.token_logo_url),
@@ -160,6 +168,8 @@ export const useGlobalStore = defineStore('global', () => {
     headFollowsNum,
     getFollowsNum,
     latestNotice,
-    pnlTrackerVisible
+    pnlTrackerVisible,
+    userFavoriteGroups,
+    getUserFavoriteGroups:_getUserFavoriteGroups
   }
 })

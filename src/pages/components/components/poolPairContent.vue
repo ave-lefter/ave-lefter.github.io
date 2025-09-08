@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import { addFavorite, addFavoriteGroup } from '~/api/fav'
 import XIcon from '~/components/xPopup/xIcon.vue'
 
 const emit = defineEmits(['collect','toggleKline'])
 const rankKlineStore = useRankKlineStore()
+const walletStore = useWalletStore()
+const botStore = useBotStore()
 const { t } = useI18n()
 const props = defineProps<{
   pageNO: number
@@ -13,6 +16,10 @@ const props = defineProps<{
   activeKline?:boolean
   enableKline?:boolean
 }>()
+
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
 
 function getSymbol(row, shouldReverse = false) {
   const isZeroAddress = row.target_token == row.token0_address
@@ -76,6 +83,23 @@ const created_at_unix = computed(() => {
 function toggleKline() {
   emit('toggleKline',props.row)
 }
+
+function newGroupAndCollect(newGroupName:string) {
+  addFavoriteGroup(newGroupName,walletAddress.value).then(res=>{
+    if(res){
+      addFavorite(props.row.id, walletAddress.value, Number(res)).then(() => {
+        ElMessage.success(t('collected'))
+        globalStore.userFavoriteGroups.push({
+          group_id: Number(res),
+          name: newGroupName,
+        })
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    }
+  }).catch(console.log)
+}
 </script>
 
 <template>
@@ -100,12 +124,8 @@ function toggleKline() {
       class="text-right text-10px"
       >#{{ (pageNO - 1) * pageSize + rowIndex + 1 }}</span
     >
-    <div class="flex items-center" @click.stop="emit('collect', rowIndex, row)">
-      <Icon
-        name="custom:star"
-        class="text-16px cursor-pointer ml-5px mr-12px"
-        :class="row.is_fav ? 'color-[--yellow]' : 'color-[--icon-color]'"
-      />
+    <div class="flex items-center">
+      <Collect :iconClass="`text-16px cursor-pointer ml-5px mr-12px`" :isCollected="row.is_fav" :userFavoriteGroups="globalStore.userFavoriteGroups" @collect="emit('collect', rowIndex, row)" @newGroupAndCollect="newGroupAndCollect"/>
     </div>
     <div class="flex items-center gap-8px">
       <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
