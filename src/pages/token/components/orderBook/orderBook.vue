@@ -169,11 +169,11 @@
                       :show-address="!(row?.newTags?.length > 1)" :chain="row.chain" :wallet_logo="row.wallet_logo"
                       addressClass="inline-block truncate max-w-full"
                       :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
-                      class="color-[--d-A9B0BC-l-566275] truncate min-w-0 text-xs sm:text-sm"
+                      class="color-[--d-A9B0BC-l-566275] truncate min-w-0 !text-12px"
                       :mouseoverAddress="e => openMarkerTooltip(row, e)" :canEdit="false"
                       @update-remark="updateRemark" />
                     <div v-if="row.count && row.count > 1"
-                      class="color-[--d-A9B0BC-l-566275] text-xs ml-2px whitespace-nowrap">
+                      class="color-[--d-A9B0BC-l-566275] !text-12px ml-2px whitespace-nowrap">
                       ({{ row.count }})
                     </div>
                   </div>
