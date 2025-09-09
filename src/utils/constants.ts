@@ -99,6 +99,7 @@ export const ProvideType = {
   HOT_TOKENS: 'hot-tokens',
 }
 export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer']
+export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
 
 export const defaultPaginationParams = {
   pageNO: 1,
