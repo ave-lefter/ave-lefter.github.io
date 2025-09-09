@@ -224,7 +224,8 @@ onMounted(() => {
 
 <template>
   <div class="flex-1 h-[calc(100%-76px)] flex flex-col">
-    <el-table v-loading="loading" class="mt-12px" :height="pageData.total > 50 ? 'calc(100% - 84px)' : '100%'"
+    <el-table
+v-loading="loading" class="mt-12px" :height="pageData.total > 50 ? 'calc(100% - 84px)' : '100%'"
       row-class-name="group" :data="tableList" fit @sort-change="handleSortChange" @row-click="tableRowClick">
       <template #empty>
         <div v-if="botStore.evmAddress || walletStore.address">
@@ -321,7 +322,7 @@ class="flex items-center color-[var(--d-F5F5F5-l-333)]"
               {{ t('copyTrade') }}
             </a>
             <div
-              v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
+              v-if="SupportMonitorChain.includes(row?.user_chain)"
               class="flex items-center mr-12px cursor-pointer" @click="handleMonitor(row)">
               <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-12px mr-5px  mb--1px color-#999 group-hover:color-#3F80F7"/>
               <Icon v-else name="custom:monitor-icon" class="text-15px mr-2px mb-1px color-[var(--d-CCC-l-666)] group-hover:color-#3F80F7"/>
