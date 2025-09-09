@@ -8,6 +8,7 @@ import type { Size } from '~/api/types/pump'
 import { getSwapSize } from '@/utils/index'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import useWalletSwap from './quickSwap/wallet'
+import { recordTxV2, updateTxV2 } from '~/api/tracking'
 const { walletSwap, loadingWalletSwap } = useWalletSwap()
 
 const {t} = useI18n()
@@ -176,6 +177,17 @@ function handleTxSuccess(res: any, _batchId: string) {
       tokenStore.placeOrderUpdate++
       loadingSwap.value = false
     }, 500)
+    const chain = props.row.chain
+    const txInfo: any = res?.[0] || {}
+    recordTxV2({
+      txInfo,
+      chain: chain,
+      destination: chain === 'solana' ? '/botapi/swap/createSolTx' : '/botapi/swap/createSwapEvmTx' ,
+      type: 10
+    })
+    const batchIdObj = {
+      [txInfo?.batchId]: txInfo?.id
+    }
     const unwatch = watch(() => wsStore.wsResult.tgbot, (subscribeResult) => {
       const batchId = subscribeResult.batchId
       if (batchId === _batchId) {
@@ -186,6 +198,8 @@ function handleTxSuccess(res: any, _batchId: string) {
         tokenStore.placeOrderSuccess++
         if (subscribeResult?.txList?.[0]?.success) {
           ElNotification({type: 'success', message: t('tradeSuccess')})
+          const txInfo = subscribeResult?.txList?.[0]
+          updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
         } else {
           handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
         }

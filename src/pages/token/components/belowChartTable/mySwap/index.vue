@@ -116,9 +116,9 @@ function setActiveTab(val: string) {
 const removeLeadingMinus = (str: string) => str.startsWith('-') ? str.slice(1) : str
 
 const getWalletTxData = async () => {
-  const supportedChains = ['solana', 'bsc']
+  // const supportedChains = ['solana', 'bsc']
   const chain = walletStore.address ? walletStore.chain : activeTab.value
-  if (!supportedChains.includes(chain)) {
+  if (!SupportFullDataChain.includes(chain)) {
     walletTxData.value = null
     return
   }
@@ -226,7 +226,7 @@ onActivated(() => {
     </div>
 
     <!-- 顶部交易统计区域 -->
-    <div v-if="activeTab !== 'xlayer'" class="transaction-stats">
+    <div class="transaction-stats">
       <div class="stat-item">
         <div class="stat-label text-[--d-666-l-999]">{{ t('balance1') }}</div>
         <div class="stat-value table-field-text text-[var(--d-999-l-959A9F)]">${{ formatNumber(balance, 2) }}</div>

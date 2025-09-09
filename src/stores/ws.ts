@@ -13,6 +13,7 @@ export const useWSStore = defineStore('ws', () => {
   const isConnected = shallowRef(false)
   const botSwapStore = useBotSwapStore()
   const globalStore = useGlobalStore()
+  const botStore = useBotStore()
   // const route = useRoute()
 
   // const tokenStore = useTokenStore()
@@ -52,7 +53,10 @@ export const useWSStore = defineStore('ws', () => {
       const { event, data } = msg
       if (event === WSEventType.TGBOT) {
         wsResult[event] = data?.msg
-      } else if (event === WSEventType.MONITOR) {
+      }else if (event === WSEventType.ASSET) {
+        wsResult[event] = data?.msg
+        botStore.updateBalance(data)
+      }else if (event === WSEventType.MONITOR) {
         wsResult[event] = data?.msg
       } else if (event === WSEventType.TX) {
         const tx: WSTx = data?.tx

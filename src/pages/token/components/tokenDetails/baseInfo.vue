@@ -15,6 +15,8 @@ import BigNumber from 'bignumber.js'
 
 const tokenDetailStore = useTokenDetailsStore()
 const botStore = useBotStore()
+const walletStore = useWalletStore()
+const globalStore = useGlobalStore()
 const {t} = useI18n()
 const route = useRoute()
 const listQuery = shallowRef({
@@ -33,14 +35,17 @@ const filteredTrendList = computed(() => {
     i =>
       (i.is_target && (i.event_type == 'swap_buy' || i.event_type == 'swap_sell')) ||
       !(i.event_type == 'swap_buy' || i.event_type == 'swap_sell')
-  ).filter(i => {
-    return NATIVE_TOKENS.findIndex(y => {
-      // 当前不是主币那么才过滤
-      return y?.toLowerCase() != address?.toLowerCase() && y?.toLowerCase() == i.token?.toLowerCase()
-    }) == -1
+  ).filter(el=>{
+    const nativeTokens = NATIVE_TOKENS.map(native => native.toLowerCase())
+    // 当前查看的是主币的持币详情
+    const isNativeTokenDetail = tokenDetailStore.tokenInfo ? nativeTokens.includes(tokenDetailStore.tokenInfo.address.toLowerCase()) :false
+    //  当前列表项中是主币
+    const isMainToken = NATIVE_TOKENS.includes(el.token.toLowerCase())
+    return (isNativeTokenDetail && isMainToken) || (!isNativeTokenDetail && !isMainToken)
   })
 
 })
+const walletAddress = computed(() => botStore.evmAddress || walletStore.address)
 const listStatus = ref({
   loading: false,
   finished: false,
@@ -79,7 +84,7 @@ function _getTokenStatistics() {
   const {chain, address} = tokenDetailStore.tokenInfo!
   const data = {
     user_address: tokenDetailStore.user_address,
-    self_address: botStore.evmAddress,
+    self_address: walletAddress.value,
     token: address,
     chain
   }
@@ -197,6 +202,7 @@ const collect = async () => {
         group: form.group,
         is_monitored: form.is_monitored,
       }).then((res) => {
+        globalStore.getFollowsNum()
         // getList()
         _getTokenStatistics()
         return Promise.resolve(res)
@@ -212,6 +218,7 @@ const collect = async () => {
     user_address: tokenDetailStore.user_address,
     user_chain: tokenDetailStore.tokenInfo!.chain
   }).then(() => {
+    globalStore.getFollowsNum()
     ElMessage.success( t('attention1Canceled'))
     // getList()
      _getTokenStatistics()
