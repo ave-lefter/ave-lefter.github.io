@@ -257,7 +257,7 @@ export function getKlineProfilingTagsV2(data:{
     return Promise.resolve([])
   }
   const { $api } = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v2api/token_info/v1/kline/profiling_tags', {
+  return $api('/v2api/token_info/v1/kline/profiling_tags', {
     method: 'get',
     query: {
       ...data,
