@@ -226,21 +226,24 @@ export function getKlineProfilingTags(data: {
   })
 }
 
-export interface IGetKlineProfilingTagsV2Item{
-  sell?: IBuySellData[]
-  buy?: IBuySellData[]
-  time: number
+export interface IGetKlineProfilingTagsV2Item {
+  holders: Holder[];
+  time:    number;
 }
 
-export interface IBuySellData{
-  amount: number
-  // 交易次数
-  txns: number
-  // 交易额
-  volume: number
-  wallet_address:string
-  wallet_logo:WalletLogo
-  tx_time:number
+export interface Holder {
+  buy?:            HolderBuy;
+  remark:         string;
+  sell?:           HolderBuy;
+  wallet_address: string;
+  wallet_logo:    WalletLogo;
+}
+
+export interface HolderBuy {
+  amount:  string;
+  tx_time: number;
+  txns:    string;
+  volume:  string;
 }
 // 获取 kline 画像
 export function getKlineProfilingTagsV2(data:{
@@ -709,7 +712,7 @@ export interface GetTokenStatisticsResponse {
   main_token_balance_amount: string;
 }
 
-interface WalletLogo {
+export interface WalletLogo {
   name: string;
   url: string;
   logo: string;

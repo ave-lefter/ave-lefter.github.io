@@ -2,7 +2,7 @@
 import { filterLanguage } from './utils'
 import { useLocalStorage, type RemovableRef } from '@vueuse/core'
 import type { IChartingLibraryWidget, Mark } from '~/types/tradingview/charting_library'
-import { getUserKlineTxTags, getKlineProfilingTagsV2, type IGetKlineProfilingTagsV2Item, type IBuySellData } from '@/api/token'
+import { getUserKlineTxTags, getKlineProfilingTagsV2, type IGetKlineProfilingTagsV2Item,  type HolderBuy, type WalletLogo } from '@/api/token'
 import type { SimpleWSTx, WSTx } from './types'
 
 type TradeSide = {
@@ -17,9 +17,11 @@ type TradeData = {
   sell?: TradeSide
 }
 
+type HolderBuyData = HolderBuy & {wallet_address:string,wallet_logo:WalletLogo}
+
 type TFormatTxsParams = {
   urlPrefix:string
-  data: IBuySellData[]
+  el: HolderBuyData
   side: 'buy' | 'sell'
   type: number | string
   name:string
@@ -159,36 +161,41 @@ export function useKlineMarks() {
     const interval1 = Number(interval)
     for(const item of data){
       const bucketTime = Math.floor(item.time / interval1) * interval1
-      const buyArr = formatTxsArr({
-        urlPrefix,
-        data: item.buy || [],
-        side: 'buy',
-        type,
-        name,
-        bucketTime
-      })
-      const sellArr = formatTxsArr({
-        urlPrefix,
-        data: item.sell || [],
-        side: 'sell',
-        type,
-        name,
-        bucketTime
-      })
-      result.push(...buyArr, ...sellArr)
+      for(const holder of item.holders){
+        const {wallet_address,wallet_logo} = holder
+        if(holder.buy){
+          result.push(formatTxsObj({
+            el:{...holder.buy,wallet_address,wallet_logo},
+            side:'buy',
+            type,
+            name,
+            bucketTime,
+            urlPrefix
+          }))
+        }
+        if(holder.sell){
+          result.push(formatTxsObj({
+            el:{...holder.sell,wallet_address,wallet_logo},
+            side:'sell',
+            type,
+            name,
+            bucketTime,
+            urlPrefix
+          }))
+        }
+      }
     }
     return result
   }
 
-  function formatTxsArr({
-    data,
+  function formatTxsObj({
+    el,
     side,
     type,
     urlPrefix,
     name,
     bucketTime
   }:TFormatTxsParams) {
-    return data.map(el=>{
       const isBuy = side === 'buy'
       const isKOL = type === '31'
       let imageUrl = isBuy
@@ -215,7 +222,7 @@ export function useKlineMarks() {
         imageUrl,
         label: isBuy ? 'B' : 'S',
         labelFontColor: '#fff',
-        minSize: el.volume >= 2000 ? 30 : 25,
+        minSize: Number(el.volume) >= 2000 ? 30 : 25,
         hoveredBorderWidth: borderWidth,
         borderWidth: borderWidth,
         text:getTooltipTxt(name, type, el, isBuy,bucketTime),
@@ -223,10 +230,9 @@ export function useKlineMarks() {
         user_address:el.wallet_address,
         tx_time:el.tx_time
       }
-    })
   }
 
-  function getTooltipTxt(name:string, type:number|string, el:IBuySellData,isBuy:boolean,bucketTime:number) {
+  function getTooltipTxt(name:string, type:number|string, el:HolderBuyData,isBuy:boolean,bucketTime:number) {
     const swapType = isBuy ? t('bought') : t('sold')
     const formatedName = name?.replace(/\(.*\)$/, '')
     // 处理聪明钱
@@ -236,7 +242,7 @@ export function useKlineMarks() {
       const AvgTxt = isBuy ? t('campaignBuyAvg') : t('campaignSellAvg')
       return `${formatedName} ${swapType}
         ${flowText}: ${formatNumber(el.volume, 2)}(${formatNumber(el.txns, 0)})
-        ${AvgTxt}: $${formatNumber(el.volume / (el.amount || 1), 4)}
+        ${AvgTxt}: $${formatNumber(Number(el.volume) / (Number(el.amount) || 1), 4)}
         ${swapType}: ${formatNumber(el.volume, 2)}
         ${formatDate(bucketTime, 'YYYY-MM-DD HH:mm')}
       `
@@ -244,7 +250,7 @@ export function useKlineMarks() {
     return `${el.wallet_logo?.name || `${formatedName}`} ${swapType}
         ${t('amountB')}: ${formatNumber(el.amount, 2)}
         ${t('amountU')}: $${formatNumber(el.volume, 2)}
-        ${t('price')}: $${formatNumber(el.volume / (el.amount || 1), 4)}
+        ${t('price')}: $${formatNumber(Number(el.volume) / (Number(el.amount) || 1), 4)}
         ${t('Txs')}: ${formatNumber(el.txns)}
         ${formatDate(bucketTime, 'YYYY-MM-DD HH:mm')}
         `
