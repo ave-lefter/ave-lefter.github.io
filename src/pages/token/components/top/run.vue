@@ -406,6 +406,20 @@ watch(
     }
   }
 )
+watch(
+  () => visible.value,
+  (val) => {
+    if (val) {
+      tableList.value = []
+      pageNO.value = 1
+      pageSize.value = 20
+      loadingRun.value = false
+      finished.value = false
+      getRugPullList()
+    }
+  }
+)
+
 
 function firstCharacterToupperCase(str: string): string {
   return str.replace(/^\S/, (match) => match.toUpperCase())
@@ -530,7 +544,7 @@ async function getRugPullList() {
 }
 
 onMounted(() => {
-  getRugPullList()
+  // getRugPullList()
 })
 </script>
 <style lang="scss" scoped>
