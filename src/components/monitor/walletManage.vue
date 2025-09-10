@@ -94,7 +94,7 @@
                 <span>{{ $t('enableMonitor') }}</span>
               </div> -->
               <div
-                v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
+                v-if="SupportMonitorChain.includes(row?.user_chain)"
                 class="flex items-center mr-4px cursor-pointer color-[#666]"
                 @click.stop.prevent="handleMonitor(row,rowIndex)">
                 <Icon name="custom:monitor-icon" class="text-14px mr-2px color-[var(--d-CCC-l-666)] group-hover:color-#3F80F7" />
