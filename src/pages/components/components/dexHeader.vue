@@ -11,7 +11,7 @@ const ammOptions = computed(()=>{
     return [
         {
             chain:'',
-            name:t('allDex'),
+            name:'',
             swap_url:'',
             show_name:t('allDex'),
         }
@@ -20,6 +20,7 @@ const ammOptions = computed(()=>{
 const globalStore = useGlobalStore()
 const setupFilter = globalStore.rankConditions[globalStore.rankActiveTab]?.filter
 const isFilterHighlight = ref(!!setupFilter.amm)
+const popoverVisible = ref(false)
 const searchKey = ref('')
 const filteredAmmList = computed(()=>{
     return ammOptions.value.filter((el)=>{
@@ -31,24 +32,26 @@ const filteredAmmList = computed(()=>{
 <template>
   <div class="flex items-center gap-2px">
     DEX
-    <el-popover trigger="click" :width="250">
+    <el-popover v-model:visible="popoverVisible" trigger="click" :width="250" popper-class="[&&]:[--el-popover-padding:0]">
         <template #reference>
             <Icon name="custom:filter" class="text-10px cursor-pointer"  :class="isFilterHighlight ? 'color-[--d-999-l-666]' : ''"/>
         </template>
         <template #default>
-            <el-input
-                v-model="searchKey"
-                class="[--el-border-color:transparent] mb-10px"
-                :placeholder="$t('search')"
-                clearable
-            >
-                <template #prefix>
-                <Icon name="hugeicons:search-01" />
-                </template>
-            </el-input>
+            <div class="py-10px px-12px">
+                <el-input
+                    v-model="searchKey"
+                    class="[--el-border-color:transparent]"
+                    :placeholder="$t('search')"
+                    clearable
+                >
+                    <template #prefix>
+                    <Icon name="hugeicons:search-01" />
+                    </template>
+                </el-input>
+            </div>
             <el-scrollbar v-if="filteredAmmList.length > 0" :height="300">
                 <ul>
-                    <li v-for="item in filteredAmmList" :key="item.name" class="flex items-center py-10px gap-4px">
+                    <li v-for="item in filteredAmmList" :key="item.name" class="flex items-center px-12px py-10px gap-4px cursor-pointer" @click="setFilterForm(['amm',item.name]);popoverVisible = false;isFilterHighlight=!!item.name;">
                         <img v-if="item.chain" class="w-20px h-20px rounded-full" :src="`${globalStore.token_logo_url}swap/${item.name}.jpeg`" alt="">
                         <span v-else class="iconfont icon-dexs1"/>
                         <span>{{ item.show_name }}</span>
