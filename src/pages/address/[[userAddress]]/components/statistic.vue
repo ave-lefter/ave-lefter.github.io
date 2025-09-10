@@ -532,7 +532,7 @@ defineExpose({
 })
 
 function addressClick() {
-  console.log('addressClick', formatExplorerUrl(chain.value, address.value, 'address'))
+  window.open(formatExplorerUrl(chain.value, address.value, 'address'))
 }
 </script>
 <style scoped>
