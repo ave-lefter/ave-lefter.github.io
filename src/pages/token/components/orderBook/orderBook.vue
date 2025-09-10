@@ -190,7 +190,7 @@
               <img src="@/assets/images/empty-black.svg" alt="">
             </div>
           </template>
-        </el-scrollbar></div></el-scrollbar>
+        </el-scrollbar>
       </div>
     </div>
     <!-- status -->
