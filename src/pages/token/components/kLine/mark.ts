@@ -2,7 +2,7 @@
 import { filterLanguage } from './utils'
 import { useLocalStorage, type RemovableRef } from '@vueuse/core'
 import type { IChartingLibraryWidget, Mark } from '~/types/tradingview/charting_library'
-import { getUserKlineTxTags, getKlineProfilingTags } from '@/api/token'
+import { getUserKlineTxTags, getKlineProfilingTagsV2, type IGetKlineProfilingTagsV2Item,  type HolderBuy, type WalletLogo } from '@/api/token'
 import type { SimpleWSTx, WSTx } from './types'
 
 type TradeSide = {
@@ -15,6 +15,17 @@ type TradeData = {
   time: number
   buy?: TradeSide
   sell?: TradeSide
+}
+
+type HolderBuyData = HolderBuy & {wallet_address:string,wallet_logo:WalletLogo}
+
+type TFormatTxsParams = {
+  urlPrefix:string
+  el: HolderBuyData
+  side: 'buy' | 'sell'
+  type: number | string
+  name:string
+  bucketTime:number
 }
 
 export function useKlineMarks() {
@@ -74,11 +85,14 @@ export function useKlineMarks() {
     })
     headerBtns.push(btn)
   }
-
+  // “我的”
   const marksMap: Map<string, TradeData[]> = new Map()
+  // 画像打点
+  const profilingMarksCache: Map<string, Mark[]> = new Map()
 
   watch(() => tokenStore.token?.token, () => {
     marksMap.clear()
+    profilingMarksCache.clear()
   })
 
 
@@ -100,6 +114,11 @@ export function useKlineMarks() {
         onDataCallback(marks || [])
         return
       }
+      if(profilingMarksCache.has(id) && markTabsChecked.value?.[v.id]) {
+        const marks = profilingMarksCache.get(id)!
+        onDataCallback(marks)
+        return
+      }
       if (v.id === 'trade' && markTabsChecked.value?.[v.id]) {
         getUserKlineTxTags({
           from,
@@ -114,19 +133,127 @@ export function useKlineMarks() {
           onDataCallback(marks || [])
         })
       } else if (markTabsChecked.value?.[v.id]) {
-        getKlineProfilingTags({
+        getKlineProfilingTagsV2({
           from,
           to,
           interval,
-          pair: pair + '-' + chain,
+          pair_id: pair + '-' + chain,
           type: v.id
         }).then(res => {
-          const marks = formatToMarks(res, interval, v.id, v.name)
-          marksMap.set(id, res || [])
-          onDataCallback(marks || [])
+          if(Array.isArray(res)){
+            const marks = formatProfilingToMarks(res || [], interval, v.id, v.name)
+            profilingMarksCache.set(id, marks)
+            onDataCallback(marks || [])
+          }
         })
       }
     })
+  }
+
+  function formatProfilingToMarks(
+    data: IGetKlineProfilingTagsV2Item[],
+    interval: number | string,
+    type: keyof typeof markTabsChecked.value,
+    name: string
+  ) {
+    const result: (Mark & { tx_time: number,user_address:string })[] = []
+    const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
+    const interval1 = Number(interval)
+    for(const item of data){
+      const bucketTime = Math.floor(item.time / interval1) * interval1
+      for(const holder of item.holders){
+        const {wallet_address,wallet_logo} = holder
+        if(holder.buy){
+          result.push(formatTxsObj({
+            el:{...holder.buy,wallet_address,wallet_logo},
+            side:'buy',
+            type,
+            name,
+            bucketTime,
+            urlPrefix
+          }))
+        }
+        if(holder.sell){
+          result.push(formatTxsObj({
+            el:{...holder.sell,wallet_address,wallet_logo},
+            side:'sell',
+            type,
+            name,
+            bucketTime,
+            urlPrefix
+          }))
+        }
+      }
+    }
+    return result
+  }
+
+  function formatTxsObj({
+    el,
+    side,
+    type,
+    urlPrefix,
+    name,
+    bucketTime
+  }:TFormatTxsParams) {
+      const isBuy = side === 'buy'
+      const isKOL = type === '31'
+      let imageUrl = isBuy
+      ? `${urlPrefix}signals/marks/mark-buy-${type}.png`
+      : `${urlPrefix}signals/marks/mark-sell-${type}.png`
+      if(el.wallet_logo?.logo && el.wallet_logo.logo.includes('.webp')){
+        imageUrl = el.wallet_logo.logo
+      }
+      let borderColor = 'transparent'
+      let borderWidth = 0
+      if(isKOL){
+        borderWidth = 2
+        if(isBuy){
+          borderColor = '#12B886'
+        }else {
+          borderColor = '#F6465D'
+        }
+      }
+
+      return {
+        id: `${el.tx_time}-${side}-${type}`,
+        time: bucketTime,
+        color: { background: 'transparent', border: borderColor },
+        imageUrl,
+        label: isBuy ? 'B' : 'S',
+        labelFontColor: '#fff',
+        minSize: Number(el.volume) >= 2000 ? 30 : 25,
+        hoveredBorderWidth: borderWidth,
+        borderWidth: borderWidth,
+        text:getTooltipTxt(name, type, el, isBuy,bucketTime),
+        showLabelWhenImageLoaded: false,
+        user_address:el.wallet_address,
+        tx_time:el.tx_time
+      }
+  }
+
+  function getTooltipTxt(name:string, type:number|string, el:HolderBuyData,isBuy:boolean,bucketTime:number) {
+    const swapType = isBuy ? t('bought') : t('sold')
+    const formatedName = name?.replace(/\(.*\)$/, '')
+    // 处理聪明钱
+    if(Number(type) === 30) {
+      const swapType = isBuy ? t('netInflow') : t('netOutflow')
+      const flowText = isBuy ? t('inflow') : t('outflow')
+      const AvgTxt = isBuy ? t('campaignBuyAvg') : t('campaignSellAvg')
+      return `${formatedName} ${swapType}
+        ${flowText}: ${formatNumber(el.volume, 2)}(${formatNumber(el.txns, 0)})
+        ${AvgTxt}: $${formatNumber(Number(el.volume) / (Number(el.amount) || 1), 4)}
+        ${swapType}: ${formatNumber(el.volume, 2)}
+        ${formatDate(bucketTime, 'YYYY-MM-DD HH:mm')}
+      `
+    }
+    return `${el.wallet_logo?.name || `${formatedName}`} ${swapType}
+        ${t('amountB')}: ${formatNumber(el.amount, 2)}
+        ${t('amountU')}: $${formatNumber(el.volume, 2)}
+        ${t('price')}: $${formatNumber(Number(el.volume) / (Number(el.amount) || 1), 4)}
+        ${t('Txs')}: ${formatNumber(el.txns)}
+        ${formatDate(bucketTime, 'YYYY-MM-DD HH:mm')}
+        `
   }
 
   function formatToMarks(
@@ -198,7 +325,7 @@ export function useKlineMarks() {
         // position: isBuy ? 'below' : 'above',
         borderWidth: 0,
         text: getMarkTooltipContent(entry, type, name),
-        showLabelWhenImageLoaded: false
+        showLabelWhenImageLoaded: false,
       })
     }
 
@@ -312,7 +439,8 @@ ${formatDate(entry.time, 'YYYY-MM-DD HH:mm')}
     markTabsChecked,
     createMarkButton,
     getMarks,
-    wsTxUpdateMarks
+    wsTxUpdateMarks,
+    profilingMarksCache
   }
 }
 

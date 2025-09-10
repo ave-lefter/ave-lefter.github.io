@@ -65,10 +65,10 @@ const { t } = useI18n()
 const {lang,isDark} = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
 
-const supportChains=ref(['solana','bsc'])
+// const supportChains=ref(['solana','bsc'])
 
 const disabledMonitor=computed(()=>{
-  return !supportChains.value.includes(followStore.favAddressChain) || !botStore.evmAddress
+  return !SupportMonitorChain.includes(followStore.favAddressChain) || !botStore.evmAddress
 })
 
 const props=defineProps({

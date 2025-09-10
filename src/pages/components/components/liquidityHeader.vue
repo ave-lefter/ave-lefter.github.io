@@ -10,6 +10,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:isVolUSDT', value: boolean): void
 }>()
+const globalStore = useGlobalStore()
 const defaultSort = computed(() => {
   if (props.sortConditions.sort === 'tvl') {
     return props.sortConditions.sort_dir
@@ -30,7 +31,7 @@ const openTimeList = shallowRef([
   { text: '> $300K', value: '300000' },
   { text: '> $1M', value: '1000000' },
 ])
-const isFilterHighlight = shallowRef(false)
+const isFilterHighlight = shallowRef(!!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.tvl_min || !!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.tvl_max)
 const { t } = useI18n()
 function confirm(params?: [string, string]) {
   if (!params || !params.some((el) => !!el)) {
@@ -66,6 +67,7 @@ function confirm(params?: [string, string]) {
     />
     <RangePopover
       v-model="popoverVisible"
+      sortKey="tvl"
       :width="225"
       :title="`${$t('liquidity1')}($)`"
       :list="openTimeList"

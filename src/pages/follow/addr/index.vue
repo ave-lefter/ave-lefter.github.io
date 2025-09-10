@@ -503,7 +503,7 @@
                {{ t('delete') }}
              </div>
             <div
-              v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
+              v-if="SupportMonitorChain.includes(row?.user_chain)"
               class="flex items-center mr-12px cursor-pointer " @click="handleMonitor(row,$index)">
               <Icon v-if="!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 )" name="custom:monitor2-icon" class="text-12px mr-5px color-#999 group-hover:color-#3F80F7"/>
               <Icon v-else name="custom:monitor-icon" class="text-15px mr-2px mb-1px color-[var(--d-CCC-l-666)] group-hover:color-#3F80F7"/>
@@ -512,7 +512,7 @@
                 {{ (!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))? t('pause') : t('enable') }}
               </span>
             </div>
-            <div class="flex items-center mr-12px color-[var(--d-666-l-CCC)] cursor-not-allowed" v-else>
+            <div v-else class="flex items-center mr-12px color-[var(--d-666-l-CCC)] cursor-not-allowed">
               <Icon name="custom:monitor-icon" class="text-15px mr-2px mb-1px" />
             </div>
           </div>
