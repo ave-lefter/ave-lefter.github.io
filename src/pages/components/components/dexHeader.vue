@@ -48,12 +48,10 @@ const filteredAmmList = computed(()=>{
             </el-input>
             <el-scrollbar v-if="filteredAmmList.length > 0" :height="300">
                 <ul>
-                    <li v-for="item in filteredAmmList" :key="item.name">
-                        <div class="flex items-center py-10px gap-4px">
-                            <img v-if="item.chain" class="w-20px h-20px rounded-full" :src="`${globalStore.token_logo_url}swap/${item.name}.jpeg`" alt="">
-                            <span v-else class="iconfont icon-dexs1"/>
-                            <span>{{ item.show_name }}</span>
-                        </div>
+                    <li v-for="item in filteredAmmList" :key="item.name" class="flex items-center py-10px gap-4px">
+                        <img v-if="item.chain" class="w-20px h-20px rounded-full" :src="`${globalStore.token_logo_url}swap/${item.name}.jpeg`" alt="">
+                        <span v-else class="iconfont icon-dexs1"/>
+                        <span>{{ item.show_name }}</span>
                     </li>
                 </ul>
                 </el-scrollbar>
