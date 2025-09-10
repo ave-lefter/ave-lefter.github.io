@@ -303,7 +303,7 @@ async function initChart() {
       backgroundColor: themeStore.isDark ? '#0B0D12' : '#F6F9FF',
       foregroundColor: '#3F80F7'
     },
-    custom_css_url: `${location.origin}/tv_custom.css`,
+    custom_css_url: `${location.origin}/tv_custom_1.css`,
     // format: (showMarket.value ? 'volume' : 'price') as SeriesFormat,
     custom_formatters: {
       priceFormatterFactory: () => {
@@ -648,7 +648,7 @@ async function initChart() {
   _widget?.subscribe('onMarkClick', (markId) => {
     const {token,symbol,logo_url,chain} = tokenStore.tokenInfo?.token||{}
     const {target_token,token0_address,token0_symbol,token1_symbol,pair} = tokenStore.pair || {}
-    
+
     let user_address = user.value
     for(const [,markArr] of profilingMarksCache){
      const addr = markArr.find(el => el.id === markId)?.user_address
