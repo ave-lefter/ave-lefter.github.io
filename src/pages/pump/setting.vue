@@ -3,7 +3,7 @@
     :visible="visible"
     @update:visible="updateVisible"
     popper-class="new-popover"
-    placement="bottom-start"
+    placement="bottom"
     :width="320"
     trigger="click"
     :teleported="false"
