@@ -13,7 +13,7 @@
       <div class="" style="width: 100%; text-align: center; margin-top: 30px;">
         <div class="text-12px tc w-100% mb-15px color-#f3841e" style="color: #f3841e">{{ $t('importTip') }}</div>
         <el-button
-          :color="themeStore.isDark?'#F5F5F5':'#222222'"
+          type="primary"
           style="width: 100%; border-radius: 8px; height: 48px;" native-type="submit" size="large">
           {{ $t('confirm') }}
         </el-button>
@@ -79,6 +79,6 @@ function importCode() {
 
 <style lang="scss" scoped>
 .form-container :deep() .el-form-item__label {
-  --at-apply: text-14px color-[--d-666-l-999];
+  --at-apply: text-14px color-[--third-text];
 }
 </style>

@@ -75,7 +75,7 @@ const props = defineProps({
   },
   addressClass: { type: String, default: '' },
   addressStyle: { type: String, default: '' },
-  iconEditColor: { type: String, default: 'var(--d-666-l-999)' },
+  iconEditColor: { type: String, default: 'var(--third-text)' },
   showAddressTitle: { type: Boolean, default: false },
   iconEditSize: { type: String, default: '12px' },
   iconSize: { type: String, default: '16px' },

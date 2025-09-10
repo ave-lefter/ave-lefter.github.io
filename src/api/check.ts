@@ -148,7 +148,9 @@ interface ContractData {
   tm_bonus_token_name_for_lp?: string
   is_low_liquidity?: number
   creator_address?: string
-  ai_report: {
+  ai_report: AiReport
+}
+export interface AiReport {
     fee_structure: {
       buy_fee: string
       max_tx_amount: string
@@ -175,7 +177,6 @@ interface ContractData {
       risk_level: string
     }
   }
-}
 interface Risk {
   code_snippet?: string
   description_en: string

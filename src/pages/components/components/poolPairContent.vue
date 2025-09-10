@@ -64,9 +64,9 @@ function addOrRemoveBlackList(item: { token: string }, type: 'ca' | 'dev' | 'key
 
 function timerCountColor(val: number) {
   if (Number(formatTimeFromNow(val, true)) < 3600 * 24) {
-    return 'color-#FFA622'
+    return 'color-[--yellow]'
   }
-  return 'color-[--d-666-l-999]'
+  return ''
 }
 const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'circle')
 const created_at_unix = computed(() => {
@@ -79,20 +79,22 @@ function toggleKline() {
 </script>
 
 <template>
-  <div class="[&&]:color-[--d-666-l-999] [&&]:text-12px flex items-center box">
-    <Icon
+  <div class="[&&]:color-[--third-text] [&&]:text-12px flex items-center box">
+    <div class="items-center justify-center w-16px h-16px bg-[--main-bg] rounded-2px absolute top-5px left-5px hidden icon hover:color-[--secondary-text]">
+      <Icon
       v-if="!inBlackList(row)"
       v-tooltip="$t('blockToken')"
       name="custom:invisible"
-      class="text-12px absolute top-5px left-5px hidden icon"
-      @click.self.stop="blockToken(row)"
-    />
-    <Icon
-      v-else
-      name="custom:visible"
-      class="text-9px absolute top-5px left-5px hidden icon"
+      class="text-12px"
       @click.self.stop="addOrRemoveBlackList(row, 'ca')"
-    />
+      />
+      <Icon
+        v-else
+        name="custom:visible"
+        class="text-9px"
+        @click.self.stop="addOrRemoveBlackList(row, 'ca')"
+      />
+    </div>
     <span
       :style="{ width: Math.ceil(getTextWidth('#' + pageNO * pageSize)) + 'px' }"
       class="text-right text-10px"
@@ -101,8 +103,8 @@ function toggleKline() {
     <div class="flex items-center" @click.stop="emit('collect', rowIndex, row)">
       <Icon
         name="custom:star"
-        class="color-var(--d-999-l-666) text-16px cursor-pointer ml-5px mr-12px"
-        :class="row.is_fav ? 'color-#ffbb19' : ''"
+        class="text-16px cursor-pointer ml-5px mr-12px"
+        :class="row.is_fav ? 'color-[--yellow]' : 'color-[--icon-color]'"
       />
     </div>
     <div class="flex items-center gap-8px">
@@ -134,16 +136,16 @@ function toggleKline() {
       </el-tooltip>
       <div class="flex flex-col gap-6px">
         <div class="flex items-center lh-20px">
-          <span class="text-16px color-[--d-CCC-l-333] max-w-88px truncate"> {{ getSymbol(row) }}</span
-          ><span class="text-10px color-[--d-666-l-999]">/{{ getSymbol(row, true) }} </span>
+          <span class="text-16px color-[--main-text] max-w-88px truncate"> {{ getSymbol(row) }}</span
+          ><span class="text-10px">/{{ getSymbol(row, true) }} </span>
           <Icon
             v-copy="row.target_token"
             name="bxs:copy"
-            class="text-12px ml-8px [&&]:color-[--d-666-l-999]"
+            class="text-12px ml-8px"
             @click.self.stop
           />
           <a
-            class="ml-4px [&&]:color-[--d-666-l-999] lh-10px"
+            class="ml-4px lh-10px"
             :href="`https://x.com/search?q=($${getSymbol(row)} OR ${row.target_token})&src=typed_query&f=live`"
             target="_blank"
             @click.stop
@@ -173,7 +175,7 @@ function toggleKline() {
                 :stroke-width="1.5"
                 indeterminate
               >
-                <Icon name="material-symbols:lock" class="color-[--d-666-l-999] text-8px" />
+                <Icon name="material-symbols:lock" class="text-8px" />
               </el-progress>
             </template>
             <template #content>
@@ -193,8 +195,8 @@ function toggleKline() {
           <Icon
             v-if="enableKline"
             v-tooltip="!activeKline?$t('kline'):$t('hidekline')"
-            name="custom:kline" class="text-12px ml-4px hover:color-#8CA0C3" 
-            :class="activeKline ? 'color-#8CA0C3' : 'color-#566275'"
+            name="custom:kline" class="text-12px ml-4px hover:color-[--secondary-text]" 
+            :class="activeKline ? 'color-[--secondary-text]' : 'color-[--third-text]'"
             @click.self.stop="toggleKline"
           />
         </div>
@@ -210,7 +212,7 @@ function toggleKline() {
               :end-time="60"
             >
               <template #default="{ seconds }">
-                <span v-if="seconds < 60" class="color-#FFA622"> {{ seconds }}s </span>
+                <span v-if="seconds < 60" class="color-[--yellow]"> {{ seconds }}s </span>
                 <span v-else :class="timerCountColor(created_at_unix)">
                   {{ formatTimeFromNow(created_at_unix) }}
                 </span>
@@ -252,7 +254,7 @@ function toggleKline() {
                 alt=""
                 onerror="this.src='/icon-default.png'"
               >
-              <span v-if="i.tag" :class="i.color === 'green' ? 'color-#12B886' : 'color-#F6465D'">{{
+              <span v-if="i.tag" :class="i.color === 'green' ? 'color-[--up-color]' : 'color-[--down-color]'">{{
                 $t(i.tag)
               }}</span>
             </div>
@@ -270,7 +272,7 @@ function toggleKline() {
 }
 .is-hovered {
   .icon {
-    display: block;
+    display: flex;
   }
 }
 </style>

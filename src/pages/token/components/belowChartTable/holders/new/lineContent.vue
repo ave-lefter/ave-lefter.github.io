@@ -1,26 +1,26 @@
 <template>
-  <div v-if="['solana']?.includes(addressAndChain.chain)" class="w-lineLight h-52px w-100% px-10px border-b-1px border-b-solid border-b-[--d-1A1A1A-l-F2F2F2] mb-12px" :class="isHidden && 'h-0px! border-b-0px p-0px!'">
+  <div v-if="['solana']?.includes(addressAndChain.chain)" class="w-lineLight h-52px w-100% px-10px border-b-1px border-b-solid border-b-[--main-divider] mb-12px" :class="isHidden && 'h-0px! border-b-0px p-0px!'">
     <ul v-if="!isHidden" class="flex gap-24px">
       <li class="flex gap-8px" @click.stop="popVisible = true">
         <div class="clickable">
-          <div class="font-400 text-12px lh-16px tracking-0px color-[--d-666-l-999] mb-4px flex items-center">
+          <div class="font-400 text-12px lh-16px tracking-0px color-[--third-text] mb-4px flex items-center">
             {{ t('holdersNum') }}{{ holders1M?'(1m)':'(1h)' }}
             <Icon name="material-symbols:chevron-right-rounded" class="ml-4px text-14px"/>
           </div>
-          <div class="font-500 text-14px lh-16px tracking-0px color-[--d-FFF-l-333]">{{ formatNumber(holdersNum,4) }}</div>
+          <div class="font-500 text-14px lh-16px tracking-0px color-[--main-text]">{{ formatNumber(holdersNum,4) }}</div>
         </div>
         <lineS  class="w-120px h-40px" :dataList="dataList1" :loading="loading1" :showSeries="[false, false]"  :showLeft="showLeft1" />
       </li>
       <li class="flex gap-8px"  @click.stop="popVisible = true">
         <div class="clickable">
-          <div class="font-400 text-12px lh-16px tracking-0px color-[--d-666-l-999] mb-4px flex items-center">
+          <div class="font-400 text-12px lh-16px tracking-0px color-[--third-text] mb-4px flex items-center">
             <span class="w-38px">
               Top{{topN}}
             </span>
-            <Icon name="custom:exchange-horizontal" class="ml-4px color-[--d-666-l-999] text-10px clickable" @click.stop="dataType2++"/>
+            <Icon name="custom:exchange-horizontal" class="ml-4px color-[--third-text] text-10px clickable" @click.stop="dataType2++"/>
             <Icon name="material-symbols:chevron-right-rounded" class="ml-4px text-14px"/>
           </div>
-          <div class="font-500 text-14px lh-16px tracking-0px color-[--d-FFF-l-333]">{{  `${formatNumber(Math.abs(Number(holdersAvg) * 100), 2)}%` }}</div>
+          <div class="font-500 text-14px lh-16px tracking-0px color-[--main-text]">{{  `${formatNumber(Math.abs(Number(holdersAvg) * 100), 2)}%` }}</div>
         </div>
         <lineS  class="w-120px h-40px" :dataList="dataList2" :loading="loading2" :showSeries="[false, false]"  :showLeft="showLeft2" />
       </li>
@@ -28,8 +28,8 @@
       <li class="flex-1"/>
       <li class="flex-1"/> -->
     </ul>
-    <div :class="['bg-[--d-222-l-F2F2F2] w-20px h-12px flex items-center justify-center mx-auto cursor-pointer transition-all duration-0.4s', isHidden && 'rotate-z-180 origin-center']" @click="isHidden = !isHidden">
-      <Icon name="material-symbols:keyboard-arrow-up" class="color-[--d-CCC-l-333]"/>
+    <div :class="['bg-[--main-list-hover] w-20px h-12px flex items-center justify-center mx-auto cursor-pointer transition-all duration-0.4s', isHidden && 'rotate-z-180 origin-center']" @click="isHidden = !isHidden">
+      <Icon name="material-symbols:keyboard-arrow-up" class="color-[--main-text]"/>
     </div>
     <RightPop v-if="popVisible" v-model="popVisible" :holdersNum="Number(holdersNum)" :activeTime="holders1M?'1m':'1h'"/>
   </div>
@@ -76,7 +76,7 @@ const topN=computed(()=>{
 const addressAndChain = computed(() => {
   const id = route.params.id as string
   if (id) {
-    return getAddressAndChainFromId(id) 
+    return getAddressAndChainFromId(id)
   }
   return {
     address: token.value?.token || '',
@@ -87,7 +87,7 @@ const addressAndChain = computed(() => {
 const isInitialized = shallowRef(false) // 用于控制初始化
 
 function init1() {
-  if(!['solana']?.includes(addressAndChain.value?.chain)) return 
+  if(!['solana']?.includes(addressAndChain.value?.chain)) return
   _getHoldersTokenCountLight()
   if(!holders1M.value){
     if(timer){
@@ -131,7 +131,7 @@ function _getHoldersTokenCountLight(){
   })
 }
 function init2() {
-  if(!['solana']?.includes(addressAndChain.value?.chain)) return 
+  if(!['solana']?.includes(addressAndChain.value?.chain)) return
   loading2.value = true
   getHoldersTokenHoldersLight(addressAndChain.value.address, addressAndChain.value.chain,topN.value).then(res => {
     // console.log('getHoldersTokenHoldersLight', res)
@@ -163,7 +163,7 @@ function init2() {
 
 function init() {
   // initialize()
-  if(isInitialized.value) return 
+  if(isInitialized.value) return
   if(timer){
     clearTimeout(timer)
   }
@@ -201,7 +201,7 @@ watch(()=>topN.value, (val) => {
 watch(()=>isHidden.value, (val) => {
   console.log('isHidden changed', val)
   // if(!val){
-  //   if(!holders1M.value)return 
+  //   if(!holders1M.value)return
   //   init1()
   // }else{
   //   clearTimeout(timer)

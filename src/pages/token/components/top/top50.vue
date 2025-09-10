@@ -10,7 +10,7 @@
   >
     <template #reference>
       <a class="top50 bg-btn text-10px" href="" @click.stop.prevent>
-        <Icon name="custom:top" class="text-[--d-666-l-999] h-10px mr-2px" />
+        <Icon name="custom:top" class="text-[--third-text] h-10px mr-2px" />
         <span
           class="text-10px"
           :class="{
@@ -44,12 +44,12 @@
           <el-tooltip
             v-if="list[0]?.tag == 'early'"
             placement="top"
+            popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!"
           >
             <template #content>{{ t('top50TitleTip') }}</template>
             <Icon
-              class=" text-14px ml-5px mt-2px"
+              class="text-14px ml-5px mt-2px color-[--third-text] cursor-pointer"
               name="mi:circle-warning"
-              color="#959a9f"
             />
           </el-tooltip>
         </div>
@@ -140,7 +140,7 @@
           >
           <span class="ml-5px font-14">Ave.ai</span>
         </div>
-        <span class="mt_5px block" style="font-size: 10px; color: #959a9f">
+        <span class="mt-5px block text-10px color-[--secondary-text]">
           {{ t('campaignTitle') }}
         </span>
       </div>
@@ -229,7 +229,7 @@ function getEarlyholders() {
 <style lang="scss" scoped>
 .top50 {
   font-size: 12px;
-  color: var(--custom-text-2-color);
+  // color: var(--custom-text-2-color);
   display: flex;
   background: var(--custom-bg-7-color);
   border-radius: 2px;
@@ -293,7 +293,7 @@ function getEarlyholders() {
     align-items: center;
     justify-content: center;
     border-radius: 2px;
-    background-color: var(--d-222-l-F2F2F2) /* var(--d-222-l-F2F2F2) */;
+    background-color: var(--main-input-button-bg);
     padding: 2px;
 }
 </style>

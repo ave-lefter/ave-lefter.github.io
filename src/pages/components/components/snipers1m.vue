@@ -5,10 +5,10 @@ defineProps<{
 
 function formatColor(row) {
   if (Number(row.rusher_tx_count || 0) < 5) {
-    return 'color-[--d-666-l-999]'
+    return 'color-[--third-text]'
   }
   // <30显示白色
-  return ''
+  return 'color-[--secondary-text]'
 }
 </script>
 <template>

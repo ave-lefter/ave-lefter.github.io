@@ -1,15 +1,15 @@
 <template>
   <div>
     <div class="flex justify-between items-center gap-8px h-54px">
-      <el-select v-model="selectGroupId"  :mode="mode" @click.stop @change="(val) => filterGroup(val)">
-        <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
-        <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
+      <el-select v-model="selectGroupId" style="--el-fill-color-blank:var(--dialog-list-hover)"  :mode="mode" @click.stop @change="(val) => filterGroup(val)">
+        <el-option :key="0" :value="0" :label="$t('defaultGroup')" class="[&&]:h-20px [&&]:lh-20px [&&]:text-10px"/>
+        <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id"  class="[&&]:h-20px [&&]:lh-20px [&&]:text-10px"/>
       </el-select>
-      <el-button ref="addButtonRef"  style="height: 32px;color: var(--d-999-l-666) !important; padding: 8px 10px !important;font-size: 12px;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark">
+      <el-button ref="addButtonRef" class="dialog-button"  style="height: 32px; padding: 8px 10px !important;font-size: 12px;">
         <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
         {{ $t('addWallet') }}
       </el-button>
-      <el-button  :color="isDark?'#333':'#F2F2F2'" style="height: 32px;color: var(--d-999-l-666) !important;padding: 8px 10px !important; margin-left: 0px;font-size: 12px;" :dark="isDark" @click.stop.prevent="showBatchAddressDetails=true" >
+      <el-button class="dialog-button" style="height: 32px;padding: 8px 10px !important; margin-left: 0px;font-size: 12px;" @click.stop.prevent="showBatchAddressDetails=true" >
         <Icon name="mingcute:new-folder-fill" class="text-12px mr-5px"/>
         {{ $t('bulkImport') }}
       </el-button>
@@ -31,7 +31,8 @@
         :style="{
           height:props.scrollHeight-50+'px',
           // height:'500px',
-          '--el-table-border':'1px solid #333',
+          // '--el-table-border':'1px solid #333',
+          '--el-table-bg-color':'transparent',
           'overflow':'visible',
           paddingBottom:!showFooter?'0px':'20px'
         }"
@@ -47,33 +48,33 @@
             <UserAvatar :key="row.user_address+row.user_chain" class="mr-10px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="24px" />
             <div>
               <!-- :formatAddress="(address) =>address?.slice(0, 4) + '...' + address?.slice(-4)" -->
-            <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 60px;font-size: 14px;color:var(--d-EAECEF-l-333)" iconEditColor="#999" iconEditSize="10px" showAddressTitle/>
+            <UserRemark :key="row.user_address+row.user_chain"  :remark="row.remark" :address="row.user_address" :chain="row.user_chain" addressClass="token-symbol ellipsis" addressStyle="max-width: 60px;font-size: 14px;color:var(--main-text)" iconEditColor="var(--third-text)" iconEditSize="10px" showAddressTitle/>
             </div>
          </template>
          <template #header-group>
             <span>{{ $t('addrGroup') }}</span>
           </template>
           <template #cell-group="{ row }">
-             <el-select v-model="row.group_id" size="small" filterable popper-class="[&&]:[--el-bg-color-overlay:var(--d-222-l-FFF)] w-addrGroup" class="[&&]:[--el-text-color-regular:var(--d-222-l-333)]" @click.stop @change="(val) => getRowGroupChange(val, row)">
-              <el-option :key="0" :value="0" :label="$t('defaultGroup')" filterable/>
-              <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
+             <el-select v-model="row.group_id" size="small" :suffix-icon="SuffixIcon" filterable popper-class="w-addrGroup" class="[&&]:[--el-text-color-regular:--main-text] [&&]:[--el-fill-color-blank:--dialog-list-hover]" @click.stop @change="(val) => getRowGroupChange(val, row)">
+              <el-option :key="0" :value="0" :label="$t('defaultGroup')" filterable class="[&&]:h-20px [&&]:lh-20px [&&]:text-10px"/>
+              <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" class="[&&]:h-20px [&&]:lh-20px [&&]:text-10px"/>
             </el-select>
           </template>
           <template #header-chain>
             <span>{{ $t('chain') }}</span>
-            <el-popover v-model:visible="visible" popper-style="width: 103px;min-width: 103px;" trigger="click">
+            <el-popover v-model:visible="visible" popper-style="width: 133px;min-width: 133px;" trigger="click">
               <template #reference>
                   <Icon
                     id="custom-filter"
                     name="custom:filter"
                     :style="{
-                      color: conditions.user_chain!=='AllChains' ? 'var(--d-F5F5F5-l-333)' : 'var(--custom-font-8-color)'
+                      color: conditions.user_chain!=='AllChains' ? 'var(--secondary-text)' : 'var(--third-text)'
                     }"
                     class="text-10px cursor-pointer ml-2px"
                   />
               </template>
               <ul>
-                <li v-for="item in chainOptions" :key="item.value" class="hover:bg-[--d-333-l-F2F2F2] h-26px! flex! items-center! font-500! text-14px! lh-20px! clickable" @click.stop="conditions.user_chain=item.value;user_chain=item.value;visible=false">
+                <li v-for="item in chainOptions" :key="item.value" class="rounded-2px hover:bg-[--dialog-list-hover] h-26px! flex! items-center! font-500! text-14px! lh-20px! clickable px-8px py-5px" @click.stop="conditions.user_chain=item.value;user_chain=item.value;visible=false">
                   <Icon v-if="item.value=='AllChains'" name="icon-park-outline:link-one" class="text-15px mr-4px rd-50%"/>
                   <img v-else :src="`${token_logo_url}chain/${item?.id}.png`" class="rd-50% mr-4px" width="16" lazy alt="">
                   <span>{{ item.label }}</span>
@@ -95,18 +96,18 @@
               </div> -->
               <div
                 v-if="SupportMonitorChain.includes(row?.user_chain)"
-                class="flex items-center mr-4px cursor-pointer color-[#666]"
+                class="flex items-center mr-4px cursor-pointer color-[--third-text]"
                 @click.stop.prevent="handleMonitor(row,rowIndex)">
-                <Icon name="custom:monitor-icon" class="text-14px mr-2px color-[var(--d-CCC-l-666)] group-hover:color-#3F80F7" />
+                <Icon name="custom:monitor-icon" class="text-14px mr-2px color-[--third-text] group-hover:color-[--primary-color]" />
                 <!-- <span
                   class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
                   {{ row?.is_monitored === 1 ? t('pause') : t('openMonitor') }}
                 </span> -->
               </div>
               <div v-else class="flex items-center mr-4px cursor-not-allowed">
-                <Icon name="custom:monitor-icon" class="text-14px mr-2px color-[var(--d-666-l-CCC)]" />
+                <Icon name="custom:monitor-icon" class="text-14px mr-2px color-[--third-text]" />
               </div>
-              <Icon name="bx:bxs-trash-alt" class="text-13px color-#666" @click.stop.prevent="handleDeleteAttention(row)"/>
+              <Icon name="bx:bxs-trash-alt" class="text-13px color-[--third-text]" @click.stop.prevent="handleDeleteAttention(row)"/>
             </div>
          </template>
           <!-- <template #footer>
@@ -132,6 +133,7 @@ import { getAttentionPageList, moveFavoriteGroup2, deleteAttention ,addAttention
 import { defaultPaginationParams } from '@/utils/constants'
 import type {RowEventHandlerParams} from 'element-plus'
 import { throttle } from 'lodash-es'
+import SuffixIcon from '../suffixIcon.vue'
 const { t } = useI18n()
 const $router = useRouter()
 const props=defineProps({

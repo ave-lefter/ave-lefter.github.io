@@ -30,21 +30,21 @@ const filterTime = ref([])
     :width="420"
     trigger="click"
     teleported
-    popper-style="max-width: 420px;--el-text-color-primary:--d-666-l-999"
+    popper-style="max-width: 420px;--el-text-color-primary:--third-text"
     popper-class="transaction-popover"
     :popper-options="{ modifiers: [{ name: 'preventOverflow', options: { boundary: boundary, padding: 0 } }] }"
   >
     <template #reference>
       <Icon
         name="custom:filter"
-        :class="`${modelValue.length?'color-[--d-999-l-666]':'color-[--d-666-l-999]'} cursor-pointer text-10px`"
+        :class="`${modelValue.length?'color-[--secondary-text]':'color-[--third-text]'} cursor-pointer text-10px`"
       />
     </template>
     <template #default>
-      <div class="text-14px font-400 color-[--d-F5F5F5-l-222]">
+      <div class="text-14px font-400 color-[--main-text]">
         {{ $t('filterTime') }}
       </div>
-      <div class="mt-10px flex color-[--d-999-l-666] text-12px">
+      <div class="mt-10px flex color-[--secondary-text] text-12px">
         <span class="flex-[1.2]">{{ $t('startTime') }}</span>
         <span class="flex-1">{{ $t('endTime1') }}</span>
       </div>
@@ -64,7 +64,7 @@ const filterTime = ref([])
       <div class="flex mt-20px">
         <el-button
           class="h-30px flex-1 m-l-auto"
-          :color="isDark ? '#333':'#F2F2F2'"
+          :color="isDark ? '#252E3C':'#D9E8FF'"
           @click="filterTime.length=0;emit('confirm')"
         >
           {{ $t('reset') }}

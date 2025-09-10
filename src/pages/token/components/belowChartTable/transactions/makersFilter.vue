@@ -12,7 +12,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:visible', 'confirm', 'reset'])
 const {evmAddress, getWalletAddress} = useBotStore()
-const {isDark} = storeToRefs(useThemeStore())
+const themeStore = useThemeStore()
 const tempAddress = shallowRef('')
 
 const computedVisible = computed({
@@ -39,30 +39,33 @@ watch(() => props.modelValue, () => {
     <template #reference>
       <Icon
         name="custom:filter"
-        :class="`${modelValue?'color-[--d-999-l-666]':'color-[--d-666-l-999]'} cursor-pointer text-10px`"
+        :class="`${modelValue?'color-[--secondary-text]':'color-[--third-text]'} cursor-pointer text-10px`"
       />
     </template>
     <template #default>
       <div class="flex">
         <el-input
           v-model.trim="tempAddress"
+          style="--el-input-bg-color: var(--dialog-list-hover);"
           :placeholder="$t('enterAddress')"
           clearable
         />
       </div>
       <el-button
         v-if="evmAddress"
+        :key="themeStore.theme"
         class="h-30px mt-20px w-full"
         size="default"
-        :color="isDark ? '#333':'#F2F2F2'"
+        color="var(--border)"
         @click="tempAddress=getWalletAddress(chain)||''"
       >
         {{ $t('filterWallet') }}
       </el-button>
       <div class="flex mt-20px">
         <el-button
+          :key="themeStore.theme"
           class="h-30px flex-1 m-l-auto"
-          :color="isDark ? '#333':'#F2F2F2'"
+          color="var(--border)"
           @click="tempAddress='';emit('confirm')"
         >
           {{ $t('reset') }}

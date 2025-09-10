@@ -205,11 +205,11 @@ async function setTokenBalance(chain: string, init = false) {
 
 function getColorClass(val: string | number) {
   if (Number(val) > 0) {
-    return 'color-#12B886'
+    return 'color-[--up-color]'
   } else if (Number(val) < 0) {
-    return 'color-#FF646D'
+    return 'color-[--down-color]'
   } else {
-    return 'color-#F5F5F5'
+    return 'color-[--white]'
   }
 }
 
@@ -277,12 +277,12 @@ function resetPnl() {
       </div>
       <div class="mt--26px flex-1 flex items-center justify-center">
         <div v-if="!botStore.evmAddress" class="text-center">
-          <div class="color-[--d-999-l-666] text-12px lh-18px mb-12px">
+          <div class="color-[--white] text-12px lh-18px mb-12px">
             {{ $t('notLogin') }}
           </div>
           <el-button
             size="small"
-            class="[--el-button-border-color:--d-F5F5F5-l-333] [--el-button-hover-text-color:--d-F5F5F5-l-333] [--el-button-hover-border-color:--d-F5F5F5-l-333] [--el-button-hover-bg-color:transparent]"
+            class="[&&]:[--el-button-border-color:--white] [&&]:[--el-button-hover-text-color:--white] [&&]:[--el-button-hover-border-color:--white] [&&]:[--el-button-hover-bg-color:transparent] [&&]:[--el-button-bg-color:transparent] [&&]:[--el-button-text-color:--white]"
             @click="login"
             >{{ $t('login') }}</el-button
           >
@@ -290,7 +290,7 @@ function resetPnl() {
         <div v-else class="flex flex-1">
           <div class="flex-1 flex flex-col items-center">
             <div
-              class="color-#F5F5F5 font-bold mb-2px flex items-center gap-4px"
+              class="color-[--white] font-bold mb-2px flex items-center gap-4px"
               :style="{
                 fontSize: 16 * scale + 'px',
                 lineHeight: 20 * scale + 'px',
@@ -305,7 +305,7 @@ function resetPnl() {
             </div>
             <span
               v-if="pnlSetting.showU"
-              class="color-#F5F5F5 mb-2px"
+              class="color-[--white] mb-2px"
               :style="{
                 fontSize: 10 * scale + 'px',
                 lineHeight: 12 * scale + 'px',
@@ -314,7 +314,7 @@ function resetPnl() {
               ${{ formatNumber(currentBalanceUsd, 1) }}
             </span>
             <div
-              class="color-[--d-999-l-666]"
+              class="color-#FFFFFF99"
               :style="{
                 fontSize: 12 * scale + 'px',
                 lineHeight: 16 * scale + 'px',
@@ -325,7 +325,7 @@ function resetPnl() {
           </div>
           <div class="flex-1 flex flex-col items-center">
             <div
-              class="color-#F5F5F5 font-bold mb-2px flex items-center gap-4px"
+              class="color-[--white] font-bold mb-2px flex items-center gap-4px"
               :style="{
                 fontSize: 16 * scale + 'px',
                 lineHeight: 20 * scale + 'px',
