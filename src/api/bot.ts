@@ -526,10 +526,10 @@ export function bot_createSwapEvmTx(params: {
 }) {
   const { $api } = useNuxtApp()
   const botStore = useBotStore()
-  if (params.chain === 'xlayer') {
-    params.autoSell = false
-    params.autoSellConfig = []
-  }
+  // if (params.chain === 'xlayer') {
+  //   params.autoSell = false
+  //   params.autoSellConfig = []
+  // }
   return $api('/botapi/swap/createSwapEvmTx', {
     method: 'post',
     body: {
