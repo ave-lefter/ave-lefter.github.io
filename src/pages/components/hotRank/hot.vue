@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
 import { getHotDefaultColumns } from './columnRender/hotColumusService'
-import { getTreasureList } from '~/api/market'
+import { getTreasureList, type IGetTreasureConfig } from '~/api/market'
 import {
   quickContent,
   dexContent,
@@ -32,6 +32,7 @@ import {
   PriceContent,
   PriceChange,
   TokenPage,
+  DexHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
@@ -48,6 +49,7 @@ const props = defineProps<{
   activeChain: string
   activeSubTab?: string
   activeTab?: string
+  ammList: IGetTreasureConfig['swaps']
 }>()
 const aveTableRef = useTemplateRef('aveTableRef')
 const {rankConditions} = storeToRefs(globalStore)
@@ -375,7 +377,7 @@ const headerRenderer = computed(() => {
     markers_dynamic: DynamicMarkersHeader,
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
-    dex: () => 'DEX',
+    dex: DexHeader,
     security: () => t('security'),
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
@@ -490,6 +492,7 @@ function resetColumns(needClear:boolean) {
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
+          :ammList="item.key === 'dex' ? ammList : null"
         />
       </template>
       <template
