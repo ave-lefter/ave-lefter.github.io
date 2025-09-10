@@ -40,7 +40,7 @@
             {{ tableView.isAmount ? t('swapPrice') : t('MC') }}
 
             <el-button
-              class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
+              class="p-0 px-2px border-none [&&]:bg-[transparent] hover:bg-[transparent] h-auto"
               @click="tableView.isAmount = !tableView.isAmount"
             >
               <svg v-if="tableView.isAmount" width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" class="color-[--third-text]">
@@ -56,7 +56,7 @@
             <div class="flex items-center justify-end gap-2px">
               <span>{{ t('amountU').slice(0,3) }}</span>
               <el-button
-                class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
+                class="p-0 px-2px border-none [&&]:bg-[transparent] hover:bg-[transparent] h-auto"
                 @click="tableView.isVolUSDT = !tableView.isVolUSDT"
               >
                 <svg v-if="tableView.isVolUSDT" width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" class="color-[--third-text]">
