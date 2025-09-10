@@ -23,7 +23,7 @@ const isFilterHighlight = ref(!!setupFilter.amm)
 const searchKey = ref('')
 const filteredAmmList = computed(()=>{
     return ammOptions.value.filter((el)=>{
-        return el.name.includes(searchKey.value)
+        return el.show_name.includes(searchKey.value)
     })
 })
 </script>
@@ -33,7 +33,7 @@ const filteredAmmList = computed(()=>{
     DEX
     <el-popover trigger="click" :width="250">
         <template #reference>
-            <Icon name="custom:filter" class="text-10px cursor-pointer"/>
+            <Icon name="custom:filter" class="text-10px cursor-pointer"  :class="isFilterHighlight ? 'color-[--d-999-l-666]' : ''"/>
         </template>
         <template #default>
             <el-input
@@ -49,8 +49,9 @@ const filteredAmmList = computed(()=>{
             <el-scrollbar v-if="filteredAmmList.length > 0" :height="300">
                 <ul>
                     <li v-for="item in filteredAmmList" :key="item.name">
-                        <div class="flex items-center gap-2px">
-                            <div class="w-10px h-10px rounded-full" :style="{background:item.chain}"/>
+                        <div class="flex items-center py-10px gap-4px">
+                            <img v-if="item.chain" class="w-20px h-20px rounded-full" :src="`${globalStore.token_logo_url}swap/${item.name}.jpeg`" alt="">
+                            <span v-else class="iconfont icon-dexs1"/>
                             <span>{{ item.show_name }}</span>
                         </div>
                     </li>
