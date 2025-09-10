@@ -253,9 +253,9 @@ function getAllTagsActivityList() {
         align-items: center;
         justify-content: space-between;
         font-size: 12px;
-        color: var(--d-999-l-666);
+        color: var(--secondary-text);
         .color-878FBC {
-          color: var(--custom-text-2-color);
+          color: var(--secondary-text);
         }
         .tr {
           text-align: right;
@@ -265,7 +265,7 @@ function getAllTagsActivityList() {
         }
         span {
           &:first-child {
-            color: var(--custom-text-2-color);
+            color: var(--secondary-text);
             display: block;
             font-size: 11px;
             line-height: 16px;

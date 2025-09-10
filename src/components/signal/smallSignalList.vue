@@ -17,7 +17,7 @@ const botStore = useBotStore()
     <div
       v-for="({chain,logo,symbol,id,token,issue_platform,mc_cur,signal_time,price_change_24h},index) in signalList"
       :key="id"
-      class="pb-12px border-b-1px border-b-solid border-b-[--d-1A1A1A-l-F2F2F2] cursor-pointer"
+      class="pb-12px border-b-1px border-b-solid border-b-[--main-list-hover] cursor-pointer"
       @click="navigateTo(`/token/${token}-${chain}`)"
     >
       <div class="flex justify-between mb-4px">
@@ -47,7 +47,7 @@ const botStore = useBotStore()
           
           <div class="flex flex-col gap-4px">
             <span
-                class="font-500 color-[--d-F5F5F5-l-333] text-16px cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis max-w-90px"
+                class="font-500 color-[--main-text] text-16px cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis max-w-90px"
             >{{ symbol }}</span>
             <div class="color-[--d-666-l-999] flex items-center gap-8px">
               <Icon v-copy="token" name="bxs:copy" class="clickable text-10px"/>
@@ -80,9 +80,9 @@ const botStore = useBotStore()
         />
       </div>
       <div class="flex justify-between">
-        <div class="flex color-[--d-666-l-999] text-12px">
+        <div class="flex color-[--third-text] text-12px">
           {{ $t('mCap') }}
-          <span class="color-[--d-F5F5F5-l-333] ml-4px">
+          <span class="color-[--main-text] ml-4px">
             ${{ formatNumber(mc_cur, 1) }}
           </span>
           <span class="ml-8px">24h</span>
@@ -95,15 +95,15 @@ const botStore = useBotStore()
           v-if="signal_time && Number(formatTimeFromNow(signal_time, true)) < 60"
           :key="signal_time" :timestamp="signal_time" :end-time="60">
           <template #default="{ seconds }">
-              <span v-if="seconds < 60" v-tooltip="formatDate(signal_time,'MM/DD HH:mm:ss')" class="color-#FFA622 text-12px">
+              <span v-if="seconds < 60" v-tooltip="formatDate(signal_time,'MM/DD HH:mm:ss')" class="color-[--yellow] text-12px">
                 {{ seconds }}s
               </span>
-            <span v-else v-tooltip="formatDate(signal_time,'MM/DD HH:mm:ss')" class="color-[--d-999-l-666] text-12px">
+            <span v-else v-tooltip="formatDate(signal_time,'MM/DD HH:mm:ss')" class="color-[--third-text] text-12px">
                 {{ formatTimeFromNow(signal_time) }}
               </span>
           </template>
         </TimerCount>
-        <span v-else v-tooltip="formatDate(signal_time,'MM/DD HH:mm:ss')" class="color-[--d-999-l-666] text-12px">
+        <span v-else v-tooltip="formatDate(signal_time,'MM/DD HH:mm:ss')" class="color-[--third-text] text-12px">
             {{ formatTimeFromNow(signal_time) }}
         </span>
       </div>

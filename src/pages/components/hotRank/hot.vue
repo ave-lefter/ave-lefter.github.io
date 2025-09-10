@@ -421,7 +421,7 @@ const Row = ({ cells, rowData }) => {
 }
 
 function getRowClass({rowData}:Parameters<RowClassNameGetter<any>>[0]) {
-    const commonClass = `color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)] ${rowData.isKline ? 'h-400px [--el-table-row-hover-bg-color:transparent] overflow-visible!' : 'h-81px'}`
+    const commonClass = `cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)] ${rowData.isKline ? 'h-360px [--el-table-row-hover-bg-color:transparent] overflow-visible!' : 'h-81px'}`
     if(rankKlineStore.klineRow.id && rowData.id !== rankKlineStore.klineRow.id && !rowData.isKline){
         return 'row-disabled '+commonClass
     } else {
@@ -478,8 +478,8 @@ function resetColumns(needClear:boolean) {
       :header-height="40"
       :estimated-row-height="rankKlineStore.klineRow.id ? 400 : 81"
       fixed
-      style="--el-bg-color: var(--d-111-l-FFF)"
-      :rowClass="getRowClass"
+      style="--el-bg-color: var(--secondary-bg)"
+      :row-class="getRowClass"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"
@@ -526,7 +526,7 @@ function resetColumns(needClear:boolean) {
     v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
-    class="mt-5px py-9px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
+    class="mt-5px py-9px flex justify-center [&&]:[--el-pagination-button-height:18px]"
     layout="total, prev, pager, next"
     :total="pageInfo.total || 0"
     :small="false"

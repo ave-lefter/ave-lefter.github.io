@@ -3,14 +3,14 @@ defineProps<{
   row: any
 }>()
 function getMarketCapColor(row) {
-  if (!row?.market_cap) return 'color-#848E9C'
+  if (!row?.market_cap) return 'color-[--thrid-text]'
 
   const marketCap = row.market_cap
   const tokenAge = getTokenAge(row?.created_at)
 
   // 币龄小于1天且市值大于100万，或币龄小于7天且市值大于1000万
   if ((tokenAge < 86400 && marketCap > 1000000) || (tokenAge < 604800 && marketCap > 10000000)) {
-    return 'color-#FFA622' // 黄色
+    return 'color-[--yellow]' // 黄色
   }
 }
 

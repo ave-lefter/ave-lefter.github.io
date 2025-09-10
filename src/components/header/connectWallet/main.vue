@@ -22,13 +22,13 @@
       <div v-show="botStore.connectWalletTab === 0" class="text-14px text-center min-h-200px">
         <emailRegisterAndLogin ref="loginForm" v-model:cType="emailRegisterType">
           <template v-if="emailRegisterType === 'login'">
-            <button class="w-full bg-[--d-333-l-F2F2F2] h-40px flex items-center justify-center border-none mt-20px rd-6px px-12px clickable"  @click.stop="botStore.connectWalletTab = 1">
+            <button class="w-full bg-[--border] h-40px flex items-center justify-center border-none mt-20px rd-6px px-12px clickable"  @click.stop="botStore.connectWalletTab = 1">
               <span class="mr-auto">{{ $t('chainWallet') }}</span>
               <img class="mr-10px" src="@/assets/images/wallet/metaMask.png"  width="20" alt="metamask" srcset="" lazy>
               <img class="mr-10px" src="@/assets/images/wallet/phantom.png"  width="20" alt="phantom" srcset="" lazy>
               <img class="mr-10px" src="@/assets/images/wallet/okx.png"  width="20" alt="okx" srcset="" lazy>
               <img class="mr-8px" src="@/assets/images/wallet/wc.png"  width="20" alt="wc" srcset="" lazy>
-              <Icon class="text-14px color-[--d-666-l-999]" name="ep:arrow-right" />
+              <Icon class="text-14px color-[--third-text]" name="ep:arrow-right" />
             </button>
             <ul class="flex items-center justify-center gap-8px mt-20px">
               <template v-for="(item, k) in tabs" :key="item.value">
@@ -105,12 +105,12 @@ defineExpose({ emailRegisterType })
 
 <style scoped lang='scss'>
 
-:deep() .el-input {
-  --el-input-border-color: #444444;
-  --el-input-placeholder-color: var(--d-666-l-999);
-  --el-text-color-placeholder: #999;
-  --el-input-bg-color: var(--d-333-l-F2F2F2)
-}
+// :deep() .el-input {
+//   --el-input-border-color: #444444;
+//   --el-input-placeholder-color: var(--d-666-l-999);
+//   --el-text-color-placeholder: #999;
+//   --el-input-bg-color: var(--d-333-l-F2F2F2)
+// }
 
 :deep() .el-input__wrapper {
   border: none;

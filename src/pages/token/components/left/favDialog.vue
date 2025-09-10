@@ -69,7 +69,7 @@ const Component = computed(() => {
           v-for="(item, $index) in tabs"
           :key="$index" href="javascript:;"
           :class="`decoration-none inline-block text-16px pb-12px border-b-solid border-b-2px mr-24px text-center
-          ${item.id === activeTab?'color-[var(--d-F5F5F5-l-333)] border-b-[--d-D9D9D9-l-333]':'color-#80838b border-b-transparent'}`"
+          ${item.id === activeTab?'color-[--main-text] border-b-[--main-text]':'color-[--third-text] border-b-transparent'}`"
           @click.stop.prevent="activeTab=item.id"
         >
           {{ item.name }}

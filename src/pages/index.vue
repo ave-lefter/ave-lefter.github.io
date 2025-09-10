@@ -246,26 +246,29 @@ function getMedias(appendix: string) {
 </script>
 
 <template>
-  <div class="w-full [&&]:max-w-1920px mx-auto">
-    <CategoryTabs
-      v-model:activeSubTab="activeSubTab"
-      v-model:activeTab="activeTab"
-      v-model:activeChain="activeChain"
-      :categories="currentChainObj?.categories || []"
-      :chains="chains"
-    />
-    <KeepAlive :max="6">
-      <component
-        :is="components[activeTab]"
-        ref="dynamicComponentRef"
-        :listMapFunction="listMapFunction"
-        :activeChain="activeChain"
-        :activeTab="activeTab"
-        :activeSubTab="activeSubTab"
-        :ammList="currentChainObj?.swaps||[]"
+  <div class="w-full bg-[--main-bg]">
+    <div class="[&&]:max-w-1920px mx-auto">
+      <CategoryTabs
+        v-model:activeSubTab="activeSubTab"
+        v-model:activeTab="activeTab"
+        v-model:activeChain="activeChain"
+        :categories="currentChainObj?.categories || []"
+        :chains="chains"
       />
-    </KeepAlive>
+      <KeepAlive :max="6">
+        <component
+          :is="components[activeTab]"
+          ref="dynamicComponentRef"
+          :listMapFunction="listMapFunction"
+          :activeChain="activeChain"
+          :activeTab="activeTab"
+          :activeSubTab="activeSubTab"
+          :ammList="currentChainObj?.swaps || []"
+        />
+      </KeepAlive>
+    </div>
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+</style>

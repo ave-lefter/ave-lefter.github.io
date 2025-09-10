@@ -10,7 +10,7 @@
         :height="tableHeight"
         style="width: 100%;font-size: 12px"
         class="table-container"
-        cell-class-name="color-[--d-999-l-959A9F] text-12px"
+        cell-class-name="color-[--secondary-text] text-12px"
         :default-sort="{
           prop: conditions.sort,
           order: conditions.direction ? conditions.direction + 'ending' : undefined
@@ -118,10 +118,10 @@
               </a>
               <Icon
                 :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
-                :class="row.is_wallet_address_fav ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="color-var(--d-999-l-666) text-14px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
+                :class="row.is_wallet_address_fav ? 'color-[#F45469]' : 'color-[--third-text]'" class="color-var(--d-999-l-666) text-14px clickable shrink-0" @click.stop.prevent="collect(row,$index)" />
               <Icon
                 name="custom:filter"
-                class="color-[--d-666-l-999] cursor-pointer text-10px"
+                class="color-[--third-text] cursor-pointer text-10px"
                 @click="handlerDialogProfitLoss(row)"
               />
             </div>

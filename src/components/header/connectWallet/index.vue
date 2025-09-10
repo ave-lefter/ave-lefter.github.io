@@ -43,8 +43,8 @@ const tabCom = computed(() => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #222222;
-  border: 1px solid #27282B;
+  background-color: var(--dialog-bg);
+  // border: 1px solid #27282B;
   margin: 0;
   --el-dialog-padding-primary: 0px;
   .el-dialog__headerbtn {

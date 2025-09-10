@@ -1,11 +1,11 @@
 <template>
   <span
     :class="{
-      'text-[var(--color-teal-300)]': value > 0,
-      'text-[var(--color-red-500)]': value < 0
+      'text-[var(--up-color)]': value > 0,
+      'text-[var(--down-color)]': value < 0
     }"
   >
-    {{value > 0 ? '+' : ''}}{{value < 0 ? '-' : ''}}{{signVisible ? '$' : ''}}<slot></slot>
+    {{value > 0 ? '+' : ''}}{{value < 0 ? '-' : ''}}{{signVisible ? '$' : ''}}<slot/>
   </span>
 </template>
 

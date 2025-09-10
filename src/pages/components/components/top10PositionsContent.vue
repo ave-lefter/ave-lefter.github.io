@@ -6,10 +6,10 @@ defineProps<{
 function formatColor(row) {
   // 1. >30%显示黄色
   if (row.holders_top10_ratio >= 30) {
-    return 'color-#FFA622'
+    return 'color-[--yellow]'
     // 0 灰色
   } else if (row.holders_top10_ratio === 0) {
-    return ' color-[--d-666-l-999]'
+    return 'color-[--third-text]'
   }
 }
 </script>

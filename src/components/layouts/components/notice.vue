@@ -8,23 +8,23 @@
   >
     <template #reference>
       <div
-        class="bg-[var(--d-141721-l-E8F1FF)] rounded-4px p-8px ml-8px h-32px flex items-center"
+        class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px flex items-center"
         @click.stop="visitSysNotice"
       >
         <el-badge :is-dot="limitOrderUnRead||!isLatestExperienced" class="h-20px" color="#F6465D">
           <Icon
-            class="text-20px text-#8CA0C3 cursor-pointer"
+            class="text-20px text-[--secondary-text] cursor-pointer"
             name="material-symbols:notifications"
           />
         </el-badge>
       </div>
     </template>
     <div class="p-20px pr-0">
-      <div class="flex mr-20px items-center gap-20px mb-20px border-b-solid border-b-1px border-b-[--d-333-l-F2F2F2]">
+      <div class="flex mr-20px items-center gap-20px mb-20px border-b-solid border-b-1px border-b-[--dialog-divider]">
         <a
           href="javascript:;"
-          :class="`decoration-none text-14px lh-16px pb-12px text-center color-[--d-999-l-666] b-b-solid b-b-2px
-         ${!isLimitOrder ? 'color-[--d-E9E9E9-l-222] b-b-[--d-F5F5F5-l-333]':'b-b-transparent'}`"
+          :class="`decoration-none text-14px lh-16px pb-12px text-center b-b-solid b-b-2px
+         ${!isLimitOrder ? 'color-[--main-text] b-b-[--main-text]':'b-b-transparent color-[--third-text]'}`"
           @click="activeTab = 'notice'"
         >
           {{ $t('notice') }}
@@ -32,8 +32,8 @@
         <a
           v-show="isBotLogin && completedLimitTx.length > 0"
           href="javascript:;"
-          :class="`decoration-none text-14px lh-16px pb-12px text-center color-[--d-999-l-666] b-b-solid b-b-2px
-         ${isLimitOrder ? 'color-[--d-E9E9E9-l-222] b-b-[--d-F5F5F5-l-333]':'b-b-transparent'}`"
+          :class="`decoration-none text-14px lh-16px pb-12px text-center b-b-solid b-b-2px
+         ${isLimitOrder ? 'color-[--main-text] b-b-[--main-text]':'b-b-transparent color-[--third-text]'}`"
           @click.stop="handleVisible"
           @click="activeTab='limitOrder'"
         >
@@ -52,12 +52,12 @@
             :key="idx"
           >
             <h2
-              class="text-16px mb-10px color-[--d-F5F5F5-l-333] font-600"
+              class="text-16px mb-10px color-[--main-text] font-600"
             >
               {{ title }}
             </h2>
-            <div class="text-12px mb-4px color-[--d-999-l-666]" v-html="content"/>
-            <p class="text-12px color-#999 my-0">
+            <div class="text-12px mb-4px color-[--secondary-text]" v-html="content"/>
+            <p class="text-12px color-[--third-text] my-0">
               {{ formatDate(time, 'YYYY/MM/DD HH:mm:ss') }}
             </p>
           </li>
@@ -111,7 +111,7 @@
             <div v-else-if="item.status === 'auto_cancelled'" class="text-12px">{{ item.symbol }}
               {{ $t('limitOrderAutoCancel', {f: formatBotError(item?.errorLog || '')}) }}
             </div>
-            <div class="color-[--d-666-l-999] text-12px">{{ formatDate((item?.updateTime) || item?.createTime) }}</div>
+            <div class="color-[--third-text] text-12px">{{ formatDate((item?.updateTime) || item?.createTime) }}</div>
           </li>
         </ul>
       </el-scrollbar>

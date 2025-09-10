@@ -36,9 +36,7 @@
               link
               :disabled="isCounting"
               :loading="loading2"
-              :style="{
-                color: mode == 'dark' ? '#3F80F7' : '#3F80F7',
-              }"
+              type="primary"
               @click="sendVerificationCode"
             >
               {{
@@ -87,7 +85,7 @@
           @click="showRefCode = !showRefCode"
         >
           <div
-            class="gap-8px flex items-center cursor-pointer w-100%"
+            class="gap-8px flex items-center cursor-pointer w-100% color-[--main-text]"
           >
             {{ $t("startInvitationCode") }}
             <el-icon class="h-5.5px w-9.5px">
@@ -109,7 +107,7 @@
           class="el-form-item__label icon mb-0 justify-between!"
         >
           <a
-            class="gap-8px flex items-center clickable underline! color-[--d-F5F5F5-l-333]"
+            class="gap-8px flex items-center clickable underline! color-[--main-text]"
             @click="loginType = loginType === 'password' ? 'email' : 'password'"
           >
             {{
@@ -122,7 +120,7 @@
             </el-icon> -->
           </a>
           <a
-            class="gap-8px flex items-center clickable underline! color-[--d-F5F5F5-l-333]"
+            class="gap-8px flex items-center clickable underline! color-[--main-text]"
             @click.prevent="emit('update:c-type', 'reset')"
           >
             {{ $t("startForgetPassword") }}
@@ -132,7 +130,7 @@
       <el-form-item class="mb-10px!">
         <el-button
           class="h-48px!"
-          :color="'#3F80F7'"
+          type="primary"
           size="large"
           :disabled="cType == 'register' && !form.agree"
           :loading="loading"
@@ -142,13 +140,13 @@
         >
       </el-form-item>
       <p class="botFooter">
-        <span :style="lang == 'en' ? { 'margin-right': '10px' } : ''">{{
+        <span class="color-[--third-text]" :style="lang == 'en' ? { 'margin-right': '10px' } : ''">{{
           cType == "register" ? $t("startBotFooter11") : $t("startBotFooter21")
         }}</span>
         <a
           v-if="cType == 'register'"
           href="javascript:void(0)"
-          class="color-[#3F80F7]"
+          class="color-#3F80F7"
           @click.prevent="emit('update:c-type', 'login')"
         >
           {{ $t("startBotFooter12") }}</a
@@ -156,7 +154,7 @@
         <a
           v-else
           href="javascript:void(0)"
-          class="color-[#3F80F7]"
+          class="color-#3F80F7"
           @click.prevent="emit('update:c-type', 'register')"
         >
           {{ $t("register") }}</a
@@ -167,7 +165,7 @@
         size="small"
         class="h-20px lh-20px mt-20px mb-0px!"
       >
-        <el-checkbox v-model="form.agree" class="text-[#999] mx-auto! my-0">
+        <el-checkbox v-model="form.agree" class="color-[--secondary-text] mx-auto! my-0">
           {{ $t("startFooter1") }}&nbsp;
           <el-link
             type="primary"
@@ -193,14 +191,14 @@
         {{ $t("startTg") }}
       </span>
     </el-divider>
-    <ul v-show="cType === 'login'" class="w-loginByThird">
+    <ul v-show="cType === 'login'" :key="useThemeStore().theme" class="w-loginByThird">
       <li class="relative">
-        <el-button class="w-[100%]" :color="isDark ? '#333' : '#F2F2F2'" :loading="loading4" :disabled="disabled4">
+        <el-button class="w-[100%]" color="var(--border)" :loading="loading4" :disabled="disabled4">
           <div id="g_id_onload" :class="[loading4 ? 'loading' : '']" />
         </el-button>
       </li>
       <li>
-        <el-button class="inline-block w-[100%]" :color="isDark ? '#333' : '#F2F2F2'" @click.stop="botStore.tgLogin()"
+        <el-button class="inline-block w-[100%]" color="var(--border)" @click.stop="botStore.tgLogin()"
           ><img src="@/assets/images/tgIcon.svg" width="20" height="20" class="mt--3px">
         </el-button>
       </li>
@@ -585,8 +583,8 @@ onBeforeUnmount(() => {
 .w-divider {
   border-color: #333;
   margin: 50px 0 40px 0;
-  --el-bg-color: #222222;
-  --el-text-color-primary: var(--d-666-l-CCC);
+  --el-bg-color: var(--dialog-bg);
+  --el-text-color-primary: var(--third-text);
 }
 
 .w-emailRegister {
@@ -599,9 +597,9 @@ onBeforeUnmount(() => {
     height: 48px;
   }
 
-  :deep() .el-button.is-link {
-    color: #f5f5f5;
-  }
+  // :deep() .el-button.is-link {
+  //   color: #f5f5f5;
+  // }
 
   .el-form-item {
     margin-bottom: 20px;
@@ -648,13 +646,14 @@ onBeforeUnmount(() => {
   .countdownBtn {
     &.el-button.is-link {
       font-weight: 400;
-      color: #f5f5f5;
+      background: transparent;
+      --el-mask-color-extra-light: transparent;
 
       &.is-disabled {
-        color: #f5f5f5;
+        color: var(--main-text);
 
         &:hover {
-          color: #f5f5f5;
+           color: var(--main-text);
         }
       }
     }
@@ -668,7 +667,7 @@ onBeforeUnmount(() => {
     flex-wrap: nowrap;
     >li{
       flex: 1;
-    
+
     }
     :deep() .el-button.is-loading:before {
       background-color: transparent;
@@ -754,20 +753,20 @@ onBeforeUnmount(() => {
       border-color: var(--d-EAECEF-l-333);
     }
 
-    .countdownBtn {
-      &.el-button.is-link {
-        color: #333333;
-        font-weight: 400;
+    // .countdownBtn {
+    //   &.el-button.is-link {
+    //     color: #333333;
+    //     font-weight: 400;
 
-        &.is-disabled {
-          color: #333333;
+    //     &.is-disabled {
+    //       color: #333333;
 
-          &:hover {
-            color: #333333;
-          }
-        }
-      }
-    }
+    //       &:hover {
+    //         color: #333333;
+    //       }
+    //     }
+    //   }
+    // }
 
     .w-divider {
       color: #ffffff;

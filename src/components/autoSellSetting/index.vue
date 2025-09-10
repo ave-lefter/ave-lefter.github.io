@@ -66,18 +66,18 @@ onMounted(() => {
 .autoSellSetting-btn {
   height: 28px;
   border: none;
-  background: var(--d-151A22-l-E8F1FF);
+  background: var(--main-input-button-bg);
   padding: 3px 8px;
   border-radius: 4px;
   display: flex;
   align-items: center;
   font-size: 12px;
   // font-weight: 500;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   // color: var(--d-999-l-666);
   border: 1px solid transparent;
   &.active {
-    color: var(--d-F5F5F5-l-333);
+    color: var(--main-text);
     border: 1px solid #3F80F7;
   }
 }

@@ -30,15 +30,15 @@
     @close="handleNoticeClose"
   />
   <div
-    class="info flex items-center bg-[--d-111-l-FFF] mb-1px h-64px p-x-16px text-12px color-[--d-666-l-999]"
+    class="info flex items-center bg-[--secondary-bg] mb-1px h-64px p-x-16px text-12px color-[--third-text]"
   >
     <Icon
       name="material-symbols:kid-star"
-      class="color-var(--d-999-l-666) h-16px w-16px clickable"
-      :class="collected ? 'color-#ffbb19' : ''"
+      class="h-16px w-16px clickable"
+      :class="collected ? 'color-#ffbb19' : 'color-[--icon-color]'"
       @click="collect"
     />
-    <div class="token-info ml-16px flex items-center color-[--d-666-l-999]">
+    <div class="token-info ml-16px flex items-center color-[--third-text]">
       <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" >
         <template #content>
           <el-image
@@ -92,7 +92,7 @@
       <div class="ml-8px">
         <div class="flex items-center">
           <span
-            class="text-16px leading-[1.25] color-[--d-F5F5F5-l-333] font-500"
+            class="text-16px leading-[1.25] color-[--main-text] font-500"
             >{{ token?.symbol }}</span
           >
           <span class="ml-8px text-12px font-500 mr-8px">{{
@@ -110,7 +110,7 @@
                   >
                     <Icon
                       :name="`custom:${item.icon}`"
-                      class="text-[--d-666-l-999] text-12px"
+                      class="text-[--third-text] text-12px"
                     />
                   </span>
                   <a
@@ -123,7 +123,7 @@
                   >
                     <Icon
                       :name="`custom:${item.icon}`"
-                      class="text-[--d-666-l-999] text-12px"
+                      class="text-[--third-text] text-12px"
                     />
                   </a>
                 </template>
@@ -139,7 +139,7 @@
                   >
                     <Icon
                       :name="`custom:${item.icon}`"
-                      class="text-[--d-666-l-999] text-12px"
+                      class="text-[--third-text] text-12px"
                     />
                   </span>
                   <XPopup v-else-if="item.icon === 'twitter'" :tokenId="(route.params.id as string)" :type="tokenStore.twitterType">
@@ -157,7 +157,7 @@
                       <Icon
                         v-else
                         :name="`custom:${item.icon}`"
-                        class="text-[--d-666-l-999] text-12px"
+                        class="text-[--third-text] text-12px"
                       />
                     </a>
                   </XPopup>
@@ -172,7 +172,7 @@
                   >
                     <Icon
                       :name="`custom:${item.icon}`"
-                      class="text-[--d-666-l-999] text-12px"
+                      class="text-[--third-text] text-12px"
                     />
                   </a>
                 </template>
@@ -184,7 +184,7 @@
               target="_blank"
             >
               <Icon
-                class="text-[--d-666-l-999] h-16px w-10px"
+                class="text-[--third-text] h-16px w-10px"
                 name="custom:search"
               />
             </a>
@@ -258,7 +258,7 @@
             <template #reference>
               <a class="w-zu flex-start bg-btn" href="" @click.stop.prevent>
                 <Icon
-                  class="text-[--d-666-l-999] text-12px"
+                  class="text-[--third-text] text-12px"
                   name="custom:groups"
                 />
                 <span class="ml-2px ellipsis block" style="max-width: 140px">
@@ -287,6 +287,7 @@
                 </div>
                 <div class="mt-20px flex-center">
                   <el-button
+                    :key="themeStore.theme"
                     class="flex-1"
                     size="default"
                     style="
@@ -294,7 +295,7 @@
                       min-width: 70px;
                       --el-button-font-weight: 400;
                     "
-                    :color="theme !== 'dark' ? '#f2f2f2' : '#333333'"
+                    color="var(--border)"
                     @click.stop="handleReset()"
                   >
                     {{ $t('cancel') }}
@@ -308,7 +309,7 @@
                       min-width: 70px;
                       --el-button-font-weight: 400;
                     "
-                    :color="theme !== 'dark' ? '#222222' : '#f5f5f5'"
+                    type="primary"
                     @click.stop="
                       confirmSwitchGroup(id, selectedGroup, walletAddress)
                     "
@@ -331,7 +332,7 @@
             <template #reference>
               <a class="w-zu flex-start bg-btn" href="" @click.stop.prevent>
                 <Icon
-                  class="text-[--d-666-l-999] text-12px"
+                  class="text-[--third-text] text-12px"
                   name="custom:remark"
                 />
                 <span class="ml-2px ellipsis block" style="max-width: 140px">{{
@@ -351,6 +352,7 @@
                 </div>
                 <div class="mt-20px flex-center">
                   <el-button
+                    :key="themeStore.theme"
                     class="flex-1"
                     size="default"
                     style="
@@ -359,7 +361,7 @@
                       margin-left: auto;
                       --el-button-font-weight: 400;
                     "
-                    :color="theme !== 'dark' ? '#f2f2f2' : '#333333'"
+                   color="var(--border)"
                     @click.stop="handleReset()"
                   >
                     {{ $t('cancel') }}
@@ -367,7 +369,7 @@
                   <el-button
                     class="flex-1"
                     size="default"
-                    :color="theme !== 'dark' ? '#222222' : '#f5f5f5'"
+                    type="primary"
                     style="
                       height: 30px;
                       min-width: 70px;
@@ -385,7 +387,7 @@
         <div class="text-12px flex items-center mt-4px">
           <a
             v-if="token?.token !== '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'"
-            class="hover:color-[--d-F5F5F5-l-333] leading-12px font-500"
+            class="hover:color-[--main-text] leading-12px font-500"
             :href="formatExplorerUrl(token?.chain as string, token?.token as string)"
             target="_blank"
           >
@@ -401,7 +403,7 @@
           <span
             v-if="pair"
             v-tooltip="formatDate(pair?.created_at)"
-            class="ml-5px hover:color-[--d-F5F5F5-l-333] leading-12px font-400 mr-8px"
+            class="ml-5px hover:color-[--main-text] leading-12px font-400 mr-8px"
             >
             {{ formatTimeFromNow(pair?.created_at) }}
             </span>
@@ -530,7 +532,7 @@
             class="minor flex-end color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px"
           >
             <Icon
-              class="text-[--d-666-l-999] h-12px w-12px mr-2px"
+              class="text-[--third-text] h-12px w-12px mr-2px"
               name="custom:smart"
             />
             <span class="mr-2px text-10px">{{ $t('smarter') }}</span>
@@ -602,7 +604,7 @@
       />
     </div>
     <div class="item ml-24px items-end!">
-      <span class="text-20px color-[--d-F5F5F5-l-333]">
+      <span class="text-20px color-[--main-text]">
         ${{ formatNumber(price || 0, { decimals: 4, limit: 6 }) }}</span
       >
       <span
@@ -620,30 +622,30 @@
 
     <div class="item ml-24px">
       <span>{{ $t('mcap') }}</span>
-      <span class="block mt-8px color-[--d-F5F5F5-l-333]"
+      <span class="block mt-8px color-[--main-text]"
         >${{ formatNumber(marketCap, 2) }}</span
       >
     </div>
     <div class="item ml-24px">
       <span>{{ $t('24Volume') }}</span>
-      <span class="block mt-8px color-[--d-F5F5F5-l-333]"
+      <span class="block mt-8px color-[--main-text]"
         >${{ formatNumber(volume24, 2) }}</span
       >
     </div>
     <div class="item ml-24px">
       <span>{{ $t('holders') }}</span>
-      <span class="block mt-8px color-[--d-F5F5F5-l-333]">{{
+      <span class="block mt-8px color-[--main-text]">{{
         formatNumber(token?.holders || 0, { limit: 10 })
       }}</span>
     </div>
     <div class="item ml-24px">
       <span>DEV</span>
       <span
-        class="block mt-8px color-[--d-F5F5F5-l-333]"
+        class="block mt-8px color-[--main-text]"
         :style="{
           color:
             Number(token?.dev_balance_ratio_cur || 0) * 100 < 0.1
-              ? 'var(--d-666-l-999)'
+              ? 'var(--third-text)'
               : (token?.dev_balance_ratio_cur ?? 0) * 100 > 10
               ? '#FFA622'
               : '',
@@ -740,7 +742,7 @@
           color:
             (rugPull?.rates?.rugged_rate ?? 0) > 60
               ? '#F6465D'
-              : 'var(--d-999-l-666)',
+              : 'var(--third-text)',
         }"
       >
         <Icon name="custom:rug" class="text-12px mr-2px" />
@@ -798,7 +800,7 @@ const { token_logo_url } = useConfigStore()
 const tokenStore = useTokenStore()
 const {collected} = storeToRefs(useTokenStore())
 const { evmAddress } = storeToRefs(useBotStore())
-const { theme } = useThemeStore()
+const themeStore = useThemeStore()
 const { t } = useI18n()
 const route = useRoute()
 const { mode } = storeToRefs(useGlobalStore())
@@ -1288,7 +1290,7 @@ function handleNoticeClose() {
   }
 }
 .bg-btn {
-  --uno: bg-[--d-222-l-F2F2F2] rounded-2px mr-4px flex items-center
+  --uno: bg-[--main-input-button-bg] rounded-2px mr-4px flex items-center
     justify-center h-16px min-w-16px p-2px;
 }
 .item {

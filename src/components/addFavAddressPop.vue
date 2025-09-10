@@ -1,10 +1,10 @@
 <template>
-  <el-popover ref="popoverRef" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" @before-leave="reset">
+  <el-popover ref="popoverRef" :width="props?.width" trigger="click" placement="bottom" :virtual-ref="props.buttonRef" virtual-triggering :title="props?.title" :persistent="false" popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--main-text)" @before-leave="reset">
     <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" @submit.prevent.stop="handleSubmit(formRef)" >
       <el-form-item prop="user_chain" required label-position="top" size="large" class="mb-13px!">
         <div class="flex justify-between items-center w-100%">
-          <h4 class="font-500 text-12px lh-[120%] color-[var(--d-FFF-l-000)]">{{ $t('addWallet') }}</h4>
-          <el-select v-model="form.user_chain" :placeholder="t('placeholderPrefix1') + t('chain')" value-key="value" size="small" style="--el-text-color-regular:var(--d-FFF-l-000);--el-select-input-color:var(--d-FFF-l-000)" :suffix-icon="CaretBottom" class="w-70px!" :teleported="false" popper-class="w-103px">
+          <h4 class="font-500 text-12px lh-[120%] color-[--main-text]">{{ $t('addWallet') }}</h4>
+          <el-select v-model="form.user_chain" :placeholder="t('placeholderPrefix1') + t('chain')" value-key="value" size="small" style="--el-fill-color-blank:var(--border);" :suffix-icon="CaretBottom" class="w-70px!" :teleported="false" popper-class="w-103px">
             <template #prefix>
               <div class="h-12px inline-flex items-center">
                 <img :src="`${token_logo_url}chain/${form.user_chain?.id}.png`" class="rd-50%" width="12" lazy alt="">
@@ -24,14 +24,14 @@
           <el-input v-model="form.remark" :placeholder="t('placeholderPrefix') + t('remark')"/>
       </el-form-item>
       <el-form-item prop="group_id" required label-position="top" size="large" class="mb-20px!">
-        <el-select v-model="form.group_id" :placeholder="t('placeholderPrefix1') + t('addrGroup')" :teleported="false">
+        <el-select v-model="form.group_id" :placeholder="t('placeholderPrefix1') + t('addrGroup')" :teleported="false" style="--el-fill-color-blank:var(--border)">
           <el-option :key="0" :value="0" :label="$t('defaultGroup')" />
           <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
         </el-select>
       </el-form-item>
       <el-form-item class="mb-0px!">
         <div class="flex-between w-100% ">
-          <el-button style="background: var(--d-333-l-F2F2F2)" class="flex-1" @click.stop.prevent="handleCancel">{{ $t('cancel') }}</el-button>
+          <el-button class="flex-1" @click.stop.prevent="handleCancel">{{ $t('cancel') }}</el-button>
           <el-button type="primary" class="flex-1" native-type="submit">{{ $t('confirm') }}</el-button>
         </div>
       </el-form-item>
@@ -166,16 +166,16 @@ defineExpose({
 <style scoped lang="scss">
 .el-popper{
   --el-popover-title-font-size:14px;
-  --el-popover-title-text-color:var(--d-FFF-l-000);
+  // --el-popover-title-text-color:var(--d-FFF-l-000);
 }
 .el-popover__reference {
   margin-bottom: 10px;
 }
 :deep() .el-input {
-  --el-input-border-color: #444444;
-  --el-input-placeholder-color: var(--d-666-l-999);
-  --el-text-color-placeholder: #999;
-  --el-input-bg-color: var(--d-333-l-F2F2F2)
+  --el-input-border-color: var(--border);
+  --el-input-placeholder-color: var(--third-text);
+  --el-text-color-placeholder: var(--third-text);
+  --el-input-bg-color: var(--border)
 }
 :deep() .el-button {
   --el-border:none;

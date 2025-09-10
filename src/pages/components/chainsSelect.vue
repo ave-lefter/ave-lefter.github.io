@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { IGetTreasureConfig } from '~/api/market'
+import SuffixIcon from '~/components/suffixIcon.vue'
 
 const props = defineProps<{
   list: IGetTreasureConfig[]
@@ -36,13 +37,12 @@ const currentChain = computed(() => {
 <template>
   <el-select
     v-model="_activeChain"
-    class="[&&]:w-120px shrink-0 [&&]:[--el-select-input-color:--d-F5F5F5-l-333]"
-    popper-class="[--el-border-color-light:transparent]"
+    :suffix-icon="SuffixIcon"
+    class="[&&]:w-120px shrink-0"
   >
     <template #header>
       <el-input
         v-model="searchKey"
-        class="[--el-border-color:transparent]"
         :placeholder="$t('searchChain')"
         clearable
       >
@@ -54,7 +54,7 @@ const currentChain = computed(() => {
     <template #label>
       <div class="flex items-center gap-4px">
         <template v-if="currentChain.chain_id === '-1'">
-          <Icon name="custom:chain" class="color-[--d-F5F5F5-l-333]" />
+          <Icon name="custom:chain" class="color-[--main-text]" />
           {{ $t('allChain') }}
         </template>
         <template v-else>
@@ -75,7 +75,7 @@ const currentChain = computed(() => {
     >
       <div class="flex items-center gap-4px">
         <template v-if="item.chain_id === '-1'">
-          <Icon name="custom:chain" class="color-[--d-F5F5F5-l-333]" />
+          <Icon name="custom:chain" class="color-[--main-text]" />
           {{ $t('allChain') }}
         </template>
         <template v-else>
@@ -92,6 +92,4 @@ const currentChain = computed(() => {
 </template>
 
 <style scoped lang="scss">
-:deep(.el-select__wrapper){
-  --el-fill-color-blank:var(--d-1A1A1A-l-F2F2F2);
-}</style>
+</style>

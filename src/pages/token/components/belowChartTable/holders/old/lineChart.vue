@@ -131,16 +131,16 @@
       myChart = echarts.init(dom)
     }
 
-    const isLight = mode.value === 'light'
+    // const isLight = mode.value === 'light'
 
     myChart?.setOption({
       legend: { show: false },
       tooltip: {
         trigger: 'axis',
-        backgroundColor: isLight ? '#F5F5F5' : '#17191C',
+        backgroundColor: 'var(--dialog-bg)',
         textStyle: {
           fontSize: 10,
-          color: '#959A9F',
+          color: 'var(--secondary-text)',
           fontFamily: 'Outfit-Medium'
         },
         borderWidth: 0
@@ -160,7 +160,7 @@
         axisLine: { show: false },
         axisTick: { show: false },
         axisLabel: {
-          color:  mode.value === 'light'? '#999' : '#666',
+          color:  mode.value === 'light'? '#8ca0c3' : '#566275',
           fontFamily: 'Outfit-Medium'
         }
       },
@@ -169,7 +169,7 @@
         axisLine: { show: false },
         axisTick: { show: false },
         axisLabel: {
-          color:  mode.value === 'light'? '#999' : '#666',
+          color:  mode.value === 'light'? '#8ca0c3' : '#566275',
           fontFamily: 'Outfit-Medium',
           formatter: '{value}%'
         },

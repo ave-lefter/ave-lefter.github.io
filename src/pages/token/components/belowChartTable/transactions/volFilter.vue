@@ -19,6 +19,7 @@ const computedVisible = computed({
 })
 const filterArray = ref<(undefined | number)[]>([])
 const isActive = computed(() => props.modelValue.filter(el => !!el).length > 0)
+const themeStore = useThemeStore()
 
 function onBlur(index: number) {
   const min = Number(filterArray.value[0])
@@ -42,7 +43,7 @@ function onBlur(index: number) {
     <template #reference>
       <Icon
         name="custom:filter"
-        :class="`${isActive?'color-[--d-999-l-666]':'color-[--d-666-l-999]'} cursor-pointer text-10px`"
+        :class="`${isActive?'color-[--secondary-text]':'color-[--third-text]'} cursor-pointer text-10px`"
       />
     </template>
     <template #default>
@@ -80,8 +81,9 @@ function onBlur(index: number) {
       </div>
       <div class="flex mt-10px">
         <el-button
+          :key="themeStore.theme"
           class="h-30px flex-1 m-l-auto"
-          :color="isDark ? '#333':'#F2F2F2'"
+          color="var(--border)"
           @click="filterArray.length=0;emit('confirm')"
         >
           {{ $t('reset') }}

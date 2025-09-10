@@ -9,7 +9,7 @@
       <TheHeader/>
        <!-- :style="signalStore.translateStyle"  translate-x-0px-->
       <div
-        :class="['relative flex bg-[--d-000-l-F6F6F6] gap-1px pt-1px transition-transform transition-duration-300 overflow-hidden',]"
+        :class="['relative flex bg-[--main-divider] gap-1px pt-1px transition-transform transition-duration-300 overflow-hidden',]"
         :style="{..._style,transform:`translateX(${signalStore.translateStyle||monitorStore.translateStyle||dragPumpStore.translateStyle}px)`}"
       >
         <slot/>

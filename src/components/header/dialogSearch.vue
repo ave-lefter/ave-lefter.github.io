@@ -20,12 +20,12 @@
     >
       <template #prefix>
         <Icon
-          class="text-20px text-[--d-666-l-999]"
+          class="text-20px text-[--third-text]"
           name="custom:search"
         />
       </template>
       <template #suffix>
-        <Icon v-if="query" name="pajamas:clear" class="color-[--d-666-l-999] text-12px hover:opacity-70% cursor-pointer" @click="query=''"/>
+        <Icon v-if="query" name="pajamas:clear" class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer" @click="query=''"/>
       </template>
     </el-input>
 
@@ -34,11 +34,11 @@
       class="search-history-container mt-24px px-20px"
     >
       <div class="header-title flex items-center justify-between">
-        <span class="color-[--d-666-l-999] text-12px">{{
+        <span class="color-[--third-text] text-12px">{{
           $t('searchHistory')
         }}</span>
         <Icon
-          class="text-14px text-[--d-666-l-999] cursor-pointer"
+          class="text-14px text-[--third-text] cursor-pointer"
           name="ic:baseline-delete"
           @click.stop="confirm"
         />
@@ -375,13 +375,11 @@ function done() {
     cursor: pointer;
     border: none;
     font-size: 14px;
-    color: var(--d-666-l-999);
+    color: var(--third-text);
     &.active {
-      color: var(--d-F5F5F5-l-333);
+      color: var(--main-text);
     }
   }
-}
-.search-history-container {
 }
 .search-history {
   display: flex;
@@ -389,14 +387,14 @@ function done() {
 }
 .history-tag {
   min-width: 60px;
-  background: var(--d-333-l-F2F2F2);
+  background: var(--border);
   color: #848e9c;
   border-radius: 4px;
   margin-right: 8px;
   margin-bottom: 10px;
   padding: 7px 9px;
   border: none;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   font-size: 12px;
   cursor: pointer;
   & + .history-tag {
