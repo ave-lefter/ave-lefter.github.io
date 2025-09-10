@@ -403,6 +403,7 @@ watch(
       pageSize.value = 20
       loadingRun.value = false
       finished.value = false
+      // getRugPullList()
     }
   }
 )
