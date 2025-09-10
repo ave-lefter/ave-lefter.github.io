@@ -343,14 +343,11 @@ function switchProgress() {
 }
 onMounted(() => {
   if (width.value >= 1920) {
-    console.log('---width--333---')
     scrollHeight.value = 500
   } else if (width.value >= 1200) {
-    console.log('---width--222---')
     scrollHeight.value = 270
   } else if (width.value >= 768) {
     scrollHeight.value = 270
-      console.log('---width--11111----')
   } else {
     scrollHeight.value = 300
   }
