@@ -11,13 +11,13 @@ defineProps({
 const {userInfo} = storeToRefs(useBotStore())
 const { address } = storeToRefs(useWalletStore())
 const {isSupportEvmChains,evmAddress} = storeToRefs(useBotStore())
+const themeStore = useThemeStore()
 const visible = shallowRef(false)
 const options = computed(() => {
   return evmAddress.value?useBotStore().isSupportChains:isSupportEvmChains.value
 })
 const selectedChains = shallowRef<string[]>([])
 
-const {isDark} = storeToRefs(useThemeStore())
 const displayChains = computed(() => {
   return selectedChains.value.slice(0, 2)
 })
@@ -62,7 +62,7 @@ function onCancel() {
       v-model:visible="visible"
       placement="bottom"
       trigger="click"
-      :popper-style="{ padding: '20px 16px',width: 'auto', minWidth: '164px' }"
+      :popper-style="{ padding: '15px',width: 'auto', minWidth: '164px' }"
     >
       <template
           #reference
@@ -84,7 +84,7 @@ function onCancel() {
         </div>
       </template>
       <div
-          class="pb-5px color-#f5f5f5 [--el-checkbox-checked-bg-color:#000] [--el-checkbox-checked-input-border-color:#000] checkbox-container"
+          class="color-#f5f5f5 [--el-checkbox-checked-bg-color:#000] [--el-checkbox-checked-input-border-color:#000] checkbox-container"
       >
         <el-scrollbar height="130px">
           <el-checkbox-group
@@ -102,17 +102,17 @@ function onCancel() {
         </el-scrollbar>
         <div class="mt-12px flex justify-between">
           <el-button
+            :key="themeStore.theme"
             size="small"
-            class="h-30px min-w-60px [--el-button-font-weight: 400]"
-            :color="isDark?'#333':'#f2f2f2'"
+            class="h-30px min-w-60px"
+            color="var(--border)"
             @click="onCancel"
           >
             {{ $t('cancel') }}
           </el-button>
           <el-button
             size="small" type="primary"
-            class="h-30px min-w-60px [--el-button-font-weight: 400]"
-            :color="isDark?'#f5f5f5':'#222'"
+            class="h-30px min-w-60px"
             :disabled="selectedChains.length === 0"
             @click="onConfirm"
           >

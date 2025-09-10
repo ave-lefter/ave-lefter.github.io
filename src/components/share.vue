@@ -140,7 +140,7 @@ function getColorClass(val: string) {
   <slot>
     <Icon
       name="custom:share"
-      :class="['text-12px color-[--d-999-l-666] ml-6px cursor-pointer', props.classString]"
+      :class="['text-12px color-[--third-text] ml-6px cursor-pointer', props.classString]"
       @click.self.stop="openDialog"
     />
   </slot>

@@ -6,10 +6,10 @@ defineProps<{
 function formatColor(row) {
   // >30显示红色
   if (row.sniper_tx_count > 30) {
-    return 'color-#EB2B4B'
+    return 'color-[--down-color]'
   }
   // <30显示白色
-  return ''
+  return 'color-[--secondary-text]'
 }
 </script>
 <template>

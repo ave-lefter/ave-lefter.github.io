@@ -28,7 +28,7 @@ const flexColumns = [
 const emit = defineEmits(['close'])
 </script>
 <template>
-  <div v-show="dialogValues.visible" class="w-360px p-12px bg-[--d-111-l-FFF]">
+  <div v-show="dialogValues.visible" class="w-360px p-12px bg-[--secondary-bg]">
     <div
       class="flex justify-between items-center text-14px lh-16px pb-16px border-b-1px border-b-solid border-b-[--d-1A1A1A-l-F2F2F2] mb-9px"
     >

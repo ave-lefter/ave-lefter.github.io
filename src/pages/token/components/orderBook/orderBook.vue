@@ -1005,7 +1005,7 @@ const updatetokenTxs = useThrottleFn(() => {
 <style lang="scss" scoped>
 .me-btn {
   background: transparent;
-  color: var(--d-999-l-666);
+  color: var(--secondary-text);
   display: flex;
   align-items: center;
   border: none;

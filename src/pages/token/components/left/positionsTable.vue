@@ -9,6 +9,7 @@ import BigNumber from 'bignumber.js'
 import {useDebounceFn, useThrottleFn} from '@vueuse/core'
 import {useWalletStore} from '~/stores/wallet'
 import type { BotChain, BotSettingKey } from '~/utils/types'
+import { recordTxV2, updateTxV2 } from '~/api/tracking'
 
 const {updateHolderNum}= storeToRefs(useUserStore())
 const {t} = useI18n()
@@ -448,20 +449,31 @@ async function submitSwap(balance: number, row: GetUserBalanceResponse & { index
       ? Number(new BigNumber(slippage || '9').times(100).toFixed(0)) : 900
   }
   const tx = isSolana ? bot_createSolTx(data) : bot_createSwapEvmTx(data)
-  tx.then(res => handleTxSuccess(res, data.batchId, row.index))
+  tx.then(res => handleTxSuccess(res, data.batchId, row.index, row))
     .catch(err => {
       handleBotError(err || 'swap error')
       loadingSwap.value[row.index] = false
     })
 }
 
-function handleTxSuccess(res: any, _batchId: string, tokenId: string) {
+function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUserBalanceResponse) {
   if (res) {
     let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
       ElNotification({type: 'success', message: t('transactionsSubmitted')})
       tokenStore.placeOrderUpdate++
       loadingSwap.value[tokenId] = false
     }, 500)
+    const chain = row?.chain || ''
+    const txInfo: any = res?.[0] || {}
+    recordTxV2({
+      txInfo,
+      chain: chain,
+      destination: chain === 'solana' ? '/botapi/swap/createSolTx' : '/botapi/swap/createSwapEvmTx' ,
+      type: 10
+    })
+    const batchIdObj = {
+      [txInfo?.batchId]: txInfo?.id
+    }
     const unwatch = watch(() => wsStore.wsResult.tgbot, (subscribeResult) => {
       const batchId = subscribeResult.batchId
       if (batchId === _batchId) {
@@ -472,6 +484,8 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string) {
         tokenStore.placeOrderSuccess++
         if (subscribeResult?.txList?.[0]?.success) {
           ElNotification({type: 'success', message: t('tradeSuccess')})
+          const txInfo = subscribeResult?.txList?.[0]
+          updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
         } else {
           handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
         }
@@ -526,7 +540,7 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string) {
         <div class="pr-10px pb-20px">
           <NuxtLink
             v-for="(row,$index) in listData" :key="$index"
-            class="text-12px flex justify-between pl-10px py-10px cursor-pointer hover:bg-[var(--d-1A1A1A-l-F2F2F2)]"
+            class="text-12px flex justify-between pl-10px py-10px cursor-pointer hover:bg-[--dialog-bg]"
             :to="`/token/${row.index}`"
           >
             <div class="flex-[1.5] flex items-center">
@@ -540,13 +554,13 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string) {
               </el-tooltip>
               <div class="ml-6px">
                 <div class="flex">
-                  <span class="color-[var(--d-F5F5F5-l-333)]">{{ row.symbol }}</span>
+                  <span class="color-[var(--main-text)]">{{ row.symbol }}</span>
                   <Icon
                     v-if="row.risk_score > 55 || row.risk_level < 0"
                     name="custom:danger"
                     class="font-14 ml-2px color-#F72121"/>
                 </div>
-                <div class="mt-2px color-[var(--d-999-l-666)]">
+                <div class="mt-2px color-[--third-text]">
                   <template v-if="row.balance === 0">$0</template>
                   <template v-else-if="row.balance === '--'">--</template>
                   <template v-else>

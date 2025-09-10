@@ -1,5 +1,5 @@
 <template>
-  <div class="flex bg-[--d-000-l-F6F6F6] gap-1px flex min-w-0 w-full" style="min-height: calc(100vh - 92px);">
+  <div class="flex bg-[--main-divider] gap-1px flex min-w-0 w-full" style="min-height: calc(100vh - 92px);">
     <div class="flex-1 min-w-0">
       <Top/>
       <div class="flex gap-1px">
@@ -11,17 +11,17 @@
         <div class="flex-1 hide-scrollbar min-w-0 relative">
           <div
             v-show="globalStore.showLeft"
-            :class="`absolute bg-[--d-333-l-DDD] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left--14px hover:w-30px hover:left--34px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px`"
+            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left--11px hover:w-30px hover:left--31px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
             @click="globalStore.$patch({showLeft:false})"
           >
-            <Icon name="material-symbols:arrow-back-ios-new-rounded" :class="`color-[--d-FFF-l-222] text-12px`"/>
+            <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px"/>
           </div>
           <div
             v-show="!globalStore.showLeft"
-            :class="`absolute bg-[--d-333-l-DDD] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left-0 hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px`"
+            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left-0 hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
             @click="globalStore.$patch({showLeft:true})"
           >
-            <Icon name="material-symbols:arrow-forward-ios" :class="`color-[--d-FFF-l-222] text-12px`"/>
+            <Icon name="material-symbols:arrow-forward-ios" class="text-12px"/>
           </div>
           <el-scrollbar :height="scrollbarHeight">
             <div
@@ -202,6 +202,24 @@ function subBalanceChange() {
   })
 }
 
+// 订阅画像
+function subscribePortrait() {
+  usePublicPortraitStore().reset()
+  const {address,chain} = getAddressAndChainFromId(route.params.id as string)
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: [WSEventType.PUBLIC_PORTRAIT],
+    id:1
+  })
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'subscribe',
+    params: [WSEventType.PUBLIC_PORTRAIT, address, chain],
+    id: 1
+  })
+}
+
 function _getTokenInfo() {
   const id = route.params.id as string
   getTokenInfo(id).then(res => {
@@ -230,6 +248,7 @@ function init() {
 
 watch(() => route.params.id, () => {
   init()
+  subscribePortrait()
 })
 
 function visibilitychangeFn() {
@@ -239,6 +258,7 @@ function visibilitychangeFn() {
 
 onBeforeMount(() => {
   init()
+  subscribePortrait()
   document.addEventListener('visibilitychange', visibilitychangeFn)
 })
 
@@ -251,6 +271,12 @@ onUnmounted(() => {
       'asset'
     ],
     id: 1
+  })
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: [WSEventType.PUBLIC_PORTRAIT],
+    id:1
   })
 })
 

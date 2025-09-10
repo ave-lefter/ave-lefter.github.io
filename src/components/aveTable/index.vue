@@ -128,7 +128,7 @@ function calculateColumnWidths() {
         ref="tableRef"
         class="el-table"
         style="--el-table-border:0;--el-bg-color:transparent;font-size: 12px;"
-        :header-class="`bg-[--d-222-l-F2F2F2] ${headerClass}`"
+        :header-class="`bg-[--main-list-header-bg] ${headerClass}`"
         :header-height="headerHeight"
         :columns="computedColumns"
         :data="data"
@@ -158,7 +158,7 @@ function calculateColumnWidths() {
           <span v-else/>
         </template>
         <template v-if="data.length >0 && showFooter" #footer>
-          <div class="text-center px-0 pt-15px pb-10px text-12px text-[#959a9f] bg-[--d-111-l-FFF] absolute w-100%" :class="`top-${rowHeight}px`">
+          <div class="text-center px-0 pt-15px pb-10px text-12px text-[--third-text] absolute w-100%" :class="`top-${rowHeight}px`">
               {{ footText || t('loading') }}
           </div>
         </template>
@@ -169,6 +169,6 @@ function calculateColumnWidths() {
 
 <style scoped lang="scss">
 :deep() .el-table-v2__footer{
-  overflow: visible; 
+  overflow: visible;
 }
 </style>

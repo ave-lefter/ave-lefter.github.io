@@ -118,15 +118,15 @@ const init = () => {
       itemHeight: 10,
       icon: 'circle',
       textStyle: {
-        color: '#787B86',
+        color: 'var(--third-text)',
         fontSize: 12
       }
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: mode.value  === 'light' ? '#F2F2F2' : '#333',
+      backgroundColor: 'var(--dialog-bg)',
       textStyle: {
-        color: mode.value  === 'light' ? '#666' : '#999',
+        color: 'var(--secondary-text)',
         fontFamily: 'Poppins',
         fontSize: 12
       },
@@ -141,7 +141,7 @@ const init = () => {
       formatter: function (params) {
         let result = params[0].name + '<br>' // 标题
         params.forEach(item => {
-          result += `<div style="display:flex;align-items:center;"><div style="min-width:60px">${item.marker} ${item.seriesName}</div><span style="color:${mode.value === 'light' ? '#17191C' : '#F5F5F5'};flex:1;text-align:right">${formatNumber(item.value || 0, 2)}</span><br></div>`// 每行内容
+          result += `<div style="display:flex;align-items:center;"><div style="min-width:60px">${item.marker} ${item.seriesName}</div><span style="color:var(--main-text);flex:1;text-align:right">${formatNumber(item.value || 0, 2)}</span><br></div>`// 每行内容
         })
         return result
       },
@@ -171,7 +171,7 @@ const init = () => {
         show: true
       },
       axisLabel: {
-        color: mode.value  === 'light' ? '#999' : '#666',
+        color: mode.value === 'light'? '#8ca0c3' : '#566275',
         fontFamily: 'Poppins'
       },
       nameTextStyle: {
@@ -197,7 +197,7 @@ const init = () => {
         show: false
       },
       axisLabel: {
-        color: mode.value  === 'light' ? '#999' : '#666',
+        color:  mode.value === 'light'? '#8ca0c3' : '#566275',
         fontFamily: 'Poppins',
         formatter: '{value}'
       },

@@ -703,7 +703,7 @@ function switchChain(chain: string) {
 </script>
 
 <template>
-  <div class="w-full bg-[--d-111-l-FFF]">
+  <div class="w-full bg-[--secondary-bg]">
     <div class="p-12px flex justify-between">
       <div class="flex gap-8px">
         <span
@@ -736,7 +736,7 @@ function switchChain(chain: string) {
             v-for="{ label, value } in smartChains"
             :key="value"
             class="flex items-center justify-center gap-4px px-8px py-6px text-12px rounded-4px cursor-pointer"
-            :class="`${activeChain === value ? 'bg-[--d-111-l-FFF]' : ''}`"
+            :class="`${activeChain === value ? 'bg-[--secondary-bg]' : ''}`"
             @click="activeChain = value"
           >
             <img
@@ -754,7 +754,7 @@ function switchChain(chain: string) {
             v-for="interval in ['1D', '7D', '30D']"
             :key="interval"
             class="flex items-center justify-center gap-4px px-8px py-6px text-12px rounded-4px cursor-pointer"
-            :class="`${activeInterval === interval ? 'bg-[--d-111-l-FFF]' : ''}`"
+            :class="`${activeInterval === interval ? 'bg-[--secondary-bg]' : ''}`"
             @click="handleIntervalChange(interval)"
           >
             {{ interval }}
@@ -765,7 +765,7 @@ function switchChain(chain: string) {
             v-for="{ label, value } in smartChains"
             :key="value"
             class="flex items-center justify-center gap-4px px-8px py-6px text-12px rounded-4px cursor-pointer"
-            :class="`${activeChain2 === value ? 'bg-[--d-111-l-FFF]' : ''}`"
+            :class="`${activeChain2 === value ? 'bg-[--secondary-bg]' : ''}`"
             @click="switchChain(value)"
           >
             <img

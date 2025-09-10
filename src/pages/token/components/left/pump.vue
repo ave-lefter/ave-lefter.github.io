@@ -286,7 +286,7 @@ function getTargetToken(row: GetHomePumpListResponse) {
             v-for="(item,index) in tabList"
             :key="index"
             :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-999-l-666] px-4px py-2px rounded-4px cursor-pointer ${
-              activeTab===item.value?'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333]' : ''}`"
+              activeTab===item.value?'bg-[--d-222-l-F2F2F2] color-[--main-text]' : ''}`"
             @click="setActiveTab(item.value,index)"
           >
         {{ item.label }}
@@ -319,7 +319,7 @@ function getTargetToken(row: GetHomePumpListResponse) {
       <NuxtLink
         v-for="(row,$index) in sortedListData"
         :key="$index"
-        class="px-10px flex items-center h-50px cursor-pointer hover:bg-[--d-1A1A1A-l-F2F2F2] text-12px"
+        class="px-10px flex items-center h-50px cursor-pointer hover:bg-[--dialog-bg] text-12px"
         :to="`/token/${row.target_token}-${row.chain}`"
         @mouseenter="setPausedStatus(true)"
         @mouseleave="setPausedStatus(false)"
@@ -342,17 +342,17 @@ function getTargetToken(row: GetHomePumpListResponse) {
                   logo_url:getTargetToken(row).logo,
                   symbol:getTargetToken(row).symbol,
                 }"
-               chain-class="hidden" 
+               chain-class="hidden"
                token-class="w-240px h-240px [&&]:mr-0 rounded-16px" />
             </template>
           </el-tooltip>
-          
+
           <div class="ml-6px">
             <div
-              class="flex items-center color-[--d-F5F5F5-l-333] max-w-80px overflow-hidden whitespace-nowrap">
+              class="flex items-center color-[--main-text] max-w-80px overflow-hidden whitespace-nowrap">
               {{ getTargetToken(row).symbol }}
             </div>
-            <div class="mt-2px color-[--d-999-l-666] text-10px">
+            <div class="mt-2px color-[--third-text] text-10px">
               <TimerCount
                 v-if="row.created_at && Number(formatTimeFromNow(dayjs(row.created_at).unix(),true)) < 60"
                 :key="dayjs(row.created_at).unix()"
@@ -360,7 +360,7 @@ function getTargetToken(row: GetHomePumpListResponse) {
                 :end-time="60"
               >
                 <template #default="{seconds}">
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--third-text]">
                 <template v-if="seconds<60">
                   {{ seconds }}s
                 </template>
@@ -389,7 +389,7 @@ function getTargetToken(row: GetHomePumpListResponse) {
           <span class="color-[--d-666-l-999]">{{ formatNumber(row.tx_24h_count) }}</span>
         </div>
         <div class="w-70px flex-col flex items-end">
-          <span class="color-[--d-F5F5F5-l-333]">${{ formatNumber(row.market_cap, 2) }}</span>
+          <span class="color-[--main-text]">${{ formatNumber(row.market_cap, 2) }}</span>
           <span :class="getColorClass(row.price_change_24h)">{{ addSign(Number(row.price_change_24h)) }}{{
               formatNumber(Math.abs(Number(row.price_change_24h)), 1)
             }}%</span>

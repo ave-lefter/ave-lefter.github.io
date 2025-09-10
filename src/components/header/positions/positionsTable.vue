@@ -17,7 +17,7 @@
         <template #header="{ column }">
           <div v-if="column.property == 'total_profit_ratio'" class="flex items-center text-right justify-end">
             <span>{{ column.label }}</span>
-            <el-tooltip :effect="mode" placement="top-end" :content="$t('PnLTips')" persistent>
+            <el-tooltip :effect="mode" placement="top-end" :content="$t('PnLTips')" popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!" persistent>
               <el-icon style="cursor: pointer; font-size: 14px; margin-left: 2px;">
                 <QuestionFilled />
               </el-icon>
@@ -63,8 +63,8 @@
           :infinite-scroll-delay="200"
           :infinite-scroll-immediate="true"
         />
-          <div v-if="paginationParams.loaded && dataSource?.length > 0"  class="text-center px-0 pt-15px pb-10px text-12px text-[#959a9f]">{{ $t('loading') }} </div>
-          <div v-else-if="paginationParams.finished && dataSource?.length > 0" class="text-center px-0 pt-15px pb-10px text-12px text-[#959a9f]">{{ $t('noMore') }}</div>
+          <div v-if="paginationParams.loaded && dataSource?.length > 0"  class="text-center px-0 pt-15px pb-10px text-12px color-[--third-text]">{{ $t('loading') }} </div>
+          <div v-else-if="paginationParams.finished && dataSource?.length > 0" class="text-center px-0 pt-15px pb-10px text-12px color-[--third-text]">{{ $t('noMore') }}</div>
       </template>
     </el-table>
     <HideTokenDialog
@@ -267,9 +267,10 @@ onMounted(() => {
 .table-position.el-table{
   --el-table-tr-bg-color:transparent;
   --el-table-header-bg-color:transparent;
-  --el-table-header-text-color:var(--d-999-l-666);
-  --el-table-text-color:var(--d-F5F5F5-l-222);
-  --el-table-row-hover-bg-color:var(--d-2A2A2A-l-F2F2F2);
+  // --el-table-header-text-color:var(--d-999-l-666);
+  --el-table-text-color:var(--main-text);
+  --el-table-row-hover-bg-color:var(--border);
+  --el-table-bg-color: transparent;
   :deep() thead{
     font-size: 10px;
     tr{
