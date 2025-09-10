@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
 import { getNewDefaultColumns } from './columnRender/newColumnsService'
-import { getTreasureList } from '~/api/market'
+import { getTreasureList, type IGetTreasureConfig } from '~/api/market'
 import {
   PriceContent,
   PriceHeader,
@@ -34,6 +34,7 @@ import {
   DevHeader,
   Snipers1mHeader,
   Snipers1mContent,
+  DexHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
@@ -48,6 +49,7 @@ const props = defineProps<{
   activeChain: string
   activeSubTab: string
   activeTab: string
+  ammList: IGetTreasureConfig['swaps']
 }>()
 const {rankConditions} = storeToRefs(globalStore)
 function setSortConditions(params: { sort: string; sort_dir: string }) {
@@ -296,7 +298,7 @@ const headerRenderer = computed(() => {
     markers_dynamic: DynamicMarkersHeader,
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
-    dex: () => 'DEX',
+    dex: DexHeader,
     security: () => t('security'),
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
@@ -380,6 +382,7 @@ const cellRenderer = computed(() => {
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
+          :ammList="item.key === 'dex' ? ammList : null"
         />
       </template>
       <template v-for="item in visibleColumns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
