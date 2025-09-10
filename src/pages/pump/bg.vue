@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div v-if="Object.keys(pumpSetting.bg)?.length > 0">
+
     <el-checkbox-group v-model="pumpSetting.bgList" class="checkbox-group">
       <el-checkbox
         v-for="i in platforms"
@@ -10,7 +11,7 @@
         <div class="flex-start flex-1" @click.stop.prevent>
           <div ref="el">
             <el-color-picker
-              v-model="pumpSetting.bg[i.platform]"
+              v-model="pumpSetting.bg[i.platform]['bg']"
               persistent
               append-to="body"
               :teleported="true"
@@ -20,7 +21,7 @@
           </div>
           <div
             class="flex-start border-1px border-solid rounded-4px px-4px py-2px text-10px"
-            :style="{ 'border-color': pumpSetting.bg[i.platform] }"
+            :style="{ 'border-color': pumpSetting.bg[i.platform]?.['color'], 'background': pumpSetting.bg[i.platform]?.['bg'] }"
           >
             <el-image
               class="mr-5px rounded w-12px"
@@ -42,7 +43,7 @@
 
 <script lang="ts" setup>
 import type { PumpConfig } from '@/api/types/pump'
-import { getBgColor } from '@/utils/index'
+import { getBgColor, getPumpBgColor,  getLightDarkValue, pumpMap, type PlatformsType} from '@/utils/index'
 const emit = defineEmits(['blur', 'focus'])
 const props = withDefaults(
   defineProps<{
@@ -52,21 +53,44 @@ const props = withDefaults(
   {}
 )
 const globalStore = useGlobalStore()
-const { pumpSetting, token_logo_url } = storeToRefs(globalStore)
+const { pumpSetting, token_logo_url, mode , isDark} = storeToRefs(globalStore)
 const platforms = computed(() => {
   const obj = props.pumpConfig?.find((i) => i.chain == props.chain)
   return obj?.platforms || []
 })
+watch(mode, (val) => {
+  // if (Object.keys(pumpSetting.value.bg)?.length > 0) {
+  //   const list = props.pumpConfig?.flatMap((i) => i.platforms) || []
+  //   list.forEach((i) => {
+  //     const platform = pumpMap[i.platform as PlatformsType]
+  //     if (platform) {
+  //     const defaultVars =  platform['bg']
+  //       const defaultObj = getLightDarkValue(defaultVars)
+  //       console.log('------isDark.value-----', isDark.value,pumpSetting.value.bg[i.platform].bg, defaultObj)
+  //       if (isDark.value && pumpSetting.value.bg[i.platform].bg == defaultObj?.light || !isDark.value && pumpSetting.value.bg[i.platform].bg == defaultObj?.dark) {
+  //           pumpSetting.value.bg[i.platform] = getPumpBgColor(i.platform)
+  //       }
+  //      }
+  //   })
+  // }
+    const list = props.pumpConfig?.flatMap((i) => i.platforms) || []
+    list.forEach((i) => {
+      pumpSetting.value.bg[i.platform]= getPumpBgColor(i.platform)
+    })
+})
 onMounted(() => {
-  if (Object.keys(pumpSetting.value.bg)?.length ==0 ) {
+  init()
+})
+function init() {
+  if (Object.keys(pumpSetting.value.bg)?.length == 0) {
   const list = props.pumpConfig?.flatMap((i) => i.platforms) || []
     list.forEach((i) => {
-      pumpSetting.value.bg[i.platform] = getBgColor(i.platform)
+      pumpSetting.value.bg[i.platform]= getPumpBgColor(i.platform)
     })
    }
-})
+}
 function reset(platform: string) {
-  pumpSetting.value.bg[platform] = getBgColor(platform)
+  pumpSetting.value.bg[platform] = getPumpBgColor(platform)
 }
 </script>
 

@@ -126,3 +126,7 @@ export interface SizeObj {
   flash: string
   text: string
 }
+export interface pumpObjColor {
+  color: string
+  bg: string
+}

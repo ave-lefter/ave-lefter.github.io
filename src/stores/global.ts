@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
-import type { pumpBlack } from '@/api/types/pump'
+import type { pumpBlack, pumpObjColor } from '@/api/types/pump'
 import { _getFollowsNum } from '@/api/follow'
 
 import type{ GetHotTokensResponse } from '@/api/token'
@@ -61,7 +61,7 @@ export const useGlobalStore = defineStore('global', () => {
         maxColor: string
       }
     >
-    bg: Record<string, string>
+    bg: Record<string, pumpObjColor>
     bgList: string[]
     grid: Record<
       string,
@@ -74,7 +74,7 @@ export const useGlobalStore = defineStore('global', () => {
     >
     jump: 'close' | 'open' | 'open_jump'
     border: string
-  }>('pumpSetting7', {
+  }>('pumpSetting2', {
     fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
@@ -145,7 +145,7 @@ export const useGlobalStore = defineStore('global', () => {
       },
     },
     jump: 'close',
-    border: ''
+    border: '',
   })
 
   const hide_risk=shallowRef(1)

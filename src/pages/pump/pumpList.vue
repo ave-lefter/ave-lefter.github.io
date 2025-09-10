@@ -12,7 +12,7 @@
           @contextmenu="handleContextMenu($event, row)"
           @mouseenter="showPopover(row)"
           @mouseleave="hidePopover"
-          :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform] : '' }"
+          :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
         >
           <div class="w-full relative">
             <div class="flex-start items-start">
@@ -534,7 +534,7 @@
                 </div>
               </div>
             </div>
-            <div class="pump-right" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform] : '', 'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 2px 10px 0px #12B886': '0px 2px 10px 0px var(--border)') : ''}">
+            <div class="pump-right" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '', 'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 2px 10px 0px #12B886': '0px 2px 10px 0px var(--border)') : ''}">
               <div
                 v-if="
                   (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
@@ -592,7 +592,7 @@
                   </div>
                 </template>
               </div>
-              <div class="btns-swap flex-end mt-15px pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform] : '' }">
+              <div class="btns-swap flex-end mt-15px pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }">
                 <div
                   v-if="row?.state === 'migrating'"
                   style="
