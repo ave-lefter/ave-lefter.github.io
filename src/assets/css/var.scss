@@ -10,7 +10,7 @@
   // 一级文字
   --main-text:var(--d-F5F5F5-l-111);
   // 二级文字
-  --secondary-text:var(--d-C3CAD8-l-404753);
+  --secondary-text:var(--d-9CA1A8-l-404753);
   // 三级文字
   --third-text:var(--d-7C8BA2-l-9FA6B5);
   // 图标插画颜色
@@ -18,9 +18,9 @@
   // 主要背景
   --main-bg:var(--d-000-l-FFF);
   // 次要背景
-  --secondary-bg:var(--d-101115-l-F6F9FF);
+  --secondary-bg:var(--d-090B0F-l-F6F9FF);
   // 主页列表标题栏背景
-  --main-list-header-bg:var(--d-151A22-l-E8F1FF);
+  --main-list-header-bg:var(--d-12161E-l-E8F1FF);
   // 主页面列表悬浮色
   --main-list-hover:var(--d-151A22-l-E8F1FF);
   // 主页面输入框和按钮背景色
@@ -175,9 +175,10 @@
     --d-566275-l-B1BBCB: #566275;
     --d-A9B0BC-l-566275: #A9B0BC;
     --d-566275-l-A9B0BC: #566275;
-    --d-C3CAD8-l-404753: #C3CAD8;
     --d-7C8BA2-l-9FA6B5: #7C8BA2;
-    --d-101115-l-F6F9FF: #101115;
+    --d-9CA1A8-l-404753: #9CA1A8;
+    --d-090B0F-l-F6F9FF: #090B0F;
+    --d-12161E-l-E8F1FF: #12161E;
   }
 
   &.light {
@@ -303,9 +304,10 @@
     --d-566275-l-B1BBCB: #B1BBCB;
     --d-A9B0BC-l-566275: #566275;
     --d-566275-l-A9B0BC: #A9B0BC;
-    --d-C3CAD8-l-404753: #404753;
     --d-7C8BA2-l-9FA6B5: #9FA6B5;
-    --d-101115-l-F6F9FF: #F6F9FF;
+    --d-9CA1A8-l-404753: #404753;
+    --d-090B0F-l-F6F9FF: #F6F9FF;
+    --d-12161E-l-E8F1FF: #E8F1FF;
   }
 }
 
