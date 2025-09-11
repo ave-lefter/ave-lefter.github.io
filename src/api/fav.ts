@@ -157,7 +157,7 @@ function removeFavoriteGroup(group: number, address: string) {
 
 function addFavoriteGroup(name: string, address: string) {
   const { $api } = useNuxtApp()
-  return $api('https://0ftrfsdb.xyz/v1api/v3/tokens/favorite/group/add', {
+  return $api('/v1api/v3/tokens/favorite/group/add', {
     method: 'post',
     body: {
       address,
