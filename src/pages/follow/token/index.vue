@@ -620,9 +620,6 @@ onBeforeUnmount(() => {
 </template>
 
 <style lang="scss">
-:deep() .el-select.el-select{
-  /* --el-fill-color-blank:var(--tab-active-bg) */
-}
 .follow-select-popper {
   /* background: var(--d-222-l-FFF) !important; */
 
