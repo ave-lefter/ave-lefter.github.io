@@ -31,6 +31,7 @@ import {
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
+import dayjs from 'dayjs'
 
 const { t } = useI18n()
 const globalStore = useGlobalStore()
@@ -41,20 +42,15 @@ const props = defineProps<{
   activeSubTab: string
   activeTab: string
 }>()
-const sortConditions = ref({
-  sort: '',
-  sort_dir: '',
-})
+const {rankConditions} = storeToRefs(globalStore) 
 function setSortConditions(params: { sort: string; sort_dir: string }) {
-  sortConditions.value = params
+  rankConditions.value[props.activeTab].sort = params
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
-const defaultFilter = {}
-const filterForm = ref(defaultFilter)
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(filterForm.value, keyVal[0], keyVal[1])
+    set(rankConditions.value[props.activeTab].filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -87,10 +83,11 @@ const storageKey = computed(()=>{
 })
 let columns = useStorage(storageKey.value, getActivityDefaultColumns(t))
 watch(()=>props.activeTab,()=>{
+  initCache()
   columns = useStorage(storageKey.value, getActivityDefaultColumns(t))
-  sortConditions.value.sort = ''
-  sortConditions.value.sort_dir = ''
-  filterForm.value = {}
+  // sortConditions.value.sort = ''
+  // sortConditions.value.sort_dir = ''
+  // filterForm.value = {}
   pageInfo.value.pageNO = 1
   _getTreasureList()
 },{
@@ -108,6 +105,7 @@ onDeactivated(() => {
   clearTimeout(timer)
 })
 onActivated(() => {
+  initCache()
   clearTimeout(timer)
   timer = window.setTimeout(() => {
     _getTreasureList(false)
@@ -132,12 +130,18 @@ async function _getTreasureList(shouldLoading = true) {
     }
     const { total: _, ...rest } = pageInfo.value
     const _walletAddress = useBotStore().evmAddress || useWalletStore().address || ''
+    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
+      if(prev[cur]){
+        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+      }
+      return prev
+    },{...rankConditions.value[props.activeTab]?.filter})
     const res = await getTreasureList({
       category: props.activeTab,
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
-      ...sortConditions.value,
-      ...filterForm.value,
+      ...rankConditions.value[props.activeTab]?.sort,
+      ...finalFilter,
       self_address: _walletAddress,
     })
     pageInfo.value.total = res.total
@@ -181,7 +185,7 @@ watch(
       }
       return el
     })
-    const { sort, sort_dir } = sortConditions.value
+    const { sort, sort_dir } = rankConditions.value[props.activeTab]?.sort
     const sortVal = { asc: '1', desc: '-1' }[sort_dir]
     if (sortVal) {
       listData.value = updateList.toSorted((a, b) => (a[sort] - b[sort]) * sortVal)
@@ -276,6 +280,18 @@ const cellRenderer = computed(() => {
     sniper_tx_count: snipersContent
   }
 })
+
+function initCache() {
+  if(!rankConditions.value[props.activeTab]){
+    rankConditions.value[props.activeTab] = {
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    }
+  }
+}
 </script>
 <template>
   <div v-loading="loading" style="height: calc(100vh - 185px)">
@@ -297,7 +313,7 @@ const cellRenderer = computed(() => {
           :is="headerRenderer[item.key as keyof typeof headerRenderer]"
           :key="activeTab"
           v-model:isVolUSDT="isVolUSDT"
-          :sortConditions="sortConditions"
+          :sortConditions="rankConditions[activeTab]?.sort"
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"

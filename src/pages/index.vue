@@ -32,7 +32,8 @@ const components = {
 }
 const walletStore = useWalletStore()
 const botStore = useBotStore()
-const activeTab = useStorage<keyof typeof components>('rankActiveTab', 'hot')
+const globalStore = useGlobalStore()
+const activeTab = storeToRefs(globalStore).rankActiveTab
 const activeSubTab = useStorage('rankSubTab','pump_in_hot')
 const activeChain = useStorage('rankChain', 'AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])

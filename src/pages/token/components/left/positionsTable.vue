@@ -9,6 +9,7 @@ import BigNumber from 'bignumber.js'
 import {useDebounceFn, useThrottleFn} from '@vueuse/core'
 import {useWalletStore} from '~/stores/wallet'
 import type { BotChain, BotSettingKey } from '~/utils/types'
+import { recordTxV2, updateTxV2 } from '~/api/tracking'
 
 const {updateHolderNum}= storeToRefs(useUserStore())
 const {t} = useI18n()
@@ -448,20 +449,31 @@ async function submitSwap(balance: number, row: GetUserBalanceResponse & { index
       ? Number(new BigNumber(slippage || '9').times(100).toFixed(0)) : 900
   }
   const tx = isSolana ? bot_createSolTx(data) : bot_createSwapEvmTx(data)
-  tx.then(res => handleTxSuccess(res, data.batchId, row.index))
+  tx.then(res => handleTxSuccess(res, data.batchId, row.index, row))
     .catch(err => {
       handleBotError(err || 'swap error')
       loadingSwap.value[row.index] = false
     })
 }
 
-function handleTxSuccess(res: any, _batchId: string, tokenId: string) {
+function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUserBalanceResponse) {
   if (res) {
     let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
       ElNotification({type: 'success', message: t('transactionsSubmitted')})
       tokenStore.placeOrderUpdate++
       loadingSwap.value[tokenId] = false
     }, 500)
+    const chain = row?.chain || ''
+    const txInfo: any = res?.[0] || {}
+    recordTxV2({
+      txInfo,
+      chain: chain,
+      destination: chain === 'solana' ? '/botapi/swap/createSolTx' : '/botapi/swap/createSwapEvmTx' ,
+      type: 10
+    })
+    const batchIdObj = {
+      [txInfo?.batchId]: txInfo?.id
+    }
     const unwatch = watch(() => wsStore.wsResult.tgbot, (subscribeResult) => {
       const batchId = subscribeResult.batchId
       if (batchId === _batchId) {
@@ -472,6 +484,8 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string) {
         tokenStore.placeOrderSuccess++
         if (subscribeResult?.txList?.[0]?.success) {
           ElNotification({type: 'success', message: t('tradeSuccess')})
+          const txInfo = subscribeResult?.txList?.[0]
+          updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
         } else {
           handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
         }

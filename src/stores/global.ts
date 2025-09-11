@@ -71,6 +71,39 @@ export const useGlobalStore = defineStore('global', () => {
     quickVisible: true,
     quickBuyValue: '0.01',
   })
+  const rankActiveTab = useStorage('rankActiveTab', 'hot')
+  // pump 和活动榜单动态插入
+  const rankConditions = useStorage<Record<string, { sort: { sort: string; sort_dir: string }, filter: Record<string, any> }>>('rankCache',{
+    hot:{
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    },
+    new:{
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    },
+    gainer:{
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    },
+    inclusion:{
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    }
+  })
+
   const latestNotice = shallowRef<ILatestNotice>({})
   const userFavoriteGroups = ref<GetUserFavoriteGroupsResponse[]>([])
   const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)
@@ -121,15 +154,15 @@ export const useGlobalStore = defineStore('global', () => {
   const footerTokensPriceIds = computed(() => footerTokensPrice.value?.map(i => i.id))
 
   const headFollowsNum = ref<{ all: number,soldAll: number }>({ all: 0,soldAll: 0})
-  const id = computed(() => {
-    return useRoute().params?.id as string
-  })
+  // const id = computed(() => {
+  //   return useRoute().params?.id as string
+  // })
   function getFollowsNum() {
     if (!useFollowStore().currentAddress) {
       return
     }
     const params = {
-      token_id: id.value,
+      token_id: useRoute().params?.id,
       self_address: useFollowStore().currentAddress,
     }
     _getFollowsNum(params).then((res) => {
@@ -170,6 +203,8 @@ export const useGlobalStore = defineStore('global', () => {
     latestNotice,
     pnlTrackerVisible,
     userFavoriteGroups,
-    getUserFavoriteGroups:_getUserFavoriteGroups
+    getUserFavoriteGroups:_getUserFavoriteGroups,
+    rankConditions,
+    rankActiveTab
   }
 })

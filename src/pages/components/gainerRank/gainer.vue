@@ -35,6 +35,7 @@ import {
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
+import dayjs from 'dayjs'
 
 const { t } = useI18n()
 const localeStore = useLocaleStore()
@@ -47,23 +48,17 @@ const props = defineProps<{
   activeSubTab?: string
 }>()
 
-const sortConditions = ref({
-  sort: '',
-  sort_dir: '',
-})
+const {rankConditions} = storeToRefs(globalStore)
 
 function setSortConditions(params: { sort: string; sort_dir: string }) {
-  sortConditions.value = params
+  rankConditions.value.gainer.sort = params
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
 
-const defaultFilter = {}
-const filterForm = ref(defaultFilter)
-
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(filterForm.value, keyVal[0], keyVal[1])
+    set(rankConditions.value.gainer.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -112,7 +107,7 @@ onMounted(() => {
 onActivated(() => {
   console.log('涨幅榜激活')
   isActive.value = true
-  filterForm.value = {}
+  // filterForm.value = {}
   pageInfo.value.pageNO = 1
 
   const cacheKey = getCacheKey()
@@ -199,12 +194,18 @@ async function _getTreasureList(shouldLoading = true) {
     }
 
     const { total: _, ...rest } = pageInfo.value
+    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
+      if(prev[cur]){
+        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+      }
+      return prev
+    },{...rankConditions.value.gainer.filter})
 
     const requestParams: any = {
       category: 'gainer',
       ...rest,
-      ...sortConditions.value,
-      ...filterForm.value,
+      ...rankConditions.value.gainer.sort,
+      ...finalFilter,
     }
 
     if (currentRefreshId === refreshId.value && pageInfo.value.total > 0) {
@@ -315,7 +316,7 @@ watch(
     })
 
     // 应用当前排序条件
-    const { sort, sort_dir } = sortConditions.value
+    const { sort, sort_dir } = rankConditions.value.gainer.sort
     if (sort && sort_dir) {
       const sortVal = { asc: 1, desc: -1 }[sort_dir] || -1
       listData.value = updateList.toSorted((a, b) => {
@@ -462,7 +463,7 @@ const cellRenderer = computed(() => {
         <component
           :is="headerRenderer[item.key as keyof typeof headerRenderer]"
           v-model:isVolUSDT="isVolUSDT"
-          :sortConditions="sortConditions"
+          :sortConditions="rankConditions.gainer.sort"
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
