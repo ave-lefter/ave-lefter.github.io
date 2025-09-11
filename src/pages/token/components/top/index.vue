@@ -405,7 +405,7 @@
             v-tooltip="formatDate(pair?.created_at)"
             class="ml-5px hover:color-[--main-text] leading-12px font-400 mr-8px"
             >
-            {{ formatTimeFromNow(pair?.created_at) }}
+            {{ formatTimeFromNow(pair?.created_at, false, true) }}
             </span>
           <div
             v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0"
