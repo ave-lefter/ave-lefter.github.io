@@ -437,7 +437,7 @@ const getTxHistory = async () => {
         pageNo: 1,
       })
 
-      const rawList = res?.data?.list || []
+      const rawList = res?.list || []
 
       if (rawList.length > 0) {
         const mappedData = rawList.map(mapWalletOrderToTableRow)

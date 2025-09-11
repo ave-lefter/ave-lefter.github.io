@@ -15,7 +15,10 @@ import BigNumber from 'bignumber.js'
 
 const tokenDetailStore = useTokenDetailsStore()
 const botStore = useBotStore()
+const walletStore = useWalletStore()
+const globalStore = useGlobalStore()
 const {t} = useI18n()
+const route = useRoute()
 const listQuery = shallowRef({
   pageNO: 1,
   max_block_number: 0,
@@ -27,13 +30,22 @@ const attentionTriggerRef=ref()
 const checkedTrend = ref(['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY'])
 const trendList = shallowRef<GetTokenDetailsListResponse[]>([])
 const filteredTrendList = computed(() => {
+  const {address} = getAddressAndChainFromId(route.params.id as string)
   return trendList.value.filter(
     i =>
       (i.is_target && (i.event_type == 'swap_buy' || i.event_type == 'swap_sell')) ||
       !(i.event_type == 'swap_buy' || i.event_type == 'swap_sell')
-  ).filter(i => NATIVE_TOKENS.findIndex(y => y?.toLowerCase() == i.token?.toLowerCase()) == -1)
+  ).filter(el=>{
+    const nativeTokens = NATIVE_TOKENS.map(native => native.toLowerCase())
+    // 当前查看的是主币的持币详情
+    const isNativeTokenDetail = tokenDetailStore.tokenInfo ? nativeTokens.includes(tokenDetailStore.tokenInfo.address.toLowerCase()) :false
+    //  当前列表项中是主币
+    const isMainToken = NATIVE_TOKENS.includes(el.token.toLowerCase())
+    return (isNativeTokenDetail && isMainToken) || (!isNativeTokenDetail && !isMainToken)
+  })
 
 })
+const walletAddress = computed(() => botStore.evmAddress || walletStore.address)
 const listStatus = ref({
   loading: false,
   finished: false,
@@ -72,7 +84,7 @@ function _getTokenStatistics() {
   const {chain, address} = tokenDetailStore.tokenInfo!
   const data = {
     user_address: tokenDetailStore.user_address,
-    self_address: botStore.evmAddress,
+    self_address: walletAddress.value,
     token: address,
     chain
   }
@@ -108,6 +120,7 @@ function _getTokenDetailsList() {
   }
   getTokenDetailsList(data)
     .then(res => {
+      console.log(res,'res')
       const list = Array.isArray(res) ? res : []
       const arr = list.map(i => {
         let event_type = i.event_type
@@ -189,6 +202,7 @@ const collect = async () => {
         group: form.group,
         is_monitored: form.is_monitored,
       }).then((res) => {
+        globalStore.getFollowsNum()
         // getList()
         _getTokenStatistics()
         return Promise.resolve(res)
@@ -204,6 +218,7 @@ const collect = async () => {
     user_address: tokenDetailStore.user_address,
     user_chain: tokenDetailStore.tokenInfo!.chain
   }).then(() => {
+    globalStore.getFollowsNum()
     ElMessage.success( t('attention1Canceled'))
     // getList()
      _getTokenStatistics()

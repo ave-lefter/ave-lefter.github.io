@@ -19,8 +19,10 @@ const props = defineProps<{
 //   }
 //   return ''
 // })
+const globalStore = useGlobalStore()
 const popoverVisible = shallowRef(false)
-const isFilterHighlight = shallowRef(false)
+const setupFilter = globalStore.rankConditions[globalStore.rankActiveTab]?.filter
+const isFilterHighlight = shallowRef(!!setupFilter?.progress_min || !!setupFilter?.progress_max)
 const { t } = useI18n()
 
 function confirm(params?: [string, string]) {
@@ -55,6 +57,7 @@ function confirm(params?: [string, string]) {
     <!-- <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /> -->
     <RangePopover
       v-model="popoverVisible"
+      sortKey="progress"
       :width="225"
       :title=" $t('progress')"
       :list="[]"

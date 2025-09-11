@@ -100,7 +100,7 @@
         <button v-if="intro?.length > 250" class="text-12px color-#3F80F7 bg-transparent outline-none border-none clickable" @click.stop="showAll = !showAll" >{{ !showAll ? $t('more') : $t('expand') }}</button>
       </div>
     </div>
-    <div v-if="!isRank" :class="{ bg: active=='grid'}">
+    <div v-if="!isRank" :class="{ bg: active=='grid'}" class="mt-12px">
       <div class="text-14px color-[--third-text] flex items-center justify-start mb-12px">
         <Icon name="custom:ai" class="text-12px mr-5px"/> <span>{{ $t('aiSummary') }}</span>
       </div>

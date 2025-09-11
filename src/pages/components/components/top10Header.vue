@@ -7,23 +7,24 @@ const props = defineProps<{
   setFilterForm(...args: [string, string][]): void
 }>()
 
-function sortChange(sort_dir: string) {
-  props.setSortConditions({
-    sort: sort_dir ? 'holders_top10_ratio' : '',
-    sort_dir: sort_dir.replace('ending', ''),
-  })
-}
-const defaultSort = computed(() => {
-  if (props.sortConditions.sort === 'holders_top10_ratio') {
-    return (
-      {
-        asc: 'ascending',
-        desc: 'descending',
-      }[props.sortConditions.sort_dir] || ''
-    )
-  }
-  return ''
-})
+// function sortChange(sort_dir: string) {
+//   props.setSortConditions({
+//     sort: sort_dir ? 'holders_top10_ratio' : '',
+//     sort_dir: sort_dir.replace('ending', ''),
+//   })
+// }
+// const defaultSort = computed(() => {
+//   if (props.sortConditions.sort === 'holders_top10_ratio') {
+//     return (
+//       {
+//         asc: 'ascending',
+//         desc: 'descending',
+//       }[props.sortConditions.sort_dir] || ''
+//     )
+//   }
+//   return ''
+// })
+const globalStore = useGlobalStore()
 
 const popoverVisible = shallowRef(false)
 const openTimeList = shallowRef([
@@ -31,7 +32,7 @@ const openTimeList = shallowRef([
   { text: '< 30%', value: '30' },
   { text: '< 50%', value: '50' },
 ])
-const isFilterHighlight = shallowRef(false)
+const isFilterHighlight = shallowRef(!!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.holders_top10_ratio_min || !!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.holders_top10_ratio_max)
 const { t } = useI18n()
 function confirm(params?: [string, string]) {
   if (!params || !params.some((el) => !!el)) {
@@ -61,6 +62,7 @@ function confirm(params?: [string, string]) {
     <!-- <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /> -->
     <RangePopover
       v-model="popoverVisible"
+      sortKey="holders_top10_ratio"
       :width="225"
       :title="$t('top10Positions')"
       :list="openTimeList"

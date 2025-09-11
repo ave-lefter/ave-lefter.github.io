@@ -137,6 +137,24 @@ function subBalanceChange() {
   })
 }
 
+// 订阅画像
+function subscribePortrait() {
+  usePublicPortraitStore().reset()
+  const {address,chain} = getAddressAndChainFromId(route.params.id as string)
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: [WSEventType.PUBLIC_PORTRAIT],
+    id:1
+  })
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'subscribe',
+    params: [WSEventType.PUBLIC_PORTRAIT, address, chain],
+    id: 1
+  })
+}
+
 function _getTokenInfo() {
   const id = route.params.id as string
   getTokenInfo(id).then(res => {
@@ -165,6 +183,7 @@ function init() {
 
 watch(() => route.params.id, () => {
   init()
+  subscribePortrait()
 })
 
 function visibilitychangeFn() {
@@ -174,6 +193,7 @@ function visibilitychangeFn() {
 
 onBeforeMount(() => {
   init()
+  subscribePortrait()
   document.addEventListener('visibilitychange', visibilitychangeFn)
 })
 
@@ -186,6 +206,12 @@ onUnmounted(() => {
       'asset'
     ],
     id: 1
+  })
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: [WSEventType.PUBLIC_PORTRAIT],
+    id:1
   })
 })
 

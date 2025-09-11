@@ -259,8 +259,8 @@ function handleSelectChild(childItem, renderKey:string) {
       line-height: 1.5rem;
       border-radius: 1.875rem;
       // background: var(--columns-toolbar-button-color);
-      color: var(--main-text);
-      border: 1px solid var(--main-text);
+      color: var(--secondary-text);
+      border: 1px solid var(--secondary-text);
       cursor: move;
       display: flex;
       align-items: center;

@@ -38,9 +38,8 @@
         <div class="grid grid-cols-[1fr_1fr_62px_30px] gap-20px mt-8px mb-4px text-12px color-[--third-text]">
           <div class="text-left flex items-center gap-2px text-nowrap">
             {{ tableView.isAmount ? t('swapPrice') : t('MC') }}
-
             <el-button
-              class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
+              class="p-0 px-2px border-none [&&]:bg-[transparent] hover:bg-[transparent] h-auto"
               @click="tableView.isAmount = !tableView.isAmount"
             >
               <svg v-if="tableView.isAmount" width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" class="color-[--third-text]">
@@ -56,7 +55,7 @@
             <div class="flex items-center justify-end gap-2px">
               <span>{{ t('amountU').slice(0,3) }}</span>
               <el-button
-                class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
+                class="p-0 px-2px border-none [&&]:bg-[transparent] hover:bg-[transparent] h-auto"
                 @click="tableView.isVolUSDT = !tableView.isVolUSDT"
               >
                 <svg v-if="tableView.isVolUSDT" width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" class="color-[--third-text]">
@@ -251,7 +250,7 @@ import { computed, ref, shallowRef, watch, onMounted, onUnmounted, triggerRef } 
 import { storeToRefs } from 'pinia'
 import { useTokenStore } from '~/stores/token'
 import { useWSStore } from '~/stores/ws'
-import { getTokenTxs, type IGetTokenTxsResponse } from '~/api/token'
+import { getTokenTxs, type GetPairLiqResponse, type IGetTokenTxsResponse } from '~/api/token'
 import { getAddressAndChainFromId, formatTimeFromNow, getWSMessage, uuid } from '~/utils'
 import { useRoute } from 'vue-router'
 import { filterLanguage } from '~/pages/token/components/kLine/utils'
@@ -260,12 +259,14 @@ import { useThrottleFn } from '@vueuse/core'
 import UserRemark from '~/components/userRemark.vue'
 import MarkerTooltip from '../belowChartTable/transactions/markerTooltip.vue'
 import { ElScrollbar, type RowEventHandlerParams } from 'element-plus'
+import type { SimpleWSTx } from '../kLine/types'
+import BigNumber from 'bignumber.js'
 const tokenStore = useTokenStore()
 
 const MAKER_SUPPORT_CHAINS = ['solana', 'bsc']
 
 // 扩展的交易数据类型
-type ExtendedTxResponse = IGetTokenTxsResponse & {
+type ExtendedTxResponse = (IGetTokenTxsResponse | SimpleWSTx) & {
   count?: number
   senderProfile?: any
   wallet_tag?: string[]
@@ -511,7 +512,7 @@ function getWalletTag(val: IGetTokenTxsResponse) {
   }
 }
 
-function isBuy(row: IGetTokenTxsResponse) {
+function isBuy(row: IGetTokenTxsResponse | SimpleWSTx) {
   const tokenAddress = realAddress.value || addressAndChain.value.address
 
   if (!tokenAddress || !row) {
@@ -519,23 +520,41 @@ function isBuy(row: IGetTokenTxsResponse) {
     return false
   }
 
-  if (row.from_address &&
-      tokenAddress.toLowerCase?.() === row.from_address?.toLowerCase?.()) {
-    return false  // 卖出
+  if ('direction' in row && 'target' in row) {
+    return row.direction === 'buy'
   }
-  if (row.to_address &&
-      tokenAddress.toLowerCase?.() === row.to_address?.toLowerCase?.()) {
-    return true   // 买入
+  if ('from_address' in row) {
+    if (
+      row.from_address &&
+      realAddress.value.toLowerCase?.() === row.from_address?.toLowerCase?.()
+    ) {
+      return false
+    }
   }
-  return false
+
+  if ('to_address' in row) {
+    if (
+      row.to_address &&
+      realAddress.value.toLowerCase?.() === row.to_address.toLowerCase?.()
+    ) {
+      return true
+    }
+  }
 }
 
 function getRowColor(row: IGetTokenTxsResponse) {
+  if ('type' in row) {
+    if (row.type === 'addLiquidity') {
+      return 'color-#65C4ED'
+    } else if (row.type === 'removeLiquidity' || row.type === 'CollectFee') {
+      return 'color-#EF6DE2'
+    }
+  }
   return isBuy(row) ? 'color-#12B886' : 'color-#FF646D'
 }
 
 
-function getMcPrice(row: IGetTokenTxsResponse) {
+function getMcPrice(row: IGetTokenTxsResponse | SimpleWSTx) {
 
   // 获取total总数
   const total = tokenStore.circulation
@@ -543,37 +562,40 @@ function getMcPrice(row: IGetTokenTxsResponse) {
   // 根据买/卖方向获取对应的USD价格（成交价）
   let currentPriceUsd = 0
   const tokenAddress = realAddress.value || addressAndChain.value.address
-
-  if (row.from_address && tokenAddress.toLowerCase?.() === row.from_address?.toLowerCase?.()) {
-    // 卖出：使用 from_price_usd
-    currentPriceUsd = Number(row.from_price_usd) || 0
-  } else if (row.to_address && tokenAddress.toLowerCase?.() === row.to_address?.toLowerCase?.()) {
-    // 买入：使用 to_price_usd
-    currentPriceUsd = Number(row.to_price_usd) || 0
+  if ('direction' in row && 'target' in row) {
+    currentPriceUsd = Number(row.price_u)
   } else {
-    // 如果无法判断方向，使用默认价格
-    currentPriceUsd = Number(row.to_price_usd) || Number(row.from_price_usd) || 0
+    if (row.from_address && tokenAddress.toLowerCase?.() === row.from_address?.toLowerCase?.()) {
+      // 卖出：使用 from_price_usd
+      currentPriceUsd = Number(row.from_price_usd) || 0
+    } else if (row.to_address && tokenAddress.toLowerCase?.() === row.to_address?.toLowerCase?.()) {
+      // 买入：使用 to_price_usd
+      currentPriceUsd = Number(row.to_price_usd) || 0
+    } else {
+      // 如果无法判断方向，使用默认价格
+      currentPriceUsd = Number(row.to_price_usd) || Number(row.from_price_usd) || 0
+    }
+    // 如果价格为0，记录警告
+    if (currentPriceUsd === 0) {
+      console.warn('⚠️ MC计算失败 - 价格为0:', {
+        from_price_usd: row.from_price_usd,
+        to_price_usd: row.to_price_usd,
+        from_address: row.from_address,
+        to_address: row.to_address,
+        tokenAddress,
+        isBuy: isBuy(row),
+        transaction: row.transaction
+      })
+    }
   }
 
-  // 如果价格为0，记录警告
-  if (currentPriceUsd === 0) {
-    console.warn('⚠️ MC计算失败 - 价格为0:', {
-      from_price_usd: row.from_price_usd,
-      to_price_usd: row.to_price_usd,
-      from_address: row.from_address,
-      to_address: row.to_address,
-      tokenAddress,
-      isBuy: isBuy(row),
-      transaction: row.transaction
-    })
-  }
 
   // 计算市值 = 成交价USD × 总数
-  const marketCap = currentPriceUsd * total
+  const marketCap = currentPriceUsd * total?.toNumber()
 
   return marketCap
 }
-function getAmount(row: IGetTokenTxsResponse, needPrice = false, isVolUSDT = false) {
+function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, needPrice = false, isVolUSDT = false) {
   // 使用 realAddress 确保地址匹配的准确性
   const tokenAddress = realAddress.value || addressAndChain.value.address
 
@@ -583,20 +605,35 @@ function getAmount(row: IGetTokenTxsResponse, needPrice = false, isVolUSDT = fal
     return 0
   }
 
-  if (row.from_address &&
-      tokenAddress.toLowerCase?.() === row.from_address?.toLowerCase?.()) {
-    const amount = Number(row.from_amount) || 0
-    const price = needPrice ? Number(isVolUSDT ? row.from_price_usd : row.from_price_eth) || 0 : 1
-    return amount * price
+  if ('direction' in row && 'target' in row) {
+    return Number(row.target_amt || 0) * (
+        needPrice ? Number(isVolUSDT ? row.price_u : row.price_m)
+          : 1
+      )
+  }
+  if ('from_address' in row) {
+    if (
+      row.from_address &&
+      realAddress.value.toLowerCase?.() === row.from_address?.toLowerCase?.()
+    ) {
+      return row.from_amount * (
+        needPrice ? Number(isVolUSDT ? row.from_price_usd : row.from_price_eth)
+          : 1
+      )
+    }
   }
 
-  if (row.to_address &&
-      tokenAddress.toLowerCase?.() === row.to_address?.toLowerCase?.()) {
-    const amount = Number(row.to_amount) || 0
-    const price = needPrice ? Number(isVolUSDT ? row.to_price_usd : row.to_price_eth) || 0 : 1
-    return amount * price
+  if ('to_address' in row) {
+    if (
+      row.to_address &&
+      realAddress.value.toLowerCase?.() === row.to_address.toLowerCase?.()
+    ) {
+      return row.to_amount * (
+        needPrice ? Number(isVolUSDT ? row.to_price_usd : row.to_price_eth)
+          : 1
+      )
+    }
   }
-
   return 0
 }
 
@@ -619,7 +656,7 @@ function formatFixedDecimals(value: number, decimals: number): string {
 }
 
 // 新增函数：获取成交价格
-function getTransactionPrice(row: IGetTokenTxsResponse, isVolUSDT = false) {
+function getTransactionPrice(row: IGetTokenTxsResponse | SimpleWSTx, isVolUSDT = false) {
   // 使用 realAddress 确保地址匹配的准确性
   const tokenAddress = realAddress.value || addressAndChain.value.address
 
@@ -627,6 +664,10 @@ function getTransactionPrice(row: IGetTokenTxsResponse, isVolUSDT = false) {
   if (!tokenAddress || !row) {
     console.warn('🚨 getTransactionPrice: 缺少必要参数', { tokenAddress, row })
     return 0
+  }
+
+  if ('direction' in row && 'target' in row) {
+    return Number(isVolUSDT ? row.price_u : row.price_m) || 0
   }
 
   if (row.from_address &&
@@ -752,6 +793,9 @@ function openMarkerTooltip(row: ExtendedTxResponse, e: MouseEvent) {
 
 
 function hasNewAccount(row: ExtendedTxResponse) {
+  if ('direction' in row && 'target' in row) {
+    return row.direction === 'buy' && new BigNumber(row.maker_bal).eq(row.target_amt)
+  }
   if (row?.newTags?.some?.(i => i?.type === '8')) {
     return false
   }
@@ -765,6 +809,9 @@ function hasNewAccount(row: ExtendedTxResponse) {
 }
 
 function hasClearedAccount(row: ExtendedTxResponse) {
+  if ('direction' in row && 'target' in row) {
+    return row.direction === 'sell' && new BigNumber(row.maker_bal).eq(0)
+  }
   if (isBuy(row) || row.newTags?.some?.(i => i?.type === '8')) {
     return false
   }
@@ -778,6 +825,9 @@ function hasClearedAccount(row: ExtendedTxResponse) {
 }
 
 function bigWallet(row: ExtendedTxResponse) {
+  if ('maker_eth' in row) {
+    return Number(row.maker_eth || 0) >= 50
+  }
   if (row?.newTags?.some?.(i => i.type === '8')) {
     return false
   }
@@ -786,7 +836,7 @@ function bigWallet(row: ExtendedTxResponse) {
 
 // WebSocket 相关功能
 onMounted(() => {
-  onTxsLiqMessage()
+  // onTxsLiqMessage()
   // 如果组件挂载时 orderBook 已经打开，则获取数据
   if (props.modelValue && pairAddress.value) {
     _getTokenTxs()
@@ -802,50 +852,114 @@ onUnmounted(() => {
   }
 })
 
-function onTxsLiqMessage() {
-  wsStore.getWSInstance()?.onmessage(e => {
-    const msg = getWSMessage(e)
-    if (!msg || !props.modelValue) {
-      return  // 只有当 orderBook 打开时才处理消息
+watch(() => wsStore.wsResult[WSEventType.TX], data => {
+  if (!data || listStatus.value.loadingTxs) {
+    return
+  }
+  const {wallet_address, from_address, to_address} = data.tx
+  // 不是当前币种的数据
+  if (from_address !== realAddress.value && to_address !== realAddress.value) {
+    return
+  }
+
+// 检查是否已存在相同的交易（防重复）
+  const existingTx = wsPairCache.value.find(tx =>
+    (('transaction' in tx && tx.transaction === data.tx.transaction &&
+    tx.wallet_address === wallet_address))
+  )
+  if (existingTx) {
+    console.log('🔄 跳过重复交易:', data.tx.transaction)
+    return
+  }
+  txCount.value[wallet_address] = (txCount.value[wallet_address] || 0) + 1
+  const { topN, wallet_tag } = getWalletTag(data.tx)
+  const item = {
+    ...data.tx,
+    topN, wallet_tag,
+    senderProfile: JSON.parse(data.tx.profile || '{}'),
+    count: txCount.value[wallet_address],
+    time: Math.min(Math.floor(Date.now() / 1000), data.tx.time),
+    uuid: uuid()
+  }
+  wsPairCache.value.unshift(item)
+  if (!isPausedTxs.value) {
+    updatetokenTxs()
+  }
+})
+
+watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
+  if (!data || listStatus.value.loadingTxs) {
+    return
+  }
+  const simpleWSTx = data.msg as SimpleWSTx
+  const {maker, target} = simpleWSTx
+  // 不是当前币种的数据
+  if (target !== realAddress.value) {
+    return
+  }
+  txCount.value[maker] = (txCount.value[maker] || 0) + 1
+  const { topN, wallet_tag } = getWalletTag(data.msg)
+  const item = {
+    ...simpleWSTx,
+    topN, wallet_tag,
+    count: txCount.value[maker],
+    time: Math.min(Math.floor(Date.now() / 1000), simpleWSTx.time),
+    uuid: uuid(),
+    wallet_address: maker,
+    transaction: simpleWSTx.txhash,
+    senderProfile: {
+      solTotalHolding: simpleWSTx.maker_eth
     }
+  }
+  wsPairCache.value.unshift(item as any)
+  if (!isPausedTxs.value) {
+    updatetokenTxs()
+  }
+})
+// function onTxsLiqMessage() {
+//   wsStore.getWSInstance()?.onmessage(e => {
+//     const msg = getWSMessage(e)
+//     if (!msg || !props.modelValue) {
+//       return  // 只有当 orderBook 打开时才处理消息
+//     }
 
-    const {event, data} = msg
-    if (event == WSEventType.TX && !listStatus.value.loadingTxs) {
-      const {wallet_address, from_address, to_address} = data.tx
+//     const {event, data} = msg
+//     if (event == WSEventType.TX && !listStatus.value.loadingTxs) {
+//       const {wallet_address, from_address, to_address} = data.tx
 
-      // 检查是否是当前币种的数据
-      if (from_address !== realAddress.value && to_address !== realAddress.value) {
-        return
-      }
+//       // 检查是否是当前币种的数据
+//       if (from_address !== realAddress.value && to_address !== realAddress.value) {
+//         return
+//       }
 
-      // 检查是否已存在相同的交易（防重复）
-      const existingTx = wsPairCache.value.find(tx =>
-        tx.transaction === data.tx.transaction &&
-        tx.wallet_address === wallet_address
-      )
-      if (existingTx) {
-        console.log('🔄 跳过重复交易:', data.tx.transaction)
-        return
-      }
+//       // 检查是否已存在相同的交易（防重复）
+//       const existingTx = wsPairCache.value.find(tx =>
+//         tx.transaction === data.tx.transaction &&
+//         tx.wallet_address === wallet_address
+//       )
+//       if (existingTx) {
+//         console.log('🔄 跳过重复交易:', data.tx.transaction)
+//         return
+//       }
 
-      txCount.value[wallet_address] = (txCount.value[wallet_address] || 0) + 1
-      const {topN, wallet_tag} = getWalletTag(data.tx)
-      const item = {
-        ...data.tx,
-        topN, wallet_tag,
-        senderProfile: JSON.parse(data.tx.profile || '{}'),
-        count: txCount.value[wallet_address],
-        time: Math.min(Math.floor(Date.now() / 1000), data.tx.time),
-        uuid: uuid()
-      }
-      wsPairCache.value.unshift(item)
+//       txCount.value[wallet_address] = (txCount.value[wallet_address] || 0) + 1
+//       const {topN, wallet_tag} = getWalletTag(data.tx)
+//       const item = {
+//         ...data.tx,
+//         topN, wallet_tag,
+//         senderProfile: JSON.parse(data.tx.profile || '{}'),
+//         count: txCount.value[wallet_address],
+//         time: Math.min(Math.floor(Date.now() / 1000), data.tx.time),
+//         uuid: uuid()
+//       }
+//       wsPairCache.value.unshift(item)
 
-      if (!isPausedTxs.value) {
-        updatetokenTxs()
-      }
-    }
-  }, 'tx_history')
-}
+//       if (!isPausedTxs.value) {
+//         updatetokenTxs()
+//       }
+//     }
+//   }, 'tx_history')
+// }
 
 const updatetokenTxs = useThrottleFn(() => {
   if (wsPairCache.value.length === 0) return
@@ -853,8 +967,8 @@ const updatetokenTxs = useThrottleFn(() => {
   // 去重处理：检查新数据是否已存在于tokenTxs中
   const newTxs = wsPairCache.value.filter(newTx =>
     !tokenTxs.value.some(existingTx =>
-      existingTx.transaction === newTx.transaction &&
-      existingTx.wallet_address === newTx.wallet_address
+      ('transaction' in existingTx && 'transaction' in newTx && existingTx.transaction === newTx.transaction &&
+      existingTx.wallet_address === newTx.wallet_address)
     )
   )
 
