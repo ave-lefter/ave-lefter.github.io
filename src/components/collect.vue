@@ -26,6 +26,9 @@ const userFavoriteGroupsWithDefault = computed(()=>{
 })
 
 function clickStar() {
+    if(!verifyLogin()){
+        return
+    }
     if(props.isCollected){
         emit('collect')
     } else {

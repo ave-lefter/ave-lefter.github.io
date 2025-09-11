@@ -45,8 +45,15 @@ const walletAddress = computed(() => {
 
 onMounted(() => {
   _getTreasureConfig()
-  useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+  if(walletAddress.value){
+    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+  }
   trackRef({category: 'view', extra: 'home(pro.ave.ai)'})
+})
+watch(()=>walletAddress.value,(val)=>{
+  if(val){
+    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+  }
 })
 const wsStore = useWSStore()
 // 把榜单的订阅取消掉

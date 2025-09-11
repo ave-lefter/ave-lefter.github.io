@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { addFavorite, addFavoriteGroup } from '~/api/fav'
+import { addFavorite, addFavoriteGroup, removeFavorite } from '~/api/fav'
 import XIcon from '~/components/xPopup/xIcon.vue'
 
-const emit = defineEmits(['collect','toggleKline'])
+const emit = defineEmits(['toggleKline'])
 const rankKlineStore = useRankKlineStore()
 const walletStore = useWalletStore()
 const botStore = useBotStore()
@@ -100,6 +100,43 @@ function newGroupAndCollect(newGroupName:string) {
     }
   }).catch(console.log)
 }
+
+async function collect(newGroupId?:number) {
+  if (walletAddress.value) {
+    if (walletStore.address) {
+      await walletStore.signMessageForFavorite()
+    }
+    if (props.row.is_fav) {
+      removeTokenFavorite(props.row)
+    } else {
+      addTokenFavorite(props.row,newGroupId || 0)
+    }
+  } else {
+    verifyLogin()
+  }
+}
+
+function removeTokenFavorite(row) {
+  removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
+    .then(() => {
+      ElMessage.success(t('cancelled1'))
+      row.is_fav = false
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
+
+function addTokenFavorite(row, newGroupId: number) {
+  addFavorite(`${row.token}-${row.chain}`, walletAddress.value, newGroupId)
+    .then(() => {
+      ElMessage.success(t('collected'))
+      row.is_fav = true
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
 </script>
 
 <template>
@@ -125,7 +162,7 @@ function newGroupAndCollect(newGroupName:string) {
       >#{{ (pageNO - 1) * pageSize + rowIndex + 1 }}</span
     >
     <div class="flex items-center">
-      <Collect :iconClass="`text-16px cursor-pointer ml-5px mr-12px`" :isCollected="row.is_fav" :userFavoriteGroups="globalStore.userFavoriteGroups" @collect="emit('collect', rowIndex, row)" @newGroupAndCollect="newGroupAndCollect"/>
+      <Collect :iconClass="`text-16px cursor-pointer ml-5px mr-12px`" :isCollected="row.is_fav" :userFavoriteGroups="globalStore.userFavoriteGroups" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
     </div>
     <div class="flex items-center gap-8px">
       <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
