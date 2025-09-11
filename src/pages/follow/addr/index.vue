@@ -2,14 +2,14 @@
   <div class="w-address flex-1 w-100% h-[calc(100%-76px)] flex flex-col relative" :class="{ 'mt-12px': currentAddress }">
     <ul v-if="currentAddress" class="w-operate">
       <li v-if="evmAddress" class="flex items-center gap-2px">
-          <el-checkbox v-model="isMonitor" :label="t('onlyPush')"  style="color:var(--d-999-l-666);z-index: 0;--el-checkbox-font-weight:400" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! [&&]:[--el-checkbox-input-border:1px_solid_var(--d-666-l-999)]" size="large"/>
-          <span class="text-[var(--d-999-l-666)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/50` }}</span>
+          <el-checkbox v-model="isMonitor" :label="t('onlyPush')"  style="color:var(--secondary-text);z-index: 0;--el-checkbox-font-weight:400" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! [&&]:[--el-checkbox-input-border:1px_solid_var(--d-666-l-999)]" size="large"/>
+          <span class="text-[var(--secondary-text)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/50` }}</span>
       </li>
       <li class="btn">
         <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>
       </li>
       <li>
-        <el-radio-group v-model="conditions.time_interval" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#111':'#fff'" :text-color="isDark?'#F5F5F5':'#333'" @change="()=>{}">
+        <el-radio-group v-model="conditions.time_interval" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#1F242C':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
           <el-radio-button label="7D" :value="'7d'" />
           <el-radio-button label="30D" :value="'30d'" />
         </el-radio-group>
@@ -19,7 +19,7 @@
       <pro-groups v-if="!isMonitor" v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
       <!-- <div v-else/> -->
     </div>
-    <div class="m-table w-100% mt-12px flex-1 overflow-hidden">
+    <div class="m-table w-100% mt-12px flex-1 overflow-hidden bg-[--secondary-bg]">
       <el-table
       ref="tableRef" v-loading="loading" class='' :data="filterDataSource" table-layout="fixed" row-class-name="group" height="calc(100% - 72px)"
       :default-sort="defaultSort" @sort-change="handleSortChange" @row-click="tableRowClick">
@@ -933,12 +933,12 @@ function handleSort(val:any, dir='',sort:string) {
 <style scoped lang="scss">
 :deep().el-radio-group{
   padding: 2px;
-  background: var(--d-222-l-F2F2F2);
+  background: var(--main-input-button-bg);
   border-radius: 4px;
   .el-radio-button__inner{
-    background: var(--d-222-l-F2F2F2);
+    background: var(--main-input-button-bg);
     border: none;
-    color: var(--d-666-l-999);
+    color: var(--secondary-text);
     font-weight: 500;
   }
 }
@@ -968,10 +968,10 @@ function handleSort(val:any, dir='',sort:string) {
     height: 24px;
     line-height: 24px;
     cursor: pointer;
-    background-color: var(--d-222-l-F2F2F2);
+    background-color: var(--main-input-button-bg);
     justify-content: center;
     align-items: center;
-    color: var(--d-999-l-666);
+    color: var(--secondary-text);
     border-radius: 4px;
 
     &.active {

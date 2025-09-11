@@ -332,8 +332,8 @@ onBeforeUnmount(() => {
     <div v-if="botStore.evmAddress || walletStore.address"
       class="flex items-center px-16px mt-12px gap-8px overflow-x-auto scrollbar-hide">
       <div v-for="(item, index) in allTabsGroup" :key="item.value"
-        class="cursor-pointer text-12px color-[--d-666-l-999] bg-[--d-1A1A1A-l-F2F2F2] px-8px h-28px rounded-4px shrink-0 flex items-center"
-        :class="[activeTab === item.value && 'bg-[--d-333-l-0A0B0C] color-[#F5F5F5]']"
+        class="cursor-pointer text-12px color-[--third-text] bg-[--main-input-button-bg] px-8px h-28px rounded-4px shrink-0 flex items-center"
+        :class="[activeTab === item.value && 'bg-[#3F80F7] color-[#F5F5F5]']"
         @click="setActiveTab(item.value)">
         {{ item.label }}
         <el-popover trigger="click" @hide="editHide" ref="editGroupPopoverRef" :width="editId ? 250 : 100"
@@ -377,7 +377,7 @@ onBeforeUnmount(() => {
         <template #reference>
           <!-- 新增 -->
           <div @click="editId = undefined"
-            class="cursor-pointer text-12px bg-[--d-222-l-F2F2F2] color-[--d-999-l-666] px-8px h-28px rounded-4px shrink-0 flex items-center">
+            class="cursor-pointer text-12px bg-[--main-input-button-bg] color-[--secondary-text] px-8px h-28px rounded-4px shrink-0 flex items-center">
             <Icon name="custom:add-icon" class="text-12px mr-2px" />
             {{ t('newGroup') }}
           </div>
@@ -401,7 +401,7 @@ onBeforeUnmount(() => {
       <el-popover trigger="click" @hide="moveValue = ''" ref="moveGroupPopoverRef" :width="250">
         <template #reference>
           <div @click="handleMoveGroup"
-            class="cursor-pointer text-12px bg-[--d-222-l-F2F2F2] color-[--d-999-l-666] px-8px h-28px rounded-4px shrink-0 flex items-center">
+            class="cursor-pointer text-12px bg-[--main-input-button-bg] color-[--secondary-text] px-8px h-28px rounded-4px shrink-0 flex items-center">
             <Icon name="custom:list-icon" class="text-12px mr-2px" />
             {{ t('groupManage') }}
           </div>
