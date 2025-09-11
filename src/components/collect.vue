@@ -44,7 +44,7 @@ const onConfirm = () => {
     } else {
         emit('collect',activeGroupId.value)
     }
-    popoverVisible.value = false
+    hidePopover()
 }
 
 document.addEventListener('click',hidePopover)
@@ -54,6 +54,8 @@ onUnmounted(()=>{
 
 function hidePopover() {
     popoverVisible.value = false
+    newGroupName.value = ''
+    inputVisible.value = false
 }
 
 function changeActiveGroupId(groupId:number) {

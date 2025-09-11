@@ -72,7 +72,7 @@ export const useGlobalStore = defineStore('global', () => {
     quickBuyValue: '0.01',
   })
   const latestNotice = shallowRef<ILatestNotice>({})
-  const userFavoriteGroups = shallowRef<GetUserFavoriteGroupsResponse[]>([])
+  const userFavoriteGroups = ref<GetUserFavoriteGroupsResponse[]>([])
   const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])

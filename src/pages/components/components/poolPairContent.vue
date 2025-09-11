@@ -87,16 +87,11 @@ function toggleKline() {
 function newGroupAndCollect(newGroupName:string) {
   addFavoriteGroup(newGroupName,walletAddress.value).then(res=>{
     if(res){
-      addFavorite(props.row.id, walletAddress.value, Number(res)).then(() => {
-        ElMessage.success(t('collected'))
-        globalStore.userFavoriteGroups.push({
-          group_id: Number(res),
-          name: newGroupName,
-        })
+      globalStore.userFavoriteGroups.push({
+        group_id: Number(res),
+        name: newGroupName,
       })
-      .catch((err) => {
-        console.log(err)
-      })
+      addTokenFavorite(props.row,Number(res))
     }
   }).catch(console.log)
 }
