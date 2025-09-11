@@ -70,6 +70,8 @@ export const useGlobalStore = defineStore('global', () => {
     quickVisible: true,
     quickBuyValue: '0.01',
   })
+
+  const lastVisitTokens = useStorage('lastTokens', [])
   const latestNotice = shallowRef<ILatestNotice>({})
   const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)
 
@@ -160,6 +162,7 @@ export const useGlobalStore = defineStore('global', () => {
     headFollowsNum,
     getFollowsNum,
     latestNotice,
-    pnlTrackerVisible
+    pnlTrackerVisible,
+    lastVisitTokens
   }
 })

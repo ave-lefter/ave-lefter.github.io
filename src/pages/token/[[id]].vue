@@ -69,7 +69,6 @@ const scrollbarHeight = computed(() => {
 })
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
-const {add} = useCacheArr('lastTokens')
 const addresses = computed(() => {
   const result = botStore.userInfo?.addresses
   if (Array.isArray(result)) {
@@ -202,7 +201,18 @@ function refresh() {
 }
 
 function addVisit() {
-  
+  if(globalStore.lastVisitTokens.length >= 10){
+    globalStore.lastVisitTokens.shift()
+  }
+  if(tokenStore.tokenInfo){
+    const {logo_url,symbol,chain,token} = tokenStore.tokenInfo.token
+    globalStore.lastVisitTokens.push({
+      logo_url,
+      symbol,
+      chain,
+      token,
+    })
+  }
 }
 </script>
 
