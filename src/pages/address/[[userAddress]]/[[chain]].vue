@@ -247,4 +247,7 @@ function scrollToTop() {
     border-color: var(--d-333-l-666);
   }
 }
+:deep(.el-scrollbar__bar.is-vertical){
+  display: none;
+}
 </style>
