@@ -150,6 +150,7 @@
             :searchOriginKeyword="searchOriginKeyword"
             :searchOriginType="searchOriginType"
             @handleSortChange="handleSortChange"
+            @filterAddress="filterAddress"
             @filterOriginAddress="filterOriginAddress"
           />
           <!-- <el-tooltip
@@ -215,6 +216,7 @@ import BigNumber from 'bignumber.js'
 import {
   _getTop100range,
   _getHoldersList,
+  searchAddressHolder,
   type AggregateStats,
   type HolderStat,
 } from '@/api/holders'
@@ -253,15 +255,16 @@ const { t } = useI18n()
 const activeTab = shallowRef<'all' | 'buy' |'sell' | 'buy24h' | 'sell24h' | '-100'>('all')
 const globalStore = useGlobalStore()
 
+// keyword: input value in the popover; searchKeyword: active search flag/value
 const searchKeyword = shallowRef('')
 const loadingHolders = shallowRef(false)
 
 const holderListObj = ref<Record<string, HolderStat[]>>({})
+const filterListObj = ref<Record<string, HolderStat[]>>({})
 const aggregateStatsObj = ref<Record<string, AggregateStats>>({})
 const selfAddress = computed(() => botStore.evmAddress || walletStore.address)
 
   // const show_bubble = shallowRef(false)
-
 const searchOriginKeyword = shallowRef('')
 const searchOriginType = shallowRef('')
 const holdersRef = useTemplateRef('holdersRef')
@@ -310,27 +313,19 @@ const tabs = computed(() => {
 })
 const id = computed(() => route.params.id as string)
 const holderList = computed(() => {
-  // if (this.searchKeyword) {
-  //   return this.filterList || []
-  // }
-  const list = holderListObj?.value?.[activeTab.value] || []
-  // list = list?.map(i => {
-  //   if (
-  //     this.$store.state.token_user?.remark &&
-  //     i.holder === this.$store.state.token_user?.address
-  //   ) {
-  //     i.remark = this.$store.state.token_user?.remark
-  //   }
-  //   return i
-  // })
+  // Switch data source based on searchKeyword: align with legacy behavior
+  const baseList = searchKeyword.value
+    ? (filterListObj?.value?.[activeTab.value] || [])
+    : (holderListObj?.value?.[activeTab.value] || [])
+
   if (searchOriginKeyword.value) {
     if (searchOriginType.value == 'sol') {
-      return list?.filter(i => i.sol_first_transfer_in_from == searchOriginKeyword.value) || []
+      return baseList?.filter(i => i.sol_first_transfer_in_from == searchOriginKeyword.value) || []
     } else {
-      return list?.filter(i => i.token_first_transfer_in_from == searchOriginKeyword.value) || []
+      return baseList?.filter(i => i.token_first_transfer_in_from == searchOriginKeyword.value) || []
     }
   }
-  return list || []
+  return baseList || []
 })
 
 const aggregateStats = computed(
@@ -484,6 +479,35 @@ function filterOriginAddress(row:{ address: string, type: string }) {
     searchOriginKeyword.value = row.address || ''
     searchOriginType.value = row.type || ''
   }
+}
+function filterAddress(val: string) {
+  // Align with legacy: when there is a search keyword, use dedicated search API
+  searchKeyword.value = val || ''
+  if (!searchKeyword.value) {
+    getHoldersList()
+    return
+  }
+  let tag_type: string | undefined = undefined
+  if (!['all', 'buy', 'sell', 'buy24h', 'sell24h'].some(i => activeTab.value === i)) {
+    tag_type = activeTab.value
+  }
+  const params = {
+    token_id: id.value,
+    self_address: selfAddress.value,
+    keyword: searchKeyword.value,
+    tag_type,
+  }
+  loadingHolders.value = true
+  searchAddressHolder(params)
+    .then((res) => {
+      filterListObj.value[activeTab.value] = Array.isArray(res) ? res : []
+    })
+    .catch(() => {
+      filterListObj.value[activeTab.value] = []
+    })
+    .finally(() => {
+      loadingHolders.value = false
+    })
 }
 </script>
 <style lang="scss" scoped>

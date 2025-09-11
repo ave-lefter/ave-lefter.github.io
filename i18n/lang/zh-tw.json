@@ -1368,5 +1368,16 @@
   "MaxTxAmount": "單筆tx最大量",
   "MaxWalletAmount": "單錢包最大量",
   "riskRemoved": "已解除",
-  "groupNameAlreadyExists": "分組名稱已存在"
+  "groupNameAlreadyExists": "分組名稱已存在",
+  "displayBorder": "顯示描邊",
+  "highlightBorder": "突出描邊",
+  "display": "顯示",
+  "background": "背景",
+  "layout": "佈局",
+  "undo": "不打開",
+  "open": "打開",
+  "jump": "打開跳轉",
+  "threeLayout": "三欄佈局",
+  "detailsAfterPurchase": "買後代幣詳情",
+  "mini": "小號"
 }

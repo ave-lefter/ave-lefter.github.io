@@ -219,3 +219,16 @@ debox-chat-widget {
   transition-duration: 0s !important;
   transition-timing-function: linear !important;
 }
+/* 隐藏 el-scrollbar 自带的滚动条 */
+.hidden-scrollbar .el-scrollbar__bar {
+  display: none;
+}
+
+/* 同时隐藏浏览器默认滚动条 */
+.hidden-scrollbar ::-webkit-scrollbar {
+  display: none;
+}
+.hidden-scrollbar {
+  -ms-overflow-style: none;  /* IE、Edge */
+  scrollbar-width: none;     /* Firefox */
+}

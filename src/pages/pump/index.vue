@@ -88,7 +88,7 @@
         :settingsButtonVisible="true"
       />
       <div class="flex-1" />
-      <Setting :chain="activeChain"/>
+      <Setting :chain="activeChain" :pumpConfig="pumpConfig"/>
       <BlackList />
       <AutoSellSetting :chain="activeChain" />
       <div class="tabs">
@@ -114,8 +114,8 @@
         </button>
       </div>
     </div>
-    <el-row  :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full px-16px">
-      <el-col v-if="single('new')" :span=" width > 1024 ? 8 : 24">
+    <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full px-16px">
+      <el-col v-show="single('new') && pumpSetting.grid['new'].show" :span="getSpan()" :style="{order: orderNew}">
         <div class="pump-item  rounded-4px" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px">
             <template v-if="width > 1024">
@@ -202,13 +202,14 @@
 
           <PumpList
             class="pump-item_list-new"
+            type="new"
             :tableList="list1 || []"
             :quickBuyValue="quickBuyValue"
             :loading="loading[activeChain + '-' + 'new']"
           />
         </div>
       </el-col>
-      <el-col v-if="single('soon')" :span=" width > 1024 ? 8 : 24">
+      <el-col v-show="single('soon') && pumpSetting.grid['soon'].show" :span="getSpan()" :style="{order: orderSoon}">
         <div class="pump-item" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
@@ -294,6 +295,7 @@
           </div>
           <PumpList
             class="pump-item_list-soon"
+            type="soon"
             :tableList="list2 || []"
             :quickBuyValue="quickBuyValue"
             :loading="loading[activeChain + '-' + 'soon']"
@@ -301,7 +303,7 @@
           />
         </div>
       </el-col>
-      <el-col v-if="single('graduated')" :span=" width > 1024 ? 8 : 24">
+      <el-col v-show="single('graduated') && pumpSetting.grid['graduated'].show" :span="getSpan()" :style="{order: orderGraduated}">
         <div class="pump-item" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px rounded-4px">
             <template v-if="width > 1024">
@@ -389,6 +391,7 @@
           <PumpList
             class="pump-item_list-graduated"
             :tableList="list3 || []"
+            type="graduated"
             :quickBuyValue="quickBuyValue"
             :loading="loading[activeChain + '-' + 'graduated']"
             isOut
@@ -396,6 +399,7 @@
         </div>
       </el-col>
     </el-row>
+
     <audio
       ref="pumpAudio" controls style="display: none"
       src="/signal.mp3"
@@ -441,6 +445,15 @@ const activeChain = useStorage<ChainKey>(
 const globalStore = useGlobalStore()
 const { pumpSetting, token_logo_url, pumpBlackList } = storeToRefs(globalStore)
 
+const orderNew = computed(() => {
+  return pumpSetting.value.grid['new'].order
+})
+const orderSoon = computed(() => {
+  return pumpSetting.value.grid['soon'].order
+})
+const orderGraduated= computed(() => {
+  return pumpSetting.value.grid['graduated'].order
+})
 const pumpConfig = shallowRef<PumpConfig[]>()
 const isRotate = ref(false)
 const pump_count = shallowRef({
@@ -1347,7 +1360,23 @@ function getFilterData(list, conditions) {
         }
         return pass
       })
+}
+function getSpan() {
+  const visibleList = Object.values(pumpSetting?.value.grid || {}).filter(i => i.show) || []
+  if (width.value > 1024) {
+    if(visibleList?.length ==1){
+      return 24
     }
+    if(visibleList?.length ==2){
+      return 12
+    }
+    if(visibleList?.length ==3){
+      return 8
+    }
+  } else {
+    return 24
+  }
+}
 </script>
 
 <style scoped lang="scss">
