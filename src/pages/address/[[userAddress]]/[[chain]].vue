@@ -4,11 +4,7 @@
       <el-select
         :style="{ width: '120px' }"
         :model-value="chain"
-        @update:model-value="
-          (val) => {
-            navigateTo(`/address/${botStore.getWalletAddress(val)}/${val}`)
-          }
-        "
+        @update:model-value="updateModelChain"
       >
         <template #prefix>
           <ChainToken :chain="chain" :width="16" />
@@ -89,7 +85,7 @@ import ActivityCharts from './components/activityCharts.vue'
 import PageBlank from './components/pageBlank.vue'
 import PageOther from './components/pageOther.vue'
 import { getChainInfo } from '@/utils'
-import { useEventBus } from '@vueuse/core'
+import { useEventBus,useStorage } from '@vueuse/core'
 
 const isVolUSDT = ref(true)
 provide('isVolUSDT', isVolUSDT)
@@ -100,12 +96,13 @@ const route = useRoute()
 const botStore = useBotStore()
 const themeStore = useThemeStore()
 const walletStore = useWalletStore()
+const cachedChain = useStorage('cachedChain', 'solana',sessionStorage)
 const chain = computed(() => {
   if (route.params.chain) {
     return route.params.chain
   }
   if (botStore?.userInfo?.evmAddress) {
-    return 'solana'
+    return cachedChain.value
   }
   return walletStore.chain || ''
 })
@@ -114,7 +111,7 @@ const userAddress = computed(() => {
     return route.params.userAddress
   }
   if (botStore?.userInfo?.evmAddress) {
-    return botStore.getWalletAddress('solana')
+    return botStore.getWalletAddress(cachedChain.value)
   }
   return walletStore.address || ''
 })
@@ -146,9 +143,20 @@ const smartChains = computed(() => {
   // 如果是自己的钱包地址且为 bot 钱包那么展示所有的链，链钱包后面再改
   if (botStore.evmAddress && isSelfAddress.value) {
     const botChains = botStore.userInfo?.addresses?.filter?.((el) => SupportFullDataChain.includes(el.chain))
+    console.log('botChains', botChains)
     if (botChains && botChains.length > 0) {
       return botChains
     }
+  }
+  // 如果是看的是别人的 evm 链的钱包，则展示所有 evm 链，因为 evm 链的地址是通用的
+  if(route.params.chain && isEvmChain(route.params.chain)){
+    return botStore.isSupportChains
+      .filter(el => el !==  'solana')
+      .map(el=>{
+        return {
+          chain: el,
+        }
+      })
   }
   return [
     {
@@ -180,6 +188,16 @@ function scrollToTop() {
     top: 0,
     behavior: 'smooth'
   })
+}
+
+function updateModelChain(val) {
+  let address = botStore.getWalletAddress(val)
+  if(!route.params.chain){
+    cachedChain.value = val
+  } else if(!isSelfAddress.value) {
+    address = route.params.userAddress
+  }
+  navigateTo(`/address/${address}/${val}`)
 }
 
 // Watchers
