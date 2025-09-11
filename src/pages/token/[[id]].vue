@@ -69,6 +69,7 @@ const scrollbarHeight = computed(() => {
 })
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
+const {add} = useCacheArr('lastTokens')
 const addresses = computed(() => {
   const result = botStore.userInfo?.addresses
   if (Array.isArray(result)) {
@@ -165,6 +166,7 @@ function init() {
 
 watch(() => route.params.id, () => {
   init()
+  addVisit()
 })
 
 function visibilitychangeFn() {
@@ -174,6 +176,7 @@ function visibilitychangeFn() {
 
 onBeforeMount(() => {
   init()
+  addVisit()
   document.addEventListener('visibilitychange', visibilitychangeFn)
 })
 
@@ -196,6 +199,10 @@ onBeforeRouteLeave(() => {
 
 function refresh() {
   init()
+}
+
+function addVisit() {
+  
 }
 </script>
 
