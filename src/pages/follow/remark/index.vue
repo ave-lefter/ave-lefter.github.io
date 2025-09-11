@@ -246,14 +246,14 @@ v-loading="loading" class="mt-12px" :height="pageData.total > 50 ? 'calc(100% - 
       <el-table-column :label="t('address')" min-width="160">
         <template #default="{ row, $index }">
           <div class="flex items-center">
-            <span class="text-[--d-666-l-999] text-10px mr-5px">
+            <span class="text-[--third-text] text-10px mr-5px">
               #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
             </span>
             <Icon
 :key="`${row.user_address}-${row.user_chain}`" :ref="(el: any) => $refs.buttonRefs[$index] = el"
               name="custom:attention"
-              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'"
-              class="color-[--d-666-l-999] text-12px clickable shrink-0"
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--icon-color]'"
+              class="color-[--icon-color] text-12px clickable shrink-0"
               @click.stop.prevent="collect(row)" />
             <UserAvatar
 :key="`${row.user_address}-${row.user_chain}`" class="mx-8px" :wallet_logo="row.wallet_logo"
@@ -263,13 +263,13 @@ v-loading="loading" class="mt-12px" :height="pageData.total > 50 ? 'calc(100% - 
                 <UserRemark
 :key="`${row.user_address}-${row.user_chain}`" :remark="row.remark"
                   :address="row.user_address" :chain="row.user_chain"
-                  addressClass="token-symbol ellipsis py-0px! text-14px lh-none" addressStyle="max-width: 85px"
-                  :iconEditColor="isDark ? '#666' : '#999'" iconEditSize="10px" showAddressTitle
+                  addressClass="token-symbol ellipsis py-0px! text-14px lh-none color-[--main-text]" addressStyle="max-width: 85px"
+                 :iconEditColor="isDark?'#7C8BA2':'#9FA6B5'" iconEditSize="10px" showAddressTitle
                   :formatAddress="(address) => address?.slice(0, 4) + '...' + address?.slice(-4)" />
               </div>
               <div class="flex items-center mt-6px">
                 <Icon
-v-copy="row?.user_address" name="bxs:copy" class="clickable text-[--d-666-l-999] w-12px h-12px"
+v-copy="row?.user_address" name="bxs:copy" class="clickable text-[--third-text] w-12px h-12px"
                   @click.stop.prevent />
                 <Icon name="custom:sun-icon" class="text-12px w-12px h-12px mx-5px" />
                 <Icon name="custom:wallet-icon" class="text-12px w-12px h-12px" />
@@ -281,7 +281,7 @@ v-copy="row?.user_address" name="bxs:copy" class="clickable text-[--d-666-l-999]
       <el-table-column :label="t('noteTime')" align="right">
         <template #default="{ row }">
           <el-tooltip placement="right" :content="dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss')">
-            <div class="text-[#666]">
+            <div class="text-[--secondary-text]">
               {{ formatTimeFromNow(row?.create_time) }}
             </div>
           </el-tooltip>
@@ -316,7 +316,7 @@ v-copy="row?.user_address" name="bxs:copy" class="clickable text-[--d-666-l-999]
         <template #default="{ row }">
           <div class="flex flex-row-reverse" @click.stop>
             <a
-class="flex items-center color-[var(--d-F5F5F5-l-333)]"
+class="flex items-center color-[--secondary-text]"
               :href="`https://t.me/AveSniperBot?start=fs-${row.user_chain}-${row.user_address}`" target="_blank">
               <Icon name="custom:documentary-wallet" class="text-16px mr-2px" />
               {{ t('copyTrade') }}
@@ -327,7 +327,7 @@ class="flex items-center color-[var(--d-F5F5F5-l-333)]"
               <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-12px mr-5px  mb--1px color-#999 group-hover:color-#3F80F7"/>
               <Icon v-else name="custom:monitor-icon" class="text-15px mr-2px mb-1px color-[var(--d-CCC-l-666)] group-hover:color-#3F80F7"/>
               <span
-                class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out color-[var(--d-F5F5F5-l-333)]">
+                class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out color-[--secondary-text]">
                 {{ (row?.is_monitored === 1) ? t('pause') : t('enable') }}
               </span>
             </div>
@@ -420,6 +420,6 @@ class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[#3F80F7] 
  }
 
 :deep() .el-table {
-  --el-table-text-color: var(--d-CCC-l-333);
+  --el-table-text-color: var(--secondary-text);
 }
 </style>

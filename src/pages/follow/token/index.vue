@@ -7,7 +7,7 @@ import { getChainDefaultIcon } from '~/utils'
 import ArcProgress from '~/components/arcProgress.vue'
 import { getNewFavoriteList, getUserFavoriteGroups, removeFavorite, removeFavoriteGroup, addFavoriteGroup, changeFavoriteGroupName, moveFavoriteGroup, editTokenFavRemark, getGroupChangeIndex } from '~/api/fav'
 import { WSEventType } from '~/utils/constants'
-
+const {isDark} = storeToRefs(useGlobalStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const configStore = useConfigStore()
@@ -358,10 +358,11 @@ onBeforeUnmount(() => {
               <div>{{ t('rename') }}</div>
               <el-input v-model="groupValue" :placeholder="t('enterGroupName')" class="mt-8px w-100%" />
               <div class="flex items-center justify-between mt-12px gap-12px">
-                <div @click="editGroupPopoverRef[index]?.hide()"
+                <!-- <div @click="editGroupPopoverRef[index]?.hide()"
                   class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
                   {{ t('cancel') }}
-                </div>
+                </div> -->
+                <el-button class="flex-1" :color="!isDark?'#D9E8FF' : '#1F242C'" @click.stop.prevent="editGroupPopoverRef[index]?.hide()">{{ $t('cancel') }}</el-button>
                 <div @click="handleUpdateGroupConfirm(item, index)"
                   class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[#3F80F7] px-12px py-8px rounded-4px">
                   {{ t('confirm') }}
@@ -387,10 +388,11 @@ onBeforeUnmount(() => {
           <el-input ref="addGroupInputRef" v-model="groupValue" :placeholder="t('enterGroupName')"
             class="mt-8px w-100%" />
           <div class="flex items-center justify-between mt-12px gap-12px">
-            <div @click="addGroupPopoverRef?.hide()"
+            <!-- <div @click="addGroupPopoverRef?.hide()"
               class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
               {{ t('cancel') }}
-            </div>
+            </div> -->
+            <el-button class="flex-1" :color="!isDark?'#D9E8FF' : '#1F242C'" @click.stop.prevent="addGroupPopoverRef?.hide()">{{ $t('cancel') }}</el-button>
             <div @click="handleAddGroup()"
               class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[#3F80F7] px-12px py-8px rounded-4px">
               {{ t('confirm') }}
@@ -419,10 +421,11 @@ onBeforeUnmount(() => {
             </VueDraggableNext>
           </el-scrollbar>
           <div class="flex items-center justify-between mt-12px gap-12px">
-            <div @click="moveGroupPopoverRef?.hide()"
+            <!-- <div @click="moveGroupPopoverRef?.hide()"
               class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
               {{ t('cancel') }}
-            </div>
+            </div> -->
+            <el-button class="flex-1" :color="!isDark?'#D9E8FF' : '#1F242C'" @click.stop.prevent="moveGroupPopoverRef?.hide()">{{ $t('cancel') }}</el-button>
             <div @click="handleMoveGroupConfirm"
               class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[#3F80F7] px-12px py-8px rounded-4px">
               {{ t('confirm') }}
@@ -458,7 +461,7 @@ onBeforeUnmount(() => {
           <template #default="{ row, $index }">
             <NuxtLink :to="`/token/${row.token}-${row.chain}`" @click.stop.prevent>
               <div class="flex items-center">
-                <span class="text-[--d-666-l-999] text-10px mr-5px">
+                <span class="text-[--third-text] text-10px mr-5px">
                   #{{ (pageData.page - 1) * pageData.pageSize + $index + 1 }}
                 </span>
                 <Icon v-if="addressValue" name="material-symbols:kid-star"
@@ -483,17 +486,17 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="ml-8px flex flex-col lh-none justify-between h-32px">
                   <div class="flex items-center">
-                    <span class="text-13px">{{ row.symbol }}</span>
-                    <div class="text-12px text-[--d-666-l-999] ml-4px">
+                    <span class="text-13px text-[--main-text]">{{ row.symbol }}</span>
+                    <div class="text-12px text-[--third-text] ml-4px">
                       {{ `[*${row?.token?.slice(-6)}]` }}
                     </div>
                     <Icon @click.stop.prevent v-copy="row?.token" name="bxs:copy"
-                      class="ml-4px clickable text-[--d-666-l-999] text-12px" />
+                      class="ml-4px clickable text-[--third-text] text-12px" />
 
                     <a class="ml-4px flex items-center"
                       :href="`https://x.com/search?q=(${row?.symbol}OR${row?.token})&src=typed_query&f=live`"
                       target="_blank" @click.stop>
-                      <Icon class="text-[--d-666-l-999] h-12px w-12px text-12px" name="custom:search" />
+                      <Icon class="text-[--third-text] h-12px w-12px text-12px" name="custom:search" />
                     </a>
                     <img
                       v-if="row.issue_platform"
@@ -510,15 +513,15 @@ onBeforeUnmount(() => {
                       :title="row.remark" v-if="row.remark">{{ row.remark }}</div>
                     <!-- 备注 -->
                     <div class="flex items-center" ref="buttonRef" @click.stop.prevent='handleRemarkShow(row, $event)'>
-                      <Icon class="text-[--d-666-l-999] w-12px h-12px ml-4px" name="custom:remark" />
+                      <Icon class="text-[--third-text] w-12px h-12px ml-4px" name="custom:remark" />
                     </div>
                     <a class="flex items-center" v-if="row?.twitter" v-tooltip="row?.twitter" :href="row?.twitter"
                       target="_blank" @click.stop>
-                      <Icon :name="`custom:twitter`" class="text-[--d-666-l-999] h-14px w-14px ml-4px" />
+                      <Icon :name="`custom:twitter`" class="text-[--third-text] h-14px w-14px ml-4px" />
                     </a>
                     <a class="flex items-center" v-if="row?.telegram" v-tooltip="row?.telegram" :href="row?.telegram"
                       target="_blank" @click.stop>
-                      <Icon :name="`custom:tg`" class="text-[--d-666-l-999] h-14px w-14px ml-4px" />
+                      <Icon :name="`custom:tg`" class="text-[--third-text] h-14px w-14px ml-4px" />
                     </a>
                   </div>
                 </div>
@@ -582,7 +585,7 @@ onBeforeUnmount(() => {
         <el-table-column :label="t('tokenGroup')" align="right" width="170">
           <template #default="{ row }">
             <el-select v-model="row.group_id" placement="bottom-end" style="width: 100px;"
-              popper-class="follow-select-popper" filterable class="[&&]:[--el-text-color-regular:var(--d-CCC-l-333)]"
+              popper-class="follow-select-popper" filterable class="[&&]:[--el-text-color-regular:var(--secondary-text)] [&&]:[--el-input-icon-color:var(--secondary-text)]"
               @click.stop @change="(val) => getRowGroupChange(val, row)">
               <el-option v-for="item in allTabsGroup" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
@@ -601,10 +604,11 @@ onBeforeUnmount(() => {
         <el-input v-model="remarkValue" clearable maxlength="50" show-word-limit :placeholder="t('enterRemark')"
           class="mt-8px w-100%" />
         <div class="flex items-center justify-between mt-12px gap-12px">
-          <div @click="visibleShow = false"
+          <!-- <div @click="visibleShow = false"
             class="flex-1 text-center cursor-pointer text-14px color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2] px-12px py-8px rounded-4px">
             {{ t('cancel') }}
-          </div>
+          </div> -->
+           <el-button class="flex-1" :color="!isDark?'#D9E8FF' : '#1F242C'" @click.stop.prevent="visibleShow = false">{{ $t('cancel') }}</el-button>
           <div @click="handleRemarkGroup(rowData)"
             class="flex-1 text-center cursor-pointer text-14px color-[#F5F5F5] bg-[#3F80F7] px-12px py-8px rounded-4px">
             {{ t('confirm') }}
@@ -616,24 +620,27 @@ onBeforeUnmount(() => {
 </template>
 
 <style lang="scss">
+:deep() .el-select.el-select{
+  /* --el-fill-color-blank:var(--tab-active-bg) */
+}
 .follow-select-popper {
-  background: var(--d-222-l-FFF) !important;
+  /* background: var(--d-222-l-FFF) !important; */
 
   .el-select-dropdown {
-    background: var(--d-222-l-FFF);
+    /* background: var(--d-222-l-FFF); */
   }
 
   .el-select__wrapper {
-    background: var(--d-222-l-FFF);
+    /* background: var(--d-222-l-FFF); */
   }
 
   .el-select-dropdown__item.is-hovering {
-    background: var(--d-333-l-f5f7fa);
+    /* background: var(--d-333-l-f5f7fa); */
   }
 
   .el-popper__arrow::before {
-    background: var(--d-222-l-FFF) !important;
-    display: none;
+    /* background: var(--d-222-l-FFF) !important; */
+    /* display: none; */
   }
 }
 </style>
@@ -683,7 +690,10 @@ onBeforeUnmount(() => {
 }
 
 :deep(.el-table) {
-  --el-table-row-hover-bg-color: var(--d-1A1A1A-l-fafafa);
-  --el-table-text-color: var(--d-CCC-l-333);
+  /* --el-table-row-hover-bg-color: var(--d-1A1A1A-l-fafafa); */
+  --el-table-text-color: var(--secondary-text);
+}
+:deep() .el-select.el-select{
+  --el-fill-color-blank:var(--tab-active-bg)
 }
 </style>

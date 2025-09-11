@@ -67,7 +67,7 @@
                </VueDraggableNext>
           </el-scrollbar>
           <div class="flex-between w-100%">
-            <el-button :color="!isDark?'#f2f2f2' : '#333333'"  class="flex-1" @click.stop.prevent="()=>popoverRef2?.hide?.()">{{ $t('cancel') }}</el-button>
+            <el-button :color="!isDark?'#D9E8FF' : '#1F242C'"  class="flex-1" @click.stop.prevent="()=>popoverRef2?.hide?.()">{{ $t('cancel') }}</el-button>
             <el-button type="primary" class="flex-1" color="#3F80F7" @click.stop.prevent="handleSort">{{ $t('confirm') }}</el-button>
           </div>
         </div>
@@ -98,11 +98,11 @@
     popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--main-text)" width="248" :teleported="false">
       <el-form ref="formRef" v-click-outside="clickOutside" :model="form" :rules="rules" @submit.prevent.stop="handleConfirmEdit(formRef)">
         <el-form-item prop="groupName" label-position="top" size="large" class="mb-20px!">
-          <el-input v-model="form.groupName"    class="[&&]:[--el-fill-color-blank:var(--d-666-l-F2F2F2)] [%%]:[el-input__count-inner:transparent]" :placeholder="t('enterGroupName')" :maxlength="50" show-word-limit clearable />
+          <el-input v-model="form.groupName" class="[&&]:[--el-fill-color-blank:var(--d-666-l-F2F2F2)] [%%]:[el-input__count-inner:transparent]" :placeholder="t('enterGroupName')" :maxlength="50" show-word-limit clearable />
         </el-form-item>
         <el-form-item class="mb-0px!">
           <div class="flex-between w-100%">
-            <el-button :color="!isDark?'#f2f2f2' : '#333333'" class="flex-1" @click.stop.prevent="handleCancelEdit">{{ $t('cancel') }}</el-button>
+            <el-button :color="!isDark?'#D9E8FF' : '#1F242C'" class="flex-1" @click.stop.prevent="handleCancelEdit">{{ $t('cancel') }}</el-button>
             <el-button type="primary" color="#3F80F7"  class="flex-1" native-type="submit">{{ $t('confirm') }}</el-button>
           </div>
         </el-form-item>
