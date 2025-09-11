@@ -42,7 +42,7 @@ watch(props , (val) => {
   justify-content: center;
   align-items: center;
   vertical-align: middle;
-  color: #3F80F7;
+  color: var(--primary-color);
   background-color: #3F80F71A;
   font-family: SF Pro;
   font-weight: 400;
@@ -54,15 +54,15 @@ watch(props , (val) => {
   border-radius: 4px;
   border: 0 none;
   &.primary{
-    color: #3F80F7;
+    color: var(--primary-color);
     background-color: #3F80F71A;
   }
   &.success{
-    color: #12B886;
+    color: var(--up-color);
     background-color: #12B8861A;
   }
   &.danger{
-    color: #F6465D;
+    color: var(--down-color);
     background-color: #F6465D1A;
   }
   &.large{

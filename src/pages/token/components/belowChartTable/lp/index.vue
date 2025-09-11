@@ -2,8 +2,8 @@
   <div class="w-lp">
     <div  class="w-[100%]">
       <div class="flex gap-10px items-center ml-12px">
-        <div class="font-400 text-12px lh-16px color-[--d-999-l-666]">{{ $t('liquidity') }}</div>
-        <el-radio-group v-model="activeTime" class="m-radio-group" size="small" :fill="isDark?'#333':'#666'" :text-color="isDark?'#F5F5F5':'#FFF'" @change="init1">
+        <div class="font-400 text-12px lh-16px color-[--third-text]">{{ $t('liquidity') }}</div>
+        <el-radio-group v-model="activeTime" class="m-radio-group" size="small" fill="var(--tab-active-bg)" :text-color="isDark?'#F5F5F5':'#FFF'" @change="init1">
           <el-radio-button label="7D" :value="7" />
           <el-radio-button label="1M" :value="30" />
         </el-radio-group>
@@ -27,7 +27,7 @@
           :align="col.align">
           <template #default="{ row }">
             <Column :row="row" :col="col" :customKeys="['mark', 'addAmt', 'netAmt', 'txns', 'percent']">
-              <div v-if="col.prop == 'mark'" class="flex-start gap-2px hover:color-[--d-FFF-l-000] cursor-pointer" @click.stop="tableRowClick(row)">
+              <div v-if="col.prop == 'mark'" class="flex-start gap-2px hover:color-[--dialog-bg] cursor-pointer" @click.stop="tableRowClick(row)">
                 <Icon v-if="formatLock(row)" color="#B3920E" name="material-symbols:lock" />
                 <Icon v-if="row.is_contract == 1" name="iconamoon:file-document-thin"  />
                 <pro-tag v-if="Number(row?.analysis_show_creator) === 1">{{ $t('contractCreator') }}</pro-tag>
@@ -377,10 +377,10 @@ function init2() {
 
 <style scoped lang="scss">
 .m-table {
-  .el-table.el-table{
-    --el-table-header-bg-color: var(--d-222-l-F2F2F2);
-    --el-table-tr-bg-color: transparent;
-  }
+  // .el-table.el-table{
+  //   --el-table-header-bg-color: var(--d-222-l-F2F2F2);
+  //   --el-table-tr-bg-color: transparent;
+  // }
   :deep() .cell{
     padding-top: 0;
     padding-bottom: 0;
@@ -388,16 +388,16 @@ function init2() {
   :deep() .el-table__expand-icon {
     display: none;
   }
-  :deep() .el-table__expanded-cell td {
-    --el-table-row-hover-bg-color:var(--d-222-l-F2F2F2);
-     background-color: var(--d-222-l-F2F2F2);
-  }
+  // :deep() .el-table__expanded-cell td {
+  //   --el-table-row-hover-bg-color:var(--d-222-l-F2F2F2);
+  //    background-color: var(--d-222-l-F2F2F2);
+  // }
   :deep() th {
     font-weight: 400;
     font-size: 12px;
     line-height: 16px;
     letter-spacing: 0px;
-    color: var(--d-666-l-999);
+    // color: var(--third-text);
   }
 
   :deep() td {
@@ -405,7 +405,7 @@ function init2() {
     font-size: 13px;
     line-height: 1;
     letter-spacing: 0px;
-    color: var(--d-999-l-666);
+    // color: var(--d-999-l-666);
     .cell{
       line-height: 1.5;
     }
@@ -420,7 +420,7 @@ function init2() {
   width: 100%;
   height: 3px;
   display: flex;
-  background: var(--d-666-l-999);
+  background: #222;
   border-radius: 1.5px;
   margin-top: 5px;
   margin-bottom: 3px;
@@ -428,7 +428,7 @@ function init2() {
   >span {
     height: 3px;
     border-radius: 1.5px;
-    background: var(--d-999-l-666);
+    background: var(--secondary-text);
   }
 }
 </style>

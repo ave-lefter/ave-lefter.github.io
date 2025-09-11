@@ -150,9 +150,9 @@ onMounted(() => {
       align-items: center;
       flex: 1;
       border-radius: 4px;
-      background: var(--d-222-l-F2F2F2);
+      background: var(--main-input-button-bg);
       cursor: pointer;
-      color: var(--d-666-l-999);
+      color: var(--third-text);
       &:first-child {
         border-radius: 4px 0 0 4px;
       }
@@ -185,16 +185,6 @@ onMounted(() => {
   }
   .select-box {
     position: relative;
-    .btn-set {
-      color: var(--custom-text-2-color);
-      position: absolute;
-      top: 50%;
-      right: 0;
-      transform: translateY(-40%);
-      &:hover {
-        color: var(--custom-text-1-color);
-      }
-    }
   }
   .select-tabs {
     :deep() {
@@ -202,13 +192,13 @@ onMounted(() => {
       .el-tabs__item {
         font-size: 12px;
         padding: 0 10px;
-        --el-text-color-primary: var(--d-666-l-999);
+        --el-text-color-primary: var(--third-text);
         cursor: pointer;
         &.is-active {
-          color: var(--d-F5F5F5-l-333);
+          color: var(--main-text);
         }
         &:hover:not(.is-active) {
-          color: var(--d-666-l-999);
+          color: var(--third-text);
         }
       }
       .el-tabs__header {
@@ -216,7 +206,7 @@ onMounted(() => {
       }
       .el-tabs__active-bar {
         height: 2px;
-        background-color: var(--d-F5F5F5-l-333);
+        background-color: var(--main-text);
       }
       .el-tabs__nav-wrap::after {
         height: 0.5px;
@@ -228,14 +218,14 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: var(--d-222-l-F2F2F2);
+    background: var(--main-input-button-bg);
     padding: 2px;
     border-radius: 4px;
     font-size: 12px;
     height: 24px;
     button {
       border: none;
-      color: var(--d-666-l-999);
+      color: var(--third-text);
       letter-spacing: 0;
       font-weight: 400;
       cursor: pointer;
@@ -245,8 +235,8 @@ onMounted(() => {
       height: 20px;
       text-align: center;
       &.active {
-        background: var(--d-111-l-FFF);
-        color: var(--d-F5F5F5-l-333);
+        background: var(--tab-active-bg);
+        color: var(--main-text);
       }
     }
   }

@@ -1,7 +1,56 @@
 :root {
   --primary-color: #3F80F7;
-  --color-red-500: #F6465D;
-  --color-teal-300: #12B886;
+  --down-color: #F6465D;
+  --up-color: #12B886;
+  --yellow:#FFA622;
+  --x-blue:#009EF7;
+  --pump-green:#55D592;
+  --signal-red:#E50000;
+  --signal-green:#37B270;
+  // 一级文字
+  --main-text:var(--d-F5F5F5-l-111);
+  // 二级文字
+  --secondary-text:var(--d-9CA1A8-l-404753);
+  // 三级文字
+  --third-text:var(--d-7C8BA2-l-9FA6B5);
+  // 图标插画颜色
+  --icon-color:var(--d-383F4B-l-CAD6EC);
+  // 主要背景
+  --main-bg:var(--d-000-l-FFF);
+  // 次要背景
+  --secondary-bg:var(--d-101114-l-F6F9FF);
+  // 主页列表标题栏背景
+  --main-list-header-bg:var(--d-1B1D21-l-E8F1FF);
+  // 主页面列表悬浮色
+  --main-list-hover:var(--d-16181D-l-E8F1FF);
+  // 主页面输入框和按钮背景色
+  --main-input-button-bg:var(--d-16181D-l-ECF3FF);
+    // 弹窗背景
+  --dialog-bg:var(--d-16181D-l-FFF);
+  // 弹窗tab选中色
+  --dialog-tab-active-bg:var(--d-282D35-l-FFF);
+  // 主页面分割线
+  --main-divider:var(--d-1F242C-l-E8F1FF);
+  // 弹窗分割线
+  --dialog-divider:var(--d-1F242C-l-E8F1FF);
+  // 主页tab选中色
+  --tab-active-bg:var(--d-1F242C-l-FFF);
+  // 弹窗选中色&输入框&边框
+  --border:var(--d-1F242C-l-D9E8FF);
+  // 弹窗列表悬浮色
+  --dialog-list-hover:var(--d-202834-l-E8F1FF);
+  // 白色
+  --white:#F5F5F5;
+  // 反色
+  --reverse-color:var(--d-111-l-F5F5F5);
+  // 灰色按钮悬浮色
+  --gray-button-hover:var(--d-212936-l-C3D1E5);
+  // 蓝色按钮悬浮色
+  --primary-button-hover:#3973DE;
+  // 弹窗 Tab 选中色
+  --dialog-tab-active:var(--d-383F4B-l-FFF);
+  // 主页列表标题栏背景
+  --table-title-bg:var(--d-12161D-l-ECF3FF);
   &.dark {
     // 规范：颜色相同省略为 3 位，所有都用大写
     --d-333-l-ECECEC: #333;
@@ -95,25 +144,60 @@
     --d-444-l-DDD: #444;
     --d-566275-l-8CA0C3: #566275;
     --d-141721-l-E8F1FF: #141721;
-    --d-151A22-l-E8F1FF: #151A22;
     --d-0B0D12-l-F6F9FF: #0B0D12;
     --d-8CA0C3-l-566275: #8CA0C3;
     --d-F5F5F5-l-111: #F5F5F5;
     --d-F5F5F5-l-0B0D12: #F5F5F5;
     --d-FCFDFF-l-333: #FCFDFF;
     --d-FCFDFF-l-999: #FCFDFF;
-    --d-151A22-l-FFFFFF: #151A22;
     --d-17191E-l-D1D4D9: #17191E;
     --d-252E3C-l-FFF: #252E3C;
     --d-252E3C-l-E8F1FF: #252E3C;
     --d-252B34-l-CAD6EC: #252B34;
     --d-252B34-l-E8F1FF: #252B34;
-    --d-151A22-l-FFF: #151A22;
     --d-CCC-l-666: #CCC;
+    --d-252E3C-l-D9E8FF: #252E3C;
+    --d-111-l-F5F5F5: #111;
+    --d-566275-l-252E3C: #566275;
+    --d-252E3C-l-566275: #252E3C;
     --d-0B0D12-l-FFF: #0B0D12;
     --d-FFF-l-111: #FFF;
     --d-FFFFFF08-l-33333308: #FFFFFF08;
+    --d-212936-l-C3D1E5: #212936;
+    --d-383F4B-l-FFF: #383F4B;
+    --d-383F4B-l-CAD6EC: #383F4B;
+    --d-12161D-l-ECF3FF: #12161D;
+    --d-202834-l-E8F1FF: #202834;
     --d-252E3C-l-D9E8FF: #252E3C;
+    --d-566275-l-A9B0BC: #566275;
+    --d-A9B0BC-l-566275: #A9B0BC;
+    --d-C3C9D2-l-566275: #C3C9D2;
+    --d-566275-l-B1BBCB: #566275;
+    --d-A9B0BC-l-566275: #A9B0BC;
+    --d-566275-l-A9B0BC: #566275;
+    --d-172521-l-DEF4EF: #172521;
+    --d-281915-l-F7E2DD: #281915;
+    --d-252914-l-F3FADC: #252914;
+    --d-0E2619-l-D1F5E3: #0E2619;
+    --d-28211D-l-F7EEE9: #28211D;
+    --d-281B2C-l-F7E5FF: #281B2C;
+    --d-19161D-l-E1DDE9: #19161D;
+    --d-281915-l-D1F4DF: #281915;
+    --d-24211E-l-F1EEEA: #24211E;
+    --d-282116-l-F7EFDF: #282116;
+    --d-7C8BA2-l-9FA6B5: #7C8BA2;
+    --d-9CA1A8-l-404753: #9CA1A8;
+    --d-090B0F-l-F6F9FF: #090B0F;
+    --d-101114-l-F6F9FF: #101114;
+    --d-1B1D21-l-E8F1FF: #1B1D21;
+    --d-16181D-l-E8F1FF: #16181D;
+    --d-16181D-l-ECF3FF: #16181D;
+    --d-16181D-l-FFF: #16181D;
+    --d-282D35-l-FFF: #282D35;
+    --d-1F242C-l-E8F1FF: #1F242C;
+    --d-1F242C-l-FFF: #1F242C;
+    --d-1F242C-l-D9E8FF: #1F242C;
+    --d-5A5E64-l-A9B0BC: #5A5E64;
   }
 
   &.light {
@@ -208,25 +292,60 @@
     --d-444-l-DDD: #DDD;
     --d-566275-l-8CA0C3: #8CA0C3;
     --d-141721-l-E8F1FF: #E8F1FF;
-    --d-151A22-l-E8F1FF: #E8F1FF;
     --d-0B0D12-l-F6F9FF: #F6F9FF;
     --d-8CA0C3-l-566275: #566275;
     --d-F5F5F5-l-111: #111;
     --d-F5F5F5-l-0B0D12: #0B0D12;
     --d-FCFDFF-l-333: #333;
     --d-FCFDFF-l-999: #999;
-    --d-151A22-l-FFFFFF: #FFF;
     --d-17191E-l-D1D4D9: #D1D4D9;
     --d-252E3C-l-FFF: #FFF;
     --d-252E3C-l-E8F1FF: #E8F1FF;
     --d-252B34-l-CAD6EC: #CAD6EC;
     --d-252B34-l-E8F1FF: #E8F1FF;
-    --d-151A22-l-FFF: #FFF;
     --d-CCC-l-666: #666;
+    --d-252E3C-l-D9E8FF: #D9E8FF;
+    --d-111-l-F5F5F5: #F5F5F5;
+    --d-566275-l-252E3C: #252E3C;
+    --d-252E3C-l-566275: #566275;
     --d-0B0D12-l-FFF: #FFF;
     --d-FFF-l-111: #111;
     --d-FFFFFF08-l-33333308: #33333308;
+    --d-212936-l-C3D1E5: #C3D1E5;
+    --d-383F4B-l-FFF: #FFF;
+    --d-383F4B-l-CAD6EC: #CAD6EC;
+    --d-12161D-l-ECF3FF: #ECF3FF;
+    --d-202834-l-E8F1FF: #E8F1FF;
     --d-252E3C-l-D9E8FF: #D9E8FF;
+    --d-566275-l-A9B0BC: #A9B0BC;
+    --d-A9B0BC-l-566275: #566275;
+    --d-C3C9D2-l-566275: #566275;
+    --d-566275-l-B1BBCB: #B1BBCB;
+    --d-A9B0BC-l-566275: #566275;
+    --d-566275-l-A9B0BC: #A9B0BC;
+    --d-172521-l-DEF4EF: #DEF4EF;
+    --d-281915-l-F7E2DD: #F7E2DD;
+    --d-252914-l-F3FADC: #F3FADC;
+    --d-0E2619-l-D1F5E3: #D1F5E3;
+    --d-28211D-l-F7EEE9: #F7EEE9;
+    --d-281B2C-l-F7E5FF: #F7E5FF;
+    --d-19161D-l-E1DDE9: #E1DDE9;
+    --d-281915-l-D1F4DF: #D1F4DF;
+    --d-24211E-l-F1EEEA: #F1EEEA;
+    --d-282116-l-F7EFDF: #F7EFDF;
+    --d-7C8BA2-l-9FA6B5: #9FA6B5;
+    --d-9CA1A8-l-404753: #404753;
+    --d-090B0F-l-F6F9FF: #F6F9FF;
+    --d-101114-l-F6F9FF: #F6F9FF;
+    --d-1B1D21-l-E8F1FF: #E8F1FF;
+    --d-16181D-l-E8F1FF: #E8F1FF;
+    --d-16181D-l-ECF3FF: #ECF3FF;
+    --d-16181D-l-FFF: #FFF;
+    --d-282D35-l-FFF: #FFF;
+    --d-1F242C-l-E8F1FF: #E8F1FF;
+    --d-1F242C-l-FFF: #FFF;
+    --d-1F242C-l-D9E8FF: #D9E8FF;
+    --d-5A5E64-l-A9B0BC: #A9B0BC;
   }
 }
 

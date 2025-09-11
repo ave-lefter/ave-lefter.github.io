@@ -63,15 +63,15 @@ function resetBg() {
     :close-on-click-modal="false"
     class="pnl-setting-dialog"
   >
-    <div class="mx--20px border-t-1px border-t-solid border-[--d-333-l-F2F2F2]" />
+    <div class="mx--20px border-t-1px border-t-solid border-[--dialog-divider]" />
     <div class="flex pt-20px items-center justify-between">
-      <span class="color-[--d-CCC-l-333] text-12px">{{ $t('selectChain') }}</span>
-      <div class="flex items-ceter gap-4px px-4px py-2px rounded-4px bg-[--d-333-l-F2F2F2]">
+      <span class="color-[--secondary-text] text-12px">{{ $t('selectChain') }}</span>
+      <div class="flex items-ceter gap-4px px-4px py-2px rounded-4px bg-[--dialog-divider]">
         <div
           v-for="chain in supportChains"
           :key="chain"
           class="cursor-pointer rounded-4px px-4px py-2px"
-          :class="settings.chain === chain ? 'bg-[--d-111-l-FFF]' : ''"
+          :class="settings.chain === chain ? 'bg-[--dialog-bg]' : ''"
           @click="settings.chain = chain"
         >
           <ChainToken :chain="chain" :width="16" />
@@ -79,9 +79,9 @@ function resetBg() {
       </div>
     </div>
     <div class="pt-20px">
-      <div class="flex justify-between color-[--d-CCC-l-333] text-12px lh-18px mb-16px">
+      <div class="flex justify-between color-[--secondary-text] text-12px lh-18px mb-16px">
         <span>{{ $t('backgroundImage') }}</span>
-        <div class="flex items-center gap-4px cursor-pointer" @click="resetBg">
+        <div class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]" @click="resetBg">
           <Icon name="custom:refresh-left" />
           {{ $t('resetBackground') }}
         </div>
@@ -94,7 +94,7 @@ function resetBg() {
           Authorization:`Bearer ${useBotStore().accessToken}`,
           'X-Auth':XAuth
         }"
-        class="[--el-fill-color-blank:--d-333-l-F2F2F2] [--el-border-color:--d-333-l-F2F2F2] [--el-color-primary:--d-333-l-F2F2F2] upload"
+        class="[--el-fill-color-blank:--dialog-divider] [--el-border-color:--dialog-divider] [--el-color-primary:--dialog-divider] upload"
         accept=".png,.jpg,.jpeg,.webp"
         drag
         :show-file-list="false"
@@ -112,23 +112,23 @@ function resetBg() {
             }"
           >
           <div class="relative flex-1 flex flex-col items-center">
-            <div class="color-#F5F5F5 font-bold mb-2px flex items-center gap-4px text-16px lh-20px">
+            <div class="color-[--main-text] font-bold mb-2px flex items-center gap-4px text-16px lh-20px">
               <ChainToken :chain="settings.chain" :width="16" />
               {{ settings.solUsdSwitch ? '$1.29' : 1.29 }}
             </div>
-            <span v-if="settings.showU" class="color-#F5F5F5 mb-2px text-12px lh-16px">
+            <span v-if="settings.showU" class="color-[--main-text] mb-2px text-12px lh-16px">
               $1.29
             </span>
-            <div class="color-[--d-999-l-666] text-12px lh-16px">
+            <div class="color-[--third-text] text-12px lh-16px">
               {{ $t('balance1') }}
             </div>
           </div>
           <div class="relative flex-1 flex flex-col items-center">
-            <div class="color-#F5F5F5 font-bold mb-2px flex items-center gap-4px text-16px lh-20px">
+            <div class="color-[--main-text] font-bold mb-2px flex items-center gap-4px text-16px lh-20px">
               <ChainToken :chain="settings.chain" :width="16" />
               <span class="color-#12B886"> +{{ settings.solUsdSwitch ? '$1.29' : '1.29' }} </span>
             </div>
-            <span v-if="settings.showU" class="mb-2px text-12px lh-16px color-#12B886">
+            <span v-if="settings.showU" class="mb-2px text-12px lh-16px color-[--up-color]">
               +$1.29
             </span>
             <div class="color-#12B886 text-12px lh-16px">+100%</div>
@@ -138,30 +138,30 @@ function resetBg() {
           >
             <div
               class="flex relative justify-center mb-6px"
-              :class="settings.background ? 'color-#F5F5F5' : 'color-[--d-CCC-l-333]'"
+              :class="settings.background ? 'color-[--main-text]' : 'color-[--secondary-text]'"
             >
               <Icon name="custom:upload-cloud" class="text-24px" />
             </div>
             <div
               class="text-12px relative lh-18px text-center"
-              :class="settings.background ? 'color-#F5F5F5' : 'color-[--d-999-l-666]'"
+              :class="settings.background ? 'color-[--main-text]' : 'color-[--third-text]'"
             >
               {{ $t('uploadImage') }}
             </div>
           </div>
         </div>
       </el-upload>
-      <div class="color-[--d-666-l-999] text-12px mt-2 mb-24px">
+      <div class="color-[--third-text] text-12px mt-2 mb-24px">
         {{ $t('recommendedAspectRatio') }}
       </div>
     </div>
 
-    <div class="color-[--d-CCC-l-333] lh-20px mb-16px">{{ $t('setBackground') }}</div>
+    <div class="color-[--main-text] lh-20px mb-16px">{{ $t('setBackground') }}</div>
     <div class="flex items-center justify-between mb-16px">
-      <span class="text-12px color-[--d-CCC-l-333]">{{ $t('blur') }}</span>
+      <span class="text-12px color-[--secondary-text]">{{ $t('blur') }}</span>
       <el-input
         v-model.number="settings.blur"
-        class="w-54px [--el-input-height:28px] text-12px [--el-input-icon-color:--d-CCC-l-333] [--el-input-border-color:--d-333-l-F2F2F2]"
+        class="w-54px [--el-input-height:28px] text-12px [--el-input-icon-color:--secondary-text] [--el-input-border-color:--dialog-divider]"
       >
         <template #suffix>px</template>
       </el-input>
@@ -178,13 +178,13 @@ function resetBg() {
         15: '15',
         20: '20',
       }"
-      class="[&&]:[--el-slider-button-size:8px] [--el-color-white:#3F80F7] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] mx-4px"
+      class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--primary-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] mx-4px"
     />
     <div class="flex items-center justify-between mt-32px mb-16px">
-      <span class="text-12px color-[--d-CCC-l-333]">{{ $t('opacity') }}</span>
+      <span class="text-12px color-[--secondary-text]">{{ $t('opacity') }}</span>
       <el-input
         v-model.number="settings.opacity"
-        class="w-54px [--el-input-height:28px] text-12px [--el-input-icon-color:--d-CCC-l-333] [--el-input-border-color:--d-333-l-F2F2F2]"
+        class="w-54px [--el-input-height:28px] text-12px [--el-input-icon-color:--secondary-text] [--el-input-border-color:--dialog-divider]"
       >
         <template #suffix>%</template>
       </el-input>
@@ -201,11 +201,11 @@ function resetBg() {
         75: '75',
         100: '100',
       }"
-      class="[&&]:[--el-slider-button-size:8px] [--el-color-white:#3F80F7] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] mx-4px"
+      class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--primary-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] mx-4px"
     />
 
     <div class="flex items-center justify-between mt-40px">
-      <span class="color-[--d-CCC-l-333] text-12px"
+      <span class="color-[--secondary-text] text-12px"
         >{{ getChainInfo(settings.chain)?.main_name }}{{ $t('solUsdSwitch') }}</span
       >
       <el-switch
@@ -215,7 +215,7 @@ function resetBg() {
       />
     </div>
     <div class="flex items-center justify-between mt-24px">
-      <span class="color-[--d-CCC-l-333] text-12px">{{ $t('showU') }}</span>
+      <span class="color-[--secondary-text] text-12px">{{ $t('showU') }}</span>
       <el-switch
         v-model="settings.showU"
         class="[&&]:h-20px"
@@ -227,7 +227,6 @@ function resetBg() {
       <div class="flex">
         <el-button
           class="h-30px flex-1 m-l-auto"
-          :color="themeStore.isDark ? '#333' : '#F2F2F2'"
           @click="onReset"
         >
           {{ $t('reset') }}
@@ -255,12 +254,12 @@ function resetBg() {
   .el-slider__stop {
     height: 4px;
     top: -1px;
-    --el-slider-stop-bg-color: var(--d-666-l-999);
+    --el-slider-stop-bg-color: var(--secondary-text);
     --el-border-radius-circle: 1px;
   }
   .el-slider__marks-text {
     font-size: 12px;
-    color: var(--d-666-l-999);
+    color: var(--secondary-text);
     margin-top: 6px;
   }
 }

@@ -3,13 +3,13 @@
     <Icon
       name="custom:sort-up"
       class="text-4px cursor-pointer"
-      :class="sortOrder==='asc' ? 'color-[--d-F5F5F5-l-333]' : 'color-[--d-666-l-999]'"
+      :class="sortOrder==='asc' ? 'color-[--secondary-text]' : 'color-[--third-text]'"
       @click.self.stop="handleSort('asc')"
     />
     <Icon
       name="custom:sort-up"
        class="text-4px mt-1px rotate-180 cursor-pointer"
-      :class="sortOrder==='desc' ? 'color-[--d-F5F5F5-l-333]' : 'color-[--d-666-l-999]'"
+      :class="sortOrder==='desc' ? 'color-[--secondary-text]' : 'color-[--third-text]'"
       @click.self.stop="handleSort('desc')"
     />
   </span>

@@ -432,10 +432,10 @@ function getFilterData(list, conditions) {
 
 <template>
   <div
-    class="w-full h-full bg-[--d-0B0D12-l-F6F9FF] p-12px"
+    class="w-full h-full bg-[--secondary-bg] p-12px"
     :class="{'pr-16px':pumpStore.isLeftFixed,'pl-16px':pumpStore.isRightFixed}"
   >
-    <Icon name="custom:drag2" class="absolute top-4px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2] drag-handle" />
+    <Icon name="custom:drag2" class="absolute top-4px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle" />
     <div class="flex mb-16px">
       <PlatformSelect />
       <div class="flex-1 mt--12px mb--16px drag-handle" />
@@ -444,7 +444,7 @@ function getFilterData(list, conditions) {
           <template #default="{ visible }">
             <div
 v-tooltip="$t('customize')"
-              class="flex items-center gap-4px mr-8px text-12px bg-[--d-151A22-l-E8F1FF] color-[--d-8CA0C3-l-566275] hover:color-[--d-F5F5F5-l-333] px-4px py-2px rounded-4px cursor-pointer">
+              class="flex items-center gap-4px mr-8px text-12px bg-[--main-input-button-bg] color-[--secondary-text] hover:color-[--main-text] px-4px py-2px rounded-4px cursor-pointer">
               <Icon name="custom:customized" class="text-13px" />
               <Icon :name="visible ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'" class="text-16px" />
             </div>
@@ -452,24 +452,24 @@ v-tooltip="$t('customize')"
         </Setting>
         <BlackList reference-class="text-12px" buttonClass="w-20px h-20px! p-0! justify-center!" />
         <Icon
-name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-333]"
+name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]"
           @click.self="pumpStore.visible = false" />
       </div>
     </div>
-    <div class="flex pb-8px border-b-1px border-b-solid border-b-[--d-222-l-F2F2F2] mb-12px">
+    <div class="flex pb-8px border-b-1px border-b-solid border-b-[--main-input-button-bg] mb-12px">
       <div class="flex items-center gap-8px">
         <span
-          v-for="(item, index) in tabList" :key="index" :class="`decoration-none shrink-0 text-14px lh-20px text-center color-[--d-566275-l-8CA0C3] px-8px py-4px rounded-4px cursor-pointer ${activeTab === item.value ? 'bg-[--d-151A22-l-E8F1FF] color-[--d-F5F5F5-l-333]' : ''
+          v-for="(item, index) in tabList" :key="index" :class="`decoration-none shrink-0 text-14px lh-20px text-center px-8px py-4px rounded-4px cursor-pointer ${activeTab === item.value ? 'bg-[--tab-active-bg] color-[--main-text]' : 'color-[--third-text]'
           }`" @click="setActiveTab(item.value)">
           {{ item.label }}
         </span>
       </div>
       <div class="flex-1 drag-handle mb--8px" />
       <div class="flex items-center gap-8px">
-        <div class="flex items-ceter gap-4px p-2px rounded-4px bg-[--d-151A22-l-E8F1FF]">
+        <div class="flex items-ceter gap-4px p-2px rounded-4px bg-[--main-input-button-bg]">
           <div
             v-for="(item, idx) in pumpStore.pumpConfig" :key="idx" class="cursor-pointer rounded-4px p-1px"
-            :class="pumpStore.activeChain === item.chain ? 'bg-[--d-111-l-FFF]' : ''"
+            :class="pumpStore.activeChain === item.chain ? 'bg-[--tab-active-bg]' : ''"
             @click="pumpStore.activeChain = item.chain as ChainKey">
             <ChainToken :chain="item.chain" :width="16" />
           </div>
@@ -481,7 +481,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
         <signal-quick-buy-input v-model="quickBuyValue" size="small" class="[--el-border-color:transparent]" style="--el-input-bg-color:var(--d-151A22-l-E8F1FF);--el-text-color-regular:var(--d-8CA0C3-l-566275);--el-input-icon-color:var(--d-8CA0C3-l-566275)" />
         <el-select
           v-model="botSettingStore.botSettings[pumpStore.activeChain]!.selected" fit-input-width size="small"
-          :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px] new-select" popper-class="small-select new-select-popper">
+          :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px]" popper-class="small-select">
           <el-option v-for="item in BotSettingsArr" :key="item.value" :value="item.value" :label="item.label" />
         </el-select>
         <div

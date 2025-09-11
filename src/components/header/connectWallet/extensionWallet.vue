@@ -6,7 +6,7 @@
     <span class="font-600">{{ $t('connectWallet') }}</span>
   </div>
   <div class="mt-40px">
-    <div class="text-14px color-[--d-666-l-999] mb-10px">{{ $t('selectNetwork') }}</div>
+    <div class="text-14px color-[--third-text] mb-10px">{{ $t('selectNetwork') }}</div>
     <el-select
       v-model="chain"
       filterable
@@ -29,52 +29,52 @@
       >
         <img :src="`${configStore.token_logo_url}chain/${item.net_name}.png`" class="rd-50% mr-5px" width="32" lazy alt="">
         <span>{{ item.name || '' }}</span>
-        <span class="ml-auto color-[--d-666-l-999] text-12px">{{ item.description || '' }}</span>
+        <span class="ml-auto color-[--third-text] text-12px">{{ item.description || '' }}</span>
       </el-option>
     </el-select>
-    <div class="text-14px color-[--d-666-l-999] mb-10px mt-40px">{{ $t('selectWallet') }}</div>
+    <div class="text-14px color-[--third-text] mb-10px mt-40px">{{ $t('selectWallet') }}</div>
     <el-scrollbar height="350px">
       <ul v-if="chain && isEvmChain(chain)">
-        <li v-for="item in walletStore.evmWallets" :key="item.name" class="flex items-center mb-10px bg-[--d-333-l-F2F2F2] h-48px rd-6px px-12px clickable" @click.stop="connectEvmWallet(item)">
+        <li v-for="item in walletStore.evmWallets" :key="item.name" class="flex items-center mb-10px bg-[--border] h-48px rd-6px px-12px clickable" @click.stop="connectEvmWallet(item)">
           <img :src="item.icon" class="mr-10px rd-5px" width="32" lazy alt="">
           <span>{{ item.name }}</span>
-          <span v-if="item?.provider" class="ml-auto color-[--d-666-l-999] text-14px">{{ $t('detected') }}</span>
+          <span v-if="item?.provider" class="ml-auto color-[--third-text] text-14px">{{ $t('detected') }}</span>
         </li>
-        <li class="flex items-center mb-10px bg-[--d-333-l-F2F2F2] h-48px rd-6px px-12px clickable" @click.stop="connectEvmWallet('AveWallet')">
+        <li class="flex items-center mb-10px bg-[--border] h-48px rd-6px px-12px clickable" @click.stop="connectEvmWallet('AveWallet')">
           <img src="@/assets/images/logo-bg.png" class="mr-10px rd-5px" width="32" lazy alt="">
           <span>AveWallet</span>
-          <span class="ml-auto color-[--d-666-l-999] text-14px">{{ $t('scan') }}</span>
+          <span class="ml-auto color-[--third-text] text-14px">{{ $t('scan') }}</span>
         </li>
-        <li class="flex items-center mb-10px bg-[--d-333-l-F2F2F2] h-48px rd-6px px-12px clickable" @click.stop="connectEvmWallet('Binance Wallet')">
+        <li class="flex items-center mb-10px bg-[--border] h-48px rd-6px px-12px clickable" @click.stop="connectEvmWallet('Binance Wallet')">
           <img src="@/assets/images/binance.png" class="mr-10px rd-5px" width="32" lazy alt="">
           <span>Binance Wallet</span>
-          <span class="ml-auto color-[--d-666-l-999] text-14px">{{ $t('scan') }}</span>
+          <span class="ml-auto color-[--third-text] text-14px">{{ $t('scan') }}</span>
         </li>
-        <li class="flex items-center mb-10px bg-[--d-333-l-F2F2F2] h-48px rd-6px px-12px clickable" @click.stop="connectEvmWallet('WalletConnect')">
+        <li class="flex items-center mb-10px bg-[--border] h-48px rd-6px px-12px clickable" @click.stop="connectEvmWallet('WalletConnect')">
           <Icon name="simple-icons:walletconnect" class="color-#5294F7 mr-10px text-32px" />
           <span>Wallet Connect V2</span>
-          <span class="ml-auto color-[--d-666-l-999] text-14px">{{ $t('scan') }}</span>
+          <span class="ml-auto color-[--third-text] text-14px">{{ $t('scan') }}</span>
         </li>
       </ul>
       <ul v-if="chain === 'solana'">
-        <li v-for="item in walletStore.solanaWallets" :key="item.name" class="flex items-center mb-10px bg-[--d-333-l-F2F2F2] h-48px rd-6px px-12px clickable" @click.stop="_connectSolanaWallet(item)">
+        <li v-for="item in walletStore.solanaWallets" :key="item.name" class="flex items-center mb-10px bg-[--border] h-48px rd-6px px-12px clickable" @click.stop="_connectSolanaWallet(item)">
           <img :src="item.icon" class="mr-10px rd-5px" width="32" lazy alt="">
           <span>{{ item.name }}</span>
-          <span v-if="item?.features" class="ml-auto color-[--d-666-l-999] text-14px">{{ $t('detected') }}</span>
+          <span v-if="item?.features" class="ml-auto color-[--third-text] text-14px">{{ $t('detected') }}</span>
         </li>
       </ul>
       <ul v-if="chain === 'tron'">
-        <li v-for="item in walletStore.tronWalletAdapters" :key="item.name" class="flex items-center mb-10px bg-[--d-333-l-F2F2F2] h-48px rd-6px px-12px clickable" @click.stop="_connectTronWallet(item)">
+        <li v-for="item in walletStore.tronWalletAdapters" :key="item.name" class="flex items-center mb-10px bg-[--border] h-48px rd-6px px-12px clickable" @click.stop="_connectTronWallet(item)">
           <img :src="item.icon" class="mr-10px rd-5px" width="32" lazy alt="">
           <span>{{ item.name }}</span>
-          <span v-if="item?.readyState === 'Found'" class="ml-auto color-[--d-666-l-999] text-14px">{{ item?.name === 'WalletConnect' ? $t('scan') : $t('detected') }}</span>
+          <span v-if="item?.readyState === 'Found'" class="ml-auto color-[--third-text] text-14px">{{ item?.name === 'WalletConnect' ? $t('scan') : $t('detected') }}</span>
         </li>
       </ul>
       <ul v-if="chain === 'sui'">
-        <li v-for="item in walletStore.suiWallets" :key="item.name" class="flex items-center mb-10px bg-[--d-333-l-F2F2F2] h-48px rd-6px px-12px clickable" @click.stop="_connectSuiWallet(item)">
+        <li v-for="item in walletStore.suiWallets" :key="item.name" class="flex items-center mb-10px bg-[--border] h-48px rd-6px px-12px clickable" @click.stop="_connectSuiWallet(item)">
           <img :src="item.icon" class="mr-10px rd-5px" width="32" lazy alt="">
           <span>{{ item.name }}</span>
-          <span v-if="item?.features" class="ml-auto color-[--d-666-l-999] text-14px">{{ $t('detected') }}</span>
+          <span v-if="item?.features" class="ml-auto color-[--third-text] text-14px">{{ $t('detected') }}</span>
         </li>
       </ul>
     </el-scrollbar>

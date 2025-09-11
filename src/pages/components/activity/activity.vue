@@ -346,8 +346,8 @@ function initCache() {
       :header-height="40"
       :row-height="81"
       fixed
-      style="--el-bg-color: var(--d-111-l-FFF)"
-      row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
+       style="--el-bg-color: var(--secondary-bg)"
+       row-class="cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)]"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"
@@ -383,7 +383,7 @@ function initCache() {
     v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
-    class="mt-5px py-9px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
+    class="mt-5px py-9px flex justify-center [&&]:[--el-pagination-button-height:18px]"
     layout="total, prev, pager, next"
     :total="pageInfo.total || 0"
     :small="false"

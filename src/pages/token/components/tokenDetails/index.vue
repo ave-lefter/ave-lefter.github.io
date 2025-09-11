@@ -163,7 +163,7 @@ async function _getTokenDetailMarks(type: string) {
     style="--el-drawer-bg-color:transparent"
   >
     <div
-      class="absolute left-0 right-0 top-0 bottom-0 z-3012 bg-[--d-222-l-FFF] rounded-tl-10px rounded-bl-10px flex flex-col"
+      class="absolute left-0 right-0 top-0 bottom-0 z-3012 bg-[--dialog-bg] rounded-tl-10px rounded-bl-10px flex flex-col"
     >
       <div
         class="flex-1 max-w-480px overflow-y-auto overflow-x-hidden"
@@ -178,19 +178,19 @@ async function _getTokenDetailMarks(type: string) {
               }"
               />
               <span class="text-14px ml-4px mr-4px">{{ symbol.target }}</span>
-              <span v-if="symbol.source" class="text-12px color-[--d-999-l-666] mr-8px">/ {{ symbol.source }}</span>
+              <span v-if="symbol.source" class="text-12px color-[--secondary-text] mr-8px">/ {{ symbol.source }}</span>
               <Icon
                 v-copy="tokenDetailsStore.tokenInfo?.address" name="bxs:copy"
-                class="cursor-pointer text-10px color-[--d-666-l-999]"
+                class="cursor-pointer text-10px color-[--third-text]"
               />
             </div>
             <div
-              class="flex items-center border-solid border-0.5px color-#999 border-[--d-333-l-F2F2F2] rounded-4px"
+              class="flex items-center border-solid border-0.5px color-[--third-text] border-[--border] rounded-4px"
             >
               <span
                 v-for="(item, index) in timeList"
                 :key="index"
-                :class="`px-14px py-4px text-12px hover:opacity-80 cursor-pointer ${item.id===activeTime? 'color-[--d-F5F5F5-l-333] bg-[--d-333-l-F2F2F2]':''}`"
+                :class="`px-14px py-4px text-12px hover:opacity-80 cursor-pointer ${item.id===activeTime? 'color-[--main-text] bg-[--border]':''}`"
                 @click="switchTimeTab(item.id)"
               >
                 {{ item.name }}

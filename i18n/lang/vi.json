@@ -757,5 +757,6 @@
   "holdersNumTotal": "Chủ sở hữu tổng số",
   "holdersTotalChange": "Người nắm giữ thay đổi",
   "holdersChange": "Người nắm giữ thay đổi",
-  "holdersChange2": "Người giữ changs trong {n}"
+  "holdersChange2": "Người giữ changs trong {n}",
+  "lockAmount": "Số lượng khóa"
 }

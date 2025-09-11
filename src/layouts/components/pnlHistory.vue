@@ -15,18 +15,18 @@ defineProps<{
     width="420px"
     :close-on-click-modal="false"
   >
-    <div class="mx--20px border-t-1px border-t-solid border-[--d-333-l-F2F2F2]" />
+    <div class="mx--20px border-t-1px border-t-solid border-[--dialog-divider]" />
     <el-scrollbar :height="500" class="mx--20px">
       <div
         v-for="{ balance, time, amount } in list"
         :key="time"
-        class="p-20px flex justify-between items-center hover:bg-[--d-333-l-F2F2F2]"
+        class="p-20px flex justify-between items-center hover:bg-[--dialog-list-hover]"
       >
         <div class="flex flex-col gap-8px">
-          <span class="color-[--d-F5F5F5-l-333] font-500 text-16px lh-20px"
+          <span class="color-[--main-text] font-500 text-16px lh-20px"
             >{{ formatNumber(balance, 3) }} {{ getChainInfo(chain)?.main_name }}</span
           >
-          <div class="color-[--d-666-l-999] text-12px lh-16px">
+          <div class="color-[--third-text] text-12px lh-16px">
             {{ formatDate(time, 'YYYY/MM/DD HH:mm:ss') }}
           </div>
         </div>
@@ -39,7 +39,7 @@ defineProps<{
         </div>
       </div>
       <ave-empty v-if="list.length === 0" class="pt-100px">
-        <span class="color-[--d-666-l-999] text-12px lh-16px mt-10px">{{ $t('noHistory') }}</span>
+        <span class="color-[--third-text] text-12px lh-16px mt-10px">{{ $t('noHistory') }}</span>
       </ave-empty>
     </el-scrollbar>
   </el-dialog>

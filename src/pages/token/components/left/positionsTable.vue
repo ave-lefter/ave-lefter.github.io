@@ -540,7 +540,7 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
         <div class="pr-10px pb-20px">
           <NuxtLink
             v-for="(row,$index) in listData" :key="$index"
-            class="text-12px flex justify-between pl-10px py-10px cursor-pointer hover:bg-[var(--d-1A1A1A-l-F2F2F2)]"
+            class="text-12px flex justify-between pl-10px py-10px cursor-pointer hover:bg-[--dialog-bg]"
             :to="`/token/${row.index}`"
           >
             <div class="flex-[1.5] flex items-center">
@@ -554,13 +554,13 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
               </el-tooltip>
               <div class="ml-6px">
                 <div class="flex">
-                  <span class="color-[var(--d-F5F5F5-l-333)]">{{ row.symbol }}</span>
+                  <span class="color-[var(--main-text)]">{{ row.symbol }}</span>
                   <Icon
                     v-if="row.risk_score > 55 || row.risk_level < 0"
                     name="custom:danger"
                     class="font-14 ml-2px color-#F72121"/>
                 </div>
-                <div class="mt-2px color-[var(--d-999-l-666)]">
+                <div class="mt-2px color-[--third-text]">
                   <template v-if="row.balance === 0">$0</template>
                   <template v-else-if="row.balance === '--'">--</template>
                   <template v-else>

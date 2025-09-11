@@ -508,11 +508,11 @@ function formatSolanaStatusColor(item: { state: string; expiredAt: null }) {
   letter-spacing: 0;
   font-weight: 400;
   &:not(:last-child) {
-    border-bottom: 1px solid var(--d-333-l-F5F5F5);
+    border-bottom: 1px solid var(--border);
   }
   .label {
     font-size: 12px;
-    color: var(--d-999-l-666);
+    color: var(--third-text);
     letter-spacing: 0;
     font-weight: 400;
     min-width: 20px;
@@ -572,7 +572,7 @@ function formatSolanaStatusColor(item: { state: string; expiredAt: null }) {
     bottom: 0px;
     right: -3px;
     border-radius: 50%;
-    border: 1px solid var(--d-333-l-F5F5F5);
+    border: 1px solid var(--border);
   }
 }
 

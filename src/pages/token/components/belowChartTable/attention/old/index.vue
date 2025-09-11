@@ -156,13 +156,13 @@ function _deleteAttention(row: AddAttentionOld, index: number) {
 .histrory {
   padding-bottom: 10px;
   .top {
-    color: var(--d-666-l-999);
+    color: var(--third-text);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 5px;
     font-size: 12px;
-    background: var(--d-222-l-F2F2F2);
+    background: var(--table-title-bg);
     > :nth-child(1) {
       flex: 1;
     }
@@ -245,10 +245,10 @@ function _deleteAttention(row: AddAttentionOld, index: number) {
       }
       cursor: pointer;
       &:hover {
-        background-color: var(--d-1A1A1A-l-F2F2F2);
+        background-color: var(--dialog-bg);
       }
     }
-    color: var(--d-999-l-959A9F);
+    color: var(--secondary-text);
     .green {
       color: #12b886;
     }
@@ -256,10 +256,10 @@ function _deleteAttention(row: AddAttentionOld, index: number) {
       color: #ff646d;
     }
     i.edit {
-      color: var(--custom-text-2-color);
+      color: var(--third-text);
       vertical-align: middle;
       &:hover {
-        color: var(--custom-primary-color);
+        color: var(--primary-color);
       }
     }
     // a {
