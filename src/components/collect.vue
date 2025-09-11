@@ -39,6 +39,11 @@ function clickStar() {
 const onConfirm = () => {
     // 如果未关注，则关注
     if(newGroupName.value){
+        const hasNewGroup = userFavoriteGroupsWithDefault.value.find(item => item.name === newGroupName.value)
+        if(hasNewGroup){
+            ElMessage.error(t('groupNameAlreadyExists'))
+            return
+        }
         // 新建分组并关注
         emit('newGroupAndCollect',newGroupName.value)
     } else {
@@ -83,7 +88,7 @@ function changeActiveGroupId(groupId:number) {
                     <Icon name="material-symbols:add-circle" class="mr-4px"/>{{ $t('newGroup') }}
                 </el-button>
                 <div class="flex mt-4px">
-                    <el-button class="flex-1" @click="popoverVisible = false">
+                    <el-button class="flex-1" @click="hidePopover">
                         {{ $t('cancel') }}
                     </el-button>
                     <el-button :loading="confirmLoading" class="flex-1" type="primary" @click="onConfirm">

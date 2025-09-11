@@ -1367,5 +1367,6 @@
   "TransferTax": "轉帳稅",
   "MaxTxAmount": "單筆tx最大量",
   "MaxWalletAmount": "單錢包最大量",
-  "riskRemoved": "已解除"
+  "riskRemoved": "已解除",
+  "groupNameAlreadyExists": "分組名稱已存在"
 }
