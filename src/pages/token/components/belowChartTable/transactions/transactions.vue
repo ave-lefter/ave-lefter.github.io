@@ -961,7 +961,7 @@ const collect = async (row: any,index:number) => {
         <template #cell-amountU="{ row }">
           <div
             v-if="row.type === undefined" :class="`absolute h-full ${getGradient(row)} opacity-15`"
-            :style="`width:${Math.min(getAmount(row, true, true) / 20, 100)}%`" />
+            :style="`width:${Math.min(getAmount(row, true, true) / (addressAndChain.chain === 'solana' ? 10 : 20), 100)}%`" />
           <div v-if="row.type === undefined" :class="`${getRowColor(row)} w-full h-full flex items-center justify-end`">
             <template v-if="tableView.isVolUSDT">
               ${{ formatNumber(getAmount(row, true, true), 2) }}

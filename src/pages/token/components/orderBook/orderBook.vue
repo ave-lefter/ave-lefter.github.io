@@ -635,7 +635,7 @@ function getFullRowGradient(row: ExtendedTxResponse) {
 
 function getAmountBarWidthPercent(row: ExtendedTxResponse) {
   const vol = getAmount(row, true, true)
-  const width = Math.min(vol / 20, 100) / 100
+  const width = Math.min(vol / (addressAndChain.value.chain === 'solana' ? 10 : 20), 100) / 100
   return width.toFixed(3)
 }
 
