@@ -219,6 +219,7 @@ import { formatDec, formatNumber } from '@/utils/formatNumber'
 import { useEventBus } from '@vueuse/core'
 import AutoSellSet from './autoSellSet.vue'
 import type { BotChain, BotSettingKey } from '~/utils/types'
+import { recordTxV2, updateTxV2 } from '~/api/tracking'
 
 interface Token {
   address?: string
@@ -703,6 +704,18 @@ async function submitBotSwap() {
           amountNativeOut.value = ''
           // this.dialogVisibleSwap = false
         }, 500)
+        const chain = 'solana'
+        const txInfo: any = res?.[0] || {}
+        console.log('recordTxV2 txInfo', txInfo)
+        recordTxV2({
+          txInfo,
+          chain: chain,
+          destination: chain === 'solana' ? '/botapi/swap/createSolTx' : '/botapi/swap/createSwapEvmTx' ,
+          type: 10
+        })
+        const batchIdObj = {
+          [txInfo?.batchId]: txInfo?.id
+        }
         const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
           const batchId = subscribeResult.batchId
           if (batchId === data.batchId) {
@@ -713,6 +726,8 @@ async function submitBotSwap() {
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
+              const txInfo = subscribeResult?.txList?.[0]
+              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
             }
@@ -778,6 +793,17 @@ async function submitBotSwap() {
           amountTokenOut.value = ''
           // this.dialogVisibleSwap = false
         }, 500)
+        const txInfo: any = res?.[0] || {}
+        recordTxV2({
+          txInfo,
+          chain: chain,
+          destination: '/botapi/swap/createSwapEvmTx' ,
+          type: 10
+        })
+        const batchIdObj = {
+          [txInfo?.batchId]: txInfo?.id
+        }
+
         const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
           const batchId = subscribeResult.batchId
           if (batchId === data.batchId) {
@@ -788,6 +814,8 @@ async function submitBotSwap() {
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
+              const txInfo = subscribeResult?.txList?.[0]
+              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
             }
@@ -877,6 +905,16 @@ function submitBotLimit() {
           //   this.$store.state.bot.orderTabActive = 'my'
           // }
         }, 500)
+        const txInfo: any = res?.[0] || {}
+        recordTxV2({
+          txInfo,
+          chain: chain,
+          destination: '/botapi/swap/createSolLimitTx',
+          type: 20
+        })
+        const batchIdObj = {
+          [txInfo?.batchId]: txInfo?.id
+        }
         const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
           const batchId = subscribeResult.batchId
           if (batchId === data.batchId) {
@@ -887,6 +925,8 @@ function submitBotLimit() {
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
+              const txInfo = subscribeResult?.txList?.[0]
+              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
             }
@@ -940,6 +980,16 @@ function submitBotLimit() {
           amountTokenOut.value = ''
           amountNativeOut.value = ''
         }, 500)
+        const txInfo: any = res?.[0] || {}
+        recordTxV2({
+          txInfo,
+          chain: chain,
+          destination: '/botapi/swap/createEvmLimitTx',
+          type: 20
+        })
+        const batchIdObj = {
+          [txInfo?.batchId]: txInfo?.id
+        }
         const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
           const batchId = subscribeResult.batchId
           if (batchId === data.batchId) {
@@ -950,6 +1000,8 @@ function submitBotLimit() {
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
+              const txInfo = subscribeResult?.txList?.[0]
+              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
             }

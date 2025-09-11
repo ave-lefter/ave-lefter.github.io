@@ -310,8 +310,13 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
   if (target !== realAddress.value) {
     return
   }
+  // 先把加减池子过滤掉
+  if(!['buy','sell'].includes(simpleWSTx.direction)) {
+    return
+  }
   txCount.value[maker] = (txCount.value[maker] || 0) + 1
   const { topN, wallet_tag } = getWalletTag(data.msg)
+  const newTags = getSimpleTxTags(simpleWSTx.tag)
   const item = {
     ...simpleWSTx,
     topN, wallet_tag,
@@ -322,7 +327,8 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
     transaction: simpleWSTx.txhash,
     senderProfile: {
       solTotalHolding: simpleWSTx.maker_eth
-    }
+    },
+    newTags
   }
   wsPairCache.value.unshift(item as any)
   if (!isPausedTxs.value) {
@@ -431,6 +437,18 @@ async function _getTokenTxs() {
     console.log('=>(transactions.vue:62) e', e)
   } finally {
     listStatus.value.loadingTxs = false
+  }
+}
+
+function getSimpleTxTags(tag?:string) {
+  if(tag){
+    const wallet_tag = tag.split(',')
+    const tagsMap = {
+      MEVBot:{
+        type:'8'
+      }
+    }
+    return wallet_tag.map(el => tagsMap[el]).filter(el=> !!el)
   }
 }
 

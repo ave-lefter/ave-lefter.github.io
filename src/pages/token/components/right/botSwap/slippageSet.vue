@@ -722,7 +722,7 @@ function addStopLoss() {
     font-size: 14px;
     background: transparent;
     &.active {
-      background: var(--dialog-tab-active);
+      background: var(--dialog-tab-active-bg);
       color: var(--main-text);
     }
   }

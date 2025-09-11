@@ -16,8 +16,11 @@ export function onRequest({ options, request }: MyFetchContext) {
   }
   // headers.lang = language
   options.headers.set('lang', language)
-
   const url = request as string
+  if (url?.includes('/v2/aveswap/')) {
+    options.headers.set('lang-zone', localStorage.getItem('language') || 'en')
+  }
+
   // 请求头 authorization
   if (url?.includes('/v1api/v1')) {
     const date = Date.now()

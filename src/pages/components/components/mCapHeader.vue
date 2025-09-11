@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import RangePopover from './rangePopover.vue'
 
+const globalStore = useGlobalStore()
 const props = defineProps<{
   sortConditions: { sort: string; sort_dir: string }
   setSortConditions(params: { sort: string; sort_dir: string }): void
   setFilterForm(...args: [string, string][]): void
 }>()
 
+const sortKey = 'market_cap'
 function sortChange(sort_dir: string) {
   props.setSortConditions({
-    sort: sort_dir ? 'market_cap' : '',
+    sort: sort_dir ? sortKey : '',
     sort_dir: sort_dir,
   })
 }
 const defaultSort = computed(() => {
-  if (props.sortConditions.sort === 'market_cap') {
+  if (props.sortConditions.sort === sortKey) {
     return props.sortConditions.sort_dir
   }
   return ''
@@ -25,7 +27,7 @@ const openTimeList = shallowRef([
   { text: '> $300K', value: '300000' },
   { text: '> $1M', value: '1000000' },
 ])
-const isFilterHighlight = shallowRef(false)
+const isFilterHighlight = shallowRef(!!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.marketcap_min || !!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.marketcap_max)
 const { t } = useI18n()
 function confirm(params?: [string, string]) {
   if (!params || !params.some((el) => !!el)) {
@@ -56,6 +58,7 @@ function confirm(params?: [string, string]) {
     <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
     <RangePopover
       v-model="popoverVisible"
+      sortKey="marketcap"
       :width="225"
       :title="`${$t('mCap')}($)`"
       :list="openTimeList"

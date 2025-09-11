@@ -31,6 +31,7 @@ const props = defineProps<{
 }>()
 const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const botStore = useBotStore()
+const tokenDetailsStore = useTokenDetailsStore()
 const route = useRoute()
 const token = computed(() => {
   return (props.isRank && 'klineRow' in tokenStore) ? tokenStore.klineRow?.id : route.params.id as string
@@ -249,7 +250,7 @@ function createToggleButton() {
 }
 
 
-const { createMarkButton, getMarks, marksTabs, wsTxUpdateMarks } = useKlineMarks()
+const { createMarkButton, getMarks, marksTabs, wsTxUpdateMarks,profilingMarksCache } = useKlineMarks()
 
 watch(marksTabs, () => {
   if (!isReady.value) return
@@ -645,7 +646,36 @@ async function initChart() {
 
   // onMarkClick
   _widget?.subscribe('onMarkClick', (markId) => {
-    console.log('markId', markId)
+    const {token,symbol,logo_url,chain} = tokenStore.tokenInfo?.token||{}
+    const {target_token,token0_address,token0_symbol,token1_symbol,pair} = tokenStore.pair || {}
+    
+    let user_address = user.value
+    for(const [,markArr] of profilingMarksCache){
+     const addr = markArr.find(el => el.id === markId)?.user_address
+     if(addr){
+      user_address = addr
+      break
+     }
+    }
+    const $patchParams = {
+      drawerVisible:true,
+      tokenInfo:{
+        id:route.params.id as string,
+        symbol,
+        logo_url,
+        chain,
+        address:token
+      },
+      pairInfo:{
+        target_token,
+        token0_address,
+        token0_symbol,
+        token1_symbol,
+        pairAddress:pair
+      },
+      user_address
+    }
+    tokenDetailsStore.$patch($patchParams)
   })
 
   subscribeStudyEvent()
