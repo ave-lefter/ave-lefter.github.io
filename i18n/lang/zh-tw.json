@@ -1368,6 +1368,7 @@
   "MaxTxAmount": "單筆tx最大量",
   "MaxWalletAmount": "單錢包最大量",
   "riskRemoved": "已解除",
+  "groupNameAlreadyExists": "分組名稱已存在",
   "displayBorder": "顯示描邊",
   "highlightBorder": "突出描邊",
   "display": "顯示",
