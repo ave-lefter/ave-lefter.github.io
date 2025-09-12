@@ -139,7 +139,7 @@ function subBalanceChange() {
 
 function _getTokenInfo() {
   const id = route.params.id as string
-  getTokenInfo(id).then(res => {
+  return getTokenInfo(id).then(res => {
     tokenStore.tokenInfo = res
     tokenStore.pairAddress = res?.pairs?.[0].pair || ''
   })
@@ -152,9 +152,13 @@ function _getTokenInfoExtra() {
   })
 }
 
-function init() {
+function init(isRefresh = false) {
   tokenStore.tokenPrice = 0
-  _getTokenInfo()
+  _getTokenInfo().then(()=>{
+    if(!isRefresh){
+      addVisit()
+    }
+  })
   _getTokenInfoExtra()
   // wsStore.onmessageTxUpdateToken()
   tokenStore._getTotalHolders(route.params.id as string)
@@ -165,7 +169,6 @@ function init() {
 
 watch(() => route.params.id, () => {
   init()
-  addVisit()
 })
 
 function visibilitychangeFn() {
@@ -175,7 +178,6 @@ function visibilitychangeFn() {
 
 onBeforeMount(() => {
   init()
-  addVisit()
   document.addEventListener('visibilitychange', visibilitychangeFn)
 })
 
@@ -197,7 +199,7 @@ onBeforeRouteLeave(() => {
 })
 
 function refresh() {
-  init()
+  init(true)
 }
 
 function addVisit() {
@@ -207,9 +209,9 @@ function addVisit() {
     if(index !== -1){
       globalStore.lastVisitTokens.splice(index, 1)
     } else if(globalStore.lastVisitTokens.length >= 10){
-      globalStore.lastVisitTokens.shift()
+      globalStore.lastVisitTokens.pop()
     }
-    globalStore.lastVisitTokens.push({
+    globalStore.lastVisitTokens.unshift({
       id:token+'-'+chain,
       logo_url,
       symbol,

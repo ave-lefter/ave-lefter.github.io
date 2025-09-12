@@ -1379,5 +1379,6 @@
   "TransferTax": "转账税",
   "MaxTxAmount": "单笔tx最大量",
   "MaxWalletAmount": "单钱包最大量",
-  "riskRemoved": "已解除"
+  "riskRemoved": "已解除",
+  "closeOtherPages": "关闭其他页"
 }

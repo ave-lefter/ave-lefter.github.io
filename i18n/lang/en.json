@@ -1380,5 +1380,6 @@
   "TransferTax": "Transfer Tax",
   "MaxTxAmount": "Max Tx Amount",
   "MaxWalletAmount": "Max Wallet Amount",
-  "riskRemoved": "Risk Removed"
+  "riskRemoved": "Risk Removed",
+  "closeOtherPages": "Close Other Pages"
 }
