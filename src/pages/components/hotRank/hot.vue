@@ -472,6 +472,7 @@ function resetColumns(needClear:boolean) {
   <div v-loading="loading" style="height: calc(100vh - 185px)">
     <AveTable
       ref="aveTableRef"
+      rowKey="rowKey"
       :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"

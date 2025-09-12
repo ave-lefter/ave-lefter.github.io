@@ -43,6 +43,10 @@ const props = defineProps({
   },
   loading: Boolean,
   fixed: Boolean,
+  rowKey:{
+    type: String,
+    default: 'id'
+  }
 })
 const emits = defineEmits<{
   (e: 'endReached', value: number): void
@@ -126,6 +130,7 @@ function calculateColumnWidths() {
       <!-- 透传所有 $attrs，支持 el-table-v2 的其它属性 -->
       <ElTableV2
         ref="tableRef"
+        :rowKey="rowKey"
         class="el-table"
         style="--el-table-border:0;--el-bg-color:transparent;font-size: 12px;"
         :header-class="`bg-[--main-list-header-bg] ${headerClass}`"
