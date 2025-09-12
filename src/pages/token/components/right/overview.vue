@@ -34,7 +34,7 @@
       </li>
       <li v-if="token?.total" class="flex justify-between mb-12px">
         <span class="color-[--third-text]">{{ $t('mcap') }}</span>
-        <span class="color-[--secondary-text]">${{ formatNumber(tokenStore?.marketCap || 0) }}</span>
+        <span class="color-[--secondary-text]">${{ formatNumber(tokenStore?.marketCap || 0,2) }}</span>
       </li>
       <li v-if="checkStore.checkResult?.creator_address" class="flex justify-between mb-12px">
         <span class="color-[--third-text]">{{ $t('contractCreator') }}</span>

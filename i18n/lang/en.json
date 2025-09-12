@@ -1380,5 +1380,19 @@
   "TransferTax": "Transfer Tax",
   "MaxTxAmount": "Max Tx Amount",
   "MaxWalletAmount": "Max Wallet Amount",
-  "riskRemoved": "Risk Removed"
+  "riskRemoved": "Risk Removed",
+  "groupNameAlreadyExists": "Group name already exists",
+  "displayBorder": "Display Border",
+  "highlightBorder": "Highlight Border",
+  "display": "Display",
+  "data": "Data",
+  "background": "Bg",
+  "layout": "Layout",
+  "undo": "Undo",
+  "open": "Open",
+  "jump": "Open to jump",
+  "threeLayout": "Three-column layout",
+  "detailsAfterPurchase": "Token details after purchase",
+  "mini": "Mini",
+  "gas": "Gas Fee"
 }

@@ -54,7 +54,7 @@ export const useWSStore = defineStore('ws', () => {
       if (event === WSEventType.TGBOT) {
         wsResult[event] = data?.msg
       }else if (event === WSEventType.ASSET) {
-        wsResult[event] = data?.msg
+        wsResult[event] = data
         botStore.updateBalance(data)
       }else if (event === WSEventType.MONITOR) {
         wsResult[event] = data?.msg

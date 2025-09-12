@@ -1379,5 +1379,19 @@
   "TransferTax": "转账税",
   "MaxTxAmount": "单笔tx最大量",
   "MaxWalletAmount": "单钱包最大量",
-  "riskRemoved": "已解除"
+  "riskRemoved": "已解除",
+  "groupNameAlreadyExists": "分组名称已存在",
+  "displayBorder": "显示描边",
+  "highlightBorder": "突出描边",
+  "display": "显示",
+  "data": "数据",
+  "background": "背景",
+  "layout": "布局",
+  "undo": "不打开",
+  "open": "打开",
+  "jump": "打开跳转",
+  "threeLayout": "三栏布局",
+  "detailsAfterPurchase": "买后代币详情",
+  "mini": "小号",
+  "gas": "gas费"
 }

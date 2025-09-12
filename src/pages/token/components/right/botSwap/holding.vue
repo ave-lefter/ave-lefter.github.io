@@ -66,7 +66,7 @@ async function getWalletTxData() {
   if (!token || !chain) {
     return
   }
-  if (!['solana', 'bsc'].includes(chain)) {
+  if (!botStore.isSupportChains.includes(chain as typeof botStore.isSupportChains[number])) {
     walletTokenInfo.value = null
     return
   }
@@ -81,6 +81,7 @@ async function getWalletTxData() {
     user_token: token
   }
   return bot_getUserWalletTxInfo(params).then(async res => {
+    console.log('walletTokenInfo', res)
     walletTokenInfo.value = res?.[0] || null
     // const avgPrice = Number(res?.[0]?.balance_amount) > 0 ? Number(res?.[0]?.average_purchase_price_usd || 0) : 0
     // useEventBus('updateAvgPrice').emit(avgPrice)
@@ -101,7 +102,7 @@ async function _bot_getAddressAllBalances() {
   if (!token || !chain) {
     return
   }
-  if (!botStore.isSupportChains?.includes?.(chain)) {
+  if (!botStore.isSupportChains?.includes?.(chain as typeof botStore.isSupportChains[number])) {
     return
   }
   const params = {

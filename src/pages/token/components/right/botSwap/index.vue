@@ -1,6 +1,6 @@
 <template>
   <div class="bot-swap-container">
-    <Holding v-if="chain !== 'xlayer'" />
+    <Holding  />
     <div class="tabs">
       <button v-for="(item, index) in tabs" :key="index" class="tab-item" :class="{ active: item.value === activeTab, [`tab-${item.value}`]: true }" type="button" @click="activeTab = item.value">
         <span>{{ item.name }}</span>
@@ -73,12 +73,12 @@ const tabs2 = computed(() => {
 })
 
 const types = computed(() => {
-  const chain = getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain
-  if (chain === 'xlayer') {
-    return [
-      { value: 'market', name: t('swapT') },
-    ] as const
-  }
+  // const chain = getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain
+  // if (chain === 'xlayer') {
+  //   return [
+  //     { value: 'market', name: t('swapT') },
+  //   ] as const
+  // }
   return [
     { value: 'market', name: t('swapT') },
     { value: 'limit', name: t('limitT') },

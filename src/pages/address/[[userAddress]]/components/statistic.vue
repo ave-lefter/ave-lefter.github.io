@@ -47,12 +47,12 @@
             </a>
           </div>
           <div class="flex items-center gap-2">
-            <div v-copy="address" class="statistic-address flex gap-2.5 cursor-pointer">
+            <div class="statistic-address flex gap-2.5 cursor-pointer" @click="addressClick">
               <div
                 class="statistic-address-copy flex items-center justify-center px-2 py-1.75 h-6 rounded text-3 gap-1 text-[--d-666-l-959A9F] bg-[--d-222-l-F2F2F2]"
               >
                 {{ addressText }}
-                <Icon name="bxs:copy" class="text-2.5 clickable text-[--d-666-l-959A9F]" />
+                <Icon v-copy="address" name="bxs:copy" class="text-2.5 clickable text-[--d-666-l-959A9F]" />
               </div>
             </div>
             <div
@@ -530,6 +530,10 @@ function mergeStatistics(data: any) {
 defineExpose({
   mergeStatistics,
 })
+
+function addressClick() {
+  window.open(formatExplorerUrl(chain.value, address.value, 'address'))
+}
 </script>
 <style scoped>
 .custom-switch {

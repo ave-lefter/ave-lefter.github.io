@@ -87,3 +87,7 @@ html, body {
 .text-hF57_4zZ{
   max-width: 300px !important
 }
+
+.chart-markup-table.pane.pane--cursor-default:has(.tooltip-eSLcXvvL) {
+  cursor: pointer;
+}
