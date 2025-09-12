@@ -50,7 +50,7 @@
                   />
               </template>
               <template #default>
-                <div class="text-14px text-[var(--d-fff-l-333)]">{{$t('searchKol')}}</div>
+                <div class="text-14px text-[var(--main-text)]">{{$t('searchKol')}}</div>
                 <el-input class="mt-8px" v-model="filterForm['keyword'].keyword" :placeholder="$t('searchKolPlaceholder')" clearable />
                 <div class="mt-12px flex items-center justify-center">
                     <el-button
@@ -90,7 +90,7 @@
                     name="custom:filter"
                     class="text-10px cursor-pointer  ml-3px"
                     :style="{
-                      color: isActiveFilter('last_trade_time') ? 'var(--d-999-l-666)' : ''
+                      color: isActiveFilter('last_trade_time') ? 'var(--third-text)' : ''
                     }"
                     @click.stop.prevent
                   />
@@ -145,13 +145,13 @@
               style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
             >
               <span v-if="$index < 9" style="opacity: 0" class="text-10px">0</span>
-              <span class="text-10px color-[--d-666-l-999]">
+              <span class="text-10px color-[--third-text]">
                 #{{ (pageNO - 1) * pageSize + $index + 1 }}
               </span>
               <Icon
                 v-if="shouldRenderChild"
                 :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
-                :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="text-14px clickable shrink-0 mr-5px ml-8px" @click.stop.prevent="collect(row,$index)" />
+                :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--third-text]'" class="text-14px clickable shrink-0 mr-5px ml-8px" @click.stop.prevent="collect(row,$index)" />
 
               <UserAvatar class="mr-10px" iconSize="32px" iconChainSize="14px" :wallet_logo="{...(row?.wallet_logo || {}), url: row?.wallet_logo?.url || row?.twitter_url, logo: row?.wallet_logo?.logo || row?.avatar_url}" :address="row.wallet_address" />
               <div>
@@ -159,7 +159,7 @@
                   <UserRemark addressClass="token-symbol ellipsis" addressStyle="max-width: 70px" showAddressTitle :address="row.wallet_address" :chain="row.chain" :remark="row.remark || row.nickname" :wallet_logo="row.wallet_logo" :formatAddress="a=> '*' + a?.slice(-5)" @updateRemark="({remark}) => row.remark = remark"/>
                   <img  v-if="activeTab === 'kol'" style="width: 10px; height: 10px; margin-left: 8px;" src="@/assets/images/x.png" alt="" srcset="" @click.stop="goLink1(row?.wallet_logo?.url)">
                 </div>
-                <div class="text-10px color-icon flex-start mt-4px color-[--d-666-l-999]" style="line-height: 1">
+                <div class="text-10px color-icon flex-start mt-4px color-[--third-text]" style="line-height: 1">
                   <div
                     class="mr-5px"
                     :style="{
@@ -194,7 +194,7 @@
                   <Icon
                     v-copy="row.wallet_address"
                     name="bxs:copy"
-                    class="text-10px cursor-pointer color-[--d-666-l-999] ml-5px"
+                    class="text-10px cursor-pointer color-[--third-text] ml-5px"
                     @click.stop.prevent
                   />
                   <div v-if="row?.extra?.length > 0" class="media-list flex-start">
@@ -272,7 +272,7 @@
           min-width="100px"
         >
         <template #header>
-          <span class="bg-[--d-333-l-FFF] color-[--d-CCC-l-333] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
+          <span class="bg-[--tab-active-bg] color-[--main-text] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
           <span>Pnl</span>
         </template>
           <template #default="{ row }">
@@ -287,7 +287,7 @@
                 <span v-else-if="row?.total_profit_rate < 0" class="red">
                   {{ formatNumber(row?.total_profit_rate * 100 || 0) }}%
                 </span>
-                <span v-else class="color-[--d-666-l-999]">0</span>
+                <span v-else class="color-[--third-text]">0</span>
               </div>
             </div>
           </template>
@@ -328,12 +328,12 @@
               <div class="flex flex-col items-center justify-center ml-5px">
                 <i
                   class="w-0 h-0 border-solid border-5px border-transparent cursor-pointer"
-                  :class="conditions.sort == 'total_volume' &&  conditions.sort_dir == 'asc' ? 'border-b-[--d-F5F5F5-l-333]' : 'border-b-[--d-666-l-999]'"
+                  :class="conditions.sort == 'total_volume' &&  conditions.sort_dir == 'asc' ? 'border-b-[--main-text]' : 'border-b-[--third-text]'"
                   @click.stop="switchSort('total_volume', -1)"
                 />
                 <i
                   class="w-0 h-0 border-solid border-5px border-transparent mt-2px cursor-pointer"
-                  :class="conditions.sort == 'total_volume' &&  conditions.sort_dir == 'desc' ? 'border-t-[--d-F5F5F5-l-333]' : 'border-t-[--d-666-l-999]'"
+                  :class="conditions.sort == 'total_volume' &&  conditions.sort_dir == 'desc' ? 'border-t-[--main-text]' : 'border-t-[--third-text]'"
                   @click.stop="switchSort('total_volume', 1)"
                 />
               </div>
@@ -347,12 +347,12 @@
               <div class="flex flex-col items-center justify-center ml-5px">
                 <i
                   class="w-0 h-0 border-solid border-5px border-transparent cursor-pointer"
-                  :class="conditions.sort == 'total_trades' &&  conditions.sort_dir == 'asc' ? 'border-b-[--d-F5F5F5-l-333]' : 'border-b-[--d-666-l-999]'"
+                  :class="conditions.sort == 'total_trades' &&  conditions.sort_dir == 'asc' ? 'border-b-[--main-text]' : 'border-b-[--third-text]'"
                   @click.stop="switchSort('total_trades', -1)"
                 />
                 <i
                   class="w-0 h-0 border-solid border-5px border-transparent mt-2px cursor-pointer"
-                  :class="conditions.sort == 'total_trades' &&  conditions.sort_dir == 'desc' ? 'border-t-[--d-F5F5F5-l-333]' : 'border-t-[--d-666-l-999]'"
+                  :class="conditions.sort == 'total_trades' &&  conditions.sort_dir == 'desc' ? 'border-t-[--main-text]' : 'border-t-[--third-text]'"
                   @click.stop="switchSort('total_trades', 1)"
                 />
               </div>
@@ -367,12 +367,12 @@
               @mouseleave="showPop = false"
              >
              <div class="cursor-pointer">
-              <div  class="hover-dot" :class="!row?.total_volume ? 'color-[--d-666-l-999]' : ''">
+              <div  class="hover-dot" :class="!row?.total_volume ? 'color-[--third-text]' : ''">
                 ${{
                   row?.total_volume > 0 ? formatNumber(row?.total_volume || 0, 2) : 0
                 }}
               </div>
-              <span class="hover-dot text-12px" :class="!row?.total_trades ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-666]'">
+              <span class="hover-dot text-12px" :class="!row?.total_trades ? 'color-[--third-text]' : 'color-[--secondary-text]'">
                 {{
                   row?.total_trades > 0 ? formatNumber(row?.total_trades || 0, 2) : 0
                 }}
@@ -449,7 +449,7 @@
           :min-width="110"
         >
         <template #header>
-          <span class="bg-[--d-333-l-FFF] color-[--d-CCC-l-333] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
+          <span class="bg-[--tab-active-bg] color-[--main-text] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
           <span>{{ $t('score') }}</span>
         </template>
         <template #default="{ row }">
@@ -459,7 +459,7 @@
 
         <el-table-column align="right" :min-width="200">
           <template #header>
-            <span class="bg-[--d-333-l-FFF] color-[--d-CCC-l-333] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
+            <span class="bg-[--tab-active-bg] color-[--main-text] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
             <span>{{ $t('profit4') }}</span>
             <el-popover
               v-model:visible="filterForm['profit_percent_num'].visible"
@@ -467,7 +467,7 @@
               popper-class="chains-table-filter"
               title=""
               :width="220"
-              trigger="hover"
+              trigger="click"
               teleported
             >
               <template #reference>
@@ -476,7 +476,7 @@
                     name="custom:filter"
                     class="text-10px cursor-pointer  ml-3px mr-7px"
                     :style="{
-                      color: isActiveFilter('profit_percent_num') ? 'var(--d-999-l-666)' : ''
+                      color: isActiveFilter('profit_percent_num') ? 'var(--secondary-text)' : ''
                     }"
                   />
               </template>
@@ -506,7 +506,7 @@
                               class="w-0 h-0 border-solid border-5px border-transparent cursor-pointer "
                               :class="
                                   filterForm['profit_percent_num'].profit_obj[key].sort_dir === 'asc'
-                                    ? 'border-b-[--d-F5F5F5-l-333]' : 'border-b-[--d-666-l-999]'
+                                    ? 'border-b-[--main-text]' : 'border-b-[--third-text]'
                                 "
                                 @click.stop="
                                   handleSort(filterForm['profit_percent_num'].profit_obj[key], 'asc')
@@ -516,7 +516,7 @@
                               class="w-0 h-0 border-solid border-5px border-transparent mt-2px cursor-pointer"
                               :class="
                                   filterForm['profit_percent_num'].profit_obj[key].sort_dir === 'desc'
-                                    ? 'border-t-[--d-F5F5F5-l-333]' : 'border-t-[--d-666-l-999]'
+                                    ? 'border-t-[--main-text]' : 'border-t-[--third-text]'
                                 "
                                 @click.stop="
                                   handleSort(filterForm['profit_percent_num'].profit_obj[key], 'desc')
@@ -605,7 +605,7 @@
             <div class="flex-end">
               <div class="mr-40px">
                 <div class="flex-end">
-                  <span class="text-12px mr-4px color-[--d-999-l-666]">
+                  <span class="text-12px mr-4px color-[--secondary-text]">
                     {{ filterForm['profit_percent_num'].profit_obj.profit_above_900_percent_num.name }}
                   </span>
                   <span
@@ -616,7 +616,7 @@
                   </span>
                 </div>
                 <div class="mt-10px flex-end">
-                  <span class="text-12px mr-4px color-[--d-999-l-666]">
+                  <span class="text-12px mr-4px color-[--secondary-text]">
                     {{ filterForm['profit_percent_num'].profit_obj.profit_300_900_percent_num.name }}
                   </span>
                   <span
@@ -629,7 +629,7 @@
               </div>
               <div>
                 <div class="flex-end">
-                  <span class="text-12px mr-4px color-[--d-999-l-666]">
+                  <span class="text-12px mr-4px color-[--secondary-text]">
                     {{ filterForm['profit_percent_num'].profit_obj.profit_100_300_percent_num.name }}
                   </span>
                   <span
@@ -640,7 +640,7 @@
                   </span>
                 </div>
                 <div class="mt-10px flex-end">
-                  <span class="text-12px mr-4px color-[--d-999-l-666]">
+                  <span class="text-12px mr-4px color-[--secondary-text]">
                     {{ filterForm['profit_percent_num'].profit_obj.profit_10_100_percent_num.name }}
                   </span>
                   <span
@@ -712,7 +712,7 @@
                   <span v-else-if="item?.volume < 0" class="red">
                     ${{ formatNumber(item?.volume || 0, 2, 4, 10 ** 4) }}
                   </span>
-                  <span v-else class="color-[--d-666-l-999]">0</span>
+                  <span v-else class="color-[--third-text]">0</span>
                 </div>
               </div>
             </div>
@@ -720,13 +720,13 @@
         </el-table-column>
         <el-table-column align="right" :min-width="230">
           <template #header>
-            <span class="bg-[--d-333-l-FFF] color-[--d-CCC-l-333] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
+            <span class="bg-[--tab-active-bg] color-[--main-text] rounded-2px px-2px mr-2px text-12px">{{ activeInterval }}</span>
             <span class="mr-7px">{{ $t('loss') }}</span>
           </template>
           <template #default="{ row }">
             <div class="flex-end" style="align-items: baseline;">
               <div class="mr-40px flex-end">
-                <span class="text-12px mr-4px color-[--d-999-l-666]">
+                <span class="text-12px mr-4px color-[--secondary-text]">
                   {{ filterForm['profit_percent_num_lt'].profit_obj.profit_neg10_10_percent_num.name }}
                 </span>
                 <span
@@ -738,7 +738,7 @@
               </div>
               <div>
                 <div class="flex-end">
-                  <span class="text-12px mr-4px color-[--d-999-l-666]">
+                  <span class="text-12px mr-4px color-[--secondary-text]">
                     {{ filterForm['profit_percent_num_lt'].profit_obj.profit_neg50_neg10_percent_num.name }}
                   </span>
                   <span
@@ -749,7 +749,7 @@
                   </span>
                 </div>
                 <div class="mt-10px flex-end">
-                  <span class="text-12px mr-4px color-[--d-999-l-666]">
+                  <span class="text-12px mr-4px color-[--secondary-text]">
                     {{ filterForm['profit_percent_num_lt'].profit_obj.profit_neg100_neg50_percent_num.name }}
                   </span>
                   <span
@@ -817,13 +817,13 @@
     >
       <div>
         <div class="flex items-center justify-between text-12px px-12px py-12px">
-          <span class="color-[var(--d-666-l-999)] flex-1 text-left">{{ $t('24Volume') }}</span>
-          <span class="color-[var(--d-666-l-999)] flex-1">{{ $t('buy3') }}</span>
-          <span class="color-[var(--d-666-l-999)] flex-1 text-right">{{ $t('sell3') }}</span>
+          <span class="color-[var(--third-text)] flex-1 text-left">{{ $t('24Volume') }}</span>
+          <span class="color-[var(--third-text)] flex-1">{{ $t('buy3') }}</span>
+          <span class="color-[var(--third-text)] flex-1 text-right">{{ $t('sell3') }}</span>
         </div>
         <div class="bg-[--d-1A1A1A-l-F2F2F2] px-12px py-6px">
           <div class="flex items-center justify-between text-14px">
-            <span class="color-[var(--d-F5F5F5-l-333)] flex-1 text-left">
+            <span class="color-[var(--secondary-text)] flex-1 text-left">
                 ${{ formatNumber(currentRow?.total_volume || 0, 2) }}
             </span>
             <span class="color-#12B886 flex-1" >
@@ -846,13 +846,13 @@
           </div>
         </div>
         <div class="flex items-center justify-between text-12px px-12px py-12px">
-          <span class="color-[var(--d-666-l-999)] flex-1 text-left">{{ $t('24TxAddress') }}</span>
-          <span class="color-[var(--d-666-l-999)] flex-1">{{ $t('buy3') }}</span>
-          <span class="color-[var(--d-666-l-999)] flex-1 text-right">{{ $t('sell3') }}</span>
+          <span class="color-[var(--third-text)] flex-1 text-left">{{ $t('24TxAddress') }}</span>
+          <span class="color-[var(--third-text)] flex-1">{{ $t('buy3') }}</span>
+          <span class="color-[var(--third-text)] flex-1 text-right">{{ $t('sell3') }}</span>
         </div>
         <div class="bg-[--d-1A1A1A-l-F2F2F2] px-12px py-6px">
           <div class="flex items-center justify-between text-14px">
-            <span class="color-[var(--d-F5F5F5-l-333)] flex-1 text-left">
+            <span class="color-[var(--secondary-text)] flex-1 text-left">
                 {{ formatNumber(currentRow?.total_trades || 0,2) }}
             </span>
             <span class="color-#12B886 flex-1">
@@ -1055,9 +1055,9 @@ function getActiveClass(
 ) {
   const isEqual = activeSort.value === activeSort1 && sortBy.value === sortBy1
   if (direction === 'descending') {
-    return isEqual ? 'border-t-[--d-F5F5F5-l-333]' : 'border-t-[--d-666-l-999]'
+    return isEqual ? 'border-t-[--main-text]' : 'border-t-[--third-text]'
   }
-  return isEqual ? 'border-b-[--d-F5F5F5-l-333]' : 'border-b-[--d-666-l-999]'
+  return isEqual ? 'border-b-[--main-text]' : 'border-b-[--third-text]'
 }
 function switchSort(sortBy1: string, activeSort1?: SortValue) {
   if (sortBy.value !== sortBy1) {
@@ -1123,12 +1123,12 @@ function scrollToTop() {
     .el-table__body {
       tr:hover {
         .hover-dot{
-          border-bottom: 1px dotted var(--d-CCC-l-333)
+          border-bottom: 1px dotted var(--secondary-text)
         }
       }
       .cell {
         padding-right: 19px;
-        color: var(--d-CCC-l-333);
+        color: var(--secondary-text);
       }
     }
 }
@@ -1236,7 +1236,7 @@ a.a-gray{
   color: var(--d-E9E9E9-l-222);
   .filter-title {
     font-size: 12px;
-    color: var(--d-999-l-666);
+    color: var(--main-text);
     font-weight: 500;
   }
 
@@ -1353,8 +1353,8 @@ a.a-gray{
     color: #F5F5F5;
   }
   &.bg-gray-1 {
-    background: var(--d-222-l-F2F2F2);
-    color: var(--d-666-l-999);
+    background: var(--tab-active-bg);
+    color: var(--third-text);
   }
   &.bg-yellow-1 {
     color: #F5F5F5;
@@ -1366,7 +1366,7 @@ a.trade {
   padding: 1px 7px;
   border-radius: 2px;
   font-size: 12px;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   white-space: nowrap;
   display: flex;
   align-items: center;
@@ -1390,18 +1390,17 @@ ul.openTime {
       align-items: center;
       justify-content: center;
       font-size: 12px;
-      color: var(--d-E9E9E9-l-222);
+      color: var(--main-text);
       letter-spacing: 0;
       line-height: 16px;
       font-weight: 400;
-      border: 1px solid var(--d-333-l-F5F5F5);
+      border: 1px solid var(--border);
       padding: 8px 15px;
       text-align: center;
       margin-bottom: 10px;
       border-radius: 4px;
       &.active {
-        border: 1px solid var(--d-F5F5F5-l-333);
-        background: var(--d-333-l-F5F5F5);
+        border: 1px solid #3F80F7;
 
       }
     }
@@ -1416,13 +1415,41 @@ ul.openTime {
   color:#fff;
 }
 .reset {
-  background-color: var(--d-333-l-F2F2F2);
-  color: var (--d-F5F5F5-l-333);
-  border-color: var(--d-333-l-F2F2F2);
+  background-color: var(--border);
+  color: var (--main-text);
+  border-color: var(--border);
 }
 .hover-dot{
   &:hover {
-    border-bottom: 1px dotted var(--d-CCC-l-333)
+    border-bottom: 1px dotted var(--secondary-text)
+  }
+}
+:deep().el-input.el-input {
+  --el-input-bg-color: var(--border);
+  --el-input-border-color: var(--border);
+  --el-input-border-radius: 4px;
+  color: var(--main-text);
+  .el-checkbox__inner{
+      border-color: var(--border);
+    }
+  .el-input__wrapper {
+    background: transparent;
+    &:hover {
+      box-shadow: 0 0 0 1px #3F80F7 inset;
+    }
+    &.is-focus {
+      border-color: #3F80F7; /* 蓝色 */
+      box-shadow: 0 0 0 1px #3F80F7 inset;
+    }
+    .el-input__suffix{
+      color: var(--third-text)
+    }
+    .el-input__inner{
+      color: var(--main-text);
+      &::placeholder {
+        color: var(--third-text);
+      }
+    }
   }
 }
 </style>

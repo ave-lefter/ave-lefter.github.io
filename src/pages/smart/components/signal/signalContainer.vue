@@ -208,7 +208,7 @@ function scrollToTop() {
         @onReset="onReset"
         @onConfirm="onConfirm"
       />
-      <div class="flex items-center text-12px ml-20px color-[--d-F5F5F5-l-333]">
+      <div class="flex items-center text-12px ml-20px color-[--main-text]">
         {{ $t('NewSignalAlert') }}
         <el-switch
           v-model="shouldAlert"
@@ -217,7 +217,7 @@ function scrollToTop() {
           inactive-value="0"
         />
       </div>
-      <div class="flex items-center text-12px ml-20px color-[--d-F5F5F5-l-333]">
+      <div class="flex items-center text-12px ml-20px color-[--main-text]">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
           <circle cx="7" cy="7" r="7" fill="#349EFF"/>
           <path
@@ -241,7 +241,7 @@ function scrollToTop() {
       </div>
       <div
         v-show="showResetBtn"
-        class="flex items-center text-12px gap-2px cursor-pointer ml-20px color-[--d-F5F5F5-l-333]"
+        class="flex items-center text-12px gap-2px cursor-pointer ml-20px color-[--main-text]"
         @click="setFilterToken('')"
       >
         <Icon name="custom:reset" class="text-14px"/>
@@ -253,7 +253,7 @@ function scrollToTop() {
       @updateFilterToken="setFilterToken"
     />
   </div>
-  <div class="flex pt-4px bg-[--d-222-l-F2F2F2]">
+  <div class="flex pt-4px bg-[--main-divider]">
     <SignalTopList
     ref="topListRef"
     :dialogValues="dialogValues"
