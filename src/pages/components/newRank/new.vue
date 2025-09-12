@@ -141,7 +141,7 @@ async function _getTreasureList(shouldLoading = true) {
     clearTimeout(timer)
     timer = window.setTimeout(() => {
       _getTreasureList(false)
-    }, 10000)
+    }, 5000)
   } finally {
     loading.value = false
   }
@@ -156,7 +156,7 @@ onActivated(() => {
   clearTimeout(timer)
   timer = window.setTimeout(() => {
     _getTreasureList(false)
-  }, 10000)
+  }, 5000)
 })
 
 const wsStore = useWSStore()
