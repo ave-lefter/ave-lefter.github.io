@@ -1393,5 +1393,6 @@
   "jump": "Open to jump",
   "threeLayout": "Three-column layout",
   "detailsAfterPurchase": "Token details after purchase",
-  "mini": "Mini"
+  "mini": "Mini",
+  "gas": "Gas Fee"
 }

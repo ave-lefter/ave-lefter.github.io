@@ -1392,5 +1392,6 @@
   "jump": "打开跳转",
   "threeLayout": "三栏布局",
   "detailsAfterPurchase": "买后代币详情",
-  "mini": "小号"
+  "mini": "小号",
+  "gas": "gas费"
 }
