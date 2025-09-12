@@ -1,6 +1,7 @@
 <template>
   <div class="flex bg-[--main-divider] gap-1px flex min-w-0 w-full" style="min-height: calc(100vh - 92px);">
     <div class="flex-1 min-w-0">
+      <TokenHistory/>
       <Top/>
       <div class="flex gap-1px">
         <div class="hide-scrollbar">

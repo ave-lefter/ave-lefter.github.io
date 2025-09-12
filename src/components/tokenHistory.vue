@@ -12,7 +12,7 @@ const scrollbar = useTemplateRef<InstanceType<typeof ElScrollbar>>('scrollbar')
 const scrollbarLeft = ref(0)
 
 const arrowVisible = computed(()=>{
-  return Math.abs(containerWidth.value - 220 - scrollContentWidth.value) < 2
+  return containerWidth.value - scrollContentWidth.value <= 164
 })
 
 function closeOtherPages() {
