@@ -1,5 +1,5 @@
 <template>
-  <div class="relative" :style="{height: `${isRank ? 290 : kHeight}px`}">
+  <div class="relative" :style="{height: `${isRank ? 390 : kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
     <UnknownRisk v-show="isReady" :isRank="isRank" @refresh="refresh" />
   </div>

@@ -37,8 +37,8 @@ const activeTab = storeToRefs(globalStore).rankActiveTab
 const activeSubTab = useStorage('rankSubTab','pump_in_hot')
 const activeChain = useStorage('rankChain', 'AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
-const categories = computed(() => {
-  return chains.value.find((el) => el.net_name === activeChain.value)?.categories || []
+const currentChainObj = computed(() => {
+  return chains.value.find((el) => el.net_name === activeChain.value)
 })
 const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
@@ -265,7 +265,7 @@ function getMedias(appendix: string) {
         v-model:activeSubTab="activeSubTab"
         v-model:activeTab="activeTab"
         v-model:activeChain="activeChain"
-        :categories="categories"
+        :categories="currentChainObj?.categories || []"
         :chains="chains"
       />
       <KeepAlive :max="6">
@@ -276,6 +276,7 @@ function getMedias(appendix: string) {
           :activeChain="activeChain"
           :activeTab="activeTab"
           :activeSubTab="activeSubTab"
+          :ammList="currentChainObj?.swaps || []"
         />
       </KeepAlive>
     </div>

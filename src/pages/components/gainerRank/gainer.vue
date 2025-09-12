@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
 import { getGainDefaultColumns } from './columnRender/gainColumnsService'
-import { getPriceChangeTopTokens, getTreasureList } from '~/api/market'
+import { getPriceChangeTopTokens, getTreasureList, type IGetTreasureConfig } from '~/api/market'
 import {
   quickContent,
   dexContent,
@@ -31,6 +31,7 @@ import {
   SnipersHeader,
   PriceContent,
   PriceChange,
+  DexHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
@@ -46,6 +47,7 @@ const props = defineProps<{
   activeChain: string
   activeTab?: string
   activeSubTab?: string
+  ammList: IGetTreasureConfig['swaps']
 }>()
 
 const {rankConditions} = storeToRefs(globalStore)
@@ -403,7 +405,7 @@ const headerRenderer = computed(() => {
     markers_dynamic: DynamicMarkersHeader,
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
-    dex: () => 'DEX',
+    dex: DexHeader,
     security: () => t('security'),
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
@@ -448,6 +450,7 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" style="height: calc(100vh - 185px)">
     <AveTable
+      rowKey="rowKey"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
@@ -467,6 +470,7 @@ const cellRenderer = computed(() => {
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
+          :ammList="item.key === 'dex' ? ammList : null"
         />
       </template>
       <template v-for="item in columns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">

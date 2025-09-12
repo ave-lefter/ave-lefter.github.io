@@ -31,6 +31,7 @@ export function getInclusionOptions(t: ReturnType<typeof useI18n>['t']) {
           // 'runTime1',
           // 'runTime2',
           'snipersContent',
+          'dexContent'
           // 'snipers1mContent',
           // 'securityContent',
           // 'insidersContent',
@@ -186,6 +187,14 @@ export function getInclusionDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       render: 'snipersContent',
       minWidth:getTextWidth(t('snipers')) + 68,
       align:'right'
+    },
+    {
+      title: 'DEX',
+      key: 'dex',
+      isVisible: false,
+      render: 'dexContent',
+      minWidth:70,
+      align:'center'
     },
     // {
     //   title: t('snipers_1m'),
