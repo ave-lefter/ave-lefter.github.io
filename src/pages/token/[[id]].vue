@@ -203,17 +203,16 @@ function refresh() {
 function addVisit() {
   if(tokenStore.tokenInfo){
     const {logo_url,symbol,chain,token} = tokenStore.tokenInfo.token
-    const index = globalStore.lastVisitTokens.findIndex(item => item.token === token && item.chain === chain)
+    const index = globalStore.lastVisitTokens.findIndex(item => item.id === token+'-'+chain)
     if(index !== -1){
       globalStore.lastVisitTokens.splice(index, 1)
     } else if(globalStore.lastVisitTokens.length >= 10){
       globalStore.lastVisitTokens.shift()
     }
     globalStore.lastVisitTokens.push({
+      id:token+'-'+chain,
       logo_url,
       symbol,
-      chain,
-      token,
       priceChange: tokenStore.priceChange,
       marketCap: tokenStore.marketCap,
     })

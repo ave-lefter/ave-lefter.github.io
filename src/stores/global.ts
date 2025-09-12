@@ -72,10 +72,9 @@ export const useGlobalStore = defineStore('global', () => {
   })
 
   const lastVisitTokens = useStorage<{
+    id: string,
     logo_url: string,
     symbol: string,
-    chain: string,
-    token: string,
     priceChange: number | undefined,
     marketCap: string,
   }[]>('lastTokens', [])

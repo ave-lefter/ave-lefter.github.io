@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const activeTab = ref(1)
+import { useStorage } from '@vueuse/core'
+
+const globalStore = useGlobalStore()
+const activeTab = useStorage('topColTab',1)
 </script>
 
 <template>
@@ -11,6 +14,16 @@ const activeTab = ref(1)
     <div class="w-32px h-32px flex items-center justify-center cursor-pointer text-[--secondary-text]">
       <Icon name="material-symbols:arrow-back-ios-new-rounded"/>
     </div>    
+    <el-scrollbar>
+      <div class="flex items-center gap-8px whitespace-nowrap h-full">
+        <NuxtLink v-for="item in globalStore.lastVisitTokens" :key="item.id" class="flex items-center gap-4.5px" :to="`/token/${item.id}`">
+          <TokenImg :row="{logo_url:item.logo_url,symbol:item.symbol,chain:''}" :tokenClass="'w-16px h-16px'"/>
+          {{ item.symbol }}
+          ${{ formatNumber(item.marketCap,2) }}
+          {{addSign(Number(item.priceChange))}}{{ formatNumber(Number(item.priceChange),2) }}%
+        </NuxtLink>
+      </div>
+    </el-scrollbar>
     <div class="w-32px h-32px flex items-center justify-center cursor-pointer text-[--secondary-text]">
       <Icon name="material-symbols:arrow-forward-ios"/>
     </div>
