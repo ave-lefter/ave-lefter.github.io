@@ -15,7 +15,7 @@ function getTarget(row, key: 'symbol' | 'value' | 'init') {
 
 <template>
   <div v-if="isVolUSDT">
-    <div class="lh-18px mb-2px" :class="row.tvl < row.init_tvl ? 'color-[--down-color]' : ''">
+    <div class="lh-18px mb-2px" :class="row.tvl < row.init_tvl ? 'color-[--down-color]' : 'color-[--main-text]'">
       ${{ formatNumber(row.tvl || 0, 1) }}
     </div>
     <div class="lh-16px color-[--third-text] text-12px">
@@ -23,7 +23,7 @@ function getTarget(row, key: 'symbol' | 'value' | 'init') {
     </div>
   </div>
   <div v-else>
-    <div class="lh-18px mb-2px">
+    <div class="lh-18px mb-2px color-[--main-text]">
       {{ formatNumber(getTarget(row, 'value'), 1) }} {{ getTarget(row, 'symbol') }}
     </div>
     <div class="lh-16px color-[--third-text] text-12px">

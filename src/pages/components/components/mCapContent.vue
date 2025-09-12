@@ -12,6 +12,7 @@ function getMarketCapColor(row) {
   if ((tokenAge < 86400 && marketCap > 1000000) || (tokenAge < 604800 && marketCap > 10000000)) {
     return 'color-[--yellow]' // 黄色
   }
+  return 'color-[--main-text]'
 }
 
 function getTokenAge(listingTime: number) {
