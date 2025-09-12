@@ -51,7 +51,7 @@ const filteredAmmList = computed(()=>{
             </div>
             <el-scrollbar v-if="filteredAmmList.length > 0" :height="300">
                 <ul>
-                    <li v-for="item in filteredAmmList" :key="item.name" class="flex items-center px-12px h-34px gap-4px cursor-pointer hover:bg-[--border]" :class="setupFilter.amm===item.name ? 'color-[--primary-color]':''" @click="setFilterForm(['amm',item.name]);popoverVisible = false;isFilterHighlight=!!item.name;">
+                    <li v-for="item in filteredAmmList" :key="item.name" class="flex items-center px-12px h-34px gap-4px cursor-pointer hover:bg-[--border]" :class="setupFilter.amm===item.name ? 'bg-[--border]':''" @click="setFilterForm(['amm',item.name]);popoverVisible = false;isFilterHighlight=!!item.name;">
                         <img v-if="item.chain" class="w-16px h-16px rounded-full" :src="`${globalStore.token_logo_url}swap/${item.name}.jpeg`" alt="">
                         <Icon v-else name="custom:switch" class="text-16px"/>
                         <span>{{ item.show_name }}</span>
