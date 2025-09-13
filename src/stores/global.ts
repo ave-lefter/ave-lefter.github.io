@@ -76,7 +76,8 @@ export const useGlobalStore = defineStore('global', () => {
     logo_url: string,
     symbol: string,
     priceChange: number | undefined,
-    marketCap: string,
+    circulation: string,
+    price: number,
   }[]>('lastTokens', [])
   const latestNotice = shallowRef<ILatestNotice>({} as ILatestNotice)
   const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)

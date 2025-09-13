@@ -217,8 +217,10 @@ function addVisit() {
       logo_url,
       symbol,
       priceChange: tokenStore.priceChange,
-      marketCap: tokenStore.marketCap,
+      circulation: tokenStore.circulation.toString(),
+      price: tokenStore.price || 0,
     })
+    usePriceV2Store().sendPriceWs()
   }
 }
 </script>
