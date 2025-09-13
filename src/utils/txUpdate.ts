@@ -25,9 +25,9 @@ export function _updatePriceFromSimpleTx(tx: SimpleWSTx) {
         pair.token0_price_usd = Number(tx.price_u)
         pair.reserve1 = Number(tx.reserve1)
       } else if (isToken1) {
-        pair.reserve1 = Number(tx.reserve1)
+        pair.reserve1 = Number(tx.reserve0)
         pair.token1_price_usd = Number(tx.price_u)
-        pair.reserve0 = Number(tx.reserve0)
+        pair.reserve0 = Number(tx.reserve1)
       }
       const volume = new BigNumber(tx.target_amt).times(price) || 0
       pair.volume_u = new BigNumber(pair.volume_u).plus(volume).toNumber()
