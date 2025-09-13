@@ -157,7 +157,7 @@
               <div>
                 <div class="flex-start">
                   <UserRemark addressClass="token-symbol ellipsis" addressStyle="max-width: 70px" showAddressTitle :address="row.wallet_address" :chain="row.chain" :remark="row.remark || row.nickname" :wallet_logo="row.wallet_logo" :formatAddress="a=> '*' + a?.slice(-5)" @updateRemark="({remark}) => row.remark = remark"/>
-                  <img  v-if="activeTab === 'kol'" style="width: 10px; height: 10px; margin-left: 8px;" src="@/assets/images/x.png" alt="" srcset="" @click.stop="goLink1(row?.wallet_logo?.url)">
+                  <img  v-if="activeTab === 'kol'" style="width: 12px; height: 12px; margin-left: 8px;" src="@/assets/images/x.png" alt="" srcset="" @click.stop="goLink1(row?.wallet_logo?.url)">
                 </div>
                 <div class="text-10px color-icon flex-start mt-4px color-[--third-text]" style="line-height: 1">
                   <div
@@ -194,7 +194,7 @@
                   <Icon
                     v-copy="row.wallet_address"
                     name="bxs:copy"
-                    class="text-10px cursor-pointer color-[--third-text] ml-5px"
+                    class="text-12px cursor-pointer color-[--third-text] ml-5px"
                     @click.stop.prevent
                   />
                   <div v-if="row?.extra?.length > 0" class="media-list flex-start">
@@ -821,7 +821,7 @@
           <span class="color-[var(--third-text)] flex-1">{{ $t('buy3') }}</span>
           <span class="color-[var(--third-text)] flex-1 text-right">{{ $t('sell3') }}</span>
         </div>
-        <div class="bg-[--d-1A1A1A-l-F2F2F2] px-12px py-6px">
+        <div class="px-12px py-6px">
           <div class="flex items-center justify-between text-14px">
             <span class="color-[var(--secondary-text)] flex-1 text-left">
                 ${{ formatNumber(currentRow?.total_volume || 0, 2) }}
@@ -850,7 +850,7 @@
           <span class="color-[var(--third-text)] flex-1">{{ $t('buy3') }}</span>
           <span class="color-[var(--third-text)] flex-1 text-right">{{ $t('sell3') }}</span>
         </div>
-        <div class="bg-[--d-1A1A1A-l-F2F2F2] px-12px py-6px">
+        <div class="px-12px py-6px">
           <div class="flex items-center justify-between text-14px">
             <span class="color-[var(--secondary-text)] flex-1 text-left">
                 {{ formatNumber(currentRow?.total_trades || 0,2) }}
@@ -1362,7 +1362,7 @@ a.a-gray{
   }
 }
 a.trade {
-  background:  #3F80F733;
+  background:  #3F80F71A;
   padding: 1px 7px;
   border-radius: 2px;
   font-size: 12px;

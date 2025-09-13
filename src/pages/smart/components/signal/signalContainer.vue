@@ -253,7 +253,7 @@ function scrollToTop() {
       @updateFilterToken="setFilterToken"
     />
   </div>
-  <div class="flex pt-4px bg-[--main-divider]">
+  <div class="flex pt-4px bg-[--main-bg]">
     <SignalTopList
     ref="topListRef"
     :dialogValues="dialogValues"
