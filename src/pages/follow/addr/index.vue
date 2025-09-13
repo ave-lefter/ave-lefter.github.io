@@ -505,8 +505,8 @@
             <div
               v-if="SupportMonitorChain.includes(row?.user_chain)"
               class="flex items-center mr-12px cursor-pointer " @click="handleMonitor(row,$index)">
-              <Icon v-if="!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 )" name="custom:monitor2-icon" class="text-12px mr-5px color-#999 group-hover:color-#3F80F7"/>
-              <Icon v-else name="custom:monitor-icon" class="text-15px mr-2px mb-1px color-[var(--d-CCC-l-666)] group-hover:color-#3F80F7"/>
+              <Icon v-if="!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 )" name="custom:monitor2-icon" class="text-12px mr-5px group-hover:color-#3F80F7"/>
+              <Icon v-else name="custom:monitor-icon" class="text-15px mr-2px mb-1px  group-hover:color-#3F80F7"/>
               <span
                 class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out color-[--secondary-text]">
                 {{ (!isMonitor ? (row?.is_monitored === 1 ):(row?.is_pause === 0 ))? t('pause') : t('enable') }}

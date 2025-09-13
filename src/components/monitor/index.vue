@@ -10,7 +10,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
     />
     <el-tabs v-model="activeName" style="" class="m-tabs" @tab-change="handleClick">
       <el-tab-pane :label="$t('walletManage')" :name="0" lazy>
-        <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps"/>
+        <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps" :isLarge="props.isLarge"/>
         <AveEmpty
           v-else
           :style="{height:`${props.scrollHeight-50}px`}"
