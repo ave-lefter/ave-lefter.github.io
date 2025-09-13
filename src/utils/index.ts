@@ -1099,6 +1099,12 @@ export function getCssVariable(key: string) {
   return getComputedStyle(document.documentElement).getPropertyValue(key)
 }
 
+export function hexToRgba(hex: string, alpha = 1) {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
 export function getLightDarkValue(cssVarName: string) {
   const match = cssVarName.match(/^(--.*?)-(l|d)-([0-9A-Fa-f]{6})$/)
   if (!match) {

@@ -11,7 +11,7 @@
       fit
       style="width: 100%"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
-      cell-class-name="color-[--d-CCC-l-333]"
+      cell-class-name="color-[--secondary-text]"
       row-class-name="cursor-pointer"
       @row-click="jumpBalance"
       @sort-change="handleSortChange"
@@ -33,7 +33,7 @@
         <template v-if="isSelfAddress && (walletStore.walletName!=='WatchWallet')" #default="{ row }">
           <Icon
             name="bx:bxs-hide"
-            class="absolute top-0 left-0 hidden bxs-hide cursor-pointer color-#959a9f"
+            class="absolute top-0 left-0 hidden bxs-hide cursor-pointer color-[--secondary-text]"
             @click.self.stop="hideToken(row)"
           />
         </template>
@@ -46,19 +46,19 @@
         sortable="custom"
       >
         <template #default="{ row }">
-          <span v-if="row?.total_profit > 0" class="color-#12B886">
+          <span v-if="row?.total_profit > 0" class="color-[--up-color]">
             ${{ formatNumber(row?.total_profit || 0, 2) }}
           </span>
           <span v-else-if="row?.total_profit == 0">$0</span>
           <span v-else-if="row?.total_profit == '--'">--</span>
-          <span v-else class="color-#FF646D">
+          <span v-else class="color-[--down-color]">
             {{ '-$' + formatNumber(Math.abs(row?.total_profit) || 0, 2) }}
           </span>
-          <span class="block lh-17px">
+          <span class="block lh-17px color-[--third-text]">
             <template v-if="row?.total_profit_ratio == 0">0</template>
             <template v-else-if="row?.total_profit_ratio == '--'">--</template>
             <template v-else>
-              <span :style="{ color: row?.total_profit_ratio > 0 ? 'color-#12B886' : 'color-#FF646D' }">
+              <span :style="{ color: row?.total_profit_ratio > 0 ? 'color-[--up-color]' : 'color-[--down-color]' }">
                 {{ formatNumber(row?.total_profit_ratio * 100 || 0, 2) }}%
               </span>
             </template>
@@ -73,16 +73,16 @@
         sortable="custom"
       >
         <template #default="{ row }">
-          <div v-if="row?.unrealized_profit == 0 && row.balance_amount == 0" class="color-#FF646D text-12px">
+          <div v-if="row?.unrealized_profit == 0 && row.balance_amount == 0" class="color-[--down-color] text-12px">
             {{$t('sellAl')}}
           </div>
           <div v-else>
-            <span v-if="row?.unrealized_profit > 0" class="color-#12B886">
+            <span v-if="row?.unrealized_profit > 0" class="color-[--up-color]">
               ${{ formatNumber(row?.unrealized_profit || 0, 2) }}
             </span>
             <span v-else-if="row?.unrealized_profit == 0">$0</span>
             <span v-else-if="row?.unrealized_profit == '--'">--</span>
-            <span v-else class="color-#FF646D">
+            <span v-else class="color-[--down-color]">
               {{ '-$' + formatNumber(Math.abs(row?.unrealized_profit) || 0, 2) }}
             </span>
           </div>
@@ -100,13 +100,13 @@
             {{ $t('balance1') }}
             <Icon
               name="custom:price"
-              :class="`${injecteIsVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-222]'} cursor-pointer ml-3px`"
+              :class="`${injecteIsVolUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer ml-3px`"
               @click.stop.prevent="injecteIsVolUSDT=!injecteIsVolUSDT"
             />
           </span>
         </template>
         <template #default="{ row }">
-          <div v-if="row.balance_amount == 0 && row.total_sold > 0" class="color-#FF646D text-12px">{{$t('sellAl')}}</div>
+          <div v-if="row.balance_amount == 0 && row.total_sold > 0" class="color-[--down-color] text-12px">{{$t('sellAl')}}</div>
           <div v-else>
             <span v-if="row?.balance_usd == 0">0</span>
             <span v-else-if="row?.balance_usd == '--'">--</span>
@@ -124,7 +124,7 @@
               </template>
             </span>
             <span
-                class="block text-12px lh-17px"
+                class="block text-12px lh-17px color-[--third-text]"
             >
               <template v-if="row?.balance_amount == 0">0</template>
               <template v-else-if="row?.balance_amount == '--'">--</template>
@@ -143,7 +143,7 @@
             {{ '$' + formatNumber(row?.total_purchase_usd || 0, 2) }}
           </span>
           <span
-              class="block text-12px lh-17px"
+              class="block text-12px lh-17px color-[--third-text]"
           >
             <template v-if="row?.average_purchase_price_usd == 0">0</template>
             <template v-else-if="row?.average_purchase_price_usd == '--'">--</template>
@@ -162,7 +162,7 @@
             {{ '$' + formatNumber(row?.total_sold_usd || 0, 2) }}
           </span>
           <span
-              class="block text-12px lh-17px"
+              class="block text-12px lh-17px color-[--third-text]"
           >
             <template v-if="row?.average_sold_price_usd == 0">0</template>
             <template v-else-if="row?.average_sold_price_usd == '--'">--</template>
@@ -177,15 +177,15 @@
         <template #default="{ row }">
           <template v-if="row?.total_transfer_in_amount == 0">0</template>
           <template v-else-if="row?.total_transfer_in_amount == '--'">--</template>
-          <span v-else class="color-#12B886">
+          <span v-else class="color-[--up-color]">
             {{ formatNumber(row?.total_transfer_in_amount || 0, 2) }}
           </span>
           <span
-              class="block lh-17px"
+              class="block lh-17px color-[--third-text]"
           >
             <template v-if="row?.total_transfer_out_amount == 0">0</template>
             <template v-else-if="row?.total_transfer_out_amount == '--'">--</template>
-            <span v-else class="color-#FF646D">
+            <span v-else class="color-[--down-color]">
               {{ formatNumber(row?.total_transfer_out_amount || 0, 2) }}
             </span>
           </span>
@@ -195,13 +195,13 @@
         <template #default="{ row }">
           <template v-if="row?.total_purchase == 0">0</template>
           <template v-else-if="row?.total_purchase == '--'">--</template>
-          <span v-else class="color-#12B886">
+          <span v-else class="color-[--up-color]">
             {{ formatNumber(row?.total_purchase || 0, 2) }}
           </span>
-          <span :style="{ color: themeStore.isDark ?  '#666666':'#D8D8D8'  }">/</span>
+          <span class="color-[--secondary-text]">/</span>
           <template v-if="row?.total_sold == 0">0</template>
           <template v-else-if="row?.total_sold == '--'">--</template>
-          <span v-else class="color-#FF646D">
+          <span v-else class="color-[--down-color]">
             {{ formatNumber(row?.total_sold || 0, 2) }}
           </span>
         </template>

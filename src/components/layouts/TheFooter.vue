@@ -12,7 +12,7 @@
           chain: ''
         }" token-class="w-16px h-16px [&&]:mr-0" />
         <span class="color-[--secondary-text]">{{ showPrice.symbol }}</span>
-        <span :class="`color-${showPrice.color}`">{{'$'+formatDec(showPrice?.current_price_usd || 0, 2)}}</span>
+        <span :class="`${showPrice.isUp ? 'color-[--up-color]' : 'color-[--down-color]'}`">{{'$'+formatDec(showPrice?.current_price_usd || 0, 2)}}</span>
       </NuxtLink>
        <el-popover popper-style="padding: 12px;min-width: 132px" width="132" placement="top" :teleported="false">
         <template #reference>
@@ -174,7 +174,7 @@ const ids = [
 const data = ref<Array<{
   symbol: string
   logo_url: string
-  color: string
+  isUp: boolean
   current_price_usd: number
   id: string
   hidden?: boolean
@@ -194,7 +194,7 @@ const initPage = () => {
         symbol,
         logo_url: i.logo_url,
         hidden: false,
-        color: i.price_change >= 0 ? '[--up-color]' : '[--down-color]',
+        isUp: i.price_change >= 0,
         id: ids[index]
       }
     })

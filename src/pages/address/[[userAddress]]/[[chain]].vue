@@ -1,8 +1,9 @@
 <template>
-  <div v-if="userAddress && chain && SupportFullDataChain.includes(chain)" ref="scrollRef" className="flex flex-col w-full gap-3 p-[20px] pt-[10px] bg-[var(--d-111-l-FFF)] pb-0 overflow-y-auto" style="max-height: calc(100vh - 92px);">
+  <div v-if="userAddress && chain && SupportFullDataChain.includes(chain)" ref="scrollRef" className="flex flex-col w-full gap-3 p-[20px] pt-[10px] bg-[--main-bg] pb-0 overflow-y-auto" style="max-height: calc(100vh - 92px);">
     <div class="flex-between">
       <el-select
         :style="{ width: '120px' }"
+        :suffix-icon="SuffixIcon"
         :model-value="chain"
         @update:model-value="updateModelChain"
       >
@@ -21,7 +22,22 @@
           </div>
         </el-option>
       </el-select>
-      <el-radio-group
+      <div class="p-1 rounded-1 bg-[--main-input-button-bg]">
+        <button
+          v-for="(item, index) in options"
+          :key="index"
+          class="lh-16px py-2px px-8px border-none cursor-pointer rounded-2px text-12px"
+          :class="
+            interval === item.id
+              ? 'bg-[--secondary-bg] color-[--main-text]'
+              : 'bg-transparent color-[--third-text]'
+          "
+          @click.stop="interval = item.id"
+        >
+          {{ item.name }}
+        </button>
+      </div>
+      <!-- <el-radio-group
         v-model="interval"
         class="m-radio-group"
         size="small"
@@ -36,7 +52,7 @@
           :label="option.name"
           :value="option.id"
         />
-      </el-radio-group>
+      </el-radio-group> -->
     </div>
 
     <div class="flex align-stretch">
@@ -69,7 +85,7 @@
     />
   </div>
 
-  <div v-else-if="userAddress && chain" ref="scrollRef" class="flex flex-col w-full h-full bg-[var(--d-111-l-FFF)] items-center pb-0">
+  <div v-else-if="userAddress && chain" ref="scrollRef" class="flex flex-col w-full h-full bg-[--secondary-bg] items-center pb-0">
     <PageOther
       :address="userAddress"
       :chain="chain"
@@ -86,6 +102,8 @@ import PageBlank from './components/pageBlank.vue'
 import PageOther from './components/pageOther.vue'
 import { getChainInfo } from '@/utils'
 import { useEventBus,useStorage } from '@vueuse/core'
+import SuffixIcon from '~/components/suffixIcon.vue'
+
 
 const isVolUSDT = ref(true)
 provide('isVolUSDT', isVolUSDT)
@@ -247,5 +265,8 @@ function updateModelChain(val) {
     + .el-radio-button__inner {
     border-color: var(--d-333-l-666);
   }
+}
+:deep(.el-scrollbar__bar.is-vertical){
+  display: none;
 }
 </style>

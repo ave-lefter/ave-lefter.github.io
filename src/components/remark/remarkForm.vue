@@ -18,7 +18,6 @@
     >
       <el-input
         v-model="form.remark"
-        class="[&&]:[--el-fill-color-blank:var(--d-666-l-F2F2F2)]"
         type="text"
         clearable
         maxlength="20"
@@ -32,8 +31,6 @@
         <el-button
           :key="themeStore.theme"
           style="height: 32px; flex: 1; font-weight: 400"
-          color="var(--border)"
-          class="[&&]:[--el-color-black:#333]"
           @click="onCancel"
         >
           {{ t('cancel') }}
@@ -42,7 +39,6 @@
           native-type="submit"
           type="primary"
           style="height: 32px; flex: 1; font-weight: 400"
-          :color="buttonConfirmColor"
         >
           {{ t('confirm') }}
         </el-button>
@@ -106,19 +102,19 @@ function onCancel() {
 </script>
 
 <style scoped lang="scss">
-:deep() .el-input {
-  --el-input-border-color: var(--border);
-  --el-input-placeholder-color: var(--d-666-l-999);
-  --el-text-color-placeholder: #999;
-  --el-input-bg-color: var(--dialog-bg)
-}
+// :deep() .el-input {
+//   --el-input-border-color: var(--border);
+//   --el-input-placeholder-color: var(--d-666-l-999);
+//   --el-text-color-placeholder: #999;
+//   --el-input-bg-color: var(--dialog-bg)
+// }
 :deep() .el-button {
   --el-border:none;
 }
 :deep() .el-input__wrapper {
   border-radius: 6px;
-  &:hover {
-    box-shadow: 0 0 0 1px #3F80F7 inset;
-  }
+  // &:hover {
+  //   box-shadow: 0 0 0 1px #3F80F7 inset;
+  // }
 }
 </style>

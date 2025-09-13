@@ -20,8 +20,8 @@ export const MAIN_COIN: {
     '0x5545153ccfca01fbd7dd11c0b23ba694d9509a6f-heco',
 }
 
-export const upColor = ['#12B886']
-export const downColor = ['#F6465D']
+export const upColor = ['var(--up-color)']
+export const downColor = ['var(--down-color)']
 // WebSocket 事件类型常量
 export const WSEventType = {
   KLINE: 'kline',

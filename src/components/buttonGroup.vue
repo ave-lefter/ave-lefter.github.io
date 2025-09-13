@@ -38,7 +38,7 @@ const click = (item: { id: string; name: string }) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--d-222-l-F2F2F2);
+  background: var(--main-input-button-bg);
   padding: 1px;
   border-radius: 4px;
   font-size: 12px;
@@ -46,7 +46,7 @@ const click = (item: { id: string; name: string }) => {
 
   button {
     border: none;
-    color: var(--d-666-l-999);
+    color: var(--third-text);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;
@@ -57,8 +57,8 @@ const click = (item: { id: string; name: string }) => {
     text-align: center;
 
     &.active {
-      background: var(--d-111-l-FFF);
-      color: var(--d-F5F5F5-l-333);
+      background: var(--tab-active-bg);
+      color: var(--main-text);
     }
   }
 }

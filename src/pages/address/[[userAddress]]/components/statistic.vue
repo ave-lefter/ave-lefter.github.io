@@ -1,5 +1,5 @@
 <template>
-  <div class="p-5 flex justify-between mr-5 flex-1 rounded-2 bg-[--d-111-l-F8F8F8]">
+  <div class="p-5 flex justify-between mr-5 flex-1 rounded-2 bg-[--secondary-bg]">
     <div>
       <div class="flex gap-6 mb-5">
         <UserAvatar
@@ -16,7 +16,7 @@
           <div class="flex items-center mb-1.5">
             <UserRemark
               :key="address"
-              class="gap-1.5 text-6 leading-7.5 text-[var(--a-text-5-color)]"
+              class="gap-1.5 text-6 leading-7.5 text-[--main-text]"
               :address="address"
               :remark="defaultRemark"
               :chain="chain"
@@ -27,7 +27,7 @@
             />
             <a
               v-if="statistics.x_url"
-              class="flex items-center justify-center ml-6 gap-1 px-2 py-1 h-6 rounded text-3 cursor-pointer text-[var(--d-fff-l-18181B)] bg-gradient-to-r from-[rgba(18,184,134,0.2)] to-[rgba(139,79,221,0.2)]"
+              class="flex items-center justify-center ml-6 gap-1 px-2 py-1 h-6 rounded text-3 cursor-pointer text-[--main-text] bg-gradient-to-r from-[rgba(18,184,134,0.2)] to-[rgba(139,79,221,0.2)]"
               :href="statistics.x_url"
               target="_blank"
             >
@@ -37,28 +37,28 @@
             </a>
             <a
               v-else-if="isSelfAddress"
-              class="flex items-center justify-center ml-6 gap-1 px-2 py-1 h-6 rounded text-3 cursor-pointer text-[var(--d-fff-l-18181B)] bg-gradient-to-r from-[rgba(18,184,134,0.2)] to-[rgba(139,79,221,0.2)]"
+              class="flex items-center justify-center ml-6 gap-1 px-2 py-1 h-6 rounded text-3 cursor-pointer text-[--main-text] bg-gradient-to-r from-[rgba(18,184,134,0.2)] to-[rgba(139,79,221,0.2)]"
               @click="_bindTwitter"
             >
               <Icon
                 name="custom:twitterx"
-                class="text-3 text-[var(--d-fff-l-18181B)]"/>
+                class="text-3 text-[--main-text]"/>
               {{ $t('connect') }}
             </a>
           </div>
           <div class="flex items-center gap-2">
             <div class="statistic-address flex gap-2.5 cursor-pointer" @click="addressClick">
               <div
-                class="statistic-address-copy flex items-center justify-center px-2 py-1.75 h-6 rounded text-3 gap-1 text-[--d-666-l-959A9F] bg-[--d-222-l-F2F2F2]"
+                class="statistic-address-copy flex items-center justify-center px-2 py-1.75 h-6 rounded text-3 gap-1 text-[--third-text] bg-[--main-input-button-bg]"
               >
                 {{ addressText }}
-                <Icon v-copy="address" name="bxs:copy" class="text-2.5 clickable text-[--d-666-l-959A9F]" />
+                <Icon v-copy="address" name="bxs:copy" class="text-2.5 clickable text-[--third-text]" />
               </div>
             </div>
             <div
-              class="flex items-center gap-1 px-2 py-0 h-6 rounded text-3 text-[--d-666-l-959A9F] bg-[--d-222-l-F2F2F2]"
+              class="flex items-center gap-1 px-2 py-0 h-6 rounded text-3 text-[--third-text] bg-[--main-input-button-bg]"
             >
-              <Icon name="custom:cake" class="text5 text-[--d-666-l-959A9F]" />
+              <Icon name="custom:cake" class="text5 text-[--third-text]" />
               <span>{{ wallet_age?.value }}</span>
               <span>{{ wallet_age?.unit || '' }}</span>
             </div>
@@ -66,7 +66,7 @@
         </div>
       </div>
       <div class="flex gap-2 items-center mb-5 text-6 leading-7.5 font-bold">
-        <strong class="text-6 leading-7.5 text-[var(--d-FFF-l-333)]">
+        <strong class="text-6 leading-7.5 text-[--main-text]">
           {{ uSymbol }}{{ total_balance }} {{ main_token_symbol }}
         </strong>
         <el-switch
@@ -81,13 +81,13 @@
           </template>
           <template #inactive-action>
             <span
-              class="flex w-full h-full items-center justify-center text-2.5 rounded-full text-[var(--d-FFF-l-333)] bg-[var(--d-222-l-FFF)]"
+              class="flex w-full h-full items-center justify-center text-2.5 rounded-full text-[--main-text] bg-[--icon-color]"
               >$</span
             >
           </template>
         </el-switch>
       </div>
-      <p class="m-0 mb-2 leading-5 text-3.5 text-[var(--d-666-l-959A9F)]">
+      <p class="m-0 mb-2 leading-5 text-3.5 text-[--secondary-text]">
         {{ $t('totalPnL2') }}（{{ intervalText }}）
         <AveNumber :value="statistics.profit" :signVisible="injecteIsVolUSDT">
           {{ formatNumber(Math.abs((statistics.profit ?? 0) / main_token_price), 2) }}
@@ -97,7 +97,7 @@
           {{ formatNumber(Math.abs((statistics?.profit_ratio ?? 0) * 100), 1) }}%
         </AveNumber>
       </p>
-      <p class="m-0 mb-2 leading-5 text-3.5 text-[var(--d-666-l-959A9F)]">
+      <p class="m-0 mb-2 leading-5 text-3.5 text-[--secondary-text]">
         {{ $t('winRate2') }}（{{ intervalText }}）
         <AveNumber :value="statistics.win_rate">
           {{ formatNumber(Math.abs(statistics.win_rate ?? 0), 1) }}%
@@ -108,26 +108,26 @@
       <div class="flex justify-end items-center h-15 gap-2 mb-5">
         <a
           v-if="statistics.is_wallet_address_fav === 1"
-          class="w-25 px-0 box-border flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[--d-222-l-FFF] text-3 leading-4 cursor-pointer rounded text-[var(--d-666-l-999)] hover:opacity-100 hover:bg-[rgba(246,70,93,0.1)]"
+          class="w-25 px-0 box-border flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[--main-input-button-bg] text-3 leading-4 cursor-pointer rounded text-[--third-text] "
           @click="_deleteAttention"
         >
-          <Icon name="custom:accountcheck" class="text-3.5" />
+          <Icon name="custom:followed" class="text-3.5" />
           <span>{{ $t('followed') }}</span>
-          <span class="hidden text-[#f6465d]">{{ $t('cancelFollowed') }}</span>
+          <span class="hidden text-[--down-color]">{{ $t('cancelFollowed') }}</span>
         </a>
         <a
           v-else
-          class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[#3F80F7] text-3 leading-4 cursor-pointer rounded text-[#fff]"
+          class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[--primary-color] text-3 leading-4 cursor-pointer rounded text-[--main-text]"
           @click="_addAttention"
         >
-          <Icon name="custom:accountplus" class="text-4" />
+          <Icon name="custom:follow" class="text-4" />
           {{ $t('follow') }}
         </a>
         <a
-          class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[#3F80F7] text-3 leading-4 cursor-pointer rounded text-[#fff]"
+          class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[--primary-color] text-3 leading-4 cursor-pointer rounded text-[--main-text]"
           @click="shareComponent && shareComponent.openDialog()"
         >
-          <Share ref="shareComponent" type="walletDetailTop" :statistics="statistics" :address="address" :chain="chain" classString="!color-[#fff]" />
+          <Share ref="shareComponent" type="walletDetailTop" :statistics="statistics" :address="address" :chain="chain" classString="!color-[--main-text] [&&]:ml-0" />
           {{ $t('share') }}
         </a>
       </div>
@@ -283,10 +283,10 @@ const pnl = computed(() => {
         let color,
           sign = ''
         if (tooltipData.value > 0) {
-          color = '#12B886'
+          color = getCssVariable('--up-color')
           sign = '+'
         } else if (tooltipData.value < 0) {
-          color = '#F6465D'
+          color = getCssVariable('--down-color')
           sign = '-'
         }
         return `<div style="font-size: 12px;">
@@ -310,7 +310,7 @@ const pnl = computed(() => {
         itemStyle: {
           color: (params: { value: { value: number; negative: any } }) => {
             if (Math.abs(params.value?.value) > 0) {
-              return params.value?.negative ? '#F6465D' : '#12B886'
+              return params.value?.negative ? getCssVariable('--down-color') : getCssVariable('--up-color')
             }
             return isDark.value ? '#999' : '#E5E5E5'
           },
@@ -537,8 +537,8 @@ function addressClick() {
 </script>
 <style scoped>
 .custom-switch {
-  --el-switch-off-color: var(--d-333333-l-F2F2F2);
-  --el-switch-on-color: var(--d-666-l-CCC);
+  --el-switch-off-color: var(--main-input-button-bg);
+  --el-switch-on-color: var(--icon-color);
 }
 
 ::v-deep .el-switch__action {
