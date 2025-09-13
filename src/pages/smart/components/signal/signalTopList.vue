@@ -30,12 +30,12 @@ const emit = defineEmits(['close'])
 <template>
   <div v-show="dialogValues.visible" class="w-360px p-12px bg-[--secondary-bg]">
     <div
-      class="flex justify-between items-center text-14px lh-16px pb-16px border-b-1px border-b-solid border-b-[--d-1A1A1A-l-F2F2F2] mb-9px"
+      class="flex justify-between items-center text-14px lh-16px pb-16px border-b-1px border-b-solid border-b-[--main-divider] mb-9px"
     >
       {{ $t('SignalTopList') }}
       <Icon name="material-symbols:close" class="cursor-pointer" @click="emit('close')" />
     </div>
-    <div class="flex items-center text-12px lh-16px color-[--d-666-l-999] mb-8px">
+    <div class="flex items-center text-12px lh-16px color-[--third-text] mb-8px">
       <span :class="flexColumns[0]">
         {{ $t('token') }}
       </span>
@@ -60,7 +60,7 @@ const emit = defineEmits(['close'])
             <img v-if="$index + 1 === 1" src="@/assets/images/111.svg" >
             <img v-else-if="$index + 1 === 2" src="@/assets/images/222.svg" >
             <img v-else-if="$index + 1 === 3" src="@/assets/images/333.svg" >
-            <div v-else class="text-12px color-[--d-666-l-999]">{{ $index + 1 }}</div>
+            <div v-else class="text-12px color-[--third-text]">{{ $index + 1 }}</div>
           </div>
           <div
             class="flex items-center text-12px gap-8px cursor-pointer"
@@ -77,12 +77,12 @@ const emit = defineEmits(['close'])
             <span class="shrink-0 truncate max-w-68px">{{ row.symbol }}</span>
           </div>
         </div>
-        <div class="color-[--d-999-l-666] text-12px" :class="flexColumns[1]">
+        <div class="color-[--third-text] text-12px" :class="flexColumns[1]">
           <span v-tooltip="formatDate(row.first_signal_time, 'MM/DD HH:mm:ss')">{{
             formatDate(row.first_signal_time, 'HH:mm:ss')
           }}</span>
         </div>
-        <div class="color-[--d-999-l-666] text-12px" :class="flexColumns[2]">
+        <div class="color-[--secondary-text] text-12px" :class="flexColumns[2]">
           ${{ formatNumber(row.first_signal_mc, 2) }}
         </div>
         <div class="color-#12B886 text-16px" :class="flexColumns[3]">

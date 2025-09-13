@@ -204,6 +204,14 @@
           </span>
         </template>
       </el-table-column>
+      <el-table-column align="right" :label="$t('gas')">
+        <template #default="{ row }">
+          <span v-if="row?.gas > 0">
+            ${{ formatNumber(row?.gas || 0, 2) }}
+          </span>
+          <span  v-else class="color-#959A9F">--</span>
+        </template>
+      </el-table-column>
       <el-table-column align="right" :label="$t('value')">
         <template #header>
           <span>{{ $t('value') }}</span>

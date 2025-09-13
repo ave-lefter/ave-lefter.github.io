@@ -55,7 +55,7 @@ function updateCurrentNum() {
 </script>
 
 <template>
-  <div class="flex items-center color-[--d-999-l-666]">
+  <div class="flex items-center color-[--third-text]">
     <el-popover
       v-model:visible="filterVisible"
       placement="bottom-end"
@@ -65,24 +65,24 @@ function updateCurrentNum() {
       <template #reference>
         <div
 v-tooltip="$t('FilterTips')"
-             class="flex items-center cursor-pointer text-12px gap-4px"
+             class="flex items-center cursor-pointer text-12px gap-4px color-[--secondary-text]"
         >
           <Icon
             name="custom:filter"
             class="text-12px cursor-pointer"
           />
           {{ $t('filter') }}
-          <span v-if="currentFilterNum>0" class="w-14px h-14px rounded-2px bg-#333 color-#F5F5F5 text-center lh-14px">{{
+          <span v-if="currentFilterNum>0" class="w-14px h-14px rounded-2px bg-[--secondary-text] color-#F5F5F5 text-center lh-14px">{{
               currentFilterNum
             }}</span>
         </div>
       </template>
       <template #default>
-        <div class="mb-12px text-16px color-[--d-F5F5F5-l-333]">
+        <div class="mb-12px text-16px color-[--main-text]">
           {{ $t('filter') }}
         </div>
         <div class="mb-16px flex flex-col gap-8px text-12px">
-          <label class="color-[--d-999-l-666]">{{ $t('TokenAddress') }}</label>
+          <label class="color-[--secondary-text]">{{ $t('TokenAddress') }}</label>
           <el-input
             v-model="tempFilterParams.token"
             size="large"
@@ -91,14 +91,14 @@ v-tooltip="$t('FilterTips')"
           />
         </div>
         <div class="mb-16px flex flex-col gap-8px text-12px">
-          <label class="color-[--d-999-l-666]">{{ $t('SignalCount') }}</label>
+          <label class="color-[--secondary-text]">{{ $t('SignalCount') }}</label>
           <div class="flex gap-8px">
             <div
               v-for="item in [2,5,15]"
               :key="item"
-              class="flex-1 cursor-pointer h-32px bg-[--d-333-l-F2F2F2] border-solid border-1px border-[--d-222-l-F2F2F2] text-12px color-[--d-F5F5F5-l-333] flex items-center justify-center rounded-4px"
+              class="flex-1 cursor-pointer h-32px bg-[--border] border-solid border-1px border-[--border] text-12px color-[--secondary-text] flex items-center justify-center rounded-4px"
               :class="{
-                'color-#3f80f7 border-color-#3f80f7':tempFilterParams.history_count === item
+                'color-[--main-text] border-color-#3f80f7':tempFilterParams.history_count === item
               }"
               @click="()=>{
                 if(tempFilterParams.history_count !== item){
@@ -113,14 +113,14 @@ v-tooltip="$t('FilterTips')"
           </div>
         </div>
         <div class="mb-16px flex flex-col gap-8px text-12px">
-          <label class="color-[--d-999-l-666]">{{ $t('CurrentMC') }}</label>
+          <label class="color-[--secondary-text]">{{ $t('CurrentMC') }}</label>
           <div class="flex gap-8px">
             <div
               v-for="(item,idx) in mcOptions"
               :key="idx"
-              class="flex-1 cursor-pointer h-32px bg-[--d-333-l-F2F2F2] border-solid border-1px border-[--d-222-l-F2F2F2] text-12px color-[--d-F5F5F5-l-333] flex items-center justify-center rounded-4px"
+              class="flex-1 cursor-pointer h-32px bg-[--border] border-solid border-1px border-[--border] text-12px color-[--secondary-text] flex items-center justify-center rounded-4px"
               :class="{
-                'color-#3f80f7 border-color-#3f80f7':tempFilterParams.mc_curr === item.value
+                'color-[--main-text] border-color-#3f80f7':tempFilterParams.mc_curr === item.value
               }"
               @click="()=>{
                 if(tempFilterParams.mc_curr !== item.value){
@@ -136,7 +136,7 @@ v-tooltip="$t('FilterTips')"
         </div>
         <div class="flex">
           <el-button
-            class="h-32px flex-1 m-l-auto"
+            class="h-32px flex-1 m-l-auto reset"
             :color="themeStore.isDark ? '#333':'#F2F2F2'"
             @click="onReset"
           >
@@ -154,3 +154,10 @@ v-tooltip="$t('FilterTips')"
     </el-popover>
   </div>
 </template>
+<style lang="scss" scoped>
+.reset {
+  background-color: var(--border);
+  color: var (--main-text);
+  border-color: var(--border);
+}
+</style>

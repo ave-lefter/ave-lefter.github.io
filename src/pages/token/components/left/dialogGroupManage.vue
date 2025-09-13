@@ -5,8 +5,8 @@ import {
   type GetUserFavoriteGroupsResponse, removeFavoriteGroup,
 } from '~/api/fav'
 import {confirmChangeName} from '~/composables/fav'
-import {useEventBus} from "@vueuse/core";
-import {BusEventType} from "~/utils/constants";
+import {useEventBus} from '@vueuse/core'
+import {BusEventType} from '~/utils/constants'
 
 const {t} = useI18n()
 const botStore = useBotStore()
@@ -118,6 +118,9 @@ async function _removeFavoriteGroup(item: GetUserFavoriteGroupsResponse) {
 async function _confirmChangeName() {
   await confirmChangeName()
   props.getData()
+  favDialogEvent.emit({
+    type:'changeFavoriteGroupName',
+  })
 }
 
 </script>
