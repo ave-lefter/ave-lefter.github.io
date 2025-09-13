@@ -324,7 +324,7 @@ watch(
       listData.value = updateList.toSorted((a, b) => {
         const aVal = Number(a[sort]) || 0
         const bVal = Number(b[sort]) || 0
-        return (bVal - aVal) * sortVal
+        return (aVal - bVal) * sortVal
       })
     } else {
       // 默认按24小时涨幅排序（降序）
