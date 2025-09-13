@@ -202,6 +202,7 @@
 
           <PumpList
             class="pump-item_list-new"
+            :scrollHeight="scrollHeight"
             :tableList="list1 || []"
             :quickBuyValue="quickBuyValue"
             :loading="loading[activeChain + '-' + 'new']"
@@ -294,6 +295,7 @@
           </div>
           <PumpList
             class="pump-item_list-soon"
+            :scrollHeight="scrollHeight"
             :tableList="list2 || []"
             :quickBuyValue="quickBuyValue"
             :loading="loading[activeChain + '-' + 'soon']"
@@ -388,6 +390,7 @@
           </div>
           <PumpList
             class="pump-item_list-graduated"
+            :scrollHeight="scrollHeight"
             :tableList="list3 || []"
             :quickBuyValue="quickBuyValue"
             :loading="loading[activeChain + '-' + 'graduated']"
@@ -682,6 +685,9 @@ const list2 = computed(() => {
     }
     return filterList
   })
+const scrollHeight = computed(()=>{
+  return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
+})
 watch(() => list1.value?.[0]?.target_token, (val) => {
   if(pump_notice.value[activeChain.value].new && pumpAudio.value && val) {
     pumpAudio.value.play()
