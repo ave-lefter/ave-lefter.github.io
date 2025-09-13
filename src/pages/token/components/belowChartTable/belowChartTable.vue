@@ -165,7 +165,7 @@ onMounted(() => {
         @click="activeTab = item.component">
         <div v-if="item.component == 'Orders'" class="w-1px h-20px bg-[var(--custom-br-1-color)] mr-20px mb-8px"/>
         <div
-          :class="`b-b-solid b-b-2px pb-12px flex-start ${activeTab === item.component ? ' b-b-[--main-text]' : 'b-b-transparent'}`">
+          :class="`b-b-solid b-b-2px pb-8px flex-start ${activeTab === item.component ? ' b-b-[--main-text]' : 'b-b-transparent'}`">
           <strong>{{ item.name }}</strong>
           <span v-if="item.component === 'Orders'">({{ tokenStore.registrationNum }})</span>
           <span v-if="item.component === 'LP'" class="flex-start">

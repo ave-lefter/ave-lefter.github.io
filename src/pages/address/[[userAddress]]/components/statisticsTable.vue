@@ -54,7 +54,7 @@
         :infinite-scroll-delay="200"
         :infinite-scroll-disabled="tableData.loading || tableData.finished || tableData.error"
         :infinite-scroll-immediate="false"
-        class="relative min-h-500px"
+        class="relative min-h-500px bg-[--secondary-bg]"
         infinite-scroll-distance="300"
       >
         <RecentPnl
