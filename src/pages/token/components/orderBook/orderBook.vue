@@ -88,7 +88,7 @@
               <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
                 <!-- 整行渐变背景 -->
                 <div class="absolute inset-0 pointer-events-none"
-                  :style="{ backgroundColor: getFullRowGradient(row), transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'left' }" />
+                  :style="{ backgroundColor: getFullRowGradient(row), transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'right' }" />
 
                 <!-- Time -->
                 <div class="text-left min-w-0">
@@ -194,7 +194,8 @@
       </div>
     </div>
     <!-- status -->
-    <div class="absolute bottom-0 h-24px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
+    <div
+      class="absolute bottom-0 h-24px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
 
       <div v-show="isPausedTxs" class="flex items-center gap-x-7px">
         <Icon name="custom:stop" class="text-14px" />
@@ -634,7 +635,7 @@ function getFullRowGradient(row: ExtendedTxResponse) {
 
 function getAmountBarWidthPercent(row: ExtendedTxResponse) {
   const vol = getAmount(row, true, true)
-  const width = Math.min(vol / 20, 100) / 100
+  const width = Math.min(vol / (addressAndChain.value.chain === 'solana' ? 10 : 20), 100) / 100
   return width.toFixed(3)
 }
 

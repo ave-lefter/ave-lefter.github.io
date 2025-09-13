@@ -69,7 +69,7 @@
         </el-input>
       </div>
     </template>
-    <AutoSellSet v-if="activeTab === 'buy' && swapType==='market' && chain !== 'xlayer'" class="mt-15px" />
+    <AutoSellSet v-if="activeTab === 'buy' && swapType==='market'" class="mt-15px" />
     <template v-if="isSupportSwap">
       <el-button v-if="!isApprove" :color="swapButtonColor" class="submit-btn" native-type="button" :loading="loadingApprove || loadingSwap || loadingAllowance" :disabled="Number(fromToken.balance) < Number(fromAmount)" @click.stop="approve">{{ Number(fromToken.balance) === 0 || Number(fromToken.balance) < Number(fromAmount) ? (checkAmountMessage() || $t('approve')) : $t('approve') }}</el-button>
 
@@ -125,7 +125,7 @@
           <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-12px color-[--third-text] ml-auto mr-4px cursor-pointer" />
           <span>{{ botPriorityFee }} SOL</span>
         </template>
-        <template v-if="activeTab === 'buy' && swapType === 'market' && chain !== 'xlayer' && botSettings?.[chain || '']">
+        <template v-if="activeTab === 'buy' && swapType === 'market' && botSettings?.[chain || '']">
           <span class="mr-4px ml-auto color-[--third-text]">{{ $t('autoSellHalf') }}</span>
           <el-switch
             v-model="botSettingStore.autoSellConfigs.autoSell"
