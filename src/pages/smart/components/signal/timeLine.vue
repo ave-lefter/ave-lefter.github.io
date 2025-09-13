@@ -130,11 +130,11 @@ function getLevel(value: number) {
 
 <template>
   <div class="flex gap-16px items-center">
-    <div class="flex items-center text-12px" style="color:var(--d-999-l-222);">
+    <div class="flex items-center text-12px" style="color:var(--secondary-text);">
       <span class="mr-8px">{{ $t('normal') }}</span>
       <div class="flex items-center gap-2px">
         <div
-          v-for="(el,idx) in 4" :key="idx" class="w-8px h-8px rounded-2px bg-[--d-333-l-999]"
+          v-for="(el,idx) in 4" :key="idx" class="w-8px h-8px rounded-2px bg-[--main-list-hover]"
           :class="({
               1:'bg-#286DFF opacity-20',
               2:'bg-#286DFF opacity-50',
@@ -150,7 +150,7 @@ function getLevel(value: number) {
         class="relative w-6px h-6px"
       >
         <i
-          class="block w-full h-full bg-[--d-333-l-999]"
+          class="block w-full h-full bg-[--main-list-hover]"
           :class="getLevel(Number(el.volume))"
           @mouseenter.stop="showLinePop($event,el)"
           @mouseleave.stop="hideLinePop"
@@ -206,7 +206,7 @@ function getLevel(value: number) {
       @mouseenter="cancelHide"
       @mouseleave="hideDogPop"
     >
-      <div class="w-full table-row color-[--d-666-l-999] mb-6px">
+      <div class="w-full table-row color-[--third-text] mb-6px">
         <div class="table-cell">{{ $t('FirstAlert') }}</div>
         <div class="table-cell">{{ $t('Token') }}</div>
         <div class="table-cell text-right">{{ $t('MC') }}</div>
