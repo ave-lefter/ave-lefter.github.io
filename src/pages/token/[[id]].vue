@@ -1,7 +1,7 @@
 <template>
   <div class="flex bg-[--main-divider] gap-1px flex min-w-0 w-full" style="min-height: calc(100vh - 92px);">
     <div class="flex-1 min-w-0">
-      <TokenHistory/>
+      <TokenHistory v-if="globalStore.tokenHistoryVisible" class="mb-1px"/>
       <Top/>
       <div class="flex gap-1px">
         <div class="hide-scrollbar">
@@ -64,7 +64,13 @@ const tagStore = useTagStore()
 const tokenStore = useTokenStore()
 const scrollbarHeight = computed(() => {
   if (tokenStore.isShowWaring) {
+    if(globalStore.tokenHistoryVisible){
+      return 'calc(100vh - 230px)'
+    }
     return 'calc(100vh - 198px)'
+  }
+  if(globalStore.tokenHistoryVisible){
+    return 'calc(100vh - 190px)'
   }
   return 'calc(100vh - 158px)'
 })
@@ -216,7 +222,7 @@ function addVisit() {
       id:token+'-'+chain,
       logo_url,
       symbol,
-      priceChange: tokenStore.priceChange,
+      price_change: tokenStore.priceChange,
       circulation: tokenStore.circulation.toString(),
       price: tokenStore.price || 0,
     })

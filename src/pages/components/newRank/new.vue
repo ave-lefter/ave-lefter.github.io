@@ -47,6 +47,7 @@ const props = defineProps<{
   activeChain: string
   activeSubTab: string
   activeTab: string
+  height: string
 }>()
 const sortConditions = ref({
   sort: '',
@@ -356,7 +357,7 @@ const cellRenderer = computed(() => {
 })
 </script>
 <template>
-  <div v-loading="loading" style="height: calc(100vh - 185px)">
+  <div v-loading="loading" :style="`height:${height}`">
     <AveTable
       :loading="loading"
       :data="filteredListData"

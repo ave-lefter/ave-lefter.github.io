@@ -30,6 +30,7 @@ const components = {
   volume: activityComponent,
   heaven_pump: pumpComponent,
 }
+const globalStore = useGlobalStore()
 const activeTab = useStorage<keyof typeof components>('rankActiveTab', 'hot')
 const activeSubTab = useStorage('rankSubTab','pump_in_hot')
 const activeChain = useStorage('rankChain', 'AllChains')
@@ -242,6 +243,21 @@ function getMedias(appendix: string) {
   }
   return []
 }
+
+const height = computed(() => {
+  const {tokenHistoryVisible} = globalStore
+  // 有子 Tabs
+  if(components[activeTab.value] === pumpComponent){
+    if(tokenHistoryVisible){
+      return 'calc(100vh - 261px)'
+    }
+    return 'calc(100vh - 229px)'
+  }
+  if(tokenHistoryVisible){
+    return 'calc(100vh - 217px)'
+  }
+  return 'calc(100vh - 185px)'
+})
 </script>
 
 <template>
@@ -258,6 +274,7 @@ function getMedias(appendix: string) {
         <component
           :is="components[activeTab]"
           ref="dynamicComponentRef"
+          :height="height"
           :listMapFunction="listMapFunction"
           :activeChain="activeChain"
           :activeTab="activeTab"

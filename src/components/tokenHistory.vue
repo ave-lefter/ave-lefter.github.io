@@ -2,21 +2,79 @@
 import { useElementSize, useStorage } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
 import type { ElScrollbar } from 'element-plus'
+import { getUserBalance, type GetUserBalanceResponse } from '~/api/swap'
 import type { IPriceV2Response } from '~/api/types/ws'
 
 const wsStore = useWSStore()
 const globalStore = useGlobalStore()
-const activeTab = useStorage('topColTab',1)
+const botStore = useBotStore()
+const walletStore = useWalletStore()
+const activeTab = useStorage<0|1>('topColTab',1)
 const scrollbar = useTemplateRef<InstanceType<typeof ElScrollbar>>('scrollbar')
 const scrollbarLeft = ref(0)
 const scrollContent = useTemplateRef<HTMLElement>('scrollContent')
 const {width:scrollContentWidth} = useElementSize(scrollContent)
+// 持仓数据
+const positionList = shallowRef<(GetUserBalanceResponse&{id:string})[]>([])
 
 const arrowVisible = computed(()=>{
   const aWidth = Array.from(scrollContent.value?.children || []).reduce((acc,item)=>acc+item?.clientWidth,0)
-  const gapWidth = (globalStore.lastVisitTokens.length - 1) * 18
+  const gapWidth = (listData.value.length - 1) * 18
   return scrollContentWidth.value < aWidth + gapWidth
 })
+
+const isEvmChainWallet = computed(() => {
+  return getChainInfo(walletStore.chain)?.vm_type === 'evm'
+})
+
+const userIds = computed(() => {
+  if (botStore.userInfo) {
+    return botStore.userInfo.addresses.map(({address, chain}) => address + '-' + chain)
+  } else {
+     if (walletStore.address && isEvmChainWallet.value && (walletStore.walletName!=='WatchWallet')) {
+      return [walletStore.address + '-' + 'bsc', walletStore.address + '-' + 'base', walletStore.address + '-' + 'eth']
+    }
+    else {
+      return [walletStore.address + '-' + walletStore.chain]
+    }
+  }
+})
+
+const listData = computed(()=>{
+  return {
+    0: positionList.value,
+    1:globalStore.lastVisitTokens
+  }[activeTab.value]
+})
+
+watch(activeTab,()=>{
+  // 如果当前 tab 为持仓则调用持仓接口
+  if(activeTab.value === 0){
+    _getUserBalance()
+  }
+},{immediate:true})
+
+watch(()=>[botStore.evmAddress,walletStore.address,walletStore.walletSignature[walletStore.address]],()=>{
+  _getUserBalance()
+})
+
+function _getUserBalance() {
+  getUserBalance({
+    hide_risk:globalStore.hide_risk,
+    hide_small:globalStore.hide_small,
+    user_ids:userIds.value,
+    pageSize:10
+  }).then(res=>{
+    positionList.value = (res.data || []).map(el=>{
+      return {
+        ...el,
+        id:el.token === NATIVE_TOKEN
+          ? getChainInfo(el.chain)?.wmain_wrapper + '-' + el.chain
+          : `${el.token}-${el.chain}`,
+      }
+    })
+  })
+}
 
 function closeOtherPages() {
   globalStore.lastVisitTokens.length = 0
@@ -36,10 +94,21 @@ function onDelete(id:string) {
   globalStore.lastVisitTokens = globalStore.lastVisitTokens.filter(item => item.id !== id)
 }
 
+const priceChangeCallbacks = {
+  0:balancePriceChange,
+  1:lastTokensPriceChange
+}
 watch(
   () => wsStore.wsResult[WSEventType.PRICEV2],
   (val: IPriceV2Response) => {
-    globalStore.lastVisitTokens = globalStore.lastVisitTokens.map((i) => {
+  const callback = priceChangeCallbacks[activeTab.value]
+   if(callback){
+    callback(val)
+   }
+  }
+)
+function lastTokensPriceChange(val:IPriceV2Response) {
+  globalStore.lastVisitTokens = globalStore.lastVisitTokens.map((i) => {
       const item = val.prices.find((j) => {
         return i.id === j.token +'-'+j.chain
       })
@@ -52,8 +121,11 @@ watch(
       }
       return i
     })
-  }
-)
+}
+
+function balancePriceChange(val:IPriceV2Response) {
+  
+}
 </script>
 
 <template>
@@ -67,11 +139,16 @@ watch(
     </div>    
     <el-scrollbar ref="scrollbar" @scroll="onScroll">
       <div ref="scrollContent" class="flex items-center gap-18px whitespace-nowrap h-32px text-12px color-[--third-text]">
-        <NuxtLink v-for="item in globalStore.lastVisitTokens" :key="item.id" class="flex items-center gap-4px hover:color-[--main-text]" :to="`/token/${item.id}`">
+        <NuxtLink v-for="item in listData" :key="item.id" class="flex items-center gap-4px hover:color-[--main-text]" :to="`/token/${item.id}`">
           <TokenImg :row="{logo_url:item.logo_url,symbol:item.symbol,chain:''}" :tokenClass="'w-16px h-16px'"/>
           {{ item.symbol }}
-          ${{ formatNumber(new BigNumber(item.price).times(new BigNumber(item.circulation)).toFixed(),2) }}
-          <span :class="getColorClass(Number(item.priceChange))">{{item.priceChange>0?'+':''}}{{ formatNumber(Number(item.priceChange),2) }}%</span>
+          <template v-if="'circulation' in item">
+            ${{ formatNumber(new BigNumber(item.price).times(new BigNumber(item.circulation)).toFixed(),2) }}
+          </template>
+          <template v-else>
+            ${{ formatNumber(Number(item.current_price_usd),2) }}
+          </template>
+          <span :class="getColorClass(Number(item.price_change))">{{item.price_change>0?'+':''}}{{ formatNumber(Number(item.price_change),2) }}%</span>
           <Icon name="custom:delete" class="cursor-pointer" @click.self.stop.prevent="onDelete(item.id)"/>
         </NuxtLink>
       </div>
@@ -80,7 +157,7 @@ watch(
       <Icon name="material-symbols:arrow-forward-ios"/>
     </div>
     <div
-v-if="globalStore.lastVisitTokens.length >= 1"
+v-if="listData.length >= 1"
 class="p-8px h-32px flex items-center color-[--secondary-text] hover:color-[--main-text] gap-4px whitespace-nowrap text-12px cursor-pointer"
     @click="closeOtherPages"
     >

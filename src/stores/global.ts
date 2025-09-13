@@ -71,11 +71,13 @@ export const useGlobalStore = defineStore('global', () => {
     quickBuyValue: '0.01',
   })
 
+  // 预留一个全局变量，用于控制 token 历史的显示
+  const tokenHistoryVisible = true
   const lastVisitTokens = useStorage<{
     id: string,
     logo_url: string,
     symbol: string,
-    priceChange: number | undefined,
+    price_change: number | undefined,
     circulation: string,
     price: number,
   }[]>('lastTokens', [])
@@ -170,6 +172,7 @@ export const useGlobalStore = defineStore('global', () => {
     getFollowsNum,
     latestNotice,
     pnlTrackerVisible,
-    lastVisitTokens
+    lastVisitTokens,
+    tokenHistoryVisible
   }
 })
