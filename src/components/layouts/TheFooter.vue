@@ -32,7 +32,7 @@
               chain: ''
             }" token-class="w-16px h-16px [&&]:mr-0" />
             <span class="color-[--secondary-text]">{{ item.symbol }}</span>
-            <span :class="`color-${item.color}`">{{'$'+formatDec(item?.current_price_usd || 0, 2)}}</span>
+            <span :class="`${showPrice.isUp ? 'color-[--up-color]' : 'color-[--down-color]'}`">{{'$'+formatDec(item?.current_price_usd || 0, 2)}}</span>
           </NuxtLink>
         </div>
       </el-popover>
