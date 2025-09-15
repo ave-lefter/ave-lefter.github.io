@@ -167,7 +167,7 @@ export const useGlobalStore = defineStore('global', () => {
       marketBuy:'',
       marketSell:'',
       limit:'',
-      volume:''
+      volume:50
     }
   })
   const rankActiveTab = useStorage('rankActiveTab', 'hot')
