@@ -127,7 +127,7 @@
             </el-input>
           </div>
           <div v-if="showQuickAmount" class="mt-20px">
-            <div class="mb-10px" style="color: #12B886;">{{ $t('setOneClickBuyAmount') }}({{ getChainInfo(chain)?.main_name }})</div>
+            <div class="mb-10px" style="color: #12B886;">{{ $t('setOneClickBuyAmount') }}</div>
             <el-row :gutter="10">
               <el-col v-for="(item, index) in botSetting[selected].buyValueList" :key="index" :span="6" class="click-setting">
                 <el-input v-model="botSetting[selected].buyValueList[index]" class="input-number" inputmode="decimal" placeholder="0.0" @input="value => handleBuyValue(value, index)" @blur="handleBlurBuyValue(index)"/>
