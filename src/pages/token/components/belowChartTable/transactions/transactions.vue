@@ -310,8 +310,13 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
   if (target !== realAddress.value) {
     return
   }
+  // 先把加减池子过滤掉
+  if(!['buy','sell'].includes(simpleWSTx.direction)) {
+    return
+  }
   txCount.value[maker] = (txCount.value[maker] || 0) + 1
   const { topN, wallet_tag } = getWalletTag(data.msg)
+  const newTags = getSimpleTxTags(simpleWSTx.tag)
   const item = {
     ...simpleWSTx,
     topN, wallet_tag,
@@ -322,7 +327,8 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
     transaction: simpleWSTx.txhash,
     senderProfile: {
       solTotalHolding: simpleWSTx.maker_eth
-    }
+    },
+    newTags
   }
   wsPairCache.value.unshift(item as any)
   if (!isPausedTxs.value) {
@@ -434,6 +440,18 @@ async function _getTokenTxs() {
   }
 }
 
+function getSimpleTxTags(tag?:string) {
+  if(tag){
+    const wallet_tag = tag.split(',')
+    const tagsMap = {
+      MEVBot:{
+        type:'8'
+      }
+    }
+    return wallet_tag.map(el => tagsMap[el]).filter(el=> !!el)
+  }
+}
+
 function getWalletTag(val: IGetTokenTxsResponse) {
   const wallet_tagStr = val.wallet_tag_v2 || ''
   let topN = ''
@@ -474,7 +492,7 @@ async function _getPairLiq() {
 }
 
 function isBuy(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) {
-  if ('direction' in row) {
+  if ('direction' in row && 'target' in row) {
     return row.direction === 'buy'
   }
   if ('from_address' in row) {
@@ -510,7 +528,7 @@ function getRowColor(row: GetPairLiqResponse | IGetTokenTxsResponse) {
 function getPrice(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, isShowToken = false) {
   // route.params。id 同步更改，而接口异步请求，此时更新该值变成了 0
   const tokenAddress = realAddress.value
-  if ('direction' in row) {
+  if ('direction' in row && 'target' in row) {
     return row.price_u
   }
   if ('from_address' in row) {
@@ -544,7 +562,7 @@ function getPrice(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, i
 }
 
 function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, needPrice = false, isVolUSDT = false) {
-  if ('direction' in row) {
+  if ('direction' in row && 'target' in row) {
     return Number(row.target_amt || 0) * (
         needPrice ? Number(isVolUSDT ? row.price_u : row.price_m)
           : 1
@@ -577,7 +595,7 @@ function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, 
 }
 
 function hasNewAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
-  if ('direction' in row) {
+  if ('direction' in row && 'target' in row) {
     return row.direction === 'buy' && new BigNumber(row.maker_bal).eq(row.target_amt)
   }
   if (row?.newTags?.some?.(i => i?.type === '8')) {
@@ -593,7 +611,7 @@ function hasNewAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleW
 }
 
 function hasClearedAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
-  if ('direction' in row) {
+  if ('direction' in row && 'target' in row) {
     return row.direction === 'sell' && new BigNumber(row.maker_bal).eq(0)
   }
   if (isBuy(row) || row.newTags?.some?.(i => i?.type === '8')) {
@@ -768,8 +786,8 @@ const collect = async (row: any,index:number) => {
         class="flex items-center whitespace-nowrap w-[80%] overflow-x-auto scrollbar-hide"
       >
         <a
-          v-for="(item,index) in tabs" :key="item.value" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-666-l-999] px-12px py-4px rounded-4px
-         ${activeTab === item.value ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333]' : ''}`"
+          v-for="(item,index) in tabs" :key="item.value" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
+         ${activeTab === item.value ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
           @click="setActiveTab(item.value,index)">
           {{ item.label }}
         </a>
@@ -786,7 +804,7 @@ const collect = async (row: any,index:number) => {
         {{ $t('loading') }}
       </div>
       <template v-else>
-        <div class="lh-20px text-13px py-6px bg-#3F80F71A text-center mb-12px flex justify-center">
+        <div class="lh-20px text-13px py-6px bg-#3F80F71A text-center mb-12px flex justify-center text-[--third-text]">
           <div
             v-html="$t('filterTip', {
             address: `<span class='color-#3F80F7'>&nbsp;${tableFilter.markerAddress.slice(0, 4)}...${tableFilter.markerAddress.slice(-4)}&nbsp;</span>`,
@@ -826,7 +844,7 @@ const collect = async (row: any,index:number) => {
             <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
             <img v-else src="@/assets/images/empty-black.svg" alt="">
             <span
-              class="mt-10px color-[--d-666-l-999]"
+              class="mt-10px color-[--third-text]"
             >
               {{ t('emptyNoData') }}
             </span>
@@ -838,7 +856,7 @@ const collect = async (row: any,index:number) => {
             <span>{{ $t('time') }}</span>
             <Icon
               :name="`${tableView.isShowDate ? 'custom:calendar' : 'custom:countdown'}`"
-              class="color-[--d-666-l-999] cursor-pointer" @click.self="tableView.isShowDate = !tableView.isShowDate" />
+              class="color-[--third-text] cursor-pointer" @click.self="tableView.isShowDate = !tableView.isShowDate" />
             <TableDateFilter
               v-model:visible="tableFilterVisible.timestamp" :modelValue="tableFilter.timestamp" :boundary="txsContainer || undefined"
               @confirm="onTimestampConfirm" />
@@ -849,7 +867,7 @@ const collect = async (row: any,index:number) => {
             v-if="!tableView.isShowDate && row.time && Number(formatTimeFromNow(row.time, true)) < 60"
             :key="`${row.time}${rowIndex}`" :timestamp="row.time" :end-time="60">
             <template #default="{ seconds }">
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 <template v-if="seconds < 60">
                   {{ seconds }}s
                 </template>
@@ -859,7 +877,7 @@ const collect = async (row: any,index:number) => {
               </span>
             </template>
           </TimerCount>
-          <span v-else class="color-[--d-999-l-666]">
+          <span v-else class="color-[--secondary-text]">
             {{
               tableView.isShowDate
                 ? formatDate(row.time, 'HH:mm:ss')
@@ -916,13 +934,13 @@ const collect = async (row: any,index:number) => {
           <div v-else>
             <div :class="getRowColor(row)">
               {{ formatNumber(row.amount0 || 0) }}
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 {{ row.token0_symbol }}
               </span>
             </div>
             <div :class="getRowColor(row)">
               {{ formatNumber(row.amount1 || 0) }}
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 {{ row.token1_symbol }}
               </span>
             </div>
@@ -933,7 +951,7 @@ const collect = async (row: any,index:number) => {
             <span>{{ $t('amountU') }}</span>
             <Icon
               name="custom:price"
-              :class="`${tableView.isVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-666]'} cursor-pointer`"
+              :class="`${tableView.isVolUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer`"
               @click.self="tableView.isVolUSDT = !tableView.isVolUSDT" />
             <VolFilter
               v-model:visible="tableFilterVisible.amountU" :modelValue="tableFilter.amountU"
@@ -943,14 +961,14 @@ const collect = async (row: any,index:number) => {
         <template #cell-amountU="{ row }">
           <div
             v-if="row.type === undefined" :class="`absolute h-full ${getGradient(row)} opacity-15`"
-            :style="`width:${Math.min(getAmount(row, true, true) / 20, 100)}%`" />
+            :style="`width:${Math.min(getAmount(row, true, true) / (addressAndChain.chain === 'solana' ? 10 : 20), 100)}%`" />
           <div v-if="row.type === undefined" :class="`${getRowColor(row)} w-full h-full flex items-center justify-end`">
             <template v-if="tableView.isVolUSDT">
               ${{ formatNumber(getAmount(row, true, true), 2) }}
             </template>
             <template v-else>
               {{ formatNumber(getAmount(row, true, false), 3) }}
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 &nbsp;{{ getChainInfo(row.chain)?.main_name }}
               </span>
             </template>
@@ -961,7 +979,7 @@ const collect = async (row: any,index:number) => {
             </template>
             <template v-else>
               {{ formatNumber(row.amount0 * row.token0_price_eth + row.amount1 * row.token1_price_eth, 2) }}
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 {{ getChainInfo(row.chain)?.main_name }}
               </span>
             </template>
@@ -998,7 +1016,7 @@ const collect = async (row: any,index:number) => {
               :address="row.wallet_address"
               :maxRemarkLength="8"
               :chain="row.chain"
-              :wallet_logo="row.wallet_logo" class="color-[--d-999-l-666]"
+              :wallet_logo="row.wallet_logo" class="color-[--secondary-text]"
               :mouseoverAddress="e => openMarkerTooltip(row, e)"
             >
               <div v-if="row.count && row.count > 1">
@@ -1007,15 +1025,15 @@ const collect = async (row: any,index:number) => {
             </UserRemark>
             <Icon
               :ref="(el: any) => $refs.buttonRefs[rowIndex] = el" name="custom:attention"
-              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--third-text]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
             <Icon
               name="custom:filter"
-              :class="`${tableFilter.markerAddress ? 'color-[--d-999-l-666]' : 'color-[--d-666-l-999]'} cursor-pointer text-10px shrink-0`"
+              :class="`${tableFilter.markerAddress ? 'color-[--secondary-text]' : 'color-[--third-text]'} cursor-pointer text-10px shrink-0`"
               @click.self.stop="setMakerAddress(row.wallet_address)" />
           </div>
         </template>
         <template #cell-SOLBalance="{ row }">
-          <span v-if="row.senderProfile" class="color-[--d-999-l-666]">
+          <span v-if="row.senderProfile" class="color-[--secondary-text]">
             {{ formatNumber(row.senderProfile?.solTotalHolding || 0, 2) }}
           </span>
         </template>
@@ -1030,7 +1048,7 @@ const collect = async (row: any,index:number) => {
               class="w-16px h-16px cursor-pointer rounded-full"
               :src="formatIconSwap(row.amm)" alt="" @click.stop.self="goBrowser(row)">
             <Icon
-              name="custom:browser" class="text-16px color-[--d-666-l-999] cursor-pointer"
+              name="custom:browser" class="text-16px color-[--third-text] cursor-pointer"
               @click.stop.self="goBrowser(row)" />
           </div>
         </template>

@@ -19,13 +19,13 @@
         <div class="ml-2 flex flex-col justify-items-start gap-1">
           <div v-copy="address" class="flex cursor-pointer">
             <div
-              class="flex items-center justify-center px-2 py-1.75 h-6 rounded text-3 gap-1 bg-[--d-222-l-F2F2F2]"
+              class="flex items-center justify-center px-2 py-1.75 h-6 rounded text-3 gap-1 bg-[--main-input-button-bg] color-[--main-text]"
             >
               {{ address.slice(0, 6) + '...' + address.slice(-4) }}
-              <Icon name="bxs:copy" class="text-2.5 clickable text-[--d-666-l-959A9F]" />
+              <Icon name="bxs:copy" class="text-2.5 clickable text-[--third-text]" />
             </div>
           </div>
-          <span class="text-[12px] color-[--d-666-l-959A9F]">{{ $t('address') }}</span>
+          <span class="text-[12px] color-[--third-text]">{{ $t('address') }}</span>
         </div>
       </div>
       <div class="item flex items-center ml-136px">
@@ -38,10 +38,10 @@
           token-class="w-10 h-10"
         />
         <div class="ml-2 flex flex-col justify-items-start gap-1">
-          <span class="text-12px">
+          <span class="text-12px color-[--main-text]">
             $ {{ formatNumberS(userTotalBalance, 3) || '-.-' }}
           </span>
-          <span class="text-12px color-[--d-666-l-959A9F]">{{ $t('totalBalance') }}</span>
+          <span class="text-12px color-[--third-text]">{{ $t('totalBalance') }}</span>
         </div>
       </div>
     </div>
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import Balance from './balance'
+import Balance from './balance/index.vue'
 const configStore = useConfigStore()
 const s3BaseUrl = configStore.token_logo_url
 

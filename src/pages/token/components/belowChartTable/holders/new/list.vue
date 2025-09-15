@@ -30,74 +30,68 @@
         fixed="left"
       >
         <template #header>
-          <span>{{ $t('wallet2') }}</span>
-          <i
-            v-if="searchKeyword"
-            class="iconfont icon-fitter1 text-10px ml-3px clickable"
-            :style="{
-              color: searchKeyword
-                ? 'var(--a-btn-bg-2-color)'
-                : 'var(--custom-font-8-color)',
-            }"
-            @click.stop.prevent="handleFilterQuery('')"
-          />
-          <el-popover
-            v-else
-            v-model:visible="visible"
-            placement="bottom-start"
-            popper-class="chains-table-filter"
-            title=""
-            :width="350"
-            trigger="click"
-          >
-            <template #reference>
-              <i
-                class="iconfont icon-fitter1 text-10px ml-3px clickable"
-                :style="{
-                  color: searchKeyword
-                    ? 'var(--a-btn-bg-2-color)'
-                    : 'var(--custom-font-8-color)',
-                }"
-                @click.stop
-              />
-            </template>
-            <template #default>
-              <div class="filter-box">
-                <div class="flex mt-10">
-                  <el-input
-                    v-model.trim="keyword"
-                    :placeholder="$t('searchWallet')"
-                    clearable
-                  />
+          <div class="flex items-center">
+            <span>{{ $t('wallet2') }}</span>
+            <!-- <i
+              v-if="searchKeyword"
+              class="iconfont icon-fitter1 text-10px ml-3px clickable"
+              :style="{
+                color: searchKeyword
+                  ? 'var(--a-btn-bg-2-color)'
+                  : 'var(--custom-font-8-color)',
+              }"
+              @click.stop.prevent="handleFilterQuery('')"
+            /> -->
+            <Icon name="custom:filter" v-if="searchKeyword" class="color-[--d-FFF-l-000] cursor-pointer text-10px" @click.stop.prevent="handleFilterQuery('')" />
+            <el-popover
+              v-else
+              v-model:visible="visible"
+              placement="bottom-start"
+              title=""
+              :width="350"
+              trigger="click"
+            >
+              <template #reference>
+                <div><Icon name="custom:filter" class="color-[--d-666-l-999] cursor-pointer text-10px" /></div>
+              </template>
+              <template #default>
+                <div>
+                  <div class="flex mt-10px">
+                    <el-input
+                      v-model.trim="keyword"
+                      :placeholder="$t('searchWallet')"
+                      clearable
+                    />
+                  </div>
+                  <div class="mt-20px">
+                    <el-button
+                      class="w-full"
+                      size="default"
+                      :color="
+                        !themeStore.isDark ? '#222222' : '#f5f5f5'
+                      "
+                      style="
+                        height: 30px;
+                        min-width: 70px;
+                        --el-button-font-weight: 400;
+                      "
+                      @click.stop="handleFilterQuery(keyword)"
+                    >
+                      {{ $t('confirm') }}
+                    </el-button>
+                  </div>
                 </div>
-                <div class="mt-20">
-                  <el-button
-                    class="width_100"
-                    size="default"
-                    :color="
-                      mode !== 'dark' ? '#222222' : '#f5f5f5'
-                    "
-                    style="
-                      height: 30px;
-                      min-width: 70px;
-                      --el-button-font-weight: 400;
-                    "
-                    @click.stop="handleFilterQuery(keyword)"
-                  >
-                    {{ $t('confirm') }}
-                  </el-button>
-                </div>
-              </div>
-            </template>
-          </el-popover>
+              </template>
+            </el-popover>
+          </div>
         </template>
         <template #default="{ row, $index }">
           <div class="flex items-baseline ">
             <div class="flex-start">
-              <span class="color-[--d-666-l-999] mr-10px">{{ $index +1 < 10? "0" : '' }}{{ $index + 1 }}</span>
+              <span class="color-[--third-text] mr-10px">{{ $index +1 < 10? "0" : '' }}{{ $index + 1 }}</span>
               <Icon
                 :ref="(el: any) => $refs.buttonRefs[$index] = el" name="custom:attention"
-                :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 mt-4px" @click.stop.prevent="collect(row,$index)" />
+                :class="row.is_wallet_address_fav === 1 ? 'color-#F45469' : 'color-[--icon-color]'" class="h-16px w-16px clickable shrink-0 mt-4px" @click.stop.prevent="collect(row,$index)" />
             </div>
             <div class="relative">
               <div class="flex-start">
@@ -111,7 +105,7 @@
                     :remark="row.remark"
                     :address="row.holder"
                     :chain="row.chain"
-                    iconEditColor="var(--d-666-l-999)"
+                    iconEditColor="var(--third-text)"
                     iconEditSize="12px"
                     :wallet_logo="row.wallet_logo"
                     showAddressTitle
@@ -120,15 +114,15 @@
                         address?.slice(0, 4) + '...' + address?.slice(-4)
                     "
                   >
-                    <div class="text-[--d-666-l-999]">
+                    <div class="text-[--third-text]">
                       (
                       <span
                         :style="{
                           color: !row?.total_bought
-                            ? 'var(--d-666-l-999)'
+                            ? 'var(--third-text)'
                             : '#12B886',
                         }"
-                        class="text-[--d-666-l-999]"
+                        class="text-[--third-text]"
                       >
                         {{ formatNumber(row?.total_bought || 0, 2) }}
                       </span>
@@ -136,7 +130,7 @@
                       <span
                         :style="{
                           color: !row?.total_sold
-                            ? 'var(--d-666-l-999)'
+                            ? 'var(--third-text)'
                             : '#F6465D',
                         }"
                       >
@@ -173,7 +167,7 @@
         <template #default="{ row }">
           <span
             :style="{
-              color: !row?.main_coin_balance ? 'var(--d-666-l-999)' : '',
+              color: !row?.main_coin_balance ? 'var(--third-text)' : '',
             }"
           >
             {{ formatNumber(row?.main_coin_balance || 0, 2) }}
@@ -237,24 +231,8 @@
         <template #header>
           <div style="display: inline-flex; align-items: center">
             <span>{{ $t('ratio')}}/{{ isShowBalance ? $t('bal') : $t('amount') }}</span>
-            <img
-              v-show="isShowBalance"
-              class="clickable ml-3px"
-              src="@/assets/images/ratio.svg"
-              height="12"
-              alt=""
-              srcset=""
-              @click.stop="isShowBalance = false"
-            >
-            <img
-              v-show="!isShowBalance"
-              class="clickable ml-3px"
-              src="@/assets/images/amount.svg"
-              height="12"
-              alt=""
-              srcset=""
-              @click.stop="isShowBalance = true"
-            >
+            <Icon v-show="isShowBalance" name="custom:dollar" class="color-[--third-text] clickable text-12px ml-3px"  @click.stop="isShowBalance = false" />
+            <Icon v-show="!isShowBalance" name="custom:amount" class="color-[--third-text] clickable text-12px ml-3px" @click.stop="isShowBalance = true" />
           </div>
         </template>
         <template #default="{ row }">
@@ -269,7 +247,7 @@
 
               :style="{
                 color: !row?.balance_ratio
-                  ? 'var(--d-666-l-999)'
+                  ? 'var(--third-text)'
                   : '',
               }"
             >
@@ -277,21 +255,15 @@
             </div>
             <div
               v-if="isShowBalance"
-              class="text-12px"
+              class="text-12px color-[--third-text]"
               style="line-height: 1.3"
-              :style="{
-                color: !row?.balance_usd ? 'var(--d-666-l-999)' : 'var(--d-666-l-999)',
-              }"
             >
               {{ '$' + formatNumber(row?.balance_usd || 0, 1) }}
             </div>
             <div
               v-else
-              class="text-12px"
+              class="text-12px color-[--third-text]"
               style="line-height: 1.3"
-              :style="{
-                color: !row?.balance ? 'var(--d-666-l-999)' : 'var(--d-666-l-999)',
-              }"
             >
               {{ formatNumber(row?.balance || 0, 1) }}
             </div>
@@ -311,7 +283,7 @@
           <div
             :style="{
               color: !formatProfit(row, price)
-                ? 'var(--d-666-l-999)'
+                ? 'var(--third-text)'
                 : formatProfit(row, price) > 0
                 ? '#12B886'
                 : '#F6465D',
@@ -336,7 +308,7 @@
             class="text-12px"
             :style="{
               color: !row?.total_profit_ratio
-                ? 'var(--d-666-l-999)'
+                ? 'var(--third-text)'
                 : row?.total_profit_ratio > 0
                 ? '#12B886'
                 : '#F6465D',
@@ -363,7 +335,7 @@
           <span
             :style="{
               color: !row?.realized_profit
-                ? 'var(--d-666-l-999)'
+                ? 'var(--third-text)'
                 : row?.realized_profit > 0
                 ? '#12B886'
                 : '#F6465D',
@@ -399,7 +371,7 @@
           <span
             :style="{
               color: !formatUnrealizedProfit(row, price)
-                ? 'var(--d-666-l-999)'
+                ? 'var(--third-text)'
                 : formatUnrealizedProfit(row, price) > 0
                 ? '#12B886'
                 : '#F6465D',
@@ -436,7 +408,7 @@
           <div
             style="line-height: 1.3"
             :style="{
-              color: !row?.bought_usd ? 'var(--d-666-l-999)' : '#12B886',
+              color: !row?.bought_usd ? 'var(--third-text)' : '#12B886',
             }"
           >
             ${{ formatNumber(row?.bought_usd || 0, 1) }}
@@ -445,8 +417,8 @@
             <span
               :style="{
                 color: !row?.bought
-                  ? 'var(--d-666-l-999)'
-                  : 'var(--d-666-l-999)',
+                  ? 'var(--third-text)'
+                  : 'var(--third-text)',
               }"
             >
               {{ formatNumber(row?.bought || 0, 1) }}
@@ -467,7 +439,7 @@
           <div
             style="line-height: 1.3"
             :style="{
-              color: !row?.sold_usd ? 'var(--d-666-l-999)' : '#F6465D',
+              color: !row?.sold_usd ? 'var(--third-text)' : '#F6465D',
             }"
           >
             ${{ formatNumber(row?.sold_usd || 0, 2) }}
@@ -476,8 +448,8 @@
             <span
               :style="{
                 color: !row?.sold
-                  ? 'var(--d-666-l-999)'
-                  : 'var(--d-666-l-999)',
+                  ? 'var(--third-text)'
+                  : 'var(--third-text)',
               }"
             >
               {{ formatNumber(row?.sold || 0, 1) }}
@@ -497,8 +469,8 @@
             style="line-height: 1.3"
             :style="{
               color: !row?.avg_purchase_price
-                ? 'var(--d-666-l-999)'
-                : 'var(--d-666-l-999)',
+                ? 'var(--third-text)'
+                : 'var(--third-text)',
             }"
           >
             ${{ formatNumber(row?.avg_purchase_price || 0, 2) }}
@@ -508,8 +480,8 @@
             style="line-height: 1.3"
             :style="{
               color: !row?.avg_sale_price
-                ? 'var(--d-666-l-999)'
-                : 'var(--d-666-l-999)',
+                ? 'var(--third-text)'
+                : 'var(--third-text)',
             }"
           >
             ${{ formatNumber(row?.avg_sale_price || 0, 2) }}
@@ -537,7 +509,7 @@
             style="line-height: 1.3"
             :style="{
               color: !row?.sol_first_transfer_in_from
-                ? 'var(--d-666-l-999)'
+                ? 'var(--third-text)'
                 : '',
             }"
           >
@@ -552,11 +524,11 @@
               <UserRemark
                 :key="row.sol_first_transfer_in_from"
                 addressClass="token-symbol ellipsis"
-                addressStyle="max-width: 80px;display: inline-block; color:#959a9f"
+                addressStyle="max-width: 80px;display: inline-block;"
                 :remark="row.sol_first_transfer_in_from_remark"
                 :address="row.sol_first_transfer_in_from"
                 :chain="row.chain"
-                iconEditColor="var(--d-666-l-999)"
+                iconEditColor="var(--third-text)"
                 iconEditSize="12px"
                 showAddressTitle
                 :formatAddress="
@@ -570,11 +542,11 @@
             <Icon
               v-if="row?.sol_first_transfer_in_from"
               name="custom:filter"
-              class="color-[--d-666-l-999] cursor-pointer text-10px ml-3px"
+              class="color-[--third-text] cursor-pointer text-10px ml-3px"
               :style="{
                 color:
                   searchOriginKeyword && searchOriginType == 'sol'
-                    ? 'var(--d-F5F5F5-l-222)'
+                    ? 'var(--main-text)'
                     : '',
               }"
               @click.stop.prevent="
@@ -587,8 +559,8 @@
             style="line-height: 1.3"
             :style="{
               color: !row?.sol_first_transfer_in_time
-                ? 'var(--d-666-l-999)'
-                : 'var(--d-666-l-999',
+                ? 'var(--third-text)'
+                : 'var(--third-text',
             }"
           >
             {{
@@ -614,7 +586,7 @@
             style="line-height: 1.3"
             :style="{
               color: !row?.token_first_transfer_in_from
-                ? 'var(--d-666-l-999)'
+                ? 'var(--third-text)'
                 : '',
             }"
           >
@@ -629,11 +601,11 @@
               <UserRemark
                 :key="row.token_first_transfer_in_from"
                 addressClass="token-symbol ellipsis"
-                addressStyle="max-width: 80px;display: inline-block; color:#959a9f"
+                addressStyle="max-width: 80px;display: inline-block;"
                 :remark="row.token_first_transfer_in_from_remark"
                 :address="row.token_first_transfer_in_from"
                 :chain="row.chain"
-                iconEditColor="var(--d-666-l-999)"
+                iconEditColor="var(--third-text)"
                 iconEditSize="12px"
                 showAddressTitle
                 :formatAddress="
@@ -646,7 +618,7 @@
             <Icon
               v-if="row?.token_first_transfer_in_from"
               name="custom:filter"
-              class="color-[--d-666-l-999] cursor-pointer text-10px ml-3px"
+              class="color-[--third-text] cursor-pointer text-10px ml-3px"
               :style="{
                 color:
                   searchOriginKeyword && searchOriginType == 'other'
@@ -663,8 +635,8 @@
             style="line-height: 1.3"
             :style="{
               color: !row?.token_first_transfer_in_time
-                ? 'var(--d-666-l-999)'
-                : 'var(--d-666-l-999)',
+                ? 'var(--third-text)'
+                : 'var(--third-text)',
             }"
           >
             {{
@@ -688,7 +660,7 @@
           <div
             style="line-height: 1.3"
             :style="{
-              color: !row?.transfer_in ? 'var(--d-666-l-999)' : '#12B886',
+              color: !row?.transfer_in ? 'var(--third-text)' : '#12B886',
             }"
           >
             +{{ formatNumber(row?.transfer_in || 0, 1) }}
@@ -698,7 +670,7 @@
             style="line-height: 1.3"
             :style="{
               color: !row?.transfer_out
-                ? 'var(--d-666-l-999)'
+                ? 'var(--third-text)'
                 : '#F6465D',
             }"
           >
@@ -719,7 +691,7 @@
             style="line-height: 1.3"
             :style="{
               color: !row?.max_single_purchase_usd
-                ? 'var(--d-666-l-999)'
+                ? 'var(--third-text)'
                 : '#12B886',
             }"
           >
@@ -730,7 +702,7 @@
             style="line-height: 1.3"
             :style="{
               color: !row?.max_single_sold_usd
-                ? 'var(--d-666-l-999)'
+                ? 'var(--third-text)'
                 : '#F6465D',
             }"
           >
@@ -758,7 +730,7 @@
               60 * 1000 - (Date.now() - new Date(row.last_txn_time).getTime())
             "
             style="
-              --van-count-down-text-color: var(--d-666-l-999);
+              --van-count-down-text-color: var(--third-text);
               --van-count-down-line-height: 1;
               --van-count-down-font-size: 13px;
             "
@@ -773,7 +745,7 @@
               </template>
             </template>
           </van-count-down> -->
-          <span v-tooltip="formatDate(row.last_txn_time, 'YYYY-MM-DD HH:mm:ss')" class="text-[--d-666-l-999]">
+          <span v-tooltip="formatDate(row.last_txn_time, 'YYYY-MM-DD HH:mm:ss')" class="text-[--third-text]">
             {{
               row.last_txn_time
                 ? dayjs(new Date(row.last_txn_time).getTime()).fromNow()
@@ -844,7 +816,7 @@
                     <span class="ml-3 text-12px">{{ item.symbol }}</span>
                     <i
                       v-copy="item.tokenAddress"
-                      style="color: var(--d-666-l-999)"
+                      style="color: var(--third-text)"
                       class="iconfont icon-copy text-12px ml-3"
                     />
                   </div>
@@ -863,7 +835,7 @@
                       style="line-height: 1.3"
                       :style="{
                         color: !item?.balanceRatio
-                          ? 'var(--d-666-l-999)'
+                          ? 'var(--third-text)'
                           : 'var(--a-text-1-color)',
                       }"
                     >
@@ -891,7 +863,7 @@
                   <div
                     :style="{
                       color: !item?.balance_usd
-                        ? 'var(--d-666-l-999)'
+                        ? 'var(--third-text)'
                         : 'var(--a-text-1-color)',
                     }"
                   >
@@ -900,7 +872,7 @@
                   <div
                     :style="{
                       color: !item?.balance_usd
-                        ? 'var(--d-666-l-999)'
+                        ? 'var(--third-text)'
                         : 'var(--a-text-2-color)',
                     }"
                   >
@@ -977,8 +949,9 @@ const $refs = ref({
 })
 const { t } = useI18n()
 const globalStore = useGlobalStore()
+const themeStore = useThemeStore()
 const route = useRoute()
-const isShowBalance = shallowRef(false)
+const isShowBalance = shallowRef(true)
 const visible = shallowRef(false)
 const searchKeyword = shallowRef('')
 const keyword = shallowRef('')
@@ -1094,6 +1067,7 @@ function handleFilterQuery(k: string) {
   visible.value = false
   $emit('filterAddress', k)
   keyword.value = k || ''
+  searchKeyword.value = k || ''
 }
 // function goLink() { }
 function handleSortChange(obj:{prop: string, order:string }) {
@@ -1130,16 +1104,16 @@ function clearSort() {
     }
   }
   .line-bar {
-  width: 100px;
-  height: 3px;
-  display: flex;
-  background: var(--d-666-l-999);
-  border-radius: 1.5px;
-  margin-top: 4px;
-  > span {
+    width: 100px;
     height: 3px;
+    display: flex;
+    background: #222;
     border-radius: 1.5px;
-    background: #999;
+    margin-top: 4px;
+    > span {
+      height: 3px;
+      border-radius: 1.5px;
+      background: var(--secondary-text);
+    }
   }
-}
 </style>

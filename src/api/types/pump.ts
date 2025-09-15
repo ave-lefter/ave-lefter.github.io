@@ -4,7 +4,7 @@ interface Platform {
   platform_icon: string
 }
 export interface PumpConfig {
-  chain: string
+  chain: ChainKey
   chain_show: string
   platforms: Platform[]
 }
@@ -72,6 +72,7 @@ export interface PumpObj {
   summary?: string
   buyers_24h?: number
   sellers_24h?: number
+  platform: string
 }
 
 interface Pair {
@@ -89,10 +90,12 @@ interface Pair {
   token0_decimal: number
   token0_price_usd: number
   token0_symbol: string
+  token0_logo_url: string
   token1_address: string
   token1_decimal: number
   token1_price_usd: number
   token1_symbol: string
+  token1_logo_url: string
   total: number
   tvl: number
   progress: number
@@ -117,10 +120,13 @@ export type pumpBlack = {
   address: string,
   type: 'ca'|'dev'| 'keyword'
 }
-export type Size = 'small' | 'medium' | 'large'
+export type Size ='mini'| 'small' | 'medium' | 'large'
 
 export interface SizeObj {
   flash: string
-  amm: string
   text: string
+}
+export interface pumpObjColor {
+  color: string
+  bg: string
 }

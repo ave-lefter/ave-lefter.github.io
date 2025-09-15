@@ -176,7 +176,7 @@ function getFavoriteCheck(token_id: string, address: string) {
   })
 }
 
-function addFavorite(token_id: string, address: string, group?: 0, remark?: string) {
+function addFavorite(token_id: string, address: string, group?:number, remark?: string) {
   const { $api } = useNuxtApp()
   return $api('/v1api/v3/tokens/favorite/add', {
     method: 'post',

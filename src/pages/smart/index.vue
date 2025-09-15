@@ -4,6 +4,7 @@ import KOL from './components/kol/index.vue'
 import { getTopSignal, type ITopSignal } from '~/api/signal'
 import { _getKolList, _getSmartList } from '@/api/kol'
 import { useLocalStorage, useStorage } from '@vueuse/core'
+import type { ChainKey } from '~/api/types/pump'
 const Version = 1
 const { t } = useI18n()
 
@@ -19,8 +20,8 @@ const smartChains = computed(() => {
     }
   })
 })
-const activeChain = shallowRef('solana')
-const activeChain2 = shallowRef('solana')
+const activeChain = shallowRef<ChainKey>('solana')
+const activeChain2 = shallowRef<ChainKey>('solana')
 
 const dialogValues = ref<{
   visible: boolean
@@ -185,7 +186,7 @@ function handleIntervalChange(interval: string) {
 function init() {
   // 页面初始化时清空所有搜索状态
   searchKeywords.value = {}
-  
+
   if (filterConditions?.value) {
     activeChain2.value = filterConditions.value.chain
     // activeTab.value = filterConditions.value.category
@@ -201,7 +202,7 @@ function init() {
       version: Version,
     }
   }
-  
+
   // this.initFilterForm()
   getSmartList()
 }
@@ -692,23 +693,23 @@ function resetSort() {
 function switchChain(chain: string) {
   activeChain2.value = chain
   filterConditions.value.chain = chain
-  
+
   // 切换链时清空所有搜索状态
   searchKeywords.value = {}
-  
+
   initFilterForm()
   getSmartList()
 }
 </script>
 
 <template>
-  <div class="w-full bg-[--d-111-l-FFF]">
+  <div class="w-full bg-[--main-bg]">
     <div class="p-12px flex justify-between">
       <div class="flex gap-8px">
         <span
           v-for="(item, $index) in tabs"
           :key="$index"
-          class="py-8px text-14px px-12px rounded-4px bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999] flex items-center justify-center cursor-pointer"
+          class="py-8px text-14px px-12px rounded-4px bg-[--main-input-button-bg] color-[--secondary-text] flex items-center justify-center cursor-pointer"
           :class="{ active: activeTab == item.id }"
           @click.stop.prevent="handleTabChange(item.id)"
         >
@@ -728,13 +729,14 @@ function switchChain(chain: string) {
             style="margin-left: 20px"
             :showQuickAmount="false"
           />
+          <AutoSellSetting class="ml-20px" :chain="activeChain" />
         </div>
-        <div class="p-2px rounded-4px bg-[--d-333-l-F2F2F2] flex">
+        <div class="p-2px rounded-4px bg-[--main-input-button-bg] flex color-[--third-text]">
           <div
             v-for="{ label, value } in smartChains"
             :key="value"
             class="flex items-center justify-center gap-4px px-8px py-6px text-12px rounded-4px cursor-pointer"
-            :class="`${activeChain === value ? 'bg-[--d-111-l-FFF]' : ''}`"
+            :class="`${activeChain === value ? 'bg-[--tab-active-bg] color-[--main-text]' : ''}`"
             @click="activeChain = value"
           >
             <img
@@ -747,23 +749,23 @@ function switchChain(chain: string) {
         </div>
       </div>
       <div v-else class="flex-end">
-        <div class="p-2px rounded-4px bg-[--d-333-l-F2F2F2] flex">
+        <div class="p-2px rounded-4px bg-[--main-input-button-bg] flex color-[--third-text]">
           <div
             v-for="interval in ['1D', '7D', '30D']"
             :key="interval"
             class="flex items-center justify-center gap-4px px-8px py-6px text-12px rounded-4px cursor-pointer"
-            :class="`${activeInterval === interval ? 'bg-[--d-111-l-FFF]' : ''}`"
+            :class="`${activeInterval === interval ? 'bg-[--tab-active-bg] color-[--main-text]' : ''}`"
             @click="handleIntervalChange(interval)"
           >
             {{ interval }}
           </div>
         </div>
-        <div class="p-2px rounded-4px bg-[--d-333-l-F2F2F2] flex ml-12px">
+        <div class="p-2px rounded-4px bg-[--main-input-button-bg] flex ml-12px color-[--third-text]">
           <div
             v-for="{ label, value } in smartChains"
             :key="value"
             class="flex items-center justify-center gap-4px px-8px py-6px text-12px rounded-4px cursor-pointer"
-            :class="`${activeChain2 === value ? 'bg-[--d-111-l-FFF]' : ''}`"
+            :class="`${activeChain2 === value ? 'bg-[--tab-active-bg] color-[--main-text]' : ''}`"
             @click="switchChain(value)"
           >
             <img
@@ -808,7 +810,7 @@ function switchChain(chain: string) {
 
 <style scoped lang="scss">
 .active {
-  background: #333333;
+  background: #3F80F7;
   color: #f5f5f5;
 }
 .interval-btns {

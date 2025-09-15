@@ -504,5 +504,12 @@
   "blockHeight": "Bloquear",
   "withdrawAgain": "Retire novamente",
   "trading": "negociação",
-  "withdrawTip": "0,002 é necessário para garantir o uso normal da função da carteira"
+  "withdrawTip": "0,002 é necessário para garantir o uso normal da função da carteira",
+  "holdersNum": "Número de moedas mantidas",
+  "holdersAnalysis": "Análise dos titulares",
+  "holdersNumTotal": "Totals Total",
+  "holdersTotalChange": "Os titulares mudam",
+  "holdersChange": "Os titulares mudam",
+  "holdersChange2": "Holder Changs em {n}",
+  "lockAmount": "Quantidade Bloqueada"
 }

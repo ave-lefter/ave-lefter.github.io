@@ -3,6 +3,7 @@
   :class="{ 'left-drag': monitorStore.isLeftFixed, 'right-drag': monitorStore.isRightFixed }"
   :shouldRenderChild="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing" @on-drag="drag">
     <!-- <Monitor v-bind="props2"/> -->
+    <!-- {{ dragStore.leftWidth.signal }}{{ dragStore.leftWidth.monitor }} {{ dragStore.leftWidth.pump }} -->
     <component :is="lazyComponent" v-bind="props2"/>
   </Draggable>
 </template>
@@ -10,6 +11,7 @@
 <script setup lang="ts">
 const signalStore = useSignalStore()
 const monitorStore = useMonitorStore()
+const dragStore = useDragStore()
 const {placement}=storeToRefs(monitorStore)
 const {lang} = storeToRefs(useGlobalStore())
 const key=ref(0)
@@ -66,7 +68,7 @@ const props1=computed(()=>{
   }else if(placement.value==='left'){
     data={
       className: '[&&]:relative shrink-0 left fixed! top-61px',
-      style: `left:${(signalStore.isLeftFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0}px`,
+      style: `left:${dragStore.leftWidth.monitor}px`,
       axis: 'x',
       x: 0,
       minWidth: lang.value.indexOf('zh') > -1 ? 360 : 360,
@@ -81,7 +83,7 @@ const props1=computed(()=>{
     data = {
       className: '[&&]:relative shrink-0 right fixed! top-61px left-0',
       axis: 'x',
-      x: monitorStore.winWidth - monitorStore.fixedWidth - ((signalStore.isRightFixed && signalStore.signalVisible) ? signalStore.fixedWidth + 1 : 0),
+      x: dragStore.rightWidth.monitor,
       y:0,
       minWidth: lang.value.indexOf('zh') > -1 ? 360 : 360,
       maxWidth: 438,
@@ -108,7 +110,7 @@ const props2=computed(()=>{
   let data={} as any
   if(placement.value==='center'){
     data={
-      class:'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]',
+      class:'rounded-8px shadow-[0_5px_10px_0_#0000001A]',
       scrollHeight:monitorStore.monitorBoundingRect.height-40, 
       isLarge:monitorStore.monitorBoundingRect.width>720
     }

@@ -1,8 +1,8 @@
 <template>
-  <div class="trade flex w-[40vw] rounded-2 bg-[--d-111-l-F8F8F8]">
+  <div class="trade flex w-[40vw] rounded-2 bg-[--secondary-bg]">
     <div class="trade-pnl min-w-0 flex-1 p-5">
       <div class="flex justify-between mb-5">
-        <span class="trade-pnl-title text-3.5 leading-4.25 text-center text-[var(--d-666-l-959A9F)]">
+        <span class="trade-pnl-title text-3.5 leading-4.25 text-center text-[--main-text]">
           {{ $t('bestToken2') }}（{{ intervalText }}）
         </span>
         <ButtonGroup
@@ -29,7 +29,7 @@
     </div>
     <div class="min-w-0 flex-1 p-5">
       <div class="flex justify-between mb-6">
-        <span class="trade-pnl-title text-3.5 leading-4.25 text-center text-[var(--d-666-l-959A9F)]">
+        <span class="trade-pnl-title text-3.5 leading-4.25 text-center text-[--main-text]">
         {{ $t('profit3') }}（{{ intervalText }}）
         </span>
       </div>
@@ -39,12 +39,12 @@
           :key="key"
           class="trade-pnl-stage-item flex items-center"
         >
-          <span class="flex-shrink-0 text-3 font-500 text-[var(--d-FFF-l-333)]">{{ label }}</span>
+          <span class="flex-shrink-0 text-3 font-500 text-[--main-text]">{{ label }}</span>
           <span
             class="flex-1 text-3 text-right"
             :class="{
-              'text-[var(--color-teal-300)]': !negative,
-              'text-[var(--color-red-500)]': negative,
+              'text-[--up-color]': !negative,
+              'text-[--down-color]': negative,
             }"
           >
             {{ txAnalysis.profit_range?.[key] }} ({{ getProfitRatio(key) }})
@@ -69,7 +69,6 @@
 import { getTxAnalysis } from '@/api/wallet'
 import AveCharts from '@/components/charts/aveCharts.vue'
 import AveEmpty from '@/components/aveEmpty.vue'
-import { size } from 'lodash-es'
 
 const BestTokenEnum = {
   TOTAL_RATIO: 'total_profit_ratio',
@@ -152,13 +151,13 @@ const bestToken = ref<BestTokenType>({
     type: 'bar',
     data: [],
     itemStyle: {
-      color: '#12B886',
+      color: getCssVariable('--up-color'),
     },
     barWidth: 14,
     label: {
       show: true,
       position: 'right',
-      color: '#12B886',
+      color: getCssVariable('--up-color'),
       fontWeight: 'normal',
       size:10,
       offset: [-3, 0],
@@ -193,7 +192,7 @@ const winProfit = ref({
       stack: 'background',
       data: [],
       itemStyle: {
-        color: 'rgba(18, 184, 134, 1)',
+        color: getCssVariable('--up-color'),
       },
       barWidth: 12,
     },
@@ -203,7 +202,7 @@ const winProfit = ref({
       stack: 'background',
       data: [],
       itemStyle: {
-        color: 'rgba(18, 184, 134, 0.6)',
+        color: hexToRgba(getCssVariable('--up-color'), 0.6),
       },
       barWidth: 12,
     },
@@ -213,7 +212,7 @@ const winProfit = ref({
       stack: 'background',
       data: [],
       itemStyle: {
-        color: 'rgba(18, 184, 134, 0.3)',
+        color: hexToRgba(getCssVariable('--up-color'), 0.3),
       },
       barWidth: 12,
     },
@@ -223,7 +222,7 @@ const winProfit = ref({
       stack: 'background',
       data: [],
       itemStyle: {
-        color: 'rgba(246, 70, 93, 0.6)',
+        color: hexToRgba(getCssVariable('--down-color'), 0.6),
       },
       barWidth: 12,
     },
@@ -233,7 +232,7 @@ const winProfit = ref({
       stack: 'background',
       data: [],
       itemStyle: {
-        color: 'rgba(246, 70, 93, 1)',
+        color: getCssVariable('--down-color'),
       },
       barWidth: 12,
     },
@@ -420,7 +419,7 @@ onMounted(() => {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background-color: var(--color-teal-300)
+    background-color: var(--up-color)
 }
 .trade-pnl-stage-item:nth-child(2):before {
   opacity: 0.6;
@@ -430,9 +429,9 @@ onMounted(() => {
 }
 .trade-pnl-stage-item:nth-child(4):before {
   opacity: 0.6;
-  background-color: var(--color-red-500);
+  background-color: var(--down-color);
 }
 .trade-pnl-stage-item:nth-child(5):before {
-  background-color: var(--color-red-500);
+  background-color: var(--down-color);
 }
 </style>

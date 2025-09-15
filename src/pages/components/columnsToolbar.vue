@@ -26,10 +26,10 @@ const modelColumns = ref(cloneDeep(storeColumns.value.filter((item) =>item.child
 // 当对话框打开时，更新本地列配置
 const openDialog = () => {
   dialogVisible.value = true
-  console.log('storeColumns', props.storageKey)
   storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
   initColumns.value = props.getDefaultColumns(t)
   modelColumns.value = cloneDeep(storeColumns.value.filter((item) => item.children || item.isVisible))
+  console.log(storeColumns.value)
   hotSettings.value = {
     avatar_isCircle:globalStore.pumpSetting.avatar_isCircle,
     isBlacklist:globalStore.pumpSetting.isBlacklist
@@ -43,7 +43,10 @@ const handleSelect = (item) => {
   } else {
     const data = initColumns.value.find((arr) => arr.render === item)
     if (data) {
-      modelColumns.value.push(cloneDeep({ ...data, isVisible: true }))
+      const quickIndex = modelColumns.value.findIndex(el=>el.key==='quick')
+      if(quickIndex!==-1){
+        modelColumns.value.splice(quickIndex,0,{ ...data, isVisible: true })
+      }
     }
   }
 }
@@ -84,14 +87,14 @@ function handleSelectChild(childItem, renderKey:string) {
   <div>
     <div @click="openDialog">
       <div
-        class="flex items-center color-[--d-999-l-666] cursor-pointer"
+        class="flex items-center color-[--secondary-text] hover:color-[--main-text] cursor-pointer"
       >
         <Icon name="custom:order" class="text-16px shrink-0" />
         <span class="text-12px ml-2px shrink-0">{{ t('custom') }}</span>
       </div>
     </div>
     <el-dialog v-model="dialogVisible" align-center append-to-body :title="$t('customizeScreener')" width="820">
-      <div class="flex flex-col gap-20px pt-20px pb-20px">
+      <div class="flex flex-col gap-20px pt-20px pb-20px border-t border-t-solid border-t-[--border]">
         <div class="cursor-pointer flex items-center" @click="hotSettings.avatar_isCircle = ({circle:'rect',rect:'circle'})[hotSettings.avatar_isCircle]">
           <template v-if="hotSettings.avatar_isCircle === 'circle'">
             <Icon name="custom:progress-circle" class="text-12px mr-8px" />
@@ -129,7 +132,7 @@ function handleSelectChild(childItem, renderKey:string) {
                 :class="item.fixed ? 'columns-bg-disabled' : ''"
               >
               {{ initColumns.find((arr) => arr.render === item.render)?.title  }}
-                <Icon name="custom:handle" class="ml-2 color-[--d-666-l-999]" />
+                <Icon name="custom:handle" class="ml-2 color-[--third-text]" />
               </div>
             </template>
           </VueDraggable>
@@ -166,7 +169,6 @@ function handleSelectChild(childItem, renderKey:string) {
         </div>
         <div class="flex items-center gap-20px mt-40px">
           <el-button
-            :color="themeStore.isDark ? '#333' : '#F2F2F2'"
             class="flex-1"
             size="large"
             @click="handleReset"
@@ -183,7 +185,7 @@ function handleSelectChild(childItem, renderKey:string) {
 </template>
 
 <style>
-:root {
+/* :root {
   --columns-toolbar-button-bg: #222;
   --columns-toolbar-button-color: #fff;
   --columns-toolbar-text-color: #000;
@@ -192,8 +194,8 @@ function handleSelectChild(childItem, renderKey:string) {
   --columns-options-list-item-bg: #f2f2f2;
   --columns-options-list-item-bg-select: rgba(40, 109, 255, 0.1);
   --columns-options-list-item-color: #333;
-  --columns-options-list-item-color-select: #286dff;
-  --columns-toolbar-vector-title-color: #286dff;
+  --columns-options-list-item-color-select: var(--primary-color);
+  --columns-toolbar-vector-title-color: var(--primary-color);
   --columns-draggable-columns-bg: #333;
 }
 
@@ -209,40 +211,40 @@ function handleSelectChild(childItem, renderKey:string) {
   --columns-options-list-item-color-select: #fff;
   --columns-toolbar-vector-title-color: #fff;
   --columns-draggable-columns-bg: #999;
-}
+} */
 </style>
 
 <style lang="scss" scoped>
-.toolbar-vector-title {
-  margin-left: 0.25rem;
-  font-size: 0.75rem;
-  color: var(--columns-toolbar-vector-title-color);
-  cursor: pointer;
-}
+// .toolbar-vector-title {
+//   margin-left: 0.25rem;
+//   font-size: 0.75rem;
+//   color: var(--columns-toolbar-vector-title-color);
+//   cursor: pointer;
+// }
 
-.toolbar-vector {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  color: var(--custom-text-5-color);
-}
+// .toolbar-vector {
+//   width: 16px;
+//   height: 16px;
+//   cursor: pointer;
+//   color: var(--custom-text-5-color);
+// }
 
-.content-bg {
-  // padding: 1.25rem;
-  // background: var(--columns-toolbar-button-color);
-  // background: var(--a-popup-bg-color);
-}
+// .content-bg {
+//   // padding: 1.25rem;
+//   // background: var(--columns-toolbar-button-color);
+//   // background: var(--a-popup-bg-color);
+// }
 
-.toolbar-vector-container {
-  cursor: pointer;
-  min-width: 63px;
-}
+// .toolbar-vector-container {
+//   cursor: pointer;
+//   min-width: 63px;
+// }
 
 .draggable-box-bg {
   padding: 1.25rem;
   min-height: 8.25rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--columns-draggable-box-bg);
+  border: 1px solid var(--border);
 
   .draggable-list-bg {
     display: flex;
@@ -256,9 +258,9 @@ function handleSelectChild(childItem, renderKey:string) {
       height: 1.5rem;
       line-height: 1.5rem;
       border-radius: 1.875rem;
-      background: var(--columns-toolbar-button-color);
-      color: var(--columns-toolbar-text-color);
-      border: 1px solid var(--columns-draggable-columns-bg);
+      // background: var(--columns-toolbar-button-color);
+      color: var(--secondary-text);
+      border: 1px solid var(--secondary-text);
       cursor: move;
       display: flex;
       align-items: center;
@@ -268,7 +270,7 @@ function handleSelectChild(childItem, renderKey:string) {
 
 .option-bg {
   margin-top: 1.25rem;
-  color: var(--columns-toolbar-text-color);
+  color: var(--main-text);
 
   .options-list-bg {
     margin-top: 1.25rem;
@@ -283,8 +285,8 @@ function handleSelectChild(childItem, renderKey:string) {
       height: 1.5rem;
       border-radius: 1.875rem;
       // background: var(--columns-options-list-item-bg);
-      color: #999999;
-      border: 1px solid #999999;
+      color: var(--third-text);
+      border: 1px solid var(--third-text);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -292,9 +294,9 @@ function handleSelectChild(childItem, renderKey:string) {
     }
 
     .options-list-item-select {
-      color: #286dff;
+      color: var(--primary-color);
       // background: var(--columns-options-list-item-bg-select);
-      border: 1px solid #286dff;
+      border: 1px solid var(--primary-color);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -302,38 +304,38 @@ function handleSelectChild(childItem, renderKey:string) {
   }
 }
 
-.button-container {
-  display: flex;
-  flex-direction: row-reverse;
-  margin-top: 30px;
-}
+// .button-container {
+//   display: flex;
+//   flex-direction: row-reverse;
+//   margin-top: 30px;
+// }
 
-.reset-button {
-  display: flex;
-  width: 13.3125rem;
-  height: 2.5rem;
-  padding: 0.5rem 2.5rem;
-  justify-content: center;
-  align-items: center;
-  border-radius: 0.375rem;
-  background: var(--custom-bg-9-color);
-  color: var(--custom-font-1-color);
-  cursor: pointer;
-  margin-right: 20px;
-}
+// .reset-button {
+//   display: flex;
+//   width: 13.3125rem;
+//   height: 2.5rem;
+//   padding: 0.5rem 2.5rem;
+//   justify-content: center;
+//   align-items: center;
+//   border-radius: 0.375rem;
+//   background: var(--border);
+//   color: var(--main-text);
+//   cursor: pointer;
+//   margin-right: 20px;
+// }
 
-.confirm-button {
-  display: flex;
-  width: 13.3125rem;
-  height: 2.5rem;
-  padding: 0.5rem 2.5rem;
-  justify-content: center;
-  align-items: center;
-  border-radius: 0.375rem;
-  background: var(--columns-toolbar-button-bg);
-  color: var(--columns-toolbar-button-color);
-  cursor: pointer;
-}
+// .confirm-button {
+//   display: flex;
+//   width: 13.3125rem;
+//   height: 2.5rem;
+//   padding: 0.5rem 2.5rem;
+//   justify-content: center;
+//   align-items: center;
+//   border-radius: 0.375rem;
+//   background: var(--primary-color);
+//   color: var(--white);
+//   cursor: pointer;
+// }
 
 .columns-bg {
   padding: 15px;
@@ -361,11 +363,11 @@ function handleSelectChild(childItem, renderKey:string) {
 .handle {
   cursor: move;
   margin-left: 8px;
-  color: #999;
+  // color: #999;
 }
 
 .ghost {
   opacity: 0.5;
-  background: #e6e6e6;
+  // background: #e6e6e6;
 }
 </style>

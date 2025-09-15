@@ -12,6 +12,7 @@
 const signalStore = useSignalStore()
 const monitorStore = useMonitorStore()
 const dragPumpStore = usePumpStore()
+const dragStore = useDragStore()
 const { placement } = storeToRefs(dragPumpStore)
 const key = ref(0)
 
@@ -71,7 +72,7 @@ const props1 = computed(() => {
     },
     left: {
       className: '[&&]:relative shrink-0 left fixed! top-61px',
-      style: `left:${getLeftVal('left')}px`,
+      style: `left:${dragStore.leftWidth.pump}px`,
       axis: 'x',
       x: 0,
       minWidth: dragConstant.value.minWidth,
@@ -85,7 +86,7 @@ const props1 = computed(() => {
     right: {
       className: '[&&]:relative shrink-0 right fixed! top-61px left-0',
       axis: 'x',
-      x: dragPumpStore.winWidth - dragPumpStore.fixedWidth - getLeftVal('right'),
+      x: dragStore.rightWidth.pump,
       y: 0,
       minWidth: dragConstant.value.minWidth,
       maxWidth: dragConstant.value.maxWidth,

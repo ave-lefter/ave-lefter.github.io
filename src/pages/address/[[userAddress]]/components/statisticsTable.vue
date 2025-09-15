@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="flex justify-between border-b-1px border-b-solid border-b-[--d-222-l-F2F2F2] mb-10px mt-20px">
+    <div class="flex justify-between border-b-1px border-b-solid border-b-[--main-divider] mb-10px mt-20px">
       <div class="flex items-center gap-24px">
         <a
           v-for="(item, index) in tabs"
           :key="index"
-          :class="`text-16px pb-10px cursor-pointer flex items-center decoration-none lh-20px text-center color-[--d-666-l-999] b-b-solid b-b-3px ${activeTab === item.id ? 'color-[--d-F5F5F5-l-222] b-b-[--d-F5F5F5-l-333]' : 'b-b-transparent'}`"
+          :class="`text-16px pb-10px cursor-pointer flex items-center decoration-none lh-20px text-center  b-b-solid b-b-3px ${activeTab === item.id ? 'color-[--main-text] b-b-[--main-text]' : 'color-[--third-text] b-b-transparent'}`"
           @click.stop.prevent="switchTab(item)"
         >
           {{ item.title }}
@@ -42,7 +42,7 @@
           v-model="trendQuery.hideNative"
           :false-value="0"
           :true-value="1"
-          class="color-[#666666]"
+          class="color-[--third-text]"
         >
           {{ $t('hideNative') }}
         </el-checkbox>
@@ -54,7 +54,7 @@
         :infinite-scroll-delay="200"
         :infinite-scroll-disabled="tableData.loading || tableData.finished || tableData.error"
         :infinite-scroll-immediate="false"
-        class="relative min-h-500px"
+        class="relative min-h-500px bg-[--secondary-bg]"
         infinite-scroll-distance="300"
       >
         <RecentPnl
@@ -93,8 +93,7 @@
           :tableData="filterTableList"
         />
         <div
-          :style="{ color: mode === 'light' ? '#666' : '#999' }"
-          class="mt-[2px] mb-[5px] py-[10px] text-[12px] text-center"
+          class="mt-[2px] mb-[5px] py-[10px] text-[12px] text-center color-[--third-text]"
         >
           <span v-if="tableData.loading && tableData.pageNO > 1">{{ $t('loading') }}</span>
         </div>

@@ -4,7 +4,7 @@
     <Icon
       id="custom-filter"
       name="custom:filter"
-      class="text-12px cursor-pointer"
+      class="text-12px cursor-pointer color-[--secondary-text]"
     />
     <template #dropdown>
       <checkbox-group v-model="modelValue" :options="props.options"/>
@@ -38,10 +38,10 @@ const emit = defineEmits<{
   padding: 2px 12px !important;
   .el-checkbox{
     margin-right: 0px;
-    color:var(--d-666-l-999)
+    color:var(--third-text);
   }
   .el-checkbox__input.is-checked + .el-checkbox__label{
-    color:var(--d-F5F5F5-l-333)
+    color:var(--main-text);
   }
 }
 </style>

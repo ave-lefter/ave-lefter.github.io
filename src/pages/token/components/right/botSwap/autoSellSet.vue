@@ -8,7 +8,7 @@
         props: {
           'popper-class': 'max-w-500px'
         }
-      }" name="material-symbols:help-rounded" class="text-14px color-[--d-333-l-DDD] cursor-pointer ml-3px" />
+      }" name="material-symbols:help-rounded" class="text-14px color-[--icon-color] cursor-pointer ml-3px" />
     </div>
     <ul v-show="isAutoSellConfig">
       <li v-for="(item, index) in autoSellConfig" :key="index" class="mt-8px flex items-center gap-4px">
@@ -17,22 +17,22 @@
             <div class="flex items-center">
               <Icon v-if="item.isUp" name="ri:arrow-up-long-fill" class="color-#12B886" />
               <Icon v-else name="ri:arrow-down-long-fill" class="color-#F6465D" />
-              <span class="text-12px color-[--d-666-l-999]">{{ item.isUp ? $t('rise') : $t('fall') }}</span>
+              <span class="text-12px color-[--third-text]">{{ item.isUp ? $t('rise') : $t('fall') }}</span>
             </div>
           </template>
           <template #suffix>
-            <span class="color-[--d-666-l-999]">%</span>
+            <span class="color-[--third-text]">%</span>
           </template>
         </el-input-number>
         <el-input-number v-model="item.sellRatio" class="input-number-limit" :min="1" :max="100" :controls="false" placeholder="--" @update:model-value="triggerAutoSellConfig">
           <template #prefix>
-            <span class="text-12px color-[--d-666-l-999]">{{ $t('sell') }}</span>
+            <span class="text-12px color-[--third-text]">{{ $t('sell') }}</span>
           </template>
           <template #suffix>
-            <span class="color-[--d-666-l-999]">%</span>
+            <span class="color-[--third-text]">%</span>
           </template>
         </el-input-number>
-        <Icon class="text-16px ml-5px clickable color-[--d-666-l-999]" name="bx:bxs-trash-alt" @click.stop="deleteAutoSellConfig(index)" />
+        <Icon class="text-16px ml-5px clickable color-[--third-text]" name="bx:bxs-trash-alt" @click.stop="deleteAutoSellConfig(index)" />
       </li>
       <li class="flex gap-8px items-center text-12px mt-8px">
         <button class="flex-1 h-24px flex items-center justify-center clickable bg-#12B8861A color-#12B886 border-none rd-4px disabled:op-50 disabled:cursor-not-allowed" :disabled="autoSellConfig?.length >= 5" @click.stop="addStopProfit">{{ $t('addTakeProfit') }}</button>

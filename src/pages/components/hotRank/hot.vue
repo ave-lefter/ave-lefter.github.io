@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
 import { getHotDefaultColumns } from './columnRender/hotColumusService'
-import { getTreasureList } from '~/api/market'
+import { getTreasureList, type IGetTreasureConfig } from '~/api/market'
 import {
   quickContent,
   dexContent,
@@ -31,45 +31,56 @@ import {
   SnipersHeader,
   PriceContent,
   PriceChange,
+  TokenPage,
+  DexHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
-import type { RowEventHandlerParams } from 'element-plus'
+import dayjs from 'dayjs'
+import type { RowClassNameGetter, RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
 const localeStore = useLocaleStore()
 const globalStore = useGlobalStore()
+const rankKlineStore = useRankKlineStore()
 
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
   activeChain: string
   activeSubTab?: string
   activeTab?: string
+  ammList: IGetTreasureConfig['swaps']
 }>()
-const sortConditions = ref({
-  sort: '',
-  sort_dir: '',
-})
+const aveTableRef = useTemplateRef('aveTableRef')
+const {rankConditions} = storeToRefs(globalStore)
 function setSortConditions(params: { sort: string; sort_dir: string }) {
-  sortConditions.value = params
+  rankConditions.value.hot.sort = params
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
-const defaultFilter = {}
-const filterForm = ref(defaultFilter)
+
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(filterForm.value, keyVal[0], keyVal[1])
+    set(rankConditions.value.hot.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
 const listData = ref<any[]>([])
 const filteredListData = computed(() => {
+  let result = [...listData.value]
   if (globalStore.pumpSetting.isBlacklist) {
-    return listData.value.filter((el) => !inBlackList(el))
+    result = result.filter((el) => !inBlackList(el))
   }
-  return listData.value
+  if(rankKlineStore.klineRow.id){
+    const index = result.findIndex(el => el.id === rankKlineStore.klineRow.id)
+    if(index !== -1){
+      result.splice(index+1,0,{
+        isKline:true
+      })
+    }
+  }
+  return result
 })
 function inBlackList(row) {
   const symbol = row.token0_address === row.target_token ? row.token0_symbol : row.token1_symbol
@@ -90,33 +101,57 @@ const loading = shallowRef(false)
 const columns = useStorage('hotUserTableColumns', getHotDefaultColumns(t))
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
+  const {klineRow:{id}} = rankKlineStore
+  if(rowData.isKline){
+    return
+  } else if(id && rowData.id !== id){
+    toggleKline(rankKlineStore.klineRow)
+    return
+  }
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
 }
 
-const mounted = shallowRef(false)
-onMounted(() => {
-  setTimeout(()=>{
-    mounted.value = true
-  },20)
-  _getTreasureList()
+// const mounted = shallowRef(false)
+// onMounted(() => {
+//   setTimeout(()=>{
+//     mounted.value = true
+//   },20)
+//   _getTreasureList()
+// })
+
+onUnmounted(() => {
+  clearTimeout(timer)
 })
 
 // 监听组件激活状态
 onActivated(() => {
   console.log('热搜榜激活')
   isActive.value = true
+  resetColumns(false)
   // 延迟重新获取数据，避免快速切换时的冲突
   setTimeout(() => {
     if (isActive.value) {
       _getTreasureList()
     }
   }, 100)
+  window.addEventListener('beforeunload',resetKline)
+  if(aveTableRef.value){
+    aveTableRef.value.scrollToLeft(0)
+  }
 })
+
+function resetKline() {
+  if(rankKlineStore.klineRow.id){
+    toggleKline(rankKlineStore.klineRow)
+  }
+  window.removeEventListener('beforeunload',resetKline)
+}
 
 onDeactivated(() => {
   console.log('热搜榜停用')
   isActive.value = false
   clearTimeout(timer)
+  resetKline()
   // 停用时取消WebSocket订阅，使用唯一ID
   wsStore.send({
     jsonrpc: '2.0',
@@ -125,19 +160,16 @@ onDeactivated(() => {
     id: 1,
   })
 })
-onActivated(() => {
-  if(!mounted.value){
-    return
-  }
-  clearTimeout(timer)
-  _getTreasureList(false)
-})
-onDeactivated(() => {
-  clearTimeout(timer)
-})
-onUnmounted(() => {
-  clearTimeout(timer)
-})
+// onActivated(() => {
+//   if(!mounted.value){
+//     return
+//   }
+//   clearTimeout(timer)
+//   _getTreasureList(false)
+// })
+// onDeactivated(() => {
+//   clearTimeout(timer)
+// })
 
 watch(
   () => [props.activeChain, localeStore.locale],
@@ -146,6 +178,14 @@ watch(
     _getTreasureList()
   }
 )
+
+watch(()=>pageInfo.value.pageNO,()=>{
+  if(aveTableRef.value){
+    setTimeout(()=>{
+      aveTableRef.value.scrollToTop(0)
+    },20)
+  }
+})
 
 let timer: number
 async function _getTreasureList(shouldLoading = true) {
@@ -156,14 +196,23 @@ async function _getTreasureList(shouldLoading = true) {
     }
     if (shouldLoading) {
       loading.value = true
+      if(rankKlineStore.klineRow.id){
+        toggleKline(rankKlineStore.klineRow)
+      }
     }
     const { total: _, ...rest } = pageInfo.value
+    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
+      if(prev[cur]){
+        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+      }
+      return prev
+    },{...rankConditions.value.hot.filter})
     const res = await getTreasureList({
       category: 'hot',
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
-      ...sortConditions.value,
-      ...filterForm.value,
+      ...rankConditions.value.hot.sort,
+      ...finalFilter,
       self_address: walletAddress.value,
     })
     pageInfo.value.total = res.total
@@ -187,6 +236,10 @@ watch(
   ({ prices }) => {
     // 只有在组件激活时才处理数据
     if (!isActive.value) return
+    // k 线出现的时候不处理数据
+    if(rankKlineStore.klineRow.id){
+      return
+    }
 
     const pricesMap = Array.isArray(prices)
       ? prices.reduce((pre, cur) => {
@@ -210,7 +263,7 @@ watch(
       }
       return el
     })
-    const { sort, sort_dir } = sortConditions.value
+    const { sort, sort_dir } = rankConditions.value.hot.sort
     const sortVal = { asc: '1', desc: '-1' }[sort_dir]
     if (sortVal) {
       listData.value = updateList.toSorted((a, b) => (a[sort] - b[sort]) * sortVal)
@@ -243,50 +296,6 @@ const botStore = useBotStore()
 const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
-async function collect(index: number, row) {
-  if (walletAddress.value) {
-    if (walletStore.address) {
-      await walletStore.signMessageForFavorite()
-    }
-    if (row.is_fav) {
-      removeTokenFavorite(row, index)
-    } else {
-      addTokenFavorite(row, index)
-    }
-  } else {
-    verifyLogin()
-  }
-}
-
-function removeTokenFavorite(row, index: number) {
-  loading.value = true
-  removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
-    .then(() => {
-      ElMessage.success(t('cancelled1'))
-      row.is_fav = false
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-function addTokenFavorite(row, index: number) {
-  loading.value = true
-  addFavorite(`${row.token}-${row.chain}`, walletAddress.value, 0)
-    .then(() => {
-      ElMessage.success(t('collected'))
-      row.is_fav = true
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
 
 function sizeChange() {
   pageInfo.value.pageNO = 1
@@ -323,7 +332,7 @@ const headerRenderer = computed(() => {
     markers_dynamic: DynamicMarkersHeader,
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
-    dex: () => 'DEX',
+    dex: DexHeader,
     security: () => t('security'),
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
@@ -359,18 +368,74 @@ const cellRenderer = computed(() => {
     sniper_tx_count: snipersContent,
   }
 })
+const Row = ({ cells, rowData }) => {
+  if(rowData.isKline){
+    return <TokenPage/>
+  }
+  return cells
+}
+
+function getRowClass({rowData}:Parameters<RowClassNameGetter<any>>[0]) {
+    const commonClass = `cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)] ${rowData.isKline ? 'h-360px [--el-table-row-hover-bg-color:transparent] overflow-visible!' : 'h-81px'}`
+    if(rankKlineStore.klineRow.id && rowData.id !== rankKlineStore.klineRow.id && !rowData.isKline){
+        return 'row-disabled '+commonClass
+    } else {
+        return commonClass
+    }
+}
+
+function toggleKline(row:Record<string,any>) {
+    if(rankKlineStore.klineRow.id === row.id){
+      const rowIndex = filteredListData.value.findIndex(el => el.isKline)
+      rankKlineStore.klineRow = {}
+        resetColumns(false)
+        _getTreasureList(false)
+        setTimeout(()=>{
+          if(rowIndex !== -1 && aveTableRef.value){
+            aveTableRef.value.scrollToTop((rowIndex-1)*81)
+          }
+        })
+    } else {
+      rankKlineStore.klineRow = row
+        resetColumns(true)
+        rankKlineStore.getData(row)
+        clearTimeout(timer)
+        setTimeout(()=>{
+          if(aveTableRef.value){
+            const rowIndex = filteredListData.value.findIndex(el => el.isKline)
+            if(rowIndex!==-1){
+              aveTableRef.value.scrollToTop((rowIndex-1)*81)
+            }
+          }
+        },100)
+    }
+}
+
+function resetColumns(needClear:boolean) {
+  const quickIndex= columns.value.findIndex(el => el.key === 'quick')
+  if(needClear){
+    columns.value[0].fixed=''
+    columns.value[quickIndex].fixed=''
+  } else {
+    columns.value[0].fixed='left'
+    columns.value[quickIndex].fixed='right'
+    localStorage.setItem('hotUserTableColumns',JSON.stringify(columns.value))
+  }
+}
 </script>
 <template>
   <div v-loading="loading" style="height: calc(100vh - 185px)">
     <AveTable
+      ref="aveTableRef"
+      rowKey="rowKey"
       :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
-      :row-height="81"
+      :estimated-row-height="rankKlineStore.klineRow.id ? 400 : 81"
       fixed
-      style="--el-bg-color: var(--d-111-l-FFF)"
-      row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
+      style="--el-bg-color: var(--secondary-bg)"
+      :row-class="getRowClass"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"
@@ -379,10 +444,11 @@ const cellRenderer = computed(() => {
         <component
           :is="headerRenderer[item.key as keyof typeof headerRenderer]"
           v-model:isVolUSDT="isVolUSDT"
-          :sortConditions="sortConditions"
+          :sortConditions="rankConditions.hot.sort"
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
+          :ammList="item.key === 'dex' ? ammList : null"
         />
       </template>
       <template
@@ -394,6 +460,8 @@ const cellRenderer = computed(() => {
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"
           :isVolUSDT="isVolUSDT"
+          :enableKline="activeTab === 'hot'"
+          :activeKline="rankKlineStore.klineRow.id === row.id"
           :row="row"
           :rowIndex="rowIndex"
           :pageNO="pageInfo.pageNO"
@@ -401,8 +469,11 @@ const cellRenderer = computed(() => {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
           :activeChain="activeChain"
           :childrenData="item.children || []"
-          @collect="collect"
+          @toggleKline="toggleKline"
         />
+      </template>
+      <template #row="{style,...rowProps}">
+        <Row v-bind="rowProps" />
       </template>
     </AveTable>
   </div>
@@ -410,7 +481,7 @@ const cellRenderer = computed(() => {
     v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
-    class="mt-5px py-9px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
+    class="mt-5px py-9px flex justify-center [&&]:[--el-pagination-button-height:18px]"
     layout="total, prev, pager, next"
     :total="pageInfo.total || 0"
     :small="false"
@@ -423,6 +494,14 @@ const cellRenderer = computed(() => {
 <style scoped lang="scss">
 :deep(.el-table-v2__header-cell),
 :deep(.el-table-v2__row-cell) {
-  padding: 0 16px;
+  @apply px-16px;
+}
+:deep{
+  .row-disabled{
+    --el-table-border:1px solid #1A1A1A;
+    &:before{
+      --uno:content-[''] absolute top-0 left-0 w-full bottom-0 bg-black/80 z-1;
+    }
+  }
 }
 </style>

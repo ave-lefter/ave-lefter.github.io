@@ -6,7 +6,7 @@
     trigger="click"
   >
     <template #reference>
-      <button class="text-12px bg-[--d-141721-l-E8F1FF] rounded-4px p-8px ml-8px h-32px flex items-center clickable color-[--d-F5F5F5-l-333] border-none">
+      <button class="text-12px bg-[--d-141721-l-E8F1FF] rounded-4px p-8px ml-8px h-32px flex items-center clickable color-[--main-text] border-none">
         <img height="24" class="mr-5px rd-50%" :src="`${configStore.token_logo_url}chain/${walletStore.chain}.png`" :alt="walletStore.chain" onerror="this.src='/icon-default.png'">
         <span>{{ currentAccountSplit }}</span>
       </button>
@@ -33,38 +33,38 @@
     </div> -->
     <ul class="tg-wallet-list_footer flex flex-col gap-10px">
       <li class="flex justify-between h-40px px-8px clickable" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}`);showExWallet=false">
-        <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px" >
+        <div class="color-[--main-text] flex items-center gap-8px" >
           <Icon name="custom:wallet2" class="text-16px" />
           <span class="text-14px">{{ $t('myWallet1') }}</span>
         </div>
-        <div class="color-#999 flex items-center gap-4px">
+        <div class="color-[--secondary-text] flex items-center gap-4px">
           <span class="text-12px">
             {{ currentAccountSplit || '' }}
           </span>
           <Icon
             v-copy="walletStore.address"
             name="bxs:copy"
-            class="text-12px clickable color-#999"
+            class="text-12px clickable color-[--secondary-text]"
             @click.stop.prevent
           />
           <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
         </div>
       </li>
       <li v-if="walletStore.chain === 'solana'" class="flex justify-between h-40px px-8px clickable" @click.stop="$router.push('/solana-rent-recovery');showExWallet=false">
-        <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+        <div class="color-[--main-text] flex items-center gap-8px">
           <Icon name="custom:sack-dollar" class="text-16px" />
           <span class="text-14px">{{ $t('rentRecovery') }}</span>
         </div>
-        <div class="color-#999 flex items-center gap-4px">
+        <div class="color-[--secondary-text] flex items-center gap-4px">
           <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
         </div>
       </li>
       <li class="flex justify-between h-40px px-8px clickable" @click.stop="walletStore.disconnect()">
-        <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+        <div class="color-[--main-text] flex items-center gap-8px">
           <Icon name="custom:log-out" class="text-16px" />
           <span class="text-14px">{{ $t('disconnect') }}</span>
         </div>
-        <div class="color-#999 flex items-center gap-4px">
+        <div class="color-[--secondary-text] flex items-center gap-4px">
           <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
         </div>
       </li>

@@ -8,6 +8,7 @@ const props = defineProps<{
   setFilterForm(...args: [string, string][]): void
 }>()
 
+const globalStore = useGlobalStore()
 const lowerCaseInterval = computed(() => props.activeInterval)
 const volPrefix = computed(() => `volume_u_${lowerCaseInterval.value}`)
 const txsPrefix = computed(() => `tx_${lowerCaseInterval.value}_count`)
@@ -49,8 +50,8 @@ const txsOptions = shallowRef([
   { text: '> 500', value: '500' },
   { text: '> 1000', value: '1000' },
 ])
-const isFilterHighlight = shallowRef(false)
-const isTxsHighlight = shallowRef(false)
+const isFilterHighlight = shallowRef(!!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.[volPrefix.value + '_min'] || !!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.[volPrefix.value + '_max'])
+const isTxsHighlight = shallowRef(!!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.[txsPrefix.value + '_min'] || !!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.[txsPrefix.value + '_max'])
 const { t } = useI18n()
 
 function volConfirm(params?: [string, string]) {
@@ -99,7 +100,7 @@ function confirm(
       @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')"
     >
       <span
-        class="lh-16px rounded-2px px-2px text-12px bg-[--d-333-l-FFF] color-[--d-CCC-l-333]"
+        class="lh-16px rounded-2px px-2px text-12px bg-[--border] color-[--secondary-text]"
         >{{ activeInterval }}</span
       >
       Vol
@@ -107,6 +108,7 @@ function confirm(
     <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
     <RangePopover
       v-model="volVisible"
+      :sort-key="volPrefix"
       :width="225"
       :title="$t('nVolume', { n: activeInterval }) + '($)'"
       :list="volOptions"
@@ -121,6 +123,7 @@ function confirm(
     <HeadSort :defaultSort="txsDefaultSort" @sort-change="txsSortChange" />
     <RangePopover
       v-model="txsVisible"
+      :sort-key="txsPrefix"
       :width="225"
       :title="$t('nTxAddress', { n: activeInterval })"
       :list="txsOptions"

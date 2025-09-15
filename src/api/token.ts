@@ -226,6 +226,47 @@ export function getKlineProfilingTags(data: {
   })
 }
 
+export interface IGetKlineProfilingTagsV2Item {
+  holders: Holder[];
+  time:    number;
+}
+
+export interface Holder {
+  buy?:            HolderBuy;
+  remark:         string;
+  sell?:           HolderBuy;
+  wallet_address: string;
+  wallet_logo:    WalletLogo;
+}
+
+export interface HolderBuy {
+  amount:  string;
+  tx_time: number;
+  txns:    string;
+  volume:  string;
+}
+// 获取 kline 画像
+export function getKlineProfilingTagsV2(data:{
+  interval: string
+  from: number
+  to: number
+  type: string
+  pair_id: string
+}):Promise<IGetKlineProfilingTagsV2Item[]>{
+  if (!data?.pair_id) {
+    return Promise.resolve([])
+  }
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token_info/v1/kline/profiling_tags', {
+    method: 'get',
+    query: {
+      ...data,
+    }
+  }).catch(() => {
+    return Promise.resolve([])
+  })
+}
+
 export interface GetHotTokensResponse {
   token: string;
   chain: string;
@@ -671,7 +712,7 @@ export interface GetTokenStatisticsResponse {
   main_token_balance_amount: string;
 }
 
-interface WalletLogo {
+export interface WalletLogo {
   name: string;
   url: string;
   logo: string;
@@ -823,7 +864,7 @@ export const bot_getUserWalletTxInfo = createCacheRequest(async function(query: 
   })
 }, 2000)
 
-export async function bot_getUserTxHistory1(query: {
+export const bot_getUserTxHistory1 = createCacheRequest(async function (query: {
   page: number;
   pageSize: number;
   chain: string;
@@ -844,7 +885,7 @@ export async function bot_getUserTxHistory1(query: {
     method: 'get',
     query,
   })
-}
+}, 500)
 
 // 链钱包交易历史接口类型定义
 export interface WalletOrderItem {
@@ -894,12 +935,10 @@ export interface WalletOrderItem {
 }
 
 export interface WalletOrdersResponse {
-  data: {
-    total: number
-    pageSize: number
-    pageNo: number
-    list: WalletOrderItem[]
-  }
+  total: number
+  pageSize: number
+  pageNo: number
+  list: WalletOrderItem[]
 }
 
 // 链钱包交易历史查询接口

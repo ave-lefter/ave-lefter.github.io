@@ -5,7 +5,7 @@
     href=""
     @click.stop.prevent="show_bubble = !show_bubble"
   >
-    <Icon name="custom:bubble" class="color-[--d-696E7C-l-fff] icon-bubble" />
+    <Icon name="custom:bubble" class="color-[--third-text] icon-bubble" />
   </a>
   <el-dialog
     v-model="show_bubble"
@@ -67,7 +67,7 @@ function openDialog() { }
   font-size: 12px;
   padding: 6px 8px;
   border-radius: 4px;
-  background: var(--d-2D3037-l-999);
+  background: var(--border);
   transition: all .2s;
 }
 </style>

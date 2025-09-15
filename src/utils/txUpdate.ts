@@ -23,9 +23,11 @@ export function _updatePriceFromSimpleTx(tx: SimpleWSTx) {
       if (isToken0) {
         pair.reserve0 = Number(tx.reserve0)
         pair.token0_price_usd = Number(tx.price_u)
-      } else if (isToken1) {
         pair.reserve1 = Number(tx.reserve1)
+      } else if (isToken1) {
+        pair.reserve1 = Number(tx.reserve0)
         pair.token1_price_usd = Number(tx.price_u)
+        pair.reserve0 = Number(tx.reserve1)
       }
       const volume = new BigNumber(tx.target_amt).times(price) || 0
       pair.volume_u = new BigNumber(pair.volume_u).plus(volume).toNumber()
@@ -65,6 +67,27 @@ export function _updatePriceFromSimpleTx(tx: SimpleWSTx) {
   } else if (tx.direction === 'buy' && new BigNumber(tx.maker_bal).eq(tx.target_amt)) {
     // 新钱包
     tokenStore.token.holders = tokenStore.token.holders + 1
+  }
+
+ // 更新 amount_24
+  tokenStore.tokenInfoExtra = {
+    ...(tokenStore.tokenInfoExtra || {
+        highestPrice_24: 0,
+        lowestPrice_24: 0,
+        amount_24: 0,
+        volume_24: 0,
+        exchangeTime_24: 0,
+        pair_holders: 0,
+        pair_lock_percent: 0,
+        buy_tax: 0,
+        sell_tax: 0,
+        can_mintable: false,
+        confirmed_minted: 0,
+        max: 0,
+        limit: 0,
+        insiders_balance_ratio_cur: 0
+    }),
+    amount_24: new BigNumber(tokenStore.tokenInfoExtra?.amount_24 || 0).plus(tx.target_amt).toNumber(),
   }
 
 //   if (tx.profile) {

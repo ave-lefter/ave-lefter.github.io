@@ -219,7 +219,7 @@ function goLink() {
       flex-wrap: wrap;
       flex: 1;
       font-size: 14px;
-      color: var(--d-F5F5F5-l-333);
+      color: var(--main-text);
       letter-spacing: 0;
       font-weight: 400;
       display: flex;

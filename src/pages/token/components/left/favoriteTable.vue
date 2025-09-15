@@ -17,9 +17,12 @@ const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 topEventBus.on(refresh)
 const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
 favDialogEvent.on(refresh)
+const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
+topAddGroupEvent.on(_getUserFavoriteGroups)
 onUnmounted(() => {
   topEventBus.off(refresh)
   favDialogEvent.off(refresh)
+  topAddGroupEvent.off(refresh)
 })
 
 function refresh() {
@@ -238,7 +241,7 @@ function resetListStatus() {
   <div v-loading="listStatus.pageNo === 1 && listStatus.loading">
     <div class="flex items-center justify-between pr-15px pl-12px mt-10px">
       <div class="flex items-center min-w-0">
-        <span v-show="arrowVisible" class="w-20px h-20px rounded-2px color-[--d-666-l-999] hover:color-[--d-FFF-l-333] bg-[--d-111-l-FFF] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,-200)">
+        <span v-show="arrowVisible" class="w-20px h-20px rounded-2px color-[--third-text] hover:color-[--secondary-text] bg-[--secondary-bg] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,-200)">
         <Icon name="material-symbols:arrow-back-ios-new-rounded" />
       </span>
       <div
@@ -246,7 +249,7 @@ function resetListStatus() {
         class="flex items-center gap-10px whitespace-nowrap overflow-x-auto overflow-y-hidden scrollbar-hide"
       >
         <span
-          :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-999-l-666] px-4px py-2px rounded-4px cursor-pointer ${activeTab === 0 ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333]' : ''}`"
+          :class="`decoration-none shrink-0 text-12px lh-16px text-center px-4px py-2px rounded-4px cursor-pointer ${activeTab === 0 ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
           @click="setActiveTab(0, 0)"
         >
           {{ $t('defaultGroup') }}
@@ -254,19 +257,19 @@ function resetListStatus() {
         <span
           v-for="(item, index) in userFavoriteGroups.slice(1)"
           :key="index"
-          :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-999-l-666] px-4px py-2px rounded-4px cursor-pointer ${activeTab === item.group_id ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333]' : ''}`"
+          :class="`decoration-none shrink-0 text-12px lh-16px text-center px-4px py-2px rounded-4px cursor-pointer ${activeTab === item.group_id ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
           @click="setActiveTab(item.group_id, index + 1)"
         >
           {{ item.name }}
         </span>
       </div>
-      <span v-show="arrowVisible" class="mr-4px w-20px h-20px rounded-2px color-[--d-666-l-999] hover:color-[--d-FFF-l-333] bg-[--d-111-l-FFF] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,200)">
+      <span v-show="arrowVisible" class="mr-4px w-20px h-20px rounded-2px color-[--third-text] hover:color-[--secondary-text] bg-[--secondary-bg] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,200)">
         <Icon name="material-symbols:arrow-forward-ios-rounded"/>
       </span>
       </div>
       <Icon
         name="custom:remark"
-        class="shrink-0 text-12px mr-0 cursor-pointer color-#80838b hover:color-#286DFF"
+        class="shrink-0 text-12px mr-0 cursor-pointer color-[--third-text] hover:color-#286DFF"
         @click.self="onEdit"
       />
     </div>
@@ -283,7 +286,7 @@ function resetListStatus() {
           <NuxtLink
             v-for="(row, $index) in sortedFavList"
             :key="$index"
-            class="px-10px flex items-center h-50px cursor-pointer hover:bg-[var(--d-1A1A1A-l-F2F2F2)]"
+            class="px-10px flex items-center h-50px cursor-pointer hover:bg-[--dialog-bg]"
             :to="`/token/${row.token}-${row.chain}`"
           >
             <div class="flex items-center flex-1">
@@ -295,7 +298,7 @@ function resetListStatus() {
                   <TokenImg :row="row" chain-class="hidden" token-class="w-240px h-240px [&&]:mr-0 rounded-16px" />
                 </template>
               </el-tooltip>
-              
+
               <div class="flex flex-col items-start">
                 <span class="text-12px flex items-center">
                   {{ row.symbol }}

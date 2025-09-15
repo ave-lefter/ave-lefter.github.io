@@ -499,5 +499,12 @@
   "blockHeight": "Engellemek",
   "withdrawAgain": "Tekrar geri çekil",
   "trading": "ticaret",
-  "withdrawTip": "Cüzdan fonksiyonunun normal kullanımını sağlamak için 0.002 gereklidir"
+  "withdrawTip": "Cüzdan fonksiyonunun normal kullanımını sağlamak için 0.002 gereklidir",
+  "holdersNum": "Tutulan para sayısı",
+  "holdersAnalysis": "Sahipler Analizi",
+  "holdersNumTotal": "Sahipler Toplam",
+  "holdersTotalChange": "Sahipler değişir",
+  "holdersChange": "Sahipler değişir",
+  "holdersChange2": "{N}",
+  "lockAmount": "Kilitli miktar"
 }

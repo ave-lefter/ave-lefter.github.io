@@ -20,6 +20,7 @@ const defaultSort = computed(() => {
   }
   return ''
 })
+const globalStore = useGlobalStore()
 
 const popoverVisible = shallowRef(false)
 const openTimeList = shallowRef([
@@ -27,7 +28,7 @@ const openTimeList = shallowRef([
   { text: '> 500', value: '500' },
   { text: '> 1000', value: '1000' },
 ])
-const isFilterHighlight = shallowRef(false)
+const isFilterHighlight = shallowRef(!!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.[prefix.value + '_min'] || !!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.[prefix.value + '_max'])
 const { t } = useI18n()
 function confirm(params?: [string, string]) {
   if (!params || !params.some((el) => !!el)) {
@@ -55,13 +56,14 @@ function confirm(params?: [string, string]) {
       @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')"
     >
       <span
-        class="lh-16px rounded-2px px-2px text-12px bg-[--d-333-l-FFF] color-[--d-CCC-l-333]"
+        class="lh-16px rounded-2px px-2px text-12px bg-[--border] color-[--secondary-text]"
         >{{ activeInterval }}</span
       >{{ $t('markers') }}
     </div>
     <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
     <RangePopover
       v-model="popoverVisible"
+      :sort-key="prefix"
       :width="225"
       :title="$t('nMarkers', { n: activeInterval })"
       :list="openTimeList"

@@ -17,15 +17,15 @@
           <SlippageSetMarket :chain="chain" />
         </div>
         <Icon
-          class="text-14px clickable color-[--d-999-l-666] clickable" name="ri:close-large-fill"
+          class="text-14px clickable color-[--main-text] clickable" name="ri:close-large-fill"
           @click.stop="visible = false" />
       </div>
       <div class="content">
         <div class="flex-between mt-10px">
           <span class="">{{ $t('buy1') }}</span>
-          <span class="color-#999 ml-auto">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.native?.balance || 0)
+          <span class="color-[--secondary-text] ml-auto">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.native?.balance || 0)
             }}&nbsp;{{ getChainInfo(chain)?.main_name }}</span>
-          <RefreshBalance class="color-#999" :type="0" />
+          <RefreshBalance class="color-[--secondary-text]" :type="0" />
         </div>
         <div class="mt-10px tabs">
           <el-button
@@ -36,9 +36,9 @@
         </div>
         <div class="flex-between mt-15px">
           <span class="">{{ $t('sell1') }}</span>
-          <span class="color-#999 ml-auto">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.token?.balance || 0)
+          <span class="color-[--secondary-text] ml-auto">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.token?.balance || 0)
             }}&nbsp;{{ tokenStore.token?.symbol || '' }}</span>
-          <RefreshBalance class="color-#999" :type="1" />
+          <RefreshBalance class="color-[--secondary-text]" :type="1" />
         </div>
         <div class="mt-10px tabs">
           <el-button
@@ -67,6 +67,7 @@ import { bot_createSolTx, bot_createSwapEvmTx } from '@/api/bot'
 import RefreshBalance from './refreshBalance.vue'
 import SlippageSetMarket from './slippageSetMarket.vue'
 import type { BotChain, BotSettingKey } from '~/utils/types'
+import { recordTxV2, updateTxV2 } from '~/api/tracking'
 
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
@@ -185,6 +186,17 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             loadingSwapSell.value[index] = false
           }
         }, 500)
+        const chain = 'solana'
+        const txInfo: any = res?.[0] || {}
+        recordTxV2({
+          txInfo,
+          chain: chain,
+          destination: chain === 'solana' ? '/botapi/swap/createSolTx' : '/botapi/swap/createSwapEvmTx' ,
+          type: 10
+        })
+        const batchIdObj = {
+          [txInfo?.batchId]: txInfo?.id
+        }
         const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
           const batchId = subscribeResult.batchId
           if (batchId === data.batchId) {
@@ -195,6 +207,8 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
+              const txInfo = subscribeResult?.txList?.[0]
+              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
             }
@@ -266,6 +280,16 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
           }
           // this.dialogVisibleSwap = false
         }, 500)
+        const txInfo: any = res?.[0] || {}
+        recordTxV2({
+          txInfo,
+          chain: chain,
+          destination: '/botapi/swap/createSwapEvmTx',
+          type: 10
+        })
+        const batchIdObj = {
+          [txInfo?.batchId]: txInfo?.id
+        }
         const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
           const batchId = subscribeResult.batchId
           if (batchId === data.batchId) {
@@ -280,6 +304,8 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
               setTimeout(() => {
                 getTokenBalance()
               }, 1000)
+              const txInfo = subscribeResult?.txList?.[0]
+              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
               unwatch()
@@ -468,9 +494,9 @@ onUnmounted(() => {
 .fixed-one-click {
   position: fixed;
   z-index: 3;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   font-size: 12px;
-  background: var(--d-222-l-F2F2F2);
+  background: var(--dialog-bg);
   border-radius: 8px;
   min-width: 240px;
   padding: 12px;
@@ -526,7 +552,7 @@ onUnmounted(() => {
 
     button {
       border: none;
-      color: var(--d-999-l-666);
+      color: var(--secondary-text);
       letter-spacing: 0;
       font-weight: 400;
       cursor: pointer;
@@ -538,8 +564,8 @@ onUnmounted(() => {
 
       &.active {
         // color: var(--custom-font-4-color);
-        color: var(--d-F5F5F5-l-333);
-        background: var(--d-333-l-FFF);
+        color: var(--main-text);
+        background: var(--border);
       }
     }
   }

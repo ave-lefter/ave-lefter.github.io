@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
 import { getOpenTimeList } from '../hotRank/columnRender/hotColumusService'
 import RangePopover from './rangePopover.vue'
 
@@ -10,9 +9,11 @@ const props = defineProps<{
   setFilterForm(...args: [string, string][]): void
 }>()
 
+const sortKey = 'created_at'
+const globalStore = useGlobalStore()
 const popoverVisible = shallowRef(false)
 const defaultSort = computed(() => {
-  if (props.sortConditions.sort === 'created_at') {
+  if (props.sortConditions.sort === sortKey) {
     return props.sortConditions.sort_dir
   }
   return ''
@@ -20,13 +21,14 @@ const defaultSort = computed(() => {
 
 function sortChange(sort_dir: string) {
   props.setSortConditions({
-    sort: sort_dir ? 'created_at' : '',
+    sort: sort_dir ? sortKey : '',
     sort_dir: sort_dir,
   })
 }
 const openTimeList = computed(() => getOpenTimeList(t('all')))
 
-const isFilterHighlight = shallowRef(false)
+const setupFilter = globalStore.rankConditions[globalStore.rankActiveTab]?.filter
+const isFilterHighlight = shallowRef(!!setupFilter?.created_at_max || !!setupFilter?.created_at_min)
 
 function confirm(params?: [string, string]) {
   if (!params || !params.some((el) => !!el)) {
@@ -42,7 +44,8 @@ function confirm(params?: [string, string]) {
   const _params = params.map((el, idx) => {
     return [
       `${{ 0: 'created_at_max', 1: 'created_at_min' }[idx]}` as string,
-      el ? dayjs().unix() - Number(el) * 60 : '',
+      // el ? dayjs().unix() - Number(el) * 60 : '',
+      el || '',
     ]
   }) as [string, string][]
   props.setFilterForm(..._params)
@@ -62,6 +65,7 @@ function confirm(params?: [string, string]) {
     <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
     <RangePopover
       v-model="popoverVisible"
+      :sortKey="sortKey"
       :width="300"
       :title="$t('openTime')"
       :list="openTimeList"

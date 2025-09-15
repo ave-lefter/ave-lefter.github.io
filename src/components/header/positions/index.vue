@@ -117,10 +117,10 @@ onMounted(() => {
 <style scoped lang='scss'>
 .tg-name-box {
   margin-left: 10px;
-  color: var(--d-E9E9E9-l-222);
+  color: var(--main-text);
   height: 32px;
   cursor: pointer;
-  background: var(--d-141721-l-E8F1FF);
+  background: var(--main-input-button-bg);
   border-radius: 4px;
   padding: 0 10px;
   min-width: 60px;
