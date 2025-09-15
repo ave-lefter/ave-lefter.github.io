@@ -7,6 +7,7 @@
     }"
     :show-close="false"
     modal-class="modal-layer"
+    @close="startExperience"
   >
     <!--    初始弹窗  -->
     <div v-if="newUserNoticeVisible" style="text-align: center">
