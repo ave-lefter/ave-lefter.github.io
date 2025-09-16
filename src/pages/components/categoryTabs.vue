@@ -270,7 +270,7 @@ watch(()=>props.categories,()=>{
         <span
           v-for="(item, index) in supportCategories"
           :key="index"
-          class="p-2 lh-16px cursor-pointer rounded-1 flex items-center shrink-0"
+          class="p-2 lh-16px cursor-pointer rounded-1 flex items-center shrink-0 relative"
           :class="
             activeTab === item.category
               ? 'color-[--white] bg-[--primary-color]'
@@ -285,6 +285,8 @@ watch(()=>props.categories,()=>{
             :class="configMap[item.category as keyof typeof configMap].class"
           />
           {{ (item as any)[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
+          <img v-if="item.is_hot === 1" class="absolute right-0px top-0px" src="@/assets/images/hot.svg" alt="" :height="10">
+          <img v-else-if="item.is_hot === 2" class="absolute right-0px top-0px" src="@/assets/images/new.svg" alt="" :height="10">
         </span>
       </div>
       <div class="flex gap-12px items-center text-12px">
