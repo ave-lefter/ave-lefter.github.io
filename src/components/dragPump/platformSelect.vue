@@ -4,11 +4,7 @@ const pumpStore = usePumpStore()
 const { token_logo_url } = useConfigStore()
 
 const platforms = computed(() => {
-  if (pumpStore.activeChain == 'solana') {
-    return pumpStore.pump_solana_platforms.join(',')
-  } else {
-    return 'fourmeme'
-  }
+  return pumpStore.pumpV3?.[pumpStore.activeChain]?.platforms?.join(',')
 })
 const platformsList = computed(() => {
   const list = pumpStore.pumpConfig.filter((i) => i.chain === pumpStore.activeChain)
@@ -46,25 +42,8 @@ const platformsList = computed(() => {
     <template #default>
       <template v-for="item in pumpStore.pumpConfig" :key="item.chain">
         <template v-if="item.chain === pumpStore.activeChain">
-          <div v-if="item.platforms?.length <= 1" class="pump-platforms">
-            <el-checkbox
-              v-for="i in item.platforms"
-              :key="i.platform"
-              :label="i.platform_show"
-              :model-value="true"
-              disabled
-            >
-              <el-image
-                class="mr-5px rounded w-14px"
-                :src="`${token_logo_url}${i.platform_icon?.replace('/signals/', 'signals/')}`"
-              />
-              {{ i.platform_show }}
-            </el-checkbox>
-          </div>
-
           <el-checkbox-group
-            v-else
-            v-model="pumpStore.pump_solana_platforms"
+            v-model="pumpStore.pumpV3[pumpStore.activeChain].platforms as string[]"
             class="pump-platforms"
           >
             <el-checkbox
@@ -73,8 +52,8 @@ const platformsList = computed(() => {
               :label="i.platform_show"
               :value="i.platform"
               :disabled="
-                pumpStore.pump_solana_platforms?.includes(i.platform) &&
-                pumpStore.pump_solana_platforms?.length === 1
+                pumpStore.pumpV3[pumpStore.activeChain].platforms?.includes(i.platform) &&
+                pumpStore.pumpV3[pumpStore.activeChain].platforms?.length === 1
               "
             >
               <el-image

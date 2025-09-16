@@ -34,28 +34,8 @@
         <template #default>
           <template v-for="item in pumpConfig" :key="item.chain">
             <template v-if="item.chain === activeChain">
-              <div v-if="item.platforms?.length <= 1" class="pump-platforms">
-                <el-checkbox
-                  v-for="i in item.platforms"
-                  :key="i.platform"
-                  :label="i.platform_show"
-                  :model-value="true"
-                  disabled
-                >
-                  <el-image
-                    class="mr-5px rounded w-14px"
-                    :src="`${token_logo_url}${i.platform_icon?.replace(
-                      '/signals/',
-                      'signals/'
-                    )}`"
-                  />
-                  {{ i.platform_show }}
-                </el-checkbox>
-              </div>
-
               <el-checkbox-group
-                v-else
-                v-model="pump_solana_platforms"
+                v-model="pumpV3[activeChain].platforms as string[]"
                 class="pump-platforms"
               >
                 <el-checkbox
@@ -64,8 +44,8 @@
                   :label="i.platform_show"
                   :value="i.platform"
                   :disabled="
-                    pump_solana_platforms?.includes(i.platform) &&
-                    pump_solana_platforms?.length === 1
+                    pumpV3[activeChain].platforms?.includes(i.platform) &&
+                    pumpV3[activeChain].platforms?.length === 1
                   "
                 >
                   <el-image
@@ -98,7 +78,7 @@
           :class="{ active: item.chain === activeChain }"
           class="flex-start"
           type="button"
-          @click.stop="activeChain = item.chain"
+          @click.stop="switchChain(item)"
         >
           <el-image
             style="
@@ -165,7 +145,7 @@
             </span>
             <span class="flex-1" />
             <el-input
-              v-if="pumpSetting?.show_search"
+              v-if="pumpSetting?.show_search && pump_query[activeChain]?.new"
               ref="inputSearch"
               v-model.trim="pump_query[activeChain].new"
               class="search-input1 px-20px mr-4px"
@@ -181,14 +161,14 @@
               </template>
               <template #suffix>
                 <Icon
-                  v-if="pump_query[activeChain].new"
+                  v-if="pump_query[activeChain]?.new"
                   name="pajamas:clear"
                   class="color-[--third-text] text-12px hover:opacity-70% cursor-pointer mr-10px"
                   @click="pump_query[activeChain].new = ''"
                 />
               </template>
             </el-input>
-            <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer  hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.new } "  @click="pump_notice[activeChain].new = !pump_notice[activeChain].new">
+            <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer  hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.new } "  @click="pump_notice[activeChain].new = !pump_notice[activeChain]?.new">
             <Icon
             name="icon-park-solid:volume-notice"
             class="text-12px"
@@ -259,7 +239,7 @@
             </span>
             <span class="flex-1" />
             <el-input
-              v-if="pumpSetting?.show_search"
+              v-if="pumpSetting?.show_search && pump_query[activeChain]?.soon"
               ref="inputSearch"
               v-model.trim="pump_query[activeChain].soon"
               class="search-input1 px-20px mr-4px"
@@ -354,7 +334,7 @@
             </span>
             <span class="flex-1" />
             <el-input
-              v-if="pumpSetting?.show_search"
+              v-if="pumpSetting?.show_search && pump_query[activeChain]?.graduated"
               ref="inputSearch"
               v-model.trim="pump_query[activeChain].graduated"
               class="search-input1 px-20px mr-4px"
@@ -420,7 +400,8 @@ import type {
   PumpObj,
   ChainKey,
   CategoryKey,
-  WSPump
+  WSPump,
+  pumpData
 } from '@/api/types/pump'
 import { throttle } from 'lodash-es'
 import { isJSON, formatUrl, usePumpTableDataFetching } from '@/utils/index'
@@ -481,6 +462,11 @@ const pump_query  = useStorage(
       new: '',
       soon: '',
       graduated: ''
+    },
+    xlayer: {
+      new: '',
+      soon: '',
+      graduated: ''
     }
   },
   localStorage
@@ -498,9 +484,26 @@ const pumpFilter_solana_soon = usePumpTableDataFetching(
 const pumpFilter_solana_graduated = usePumpTableDataFetching(
   'pumpFilter_solana_graduated'
 )
-const pump_solana_platforms = useStorage(
-  'pump_solana_platforms1',
-  ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk', 'bags', 'heaven'],
+
+const pumpFilter_xlayer_new = usePumpTableDataFetching('pumpFilter_xlayer_new')
+const pumpFilter_xlayer_soon = usePumpTableDataFetching('pumpFilter_xlayer_soon')
+const pumpFilter_xlayer_graduated = usePumpTableDataFetching(
+  'pumpFilter_xlayer_graduated'
+)
+
+const pumpV3 = useStorage<Record<ChainKey,pumpData>>(
+  'pumpV3',
+  {
+    'solana': {
+      platforms: []
+    },
+    'bsc': {
+      platforms: []
+    },
+    'xlayer': {
+      platforms: []
+    }
+  },
   localStorage
 )
 
@@ -514,6 +517,11 @@ const pump_notice = useStorage(
     }
     ,
     bsc: {
+      new: false,
+      soon: false,
+      graduated: false
+    },
+    xlayer: {
       new: false,
       soon: false,
       graduated: false
@@ -537,6 +545,11 @@ const fourmemeListObj = reactive<
     soon: [],
     graduated: [],
   },
+  xlayer: {
+    new: [],
+    soon: [],
+    graduated: [],
+  },
 })
 const loading: Record<string, boolean> = reactive({
   'bsc-new': false,
@@ -545,6 +558,11 @@ const loading: Record<string, boolean> = reactive({
   'solana-new': false,
   'solana-soon': false,
   'solana-graduated': false,
+
+  'xlayer-new': false,
+  'xlayer-soon': false,
+  'xlayer-graduated': false,
+
 })
 
 const isPausedObj = ref({
@@ -567,10 +585,7 @@ const platformsList = computed(() => {
   )
 })
 const platforms = computed(() => {
-  if (activeChain.value == 'solana') {
-    return pump_solana_platforms?.value?.join(',')
-  } else {
-  return 'fourmeme'}
+    return pumpV3.value?.[activeChain.value]?.platforms?.join(',')
 })
 const tabsList = computed(() => {
   return [
@@ -696,21 +711,21 @@ const list2 = computed(() => {
     return filterList
   })
 watch(() => list1.value?.[0]?.target_token, (val) => {
-  if(pump_notice.value[activeChain.value].new && pumpAudio.value && val) {
+  if(pump_notice?.value?.[activeChain.value]?.new && pumpAudio.value && val) {
     pumpAudio.value.play()
   }
 })
 watch(() => list2.value?.[0]?.target_token, (val) => {
-  if(pump_notice.value[activeChain.value].new && pumpAudio.value && val) {
+  if(pump_notice?.value?.[activeChain.value]?.new && pumpAudio.value && val) {
     pumpAudio.value.play()
   }
 })
 watch(() => list3.value?.[0]?.target_token, (val) => {
-  if(pump_notice.value[activeChain.value].new && pumpAudio.value && val) {
+  if(pump_notice?.value?.[activeChain.value]?.new && pumpAudio.value && val) {
     pumpAudio.value.play()
   }
 })
-watch(pump_solana_platforms, () => {
+watch(()=> pumpV3.value[activeChain.value].platforms, () => {
   getPumpList()
 })
 watch(activeChain, () => {
@@ -745,13 +760,13 @@ watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
     logoList.value.unshift(obj)
   }
 })
-watch(()=>pump_query.value[activeChain.value].new, () => {
+watch(()=>pump_query.value[activeChain.value]?.new, () => {
   debouncedFetch('new')
 }, { deep: true })
-watch(()=>pump_query.value[activeChain.value].soon, () => {
+watch(()=>pump_query.value[activeChain.value]?.soon, () => {
   debouncedFetch('soon')
 }, { deep: true })
-watch(()=>pump_query.value[activeChain.value].graduated, () => {
+watch(()=>pump_query.value[activeChain.value]?.graduated, () => {
   debouncedFetch('graduated')
 }, { deep: true })
 
@@ -854,46 +869,46 @@ function getMouseInsideElement(event:any, element:any) {
       mouseY <= rect.bottom
     )
 }
-// function wsUpdateBaseInfo(obj: { logo_url: string, name: string, token: string, symbol: string , rTime: number}) {
-//   wsTableList.value = wsTableList.value?.map(i => {
-//     if (obj.token == i.target_token) {
-//       return {
-//         ...i,
-//         logo_url: obj.logo_url,
-//         name: obj.name,
-//         symbol: obj.symbol
-//       }
-//     }
-//     return i
-//   })
-//   wsTableListCache.value = wsTableListCache.value?.map(i => {
-//     if (obj.token == i.target_token) {
-//       return {
-//         ...i,
-//         logo_url: obj.logo_url,
-//         name: obj.name,
-//         symbol: obj.symbol
-//       }
-//     }
-//     return i
-//   })
-//   const c = ['new', 'soon', 'graduated']
-//   c.forEach((i) => {
-//     fourmemeListObj[activeChain.value][i] = fourmemeListObj?.[activeChain.value][i]?.map((j) => {
-//       if (obj.token == j.target_token) {
-//         return {
-//           ...j,
-//           logo_url: obj.logo_url,
-//           name: obj.name,
-//           symbol: obj.symbol
-//         }
-//       }
-//       return {
-//         ...j,
-//       }
-//     })
-//   })
-// }
+function wsUpdateBaseInfo(obj: { logo_url: string, name: string, token: string, symbol: string , rTime: number}) {
+  wsTableList.value = wsTableList.value?.map(i => {
+    if (obj.token == i.target_token) {
+      return {
+        ...i,
+        logo_url: obj.logo_url,
+        name: obj.name,
+        symbol: obj.symbol
+      }
+    }
+    return i
+  })
+  wsTableListCache.value = wsTableListCache.value?.map(i => {
+    if (obj.token == i.target_token) {
+      return {
+        ...i,
+        logo_url: obj.logo_url,
+        name: obj.name,
+        symbol: obj.symbol
+      }
+    }
+    return i
+  })
+  const c = ['new', 'soon', 'graduated']
+  c.forEach((i) => {
+    fourmemeListObj[activeChain.value][i] = fourmemeListObj?.[activeChain.value][i]?.map((j) => {
+      if (obj.token == j.target_token) {
+        return {
+          ...j,
+          logo_url: obj.logo_url,
+          name: obj.name,
+          symbol: obj.symbol
+        }
+      }
+      return {
+        ...j,
+      }
+    })
+  })
+}
 function wsUpdateTableList(wsList: WSPump[]) {
       const c = ['new', 'soon', 'graduated']
       if (!wsList?.length) return
@@ -967,7 +982,14 @@ function wsUpdateTableList(wsList: WSPump[]) {
     }
 function getPumpConfig() {
   _getPumpConfig().then((res) => {
-    pumpConfig.value = res
+    pumpConfig.value = Array.isArray(res) ? res : []
+    console.log('----pumpConfig--------',pumpConfig.value)
+    pumpConfig.value?.forEach(i => {
+      if (!pumpV3.value[i.chain].platforms?.length) {
+        const platforms =  i.platforms?.map(y=>y?.platform) || []
+          pumpV3.value[i.chain].platforms = platforms
+      }
+    })
   })
 }
 function handlerFilterConfirm(
@@ -1035,34 +1057,29 @@ function getPumpList(isFilter = false) {
 }
 
 function getPump(params, isFilter = false) {
+  console.log('---getPump-111------',params)
   const chain = activeChain.value
   if (Timer[params.category]) {
     clearTimeout(Timer[params.category])
     Timer[params.category] = null
   }
 
-  if ((isPausedObj.value[params.category] || route.name !== 'pump') && !isFilter) {
+  if ((isPausedObj.value?.[params.category] || route.name !== 'pump') && !isFilter) {
     Timer[params.category] = setTimeout(() => {
       getPump(params)
     }, 5000)
     return
   }
   params.chain = chain
-  if (pump_count.value[chain][params.category] === 0) {
+  if (pump_count.value[chain]?.[params.category] === 0) {
     loading[chain + '-' + params.category] = true
   }
 
-  if (chain === 'solana') {
-    if (!pump_solana_platforms?.value?.length) {
-      params.platforms = 'pump,moonshot'
-    } else {
-      params.platforms = pump_solana_platforms.value?.join(',')
-    }
-  } else {
-    params.platforms = 'fourmeme'
+  if (pumpV3.value?.[activeChain.value]?.platforms?.length > 0) {
+    params.platforms = pumpV3.value[activeChain.value]?.platforms?.join(',')
   }
 
-  if (pump_query.value[chain][params.category]) {
+  if (pump_query.value?.[chain]?.[params.category]) {
     if (isFilter) {
       params.q = params.q + pump_query.value[activeChain.value][params.category]
     } else {
@@ -1329,9 +1346,8 @@ function getFilterData(list, conditions) {
         if (conditions?.tvl_max) {
           pass = pass && i.tvl <= Number(conditions.tvl_max)
         }
-        //  platforms: 'pump,moonshot',
-        if (pump_solana_platforms?.value.length > 0 && i.chain === 'solana') {
-          pass = pass && pump_solana_platforms.value.includes(i.amm)
+        if (pumpV3.value[activeChain.value].platforms.length > 0) {
+          pass = pass && pumpV3.value[activeChain.value].platforms.includes(i.platform_id)
         }
         if (conditions?.holder_min) {
           pass = pass && (i?.holder || 0) >= Number(conditions.holder_min)
@@ -1376,6 +1392,10 @@ function getSpan() {
   } else {
     return 24
   }
+}
+function switchChain(item: { chain: ChainKey }) {
+  console.log('------switchChain--------',item.chain)
+  activeChain.value = item.chain
 }
 </script>
 

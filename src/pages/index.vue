@@ -29,6 +29,7 @@ const components = {
   xstocks: activityComponent,
   volume: activityComponent,
   heaven_pump: pumpComponent,
+  xdyorswap_pump: pumpComponent
 }
 const walletStore = useWalletStore()
 const botStore = useBotStore()
