@@ -13,11 +13,29 @@
       </div>
       <div v-if="isToken" class="flex items-center gap-10px">
         <el-checkbox
+          v-model="conditions_wallet.hide_risk"
+          :false-value="0"
+          :true-value="1"
+          class="[&&]:mr-0"
+          @change="onConditionChange"
+        >
+          {{ $t('hideRiskTokenShort') }}
+        </el-checkbox>
+        <el-checkbox
+          v-model="conditions_wallet.hide_noswap"
+          :false-value="0"
+          :true-value="1"
+          class="[&&]:mr-0"
+          @change="onConditionChange"
+        >
+          {{ $t('hideNoSwap') }}
+        </el-checkbox>
+        <el-checkbox
           v-model="conditions_wallet.hide_sold"
           class="[&&]:mr-0"
           :false-value="0"
           :true-value="1"
-          @change="onConditionChange('hide_sold')"
+          @change="onConditionChange"
         >
           {{ $t('hide_sell') }}
         </el-checkbox>
@@ -25,8 +43,7 @@
           v-model="conditions_wallet.hide_small"
           :false-value="0"
           :true-value="1"
-          class="text-14px"
-          @change="onConditionChange('hide_small')"
+          @change="onConditionChange"
         >
           {{ $t('hideSmallAssets1') + '<1USD' }}
         </el-checkbox>
@@ -141,6 +158,8 @@ const max_event_id = ref(0)
 const conditions_wallet = useStorage('conditions_wallet', {
   hide_sold: 1,
   hide_small: 1,
+  hide_risk:1,
+  hide_noswap:1,
   sort: 'last_txn_time',
   sort_dir: 'desc',
 })
@@ -271,6 +290,8 @@ const _getWhaleTokenList = async () => {
     is_self: props.isSelfAddress ? 1 : 0,
     ...(conditions_wallet.value.hide_sold === 1 && { hide_sold: 1 }),
     ...(conditions_wallet.value.hide_small === 1 && { hide_small: 1 }),
+    ...(conditions_wallet.value.hide_risk === 1 && { hide_risk: 1 }),
+    ...(conditions_wallet.value.hide_noswap === 1 && { hide_noswap: 1 }),
   }
 
   try {

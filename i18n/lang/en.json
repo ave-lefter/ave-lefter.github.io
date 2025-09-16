@@ -1394,5 +1394,6 @@
   "threeLayout": "Three-column layout",
   "detailsAfterPurchase": "Token details after purchase",
   "mini": "Mini",
-  "gas": "Gas Fee"
+  "gas": "Gas Fee",
+  "hideNoSwap":"Hide Unswapped"
 }
