@@ -145,11 +145,11 @@
       </div>
     </el-popover>
     <div
-      class="bg-[var(--d-141721-l-E8F1FF)] rounded-4px p-8px ml-8px h-32px flex items-center cursor-pointer hover:opacity-80"
+      class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px flex items-center cursor-pointer hover:opacity-80"
       @click="globalStore.audioSettings.active = 'notice'"
     >
       <Icon
-        class="text-20px text-#8CA0C3"
+        class="text-20px color-[--secondary-text]"
         name="custom:alert"
       />
     </div>
