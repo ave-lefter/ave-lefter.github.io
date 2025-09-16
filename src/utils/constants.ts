@@ -1,3 +1,14 @@
+import Beep from '@/assets/audio/beep.mp3'
+import Bell from '@/assets/audio/bell.mp3'
+import Ding from '@/assets/audio/ding.wav'
+import Click from '@/assets/audio/click.wav'
+import Dog from '@/assets/audio/dog.wav'
+import Gun from '@/assets/audio/gun.wav'
+import Pop from '@/assets/audio/pop.wav'
+import Bar from '@/assets/audio/bar.mp3'
+import Message from '@/assets/audio/message.wav'
+import Bong from '@/assets/audio/bong.mp3'
+
 export const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 export const SOLANA_NATIVE_TOKEN = 'So11111111111111111111111111111111111111112'
 
@@ -135,31 +146,26 @@ export const BotSettingsArr = [
 
 export const audioList = [
   '',
+  'Beep',
   'Bell',
-  'Cheer',
-  'Coins',
-  'Handgun',
-  'Kaching',
-  'Nice',
+  'Ding',
+  'Click',
+  'Dog',
+  'Gun',
   'Pop',
-  'Shotgun',
-  'Sonumi',
-  'Yes',
-  'Alipay',
-  'Wechat',
-]
-
+  'Bar',
+  'Message',
+  'Bong',
+] as const
 export const audioNameToResource = {
-  Bell: 'Bell',
-  Cheer: 'Cheer',
-  Coins: 'Coins',
-  Handgun: 'Handgun',
-  Kaching: 'Kaching',
-  Nice: 'Nice',
-  Pop: 'Pop',
-  Shotgun: 'Shotgun',
-  Sonumi: 'Sonumi',
-  Yes: 'Yes',
-  Alipay: 'Alipay',
-  Wechat: 'Wechat',
+  Beep,
+  Bell,
+  Ding,
+  Click,
+  Dog,
+  Gun,
+  Pop,
+  Bar,
+  Message,
+  Bong,
 }

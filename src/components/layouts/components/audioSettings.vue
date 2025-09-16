@@ -15,6 +15,13 @@ const dialogVisible = computed({
 const isNotice = computed(() => {
     return globalStore.audioSettings.active === 'notice'
 })
+const audioRef = ref<HTMLAudioElement | null>(null)
+function playAudio(audioKey:keyof typeof audioNameToResource) {
+    if(audioRef.value){
+        audioRef.value.src = audioNameToResource[audioKey]
+        audioRef.value.play()
+    }
+}
 </script>
 
 <template>
@@ -33,7 +40,7 @@ const isNotice = computed(() => {
                 <!-- @todos -->
             </div>
             <div v-else>
-                <AudioSettingsItem item-key="signal" :title="$t('signal')" />
+                <AudioSettingsItem item-key="signal" :title="$t('signal')" @playAudio="playAudio" />
                 <AudioSettingsItem item-key="monitor" :title="$t('followMonitor')" />
                 <div class="mb-21px text-12px">{{ $t('tradeSound') }}</div>
                 <AudioSettingsItem class="color-[--secondary-text]" item-key="marketBuy" :title="$t('buySound')" />
@@ -58,6 +65,7 @@ v-model="globalStore.audioSettings.audio.volume" :min="0" :max="100" :step="1" :
                     class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--primary-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] mx-4px [--el-color-info:--third-text]" />
                 <el-button type="primary" class="w-full mt-70px">{{ $t('complete') }}</el-button>
             </div>
+            <audio ref="audioRef" class="hidden" />
         </template>
     </el-dialog>
 </template>

@@ -2,10 +2,20 @@
 import SuffixIcon from '~/components/suffixIcon.vue'
 
 const globalStore = useGlobalStore()
-defineProps<{
+const props = defineProps<{
     title: string
     itemKey: keyof typeof globalStore.audioSettings.audio
 }>()
+const emit = defineEmits<{
+    (e: 'playAudio', audio: keyof typeof audioNameToResource): void
+}>()
+
+function playAudio() {
+    const audioKey = globalStore.audioSettings.audio[props.itemKey] as string
+    if(audioKey){
+        emit('playAudio', audioKey)
+    }
+}
 </script>
 
 <template>
@@ -24,7 +34,7 @@ v-model="globalStore.audioSettings.audio[itemKey]" class="new-select"
             <div class="w-1px h-8px bg-[--icon-color] mx-4px shrink-0" />
             <Icon
 name="custom:play-circle-line"
-                class="text-16px shrink-0 color-[--secondary-text] cursor-pointer" />
+                class="text-16px shrink-0 color-[--secondary-text] cursor-pointer" @click.self="playAudio"/>
         </div>
     </div>
 </template>
