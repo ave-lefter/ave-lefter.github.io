@@ -94,13 +94,13 @@ watch(
   }
 )
 watch(
-  () => [pumpStore.pump_solana_platforms, activeTab.value],
+  () => [pumpStore.pumpV3?.[pumpStore.activeChain]?.platforms, activeTab.value],
   () => {
     init()
   }
 )
 
-watch(() => pumpStore.pump_query[pumpStore.activeChain][activeTab.value], () => {
+watch(() => pumpStore.pump_query[pumpStore.activeChain]?.[activeTab.value], () => {
   debouncedSearch()
 }, { deep: true })
 
@@ -302,16 +302,19 @@ function pumpMapFunction(resItem: PumpObj) {
 function getPumpParams(oldParams, isFilter: boolean) {
   let platforms = 'fourmeme'
   //   platforms
-  if (pumpStore.activeChain === 'solana') {
-    if (!pumpStore.pump_solana_platforms?.length) {
-      platforms = 'pump,moonshot'
-    } else {
-      platforms = pumpStore.pump_solana_platforms.join(',')
-    }
+  // if (pumpStore.activeChain === 'solana') {
+  //   if (!pumpStore.pump_solana_platforms?.length) {
+  //     platforms = 'pump,moonshot'
+  //   } else {
+  //     platforms = pumpStore.pump_solana_platforms.join(',')
+  //   }
+  // }
+  if (pumpStore.pumpV3?.[pumpStore.activeChain]?.platforms?.length > 0) {
+    platforms = pumpStore.pumpV3?.[pumpStore.activeChain]?.platforms?.join(',')
   }
   let q = oldParams.q
   //   q
-  if (pumpStore.pump_query[pumpStore.activeChain][activeTab.value]) {
+  if (pumpStore.pump_query[pumpStore.activeChain]?.[activeTab.value]) {
     if (isFilter) {
       q = oldParams.q + pumpStore.pump_query[pumpStore.activeChain][activeTab.value]
     } else {
@@ -396,8 +399,8 @@ function getFilterData(list, conditions) {
       pass = pass && i.tvl <= Number(conditions.tvl_max)
     }
     //  platforms: 'pump,moonshot',
-    if (pumpStore.pump_solana_platforms?.length > 0 && i.chain === 'solana') {
-      pass = pass && pumpStore.pump_solana_platforms.includes(i.amm)
+    if (pumpStore.pumpV3[pumpStore.activeChain]?.platforms?.length >0) {
+      pass = pass && pumpStore.pumpV3[pumpStore.activeChain].platforms.includes(i.platform_id)
     }
     if (conditions?.holder_min) {
       pass = pass && (i?.holder || 0) >= Number(conditions.holder_min)
@@ -487,7 +490,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
         <div
           class="w-20px h-20px flex items-center justify-center bg-[--d-151A22-l-E8F1FF] rounded-4px color-[--d-566275-l-8CA0C3] cursor-pointer hover:color-[--d-F5F5F5-l-333]"
           :class="{
-            'color-[--d-F5F5F5-l-333]': pumpStore.pump_notice[pumpStore.activeChain][activeTab],
+            'color-[--d-F5F5F5-l-333]': pumpStore.pump_notice[pumpStore.activeChain]?.[activeTab],
           }" @click="
             pumpStore.pump_notice[pumpStore.activeChain][activeTab] =
             !pumpStore.pump_notice[pumpStore.activeChain][activeTab]
@@ -499,8 +502,9 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
         </div>
       </div>
       <div class="flex items-center gap-8px">
-        <AutoSellSetting :chain="pumpStore.activeChain" />
+        <AutoSellSetting :chain="pumpStore?.activeChain" />
         <el-input
+          v-if="pumpStore.pump_query[pumpStore.activeChain]?.[activeTab]"
           ref="inputSearch" v-model.trim="pumpStore.pump_query[pumpStore.activeChain][activeTab]"
           class="w-90px [--el-input-border-color:--d-222-l-F2F2F2]" size="small" :placeholder="$t('search')"
           style="--el-input-bg-color:var(--d-151A22-l-E8F1FF);--el-text-color-regular:var(--d-566275-l-8CA0C3)"
@@ -513,7 +517,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
           </template>
           <template #suffix>
             <Icon
-v-if="pumpStore.pump_query[pumpStore.activeChain][activeTab]" name="pajamas:clear"
+              v-if="pumpStore.pump_query[pumpStore.activeChain]?.[activeTab]" name="pajamas:clear"
               class="color-[--d-666-l-999] text-12px hover:opacity-70% cursor-pointer mr-10px"
               @click="pumpStore.pump_query[pumpStore.activeChain][activeTab] = ''" />
           </template>

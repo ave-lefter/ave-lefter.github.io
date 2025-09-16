@@ -153,7 +153,14 @@ const configMap = computed(() => {
       getDefaultColumns:getActivityDefaultColumns,
       getOptions:getActivityOptions,
       class:''
-    }
+    },
+    xdyorswap_pump:{
+      icon:'',
+      storageKey:'xdyorswap_pumpTableColumns',
+      getDefaultColumns:getPumpDefault,
+      getOptions:getPumpOptions,
+      class:''
+    },
   }
 })
 
@@ -204,7 +211,8 @@ const supportCategories = computed(() => {
     // 'cto',
     'xstocks',
     'volume',
-    'heaven_pump'
+    'heaven_pump',
+    'xdyorswap_pump'
   ]
   return (props.categories || []).filter((el) => {
     return keys.includes(el.category)
