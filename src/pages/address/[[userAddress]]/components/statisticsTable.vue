@@ -290,6 +290,8 @@ const _getWhaleTokenList = async () => {
     is_self: props.isSelfAddress ? 1 : 0,
     ...(conditions_wallet.value.hide_sold === 1 && { hide_sold: 1 }),
     ...(conditions_wallet.value.hide_small === 1 && { hide_small: 1 }),
+    ...(conditions_wallet.value.hide_risk === 1 && { hide_risk: 1 }),
+    ...(conditions_wallet.value.hide_noswap === 1 && { hide_noswap: 1 }),
   }
 
   try {
