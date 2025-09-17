@@ -1395,5 +1395,11 @@
   "detailsAfterPurchase": "Token details after purchase",
   "mini": "Mini",
   "gas": "Gas Fee",
-  "hideNoSwap":"Hide Unswapped"
+  "hideNoSwap":"Hide Unswapped",
+  "clickChartFilter":"Click chart to filter",
+  "clickChartHideFilter":"Click chart to hide filter",
+  "markerAddressFilter":"Transaction Address Filter",
+  "markerAddress":"Transaction Address",
+  "filterSmallAmount":"Filter Small Amount>=",
+  "filterLargeAmount":"Filter Large Amount<="
 }

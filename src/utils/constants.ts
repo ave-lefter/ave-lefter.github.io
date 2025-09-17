@@ -99,6 +99,7 @@ export const BusEventType = {
 
 export const ProvideType = {
   HOT_TOKENS: 'hot-tokens',
+  KLINE_DATE_FILTER: 'kline-date-filter',
 }
 export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer']
 export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
@@ -133,3 +134,16 @@ export const BotSettingsArr = [
     label: 'P3',
   }
 ] as const
+
+export const resolutionMap  = {
+  '1S':{
+    val:1,
+    unit:'s'
+  },'1D':{
+    val:1,
+    unit:'d'
+  }, '1W':{
+    val:1,
+    unit:'w'
+  }
+} as const

@@ -197,6 +197,8 @@ export const useGlobalStore = defineStore('global', () => {
   const holderBlackList = useStorage<Array<pumpBlack>>('holderBlackList', [])
 
    const hotList = shallowRef<GetHotTokensResponse[]>([])
+  //  点击图表显示交易历史
+   const isClickKlineFilter = useStorage('isClickKlineFilter', true)
    function sendFooterPriceWs() {
     const data = {
       jsonrpc: '2.0',
@@ -290,6 +292,7 @@ export const useGlobalStore = defineStore('global', () => {
     userFavoriteGroups,
     getUserFavoriteGroups:_getUserFavoriteGroups,
     rankConditions,
-    rankActiveTab
+    rankActiveTab,
+    isClickKlineFilter
   }
 })

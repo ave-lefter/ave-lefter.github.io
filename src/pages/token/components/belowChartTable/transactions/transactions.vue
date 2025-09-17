@@ -22,8 +22,10 @@ import IconUnknown from '@/assets/images/icon-unknown.png'
 import type {AveTable} from '#components'
 import type { SimpleWSTx } from '../../kLine/types'
 import BigNumber from 'bignumber.js'
+import DateFilterCard from '../../dateFilterCard.vue'
 // import type { content } from 'html2canvas/dist/types/css/property-descriptors/content'
 const globalStore = useGlobalStore()
+const klineDateFilter = inject<Ref<string[]>>(ProvideType.KLINE_DATE_FILTER)
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
@@ -217,6 +219,14 @@ const addressAndChain = computed(() => {
     chain: token.value?.chain || ''
   }
 })
+
+watch(() => klineDateFilter?.value, (val) => {
+  if (val) {
+    tableFilter.value.timestamp = val
+    _getTokenTxs()
+  }
+})
+
 watch(() => pairAddress.value, (pair, oldPair) => {
   if (pairAddress.value) {
     _getPairLiq()
@@ -390,6 +400,7 @@ const updateLiqList = useThrottleFn(() => {
 function onTimestampConfirm(timestamp: string[] = []) {
   tableFilterVisible.value.timestamp = false
   tableFilter.value.timestamp = timestamp
+  _getTokenTxs()
 }
 
 function confirmVolFilter(amountU: string[] = []) {
@@ -411,7 +422,9 @@ async function _getTokenTxs() {
     const getPairTxsParams = {
       token_id: route.params.id as string,
       tag_type,
-      maker: tableFilter.value.markerAddress
+      maker: tableFilter.value.markerAddress,
+      time_min:tableFilter.value.timestamp[0],
+      time_max:tableFilter.value.timestamp[1]
     }
     if (tag_type === '-100' && !followStore.currentAddress) {
       tokenTxs.value = []
@@ -792,11 +805,15 @@ const collect = async (row: any,index:number) => {
           {{ item.label }}
         </a>
       </div>
-      <div v-show="isPausedTxs" class="flex items-center color-#FFA622 text-12px">
-        <Icon name="custom:stop" />
-        <span class="ml-3px">{{ $t('paused') }}</span>
+      <div class="flex items-center gap-12px">
+        <div v-show="isPausedTxs" class="flex items-center color-#FFA622 text-12px">
+          <Icon name="custom:stop" />
+          <span class="ml-3px">{{ $t('paused') }}</span>
+        </div>
+        <span v-tooltip="$t('clickChartShowTx')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart"/></span>
       </div>
     </div>
+    <DateFilterCard v-if="tableFilter.timestamp.length" v-model:timestamp="tableFilter.timestamp" @update:timestamp="_getTokenTxs"/>
     <template v-if="tableFilter.markerAddress">
       <div
         v-if="listStatus.loadingTxs || listStatus.loadingLiq"

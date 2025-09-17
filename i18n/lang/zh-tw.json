@@ -1381,5 +1381,11 @@
   "detailsAfterPurchase": "買後代幣詳情",
   "mini": "小號",
   "gas": "gas費",
-  "hideNoSwap":"隱藏未購買"
+  "hideNoSwap":"隱藏未購買",
+  "clickChartFilter": "點擊圖表篩選",
+  "clickChartHideFilter": "點擊圖表隱藏篩選",
+  "markerAddressFilter": "交易地址篩選",
+  "markerAddress": "交易者地址",
+  "filterSmallAmount": "過濾小額>=",
+  "filterLargeAmount": "過濾大額<="
 }

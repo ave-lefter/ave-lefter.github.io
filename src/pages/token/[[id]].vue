@@ -93,6 +93,10 @@ const wsStore = useWSStore()
 const orderBookVisible = useStorage('orderBookVisible', false)
 provide('orderBookVisible', orderBookVisible)
 
+// 点击 k 线的日期筛选
+const klineDateFilter = ref<string[]>([])
+provide(ProvideType.KLINE_DATE_FILTER, klineDateFilter)
+
 // KLine 高度监听
 const klineHeight = useStorage('kHeight', DefaultHeight.KLINE)
 // 订单簿宽度管理
