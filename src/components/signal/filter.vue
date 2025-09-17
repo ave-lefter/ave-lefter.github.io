@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const props = defineProps<{
-  modelValue: string
   filterParams: {
     token: string
     history_count: undefined | number
@@ -8,15 +7,16 @@ const props = defineProps<{
     mc_curr_sign: string
   }
 }>()
-const emit = defineEmits(['update:modelValue', 'update:filterParams', 'onConfirm', 'onReset'])
-const shouldAlert = computed({
-  get() {
-    return props.modelValue
-  },
-  set(value) {
-    emit('update:modelValue', value)
-  }
-})
+const globalStore = useGlobalStore()
+const emit = defineEmits(['update:filterParams', 'onConfirm', 'onReset'])
+// const shouldAlert = computed({
+//   get() {
+//     return props.modelValue
+//   },
+//   set(value) {
+//     emit('update:modelValue', value)
+//   }
+// })
 const tempFilterParams = ref({
   token: '',
   history_count: undefined as undefined | number,
@@ -35,7 +35,7 @@ const mcOptions = shallowRef([
   {label: '<$1M', value: 1e6},
   {label: '<$10M', value: 1e7},
 ])
-const themeStore = useThemeStore()
+// const themeStore = useThemeStore()
 
 const currentFilterNum = shallowRef(0)
 function onConfirm() {
@@ -161,14 +161,15 @@ function updateCurrentNum() {
       </template>
     </el-popover>
     <Icon
-      name="icon-park-solid:volume-notice"
-      class="mr-4px"
+      :name="globalStore.audioSettings.audio.signal ? 'custom:ad':'custom:admute'"
+      class="mr-4px cursor-pointer"
+      @click="globalStore.audioSettings.active = 'notice'"
     />
-    <el-switch
+    <!-- <el-switch
       v-model="shouldAlert"
       size="small"
       active-value="1"
-      inactive-value="0"/>
+      inactive-value="0"/> -->
   </div>
 </template>
 

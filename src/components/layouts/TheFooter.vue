@@ -134,7 +134,7 @@
         </a>
       </li>
     </ul>
-    <audio ref='audioElement' controls :src='ring' style='display: none'/>
+    <audio ref='audioElement' controls :src='audioNameToResource[globalStore.audioSettings.audio.monitor as keyof typeof audioNameToResource]' style='display: none'/>
     <Batch @refresh="()=>{}"/>
   </footer>
 </template>
@@ -283,7 +283,7 @@ watch(visible, val => {
 watch(() => wsStore.wsResult[WSEventType.MONITOR], () => {
   // console.log('wsStore.wsResult[WSEventType.MONITOR]', wsStore.wsResult[WSEventType.MONITOR])
   throttle(() => {
-    if(hasRing.value&&botStore.evmAddress){
+    if(globalStore.audioSettings.audio.monitor&&botStore.evmAddress){
       audioElement.value?.play()
     }
   },1000)()

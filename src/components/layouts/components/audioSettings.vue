@@ -27,7 +27,7 @@ function playAudio(settingKey: keyof typeof audioSettings.value.audio) {
 }
 
 function save() {
-    console.log(audioSettings.value)
+    globalStore.audioSettings = cloneDeep(audioSettings.value)
 }
 </script>
 

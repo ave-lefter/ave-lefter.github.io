@@ -13,6 +13,7 @@ const props = defineProps<{
   containerWidth: number
   scrollHeight: number
 }>()
+const globalStore = useGlobalStore()
 const configStore = useConfigStore()
 const botSettingStore = useBotSettingStore()
 const localeStore = useLocaleStore()
@@ -27,6 +28,10 @@ const sortParams = shallowRef({
   activeSort: 0
 })
 
+const audioUrl = computed(()=>{
+  return audioNameToResource[globalStore.audioSettings.audio.signal as keyof typeof audioNameToResource]
+  || audioNameToResource.Beep
+})
 const filterSignalList = computed(() => {
   const {sortBy, activeSort} = sortParams.value
   return signalStore.signalList.filter(filterCallback).toSorted((a, b) => {
@@ -73,7 +78,7 @@ function resetAndGet() {
   fetchSignalList()
 }
 
-const shouldAlert = useStorage('shouldAlert', '1')
+// const shouldAlert = useStorage('shouldAlert', '1')
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const signalStore = useSignalStore()
 const isSmallScreen = computed(() => {
@@ -145,7 +150,7 @@ const signalAudio = useTemplateRef('signalAudio')
 watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], ({msg: _signalData}: {
   msg: GetSignalV2ListResponse
 }) => {
-  if (shouldAlert.value === '1' && signalAudio.value && filterCallback(_signalData)) {
+  if (globalStore.audioSettings.audio.signal && signalAudio.value && filterCallback(_signalData)) {
     signalAudio.value.currentTime = 0
     signalAudio.value.play()
   }
@@ -291,7 +296,6 @@ function cancelHide() {
       <div class="flex items-center gap-12px">
         <Filter
           v-if="isLargeScreen"
-          v-model="shouldAlert"
           :filter-params="signalStore.filterParams"
           @onConfirm="val=>{signalStore.filterParams={...val};resetAndGet();}"
           @onReset="resetFilterParams"
@@ -349,7 +353,6 @@ function cancelHide() {
         class="flex items-center justify-between mb-18px"
       >
         <Filter
-          v-model="shouldAlert"
           :filter-params="signalStore.filterParams"
           @onConfirm="val=>{signalStore.filterParams={...val};resetAndGet();}"
           @onReset="resetFilterParams"
@@ -402,7 +405,8 @@ function cancelHide() {
     </div>
     <audio
       ref="signalAudio" controls style="display: none"
-      src="/signal.mp3"
+      :src="audioUrl"
+      :volume="+globalStore.audioSettings.audio.signal/100"
     />
 
     <!--  actions -->
