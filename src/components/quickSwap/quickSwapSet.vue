@@ -56,7 +56,7 @@
           type="button"
           @click.stop="botSettingStore.botSettings[chain]!.selected = item.value"
           @mouseenter="showPopover(item.value)"
-
+          @mouseleave="visible = false"
 
         >
           {{ item.label }}
