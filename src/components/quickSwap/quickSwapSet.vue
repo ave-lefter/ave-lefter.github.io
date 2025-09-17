@@ -77,29 +77,36 @@
       virtual-triggering
       trigger="contextmenu"
       placement="bottom"
+      popper-style="min-width: auto; width: auto;"
     >
       <ul>
         <li class="text-14px mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-12px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
-          <span v-if="botSettingStore.botSettings?.[chain]?.[selected]?.slippage !== 'auto'">{{
+          <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-14px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
+          <span class="mr-4px color-[--third-text] text-14px">{{ $t('slippage') }}</span>
+          <span v-if="botSettingStore.botSettings?.[chain]?.[selected]?.slippage !== 'auto'">
+            {{
               botSettingStore.botSettings?.[chain || '']?.[selected]?.slippage
             }}%</span>
           <span v-else>{{ $t('auto') }}</span>
         </li>
         <li v-if="isEvmChain(chain || '')" class="text-14px mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="text-12px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
-          <span>${{ getEstimatedGas() }}</span>
+          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="text-14px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
+          <span class="mr-4px color-[--third-text] text-14px">{{ $t('estimatedGas') }}</span>
+          ${{ getEstimatedGas() }}
         </li>
         <li v-if="chain === 'solana'" class="text-14px mt-4px mb-4px flex-start">
-          <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-12px color-[--third-text] mr-6px cursor-pointer ml-0"/>
-          <span>{{ botPriorityFee }} SOL</span>
+          <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-14px color-[--third-text] mr-6px cursor-pointer ml-0"/>
+          <span class="mr-4px color-[--third-text] text-14px whitespace-nowrap block">{{ $t('priorityFee') }}</span>
+          <span class="whitespace-nowrap">{{ botPriorityFee }} SOL</span>
         </li>
         <li class="text-14px mt-4px mb-4px flex-start">
-          <span class="mr-4px color-[--third-text] text-14px">{{ $t('autoSellHalf') }}</span>
+          <Icon v-tooltip="$t('autoSellHalf')" :name="`custom:half-${globalStore.mode}`" class="text-18px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
+          <span class="mr-4px color-[--third-text] text-14px whitespace-nowrap">{{ $t('autoSellHalf') }}</span>
           {{  botSettingStore.autoSellConfigs?.autoSell ? $t('on') : $t('off') }}
         </li>
 
         <li class="text-14px mt-4px mb-4px flex-start">
+          <Icon v-tooltip="$t('mev')" name="custom:mev" class="text-16px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
           <span class="mr-4px color-[--third-text] text-14px">{{ $t('mev') }}</span>
           {{  botSettingStore.botSettings?.[chain]?.[selected]?.mev ? $t('on')  : $t('off') }}
         </li>
@@ -132,6 +139,7 @@ const props = withDefaults(defineProps<{
   quickBuyValue: '0.01',
   settingsButtonVisible:true
 })
+const globalStore = useGlobalStore()
 const gasPrice = shallowRef(0)
 
 const visible = ref(false)
