@@ -79,3 +79,41 @@ export interface IPumpResponse {
   state: string;
   time: number;
 }
+
+export interface ITGBotResponse {
+  batchId:          string;
+  chain:            string;
+  followAddress:    string;
+  followBuyType:    number;
+  followOrderId:    number;
+  followSellType:   number;
+  inAmount:         string;
+  inTokenAddress:   string;
+  inTokenDecimals:  number;
+  inTokenName:      string;
+  inTokenSymbol:    string;
+  limitPrice:       string;
+  msgId:            number;
+  outTokenAddress:  string;
+  outTokenDecimals: number;
+  outTokenName:     string;
+  outTokenSymbol:   string;
+  swapType:         number;
+  tgUid:            string;
+  txList:           TxList[];
+}
+
+export interface TxList {
+  createPrice:   string;
+  failMessage:   string;
+  fromAmount:    string;
+  orderPrice:    string;
+  outputAmount:  string;
+  price:         number;
+  profit:        string;
+  success:       boolean;
+  swapType:      number;
+  txHash:        string;
+  walletAddress: string;
+  walletName:    string;
+}

@@ -30,7 +30,7 @@ const sortParams = shallowRef({
 
 const audioUrl = computed(()=>{
   return audioNameToResource[globalStore.audioSettings.audio.signal as keyof typeof audioNameToResource]
-  || audioNameToResource.Beep
+  || audioNameToResource.Bar
 })
 const filterSignalList = computed(() => {
   const {sortBy, activeSort} = sortParams.value
@@ -406,7 +406,7 @@ function cancelHide() {
     <audio
       ref="signalAudio" controls style="display: none"
       :src="audioUrl"
-      :volume="+globalStore.audioSettings.audio.signal/100"
+      :volume="+globalStore.audioSettings.audio.signal/100 || 0.5"
     />
 
     <!--  actions -->

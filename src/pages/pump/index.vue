@@ -188,12 +188,13 @@
                 />
               </template>
             </el-input>
-            <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer  hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.new } "  @click="pump_notice[activeChain].new = !pump_notice[activeChain].new">
+            <!-- <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer  hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.new } "  @click="pump_notice[activeChain].new = !pump_notice[activeChain].new">
             <Icon
             name="icon-park-solid:volume-notice"
             class="text-12px"
             />
-            </span>
+            </span> -->
+            <AudioSelect activeTab="new" />
             <PumpFilter
               :storage="`pumpFilter_${activeChain}_new`"
               @update:filterData="handlerFilterConfirm"
@@ -282,12 +283,13 @@
                 />
               </template>
             </el-input>
-            <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.soon } "  @click="pump_notice[activeChain].soon = !pump_notice[activeChain].soon">
+            <!-- <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.soon } "  @click="pump_notice[activeChain].soon = !pump_notice[activeChain].soon">
               <Icon
               name="icon-park-solid:volume-notice"
               class="text-12px"
               />
-            </span>
+            </span> -->
+            <AudioSelect activeTab="soon" />
             <PumpFilter
               :storage="`pumpFilter_${activeChain}_soon`"
               @update:filterData="handlerFilterConfirm"
@@ -377,12 +379,13 @@
                 />
               </template>
             </el-input>
-            <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.graduated } "  @click="pump_notice[activeChain].graduated = !pump_notice[activeChain].graduated">
+            <!-- <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.graduated } "  @click="pump_notice[activeChain].graduated = !pump_notice[activeChain].graduated">
               <Icon
               name="icon-park-solid:volume-notice"
               class="text-12px"
               />
-            </span>
+            </span> -->
+            <AudioSelect activeTab="graduated" />
             <PumpFilter
               :storage="`pumpFilter_${activeChain}_graduated`"
               @update:filterData="handlerFilterConfirm"
@@ -402,7 +405,8 @@
 
     <audio
       ref="pumpAudio" controls style="display: none"
-      src="/signal.mp3"
+      :src="audioUrl"
+      :volume="+globalStore.audioSettings.audio.signal/100 || 0.5"
     />
   </div>
 </template>
@@ -425,6 +429,7 @@ import type {
 import { throttle } from 'lodash-es'
 import { isJSON, formatUrl, usePumpTableDataFetching } from '@/utils/index'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
+import AudioSelect from './audioSelect.vue'
 const Timer = {
   new: null,
   soon: null,
@@ -442,6 +447,7 @@ const activeChain = useStorage<ChainKey>(
   'solana',
   sessionStorage
 )
+const audioUrl = ref('')
 const globalStore = useGlobalStore()
 const { pumpSetting, token_logo_url, pumpBlackList } = storeToRefs(globalStore)
 
@@ -504,25 +510,8 @@ const pump_solana_platforms = useStorage(
   localStorage
 )
 
-const pump_notice = useStorage(
-  'pump_notice',
-  {
-    solana: {
-      new: false,
-      soon: false,
-      graduated: false
-    }
-    ,
-    bsc: {
-      new: false,
-      soon: false,
-      graduated: false
-    }
-  },
-  localStorage
-)
+const {pump_notice} = storeToRefs(usePumpStore())
 const pumpAudio = useTemplateRef('pumpAudio')
-
 const visible_platforms = shallowRef(false)
 const fourmemeListObj = reactive<
   Record<ChainKey, Record<CategoryKey, PumpObj[]>>
@@ -696,17 +685,26 @@ const list2 = computed(() => {
     return filterList
   })
 watch(() => list1.value?.[0]?.target_token, (val) => {
-  if(pump_notice.value[activeChain.value].new && pumpAudio.value && val) {
+  const newAudio = pump_notice.value[activeChain.value].new
+  if(newAudio && pumpAudio.value && val) {
+    audioUrl.value = audioNameToResource[newAudio as keyof typeof audioNameToResource]
+    || audioNameToResource.Beep
     pumpAudio.value.play()
   }
 })
 watch(() => list2.value?.[0]?.target_token, (val) => {
-  if(pump_notice.value[activeChain.value].new && pumpAudio.value && val) {
+  const soonAudio = pump_notice.value[activeChain.value].soon
+  if(soonAudio && pumpAudio.value && val) {
+    audioUrl.value = audioNameToResource[soonAudio as keyof typeof audioNameToResource]
+    || audioNameToResource.Beep
     pumpAudio.value.play()
   }
 })
 watch(() => list3.value?.[0]?.target_token, (val) => {
-  if(pump_notice.value[activeChain.value].new && pumpAudio.value && val) {
+  const graduatedAudio = pump_notice.value[activeChain.value].graduated
+  if(graduatedAudio && pumpAudio.value && val) {
+    audioUrl.value = audioNameToResource[graduatedAudio as keyof typeof audioNameToResource]
+    || audioNameToResource.Beep
     pumpAudio.value.play()
   }
 })

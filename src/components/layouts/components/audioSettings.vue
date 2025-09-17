@@ -55,14 +55,12 @@ function save() {
                 <AudioSettingsItem v-model="audioSettings.audio.limit" class="color-[--secondary-text]" :title="$t('limit')" @playAudio="playAudio('limit')"/>
                 <div class="flex justify-between items-center text-12px mt-24px mb-12px">
                     {{ $t('volume2') }}
-                    <el-input
-v-model.number="audioSettings.audio.volume"
-                        class="w-60px [--el-input-height:28px] text-12px [--el-input-icon-color:--d-CCC-l-333] [--el-input-border-color:--d-333-l-F2F2F2]">
+                    <el-input v-model.number="audioSettings.audio.volume" class="w-60px [--el-input-height:28px] text-12px [--el-input-icon-color:--d-CCC-l-333] [--el-input-border-color:--d-333-l-F2F2F2]">
                         <template #suffix><span class="color-[--third-text]">%</span></template>
                     </el-input>
                 </div>
                 <el-slider
-v-model="audioSettings.audio.volume" :min="0" :max="100" :step="1" :marks="{
+v-model="audioSettings.audio.volume" :min="0" :max="100" :step="1"  :marks="{
                     0: '0',
                     25: '25',
                     50: '50',

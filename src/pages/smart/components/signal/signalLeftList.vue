@@ -9,6 +9,7 @@ import {
 import {useStorage, useThrottleFn, useWindowSize} from '@vueuse/core'
 import QuickSwapButton from '~/components/quickSwap/quickSwapButton.vue'
 
+const globalStore = useGlobalStore()
 const localeStore = useLocaleStore()
 const props = defineProps<{
   activeChain: string
@@ -142,12 +143,16 @@ const onScroll = useThrottleFn(({scrollTop}: { scrollTop: number }) => {
 
 const signalAudio = useTemplateRef('signalAudio')
 const wsStore = useWSStore()
-const shouldAlert = useStorage('shouldAlert', '1')
+const audioUrl = computed(()=>{
+  return audioNameToResource[globalStore.audioSettings.audio.signal as keyof typeof audioNameToResource]
+  || audioNameToResource.Bar
+})
+// const shouldAlert = useStorage('shouldAlert', '1')
 watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], ({msg: _signalData}: {
   msg: GetSignalV2ListResponse
 }) => {
   listData.value.unshift(_signalData)
-  if (shouldAlert.value === '1' && signalAudio.value && filterCallback(_signalData)) {
+  if (globalStore.audioSettings.audio.signal && signalAudio.value && filterCallback(_signalData)) {
     signalAudio.value.currentTime = 0
     signalAudio.value.play()
   }
@@ -628,7 +633,8 @@ function openTokenDetail(el: IActionItem) {
   </el-popover>
   <audio
     ref="signalAudio" controls style="display: none"
-    src="/signal.mp3"
+    :src="audioUrl"
+    :volume="+globalStore.audioSettings.audio.signal/100 || 0.5"
   />
 </template>
 

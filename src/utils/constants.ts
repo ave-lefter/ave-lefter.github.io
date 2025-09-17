@@ -8,7 +8,7 @@ import Pop from '@/assets/audio/pop.wav'
 import Bar from '@/assets/audio/bar.mp3'
 import Message from '@/assets/audio/message.wav'
 import Bong from '@/assets/audio/bong.mp3'
-
+import Coin from '@/assets/audio/Coin.wav'
 export const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 export const SOLANA_NATIVE_TOKEN = 'So11111111111111111111111111111111111111112'
 
@@ -157,6 +157,7 @@ export const audioList = [
   'Bar',
   'Message',
   'Bong',
+  'Coin'
 ] as const
 export const audioNameToResource = {
   Beep,
@@ -169,4 +170,12 @@ export const audioNameToResource = {
   Bar,
   Message,
   Bong,
+  Coin
+}
+
+export const SwapType = {
+  BUY: 1,
+  SELL: 2,
+  LIMIT_BUY: 5,
+  LIMIT_SELL: 6,
 }

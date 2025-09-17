@@ -117,15 +117,15 @@ export const usePumpStore = defineStore('pumpStore', () => {
         'pump_notice',
         {
           solana: {
-            new: false,
-            soon: false,
-            graduated: false
+            new: '',
+            soon: '',
+            graduated: ''
           }
           ,
           bsc: {
-            new: false,
-            soon: false,
-            graduated: false
+            new: '',
+            soon: '',
+            graduated: ''
           }
         }
       )

@@ -134,7 +134,7 @@
         </a>
       </li>
     </ul>
-    <audio ref='audioElement' controls :src='audioNameToResource[globalStore.audioSettings.audio.monitor as keyof typeof audioNameToResource]' style='display: none'/>
+    <audio ref='audioElement' controls :src='audioUrl' style='display: none'/>
     <Batch @refresh="()=>{}"/>
   </footer>
 </template>
@@ -290,6 +290,10 @@ watch(() => wsStore.wsResult[WSEventType.MONITOR], () => {
   if (!visible.value) {
     isDoted2.value = true
   }
+})
+const audioUrl = computed(()=>{
+  return audioNameToResource[globalStore.audioSettings.audio.monitor as keyof typeof audioNameToResource]
+  || audioNameToResource.Coin
 })
 </script>
 
