@@ -27,7 +27,7 @@ import { useStorage } from '@vueuse/core'
 const globalStore = useGlobalStore()
 const { lang } = storeToRefs(globalStore)
 const bannerList = shallowRef<Banner[]>([])
-const showBanner = useStorage('showBanner', true, sessionStorage)
+const showBanner = useStorage('showBanner', true, localStorage)
 watch(lang, () => {
   getBannersAll()
 })
