@@ -85,7 +85,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                 <span>{{ $t('time') }}</span>
               </template>
               <template #cell-time="{ row }">
-                <TimerCount
+                <!-- <TimerCount
                     v-if="row?.time && Number(formatTimeFromNow(row?.time, true)) < 60"
                     :key="row?.time" :timestamp="row?.time" :end-time="60">
                     <template #default="{ seconds }">
@@ -99,6 +99,48 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                   </TimerCount>
                   <div v-else class="color-[--third-text] text-12px">
                     {{ formatTimeFromNow(row?.time) }}
+                  </div> -->
+                   <div
+                      v-tooltip="formatDate(row?.created_at || row?.time)"
+                      class="time"
+                      :style="{
+                        color:
+                          Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
+                            ? '#FFA622'
+                            : '#12B886',
+                      }"
+                    >
+                      <template v-if="!(row?.created_at || row?.time)"><span>-</span></template>
+                      <template
+                        v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
+                      >
+                      <span>
+                        {{
+                          formatCountdown(
+                            Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
+                            false
+                          )
+                        }}
+                      </span>
+                      </template>
+                      <TimerCount
+                        v-else-if="
+                          (row?.created_at || row?.time) &&
+                          Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
+                        "
+                        :key="`${row.created_at}`"
+                        :timestamp="row.created_at"
+                        :end-time="60"
+                      >
+                        <template #default="{ seconds }">
+                          <span class="color-#FFA622">
+                            <template v-if="seconds < 60"> {{ seconds }}s </template>
+                            <template v-else>
+                              {{ formatTimeFromNow(row.created_at) }}
+                            </template>
+                          </span>
+                        </template>
+                      </TimerCount>
                   </div>
               </template>
               <template #header-symbol>
@@ -197,20 +239,47 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                       <span class="color-[--third-text]">{{ toggleMc? $t('price') : $t('mcap') }}</span>
                       <span class="color-[--main-text]">{{ toggleMc? row?._target_Token?.price: row?._mc }}</span>
                     </div>
-                    <TimerCount
-                      v-if="row?.time && Number(formatTimeFromNow(row?.time, true)) < 60"
-                      :key="row?.time" :timestamp="row?.time" :end-time="60">
-                      <template #default="{ seconds }">
-                    <span v-if="seconds < 60" class="color-[--yellow] text-12px">
-                      {{ seconds }}s
-                    </span>
-                        <span v-else class="color-[--third-text] text-12px">
-                      {{ formatTimeFromNow(row?.time) }}
-                    </span>
-                      </template>
-                    </TimerCount>
-                    <div v-else class="color-[--third-text] text-12px">
-                      {{ formatTimeFromNow(row?.time) }}
+                    <div
+                        v-tooltip="formatDate(row?.created_at || row?.time)"
+                        class="time"
+                        :style="{
+                          color:
+                            Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
+                              ? '#FFA622'
+                              : '#12B886',
+                        }"
+                      >
+                        <template v-if="!(row?.created_at || row?.time)"><span>-</span></template>
+                        <template
+                          v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
+                        >
+                        <span>
+                          {{
+                            formatCountdown(
+                              Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
+                              false
+                            )
+                          }}
+                        </span>
+                        </template>
+                        <TimerCount
+                          v-else-if="
+                            (row?.created_at || row?.time) &&
+                            Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
+                          "
+                          :key="`${row.created_at}`"
+                          :timestamp="row.created_at"
+                          :end-time="60"
+                        >
+                          <template #default="{ seconds }">
+                            <span class="color-#FFA622">
+                              <template v-if="seconds < 60"> {{ seconds }}s </template>
+                              <template v-else>
+                                {{ formatTimeFromNow(row.created_at) }}
+                              </template>
+                            </span>
+                          </template>
+                        </TimerCount>
                     </div>
                   </div>
                 </div>
@@ -323,7 +392,6 @@ const txTypeList=computed(() => {
     { label: t('sell'), value: 1 },
   ]
 })
-
 const walletManageProps=computed(() => {
   return {
     scrollHeight: props.scrollHeight,
@@ -337,6 +405,14 @@ onMounted(async () => {
     // console.log('monitor visible', el)
   })
   init()
+
+ 
+})
+ useVisibilityChange(() => {
+  botStore.bot_subscribe()
+  if(visible.value&&(activeName.value===1)){
+    updateDateSource()
+  }
 })
 watch(() => txType.value, (val) => {
   const monitor_type:Array<'sell' | 'buy'>=[]
@@ -447,6 +523,10 @@ watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
   }
 })
 
+// onMounted(() => {
+ 
+// })
+
 const mergeDataSource = (msg:any) => {
   if(msg?.length>0){
     const data = dataSourceCache?.value || []
@@ -470,6 +550,14 @@ const mergeDataSource = (msg:any) => {
 const updateDateSource = throttle(function() {
   if(!visible.value||(activeName.value!==1)) return
   dataSource.value.splice(0, dataSource.value?.length, ...dataSourceCache.value)
+
+  // dataSource.value=dataSource.value.map(i=>{
+  //   console.log('i', i)
+  //   return {
+  //     time:1758044700,
+  //     ...i
+  //   }
+  // })
 }, 500)
 
     // watch(()=>props.data, (val) => {

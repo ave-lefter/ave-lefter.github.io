@@ -415,6 +415,7 @@ export const useBotStore = defineStore('bot', () => {
     getChainsTokenBalance,
     getUserAllChainBalance,
     getBundleAvailable,
-    updateBalance
+    updateBalance,
+    bot_subscribe
   }
 })
