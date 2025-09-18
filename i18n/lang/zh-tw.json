@@ -1389,5 +1389,14 @@
   "threeLayout": "三欄佈局",
   "detailsAfterPurchase": "買後代幣詳情",
   "mini": "小號",
-  "gas": "gas費"
+  "gas": "gas費",
+  "monitorGlobalPush":"關注監控全局推送",
+  "signalGlobalPush":"信號廣場全局推送",
+  "topLeft":"頂部左邊",
+  "topMiddle":"頂部中間",
+  "topRight":"頂部右邊",
+  "bottomLeft":"底部左邊",
+  "bottomMiddle":"底部中間",
+  "bottomRight":"底部右邊",
+  "ToastPosition":"提示位置"
 }

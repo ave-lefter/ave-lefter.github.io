@@ -159,7 +159,9 @@ export const useGlobalStore = defineStore('global', () => {
   const audioSettings = useStorage('audioSettings',{
     active:'',
     notice:{
-      // @todos
+      monitor:false,
+      signal:true,
+      position:'top'
     },
     audio:{
       signal:'Bar',

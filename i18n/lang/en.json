@@ -1358,8 +1358,8 @@
   "availableRent": "Available Rent",
   "closeAccountsSuccess": "Recycling of rent successfully",
   "loadingCloseAccount": "Close your account and recycle your rent, please wait...",
-  "noticeSettings": "Notice Settings",
-  "audioSettings": "Audio Settings",
+  "noticeSettings": "Notice",
+  "audioSettings": "Audio",
   "close":"Close",
   "followMonitor":"Follow Monitor",
   "tradeSound":"Trade Sound",
@@ -1403,5 +1403,14 @@
   "threeLayout": "Three-column layout",
   "detailsAfterPurchase": "Token details after purchase",
   "mini": "Mini",
-  "gas": "Gas Fee"
+  "gas": "Gas Fee",
+  "monitorGlobalPush": "Monitor Global Push",
+  "signalGlobalPush": "Signal Global Push",
+  "topLeft": "Top Left",
+  "topMiddle": "Top Middle",
+  "topRight": "Top Right",
+  "bottomLeft": "Bottom Left",
+  "bottomMiddle": "Bottom Middle",
+  "bottomRight": "Bottom Right",
+  "ToastPosition": "Toast Position"
 }

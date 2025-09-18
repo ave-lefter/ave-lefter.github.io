@@ -1402,5 +1402,14 @@
   "threeLayout": "三栏布局",
   "detailsAfterPurchase": "买后代币详情",
   "mini": "小号",
-  "gas": "gas费"
+  "gas": "gas费",
+  "monitorGlobalPush":"关注监控全局推送",
+  "signalGlobalPush":"信号广场全局推送",
+  "topLeft":"顶部左边",
+  "topMiddle":"顶部中间",
+  "topRight":"顶部右边",
+  "bottomLeft":"底部左边",
+  "bottomMiddle":"底部中间",
+  "bottomRight":"底部右边",
+  "ToastPosition":"提示位置"
 }

@@ -43,8 +43,18 @@ function save() {
         </template>
         <template #default>
             <div class="mx--20px border-t-solid border-t-1px border-t-[--dialog-divider] mb-20px" />
-            <div v-if="isNotice">
-                <!-- @todos -->
+            <div v-if="isNotice" class="text-12px">
+                <div class="flex justify-between items-center mb-16px">
+                   <span>{{ $t('monitorGlobalPush') }}</span>
+                   <el-switch v-model="audioSettings.notice.monitor" />
+                </div>
+                <div class="flex justify-between items-center mb-24px">
+                   <span>{{ $t('signalGlobalPush') }}</span>
+                   <el-switch v-model="audioSettings.notice.signal" />
+                </div>
+                <div>
+                    <div>{{  }}</div>
+                </div>
             </div>
             <div v-else>
                 <AudioSettingsItem v-model="audioSettings.audio.signal" :title="$t('signal')" @playAudio="playAudio('signal')" />
