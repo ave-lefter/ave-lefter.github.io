@@ -162,6 +162,8 @@
   "sunpump_king": "Graduated from Sumpump",
   "movepump_king": "Graduated from Movepump",
   "timefun_king": "Graduated from Timefun",
+  "xflapswap_king": "Graduated from Flap",
+  "dyorswapfun_king": "Graduated from DYOR",
   "moonshot": "Moonshot",
   "moonshot_king": "Graduated from Moonshot",
   "raydiumlaunchlab_king": "Graduated from Raydiumlaunchlab",
@@ -1395,5 +1397,5 @@
   "detailsAfterPurchase": "Token details after purchase",
   "mini": "Mini",
   "gas": "Gas Fee",
-  "hideNoSwap":"Hide Unswapped"
+  "hideNoSwap": "Hide Unswapped"
 }
