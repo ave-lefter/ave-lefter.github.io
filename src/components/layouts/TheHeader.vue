@@ -146,7 +146,7 @@
     </el-popover>
     <div
       class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px flex items-center cursor-pointer hover:opacity-80"
-      @click="globalStore.audioSettings.active = 'notice'"
+      @click="globalStore.audioSettings.active = 'audio'"
     >
       <Icon
         class="text-20px color-[--secondary-text]"
