@@ -215,7 +215,7 @@ function addVisit() {
     const index = globalStore.lastVisitTokens.findIndex(item => item.id === token+'-'+chain)
     if(index !== -1){
       globalStore.lastVisitTokens.splice(index, 1)
-    } else if(globalStore.lastVisitTokens.length >= 10){
+    } else if(globalStore.lastVisitTokens.length >= 20){
       globalStore.lastVisitTokens.pop()
     }
     globalStore.lastVisitTokens.unshift({

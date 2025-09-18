@@ -70,7 +70,7 @@ function _getUserBalance() {
     hide_risk:globalStore.hide_risk,
     hide_small:globalStore.hide_small,
     user_ids:userIds.value,
-    pageSize:10
+    pageSize:20
   }).then(res=>{
     positionList.value = (res.data || []).map(el=>{
       return {
