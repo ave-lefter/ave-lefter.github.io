@@ -1412,5 +1412,6 @@
   "bottomLeft": "Bottom Left",
   "bottomMiddle": "Bottom Middle",
   "bottomRight": "Bottom Right",
-  "ToastPosition": "Toast Position"
+  "ToastPosition": "Toast Position",
+  "example": "Display Example"
 }

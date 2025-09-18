@@ -1411,5 +1411,6 @@
   "bottomLeft":"底部左边",
   "bottomMiddle":"底部中间",
   "bottomRight":"底部右边",
-  "ToastPosition":"提示位置"
+  "ToastPosition":"提示位置",
+  "example":"显示示例"
 }

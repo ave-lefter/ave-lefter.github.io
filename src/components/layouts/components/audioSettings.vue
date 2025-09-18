@@ -1,10 +1,52 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import { cloneDeep } from 'lodash-es'
 import AudioSettingsItem from './audioSettingsItem.vue'
+import BellIcon from './bellIcon.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const globalStore = useGlobalStore()
+
 // 当前暂存的配置
 const audioSettings = ref(cloneDeep(globalStore.audioSettings))
+const toastPositions = [
+    {
+        label:'topLeft',
+        className:'pl-6px pt-6px',
+        parentClassName:'pt-7px pl-7px',
+        placement:'top-left' as const
+    },
+    {
+        label:'topMiddle',
+        className:'pt-6px flex justify-center',
+        parentClassName:'pt-7px',
+        placement:'top' as const
+    },
+    {
+        label:'topRight',
+        className:'pt-6px pr-6px flex justify-end',
+        parentClassName:'pt-7px pr-7px',
+        placement:'top-right' as const
+    },
+    {
+        label:'bottomLeft',
+        className:'pl-6px pb-6px flex items-end',
+        parentClassName:'pb-7px pl-7px',
+        placement:'bottom-left' as const
+    },
+    {
+        label:'bottomMiddle',
+        className:'pb-6px flex items-end justify-center',
+        parentClassName:'pb-7px',
+        placement:'bottom' as const
+    },
+    {
+        label:'bottomRight',
+        className:'pb-6px pr-6px flex justify-end items-end',
+        parentClassName:'pb-7px pr-7px',
+        placement:'bottom-right' as const
+    }
+]
 const dialogVisible = computed({
     get() {
         return !!globalStore.audioSettings.active
@@ -29,6 +71,14 @@ function playAudio(settingKey: keyof typeof audioSettings.value.audio) {
 function save() {
     globalStore.audioSettings = cloneDeep(audioSettings.value)
 }
+
+function selectPosition(item:typeof toastPositions[number]) {
+    audioSettings.value.notice.position = item.placement
+    ElMessage({
+        placement:item.placement,
+        message:t('example')
+    })
+}
 </script>
 
 <template>
@@ -46,15 +96,36 @@ function save() {
             <div v-if="isNotice" class="text-12px">
                 <div class="flex justify-between items-center mb-16px">
                    <span>{{ $t('monitorGlobalPush') }}</span>
-                   <el-switch v-model="audioSettings.notice.monitor" />
+                   <el-switch v-model="audioSettings.notice.monitor" class="[&&]:h-20px"/>
                 </div>
                 <div class="flex justify-between items-center mb-24px">
                    <span>{{ $t('signalGlobalPush') }}</span>
-                   <el-switch v-model="audioSettings.notice.signal" />
+                   <el-switch v-model="audioSettings.notice.signal" class="[&&]:h-20px"/>
                 </div>
-                <div>
-                    <div>{{  }}</div>
+                <div class="mb-40px">
+                    <div class="lh-18px mb-16px">{{ $t('ToastPosition') }}</div>
+                    <div class="flex gap-x-10px gap-y-16px flex-wrap">
+                        <div
+                            v-for="item in toastPositions" :key="item.label" 
+                            class="text-center color-[--secondary-text] cursor-pointer hover:color-[--main-text] group" @click="selectPosition(item)">
+                            <div :class="`bg-[--secondary-bg] border-1px border-solid border-[--border] rounded-4px mb-9px group-hover:border-[--primary-color] transition-all duration-300 ${item.parentClassName}`">
+                                <div :class="`w-91px h-63px bg-[--dialog-bg] ${item.className}`">
+                                    <div class="w-54px h-20px bg-[--secondary-bg] rounded-4px flex items-center justify-center">
+                                        <div class="w-6px h-6px bg-[--primary-color] rounded-full mr-3px"/>
+                                        <div>
+                                            <div class="w-33px h-2px bg-[--main-input-button-bg]"/>
+                                            <div class="mt-2px w-18px h-2px bg-[--main-input-button-bg]"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{ $t(item.label) }}
+                        </div>
+                    </div>
                 </div>
+                <el-button type="primary" class="w-full">
+                    {{ $t('complete') }}
+                </el-button>
             </div>
             <div v-else>
                 <AudioSettingsItem v-model="audioSettings.audio.signal" :title="$t('signal')" @playAudio="playAudio('signal')" />

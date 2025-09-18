@@ -1398,5 +1398,6 @@
   "bottomLeft":"底部左邊",
   "bottomMiddle":"底部中間",
   "bottomRight":"底部右邊",
-  "ToastPosition":"提示位置"
+  "ToastPosition":"提示位置",
+  "example":"顯示示例"
 }
