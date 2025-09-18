@@ -34,9 +34,9 @@ function save() {
 <template>
     <el-dialog v-model="dialogVisible" :width="360">
         <template #header>
-            <!-- <span
+            <span
                 :class="`text-20px font-500 mr-24px cursor-pointer ${isNotice ? 'color-[--main-text]' : 'color-[--third-text]'}`"
-                @click="audioSettings.active = 'notice'">{{ $t('noticeSettings') }}</span> -->
+                @click="audioSettings.active = 'notice'">{{ $t('noticeSettings') }}</span>
             <span
                 :class="`text-20px font-500 cursor-pointer ${!isNotice ? 'color-[--main-text]' : 'color-[--third-text]'}`"
                 @click="audioSettings.active = 'audio'">{{ $t('audioSettings') }}</span>

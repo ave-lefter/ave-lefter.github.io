@@ -163,7 +163,7 @@ function updateCurrentNum() {
     <Icon
       :name="globalStore.audioSettings.audio.signal ? 'custom:ad':'custom:admute'"
       class="mr-4px cursor-pointer"
-      @click="globalStore.audioSettings.active = 'audio'"
+      @click="globalStore.audioSettings.active = 'notice'"
     />
     <!-- <el-switch
       v-model="shouldAlert"
