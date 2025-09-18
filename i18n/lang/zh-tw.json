@@ -1368,5 +1368,5 @@
   "MaxTxAmount": "單筆tx最大量",
   "MaxWalletAmount": "單錢包最大量",
   "riskRemoved": "已解除",
-  "closeOtherPages": "關閉其他頁"
+  "closeAll": "關閉所有記錄"
 }

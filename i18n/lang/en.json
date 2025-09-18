@@ -1381,5 +1381,5 @@
   "MaxTxAmount": "Max Tx Amount",
   "MaxWalletAmount": "Max Wallet Amount",
   "riskRemoved": "Risk Removed",
-  "closeOtherPages": "Close Other Pages"
+  "closeAll": "Close All Records"
 }

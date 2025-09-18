@@ -24,7 +24,7 @@ const isLastVisitTab = computed(()=>{
 const arrowVisible = computed(()=>{
   const aWidth = Array.from(scrollContent.value?.children || []).reduce((acc,item)=>acc + item.getBoundingClientRect().width,0)
   const gapWidth = Math.max((listData.value.length - 1) * 18,0)
-  return Math.abs(scrollContentWidth.value - aWidth - gapWidth) > 1
+  return scrollContentWidth.value  < aWidth + gapWidth
 })
 
 const isEvmChainWallet = computed(() => {
@@ -218,10 +218,10 @@ function balancePriceChange(val:IPriceV2Response) {
     <div v-if="arrowVisible" class="w-32px h-32px flex items-center justify-center cursor-pointer text-[--secondary-text] hover:text-[--main-text]" @click="scrollX(-200)">
       <Icon name="material-symbols:arrow-back-ios-new-rounded"/>
     </div>    
-    <el-scrollbar ref="scrollbar" @scroll="onScroll">
+    <el-scrollbar ref="scrollbar" class="flex-1" @scroll="onScroll">
       <div ref="scrollContent" class="flex items-center gap-18px whitespace-nowrap h-32px text-12px color-[--third-text]">
         <NuxtLink v-for="item in listData" :key="item.id" class="flex items-center gap-4px hover:color-[--main-text]" :to="`/token/${item.id}`">
-          <TokenImg :row="{logo_url:item.logo_url,symbol:item.symbol,chain:''}" :tokenClass="'w-16px h-16px'"/>
+          <TokenImg :row="{logo_url:item.logo_url,symbol:item.symbol,chain:getAddressAndChainFromId(item.id)?.chain}" :tokenClass="'w-16px h-16px'" chainClass="hidden"/>
           {{ item.symbol }}
 
           <template v-if="'circulation' in item">
@@ -250,9 +250,13 @@ class="p-8px h-32px flex items-center color-[--secondary-text] hover:color-[--ma
     @click="closeOtherPages"
     >
       <Icon name="line-md:close"/>
-      {{ $t('closeOtherPages') }}
+      {{ $t('closeAll') }}
     </div>
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+:deep(.el-scrollbar__bar.is-horizontal){
+  display: none;
+}
+</style>
