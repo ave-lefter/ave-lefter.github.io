@@ -162,6 +162,8 @@
   "sunpump_king": "Sumpump外盤",
   "movepump_king": "Movepump外盤",
   "timefun_king": "Timefun外盤",
+  "xflapswap_king": "Flap外盤",
+  "dyorswapfun_king": "DYOR外盤",
   "moonshot": "Moonshot內盤",
   "moonshot_king": "Moonshot外盤",
   "raydiumlaunchlab_king": "Raydiumlaunchlab外盤",
@@ -1381,5 +1383,5 @@
   "detailsAfterPurchase": "買後代幣詳情",
   "mini": "小號",
   "gas": "gas費",
-  "hideNoSwap":"隱藏未購買"
+  "hideNoSwap": "隱藏未購買"
 }
