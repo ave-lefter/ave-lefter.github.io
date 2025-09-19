@@ -212,11 +212,11 @@ function balancePriceChange(val:IPriceV2Response) {
 
 <template>
   <div class="h-32px mt-1px bg-[--secondary-bg] flex items-center">
-    <div class="px-16px flex items-center gap-8px text-[--icon-color]">
+    <div class="pl-16px pr-8px flex items-center gap-8px text-[--icon-color]">
       <Icon :key="0" v-tooltip="$t('positions')" name="custom:position" class="cursor-pointer hover:color-[--secondary-text]" :class="activeTab===0?'text-[--secondary-text]':''" @click="activeTab=0"/>
       <Icon :key="1" v-tooltip="$t('history')" name="custom:history-fill" class="cursor-pointer hover:color-[--secondary-text]" :class="activeTab===1?'text-[--secondary-text]':''" @click="activeTab=1"/>
     </div>
-    <div v-if="arrowVisible" class="w-32px h-32px flex items-center justify-center cursor-pointer text-[--secondary-text] hover:text-[--main-text]" @click="scrollX(-200)">
+    <div v-if="arrowVisible" class="w-24px h-32px flex items-center justify-center cursor-pointer text-[--secondary-text] hover:text-[--main-text]" @click="scrollX(-200)">
       <Icon name="material-symbols:arrow-back-ios-new-rounded"/>
     </div>    
     <el-scrollbar ref="scrollbar" class="flex-1" @scroll="onScroll">
@@ -242,7 +242,7 @@ function balancePriceChange(val:IPriceV2Response) {
         </NuxtLink>
       </div>
     </el-scrollbar>
-    <div v-if="arrowVisible" class="w-32px h-32px flex items-center justify-center cursor-pointer text-[--secondary-text] hover:text-[--main-text]" @click="scrollX(200)">
+    <div v-if="arrowVisible" class="w-24px h-32px flex items-center justify-center cursor-pointer text-[--secondary-text] hover:text-[--main-text]" @click="scrollX(200)">
       <Icon name="material-symbols:arrow-forward-ios"/>
     </div>
     <div
