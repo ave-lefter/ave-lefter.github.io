@@ -151,6 +151,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
                   <Icon v-else name="custom:twitter" class="text-10px"/>
                 </a>
               </XPopup>
+              <PumpLive v-if="item?.is_streaming" :tokenId="item.token + '-' + item.chain" />
             </div>
           </div>
         </div>

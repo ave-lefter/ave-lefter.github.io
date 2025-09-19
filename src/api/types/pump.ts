@@ -73,6 +73,7 @@ export interface PumpObj {
   buyers_24h?: number
   sellers_24h?: number
   platform: string
+  is_streaming?: boolean
 }
 
 interface Pair {
