@@ -5,6 +5,7 @@ import type { ElScrollbar } from 'element-plus'
 import { getUserBalance, type GetUserBalanceResponse } from '~/api/swap'
 import type { IAssetResponse, IPriceV2Response } from '~/api/types/ws'
 
+const route = useRoute()
 const wsStore = useWSStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
@@ -220,8 +221,8 @@ function balancePriceChange(val:IPriceV2Response) {
     </div>    
     <el-scrollbar ref="scrollbar" class="flex-1" @scroll="onScroll">
       <div ref="scrollContent" class="flex items-center gap-18px whitespace-nowrap h-32px text-12px color-[--third-text]">
-        <NuxtLink v-for="item in listData" :key="item.id" class="flex items-center gap-4px hover:color-[--main-text]" :to="`/token/${item.id}`">
-          <TokenImg :row="{logo_url:item.logo_url,symbol:item.symbol,chain:getAddressAndChainFromId(item.id)?.chain}" :tokenClass="'w-16px h-16px'" chainClass="hidden"/>
+        <NuxtLink v-for="item in listData" :key="item.id" class="h-full flex items-center gap-4px hover:color-[--main-text] group" :class="item.id===route.params.id?'border-b-solid border-b-[--secondary-text] [&&]:color-[--main-text]':''" :to="`/token/${item.id}`">
+          <TokenImg :row="{logo_url:item.logo_url,symbol:item.symbol,chain:getAddressAndChainFromId(item.id)?.chain}" :tokenClass="'w-16px h-16px'" chainClass="w-8px h-8px"/>
           {{ item.symbol }}
 
           <template v-if="'circulation' in item">
@@ -237,7 +238,7 @@ function balancePriceChange(val:IPriceV2Response) {
           <template v-else>
             <span :class="getColorClass(Number(item.price_change))">{{+item.price_change>0?'+':''}}{{ formatNumber(Number(item.price_change),2) }}%</span>
           </template>
-          <Icon v-show="isLastVisitTab" name="custom:delete" class="cursor-pointer" @click.self.stop.prevent="onDelete(item.id)"/>
+          <Icon v-if="isLastVisitTab" name="custom:close" class="cursor-pointer text-16px hidden group-hover:block" @click.self.stop.prevent="onDelete(item.id)"/>
         </NuxtLink>
       </div>
     </el-scrollbar>
