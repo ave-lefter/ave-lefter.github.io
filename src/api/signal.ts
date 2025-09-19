@@ -37,6 +37,7 @@ export interface GetSignalV2ListResponse<T = IActionItem> {
     total_sold_usd: string;
     balance: string
   }
+  is_streaming?: boolean
 }
 
 export interface IActionItem {
@@ -145,6 +146,7 @@ export interface IActionV3Item {
   quote_token_volume: string;
   action_time: number;
   token_balance_usd: string;
+  i
 }
 
 /**

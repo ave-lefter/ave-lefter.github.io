@@ -179,6 +179,7 @@
                 </template>
               </div>
             </div>
+            <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
             <a
               class="media-item bg-btn"
               :href="`https://x.com/search?q=($${token?.symbol} OR ${token?.token})&src=typed_query&f=live`"
