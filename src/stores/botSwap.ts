@@ -54,6 +54,145 @@ export const useBotSwapStore = defineStore('botSwap', () => {
     }
   ])
 
+  const botSwapBaseTokens = ref({
+    bsc: [
+      {
+        chain: 'bsc',
+        balance: '0',
+        symbol: 'BNB',
+        decimals: 18,
+        address: NATIVE_TOKEN,
+        price: 1,
+        logo_url: 'token_icon/bsc/0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c.png'
+      },
+      {
+        chain: 'bsc',
+        balance: '0',
+        symbol: 'USDT',
+        decimals: 18,
+        address: '0x55d398326f99059ff775485246999027b3197955',
+        price: 1,
+        logo_url: 'token_icon/bsc/0x55d398326f99059ff775485246999027b3197955_1743508127.png'
+      },
+       {
+        chain: 'bsc',
+        balance: '0',
+        symbol: 'USDC',
+        decimals: 18,
+        address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
+        price: 1,
+        logo_url: 'token_icon/bsc/0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d.png'
+      },
+    ],
+    eth: [
+      {
+        chain: 'eth',
+        balance: '0',
+        symbol: 'ETH',
+        decimals: 18,
+        address: NATIVE_TOKEN,
+        price: 1,
+        logo_url: 'token_icon/eth/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2_1744610045.png'
+      },
+      {
+        chain: 'eth',
+        balance: '0',
+        symbol: 'USDT',
+        decimals: 6,
+        address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+        price: 1,
+        logo_url: 'token_icon/eth/0xdac17f958d2ee523a2206206994597c13d831ec7.png'
+      },
+      {
+        chain: 'eth',
+        balance: '0',
+        symbol: 'USDC',
+        decimals: 6,
+        address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+        price: 1,
+        logo_url: 'token_icon/eth/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png'
+      },
+    ],
+    base: [
+       {
+        chain: 'base',
+        balance: '0',
+        symbol: 'ETH',
+        decimals: 18,
+        address: NATIVE_TOKEN,
+        price: 1,
+        logo_url: 'token_icon/base/0x4200000000000000000000000000000000000006_1690726006.png'
+      },
+      {
+        chain: 'base',
+        balance: '0',
+        symbol: 'USDC',
+        decimals: 6,
+        address: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+        price: 1,
+        logo_url: 'token_icon/base/0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.png'
+      },
+    ],
+    xlayer: [
+      {
+        chain: 'xlayer',
+        balance: '0',
+        symbol: 'OKB',
+        decimals: 18,
+        address: NATIVE_TOKEN,
+        price: 1,
+        logo_url: 'token_icon/xlayer/0xe538905cf8410324e03a5a23c1c177a474d59b2b.png'
+      },
+      {
+        chain: 'xlayer',
+        balance: '0',
+        symbol: 'USDT',
+        decimals: 6,
+        address: '0x1e4a5963abfd975d8c9021ce480b42188849d41d',
+        price: 1,
+        logo_url: 'token_icon/xlayer/0x1e4a5963abfd975d8c9021ce480b42188849d41d.png'
+      },
+      {
+        chain: 'xlayer',
+        balance: '0',
+        symbol: 'USDC',
+        decimals: 6,
+        address: '0x74b7f16337b8972027f6196a17a631ac6de26d22',
+        price: 1,
+        logo_url: 'token_icon/xlayer/0x74b7f16337b8972027f6196a17a631ac6de26d22.png'
+      },
+    ],
+    solana: [
+      {
+        chain: 'solana',
+        balance: '0',
+        symbol: 'SOL',
+        decimals: 9,
+        address: 'sol',
+        price: 1,
+        logo_url: 'token_icon/solana/So11111111111111111111111111111111111111112.png'
+      },
+       {
+        chain: 'solana',
+        balance: '0',
+        symbol: 'USDT',
+        decimals: 6,
+        address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+        price: 1,
+        logo_url: 'token_icon/solana/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB.png'
+      },
+      {
+        chain: 'solana',
+        balance: '0',
+        symbol: 'USDC',
+        decimals: 6,
+        address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+        price: 1,
+        logo_url: 'token_icon/solana/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v.png'
+      },
+    ]
+  })
+
   function _bot_getGasTip() {
     if (botStore.accessToken && botStore.userInfo?.tgUid) {
       return bot_getGasTip().then(async res => {
@@ -112,6 +251,7 @@ export const useBotSwapStore = defineStore('botSwap', () => {
     priceLimit,
     mainTokensPrice,
     mainTokensPriceIds,
+    botSwapBaseTokens,
     bot_getGasTip: _bot_getGasTip,
     sendNativePriceWs,
     onmessageNativePrice
