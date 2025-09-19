@@ -232,3 +232,13 @@ debox-chat-widget {
   -ms-overflow-style: none;  /* IE、Edge */
   scrollbar-width: none;     /* Firefox */
 }
+.pump-live-bg {
+  .icon-live {
+    display: none;
+  }
+  &:hover {
+    .icon-live {
+      display: flex;
+    }
+  }
+}

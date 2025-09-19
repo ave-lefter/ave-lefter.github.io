@@ -43,7 +43,7 @@ const tokenLogoUrl = computed(() => {
 </script>
 
 <template>
-  <div class="relative">
+  <div class="relative text-0px">
     <el-image
       :class="`mr-3px ${isCircle?'rounded-full':''}  block ${tokenClass}`"
       :src="tokenLogoUrl"
