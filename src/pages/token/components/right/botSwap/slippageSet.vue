@@ -9,7 +9,7 @@
       <template #header>
         <div class="text-20px mb-10px font-400">
           <button class="border-none bg-transparent clickable color-[--third-text] px-0" :class="{'color-[--main-text]!': settingTab === 0}" @click.stop="settingTab = 0">{{ $t('basicSetting') }}</button>
-          <button v-if="chain !== 'xlayer'" class="border-none bg-transparent clickable color-[--third-text] px-0 ml-24px" :class="{'color-[--main-text]!': settingTab === 1}" @click.stop="settingTab = 1">{{ $t('autoSellSetting') }}</button>
+          <button class="border-none bg-transparent clickable color-[--third-text] px-0 ml-24px" :class="{'color-[--main-text]!': settingTab === 1}" @click.stop="settingTab = 1">{{ $t('autoSellSetting') }}</button>
         </div>
       </template>
       <el-form class="popup-content" @submit.prevent="confirmSubmit">
@@ -127,7 +127,7 @@
             </el-input>
           </div>
           <div v-if="showQuickAmount" class="mt-20px">
-            <div class="mb-10px" style="color: #12B886;">{{ $t('setOneClickBuyAmount') }}({{ getChainInfo(chain)?.main_name }})</div>
+            <div class="mb-10px" style="color: #12B886;">{{ $t('setOneClickBuyAmount') }}</div>
             <el-row :gutter="10">
               <el-col v-for="(item, index) in botSetting[selected].buyValueList" :key="index" :span="6" class="click-setting">
                 <el-input v-model="botSetting[selected].buyValueList[index]" class="input-number" inputmode="decimal" placeholder="0.0" @input="value => handleBuyValue(value, index)" @blur="handleBlurBuyValue(index)"/>
@@ -355,9 +355,7 @@ const clipboardQuickInput = ref(cloneDeep(botSettingStore.clipboardQuickInput))
 
 watch(show, (val) => {
   if (val) {
-    if (props.chain === 'xlayer') {
-      settingTab.value = 0
-    } else if (props.showAutoSell) {
+    if (props.showAutoSell) {
       settingTab.value = 1
     }
     const selected = botSetting.value.selected
@@ -722,7 +720,7 @@ function addStopLoss() {
     font-size: 14px;
     background: transparent;
     &.active {
-      background: var(--dialog-tab-active);
+      background: var(--dialog-tab-active-bg);
       color: var(--main-text);
     }
   }

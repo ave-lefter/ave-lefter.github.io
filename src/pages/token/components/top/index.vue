@@ -32,12 +32,13 @@
   <div
     class="info flex items-center bg-[--secondary-bg] mb-1px h-64px p-x-16px text-12px color-[--third-text]"
   >
-    <Icon
+    <!-- <Icon
       name="material-symbols:kid-star"
       class="h-16px w-16px clickable"
       :class="collected ? 'color-#ffbb19' : 'color-[--icon-color]'"
       @click="collect"
-    />
+    /> -->
+    <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
     <div class="token-info ml-16px flex items-center color-[--third-text]">
       <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" >
         <template #content>
@@ -178,6 +179,7 @@
                 </template>
               </div>
             </div>
+            <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
             <a
               class="media-item bg-btn"
               :href="`https://x.com/search?q=($${token?.symbol} OR ${token?.token})&src=typed_query&f=live`"
@@ -311,7 +313,7 @@
                     "
                     type="primary"
                     @click.stop="
-                      confirmSwitchGroup(id, selectedGroup, walletAddress)
+                      confirmSwitchGroup(selectedGroup)
                     "
                   >
                     {{ $t('confirm') }}
@@ -405,7 +407,7 @@
             v-tooltip="formatDate(pair?.created_at)"
             class="ml-5px hover:color-[--main-text] leading-12px font-400 mr-8px"
             >
-            {{ formatTimeFromNow(pair?.created_at) }}
+            {{ formatTimeFromNow(pair?.created_at, false, true) }}
             </span>
           <div
             v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0"
@@ -783,6 +785,7 @@ import {
   getUserFavoriteGroups,
   moveFavoriteGroup,
   editTokenFavRemark,
+  addFavoriteGroup,
 } from '@/api/fav'
 import { _getRugPull, type ResultRugPull } from '@/api/run'
 import type { Token, Pair } from '@/api/types/token'
@@ -829,6 +832,7 @@ const loadingRun = shallowRef(false)
 const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
 favDialogEvent.on(handleFavDialogEvent)
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
+const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
 onUnmounted(() => {
   favDialogEvent.off(handleFavDialogEvent)
 })
@@ -959,12 +963,26 @@ function getTokenFavoriteCheck() {
     })
     .finally(() => {})
 }
-function addTokenFavorite() {
+
+function newGroupAndCollect(newGroupName:string) {
+  addFavoriteGroup(newGroupName, walletAddress.value).then(res=>{
+    topAddGroupEvent.emit()
+    if(res){
+      addTokenFavorite(Number(res))
+      userFavoriteGroups.value.push({
+        group_id: Number(res),
+        name: newGroupName,
+      })
+    }
+  })
+}
+
+function addTokenFavorite(groupId?:number) {
   loading.value = true
-  addFavorite(id.value, walletAddress.value)
+  addFavorite(id.value, walletAddress.value,groupId || 0)
     .then(() => {
       ElMessage.success(t('collected'))
-      collected.value = true
+      getTokenFavoriteCheck()
       topEventBus.emit()
     })
     .catch((err) => {
@@ -990,7 +1008,7 @@ function removeTokenFavorite() {
     })
 }
 
-async function collect() {
+async function collect(groupId?:number) {
   if (walletAddress.value) {
     if (walletStore.address) {
       await walletStore.signMessageForFavorite()
@@ -998,7 +1016,7 @@ async function collect() {
     if (collected.value) {
       removeTokenFavorite()
     } else {
-      addTokenFavorite()
+      addTokenFavorite(groupId)
     }
   } else {
     verifyLogin()
@@ -1018,13 +1036,13 @@ async function getTokenUserFavoriteGroups() {
   }
 }
 
-function confirmSwitchGroup(tokenId: string, id: number, evmAddress: string) {
+function confirmSwitchGroup(nextGroupId: number,tokenId= id.value, evmAddress= walletAddress.value) {
   if (!evmAddress) {
     return
   }
-  if (groupId.value !== id) {
+  if (groupId.value !== nextGroupId) {
     loadingGroupEdit.value = true
-    moveFavoriteGroup(tokenId, id, evmAddress)
+    moveFavoriteGroup(tokenId, nextGroupId, evmAddress)
       .then(() => {
         ElMessage.success(t('success'))
         editableGroup.value = false

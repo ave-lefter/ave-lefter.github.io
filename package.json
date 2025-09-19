@@ -23,6 +23,7 @@
     "@solana/spl-token": "^0.4.13",
     "@solana/web3.js": "^1.98.2",
     "@tronweb3/tronwallet-adapters": "^1.2.9",
+    "@vueuse/components": "^13.9.0",
     "@vueuse/core": "^13.1.0",
     "@wallet-standard/app": "^1.1.0",
     "@walletconnect/ethereum-provider": "^2.21.3",
@@ -65,6 +66,7 @@
     "vue-draggable-resizable": "^3.0.0",
     "vue-kinesis": "^2.0.5",
     "vue-router": "^4.5.0",
+    "vuedraggable": "^4.1.0",
     "web3": "^4.16.0",
     "wowjs": "^1.1.3"
   },

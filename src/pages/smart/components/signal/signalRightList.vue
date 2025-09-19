@@ -151,7 +151,7 @@ function openDrawer(item: GetSignalV2ListResponse<IActionItem | IActionV3Item>) 
         v-for="(item,index) in listData"
         :key="index"
         :class="item.actions.length > 3 ? 'border-#3F80F7':'hover:border-#3F80F7'"
-        class="border-1px border-solid border-[--d-333-l-DDD] transition-colors transition-.3s"
+        class="border-1px border-solid border-[--main-divider] transition-colors transition-.3s"
         :item="item"
         :filterToken="filterToken"
         :filter="filter"
@@ -160,7 +160,7 @@ function openDrawer(item: GetSignalV2ListResponse<IActionItem | IActionV3Item>) 
         @openDrawer="openDrawer"
       />
     </div>
-    <div v-if="listStatus.loading" class="flex py-10px justify-center text-12px text-[#959a9f]">{{
+    <div v-if="listStatus.loading" class="flex py-10px justify-center text-12px text-[--third-text]">{{
         $t('loading')
       }}
     </div>
@@ -171,7 +171,7 @@ function openDrawer(item: GetSignalV2ListResponse<IActionItem | IActionV3Item>) 
     :size="480"
   >
     <template #header>
-      <span class="color-[--d-F5F5F5-l-333] text-20px">{{ $t('SignalDetail') }}</span>
+      <span class="color-[--main-text] text-20px">{{ $t('SignalDetail') }}</span>
     </template>
     <template #default>
       <SignalRightItem

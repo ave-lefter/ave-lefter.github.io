@@ -30,7 +30,60 @@
         fixed="left"
       >
         <template #header>
-          <span>{{ $t('wallet2') }}</span>
+          <div class="flex items-center">
+            <span>{{ $t('wallet2') }}</span>
+            <!-- <i
+              v-if="searchKeyword"
+              class="iconfont icon-fitter1 text-10px ml-3px clickable"
+              :style="{
+                color: searchKeyword
+                  ? 'var(--a-btn-bg-2-color)'
+                  : 'var(--custom-font-8-color)',
+              }"
+              @click.stop.prevent="handleFilterQuery('')"
+            /> -->
+            <Icon name="custom:filter" v-if="searchKeyword" class="color-[--d-FFF-l-000] cursor-pointer text-10px" @click.stop.prevent="handleFilterQuery('')" />
+            <el-popover
+              v-else
+              v-model:visible="visible"
+              placement="bottom-start"
+              title=""
+              :width="350"
+              trigger="click"
+            >
+              <template #reference>
+                <div><Icon name="custom:filter" class="color-[--d-666-l-999] cursor-pointer text-10px" /></div>
+              </template>
+              <template #default>
+                <div>
+                  <div class="flex mt-10px">
+                    <el-input
+                      v-model.trim="keyword"
+                      :placeholder="$t('searchWallet')"
+                      clearable
+                    />
+                  </div>
+                  <div class="mt-20px">
+                    <el-button
+                      class="w-full"
+                      size="default"
+                      :color="
+                        !themeStore.isDark ? '#222222' : '#f5f5f5'
+                      "
+                      style="
+                        height: 30px;
+                        min-width: 70px;
+                        --el-button-font-weight: 400;
+                      "
+                      @click.stop="handleFilterQuery(keyword)"
+                    >
+                      {{ $t('confirm') }}
+                    </el-button>
+                  </div>
+                </div>
+              </template>
+            </el-popover>
+          </div>
         </template>
         <template #default="{ row, $index }">
           <div class="flex items-baseline ">
@@ -896,8 +949,9 @@ const $refs = ref({
 })
 const { t } = useI18n()
 const globalStore = useGlobalStore()
+const themeStore = useThemeStore()
 const route = useRoute()
-const isShowBalance = shallowRef(false)
+const isShowBalance = shallowRef(true)
 const visible = shallowRef(false)
 const searchKeyword = shallowRef('')
 const keyword = shallowRef('')
@@ -1013,6 +1067,7 @@ function handleFilterQuery(k: string) {
   visible.value = false
   $emit('filterAddress', k)
   keyword.value = k || ''
+  searchKeyword.value = k || ''
 }
 // function goLink() { }
 function handleSortChange(obj:{prop: string, order:string }) {

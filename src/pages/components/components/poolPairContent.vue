@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import { addFavorite, addFavoriteGroup, removeFavorite } from '~/api/fav'
 import XIcon from '~/components/xPopup/xIcon.vue'
 
-const emit = defineEmits(['collect','toggleKline'])
+const emit = defineEmits(['toggleKline'])
 const rankKlineStore = useRankKlineStore()
+const walletStore = useWalletStore()
+const botStore = useBotStore()
 const { t } = useI18n()
 const props = defineProps<{
   pageNO: number
@@ -13,6 +16,10 @@ const props = defineProps<{
   activeKline?:boolean
   enableKline?:boolean
 }>()
+
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
 
 function getSymbol(row, shouldReverse = false) {
   const isZeroAddress = row.target_token == row.token0_address
@@ -76,6 +83,55 @@ const created_at_unix = computed(() => {
 function toggleKline() {
   emit('toggleKline',props.row)
 }
+
+function newGroupAndCollect(newGroupName:string) {
+  addFavoriteGroup(newGroupName,walletAddress.value).then(res=>{
+    if(res){
+      globalStore.userFavoriteGroups.push({
+        group_id: Number(res),
+        name: newGroupName,
+      })
+      addTokenFavorite(props.row,Number(res))
+    }
+  }).catch(console.log)
+}
+
+async function collect(newGroupId?:number) {
+  if (walletAddress.value) {
+    if (walletStore.address) {
+      await walletStore.signMessageForFavorite()
+    }
+    if (props.row.is_fav) {
+      removeTokenFavorite(props.row)
+    } else {
+      addTokenFavorite(props.row,newGroupId || 0)
+    }
+  } else {
+    verifyLogin()
+  }
+}
+
+function removeTokenFavorite(row) {
+  removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
+    .then(() => {
+      ElMessage.success(t('cancelled1'))
+      row.is_fav = false
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
+
+function addTokenFavorite(row, newGroupId: number) {
+  addFavorite(`${row.token}-${row.chain}`, walletAddress.value, newGroupId)
+    .then(() => {
+      ElMessage.success(t('collected'))
+      row.is_fav = true
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
 </script>
 
 <template>
@@ -100,12 +156,8 @@ function toggleKline() {
       class="text-right text-10px"
       >#{{ (pageNO - 1) * pageSize + rowIndex + 1 }}</span
     >
-    <div class="flex items-center" @click.stop="emit('collect', rowIndex, row)">
-      <Icon
-        name="custom:star"
-        class="text-16px cursor-pointer ml-5px mr-12px"
-        :class="row.is_fav ? 'color-[--yellow]' : 'color-[--icon-color]'"
-      />
+    <div class="flex items-center">
+      <Collect :iconClass="`text-16px cursor-pointer ml-5px mr-12px`" :isCollected="row.is_fav" :userFavoriteGroups="globalStore.userFavoriteGroups" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
     </div>
     <div class="flex items-center gap-8px">
       <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
@@ -195,7 +247,7 @@ function toggleKline() {
           <Icon
             v-if="enableKline"
             v-tooltip="!activeKline?$t('kline'):$t('hidekline')"
-            name="custom:kline" class="text-12px ml-4px hover:color-[--secondary-text]" 
+            name="custom:kline" class="text-12px ml-4px hover:color-[--secondary-text]"
             :class="activeKline ? 'color-[--secondary-text]' : 'color-[--third-text]'"
             @click.self.stop="toggleKline"
           />
@@ -241,6 +293,7 @@ function toggleKline() {
               </div>
             </template>
           </div>
+          <PumpLive v-if="row?.is_streaming" :class="{'ml-4px': row?.medias?.length > 0}" class="mr-0!" :tokenId="((row.token + '-' + row.chain) as string)" />
           <template v-if="row.signal_arr?.length > 0">
             <div
               v-for="(i, index) in row.signal_arr"

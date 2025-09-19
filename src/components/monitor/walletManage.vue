@@ -95,17 +95,19 @@
                 <span>{{ $t('enableMonitor') }}</span>
               </div> -->
               <div
-                v-if="row?.user_chain === 'solana' || row?.user_chain === 'bsc'"
+                v-if="SupportMonitorChain.includes(row?.user_chain)"
                 class="flex items-center mr-4px cursor-pointer color-[--third-text]"
                 @click.stop.prevent="handleMonitor(row,rowIndex)">
-                <Icon name="custom:monitor-icon" class="text-14px mr-2px color-[--third-text] group-hover:color-[--primary-color]" />
-                <!-- <span
+                <Icon v-if="row?.is_monitored === 1" name="custom:monitor2-icon" class="text-12px mr-2px color-[--third-text] group-hover:color-[--primary-color]" />
+                <Icon v-else name="custom:monitor-icon" class="text-14px mr-2px color-[--third-text] group-hover:color-[--primary-color]" />
+                <span
+                  v-if="props.isLarge"
                   class="overflow-hidden whitespace-nowrap max-w-0 group-hover:max-w-[100px] transition-all duration-500 ease-in-out">
-                  {{ row?.is_monitored === 1 ? t('pause') : t('openMonitor') }}
-                </span> -->
+                  {{ row?.is_monitored === 1 ? t('pause') : t('enable') }}
+                </span>
               </div>
               <div v-else class="flex items-center mr-4px cursor-not-allowed">
-                <Icon name="custom:monitor-icon" class="text-14px mr-2px color-[--third-text]" />
+                <Icon name="custom:monitor-icon" class="text-14px mr-2px color-[var(--d-666-l-CCC)]" />
               </div>
               <Icon name="bx:bxs-trash-alt" class="text-13px color-[--third-text]" @click.stop.prevent="handleDeleteAttention(row)"/>
             </div>
@@ -141,6 +143,10 @@ const props=defineProps({
     type:Number,
     default:500
   },
+  isLarge:{
+    type:Boolean,
+    default:false
+  }
 })
 const { mode, isDark, token_logo_url } = storeToRefs(useGlobalStore())
 const chainOptions=computed(()=>{
@@ -272,7 +278,7 @@ const handleMonitor=throttle((row:any,index:number=0)=>{
     }).then(() => {
       monitorList1.value[index].is_monitored = row.is_monitored===0?1:0
       // monitorList1.value[index].is_pause = row.is_pause===0?1:0
-      // getTableList()
+      getTableList()
       // followStore.shouldInitAddressPage={
       //   num: followStore.shouldInitAddressPage.num + 1,
       //   isSelfUpdate: false
@@ -289,7 +295,7 @@ const handleMonitor=throttle((row:any,index:number=0)=>{
       user_address: botStore.evmAddress,
     }).then(() => {
       monitorList1.value[index].is_monitored = row.is_monitored===0?1:0
-      // getTableList()
+      getTableList()
       ElMessage.success(t('success'))
       // followStore.shouldInitAddressPage={
       //   num: followStore.shouldInitAddressPage.num + 1,

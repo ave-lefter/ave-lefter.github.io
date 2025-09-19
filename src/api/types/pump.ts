@@ -72,6 +72,8 @@ export interface PumpObj {
   summary?: string
   buyers_24h?: number
   sellers_24h?: number
+  platform: string
+  is_streaming?: boolean
 }
 
 interface Pair {
@@ -112,17 +114,23 @@ export interface WSPumpObj {
 }
 export type WSPump = WSPumpObj & Pair
 
-export type ChainKey = 'solana' | 'bsc'
+export type ChainKey = 'solana' | 'bsc' | 'xlayer'
 export type CategoryKey = 'new' | 'soon' | 'graduated'
 
 export type pumpBlack = {
   address: string,
   type: 'ca'|'dev'| 'keyword'
 }
-export type Size = 'small' | 'medium' | 'large'
+export type Size ='mini'| 'small' | 'medium' | 'large'
 
 export interface SizeObj {
   flash: string
-  amm: string
   text: string
+}
+export interface pumpObjColor {
+  color: string
+  bg: string
+}
+export interface pumpData {
+  platforms: String[]
 }

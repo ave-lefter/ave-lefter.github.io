@@ -1,5 +1,5 @@
 <template>
-  <div class="relative" :style="{height: `${isRank ? 290 : kHeight}px`}">
+  <div class="relative" :style="{height: `${isRank ? 390 : kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
     <UnknownRisk v-show="isReady" :isRank="isRank" @refresh="refresh" />
   </div>
@@ -31,6 +31,7 @@ const props = defineProps<{
 }>()
 const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const botStore = useBotStore()
+const tokenDetailsStore = useTokenDetailsStore()
 const route = useRoute()
 const token = computed(() => {
   return (props.isRank && 'klineRow' in tokenStore) ? tokenStore.klineRow?.id : route.params.id as string
@@ -249,7 +250,7 @@ function createToggleButton() {
 }
 
 
-const { createMarkButton, getMarks, marksTabs, wsTxUpdateMarks } = useKlineMarks()
+const { createMarkButton, getMarks, marksTabs, wsTxUpdateMarks,profilingMarksCache } = useKlineMarks()
 
 watch(marksTabs, () => {
   if (!isReady.value) return
@@ -302,7 +303,7 @@ async function initChart() {
       backgroundColor: themeStore.isDark ? '#0B0D12' : '#F6F9FF',
       foregroundColor: '#3F80F7'
     },
-    custom_css_url: `${location.origin}/tv_custom.css`,
+    custom_css_url: `${location.origin}/tv_custom_1.css`,
     // format: (showMarket.value ? 'volume' : 'price') as SeriesFormat,
     custom_formatters: {
       priceFormatterFactory: () => {
@@ -645,7 +646,36 @@ async function initChart() {
 
   // onMarkClick
   _widget?.subscribe('onMarkClick', (markId) => {
-    console.log('markId', markId)
+    const {token,symbol,logo_url,chain} = tokenStore.tokenInfo?.token||{}
+    const {target_token,token0_address,token0_symbol,token1_symbol,pair} = tokenStore.pair || {}
+
+    let user_address = user.value
+    for(const [,markArr] of profilingMarksCache){
+     const addr = markArr.find(el => el.id === markId)?.user_address
+     if(addr){
+      user_address = addr
+      break
+     }
+    }
+    const $patchParams = {
+      drawerVisible:true,
+      tokenInfo:{
+        id:route.params.id as string,
+        symbol,
+        logo_url,
+        chain,
+        address:token
+      },
+      pairInfo:{
+        target_token,
+        token0_address,
+        token0_symbol,
+        token1_symbol,
+        pairAddress:pair
+      },
+      user_address
+    }
+    tokenDetailsStore.$patch($patchParams)
   })
 
   subscribeStudyEvent()

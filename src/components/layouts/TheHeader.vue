@@ -20,7 +20,7 @@
     </ul>
     <div class="flex-1" />
     <a
-      class="bg-[--d-141721-l-E8F1FF] rounded-4px p-8px ml-8px h-32px w-320px flex items-center no-underline"
+      class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px w-320px flex items-center no-underline"
       href=""
       @click.stop.prevent="dialogVisible_search = !dialogVisible_search"
     >

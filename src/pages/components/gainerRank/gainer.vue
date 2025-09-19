@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
 import { getGainDefaultColumns } from './columnRender/gainColumnsService'
-import { getPriceChangeTopTokens, getTreasureList } from '~/api/market'
+import { getPriceChangeTopTokens, getTreasureList, type IGetTreasureConfig } from '~/api/market'
 import {
   quickContent,
   dexContent,
@@ -31,10 +31,12 @@ import {
   SnipersHeader,
   PriceContent,
   PriceChange,
+  DexHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
+import dayjs from 'dayjs'
 
 const { t } = useI18n()
 const localeStore = useLocaleStore()
@@ -46,25 +48,20 @@ const props = defineProps<{
   activeTab?: string
   activeSubTab?: string
   height: string
+  ammList: IGetTreasureConfig['swaps']
 }>()
 
-const sortConditions = ref({
-  sort: '',
-  sort_dir: '',
-})
+const {rankConditions} = storeToRefs(globalStore)
 
 function setSortConditions(params: { sort: string; sort_dir: string }) {
-  sortConditions.value = params
+  rankConditions.value.gainer.sort = params
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
 
-const defaultFilter = {}
-const filterForm = ref(defaultFilter)
-
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(filterForm.value, keyVal[0], keyVal[1])
+    set(rankConditions.value.gainer.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -113,7 +110,7 @@ onMounted(() => {
 onActivated(() => {
   console.log('涨幅榜激活')
   isActive.value = true
-  filterForm.value = {}
+  // filterForm.value = {}
   pageInfo.value.pageNO = 1
 
   const cacheKey = getCacheKey()
@@ -200,12 +197,18 @@ async function _getTreasureList(shouldLoading = true) {
     }
 
     const { total: _, ...rest } = pageInfo.value
+    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
+      if(prev[cur]){
+        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+      }
+      return prev
+    },{...rankConditions.value.gainer.filter})
 
     const requestParams: any = {
       category: 'gainer',
       ...rest,
-      ...sortConditions.value,
-      ...filterForm.value,
+      ...rankConditions.value.gainer.sort,
+      ...finalFilter,
     }
 
     if (currentRefreshId === refreshId.value && pageInfo.value.total > 0) {
@@ -316,13 +319,13 @@ watch(
     })
 
     // 应用当前排序条件
-    const { sort, sort_dir } = sortConditions.value
+    const { sort, sort_dir } = rankConditions.value.gainer.sort
     if (sort && sort_dir) {
       const sortVal = { asc: 1, desc: -1 }[sort_dir] || -1
       listData.value = updateList.toSorted((a, b) => {
         const aVal = Number(a[sort]) || 0
         const bVal = Number(b[sort]) || 0
-        return (bVal - aVal) * sortVal
+        return (aVal - bVal) * sortVal
       })
     } else {
       // 默认按24小时涨幅排序（降序）
@@ -367,51 +370,6 @@ const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
 
-async function collect(index: number, row) {
-  if (walletAddress.value) {
-    if (walletStore.address) {
-      await walletStore.signMessageForFavorite()
-    }
-    if (row.is_fav) {
-      removeTokenFavorite(row, index)
-    } else {
-      addTokenFavorite(row, index)
-    }
-  } else {
-    verifyLogin()
-  }
-}
-
-function removeTokenFavorite(row, index: number) {
-  loading.value = true
-  removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
-    .then(() => {
-      ElMessage.success(t('cancelled1'))
-      listData.value[index].is_fav = false
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-function addTokenFavorite(row, index: number) {
-  loading.value = true
-  addFavorite(`${row.token}-${row.chain}`, walletAddress.value, 0)
-    .then(() => {
-      ElMessage.success(t('collected'))
-      listData.value[index].is_fav = true
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
 function sizeChange() {
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -448,7 +406,7 @@ const headerRenderer = computed(() => {
     markers_dynamic: DynamicMarkersHeader,
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
-    dex: () => 'DEX',
+    dex: DexHeader,
     security: () => t('security'),
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
@@ -493,6 +451,7 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" :style="`height:${height}`">
     <AveTable
+      rowKey="rowKey"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
@@ -508,10 +467,11 @@ const cellRenderer = computed(() => {
         <component
           :is="headerRenderer[item.key as keyof typeof headerRenderer]"
           v-model:isVolUSDT="isVolUSDT"
-          :sortConditions="sortConditions"
+          :sortConditions="rankConditions.gainer.sort"
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
+          :ammList="item.key === 'dex' ? ammList : null"
         />
       </template>
       <template v-for="item in columns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
@@ -526,7 +486,6 @@ const cellRenderer = computed(() => {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
           :activeChain="activeChain"
           :childrenData="item.children || []"
-          @collect="collect"
         />
       </template>
     </AveTable>

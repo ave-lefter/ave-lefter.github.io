@@ -267,14 +267,14 @@ function openTokenDetail(el: IActionItem) {
           id
         },index) in filterSignalList"
           :key="index"
-          class="p-12px  bg-[--secondary-bg] border-[--d-111-l-FFF] hover:bg-[--d-222-l-F2F2F2] cursor-pointer transition-colors"
-          :class="selectId===id?'bg-[--d-222-l-F2F2F2]':''"
+          class="p-12px  bg-[--secondary-bg] hover:bg-[--main-list-hover] cursor-pointer transition-colors"
+          :class="selectId===id?'bg-[--main-list-hover]':''"
           @click="selectSignal(id,token)"
         >
           <div class="mb-22px flex justify-between">
             <div class="flex items-center gap-8px">
               <div
-                  class="flex items-center gap-4px relative ml--20px p-6px h-26px color-#FFF lh-14px rounded-rt-3px rounded-rb-3px bg-#333"
+                  class="flex items-center gap-4px relative ml--20px p-6px h-26px color-[--main-text] lh-14px rounded-rt-3px rounded-rb-3px bg-[--tab-active-bg]"
               >
                 <span
                   class="absolute bottom--4px left--4px w-0 h-0 border-t-solid border-t-4px border-t-transparent border-r-4px border-r-solid border-r-transparent border-l-4px border-l-solid border-l-#333 transform-scale-x-[-1] transform-scale-y-[-1]"
@@ -293,7 +293,7 @@ function openTokenDetail(el: IActionItem) {
             </div>
             <div
               v-tooltip="formatDate(signal_time, 'MM/DD HH:mm:ss')"
-              class="flex items-center gap-4px color-[--d-666-l-999] hover:color-[--d-F5F5F5-l-333] cursor-pointer"
+              class="flex items-center gap-4px color-[--third-text] hover:color-[--main-text] cursor-pointer"
             >
               <Icon
                 name="custom:clock"
@@ -332,9 +332,9 @@ function openTokenDetail(el: IActionItem) {
                 />
               </div>
               <div>
-                <div class="mb-4px flex items-center gap-8px color-[--d-666-l-999]">
+                <div class="mb-4px flex items-center gap-8px color-[--third-text]">
                   <span
-                    class="text-16px font-500 color-[--d-F5F5F5-l-333]"
+                    class="text-16px font-500 color-[--main-text]"
                     @click.stop="navigateTo(`/token/${token}-${chain}`)"
                   >{{ symbol }}</span>
                   <a
@@ -366,24 +366,24 @@ function openTokenDetail(el: IActionItem) {
                     <span v-if="seconds < 60" class="color-#FFA622 text-12px">
                       {{ seconds }}s
                     </span>
-                        <span v-else class="color-[--d-666-l-999] text-12px">
+                        <span v-else class="color-[--third-text] text-12px">
                       {{ formatTimeFromNow(token_create_time) }}
                     </span>
                       </template>
                     </TimerCount>
-                    <div v-else class="color-[--d-666-l-999] text-12px">
+                    <div v-else class="color-[--third-text] text-12px">
                       {{ formatTimeFromNow(token_create_time) }}
                     </div>
                   </div>
                   <span
                     v-copy="token"
-                    class="text-12px cursor-pointer color-[--d-666-l-999]">{{
+                    class="text-12px cursor-pointer color-[--third-text]">{{
                       token.slice(0, 4)
                     }}...{{ token.slice(-4) }}</span>
-                  <Icon v-copy="token" name="bxs:copy" class="cursor-pointer text-12px color-[--d-666-l-999]"/>
+                  <Icon v-copy="token" name="bxs:copy" class="cursor-pointer text-12px color-[--third-text]"/>
                   <div
                     v-if="Number(top10_ratio) > 0"
-                    class="text-10px flex items-center gap-2px color-[--d-666-l-999]"
+                    class="text-10px flex items-center gap-2px color-[--third-text]"
                     :class="{
                     'color-#F6465D':Number(top10_ratio) > 30
                 }"
@@ -420,7 +420,7 @@ function openTokenDetail(el: IActionItem) {
               </div>
             </div>
             <div>
-              <div class="color-[--d-999-l-666] mb-8px text-12px text-right">
+              <div class="color-[--secondary-text] mb-8px text-12px text-right">
                 {{ $t('MaximumIncrease') }}
               </div>
               <div
@@ -433,8 +433,8 @@ function openTokenDetail(el: IActionItem) {
           <div class="flex justify-between items-end text-12px lh-16px">
             <div class="flex flex-col gap-8px">
               <div class="flex-1 flex">
-                <div class="color-[--d-666-l-999] w-80px">{{ $t('CurrentAlert') }}</div>
-                <div class="color-[--d-999-l-666]">
+                <div class="color-[--third-text] w-80px">{{ $t('CurrentAlert') }}</div>
+                <div class="color-[--secondary-text]">
                   {{
                     first_signal_time
                       ? formatDate(first_signal_time, 'MM/DD HH:mm:ss')
@@ -443,7 +443,7 @@ function openTokenDetail(el: IActionItem) {
                 </div>
               </div>
               <div class="flex-1 flex">
-                <div class="color-[--d-666-l-999] w-80px">
+                <div class="color-[--third-text] w-80px">
                   {{ $t('CurrentMC') }}
                 </div>
                 <div class="flex items-center gap-4px color-[--d-F5F5F5-l-333]">
@@ -539,22 +539,22 @@ function openTokenDetail(el: IActionItem) {
             class="flex items-center gap-8px mt-12px"
            >
             <Icon name="custom:ai" class="shrink-0"/>
-            <div class="color-[--d-F5F5F5-l-333] text-12px whitespace-nowrap overflow-hidden text-ellipsis">
+            <div class="color-[--main-text] text-12px whitespace-nowrap overflow-hidden text-ellipsis">
               {{ headline }}
             </div>
           </div>
         </div>
       </div>
-      <div v-if="listStatus.loading" class="flex py-10px justify-center text-12px text-[#959a9f]">{{
+      <div v-if="listStatus.loading" class="flex py-10px justify-center text-12px text-[--third-text]">{{
           $t('loading')
         }}
       </div>
     </el-scrollbar>
     <div
-      class="mt-8px cursor-col-resize bg-[--d-333-l-F2F2F2] gap-1px hover:bg-[--d-666-l-CCC] flex flex-col items-center justify-center w-6px"
+      class="mt-8px cursor-col-resize bg-[--icon-color] gap-1px hover:bg-[--third-text] flex flex-col items-center justify-center w-6px"
       @mousedown.stop.prevent="drag"
     >
-      <span v-for="i in 3" :key="i" class="bg-#444 w-2px h-2px rounded-full"/>
+      <span v-for="i in 3" :key="i" class="bg-[--secondary-text] w-2px h-2px rounded-full"/>
     </div>
   </div>
   <!--  actions -->
@@ -572,7 +572,7 @@ function openTokenDetail(el: IActionItem) {
       @mouseenter="cancelHide"
       @mouseleave="hidePopover"
     >
-      <div class="flex color-[--d-666-l-999] text-12px mb-8px">
+      <div class="flex color-[--third-text] text-12px mb-8px">
         <div class="flex-1">
           {{ $t('wallet') }}
         </div>
@@ -583,7 +583,7 @@ function openTokenDetail(el: IActionItem) {
           {{ $t('time') }}
           <!-- <Icon
             :name="`${isShowDate ? 'custom:calendar' : 'custom:countdown'}`"
-            class="color-[--d-666-l-999] cursor-pointer" @click.self="isShowDate = !isShowDate"
+            class="color-[--third-text] cursor-pointer" @click.self="isShowDate = !isShowDate"
           /> -->
         </div>
       </div>
@@ -598,20 +598,20 @@ function openTokenDetail(el: IActionItem) {
           action_time
         },idx) in currentSignal.actions"
           :key="idx"
-          class="flex color-[--d-999-l-666] text-12px lh-14px cursor-pointer"
+          class="flex color-[--secondary-text] text-12px lh-14px cursor-pointer"
           @click="openTokenDetail(currentSignal.actions[idx])"
         >
           <div class="flex-1 flex items-center">
             <span class="w-10px h-10px rounded-full bg-#37B270 mr-4px"/>
-            <span class="color-[--d-F5F5F5-l-333] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px">{{
+            <span class="color-[--main-text] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px">{{
                 wallet_alias || $t('wallet')
               }}</span>
-            <span class="color-[--d-999-l-666]">(*{{ wallet_address.slice(-4) }})</span>
+            <span class="color-[--secondary-text]">(*{{ wallet_address.slice(-4) }})</span>
           </div>
           <div class="flex-1 color-#12B886">
             {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : '' }}{{ formatNumber(quote_token_amount, 2) }} {{
               quote_token_symbol
-            }}<span class="color-[--d-999-l-666]">(${{ formatNumber(quote_token_volume, 0) }})</span>
+            }}<span class="color-[--secondary-text]">(${{ formatNumber(quote_token_volume, 0) }})</span>
           </div>
           <div class="w-40px flex justify-end">
             <!-- <template v-if="isShowDate">

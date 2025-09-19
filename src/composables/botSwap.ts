@@ -50,15 +50,20 @@ export function useBotSwap(type: number = 0) {
       }
       return
     }
+    let payToken = tokenStore.swap.payToken
+    let token1 = chainMainToken[chain] || NATIVE_TOKEN
+    let payTokenAddress = payToken.chain !== chain ? token1 : (payToken?.address || NATIVE_TOKEN)
     bot_getTokenBalance({
       chain: chain,
-      tokens: [address, chainMainToken[chain] || NATIVE_TOKEN],
+      tokens: [address, token1, payTokenAddress],
       walletAddress: walletAddress
     }).then(tokens => {
       const t1 = tokens[0]
       const t2 = tokens[1]
+      const t3 = tokens[2]
       tokenStore.swap.token = {...tokenStore.token, ...t1, address: (t1.token || t1.address), chain: chain}
       tokenStore.swap.native = {...t2, symbol: getChainInfo(chain)?.main_name, chain: chain, address: t2.token || t2.address, decimals: t2?.decimals || t2?.decimal}
+      tokenStore.swap.payToken = {...tokenStore.swap.payToken, ...t3}
       _getTokensPrice(true)
     })
   }
@@ -67,12 +72,15 @@ export function useBotSwap(type: number = 0) {
     const {token, native} = tokenStore.swap
     const token1Id = token?.address + '-' + token?.chain
     const token2Id = native?.address + '-' + native?.chain
-    return getTokensPrice([token1Id, token2Id]).then(async res => {
+    const token3Id = tokenStore.swap.payToken?.address + '-' + tokenStore.swap.payToken?.chain
+    return getTokensPrice([token1Id, token2Id, token3Id]).then(async res => {
       if (res) {
         const price1 = res?.[0]?.current_price_usd || 0
         const price2 = res?.[1]?.current_price_usd || 0
+        const price3 = res?.[2]?.current_price_usd || 0
         tokenStore.swap.native.price = price2
         tokenStore.swap.token.price = price1
+        tokenStore.swap.payToken.price = price3
         if (isUpdateBalance) {
           if (botStore.userInfo?.addresses?.length > 0) {
              botStore.userInfo!.addresses = (botStore.userInfo?.addresses || []).map(i => {
@@ -130,6 +138,29 @@ export function useBotSwap(type: number = 0) {
     })
   }, 500, { leading: true, trailing: true })
 
+  const getSwapPayTokenBalance = debounce(() => {
+    const parsed = getParsedRoute()
+    const chain = parsed?.chain || tokenInfo.value?.chain
+    const address = parsed?.address || tokenInfo.value?.token
+    if (!address || !chain) return
+    const walletAddress = getWalletAddress(chain)
+
+    if (!walletAddress) return
+    let payToken = tokenStore.swap.payToken
+    if (!payToken || !payToken?.address || payToken?.chain !== chain) return
+    loading.value = true
+    bot_getTokenBalance({
+      chain: chain,
+      tokens: [payToken?.address],
+      walletAddress: walletAddress
+    }).then(tokens => {
+      const t3 = tokens[0]
+      tokenStore.swap.payToken = {...payToken, ...t3}
+    }).finally(() => {
+      loading.value = false
+    })
+  }, 500, { leading: true, trailing: true })
+
   function getChain() {
     const routeParams = getAddressAndChainFromId(route.params.id as string)
     const chain = routeParams?.chain || tokenInfo.value?.chain || ''
@@ -162,11 +193,15 @@ export function useBotSwap(type: number = 0) {
     })
   }
 
-  const refreshTokenBalance = () => {
+  const refreshTokenBalance = (isPayToken = false) => {
     if (type === 1) {
       getSwapTokenBalance()
     } else {
-      getSwapNativeTokenBalance()
+      if (isPayToken) {
+        getSwapPayTokenBalance()
+      } else {
+        getSwapNativeTokenBalance()
+      }
     }
   }
 

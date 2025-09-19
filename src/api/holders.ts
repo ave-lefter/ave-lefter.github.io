@@ -173,6 +173,20 @@ export function _getTop100balance(params: {
     },
   })
 }
+
+// Search holders by address keyword (align with legacy implementation)
+export function searchAddressHolder(params: {
+  token_id: string
+  self_address?: string
+  keyword: string
+  tag_type?: string
+}): Promise<HolderStat[]> {
+  const { $api } = useNuxtApp()
+  return $api('/v1api/v3/stats/holder', {
+    method: 'get',
+    query: params,
+  })
+}
 export interface AllTagsStats {
   token: string
   date: Date | undefined

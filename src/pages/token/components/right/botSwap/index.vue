@@ -1,6 +1,6 @@
 <template>
   <div class="bot-swap-container">
-    <Holding v-if="chain !== 'xlayer'" />
+    <Holding  />
     <div class="tabs">
       <button v-for="(item, index) in tabs" :key="index" class="tab-item" :class="{ active: item.value === activeTab, [`tab-${item.value}`]: true }" type="button" @click="activeTab = item.value">
         <span>{{ item.name }}</span>
@@ -36,6 +36,7 @@ const swapType = shallowRef<'limit' | 'market'>('market')
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
 const wsStore = useWSStore()
+const botSwapStore = useBotSwapStore()
 
 const { getTokenBalance } = useBotSwap()
 
@@ -73,12 +74,12 @@ const tabs2 = computed(() => {
 })
 
 const types = computed(() => {
-  const chain = getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain
-  if (chain === 'xlayer') {
-    return [
-      { value: 'market', name: t('swapT') },
-    ] as const
-  }
+  // const chain = getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain
+  // if (chain === 'xlayer') {
+  //   return [
+  //     { value: 'market', name: t('swapT') },
+  //   ] as const
+  // }
   return [
     { value: 'market', name: t('swapT') },
     { value: 'limit', name: t('limitT') },
@@ -118,6 +119,9 @@ function initToken() {
   tokenStore.swap.token = {address, chain}
   if (chain !== tokenStore.swap.native.chain) {
     tokenStore.swap.native = {symbol: getChainInfo(chain)?.main_name, chain: chain, address: chainMainToken[chain] || NATIVE_TOKEN, decimals: getChainInfo(chain)?.decimals }
+  }
+  if (chain !== tokenStore.swap.payToken.chain) {
+    tokenStore.swap.payToken = (botSwapStore?.botSwapBaseTokens?.[(chain || '') as BotChain] || [])[0]
   }
 }
 

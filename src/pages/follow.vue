@@ -64,8 +64,8 @@ ul.w-tabs{
     height: 32px;
     line-height: 32px;
     cursor: pointer;
-    color:var(--d-666-l-999);
-    background-color:var(--d-1A1A1A-l-F2F2F2);
+    color:var(--third-text);
+    background-color:var(--main-input-button-bg);
     justify-content: center;
     align-items: center;
     border-radius: 4px;
@@ -73,8 +73,8 @@ ul.w-tabs{
       padding: 0 16px;
     }
     &.active{
-      color: #f5f5f5;
-      background-color:var(--d-333-l-0A0B0C);
+      color: var(--white);
+      background-color:#3F80F7;
     }
   }
 }

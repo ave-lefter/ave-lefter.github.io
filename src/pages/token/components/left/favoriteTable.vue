@@ -17,9 +17,12 @@ const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 topEventBus.on(refresh)
 const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
 favDialogEvent.on(refresh)
+const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
+topAddGroupEvent.on(_getUserFavoriteGroups)
 onUnmounted(() => {
   topEventBus.off(refresh)
   favDialogEvent.off(refresh)
+  topAddGroupEvent.off(refresh)
 })
 
 function refresh() {

@@ -1,6 +1,7 @@
 import {UAParser} from 'ua-parser-js'
 import Cookies from 'js-cookie'
 import { createCacheRequest } from '@/utils/cacheRequest'
+import BigNumber from 'bignumber.js'
 // record_id（有tx_hash就用tx_hash，否则用order_id）
 // chain（record_id + chain 做主键）
 // create_time（服务器时间）
@@ -118,4 +119,79 @@ export const trackRef = createCacheRequest(async function trackRef(data) {
     }]}
   })
 }, 3000)
+
+
+
+export function recordTransactionV2(data: any) {
+  const ua = window.navigator.userAgent
+  let platform = 'pc'
+  if (ua.includes('Android') && /Ave.ai/i.test(ua)) {
+    platform = 'android'
+  } else if (ua.includes('iPhone') && /Ave.ai/i.test(ua)) {
+    platform = 'ios'
+  }
+  const { $api } = useNuxtApp()
+  console.log('recordTransactionV2', data)
+  return $api('/v1api/v2/aveswap/recordtx_v2', {
+    method: 'post',
+    body: {
+      platform,
+      record_from: 'bot_api',
+      ...data,
+      in_amount: Number(data.in_amount),
+      out_amount: Number(data.out_amount),
+    }
+  }).catch(err => {
+    console.log(err)
+  })
+}
+
+export function recordTxV2({ txInfo, chain, destination, type }: {
+  txInfo: any,
+  chain: string,
+  destination: string,
+  type: number
+}) {
+  console.log('recordTxV2', txInfo)
+  return recordTransactionV2({
+    record_from: 'bot_api',
+    record_id: String(txInfo?.id),
+    chain,
+    platform: 'pc',
+    type,
+    tx_hash: txInfo?.txHash || '',
+    destination,
+    wallet: txInfo?.creatorAddress || '',
+    out_token: txInfo?.outTokenAddress || '',
+    out_amount: new BigNumber(txInfo?.outAmount || 0).shiftedBy(-1 * (txInfo?.outDecimals || txInfo?.outTokenDecimals || 0)).toFixed(),
+    out_price: Number(txInfo?.outPrice || 0),
+    in_token: txInfo?.inTokenAddress || '',
+    in_amount: new BigNumber(txInfo?.inAmount || 0).shiftedBy(-1 * (txInfo?.inDecimals || txInfo?.inTokenDecimals || 0)).toFixed(),
+    in_price: Number(txInfo?.inPrice || 0),
+    remark: '',
+    to: txInfo?.to || '',
+  })
+}
+
+
+export function updateTransactionV2(data: any) {
+  const { $api } = useNuxtApp()
+  return $api('/v1api/v2/aveswap/updatetx_v2', {
+    method: 'post',
+    body: { ...data }
+  }).catch(err => {
+    console.log(err)
+  })
+}
+
+export function updateTxV2(txInfo: any, id: string | number) {
+  return updateTransactionV2({
+    record_from: 'bot_api',
+    record_id: String(id),
+    chain: txInfo.chain,
+    tx_hash: txInfo?.txHash,
+    status: 100,
+    to: '',
+  })
+}
 

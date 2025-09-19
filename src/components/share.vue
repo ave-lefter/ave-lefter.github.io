@@ -127,11 +127,11 @@ function getRandom(min: number, max: number) {
 
 function getColorClass(val: string) {
   if (Number(val) > 0) {
-    return 'color-#12b886!'
+    return 'color-[--up-color]!'
   } else if (Number(val) < 0) {
-    return 'color-#ff646d!'
+    return 'color-[--down-color]!'
   } else {
-    return 'color-#848E9C!'
+    return 'color-[--third-text]!'
   }
 }
 </script>
@@ -166,10 +166,10 @@ function getColorClass(val: string) {
                 height="24" alt=""
                 srcset=""
               >
-              <span class="ml-5px text-20px">Ave.ai</span>
+              <span class="ml-5px text-20px color-[--white]">Ave.ai</span>
             </div>
             <span
-              class="mt-5px block ml-auto text-10px color-#fff m-w-180px text-center">{{
+              class="mt-5px block ml-auto text-10px color-[--white] m-w-180px text-center">{{
                 $t('campaignTitle')
               }}</span>
           </div>
@@ -181,12 +181,12 @@ function getColorClass(val: string) {
             icon-size="40px"
             icon-chain-size="20px"
           />
-          <span class="text-14px color-#999 ml-8px">
+          <span class="text-14px color-[--third-text] ml-8px">
               {{ address?.slice(0, 4) + '...' + address?.slice(-4) }}
           </span>
         </div>
         <div class="mt-15px text-40px lh-none" :class="getColorClass(statistics.total_profit_ratio)">
-          <div class="color-#999 text-14px">{{ $t('RIO') }}</div>
+          <div class="color-[--third-text] text-14px">{{ $t('RIO') }}</div>
           <ExcludeError
             :model-value="statistics.total_profit_ratio"
           >
@@ -263,7 +263,6 @@ function getColorClass(val: string) {
                 {{ $t('winRate') }}
               </td>
               <td :class="getColorClass(statistics.total_win_rate)">
-                {{ console.log("statistics",statistics) }}
                 <ExcludeError
                   :model-value="statistics.total_win_rate"
                 >
@@ -278,16 +277,16 @@ function getColorClass(val: string) {
         </table>
         <div class="absolute right-30px bottom-30px flex justify-end text-center">
           <div class="text-right mt-10px">
-            <span class="font-20 font_weight_700 block color-#FFF">{{ $t('campaignSubTitle') }}</span>
-            <span class="font-12 font_weight_400 mt_10 color-#FFF">{{ $t('campaignDesc') }}</span>
+            <span class="font-20 font_weight_700 block color-[--white]">{{ $t('campaignSubTitle') }}</span>
+            <span class="font-12 font_weight_400 mt_10 color-[--white]">{{ $t('campaignDesc') }}</span>
           </div>
           <div class="ml-10px">
             <img :src="qrcodeUrl" :alt="$t('campaignScan')" width="60px" height="60px">
-            <span class="text-14px font-400 mt-5px block color-#FFF">{{ $t('campaignScan') }}</span>
+            <span class="text-14px font-400 mt-5px block color-[--white]">{{ $t('campaignScan') }}</span>
           </div>
         </div>
       </div>
-      <div class="flex justify-between mx-auto mt-20px text-12px w-300px color-#999">
+      <div class="flex justify-between mx-auto mt-20px text-12px w-300px color-[--third-text]">
         <div class="flex-col flex items-center cursor-pointer" @click.stop="downloadSharePoster">
           <img src="@/assets/images/share/download.svg" height="48" alt="" srcset="">
           <span class="mt-8px">{{ $t('download') }}</span>

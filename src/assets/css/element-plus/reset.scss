@@ -119,6 +119,7 @@
     padding: 0 12px;
   }
   .el-select-dropdown__item.is-selected{
+    color:var(--main-color);
     font-weight: normal;
   }
   .el-select-dropdown__item.is-hovering{
@@ -279,4 +280,22 @@
 
 .el-switch{
   --el-border-color:var(--icon-color);
+}
+
+.el-color-picker.el-tooltip__trigger{
+  width: 24px;
+  height: 24px;
+  .el-color-picker__trigger{
+    --el-border-color: none;
+  }
+  .el-color-picker__icon{
+    display: none;
+  }
+}
+.el-color-dropdown {
+  // background-color: #fff !important; // 你想要的颜色
+  // border-radius: 8px;                // 圆角
+  // box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  z-index: 1111111111111;
+  --el-bg-color-overlay: #000;
 }

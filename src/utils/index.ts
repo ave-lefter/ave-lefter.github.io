@@ -14,7 +14,7 @@ import BigNumber from 'bignumber.js'
 import type {SearchHot} from '~/api/types/search'
 import type { ConfigType } from 'dayjs'
 import { useStorage } from '@vueuse/core'
-import type { Size, SizeObj } from '~/api/types/pump'
+import type { Size, SizeObj, pumpObjColor } from '~/api/types/pump'
 import FingerprintJs from '@fingerprintjs/fingerprintjs'
 import { UniChainsV4 } from './wallet/utils/abi'
 export * from './wallet/utils/index'
@@ -846,19 +846,20 @@ export function _isArray(val:any) {
 
 export function getSwapSize(type: Size):SizeObj {
   const obj:Record<Size, SizeObj> = {
-    small: {
+    mini: {
       flash:'6px',
-      amm: '10px',
       text: '10px'
+    },
+    small: {
+      flash:'8px',
+      text: '12px'
     },
     medium: {
       flash:'10px',
-      amm: '12px',
-      text: '12px'
+      text: '14px'
     },
     large: {
       flash:'12px',
-      amm: '16px',
       text: '16px'
     }
   }
@@ -979,18 +980,89 @@ export function getMedias(appendix: string | undefined,t:ReturnType<typeof useI1
   }
   return []
 }
-// type PlatformType = 'pump' | 'bonk' | 'moonshot' | 'raydium' | 'believe' | 'jupstudio' | 'moon_new' | 'cookingcity'
-// const pumpColorMap: Record<PlatformType, string> = {
-//   pump: '#55D592',
-//   bonk: '#FF5E1F',
-//   moonshot: '#DFFF17',
-//   raydium: '#FDB32C',
-//   believe: '#00E043',
-//   jupstudio: '#FEB069',
-//   moon_new: '#FF75FF',
-//   cookingcity: '#6C416F',
-// }
-type PlatformType = 'pump.fun' | 'letsbonk.fun' | 'dexscreener.com' | 'raydium.io' | 'believe.app' | 'jup.ag' | 'moonshot.com' | 'cookingcity'
+export  type PlatformsType = 'pump' | 'bonk' | 'moonshot' | 'raydium' | 'believe' | 'jupstudio' | 'moon_new' | 'cookingcity'| 'fourmeme' | 'bags' | 'heaven'
+const pumpColorsMap: Record<PlatformsType, string> = {
+  pump: '#55D592',
+  bonk: '#FF5E1F',
+  moonshot: '#DFFF17',
+  raydium: '#FDB32C',
+  believe: '#00E043',
+  jupstudio: '#FEB069',
+  moon_new: '#FF75FF',
+  cookingcity: '#6C416F',
+  fourmeme: '#6C416F',
+  bags: '#2ff86f',
+  heaven: '#906f3e',
+}
+export function getBgColor(platform: string): string {
+  return pumpColorsMap[platform as PlatformsType] || '#FFA622'
+}
+ export const pumpMap: Record<PlatformsType, pumpObjColor> = {
+   pump: {
+     color: '#55D592',
+     bg: '--d-172521-l-DEF4EF',
+   },
+   bonk: {
+     color: '#FF5E1F',
+     bg: '--d-281915-l-F7E2DD',
+   },
+   moonshot: {
+     color: '#DFFF17',
+     bg: '--d-252914-l-F3FADC',
+   },
+
+   raydium: {
+     color: '#FDB32C',
+     bg: '--d-282116-l-F7EFDF',
+   },
+   believe: {
+     color: '#00E043',
+     bg: '--d-0E2619-l-D1F5E3',
+   },
+   jupstudio: {
+     color: '#FEB069',
+     bg: '--d-28211D-l-F7EEE9',
+   },
+   moon_new: {
+     color: '#FF75FF',
+     bg: '--d-281B2C-l-F7E5FF',
+   },
+   cookingcity: {
+     color: '#6C416F',
+     bg: '--d-19161D-l-E1DDE9',
+   },
+   fourmeme: {
+     color: '#55D592',
+     bg: '--d-172521-l-DEF4EF',
+   },
+   bags: {
+     color: '#00D62B',
+     bg: '--d-281915-l-D1F4DF',
+   },
+   heaven: {
+     color: '#D5AF74',
+     bg: '--d-24211E-l-F1EEEA',
+   },
+ }
+
+export function getPumpBgColor(platform: string): pumpObjColor {
+
+    const item = pumpMap[platform as PlatformsType]
+    if (!item) {
+      return { color: '#55D592', bg: resolveColor('--d-172521-l-DEF4EF') }
+    }
+    return {
+      ...item,
+      bg: resolveColor(item.bg),
+    }
+}
+function resolveColor(value: string): string {
+  if (value.startsWith('--')) {
+    return getCssVariable(value) || getCssVariable('--d-172521-l-DEF4EF') // 取不到就给默认色
+  }
+  return value
+}
+type PlatformType = 'pump.fun' | 'letsbonk.fun' | 'dexscreener.com' | 'raydium.io' | 'believe.app' | 'jup.ag' | 'moonshot.com' | 'cookingcity' | 'fourmeme'
 const pumpColorMap: Record<PlatformType, string> = {
   'pump.fun': '#55D592',
   'letsbonk.fun': '#FF5E1F',
@@ -1000,6 +1072,7 @@ const pumpColorMap: Record<PlatformType, string> = {
   'jup.ag': '#FEB069',
   'moonshot.com': '#FF75FF',
   cookingcity: '#6C416F',
+  fourmeme: '#6C416F',
 }
 export function getPumpColor(platform: string): string {
   return pumpColorMap[platform as PlatformType] || '#FFA622'
@@ -1024,4 +1097,26 @@ export function requestTimeout(interval: number, callback: () => void) {
 
 export function getCssVariable(key: string) {
   return getComputedStyle(document.documentElement).getPropertyValue(key)
+}
+
+export function hexToRgba(hex: string, alpha = 1) {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+export function getLightDarkValue(cssVarName: string) {
+  const match = cssVarName.match(/^(--.*?)-(l|d)-([0-9A-Fa-f]{6})$/)
+  if (!match) {
+    throw new Error(`变量名格式不符合: ${cssVarName}`)
+  }
+
+  const [, prefix, , hex] = match
+  const lightName = `${prefix}-l-${hex}`
+  const darkName = `${prefix}-d-${hex}`
+
+  return {
+    light: getCssVariable(lightName),
+    dark: getCssVariable(darkName),
+  }
 }

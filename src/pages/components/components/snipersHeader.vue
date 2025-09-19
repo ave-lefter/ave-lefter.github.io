@@ -6,32 +6,33 @@ const props = defineProps<{
   setSortConditions(params: { sort: string; sort_dir: string }): void
   setFilterForm(...args: [string, string][]): void
 }>()
-const defaultSort = computed(() => {
-  if (props.sortConditions.sort === 'sniper_tx_count') {
-    return (
-      {
-        asc: 'ascending',
-        desc: 'descending',
-      }[props.sortConditions.sort_dir] || ''
-    )
-  }
-  return ''
-})
+// const defaultSort = computed(() => {
+//   if (props.sortConditions.sort === 'sniper_tx_count') {
+//     return (
+//       {
+//         asc: 'ascending',
+//         desc: 'descending',
+//       }[props.sortConditions.sort_dir] || ''
+//     )
+//   }
+//   return ''
+// })
 
-function sortChange(sort_dir: string) {
-  props.setSortConditions({
-    sort: sort_dir ? 'sniper_tx_count' : '',
-    sort_dir: sort_dir.replace('ending', ''),
-  })
-}
+// function sortChange(sort_dir: string) {
+//   props.setSortConditions({
+//     sort: sort_dir ? 'sniper_tx_count' : '',
+//     sort_dir: sort_dir.replace('ending', ''),
+//   })
+// }
 
+const globalStore = useGlobalStore()
 const popoverVisible = shallowRef(false)
 const openTimeList = shallowRef([
   { text: '< 10', value: '10' },
   { text: '< 50', value: '50' },
   { text: '< 100', value: '100' },
 ])
-const isFilterHighlight = shallowRef(false)
+const isFilterHighlight = shallowRef(!!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.sniper_tx_count_min || !!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.sniper_tx_count_max)
 const { t } = useI18n()
 function confirm(params?: [string, string]) {
   if (!params || !params.some((el) => !!el)) {
@@ -58,6 +59,7 @@ function confirm(params?: [string, string]) {
     <!-- <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /> -->
     <RangePopover
       v-model="popoverVisible"
+      sortKey="sniper_tx_count"
       :width="225"
       :title="$t('snipers')"
       :list="openTimeList"

@@ -41,6 +41,7 @@ import {
   Headline,
 } from '../components/index'
 import { set } from 'lodash-es'
+import dayjs from 'dayjs'
 import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
 
@@ -59,20 +60,15 @@ const props = defineProps<{
   activeTab: string
   height: string
 }>()
-const sortConditions = ref({
-  sort: '',
-  sort_dir: '',
-})
+const {rankConditions} = storeToRefs(globalStore)
 function setSortConditions(params: { sort: string; sort_dir: string }) {
-  sortConditions.value = params
+  rankConditions.value[props.activeTab].sort = params
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
-const defaultFilter = {}
-const filterForm = ref(defaultFilter)
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(filterForm.value, keyVal[0], keyVal[1])
+    set(rankConditions.value[props.activeTab].filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -105,10 +101,11 @@ const storageKey = computed(()=>{
 })
 let columns = useStorage(storageKey.value, getPumpDefault(t))
 watch(()=>props.activeTab,()=>{
+  initCache()
   columns = useStorage(storageKey.value, getPumpDefault(t))
-  sortConditions.value.sort = ''
-  sortConditions.value.sort_dir = ''
-  filterForm.value = {}
+  // sortConditions.value.sort = ''
+  // sortConditions.value.sort_dir = ''
+  // filterForm.value = {}
   pageInfo.value.pageNO = 1
   _getTreasureList()
 },{
@@ -134,12 +131,18 @@ async function _getTreasureList(shouldLoading = true) {
       loading.value = true
     }
     const { total: _, ...rest } = pageInfo.value
+    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
+      if(prev[cur]){
+        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+      }
+      return prev
+    },{...rankConditions.value[props.activeTab].filter})
     const res = await getTreasureList({
       category: props.activeSubTab,
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
-      ...sortConditions.value,
-      ...filterForm.value,
+      ...rankConditions.value[props.activeTab]?.sort,
+      ...finalFilter,
       self_address: walletAddress.value,
     })
     pageInfo.value.total = res.total
@@ -162,6 +165,7 @@ onDeactivated(() => {
   clearTimeout(timer)
 })
 onActivated(() => {
+  initCache()
   clearTimeout(timer)
   timer = window.setTimeout(() => {
     _getTreasureList(false)
@@ -195,7 +199,7 @@ watch(
       }
       return el
     })
-    const { sort, sort_dir } = sortConditions.value
+    const { sort, sort_dir } = rankConditions.value[props.activeTab].sort
     const sortVal = { asc: '1', desc: '-1' }[sort_dir]
     if (sortVal) {
       listData.value = updateList.toSorted((a, b) => (a[sort] - b[sort]) * sortVal)
@@ -216,51 +220,6 @@ function initWs() {
     params: ['price_extra', params],
     id: 1,
   })
-}
-
-async function collect(index: number, row) {
-  if (walletAddress.value) {
-    if (walletStore.address) {
-      await walletStore.signMessageForFavorite()
-    }
-    if (row.is_fav) {
-      removeTokenFavorite(row, index)
-    } else {
-      addTokenFavorite(row, index)
-    }
-  } else {
-    verifyLogin()
-  }
-}
-
-function removeTokenFavorite(row, index: number) {
-  loading.value = true
-  removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
-    .then(() => {
-      ElMessage.success(t('cancelled1'))
-      row.is_fav = false
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-function addTokenFavorite(row, index: number) {
-  loading.value = true
-  addFavorite(`${row.token}-${row.chain}`, walletAddress.value, 0)
-    .then(() => {
-      ElMessage.success(t('collected'))
-      row.is_fav = true
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
 }
 
 function sizeChange() {
@@ -360,6 +319,18 @@ const cellRenderer = computed(() => {
     last_trade_at: LastTradeContent,
   }
 })
+
+function initCache() {
+  if(!rankConditions.value[props.activeTab]){
+    rankConditions.value[props.activeTab] = {
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    }
+  }
+}
 </script>
 <template>
   <div v-loading="loading" :style="`height:${height}`">
@@ -382,9 +353,10 @@ const cellRenderer = computed(() => {
         :is="headerRenderer[item.key as keyof typeof headerRenderer]"
           :key="activeTab"
           v-model:isVolUSDT="isVolUSDT"
-          :sortConditions="sortConditions"
+          :sortConditions="rankConditions[activeTab]?.sort"
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
+          :activeTab="activeTab"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
         />
       </template>
@@ -400,7 +372,6 @@ const cellRenderer = computed(() => {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
           :activeChain="activeChain"
           :childrenData="item.children || []"
-          @collect="collect"
         />
       </template>
     </AveTable>
