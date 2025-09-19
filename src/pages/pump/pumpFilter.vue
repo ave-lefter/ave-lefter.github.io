@@ -168,7 +168,7 @@
             <div style="display: flex; width: 100%" class="mt-30px">
               <el-button
                 class="flex-1"
-                style="height: 30px; min-width: 60px; --el-button-font-weight: 400; background: #252B34; border: none;color: #f5f5f5"
+                style="height: 30px; min-width: 60px; --el-button-font-weight: 400; background: var(--border); border: none;color: var(--main-text)"
                 @click="reset"
               >
                 {{ $t('reset') }}
@@ -699,8 +699,8 @@ const tabs = computed(() => {
   justify-content: center;
   padding: 5px 8px;
   cursor: pointer;
-  color: var(--d-566275-l-8CA0C3);
-  background: var(--d-151A22-l-E8F1FF);
+  color: var(--third-text);
+  background: var(--main-input-button-bg);
   border-radius: 4px;
   font-size: 12px;
   line-height: 14px;
@@ -710,7 +710,7 @@ const tabs = computed(() => {
   height: 26px;
   position: relative;
   &.hight{
-    color: var(--d-999-l-666)
+    color: var(--main-text)
   }
 
   img {
@@ -724,17 +724,17 @@ const tabs = computed(() => {
     width: 14px;
     height: 14px;
     text-align: center;
-    background-color: var(--d-566275-l-8CA0C3);
-    color: var(--d-F5F5F5-l-333);
+    background-color: var(--third-text);
+    color: var(--main-text);
     margin-left: 4px;
     font-size: 10px;
   }
 
   &:hover {
     cursor: pointer;
-    color: var(--d-F5F5F5-l-333);
+    color: var(--main-text);
     .iconify {
-      color: var(--d-F5F5F5-l-333);
+      color: var(--main-text);
     }
   }
 
@@ -747,7 +747,7 @@ const tabs = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--d-252E3C-l-E8F1FF);
+  background: var(--border);
   padding: 4px;
   border-radius: 4px;
   font-size: 12px;
@@ -756,12 +756,12 @@ const tabs = computed(() => {
   button {
     border: none;
     // font-size: 14px;
-    color: var(--d-566275-l-8CA0C3);
+    color: var(--third-text);
     letter-spacing: 0;
     font-weight: 400;
     cursor: pointer;
     border-radius: 4px;
-    border: 1ox solid var(--d-566275-l-8CA0C3);
+    border: 1ox solid var(--border);
     background: transparent;
     min-width: 36px;
     padding: 6px 6px;
@@ -771,32 +771,33 @@ const tabs = computed(() => {
     align-items: center;
     justify-content: center;
     &.active {
-      color: var(--d-F5F5F5-l-111);
-      background: var(--d-151A22-l-FFFFFF);
+      color: var(--main-text);
+      background: var(--dialog-tab-active-bg);
     }
   }
 }
 .border{
   border: none;
-  border-bottom: 1px solid var(--d-252E3C-l-E8F1FF);
+  border-bottom: 1px solid var(--dialog-divider);
 }
 :deep().el-form-item__label{
-  color: var(--d-8CA0C3-l-566275);
+  color: var(--secondary-text);
 
 }
 :deep().el-checkbox__inner{
-  border-color: var(--d-252E3C-l-E8F1FF);
+  border-color: var(--border);
 
 }
 :deep().el-checkbox__label{
-  color: var(--d-566275-l-8CA0C3);
+  color: var(--third-text);
 }
 :deep().el-input.el-input {
-  --el-input-bg-color: var(--d-252E3C-l-E8F1FF);
-  --el-input-border-color: var(--d-252E3C-l-E8F1FF);
+  --el-input-bg-color: var(--border);
+  --el-input-border-color: var(--border);
   --el-input-border-radius: 4px;
+  color: var(--main-text);
   .el-checkbox__inner{
-      border-color: var(--d-252E3C-l-E8F1FF);
+      border-color: var(--border);
     }
   .el-input__wrapper {
     background: transparent;
@@ -808,10 +809,13 @@ const tabs = computed(() => {
       box-shadow: 0 0 0 1px #3F80F7 inset;
     }
     .el-input__suffix{
-      color: var(--d-566275-l-8CA0C3)
+      color: var(--third-text)
     }
-    .el-input__inner::placeholder {
-      color: var(--d-566275-l-8CA0C3);
+    .el-input__inner{
+      color: var(--main-text);
+      &::placeholder {
+        color: var(--third-text);
+      }
     }
   }
 }

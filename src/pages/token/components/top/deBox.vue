@@ -9,7 +9,7 @@
       >
       <Icon
         name="custom:debox"
-        class="color-[--d-666-l-999] text-12px"
+        class="color-[--third-text] text-12px"
         :class="show? 'color-#21c161': ''"
       />
       <!-- <img v-if="show" src="@/assets/images/debox_on.svg" alt="" width="16px">
@@ -172,7 +172,7 @@ function toggle() {
     align-items: center;
     justify-content: center;
     border-radius: 2px;
-    background-color: var(--d-222-l-F2F2F2);
+    background-color: var(--main-input-button-bg);
     padding: 2px;
 }
 </style>

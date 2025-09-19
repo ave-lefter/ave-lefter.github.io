@@ -39,7 +39,7 @@ const getColor = (id: string) => {
   .tabs {
     display: flex;
     align-items: center;
-     background: var(--d-222-l-F2F2F2);
+     background: var(--main-list-hover);
     .tab-button {
       display: flex;
       flex-direction: column;
@@ -47,8 +47,8 @@ const getColor = (id: string) => {
       justify-content: center;
       cursor: pointer;
       border: none;
-      background: var(--d-222-l-F2F2F2);
-      color: var(--d-F5F5F5-l-333);
+      background: var(--main-list-hover);
+      color: var(--main-text);
       flex: 1;
       min-height: 44px;
       &:first-child {
@@ -65,7 +65,7 @@ const getColor = (id: string) => {
         margin-top: 2px;
       }
       &.active {
-        background: var(--d-333-l-DDD);
+        background: var(--tab-active-bg);
       }
     }
   }

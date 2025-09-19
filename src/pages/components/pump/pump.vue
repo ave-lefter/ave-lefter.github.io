@@ -221,51 +221,6 @@ function initWs() {
   })
 }
 
-async function collect(index: number, row) {
-  if (walletAddress.value) {
-    if (walletStore.address) {
-      await walletStore.signMessageForFavorite()
-    }
-    if (row.is_fav) {
-      removeTokenFavorite(row, index)
-    } else {
-      addTokenFavorite(row, index)
-    }
-  } else {
-    verifyLogin()
-  }
-}
-
-function removeTokenFavorite(row, index: number) {
-  loading.value = true
-  removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
-    .then(() => {
-      ElMessage.success(t('cancelled1'))
-      row.is_fav = false
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-function addTokenFavorite(row, index: number) {
-  loading.value = true
-  addFavorite(`${row.token}-${row.chain}`, walletAddress.value, 0)
-    .then(() => {
-      ElMessage.success(t('collected'))
-      row.is_fav = true
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
 function sizeChange() {
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -386,8 +341,8 @@ function initCache() {
       :header-height="40"
       :row-height="81"
       fixed
-      style="--el-bg-color: var(--d-111-l-FFF)"
-      row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
+      style="--el-bg-color: var(--secondary-bg)"
+       row-class="cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)]"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"
@@ -416,7 +371,6 @@ function initCache() {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
           :activeChain="activeChain"
           :childrenData="item.children || []"
-          @collect="collect"
         />
       </template>
     </AveTable>
@@ -425,7 +379,7 @@ function initCache() {
     v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
-    class="mt-5px py-9px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
+    class="mt-5px py-9px flex justify-center [&&]:[--el-pagination-button-height:18px]"
     layout="total, prev, pager, next"
     :total="pageInfo.total || 0"
     :small="false"

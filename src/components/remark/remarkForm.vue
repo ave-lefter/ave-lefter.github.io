@@ -17,7 +17,6 @@
       :required="required"
     >
       <el-input
-        class="[&&]:[--el-fill-color-blank:var(--d-666-l-F2F2F2)]"
         v-model="form.remark"
         type="text"
         clearable
@@ -30,9 +29,8 @@
     <el-form-item style="margin-top: 30px; margin-bottom: 0;">
       <div style="display: flex; justify-content: flex-end; width: 100%;gap:6px;">
         <el-button
+          :key="themeStore.theme"
           style="height: 32px; flex: 1; font-weight: 400"
-          :color="buttonCancelColor"
-          class="[&&]:[--el-color-black:#333]"
           @click="onCancel"
         >
           {{ t('cancel') }}
@@ -41,7 +39,6 @@
           native-type="submit"
           type="primary"
           style="height: 32px; flex: 1; font-weight: 400"
-          :color="buttonConfirmColor"
         >
           {{ t('confirm') }}
         </el-button>
@@ -81,7 +78,7 @@ const buttonCancelColor = computed(() =>
 )
 const buttonConfirmColor = computed(() =>
   !themeStore.isDark ? '#3F80F7' : '#3F80F7'
-) 
+)
 
 const rules = {
   remark: [
@@ -105,22 +102,19 @@ function onCancel() {
 </script>
 
 <style scoped lang="scss">
-:deep() .el-input {
-  --el-input-border-color: #444444;
-  --el-input-placeholder-color: var(--d-666-l-999);
-  --el-text-color-placeholder: #999;
-  --el-input-bg-color: var(--d-333-l-F2F2F2)
-}
+// :deep() .el-input {
+//   --el-input-border-color: var(--border);
+//   --el-input-placeholder-color: var(--d-666-l-999);
+//   --el-text-color-placeholder: #999;
+//   --el-input-bg-color: var(--dialog-bg)
+// }
 :deep() .el-button {
   --el-border:none;
 }
 :deep() .el-input__wrapper {
-  border: none;
   border-radius: 6px;
-  box-shadow: none;
-
-  &:hover {
-    box-shadow: 0 0 0 1px #3F80F7 inset;
-  }
+  // &:hover {
+  //   box-shadow: 0 0 0 1px #3F80F7 inset;
+  // }
 }
 </style>

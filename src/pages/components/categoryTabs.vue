@@ -47,7 +47,7 @@ const configMap = computed(() => {
       storageKey: 'hotUserTableColumns',
       getDefaultColumns: getHotDefaultColumns,
       getOptions: getHotOptions,
-      class: isHot.value ? 'color-#FFA622' : '',
+      class: isHot.value ? 'color-[--yellow]' : '',
     },
     new: {
       icon: 'custom:new',
@@ -153,7 +153,14 @@ const configMap = computed(() => {
       getDefaultColumns:getActivityDefaultColumns,
       getOptions:getActivityOptions,
       class:''
-    }
+    },
+    xdyorswap_pump:{
+      icon:'',
+      storageKey:'xdyorswap_pumpTableColumns',
+      getDefaultColumns:getPumpDefault,
+      getOptions:getPumpOptions,
+      class:''
+    },
   }
 })
 
@@ -204,7 +211,8 @@ const supportCategories = computed(() => {
     // 'cto',
     'xstocks',
     'volume',
-    'heaven_pump'
+    'heaven_pump',
+    'xdyorswap_pump'
   ]
   return (props.categories || []).filter((el) => {
     return keys.includes(el.category)
@@ -251,7 +259,7 @@ watch(()=>props.categories,()=>{
 </script>
 
 <template>
-  <div class="flex gap-16px py-12px px-16px bg-[--d-111-l-FFF]">
+  <div class="flex gap-16px py-12px px-16px bg-[--main-bg]">
     <ChainsSelect
       :activeChain="activeChain"
       :list="chains"
@@ -262,11 +270,11 @@ watch(()=>props.categories,()=>{
         <span
           v-for="(item, index) in supportCategories"
           :key="index"
-          class="p-2 lh-16px cursor-pointer rounded-1 flex items-center shrink-0"
+          class="p-2 lh-16px cursor-pointer rounded-1 flex items-center shrink-0 relative"
           :class="
             activeTab === item.category
-              ? 'color-#F5F5F5 bg-#333'
-              : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
+              ? 'color-[--white] bg-[--primary-color]'
+              : 'bg-[--main-input-button-bg] color-[--secondary-text]'
           "
           @click="updateCategory(item.category, item.sub_category || [],index)"
         >
@@ -277,18 +285,20 @@ watch(()=>props.categories,()=>{
             :class="configMap[item.category as keyof typeof configMap].class"
           />
           {{ (item as any)[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
+          <img v-if="item.is_hot === 1" class="absolute right-0px top-0px" src="@/assets/images/hot.svg" alt="" :height="10">
+          <img v-else-if="item.is_hot === 2" class="absolute right-0px top-0px" src="@/assets/images/new.svg" alt="" :height="10">
         </span>
       </div>
       <div class="flex gap-12px items-center text-12px">
-        <div class="p-1 rounded-1 bg-[--d-222-l-F2F2F2]">
+        <div class="p-1 rounded-1 bg-[--main-input-button-bg]">
           <button
             v-for="(item, index) in intervals"
             :key="index"
-            class="lh-16px py-2px px-8px color-[--d-666-l-999] border-none cursor-pointer rounded-2px"
+            class="lh-16px py-2px px-8px border-none cursor-pointer rounded-2px"
             :class="
               globalStore.rankCommon.activeInterval === item.id
-                ? 'bg-[--d-111-l-FFF] color-[--d-F5F5F5-l-333]'
-                : 'bg-transparent'
+                ? 'bg-[--border] color-[--main-text]'
+                : 'bg-transparent color-[--secondary-text]'
             "
             @click.stop="globalStore.rankCommon.activeInterval = item.id"
           >
@@ -317,7 +327,7 @@ watch(()=>props.categories,()=>{
   </div>
   <div
     v-if="sub_category_list.length"
-    class="flex items-center gap-8px text-12px px-16px pb-12px bg-[--d-111-l-FFF]"
+    class="flex items-center gap-8px text-12px px-16px pb-12px bg-[--main-bg]"
   >
     <div
       v-for="item in sub_category_list"
@@ -325,8 +335,8 @@ watch(()=>props.categories,()=>{
       class="p-2 lh-16px cursor-pointer rounded-1 flex items-center"
       :class="
         activeSubTab === item.category
-          ? 'color-#F5F5F5 bg-#333'
-          : 'bg-[--d-1A1A1A-l-F2F2F2] color-[--d-666-l-999]'
+           ? 'color-[--white] bg-[--primary-color]'
+              : 'bg-[--main-input-button-bg] color-[--secondary-text]'
       "
       @click="updateSubCategory(item.category)"
     >
@@ -334,7 +344,7 @@ watch(()=>props.categories,()=>{
         v-if="isPump"
         :name="`custom:${item.category.replaceAll('_', '-')}`"
         class="mr-1 text-12px"
-        :class="activeSubTab === item.category ? 'color-#F5F5F5' : ''"
+        :class="activeSubTab === item.category ? 'color-[--white]' : ''"
       />
       {{ item[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
     </div>

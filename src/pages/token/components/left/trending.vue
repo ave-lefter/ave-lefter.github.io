@@ -107,7 +107,7 @@ const columns = computed(() => {
 </script>
 
 <template>
-  <div class="color-[--d-F5F5F5-l-333]">
+  <div class="color-[--main-text]">
     <THead
       v-model:sort="sort"
       :columns="columns"
@@ -119,7 +119,7 @@ const columns = computed(() => {
       <NuxtLink
         v-for="(row,$index) in sortedHotList"
         :key="$index"
-        class="px-10px flex items-center h-50px cursor-pointer hover:bg-[--d-1A1A1A-l-F2F2F2] text-12px"
+        class="px-10px flex items-center h-50px cursor-pointer hover:bg-[--dialog-bg] text-12px"
         :to="`/token/${row.token}-${row.chain}`"
       >
         <div class="flex-1 flex items-center">
@@ -128,12 +128,12 @@ const columns = computed(() => {
               <TokenImg :row="row"/>
             </template>
             <template #content>
-              <TokenImg :row="row" chain-class="hidden" token-class="w-240px h-240px [&&]:mr-0 rounded-16px" />
+              <TokenImg :row="row" chain-class="hidden" token-class="w-240px h-240px [&&]:mr-0 rd-16px" />
             </template>
           </el-tooltip>
           <div class="ml-6px">
             <div class="flex items-center">
-              <span class="color-[--d-F5F5F5-l-333] max-w-80px overflow-hidden text-ellipsis whitespace-nowrap">{{
+              <span class="color-[--main-text] max-w-80px overflow-hidden text-ellipsis whitespace-nowrap">{{
                   row.symbol
                 }}</span>
               <img
@@ -148,7 +148,7 @@ const columns = computed(() => {
                 name="custom:danger"
                 class="font-14 ml-2px color-#F72121"/>
             </div>
-            <div class="mt-2px color-[--d-999-l-666]">
+            <div class="mt-2px color-[--third-text]">
               <template v-if="row.current_price_usd === 0">0</template>
               <template v-else-if="row.current_price_usd === '--'">--</template>
               <template v-else>

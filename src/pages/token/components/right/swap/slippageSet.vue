@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="flex items-center">
-      <span v-if="canSetAuto" class="mr-5px color-[--d-F5F5F5-l-333]">
+      <span v-if="canSetAuto" class="mr-5px color-[--main-text]">
         {{ slippage === 'auto' ? $t('autoSlippage') : $t('manualSlippage') }}({{ slippage === 'auto' ? autoSlippage : slippage }}%)
       </span>
-      <span v-else style="color: var(--custom-text-1-color);">{{ slippage }}%</span>
-      <Icon class="ml-5px clickable" name=tdesign:setting-1 @click.stop="show = true" />
+      <span v-else class="mr-5px">{{ slippage }}%</span>
+      <Icon class="clickable" name=tdesign:setting-1 @click.stop="show = true" />
     </div>
     <el-dialog v-model="show" width="500px" append-to-body>
       <template #header>
@@ -66,9 +66,9 @@
         </div>
         <div class="form-submit">
           <el-button
-            class="swap-button w-full"
+            class="swap-button w-full rd-8px!"
+            size="large"
             block
-            round
             native-type="submit"
             type="primary"
             :disabled="slippage == 0"
@@ -161,11 +161,11 @@ function validator(val: number | string) {
     }
   }
   .radio-item {
-    background: var(--d-333-l-F5F5F5);
+    background: var(--border);
     border-radius: 8px;
     min-width: 86px;
     font-size: 14px;
-    color: var(--d-F5F5F5-l-333);
+    color: var(--main-text);
     letter-spacing: 0;
     font-weight: 400;
     text-align: center;
@@ -176,7 +176,7 @@ function validator(val: number | string) {
 }
 .slippage-label {
   font-size: 14px;
-  color: #80838b;
+  color: var(--secondary-text);
   letter-spacing: 0;
   text-align: center;
   font-weight: 400;
@@ -189,16 +189,16 @@ function validator(val: number | string) {
   display: flex;
   align-items: center;
   font-size: 16px;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   font-weight: 400;
   .is-disabled  {
     opacity: 0.5;
   }
   &:deep() .el-input__wrapper, &:deep() .el-input__inner {
-    background-color: var(--d-333-l-F5F5F5);
+    background-color: var(--border);
   }
   &:deep() .el-input-number__decrease, &:deep() .el-input-number__increase {
-    background-color: var(--d-333-l-F5F5F5);
+    background-color: var(--border);
   }
   .input {
     font-size: 14px;
@@ -222,7 +222,7 @@ function validator(val: number | string) {
 .form-submit {
   margin-top: 40px;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 .tip {
   font-size: 14px;

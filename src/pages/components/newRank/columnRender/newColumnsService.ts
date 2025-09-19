@@ -34,6 +34,7 @@ export function getNewOptions(t: ReturnType<typeof useI18n>['t']) {
           'snipers1mContent',
           'securityContent',
           'insidersContent',
+          'dexContent'
         ],
       },
     ]
@@ -223,6 +224,14 @@ export function getNewDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       ],
       minWidth:getTextWidth(t('security'), 50) + 55,
       align:'right'
+    },
+    {
+      title: 'DEX',
+      key: 'dex',
+      isVisible: false,
+      render: 'dexContent',
+      minWidth:70,
+      align:'center'
     },
     {
       title: t('quick'),

@@ -56,7 +56,7 @@ watch(
 <template>
   <div class="code-block">
     <div class="flex-end">
-      <Icon v-copy="props.code" name="bxs:copy" class="clickable text-14px color-[--d-666-l-999]" />
+      <Icon v-copy="props.code" name="bxs:copy" class="clickable text-14px color-[--third-text]" />
     </div>
     <div class="code-scroll" v-if="props.show">
       <pre>

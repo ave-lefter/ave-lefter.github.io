@@ -1,7 +1,7 @@
 <template>
   <div v-if="isAutoSellConfig" class="min-w-180px">
-    <div class="mb-3px">{{ $t('autoSellStrategy') }}</div>
-    <ul class="color-#999">
+    <div class="mb-3px color-[--main-text]">{{ $t('autoSellStrategy') }}</div>
+    <ul class="color-[--secondary-text]">
       <li v-if="botSettingStore.autoSellConfig_autoSell">{{ $t('autoSellHalf') }}: {{ $t('takeProfit') }} <span class="color-#12B886">100%</span>, {{ $t('sell') }} <span class="color-#12B886">50%</span></li>
       <li v-if="autoSellConfigs.isAutoSellConfig_devsell && Number(autoSellConfigs.autoSellConfig_devsell!.priceChange) > 0 && Number(autoSellConfigs.autoSellConfig_devsell!.sellRatio) > 0">{{ $t('DEVSEll') }}: <span class="text-18px mt--3px">≥</span><span class="color-#F6465D">{{ autoSellConfigs.autoSellConfig_devsell!.priceChange }}%</span>, {{ $t('sell') }} <span class="color-#F6465D">{{ autoSellConfigs.autoSellConfig_devsell!.sellRatio }}%</span></li>
       <li v-if="autoSellConfigs.isAutoSellConfig_trailing && Number(autoSellConfigs.autoSellConfig_trailing!.priceChange) > 0 && Number(autoSellConfigs.autoSellConfig_trailing!.sellRatio) > 0">{{ $t('trailingStop') }}: {{ $t('pullback') }} <span class="color-#F6465D">{{ autoSellConfigs.autoSellConfig_trailing!.priceChange }}%</span>, {{ $t('sell') }} <span class="color-#F6465D">{{ autoSellConfigs.autoSellConfig_trailing!.sellRatio }}%</span></li>

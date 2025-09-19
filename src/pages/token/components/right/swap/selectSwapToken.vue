@@ -2,7 +2,7 @@
   <button class="flex items-center bg-transparent border-none p-0 clickable text-14px" type="button" @click.stop="show = true">
     <template v-if="props.token?.address || props.token?.token">
       <TokenImg :key="props.token?.address" :row="props.token" />
-      <span class="text-14px color-[--d-F5F5F5-l-333] font-400 ml-3px">
+      <span class="text-14px color-[--main-text] font-400 ml-3px">
         {{ props.token?.symbol || '' }}
       </span>
     </template>

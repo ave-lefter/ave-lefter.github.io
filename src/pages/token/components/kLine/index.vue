@@ -1,14 +1,14 @@
 <template>
-  <div class="relative" :style="{height: `${isRank ? 290 : kHeight}px`}">
+  <div class="relative" :style="{height: `${isRank ? 390 : kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
     <UnknownRisk v-show="isReady" :isRank="isRank" @refresh="refresh" />
   </div>
   <div
     v-if="!isRank"
-    class="w-full cursor-row-resize bg-[--d-222-l-F2F2F2] gap-1px hover:bg-[--d-666-l-CCC] flex items-center justify-center h-4px"
+    class="w-full cursor-row-resize bg-[--border] gap-1px hover:bg-[--third-text] flex items-center justify-center h-4px"
     @mousedown.stop.prevent="drag"
   >
-    <span v-for="i in 4" :key="i" class="bg-#444 w-2px h-2px rounded-full"/>
+    <span v-for="i in 4" :key="i" class="bg-[--icon-color] w-2px h-2px rounded-full"/>
   </div>
 </template>
 
@@ -31,6 +31,7 @@ const props = defineProps<{
 }>()
 const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const botStore = useBotStore()
+const tokenDetailsStore = useTokenDetailsStore()
 const route = useRoute()
 const token = computed(() => {
   return (props.isRank && 'klineRow' in tokenStore) ? tokenStore.klineRow?.id : route.params.id as string
@@ -145,10 +146,11 @@ const showMarket = useLocalStorage('tv_showMarket', false)
 watch(() => themeStore.theme, (val) => {
   if (_widget) {
     _widget?.changeTheme(val).then(() => {
+      setIframeCssVar()
       _widget?.applyOverrides?.({
         'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
         'paneProperties.backgroundType': 'solid',
-        'paneProperties.background': themeStore.isDark ? '#111' : '#fff',
+        'paneProperties.background': getCssVariable('--secondary-bg'),
       })
     })
   }
@@ -248,7 +250,7 @@ function createToggleButton() {
 }
 
 
-const { createMarkButton, getMarks, marksTabs, wsTxUpdateMarks } = useKlineMarks()
+const { createMarkButton, getMarks, marksTabs, wsTxUpdateMarks,profilingMarksCache } = useKlineMarks()
 
 watch(marksTabs, () => {
   if (!isReady.value) return
@@ -298,10 +300,10 @@ async function initChart() {
     timezone: getTimezone() as Timezone,
     time_frames: [],
     loading_screen: {
-      backgroundColor: themeStore.isDark ? '#111' : '#fff',
+      backgroundColor: themeStore.isDark ? '#0B0D12' : '#F6F9FF',
       foregroundColor: '#3F80F7'
     },
-    custom_css_url: `${location.origin}/tv_custom.css`,
+    custom_css_url: `${location.origin}/tv_custom_1.css`,
     // format: (showMarket.value ? 'volume' : 'price') as SeriesFormat,
     custom_formatters: {
       priceFormatterFactory: () => {
@@ -328,7 +330,8 @@ async function initChart() {
       // "scalesProperties.lineColor": '#333',
       'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
       'paneProperties.backgroundType': 'solid',
-      'paneProperties.background': themeStore.isDark ? '#111' : '#fff',
+      // --d-0B0D12-l-F6F9FF
+      'paneProperties.background': themeStore.isDark ? '#0B0D12' : '#F6F9FF',
       'paneProperties.vertGridProperties.style': 2,
       // "paneProperties.vertGridProperties.color": style.grid,
       // "paneProperties.horzGridProperties.style": 2,
@@ -396,6 +399,7 @@ async function initChart() {
         if (!isSupportSecChains) {
           configurationData.supported_resolutions = ['1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[]
         }
+        setIframeCssVar()
 
         setTimeout(() => callback(configurationData), 50)
       },
@@ -627,6 +631,11 @@ async function initChart() {
     subscribePriceMove()
     // 从缓存中读取数据并创建指标
     createStudy()
+    _widget?.applyOverrides?.({
+      'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
+      'paneProperties.backgroundType': 'solid',
+      'paneProperties.background': getCssVariable('--secondary-bg'),
+    })
   })
 
   _widget?.headerReady().then(() => {
@@ -637,7 +646,36 @@ async function initChart() {
 
   // onMarkClick
   _widget?.subscribe('onMarkClick', (markId) => {
-    console.log('markId', markId)
+    const {token,symbol,logo_url,chain} = tokenStore.tokenInfo?.token||{}
+    const {target_token,token0_address,token0_symbol,token1_symbol,pair} = tokenStore.pair || {}
+
+    let user_address = user.value
+    for(const [,markArr] of profilingMarksCache){
+     const addr = markArr.find(el => el.id === markId)?.user_address
+     if(addr){
+      user_address = addr
+      break
+     }
+    }
+    const $patchParams = {
+      drawerVisible:true,
+      tokenInfo:{
+        id:route.params.id as string,
+        symbol,
+        logo_url,
+        chain,
+        address:token
+      },
+      pairInfo:{
+        target_token,
+        token0_address,
+        token0_symbol,
+        token1_symbol,
+        pairAddress:pair
+      },
+      user_address
+    }
+    tokenDetailsStore.$patch($patchParams)
   })
 
   subscribeStudyEvent()
@@ -759,6 +797,18 @@ const { resetLimitPriceLineId, subscribePriceMove } = useLimitPriceLine(() => _w
 
 const { resetAvgPriceLineId } = useAvgPriceLine(() => _widget, () => isReadyLine, showMarket)
 useBotLimitLine(() => _widget, () => isReadyLine, showMarket)
+
+
+function setIframeCssVar() {
+  const iframe = document.querySelector('#tv_chart_container iframe') as HTMLIFrameElement
+  const iframeRoot = iframe?.contentWindow?.document.documentElement
+  if (!iframeRoot) {
+    console.error('无法获取 iframe 内部的根元素')
+    return
+  }
+  // 给 iframe 内部设置 CSS 变量
+  iframeRoot.style.setProperty('--secondary-bg', getCssVariable('--secondary-bg'))
+}
 
 
 onBeforeUnmount(() => {

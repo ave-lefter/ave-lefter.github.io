@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
 import { getGainDefaultColumns } from './columnRender/gainColumnsService'
-import { getPriceChangeTopTokens, getTreasureList } from '~/api/market'
+import { getPriceChangeTopTokens, getTreasureList, type IGetTreasureConfig } from '~/api/market'
 import {
   quickContent,
   dexContent,
@@ -31,6 +31,7 @@ import {
   SnipersHeader,
   PriceContent,
   PriceChange,
+  DexHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
@@ -46,6 +47,7 @@ const props = defineProps<{
   activeChain: string
   activeTab?: string
   activeSubTab?: string
+  ammList: IGetTreasureConfig['swaps']
 }>()
 
 const {rankConditions} = storeToRefs(globalStore)
@@ -322,7 +324,7 @@ watch(
       listData.value = updateList.toSorted((a, b) => {
         const aVal = Number(a[sort]) || 0
         const bVal = Number(b[sort]) || 0
-        return (bVal - aVal) * sortVal
+        return (aVal - bVal) * sortVal
       })
     } else {
       // 默认按24小时涨幅排序（降序）
@@ -367,51 +369,6 @@ const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
 
-async function collect(index: number, row) {
-  if (walletAddress.value) {
-    if (walletStore.address) {
-      await walletStore.signMessageForFavorite()
-    }
-    if (row.is_fav) {
-      removeTokenFavorite(row, index)
-    } else {
-      addTokenFavorite(row, index)
-    }
-  } else {
-    verifyLogin()
-  }
-}
-
-function removeTokenFavorite(row, index: number) {
-  loading.value = true
-  removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
-    .then(() => {
-      ElMessage.success(t('cancelled1'))
-      listData.value[index].is_fav = false
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-function addTokenFavorite(row, index: number) {
-  loading.value = true
-  addFavorite(`${row.token}-${row.chain}`, walletAddress.value, 0)
-    .then(() => {
-      ElMessage.success(t('collected'))
-      listData.value[index].is_fav = true
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
 function sizeChange() {
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -448,7 +405,7 @@ const headerRenderer = computed(() => {
     markers_dynamic: DynamicMarkersHeader,
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
-    dex: () => 'DEX',
+    dex: DexHeader,
     security: () => t('security'),
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
@@ -493,13 +450,14 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" style="height: calc(100vh - 185px)">
     <AveTable
+      rowKey="rowKey"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
       :row-height="81"
       fixed
-      style="--el-bg-color: var(--d-111-l-FFF)"
-      row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
+      style="--el-bg-color: var(--secondary-bg)"
+      row-class="cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)]"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"
@@ -512,6 +470,7 @@ const cellRenderer = computed(() => {
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
+          :ammList="item.key === 'dex' ? ammList : null"
         />
       </template>
       <template v-for="item in columns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
@@ -526,7 +485,6 @@ const cellRenderer = computed(() => {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
           :activeChain="activeChain"
           :childrenData="item.children || []"
-          @collect="collect"
         />
       </template>
     </AveTable>
@@ -535,7 +493,7 @@ const cellRenderer = computed(() => {
     v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
-    class="mt-5px py-9px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
+    class="mt-5px py-9px flex justify-center [&&]:[--el-pagination-button-height:18px]"
     layout="total, prev, pager, next"
     :total="pageInfo.total || 0"
     :small="false"

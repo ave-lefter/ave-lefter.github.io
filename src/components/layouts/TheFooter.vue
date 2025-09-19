@@ -1,5 +1,5 @@
 <template>
-  <footer class="h-32px bg-[--d-222-l-F2F2F2]  w-full px-12px py-16px footer fixed bottom-0 z-33">
+  <footer class="h-32px bg-[--main-list-hover]  w-full px-12px py-16px footer fixed bottom-0 z-33">
     <div class="left relative">
       <NuxtLink
         v-if="showPrice"
@@ -11,12 +11,12 @@
           logo_url: showPrice.logo_url,
           chain: ''
         }" token-class="w-16px h-16px [&&]:mr-0" />
-        <span class="color-[--d-999-l-666]">{{ showPrice.symbol }}</span>
-        <span :class="`color-${showPrice.color}`">{{'$'+formatDec(showPrice?.current_price_usd || 0, 2)}}</span>
+        <span class="color-[--secondary-text]">{{ showPrice.symbol }}</span>
+        <span :class="`${showPrice.isUp ? 'color-[--up-color]' : 'color-[--down-color]'}`">{{'$'+formatDec(showPrice?.current_price_usd || 0, 2)}}</span>
       </NuxtLink>
        <el-popover popper-style="padding: 12px;min-width: 132px" width="132" placement="top" :teleported="false">
         <template #reference>
-          <Icon name="custom:set-up" class="text-12px ml-2px color-#666" />
+          <Icon name="custom:set-up" class="text-12px ml-2px color-[--main-text]" />
         </template>
         <div class="flex items-start justify-center flex-col text-12px gap-16px">
           <NuxtLink
@@ -31,24 +31,24 @@
               logo_url: item.logo_url,
               chain: ''
             }" token-class="w-16px h-16px [&&]:mr-0" />
-            <span class="color-[--d-999-l-666]">{{ item.symbol }}</span>
-            <span :class="`color-${item.color}`">{{'$'+formatDec(item?.current_price_usd || 0, 2)}}</span>
+            <span class="color-[--secondary-text]">{{ item.symbol }}</span>
+            <span :class="`${showPrice.isUp ? 'color-[--up-color]' : 'color-[--down-color]'}`">{{'$'+formatDec(item?.current_price_usd || 0, 2)}}</span>
           </NuxtLink>
         </div>
       </el-popover>
-      <div class="flex items-center gap-4px color-[--d-999-l-666] mx-12px cursor-pointer hover:color-inherit" :class="{'color-inherit':dragPumpStore.visible}" @click="dragPumpStore.visible=!dragPumpStore.visible">
+      <div class="flex items-center gap-4px mx-12px cursor-pointer hover:color-[--main-text]" :class="dragPumpStore.visible?'color-[--main-text]':'color-[--secondary-text]'" @click="dragPumpStore.visible=!dragPumpStore.visible">
         <Icon name="custom:pump-icon"/>
         {{ $t('pump1') }}
       </div>
-      <div class="flex items-center mr-12px color-[--d-999-l-666] gap-4px cursor-pointer" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
+      <div class="flex items-center mr-12px gap-4px cursor-pointer hover:color-[--main-text]" :class="globalStore.pnlTrackerVisible?'color-[--main-text]':'color-[--secondary-text]'" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
         <Icon name="custom:chart" class="text-12px" />
         {{ $t('PnlTracker') }}
       </div>
       <el-badge :is-dot="(!!botStore.evmAddress)&&isDoted2" class="mr-12px">
         <div
           id="monitor"
-          class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit"
-          :class="{'color-inherit':visible}" 
+          class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
+          :class="visible?'color-[--main-text]':'color-[--secondary-text]'" 
           @click="visible=!visible"
         >
           <Icon
@@ -59,8 +59,8 @@
       </el-badge>
       <el-badge :is-dot="isDoted">
         <div
-          class="flex items-center color-[--d-999-l-666] gap-4px cursor-pointer hover:color-inherit"
-          :class="{'color-inherit':signalStore.signalVisible}" 
+          class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
+          :class="signalStore.signalVisible?'color-[--main-text]':'color-[--secondary-text]'" 
           @click="signalStore.signalVisible=!signalStore.signalVisible"
         >
           <Icon
@@ -71,7 +71,7 @@
       </el-badge>
     </div>
     <ul class="right">
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+      <li class="color-[--secondary-text] hover:color-[--main-text]">
         <a target="_blank" href="https://www.tradingview.com/" class="flex-center">
           <Icon name="simple-icons:tradingview" class="text-18px mr-2px" />TradingView
           <!-- <img v-if="isDark" src="@/assets/images/tradingView-dark.svg" alt="" height="12" />
@@ -88,18 +88,18 @@
         <img src="@/assets/images/btok-logo.png" alt="" height="16" lazy >
       </a>
       </li>
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] flex items-center gap-2px">
+      <li class="color-[--secondary-text] hover:color-[--main-text] flex items-center gap-2px">
       <a target="_blank" href="https://cloud.ave.ai">API</a>
       </li>
       <el-popover popper-style="padding: 12px;min-width: 50px;width:auto"  placement="top" :teleported="false">
       <template #reference>
-          <Icon name="custom:set-up" class="text-12px ml-2px color-#666" />
+          <Icon name="custom:set-up" class="text-12px ml-2px color-[--main-text]" />
       </template>
       <ul class="flex items-start justify-center flex-col text-12px gap-16px font-500">
-        <!-- <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+        <!-- <li class="color-[--d-999-l-666] hover:color-[--main-text]">
           <a class="hover:decoration-underline" target="_blank" href="https://eco.ave.ai">{{ $t('ecosystem') }}</a>
         </li> -->
-        <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+        <li class="color-[--secondary-text] hover:color-[--main-text]">
           <a
             class="hover:decoration-underline" target="_blank" :href="lang?.includes?.('zh')
               ? 'https://doc.ave.ai/cn/mian-ze-shen-ming'
@@ -108,27 +108,27 @@
             {{ $t('disclaimers') }}
           </a>
         </li>
-        <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+        <li class="color-[--secondary-text] hover:color-[--main-text]">
           <a target="_blank" class="hover:decoration-underline" href="/privacy.html">{{ $t('privacyPolicy') }}</a>
         </li>
 
       </ul>
       </el-popover>
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000] mr-8px">
+      <li class="color-[--secondary-text] hover:color-[--main-text] mr-8px">
         <a
           target="_blank" :href="lang?.includes?.('zh') ? 'https://x.com/aveai_info' : 'https://x.com/AveaiGlobal'"
           class="flex-center">
           <Icon name="bi:twitter-x" class="text-16px" />
         </a>
       </li>
-      <li class="color-[--d-999-l-666] hover:color-#3F80F7 mr-8px">
+      <li class="color-[--secondary-text] hover:color-[--primary-color] mr-8px">
         <a
           target="_blank" :href="lang?.includes?.('zh') ? 'https://t.me/ave_community_cn' : 'https://t.me/aveai_english'"
           class="flex-center">
           <Icon name="lineicons:telegram-original" class="text-19px" />
         </a>
       </li>
-      <li class="color-[--d-999-l-666] hover:color-[--d-FFF-l-000]">
+      <li class="color-[--secondary-text] hover:color-[--main-text]">
         <a href="mailto:avebusiness100@ave.ai" class="flex-center">
           <Icon name="material-symbols:mail" class="text-20px" />
         </a>
@@ -174,7 +174,7 @@ const ids = [
 const data = ref<Array<{
   symbol: string
   logo_url: string
-  color: string
+  isUp: boolean
   current_price_usd: number
   id: string
   hidden?: boolean
@@ -194,7 +194,7 @@ const initPage = () => {
         symbol,
         logo_url: i.logo_url,
         hidden: false,
-        color: i.price_change >= 0 ? upColor[0] : downColor[0],
+        isUp: i.price_change >= 0,
         id: ids[index]
       }
     })

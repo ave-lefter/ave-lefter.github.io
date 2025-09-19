@@ -29,19 +29,33 @@ const components = {
   xstocks: activityComponent,
   volume: activityComponent,
   heaven_pump: pumpComponent,
+  xdyorswap_pump: pumpComponent
 }
+const walletStore = useWalletStore()
+const botStore = useBotStore()
 const globalStore = useGlobalStore()
 const activeTab = storeToRefs(globalStore).rankActiveTab
 const activeSubTab = useStorage('rankSubTab','pump_in_hot')
 const activeChain = useStorage('rankChain', 'AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
-const categories = computed(() => {
-  return chains.value.find((el) => el.net_name === activeChain.value)?.categories || []
+const currentChainObj = computed(() => {
+  return chains.value.find((el) => el.net_name === activeChain.value)
+})
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
 })
 
 onMounted(() => {
   _getTreasureConfig()
+  if(walletAddress.value){
+    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+  }
   trackRef({category: 'view', extra: 'home(pro.ave.ai)'})
+})
+watch(()=>walletAddress.value,(val)=>{
+  if(val){
+    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+  }
 })
 const wsStore = useWSStore()
 // 把榜单的订阅取消掉
@@ -246,25 +260,29 @@ function getMedias(appendix: string) {
 </script>
 
 <template>
-  <div class="w-full [&&]:max-w-1920px mx-auto">
-    <CategoryTabs
-      v-model:activeSubTab="activeSubTab"
-      v-model:activeTab="activeTab"
-      v-model:activeChain="activeChain"
-      :categories="categories"
-      :chains="chains"
-    />
-    <KeepAlive :max="6">
-      <component
-        :is="components[activeTab]"
-        ref="dynamicComponentRef"
-        :listMapFunction="listMapFunction"
-        :activeChain="activeChain"
-        :activeTab="activeTab"
-        :activeSubTab="activeSubTab"
+  <div class="w-full bg-[--main-bg]">
+    <div class="[&&]:max-w-1920px mx-auto">
+      <CategoryTabs
+        v-model:activeSubTab="activeSubTab"
+        v-model:activeTab="activeTab"
+        v-model:activeChain="activeChain"
+        :categories="currentChainObj?.categories || []"
+        :chains="chains"
       />
-    </KeepAlive>
+      <KeepAlive :max="6">
+        <component
+          :is="components[activeTab]"
+          ref="dynamicComponentRef"
+          :listMapFunction="listMapFunction"
+          :activeChain="activeChain"
+          :activeTab="activeTab"
+          :activeSubTab="activeSubTab"
+          :ammList="currentChainObj?.swaps || []"
+        />
+      </KeepAlive>
+    </div>
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+</style>

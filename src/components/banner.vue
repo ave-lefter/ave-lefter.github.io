@@ -26,8 +26,8 @@ import { _getBannersAll, type Banner } from '@/api/banner.js'
 import { useStorage } from '@vueuse/core'
 const globalStore = useGlobalStore()
 const { lang } = storeToRefs(globalStore)
-const bannerList = shallowRef<Banner[]>([])
-const showBanner = useStorage('showBanner', true, sessionStorage)
+const bannerList = useStorage<Banner[]>('bannerList_pro', [], localStorage)
+const showBanner = useStorage('showBanner', true, localStorage)
 watch(lang, () => {
   getBannersAll()
 })
@@ -37,7 +37,11 @@ onMounted(() => {
 function getBannersAll() {
   _getBannersAll()
     .then((res) => {
-      bannerList.value = Array.isArray(res) ? res : []
+      const list = Array.isArray(res) ? res : []
+      if (JSON.stringify(bannerList.value) !== JSON.stringify(list)) {
+        bannerList.value = list
+        showBanner.value = true
+      }
     })
     .catch((err) => {
       console.log(err)

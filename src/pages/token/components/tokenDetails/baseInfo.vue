@@ -18,6 +18,7 @@ const botStore = useBotStore()
 const walletStore = useWalletStore()
 const globalStore = useGlobalStore()
 const {t} = useI18n()
+const route = useRoute()
 const listQuery = shallowRef({
   pageNO: 1,
   max_block_number: 0,
@@ -29,6 +30,7 @@ const attentionTriggerRef=ref()
 const checkedTrend = ref(['SWAP', 'ADD_LIQUIDITY/REMOVE_LIQUIDITY'])
 const trendList = shallowRef<GetTokenDetailsListResponse[]>([])
 const filteredTrendList = computed(() => {
+  const {address} = getAddressAndChainFromId(route.params.id as string)
   return trendList.value.filter(
     i =>
       (i.is_target && (i.event_type == 'swap_buy' || i.event_type == 'swap_sell')) ||
@@ -118,6 +120,7 @@ function _getTokenDetailsList() {
   }
   getTokenDetailsList(data)
     .then(res => {
+      console.log(res,'res')
       const list = Array.isArray(res) ? res : []
       const arr = list.map(i => {
         let event_type = i.event_type
@@ -207,7 +210,7 @@ const collect = async () => {
         return Promise.reject(err)
       })
     })
-    return 
+    return
   }
   // loading.value = true
   deleteAttention({
@@ -243,7 +246,7 @@ const collect = async () => {
           iconChainSize="14px"
           class="rounded-full"
         />
-        <div class="ml-6px color-[--d-F5F5F5-l-333]">
+        <div class="ml-6px color-[--main-text]">
           <div class="flex items-center gap-6px mb-3px">
             <UserRemark
               showAddressTitle
@@ -256,7 +259,7 @@ const collect = async () => {
             />
             <Icon
               ref="attentionTriggerRef" name="custom:attention"
-              :class="statistics.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect()" />
+              :class="statistics.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--third-text]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect()" />
             <div v-if="statistics.newTags?.length > 0" class="ml-6px">
               <el-tooltip
                 placement="top"
@@ -316,13 +319,13 @@ const collect = async () => {
             </div>
           </div>
           <div class="flex items-center gap-6px">
-            <span class="text-12px color-[--d-999-l-959A9F]">{{
+            <span class="text-12px color-[--secondary-text]">{{
                 tokenDetailStore.user_address.slice(0, 4)
               }}...{{ tokenDetailStore.user_address.slice(-4) }}</span>
             <Icon
               v-copy="tokenDetailStore.user_address"
               name="bxs:copy"
-              class="cursor-pointer color-[--d-666-l-999] text-10px"
+              class="cursor-pointer color-[--third-text] text-10px"
             />
             <!--<Icon-->
             <!--  name="custom:attention"-->
@@ -336,7 +339,7 @@ const collect = async () => {
       </div>
       <NuxtLink
         v-if="$route.path.indexOf('/address/') == -1"
-        :to="`/address/${tokenDetailStore.user_address}/${tokenDetailStore.tokenInfo!.chain}`" class="py-7px px-8px bg-[--d-333-l-F2F2F2] rounded-4px color-[--d-F5F5F5-l-333] text-12px"
+        :to="`/address/${tokenDetailStore.user_address}/${tokenDetailStore.tokenInfo!.chain}`" class="py-7px px-8px bg-[--border] rounded-4px color-[--main-text] text-12px"
         @click.stop="tokenDetailStore.drawerVisible = false"
       >
         {{ $t('walletDetail') }}
@@ -344,7 +347,7 @@ const collect = async () => {
     </div>
     <div class="flex items-center mb-20px">
       <div class="flex-1 flex flex-col">
-        <span class="color-[--d-666-l-999] text-12px lh-16px mb-4px">{{ $t('total_profit') }}</span>
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('total_profit') }}</span>
         <div
           class="flex text-16px lh-24px items-center"
           :class="getColorClass(statistics.total_profit)"
@@ -368,8 +371,8 @@ const collect = async () => {
         </div>
       </div>
       <div class="flex-1 flex flex-col">
-        <span class="color-[--d-666-l-999] text-12px lh-16px mb-4px">{{ $t('walletTotalBalance') }}</span>
-        <div class="flex text-16px lh-24px items-center color-[--d-F5F5F5-l-333]"
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('walletTotalBalance') }}</span>
+        <div class="flex text-16px lh-24px items-center color-[--main-text]"
         >
           <ExcludeError
             :model-value="statistics.balance_amount">
@@ -382,8 +385,8 @@ const collect = async () => {
     </div>
     <div class="flex items-center mb-20px">
       <div class="flex-1 flex flex-col">
-        <span class="color-[--d-666-l-999] text-12px lh-16px mb-4px">{{ $t('wallet_detail_transfer_in_out') }}</span>
-        <div class="flex text-16px lh-24px items-center color-#959a9f"
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('wallet_detail_transfer_in_out') }}</span>
+        <div class="flex text-16px lh-24px items-center color-[--secondary-text]"
         >
           <ExcludeError :model-value="statistics.total_transfer_in_usd">
             <span class="color-#12B886">
@@ -392,15 +395,15 @@ const collect = async () => {
               }}
             </span>
           </ExcludeError>
-          <span class="color-[--d-999-l-666]">/</span>
+          <span class="color-[--secondary-text]">/</span>
           <ExcludeError :model-value="statistics.total_transfer_out_usd">
             <span class="color-#F6465D">${{ formatNumber(statistics.total_transfer_out_usd, 2) }}</span>
           </ExcludeError>
         </div>
       </div>
       <div class="flex-1 flex flex-col">
-        <span class="color-[--d-666-l-999] text-12px lh-16px mb-4px">{{ $t('wallet_detail_total_buy_sell') }}</span>
-        <div class="flex text-16px lh-24px items-center color-#959a9f"
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('wallet_detail_total_buy_sell') }}</span>
+        <div class="flex text-16px lh-24px items-center color-[--secondary-text]"
         >
           <ExcludeError :model-value="statistics.total_purchase_usd">
             <span class="color-#12B886">
@@ -409,7 +412,7 @@ const collect = async () => {
               }}
             </span>
           </ExcludeError>
-          <span class="color-[--d-999-l-666]">/</span>
+          <span class="color-[--secondary-text]">/</span>
           <ExcludeError :model-value="statistics.total_sold_usd">
             <span class="color-#F6465D">${{ formatNumber(statistics.total_sold_usd, 2) }}</span>
           </ExcludeError>
@@ -418,7 +421,7 @@ const collect = async () => {
     </div>
     <div class="flex items-center mb-20px">
       <div class="flex-1 flex flex-col">
-        <span class="color-[--d-666-l-999] text-12px lh-16px mb-4px">{{ $t('wallet_detail_buy_sell_avg') }}</span>
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('wallet_detail_buy_sell_avg') }}</span>
         <div
           class="flex text-16px lh-24px items-center"
           :class="getColorClass(statistics.total_profit)"
@@ -430,15 +433,15 @@ const collect = async () => {
               }}
             </span>
           </ExcludeError>
-          <span class="color-[--d-999-l-666]">/</span>
+          <span class="color-[--secondary-text]">/</span>
           <ExcludeError :model-value="statistics.average_sold_price_usd">
             <span class="color-#F6465D">${{ formatNumber(statistics.average_sold_price_usd, 2) }}</span>
           </ExcludeError>
         </div>
       </div>
       <div class="flex-1 flex flex-col">
-        <span class="color-[--d-666-l-999] text-12px lh-16px mb-4px">{{ $t('wallet_detail_tx_count') }}</span>
-        <div class="flex text-16px lh-24px items-center color-#959a9f"
+        <span class="color-[--secondary-text] text-12px lh-16px mb-4px">{{ $t('wallet_detail_tx_count') }}</span>
+        <div class="flex text-16px lh-24px items-center color-[--secondary-text]"
         >
           <ExcludeError :model-value="statistics.total_purchase">
             <span class="color-#12B886">
@@ -447,7 +450,7 @@ const collect = async () => {
               }}
             </span>
           </ExcludeError>
-          <span class="color-[--d-999-l-666]">/</span>
+          <span class="color-[--secondary-text]">/</span>
           <ExcludeError :model-value="statistics.total_sold">
             <span class="color-#F6465D">{{ formatNumber(statistics.total_sold, 2) }}</span>
           </ExcludeError>
@@ -471,7 +474,7 @@ const collect = async () => {
       />
       <div
         v-if="listStatus.loading&&listQuery.pageNO!==1"
-        class="mt-20px text-14px text-center color-[--d-999-l-666]">
+        class="mt-20px text-14px text-center color-[--secondary-text]">
         {{ $t('loading') }}
       </div>
     </div>

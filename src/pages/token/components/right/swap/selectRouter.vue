@@ -157,7 +157,7 @@ a {
   font-size: 14px;
   display: flex;
   align-items: center;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   letter-spacing: 0;
   font-weight: 400;
   padding: 14px 0;

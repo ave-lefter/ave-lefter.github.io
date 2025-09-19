@@ -21,9 +21,7 @@
             :placeholder="$t('startVerificationCode')" name="new-verificationCode">
             <template #suffix>
               <el-button
-                class="countdownBtn" link :disabled="disabledCountdownBtn" :loading="loading2" :style="{
-                color: mode == 'dark' ? '##3F80F7' : '##3F80F7',
-              }" @click="sendVerificationCode">
+                class="countdownBtn bg-transparent!" link type="primary" :disabled="disabledCountdownBtn" :loading="loading2" @click="sendVerificationCode">
                 {{
                   isCounting ? `${count}${$t("SS")}` : $t("startCountDown")
                 }}</el-button>
@@ -48,7 +46,7 @@
       </el-result>
       <el-form-item :class="['mb-0px!']">
         <el-button
-          :color="'#3F80F7'" class="h-48px!"
+          type="primary" class="h-48px!"
           size="large" :loading="loading" style="width: 100%" @click="submitForm">{{ startSubmitText }}</el-button>
       </el-form-item>
       <p v-if="step === 2" class="tip">*&nbsp;{{ $t('startResetTip') }}</p>
@@ -310,7 +308,7 @@ function sendVerificationCode() {
     line-height: 150%;
     letter-spacing: 0px;
     text-align: left;
-    color: var(--d-666-l-999);
+    color: var(--third-text);
     word-break: break-all;
   }
 
@@ -348,9 +346,9 @@ function sendVerificationCode() {
     height: 48px;
   }
 
-  :deep() .el-button.is-link {
-    color: #f5f5f5;
-  }
+  // :deep() .el-button.is-link {
+  //   color: #f5f5f5;
+  // }
 
   .el-form-item {
     margin-bottom: 20px;
@@ -372,13 +370,14 @@ function sendVerificationCode() {
   .countdownBtn {
     &.el-button.is-link {
       font-weight: 400;
-      color: #f5f5f5;
+      background: transparent;
+      --el-mask-color-extra-light: transparent;
 
       &.is-disabled {
-        color: #f5f5f5;
+        color: var(--main-text);
 
         &:hover {
-          color: #f5f5f5;
+           color: var(--main-text);
         }
       }
     }
@@ -397,20 +396,20 @@ function sendVerificationCode() {
       }
     }
 
-    .countdownBtn {
-      &.el-button.is-link {
-        color: #333333;
-        font-weight: 400;
+    // .countdownBtn {
+    //   &.el-button.is-link {
+    //     color: #333333;
+    //     font-weight: 400;
 
-        &.is-disabled {
-          color: #333333;
+    //     &.is-disabled {
+    //       color: #333333;
 
-          &:hover {
-            color: #333333;
-          }
-        }
-      }
-    }
+    //       &:hover {
+    //         color: #333333;
+    //       }
+    //     }
+    //   }
+    // }
   }
 }
 </style>

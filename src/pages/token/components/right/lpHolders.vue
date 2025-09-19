@@ -52,7 +52,7 @@
       </a>
       <div>
         {{ formatNumber(item.quantity || 0, 2) }}
-        <span class="color-[--d-666-l-999]">({{ formatNumber(item.percent || 0, 2) }}%)</span>
+        <span class="color-[--third-text]">({{ formatNumber(item.percent || 0, 2) }}%)</span>
       </div>
     </li>
     <table v-if="item.lock && item.lock.length > 0" class="table-lock">
@@ -135,18 +135,18 @@ onMounted(() => {
 <style lang="scss" scoped>
 .card-list-item {
   font-size: 14px;
-  color: var(--d-666-l-999);
+  color: var(--third-text);
   letter-spacing: 0;
   font-weight: 400;
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
   > :nth-child(1) {
-    color: var(--d-666-l-999);
+    color: var(--third-text);
   }
   > :nth-child(2) {
     text-align: right;
-    color: var(--d-999-l-666);
+    color: var(--secondary-text);
   }
   > .danger {
     color: #f81111;

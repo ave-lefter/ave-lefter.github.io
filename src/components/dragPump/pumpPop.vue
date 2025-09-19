@@ -94,13 +94,13 @@ watch(
   }
 )
 watch(
-  () => [pumpStore.pump_solana_platforms, activeTab.value],
+  () => [pumpStore.pumpV3?.[pumpStore.activeChain]?.platforms, activeTab.value],
   () => {
     init()
   }
 )
 
-watch(() => pumpStore.pump_query[pumpStore.activeChain][activeTab.value], () => {
+watch(() => pumpStore.pump_query[pumpStore.activeChain]?.[activeTab.value], () => {
   debouncedSearch()
 }, { deep: true })
 
@@ -302,16 +302,19 @@ function pumpMapFunction(resItem: PumpObj) {
 function getPumpParams(oldParams, isFilter: boolean) {
   let platforms = 'fourmeme'
   //   platforms
-  if (pumpStore.activeChain === 'solana') {
-    if (!pumpStore.pump_solana_platforms?.length) {
-      platforms = 'pump,moonshot'
-    } else {
-      platforms = pumpStore.pump_solana_platforms.join(',')
-    }
+  // if (pumpStore.activeChain === 'solana') {
+  //   if (!pumpStore.pump_solana_platforms?.length) {
+  //     platforms = 'pump,moonshot'
+  //   } else {
+  //     platforms = pumpStore.pump_solana_platforms.join(',')
+  //   }
+  // }
+  if (pumpStore.pumpV3?.[pumpStore.activeChain]?.platforms?.length > 0) {
+    platforms = pumpStore.pumpV3?.[pumpStore.activeChain]?.platforms?.join(',')
   }
   let q = oldParams.q
   //   q
-  if (pumpStore.pump_query[pumpStore.activeChain][activeTab.value]) {
+  if (pumpStore.pump_query[pumpStore.activeChain]?.[activeTab.value]) {
     if (isFilter) {
       q = oldParams.q + pumpStore.pump_query[pumpStore.activeChain][activeTab.value]
     } else {
@@ -396,8 +399,8 @@ function getFilterData(list, conditions) {
       pass = pass && i.tvl <= Number(conditions.tvl_max)
     }
     //  platforms: 'pump,moonshot',
-    if (pumpStore.pump_solana_platforms?.length > 0 && i.chain === 'solana') {
-      pass = pass && pumpStore.pump_solana_platforms.includes(i.amm)
+    if (pumpStore.pumpV3[pumpStore.activeChain]?.platforms?.length >0) {
+      pass = pass && pumpStore.pumpV3[pumpStore.activeChain].platforms.includes(i.platform_id)
     }
     if (conditions?.holder_min) {
       pass = pass && (i?.holder || 0) >= Number(conditions.holder_min)
@@ -432,10 +435,10 @@ function getFilterData(list, conditions) {
 
 <template>
   <div
-    class="w-full h-full bg-[--d-0B0D12-l-F6F9FF] p-12px"
+    class="w-full h-full bg-[--secondary-bg] p-12px"
     :class="{'pr-16px':pumpStore.isLeftFixed,'pl-16px':pumpStore.isRightFixed}"
   >
-    <Icon name="custom:drag2" class="absolute top-4px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2] drag-handle" />
+    <Icon name="custom:drag2" class="absolute top-4px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle" />
     <div class="flex mb-16px">
       <PlatformSelect />
       <div class="flex-1 mt--12px mb--16px drag-handle" />
@@ -444,7 +447,7 @@ function getFilterData(list, conditions) {
           <template #default="{ visible }">
             <div
 v-tooltip="$t('customize')"
-              class="flex items-center gap-4px mr-8px text-12px bg-[--d-151A22-l-E8F1FF] color-[--d-8CA0C3-l-566275] hover:color-[--d-F5F5F5-l-333] px-4px py-2px rounded-4px cursor-pointer">
+              class="flex items-center gap-4px mr-8px text-12px bg-[--main-input-button-bg] color-[--secondary-text] hover:color-[--main-text] px-4px py-2px rounded-4px cursor-pointer">
               <Icon name="custom:customized" class="text-13px" />
               <Icon :name="visible ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'" class="text-16px" />
             </div>
@@ -452,24 +455,24 @@ v-tooltip="$t('customize')"
         </Setting>
         <BlackList reference-class="text-12px" buttonClass="w-20px h-20px! p-0! justify-center!" />
         <Icon
-name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-333]"
+name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]"
           @click.self="pumpStore.visible = false" />
       </div>
     </div>
-    <div class="flex pb-8px border-b-1px border-b-solid border-b-[--d-222-l-F2F2F2] mb-12px">
+    <div class="flex pb-8px border-b-1px border-b-solid border-b-[--main-input-button-bg] mb-12px">
       <div class="flex items-center gap-8px">
         <span
-          v-for="(item, index) in tabList" :key="index" :class="`decoration-none shrink-0 text-14px lh-20px text-center color-[--d-566275-l-8CA0C3] px-8px py-4px rounded-4px cursor-pointer ${activeTab === item.value ? 'bg-[--d-151A22-l-E8F1FF] color-[--d-F5F5F5-l-333]' : ''
+          v-for="(item, index) in tabList" :key="index" :class="`decoration-none shrink-0 text-14px lh-20px text-center px-8px py-4px rounded-4px cursor-pointer ${activeTab === item.value ? 'bg-[--tab-active-bg] color-[--main-text]' : 'color-[--third-text]'
           }`" @click="setActiveTab(item.value)">
           {{ item.label }}
         </span>
       </div>
       <div class="flex-1 drag-handle mb--8px" />
       <div class="flex items-center gap-8px">
-        <div class="flex items-ceter gap-4px p-2px rounded-4px bg-[--d-151A22-l-E8F1FF]">
+        <div class="flex items-ceter gap-4px p-2px rounded-4px bg-[--main-input-button-bg]">
           <div
             v-for="(item, idx) in pumpStore.pumpConfig" :key="idx" class="cursor-pointer rounded-4px p-1px"
-            :class="pumpStore.activeChain === item.chain ? 'bg-[--d-111-l-FFF]' : ''"
+            :class="pumpStore.activeChain === item.chain ? 'bg-[--tab-active-bg]' : ''"
             @click="pumpStore.activeChain = item.chain as ChainKey">
             <ChainToken :chain="item.chain" :width="16" />
           </div>
@@ -481,13 +484,13 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
         <signal-quick-buy-input v-model="quickBuyValue" size="small" class="[--el-border-color:transparent]" style="--el-input-bg-color:var(--d-151A22-l-E8F1FF);--el-text-color-regular:var(--d-8CA0C3-l-566275);--el-input-icon-color:var(--d-8CA0C3-l-566275)" />
         <el-select
           v-model="botSettingStore.botSettings[pumpStore.activeChain]!.selected" fit-input-width size="small"
-          :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px] new-select" popper-class="small-select new-select-popper">
+          :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px]" popper-class="small-select">
           <el-option v-for="item in BotSettingsArr" :key="item.value" :value="item.value" :label="item.label" />
         </el-select>
         <div
           class="w-20px h-20px flex items-center justify-center bg-[--d-151A22-l-E8F1FF] rounded-4px color-[--d-566275-l-8CA0C3] cursor-pointer hover:color-[--d-F5F5F5-l-333]"
           :class="{
-            'color-[--d-F5F5F5-l-333]': pumpStore.pump_notice[pumpStore.activeChain][activeTab],
+            'color-[--d-F5F5F5-l-333]': pumpStore.pump_notice[pumpStore.activeChain]?.[activeTab],
           }" @click="
             pumpStore.pump_notice[pumpStore.activeChain][activeTab] =
             !pumpStore.pump_notice[pumpStore.activeChain][activeTab]
@@ -499,8 +502,9 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
         </div>
       </div>
       <div class="flex items-center gap-8px">
-        <AutoSellSetting :chain="pumpStore.activeChain" />
+        <AutoSellSetting :chain="pumpStore?.activeChain" />
         <el-input
+          v-if="pumpStore.pump_query[pumpStore.activeChain]?.[activeTab]"
           ref="inputSearch" v-model.trim="pumpStore.pump_query[pumpStore.activeChain][activeTab]"
           class="w-90px [--el-input-border-color:--d-222-l-F2F2F2]" size="small" :placeholder="$t('search')"
           style="--el-input-bg-color:var(--d-151A22-l-E8F1FF);--el-text-color-regular:var(--d-566275-l-8CA0C3)"
@@ -513,7 +517,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-33
           </template>
           <template #suffix>
             <Icon
-v-if="pumpStore.pump_query[pumpStore.activeChain][activeTab]" name="pajamas:clear"
+              v-if="pumpStore.pump_query[pumpStore.activeChain]?.[activeTab]" name="pajamas:clear"
               class="color-[--d-666-l-999] text-12px hover:opacity-70% cursor-pointer mr-10px"
               @click="pumpStore.pump_query[pumpStore.activeChain][activeTab] = ''" />
           </template>

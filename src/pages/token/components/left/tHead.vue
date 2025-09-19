@@ -15,12 +15,12 @@ function getActiveClass(activeSort: number, sortBy: string, direction: string) {
   const isEqual = props.sort.activeSort === activeSort && props.sort.sortBy === sortBy
   if (direction === 't') {
     return isEqual
-      ? 'border-t-[--d-F5F5F5-l-333]'
-      : 'border-t-[--d-666-l-999]'
+      ? 'border-t-[--main-text]'
+      : 'border-t-[--third-text]'
   }
   return isEqual
-    ? 'border-b-[--d-F5F5F5-l-333]'
-    : 'border-b-[--d-666-l-999]'
+    ? 'border-b-[--main-text]'
+    : 'border-b-[--third-text]'
 }
 
 const statusTo = {
@@ -47,7 +47,7 @@ function switchSort(sortBy: string, activeSort?: number) {
 
 <template>
   <div
-    class="flex justify-between items-center px-12px py-8px text-12px h-32px color-[--d-666-l-999]"
+    class="flex justify-between items-center px-12px py-8px text-12px h-32px color-[--third-text]"
   >
     <div
       v-for="(column, i) in columns"
@@ -57,7 +57,7 @@ function switchSort(sortBy: string, activeSort?: number) {
       <template v-if="column.label">
         {{ column.label }}
       </template>
-      <slot v-else :name="column.value"></slot>
+      <slot v-else :name="column.value"/>
       <div v-if="column.sort" class="flex flex-col items-center justify-center ml-5px">
         <i
           :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer

@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie'
 import BigNumber from 'bignumber.js'
 import type { BotChain } from '~/utils/types'
+import { createCacheRequest } from '#imports'
 
 export function login(data: {
   username?: string
@@ -368,7 +369,7 @@ export function bot_updateWebConfig(data: { chain?: string, webConfig?: string }
 //   })
 // }
 
-export function bot_getTokenBalance(data: {
+export const bot_getTokenBalance = createCacheRequest(function(data: {
   chain: string
   walletAddress: string
   tokens: string[]
@@ -391,7 +392,7 @@ export function bot_getTokenBalance(data: {
       }
     })
   })
-}
+}, 500)
 
 // 推荐GasTip(二期)
 // 返回高、中、低三档，eth用wei， solana返回lamports, solana忽略mev
@@ -526,10 +527,10 @@ export function bot_createSwapEvmTx(params: {
 }) {
   const { $api } = useNuxtApp()
   const botStore = useBotStore()
-  if (params.chain === 'xlayer') {
-    params.autoSell = false
-    params.autoSellConfig = []
-  }
+  // if (params.chain === 'xlayer') {
+  //   params.autoSell = false
+  //   params.autoSellConfig = []
+  // }
   return $api('/botapi/swap/createSwapEvmTx', {
     method: 'post',
     body: {

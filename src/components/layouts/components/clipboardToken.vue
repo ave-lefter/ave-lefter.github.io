@@ -1,5 +1,5 @@
 <template>
-  <div v-if="clipboardTokenInfo?.token" class="flex items-center color-[--d-E9E9E9-l-222] bg-[--d-222-l-F2F2F2] h-32px px-8px clipboard-token-container rd-4px ml-10px">
+  <div v-if="clipboardTokenInfo?.token" class="flex items-center color-[--main-text] bg-[--main-input-button-bg] h-32px px-8px clipboard-token-container rd-4px ml-10px">
     <NuxtLink :to="`/token/${clipboardTokenInfo.token}-${clipboardTokenInfo.chain}`" class="flex items-center mr-8px">
       <TokenImg :row="clipboardTokenInfo" tokenClass="w-16px h-16px" chainClass="w-8px h-8px bottom--2px! right--2px!" class="w-16px h-16px" />
       <span class="text-12px ml-4px">{{ clipboardTokenInfo.symbol || '' }}</span>
@@ -36,7 +36,7 @@
       :end-time="60"
     >
       <template #default="{ seconds }">
-        <span class="text-12px ml-8px" :class="{'color-[--d-999-l-666]': seconds >= 60, 'color-#FFA622': seconds < 60}">
+        <span class="text-12px ml-8px" :class="{'color-[--secondary-text]': seconds >= 60, 'color-#FFA622': seconds < 60}">
           <template v-if="seconds < 60">
             {{ seconds }}s
           </template>
@@ -131,7 +131,7 @@ onMounted(() => {
 <style scoped lang='scss'>
 .clipboard-token-container :deep() {
   .icon-bot-setting {
-    color: var(--d-666-l-999);
+    color: var(--third-text);
   }
 }
 </style>

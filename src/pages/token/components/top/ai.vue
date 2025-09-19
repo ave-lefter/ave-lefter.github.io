@@ -61,13 +61,14 @@
           <div class="flex-start">
             <div style="width: 20px">
               <img
+                class="align-middle"
                 :src="getAssetsImagesUrl(riskStatus[i.risk_level])"
                 width="12px"
                 alt=""
               >
             </div>
             <div>
-              <span class="risk-message" :style="{ color: i?.risk_level == -3 ? 'var(--d-F5F5F5-l-333)' : 'var(--d-999-l-666)'}">
+              <span class="risk-message" :style="{ color: i?.risk_level == -3 ? 'var(--main-text)' : 'var(--secondary-text)'}">
                 {{ isZh ? i.name_zh || '' : i.name_en || '' }}
                 {{ i?.risk_removed === 1 ? `(${$t('riskRemoved')})` : '' }}
               </span>
@@ -118,24 +119,7 @@
 
 <script setup lang="ts">
 import Code from './code.vue'
-
-// ---------------- Props 定义 ----------------
-interface FeeStructure {
-  buy_fee?: number
-  sell_fee?: number
-  transfer_fee?: number
-  max_tx_amount?: number
-  max_wallet_amount?: number
-}
-
-interface ObjType {
-  mechanism_zh?: string
-  mechanism_en?: string
-  ownerControl?: string[]
-  summary?: { is_owner_renounced?: number }
-  fee_structure?: FeeStructure
-}
-
+import type { AiReport } from'@/api/check'
 interface Risk {
   code_snippet?: string
   description_en: string
@@ -148,7 +132,7 @@ interface Risk {
 }
 
 const props = defineProps<{
-  obj: ObjType
+  obj: AiReport
   riskList: Risk[]
 }>()
 
@@ -216,13 +200,13 @@ function getAssetsImagesUrl(id: string) {
 
 <style lang="scss" scoped>
 .AI {
-  color: var(--d-999-l-666);
+  color: var(--third-text);
   font-size: 14px;
   font-style: normal;
   line-height: 20px; /* 142.857% */
   margin-bottom: 20px;
   .title {
-    color: var(--d-F5F5F5-l-333);
+    color: var(--main-text);
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
@@ -282,8 +266,8 @@ function getAssetsImagesUrl(id: string) {
   position: absolute;
   right: 3px;
   bottom: -2px;
-  color: var(--d-F5F5F5-l-333);
-  background: var(--d-111-l-FFF);
+  color: var(--third-text);
+  background: var(--dialog-list-hover);
   padding: 2px 7px;
 }
 </style>

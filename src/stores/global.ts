@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
-import type { pumpBlack } from '@/api/types/pump'
+import type { pumpBlack, pumpObjColor } from '@/api/types/pump'
 import { _getFollowsNum } from '@/api/follow'
 
 import type{ GetHotTokensResponse } from '@/api/token'
 import type { ILatestNotice } from '~/api/user'
+import { getUserFavoriteGroups, type GetUserFavoriteGroupsResponse } from '~/api/fav'
 export const useGlobalStore = defineStore('global', () => {
   const wsStore = useWSStore()
   const localeStore = useLocaleStore()
@@ -51,7 +52,30 @@ export const useGlobalStore = defineStore('global', () => {
     isBlacklist: boolean
     show_search: boolean
     define: string[]
-  }>('pumpSetting', {
+    data: Record<
+      string,
+      {
+        minSize: number
+        minColor: string
+        middleSize: number
+        middleColor: string
+        maxColor: string
+      }
+    >
+    bg: Record<string, pumpObjColor>
+    bgList: string[]
+    grid: Record<
+      string,
+      {
+        id: string
+        order: number
+        name: string
+        show: boolean
+      }
+    >
+    jump: 'close' | 'open' | 'open_jump'
+    border: string
+  }>('pumpSetting2', {
     fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
@@ -60,7 +84,69 @@ export const useGlobalStore = defineStore('global', () => {
     isRight: false,
     isBlacklist: true,
     show_search: true,
-    define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','insider', 'sniper', 'rug', 'kol', 'markers'],
+    define: [
+      'name',
+      'txs',
+      'vol',
+      'holder',
+      'mcap',
+      'media',
+      'smart',
+      'top',
+      'dev',
+      'insider',
+      'sniper',
+      'rug',
+      'kol',
+      'markers',
+    ],
+    data: {
+      mc: {
+        minSize: 30000,
+        minColor: getCssVariable('--main-text'),
+        middleSize: 100000,
+        middleColor: '#FFA622',
+        maxColor: '#12B886',
+      },
+      vol: {
+        minSize: 1000,
+        minColor: getCssVariable('--main-text'),
+        middleSize: 50000,
+        middleColor: '#FFA622',
+        maxColor: '#12B886',
+      },
+      holders: {
+        minSize: 100,
+        minColor: getCssVariable('--main-text'),
+        middleSize: 500,
+        middleColor: '#FFA622',
+        maxColor: '#12B886',
+      },
+    },
+    bg: {},
+    bgList: [],
+    grid: {
+      new: {
+        id: 'new',
+        order: 1,
+        name: 'new1',
+        show: true,
+      },
+      soon: {
+        id: 'soon',
+        order: 2,
+        name: 'soon',
+        show: true,
+      },
+      graduated: {
+        id: 'graduated',
+        order: 2,
+        name: 'graduated',
+        show: true,
+      },
+    },
+    jump: 'close',
+    border: '',
   })
 
   const hide_risk=shallowRef(1)
@@ -104,6 +190,7 @@ export const useGlobalStore = defineStore('global', () => {
   })
 
   const latestNotice = shallowRef<ILatestNotice>({})
+  const userFavoriteGroups = ref<GetUserFavoriteGroupsResponse[]>([])
   const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
@@ -173,6 +260,12 @@ export const useGlobalStore = defineStore('global', () => {
     })
   }
 
+  function _getUserFavoriteGroups(walletAddress:string) {
+    getUserFavoriteGroups(walletAddress).then((res) => {
+      userFavoriteGroups.value = (res || []).filter((el) => !!el.name)
+    })
+  }
+
   return {
     lang: computed(() => localeStore.locale),
     token_logo_url: computed(() => configStore.token_logo_url),
@@ -194,6 +287,8 @@ export const useGlobalStore = defineStore('global', () => {
     getFollowsNum,
     latestNotice,
     pnlTrackerVisible,
+    userFavoriteGroups,
+    getUserFavoriteGroups:_getUserFavoriteGroups,
     rankConditions,
     rankActiveTab
   }
