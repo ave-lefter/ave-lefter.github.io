@@ -1,7 +1,6 @@
 <script setup lang="tsx">
 import { cloneDeep } from 'lodash-es'
 import AudioSettingsItem from './audioSettingsItem.vue'
-import BellIcon from './bellIcon.vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -67,6 +66,12 @@ function playAudio(settingKey: keyof typeof audioSettings.value.audio) {
         audioRef.value.play()
     }
 }
+
+watch(dialogVisible,()=>{
+    if(dialogVisible.value){
+        audioSettings.value = cloneDeep(globalStore.audioSettings)
+    }
+})
 
 function save() {
     globalStore.audioSettings = cloneDeep(audioSettings.value)

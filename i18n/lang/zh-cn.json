@@ -1412,5 +1412,7 @@
   "bottomMiddle":"底部中间",
   "bottomRight":"底部右边",
   "ToastPosition":"提示位置",
-  "example":"显示示例"
+  "example":"显示示例",
+  "justNow":"刚刚",
+  "of":"的"
 }

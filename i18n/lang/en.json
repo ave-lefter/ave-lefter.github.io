@@ -1413,5 +1413,7 @@
   "bottomMiddle": "Bottom Middle",
   "bottomRight": "Bottom Right",
   "ToastPosition": "Toast Position",
-  "example": "Display Example"
+  "example": "Display Example",
+  "justNow": "Just Now",
+  "of": "of"
 }

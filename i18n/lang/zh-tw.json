@@ -1399,5 +1399,7 @@
   "bottomMiddle":"底部中間",
   "bottomRight":"底部右邊",
   "ToastPosition":"提示位置",
-  "example":"顯示示例"
+  "example":"顯示示例",
+  "justNow":"剛剛",
+  "of":"的"
 }

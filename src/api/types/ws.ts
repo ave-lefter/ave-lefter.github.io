@@ -117,3 +117,35 @@ export interface TxList {
   walletAddress: string;
   walletName:    string;
 }
+
+export interface IMonitorWsResponse {
+  id:             string;
+  time:           number;
+  transaction:    string;
+  block_number:   string;
+  chain:          string;
+  amm:            string;
+  pair_address:   string;
+  tx_type:        number;
+  position_type:  number;
+  from_address:   string;
+  from_symbol:    string;
+  from_logo:      string;
+  from_amount:    string;
+  from_price_usd: string;
+  from_price_eth: string;
+  to_address:     string;
+  to_symbol:      string;
+  to_logo:        string;
+  to_amount:      string;
+  to_price_usd:   string;
+  to_price_eth:   string;
+  target_address: string;
+  target_mcap:    string;
+  avg_price_usd:  string;
+  pnl_usd:        string;
+  position_usd:   string;
+  maker_address:  string;
+  maker_alias:    string;
+  maker_logo:     string;
+}

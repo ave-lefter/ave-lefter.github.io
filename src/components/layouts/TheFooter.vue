@@ -139,12 +139,19 @@
   </footer>
 </template>
 
-<script setup lang='ts'>
+<script setup lang='tsx'>
 import ring from '@/assets/audio/ring.wav'
 import { cloneDeep, throttle  } from 'lodash-es'
 import { formatDec } from '~/utils/formatNumber'
 import { getTokensPrice } from '@/api/token'
 import { upColor, downColor } from '@/utils/constants'
+import type { GetSignalV2ListResponse } from '~/api/signal'
+import UserAvatar from '../userAvatar.vue'
+import type { IMonitorWsResponse } from '~/api/types/ws'
+import bellImg from '@/assets/images/bell.svg'
+import { TokenImg } from '#components'
+
+const {t} = useI18n()
 const {visible,hasRing} = storeToRefs(useMonitorStore())
 const signalStore = useSignalStore()
 const globalStore = useGlobalStore()
@@ -268,11 +275,21 @@ watch(() => signalStore.signalVisible, val => {
     isDoted.value = false
   }
 })
-watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], () => {
+watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], ({msg}:{msg:GetSignalV2ListResponse}) => {
   if (!signalStore.signalVisible) {
     isDoted.value = true
   }
+  signalToast(msg)
 })
+
+function signalToast(val:GetSignalV2ListResponse) {
+  const actionsCount = val.actions.length
+  const actionsVol = val.actions.reduce((acc, curr) => acc + Number(curr.quote_token_volume), 0)
+  const firstAction = val.actions[0]
+  const logoTemplate = actionsCount === 1 ? <UserAvatar wallet_logo={{logo:firstAction?.wallet_logo,name:firstAction?.wallet_alias}}/>:''
+  const centerTemplate = <>{actionsCount}{t('signalUnit')}{t(val.tag)} {t('justNow')}</>
+}
+
 watch(visible, val => {
   // console.log('visible', val)
   if (val) {
@@ -280,7 +297,7 @@ watch(visible, val => {
   }
 })
 
-watch(() => wsStore.wsResult[WSEventType.MONITOR], () => {
+watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
   // console.log('wsStore.wsResult[WSEventType.MONITOR]', wsStore.wsResult[WSEventType.MONITOR])
   throttle(() => {
     if(globalStore.audioSettings.audio.monitor&&botStore.evmAddress){
@@ -290,7 +307,78 @@ watch(() => wsStore.wsResult[WSEventType.MONITOR], () => {
   if (!visible.value) {
     isDoted2.value = true
   }
+  monitorToast(val)
 })
+
+monitorToast([
+    {
+        'id': '0000000367770902-0053',
+        'time': 1758249972,
+        'transaction': '5v1SSQcrPReR9JxSHquoA9c4YjsNJM7nGbR9DWAb7d8Bb1S5FXBgXP1PrMhVepm3j1vBBVLvwpM3Nar6kjEYW9L3',
+        'block_number': '367770902',
+        'chain': 'solana',
+        'amm': 'pump',
+        'pair_address': '9doNHkub9np3bbs829158FjDCafjUASjwhC59st5EJ4A',
+        'tx_type': 0,
+        'position_type': 0,
+        'from_address': 'So11111111111111111111111111111111111111112',
+        'from_symbol': 'SOL',
+        'from_logo': 'token_icon/solana/So11111111111111111111111111111111111111112.png',
+        'from_amount': '0.000009875',
+        'from_price_usd': '247.24336',
+        'from_price_eth': '0.99967',
+        'to_address': 'BwHmag4urFEHUAsxf9nzwNEbfnd1W7WENNXLjHXZpump',
+        'to_symbol': '132ikfwjn1',
+        'to_logo': '',
+        'to_amount': '328.07727',
+        'to_price_usd': '0.0000074419',
+        'to_price_eth': '0.00000003009961',
+        'target_address': 'BwHmag4urFEHUAsxf9nzwNEbfnd1W7WENNXLjHXZpump',
+        'target_mcap': '10197.19831459155',
+        'avg_price_usd': '',
+        'pnl_usd': '',
+        'position_usd': '0.002441518235613',
+        'maker_address': '9pGGbT8pwgfV39C3g1X4NeySvbuojh8BUmpaL38a6fPp',
+        'maker_alias': '',
+        'maker_logo': ''
+    }
+])
+function monitorToast(val:IMonitorWsResponse[]) {
+  val.forEach(item => {
+    ElMessage({
+      icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
+      message:()=>(
+        <div class='inline-flex items-center gap-4px text-12px'>
+          <UserAvatar 
+              wallet_logo={{logo:item.maker_logo,name:item.maker_alias}}
+              address={item.maker_address}
+              chain={item.chain}
+              iconSize='16px'
+          />
+          <span>{item.maker_alias}</span>
+          <span>{t('justNow')}<span class={getIsBuy(item)?'color-[--up-color]':'color-[--down-color]'}>{
+            getIsBuy(item)?t('buy'):t('sell')
+            }{
+              formatNumber(getIsBuy(item)?item.from_amount:item.to_amount,1)
+            }{
+              getIsBuy(item)?item.from_symbol:item.to_symbol
+            }</span>{t('of')}</span>
+          <TokenImg row={{logo_url:getIsBuy(item)?item.to_logo:item.from_logo,chain:''}} token-class="w-16px h-16px" />
+        </div>
+      ),
+      placement:globalStore.audioSettings.notice.position as any,
+    })
+  })
+}
+function getIsBuy(item: { position_type?: string | number; tx_type?: string | number }) {
+  // console.log('item', item)
+  if (item.position_type !== undefined) {
+    return item.position_type === 0 || item.position_type === 1
+  } else {
+    return item.tx_type === 0
+  }
+}
+
 const audioUrl = computed(()=>{
   return audioNameToResource[globalStore.audioSettings.audio.monitor as keyof typeof audioNameToResource]
   || audioNameToResource.Coin
