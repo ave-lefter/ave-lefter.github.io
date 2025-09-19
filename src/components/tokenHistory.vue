@@ -221,7 +221,7 @@ function balancePriceChange(val:IPriceV2Response) {
     </div>    
     <el-scrollbar ref="scrollbar" class="flex-1" @scroll="onScroll">
       <div ref="scrollContent" class="flex items-center gap-18px whitespace-nowrap h-32px text-12px color-[--third-text]">
-        <NuxtLink v-for="item in listData" :key="item.id" class="h-full flex items-center gap-4px hover:color-[--main-text] group" :class="item.id===route.params.id?'border-b-solid border-b-[--secondary-text] [&&]:color-[--main-text]':''" :to="`/token/${item.id}`">
+        <NuxtLink v-for="item in listData" :key="item.id" class="h-full flex items-center gap-4px hover:color-[--main-text] group" :class="item.id===route.params.id?'border-b-solid border-b-[--secondary-text] [&&]:color-[--main-text]':''" :to="`/token/${item.id}`" @click="scrollbar && scrollbar.setScrollLeft(0)">
           <TokenImg :row="{logo_url:item.logo_url,symbol:item.symbol,chain:getAddressAndChainFromId(item.id)?.chain}" :tokenClass="'w-16px h-16px'" chainClass="w-8px h-8px"/>
           {{ item.symbol }}
 
