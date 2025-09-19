@@ -47,6 +47,7 @@ const props = defineProps<{
   activeChain: string
   activeTab?: string
   activeSubTab?: string
+  height: string
   ammList: IGetTreasureConfig['swaps']
 }>()
 
@@ -448,7 +449,7 @@ const cellRenderer = computed(() => {
 </script>
 
 <template>
-  <div v-loading="loading" style="height: calc(100vh - 185px)">
+  <div v-loading="loading" :style="`height:${height}`">
     <AveTable
       rowKey="rowKey"
       :data="filteredListData"

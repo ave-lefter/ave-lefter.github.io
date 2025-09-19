@@ -156,6 +156,18 @@ export const useGlobalStore = defineStore('global', () => {
     quickVisible: true,
     quickBuyValue: '0.01',
   })
+
+  // 预留一个全局变量，用于控制 token 历史的显示
+  const tokenHistoryVisible = true
+  const lastVisitTokens = useStorage<{
+    id: string,
+    logo_url: string,
+    symbol: string,
+    price_change: number | undefined,
+    circulation: string,
+    price: number,
+  }[]>('lastTokens', [])
+  const latestNotice = shallowRef<ILatestNotice>({} as ILatestNotice)
   const rankActiveTab = useStorage('rankActiveTab', 'hot')
   // pump 和活动榜单动态插入
   const rankConditions = useStorage<Record<string, { sort: { sort: string; sort_dir: string }, filter: Record<string, any> }>>('rankCache',{
@@ -189,7 +201,6 @@ export const useGlobalStore = defineStore('global', () => {
     }
   })
 
-  const latestNotice = shallowRef<ILatestNotice>({})
   const userFavoriteGroups = ref<GetUserFavoriteGroupsResponse[]>([])
   const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)
 
@@ -287,6 +298,8 @@ export const useGlobalStore = defineStore('global', () => {
     getFollowsNum,
     latestNotice,
     pnlTrackerVisible,
+    lastVisitTokens,
+    tokenHistoryVisible,
     userFavoriteGroups,
     getUserFavoriteGroups:_getUserFavoriteGroups,
     rankConditions,
