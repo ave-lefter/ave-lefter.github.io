@@ -162,6 +162,9 @@ const audioElement=ref<HTMLAudioElement|null>(null)
 const { lang } = storeToRefs(globalStore)
 const { token } = storeToRefs(useTokenStore())
 const route = useRoute()
+const isEn = computed(()=>{
+  return lang.value === 'en'
+})
 const addressAndChain = computed(() => {
   const id = route.params.id as string
   if (id) {
@@ -302,7 +305,11 @@ function signalToast(val:GetSignalV2ListResponse) {
     icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
     placement:globalStore.audioSettings.notice.position as any,
     message:()=>(
-      <div class='inline-flex items-center gap-4px text-12px'
+      <div 
+        class='inline-flex items-center gap-4px text-12px cursor-pointer'
+        onClick={()=>{
+        navigateTo(`/token/${val.token}-${val.chain}`)
+        }}
       >
          {actionsCount === 1 && <UserAvatar 
             wallet_logo={{logo:firstAction?.wallet_logo,name:firstAction?.wallet_alias}}
@@ -310,9 +317,9 @@ function signalToast(val:GetSignalV2ListResponse) {
             chain={val.chain}
             iconSize='16px'
         />}
-        <span>{actionsCount}{t('signalUnit')}{t(val.tag.replace('_buy',''))}</span>{t('justNow')}<span class='color-[--up-color] ml--4px'>{t('buy')}{
+        <span>{actionsCount}{t('signalUnit')}{t(val.tag.replace('_buy',''))}</span>{t('justNow')}<span class='color-[--up-color] ml--4px'>{t('buy')}{isEn.value ? ' ':''}{
             formatNumber(actionsVol,1)
-          } {
+          }{
             firstAction.quote_token_symbol.toUpperCase() === 'USDC'
               ? 'U' 
               : firstAction.quote_token_symbol
@@ -352,7 +359,12 @@ function monitorToast(val:IMonitorWsResponse[]) {
       icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
       placement:globalStore.audioSettings.notice.position as any,
       message:()=>(
-        <div class='inline-flex items-center gap-4px text-12px'>
+        <div 
+          class='inline-flex items-center gap-4px text-12px cursor-pointer'
+          onClick={()=>{
+            navigateTo(`/address/${item.maker_address}/${item.chain}`)
+          }}
+        >
           <UserAvatar 
               wallet_logo={{logo:item.maker_logo,name:item.maker_alias}}
               address={item.maker_address}
@@ -362,7 +374,7 @@ function monitorToast(val:IMonitorWsResponse[]) {
           <span>{item.maker_alias}</span>
           <span>{t('justNow')}<span class={getIsBuy(item)?'color-[--up-color]':'color-[--down-color]'}>{
             getIsBuy(item)?t('buy'):t('sell')
-            }{
+            }{isEn.value ? ' ':''}{
               formatNumber(getIsBuy(item)?item.from_amount:item.to_amount,1)
             }{
               getIsBuy(item)?item.from_symbol:item.to_symbol
