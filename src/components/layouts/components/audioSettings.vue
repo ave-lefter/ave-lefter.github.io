@@ -73,16 +73,29 @@ watch(dialogVisible,()=>{
     }
 })
 
-function save() {
-    globalStore.audioSettings = cloneDeep(audioSettings.value)
-}
-
 function selectPosition(item:typeof toastPositions[number]) {
     audioSettings.value.notice.position = item.placement
     ElMessage({
         placement:item.placement,
         message:t('example')
     })
+}
+
+function getSelectedClass(item:string) {
+    if(audioSettings.value.notice.position === item){
+      return {
+        parent:'border-[--primary-color]',
+        class:'color-[--main-text]'
+      }
+    }
+    return {
+        class:'color-[--secondary-text]'
+    }
+}
+
+function onSave() {
+    globalStore.audioSettings = cloneDeep(audioSettings.value)
+    dialogVisible.value = false
 }
 </script>
 
@@ -112,9 +125,9 @@ function selectPosition(item:typeof toastPositions[number]) {
                     <div class="flex gap-x-10px gap-y-16px flex-wrap">
                         <div
                             v-for="item in toastPositions" :key="item.label" 
-                            class="text-center color-[--secondary-text] cursor-pointer hover:color-[--main-text] group" @click="selectPosition(item)">
-                            <div :class="`bg-[--secondary-bg] border-1px border-solid border-[--border] rounded-4px mb-9px group-hover:border-[--primary-color] transition-all duration-300 ${item.parentClassName}`">
-                                <div :class="`w-91px h-63px bg-[--dialog-bg] ${item.className}`">
+                            :class="`text-center cursor-pointer hover:color-[--main-text] group ${getSelectedClass(item.placement)?.class || ''}`" @click="selectPosition(item)">
+                            <div :class="`bg-[--secondary-bg] border-1px border-solid border-[--border] rounded-4px mb-9px group-hover:border-[--primary-color] transition-all duration-300 ${item.parentClassName} ${getSelectedClass(item.placement)?.parent || ''}`">
+                                <div :class="`w-91px h-63px bg-[--dialog-bg] rounded-4px ${item.className}`">
                                     <div class="w-54px h-20px bg-[--secondary-bg] rounded-4px flex items-center justify-center">
                                         <div class="w-6px h-6px bg-[--primary-color] rounded-full mr-3px"/>
                                         <div>
@@ -128,7 +141,7 @@ function selectPosition(item:typeof toastPositions[number]) {
                         </div>
                     </div>
                 </div>
-                <el-button type="primary" class="w-full">
+                <el-button type="primary" class="w-full" @click="onSave">
                     {{ $t('complete') }}
                 </el-button>
             </div>
