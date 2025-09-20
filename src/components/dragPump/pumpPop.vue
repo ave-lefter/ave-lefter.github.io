@@ -167,6 +167,16 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val: WSPump[]) => {
   }
 })
 
+watch(()=>pumpStore.pump_notice[pumpStore.activeChain][activeTab.value],val=>{
+  if(val){
+    setTimeout(()=>{
+      if(pumpAudio.value){
+        pumpAudio.value.play()
+      }
+    })
+  }
+})
+
 const addListData = useThrottleFn(()=>{
   pumpStore.listData.unshift(...wsCacheList.value)
   wsCacheList.value.length = 0

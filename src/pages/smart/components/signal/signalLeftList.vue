@@ -158,6 +158,16 @@ watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], ({msg: _sign
   }
 })
 
+watch(()=>globalStore.audioSettings.audio.signal,val=>{
+  if(val){
+   setTimeout(()=>{
+    if(signalAudio.value){
+      signalAudio.value.play()
+    }
+   })
+  }
+})
+
 function filterCallback(el: GetSignalV2ListResponse) {
   const {token, history_count, mc_curr} = tempQueryParams.value
   const tokenMatched = !token || el.token === token

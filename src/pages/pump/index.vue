@@ -412,7 +412,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage, useDebounceFn, useWindowSize } from '@vueuse/core'
+import { useStorage, useDebounceFn, useWindowSize, useThrottleFn } from '@vueuse/core'
 import QuickSwapSet from '@/components/quickSwap/quickSwapSet.vue'
 import PumpList from './pumpList.vue'
 import Setting from './setting.vue'
@@ -684,28 +684,40 @@ const list2 = computed(() => {
     }
     return filterList
   })
-watch(() => list1.value?.[0]?.target_token, (val) => {
+watch(() => list1.value?.[0]?.target_token, useThrottleFn((val) => {
   const newAudio = pump_notice.value[activeChain.value].new
   if(newAudio && pumpAudio.value && val) {
     audioUrl.value = audioNameToResource[newAudio as keyof typeof audioNameToResource]
     || audioNameToResource.Beep
     pumpAudio.value.play()
   }
-})
-watch(() => list2.value?.[0]?.target_token, (val) => {
+},300))
+watch(() => list2.value?.[0]?.target_token, useThrottleFn((val) => {
   const soonAudio = pump_notice.value[activeChain.value].soon
   if(soonAudio && pumpAudio.value && val) {
     audioUrl.value = audioNameToResource[soonAudio as keyof typeof audioNameToResource]
     || audioNameToResource.Beep
     pumpAudio.value.play()
   }
-})
-watch(() => list3.value?.[0]?.target_token, (val) => {
+},300))
+watch(() => list3.value?.[0]?.target_token, useThrottleFn((val) => {
   const graduatedAudio = pump_notice.value[activeChain.value].graduated
   if(graduatedAudio && pumpAudio.value && val) {
     audioUrl.value = audioNameToResource[graduatedAudio as keyof typeof audioNameToResource]
     || audioNameToResource.Beep
     pumpAudio.value.play()
+  }
+},300))
+watch(()=>[pump_notice.value[activeChain.value].new,
+pump_notice.value[activeChain.value].soon,
+pump_notice.value[activeChain.value].graduated
+],(val)=>{
+  if(val.some(el=>!!el)){
+    setTimeout(()=>{
+      if(pumpAudio.value){
+        pumpAudio.value.play()
+      }
+    })
   }
 })
 watch(pump_solana_platforms, () => {
