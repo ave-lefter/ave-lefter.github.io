@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/first-attribute-linebreak -->
 <template>
   <div>
-    <el-table v-loading="loading && !txHistory?.length" :data="txHistory" fit stripe :height="tableHeight"
+    <el-table v-loading="loading && !txHistory?.length" :data="txHistory" fit stripe :height="tableHeight" row-class-name="text-12px" header-row-class-name="text-12px"
       style="width: 100%;" @row-click="tableRowClick">
       <template #empty>
         <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
@@ -32,7 +32,7 @@
                       alt="" srcset="">
                   </template>
                 </el-image>
-                <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px rd-50%"
+                <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-0 rd-50%"
                   :src="`${configStore.token_logo_url}chain/${row.chain}.png`" alt="" srcset="">
               </div>
             </div>
@@ -133,7 +133,7 @@
           <div class="text-[--secondary-text] text-right">${{ isBuy(row.swapType) ? formatNumber(row?.outPrice ||
             0) : formatNumber(row?.inPrice || 0) }}</div>
         </template>
-        <template #default="{ row }" v-else>
+        <template v-else #default="{ row }">
           <div class="text-[--secondary-text] text-right">${{ isBuyChain(row.swapType) ? formatNumber(row?.outPrice ||
             0) : formatNumber(row?.inPrice || 0) }}</div>
         </template>

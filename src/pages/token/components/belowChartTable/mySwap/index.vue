@@ -6,6 +6,8 @@ import unified from './unified.vue'
 import { bot_getUserWalletTxInfo } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
 import { useSessionStorage } from '@vueuse/core'
+import type { WalletTokenInfo } from '~/api/types/token'
+import type { IPriceV2Response } from '~/api/types/ws'
 
 // const props = defineProps({
 //   currentActiveTab: {
@@ -25,7 +27,7 @@ const unifiedRef = ref()
 const _chain = getAddressAndChainFromId(route.params.id as string)?.chain
 const activeTab = ref(_chain || walletStore.chain || 'solana')
 const botOrderOnlyCurrentToken = useSessionStorage('mySwapBotOrderOnlyCurrentToken', true)
-const walletTxData = ref<any>()
+const walletTxData = ref<WalletTokenInfo>()
 const tabs = computed(() => {
   // 获取原始地址数组
   const addresses = botStore.userInfo?.addresses || []
@@ -178,6 +180,22 @@ watch([() => route.params.id], () => {
     timer = null
   }
   refreshData()
+})
+
+watch(()=>wsStore.wsResult[WSEventType.PRICEV2],(val:IPriceV2Response)=>{
+   val.prices.find(el=>{
+    const tokenId = el.token +'-' + el.chain
+    if(tokenId === route.params.id && walletTxData.value){
+      const balance_amount = Number((walletTxData.value.balance_amount || 0))
+      const newBalance = el.uprice * balance_amount
+      const _unrealizedProfit = (el.uprice - Number(walletTxData.value.average_purchase_price_usd || 0)) * balance_amount
+      const _totalProfit = _unrealizedProfit + Number((walletTxData.value.realized_profit || 0))
+
+      walletTxData.value.balance_usd = String(newBalance)
+      walletTxData.value.unrealized_profit = String(_unrealizedProfit)
+      walletTxData.value.total_profit = String(_totalProfit)
+    }
+   })
 })
 
 function refreshData() {
