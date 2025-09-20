@@ -371,7 +371,7 @@ function monitorToast(val:IMonitorWsResponse[]) {
               chain={item.chain}
               iconSize='16px'
           />
-          <span>{item.maker_alias}</span>
+          <span>{item.maker_alias || (item.maker_address.slice(0,4)+'...'+item.maker_address.slice(0,-4))}</span>
           <span>{t('justNow')}<span class={getIsBuy(item)?'color-[--up-color]':'color-[--down-color]'}>{
             getIsBuy(item)?t('buy'):t('sell')
             }{isEn.value ? ' ':''}{
