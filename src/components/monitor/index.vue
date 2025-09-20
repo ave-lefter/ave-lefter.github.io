@@ -303,12 +303,12 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
           </el-button>
         </AveEmpty>
       </el-tab-pane>
-      <el-tab-pane :name="activeName">
+      <el-tab-pane disabled>
          <template #label>
             <div class="cursor-move w-100% h-100% drag-handle" />
          </template>
       </el-tab-pane>
-      <el-tab-pane :name="activeName">
+      <el-tab-pane disabled>
         <template #label>
           <div class="m-op flex-end gap-8px w-100% h-100%">
             <template v-if="activeName===1 && props.isLarge">
@@ -743,6 +743,9 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
       &.is-active{
         color:var(--main-text);
       }
+    }
+    &.is-disabled{
+      cursor:pointer;
     }
   }
   :deep() .el-tabs__header{
