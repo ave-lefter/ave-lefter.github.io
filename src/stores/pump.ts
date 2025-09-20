@@ -131,19 +131,19 @@ export const usePumpStore = defineStore('pumpStore', () => {
     })
       const pump_notice = useStorage('pump_notice', {
         solana: {
-          new: false,
-          soon: false,
-          graduated: false,
+          new: '',
+          soon: '',
+          graduated: '',
         },
         bsc: {
-          new: false,
-          soon: false,
-          graduated: false,
+          new: '',
+          soon: '',
+          graduated: '',
         },
         xlayer: {
-          new: false,
-          soon: false,
-          graduated: false,
+          new: '',
+          soon: '',
+          graduated: '',
         },
       })
     const listData = shallowRef<PumpObj[]>([])
