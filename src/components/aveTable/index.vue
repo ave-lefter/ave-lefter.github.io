@@ -86,6 +86,7 @@ const defaultSlots = computed(() => {
   for (const key of TABLE_V2_DEFAULT_SLOTS) {
     if (slots[key]) s[key] = slots[key]
   }
+  console.log(s)
   return s
 })
 

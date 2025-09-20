@@ -142,9 +142,9 @@ function onDrag(x: number, y: number) {
     top:0;
     height: 100%;
     gap:1px;
-    background: var(--third-text);
+    background: #5A5E64;
     &:hover{
-      background: var(--secondary-text);
+      background: #9CA1A8;
     }
 }
 .left-drag .handle-mr{
