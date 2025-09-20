@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ITopSignal } from '~/api/signal'
+const globalStore = useGlobalStore()
 
 defineProps<{
   dialogValues: {
@@ -26,6 +27,9 @@ const flexColumns = [
   'w-60px text-right',
 ]
 const emit = defineEmits(['close'])
+const scrollHeight = computed(()=>{
+  return globalStore.tokenHistoryVisible ? 'calc(100vh - 335px)':'calc(100vh - 302px)'
+})
 </script>
 <template>
   <div v-show="dialogValues.visible" class="w-360px p-12px bg-[--secondary-bg]">
@@ -49,7 +53,7 @@ const emit = defineEmits(['close'])
         {{ $t('MaximumIncrease2') }}
       </span>
     </div>
-    <el-scrollbar ref="scrollRef" height="calc(100vh - 302px)" class="mx--12px px-12px">
+    <el-scrollbar ref="scrollRef" :height="scrollHeight" class="mx--12px px-12px">
       <div
         v-for="(row, $index) in dialogValues.list"
         :key="row.token"

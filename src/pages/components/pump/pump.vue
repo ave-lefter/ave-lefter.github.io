@@ -58,6 +58,7 @@ const props = defineProps<{
   activeChain: string
   activeSubTab: string
   activeTab: string
+  height: string
 }>()
 const {rankConditions} = storeToRefs(globalStore)
 function setSortConditions(params: { sort: string; sort_dir: string }) {
@@ -332,7 +333,7 @@ function initCache() {
 }
 </script>
 <template>
-  <div v-loading="loading" style="height: calc(100vh - 229px)">
+  <div v-loading="loading" :style="`height:${height}`">
     <AveTable
       row-key="rowKey"
       :loading="loading"

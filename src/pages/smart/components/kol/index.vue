@@ -7,7 +7,7 @@
         :data="tableData"
         :header-cell-style="{ fontSize: '12px' }"
         fit
-        class="table-container"
+        :style="`height:${scrollbarHeight}`"
         :default-sort="{
           prop: conditions.sort,
           order: conditions.sort_dir ? conditions.sort_dir + 'ending' : null
@@ -51,7 +51,7 @@
               </template>
               <template #default>
                 <div class="text-14px text-[var(--main-text)]">{{$t('searchKol')}}</div>
-                <el-input class="mt-8px" v-model="filterForm['keyword'].keyword" :placeholder="$t('searchKolPlaceholder')" clearable />
+                <el-input v-model="filterForm['keyword'].keyword" class="mt-8px" :placeholder="$t('searchKolPlaceholder')" clearable />
                 <div class="mt-12px flex items-center justify-center">
                     <el-button
                       class="flex-1 reset"
@@ -975,7 +975,9 @@ const $refs = ref({
   currentBtnRef: {} as Record<number, any>,
 })
 const filterHeight = computed(() => wHeight.value - 200)
-
+const scrollbarHeight = computed(()=>{
+  return useGlobalStore().tokenHistoryVisible ? 'calc(100vh - 182px)' : 'calc(100vh - 150px)'
+})
 
 
 function goLink1 (url: string) {
@@ -1115,10 +1117,10 @@ function scrollToTop() {
     align-items: center;
   }
 }
-.table-container{
-  height: calc(100vh - 150px);
+// .table-container{
+//   height: calc(100vh - 150px);
 
-}
+// }
 ::v-deep(.el-table) {
     .el-table__body {
       tr:hover {

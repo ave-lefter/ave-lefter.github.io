@@ -35,6 +35,9 @@ importers:
       '@tronweb3/tronwallet-adapters':
         specifier: ^1.2.9
         version: 1.2.9(@netlify/blobs@8.2.0)(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.3)
+      '@vueuse/components':
+        specifier: ^13.9.0
+        version: 13.9.0(vue@3.5.13(typescript@5.8.3))
       '@vueuse/core':
         specifier: ^13.1.0
         version: 13.1.0(vue@3.5.13(typescript@5.8.3))
@@ -3494,8 +3497,18 @@ packages:
   '@vue/shared@3.5.13':
     resolution: {integrity: sha512-/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==}
 
+  '@vueuse/components@13.9.0':
+    resolution: {integrity: sha512-0DDFpjG3hEEK+3YgSzE/OzOGqpo/KmxcXWzW2YdmgahZvaoUdegn68GmbdcHRJE7CH55dDj13Cz47iN8QoI3jQ==, tarball: https://registry.npmjs.org/@vueuse/components/-/components-13.9.0.tgz}
+    peerDependencies:
+      vue: ^3.5.0
+
   '@vueuse/core@13.1.0':
     resolution: {integrity: sha512-PAauvdRXZvTWXtGLg8cPUFjiZEddTqmogdwYpnn60t08AA5a8Q4hZokBnpTOnVNqySlFlTcRYIC8OqreV4hv3Q==}
+    peerDependencies:
+      vue: ^3.5.0
+
+  '@vueuse/core@13.9.0':
+    resolution: {integrity: sha512-ts3regBQyURfCE2BcytLqzm8+MmLlo5Ln/KLoxDVcsZ2gzIwVNnQpQOL/UKV8alUqjSZOlpFZcRNsLRqj+OzyA==, tarball: https://registry.npmjs.org/@vueuse/core/-/core-13.9.0.tgz}
     peerDependencies:
       vue: ^3.5.0
 
@@ -3505,11 +3518,19 @@ packages:
   '@vueuse/metadata@13.1.0':
     resolution: {integrity: sha512-+TDd7/a78jale5YbHX9KHW3cEDav1lz1JptwDvep2zSG8XjCsVE+9mHIzjTOaPbHUAk5XiE4jXLz51/tS+aKQw==}
 
+  '@vueuse/metadata@13.9.0':
+    resolution: {integrity: sha512-1AFRvuiGphfF7yWixZa0KwjYH8ulyjDCC0aFgrGRz8+P4kvDFSdXLVfTk5xAN9wEuD1J6z4/myMoYbnHoX07zg==, tarball: https://registry.npmjs.org/@vueuse/metadata/-/metadata-13.9.0.tgz}
+
   '@vueuse/metadata@9.13.0':
     resolution: {integrity: sha512-gdU7TKNAUVlXXLbaF+ZCfte8BjRJQWPCa2J55+7/h+yDtzw3vOoGQDRXzI6pyKyo6bXFT5/QoPE4hAknExjRLQ==, tarball: https://registry.npmjs.org/@vueuse/metadata/-/metadata-9.13.0.tgz}
 
   '@vueuse/shared@13.1.0':
     resolution: {integrity: sha512-IVS/qRRjhPTZ6C2/AM3jieqXACGwFZwWTdw5sNTSKk2m/ZpkuuN+ri+WCVUP8TqaKwJYt/KuMwmXspMAw8E6ew==}
+    peerDependencies:
+      vue: ^3.5.0
+
+  '@vueuse/shared@13.9.0':
+    resolution: {integrity: sha512-e89uuTLMh0U5cZ9iDpEI2senqPGfbPRTHM/0AaQkcxnpqjkZqDYP8rpfm7edOz8s+pOCOROEy1PIveSW8+fL5g==, tarball: https://registry.npmjs.org/@vueuse/shared/-/shared-13.9.0.tgz}
     peerDependencies:
       vue: ^3.5.0
 
@@ -15205,11 +15226,24 @@ snapshots:
 
   '@vue/shared@3.5.13': {}
 
+  '@vueuse/components@13.9.0(vue@3.5.13(typescript@5.8.3))':
+    dependencies:
+      '@vueuse/core': 13.9.0(vue@3.5.13(typescript@5.8.3))
+      '@vueuse/shared': 13.9.0(vue@3.5.13(typescript@5.8.3))
+      vue: 3.5.13(typescript@5.8.3)
+
   '@vueuse/core@13.1.0(vue@3.5.13(typescript@5.8.3))':
     dependencies:
       '@types/web-bluetooth': 0.0.21
       '@vueuse/metadata': 13.1.0
       '@vueuse/shared': 13.1.0(vue@3.5.13(typescript@5.8.3))
+      vue: 3.5.13(typescript@5.8.3)
+
+  '@vueuse/core@13.9.0(vue@3.5.13(typescript@5.8.3))':
+    dependencies:
+      '@types/web-bluetooth': 0.0.21
+      '@vueuse/metadata': 13.9.0
+      '@vueuse/shared': 13.9.0(vue@3.5.13(typescript@5.8.3))
       vue: 3.5.13(typescript@5.8.3)
 
   '@vueuse/core@9.13.0(vue@3.5.13(typescript@5.8.3))':
@@ -15224,9 +15258,15 @@ snapshots:
 
   '@vueuse/metadata@13.1.0': {}
 
+  '@vueuse/metadata@13.9.0': {}
+
   '@vueuse/metadata@9.13.0': {}
 
   '@vueuse/shared@13.1.0(vue@3.5.13(typescript@5.8.3))':
+    dependencies:
+      vue: 3.5.13(typescript@5.8.3)
+
+  '@vueuse/shared@13.9.0(vue@3.5.13(typescript@5.8.3))':
     dependencies:
       vue: 3.5.13(typescript@5.8.3)
 

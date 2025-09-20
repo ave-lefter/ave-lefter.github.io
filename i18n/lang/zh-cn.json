@@ -164,6 +164,8 @@
   "sunpump_king": "Sumpump外盘",
   "movepump_king": "Movepump外盘",
   "timefun_king": "Timefun外盘",
+  "xflapswap_king": "Flap外盘",
+  "dyorswapfun_king": "DYOR外盘",
   "moonshot": "Moonshot内盘",
   "moonshot_king": "Moonshot外盘",
   "raydiumlaunchlab_king": "Raydiumlaunchlab外盘",
@@ -1389,6 +1391,7 @@
   "MaxTxAmount": "单笔tx最大量",
   "MaxWalletAmount": "单钱包最大量",
   "riskRemoved": "已解除",
+  "closeAll": "关闭所有记录",
   "groupNameAlreadyExists": "分组名称已存在",
   "displayBorder": "显示描边",
   "highlightBorder": "突出描边",
@@ -1414,5 +1417,6 @@
   "ToastPosition":"提示位置",
   "example":"显示示例",
   "justNow":"刚刚",
-  "of":"的"
+  "of":"的",
+  "hideNoSwap": "隐藏未购买"
 }

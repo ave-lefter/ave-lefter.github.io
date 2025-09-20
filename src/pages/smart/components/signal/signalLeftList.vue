@@ -14,6 +14,7 @@ const localeStore = useLocaleStore()
 const props = defineProps<{
   activeChain: string
   quickBuyValue: string
+  scrollbarHeight:number
 }>()
 const listData = shallowRef<GetSignalV2ListResponse[]>([])
 const filterSignalList = computed(() => {
@@ -129,13 +130,12 @@ function cancelHide() {
 }
 
 // const isShowDate = ref(true)
-const {height} = useWindowSize()
 const scrollbar = useTemplateRef('scrollbar')
 
 const onScroll = useThrottleFn(({scrollTop}: { scrollTop: number }) => {
   if (scrollbar.value) {
     const scrollElement = scrollbar.value.wrapRef
-    if (scrollElement && scrollElement.scrollHeight - scrollTop - (height.value - 226) < 30) {
+    if (scrollElement && scrollElement.scrollHeight - scrollTop - props.scrollbarHeight < 30) {
       fetchSignalList()
     }
   }
@@ -249,7 +249,7 @@ function openTokenDetail(el: IActionItem) {
     <el-scrollbar
       ref="scrollbar"
       :style="`width:${width}px`"
-      :height="height-226"
+      :height="scrollbarHeight"
       @scroll="onScroll"
     >
       <AveEmpty

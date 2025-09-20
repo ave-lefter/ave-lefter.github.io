@@ -14,7 +14,8 @@ export default withNuxt({
     'vue/no-multiple-template-root': 'off',
     'vue/attribute-hyphenation': 'off',
     'vue/no-v-html': 'off',
-    'vue/v-on-event-hyphenation': 'off'
+    'vue/v-on-event-hyphenation': 'off',
+    'vue/first-attribute-linebreak': 'off'
   }
 })
 

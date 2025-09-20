@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TimeLine from './timeLine.vue'
-import {useEventBus, useStorage} from '@vueuse/core'
+import {useEventBus, useStorage, useWindowSize} from '@vueuse/core'
 import Filter from './filter.vue'
 import {
   type GetSignalV2ListResponse,
@@ -22,8 +22,9 @@ const props = defineProps<{
     list:ITopSignal[]
   }
 }>()
-const localeStore = useLocaleStore()
+const {height} = useWindowSize()
 const globalStore = useGlobalStore()
+const localeStore = useLocaleStore()
 // token: 筛选 token
 // history_count：筛选信号数，对应值2, 5, 15
 // 市值：mc_curr，市值过滤，
@@ -42,6 +43,12 @@ const showResetBtn = shallowRef(false)
 const signalLeftList = useTemplateRef<InstanceType<typeof SignalLeftList>>('signalLeftList')
 const signalRightList = useTemplateRef<InstanceType<typeof SignalRightList>>('signalRightList')
 const audioVisible = ref(false)
+
+const scrollbarHeight = computed(()=>{
+  const tokenHistoryHeight = globalStore.tokenHistoryVisible ? 32 : 0
+  return height.value - 226 - tokenHistoryHeight
+})
+
 onMounted(() => {
   initWs()
   updateLeftList()
@@ -268,12 +275,14 @@ function scrollToTop() {
     />
     <SignalLeftList
       ref="signalLeftList"
+      :scrollbarHeight="scrollbarHeight"
       :activeChain="activeChain"
       :quickBuyValue="quickBuyValue"
       @setToken="setFilterToken"
     />
     <SignalRightList
       ref="signalRightList"
+      :scrollbarHeight="scrollbarHeight"
       :activeChain="activeChain"
       :quickBuyValue="quickBuyValue"
       @setResetBtn="setResetBtn"

@@ -77,125 +77,131 @@
         </div>
 
         <!-- 表格内容 -->
-        <el-scrollbar style="margin-right: -12px;padding-right: 12px;" :height="`${(klineHeight ?? 200) - 75}px`">
-          <div v-for="(row, index) in filterTableList" :key="index"
+        <UseVirtualList :key="klineHeight" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 75}px`">
+          <!-- <div v-for="(row, index) in filterTableList" :key="index"
             class="relative overflow-hidden cursor-pointer mt-1px first:mt-0" @mouseenter="isPausedTxs = true"
-            @mouseleave="isPausedTxs = false" @click="onRowClick({ rowData: row } as any)">
+            @mouseleave="isPausedTxs = false" @click="onRowClick({ rowData: row } as any)"> -->
 
             <!-- 表格内容 -->
-            <div
-              class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10">
-              <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
-                <!-- 整行渐变背景 -->
-                <div class="absolute inset-0 pointer-events-none"
-                  :style="{ backgroundColor: getFullRowGradient(row), transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'right' }" />
+             <template #default="{data:row,index}">
+                <div
+                class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
+                @mouseenter="isPausedTxs = true"
+                @mouseleave="isPausedTxs = false" 
+                @click="onRowClick({ rowData: row } as any)"
+                >
+                <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
+                  <!-- 整行渐变背景 -->
+                  <div class="absolute inset-0 pointer-events-none"
+                    :style="{ backgroundColor: getFullRowGradient(row), transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'right' }" />
 
-                <!-- Time -->
-                <div class="text-left min-w-0">
-                  <div class="color-[--d-5A5E64-l-A9B0BC]">
-                    <TimerCount v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
-                      :key="`${row.time}${index}`" :timestamp="row.time" :end-time="60">
-                      <template #default="{ seconds }">
-                        <span class="color-[--d-5A5E64-l-A9B0BC]">
-                          <template v-if="seconds < 60">
-                            {{ seconds }}s
-                          </template>
-                          <template v-else>
-                            {{ formatTimeFromNow(row.time) }}
-                          </template>
+                  <!-- Time -->
+                  <div class="text-left min-w-0">
+                    <div class="color-[--d-5A5E64-l-A9B0BC]">
+                      <TimerCount v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
+                        :key="`${row.time}${index}`" :timestamp="row.time" :end-time="60">
+                        <template #default="{ seconds }">
+                          <span class="color-[--d-5A5E64-l-A9B0BC]">
+                            <template v-if="seconds < 60">
+                              {{ seconds }}s
+                            </template>
+                            <template v-else>
+                              {{ formatTimeFromNow(row.time) }}
+                            </template>
+                          </span>
+                        </template>
+                      </TimerCount>
+                      <span v-else class="color-[--d-5A5E64-l-A9B0BC]">
+                        {{ formatTimeFromNow(row.time) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Amount -->
+                  <div class="text-right text-nowrap min-w-0">
+                    <div :class="getRowColor(row)" class="font-medium truncate">
+                      <template v-if="tableView.isVolUSDT">
+                        <span>
+                          ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
                         </span>
                       </template>
-                    </TimerCount>
-                    <span v-else class="color-[--d-5A5E64-l-A9B0BC]">
-                      {{ formatTimeFromNow(row.time) }}
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Amount -->
-                <div class="text-right text-nowrap min-w-0">
-                  <div :class="getRowColor(row)" class="font-medium truncate">
-                    <template v-if="tableView.isVolUSDT">
-                      <span>
-                        ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
-                      </span>
-                    </template>
-                    <template v-else>
-                      <span>
-                        ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
-                        <span class="color-[--d-5A5E64-l-A9B0BC] hidden sm:inline">
-                          {{ getChainInfo(row.chain)?.main_name }}
+                      <template v-else>
+                        <span>
+                          ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
+                          <span class="color-[--d-5A5E64-l-A9B0BC] hidden sm:inline">
+                            {{ getChainInfo(row.chain)?.main_name }}
+                          </span>
                         </span>
-                      </span>
-                    </template>
-                  </div>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px">
-                <!-- Price -->
-                <div class="text-right text-nowrap min-w-0 overflow-visible">
-                  <div class="color-[--secondary-text]">
-                    <template v-if="tableView.isAmount">
-                      <span>
-                        ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
-                      </span>
-                    </template>
-                    <template v-else>
-                      <span>
-                        ${{ formatNumber(getMcPrice(row), { decimals: 2 }) }}
-                      </span>
-                    </template>
+                      </template>
+                    </div>
                   </div>
                 </div>
 
-                <!-- Trader -->
-                <div class="text-right overflow-hidden min-w-0">
-                  <div class="flex items-center justify-end min-w-0">
-                    <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(row.chain) && row.senderProfile">
-                      <Icon v-if="hasNewAccount(row)"
-                        v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                        name="custom:new-account" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                      <Icon v-if="hasClearedAccount(row)"
-                        v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                        name="custom:cleared-account"
-                        class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                      <Icon v-if="bigWallet(row)"
-                        v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                        name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                    </template>
-                    <SignalTags v-if="windowWidth >= 480" tagClass="mr-3px"
-                      :tags="(row.newTags || []).map((el: any) => tagStore.matchTag(el.type))"
-                      :walletAddress="row.wallet_address" :chain="row.chain" />
+                <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px">
+                  <!-- Price -->
+                  <div class="text-right text-nowrap min-w-0 overflow-visible">
+                    <div class="color-[--secondary-text]">
+                      <template v-if="tableView.isAmount">
+                        <span>
+                          ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
+                        </span>
+                      </template>
+                      <template v-else>
+                        <span>
+                          ${{ formatNumber(getMcPrice(row), { decimals: 2 }) }}
+                        </span>
+                      </template>
+                    </div>
+                  </div>
 
-                    <UserRemark :remark="row.remark" :address="row.wallet_address"
-                      :show-address="!(row?.newTags?.length > 1)" :chain="row.chain" :wallet_logo="row.wallet_logo"
-                      addressClass="inline-block truncate max-w-full"
-                      :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
-                      class="color-[--secondary-text] truncate min-w-0 !text-12px"
-                      :mouseoverAddress="e => openMarkerTooltip(row, e)" :canEdit="false"
-                      @update-remark="updateRemark" />
-                    <div v-if="row.count && row.count > 1"
-                      class="color-[--secondary-text] !text-12px ml-2px whitespace-nowrap">
-                      ({{ row.count }})
+                  <!-- Trader -->
+                  <div class="text-right overflow-hidden min-w-0">
+                    <div class="flex items-center justify-end min-w-0">
+                      <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(row.chain) && row.senderProfile">
+                        <Icon v-if="hasNewAccount(row)"
+                          v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                          name="custom:new-account" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                        <Icon v-if="hasClearedAccount(row)"
+                          v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                          name="custom:cleared-account"
+                          class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                        <Icon v-if="bigWallet(row)"
+                          v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                          name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                      </template>
+                      <SignalTags v-if="windowWidth >= 480" tagClass="mr-3px"
+                        :tags="(row.newTags || []).map((el: any) => tagStore.matchTag(el.type))"
+                        :walletAddress="row.wallet_address" :chain="row.chain" />
+
+                      <UserRemark :remark="row.remark" :address="row.wallet_address"
+                        :show-address="!(row?.newTags?.length > 1)" :chain="row.chain" :wallet_logo="row.wallet_logo"
+                        addressClass="inline-block truncate max-w-full"
+                        :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
+                        class="color-[--secondary-text] truncate min-w-0 !text-12px"
+                        :mouseoverAddress="e => openMarkerTooltip(row, e)" :canEdit="false"
+                        @update-remark="updateRemark" />
+                      <div v-if="row.count && row.count > 1"
+                        class="color-[--secondary-text] !text-12px ml-2px whitespace-nowrap">
+                        ({{ row.count }})
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+             </template>
+          <!-- </div> -->
+        </UseVirtualList>
+        <template v-if="filterTableList.length === 0 && !listStatus.loadingTxs">
+          <div class="h-full flex flex-col items-center justify-center "
+            :style="{ height: `${(klineHeight ?? 200) - 105}px` }">
+            <img src="@/assets/images/empty-black.svg" alt="">
           </div>
-          <template v-if="filterTableList.length === 0 && !listStatus.loadingTxs">
-            <div class="h-full flex flex-col items-center justify-center "
-              :style="{ height: `${(klineHeight ?? 200) - 105}px` }">
-              <img src="@/assets/images/empty-black.svg" alt="">
-            </div>
-          </template>
-        </el-scrollbar>
+        </template>
       </div>
     </div>
     <!-- status -->
     <div
-      class="absolute bottom-0 h-24px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
+      class="z-10 absolute bottom-0 h-24px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
 
       <div v-show="isPausedTxs" class="flex items-center gap-x-7px">
         <Icon name="custom:stop" class="text-14px" />
@@ -233,6 +239,7 @@ import { useRoute } from 'vue-router'
 import { filterLanguage } from '~/pages/token/components/kLine/utils'
 import { WSEventType } from '~/utils/constants'
 import { useThrottleFn } from '@vueuse/core'
+import { UseVirtualList } from '@vueuse/components'
 import UserRemark from '~/components/userRemark.vue'
 import MarkerTooltip from '../belowChartTable/transactions/markerTooltip.vue'
 import { ElScrollbar, type RowEventHandlerParams } from 'element-plus'

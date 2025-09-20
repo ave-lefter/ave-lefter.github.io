@@ -131,6 +131,7 @@ export interface Token {
   is_audited: boolean
   dev_balance_ratio_cur: number
   launchpad: string
+  is_streaming?: boolean
 }
 
 export interface Volume {

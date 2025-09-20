@@ -1,5 +1,5 @@
 import { useStorage, useThrottleFn, useWindowSize } from '@vueuse/core'
-import type { ChainKey, PumpConfig, PumpObj } from '~/api/types/pump'
+import type { ChainKey, PumpConfig, PumpObj, pumpData } from '~/api/types/pump'
 import { _getPumpConfig, _getPumpList } from '@/api/pump'
 
 export const usePumpStore = defineStore('pumpStore', () => {
@@ -92,43 +92,60 @@ export const usePumpStore = defineStore('pumpStore', () => {
         'pump_solana_platforms',
         ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk','bags']
     )
+    const pumpV3 = useStorage<Record<ChainKey, pumpData>>(
+        'pumpV3',
+        {
+            solana: {
+                platforms: [],
+            },
+            bsc: {
+                platforms: [],
+            },
+            xlayer: {
+                platforms: [],
+            },
+        },
+    localStorage
+    )
     const activeChain = useStorage<ChainKey>(
         'pump_activeChain',
         'solana',
         sessionStorage
     )
-    const pump_query  = useStorage(
-        'pump_query',
-        {
-          solana: {
-            new: '',
-            soon: '',
-            graduated: ''
-          }
-          ,
-          bsc: {
-            new: '',
-            soon: '',
-            graduated: ''
-          }
-        }
-      )
-      const pump_notice = useStorage(
-        'pump_notice',
-        {
-          solana: {
-            new: '',
-            soon: '',
-            graduated: ''
-          }
-          ,
-          bsc: {
-            new: '',
-            soon: '',
-            graduated: ''
-          }
-        }
-      )
+    const pump_query = useStorage('pump_query', {
+      solana: {
+        new: '',
+        soon: '',
+        graduated: '',
+      },
+      bsc: {
+        new: '',
+        soon: '',
+        graduated: '',
+      },
+      xlayer: {
+        new: '',
+        soon: '',
+        graduated: '',
+      },
+    })
+      const pump_notice = useStorage('pump_notice', {
+        solana: {
+          new: false,
+          soon: false,
+          graduated: false,
+        },
+        bsc: {
+          new: false,
+          soon: false,
+          graduated: false,
+        },
+        xlayer: {
+          new: false,
+          soon: false,
+          graduated: false,
+        },
+      })
     const listData = shallowRef<PumpObj[]>([])
 
     return {
@@ -154,6 +171,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
         pump_query,
         listData,
         pump_notice,
-        shouldHide
+        shouldHide,
+        pumpV3
     }
 })

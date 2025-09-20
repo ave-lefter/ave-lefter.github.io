@@ -4,17 +4,23 @@
     v-else
     name="custom:refresh-left"
     class="ml-5px clickable text-14px"
-    @click.stop="refreshTokenBalance"
+    @click.stop="refreshTokenBalance(props.isPayToken)"
   />
 </template>
 
 <script lang="ts" setup>
 import { useBotSwap } from '~/composables/botSwap'
-interface Props {
-  type: number
-}
 
-const props = defineProps<Props>()
+const props = defineProps({
+  type: {
+    type: Number,
+    default: 0
+  },
+  isPayToken: {
+    type: Boolean,
+    default: false
+  }
+})
 
 const { loading, refreshTokenBalance } = useBotSwap(props.type)
 

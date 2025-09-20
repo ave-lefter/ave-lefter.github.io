@@ -239,6 +239,8 @@ export default defineNuxtConfig({
       { code: 'tr', file: 'tr.json', name: 'Türkçe' },
       { code: 'ru', file: 'ru.json', name: 'Русский' },
       { code: 'vi', file: 'vi.json', name: 'Tiếng Việt' },
+      { code: 'ko', file: 'ko.json', name: '한국어' },
+      { code: 'ja', file: 'ja.json', name: '日本語' },
     ],
     defaultLocale: 'en',
     detectBrowserLanguage: false,

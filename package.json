@@ -23,6 +23,7 @@
     "@solana/spl-token": "^0.4.13",
     "@solana/web3.js": "^1.98.2",
     "@tronweb3/tronwallet-adapters": "^1.2.9",
+    "@vueuse/components": "^13.9.0",
     "@vueuse/core": "^13.1.0",
     "@wallet-standard/app": "^1.1.0",
     "@walletconnect/ethereum-provider": "^2.21.3",

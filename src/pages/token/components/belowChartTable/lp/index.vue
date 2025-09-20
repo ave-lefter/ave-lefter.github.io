@@ -27,7 +27,7 @@
           :align="col.align">
           <template #default="{ row }">
             <Column :row="row" :col="col" :customKeys="['mark', 'addAmt', 'netAmt', 'txns', 'percent']">
-              <div v-if="col.prop == 'mark'" class="flex-start gap-2px hover:color-[--dialog-bg] cursor-pointer" @click.stop="tableRowClick(row)">
+              <div v-if="col.prop == 'mark'" class="flex-start gap-2px cursor-pointer" @click.stop="tableRowClick(row)">
                 <Icon v-if="formatLock(row)" color="#B3920E" name="material-symbols:lock" />
                 <Icon v-if="row.is_contract == 1" name="iconamoon:file-document-thin"  />
                 <pro-tag v-if="Number(row?.analysis_show_creator) === 1">{{ $t('contractCreator') }}</pro-tag>

@@ -311,6 +311,7 @@
                       </template>
                     </div>
                   </div>
+                  <PumpLive v-if="row?.is_streaming" :tokenId="(row.token + '-' + row.chain) as string" />
                   <a
                     class="media-item h-12px block leading-12px"
                     :href="`https://x.com/search?q=($${row?.symbol} OR ${row?.token})&src=typed_query&f=live`"

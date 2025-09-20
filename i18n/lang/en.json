@@ -162,6 +162,8 @@
   "sunpump_king": "Graduated from Sumpump",
   "movepump_king": "Graduated from Movepump",
   "timefun_king": "Graduated from Timefun",
+  "xflapswap_king": "Graduated from Flap",
+  "dyorswapfun_king": "Graduated from DYOR",
   "moonshot": "Moonshot",
   "moonshot_king": "Graduated from Moonshot",
   "raydiumlaunchlab_king": "Graduated from Raydiumlaunchlab",
@@ -1390,6 +1392,7 @@
   "MaxTxAmount": "Max Tx Amount",
   "MaxWalletAmount": "Max Wallet Amount",
   "riskRemoved": "Risk Removed",
+  "closeAll": "Close All Records",
   "groupNameAlreadyExists": "Group name already exists",
   "displayBorder": "Display Border",
   "highlightBorder": "Highlight Border",
@@ -1415,5 +1418,6 @@
   "ToastPosition": "Toast Position",
   "example": "Display Example",
   "justNow": "Just Now ",
-  "of": " Of "
+  "of": " Of ",
+  "hideNoSwap": "Hide Unswapped"
 }
