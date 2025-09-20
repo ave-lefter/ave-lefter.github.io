@@ -218,7 +218,7 @@ function scrollToTop() {
         </template>
         <template #default>
             <ul class="el-scrollbar__view el-select-dropdown__list [&&]:m--12px">
-              <li v-for="item in audioList" :key="item" class="el-select-dropdown__item hover:bg-[--border]" @click="globalStore.audioSettings.audio.signal=item;audioVisible=false;">
+              <li v-for="item in audioList" :key="item" class="el-select-dropdown__item hover:bg-[--border]" :class="{'bg-[--border]': globalStore.audioSettings.audio.signal === item}" @click="globalStore.audioSettings.audio.signal=item;audioVisible=false;">
                 <span class="text-12px">{{item || $t('close')}}</span>
               </li>
             </ul>

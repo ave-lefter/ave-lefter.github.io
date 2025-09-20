@@ -154,7 +154,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                       <Icon
                         :name="audioSettings.audio.monitor ? 'custom:ad':'custom:admute'"
                         class="cursor-pointer text-16px color-[--secondary-text]"
-                        @click="audioSettings.active = 'notice'"
+                        @click="audioSettings.active = 'audio'"
                       />
                       <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
                     </div>
@@ -247,7 +247,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
               <Icon
                 :name="audioSettings.audio.monitor ? 'custom:ad':'custom:admute'"
                 class="cursor-pointer color-[--secondary-text]"
-                @click="audioSettings.active = 'notice'"
+                @click="audioSettings.active = 'audio'"
               />
               <!-- <el-switch
                 v-model="hasRing"

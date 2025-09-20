@@ -362,7 +362,7 @@ function monitorToast(val:IMonitorWsResponse[]) {
         <div 
           class='inline-flex items-center gap-4px text-12px cursor-pointer'
           onClick={()=>{
-            navigateTo(`/address/${item.maker_address}/${item.chain}`)
+            navigateTo(`/token/${getIsBuy(item)?item.to_address:item.from_address}-${item.chain}`)
           }}
         >
           <UserAvatar 

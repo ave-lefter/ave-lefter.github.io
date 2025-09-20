@@ -75,9 +75,9 @@ watch(dialogVisible,()=>{
 
 function selectPosition(item:typeof toastPositions[number]) {
     audioSettings.value.notice.position = item.placement
-    ElMessage({
+    ElMessage.warning({
         placement:item.placement,
-        message:t('example')
+        message:<span class="color-[--main-text] text-12px">{t('example')}</span>
     })
 }
 
@@ -167,7 +167,7 @@ v-model="audioSettings.audio.volume" :min="0" :max="100" :step="1"  :marks="{
                     100: '100',
                 }"
                     class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--primary-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] mx-4px [--el-color-info:--third-text]" />
-                <el-button type="primary" class="w-full mt-70px" @click="save">{{ $t('complete') }}</el-button>
+                <el-button type="primary" class="w-full mt-70px" @click="onSave">{{ $t('complete') }}</el-button>
             </div>
             <audio ref="audioRef" class="hidden" :volume="audioSettings.audio.volume/100"/>
         </template>
