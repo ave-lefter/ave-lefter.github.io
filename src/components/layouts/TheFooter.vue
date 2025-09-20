@@ -301,7 +301,7 @@ function signalToast(val:GetSignalV2ListResponse) {
   const actionsCount = val.actions.length
   const actionsVol = val.actions.reduce((acc, curr) => acc + Number(curr.quote_token_amount), 0)
   const firstAction = val.actions[0]
-  ElMessage({
+  const msg = ElMessage({
     icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
     placement:globalStore.audioSettings.notice.position as any,
     message:()=>(
@@ -329,6 +329,7 @@ function signalToast(val:GetSignalV2ListResponse) {
       </div>
     )
   })
+  messageQueue.add(msg)
 }
 
 watch(visible, val => {
@@ -355,7 +356,7 @@ watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
 
 function monitorToast(val:IMonitorWsResponse[]) {
   val.forEach(item => {
-    ElMessage({
+    const msg = ElMessage({
       icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
       placement:globalStore.audioSettings.notice.position as any,
       message:()=>(
@@ -384,6 +385,7 @@ function monitorToast(val:IMonitorWsResponse[]) {
         </div>
       )
     })
+    messageQueue.add(msg)
   })
 }
 function getIsBuy(item: { position_type?: string | number; tx_type?: string | number }) {
