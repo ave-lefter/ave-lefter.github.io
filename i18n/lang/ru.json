@@ -757,5 +757,6 @@
   "holdersTotalChange": "Держатели меняются",
   "holdersChange": "Держатели меняются",
   "holdersChange2": "Держатель Чангс в {n}",
-  "lockAmount": "Сумма блокировки"
+  "lockAmount": "Сумма блокировки",
+  "transferToken": "Выберите токен переноса"
 }

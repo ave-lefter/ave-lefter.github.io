@@ -511,5 +511,6 @@
   "holdersTotalChange": "Cambio de titulares",
   "holdersChange": "Cambio de titulares",
   "holdersChange2": "Changs de titular en {n}",
-  "lockAmount": "Cantidad bloqueada"
+  "lockAmount": "Cantidad bloqueada",
+  "transferToken": "Seleccione Token de transferencia"
 }

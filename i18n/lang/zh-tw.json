@@ -1383,5 +1383,6 @@
   "detailsAfterPurchase": "買後代幣詳情",
   "mini": "小號",
   "gas": "gas費",
-  "hideNoSwap": "隱藏未購買"
+  "hideNoSwap": "隱藏未購買",
+  "transferToken": "選擇轉賬代幣"
 }

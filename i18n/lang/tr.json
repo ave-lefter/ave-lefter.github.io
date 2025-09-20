@@ -506,5 +506,6 @@
   "holdersTotalChange": "Sahipler değişir",
   "holdersChange": "Sahipler değişir",
   "holdersChange2": "{N}",
-  "lockAmount": "Kilitli miktar"
+  "lockAmount": "Kilitli miktar",
+  "transferToken": "Aktarma jetonunu seçin"
 }

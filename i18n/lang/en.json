@@ -1397,5 +1397,6 @@
   "detailsAfterPurchase": "Token details after purchase",
   "mini": "Mini",
   "gas": "Gas Fee",
-  "hideNoSwap": "Hide Unswapped"
+  "hideNoSwap": "Hide Unswapped",
+  "transferToken": "Select transfer token"
 }
