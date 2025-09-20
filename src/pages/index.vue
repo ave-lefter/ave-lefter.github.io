@@ -272,6 +272,10 @@ const height = computed(() => {
   }
   return 'calc(100vh - 185px)'
 })
+
+const needAmmList = computed(()=>{
+  return ['gainer', 'hot', 'new', 'inclusion','binance_alpha','xstocks'].includes(activeTab.value)
+})
 </script>
 
 <template>
@@ -293,7 +297,7 @@ const height = computed(() => {
           :activeChain="activeChain"
           :activeTab="activeTab"
           :activeSubTab="activeSubTab"
-          :ammList="currentChainObj?.swaps || []"
+          v-bind="needAmmList ? { ammList: currentChainObj?.swaps || [] } : {}"
         />
       </KeepAlive>
     </div>
