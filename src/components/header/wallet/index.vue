@@ -146,8 +146,8 @@
           </el-icon>
           <span class="ml-5px">{{ t('deposit') }}</span>
         </div>
-        <div class="tg-wallet-list_content">
-          <div style="padding: 15px 20px;">
+        <div class="tg-wallet-list_content pb-0px">
+          <div style="padding: 15px 20px 20px">
             <el-select v-model="depositChain" class="chains-select" placeholder="Select" size="large"
               style="width: 100%" :teleported="false" :suffix-icon="ArrowDownBold">
               <template #prefix>
@@ -165,9 +165,14 @@
             </el-select>
             <div class="flex-center mt-30px flex-col">
               <canvas id="qr-chain-canvas" />
-              <div class="text-12px color-[--secondary-text]" style="display: flex; align-items: center; word-break: break-all; line-height: 1.2; padding: 20px 20px 40px;">
+              <div class="text-12px color-[--secondary-text]" style="display: flex; align-items: center; word-break: break-all; line-height: 1.2; padding: 20px 20px 0px;">
                 <span>{{ depositChainInfo?.address || '' }}</span>
                 <Icon v-if="depositChainInfo?.address" v-copy="depositChainInfo?.address" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
+              </div>
+              <div v-if="depositChain!=='solana'" class="flex-center flex-col">
+                <div class="text-12px color-[--secondary-text]" style="display: flex; align-items: center; word-break: break-all; line-height: 1.2; padding: 26px 20px 0px;">
+                  {{ t('depositTip') }}
+                </div>
               </div>
             </div>
           </div>
@@ -215,7 +220,6 @@
                   :options="balanceList"
                   :suffix-icon="ArrowDownBold"
                   placeholder="Please select"
-                  @change="handleSelectChange"
                 >
                   <!-- <template #loading>
                     <svg class="circular" viewBox="0 0 50 50">
@@ -516,7 +520,15 @@ watch(tgWalletVisible, () => {
 })
 // 0918
 const select2Loading=ref(false)
-const select2Value = ref()
+
+const tokenDecimals= computed(() => {
+  return balanceList.value?.find?.(i => i?.token === withdrawForm.token)?.decimals||18
+})
+
+const decimals = computed(() => {
+  return withdrawChainInfo2?.value?.token === NATIVE_TOKEN ? (withdrawChainInfo.value?.decimals || 18) : tokenDecimals?.value
+})
+
 const balanceList=shallowRef<GetUserBalanceResponse[]>([])
 
 const withdrawChainInfo2=computed(() => {
@@ -524,7 +536,7 @@ const withdrawChainInfo2=computed(() => {
   return balanceList.value?.find?.(i => i?.token === withdrawForm.token)
 })
 
-watch(()=>withdrawChainInfo2?.value?.token,()=>{
+watch(()=>withdrawChainInfo2?.value?.token,(val)=>{
     withdrawFormRef.value?.resetFields?.()
     getTransferGasFee()
 })
@@ -539,6 +551,7 @@ watch(() => withdrawChainInfo.value?.chain, () => {
 function getUserBalanceDetails(){
   const user_ids = [withdrawChainInfo.value?.address+'-'+withdrawChainInfo.value?.chain]
   select2Loading.value=true
+  // todo
   getUserBalance({
     pageSize:100,
     user_ids,
@@ -568,10 +581,6 @@ function getUserBalanceDetails(){
   })
 }
 
-function handleSelectChange(val) {
-  console.log('handleSelectChange', val)
-}
-
 
 watch(() => depositChainInfo.value?.chain, () => {
   if (depositChainInfo.value?.address) {
@@ -584,7 +593,7 @@ watch(showVisible, (val) => {
     setChainQr()
   } else if (val === 3) {
     withdrawFormRef.value?.resetFields?.()
-  }
+  } 
   // bot_getTransfer({
   //   chain:'solana',
   //   batchId:1753859256515
@@ -676,17 +685,18 @@ async function setChainQr() {
 function handleWithdraw() {
   withdrawFormRef?.value?.validate((valid) => {
     if (valid) {
-      const decimals = withdrawChainInfo.value?.decimals || 18
-      let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals).plus(withdrawForm.amount || 0)
+      // const decimals = withdrawChainInfo.value?.decimals || 18
+      let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals.value).plus(withdrawForm.amount || 0)
       if (withdrawForm?.chain === 'solana') {
         gasFee = gasFee.plus('0.002')
       }else{
         gasFee = new BigNumber(0)
       }
       gasFeeVal.value = gasFee.toNumber()
-      const balance = new BigNumber(withdrawChainInfo.value?.balance || 0)
+      const balance = new BigNumber(withdrawChainInfo2?.value?.balance || 0)
+      // const balance = new BigNumber(withdrawChainInfo.value?.balance || 0)
       if (balance.lt(gasFee)) {
-        ElMessage.error(t('transferInsufficientBalance', { s: getChainInfo(withdrawForm.chain)?.main_name }))
+        ElMessage.error(t('transferInsufficientBalance', { s: withdrawChainInfo2?.value?.symbol||getChainInfo(withdrawForm.chain)?.main_name }))
         return
       }
       showVisible.value = 4
@@ -701,7 +711,7 @@ function handleWithdraw2() {
         solana: 'sol',
         ton: 'TON',
       }
-      const amount = ((new BigNumber(withdrawForm.amount || 0)).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${withdrawChainInfo.value?.decimals || 18}})?`)) || [''])[0]
+      const amount = ((new BigNumber(withdrawForm.amount || 0)).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals.value}})?`)) || [''])[0]
       if ((Number(amount) || 0) <= 0) {
         ElNotify({ title: 'Error', type: 'error', message: t('withdrawAmountTooSmall') })
         return
@@ -715,10 +725,10 @@ function handleWithdraw2() {
         batchId: Date.now().toString(),
         chain: withdrawForm.chain,
         creatorAddress: withdrawChainInfo?.value?.address || '',
-        tokenAddress: withdrawChainInfo2?.value?.token || NATIVE_TOKEN,
+        tokenAddress: withdrawChainInfo2?.value?.token === NATIVE_TOKEN?(chainMainToken[withdrawForm.chain]||withdrawChainInfo2?.value?.token) :withdrawChainInfo2?.value?.token,
         //  tokenAddress: chainMainToken[withdrawForm.chain] || NATIVE_TOKEN,
         tgUid: botStore?.userInfo?.tgUid,
-        amount: utils.parseUnits(amount || 0, withdrawChainInfo.value?.decimals || 18).toString(),
+        amount: utils.parseUnits(amount || 0, decimals.value).toString(),
         transferTo: withdrawForm.address,
         memo: '',
         emailCode: emailCode.value,
@@ -726,12 +736,12 @@ function handleWithdraw2() {
         gasTip: 0,
         source: 'web' as const
       }
-      console.log('handleWithdraw2',data)
+      // return console.log('handleWithdraw2',data)
       ElMessageBox.confirm(
         t('confirmWithdraw', {
           amount: amount,
           address: withdrawForm.address,
-          symbol: getChainInfo(withdrawForm.chain)?.main_name
+          symbol: withdrawChainInfo2?.value?.symbol||getChainInfo(withdrawForm.chain)?.main_name
         }),
         t('tips'),
         {
@@ -783,6 +793,7 @@ function handleWithdraw2() {
                   unwatch()
                   setTimeout(() => {
                     botStore.getUserAllChainBalance()
+                    // getUserBalanceDetails()
                   }, 1000)
                 } else {
                   withdrawStatus.value = 2
@@ -827,11 +838,11 @@ const getTransferGasFee = throttle(function () {
 
  async function  handleMax() {
   console.log('handleMax')
-  const decimals = withdrawChainInfo.value?.decimals || 18
+  // const decimals = withdrawChainInfo.value?.decimals || 18
   if ((!gasFeeObj.value[withdrawForm.chain]) && withdrawForm.chain ==='solana') {
     await getTransferGasFee().catch(console.log)
   }
-  let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals)
+  let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals.value)
   if (withdrawForm?.chain === 'solana') {
     gasFee = gasFee.plus('0.002')
   } else{
@@ -840,10 +851,10 @@ const getTransferGasFee = throttle(function () {
   const balance = new BigNumber(withdrawChainInfo2.value?.balance || 0)
   // const balance = new BigNumber(withdrawChainInfo.value?.balance || 0)
   if (balance.lt(gasFee)) {
-    ElMessage.error(t('transferInsufficientBalance', { s: getChainInfo(withdrawForm.chain)?.main_name }))
+    ElMessage.error(t('transferInsufficientBalance', { s: withdrawChainInfo2?.value?.symbol||getChainInfo(withdrawForm.chain)?.main_name }))
     return
   }
-  const matchResult = balance.minus(gasFee).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${withdrawChainInfo.value?.decimals || 18}})?`))
+  const matchResult = balance.minus(gasFee).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals.value}})?`))
   const amount = matchResult ? matchResult[0] : ''
   withdrawForm.amount = amount
   withdrawFormRef.value?.validateField?.('amount')

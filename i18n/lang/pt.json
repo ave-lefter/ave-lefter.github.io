@@ -512,5 +512,6 @@
   "holdersChange": "Os titulares mudam",
   "holdersChange2": "Holder Changs em {n}",
   "lockAmount": "Quantidade Bloqueada",
-  "transferToken": "Selecione Token de transferência"
+  "transferToken": "Selecione Token de transferência",
+  "depositTip": "* Endereço atual EVM Chain Universal"
 }

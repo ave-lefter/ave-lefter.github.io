@@ -1384,5 +1384,6 @@
   "mini": "小號",
   "gas": "gas費",
   "hideNoSwap": "隱藏未購買",
-  "transferToken": "選擇轉賬代幣"
+  "transferToken": "選擇轉賬代幣",
+  "depositTip": "*當前地址 EVM 鏈通用"
 }

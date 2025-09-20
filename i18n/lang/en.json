@@ -1398,5 +1398,6 @@
   "mini": "Mini",
   "gas": "Gas Fee",
   "hideNoSwap": "Hide Unswapped",
-  "transferToken": "Select transfer token"
+  "transferToken": "Select transfer token",
+  "depositTip": "* Current address EVM chain universal"
 }

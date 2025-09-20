@@ -1397,5 +1397,6 @@
   "mini": "小号",
   "gas": "gas费",
   "hideNoSwap": "隐藏未购买",
-  "transferToken": "选择转账代币"
+  "transferToken": "选择转账代币",
+  "depositTip": "*当前地址 EVM 链通用"
 }
