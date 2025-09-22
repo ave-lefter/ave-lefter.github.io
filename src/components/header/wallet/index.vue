@@ -88,12 +88,10 @@
               <span class="font-500 text-12px flex items-center color-#FFBE3C gap-8px">
                 <template v-if="authInfo?.emailAddress && authInfo?.authSetting">
                   <Icon name="mingcute:check-circle-fill" class="text-17px color-#12B886 mt-1px" />
-                  <!-- <Icon name="custom:check-circle" class="text-14px color-#12B886"/>  -->
                   <span class="color-#12B886">{{ t('bounded') }}</span>
                 </template>
                 <template v-else>
                   <Icon name="mingcute:warning-fill" class="text-17px mt-1px" />
-                  <!-- <Icon name="custom:exclamation-circle" class="text-14px"/>-->
                   <span>{{ t('notBound') }}</span>
                 </template>
               </span>
@@ -129,7 +127,6 @@
         </div>
         <ul class="tg-wallet-list_content">
           <el-scrollbar :max-height="300">
-            <!-- $store.dispatch('bot_switchWallet', item); -->
             <li v-for="(item, index) in botStore.walletList" :key="index"
               :class="{ active: item.name === botStore?.userInfo?.name }" @click.stop="switchWallet(item)">
               <img style="border-radius: 50%;margin-right: 5px;" height="32" :src="generateAvatarIcon(item?.name || '')"
@@ -208,7 +205,6 @@
               </el-select>
             </el-form-item>
             <el-form-item :label="t('transferToken')" label-position="top" >
-              <!-- withdrawForm.token:{{ JSON.stringify(withdrawForm.token) }} -->
                 <el-select-v2
                   v-model="withdrawForm.token"
                   filterable
@@ -221,14 +217,20 @@
                   :suffix-icon="ArrowDownBold"
                   placeholder="Please select"
                 >
-                  <!-- <template #loading>
-                    <svg class="circular" viewBox="0 0 50 50">
-                      <circle class="path" cx="25" cy="25" r="20" fill="none" />
-                    </svg>
-                  </template> -->
                   <template #prefix>
-                    <img v-if="withdrawForm.chain && (withdrawForm.token===NATIVE_TOKEN)" height="24" class="mr-5px border-rd-[50%]"
-                      :src="`${token_logo_url}chain/${withdrawForm.chain}.png`" style="" alt="" srcset="">
+                    <div v-if="withdrawForm.chain && (withdrawForm.token===NATIVE_TOKEN)" class="relative w-24px h-24px mr-8px">
+                      <el-image class="mr-3px border-rd-[50%] w-24px h-24px" height="24" :src="`${token_logo_url}token_icon/${withdrawForm.chain}/${NATIVE_TOKEN}.png`">
+                          <template #error>
+                            <img class="w-24px h-24px rounded-full" :src="getChainDefaultIcon(withdrawForm.chain, withdrawChainInfo2?.symbol)" />
+                          </template>
+                          <template #placeholder>
+                            <img class="w-24px h-24px rounded-full" :src="getChainDefaultIcon(withdrawForm.chain, withdrawChainInfo2?.symbol)" />
+                          </template>
+                      </el-image>
+                      <img class="w-12px h-12px absolute right-0px bottom-0px rounded-[50%]"
+                        :src="`${token_logo_url}chain/${withdrawForm.chain}.png`" alt=""
+                        onerror="this.src='/icon-default.png'" srcset="" >
+                    </div>
                     <TokenImg v-else :row="withdrawChainInfo2" class="w-24px h-24px mr-8px" />
                   </template>
                   <template #default="{ item }">
@@ -319,7 +321,7 @@
             </div>
             <div class="mb-8px font-500 text-14px lh-[100%] tracking-0px text-center">{{ withdrawResult }}</div>
             <div class="mb-24px font-500 text-20px lh-24px tracking-0px text-center">
-              -{{ formatNumber(withdrawForm.amount, 5) }} {{ withdrawChainInfo2?.symbol||getChainInfo(withdrawForm.chain)?.main_name }}
+              -{{ formatNumber(withdrawForm.amount, 5) }} {{ billObj?.tokenSymbol||getChainInfo(withdrawForm.chain)?.main_name }}
             </div>
             <ul class="flex flex-col gap-20px mb-30px">
               <li class="flex-between">
@@ -420,9 +422,9 @@ const withdrawForm = reactive<WithdrawFormData>({
   memo: '',
   token:''
 })
-const loadingWithdraw = ref(false)
-const emailCode = ref('')
-const authCode = ref('')
+const loadingWithdraw = ref<boolean>(false)
+const emailCode = ref<string>('')
+const authCode = ref<string>('')
 const withdrawFormRef = ref<FormInstance>()
 
 const gasFeeObj = ref<{ [key: string]: number }>({
@@ -431,9 +433,9 @@ const gasFeeObj = ref<{ [key: string]: number }>({
   bsc: 21000000000000,
   base: 452549454000
 })
-const gasFeeVal = ref(0)
+const gasFeeVal = ref<number>(0)
 
-const withdrawStatus = ref(0)
+const withdrawStatus = ref<number>(0)
 
 const withdrawResult = computed(() => {
   return [t('trading'), t('tradeSuccess'), t('tradeFail')][withdrawStatus.value]
@@ -518,8 +520,9 @@ watch(tgWalletVisible, () => {
   gasFeeVal.value = 0
   billObj.value = {}
 })
+
 // 0918
-const select2Loading=ref(false)
+const select2Loading=ref<boolean>(false)
 
 const tokenDecimals= computed(() => {
   return balanceList.value?.find?.(i => i?.token === withdrawForm.token)?.decimals||18
@@ -536,9 +539,11 @@ const withdrawChainInfo2=computed(() => {
   return balanceList.value?.find?.(i => i?.token === withdrawForm.token)
 })
 
-watch(()=>withdrawChainInfo2?.value?.token,(val)=>{
+watch(()=>withdrawChainInfo2?.value?.token,()=>{
+  if(showVisible.value===3){
     withdrawFormRef.value?.resetFields?.()
     getTransferGasFee()
+  }
 })
 
 watch(() => withdrawChainInfo.value?.chain, () => {
@@ -569,12 +574,7 @@ function getUserBalanceDetails(){
         }
       })
       exists = balanceList.value.some(item => item.token === NATIVE_TOKEN)
-
-      console.log('balanceList.value',balanceList.value)
-      // select2Value.value = {
-      //   label: getChainInfo(withdrawForm.chain)?.main_name,
-      //   value: NATIVE_TOKEN
-      // }
+    
       withdrawForm.token = NATIVE_TOKEN
     }else{
       balanceList.value=[]
@@ -587,8 +587,8 @@ function getUserBalanceDetails(){
         balance_usd: 0,
         decimals: getChainInfo(withdrawForm.chain)?.decimals || 18,
         address: '',
-        chain: '',
-        logo_url: '',
+        chain: withdrawForm.chain||'',
+        logo_url: `${token_logo_url.value}token_icon/${withdrawForm.chain}/${NATIVE_TOKEN}.png`,
         total_profit: '',
         total_profit_ratio: '',
         average_purchase_price_usd: '',
@@ -818,8 +818,10 @@ function handleWithdraw2() {
                   unwatch()
                   setTimeout(() => {
                     botStore.getUserAllChainBalance()
-                    // getUserBalanceDetails()
                   }, 1000)
+                  setTimeout(() => {
+                    getUserBalanceDetails()
+                  }, 3000)
                 } else {
                   withdrawStatus.value = 2
                   ElNotify({ title: 'Error', type: 'error', message: formatBotError(subscribeResult.failMessage) || 'Withdraw failed' })
