@@ -227,9 +227,9 @@
                     </svg>
                   </template> -->
                   <template #prefix>
-                    <!-- <img v-if="withdrawForm.chain" height="24" class="mr-5px border-rd-[50%]"
-                      :src="`${token_logo_url}chain/${withdrawForm.chain}.png`" style="" alt="" srcset=""> -->
-                    <TokenImg :row="withdrawChainInfo2" class="w-24px h-24px mr-8px" />
+                    <img v-if="withdrawForm.chain && (withdrawForm.token===NATIVE_TOKEN)" height="24" class="mr-5px border-rd-[50%]"
+                      :src="`${token_logo_url}chain/${withdrawForm.chain}.png`" style="" alt="" srcset="">
+                    <TokenImg v-else :row="withdrawChainInfo2" class="w-24px h-24px mr-8px" />
                   </template>
                   <template #default="{ item }">
                     <div class="flex-between">
@@ -559,6 +559,7 @@ function getUserBalanceDetails(){
     hide_small:0
   }).then(res=>{
     const data=res?.data||[]
+    let exists=false
     if(data.length){
       balanceList.value =data.map(i=>{
         return {
@@ -567,6 +568,9 @@ function getUserBalanceDetails(){
           value: i.token
         }
       })
+      exists = balanceList.value.some(item => item.token === NATIVE_TOKEN)
+
+      console.log('balanceList.value',balanceList.value)
       // select2Value.value = {
       //   label: getChainInfo(withdrawForm.chain)?.main_name,
       //   value: NATIVE_TOKEN
@@ -574,8 +578,29 @@ function getUserBalanceDetails(){
       withdrawForm.token = NATIVE_TOKEN
     }else{
       balanceList.value=[]
-      withdrawForm.token = ''
     }
+    if (!exists) {
+      balanceList.value.unshift({
+        symbol: getChainInfo(withdrawForm.chain)?.main_name,
+        token: NATIVE_TOKEN,
+        balance: 0,
+        balance_usd: 0,
+        decimals: getChainInfo(withdrawForm.chain)?.decimals || 18,
+        address: '',
+        chain: '',
+        logo_url: '',
+        total_profit: '',
+        total_profit_ratio: '',
+        average_purchase_price_usd: '',
+        current_price_usd: 0,
+        price_change: 0,
+        risk_level: 0,
+        risk_score: 0,
+        label: getChainInfo(withdrawForm.chain)?.main_name,
+        value: NATIVE_TOKEN
+      })
+    }
+    withdrawForm.token = NATIVE_TOKEN
   }).finally(()=>{
     select2Loading.value=false
   })
