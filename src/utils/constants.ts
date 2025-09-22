@@ -133,3 +133,10 @@ export const BotSettingsArr = [
     label: 'P3',
   }
 ] as const
+
+export const SwapType = {
+  BUY: 1,
+  SELL: 2,
+  LIMIT_BUY: 5,
+  LIMIT_SELL: 6,
+}

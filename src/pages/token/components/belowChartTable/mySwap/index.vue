@@ -28,6 +28,7 @@ const _chain = getAddressAndChainFromId(route.params.id as string)?.chain
 const activeTab = ref(_chain || walletStore.chain || 'solana')
 const botOrderOnlyCurrentToken = useSessionStorage('mySwapBotOrderOnlyCurrentToken', true)
 const walletTxData = ref<WalletTokenInfo>()
+useSwapUpdate(walletTxData)
 const tabs = computed(() => {
   // 获取原始地址数组
   const addresses = botStore.userInfo?.addresses || []
@@ -182,22 +183,6 @@ watch([() => route.params.id], () => {
   refreshData()
 })
 
-watch(()=>wsStore.wsResult[WSEventType.PRICEV2],(val:IPriceV2Response)=>{
-   val.prices.find(el=>{
-    const tokenId = el.token +'-' + el.chain
-    if(tokenId === route.params.id && walletTxData.value){
-      const balance_amount = Number((walletTxData.value.balance_amount || 0))
-      const newBalance = el.uprice * balance_amount
-      const _unrealizedProfit = (el.uprice - Number(walletTxData.value.average_purchase_price_usd || 0)) * balance_amount
-      const _totalProfit = _unrealizedProfit + Number((walletTxData.value.realized_profit || 0))
-
-      walletTxData.value.balance_usd = String(newBalance)
-      walletTxData.value.unrealized_profit = String(_unrealizedProfit)
-      walletTxData.value.total_profit = String(_totalProfit)
-    }
-   })
-})
-
 function refreshData() {
   getWalletTxData()
 
@@ -217,6 +202,7 @@ onMounted(() => {
 onActivated(() => {
    refreshData()
 })
+
 </script>
 
 <template>
@@ -296,7 +282,7 @@ onActivated(() => {
       </div>
     </div>
 
-    <unified v-if="botStore?.userInfo?.evmAddress || walletStore.address" ref="unifiedRef" :chain="activeTab" :currentToken="botOrderOnlyCurrentToken" :userAddress="userAddress || ''" />
+    <unified v-if="botStore?.userInfo?.evmAddress || walletStore.address" ref="unifiedRef" :chain="activeTab" :currentToken="botOrderOnlyCurrentToken" :userAddress="userAddress || ''"/>
   </div>
 </template>
 

@@ -257,6 +257,7 @@ import { evm_utils } from '@/utils'
 import { ref, nextTick } from 'vue'
 
 const { formatUnits } = evm_utils
+const emit = defineEmits(['buyChange'])
 
 const props = defineProps({
   chain: {
@@ -282,6 +283,7 @@ const { mode } = storeToRefs(useGlobalStore())
 const tokenStore = useTokenStore()
 const { t } = useI18n()
 const configStore = useConfigStore()
+const globalStore = useGlobalStore()
 
 // 钱包类型判断
 const isBotWallet = computed(() => {
@@ -423,6 +425,7 @@ const getTxHistory = async () => {
         maxTradeVolume: 100000
       })
       txHistory.value = res || []
+      globalStore.mySwapList = res || []
     } else {
       // 链钱包使用新接口
       const tokenAddress = currentTokenAddress.value
@@ -442,10 +445,11 @@ const getTxHistory = async () => {
       if (rawList.length > 0) {
         const mappedData = rawList.map(mapWalletOrderToTableRow)
         txHistory.value = mappedData
+        globalStore.mySwapList = mappedData
       } else {
         txHistory.value = []
+        globalStore.mySwapList = []
       }
-
     }
   } catch (error) {
     console.error('获取交易历史错误:', error)

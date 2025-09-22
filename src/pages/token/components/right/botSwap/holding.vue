@@ -63,6 +63,7 @@ watch(userAddress, (val) => {
 
 
 const walletTokenInfo = ref<WalletTokenInfo | null>(null)
+useSwapUpdate(walletTokenInfo)
 async function getWalletTxData() {
   const [token, chain] = getAddressAndChainFromId(route.params?.id as string, 1)
   if (!token || !chain) {
@@ -145,22 +146,6 @@ watch(() => tokenStore.placeOrderSuccess, () => {
   isShow.value = true
   getWalletTxDataPoll()
   _bot_getAddressAllBalances()
-})
-
-watch(()=>wsStore.wsResult[WSEventType.PRICEV2],(val:IPriceV2Response)=>{
-   val.prices.find(el=>{
-    const tokenId = el.token +'-' + el.chain
-    if(tokenId === route.params.id && walletTokenInfo.value){
-      const balance_amount = Number((walletTokenInfo.value.balance_amount || 0))
-      const newBalance = el.uprice * balance_amount
-      const _unrealizedProfit = (el.uprice - Number(walletTokenInfo.value.average_purchase_price_usd || 0)) * balance_amount
-      const _totalProfit = _unrealizedProfit + Number((walletTokenInfo.value.realized_profit || 0))
-
-      walletTokenInfo.value.balance_usd = String(newBalance)
-      walletTokenInfo.value.unrealized_profit = String(_unrealizedProfit)
-      walletTokenInfo.value.total_profit = String(_totalProfit)
-    }
-   })
 })
 
 // watch(() => tokenStore.pairAddress, (val) => {
