@@ -311,7 +311,7 @@ function cancelHide() {
               class="flex items-center rounded-full w-12px h-12px"
               :src="`${configStore.token_logo_url}chain/${signalStore.activeChain}.png`"
             />
-            <span class="text-10px color-[--main-text]">
+            <span class="text-12px color-[--main-text]">
               {{ signalStore.activeChain.slice(0, 3).toUpperCase() }}
             </span>
           </template>
@@ -319,7 +319,7 @@ function cancelHide() {
             v-for="net_name in chainOptions"
             :key="net_name"
             :value="net_name"
-            class="[&&]:text-10px flex items-center [&&]:h-26px [&&]:lh-26px"
+            class="[&&]:text-12px flex items-center [&&]:h-26px [&&]:lh-26px"
           >
             <el-image
               class="flex items-center rounded-full w-12px h-12px mr-4px"
