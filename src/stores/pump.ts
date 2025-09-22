@@ -84,7 +84,13 @@ export const usePumpStore = defineStore('pumpStore', () => {
 
     function getPumpConfig() {
         _getPumpConfig().then((res) => {
-            pumpConfig.value = res
+            pumpConfig.value = res || []
+            pumpConfig.value.forEach(i => {
+              if (!pumpV3.value[i.chain].platforms?.length) {
+                const platforms =  i.platforms.map(y=>y?.platform) || []
+                  pumpV3.value[i.chain].platforms = platforms
+              }
+            })
         })
     }
 
