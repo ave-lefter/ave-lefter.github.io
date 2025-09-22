@@ -26,7 +26,7 @@ v-model="modelValue" class="new-select"
             <div class="w-1px h-8px bg-[--icon-color] mx-4px shrink-0" />
             <Icon
 name="custom:play-circle-line"
-                class="text-16px shrink-0 color-[--secondary-text] cursor-pointer" @click.self="emit('playAudio')"/>
+                class="text-16px shrink-0 color-[--secondary-text] cursor-pointer hover:color-[--main-text]" @click.self="emit('playAudio')"/>
         </div>
     </div>
 </template>
