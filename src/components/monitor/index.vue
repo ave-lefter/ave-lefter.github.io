@@ -193,11 +193,11 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                   <div class="flex-between w-100%">
                     <div class="flex-start gap-8px">
                       <FilterType v-model="txType" :options="txTypeList" />
-                      <Icon name="icon-park-solid:volume-notice" class="color-[--secondary-text]"/>
-                      <el-switch
-                        v-model="hasRing"
-                        size="small"
-                       />
+                      <Icon
+                        :name="audioSettings.audio.monitor ? 'custom:ad':'custom:admute'"
+                        class="cursor-pointer text-16px color-[--secondary-text]"
+                        @click="audioSettings.active = 'audio'"
+                      />
                       <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
                     </div>
                     <QuickBuyInput
@@ -303,22 +303,26 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
           </el-button>
         </AveEmpty>
       </el-tab-pane>
-      <el-tab-pane :name="activeName">
+      <el-tab-pane disabled>
          <template #label>
             <div class="cursor-move w-100% h-100% drag-handle" />
          </template>
       </el-tab-pane>
-      <el-tab-pane :name="activeName">
+      <el-tab-pane disabled>
         <template #label>
           <div class="m-op flex-end gap-8px w-100% h-100%">
             <template v-if="activeName===1 && props.isLarge">
               <FilterType v-model="txType" :options="txTypeList" />
-              <Icon name="icon-park-solid:volume-notice"/>
-              <el-switch
+              <Icon
+                :name="audioSettings.audio.monitor ? 'custom:ad':'custom:admute'"
+                class="cursor-pointer color-[--secondary-text]"
+                @click="audioSettings.active = 'audio'"
+              />
+              <!-- <el-switch
                 v-model="hasRing"
                 class="[&&]:[--el-switch-on-color:--primary-color]"
                 size="small"
-                />
+                /> -->
               <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
             </template>
             <el-button v-if="(activeName===1) && botStore.evmAddress" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;" class="dialog-button"  :dark="isDark" >
@@ -360,7 +364,7 @@ const { t } = useI18n()
 const { hasRing ,monitorList2:dataSourceCache,visible,activeName,txType,isLeftFixed,isRightFixed} = storeToRefs(useMonitorStore())
 
 const {updateNum3} = storeToRefs(useFollowStore())
-const { isDark } = storeToRefs(useGlobalStore())
+const { isDark,audioSettings } = storeToRefs(useGlobalStore())
 const props = defineProps({
   scrollHeight: {
     type: Number,
@@ -739,6 +743,9 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
       &.is-active{
         color:var(--main-text);
       }
+    }
+    &.is-disabled{
+      cursor:pointer;
     }
   }
   :deep() .el-tabs__header{
