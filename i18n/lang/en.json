@@ -1401,5 +1401,6 @@
   "markerAddressFilter":"Transaction Address Filter",
   "markerAddress":"Transaction Address",
   "filterSmallAmount":"Filter Small Amount>=",
-  "filterLargeAmount":"Filter Large Amount<="
+  "filterLargeAmount":"Filter Large Amount<=",
+  "clickChartShowTx":"Click chart to show transaction"
 }

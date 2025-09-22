@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
+
 const {isDark} = storeToRefs(useThemeStore())
 const props = defineProps({
   visible: Boolean,
@@ -21,6 +24,29 @@ const computedVisible = computed({
   }
 })
 const filterTime = ref([])
+const disabledStart = {
+  disabledDate:(date:Date)=>{
+     if(filterTime.value[1]){
+      return dayjs(date).isAfter(dayjs(filterTime.value[1]*1000)) 
+     }
+     return false
+  },
+  disabledHours:(role: string, comparingDate?: Dayjs)=>{
+    if(comparingDate && filterTime.value[1]){
+      const arr = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
+      return arr.filter(()=>{
+        return comparingDate.isAfter(dayjs(filterTime.value[1]*1000))
+      })
+    }
+    return []
+  },
+  disabledMinutes:(date:Date)=>{
+
+  },
+  disabledSeconds:(date:Date)=>{
+
+  }
+}
 </script>
 
 <template>
@@ -48,19 +74,34 @@ const filterTime = ref([])
         <span class="flex-[1.2]">{{ $t('startTime') }}</span>
         <span class="flex-1">{{ $t('endTime1') }}</span>
       </div>
-      <el-date-picker
-        v-model="filterTime"
-        class="mt-5px [--el-font-size-base:12px]"
-        type="datetimerange"
-        range-separator="To"
-        start-placeholder="yyyy/mm/dd hh:mm:ss"
-        end-placeholder="yyyy/mm/dd hh:mm:ss"
-        format="YYYY-MM-DD HH:mm:ss"
-        value-format="X"
-        prefix-icon="Calendar"
-        :teleported="false"
-        @clear="filterTime=[]"
-      />
+      <div class="mt-5px flex items-center gap-4px">
+        <el-date-picker
+          v-bind="disabledStart"
+          v-model="filterTime[0]"
+          class="[--el-font-size-base:12px]"
+          type="datetime"
+          range-separator="To"
+          start-placeholder="yyyy/mm/dd hh:mm:ss"
+          end-placeholder="yyyy/mm/dd hh:mm:ss"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="X"
+          prefix-icon="Calendar"
+          :teleported="false"
+        />
+        to
+        <el-date-picker
+          v-model="filterTime[1]"
+          class="[--el-font-size-base:12px]"
+          type="datetime"
+          range-separator="To"
+          start-placeholder="yyyy/mm/dd hh:mm:ss"
+          end-placeholder="yyyy/mm/dd hh:mm:ss"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="X"
+          prefix-icon="Calendar"
+          :teleported="false"
+        />
+      </div>
       <div class="flex mt-20px">
         <el-button
           class="h-30px flex-1 m-l-auto"

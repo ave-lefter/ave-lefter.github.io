@@ -1400,5 +1400,6 @@
   "markerAddressFilter": "交易地址筛选",
   "markerAddress": "交易者地址",
   "filterSmallAmount": "过滤小额>=",
-  "filterLargeAmount": "过滤大额<="
+  "filterLargeAmount": "过滤大额<=",
+  "clickChartShowTx": "点击图表显示交易"
 }

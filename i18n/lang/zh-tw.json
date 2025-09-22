@@ -1387,5 +1387,6 @@
   "markerAddressFilter": "交易地址篩選",
   "markerAddress": "交易者地址",
   "filterSmallAmount": "過濾小額>=",
-  "filterLargeAmount": "過濾大額<="
+  "filterLargeAmount": "過濾大額<=",
+  "clickChartShowTx": "點擊圖表顯示交易"
 }
