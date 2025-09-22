@@ -558,7 +558,7 @@ function getUserBalanceDetails(){
   select2Loading.value=true
   // todo
   getUserBalance({
-    pageSize:100,
+    pageSize:300,
     user_ids,
     hide_risk:1,
     hide_small:0
@@ -712,11 +712,12 @@ function handleWithdraw() {
     if (valid) {
       // const decimals = withdrawChainInfo.value?.decimals || 18
       let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals.value).plus(withdrawForm.amount || 0)
-      if (withdrawForm?.chain === 'solana') {
-        gasFee = gasFee.plus('0.002')
-      }else{
-        gasFee = new BigNumber(0)
-      }
+      // if (withdrawForm?.chain === 'solana') {
+      //   gasFee = gasFee.plus('0.002')
+      // }else{
+      //   gasFee = new BigNumber(0)
+      // }
+      gasFee = new BigNumber(0)
       gasFeeVal.value = gasFee.toNumber()
       const balance = new BigNumber(withdrawChainInfo2?.value?.balance || 0)
       // const balance = new BigNumber(withdrawChainInfo.value?.balance || 0)
@@ -870,11 +871,12 @@ const getTransferGasFee = throttle(function () {
     await getTransferGasFee().catch(console.log)
   }
   let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals.value)
-  if (withdrawForm?.chain === 'solana') {
-    gasFee = gasFee.plus('0.002')
-  } else{
-    gasFee = new BigNumber(0)
-  }
+  // if (withdrawForm?.chain === 'solana') {
+  //   gasFee = gasFee.plus('0.002')
+  // } else{
+  //   gasFee = new BigNumber(0)
+  // }
+  gasFee = new BigNumber(0)
   const balance = new BigNumber(withdrawChainInfo2.value?.balance || 0)
   // const balance = new BigNumber(withdrawChainInfo.value?.balance || 0)
   if (balance.lt(gasFee)) {
