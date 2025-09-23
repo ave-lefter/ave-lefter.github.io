@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
+import PumpLiveSort from './live/pumpLiveSort.vue'
 import type { CategoryElement, IGetTreasureConfig } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
 import { getNewDefaultColumns, getNewOptions } from './newRank/columnRender/newColumnsService'
@@ -161,6 +162,13 @@ const configMap = computed(() => {
       getOptions:getPumpOptions,
       class:''
     },
+    pumplive:{
+      icon: 'custom:video',
+      storageKey: '',
+      getDefaultColumns: () => { },
+      getOptions: () => { },
+      class:''
+    },
   }
 })
 
@@ -212,7 +220,8 @@ const supportCategories = computed(() => {
     'xstocks',
     'volume',
     'heaven_pump',
-    'xdyorswap_pump'
+    'xdyorswap_pump',
+    'pumplive'
   ]
   return (props.categories || []).filter((el) => {
     return keys.includes(el.category)
@@ -290,7 +299,8 @@ watch(()=>props.categories,()=>{
         </span>
       </div>
       <div class="flex gap-12px items-center text-12px">
-        <div class="p-1 rounded-1 bg-[--main-input-button-bg]">
+        <PumpLiveSort v-if="props.activeTab =='pumplive'"/>
+        <div class="p-1 rounded-1 bg-[--main-input-button-bg]" v-else>
           <button
             v-for="(item, index) in intervals"
             :key="index"
@@ -310,13 +320,14 @@ watch(()=>props.categories,()=>{
           <QuickSwapSet
             v-if="globalStore.rankCommon.quickVisible&&isSupportedChain"
             v-model:quickBuyValue="globalStore.rankCommon.quickBuyValue"
-            class="mr-12px"
+            :class=" props.activeTab =='pumplive'? '': 'mr-12px'"
             :settingsButtonVisible="false"
             :chain="(activeChain==='AllChains'?'':activeChain)"
           />
-          <BlackList />
+          <BlackList  v-if="props.activeTab !=='pumplive'"/>
           <ColumnsToolbar
             class="ml-4px"
+            :activeTab="props.activeTab"
             :storageKey="configMap[activeTab as keyof typeof configMap].storageKey"
             :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns"
             :getOptions="configMap[activeTab as keyof typeof configMap].getOptions"

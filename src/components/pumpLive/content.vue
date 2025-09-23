@@ -54,14 +54,4 @@ defineProps({
 </script>
 
 <style scoped lang="scss">
-.pump-live-bg {
-  .icon-live {
-    display: none;
-  }
-  &:hover {
-    .icon-live {
-      display: flex;
-    }
-  }
-}
 </style>

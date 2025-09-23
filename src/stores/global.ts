@@ -151,10 +151,16 @@ export const useGlobalStore = defineStore('global', () => {
 
   const hide_risk=shallowRef(1)
   const hide_small=shallowRef(0)
-  const rankCommon = useStorage('rankCommon',{
+  const rankCommon = useStorage('rankCommon', {
     activeInterval: '24h',
     quickVisible: true,
     quickBuyValue: '0.01',
+    sort: 'time',
+    sort_dir: ''
+  })
+  const pumpLiveSort = useStorage('pumpLiveSort', {
+    sort: 'created_timestamp',
+    sort_dir: 'DESC',
   })
   const audioSettings = useStorage('audioSettings',{
     active:'',
@@ -318,8 +324,9 @@ export const useGlobalStore = defineStore('global', () => {
     lastVisitTokens,
     tokenHistoryVisible,
     userFavoriteGroups,
-    getUserFavoriteGroups:_getUserFavoriteGroups,
+    getUserFavoriteGroups: _getUserFavoriteGroups,
     rankConditions,
-    rankActiveTab
+    rankActiveTab,
+    pumpLiveSort
   }
 })
