@@ -143,7 +143,10 @@ let timer: null | ReturnType<typeof setInterval> = null
 let lastUpdateTime = 0
 const maxUpdateNum = 15
 
-watch([() => wsStore.wsResult?.tgbot], () => {
+watch(() => wsStore.wsResult[WSEventType.TGBOT], (val) => {
+  if(!val){
+    return
+  }
   const chain = getAddressAndChainFromId(String(route.params.id))?.chain
   if (tabs.value.find(i => i?.chain === chain)) {
     activeTab.value = chain
@@ -169,7 +172,7 @@ watch([() => wsStore.wsResult?.tgbot], () => {
   } else {
     lastUpdateTime = 0
   }
-})
+},{immediate:true})
 
 watch([() => route.params.id], () => {
   const chain = getAddressAndChainFromId(String(route.params.id))?.chain
