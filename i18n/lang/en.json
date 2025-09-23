@@ -231,7 +231,7 @@
   "normal": "Normal",
   "fast": "Fast",
   "setting": "Setting",
-  "setTips": "You can set up to 3 different transaction profiles (S1/S2/S3) to adjust your smart-mev protection, priority, and slippage settings",
+  "setTips": "You can set up to 3 different transaction profiles (P1/P2/P3) to adjust your smart-mev protection, priority, and slippage settings",
   "slippage": "Slippage",
   "autoSlippage": "Auto slippage",
   "enterSlippage": "Please enter slippage",
@@ -1421,5 +1421,11 @@
   "of": " Of ",
   "hideNoSwap": "Hide Unswapped",
   "transferToken": "Select transfer token",
-  "depositTip": "* Current address EVM chain universal"
+  "depositTip": "* Current address EVM chain universal",
+  "hotkeyTips": "Press Spacebar to use hotkeys",
+  "hotkeyTips1": "Click to enable hotkeys",
+  "enablePnLTips1": "Enable showing PNL",
+  "enablePnLTips2": "Disable showing PNL",
+  "enableShowsReflected": "Enable shows reflected amount on hover",
+  "disableShowsReflected": "Disable shows reflected amount on hover"
 }
