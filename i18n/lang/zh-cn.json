@@ -1419,6 +1419,8 @@
   "justNow":"刚刚",
   "of":"的",
   "hideNoSwap": "隐藏未购买",
+  "transferToken": "选择转账代币",
+  "depositTip": "*当前地址 EVM 链通用",
   "hotkeyTips": "按着 空格键 使用热键",
   "hotkeyTips1": "点击按钮，启用快捷键",
   "enablePnLTips1": "启用显示PNL功能",

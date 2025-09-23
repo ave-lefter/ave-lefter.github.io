@@ -1406,6 +1406,8 @@
   "justNow":"剛剛",
   "of":"的",
   "hideNoSwap": "隱藏未購買",
+  "transferToken": "選擇轉賬代幣",
+  "depositTip": "*當前地址 EVM 鏈通用",
   "hotkeyTips": "按著 空格鍵 使用熱鍵",
   "hotkeyTips1": "點擊按鈕，啟用快捷鍵",
   "enablePnLTips1": "啟用顯示PNL功能",

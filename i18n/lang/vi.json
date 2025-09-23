@@ -758,5 +758,7 @@
   "holdersTotalChange": "Người nắm giữ thay đổi",
   "holdersChange": "Người nắm giữ thay đổi",
   "holdersChange2": "Người giữ changs trong {n}",
-  "lockAmount": "Số lượng khóa"
+  "lockAmount": "Số lượng khóa",
+  "transferToken": "Chọn mã thông báo chuyển",
+  "depositTip": "* Địa chỉ hiện tại Chuỗi EVM Universal"
 }

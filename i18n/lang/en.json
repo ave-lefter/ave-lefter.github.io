@@ -1420,6 +1420,8 @@
   "justNow": "Just Now ",
   "of": " Of ",
   "hideNoSwap": "Hide Unswapped",
+  "transferToken": "Select transfer token",
+  "depositTip": "* Current address EVM chain universal",
   "hotkeyTips": "Press Spacebar to use hotkeys",
   "hotkeyTips1": "Click to enable hotkeys",
   "enablePnLTips1": "Enable showing PNL",
