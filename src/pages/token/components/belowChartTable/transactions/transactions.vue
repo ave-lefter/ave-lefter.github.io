@@ -814,7 +814,7 @@ const collect = async (row: any,index:number) => {
         <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart"/></span>
       </div>
     </div>
-    <DateFilterCard v-if="tableFilter.timestamp.length" v-model:timestamp="tableFilter.timestamp" @update:timestamp="_getTokenTxs"/>
+    <DateFilterCard v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" v-model:timestamp="tableFilter.timestamp" @update:timestamp="_getTokenTxs"/>
     <template v-if="tableFilter.markerAddress">
       <div
         v-if="listStatus.loadingTxs || listStatus.loadingLiq"
