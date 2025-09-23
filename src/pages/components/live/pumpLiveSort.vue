@@ -1,22 +1,22 @@
 <template>
   <div class="flex-end">
     <a
+      v-for="(item, $index) in tabs"
+      :key="$index"
       class="text-12px mr-5px flex items-center"
       :class="globalStore.pumpLiveSort.sort === item.id ? 'active' : ''"
       href=""
       @click.stop.prevent="switchTab(item)"
-      v-for="(item, $index) in tabs"
-      :key="$index"
-      >{{ item.name }}
+      >{{ $t(item.name) }}
       <template v-if="globalStore.pumpLiveSort.sort === item.id">
         <Icon
-          class="text-18px"
           v-if="globalStore.pumpLiveSort.sort_dir == 'ASC'"
+          class="text-18px"
           name="material-symbols:fitbit-arrow-upward"
         />
         <Icon
-          class="text-18px"
           v-if="globalStore.pumpLiveSort.sort_dir == 'DESC'"
+          class="text-18px"
           name="material-symbols:fitbit-arrow-downward"
         />
       </template>
@@ -40,7 +40,7 @@ const tabs = computed<Tab[]>(() => {
     },
     {
       id: 'created_timestamp',
-      name: 'Time',
+      name: 'time',
     },
   ]
 })
