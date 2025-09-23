@@ -18,19 +18,19 @@ const components = {
   inclusion:inclusionRank,
   hot,
   gainer,
-  pump: pumpComponent,
-  bonk_pump: pumpComponent,
-  four: pumpComponent,
-  bonk: pumpComponent,
-  moonshot: pumpComponent,
-  Studio: pumpComponent,
-  novabits: pumpComponent,
+  // pump: pumpComponent,
+  // bonk_pump: pumpComponent,
+  // four: pumpComponent,
+  // bonk: pumpComponent,
+  // moonshot: pumpComponent,
+  // Studio: pumpComponent,
+  // novabits: pumpComponent,
   binance_alpha: activityComponent,
   cto: activityComponent,
   xstocks: activityComponent,
   volume: activityComponent,
   heaven_pump: pumpComponent,
-  xdyorswap_pump: pumpComponent,
+  // xdyorswap_pump: pumpComponent,
   pumplive: liveComponent
 }
 const walletStore = useWalletStore()
@@ -42,6 +42,12 @@ const activeChain = useStorage('rankChain', 'AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
 const currentChainObj = computed(() => {
   return chains.value.find((el) => el.net_name === activeChain.value)
+})
+const isPump = computed(()=>{
+  if(Array.isArray(currentChainObj.value?.categories)){
+    return currentChainObj.value.categories.find(el=>el.category === activeTab.value)?.is_pump
+  }
+  return 0
 })
 const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
@@ -263,7 +269,7 @@ function getMedias(appendix: string) {
 const height = computed(() => {
   const {tokenHistoryVisible} = globalStore
   // 有子 Tabs
-  if(components[activeTab.value] === pumpComponent){
+  if(isPump.value){
     if(tokenHistoryVisible){
       return 'calc(100vh - 261px)'
     }
@@ -292,7 +298,7 @@ const needAmmList = computed(()=>{
       />
       <KeepAlive :max="6">
         <component
-          :is="components[activeTab]"
+          :is="isPump?pumpComponent:components[activeTab]"
           ref="dynamicComponentRef"
           :height="height"
           :listMapFunction="listMapFunction"
