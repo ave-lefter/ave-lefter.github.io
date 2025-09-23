@@ -37,6 +37,7 @@ import type { WalletTokenInfo } from '@/api/types/token'
 import { formatNumber } from '@/utils/formatNumber'
 import { useEventBus } from '@vueuse/core'
 import { bot_getAddressAllBalances } from '@/api/bot'
+import { useSwapUpdate } from '~/composables/useSwapUpdate'
 
 defineProps({
   isForceShow: {
@@ -68,6 +69,7 @@ watch(userAddress, (val) => {
 
 
 const walletTokenInfo = ref<WalletTokenInfo | null>(null)
+useSwapUpdate(walletTokenInfo)
 async function getWalletTxData() {
   const [token, chain] = getAddressAndChainFromId(route.params?.id as string, 1)
   if (!token || !chain) {

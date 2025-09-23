@@ -228,6 +228,7 @@ export const useGlobalStore = defineStore('global', () => {
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
   const holderBlackList = useStorage<Array<pumpBlack>>('holderBlackList', [])
+  const mySwapList = ref<any[]>([])
 
    const hotList = shallowRef<GetHotTokensResponse[]>([])
    function sendFooterPriceWs() {
@@ -327,6 +328,7 @@ export const useGlobalStore = defineStore('global', () => {
     getUserFavoriteGroups: _getUserFavoriteGroups,
     rankConditions,
     rankActiveTab,
+    mySwapList,
     pumpLiveSort
   }
 })
