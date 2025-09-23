@@ -8,7 +8,7 @@
     <div class="pumplive" v-if="pumpLiveList?.length > 0">
       <!-- <div class="contain"> -->
       <div
-        class="item rounded-8px"
+        class="item rounded-8px cursor-pointer"
         v-for="(item, $index) in pumpLiveList"
         :key="$index"
         @click="jump(item)"
@@ -48,51 +48,33 @@
           <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
             <template #default>
               <el-image
-                v-if="item?.image_uri"
                 fit="cover"
-                class="rd-50% mr-8px w-24px h-24px"
-                :src="item.image_uri"
+                class="rd-50% w-24px h-24px"
+                :src="getSymbolDefaultIcon(item)"
                 alt=""
                 srcset=""
               >
                 <template #placeholder>
-                  <span
-                    class="h-24px w-24px bg-[--main-input-button-bg] rounded-50% px-6px py-6px flex"
-                  >
-                    <img src="@/assets/icons/pump.svg" class="w-full h-full object-cover" />
-                  </span>
+                  <img :src="getChainDefaultIcon(item.chain, item.symbol)" class="token-icon w-24px text-16px color-#fff"/>
                 </template>
                 <template #error>
-                  <span
-                    class="h-24px w-24px bg-[--main-input-button-bg] rounded-50% px-6px py-6px flex"
-                  >
-                    <img src="@/assets/icons/pump.svg" class="w-full h-full object-cover" />
-                  </span>
+                  <img :src="getChainDefaultIcon(item.chain, item.symbol)" class="token-icon w-24px text-16px color-#fff"/>
                 </template>
               </el-image>
             </template>
             <template #content>
               <el-image
-                v-if="item?.image_uri"
                 fit="cover"
                 class="rd-8px w-240px h-240px"
-                :src="item.image_uri"
+                :src="getSymbolDefaultIcon(item)"
                 alt=""
                 srcset=""
               >
                 <template #placeholder>
-                  <span
-                    class="h-24px w-24px bg-[--main-input-button-bg] rounded-50% px-6px py-6px flex"
-                  >
-                    <img src="@/assets/icons/pump.svg" class="w-full h-full object-cover" />
-                  </span>
+                  <img :src="getChainDefaultIcon(item.chain, item.symbol)" class="token-icon w-228px text-16px color-#fff"/>
                 </template>
                 <template #error>
-                  <span
-                    class="h-24px w-24px bg-[--main-input-button-bg] rounded-50% px-6px py-6px flex"
-                  >
-                    <img src="@/assets/icons/pump.svg" class="w-full h-full object-cover" />
-                  </span>
+                  <img :src="getChainDefaultIcon(item.chain, item.symbol)" class="token-icon w-228px text-16px color-#fff" />
                 </template>
               </el-image>
             </template>
