@@ -48,7 +48,6 @@ defineProps({
 const route = useRoute()
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
-const wsStore = useWSStore()
 const isShow = ref(false)
 const userAddress = computed(() => {
   const [token, chain] = getAddressAndChainFromId(route.params?.id as string, 1)
