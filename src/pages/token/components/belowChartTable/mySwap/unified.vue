@@ -257,7 +257,6 @@ import { evm_utils } from '@/utils'
 import { ref, nextTick } from 'vue'
 
 const { formatUnits } = evm_utils
-const emit = defineEmits(['buyChange'])
 
 const props = defineProps({
   chain: {
