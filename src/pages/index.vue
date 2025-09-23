@@ -12,6 +12,7 @@ import { trackRef } from '~/api/tracking'
 
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
 const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
+const liveComponent = defineAsyncComponent(() => import('./components/live/index.vue'))
 const components = {
   new: newRank,
   inclusion:inclusionRank,
@@ -29,7 +30,8 @@ const components = {
   xstocks: activityComponent,
   volume: activityComponent,
   heaven_pump: pumpComponent,
-  xdyorswap_pump: pumpComponent
+  xdyorswap_pump: pumpComponent,
+  pumplive: liveComponent
 }
 const walletStore = useWalletStore()
 const botStore = useBotStore()
