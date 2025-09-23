@@ -1401,5 +1401,5 @@
   "markerAddress": "交易者地址",
   "filterSmallAmount": "过滤小额>=",
   "filterLargeAmount": "过滤大额<=",
-  "clickChartShowTx": "点击图表显示交易"
+  "selectCorrectTimeRange": "请选择正确的时间范围"
 }

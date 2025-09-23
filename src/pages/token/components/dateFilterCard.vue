@@ -32,7 +32,7 @@ function setTimeStamp(type:number){
     if (!start || !end) {
         return '--'
     }
-   const resolution = localStorage.getItem('tv_resolution')
+   const resolution = localStorage.getItem('tv_resolution') || '15'
    if(resolution){
     const params = resolutionMap[resolution as keyof typeof resolutionMap] || {val:resolution,unit:'m'}
     const startUnix = dayjs(Number(start)*1000).add(type*params.val,params.unit).unix()

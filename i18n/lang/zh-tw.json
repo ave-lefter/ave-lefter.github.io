@@ -1388,5 +1388,6 @@
   "markerAddress": "交易者地址",
   "filterSmallAmount": "過濾小額>=",
   "filterLargeAmount": "過濾大額<=",
-  "clickChartShowTx": "點擊圖表顯示交易"
+  "clickChartShowTx": "點擊圖表顯示交易",
+  "selectCorrectTimeRange": "請選擇正確的時間範圍"
 }

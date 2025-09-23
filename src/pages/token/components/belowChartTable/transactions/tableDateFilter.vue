@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 
 const {isDark} = storeToRefs(useThemeStore())
 const props = defineProps({
   visible: Boolean,
   modelValue: {
-    type: Array,
+    type: Array<string>,
     default: () => []
   },
   boundary: {
@@ -24,29 +23,27 @@ const computedVisible = computed({
   }
 })
 const filterTime = ref([])
-const disabledStart = {
-  disabledDate:(date:Date)=>{
-     if(filterTime.value[1]){
-      return dayjs(date).isAfter(dayjs(filterTime.value[1]*1000)) 
-     }
-     return false
-  },
-  disabledHours:(role: string, comparingDate?: Dayjs)=>{
-    if(comparingDate && filterTime.value[1]){
-      const arr = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
-      return arr.filter(()=>{
-        return comparingDate.isAfter(dayjs(filterTime.value[1]*1000))
-      })
+const disabledStartDate = (date:Date)=>{
+    if(filterTime.value[1]){
+    return dayjs(date).isAfter(dayjs(filterTime.value[1]*1000)) 
     }
-    return []
-  },
-  disabledMinutes:(date:Date)=>{
-
-  },
-  disabledSeconds:(date:Date)=>{
-
-  }
+    return false
 }
+const disabledEndDate = (date:Date)=>{
+  if(filterTime.value[0]){
+    return dayjs(date).isBefore(dayjs(filterTime.value[0]*1000))
+  }
+  return false
+}
+const disabledSave = computed(()=>{
+  if(filterTime.value[1] && filterTime.value[0]){
+    return filterTime.value[1] < filterTime.value[0]
+  }
+  return false
+})
+watch(()=>props.modelValue,(val:string[])=>{
+  filterTime.value = val
+})
 </script>
 
 <template>
@@ -74,10 +71,10 @@ const disabledStart = {
         <span class="flex-[1.2]">{{ $t('startTime') }}</span>
         <span class="flex-1">{{ $t('endTime1') }}</span>
       </div>
-      <div class="mt-5px flex items-center gap-4px">
+      <div class="mt-5px flex items-center gap-4px text-12px">
         <el-date-picker
-          v-bind="disabledStart"
           v-model="filterTime[0]"
+          :disabled-date="disabledStartDate"
           class="[--el-font-size-base:12px]"
           type="datetime"
           range-separator="To"
@@ -88,9 +85,10 @@ const disabledStart = {
           prefix-icon="Calendar"
           :teleported="false"
         />
-        to
+        {{ $t('to') }}
         <el-date-picker
           v-model="filterTime[1]"
+          :disabled-date="disabledEndDate"
           class="[--el-font-size-base:12px]"
           type="datetime"
           range-separator="To"
@@ -102,6 +100,9 @@ const disabledStart = {
           :teleported="false"
         />
       </div>
+      <div v-if="disabledSave" class="text-12px text-[--down-color] mt-4px">
+      {{ $t('selectCorrectTimeRange') }}
+      </div>
       <div class="flex mt-20px">
         <el-button
           class="h-30px flex-1 m-l-auto"
@@ -111,6 +112,7 @@ const disabledStart = {
           {{ $t('reset') }}
         </el-button>
         <el-button
+          :disabled="disabledSave"
           type="primary"
           class="h-30px flex-1 m-l-auto"
           @click="emit('confirm',filterTime.slice())"
