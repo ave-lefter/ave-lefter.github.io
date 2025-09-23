@@ -15,10 +15,12 @@ const isPaused = ref(false)
 const loading = ref(false)
 const isMounted = ref(false)
 const wsCacheList = shallowRef<PumpObj[]>([])
+const audioVisible = ref(false)
 defineProps<{
   scrollHeight: number
 }>()
 const pumpStore = usePumpStore()
+const globalStore = useGlobalStore()
 const wsStore = useWSStore()
 const botSettingStore = useBotSettingStore()
 const { pumpSetting, pumpBlackList } = useGlobalStore()
@@ -38,6 +40,10 @@ const tabList = computed(() => {
       value: 'graduated' as const,
     },
   ]
+})
+const audioUrl = computed(()=>{
+  return audioNameToResource[pumpStore.pump_notice[pumpStore.activeChain][activeTab.value] as keyof typeof audioNameToResource]
+  || ''
 })
 const filterBlackList = computed(() => {
   // blackList
@@ -158,6 +164,16 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val: WSPump[]) => {
     if(!isPaused.value){
       addListData()
     }
+  }
+})
+
+watch(()=>pumpStore.pump_notice[pumpStore.activeChain][activeTab.value],val=>{
+  if(val){
+    setTimeout(()=>{
+      if(pumpAudio.value){
+        pumpAudio.value.play()
+      }
+    })
   }
 })
 
@@ -487,17 +503,25 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
           :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px]" popper-class="small-select">
           <el-option v-for="item in BotSettingsArr" :key="item.value" :value="item.value" :label="item.label" />
         </el-select>
-        <div
-          class="w-20px h-20px flex items-center justify-center bg-[--d-151A22-l-E8F1FF] rounded-4px color-[--d-566275-l-8CA0C3] cursor-pointer hover:color-[--d-F5F5F5-l-333]"
-          :class="{
-            'color-[--d-F5F5F5-l-333]': pumpStore.pump_notice[pumpStore.activeChain]?.[activeTab],
-          }" @click="
-            pumpStore.pump_notice[pumpStore.activeChain][activeTab] =
-            !pumpStore.pump_notice[pumpStore.activeChain][activeTab]
-            ">
-          <Icon name="icon-park-solid:volume-notice" class="text-12px" />
-        </div>
-        <div v-show="isPaused" class="flex items-center justify-center w-20px h-20px color-#FFA622 bg-#FFA6221A rounded-4px">
+        <el-popover v-model:visible="audioVisible" trigger="click" popper-class="el-select__popper">
+          <template #reference>
+              <div
+              class="w-20px h-20px flex items-center justify-center bg-[--d-151A22-l-E8F1FF] rounded-4px color-[--secondary-text] cursor-pointer hover:color-[--main-text]"
+              :class="{
+                'color-[--main-text]': pumpStore.pump_notice[pumpStore.activeChain][activeTab],
+              }">
+              <Icon :name="pumpStore.pump_notice[pumpStore.activeChain][activeTab]?'custom:ad':'custom:admute'" class="text-14px" />
+            </div>
+          </template>
+          <template #default>
+            <ul class="el-scrollbar__view el-select-dropdown__list [&&]:m--12px">
+              <li v-for="item in audioList" :key="item" class="el-select-dropdown__item hover:bg-[--border]" :class="{'bg-[--border]': pumpStore.pump_notice[pumpStore.activeChain][activeTab]===item}" @click="pumpStore.pump_notice[pumpStore.activeChain][activeTab]=item;audioVisible=false;">
+                <span class="text-12px">{{item || $t('close')}}</span>
+              </li>
+            </ul>
+          </template>
+        </el-popover>
+        <div v-show="isPaused" class="flex items-center justify-center w-20px h-20px color-[--yellow] bg-#FFA6221A rounded-4px">
           <Icon name="custom:stop"/>
         </div>
       </div>
@@ -537,7 +561,8 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
     </div>
     <audio
       ref="pumpAudio" controls style="display: none"
-      src="/signal.mp3"
+      :src="audioUrl"
+      :volume="+globalStore.audioSettings.audio.signal/100 || 0.5"
     />
   </div>
 </template>

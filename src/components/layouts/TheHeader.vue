@@ -144,7 +144,15 @@
         </div>
       </div>
     </el-popover>
-
+    <div
+      class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px flex items-center cursor-pointer hover:opacity-80"
+      @click="globalStore.audioSettings.active = 'notice'"
+    >
+      <Icon
+        class="text-20px color-[--secondary-text]"
+        name="custom:alert"
+      />
+    </div>
     <Notice/>
     <el-dropdown
       trigger="click"
@@ -190,6 +198,8 @@
     <!-- <component :is="connectWalletCom" v-model="botStore.connectVisible" /> -->
     <ConnectWalletCom />
     <BotTipDialog/>
+    <AudioSettings/>
+    <audio ref='audioElement' controls :src='audioUrl' class="hidden"/>
   </header>
 </template>
 <script lang="ts" setup>
@@ -201,15 +211,21 @@ import Positions from '@/components/header/positions/index.vue'
 import ExWalletBtn from '../header/connectWallet/exWalletBtn.vue'
 import BotTipDialog from './components/botTipDialog.vue'
 import ClipboardToken from './components/clipboardToken.vue'
+import AudioSettings from './components/audioSettings.vue'
+import type { ITGBotResponse } from '~/api/types/ws'
 // import connectWallet from '@/components/header/connectWallet/index.vue'
 // const connectWallet = shallowRef<Component | null>(null)
+const audioUrl = ref('')
+const audioElement = useTemplateRef('audioElement')
 const { locales } = useI18n()
 const themeStore = useThemeStore()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
+const wsStore = useWSStore()
 const route = useRoute()
 const langStore = useLocaleStore()
 const {t } = useI18n()
+const globalStore = useGlobalStore()
 const  appDownloadVisible = shallowRef(false)
 const list = computed(() => {
   // let query = ''
@@ -259,6 +275,27 @@ onMounted(()=>{
 function toReferrer() {
   window.open('/referral')
 }
+
+watch(()=>wsStore.wsResult[WSEventType.TGBOT],(subscribeResult:ITGBotResponse)=>{
+  if (subscribeResult?.txList?.[0]?.success) {
+    const {swapType} = subscribeResult
+    const {audioSettings:{audio}} = globalStore
+    const map = {
+      [SwapType.BUY]: audio.marketBuy,
+      [SwapType.SELL]: audio.marketSell,
+      [SwapType.LIMIT_BUY]: audio.limit,
+      [SwapType.LIMIT_SELL]: audio.limit,
+    }
+    if(map[swapType]) {
+      audioUrl.value = audioNameToResource[map[swapType] as keyof typeof audioNameToResource]
+      setTimeout(()=>{
+        if(audioElement.value) {
+          audioElement.value.play()
+        }
+      },20)
+    }
+  }
+})
 </script>
 <style lang="scss" scoped>
 header {

@@ -162,6 +162,22 @@ export const useGlobalStore = defineStore('global', () => {
     sort: 'created_timestamp',
     sort_dir: 'DESC',
   })
+  const audioSettings = useStorage('audioSettings',{
+    active:'',
+    notice:{
+      monitor:false,
+      signal:true,
+      position:'top'
+    },
+    audio:{
+      signal:'Bar',
+      monitor:'Coin',
+      marketBuy:'',
+      marketSell:'',
+      limit:'',
+      volume:50
+    }
+  })
 
   // 预留一个全局变量，用于控制 token 历史的显示
   const tokenHistoryVisible = true
@@ -303,6 +319,7 @@ export const useGlobalStore = defineStore('global', () => {
     headFollowsNum,
     getFollowsNum,
     latestNotice,
+    audioSettings,
     pnlTrackerVisible,
     lastVisitTokens,
     tokenHistoryVisible,
