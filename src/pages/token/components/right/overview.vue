@@ -15,7 +15,7 @@
     <ul class="text-12px" :class="{ active: active=='grid'}">
       <li class="flex justify-between mb-12px">
         <span class="color-[--third-text]">{{ $t('name') }}</span>
-        <span class="color-[--secondary-text] ellipsis" :class="active =='grid' ? 'max-w-75px' : 'max-w-200px'">{{ token?.name || '-' }}</span>
+        <span class="color-[--secondary-text] ellipsis" :class="active =='grid' ? 'max-w-75px' : 'max-w-200px'">{{ token?.name || token?.symbol || '-' }}</span>
       </li>
       <li v-if="token?.token" class="flex justify-between mb-12px">
         <span class="color-[--third-text]">{{ $t('token') }}</span>

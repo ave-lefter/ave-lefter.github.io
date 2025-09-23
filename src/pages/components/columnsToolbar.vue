@@ -5,6 +5,7 @@ import { cloneDeep } from 'lodash-es'
 
 const props = defineProps<{
   storageKey: string
+  activeTab: string
   getDefaultColumns: (t: ReturnType<typeof useI18n>['t']) => any
   getOptions: (t: ReturnType<typeof useI18n>['t']) => any
 }>()
@@ -21,14 +22,14 @@ const themeStore = useThemeStore()
 const hotOptions = computed(() => props.getOptions(t))
 
 const initColumns = ref([])
-const modelColumns = ref(cloneDeep(storeColumns.value.filter((item) =>item.children || item.isVisible)))
+const modelColumns = ref(cloneDeep(storeColumns.value?.filter((item) =>item.children || item.isVisible)))
 
 // 当对话框打开时，更新本地列配置
 const openDialog = () => {
   dialogVisible.value = true
   storeColumns = useStorage(props.storageKey, props.getDefaultColumns(t))
   initColumns.value = props.getDefaultColumns(t)
-  modelColumns.value = cloneDeep(storeColumns.value.filter((item) => item.children || item.isVisible))
+  modelColumns.value = cloneDeep(storeColumns.value?.filter((item) => item.children || item.isVisible))
   console.log(storeColumns.value)
   hotSettings.value = {
     avatar_isCircle:globalStore.pumpSetting.avatar_isCircle,
@@ -77,7 +78,7 @@ function handleSelectChild(childItem, renderKey:string) {
   childItem.isVisible = !childItem.isVisible
   const index = modelColumns.value.findIndex((arr) => arr.render === renderKey)
   if(index!==-1){
-    modelColumns.value[index].isVisible = 
+    modelColumns.value[index].isVisible =
     modelColumns.value[index].children.some(el=>el.isVisible)
   }
 }
@@ -85,12 +86,12 @@ function handleSelectChild(childItem, renderKey:string) {
 
 <template>
   <div>
-    <div @click="openDialog">
+    <div @click="openDialog" v-if="props.activeTab !=='pumplive'">
       <div
         class="flex items-center color-[--secondary-text] hover:color-[--main-text] cursor-pointer"
       >
         <Icon name="custom:order" class="text-16px shrink-0" />
-        <span class="text-12px ml-2px shrink-0">{{ t('custom') }}</span>
+        <span class="text-12px ml-2px shrink-0">{{ $t('custom') }}</span>
       </div>
     </div>
     <el-dialog v-model="dialogVisible" align-center append-to-body :title="$t('customizeScreener')" width="820">

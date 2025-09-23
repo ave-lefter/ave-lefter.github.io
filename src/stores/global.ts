@@ -151,11 +151,45 @@ export const useGlobalStore = defineStore('global', () => {
 
   const hide_risk=shallowRef(1)
   const hide_small=shallowRef(0)
-  const rankCommon = useStorage('rankCommon',{
+  const rankCommon = useStorage('rankCommon', {
     activeInterval: '24h',
     quickVisible: true,
     quickBuyValue: '0.01',
+    sort: 'time',
+    sort_dir: ''
   })
+  const pumpLiveSort = useStorage('pumpLiveSort', {
+    sort: 'created_timestamp',
+    sort_dir: 'DESC',
+  })
+  const audioSettings = useStorage('audioSettings',{
+    active:'',
+    notice:{
+      monitor:false,
+      signal:true,
+      position:'top'
+    },
+    audio:{
+      signal:'Bar',
+      monitor:'Coin',
+      marketBuy:'',
+      marketSell:'',
+      limit:'',
+      volume:50
+    }
+  })
+
+  // 预留一个全局变量，用于控制 token 历史的显示
+  const tokenHistoryVisible = true
+  const lastVisitTokens = useStorage<{
+    id: string,
+    logo_url: string,
+    symbol: string,
+    price_change: number | undefined,
+    circulation: string,
+    price: number,
+  }[]>('lastTokens', [])
+  const latestNotice = shallowRef<ILatestNotice>({} as ILatestNotice)
   const rankActiveTab = useStorage('rankActiveTab', 'hot')
   // pump 和活动榜单动态插入
   const rankConditions = useStorage<Record<string, { sort: { sort: string; sort_dir: string }, filter: Record<string, any> }>>('rankCache',{
@@ -189,7 +223,6 @@ export const useGlobalStore = defineStore('global', () => {
     }
   })
 
-  const latestNotice = shallowRef<ILatestNotice>({})
   const userFavoriteGroups = ref<GetUserFavoriteGroupsResponse[]>([])
   const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)
 
@@ -286,10 +319,14 @@ export const useGlobalStore = defineStore('global', () => {
     headFollowsNum,
     getFollowsNum,
     latestNotice,
+    audioSettings,
     pnlTrackerVisible,
+    lastVisitTokens,
+    tokenHistoryVisible,
     userFavoriteGroups,
-    getUserFavoriteGroups:_getUserFavoriteGroups,
+    getUserFavoriteGroups: _getUserFavoriteGroups,
     rankConditions,
-    rankActiveTab
+    rankActiveTab,
+    pumpLiveSort
   }
 })

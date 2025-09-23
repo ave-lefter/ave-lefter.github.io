@@ -61,11 +61,21 @@ export const useTokenStore = defineStore('token', () => {
   const commonHeight = computed(() => height.value - centerTopHeight.value)
 
   const swap = reactive<{
-    native: Token
-    token: Token
+    native: Token,
+    token: Token,
+    payToken: Token
   }>({
     native: {},
-    token: {}
+    token: {},
+    payToken: {
+      chain: 'solana',
+      symbol: 'SOL',
+      decimals: 9,
+      address: 'sol',
+      price: 1,
+      logo_url: 'token_icon/solana/So11111111111111111111111111111111111111112.png',
+      balance: '0'
+    }
   })
 
   const circulation = computed(() => {

@@ -247,7 +247,7 @@ function addTokenFavorite(row, newGroupId: number) {
           <Icon
             v-if="enableKline"
             v-tooltip="!activeKline?$t('kline'):$t('hidekline')"
-            name="custom:kline" class="text-12px ml-4px hover:color-[--secondary-text]" 
+            name="custom:kline" class="text-12px ml-4px hover:color-[--secondary-text]"
             :class="activeKline ? 'color-[--secondary-text]' : 'color-[--third-text]'"
             @click.self.stop="toggleKline"
           />
@@ -293,6 +293,7 @@ function addTokenFavorite(row, newGroupId: number) {
               </div>
             </template>
           </div>
+          <PumpLive v-if="row?.is_streaming" :class="{'ml-4px': row?.medias?.length > 0}" class="mr-0!" :tokenId="((row.token + '-' + row.chain) as string)" />
           <template v-if="row.signal_arr?.length > 0">
             <div
               v-for="(i, index) in row.signal_arr"

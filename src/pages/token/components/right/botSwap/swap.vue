@@ -6,18 +6,32 @@
           <span class="text-12px color-[--secondary-text]">{{ $t('amount') }}</span>
         </template>
         <template #append>
-          <img :src="tokenStore.swap.native?.logo_url || `${configStore.token_logo_url}token_icon/${chain}/${getChainInfo(chain || '').wmain_wrapper || ''}.png`" class="rd-50%" height="20"  alt="" srcset="" >
+          <!-- <img :src="tokenStore.swap.native?.logo_url || `${configStore.token_logo_url}token_icon/${chain}/${getChainInfo(chain || '').wmain_wrapper || ''}.png`" class="rd-50%" height="20"  alt="" srcset="" > -->
+          <el-dropdown placement="bottom" trigger="click" @visible-change="visible => show = visible">
+            <div class="inline-flex items-center clickable">
+              <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50%" height="20"  alt="" srcset="" >
+              <Icon class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
+            </div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item.address !== tokenStore.swap.payToken?.address)" :key="item.address" @click.stop="tokenStore.swap.payToken = item;$emit('getTokenBalance');amountNative='';amountNativeOut=''">
+                  <img :src="`${configStore.token_logo_url}${item.logo_url}`" class="rd-50% mr-8px" height="16"  alt="" srcset="" >
+                  <span class="text-12px font-400">{{ item.symbol }}</span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </template>
       </el-input>
       <div class="flex items-center mt-10px text-12px" >
         <span class="color-[--main-text]">≈{{  formatNumber(amountNativeOut || 0) }} {{ tokenInfo?.symbol }}</span>
-        <div class="clickable ml-auto color-[--third-text]" @click.stop="handleMax(tokenStore.swap.native?.balance || 0, 'buy')">{{ $t('balance1') }}: <span>{{ formatNumber(tokenStore.swap.native?.balance || 0) }}</span> {{ getChainInfo(tokenInfo?.chain || '')?.main_name }}
+        <div class="clickable ml-auto color-[--third-text]" @click.stop="handleMax(tokenStore.swap.payToken?.balance || 0, 'buy')">{{ $t('balance1') }}: <span>{{ formatNumber(tokenStore.swap.payToken?.balance || 0) }}</span> {{ tokenStore.swap.payToken?.symbol || '' }}
         </div>
-        <RefreshBalance class="color-[--third-text]" :type="0"/>
+        <RefreshBalance class="color-[--third-text]" :type="0" isPayToken />
       </div>
       <div class="tabs mt-10px">
         <button v-for="(item, index) in tabs1" :key="index" class="tab-item" type="button"  @click.stop="handleAmount(item, 'buy')">
-          <img class="mr-5px" :src="tokenStore.swap.native?.logo_url || `${configStore.token_logo_url}token_icon/${chain}/${getChainInfo(chain || '').wmain_wrapper || ''}.png`" style="border-radius: 50%;" height="14"  alt="" srcset="" >
+          <img class="mr-5px" :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" style="border-radius: 50%;" height="14"  alt="" srcset="" >
           <span>{{ item.name }}</span>
         </button>
       </div>
@@ -32,9 +46,24 @@
         </template>
       </el-input>
       <div class="flex items-center mt-10px text-12px">
-        <span class="color-[--main-text]">≈{{ formatNumber(amountTokenOut || 0) }} {{ getChainInfo(chain || '')?.main_name }}</span>
+        <div class="color-[--main-text] flex items-center"><span>≈{{ formatNumber(amountTokenOut || 0) }}</span>
+          <el-dropdown placement="bottom" trigger="click" @visible-change="visible => show = visible">
+            <div class="inline-flex items-center clickable text-12px ml-4px">
+              <span>{{ tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }}</span>
+              <Icon class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
+            </div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item.address !== tokenStore.swap.payToken?.address)" :key="item.address" @click.stop="tokenStore.swap.payToken = item;$emit('getTokenBalance');amountToken='';amountTokenOut=''">
+                  <img :src="`${configStore.token_logo_url}${item.logo_url}`" class="rd-50% mr-8px" height="16"  alt="" srcset="" >
+                  <span class="text-12px font-400">{{ item.symbol }}</span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
         <span class="clickable ml-auto color-[--third-text]" @click.stop="handleMax(tokenStore.swap.token?.balance || 0, 'sell')">{{ $t('balance1') }}: <span >{{ formatNumber(tokenStore.swap.token?.balance || 0) }}</span> {{ tokenInfo?.symbol }}</span>
-        <RefreshBalance class="color-[--third-text]" :type="1"/>
+        <RefreshBalance class="color-[--third-text]" :type="1" isPayToken/>
       </div>
       <div class="tabs mt-10px">
         <button v-for="(item, index) in tabs2" :key="index" class="tab-item" type="button" @click.stop="handleAmount(item, 'sell')">
@@ -54,12 +83,12 @@
       </el-input>
       <div class="slider-swap" :class="activeTab">
         <div class="slider-swap_left">
-          <el-slider :model-value="priceLimitRange1" :show-tooltip="false" :show-input-controls="false" :min="-100" :max="100" @input="onSliderInput" />
+          <el-slider :model-value="priceLimitRange1" :show-tooltip="false" :show-input-controls="false" :min="-100" :max="100" @input="(val) => onSliderInput(val as number)" />
           <div class="slider-swap_left-mark">
-            <span v-for="(item, index) in [-100, -50, 0, 50, 100]" :key="index" class="clickable" @click.stop="priceLimitRange1=item">{{item}}%</span>
+            <span v-for="(item, index) in [-100, -50, 0, 50, 100]" :key="index" class="clickable" @click.stop="priceLimitRange=item">{{item}}%</span>
           </div>
         </div>
-        <el-input v-model.number="priceLimitRange" placeholder="0" class="input-number max-w-70px ml-15px text-14px!" @update:model-value="value => priceLimit = value?.replace?.(/\-|[^\d.]/g, '')">
+        <el-input v-model="priceLimitRange" placeholder="0" class="input-number max-w-70px ml-15px text-14px!" @update:model-value="value => priceLimitRange = value?.replace?.(/\-|[^\d.]/g, '')">
           <template #prefix>
             <div class="w-10px" />
           </template>
@@ -244,6 +273,8 @@ const emit = defineEmits(['getTokenBalance', 'update:botSettings'])
 
 const { t } = useI18n()
 
+const show = ref(false)
+
 // 响应式状态
 const amountToken = ref('')
 const amountNative = ref('')
@@ -264,10 +295,10 @@ const swapQuoteInfo = reactive({
 // 限价单
 const isPriceLimit = ref(true)
 const priceLimit = ref('')
-const priceLimitRange = ref<undefined | number>(undefined)
+const priceLimitRange = ref<undefined | number | string>(undefined)
 
 const priceLimitRange1 = computed(() => {
-  return Number(priceLimitRange.value) > 100 ? 100 : priceLimitRange.value
+  return Number(priceLimitRange.value) > 100 ? 100 : (Number(priceLimitRange.value) || undefined)
 })
 
 function onSliderInput(val: number) {
@@ -282,8 +313,9 @@ watch(priceLimitRange, (val) => {
 })
 
 let isLineChange = false
+let isPriceLimit_move = false
 useEventBus<string>('priceLimit_move').on((price) => {
-  if (props.swapType !== 'limit') return
+  if (props.swapType !== 'limit' || isPriceLimit_move) return
   if (!Number.isNaN(Number(price))) {
     isLineChange = true
     priceLimitRange.value = Number(new BigNumber(price || 0).minus(tokenStore.price || 0).div(tokenStore.price || 0).times(100).toFixed(0))
@@ -326,11 +358,15 @@ useEventBus('klineDataReady').on(() => {
 
 function updateStorePriceLimit() {
   if (isLineChange) return
+  isPriceLimit_move = true
   if(!isPriceLimit.value) {
     useEventBus<number>('priceLimit').emit(Number(formatDec(new BigNumber(priceLimit.value).div(tokenStore.circulation || 1).toFixed(), 4)))
   } else {
     useEventBus<number>('priceLimit').emit(Number(priceLimit.value))
   }
+  nextTick(() => {
+    isPriceLimit_move = false
+  })
 }
 
 const gasPrice = ref(0)
@@ -364,7 +400,7 @@ const walletAddress = computed(() => {
 })
 
 const fromToken = computed(() => {
-  return props.activeTab === 'buy' ? tokenStore.swap.native : tokenStore.swap.token
+  return props.activeTab === 'buy' ? tokenStore.swap.payToken : tokenStore.swap.token
 })
 
 const fromAmount = computed(() => {
@@ -437,14 +473,19 @@ const handleMax = (balance: string | number, type: 'buy' | 'sell') => {
   const min = MIN_BALANCE[chain.value as 'bsc' | 'solana' | 'base' | 'eth'] || 0.01
   const decimals = fromToken.value.decimals || 18
   const fromAmount = balance || 0
+  const nativeTokens = ['sol', 'ton', NATIVE_TOKEN]
   if (type === 'buy') {
-    if (new BigNumber(balance).lt(min)) {
-      ElMessageBox.alert(t('balanceNotEnough', {n: min, s: fromToken.value.symbol}), t('tips'), {
-        confirmButtonText: t('okay')
-      })
-      return
+    if (nativeTokens.includes(fromToken.value.address || '')) {
+      if (new BigNumber(balance).lt(min)) {
+        ElMessageBox.alert(t('balanceNotEnough', {n: min, s: fromToken.value.symbol}), t('tips'), {
+          confirmButtonText: t('okay')
+        })
+        return
+      }
+      amountNative.value = new BigNumber(fromAmount)?.minus(min).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals}})?`))?.[0] || ''
+    } else {
+      amountNative.value = new BigNumber(fromAmount).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals}})?`))?.[0] || ''
     }
-    amountNative.value = new BigNumber(fromAmount)?.minus(min).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals}})?`))?.[0] || ''
   } else {
     amountToken.value =  new BigNumber(fromAmount).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals}})?`))?.[0] || ''
   }
@@ -458,7 +499,7 @@ function handleAmount(item: { name: string; value: string }, type: 'buy' | 'sell
     const p = item.value
     let a = tokenStore.swap.token.balance || 0
     if (p) {
-      const decimals = tokenStore.swap.native.decimals || 0
+      const decimals = tokenStore.swap.payToken.decimals || 0
       a = new BigNumber(a).times(p).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals}})?`))?.[0] || 0
       if (Number(a) === 0) {
         a = ''
@@ -513,7 +554,11 @@ async function quoteBot(chain: string, type = props.activeTab, isGetPrice = true
   if (isGetPrice) {
     await _getTokensPrice()
   }
-  const nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || tokenStore.swap.native.price || 0
+  const nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || tokenStore.swap.payToken.price || 0
+
+  const payToken = tokenStore.swap.payToken
+
+  const payTokenPrice = (['sol', NATIVE_TOKEN].includes(payToken.address || '') ? nativePrice : tokenStore.swap.payToken.price) || 0
 
   let price: number = tokenStore.price || tokenStore.swap.token?.price || 0
   if (props.swapType === 'limit') {
@@ -521,8 +566,8 @@ async function quoteBot(chain: string, type = props.activeTab, isGetPrice = true
     price = Number(formatDec(p || tokenStore.price || tokenStore.swap.token?.price || 0, 4))
   }
 
-  const fromPrice = isBuy ? (nativePrice || tokenStore.swap.native?.price) : price
-  const toPrice = isBuy ? price : (nativePrice || tokenStore.swap.native?.price || 0)
+  const fromPrice = isBuy ? payTokenPrice : price
+  const toPrice = isBuy ? price : payTokenPrice
   const res = Number(fromAmount) * (fromPrice || 0) / (toPrice || 1)
   if (res) {
     if (type === 'buy') {
@@ -530,8 +575,8 @@ async function quoteBot(chain: string, type = props.activeTab, isGetPrice = true
     } else {
       amountTokenOut.value = String(res) || '0'
     }
-    const fromToken = type === 'buy' ? tokenStore.swap.native : tokenStore.swap.token
-    const toToken = type === 'buy' ? tokenStore.swap.token : tokenStore.swap.native
+    const fromToken = type === 'buy' ? tokenStore.swap.payToken : tokenStore.swap.token
+    const toToken = type === 'buy' ? tokenStore.swap.token : tokenStore.swap.payToken
     const fromAmount = type === 'buy' ? amountNative.value : amountToken.value
     const toAmount = type === 'buy' ? amountNativeOut.value : amountTokenOut.value
     swapQuoteInfo.fromAmount = fromAmount
@@ -551,8 +596,8 @@ const getTokensPriceFun = debounce(function (resolve, reject) {
 
 function _getTokensPrice() {
   return new Promise((resolve, reject) => {
-    if (tokenStore.swap.native.price && tokenStore.swap.token.price) {
-      resolve([{ current_price_usd: tokenStore.swap.token.price }, { current_price_usd: tokenStore.swap.native.price }])
+    if (tokenStore.swap.payToken.price && tokenStore.swap.token.price) {
+      resolve([{ current_price_usd: tokenStore.swap.token.price }, { current_price_usd: tokenStore.swap.payToken.price }])
     }
     getTokensPriceFun(resolve, reject)
   })
@@ -605,7 +650,7 @@ function checkAmount() {
   const fromTokenBalance = fromToken.value.balance || 0
   return !(
     Number(fromTokenBalance) < Number(fromAmount.value) ||
-    String(fromAmount.value) === '0' || tokenStore.swap.token.address === tokenStore.swap.native.address || new BigNumber(fromAmount.value || 0).lte(0) ||
+    String(fromAmount.value) === '0' || tokenStore.swap.token.address === tokenStore.swap.payToken.address || new BigNumber(fromAmount.value || 0).lte(0) ||
     (new BigNumber(priceLimit.value || 0).lte(0) && props.swapType === 'limit')
   )
 }
@@ -647,7 +692,7 @@ async function submitBotSwap() {
     solana: 'sol',
     ton: 'TON',
   }
-  const native = chainMainToken?.[chain] || NATIVE_TOKEN
+  const native = tokenStore.swap.payToken.address || chainMainToken?.[chain] || NATIVE_TOKEN
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
   if (chain === 'solana') {
     // let mev = this.botSettings?.solana?.mev
@@ -665,8 +710,8 @@ async function submitBotSwap() {
     const botPriorityFee = new BigNumber(priorityFee).times(10 ** 9).toFixed(0)
     // let min = this.botProtection ? '2000000' : '1500000'
     // botPriorityFee = botPriorityFee.lt(min) ? min : botPriorityFee.toFixed(0)
-    const ft = isBuy ? tokenStore.swap.native : tokenStore.swap.token
-    const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.native
+    const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
+    const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
     const slippage = botSettingStore.botSettings?.solana?.[botSettingStore.botSettings?.solana?.selected]?.slippage || 9
     const data = {
       batchId: Date.now().toString(),
@@ -749,8 +794,8 @@ async function submitBotSwap() {
     const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]
     const gasPrice = !settings?.customFee ? '0' : (settings?.customFee || gasTips?.[settings?.level] || '3')
     const gasTip = Number(new BigNumber(gasPrice).times(10 ** 9).toFixed(0))
-    const ft = isBuy ? tokenStore.swap.native : tokenStore.swap.token
-    const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.native
+    const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
+    const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
     const data = {
       batchId: Date.now().toString(),
       chain: chain,
@@ -848,7 +893,7 @@ function submitBotLimit() {
     solana: 'sol',
     ton: 'TON',
   }
-  const native = chainMainToken?.[chain] || NATIVE_TOKEN
+  const native = tokenStore.swap.payToken.address || chainMainToken?.[chain] || NATIVE_TOKEN
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
   if (chain === 'solana') {
     // let mev = this.botSettings?.solana?.mev
@@ -867,7 +912,7 @@ function submitBotLimit() {
     const p = isPriceLimit.value ? priceLimit.value : formatDec(new BigNumber(priceLimit.value || 0).div(tokenStore.circulation || 1).toFixed(), 4)
     // let min = this.botProtection ? '2000000' : '1500000'
     // botPriorityFee = botPriorityFee.lt(min) ? min : botPriorityFee.toFixed(0)
-    const ft = isBuy ? tokenStore.swap.native : tokenStore.swap.token
+    const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     // const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.native
     const slippage = botSettingStore.botSettings?.solana?.[botSettingStore.botSettings?.solana?.selected]?.slippage || 9
     const data = {
@@ -948,8 +993,8 @@ function submitBotLimit() {
     const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]
     const gasPrice = (settings?.customFee || gasTips?.[settings?.level as 0 | 1 | 2] || '3')
     const gasTip = Number(new BigNumber(gasPrice).times(10 ** 9).toFixed(0))
-    const ft = isBuy ? tokenStore.swap.native : tokenStore.swap.token
-    const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.native
+    const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
+    const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
     const p = isPriceLimit.value ? priceLimit.value : formatDec(new BigNumber(priceLimit.value || 0).div(tokenStore.circulation || 1).toFixed(), 4)
     const data = {
       batchId: Date.now().toString(),
@@ -1036,7 +1081,8 @@ function getEstimatedGas() {
     // let botSettings = this.botSettings?.[this.chain]?.[] || {}
     const botSettings = botSettingStore.botSettings?.[chain]?.[botSettingStore.botSettings?.[chain]?.selected]
     const mev = botSettings?.mev
-    const nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || tokenStore.swap.native.price || 0
+    const _nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || 0
+    const nativePrice = (tokenStore.swap.payToken.address === 'sol' || tokenStore.swap.token.address === NATIVE_TOKEN) ? _nativePrice : tokenStore.swap.payToken.price || 0
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
     const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]
@@ -1361,6 +1407,15 @@ onMounted(() => {
           }
         }
       }
+    }
+  }
+
+  .arrow-up {
+    font-size: 16px;
+    transition: all 0.2s linear;
+    color: var(--secondary-text);
+    &.active {
+      transform: rotate(180deg);
     }
   }
 </style>

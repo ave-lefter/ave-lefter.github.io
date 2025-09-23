@@ -12,6 +12,7 @@ import { trackRef } from '~/api/tracking'
 
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
 const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
+const liveComponent = defineAsyncComponent(() => import('./components/live/index.vue'))
 const components = {
   new: newRank,
   inclusion:inclusionRank,
@@ -29,7 +30,8 @@ const components = {
   xstocks: activityComponent,
   volume: activityComponent,
   heaven_pump: pumpComponent,
-  xdyorswap_pump: pumpComponent
+  xdyorswap_pump: pumpComponent,
+  pumplive: liveComponent
 }
 const walletStore = useWalletStore()
 const botStore = useBotStore()
@@ -257,6 +259,21 @@ function getMedias(appendix: string) {
   }
   return []
 }
+
+const height = computed(() => {
+  const {tokenHistoryVisible} = globalStore
+  // 有子 Tabs
+  if(components[activeTab.value] === pumpComponent){
+    if(tokenHistoryVisible){
+      return 'calc(100vh - 261px)'
+    }
+    return 'calc(100vh - 229px)'
+  }
+  if(tokenHistoryVisible){
+    return 'calc(100vh - 217px)'
+  }
+  return 'calc(100vh - 185px)'
+})
 </script>
 
 <template>
@@ -273,6 +290,7 @@ function getMedias(appendix: string) {
         <component
           :is="components[activeTab]"
           ref="dynamicComponentRef"
+          :height="height"
           :listMapFunction="listMapFunction"
           :activeChain="activeChain"
           :activeTab="activeTab"

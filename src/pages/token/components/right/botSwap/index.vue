@@ -36,6 +36,7 @@ const swapType = shallowRef<'limit' | 'market'>('market')
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
 const wsStore = useWSStore()
+const botSwapStore = useBotSwapStore()
 
 const { getTokenBalance } = useBotSwap()
 
@@ -118,6 +119,9 @@ function initToken() {
   tokenStore.swap.token = {address, chain}
   if (chain !== tokenStore.swap.native.chain) {
     tokenStore.swap.native = {symbol: getChainInfo(chain)?.main_name, chain: chain, address: chainMainToken[chain] || NATIVE_TOKEN, decimals: getChainInfo(chain)?.decimals }
+  }
+  if (chain !== tokenStore.swap.payToken.chain) {
+    tokenStore.swap.payToken = (botSwapStore?.botSwapBaseTokens?.[(chain || '') as BotChain] || [])[0]
   }
 }
 

@@ -51,7 +51,7 @@ export function removeEvent (el, event, handler) {
   if (el.detachEvent) {
     el.detachEvent('on' + event, handler)
   } else if (el.removeEventListener) {
-    el.removeEventListener(event, handler, true)
+    el.removeEventListener?.(event, handler, true)
   } else {
     el['on' + event] = null
   }
