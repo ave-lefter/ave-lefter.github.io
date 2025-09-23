@@ -29,7 +29,7 @@ const components = {
   cto: activityComponent,
   xstocks: activityComponent,
   volume: activityComponent,
-  heaven_pump: pumpComponent,
+  // heaven_pump: pumpComponent,
   // xdyorswap_pump: pumpComponent,
   pumplive: liveComponent
 }
@@ -44,6 +44,9 @@ const currentChainObj = computed(() => {
   return chains.value.find((el) => el.net_name === activeChain.value)
 })
 const isPump = computed(()=>{
+  if(activeTab.value === 'pump'){
+    return 1
+  }
   if(Array.isArray(currentChainObj.value?.categories)){
     return currentChainObj.value.categories.find(el=>el.category === activeTab.value)?.is_pump
   }
@@ -298,7 +301,7 @@ const needAmmList = computed(()=>{
       />
       <KeepAlive :max="6">
         <component
-          :is="isPump?pumpComponent:components[activeTab]"
+          :is="isPump?pumpComponent:components[activeTab as keyof typeof components]"
           ref="dynamicComponentRef"
           :height="height"
           :listMapFunction="listMapFunction"

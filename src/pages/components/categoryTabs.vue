@@ -43,7 +43,7 @@ const isNew = computed(() => props.activeTab === 'new')
 const isInclusion = computed(() => props.activeTab === 'inclusion')
 const configMap = computed(() => {
   const pumpMaps = props.categories.reduce((prev,cur)=>{
-    if(cur.is_pump){
+    if(cur.is_pump && cur.category !== 'pump'){
       prev[cur.category] = {
         icon: '',
         storageKey: `${cur.category}TableColumns`,
@@ -300,7 +300,7 @@ watch(()=>props.categories,()=>{
           @click="updateCategory(item.category, item.sub_category || [],index)"
         >
           <Icon
-            v-if="configMap[item.category as keyof typeof configMap].icon"
+            v-if="configMap[item.category as keyof typeof configMap]?.icon"
             :name="configMap[item.category as keyof typeof configMap].icon"
             class="mr-1 text-12px"
             :class="configMap[item.category as keyof typeof configMap].class"
@@ -338,6 +338,7 @@ watch(()=>props.categories,()=>{
           />
           <BlackList  v-if="props.activeTab !=='pumplive'"/>
           <ColumnsToolbar
+            v-if="configMap[activeTab as keyof typeof configMap]"
             class="ml-4px"
             :activeTab="props.activeTab"
             :storageKey="configMap[activeTab as keyof typeof configMap].storageKey"
