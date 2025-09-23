@@ -233,7 +233,7 @@
   "normal": "一般",
   "fast": "快速",
   "setting": "设置",
-  "setTips": "您可以设置最多 3 个不同的交易配置文件 （S1/S2/S3） 来调整您的 smart-mev 保护、优先费、和滑点设置",
+  "setTips": "您可以设置最多 3 个不同的交易配置文件 （P1/P2/P3） 来调整您的 smart-mev 保护、优先费、和滑点设置",
   "slippage": "滑点容差",
   "autoSlippage": "自动滑点",
   "enterSlippage": "请输入滑点容差",
@@ -1418,5 +1418,13 @@
   "example":"显示示例",
   "justNow":"刚刚",
   "of":"的",
-  "hideNoSwap": "隐藏未购买"
+  "hideNoSwap": "隐藏未购买",
+  "transferToken": "选择转账代币",
+  "depositTip": "*当前地址 EVM 链通用",
+  "hotkeyTips": "按着 空格键 使用热键",
+  "hotkeyTips1": "点击按钮，启用快捷键",
+  "enablePnLTips1": "启用显示PNL功能",
+  "enablePnLTips2": "禁用显示PNL功能",
+  "enableShowsReflected": "启用悬停显示预估数量",
+  "disableShowsReflected": "禁用悬停显示预估数量"
 }
