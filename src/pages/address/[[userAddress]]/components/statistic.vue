@@ -117,17 +117,17 @@
         </a>
         <a
           v-else
-          class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[--primary-color] text-3 leading-4 cursor-pointer rounded text-[--main-text]"
+          class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[--primary-color] text-3 leading-4 cursor-pointer rounded text-[--white]"
           @click="_addAttention"
         >
           <Icon name="custom:follow" class="text-4" />
           {{ $t('follow') }}
         </a>
         <a
-          class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[--primary-color] text-3 leading-4 cursor-pointer rounded text-[--main-text]"
+          class="flex items-center justify-center gap-1 py-2.75 px-4.5 bg-[--primary-color] text-3 leading-4 cursor-pointer rounded text-[--white]"
           @click="shareComponent && shareComponent.openDialog()"
         >
-          <Share ref="shareComponent" type="walletDetailTop" :statistics="statistics" :address="address" :chain="chain" classString="!color-[--main-text] [&&]:ml-0" />
+          <Share ref="shareComponent" type="walletDetailTop" :statistics="statistics" :address="address" :chain="chain" classString="!color-[--white] [&&]:ml-0" />
           {{ $t('share') }}
         </a>
       </div>

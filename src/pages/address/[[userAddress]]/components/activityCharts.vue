@@ -119,7 +119,7 @@ const activity = ref({
                 style="
                   display: flex;
                   align-items: center;
-                  color:var(--secondary-text);
+                  color:var(--third-text);
                   font-size: 12px;
                   justify-content: space-between;
                   gap:8px;
@@ -145,7 +145,7 @@ const activity = ref({
                     }).join('')}
                   </div>
               </div>
-              <div style="color:var(--secondary-text);font-size: 12px;">
+              <div style="color:var(--third-text);font-size: 12px;">
                  ${$t('Vol')}: $${formatNumber(value?.volume, 2)}
               </div>
           </div>
