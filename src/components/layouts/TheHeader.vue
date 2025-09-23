@@ -2,7 +2,10 @@
   <header
     class="w-full bg-[--main-bg] flex items-center justify-between p-x-17px h-60px"
   >
-    <NuxtLink to="/" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></NuxtLink>
+    <NuxtLink to="/" class="flex items-center gap-4px">
+      <img height="26" src="~/assets/images/avedex_mobile_logo.png" >
+      <Icon name="custom:name" class="color-[--d-FFF-l-000]"/>
+    </NuxtLink>
     <!-- <a :href="homeUrl" target="_blank" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></a> -->
     <!-- <ul class="menu ml-20px">
       <li v-for="(item, $index) in list" :key="$index">
