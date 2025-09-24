@@ -44,7 +44,7 @@ const currentChainObj = computed(() => {
   return chains.value.find((el) => el.net_name === activeChain.value)
 })
 const isPump = computed(()=>{
-  if(activeTab.value === 'pump'){
+  if(['four','pump','bonk_pump'].includes(activeTab.value)){
     return 1
   }
   if(Array.isArray(currentChainObj.value?.categories)){
