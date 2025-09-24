@@ -400,7 +400,7 @@ export function getTokenTxs(query: {
 }): Promise<IGetTokenTxsResponse[]> {
   const address=localStorage.bot_evmAddress || localStorage.walletAddress
   const {$api} = useNuxtApp()
-  return $api('/v2api_zihoe/token_info/v1/token/txs', {
+  return $api('/v2api/token_info/v1/token/txs', {
     method: 'get',
     query:{
       address,
