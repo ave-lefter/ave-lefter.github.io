@@ -130,7 +130,7 @@ function handleSelectChild(childItem, renderKey:string) {
               <div
                 v-if="item.isVisible"
                 class="draggable-columns-bg"
-                :class="item.fixed ? 'columns-bg-disabled' : ''"
+                :class="item?.fixed ? 'columns-bg-disabled' : ''"
               >
               {{ initColumns.find((arr) => arr.render === item.render)?.title  }}
                 <Icon name="custom:handle" class="ml-2 color-[--third-text]" />

@@ -413,14 +413,16 @@ function toggleKline(row:Record<string,any>) {
 }
 
 function resetColumns(needClear:boolean) {
-  const quickIndex= columns.value.findIndex(el => el.key === 'quick')
-  if(needClear){
-    columns.value[0].fixed=''
-    columns.value[quickIndex].fixed=''
-  } else {
-    columns.value[0].fixed='left'
-    columns.value[quickIndex].fixed='right'
-    localStorage.setItem('hotUserTableColumns',JSON.stringify(columns.value))
+  const quickIndex = columns.value.findIndex(el => el.key === 'quick')
+  if (columns.value[quickIndex] && columns.value[0]) {
+    if (needClear) {
+      columns.value[0].fixed=''
+      columns.value[quickIndex].fixed=''
+    } else {
+      columns.value[0].fixed='left'
+      columns.value[quickIndex].fixed='right'
+      localStorage.setItem('hotUserTableColumns',JSON.stringify(columns.value))
+    }
   }
 }
 </script>

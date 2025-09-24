@@ -1426,5 +1426,6 @@
   "enablePnLTips1": "启用显示PNL功能",
   "enablePnLTips2": "禁用显示PNL功能",
   "enableShowsReflected": "启用悬停显示预估数量",
-  "disableShowsReflected": "禁用悬停显示预估数量"
+  "disableShowsReflected": "禁用悬停显示预估数量",
+  "myToken": "我的代币"
 }

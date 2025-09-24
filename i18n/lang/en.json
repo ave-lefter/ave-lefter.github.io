@@ -1362,13 +1362,13 @@
   "loadingCloseAccount": "Close your account and recycle your rent, please wait...",
   "noticeSettings": "Notice",
   "audioSettings": "Audio",
-  "close":"Close",
-  "followMonitor":"Follow Monitor",
-  "tradeSound":"Trade Sound",
-  "buySound":"Buy Sound",
-  "sellSound":"Sell Sound",
-  "tradeNotice":"Trade Notice",
-  "volume2":"Volume",
+  "close": "Close",
+  "followMonitor": "Follow Monitor",
+  "tradeSound": "Trade Sound",
+  "buySound": "Buy Sound",
+  "sellSound": "Sell Sound",
+  "tradeNotice": "Trade Notice",
+  "volume2": "Volume",
   "holdersNum": "Holders Num",
   "holdersAnalysis": "Holders Analysis",
   "holdersNumTotal": "Holders Total",
@@ -1427,5 +1427,6 @@
   "enablePnLTips1": "Enable showing PNL",
   "enablePnLTips2": "Disable showing PNL",
   "enableShowsReflected": "Enable shows reflected amount on hover",
-  "disableShowsReflected": "Disable shows reflected amount on hover"
+  "disableShowsReflected": "Disable shows reflected amount on hover",
+  "myToken": "My Token"
 }
