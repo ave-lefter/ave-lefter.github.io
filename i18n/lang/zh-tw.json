@@ -1413,5 +1413,8 @@
   "enablePnLTips1": "啟用顯示PNL功能",
   "enablePnLTips2": "禁用顯示PNL功能",
   "enableShowsReflected": "啟用懸停顯示預估數量",
-  "disableShowsReflected": "禁用懸停顯示預估數量"
+  "disableShowsReflected": "禁用懸停顯示預估數量",
+  "tweetSearchContractAddress": "推特搜索合約地址",
+  "tweetSearchContractAddress2": "推特搜索代幣名稱",
+  "tweetSearchContractAddress3": "推特搜索名稱及合約"
 }

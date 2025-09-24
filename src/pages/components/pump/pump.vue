@@ -239,7 +239,7 @@ const filterMap = {
 }
 
 const visibleColumns = computed(() => {
-  return columns.value.filter((el) => {
+  return columns.value?.filter?.((el) => {
     if (filterMap[el.key as keyof typeof filterMap]) {
       return filterMap[el.key as keyof typeof filterMap](el)
     }
