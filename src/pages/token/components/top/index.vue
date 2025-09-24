@@ -182,25 +182,24 @@
             <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
             <el-popover popper-class="[&&]:[--el-popover-bg-color:--border]">
               <template #reference>
-                <a
-                  class="media-item bg-btn"
-                  href="javscript:;"
+                <span
+                  class="media-item bg-btn cursor-pointer"
                 >
                   <Icon
                     class="text-[--third-text] h-16px w-10px"
                     name="custom:search"
                   />
-                </a>
+              </span>
               </template>
               <template #default>
                 <div class="py-4px [&&]:m--12px flex flex-col">
                   <a :href="`https://x.com/search?q=${token?.token}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
                     {{ $t('tweetSearchContractAddress') }}
                   </a>
-                  <a :href="`https://x.com/search?q=${owner}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                  <a :href="`https://x.com/search?q=$${token?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
                     {{ $t('tweetSearchContractAddress2') }}
                   </a>
-                  <a :href="`https://x.com/search?q=$${token?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                  <a :href="`https://x.com/search?q=($${token?.symbol} OR ${token?.token})&src=typed_query&f=live`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
                     {{ $t('tweetSearchContractAddress3') }}
                   </a>
                 </div>
