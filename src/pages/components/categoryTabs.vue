@@ -42,17 +42,17 @@ const isPump = computed(() => props.activeTab === 'pump')
 const isNew = computed(() => props.activeTab === 'new')
 const isInclusion = computed(() => props.activeTab === 'inclusion')
 const configMap = computed(() => {
-  const pumpMaps = props.categories.reduce((prev,cur)=>{
-    if(cur.is_pump && cur.category !== 'pump'){
-      prev[cur.category] = {
-        icon: '',
-        storageKey: `${cur.category}TableColumns`,
-        getDefaultColumns: getPumpDefault,
-        getOptions: getPumpOptions,
-      }
-    }
-    return prev
-  },{} as any)
+  // const pumpMaps = props.categories.reduce((prev,cur)=>{
+  //   if(cur.is_pump && cur.category !== 'pump'){
+  //     prev[cur.category] = {
+  //       icon: '',
+  //       storageKey: `${cur.category}TableColumns`,
+  //       getDefaultColumns: getPumpDefault,
+  //       getOptions: getPumpOptions,
+  //     }
+  //   }
+  //   return prev
+  // },{} as any)
   return {
     hot: {
       icon: 'custom:hot',
@@ -82,55 +82,55 @@ const configMap = computed(() => {
       getOptions: getPumpOptions,
       class: '',
     },
-    // bonk_pump: {
-    //   icon: '',
-    //   storageKey: 'bonk_pumpTableColumns',
-    //   getDefaultColumns: getPumpDefault,
-    //   getOptions: getPumpOptions,
-    //   class: '',
-    // },
-    // four: {
-    //   icon: '',
-    //   storageKey: 'fourTableColumns',
-    //   getDefaultColumns: getPumpDefault,
-    //   getOptions: getPumpOptions,
-    //   class: '',
-    // },
-    // bonk: {
-    //   icon: '',
-    //   storageKey: 'bonkTableColumns',
-    //   getDefaultColumns: getPumpDefault,
-    //   getOptions: getPumpOptions,
-    //   class: '',
-    // },
-    // moonshot: {
-    //   icon: '',
-    //   storageKey: 'moonshotTableColumns',
-    //   getDefaultColumns: getPumpDefault,
-    //   getOptions: getPumpOptions,
-    //   class: '',
-    // },
-    // Studio: {
-    //   icon: '',
-    //   storageKey: 'StudioTableColumns',
-    //   getDefaultColumns: getPumpDefault,
-    //   getOptions: getPumpOptions,
-    //   class: '',
-    // },
-    // novabits: {
-    //   icon: '',
-    //   storageKey: 'novabitsTableColumns',
-    //   getDefaultColumns: getPumpDefault,
-    //   getOptions: getPumpOptions,
-    //   class: '',
-    // },
-    // heaven_pump:{
-    //   icon:'',
-    //   storageKey:'heaven_pumpTableColumns',
-    //   getDefaultColumns:getPumpDefault,
-    //   getOptions:getPumpOptions,
-    //   class:''
-    // },
+    bonk_pump: {
+      icon: '',
+      storageKey: 'bonk_pumpTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    four: {
+      icon: '',
+      storageKey: 'fourTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    bonk: {
+      icon: '',
+      storageKey: 'bonkTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    moonshot: {
+      icon: '',
+      storageKey: 'moonshotTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    Studio: {
+      icon: '',
+      storageKey: 'StudioTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    novabits: {
+      icon: '',
+      storageKey: 'novabitsTableColumns',
+      getDefaultColumns: getPumpDefault,
+      getOptions: getPumpOptions,
+      class: '',
+    },
+    heaven_pump:{
+      icon:'',
+      storageKey:'heaven_pumpTableColumns',
+      getDefaultColumns:getPumpDefault,
+      getOptions:getPumpOptions,
+      class:''
+    },
     inclusion: {
       icon: 'custom:inclusion',
       storageKey: 'inclusionTableColumns',
@@ -166,13 +166,13 @@ const configMap = computed(() => {
       getOptions:getActivityOptions,
       class:''
     },
-    // xdyorswap_pump:{
-    //   icon:'',
-    //   storageKey:'xdyorswap_pumpTableColumns',
-    //   getDefaultColumns:getPumpDefault,
-    //   getOptions:getPumpOptions,
-    //   class:''
-    // },
+    xdyorswap_pump:{
+      icon:'',
+      storageKey:'xdyorswap_pumpTableColumns',
+      getDefaultColumns:getPumpDefault,
+      getOptions:getPumpOptions,
+      class:''
+    },
     pumplive:{
       icon: 'custom:video',
       storageKey: '',
@@ -180,7 +180,7 @@ const configMap = computed(() => {
       getOptions: () => { },
       class:''
     },
-    ...pumpMaps
+    // ...pumpMaps
   }
 })
 
