@@ -75,7 +75,7 @@ export const useGlobalStore = defineStore('global', () => {
     >
     jump: 'close' | 'open' | 'open_jump'
     border: string
-  }>('pumpSetting4', {
+  }>('pumpSetting5', {
     fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',

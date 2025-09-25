@@ -118,7 +118,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
         'solana',
         sessionStorage
     )
-    const pump_query = useStorage('pump_query', {
+    const pump_query = useStorage('pump_query1', {
       solana: {
         new: '',
         soon: '',
@@ -135,7 +135,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
         graduated: '',
       },
     })
-      const pump_notice = useStorage('pump_notice', {
+      const pump_notice = useStorage('pump_notice2', {
         solana: {
           new: '',
           soon: '',

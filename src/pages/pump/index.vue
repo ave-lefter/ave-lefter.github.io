@@ -140,7 +140,7 @@
                 <span>{{ item.name || '' }}</span>
               </button>
             </div>
-            <span  v-show="isPausedObj.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+            <span  v-show="isPausedObj?.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
@@ -236,7 +236,7 @@
                 <span>{{ item.name || '' }}</span>
               </button>
             </div>
-            <span  v-show="isPausedObj.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+            <span  v-show="isPausedObj?.soon" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
@@ -333,7 +333,7 @@
               </button>
             </div>
 
-            <span  v-show="isPausedObj.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
+            <span  v-show="isPausedObj?.graduated" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
@@ -464,7 +464,7 @@ const pump_count = shallowRef({
   }
 })
 const pump_query  = useStorage(
-  'pump_query',
+  'pump_query1',
   {
     solana: {
       new: '',
@@ -706,7 +706,7 @@ const scrollHeight = computed(()=>{
   return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
 })
 watch(() => list1.value?.[0]?.target_token, useThrottleFn((val) => {
-  const newAudio = pump_notice.value[activeChain.value].new
+  const newAudio = pump_notice.value[activeChain.value]?.new
   if(newAudio && pumpAudio.value && val) {
     audioUrl.value = audioNameToResource[newAudio as keyof typeof audioNameToResource]
     || audioNameToResource.Beep
@@ -714,7 +714,7 @@ watch(() => list1.value?.[0]?.target_token, useThrottleFn((val) => {
   }
 },300))
 watch(() => list2.value?.[0]?.target_token, useThrottleFn((val) => {
-  const soonAudio = pump_notice.value[activeChain.value].soon
+  const soonAudio = pump_notice.value[activeChain.value]?.soon
   if(soonAudio && pumpAudio.value && val) {
     audioUrl.value = audioNameToResource[soonAudio as keyof typeof audioNameToResource]
     || audioNameToResource.Beep
@@ -722,16 +722,16 @@ watch(() => list2.value?.[0]?.target_token, useThrottleFn((val) => {
   }
 },300))
 watch(() => list3.value?.[0]?.target_token, useThrottleFn((val) => {
-  const graduatedAudio = pump_notice.value[activeChain.value].graduated
+  const graduatedAudio = pump_notice.value[activeChain.value]?.graduated
   if(graduatedAudio && pumpAudio.value && val) {
     audioUrl.value = audioNameToResource[graduatedAudio as keyof typeof audioNameToResource]
     || audioNameToResource.Beep
     pumpAudio.value.play()
   }
 },300))
-watch(()=>[pump_notice.value[activeChain.value].new,
-pump_notice.value[activeChain.value].soon,
-pump_notice.value[activeChain.value].graduated
+watch(()=>[pump_notice.value[activeChain.value]?.new,
+pump_notice.value[activeChain.value]?.soon,
+pump_notice.value[activeChain.value]?.graduated
 ],(val)=>{
   if(val.some(el=>!!el)){
     setTimeout(()=>{
