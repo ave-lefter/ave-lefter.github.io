@@ -456,6 +456,11 @@ const pump_count = shallowRef({
     new: 0,
     soon: 0,
     graduated: 0
+  },
+  xlayer: {
+    new: 0,
+    soon: 0,
+    graduated: 0
   }
 })
 const pump_query  = useStorage(
