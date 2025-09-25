@@ -305,9 +305,9 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
         <div class="flex-[2] flex items-center">
           <UserRemark :key="wallet_address" :address="wallet_address" :chain="activeChain" :remark="wallet_alias || ''" :showIcon="true" :teleported="true" :wallet_logo="{logo:wallet_logo,name:wallet_alias, url: ''}" iconSize="24px" avatar-class="mr-4px" :formatAddress="(address) => `(*${ address.slice(-4) })`" :showAddress="false">
             <template #default="{remark}">
-              <span class="color-[--third-text] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px">{{
+              <span class="color-[--secondary-text] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px">{{
                 remark || $t('wallet')
-              }}</span><span class="color-[--secondary-text]">(*{{ wallet_address.slice(-4) }})</span>
+              }}</span><span class="color-[--third-text]">(*{{ wallet_address.slice(-4) }})</span>
             </template>
           </UserRemark>
           <!-- <UserAvatar

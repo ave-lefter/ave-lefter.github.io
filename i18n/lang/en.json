@@ -1428,5 +1428,8 @@
   "enablePnLTips2": "Disable showing PNL",
   "enableShowsReflected": "Enable shows reflected amount on hover",
   "disableShowsReflected": "Disable shows reflected amount on hover",
-  "myToken": "My Token"
+  "myToken": "My Token",
+  "tweetSearchContractAddress": "Search contract address",
+  "tweetSearchContractAddress2": "Search token name",
+  "tweetSearchContractAddress3": "Search name and contract"
 }

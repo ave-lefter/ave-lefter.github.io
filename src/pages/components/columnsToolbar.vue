@@ -86,7 +86,7 @@ function handleSelectChild(childItem, renderKey:string) {
 
 <template>
   <div>
-    <div @click="openDialog" v-if="props.activeTab !=='pumplive'">
+    <div v-if="props.activeTab !=='pumplive'" @click="openDialog">
       <div
         class="flex items-center color-[--secondary-text] hover:color-[--main-text] cursor-pointer"
       >

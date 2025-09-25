@@ -272,7 +272,7 @@ watch(()=>globalStore.footerTokensPrice, (newVal) => {
       const newItem = newVal.filter(i => i.id === ids[index])?.[0]
       if(newItem){
         item.current_price_usd = newItem?.current_price_usd || item.current_price_usd
-        item.color = newItem?.price_change>=0?upColor[0]:downColor[0]
+        item.isUp = newItem?.price_change>=0
       }
     }
   }

@@ -2,7 +2,13 @@
   <header
     class="w-full bg-[--main-bg] flex items-center justify-between p-x-17px h-60px"
   >
-    <NuxtLink to="/" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></NuxtLink>
+    <NuxtLink to="/" class="flex items-center gap-4px">
+      <img height="26" src="~/assets/images/avedex_mobile_logo.png" >
+      <div class="flex items-end gap-5px">
+        <Icon name="custom:name" class="color-[--d-FFF-l-000] text-14px"/>
+        <Icon name="custom:pro" class="text-8px"/>
+      </div>
+    </NuxtLink>
     <!-- <a :href="homeUrl" target="_blank" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></a> -->
     <!-- <ul class="menu ml-20px">
       <li v-for="(item, $index) in list" :key="$index">
@@ -22,7 +28,7 @@
     <a
       class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px w-320px flex items-center no-underline"
       href=""
-      @click.stop.prevent="dialogVisible_search = !dialogVisible_search"
+      @click.stop.prevent="showDialog"
     >
       <Icon
         class="text-16px text-[--third-text]"
@@ -194,7 +200,7 @@
         :name="themeStore.isDark ? 'custom:dark' : 'custom:light'"
       />
     </a>
-    <dialog-search v-model="dialogVisible_search" />
+    <dialog-search ref="dialogSearchRef" v-model="dialogVisible_search"/>
     <!-- <component :is="connectWalletCom" v-model="botStore.connectVisible" /> -->
     <ConnectWalletCom />
     <BotTipDialog/>
@@ -217,6 +223,7 @@ import type { ITGBotResponse } from '~/api/types/ws'
 // const connectWallet = shallowRef<Component | null>(null)
 const audioUrl = ref('')
 const audioElement = useTemplateRef('audioElement')
+const dialogSearchRef = useTemplateRef('dialogSearchRef')
 const { locales } = useI18n()
 const themeStore = useThemeStore()
 const botStore = useBotStore()
@@ -296,6 +303,15 @@ watch(()=>wsStore.wsResult[WSEventType.TGBOT],(subscribeResult:ITGBotResponse)=>
     }
   }
 })
+
+async function showDialog() {
+  dialogVisible_search.value = !dialogVisible_search.value
+  // 自动粘贴剪切板
+  const clipboard = await navigator.clipboard.readText()
+  if(clipboard && dialogSearchRef.value){
+    dialogSearchRef.value.setQuery(clipboard)
+  }
+}
 </script>
 <style lang="scss" scoped>
 header {
