@@ -1014,6 +1014,7 @@ const collect = async (row: any,index:number) => {
             <UserRemark
               :remark="row.remark"
               :address="row.wallet_address"
+              :addressClass="currentRow.wallet_address===row.wallet_address?'bg-#12B88633':''"
               :maxRemarkLength="8"
               :chain="row.chain"
               :wallet_logo="row.wallet_logo" class="color-[--secondary-text]"
