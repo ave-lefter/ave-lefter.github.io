@@ -205,7 +205,7 @@
                 </div>
               </template>
             </el-popover>
-            
+
             <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
               <div
                 v-for="(i, index) in getTags(pair)?.normal_tag"
@@ -580,7 +580,7 @@
     </div>
 
     <div class="flex-1" />
-    <div
+    <!-- <div
       v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100"
       class="item"
     >
@@ -620,7 +620,7 @@
         :show-text="false"
         style="width: 90px"
       />
-    </div>
+    </div> -->
     <div class="item ml-24px items-end!">
       <span class="text-20px color-[--main-text]">
         ${{ formatNumber(price || 0, { decimals: 4, limit: 6 }) }}</span
@@ -638,7 +638,13 @@
       >
     </div>
 
-    <div class="item ml-24px">
+    <div class="item ml-24px" v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100">
+      <span>{{ $t('progress') }}</span>
+      <span class="block mt-8px color-[--main-text]"
+        >{{ formatNumber(pair?.progress || 0, 2) }}%</span
+      >
+    </div>
+    <div class="item ml-24px ">
       <span>{{ $t('mcap') }}</span>
       <span class="block mt-8px color-[--main-text]"
         >${{ formatNumber(marketCap, 2) }}</span
@@ -1334,7 +1340,5 @@ function handleNoticeClose() {
 .item {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 </style>
