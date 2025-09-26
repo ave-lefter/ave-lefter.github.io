@@ -16,21 +16,13 @@
           ]" @click="setActiveTab(tab.value, index)">
           {{ tab.label }}
         </button>
-        <button
-          v-if="botStore?.userInfo?.name"
-          :class="[
-            'shrink-0 text-12px px-12px py-4px rounded-4px border-none cursor-pointer',
-            isMeActive
-              ? 'bg-[--tab-active-bg] color-[--main-text]'
-              : 'bg-transparent color-[--third-text]'
-          ]"
-          @click="toggleClickMe"
-        >
-          <!-- <Icon name="i-tdesign:user-filled" class="text-md" /> -->
-          <span>{{ t('me') }}</span>
-        </button>
       </div>
       <div class="flex items-center gap-8px">
+        <button v-if="botStore?.userInfo?.name" class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
+          :class="{ 'active': isMeActive }" @click="toggleClickMe">
+          <Icon name="i-tdesign:user-filled" class="text-md" />
+          <span>{{ t('me') }}</span>
+        </button>
         <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart" /></span>
         <Icon name="custom:filter" class="text-12px cursor-pointer" :class="isFilterActive?'color-[--primary-color]':'color-[--third-text] hover:color-[--secondary-text]'" @click.self="filterDialogVisible=true"/>
       </div>
@@ -90,7 +82,7 @@
         </div>
 
         <!-- 表格内容 -->
-        <UseVirtualList :key="klineHeight" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 75}px`">
+        <UseVirtualList v-if="filterTableList.length > 0" :key="klineHeight" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 75}px`">
           <!-- <div v-for="(row, index) in filterTableList" :key="index"
             class="relative overflow-hidden cursor-pointer mt-1px first:mt-0" @mouseenter="isPausedTxs = true"
             @mouseleave="isPausedTxs = false" @click="onRowClick({ rowData: row } as any)"> -->
@@ -384,7 +376,7 @@ const dialogFilter = ref({...defaultDialogFilter})
 const tabs = computed(() => {
   const arr: Array<{ label: string, value: string }> = []
   if (Array.isArray(totalHolders.value)) {
-    totalHolders.value.filter(el=>el.type==='25').forEach(i => {
+    totalHolders.value.forEach(i => {
       const num = i.total_address
       if (num > 0) {
         arr.push({
@@ -861,14 +853,15 @@ function setActiveTab(val: string, index: number) {
 
 function toggleClickMe() {
   console.log('🔄 切换"我的交易"筛选')
-  // if (isMeActive.value) {
-  //   isMeActive.value = false
-  //   tableFilter.value.markerAddress = ''
-  // } else {
-    // isMeActive.value = true
-    tableFilter.value.markerAddress = botStore.getWalletAddress(addressAndChain.value.chain)!
-  // }
-  resetData('')
+  if (isMeActive.value) {
+    tableFilter.value.markerAddress = ''
+    dialogFilter.value.markerAddress = ''
+  } else {
+    const walletAddress = botStore.getWalletAddress(addressAndChain.value.chain)!
+    tableFilter.value.markerAddress = walletAddress
+    dialogFilter.value.markerAddress = walletAddress
+  }
+  wsPairCache.value.length = 0  // 清空缓存
   _getTokenTxs()
 }
 

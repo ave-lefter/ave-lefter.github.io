@@ -23,7 +23,7 @@ function formatTime(date:string) {
 
 function reset() {
     if(timestamp.value){
-        timestamp.value.length = 0
+        timestamp.value = []
     }
 }
 
