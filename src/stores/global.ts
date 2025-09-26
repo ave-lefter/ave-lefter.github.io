@@ -12,6 +12,7 @@ export const useGlobalStore = defineStore('global', () => {
   const themeStore = useThemeStore()
   const configStore = useConfigStore()
   const showLeft = shallowRef(true)
+  const isUSDT = useStorage('isUSDT', true)
   const footerTokensPrice = shallowRef([
     {
       token: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
@@ -329,6 +330,7 @@ export const useGlobalStore = defineStore('global', () => {
     rankConditions,
     rankActiveTab,
     mySwapList,
-    pumpLiveSort
+    pumpLiveSort,
+    isUSDT
   }
 })

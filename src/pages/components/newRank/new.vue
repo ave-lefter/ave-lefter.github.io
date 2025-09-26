@@ -88,7 +88,6 @@ const pageInfo = ref({
   pageSize: 50,
   total: 0,
 })
-const isVolUSDT = shallowRef(true)
 const loading = shallowRef(false)
 const storageKey = computed(()=>{
   return props.activeTab + 'TableColumns'
@@ -335,7 +334,6 @@ const cellRenderer = computed(() => {
       <template v-for="item in visibleColumns" :key="item.key" #[`header-${item.key}`]>
         <component
           :is="headerRenderer[item.key as keyof typeof headerRenderer]"
-          v-model:isVolUSDT="isVolUSDT"
           :sortConditions="rankConditions.new.sort"
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
@@ -347,7 +345,6 @@ const cellRenderer = computed(() => {
         <component
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"
-          :isVolUSDT="isVolUSDT"
           :row="row"
           :rowIndex="rowIndex"
           :pageNO="pageInfo.pageNO"

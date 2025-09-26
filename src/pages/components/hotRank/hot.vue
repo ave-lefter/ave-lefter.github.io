@@ -97,7 +97,6 @@ const pageInfo = ref({
   pageSize: 50,
   total: 0,
 })
-const isVolUSDT = shallowRef(true)
 const loading = shallowRef(false)
 const columns = useStorage('hotUserTableColumns', getHotDefaultColumns(t))
 
@@ -446,7 +445,6 @@ function resetColumns(needClear:boolean) {
       <template v-for="item in visibleColumns" :key="item.key" #[`header-${item.key}`]>
         <component
           :is="headerRenderer[item.key as keyof typeof headerRenderer]"
-          v-model:isVolUSDT="isVolUSDT"
           :sortConditions="rankConditions.hot.sort"
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
@@ -462,7 +460,6 @@ function resetColumns(needClear:boolean) {
         <component
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"
-          :isVolUSDT="isVolUSDT"
           :enableKline="activeTab === 'hot'"
           :activeKline="rankKlineStore.klineRow.id === row.id"
           :row="row"
