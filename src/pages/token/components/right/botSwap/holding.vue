@@ -1,5 +1,5 @@
 <template>
-  <div v-if="(Number(walletTokenInfo?.balance_usd || 0) > 0 && Number(tokenStore.swap?.token?.balance || 0) > 0) || isShow" class="max-h-54px flex items-start justify-between color-[--main-text] text-center bg-[--main-list-hover] mb-12px py-10px rd-4px">
+  <div v-if="(Number(walletTokenInfo?.balance_usd || 0) > 0 && Number(tokenStore.swap?.token?.balance || 0) > 0) || isShow || isForceShow" class="max-h-54px flex items-start justify-between color-[--main-text] text-center bg-[--main-list-hover] mb-12px py-10px rd-4px">
     <div class="flex-1">
       <div class="text-11px color-[--third-text]">{{ $t('bought') }}</div>
       <div class="text-12px mt-5px color-#12B886">${{ formatNumber(walletTokenInfo?.total_purchase_usd || 0, 2) }}</div>
@@ -37,6 +37,14 @@ import type { WalletTokenInfo } from '@/api/types/token'
 import { formatNumber } from '@/utils/formatNumber'
 import { useEventBus } from '@vueuse/core'
 import { bot_getAddressAllBalances } from '@/api/bot'
+import { useSwapUpdate } from '~/composables/useSwapUpdate'
+
+defineProps({
+  isForceShow: {
+    type: Boolean,
+    default: false
+  }
+})
 const route = useRoute()
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
@@ -61,6 +69,7 @@ watch(userAddress, (val) => {
 
 
 const walletTokenInfo = ref<WalletTokenInfo | null>(null)
+useSwapUpdate(walletTokenInfo)
 async function getWalletTxData() {
   const [token, chain] = getAddressAndChainFromId(route.params?.id as string, 1)
   if (!token || !chain) {

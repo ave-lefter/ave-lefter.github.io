@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ColumnsToolbar from './columnsToolbar.vue'
 import BlackList from '../pump/blackList.vue'
+import PumpLiveSort from './live/pumpLiveSort.vue'
 import type { CategoryElement, IGetTreasureConfig } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
 import { getNewDefaultColumns, getNewOptions } from './newRank/columnRender/newColumnsService'
@@ -41,6 +42,17 @@ const isPump = computed(() => props.activeTab === 'pump')
 const isNew = computed(() => props.activeTab === 'new')
 const isInclusion = computed(() => props.activeTab === 'inclusion')
 const configMap = computed(() => {
+  const pumpMaps = props.categories.reduce((prev,cur)=>{
+    if(cur.is_pump && cur.category !== 'pump'){
+      prev[cur.category] = {
+        icon: '',
+        storageKey: `${cur.category}TableColumns`,
+        getDefaultColumns: getPumpDefault,
+        getOptions: getPumpOptions,
+      }
+    }
+    return prev
+  },{} as any)
   return {
     hot: {
       icon: 'custom:hot',
@@ -70,55 +82,55 @@ const configMap = computed(() => {
       getOptions: getPumpOptions,
       class: '',
     },
-    bonk_pump: {
-      icon: '',
-      storageKey: 'bonk_pumpTableColumns',
-      getDefaultColumns: getPumpDefault,
-      getOptions: getPumpOptions,
-      class: '',
-    },
-    four: {
-      icon: '',
-      storageKey: 'fourTableColumns',
-      getDefaultColumns: getPumpDefault,
-      getOptions: getPumpOptions,
-      class: '',
-    },
-    bonk: {
-      icon: '',
-      storageKey: 'bonkTableColumns',
-      getDefaultColumns: getPumpDefault,
-      getOptions: getPumpOptions,
-      class: '',
-    },
-    moonshot: {
-      icon: '',
-      storageKey: 'moonshotTableColumns',
-      getDefaultColumns: getPumpDefault,
-      getOptions: getPumpOptions,
-      class: '',
-    },
-    Studio: {
-      icon: '',
-      storageKey: 'StudioTableColumns',
-      getDefaultColumns: getPumpDefault,
-      getOptions: getPumpOptions,
-      class: '',
-    },
-    novabits: {
-      icon: '',
-      storageKey: 'novabitsTableColumns',
-      getDefaultColumns: getPumpDefault,
-      getOptions: getPumpOptions,
-      class: '',
-    },
-    heaven_pump:{
-      icon:'',
-      storageKey:'heaven_pumpTableColumns',
-      getDefaultColumns:getPumpDefault,
-      getOptions:getPumpOptions,
-      class:''
-    },
+    // bonk_pump: {
+    //   icon: '',
+    //   storageKey: 'bonk_pumpTableColumns',
+    //   getDefaultColumns: getPumpDefault,
+    //   getOptions: getPumpOptions,
+    //   class: '',
+    // },
+    // four: {
+    //   icon: '',
+    //   storageKey: 'fourTableColumns',
+    //   getDefaultColumns: getPumpDefault,
+    //   getOptions: getPumpOptions,
+    //   class: '',
+    // },
+    // bonk: {
+    //   icon: '',
+    //   storageKey: 'bonkTableColumns',
+    //   getDefaultColumns: getPumpDefault,
+    //   getOptions: getPumpOptions,
+    //   class: '',
+    // },
+    // moonshot: {
+    //   icon: '',
+    //   storageKey: 'moonshotTableColumns',
+    //   getDefaultColumns: getPumpDefault,
+    //   getOptions: getPumpOptions,
+    //   class: '',
+    // },
+    // Studio: {
+    //   icon: '',
+    //   storageKey: 'StudioTableColumns',
+    //   getDefaultColumns: getPumpDefault,
+    //   getOptions: getPumpOptions,
+    //   class: '',
+    // },
+    // novabits: {
+    //   icon: '',
+    //   storageKey: 'novabitsTableColumns',
+    //   getDefaultColumns: getPumpDefault,
+    //   getOptions: getPumpOptions,
+    //   class: '',
+    // },
+    // heaven_pump:{
+    //   icon:'',
+    //   storageKey:'heaven_pumpTableColumns',
+    //   getDefaultColumns:getPumpDefault,
+    //   getOptions:getPumpOptions,
+    //   class:''
+    // },
     inclusion: {
       icon: 'custom:inclusion',
       storageKey: 'inclusionTableColumns',
@@ -154,13 +166,21 @@ const configMap = computed(() => {
       getOptions:getActivityOptions,
       class:''
     },
-    xdyorswap_pump:{
-      icon:'',
-      storageKey:'xdyorswap_pumpTableColumns',
-      getDefaultColumns:getPumpDefault,
-      getOptions:getPumpOptions,
+    // xdyorswap_pump:{
+    //   icon:'',
+    //   storageKey:'xdyorswap_pumpTableColumns',
+    //   getDefaultColumns:getPumpDefault,
+    //   getOptions:getPumpOptions,
+    //   class:''
+    // },
+    pumplive:{
+      icon: 'custom:video',
+      storageKey: '',
+      getDefaultColumns: () => { },
+      getOptions: () => { },
       class:''
     },
+    ...pumpMaps
   }
 })
 
@@ -194,30 +214,31 @@ function getPumpIcon(isPump: boolean) {
   }
 }
 const globalStore = useGlobalStore()
-const supportCategories = computed(() => {
-  const keys = [
-    'hot',
-    'new',
-    'gainer',
-    'pump',
-    'bonk_pump',
-    'four',
-    'bonk',
-    'moonshot',
-    'Studio',
-    'novabits',
-    'inclusion',
-    'binance_alpha',
-    // 'cto',
-    'xstocks',
-    'volume',
-    'heaven_pump',
-    'xdyorswap_pump'
-  ]
-  return (props.categories || []).filter((el) => {
-    return keys.includes(el.category)
-  })
-})
+// const supportCategories = computed(() => {
+//   const keys = [
+//     'hot',
+//     'new',
+//     'gainer',
+//     'pump',
+//     'bonk_pump',
+//     'four',
+//     'bonk',
+//     'moonshot',
+//     'Studio',
+//     'novabits',
+//     'inclusion',
+//     'binance_alpha',
+//     // 'cto',
+//     'xstocks',
+//     'volume',
+//     'heaven_pump',
+//     'xdyorswap_pump',
+//     'pumplive'
+//   ]
+//   return (props.categories || []).filter((el) => {
+//     return keys.includes(el.category)
+//   })
+// })
 const localeStore = useLocaleStore()
 const sub_category_list = computed(() => {
   return (
@@ -248,7 +269,7 @@ const isSupportedChain = computed(()=>{
 })
 watch(()=>props.categories,()=>{
   setTimeout(()=>{
-    const index = supportCategories.value.findIndex((el) => {
+    const index = props.categories.findIndex((el) => {
       return el.category === props.activeTab
     })
     if (index > -1) {
@@ -268,7 +289,7 @@ watch(()=>props.categories,()=>{
     <div class="flex flex-1 gap-16px justify-between">
       <div ref="categoryRef" class="flex gap-2 text-12px flex-1 overflow-x-auto scrollbar-hide">
         <span
-          v-for="(item, index) in supportCategories"
+          v-for="(item, index) in categories"
           :key="index"
           class="p-2 lh-16px cursor-pointer rounded-1 flex items-center shrink-0 relative"
           :class="
@@ -279,7 +300,7 @@ watch(()=>props.categories,()=>{
           @click="updateCategory(item.category, item.sub_category || [],index)"
         >
           <Icon
-            v-if="configMap[item.category as keyof typeof configMap].icon"
+            v-if="configMap[item.category as keyof typeof configMap]?.icon"
             :name="configMap[item.category as keyof typeof configMap].icon"
             class="mr-1 text-12px"
             :class="configMap[item.category as keyof typeof configMap].class"
@@ -290,7 +311,8 @@ watch(()=>props.categories,()=>{
         </span>
       </div>
       <div class="flex gap-12px items-center text-12px">
-        <div class="p-1 rounded-1 bg-[--main-input-button-bg]">
+        <PumpLiveSort v-if="props.activeTab =='pumplive'"/>
+        <div v-else class="p-1 rounded-1 bg-[--main-input-button-bg]">
           <button
             v-for="(item, index) in intervals"
             :key="index"
@@ -310,13 +332,15 @@ watch(()=>props.categories,()=>{
           <QuickSwapSet
             v-if="globalStore.rankCommon.quickVisible&&isSupportedChain"
             v-model:quickBuyValue="globalStore.rankCommon.quickBuyValue"
-            class="mr-12px"
+            :class=" props.activeTab =='pumplive'? '': 'mr-12px'"
             :settingsButtonVisible="false"
             :chain="(activeChain==='AllChains'?'':activeChain)"
           />
-          <BlackList />
+          <BlackList  v-if="props.activeTab !=='pumplive'"/>
           <ColumnsToolbar
+            v-if="configMap[activeTab as keyof typeof configMap]"
             class="ml-4px"
+            :activeTab="props.activeTab"
             :storageKey="configMap[activeTab as keyof typeof configMap].storageKey"
             :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns"
             :getOptions="configMap[activeTab as keyof typeof configMap].getOptions"

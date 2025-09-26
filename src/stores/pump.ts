@@ -84,7 +84,13 @@ export const usePumpStore = defineStore('pumpStore', () => {
 
     function getPumpConfig() {
         _getPumpConfig().then((res) => {
-            pumpConfig.value = res
+            pumpConfig.value = res || []
+            pumpConfig.value.forEach(i => {
+              if (!pumpV3.value[i.chain].platforms?.length) {
+                const platforms =  i.platforms.map(y=>y?.platform) || []
+                  pumpV3.value[i.chain].platforms = platforms
+              }
+            })
         })
     }
 
@@ -112,7 +118,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
         'solana',
         sessionStorage
     )
-    const pump_query = useStorage('pump_query', {
+    const pump_query = useStorage('pump_query1', {
       solana: {
         new: '',
         soon: '',
@@ -129,21 +135,21 @@ export const usePumpStore = defineStore('pumpStore', () => {
         graduated: '',
       },
     })
-      const pump_notice = useStorage('pump_notice', {
+      const pump_notice = useStorage('pump_notice2', {
         solana: {
-          new: false,
-          soon: false,
-          graduated: false,
+          new: '',
+          soon: '',
+          graduated: '',
         },
         bsc: {
-          new: false,
-          soon: false,
-          graduated: false,
+          new: '',
+          soon: '',
+          graduated: '',
         },
         xlayer: {
-          new: false,
-          soon: false,
-          graduated: false,
+          new: '',
+          soon: '',
+          graduated: '',
         },
       })
     const listData = shallowRef<PumpObj[]>([])

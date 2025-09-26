@@ -12,24 +12,26 @@ import { trackRef } from '~/api/tracking'
 
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
 const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
+const liveComponent = defineAsyncComponent(() => import('./components/live/index.vue'))
 const components = {
   new: newRank,
   inclusion:inclusionRank,
   hot,
   gainer,
-  pump: pumpComponent,
-  bonk_pump: pumpComponent,
-  four: pumpComponent,
-  bonk: pumpComponent,
-  moonshot: pumpComponent,
-  Studio: pumpComponent,
-  novabits: pumpComponent,
+  // pump: pumpComponent,
+  // bonk_pump: pumpComponent,
+  // four: pumpComponent,
+  // bonk: pumpComponent,
+  // moonshot: pumpComponent,
+  // Studio: pumpComponent,
+  // novabits: pumpComponent,
   binance_alpha: activityComponent,
   cto: activityComponent,
   xstocks: activityComponent,
   volume: activityComponent,
-  heaven_pump: pumpComponent,
-  xdyorswap_pump: pumpComponent
+  // heaven_pump: pumpComponent,
+  // xdyorswap_pump: pumpComponent,
+  pumplive: liveComponent
 }
 const walletStore = useWalletStore()
 const botStore = useBotStore()
@@ -40,6 +42,12 @@ const activeChain = useStorage('rankChain', 'AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
 const currentChainObj = computed(() => {
   return chains.value.find((el) => el.net_name === activeChain.value)
+})
+const isPump = computed(()=>{
+  if(Array.isArray(currentChainObj.value?.categories)){
+    return currentChainObj.value.categories.find(el=>el.category === activeTab.value)?.is_pump
+  }
+  return 0
 })
 const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
@@ -257,6 +265,25 @@ function getMedias(appendix: string) {
   }
   return []
 }
+
+const height = computed(() => {
+  const {tokenHistoryVisible} = globalStore
+  // 有子 Tabs
+  if(isPump.value){
+    if(tokenHistoryVisible){
+      return 'calc(100vh - 261px)'
+    }
+    return 'calc(100vh - 229px)'
+  }
+  if(tokenHistoryVisible){
+    return 'calc(100vh - 217px)'
+  }
+  return 'calc(100vh - 185px)'
+})
+
+const needAmmList = computed(()=>{
+  return ['gainer', 'hot', 'new', 'inclusion','binance_alpha','xstocks'].includes(activeTab.value)
+})
 </script>
 
 <template>
@@ -271,13 +298,14 @@ function getMedias(appendix: string) {
       />
       <KeepAlive :max="6">
         <component
-          :is="components[activeTab]"
+          :is="isPump?pumpComponent:components[activeTab as keyof typeof components]"
           ref="dynamicComponentRef"
+          :height="height"
           :listMapFunction="listMapFunction"
           :activeChain="activeChain"
           :activeTab="activeTab"
           :activeSubTab="activeSubTab"
-          :ammList="currentChainObj?.swaps || []"
+          v-bind="needAmmList ? { ammList: currentChainObj?.swaps || [] } : {}"
         />
       </KeepAlive>
     </div>

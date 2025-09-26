@@ -134,17 +134,24 @@
         </a>
       </li>
     </ul>
-    <audio ref='audioElement' controls :src='ring' style='display: none'/>
+    <audio ref='audioElement' controls :src='audioUrl' style='display: none'/>
     <Batch @refresh="()=>{}"/>
   </footer>
 </template>
 
-<script setup lang='ts'>
+<script setup lang='tsx'>
 import ring from '@/assets/audio/ring.wav'
-import { cloneDeep, throttle  } from 'lodash-es'
+import { cloneDeep, first, throttle  } from 'lodash-es'
 import { formatDec } from '~/utils/formatNumber'
 import { getTokensPrice } from '@/api/token'
 import { upColor, downColor } from '@/utils/constants'
+import type { GetSignalV2ListResponse } from '~/api/signal'
+import UserAvatar from '../userAvatar.vue'
+import type { IMonitorWsResponse } from '~/api/types/ws'
+import bellImg from '@/assets/images/bell.svg'
+import { TokenImg } from '#components'
+
+const {t} = useI18n()
 const {visible,hasRing} = storeToRefs(useMonitorStore())
 const signalStore = useSignalStore()
 const globalStore = useGlobalStore()
@@ -155,6 +162,9 @@ const audioElement=ref<HTMLAudioElement|null>(null)
 const { lang } = storeToRefs(globalStore)
 const { token } = storeToRefs(useTokenStore())
 const route = useRoute()
+const isEn = computed(()=>{
+  return lang.value === 'en'
+})
 const addressAndChain = computed(() => {
   const id = route.params.id as string
   if (id) {
@@ -182,6 +192,15 @@ const data = ref<Array<{
 onMounted(() => {
   // Add any initialization logic if needed
   initPage()
+  wsStore.send({
+    'jsonrpc': '2.0',
+    method: 'subscribe',
+    'params': [
+      'signalsv2_public_monitor',
+      'solana'
+    ],
+    'id': 1
+  })
 })
 const initPage = () => {
   // Initialize the page or perform any setup tasks
@@ -253,7 +272,7 @@ watch(()=>globalStore.footerTokensPrice, (newVal) => {
       const newItem = newVal.filter(i => i.id === ids[index])?.[0]
       if(newItem){
         item.current_price_usd = newItem?.current_price_usd || item.current_price_usd
-        item.color = newItem?.price_change>=0?upColor[0]:downColor[0]
+        item.isUp = newItem?.price_change>=0
       }
     }
   }
@@ -268,11 +287,51 @@ watch(() => signalStore.signalVisible, val => {
     isDoted.value = false
   }
 })
-watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], () => {
+
+watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], ({msg}:{msg:GetSignalV2ListResponse}) => {
   if (!signalStore.signalVisible) {
     isDoted.value = true
   }
+  if(globalStore.audioSettings.notice.signal){
+    signalToast(msg)
+  }
 })
+
+function signalToast(val:GetSignalV2ListResponse) {
+  const actionsCount = val.actions.length
+  const actionsVol = val.actions.reduce((acc, curr) => acc + Number(curr.quote_token_amount), 0)
+  const firstAction = val.actions[0]
+  const msg = ElMessage({
+    icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
+    placement:globalStore.audioSettings.notice.position as any,
+    message:()=>(
+      <div 
+        class='inline-flex items-center gap-4px text-12px cursor-pointer'
+        onClick={()=>{
+        navigateTo(`/token/${val.token}-${val.chain}`)
+        }}
+      >
+         {actionsCount === 1 && <UserAvatar 
+            wallet_logo={{logo:firstAction?.wallet_logo,name:firstAction?.wallet_alias}}
+            address={firstAction.wallet_address}
+            chain={val.chain}
+            iconSize='16px'
+        />}
+        <span>{actionsCount}{t('signalUnit')}{t(val.tag.replace('_buy',''))}</span>{t('justNow')}<span class='color-[--up-color] ml--4px'>{t('buy')}{isEn.value ? ' ':''}{
+            formatNumber(actionsVol,1)
+          }{
+            firstAction.quote_token_symbol.toUpperCase() === 'USDC'
+              ? 'U' 
+              : firstAction.quote_token_symbol
+          }</span>{t('of')}
+        <TokenImg row={{logo_url:val.logo,chain:'',symbol:val.symbol}} token-class="w-16px h-16px" />
+        {val.symbol} 
+      </div>
+    )
+  })
+  messageQueue.add(msg)
+}
+
 watch(visible, val => {
   // console.log('visible', val)
   if (val) {
@@ -280,16 +339,67 @@ watch(visible, val => {
   }
 })
 
-watch(() => wsStore.wsResult[WSEventType.MONITOR], () => {
+watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
   // console.log('wsStore.wsResult[WSEventType.MONITOR]', wsStore.wsResult[WSEventType.MONITOR])
   throttle(() => {
-    if(hasRing.value&&botStore.evmAddress){
+    if(globalStore.audioSettings.audio.monitor&&botStore.evmAddress){
       audioElement.value?.play()
     }
   },1000)()
   if (!visible.value) {
     isDoted2.value = true
   }
+  if(globalStore.audioSettings.notice.monitor){
+    monitorToast(val)
+  }
+})
+
+function monitorToast(val:IMonitorWsResponse[]) {
+  val.forEach(item => {
+    const msg = ElMessage({
+      icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
+      placement:globalStore.audioSettings.notice.position as any,
+      message:()=>(
+        <div 
+          class='inline-flex items-center gap-4px text-12px cursor-pointer'
+          onClick={()=>{
+            navigateTo(`/token/${getIsBuy(item)?item.to_address:item.from_address}-${item.chain}`)
+          }}
+        >
+          <UserAvatar 
+              wallet_logo={{logo:item.maker_logo,name:item.maker_alias}}
+              address={item.maker_address}
+              chain={item.chain}
+              iconSize='16px'
+          />
+          <span>{item.maker_alias || (item.maker_address.slice(0,4)+'...'+item.maker_address.slice(-4))}</span>
+          <span>{t('justNow')}<span class={getIsBuy(item)?'color-[--up-color]':'color-[--down-color]'}>{
+            getIsBuy(item)?t('buy'):t('sell')
+            }{isEn.value ? ' ':''}{
+              formatNumber(getIsBuy(item)?item.from_amount:item.to_amount,1)
+            }{
+              getIsBuy(item)?item.from_symbol:item.to_symbol
+            }</span>{t('of')}</span>
+          <TokenImg row={{logo_url:getIsBuy(item)?item.to_logo:item.from_logo,chain:'',symbol:getIsBuy(item)?item.to_symbol:item.from_symbol}} token-class="w-16px h-16px" />
+          {getIsBuy(item)?item.to_symbol:item.from_symbol}
+        </div>
+      )
+    })
+    messageQueue.add(msg)
+  })
+}
+function getIsBuy(item: { position_type?: string | number; tx_type?: string | number }) {
+  // console.log('item', item)
+  if (item.position_type !== undefined) {
+    return item.position_type === 0 || item.position_type === 1
+  } else {
+    return item.tx_type === 0
+  }
+}
+
+const audioUrl = computed(()=>{
+  return audioNameToResource[globalStore.audioSettings.audio.monitor as keyof typeof audioNameToResource]
+  || audioNameToResource.Coin
 })
 </script>
 

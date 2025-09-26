@@ -58,6 +58,7 @@ const props = defineProps<{
   activeChain: string
   activeSubTab: string
   activeTab: string
+  height: string
 }>()
 const {rankConditions} = storeToRefs(globalStore)
 function setSortConditions(params: { sort: string; sort_dir: string }) {
@@ -238,7 +239,7 @@ const filterMap = {
 }
 
 const visibleColumns = computed(() => {
-  return columns.value.filter((el) => {
+  return columns.value?.filter?.((el) => {
     if (filterMap[el.key as keyof typeof filterMap]) {
       return filterMap[el.key as keyof typeof filterMap](el)
     }
@@ -332,7 +333,7 @@ function initCache() {
 }
 </script>
 <template>
-  <div v-loading="loading" style="height: calc(100vh - 229px)">
+  <div v-loading="loading" :style="`height:${height}`">
     <AveTable
       row-key="rowKey"
       :loading="loading"

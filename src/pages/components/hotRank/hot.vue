@@ -49,6 +49,7 @@ const props = defineProps<{
   activeChain: string
   activeSubTab?: string
   activeTab?: string
+  height: string
   ammList: IGetTreasureConfig['swaps']
 }>()
 const aveTableRef = useTemplateRef('aveTableRef')
@@ -412,19 +413,21 @@ function toggleKline(row:Record<string,any>) {
 }
 
 function resetColumns(needClear:boolean) {
-  const quickIndex= columns.value.findIndex(el => el.key === 'quick')
-  if(needClear){
-    columns.value[0].fixed=''
-    columns.value[quickIndex].fixed=''
-  } else {
-    columns.value[0].fixed='left'
-    columns.value[quickIndex].fixed='right'
-    localStorage.setItem('hotUserTableColumns',JSON.stringify(columns.value))
+  const quickIndex = columns.value.findIndex(el => el.key === 'quick')
+  if (columns.value[quickIndex] && columns.value[0]) {
+    if (needClear) {
+      columns.value[0].fixed=''
+      columns.value[quickIndex].fixed=''
+    } else {
+      columns.value[0].fixed='left'
+      columns.value[quickIndex].fixed='right'
+      localStorage.setItem('hotUserTableColumns',JSON.stringify(columns.value))
+    }
   }
 }
 </script>
 <template>
-  <div v-loading="loading" style="height: calc(100vh - 185px)">
+  <div v-loading="loading" :style="`height:${height}`">
     <AveTable
       ref="aveTableRef"
       rowKey="rowKey"

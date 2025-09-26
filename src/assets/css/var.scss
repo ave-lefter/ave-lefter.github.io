@@ -14,7 +14,7 @@
   // 三级文字
   --third-text:var(--d-5A5E64-l-A9B0BC);
   // 图标插画颜色
-  --icon-color:var(--d-383F4B-l-CAD6EC);
+  --icon-color:var(--d-3B3E44-l-CAD6EC);
   // 主要背景
   --main-bg:var(--d-000-l-FFF);
   // 次要背景
@@ -22,7 +22,7 @@
   // 主页列表标题栏背景
   --main-list-header-bg:var(--d-1B1D21-l-ECF3FF);
   // 主页面列表悬浮色
-  --main-list-hover:var(--d-16181D-l-E8F1FF);
+  --main-list-hover:var(--d-1E2025-l-E8F1FF);
   // 主页面输入框&按钮背景色
   --main-input-button-bg:var(--d-16181D-l-ECF3FF);
     // 弹窗背景
@@ -51,6 +51,8 @@
   --dialog-tab-active:var(--d-383F4B-l-FFF);
   // 主页列表标题栏背景
   --table-title-bg:var(--d-12161D-l-ECF3FF);
+  // 主页面悬浮弹窗色
+  --tooltip:var(--d-1F242C-l-FFF);
   &.dark {
     // 规范：颜色相同省略为 3 位，所有都用大写
     --d-333-l-ECECEC: #333;
@@ -202,6 +204,9 @@
     --d-1B1D21-l-ECF3FF: #1B1D21;
     --d-1F242C-l-E0ECFF: #1F242C;
     --d-1F242C-l-E2EEFF: #1F242C;
+    --d-3B3E44-l-CAD6EC: #3B3E44;
+    --d-151A22-l-E8F1FF: #151A22;
+    --d-1E2025-l-E8F1FF: #1E2025;
   }
 
   &.light {
@@ -354,6 +359,9 @@
     --d-1B1D21-l-ECF3FF: #ECF3FF;
     --d-1F242C-l-E0ECFF: #E0ECFF;
     --d-1F242C-l-E2EEFF: #E2EEFF;
+    --d-3B3E44-l-CAD6EC: #CAD6EC;
+    --d-151A22-l-E8F1FF: #E8F1FF;
+    --d-1E2025-l-E8F1FF: #E8F1FF;
   }
 }
 

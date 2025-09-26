@@ -77,7 +77,7 @@
       virtual-triggering
       trigger="contextmenu"
       placement="bottom"
-      :width="170"
+      popper-style="min-width: auto; width: auto;"
     >
       <ul>
         <li class="text-14px mt-4px mb-4px flex-start">
@@ -96,12 +96,12 @@
         </li>
         <li v-if="chain === 'solana'" class="text-14px mt-4px mb-4px flex-start">
           <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-14px color-[--third-text] mr-6px cursor-pointer ml-0"/>
-          <span class="mr-4px color-[--third-text] text-14px">{{ $t('priorityFee') }}</span>
-          {{ botPriorityFee }} SOL
+          <span class="mr-4px color-[--third-text] text-14px whitespace-nowrap block">{{ $t('priorityFee') }}</span>
+          <span class="whitespace-nowrap">{{ botPriorityFee }} SOL</span>
         </li>
         <li class="text-14px mt-4px mb-4px flex-start">
           <Icon v-tooltip="$t('autoSellHalf')" :name="`custom:half-${globalStore.mode}`" class="text-18px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
-          <span class="mr-4px color-[--third-text] text-14px">{{ $t('autoSellHalf') }}</span>
+          <span class="mr-4px color-[--third-text] text-14px whitespace-nowrap">{{ $t('autoSellHalf') }}</span>
           {{  botSettingStore.autoSellConfigs?.autoSell ? $t('on') : $t('off') }}
         </li>
 

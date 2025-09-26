@@ -5,7 +5,7 @@
         class="token-info table-item_d flex items-center whitespace-nowrap overflow-hidden text-ellipsis"
         @click.stop.prevent="tableRowClick(row)"
       >
-        <div class="icon-token-container relative flex mr-2">
+        <div class="icon-token-container relative flex mr-2 lh-0">
           <TokenImg
             :row="{
               logo_url: row.logo_url ? `${s3BaseUrl}${row.logo_url}`:'',

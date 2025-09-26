@@ -2,8 +2,8 @@
   <div>
     <div class="flex justify-between items-center gap-8px h-54px">
       <el-select v-model="selectGroupId" style="--el-fill-color-blank:var(--dialog-list-hover)"  :mode="mode" @click.stop @change="(val) => filterGroup(val)">
-        <el-option :key="0" :value="0" :label="$t('defaultGroup')" class="[&&]:h-20px [&&]:lh-20px [&&]:text-10px"/>
-        <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id"  class="[&&]:h-20px [&&]:lh-20px [&&]:text-10px"/>
+        <el-option :key="0" :value="0" :label="$t('defaultGroup')" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
+        <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id"  class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
       </el-select>
       <el-button ref="addButtonRef" class="dialog-button"  style="height: 32px; padding: 8px 10px !important;font-size: 12px;">
         <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
@@ -56,8 +56,8 @@
           </template>
           <template #cell-group="{ row }">
              <el-select v-model="row.group_id" size="small" :suffix-icon="SuffixIcon" filterable popper-class="w-addrGroup" class="[&&]:[--el-text-color-regular:--main-text] [&&]:[--el-fill-color-blank:--dialog-list-hover]" @click.stop @change="(val) => getRowGroupChange(val, row)">
-              <el-option :key="0" :value="0" :label="$t('defaultGroup')" filterable class="[&&]:h-20px [&&]:lh-20px [&&]:text-10px"/>
-              <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" class="[&&]:h-20px [&&]:lh-20px [&&]:text-10px"/>
+              <el-option :key="0" :value="0" :label="$t('defaultGroup')" filterable class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
+              <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
             </el-select>
           </template>
           <template #header-chain>

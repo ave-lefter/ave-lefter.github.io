@@ -179,16 +179,33 @@
                 </template>
               </div>
             </div>
-            <a
-              class="media-item bg-btn"
-              :href="`https://x.com/search?q=($${token?.symbol} OR ${token?.token})&src=typed_query&f=live`"
-              target="_blank"
-            >
-              <Icon
-                class="text-[--third-text] h-16px w-10px"
-                name="custom:search"
-              />
-            </a>
+            <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
+            <el-popover popper-class="[&&]:[--el-popover-bg-color:--border]">
+              <template #reference>
+                <span
+                  class="media-item bg-btn cursor-pointer"
+                >
+                  <Icon
+                    class="text-[--third-text] h-16px w-10px"
+                    name="custom:search"
+                  />
+              </span>
+              </template>
+              <template #default>
+                <div class="py-4px [&&]:m--12px flex flex-col">
+                  <a :href="`https://x.com/search?q=${token?.token}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                    {{ $t('tweetSearchContractAddress') }}
+                  </a>
+                  <a :href="`https://x.com/search?q=$${token?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                    {{ $t('tweetSearchContractAddress2') }}
+                  </a>
+                  <a :href="`https://x.com/search?q=($${token?.symbol} OR ${token?.token})&src=typed_query&f=live`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                    {{ $t('tweetSearchContractAddress3') }}
+                  </a>
+                </div>
+              </template>
+            </el-popover>
+
             <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
               <div
                 v-for="(i, index) in getTags(pair)?.normal_tag"
@@ -563,7 +580,7 @@
     </div>
 
     <div class="flex-1" />
-    <div
+    <!-- <div
       v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100"
       class="item"
     >
@@ -603,7 +620,7 @@
         :show-text="false"
         style="width: 90px"
       />
-    </div>
+    </div> -->
     <div class="item ml-24px items-end!">
       <span class="text-20px color-[--main-text]">
         ${{ formatNumber(price || 0, { decimals: 4, limit: 6 }) }}</span
@@ -621,7 +638,13 @@
       >
     </div>
 
-    <div class="item ml-24px">
+    <div class="item ml-24px" v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100">
+      <span>{{ $t('progress') }}</span>
+      <span class="block mt-8px color-[--main-text]"
+        >{{ formatNumber(pair?.progress || 0, 2) }}%</span
+      >
+    </div>
+    <div class="item ml-24px ">
       <span>{{ $t('mcap') }}</span>
       <span class="block mt-8px color-[--main-text]"
         >${{ formatNumber(marketCap, 2) }}</span
@@ -848,6 +871,10 @@ function handleFavDialogEvent({ tokenId, type, groupId }: IFavDialogEventArgs) {
 }
 
 const walletStore = useWalletStore()
+const owner = computed(() => {
+  const owner = useCheckStore().checkResult?.owner || token.value?.owner || ''
+  return owner
+})
 const walletAddress = computed(() => {
   return evmAddress.value || walletStore.address
 })
@@ -1313,7 +1340,5 @@ function handleNoticeClose() {
 .item {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 </style>

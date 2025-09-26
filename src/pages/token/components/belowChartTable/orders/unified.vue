@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-table v-loading="loading && !txOrder?.length" :data="txOrder" fit stripe :height="tableHeight"
+    <el-table v-loading="loading && !txOrder?.length" :data="txOrder" fit stripe :height="tableHeight" row-class-name="text-12px" header-row-class-name="text-12px"
       style="width: 100%" @row-click="tableRowClick">
       <template #empty>
         <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
@@ -31,7 +31,7 @@
                       alt="" srcset="">
                   </template>
                 </el-image>
-                <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-3px rd-50%"
+                <img v-if="row?.chain" class="w-12px h-12px absolute bottom-3px right-0 rd-50%"
                   :src="`${configStore.token_logo_url}chain/${row.chain}.png`" alt="" srcset="">
               </div>
             </div>

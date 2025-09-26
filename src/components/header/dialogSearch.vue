@@ -354,13 +354,19 @@ onMounted(() => {
 })
 function done() {
   if (tabActive.value === 'token') {
-    if (query) {
+    if (query.value) {
       tokenSearch()
     } else {
       _getHotTokens()
     }
   }
 }
+
+defineExpose({
+  setQuery(val:string){
+    query.value = val
+  }
+})
 </script>
 
 <style lang="scss" scoped>

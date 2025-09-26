@@ -1,6 +1,7 @@
 <template>
   <div class="flex bg-[--main-divider] gap-1px flex min-w-0 w-full" style="min-height: calc(100vh - 92px);">
     <div class="flex-1 min-w-0">
+      <TokenHistory v-if="globalStore.tokenHistoryVisible" class="mb-1px"/>
       <Top/>
       <div class="flex gap-1px">
         <div class="hide-scrollbar">
@@ -74,7 +75,13 @@ const tagStore = useTagStore()
 const tokenStore = useTokenStore()
 const scrollbarHeight = computed(() => {
   if (tokenStore.isShowWaring) {
+    if(globalStore.tokenHistoryVisible){
+      return 'calc(100vh - 230px)'
+    }
     return 'calc(100vh - 198px)'
+  }
+  if(globalStore.tokenHistoryVisible){
+    return 'calc(100vh - 190px)'
   }
   return 'calc(100vh - 158px)'
 })
@@ -226,7 +233,7 @@ function subscribePortrait() {
 
 function _getTokenInfo() {
   const id = route.params.id as string
-  getTokenInfo(id).then(res => {
+  return getTokenInfo(id).then(res => {
     tokenStore.tokenInfo = res
     tokenStore.pairAddress = res?.pairs?.[0].pair || ''
   })
@@ -239,9 +246,13 @@ function _getTokenInfoExtra() {
   })
 }
 
-function init() {
+function init(isRefresh = false) {
   tokenStore.tokenPrice = 0
-  _getTokenInfo()
+  _getTokenInfo().then(()=>{
+    if(!isRefresh){
+      addVisit()
+    }
+  })
   _getTokenInfoExtra()
   // wsStore.onmessageTxUpdateToken()
   tokenStore._getTotalHolders(route.params.id as string)
@@ -290,7 +301,28 @@ onBeforeRouteLeave(() => {
 })
 
 function refresh() {
-  init()
+  init(true)
+}
+
+function addVisit() {
+  if(tokenStore.tokenInfo){
+    const {logo_url,symbol,chain,token} = tokenStore.tokenInfo.token
+    const index = globalStore.lastVisitTokens.findIndex(item => item.id === token+'-'+chain)
+    if(index !== -1){
+      globalStore.lastVisitTokens.splice(index, 1)
+    } else if(globalStore.lastVisitTokens.length >= 20){
+      globalStore.lastVisitTokens.pop()
+    }
+    globalStore.lastVisitTokens.unshift({
+      id:token+'-'+chain,
+      logo_url,
+      symbol,
+      price_change: tokenStore.priceChange,
+      circulation: tokenStore.circulation.toString(),
+      price: tokenStore.price || 0,
+    })
+    usePriceV2Store().sendPriceWs()
+  }
 }
 </script>
 

@@ -6,6 +6,8 @@ import unified from './unified.vue'
 import { bot_getUserWalletTxInfo } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
 import { useSessionStorage } from '@vueuse/core'
+import type { WalletTokenInfo } from '~/api/types/token'
+import type { IPriceV2Response } from '~/api/types/ws'
 
 // const props = defineProps({
 //   currentActiveTab: {
@@ -25,7 +27,8 @@ const unifiedRef = ref()
 const _chain = getAddressAndChainFromId(route.params.id as string)?.chain
 const activeTab = ref(_chain || walletStore.chain || 'solana')
 const botOrderOnlyCurrentToken = useSessionStorage('mySwapBotOrderOnlyCurrentToken', true)
-const walletTxData = ref<any>()
+const walletTxData = ref<WalletTokenInfo>()
+useSwapUpdate(walletTxData)
 const tabs = computed(() => {
   // 获取原始地址数组
   const addresses = botStore.userInfo?.addresses || []
@@ -140,7 +143,10 @@ let timer: null | ReturnType<typeof setInterval> = null
 let lastUpdateTime = 0
 const maxUpdateNum = 15
 
-watch([() => wsStore.wsResult?.tgbot], () => {
+watch(() => wsStore.wsResult[WSEventType.TGBOT], (val) => {
+  if(!val){
+    return
+  }
   const chain = getAddressAndChainFromId(String(route.params.id))?.chain
   if (tabs.value.find(i => i?.chain === chain)) {
     activeTab.value = chain
@@ -166,7 +172,7 @@ watch([() => wsStore.wsResult?.tgbot], () => {
   } else {
     lastUpdateTime = 0
   }
-})
+},{immediate:true})
 
 watch([() => route.params.id], () => {
   const chain = getAddressAndChainFromId(String(route.params.id))?.chain
@@ -199,6 +205,7 @@ onMounted(() => {
 onActivated(() => {
    refreshData()
 })
+
 </script>
 
 <template>
@@ -278,7 +285,7 @@ onActivated(() => {
       </div>
     </div>
 
-    <unified v-if="botStore?.userInfo?.evmAddress || walletStore.address" ref="unifiedRef" :chain="activeTab" :currentToken="botOrderOnlyCurrentToken" :userAddress="userAddress || ''" />
+    <unified v-if="botStore?.userInfo?.evmAddress || walletStore.address" ref="unifiedRef" :chain="activeTab" :currentToken="botOrderOnlyCurrentToken" :userAddress="userAddress || ''"/>
   </div>
 </template>
 

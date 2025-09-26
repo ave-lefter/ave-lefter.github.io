@@ -1,6 +1,6 @@
 <template>
   <div @click.stop.prevent>
-    <span class="text-12px color-[--main-text]">{{ $t('MC') }}</span>
+    <span class="text-12px color-[--main-text]">{{ $t('MC') }}($)</span>
     <div class="flex-between mt-8px gap-9px">
       <div class="item flex-1">
         <div class="border-1px border-solid border-[--border] px-4px py-1px flex-start">
@@ -88,7 +88,7 @@
         >
       </div>
     </div>
-    <span class="text-12px color-[--main-text] mt-16px block">{{ $t('vol') }}</span>
+    <span class="text-12px color-[--main-text] mt-16px block">{{ $t('vol') }}($)</span>
     <div class="flex-between mt-8px gap-9px">
       <div class="item flex-1">
         <div class="border-1px border-solid border-[--border] px-4px py-1px flex-start">
@@ -113,7 +113,7 @@
           <Icon
             name="custom:refresh"
             class="color-[--third-text] text-8px ml-2px cursor-pointer"
-            @click.stop.prevent="reset('mc', 'min')"
+            @click.stop.prevent="reset('vol', 'min')"
           />
         </div>
         <span class="text-8px color-[--third-text] mt-2px"
@@ -363,7 +363,7 @@ function reset(type: string, dir: string) {
       pumpSetting.value.data.mc.maxColor = '#12B886'
     }
   }
-    if (type === 'vol') {
+  if (type === 'vol') {
     if (dir === 'min') {
       pumpSetting.value.data.vol.minSize = 1000
       pumpSetting.value.data.vol.minColor = getCssVariable('--main-text')

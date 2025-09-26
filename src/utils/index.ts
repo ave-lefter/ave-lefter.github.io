@@ -17,6 +17,7 @@ import { useStorage } from '@vueuse/core'
 import type { Size, SizeObj, pumpObjColor } from '~/api/types/pump'
 import FingerprintJs from '@fingerprintjs/fingerprintjs'
 import { UniChainsV4 } from './wallet/utils/abi'
+import type { MessageHandler } from 'element-plus'
 export * from './wallet/utils/index'
 
 export function isJSON(str: string) {
@@ -1120,3 +1121,25 @@ export function getLightDarkValue(cssVarName: string) {
     dark: getCssVariable(darkName),
   }
 }
+
+// 当有新消息时将数据存入队列，保证队列中只有 10 条数据，将久远的数据删除
+class MessageQueue {
+  private queue: MessageHandler[] = []
+  private maxLength = 10
+
+  add(message: MessageHandler) {
+    this.queue.push(message)
+    if (this.queue.length > this.maxLength) {
+      const message = this.queue.shift()
+      if (message) {
+        message.close()
+      }
+    }
+  }
+
+  getQueue() {
+    return this.queue
+  }
+}
+
+export const messageQueue = new MessageQueue()

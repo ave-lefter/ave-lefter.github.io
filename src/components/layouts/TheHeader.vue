@@ -2,7 +2,13 @@
   <header
     class="w-full bg-[--main-bg] flex items-center justify-between p-x-17px h-60px"
   >
-    <NuxtLink to="/" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></NuxtLink>
+    <NuxtLink to="/" class="flex items-center gap-4px">
+      <img height="26" src="~/assets/images/avedex_mobile_logo.png" >
+      <div class="flex items-end gap-5px">
+        <Icon name="custom:name" class="color-[--d-FFF-l-000] text-14px"/>
+        <Icon name="custom:pro" class="text-8px"/>
+      </div>
+    </NuxtLink>
     <!-- <a :href="homeUrl" target="_blank" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></a> -->
     <!-- <ul class="menu ml-20px">
       <li v-for="(item, $index) in list" :key="$index">
@@ -22,7 +28,7 @@
     <a
       class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px w-320px flex items-center no-underline"
       href=""
-      @click.stop.prevent="dialogVisible_search = !dialogVisible_search"
+      @click.stop.prevent="showDialog"
     >
       <Icon
         class="text-16px text-[--third-text]"
@@ -144,7 +150,15 @@
         </div>
       </div>
     </el-popover>
-
+    <div
+      class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px flex items-center cursor-pointer hover:opacity-80"
+      @click="globalStore.audioSettings.active = 'notice'"
+    >
+      <Icon
+        class="text-20px color-[--secondary-text]"
+        name="custom:alert"
+      />
+    </div>
     <Notice/>
     <el-dropdown
       trigger="click"
@@ -186,10 +200,12 @@
         :name="themeStore.isDark ? 'custom:dark' : 'custom:light'"
       />
     </a>
-    <dialog-search v-model="dialogVisible_search" />
+    <dialog-search ref="dialogSearchRef" v-model="dialogVisible_search"/>
     <!-- <component :is="connectWalletCom" v-model="botStore.connectVisible" /> -->
     <ConnectWalletCom />
     <BotTipDialog/>
+    <AudioSettings/>
+    <audio ref='audioElement' controls :src='audioUrl' class="hidden"/>
   </header>
 </template>
 <script lang="ts" setup>
@@ -201,15 +217,22 @@ import Positions from '@/components/header/positions/index.vue'
 import ExWalletBtn from '../header/connectWallet/exWalletBtn.vue'
 import BotTipDialog from './components/botTipDialog.vue'
 import ClipboardToken from './components/clipboardToken.vue'
+import AudioSettings from './components/audioSettings.vue'
+import type { ITGBotResponse } from '~/api/types/ws'
 // import connectWallet from '@/components/header/connectWallet/index.vue'
 // const connectWallet = shallowRef<Component | null>(null)
+const audioUrl = ref('')
+const audioElement = useTemplateRef('audioElement')
+const dialogSearchRef = useTemplateRef('dialogSearchRef')
 const { locales } = useI18n()
 const themeStore = useThemeStore()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
+const wsStore = useWSStore()
 const route = useRoute()
 const langStore = useLocaleStore()
 const {t } = useI18n()
+const globalStore = useGlobalStore()
 const  appDownloadVisible = shallowRef(false)
 const list = computed(() => {
   // let query = ''
@@ -258,6 +281,36 @@ onMounted(()=>{
 
 function toReferrer() {
   window.open('/referral')
+}
+
+watch(()=>wsStore.wsResult[WSEventType.TGBOT],(subscribeResult:ITGBotResponse)=>{
+  if (subscribeResult?.txList?.[0]?.success) {
+    const {swapType} = subscribeResult
+    const {audioSettings:{audio}} = globalStore
+    const map = {
+      [SwapType.BUY]: audio.marketBuy,
+      [SwapType.SELL]: audio.marketSell,
+      [SwapType.LIMIT_BUY]: audio.limit,
+      [SwapType.LIMIT_SELL]: audio.limit,
+    }
+    if(map[swapType]) {
+      audioUrl.value = audioNameToResource[map[swapType] as keyof typeof audioNameToResource]
+      setTimeout(()=>{
+        if(audioElement.value) {
+          audioElement.value.play()
+        }
+      },20)
+    }
+  }
+})
+
+async function showDialog() {
+  dialogVisible_search.value = !dialogVisible_search.value
+  // 自动粘贴剪切板
+  const clipboard = await navigator.clipboard.readText()
+  if(clipboard && dialogSearchRef.value){
+    dialogSearchRef.value.setQuery(clipboard)
+  }
 }
 </script>
 <style lang="scss" scoped>
