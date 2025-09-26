@@ -467,7 +467,7 @@ const filterTableList = computed(() => {
 })
 
 watch(() => klineDateFilter?.value, (val) => {
-  if (val) {
+  if (val && props.modelValue) {
     tableFilter.value.timestamp = val
     _getTokenTxs()
   }

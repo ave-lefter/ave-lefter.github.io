@@ -223,7 +223,7 @@ const addressAndChain = computed(() => {
 })
 
 watch(() => klineDateFilter?.value, (val) => {
-  if (val) {
+  if (val && !orderBookVisible.value) {
     tableFilter.value.timestamp = val
     _getTokenTxs()
   }
