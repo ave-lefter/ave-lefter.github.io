@@ -1,5 +1,5 @@
 <template>
-  <div class="w-safe bg-[--secondary-bg] flex-1 w-100% px-200px pt-40px" style="height: calc(100vh - 92px)">
+  <div class="w-safe bg-[--secondary-bg] flex-1 w-100% px-200px pt-40px overflow-y-auto" style="height: calc(100vh - 92px)">
     <div v-if="step !== 0" class="flex-start text-20px mb-22px">
       <el-icon size="12" class="clickable" @click="step=0">
         <Back />
