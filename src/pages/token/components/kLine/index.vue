@@ -680,8 +680,16 @@ async function initChart() {
     }
     tokenDetailsStore.$patch($patchParams)
   })
+
+  let mouseDownTime = 0
+  _widget.subscribe('mouse_down',()=>{
+    mouseDownTime = performance.now()
+  })
   
   _widget.subscribe('mouse_up', (e) => {
+    if(performance.now() - mouseDownTime >=100){
+      return
+    }
     const startTime = _widget?.activeChart().getTimeScale().coordinateToTime(e.clientX-56)
     if(startTime && resolution.value){
       // 获取 tradingview 时间周期

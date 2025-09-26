@@ -26,6 +26,8 @@ import DateFilterCard from '../../dateFilterCard.vue'
 // import type { content } from 'html2canvas/dist/types/css/property-descriptors/content'
 const globalStore = useGlobalStore()
 const klineDateFilter = inject<Ref<string[]>>(ProvideType.KLINE_DATE_FILTER)
+// 订单簿状态 - 通过 provide/inject 与父组件通信
+const orderBookVisible = inject<Ref<boolean>>('orderBookVisible', ref(false))
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
@@ -248,6 +250,14 @@ watch(() => route.params.id, val => {
 
 watch(() => followStore.currentAddress, () => {
   if (activeTab.value === '-100') {
+    _getTokenTxs()
+  }
+})
+
+watch(orderBookVisible,(val,oldVal)=>{
+  if(oldVal && !val){
+    resetCache()
+    tableFilter.value.markerAddress = ''
     _getTokenTxs()
   }
 })

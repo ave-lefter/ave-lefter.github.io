@@ -569,9 +569,9 @@ async function _getTokenTxs() {
     }).reverse()
   } catch (e) {
     // 只有在没有现有数据时才清空，避免网络错误导致数据丢失
-    if (tokenTxs.value.length === 0) {
+    // if (tokenTxs.value.length === 0) {
       tokenTxs.value = []
-    }
+    // }
     console.log('🚨 订单薄数据获取失败:', e)
   } finally {
     listStatus.value.loadingTxs = false
