@@ -240,7 +240,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits<{
-  (e: 'update:c-type', cType: 'login' | 'register'| 'reset'): void
+  (e: 'update:c-type', cType: 'login' | 'register' | 'reset'): void,
+  (e: 'update:show-bot-mnemonic-phrase', cType: true | false): void,
 }>()
 const count = ref(60)
 const isCounting = ref(false)
@@ -449,7 +450,8 @@ function register() {
 function submitForm() {
   loading.value = true
   if (props.cType == 'login') {
-    login()
+    emit('update:show-bot-mnemonic-phrase', true)
+    // login()
   } else {
     register()
   }
