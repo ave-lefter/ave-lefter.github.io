@@ -42,7 +42,7 @@
               }"
               @click.stop.prevent="handleFilterQuery('')"
             /> -->
-            <Icon name="custom:filter" v-if="searchKeyword" class="color-[--d-FFF-l-000] cursor-pointer text-10px" @click.stop.prevent="handleFilterQuery('')" />
+            <Icon v-if="searchKeyword" name="custom:filter" class="color-[--d-FFF-l-000] cursor-pointer text-10px" @click.stop.prevent="handleFilterQuery('')" />
             <el-popover
               v-else
               v-model:visible="visible"
@@ -221,18 +221,18 @@
         </template>
       </el-table-column> -->
       <el-table-column
-        :label="$t('ratio') + isShowBalance ? $t('bal') : $t('amount')"
+        :label="$t('ratio') + globalStore.isUSDT ? $t('bal') : $t('amount')"
         align="right"
-        :width="getTextWidth((isShowBalance? $t('bal') : $t('amount')) +'/'+ $t('ratio'))+ 100"
+        :width="getTextWidth((globalStore.isUSDT? $t('bal') : $t('amount')) +'/'+ $t('ratio'))+ 100"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         prop="balance"
       >
         <template #header>
           <div style="display: inline-flex; align-items: center">
-            <span>{{ $t('ratio')}}/{{ isShowBalance ? $t('bal') : $t('amount') }}</span>
-            <Icon v-show="isShowBalance" name="custom:dollar" class="color-[--third-text] clickable text-12px ml-3px"  @click.stop="isShowBalance = false" />
-            <Icon v-show="!isShowBalance" name="custom:amount" class="color-[--third-text] clickable text-12px ml-3px" @click.stop="isShowBalance = true" />
+            <span>{{ $t('ratio')}}/{{ globalStore.isUSDT ? $t('bal') : $t('amount') }}</span>
+            <Icon v-show="globalStore.isUSDT" name="custom:dollar" class="color-[--third-text] clickable text-12px ml-3px"  @click.stop="globalStore.isUSDT = false" />
+            <Icon v-show="!globalStore.isUSDT" name="custom:amount" class="color-[--third-text] clickable text-12px ml-3px" @click.stop="globalStore.isUSDT = true" />
           </div>
         </template>
         <template #default="{ row }">
@@ -254,7 +254,7 @@
               {{ formatNumber((row?.balance_ratio || 0) * 100, 1) }}%
             </div>
             <div
-              v-if="isShowBalance"
+              v-if="globalStore.isUSDT"
               class="text-12px color-[--third-text]"
               style="line-height: 1.3"
             >
@@ -951,7 +951,7 @@ const { t } = useI18n()
 const globalStore = useGlobalStore()
 const themeStore = useThemeStore()
 const route = useRoute()
-const isShowBalance = shallowRef(true)
+// const isShowBalance = shallowRef(true)
 const visible = shallowRef(false)
 const searchKeyword = shallowRef('')
 const keyword = shallowRef('')

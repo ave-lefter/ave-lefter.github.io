@@ -1,8 +1,8 @@
 <script setup lang="ts">
 defineProps<{
   row: any
-  isVolUSDT: boolean
 }>()
+const globalStore = useGlobalStore()
 function getTarget(row, key: 'symbol' | 'value' | 'init') {
   const isZero = row.target_token === row.token0_address
   return {
@@ -14,7 +14,7 @@ function getTarget(row, key: 'symbol' | 'value' | 'init') {
 </script>
 
 <template>
-  <div v-if="isVolUSDT">
+  <div v-if="globalStore.isUSDT">
     <div class="lh-18px mb-2px" :class="row.tvl < row.init_tvl ? 'color-[--down-color]' : 'color-[--main-text]'">
       ${{ formatNumber(row.tvl || 0, 1) }}
     </div>

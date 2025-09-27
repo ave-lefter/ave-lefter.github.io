@@ -267,16 +267,9 @@ function getMedias(appendix: string) {
 }
 
 const height = computed(() => {
-  const {tokenHistoryVisible} = globalStore
   // 有子 Tabs
   if(isPump.value){
-    if(tokenHistoryVisible){
-      return 'calc(100vh - 261px)'
-    }
     return 'calc(100vh - 229px)'
-  }
-  if(tokenHistoryVisible){
-    return 'calc(100vh - 217px)'
   }
   return 'calc(100vh - 185px)'
 })
