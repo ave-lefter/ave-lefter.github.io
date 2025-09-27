@@ -308,7 +308,8 @@ async function showDialog() {
   dialogVisible_search.value = !dialogVisible_search.value
   // 自动粘贴剪切板
   const clipboard = await navigator.clipboard.readText()
-  if(clipboard && dialogSearchRef.value){
+  const isValid = clipboard && ['eth', 'solana','tron','sui','ton','brc20'].some(i => isValidAddress(clipboard, i))
+  if(isValid && dialogSearchRef.value){
     dialogSearchRef.value.setQuery(clipboard)
   }
 }

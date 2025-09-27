@@ -175,7 +175,9 @@
 
                       <UserRemark :remark="row.remark" :address="row.wallet_address"
                         :show-address="!(row?.newTags?.length > 1)" :chain="row.chain" :wallet_logo="row.wallet_logo"
-                        addressClass="inline-block truncate max-w-full"
+                        :addressClass="`inline-block truncate max-w-full ${
+                          markerTooltipVisible && currentRow.wallet_address===row.wallet_address?'bg-#12B88633':''
+                        }`"
                         :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
                         class="color-[--secondary-text] truncate min-w-0 !text-12px"
                         :mouseoverAddress="e => openMarkerTooltip(row, e)" :canEdit="false"
