@@ -75,7 +75,7 @@ import { useEventBus } from '@vueuse/core'
    return ['/smart','/address'].some(url=>route.fullPath.includes(url))
   })
   const tokenHistoryVisible = computed(()=>{
-    return !['/','/token/'].some(url=>route.fullPath.includes(url))
+    return !route.fullPath.includes('/token/') && route.fullPath!=='/'
   })
 
   const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
