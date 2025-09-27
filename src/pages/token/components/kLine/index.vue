@@ -687,7 +687,7 @@ async function initChart() {
   })
   
   _widget.subscribe('mouse_up', (e) => {
-    if(performance.now() - mouseDownTime >=100){
+    if(performance.now() - mouseDownTime >=200){
       return
     }
     const startTime = _widget?.activeChart().getTimeScale().coordinateToTime(e.clientX-56)
