@@ -92,7 +92,7 @@
                 <div
                 class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
                 @mouseenter="isPausedTxs = true"
-                @mouseleave="isPausedTxs = false" 
+                @mouseleave="isPausedTxs = false"
                 @click="onRowClick({ rowData: row } as any)"
                 >
                 <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
@@ -334,7 +334,6 @@ const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const wsStore = useWSStore()
 const tagStore = useTagStore()
-const globalStore = useGlobalStore()
 const tokenDetailSStore = useTokenDetailsStore()
 
 // 状态管理
@@ -1159,7 +1158,7 @@ function resetDialogFilter() {
   dialogFilter.value = {
  ...defaultDialogFilter
   }
- 
+
   confirmDialogFilter()
 }
 </script>
