@@ -231,6 +231,8 @@ export const useGlobalStore = defineStore('global', () => {
   const mySwapList = ref<any[]>([])
 
    const hotList = shallowRef<GetHotTokensResponse[]>([])
+  //  点击图表显示交易历史
+   const isClickKlineFilter = useStorage('isClickKlineFilter', true)
    function sendFooterPriceWs() {
     const data = {
       jsonrpc: '2.0',
@@ -328,6 +330,7 @@ export const useGlobalStore = defineStore('global', () => {
     getUserFavoriteGroups: _getUserFavoriteGroups,
     rankConditions,
     rankActiveTab,
+    isClickKlineFilter,
     mySwapList,
     pumpLiveSort
   }

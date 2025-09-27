@@ -404,7 +404,8 @@ export function getTokenTxs(query: {
     method: 'get',
     query:{
       address,
-      ...query
+      ...query,
+      history:1
     }
   })
 }

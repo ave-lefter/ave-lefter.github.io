@@ -25,13 +25,16 @@ import { useKlineMarks } from './mark'
 import {DefaultHeight, WSSimpleTxChain} from '~/utils/constants'
 import { TW_STUDY } from './constant'
 import UnknownRisk from './unknownRisk.vue'
+import dayjs from 'dayjs'
 
 const props = defineProps<{
   isRank?:boolean
 }>()
+const klineDateFilter = inject<Ref<string[]>>(ProvideType.KLINE_DATE_FILTER)
 const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const botStore = useBotStore()
 const tokenDetailsStore = useTokenDetailsStore()
+const globalStore = useGlobalStore()
 const route = useRoute()
 const token = computed(() => {
   return (props.isRank && 'klineRow' in tokenStore) ? tokenStore.klineRow?.id : route.params.id as string
@@ -676,6 +679,27 @@ async function initChart() {
       user_address
     }
     tokenDetailsStore.$patch($patchParams)
+  })
+
+  let mouseDownTime = 0
+  _widget.subscribe('mouse_down',()=>{
+    mouseDownTime = performance.now()
+  })
+  
+  _widget.subscribe('mouse_up', (e) => {
+    if(performance.now() - mouseDownTime >=200){
+      return
+    }
+    const startTime = _widget?.activeChart().getTimeScale().coordinateToTime(e.clientX-56)
+    if(startTime && resolution.value){
+      // 获取 tradingview 时间周期
+      const dayjsParams = resolutionMap[resolution.value as keyof typeof resolutionMap] || {val:resolution.value,unit:'m'}
+      const endTime = dayjs(startTime*1000).add(dayjsParams.val,dayjsParams.unit).unix()
+      if(globalStore.isClickKlineFilter && klineDateFilter?.value){
+        klineDateFilter.value = [String(startTime),String(endTime)]
+      }
+    }
+   
   })
 
   subscribeStudyEvent()

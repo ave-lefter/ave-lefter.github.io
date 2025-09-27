@@ -17,15 +17,20 @@
           {{ tab.label }}
         </button>
       </div>
-      <button v-if="botStore?.userInfo?.name" class="me-btn shrink-0 flex items-center gap-4px sticky right-0 "
-        :class="{ 'active': isMeActive }" @click="toggleClickMe">
-        <Icon name="i-tdesign:user-filled" class="text-md" />
-        <span>{{ t('me') }}</span>
-      </button>
+      <div class="flex items-center gap-8px">
+        <button v-if="botStore?.userInfo?.name" class="me-btn shrink-0 flex items-center gap-4px sticky right-0 cursor-pointer"
+          :class="{ 'active': isMeActive }" @click="toggleClickMe">
+          <Icon name="i-tdesign:user-filled" class="text-md" />
+          <span>{{ t('me') }}</span>
+        </button>
+        <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart" /></span>
+        <Icon name="custom:filter" class="text-12px cursor-pointer" :class="isFilterActive?'color-[--primary-color]':'color-[--third-text] hover:color-[--secondary-text]'" @click.self="filterDialogVisible=true"/>
+      </div>
     </div>
 
     <!-- 表格 -->
     <div class="px-12px">
+      <DateFilterCard v-if="tableFilter.timestamp.length" v-model:timestamp="tableFilter.timestamp" @update:timestamp="_getTokenTxs"/>
       <div v-loading="listStatus.loadingTxs" class="text-12px">
         <!-- 表格头部 -->
         <div
@@ -77,7 +82,7 @@
         </div>
 
         <!-- 表格内容 -->
-        <UseVirtualList :key="klineHeight" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 75}px`">
+        <UseVirtualList v-if="filterTableList.length > 0" :key="klineHeight" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 75}px`">
           <!-- <div v-for="(row, index) in filterTableList" :key="index"
             class="relative overflow-hidden cursor-pointer mt-1px first:mt-0" @mouseenter="isPausedTxs = true"
             @mouseleave="isPausedTxs = false" @click="onRowClick({ rowData: row } as any)"> -->
@@ -227,6 +232,55 @@
       <SignalTags tagClass="mr-3px" :tags="currentRow.newTags" :walletAddress="currentRow.wallet_address"
         :chain="currentRow.chain" />
     </MarkerTooltip>
+    <el-dialog v-model="filterDialogVisible" :width="440" :title="$t('markerAddressFilter')">
+      <div class="mx--16px h-1px bg-[--border] mb-20px"/>
+      <div class="mb-10px">
+        <label for="markerAddress">
+          {{ $t('markerAddress') }}
+        </label>
+      </div>
+      <el-input id="markerAddress" v-model="dialogFilter.markerAddress" clearable class="text-12px" :placeholder="$t('markerAddress')"/>
+      <div class="mb-10px mt-20px">
+        <label>
+          {{ $t('filter') }}
+        </label>
+      </div>
+      <div class="flex items-center gap-20px">
+        <el-input
+          v-model.trim.number="dialogFilter.minVol"
+          clearable
+          type="text"
+          class="text-12px"
+          :placeholder="$t('filterSmallAmount')"
+          style="--el-input-border-color:var(--border);"
+          @input="(value) => (dialogFilter.minVol = value.replace(/\-|[^\d.]/g, ''))"
+        >
+          <template #suffix>$</template>
+        </el-input>
+        <el-input
+          v-model.trim.number="dialogFilter.maxVol"
+          clearable
+          type="text"
+           class="text-12px"
+           :placeholder="$t('filterLargeAmount')"
+           style="--el-input-border-color:var(--border)"
+          @input="(value) => (dialogFilter.maxVol = value.replace(/\-|[^\d.]/g, ''))"
+        >
+          <template #suffix>$</template>
+        </el-input>
+      </div>
+      <div class="mt-20px flex">
+        <el-button
+          class="h-30px flex-1 m-l-auto"
+          @click="resetDialogFilter"
+        >
+          {{ $t('reset') }}
+        </el-button>
+        <el-button type="primary" class="h-30px flex-1 m-l-auto" @click="confirmDialogFilter">
+          {{ $t('confirm') }}
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -247,6 +301,7 @@ import MarkerTooltip from '../belowChartTable/transactions/markerTooltip.vue'
 import { ElScrollbar, type RowEventHandlerParams } from 'element-plus'
 import type { SimpleWSTx } from '../kLine/types'
 import BigNumber from 'bignumber.js'
+import DateFilterCard from '../dateFilterCard.vue'
 const tokenStore = useTokenStore()
 const themeStore = useThemeStore()
 
@@ -266,6 +321,7 @@ const props = defineProps<{
   klineHeight?: number
 }>()
 
+const klineDateFilter = inject<Ref<string[]>>(ProvideType.KLINE_DATE_FILTER)
 defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
@@ -274,6 +330,7 @@ const { t } = useI18n()
 const route = useRoute()
 const { totalHolders, pairAddress, pair, token, } = storeToRefs(useTokenStore())
 
+const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const wsStore = useWSStore()
 const tagStore = useTagStore()
@@ -284,7 +341,7 @@ const tabsContainer = ref<HTMLElement | null>(null)
 const activeTab = shallowRef('all')
 const isPausedTxs = shallowRef(false)
 const markerTooltipVisible = shallowRef(false)
-const isMeActive = ref(false)
+// const isMeActive = ref(false)
 const listStatus = ref({
   loadingTxs: false
 })
@@ -293,7 +350,10 @@ const tokenTxs = shallowRef<ExtendedTxResponse[]>([])
 const wsPairCache = shallowRef<ExtendedTxResponse[]>([])
 const tableFilter = ref({
   markerAddress: '',
-  tag_type: 'all'
+  tag_type: 'all',
+  minVol:'',
+  maxVol:'',
+  timestamp:[] as string[]
 })
 const txCount = shallowRef<{ [key: string]: number }>({})
 const makerTooltip = ref()
@@ -307,6 +367,13 @@ const tableView = ref({
 
 // 只在交易历史接口更新之后更新，防止 route 地址更新导致列表数据更新异常
 const realAddress = shallowRef(getAddressAndChainFromId(route.params.id as string).address)
+const filterDialogVisible = shallowRef(false)
+const defaultDialogFilter = {
+  markerAddress: '',
+  minVol:'',
+  maxVol:''
+}
+const dialogFilter = ref({...defaultDialogFilter})
 
 const tabs = computed(() => {
   const arr: Array<{ label: string, value: string }> = []
@@ -341,6 +408,10 @@ const tabs = computed(() => {
   ...arr]
 })
 
+const isFilterActive = computed(()=>{
+  return tableFilter.value.markerAddress || tableFilter.value.minVol || tableFilter.value.maxVol
+})
+
 const addressAndChain = computed(() => {
   const id = route.params.id as string
   if (id) {
@@ -350,6 +421,10 @@ const addressAndChain = computed(() => {
     address: token.value?.token || '',
     chain: token.value?.chain || ''
   }
+})
+
+const isMeActive = computed(()=>{
+  return tableFilter.value.markerAddress === botStore.getWalletAddress(addressAndChain.value.chain)!
 })
 
 const filterTableListMap = {
@@ -373,7 +448,31 @@ const filterTableList = computed(() => {
     )
   }
 
+  // 时间筛选
+  const [startTime, endTime] = tableFilter.value.timestamp
+  if (startTime) {
+    tableList = tableList.filter(item => item.time >= Number(startTime))
+  }
+  if (endTime) {
+    tableList = tableList.filter(item => item.time <= Number(endTime))
+  }
+  // 交易额筛选
+  const { minVol, maxVol } = tableFilter.value
+  if (minVol) {
+    tableList = tableList.filter(item => getAmount(item, true, true) >= Number(minVol))
+  }
+  if (maxVol) {
+    tableList = tableList.filter(item => getAmount(item, true, true) <= Number(maxVol))
+  }
+
   return tableList
+})
+
+watch(() => klineDateFilter?.value, (val) => {
+  if (val && props.modelValue) {
+    tableFilter.value.timestamp = val
+    _getTokenTxs()
+  }
 })
 
 // 监听 pairAddress 变化（token切换）
@@ -450,7 +549,9 @@ async function _getTokenTxs() {
     const getTokenTxsParams = {
       token_id: route.params.id as string,
       tag_type,
-      maker: tableFilter.value.markerAddress
+      maker: tableFilter.value.markerAddress,
+      time_min:tableFilter.value.timestamp?.[0],
+      time_max:tableFilter.value.timestamp?.[1]
     }
     const res = await getTokenTxs(getTokenTxsParams)
 
@@ -470,9 +571,9 @@ async function _getTokenTxs() {
     }).reverse()
   } catch (e) {
     // 只有在没有现有数据时才清空，避免网络错误导致数据丢失
-    if (tokenTxs.value.length === 0) {
+    // if (tokenTxs.value.length === 0) {
       tokenTxs.value = []
-    }
+    // }
     console.log('🚨 订单薄数据获取失败:', e)
   } finally {
     listStatus.value.loadingTxs = false
@@ -713,10 +814,9 @@ function getTransactionPrice(row: IGetTokenTxsResponse | SimpleWSTx, isVolUSDT =
 
 function setActiveTab(val: string, index: number) {
   console.log('🔄 切换订单薄标签:', val)
-  activeTab.value = val
-  txCount.value = {}
-  wsPairCache.value.length = 0  // 清空缓存
-  tableFilter.value.tag_type = val
+  resetData(val)
+  // isMeActive.value = false
+  tableFilter.value.markerAddress = ''
   _getTokenTxs()
 
   // 滚动到 tab 中心位置
@@ -756,14 +856,22 @@ function setActiveTab(val: string, index: number) {
 function toggleClickMe() {
   console.log('🔄 切换"我的交易"筛选')
   if (isMeActive.value) {
-    isMeActive.value = false
     tableFilter.value.markerAddress = ''
+    dialogFilter.value.markerAddress = ''
   } else {
-    isMeActive.value = true
-    tableFilter.value.markerAddress = botStore.getWalletAddress(addressAndChain.value.chain)!
+    const walletAddress = botStore.getWalletAddress(addressAndChain.value.chain)!
+    tableFilter.value.markerAddress = walletAddress
+    dialogFilter.value.markerAddress = walletAddress
   }
   wsPairCache.value.length = 0  // 清空缓存
   _getTokenTxs()
+}
+
+function resetData(val:string) {
+  activeTab.value = val
+  txCount.value = {}
+  wsPairCache.value.length = 0  // 清空缓存
+  tableFilter.value.tag_type = val
 }
 
 
@@ -886,6 +994,17 @@ watch(() => wsStore.wsResult[WSEventType.TX], data => {
   if (from_address !== realAddress.value && to_address !== realAddress.value) {
     return
   }
+  const { timestamp, markerAddress } = tableFilter.value
+  const [startTime, endTime] = timestamp || []
+  if(startTime && data.tx.time < Number(startTime)){
+    return
+  }
+  if(endTime && data.tx.time > Number(endTime)){
+    return
+  }
+  if(markerAddress && wallet_address !== markerAddress){
+    return
+  }
 
   // 检查是否已存在相同的交易（防重复）
   const existingTx = wsPairCache.value.find(tx =>
@@ -920,6 +1039,17 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
   const { maker, target } = simpleWSTx
   // 不是当前币种的数据
   if (target !== realAddress.value) {
+    return
+  }
+  const { timestamp, markerAddress } = tableFilter.value
+  const [startTime, endTime] = timestamp || []
+  if(startTime && simpleWSTx.time < Number(startTime)){
+    return
+  }
+  if(endTime && simpleWSTx.time > Number(endTime)){
+    return
+  }
+  if(markerAddress && maker !== markerAddress){
     return
   }
   txCount.value[maker] = (txCount.value[maker] || 0) + 1
@@ -1011,6 +1141,26 @@ const updatetokenTxs = useThrottleFn(() => {
   triggerRef(tokenTxs)
 }, 500)
 
+function confirmDialogFilter() {
+  Object.keys(dialogFilter.value).forEach((key)=>{
+    tableFilter.value[key as keyof typeof dialogFilter.value] =
+    dialogFilter.value[key as keyof typeof dialogFilter.value]
+  })
+  if(!dialogFilter.value.markerAddress){
+    activeTab.value = 'all'
+  }
+
+  _getTokenTxs()
+  filterDialogVisible.value = false
+}
+
+function resetDialogFilter() {
+  dialogFilter.value = {
+ ...defaultDialogFilter
+  }
+ 
+  confirmDialogFilter()
+}
 </script>
 
 <style lang="scss" scoped>

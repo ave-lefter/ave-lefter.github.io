@@ -22,8 +22,12 @@ import IconUnknown from '@/assets/images/icon-unknown.png'
 import type {AveTable} from '#components'
 import type { SimpleWSTx } from '../../kLine/types'
 import BigNumber from 'bignumber.js'
+import DateFilterCard from '../../dateFilterCard.vue'
 // import type { content } from 'html2canvas/dist/types/css/property-descriptors/content'
 const globalStore = useGlobalStore()
+const klineDateFilter = inject<Ref<string[]>>(ProvideType.KLINE_DATE_FILTER)
+// 订单簿状态 - 通过 provide/inject 与父组件通信
+const orderBookVisible = inject<Ref<boolean>>('orderBookVisible', ref(false))
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
@@ -217,6 +221,14 @@ const addressAndChain = computed(() => {
     chain: token.value?.chain || ''
   }
 })
+
+watch(() => klineDateFilter?.value, (val) => {
+  if (val && !orderBookVisible.value) {
+    tableFilter.value.timestamp = val
+    _getTokenTxs()
+  }
+})
+
 watch(() => pairAddress.value, (pair, oldPair) => {
   if (pairAddress.value) {
     _getPairLiq()
@@ -238,6 +250,14 @@ watch(() => route.params.id, val => {
 
 watch(() => followStore.currentAddress, () => {
   if (activeTab.value === '-100') {
+    _getTokenTxs()
+  }
+})
+
+watch(orderBookVisible,(val,oldVal)=>{
+  if(oldVal && !val){
+    resetCache()
+    tableFilter.value.markerAddress = ''
     _getTokenTxs()
   }
 })
@@ -284,6 +304,17 @@ watch(() => wsStore.wsResult[WSEventType.TX], data => {
   if (from_address !== realAddress.value && to_address !== realAddress.value) {
     return
   }
+  const { timestamp, markerAddress } = tableFilter.value
+  const [startTime, endTime] = timestamp || []
+  if(startTime && data.tx.time < Number(startTime)){
+    return
+  }
+  if(endTime && data.tx.time > Number(endTime)){
+    return
+  }
+  if(markerAddress && wallet_address !== markerAddress){
+    return
+  }
   txCount.value[wallet_address] = (txCount.value[wallet_address] || 0) + 1
   const { topN, wallet_tag } = getWalletTag(data.tx)
   const item = {
@@ -312,6 +343,17 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
   }
   // 先把加减池子过滤掉
   if(!['buy','sell'].includes(simpleWSTx.direction)) {
+    return
+  }
+  const { timestamp, markerAddress } = tableFilter.value
+  const [startTime, endTime] = timestamp || []
+  if(startTime && simpleWSTx.time < Number(startTime)){
+    return
+  }
+  if(endTime && simpleWSTx.time > Number(endTime)){
+    return
+  }
+  if(markerAddress && maker !== markerAddress){
     return
   }
   txCount.value[maker] = (txCount.value[maker] || 0) + 1
@@ -377,6 +419,7 @@ function subscribeLiq(pair: string, oldPair?: string) {
 
 const updatePairTxs = useThrottleFn(() => {
   tokenTxs.value.unshift(...wsPairCache.value)
+  tokenTxs.value = tokenTxs.value.slice(0,1000)
   wsPairCache.value.length = 0
   triggerRef(tokenTxs)
 }, 500)
@@ -390,6 +433,7 @@ const updateLiqList = useThrottleFn(() => {
 function onTimestampConfirm(timestamp: string[] = []) {
   tableFilterVisible.value.timestamp = false
   tableFilter.value.timestamp = timestamp
+  _getTokenTxs()
 }
 
 function confirmVolFilter(amountU: string[] = []) {
@@ -411,7 +455,9 @@ async function _getTokenTxs() {
     const getPairTxsParams = {
       token_id: route.params.id as string,
       tag_type,
-      maker: tableFilter.value.markerAddress
+      maker: tableFilter.value.markerAddress,
+      time_min:tableFilter.value.timestamp[0],
+      time_max:tableFilter.value.timestamp[1]
     }
     if (tag_type === '-100' && !followStore.currentAddress) {
       tokenTxs.value = []
@@ -792,11 +838,15 @@ const collect = async (row: any,index:number) => {
           {{ item.label }}
         </a>
       </div>
-      <div v-show="isPausedTxs" class="flex items-center color-#FFA622 text-12px">
-        <Icon name="custom:stop" />
-        <span class="ml-3px">{{ $t('paused') }}</span>
+      <div class="flex items-center gap-12px">
+        <div v-show="isPausedTxs" class="flex items-center color-#FFA622 text-12px">
+          <Icon name="custom:stop" />
+          <span class="ml-3px">{{ $t('paused') }}</span>
+        </div>
+        <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart"/></span>
       </div>
     </div>
+    <DateFilterCard v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" v-model:timestamp="tableFilter.timestamp" @update:timestamp="_getTokenTxs"/>
     <template v-if="tableFilter.markerAddress">
       <div
         v-if="listStatus.loadingTxs || listStatus.loadingLiq"
