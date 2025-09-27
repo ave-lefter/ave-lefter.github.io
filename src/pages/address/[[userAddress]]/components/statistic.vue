@@ -70,11 +70,11 @@
           {{ uSymbol }}{{ total_balance }} {{ main_token_symbol }}
         </strong>
         <el-switch
-          :model-value="injecteIsVolUSDT"
+          :model-value="globalStore.isUSDT"
           class="custom-switch"
           :inactive-value="true"
           :active-value="false"
-          @update:model-value="injecteIsVolUSDT=!injecteIsVolUSDT"
+          @update:model-value="globalStore.isUSDT=!globalStore.isUSDT"
         >
           <template #active-action>
             <ChainToken :chain="chain" :width="16" />
@@ -89,7 +89,7 @@
       </div>
       <p class="m-0 mb-2 leading-5 text-3.5 text-[--secondary-text]">
         {{ $t('totalPnL2') }}（{{ intervalText }}）
-        <AveNumber :value="statistics.profit" :signVisible="injecteIsVolUSDT">
+        <AveNumber :value="statistics.profit" :signVisible="globalStore.isUSDT">
           {{ formatNumber(Math.abs((statistics.profit ?? 0) / main_token_price), 2) }}
           {{ main_token_symbol }}
         </AveNumber>
@@ -189,6 +189,7 @@ const props = defineProps({
 const { t } = useI18n()
 
 const { address, chain, interval, intervalText } = toRefs(props)
+const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const themeStore = useThemeStore()
@@ -346,7 +347,7 @@ const wallet_age = computed(() => {
     : getDuring(_wallet_age ? ((Number(_wallet_age) || 0) * 1000) : undefined)
 })
 
-const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
+// const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
 
 const total_balance = computed(() => {
   const formatMap: Record<string, number> = {
@@ -358,21 +359,21 @@ const total_balance = computed(() => {
   const { total_balance_without_risk } = balanceAnalysis.value
 
   return formatNumber((Number(total_balance_without_risk) || 0) / Number(main_token_price.value), {
-    decimals: injecteIsVolUSDT?.value ? 4 : formatMap[chain.value],
+    decimals: globalStore.isUSDT ? 4 : formatMap[chain.value],
     limit: 20,
   })
 })
 
 const main_token_price = computed(() => {
-  return injecteIsVolUSDT?.value ? 1 : Number((balanceAnalysis.value.main_token_price || 0))
+  return globalStore.isUSDT ? 1 : Number((balanceAnalysis.value.main_token_price || 0))
 })
 
 const uSymbol = computed(() => {
-  return injecteIsVolUSDT?.value ? '$' : ''
+  return globalStore.isUSDT ? '$' : ''
 })
 
 const main_token_symbol = computed(() => {
-  return injecteIsVolUSDT?.value ? '' : balanceAnalysis.value.main_token_symbol
+  return globalStore.isUSDT ? '' : balanceAnalysis.value.main_token_symbol
 })
 
 watch(

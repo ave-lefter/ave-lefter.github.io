@@ -191,7 +191,7 @@ const txCount = shallowRef<{ [key: string]: number }>({})
 const tableView = ref({
   isShowDate: false,
   // isSwapPriceUSDT: true, 不常用，先删除
-  isVolUSDT: true
+  // isVolUSDT: true
 })
 const tableFilterVisible = ref({
   timestamp: false,
@@ -951,8 +951,8 @@ const collect = async (row: any,index:number) => {
             <span>{{ $t('amountU') }}</span>
             <Icon
               name="custom:price"
-              :class="`${tableView.isVolUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer`"
-              @click.self="tableView.isVolUSDT = !tableView.isVolUSDT" />
+              :class="`${globalStore.isUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer`"
+              @click.self="globalStore.isUSDT = !globalStore.isUSDT" />
             <VolFilter
               v-model:visible="tableFilterVisible.amountU" :modelValue="tableFilter.amountU"
               @confirm="confirmVolFilter" />
@@ -963,7 +963,7 @@ const collect = async (row: any,index:number) => {
             v-if="row.type === undefined" :class="`absolute h-full ${getGradient(row)} opacity-15`"
             :style="`width:${Math.min(getAmount(row, true, true) / (addressAndChain.chain === 'solana' ? 10 : 20), 100)}%`" />
           <div v-if="row.type === undefined" :class="`${getRowColor(row)} w-full h-full flex items-center justify-end`">
-            <template v-if="tableView.isVolUSDT">
+            <template v-if="globalStore.isUSDT">
               ${{ formatNumber(getAmount(row, true, true), 2) }}
             </template>
             <template v-else>
@@ -974,7 +974,7 @@ const collect = async (row: any,index:number) => {
             </template>
           </div>
           <div v-else :class="getRowColor(row)">
-            <template v-if="tableView.isVolUSDT">
+            <template v-if="globalStore.isUSDT">
               ${{ formatNumber(row.amount0 * row.token0_price_usd + row.amount1 * row.token1_price_usd, 2) }}
             </template>
             <template v-else>

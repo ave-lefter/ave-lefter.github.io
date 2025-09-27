@@ -117,8 +117,8 @@
             {{ $t('balance1') }}
             <Icon
               name="custom:price"
-              :class="`${injecteIsVolUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer ml-3px`"
-              @click.stop.prevent="injecteIsVolUSDT=!injecteIsVolUSDT"
+              :class="`${globalStore.isUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer ml-3px`"
+              @click.stop.prevent="globalStore.isUSDT=!globalStore.isUSDT"
             />
           </span>
         </template>
@@ -128,7 +128,7 @@
             <span v-if="row?.balance_usd == 0">0</span>
             <span v-else-if="row?.balance_usd == '--'">--</span>
             <span v-else class="flex justify-end">
-              <template v-if="!injecteIsVolUSDT">
+              <template v-if="!globalStore.isUSDT">
                 {{
                   row?.main_token_price == 0
                     ? 0
@@ -286,8 +286,9 @@ const emit = defineEmits(['hideToken'])
 
 const hideTokenVisible = ref(false)
 const currentHideToken = ref({})
+const globalStore = useGlobalStore()
 
-const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
+// const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
 
 const themeStore = useThemeStore()
 

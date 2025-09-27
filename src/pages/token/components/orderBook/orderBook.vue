@@ -36,8 +36,8 @@
               <div class="flex items-center justify-end gap-2px">
                 <span>{{ t('amountU').slice(0, 3) }}</span>
                 <el-button class="p-0 px-2px border-none hover:bg-[transparent] h-auto"
-                  @click="tableView.isVolUSDT = !tableView.isVolUSDT">
-                  <svg v-if="tableView.isVolUSDT" width="10" height="10" viewBox="0 0 10 10" fill="none"
+                  @click="globalStore.isUSDT = !globalStore.isUSDT">
+                  <svg v-if="globalStore.isUSDT" width="10" height="10" viewBox="0 0 10 10" fill="none"
                     xmlns="http://www.w3.org/2000/svg" class="color-[--d-5A5E64-l-A9B0BC]">
                     <path
                       d="M5 0C2.23884 0 0 2.23884 0 5C0 7.76116 2.23884 10 5 10C7.76116 10 10 7.76116 10 5C10 2.23884 7.76116 0 5 0ZM5.24889 7.42411L5.25112 7.7779C5.25112 7.82701 5.21094 7.8683 5.16183 7.8683H4.84486C4.79576 7.8683 4.75558 7.82812 4.75558 7.77902V7.42857C3.76451 7.35491 3.29799 6.79017 3.24777 6.17634C3.24331 6.12388 3.2846 6.07924 3.33706 6.07924H3.85268C3.89621 6.07924 3.93415 6.11049 3.94085 6.1529C3.99777 6.5067 4.27344 6.7712 4.76785 6.83705V5.24442L4.49219 5.17411C3.90848 5.0346 3.35268 4.67076 3.35268 3.9163C3.35268 3.10268 3.97098 2.66518 4.76116 2.58817V2.21986C4.76116 2.17076 4.80134 2.13058 4.85045 2.13058H5.16406C5.21317 2.13058 5.25334 2.17076 5.25334 2.21986V2.58482C6.01786 2.66183 6.59152 3.10826 6.65848 3.80357C6.66406 3.85603 6.62276 3.90179 6.56919 3.90179H6.06808C6.02343 3.90179 5.98549 3.8683 5.97991 3.82478C5.93527 3.49888 5.67411 3.23326 5.24889 3.17522V4.6741L5.53237 4.73996C6.25558 4.91852 6.74777 5.26451 6.74777 6.03907C6.74777 6.87947 6.12277 7.34822 5.24889 7.42411ZM4.04688 3.86496C4.04688 4.14843 4.2221 4.36831 4.59933 4.50446C4.65179 4.52567 4.70424 4.54241 4.76674 4.56026V3.17634C4.35491 3.2288 4.04688 3.45982 4.04688 3.86496ZM5.34709 5.37388C5.31585 5.36718 5.2846 5.35938 5.24889 5.34933V6.84152C5.72433 6.79911 6.05246 6.53795 6.05246 6.10044C6.05246 5.75782 5.875 5.53459 5.34709 5.37388Z"
@@ -120,7 +120,7 @@
                   <!-- Amount -->
                   <div class="text-right text-nowrap min-w-0">
                     <div :class="getRowColor(row)" class="font-medium truncate">
-                      <template v-if="tableView.isVolUSDT">
+                      <template v-if="globalStore.isUSDT">
                         <span>
                           ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
                         </span>
@@ -275,6 +275,7 @@ const { totalHolders, pairAddress, pair, token, } = storeToRefs(useTokenStore())
 const botStore = useBotStore()
 const wsStore = useWSStore()
 const tagStore = useTagStore()
+const globalStore = useGlobalStore()
 const tokenDetailSStore = useTokenDetailsStore()
 
 // 状态管理
@@ -299,7 +300,7 @@ const currentRow = shallowRef<ExtendedTxResponse>({} as any)
 
 // 表格视图状态
 const tableView = ref({
-  isVolUSDT: true,
+  // isVolUSDT: true,
   isAmount: true,
 })
 
