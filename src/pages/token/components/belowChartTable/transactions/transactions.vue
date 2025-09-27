@@ -304,6 +304,17 @@ watch(() => wsStore.wsResult[WSEventType.TX], data => {
   if (from_address !== realAddress.value && to_address !== realAddress.value) {
     return
   }
+  const { timestamp, markerAddress } = tableFilter.value
+  const [startTime, endTime] = timestamp || []
+  if(startTime && data.tx.time < Number(startTime)){
+    return
+  }
+  if(endTime && data.tx.time > Number(endTime)){
+    return
+  }
+  if(markerAddress && wallet_address !== markerAddress){
+    return
+  }
   txCount.value[wallet_address] = (txCount.value[wallet_address] || 0) + 1
   const { topN, wallet_tag } = getWalletTag(data.tx)
   const item = {
@@ -332,6 +343,17 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
   }
   // 先把加减池子过滤掉
   if(!['buy','sell'].includes(simpleWSTx.direction)) {
+    return
+  }
+  const { timestamp, markerAddress } = tableFilter.value
+  const [startTime, endTime] = timestamp || []
+  if(startTime && simpleWSTx.time < Number(startTime)){
+    return
+  }
+  if(endTime && simpleWSTx.time > Number(endTime)){
+    return
+  }
+  if(markerAddress && maker !== markerAddress){
     return
   }
   txCount.value[maker] = (txCount.value[maker] || 0) + 1

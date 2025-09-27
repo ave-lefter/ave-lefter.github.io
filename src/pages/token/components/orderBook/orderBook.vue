@@ -992,6 +992,17 @@ watch(() => wsStore.wsResult[WSEventType.TX], data => {
   if (from_address !== realAddress.value && to_address !== realAddress.value) {
     return
   }
+  const { timestamp, markerAddress } = tableFilter.value
+  const [startTime, endTime] = timestamp || []
+  if(startTime && data.tx.time < Number(startTime)){
+    return
+  }
+  if(endTime && data.tx.time > Number(endTime)){
+    return
+  }
+  if(markerAddress && wallet_address !== markerAddress){
+    return
+  }
 
   // 检查是否已存在相同的交易（防重复）
   const existingTx = wsPairCache.value.find(tx =>
@@ -1026,6 +1037,17 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
   const { maker, target } = simpleWSTx
   // 不是当前币种的数据
   if (target !== realAddress.value) {
+    return
+  }
+  const { timestamp, markerAddress } = tableFilter.value
+  const [startTime, endTime] = timestamp || []
+  if(startTime && simpleWSTx.time < Number(startTime)){
+    return
+  }
+  if(endTime && simpleWSTx.time > Number(endTime)){
+    return
+  }
+  if(markerAddress && maker !== markerAddress){
     return
   }
   txCount.value[maker] = (txCount.value[maker] || 0) + 1
