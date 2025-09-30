@@ -1431,5 +1431,14 @@
   "myToken": "My Token",
   "tweetSearchContractAddress": "Search contract address",
   "tweetSearchContractAddress2": "Search token name",
-  "tweetSearchContractAddress3": "Search name and contract"
+  "tweetSearchContractAddress3": "Search name and contract",
+  "aveBotSwapWallet": "Ave Bot Swap Wallet",
+  "mnemonicTip": "The balance in your {chain} wallet is 0. Please recharge",
+  "mnemonicTip2": "Suggest manually copying the following mnemonic words and storing them in a safe place",
+  "mnemonic": "Mnemonic",
+  "clickMnemonic": "Click to display mnemonic words",
+  "continue": "Continue",
+  "lastChance": "Please save the mnemonic words properly. Once closed, they will not be able to be viewed again.",
+  "saved": "Saved",
+  "startSwap": "Start Swap"
 }

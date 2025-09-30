@@ -170,7 +170,7 @@
           <el-link
             type="primary"
             underline="never"
-            class="decoration-underline!"
+            class="decoration-underline! color-[--main-text]"
             :href="
               !lang?.includes?.('zh-')
                 ? 'https://doc.ave.ai/cn/yong-hu-xie-yi'
@@ -180,7 +180,7 @@
             >&nbsp;{{ $t("startFooter2") }}</el-link
           >
           &nbsp;{{ $t("startFooter3") }}
-          <el-link type="primary" underline="never" href="https://ave.ai/privacy" target="_blank" class="decoration-underline!">
+          <el-link type="primary" underline="never" href="https://ave.ai/privacy" target="_blank" class="decoration-underline! color-[--main-text]">
             &nbsp;{{ $t("startFooter4") }}</el-link
           >
         </el-checkbox>
@@ -394,7 +394,9 @@ function login() {
         .then(() => {
           loading.value = false
           // store.commit("changeConnectVisible", false);
-          botStore.changeConnectVisible(false)
+          if (!botStore.mnemonic) {
+            botStore.changeConnectVisible(false)
+          }
         })
         .catch((err) => {
           // store.commit('showMessage', { type: 'error', text: err });
@@ -450,8 +452,7 @@ function register() {
 function submitForm() {
   loading.value = true
   if (props.cType == 'login') {
-    emit('update:show-bot-mnemonic-phrase', true)
-    // login()
+    login()
   } else {
     register()
   }

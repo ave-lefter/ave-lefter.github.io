@@ -36,9 +36,11 @@ export const useUserStore = defineStore('user', () => {
     // isSupportChains,
     // getWalletAddress,
     // changeConnectVisible,
-    // connectWalletTab,
+    connectWalletTab,
+    mnemonic,
+    showBotMnemonicPhrase,
   } = storeToRefs(botStore)
-  const { getUserInfo } = botStore
+  const { getUserInfo, changeConnectVisible } = botStore
   const email = useLocalStorage('email', '')
   const authInfo = shallowRef({} as {
     guid: string
@@ -62,7 +64,7 @@ export const useUserStore = defineStore('user', () => {
       refreshToken.value = res.refreshToken
       evmAddress.value = res.evmAddress
       getUserInfo()
-      
+
     },
     async loginEmail(data: Parameters<typeof loginEmail>[0]) {
       walletStore.disconnect()
@@ -70,6 +72,13 @@ export const useUserStore = defineStore('user', () => {
       accessToken.value = res.accessToken
       refreshToken.value = res.refreshToken
       evmAddress.value = res.evmAddress
+      // if (res.tgUid && res.mnemonic) {
+        mnemonic.value =
+          res.mnemonic || ''
+        changeConnectVisible(true)
+      showBotMnemonicPhrase.value = true
+      connectWalletTab.value = 0
+      // }
       getUserInfo()
     },
     async emailCodeLogin(data: Parameters<typeof emailCodeLogin>[0]) {
@@ -78,6 +87,12 @@ export const useUserStore = defineStore('user', () => {
       accessToken.value = res.accessToken
       refreshToken.value = res.refreshToken
       evmAddress.value = res.evmAddress
+      if (res.tgUid && res.mnemonic) {
+        mnemonic.value = res.mnemonic || ''
+        changeConnectVisible(true)
+        showBotMnemonicPhrase.value = true
+        connectWalletTab.value = 0
+      }
       getUserInfo()
     },
     verifyRecoverCode(data: Parameters<typeof verifyRecoverCode>[0]) {
@@ -92,6 +107,12 @@ export const useUserStore = defineStore('user', () => {
       accessToken.value = res.accessToken
       refreshToken.value = res.refreshToken
       evmAddress.value = res.evmAddress
+      if (res.tgUid && res.mnemonic) {
+        mnemonic.value = res.mnemonic || ''
+        changeConnectVisible(true)
+        showBotMnemonicPhrase.value = true
+        connectWalletTab.value = 0
+      }
       getUserInfo()
     },
     async bindEmailAccount(data: Parameters<typeof bindEmailAccount>[0]) {

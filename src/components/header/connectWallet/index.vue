@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="botStore.connectVisible" width="500" height='630' :class="['dialog-connect', theme]" append-to-body>
+  <el-dialog v-model="botStore.connectVisible" width="500" height='630' :class="['dialog-connect', theme]" append-to-body :close-on-click-modal="false">
     <div :class="botStore.connectWalletTab === 1 ? 'min-h-560px' : ''">
       <component :is="tabCom" />
     </div>

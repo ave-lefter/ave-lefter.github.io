@@ -21,7 +21,7 @@
     <div class="m-content">
       <div v-show="botStore.connectWalletTab === 0" class="text-14px text-center min-h-200px">
         <botMnemonicPhrase v-if="showBotMnemonicPhrase"></botMnemonicPhrase>
-        <emailRegisterAndLogin v-else ref="loginForm" v-model:cType="emailRegisterType" v-model:showBotMnemonicPhrase="showBotMnemonicPhrase">
+        <emailRegisterAndLogin v-else ref="loginForm" v-model:cType="emailRegisterType">
           <template v-if="emailRegisterType === 'login'">
             <button class="w-full bg-[--border] h-40px flex items-center justify-center border-none mt-20px rd-6px px-12px clickable"  @click.stop="botStore.connectWalletTab = 1">
               <span class="mr-auto">{{ $t('chainWallet') }}</span>
@@ -48,13 +48,15 @@
 import { ArrowLeft } from '@element-plus/icons-vue'
 import emailRegisterAndLogin from './emailRegisterAndLogin.vue'
 import botMnemonicPhrase from './botMnemonicPhrase.vue'
+import { useStorage } from '@vueuse/core'
 const emailRegisterType = ref('login')
 const botStore = useBotStore()
 const themeStore = useThemeStore()
 const { t } = useI18n()
 const ResetCom = defineAsyncComponent(() => import('./reset.vue'))
-const showBotMnemonicPhrase = shallowRef(false)
-
+const showBotMnemonicPhrase = computed(() => {
+  return botStore.showBotMnemonicPhrase
+})
 const title = computed(() => {
   const connectWalletTab = botStore.connectWalletTab
   if (connectWalletTab == 0) {
@@ -92,8 +94,11 @@ const tabs = computed(() => {
     }
   ]
 })
-
 watch(() => botStore.connectVisible, (val) => {
+  if (!val) {
+    botStore.showBotMnemonicPhrase = false
+    botStore.mnemonic = ''
+  }
   if (!val && (emailRegisterType.value === 'reset' || emailRegisterType.value === 'register')) {
     nextTick(() => {
       emailRegisterType.value = 'login'
