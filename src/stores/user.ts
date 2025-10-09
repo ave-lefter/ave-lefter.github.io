@@ -72,13 +72,13 @@ export const useUserStore = defineStore('user', () => {
       accessToken.value = res.accessToken
       refreshToken.value = res.refreshToken
       evmAddress.value = res.evmAddress
-      // if (res.tgUid && res.mnemonic) {
+      if (res.tgUid && res.mnemonic) {
         mnemonic.value =
           res.mnemonic || ''
         changeConnectVisible(true)
       showBotMnemonicPhrase.value = true
       connectWalletTab.value = 0
-      // }
+      }
       getUserInfo()
     },
     async emailCodeLogin(data: Parameters<typeof emailCodeLogin>[0]) {
