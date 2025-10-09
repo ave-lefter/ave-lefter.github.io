@@ -24,7 +24,7 @@
       <TokenColumn
         :column-props="{
           label: $t('walletToken')+'/'+$t('recentlyTrade'),
-          width: '180',
+          width: '210',
           fixed: 'left',
           sortable: 'custom',
           sortOrders: ['descending', 'ascending', null],
