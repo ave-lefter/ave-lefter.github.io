@@ -1433,7 +1433,7 @@
   "tweetSearchContractAddress2": "Search token name",
   "tweetSearchContractAddress3": "Search name and contract",
   "aveBotSwapWallet": "Ave Bot Swap Wallet",
-  "mnemonicTip": "The balance in your {chain} wallet is 0. Please recharge",
+  "mnemonicTip": "The balance in your {chain} wallet is 0, Please recharge",
   "mnemonicTip2": "Suggest manually copying the following mnemonic words and storing them in a safe place",
   "mnemonic": "Mnemonic",
   "clickMnemonic": "Click to display mnemonic words",

@@ -21,7 +21,7 @@
         />
         <Icon
           name="material-symbols:qr-code"
-          class="text-12px ml-2px cursor-pointer color-[--third-text] ml-6px hover:opacity-80"
+          class="text-12px cursor-pointer color-[--third-text] ml-8px hover:opacity-80"
           @mouseover="showCode(item, $event)"
           @mouseleave="visible = !visible"
         />

@@ -37,7 +37,7 @@ const tabCom = computed(() => {
   border-width: 0!important;
   min-width: 500px;
   min-height: 300px;
-  padding: 40px 40px;
+  padding: 40px 20px;
   box-sizing: border-box;
   position: absolute;
   top: 50%;

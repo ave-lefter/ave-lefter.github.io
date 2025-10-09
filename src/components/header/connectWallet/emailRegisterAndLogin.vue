@@ -177,10 +177,11 @@
                 : 'https://doc.ave.ai/ave.ai-user-agreement'
             "
             target="_blank"
+            style="color: var(--main-text)"
             >&nbsp;{{ $t("startFooter2") }}</el-link
           >
           &nbsp;{{ $t("startFooter3") }}
-          <el-link type="primary" underline="never" href="https://ave.ai/privacy" target="_blank" class="decoration-underline! color-[--main-text]">
+          <el-link type="primary" underline="never" href="https://ave.ai/privacy" target="_blank" class="decoration-underline! color-[--main-text]" style="color: var(--main-text)">
             &nbsp;{{ $t("startFooter4") }}</el-link
           >
         </el-checkbox>
