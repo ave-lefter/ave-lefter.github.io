@@ -474,7 +474,9 @@ function handleCredentialResponse(response: any) {
       //   text: language === 'cn' ? '登录成功' : 'Log in successful'
       // })
       loading3.value = false
-      botStore.changeConnectVisible(false)
+      if (!botStore.mnemonic) {
+        botStore.changeConnectVisible(false)
+      }
     })
     .catch((err) => {
       ElMessage.error(String(err))
