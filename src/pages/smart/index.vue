@@ -20,7 +20,7 @@ const smartChains = computed(() => {
     }
   })
 })
-const activeChain = shallowRef<ChainKey>('solana')
+const activeChain = shallowRef<ChainKey>('bsc')
 const activeChain2 = shallowRef<ChainKey>('solana')
 
 const dialogValues = ref<{
