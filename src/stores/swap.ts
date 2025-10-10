@@ -334,7 +334,7 @@ export const useSwapStore = defineStore('swap', () => {
         } else {
           isFourMeme.value = false
         }
-        if (pairInfo?.amm === 'dyorswapfun' && pairInfo?.chain === 'xlayer') {
+        if (pairInfo?.amm === 'dyorswapfun' && ['xlayer', 'gatelayer']?.includes?.(pairInfo?.chain)) {
           isDyorswapfun.value = true
         } else {
           isDyorswapfun.value = false
