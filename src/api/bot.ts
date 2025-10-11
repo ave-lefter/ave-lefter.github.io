@@ -91,6 +91,8 @@ export function loginEmail(data: {
   refreshToken: string
   emailAddress: string
   evmAddress: string
+  tgUid: string
+  mnemonic?: string
 }> {
   const { $api } = useNuxtApp()
   const locale = useLocaleStore().locale
@@ -99,6 +101,7 @@ export function loginEmail(data: {
     body: {
       source: 'web',
       language: locale?.includes?.('zh-') ? 'cn' : 'en',
+      needMnemonic: true,
       ...data
     }
   })
@@ -115,13 +118,15 @@ export function emailCodeLogin(data: {
   refreshToken: string
   tgUid: string
   ref1Guid: string
-  walletName: string
+  walletName: string,
+  mnemonic?: string
 }> {
   const { $api } = useNuxtApp()
   return $api('/botapi/user/emailCodeLogin', {
     method: 'post',
     body: {
       source: 'web',
+      needMnemonic: true,
       ...data
     }
   })
@@ -163,13 +168,16 @@ export function googleLogin(data: {
   accessToken: string
   refreshToken: string
   emailAddress: string
-  evmAddress: string
+  evmAddress: string,
+  tgUid: string
+  mnemonic?: string
 }> {
   const { $api } = useNuxtApp()
   return $api('/botapi/user/googleLogin', {
     method: 'post',
     body: {
       source: 'web',
+      needMnemonic: true,
       ...data
     }
   })

@@ -170,17 +170,18 @@
           <el-link
             type="primary"
             underline="never"
-            class="decoration-underline!"
+            class="decoration-underline! color-[--main-text]"
             :href="
               !lang?.includes?.('zh-')
                 ? 'https://doc.ave.ai/cn/yong-hu-xie-yi'
                 : 'https://doc.ave.ai/ave.ai-user-agreement'
             "
             target="_blank"
+            style="color: var(--main-text)"
             >&nbsp;{{ $t("startFooter2") }}</el-link
           >
           &nbsp;{{ $t("startFooter3") }}
-          <el-link type="primary" underline="never" href="https://ave.ai/privacy" target="_blank" class="decoration-underline!">
+          <el-link type="primary" underline="never" href="https://ave.ai/privacy" target="_blank" class="decoration-underline! color-[--main-text]" style="color: var(--main-text)">
             &nbsp;{{ $t("startFooter4") }}</el-link
           >
         </el-checkbox>
@@ -240,7 +241,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits<{
-  (e: 'update:c-type', cType: 'login' | 'register'| 'reset'): void
+  (e: 'update:c-type', cType: 'login' | 'register' | 'reset'): void,
+  (e: 'update:show-bot-mnemonic-phrase', cType: true | false): void,
 }>()
 const count = ref(60)
 const isCounting = ref(false)
@@ -393,7 +395,9 @@ function login() {
         .then(() => {
           loading.value = false
           // store.commit("changeConnectVisible", false);
-          botStore.changeConnectVisible(false)
+          if (!botStore.mnemonic) {
+            botStore.changeConnectVisible(false)
+          }
         })
         .catch((err) => {
           // store.commit('showMessage', { type: 'error', text: err });
@@ -471,7 +475,9 @@ function handleCredentialResponse(response: any) {
       //   text: language === 'cn' ? '登录成功' : 'Log in successful'
       // })
       loading3.value = false
-      botStore.changeConnectVisible(false)
+      if (!botStore.mnemonic) {
+        botStore.changeConnectVisible(false)
+      }
     })
     .catch((err) => {
       ElMessage.error(String(err))

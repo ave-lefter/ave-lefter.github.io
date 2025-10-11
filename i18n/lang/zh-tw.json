@@ -1425,5 +1425,14 @@
   "myToken": "我的代幣",
   "tweetSearchContractAddress": "推特搜索合約地址",
   "tweetSearchContractAddress2": "推特搜索代幣名稱",
-  "tweetSearchContractAddress3": "推特搜索名稱及合約"
+  "tweetSearchContractAddress3": "推特搜索名稱及合約",
+  "aveBotSwapWallet": "AVE Bot交易錢包",
+  "mnemonicTip": "您的{ chain }錢包中的餘額為0，向此錢包充值可開始交易",
+  "mnemonicTip2": "建議手動抄寫下麵的助記詞並將其保存在安全的地方",
+  "mnemonic": "助記詞",
+  "clickMnemonic": "點擊顯示助記詞",
+  "continue": "繼續",
+  "lastChance": "請妥善保存助記詞，關閉後將無法再次查看。",
+  "saved": "我已保存好助記詞",
+  "startSwap": "開始交易"
 }

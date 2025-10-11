@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useLocalStorage } from '@vueuse/core'
+import { useLocalStorage, useStorage } from '@vueuse/core'
 import {
   refreshAccessToken as _refAcc,
   login,
@@ -38,13 +38,15 @@ export const useBotStore = defineStore('bot', () => {
   const accessToken = useLocalStorage('bot_accessToken', '')
   const refreshToken = useLocalStorage('bot_refreshToken', '')
   const evmAddress = useLocalStorage('bot_evmAddress', '')
+  const mnemonic = useStorage('bog_mnemonic', '', sessionStorage)
+  const showBotMnemonicPhrase = useStorage('showBotMnemonicPhrase', false, sessionStorage)
   const botReqCount = ref(0)
   const bundleAvailableUpdate = ref(0)
   const refreshing = ref(false)
   const subscribed = ref(false)
   const bundleAvailable = ref(false)
 
-  const connectVisible = ref(false)
+  const connectVisible = useStorage('connectVisible', false, sessionStorage)
   const connectWalletTab = ref(0)
   const walletList = ref<Awaited<ReturnType<typeof bot_getWalletsAllChain>>>([])
   const botSwapStore = useBotSwapStore()
@@ -416,6 +418,8 @@ export const useBotStore = defineStore('bot', () => {
     getUserAllChainBalance,
     getBundleAvailable,
     updateBalance,
-    bot_subscribe
+    bot_subscribe,
+    mnemonic,
+    showBotMnemonicPhrase
   }
 })

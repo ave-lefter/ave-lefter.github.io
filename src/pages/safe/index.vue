@@ -101,14 +101,16 @@
                 <template #suffix>
                   <a
                     v-copy="googleAuth.secret" href="javascript:void(0)"
-                    class="text-14px font-400 lh-20px text-left text-from-font decoration-none text-#3F80F7">{{ t('copy') }}</a>
+                    style="pointer-events: auto"
+                    class="text-14px font-400 lh-20px text-left text-from-font decoration-none text-#3F80F7 cursor-pointer">{{ t('copy') }}</a>
                 </template>
               </el-input>
               <el-input v-model="googleAuth.secret" disabled size="large" class="h-48px font-500 text-16px mb-20px">
                 <template #suffix>
                   <a
                     v-copy="googleAuth.secret" href="javascript:void(0)"
-                    class="text-14px font-400 lh-20px text-left text-from-font decoration-none text-#3F80F7">{{ t('copy') }}</a>
+                    style="pointer-events: auto"
+                    class="text-14px font-400 lh-20px text-left text-from-font decoration-none text-#3F80F7 cursor-pointe">{{ t('copy') }}</a>
                 </template>
               </el-input>
                <el-button type="primary" class="w-full" size="large" @click="step = 1.2">{{ t('next') }}</el-button>
