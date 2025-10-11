@@ -45,7 +45,7 @@
         @click.stop.prevent="hide = !hide"
       >
         <div
-          class="mask text-center color-[--main-text] absolute bg-[--border] top-0 right-0 left-0 bottom-0 flex items-center justify-center z-1 opacity-97 text-14px"
+          class="mask text-center color-[--main-text] absolute bg-[--border] top-0 right-0 left-0 bottom-0 flex items-center justify-center z-1 text-14px"
           v-if="hide"
         >
           <Icon name="custom:show-code" class="text-16px mr-4px color-[--main-text]" />
