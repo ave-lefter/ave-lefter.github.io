@@ -5,10 +5,6 @@ const props = defineProps<{
   sortConditions: { sort: string; sort_dir: string }
   setSortConditions(params: { sort: string; sort_dir: string }): void
   setFilterForm(...args: [string, string][]): void
-  isVolUSDT: boolean
-}>()
-const emit = defineEmits<{
-  (e: 'update:isVolUSDT', value: boolean): void
 }>()
 const globalStore = useGlobalStore()
 const defaultSort = computed(() => {
@@ -62,8 +58,8 @@ function confirm(params?: [string, string]) {
     <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
     <Icon
       name="custom:price"
-      :class="`${isVolUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer`"
-      @click.self="emit('update:isVolUSDT',!isVolUSDT)"
+      :class="`${globalStore.isUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer`"
+      @click.self="globalStore.isUSDT = !globalStore.isUSDT"
     />
     <RangePopover
       v-model="popoverVisible"

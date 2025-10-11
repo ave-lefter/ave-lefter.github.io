@@ -1586,7 +1586,7 @@ export async function approve(tokenAddress: string, spender = getSwapContract(us
 
 export function quoteDyorswapfunPump({from_token, to_token, amountIn, pairs, from_price, to_price}: { from_token: string; to_token: string; amountIn: string; pairs: any; from_price: any; to_price: any }, chain = useWalletStore().chain) {
   let pair = pairs[0]
-  if (pair.amm === 'dyorswapfun' && chain === 'xlayer') {
+  if (pair.amm === 'dyorswapfun' && (chain === 'xlayer' || chain === 'gatelayer')) {
     let from_decimals = pair.token0_decimal
     let to_decimals = pair.token1_decimal
     if (pair.token1_address === from_token || pair.token0_address === to_token) {
@@ -1609,26 +1609,46 @@ export async function dyorswapfunPumpSwap({fromToken, toToken, fromAmount}: { fr
     "function swapExactETHForTokensSupportingFeeOnTransferTokensV2(uint256 amountIn, uint256 amountOutMin, address[] path, address to, uint256 deadline) payable",
     "function swapExactTokensForETHSupportingFeeOnTransferTokens(uint256 amountIn, uint256 amountOutMin, address[] path, address to, uint256 deadline)"
   ]
+  if (chain === 'gatelayer') {
+    abi = [
+      "function swapExactETHForTokensSupportingFeeOnTransferTokens(uint256 amountOutMin, address[] path, address to, uint256 deadline) payable",
+      "function swapExactTokensForETHSupportingFeeOnTransferTokens(uint256 amountIn, uint256 amountOutMin, address[] path, address to, address team, uint256 teamRatePercent, uint256 deadline)",
+      "function swapExactTokensForTokensSupportingFeeOnTransferTokens(uint256 amountIn, uint256 amountOutMin, address[] path, address to, address team, uint256 teamRatePercent, uint256 deadline)",
+    ]
+  }
   let address = '0xfd947a61e2c54413031ddb1f754dbe0e696efa09'
+  if (chain === 'gatelayer') {
+    address = '0xC5d6974951201FB5f20C0efB4B6BEF5cf8FF1617'
+  }
   const dyorswapfunRouter = new Contract(address, abi, signer)
   let amountIn = fromToken.amount
   let amountOut = toToken.amount
   let path = [fromToken.address, toToken.address]
   if (isBuy) {
     path[0] = '0xe538905cf8410324e03a5a23c1c177a474d59b2b'
+    if (chain === 'gatelayer') {
+      path[0] = '0x6803b8e93b13941f6b73b82e324b80251b3de338'
+    }
   } else {
     path[1] = '0xe538905cf8410324e03a5a23c1c177a474d59b2b'
+    if (chain === 'gatelayer') {
+      path[1] = '0x6803b8e93b13941f6b73b82e324b80251b3de338'
+    }
   }
   let amountOutMin = new BigNumber(amountOut).times(new BigNumber('10000').minus(new BigNumber(parseInt((Number(slippage) * 100).toString())))).div('10000').toFixed(0)
   if (!isBuy) {
     let deadline = new BigNumber(Math.floor(Date.now() / 1000) + 60 * 20).toFixed(0)
+    let params = [amountIn, amountOutMin, path, to]
+    if (chain === 'gatelayer') {
+      params = [amountIn, amountOutMin, path, to, '0x0000000000000000000000000000000000000000', '0']
+    }
 
-    let gas = await dyorswapfunRouter.swapExactTokensForETHSupportingFeeOnTransferTokens.estimateGas(amountIn, amountOutMin, path, to, deadline)
+    let gas = await dyorswapfunRouter.swapExactTokensForETHSupportingFeeOnTransferTokens.estimateGas(...params, deadline)
 
     let gasLimit = new BigNumber(gas.toString()).times('100').div('10').toFixed(0)
     return {
-      swap: () => dyorswapfunRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(amountIn, amountOutMin, path, to, Math.floor(Date.now() / 1000) + 60 * 20, { gasLimit }),
-      swapCallStatic: () => dyorswapfunRouter.swapExactTokensForETHSupportingFeeOnTransferTokens.staticCall(amountIn, amountOutMin, path, to, Math.floor(Date.now() / 1000) + 60 * 20),
+      swap: () => dyorswapfunRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(...params, Math.floor(Date.now() / 1000) + 60 * 20, { gasLimit }),
+      swapCallStatic: () => dyorswapfunRouter.swapExactTokensForETHSupportingFeeOnTransferTokens.staticCall(...params, Math.floor(Date.now() / 1000) + 60 * 20),
       gasValue: gasLimit.toString(),
       swapInfo: {
         fromToken: fromToken,

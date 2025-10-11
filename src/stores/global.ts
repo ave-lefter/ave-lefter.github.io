@@ -12,6 +12,7 @@ export const useGlobalStore = defineStore('global', () => {
   const themeStore = useThemeStore()
   const configStore = useConfigStore()
   const showLeft = shallowRef(true)
+  const isUSDT = useStorage('isUSDT', true)
   const footerTokensPrice = shallowRef([
     {
       token: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
@@ -231,6 +232,8 @@ export const useGlobalStore = defineStore('global', () => {
   const mySwapList = ref<any[]>([])
 
    const hotList = shallowRef<GetHotTokensResponse[]>([])
+  //  点击图表显示交易历史
+   const isClickKlineFilter = useStorage('isClickKlineFilter', true)
    function sendFooterPriceWs() {
     const data = {
       jsonrpc: '2.0',
@@ -328,7 +331,9 @@ export const useGlobalStore = defineStore('global', () => {
     getUserFavoriteGroups: _getUserFavoriteGroups,
     rankConditions,
     rankActiveTab,
+    isClickKlineFilter,
     mySwapList,
-    pumpLiveSort
+    pumpLiveSort,
+    isUSDT
   }
 })

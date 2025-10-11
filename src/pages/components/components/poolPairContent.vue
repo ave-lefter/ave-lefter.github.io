@@ -142,7 +142,7 @@ function addTokenFavorite(row, newGroupId: number) {
       v-tooltip="$t('blockToken')"
       name="custom:invisible"
       class="text-12px"
-      @click.self.stop="addOrRemoveBlackList(row, 'ca')"
+      @click.self.stop="blockToken(row)"
       />
       <Icon
         v-else

@@ -536,6 +536,9 @@ function getAllowance() {
     if (chain === 'xlayer' && swapStore.isXflapswap) {
       spender = '0xb30d8c4216e1f21f27444d2ffaee3ad577808678'
     }
+    if (chain === 'gatelayer' && swapStore.isDyorswapfun) {
+      spender = '0xC5d6974951201FB5f20C0efB4B6BEF5cf8FF1617'
+    }
     loadingAllowance.value = true
     allowance(swapStore.fromToken.address, spender).then(res => {
       swapStore.allowance = res.toString()
@@ -1449,6 +1452,9 @@ async function _approve() {
   }
   if (walletStore.chain  === 'xlayer' && swapStore.isXflapswap) {
     spender = '0xb30d8c4216e1f21f27444d2ffaee3ad577808678'
+  }
+  if (walletStore.chain  === 'gatelayer' && swapStore.isDyorswapfun) {
+    spender = '0xC5d6974951201FB5f20C0efB4B6BEF5cf8FF1617'
   }
 
   approve(swapStore.fromToken.address, spender).then(res => {
