@@ -3,50 +3,31 @@ import type {TableV2Instance} from 'element-plus'
 import {useElementSize} from '@vueuse/core'
 
 const {t} = useI18n()
-const props = defineProps({
-  columns: {
-    type: Array<any>,
-    required: true
-  },
-  data: {
-    type: Array,
-    required: true
-  },
-  showEmptyText: Boolean,
-  emptyText: {
-    type: String,
-    default: ''
-  },
-  showFooter: {
-    type: Boolean,
-    default: false
-  },
-  footText: {
-    type: String,
-    default: ''
-  },
-  rowHeight:{
-    type: Number,
-    default: 50
-  },
-  headerHeight:{
-    type: Number,
-    default: 32
-  },
-  headerClass:{
-    type: String,
-    default: ''
-  },
-  footerHeight: {
-    type: Number,
-    default: 0
-  },
-  loading: Boolean,
-  fixed: Boolean,
-  rowKey:{
-    type: String,
-    default: 'id'
-  }
+const props = withDefaults(defineProps<{
+  columns:any[],
+  data:any[],
+  showEmptyText?:boolean,
+  emptyText?:string,
+  showFooter?:boolean,
+  footText?:string,
+  rowHeight?:number,
+  headerHeight?:number,
+  headerClass?:string,
+  footerHeight?:number,
+  loading?:boolean,
+  fixed?:boolean,
+  rowKey?:string,
+  rowClass?:string | any,
+}>(),{
+  showFooter:false,
+  footText:'',
+  rowHeight:50,
+  headerHeight:32,
+  headerClass:'',
+  footerHeight:0,
+  rowKey:'id',
+  rowClass:'',
+  emptyText:''
 })
 const emits = defineEmits<{
   (e: 'endReached', value: number): void
@@ -144,6 +125,7 @@ function calculateColumnWidths() {
         v-bind="attrs"
         :fixed="fixed"
         :row-height='rowHeight'
+        :row-class="rowClass"
         @end-reached="remainDistance=> emits('endReached', remainDistance)"
       >
         <template v-for="(slotFn, slotName) in defaultSlots" #[slotName]="slotProps">

@@ -22,7 +22,7 @@ import {
   MCapContent,
   MCapHeader,
   InsidersContent,
-  Headline,
+  // Headline,
   DynamicPriceChangeHeader,
   PoolPairHeader,
   PoolPairContent,
@@ -33,9 +33,10 @@ import {
   PriceChange,
   TokenPage,
   DexHeader,
+  TrendChart,
+  TrendChartHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
-import { addFavorite, removeFavorite } from '~/api/fav'
 import dayjs from 'dayjs'
 import type { RowClassNameGetter, RowEventHandlerParams } from 'element-plus'
 
@@ -98,7 +99,7 @@ const pageInfo = ref({
   total: 0,
 })
 const loading = shallowRef(false)
-const columns = useStorage('hotUserTableColumns', getHotDefaultColumns(t))
+const columns = useStorage('hotRanks', getHotDefaultColumns(t))
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
   const {klineRow:{id}} = rankKlineStore
@@ -321,7 +322,8 @@ const visibleColumns = computed(() => {
 const headerRenderer = computed(() => {
   return {
     poolPair: PoolPairHeader,
-    headline: () => t('aiSummary'),
+    // headline: () => t('aiSummary'),
+    trendChart:TrendChartHeader,
     mCap: MCapHeader,
     current_price_usd: PriceHeader,
     price_change_1m: DynamicPriceChangeHeader,
@@ -343,7 +345,8 @@ const headerRenderer = computed(() => {
 const cellRenderer = computed(() => {
   return {
     poolPair: PoolPairContent,
-    headline: Headline,
+    // headline: Headline,
+    trendChart:TrendChart,
     mCap: MCapContent,
     current_price_usd: PriceContent,
     price_change_1m: ({ row }) => {
@@ -429,7 +432,6 @@ function resetColumns(needClear:boolean) {
   <div v-loading="loading" :style="`height:${height}`">
     <AveTable
       ref="aveTableRef"
-      rowKey="rowKey"
       :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"

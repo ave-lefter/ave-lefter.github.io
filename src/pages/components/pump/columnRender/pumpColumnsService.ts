@@ -3,7 +3,7 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
       {
         title: t('basicInfo'),
         list: [
-          'headline',
+          // 'headline',
           'mCapContent',
           'liquidityContent',
           'holdersContent',
@@ -50,10 +50,10 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         minWidth:320
       },
       {
-        title:t('aiSummary'),
+        title:t('trendChart'),
         isVisible: true,
-        key:'headline',
-        render:'headline',
+        key:'trendChart',
+        render:'trendChart',
         minWidth:232,
       },
       {

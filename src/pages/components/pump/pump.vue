@@ -334,7 +334,6 @@ function initCache() {
 <template>
   <div v-loading="loading" :style="`height:${height}`">
     <AveTable
-      row-key="rowKey"
       :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"

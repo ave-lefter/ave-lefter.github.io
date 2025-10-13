@@ -208,7 +208,6 @@ function listMapFunction(i: Record<string, any>) {
   }
   return {
     ...i,
-    rowKey:uuidv4(),
     id: `${i.target_token}-${i.chain}`,
     pair_id: `${i.pair}-${i.chain}`,
     token: i.target_token,
