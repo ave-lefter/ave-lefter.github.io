@@ -18,7 +18,16 @@ import { useBotSettingStore } from './botSetting'
 import { deepMerge, evm_utils as utils ,getChainInfo } from '@/utils'
 import { NATIVE_TOKEN } from '@/utils/constants'
 
-type AddressItem = { chain: string; address: string; price?: number; balance?: string; decimals?: number; logo_url?: string };
+type AddressItem = { chain: string; address: string; price?: number; balance?: string; decimals?: number; logo_url?: string; tokenBalances?: {
+  [key: string]: {
+    chain: string
+    address: string
+    price?: number
+    balance?: string
+    decimals?: number
+    logo_url?: string
+  }
+}}
 const updateBalanceLoading: { [key: string]: boolean } = {}
 const _refreshAccessToken = createCacheRequest(_refAcc, 3000)
 export const useBotStore = defineStore('bot', () => {
@@ -97,61 +106,122 @@ export const useBotStore = defineStore('bot', () => {
   }
 
   function getChainsTokenBalance(data: { chain: string; tokens: any[]; walletAddress: string }[]) {
-      if (!accessToken.value) {
-        return Promise.resolve([])
-      }
-      return bot_getChainsTokenBalance(data).then(async res => {
-        return res?.map((i: { balance: any; decimals: any; decimal: any; token: string; chain: any }) => {
-          const balance = i.balance
-          const decimals = i.decimals || i.decimal || 0
-          const token = i.token === 'sol' ? 'So11111111111111111111111111111111111111112' : i.token
-          return {
-            ...i,
-            initBalance: balance,
-            balance: decimals == 0 ? balance : utils.formatUnits(balance.toString(), decimals),
-            chain: i.chain,
-            token
-          }
-        })
+    if (!accessToken.value) {
+      return Promise.resolve([])
+    }
+    return bot_getChainsTokenBalance(data).then(async res => {
+      return res?.map((i: { balance: any; decimals: any; decimal: any; token: string; chain: any }) => {
+        const balance = i.balance
+        const decimals = i.decimals || i.decimal || 0
+        const token = i.token === 'sol' ? 'So11111111111111111111111111111111111111112' : i.token
+        return {
+          ...i,
+          initBalance: balance,
+          balance: decimals == 0 ? balance : utils.formatUnits(balance.toString(), decimals),
+          chain: i.chain,
+          token
+        }
       })
+    })
   }
-  function getUserAllChainBalance() {
-       if (!accessToken.value) {
-        return
+  function getUserAllChainBalance(item: {address: string, chain: string} | null = null) {
+    if (!accessToken.value) {
+      return
+    }
+    let addresses: string[] = []
+    walletList.value?.forEach?.((i) => {
+      addresses = [...addresses, ...(i.addresses?.map?.(i => i?.address || '') || [])]
+      let _item = item
+      if (item?.address === NATIVE_TOKEN || item?.address === 'sol') {
+        _item = null
       }
-      const chainMainToken: { [key: string]: string } = {
-        solana: 'sol',
-        ton: 'TON',
-      }
-      if (userInfo.value?.addresses && userInfo.value.addresses.length > 0) {
-        const addresses = userInfo.value?.addresses || []
+      _getUserAllChainBalance(i.addresses, _item)
+    })
+    if (!item) {
+      const adds = Array.from(new Set(addresses))
+      subBalanceChange(adds)
+    }
+  }
+
+  function _getUserAllChainBalance(addresses: Array<AddressItem> = [], item: {address: string, chain: string} | null = null) {
+    if (!accessToken.value) {
+      return
+    }
+    const chainMainToken: { [key: string]: string } = {
+      solana: 'sol',
+      ton: 'TON',
+    }
+    if (addresses && addresses?.length > 0) {
+      if (item) {
         const tokens = addresses.map((i) => {
           return {
             chain: i.chain,
-            tokens: [chainMainToken[i.chain] || NATIVE_TOKEN],
+            tokens: [item?.address],
             walletAddress: i.address
           }
-        })
+        })?.filter(j => j.chain === item?.chain)
         getChainsTokenBalance(tokens).then(res => {
-          if (userInfo.value && Array.isArray(userInfo.value.addresses)) {
-            (res || []).forEach?.((i: { balance: any; decimals: any; decimal: any }, k: number) => {
-              userInfo.value!.addresses[k] = { ...userInfo.value!.addresses?.[k], balance: i?.balance || 0, decimals: i.decimals || i.decimal }
+          if (Array.isArray(addresses)) {
+            (res || []).forEach?.((i: { balance: any; decimals: any; decimal: any; chain: string }) => {
+              addresses?.forEach?.((j) => {
+                if (j.chain === i.chain) {
+                  if (!j.tokenBalances) {
+                    j.tokenBalances = {}
+                  }
+                  j.tokenBalances[item.address] = {
+                    chain: i.chain,
+                    address: item.address,
+                    balance: i.balance
+                  }
+                }
+              })
             })
           }
         })
-        const chainMainToken1: { [key: string]: string } = {
-          solana: 'So11111111111111111111111111111111111111112',
-        }
-        const adds = Array.from(new Set(addresses?.map?.(i => i?.address || '') || []))
-        subBalanceChange(adds)
-        const tokenIds = userInfo.value?.addresses?.map(i => ((chainMainToken1?.[i.chain] || NATIVE_TOKEN) + '-' +  i.chain))
+        const tokenIds = [item?.address + '-' + item?.chain]
         getTokensPrice(tokenIds).then(res => {
-          if (userInfo.value && Array.isArray(userInfo.value.addresses)) {
-            res?.forEach?.((i, k) => {
-              userInfo.value!.addresses[k] = {...userInfo.value?.addresses?.[k], price: i?.current_price_usd || 0, logo_url: i?.logo_url || ''}
+          if (Array.isArray(addresses)) {
+            addresses?.forEach?.((j) => {
+              if (j.chain === item?.chain) {
+                if (!j.tokenBalances) {
+                  j.tokenBalances = {}
+                }
+                if (!j.tokenBalances[item.address]) {
+                  j.tokenBalances[item.address] = {} as any
+                }
+                j.tokenBalances[item.address].price = res?.[0]?.price || 0
+                j.tokenBalances[item.address].logo_url = res?.[0]?.logo_url || ''
+              }
             })
           }
         })
+        return
+      }
+      const tokens = addresses.map((i) => {
+        return {
+          chain: i.chain,
+          tokens: [chainMainToken[i.chain] || NATIVE_TOKEN],
+          walletAddress: i.address
+        }
+      })
+      getChainsTokenBalance(tokens).then(res => {
+        if (Array.isArray(addresses)) {
+          (res || []).forEach?.((i: { balance: any; decimals: any; decimal: any }, k: number) => {
+            addresses[k] = { ...addresses?.[k], balance: i?.balance || 0, decimals: i.decimals || i.decimal }
+          })
+        }
+      })
+      const chainMainToken1: { [key: string]: string } = {
+        solana: 'So11111111111111111111111111111111111111112',
+      }
+      const tokenIds = addresses?.map(i => ((chainMainToken1?.[i.chain] || NATIVE_TOKEN) + '-' +  i.chain))
+      getTokensPrice(tokenIds).then(res => {
+        if (Array.isArray(addresses)) {
+          res?.forEach?.((i, k) => {
+            addresses[k] = {...addresses?.[k], price: i?.current_price_usd || 0, logo_url: i?.logo_url || ''}
+          })
+        }
+      })
     }
   }
   function subBalanceChange(addresses: string[]) {
@@ -171,14 +241,14 @@ export const useBotStore = defineStore('bot', () => {
     })
   }
   function getBundleAvailable(): Promise<any> {
-      if (bundleAvailableUpdate.value > 0) {
-        return Promise.resolve(bundleAvailable.value)
-      }
-      return bot_getBundleAvailable().then(res => {
-        bundleAvailable.value = res
-        bundleAvailableUpdate.value++
-        return res
-      })
+    if (bundleAvailableUpdate.value > 0) {
+      return Promise.resolve(bundleAvailable.value)
+    }
+    return bot_getBundleAvailable().then(res => {
+      bundleAvailable.value = res
+      bundleAvailableUpdate.value++
+      return res
+    })
   }
   function getUserInfo() {
     if (accessToken.value) {
@@ -357,7 +427,8 @@ export const useBotStore = defineStore('bot', () => {
       const wrapToken = getChainInfo(chain)?.wmain_wrapper
       if (token && (token === NATIVE_TOKEN || token === 'sol' || token === wrapToken)) {
         const walletAddress = data?.client_address || ''
-        const isHasWallet = userInfo.value.addresses?.some?.(i => i?.address === walletAddress)
+        // const isHasWallet = userInfo.value.addresses?.some?.(i => i?.address === walletAddress)
+        const isHasWallet = walletList?.value?.some?.(i => i?.addresses?.some?.(j => j?.address === walletAddress))
         if (isHasWallet) {
           const key = walletAddress + '_' + chain
           if (updateBalanceLoading?.[key]) {
@@ -371,9 +442,20 @@ export const useBotStore = defineStore('bot', () => {
           }).then(tokens => {
             const t = tokens?.[0]
             console.log('updateBalance------getTokenBalance', t)
-            userInfo.value.addresses = (userInfo.value.addresses || []).map(i => {
-              if (i?.chain === chain && i.address === walletAddress) {
-                i.balance = t.balance || 0
+            // userInfo.value.addresses = (userInfo.value.addresses || []).map(i => {
+            //   if (i?.chain === chain && i.address === walletAddress) {
+            //     i.balance = t.balance || 0
+            //   }
+            //   return i
+            // })
+            walletList.value = (walletList.value || []).map(i => {
+              if (i?.addresses?.some?.(j => j?.chain === chain && j.address === walletAddress)) {
+                i.addresses = (i.addresses || []).map(j => {
+                  if (j?.chain === chain && j.address === walletAddress) {
+                    j.balance = t.balance || 0
+                  }
+                  return j
+                })
               }
               return i
             })

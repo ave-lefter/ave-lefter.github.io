@@ -603,7 +603,7 @@ export function getUserTxs(token_id: string, address: string) {
 export function getTokensPrice(tokenIds: string[]) {
   const ids = tokenIds.map(i => {
     const [token, chain] = getAddressAndChainFromId(i, 1)
-    if (token && chain && token === NATIVE_TOKEN) {
+    if (token && chain && (token === NATIVE_TOKEN || token === 'sol')) {
       const chainInfo = getChainInfo(chain)
       return chainInfo.wmain_wrapper + '-' + chain
     }

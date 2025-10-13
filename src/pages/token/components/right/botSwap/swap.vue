@@ -554,7 +554,8 @@ async function quoteBot(chain: string, type = props.activeTab, isGetPrice = true
   if (isGetPrice) {
     await _getTokensPrice()
   }
-  const nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || tokenStore.swap.payToken.price || 0
+  const nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || tokenStore.swap.payToken.price || tokenStore.swap.native.price || 0
+
 
   const payToken = tokenStore.swap.payToken
 
@@ -569,6 +570,7 @@ async function quoteBot(chain: string, type = props.activeTab, isGetPrice = true
   const fromPrice = isBuy ? payTokenPrice : price
   const toPrice = isBuy ? price : payTokenPrice
   const res = Number(fromAmount) * (fromPrice || 0) / (toPrice || 1)
+  console.log('res', res)
   if (res) {
     if (type === 'buy') {
       amountNativeOut.value = String(res) || '0'
@@ -586,6 +588,7 @@ async function quoteBot(chain: string, type = props.activeTab, isGetPrice = true
     swapQuoteInfo.from_price = fromPrice || 0
     swapQuoteInfo.to_price = toPrice || 0
     quoteLoading.value = false
+    console.log('swapQuoteInfo', swapQuoteInfo)
     return
   }
 }
@@ -713,12 +716,19 @@ async function submitBotSwap() {
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
     const slippage = botSettingStore.botSettings?.solana?.[botSettingStore.botSettings?.solana?.selected]?.slippage || 9
-    const data = {
-      batchId: Date.now().toString(),
-      swapList: [{
-        creatorAddress: walletAddress,
+    const batchId = Date.now().toString()
+    const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
+      const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
+      return {
+        batchId: batchId + String(k),
+        creatorAddress: addr || '',
         inAmount: new BigNumber(amount || 0).times(10 ** (ft?.decimals || 0)).toFixed(0),
-      }],
+      }
+    })
+
+    const data = {
+      // batchId: Date.now().toString(),
+      swapList: swapList,
       inTokenAddress: isBuy ? native : (ft.address || ''),
       outTokenAddress: isBuy ? (tt.address || '') : native,
       swapType: (isBuy ? 1 : 2) as 1 | 2,
@@ -735,50 +745,60 @@ async function submitBotSwap() {
 
     bot_createSolTx(data).then(res => {
       if (res) {
-        let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
-          // this.$store.state.bot.historyUpdate++
-          tokenStore.placeOrderUpdate++
-          ElNotification({ type: 'success', message: t('transactionsSubmitted') })
-          // if (!['myBotHistory', 'myBotPosition']?.includes(this.$store.state.tabActive)) {
-          //   this.$store.state.tabActive = 'myBotHistory'
-          // }
-          loadingSwap.value = false
-          amountToken.value = ''
-          amountNative.value = ''
-          amountTokenOut.value = ''
-          amountNativeOut.value = ''
-          // this.dialogVisibleSwap = false
-        }, 500)
         const chain = 'solana'
-        const txInfo: any = res?.[0] || {}
-        console.log('recordTxV2 txInfo', txInfo)
-        recordTxV2({
-          txInfo,
-          chain: chain,
-          destination: chain === 'solana' ? '/botapi/swap/createSolTx' : '/botapi/swap/createSwapEvmTx' ,
-          type: 10
-        })
-        const batchIdObj = {
-          [txInfo?.batchId]: txInfo?.id
-        }
-        const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
-          const batchId = subscribeResult.batchId
-          if (batchId === data.batchId) {
+        const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
+        res?.forEach?.((txInfo: any) => {
+          const walletName = botStore.walletList?.find?.(j => j?.addresses?.find?.(k => k?.chain === chain)?.address === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
+          let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
+            // this.$store.state.bot.historyUpdate++
+            tokenStore.placeOrderUpdate++
+            ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
+            // if (!['myBotHistory', 'myBotPosition']?.includes(this.$store.state.tabActive)) {
+            //   this.$store.state.tabActive = 'myBotHistory'
+            // }
+            loadingSwap.value = false
+            amountToken.value = ''
+            amountNative.value = ''
+            amountTokenOut.value = ''
+            amountNativeOut.value = ''
+            // this.dialogVisibleSwap = false
+          }, 500)
+          if (txInfo?.errorLog) {
             if (Timer) {
               clearTimeout(Timer)
               Timer = null
             }
-            tokenStore.placeOrderSuccess++
-            if (subscribeResult?.txList?.[0]?.success) {
-              ElNotification({ type: 'success', message: t('tradeSuccess') })
-              const txInfo = subscribeResult?.txList?.[0]
-              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
-            } else {
-              handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
+            handleBotError(walletName + ' ' + txInfo?.errorLog)
+            if (isError) {
+              loadingSwap.value = false
+              return
             }
-            unwatch()
-            loadingSwap.value = false
           }
+          recordTxV2({
+            txInfo,
+            chain: chain,
+            destination: chain === 'solana' ? '/botapi/swap/createSolTx' : '/botapi/swap/createSwapEvmTx' ,
+            type: 10
+          })
+          const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
+            const _batchId = subscribeResult.batchId
+            const txInfo1 = subscribeResult?.txList?.[0]
+            if (_batchId?.includes(batchId) && txInfo.creatorAddress === txInfo1?.walletAddress) {
+              if (Timer) {
+                clearTimeout(Timer)
+                Timer = null
+              }
+              tokenStore.placeOrderSuccess++
+               if (txInfo1?.success) {
+                ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
+                updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
+              } else {
+                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error')
+              }
+              unwatch()
+              loadingSwap.value = false
+            }
+          })
         })
       }
     }).catch(err => {
@@ -796,13 +816,19 @@ async function submitBotSwap() {
     const gasTip = Number(new BigNumber(gasPrice).times(10 ** 9).toFixed(0))
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
-    const data = {
-      batchId: Date.now().toString(),
-      chain: chain,
-      swapList: [{
-        creatorAddress: walletAddress,
+    const batchId = Date.now().toString()
+    const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
+      const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
+      return {
+        batchId: batchId + String(k), // batchId + k,
+        creatorAddress: addr || '',
         inAmount: new BigNumber(amount || 0).times(10 ** (ft?.decimals || 0)).toFixed(0),
-      }],
+      }
+    })
+    const data = {
+      // batchId: Date.now().toString(),
+      chain: chain,
+      swapList: swapList,
       inTokenAddress: isBuy ? native : (ft.address || ''),
       outTokenAddress: isBuy ? (tt.address || '') : native,
       swapType: (isBuy ? 1 : 2) as 1 | 2,
@@ -817,56 +843,73 @@ async function submitBotSwap() {
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellPriorityFee: gasTip
     }
-    if (!isBuy) {
-      await checkApproveAndApprove({
-        token: ft.address,
-        chain: chain,
-        owner: walletAddress
-      }).catch(() => {
-        loadingSwap.value = false
-      })
-    }
+    // await Promise.all(swapList.map(i => {
+    //   return checkApproveAndApprove({
+    //     token: ft.address,
+    //     chain: chain,
+    //     owner: i.creatorAddress
+    //   })
+    // })).catch(() => {
+    //   loadingSwap.value = false
+    // })
+    await checkApproveAndApprove({
+      token: ft.address,
+      chain: chain,
+      owner: walletAddress
+    }).catch(() => {
+      loadingSwap.value = false
+    })
     bot_createSwapEvmTx(data).then(res => {
       if (res) {
-        let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
-          tokenStore.placeOrderUpdate++
-          ElNotification({ type: 'success', message: t('transactionsSubmitted') })
-          loadingSwap.value = false
-          amountNative.value = ''
-          amountNativeOut.value = ''
-          amountToken.value = ''
-          amountTokenOut.value = ''
-          // this.dialogVisibleSwap = false
-        }, 500)
-        const txInfo: any = res?.[0] || {}
-        recordTxV2({
-          txInfo,
-          chain: chain,
-          destination: '/botapi/swap/createSwapEvmTx' ,
-          type: 10
-        })
-        const batchIdObj = {
-          [txInfo?.batchId]: txInfo?.id
-        }
-
-        const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
-          const batchId = subscribeResult.batchId
-          if (batchId === data.batchId) {
+        const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
+        res?.forEach?.((txInfo: any) => {
+          const walletName = botStore.walletList?.find?.(j => j?.evmAddress?.toLowerCase?.() === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
+          let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
+            tokenStore.placeOrderUpdate++
+            ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
+            loadingSwap.value = false
+            amountNative.value = ''
+            amountNativeOut.value = ''
+            amountToken.value = ''
+            amountTokenOut.value = ''
+            // this.dialogVisibleSwap = false
+          }, 500)
+          if (txInfo?.errorLog) {
             if (Timer) {
               clearTimeout(Timer)
               Timer = null
             }
-            tokenStore.placeOrderSuccess++
-            if (subscribeResult?.txList?.[0]?.success) {
-              ElNotification({ type: 'success', message: t('tradeSuccess') })
-              const txInfo = subscribeResult?.txList?.[0]
-              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
-            } else {
-              handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
+            handleBotError(walletName + ' ' + txInfo?.errorLog)
+            if (isError) {
+              loadingSwap.value = false
+              return
             }
-            unwatch()
-            loadingSwap.value = false
           }
+          recordTxV2({
+            txInfo,
+            chain: chain,
+            destination: '/botapi/swap/createSwapEvmTx' ,
+            type: 10
+          })
+          const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
+            const _batchId = subscribeResult.batchId
+            const txInfo1 = subscribeResult?.txList?.[0]
+            if (_batchId?.includes?.(batchId) && txInfo.creatorAddress === txInfo1?.walletAddress) {
+              if (Timer) {
+                clearTimeout(Timer)
+                Timer = null
+              }
+              tokenStore.placeOrderSuccess++
+              if (txInfo1?.success) {
+                ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
+                updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
+              } else {
+                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error')
+              }
+              unwatch()
+              loadingSwap.value = false
+            }
+          })
         })
       }
     }).catch(err => {
@@ -915,12 +958,18 @@ function submitBotLimit() {
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     // const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.native
     const slippage = botSettingStore.botSettings?.solana?.[botSettingStore.botSettings?.solana?.selected]?.slippage || 9
-    const data = {
-      batchId: Date.now().toString(),
-      swapList: [{
-        creatorAddress: walletAddress,
+    const batchId = Date.now().toString()
+    const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
+      const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
+      return {
+        batchId: batchId + String(k), // batchId + k,
+        creatorAddress: addr || '',
         inAmount: new BigNumber(amount || 0).times(10 ** (ft?.decimals || 0)).toFixed(0),
-      }],
+      }
+    })
+    const data = {
+      // batchId: Date.now().toString(),
+      swapList: swapList,
       tokenAddress: tokenStore.swap.token.address || tokenStore.token?.token || '',
       swapType: (isBuy ? 5 : 6) as 5 | 6, //5:Buy limit 6:Sell limit
       isPrivate: mev || false,
@@ -932,52 +981,67 @@ function submitBotLimit() {
     }
     bot_createSolLimitTx(data).then(res => {
       if (res) {
-        let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
-          // this.$store.state.bot.limitHistoryUpdate++
-          tokenStore.placeOrderUpdate++
-          priceLimit.value = ''
-          ElNotification({ type: 'success', message: t('limitSubmitted') })
-          //  if (!['myBotPosition', 'botLimitOrder']?.includes(this.$store.state.tabActive)) {
-          //   this.$store.state.tabActive = 'botLimitOrder'
-          // }
-          loadingSwap.value = false
-          amountToken.value = ''
-          amountNative.value = ''
-          amountTokenOut.value = ''
-          amountNativeOut.value = ''
-          // this.dialogVisibleSwap = false
-          // if (this.$store.state.tabActive === 'botLimitOrder') {
-          //   this.$store.state.bot.orderTabActive = 'my'
-          // }
-        }, 500)
-        const txInfo: any = res?.[0] || {}
-        recordTxV2({
-          txInfo,
-          chain: chain,
-          destination: '/botapi/swap/createSolLimitTx',
-          type: 20
-        })
-        const batchIdObj = {
-          [txInfo?.batchId]: txInfo?.id
-        }
-        const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
-          const batchId = subscribeResult.batchId
-          if (batchId === data.batchId) {
+        const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
+        res?.forEach?.((txInfo: any) => {
+          console.log('txInfo', txInfo, botStore.walletList)
+          const walletName = botStore.walletList?.find?.(j => j?.addresses?.find?.(k => k?.chain === 'solana')?.address === txInfo?.creatorAddress)?.name || ''
+          console.log('walletName', walletName)
+          let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
+            // this.$store.state.bot.limitHistoryUpdate++
+            tokenStore.placeOrderUpdate++
+            if (txInfo?.creatorAddress?.toLowerCase() === walletAddress) {
+              priceLimit.value = ''
+            }
+            ElNotification({ type: 'success', message: walletName + ' ' + t('limitSubmitted') })
+            //  if (!['myBotPosition', 'botLimitOrder']?.includes(this.$store.state.tabActive)) {
+            //   this.$store.state.tabActive = 'botLimitOrder'
+            // }
+            loadingSwap.value = false
+            amountToken.value = ''
+            amountNative.value = ''
+            amountTokenOut.value = ''
+            amountNativeOut.value = ''
+            // this.dialogVisibleSwap = false
+            // if (this.$store.state.tabActive === 'botLimitOrder') {
+            //   this.$store.state.bot.orderTabActive = 'my'
+            // }
+          }, 500)
+          if (txInfo?.errorLog) {
             if (Timer) {
               clearTimeout(Timer)
               Timer = null
             }
-            tokenStore.placeOrderSuccess++
-            if (subscribeResult?.txList?.[0]?.success) {
-              ElNotification({ type: 'success', message: t('tradeSuccess') })
-              const txInfo = subscribeResult?.txList?.[0]
-              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
-            } else {
-              handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
+            handleBotError(walletName + ' ' + txInfo?.errorLog)
+            if (isError) {
+              loadingSwap.value = false
+              return
             }
-            unwatch()
-            loadingSwap.value = false
           }
+          recordTxV2({
+            txInfo,
+            chain: chain,
+            destination: '/botapi/swap/createSolLimitTx',
+            type: 20
+          })
+          const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
+            const _batchId = subscribeResult.batchId
+            const txInfo1 = subscribeResult?.txList?.[0]
+            if (_batchId?.includes(batchId) && txInfo.creatorAddress === txInfo1?.walletAddress) {
+              if (Timer) {
+                clearTimeout(Timer)
+                Timer = null
+              }
+              tokenStore.placeOrderSuccess++
+              if (txInfo1?.success) {
+                ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
+                updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
+              } else {
+                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error')
+              }
+              unwatch()
+              loadingSwap.value = false
+            }
+          })
         })
       }
     }).catch(err => {
@@ -996,13 +1060,19 @@ function submitBotLimit() {
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
     const p = isPriceLimit.value ? priceLimit.value : formatDec(new BigNumber(priceLimit.value || 0).div(tokenStore.circulation || 1).toFixed(), 4)
-    const data = {
-      batchId: Date.now().toString(),
-      chain: chain,
-      swapList: [{
-        creatorAddress: walletAddress,
+    const batchId = Date.now().toString()
+    const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
+      const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
+      return {
+        batchId: batchId + String(k), // batchId + k,
+        creatorAddress: addr || '',
         inAmount: new BigNumber(amount || 0).times(10 ** (ft?.decimals || 0)).toFixed(0),
-      }],
+      }
+    })
+    const data = {
+      // batchId: Date.now().toString(),
+      chain: chain,
+      swapList: swapList,
       inTokenAddress: isBuy ? native : (ft.address || ''),
       outTokenAddress: isBuy ? (tt.address || '') : native,
       swapType: (isBuy ? 5 : 6) as 5 | 6,
@@ -1015,44 +1085,57 @@ function submitBotLimit() {
     }
     bot_createEvmLimitTx(data).then(res => {
       if (res) {
-        let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
+        const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
+        res?.forEach?.((txInfo: any) => {
+          const walletName = botStore.walletList?.find?.(j => j?.addresses?.find?.(k => k?.chain === chain)?.address === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
+          let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
           tokenStore.placeOrderUpdate++
-          priceLimit.value = ''
-          ElNotification({ type: 'success', message: t('limitSubmitted') })
+          if (txInfo?.creatorAddress?.toLowerCase() === walletAddress) {
+            priceLimit.value = ''
+          }
+          ElNotification({ type: 'success', message: walletName + ' ' + t('limitSubmitted') })
           loadingSwap.value = false
           amountToken.value = ''
           amountNative.value = ''
           amountTokenOut.value = ''
           amountNativeOut.value = ''
         }, 500)
-        const txInfo: any = res?.[0] || {}
+        if (txInfo?.errorLog) {
+          if (Timer) {
+            clearTimeout(Timer)
+            Timer = null
+          }
+          handleBotError(walletName + ' ' + txInfo?.errorLog)
+          if (isError) {
+            loadingSwap.value = false
+            return
+          }
+        }
         recordTxV2({
           txInfo,
           chain: chain,
           destination: '/botapi/swap/createEvmLimitTx',
           type: 20
         })
-        const batchIdObj = {
-          [txInfo?.batchId]: txInfo?.id
-        }
         const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
-          const batchId = subscribeResult.batchId
-          if (batchId === data.batchId) {
-            if (Timer) {
-              clearTimeout(Timer)
-              Timer = null
+          const _batchId = subscribeResult.batchId
+            const txInfo1 = subscribeResult?.txList?.[0]
+            if (_batchId?.includes(batchId) && txInfo.creatorAddress === txInfo1?.walletAddress) {
+              if (Timer) {
+                clearTimeout(Timer)
+                Timer = null
+              }
+              tokenStore.placeOrderSuccess++
+              if (txInfo1?.success) {
+                ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
+                updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
+              } else {
+                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error')
+              }
+              unwatch()
+              loadingSwap.value = false
             }
-            tokenStore.placeOrderSuccess++
-            if (subscribeResult?.txList?.[0]?.success) {
-              ElNotification({ type: 'success', message: t('tradeSuccess') })
-              const txInfo = subscribeResult?.txList?.[0]
-              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
-            } else {
-              handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
-            }
-            unwatch()
-            loadingSwap.value = false
-          }
+          })
         })
       }
     }).catch(err => {

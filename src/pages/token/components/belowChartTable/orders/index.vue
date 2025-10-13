@@ -6,6 +6,7 @@ import { getChainInfo } from '@/utils'
 import unified from './unified.vue'
 import { cancelAllLimitOrdersByGuid } from '@/api/token'
 import { useEventBus } from '@vueuse/core'
+import SelectWallet from '../selectWallet.vue'
 
 const props = defineProps({
   currentActiveTab: {
@@ -23,6 +24,7 @@ const wsStore = useWSStore()
 const unifiedRef = ref<any>()
 const activeTab = ref('solana')
 const botOrderOnlyCurrentToken = ref(false)
+const boundary = useTemplateRef('myOrders')
 const tabs = computed(() => {
   // 获取原始地址数组
   const addresses = botStore.userInfo?.addresses || []
@@ -36,7 +38,12 @@ const tabs = computed(() => {
   })
 })
 
+const selectWalletRef = useTemplateRef<typeof SelectWallet>('selectWallet')
+
 const userAddress = computed(() => {
+  if (selectWalletRef.value?.evmAddress) {
+    return botStore?.walletList?.find?.(i => i.evmAddress === selectWalletRef.value?.evmAddress)?.addresses?.find?.(i => i.chain === activeTab.value)?.address || ''
+  }
   const address = botStore.userInfo?.addresses.find((item) => item.chain === activeTab.value)
   return address?.address || ''
 })
@@ -98,7 +105,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <div ref="myOrders">
     <div class="px-12px mb-10px flex justify-between">
       <div class="flex items-center whitespace-nowrap w-[80%] overflow-x-auto scrollbar-hide">
         <a v-for="(item) in tabs" :key="item.chain" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px ${activeTab === item.chain ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`" @click="setActiveTab(item.chain)">
@@ -119,6 +126,7 @@ onMounted(() => {
           {{ t('cancelAll') }}
         </button>
       </div>
+      <SelectWallet ref="selectWallet" :chain="(activeTab as BotChain)" :boundary="boundary" />
     </div>
     <unified ref="unifiedRef" :chain="activeTab" :currentToken="botOrderOnlyCurrentToken" :userAddress="userAddress" />
   </div>

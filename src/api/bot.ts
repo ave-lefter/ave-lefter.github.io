@@ -293,6 +293,14 @@ export function bot_getWalletsAllChain(params: {
     address: string
     price?: number
     balance?: string
+    tokenBalances?: {
+      [key: string]: {
+        chain: string
+        address: string
+        price?: number
+        balance?: string
+      }
+    }
   }>
 }>> {
   const { $api } = useNuxtApp()
@@ -431,7 +439,7 @@ export const bot_getChainsTokenBalance = createCacheRequest(function(params) {
     method: 'post',
     body: params
   })
-}, 500)
+}, 1000)
 
 // 查询sol bundle是否可用
 // /swap/getBundleAvailable GET
@@ -499,7 +507,7 @@ export function bot_createSolTx(params: {
   return $api('/botapi/swap/createSolTx', {
     method: 'post',
     body: {
-      batchId: Date.now().toString(),
+      // batchId: Date.now().toString(),
       source: 'web',
       autoSell: false,
       channelRef: Cookies.get('refCode') || undefined,
@@ -542,7 +550,7 @@ export function bot_createSwapEvmTx(params: {
   return $api('/botapi/swap/createSwapEvmTx', {
     method: 'post',
     body: {
-      batchId: Date.now().toString(),
+      // batchId: Date.now().toString(),
       source: 'web',
       autoSell: false,
       preApprove: true,
@@ -575,7 +583,7 @@ export function bot_createSolLimitTx(params: {
   return $api('/botapi/swap/createSolLimitTx', {
     method: 'post',
     body: {
-      batchId: Date.now().toString(),
+      // batchId: Date.now().toString(),
       source: 'web',
       tgUid: botStore.userInfo?.tgUid,
       ...params,
@@ -607,7 +615,7 @@ export function bot_createEvmLimitTx(params: {
   return $api('/botapi/swap/createEvmLimitTx', {
     method: 'post',
     body: {
-      batchId: Date.now().toString(),
+      // batchId: Date.now().toString(),
       tgUid: botStore.userInfo?.tgUid,
       source: 'web',
       preApprove: true,
