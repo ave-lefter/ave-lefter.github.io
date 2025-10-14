@@ -422,7 +422,7 @@ function getFilterData(list, conditions) {
       pass = pass && i.tvl <= Number(conditions.tvl_max)
     }
     //  platforms: 'pump,moonshot',
-    if (pumpStore.pumpV3[pumpStore.activeChain]?.platforms?.length >0) {
+    if (pumpStore.pumpV3[pumpStore.activeChain]?.platforms?.length >0 && i.platform_id) {
       pass = pass && pumpStore.pumpV3[pumpStore.activeChain].platforms.includes(i.platform_id)
     }
     if (conditions?.holder_min) {
