@@ -231,7 +231,10 @@ export const useGlobalStore = defineStore('global', () => {
   const holderBlackList = useStorage<Array<pumpBlack>>('holderBlackList', [])
   const mySwapList = ref<any[]>([])
 
-   const hotList = shallowRef<GetHotTokensResponse[]>([])
+  const hotList = shallowRef<GetHotTokensResponse[]>([])
+  const showImport = shallowRef(false)
+ const showBotRecord = shallowRef(false)
+
   //  点击图表显示交易历史
    const isClickKlineFilter = useStorage('isClickKlineFilter', true)
    function sendFooterPriceWs() {
@@ -334,6 +337,8 @@ export const useGlobalStore = defineStore('global', () => {
     isClickKlineFilter,
     mySwapList,
     pumpLiveSort,
-    isUSDT
+    isUSDT,
+    showImport,
+    showBotRecord
   }
 })
