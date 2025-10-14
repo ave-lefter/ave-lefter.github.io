@@ -133,7 +133,7 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val: WSPump[]) => {
   if (Array.isArray(val)) {
     const rTime = Date.now()
     const list = val
-    .filter(el=> el.state === activeTab.value)
+    .filter(el=> el.state === getActiveTab(activeTab.value))
     .filter(el => el.chain === pumpStore.activeChain)
     .map(i => ({
       ...i,
@@ -198,7 +198,14 @@ function subscribe() {
     id: 1,
   })
 }
-
+function getActiveTab(activeTab: 'new'| 'soon' | 'graduated') {
+  const obj = {
+    new: 'new',
+    soon: 'migrating',
+    graduated: 'migrated',
+  }
+  return obj[activeTab] || ''
+}
 const debouncedSearch = useDebounceFn(() => {
   init(true)
 }, 500)
