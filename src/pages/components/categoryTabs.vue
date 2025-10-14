@@ -13,6 +13,7 @@ import {
   getActivityDefaultColumns,
   getActivityOptions,
 } from './activity/columnRender/columusService'
+import RankFilter from './rankFilter.vue'
 
 const emit = defineEmits<{
   (e: 'update:activeTab' | 'update:activeChain' | 'update:activeSubTab', value: string): void
@@ -24,6 +25,7 @@ const props = defineProps<{
   chains: IGetTreasureConfig[]
   activeChain: string
   activeSubTab: string
+  ammList: IGetTreasureConfig['swaps']
 }>()
 // const { t } = useI18n()
 const intervals = computed(() => {
@@ -265,6 +267,7 @@ watch(()=>props.categories,()=>{
           </button>
         </div>
         <div class="flex items-center">
+          <RankFilter :storageKey="configMap[activeTab as keyof typeof configMap].storageKey"  :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns" :ammList="ammList"/>
           <el-switch v-if="isSupportedChain" v-model="globalStore.rankCommon.quickVisible" class="mr-2" />
           <QuickSwapSet
             v-if="globalStore.rankCommon.quickVisible&&isSupportedChain"

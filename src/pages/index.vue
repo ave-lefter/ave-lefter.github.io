@@ -286,6 +286,7 @@ const needAmmList = computed(()=>{
         v-model:activeTab="activeTab"
         v-model:activeChain="activeChain"
         :categories="currentChainObj?.categories || []"
+        :ammList="currentChainObj?.swaps || []"
         :chains="chains"
       />
       <KeepAlive :max="6">

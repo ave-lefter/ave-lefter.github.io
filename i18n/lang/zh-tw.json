@@ -1426,5 +1426,7 @@
   "tweetSearchContractAddress": "推特搜索合約地址",
   "tweetSearchContractAddress2": "推特搜索代幣名稱",
   "tweetSearchContractAddress3": "推特搜索名稱及合約",
-  "trendChart": "走勢圖"
+  "trendChart": "走勢圖",
+  "dexSelect": "Dex選擇",
+  "intervalSelect": "時間選擇"
 }
