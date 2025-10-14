@@ -118,8 +118,8 @@ watch(() => botStore.evmAddress, () => {
 
 const activeTabToState = {
   pump_in_new: 'new',
-  pump_in_almost: 'soon',
-  pump_out_new: 'graduated'
+  pump_in_almost: 'migrating',
+  pump_out_new: 'migrated'
 } as Record<string, string>
 watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
   if (Array.isArray(val.msgs)) {

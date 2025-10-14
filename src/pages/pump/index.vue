@@ -643,7 +643,7 @@ const list2 = computed(() => {
         )
     )
   }
-  const list1 = (wsTableList.value || [])?.filter(i => i.state === 'soon' && i.chain === activeChain.value)
+  const list1 = (wsTableList.value || [])?.filter(i => (i.state === 'migrating') && i.chain === activeChain.value)
   const pumpFilter_soon = localStorage.getItem(
     `pumpFilter_${activeChain.value}_soon`
   )
@@ -678,7 +678,7 @@ const list2 = computed(() => {
         )
     )
   }
-  const list1 = (wsTableList.value || [])?.filter(i => i.state === 'graduated' && i.chain === activeChain.value)
+  const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
   const pumpFilter_graduated= localStorage.getItem(
     `pumpFilter_${activeChain.value}_graduated`
   )
