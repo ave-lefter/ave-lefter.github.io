@@ -9,7 +9,7 @@ import SuffixIcon from '../suffixIcon.vue'
 import PumpFilter from '~/pages/pump/pumpFilter.vue'
 import { _getPumpList } from '~/api/pump'
 
-let timer = { id: null }
+let timer: { id: number | null } = { id: null }
 const pumpAudio = useTemplateRef('pumpAudio')
 const isPaused = ref(false)
 const loading = ref(false)
@@ -120,6 +120,7 @@ watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
       if (val.token == i.target_token) {
         return {
           ...i,
+          ...val,
           logo_url: val.logo_url,
           name: val.name,
           symbol: val.symbol
@@ -263,9 +264,9 @@ function getPump(params: Record<string, any>, isFilter = false) {
     })
     .finally(() => {
       loading.value = false
-      // timer = requestTimeout(5000, () => {
-      //   updatePump(finalParams)
-      // })
+      timer = requestTimeout(5000, () => {
+        updatePump(finalParams)
+      })
     })
 }
 
