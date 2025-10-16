@@ -778,7 +778,7 @@ watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
   if (val) {
     const rTime = Date.now()
     const obj = { ...val, rTime: rTime }
-        console.log('----obj------',obj.symbol,'--MC--',obj.market_cap, '--progress--',obj.progress,  '--top--',obj.holders_top10_ratio  )
+        // console.log('----obj------',obj.symbol,'--MC--',obj.market_cap, '--progress--',obj.progress,  '--top--',obj.holders_top10_ratio  )
     logoList.value = logoList?.value?.filter?.(i => i.token !== obj.token && rTime - (i.rTime || 0) <= 16000)
     logoList.value.unshift(obj)
   }
