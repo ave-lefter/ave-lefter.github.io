@@ -5,6 +5,7 @@
         v-model:visible="visible_platforms"
         placement="bottom-start"
         popper-class="new-popover"
+        :width="'auto'"
         trigger="click"
       >
         <template #reference>
@@ -36,7 +37,7 @@
             <template v-if="item.chain === activeChain">
               <el-checkbox-group
                 v-model="pumpV3[activeChain].platforms as string[]"
-                class="pump-platforms"
+                class="pump-platforms flex flex-col"
               >
                 <el-checkbox
                   v-for="i in item.platforms"
@@ -1080,7 +1081,7 @@ function getPumpList(isFilter = false) {
 }
 
 function getPump(params, isFilter = false) {
-  console.log('---getPump-111------',params)
+  // console.log('---getPump-111------',params)
   const chain = activeChain.value
   if (Timer[params.category]) {
     clearTimeout(Timer[params.category])
