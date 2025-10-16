@@ -631,7 +631,6 @@ const wsList = getFilterData(list1, pumpFilter_new)
       }
     })
   }
- filterList = getFilterData(filterList, pumpFilter_new)
   return filterList
 })
 
@@ -669,7 +668,6 @@ const list2 = computed(() => {
         }
       })
     }
-    filterList= getFilterData(filterList, pumpFilter_soon)
     return filterList
   })
   const list3 = computed(() => {
@@ -706,7 +704,6 @@ const list2 = computed(() => {
         }
       })
     }
-    filterList = getFilterData(filterList, pumpFilter_graduated)
     return filterList
   })
 const scrollHeight = computed(()=>{
