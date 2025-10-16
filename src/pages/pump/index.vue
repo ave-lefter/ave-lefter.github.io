@@ -620,6 +620,7 @@ const wsList = getFilterData(list1, pumpFilter_new)
       if (obj) {
         return {
           ...i,
+          ...obj,
           logo_url: obj?.logo_url,
           name: obj?.name,
           symbol: obj?.symbol
@@ -629,6 +630,7 @@ const wsList = getFilterData(list1, pumpFilter_new)
       }
     })
   }
+ filterList = getFilterData(filterList, pumpFilter_new)
   return filterList
 })
 
@@ -656,6 +658,7 @@ const list2 = computed(() => {
         if (obj) {
           return {
             ...i,
+            ...obj,
             logo_url: obj?.logo_url,
             name: obj?.name,
             symbol: obj?.symbol
@@ -665,6 +668,7 @@ const list2 = computed(() => {
         }
       })
     }
+    filterList= getFilterData(filterList, pumpFilter_soon)
     return filterList
   })
   const list3 = computed(() => {
@@ -691,6 +695,7 @@ const list2 = computed(() => {
         if (obj) {
           return {
             ...i,
+            ...obj,
             logo_url: obj?.logo_url,
             name: obj?.name,
             symbol: obj?.symbol
@@ -700,6 +705,7 @@ const list2 = computed(() => {
         }
       })
     }
+    filterList = getFilterData(filterList, pumpFilter_graduated)
     return filterList
   })
 const scrollHeight = computed(()=>{
@@ -772,6 +778,7 @@ watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
   if (val) {
     const rTime = Date.now()
     const obj = { ...val, rTime: rTime }
+        // console.log('----obj------',obj.symbol,'--MC--',obj.market_cap, '--progress--',obj.progress,  '--top--',obj.holders_top10_ratio  )
     logoList.value = logoList?.value?.filter?.(i => i.token !== obj.token && rTime - (i.rTime || 0) <= 16000)
     logoList.value.unshift(obj)
   }
