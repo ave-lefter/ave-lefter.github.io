@@ -31,7 +31,6 @@
       >
         <el-table
           ref="table_ref"
-          :load="loading"
           :data="eventsDetail.events"
           fit
           style="width: 100%"
