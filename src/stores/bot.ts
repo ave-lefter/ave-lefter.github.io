@@ -17,6 +17,7 @@ import { tgLogin } from '@/utils/bot'
 import { useBotSettingStore } from './botSetting'
 import { deepMerge, evm_utils as utils ,getChainInfo } from '@/utils'
 import { NATIVE_TOKEN } from '@/utils/constants'
+import { debounce } from 'lodash-es'
 
 type AddressItem = { chain: string; address: string; price?: number; balance?: string; decimals?: number; logo_url?: string; tokenBalances?: {
   [key: string]: {
@@ -128,18 +129,16 @@ export const useBotStore = defineStore('bot', () => {
     if (!accessToken.value) {
       return
     }
-    let addresses: string[] = []
-    walletList.value?.forEach?.((i) => {
-      addresses = [...addresses, ...(i.addresses?.map?.(i => i?.address || '') || [])]
+    for(let k = 0; k < walletList.value.length; k++) {
+      let i = walletList.value[k]
       let _item = item
       if (item?.address === NATIVE_TOKEN || item?.address === 'sol') {
         _item = null
       }
-      _getUserAllChainBalance(i.addresses, _item)
-    })
+      _getUserAllChainBalance(i?.addresses || [], _item)
+    }
     if (!item) {
-      const adds = Array.from(new Set(addresses))
-      subBalanceChange(adds)
+      subBalanceChange()
     }
   }
 
@@ -224,7 +223,12 @@ export const useBotStore = defineStore('bot', () => {
       })
     }
   }
-  function subBalanceChange(addresses: string[]) {
+  const subBalanceChange = debounce(_subBalanceChange, 1000)
+  function _subBalanceChange() {
+    const addresses = (walletList.value || []).reduce((pre: string[], cur) => {
+      return [...pre, ...(cur.addresses?.map?.(i => i?.address || '') || [])]
+    }, [] as string[])
+    const adds = Array.from(new Set(addresses))
     wsStore.send({
       jsonrpc: '2.0',
       method: 'unsubscribe',
@@ -236,7 +240,7 @@ export const useBotStore = defineStore('bot', () => {
     wsStore.send({
       jsonrpc: '2.0',
       method: 'subscribe',
-      params: ['asset', addresses],
+      params: ['asset', adds],
       id: 1,
     })
   }
@@ -502,6 +506,7 @@ export const useBotStore = defineStore('bot', () => {
     updateBalance,
     bot_subscribe,
     mnemonic,
-    showBotMnemonicPhrase
+    showBotMnemonicPhrase,
+    subBalanceChange
   }
 })
