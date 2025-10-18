@@ -70,8 +70,8 @@
         </div>
       </div>
       <div class="text-center mt-30px">
-        <el-button style="width: 30%" v-copy="mnemonic" @click.stop.prevent> 复制 </el-button>
-        <el-button style="width: 30%" type="primary" @click.stop.prevent="goOn"> 继续 </el-button>
+        <el-button style="width: 30%" v-copy="mnemonic?.join(' ')" @click.stop.prevent> {{ $t('copy') }} </el-button>
+        <el-button style="width: 30%" type="primary" @click.stop.prevent="goOn"> {{ $t('continue') }} </el-button>
       </div>
     </el-dialog>
   </div>

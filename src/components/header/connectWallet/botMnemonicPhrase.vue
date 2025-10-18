@@ -57,7 +57,7 @@
         </div>
         <div class="w-12px h-12px ml-30px">
           <Icon
-            v-copy="mnemonic"
+            v-copy="mnemonic?.join(' ')"
             name="bxs:copy"
             class="text-12px ml-2px cursor-pointer color-[--third-text] block hover:opacity-80"
             @click.stop.prevent
