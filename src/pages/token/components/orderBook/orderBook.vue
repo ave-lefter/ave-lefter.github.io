@@ -175,7 +175,7 @@
                           name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
                       </template>
                       <SignalTags v-if="windowWidth >= 480" tagClass="mr-3px"
-                        :tags="(row.newTags || []).map((el: any) => tagStore.matchTag(el.type))"
+                        :tags="(row.newTags || []).map((el: any) => tagStore.matchTag(el.type)||el)"
                         :walletAddress="row.wallet_address" :chain="row.chain" />
 
                       <UserRemark :remark="row.remark" :address="row.wallet_address"

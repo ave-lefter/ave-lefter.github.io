@@ -1058,7 +1058,7 @@ const collect = async (row: any,index:number) => {
               name="custom:big" class="mr-3px shrink-0"/>
           </template>
           <SignalTags
-            tagClass="mr-3px" :tags="(row.newTags||[]).map((el: any)=>tagStore.matchTag(el.type))"
+            tagClass="mr-3px" :tags="(row.newTags||[]).map((el: any)=>tagStore.matchTag(el.type)||el)"
                       :walletAddress="row.wallet_address" :chain="row.chain"/>
           <div :key="row.wallet_address" class="flex items-center gap-4px">
             <UserRemark
