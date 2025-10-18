@@ -56,6 +56,18 @@ watch(visible,()=>{
     tempFilter.value.activeInterval = globalStore.rankCommon.activeInterval
   }
 })
+
+function confirm(data:Record<string,any>) {
+  const {activeInterval,...rest} = data
+  for(const [restKey,restVal] of Object.entries(rest)){
+    const newVal = restVal === ' ' ? '' :restVal
+    globalStore.rankConditions[globalStore.rankActiveTab].filter[restKey] = newVal
+  }
+  if(activeInterval){
+    globalStore.rankCommon.activeInterval = activeInterval
+  }
+  visible.value=false
+}
 </script>
 
 <template>
@@ -130,7 +142,7 @@ watch(visible,()=>{
               clearable
             >
               <template #suffix>
-                <span>h</span>
+                <span>min</span>
               </template>
             </el-input>
             <span class="color-[--third-text]">~</span>
@@ -141,7 +153,7 @@ watch(visible,()=>{
               clearable
             >
               <template #suffix>
-                <span>h</span>
+                <span>min</span>
               </template>
             </el-input>
           </div>
@@ -159,7 +171,7 @@ watch(visible,()=>{
                 clearable
               >
                 <template #suffix>
-                  <span>h</span>
+                  <span>%</span>
                 </template>
               </el-input>
               <span class="color-[--third-text]">~</span>
@@ -170,7 +182,7 @@ watch(visible,()=>{
                 clearable
               >
                 <template #suffix>
-                  <span>h</span>
+                  <span>%</span>
                 </template>
               </el-input>
             </div>
@@ -374,10 +386,10 @@ watch(visible,()=>{
           </div>
           <!-- 池子¥ -->
           <div v-if="item.key === 'mCap' && item.isVisible" :key="item.key" class="flex items-center justify-between text-12px py-6px mb-8px">
-            <span class="color-[--secondary-text]">{{ $t('mCap') }}($)</span>
+            <span class="color-[--secondary-text]">{{ $t('liquidity1') }}($)</span>
             <div class="flex items-center gap-8px">
               <el-input
-                v-model.trim.number="tempFilter.marketcap_min"
+                v-model.trim.number="tempFilter.tvl_min"
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
@@ -388,7 +400,7 @@ watch(visible,()=>{
               </el-input>
               <span class="color-[--third-text]">~</span>
               <el-input
-                v-model.trim.number="tempFilter.marketcap_max"
+                v-model.trim.number="tempFilter.tvl_max"
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
@@ -400,9 +412,66 @@ watch(visible,()=>{
             </div>
           </div>
           <!-- 交易量 -->
+          <div v-if="item.key === 'dynamicVolAndTxs' && item.isVisible" :key="item.key" class="flex items-center justify-between text-12px py-6px mb-8px">
+            <span class="color-[--secondary-text]">{{ $t('Vol') }}($)</span>
+            <div class="flex items-center gap-8px">
+              <el-input
+                v-model.trim.number="tempFilter[`volume_u_${tempFilter.activeInterval}_min`]"
+                class="w-106px"
+                :placeholder="$t('minor')"
+                clearable
+              >
+                <template #suffix>
+                  <span>$</span>
+                </template>
+              </el-input>
+              <span class="color-[--third-text]">~</span>
+              <el-input
+                v-model.trim.number="tempFilter[`volume_u_${tempFilter.activeInterval}_max`]"
+                class="w-106px"
+                :placeholder="$t('max1')"
+                clearable
+              >
+                <template #suffix>
+                  <span>$</span>
+                </template>
+              </el-input>
+            </div>
+          </div>
           <!-- 交易数 -->
+          <div v-if="item.key === 'dynamicVolAndTxs' && item.isVisible" :key="item.key" class="flex items-center justify-between text-12px py-6px mb-8px">
+            <span class="color-[--secondary-text]">{{ $t('txns') }}</span>
+            <div class="flex items-center gap-8px">
+              <el-input
+                v-model.trim.number="tempFilter[`tx_${tempFilter.activeInterval}_count_min`]"
+                class="w-106px"
+                :placeholder="$t('minor')"
+                clearable
+              />
+              <span class="color-[--third-text]">~</span>
+              <el-input
+                v-model.trim.number="tempFilter[`tx_${tempFilter.activeInterval}_count_min`]"
+                class="w-106px"
+                :placeholder="$t('max1')"
+                clearable
+              />
+            </div>
+          </div>
           </template>
         </template>
+        <div class="mt-20px flex">
+          <el-button
+            class="h-30px flex-1 m-l-auto"
+            @click="confirm({})"
+          >
+            {{ $t('reset') }}
+          </el-button>
+          <el-button type="primary" class="h-30px flex-1 m-l-auto"
+          @click="confirm(tempFilter)"
+          >
+            {{ $t('confirm') }}
+          </el-button>
+        </div>
       </template>
     </el-popover>
 </template>

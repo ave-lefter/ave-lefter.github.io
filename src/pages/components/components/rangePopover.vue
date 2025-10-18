@@ -30,6 +30,19 @@ const defaultRangeArr = computed(()=>{
   return arr
 })
 const rangeArr = ref<[string, string]>(defaultRangeArr.value)
+
+watch(()=>{
+  const newFilter = globalStore.rankConditions[globalStore.rankActiveTab]?.filter
+  return [newFilter?.[`${props.sortKey}_min`], newFilter?.[`${props.sortKey}_max`]]
+},([minVal,maxVal])=>{
+  if(minVal){
+    rangeArr.value[0] = minVal
+  }
+  if(maxVal){
+    rangeArr.value[1] = maxVal
+  }
+  emit('confirm',rangeArr.value)
+})
 function confirm(params?: [string, string]) {
   if (!params) {
     rangeArr.value = ['', '']
