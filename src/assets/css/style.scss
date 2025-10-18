@@ -242,3 +242,13 @@ debox-chat-widget {
     }
   }
 }
+.bot-manage-table{
+    &.el-table {
+    .el-table__row > td:first-child {
+      .cell {
+          display: flex;
+          align-items: center;
+        }
+    }
+  }
+}

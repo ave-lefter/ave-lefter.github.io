@@ -1447,5 +1447,16 @@
   "lastChance": "请妥善保存助记词，关闭后将无法再次查看。",
   "saved": "我已保存好助记词",
   "startSwap": "开始交易",
+  "walletList": "钱包列表",
+  "createWallet": "创建钱包",
+  "archived": "已归档",
+  "importWallet": "导入钱包",
+  "walletRemove": "删除钱包",
+  "walletRemoveTip1": "检测到当前钱包仍有余额，请先转出资产后再进行删除操作。是否仍要继续删除？删除后将无法恢复钱包。",
+  "walletRemoveTip2": "是否确认删除钱包，删除之后无法恢复钱包。",
+  "operateHistory": "操作记录",
+  "automaticRecognition": "（自动识别）",
+  "importBotTip": "平台将自动识别助记词所属链（如 Solana、BSC、Base 等），仅导入检测到的钱包",
+  "wallet Manage": "钱包管理",
   "all1": "全选"
 }
