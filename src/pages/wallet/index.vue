@@ -19,14 +19,18 @@
         type="primary"
         @click.stop.prevent="generateWallet"
         :loading="loadingCreate"
-        ><Icon name="custom:wallet-fill" class="text-12px mr-4px" />{{ $t('createWallet') }}</el-button
+        ><Icon name="custom:wallet-fill" class="text-12px mr-4px" />{{
+          $t('createWallet')
+        }}</el-button
       >
       <el-button
         v-if="currentAddress"
         class="text-12px"
         size="small"
         @click.stop.prevent="showImport = true"
-        ><Icon name="mingcute:new-folder-fill" class="text-102x mr-4px" />{{ $t('importWallet') }}</el-button
+        ><Icon name="mingcute:new-folder-fill" class="text-102x mr-4px" />{{
+          $t('importWallet')
+        }}</el-button
       >
     </div>
     <List :tableData="tableData" :loading="loading" @refresh="refresh" />
@@ -42,8 +46,8 @@
       append-to-body
       :close-on-click-modal="false"
     >
-      <span class="text-24px">助记词</span>
-      <div class="relative cursor-pointer min-h-160px" @click="hide = !hide">
+      <span class="text-24px">{{ $t('mnemonic') }}</span>
+      <div class="relative cursor-pointer min-h-160px" @click="hide = false">
         <div
           class="mask text-center color-[--main-text] absolute bg-[--border] top-0 right-0 left-0 bottom-0 flex items-center justify-center z-1 text-14px"
           v-if="hide"
@@ -52,13 +56,17 @@
           {{ $t('clickMnemonic') }}
         </div>
         <div class="grid grid-cols-3 gap-2 mt-30px">
-          <span
-            class="mnemonic-item block border border-solid border-[--dialog-divider] py-8px text-center"
+          <div
+            class="mnemonic-item block border border-solid border-[--dialog-divider] py-8px text-center relative"
             v-for="(item, $index) in mnemonic"
             :key="$index"
           >
+            <span
+              class="color-[--third-text] rounded-4px text-10px px-4px py-1px overflow-hidden text-ellipsis whitespace-nowrap max-w-100px line-height-15px absolute  left-2px top-2px"
+              >{{ $index + 1 }}</span
+            >
             {{ item }}
-          </span>
+          </div>
         </div>
       </div>
       <div class="text-center mt-30px">
@@ -166,7 +174,7 @@ function getMultiWalletsAllChain() {
 }
 function generateWallet() {
   if (tableData.value?.length >= 10) {
-    ElMessage.error('当前 bot 钱包仅支持创建 9 个子钱包账户')
+    ElMessage.error(t('createTips'))
     return
   }
   loadingCreate.value = true

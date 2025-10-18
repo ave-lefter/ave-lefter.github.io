@@ -42,7 +42,7 @@
 
       <div
         class="bg-[--border] rounded-8px text-14px color-[--main-text] flex-start px-12px py-14px mt-8px flex-between relative cursor-pointer"
-        @click.stop.prevent="hide = !hide"
+        @click.stop.prevent="hide = false"
       >
         <div
           class="mask text-center color-[--main-text] absolute bg-[--border] top-0 right-0 left-0 bottom-0 flex items-center justify-center z-1 text-14px"

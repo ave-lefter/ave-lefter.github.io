@@ -1459,5 +1459,7 @@
   "operateHistory": "Operate History",
   "automaticRecognition": "(Automatic Recognition)",
   "importBotTip": "The platform will automatically recognize the chain to which the mnemonic words belong (such as Solana, BSC, Base, etc.), and only import the detected wallets",
-  "all1": "All"
+  "all1": "All",
+  "currentWallet": "Current Wallet",
+  "createTips": "The current bot wallet only supports creating 9 sub wallet accounts"
 }
