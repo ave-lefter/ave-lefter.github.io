@@ -199,7 +199,7 @@
         :name="themeStore.isDark ? 'custom:dark' : 'custom:light'"
       />
     </a>
-    <dialog-search ref="dialogSearchRef" v-model="dialogVisible_search"/>
+    <dialog-search ref="dialogSearchRef"/>
     <!-- <component :is="connectWalletCom" v-model="botStore.connectVisible" /> -->
     <ConnectWalletCom />
     <BotTipDialog/>
@@ -257,7 +257,7 @@ const homeUrl = computed(() => {
   return 'https://ave.ai/' + query
 })
 
-const dialogVisible_search = shallowRef(false)
+// const dialogVisible_search = shallowRef(false)
 
 // const lazyComponent = shallowRef<Component | null>(null)
 // const loadComponent = async () => {
@@ -304,7 +304,7 @@ watch(()=>wsStore.wsResult[WSEventType.TGBOT],(subscribeResult:ITGBotResponse)=>
 })
 
 async function showDialog() {
-  dialogVisible_search.value = !dialogVisible_search.value
+  globalStore.dialogVisible_search = !globalStore.dialogVisible_search
   // 自动粘贴剪切板
   const clipboard = await navigator.clipboard.readText()
   const isValid = clipboard && ['eth', 'solana','tron','sui','ton','brc20'].some(i => isValidAddress(clipboard, i))

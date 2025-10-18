@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="visible"
+    v-model="dialogVisible_search"
     width="780"
     height="590"
     :show-close="false"
@@ -71,16 +71,16 @@
           v-if="tabActive === 'token'"
           :tokens="hotTokenList.slice(0, 200) || []"
           :loading="loading"
-          @close="visible = false"
+          @close="dialogVisible_search = false"
           @done="done"
         />
-        <WalletTable v-else :tokens="smartTop10List || []" :loading="loading"  @close="visible = false" />
+        <WalletTable v-else :tokens="smartTop10List || []" :loading="loading"  @close="dialogVisible_search = false" />
       </template>
       <WalletTable
         v-else-if="tabActive === 'wallet'"
         :tokens="searchResult?.wallet_list || []"
         :loading="loading"
-        @close="visible = false"
+        @close="dialogVisible_search = false"
       />
       <template v-else>
         <ChainTabs v-model:chain="activeChain" />
@@ -88,7 +88,7 @@
           isCanFilter
           :tokens="searchResult?.token_list?.slice?.(0, 200) || []"
           :loading="loading"
-          @close="visible = false"
+          @close="dialogVisible_search = false"
           @filter="handleFilter"
           @sortChange="handleSortChange"
           @done="done"
@@ -110,24 +110,24 @@ import { ProvideType } from '~/utils/constants'
 import { getHotTokens, type GetHotTokensResponse } from '@/api/token'
 import type {IPriceV2Response} from '~/api/types/ws'
 import ChainTabs from './chainTabs/index.vue'
-const { hotList } = storeToRefs(useGlobalStore())
+const { hotList,dialogVisible_search,dialogSearchText:query } = storeToRefs(useGlobalStore())
 const {currentAddress} =storeToRefs(useFollowStore())
-const { modelValue } = defineProps({
-  modelValue: Boolean,
-})
+// const { modelValue } = defineProps({
+//   modelValue: Boolean,
+// })
 
-const $emit = defineEmits(['update:modelValue'])
+// const $emit = defineEmits(['update:modelValue'])
 const { t } = useI18n()
 const themeStore = useThemeStore()
-const visible = computed({
-  get() {
-    return modelValue
-  },
-  set(value) {
-    $emit('update:modelValue', value)
-  },
-})
-const query = shallowRef('')
+// const visible = computed({
+//   get() {
+//     return modelValue
+//   },
+//   set(value) {
+//     $emit('update:modelValue', value)
+//   },
+// })
+// const query = shallowRef('')
 const tabActive = shallowRef('token')
 const inputSearch = useTemplateRef<HTMLElement | null>('inputSearch')
 const tabs = computed(() => {
@@ -269,7 +269,7 @@ watch(() => currentAddress.value, () => {
   getSmartTop10()
 })
 
-watch(visible, (val) => {
+watch(dialogVisible_search, (val) => {
   if (val) {
     query.value = ''
     activeChain.value = ''

@@ -199,9 +199,10 @@
                   <a :href="`https://x.com/search?q=$${token?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
                     {{ $t('tweetSearchContractAddress2') }}
                   </a>
-                  <a :href="`https://x.com/search?q=($${token?.symbol} OR ${token?.token})&src=typed_query&f=live`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                  <a :href="`https://www.google.com/search?q=${token?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
                     {{ $t('tweetSearchContractAddress3') }}
                   </a>
+                  <span class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer" @click="handleSearchTokenName">{{ $t('tweetSearchContractAddress4') }}</span>
                 </div>
               </template>
             </el-popover>
@@ -638,7 +639,7 @@
       >
     </div>
 
-    <div class="item ml-24px" v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100">
+    <div v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100" class="item ml-24px">
       <span>{{ $t('progress') }}</span>
       <span class="block mt-8px color-[--main-text]"
         >{{ formatNumber(pair?.progress || 0, 2) }}%</span
@@ -828,7 +829,7 @@ const { evmAddress } = storeToRefs(useBotStore())
 const themeStore = useThemeStore()
 const { t } = useI18n()
 const route = useRoute()
-const { mode } = storeToRefs(useGlobalStore())
+const { mode,dialogVisible_search,dialogSearchText } = storeToRefs(useGlobalStore())
 
 const editableGroup = shallowRef(false)
 const groupId = shallowRef(0)
@@ -1317,6 +1318,12 @@ function getRugPull() {
 function handleNoticeClose() {
   const id = route.params.id as string
   tokenStore.tokenWarningObj[id] = true
+}
+async function handleSearchTokenName() {
+  dialogVisible_search.value = true
+  await Promise.resolve()
+  dialogSearchText.value = token.value?.symbol || ''
+  
 }
 </script>
 

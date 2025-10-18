@@ -234,6 +234,10 @@ export const useGlobalStore = defineStore('global', () => {
    const hotList = shallowRef<GetHotTokensResponse[]>([])
   //  点击图表显示交易历史
    const isClickKlineFilter = useStorage('isClickKlineFilter', true)
+  //  搜索框的展示
+  const dialogVisible_search = ref(false)
+  // 搜索框的文案
+  const dialogSearchText = ref('')
    function sendFooterPriceWs() {
     const data = {
       jsonrpc: '2.0',
@@ -334,6 +338,8 @@ export const useGlobalStore = defineStore('global', () => {
     isClickKlineFilter,
     mySwapList,
     pumpLiveSort,
-    isUSDT
+    isUSDT,
+    dialogVisible_search,
+    dialogSearchText
   }
 })
