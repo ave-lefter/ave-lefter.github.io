@@ -1444,5 +1444,6 @@
   "walletRemoveTip2": "否確認删除錢包，删除之後無法恢復錢包。",
   "operateHistory": "操作記錄",
   "automaticRecognition": "（自動識別）",
-  "importBotTip": "平臺將自動識別助記詞所屬鏈（如Solana、BSC、Base等），僅導入檢測到的錢包"
+  "importBotTip": "平臺將自動識別助記詞所屬鏈（如Solana、BSC、Base等），僅導入檢測到的錢包",
+  "all1": "全選"
 }

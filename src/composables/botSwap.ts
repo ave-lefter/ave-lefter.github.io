@@ -65,6 +65,8 @@ export function useBotSwap(type: number = 0) {
       tokenStore.swap.native = {...t2, symbol: getChainInfo(chain)?.main_name, chain: chain, address: t2.token || t2.address, decimals: t2?.decimals || t2?.decimal}
       tokenStore.swap.payToken = {...tokenStore.swap.payToken, ...t3}
       _getTokensPrice(true)
+      botStore?.getUserAllChainBalance(tokenStore.swap.payToken as {address: string, chain: string})
+      botStore?.getUserAllChainBalance(tokenStore.swap.token as {address: string, chain: string})
     })
   }
 

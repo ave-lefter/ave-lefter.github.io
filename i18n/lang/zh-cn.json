@@ -1447,7 +1447,6 @@
   "lastChance": "请妥善保存助记词，关闭后将无法再次查看。",
   "saved": "我已保存好助记词",
   "startSwap": "开始交易",
-
   "walletList": "钱包列表",
   "createWallet": "创建钱包",
   "archived": "已归档",
@@ -1458,5 +1457,6 @@
   "operateHistory": "操作记录",
   "automaticRecognition": "（自动识别）",
   "importBotTip": "平台将自动识别助记词所属链（如 Solana、BSC、Base 等），仅导入检测到的钱包",
-  "wallet Manage": "钱包管理"
+  "wallet Manage": "钱包管理",
+  "all1": "全选"
 }

@@ -5,8 +5,7 @@
     <NuxtLink to="/" class="flex items-center gap-4px">
       <img height="26" src="~/assets/images/avedex_mobile_logo.png" >
       <div class="flex items-end gap-5px">
-        <Icon name="custom:name" class="color-[--d-FFF-l-000] text-14px"/>
-        <Icon name="custom:pro" class="text-8px"/>
+        <Icon name="custom:ave-ai" class="color-[--d-FFF-l-000] text-14px"/>
       </div>
     </NuxtLink>
     <!-- <a :href="homeUrl" target="_blank" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></a> -->
