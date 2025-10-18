@@ -760,5 +760,7 @@
   "holdersChange2": "Người giữ changs trong {n}",
   "lockAmount": "Số lượng khóa",
   "transferToken": "Chọn mã thông báo chuyển",
-  "depositTip": "* Địa chỉ hiện tại Chuỗi EVM Universal"
+  "depositTip": "* Địa chỉ hiện tại Chuỗi EVM Universal",
+  "buySetting": "mua thiết lập",
+  "sellSetting": "bán thiết lập"
 }

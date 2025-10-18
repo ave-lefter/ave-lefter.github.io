@@ -397,8 +397,8 @@ function beforeSubmitSwap(balance: number, row: GetUserBalanceResponse & { index
 async function submitSwap(balance: number, row: GetUserBalanceResponse & { index: string }) {
   const isSolana = row.chain === 'solana'
   const {botSettings} = botSettingStore
-  const selected = botSettings?.[row.chain as BotChain]?.selected
-  const currentBotSetting = botSettings?.[row.chain as BotChain]?.[selected as BotSettingKey]
+  const selected = botSettings?.[row.chain as BotChain]?.sell?.selected
+  const currentBotSetting = botSettings?.[row.chain as BotChain]?.sell?.[selected as BotSettingKey]
   if (isSolana && currentBotSetting?.mev) {
     if (!await botStore.getBundleAvailable()) {
       loadingSwap.value[row.index] = false
