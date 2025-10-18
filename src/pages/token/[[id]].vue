@@ -190,28 +190,28 @@ provide('documentVisible', documentVisible)
 
 watch(() => addresses.value, () => {
   if (addresses.value?.length) {
-    subBalanceChange()
+    botStore.subBalanceChange()
   }
 }, {
   immediate: true
 })
 
-function subBalanceChange() {
-  wsStore.send({
-    jsonrpc: '2.0',
-    method: 'unsubscribe',
-    params: [
-      'asset'
-    ],
-    id: 1
-  })
-  wsStore.send({
-    jsonrpc: '2.0',
-    method: 'subscribe',
-    params: ['asset', addresses.value],
-    id: 1,
-  })
-}
+// function subBalanceChange() {
+//   wsStore.send({
+//     jsonrpc: '2.0',
+//     method: 'unsubscribe',
+//     params: [
+//       'asset'
+//     ],
+//     id: 1
+//   })
+//   wsStore.send({
+//     jsonrpc: '2.0',
+//     method: 'subscribe',
+//     params: ['asset', addresses.value],
+//     id: 1,
+//   })
+// }
 
 // 订阅画像
 function subscribePortrait() {
