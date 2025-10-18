@@ -39,11 +39,12 @@
 </template>
 
 <script setup lang="ts">
+import { type Records } from '@/api/botManage'
 const { showBotRecord } = storeToRefs(useGlobalStore())
 const { t } = useI18n()
 defineProps({
   tableData: {
-    type: Array,
+    type: Array as PropType<Records[]>,
     default: () => [],
   },
   loading: {

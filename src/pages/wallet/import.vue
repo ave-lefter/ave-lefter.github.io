@@ -15,8 +15,10 @@
         />
       </div>
       <div>
-        <span class="text-14px color-[--main-text]">{{ $t('allChain') }} {{ $t('automaticRecognition') }}</span>
-        <div class="text-12px color-[--third-text] mt-8px ">
+        <span class="text-14px color-[--main-text]"
+          >{{ $t('allChain') }} {{ $t('automaticRecognition') }}</span
+        >
+        <div class="text-12px color-[--third-text] mt-8px">
           {{ $t('importBotTip') }}
         </div>
       </div>
@@ -31,7 +33,8 @@
             class="input"
             :placeholder="`${i + 1}`"
             @input="handleInput($event, i)"
-            @keydown="handleKeydown($event as KeyboardEvent, i)"
+            @keydown.enter="handleKeydown($event as KeyboardEvent, i)"
+            @paste="handlePaste($event, i)"
           />
         </div>
         <div class="error-message">
@@ -39,7 +42,7 @@
         </div>
         <div class="flex-between">
           <el-button class="width100 button" size="small" @click.stop.prevent="reset">
-            取消
+            {{ $t('reset') }}
           </el-button>
           <el-button
             class="width100 button"
@@ -91,6 +94,22 @@ const handleKeydown = (e: KeyboardEvent, index: number) => {
     nextTick(() => inputs.value[index + 1]?.focus())
   }
 }
+// 处理粘贴事件
+const handlePaste = (e: KeyboardEvent, index: number) => {
+  const pasteData = e.clipboardData.getData('text').trim()
+
+  const arr = pasteData?.replace(/\s+/g, ' ')?.split(' ')
+  if (arr?.length == 12) {
+    e.preventDefault() // 阻止默认粘贴行为
+    if (/^[a-zA-Z\s]+$/.test(pasteData)) {
+      arr.forEach((item: string, $index: number) => {
+        words.value[$index] = item
+      })
+    } else {
+      ElMessage.error(t('importTip1eTips'))
+    }
+  }
+}
 function encryptMsg(plainText: string, guid: string): string {
   // 1. 明文 → Base64 编码（因为解密时有两层 Base64）
   const base64Plain = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(plainText))
@@ -111,16 +130,13 @@ function encryptMsg(plainText: string, guid: string): string {
   return encrypted.ciphertext.toString(CryptoJS.enc.Base64)
 }
 const handleBulkImportAttention = () => {
-  // if (words.value.some((w) => !w.trim())) {
-  //   errorMsg.value = '请填写完整的 12 个助记词'
-  //   return
-  // }
+  if (words.value.some((w) => !w.trim())) {
+    errorMsg.value = t('importTip1eTips2')
+    return
+  }
   loading.value = true
   const guid = botStore?.userInfo?.tgUid || ''
   const encryptedMnemonic = encryptMsg(mnemonic.value, guid)
-  console.log('--------mnemonic------', mnemonic.value)
-  console.log('--------encryptedMnemonic------', encryptedMnemonic)
-  console.log('--------guid------', guid)
   _importWallet(encryptedMnemonic)
     .then((res) => {
       ElMessage.success(t('success'))

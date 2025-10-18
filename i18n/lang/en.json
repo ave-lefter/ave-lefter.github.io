@@ -1461,5 +1461,7 @@
   "importBotTip": "The platform will automatically recognize the chain to which the mnemonic words belong (such as Solana, BSC, Base, etc.), and only import the detected wallets",
   "all1": "All",
   "currentWallet": "Current Wallet",
-  "createTips": "The current bot wallet only supports creating 9 sub wallet accounts"
+  "createTips": "The current bot wallet only supports creating 9 sub wallet accounts",
+  "importTip1eTips": "The mnemonic consists of 12 English words separated by spaces.",
+  "importTip1eTips2": "Please fill in the complete 12 mnemonic words"
 }

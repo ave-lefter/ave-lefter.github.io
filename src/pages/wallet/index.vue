@@ -7,7 +7,7 @@
       <span class="text-16px font-500">{{ $t('walletList') }}</span>
       <span
         v-if="currentAddress"
-        class="text-16px font-500 color-[--third-text] ml-40px"
+        class="text-16px font-500 color-[--third-text] ml-40px cursor-pointer"
         @click="getWalletOperationRecord"
         >{{ $t('archived') }}</span
       >
@@ -33,7 +33,7 @@
         }}</el-button
       >
     </div>
-    <List :tableData="tableData" :loading="loading" @refresh="refresh" />
+    <List :tableData="mergeTableData" :loading="loading" @refresh="refresh" />
     <Import @refresh="refresh" />
     <Record :tableData="recordList" :loading="loadingRecord" />
     <!-- 创建完成展示助记词 -->
@@ -62,7 +62,7 @@
             :key="$index"
           >
             <span
-              class="color-[--third-text] rounded-4px text-10px px-4px py-1px overflow-hidden text-ellipsis whitespace-nowrap max-w-100px line-height-15px absolute  left-2px top-2px"
+              class="color-[--third-text] rounded-4px text-10px px-4px py-1px overflow-hidden text-ellipsis whitespace-nowrap max-w-100px line-height-15px absolute left-2px top-2px"
               >{{ $index + 1 }}</span
             >
             {{ item }}
@@ -70,8 +70,8 @@
         </div>
       </div>
       <div class="text-center mt-30px">
-        <el-button style="width: 30%" v-copy="mnemonic" @click.stop.prevent> 复制 </el-button>
-        <el-button style="width: 30%" type="primary" @click.stop.prevent="goOn"> 继续 </el-button>
+        <el-button style="width: 30%" v-copy="mnemonic?.join(' ')" @click.stop.prevent> {{ $t('copy') }} </el-button>
+        <el-button style="width: 30%" type="primary" @click.stop.prevent="goOn"> {{ $t('continue') }} </el-button>
       </div>
     </el-dialog>
   </div>
@@ -125,6 +125,27 @@ watch(
     }
   }
 )
+const mergeTableData = computed(() => {
+  return tableData.value.map((item) => {
+    const addrList = item.balancesInfo || []
+    const matchGroup = botStore?.walletList?.find((w) => w.evmAddress === item.evmAddress)
+    if (!matchGroup) return item
+    const updatedList = addrList.map((addr) => {
+      const match = matchGroup.addresses.find(
+        (a) => a.chain === addr.chain && a.address === addr.address
+      )
+      return match
+        ? { ...addr, balance: match.balance } // balance 替换
+        : addr
+    })
+    return {
+      ...item,
+      balance: updatedList?.reduce((sum, item) => sum + Number(item.balance), 0),
+      balancesInfo: updatedList,
+    }
+  })
+})
+
 onMounted(() => {
   getMultiWalletsAllChain()
 })
@@ -132,12 +153,11 @@ function getWalletOperationRecord() {
   loadingRecord.value = true
   _getWalletOperationRecord()
     .then((res) => {
-      console.log('------getWalletOperationRecord------', res)
       recordList.value = res
       showBotRecord.value = true
     })
     .catch((err) => {
-      ElMessage.error(String(err))
+      ElMessage.error(err)
     })
     .finally(() => {
       loadingRecord.value = false
@@ -150,6 +170,7 @@ function getMultiWalletsAllChain() {
       tableData.value = Array.isArray(res)
         ? res?.map((item, index) => ({
             id: `parent-${index}`,
+            tgUid: item.tgUid,
             address: item.tgUid,
             name: item.name,
             source: item.source,
@@ -168,15 +189,18 @@ function getMultiWalletsAllChain() {
           }))
         : []
     })
+    .catch((err) => {
+      ElMessage.error(err)
+    })
     .finally(() => {
       loading.value = false
     })
 }
 function generateWallet() {
-  if (tableData.value?.length >= 10) {
-    ElMessage.error(t('createTips'))
-    return
-  }
+  // if (tableData.value?.length >= 10) {
+  //   ElMessage.error(t('createTips'))
+  //   return
+  // }
   loadingCreate.value = true
   _generateWallet()
     .then((res) => {
