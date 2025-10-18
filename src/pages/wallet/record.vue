@@ -21,12 +21,16 @@
           <span>{{ $t('time') }}</span>
         </div>
         <div class="flex-between py-8px" v-for="(item, $index) in tableData">
-          <span>{{getType(item.status || '')}}<span class="ml-9px">{{ item.evmAddress?.replace?.(new RegExp('(.{6})(.+)(.{4})'), '$1...$3') }}</span>         <Icon
+          <div>
+            {{ getType(item.status || '') }}
+            <span class="ml-9px">{{ item.name || 'Wallet '+ item.evmAddress?.slice(-4)}}</span>
+            <Icon
               v-copy="item?.evmAddress"
               name="bxs:copy"
               class="ml-5px mb--1px clickable color-[--third-text]"
               @click.stop
-            /></span>
+            />
+          </div>
           <span>{{ formatDate(item?.updateTime, 'MM/DD HH:mm:ss') }}</span>
         </div>
       </div>
@@ -106,9 +110,8 @@ function getType(type: 'import' | 'create' | 'delete') {
       }
     }
     .part {
-        font-size: 12px;
-        color:var(--secondary-text)
-
+      font-size: 12px;
+      color: var(--secondary-text);
     }
   }
 }

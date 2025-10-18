@@ -1445,5 +1445,7 @@
   "operateHistory": "操作記錄",
   "automaticRecognition": "（自動識別）",
   "importBotTip": "平臺將自動識別助記詞所屬鏈（如Solana、BSC、Base等），僅導入檢測到的錢包",
-  "all1": "全選"
+  "all1": "全選",
+  "currentWallet": "当前钱包",
+    "createTips": "當前bot錢包僅支持創建9個子錢包帳戶"
 }

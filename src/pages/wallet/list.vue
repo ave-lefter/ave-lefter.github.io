@@ -45,38 +45,47 @@
               :showAddress="true"
               @refresh="emit('refresh')"
             />
+            <span
+              v-if="evmAddress == row.evmAddress"
+              class="border-solid border-0.5px border-#286dff color-#286dff rounded-4px text-10px px-4px py-1px overflow-hidden text-ellipsis whitespace-nowrap max-w-100px ml-10px line-height-15px"
+              >{{ $t('currentWallet') }}</span
+            >
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="chain" :label="$t('chain')" />
-      <el-table-column prop="balance" :label="$t('balance1')" >
-          <template #default="{ row }">
-          {{  formatNumber(row?.balance || 0, 2) }}
+      <el-table-column prop="chain" :label="$t('chain')">
+        <template #default="{ row }">
+          {{ getChainInfo(row?.chain)?.name }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="balance" :label="$t('balance1')">
+        <template #default="{ row }">
+          {{ formatNumber(row?.balance || 0, 2) }}
         </template>
       </el-table-column>
       <el-table-column prop="source" :label="$t('origin')">
         <template #default="{ row }">
-          {{ row.source || '-' }}
+          {{ row?.isChildren ? '' : row.source || '-' }}
         </template>
       </el-table-column>
-      <el-table-column prop="operate" :label="$t('operate')" align="right">
+      <el-table-column :label="$t('operate')" align="right">
         <template #default="{ row }">
           <Icon
             class="text-14px text-[--third-text] cursor-pointer hover:color-[--main-text]"
             name="ic:baseline-delete"
-            v-if="row.operate == 'delete'"
+            v-if="row.operate == 'delete' && evmAddress !== row.evmAddress"
             @click.stop.prevent="removeWallet(row)"
           />
 
           <div
-            v-else
+            v-else-if="row?.isChildren"
             class="mr-40px bg-[--main-input-button-bg] rounded-4px inline-flex items-center gap-4px py-2px px-4px cursor-pointer"
+            @click.stop.prevent="deposit(row)"
           >
             <Icon name="custom:download" class="text-10px" />
-            <span class="font-500 text-12px" @click.stop.prevent="deposit(row)">{{
-              t('deposit2')
-            }}</span>
+            <span class="font-500 text-12px">{{ t('deposit2') }}</span>
           </div>
+          <span v-else></span>
         </template>
       </el-table-column>
     </el-table>
@@ -93,8 +102,10 @@
         <canvas id="qr-chain-canvas-code" />
         <div class="text-14px color-[--secondary-text] mt-26px">
           <span class="color-[--primary-color] mr-4px text-17px">{{
-            capitalize(currentObj.chain)
-          }}</span
+            getChainInfo(currentObj?.chain)?.name
+          }}
+
+          </span
           >{{ $t('walletAddress') }}
         </div>
         <span class="mt-26px color-[--main-text] text-14px block">{{ currentObj.address }}</span>
@@ -123,6 +134,7 @@ const { token_logo_url, mode } = storeToRefs(useGlobalStore())
 const { theme } = storeToRefs(useThemeStore())
 const { t } = useI18n()
 const router = useRouter()
+const { evmAddress } = storeToRefs(useBotStore())
 const dialogVisible = shallowRef(false)
 const currentObj = ref<{ chain: string; address: string }>({
   chain: '',
@@ -131,16 +143,12 @@ const currentObj = ref<{ chain: string; address: string }>({
 
 function removeWallet(item: Wallet) {
   if (Number(item?.balance) > 0) {
-    ElMessageBox.confirm(
-      t('walletRemoveTip1'),
-      t('walletRemove'),
-      {
-        type: 'warning',
-        confirmButtonText: t('confirm'),
-        cancelButtonText: t('cancel'),
-        customClass: mode.value,
-      }
-    ).then(() => {
+    ElMessageBox.confirm(t('walletRemoveTip1'), t('walletRemove'), {
+      type: 'warning',
+      confirmButtonText: t('confirm'),
+      cancelButtonText: t('cancel'),
+      customClass: mode.value,
+    }).then(() => {
       confirmRemoveWallet(item)
     })
   } else {
