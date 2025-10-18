@@ -101,21 +101,18 @@
       <div class="w-420px h-426px flex flex-col items-center justify-center">
         <canvas id="qr-chain-canvas-code" />
         <div class="text-14px color-[--secondary-text] mt-26px">
-          <span class="color-[--primary-color] mr-4px text-17px">{{
-            getChainInfo(currentObj?.chain)?.name
-          }}
-
-          </span
+          <span class="color-[--primary-color] mr-4px text-17px"
+            >{{ getChainInfo(currentObj?.chain || '')?.name  }} </span
           >{{ $t('walletAddress') }}
         </div>
-        <span class="mt-26px color-[--main-text] text-14px block">{{ currentObj.address }}</span>
+        <span class="mt-26px color-[--main-text] text-14px block">{{ currentObj?.address }}</span>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { _getMultiWalletsAllChain, _removeWallet, type Wallet, type Address } from '@/api/botManage'
+import { _removeWallet, type Wallet, type Address } from '@/api/botManage'
 import { ElMessage } from 'element-plus'
 import QrCodeWithLogo from 'qr-code-with-logo'
 import Remark from './remark.vue'
@@ -136,10 +133,7 @@ const { t } = useI18n()
 const router = useRouter()
 const { evmAddress } = storeToRefs(useBotStore())
 const dialogVisible = shallowRef(false)
-const currentObj = ref<{ chain: string; address: string }>({
-  chain: '',
-  address: '',
-})
+const currentObj = ref<Address | null>(null)
 
 function removeWallet(item: Wallet) {
   if (Number(item?.balance) > 0) {
@@ -173,13 +167,14 @@ function confirmRemoveWallet(item: Wallet) {
       console.log('--------err-------', err)
     })
 }
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-function deposit(item: Wallet) {
+
+function deposit(item: Address) {
   currentObj.value = item
   dialogVisible.value = true
   setTimeout(() => {
     setChainQr()
   }, 200)
+
 }
 async function setChainQr() {
   const canvas = document.getElementById('qr-chain-canvas-code')
@@ -188,20 +183,20 @@ async function setChainQr() {
   }
   QrCodeWithLogo.toCanvas({
     canvas: canvas,
-    content: currentObj.value.address,
+    content: currentObj.value?.address || '',
     width: 200,
     nodeQrCodeOptions: {
       margin: 2,
     },
     logo: {
-      src: `${token_logo_url.value}chain/${currentObj.value.chain}.png`,
+      src: `${token_logo_url.value}chain/${currentObj.value?.chain || 'bsc'}.png`,
       logoRadius: 8,
     },
   }).catch((err: any) => {
     console.log('QrCodeWithLogo error', err)
   })
 }
-function tableRowClick(item: Wallet) {
+function tableRowClick(item: Address) {
   if (item.isChildren) {
     const routeData = router.resolve({
       path: `/address/${item.address}/${item.chain}`,

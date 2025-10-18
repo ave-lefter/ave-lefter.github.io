@@ -39,7 +39,7 @@
         </div>
         <div class="flex-between">
           <el-button class="width100 button" size="small" @click.stop.prevent="reset">
-            取消
+            {{ $t('reset') }}
           </el-button>
           <el-button
             class="width100 button"

@@ -1,5 +1,16 @@
 export interface Wallet {
+  id: string
   tgUid: string
+  evmAddress: string
+  address: string
+  name: string
+  balance: string | number
+  source: string
+  operate: string
+  balancesInfo: Address[]
+}
+export interface Address {
+  id: string
   chain: string
   address: string
   name: string
@@ -7,15 +18,6 @@ export interface Wallet {
   source: string
   operate: string
   isChildren: boolean
-  balancesInfo: Address[]
-}
-export interface Address {
-  chain: string
-  address: string
-  name: string
-  balance: string
-  source: string
-  operate: string
 }
 
 export function _getMultiWalletsAllChain(): Promise<Wallet[]> {
@@ -72,6 +74,7 @@ export interface Records {
   id: number
   status: 'import' | 'create' | 'delete'
   guid: string
+  name: string
   evmAddress: string
   addressType: number
   updateTime: string
