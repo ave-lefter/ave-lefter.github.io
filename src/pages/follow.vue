@@ -1,6 +1,6 @@
 <template>
-  <div class="w-follow bg-[--d-222-l-F2F2F2]  flex-1 w-100%" style="height: calc(100vh - 92px);">
-   <div class="flex flex-col bg-[--d-111-l-FFF] h-100% py-12px w-100%">
+  <div class="w-follow bg-[--d-222-l-F2F2F2]  flex-1 w-100%" :style="{height}">
+   <div class="flex flex-col bg-[--secondary-bg] h-100% py-12px w-100%">
      <ul class="w-tabs pl-16px">
        <li v-for="item in tabData" :key="item.path" :class="{active:route.path === item.path}"><NuxtLink :to="item.path">{{item.label}}</NuxtLink></li>
      </ul>
@@ -13,7 +13,10 @@
 const route=useRoute()
 const { t } = useI18n()
 const defaultPath=ref('/follow/token')
-console.log('router',route)
+const globalStore = useGlobalStore()
+const height = computed(()=>{
+  return globalStore.tokenHistoryVisible ? 'calc(100vh - 125px)':'calc(100vh - 92px)'
+})
 const tabData=computed(()=>[
   {
     label:t('customToken'),
@@ -61,8 +64,8 @@ ul.w-tabs{
     height: 32px;
     line-height: 32px;
     cursor: pointer;
-    color:var(--d-666-l-999);
-    background-color:var(--d-1A1A1A-l-F2F2F2);
+    color:var(--third-text);
+    background-color:var(--main-input-button-bg);
     justify-content: center;
     align-items: center;
     border-radius: 4px;
@@ -70,8 +73,8 @@ ul.w-tabs{
       padding: 0 16px;
     }
     &.active{
-      color: #f5f5f5;
-      background-color:var(--d-333-l-0A0B0C);
+      color: var(--white);
+      background-color:#3F80F7;
     }
   }
 }

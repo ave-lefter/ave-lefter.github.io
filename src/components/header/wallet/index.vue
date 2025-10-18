@@ -1,15 +1,13 @@
 <template>
-  <el-popover v-model:visible="tgWalletVisible" placement="bottom-end" :width="360" trigger="click"
-    :popper-style="`--el-popover-padding: 0; --el-bg-color-overlay: ${mode === 'dark' ? '#222222' : '#ffffff'}`">
+  <el-popover v-model:visible="tgWalletVisible" placement="bottom-end" :width="360" trigger="click" popper-style="--el-popover-padding: 0;">
     <template #reference>
       <div
-        class="flex text-12px clickable-btn text-[--d-E9E9E9-l-222] h-32px cursor-pointer flex items-center bg-[--d-141721-l-E8F1FF] border-rd-4px px-10px py-0 min-w-80px  ml-8px">
+        class="flex text-12px clickable-btn color-[--main-text] bg-[--main-input-button-bg] h-32px cursor-pointer flex items-center border-rd-4px px-10px py-0 min-w-80px  ml-8px">
         <img
           class="border-rd-[50%] mr-5px" height="16" :src="generateAvatarIcon(botStore?.userInfo?.name || '')"
           alt="">
         <span>{{ botStore?.userInfo?.name || '' }}</span>
-        <Icon name="mdi:menu-down"
-          :class="['font-size-28px cursor-pointer ml--5px transition-all duration-0.4s', !!tgWalletVisible && 'rotate-z-180 origin-center']" />
+        <Icon name="mdi:menu-down" :class="['font-size-28px cursor-pointer ml--5px transition-all duration-0.4s', !!tgWalletVisible && 'rotate-z-180 origin-center']" />
       </div>
     </template>
     <div class="tg-wallet-container">
@@ -19,18 +17,16 @@
             <img style="border-radius: 50%;margin-right: 5px;" height="40"
               :src="generateAvatarIcon(botStore?.userInfo?.name || '')" alt="">
             <span style="margin-right: 8px;">{{ botStore?.userInfo?.name || '' }}</span>
-            <Icon name="mdi:menu-down"
-              :class="['font-size-28px cursor-pointer ml--5px transition-all duration-0.4s']" />
+            <Icon name="mdi:menu-down" :class="['font-size-28px cursor-pointer ml--5px transition-all duration-0.4s']" />
           </div>
         </div>
         <ul class="tg-wallet-list_content">
           <el-scrollbar :max-height="300">
-            <li v-for="(item, index) in botStore?.userInfo?.addresses || []" :key="index" class="clickable"
-              @click.stop="navigateToWallet(item.address, item.chain)">
+            <li v-for="(item, index) in botStore?.userInfo?.addresses || []" :key="index" class="clickable" @click.stop="navigateToWallet(item.address, item.chain)">
               <img :src="`${token_logo_url}chain/${item.chain}.png`" class="mr-5px border-rd-[50%]" height="32" alt="">
               <div>
                 <div class="text-16px">{{ getChainInfo(item.chain)?.name }}</div>
-                <div class="text-12px color-[--d-999-l-959A9F] mt-5px">
+                <div class="text-12px color-[--secondary-text] mt-5px">
                   <span>{{ item.address?.replace?.(new RegExp('(.{6})(.+)(.{4})'), '$1...$3') }}</span>
                   <Icon v-copy="item.address" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
@@ -38,7 +34,7 @@
               <div class="text-right" style="margin-left: auto;">
                 <div class="text-14px">{{ formatNumber(item?.balance || 0, 5) }} {{
                   getChainInfo(item.chain)?.main_name }}</div>
-                <div class="text-12px color-[--d-999-l-959A9F] mt-5px ">$ {{ formatNumber((item?.price || 0) *
+                <div class="text-12px color-[--secondary-text] mt-5px ">$ {{ formatNumber((item?.price || 0) *
                   Number(item?.balance
                     ||
                     0), 1) }}</div>
@@ -49,11 +45,11 @@
         <div style="flex: 1;" />
         <ul class="tg-wallet-list_footer flex flex-col gap-10px">
           <li class="flex justify-between h-40px px-20px clickable">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px" @click.stop="showVisible = 1">
+            <div class="color-[--main-text] flex items-center gap-8px" @click.stop="showVisible = 1">
               <Icon name="custom:wallet2" class="text-16px" />
               <span class="font-500 text-14px">{{ t('myWallet1') }}</span>
             </div>
-            <div class="color-#999 flex items-center gap-4px">
+            <div class="color-[--secondary-text] flex items-center gap-4px">
               <span class="font-500 text-12px">
                 {{ botStore?.userInfo?.name || '' }}
               </span>
@@ -61,22 +57,22 @@
             </div>
           </li>
           <li class="flex justify-between h-40px px-20px clickable" @click.stop="showVisible = 2">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+            <div class="color-[--main-text] flex items-center gap-8px">
               <Icon name="custom:download" class="text-16px" />
               <span class="font-500 text-14px">{{ t('deposit2') }}</span>
             </div>
-            <div class="color-#999 flex items-center gap-4px">
+            <div class="color-[--secondary-text] flex items-center gap-4px">
               <span class="font-500 text-12px">
               </span>
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>
           </li>
           <li class="flex justify-between h-40px px-20px clickable" @click.stop="showVisible = 3">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+            <div class="color-[--main-text] flex items-center gap-8px">
               <Icon name="custom:upload" class="text-16px" />
               <span class="font-500 text-14px">{{ t('withdraw') }}</span>
             </div>
-            <div class="color-#999 flex items-center gap-4px">
+            <div class="color-[--secondary-text] flex items-center gap-4px">
               <span class="font-500 text-12px">
               </span>
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
@@ -84,20 +80,18 @@
           </li>
           <li class="flex justify-between h-40px px-20px clickable"
             @click="router.push('/safe');tgWalletVisible = false">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+            <div class="color-[--main-text] flex items-center gap-8px">
               <Icon name="custom:shield-check" class="text-16px" />
               <span class="font-500 text-14px">{{ t('safe') }}</span>
             </div>
-            <div class="color-#999 flex items-center gap-4px">
+            <div class="color-[--secondary-text] flex items-center gap-4px">
               <span class="font-500 text-12px flex items-center color-#FFBE3C gap-8px">
                 <template v-if="authInfo?.emailAddress && authInfo?.authSetting">
                   <Icon name="mingcute:check-circle-fill" class="text-17px color-#12B886 mt-1px" />
-                  <!-- <Icon name="custom:check-circle" class="text-14px color-#12B886"/>  -->
                   <span class="color-#12B886">{{ t('bounded') }}</span>
                 </template>
                 <template v-else>
                   <Icon name="mingcute:warning-fill" class="text-17px mt-1px" />
-                  <!-- <Icon name="custom:exclamation-circle" class="text-14px"/>-->
                   <span>{{ t('notBound') }}</span>
                 </template>
               </span>
@@ -105,20 +99,20 @@
             </div>
           </li>
           <li class="flex justify-between h-40px px-20px clickable" @click.stop="$router.push('/solana-rent-recovery');tgWalletVisible = false">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+            <div class="color-[--main-text] flex items-center gap-8px">
               <Icon name="custom:sack-dollar" class="text-16px" />
               <span class="font-500 text-14px">{{ t('rentRecovery') }}</span>
             </div>
-            <div class="color-#999 flex items-center gap-4px">
+            <div class="color-[--secondary-text] flex items-center gap-4px">
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>
           </li>
           <li class="flex justify-between h-40px px-20px clickable" @click.stop="walletStore.disconnect(); tgWalletVisible = false">
-            <div class="color-[--d-F5F5F5-l-333] flex items-center gap-8px">
+            <div class="color-[--main-text] flex items-center gap-8px">
               <Icon name="custom:log-out" class="text-16px" />
               <span class="font-500 text-14px">{{ t('logout') }}</span>
             </div>
-            <div class="color-#999 flex items-center gap-4px">
+            <div class="color-[--secondary-text] flex items-center gap-4px">
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>
           </li>
@@ -133,7 +127,6 @@
         </div>
         <ul class="tg-wallet-list_content">
           <el-scrollbar :max-height="300">
-            <!-- $store.dispatch('bot_switchWallet', item); -->
             <li v-for="(item, index) in botStore.walletList" :key="index"
               :class="{ active: item.name === botStore?.userInfo?.name }" @click.stop="switchWallet(item)">
               <img style="border-radius: 50%;margin-right: 5px;" height="32" :src="generateAvatarIcon(item?.name || '')"
@@ -150,8 +143,8 @@
           </el-icon>
           <span class="ml-5px">{{ t('deposit') }}</span>
         </div>
-        <div class="tg-wallet-list_content">
-          <div style="padding: 15px 20px;">
+        <div class="tg-wallet-list_content pb-0px">
+          <div style="padding: 15px 20px 20px">
             <el-select v-model="depositChain" class="chains-select" placeholder="Select" size="large"
               style="width: 100%" :teleported="false" :suffix-icon="ArrowDownBold">
               <template #prefix>
@@ -169,11 +162,14 @@
             </el-select>
             <div class="flex-center mt-30px flex-col">
               <canvas id="qr-chain-canvas" />
-              <div class="text-12px"
-                style="display: flex; align-items: center; word-break: break-all; line-height: 1.2; padding: 20px 20px 40px; color: var(--d-999-l-222);">
+              <div class="text-12px color-[--secondary-text]" style="display: flex; align-items: center; word-break: break-all; line-height: 1.2; padding: 20px 20px 0px;">
                 <span>{{ depositChainInfo?.address || '' }}</span>
-                <Icon v-if="depositChainInfo?.address" v-copy="depositChainInfo?.address" name="bxs:copy"
-                  class="ml-5px mb--1px clickable" @click.stop />
+                <Icon v-if="depositChainInfo?.address" v-copy="depositChainInfo?.address" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
+              </div>
+              <div v-if="depositChain!=='solana'" class="flex-center flex-col">
+                <div class="text-12px color-[--secondary-text]" style="display: flex; align-items: center; word-break: break-all; line-height: 1.2; padding: 26px 20px 0px;">
+                  {{ t('depositTip') }}
+                </div>
               </div>
             </div>
           </div>
@@ -190,7 +186,7 @@
           ref="withdrawFormRef" :model="withdrawForm" :rules="rules" hide-required-asterisk
           class="tg-wallet-list_content" size="large" @submit.prevent="handleWithdraw">
           <div style="padding: 15px 20px 20px;">
-            <el-form-item label="" label-position="top">
+            <el-form-item :label="t('selectChain')" label-position="top">
               <el-select v-model="withdrawForm.chain" class="chains-select" placeholder="Select" size="large"
                 style="width: 100%" :teleported="false" :suffix-icon="ArrowDownBold"
                 @change="handleWithdrawChainChange">
@@ -208,26 +204,80 @@
                 </el-option>
               </el-select>
             </el-form-item>
+            <el-form-item :label="t('transferToken')" label-position="top" >
+                <el-select-v2
+                  v-model="withdrawForm.token"
+                  filterable
+                  v-loading="select2Loading"
+                  :item-height="48"
+                  size="large"
+                  class="chains-select" 
+                  :teleported="false"
+                  :options="balanceList"
+                  :suffix-icon="ArrowDownBold"
+                  placeholder="Please select"
+                >
+                  <template #prefix>
+                    <div v-if="withdrawForm.chain && (withdrawForm.token===NATIVE_TOKEN)" class="relative w-24px h-24px mr-8px">
+                      <el-image class="mr-3px border-rd-[50%] w-24px h-24px" height="24" :src="`${token_logo_url}token_icon/${withdrawForm.chain}/${NATIVE_TOKEN}.png`">
+                          <template #error>
+                            <img class="w-24px h-24px rounded-full" :src="getChainDefaultIcon(withdrawForm.chain, withdrawChainInfo2?.symbol)" />
+                          </template>
+                          <template #placeholder>
+                            <img class="w-24px h-24px rounded-full" :src="getChainDefaultIcon(withdrawForm.chain, withdrawChainInfo2?.symbol)" />
+                          </template>
+                      </el-image>
+                      <img class="w-12px h-12px absolute right-0px bottom-0px rounded-[50%]"
+                        :src="`${token_logo_url}chain/${withdrawForm.chain}.png`" alt=""
+                        onerror="this.src='/icon-default.png'" srcset="" >
+                    </div>
+                    <TokenImg v-else :row="withdrawChainInfo2" class="w-24px h-24px mr-8px" />
+                  </template>
+                  <template #default="{ item }">
+                    <div class="flex-between">
+                      <!-- <span style="margin-right: 8px">{{ item.symbol }}</span> -->
+                       <div class="flex items-center clickable flex-nowrap relative  h-48px">
+                         <TokenImg :row="item" class="w-24px h-24px mr-8px" />
+                         <div class="whitespace-nowrap text-ellipsis overflow-hidden max-w-80px">{{ item?.symbol }}</div>
+                       </div>
+                       <div class="flex flex-col items-end text-10px h-48px lh-10px justify-center">
+                        <span>{{ formatNumber(item.balance, 4) }}</span>
+                        <span>${{ formatNumber(item.balance_usd, 4) }}</span>
+                       </div>
+                      <!-- <span style="color: var(--el-text-color-secondary); font-size: 13px">
+                        {{ item.value }}
+                      </span> -->
+                    </div>
+                  </template>
+                </el-select-v2>
+            </el-form-item>
             <el-form-item :label="t('plsEnterAddress')" label-position="top" prop="address">
               <el-input v-model="withdrawForm.address"
-                style="background: var( --d-333-l-F2F2F2); --el-input-bg-color: var( --d-333-l-F2F2F2); --el-input-border-color: var( --d-333-l-F2F2F2); border-radius: 4px;--el-input-height:48px;"
+                style="border-radius: 4px;--el-input-height:48px;"
                 clearable placeholder="" />
             </el-form-item>
             <el-form-item :label="t('plsEnterAmount')" label-position="top" prop="amount">
               <el-input v-model="withdrawForm.amount"
-                style="background: var( --d-333-l-F2F2F2); --el-input-bg-color: var( --d-333-l-F2F2F2); --el-input-border-color: var( --d-333-l-F2F2F2); border-radius: 4px;--el-input-height:48px;"
+                style="border-radius: 4px;--el-input-height:48px;"
                 inputmode="decimal" clearable placeholder="0.00"
                 @input="value => withdrawForm.amount = value.replace(/\-|[^\d.]/g, '')">
                 <template #suffix>
-                  <span class="color-[--d-F5F5F5-l-333]">{{ getChainInfo(withdrawForm.chain)?.main_name }}</span>
+                  <span class="color-[--main-text]">{{  withdrawChainInfo2?.symbol || getChainInfo(withdrawForm.chain)?.main_name}}</span>
+                  <!-- <span class="color-[--main-text]">{{ getChainInfo(withdrawForm.chain)?.main_name }}</span> -->
                 </template>
               </el-input>
-              <div class="text-12px color-[--d-999-l-959A9F] text-right"
+              <div class="text-12px color-[--secondary-text] text-right"
                 style="width: 100%; line-height: 1; margin-top: 5px;position: absolute; right: 0; top: 100%;">
-                <span>{{ t('balance1') }}: {{
-                  formatNumber(withdrawChainInfo?.balance || 0, 5) }} {{
-                  getChainInfo(withdrawForm.chain)?.main_name
-                  }}</span>
+                <span>{{ t('balance1') }}: 
+                  <!-- {{
+                    formatNumber(withdrawChainInfo?.balance || 0, 5) }} {{
+                    getChainInfo(withdrawForm.chain)?.main_name
+                  }} -->
+                  {{
+                    formatNumber(withdrawChainInfo2?.balance || 0, 5) }} {{
+                    withdrawChainInfo2?.symbol || getChainInfo(withdrawForm.chain)?.main_name
+                  }}
+                </span>
                 <span class="text-12px font-400 color-#3F80F7 clickable ml-10px" @click.stop="handleMax">{{ t('max') }}</span>
               </div>
             </el-form-item>
@@ -239,16 +289,16 @@
         </el-form>
         <div v-else-if="!(authInfo?.emailAddress && authInfo?.authSetting)" class="px-20px py-102px text-center">
           <Icon name="custom:shield-user-line" class="text-72px color-[--d-FCFDFF-l-999] mb-16px" />
-          <div class="font-500 text-14px lh-18px color-[--d-F5F5F5-l-333] mb-8px">{{ t('2faT1') }}</div>
-          <div class="font-400 text-12px lh-16px color-#999 mb-30px">{{ t('2faP1') }}</div>
+          <div class="font-500 text-14px lh-18px color-[--main-text] mb-8px">{{ t('2faT1') }}</div>
+          <div class="font-400 text-12px lh-16px color-[--secondary-text] mb-30px">{{ t('2faP1') }}</div>
           <el-button type="primary" class="w-full" size="large" @click="router.push('/safe');tgWalletVisible = false">{{
             t('bindNow') }}</el-button>
         </div>
         <div v-else-if="(authInfo?.emailAddress && authInfo?.authSetting) && !authInfo?.transferStatus"
           class="px-20px py-102px text-center">
           <Icon name="custom:shield-user-line2" class="text-72px color-[--d-FCFDFF-l-999] mb-16px" />
-          <div class="font-500 text-14px lh-18px color-[--d-F5F5F5-l-333] mb-8px">{{ t('2faT2') }}</div>
-          <div class="font-400 text-12px lh-16px color-#999 mb-30px">{{ t('2faP1') }}</div>
+          <div class="font-500 text-14px lh-18px color-[--main-text] mb-8px">{{ t('2faT2') }}</div>
+          <div class="font-400 text-12px lh-16px color-[--secondary-text] mb-30px">{{ t('2faP1') }}</div>
           <el-button type="primary" class="w-full" size="large" disabled>{{ t('cooling') }}</el-button>
         </div>
       </div>
@@ -264,57 +314,56 @@
         </div>
         <div class="p-20px">
           <div>
-            <div class="mb-8px h-48px w-48px rounded-[50%] bg-[--d-333-l-F2F2F2] flex-center mx-auto">
-              <el-button v-if="withdrawStatus === 0" type="primary" loading text
-                class="[&&]:[--el-mask-color-extra-light:transparent] h-48px w-48px p-0"></el-button>
+            <div class="mb-8px h-48px w-48px rounded-[50%] bg-[--border] flex-center mx-auto">
+              <el-button v-if="withdrawStatus === 0" type="primary" loading text class="[&&]:[--el-mask-color-extra-light:transparent] h-48px w-48px p-0"></el-button>
               <Icon v-else-if="withdrawStatus === 1" name="custom:success" class="text-16px" />
               <Icon v-else name="custom:fail" class="text-18px" />
             </div>
             <div class="mb-8px font-500 text-14px lh-[100%] tracking-0px text-center">{{ withdrawResult }}</div>
             <div class="mb-24px font-500 text-20px lh-24px tracking-0px text-center">
-              -{{ formatNumber(withdrawForm.amount, 5) }} {{ getChainInfo(withdrawForm.chain)?.main_name }}
+              -{{ formatNumber(withdrawForm.amount, 5) }} {{ billObj?.tokenSymbol||getChainInfo(withdrawForm.chain)?.main_name }}
             </div>
             <ul class="flex flex-col gap-20px mb-30px">
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('toAddress') }}</div>
+                <div class="color-[--secondary-text]">{{ t('toAddress') }}</div>
                 <div>{{ billObj.transferTo ?billObj.transferTo?.slice(0, 13) + '...' +
                   billObj.transferTo?.slice(-11):'--' }}
                   <Icon v-copy="billObj.transferTo" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
               </li>
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('fromAddress') }}</div>
+                <div class="color-[--secondary-text]">{{ t('fromAddress') }}</div>
                 <div>{{ billObj.creatorAddress ?billObj.creatorAddress?.slice(0, 13) + '...' +
                   billObj.creatorAddress?.slice(-11):'--' }}
                   <Icon v-copy="billObj.creatorAddress" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
               </li>
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('gasFee') }}</div>
+                <div class="color-[--secondary-text]">{{ t('gasFee') }}</div>
                 <div>{{ formatNumber((gasFeeVal) || 0, 8) || '--' }} {{ getChainInfo(withdrawForm.chain)?.main_name }}(${{
                    formatNumber((gasFeeVal*(withdrawChainInfo?.price||0)) || 0, 4) ||'--' }})</div>
               </li>
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('network') }}</div>
+                <div class="color-[--secondary-text]">{{ t('network') }}</div>
                 <div class="flex-end"><img :src="`${token_logo_url}chain/${billObj.chain}.png`" class="rd-50% mr-4px"
                     width="14" lazy alt="">{{ billObj.chain &&getChainInfo(billObj.chain)?.name }}</div>
               </li>
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('txHash1') }}</div>
+                <div class="color-[--secondary-text]">{{ t('txHash1') }}</div>
                 <div class="clickable" @click.stop="queryHash">{{ billObj.txHash ?billObj.txHash?.slice(0, 13) + '...' + billObj.txHash?.slice(-11):'--' }}
                   <Icon v-copy="billObj.txHash" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
                 </div>
               </li>
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('blockHeight') }}</div>
+                <div class="color-[--secondary-text]">{{ t('blockHeight') }}</div>
                 <div>{{ billObj.blockNumber||'--' }}</div>
               </li>
               <li class="flex-between">
-                <div class="color-[--d-666-l-999]">{{ t('time') }}</div>
+                <div class="color-[--secondary-text]">{{ t('time') }}</div>
                 <div>{{ billObj.createTime ?formatDate(billObj.createTime, 'YYYY-MM-DD HH:mm:ss'):'--' }}</div>
               </li>
             </ul>
-            <el-button class="w-full" size="large" :color="isDark ? '#333333' :'#F2F2F2'" @click="showVisible = 0">{{
+            <el-button :key="Number(isDark)" class="w-full" size="large" color="var(--border)" @click="showVisible = 0">{{
               t('withdrawAgain') }}</el-button>
           </div>
         </div>
@@ -324,6 +373,8 @@
 </template>
 
 <script setup lang="ts">
+
+import TokenImg from '@/components/tokenImg.vue'
 import { bot_createSafeTransferTx, bot_getTransferGasFee, bot_getTransfer } from '@/api/bot'
 import { generateAvatarIcon, getChainInfo, isValidAddress, evm_utils as utils } from '@/utils'
 import { formatBotError, handleBotError } from '@/utils/bot'
@@ -337,7 +388,7 @@ import { throttle } from 'lodash-es'
 import QrCodeWithLogo from 'qr-code-with-logo'
 import doubleCheck from './doubleCheck.vue'
 // import { getTokensPrice } from '@/api/token'
-
+import { getUserBalance, type GetUserBalanceResponse } from '~/api/swap'
 const { authInfo } = storeToRefs(useUserStore())
 const { mode, token_logo_url, isDark } = storeToRefs(useGlobalStore())
 const { t } = useI18n()
@@ -361,17 +412,19 @@ interface WithdrawFormData {
   amount: string
   address: string
   chain: BotChain
-  memo?: string
+  memo?: string,
+  token: string
 }
 const withdrawForm = reactive<WithdrawFormData>({
   amount: '',
   address: '',
   chain: 'solana',
-  memo: ''
+  memo: '',
+  token:''
 })
-const loadingWithdraw = ref(false)
-const emailCode = ref('')
-const authCode = ref('')
+const loadingWithdraw = ref<boolean>(false)
+const emailCode = ref<string>('')
+const authCode = ref<string>('')
 const withdrawFormRef = ref<FormInstance>()
 
 const gasFeeObj = ref<{ [key: string]: number }>({
@@ -380,9 +433,9 @@ const gasFeeObj = ref<{ [key: string]: number }>({
   bsc: 21000000000000,
   base: 452549454000
 })
-const gasFeeVal = ref(0)
+const gasFeeVal = ref<number>(0)
 
-const withdrawStatus = ref(0)
+const withdrawStatus = ref<number>(0)
 
 const withdrawResult = computed(() => {
   return [t('trading'), t('tradeSuccess'), t('tradeFail')][withdrawStatus.value]
@@ -451,7 +504,7 @@ const checkAmount = (balance: BigNumber.Value) => (rule: any, value: BigNumber.V
 const rules = computed(() => ({
   amount: [
     { required: true, message: t('plsEnterAmount'), trigger: 'blur' },
-    { validator: checkAmount(withdrawChainInfo.value?.balance || 0), trigger: 'blur' }
+    { validator: checkAmount(withdrawChainInfo2.value?.balance || 0), trigger: 'blur' }
   ],
   address: [
     { required: true, message: t('plsEnterAddress'), trigger: 'blur' },
@@ -468,6 +521,92 @@ watch(tgWalletVisible, () => {
   billObj.value = {}
 })
 
+// 0918
+const select2Loading=ref<boolean>(false)
+
+const tokenDecimals= computed(() => {
+  return balanceList.value?.find?.(i => i?.token === withdrawForm.token)?.decimals||18
+})
+
+const decimals = computed(() => {
+  return withdrawChainInfo2?.value?.token === NATIVE_TOKEN ? (withdrawChainInfo.value?.decimals || 18) : tokenDecimals?.value
+})
+
+const balanceList=shallowRef<GetUserBalanceResponse[]>([])
+
+const withdrawChainInfo2=computed(() => {
+  console.log('withdrawChainInfo2', balanceList.value,withdrawForm.token,balanceList.value?.find?.(i => i?.token === withdrawForm.token))
+  return balanceList.value?.find?.(i => i?.token === withdrawForm.token)
+})
+
+watch(()=>withdrawChainInfo2?.value?.token,()=>{
+  if(showVisible.value===3){
+    withdrawFormRef.value?.resetFields?.()
+    getTransferGasFee()
+  }
+})
+
+watch(() => withdrawChainInfo.value?.chain, () => {
+  console.log('withdrawChainInfo.value?.chain', withdrawChainInfo.value?.chain)
+  if (withdrawChainInfo.value?.address) {
+    getUserBalanceDetails()
+  }
+},{immediate:true})
+
+function getUserBalanceDetails(){
+  const user_ids = [withdrawChainInfo.value?.address+'-'+withdrawChainInfo.value?.chain]
+  select2Loading.value=true
+  // todo
+  getUserBalance({
+    pageSize:300,
+    user_ids,
+    hide_risk:1,
+    hide_small:0
+  }).then(res=>{
+    const data=res?.data||[]
+    let exists=false
+    if(data.length){
+      balanceList.value =data.map(i=>{
+        return {
+          ...i,
+          label: i.symbol,
+          value: i.token
+        }
+      })
+      exists = balanceList.value.some(item => item.token === NATIVE_TOKEN)
+    
+      withdrawForm.token = NATIVE_TOKEN
+    }else{
+      balanceList.value=[]
+    }
+    if (!exists) {
+      balanceList.value.unshift({
+        symbol: getChainInfo(withdrawForm.chain)?.main_name,
+        token: NATIVE_TOKEN,
+        balance: 0,
+        balance_usd: 0,
+        decimals: getChainInfo(withdrawForm.chain)?.decimals || 18,
+        address: '',
+        chain: withdrawForm.chain||'',
+        logo_url: `${token_logo_url.value}token_icon/${withdrawForm.chain}/${NATIVE_TOKEN}.png`,
+        total_profit: '',
+        total_profit_ratio: '',
+        average_purchase_price_usd: '',
+        current_price_usd: 0,
+        price_change: 0,
+        risk_level: 0,
+        risk_score: 0,
+        label: getChainInfo(withdrawForm.chain)?.main_name,
+        value: NATIVE_TOKEN
+      })
+    }
+    withdrawForm.token = NATIVE_TOKEN
+  }).finally(()=>{
+    select2Loading.value=false
+  })
+}
+
+
 watch(() => depositChainInfo.value?.chain, () => {
   if (depositChainInfo.value?.address) {
     setChainQr()
@@ -479,7 +618,7 @@ watch(showVisible, (val) => {
     setChainQr()
   } else if (val === 3) {
     withdrawFormRef.value?.resetFields?.()
-  }
+  } 
   // bot_getTransfer({
   //   chain:'solana',
   //   batchId:1753859256515
@@ -571,17 +710,19 @@ async function setChainQr() {
 function handleWithdraw() {
   withdrawFormRef?.value?.validate((valid) => {
     if (valid) {
-      const decimals = withdrawChainInfo.value?.decimals || 18
-      let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals).plus(withdrawForm.amount || 0)
-      if (withdrawForm?.chain === 'solana') {
-        gasFee = gasFee.plus('0.002')
-      }else{
-        gasFee = new BigNumber(0)
-      }
+      // const decimals = withdrawChainInfo.value?.decimals || 18
+      let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals.value).plus(withdrawForm.amount || 0)
+      // if (withdrawForm?.chain === 'solana') {
+      //   gasFee = gasFee.plus('0.002')
+      // }else{
+      //   gasFee = new BigNumber(0)
+      // }
+      gasFee = new BigNumber(0)
       gasFeeVal.value = gasFee.toNumber()
-      const balance = new BigNumber(withdrawChainInfo.value?.balance || 0)
+      const balance = new BigNumber(withdrawChainInfo2?.value?.balance || 0)
+      // const balance = new BigNumber(withdrawChainInfo.value?.balance || 0)
       if (balance.lt(gasFee)) {
-        ElMessage.error(t('transferInsufficientBalance', { s: getChainInfo(withdrawForm.chain)?.main_name }))
+        ElMessage.error(t('transferInsufficientBalance', { s: withdrawChainInfo2?.value?.symbol||getChainInfo(withdrawForm.chain)?.main_name }))
         return
       }
       showVisible.value = 4
@@ -596,7 +737,7 @@ function handleWithdraw2() {
         solana: 'sol',
         ton: 'TON',
       }
-      const amount = ((new BigNumber(withdrawForm.amount || 0)).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${withdrawChainInfo.value?.decimals || 18}})?`)) || [''])[0]
+      const amount = ((new BigNumber(withdrawForm.amount || 0)).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals.value}})?`)) || [''])[0]
       if ((Number(amount) || 0) <= 0) {
         ElNotify({ title: 'Error', type: 'error', message: t('withdrawAmountTooSmall') })
         return
@@ -610,9 +751,10 @@ function handleWithdraw2() {
         batchId: Date.now().toString(),
         chain: withdrawForm.chain,
         creatorAddress: withdrawChainInfo?.value?.address || '',
-        tokenAddress: chainMainToken[withdrawForm.chain] || NATIVE_TOKEN,
+        tokenAddress: withdrawChainInfo2?.value?.token === NATIVE_TOKEN?(chainMainToken[withdrawForm.chain]||withdrawChainInfo2?.value?.token) :withdrawChainInfo2?.value?.token,
+        //  tokenAddress: chainMainToken[withdrawForm.chain] || NATIVE_TOKEN,
         tgUid: botStore?.userInfo?.tgUid,
-        amount: utils.parseUnits(amount || 0, withdrawChainInfo.value?.decimals || 18).toString(),
+        amount: utils.parseUnits(amount || 0, decimals.value).toString(),
         transferTo: withdrawForm.address,
         memo: '',
         emailCode: emailCode.value,
@@ -620,11 +762,12 @@ function handleWithdraw2() {
         gasTip: 0,
         source: 'web' as const
       }
+      // return console.log('handleWithdraw2',data)
       ElMessageBox.confirm(
         t('confirmWithdraw', {
           amount: amount,
           address: withdrawForm.address,
-          symbol: getChainInfo(withdrawForm.chain)?.main_name
+          symbol: withdrawChainInfo2?.value?.symbol||getChainInfo(withdrawForm.chain)?.main_name
         }),
         t('tips'),
         {
@@ -677,6 +820,9 @@ function handleWithdraw2() {
                   setTimeout(() => {
                     botStore.getUserAllChainBalance()
                   }, 1000)
+                  setTimeout(() => {
+                    getUserBalanceDetails()
+                  }, 3000)
                 } else {
                   withdrawStatus.value = 2
                   ElNotify({ title: 'Error', type: 'error', message: formatBotError(subscribeResult.failMessage) || 'Withdraw failed' })
@@ -720,22 +866,24 @@ const getTransferGasFee = throttle(function () {
 
  async function  handleMax() {
   console.log('handleMax')
-  const decimals = withdrawChainInfo.value?.decimals || 18
+  // const decimals = withdrawChainInfo.value?.decimals || 18
   if ((!gasFeeObj.value[withdrawForm.chain]) && withdrawForm.chain ==='solana') {
     await getTransferGasFee().catch(console.log)
   }
-  let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals)
-  if (withdrawForm?.chain === 'solana') {
-    gasFee = gasFee.plus('0.002')
-  } else{
-    gasFee = new BigNumber(0)
-  }
-  const balance = new BigNumber(withdrawChainInfo.value?.balance || 0)
+  let gasFee = new BigNumber(gasFeeObj.value[withdrawForm.chain] || 0).div(10 ** decimals.value)
+  // if (withdrawForm?.chain === 'solana') {
+  //   gasFee = gasFee.plus('0.002')
+  // } else{
+  //   gasFee = new BigNumber(0)
+  // }
+  gasFee = new BigNumber(0)
+  const balance = new BigNumber(withdrawChainInfo2.value?.balance || 0)
+  // const balance = new BigNumber(withdrawChainInfo.value?.balance || 0)
   if (balance.lt(gasFee)) {
-    ElMessage.error(t('transferInsufficientBalance', { s: getChainInfo(withdrawForm.chain)?.main_name }))
+    ElMessage.error(t('transferInsufficientBalance', { s: withdrawChainInfo2?.value?.symbol||getChainInfo(withdrawForm.chain)?.main_name }))
     return
   }
-  const matchResult = balance.minus(gasFee).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${withdrawChainInfo.value?.decimals || 18}})?`))
+  const matchResult = balance.minus(gasFee).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals.value}})?`))
   const amount = matchResult ? matchResult[0] : ''
   withdrawForm.amount = amount
   withdrawFormRef.value?.validateField?.('amount')
@@ -765,13 +913,13 @@ const getTransferGasFee = throttle(function () {
 
 .tg-wallet-list {
   min-height: 400px;
-  color: var(--d-E9E9E9-l-222);
+  color: var(--main-text);
   display: flex;
   flex-direction: column;
 
   .tg-wallet-list_title {
     padding: 20px;
-    border-bottom: 0.5px solid var(--d-33353D-l-F5F5F5);
+    border-bottom: 0.5px solid var(--border);
   }
 
   .tg-wallet-list_content {
@@ -783,11 +931,11 @@ const getTransferGasFee = throttle(function () {
       cursor: pointer;
 
       &:hover {
-        background: var(--d-333-l-F2F2F2);
+        background: var(--border);
       }
 
       &.active {
-        background: var(--d-333-l-F2F2F2);
+        background: var(--border);
       }
     }
   }
@@ -803,14 +951,13 @@ const getTransferGasFee = throttle(function () {
     :deep() {
       .el-select__wrapper.el-select__wrapper {
         box-shadow: none;
-        background: var(--d-333-l-F2F2F2);
+        // background: var(--d-333-l-F2F2F2);
         min-height: 48px;
       }
-
       .el-select-dropdown__item {
         padding: 0 32px 0 15px;
         height: 48px;
-        --el-fill-color-lighter: var(--d-333-l-F2F2F2);
+        // --el-fill-color-lighter: var(--d-333-l-F2F2F2);
       }
     }
   }
@@ -818,7 +965,7 @@ const getTransferGasFee = throttle(function () {
   .go-wallet-route {
     margin-left: auto;
     font-size: 14px;
-    color: #999999;
+    color: var(--secondary-text);
 
     &:hover {
       color: var(--d-FFF-l-000);

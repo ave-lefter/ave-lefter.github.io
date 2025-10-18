@@ -38,7 +38,7 @@
         :address="address"
         :chain="chain"
         :remark="remark"
-        :popoverProps="{width: 320,title:t('editRemark'),popperClass:'[&&]:[--el-popover-title-text-color:var(--d-FFF-l-333)] [&&]:[--el-popover-title-font-size:14px]'}"
+        :popoverProps="{width: 320,title:t('editRemark'),popperClass:'[&&]:[--el-popover-title-text-color:--main-text] [&&]:[--el-popover-title-font-size:14px]'}"
         @confirm="_updateWhaleRemark"
       />
       <Icon v-else name="custom:remark" class="text-12px ml-5px clickable icon-remark shrink-0" @click.stop.prevent="verifyLogin"/>
@@ -75,7 +75,7 @@ const props = defineProps({
   },
   addressClass: { type: String, default: '' },
   addressStyle: { type: String, default: '' },
-  iconEditColor: { type: String, default: 'var(--d-666-l-999)' },
+  iconEditColor: { type: String, default: 'var(--third-text)' },
   showAddressTitle: { type: Boolean, default: false },
   iconEditSize: { type: String, default: '12px' },
   iconSize: { type: String, default: '16px' },

@@ -505,5 +505,8 @@
   "holdersNumTotal": "Sahipler Toplam",
   "holdersTotalChange": "Sahipler değişir",
   "holdersChange": "Sahipler değişir",
-  "holdersChange2": "{N}"
+  "holdersChange2": "{N}",
+  "lockAmount": "Kilitli miktar",
+  "transferToken": "Aktarma jetonunu seçin",
+  "depositTip": "* Mevcut Adres EVM Zinciri Universal"
 }

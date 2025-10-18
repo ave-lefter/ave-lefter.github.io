@@ -9,7 +9,7 @@
     <component :is="ResetCom" v-if="emailRegisterType == 'reset'" v-model:cType="emailRegisterType" />
   </keep-alive>
   <div v-show="emailRegisterType !== 'reset'" class='w-content mt-40px'>
-    <h3 v-show="emailRegisterType !== 'reset'" class="font-700 flex items-center justify-center text-40px mb-40px lh-none decoration-none">
+    <h3 v-show="emailRegisterType !== 'reset' && !showBotMnemonicPhrase" class="font-700 flex items-center justify-center text-40px mb-40px lh-none decoration-none">
       <el-icon
         v-if="botStore.connectWalletTab !== 0"
         :size="35" style="color:var(--d-999-l-222);"
@@ -20,15 +20,16 @@
     </h3>
     <div class="m-content">
       <div v-show="botStore.connectWalletTab === 0" class="text-14px text-center min-h-200px">
-        <emailRegisterAndLogin ref="loginForm" v-model:cType="emailRegisterType">
+        <botMnemonicPhrase v-if="showBotMnemonicPhrase"></botMnemonicPhrase>
+        <emailRegisterAndLogin v-else ref="loginForm" v-model:cType="emailRegisterType">
           <template v-if="emailRegisterType === 'login'">
-            <button class="w-full bg-[--d-333-l-F2F2F2] h-40px flex items-center justify-center border-none mt-20px rd-6px px-12px clickable"  @click.stop="botStore.connectWalletTab = 1">
+            <button class="w-full bg-[--border] h-40px flex items-center justify-center border-none mt-20px rd-6px px-12px clickable"  @click.stop="botStore.connectWalletTab = 1">
               <span class="mr-auto">{{ $t('chainWallet') }}</span>
               <img class="mr-10px" src="@/assets/images/wallet/metaMask.png"  width="20" alt="metamask" srcset="" lazy>
               <img class="mr-10px" src="@/assets/images/wallet/phantom.png"  width="20" alt="phantom" srcset="" lazy>
               <img class="mr-10px" src="@/assets/images/wallet/okx.png"  width="20" alt="okx" srcset="" lazy>
               <img class="mr-8px" src="@/assets/images/wallet/wc.png"  width="20" alt="wc" srcset="" lazy>
-              <Icon class="text-14px color-[--d-666-l-999]" name="ep:arrow-right" />
+              <Icon class="text-14px color-[--third-text]" name="ep:arrow-right" />
             </button>
             <ul class="flex items-center justify-center gap-8px mt-20px">
               <template v-for="(item, k) in tabs" :key="item.value">
@@ -46,12 +47,16 @@
 <script setup lang='ts'>
 import { ArrowLeft } from '@element-plus/icons-vue'
 import emailRegisterAndLogin from './emailRegisterAndLogin.vue'
+import botMnemonicPhrase from './botMnemonicPhrase.vue'
+import { useStorage } from '@vueuse/core'
 const emailRegisterType = ref('login')
 const botStore = useBotStore()
 const themeStore = useThemeStore()
 const { t } = useI18n()
 const ResetCom = defineAsyncComponent(() => import('./reset.vue'))
-
+const showBotMnemonicPhrase = computed(() => {
+  return botStore.showBotMnemonicPhrase
+})
 const title = computed(() => {
   const connectWalletTab = botStore.connectWalletTab
   if (connectWalletTab == 0) {
@@ -89,8 +94,11 @@ const tabs = computed(() => {
     }
   ]
 })
-
 watch(() => botStore.connectVisible, (val) => {
+  if (!val) {
+    botStore.showBotMnemonicPhrase = false
+    botStore.mnemonic = ''
+  }
   if (!val && (emailRegisterType.value === 'reset' || emailRegisterType.value === 'register')) {
     nextTick(() => {
       emailRegisterType.value = 'login'
@@ -105,12 +113,12 @@ defineExpose({ emailRegisterType })
 
 <style scoped lang='scss'>
 
-:deep() .el-input {
-  --el-input-border-color: #444444;
-  --el-input-placeholder-color: var(--d-666-l-999);
-  --el-text-color-placeholder: #999;
-  --el-input-bg-color: var(--d-333-l-F2F2F2)
-}
+// :deep() .el-input {
+//   --el-input-border-color: #444444;
+//   --el-input-placeholder-color: var(--d-666-l-999);
+//   --el-text-color-placeholder: #999;
+//   --el-input-bg-color: var(--d-333-l-F2F2F2)
+// }
 
 :deep() .el-input__wrapper {
   border: none;

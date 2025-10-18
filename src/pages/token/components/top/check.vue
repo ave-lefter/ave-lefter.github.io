@@ -3,12 +3,15 @@
     v-model="visible"
     append-to-body
     :with-header="false"
-    :size="430"
+    :size="480"
     class="draw-right"
   >
-    <div class="check-container bg-[--d-222-l-FFF] color-[--d-F5F5F5-l-333]">
-      <div class="flex items-center justify-between text-20px p-20px sticky top-0 bg-[--d-222-l-FFF] z-1">
-        <span>{{ $t('check2') }}</span>
+    <div class="check-container bg-[--dialog-bg] color-[--main-text]">
+      <div class="flex items-center justify-between text-20px p-20px sticky top-0 bg-[--dialog-bg] z-1">
+        <div v-if="checkResult?.ai_report" class="flex-start">
+          <img src="@/assets/images/AI.svg" alt="" :width="20" class="mr-5px">{{ $t('AI') }}
+        </div>
+        <span v-else>{{ $t('check2') }}</span>
         <Icon name="ri:close-large-fill" class="clickable" @click.stop="visible = false" />
       </div>
       <div class="check-content">
@@ -36,8 +39,9 @@
                   </div>
                   <arc-progress
                     :progress="progress"
-                    :width="100"
-                    :thickness="5"
+                    :width="140"
+                    :height="80"
+                    :thickness="7"
                     :big="false"
                     class="arc-progress"
                     fontSize="24px"
@@ -61,14 +65,43 @@
             </div>
           </el-col>
           <el-col :span="24">
-            <div class="risk-statics">
+            <div v-if="checkResult?.ai_report" class="risk-statics">
+              <div class="item1">
+                <img
+                  v-if="riskAIList?.filter(i=> Number(i?.risk_level) == -3)?.length >0"
+                  :height="16"
+                  src="@/assets/images/risk-gaoliang.svg"
+                >
+                <img v-else :height="16" src="@/assets/images/risk.svg" >
+                <span class="num">{{ riskAIList?.filter(i=> Number(i?.risk_level) == -3)?.length || 0 }}</span>
+              </div>
+              <div class="item1">
+                <img
+                  v-if="riskAIList.filter(i=>Number(i?.risk_level) == -2)?.length >0"
+                  src="@/assets/images/yichang1-gaoliang.svg"
+                  :height="16"
+                >
+                <img v-else :height="16" src="@/assets/images/yichang1.svg" >
+                <span class="num">{{ riskAIList.filter(i=>Number(i?.risk_level) == -2)?.length }}</span>
+              </div>
+              <div class="item1">
+                <img
+                  v-if="riskAIList.filter(i=> Number(i?.risk_level) !== -1)?.length >0"
+                  :height="16"
+                  src="@/assets/images/zhuyi1-gaoliang.svg"
+                >
+                <img v-else :height="16" src="@/assets/images/zhuyi1.svg" >
+                <span class="num">{{ riskAIList.filter(i=> Number(i?.risk_level) == -1)?.length }}</span>
+              </div>
+            </div>
+            <div v-else class="risk-statics">
               <div class="item1">
                 <img
                   v-if="statistics_risk"
-                  :width="12"
+                  :height="16"
                   src="@/assets/images/risk-gaoliang.svg"
                 >
-                <img v-else :width="12" src="@/assets/images/risk.svg" >
+                <img v-else :height="16" src="@/assets/images/risk.svg" >
 
                 <span class="num">{{ statistics_risk || 0 }}</span>
               </div>
@@ -76,23 +109,23 @@
                 <img
                   v-if="statistics_warning"
                   src="@/assets/images/yichang1-gaoliang.svg"
-                  :width="12"
+                  :height="16"
                 >
-                <img v-else :width="12" src="@/assets/images/yichang1.svg" >
+                <img v-else :height="16" src="@/assets/images/yichang1.svg" >
                 <span class="num">{{ statistics_warning }}</span>
               </div>
               <div class="item1">
                 <img
                   v-if="statistics_unknown"
-                  :width="12"
+                  :height="16"
                   src="@/assets/images/zhuyi1-gaoliang.svg"
                 >
-                <img v-else :width="12" src="@/assets/images/zhuyi1.svg" >
+                <img v-else :height="16" src="@/assets/images/zhuyi1.svg" >
                 <span class="num">{{ statistics_unknown }}</span>
               </div>
             </div>
           </el-col>
-          <el-col :span="24">
+          <el-col v-if="!checkResult?.ai_report" :span="24">
             <div class="card card1">
               <ul>
                 <template
@@ -112,7 +145,7 @@
                           width="12px"
                           alt=""
                         >
-                        <span class="color-[--d-999-l-666] ml-5px">{{ item[1] }}</span>
+                        <span class="color-[--secondary-text] ml-5px">{{ item[1] }}</span>
                       </div>
                   </li>
                   <li
@@ -132,7 +165,7 @@
                       width="12px"
                       alt=""
                     >
-                    <span :class="item[0] > 1 ? 'color-[--d-F5F5F5-l-333] ml-5px' : 'color-[--d-999-l-666] ml-5px'">{{ item[1] }}</span>
+                    <span :class="item[0] > 1 ? 'color-[--main-text] ml-5px' : 'color-[--secondary-text] ml-5px'">{{ item[1] }}</span>
                   </li>
                 </template>
               </ul>
@@ -144,7 +177,7 @@
                 @click.stop.prevent="showRiskList = !showRiskList"
               >
                 <Icon
-                  class="text-24px color-[--d-666-l-999]"
+                  class="text-24px color-[--third-text]"
                   :name="
                     showRiskList
                       ? 'material-symbols:keyboard-arrow-up'
@@ -194,7 +227,7 @@
                           <use xlink:href="#icon-shouqi1"></use>
                         </svg> -->
                         <Icon
-                          class="text-20px color-[--d-999-l-666]"
+                          class="text-20px color-[--secondary-text]"
                           :name="
                             buy_tax_list_show
                               ? 'material-symbols:keyboard-arrow-up'
@@ -357,7 +390,7 @@
                         "
                       >
                         <Icon
-                          class="text-20px color-[--d-999-l-666]"
+                          class="text-20px color-[--secondary-text]"
                           :name="
                             sell_tax_list_show
                               ? 'material-symbols:keyboard-arrow-up'
@@ -656,8 +689,11 @@
               </ul>
             </div>
           </el-col>
+          <el-col v-if="checkResult?.ai_report" :span="24">
+            <AI :obj="checkResult?.ai_report" :riskList="riskAIList"/>
+          </el-col>
           <el-col :span="24">
-            <div class="text-12px">
+            <div class="text-14px mt-10px">
               {{ list?.[0]?.name }}({{ formatNumber(checkResult?.holders || 0)}})
             </div>
             <div class="card card1">
@@ -764,7 +800,7 @@
                     </a>
                     <div class="flex items-center">
                       <span>{{ formatNumber(item.quantity || 0, 2) }}</span>
-                      <span v-if="checkResult?.total && item?.quantity" class="color-[--d-666-l-999]">
+                      <span v-if="checkResult?.total && item?.quantity" class="color-[--third-text]">
                         ({{
                           formatNumber(
                             Number(item?.quantity) * 100 /
@@ -811,7 +847,7 @@
                 {{ $t('remark') }}: {{ holder_remark }}
               </div>
             </div>
-            <div class="text-12px">
+            <div class="text-14px">
               {{ list?.[1]?.name }}({{
                 formatNumber(checkResult?.pair_holders || 0)
               }})
@@ -912,7 +948,7 @@
                           (checkResult?.pair_total && item?.quantity) ||
                           item?.percent
                         "
-                        class="color-[--d-666-l-999]"
+                        class="color-[--third-text]"
                       >
                         ({{
                           item.percent && Number(item?.percent)
@@ -1160,12 +1196,12 @@
           </el-col>
           <el-col v-if="checkResult?.holder_analysis" :span="24">
             <div class="card card1 simulate">
-              <span class="text-12px">{{ $t('simulate') }}</span>
+              <span class="text-14px">{{ $t('simulate') }}</span>
               <table class="rd-4px">
                 <tbody>
                   <tr>
                     <td>
-                      <span class="block color-[--d-666-l-999]">{{
+                      <span class="block color-[--third-text]">{{
                         $t('simulateHolders')
                       }}</span>
                       <span class="block">
@@ -1177,7 +1213,7 @@
                       </span>
                     </td>
                     <td>
-                      <span class="block color-[--d-666-l-999]">{{
+                      <span class="block color-[--third-text]">{{
                         $t('sellSuccessful')
                       }}</span>
                       <span class="block">
@@ -1190,7 +1226,7 @@
                     </td>
                     <td>
                       <span
-                        class="block color-[--d-666-l-999]"
+                        class="block color-[--third-text]"
                         :class="{
                           failedBg:
                             (checkResult?.holder_analysis?.sell_failure ?? 0) >
@@ -1216,7 +1252,7 @@
                     </td>
                     <td>
                       <span
-                        class="block color-[--d-666-l-999]"
+                        class="block color-[--third-text]"
                         :class="{
                           balanceBg:
                             (checkResult?.holder_analysis
@@ -1237,13 +1273,13 @@
                   </tr>
                   <tr>
                     <td>
-                      <span class="color-[--d-666-l-999]">{{ $t('sellSlippage') }}</span>
+                      <span class="color-[--third-text]">{{ $t('sellSlippage') }}</span>
                     </td>
                     <td colspan="3" class="tl">
                       <span
                         :class="{ avgBg: checkResult?.avg_tax_too_high == 1 }"
                       >
-                        <span class="color-[--d-666-l-999]">{{ $t('averageTax') }}</span>
+                        <span class="color-[--third-text]">{{ $t('averageTax') }}</span>
                         &nbsp;{{
                           formatNumber(
                             checkResult?.holder_analysis?.average_tax || 0
@@ -1257,11 +1293,11 @@
                         class="flex-start"
                       >
                         <span>
-                          <span class="color-[--d-666-l-999]">{{ $t('slippage1') }}</span>
+                          <span class="color-[--third-text]">{{ $t('slippage1') }}</span>
                           &nbsp;{{ formatNumber(item?.tax) }}%
                         </span>
                         <span>
-                          <span class="color-[--d-666-l-999]">{{
+                          <span class="color-[--third-text]">{{
                             $t('addressCount')
                           }}</span>
                           &nbsp;{{ item?.count }}
@@ -1284,14 +1320,14 @@
           </el-col>
           <el-col>
             <div class="card card1">
-              <h3 class="text-12px">{{ $t('communityTrust') }}</h3>
+              <h3 class="text-14px">{{ $t('communityTrust') }}</h3>
               <div class="community-container mt-20px">
                 <div class="thumbs-container" @click.stop="voteSupport">
                   <Icon
                     name="garden:thumbs-up-fill-12"
                     :style="{
                       color:
-                        (checkResult?.my_vote ?? 0) > 0 ? '#12B886' : '#e1e1e1',
+                        (checkResult?.my_vote ?? 0) > 0 ? '#12B886' : 'var(--secondary-text)',
                     }"
                   />
                   <span class="thumbs-label">
@@ -1335,7 +1371,7 @@
                   class="iconfont icon-fandui icon-thumbs"
                   :style="{ color: checkResult.my_vote < 0 ? '#F6465D' : '#e1e1e1' }"
                 ></i> -->
-                  <Icon name="garden:thumbs-down-fill-12" :style="{ color: (checkResult?.my_vote ?? 0) < 0 ? '#F6465D' : '#e1e1e1'}"
+                  <Icon name="garden:thumbs-down-fill-12" :style="{ color: (checkResult?.my_vote ?? 0) < 0 ? '#F6465D' : 'var(--secondary-text)'}"
                   />
                   <span class="thumbs-label">
                     {{ $t('against') }}({{ checkResult?.vote_against || 0 }})
@@ -1372,6 +1408,7 @@ import {
 import { formatNumber } from '@/utils/formatNumber'
 import { filterGas, formatExplorerUrl, formatDate } from '@/utils/index'
 import { ElMessageBox, ElMessage } from 'element-plus'
+import AI from './ai.vue'
 const tokenStore = useTokenStore()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -1416,6 +1453,14 @@ const visible = computed({
   set(value) {
     $emit('update:modelValue', value)
   },
+})
+const riskAIList = computed(() => {
+  let list = checkResult.value?.ai_report?.risk || []
+  list = list?.map((i: any) => ({
+    ...i,
+    risk_level: i.risk_removed == 1 ? '1' : i?.risk_level,
+  }))
+  return list
 })
 const hasNoAdmin = computed(() => {
   return (
@@ -2151,7 +2196,7 @@ function getVote() {
   margin: 0 0 10px 0;
   padding: 10px 10px;
   &.basic {
-    background: var(--d-333-l-F2F2F2);
+    background: var(--dialog-list-hover);
     // border: 1px solid var(--d-282e35-l-e5e5e5);
     border-radius: 4px;
     // .card-list-item > :nth-child(1) {
@@ -2195,13 +2240,13 @@ function getVote() {
   display: flex;
   justify-content: space-between;
   padding: 10px 0 0;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   // align-items: center;
   font-size: 12px;
   .label {
     margin-right: 10px;
     font-weight: 400;
-    color: var(--d-666-l-999);
+    color: var(--third-text);
   }
   .value {
     font-weight: 500;
@@ -2209,7 +2254,7 @@ function getVote() {
   .range-text {
     font-size: 12px;
     margin-right: 5px;
-    color: var(--d-999-l-666);
+    color: var(--secondary-text);
   }
   .range {
     width: 35%;
@@ -2254,13 +2299,13 @@ function getVote() {
   }
 
   &.holder-item {
-    color: var(--d-999-l-666);
+    color: var(--secondary-text);
     > :nth-child(1) {
-      color: var(--d-666-l-999);
+      color: var(--third-text);
     }
   }
   > :nth-child(1) {
-    color: var(--d-999-l-666);
+    color: var(--secondary-text);
   }
   > :nth-child(2) {
     text-align: left;
@@ -2342,8 +2387,6 @@ function getVote() {
   align-items: center;
   padding: 10px 30px 0px 30px;
   cursor: pointer;
-  .label {
-  }
   img {
     width: 60px;
     margin: 15px 0 5px 0;
@@ -2417,16 +2460,17 @@ function getVote() {
   }
 }
 .table-lock {
-  color: var(--d-999-l-666);
-  background: var(--d-333-l-F2F2F2);
+  color: var(--secondary-text);
+  background: var(--dialog-list-hover);
   border-radius: 4px;
   width: 100%;
   font-size: 12px;
   padding: 5px;
+  margin: 5px 0;
   td,
   th {
     text-align: left;
-    color: var(--d-666-l-999);
+    color: var(--third-text);
     &:nth-child(2),
     &:nth-child(3),
     &:nth-child(4) {
@@ -2463,7 +2507,7 @@ function getVote() {
 
   .thumbs-label {
     font-size: 12px;
-    color: var(--d-999-l-666);
+    color: var(--secondary-text);
     line-height: 20px;
     font-weight: 400;
     margin-top: 5px;
@@ -2629,7 +2673,7 @@ function getVote() {
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  margin-bottom: 0;
+  margin-bottom: 10px;
   margin-top: 10px;
   .item1 {
     display: flex;
@@ -2651,8 +2695,8 @@ function getVote() {
         margin-left: 4px;
       }
       &.num {
-        font-size: 14px;
-        color: var(--custom-font-5-color);
+        font-size: 16px;
+        color: var(--secondary-text);
         letter-spacing: 0;
         line-height: 24px;
         font-weight: 500;
@@ -2674,10 +2718,10 @@ function getVote() {
     padding: 4px 0;
     display: inline-block;
     &:hover {
-      color: var(--d-F5F5F5-l-333);
+      color: var(--main-text);
     }
     &.active {
-      color: var(--d-F5F5F5-l-333);
+      color: var(--main-text);
       border-bottom: 2px solid #3f80f7;
     }
   }
@@ -2690,7 +2734,7 @@ function getVote() {
     border-collapse: collapse;
     width: 100%;
     font-size: 12px;
-    color: var(--d-F5F5F5-l-333);
+    color: var(--main-text);
     background-color: var(--d-333-l-F2F2F2);
     letter-spacing: 0;
     font-weight: 400;

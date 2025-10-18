@@ -1,5 +1,5 @@
 <template>
-  <button v-show="botStore.isSupportChains?.includes(chain)" class="one-click-btn clickable" :class="{ 'active': visible }" @click.stop="visible = !visible">
+  <button v-show="botStore.isSupportChains?.includes(chain)" class="one-click-btn clickable" :class="{ 'active': visible }" @keyup.prevent @keydown.enter.prevent @click.stop="visible = !visible">
     <Icon name="ion:flash" />
     <span class="ml-5px">{{ $t('oneClick') }}</span>
   </button>
@@ -7,48 +7,56 @@
     <template v-if="botStore.isSupportChains?.includes(chain) && visible">
       <div class="flex-between">
         <div class="flex-start">
-          <span>{{ $t('oneClick') }}</span>
+          <!-- <span>{{ $t('oneClick') }}</span> -->
+          <Icon :key="isEnableHotkey" v-tooltip="isEnableHotkey ? $t('hotkeyTips') : $t('hotkeyTips1')" class="text-14px color-[--secondary-text] clickable" :class="{ 'color-[--primary-color]!': isEnableHotkey }" name="ri:keyboard-box-fill" @click.stop="isEnableHotkey = !isEnableHotkey" @mousedown.stop />
+          <Icon :key="isEnablePnL" v-tooltip="isEnablePnL ? $t('enablePnLTips2') : $t('enablePnLTips1')" name="bx:bxs-bar-chart-alt-2" class="text-14px color-[--secondary-text] clickable ml-5px" :class="{ 'color-[--primary-color]!': isEnablePnL }" @mousedown.stop @click.stop="isEnablePnL = !isEnablePnL" />
+          <Icon :key="isEnableShowsReflected" v-tooltip="isEnableShowsReflected ? $t('disableShowsReflected') : $t('enableShowsReflected')" name="ph:approximate-equals-bold" class="text-14px color-[--secondary-text] clickable ml-5px" :class="{ 'color-[--primary-color]!': isEnableShowsReflected }" @mousedown.stop @click.stop="isEnableShowsReflected = !isEnableShowsReflected" />
           <div class="tabs-1 ml-5px">
             <button
               v-for="item in BotSettingsArr" :key="item.value"
-              :class="{ 'active': item.value === botSettings?.[chain]?.selected }" type="button"
+              :class="{ 'active': item.value === botSettings?.[chain]?.selected }" type="button" @mousedown.stop
               @click.stop="botSettings[chain]!.selected = item.value">{{ item.label }}</button>
           </div>
-          <SlippageSetMarket :chain="chain" />
+          <SlippageSetMarket class="ml-5px" :chain="chain" @mousedown.stop />
         </div>
         <Icon
-          class="text-14px clickable color-[--d-999-l-666] clickable" name="ri:close-large-fill"
-          @click.stop="visible = false" />
+          class="text-14px clickable color-[--main-text] clickable" name="ri:close-large-fill"
+          @click.stop="visible = false" @mousedown.stop />
       </div>
+      <el-divider class="b-t-color-[--dialog-divider]! mt-10px! mb-5px!" />
       <div class="content">
         <div class="flex-between mt-10px">
-          <span class="">{{ $t('buy1') }}</span>
-          <span class="color-#999 ml-auto">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.native?.balance || 0)
+          <span class="mr-auto">{{ $t('buy') }}</span>
+          <span v-if="isEnableShowsReflected && Number(estimateBuyAmount) > 0" class="mr-5px">≈{{ formatNumber(estimateBuyAmount, 3) }} {{ tokenStore.swap.token?.symbol || tokenStore.token?.symbol || '' }}</span>
+          <span class="color-[--secondary-text]">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.native?.balance || 0)
             }}&nbsp;{{ getChainInfo(chain)?.main_name }}</span>
-          <RefreshBalance class="color-#999" :type="0" />
+          <RefreshBalance class="color-[--secondary-text]" :type="0" @mousedown.stop />
         </div>
         <div class="mt-10px tabs">
           <el-button
             v-for="(item, $index) in botSettings?.[chain]![selected]?.buyValueList"
-            :key="$index" class="one-click-button green clickable" :loading="loadingSwapBuy[$index]"
-            :disabled="loadingSwapBuy[$index]" @click.stop.prevent="submitBotSwap(item, 'buy', $index)">{{
+            :key="$index" class="one-click-button green clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :loading="loadingSwapBuy[$index]"
+            :disabled="loadingSwapBuy[$index]" @click.stop.prevent="submitBotSwap(item, 'buy', $index)" @mousedown.stop @mouseover.stop="hoverBuyAmount = item" @mouseleave.stop="hoverBuyAmount = ''">{{
               !loadingSwapBuy[$index] ? item : '' }}</el-button>
         </div>
-        <div class="flex-between mt-15px">
-          <span class="">{{ $t('sell1') }}</span>
-          <span class="color-#999 ml-auto">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.token?.balance || 0)
+        <div class="flex-between mt-20px">
+          <span class="mr-auto">{{ $t('sell') }}</span>
+          <span v-if="isEnableShowsReflected && Number(estimateSellAmount) > 0" class="mr-5px">≈{{ formatNumber(estimateSellAmount, 3) }} {{ getChainInfo(chain)?.main_name || '' }}</span>
+          <span class="color-[--secondary-text]">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.token?.balance || 0)
             }}&nbsp;{{ tokenStore.token?.symbol || '' }}</span>
-          <RefreshBalance class="color-#999" :type="1" />
+          <RefreshBalance class="color-[--secondary-text]" :type="1" @mousedown.stop />
         </div>
         <div class="mt-10px tabs">
           <el-button
             v-for="(item, $index) in botSettings?.[chain]![selected]?.sellPerList"
-            :key="$index" class="one-click-button red clickable" :loading="loadingSwapSell[$index]"
-            :disabled="loadingSwapSell[$index]" @click.stop.prevent="handleSellAmount(item, $index)">{{
+            :key="$index" class="one-click-button red clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :loading="loadingSwapSell[$index]"
+            :disabled="loadingSwapSell[$index]" @click.stop.prevent="handleSellAmount(item, $index)" @mousedown.stop @mouseover.stop="hoverSellAmount = item" @mouseleave.stop="hoverSellAmount = ''">{{
               !loadingSwapSell[$index] ? item + '%' : ''
             }}</el-button>
         </div>
       </div>
+
+      <Holding v-show="isEnablePnL" isForceShow class="b-t-solid b-t-1px b-color-[--dialog-divider] mt-15px rd-0! pb-0! mb-0! gap-8px bg-transparent!" />
     </template>
 
   </div>
@@ -57,7 +65,7 @@
 <script setup lang='ts'>
 import { formatNumber } from '@/utils/formatNumber'
 import { getChainInfo, isEvmChain } from '@/utils'
-import { useLocalStorage } from '@vueuse/core'
+import { useLocalStorage, useEventListener } from '@vueuse/core'
 import { ElNotification } from 'element-plus'
 import BigNumber from 'bignumber.js'
 import { NATIVE_TOKEN } from '@/utils/constants'
@@ -67,6 +75,8 @@ import { bot_createSolTx, bot_createSwapEvmTx } from '@/api/bot'
 import RefreshBalance from './refreshBalance.vue'
 import SlippageSetMarket from './slippageSetMarket.vue'
 import type { BotChain, BotSettingKey } from '~/utils/types'
+import { recordTxV2, updateTxV2 } from '~/api/tracking'
+import Holding from './holding.vue'
 
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
@@ -80,6 +90,13 @@ const loadingSwapBuy = ref([false, false, false, false, false])
 const loadingSwapSell = ref([false, false, false, false, false])
 
 const visible = useLocalStorage('oneClickVisible', false)
+
+const isCanKeySwap = ref(false)
+const isEnableHotkey = useLocalStorage('isEnableHotkey', false)
+
+const isEnablePnL = useLocalStorage('isEnablePnL', true)
+const isEnableShowsReflected = useLocalStorage('isEnableShowsReflected', false)
+
 const { getTokenBalance, checkApproveAndApprove } = useBotSwap()
 
 const chain = computed(() => {
@@ -93,6 +110,54 @@ const selected = computed(() => {
 
 function getChain() {
   return ((getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) || '') as BotChain
+}
+
+const nativePrice = computed(() => {
+  const chain = getChain()
+  return botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || tokenStore.swap.native.price || 0
+})
+
+const tokenPrice = computed(() => {
+  return tokenStore.price || tokenStore.swap.token?.price || 0
+})
+
+const hoverBuyAmount = ref('')
+
+const hoverSellAmount = ref('')
+
+
+const estimateBuyAmount = computed(() => {
+  return new BigNumber(hoverBuyAmount.value || 0).times(nativePrice.value).div(tokenPrice.value).toFixed()
+})
+
+const estimateSellAmount = computed(() => {
+  return new BigNumber(hoverSellAmount.value || 0).times(tokenPrice.value).div(nativePrice.value).toFixed()
+})
+
+
+function addSpaceKeyDownEvent() {
+  useEventListener(document, 'keydown', (e) => {
+    if (e.code === 'Space') {
+      isCanKeySwap.value = true
+    }
+  })
+  useEventListener(document, 'keyup', (e) => {
+    if (e.code === 'Space') {
+      isCanKeySwap.value = false
+    }
+  })
+  useEventListener(document, 'keyup', (e) => {
+    if (isCanKeySwap.value && isEnableHotkey.value) {
+      const index = ['q', 'w', 'e', 'r'].indexOf(e.key)
+      if (index >= 0) {
+        submitBotSwap(botSettings.value?.[chain.value]![selected.value]?.buyValueList[index], 'buy', index)
+      }
+      const index2 = ['a', 's', 'd', 'f'].indexOf(e.key)
+      if (index2 >= 0) {
+        submitBotSwap(botSettings.value?.[chain.value]![selected.value]?.sellPerList[index2], 'sell', index2)
+      }
+    }
+  })
 }
 
 
@@ -185,6 +250,17 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             loadingSwapSell.value[index] = false
           }
         }, 500)
+        const chain = 'solana'
+        const txInfo: any = res?.[0] || {}
+        recordTxV2({
+          txInfo,
+          chain: chain,
+          destination: chain === 'solana' ? '/botapi/swap/createSolTx' : '/botapi/swap/createSwapEvmTx' ,
+          type: 10
+        })
+        const batchIdObj = {
+          [txInfo?.batchId]: txInfo?.id
+        }
         const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
           const batchId = subscribeResult.batchId
           if (batchId === data.batchId) {
@@ -195,6 +271,8 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
+              const txInfo = subscribeResult?.txList?.[0]
+              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
             }
@@ -266,6 +344,16 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
           }
           // this.dialogVisibleSwap = false
         }, 500)
+        const txInfo: any = res?.[0] || {}
+        recordTxV2({
+          txInfo,
+          chain: chain,
+          destination: '/botapi/swap/createSwapEvmTx',
+          type: 10
+        })
+        const batchIdObj = {
+          [txInfo?.batchId]: txInfo?.id
+        }
         const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
           const batchId = subscribeResult.batchId
           if (batchId === data.batchId) {
@@ -280,6 +368,8 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
               setTimeout(() => {
                 getTokenBalance()
               }, 1000)
+              const txInfo = subscribeResult?.txList?.[0]
+              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
               unwatch()
@@ -432,6 +522,7 @@ function disableDragScroll() {
 
 onMounted(() => {
   enableDragScroll()
+  addSpaceKeyDownEvent()
 })
 
 onUnmounted(() => {
@@ -468,11 +559,11 @@ onUnmounted(() => {
 .fixed-one-click {
   position: fixed;
   z-index: 3;
-  color: var(--d-F5F5F5-l-333);
+  color: var(--main-text);
   font-size: 12px;
-  background: var(--d-222-l-F2F2F2);
+  background: var(--dialog-bg);
   border-radius: 8px;
-  min-width: 240px;
+  min-width: 360px;
   padding: 12px;
   top: 210px;
   left: 350px;
@@ -487,29 +578,74 @@ onUnmounted(() => {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
 
       .one-click-button {
-        font-size: 12px;
+        font-size: 14px;
         min-width: 48px;
-        height: 24px;
+        height: 32px;
         padding: 3px 8px;
-        margin-right: 8px;
+        margin: 0;
+        // margin-right: 8px;
         flex: 1;
         text-align: center;
         background: transparent;
+        position: relative;
 
-        &:last-child {
-          margin-right: 0;
+        // &:last-child {
+        //   margin-right: 0;
+        // }
+
+        &.active:after {
+          content: '';
+          position: absolute;
+          top: calc(100% + 5px);
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: var(--dialog-list-hover);
+          min-width: 20px;
+          padding: 3px 0;
+          color: var(--main-text);
+          font-size: 14px;
+          border-radius: 4px;
         }
 
         &.green {
           color: #12b886;
           border: 1px solid #12b886;
+          &.active {
+            &:nth-child(1)::after {
+              content: 'Q';
+            }
+            &:nth-child(2)::after {
+              content: 'W';
+            }
+            &:nth-child(3)::after {
+              content: 'E';
+            }
+            &:nth-child(4)::after {
+              content: 'R';
+            }
+          }
         }
 
         &.red {
           color: #ff646d;
           border: 1px solid #ff646d;
+          &.active {
+            &:nth-child(1)::after {
+              content: 'A';
+            }
+            &:nth-child(2)::after {
+              content: 'S';
+            }
+            &:nth-child(3)::after {
+              content: 'D';
+            }
+            &:nth-child(4)::after {
+              content: 'F';
+            }
+          }
         }
       }
     }
@@ -526,7 +662,7 @@ onUnmounted(() => {
 
     button {
       border: none;
-      color: var(--d-999-l-666);
+      color: var(--secondary-text);
       letter-spacing: 0;
       font-weight: 400;
       cursor: pointer;
@@ -538,8 +674,8 @@ onUnmounted(() => {
 
       &.active {
         // color: var(--custom-font-4-color);
-        color: var(--d-F5F5F5-l-333);
-        background: var(--d-333-l-FFF);
+        color: var(--main-text);
+        background: var(--border);
       }
     }
   }

@@ -2,7 +2,7 @@
   <div v-if="(result?.total<=0) && (walletStore.walletName === 'WatchWallet')"/>
   <div v-else>
     <span
-      class="flex items-center text-14px cursor-pointer color-[--d-FFF-l-333]"
+      class="flex items-center text-14px cursor-pointer color-[--main-text]"
       @click="showBlackList"
     >
       <Icon name="custom:black" class="mr-4px" />
@@ -25,7 +25,7 @@
           @keyup.enter="getBlackList"
         >
           <template #prefix>
-            <Icon class="text-16px text-[var(--d-666-l-999)]" name="ep:search" />
+            <Icon class="text-16px text-[--secondary-text]" name="ep:search" />
           </template>
         </el-input>
 
@@ -84,7 +84,7 @@
           v-if="result.total"
           v-model:current-page="query.pageNo"
           v-model:page-size="query.pageSize"
-          class="pagination-box mx-auto bg-[--d-222-l-FFF]! border-t-none!"
+          class="mx-auto border-t-none!"
           layout="total, prev, pager, next"
           :total="result.total"
           hide-on-single-page

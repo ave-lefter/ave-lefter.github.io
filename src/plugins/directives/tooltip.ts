@@ -167,8 +167,8 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
       tooltip.hide()
     }
     const { onMouseEnter, onMouseLeave } = el.__tooltipHandlers || {}
-    if (onMouseEnter) el.removeEventListener('mouseenter', onMouseEnter)
-    if (onMouseLeave) el.removeEventListener('mouseleave', onMouseLeave)
+    if (onMouseEnter) el?.removeEventListener?.('mouseenter', onMouseEnter)
+    if (onMouseLeave) el?.removeEventListener?.('mouseleave', onMouseLeave)
 
     delete el.__tooltipHandlers
     delete el.__lastTooltipValue

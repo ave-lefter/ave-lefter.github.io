@@ -6,31 +6,32 @@ const props = defineProps<{
   setSortConditions(params: { sort: string; sort_dir: string }): void
   setFilterForm(...args: [string, string][]): void
 }>()
-const defaultSort = computed(() => {
-  if (props.sortConditions.sort === 'holders') {
-    return (
-      {
-        asc: 'ascending',
-        desc: 'descending',
-      }[props.sortConditions.sort_dir] || ''
-    )
-  }
-  return ''
-})
+// const defaultSort = computed(() => {
+//   if (props.sortConditions.sort === 'holders') {
+//     return (
+//       {
+//         asc: 'ascending',
+//         desc: 'descending',
+//       }[props.sortConditions.sort_dir] || ''
+//     )
+//   }
+//   return ''
+// })
 
-function sortChange(sort_dir: string) {
-  props.setSortConditions({
-    sort: sort_dir ? 'holders' : '',
-    sort_dir: sort_dir.replace('ending', ''),
-  })
-}
+// function sortChange(sort_dir: string) {
+//   props.setSortConditions({
+//     sort: sort_dir ? 'holders' : '',
+//     sort_dir: sort_dir.replace('ending', ''),
+//   })
+// }
+const globalStore = useGlobalStore()
 const popoverVisible = shallowRef(false)
 const openTimeList = shallowRef([
   { text: '< 100', value: '100' },
   { text: '< 1000', value: '1000' },
   { text: '< 10000', value: '10000' },
 ])
-const isFilterHighlight = shallowRef(false)
+const isFilterHighlight = shallowRef(!!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.holder_min || !!globalStore.rankConditions[globalStore.rankActiveTab]?.filter?.holder_max)
 const { t } = useI18n()
 function confirm(params?: [string, string]) {
   if (!params || !params.some((el) => !!el)) {
@@ -56,6 +57,7 @@ function confirm(params?: [string, string]) {
     {{ $t('holders') }}
     <RangePopover
       v-model="popoverVisible"
+      sortKey="holder"
       :width="225"
       :title="$t('holders')"
       :list="openTimeList"

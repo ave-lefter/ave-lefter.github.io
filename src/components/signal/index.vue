@@ -13,6 +13,7 @@ const props = defineProps<{
   containerWidth: number
   scrollHeight: number
 }>()
+const globalStore = useGlobalStore()
 const configStore = useConfigStore()
 const botSettingStore = useBotSettingStore()
 const localeStore = useLocaleStore()
@@ -27,6 +28,10 @@ const sortParams = shallowRef({
   activeSort: 0
 })
 
+const audioUrl = computed(()=>{
+  return audioNameToResource[globalStore.audioSettings.audio.signal as keyof typeof audioNameToResource]
+  || audioNameToResource.Bar
+})
 const filterSignalList = computed(() => {
   const {sortBy, activeSort} = sortParams.value
   return signalStore.signalList.filter(filterCallback).toSorted((a, b) => {
@@ -73,7 +78,7 @@ function resetAndGet() {
   fetchSignalList()
 }
 
-const shouldAlert = useStorage('shouldAlert', '1')
+// const shouldAlert = useStorage('shouldAlert', '1')
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const signalStore = useSignalStore()
 const isSmallScreen = computed(() => {
@@ -145,7 +150,7 @@ const signalAudio = useTemplateRef('signalAudio')
 watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], ({msg: _signalData}: {
   msg: GetSignalV2ListResponse
 }) => {
-  if (shouldAlert.value === '1' && signalAudio.value && filterCallback(_signalData)) {
+  if (globalStore.audioSettings.audio.signal && signalAudio.value && filterCallback(_signalData)) {
     signalAudio.value.currentTime = 0
     signalAudio.value.play()
   }
@@ -279,19 +284,18 @@ function cancelHide() {
 
 <template>
   <div
-      class="bg-[--d-111-l-FFF] p-12px pt-0 relative shrink-0 signal h-full"
+      class="bg-[--secondary-bg] p-12px pt-0 relative shrink-0 signal h-full"
   >
     <Icon
         name="custom:drag2"
-        class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2]"
+        class="absolute top-3px left-50% ml--6px text-6px bg-[--icon-color]"
     />
     <div
-        class="flex items-center py-10.5px justify-between mb-16px border-b-solid border-b-1px border-b-[--d-333-l-F5F5F5] cursor-move">
-      <span class="color-[--d-FFF-l-222] text-14px">{{ $t('signal') }}</span>
+        class="flex items-center py-10.5px justify-between mb-16px border-b-solid border-b-1px border-b-[--main-divider] cursor-move">
+      <span class="color-[--main-text] text-14px">{{ $t('signal') }}</span>
       <div class="flex items-center gap-12px">
         <Filter
           v-if="isLargeScreen"
-          v-model="shouldAlert"
           :filter-params="signalStore.filterParams"
           @onConfirm="val=>{signalStore.filterParams={...val};resetAndGet();}"
           @onReset="resetFilterParams"
@@ -300,7 +304,6 @@ function cancelHide() {
           size="small"
           placeholder=""
           :suffix-icon="SelectIcon"
-          popper-class="[&&]:[--el-fill-color-light:--d-333-l-F2F2F2] [--el-bg-color-overlay:--d-1A1A1A-l-FFF]"
           @change="setActiveChain"
         >
           <template #prefix>
@@ -308,7 +311,7 @@ function cancelHide() {
               class="flex items-center rounded-full w-12px h-12px"
               :src="`${configStore.token_logo_url}chain/${signalStore.activeChain}.png`"
             />
-            <span class="text-10px color-[--d-FFF-l-333]">
+            <span class="text-12px color-[--main-text]">
               {{ signalStore.activeChain.slice(0, 3).toUpperCase() }}
             </span>
           </template>
@@ -316,7 +319,7 @@ function cancelHide() {
             v-for="net_name in chainOptions"
             :key="net_name"
             :value="net_name"
-            class="[&&]:text-10px flex items-center"
+            class="[&&]:text-12px flex items-center [&&]:h-26px [&&]:lh-26px"
           >
             <el-image
               class="flex items-center rounded-full w-12px h-12px mr-4px"
@@ -329,7 +332,7 @@ function cancelHide() {
           v-if="isLargeScreen"
           v-model="quickBuyValue"
           size="small"
-          class="[--el-border-color:transparent]"
+          class="[--el-border-color:transparent] shrink-0"
         />
         <SlippageSet
           id="drag-settings"
@@ -339,7 +342,7 @@ function cancelHide() {
         />
         <Icon
           name="custom:close"
-          class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-333]"
+          class="text-14px shrink-0 cursor-pointer color-[--main-text]"
           @click.self="signalStore.signalVisible=false"
         />
       </div>
@@ -350,7 +353,6 @@ function cancelHide() {
         class="flex items-center justify-between mb-18px"
       >
         <Filter
-          v-model="shouldAlert"
           :filter-params="signalStore.filterParams"
           @onConfirm="val=>{signalStore.filterParams={...val};resetAndGet();}"
           @onReset="resetFilterParams"
@@ -384,7 +386,7 @@ function cancelHide() {
         <AveEmpty v-if="signalStore.signalList.length===0&&!signalStore.listStatus.loading" class="pt-10px"/>
         <div
           v-if="signalStore.listStatus.loading"
-          class="flex justify-center text-12px text-[#959a9f]"
+          class="flex justify-center text-12px text-[--third-text]"
         >
           {{ $t('loading') }}
         </div>
@@ -403,7 +405,8 @@ function cancelHide() {
     </div>
     <audio
       ref="signalAudio" controls style="display: none"
-      src="/signal.mp3"
+      :src="audioUrl"
+      :volume="+globalStore.audioSettings.audio.signal/100 || 0.5"
     />
 
     <!--  actions -->
@@ -411,7 +414,7 @@ function cancelHide() {
       :width="320"
       :virtual-ref="buttonRef"
       :visible="popVisible"
-      popper-class="[--el-bg-color-overlay:--d-1A1A1A-l-FFF] max-h-200px [&&]:[--el-popover-padding:0] overflow-y-auto"
+      popper-class="[--el-bg-color-overlay:--main-divider] max-h-200px [&&]:[--el-popover-padding:0] overflow-y-auto"
       virtual-triggering
       append-to-body
     >
@@ -420,7 +423,7 @@ function cancelHide() {
         @mouseenter="cancelHide"
         @mouseleave="hidePopover"
       >
-        <div class="flex color-[--d-666-l-999] text-12px mb-8px">
+        <div class="flex color-[--third-text] text-12px mb-8px">
           <div class="flex-1">
             {{ $t('wallet') }}
           </div>
@@ -446,19 +449,19 @@ function cancelHide() {
           action_time
         },idx) in currentActions"
             :key="idx"
-            class="flex color-[--d-999-l-666] text-12px lh-14px"
+            class="flex color-[--secondary-text] text-12px lh-14px"
           >
             <div class="flex-1 flex items-center">
-              <span class="w-10px h-10px rounded-full bg-#37B270 mr-4px"/>
-              <span class="color-[--d-F5F5F5-l-333] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px">{{
+              <span class="w-10px h-10px rounded-full bg-[--signal-green] mr-4px"/>
+              <span class="color-[--main-text] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px">{{
                   wallet_alias || $t('wallet')
                 }}</span>
-              <span class="color-[--d-999-l-666]">(*{{ wallet_address.slice(-4) }})</span>
+              <span>(*{{ wallet_address.slice(-4) }})</span>
             </div>
-            <div class="flex-1 color-#12B886">
+            <div class="flex-1 color-[--up-color]">
               {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : '' }}{{ formatNumber(quote_token_amount, 2) }} {{
                 quote_token_symbol
-              }}<span class="color-[--d-999-l-666]">(${{ formatNumber(quote_token_volume, 0) }})</span>
+              }}<span>(${{ formatNumber(quote_token_volume, 0) }})</span>
             </div>
             <div class="w-40px flex justify-end">
               <!-- <template v-if="isShowDate">
@@ -476,18 +479,18 @@ function cancelHide() {
   </div>
 </template>
 
-<style lang="scss">
-.signal {
-  .el-select {
-    --el-select-width: 60px;
-    --el-fill-color-blank: var(--d-222-l-F2F2F2);
-    --el-bg-color-overlay: var(--d-222-l-F2F2F2);
-  }
+<style lang="scss" scoped>
+:deep{
+  .signal {
+    .el-select {
+      --el-select-width: 60px;
+    }
 
-  .el-select--small .el-select__wrapper {
-    gap: 1px;
-    min-height: 20px;
-    line-height: 14px;
+    .el-select--small .el-select__wrapper {
+      gap: 1px;
+      min-height: 20px;
+      line-height: 14px;
+    }
   }
 }
 </style>

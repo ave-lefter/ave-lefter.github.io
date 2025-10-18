@@ -146,8 +146,46 @@ interface ContractData {
   mechanism_intro?: string
   tm_bonus_token_for_holders?: string
   tm_bonus_token_name_for_lp?: string
-  is_low_liquidity?: number,
+  is_low_liquidity?: number
   creator_address?: string
+  ai_report: AiReport
+}
+export interface AiReport {
+    fee_structure: {
+      buy_fee: string
+      max_tx_amount: string
+      sell_fee: string
+      transfer_fee: string
+    }
+    mechanism_en: string
+    mechanism_zh: string
+    ownerControl: string[]
+    risk: Risk[]
+    summary: {
+      audit_pass_by: string
+      has_backdoor: boolean
+      has_external_dependency_risk: boolean
+      has_fee_abuse: boolean
+      has_hidden_permissions: boolean
+      has_logic_confusion: boolean
+      has_mint_burn_risk: boolean
+      has_reentrancy_risk: boolean
+      has_slippage_risk: boolean
+      has_transfer_risk: boolean
+      has_whitelist_abuse: boolean
+      is_owner_renounced: number
+      risk_level: string
+    }
+  }
+interface Risk {
+  code_snippet?: string
+  description_en: string
+  description_zh: string
+  is_related_to_owner: boolean
+  name_en: string
+  name_zh: string
+  risk_level: number
+  risk_removed: number
 }
 interface TokenContract {
   chain?: string

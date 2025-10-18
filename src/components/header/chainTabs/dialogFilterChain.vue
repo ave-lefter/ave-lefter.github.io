@@ -20,7 +20,7 @@
       >
       <template #prefix>
         <Icon
-          class="text-20px text-[--d-666-l-999]"
+          class="text-20px text-[--third-text]"
           name="custom:search"
         />
       </template>
@@ -62,7 +62,7 @@
             </div>
             <div class="flex-1"/>
             <a @click.stop.prevent="remove(i, index)">
-              <el-icon :color="themeStore.isDark ? '#666' : '#999'" size="16"><RemoveFilled /></el-icon>
+              <el-icon color="var(--third-text)" size="16"><RemoveFilled /></el-icon>
             </a>
           </div>
         </el-col>
@@ -93,7 +93,7 @@
               <i v-else class="iconfont icon-bianzu switch mr-5pxpx" style="font-size: 20px"/>
               <div>
                 <div class="flex-start">
-                  <span class="token-symbol ellipsis color-#999" :title="i.value ? i.text : $t('allChain')">
+                  <span class="token-symbol ellipsis color-[--secondary-text]" :title="i.value ? i.text : $t('allChain')">
                     {{ i.value ? i.text : $t('allChain') }}
                   </span>
                 </div>
@@ -104,7 +104,7 @@
               </div>
               <div class="flex-1"/>
               <a @click.stop.prevent="add(i, index)">
-                <el-icon :color="themeStore.isDark ? '#666' : '#999'" size="16"><CirclePlusFilled /></el-icon>
+                <el-icon color="var(--third-text)" size="16"><CirclePlusFilled /></el-icon>
               </a>
             </div>
           </el-col>
@@ -122,7 +122,7 @@
 import imageEmptyWhite from '@/assets/images/empty-white.svg'
 import imageEmptyBlack from '@/assets/images/empty-black.svg'
 import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
-import { CirclePlusFilled, RemoveFilled, Search } from '@element-plus/icons-vue'
+import { CirclePlusFilled, RemoveFilled } from '@element-plus/icons-vue'
 import type { PropType } from 'vue'
 // import { useDraggable } from 'vue-draggable-plus'
 // import { useCompressStorage } from '@/utils/utils.js'
@@ -243,7 +243,7 @@ onMounted(() => {
     }
   }
   .item {
-    background: var(--d-333-l-F2F2F2);
+    background: var(--dialog-divider);
     border: 1px solid transparent;
     border-radius: 6px;
     margin-top: 10px;
@@ -287,14 +287,14 @@ onMounted(() => {
   margin-left: 5px;
   :deep() .el-input__wrapper {
     background-color: transparent;
-    border-bottom: 1px solid var(--d-333-l-ECECEC);
+    border-bottom: 1px solid var(--border);
     padding-left: 0px;
     box-shadow: none;
     & :hover {
       box-shadow: none;
     }
     .el-input__inner::placeholder {
-      color: var(--d-666-l-999);
+      color: var(--third-text);
     }
   }
 }

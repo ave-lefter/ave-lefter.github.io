@@ -1,23 +1,24 @@
 <template>
   <div
-class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overflow-hidden"
+class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overflow-hidden"
   :class="{'pr-10px!':isLeftFixed,'pl-10px!':isRightFixed}"
   >
     <!-- <div class="w-100% h-40px absolute pointer-events-auto z-999 drag-handle left-0"/> -->
     <Icon
         name="custom:drag2"
-        class="absolute top-3px left-50% ml--6px text-6px bg-[--d-333-l-F2F2F2] drag-handle"
+        class="absolute top-3px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle"
     />
     <el-tabs v-model="activeName" style="" class="m-tabs" @tab-change="handleClick">
       <el-tab-pane :label="$t('walletManage')" :name="0" lazy>
-        <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps"/>
+        <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps" :isLarge="props.isLarge"/>
         <AveEmpty
           v-else
           :style="{height:`${props.scrollHeight-50}px`}"
           class="overflow-hidden"
         >
-          <span class="text-12px mt-10px">{{ $t('noBotWalletTip') }}</span>
+          <span class="text-12px mt-10px color-[--third-text]">{{ $t('noBotWalletTip') }}</span>
           <el-button
+            type="primary"
             class="mt-10px"
             @click="botStore.$patch({
             connectVisible: true
@@ -40,10 +41,10 @@ class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overfl
               fixed
               :style="{
                 height:props.scrollHeight+'px',
-                '--el-table-border':'1px solid #333'
+                // '--el-table-border':'1px solid var(--dialog-list-hover)',
+                // '--el-table-bg-color':'transparent'
                 // height:'500px',
               }"
-              headerClass="bg-transparent"
               row-class='cursor-pointer'
               :rowEventHandlers="{
               onClick: (row:any)=>jumpToken(row)
@@ -70,7 +71,7 @@ class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overfl
                 <span>{{ $t('value') }}</span>
               </template>
               <template #cell-amount="{ row }">
-                <span :class="getIsBuy(row)?`color-${upColor[0]}`:`color-${downColor[0]}`">
+                <span :class="getIsBuy(row)?`color-[--up-color]`:`color-[--down-color]}`">
                   {{ !toggleMc? row?._main_Token?.amount+row?._main_Token?.symbol: row?._main_Token.total}}
                 </span>
               </template>
@@ -84,20 +85,62 @@ class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overfl
                 <span>{{ $t('time') }}</span>
               </template>
               <template #cell-time="{ row }">
-                <TimerCount
+                <!-- <TimerCount
                     v-if="row?.time && Number(formatTimeFromNow(row?.time, true)) < 60"
                     :key="row?.time" :timestamp="row?.time" :end-time="60">
                     <template #default="{ seconds }">
-                  <span v-if="seconds < 60" class="color-#FFA622 text-12px">
+                  <span v-if="seconds < 60" class="color-[--yellow] text-12px">
                     {{ seconds }}s
                   </span>
-                      <span v-else class="color-[--d-999-l-666] text-12px">
+                      <span v-else class="color-[--third-text] text-12px">
                     {{ formatTimeFromNow(row?.time) }}
                   </span>
                     </template>
                   </TimerCount>
-                  <div v-else class="color-[--d-999-l-666] text-12px">
+                  <div v-else class="color-[--third-text] text-12px">
                     {{ formatTimeFromNow(row?.time) }}
+                  </div> -->
+                   <div
+                      v-tooltip="formatDate(row?.created_at || row?.time)"
+                      class="time"
+                      :style="{
+                        color:
+                          Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
+                            ? '#FFA622'
+                            : '#12B886',
+                      }"
+                    >
+                      <template v-if="!(row?.created_at || row?.time)"><span>-</span></template>
+                      <template
+                        v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
+                      >
+                      <span>
+                        {{
+                          formatCountdown(
+                            Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
+                            false
+                          )
+                        }}
+                      </span>
+                      </template>
+                      <TimerCount
+                        v-else-if="
+                          (row?.created_at || row?.time) &&
+                          Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
+                        "
+                        :key="`${row.created_at}`"
+                        :timestamp="row.created_at"
+                        :end-time="60"
+                      >
+                        <template #default="{ seconds }">
+                          <span class="color-#FFA622">
+                            <template v-if="seconds < 60"> {{ seconds }}s </template>
+                            <template v-else>
+                              {{ formatTimeFromNow(row.created_at) }}
+                            </template>
+                          </span>
+                        </template>
+                      </TimerCount>
                   </div>
               </template>
               <template #header-symbol>
@@ -150,11 +193,11 @@ class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overfl
                   <div class="flex-between w-100%">
                     <div class="flex-start gap-8px">
                       <FilterType v-model="txType" :options="txTypeList" />
-                      <Icon name="icon-park-solid:volume-notice" :style="`color:var(--d-F5F5F5-l-333)`"/>
-                      <el-switch
-                        v-model="hasRing"
-                        size="small"
-                       />
+                      <Icon
+                        :name="audioSettings.audio.monitor ? 'custom:ad':'custom:admute'"
+                        class="cursor-pointer text-16px color-[--secondary-text]"
+                        @click="audioSettings.active = 'audio'"
+                      />
                       <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
                     </div>
                     <QuickBuyInput
@@ -182,8 +225,8 @@ class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overfl
                   </div>
                   <div class="flex-between">
                     <div class="flex-start gap-4px">
-                      <div>{{ getTxType(row) }}</div>
-                      <span :class="getIsBuy(row)?`color-${upColor[0]}`:`color-${downColor[0]}`">
+                      <div class="color-[--third-text]">{{ getTxType(row) }}</div>
+                      <span :class="getIsBuy(row)?`color-[--up-color]`:`color-[--down-color]`">
                         {{ !toggleMc? row?._main_Token?.amount+row?._main_Token?.symbol: row?._main_Token.total}}
                       </span>
                       <TokenImg
@@ -191,25 +234,52 @@ class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overfl
                           logo_url: row?._target_Token?.logo_url,
                           chain: row?.chain
                         }" token-class="w-16px h-16px [&&]:mr-4px" />
-                          <span>{{ row?._target_Token?.symbol }}</span>
+                          <span class="color-[--main-text]">{{ row?._target_Token?.symbol }}</span>
                           <img v-if="row?.amm=='pump'"  src="https://www.iconaves.com/signals/pump_king.png" style="width:12px;height:12px">
-                      <span class="color-[var(--d-666-l-999)]">{{ toggleMc? $t('price') : $t('mcap') }}</span>
-                      <span>{{ toggleMc? row?._target_Token?.price: row?._mc }}</span>
+                      <span class="color-[--third-text]">{{ toggleMc? $t('price') : $t('mcap') }}</span>
+                      <span class="color-[--main-text]">{{ toggleMc? row?._target_Token?.price: row?._mc }}</span>
                     </div>
-                    <TimerCount
-                      v-if="row?.time && Number(formatTimeFromNow(row?.time, true)) < 60"
-                      :key="row?.time" :timestamp="row?.time" :end-time="60">
-                      <template #default="{ seconds }">
-                    <span v-if="seconds < 60" class="color-#FFA622 text-12px">
-                      {{ seconds }}s
-                    </span>
-                        <span v-else class="color-[--d-999-l-666] text-12px">
-                      {{ formatTimeFromNow(row?.time) }}
-                    </span>
-                      </template>
-                    </TimerCount>
-                    <div v-else class="color-[--d-999-l-666] text-12px">
-                      {{ formatTimeFromNow(row?.time) }}
+                    <div
+                        v-tooltip="formatDate(row?.created_at || row?.time)"
+                        class="time"
+                        :style="{
+                          color:
+                            Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
+                              ? '#FFA622'
+                              : '#12B886',
+                        }"
+                      >
+                        <template v-if="!(row?.created_at || row?.time)"><span>-</span></template>
+                        <template
+                          v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
+                        >
+                        <span>
+                          {{
+                            formatCountdown(
+                              Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
+                              false
+                            )
+                          }}
+                        </span>
+                        </template>
+                        <TimerCount
+                          v-else-if="
+                            (row?.created_at || row?.time) &&
+                            Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
+                          "
+                          :key="`${row.created_at}`"
+                          :timestamp="row.created_at"
+                          :end-time="60"
+                        >
+                          <template #default="{ seconds }">
+                            <span class="color-#FFA622">
+                              <template v-if="seconds < 60"> {{ seconds }}s </template>
+                              <template v-else>
+                                {{ formatTimeFromNow(row.created_at) }}
+                              </template>
+                            </span>
+                          </template>
+                        </TimerCount>
                     </div>
                   </div>
                 </div>
@@ -233,25 +303,29 @@ class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overfl
           </el-button>
         </AveEmpty>
       </el-tab-pane>
-      <el-tab-pane :name="activeName">
+      <el-tab-pane disabled>
          <template #label>
             <div class="cursor-move w-100% h-100% drag-handle" />
          </template>
       </el-tab-pane>
-      <el-tab-pane :name="activeName">
+      <el-tab-pane disabled>
         <template #label>
           <div class="m-op flex-end gap-8px w-100% h-100%">
             <template v-if="activeName===1 && props.isLarge">
               <FilterType v-model="txType" :options="txTypeList" />
-              <Icon name="icon-park-solid:volume-notice"/>
-              <el-switch
+              <Icon
+                :name="audioSettings.audio.monitor ? 'custom:ad':'custom:admute'"
+                class="cursor-pointer color-[--secondary-text]"
+                @click="audioSettings.active = 'audio'"
+              />
+              <!-- <el-switch
                 v-model="hasRing"
-                class="[&&]:[--el-switch-on-color:#3F80F7]"
+                class="[&&]:[--el-switch-on-color:--primary-color]"
                 size="small"
-                />
+                /> -->
               <pro-tag size="small" class="cursor-pointer w-55px" @click="toggleMc=!toggleMc">{{ !toggleMc?'U/Pri':'C/MC' }}<Icon name="lsicon:switch-filled" class="ml-4px text-12px"/></pro-tag>
             </template>
-            <el-button v-if="(activeName===1) && botStore.evmAddress" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;color: var(--d-999-l-666) !important;" :color="isDark?'#333':'#F2F2F2'" :dark="isDark" >
+            <el-button v-if="(activeName===1) && botStore.evmAddress" :ref="(ref)=>addButtonRef=ref" size="small" style="height: 20px;" class="dialog-button"  :dark="isDark" >
               <Icon name="ic:baseline-person-add-alt-1" class="text-12px  mr-5px"/>
               {{ $t('addWallet') }}
             </el-button>
@@ -261,10 +335,10 @@ class="w-monitor w-100% h-100% bg-[--d-111-l-FFF] pl-12px pr-6px relative overfl
               v-model="quickBuyValue"
               size="small"
             />
-            <Icon class="text-14px color-[var(--d-999-l-666)] hover:color-[--d-F5F5F5-l-333] cursor-pointer" name="custom:pump-setting" @click.stop.prevent="navigateTo('/follow/addr', {replace: true})"/>
+            <Icon class="text-14px color-[--secondary-text] hover:color-[--main-text] cursor-pointer" name="custom:pump-setting" @click.stop.prevent="navigateTo('/follow/addr', {replace: true})"/>
             <Icon
               name="custom:close"
-              class="text-14px shrink-0 cursor-pointer color-[--d-FFF-l-333]"
+              class="text-14px shrink-0 cursor-pointer color-[--main-text]"
               @click.self="visible=false"
             />
         </div>
@@ -290,7 +364,7 @@ const { t } = useI18n()
 const { hasRing ,monitorList2:dataSourceCache,visible,activeName,txType,isLeftFixed,isRightFixed} = storeToRefs(useMonitorStore())
 
 const {updateNum3} = storeToRefs(useFollowStore())
-const { isDark } = storeToRefs(useGlobalStore())
+const { isDark,audioSettings } = storeToRefs(useGlobalStore())
 const props = defineProps({
   scrollHeight: {
     type: Number,
@@ -322,7 +396,6 @@ const txTypeList=computed(() => {
     { label: t('sell'), value: 1 },
   ]
 })
-
 const walletManageProps=computed(() => {
   return {
     scrollHeight: props.scrollHeight,
@@ -336,6 +409,14 @@ onMounted(async () => {
     // console.log('monitor visible', el)
   })
   init()
+
+ 
+})
+ useVisibilityChange(() => {
+  botStore.bot_subscribe()
+  if(visible.value&&(activeName.value===1)){
+    updateDateSource()
+  }
 })
 watch(() => txType.value, (val) => {
   const monitor_type:Array<'sell' | 'buy'>=[]
@@ -446,6 +527,10 @@ watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
   }
 })
 
+// onMounted(() => {
+ 
+// })
+
 const mergeDataSource = (msg:any) => {
   if(msg?.length>0){
     const data = dataSourceCache?.value || []
@@ -469,6 +554,14 @@ const mergeDataSource = (msg:any) => {
 const updateDateSource = throttle(function() {
   if(!visible.value||(activeName.value!==1)) return
   dataSource.value.splice(0, dataSource.value?.length, ...dataSourceCache.value)
+
+  // dataSource.value=dataSource.value.map(i=>{
+  //   console.log('i', i)
+  //   return {
+  //     time:1758044700,
+  //     ...i
+  //   }
+  // })
 }, 500)
 
     // watch(()=>props.data, (val) => {
@@ -508,7 +601,7 @@ function init2() {
     })
     dataSourceCache.value = list.filter(i => {
       return txType.value.includes(i.tx_type)
-    })  
+    })
     updateDateSource()
   }).catch((err) => {
     console.error(err)
@@ -630,6 +723,7 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
   :deep() .el-table.el-table-v2{
     --el-table-header-bg-color: transparent;
     --el-table-tr-bg-color: transparent;
+    --el-table-bg-color:transparent;
     /* .el-table-v2__table{
       --el-table-border:1px solid;
     } */
@@ -637,18 +731,21 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
 }
 .m-tabs{
   :deep() .el-tabs__header{
-    --el-border-color-light:var(--d-333-l-F2F2F2);
-    --el-color-primary:var(--d-F5F5F5-l-333);
-    --el-text-color-primary:var(--d-666-l-999);
+    --el-border-color-light:var(--dialog-list-hover);
+    --el-color-primary:var(--main-text);
+    --el-text-color-primary:var(--third-text);
   }
   --el-tabs-header-height:44px;
   :deep() .el-tabs__item{
     font-weight: 400;
     &:hover{
-      color:var(--d-666-l-999);
+      color:var(--third-text);
       &.is-active{
-        color:var(--d-F5F5F5-l-333);
+        color:var(--main-text);
       }
+    }
+    &.is-disabled{
+      cursor:pointer;
     }
   }
   :deep() .el-tabs__header{

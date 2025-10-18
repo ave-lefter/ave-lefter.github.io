@@ -6,6 +6,8 @@ import unified from './unified.vue'
 import { bot_getUserWalletTxInfo } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
 import { useSessionStorage } from '@vueuse/core'
+import type { WalletTokenInfo } from '~/api/types/token'
+import type { IPriceV2Response } from '~/api/types/ws'
 
 // const props = defineProps({
 //   currentActiveTab: {
@@ -25,7 +27,8 @@ const unifiedRef = ref()
 const _chain = getAddressAndChainFromId(route.params.id as string)?.chain
 const activeTab = ref(_chain || walletStore.chain || 'solana')
 const botOrderOnlyCurrentToken = useSessionStorage('mySwapBotOrderOnlyCurrentToken', true)
-const walletTxData = ref<any>()
+const walletTxData = ref<WalletTokenInfo>()
+useSwapUpdate(walletTxData)
 const tabs = computed(() => {
   // 获取原始地址数组
   const addresses = botStore.userInfo?.addresses || []
@@ -140,7 +143,10 @@ let timer: null | ReturnType<typeof setInterval> = null
 let lastUpdateTime = 0
 const maxUpdateNum = 15
 
-watch([() => wsStore.wsResult?.tgbot], () => {
+watch(() => wsStore.wsResult[WSEventType.TGBOT], (val) => {
+  if(!val){
+    return
+  }
   const chain = getAddressAndChainFromId(String(route.params.id))?.chain
   if (tabs.value.find(i => i?.chain === chain)) {
     activeTab.value = chain
@@ -166,7 +172,7 @@ watch([() => wsStore.wsResult?.tgbot], () => {
   } else {
     lastUpdateTime = 0
   }
-})
+},{immediate:true})
 
 watch([() => route.params.id], () => {
   const chain = getAddressAndChainFromId(String(route.params.id))?.chain
@@ -199,6 +205,7 @@ onMounted(() => {
 onActivated(() => {
    refreshData()
 })
+
 </script>
 
 <template>
@@ -207,15 +214,15 @@ onActivated(() => {
       <!-- Bot钱包显示链选择器 -->
       <div v-if="botStore?.userInfo?.evmAddress" class="flex items-center whitespace-nowrap w-[80%] overflow-x-auto scrollbar-hide">
         <a
-          v-for="(item) in tabs" :key="item.chain" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-999-l-666] px-12px py-4px rounded-4px
-          ${activeTab === item.chain ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333]' : ''}`"
+          v-for="(item) in tabs" :key="item.chain" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
+          ${activeTab === item.chain ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
           @click="setActiveTab(item.chain)">
           {{ getChainInfo(item.chain).name }}
         </a>
       </div>
       <!-- 链钱包显示当前链名称 -->
       <div v-else class="flex items-center">
-        <span class="text-12px text-[--d-999-l-666] px-12px py-4px">
+        <span class="text-12px text-[--third-text] px-12px py-4px">
           <!-- {{ getChainInfo(walletStore.chain || activeTab).name }} -->
         </span>
       </div>
@@ -228,9 +235,9 @@ onActivated(() => {
     <!-- 顶部交易统计区域 -->
     <div class="transaction-stats">
       <div class="stat-item">
-        <div class="stat-label text-[--d-666-l-999]">{{ t('balance1') }}</div>
-        <div class="stat-value table-field-text text-[var(--d-999-l-959A9F)]">${{ formatNumber(balance, 2) }}</div>
-        <div class="stat-change table-field-text text-[var(--d-999-l-959A9F)]">
+        <div class="stat-label text-[--third-text]">{{ t('balance1') }}</div>
+        <div class="stat-value table-field-text text-[--secondary-text]">${{ formatNumber(balance, 2) }}</div>
+        <div class="stat-change table-field-text text-[--secondary-text]">
           {{ formatNumber(walletTxData?.balance_amount || 0, 4) }} {{ tokenSymbol }}
           <span :style="{ color: changePercentage >= 0 ? '#12B886' : '#ff646d' }">
             ({{ changePercentage >= 0 ? '+' : '' }}{{ formatNumber(changePercentage, 2) }}%)
@@ -238,47 +245,47 @@ onActivated(() => {
         </div>
       </div>
       <div class="stat-item">
-        <div class="stat-label text-[--d-666-l-999]">{{ t('totalProfit') }}</div>
-        <div class="stat-value table-field-text text-[var(--d-999-l-959A9F)]" :style="{ color: totalProfit >= 0 ? '#12B886' : '#ff646d' }">
+        <div class="stat-label text-[--third-text]">{{ t('totalProfit') }}</div>
+        <div class="stat-value table-field-text text-[--secondary-text]" :style="{ color: totalProfit >= 0 ? '#12B886' : '#ff646d' }">
           {{ totalProfit >= 0 ? '+' : '-' }}${{ removeLeadingMinus(formatNumber(totalProfit, 2)) }}
         </div>
-        <div class="stat-change text-[var(--d-999-l-959A9F)]" :style="{ color: profitPercentage >= 0 ? '#12B886' : '#ff646d' }">
+        <div class="stat-change text-[--secondary-text]" :style="{ color: profitPercentage >= 0 ? '#12B886' : '#ff646d' }">
           {{ profitPercentage >= 0 ? '+' : '' }}{{ formatNumber(profitPercentage, 2) }}%
         </div>
       </div>
       <div class="stat-item">
-        <div class="stat-label text-[--d-666-l-999]">{{ t('realizedProfit') }}</div>
-        <div class="stat-value table-field-text text-[var(--d-999-l-959A9F)]" :style="{ color: realizedProfit >= 0 ? '#12B886' : '#ff646d' }">
+        <div class="stat-label text-[--third-text]">{{ t('realizedProfit') }}</div>
+        <div class="stat-value table-field-text text-[--secondary-text]" :style="{ color: realizedProfit >= 0 ? '#12B886' : '#ff646d' }">
           {{ realizedProfit >= 0 ? '+' : '-' }}${{ removeLeadingMinus(formatNumber(realizedProfit, 2)) }}
         </div>
-        <div class="stat-change text-[var(--d-999-l-959A9F)]" :style="{ color: realizedProfitPercentage >= 0 ? '#12B886' : '#ff646d' }">
+        <div class="stat-change text-[--secondary-text]" :style="{ color: realizedProfitPercentage >= 0 ? '#12B886' : '#ff646d' }">
           {{ realizedProfitPercentage >= 0 ? '+' : '' }}{{ formatNumber(realizedProfitPercentage, 2) }}%
         </div>
       </div>
       <div class="stat-item">
-        <div class="stat-label text-[--d-666-l-999]">{{ t('unrealizedProfit') }}</div>
-        <div class="stat-value table-field-text text-[--d-999-l-959A9F]" :style="{ color: unrealizedProfit >= 0 ? '#12B886' : '#ff646d' }">
+        <div class="stat-label text-[--third-text]">{{ t('unrealizedProfit') }}</div>
+        <div class="stat-value table-field-text text-[--secondary-text]" :style="{ color: unrealizedProfit >= 0 ? '#12B886' : '#ff646d' }">
           {{ unrealizedProfit >= 0 ? '+' : '-' }}${{ removeLeadingMinus(formatNumber(unrealizedProfit, 2)) }}
         </div>
-        <div class="stat-change text-[--d-999-l-959A9F]" :style="{ color: unrealizedProfitPercentage >= 0 ? '#12B886' : '#ff646d' }">
+        <div class="stat-change text-[--secondary-text]" :style="{ color: unrealizedProfitPercentage >= 0 ? '#12B886' : '#ff646d' }">
           {{ unrealizedProfitPercentage >= 0 ? '+' : '' }}{{ formatNumber(unrealizedProfitPercentage, 2) }}%
         </div>
       </div>
       <div class="stat-item">
-        <div class="stat-label text-[--d-666-l-999]">{{ t('buyPriceWithSlash') }}</div>
-        <div class="stat-value table-field-text text-[--d-999-l-959A9F]">{{ buyTokenAmount }} {{
+        <div class="stat-label text-[--third-text]">{{ t('buyPriceWithSlash') }}</div>
+        <div class="stat-value table-field-text text-[--secondary-text]">{{ buyTokenAmount }} {{
           tokenSymbol }}</div>
-        <div class="stat-change table-field-text text-[--d-999-l-959A9F]">{{ buyUsdAmount }}</div>
+        <div class="stat-change table-field-text text-[--secondary-text]">{{ buyUsdAmount }}</div>
       </div>
       <div class="stat-item">
-        <div class="stat-label text-[--d-666-l-999]">{{ t('sellPriceWithSlash') }}</div>
-        <div class="stat-value table-field-text text-[--d-999-l-959A9F]">{{ sellTokenAmount }} {{
+        <div class="stat-label text-[--third-text]">{{ t('sellPriceWithSlash') }}</div>
+        <div class="stat-value table-field-text text-[--secondary-text]">{{ sellTokenAmount }} {{
           tokenSymbol }}</div>
-        <div class="stat-change table-field-text text-[--d-999-l-959A9F]">{{ sellUsdAmount }}</div>
+        <div class="stat-change table-field-text text-[--secondary-text]">{{ sellUsdAmount }}</div>
       </div>
     </div>
 
-    <unified v-if="botStore?.userInfo?.evmAddress || walletStore.address" ref="unifiedRef" :chain="activeTab" :currentToken="botOrderOnlyCurrentToken" :userAddress="userAddress || ''" />
+    <unified v-if="botStore?.userInfo?.evmAddress || walletStore.address" ref="unifiedRef" :chain="activeTab" :currentToken="botOrderOnlyCurrentToken" :userAddress="userAddress || ''"/>
   </div>
 </template>
 
@@ -289,9 +296,8 @@ onActivated(() => {
   justify-content: space-between;
   margin: 5px 0 15px;
   padding: 10px 0;
-  border-top: 1px solid var(--d-222-l-F2F2F2);
-  border-bottom: 1px solid var(--d-222-l-F2F2F2);
-  background-color: var(--custom-bg-1-color);
+  border-top: 1px solid var(--main-divider);
+  border-bottom: 1px solid var(--main-divider);
 
   .stat-item {
     flex: 1;

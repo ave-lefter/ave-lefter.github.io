@@ -1,5 +1,5 @@
 <template>
-  <div class="color-[--d-F5F5F5-l-333]">
+  <div class="color-[--main-text]">
     <div class="wc-qr-container flex items-center justify-center h-320px">
       <el-skeleton :loading="loading" animated>
         <template #template>

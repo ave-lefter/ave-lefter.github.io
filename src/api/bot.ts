@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie'
 import BigNumber from 'bignumber.js'
 import type { BotChain } from '~/utils/types'
+import { createCacheRequest } from '#imports'
 
 export function login(data: {
   username?: string
@@ -90,6 +91,8 @@ export function loginEmail(data: {
   refreshToken: string
   emailAddress: string
   evmAddress: string
+  tgUid: string
+  mnemonic?: string
 }> {
   const { $api } = useNuxtApp()
   const locale = useLocaleStore().locale
@@ -98,6 +101,7 @@ export function loginEmail(data: {
     body: {
       source: 'web',
       language: locale?.includes?.('zh-') ? 'cn' : 'en',
+      needMnemonic: true,
       ...data
     }
   })
@@ -114,13 +118,15 @@ export function emailCodeLogin(data: {
   refreshToken: string
   tgUid: string
   ref1Guid: string
-  walletName: string
+  walletName: string,
+  mnemonic?: string
 }> {
   const { $api } = useNuxtApp()
   return $api('/botapi/user/emailCodeLogin', {
     method: 'post',
     body: {
       source: 'web',
+      needMnemonic: true,
       ...data
     }
   })
@@ -162,13 +168,16 @@ export function googleLogin(data: {
   accessToken: string
   refreshToken: string
   emailAddress: string
-  evmAddress: string
+  evmAddress: string,
+  tgUid: string
+  mnemonic?: string
 }> {
   const { $api } = useNuxtApp()
   return $api('/botapi/user/googleLogin', {
     method: 'post',
     body: {
       source: 'web',
+      needMnemonic: true,
       ...data
     }
   })
@@ -368,7 +377,7 @@ export function bot_updateWebConfig(data: { chain?: string, webConfig?: string }
 //   })
 // }
 
-export function bot_getTokenBalance(data: {
+export const bot_getTokenBalance = createCacheRequest(function(data: {
   chain: string
   walletAddress: string
   tokens: string[]
@@ -391,7 +400,7 @@ export function bot_getTokenBalance(data: {
       }
     })
   })
-}
+}, 500)
 
 // 推荐GasTip(二期)
 // 返回高、中、低三档，eth用wei， solana返回lamports, solana忽略mev
@@ -526,10 +535,10 @@ export function bot_createSwapEvmTx(params: {
 }) {
   const { $api } = useNuxtApp()
   const botStore = useBotStore()
-  if (params.chain === 'xlayer') {
-    params.autoSell = false
-    params.autoSellConfig = []
-  }
+  // if (params.chain === 'xlayer') {
+  //   params.autoSell = false
+  //   params.autoSellConfig = []
+  // }
   return $api('/botapi/swap/createSwapEvmTx', {
     method: 'post',
     body: {

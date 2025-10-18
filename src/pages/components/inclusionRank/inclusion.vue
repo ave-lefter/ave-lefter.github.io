@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
 import { getInclusionDefaultColumns } from './columnRender/inclusionColumnsService'
-import { getTreasureList } from '~/api/market'
+import { getTreasureList, type IGetTreasureConfig } from '~/api/market'
 import {
   PriceContent,
   PriceHeader,
@@ -37,10 +37,12 @@ import {
   LastTradeHeader,
   LastTradeContent,
   Headline,
+  DexHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
+import dayjs from 'dayjs'
 
 const { t } = useI18n()
 const globalStore = useGlobalStore()
@@ -50,21 +52,18 @@ const props = defineProps<{
   activeChain: string
   activeSubTab: string
   activeTab: string
+  height: string
+  ammList: IGetTreasureConfig['swaps']
 }>()
-const sortConditions = ref({
-  sort: '',
-  sort_dir: '',
-})
+const {rankConditions} = storeToRefs(globalStore)
 function setSortConditions(params: { sort: string; sort_dir: string }) {
-  sortConditions.value = params
+  rankConditions.value.inclusion.sort = params
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
-const defaultFilter = {}
-const filterForm = ref(defaultFilter)
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(filterForm.value, keyVal[0], keyVal[1])
+    set(rankConditions.value.inclusion.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -92,7 +91,6 @@ const pageInfo = ref({
   pageSize: 50,
   total: 0,
 })
-const isVolUSDT = shallowRef(true)
 const loading = shallowRef(false)
 const storageKey = computed(()=>{
   return props.activeTab + 'TableColumns'
@@ -124,12 +122,18 @@ async function _getTreasureList(shouldLoading = true) {
       loading.value = true
     }
     const { total: _, ...rest } = pageInfo.value
+    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
+      if(prev[cur]){
+        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+      }
+      return prev
+    },{...rankConditions.value.inclusion.filter})
     const res = await getTreasureList({
       category: props.activeTab,
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
-      ...sortConditions.value,
-      ...filterForm.value,
+      ...rankConditions.value.inclusion.sort,
+      ...finalFilter,
       self_address: walletAddress.value,
     })
     pageInfo.value.total = res.total
@@ -185,7 +189,7 @@ watch(
       }
       return el
     })
-    const { sort, sort_dir } = sortConditions.value
+    const { sort, sort_dir } = rankConditions.value.inclusion.sort
     const sortVal = { asc: '1', desc: '-1' }[sort_dir]
     if (sortVal) {
       listData.value = updateList.toSorted((a, b) => (a[sort] - b[sort]) * sortVal)
@@ -213,50 +217,6 @@ const botStore = useBotStore()
 const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
-async function collect(index: number, row) {
-  if (walletAddress.value) {
-    if (walletStore.address) {
-      await walletStore.signMessageForFavorite()
-    }
-    if (row.is_fav) {
-      removeTokenFavorite(row, index)
-    } else {
-      addTokenFavorite(row, index)
-    }
-  } else {
-    verifyLogin()
-  }
-}
-
-function removeTokenFavorite(row, index: number) {
-  loading.value = true
-  removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
-    .then(() => {
-      ElMessage.success(t('cancelled1'))
-      row.is_fav = false
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-function addTokenFavorite(row, index: number) {
-  loading.value = true
-  addFavorite(`${row.token}-${row.chain}`, walletAddress.value, 0)
-    .then(() => {
-      ElMessage.success(t('collected'))
-      row.is_fav = true
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
 
 function sizeChange() {
   pageInfo.value.pageNO = 1
@@ -297,7 +257,7 @@ const headerRenderer = computed(() => {
     markers_dynamic: DynamicMarkersHeader,
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
-    dex: () => 'DEX',
+    dex: DexHeader,
     security: () => t('security'),
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
@@ -359,16 +319,17 @@ const cellRenderer = computed(() => {
 })
 </script>
 <template>
-  <div v-loading="loading" style="height: calc(100vh - 185px)">
+  <div v-loading="loading" :style="`height:${height}`">
     <AveTable
+      rowKey="rowKey"
       :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
       :row-height="81"
       fixed
-      style="--el-bg-color: var(--d-111-l-FFF)"
-      row-class="color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)]"
+      style="--el-bg-color: var(--secondary-bg)"
+       row-class="cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)]"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"
@@ -376,18 +337,17 @@ const cellRenderer = computed(() => {
       <template v-for="item in visibleColumns" :key="item.key" #[`header-${item.key}`]>
         <component
           :is="headerRenderer[item.key as keyof typeof headerRenderer]"
-          v-model:isVolUSDT="isVolUSDT"
-          :sortConditions="sortConditions"
+          :sortConditions="rankConditions.inclusion.sort"
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
+          :ammList="item.key === 'dex' ? ammList : null"
         />
       </template>
       <template v-for="item in visibleColumns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
         <component
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"
-          :isVolUSDT="isVolUSDT"
           :row="row"
           :rowIndex="rowIndex"
           :pageNO="pageInfo.pageNO"
@@ -395,7 +355,6 @@ const cellRenderer = computed(() => {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
           :activeChain="activeChain"
           :childrenData="item.children || []"
-          @collect="collect"
         />
       </template>
     </AveTable>
@@ -404,7 +363,7 @@ const cellRenderer = computed(() => {
     v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
-    class="mt-5px py-9px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
+    class="mt-5px py-9px flex justify-center [&&]:[--el-pagination-button-height:18px]"
     layout="total, prev, pager, next"
     :total="pageInfo.total || 0"
     :small="false"

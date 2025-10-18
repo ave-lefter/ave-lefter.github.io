@@ -22,8 +22,12 @@ import IconUnknown from '@/assets/images/icon-unknown.png'
 import type {AveTable} from '#components'
 import type { SimpleWSTx } from '../../kLine/types'
 import BigNumber from 'bignumber.js'
+import DateFilterCard from '../../dateFilterCard.vue'
 // import type { content } from 'html2canvas/dist/types/css/property-descriptors/content'
 const globalStore = useGlobalStore()
+const klineDateFilter = inject<Ref<string[]>>(ProvideType.KLINE_DATE_FILTER)
+// 订单簿状态 - 通过 provide/inject 与父组件通信
+const orderBookVisible = inject<Ref<boolean>>('orderBookVisible', ref(false))
 const $refs = ref({
   buttonRefs: {} as Record<number, any>
 })
@@ -191,7 +195,7 @@ const txCount = shallowRef<{ [key: string]: number }>({})
 const tableView = ref({
   isShowDate: false,
   // isSwapPriceUSDT: true, 不常用，先删除
-  isVolUSDT: true
+  // isVolUSDT: true
 })
 const tableFilterVisible = ref({
   timestamp: false,
@@ -217,6 +221,14 @@ const addressAndChain = computed(() => {
     chain: token.value?.chain || ''
   }
 })
+
+watch(() => klineDateFilter?.value, (val) => {
+  if (val && !orderBookVisible.value) {
+    tableFilter.value.timestamp = val
+    _getTokenTxs()
+  }
+})
+
 watch(() => pairAddress.value, (pair, oldPair) => {
   if (pairAddress.value) {
     _getPairLiq()
@@ -238,6 +250,14 @@ watch(() => route.params.id, val => {
 
 watch(() => followStore.currentAddress, () => {
   if (activeTab.value === '-100') {
+    _getTokenTxs()
+  }
+})
+
+watch(orderBookVisible,(val,oldVal)=>{
+  if(oldVal && !val){
+    resetCache()
+    tableFilter.value.markerAddress = ''
     _getTokenTxs()
   }
 })
@@ -284,6 +304,17 @@ watch(() => wsStore.wsResult[WSEventType.TX], data => {
   if (from_address !== realAddress.value && to_address !== realAddress.value) {
     return
   }
+  const { timestamp, markerAddress } = tableFilter.value
+  const [startTime, endTime] = timestamp || []
+  if(startTime && data.tx.time < Number(startTime)){
+    return
+  }
+  if(endTime && data.tx.time > Number(endTime)){
+    return
+  }
+  if(markerAddress && wallet_address !== markerAddress){
+    return
+  }
   txCount.value[wallet_address] = (txCount.value[wallet_address] || 0) + 1
   const { topN, wallet_tag } = getWalletTag(data.tx)
   const item = {
@@ -310,8 +341,24 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
   if (target !== realAddress.value) {
     return
   }
+  // 先把加减池子过滤掉
+  if(!['buy','sell'].includes(simpleWSTx.direction)) {
+    return
+  }
+  const { timestamp, markerAddress } = tableFilter.value
+  const [startTime, endTime] = timestamp || []
+  if(startTime && simpleWSTx.time < Number(startTime)){
+    return
+  }
+  if(endTime && simpleWSTx.time > Number(endTime)){
+    return
+  }
+  if(markerAddress && maker !== markerAddress){
+    return
+  }
   txCount.value[maker] = (txCount.value[maker] || 0) + 1
   const { topN, wallet_tag } = getWalletTag(data.msg)
+  const newTags = getSimpleTxTags(simpleWSTx.tag)
   const item = {
     ...simpleWSTx,
     topN, wallet_tag,
@@ -322,7 +369,8 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
     transaction: simpleWSTx.txhash,
     senderProfile: {
       solTotalHolding: simpleWSTx.maker_eth
-    }
+    },
+    newTags
   }
   wsPairCache.value.unshift(item as any)
   if (!isPausedTxs.value) {
@@ -371,6 +419,7 @@ function subscribeLiq(pair: string, oldPair?: string) {
 
 const updatePairTxs = useThrottleFn(() => {
   tokenTxs.value.unshift(...wsPairCache.value)
+  tokenTxs.value = tokenTxs.value.slice(0,1000)
   wsPairCache.value.length = 0
   triggerRef(tokenTxs)
 }, 500)
@@ -384,6 +433,7 @@ const updateLiqList = useThrottleFn(() => {
 function onTimestampConfirm(timestamp: string[] = []) {
   tableFilterVisible.value.timestamp = false
   tableFilter.value.timestamp = timestamp
+  _getTokenTxs()
 }
 
 function confirmVolFilter(amountU: string[] = []) {
@@ -405,7 +455,9 @@ async function _getTokenTxs() {
     const getPairTxsParams = {
       token_id: route.params.id as string,
       tag_type,
-      maker: tableFilter.value.markerAddress
+      maker: tableFilter.value.markerAddress,
+      time_min:tableFilter.value.timestamp[0],
+      time_max:tableFilter.value.timestamp[1]
     }
     if (tag_type === '-100' && !followStore.currentAddress) {
       tokenTxs.value = []
@@ -431,6 +483,18 @@ async function _getTokenTxs() {
     console.log('=>(transactions.vue:62) e', e)
   } finally {
     listStatus.value.loadingTxs = false
+  }
+}
+
+function getSimpleTxTags(tag?:string) {
+  if(tag){
+    const wallet_tag = tag.split(',')
+    const tagsMap = {
+      MEVBot:{
+        type:'8'
+      }
+    }
+    return wallet_tag.map(el => tagsMap[el]).filter(el=> !!el)
   }
 }
 
@@ -768,17 +832,21 @@ const collect = async (row: any,index:number) => {
         class="flex items-center whitespace-nowrap w-[80%] overflow-x-auto scrollbar-hide"
       >
         <a
-          v-for="(item,index) in tabs" :key="item.value" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center color-[--d-666-l-999] px-12px py-4px rounded-4px
-         ${activeTab === item.value ? 'bg-[--d-222-l-F2F2F2] color-[--d-F5F5F5-l-333]' : ''}`"
+          v-for="(item,index) in tabs" :key="item.value" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
+         ${activeTab === item.value ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
           @click="setActiveTab(item.value,index)">
           {{ item.label }}
         </a>
       </div>
-      <div v-show="isPausedTxs" class="flex items-center color-#FFA622 text-12px">
-        <Icon name="custom:stop" />
-        <span class="ml-3px">{{ $t('paused') }}</span>
+      <div class="flex items-center gap-12px">
+        <div v-show="isPausedTxs" class="flex items-center color-#FFA622 text-12px">
+          <Icon name="custom:stop" />
+          <span class="ml-3px">{{ $t('paused') }}</span>
+        </div>
+        <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart"/></span>
       </div>
     </div>
+    <DateFilterCard v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" v-model:timestamp="tableFilter.timestamp" @update:timestamp="_getTokenTxs"/>
     <template v-if="tableFilter.markerAddress">
       <div
         v-if="listStatus.loadingTxs || listStatus.loadingLiq"
@@ -786,7 +854,7 @@ const collect = async (row: any,index:number) => {
         {{ $t('loading') }}
       </div>
       <template v-else>
-        <div class="lh-20px text-13px py-6px bg-#3F80F71A text-center mb-12px flex justify-center">
+        <div class="lh-20px text-13px py-6px bg-#3F80F71A text-center mb-12px flex justify-center text-[--third-text]">
           <div
             v-html="$t('filterTip', {
             address: `<span class='color-#3F80F7'>&nbsp;${tableFilter.markerAddress.slice(0, 4)}...${tableFilter.markerAddress.slice(-4)}&nbsp;</span>`,
@@ -826,7 +894,7 @@ const collect = async (row: any,index:number) => {
             <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
             <img v-else src="@/assets/images/empty-black.svg" alt="">
             <span
-              class="mt-10px color-[--d-666-l-999]"
+              class="mt-10px color-[--third-text]"
             >
               {{ t('emptyNoData') }}
             </span>
@@ -838,7 +906,7 @@ const collect = async (row: any,index:number) => {
             <span>{{ $t('time') }}</span>
             <Icon
               :name="`${tableView.isShowDate ? 'custom:calendar' : 'custom:countdown'}`"
-              class="color-[--d-666-l-999] cursor-pointer" @click.self="tableView.isShowDate = !tableView.isShowDate" />
+              class="color-[--third-text] cursor-pointer" @click.self="tableView.isShowDate = !tableView.isShowDate" />
             <TableDateFilter
               v-model:visible="tableFilterVisible.timestamp" :modelValue="tableFilter.timestamp" :boundary="txsContainer || undefined"
               @confirm="onTimestampConfirm" />
@@ -849,7 +917,7 @@ const collect = async (row: any,index:number) => {
             v-if="!tableView.isShowDate && row.time && Number(formatTimeFromNow(row.time, true)) < 60"
             :key="`${row.time}${rowIndex}`" :timestamp="row.time" :end-time="60">
             <template #default="{ seconds }">
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 <template v-if="seconds < 60">
                   {{ seconds }}s
                 </template>
@@ -859,7 +927,7 @@ const collect = async (row: any,index:number) => {
               </span>
             </template>
           </TimerCount>
-          <span v-else class="color-[--d-999-l-666]">
+          <span v-else class="color-[--secondary-text]">
             {{
               tableView.isShowDate
                 ? formatDate(row.time, 'HH:mm:ss')
@@ -916,13 +984,13 @@ const collect = async (row: any,index:number) => {
           <div v-else>
             <div :class="getRowColor(row)">
               {{ formatNumber(row.amount0 || 0) }}
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 {{ row.token0_symbol }}
               </span>
             </div>
             <div :class="getRowColor(row)">
               {{ formatNumber(row.amount1 || 0) }}
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 {{ row.token1_symbol }}
               </span>
             </div>
@@ -933,8 +1001,8 @@ const collect = async (row: any,index:number) => {
             <span>{{ $t('amountU') }}</span>
             <Icon
               name="custom:price"
-              :class="`${tableView.isVolUSDT ? 'color-[--d-666-l-999]' : 'color-[--d-999-l-666]'} cursor-pointer`"
-              @click.self="tableView.isVolUSDT = !tableView.isVolUSDT" />
+              :class="`${globalStore.isUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer`"
+              @click.self="globalStore.isUSDT = !globalStore.isUSDT" />
             <VolFilter
               v-model:visible="tableFilterVisible.amountU" :modelValue="tableFilter.amountU"
               @confirm="confirmVolFilter" />
@@ -943,25 +1011,25 @@ const collect = async (row: any,index:number) => {
         <template #cell-amountU="{ row }">
           <div
             v-if="row.type === undefined" :class="`absolute h-full ${getGradient(row)} opacity-15`"
-            :style="`width:${Math.min(getAmount(row, true, true) / 20, 100)}%`" />
+            :style="`width:${Math.min(getAmount(row, true, true) / (addressAndChain.chain === 'solana' ? 10 : 20), 100)}%`" />
           <div v-if="row.type === undefined" :class="`${getRowColor(row)} w-full h-full flex items-center justify-end`">
-            <template v-if="tableView.isVolUSDT">
+            <template v-if="globalStore.isUSDT">
               ${{ formatNumber(getAmount(row, true, true), 2) }}
             </template>
             <template v-else>
               {{ formatNumber(getAmount(row, true, false), 3) }}
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 &nbsp;{{ getChainInfo(row.chain)?.main_name }}
               </span>
             </template>
           </div>
           <div v-else :class="getRowColor(row)">
-            <template v-if="tableView.isVolUSDT">
+            <template v-if="globalStore.isUSDT">
               ${{ formatNumber(row.amount0 * row.token0_price_usd + row.amount1 * row.token1_price_usd, 2) }}
             </template>
             <template v-else>
               {{ formatNumber(row.amount0 * row.token0_price_eth + row.amount1 * row.token1_price_eth, 2) }}
-              <span class="color-[--d-999-l-666]">
+              <span class="color-[--secondary-text]">
                 {{ getChainInfo(row.chain)?.main_name }}
               </span>
             </template>
@@ -996,9 +1064,10 @@ const collect = async (row: any,index:number) => {
             <UserRemark
               :remark="row.remark"
               :address="row.wallet_address"
+              :addressClass="markerTooltipVisible && currentRow.wallet_address===row.wallet_address?'bg-#12B88633':''"
               :maxRemarkLength="8"
               :chain="row.chain"
-              :wallet_logo="row.wallet_logo" class="color-[--d-999-l-666]"
+              :wallet_logo="row.wallet_logo" class="color-[--secondary-text]"
               :mouseoverAddress="e => openMarkerTooltip(row, e)"
             >
               <div v-if="row.count && row.count > 1">
@@ -1007,15 +1076,15 @@ const collect = async (row: any,index:number) => {
             </UserRemark>
             <Icon
               :ref="(el: any) => $refs.buttonRefs[rowIndex] = el" name="custom:attention"
-              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--d-666-l-999]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--third-text]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
             <Icon
               name="custom:filter"
-              :class="`${tableFilter.markerAddress ? 'color-[--d-999-l-666]' : 'color-[--d-666-l-999]'} cursor-pointer text-10px shrink-0`"
+              :class="`${tableFilter.markerAddress ? 'color-[--secondary-text]' : 'color-[--third-text]'} cursor-pointer text-10px shrink-0`"
               @click.self.stop="setMakerAddress(row.wallet_address)" />
           </div>
         </template>
         <template #cell-SOLBalance="{ row }">
-          <span v-if="row.senderProfile" class="color-[--d-999-l-666]">
+          <span v-if="row.senderProfile" class="color-[--secondary-text]">
             {{ formatNumber(row.senderProfile?.solTotalHolding || 0, 2) }}
           </span>
         </template>
@@ -1030,7 +1099,7 @@ const collect = async (row: any,index:number) => {
               class="w-16px h-16px cursor-pointer rounded-full"
               :src="formatIconSwap(row.amm)" alt="" @click.stop.self="goBrowser(row)">
             <Icon
-              name="custom:browser" class="text-16px color-[--d-666-l-999] cursor-pointer"
+              name="custom:browser" class="text-16px color-[--third-text] cursor-pointer"
               @click.stop.self="goBrowser(row)" />
           </div>
         </template>

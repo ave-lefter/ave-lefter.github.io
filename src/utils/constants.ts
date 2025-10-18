@@ -1,5 +1,17 @@
+import Beep from '@/assets/audio/beep.mp3'
+import Bell from '@/assets/audio/bell.mp3'
+import Ding from '@/assets/audio/ding.wav'
+import Click from '@/assets/audio/click.wav'
+import Dog from '@/assets/audio/dog.wav'
+import Gun from '@/assets/audio/gun.wav'
+import Pop from '@/assets/audio/pop.wav'
+import Bar from '@/assets/audio/bar.mp3'
+import Message from '@/assets/audio/message.wav'
+import Bong from '@/assets/audio/bong.mp3'
+import Coin from '@/assets/audio/Coin.wav'
 export const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 export const SOLANA_NATIVE_TOKEN = 'So11111111111111111111111111111111111111112'
+
 
 export function getNativeToken(chain: string) {
   return ({
@@ -93,12 +105,15 @@ export const BusEventType = {
   FAV_DIALOG: 'fav-dialog',
   // LEFT_DRAG: 'left-drag',
   SCROLL_TO_TOP: 'scroll-to-top',
+  TOP_ADD_GROUP: 'top-add-group',
 }
 
 export const ProvideType = {
   HOT_TOKENS: 'hot-tokens',
+  KLINE_DATE_FILTER: 'kline-date-filter',
 }
 export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer','fsc']
+export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
 
 export const defaultPaginationParams = {
   pageNO: 1,
@@ -130,3 +145,50 @@ export const BotSettingsArr = [
     label: 'P3',
   }
 ] as const
+
+export const resolutionMap  = {
+  '1S':{
+    val:1,
+    unit:'s'
+  },'1D':{
+    val:1,
+    unit:'d'
+  }, '1W':{
+    val:1,
+    unit:'w'
+  }
+} as const
+export const audioList = [
+  '',
+  'Beep',
+  'Bell',
+  'Ding',
+  'Click',
+  'Dog',
+  'Gun',
+  'Pop',
+  'Bar',
+  'Message',
+  'Bong',
+  'Coin'
+] as const
+export const audioNameToResource = {
+  Beep,
+  Bell,
+  Ding,
+  Click,
+  Dog,
+  Gun,
+  Pop,
+  Bar,
+  Message,
+  Bong,
+  Coin
+}
+
+export const SwapType = {
+  BUY: 1,
+  SELL: 2,
+  LIMIT_BUY: 5,
+  LIMIT_SELL: 6,
+}

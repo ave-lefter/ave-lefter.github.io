@@ -80,7 +80,7 @@ function onDrag(x: number, y: number) {
   >
     <slot/>
     <template #mr>
-      <span v-for="i in 3" :key="i" class="bg-#444 w-2px h-2px rounded-full"/>
+      <span v-for="i in 3" :key="i" class="bg-[--icon-color] w-2px h-2px rounded-full"/>
     </template>
   </VueDraggableResizable>
 </template>
@@ -142,9 +142,9 @@ function onDrag(x: number, y: number) {
     top:0;
     height: 100%;
     gap:1px;
-    background: var(--d-333-l-F2F2F2);
+    background: #5A5E64;
     &:hover{
-      background: var(--d-666-l-CCC);
+      background: #9CA1A8;
     }
 }
 .left-drag .handle-mr{

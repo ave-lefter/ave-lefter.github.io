@@ -77,7 +77,7 @@ export const useSignalStore = defineStore('signalStore', () => {
     fixedWidth.value = width
   }
 
-  const activeChain = shallowRef('solana')
+  const activeChain = shallowRef('bsc')
 
   // token: 筛选 token
   // history_count：筛选信号数，对应值2, 5, 15

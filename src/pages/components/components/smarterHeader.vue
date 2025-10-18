@@ -4,6 +4,8 @@ const props = defineProps<{
   setSortConditions(params: { sort: string; sort_dir: string }): void
   setFilterForm(...args: any[]): void
 }>()
+
+const globalStore = useGlobalStore()
 const defaultSort = computed(() => {
   if (props.sortConditions.sort === 'smart_money_tx_count_24h') {
     return props.sortConditions.sort_dir
@@ -19,10 +21,13 @@ function sortChange(sort_dir: string) {
 }
 
 const popoverVisible = shallowRef(false)
-const isFilterHighlight = shallowRef(false)
+// setup时获取
+const setupFilter = globalStore.rankConditions[globalStore.rankActiveTab]?.filter
+const isFilterHighlight = shallowRef(!!setupFilter?.smart_money_buy_count_24h_min || !!setupFilter?.smart_money_buy_count_24h_max || !!setupFilter?.smart_money_sell_count_24h_min || !!setupFilter?.smart_money_sell_count_24h_max)
+
 const themeStore = useThemeStore()
-const buyRange = ref(['', ''])
-const sellRange = ref(['', ''])
+const buyRange = ref([setupFilter?.smart_money_buy_count_24h_min || '', setupFilter?.smart_money_buy_count_24h_max || ''])
+const sellRange = ref([setupFilter?.smart_money_sell_count_24h_min || '', setupFilter?.smart_money_sell_count_24h_max || ''])
 
 const { t } = useI18n()
 function confirm(params1?: [string, string], params2?: [string, string]) {
@@ -83,19 +88,20 @@ function reset() {
         <Icon
           name="custom:filter"
           class="text-10px cursor-pointer"
-          :class="isFilterHighlight ? 'color-[--d-999-l-666]' : ''"
+          :class="isFilterHighlight ? 'color-[--secondary-text]' : ''"
         />
       </template>
       <template #default>
-        <div class="color-[--d-999-l-666] text-12px lh-12px">
+        <div class="color-[--secondary-text] text-12px lh-12px">
           {{ $t('smarterBuyTxns') }}
         </div>
-        <div class="flex items-center mt-8px mb-20px">
+        <div class="flex items-center mt-8px mb-20px [--el-font-size-base:12px]">
           <el-input
             v-model.trim.number="buyRange[0]"
             clearable
             type="text"
             :placeholder="$t('min3')"
+             style="--el-input-border-color:var(--border)"
             @input="(value) => (buyRange[0] = value.replace(/\-|[^\d.]/g, ''))"
           />
           <span class="ml-10px mr-10px">~</span>
@@ -104,18 +110,20 @@ function reset() {
             clearable
             type="text"
             :placeholder="$t('max')"
+             style="--el-input-border-color:var(--border)"
             @input="(value) => (buyRange[1] = value.replace(/\-|[^\d.]/g, ''))"
           />
         </div>
         <div class="color-[--d-999-l-666] text-12px lh-12px">
           {{ $t('smarterSellTxns') }}
         </div>
-        <div class="flex items-center mt-8px">
+        <div class="flex items-center mt-8px [--el-font-size-base:12px]">
           <el-input
             v-model.trim.number="sellRange[0]"
             clearable
             type="text"
             :placeholder="$t('min3')"
+             style="--el-input-border-color:var(--border)"
             @input="(value) => (sellRange[0] = value.replace(/\-|[^\d.]/g, ''))"
           />
           <span class="ml-10px mr-10px">~</span>
@@ -124,13 +132,13 @@ function reset() {
             clearable
             type="text"
             :placeholder="$t('max')"
+             style="--el-input-border-color:var(--border)"
             @input="(value) => (sellRange[1] = value.replace(/\-|[^\d.]/g, ''))"
           />
         </div>
         <div class="mt-20px flex">
           <el-button
             class="h-30px flex-1 m-l-auto"
-            :color="themeStore.isDark ? '#333' : '#F2F2F2'"
             @click="reset"
           >
             {{ $t('reset') }}

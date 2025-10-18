@@ -1,26 +1,26 @@
 <template>
   <el-drawer
     v-model="visible"
-    class="bg-[--d-222-l-FFF] color-[--d-F5F5F5-l-333]"
+    class="[&&]:bg-[--dialog-bg]"
     :size="500"
-    header-class="!mb-5"
+    header-class="!mb-5 [&&]:color-[--main-text]"
   >
     <template #header>
-      <span class="pnl-title text-[var(--d-FFF-l-333)]">{{ $t('pnlDetail') }}</span>
+      <span class="pnl-title color-[--main-text]">{{ $t('pnlDetail') }}</span>
     </template>
-    <el-divider class="!m-0 !mb-5 !border-t-[--d-33353D-l-F5F5F5]" />
+    <el-divider class="!m-0 !mb-5 !border-t-[--dialog-divider]" />
     <div>
       <div class="pnl-row flex justify-between px-5 text-3.5 leading-5 mb-3">
-        <span class="pnl-row-name text-[#959a9f]">{{ $t('Txs') }}</span>
-        <span class="pnl-row-value text-[var(--d-FFF-l-333)]">{{ eventsDetail.txns }}</span>
+        <span class="pnl-row-name text-[--third-text]">{{ $t('Txs') }}</span>
+        <span class="pnl-row-value color-[--main-text]">{{ eventsDetail.txns }}</span>
       </div>
       <div class="pnl-row flex justify-between px-5 text-3.5 leading-5 mb-3">
-        <span class="pnl-row-name text-[#959a9f]">{{ $t('Vol') }}</span>
-        <span class="pnl-row-value text-[var(--d-FFF-l-333)]">${{ volume }}</span>
+        <span class="pnl-row-name text-[--third-text]">{{ $t('Vol') }}</span>
+        <span class="pnl-row-value color-[--main-text]">${{ volume }}</span>
       </div>
       <div class="pnl-row flex justify-between px-5 text-3.5 leading-5 mb-3">
-        <span class="pnl-row-name text-[#959a9f]">{{ $t('time') }}</span>
-        <span class="pnl-row-value text-[var(--d-FFF-l-333)]">{{ time }}</span>
+        <span class="pnl-row-name text-[--third-text]">{{ $t('time') }}</span>
+        <span class="pnl-row-value color-[--main-text]">{{ time }}</span>
       </div>
       <div
         v-infinite-scroll="onLoad"
@@ -72,13 +72,13 @@
           </el-table-column>
           <el-table-column :label="$t('time')">
             <template #default="{ row }">
-              <span class="text-3">
+              <span class="text-3 lh-16px">
                 {{ dayjs(row.block_time * 1000).format('YYYY-MM-DD HH:mm:ss') }}
               </span>
             </template>
           </el-table-column>
         </el-table>
-        <div class="mt-5 text-3.5 text-center text-[--d-666-l-959A9F)]]">
+        <div class="mt-5 text-3.5 text-center text-[--third-text]">
           <span v-if="loading && pageNO > 1">{{ $t('loading') }}</span>
         </div>
       </div>
@@ -153,7 +153,6 @@ const volume = computed(() => {
 
 const time = computed(() => {
   const { start_time, end_time } = props.eventsDetail
-  console.log('props.eventsDetail', props.eventsDetail)
   if (!start_time || !end_time) {
     return '--'
   }
@@ -193,3 +192,23 @@ const onLoad = () => {
   emit('detailOnLoad')
 }
 </script>
+<style lang="scss" scoped>
+:deep(.el-table.el-table){
+  --el-table-header-bg-color:transparent;
+  --el-table-bg-color:transparent;
+  --el-table-tr-bg-color:transparent;
+  .cell{
+    line-height: inherit;
+  }
+  th:nth-child(1),td:nth-child(1){
+    .cell{
+      padding-left: 20px;
+    }
+  }
+  th:nth-last-child,td:nth-last-child{
+     .cell{
+      padding-right: 20px;
+     }
+  }
+}
+</style>

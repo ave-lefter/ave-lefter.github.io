@@ -2,30 +2,34 @@
   <button class="flex items-center bg-transparent border-none p-0 clickable text-14px" type="button" @click.stop="show = true">
     <template v-if="props.token?.address || props.token?.token">
       <TokenImg :key="props.token?.address" :row="props.token" />
-      <span class="text-14px color-[--d-F5F5F5-l-333] font-400 ml-3px">
+      <span class="text-14px color-[--main-text] font-400 ml-3px">
         {{ props.token?.symbol || '' }}
       </span>
     </template>
     <div v-else>{{ $t('pleaseSelectToken') }}</div>
     <Icon class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
   </button>
-  <el-dialog v-model="show"	 append-to-body class="dialog-select" width="420px">
+  <el-dialog v-model="show"	 append-to-body class="new-dialog" width="420px">
     <template #header>
-      <span>{{ t('selectToken') }}</span>
+      <span class="text-20px font-500">{{ t('selectToken') }}</span>
     </template>
     <div class="search-dialog-container" @click.stop>
       <el-input
         ref="inputSearch"
+        class="search-input"
         v-model.trim="keyword"
         :placeholder="t('enterAddress/token')"
         clearable
         @keydown.enter="tokenSearch"
       >
         <template #prefix>
-          <el-icon><Search /></el-icon>
+          <Icon
+            class="text-16px text-[--third-text]"
+            name="custom:search"
+          />
         </template>
       </el-input>
-      <div class="search-content" style="padding-top: 10px">
+      <div class="search-content mt-16px">
         <SearchTable
           :searchTokens="searchResultTokens"
           :loading="loading"
@@ -209,6 +213,18 @@ function handleSelectToken(item: { address?: string; token?: string; value?: num
 .select2 {
   :deep() .el-input__prefix-inner > :last-child {
     margin-right: 8px;
+  }
+}
+.search-input {
+  background: var(--border);
+  padding: 0;
+  border-radius: 4px;
+  height:48px;
+  :deep().el-input__wrapper {
+    border-bottom: 1px solid var(--border);
+    .el-input__inner::placeholder {
+      color: var(--third-text);
+    }
   }
 }
 </style>

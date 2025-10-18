@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useLocalStorage } from '@vueuse/core'
+import { useLocalStorage, useStorage } from '@vueuse/core'
 import {
   refreshAccessToken as _refAcc,
   login,
@@ -8,7 +8,8 @@ import {
   bot_updateWebConfig,
   bot_getChainsTokenBalance,
   bot_getUserInfoByGuid,
-  bot_getBundleAvailable
+  bot_getBundleAvailable,
+  bot_getTokenBalance
 } from '@/api/bot'
 import { getTokensPrice  } from '@/api/token'
 import { createCacheRequest } from '@/utils/cacheRequest'
@@ -18,11 +19,12 @@ import { deepMerge, evm_utils as utils ,getChainInfo } from '@/utils'
 import { NATIVE_TOKEN } from '@/utils/constants'
 
 type AddressItem = { chain: string; address: string; price?: number; balance?: string; decimals?: number; logo_url?: string };
-
+const updateBalanceLoading: { [key: string]: boolean } = {}
 const _refreshAccessToken = createCacheRequest(_refAcc, 3000)
 export const useBotStore = defineStore('bot', () => {
   const walletStore = useWalletStore()
   const configStore = useConfigStore()
+  const tokenStore = useTokenStore()
   const isSupportChains = ['eth', 'bsc', 'solana', 'base', 'xlayer'] as const
   const isSupportEvmChains = computed(() => {
     const chainConfig = configStore.chainConfig
@@ -36,13 +38,15 @@ export const useBotStore = defineStore('bot', () => {
   const accessToken = useLocalStorage('bot_accessToken', '')
   const refreshToken = useLocalStorage('bot_refreshToken', '')
   const evmAddress = useLocalStorage('bot_evmAddress', '')
+  const mnemonic = useStorage('bog_mnemonic', '', sessionStorage)
+  const showBotMnemonicPhrase = useStorage('showBotMnemonicPhrase', false, sessionStorage)
   const botReqCount = ref(0)
   const bundleAvailableUpdate = ref(0)
   const refreshing = ref(false)
   const subscribed = ref(false)
   const bundleAvailable = ref(false)
 
-  const connectVisible = ref(false)
+  const connectVisible = useStorage('connectVisible', false, sessionStorage)
   const connectWalletTab = ref(0)
   const walletList = ref<Awaited<ReturnType<typeof bot_getWalletsAllChain>>>([])
   const botSwapStore = useBotSwapStore()
@@ -138,8 +142,8 @@ export const useBotStore = defineStore('bot', () => {
         const chainMainToken1: { [key: string]: string } = {
           solana: 'So11111111111111111111111111111111111111112',
         }
-        // const adds = Array.from(new Set(addresses?.map?.(i => i?.address || '') || []))
-        // dispatch('subBalanceChange', adds)
+        const adds = Array.from(new Set(addresses?.map?.(i => i?.address || '') || []))
+        subBalanceChange(adds)
         const tokenIds = userInfo.value?.addresses?.map(i => ((chainMainToken1?.[i.chain] || NATIVE_TOKEN) + '-' +  i.chain))
         getTokensPrice(tokenIds).then(res => {
           if (userInfo.value && Array.isArray(userInfo.value.addresses)) {
@@ -149,6 +153,22 @@ export const useBotStore = defineStore('bot', () => {
           }
         })
     }
+  }
+  function subBalanceChange(addresses: string[]) {
+    wsStore.send({
+      jsonrpc: '2.0',
+      method: 'unsubscribe',
+      params: [
+        'asset'
+      ],
+      id: 1
+    })
+    wsStore.send({
+      jsonrpc: '2.0',
+      method: 'subscribe',
+      params: ['asset', addresses],
+      id: 1,
+    })
   }
   function getBundleAvailable(): Promise<any> {
       if (bundleAvailableUpdate.value > 0) {
@@ -308,6 +328,68 @@ export const useBotStore = defineStore('bot', () => {
       subscribed.value = false
     }
   }
+
+
+  function getTokenBalance(data:any) {
+      if (!accessToken.value) {
+        return Promise.resolve([])
+      }
+      const chain = data?.chain || tokenStore.tokenInfo?.token?.chain
+      if (chain === 'solana') {
+        const tokens = data.tokens?.map((res: string) => {
+          if (res === 'So11111111111111111111111111111111111111112' || res === NATIVE_TOKEN) {
+            return 'sol'
+          } else {
+            return res
+          }
+        })
+        data.tokens = tokens
+      }
+      return bot_getTokenBalance(data).then(async res => {
+        return res
+      })
+  }
+  function updateBalance( data:any) {
+    console.log('bot_updateBalance', data)
+    if (data.event === 'asset' && (data?.transfer)) {
+      const token = data?.transfer?.token
+      const chain = data?.transfer?.chain
+      const wrapToken = getChainInfo(chain)?.wmain_wrapper
+      if (token && (token === NATIVE_TOKEN || token === 'sol' || token === wrapToken)) {
+        const walletAddress = data?.client_address || ''
+        const isHasWallet = userInfo.value.addresses?.some?.(i => i?.address === walletAddress)
+        if (isHasWallet) {
+          const key = walletAddress + '_' + chain
+          if (updateBalanceLoading?.[key]) {
+            return
+          }
+          updateBalanceLoading[key] = true
+          getTokenBalance( {
+            chain: chain,
+            tokens: [NATIVE_TOKEN],
+            walletAddress: walletAddress
+          }).then(tokens => {
+            const t = tokens?.[0]
+            console.log('updateBalance------getTokenBalance', t)
+            userInfo.value.addresses = (userInfo.value.addresses || []).map(i => {
+              if (i?.chain === chain && i.address === walletAddress) {
+                i.balance = t.balance || 0
+              }
+              return i
+            })
+            if (tokenStore.swap.native?.chain === chain) {
+              tokenStore.swap.native.balance = t.balance || 0
+            }
+          }).finally(() => {
+            setTimeout(() => {
+              // updateBalanceLoading[walletAddress + '_' + chain] = null
+              Reflect.deleteProperty(updateBalanceLoading, key)
+            }, 1000)
+          })
+        }
+      }
+    }
+  }
   return {
     accessToken,
     walletList,
@@ -334,6 +416,10 @@ export const useBotStore = defineStore('bot', () => {
     switchWallet,
     getChainsTokenBalance,
     getUserAllChainBalance,
-    getBundleAvailable
+    getBundleAvailable,
+    updateBalance,
+    bot_subscribe,
+    mnemonic,
+    showBotMnemonicPhrase
   }
 })

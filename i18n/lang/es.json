@@ -510,5 +510,8 @@
   "holdersNumTotal": "Titulares Total",
   "holdersTotalChange": "Cambio de titulares",
   "holdersChange": "Cambio de titulares",
-  "holdersChange2": "Changs de titular en {n}"
+  "holdersChange2": "Changs de titular en {n}",
+  "lockAmount": "Cantidad bloqueada",
+  "transferToken": "Seleccione Token de transferencia",
+  "depositTip": "* Dirección actual EVM Cadena Universal"
 }

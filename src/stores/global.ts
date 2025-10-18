@@ -1,16 +1,18 @@
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
-import type { pumpBlack } from '@/api/types/pump'
+import type { pumpBlack, pumpObjColor } from '@/api/types/pump'
 import { _getFollowsNum } from '@/api/follow'
 
 import type{ GetHotTokensResponse } from '@/api/token'
 import type { ILatestNotice } from '~/api/user'
+import { getUserFavoriteGroups, type GetUserFavoriteGroupsResponse } from '~/api/fav'
 export const useGlobalStore = defineStore('global', () => {
   const wsStore = useWSStore()
   const localeStore = useLocaleStore()
   const themeStore = useThemeStore()
   const configStore = useConfigStore()
   const showLeft = shallowRef(true)
+  const isUSDT = useStorage('isUSDT', true)
   const footerTokensPrice = shallowRef([
     {
       token: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
@@ -51,7 +53,30 @@ export const useGlobalStore = defineStore('global', () => {
     isBlacklist: boolean
     show_search: boolean
     define: string[]
-  }>('pumpSetting', {
+    data: Record<
+      string,
+      {
+        minSize: number
+        minColor: string
+        middleSize: number
+        middleColor: string
+        maxColor: string
+      }
+    >
+    bg: Record<string, pumpObjColor>
+    bgList: string[]
+    grid: Record<
+      string,
+      {
+        id: string
+        order: number
+        name: string
+        show: boolean
+      }
+    >
+    jump: 'close' | 'open' | 'open_jump'
+    border: string
+  }>('pumpSetting5', {
     fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
@@ -60,23 +85,155 @@ export const useGlobalStore = defineStore('global', () => {
     isRight: false,
     isBlacklist: true,
     show_search: true,
-    define: ['name', 'txs', 'vol', 'holder', 'mcap', 'media', 'smart', 'top','dev','insider', 'sniper', 'rug', 'kol', 'markers'],
+    define: [
+      'name',
+      'txs',
+      'vol',
+      'holder',
+      'mcap',
+      'media',
+      'smart',
+      'top',
+      'dev',
+      'insider',
+      'sniper',
+      'rug',
+      'kol',
+      'markers',
+    ],
+    data: {
+      mc: {
+        minSize: 30000,
+        minColor: getCssVariable('--main-text'),
+        middleSize: 100000,
+        middleColor: '#FFA622',
+        maxColor: '#12B886',
+      },
+      vol: {
+        minSize: 1000,
+        minColor: getCssVariable('--main-text'),
+        middleSize: 50000,
+        middleColor: '#FFA622',
+        maxColor: '#12B886',
+      },
+      holders: {
+        minSize: 100,
+        minColor: getCssVariable('--main-text'),
+        middleSize: 500,
+        middleColor: '#FFA622',
+        maxColor: '#12B886',
+      },
+    },
+    bg: {},
+    bgList: [],
+    grid: {
+      new: {
+        id: 'new',
+        order: 1,
+        name: 'new1',
+        show: true,
+      },
+      soon: {
+        id: 'soon',
+        order: 2,
+        name: 'soon',
+        show: true,
+      },
+      graduated: {
+        id: 'graduated',
+        order: 2,
+        name: 'graduated',
+        show: true,
+      },
+    },
+    jump: 'close',
+    border: '',
   })
 
   const hide_risk=shallowRef(1)
   const hide_small=shallowRef(0)
-  const rankCommon = useStorage('rankCommon',{
+  const rankCommon = useStorage('rankCommon', {
     activeInterval: '24h',
     quickVisible: true,
     quickBuyValue: '0.01',
+    sort: 'time',
+    sort_dir: ''
   })
-  const latestNotice = shallowRef<ILatestNotice>({})
+  const pumpLiveSort = useStorage('pumpLiveSort', {
+    sort: 'created_timestamp',
+    sort_dir: 'DESC',
+  })
+  const audioSettings = useStorage('audioSettings',{
+    active:'',
+    notice:{
+      monitor:false,
+      signal:true,
+      position:'top'
+    },
+    audio:{
+      signal:'Bar',
+      monitor:'Coin',
+      marketBuy:'',
+      marketSell:'',
+      limit:'',
+      volume:50
+    }
+  })
+
+  // 预留一个全局变量，用于控制 token 历史的显示
+  const tokenHistoryVisible = true
+  const lastVisitTokens = useStorage<{
+    id: string,
+    logo_url: string,
+    symbol: string,
+    price_change: number | undefined,
+    circulation: string,
+    price: number,
+  }[]>('lastTokens', [])
+  const latestNotice = shallowRef<ILatestNotice>({} as ILatestNotice)
+  const rankActiveTab = useStorage('rankActiveTab', 'hot')
+  // pump 和活动榜单动态插入
+  const rankConditions = useStorage<Record<string, { sort: { sort: string; sort_dir: string }, filter: Record<string, any> }>>('rankCache',{
+    hot:{
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    },
+    new:{
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    },
+    gainer:{
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    },
+    inclusion:{
+      sort:{
+        sort: '',
+        sort_dir: '',
+      },
+      filter:{}
+    }
+  })
+
+  const userFavoriteGroups = ref<GetUserFavoriteGroupsResponse[]>([])
   const pnlTrackerVisible = useStorage('pnlTrackerVisible', false)
 
   const pumpBlackList = useStorage<Array<pumpBlack>>('pumpBlackList', [])
   const holderBlackList = useStorage<Array<pumpBlack>>('holderBlackList', [])
+  const mySwapList = ref<any[]>([])
 
    const hotList = shallowRef<GetHotTokensResponse[]>([])
+  //  点击图表显示交易历史
+   const isClickKlineFilter = useStorage('isClickKlineFilter', true)
    function sendFooterPriceWs() {
     const data = {
       jsonrpc: '2.0',
@@ -140,6 +297,12 @@ export const useGlobalStore = defineStore('global', () => {
     })
   }
 
+  function _getUserFavoriteGroups(walletAddress:string) {
+    getUserFavoriteGroups(walletAddress).then((res) => {
+      userFavoriteGroups.value = (res || []).filter((el) => !!el.name)
+    })
+  }
+
   return {
     lang: computed(() => localeStore.locale),
     token_logo_url: computed(() => configStore.token_logo_url),
@@ -160,6 +323,17 @@ export const useGlobalStore = defineStore('global', () => {
     headFollowsNum,
     getFollowsNum,
     latestNotice,
-    pnlTrackerVisible
+    audioSettings,
+    pnlTrackerVisible,
+    lastVisitTokens,
+    tokenHistoryVisible,
+    userFavoriteGroups,
+    getUserFavoriteGroups: _getUserFavoriteGroups,
+    rankConditions,
+    rankActiveTab,
+    isClickKlineFilter,
+    mySwapList,
+    pumpLiveSort,
+    isUSDT
   }
 })

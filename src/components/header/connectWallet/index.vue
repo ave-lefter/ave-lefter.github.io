@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="botStore.connectVisible" width="500" height='630' :class="['dialog-connect', theme]" append-to-body>
+  <el-dialog v-model="botStore.connectVisible" width="500" height='630' :class="['dialog-connect', theme]" append-to-body :close-on-click-modal="false">
     <div :class="botStore.connectWalletTab === 1 ? 'min-h-560px' : ''">
       <component :is="tabCom" />
     </div>
@@ -37,14 +37,14 @@ const tabCom = computed(() => {
   border-width: 0!important;
   min-width: 500px;
   min-height: 300px;
-  padding: 40px 40px;
+  padding: 40px 20px;
   box-sizing: border-box;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #222222;
-  border: 1px solid #27282B;
+  background-color: var(--dialog-bg);
+  // border: 1px solid #27282B;
   margin: 0;
   --el-dialog-padding-primary: 0px;
   .el-dialog__headerbtn {

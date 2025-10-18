@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import BigNumber from 'bignumber.js'
 import {getUserBalances, type IGetTokenTxsResponse} from '~/api/token'
 
 const props = defineProps({
@@ -43,7 +42,7 @@ const props = defineProps({
 // const emit = defineEmits(['updateTokenTxs'])
 
 const tokenStore = useTokenStore()
-const botStore = useBotStore()
+// const botStore = useBotStore()
 const route = useRoute()
 // const tokenTxs = shallowRef<IGetTokenTxsResponse[]>([])
 const balanceAmount = shallowRef(0)
@@ -141,35 +140,35 @@ async function _getTokenBalance() {
 </script>
 
 <template>
-  <div class="px-12px lh-20px flex justify-between items-center mb-12px text-13px">
+  <div class="px-12px lh-20px flex justify-between items-center mb-12px text-13px color-[--secondary-text]">
     <div>
-      <span class="color-#959A9F">{{ $t('balance1') }}:</span>
-      <span class="ml-4px">{{ formatNumber(balanceAmount, 3) }}</span>
-      <span class="ml-4px">${{
+      <span >{{ $t('balance1') }}:</span>
+      <span class="ml-4px color-[--main-text]">{{ formatNumber(balanceAmount, 3) }}</span>
+      <span class="ml-4px color-[--main-text]">${{
           formatNumber((tokenStore.tokenPrice || tokenPrice || 0) * (balanceAmount || 0), 3)
         }}</span>
     </div>
     <div>
-      <span class="color-#959A9F">{{ $t('profit') }}:</span>
+      <span >{{ $t('profit') }}:</span>
       <span :class="`ml-4px ${getColorClass(String(profit))}`">{{ addSign(profit) }}${{
           formatNumber(Math.abs(profit), 2)
         }}</span>
       <span :class="`ml-4px ${getColorClass(String(profitChange))}`">{{ formatNumber(profitChange * 100, 1) }}%</span>
     </div>
     <div>
-      <span class="color-#959A9F">{{ $t('totalBuy') }}:</span>
+      <span >{{ $t('totalBuy') }}:</span>
       <span class="color-#12B886 ml-4px">${{ formatNumber(totalBuySell.buyUSD || 0, 2) }}</span>
     </div>
     <div>
-      <span class="color-#959A9F">{{ $t('totalSell') }}:</span>
+      <span >{{ $t('totalSell') }}:</span>
       <span class="color-#F6465D ml-4px">${{ formatNumber(totalBuySell.sellUSD || 0, 2) }}</span>
     </div>
     <div>
-      <span class="color-#959A9F">{{ $t('avgBuyPrice') }}:</span>
+      <span >{{ $t('avgBuyPrice') }}:</span>
       <span class="color-#12B886 ml-4px">${{ formatNumber(avgBuyPrice || 0, 2) }}</span>
     </div>
     <div>
-      <span class="color-#959A9F">{{ $t('avgSellPrice') }}:</span>
+      <span >{{ $t('avgSellPrice') }}:</span>
       <span class="color-#F6465D ml-4px">${{ formatNumber(avgSellPrice || 0, 2) }}</span>
     </div>
   </div>

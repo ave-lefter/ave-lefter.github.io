@@ -4,7 +4,7 @@ defineProps<{
 }>()
 </script>
 <template>
-  <span :class="!row.current_price_usd ? 'color-[--d-666-l-999]' : ''">
+  <span class="color-[--main-text]">
     ${{ formatNumber(row.current_price_usd, 3) }}
   </span>
 </template>

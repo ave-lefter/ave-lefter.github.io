@@ -1,24 +1,24 @@
 <template>
-  <div class="w-safe bg-[--d-111-l-FFF] flex-1 w-100% px-200px pt-40px" style="height: calc(100vh - 92px)">
+  <div class="w-safe bg-[--secondary-bg] flex-1 w-100% px-200px pt-40px overflow-y-auto" style="height: calc(100vh - 92px)">
     <div v-if="step !== 0" class="flex-start text-20px mb-22px">
       <el-icon size="12" class="clickable" @click="step=0">
         <Back />
       </el-icon>
-      <span class="ml-10px font-400 text-12px lh-16px tracking-0px color-#999">{{ t('returnSafeCenter') }}</span>
+      <span class="ml-10px font-400 text-12px lh-16px tracking-0px color-[--secondary-text]">{{ t('returnSafeCenter') }}</span>
     </div>
-    <h2 class="font-500 text-24px lh-36px tracking-0px mb-10px color-[--d-F5F5F5-l-333]">{{ title }}</h2>
-    <div class="font-400 text-12px lh-16px tracking-0px mb-30px color-#999">{{ desc }}</div>
+    <h2 class="font-500 text-24px lh-36px tracking-0px mb-10px color-[--main-text]">{{ title }}</h2>
+    <div class="font-400 text-12px lh-16px tracking-0px mb-30px color-[--secondary-text]">{{ desc }}</div>
     <template v-if="step === 0">
-      <h3 class="font-500 text-16px lh-22px tracking-0px mb-30px color-[--d-F5F5F5-l-333]">{{ t('2fa') }}</h3>
+      <h3 class="font-500 text-16px lh-22px tracking-0px mb-30px color-[--main-text]">{{ t('2fa') }}</h3>
       <ul class="flex flex-col gap-30px">
         <li class="flex items-center h-40px justify-between">
           <div class="flex items-center gap-8px">
-            <div class="flex items-center justify-center bg-[--d-222-l-F2F2F2] border-rd-[50%] w-40px h-40px h-40px">
-              <Icon name="custom:email" class="color-[--d-FFF-l-333]"/>
+            <div class="flex items-center justify-center bg-[--border] border-rd-[50%] w-40px h-40px h-40px">
+              <Icon name="custom:email" class="color-[--main-text]"/>
             </div>
             <div class="flex flex-col gap-2px">
-              <span class="font-500 text-14px lh-22px tracking-0px color-[--d-FFF-l-333]">{{ t('emailVerification') }}</span>
-              <span class="font-400 text-12px lh-16px tracking-0px color-#999">{{ t('emailVerificationDsc') }}</span>
+              <span class="font-500 text-14px lh-22px tracking-0px color-[--main-text]">{{ t('emailVerification') }}</span>
+              <span class="font-400 text-12px lh-16px tracking-0px color-[--secondary-text]">{{ t('emailVerificationDsc') }}</span>
             </div>
           </div>
           <div class="flex items-center gap-8px">
@@ -32,12 +32,12 @@
         </li>
         <li class="flex items-center h-40px justify-between">
           <div class="flex items-center gap-8px">
-            <div class="flex items-center justify-center bg-[--d-222-l-F2F2F2] border-rd-[50%] w-40px h-40px h-40px">
-              <Icon name="custom:auth" class="color-[--d-FFF-l-333] text-20px"/>
+            <div class="flex items-center justify-center bg-[--border] border-rd-[50%] w-40px h-40px h-40px">
+              <Icon name="custom:auth" class="color-[--main-text] text-20px"/>
             </div>
             <div class="flex flex-col gap-2px">
-              <span class="font-500 text-14px lh-22px tracking-0px color-[--d-FFF-l-333]">{{ t('DbCheckTitle2') }}</span>
-              <span class="font-400 text-12px lh-16px tracking-0px color-#999">{{ t('googleVerificationDsc') }}</span>
+              <span class="font-500 text-14px lh-22px tracking-0px color-[--main-text]">{{ t('DbCheckTitle2') }}</span>
+              <span class="font-400 text-12px lh-16px tracking-0px color-[--secondary-text]">{{ t('googleVerificationDsc') }}</span>
             </div>
           </div>
           <div class="flex items-center gap-8px">
@@ -46,7 +46,7 @@
             <template v-else>
               <Icon name="mingcute:check-circle-fill" class="text-17px color-#12B886 mt-1px"/>
               <span class="font-400 text-15px lh-22px tracking-0px">{{ t('bounded') }}</span>
-              <span class="font-400 text-15px lh-22px tracking-0px color-#999 ml-8px decoration-underline clickable" @click="dialogVisible=true">{{ t('reset') }}</span>
+              <span class="font-400 text-15px lh-22px tracking-0px color-[--secondary-text] ml-8px decoration-underline clickable" @click="dialogVisible=true">{{ t('reset') }}</span>
             </template>
           </div>
         </li>
@@ -57,7 +57,7 @@
         <div :class="lang?.includes?.('zh') ? 'w-420px' : 'w-500px'" style="flex-shrink: 0">
           <Steps class="mb-40px" :active="bindGoogleAuthStep" :dataSource="[t('bindGoogleAuthStep1'), t('bindGoogleAuthStep2'), t('bindGoogleAuthStep3')]"/>
           <template v-if="step === 1">
-            <div class="color-[--d-F5F5F5-l-333] font-400 text-14px mb-40px">
+            <div class="color-[--main-text] font-400 text-14px mb-40px">
               <div class="mb-8px">{{ t('bindGoogleAuthStep1P1') }}</div>
               <div class="lh-20px">{{ t('bindGoogleAuthStep1P2') }}</div>
             </div>
@@ -65,18 +65,18 @@
             <div class="flex justify-between w-100% mb-40px">
               <el-popover width="200px" popper-class="h-200px flex items-center justify-center" placement="bottom">
                   <template #reference>
-                    <div class="flex items-center justify-center gap-4px w-200px h-48px border-rd-8px bg-[--d-222-l-F2F2F2] clickable">
-                      <Icon name="custom:apple" class="text-30px color-[--d-FFF-l-333]"/>
-                      <span class="color-[--d-FCFDFF-l-333] font-500 text-14px">App Store</span>  
+                    <div class="flex items-center justify-center gap-4px w-200px h-48px border-rd-8px bg-[--border] clickable">
+                      <Icon name="custom:apple" class="text-30px color-[--main-text]"/>
+                      <span class="color-[--main-text] font-500 text-14px">App Store</span>
                     </div>
                   </template>
                   <img src="@/assets/images/2faAppleQRCode.png" alt="" class="mx-auto w-188px h-188px block">
               </el-popover>
               <el-popover width="200px" popper-class="h-200px flex items-center justify-center" placement="bottom">
                   <template #reference>
-                    <div class="flex items-center justify-center gap-4px w-200px h-48px border-rd-8px bg-[--d-222-l-F2F2F2] clickable">
+                    <div class="flex items-center justify-center gap-4px w-200px h-48px border-rd-8px bg-[--border] clickable">
                       <Icon name="custom:google-play" class="text-24px"/>
-                      <span class="color-[--d-FCFDFF-l-333] font-500 text-14px">Google Play</span>
+                      <span class="color-[--main-text] font-500 text-14px">Google Play</span>
                     </div>
                   </template>
                   <img src="@/assets/images/2faGoogleQRCode.png" alt="" class="mx-auto w-188px h-188px block">
@@ -85,7 +85,7 @@
             <el-button type="primary" class="w-full" size="large" @click="step = 1.1">{{ t('next') }}</el-button>
           </template>
           <div v-show="step === 1.1" :element-loading-background="isDark ? 'rgba(19, 23, 34 0.2)' : 'rgba(255, 255, 255, 0.2)'">
-            <div class="color-[--d-F5F5F5-l-333] font-400 text-14px  mb-40px lh-20px">{{ t('bindGoogleAuthStep2P1') }}</div>
+            <div class="color-[--main-text] font-400 text-14px  mb-40px lh-20px">{{ t('bindGoogleAuthStep2P1') }}</div>
             <el-skeleton :loading="loading3" animated :throttle="500">
               <template #template>
                 <el-skeleton-item variant="image" class="w-120px h-120px mb-40px mx-auto" />
@@ -101,14 +101,16 @@
                 <template #suffix>
                   <a
                     v-copy="googleAuth.secret" href="javascript:void(0)"
-                    class="text-14px font-400 lh-20px text-left text-from-font decoration-none text-#3F80F7">{{ t('copy') }}</a>
+                    style="pointer-events: auto"
+                    class="text-14px font-400 lh-20px text-left text-from-font decoration-none text-#3F80F7 cursor-pointer">{{ t('copy') }}</a>
                 </template>
               </el-input>
               <el-input v-model="googleAuth.secret" disabled size="large" class="h-48px font-500 text-16px mb-20px">
                 <template #suffix>
                   <a
                     v-copy="googleAuth.secret" href="javascript:void(0)"
-                    class="text-14px font-400 lh-20px text-left text-from-font decoration-none text-#3F80F7">{{ t('copy') }}</a>
+                    style="pointer-events: auto"
+                    class="text-14px font-400 lh-20px text-left text-from-font decoration-none text-#3F80F7 cursor-pointe">{{ t('copy') }}</a>
                 </template>
               </el-input>
                <el-button type="primary" class="w-full" size="large" @click="step = 1.2">{{ t('next') }}</el-button>
@@ -118,7 +120,7 @@
             <el-form
               ref="googleAuthRef" :model="googleAuth" :rules="rules" label-width="0" autocomplete="off"
               size="large" @submit.prevent>
-              <div class="mb-40px text-14px font-400 color-[--d-F5F5F5-l-333] lh-20px">{{ t('bindGoogleAuthStep3P1') }}</div>
+              <div class="mb-40px text-14px font-400 color-[--main-text] lh-20px">{{ t('bindGoogleAuthStep3P1') }}</div>
               <el-form-item label="" prop="authCode" class="mb-40px!">
                 <el-input
                   v-model="googleAuth.authCode" class="h-48px font-500 text-16px" :autocomplete="'new-authCode' + Math.random()"
@@ -130,21 +132,21 @@
             </el-form>
           </template>
         </div>
-        <div class="w-1px h-216px bg-[--d-222-l-F2F2F2]"/>
+        <div class="w-1px h-216px bg-[--border]"/>
         <div class="w-437px">
-          <div class="font-500 text-14px lh-20px color-[--d-F5F5F5-l-333]">{{ t('bindGoogleAuthReadmeT1') }}</div>
-          <div class="font-400 text-14px lh-20px color-[--d-666-l-999] mb-23px">{{ t('bindGoogleAuthReadmeP1') }}</div>
-          <div class="font-500 text-14px lh-20px color-[--d-F5F5F5-l-333]">{{ t('bindGoogleAuthReadmeT2') }}</div>
-          <div class="font-400 text-14px lh-20px color-[--d-666-l-999] mb-23px">{{ t('bindGoogleAuthReadmeP2') }}</div>
+          <div class="font-500 text-14px lh-20px color-[--main-text]">{{ t('bindGoogleAuthReadmeT1') }}</div>
+          <div class="font-400 text-14px lh-20px color-[--third-text] mb-23px">{{ t('bindGoogleAuthReadmeP1') }}</div>
+          <div class="font-500 text-14px lh-20px color-[--main-text]">{{ t('bindGoogleAuthReadmeT2') }}</div>
+          <div class="font-400 text-14px lh-20px color-[--third-text] mb-23px">{{ t('bindGoogleAuthReadmeP2') }}</div>
           <a
-            class="decoration-underline font-500 text-14px lh-20px color-[--d-F5F5F5-l-333]"
+            class="decoration-underline font-500 text-14px lh-20px color-[--main-text]"
             href="https://doc.ave.ai/cn/ave.ai-jiao-cheng/gu-ge-yan-zheng-qi-an-zhuang-jiao-cheng"
             target="_blank">{{ t('DbCheckContentContent12') }}</a>
         </div>
       </div>
     </template>
     <template v-else-if="step === 1 && checkType === 'email'">
-      <el-form 
+      <el-form
         ref="formRef" class="w-420px mx-auto" :model="form" :rules="rules" label-width="0" autocomplete="off"
         size="large" label-position="top" hide-required-asterisk @submit.prevent="submitForm">
         <el-form-item :label="t('startEmail')" prop="email">
@@ -180,8 +182,8 @@
             show-password />
         </el-form-item>
         <el-form-item size="small" class="h-20px lh-20px">
-          <el-checkbox v-model="form.agree" class="text-[#999] w-[100%] [&&]:[--el-checkbox-checked-text-color:#999]">
-            <div class="flex items-center font-400 text-12px text-[#999]">
+          <el-checkbox v-model="form.agree" class="color-[--secondary-text] w-[100%] [&&]:[--el-checkbox-checked-text-color:--secondary-text]">
+            <div class="flex items-center font-400 text-12px color-[--secondary-text]">
               {{ t("startFooter1") }}&nbsp;
               <a
                 class="color-#3F80F7"
@@ -202,13 +204,13 @@
     </template>
     <el-dialog
       v-if="dialogVisible" v-model="dialogVisible"
-      width="480px" append-to-body class="text-[--d-F5F5F5-l-333]"
+      width="480px" append-to-body class="text-[--main-text]"
     >
       <template #header>
         <span class="font-500 text-20px lh-28px tracking-0px" >{{ t('resetGoogleAuthTitle') }}</span>
       </template>
       <div class="pt-20px font-400 text-16px lh-24px tracking-0px flex  gap-8px">
-        <Icon name="uiw:warning" class="text-17px w-17px mt-4px color-#999"/>
+        <Icon name="uiw:warning" class="text-17px w-17px mt-4px color-[--secondary-text]"/>
         <div class="w-398px">
           {{ t('resetGoogleAuthDsc') }}
         </div>
@@ -598,10 +600,12 @@ function goToTg() {
 </script>
 <style lang="scss" scoped>
 :deep() .el-input {
-  --el-input-border-color: #444444;
-  --el-input-placeholder-color: var(--d-666-l-999);
-  --el-text-color-placeholder: #999;
-  --el-input-bg-color: var(--d-333-l-F2F2F2)
+  // --el-input-border-color: #444444;
+  --el-input-placeholder-color: var(--third-text);
+  --el-text-color-placeholder: var(--third-text);
+  // --el-disabled-bg-color: var(--border);
+  --el-disabled-border-color: transparent;
+  // --el-input-bg-color: var(--d-333-l-F2F2F2)
 }
 
 :deep() .el-input__wrapper {
@@ -609,11 +613,11 @@ function goToTg() {
   border-radius: 6px;
   box-shadow: none;
 
-  &:hover {
-    box-shadow: 0 0 0 1px #3F80F7 inset;
-  }
+  // &:hover {
+  //   box-shadow: 0 0 0 1px #3F80F7 inset;
+  // }
 }
 :deep() .el-form-item__label {
-  color: var(--d-999-l-222);
+  color: var(--secondary-text);
 }
 </style>

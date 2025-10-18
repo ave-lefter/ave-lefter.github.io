@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TimeLine from './timeLine.vue'
-import {useEventBus, useStorage} from '@vueuse/core'
+import {useEventBus, useStorage, useWindowSize} from '@vueuse/core'
 import Filter from './filter.vue'
 import {
   type GetSignalV2ListResponse,
@@ -22,6 +22,8 @@ const props = defineProps<{
     list:ITopSignal[]
   }
 }>()
+const {height} = useWindowSize()
+const globalStore = useGlobalStore()
 const localeStore = useLocaleStore()
 // token: 筛选 token
 // history_count：筛选信号数，对应值2, 5, 15
@@ -36,10 +38,16 @@ const defaultFilterParams = {
 const filterParams = useStorage('signalParams', {
   ...defaultFilterParams
 })
-const shouldAlert = useStorage('shouldAlert', '1')
+// const shouldAlert = useStorage('shouldAlert', '1')
 const showResetBtn = shallowRef(false)
 const signalLeftList = useTemplateRef<InstanceType<typeof SignalLeftList>>('signalLeftList')
 const signalRightList = useTemplateRef<InstanceType<typeof SignalRightList>>('signalRightList')
+const audioVisible = ref(false)
+
+const scrollbarHeight = computed(()=>{
+  const tokenHistoryHeight = globalStore.tokenHistoryVisible ? 32 : 0
+  return height.value - 226 - tokenHistoryHeight
+})
 
 onMounted(() => {
   initWs()
@@ -208,16 +216,22 @@ function scrollToTop() {
         @onReset="onReset"
         @onConfirm="onConfirm"
       />
-      <div class="flex items-center text-12px ml-20px color-[--d-F5F5F5-l-333]">
-        {{ $t('NewSignalAlert') }}
-        <el-switch
-          v-model="shouldAlert"
-          class="ml-8px"
-          active-value="1"
-          inactive-value="0"
-        />
-      </div>
-      <div class="flex items-center text-12px ml-20px color-[--d-F5F5F5-l-333]">
+      <el-popover v-model:visible="audioVisible" trigger="click" popper-class="el-select__popper">
+        <template #reference>
+          <div class="flex items-center text-12px ml-20px color-[--main-text] cursor-pointer">
+            <Icon :name="globalStore.audioSettings.audio.signal?'custom:ad':'custom:admute'" class="text-16px mr-4px color-[--secondary-text]" />
+            {{ $t('NewSignalAlert') }}
+          </div>
+        </template>
+        <template #default>
+            <ul class="el-scrollbar__view el-select-dropdown__list [&&]:m--12px">
+              <li v-for="item in audioList" :key="item" class="el-select-dropdown__item hover:bg-[--border]" :class="{'bg-[--border]': globalStore.audioSettings.audio.signal === item}" @click="globalStore.audioSettings.audio.signal=item;audioVisible=false;">
+                <span class="text-12px">{{item || $t('close')}}</span>
+              </li>
+            </ul>
+          </template>
+      </el-popover>
+      <div class="flex items-center text-12px ml-20px color-[--main-text]">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
           <circle cx="7" cy="7" r="7" fill="#349EFF"/>
           <path
@@ -241,7 +255,7 @@ function scrollToTop() {
       </div>
       <div
         v-show="showResetBtn"
-        class="flex items-center text-12px gap-2px cursor-pointer ml-20px color-[--d-F5F5F5-l-333]"
+        class="flex items-center text-12px gap-2px cursor-pointer ml-20px color-[--main-text]"
         @click="setFilterToken('')"
       >
         <Icon name="custom:reset" class="text-14px"/>
@@ -253,7 +267,7 @@ function scrollToTop() {
       @updateFilterToken="setFilterToken"
     />
   </div>
-  <div class="flex pt-4px bg-[--d-222-l-F2F2F2]">
+  <div class="flex pt-4px bg-[--main-bg]">
     <SignalTopList
     ref="topListRef"
     :dialogValues="dialogValues"
@@ -261,12 +275,14 @@ function scrollToTop() {
     />
     <SignalLeftList
       ref="signalLeftList"
+      :scrollbarHeight="scrollbarHeight"
       :activeChain="activeChain"
       :quickBuyValue="quickBuyValue"
       @setToken="setFilterToken"
     />
     <SignalRightList
       ref="signalRightList"
+      :scrollbarHeight="scrollbarHeight"
       :activeChain="activeChain"
       :quickBuyValue="quickBuyValue"
       @setResetBtn="setResetBtn"

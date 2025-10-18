@@ -1,9 +1,9 @@
 <template>
   <div>
     <div class="flex justify-between mt-5 mb-2.5">
-      <h2 class="summary-title text-16px leading-5 font-500 text-[var(--d-FFF-l-333)]">{{ $t('walletActivity') }}</h2>
+      <h2 class="summary-title text-16px leading-5 font-500 text-[--main-text]">{{ $t('walletActivity') }}</h2>
     </div>
-    <div v-loading="loading" class="activity relative p-5 rounded-2 h-[220px] bg-[--d-111-l-F8F8F8]">
+    <div v-loading="loading" class="activity relative p-5 rounded-2 h-[220px] bg-[--secondary-bg]">
       <template v-if="activity.dataset.source.length <= 0">
         <AveEmpty
           :style="{
@@ -79,7 +79,7 @@ const activity = ref({
     data: [],
     axisLabel: {
       show: true,
-      color: () => (isDark.value ? '#999' : '#959A9F'),
+      color: () => getCssVariable('--third-text'),
       fontSize: 10,
       formatter: (value) => {
         const dayjsTime = dayjs(value * 1000)
@@ -112,14 +112,14 @@ const activity = ref({
       const { tokens = [] } = value || {}
       return `
           <div>
-              <div style="color:#959A9F;font-size: 12px;">
+              <div style="color:var(--third-text);font-size: 12px;">
                   ${timeStr}
               </div>
               <div
                 style="
                   display: flex;
                   align-items: center;
-                  color:#fff;
+                  color:var(--third-text);
                   font-size: 12px;
                   justify-content: space-between;
                   gap:8px;
@@ -145,7 +145,7 @@ const activity = ref({
                     }).join('')}
                   </div>
               </div>
-              <div style="color:#fff;font-size: 12px;">
+              <div style="color:var(--third-text);font-size: 12px;">
                  ${$t('Vol')}: $${formatNumber(value?.volume, 2)}
               </div>
           </div>
@@ -167,7 +167,7 @@ const activity = ref({
     selectedMode: 'single',
     select: {
       itemStyle: {
-        color: 'rgba(18, 184, 134, 1)',
+        color: getCssVariable('--up-color'),
         borderColor: 'transparent',
       },
     },

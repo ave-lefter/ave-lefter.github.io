@@ -5,7 +5,7 @@
         class="token-info table-item_d flex items-center whitespace-nowrap overflow-hidden text-ellipsis"
         @click.stop.prevent="tableRowClick(row)"
       >
-        <div class="icon-token-container relative flex mr-2">
+        <div class="icon-token-container relative flex mr-2 lh-0">
           <TokenImg
             :row="{
               logo_url: row.logo_url ? `${s3BaseUrl}${row.logo_url}`:'',
@@ -17,18 +17,18 @@
         </div>
         <div>
           <div class="flex items-center">
-            <span class="token-symbol ellipsis text-sm mr-4px">
+            <span class="token-symbol ellipsis text-sm mr-4px color-[--main-text]">
               {{ row.symbol }}
             </span>
-            <span v-if="row.last_txn_time&&row.last_txn_time!='--'" v-tooltip="formatDate(row.last_txn_time,'YYYY-MM-DD HH:mm:ss')" class="text-xs color-[--d-666-l-999]">{{ formatTimeFromNow(row.last_txn_time,false,true) }}</span>
+            <span v-if="row.last_txn_time&&row.last_txn_time!='--'" v-tooltip="formatDate(row.last_txn_time,'YYYY-MM-DD HH:mm:ss')" class="text-xs color-[--third-text]">{{ formatTimeFromNow(row.last_txn_time,false,true) }}</span>
             <Icon
               v-if="row.risk_score > 55 || row.risk_level < 0"
               name="mynaui:danger-triangle"
-              class="text-red text-3.5 ml-0.5 mt-[4px]"
+              class="text-[--down-color] text-3.5 ml-0.5 mt-[4px]"
             />
           </div>
           <div v-if="row.token !== NATIVE_TOKEN" class="flex items-start mt-0.5 min-w-[110%]" @click.stop>
-            <span class="token-address text-xs color-[--d-666-l-999]">
+            <span class="token-address text-xs color-[--third-text]">
               {{ row.token.slice(0, 4) + '...' + row.token.slice(-6) }}
               <Icon v-copy="row.token" name="bxs:copy" class="mb--0.25 text-2.5 clickable"/>
             </span>

@@ -12,35 +12,58 @@ import { trackRef } from '~/api/tracking'
 
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
 const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
+const liveComponent = defineAsyncComponent(() => import('./components/live/index.vue'))
 const components = {
   new: newRank,
   inclusion:inclusionRank,
   hot,
   gainer,
-  pump: pumpComponent,
-  bonk_pump: pumpComponent,
-  four: pumpComponent,
-  bonk: pumpComponent,
-  moonshot: pumpComponent,
-  Studio: pumpComponent,
-  novabits: pumpComponent,
+  // pump: pumpComponent,
+  // bonk_pump: pumpComponent,
+  // four: pumpComponent,
+  // bonk: pumpComponent,
+  // moonshot: pumpComponent,
+  // Studio: pumpComponent,
+  // novabits: pumpComponent,
   binance_alpha: activityComponent,
   cto: activityComponent,
   xstocks: activityComponent,
   volume: activityComponent,
-  heaven_pump: pumpComponent,
+  // heaven_pump: pumpComponent,
+  // xdyorswap_pump: pumpComponent,
+  pumplive: liveComponent
 }
-const activeTab = useStorage<keyof typeof components>('rankActiveTab', 'hot')
+const walletStore = useWalletStore()
+const botStore = useBotStore()
+const globalStore = useGlobalStore()
+const activeTab = storeToRefs(globalStore).rankActiveTab
 const activeSubTab = useStorage('rankSubTab','pump_in_hot')
 const activeChain = useStorage('rankChain', 'AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
-const categories = computed(() => {
-  return chains.value.find((el) => el.net_name === activeChain.value)?.categories || []
+const currentChainObj = computed(() => {
+  return chains.value.find((el) => el.net_name === activeChain.value)
+})
+const isPump = computed(()=>{
+  if(Array.isArray(currentChainObj.value?.categories)){
+    return currentChainObj.value.categories.find(el=>el.category === activeTab.value)?.is_pump
+  }
+  return 0
+})
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
 })
 
 onMounted(() => {
   _getTreasureConfig()
+  if(walletAddress.value){
+    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+  }
   trackRef({category: 'view', extra: 'home(pro.ave.ai)'})
+})
+watch(()=>walletAddress.value,(val)=>{
+  if(val){
+    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+  }
 })
 const wsStore = useWSStore()
 // 把榜单的订阅取消掉
@@ -242,28 +265,45 @@ function getMedias(appendix: string) {
   }
   return []
 }
+
+const height = computed(() => {
+  // 有子 Tabs
+  if(isPump.value){
+    return 'calc(100vh - 229px)'
+  }
+  return 'calc(100vh - 185px)'
+})
+
+const needAmmList = computed(()=>{
+  return ['gainer', 'hot', 'new', 'inclusion','binance_alpha','xstocks'].includes(activeTab.value)
+})
 </script>
 
 <template>
-  <div class="w-full [&&]:max-w-1920px mx-auto">
-    <CategoryTabs
-      v-model:activeSubTab="activeSubTab"
-      v-model:activeTab="activeTab"
-      v-model:activeChain="activeChain"
-      :categories="categories"
-      :chains="chains"
-    />
-    <KeepAlive :max="6">
-      <component
-        :is="components[activeTab]"
-        ref="dynamicComponentRef"
-        :listMapFunction="listMapFunction"
-        :activeChain="activeChain"
-        :activeTab="activeTab"
-        :activeSubTab="activeSubTab"
+  <div class="w-full bg-[--main-bg]">
+    <div class="[&&]:max-w-1920px mx-auto">
+      <CategoryTabs
+        v-model:activeSubTab="activeSubTab"
+        v-model:activeTab="activeTab"
+        v-model:activeChain="activeChain"
+        :categories="currentChainObj?.categories || []"
+        :chains="chains"
       />
-    </KeepAlive>
+      <KeepAlive :max="6">
+        <component
+          :is="isPump?pumpComponent:components[activeTab as keyof typeof components]"
+          ref="dynamicComponentRef"
+          :height="height"
+          :listMapFunction="listMapFunction"
+          :activeChain="activeChain"
+          :activeTab="activeTab"
+          :activeSubTab="activeSubTab"
+          v-bind="needAmmList ? { ammList: currentChainObj?.swaps || [] } : {}"
+        />
+      </KeepAlive>
+    </div>
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+</style>

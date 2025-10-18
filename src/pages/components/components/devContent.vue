@@ -13,9 +13,9 @@ defineProps<{
   <span
     :class="
       Number(row?.dev_balance_ratio_cur || 0) < 0.1
-        ? 'color-[--d-666-l-999]'
+        ? 'color-[--secondary-text]'
         : row?.dev_balance_ratio_cur > 10
-          ? 'color-#FFA622'
+          ? 'color-[--yellow]'
           : ''
     "
   >

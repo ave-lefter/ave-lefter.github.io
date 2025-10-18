@@ -1,11 +1,11 @@
 <template>
   <ul class="w-tabs flex-1 flex-wrap">
-    <li class="clickable text-[var(--d-666-l-999)]" :class="{ active: props.modelValue === 0 }" @click.stop.prevent="emit('update:modelValue', 0)">
+    <li class="clickable text-[--third-text]" :class="{ active: props.modelValue === 0 }" @click.stop.prevent="emit('update:modelValue', 0)">
       <span>{{ $t('defaultGroup') }}</span>
     </li>
     <template v-if="props.options.length > 0">
       <li
-        v-for="item in props.options" :key="item.group_id" class="clickable flex gap-2px text-[var(--d-666-l-999)]"
+        v-for="item in props.options" :key="item.group_id" class="clickable flex gap-2px text-[--third-text]"
         :class="{ active: props.modelValue === item.group_id }"
         @click.stop.prevent="emit('update:modelValue', item.group_id)">
         <!-- <el-input
@@ -33,19 +33,19 @@
           />
       </li>
     </template>
-    <li ref="addButtonRef" class="clickable color-[var(--d-999-l-666)]! flex gap-2px bg-[var(--d-222-l-F2F2F2)]!">
+    <li ref="addButtonRef" class="clickable color-[--secondary-text]! flex gap-2px bg-[--main-input-button-bg]!">
       <Icon name="custom:add-icon" class="text-12px" />
       <span>{{ $t('newGroup') }}</span>
     </li>
     <el-popover ref="popoverRef2" :width="320" trigger="click" @after-leave="handleSortClose">
        <template #reference>
-         <li class="clickable color-[var(--d-999-l-666)]! flex gap-2px bg-[var(--d-222-l-F2F2F2)]!">
+         <li class="clickable color-[--secondary-text]! flex gap-2px bg-[--main-input-button-bg]!">
            <Icon name="custom:list-icon" class="text-12px" />
            <span>{{ $t('groupManage') }}</span>
          </li>
        </template>
        <template #default>
-        <div class="font-500 text-14px lh-[120%] tracking-0% text-[--d-FFF-l-333]">
+        <div class="font-500 text-14px lh-[120%] tracking-0% text-[--main-text]">
           <div class="mb-8px text-14px lh-[120%]">{{ $t('groupManage') }}</div>
           <el-scrollbar wrap-class="mb-12px max-h-[400px]">
               <VueDraggableNext
@@ -60,14 +60,14 @@
                <li v-for="item in sortOptions" :key="item?.show_index" class="flex-between font-400 py-12px px-8px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-move"
                >
                  <span>{{ item?.name }}</span>
-                 <Icon name="material-symbols:dehaze" class="text-16px text-[var(--d-666-l-999)]"/>
+                 <Icon name="material-symbols:dehaze" class="text-16px text-[--third-text]"/>
                </li>
                  <!-- <transition-group type="transition" name="flip-list">
                  </transition-group> -->
                </VueDraggableNext>
           </el-scrollbar>
           <div class="flex-between w-100%">
-            <el-button :color="!isDark?'#f2f2f2' : '#333333'"  class="flex-1" @click.stop.prevent="()=>popoverRef2?.hide?.()">{{ $t('cancel') }}</el-button>
+            <el-button :color="!isDark?'#D9E8FF' : '#1F242C'"  class="flex-1" @click.stop.prevent="()=>popoverRef2?.hide?.()">{{ $t('cancel') }}</el-button>
             <el-button type="primary" class="flex-1" color="#3F80F7" @click.stop.prevent="handleSort">{{ $t('confirm') }}</el-button>
           </div>
         </div>
@@ -95,14 +95,14 @@
   </el-popover>
   <el-popover
     :visible="edits[currentEditGroup]" :virtual-ref="buttonRef" trigger="click" :title="$t('rename')" virtual-triggering
-    popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--d-FFF-l-000)" width="248" :teleported="false">
+    popper-style="--el-popover-title-font-size:14px;--el-popover-title-text-color:var(--main-text)" width="248" :teleported="false">
       <el-form ref="formRef" v-click-outside="clickOutside" :model="form" :rules="rules" @submit.prevent.stop="handleConfirmEdit(formRef)">
         <el-form-item prop="groupName" label-position="top" size="large" class="mb-20px!">
-          <el-input v-model="form.groupName"    class="[&&]:[--el-fill-color-blank:var(--d-666-l-F2F2F2)]" :placeholder="t('enterGroupName')" :maxlength="50" show-word-limit clearable />
+          <el-input v-model="form.groupName" class="[&&]:[--el-fill-color-blank:var(--d-666-l-F2F2F2)] [%%]:[el-input__count-inner:transparent]" :placeholder="t('enterGroupName')" :maxlength="50" show-word-limit clearable />
         </el-form-item>
         <el-form-item class="mb-0px!">
           <div class="flex-between w-100%">
-            <el-button :color="!isDark?'#f2f2f2' : '#333333'" class="flex-1" @click.stop.prevent="handleCancelEdit">{{ $t('cancel') }}</el-button>
+            <el-button :color="!isDark?'#D9E8FF' : '#1F242C'" class="flex-1" @click.stop.prevent="handleCancelEdit">{{ $t('cancel') }}</el-button>
             <el-button type="primary" color="#3F80F7"  class="flex-1" native-type="submit">{{ $t('confirm') }}</el-button>
           </div>
         </el-form-item>
@@ -248,14 +248,15 @@ ul.w-tabs {
     height: 28px;
     line-height: 28px;
     cursor: pointer;
-    background-color: var(--d-1A1A1A-l-F2F2F2);
+    background-color: var(--main-input-button-bg);
     justify-content: center;
     align-items: center;
     border-radius: 4px;
 
     &.active {
-      color: #f5f5f5;
-      background-color: var(--d-333-l-0A0B0C);
+      color: var(--white);
+      background-color: #3F80F7;
+      /* background-color: var(--d-333-l-0A0B0C); */
     }
   }
 }

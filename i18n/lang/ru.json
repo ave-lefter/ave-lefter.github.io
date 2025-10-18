@@ -756,5 +756,8 @@
   "holdersNumTotal": "Держатели всего",
   "holdersTotalChange": "Держатели меняются",
   "holdersChange": "Держатели меняются",
-  "holdersChange2": "Держатель Чангс в {n}"
+  "holdersChange2": "Держатель Чангс в {n}",
+  "lockAmount": "Сумма блокировки",
+  "transferToken": "Выберите токен переноса",
+  "depositTip": "* Текущий адрес evm ineversal"
 }

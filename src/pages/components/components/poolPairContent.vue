@@ -1,18 +1,25 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import { addFavorite, addFavoriteGroup, removeFavorite } from '~/api/fav'
 import XIcon from '~/components/xPopup/xIcon.vue'
 
-const emit = defineEmits(['collect','toggleKline'])
+const emit = defineEmits(['toggleKline'])
 const rankKlineStore = useRankKlineStore()
+const walletStore = useWalletStore()
+const botStore = useBotStore()
 const { t } = useI18n()
 const props = defineProps<{
   pageNO: number
   pageSize: number
   row: any
   rowIndex: number
-  activeKline:boolean
-  enableKline:boolean
+  activeKline?:boolean
+  enableKline?:boolean
 }>()
+
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
 
 function getSymbol(row, shouldReverse = false) {
   const isZeroAddress = row.target_token == row.token0_address
@@ -64,9 +71,9 @@ function addOrRemoveBlackList(item: { token: string }, type: 'ca' | 'dev' | 'key
 
 function timerCountColor(val: number) {
   if (Number(formatTimeFromNow(val, true)) < 3600 * 24) {
-    return 'color-#FFA622'
+    return 'color-[--yellow]'
   }
-  return 'color-[--d-666-l-999]'
+  return ''
 }
 const isCircle = computed(() => globalStore.pumpSetting.avatar_isCircle === 'circle')
 const created_at_unix = computed(() => {
@@ -76,34 +83,81 @@ const created_at_unix = computed(() => {
 function toggleKline() {
   emit('toggleKline',props.row)
 }
+
+function newGroupAndCollect(newGroupName:string) {
+  addFavoriteGroup(newGroupName,walletAddress.value).then(res=>{
+    if(res){
+      globalStore.userFavoriteGroups.push({
+        group_id: Number(res),
+        name: newGroupName,
+      })
+      addTokenFavorite(props.row,Number(res))
+    }
+  }).catch(console.log)
+}
+
+async function collect(newGroupId?:number) {
+  if (walletAddress.value) {
+    if (walletStore.address) {
+      await walletStore.signMessageForFavorite()
+    }
+    if (props.row.is_fav) {
+      removeTokenFavorite(props.row)
+    } else {
+      addTokenFavorite(props.row,newGroupId || 0)
+    }
+  } else {
+    verifyLogin()
+  }
+}
+
+function removeTokenFavorite(row) {
+  removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
+    .then(() => {
+      ElMessage.success(t('cancelled1'))
+      row.is_fav = false
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
+
+function addTokenFavorite(row, newGroupId: number) {
+  addFavorite(`${row.token}-${row.chain}`, walletAddress.value, newGroupId)
+    .then(() => {
+      ElMessage.success(t('collected'))
+      row.is_fav = true
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
 </script>
 
 <template>
-  <div class="[&&]:color-[--d-666-l-999] [&&]:text-12px flex items-center box">
-    <Icon
+  <div class="[&&]:color-[--third-text] [&&]:text-12px flex items-center box">
+    <div class="items-center justify-center w-16px h-16px bg-[--main-bg] rounded-2px absolute top-5px left-5px hidden icon hover:color-[--secondary-text]">
+      <Icon
       v-if="!inBlackList(row)"
       v-tooltip="$t('blockToken')"
       name="custom:invisible"
-      class="text-12px absolute top-5px left-5px hidden icon"
+      class="text-12px"
       @click.self.stop="blockToken(row)"
-    />
-    <Icon
-      v-else
-      name="custom:visible"
-      class="text-9px absolute top-5px left-5px hidden icon"
-      @click.self.stop="addOrRemoveBlackList(row, 'ca')"
-    />
+      />
+      <Icon
+        v-else
+        name="custom:visible"
+        class="text-9px"
+        @click.self.stop="addOrRemoveBlackList(row, 'ca')"
+      />
+    </div>
     <span
       :style="{ width: Math.ceil(getTextWidth('#' + pageNO * pageSize)) + 'px' }"
       class="text-right text-10px"
       >#{{ (pageNO - 1) * pageSize + rowIndex + 1 }}</span
     >
-    <div class="flex items-center" @click.stop="emit('collect', rowIndex, row)">
-      <Icon
-        name="custom:star"
-        class="color-var(--d-999-l-666) text-16px cursor-pointer ml-5px mr-12px"
-        :class="row.is_fav ? 'color-#ffbb19' : ''"
-      />
+    <div class="flex items-center">
+      <Collect :iconClass="`text-16px cursor-pointer ml-5px mr-12px`" :isCollected="row.is_fav" :userFavoriteGroups="globalStore.userFavoriteGroups" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
     </div>
     <div class="flex items-center gap-8px">
       <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
@@ -134,16 +188,16 @@ function toggleKline() {
       </el-tooltip>
       <div class="flex flex-col gap-6px">
         <div class="flex items-center lh-20px">
-          <span class="text-16px color-[--d-CCC-l-333] max-w-88px truncate"> {{ getSymbol(row) }}</span
-          ><span class="text-10px color-[--d-666-l-999]">/{{ getSymbol(row, true) }} </span>
+          <span class="text-16px color-[--main-text] max-w-88px truncate"> {{ getSymbol(row) }}</span
+          ><span class="text-10px">/{{ getSymbol(row, true) }} </span>
           <Icon
             v-copy="row.target_token"
             name="bxs:copy"
-            class="text-12px ml-8px [&&]:color-[--d-666-l-999]"
+            class="text-12px ml-8px"
             @click.self.stop
           />
           <a
-            class="ml-4px [&&]:color-[--d-666-l-999] lh-10px"
+            class="ml-4px lh-10px"
             :href="`https://x.com/search?q=($${getSymbol(row)} OR ${row.target_token})&src=typed_query&f=live`"
             target="_blank"
             @click.stop
@@ -173,7 +227,7 @@ function toggleKline() {
                 :stroke-width="1.5"
                 indeterminate
               >
-                <Icon name="material-symbols:lock" class="color-[--d-666-l-999] text-8px" />
+                <Icon name="material-symbols:lock" class="text-8px" />
               </el-progress>
             </template>
             <template #content>
@@ -193,8 +247,8 @@ function toggleKline() {
           <Icon
             v-if="enableKline"
             v-tooltip="!activeKline?$t('kline'):$t('hidekline')"
-            name="custom:kline" class="text-12px ml-4px hover:color-#8CA0C3" 
-            :class="activeKline ? 'color-#8CA0C3' : 'color-#566275'"
+            name="custom:kline" class="text-12px ml-4px hover:color-[--secondary-text]"
+            :class="activeKline ? 'color-[--secondary-text]' : 'color-[--third-text]'"
             @click.self.stop="toggleKline"
           />
         </div>
@@ -210,7 +264,7 @@ function toggleKline() {
               :end-time="60"
             >
               <template #default="{ seconds }">
-                <span v-if="seconds < 60" class="color-#FFA622"> {{ seconds }}s </span>
+                <span v-if="seconds < 60" class="color-[--yellow]"> {{ seconds }}s </span>
                 <span v-else :class="timerCountColor(created_at_unix)">
                   {{ formatTimeFromNow(created_at_unix) }}
                 </span>
@@ -239,6 +293,7 @@ function toggleKline() {
               </div>
             </template>
           </div>
+          <PumpLive v-if="row?.is_streaming" :class="{'ml-4px': row?.medias?.length > 0}" class="mr-0!" :tokenId="((row.token + '-' + row.chain) as string)" />
           <template v-if="row.signal_arr?.length > 0">
             <div
               v-for="(i, index) in row.signal_arr"
@@ -252,7 +307,7 @@ function toggleKline() {
                 alt=""
                 onerror="this.src='/icon-default.png'"
               >
-              <span v-if="i.tag" :class="i.color === 'green' ? 'color-#12B886' : 'color-#F6465D'">{{
+              <span v-if="i.tag" :class="i.color === 'green' ? 'color-[--up-color]' : 'color-[--down-color]'">{{
                 $t(i.tag)
               }}</span>
             </div>
@@ -270,7 +325,7 @@ function toggleKline() {
 }
 .is-hovered {
   .icon {
-    display: block;
+    display: flex;
   }
 }
 </style>

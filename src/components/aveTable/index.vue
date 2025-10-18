@@ -43,6 +43,10 @@ const props = defineProps({
   },
   loading: Boolean,
   fixed: Boolean,
+  rowKey:{
+    type: String,
+    default: 'id'
+  }
 })
 const emits = defineEmits<{
   (e: 'endReached', value: number): void
@@ -82,6 +86,7 @@ const defaultSlots = computed(() => {
   for (const key of TABLE_V2_DEFAULT_SLOTS) {
     if (slots[key]) s[key] = slots[key]
   }
+  console.log(s)
   return s
 })
 
@@ -126,9 +131,10 @@ function calculateColumnWidths() {
       <!-- 透传所有 $attrs，支持 el-table-v2 的其它属性 -->
       <ElTableV2
         ref="tableRef"
+        :rowKey="rowKey"
         class="el-table"
         style="--el-table-border:0;--el-bg-color:transparent;font-size: 12px;"
-        :header-class="`bg-[--d-222-l-F2F2F2] ${headerClass}`"
+        :header-class="`bg-[--main-list-header-bg] ${headerClass}`"
         :header-height="headerHeight"
         :columns="computedColumns"
         :data="data"
@@ -158,7 +164,7 @@ function calculateColumnWidths() {
           <span v-else/>
         </template>
         <template v-if="data.length >0 && showFooter" #footer>
-          <div class="text-center px-0 pt-15px pb-10px text-12px text-[#959a9f] bg-[--d-111-l-FFF] absolute w-100%" :class="`top-${rowHeight}px`">
+          <div class="text-center px-0 pt-15px pb-10px text-12px text-[--third-text] absolute w-100%" :class="`top-${rowHeight}px`">
               {{ footText || t('loading') }}
           </div>
         </template>
@@ -169,6 +175,6 @@ function calculateColumnWidths() {
 
 <style scoped lang="scss">
 :deep() .el-table-v2__footer{
-  overflow: visible; 
+  overflow: visible;
 }
 </style>

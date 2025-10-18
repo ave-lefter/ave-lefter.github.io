@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
 import { getHotDefaultColumns } from './columnRender/hotColumusService'
-import { getTreasureList } from '~/api/market'
+import { getTreasureList, type IGetTreasureConfig } from '~/api/market'
 import {
   quickContent,
   dexContent,
@@ -32,9 +32,11 @@ import {
   PriceContent,
   PriceChange,
   TokenPage,
+  DexHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import { addFavorite, removeFavorite } from '~/api/fav'
+import dayjs from 'dayjs'
 import type { RowClassNameGetter, RowEventHandlerParams } from 'element-plus'
 
 const { t } = useI18n()
@@ -47,22 +49,20 @@ const props = defineProps<{
   activeChain: string
   activeSubTab?: string
   activeTab?: string
+  height: string
+  ammList: IGetTreasureConfig['swaps']
 }>()
 const aveTableRef = useTemplateRef('aveTableRef')
-const sortConditions = ref({
-  sort: '',
-  sort_dir: '',
-})
+const {rankConditions} = storeToRefs(globalStore)
 function setSortConditions(params: { sort: string; sort_dir: string }) {
-  sortConditions.value = params
+  rankConditions.value.hot.sort = params
   pageInfo.value.pageNO = 1
   _getTreasureList()
 }
-const defaultFilter = {}
-const filterForm = ref(defaultFilter)
+
 function setFilterForm(...args: any[]) {
   args.forEach((keyVal) => {
-    set(filterForm.value, keyVal[0], keyVal[1])
+    set(rankConditions.value.hot.filter, keyVal[0], keyVal[1])
   })
   pageInfo.value.pageNO = 1
   _getTreasureList()
@@ -97,7 +97,6 @@ const pageInfo = ref({
   pageSize: 50,
   total: 0,
 })
-const isVolUSDT = shallowRef(true)
 const loading = shallowRef(false)
 const columns = useStorage('hotUserTableColumns', getHotDefaultColumns(t))
 
@@ -136,6 +135,9 @@ onActivated(() => {
     }
   }, 100)
   window.addEventListener('beforeunload',resetKline)
+  if(aveTableRef.value){
+    aveTableRef.value.scrollToLeft(0)
+  }
 })
 
 function resetKline() {
@@ -177,6 +179,14 @@ watch(
   }
 )
 
+watch(()=>pageInfo.value.pageNO,()=>{
+  if(aveTableRef.value){
+    setTimeout(()=>{
+      aveTableRef.value.scrollToTop(0)
+    },20)
+  }
+})
+
 let timer: number
 async function _getTreasureList(shouldLoading = true) {
   try {
@@ -191,12 +201,18 @@ async function _getTreasureList(shouldLoading = true) {
       }
     }
     const { total: _, ...rest } = pageInfo.value
+    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
+      if(prev[cur]){
+        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+      }
+      return prev
+    },{...rankConditions.value.hot.filter})
     const res = await getTreasureList({
       category: 'hot',
       ...rest,
       chain: props.activeChain !== 'AllChains' ? props.activeChain : '',
-      ...sortConditions.value,
-      ...filterForm.value,
+      ...rankConditions.value.hot.sort,
+      ...finalFilter,
       self_address: walletAddress.value,
     })
     pageInfo.value.total = res.total
@@ -247,7 +263,7 @@ watch(
       }
       return el
     })
-    const { sort, sort_dir } = sortConditions.value
+    const { sort, sort_dir } = rankConditions.value.hot.sort
     const sortVal = { asc: '1', desc: '-1' }[sort_dir]
     if (sortVal) {
       listData.value = updateList.toSorted((a, b) => (a[sort] - b[sort]) * sortVal)
@@ -280,51 +296,6 @@ const botStore = useBotStore()
 const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
-
-async function collect(index: number, row) {
-  if (walletAddress.value) {
-    if (walletStore.address) {
-      await walletStore.signMessageForFavorite()
-    }
-    if (row.is_fav) {
-      removeTokenFavorite(row, index)
-    } else {
-      addTokenFavorite(row, index)
-    }
-  } else {
-    verifyLogin()
-  }
-}
-
-function removeTokenFavorite(row, index: number) {
-  loading.value = true
-  removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
-    .then(() => {
-      ElMessage.success(t('cancelled1'))
-      row.is_fav = false
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-function addTokenFavorite(row, index: number) {
-  loading.value = true
-  addFavorite(`${row.token}-${row.chain}`, walletAddress.value, 0)
-    .then(() => {
-      ElMessage.success(t('collected'))
-      row.is_fav = true
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
 
 function sizeChange() {
   pageInfo.value.pageNO = 1
@@ -361,7 +332,7 @@ const headerRenderer = computed(() => {
     markers_dynamic: DynamicMarkersHeader,
     holders: HoldersHeader,
     smart_money_buy_volume_24h: SmarterHeader,
-    dex: () => 'DEX',
+    dex: DexHeader,
     security: () => t('security'),
     holders_top10_ratio: Top10Header,
     quick: () => t('quick'),
@@ -405,7 +376,7 @@ const Row = ({ cells, rowData }) => {
 }
 
 function getRowClass({rowData}:Parameters<RowClassNameGetter<any>>[0]) {
-    const commonClass = `color-[--d-CCC-l-333] cursor-pointer [&&]:[--el-table-border:1px_solid_var(--d-1A1A1A-l-F2F2F2)] ${rowData.isKline ? 'h-360px [--el-table-row-hover-bg-color:transparent] overflow-visible!' : 'h-81px'}`
+    const commonClass = `cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)] ${rowData.isKline ? 'h-360px [--el-table-row-hover-bg-color:transparent] overflow-visible!' : 'h-81px'}`
     if(rankKlineStore.klineRow.id && rowData.id !== rankKlineStore.klineRow.id && !rowData.isKline){
         return 'row-disabled '+commonClass
     } else {
@@ -441,29 +412,32 @@ function toggleKline(row:Record<string,any>) {
 }
 
 function resetColumns(needClear:boolean) {
-  const quickIndex= columns.value.findIndex(el => el.key === 'quick')
-  if(needClear){
-    columns.value[0].fixed=''
-    columns.value[quickIndex].fixed=''
-  } else {
-    columns.value[0].fixed='left'
-    columns.value[quickIndex].fixed='right'
-    localStorage.setItem('hotUserTableColumns',JSON.stringify(columns.value))
+  const quickIndex = columns.value.findIndex(el => el.key === 'quick')
+  if (columns.value[quickIndex] && columns.value[0]) {
+    if (needClear) {
+      columns.value[0].fixed=''
+      columns.value[quickIndex].fixed=''
+    } else {
+      columns.value[0].fixed='left'
+      columns.value[quickIndex].fixed='right'
+      localStorage.setItem('hotUserTableColumns',JSON.stringify(columns.value))
+    }
   }
 }
 </script>
 <template>
-  <div v-loading="loading" style="height: calc(100vh - 185px)">
+  <div v-loading="loading" :style="`height:${height}`">
     <AveTable
       ref="aveTableRef"
+      rowKey="rowKey"
       :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
-      :estimated-row-height="rankKlineStore.klineRow.id ? 360 : 81"
+      :estimated-row-height="rankKlineStore.klineRow.id ? 400 : 81"
       fixed
-      style="--el-bg-color: var(--d-111-l-FFF)"
-      :rowClass="getRowClass"
+      style="--el-bg-color: var(--secondary-bg)"
+      :row-class="getRowClass"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"
@@ -471,11 +445,11 @@ function resetColumns(needClear:boolean) {
       <template v-for="item in visibleColumns" :key="item.key" #[`header-${item.key}`]>
         <component
           :is="headerRenderer[item.key as keyof typeof headerRenderer]"
-          v-model:isVolUSDT="isVolUSDT"
-          :sortConditions="sortConditions"
+          :sortConditions="rankConditions.hot.sort"
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
+          :ammList="item.key === 'dex' ? ammList : null"
         />
       </template>
       <template
@@ -486,7 +460,6 @@ function resetColumns(needClear:boolean) {
         <component
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"
-          :isVolUSDT="isVolUSDT"
           :enableKline="activeTab === 'hot'"
           :activeKline="rankKlineStore.klineRow.id === row.id"
           :row="row"
@@ -496,7 +469,6 @@ function resetColumns(needClear:boolean) {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
           :activeChain="activeChain"
           :childrenData="item.children || []"
-          @collect="collect"
           @toggleKline="toggleKline"
         />
       </template>
@@ -509,7 +481,7 @@ function resetColumns(needClear:boolean) {
     v-if="pageInfo.total"
     v-model:current-page="pageInfo.pageNO"
     v-model:page-size="pageInfo.pageSize"
-    class="mt-5px py-9px flex justify-center color-[--d-666-l-999] [&&]:[--el-pagination-button-height:18px]"
+    class="mt-5px py-9px flex justify-center [&&]:[--el-pagination-button-height:18px]"
     layout="total, prev, pager, next"
     :total="pageInfo.total || 0"
     :small="false"

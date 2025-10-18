@@ -59,4 +59,5 @@ export type SimpleWSTx = {
   maker_bal: string
   maker_eth: string
   chain: string
+  tag?: string
 }

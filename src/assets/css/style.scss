@@ -19,18 +19,18 @@
   color: inherit !important;
 }
 .search-dialog.el-dialog {
-  background: var(--d-222-l-FFF);
+  background: var(--dialog-bg);
   padding: 20px 0;
   .search-input {
     .el-input__wrapper {
       background-color: transparent;
-      border-bottom: 1px solid var(--d-333-l-ECECEC);
+      border-bottom: 1px solid var(--border);
       box-shadow: none;
       & :hover {
         box-shadow: none;
       }
       .el-input__inner::placeholder {
-        color: var(--d-666-l-999);
+        color: var(--third-text);
       }
     }
     &.search-input2  .el-input__wrapper {
@@ -70,11 +70,11 @@
 }
 .checkbox-old{
   .el-checkbox__label{
-    color: var(--d-999-l-666);
+    color: var(--third-text);
   }
   .el-checkbox__input.is-checked {
     &+.el-checkbox__label{
-      color: var(--d-999-l-666);
+      color: var(--third-text);
     }
   }
   .checkbox-FFCC00{
@@ -185,7 +185,7 @@ debox-chat-widget {
 }
 .m-radio-group{
   .el-radio-button .el-radio-button__original-radio:not(:disabled) + .el-radio-button__inner{
-    border-color: var(--d-333-l-666);
+    border-color: var(--tab-active-bg);
   }
 }
 @media (max-width: 1920px) {
@@ -209,7 +209,36 @@ debox-chat-widget {
   max-height: 500px;
   overflow-y: auto;
 }
-.new-dialog.el-dialog, .new-popover.el-popover.el-popper{
-  background: var(--d-151A22-l-FFFFFF);
+.new-dialog.el-dialog, .new-popover.el-popover.el-popper, .el-drawer.draw-right{
+  background: var(--dialog-bg);
   box-shadow: 0px 2px 10px 0px var(--d-17191E-l-D1D4D9);
+
+}
+.el-button, .el-input__wrapper{
+  transition-property: background-color, border-color, color, box-shadow !important;
+  transition-duration: 0s !important;
+  transition-timing-function: linear !important;
+}
+/* 隐藏 el-scrollbar 自带的滚动条 */
+.hidden-scrollbar .el-scrollbar__bar {
+  display: none;
+}
+
+/* 同时隐藏浏览器默认滚动条 */
+.hidden-scrollbar ::-webkit-scrollbar {
+  display: none;
+}
+.hidden-scrollbar {
+  -ms-overflow-style: none;  /* IE、Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.pump-live-bg {
+  .icon-live {
+    display: none;
+  }
+  &:hover {
+    .icon-live {
+      display: flex;
+    }
+  }
 }
