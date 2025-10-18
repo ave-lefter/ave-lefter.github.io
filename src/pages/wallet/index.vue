@@ -7,7 +7,7 @@
       <span class="text-16px font-500">{{ $t('walletList') }}</span>
       <span
         v-if="currentAddress"
-        class="text-16px font-500 color-[--third-text] ml-40px"
+        class="text-16px font-500 color-[--third-text] ml-40px cursor-pointer"
         @click="getWalletOperationRecord"
         >{{ $t('archived') }}</span
       >
