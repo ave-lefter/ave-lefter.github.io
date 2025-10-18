@@ -112,7 +112,7 @@ export const ProvideType = {
   HOT_TOKENS: 'hot-tokens',
   KLINE_DATE_FILTER: 'kline-date-filter',
 }
-export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer']
+export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer','fsc']
 export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
 
 export const defaultPaginationParams = {
