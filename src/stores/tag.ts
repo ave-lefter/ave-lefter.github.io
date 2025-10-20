@@ -17,7 +17,7 @@ export const useTagStore = defineStore('tagStore', () => {
   }
 
   function matchTag(type: string) {
-    return tagMap.value[type] || {}
+    return tagMap.value[type]
   }
 
   return {
