@@ -308,19 +308,18 @@ function addVisit() {
   if(tokenStore.tokenInfo){
     const {logo_url,symbol,chain,token} = tokenStore.tokenInfo.token
     const index = globalStore.lastVisitTokens.findIndex(item => item.id === token+'-'+chain)
-    if(index !== -1){
-      globalStore.lastVisitTokens.splice(index, 1)
-    } else if(globalStore.lastVisitTokens.length >= 20){
+    if(index === -1 &&globalStore.lastVisitTokens.length >= 20){
       globalStore.lastVisitTokens.pop()
+        globalStore.lastVisitTokens.unshift({
+        id:token+'-'+chain,
+        logo_url,
+        symbol,
+        price_change: tokenStore.priceChange,
+        circulation: tokenStore.circulation.toString(),
+        price: tokenStore.price || 0,
+      })
     }
-    globalStore.lastVisitTokens.unshift({
-      id:token+'-'+chain,
-      logo_url,
-      symbol,
-      price_change: tokenStore.priceChange,
-      circulation: tokenStore.circulation.toString(),
-      price: tokenStore.price || 0,
-    })
+    
     usePriceV2Store().sendPriceWs()
   }
 }
