@@ -1462,5 +1462,6 @@
   "currentWallet": "当前钱包",
   "createTips": "当前 bot 钱包仅支持创建 9 个子钱包账户",
   "importTip1eTips": "助记词由12个英文单词组成,中间以空格分隔。",
-  "importTip1eTips2": "助记词由12个英文单词组成,中间以空格分隔。"
+  "importTip1eTips2": "助记词由12个英文单词组成,中间以空格分隔。",
+  "copyMnemonic": "复制助记词"
 }
