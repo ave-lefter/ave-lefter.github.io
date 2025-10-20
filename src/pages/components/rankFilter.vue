@@ -63,6 +63,10 @@ function confirm(data:Record<string,any>) {
     const newVal = restVal === ' ' ? '' :restVal
     globalStore.rankConditions[globalStore.rankActiveTab].filter[restKey] = newVal
   }
+  for(const [filterKey] of Object.entries(globalStore.rankConditions[globalStore.rankActiveTab].filter)){
+    const newVal = rest[filterKey] === ' ' ? '' :rest[filterKey]
+    globalStore.rankConditions[globalStore.rankActiveTab].filter[filterKey] = newVal
+  }
   if(activeInterval){
     globalStore.rankCommon.activeInterval = activeInterval
   }
@@ -136,7 +140,7 @@ function confirm(data:Record<string,any>) {
           <span class="color-[--secondary-text]">{{ $t('openTime') }}</span>
           <div class="flex items-center gap-8px">
             <el-input
-              v-model.trim.number="tempFilter.created_at_min"
+              v-model.trim.number="tempFilter.created_at_max"
               class="w-106px"
               :placeholder="$t('minor')"
               clearable
@@ -147,7 +151,7 @@ function confirm(data:Record<string,any>) {
             </el-input>
             <span class="color-[--third-text]">~</span>
             <el-input
-              v-model.trim.number="tempFilter.created_at_max"
+              v-model.trim.number="tempFilter.created_at_min"
                class="w-106px"
               :placeholder="$t('max1')"
               clearable
@@ -462,7 +466,7 @@ function confirm(data:Record<string,any>) {
         <div class="mt-20px flex">
           <el-button
             class="h-30px flex-1 m-l-auto"
-            @click="confirm({})"
+            @click="confirm(tempFilter={})"
           >
             {{ $t('reset') }}
           </el-button>
