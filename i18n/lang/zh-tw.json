@@ -1449,5 +1449,6 @@
   "currentWallet": "当前钱包",
   "createTips": "當前bot錢包僅支持創建9個子錢包帳戶",
   "importTip1eTips": "助記詞由12個英文單詞組成，中間以空格分隔。",
-  "importTip1eTips2": "請填寫完整的12個助記詞"
+  "importTip1eTips2": "請填寫完整的12個助記詞",
+  "copyMnemonic": "复制助记词"
 }

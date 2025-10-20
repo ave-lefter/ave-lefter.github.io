@@ -47,9 +47,9 @@
       :close-on-click-modal="false"
     >
       <span class="text-24px">{{ $t('mnemonic') }}</span>
-      <div class="relative cursor-pointer min-h-160px" @click="hide = false">
+      <div class="relative min-h-160px" @click="hide = false">
         <div
-          class="mask text-center color-[--main-text] absolute bg-[--border] top-0 right-0 left-0 bottom-0 flex items-center justify-center z-1 text-14px"
+          class="mask text-center color-[--main-text] absolute bg-[--border] top-0 right-0 left-0 bottom-0 flex items-center justify-center z-1 text-14px cursor-pointer"
           v-if="hide"
         >
           <Icon name="custom:show-code" class="text-16px mr-4px color-[--main-text]" />
@@ -69,9 +69,9 @@
           </div>
         </div>
       </div>
-      <div class="text-center mt-30px">
-        <el-button style="width: 30%" v-copy="mnemonic?.join(' ')" @click.stop.prevent> {{ $t('copy') }} </el-button>
-        <el-button style="width: 30%" type="primary" @click.stop.prevent="goOn"> {{ $t('continue') }} </el-button>
+      <div class="text-center mt-30px flex-between">
+        <el-button class="flex-1" v-copy="mnemonic?.join(' ')" @click.stop.prevent> {{ $t('copyMnemonic') }} </el-button>
+        <el-button class="flex-1" style="width: 30%" type="primary" @click.stop.prevent="goOn"> {{ $t('continue') }} </el-button>
       </div>
     </el-dialog>
   </div>

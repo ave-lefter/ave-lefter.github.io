@@ -1463,5 +1463,6 @@
   "currentWallet": "Current Wallet",
   "createTips": "The current bot wallet only supports creating 9 sub wallet accounts",
   "importTip1eTips": "The mnemonic consists of 12 English words separated by spaces.",
-  "importTip1eTips2": "Please fill in the complete 12 mnemonic words"
+  "importTip1eTips2": "Please fill in the complete 12 mnemonic words",
+  "copyMnemonic": "Copy Mnemonic"
 }
