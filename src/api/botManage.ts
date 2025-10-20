@@ -7,6 +7,7 @@ export interface Wallet {
   balance: string | number
   source: string
   operate: string
+  genSource: 1 | 0
   balancesInfo: Address[]
 }
 export interface Address {
@@ -20,10 +21,13 @@ export interface Address {
   isChildren: boolean
 }
 
-export function _getMultiWalletsAllChain(): Promise<Wallet[]> {
+export function _getMultiWalletsAllChain(chain: string): Promise<Wallet[]> {
   const { $api } = useNuxtApp()
   return $api('/botapi/swap/getMultiWalletsBalance', {
     method: 'get',
+    params: {
+      chain: chain
+    },
   })
 }
 

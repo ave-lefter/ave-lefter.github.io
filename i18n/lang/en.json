@@ -1453,10 +1453,10 @@
   "createWallet": "Create Wallet",
   "archived": "Archived",
   "importWallet": "Import Wallet",
-  "walletRemove": "Wallet Remove",
+  "walletRemove": "Remove Wallet",
   "walletRemoveTip1": "Detected that there is still a balance in the current wallet, please transfer the asset first before deleting it. Do you still want to continue deleting? After deletion, the wallet cannot be restored.",
   "walletRemoveTip2": "Are you sure to delete the wallet? After deletion, the wallet cannot be restored.",
-  "operateHistory": "Operate History",
+  "operateHistory": "Operation",
   "automaticRecognition": "(Automatic Recognition)",
   "importBotTip": "The platform will automatically recognize the chain to which the mnemonic words belong (such as Solana, BSC, Base, etc.), and only import the detected wallets",
   "all1": "All",
@@ -1464,5 +1464,8 @@
   "createTips": "The current bot wallet only supports creating 9 sub wallet accounts",
   "importTip1eTips": "The mnemonic consists of 12 English words separated by spaces.",
   "importTip1eTips2": "Please fill in the complete 12 mnemonic words",
-  "copyMnemonic": "Copy Mnemonic"
+  "copyMnemonic": "Copy Mnemonic",
+  "import": "Import",
+  "create": "Create",
+  "refresh": "Refresh"
 }

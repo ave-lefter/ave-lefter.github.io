@@ -9,9 +9,20 @@
         v-if="currentAddress"
         class="text-16px font-500 color-[--third-text] ml-40px cursor-pointer"
         @click="getWalletOperationRecord"
-        >{{ $t('archived') }}</span
+        >{{ $t('operateHistory') }}</span
       >
       <div class="flex-1"></div>
+
+      <el-button
+        v-if="currentAddress"
+        class="text-12px"
+        size="small"
+        @click.stop.prevent="handleClick"
+        :disabled="isDisabled"
+      >
+        <span v-if="countdown > 0">{{ countdown }}S</span>
+        <Icon v-else name="material-symbols:sync-outline" class="text-12px" />
+      </el-button>
       <el-button
         v-if="currentAddress"
         class="text-12px"
@@ -33,7 +44,11 @@
         }}</el-button
       >
     </div>
-    <List :tableData="mergeTableData" :loading="loading" @refresh="refresh" />
+    <List
+      :tableData="tableData"
+      :loading="loading"
+      @refresh="refresh"
+    />
     <Import @refresh="refresh" />
     <Record :tableData="recordList" :loading="loadingRecord" />
     <!-- 创建完成展示助记词 -->
@@ -70,8 +85,12 @@
         </div>
       </div>
       <div class="text-center mt-30px flex-between">
-        <el-button class="flex-1" v-copy="mnemonic?.join(' ')" @click.stop.prevent> {{ $t('copyMnemonic') }} </el-button>
-        <el-button class="flex-1" style="width: 30%" type="primary" @click.stop.prevent="goOn"> {{ $t('continue') }} </el-button>
+        <el-button class="flex-1" v-copy="mnemonic?.join(' ')" @click.stop.prevent>
+          {{ $t('copyMnemonic') }}
+        </el-button>
+        <el-button class="flex-1" style="width: 30%" type="primary" @click.stop.prevent="goOn">
+          {{ $t('continue') }}
+        </el-button>
       </div>
     </el-dialog>
   </div>
@@ -90,7 +109,10 @@ import {
 } from '@/api/botManage'
 import { ElMessage } from 'element-plus'
 import { decryptMsg } from '@/utils/index'
-import { useStorage } from '@vueuse/core'
+import { useStorage, useThrottleFn, useDebounceFn } from '@vueuse/core'
+defineExpose({
+  getMultiWalletsAllChain,
+})
 const { t } = useI18n()
 const { showImport, mode, showBotRecord } = storeToRefs(useGlobalStore())
 const { theme, isDark } = storeToRefs(useThemeStore())
@@ -103,6 +125,10 @@ const loading = shallowRef(false)
 const tableData = ref<Wallet[]>([])
 const recordList = ref<Records[]>([])
 const loadingRecord = shallowRef(false)
+const loadingThrottledFn = shallowRef(false)
+const countdown = ref(0)
+const isDisabled = ref(false)
+let timer: ReturnType<typeof setInterval> | null = null
 const mnemonic = computed(() => {
   const msg = encryptedMnemonic.value || ''
   const guid = botStore?.userInfo?.tgUid || ''
@@ -125,30 +151,57 @@ watch(
     }
   }
 )
-const mergeTableData = computed(() => {
-  return tableData.value.map((item) => {
-    const addrList = item.balancesInfo || []
-    const matchGroup = botStore?.walletList?.find((w) => w.evmAddress === item.evmAddress)
-    if (!matchGroup) return item
-    const updatedList = addrList.map((addr) => {
-      const match = matchGroup.addresses.find(
-        (a) => a.chain === addr.chain && a.address === addr.address
-      )
-      return match
-        ? { ...addr, balance: match.balance } // balance 替换
-        : addr
-    })
-    return {
-      ...item,
-      balance: updatedList?.reduce((sum, item) => sum + Number(item.balance), 0),
-      balancesInfo: updatedList,
-    }
-  })
-})
+// const mergeTableData = computed(() => {
+//   return tableData.value.map((item) => {
+//     const addrList = item.balancesInfo || []
+//     const matchGroup = botStore?.walletList?.find((w) => w.evmAddress === item.evmAddress)
+//     if (!matchGroup) return item
+//     const updatedList = addrList.map((addr) => {
+//       const match = matchGroup.addresses.find(
+//         (a) => a.chain === addr.chain && a.address === addr.address
+//       )
+//       return match
+//         ? { ...addr, balance: Number(match.balance) * Number(match.price) } // balance 替换
+//         : addr
+//     })
+//     return {
+//       ...item,
+//       balance: updatedList?.reduce((sum, item) => sum + Number(item.balance), 0),
+//       balancesInfo: updatedList,
+//     }
+//   })
+// })
 
 onMounted(() => {
   getMultiWalletsAllChain()
+  if (timer) clearInterval(timer)
 })
+// const throttledFn = useThrottleFn(() => {
+// loadingThrottledFn.value = true
+//   getMultiWalletsAllChain()
+// }, 60000)
+// const debouncedFetch = useDebounceFn(()=>getMultiWalletsAllChain(), 60000)
+
+function handleClick() {
+  if (isDisabled.value) return
+  getMultiWalletsAllChain()
+  // 启动倒计时
+  startCountdown(10)
+}
+const startCountdown = (seconds: number) => {
+  countdown.value = seconds
+  isDisabled.value = true
+
+  timer = setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      clearInterval(timer!)
+      timer = null
+      isDisabled.value = false
+    }
+  }, 1000)
+}
+
 function getWalletOperationRecord() {
   loadingRecord.value = true
   _getWalletOperationRecord()
@@ -164,37 +217,45 @@ function getWalletOperationRecord() {
     })
 }
 function getMultiWalletsAllChain() {
-  loading.value = true
-  _getMultiWalletsAllChain()
-    .then((res) => {
-      tableData.value = Array.isArray(res)
-        ? res?.map((item, index) => ({
-            id: `parent-${index}`,
-            tgUid: item.tgUid,
-            address: item.tgUid,
-            name: item.name,
-            source: item.source,
-            operate: 'delete',
-            evmAddress: item.balancesInfo?.filter((i) => i.chain == 'bsc')?.[0]?.address || '',
-            balance: item?.balancesInfo?.reduce((sum, item) => sum + Number(item.balance), 0),
-            balancesInfo: item.balancesInfo?.map((addr, i) => {
-              return {
-                ...addr,
-                id: `child-${index}-${i}`,
-                name: addr.address,
-                operate: 'deposit',
-                isChildren: true,
-              }
-            }),
-          }))
-        : []
-    })
-    .catch((err) => {
-      ElMessage.error(err)
-    })
-    .finally(() => {
-      loading.value = false
-    })
+  return new Promise((resolve, reject) => {
+    loading.value = true
+    const isSupportChains = botStore.isSupportChains
+      _getMultiWalletsAllChain(isSupportChains?.join(','))
+        .then((res) => {
+          console.log('------111--------')
+          tableData.value = Array.isArray(res)
+            ? res?.map((item, index) => ({
+                id: `parent-${index}`,
+                tgUid: item.tgUid,
+                address: item.tgUid,
+                name: item.name,
+                source: item.source,
+                operate: 'delete',
+                genSource: item.genSource,
+                evmAddress: item.balancesInfo?.filter((i) => i.chain == 'bsc')?.[0]?.address || '',
+                balance: item?.balancesInfo?.reduce((sum, item) => sum + Number(item.balance), 0),
+                balancesInfo: item.balancesInfo?.map((addr, i) => {
+                  return {
+                    ...addr,
+                    id: `child-${index}-${i}`,
+                    name: addr.address,
+                    operate: 'deposit',
+                    isChildren: true,
+                  }
+                }),
+              }))
+            : []
+          resolve(tableData.value)
+        })
+        .catch((err) => {
+          ElMessage.error(err)
+          reject([])
+        })
+        .finally(() => {
+          loading.value = false
+          loadingThrottledFn.value = false
+        })
+  })
 }
 function generateWallet() {
   // if (tableData.value?.length >= 10) {
@@ -221,7 +282,7 @@ function generateWallet() {
 function refresh() {
   //刷新列表
   getMultiWalletsAllChain()
-  botStore.getUserInfo()
+  // botStore.getUserInfo()
 }
 const goOn = () => {
   ElMessageBox.confirm(t('lastChance'), t('tips'), {

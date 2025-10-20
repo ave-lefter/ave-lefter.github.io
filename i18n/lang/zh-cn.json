@@ -1457,11 +1457,13 @@
   "operateHistory": "操作记录",
   "automaticRecognition": "（自动识别）",
   "importBotTip": "平台将自动识别助记词所属链（如 Solana、BSC、Base 等），仅导入检测到的钱包",
-  "wallet Manage": "钱包管理",
   "all1": "全选",
   "currentWallet": "当前钱包",
   "createTips": "当前 bot 钱包仅支持创建 9 个子钱包账户",
   "importTip1eTips": "助记词由12个英文单词组成,中间以空格分隔。",
   "importTip1eTips2": "助记词由12个英文单词组成,中间以空格分隔。",
-  "copyMnemonic": "复制助记词"
+  "copyMnemonic": "复制助记词",
+  "import": "导入",
+  "create": "创建",
+  "refresh": "刷新"
 }

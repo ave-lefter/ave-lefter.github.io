@@ -17,7 +17,7 @@
 
       <div class="part mt-24px">
         <div class="flex-between mb-5px">
-          <span>{{ $t('operate') }}</span>
+          <span>{{ $t('operation') }}</span>
           <span>{{ $t('time') }}</span>
         </div>
         <div class="flex-between py-8px" v-for="(item, $index) in tableData">
