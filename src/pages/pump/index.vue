@@ -1367,7 +1367,7 @@ function getFilterData(list, conditions) {
         if (conditions?.tvl_max) {
           pass = pass && i.tvl <= Number(conditions.tvl_max)
         }
-        if (pumpV3.value[activeChain.value].platforms.length > 0 && i.platform_id) {
+        if (pumpV3.value[activeChain.value].platforms.length > 0) {
           pass = pass && pumpV3.value[activeChain.value].platforms.includes(i.platform_id)
         }
         if (conditions?.holder_min) {
