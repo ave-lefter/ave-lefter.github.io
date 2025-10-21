@@ -5,6 +5,9 @@ export interface Wallet {
   address: string
   name: string
   balance: string | number
+  mainTokenBalance: string | number
+  usdcTokenBalance: string | number
+  usdtTokenBalance: string | number
   source: string
   operate: string
   genSource: 1 | 0
@@ -16,6 +19,9 @@ export interface Address {
   address: string
   name: string
   balance: string
+  mainTokenBalance: string
+  usdcTokenBalance: string
+  usdtTokenBalance: string
   source: string
   operate: string
   isChildren: boolean

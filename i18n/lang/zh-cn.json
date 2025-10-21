@@ -1465,5 +1465,6 @@
   "copyMnemonic": "复制助记词",
   "import": "导入",
   "create": "创建",
-  "refresh": "刷新"
+  "refresh": "刷新",
+  "mainToken": "主币"
 }

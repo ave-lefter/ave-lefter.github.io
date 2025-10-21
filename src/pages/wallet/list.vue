@@ -69,7 +69,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="source" :label="$t('origin')"  align="right">
+      <el-table-column prop="source" :label="$t('origin')" align="right">
         <template #default="{ row }">
           <template v-if="!row?.isChildren">
             <span v-if="row.source" class="mr-5px">
@@ -130,19 +130,36 @@
         <span class="mt-26px color-[--main-text] text-14px block">{{ currentObj?.address }}</span>
       </div>
     </el-dialog>
-      <el-popover
+    <el-popover
       v-model:visible="showPop"
       :virtual-ref="$refs.currentBtnRef[currentIndex]"
       virtual-triggering
       trigger="contextmenu"
       placement="right"
       popper-class="text-center"
-      :width="300"
-      :popper-style="{ padding: 0 , 'border-radius': '8px'}"
+      :popper-style="{ padding: 0, 'border-radius': '8px' }"
     >
-     <div>111111</div>
-
-  </el-popover>
+      <div class="px-10px py-10px text-14px">
+        <div class="flex-start">
+          <span class="color-[var(--third-text)]  text-left text-12px">{{ $t('mainToken') }}</span>
+          <span class="color-[var(--main-text)] flex-1 text-left ml-10px">
+            ${{ formatNumber(currentRow?.mainTokenBalance || 0, 2) }}
+          </span>
+        </div>
+        <div class="flex-start">
+          <span class="color-[var(--third-text)] text-left text-12px">USDT</span>
+          <span class="color-[var(--main-text)] flex-1 text-left ml-10px">
+            ${{ formatNumber(currentRow?.usdtTokenBalance || 0, 2) }}
+          </span>
+        </div>
+        <div class="flex-start">
+          <span class="color-[var(--third-text)] text-left text-12px">USDC</span>
+          <span class="color-[var(--main-text)] flex-1 text-left ml-10px">
+            ${{ formatNumber(currentRow?.usdcTokenBalance || 0, 2) }}
+          </span>
+        </div>
+      </div>
+    </el-popover>
   </div>
 </template>
 
@@ -176,7 +193,7 @@ const { evmAddress } = storeToRefs(useBotStore())
 const dialogVisible = shallowRef(false)
 const currentObj = ref<Address | null>(null)
 const showPop = shallowRef(false)
-const currentIndex= shallowRef(0)
+const currentIndex = shallowRef(0)
 const currentRow = ref<Address | null>(null)
 const $refs = ref({
   buttonRefs: {} as Record<number, any>,
@@ -257,7 +274,7 @@ function tableRowClick(item: Address) {
 const getRowClass = ({ row }: { row: any }) => {
   return row.isChildren ? 'cursor-pointer' : ''
 }
-function showPopover(row: Address,$index: number) {
+function showPopover(row: Address, $index: number) {
   showPop.value = true
   currentIndex.value = $index
   currentRow.value = row

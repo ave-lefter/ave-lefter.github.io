@@ -234,6 +234,9 @@ function getMultiWalletsAllChain() {
                 genSource: item.genSource,
                 evmAddress: item.balancesInfo?.filter((i) => i.chain == 'bsc')?.[0]?.address || '',
                 balance: item?.balancesInfo?.reduce((sum, item) => sum + Number(item.balance), 0),
+                mainTokenBalance: item?.balancesInfo?.reduce((sum, item) => sum + Number(item.mainTokenBalance), 0),
+                usdcTokenBalance: item?.balancesInfo?.reduce((sum, item) => sum + Number(item.usdcTokenBalance), 0),
+                usdtTokenBalance: item?.balancesInfo?.reduce((sum, item) => sum + Number(item.usdtTokenBalance), 0),
                 balancesInfo: item.balancesInfo?.map((addr, i) => {
                   return {
                     ...addr,

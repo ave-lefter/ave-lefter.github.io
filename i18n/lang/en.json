@@ -1467,5 +1467,6 @@
   "copyMnemonic": "Copy Mnemonic",
   "import": "Import",
   "create": "Create",
-  "refresh": "Refresh"
+  "refresh": "Refresh",
+  "mainToken": "Main Token"
 }

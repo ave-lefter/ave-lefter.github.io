@@ -1453,5 +1453,6 @@
   "copyMnemonic": "复制助记词",
   "import": "導入",
   "create": "創建",
-  "refresh": "刷新"
+  "refresh": "刷新",
+  "mainToken": "主幣"
 }
