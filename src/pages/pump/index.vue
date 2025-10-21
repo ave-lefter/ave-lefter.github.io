@@ -447,23 +447,6 @@ const orderGraduated= computed(() => {
 })
 const pumpConfig = shallowRef<PumpConfig[]>()
 const isRotate = ref(false)
-const pump_count = shallowRef({
-  solana: {
-      new: 0,
-      soon: 0,
-      graduated: 0
-    },
-  bsc: {
-    new: 0,
-    soon: 0,
-    graduated: 0
-  },
-  xlayer: {
-    new: 0,
-    soon: 0,
-    graduated: 0
-  }
-})
 const pump_query  = useStorage(
   'pump_query1',
   {
@@ -506,23 +489,8 @@ const pumpFilter_xlayer_graduated = usePumpTableDataFetching(
   'pumpFilter_xlayer_graduated'
 )
 
-const pumpV3 = useStorage<Record<ChainKey,pumpData>>(
-  'pumpV3',
-  {
-    'solana': {
-      platforms: []
-    },
-    'bsc': {
-      platforms: []
-    },
-    'xlayer': {
-      platforms: []
-    }
-  },
-  localStorage
-)
-
-const {pump_notice} = storeToRefs(usePumpStore())
+const { pump_notice, pumpV3 } = storeToRefs(usePumpStore())
+console.log('-------pumpV3111------',pumpV3)
 const pumpAudio = useTemplateRef('pumpAudio')
 const visible_platforms = shallowRef(false)
 const fourmemeListObj = reactive<
@@ -1092,7 +1060,7 @@ function getPump(params, isFilter = false) {
     return
   }
   params.chain = chain
-  if (pump_count.value[chain]?.[params.category] === 0) {
+  if (pumpV3.value[chain]?.[params.category]?.count === 0) {
     loading[chain + '-' + params.category] = true
   }
 
@@ -1122,111 +1090,6 @@ function getPump(params, isFilter = false) {
   _getPumpList(params)
     .then((res) => {
       const list = (res || [])?.map?.((i) => {
-        // let signal_arr = []
-        // let normal_tag = []
-        // if (i.dynamic_tag) {
-        //   const tag_arr = JSON.parse(i.dynamic_tag) || []
-        //   signal_arr = tag_arr?.filter((i) => i?.startsWith('signal'))
-        //   signal_arr = signal_arr?.map((y) => ({
-        //     tag:
-        //       y?.split('-')[5] &&
-        //       (y?.split('-')[1] == 'whale_sell' ||
-        //         y?.split('-')[1] == 'whale_buy')
-        //         ? `${y?.split('-')[1]}_trump`
-        //         : y?.split('-')[1],
-        //     color: y?.split('-')[2],
-        //     n: y?.split('-')[3],
-        //     timestamp: y?.split('-')[4],
-        //   }))
-        //   signal_arr?.sort((a, b) => b.timestamp - a.timestamp)
-        //   const kol_arr = signal_arr.filter(
-        //     (item, index) =>
-        //       signal_arr.findIndex((el) =>
-        //         new RegExp('^kol_.*$', 'gi').test(el.tag)
-        //       ) == index
-        //   )
-        //   const dev_arr = signal_arr.filter(
-        //     (item, index) =>
-        //       signal_arr.findIndex((el) =>
-        //         new RegExp('^dev_.*$', 'gi').test(el.tag)
-        //       ) == index
-        //   )
-        //   const smarter_arr = signal_arr.filter(
-        //     (item, index) =>
-        //       signal_arr.findIndex((el) =>
-        //         new RegExp('^smarter_.*$', 'gi').test(el?.tag)
-        //       ) == index
-        //   )
-        //   const whale_arr = signal_arr.filter(
-        //     (item, index) =>
-        //       signal_arr.findIndex((el) =>
-        //         new RegExp('^whale_.*$', 'gi').test(el.tag)
-        //       ) == index
-        //   )
-        //   const other_arr = signal_arr?.filter(
-        //     (el) =>
-        //       !new RegExp('^dev_|kol_|smarter_|whale_.*$', 'gi').test(el.tag)
-        //   )
-        //   signal_arr = kol_arr
-        //     ?.concat(dev_arr)
-        //     ?.concat(smarter_arr)
-        //     ?.concat(whale_arr)
-        //     ?.concat(other_arr)
-        //   signal_arr?.sort((a, b) => b.timestamp - a.timestamp)
-        //   normal_tag = tag_arr.filter((i) => !i?.startsWith('signal'))
-        // }
-        // normal_tag =
-        //   normal_tag?.map((i) => ({
-        //     tag: i,
-        //     color: 'green',
-        //     showText: false,
-        //   })) || []
-
-        // let tag_arr = []
-        // if (i.tag) {
-        //   tag_arr = i.tag?.split(',') || []
-        // }
-        // const is_rug_pull =
-        //   signal_arr?.some((i) => new RegExp('rug_pull', 'gi').test(i?.tag)) ||
-        //   normal_tag?.some((i) => new RegExp('rug_pull', 'gi').test(i?.tag))
-        // const is_shit_coins =
-        //   signal_arr?.some((i) => new RegExp('shitcoin', 'gi').test(i?.tag)) ||
-        //   normal_tag?.some((i) => new RegExp('shitcoin', 'gi').test(i.tag))
-        // if (i.risk_score >= 100 && i.chain == 'solana') {
-        //   signal_arr = []
-        //   normal_tag = [
-        //     {
-        //       tag: 'flag_dangerous',
-        //       color: 'red',
-        //       showText: true,
-        //     },
-        //   ]
-        // } else if (is_rug_pull) {
-        //   signal_arr = []
-        //   normal_tag = [
-        //     {
-        //       tag: 'flag_rug_pull',
-        //       color: 'red',
-        //       showText: true,
-        //     },
-        //   ]
-        // } else if (is_shit_coins) {
-        //   signal_arr = []
-        //   normal_tag = [
-        //     {
-        //       tag: 'flag_shit_coins',
-        //       color: 'red',
-        //       showText: true,
-        //     },
-        //   ]
-        // }
-        // if (i.cto_flag == 1) {
-        //   normal_tag.unshift({
-        //     tag: 'cto_flag',
-        //     color: 'green',
-        //     showText: false,
-        //   })
-        // }
         return {
           ...i,
           id: `${i.target_token}-${i.chain}`,
@@ -1258,10 +1121,7 @@ function getPump(params, isFilter = false) {
             i.target_token !== i.token0_address
               ? i.reserve0 * i.token0_price_usd * 2
               : i.reserve1 * i.token1_price_usd * 2,
-          medias: getMedias(i.appendix),
-          // normal_tag: normal_tag?.slice(0, 3) || [],
-          // signal_arr: signal_arr?.slice(0, 1) || [],
-          // tag_arr,
+          medias: getMedias(i.appendix)
         }
       })
       fourmemeListObj[activeChain.value][params.category as CategoryKey] = list
@@ -1272,7 +1132,7 @@ function getPump(params, isFilter = false) {
     })
     .finally(() => {
       loading[chain + '-' + params.category] = false
-      pump_count.value[chain][params.category] ++
+      pumpV3.value[chain][params.category].count ++
       Timer[params.category] = setTimeout(() => {
             getPump(params)
           }, 5000)

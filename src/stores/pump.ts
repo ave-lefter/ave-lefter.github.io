@@ -99,19 +99,46 @@ export const usePumpStore = defineStore('pumpStore', () => {
         ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk','bags']
     )
     const pumpV3 = useStorage<Record<ChainKey, pumpData>>(
-        'pumpV3',
-        {
-            solana: {
-                platforms: [],
-            },
-            bsc: {
-                platforms: [],
-            },
-            xlayer: {
-                platforms: [],
-            },
+      'pumpV4',
+      {
+        solana: {
+          platforms: [],
+          new: {
+            count: 0,
+          },
+          soon: {
+            count: 0,
+          },
+          graduated: {
+            count: 0,
+          },
         },
-    localStorage
+        bsc: {
+          platforms: [],
+          new: {
+            count: 0,
+          },
+          soon: {
+            count: 0,
+          },
+          graduated: {
+            count: 0,
+          },
+        },
+        xlayer: {
+          platforms: [],
+          new: {
+            count: 0,
+          },
+          soon: {
+            count: 0,
+          },
+          graduated: {
+            count: 0,
+          },
+        },
+      },
+      localStorage
     )
     const activeChain = useStorage<ChainKey>(
         'pump_activeChain',

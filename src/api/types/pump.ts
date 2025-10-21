@@ -133,4 +133,13 @@ export interface pumpObjColor {
 }
 export interface pumpData {
   platforms: String[]
+  new: {
+    count: number
+  }
+  soon: {
+    count: number
+  }
+  graduated: {
+    count: number
+  }
 }
