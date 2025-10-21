@@ -390,7 +390,7 @@
     <audio
       ref="pumpAudio" controls style="display: none"
       :src="audioUrl"
-      :volume="+globalStore.audioSettings.audio.signal/100 || 0.5"
+      :volume="+globalStore.audioSettings.audio.volume/100 || 0.5"
     />
   </div>
 </template>
@@ -733,18 +733,21 @@ watch(() => list3.value?.[0]?.target_token, useThrottleFn((val) => {
     pumpAudio.value.play()
   }
 },300))
-watch(()=>[pump_notice.value[activeChain.value]?.new,
+watch(() => [pump_notice.value[activeChain.value]?.new,
 pump_notice.value[activeChain.value]?.soon,
 pump_notice.value[activeChain.value]?.graduated
-],(val)=>{
+], useThrottleFn((val, old) => {
   if(val.some(el=>!!el)){
-    setTimeout(()=>{
-      if(pumpAudio.value){
-        pumpAudio.value.play()
+    const url = getChangedValue(val, old)
+    if (pumpAudio.value && url) {
+      audioUrl.value = audioNameToResource[url as keyof typeof audioNameToResource] || audioNameToResource.Beep
+      pumpAudio.value.oncanplay = () => {
+        pumpAudio.value?.play().catch(() => {})
       }
-    })
+    }
   }
-})
+},300))
+
 watch(()=> pumpV3.value[activeChain.value].platforms, () => {
   getPumpList()
 })
@@ -791,6 +794,14 @@ watch(()=>pump_query.value[activeChain.value]?.graduated, () => {
   debouncedFetch('graduated')
 }, { deep: true })
 
+const getChangedValue = (A: string[], B: string[]): string | null => {
+  for (let i = 0; i < A.length; i++) {
+    if (A[i] !== B[i]) {
+      return A[i]
+    }
+  }
+  return null
+}
 const debouncedFetch = useDebounceFn((type)=>search(type), 500)
 function search(type: string) {
   if (type == 'new') {
