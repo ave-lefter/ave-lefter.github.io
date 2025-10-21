@@ -5,9 +5,8 @@ import hot from './components/hotRank/hot.vue'
 import newRank from './components/newRank/new.vue'
 import inclusionRank from './components/inclusionRank/inclusion.vue'
 import gainer from './components/gainerRank/gainer.vue'
-import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
+import { getTreasureConfig, klinePreviews, type IGetTreasureConfig } from '~/api/market'
 
-import { v4 as uuidv4 } from 'uuid'
 import { trackRef } from '~/api/tracking'
 
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))

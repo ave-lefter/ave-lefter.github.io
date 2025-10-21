@@ -47,6 +47,20 @@ function confirm(params1?: [string, string], params2?: [string, string]) {
   props.setFilterForm(...params1Arr, ...params2Arr)
   popoverVisible.value = false
 }
+
+watch(()=>{
+  const newFilter = globalStore.rankConditions[globalStore.rankActiveTab]?.filter
+  return [newFilter.smart_money_buy_count_24h_min,newFilter.smart_money_buy_count_24h_max,newFilter.smart_money_sell_count_24h_min,newFilter.smart_money_sell_count_24h_max,globalStore.rankActiveTab,globalStore.rankCommon.activeInterval]
+},([buyMin,buyMax,sellMin,sellMax,newActiveTab,newInterval],[,,,,oldActiveTab,oldInterval])=>{
+  if(newActiveTab !== oldActiveTab || newInterval !== oldInterval){
+    return
+  }
+  buyRange.value[0] = buyMin
+  buyRange.value[1] = buyMax
+  sellRange.value[0] = sellMin
+  sellRange.value[1] = sellMax
+  confirm(buyRange.value,sellRange.value)
+})
 function getParamsArr(startKey: string, endKey: string, params?: [string, string]) {
   if (!params) {
     return [

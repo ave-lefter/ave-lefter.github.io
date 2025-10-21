@@ -1,11 +1,49 @@
 <script setup lang="ts">
 import * as echarts from 'echarts'
+import type {  KlineDatum } from '~/api/market'
 
+const retryCount = ref(0)
+const maxCount = 3
+let timer:number
 const chartDom = useTemplateRef('chartDom')
 const chartInstance = shallowRef<echarts.ECharts>()
-onMounted(() => {
-    if (chartDom.value) {
-        chartInstance.value = echarts.init(chartDom.value)
+const props = defineProps<{
+    list:KlineDatum[]
+}>()
+const isIntersecting = ref(false)
+const observer = new IntersectionObserver(entries=>{
+    isIntersecting.value = entries[0].isIntersecting
+    entries.forEach(entry => {
+    if (entry.isIntersecting && props.list?.length) {
+      initOrUpdateChart()
+      observer.unobserve(entry.target)
+    }
+  })
+})
+
+watch(()=>props.list,()=>{
+    if(isIntersecting.value && chartDom.value&&props.list?.length){
+        initOrUpdateChart()
+    }
+})
+onMounted(()=>{
+    if(chartDom.value){
+        observer.observe(chartDom.value)
+    }
+})
+
+function initOrUpdateChart() {
+        const xAxis = props.list.map(el=>el.t)
+        const barData = props.list.map(el=>el.c)
+        const lineData = props.list.map(el=>el.vol)
+        if(!chartInstance.value){
+            if(chartDom.value){
+                clearTimeout(timer)
+                chartInstance.value = echarts.init(chartDom.value)
+            } else {
+                return retry()
+            }
+        }
         chartInstance.value.setOption({
             tooltip: false,
             grid:{
@@ -27,7 +65,7 @@ onMounted(() => {
                     axisLabel: {
                         show: false // 不显示标签
                     },
-                    data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                    data: xAxis
                 }
             ],
             yAxis: [{
@@ -46,9 +84,7 @@ onMounted(() => {
                     itemStyle:{
                         color:'#383F4B'
                     },
-                    data: [
-                        2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
-                    ]
+                    data:barData
                 },
                 {
                     name: 'Temperature',
@@ -58,12 +94,25 @@ onMounted(() => {
                         color:'#37B270'
                     },
                     yAxisIndex:1,
-                    data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
+                    data: lineData
                 }
             ]
         })
+        chartInstance.value.resize()
+}
+
+function retry() {
+    if(retryCount.value<maxCount){
+        retryCount.value++
+        timer = window.setTimeout(()=>{
+            if(chartDom.value){
+                initOrUpdateChart()
+            } else{
+                retry()
+            }
+        },1000)
     }
-})
+}
 </script>
 
 <template>

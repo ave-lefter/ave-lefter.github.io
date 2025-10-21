@@ -100,7 +100,7 @@ function confirm(data:Record<string,any>) {
         <span class="text-14px block border pb-10px">{{ $t('FilterSetting') }}</span>
         <div v-if="dexVisible" class="flex items-center justify-between text-12px mb-16px">
           <span class="color-[--secondary-text]">{{ $t('dexSelect') }}</span>
-          <el-select v-model.trim="tempFilter.amm" class="[&&]:w-120px" :suffix-icon="SuffixIcon">
+          <el-select v-model.trim="tempFilter.amm" :teleported="false" class="[&&]:w-206px" :suffix-icon="SuffixIcon">
             <template #label="{label,value}">
              <div class="flex items-center gap-4px">
               <img v-if="value!==' '" class="w-16px h-16px rounded-full" :src="`${globalStore.token_logo_url}swap/${value}.jpeg`" alt="">
@@ -108,10 +108,24 @@ function confirm(data:Record<string,any>) {
               <span>{{ label }}</span>
              </div>
             </template>
-            <el-option v-for="item in filteredAmmList" :key="item.name" class="flex items-center gap-4px" :value="item.name" :label="item.show_name">
+            <template #header>
+              <div>
+                <el-input
+                    v-model="searchKey"
+                    class="[--el-border-color:transparent]"
+                    :placeholder="$t('search')"
+                    clearable
+                >
+                    <template #prefix>
+                    <Icon name="hugeicons:search-01" />
+                    </template>
+                </el-input>
+            </div>
+            </template>
+            <el-option v-for="item in filteredAmmList" :key="item.name" class="flex items-center gap-4px w-206px" :value="item.name" :label="item.show_name">
               <img v-if="item.chain" class="w-16px h-16px rounded-full" :src="`${globalStore.token_logo_url}swap/${item.name}.jpeg`" alt="">
               <Icon v-else name="custom:switch" class="text-16px"/>
-              <span>{{ item.show_name }}</span>
+              <span class="truncate">{{ item.show_name }}</span>
             </el-option>
           </el-select>
         </div>
@@ -212,7 +226,14 @@ function confirm(data:Record<string,any>) {
           </div>
           <!-- 钱包数 -->
           <div v-if="item.key === 'markers_dynamic' && item.isVisible" :key="item.key" class="flex items-center justify-between text-12px py-6px mb-8px">
-            <span class="color-[--secondary-text]">{{ $t('markers') }}</span>
+            <span class="color-[--secondary-text]">
+              <span
+                class="lh-16px rounded-2px px-2px text-12px bg-[--border] color-[--secondary-text]"
+              >
+                {{ tempFilter.activeInterval }}</span
+              >
+              {{ $t('markers') }}
+            </span>
             <div class="flex items-center gap-8px">
               <el-input
                 v-model.trim.number="tempFilter[`makers_${tempFilter.activeInterval}_min`]"
@@ -417,7 +438,10 @@ function confirm(data:Record<string,any>) {
           </div>
           <!-- 交易量 -->
           <div v-if="item.key === 'dynamicVolAndTxs' && item.isVisible" :key="item.key" class="flex items-center justify-between text-12px py-6px mb-8px">
-            <span class="color-[--secondary-text]">{{ $t('Vol') }}($)</span>
+            <span class="color-[--secondary-text]"><span
+                class="lh-16px rounded-2px px-2px text-12px bg-[--border] color-[--secondary-text]"
+                >{{ tempFilter.activeInterval }}</span
+              >{{ $t('Vol') }}</span>
             <div class="flex items-center gap-8px">
               <el-input
                 v-model.trim.number="tempFilter[`volume_u_${tempFilter.activeInterval}_min`]"
@@ -444,7 +468,13 @@ function confirm(data:Record<string,any>) {
           </div>
           <!-- 交易数 -->
           <div v-if="item.key === 'dynamicVolAndTxs' && item.isVisible" :key="item.key" class="flex items-center justify-between text-12px py-6px mb-8px">
-            <span class="color-[--secondary-text]">{{ $t('txns') }}</span>
+            <span class="color-[--secondary-text]">
+              <span
+                class="lh-16px rounded-2px px-2px text-12px bg-[--border] color-[--secondary-text]"
+                >{{ tempFilter.activeInterval }}</span
+              >
+              {{ $t('txns') }}
+            </span>
             <div class="flex items-center gap-8px">
               <el-input
                 v-model.trim.number="tempFilter[`tx_${tempFilter.activeInterval}_count_min`]"
