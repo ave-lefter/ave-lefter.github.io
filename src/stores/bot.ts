@@ -125,7 +125,7 @@ export const useBotStore = defineStore('bot', () => {
       })
     })
   }
-  function getUserAllChainBalance(item: {address: string, chain: string} | null = null) {
+  async function getUserAllChainBalance(item: {address: string, chain: string} | null = null) {
     if (!accessToken.value) {
       return
     }
@@ -134,6 +134,9 @@ export const useBotStore = defineStore('bot', () => {
       let _item = item
       if (item?.address === NATIVE_TOKEN || item?.address === 'sol') {
         _item = null
+      }
+      if (k > 0) {
+        await sleep(800)
       }
       _getUserAllChainBalance(i?.addresses || [], _item)
     }
