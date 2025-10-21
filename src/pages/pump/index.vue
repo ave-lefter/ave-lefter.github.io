@@ -146,7 +146,7 @@
             </span>
             <span class="flex-1" />
             <el-input
-              v-if="pumpSetting?.show_search && pump_query[activeChain]?.new"
+              v-if="pumpSetting?.show_search"
               ref="inputSearch"
               v-model.trim="pump_query[activeChain].new"
               class="search-input1 px-20px mr-4px"
@@ -169,12 +169,6 @@
                 />
               </template>
             </el-input>
-            <!-- <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer  hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.new } "  @click="pump_notice[activeChain].new = !pump_notice[activeChain].new">
-            <Icon
-            name="icon-park-solid:volume-notice"
-            class="text-12px"
-            />
-            </span> -->
             <AudioSelect activeTab="new" />
             <PumpFilter
               :storage="`pumpFilter_${activeChain}_new`"
@@ -242,7 +236,7 @@
             </span>
             <span class="flex-1" />
             <el-input
-              v-if="pumpSetting?.show_search && pump_query[activeChain]?.soon"
+              v-if="pumpSetting?.show_search"
               ref="inputSearch"
               v-model.trim="pump_query[activeChain].soon"
               class="search-input1 px-20px mr-4px"
@@ -265,12 +259,6 @@
                 />
               </template>
             </el-input>
-            <!-- <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.soon } "  @click="pump_notice[activeChain].soon = !pump_notice[activeChain].soon">
-              <Icon
-              name="icon-park-solid:volume-notice"
-              class="text-12px"
-              />
-            </span> -->
             <AudioSelect activeTab="soon" />
             <PumpFilter
               :storage="`pumpFilter_${activeChain}_soon`"
@@ -339,7 +327,7 @@
             </span>
             <span class="flex-1" />
             <el-input
-              v-if="pumpSetting?.show_search && pump_query[activeChain]?.graduated"
+              v-if="pumpSetting?.show_search"
               ref="inputSearch"
               v-model.trim="pump_query[activeChain].graduated"
               class="search-input1 px-20px mr-4px"
@@ -362,12 +350,6 @@
                 />
               </template>
             </el-input>
-            <!-- <span class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer hover:color-[--d-F5F5F5-l-333]" :class="{ 'color-[--d-F5F5F5-l-333]': pump_notice[activeChain]?.graduated } "  @click="pump_notice[activeChain].graduated = !pump_notice[activeChain].graduated">
-              <Icon
-              name="icon-park-solid:volume-notice"
-              class="text-12px"
-              />
-            </span> -->
             <AudioSelect activeTab="graduated" />
             <PumpFilter
               :storage="`pumpFilter_${activeChain}_graduated`"
@@ -681,7 +663,7 @@ watch(() => list1.value?.[0]?.target_token, useThrottleFn((val) => {
   const newAudio = pump_notice.value[activeChain.value]?.new
   if(newAudio && pumpAudio.value && val) {
     audioUrl.value = audioNameToResource[newAudio as keyof typeof audioNameToResource]
-    || audioNameToResource.Beep
+      || audioNameToResource.Beep
     pumpAudio.value.play()
   }
 },300))
@@ -707,7 +689,7 @@ pump_notice.value[activeChain.value]?.graduated
 ],(val)=>{
   if(val.some(el=>!!el)){
     setTimeout(()=>{
-      if(pumpAudio.value){
+      if (pumpAudio.value) {
         pumpAudio.value.play()
       }
     })
@@ -1227,7 +1209,7 @@ function getFilterData(list, conditions) {
         if (conditions?.tvl_max) {
           pass = pass && i.tvl <= Number(conditions.tvl_max)
         }
-        if (pumpV3.value[activeChain.value].platforms.length > 0 && i.platform_id) {
+        if (pumpV3.value[activeChain.value].platforms.length > 0) {
           pass = pass && pumpV3.value[activeChain.value].platforms.includes(i.platform_id)
         }
         if (conditions?.holder_min) {
