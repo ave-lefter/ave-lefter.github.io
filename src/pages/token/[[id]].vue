@@ -308,8 +308,10 @@ function addVisit() {
   if(tokenStore.tokenInfo){
     const {logo_url,symbol,chain,token} = tokenStore.tokenInfo.token
     const index = globalStore.lastVisitTokens.findIndex(item => item.id === token+'-'+chain)
-    if(index === -1 &&globalStore.lastVisitTokens.length >= 20){
-      globalStore.lastVisitTokens.pop()
+    if(index === -1){
+      if(globalStore.lastVisitTokens.length >= 20){
+        globalStore.lastVisitTokens.pop()
+      }
         globalStore.lastVisitTokens.unshift({
         id:token+'-'+chain,
         logo_url,
