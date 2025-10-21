@@ -138,8 +138,8 @@ function sendRemarkToServer(remark: string) {
       emit('refresh')
     })
     .catch((err: any) => {
-      ElMessage.error(t('fail'))
-      console.error(err)
+      ElMessage.error(err.message)
+      console.error(err.message )
     })
     .finally(() => {
       loadingEdit.value = false
