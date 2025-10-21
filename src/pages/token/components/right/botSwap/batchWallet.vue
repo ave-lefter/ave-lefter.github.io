@@ -28,14 +28,14 @@
           <span class="flex-1 text-right">{{ $t('balance1') }}({{ tokenStore.swap.payToken?.symbol }})</span>
           <span class="flex-1 text-right">{{ $t('balance1') }}({{ tokenStore.swap.token?.symbol }})</span>
         </div>
-        <div class="px-12px">
+        <div :key="botStore.evmAddress" class="px-12px">
           <el-checkbox-group
             v-model="botSwapStore.botSwapSelectedWallets"
             @change="handleCheckedChange"
           >
-            <div v-for="(item, index) in botStore?.walletList?.toSorted((a) => a.evmAddress === botStore.evmAddress ? -1 : 1)" :key="item.evmAddress" class="flex items-center h-50px" :class="{ 'b-b-solid b-b-1px b-b-[--border]': index !== botStore?.walletList.length - 1 }">
+            <div v-for="(item, index) in walletList" :key="item.evmAddress" class="flex items-center h-50px" :class="{ 'b-b-solid b-b-1px b-b-[--border]': index !== botStore?.walletList.length - 1 }">
               <div class="flex items-center" style="flex: 1.5">
-                <el-checkbox class="[&&]:[--el-checkbox-disabled-checked-icon-color:#FFF] [&&]:[--el-checkbox-disabled-checked-input-fill:#3F80F7] [&&]:[--el-checkbox-disabled-checked-input-border-color:#3F80F7] batch-checkbox" :value="item.evmAddress" :disabled="item.evmAddress === botStore.evmAddress" :checked="item.evmAddress === botStore.evmAddress" />
+                <el-checkbox :key="item.evmAddress" class="[&&]:[--el-checkbox-disabled-checked-icon-color:#FFF] [&&]:[--el-checkbox-disabled-checked-input-fill:#3F80F7] [&&]:[--el-checkbox-disabled-checked-input-border-color:#3F80F7] batch-checkbox" :value="item.evmAddress" :disabled="item.evmAddress === botStore.evmAddress" :checked="item.evmAddress === botStore.evmAddress" />
                 <div class="text-12px lh-14px" @click.stop>
                   <div class="color-[--main-text] flex">{{ item.name }}</div>
                   <div class="color-[--third-text] flex items-center" >
@@ -89,6 +89,19 @@ const isIndeterminate = ref(false)
 // const boundary = useTemplateRef('bot-swap-container')
 const allWallets = computed(() => {
   return botStore.walletList?.map?.(i => i.evmAddress) || []
+})
+
+const walletList = computed(() => {
+  const _walletList = botStore.walletList?.slice?.(0)
+  return _walletList?.sort?.((a) => a.evmAddress === botStore.evmAddress ? -1 : 1) || []
+})
+
+watch(() => botStore.evmAddress, (val) => {
+  if (val) {
+    botSwapStore.botSwapSelectedWallets = [val || '']
+  } else {
+    botSwapStore.botSwapSelectedWallets = []
+  }
 })
 
 const totalSelectWalletBalance = computed(() => {
