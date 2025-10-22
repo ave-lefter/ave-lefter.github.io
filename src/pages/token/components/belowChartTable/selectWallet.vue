@@ -10,7 +10,7 @@
     <template #reference>
       <div class="ml-20px flex items-center clickable">
         <Icon name="ri:wallet-fill"  class="color-[--secondary-text] text-14px" />
-        <span class="text-12px color-[--main-text] mx-3px whitespace-nowrap">{{ botStore.userInfo?.name || '' }}</span>
+        <span class="text-12px color-[--main-text] mx-3px whitespace-nowrap">{{ botStore.walletList?.find(i => i.evmAddress === _evmAddress)?.name || botStore.userInfo?.name || '' }}</span>
         <span class="text-10px color-[--third-text]">{{ getAddressFromChain(chain, _wallet?.addresses || [])?.address?.replace(new RegExp('(.{6})(.+)(.{4})'), '$1...$3') }}</span>
         <Icon v-copy="getAddressFromChain(chain, _wallet?.addresses || [])?.address" name="bxs:copy" class="clickable ml-5px text-12px color-[--third-text]" />
         <div class="border-l-solid border-l-1px border-l-[--icon-color] h-8px mx-8px" />

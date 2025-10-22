@@ -1468,5 +1468,6 @@
   "import": "Import",
   "create": "Create",
   "refresh": "Refresh",
-  "mainToken": "Main Token"
+  "mainToken": "Main Token",
+  "botCancelAllOrder": "Confirm to cancel the limit orders of all wallets"
 }

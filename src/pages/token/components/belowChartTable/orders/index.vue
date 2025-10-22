@@ -61,7 +61,7 @@ function toggleCurrentToken() {
 function toggleCancelAll() {
   // 如果没有待处理订单，直接返回
   if (!unifiedRef.value?.txOrder?.length) return
-  ElMessageBox.confirm(t('botCancelOrder'), '', {
+  ElMessageBox.confirm(t('botCancelAllOrder'), '', {
     confirmButtonText: t('confirm'),
     cancelButtonText: t('cancel')
   })

@@ -1466,5 +1466,6 @@
   "import": "导入",
   "create": "创建",
   "refresh": "刷新",
-  "mainToken": "主币"
+  "mainToken": "主币",
+  "botCancelAllOrder": "确认取消所有钱包的当前挂单"
 }

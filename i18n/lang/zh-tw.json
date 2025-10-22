@@ -1454,5 +1454,6 @@
   "import": "導入",
   "create": "創建",
   "refresh": "刷新",
-  "mainToken": "主幣"
+  "mainToken": "主幣",
+  "botCancelAllOrder": "確認取消所有錢包的當前掛單"
 }

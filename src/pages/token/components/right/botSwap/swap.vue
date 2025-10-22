@@ -134,7 +134,7 @@
         native-type="button"
         @click.stop="submitBotSwap"
       >
-        {{ checkAmountMessage() || (activeTab === 'buy' ? $t('buy') : $t('sell')) }}
+        {{ checkAmountMessage() || (activeTab === 'buy' ? $t('buy') : ($t('sell') + (Number(amountTokenOut || 0) > 0 ? `≈ ${ formatNumber(amountTokenOut || 0) } ${tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }` : ''))) }}
       </el-button>
       <div class="mt-10px flex items-center text-11px color-[--main-text]">
         <template v-if="botSettings[chain || ''] && isCanMev">
@@ -252,7 +252,7 @@ import { NATIVE_TOKEN, MIN_BALANCE } from '@/utils/constants'
 import BigNumber from 'bignumber.js'
 import { debounce } from 'lodash-es'
 import { getAddressAndChainFromId, isEvmChain, getRpcProvider } from '@/utils'
-import { ElMessageBox, ElNotification } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { useBotSwap } from '~/composables/botSwap'
 import { bot_createSolTx, bot_createSwapEvmTx, bot_createSolLimitTx, bot_createEvmLimitTx } from '@/api/bot'
 import RefreshBalance from './refreshBalance.vue'
@@ -261,6 +261,9 @@ import { useEventBus } from '@vueuse/core'
 import AutoSellSet from './autoSellSet.vue'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
+import delayedNotify from '~/utils/notify'
+
+const ElNotification = (arg: any) => delayedNotify({...arg, duration: 2500})
 
 interface Token {
   address?: string
@@ -724,7 +727,7 @@ const approve = async () => {
       })
     }
   }).catch((error) => {
-    handleBotError(error || 'approve error')
+    handleBotError(error || 'approve error', ElNotification)
     loadingApprove.value = false
   })
 }
@@ -813,7 +816,7 @@ async function submitBotSwap() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })
+    })?.filter?.(i => Number(i?.inAmount) > 0) || []
 
     const data = {
       // batchId: Date.now().toString(),
@@ -858,7 +861,7 @@ async function submitBotSwap() {
               clearTimeout(Timer)
               Timer = null
             }
-            handleBotError(walletName + ' ' + txInfo?.errorLog)
+            handleBotError(walletName + ' ' + txInfo?.errorLog, ElNotification)
             if (isError) {
               loadingSwap.value = false
               return
@@ -883,7 +886,7 @@ async function submitBotSwap() {
                 ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
               } else {
-                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error')
+                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error', ElNotification)
               }
               unwatch()
               loadingSwap.value = false
@@ -892,7 +895,7 @@ async function submitBotSwap() {
         })
       }
     }).catch(err => {
-      handleBotError(err || 'swap error')
+      handleBotError(err || 'swap error', ElNotification)
       loadingSwap.value = false
     })
   } else if (isEvmChain(chain)) {
@@ -917,7 +920,7 @@ async function submitBotSwap() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })
+    })?.filter?.(i => Number(i?.inAmount) > 0) || []
     const data = {
       // batchId: Date.now().toString(),
       chain: chain,
@@ -973,7 +976,7 @@ async function submitBotSwap() {
               clearTimeout(Timer)
               Timer = null
             }
-            handleBotError(walletName + ' ' + txInfo?.errorLog)
+            handleBotError(walletName + ' ' + txInfo?.errorLog, ElNotification)
             if (isError) {
               loadingSwap.value = false
               return
@@ -998,7 +1001,7 @@ async function submitBotSwap() {
                 ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
               } else {
-                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error')
+                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error', ElNotification)
               }
               unwatch()
               loadingSwap.value = false
@@ -1007,7 +1010,7 @@ async function submitBotSwap() {
         })
       }
     }).catch(err => {
-      handleBotError(err || 'swap error')
+      handleBotError(err || 'swap error', ElNotification)
       loadingSwap.value = false
     })
   }
@@ -1064,11 +1067,12 @@ function submitBotLimit() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })
+    })?.filter?.(i => Number(i?.inAmount) > 0) || []
     const data = {
       // batchId: Date.now().toString(),
       swapList: swapList,
       tokenAddress: tokenStore.swap.token.address || tokenStore.token?.token || '',
+      baseTokenAddress: native,
       swapType: (isBuy ? 5 : 6) as 5 | 6, //5:Buy limit 6:Sell limit
       isPrivate: mev || false,
       priceLimit: p,
@@ -1110,7 +1114,7 @@ function submitBotLimit() {
               clearTimeout(Timer)
               Timer = null
             }
-            handleBotError(walletName + ' ' + txInfo?.errorLog)
+            handleBotError(walletName + ' ' + txInfo?.errorLog, ElNotification)
             if (isError) {
               loadingSwap.value = false
               return
@@ -1135,7 +1139,7 @@ function submitBotLimit() {
                 ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
               } else {
-                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error')
+                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error', ElNotification)
               }
               unwatch()
               loadingSwap.value = false
@@ -1144,7 +1148,7 @@ function submitBotLimit() {
         })
       }
     }).catch(err => {
-      handleBotError(err || 'swap error')
+      handleBotError(err || 'swap error', ElNotification)
       loadingSwap.value = false
     })
   } else if (isEvmChain(chain)) {
@@ -1170,7 +1174,7 @@ function submitBotLimit() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })
+    })?.filter?.(i => Number(i?.inAmount) > 0) || []
     const data = {
       // batchId: Date.now().toString(),
       chain: chain,
@@ -1208,7 +1212,7 @@ function submitBotLimit() {
             clearTimeout(Timer)
             Timer = null
           }
-          handleBotError(walletName + ' ' + txInfo?.errorLog)
+          handleBotError(walletName + ' ' + txInfo?.errorLog, ElNotification)
           if (isError) {
             loadingSwap.value = false
             return
@@ -1233,7 +1237,7 @@ function submitBotLimit() {
                 ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
               } else {
-                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error')
+                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error', ElNotification)
               }
               unwatch()
               loadingSwap.value = false
@@ -1242,7 +1246,7 @@ function submitBotLimit() {
         })
       }
     }).catch(err => {
-      handleBotError(err || 'swap error')
+      handleBotError(err || 'swap error', ElNotification)
       loadingSwap.value = false
     })
   }
@@ -1300,6 +1304,12 @@ watch(() => tokenStore.token?.token || '', (val) => {
     amountTokenOut.value = ''
     amountNativeOut.value = ''
     watchAmount2(props.activeTab)
+  }
+})
+
+watch(() => tokenStore.swap.payToken.address, (val) => {
+  if (val) {
+    _getAllowance()
   }
 })
 

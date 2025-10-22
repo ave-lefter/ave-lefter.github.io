@@ -164,7 +164,7 @@ export const useBotStore = defineStore('bot', () => {
         })?.filter(j => j.chain === item?.chain)
         getChainsTokenBalance(tokens).then(res => {
           if (Array.isArray(addresses)) {
-            (res || []).forEach?.((i: { balance: any; decimals: any; decimal: any; chain: string }) => {
+            (res || []).forEach?.((i: { balance: any; decimals: any; decimal: any; chain: string; token: string }) => {
               addresses?.forEach?.((j) => {
                 if (j.chain === i.chain) {
                   if (!j.tokenBalances) {
@@ -177,6 +177,15 @@ export const useBotStore = defineStore('bot', () => {
                   }
                 }
               })
+              // if ((i?.token === NATIVE_TOKEN || i?.token === 'sol') && i.chain === tokenStore.swap.native?.chain) {
+              //   tokenStore.swap.native.balance = i.balance
+              // }
+              // if (i?.token === tokenStore.swap.token?.address && i.chain === tokenStore.swap.token?.chain) {
+              //   tokenStore.swap.token.balance = i.balance
+              // }
+              // if (i?.token === tokenStore.swap.payToken?.address && i.chain === tokenStore.swap.payToken?.chain) {
+              //   tokenStore.swap.payToken.balance = i.balance
+              // }
             })
           }
         })

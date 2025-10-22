@@ -1,13 +1,13 @@
 <template>
   <div>
     <el-table
+      v-loading="loading"
       :data="tableData"
       style="width: 100%"
       row-key="id"
       :tree-props="{ children: 'balancesInfo', hasChildren: 'hasChildren' }"
       default-expand-all
       class="table-list hidden-scrollbar bot-manage-table"
-      v-loading="loading"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
       :row-class-name="getRowClass"
       @row-click="tableRowClick"
@@ -29,14 +29,14 @@
               @click.stop
             />
           </template>
-          <div class="flex-start" v-else>
+          <div v-else class="flex-start">
             <img
               class="mr-8px"
               style="border-radius: 50%"
               height="24"
               :src="generateAvatarIcon(row?.name || '')"
               alt=""
-            />
+            >
             {{ row.name }}
             <Remark
               :remark="row.remark"
@@ -93,9 +93,9 @@
       <el-table-column :label="$t('operate')" align="right">
         <template #default="{ row }">
           <Icon
+            v-if="row.operate == 'delete' && evmAddress !== row.evmAddress"
             class="text-14px text-[--third-text] cursor-pointer hover:color-[--main-text]"
             name="ic:baseline-delete"
-            v-if="row.operate == 'delete' && evmAddress !== row.evmAddress"
             @click.stop.prevent="removeWallet(row)"
           />
 
@@ -107,7 +107,7 @@
             <Icon name="custom:download" class="text-10px" />
             <span class="font-500 text-12px">{{ t('deposit2') }}</span>
           </div>
-          <span v-else></span>
+          <span v-else/>
         </template>
       </el-table-column>
     </el-table>
@@ -139,26 +139,26 @@
       popper-class="text-center"
       :popper-style="{ padding: 0, 'border-radius': '8px' }"
     >
-      <div class="px-10px py-10px text-14px">
-        <div class="flex-start">
-          <span class="color-[var(--third-text)]  text-left text-12px">{{ $t('mainToken') }}</span>
-          <span class="color-[var(--main-text)] flex-1 text-left ml-10px">
-            ${{ formatNumber(currentRow?.mainTokenBalance || 0, 2) }}
-          </span>
-        </div>
-        <div class="flex-start">
-          <span class="color-[var(--third-text)] text-left text-12px">USDT</span>
-          <span class="color-[var(--main-text)] flex-1 text-left ml-10px">
-            ${{ formatNumber(currentRow?.usdtTokenBalance || 0, 2) }}
-          </span>
-        </div>
-        <div class="flex-start">
-          <span class="color-[var(--third-text)] text-left text-12px">USDC</span>
-          <span class="color-[var(--main-text)] flex-1 text-left ml-10px">
-            ${{ formatNumber(currentRow?.usdcTokenBalance || 0, 2) }}
-          </span>
-        </div>
-      </div>
+      <table class="px-10px py-10px text-14px">
+        <tr>
+          <td class="color-[var(--third-text)] text-left text-12px">{{ getChainInfo(currentRow?.chain || '')?.main_name || $t('mainToken') }}</td>
+          <td class="color-[var(--main-text)] text-left pl-5px">
+            {{ formatNumber(currentRow?.mainTokenBalance || 0, 2) }}
+          </td>
+        </tr>
+        <tr>
+          <td class="color-[var(--third-text)] text-left text-12px">USDT</td>
+          <td class="color-[var(--main-text)] text-left pl-5px">
+            {{ formatNumber(currentRow?.usdtTokenBalance || 0, 2) }}
+          </td>
+        </tr>
+        <tr>
+          <td class="color-[var(--third-text)] text-left text-12px">USDC</td>
+          <td class="color-[var(--main-text)] text-left pl-5px">
+            {{ formatNumber(currentRow?.usdcTokenBalance || 0, 2) }}
+          </td>
+        </tr>
+      </table>
     </el-popover>
   </div>
 </template>
