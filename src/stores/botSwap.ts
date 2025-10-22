@@ -10,6 +10,7 @@ export const useBotSwapStore = defineStore('botSwap', () => {
   const gasTip = useLocalStorage('bot_gasTip_v1', defaultGasTips)
 
   const botStore = useBotStore()
+  const tokenStore = useTokenStore()
 
   const wsStore = useWSStore()
 
@@ -249,6 +250,8 @@ export const useBotSwapStore = defineStore('botSwap', () => {
   }
 
  const mainTokensPriceIds = computed(() => mainTokensPrice.value?.map(i => i.id))
+
+
 
   return {
     gasTip,

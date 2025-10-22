@@ -9,7 +9,7 @@
   >
     <template #reference>
       <div class="ml-auto flex item-center clickable">
-        <Icon name="ri:wallet-fill"  class="color-[--secondary-text] text-14px" />
+        <Icon name="ri:wallet-fill" class="color-[--secondary-text] text-14px" />
         <span class="text-12px color-[--main-text] mx-3px">{{ botSwapStore.botSwapSelectedWallets?.length }}</span>
         <Icon name="prime:sort-down-fill" class="color-[--main-text] text-14px transition-all-300" :class="{ 'rotate-180': selectWalletVisible }" />
       </div>

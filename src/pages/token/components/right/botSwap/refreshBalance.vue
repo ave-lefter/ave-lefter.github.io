@@ -19,10 +19,29 @@ const props = defineProps({
   isPayToken: {
     type: Boolean,
     default: false
+  },
+  isBatch: {
+    type: Boolean,
+    default: false
   }
 })
 
-const { loading, refreshTokenBalance } = useBotSwap(props.type)
+// const botStore = useBotStore()
+// const tokenStore = useTokenStore()
+
+const { loading, refreshTokenBalance } = useBotSwap(props.type, props.isBatch)
+
+// function _refreshTokenBalance() {
+//   if (props.isBatch) {
+//     botStore.getUserAllChainBalance()
+//   } else {
+//     let walletAddress = botStore.userInfo?.addresses?.find((i) => i?.chain === chain)?.address
+//     let payToken = tokenStore.swap.payToken
+//     refreshTokenBalance(props.isPayToken)
+//   }
+// }
+
+
 
 
 </script>
