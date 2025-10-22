@@ -1141,5 +1141,17 @@ class MessageQueue {
     return this.queue
   }
 }
-
 export const messageQueue = new MessageQueue()
+
+export function getTwitterSeconds(time: number , unit: string) {
+  if (!time || time <= 0) {
+    return 0
+  }
+ if (unit === 'm') {
+    return time * 60
+  } else if (unit === 'h') {
+    return time * 60 * 60
+  } else {
+    return time
+  }
+}

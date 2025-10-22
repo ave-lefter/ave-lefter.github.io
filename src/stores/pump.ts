@@ -1,6 +1,7 @@
 import { useStorage, useThrottleFn, useWindowSize } from '@vueuse/core'
 import type { ChainKey, PumpConfig, PumpObj, pumpData } from '~/api/types/pump'
 import { _getPumpConfig, _getPumpList } from '@/api/pump'
+import { usePumpTableDataFetching } from '@/utils/index'
 
 export const usePumpStore = defineStore('pumpStore', () => {
     const route = useRoute()
@@ -86,9 +87,34 @@ export const usePumpStore = defineStore('pumpStore', () => {
         _getPumpConfig().then((res) => {
             pumpConfig.value = res || []
             pumpConfig.value.forEach(i => {
-              if (!pumpV3.value[i.chain].platforms?.length) {
+              if (!pumpV3.value[i.chain]?.platforms?.length) {
                 const platforms =  i.platforms.map(y=>y?.platform) || []
-                  pumpV3.value[i.chain].platforms = platforms
+                pumpV3.value[i.chain] = {
+                    ...(pumpV3.value[i.chain] || {}),
+                    platforms,
+                    new: {
+                        count: 0,
+                        loading: false,
+                        pumpFilter: pumpFilterDefault,
+                    },
+                    soon: {
+                        count: 0,
+                        loading: false,
+                        pumpFilter: pumpFilterDefault,
+                    },
+                    graduated: {
+                        count: 0,
+                        loading: false,
+                        pumpFilter: pumpFilterDefault,
+                    },
+                }
+                if (!pump_notice.value?.[i.chain]) {
+                    pump_notice.value[i.chain] = {
+                    new: '',
+                    soon: '',
+                    graduated: '',
+                    }
+                }
               }
             })
         })
@@ -98,45 +124,100 @@ export const usePumpStore = defineStore('pumpStore', () => {
         'pump_solana_platforms',
         ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk','bags']
     )
+    const pumpFilterDefault = {
+      q: '',
+      dev_sale_out: 0,
+      platforms: 'pump,moonshot',
+      progress_min: '', //进度
+      progress_max: '',
+
+      lage: '', //代币时长
+      rage: '',
+      dev_balance_ratio_cur_min: '', //dev 持仓%
+      dev_balance_ratio_cur_max: '',
+      holder_min: '', //持有人
+      holder_max: '',
+      holders_top10_ratio_min: '', //top10 持仓%
+      holders_top10_ratio_max: '',
+      lsnip: '', //狙击人数
+      rsnip: '',
+      smart_money_tx_count_24h_min: '', // 聪明钱交易数 （买入数+卖出数）
+      smart_money_tx_count_24h_max: '',
+      lins: '', //老鼠仓
+      rins: '',
+      lkol: '', //KOL交易人数
+      rkol: '',
+      lrug: '', //跑路概率
+      rrug: '',
+
+      market_cap_min: '', // 市值
+      market_cap_max: '',
+      volume_u_24h_min: '', //交易额
+      volume_u_24h_max: '',
+      lbtx: '', //买入交易数
+      rbtx: '',
+      lstx: '', //卖出交易数
+      rstx: '',
+      has_sm: 0,
+      sm_list: [],
+    }
     const pumpV3 = useStorage<Record<ChainKey, pumpData>>(
-      'pumpV4',
+      'pumpV5',
       {
         solana: {
           platforms: [],
           new: {
             count: 0,
+            loading: false,
+            // pumpFilter: pumpFilterDefault,
           },
           soon: {
             count: 0,
+            loading: false,
+            // pumpFilter: pumpFilterDefault,
           },
           graduated: {
             count: 0,
+            loading: false,
+            // pumpFilter: pumpFilterDefault,
           },
         },
         bsc: {
           platforms: [],
           new: {
             count: 0,
+            loading: false,
+            // pumpFilter: pumpFilterDefault,
           },
           soon: {
             count: 0,
+            loading: false,
+            // pumpFilter: pumpFilterDefault,
           },
           graduated: {
             count: 0,
+            loading: false,
+            // pumpFilter: pumpFilterDefault,
           },
         },
-        xlayer: {
-          platforms: [],
-          new: {
-            count: 0,
-          },
-          soon: {
-            count: 0,
-          },
-          graduated: {
-            count: 0,
-          },
-        },
+        // xlayer: {
+        //   platforms: [],
+        //   new: {
+        //     count: 0,
+        //     loading: false,
+        //     pumpFilter: pumpFilterDefault,
+        //   },
+        //   soon: {
+        //     count: 0,
+        //     loading: false,
+        //     pumpFilter: pumpFilterDefault,
+        //   },
+        //   graduated: {
+        //     count: 0,
+        //     loading: false,
+        //     pumpFilter: pumpFilterDefault,
+        //   },
+        // },
       },
       localStorage
     )
@@ -173,38 +254,39 @@ export const usePumpStore = defineStore('pumpStore', () => {
           soon: '',
           graduated: '',
         },
-        xlayer: {
-          new: '',
-          soon: '',
-          graduated: '',
-        },
-      })
+        // xlayer: {
+        //   new: '',
+        //   soon: '',
+        //   graduated: '',
+        // },
+      },localStorage)
     const listData = shallowRef<PumpObj[]>([])
 
     return {
-        visible,
-        boundingRect,
-        isLeftFixed,
-        isRightFixed,
-        fixedWidth,
-        winHeight,
-        winWidth,
-        translateStyle,
-        onDrag,
-        onDragStop,
-        onResizing,
-        onLeftDragStop,
-        onRightDragStop,
-        onFixedResizing,
-        placement,
-        pumpConfig,
-        getPumpConfig,
-        pump_solana_platforms,
-        activeChain,
-        pump_query,
-        listData,
-        pump_notice,
-        shouldHide,
-        pumpV3
+      visible,
+      boundingRect,
+      isLeftFixed,
+      isRightFixed,
+      fixedWidth,
+      winHeight,
+      winWidth,
+      translateStyle,
+      onDrag,
+      onDragStop,
+      onResizing,
+      onLeftDragStop,
+      onRightDragStop,
+      onFixedResizing,
+      placement,
+      pumpConfig,
+      getPumpConfig,
+      pump_solana_platforms,
+      activeChain,
+      pump_query,
+      listData,
+      pump_notice,
+      shouldHide,
+      pumpV3,
+      pumpFilterDefault
     }
 })

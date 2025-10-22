@@ -55,7 +55,11 @@ import $dayjs from '@/utils/day'
 import { formatNumber } from '@/utils/formatNumber'
 import type { XType1 } from '~/api/x'
 import { convertTextToHtml } from './utils'
-defineProps({
+import { getTwitterSeconds } from '@/utils/index'
+// import { useNow } from '@/composables/useNow'
+const globalStore = useGlobalStore()
+const { pumpSetting } = storeToRefs(globalStore)
+ const props =defineProps({
   info: {
     type: Object as PropType<XType1 | null>,
     default: () => (null),
@@ -64,7 +68,27 @@ defineProps({
     type: Boolean,
     default: false
   }
-})
+ })
+// const now = useNow()
+// const currentColor = computed(() => {
+//     const time = now.value - new Date(props.info?.tweet_created || 0).getTime()
+//     const middleSize = pumpSetting.value.data?.twitter?.middleSize ?? 0
+//     const middleUnit = pumpSetting.value.data?.twitter?.middleUnit ?? 'm'
+//     const minSize = pumpSetting.value.data?.twitter?.minSize ?? 0
+//   const minUnit = pumpSetting.value.data?.twitter?.minUnit ?? 's'
+//   if (!minSize && !middleSize) {
+//     return ''
+//   }
+//   if (time / 1000 <= getTwitterSeconds(minSize, minUnit)) {
+//     return pumpSetting.value.data?.twitter?.minColor
+//   } else if (time / 1000 <= getTwitterSeconds(middleSize, middleUnit)) {
+//     return pumpSetting.value.data?.twitter?.middleColor
+//   } else if (time / 1000 > getTwitterSeconds(middleSize, middleUnit)) {
+//     return pumpSetting.value.data?.twitter?.maxColor
+//   } else {
+//     return ''
+//   }
+// })
 </script>
 
 <style scoped lang='scss'>
