@@ -293,12 +293,16 @@ export function bot_getWalletsAllChain(params: {
     address: string
     price?: number
     balance?: string
+    decimals?: number
+    logo_url?: string
     tokenBalances?: {
       [key: string]: {
         chain: string
         address: string
         price?: number
         balance?: string
+        decimals?: number
+        logo_url?: string
       }
     }
   }>

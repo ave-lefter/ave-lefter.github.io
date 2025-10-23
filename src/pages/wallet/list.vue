@@ -142,7 +142,7 @@
       <table class="px-10px py-10px text-14px">
         <tbody>
           <template v-if="currentRow?.balancesInfo">
-            <tr v-for="(item,$index) in currentRow?.balancesInfo">
+            <tr v-for="(item,$index) in currentRow?.balancesInfo" :key="$index">
               <td class="color-[var(--third-text)] text-left text-12px">{{ getChainInfo(item?.chain || '')?.main_name  }}</td>
               <td class="color-[var(--main-text)] text-left pl-5px">
                 {{ formatNumber(item?.mainTokenBalance || 0, 2) }}

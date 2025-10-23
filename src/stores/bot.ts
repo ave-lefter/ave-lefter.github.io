@@ -165,7 +165,7 @@ export const useBotStore = defineStore('bot', () => {
       const key = `${addr.address}-${addr.chain}`
       if (!addressKeys.has(key)) {
         addressKeys.add(key)
-        pendingParams.addresses.push(addr) // 深拷贝避免原对象引用干扰
+        pendingParams.addresses.push({...addr}) // 深拷贝避免原对象引用干扰
       }
     })
 
@@ -241,15 +241,17 @@ export const useBotStore = defineStore('bot', () => {
         if (balanceParams.length > 0) {
           const balanceRes = await getChainsTokenBalance(balanceParams);
           (balanceRes || []).forEach((resItem: any) => {
-            addresses.forEach(addr => {
-              if (addr.address === resItem.walletAddress && addr.chain === resItem.chain) {
-                if (!addr.tokenBalances) addr.tokenBalances = {}
-                addr.tokenBalances[resItem.token] = {
-                  chain: resItem.chain,
-                  address: resItem.token,
-                  balance: resItem.balance
+            walletList.value?.forEach(wallet => {
+              wallet.addresses.forEach(addr => {
+                if (addr.address === resItem.walletAddress && addr.chain === resItem.chain) {
+                  if (!addr.tokenBalances) addr.tokenBalances = {}
+                  addr.tokenBalances[resItem.token] = {
+                    chain: resItem.chain,
+                    address: resItem.token,
+                    balance: resItem.balance
+                  }
                 }
-              }
+              })
             })
           })
         }
@@ -272,16 +274,18 @@ export const useBotStore = defineStore('bot', () => {
             item => item.address === priceItem.address && item.chain === chain
           )
           if (targetItem) {
-            addresses.forEach(addr => {
-              if (addr.chain === chain) {
-                if (!addr.tokenBalances) addr.tokenBalances = {}
-                const tokenBalance = addr.tokenBalances[targetItem.address] || {}
-                addr.tokenBalances[targetItem.address] = {
-                  ...tokenBalance,
-                  price: priceItem.price || 0,
-                  logo_url: priceItem.logo_url || ''
+            walletList.value?.forEach(wallet => {
+              wallet.addresses.forEach(addr => {
+                if (addr.chain === chain) {
+                  if (!addr.tokenBalances) addr.tokenBalances = {}
+                  const tokenBalance = addr.tokenBalances[targetItem.address] || {}
+                  addr.tokenBalances[targetItem.address] = {
+                    ...tokenBalance,
+                    price: priceItem.price || 0,
+                    logo_url: priceItem.logo_url || ''
+                  }
                 }
-              }
+              })
             })
           }
         })
@@ -300,12 +304,18 @@ export const useBotStore = defineStore('bot', () => {
 
       // 获取主代币余额
       const balanceRes = await getChainsTokenBalance(balanceParams);
-      (balanceRes || []).forEach((resItem: any, index: number) => {
-        const addr = addresses[index]
-        if (addr) {
-          addr.balance = resItem?.balance || 0
-          addr.decimals = resItem.decimals || resItem.decimal
-        }
+      (balanceRes || []).forEach((resItem: any) => {
+        // const addr = addresses[index]
+        const addresses = walletList.value.find(i => i.addresses?.some(a => a.address === resItem.walletAddress && a.chain === resItem.chain))?.addresses
+        const addr = addresses?.find?.(a => a.address === resItem.walletAddress && a.chain === resItem.chain)
+        walletList.value?.forEach(wallet => {
+          wallet.addresses.forEach(addr => {
+            if (addr.address === resItem.walletAddress && addr.chain === resItem.chain) {
+              addr.balance = resItem?.balance || 0
+              addr.decimals = resItem.decimals || resItem.decimal
+            }
+          })
+        })
       })
 
       // 获取主代币价格
@@ -317,11 +327,16 @@ export const useBotStore = defineStore('bot', () => {
       )
       const priceRes = await getTokensPrice(tokenIds)
       priceRes?.forEach((priceItem: any, index: number) => {
-        const addr = addresses[index]
-        if (addr) {
-          addr.price = priceItem?.current_price_usd || 0
-          addr.logo_url = priceItem?.logo_url || ''
-        }
+        let chain = tokenIds[index].split('-')[1]
+        walletList.value.forEach(i => {
+          i.addresses?.forEach(a => {
+            if (a.chain === chain) {
+              const addr = a
+              addr.price = priceItem?.current_price_usd || 0
+              addr.logo_url = priceItem?.logo_url || ''
+            }
+          })
+        })
       })
     }
   }

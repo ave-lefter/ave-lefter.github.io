@@ -842,7 +842,7 @@ async function submitBotSwap() {
           const walletName = botStore.walletList?.find?.(j => j?.addresses?.find?.(k => k?.chain === chain)?.address === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
             // this.$store.state.bot.historyUpdate++
-            tokenStore.placeOrderUpdate++
+            // tokenStore.placeOrderUpdate++
             ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
             // if (!['myBotHistory', 'myBotPosition']?.includes(this.$store.state.tabActive)) {
             //   this.$store.state.tabActive = 'myBotHistory'
@@ -960,7 +960,7 @@ async function submitBotSwap() {
         res?.forEach?.((txInfo: any) => {
           const walletName = botStore.walletList?.find?.(j => j?.evmAddress?.toLowerCase?.() === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
-            tokenStore.placeOrderUpdate++
+            // tokenStore.placeOrderUpdate++
             ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
             loadingSwap.value = false
             amountNative.value = ''
@@ -990,6 +990,8 @@ async function submitBotSwap() {
           const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
             const _batchId = subscribeResult.batchId
             const txInfo1 = subscribeResult?.txList?.[0]
+            console.log('txInfo1', txInfo1)
+            console.log('txInfo', txInfo, _batchId?.includes?.(batchId) && txInfo.creatorAddress === txInfo1?.walletAddress)
             if (_batchId?.includes?.(batchId) && txInfo.creatorAddress === txInfo1?.walletAddress) {
               if (Timer) {
                 clearTimeout(Timer)
