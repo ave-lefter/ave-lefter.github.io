@@ -11,14 +11,15 @@
           <Icon :key="isEnableHotkey" v-tooltip="isEnableHotkey ? $t('hotkeyTips') : $t('hotkeyTips1')" class="text-14px color-[--secondary-text] clickable" :class="{ 'color-[--primary-color]!': isEnableHotkey }" name="ri:keyboard-box-fill" @click.stop="isEnableHotkey = !isEnableHotkey" @mousedown.stop />
           <Icon :key="isEnablePnL" v-tooltip="isEnablePnL ? $t('enablePnLTips2') : $t('enablePnLTips1')" name="bx:bxs-bar-chart-alt-2" class="text-14px color-[--secondary-text] clickable ml-5px" :class="{ 'color-[--primary-color]!': isEnablePnL }" @mousedown.stop @click.stop="isEnablePnL = !isEnablePnL" />
           <Icon :key="isEnableShowsReflected" v-tooltip="isEnableShowsReflected ? $t('disableShowsReflected') : $t('enableShowsReflected')" name="ph:approximate-equals-bold" class="text-14px color-[--secondary-text] clickable ml-5px" :class="{ 'color-[--primary-color]!': isEnableShowsReflected }" @mousedown.stop @click.stop="isEnableShowsReflected = !isEnableShowsReflected" />
-          <div class="tabs-1 ml-5px">
+          <!-- <div class="tabs-1 ml-5px">
             <button
               v-for="item in BotSettingsArr" :key="item.value"
               :class="{ 'active': item.value === botSettings?.[chain]?.selected }" type="button" @mousedown.stop
               @click.stop="botSettings[chain]!.selected = item.value">{{ item.label }}</button>
-          </div>
-          <SlippageSetMarket class="ml-5px" :chain="chain" @mousedown.stop />
+          </div> -->
+          <!-- <SlippageSetMarket class="ml-5px" :chain="chain" @mousedown.stop /> -->
         </div>
+        <SlippageSetMarket class="mr-10px ml-auto" :chain="chain" @mousedown.stop />
         <Icon
           class="text-14px clickable color-[--main-text] clickable" name="ri:close-large-fill"
           @click.stop="visible = false" @mousedown.stop />
@@ -26,7 +27,13 @@
       <el-divider class="b-t-color-[--dialog-divider]! mt-10px! mb-5px!" />
       <div class="content">
         <div class="flex-between mt-10px">
-          <span class="mr-auto">{{ $t('buy') }}</span>
+          <span>{{ $t('buy') }}</span>
+          <div class="tabs-1 ml-5px mr-auto">
+            <button
+              v-for="item in BotSettingsArr" :key="item.value"
+              :class="{ 'active': item.value === botSettings?.[chain]?.buy?.selected }" type="button" @mousedown.stop
+              @click.stop="botSettings[chain]!.buy!.selected = item.value">{{ item.label }}</button>
+          </div>
           <span v-if="isEnableShowsReflected && Number(estimateBuyAmount) > 0" class="mr-5px">≈{{ formatNumber(estimateBuyAmount, 3) }} {{ tokenStore.swap.token?.symbol || tokenStore.token?.symbol || '' }}</span>
           <span class="color-[--secondary-text]">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.native?.balance || 0)
             }}&nbsp;{{ getChainInfo(chain)?.main_name }}</span>
@@ -34,13 +41,21 @@
         </div>
         <div class="mt-10px tabs">
           <el-button
-            v-for="(item, $index) in botSettings?.[chain]![selected]?.buyValueList"
+            v-for="(item, $index) in botSettings?.[chain]?.buy![botSettings?.[chain]?.buy?.selected || 's1']?.buyValueList"
             :key="$index" class="one-click-button green clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :loading="loadingSwapBuy[$index]"
             :disabled="loadingSwapBuy[$index]" @click.stop.prevent="submitBotSwap(item, 'buy', $index)" @mousedown.stop @mouseover.stop="hoverBuyAmount = item" @mouseleave.stop="hoverBuyAmount = ''">{{
               !loadingSwapBuy[$index] ? item : '' }}</el-button>
         </div>
-        <div class="flex-between mt-20px">
-          <span class="mr-auto">{{ $t('sell') }}</span>
+        <BottomSetting activeTab="buy" :gasPrice="tokenStore.gasPrice" @mousedown.stop />
+        <el-divider class="b-t-color-[--dialog-divider]! mt-10px! mb-5px!" />
+        <div class="flex-between mt-10px">
+          <span>{{ $t('sell') }}</span>
+          <div class="tabs-1 ml-5px mr-auto">
+            <button
+              v-for="item in BotSettingsArr" :key="item.value"
+              :class="{ 'active': item.value === botSettings?.[chain]?.sell?.selected }" type="button" @mousedown.stop
+              @click.stop="botSettings[chain]!.sell!.selected = item.value">{{ item.label }}</button>
+          </div>
           <span v-if="isEnableShowsReflected && Number(estimateSellAmount) > 0" class="mr-5px">≈{{ formatNumber(estimateSellAmount, 3) }} {{ getChainInfo(chain)?.main_name || '' }}</span>
           <span class="color-[--secondary-text]">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.token?.balance || 0)
             }}&nbsp;{{ tokenStore.token?.symbol || '' }}</span>
@@ -48,15 +63,16 @@
         </div>
         <div class="mt-10px tabs">
           <el-button
-            v-for="(item, $index) in botSettings?.[chain]![selected]?.sellPerList"
+            v-for="(item, $index) in botSettings?.[chain]?.sell![botSettings?.[chain]?.sell?.selected || 's1']?.sellPerList"
             :key="$index" class="one-click-button red clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :loading="loadingSwapSell[$index]"
             :disabled="loadingSwapSell[$index]" @click.stop.prevent="handleSellAmount(item, $index)" @mousedown.stop @mouseover.stop="hoverSellAmount = item" @mouseleave.stop="hoverSellAmount = ''">{{
               !loadingSwapSell[$index] ? item + '%' : ''
             }}</el-button>
         </div>
+        <BottomSetting activeTab="sell" :gasPrice="tokenStore.gasPrice" @mousedown.stop />
       </div>
 
-      <Holding v-show="isEnablePnL" isForceShow class="b-t-solid b-t-1px b-color-[--dialog-divider] mt-15px rd-0! pb-0! mb-0! gap-8px bg-transparent!" />
+      <Holding v-show="isEnablePnL" isForceShow class="b-t-solid b-t-1px b-color-[--dialog-divider] mt-10px rd-0! pb-0! mb-0! gap-8px bg-transparent!" />
     </template>
 
   </div>
@@ -77,6 +93,7 @@ import SlippageSetMarket from './slippageSetMarket.vue'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
 import Holding from './holding.vue'
+import BottomSetting from './bottomSetting.vue'
 
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
@@ -150,11 +167,13 @@ function addSpaceKeyDownEvent() {
     if (isCanKeySwap.value && isEnableHotkey.value) {
       const index = ['q', 'w', 'e', 'r'].indexOf(e.key)
       if (index >= 0) {
-        submitBotSwap(botSettings.value?.[chain.value]![selected.value]?.buyValueList[index], 'buy', index)
+        const _selected = botSettingStore.botSettings?.[chain.value]?.buy?.selected
+        submitBotSwap(botSettings.value?.[chain.value]![_selected || selected.value]?.buyValueList[index], 'buy', index)
       }
       const index2 = ['a', 's', 'd', 'f'].indexOf(e.key)
       if (index2 >= 0) {
-        submitBotSwap(botSettings.value?.[chain.value]![selected.value]?.sellPerList[index2], 'sell', index2)
+        const _selected = botSettingStore.botSettings?.[chain.value]?.sell?.selected
+        submitBotSwap(botSettings.value?.[chain.value]![_selected || selected.value]?.sellPerList[index2], 'sell', index2)
       }
     }
   })
@@ -204,7 +223,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
   const native = chainMainToken?.[chain] || NATIVE_TOKEN
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
   if (chain === 'solana') {
-    const botSettings = botSettingStore.botSettings?.solana
+    const botSettings = botSettingStore.botSettings?.solana?.[type]
     const selected = botSettings?.selected as BotSettingKey
     const botSetting = botSettings?.[selected]
     const mev = botSetting?.mev
@@ -297,7 +316,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       }
     })
   } else if (isEvmChain(chain)) {
-    const botSettings = botSettingStore.botSettings?.[chain]
+    const botSettings = botSettingStore.botSettings?.[chain]?.[type]
     const selected = botSettings?.selected as BotSettingKey
     const botSetting = botSettings?.[selected]
     const mev = botSetting?.mev
