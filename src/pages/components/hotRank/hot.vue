@@ -202,8 +202,8 @@ function getKlinePreviews() {
       '5m':300,
       '15m':900,
       '1h':3600,
-      '4h':14400,
-      '24h':86400
+      '4h':3600,
+      '24h':3600
     }[globalStore.rankCommon.activeInterval]),
     pair_ids
   }).then((res)=>{

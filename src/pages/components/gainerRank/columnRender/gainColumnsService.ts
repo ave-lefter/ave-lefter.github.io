@@ -45,13 +45,13 @@ export function getGainDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       render: 'poolPairContent',
       minWidth: 320
     },
-    {
-      title:t('trendChart'),
-      isVisible: true,
-      key:'trendChart',
-      render:'trendChart',
-      minWidth:232,
-    },
+    // {
+    //   title:t('trendChart'),
+    //   isVisible: true,
+    //   key:'trendChart',
+    //   render:'trendChart',
+    //   minWidth:232,
+    // },
     {
       title: t('smarter1'),
       key: 'smart_money_buy_volume_24h',

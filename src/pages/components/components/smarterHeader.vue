@@ -50,7 +50,7 @@ function confirm(params1?: [string, string], params2?: [string, string]) {
 
 watch(()=>{
   const newFilter = globalStore.rankConditions[globalStore.rankActiveTab]?.filter
-  return [newFilter.smart_money_buy_count_24h_min,newFilter.smart_money_buy_count_24h_max,newFilter.smart_money_sell_count_24h_min,newFilter.smart_money_sell_count_24h_max,globalStore.rankActiveTab,globalStore.rankCommon.activeInterval]
+  return [newFilter?.smart_money_buy_count_24h_min,newFilter?.smart_money_buy_count_24h_max,newFilter?.smart_money_sell_count_24h_min,newFilter?.smart_money_sell_count_24h_max,globalStore.rankActiveTab,globalStore.rankCommon.activeInterval]
 },([buyMin,buyMax,sellMin,sellMax,newActiveTab,newInterval],[,,,,oldActiveTab,oldInterval])=>{
   if(newActiveTab !== oldActiveTab || newInterval !== oldInterval){
     return

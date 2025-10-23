@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { useStorage } from '@vueuse/core'
 import { getNewDefaultColumns } from './columnRender/newColumnsService'
-import { getTreasureList, klinePreviews, type IGetTreasureConfig } from '~/api/market'
+import { getTreasureList, type IGetTreasureConfig } from '~/api/market'
 import {
   PriceContent,
   PriceHeader,
@@ -35,8 +35,6 @@ import {
   Snipers1mHeader,
   Snipers1mContent,
   DexHeader,
-  TrendChart,
-  TrendChartHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
 import type { RowEventHandlerParams } from 'element-plus'
@@ -44,7 +42,6 @@ import dayjs from 'dayjs'
 
 const { t } = useI18n()
 const globalStore = useGlobalStore()
-const klineChartsData = ref<any[]>([])
 
 const props = defineProps<{
   listMapFunction(i: Record<string, any>): Record<string, any>
@@ -114,28 +111,6 @@ watch(
   }
 )
 
-watch(()=>[globalStore.rankCommon.activeInterval],()=>{
-  getKlinePreviews()
-})
-
-function getKlinePreviews() {
-  const pair_ids = listData.value.map(el=>el.pair_id).toString()
-  return klinePreviews({
-    category:'u',
-    interval:({
-      '1m':60,
-      '5m':300,
-      '15m':900,
-      '1h':3600,
-      '4h':14400,
-      '24h':86400
-    }[globalStore.rankCommon.activeInterval]),
-    pair_ids
-  }).then((res)=>{
-    klineChartsData.value = res || []
-  })
-}
-
 let timer: number
 async function _getTreasureList(shouldLoading = true) {
   try {
@@ -159,7 +134,6 @@ async function _getTreasureList(shouldLoading = true) {
     })
     pageInfo.value.total = res.total
     listData.value = (res.data || []).map(props.listMapFunction)
-    getKlinePreviews()
     if (shouldLoading) {
       initWs()
     }
@@ -269,7 +243,6 @@ const headerRenderer = computed(() => {
   return {
     poolPair: PoolPairHeader,
     // headline: () => t('aiSummary'),
-    trendChart:TrendChartHeader,
     current_price_usd: PriceHeader,
     mCap: MCapHeader,
     price_change_1m: DynamicPriceChangeHeader,
@@ -298,10 +271,6 @@ const cellRenderer = computed(() => {
   return {
     poolPair: PoolPairContent,
     // headline: Headline,
-    trendChart:({row})=>{
-      const klineData = klineChartsData.value.find(el=>el.pair === row.pair && el.chain === row.chain)
-      return <TrendChart list={klineData?.kline_data || []}/>
-    },
     mCap: MCapContent,
     current_price_usd: PriceContent,
     price_change_1m: ({ row }) => {
