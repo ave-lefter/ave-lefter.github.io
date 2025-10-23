@@ -1450,5 +1450,6 @@
   "startSwap": "开始交易",
   "useChainWallet": "请使用链钱包交互当前代币",
   "pushSettings": "推送设置",
-  "newFeature":"新功能"
+  "newFeature":"新功能",
+  "CreatePair":"创建池子"
 }

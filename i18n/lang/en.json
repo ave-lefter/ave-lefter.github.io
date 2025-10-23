@@ -1452,5 +1452,6 @@
   "startSwap": "Start Swap",
   "useChainWallet": "Please use the chain wallet to interact with the current token",
   "pushSettings": "Push Settings",
-  "newFeature":"New Feature"
+  "newFeature":"New Feature",
+  "CreatePair":"Create Pair"
 }
