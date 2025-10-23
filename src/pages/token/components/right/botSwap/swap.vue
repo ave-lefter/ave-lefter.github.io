@@ -653,7 +653,6 @@ async function quoteBot(chain: string, type = props.activeTab, isGetPrice = true
   const fromPrice = isBuy ? payTokenPrice : price
   const toPrice = isBuy ? price : payTokenPrice
   const res = Number(fromAmount) * (fromPrice || 0) / (toPrice || 1)
-  console.log('res', res)
   if (res) {
     if (type === 'buy') {
       amountNativeOut.value = String(res) || '0'
