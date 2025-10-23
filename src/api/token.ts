@@ -600,7 +600,7 @@ export function getUserTxs(token_id: string, address: string) {
   })
 }
 
-export function getTokensPrice(tokenIds: string[]) {
+export const getTokensPrice = createCacheRequest(function(tokenIds: string[]) {
   const ids = tokenIds.map(i => {
     const [token, chain] = getAddressAndChainFromId(i, 1)
     if (token && chain && (token === NATIVE_TOKEN || token === 'sol')) {
@@ -618,7 +618,7 @@ export function getTokensPrice(tokenIds: string[]) {
   }).then(async res => {
     return ids.map(i => res[i])
   })
-}
+}, 3000)
 
 export interface GetTokenDetailsLineResponse {
   time: number;

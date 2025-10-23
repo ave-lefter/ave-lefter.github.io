@@ -131,12 +131,9 @@ export const useBotStore = defineStore('bot', () => {
     }
     for(let k = 0; k < walletList.value.length; k++) {
       let i = walletList.value[k]
-      let _item = item
+      let _item: typeof item | string = item
       if (item?.address === NATIVE_TOKEN || item?.address === 'sol') {
-        _item = null
-      }
-      if (k > 0) {
-        await sleep(800)
+        _item = item.chain
       }
       _getUserAllChainBalance(i?.addresses || [], _item)
     }
@@ -145,96 +142,190 @@ export const useBotStore = defineStore('bot', () => {
     }
   }
 
-  function _getUserAllChainBalance(addresses: Array<AddressItem> = [], item: {address: string, chain: string} | null = null) {
+  // 防抖合并相关变量
+  let debounceTimer: NodeJS.Timeout | null = null
+  const pendingParams: {
+    addresses: AddressItem[]
+    items: Array<{ address: string; chain: string } | null>
+  } = {
+    addresses: [],
+    items: []
+  }
+
+  async function _getUserAllChainBalance(addresses: Array<AddressItem> = [], item: {address: string, chain: string} | string | null = null): Promise<void> {
     if (!accessToken.value) {
       return
     }
-    const chainMainToken: { [key: string]: string } = {
+    // 1. 合并参数（去重处理）
+    // 合并addresses（按address+chain唯一标识去重）
+    const addressKeys = new Set(
+      pendingParams.addresses.map(addr => `${addr.address}-${addr.chain}`)
+    );
+    addresses.forEach(addr => {
+      const key = `${addr.address}-${addr.chain}`
+      if (!addressKeys.has(key)) {
+        addressKeys.add(key)
+        pendingParams.addresses.push(addr) // 深拷贝避免原对象引用干扰
+      }
+    })
+
+    // 合并items（非null项按address+chain去重）
+    if (item && typeof item === 'object') {
+      const itemKey = `${item.address}-${item.chain}`;
+      const isDuplicate = pendingParams.items.some(
+        i => i && `${i.address}-${i.chain}` === itemKey
+      );
+      if (!isDuplicate) {
+        pendingParams.items.push({ ...item }); // 深拷贝
+      }
+    }
+
+    // 2. 防抖逻辑：0.5秒后执行合并后的参数
+    if (debounceTimer) clearTimeout(debounceTimer);
+
+    return new Promise(resolve => {
+      debounceTimer = setTimeout(async () => {
+        // 执行处理逻辑（使用合并后的参数）
+        await processMergedParams(
+          [...pendingParams.addresses],
+          [...pendingParams.items],
+          item
+        );
+        // 重置参数，准备下一次合并
+        pendingParams.addresses = []
+        pendingParams.items = [];
+        debounceTimer = null
+        resolve()
+      }, 500)
+    })
+  }
+  /**
+   * 处理合并后的参数（核心业务逻辑）
+   */
+  async function processMergedParams(
+    addresses: AddressItem[],
+    items: Array<{ address: string; chain: string } | null>,
+    item: {address: string, chain: string} | string | null
+  ) {
+    if (!accessToken.value) return;
+
+    const chainMainToken: Record<string, string> = {
       solana: 'sol',
       ton: 'TON',
     }
-    if (addresses && addresses?.length > 0) {
-      if (item) {
-        const tokens = addresses.map((i) => {
-          return {
-            chain: i.chain,
-            tokens: [item?.address],
-            walletAddress: i.address
-          }
-        })?.filter(j => j.chain === item?.chain)
-        getChainsTokenBalance(tokens).then(res => {
-          if (Array.isArray(addresses)) {
-            (res || []).forEach?.((i: { balance: any; decimals: any; decimal: any; chain: string; token: string }) => {
-              addresses?.forEach?.((j) => {
-                if (j.chain === i.chain) {
-                  if (!j.tokenBalances) {
-                    j.tokenBalances = {}
-                  }
-                  j.tokenBalances[item.address] = {
-                    chain: i.chain,
-                    address: item.address,
-                    balance: i.balance
-                  }
+
+    if (addresses.length === 0) return
+
+    // 处理带item的情况（批量处理所有item）
+    const validItems = items.filter(Boolean) as Array<{ address: string; chain: string }>
+    if (validItems.length > 0) {
+      // 按chain分组，减少同链重复请求
+      const chainGroups = validItems.reduce((groups, item) => {
+        const chain = item.chain
+        if (!groups[chain]) groups[chain] = []
+        groups[chain].push(item)
+        return groups
+      }, {} as Record<string, Array<{ address: string; chain: string }>>)
+
+      // 逐个链处理
+      for (const [chain, chainItems] of Object.entries(chainGroups)) {
+        // 1. 批量获取余额
+        const balanceParams = addresses
+          .filter(addr => addr.chain === chain)
+          .map(addr => ({
+            chain: addr.chain,
+            tokens: chainItems.map(item => item.address), // 合并当前链的所有token
+            walletAddress: addr.address
+          }))
+
+        if (balanceParams.length > 0) {
+          const balanceRes = await getChainsTokenBalance(balanceParams);
+          (balanceRes || []).forEach((resItem: any) => {
+            addresses.forEach(addr => {
+              if (addr.address === resItem.walletAddress && addr.chain === resItem.chain) {
+                if (!addr.tokenBalances) addr.tokenBalances = {}
+                addr.tokenBalances[resItem.token] = {
+                  chain: resItem.chain,
+                  address: resItem.token,
+                  balance: resItem.balance
                 }
-              })
-              // if ((i?.token === NATIVE_TOKEN || i?.token === 'sol') && i.chain === tokenStore.swap.native?.chain) {
-              //   tokenStore.swap.native.balance = i.balance
-              // }
-              // if (i?.token === tokenStore.swap.token?.address && i.chain === tokenStore.swap.token?.chain) {
-              //   tokenStore.swap.token.balance = i.balance
-              // }
-              // if (i?.token === tokenStore.swap.payToken?.address && i.chain === tokenStore.swap.payToken?.chain) {
-              //   tokenStore.swap.payToken.balance = i.balance
-              // }
+              }
             })
-          }
-        })
-        const tokenIds = [item?.address + '-' + item?.chain]
-        getTokensPrice(tokenIds).then(res => {
-          if (Array.isArray(addresses)) {
-            addresses?.forEach?.((j) => {
-              if (j.chain === item?.chain) {
-                if (!j.tokenBalances) {
-                  j.tokenBalances = {}
+          })
+        }
+
+        // 2. 批量获取价格
+        const tokenIds = chainItems.map(item => `${item.address}-${item.chain}`)
+        const baseTokens = botSwapStore.botSwapBaseTokens[chain as BotChain] || []
+        // 优先使用本地缓存的USD代币价格
+        const cachedPrices = baseTokens.filter(t =>
+          tokenIds.includes(`${t.address}-${t.chain}`) && t.symbol?.includes('USD')
+        )
+        // 本地无缓存则调用接口
+        const priceRes = cachedPrices.length > 0
+          ? cachedPrices
+          : await getTokensPrice(tokenIds)
+
+        // 更新价格信息
+        priceRes.forEach((priceItem: any) => {
+          const targetItem = chainItems.find(
+            item => item.address === priceItem.address && item.chain === chain
+          )
+          if (targetItem) {
+            addresses.forEach(addr => {
+              if (addr.chain === chain) {
+                if (!addr.tokenBalances) addr.tokenBalances = {}
+                const tokenBalance = addr.tokenBalances[targetItem.address] || {}
+                addr.tokenBalances[targetItem.address] = {
+                  ...tokenBalance,
+                  price: priceItem.price || 0,
+                  logo_url: priceItem.logo_url || ''
                 }
-                if (!j.tokenBalances[item.address]) {
-                  j.tokenBalances[item.address] = {} as any
-                }
-                j.tokenBalances[item.address].price = res?.[0]?.price || 0
-                j.tokenBalances[item.address].logo_url = res?.[0]?.logo_url || ''
               }
             })
           }
         })
-        return
       }
-      const tokens = addresses.map((i) => {
-        return {
-          chain: i.chain,
-          tokens: [chainMainToken[i.chain] || NATIVE_TOKEN],
-          walletAddress: i.address
+    } else {
+      // 处理无item的情况（获取主代币信息）
+      let balanceParams = addresses.map(addr => ({
+        chain: addr.chain,
+        tokens: [chainMainToken[addr.chain] || NATIVE_TOKEN],
+        walletAddress: addr.address
+      }))
+
+      if (item && typeof item === 'string') {
+        balanceParams = balanceParams?.filter?.(i => i.chain === item) || []
+      }
+
+      // 获取主代币余额
+      const balanceRes = await getChainsTokenBalance(balanceParams);
+      (balanceRes || []).forEach((resItem: any, index: number) => {
+        const addr = addresses[index]
+        if (addr) {
+          addr.balance = resItem?.balance || 0
+          addr.decimals = resItem.decimals || resItem.decimal
         }
       })
-      getChainsTokenBalance(tokens).then(res => {
-        if (Array.isArray(addresses)) {
-          (res || []).forEach?.((i: { balance: any; decimals: any; decimal: any }, k: number) => {
-            addresses[k] = { ...addresses?.[k], balance: i?.balance || 0, decimals: i.decimals || i.decimal }
-          })
-        }
-      })
-      const chainMainToken1: { [key: string]: string } = {
+
+      // 获取主代币价格
+      const chainMainToken1: Record<string, string> = {
         solana: 'So11111111111111111111111111111111111111112',
       }
-      const tokenIds = addresses?.map(i => ((chainMainToken1?.[i.chain] || NATIVE_TOKEN) + '-' +  i.chain))
-      getTokensPrice(tokenIds).then(res => {
-        if (Array.isArray(addresses)) {
-          res?.forEach?.((i, k) => {
-            addresses[k] = {...addresses?.[k], price: i?.current_price_usd || 0, logo_url: i?.logo_url || ''}
-          })
+      const tokenIds = addresses.map(addr =>
+        `${chainMainToken1[addr.chain] || NATIVE_TOKEN}-${addr.chain}`
+      )
+      const priceRes = await getTokensPrice(tokenIds)
+      priceRes?.forEach((priceItem: any, index: number) => {
+        const addr = addresses[index]
+        if (addr) {
+          addr.price = priceItem?.current_price_usd || 0
+          addr.logo_url = priceItem?.logo_url || ''
         }
       })
     }
   }
+
   const subBalanceChange = debounce(_subBalanceChange, 1000)
   function _subBalanceChange() {
     const addresses = (walletList.value || []).reduce((pre: string[], cur) => {

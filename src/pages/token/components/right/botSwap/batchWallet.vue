@@ -37,7 +37,7 @@
               <div class="flex items-center" style="flex: 1.5">
                 <el-checkbox :key="item.evmAddress" class="[&&]:[--el-checkbox-disabled-checked-icon-color:#FFF] [&&]:[--el-checkbox-disabled-checked-input-fill:#3F80F7] [&&]:[--el-checkbox-disabled-checked-input-border-color:#3F80F7] batch-checkbox" :value="item.evmAddress" :disabled="item.evmAddress === botStore.evmAddress" :checked="item.evmAddress === botStore.evmAddress" />
                 <div class="text-12px lh-14px" @click.stop>
-                  <div class="color-[--main-text] flex">{{ item.name }}</div>
+                  <div class="color-[--main-text] overflow-hidden text-ellipsis whitespace-nowrap max-w-100px" :title="item.name">{{ item.name }}</div>
                   <div class="color-[--third-text] flex items-center" >
                     <span>{{ getAddressFromChain(chain, item.addresses)?.address?.replace(new RegExp('(.{6})(.+)(.{4})'), '$1...$3') }}</span>
                     <Icon v-copy="getAddressFromChain(chain, item.addresses)?.address" name="bxs:copy" class="clickable ml-5px text-12px" />
