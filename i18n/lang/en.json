@@ -1449,5 +1449,8 @@
   "continue": "Continue",
   "lastChance": "Please save the mnemonic words properly. Once closed, they will not be able to be viewed again.",
   "saved": "Saved",
-  "startSwap": "Start Swap"
+  "startSwap": "Start Swap",
+  "useChainWallet": "Please use the chain wallet to interact with the current token",
+  "pushSettings": "Push Settings",
+  "newFeature":"New Feature"
 }

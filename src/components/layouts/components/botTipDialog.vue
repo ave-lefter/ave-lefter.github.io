@@ -233,6 +233,12 @@ watch(newUserNoticeVisible, (val) => {
 watch(()=>[isLatestExperienced.value],()=>{
   dialogVisible.value = !isLatestExperienced.value
 })
+
+defineExpose({
+  openBotTipDialog:()=>{
+    lastExperienceTime.value = 0
+  }
+})
 </script>
 <style lang="scss">
 .dialog-bot-tips.el-dialog {

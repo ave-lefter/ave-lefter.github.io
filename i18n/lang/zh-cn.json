@@ -1447,5 +1447,8 @@
   "continue": "继续",
   "lastChance": "请妥善保存助记词，关闭后将无法再次查看。",
   "saved": "我已保存好助记词",
-  "startSwap": "开始交易"
+  "startSwap": "开始交易",
+  "useChainWallet": "请使用链钱包交互当前代币",
+  "pushSettings": "推送设置",
+  "newFeature":"新功能"
 }
