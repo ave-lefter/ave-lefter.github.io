@@ -140,24 +140,34 @@
       :popper-style="{ padding: 0, 'border-radius': '8px' }"
     >
       <table class="px-10px py-10px text-14px">
-        <tr>
-          <td class="color-[var(--third-text)] text-left text-12px">{{ getChainInfo(currentRow?.chain || '')?.main_name || $t('mainToken') }}</td>
-          <td class="color-[var(--main-text)] text-left pl-5px">
-            {{ formatNumber(currentRow?.mainTokenBalance || 0, 2) }}
-          </td>
-        </tr>
-        <tr>
-          <td class="color-[var(--third-text)] text-left text-12px">USDT</td>
-          <td class="color-[var(--main-text)] text-left pl-5px">
-            {{ formatNumber(currentRow?.usdtTokenBalance || 0, 2) }}
-          </td>
-        </tr>
-        <tr>
-          <td class="color-[var(--third-text)] text-left text-12px">USDC</td>
-          <td class="color-[var(--main-text)] text-left pl-5px">
-            {{ formatNumber(currentRow?.usdcTokenBalance || 0, 2) }}
-          </td>
-        </tr>
+        <tbody>
+          <template v-if="currentRow?.balancesInfo">
+            <tr v-for="(item,$index) in currentRow?.balancesInfo">
+              <td class="color-[var(--third-text)] text-left text-12px">{{ getChainInfo(item?.chain || '')?.main_name  }}</td>
+              <td class="color-[var(--main-text)] text-left pl-5px">
+                {{ formatNumber(item?.mainTokenBalance || 0, 2) }}
+              </td>
+            </tr>
+          </template>
+          <tr v-else>
+            <td class="color-[var(--third-text)] text-left text-12px">{{ getChainInfo(currentRow?.chain || '')?.main_name || $t('mainToken') }}</td>
+            <td class="color-[var(--main-text)] text-left pl-5px">
+              {{ formatNumber(currentRow?.mainTokenBalance || 0, 2) }}
+            </td>
+          </tr>
+          <tr>
+            <td class="color-[var(--third-text)] text-left text-12px">USDT</td>
+            <td class="color-[var(--main-text)] text-left pl-5px">
+              {{ formatNumber(currentRow?.usdtTokenBalance || 0, 2) }}
+            </td>
+          </tr>
+          <tr>
+            <td class="color-[var(--third-text)] text-left text-12px">USDC</td>
+            <td class="color-[var(--main-text)] text-left pl-5px">
+              {{ formatNumber(currentRow?.usdcTokenBalance || 0, 2) }}
+            </td>
+          </tr>
+        </tbody>
       </table>
     </el-popover>
   </div>
@@ -169,6 +179,7 @@ import { ElMessage } from 'element-plus'
 import QrCodeWithLogo from 'qr-code-with-logo'
 import Remark from './remark.vue'
 import { getCurrentInstance } from 'vue'
+import BigNumber from 'bignumber.js'
 
 defineProps({
   tableData: {
@@ -194,7 +205,7 @@ const dialogVisible = shallowRef(false)
 const currentObj = ref<Address | null>(null)
 const showPop = shallowRef(false)
 const currentIndex = shallowRef(0)
-const currentRow = ref<Address | null>(null)
+const currentRow = ref<Wallet | Address| null>(null)
 const $refs = ref({
   buttonRefs: {} as Record<number, any>,
   currentBtnRef: {} as Record<number, any>,
@@ -277,7 +288,46 @@ const getRowClass = ({ row }: { row: any }) => {
 function showPopover(row: Address, $index: number) {
   showPop.value = true
   currentIndex.value = $index
-  currentRow.value = row
+  currentRow.value = { ...row }
+  if (currentRow.value?.balancesInfo) {
+    // currentRow.value.balancesInfo = [
+    //   { mainTokenBalance: '0.0001', chain: 'eth' },
+    //   { mainTokenBalance: '1', chain: 'bsc' },
+    //   { mainTokenBalance: '0.0029', chain: 'base' },
+    //   { mainTokenBalance: '1', chain: 'solana' },
+    //   { mainTokenBalance: '1', chain: 'xlayer' },
+    // ]
+    currentRow.value.balancesInfo = currentRow.value?.balancesInfo?.reduce((acc, cur) => {
+        if (['eth', 'base'].includes(cur.chain)) {
+          const evm = acc.find((item) => item.chain === 'eth')
+          if (evm) {
+            evm.mainTokenBalance = new BigNumber(evm.mainTokenBalance).plus(cur.mainTokenBalance).toFixed()
+            } else {
+                acc.push({ ...cur, chain: 'eth' })
+            }
+        } else {
+            acc.push(cur)
+        }
+        return acc
+    }, [] as typeof currentRow.value.balancesInfo)
+
+    // let hasETH = -1;
+    //   currentRow.value.balancesInfo = currentRow.value?.balancesInfo?.reduce((acc, cur, index) => {
+    //     if (getChainInfo(cur?.chain || '')?.main_name === 'ETH') {
+    //       if (hasETH < 0) {
+    //         hasETH = index
+    //         return [...acc, cur]
+    //       } else  {
+    //         let a = [...acc]
+    //         let a = acc
+    //         a[hasETH].mainTokenBalance = new BigNumber(a[hasETH].mainTokenBalance).plus(cur.mainTokenBalance).toString()
+    //         return a
+    //       }
+    //     } else{
+    //       return [...acc, cur]
+    //     }
+    //   }, [])
+  }
 }
 </script>
 <style lang="scss" scoped>

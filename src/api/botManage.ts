@@ -11,7 +11,7 @@ export interface Wallet {
   source: string
   operate: string
   genSource: 1 | 0
-  balancesInfo: Address[]
+  balancesInfo?: Address[]
 }
 export interface Address {
   id: string
@@ -25,6 +25,7 @@ export interface Address {
   source: string
   operate: string
   isChildren: boolean
+  balancesInfo?: Address[]
 }
 
 export function _getMultiWalletsAllChain(chain: string): Promise<Wallet[]> {
