@@ -262,6 +262,7 @@ import AutoSellSet from './autoSellSet.vue'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
 import delayedNotify from '~/utils/notify'
+import { formatBotError } from '~/utils/bot'
 
 const ElNotification = (arg: any) => delayedNotify({...arg, duration: 2500})
 
@@ -885,7 +886,8 @@ async function submitBotSwap() {
                 ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
               } else {
-                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error', ElNotification)
+                const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
+                handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
               }
               unwatch()
               loadingSwap.value = false
@@ -1002,7 +1004,8 @@ async function submitBotSwap() {
                 ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
               } else {
-                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error', ElNotification)
+                const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
+                handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
               }
               unwatch()
               loadingSwap.value = false
@@ -1140,7 +1143,8 @@ function submitBotLimit() {
                 ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
               } else {
-                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error', ElNotification)
+                const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
+                handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
               }
               unwatch()
               loadingSwap.value = false
@@ -1238,7 +1242,8 @@ function submitBotLimit() {
                 ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
               } else {
-                handleBotError(txInfo1?.walletName + ' ' + txInfo1?.failMessage || 'swap error', ElNotification)
+                const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
+                handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
               }
               unwatch()
               loadingSwap.value = false

@@ -758,7 +758,7 @@ export function getCompletedLimitTx(evmAddress: string): Promise<IGetMarketCompl
 }
 
 //  /swap/getAddressAllBalances
-export function bot_getAddressAllBalances(query: {
+export const bot_getAddressAllBalances = createCacheRequest(function bot_getAddressAllBalances(query: {
   evmAddress: string
   chains?: string
   pinToken?: string
@@ -780,4 +780,4 @@ export function bot_getAddressAllBalances(query: {
     method: 'get',
     query
   })
-}
+}, 1000)
