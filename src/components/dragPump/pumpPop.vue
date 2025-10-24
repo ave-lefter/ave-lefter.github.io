@@ -507,7 +507,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
       <div class="flex items-center gap-8px">
         <signal-quick-buy-input v-model="quickBuyValue" size="small" class="[--el-border-color:transparent]" style="--el-input-bg-color:var(--d-151A22-l-E8F1FF);--el-text-color-regular:var(--d-8CA0C3-l-566275);--el-input-icon-color:var(--d-8CA0C3-l-566275)" />
         <el-select
-          v-model="botSettingStore.botSettings[pumpStore.activeChain]!.selected" fit-input-width size="small"
+          v-model="botSettingStore.botSettings[pumpStore.activeChain]!.buy!.selected" fit-input-width size="small"
           :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px]" popper-class="small-select">
           <el-option v-for="item in BotSettingsArr" :key="item.value" :value="item.value" :label="item.label" />
         </el-select>

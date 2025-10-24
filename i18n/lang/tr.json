@@ -508,5 +508,7 @@
   "holdersChange2": "{N}",
   "lockAmount": "Kilitli miktar",
   "transferToken": "Aktarma jetonunu seçin",
-  "depositTip": "* Mevcut Adres EVM Zinciri Universal"
+  "depositTip": "* Mevcut Adres EVM Zinciri Universal",
+  "buySetting": "kurulumu satın al",
+  "sellSetting": "kurulumu sat"
 }

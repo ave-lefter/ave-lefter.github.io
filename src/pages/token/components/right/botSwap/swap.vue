@@ -124,92 +124,7 @@
       >
         {{ checkAmountMessage() || (activeTab === 'buy' ? $t('buy') : $t('sell')) }}
       </el-button>
-      <div class="mt-10px flex items-center text-11px color-[--main-text]">
-        <template v-if="botSettings[chain || ''] && isCanMev">
-          <span class=" color-[--third-text] mr-4px cursor-pointer">{{ $t('mev') }}</span>
-          <el-switch
-            v-if="chain === 'solana'"
-            v-model="botSettings.solana![botSettings.solana!.selected]!.mev"
-            class="mr-auto"
-            style="--el-switch-on-color: #3c6cf6;zoom: 0.9;height: 14px;"
-            size="small"
-            :before-change="solanaMevBeforeChange"
-          />
-          <el-switch
-            v-else-if="isEvmChain(chain || '')"
-            v-model="botSettings[chain]![botSettings[chain]!.selected].mev"
-            class="mr-auto"
-            style="--el-switch-on-color: #3c6cf6;zoom: 0.9;height: 14px"
-            size="small"
-          />
-        </template>
-        <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-12px color-[--third-text] mr-4px cursor-pointer" />
-        <span v-if="botSettings?.[chain || '']?.[selected]?.slippage !== 'auto'">{{ botSettings?.[chain || '']?.[selected]?.slippage }}%</span>
-        <span v-else>{{ $t('auto') }}</span>
-        <template v-if="isEvmChain(chain || '')">
-          <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="text-12px color-[--third-text] ml-auto mr-4px cursor-pointer" />
-          <span>${{ getEstimatedGas() }}</span>
-        </template>
-        <template v-if="chain === 'solana'">
-          <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-12px color-[--third-text] ml-auto mr-4px cursor-pointer" />
-          <span>{{ botPriorityFee }} SOL</span>
-        </template>
-        <template v-if="activeTab === 'buy' && swapType === 'market' && botSettings?.[chain || '']">
-          <span class="mr-4px ml-auto color-[--third-text]">{{ $t('autoSellHalf') }}</span>
-          <el-switch
-            v-model="botSettingStore.autoSellConfigs.autoSell"
-            size="small"
-            style="--el-switch-on-color: #3c6cf6;zoom: 0.9;height: 14px;"
-          />
-        </template>
-      </div>
-      <!-- <ul class="swap-label">
-        <li v-if="activeTab === 'buy' && swapType === 'market' && botSettings?.[chain || '']" class="slippage-container">
-          <span class="mr-auto color-[--third-text]">{{ $t('autoSellHalf') }}</span>
-          <el-switch
-            v-model="botSettings[chain as string]![botSettings[chain as string]!.selected as 's1' | 's2' | 's3'].autoSell"
-            size="small"
-            style="--el-switch-on-color: #3c6cf6;zoom: 0.9;height: 14px;"
-          />
-        </li>
-        <li v-if="chain === 'solana'" class="slippage-container">
-          <span class="mr-auto color-[--third-text]">{{ $t('priorityFee') }}</span>
-          <span>{{ botPriorityFee }} SOL</span>
-        </li>
-        <li v-else-if="isEvmChain(chain || '')" class="slippage-container">
-          <span class="mr-auto color-[--third-text]">{{ $t('extraGas') }}</span>
-          <span>{{ botPriorityFee }} GWEI</span>
-        </li>
-        <li v-show="isEvmChain(chain || '') && (fromAmount && toAmount) && Number(getEstimatedGas())">
-          <div class="mr-auto color-[--third-text]">
-            {{ $t('estimatedGas') }}
-          </div>
-          <div>
-            ${{ getEstimatedGas() }}
-          </div>
-        </li>
-        <li class="slippage-container">
-          <span class="mr-auto color-[--third-text]">{{ $t('slippage') }}</span>
-          <span v-if="botSettings?.[chain || '']?.[selected]?.slippage !== 'auto'">{{ botSettings?.[chain || '']?.[selected]?.slippage }}%</span>
-          <span v-else>{{ $t('auto') }}</span>
-        </li>
-        <li v-if="botSettings[chain || ''] && isCanMev" class="slippage-container">
-          <span class="mr-auto color-[--third-text]">{{ $t('protection') }}</span>
-          <el-switch
-            v-if="chain === 'solana'"
-            v-model="botSettings.solana![botSettings.solana!.selected as 's1' | 's2' | 's3']!.mev"
-            style="--el-switch-on-color: #3c6cf6;zoom: 0.9;height: 14px;"
-            size="small"
-            :before-change="solanaMevBeforeChange"
-          />
-          <el-switch
-            v-else-if="isEvmChain(chain || '')"
-            v-model="botSettings[chain as string]![botSettings[chain as string]!.selected as 's1' | 's2' | 's3'].mev"
-            style="--el-switch-on-color: #3c6cf6;zoom: 0.9;height: 14px"
-            size="small"
-          />
-        </li>
-      </ul> -->
+      <BottomSetting :activeTab="activeTab" :swapType="swapType" :gasPrice="gasPrice" />
     </template>
 
     <div v-else-if="!botStore?.userInfo?.evmAddress" class="connect-wallet-btn">
@@ -252,6 +167,7 @@ import { useEventBus } from '@vueuse/core'
 import AutoSellSet from './autoSellSet.vue'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
+import BottomSetting from './bottomSetting.vue'
 
 interface Token {
   address?: string
@@ -372,7 +288,6 @@ function updateStorePriceLimit() {
   })
 }
 
-const gasPrice = ref(0)
 
 const route = useRoute()
 
@@ -383,7 +298,9 @@ const botSettingStore = useBotSettingStore()
 const wsStore = useWSStore()
 const configStore = useConfigStore()
 
-const { botSettings } = storeToRefs(botSettingStore)
+const {gasPrice} = storeToRefs(tokenStore)
+
+// const { botSettings } = storeToRefs(botSettingStore)
 
 
 const { getTokensPrice, allowance, getAllowance, loadingAllowance, checkApproveAndApprove, bot_approve } = useBotSwap()
@@ -413,37 +330,6 @@ const fromAmount = computed(() => {
 const toAmount = computed(() => {
   return props.activeTab === 'buy' ? amountNativeOut.value : amountTokenOut.value
 })
-
-const isCanMev = computed(() => {
-  const chain = getChain()
-  const { gasTip1List } = formatBotGasTips(botSwapStore?.gasTip, chain)
-  return gasTip1List?.length > 1
-})
-
-const selected = computed(() => {
-  const chain = getChain()
-  if (!botStore.isSupportChains.includes(chain)) {
-    return '' as BotSettingKey
-  }
-  return botSettingStore?.botSettings?.[chain]?.selected as BotSettingKey
-})
-
-const botPriorityFee = computed(() => {
-  const chain = getChain()
-  if (!botStore.isSupportChains.includes(chain)) {
-    return ''
-  }
-  const selected = botSettingStore?.botSettings?.[chain]?.selected as BotSettingKey
-  const botSettings = botSettingStore.botSettings?.[chain]?.[selected]
-  const mev = botSettings?.mev
-  const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
-  const gasTips = mev ? gasTip1List : gasTip2List
-  const gasIndex = mev ? 0 : 1
-  const settings = botSettings?.gas[gasIndex]
-  const priorityFee = settings?.customFee || gasTips?.[settings?.level as number]
-  return priorityFee
-})
-
 
 const   swapButtonColor= computed(() => {
   if (!isSupportSwap.value) {
@@ -699,8 +585,8 @@ async function submitBotSwap() {
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
   if (chain === 'solana') {
     // let mev = this.botSettings?.solana?.mev
-    const selected = botSettingStore?.botSettings?.solana?.selected as BotSettingKey
-    const botSettings = botSettingStore.botSettings?.solana?.[selected]
+    const selected = botSettingStore?.botSettings?.solana?.[props.activeTab]?.selected || botSettingStore?.botSettings?.solana?.selected || 's1'
+    const botSettings = botSettingStore.botSettings?.solana?.[props.activeTab]?.[selected]
     const mev = botSettings?.mev
 
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, 'solana')
@@ -715,7 +601,7 @@ async function submitBotSwap() {
     // botPriorityFee = botPriorityFee.lt(min) ? min : botPriorityFee.toFixed(0)
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
-    const slippage = botSettingStore.botSettings?.solana?.[botSettingStore.botSettings?.solana?.selected]?.slippage || 9
+    const slippage = botSettings?.slippage || 9
     const data = {
       batchId: Date.now().toString(),
       swapList: [{
@@ -789,7 +675,8 @@ async function submitBotSwap() {
       loadingSwap.value = false
     })
   } else if (isEvmChain(chain)) {
-    const botSettings = botSettingStore.botSettings?.[chain as BotChain]?.[botSettingStore.botSettings?.[chain as BotChain]?.selected as BotSettingKey]
+    const selected = botSettingStore.botSettings?.[chain as BotChain]?.[props.activeTab]?.selected || 's1'
+    const botSettings = botSettingStore.botSettings?.[chain as BotChain]?.[props.activeTab]?.[selected]
     const mev = botSettings?.mev
     const slippage = botSettings?.slippage || 9
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
@@ -900,7 +787,7 @@ function submitBotLimit() {
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
   if (chain === 'solana') {
     // let mev = this.botSettings?.solana?.mev
-    const selected = botSettingStore?.botSettings?.solana?.selected as BotSettingKey
+    const selected = botSettingStore?.botSettings?.solana?.[props.activeTab]?.selected || botSettingStore.botSettings?.solana?.selected || 's1'
     const botSettings = botSettingStore.botSettings?.solana?.[selected]
     const mev = botSettings?.mev
 
@@ -917,7 +804,7 @@ function submitBotLimit() {
     // botPriorityFee = botPriorityFee.lt(min) ? min : botPriorityFee.toFixed(0)
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     // const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.native
-    const slippage = botSettingStore.botSettings?.solana?.[botSettingStore.botSettings?.solana?.selected]?.slippage || 9
+    const slippage = botSettings?.slippage || 9
     const data = {
       batchId: Date.now().toString(),
       swapList: [{
@@ -988,7 +875,8 @@ function submitBotLimit() {
       loadingSwap.value = false
     })
   } else if (isEvmChain(chain)) {
-    const botSettings = botSettingStore.botSettings?.[chain]?.[botSettingStore.botSettings?.[chain]?.selected]
+    const selected = botSettingStore?.botSettings?.[chain]?.[props.activeTab]?.selected || botSettingStore.botSettings?.[chain]?.selected || 's1'
+    const botSettings = botSettingStore.botSettings?.[chain]?.[props.activeTab]?.[selected]
     const mev = botSettings?.mev
     const slippage = botSettings?.slippage || 9
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
@@ -1078,32 +966,6 @@ function getGasPrice() {
   })
 }
 
-function getEstimatedGas() {
-  const chain = getChain()
-  if (isEvmChain(chain) && botStore?.isSupportChains?.includes(chain)) {
-    // let botSettings = this.botSettings?.[this.chain]?.[] || {}
-    const botSettings = botSettingStore.botSettings?.[chain]?.[botSettingStore.botSettings?.[chain]?.selected]
-    const mev = botSettings?.mev
-    const _nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || 0
-    const nativePrice = (tokenStore.swap.payToken.address === 'sol' || tokenStore.swap.token.address === NATIVE_TOKEN) ? _nativePrice : tokenStore.swap.payToken.price || 0
-    const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
-    const gasTips = mev ? gasTip1List : gasTip2List
-    const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]
-    const extraGasPrice = settings?.customFee || gasTips?.[settings?.level as number] || '3'
-    const gasLimit = botSwapStore.gasTip?.find?.(i => i.chain === chain && i.mev === !!mev)?.gasLimit || 200000
-    return formatNumber(new BigNumber(gasPrice.value).plus(new BigNumber(extraGasPrice).times(String(10 ** 9))).times(gasLimit).times(nativePrice).div(String(10 ** 18)).toFixed(), 2)
-  }
-  return 0
-}
-
-function solanaMevBeforeChange() {
-  const botSettings = botSettingStore.botSettings?.solana?.[botSettingStore.botSettings?.solana?.selected]
-  if (!botSettings?.mev && !botStore.bundleAvailable) {
-    ElMessage({ type: 'warning', message: t('mevPending') })
-    return Promise.resolve(false)
-  }
-  return Promise.resolve(true)
-}
 
 watch(() => tokenStore.token?.token || '', (val) => {
   if (val) {

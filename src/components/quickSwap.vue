@@ -107,8 +107,8 @@ async function submitSwap(amount: string) {
   const {chain} = props.row
   const isSolana = chain === 'solana'
   const {botSettings} = botSettingStore
-  const selected = botSettings?.[chain]?.selected as BotSettingKey
-  const currentBotSetting = botSettings?.[chain]?.[selected]
+  const selected = botSettings?.[chain]?.buy?.selected as BotSettingKey
+  const currentBotSetting = botSettings?.[chain]?.buy?.[selected]
   if (isSolana && currentBotSetting?.mev) {
     if (!await botStore.getBundleAvailable()) {
       loadingSwap.value = false
