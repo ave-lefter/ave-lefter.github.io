@@ -90,7 +90,7 @@ function confirm(data:Record<string,any>) {
           <Icon
             id="custom-filter"
             name="custom:filter"
-            class="text-10px cursor-pointer"
+            class="text-10px cursor-pointer mr-4px"
           />
           <span>{{ $t('filter') }}</span>
           <span v-if="filterNumber > 0" class="filter-number">{{ filterNumber }}</span>

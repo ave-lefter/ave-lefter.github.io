@@ -459,6 +459,7 @@ function resetColumns(needClear:boolean) {
   <div v-loading="loading" :style="`height:${height}`">
     <AveTable
       ref="aveTableRef"
+      row-key="pair_id"
       :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
