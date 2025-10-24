@@ -40,39 +40,32 @@
         >
       </div>
 
-      <div
-        class="bg-[--border] rounded-8px text-14px color-[--main-text] flex-start px-12px py-14px mt-8px flex-between relative cursor-pointer"
-        @click.stop.prevent="hide = !hide"
-      >
+      <div class="relative min-h-160px" @click="hide = false">
         <div
-          class="mask text-center color-[--main-text] absolute bg-[--border] top-0 right-0 left-0 bottom-0 flex items-center justify-center z-1 text-14px"
+          class="mask text-center color-[--main-text] absolute bg-[--border] top-0 right-0 left-0 bottom-0 flex items-center justify-center z-1 text-14px cursor-pointer"
           v-if="hide"
         >
           <Icon name="custom:show-code" class="text-16px mr-4px color-[--main-text]" />
           {{ $t('clickMnemonic') }}
         </div>
-
-        <div class="grid">
-          <span v-for="(item, $index) in mnemonic" :key="$index">{{ item }}</span>
-        </div>
-        <div class="w-12px h-12px ml-30px">
-          <Icon
-            v-copy="mnemonic"
-            name="bxs:copy"
-            class="text-12px ml-2px cursor-pointer color-[--third-text] block hover:opacity-80"
-            @click.stop.prevent
-          />
+        <div class="grid grid-cols-3 gap-8px mt-30px">
+          <div
+            class="mnemonic-item block border border-solid border-[--dialog-divider] py-8px px-8px text-center relative"
+            v-for="(item, $index) in mnemonic"
+            :key="$index"
+          >
+            <span
+              class="color-[--third-text] rounded-4px text-10px px-4px py-1px overflow-hidden text-ellipsis whitespace-nowrap max-w-100px line-height-15px absolute left-2px top-2px"
+              >{{ $index + 1 }}</span
+            >
+            {{ item }}
+          </div>
         </div>
       </div>
-      <el-button
-        class="h-48px! mt-116px"
-        type="primary"
-        size="large"
-        style="width: 100%"
-        @click.stop.prevent="goOn"
-      >
-        {{ $t('startSwap') }}
-      </el-button>
+      <div class="text-center mt-116px flex-between">
+        <el-button class="h-48px! flex-1" size="large"  v-copy="mnemonic?.join(' ')" @click.stop.prevent> {{ $t('copyMnemonic') }} </el-button>
+        <el-button class="h-48px! flex-1" size="large"  type="primary" @click.stop.prevent="goOn"> {{ $t('startSwap') }} </el-button>
+      </div>
     </div>
     <el-tooltip
       ref="tooltipRef"
@@ -289,12 +282,4 @@ const goOn = () => {
 </script>
 
 <style lang="scss" scoped>
-.grid {
-  display: flex;
-  flex-wrap: wrap; /* 一行放不下自动换行 */
-  gap: 10px;
-  span {
-    text-align: center;
-  }
-}
 </style>
