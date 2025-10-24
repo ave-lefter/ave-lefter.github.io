@@ -256,10 +256,24 @@ function createToggleButton() {
 const { createMarkButton, getMarks, marksTabs, wsTxUpdateMarks,profilingMarksCache } = useKlineMarks()
 
 watch(marksTabs, () => {
-  if (!isReady.value) return
-  createHeaderButton()
+  _createHeaderButton()
 })
 
+let retryCount = 0
+function _createHeaderButton() {
+  if (!isReady.value) {
+    if (retryCount > 3) {
+      return
+    }
+    setTimeout(() => {
+      retryCount++
+      _createHeaderButton()
+    }, 500)
+  } else {
+    retryCount = 0
+    createHeaderButton()
+  }
+}
 // 提前拦截 K线 数据 没有更多
 let noData = false
 let firstBarTime = 0
@@ -685,7 +699,7 @@ async function initChart() {
   _widget.subscribe('mouse_down',()=>{
     mouseDownTime = performance.now()
   })
-  
+
   _widget.subscribe('mouse_up', (e) => {
     if(performance.now() - mouseDownTime >=200){
       return
@@ -699,7 +713,7 @@ async function initChart() {
         klineDateFilter.value = [String(startTime),String(endTime)]
       }
     }
-   
+
   })
 
   subscribeStudyEvent()
