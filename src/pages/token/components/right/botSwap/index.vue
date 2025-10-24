@@ -120,7 +120,7 @@ function initToken() {
   if (chain !== tokenStore.swap.native.chain) {
     tokenStore.swap.native = {symbol: getChainInfo(chain)?.main_name, chain: chain, address: chainMainToken[chain] || NATIVE_TOKEN, decimals: getChainInfo(chain)?.decimals }
   }
-  if (chain !== tokenStore.swap.payToken.chain) {
+  if (chain !== tokenStore.swap.payToken?.chain) {
     tokenStore.swap.payToken = (botSwapStore?.botSwapBaseTokens?.[(chain || '') as BotChain] || [])[0]
   }
 }

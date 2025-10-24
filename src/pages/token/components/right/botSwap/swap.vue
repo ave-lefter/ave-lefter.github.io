@@ -146,6 +146,9 @@
         {{ $t('connectWallet1') }}
       </el-button> -->
     </div>
+    <div v-else class="text-14px color-[--secondary-text] text-center mt-16px bg-[--icon-color] lh-40px rounded-6px">
+{{ $t('useChainWallet') }}
+    </div>
   </div>
 </template>
 <script setup lang="ts">
