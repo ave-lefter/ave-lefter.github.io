@@ -122,7 +122,7 @@
     <div v-else class="text-center">
       <el-button
         :color="isDark ? '#F5F5F5' : '#222222'"
-        style="max-width: 80%; width: 340px; margin-top: 70px"
+        style="max-width: 80%; width: 340px; margin-top: 70px;color:var(--reverse-color)"
         size="large"
         @click.stop="startExperience"
       >

@@ -1435,5 +1435,7 @@
   "lastChance": "請妥善保存助記詞，關閉後將無法再次查看。",
   "saved": "我已保存好助記詞",
   "startSwap": "開始交易",
+  "pushSettings": "推送設置",
+  "newFeature":"新功能",
   "CreatePair":"創建池子"
 }
