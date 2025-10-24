@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useLocalStorage } from '@vueuse/core'
+import { useLocalStorage, useSessionStorage } from '@vueuse/core'
 import { bot_getGasTip } from '@/api/bot'
 import { useBotStore } from './bot'
 
@@ -10,6 +10,7 @@ export const useBotSwapStore = defineStore('botSwap', () => {
   const gasTip = useLocalStorage('bot_gasTip_v1', defaultGasTips)
 
   const botStore = useBotStore()
+  const tokenStore = useTokenStore()
 
   const wsStore = useWSStore()
 
@@ -193,6 +194,10 @@ export const useBotSwapStore = defineStore('botSwap', () => {
     ]
   })
 
+  const wallets = botStore.evmAddress ? [botStore.evmAddress] : []
+
+  const botSwapSelectedWallets = useSessionStorage<string[]>('botSwapSelectedWallets', wallets)
+
   function _bot_getGasTip() {
     if (botStore.accessToken && botStore.userInfo?.tgUid) {
       return bot_getGasTip().then(async res => {
@@ -246,12 +251,15 @@ export const useBotSwapStore = defineStore('botSwap', () => {
 
  const mainTokensPriceIds = computed(() => mainTokensPrice.value?.map(i => i.id))
 
+
+
   return {
     gasTip,
     priceLimit,
     mainTokensPrice,
     mainTokensPriceIds,
     botSwapBaseTokens,
+    botSwapSelectedWallets,
     bot_getGasTip: _bot_getGasTip,
     sendNativePriceWs,
     onmessageNativePrice

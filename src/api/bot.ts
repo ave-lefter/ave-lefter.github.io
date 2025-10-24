@@ -293,6 +293,18 @@ export function bot_getWalletsAllChain(params: {
     address: string
     price?: number
     balance?: string
+    decimals?: number
+    logo_url?: string
+    tokenBalances?: {
+      [key: string]: {
+        chain: string
+        address: string
+        price?: number
+        balance?: string
+        decimals?: number
+        logo_url?: string
+      }
+    }
   }>
 }>> {
   const { $api } = useNuxtApp()
@@ -431,7 +443,7 @@ export const bot_getChainsTokenBalance = createCacheRequest(function(params) {
     method: 'post',
     body: params
   })
-}, 500)
+}, 1000)
 
 // 查询sol bundle是否可用
 // /swap/getBundleAvailable GET
@@ -499,7 +511,7 @@ export function bot_createSolTx(params: {
   return $api('/botapi/swap/createSolTx', {
     method: 'post',
     body: {
-      batchId: Date.now().toString(),
+      // batchId: Date.now().toString(),
       source: 'web',
       autoSell: false,
       channelRef: Cookies.get('refCode') || undefined,
@@ -542,7 +554,7 @@ export function bot_createSwapEvmTx(params: {
   return $api('/botapi/swap/createSwapEvmTx', {
     method: 'post',
     body: {
-      batchId: Date.now().toString(),
+      // batchId: Date.now().toString(),
       source: 'web',
       autoSell: false,
       preApprove: true,
@@ -575,7 +587,7 @@ export function bot_createSolLimitTx(params: {
   return $api('/botapi/swap/createSolLimitTx', {
     method: 'post',
     body: {
-      batchId: Date.now().toString(),
+      // batchId: Date.now().toString(),
       source: 'web',
       tgUid: botStore.userInfo?.tgUid,
       ...params,
@@ -607,7 +619,7 @@ export function bot_createEvmLimitTx(params: {
   return $api('/botapi/swap/createEvmLimitTx', {
     method: 'post',
     body: {
-      batchId: Date.now().toString(),
+      // batchId: Date.now().toString(),
       tgUid: botStore.userInfo?.tgUid,
       source: 'web',
       preApprove: true,
@@ -746,7 +758,7 @@ export function getCompletedLimitTx(evmAddress: string): Promise<IGetMarketCompl
 }
 
 //  /swap/getAddressAllBalances
-export function bot_getAddressAllBalances(query: {
+export const bot_getAddressAllBalances = createCacheRequest(function bot_getAddressAllBalances(query: {
   evmAddress: string
   chains?: string
   pinToken?: string
@@ -768,4 +780,4 @@ export function bot_getAddressAllBalances(query: {
     method: 'get',
     query
   })
-}
+}, 1000)
