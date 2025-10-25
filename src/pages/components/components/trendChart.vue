@@ -34,8 +34,12 @@ onMounted(()=>{
 
 function initOrUpdateChart() {
         const xAxis = props.list.map(el=>el.t)
-        const barData = props.list.map(el=>el.c)
-        const lineData = props.list.map(el=>el.vol)
+        const barData = props.list.map(el=>Number(el.vol))
+        const lineData = props.list.map(el=>Number(el.c))
+        const maxLineData = Math.max(...lineData)
+        const color = lineData[lineData.length -1] >= maxLineData
+        ? getCssVariable('--up-color')
+        : getCssVariable('--down-color')
         if(!chartInstance.value){
             if(chartDom.value){
                 clearTimeout(timer)
@@ -72,10 +76,12 @@ function initOrUpdateChart() {
                 type: 'value',
                 name:'Evaporation',
                 show: false, // 关键设置：不显示整个Y轴
+                scale:true
             },{
                 type: 'value',
                 name:'Temperature',
                 show: false, // 关键设置：不显示整个Y轴
+                scale:true
             }],
             series: [
                 {
@@ -91,7 +97,7 @@ function initOrUpdateChart() {
                     type: 'line',
                     symbol: 'none', // 隐藏所有节点
                     itemStyle:{
-                        color:'#37B270'
+                        color:getCssVariable('--up-color')
                     },
                     yAxisIndex:1,
                     data: lineData
