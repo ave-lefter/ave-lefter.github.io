@@ -44,11 +44,7 @@
         }}</el-button
       >
     </div>
-    <List
-      :tableData="tableData"
-      :loading="loading"
-      @refresh="refresh"
-    />
+    <List :tableData="tableData" :loading="loading" @refresh="refresh" />
     <Import @refresh="refresh" />
     <Record :tableData="recordList" :loading="loadingRecord" />
     <!-- 创建完成展示助记词 -->
@@ -57,11 +53,17 @@
       v-model="dialogVisible"
       width="500"
       height="630"
-      :class="['dialog-connect', theme]"
+      :class="['dialog-connect1', theme]"
       append-to-body
       :close-on-click-modal="false"
+      :show-close="false"
     >
-      <span class="text-24px">{{ $t('mnemonic') }}</span>
+      <template #header>
+        <div class="flex-between">
+        <span class="text-24px">{{ $t('mnemonic') }}</span>
+        <Icon name="material-symbols-light:close" class="text-30px cursor-pointer" @click.stop.prevent="dialogVisible = false"></Icon>
+        </div>
+      </template>
       <div class="relative min-h-160px" @click="hide = false">
         <div
           class="mask text-center color-[--main-text] absolute bg-[--border] top-0 right-0 left-0 bottom-0 flex items-center justify-center z-1 text-14px cursor-pointer"
@@ -85,10 +87,10 @@
         </div>
       </div>
       <div class="text-center mt-30px flex-between">
-        <el-button class="flex-1" v-copy="mnemonic?.join(' ')" @click.stop.prevent>
+        <el-button class="flex-1" style="height: 48px" v-copy="mnemonic?.join(' ')" @click.stop.prevent >
           {{ $t('copyMnemonic') }}
         </el-button>
-        <el-button class="flex-1" style="width: 30%" type="primary" @click.stop.prevent="goOn">
+        <el-button class="flex-1" style="height: 48px" type="primary" @click.stop.prevent="goOn">
           {{ $t('continue') }}
         </el-button>
       </div>
@@ -110,6 +112,7 @@ import {
 import { ElMessage } from 'element-plus'
 import { decryptMsg } from '@/utils/index'
 import { useStorage, useThrottleFn, useDebounceFn } from '@vueuse/core'
+import { Warning } from '@element-plus/icons-vue'
 defineExpose({
   getMultiWalletsAllChain,
 })
@@ -220,44 +223,53 @@ function getMultiWalletsAllChain() {
   return new Promise((resolve, reject) => {
     loading.value = true
     const isSupportChains = botStore.isSupportChains
-      _getMultiWalletsAllChain(isSupportChains?.join(','))
-        .then((res) => {
-          console.log('------111--------')
-          tableData.value = Array.isArray(res)
-            ? res?.map((item, index) => ({
-                id: `parent-${index}`,
-                tgUid: item.tgUid,
-                address: item.tgUid,
-                name: item.name,
-                source: item.source,
-                operate: 'delete',
-                genSource: item.genSource,
-                evmAddress: item.balancesInfo?.filter((i) => i.chain == 'bsc')?.[0]?.address || '',
-                balance: item?.balancesInfo?.reduce((sum, item) => sum + Number(item.balance), 0),
-                mainTokenBalance: item?.balancesInfo?.reduce((sum, item) => sum + Number(item.mainTokenBalance), 0),
-                usdcTokenBalance: item?.balancesInfo?.reduce((sum, item) => sum + Number(item.usdcTokenBalance), 0),
-                usdtTokenBalance: item?.balancesInfo?.reduce((sum, item) => sum + Number(item.usdtTokenBalance), 0),
-                balancesInfo: item.balancesInfo?.map((addr, i) => {
-                  return {
-                    ...addr,
-                    id: `child-${index}-${i}`,
-                    name: addr.address,
-                    operate: 'deposit',
-                    isChildren: true,
-                  }
-                }),
-              }))
-            : []
-          resolve(tableData.value)
-        })
-        .catch((err) => {
-          ElMessage.error(err)
-          reject([])
-        })
-        .finally(() => {
-          loading.value = false
-          loadingThrottledFn.value = false
-        })
+    _getMultiWalletsAllChain(isSupportChains?.join(','))
+      .then((res) => {
+        console.log('------111--------')
+        tableData.value = Array.isArray(res)
+          ? res?.map((item, index) => ({
+              id: `parent-${index}`,
+              tgUid: item.tgUid,
+              address: item.tgUid,
+              name: item.name,
+              source: item.source,
+              operate: 'delete',
+              genSource: item.genSource,
+              evmAddress: item.balancesInfo?.filter((i) => i.chain == 'bsc')?.[0]?.address || '',
+              balance: item?.balancesInfo?.reduce((sum, item) => sum + Number(item.balance), 0),
+              mainTokenBalance: item?.balancesInfo?.reduce(
+                (sum, item) => sum + Number(item.mainTokenBalance),
+                0
+              ),
+              usdcTokenBalance: item?.balancesInfo?.reduce(
+                (sum, item) => sum + Number(item.usdcTokenBalance),
+                0
+              ),
+              usdtTokenBalance: item?.balancesInfo?.reduce(
+                (sum, item) => sum + Number(item.usdtTokenBalance),
+                0
+              ),
+              balancesInfo: item.balancesInfo?.map((addr, i) => {
+                return {
+                  ...addr,
+                  id: `child-${index}-${i}`,
+                  name: addr.address,
+                  operate: 'deposit',
+                  isChildren: true,
+                }
+              }),
+            }))
+          : []
+        resolve(tableData.value)
+      })
+      .catch((err) => {
+        ElMessage.error(err)
+        reject([])
+      })
+      .finally(() => {
+        loading.value = false
+        loadingThrottledFn.value = false
+      })
   })
 }
 function generateWallet() {
@@ -290,9 +302,10 @@ function refresh() {
 const goOn = () => {
   ElMessageBox.confirm(t('lastChance'), t('tips'), {
     type: 'warning',
+    icon: Warning,
     confirmButtonText: t('saved'),
     cancelButtonText: t('cancel'),
-    customClass: mode.value,
+    customClass: `${mode.value} delete_confirm`,
   })
     .then(() => {
       encryptedMnemonic.value = ''
@@ -302,4 +315,5 @@ const goOn = () => {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+</style>

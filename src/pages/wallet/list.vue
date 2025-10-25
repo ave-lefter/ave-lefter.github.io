@@ -36,7 +36,7 @@
               height="24"
               :src="generateAvatarIcon(row?.name || '')"
               alt=""
-            >
+            />
             {{ row.name }}
             <Remark
               :remark="row.remark"
@@ -77,12 +77,12 @@
             </span>
             <span
               v-if="row.genSource == 1"
-              class="bg-[--primary-color] rounded-4px text-10px px-4px py-1px overflow-hidden text-ellipsis whitespace-nowrap max-w-100px line-height-20px"
+              class="bg-[--primary-color] rounded-4px text-10px px-4px py-3px overflow-hidden text-ellipsis whitespace-nowrap max-w-100px line-height-19px height-19px"
               >{{ $t('import') }}</span
             >
             <span
               v-else
-              class="bg-[--signal-green] rounded-4px text-10px px-4px py-1px overflow-hidden text-ellipsis whitespace-nowrap max-w-100px line-height-20px"
+              class="bg-[--signal-green] rounded-4px text-10px px-4px py-3px overflow-hidden text-ellipsis whitespace-nowrap max-w-100px line-height-19px height-19px"
               >{{ $t('create') }}</span
             >
 
@@ -101,26 +101,36 @@
 
           <div
             v-else-if="row?.isChildren"
-            class="mr-40px bg-[--main-input-button-bg] rounded-4px inline-flex items-center gap-4px py-2px px-4px cursor-pointer"
+            class="bg-[--main-input-button-bg] rounded-4px inline-flex items-center gap-4px py-2px px-4px cursor-pointer"
             @click.stop.prevent="deposit(row)"
           >
             <Icon name="custom:download" class="text-10px" />
             <span class="font-500 text-12px">{{ t('deposit2') }}</span>
           </div>
-          <span v-else/>
+          <span v-else />
         </template>
       </el-table-column>
     </el-table>
     <el-dialog
       v-model="dialogVisible"
       width="500"
-      height="630"
-      :class="['dialog-connect', theme]"
+      :class="[theme]"
       append-to-body
       :close-on-click-modal="false"
+      :popper-style="{ padding: '20px', 'border-radius': '8px' }"
+      :show-close="false"
     >
-      <span class="text-24px">{{ t('deposit2') }}</span>
-      <div class="w-420px h-426px flex flex-col items-center justify-center">
+      <template #header>
+        <div class="flex-between">
+          <span class="text-24px">{{ $t('deposit2') }}</span>
+          <Icon
+            name="material-symbols-light:close"
+            class="text-30px cursor-pointer"
+            @click.stop.prevent="dialogVisible = false"
+          ></Icon>
+        </div>
+      </template>
+      <div class="w-480px flex flex-col items-center justify-center mb-20px">
         <canvas id="qr-chain-canvas-code" />
         <div class="text-14px color-[--secondary-text] mt-26px">
           <span class="color-[--primary-color] mr-4px text-17px"
@@ -142,15 +152,19 @@
       <table class="px-10px py-10px text-14px">
         <tbody>
           <template v-if="currentRow?.balancesInfo">
-            <tr v-for="(item,$index) in currentRow?.balancesInfo" :key="$index">
-              <td class="color-[var(--third-text)] text-left text-12px">{{ getChainInfo(item?.chain || '')?.main_name  }}</td>
+            <tr v-for="(item, $index) in currentRow?.balancesInfo" :key="$index">
+              <td class="color-[var(--third-text)] text-left text-12px">
+                {{ getChainInfo(item?.chain || '')?.main_name }}
+              </td>
               <td class="color-[var(--main-text)] text-left pl-5px">
                 {{ formatNumber(item?.mainTokenBalance || 0, 2) }}
               </td>
             </tr>
           </template>
           <tr v-else>
-            <td class="color-[var(--third-text)] text-left text-12px">{{ getChainInfo(currentRow?.chain || '')?.main_name || $t('mainToken') }}</td>
+            <td class="color-[var(--third-text)] text-left text-12px">
+              {{ getChainInfo(currentRow?.chain || '')?.main_name || $t('mainToken') }}
+            </td>
             <td class="color-[var(--main-text)] text-left pl-5px">
               {{ formatNumber(currentRow?.mainTokenBalance || 0, 2) }}
             </td>
@@ -180,6 +194,8 @@ import QrCodeWithLogo from 'qr-code-with-logo'
 import Remark from './remark.vue'
 import { getCurrentInstance } from 'vue'
 import BigNumber from 'bignumber.js'
+import { Warning } from '@element-plus/icons-vue'
+
 
 defineProps({
   tableData: {
@@ -205,7 +221,7 @@ const dialogVisible = shallowRef(false)
 const currentObj = ref<Address | null>(null)
 const showPop = shallowRef(false)
 const currentIndex = shallowRef(0)
-const currentRow = ref<Wallet | Address| null>(null)
+const currentRow = ref<Wallet | Address | null>(null)
 const $refs = ref({
   buttonRefs: {} as Record<number, any>,
   currentBtnRef: {} as Record<number, any>,
@@ -217,9 +233,11 @@ async function removeWallet(item: Wallet) {
     if (Number(item?.balance) > 0) {
       ElMessageBox.confirm(t('walletRemoveTip1'), t('walletRemove'), {
         type: 'warning',
+        icon: Warning,
         confirmButtonText: t('confirm'),
         cancelButtonText: t('cancel'),
-        customClass: mode.value,
+        customClass: `${mode.value} delete_confirm`,
+
       }).then(() => {
         confirmRemoveWallet(item)
       })
@@ -231,9 +249,10 @@ async function removeWallet(item: Wallet) {
 function confirmRemoveWallet(item: Wallet) {
   ElMessageBox.confirm(t('walletRemoveTip2'), t('walletRemove'), {
     type: 'warning',
+    icon: Warning,
     confirmButtonText: t('confirm'),
     cancelButtonText: t('cancel'),
-    customClass: mode.value,
+    customClass: `${mode.value} delete_confirm`,
   })
     .then(() => {
       const evmAddress = item.balancesInfo?.filter((i) => i.chain == 'bsc')?.[0]?.address || ''
@@ -297,19 +316,24 @@ function showPopover(row: Address, $index: number) {
     //   { mainTokenBalance: '1', chain: 'solana' },
     //   { mainTokenBalance: '1', chain: 'xlayer' },
     // ]
-    currentRow.value.balancesInfo = currentRow.value?.balancesInfo?.reduce((acc, cur) => {
+    currentRow.value.balancesInfo = currentRow.value?.balancesInfo?.reduce(
+      (acc, cur) => {
         if (['eth', 'base'].includes(cur.chain)) {
           const evm = acc.find((item) => item.chain === 'eth')
           if (evm) {
-            evm.mainTokenBalance = new BigNumber(evm.mainTokenBalance).plus(cur.mainTokenBalance).toFixed()
-            } else {
-                acc.push({ ...cur, chain: 'eth' })
-            }
+            evm.mainTokenBalance = new BigNumber(evm.mainTokenBalance)
+              .plus(cur.mainTokenBalance)
+              .toFixed()
+          } else {
+            acc.push({ ...cur, chain: 'eth' })
+          }
         } else {
-            acc.push(cur)
+          acc.push(cur)
         }
         return acc
-    }, [] as typeof currentRow.value.balancesInfo)
+      },
+      [] as typeof currentRow.value.balancesInfo
+    )
 
     // let hasETH = -1;
     //   currentRow.value.balancesInfo = currentRow.value?.balancesInfo?.reduce((acc, cur, index) => {
