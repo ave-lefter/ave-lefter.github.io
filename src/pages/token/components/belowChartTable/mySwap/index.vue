@@ -240,7 +240,7 @@ onActivated(() => {
       <div class="flex items-center">
         <el-checkbox v-model="botOrderOnlyCurrentToken" :label="t('currentToken')" size="small" style="font-size: 12px;color:var(--d-666-l-333)" />
       </div>
-       <SelectWallet ref="selectWallet" :chain="(activeTab as BotChain)" :boundary="boundary" />
+       <SelectWallet v-if="botStore.evmAddress" ref="selectWallet" :chain="(activeTab as BotChain)" :boundary="boundary" />
     </div>
 
     <!-- 顶部交易统计区域 -->

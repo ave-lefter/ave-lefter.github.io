@@ -126,7 +126,7 @@ onMounted(() => {
           {{ t('cancelAll') }}
         </button>
       </div>
-      <SelectWallet ref="selectWallet" :chain="(activeTab as BotChain)" :boundary="boundary" />
+      <SelectWallet v-if="botStore.evmAddress" ref="selectWallet" :chain="(activeTab as BotChain)" :boundary="boundary" />
     </div>
     <unified ref="unifiedRef" :chain="activeTab" :currentToken="botOrderOnlyCurrentToken" :userAddress="userAddress" />
   </div>
