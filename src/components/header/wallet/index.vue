@@ -21,7 +21,7 @@
           </div>
         </div>
         <ul class="tg-wallet-list_content">
-          <el-scrollbar :max-height="300">
+          <el-scrollbar :max-height="318">
             <li v-for="(item, index) in botStore?.userInfo?.addresses || []" :key="index" class="clickable" @click.stop="navigateToWallet(item.address, item.chain)">
               <img :src="`${token_logo_url}chain/${item.chain}.png`" class="mr-5px border-rd-[50%]" height="32" alt="">
               <div>
@@ -211,7 +211,7 @@
                   v-loading="select2Loading"
                   :item-height="48"
                   size="large"
-                  class="chains-select" 
+                  class="chains-select"
                   :teleported="false"
                   :options="balanceList"
                   :suffix-icon="ArrowDownBold"
@@ -268,7 +268,7 @@
               </el-input>
               <div class="text-12px color-[--secondary-text] text-right"
                 style="width: 100%; line-height: 1; margin-top: 5px;position: absolute; right: 0; top: 100%;">
-                <span>{{ t('balance1') }}: 
+                <span>{{ t('balance1') }}:
                   <!-- {{
                     formatNumber(withdrawChainInfo?.balance || 0, 5) }} {{
                     getChainInfo(withdrawForm.chain)?.main_name
@@ -574,7 +574,7 @@ function getUserBalanceDetails(){
         }
       })
       exists = balanceList.value.some(item => item.token === NATIVE_TOKEN)
-    
+
       withdrawForm.token = NATIVE_TOKEN
     }else{
       balanceList.value=[]
@@ -618,7 +618,7 @@ watch(showVisible, (val) => {
     setChainQr()
   } else if (val === 3) {
     withdrawFormRef.value?.resetFields?.()
-  } 
+  }
   // bot_getTransfer({
   //   chain:'solana',
   //   batchId:1753859256515
