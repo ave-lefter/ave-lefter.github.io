@@ -4,7 +4,6 @@ import { getAddressAndChainFromId, getChainInfo, isEvmChain } from '@/utils'
 import { bot_getTokenBalance, bot_getApprove, bot_approve } from '@/api/bot'
 import { getTokensPrice } from '@/api/token'
 import { ElNotification } from 'element-plus'
-import { lo } from 'element-plus/es/locale/index.mjs'
 
 const chainMainToken: Record<string, string> = {
   solana: 'sol',
