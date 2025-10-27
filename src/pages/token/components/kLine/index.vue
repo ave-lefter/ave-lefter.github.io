@@ -224,6 +224,7 @@ function createHeaderButton() {
   })
   headerBtns = []
   createToggleButton()
+  createTogglePriceWarningButton()
   createMarkButton(_widget, headerBtns)
 }
 
@@ -238,6 +239,27 @@ function createToggleButton() {
         <span style="font-size: 12px; cursor: pointer;">
           ${isShowMarket ? 'Price / <span style="color:#286DFF">MCap</span>' : '<span style="color:#286DFF">Price</span> / MCap'}
         </span>`
+  }
+
+  btn.onclick = () => {
+    showMarket.value = !showMarket.value
+
+    updateButtonContent()
+    // resetChart()
+    _widget?.resetCache?.()
+    _widget?.activeChart?.().resetData?.()
+  }
+  updateButtonContent()
+  headerBtns.push(btn)
+}
+// 创建价格提醒按钮
+function createTogglePriceWarningButton() {
+  const btn = _widget?.createButton({ align: 'right', useTradingViewStyle: false })
+  if (!btn) return
+
+  const updateButtonContent = () => {
+    const isShowMarket = showMarket.value
+    btn.innerHTML = `<div style="display: flex;align-items: center;cursor:pointer;padding: 7px 5px 7px 0;border-radius: 6px;" onMouseOver="this.style.background='none'"  onMouseLeave="this.style.background='none'"><img width="18" height="18" src="https://ave.s3.ap-east-1.amazonaws.com/im/alert.png" /></div>`
   }
 
   btn.onclick = () => {
