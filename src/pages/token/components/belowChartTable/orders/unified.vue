@@ -213,7 +213,7 @@ const tableHeight = computed(() => {
   return Math.max(tokenStore.commonHeight - 260, 450)
 })
 
-watch([() => props.currentToken, () => botStore.userInfo?.evmAddress || ''], () => {
+watch([() => props.currentToken, () => props.userAddress || '', () => tokenStore?.placeOrderUpdate], () => {
   getUserPendingTx()
 })
 

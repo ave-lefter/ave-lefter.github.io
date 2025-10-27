@@ -44,7 +44,7 @@
         </ul>
         <div style="flex: 1;" />
         <ul class="tg-wallet-list_footer flex flex-col gap-10px">
-          <li class="flex justify-between h-40px px-20px clickable">
+          <!-- <li class="flex justify-between h-40px px-20px clickable">
             <div class="color-[--main-text] flex items-center gap-8px" @click.stop="showVisible = 1">
               <Icon name="custom:wallet2" class="text-16px" />
               <span class="font-500 text-14px">{{ t('myWallet1') }}</span>
@@ -52,6 +52,17 @@
             <div class="color-[--secondary-text] flex items-center gap-4px">
               <span class="font-500 text-12px">
                 {{ botStore?.userInfo?.name || '' }}
+              </span>
+              <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
+            </div>
+          </li> -->
+          <li class="flex justify-between h-40px px-20px clickable"  @click="router.push('/wallet');tgWalletVisible = false">
+            <div class="color-[--main-text] flex items-center gap-8px">
+              <Icon name="custom:wallet2" class="text-16px" />
+              <span class="font-500 text-14px">{{ $t('walletManage') }}</span>
+            </div>
+            <div class="color-[--secondary-text] flex items-center gap-4px">
+              <span class="font-500 text-12px">
               </span>
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>

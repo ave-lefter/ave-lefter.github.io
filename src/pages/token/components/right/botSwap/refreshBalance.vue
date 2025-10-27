@@ -19,10 +19,14 @@ const props = defineProps({
   isPayToken: {
     type: Boolean,
     default: false
+  },
+  isBatch: {
+    type: Boolean,
+    default: false
   }
 })
 
-const { loading, refreshTokenBalance } = useBotSwap(props.type)
 
+const { loading, refreshTokenBalance } = useBotSwap(props.type, props.isBatch)
 
 </script>
