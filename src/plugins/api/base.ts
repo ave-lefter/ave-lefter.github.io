@@ -100,8 +100,8 @@ export function onResponse({ response, request }: MyFetchContext) {
     response._data = JSON.parse(window.decodeURIComponent(window.atob(data).replace(/\+/g, ' ')))
     return
   }
-  if (data?.status === 1 && data?.data) {
-    response._data = data?.data
+  if (data?.status === 1) {
+    response._data = data?.data || data
     return
   }
   response._data = data
