@@ -14,7 +14,7 @@
             </div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item.address !== tokenStore.swap.payToken?.address)" :key="item.address" @click.stop="tokenStore.swap.payToken = item;$emit('getTokenBalance');amountNative='';amountNativeOut=''">
+                <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)" :key="item.address" @click.stop="tokenStore.swap.payToken = item;$emit('getTokenBalance');amountNative='';amountNativeOut=''">
                   <img :src="`${configStore.token_logo_url}${item.logo_url}`" class="rd-50% mr-8px" height="16"  alt="" srcset="" >
                   <span class="text-12px font-400">{{ item.symbol }}</span>
                 </el-dropdown-item>
@@ -64,7 +64,7 @@
             </div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item.address !== tokenStore.swap.payToken?.address)" :key="item.address" @click.stop="tokenStore.swap.payToken = item;$emit('getTokenBalance');amountToken='';amountTokenOut='';amountSellTokenPercent = ''">
+                <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)" :key="item?.address" @click.stop="tokenStore.swap.payToken = item;$emit('getTokenBalance');amountToken='';amountTokenOut='';amountSellTokenPercent = ''">
                   <img :src="`${configStore.token_logo_url}${item.logo_url}`" class="rd-50% mr-8px" height="16"  alt="" srcset="" >
                   <span class="text-12px font-400">{{ item.symbol }}</span>
                 </el-dropdown-item>
@@ -368,7 +368,7 @@ const totalSelectWalletBalance = computed(() => {
   const token = tokenStore.swap.payToken
   botStore.walletList?.forEach(i => {
     if (uniqueAddresses.includes(i.evmAddress)) {
-      balance = new BigNumber(balance).plus(getAddressFromChainBalance(chain, i.addresses, token?.address) || 0).toFixed()
+      balance = new BigNumber(balance).plus(getAddressFromChainBalance(chain, i?.addresses, token?.address) || 0).toFixed()
     }
   })
   return balance
@@ -383,7 +383,7 @@ const totalSelectWalletBalance1 = computed(() => {
   const token = tokenStore.swap.token
   botStore.walletList?.forEach(i => {
     if (uniqueAddresses.includes(i.evmAddress)) {
-      balance = new BigNumber(balance).plus(getAddressFromChainBalance(chain, i.addresses, token?.address) || 0).toFixed()
+      balance = new BigNumber(balance).plus(getAddressFromChainBalance(chain, i?.addresses, token?.address) || 0).toFixed()
     }
   })
   return balance
@@ -424,7 +424,7 @@ const handleMax = (balance: string | number, type: 'buy' | 'sell') => {
   const fromAmount = balance || 0
   const nativeTokens = ['sol', 'ton', NATIVE_TOKEN]
   if (type === 'buy') {
-    if (nativeTokens.includes(fromToken.value.address || '')) {
+    if (nativeTokens.includes(fromToken.value?.address || '')) {
       if (new BigNumber(balance).lt(min)) {
         ElMessageBox.alert(t('balanceNotEnough', {n: min, s: fromToken.value.symbol}), t('tips'), {
           confirmButtonText: t('okay')
@@ -533,7 +533,7 @@ async function quoteBot(chain: string, type = props.activeTab, isGetPrice = true
 
   const payToken = tokenStore.swap.payToken
 
-  const payTokenPrice = (['sol', NATIVE_TOKEN].includes(payToken.address || '') ? nativePrice : tokenStore.swap.payToken.price) || 0
+  const payTokenPrice = (['sol', NATIVE_TOKEN].includes(payToken?.address || '') ? nativePrice : tokenStore.swap.payToken.price) || 0
 
   let price: number = tokenStore.price || tokenStore.swap.token?.price || 0
   if (props.swapType === 'limit') {
@@ -590,14 +590,14 @@ const isSupportSwap = computed(() => {
   return botStore.accessToken && botStore?.isSupportChains?.includes?.(chain)
 })
 
-const _getAllowance = () => getAllowance(fromToken.value.address || '')
+const _getAllowance = () => getAllowance(fromToken.value?.address || '')
 
 const approve = async () => {
   loadingApprove.value = true
   bot_approve({
     batchId: Date.now().toString(),
     chain: chain.value || '',
-    tokenAddress: fromToken.value.address || '',
+    tokenAddress: fromToken.value?.address || '',
     creatorAddress: [walletAddress.value || ''],
   }).then(res => {
     if (res) {
@@ -627,7 +627,7 @@ function checkAmount() {
   const isBatchSell = botSwapStore.botSwapSelectedWallets.length > 1 && props.activeTab === 'sell'
   return !(
     ((Number(fromTokenBalance) < Number(fromAmount.value) && !isBatchSell) || (isBatchSell && Number(amountSellTokenPercent.value || 0) > 100)) ||
-    String(fromAmount.value) === '0' || tokenStore.swap.token.address === tokenStore.swap.payToken.address || new BigNumber(fromAmount.value || 0).lte(0) ||
+    String(fromAmount.value) === '0' || tokenStore.swap.token?.address === tokenStore.swap.payToken?.address || new BigNumber(fromAmount.value || 0).lte(0) ||
     (new BigNumber(priceLimit.value || 0).lte(0) && props.swapType === 'limit')
   )
 }
@@ -673,7 +673,7 @@ async function submitBotSwap() {
     solana: 'sol',
     ton: 'TON',
   }
-  const native = tokenStore.swap.payToken.address || chainMainToken?.[chain] || NATIVE_TOKEN
+  const native = tokenStore.swap.payToken?.address || chainMainToken?.[chain] || NATIVE_TOKEN
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
   const isBatchSell = botSwapStore.botSwapSelectedWallets.length > 1 && props.activeTab === 'sell'
   if (chain === 'solana') {
@@ -699,7 +699,7 @@ async function submitBotSwap() {
     const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
       const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
       const addresses = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses || []
-      const balance = getAddressFromChainBalance(chain, addresses, isBuy ? native : (ft.address || '')) || 0
+      const balance = getAddressFromChainBalance(chain, addresses, isBuy ? native : (ft?.address || '')) || 0
       const inAmount = isBatchSell ? new BigNumber(balance || 0).times(amountSellTokenPercent.value || 0).div(100).times(10 ** (ft?.decimals || 0)).toFixed(0) : new BigNumber(amount || 0).times(10 ** (ft?.decimals || 0)).toFixed(0)
       return {
         batchId: batchId + String(k),
@@ -711,8 +711,8 @@ async function submitBotSwap() {
     const data = {
       // batchId: Date.now().toString(),
       swapList: swapList,
-      inTokenAddress: isBuy ? native : (ft.address || ''),
-      outTokenAddress: isBuy ? (tt.address || '') : native,
+      inTokenAddress: isBuy ? native : (ft?.address || ''),
+      outTokenAddress: isBuy ? (tt?.address || '') : native,
       swapType: (isBuy ? 1 : 2) as 1 | 2,
       isPrivate: mev || false,
       priorityFee: botPriorityFee, // botPriorityFee
@@ -805,7 +805,7 @@ async function submitBotSwap() {
     const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
       const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
       const addresses = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses || []
-      const balance = getAddressFromChainBalance(chain, addresses, isBuy ? native : (ft.address || '')) || 0
+      const balance = getAddressFromChainBalance(chain, addresses, isBuy ? native : (ft?.address || '')) || 0
       const inAmount = isBatchSell ? new BigNumber(balance || 0).times(amountSellTokenPercent.value || 0).div(100).times(10 ** (ft?.decimals || 0)).toFixed(0) : new BigNumber(amount || 0).times(10 ** (ft?.decimals || 0)).toFixed(0)
       return {
         batchId: batchId + String(k), // batchId + k,
@@ -817,8 +817,8 @@ async function submitBotSwap() {
       // batchId: Date.now().toString(),
       chain: chain,
       swapList: swapList,
-      inTokenAddress: isBuy ? native : (ft.address || ''),
-      outTokenAddress: isBuy ? (tt.address || '') : native,
+      inTokenAddress: isBuy ? native : (ft?.address || ''),
+      outTokenAddress: isBuy ? (tt?.address || '') : native,
       swapType: (isBuy ? 1 : 2) as 1 | 2,
       contractType: 0 as 0 | 1,
       isPrivate: mev || false,
@@ -928,7 +928,7 @@ function submitBotLimit() {
     solana: 'sol',
     ton: 'TON',
   }
-  const native = tokenStore.swap.payToken.address || chainMainToken?.[chain] || NATIVE_TOKEN
+  const native = tokenStore.swap.payToken?.address || chainMainToken?.[chain] || NATIVE_TOKEN
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
   const isBatchSell = botSwapStore.botSwapSelectedWallets.length > 1 && props.activeTab === 'sell'
   if (chain === 'solana') {
@@ -955,7 +955,7 @@ function submitBotLimit() {
     const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
       const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
       const addresses = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses || []
-      const balance = getAddressFromChainBalance(chain, addresses, isBuy ? native : (ft.address || '')) || 0
+      const balance = getAddressFromChainBalance(chain, addresses, isBuy ? native : (ft?.address || '')) || 0
       const inAmount = isBatchSell ? new BigNumber(balance || 0).times(amountSellTokenPercent.value || 0).div(100).times(10 ** (ft?.decimals || 0)).toFixed(0) : new BigNumber(amount || 0).times(10 ** (ft?.decimals || 0)).toFixed(0)
       return {
         batchId: batchId + String(k), // batchId + k,
@@ -966,7 +966,7 @@ function submitBotLimit() {
     const data = {
       // batchId: Date.now().toString(),
       swapList: swapList,
-      tokenAddress: tokenStore.swap.token.address || tokenStore.token?.token || '',
+      tokenAddress: tokenStore.swap.token?.address || tokenStore.token?.token || '',
       baseTokenAddress: native,
       swapType: (isBuy ? 5 : 6) as 5 | 6, //5:Buy limit 6:Sell limit
       isPrivate: mev || false,
@@ -1064,7 +1064,7 @@ function submitBotLimit() {
     const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
       const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
       const addresses = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses || []
-      const balance = getAddressFromChainBalance(chain, addresses, isBuy ? native : (ft.address || '')) || 0
+      const balance = getAddressFromChainBalance(chain, addresses, isBuy ? native : (ft?.address || '')) || 0
       const inAmount = isBatchSell ? new BigNumber(balance || 0).times(amountSellTokenPercent.value || 0).div(100).times(10 ** (ft?.decimals || 0)).toFixed(0) : new BigNumber(amount || 0).times(10 ** (ft?.decimals || 0)).toFixed(0)
       return {
         batchId: batchId + String(k), // batchId + k,
@@ -1076,8 +1076,8 @@ function submitBotLimit() {
       // batchId: Date.now().toString(),
       chain: chain,
       swapList: swapList,
-      inTokenAddress: isBuy ? native : (ft.address || ''),
-      outTokenAddress: isBuy ? (tt.address || '') : native,
+      inTokenAddress: isBuy ? native : (ft?.address || ''),
+      outTokenAddress: isBuy ? (tt?.address || '') : native,
       swapType: (isBuy ? 5 : 6) as 5 | 6,
       swapPrice: p,
       contractType: 0 as 0 | 1,
@@ -1179,7 +1179,7 @@ watch(() => tokenStore.token?.token || '', (val) => {
   }
 })
 
-watch(() => tokenStore.swap.payToken.address, (val) => {
+watch(() => tokenStore.swap.payToken?.address, (val) => {
   if (val) {
     _getAllowance()
   }
