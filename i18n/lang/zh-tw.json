@@ -823,7 +823,7 @@
   "foundZeroBalanceAddresses": "找到 {count} 個零餘額地址",
   "fetchFailed": "獲取零餘額地址失敗",
   "deleteFailed": "批量刪除失敗",
-  "bulkDesc1": "按範例填寫錢包地址，一行一個，使用逗號分隔",
+  "bulkDesc1": "最多500個，按範例填寫錢包地址，一行一個，使用逗號分隔",
   "attentionSearch": "搜索關注地址",
   "nativeBalance": "主幣餘額",
   "lastTxsTime1": "最近交易",
@@ -1460,5 +1460,6 @@
   "create": "創建",
   "refresh": "刷新",
   "mainToken": "主幣",
-  "botCancelAllOrder": "確認取消所有錢包的當前掛單"
+  "botCancelAllOrder": "確認取消所有錢包的當前掛單",
+  "or":"或者"
 }
