@@ -1207,3 +1207,16 @@ export function decryptMsg(cipherBase64: string, guid: string): string {
   // 6. Base64 解码 → 原始明文
   return CryptoJS.enc.Base64.parse(base64Str).toString(CryptoJS.enc.Utf8)
 }
+
+export function getTwitterSeconds(time: number, unit: string) {
+  if (!time || time <= 0) {
+    return 0
+  }
+  if (unit === 'm') {
+    return time * 60
+  } else if (unit === 'h') {
+    return time * 60 * 60
+  } else {
+    return time
+  }
+}

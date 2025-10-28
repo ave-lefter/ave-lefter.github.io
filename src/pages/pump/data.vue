@@ -264,11 +264,104 @@
         >
       </div>
     </div>
+    <!-- <span class="text-12px color-[--main-text] mt-16px block">{{ $t('twitterTime') }}</span> -->
+<!--
+    <div class="flex-between mt-8px gap-9px">
+      <div class="item flex-1">
+        <div class="border-1px border-solid border-[--border] px-4px py-1px flex-start relative">
+          <div ref="el">
+            <el-color-picker
+              v-model="pumpSetting.data.twitter.minColor"
+              persistent
+              append-to="body"
+              :teleported="true"
+              @blur="emit('blur')"
+              @focus="emit('focus')"
+            />
+          </div>
+          <el-input
+            v-model.trim="pumpSetting.data.twitter.minSize"
+            class="number-input"
+            size="small"
+            @blur="(e) => onInput((e.target as HTMLInputElement).value, 'twitter', 'min')"
+          >
+          </el-input>
+          <SelectUnit v-model="pumpSetting.data.twitter.minUnit"/>
+          <div class="flex-1"></div>
+          <Icon
+            name="custom:refresh"
+            class="color-[--third-text] text-8px ml-2px cursor-pointer"
+            @click.stop.prevent="reset('twitter', 'min')"
+          />
+        </div>
+        <span class="text-8px color-[--third-text] mt-2px"
+          >0 - {{ formatNumber(pumpSetting.data.twitter.minSize || 0, 2) }}</span
+        >
+      </div>
+      <div class="item flex-1">
+        <div class="border-1px border-solid border-[--border] px-4px py-1px flex-start relative">
+          <div ref="el">
+            <el-color-picker
+              v-model="pumpSetting.data.twitter.middleColor"
+              persistent
+              append-to="body"
+              :teleported="true"
+              @blur="emit('blur')"
+              @focus="emit('focus')"
+            />
+          </div>
+          <el-input
+            v-model.trim="pumpSetting.data.twitter.middleSize"
+            class="number-input"
+            size="small"
+            @blur="(e) => onInput((e.target as HTMLInputElement).value, 'twitter', 'middle')"
+          >
+          </el-input>
+          <SelectUnit v-model="pumpSetting.data.twitter.middleUnit"/>
+          <div class="flex-1"></div>
+          <Icon
+            name="custom:refresh"
+            class="color-[--third-text] text-8px ml-2px cursor-pointer"
+            @click.stop.prevent="reset('twitter', 'middle')"
+          />
+        </div>
+        <span class="text-8px color-[--third-text] mt-2px"
+          >{{ formatNumber(pumpSetting.data.twitter.minSize || 0, 2) }} -
+          {{ formatNumber(pumpSetting.data.twitter.middleSize || 0, 2) }}</span
+        >
+      </div>
+      <div class="item flex-1">
+        <div class="border-1px border-solid border-[--border] px-4px py-1px flex-start">
+          <div ref="el">
+            <el-color-picker
+              v-model="pumpSetting.data.twitter.maxColor"
+              persistent
+              append-to="body"
+              :teleported="true"
+              @blur="emit('blur')"
+              @focus="emit('focus')"
+            />
+          </div>
+          <span class="text-12px color-[--main-text]">Above</span>
+          <div class="flex-1"></div>
+          <Icon
+            name="custom:refresh"
+            class="color-[--third-text] text-8px ml-10px cursor-pointer"
+            @click.stop.prevent="reset('twitter', 'max')"
+          />
+        </div>
+        <span class="text-8px color-[--third-text] mt-2px"
+          >{{ formatNumber(pumpSetting.data.twitter.middleSize || 0, 2) }}+</span
+        >
+      </div>
+    </div> -->
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useCssVar, useLocalStorage } from '@vueuse/core'
+import SelectUnit from './selectUnit.vue'
+import { getTwitterSeconds } from '@/utils/index'
 const emit = defineEmits(['blur', 'focus'])
 const globalStore = useGlobalStore()
 const { mode, pumpSetting } = storeToRefs(globalStore)
@@ -348,6 +441,31 @@ const onInput = (val: string, type: string, dir: string) => {
       }
     }
   }
+  if (type === 'twitter') {
+    if (value !== '') {
+      const middleSize = pumpSetting.value.data?.twitter?.middleSize ?? 0
+      const middleUnit = pumpSetting.value.data?.twitter?.middleUnit ?? 'm'
+      const minSize = pumpSetting.value.data?.twitter?.minSize ?? 0
+      const minUnit = pumpSetting.value.data?.twitter?.minUnit ?? 's'
+      if (dir === 'min') {
+        if (getTwitterSeconds(Number(value),minUnit) >=  getTwitterSeconds(Number(middleSize),middleUnit)) {
+          pumpSetting.value.data.twitter.minSize = middleSize
+          pumpSetting.value.data.twitter.minUnit = middleUnit
+
+        } else {
+          pumpSetting.value.data.twitter.minSize = Number(value)
+        }
+      }
+      if (dir === 'middle') {
+        if (getTwitterSeconds(Number(value),minUnit) <=  getTwitterSeconds(Number(minSize),minUnit)) {
+          pumpSetting.value.data.twitter.middleSize = minSize
+          pumpSetting.value.data.twitter.middleUnit = minUnit
+        } else {
+          pumpSetting.value.data.twitter.middleSize = Number(value)
+        }
+      }
+    }
+  }
 }
 function reset(type: string, dir: string) {
   if (type === 'mc') {
@@ -387,6 +505,21 @@ function reset(type: string, dir: string) {
     }
     if (dir === 'max') {
       pumpSetting.value.data.holders.maxColor = '#12B886'
+    }
+  }
+  if (type === 'twitter') {
+    if (dir === 'min') {
+      pumpSetting.value.data.twitter.minSize = 10
+      pumpSetting.value.data.twitter.minColor = '#009EF7'
+      pumpSetting.value.data.twitter.minUnit = 's'
+    }
+    if (dir === 'middle') {
+      pumpSetting.value.data.twitter.middleSize = 30
+      pumpSetting.value.data.twitter.middleColor = '#12B886'
+      pumpSetting.value.data.twitter.middleUnit = 'm'
+    }
+    if (dir === 'max') {
+      pumpSetting.value.data.twitter.maxColor = '#F6465D'
     }
   }
 }

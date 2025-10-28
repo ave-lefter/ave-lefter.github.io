@@ -166,6 +166,16 @@
                     {{ $t('hideBlackList') }}
                   </template>
                 </li>
+                <li @click="pumpSetting.isInt = !pumpSetting.isInt">
+                  <template v-if="pumpSetting.isInt">
+                    <Icon name="custom:int" class="text-12px mr-8px" />
+                    {{ $t('roundUpDisplay') }}
+                  </template>
+                  <template v-else>
+                    <Icon name="custom:dot" class="text-12px mr-8px" />
+                    {{ $t('decimalsDisplay') }}
+                  </template>
+                </li>
               </ul>
               <span class="text-12px color-[--secondary-text] mt-16px block">{{ $t('define') }}</span>
               <div class="tabs define mt-16px" >
@@ -187,7 +197,7 @@
               <Bg :pumpConfig="pumpConfig" :chain="chain" @blur="isColor = false" @focus="isColor = true"/>
             </div>
             <div v-if="activeTab == 4">
-              <Grid />
+              <Grid :isFloat="isFloat" />
             </div>
           </div>
         </el-scrollbar>
@@ -209,9 +219,12 @@ const { width } = useWindowSize()
 const props = withDefaults(
   defineProps<{
     chain: string
-    pumpConfig?: PumpConfig[]
+    pumpConfig?: PumpConfig[],
+    isFloat?: boolean
   }>(),
-  {}
+  {
+    isFloat: false
+  }
 )
 const isColor = shallowRef(false)
 const { t } = useI18n()

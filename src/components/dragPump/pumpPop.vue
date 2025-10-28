@@ -467,7 +467,7 @@ function getFilterData(list, conditions) {
       <PlatformSelect />
       <div class="flex-1 mt--12px mb--16px drag-handle" />
       <div class="flex items-center">
-        <Setting :chain="pumpStore.activeChain">
+        <Setting :chain="pumpStore.activeChain" :pumpConfig="pumpStore.pumpConfig" isFloat>
           <template #default="{ visible }">
             <div
 v-tooltip="$t('customize')"
@@ -555,6 +555,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
           </template>
         </el-input>
         <PumpFilter
+          :key="`pumpFilter_${pumpStore.activeChain}_${activeTab}`"
           hideReferenceText :storage="`pumpFilter_${pumpStore.activeChain}_${activeTab}`"
           @update:filterData="confirmFilter" />
       </div>

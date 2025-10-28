@@ -114,7 +114,7 @@ export interface WSPumpObj {
 }
 export type WSPump = WSPumpObj & Pair
 
-export type ChainKey = 'solana' | 'bsc' | 'xlayer'
+export type ChainKey = 'solana' | 'bsc'
 export type CategoryKey = 'new' | 'soon' | 'graduated'
 
 export type pumpBlack = {
@@ -133,4 +133,19 @@ export interface pumpObjColor {
 }
 export interface pumpData {
   platforms: String[]
+  new: {
+    count: number
+    loading: boolean
+    pumpFilter: {}
+  }
+  soon: {
+    count: number
+    loading: boolean
+    pumpFilter: {}
+  }
+  graduated: {
+    count: number
+    loading: boolean
+    pumpFilter: {}
+  }
 }
