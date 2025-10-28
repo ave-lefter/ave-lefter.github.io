@@ -52,14 +52,17 @@ export const useGlobalStore = defineStore('global', () => {
     isRight: boolean
     isBlacklist: boolean
     show_search: boolean
+    isInt: boolean
     define: string[]
     data: Record<
       string,
       {
         minSize: number
         minColor: string
+        minUnit?: string
         middleSize: number
         middleColor: string
+        middleUnit?: string
         maxColor: string
       }
     >
@@ -76,8 +79,8 @@ export const useGlobalStore = defineStore('global', () => {
     >
     jump: 'close' | 'open' | 'open_jump'
     border: string
-  }>('pumpSetting5', {
-    fontSize_mc: '12px',
+  }>('pumpSetting6', {
+    fontSize_mc: '16px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
     avatar_isCircle: 'rect',
@@ -85,6 +88,7 @@ export const useGlobalStore = defineStore('global', () => {
     isRight: false,
     isBlacklist: true,
     show_search: true,
+    isInt: false,
     define: [
       'name',
       'txs',
@@ -122,6 +126,15 @@ export const useGlobalStore = defineStore('global', () => {
         middleSize: 500,
         middleColor: '#FFA622',
         maxColor: '#12B886',
+      },
+      twitter: {
+        minSize: 10,
+        minColor: '#009EF7',
+        minUnit: 's',
+        middleSize: 30,
+        middleColor: '#12B886',
+        middleUnit: 'm',
+        maxColor: '#F6465D',
       },
     },
     bg: {},
@@ -233,7 +246,8 @@ export const useGlobalStore = defineStore('global', () => {
 
   const hotList = shallowRef<GetHotTokensResponse[]>([])
   const showImport = shallowRef(false)
- const showBotRecord = shallowRef(false)
+  const showBotRecord = shallowRef(false)
+
 
   //  点击图表显示交易历史
    const isClickKlineFilter = useStorage('isClickKlineFilter', true)

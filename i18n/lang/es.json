@@ -515,5 +515,14 @@
   "transferToken": "Seleccione Token de transferencia",
   "depositTip": "* Dirección actual EVM Cadena Universal",
   "buySetting": "comprar configuración",
-  "sellSetting": "vender configuración"
+  "sellSetting": "vender configuración",
+  "alerts": "Alertas",
+  "notifyDenyTip": "Navegador",
+  "notifyDenyTipBefore": "Has bloqueado las notificaciones de mensajes de Ave.ai. Por favor, activa.",
+  "notifyDenyTipAfter": "Ajustes, recarga esta página y vuelve a intentarlo.",
+  "domainSafe": "El nombre de dominio debe ser un enlace seguro.",
+  "unSupportNotify": "Este navegador no es compatible actualmente",
+  "repeatNotifyTip": "Alerta repetida: enviar notificación cada vez que se active<br> Alerta única: solo notificar una vez.",
+  "settingNotify": "Configurar alerta",
+  "repeatNotify": "Alerta repetida"
 }

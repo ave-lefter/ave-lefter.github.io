@@ -510,5 +510,14 @@
   "transferToken": "Aktarma jetonunu seçin",
   "depositTip": "* Mevcut Adres EVM Zinciri Universal",
   "buySetting": "kurulumu satın al",
-  "sellSetting": "kurulumu sat"
+  "sellSetting": "kurulumu sat",
+  "alerts": "Uyarılar",
+  "notifyDenyTip": "tarayıcı",
+  "notifyDenyTipBefore": "Ave.ai'nin mesaj bildirimlerini engellediniz. Lütfen etkinleştirin",
+  "notifyDenyTipAfter": "Ayarlar, bu sayfayı yeniden yükleyin ve tekrar deneyin.",
+  "domainSafe": "Alan adı güvenli bir bağlantı olmalıdır",
+  "unSupportNotify": "Bu tarayıcı şu anda desteklemiyor",
+  "repeatNotifyTip": "Tekrar Uyarısı: her tetiklendiğinde bildirim gönder<br> Tek Uyarı: yalnızca bir kez bildir",
+  "settingNotify": "Uyarı Ayarlama",
+  "repeatNotify": "Tekrar Uyarısı"
 }

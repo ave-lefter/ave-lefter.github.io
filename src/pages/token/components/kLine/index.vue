@@ -2,6 +2,7 @@
   <div class="relative" :style="{height: `${isRank ? 390 : kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
     <UnknownRisk v-show="isReady" :isRank="isRank" @refresh="refresh" />
+    <DialogRemind v-model="dialogVisible_remind" />
   </div>
   <div
     v-if="!isRank"
@@ -25,6 +26,7 @@ import { useKlineMarks } from './mark'
 import {DefaultHeight, WSSimpleTxChain} from '~/utils/constants'
 import { TW_STUDY } from './constant'
 import UnknownRisk from './unknownRisk.vue'
+import DialogRemind from './dialogRemind.vue'
 import dayjs from 'dayjs'
 
 const props = defineProps<{
@@ -45,6 +47,14 @@ const klinePair = ref('')
 const isReady = ref(false)
 let isReadyLine = false
 let isHeaderReady = false
+const dialogVisible_remind = ref(false)
+const Book = reactive({
+  title: '1111',
+  author: {
+    name:'托儿列夫'
+  },
+  year: 50
+})
 
 const chain = computed(() => {
   return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
@@ -258,14 +268,11 @@ function createTogglePriceWarningButton() {
   if (!btn) return
 
   const updateButtonContent = () => {
-    const isShowMarket = showMarket.value
     btn.innerHTML = `<div style="display: flex;align-items: center;cursor:pointer;padding: 7px 5px 7px 0;border-radius: 6px;" onMouseOver="this.style.background='none'"  onMouseLeave="this.style.background='none'"><img width="18" height="18" src="https://ave.s3.ap-east-1.amazonaws.com/im/alert.png" /></div>`
   }
 
   btn.onclick = () => {
-    showMarket.value = !showMarket.value
-
-    updateButtonContent()
+    dialogVisible_remind.value = !dialogVisible_remind.value
     // resetChart()
     _widget?.resetCache?.()
     _widget?.activeChart?.().resetData?.()

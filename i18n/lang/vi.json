@@ -762,5 +762,14 @@
   "transferToken": "Chọn mã thông báo chuyển",
   "depositTip": "* Địa chỉ hiện tại Chuỗi EVM Universal",
   "buySetting": "mua thiết lập",
-  "sellSetting": "bán thiết lập"
+  "sellSetting": "bán thiết lập",
+  "alerts": "Cảnh báo",
+  "notifyDenyTip": "trình duyệt",
+  "notifyDenyTipBefore": "Bạn đã chặn thông báo",
+  "notifyDenyTipAfter": "cài đặt và thử lại",
+  "domainSafe": "Tên miền phải an toàn",
+  "unSupportNotify": "Trình duyệt không hỗ trợ",
+  "repeatNotifyTip": "Lặp lại: mỗi lần<br>Một lần",
+  "settingNotify": "Cài đặt cảnh báo",
+  "repeatNotify": "Lặp lại cảnh báo"
 }

@@ -761,5 +761,14 @@
   "transferToken": "Выберите токен переноса",
   "depositTip": "* Текущий адрес evm ineversal",
   "buySetting": "купить установку",
-  "sellSetting": "продать установку"
+  "sellSetting": "продать установку",
+  "alerts": "Оповещения",
+  "notifyDenyTip": "браузер",
+  "notifyDenyTipBefore": "Вы заблокировали уведомления",
+  "notifyDenyTipAfter": "настройки и перезагрузите",
+  "domainSafe": "Требуется безопасная ссылка",
+  "unSupportNotify": "Браузер не поддерживается",
+  "repeatNotifyTip": "Повторять: каждый раз<br>Один раз",
+  "settingNotify": "Настройка оповещений",
+  "repeatNotify": "Повторять оповещения"
 }
