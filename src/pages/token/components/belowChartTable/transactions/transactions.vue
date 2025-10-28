@@ -947,6 +947,9 @@ const collect = async (row: any,index:number) => {
               <template v-else-if="row.type == 'CollectFee'">
                 {{ $t('CollectFee') }}
               </template>
+              <template v-else-if="row.type == 'CreatePair'">
+                {{ $t('CreatePair') }}
+              </template>
               <template v-else>
                 {{ row.type }}
               </template>

@@ -8,6 +8,7 @@ import { formatNumber } from '@/utils/formatNumber'
 import { useSessionStorage } from '@vueuse/core'
 import type { WalletTokenInfo } from '~/api/types/token'
 import type { IPriceV2Response } from '~/api/types/ws'
+import SelectWallet from '../selectWallet.vue'
 
 // const props = defineProps({
 //   currentActiveTab: {
@@ -28,6 +29,7 @@ const _chain = getAddressAndChainFromId(route.params.id as string)?.chain
 const activeTab = ref(_chain || walletStore.chain || 'solana')
 const botOrderOnlyCurrentToken = useSessionStorage('mySwapBotOrderOnlyCurrentToken', true)
 const walletTxData = ref<WalletTokenInfo>()
+const boundary = useTemplateRef('mySwap')
 useSwapUpdate(walletTxData)
 const tabs = computed(() => {
   // 获取原始地址数组
@@ -100,8 +102,12 @@ const sellUsdAmount = computed(() => {
     '--'
 })
 
+const selectWalletRef = useTemplateRef<typeof SelectWallet>('selectWallet')
+
 const userAddress = computed(() => {
-  if (botStore?.userInfo?.evmAddress) {
+  if (selectWalletRef.value?.evmAddress) {
+    return botStore?.walletList?.find?.(i => i.evmAddress === selectWalletRef.value?.evmAddress)?.addresses?.find?.(i => i.chain === activeTab.value)?.address || ''
+  } else if (botStore?.userInfo?.evmAddress) {
     return tabs.value.find(i => i?.chain === activeTab.value)?.address
   } else {
     return walletStore.address || ''
@@ -194,6 +200,10 @@ function refreshData() {
   }
 }
 
+watch(userAddress, () => {
+  getWalletTxData()
+})
+
 onMounted(() => {
   const chain = getAddressAndChainFromId(String(route.params.id))?.chain
   if (tabs.value.find(i => i?.chain === chain)) {
@@ -209,8 +219,8 @@ onActivated(() => {
 </script>
 
 <template>
-  <div>
-    <div v-if="botStore?.userInfo?.evmAddress || walletStore.address" class="px-12px mb-10px flex justify-between">
+  <div ref="mySwap">
+    <div v-if="botStore?.userInfo?.evmAddress || walletStore.address" class="px-12px mb-10px flex justify-between items-center">
       <!-- Bot钱包显示链选择器 -->
       <div v-if="botStore?.userInfo?.evmAddress" class="flex items-center whitespace-nowrap w-[80%] overflow-x-auto scrollbar-hide">
         <a
@@ -227,9 +237,10 @@ onActivated(() => {
         </span>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center">
         <el-checkbox v-model="botOrderOnlyCurrentToken" :label="t('currentToken')" size="small" style="font-size: 12px;color:var(--d-666-l-333)" />
       </div>
+       <SelectWallet v-if="botStore.evmAddress" ref="selectWallet" :chain="(activeTab as BotChain)" :boundary="boundary" />
     </div>
 
     <!-- 顶部交易统计区域 -->

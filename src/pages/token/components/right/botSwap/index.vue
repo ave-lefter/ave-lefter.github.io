@@ -1,10 +1,17 @@
 <template>
-  <div class="bot-swap-container">
+  <div ref="bot-swap-container" class="bot-swap-container">
     <Holding  />
     <div class="tabs">
       <button v-for="(item, index) in tabs" :key="index" class="tab-item" :class="{ active: item.value === activeTab, [`tab-${item.value}`]: true }" type="button" @click="activeTab = item.value">
         <span>{{ item.name }}</span>
       </button>
+    </div>
+    <div v-if="botStore?.userInfo?.evmAddress && botStore?.isSupportChains?.includes(chain)" class="flex items-center h-40px">
+      <div class="tabs-1 mr-5px">
+        <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)">{{ item.label }}</button>
+      </div>
+      <SlippageSet :canSetAuto="true" :isAutoSell="swapType === 'market'" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"/>
+      <BatchWallet :chain="chain" :boundary="boundary" />
     </div>
     <div class="select-box">
       <el-tabs v-model="swapType" class="select-tabs">
@@ -12,9 +19,9 @@
       </el-tabs>
       <div v-if="botStore?.userInfo?.evmAddress && botStore?.isSupportChains?.includes(chain)" class="inline-flex items-center absolute top-50% right-0 transform -translate-y-1/2">
         <div class="tabs-1 mr-5px">
-          <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)">{{ item.label }}</button>
+          <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSettingStore?.botSettings?.[chain]?.[activeTab]?.selected}" type="button" @click.stop="onSelectBotSwapSet(item.value)">{{ item.label }}</button>
         </div>
-        <SlippageSet :canSetAuto="true" :isAutoSell="swapType === 'market'" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"/>
+        <SlippageSet :canSetAuto="true" :isAutoSell="swapType === 'market'" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]" :initSwapType="activeTab" />
       </div>
     </div>
     <Swap :activeTab="activeTab" :swapType="swapType" :tabs1="tabs1" :tabs2="tabs2" @getTokenBalance="getTokenBalance"/>
@@ -27,6 +34,7 @@ import Swap from './swap.vue'
 import Bignumber from 'bignumber.js'
 import { useBotSwap } from '~/composables/botSwap'
 import Holding from './holding.vue'
+import BatchWallet from './batchWallet.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -37,12 +45,14 @@ const botStore = useBotStore()
 const tokenStore = useTokenStore()
 const wsStore = useWSStore()
 const botSwapStore = useBotSwapStore()
+const boundary = useTemplateRef('bot-swap-container')
 
 const { getTokenBalance } = useBotSwap()
 
 const chain = computed(() => {
   return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as BotChain
 })
+
 
 const tabs = computed<Array<{ value: 'buy' | 'sell', name: string }>>(() => {
   return [
@@ -52,7 +62,7 @@ const tabs = computed<Array<{ value: 'buy' | 'sell', name: string }>>(() => {
 })
 
 const tabs1 = computed(() => {
-  const botSetting = (botSettingStore?.botSettings?.[chain.value] || {}) as typeof botSettingStore.botSettings.solana
+  const botSetting = (botSettingStore?.botSettings?.[chain.value]?.buy || {}) as typeof botSettingStore.botSettings.solana
   const list = botSetting?.[botSetting.selected]?.buyValueList || ['0.02', '0.05', '0.1', '0.5']
   return list.map(i => {
     return {
@@ -63,7 +73,7 @@ const tabs1 = computed(() => {
 })
 
 const tabs2 = computed(() => {
-  const botSetting = (botSettingStore?.botSettings?.[chain.value] || {}) as typeof botSettingStore.botSettings.solana
+  const botSetting = (botSettingStore?.botSettings?.[chain.value]?.sell || {}) as typeof botSettingStore.botSettings.solana
   const list = botSetting?.[botSetting.selected]?.sellPerList || ['25', '50', '75', '100']
   return list.map(i => {
     return {
@@ -94,7 +104,7 @@ watch(types, (val) => {
 
 function onSelectBotSwapSet(item: string) {
   if (botSettingStore?.botSettings?.[chain.value]) {
-    (botSettingStore.botSettings[chain.value] as any).selected = item
+    (botSettingStore.botSettings[chain.value]![activeTab.value] as any).selected = item
   }
 }
 
@@ -120,7 +130,7 @@ function initToken() {
   if (chain !== tokenStore.swap.native.chain) {
     tokenStore.swap.native = {symbol: getChainInfo(chain)?.main_name, chain: chain, address: chainMainToken[chain] || NATIVE_TOKEN, decimals: getChainInfo(chain)?.decimals }
   }
-  if (chain !== tokenStore.swap.payToken.chain) {
+  if (chain !== tokenStore.swap.payToken?.chain) {
     tokenStore.swap.payToken = (botSwapStore?.botSwapBaseTokens?.[(chain || '') as BotChain] || [])[0]
   }
 }

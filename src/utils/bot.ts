@@ -42,12 +42,12 @@ export function formatBotError(msg: string) {
   return msg
 }
 
-export function handleBotError(err: any) {
+export function handleBotError(err: any, notify: any = ElNotification) {
   const msg =
     typeof err === 'string'
       ? err
       : err?.data?.message || err?.message || err?.msg
-  ElNotification({ title: 'Error', type: 'error', message: formatBotError(msg) })
+  notify({ title: 'Error', type: 'error', message: formatBotError(msg) })
 }
 
 export function tgLogin() {

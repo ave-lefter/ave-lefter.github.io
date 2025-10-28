@@ -759,5 +759,7 @@
   "holdersChange2": "Держатель Чангс в {n}",
   "lockAmount": "Сумма блокировки",
   "transferToken": "Выберите токен переноса",
-  "depositTip": "* Текущий адрес evm ineversal"
+  "depositTip": "* Текущий адрес evm ineversal",
+  "buySetting": "купить установку",
+  "sellSetting": "продать установку"
 }

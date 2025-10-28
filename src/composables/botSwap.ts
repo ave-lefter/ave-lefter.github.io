@@ -10,7 +10,7 @@ const chainMainToken: Record<string, string> = {
   ton: 'TON'
 }
 
-export function useBotSwap(type: number = 0) {
+export function useBotSwap(type: number = 0, isBatch = false) {
   const route = useRoute()
 
   const loading = ref(false)
@@ -65,6 +65,8 @@ export function useBotSwap(type: number = 0) {
       tokenStore.swap.native = {...t2, symbol: getChainInfo(chain)?.main_name, chain: chain, address: t2.token || t2.address, decimals: t2?.decimals || t2?.decimal}
       tokenStore.swap.payToken = {...tokenStore.swap.payToken, ...t3}
       _getTokensPrice(true)
+      botStore?.getUserAllChainBalance(tokenStore.swap.payToken as {address: string, chain: string})
+      botStore?.getUserAllChainBalance(tokenStore.swap.token as {address: string, chain: string})
     })
   }
 
@@ -97,7 +99,7 @@ export function useBotSwap(type: number = 0) {
     })
   }
 
-  const getSwapTokenBalance = debounce(() => {
+  const getSwapTokenBalance = debounce(async() => {
     const parsed = getParsedRoute()
     const chain = parsed?.chain || tokenInfo.value?.chain
     const address = parsed?.address || tokenInfo.value?.token
@@ -105,6 +107,12 @@ export function useBotSwap(type: number = 0) {
     const walletAddress = getWalletAddress(chain)
     if (!walletAddress) return
     loading.value = true
+    if (isBatch) {
+      botStore.getUserAllChainBalance(tokenStore.swap.token as {address: string, chain: string})
+      await sleep(1000)
+      loading.value = false
+      return
+    }
     bot_getTokenBalance({
       chain: chain,
       tokens: [address],
@@ -117,7 +125,7 @@ export function useBotSwap(type: number = 0) {
     })
   }, 500, { leading: true, trailing: true })
 
-  const getSwapNativeTokenBalance = debounce(() => {
+  const getSwapNativeTokenBalance = debounce(async() => {
     const parsed = getParsedRoute()
     const chain = parsed?.chain || tokenInfo.value?.chain
     const address = parsed?.address || tokenInfo.value?.token
@@ -126,6 +134,12 @@ export function useBotSwap(type: number = 0) {
 
     if (!walletAddress) return
     loading.value = true
+    if (isBatch) {
+      botStore.getUserAllChainBalance(tokenStore.swap.native as {address: string, chain: string})
+      await sleep(1000)
+      loading.value = false
+      return
+    }
     bot_getTokenBalance({
       chain: chain,
       tokens: [chainMainToken[chain] || NATIVE_TOKEN],
@@ -138,7 +152,7 @@ export function useBotSwap(type: number = 0) {
     })
   }, 500, { leading: true, trailing: true })
 
-  const getSwapPayTokenBalance = debounce(() => {
+  const getSwapPayTokenBalance = debounce(async () => {
     const parsed = getParsedRoute()
     const chain = parsed?.chain || tokenInfo.value?.chain
     const address = parsed?.address || tokenInfo.value?.token
@@ -149,6 +163,12 @@ export function useBotSwap(type: number = 0) {
     let payToken = tokenStore.swap.payToken
     if (!payToken || !payToken?.address || payToken?.chain !== chain) return
     loading.value = true
+    if (isBatch) {
+      botStore.getUserAllChainBalance(tokenStore.swap.payToken as {address: string, chain: string})
+      await sleep(1000)
+      loading.value = false
+      return
+    }
     bot_getTokenBalance({
       chain: chain,
       tokens: [payToken?.address],
@@ -298,6 +318,7 @@ export function useBotSwap(type: number = 0) {
     loadingAllowance,
     allowance,
     bot_approve: _bot_approve,
-    checkApproveAndApprove
+    checkApproveAndApprove,
+    getParsedRoute
   }
 }

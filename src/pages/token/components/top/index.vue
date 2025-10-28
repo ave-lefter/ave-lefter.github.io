@@ -180,7 +180,7 @@
               </div>
             </div>
             <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
-            <el-popover popper-class="[&&]:[--el-popover-bg-color:--border]">
+            <el-popover popper-class="[--el-popover-bg-color:--border]">
               <template #reference>
                 <span
                   class="media-item bg-btn cursor-pointer"
@@ -1323,7 +1323,7 @@ async function handleSearchTokenName() {
   dialogVisible_search.value = true
   await Promise.resolve()
   dialogSearchText.value = token.value?.symbol || ''
-  
+
 }
 </script>
 

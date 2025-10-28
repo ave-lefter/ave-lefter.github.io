@@ -7,7 +7,7 @@
     </span>
     <el-dialog v-model="show" class="new-dialog" width="500px" append-to-body>
       <template #header>
-        <div class="text-20px mb-10px font-400">
+        <div class="text-20px mb-4px font-400">
           <button class="border-none bg-transparent clickable color-[--third-text] px-0" :class="{'color-[--main-text]!': settingTab === 0}" @click.stop="settingTab = 0">{{ $t('basicSetting') }}</button>
           <button class="border-none bg-transparent clickable color-[--third-text] px-0 ml-24px" :class="{'color-[--main-text]!': settingTab === 1}" @click.stop="settingTab = 1">{{ $t('autoSellSetting') }}</button>
         </div>
@@ -35,117 +35,215 @@
               </el-input>
             </div>
           </div>
-          <div class="setting-list mb-10px rounded-4px">
-            <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSetting.selected}" type="button" @click.stop="botSetting.selected = item.value">{{ item.label }}</button>
+          <div class="setting-list mb-10px rounded-4px swap-type">
+            <button v-for="item in ([{label: $t('buySetting'), value: 'buy'}, {label: $t('sellSetting'), value: 'sell'}] as const)" :key="item.value" :class="{'active': item.value === swapType}" type="button" @click.stop="swapType = item.value">{{ item.label }}</button>
           </div>
-          <div class="color-[--third-text]">
-            {{$t('setTips')}}
-          </div>
-          <div class="flex items-center justify-between color-[--secondary-text]">
-            <span>{{ $t('slippage') }}</span>
-            <Icon class="text-15px color-[--icon-color] ml-5px clickable mr-auto" name="material-symbols:help-rounded" @click.stop="openSlippageTips" />
-            <el-checkbox v-if="canSetAuto" v-model="isAuto" :label="$t('autoSlippage')" size="large" style="--el-checkbox-text-color: var(--third-text)" />
-          </div>
-          <div class="mt-10px">
-            <el-row :gutter="10">
-              <el-col v-for="(item, index) in slippageList" :key="index" :span="6" class="radio-group">
-                <!-- <span v-if="index !== 0" style="flex: 1"></span> -->
-                <input
-                  :id="`radio-${item}-${key}`"
-                  v-model="botSetting[selected].slippageValue"
-                  type="radio"
-                  :value="item"
-                  :disabled="isAuto"
-                  class="radio-input"
-                  @change.stop="changeSlippage"
-                >
-                <label :for="`radio-${item}-${key}`" class="radio-item" style="border-radius: 4px">{{ item }}%</label>
-              </el-col>
-              <el-col :span="6">
-                <div class="slippage-input">
-                  <el-input-number
-                    v-model="botSetting[selected].customSlippage"
-                    class="bg-[--border] rounded-4px"
-                    name="slippage"
-                    type="number"
-                    :placeholder="$t('custom')"
-                    :min="0"
-                    :max="100"
-                    :step="0.01"
-                    :disabled="isAuto"
-                    controls-position="right"
-                    :controls="false"
-                    clearable
-                    :rules="[
-                      { required: true, message: $t('enterSlippage') },
-                      { validator: (val: string) => Number(val) <= 100, message: $t('slippageMaxTip') }
-                    ]"
-                    @change="val => handleCustomSlippage(val)"
-                  />
-                  <span class="color-fff">%</span>
-                </div>
-              </el-col>
-            </el-row>
-            <span v-if="botSetting[selected].slippageValue !== undefined && Number(botSetting[selected].slippageValue) <= 0.1" class="tip">{{ $t('slippageTip1') }}</span>
-          </div>
-          <div v-if="isCanMev" class="slippage-label mt-15px">
-            <span class="mr-auto color-[--secondary-text]">{{ $t('protection') }}</span>
-            <el-switch
-              v-model="botSetting[selected].mev"
-              size="small"
-              :before-change="solanaMevBeforeChange"
-              class="ml-2px"
-              style="--el-switch-on-color: #3c6cf6;"
-              @change="onProtectionChange"
-            />
-          </div>
-          <div class="slippage-label mt-15px color-[--secondary-text]">
-            <span>{{ chain === 'solana' ? $t('priorityFee') : $t('extraGas') }}</span>
-          </div>
-          <div :key="botSetting[selected].mev" class="mt-10px">
-            <el-row :gutter="10">
-              <el-col v-for="(item, index) in priorityList" :key="index" :span="8" class="radio-group">
-                <!-- <span v-if="index !== 0" style="flex: 1"></span> -->
-                <input
-                  :id="`radio-fee-${index}`"
-                  v-model="botSetting[selected].gas[botSetting[selected].mev ? 0 : 1].level"
-                  type="radio"
-                  :value="index"
-                  class="radio-input"
-                  @change.stop="changePriorityFee"
-                >
-                <label :for="`radio-fee-${index}`" class="radio-item" style="min-height: 60px;" :class="{'no-checked': botSetting?.[selected]?.gas?.[botSetting?.[selected].mev ? 0 : 1]?.customFee}" @click.stop="changePriorityFee">
-                  <div class="text-12px">{{ priorityText[index] }}</div>
-                  <span class="mt-10px text-14px" style="color: var(--a-text-1-color)">{{ item }} {{ chain === 'solana' ? 'SOL' : 'GWEI' }}</span>
-                </label>
-              </el-col>
-            </el-row>
-          </div>
-          <div class="input-swap mt-10px">
-            <el-input v-model="botSetting[selected].gas[botSetting[selected].mev ? 0 : 1].customFee" class="input-number" inputmode="decimal" clearable :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')" @update:model-value="watchCusTomPriorityFee"  @blur="handleBlurFee" >
-              <template #append><span class="color-[--third-text]">{{ chain === 'solana' ? 'SOL' : 'GWEI' }}</span></template>
-            </el-input>
-          </div>
-          <div v-if="showQuickAmount" class="mt-20px">
-            <div class="mb-10px" style="color: #12B886;">{{ $t('setOneClickBuyAmount') }}</div>
-            <el-row :gutter="10">
-              <el-col v-for="(item, index) in botSetting[selected].buyValueList" :key="index" :span="6" class="click-setting">
-                <el-input v-model="botSetting[selected].buyValueList[index]" class="input-number" inputmode="decimal" placeholder="0.0" @input="value => handleBuyValue(value, index)" @blur="handleBlurBuyValue(index)"/>
-              </el-col>
-            </el-row>
-          </div>
-          <div v-if="showQuickAmount" class="mt-20px">
-            <div class="mb-10px" style="color: #F6465D;">{{ $t('setOneClickSellAmount') }}</div>
-            <el-row :gutter="10">
-              <el-col v-for="(item, index) in botSetting[selected].sellPerList" :key="index" :span="6" class="click-setting">
-                <el-input v-model="botSetting[selected].sellPerList[index]"  class="input-number" inputmode="decimal" placeholder="0" @input="value => handlePer(value, index)">
-                  <template #suffix>
-                    <span class="color-text-1">%</span>
-                  </template>
-                </el-input>
-              </el-col>
-            </el-row>
-          </div>
+          <template v-if="swapType === 'buy'">
+            <div class="setting-list mb-10px rounded-4px">
+              <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSetting?.buy.selected}" type="button" @click.stop="botSetting.buy.selected = item.value">{{ item.label }}</button>
+            </div>
+            <div class="color-[--third-text]">
+              {{$t('setTips')}}
+            </div>
+            <div class="flex items-center justify-between color-[--secondary-text] mb-8px mt-15px">
+              <span>{{ $t('slippage') }}</span>
+              <Icon class="text-15px color-[--icon-color] ml-5px clickable mr-auto" name="material-symbols:help-rounded" @click.stop="openSlippageTips" />
+              <el-checkbox v-if="canSetAuto" v-model="isAutoB" :label="$t('autoSlippage')" size="large" style="--el-checkbox-text-color: var(--third-text); height: 16px;" />
+            </div>
+            <div class="mt-10px">
+              <el-row :gutter="10">
+                <el-col v-for="(item, index) in slippageList" :key="index" :span="6" class="radio-group">
+                  <!-- <span v-if="index !== 0" style="flex: 1"></span> -->
+                  <input
+                    :id="`radio-buy-${item}-${key}`"
+                    v-model="botSetting.buy[selectedB].slippageValue"
+                    type="radio"
+                    :value="item"
+                    :disabled="isAutoB"
+                    class="radio-input"
+                    @change.stop="changeSlippageB"
+                  >
+                  <label :for="`radio-buy-${item}-${key}`" class="radio-item" :class="{'no-checked': botSetting?.buy?.[selectedB]?.customSlippage}" style="border-radius: 4px">{{ item }}%</label>
+                </el-col>
+                <el-col :span="6">
+                  <div class="slippage-input">
+                    <el-input-number
+                      v-model="botSetting.buy[selectedB].customSlippage"
+                      class="bg-[--border] rounded-4px"
+                      name="slippage"
+                      type="number"
+                      :placeholder="$t('custom')"
+                      :min="0"
+                      :max="100"
+                      :step="0.01"
+                      :disabled="isAutoB"
+                      controls-position="right"
+                      :controls="false"
+                      clearable
+                      :rules="[
+                        { required: true, message: $t('enterSlippage') },
+                        { validator: (val: string) => Number(val) <= 100, message: $t('slippageMaxTip') }
+                      ]"
+                      @change="val => handleCustomSlippageB(val)"
+                    />
+                    <span class="color-fff">%</span>
+                  </div>
+                </el-col>
+              </el-row>
+              <span v-if="botSetting.buy[selectedB].slippageValue !== undefined && Number(botSetting.buy[selectedB].slippageValue) <= 0.1" class="tip">{{ $t('slippageTip1') }}</span>
+            </div>
+            <div v-if="isCanMev" class="slippage-label mt-15px">
+              <span class="mr-auto color-[--secondary-text]">{{ $t('protection') }}</span>
+              <el-switch
+                v-model="botSetting.buy[selectedB].mev"
+                size="small"
+                :before-change="solanaMevBeforeChange"
+                class="ml-2px"
+                style="--el-switch-on-color: #3c6cf6;"
+                @change="onProtectionChange('buy')"
+              />
+            </div>
+            <div class="slippage-label mt-15px color-[--secondary-text]">
+              <span>{{ chain === 'solana' ? $t('priorityFee') : $t('extraGas') }}</span>
+            </div>
+            <div :key="botSetting.buy[selectedB].mev" class="mt-10px">
+              <el-row :gutter="10">
+                <el-col v-for="(item, index) in priorityListB" :key="index" :span="8" class="radio-group">
+                  <!-- <span v-if="index !== 0" style="flex: 1"></span> -->
+                  <input
+                    :id="`radio-fee-buy-${index}`"
+                    v-model="botSetting.buy[selectedB].gas[botSetting.buy[selectedB].mev ? 0 : 1].level"
+                    type="radio"
+                    :value="index"
+                    class="radio-input"
+                    @change.stop="changePriorityFee('buy')"
+                  >
+                  <label :for="`radio-fee-buy-${index}`" class="radio-item" style="min-height: 60px;" :class="{'no-checked': botSetting?.buy?.[selectedB]?.gas?.[botSetting?.buy?.[selectedB].mev ? 0 : 1]?.customFee}" @click.stop="changePriorityFee('buy')">
+                    <div class="text-12px">{{ priorityText[index] }}</div>
+                    <span class="mt-10px text-14px" style="color: var(--a-text-1-color)">{{ item }} {{ chain === 'solana' ? 'SOL' : 'GWEI' }}</span>
+                  </label>
+                </el-col>
+              </el-row>
+            </div>
+            <div class="input-swap mt-10px">
+              <el-input v-model="botSetting.buy[selectedB].gas[botSetting.buy[selectedB].mev ? 0 : 1].customFee" class="input-number" inputmode="decimal" clearable :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')" @update:model-value="watchCusTomPriorityFee($event, 'buy')"  @blur="handleBlurFee('buy')" >
+                <template #append><span class="color-[--third-text]">{{ chain === 'solana' ? 'SOL' : 'GWEI' }}</span></template>
+              </el-input>
+            </div>
+            <div v-if="showQuickAmount" class="mt-20px">
+              <div class="mb-10px" style="color: #12B886;">{{ $t('setOneClickBuyAmount') }}</div>
+              <el-row :gutter="10">
+                <el-col v-for="(item, index) in botSetting.buy[selectedB].buyValueList" :key="index" :span="6" class="click-setting">
+                  <el-input v-model="botSetting.buy[selectedB].buyValueList[index]" class="input-number" inputmode="decimal" placeholder="0.0" @input="value => handleBuyValue(value, index)" @blur="handleBlurBuyValue(index)"/>
+                </el-col>
+              </el-row>
+            </div>
+          </template>
+          <template v-if="swapType === 'sell'">
+            <div class="setting-list mb-10px rounded-4px">
+              <button v-for="item in BotSettingsArr" :key="item.value" :class="{'active': item.value === botSetting.sell.selected}" type="button" @click.stop="botSetting.sell.selected = item.value">{{ item.label }}</button>
+            </div>
+            <div class="color-[--third-text]">
+              {{$t('setTips')}}
+            </div>
+            <div class="flex items-center justify-between color-[--secondary-text] mb-8px mt-15px">
+              <span>{{ $t('slippage') }}</span>
+              <Icon class="text-15px color-[--icon-color] ml-5px clickable mr-auto" name="material-symbols:help-rounded" @click.stop="openSlippageTips" />
+              <el-checkbox v-if="canSetAuto" v-model="isAutoS" :label="$t('autoSlippage')" size="large" style="--el-checkbox-text-color: var(--third-text); height: 16px;" />
+            </div>
+            <div class="mt-10px">
+              <el-row :gutter="10">
+                <el-col v-for="(item, index) in slippageList" :key="index" :span="6" class="radio-group">
+                  <!-- <span v-if="index !== 0" style="flex: 1"></span> -->
+                  <input
+                    :id="`radio-sell-${item}-${key}`"
+                    v-model="botSetting.sell[selectedS].slippageValue"
+                    type="radio"
+                    :value="item"
+                    :disabled="isAutoS"
+                    class="radio-input"
+                    @change.stop="changeSlippageS"
+                  >
+                  <label :for="`radio-sell-${item}-${key}`" class="radio-item" :class="{'no-checked': botSetting.sell?.[selectedS]?.customSlippage}" style="border-radius: 4px">{{ item }}%</label>
+                </el-col>
+                <el-col :span="6">
+                  <div class="slippage-input">
+                    <el-input-number
+                      v-model="botSetting.sell[selectedS].customSlippage"
+                      class="bg-[--border] rounded-4px"
+                      name="slippage"
+                      type="number"
+                      :placeholder="$t('custom')"
+                      :min="0"
+                      :max="100"
+                      :step="0.01"
+                      :disabled="isAutoS"
+                      controls-position="right"
+                      :controls="false"
+                      clearable
+                      :rules="[
+                        { required: true, message: $t('enterSlippage') },
+                        { validator: (val: string) => Number(val) <= 100, message: $t('slippageMaxTip') }
+                      ]"
+                      @change="val => handleCustomSlippageS(val)"
+                    />
+                    <span class="color-fff">%</span>
+                  </div>
+                </el-col>
+              </el-row>
+              <span v-if="botSetting.sell[selectedS].slippageValue !== undefined && Number(botSetting.sell[selectedS].slippageValue) <= 0.1" class="tip">{{ $t('slippageTip1') }}</span>
+            </div>
+            <div v-if="isCanMev" class="slippage-label mt-15px">
+              <span class="mr-auto color-[--secondary-text]">{{ $t('protection') }}</span>
+              <el-switch
+                v-model="botSetting.sell[selectedS].mev"
+                size="small"
+                :before-change="solanaMevBeforeChange"
+                class="ml-2px"
+                style="--el-switch-on-color: #3c6cf6;"
+                @change="onProtectionChange('sell')"
+              />
+            </div>
+            <div class="slippage-label mt-15px color-[--secondary-text]">
+              <span>{{ chain === 'solana' ? $t('priorityFee') : $t('extraGas') }}</span>
+            </div>
+            <div :key="botSetting.sell[selectedS].mev" class="mt-10px">
+              <el-row :gutter="10">
+                <el-col v-for="(item, index) in priorityListS" :key="index" :span="8" class="radio-group">
+                  <!-- <span v-if="index !== 0" style="flex: 1"></span> -->
+                  <input
+                    :id="`radio-sell-fee-${index}`"
+                    v-model="botSetting.sell[selectedS].gas[botSetting.sell[selectedS].mev ? 0 : 1].level"
+                    type="radio"
+                    :value="index"
+                    class="radio-input"
+                    @change.stop="changePriorityFee('sell')"
+                  >
+                  <label :for="`radio-sell-fee-${index}`" class="radio-item" style="min-height: 60px;" :class="{'no-checked': botSetting?.sell?.[selectedS]?.gas?.[botSetting?.sell?.[selectedS].mev ? 0 : 1]?.customFee}" @click.stop="changePriorityFee('sell')">
+                    <div class="text-12px">{{ priorityText[index] }}</div>
+                    <span class="mt-10px text-14px" style="color: var(--a-text-1-color)">{{ item }} {{ chain === 'solana' ? 'SOL' : 'GWEI' }}</span>
+                  </label>
+                </el-col>
+              </el-row>
+            </div>
+            <div class="input-swap mt-10px">
+              <el-input v-model="botSetting.sell[selectedS].gas[botSetting.sell[selectedS].mev ? 0 : 1].customFee" class="input-number" inputmode="decimal" clearable :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')" @update:model-value="watchCusTomPriorityFee($event, 'sell')"  @blur="handleBlurFee('sell')" >
+                <template #append><span class="color-[--third-text]">{{ chain === 'solana' ? 'SOL' : 'GWEI' }}</span></template>
+              </el-input>
+            </div>
+            <div v-if="showQuickAmount" class="mt-20px">
+              <div class="mb-10px" style="color: #F6465D;">{{ $t('setOneClickSellAmount') }}</div>
+              <el-row :gutter="10">
+                <el-col v-for="(item, index) in botSetting.sell[selectedS].sellPerList" :key="index" :span="6" class="click-setting">
+                  <el-input v-model="botSetting.sell[selectedS].sellPerList[index]"  class="input-number" inputmode="decimal" placeholder="0" @input="value => handlePer(value, index)">
+                    <template #suffix>
+                      <span class="color-text-1">%</span>
+                    </template>
+                  </el-input>
+                </el-col>
+              </el-row>
+            </div>
+          </template>
         </div>
         <div v-show="settingTab === 1">
           <div class="flex items-center bg-#FFBE3C1A p-10px rd-4px text-12px mb-20px">
@@ -324,7 +422,8 @@ const props = defineProps({
   isAutoSell: { type: Boolean, default: true },
   showQuickAmount: { type: Boolean, default: true },
   showClipboardSet: { type: Boolean, default: false },
-  showAutoSell: { type: Boolean, default: false }
+  showAutoSell: { type: Boolean, default: false },
+  initSwapType: { type: String as PropType<'buy' | 'sell'>, default: 'buy' }
 })
 
 const emit = defineEmits(['update:slippage', 'onSubmit'])
@@ -333,12 +432,14 @@ const { t } = useI18n()
 const botSwapStore = useBotSwapStore()
 const themeStore = useThemeStore()
 const configStore = useConfigStore()
+const swapType = ref<'buy' | 'sell'>(props.initSwapType || 'buy')
 
 const slippageList = [5, 9, 20]
 // 获取 uuid
 const key = Math.random().toString(36).slice(-8)
 const show = ref(false)
-const isAuto = ref(false)
+const isAutoB = ref(false)
+const isAutoS = ref(false)
 const botSettingStore = useBotSettingStore()
 
 const botSetting = ref(cloneDeep(props.setting ?? {}))
@@ -346,6 +447,10 @@ const botSetting = ref(cloneDeep(props.setting ?? {}))
 const { autoSellConfigs, loadAutoSellConfigs, saveAutoSellConfigs } = useAutoSellConfig()
 
 const selected = computed(() => botSetting.value.selected)
+
+const selectedB = computed(() => botSetting.value.buy.selected)
+
+const selectedS = computed(() => botSetting.value.sell.selected)
 
 const settingTab = ref(0)
 const clipboardQuickInput = ref(cloneDeep(botSettingStore.clipboardQuickInput))
@@ -355,51 +460,94 @@ const clipboardQuickInput = ref(cloneDeep(botSettingStore.clipboardQuickInput))
 
 watch(show, (val) => {
   if (val) {
+    swapType.value = props.initSwapType || swapType.value
     if (props.showAutoSell) {
       settingTab.value = 1
     }
-    const selected = botSetting.value.selected
     botSetting.value = cloneDeep(props.setting ?? {})
-    const s = botSetting.value[selected]?.slippage ?? 9
-    isAuto.value = s === 'auto'
-    botSetting.value[selected].slippageValue = s === 'auto' ? undefined : Number(s)
-    botSetting.value[selected].customSlippage = s === 'auto' || slippageList.includes(Number(s)) ? undefined : Number(s)
+    initSlippage('buy')
+    initSlippage('sell')
     loadAutoSellConfigs()
     clipboardQuickInput.value = cloneDeep(botSettingStore.clipboardQuickInput)
   }
 })
 
-watch(() => botSetting.value.selected, (val) => {
-  if (show.value) {
-    if (!botSetting.value[val].slippageValue && !botSetting.value[val].customSlippage) {
-      const s = botSetting.value[val]?.slippage ?? 9
-      isAuto.value = s === 'auto'
-      botSetting.value[val].slippageValue = s === 'auto' ? undefined : Number(s)
-      botSetting.value[val].customSlippage = s === 'auto' || slippageList.includes(Number(s)) ? undefined : Number(s)
+function initSlippage(type: 'buy' | 'sell', setIsAuto = true) {
+  const selected = botSetting.value?.[type]?.selected || botSetting.value?.selected || 's1'
+  const s = botSetting.value?.[type]?.[selected]?.slippage ?? 9
+  if (setIsAuto) {
+    if (type === 'buy') {
+      isAutoB.value = s === 'auto'
     }
+    if (type === 'sell') {
+      isAutoS.value = s === 'auto'
+    }
+  }
+  if (setIsAuto) {
+    botSetting.value[type][selected].slippageValue = s === 'auto' ? undefined : Number(s)
+    botSetting.value[type][selected].customSlippage = (s === 'auto' || slippageList.includes(Number(s))) ? undefined : Number(s)
+  } else {
+    if (s === 'auto') {
+      botSetting.value[type][selected].slippageValue = 9
+      botSetting.value[type][selected].customSlippage = undefined
+    } else {
+      botSetting.value[type][selected].slippageValue = Number(s)
+      botSetting.value[type][selected].customSlippage = slippageList.includes(Number(s)) ? undefined : Number(s)
+    }
+  }
+
+}
+
+watch(() => botSetting.value.buy.selected, () => {
+  if (show.value) {
+    initSlippage('buy')
   }
 })
 
-watch(isAuto, (val) => {
+watch(() => botSetting.value.sell.selected, () => {
+  if (show.value) {
+    initSlippage('sell')
+  }
+})
+
+watch(isAutoB, (val) => {
+  const selected = botSetting.value.buy.selected
   if (val) {
-    const selected = botSetting.value.selected
-    botSetting.value[selected].slippageValue = undefined
+    botSetting.value.buy[selected].slippageValue = undefined
   } else {
-    const selected = botSetting.value.selected
-    const s = botSetting.value[selected]?.slippage ?? 9
-    console.log(s)
-    botSetting.value[selected].slippageValue = s === 'auto' ? undefined : Number(s)
-    botSetting.value[selected].customSlippage = s === 'auto' || slippageList.includes(Number(s)) ? undefined : Number(s)
+    initSlippage('buy', false)
+
+  }
+})
+
+watch(isAutoS, (val) => {
+  const selected = botSetting.value.sell.selected
+  if (val) {
+    botSetting.value.sell[selected].slippageValue = undefined
+  } else {
+    initSlippage('sell', false)
   }
 })
 
 
 const priorityText = computed(() => [`🐢 ${t('slow')}`, `🚗 ${t('normal')}`, `🚄 ${t('fast')}`])
 
-const priorityList = computed(() => {
-  const selected = botSetting.value.selected
+// const priorityList = computed(() => {
+//   const selected = botSetting.value.selected
+//   const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore?.gasTip, props.chain)
+//   return botSetting.value[selected]?.mev ? gasTip1List : gasTip2List
+// })
+
+const priorityListB = computed(() => {
+  const selected = botSetting.value.buy.selected
   const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore?.gasTip, props.chain)
-  return botSetting.value[selected]?.mev ? gasTip1List : gasTip2List
+  return botSetting.value.buy[selected]?.mev ? gasTip1List : gasTip2List
+})
+
+const priorityListS = computed(() => {
+  const selected = botSetting.value.sell.selected
+  const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore?.gasTip, props.chain)
+  return botSetting.value.sell[selected]?.mev ? gasTip1List : gasTip2List
 })
 
 const isCanMev = computed(() => {
@@ -408,38 +556,82 @@ const isCanMev = computed(() => {
 })
 
 // other methods
-function changeSlippage() {
+// function changeSlippage() {
+//   if (!show.value) return
+//   const selected = botSetting.value.selected
+//   botSetting.value[selected].customSlippage = undefined
+// }
+
+function changeSlippageB() {
   if (!show.value) return
-  const selected = botSetting.value.selected
-  botSetting.value[selected].customSlippage = undefined
+  const selected = botSetting.value.buy.selected
+  botSetting.value.buy[selected].customSlippage = undefined
 }
 
-function handleCustomSlippage(val: number | undefined) {
+function changeSlippageS() {
+  if (!show.value) return
+  const selected = botSetting.value.sell.selected
+  botSetting.value.sell[selected].customSlippage = undefined
+}
+
+
+
+// function handleCustomSlippage(val: number | undefined) {
+//   if (val) {
+//     const selected = botSetting.value.selected
+//     botSetting.value[selected].slippageValue = botSetting.value[selected].customSlippage
+//   }
+// }
+
+function handleCustomSlippageB(val: number | undefined) {
   if (val) {
-    const selected = botSetting.value.selected
-    botSetting.value[selected].slippageValue = botSetting.value[selected].customSlippage
+    const selected = botSetting.value.buy.selected
+    botSetting.value.buy[selected].slippageValue = botSetting.value.buy[selected].customSlippage
   }
 }
+
+function handleCustomSlippageS(val: number | undefined) {
+  if (val) {
+    const selected = botSetting.value.sell.selected
+    botSetting.value.sell[selected].slippageValue = botSetting.value.sell[selected].customSlippage
+  }
+}
+
+
 
 
 function confirmSubmit() {
   const setting = cloneDeep(botSetting.value as typeof botSettingStore.botSettings['eth'])
-  const selected = botSetting.value.selected as BotSettingKey
-  const slippageValue = botSetting.value[selected].slippageValue
+  const selectedB = botSetting.value.buy.selected as BotSettingKey
+  const selectedS = botSetting.value.sell.selected as BotSettingKey
 
-  if (setting?.[selected]) {
-    if (slippageValue === undefined) {
-      setting[selected].slippage = 'auto'
+  const slippageValueB = botSetting.value.buy[selectedB].slippageValue
+  if (setting?.buy?.[selectedB]) {
+    if (slippageValueB === undefined) {
+      setting!.buy[selectedB].slippage = 'auto'
     } else {
-      setting[selected].slippage = String(slippageValue)
+      setting!.buy[selectedB].slippage = String(slippageValueB)
     };
     ['s1', 's2', 's3'].forEach((s) => {
-      Reflect.deleteProperty(setting[s as BotSettingKey], 'slippageValue')
-      Reflect.deleteProperty(setting[s as BotSettingKey], 'customSlippage')
+      Reflect.deleteProperty(setting!.buy![s as BotSettingKey], 'slippageValue')
+      Reflect.deleteProperty(setting!.buy![s as BotSettingKey], 'customSlippage')
     })
   }
 
-  if (setting?.selected) {
+  const slippageValueS = botSetting.value.sell[selectedS].slippageValue
+  if (setting?.sell?.[selectedS]) {
+    if (slippageValueS === undefined) {
+      setting!.sell[selectedS].slippage = 'auto'
+    } else {
+      setting!.sell[selectedS].slippage = String(slippageValueS)
+    };
+    ['s1', 's2', 's3'].forEach((s) => {
+      Reflect.deleteProperty(setting!.sell![s as BotSettingKey], 'slippageValue')
+      Reflect.deleteProperty(setting!.sell![s as BotSettingKey], 'customSlippage')
+    })
+  }
+
+  if (setting) {
     if (props.chain === 'solana') {
       botSettingStore.botSettings = {
         ...botSettingStore.botSettings,
@@ -453,27 +645,28 @@ function confirmSubmit() {
     }
   }
   botSettingStore.clipboardQuickInput = cloneDeep(clipboardQuickInput.value)
+  console.log('setting', setting)
   emit('onSubmit', setting)
   saveAutoSellConfigs()
   show.value = false
 }
 
-function changePriorityFee() {
+function changePriorityFee(type: 'buy' | 'sell') {
   // 如果切换等级，同时取消自定义费
-  const selected = botSetting.value.selected
-  const gas = botSetting.value[selected]?.gas?.[botSetting.value[selected].mev ? 0 : 1]
+  const selected = botSetting.value[type].selected
+  const gas = botSetting.value[type][selected]?.gas?.[botSetting.value[type][selected].mev ? 0 : 1]
   if (gas) gas.customFee = ''
 }
 
-function watchCusTomPriorityFee(val: string) {
-  const selected = botSetting.value.selected
-  const gas = botSetting.value[selected]?.gas?.[botSetting.value[selected].mev ? 0 : 1]
+function watchCusTomPriorityFee(val: string, type: 'buy' | 'sell') {
+  const selected = botSetting.value[type].selected
+  const gas = botSetting.value[type][selected]?.gas?.[botSetting.value[type][selected].mev ? 0 : 1]
   if (gas) gas.customFee = val
 }
 
-function handleBlurFee() {
-  const selected = botSetting.value.selected
-  const gas = botSetting.value[selected]?.gas?.[botSetting.value[selected].mev ? 0 : 1]
+function handleBlurFee(type: 'buy' | 'sell') {
+  const selected = botSetting.value[type].selected
+  const gas = botSetting.value[type][selected]?.gas?.[botSetting.value[type][selected].mev ? 0 : 1]
   if (gas && new BigNumber(gas.customFee).lt(0)) {
     gas.customFee = ''
   }
@@ -481,21 +674,21 @@ function handleBlurFee() {
 
 function handleBuyValue(value: string, index: number) {
   const v = value.replace(/-|[^\d.]/g, '')
-  const selected = botSetting.value.selected
-  botSetting.value[selected].buyValueList[index] = v
+  const selected = botSetting.value.buy.selected
+  botSetting.value.buy[selected].buyValueList[index] = v
 }
 
 function handleBlurBuyValue(index: number) {
   // 限制合法性，可添加逻辑
   const decimals = 4
-  const selected = botSetting.value.selected
-  const v = botSetting.value[selected].buyValueList[index]
+  const selected = botSetting.value.buy.selected
+  const v = botSetting.value.buy[selected].buyValueList[index]
   const v1 = (new BigNumber(v || 0)).toFixed()?.match?.(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals || 18}})?`))?.[0]
   if (String(v) !== String(v1)) {
     if (Number(v1) === 0) {
-      botSetting.value[selected].buyValueList[index] = '0'
+      botSetting.value.buy[selected].buyValueList[index] = '0'
     } else {
-      botSetting.value[selected].buyValueList[index] = v1
+      botSetting.value.buy[selected].buyValueList[index] = v1
     }
   }
 }
@@ -543,8 +736,8 @@ function solanaMevBeforeChange() {
   return true // 可做权限判断
 }
 
-function onProtectionChange() {
-  nextTick(() => changePriorityFee())
+function onProtectionChange(type: 'buy' | 'sell') {
+  nextTick(() => changePriorityFee(type))
 }
 
 function addStopProfit() {
@@ -722,6 +915,20 @@ function addStopLoss() {
     &.active {
       background: var(--dialog-tab-active-bg);
       color: var(--main-text);
+    }
+  }
+  &.swap-type {
+    padding: 4px;
+    button {
+      height: 32px;
+      &.active {
+        &:first-child {
+          color: var(--up-color);
+        }
+        &:last-child {
+          color: var(--down-color);
+        }
+      }
     }
   }
 }

@@ -244,7 +244,10 @@ export const useGlobalStore = defineStore('global', () => {
   const holderBlackList = useStorage<Array<pumpBlack>>('holderBlackList', [])
   const mySwapList = ref<any[]>([])
 
-   const hotList = shallowRef<GetHotTokensResponse[]>([])
+  const hotList = shallowRef<GetHotTokensResponse[]>([])
+  const showImport = shallowRef(false)
+ const showBotRecord = shallowRef(false)
+
   //  点击图表显示交易历史
    const isClickKlineFilter = useStorage('isClickKlineFilter', true)
   //  搜索框的展示
@@ -353,6 +356,8 @@ export const useGlobalStore = defineStore('global', () => {
     pumpLiveSort,
     isUSDT,
     dialogVisible_search,
-    dialogSearchText
+    dialogSearchText,
+    showImport,
+    showBotRecord
   }
 })
