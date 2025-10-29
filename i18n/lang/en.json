@@ -1452,8 +1452,8 @@
   "startSwap": "Start Swap",
   "useChainWallet": "Please use the chain wallet to interact with the current token",
   "pushSettings": "Push Settings",
-  "newFeature":"New Feature",
-  "CreatePair":"Create Pair",
+  "newFeature": "New Feature",
+  "CreatePair": "Create Pair",
   "buySetting": "Buy Setup",
   "sellSetting": "Sell Setup",
   "walletList": "Wallet List",
@@ -1476,5 +1476,6 @@
   "create": "Create",
   "refresh": "Refresh",
   "mainToken": "Main Token",
-  "botCancelAllOrder": "Confirm to cancel the limit orders of all wallets"
+  "botCancelAllOrder": "Confirm to cancel the limit orders of all wallets",
+  "optional": "Optional"
 }

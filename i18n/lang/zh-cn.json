@@ -1450,8 +1450,8 @@
   "startSwap": "开始交易",
   "useChainWallet": "请使用链钱包交互当前代币",
   "pushSettings": "推送设置",
-  "newFeature":"新功能",
-  "CreatePair":"创建池子",
+  "newFeature": "新功能",
+  "CreatePair": "创建池子",
   "buySetting": "买入设置",
   "sellSetting": "卖出设置",
   "walletList": "钱包列表",
@@ -1474,5 +1474,6 @@
   "create": "创建",
   "refresh": "刷新",
   "mainToken": "主币",
-  "botCancelAllOrder": "确认取消所有钱包的当前挂单"
+  "botCancelAllOrder": "确认取消所有钱包的当前挂单",
+  "optional": "可选"
 }

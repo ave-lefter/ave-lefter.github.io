@@ -8,6 +8,7 @@ defineProps({
     default: () => []
   }
 })
+const botStore = useBotStore()
 const {userInfo} = storeToRefs(useBotStore())
 const { address } = storeToRefs(useWalletStore())
 const {isSupportEvmChains,evmAddress} = storeToRefs(useBotStore())
@@ -24,11 +25,11 @@ const displayChains = computed(() => {
 
 onMounted(() => {
   nextTick(() => {
-    selectedChains.value = evmAddress.value ? ['eth', 'bsc', 'solana', 'base', 'xlayer'] : ['bsc', 'base', 'eth', 'xlayer']
+    selectedChains.value = evmAddress.value ? (botStore.isSupportChains as unknown as string[]) : ['bsc', 'base', 'eth', 'xlayer']
   })
 })
 function getDisabled(val: string) {
-  return selectedChains.value.length >= 5 && !selectedChains.value.includes(val)
+  return selectedChains.value.length >= 6 && !selectedChains.value.includes(val)
 }
 
 function onConfirm() {

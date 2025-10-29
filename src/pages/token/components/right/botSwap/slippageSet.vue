@@ -9,7 +9,7 @@
       <template #header>
         <div class="text-20px mb-4px font-400">
           <button class="border-none bg-transparent clickable color-[--third-text] px-0" :class="{'color-[--main-text]!': settingTab === 0}" @click.stop="settingTab = 0">{{ $t('basicSetting') }}</button>
-          <button class="border-none bg-transparent clickable color-[--third-text] px-0 ml-24px" :class="{'color-[--main-text]!': settingTab === 1}" @click.stop="settingTab = 1">{{ $t('autoSellSetting') }}</button>
+          <button v-if="chain !== 'ton'" class="border-none bg-transparent clickable color-[--third-text] px-0 ml-24px" :class="{'color-[--main-text]!': settingTab === 1}" @click.stop="settingTab = 1">{{ $t('autoSellSetting') }}</button>
         </div>
       </template>
       <el-form class="popup-content" @submit.prevent="confirmSubmit">
@@ -103,10 +103,10 @@
                 @change="onProtectionChange('buy')"
               />
             </div>
-            <div class="slippage-label mt-15px color-[--secondary-text]">
+            <div v-if="chain !== 'ton'" class="slippage-label mt-15px color-[--secondary-text]">
               <span>{{ chain === 'solana' ? $t('priorityFee') : $t('extraGas') }}</span>
             </div>
-            <div :key="botSetting.buy[selectedB].mev" class="mt-10px">
+            <div v-if="chain !== 'ton'" :key="botSetting.buy[selectedB].mev" class="mt-10px">
               <el-row :gutter="10">
                 <el-col v-for="(item, index) in priorityListB" :key="index" :span="8" class="radio-group">
                   <!-- <span v-if="index !== 0" style="flex: 1"></span> -->
@@ -125,7 +125,7 @@
                 </el-col>
               </el-row>
             </div>
-            <div class="input-swap mt-10px">
+            <div v-if="chain !== 'ton'" class="input-swap mt-10px">
               <el-input v-model="botSetting.buy[selectedB].gas[botSetting.buy[selectedB].mev ? 0 : 1].customFee" class="input-number" inputmode="decimal" clearable :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')" @update:model-value="watchCusTomPriorityFee($event, 'buy')"  @blur="handleBlurFee('buy')" >
                 <template #append><span class="color-[--third-text]">{{ chain === 'solana' ? 'SOL' : 'GWEI' }}</span></template>
               </el-input>
@@ -204,10 +204,10 @@
                 @change="onProtectionChange('sell')"
               />
             </div>
-            <div class="slippage-label mt-15px color-[--secondary-text]">
+            <div v-if="chain !== 'ton'" class="slippage-label mt-15px color-[--secondary-text]">
               <span>{{ chain === 'solana' ? $t('priorityFee') : $t('extraGas') }}</span>
             </div>
-            <div :key="botSetting.sell[selectedS].mev" class="mt-10px">
+            <div v-if="chain !== 'ton'" :key="botSetting.sell[selectedS].mev" class="mt-10px">
               <el-row :gutter="10">
                 <el-col v-for="(item, index) in priorityListS" :key="index" :span="8" class="radio-group">
                   <!-- <span v-if="index !== 0" style="flex: 1"></span> -->
@@ -226,7 +226,7 @@
                 </el-col>
               </el-row>
             </div>
-            <div class="input-swap mt-10px">
+            <div v-if="chain !== 'ton'" class="input-swap mt-10px">
               <el-input v-model="botSetting.sell[selectedS].gas[botSetting.sell[selectedS].mev ? 0 : 1].customFee" class="input-number" inputmode="decimal" clearable :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')" @update:model-value="watchCusTomPriorityFee($event, 'sell')"  @blur="handleBlurFee('sell')" >
                 <template #append><span class="color-[--third-text]">{{ chain === 'solana' ? 'SOL' : 'GWEI' }}</span></template>
               </el-input>

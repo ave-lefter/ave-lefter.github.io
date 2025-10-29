@@ -1436,8 +1436,8 @@
   "saved": "我已保存好助記詞",
   "startSwap": "開始交易",
   "pushSettings": "推送設置",
-  "newFeature":"新功能",
-  "CreatePair":"創建池子",
+  "newFeature": "新功能",
+  "CreatePair": "創建池子",
   "buySetting": "買入設置",
   "sellSetting": "賣出設置",
   "walletList": "錢包清單",
@@ -1460,5 +1460,6 @@
   "create": "創建",
   "refresh": "刷新",
   "mainToken": "主幣",
-  "botCancelAllOrder": "確認取消所有錢包的當前掛單"
+  "botCancelAllOrder": "確認取消所有錢包的當前掛單",
+  "optional": "可選"
 }

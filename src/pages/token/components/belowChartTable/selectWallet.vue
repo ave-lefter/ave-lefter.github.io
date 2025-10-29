@@ -84,7 +84,7 @@ function getAddressFromChain(chain: BotChain, addresses: typeof botStore.walletL
 }
 
 function getAddressFromChainBalance(chain: BotChain, addresses: typeof botStore.walletList[number]['addresses'], token?: string) {
-  if (token === NATIVE_TOKEN || token === 'sol' || !token) {
+  if (BotNativeTokens?.includes(token || '') || !token) {
     return getAddressFromChain(chain, addresses)?.balance || 0
   }
   return getAddressFromChain(chain, addresses)?.tokenBalances?.[token]?.balance || 0

@@ -8,6 +8,7 @@ import { MultiContract, MultiProvider, getFeeAddress, getSigner } from '~/utils/
 import { Contract } from 'ethers'
 import { TronContract, confirmTronTx } from '~/utils/wallet/utils/tronContract'
 import { getFeeIn } from '~/utils'
+import { getTonTokenList } from '~/utils/wallet/ton'
 
 export * from './sui'
 
@@ -28,8 +29,9 @@ export interface GetUserBalanceResponse {
   risk_level: number
   risk_score: number
 }
+export type GetUserBalanceResponseResult = { data: GetUserBalanceResponse[] ; total: number ;pageNo: number; pageSize: number }
 
-export const getUserBalance = createCacheRequest(function(
+export const getUserBalance = createCacheRequest(async function(
   {
     pageNO = 1,
     pageSize = 10,
@@ -38,18 +40,53 @@ export const getUserBalance = createCacheRequest(function(
     sort_dir = 'desc',
     hide_risk = 1,
     hide_small = 0
-  }): Promise<{ data: GetUserBalanceResponse[] ; total: number ;pageNo: number; pageSize: number }> {
-  const { $api } = useNuxtApp()
-  return $api('/v2api/user_balance/v1/swap/balance', {
-    method: 'post',
-    body: {
-      user_ids, //钱包ID
-      sort,     // 排序字段，支持：balance_usd、total_profit
-      sort_dir, //desc:倒序，asc:正序
-      pageSize,
-      pageNO,
-      hide_risk,  //是否隐藏高分险。0:不隐藏高风险; 1：隐藏高分险;
-      hide_small  //是否隐藏小额。 大于0时:balance_usd > hide_small; 其他：不参与过滤
+  }): Promise<GetUserBalanceResponseResult> {
+  let tonAddressId = user_ids.find((i: string) => i?.endsWith?.('-ton'))
+  let otherUserIds = user_ids?.filter((i: string) => !i?.endsWith?.('-ton'))
+  let tonTokenList: any[] = []
+  let _tokens: any = {
+    data: [],
+    total: tonTokenList?.length || 0,
+    pageNo: 1,
+    pageSize
+  }
+  return Promise.all([(async () => {
+    if (tonAddressId && pageNO === 1) {
+      tonTokenList = await getTonTokenList(getAddressAndChainFromId(tonAddressId)?.address).catch(async () => [])
+      tonTokenList = tonTokenList?.map(i => ({...i, total_profit: '0', total_profit_ratio: '--', average_purchase_price_usd: '--', 
+ }))
+    }
+    return tonTokenList
+  })(), (async () => {
+    const { $api } = useNuxtApp()
+    if (otherUserIds?.length > 0) {
+      _tokens = await $api('/v2api/user_balance/v1/swap/balance', {
+        method: 'post',
+        body: {
+          user_ids, //钱包ID
+          sort,     // 排序字段，支持：balance_usd、total_profit
+          sort_dir, //desc:倒序，asc:正序
+          pageSize,
+          pageNO,
+          hide_risk,  //是否隐藏高分险。0:不隐藏高风险; 1：隐藏高分险;
+          hide_small  //是否隐藏小额。 大于0时:balance_usd > hide_small; 其他：不参与过滤
+        }
+      })
+    }
+    return _tokens
+  })()]).then(async (res) => {
+    console.log('tonTokenList', tonTokenList, res)
+    console.log('_tokens', _tokens)
+    if (tonTokenList?.length > 0) {
+      return {
+        ..._tokens,
+        data: [...(_tokens.data || []), ...tonTokenList].sort((a, b) => {
+          return (b[sort] - a[sort]) * (sort_dir === 'desc' ? 1 : 1)
+        }),
+        total: _tokens.total + tonTokenList?.length
+      }
+    } else {
+      return _tokens
     }
   })
 }, 1000)
