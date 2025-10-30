@@ -235,6 +235,7 @@ import { ElMessage } from 'element-plus'
 import { generateAvatarIcon, getChainInfo, isValidAddress, evm_utils as utils } from '@/utils'
 import { ArrowDownBold } from '@element-plus/icons-vue'
 import SuffixIcon from './suffixIcon.vue'
+import { getAttentionPageList, getUserFavoriteGroups2} from '~/api/attention'
 const { mode, token_logo_url } = storeToRefs(useGlobalStore())
 const { currentAddress, showBatchAddressDetails } = storeToRefs(useFollowStore())
 
@@ -242,6 +243,8 @@ const { updateNum3 } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const { t } = useI18n()
 const tabActive = ref(0)
+const favTotal = ref(0)
+const favGroups = ref([])
 const importStr = ref('')
 const exportStr = ref('')
 const isValid = ref(true)
@@ -265,6 +268,9 @@ watch(()=>showBatchAddressDetails.value, (val) => {
     exportStr.value = ''
     zeroBalanceAddresses.value = ''
     zeroBalanceList.value = []
+    favTotal.value = 0;
+  } else {
+    getfavGroupsTotal();
   }
 })
 
@@ -285,6 +291,26 @@ watch(tabActive, (val) => {
     fetchZeroBalAddresses()
   }
 })
+
+const getfavGroupsTotal = async () => {
+  const groups = await getUserFavoriteGroups2(currentAddress.value)
+  const groupIds = groups.map(item => item.group_id);
+  groupIds.push(0);
+  groupIds.map(async (id) =>{
+    const data = await getTotal(id)
+    favTotal.value+=data;
+  })
+}
+
+const getTotal = async (group) => {
+  try {
+    const { total } = await getAttentionPageList({ address:currentAddress.value, user_chain:activeChain.value, group });
+
+    return total;
+  } catch (err) {
+    // console.error('copy failed:', err)
+  }
+}
 
 const copyToClipboard = async () => {
   try {
@@ -320,11 +346,11 @@ const validateInput = () => {
   errorMessage.value = ''
   if (isJSON(importStr.value)) {
     const entries = JSON.parse(importStr.value)
-    // if (entries.length > 100) {
-    //   errorMessage.value = t('batchErrorMsg3', { n: 100 })
-    //   isValid.value = false
-    //   return
-    // }
+    if (entries.length + favTotal.value > 500) {
+      errorMessage.value = t('batchErrorMsg3', { n: 500 })
+      isValid.value = false
+      return
+    }
     for (const entry of entries) {
       const address = entry.address || entry.trackedWalletAddress
       if (!isValidAddress(address, activeChain.value)) {
@@ -340,8 +366,9 @@ const validateInput = () => {
     }
   } else {
     const entries = importStr.value.split(/\s*,\s*|\n/).filter(Boolean)
-    if (entries.length > 100) {
-      errorMessage.value = t('batchErrorMsg3', { n: 100 })
+
+    if (entries.length + favTotal.value > 500) {
+      errorMessage.value = t('batchErrorMsg3', { n: 500 })
       isValid.value = false
       return
     }
