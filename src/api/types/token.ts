@@ -3,7 +3,7 @@ export interface TokenInfo {
   pairs: Pair[]
   // volumes: Volume[]
   // liquidities: Liquidity[]
-  // is_audited: boolean
+  is_audited: boolean
 }
 
 export interface Liquidity {
