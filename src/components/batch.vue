@@ -257,7 +257,7 @@ const zeroBalanceList = ref([])
 
 const emit = defineEmits(['refresh'])
 const exportNumber = computed(() => {
-  const entries = exportStr.value.split(/\s*,\s*|\n/).filter(Boolean)
+  const entries = JSON.parse(exportStr.value)
   return entries.length || 0
 })
 
@@ -304,7 +304,7 @@ const getfavGroupsTotal = async () => {
 
 const getTotal = async (group) => {
   try {
-    const { total } = await getAttentionPageList({ address:currentAddress.value, user_chain:activeChain.value, group });
+    const { total } = await getAttentionPageList({ address:currentAddress.value, pageSize:500, user_chain:activeChain.value, group });
 
     return total;
   } catch (err) {
