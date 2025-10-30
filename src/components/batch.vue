@@ -320,11 +320,11 @@ const validateInput = () => {
   errorMessage.value = ''
   if (isJSON(importStr.value)) {
     const entries = JSON.parse(importStr.value)
-    if (entries.length > 100) {
-      errorMessage.value = t('batchErrorMsg3', { n: 100 })
-      isValid.value = false
-      return
-    }
+    // if (entries.length > 100) {
+    //   errorMessage.value = t('batchErrorMsg3', { n: 100 })
+    //   isValid.value = false
+    //   return
+    // }
     for (const entry of entries) {
       const address = entry.address || entry.trackedWalletAddress
       if (!isValidAddress(address, activeChain.value)) {
@@ -461,7 +461,7 @@ const handleBulkExportAttention = () => {
 const convertJsonToString = (jsonData) => {
   const data = jsonData.map((item) => {
     return {
-      name: item.remark,
+      name: item.remark ? item.remark : '',
       address: item.user_address,
     }
   })
