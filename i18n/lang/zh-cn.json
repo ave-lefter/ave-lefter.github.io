@@ -835,7 +835,7 @@
   "foundZeroBalanceAddresses": "找到 {count} 个零余额地址",
   "fetchFailed": "获取零余额地址失败",
   "deleteFailed": "批量删除失败",
-  "bulkDesc1": "按示例填写钱包地址，一行一个，使用逗号分隔",
+  "bulkDesc1": "最多500个，按示例填写钱包地址，一行一个，使用逗号分隔",
   "attentionSearch": "搜索关注地址",
   "nativeBalance": "主币余额",
   "lastTxsTime1": "最近交易",
@@ -1479,5 +1479,6 @@
   "create": "创建",
   "refresh": "刷新",
   "mainToken": "主币",
-  "botCancelAllOrder": "确认取消所有钱包的当前挂单"
+  "botCancelAllOrder": "确认取消所有钱包的当前挂单",
+  "or":"或者"
 }
