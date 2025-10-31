@@ -1,12 +1,15 @@
 import TonWeb from 'tonweb'
-import { HttpClient, Api, type JettonBalance } from 'tonapi-sdk-js'
+import { HttpClient, Api, type JettonBalance, type Transaction, type AccountEvent } from 'tonapi-sdk-js'
 import { getTokensPrice } from '@/api/token'
 import { createSequentialThrottle } from '@/utils/createSequentialThrottle'
 import BigNumber from 'bignumber.js'
+import { TonConnectUI, THEME, type Locales } from '@tonconnect/ui'
 
 const { JettonMinter, JettonWallet} = TonWeb.token.jetton
 
 const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'))
+
+const TonReferAddress = 'UQC1SFzvJijL20wDMc-dvJqHQcWZE7wQcRZxM26xP4usCy68'
 
 const httpClient = new HttpClient({
   baseUrl: 'https://tonapi.io',
@@ -21,6 +24,113 @@ const httpClient = new HttpClient({
 
 const client = new Api(httpClient)
 
+
+export async function getTonWallets() {
+  console.log('getTonWallets')
+  const wallets = await TonConnectUI.getWallets()
+  console.log('ton wallets', wallets)
+}
+
+let tonConnectUI: TonConnectUI | null = null
+let _buttonRootId = 'ton-connect-btn'
+export function getTonConnectUI(buttonRootId: string = 'ton-connect-btn') {
+  if (!tonConnectUI) {
+    tonConnectUI = new TonConnectUI({
+      manifestUrl: `${window.location.origin}/tonconnect-manifest.json`,
+      buttonRootId: buttonRootId,
+      // actionsConfiguration: {
+      //   modals: [],
+      //   notifications: []
+      // }
+    })
+  }
+  tonConnectUI.uiOptions = {
+    // language: useLocaleStore().locale,
+    uiPreferences: {
+      theme: useThemeStore().theme === 'dark' ? THEME.DARK : THEME.LIGHT
+    }
+  }
+  return tonConnectUI
+}
+
+
+export async function connectTonWallet(buttonRootId: string = 'ton-connect-btn') {
+  const _tonConnectUI = getTonConnectUI(buttonRootId)
+  return _tonConnectUI.connectWallet().then(async walletAndWalletInfo => {
+    console.log('walletAndWalletInfo', walletAndWalletInfo)
+    if (walletAndWalletInfo?.account?.address) {
+      const walletStore = useWalletStore()
+      walletStore.address = toBase64Address(walletAndWalletInfo?.account?.address, false) || walletAndWalletInfo?.account?.address
+      walletStore.chain = 'ton'
+      walletStore.provider = _tonConnectUI
+      walletStore.walletName = walletAndWalletInfo?.name || ''
+      bindTonWalletEvent()
+    }
+    return walletAndWalletInfo
+  })
+  // return new Promise((resolve, reject) => {
+  //   const unsubscribe = _tonConnectUI.onStatusChange(
+  //     walletAndWalletInfo => {
+  //       console.log('walletAndWalletInfo', walletAndWalletInfo, _tonConnectUI)
+  //       if (walletAndWalletInfo?.account?.address) {
+  //          const walletStore = useWalletStore()
+  //           walletStore.address = walletAndWalletInfo?.account?.address
+  //           walletStore.chain = 'ton'
+  //           walletStore.provider = _tonConnectUI
+  //           walletStore.walletName = walletAndWalletInfo?.name || ''
+  //         resolve(walletAndWalletInfo)
+  //         bindTonWalletEvent()
+  //       }
+  //       unsubscribe()
+  //   }, err => {
+  //     reject(err)
+  //   })
+  // })
+}
+
+export function initTonWallet() {
+  if (!document.getElementById('ton-connect-btn')) {
+    document.body.insertAdjacentHTML('beforeend', '<div id="ton-connect-btn" style="display: none;"></div>')
+  }
+  setTimeout(() => {
+    const walletStore = useWalletStore()
+    const tonConnectUI = getTonConnectUI()
+    tonConnectUI?.connectionRestored.then(() => {
+      if (tonConnectUI.connected && tonConnectUI?.account?.address) {
+        console.log('tonConnectUI', tonConnectUI)
+        walletStore.provider = tonConnectUI
+        walletStore.address = toBase64Address(tonConnectUI?.account?.address, false) || tonConnectUI?.account?.address
+        walletStore.chain = 'ton'
+        bindTonWalletEvent()
+      } else {
+        resetWallet()
+      }
+    })
+
+  }, 0)
+}
+
+export function bindTonWalletEvent() {
+  const _tonConnectUI = getTonConnectUI(_buttonRootId)
+  _tonConnectUI.onStatusChange(
+    walletAndWalletInfo => {
+      console.log('walletAndWalletInfo', walletAndWalletInfo)
+      if (walletAndWalletInfo?.account?.address) {
+        const walletStore = useWalletStore()
+        walletStore.address = toBase64Address(walletAndWalletInfo?.account?.address, false)
+      } else {
+        resetWallet()
+      }
+    }
+  )
+}
+
+function resetWallet() {
+  const walletStore = useWalletStore()
+  walletStore.provider = null
+  walletStore.address = ''
+  walletStore.chain = ''
+}
 
 export function toBase64Address(address: string, isBounceable = true) {
   const Address = TonWeb.utils.Address
@@ -88,7 +198,10 @@ export async function getTonTokenList(address: string, _token = 'all') {
       price: symbolInfo?.current_price_usd || 0,
       current_price_usd: symbolInfo?.current_price_usd || 0,
       logo_url: symbolInfo?.logo_url || i?.jetton?.image || '',
-      balance_usd: new BigNumber(balance || 0).times(symbolInfo?.current_price_usd || 0).toFixed()
+      balance_usd: new BigNumber(balance || 0).times(symbolInfo?.current_price_usd || 0).toFixed(),
+      risk_score: 55,
+      risk_level: 0,
+      is_hidden: false
     }
   })
   if (_token && _token !== 'all') {
@@ -114,3 +227,156 @@ export async function getTonWalletBalance({token, wallet}: {token: string; walle
     return tokens?.find?.(i => toBase64Address(i?.jetton?.address) === token || token === i?.jetton?.address)?.balance || '0'
   }
 }
+
+export async function getTonTokenTransferMsg(swapInfo: { from_address: string; from_amount: string; from_decimals: number; to_address: string; to_amount: string; to_decimals: number }) {
+  let feeMsg = null
+  if (swapInfo?.from_address === NATIVE_TOKEN) {
+    feeMsg = {
+      address: TonReferAddress,
+      amount: new BigNumber(swapInfo?.from_amount || '0').times(10 ** (swapInfo?.from_decimals || 0)).times(0.003).toFixed(0),
+      // payload: null
+    }
+  } else if (swapInfo?.to_address === NATIVE_TOKEN) {
+    feeMsg = {
+      address: TonReferAddress,
+      amount: new BigNumber(swapInfo?.to_amount || '0').times(10 ** (swapInfo?.to_decimals || 0)).times(0.003).toFixed(0),
+      // payload: null
+    }
+  }
+  return feeMsg
+}
+
+async function getTransactionByMessageHash(bocBase64: string) {
+  let boc = TonWeb.boc.Cell.oneFromBoc(TonWeb.utils.base64ToBytes(bocBase64))
+  let msgId = TonWeb.utils.bytesToHex(await boc.hash())
+  return msgId
+}
+
+async function waitTonMsgTransaction(hash: string) : Promise<Transaction> {
+  let Timer: string | number | NodeJS.Timeout | null | undefined = null
+  let time = 0
+  function getTransaction(hash: string): Promise<Transaction> {
+    return new Promise((resolve, reject) => {
+      if (time >= 300) {
+        if (Timer) {
+          clearTimeout(Timer)
+          Timer = null
+        }
+        reject('Timeout')
+        return
+      }
+      client.blockchain.getBlockchainTransactionByMessageHash(hash).then(res => {
+        console.log(hash, res)
+        if (res?.hash) {
+          resolve(res)
+        } else {
+          if (Timer) {
+            clearTimeout(Timer)
+            Timer = null
+          }
+          reject('Swap fail')
+        }
+      }).catch(() => {
+        if (Timer) {
+          clearTimeout(Timer)
+          Timer = null
+        }
+        Timer = setTimeout(async () => {
+          time += 3
+          try {
+            let res = await getTransaction(hash)
+            resolve(res)
+          } catch (err) {
+            if (Timer) {
+              clearTimeout(Timer)
+              Timer = null
+            }
+            reject(err)
+          }
+        }, 3000)
+      })
+    })
+  }
+
+  await new Promise(resolve => setTimeout(resolve, 3000))
+  return getTransaction(hash)
+}
+
+
+
+async function waitTonTransaction(hash: string): Promise<Transaction | AccountEvent> {
+  const walletStore = useWalletStore()
+  let Timer: string | number | NodeJS.Timeout | null | undefined = null
+  let time = 0
+  function getTransaction(hash: string): Promise<Transaction | AccountEvent> {
+    return new Promise((resolve, reject) => {
+      if (time >= 240) {
+        if (Timer) {
+          clearTimeout(Timer)
+          Timer = null
+        }
+        reject('Timeout')
+        return
+      }
+      try {
+        client.accounts.getAccountEvent(walletStore.address, hash).then(res => {
+          console.log(hash, res)
+          if (res?.in_progress === false) {
+            resolve(res)
+          } else {
+            if (Timer) {
+              clearTimeout(Timer)
+              Timer = null
+            }
+            Timer = setTimeout(async () => {
+              time += 3
+              try {
+                let res = await getTransaction(hash)
+                resolve(res)
+              } catch (err) {
+                if (Timer) {
+                  clearTimeout(Timer)
+                  Timer = null
+                }
+                reject(err)
+              }
+            }, 3000)
+          }
+        })
+      } catch (err) {
+        if (Timer) {
+          clearTimeout(Timer)
+          Timer = null
+        }
+        reject(err)
+      }
+    })
+  }
+
+  await new Promise(resolve => setTimeout(resolve, 3000))
+  return getTransaction(hash)
+}
+
+export async function sendTonTransaction(messages: any[]) {
+  const walletStore = useWalletStore()
+  let from = walletStore.address || ''
+  from = toTonAddress(from)
+  let transaction = {
+    messages,
+    // network: '-239',
+    from: from,
+    validUntil: Date.now() + 4.5 * 60000
+  }
+  console.log('transaction', transaction)
+  // let param = JSON.stringify(transaction)
+  return (walletStore?.provider as TonConnectUI)?.sendTransaction?.(transaction).then(async res => {
+    console.log('boc', res)
+    // let hash = await getTonTransactions(store?.state?.currentAccount).then(async res => res?.events?.[0]?.event_id)
+    let hash = await getTransactionByMessageHash(res?.boc)
+    return {
+      hash: hash,
+      wait: () => waitTonMsgTransaction(hash).then(res => waitTonTransaction(res?.hash).then(async res => ({...res, hash})))
+    }
+  })
+}
+

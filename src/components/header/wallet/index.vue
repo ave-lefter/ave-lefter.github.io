@@ -177,7 +177,7 @@
                 <span>{{ depositChainInfo?.address || '' }}</span>
                 <Icon v-if="depositChainInfo?.address" v-copy="depositChainInfo?.address" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
               </div>
-              <div v-if="depositChain!=='solana'" class="flex-center flex-col">
+              <div v-if="!['solana', 'ton']?.includes(depositChain)" class="flex-center flex-col">
                 <div class="text-12px color-[--secondary-text]" style="display: flex; align-items: center; word-break: break-all; line-height: 1.2; padding: 26px 20px 0px;">
                   {{ t('depositTip') }}
                 </div>

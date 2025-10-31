@@ -47,16 +47,16 @@
               </span>
             </div>
           </div>
-          <div v-if="(row.amount || 0) > 0 || (row.value || 0) > 0" class="flex flex-col text-right">
+          <div v-if="(row.amount || 0) > 0 || (row.value || 0) > 0 || (row.balance || 0) > 0" class="flex flex-col text-right">
               <span
               class=" color-[--main-text]"
               v-html="
                 `$ ${formatNumber(
-                  (row.current_price_usd || row.price || 0) * (row?.amount || row?.value || 0)
+                  (row.current_price_usd || row.price || 0) * (row?.amount || row?.value || row.balance || 0)
                 )}`
               "
             />
-            <span class="color-[--third-text] py-2px" v-html="row.amount || row.value ? formatNumber(row?.amount || row?.value || '') : ''" />
+            <span class="color-[--third-text] py-2px" v-html="row.amount || row.value || row.balance ? formatNumber(row?.amount || row?.value || row.balance || '') : ''" />
           </div>
         </li>
       </ul>
@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang='ts'>
-import { NATIVE_TOKEN ,SupportFullDataChain} from '@/utils/constants'
+import { NATIVE_TOKEN, SupportFullDataChain} from '@/utils/constants'
 import { formatNumber } from '@/utils/formatNumber'
 const props = defineProps({
   searchTokens: {
@@ -89,6 +89,7 @@ const props = defineProps({
       risk_score?: number
       risk_level?: number
       tags?: string
+      balance?: number
     }>>,
     default: () => []
   },

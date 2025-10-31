@@ -4,6 +4,8 @@ import { getSolanaSwapQuoteTransaction, sendSolanaSwapTransaction } from '~/util
 import BigNumber from 'bignumber.js'
 import { getSolanaPumpInfo } from '~/api/swap/solana'
 import { SwapContracts } from '~/utils/wallet/utils/constants'
+import { getTonSwap } from '~/api/swap/ton'
+import { getTonTokenTransferMsg, sendTonTransaction } from '~/utils/wallet/ton'
 
 export default function useWalletSwap() {
   const walletStore = useWalletStore()
@@ -13,8 +15,9 @@ export default function useWalletSwap() {
     chain: string
     token: string
     amm: string
+    symbol: string
   }) {
-    if (!(Object.keys(SwapContracts)?.includes?.(row.chain) || row.chain === 'solana')) {
+    if (!(Object.keys(SwapContracts).concat(['solana', 'sui', 'ton'])?.includes?.(row.chain))) {
       ElNotification({title: 'Error', type: 'error', message: t('noSupportChain', {chain: getChainInfo(row.chain).name})})
       return
     }
@@ -40,6 +43,10 @@ export default function useWalletSwap() {
       const fromDecimals = getChainInfo(chain).decimals
       if (chain === 'solana') {
         quoteSolana(row, fromAmount)
+        return
+      }
+      if (chain === 'ton') {
+        quoteTon(row, fromAmount)
         return
       }
       // if (chain === 'bsc') {
@@ -185,6 +192,43 @@ export default function useWalletSwap() {
     }
   }
 
+  async function quoteTon(row: { chain: string; token: string; amm: string; symbol: string }, fromAmount: string | number) {
+    const chain = row.chain
+    const token = row.token
+    if (chain === 'ton') {
+      const fromDecimals = 9
+      const toDecimals = (await _getTokenDetails(token)).decimals || 9
+      const a = (new BigNumber(fromAmount || 0)).times('0.997')
+      const params = {
+        inputToken: 'TON',
+        outputToken: token,
+        inputTokenAmount: parseUnits(
+            a.toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${fromDecimals}})?`))?.[0] || 0,
+            fromDecimals
+          ).toFixed(0),
+        slippageBps: new BigNumber(30).times(100).toFixed(0),
+      }
+      loading.value = true
+      let tonQuoteResponse: any = {}
+      return getTonSwap(params).then(res => {
+        console.log('tonQuoteResponse', res)
+        let toAmount = '0'
+        if (res.amountOut && res.payload) {
+          tonQuoteResponse = res
+          toAmount = formatUnits(res.amountOut || '0', toDecimals)
+          submitTonSwap(tonQuoteResponse, {...params, fromAmount, toAmount, fromDecimals, toDecimals, toSymbol: row.symbol})
+        } else {
+          handleError('can not get quote')
+        }
+        return res
+      }).catch(err => {
+        console.log(err)
+        handleError(err?.error || err)
+        return Promise.resolve('')
+      })
+    }
+}
+
   // 提交交易
   async function submitSwap(_swapSubmitInfo: any, chain: string) {
     try {
@@ -319,6 +363,88 @@ export default function useWalletSwap() {
       handleError(err, 'solana')
     }
   }
+
+  async function submitTonSwap(tonQuoteResponse: any, _swapInfo: any) {
+    try {
+      loading.value = true
+      const txInfo = {
+        from_address: NATIVE_TOKEN,
+        from_symbol: 'TON',
+        from_amount: _swapInfo?.fromAmount,
+        from_decimals: _swapInfo?.fromDecimals,
+        to_address: _swapInfo.outputToken,
+        to_symbol: _swapInfo.toSymbol,
+        to_amount: _swapInfo?.toAmount,
+        to_decimals: _swapInfo?.toDecimals,
+        chain: 'ton',
+        transaction: '',
+        wallet_address: walletStore.address,
+      }
+      console.log('txInfo', txInfo)
+      const transaction: Array<{
+        address: string
+        amount: string
+        payload?: string
+      }> = [{
+        address: tonQuoteResponse?.to,
+        amount: tonQuoteResponse?.totalTransferAmount,
+        payload: tonQuoteResponse?.payload
+      }]
+      const feeMsg = await getTonTokenTransferMsg(txInfo as any)
+      if (feeMsg) {
+        transaction.push(feeMsg)
+      }
+      let Timer: null | ReturnType<typeof setTimeout> = null
+      sendTonTransaction(transaction).then(res => {
+        console.log('---confirm transaction---', res)
+        Timer = setTimeout(() => {
+          ElNotification({type: 'success', message: t('transactionsSubmitted')})
+        }, 500)
+        recordTransaction({
+          chain: 'ton',
+          destination: 'wallet rpc',
+          type: 10,
+          tx_hash: res.hash,
+          status: 1,
+          wallet: walletStore.address,
+          out_token: txInfo.to_address,
+          out_amount: _swapInfo.toAmount,
+          in_token: txInfo.from_address,
+          in_amount: _swapInfo.fromAmount
+        })
+        loading.value = false
+        return res.wait()
+      }).then(async res => {
+        console.log('----transaction---', res)
+        if (Timer) {
+          clearTimeout(Timer)
+          Timer = null
+        }
+        if (res) {
+          updateTransaction({
+            chain: 'ton',
+            tx_hash: res?.hash,
+            status: 100
+          })
+          ElNotification({ type: 'success', message: t('tradeSuccess') })
+        }
+        return res
+      }).catch((err) => {
+        console.warn('ton error', err)
+        if ((err || err?.message) === 'Timeout') {
+          ElNotification({ type: 'error', message: t('timeout_error') })
+        } else if ((err || err?.message) === 'Swap fail') {
+          ElNotification({ type: 'error', message: t('tradeFail') })
+        } else {
+          handleError(err)
+        }
+        loading.value = false
+      })
+    } catch (err) {
+      loading.value = false
+      handleError(err)
+    }
+}
 
   function _getTokenDetails(chain: string) {
     return getTokenDetails({

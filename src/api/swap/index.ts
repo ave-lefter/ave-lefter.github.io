@@ -8,7 +8,8 @@ import { MultiContract, MultiProvider, getFeeAddress, getSigner } from '~/utils/
 import { Contract } from 'ethers'
 import { TronContract, confirmTronTx } from '~/utils/wallet/utils/tronContract'
 import { getFeeIn } from '~/utils'
-import { getTonTokenList } from '~/utils/wallet/ton'
+import { getTonTokenBalance, getTonTokenList } from '~/utils/wallet/ton'
+import { getTonTokenInfo } from './ton'
 
 export * from './sui'
 
@@ -191,6 +192,13 @@ export function getUserSwapTokenList(address = useWalletStore().address, chain =
   if (chain === 'solana') {
     return getSolanaTokensBalance(address) as any
   }
+  if (chain === 'ton') {
+    if (isValidAddress(address, 'ton')) {
+      return getTonTokenList(address) as any
+    } else {
+      return Promise.resolve([])
+    }
+  }
   const { $api } = useNuxtApp()
   return $api('/v1api/v3/users/balance/token', {
     method: 'get',
@@ -207,7 +215,7 @@ export const getTokenDetails= createCacheRequest(async function (data1: {
   spender?: string
 }) {
   const { tokenAddress, chain, spender } = data1
-  const canSwapChain = isEvmChain(chain) || chain === 'solana' || chain === 'tron' || chain === 'sui'
+  const canSwapChain = isEvmChain(chain) || chain === 'solana' || chain === 'tron' || chain === 'sui' || chain === 'ton'
   const account = useWalletStore().address
   if (!chain || !tokenAddress || !canSwapChain) {
     return {
@@ -327,6 +335,13 @@ export const getTokenDetails= createCacheRequest(async function (data1: {
       address: tokenAddress,
       initBalance: balance.toString(),
       chain: chain,
+      allowance: MAX_UINT_AMOUNT
+    }
+  }
+  if (chain === 'ton') {
+    let tokenInfo = await getTonTokenInfo(account, tokenAddress)
+    return {
+      ...tokenInfo,
       allowance: MAX_UINT_AMOUNT
     }
   }
@@ -473,6 +488,9 @@ export async function getBalance(tokenAddress: string, chain = useWalletStore().
     const balance = tokenDetails?.value[0]?.account?.data?.parsed?.info?.tokenAmount?.amount || 0
     return new BigNumber(balance).toFixed(0)
   }
+  if (chain === 'ton') {
+    return getTokenDetails({tokenAddress, chain: 'ton'}).then(async res => res?.balance || '0')
+  }
   if (!/^0x[0-9a-zA-Z]{40}$/.test(account)) {
     return '0'
   }
@@ -554,6 +572,20 @@ export async function getBalanceAndAllowance(tokenAddress: string, spender = get
     return {
       allowance: new BigNumber(MAX_UINT_AMOUNT),
       balance: balance
+    }
+  }
+  if (chain === 'ton') {
+    if (isValidAddress(account, 'ton')) {
+      let balance = await getTonTokenBalance(account, tokenAddress)
+      return {
+        balance: new BigNumber(balance as string),
+        allowance: new BigNumber(MAX_UINT_AMOUNT)
+      }
+    } else {
+      return {
+        balance: new BigNumber(0),
+        allowance: new BigNumber(MAX_UINT_AMOUNT)
+      }
     }
   }
   let balance = new BigNumber(0)

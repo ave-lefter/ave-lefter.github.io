@@ -32,6 +32,9 @@ importers:
       '@solana/web3.js':
         specifier: ^1.98.2
         version: 1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
+      '@tonconnect/ui':
+        specifier: ^2.3.1
+        version: 2.3.1
       '@tronweb3/tronwallet-adapters':
         specifier: ^1.2.9
         version: 1.2.9(@netlify/blobs@8.2.0)(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.3)
@@ -2938,6 +2941,21 @@ packages:
   '@sxzz/popperjs-es@2.11.7':
     resolution: {integrity: sha512-Ccy0NlLkzr0Ex2FKvh2X+OyERHXJ88XJ1MXtsI9y9fGexlaXaVTPzBCRBwIxFkORuOb+uBqeu+RqnpgYTEZRUQ==}
 
+  '@tonconnect/isomorphic-eventsource@0.0.2':
+    resolution: {integrity: sha512-B4UoIjPi0QkvIzZH5fV3BQLWrqSYABdrzZQSI9sJA9aA+iC0ohOzFwVVGXanlxeDAy1bcvPbb29f6sVUk0UnnQ==}
+
+  '@tonconnect/isomorphic-fetch@0.0.3':
+    resolution: {integrity: sha512-jIg5nTrDwnite4fXao3dD83eCpTvInTjZon/rZZrIftIegh4XxyVb5G2mpMqXrVGk1e8SVXm3Kj5OtfMplQs0w==}
+
+  '@tonconnect/protocol@2.3.0':
+    resolution: {integrity: sha512-OxrmcXF/EsSdGeASP9VpTRojuMtTV87DKYFLRq4ZJvF/Hirfm2cgcxzzj2uksEGm5IIR010UWo6b38RuokNwFQ==}
+
+  '@tonconnect/sdk@3.3.1':
+    resolution: {integrity: sha512-lhXJu95VvbD36u5mMPg2sg+w4GQwkrYnHeJ8rVveu2N7UPwt0jvrEqKlvf7Ss1gh5RDtzs35SS3GbJlaIOAJNA==}
+
+  '@tonconnect/ui@2.3.1':
+    resolution: {integrity: sha512-G1hKn5TrqFYztbR94EG8YuhGUpp7wY8PjC1Fu7/d8rFg7XnPGlUcGmuqH8+2lYrb9Ms0M7v6+5U6S4q4+yCQtQ==}
+
   '@tronweb3/tronwallet-abstract-adapter@1.1.9':
     resolution: {integrity: sha512-2wev5T/Z+Yt96nv2upZeq54v8zk8aXCg0p6yx1BpfY2y25lC0jEiul+F/6o5s2uIUXe2ENdbpMiGQz8+/Jy1EQ==}
     engines: {node: '>=16', pnpm: '>=7'}
@@ -4553,6 +4571,9 @@ packages:
   classlist-polyfill@1.2.0:
     resolution: {integrity: sha512-GzIjNdcEtH4ieA2S8NmrSxv7DfEV5fmixQeyTmqmRmRJPGpRBaSnA2a0VrCjyT8iW8JjEdMbKzDotAJf+ajgaQ==}
 
+  classnames@2.5.1:
+    resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
+
   clean-regexp@1.0.0:
     resolution: {integrity: sha512-GfisEZEJvzKrmGWkvfhgzcz/BllN1USeqD2V6tg14OAOgaCD2Z/PUEuxnAZ/nPvmaHRG7a8y77p1T/IRQ4D1Hw==}
     engines: {node: '>=4'}
@@ -5498,6 +5519,10 @@ packages:
   events@3.3.0:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
     engines: {node: '>=0.8.x'}
+
+  eventsource@2.0.2:
+    resolution: {integrity: sha512-IzUmBGPR3+oUG9dUeXynyNmf91/3zUSJg1lCktzKw47OXuhco54U3r9B7O4XX+Rb1Itm9OZ2b0RkTs10bICOxA==}
+    engines: {node: '>=12.0.0'}
 
   evp_bytestokey@1.0.3:
     resolution: {integrity: sha512-/f2Go4TognH/KvCISP7OUsHn85hT9nUkxxA9BEWxFn+Oj9o8ZNLm/40hdlgSLyuOimsrTKLUMEorQexp/aPQeA==}
@@ -14290,6 +14315,39 @@ snapshots:
 
   '@sxzz/popperjs-es@2.11.7': {}
 
+  '@tonconnect/isomorphic-eventsource@0.0.2':
+    dependencies:
+      eventsource: 2.0.2
+
+  '@tonconnect/isomorphic-fetch@0.0.3':
+    dependencies:
+      node-fetch: 2.7.0
+    transitivePeerDependencies:
+      - encoding
+
+  '@tonconnect/protocol@2.3.0':
+    dependencies:
+      tweetnacl: 1.0.3
+      tweetnacl-util: 0.15.1
+
+  '@tonconnect/sdk@3.3.1':
+    dependencies:
+      '@tonconnect/isomorphic-eventsource': 0.0.2
+      '@tonconnect/isomorphic-fetch': 0.0.3
+      '@tonconnect/protocol': 2.3.0
+    transitivePeerDependencies:
+      - encoding
+
+  '@tonconnect/ui@2.3.1':
+    dependencies:
+      '@tonconnect/sdk': 3.3.1
+      classnames: 2.5.1
+      csstype: 3.1.3
+      deepmerge: 4.3.1
+      ua-parser-js: 1.0.40
+    transitivePeerDependencies:
+      - encoding
+
   '@tronweb3/tronwallet-abstract-adapter@1.1.9(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       eventemitter3: 4.0.7
@@ -17229,6 +17287,8 @@ snapshots:
 
   classlist-polyfill@1.2.0: {}
 
+  classnames@2.5.1: {}
+
   clean-regexp@1.0.0:
     dependencies:
       escape-string-regexp: 1.0.5
@@ -18408,6 +18468,8 @@ snapshots:
   eventemitter3@5.0.1: {}
 
   events@3.3.0: {}
+
+  eventsource@2.0.2: {}
 
   evp_bytestokey@1.0.3:
     dependencies:
@@ -23040,8 +23102,7 @@ snapshots:
 
   ua-is-frozen@0.1.2: {}
 
-  ua-parser-js@1.0.40:
-    optional: true
+  ua-parser-js@1.0.40: {}
 
   ua-parser-js@2.0.4:
     dependencies:
