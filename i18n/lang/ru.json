@@ -770,5 +770,10 @@
   "unSupportNotify": "Браузер не поддерживается",
   "repeatNotifyTip": "Повторять: каждый раз<br>Один раз",
   "settingNotify": "Настройка оповещений",
-  "repeatNotify": "Повторять оповещения"
+  "repeatNotify": "Повторять оповещения",
+  "createRecord": "Создать запись",
+  "upToNotifyUser": "当前价位${price}",
+  "downToNotifyUser": "当前价位${price}",
+  "createNotify": "Создать оповещение",
+  "placeholderNotify": "цена"
 }

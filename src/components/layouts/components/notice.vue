@@ -11,7 +11,7 @@
         class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px flex items-center"
         @click.stop="visitSysNotice"
       >
-        <el-badge :is-dot="limitOrderUnRead||!isLatestExperienced" class="h-20px" color="#F6465D">
+        <el-badge :is-dot="limitOrderUnRead||!isLatestExperienced || newRemind" class="h-20px" color="#F6465D">
           <Icon
             class="text-20px text-[--secondary-text] cursor-pointer"
             name="material-symbols:notifications"
@@ -24,7 +24,7 @@
         <a
           href="javascript:;"
           :class="`decoration-none text-14px lh-16px pb-12px text-center b-b-solid b-b-2px
-         ${!isLimitOrder ? 'color-[--main-text] b-b-[--main-text]':'b-b-transparent color-[--third-text]'}`"
+         ${activeTab == 'notice' ? 'color-[--main-text] b-b-[--main-text]':'b-b-transparent color-[--third-text]'}`"
           @click="activeTab = 'notice'"
         >
           {{ $t('notice') }}
@@ -39,12 +39,20 @@
         >
           {{ $t('limitOrder') }}
         </a>
+        <a
+          href="javascript:;"
+          :class="`decoration-none text-14px lh-16px pb-12px text-center b-b-solid b-b-2px
+         ${activeTab == 'remind' ? 'color-[--main-text] b-b-[--main-text]':'b-b-transparent color-[--third-text]'}`"
+          @click="switchRemind"
+        >
+         {{ $t('alerts') }}
+        </a>
       </div>
       <el-scrollbar
         max-height="500px"
       >
         <ul
-          v-show="!isLimitOrder"
+          v-show="activeTab == 'notice'"
           class="pr-20px flex flex-col gap-30px"
         >
           <li
@@ -114,6 +122,36 @@
             <div class="color-[--third-text] text-12px">{{ formatDate((item?.updateTime) || item?.createTime) }}</div>
           </li>
         </ul>
+        <div class="min-h-400px" v-if="activeTab == 'remind'">
+          <div class="item" v-for="(item, $index) in remindHistoryList" :keys="$index">
+            <div class="flex-between items-center parent cursor-pointer">
+              <token-img :row="item" />
+              <span class="text-16px font-500 ml-8px ellipsis">{{ item.symbol }}</span>
+              <Icon
+                class="text-16px"
+                :name="`custom:${item.direction == 'up' ? 'arrow-up' : 'arrow-down'}`"
+              />
+              <span class="ml-4px text-14px" :class="item.direction == 'up'? 'color-[--up-color]':'color-[--down-color]'">{{
+                item.direction == 'up' ? $t('gtPrice') : $t('ltPrice')
+              }}</span>
+              <span class="ml-4px text-14px"
+                >${{ formatNumber(item.warning_price || 0, { decimals: 4, limit: 6 }) }}</span
+              >
+              <span class="color-[--down-color] ml-4px text-14px"
+                >({{ item.is_repeatable == 0 ? $t('once') : $t('duplicate') }})</span
+              >
+              <div class="flex-1"></div>
+              <span class="color-[--third-text] text-12px">{{ formatTimeFromNow(item.create_time) }}</span>
+            </div>
+          </div>
+          <div
+            v-if="remindHistoryList?.length == 0 && !loadingRemindHistory"
+            class="empty text-14px color-[--icon-color] flex items-center justify-center flex-col mt-100px "
+          >
+            <Icon class="text-40px" name="custom:bell" />
+            <span class="mt-10px">{{ $t('emptyAlert') }}</span>
+          </div>
+        </div>
       </el-scrollbar>
     </div>
   </el-popover>
@@ -131,6 +169,7 @@ const {formatUnits} = evm_utils
 const ACTIVE_ENUM = {
   notice: 'notice',
   limitOrder: 'limitOrder',
+  remind: 'remind'
 } as const
 
 interface ICompletedLimitTx extends IGetMarketCompletedLimitResponse {
@@ -141,7 +180,7 @@ interface ICompletedLimitTx extends IGetMarketCompletedLimitResponse {
 }
 
 type ActiveTab = keyof typeof ACTIVE_ENUM
-
+const followStore = useFollowStore()
 const lastExperienceTime = useStorage('lastExperienceTime', 0, localStorage)
 const themeStore = useThemeStore()
 const wsStore = useWSStore()
@@ -154,6 +193,10 @@ const announceList = ref<any[]>([])
 const completedLimitTx = shallowRef<ICompletedLimitTx[]>([])
 
 const globalStore = useGlobalStore()
+const remindStore = useRemindStore()
+const { newRemind, remindHistoryList,loadingRemindHistory } = storeToRefs(remindStore)
+const { getNotifyHistoryList } = remindStore
+
 const limitOrderUnRead = computed(() => completedLimitTx.value?.some(i => visitedTime.value < (i.blockTime || Number(i.batchId) / 1000)))
 const isLimitOrder = computed(() => activeTab.value === ACTIVE_ENUM.limitOrder)
 const isBotLogin = computed(() => botStore.userInfo && botStore.userInfo.name)
@@ -163,6 +206,24 @@ const isLatestExperienced = computed(() => {
     || String(lastExperienceTime.value) === String(globalStore.latestNotice.time)
 })
 
+const currentAddress = computed(() => {
+  return followStore.currentAddress || ''
+})
+watch(newRemind, (val) => {
+  if (val && activeTab.value == 'remind') {
+    getNotifyHistoryList()
+  }
+})
+watch(
+  () => currentAddress.value,
+  (val) => {
+    if (val) {
+      getNotifyHistoryList()
+    } else {
+      remindHistoryList.value = []
+    }
+  }
+)
 watch(visible, (val) => {
   if (!val) {
     lastVisitedTime.value = visitedTime.value
@@ -249,4 +310,39 @@ async function getLatestNotice() {
 function visitSysNotice() {
   lastExperienceTime.value = globalStore.latestNotice.time
 }
+function switchRemind() {
+  activeTab.value = 'remind'
+  newRemind.value = false
+  getNotifyHistoryList()
+}
 </script>
+<style lang="scss" scoped>
+.item {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  margin-top: 12px;
+  padding-right: 15px;
+  .parent {
+    &:hover {
+      .delete {
+        color: var(--down-color);
+      }
+    }
+  }
+  ul li {
+    &:hover {
+      .delete-children {
+        display: block;
+        color: var(--down-color);
+      }
+    }
+  }
+
+  .delete {
+    color: var(--third-text);
+  }
+  .delete-children {
+    display: none;
+  }
+}
+</style>

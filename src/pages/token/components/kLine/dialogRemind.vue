@@ -8,9 +8,7 @@
   >
     <template #header>
       <div class="flex-start items-center">
-        <span class="text-20px font-500 cursor-pointer" @click.stop="switchTab(0)">
-          {{ $t('alerts') }}</span
-        >
+        <span class="text-20px font-500 cursor-pointer"> {{ $t('alerts') }}</span>
       </div>
     </template>
     <div class="content text-center" v-if="deny">
@@ -22,259 +20,231 @@
       </div>
     </div>
     <div v-else>
-      <template v-if="activeTab == 0">
-        <el-alert
-          type="warning"
-          :title="
-            form.direction == 'up' ? '当市值高于您的目标时获得提醒' : '当市值低于您的目标时获得提醒'
-          "
-          :closable="false"
-          show-icon
-          :style="{
-            backgroundColor: '#FFA6221A',
-            color: '#FFA622',
-            border: 'none',
-            fontSize: '12px',
-          }"
-        />
-        <div class="flex-between mt-16px">
-          <span class="title block">提醒频次</span>
-          <el-popover
-            popper-class="[--el-popover-bg-color:--border]"
-            placement="bottom-end"
-            trigger="click"
-            :visible="showRepeatPop"
-          >
-            <template #reference>
-              <div
-                class="flex-start items-center cursor-pointer text-12px bg-[--border] px-8px py-8px"
-                @click.stop="showRepeatPop = !showRepeatPop"
-              >
-                <template v-if="form.is_repeatable == 1">
-                  <span class="mr-4px">重复</span>
-                </template>
-                <template v-else>
-                  <span class="mr-4px">仅一次</span>
-                </template>
-                <Icon
-                  :name="!showRepeatPop ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
-                  class="text-16px color-[--main-text]"
-                />
-              </div>
-            </template>
-            <template #default>
-              <div class="py-4px [&&]:m--12px flex flex-col">
-                <div
-                  class="flex-start items-center text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer"
-                  @click.stop="toggleRepeat(1)"
-                >
-                  <span class="ml-4px mr-4px">重复</span>
-                </div>
-                <div
-                  class="flex-start items-center text-12px py-4px px-8px color hover:bg-[--dialog-tab-active] cursor-pointer"
-                  @click.stop="toggleRepeat(0)"
-                >
-                  <span class="ml-4px mr-4px">仅一次</span>
-                </div>
-              </div>
-            </template>
-          </el-popover>
-        </div>
-        <div class="flex-between mt-16px">
-          <span class="text-14px">触发条件</span>
-          <div class="flex-1"></div>
-          <span class="text-12px color-[--third-text]">{{ token?.symbol }}&nbsp;当前价格</span>
-          <span class="ml-5px text-12px"
-            >${{ formatNumber(tokenStore?.price || 0, { decimals: 4, limit: 6 }) }}</span
-          >
-        </div>
-        <div class="flex mt-20px">
-          <el-popover
-            popper-class="[--el-popover-bg-color:--border]"
-            placement="bottom-start"
-            trigger="click"
-            :visible="showDirectionPop"
-          >
-            <template #reference>
-              <div
-                class="flex-start items-center cursor-pointer text-12px bg-[--border] px-8px"
-                @click.stop="showDirectionPop = !showDirectionPop"
-              >
-                <template v-if="form.direction == 'up'">
-                  <Icon class="text-16px" name="custom:arrow-up" />
-                  <span class="ml-4px mr-4px">高于价格</span>
-                </template>
-                <template v-else>
-                  <Icon class="text-16px" name="custom:arrow-down" />
-                  <span class="ml-4px mr-4px">低于价格</span>
-                </template>
-                <Icon
-                  :name="
-                    !showDirectionPop ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'
-                  "
-                  class="text-16px color-[--main-text]"
-                />
-              </div>
-            </template>
-            <template #default>
-              <div class="py-4px [&&]:m--12px flex flex-col">
-                <div
-                  class="flex-start items-center text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer"
-                  @click.stop="toggleDirection('up')"
-                >
-                  <Icon class="text-16px" name="custom:arrow-up" />
-                  <span class="ml-4px mr-4px">高于价格</span>
-                </div>
-                <div
-                  class="flex-start items-center text-12px py-4px px-8px color hover:bg-[--dialog-tab-active] cursor-pointer"
-                  @click.stop="toggleDirection('down')"
-                >
-                  <Icon class="text-16px" name="custom:arrow-down" />
-                  <span class="ml-4px mr-4px">低于价格</span>
-                </div>
-              </div>
-            </template>
-          </el-popover>
-          <el-input
-            class="ml-8px mr-8px flex-1 h-32px"
-            v-model="form.warning_price"
-            placeholder="输入价格"
-          ></el-input>
-          <el-button
-            type="primary"
-            v-if="currentAddress"
-            @click.stop.prevent="onSubmit"
-            :loading="crateLoading"
-            >设置预警</el-button
-          >
-          <el-button type="primary" v-else>{{ $t('connectWallet') }}</el-button>
-        </div>
-        <div class="flex items-center justify-center mt-10px gap-10px">
-          <div v-for="(item, index) in ratioList" :key="index" class="radio-group flex-1">
-            <input
-              :id="`radio-buy-${item}`"
-              v-model="ratio"
-              type="radio"
-              :value="item"
-              class="radio-input"
-              @change.stop="changeRatio"
-            />
-            <label
-              :for="`radio-buy-${item}`"
-              class="radio-item"
-              :class="{ 'no-checked': customRatio }"
-              style="border-radius: 4px"
-              >{{ item }}%</label
-            >
-          </div>
-          <div class="slippage-input flex-1">
-            <el-input-number
-              v-model="customRatio"
-              class="bg-[--border] rounded-4px"
-              name="slippage"
-              type="number"
-              :placeholder="$t('custom')"
-              :min="0"
-              :max="100"
-              :step="0.01"
-              controls-position="right"
-              :controls="false"
-              clearable
-              @change="changeCustomRatio"
-            />
-            <span class="color-fff">%</span>
-          </div>
-        </div>
-
-        <el-scrollbar class="hidden-scrollbar" height="600px" v-loading="loadingRemind">
-          <div class="list mt-32px">
+      <el-alert
+        type="warning"
+        :title="form.direction == 'up' ? $t('remindUp') : $t('remindDown')"
+        :closable="false"
+        show-icon
+        :style="{
+          backgroundColor: '#FFA6221A',
+          color: '#FFA622',
+          border: 'none',
+          fontSize: '12px',
+        }"
+      />
+      <div class="flex-between mt-16px">
+        <span class="title block">{{ $t('alertFrequency') }}</span>
+        <el-popover
+          popper-class="[--el-popover-bg-color:--border]"
+          placement="bottom-end"
+          trigger="click"
+          :visible="showRepeatPop"
+        >
+          <template #reference>
             <div
-              class="item"
-              v-for="(item, $index) in remindList"
-              :keys="$index"
-              @click.stop.prevent="removeNotify(item.ids)"
+              class="flex-start items-center cursor-pointer text-12px bg-[--border] px-8px py-8px"
+              @click.stop="showRepeatPop = !showRepeatPop"
             >
-              <div class="flex-between parent cursor-pointer">
-                <token-img :row="item" tokenClass="w-32px h-32px" />
-                <span class="text-16px font-500 ml-8px">{{ item.symbol }}</span>
-                <div class="flex-1"></div>
-                <Icon class="delete text-16px cursor-pointer" name="ic:baseline-delete" />
+              <template v-if="form.is_repeatable == 1">
+                <span class="mr-4px">{{ $t('duplicate') }}</span>
+              </template>
+              <template v-else>
+                <span class="mr-4px">{{ $t('once') }}</span>
+              </template>
+              <Icon
+                :name="!showRepeatPop ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
+                class="text-16px color-[--main-text]"
+              />
+            </div>
+          </template>
+          <template #default>
+            <div class="py-4px [&&]:m--12px flex flex-col">
+              <div
+                class="flex-start items-center text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer"
+                @click.stop="toggleRepeat(1)"
+              >
+                <span class="ml-4px mr-4px">{{ $t('duplicate') }}</span>
               </div>
-              <ul class="py-4px flex flex-col mt-16px" v-if="item.children?.length > 0">
-                <li
-                  class="flex-start items-center text-14px py-8px px-8px color-[--main-text] hover:bg-[--dialog-list-hover] cursor-pointer"
-                  v-for="(i, index) in item?.children"
-                  :key="index"
-                  @click.stop.prevent="removeNotify([i.id])"
-                >
-                  <Icon
-                    class="text-16px"
-                    :name="`custom:${i.direction == 'up' ? 'arrow-up' : 'arrow-down'}`"
-                  />
-                  <span class="ml-4px color-[--secondary-text]">{{
-                    i.direction == 'up' ? '高于' : '低于'
-                  }}</span>
-                  <span class="ml-4px mr-4px"
-                    >${{ formatNumber(i.warning_price || 0, { decimals: 4, limit: 6 }) }}</span
-                  >
-                  <span class="color-[--secondary-text]">价格</span>
-                  <span class="text-12px color-[--down-color] ml-5px"
-                    >({{ i.is_repeatable == 0 ? '仅一次' : '重复' }})</span
-                  >
-                  <div class="flex-1"></div>
-                  <Icon
-                    class="delete-children text-14px cursor-pointer"
-                    name="ic:baseline-delete"
-                  />
-                </li>
-              </ul>
+              <div
+                class="flex-start items-center text-12px py-4px px-8px color hover:bg-[--dialog-tab-active] cursor-pointer"
+                @click.stop="toggleRepeat(0)"
+              >
+                <span class="ml-4px mr-4px">{{ $t('once') }}</span>
+              </div>
             </div>
+          </template>
+        </el-popover>
+      </div>
+      <div class="flex-between mt-16px">
+        <span class="text-14px">{{ $t('triggerCondition') }}</span>
+        <div class="flex-1"></div>
+        <span class="text-12px color-[--third-text]"
+          >{{ token?.symbol }}&nbsp;{{ $t('currentPrice') }}</span
+        >
+        <span class="ml-5px text-12px"
+          >${{ formatNumber(tokenStore?.price || 0, { decimals: 4, limit: 6 }) }}</span
+        >
+      </div>
+      <div class="flex mt-20px">
+        <el-popover
+          popper-class="[--el-popover-bg-color:--border]"
+          placement="bottom-start"
+          trigger="click"
+          :visible="showDirectionPop"
+        >
+          <template #reference>
             <div
-              v-if="remindList?.length == 0 && !loadingRemind"
-              class="empty text-14px color-[--icon-color] flex items-center justify-center flex-col mt-200px"
+              class="flex-start items-center cursor-pointer text-12px bg-[--border] px-8px"
+              @click.stop="showDirectionPop = !showDirectionPop"
             >
-              <Icon class="text-40px" name="custom:bell" />
-              <span class="mt-10px">暂未设置提醒</span>
+              <template v-if="form.direction == 'up'">
+                <Icon class="text-16px" name="custom:arrow-up" />
+                <span class="ml-4px mr-4px">{{ $t('gtPrice') }}</span>
+              </template>
+              <template v-else>
+                <Icon class="text-16px" name="custom:arrow-down" />
+                <span class="ml-4px mr-4px">{{ $t('ltPrice') }}</span>
+              </template>
+              <Icon
+                :name="!showDirectionPop ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
+                class="text-16px color-[--main-text]"
+              />
             </div>
-          </div>
-        </el-scrollbar>
-        <div class="text-14px color-[--third-text] mt-20px">
-          <span class="color-[--main-text]">{{ len }}</span
-          >/100个提醒
+          </template>
+          <template #default>
+            <div class="py-4px [&&]:m--12px flex flex-col">
+              <div
+                class="flex-start items-center text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer"
+                @click.stop="toggleDirection('up')"
+              >
+                <Icon class="text-16px" name="custom:arrow-up" />
+                <span class="ml-4px mr-4px">{{ $t('gtPrice') }}</span>
+              </div>
+              <div
+                class="flex-start items-center text-12px py-4px px-8px color hover:bg-[--dialog-tab-active] cursor-pointer"
+                @click.stop="toggleDirection('down')"
+              >
+                <Icon class="text-16px" name="custom:arrow-down" />
+                <span class="ml-4px mr-4px">{{ $t('ltPrice') }}</span>
+              </div>
+            </div>
+          </template>
+        </el-popover>
+        <el-input
+          class="ml-8px mr-8px flex-1 h-32px"
+          v-model="form.warning_price"
+          :placeholder="$t('placeholderNotify')"
+          @input="onInput"
+        ></el-input>
+        <el-button
+          type="primary"
+          v-if="currentAddress"
+          @click.stop.prevent="onSubmit"
+          :loading="crateLoading"
+          >{{ $t('createNotify') }}</el-button
+        >
+        <el-button type="primary" v-else @click="openConnect">{{ $t('connectWallet') }}</el-button>
+      </div>
+      <div class="flex items-center justify-center mt-10px gap-10px">
+        <div v-for="(item, index) in ratioList" :key="index" class="radio-group flex-1">
+          <input
+            :id="`radio-buy-${item}`"
+            v-model="ratio"
+            type="radio"
+            :value="item"
+            class="radio-input"
+            @change.stop="changeRatio"
+          />
+          <label
+            :for="`radio-buy-${item}`"
+            class="radio-item"
+            :class="{ 'no-checked': customRatio }"
+            style="border-radius: 4px"
+            >{{form.direction == 'up'? '+': '-' }}{{ item }}%</label
+          >
         </div>
-      </template>
-      <template v-else>
-        <el-scrollbar class="hidden-scrollbar" height="600px">
-          <div class="item" v-for="(item, $index) in remindHistoryList" :keys="$index">
-            <div class="flex-between items-center parent cursor-pointer">
+        <div class="slippage-input flex-1">
+          <span class="color-[--main-text] mr-5px">{{form.direction == 'up'? '+': '-' }}</span>
+          <el-input-number
+            v-model="customRatio"
+            class="bg-[--border] rounded-4px"
+            name="slippage"
+            type="number"
+            :placeholder="$t('custom')"
+            :max="form.direction == 'up' ? Infinity : 99"
+            :min="0"
+            :step="0.01"
+            controls-position="right"
+            :controls="false"
+            clearable
+            @change="changeCustomRatio"
+          />
+          <span class="color-[--main-text]">%</span>
+        </div>
+      </div>
+      <div class="flex-between mt-24px" v-if="remindList.length > 0">
+        <span class="title block">{{ $t('createRecord') }}</span>
+        <el-checkbox v-model="selected" :label="$t('currentToken')" />
+      </div>
+      <el-scrollbar class="hidden-scrollbar" height="600px" v-loading="loadingRemind">
+        <div class="list mt-32px">
+          <div
+            class="item"
+            v-for="(item, $index) in filterRemindList"
+            :keys="$index"
+            @click.stop.prevent="removeNotify(item.ids)"
+          >
+            <div class="flex-between parent cursor-pointer">
               <token-img :row="item" tokenClass="w-32px h-32px" />
               <span class="text-16px font-500 ml-8px">{{ item.symbol }}</span>
-              <Icon
-                class="text-16px"
-                :name="`custom:${item.direction == 'up' ? 'arrow-up' : 'arrow-down'}`"
-              />
-              <span class="ml-4px color-[--secondary-text]">{{
-                item.direction == 'up' ? '高于' : '低于'
-              }}</span>
-              <span class="ml-4px mr-4px"
-                >${{ formatNumber(item.warning_price || 0, { decimals: 4, limit: 6 }) }}</span
-              >
-              <span class="color-[--secondary-text]">价格</span>
-              <span class="text-12px color-[--down-color] ml-5px"
-                >({{ item.is_repeatable == 0 ? '仅一次' : '重复' }})</span
-              >
               <div class="flex-1"></div>
-              <span class="color-[--third-text]">{{ formatTimeFromNow(item.CreateTime) }}</span>
+              <Icon class="delete text-16px cursor-pointer" name="ic:baseline-delete" />
             </div>
+            <ul class="py-4px flex flex-col mt-16px" v-if="item.children?.length > 0">
+              <li
+                class="flex-start items-center text-14px py-8px px-8px color-[--main-text] hover:bg-[--dialog-list-hover] cursor-pointer"
+                v-for="(i, index) in item?.children"
+                :key="index"
+                @click.stop.prevent="removeNotify([i.id])"
+              >
+                <Icon
+                  class="text-16px"
+                  :name="`custom:${i.direction == 'up' ? 'arrow-up' : 'arrow-down'}`"
+                />
+                <span class="ml-4px color-[--secondary-text]"
+                  >({{ i.direction == 'up' ? $t('gtPrice') : $t('ltPrice') }})</span
+                >
+                <span class="ml-4px"
+                  >${{ formatNumber(i.warning_price || 0, { decimals: 4, limit: 6 }) }}</span
+                >
+                <span class="color-[--down-color] ml-4px">{{
+                  i.is_repeatable == 0 ? $t('once') : $t('duplicate')
+                }}</span>
+                <div class="flex-1"></div>
+                <Icon class="delete-children text-14px cursor-pointer" name="ic:baseline-delete" />
+              </li>
+            </ul>
           </div>
-        </el-scrollbar>
-      </template>
+          <div
+            v-if="filterRemindList?.length == 0 && !loadingRemind"
+            class="empty text-14px color-[--icon-color] flex items-center justify-center flex-col mt-200px"
+          >
+            <Icon class="text-40px" name="custom:bell" />
+            <span class="mt-10px">{{ $t('emptyAlert') }}</span>
+          </div>
+        </div>
+      </el-scrollbar>
+      <div class="text-14px color-[--third-text] mt-20px">
+        <span class="color-[--main-text]">{{ len }}</span
+        >/100 {{ $t('alerts1') }}
+      </div>
     </div>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { _addNotify, _removeNotify } from '@/api/remind'
+import { markRaw } from 'vue'
+import { _addNotify, _removeNotify , type Item} from '@/api/remind'
 import { Warning } from '@element-plus/icons-vue'
 const props = defineProps({
   modelValue: Boolean,
@@ -282,11 +252,12 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
 }>()
+const botStore = useBotStore()
 const { t } = useI18n()
 const { mode } = storeToRefs(useGlobalStore())
 const remindStore = useRemindStore()
-const { remindList, loadingRemind, len, remindHistoryList } = storeToRefs(remindStore)
-const { getNotifyList, getNotifyHistoryList } = remindStore
+const { remindList, loadingRemind, len } = storeToRefs(remindStore)
+const { getNotifyList } = remindStore
 const route = useRoute()
 const visible = computed({
   get: () => props.modelValue ?? false,
@@ -294,12 +265,16 @@ const visible = computed({
 })
 const tokenStore = useTokenStore()
 const deny = shallowRef(false)
-const ratioList = [-25, 25, 50, 100]
 const ratio = shallowRef(0)
 const customRatio = shallowRef(0)
+const selected = shallowRef(false)
 
 const followStore = useFollowStore()
-const form = reactive({
+const form = reactive<{
+  direction: 'up' | 'down'
+  is_repeatable: 0 | 1
+  warning_price: string | number
+}>({
   direction: 'up',
   is_repeatable: 0,
   warning_price: 0,
@@ -310,6 +285,13 @@ const activeTab = shallowRef(0)
 const crateLoading = shallowRef(false)
 const currentAddress = computed(() => {
   return followStore.currentAddress || ''
+})
+const ratioList = computed(() => {
+  if (form.direction == 'up') {
+    return [25, 50, 100]
+  } else {
+    return [50, 30, 15]
+  }
 })
 const tokenInfo = computed(() => {
   return tokenStore?.tokenInfo
@@ -322,25 +304,52 @@ const chain = computed(() => {
   const { chain } = getAddressAndChainFromId(id.value, 0)
   return chain
 })
+const filterRemindList = computed(() => {
+  if (selected.value) {
+    return remindList.value?.filter((i) => i.token == token.value?.token)
+  } else {
+    return remindList.value || []
+  }
+})
 watch(
   () => visible.value,
   (val) => {
     if (val) {
-      form.warning_price = tokenStore?.price || 0
-      form.direction = 'up'
-      form.is_repeatable = 0
-      activeTab.value = 0
-      getNotifyList()
+      init()
     }
   }
 )
+watch(
+  () => currentAddress.value,
+  (val) => {
+    if (val && !deny.value) {
+      init()
+    } else {
+      remindList.value = []
+    }
+  }
+)
+
+watch(
+  () => deny.value,
+  (val) => {
+    if (!val) {
+      init()
+    } else {
+      remindList.value = []
+    }
+  }
+)
+
 onMounted(() => {
-  init()
 })
 function init() {
+  form.warning_price = formatDec(tokenStore?.price || 0, 4)
+  form.direction = 'up'
+  form.is_repeatable = 0
   if (window.Notification && Notification.permission == 'granted') {
-    if (deny.value === false && currentAddress) {
-      //this.$store.dispatch('getNotifyList')
+    if (deny.value === false && currentAddress.value) {
+      getNotifyList()
     }
   } else {
     deny.value = true
@@ -365,20 +374,24 @@ function allowNotify() {
 }
 function onSubmit() {
   if (remindList.value?.length >= 100) {
-    ElMessage.error('最多只能添加100个价格提醒!')
+    ElMessage.error(t('alertTip2'))
+    return
+  }
+  if (!form.warning_price) {
+    ElMessage.error(t('alertTip1'))
     return
   }
   let data = {
     ...form,
     user_address: currentAddress.value,
-    token: token?.value?.token,
-    symbol: token?.value?.symbol,
-    chain: token?.value?.chain,
+    token: token?.value?.token || '',
+    symbol: token?.value?.symbol || '',
+    chain: token?.value?.chain || '',
     current_price: Number(tokenStore?.price),
     warning_price: Number(form.warning_price || 0),
   }
   crateLoading.value = true
-  _addNotify(data, currentAddress.value)
+  _addNotify(data,currentAddress.value)
     .then((res) => {
       ElMessage.success(t('success'))
       getNotifyList()
@@ -392,9 +405,9 @@ function onSubmit() {
     })
 }
 function removeNotify(ids: number[]) {
-  ElMessageBox.confirm('删除当前价格提醒', t('tips'), {
+  ElMessageBox.confirm(t('deleteAlert'), t('tips'), {
     type: 'warning',
-    icon: Warning,
+    icon: markRaw(Warning),
     confirmButtonText: t('confirm'),
     cancelButtonText: t('cancel'),
     customClass: `${mode.value} delete_confirm`,
@@ -418,36 +431,45 @@ function removeNotify(ids: number[]) {
 function toggleDirection(dir: 'up' | 'down') {
   form.direction = dir
   showDirectionPop.value = false
+  customRatio.value = 0
+  ratio.value = 0
 }
 function toggleRepeat(num: 1 | 0) {
   form.is_repeatable = num
   showRepeatPop.value = false
 }
-function switchTab(num: 1 | 0) {
-  activeTab.value = num
-  if (num == 1) {
-    getNotifyHistoryList()
-  } else {
-    getNotifyList()
-  }
-}
 function changeRatio() {
+  let price = 0
   if (ratio.value) {
-    if (ratio.value < 0) {
-      form.warning_price = (1 - ratio.value / 100) * Number(tokenStore?.price || 0)
+    if (form.direction == 'up') {
+      price = (1 + ratio.value / 100) * Number(tokenStore?.price || 0)
     } else {
-      form.warning_price = (ratio.value * Number(tokenStore?.price || 0)) / 100
+      price= (1 - ratio.value / 100) * Number(tokenStore?.price || 0)
+    }
+  } else {
+    price = Number(tokenStore?.price || 0)
+  }
+  form.warning_price = formatDec(price || 0 , 4)
+}
+function changeCustomRatio() {
+  if (customRatio.value) {
+    if (form.direction == 'up') {
+      form.warning_price = (1 + customRatio.value / 100) * Number(tokenStore?.price || 0)
+    } else {
+      form.warning_price = (1 - customRatio.value / 100) * Number(tokenStore?.price || 0)
     }
   } else {
     form.warning_price = Number(tokenStore?.price || 0)
   }
+  form.warning_price = formatDec(form.warning_price || 0, 4)
 }
-function changeCustomRatio() {
-  if (customRatio.value) {
-    form.warning_price = (customRatio.value * Number(tokenStore?.price || 0)) / 100
-  } else {
-    form.warning_price = Number(tokenStore?.price || 0)
-  }
+
+const onInput = (val: string) => {
+  // 只保留数字和小数点
+  form.warning_price = Number(val.replace(/[^0-9.]/g, '') || 0)
+}
+const openConnect = () => {
+  botStore.changeConnectVisible(true)
 }
 </script>
 
@@ -471,7 +493,7 @@ function changeCustomRatio() {
     &:hover {
       .delete-children {
         display: block;
-        color: var(--third-text);
+        color: var(--down-color);
       }
     }
   }

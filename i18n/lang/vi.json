@@ -771,5 +771,10 @@
   "unSupportNotify": "Trình duyệt không hỗ trợ",
   "repeatNotifyTip": "Lặp lại: mỗi lần<br>Một lần",
   "settingNotify": "Cài đặt cảnh báo",
-  "repeatNotify": "Lặp lại cảnh báo"
+  "repeatNotify": "Lặp lại cảnh báo",
+  "createRecord": "Tạo bản ghi",
+  "upToNotifyUser": "{symbol} вырос на {rate}%",
+  "downToNotifyUser": "{symbol} упал на {rate}%",
+  "createNotify": "Tạo cảnh báo",
+  "placeholderNotify": "giá"
 }

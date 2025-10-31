@@ -524,5 +524,10 @@
   "unSupportNotify": "Este navegador atualmente não suporta",
   "repeatNotifyTip": "*Alerta de repetição ativado: Notificação enviada a cada vez que é acionado.  \n*Alerta de repetição desativado: Notificação enviada apenas uma vez.",
   "settingNotify": "Configurar Alerta",
-  "repeatNotify": "Repetir Alerta"
+  "repeatNotify": "Repetir Alerta",
+  "createRecord": "Criar Registro",
+  "upToNotifyUser": "{symbol} sobe rapidamente para {rate}%, o preço atual ${price}",
+  "downToNotifyUser": "{symbol} cai rapidamente para {rate}%, o preço atual ${price}",
+  "createNotify": "Criar Alerta",
+  "placeholderNotify": "preço"
 }

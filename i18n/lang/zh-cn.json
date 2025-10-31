@@ -1488,5 +1488,24 @@
   "unSupportNotify": "此浏览器暂不支持",
   "repeatNotifyTip": "重复预警开启：每次触发均发送通知<br>重复预警关闭：仅通知一次",
   "settingNotify": "设置价格提醒",
-  "repeatNotify": "重复提醒"
+  "repeatNotify": "重复提醒",
+  "createRecord": "创建记录",
+  "upToNotifyUser": "{symbol}快速上涨{rate}%,当前价位${price}",
+  "downToNotifyUser": "{symbol}快速下跌{rate}%,当前价位${price}",
+  "remindUp": "当市值高于您的目标时获得提醒",
+  "remindDown": "当市值低于您的目标时获得提醒",
+  "alertFrequency": "提醒频次",
+  "duplicate": "重复",
+  "once": "仅一次",
+  "triggerCondition": "触发条件",
+  "gtPrice": "高于于价格",
+  "ltPrice": "低于于价格",
+  "createNotify": "创建预警",
+  "placeholderNotify": "预警价格",
+  "emptyAlert": "暂未设置提醒",
+  "alerts1": "个提醒",
+  "alertTip1": "请输入价格",
+  "alertTip2": "最多只能添加100个价格提醒!",
+  "deleteAlert": "删除当前价格提醒!"
+
 }

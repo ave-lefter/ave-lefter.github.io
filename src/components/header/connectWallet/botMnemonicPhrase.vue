@@ -97,6 +97,7 @@ import sha256 from 'crypto-js/sha256'
 import CryptoJS from 'crypto-js'
 import QrCodeWithLogo from 'qr-code-with-logo'
 import { Warning } from '@element-plus/icons-vue'
+import { markRaw } from 'vue'
 const botStore = useBotStore()
 const configStore = useConfigStore()
 const walletStore = useWalletStore()
@@ -268,7 +269,7 @@ function mergeBalancesToBsc(list: AddressItem[]): AddressItem[] {
 const goOn = () => {
   ElMessageBox.confirm(t('lastChance'), t('tips'), {
     type: 'warning',
-    icon: Warning,
+    icon: markRaw(Warning),
     confirmButtonText: t('saved'),
     cancelButtonText: t('cancel'),
     customClass: `${mode.value} delete_confirm`,

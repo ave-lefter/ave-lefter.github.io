@@ -16,20 +16,21 @@ export interface Notify {
 }
 
 export interface Item {
-  id: number
-  address: string
+  id?: number
+  address?: string
+  user_address?: string
   token: string
   symbol: string
   chain: string
   warning_price: number
-  create_time: number
-  last_notify_time: number
+  create_time?: number
+  last_notify_time?: number
   is_repeatable: number
-  notified_times: number
-  is_deleted: number
+  notified_times?: number
+  is_deleted?: number
   current_price: number
   direction: string
-  logo_url: string
+  logo_url?: string
 }
 
 export interface GroupedItem {
@@ -42,6 +43,22 @@ export interface GroupedItem {
   children: Item[]
 }
 
+export interface PriceNotify {
+  price_notify: PriceNotifyItem[]
+}
+export interface PriceNotifyItem {
+  notify_trigger_price?: number
+  user_notify_setting: {
+    address: string
+    chain: string
+    create_time: number
+    current_price: number
+    direction: 'up' | 'down'
+    symbol: string
+    token: string
+    warning_price: number
+  }
+}
 export function _getNotifyList(address: string): Promise<Notify[]> {
   const { $api } = useNuxtApp()
   return $api(`/v1api/v2/priceInfo/notify`, {
@@ -52,7 +69,7 @@ export function _getNotifyList(address: string): Promise<Notify[]> {
   })
 }
 
-export function _addNotify(data, address: string) {
+export function _addNotify(data: Item, address: string) {
   const { $api } = useNuxtApp()
   return $api(`/v1api/v2/priceInfo/notify/add`, {
     method: 'post',
@@ -78,6 +95,16 @@ export function _getNotifyHistoryList(address: string): Promise<Notify[]> {
   return $api(`/v1api/v2/priceInfo/notify/history`, {
     method: 'get',
     query: {
+      user_address: address,
+    },
+  })
+}
+//轮询
+export function _getNotify(address: string): Promise<PriceNotify> {
+  const { $api } = useNuxtApp()
+  return $api(`/v1api/v2/priceInfo`, {
+    method: 'post',
+    body: {
       user_address: address,
     },
   })

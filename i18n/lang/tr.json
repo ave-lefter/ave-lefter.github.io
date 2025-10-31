@@ -519,5 +519,10 @@
   "unSupportNotify": "Bu tarayıcı şu anda desteklemiyor",
   "repeatNotifyTip": "Tekrar Uyarısı: her tetiklendiğinde bildirim gönder<br> Tek Uyarı: yalnızca bir kez bildir",
   "settingNotify": "Uyarı Ayarlama",
-  "repeatNotify": "Tekrar Uyarısı"
+  "repeatNotify": "Tekrar Uyarısı",
+  "createRecord": "Kayıt Oluştur",
+  "upToNotifyUser": "{sembol} hızla {oran}%'ye yükselir, mevcut fiyat ${price}",
+  "downToNotifyUser": "{sembol} hızla {oran}%'ye düşer, mevcut fiyat ${price}",
+  "createNotify": "Uyarı Oluştur",
+  "placeholderNotify": "fiyat"
 }
