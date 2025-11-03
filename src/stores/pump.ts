@@ -88,7 +88,17 @@ export const usePumpStore = defineStore('pumpStore', () => {
             pumpConfig.value = res || []
             pumpConfig.value.forEach(i => {
               if (!pumpV3.value[i.chain]?.platforms?.length) {
-                const platforms =  i.platforms.map(y=>y?.platform) || []
+                // const platforms = i.platforms.map(y => y?.platform) || []
+                const platforms =
+                  i.platforms?.map((y) => {
+                    if (i.chain == 'solana') {
+                      if (y.platform !== 'believe') {
+                        return y.platform
+                      }
+                    } else {
+                      return y.platform
+                    }
+                  }) || []
                 pumpV3.value[i.chain] = {
                     ...(pumpV3.value[i.chain] || {}),
                     platforms,
@@ -122,7 +132,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
 
     const pump_solana_platforms = useStorage(
         'pump_solana_platforms',
-        ['pump', 'moonshot', 'raydium','believe', 'jupstudio','moon_new','cookingcity', 'bonk','bags']
+        ['pump', 'moonshot', 'raydium', 'jupstudio','moon_new','cookingcity', 'bonk','bags']
     )
     const pumpFilterDefault = {
       q: '',
@@ -162,7 +172,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
       sm_list: [],
     }
     const pumpV3 = useStorage<Record<ChainKey, pumpData>>(
-      'pumpV5',
+      'pumpV10',
       {
         solana: {
           platforms: [],
