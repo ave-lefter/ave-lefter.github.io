@@ -53,8 +53,9 @@ export const getUserBalance = createCacheRequest(async function(
   return Promise.all([(async () => {
     if (tonAddressId && pageNO === 1) {
       tonTokenList = await getTonTokenList(getAddressAndChainFromId(tonAddressId)?.address).catch(async () => [])
-      tonTokenList = tonTokenList?.map(i => ({...i, total_profit: '0', total_profit_ratio: '--', average_purchase_price_usd: '--', 
- }))
+      tonTokenList = tonTokenList?.map(i => ({...i, total_profit: '0', total_profit_ratio: '--', average_purchase_price_usd: '--' }))?.filter(i => {
+         return new BigNumber(i?.balance_usd || 0).gte(hide_small || 0)
+      })
     }
     return tonTokenList
   })(), (async () => {
