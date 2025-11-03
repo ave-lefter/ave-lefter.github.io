@@ -800,7 +800,19 @@ function getPumpConfig() {
     console.log('-------fourmemeListObj-----', fourmemeListObj)
     pumpConfig.value?.forEach(i => {
       if (!pumpV3.value[i.chain]?.platforms?.length) {
-        const platforms =  i.platforms?.map(y=>y?.platform) || []
+        const platforms = i.platforms?.map(y => {
+          if (i.chain == 'solana') {
+            if (y.platform !== 'believe') {
+              return y.platform
+            }
+          } else {
+            return y.platform
+          }
+        }) || []
+        if (i.chain == 'solana') {
+
+          console.log('----platforms--111-----',platforms)
+        }
         pumpV3.value[i.chain] = {
           ...(pumpV3.value[i.chain] || {}),
           platforms,
