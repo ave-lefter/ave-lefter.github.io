@@ -7,6 +7,7 @@ const maxCount = 3
 let timer:number
 const chartDom = useTemplateRef('chartDom')
 const chartInstance = shallowRef<echarts.ECharts>()
+const globalStore = useGlobalStore()
 const props = defineProps<{
     list:KlineDatum[]
 }>()
@@ -33,9 +34,27 @@ onMounted(()=>{
 })
 
 function initOrUpdateChart() {
-        const xAxis = props.list.map(el=>el.t)
+        const interval = ({
+        '1m':60,
+        '5m':300,
+        '15m':900,
+        '1h':3600,
+        '4h':3600,
+        '24h':3600
+        }[globalStore.rankCommon.activeInterval]) as number
+        const oldXAxis = props.list.map(el=>el.t)
+        const xAxisLength = oldXAxis.length
+        const firstTime = oldXAxis[0]
+        const needCount = 24 - xAxisLength
         const barData = props.list.map(el=>Number(el.vol))
         const lineData = props.list.map(el=>Number(el.c))
+        const newXAxis = []
+        for(let i=0;i<needCount;i++){
+            newXAxis.unshift(firstTime-interval*i)
+            barData.unshift(0)
+            lineData.unshift(0)
+        }
+        const xAxis = [...newXAxis, ...oldXAxis]
         const maxLineData = Math.max(...lineData)
         const color = lineData[lineData.length -1] >= maxLineData
         ? getCssVariable('--up-color')
