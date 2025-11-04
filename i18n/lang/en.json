@@ -1477,10 +1477,11 @@
   "refresh": "Refresh",
   "mainToken": "Main Token",
   "botCancelAllOrder": "Confirm to cancel the limit orders of all wallets",
-  "or":"Or",
+  "or": "Or",
   "bidCleared": "The bid side is cleared",
   "backToTop": "Back to top",
   "decimalsDisplay": "Decimals Display",
   "roundUpDisplay": "Round up Display",
-  "twitterTime": "Twitter Time"
+  "twitterTime": "Twitter Time",
+  "perp": "Perp"
 }

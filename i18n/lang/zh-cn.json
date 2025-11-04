@@ -1455,8 +1455,8 @@
   "twitterTime": "推文时间",
   "useChainWallet": "请使用链钱包交互当前代币",
   "pushSettings": "推送设置",
-  "newFeature":"新功能",
-  "CreatePair":"创建池子",
+  "newFeature": "新功能",
+  "CreatePair": "创建池子",
   "buySetting": "买入设置",
   "sellSetting": "卖出设置",
   "walletList": "钱包列表",
@@ -1480,5 +1480,6 @@
   "refresh": "刷新",
   "mainToken": "主币",
   "botCancelAllOrder": "确认取消所有钱包的当前挂单",
-  "or":"或者"
+  "or": "或者",
+  "perp": "合约"
 }
