@@ -11,19 +11,37 @@
       @click.stop.prevent
     >
       <div class="tabs">
-        <div :class="tabActive!== 0? 'tab' : 'tab active'" @click="tabActive = 0">{{ $t('bulkImport') }}</div>
-        <div :class="tabActive!== 1? 'tab' : 'tab active'" @click="() => { tabActive = 1; handleBulkExportAttention() }">{{ $t('bulkExport') }}</div>
-        <div :class="tabActive!== 2? 'tab' : 'tab active'" @click="tabActive = 2">{{ $t('bulkDelete') }}</div>
-        <Icon name="line-md:close" class="text-20px color-[--main-text]" @click="showBatchAddressDetails = false"/>
+        <div :class="tabActive !== 0 ? 'tab' : 'tab active'" @click="tabActive = 0">
+          {{ $t('bulkImport') }}
+        </div>
+        <div
+          :class="tabActive !== 1 ? 'tab' : 'tab active'"
+          @click="
+            () => {
+              tabActive = 1
+              handleBulkExportAttention()
+            }
+          "
+        >
+          {{ $t('bulkExport') }}
+        </div>
+        <div :class="tabActive !== 2 ? 'tab' : 'tab active'" @click="tabActive = 2">
+          {{ $t('bulkDelete') }}
+        </div>
+        <Icon
+          name="line-md:close"
+          class="text-20px color-[--main-text]"
+          @click="showBatchAddressDetails = false"
+        />
       </div>
       <div v-if="tabActive === 0" class="import part">
         <p>{{ $t('bulkDesc1') }}</p>
         <div class="example">
-          <div class="mr-5px">{{ $t('bulkExample')}}:</div>
-          <div>
-            <div>5meiN***8vGB:{{ $t('remark')}}1,</div>
-            <div>G8oaP***eLgf:{{ $t('remark')}}2</div>
-          </div>
+          <!-- <div class="mr-5px">{{ $t('bulkExample') }}:</div> -->
+          <!-- <div>
+            <div>5meiN***8vGB:{{ $t('remark') }}1,</div>
+            <div>G8oaP***eLgf:{{ $t('remark') }}2</div>
+          </div> -->
         </div>
         <el-select
           v-model="activeChain"
@@ -43,7 +61,7 @@
               style=""
               alt=""
               srcset=""
-            >
+            />
           </template>
           <el-option
             v-for="item in SupportFullDataChain"
@@ -56,16 +74,36 @@
                 v-if="item"
                 height="24"
                 class="mr-5px border-rd-[50%]"
-                style="border-radius: 45%;"
+                style="border-radius: 45%"
                 :src="`${token_logo_url}chain/${item}.png`"
                 alt=""
                 srcset=""
-              >
+              />
               <span>{{ getChainInfo(item)?.name || '' }}</span>
             </div>
           </el-option>
         </el-select>
-        <textarea v-model="importStr" class="textarea" :placeholder="$t('bulkExample')+':'+$t('wallet')+$t('address')+':'+$t('remark')+'1'" @input="validateInput"/>
+        <textarea
+          v-model="importStr"
+          class="textarea"
+          :placeholder="
+            $t('bulkExample')+':\n'+
+            '[\n'+
+            '&nbsp;&nbsp; {\n'+
+            '&nbsp;&nbsp;&nbsp;&nbsp; address:5meiN***8vGB \n'+
+            '&nbsp;&nbsp;&nbsp;&nbsp; name: name2\n'+
+            '&nbsp;&nbsp; },\n'+
+            '&nbsp;&nbsp; {\n'+
+            '&nbsp;&nbsp;&nbsp;&nbsp; address:G8oaP***eLgf \n'+
+            '&nbsp;&nbsp;&nbsp;&nbsp; name: name2\n'+
+            '&nbsp;&nbsp; }\n'+
+            ']\n\n'+
+            $t('or')+':\n'+
+            '5meiN***8vGB: name1 \n'+
+            'G8oaP***6vGA: name2 \n\n'
+          "
+          @input="validateInput"
+        />
         <div class="error-message"><span v-if="!isValid">{{ errorMessage }}</span></div>
         <div class="button black" @click="getClipboardContent">{{ $t('paste') }}</div>
         <el-button
@@ -95,12 +133,11 @@
               v-if="activeChain"
               height="24"
               class="mr-5px border-rd-[50%]"
-
               :src="`${token_logo_url}chain/${activeChain}.png`"
               style=""
               alt=""
               srcset=""
-            >
+            />
           </template>
           <el-option
             v-for="item in SupportFullDataChain"
@@ -117,12 +154,12 @@
                 style=""
                 alt=""
                 srcset=""
-              >
+              />
               <span>{{ getChainInfo(item)?.name || '' }}</span>
             </div>
           </el-option>
         </el-select>
-        <textarea v-model="exportStr" class="textarea" disabled/>
+        <textarea v-model="exportStr" class="textarea" disabled />
         <div class="button copy" @click="copyToClipboard">
           {{ $t('copy') }}
           <span v-if="exportNumber > 0">({{ exportNumber }})</span>
@@ -149,7 +186,7 @@
               style=""
               alt=""
               srcset=""
-            >
+            />
           </template>
           <el-option
             v-for="item in SupportFullDataChain"
@@ -166,7 +203,7 @@
                 style=""
                 alt=""
                 srcset=""
-              >
+              />
               <span>{{ getChainInfo(item)?.name || '' }}</span>
             </div>
           </el-option>
@@ -192,19 +229,22 @@ import {
   batchDeleteAddresses,
   bulkExportAttention,
   bulkImportAttention,
-  getZeroBalanceAddresses
+  getZeroBalanceAddresses,
 } from '~/api/attention'
 import { ElMessage } from 'element-plus'
 import { generateAvatarIcon, getChainInfo, isValidAddress, evm_utils as utils } from '@/utils'
 import { ArrowDownBold } from '@element-plus/icons-vue'
 import SuffixIcon from './suffixIcon.vue'
+import { getAttentionPageList, getUserFavoriteGroups2} from '~/api/attention'
 const { mode, token_logo_url } = storeToRefs(useGlobalStore())
-const { currentAddress ,showBatchAddressDetails} = storeToRefs(useFollowStore())
+const { currentAddress, showBatchAddressDetails } = storeToRefs(useFollowStore())
 
-const {updateNum3} = storeToRefs(useFollowStore())
+const { updateNum3 } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const { t } = useI18n()
 const tabActive = ref(0)
+const favTotal = ref(0)
+const favGroups = ref([])
 const importStr = ref('')
 const exportStr = ref('')
 const isValid = ref(true)
@@ -217,7 +257,7 @@ const zeroBalanceList = ref([])
 
 const emit = defineEmits(['refresh'])
 const exportNumber = computed(() => {
-  const entries = exportStr.value.split(/\s*,\s*|\n/).filter(Boolean)
+  const entries = JSON.parse(exportStr.value)
   return entries.length || 0
 })
 
@@ -228,6 +268,9 @@ watch(()=>showBatchAddressDetails.value, (val) => {
     exportStr.value = ''
     zeroBalanceAddresses.value = ''
     zeroBalanceList.value = []
+    favTotal.value = 0;
+  } else {
+    getfavGroupsTotal();
   }
 })
 
@@ -249,10 +292,30 @@ watch(tabActive, (val) => {
   }
 })
 
+const getfavGroupsTotal = async () => {
+  const groups = await getUserFavoriteGroups2(currentAddress.value)
+  const groupIds = groups.map(item => item.group_id);
+  groupIds.push(0);
+  groupIds.map(async (id) =>{
+    const data = await getTotal(id)
+    favTotal.value+=data;
+  })
+}
+
+const getTotal = async (group) => {
+  try {
+    const { total } = await getAttentionPageList({ address:currentAddress.value, pageSize:500, user_chain:activeChain.value, group });
+
+    return total;
+  } catch (err) {
+    // console.error('copy failed:', err)
+  }
+}
+
 const copyToClipboard = async () => {
   try {
     await navigator.clipboard.writeText(exportStr.value)
-    ElMessage.success(t('copy')+' '+t('success'))
+    ElMessage.success(t('copy') + ' ' + t('success'))
   } catch (err) {
     console.error('copy failed:', err)
   }
@@ -269,40 +332,67 @@ const getClipboardContent = async () => {
   }
 }
 
+const isJSON = (str) => {
+  try {
+    JSON.parse(str)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
 const validateInput = () => {
   isValid.value = true
   errorMessage.value = ''
-
-  const entries = importStr.value.split(/\s*,\s*|\n/).filter(Boolean)
-
-  if (entries.length > 100) {
-    errorMessage.value = t('batchErrorMsg3', { n: 100 })
-    isValid.value = false
-    return
-  }
-
-  for (const entry of entries) {
-    const [userAddress, remark = ''] = entry.split(':')
-    const trimmedUserAddress = userAddress.trim()
-    const trimmedRemark = remark.trim()
-
-    if (!isValidAddress(trimmedUserAddress, activeChain.value)) {
-      errorMessage.value = t('batchErrorMsg1', { address: trimmedUserAddress })
+  if (isJSON(importStr.value)) {
+    const entries = JSON.parse(importStr.value)
+    if (entries.length + favTotal.value > 500) {
+      errorMessage.value = t('batchErrorMsg3', { n: 500 })
       isValid.value = false
       return
     }
+    for (const entry of entries) {
+      const address = entry.address || entry.trackedWalletAddress
+      if (!isValidAddress(address, activeChain.value)) {
+        errorMessage.value = t('batchErrorMsg1', { address: address })
+        isValid.value = false
+        return
+      }
+      if (entry?.name?.length > 30) {
+        errorMessage.value = t('batchErrorMsg2', { n: 30 }) + `:${entry.name}`
+        isValid.value = false
+        return
+      }
+    }
+  } else {
+    const entries = importStr.value.split(/\s*,\s*|\n/).filter(Boolean)
 
-    if (trimmedRemark.length > 30) {
-      errorMessage.value = t('batchErrorMsg2', { n: 30 }) + `:${trimmedRemark}`
+    if (entries.length + favTotal.value > 500) {
+      errorMessage.value = t('batchErrorMsg3', { n: 500 })
       isValid.value = false
       return
+    }
+    for (const entry of entries) {
+      const [userAddress, remark = ''] = entry.split(':')
+      const trimmedUserAddress = userAddress.trim()
+      const trimmedRemark = remark.trim()
+      if (!isValidAddress(trimmedUserAddress, activeChain.value)) {
+        errorMessage.value = t('batchErrorMsg1', { address: trimmedUserAddress })
+        isValid.value = false
+        return
+      }
+      if (trimmedRemark.length > 30) {
+        errorMessage.value = t('batchErrorMsg2', { n: 30 }) + `:${trimmedRemark}`
+        isValid.value = false
+        return
+      }
     }
   }
 }
 
 const handleBulkImportAttention = () => {
   if (!currentAddress.value) {
-      botStore.changeConnectVisible(true)
+    botStore.changeConnectVisible(true)
     return
   }
   if (!isValid.value) {
@@ -314,45 +404,61 @@ const handleBulkImportAttention = () => {
   }
   loading.value = true
   bulkImportAttention(arr)
-  .then((res) => {
+    .then((res) => {
       console.log(res)
       ElMessage.success(t('success'))
       updateNum3.value++
       emit('refresh')
       showBatchAddressDetails.value = false
     })
-  .catch((err) => {
+    .catch((err) => {
       ElMessage.error(String(err))
     })
-  .finally(() => {
+    .finally(() => {
       loading.value = false
     })
 }
 
 const parseInputToJson = (input, chain) => {
   const result = []
-  const entries = input.split(/\s*,\s*|\n/).filter(Boolean)
   let isValid = true
-
-  entries.forEach((entry) => {
-    const [userAddress, remark = ''] = entry.split(':')
-    const trimmedUserAddress = userAddress.trim()
-    const trimmedRemark = remark.trim()
-
-    if (isValidAddress(trimmedUserAddress, chain)) {
-      const obj = {
-        address: '',
-        user_address: trimmedUserAddress,
-        user_chain: chain,
-        remark: trimmedRemark
+  if (!isJSON(input)) {
+    const entries = input.split(/\s*,\s*|\n/).filter(Boolean)
+    entries.forEach((entry) => {
+      const [userAddress, remark = ''] = entry.split(':')
+      const trimmedUserAddress = userAddress.trim()
+      const trimmedRemark = remark.trim()
+      if (isValidAddress(trimmedUserAddress, chain)) {
+        const obj = {
+          address: '',
+          user_address: trimmedUserAddress,
+          user_chain: chain,
+          remark: trimmedRemark,
+        }
+        result.push(obj)
+      } else {
+        isValid = false
+        console.warn(`Invalid address skipped: ${trimmedUserAddress}`)
       }
-      result.push(obj)
-    } else {
-      isValid = false
-      console.warn(`Invalid address skipped: ${trimmedUserAddress}`)
-    }
-  })
-
+    })
+  } else {
+    const entries = JSON.parse(input);
+    entries.forEach((entry) => {
+      const user_address = entry.address || entry.trackedWalletAddress
+      if (isValidAddress(user_address, chain)) {
+        const obj = {
+          address: '',
+          user_address,
+          user_chain: chain,
+          remark: entry.name,
+        }
+        result.push(obj)
+      } else {
+        isValid = false
+        console.warn(`Invalid address skipped: ${trimmedUserAddress}`)
+      }
+    })
+  }
   if (isValid) {
     return result
   } else {
@@ -362,35 +468,36 @@ const parseInputToJson = (input, chain) => {
 
 const handleBulkExportAttention = () => {
   if (!currentAddress.value) {
-      botStore.changeConnectVisible(true)
+    botStore.changeConnectVisible(true)
     return
   }
   loading.value = true
   bulkExportAttention(activeChain.value)
-  .then((res) => {
+    .then((res) => {
       console.log('bulkExportAttention', res)
       exportStr.value = convertJsonToString(res)
     })
-  .catch((err) => {
+    .catch((err) => {
       ElMessage.error(String(err))
     })
-  .finally(() => {
+    .finally(() => {
       loading.value = false
     })
 }
 
 const convertJsonToString = (jsonData) => {
-  return jsonData
-  .map((item) => {
-      const remark = item.remark? `:${item.remark}` : ''
-      return `${item.user_address}${remark},`
-    })
-  .join('\n')?.replace(/,$/, '')
+  const data = jsonData.map((item) => {
+    return {
+      name: item.remark ? item.remark : '',
+      address: item.user_address,
+    }
+  })
+  return JSON.stringify(data, null, 2)
 }
 
 const fetchZeroBalAddresses = () => {
   if (!currentAddress.value) {
-      botStore.changeConnectVisible(true)
+    botStore.changeConnectVisible(true)
     return
   }
 
@@ -401,9 +508,9 @@ const fetchZeroBalAddresses = () => {
 
   getZeroBalanceAddresses({
     user_chain: activeChain.value,
-    address: currentAddress.value
+    address: currentAddress.value,
   })
- .then((res) => {
+    .then((res) => {
       const zeroBalAddresses = res || []
       zeroBalanceList.value = zeroBalAddresses
 
@@ -414,38 +521,38 @@ const fetchZeroBalAddresses = () => {
       }
 
       zeroBalanceAddresses.value = t('foundZeroBalanceAddresses', { count: zeroBalAddresses.length }) + '\n\n' +
-                                 zeroBalAddresses.map((addr) => addr.user_address).join('\n')
+      zeroBalAddresses.map((addr) => addr.user_address).join('\n')
     })
- .catch((err) => {
+    .catch((err) => {
       console.error('获取零余额地址失败:', err)
       zeroBalanceAddresses.value = t('fetchFailed')
       loadingDelete.value = false
     })
- .finally(() => {
+    .finally(() => {
       loadingDelete.value = false
     })
 }
 
 const confirmBulkDelete = () => {
   if (zeroBalanceList.value.length === 0) {
-     fetchZeroBalAddresses()
+    fetchZeroBalAddresses()
     return
   }
 
   loadingDelete.value = true
-  console.log('zeroBalanceList',zeroBalanceList.value)
+  console.log('zeroBalanceList', zeroBalanceList.value)
   batchDeleteAddresses(zeroBalanceList.value)
- .then(() => {
-      ElMessage.success(t('deleteSuccess', {count: zeroBalanceList.value.length}))
+    .then(() => {
+      ElMessage.success(t('deleteSuccess', { count: zeroBalanceList.value.length }))
       zeroBalanceAddresses.value = t('deleteSuccess', { count: zeroBalanceList.value.length })
       emit('refresh')
-      updateNum3.value++  
+      updateNum3.value++
     })
- .catch((err) => {
+    .catch((err) => {
       console.error('批量删除失败:', err)
       zeroBalanceAddresses.value = t('deleteFailed')
     })
- .finally(() => {
+    .finally(() => {
       loadingDelete.value = false
     })
 }
@@ -471,7 +578,7 @@ const confirmBulkDelete = () => {
     min-height: 100vh;
   }
 }
-.pop-right{
+.pop-right {
   position: fixed;
   .content {
     background-color: var(--dialog-bg);
@@ -491,16 +598,16 @@ const confirmBulkDelete = () => {
           color: var(--main-text);
         }
       }
-      .iconify{
+      .iconify {
         cursor: pointer;
         position: absolute;
         right: 0;
         top: 50%;
-        transform: translateY(-50%)
+        transform: translateY(-50%);
       }
     }
     .part {
-      p{
+      p {
         margin-bottom: 10px;
         font-size: 12px;
         color: var(--secondary-text);
@@ -526,7 +633,7 @@ const confirmBulkDelete = () => {
           height: 20px;
           margin-right: 6px;
         }
-        span{
+        span {
           color: var(--d-FFF-l-222);
           font-size: 14px;
           line-height: 16px;
@@ -543,7 +650,7 @@ const confirmBulkDelete = () => {
         overflow-y: auto;
         margin-bottom: 5px;
         background-color: transparent;
-        &::placeholder{
+        &::placeholder {
           color: var(--third-text);
         }
       }
@@ -562,14 +669,14 @@ const confirmBulkDelete = () => {
         border-radius: 8px;
         text-align: center;
         &.black {
-          border:1px solid var(--border);
+          border: 1px solid var(--border);
           background-color: var(--border);
           color: var(--main-text);
           margin-bottom: 20px;
           line-height: 48px;
-          &:hover{
-            border-color:var(--gray-button-hover);
-            background-color:var(--gray-button-hover);
+          &:hover {
+            border-color: var(--gray-button-hover);
+            background-color: var(--gray-button-hover);
           }
         }
         &.copy {
@@ -578,9 +685,9 @@ const confirmBulkDelete = () => {
           color: var(--main-text);
           margin-top: 30px;
           line-height: 48px;
-          &:hover{
-            background-color:var(--primary-button-hover);
-            border-color:var(--primary-button-hover);
+          &:hover {
+            background-color: var(--primary-button-hover);
+            border-color: var(--primary-button-hover);
           }
         }
       }
@@ -588,16 +695,16 @@ const confirmBulkDelete = () => {
   }
 }
 textarea::-webkit-resizer {
-    display: none;
+  display: none;
 }
 
 textarea::-moz-resizer {
-    display: none;
+  display: none;
 }
 textarea::placeholder {
-  font-size: 14px;  /* 修改为你想要的字体大小 */
+  font-size: 14px; /* 修改为你想要的字体大小 */
 }
-textarea{
+textarea {
   font-size: 14px;
   line-height: 18px;
   font-weight: 300;

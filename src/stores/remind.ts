@@ -5,6 +5,7 @@ import {
   _getNotifyList,
   _getNotifyHistoryList,
   _getNotify,
+  _deleteNotifyHistory,
   type Notify,
   type GroupedItem,
   type Item,
@@ -21,6 +22,7 @@ export const useRemindStore = defineStore('Remind', () => {
   const timerNotify = ref<ReturnType<typeof setInterval> | null>(null)
   let errorNotify = false
   const newRemind = shallowRef(false)
+  const remindCount = shallowRef(0)
 
   const currentAddress = computed(() => botStore?.evmAddress || walletStore?.address || '')
   function getNotifyList() {
@@ -40,7 +42,7 @@ export const useRemindStore = defineStore('Remind', () => {
                   token: cur.token,
                   chain: cur.chain,
                   symbol: cur.symbol,
-                  create_time: cur.create_time,
+                  create_time: cur.create_time || '',
                   logo_url: cur.logo_url,
                   ids: [cur.id],
                   children: [cur],
@@ -49,8 +51,9 @@ export const useRemindStore = defineStore('Remind', () => {
                 acc[cur.token].children.push(cur)
                 acc[cur.token].ids.push(cur.id)
                 // 更新为最新 create_time（更大的）
-                if (cur.create_time > acc[cur.token].create_time) {
-                  acc[cur.token].create_time = cur.create_time
+                const tokenData = acc?.[cur.token]
+                if (tokenData?.create_time && cur.create_time > tokenData.create_time) {
+                  tokenData.create_time = cur.create_time
                 }
               }
               return acc
@@ -58,6 +61,10 @@ export const useRemindStore = defineStore('Remind', () => {
             {} as Record<string, GroupedItem>
           )
         )
+        remindList.value.forEach((item) => {
+          item.children.sort((a, b) => Number(b.create_time) - Number(a.create_time))
+        })
+       console.log('-----remindList.value------', remindList.value)
       })
       .catch(() => {})
       .finally(() => {
@@ -78,9 +85,18 @@ export const useRemindStore = defineStore('Remind', () => {
       return
     }
     loadingRemindHistory.value = true
-    const res = await _getNotifyHistoryList(currentAddress.value)
-    loadingRemindHistory.value = false
-    remindHistoryList.value = Array.isArray(res) ? res : []
+    const res = await _getNotifyHistoryList(currentAddress.value).finally(() => {
+      loadingRemindHistory.value = false
+    })
+    remindHistoryList.value = Array.isArray(res)
+      ? res?.map((i) => ({
+          ...i,
+          create_time:
+            i?.create_time !== '1970-01-01T00:00:00Z' && i?.create_time !== '0001-01-01T00:00:00Z'
+              ? new Date(i?.create_time).getTime() / 1000
+              : 0,
+        }))
+      : []
   }
 
   function getNotify() {
@@ -93,6 +109,7 @@ export const useRemindStore = defineStore('Remind', () => {
           let result = res?.price_notify || []
           if (result.length > 0) {
             newRemind.value = true
+            remindCount.value++
             sendNotify(result)
           }
         })
@@ -109,6 +126,17 @@ export const useRemindStore = defineStore('Remind', () => {
         })
     }
   }
+  function deleteNotifyHistory() {
+    if (!currentAddress.value) {
+      return
+    }
+    _deleteNotifyHistory(currentAddress.value)
+      .then((res) => {
+        newRemind.value = false
+        getNotifyHistoryList()
+      })
+      .catch(() => {})
+  }
   return {
     remindList,
     loadingRemind,
@@ -117,6 +145,8 @@ export const useRemindStore = defineStore('Remind', () => {
     getNotifyHistoryList,
     remindHistoryList,
     loadingRemindHistory,
-    newRemind
+    newRemind,
+    remindCount,
+    deleteNotifyHistory,
   }
 })

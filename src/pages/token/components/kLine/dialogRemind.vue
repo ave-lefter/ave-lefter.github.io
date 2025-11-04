@@ -22,7 +22,7 @@
     <div v-else>
       <el-alert
         type="warning"
-        :title="form.direction == 'up' ? $t('remindUp') : $t('remindDown')"
+        :title="$t('remindTip')"
         :closable="false"
         show-icon
         :style="{
@@ -52,7 +52,7 @@
                 <span class="mr-4px">{{ $t('once') }}</span>
               </template>
               <Icon
-                :name="!showRepeatPop ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
+                :name="!showRepeatPop ? 'radix-icons:triangle-down': 'radix-icons:triangle-up'"
                 class="text-16px color-[--main-text]"
               />
             </div>
@@ -60,13 +60,13 @@
           <template #default>
             <div class="py-4px [&&]:m--12px flex flex-col">
               <div
-                class="flex-start items-center text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer"
+                class="flex-start items-center text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-list-hover] cursor-pointer"
                 @click.stop="toggleRepeat(1)"
               >
                 <span class="ml-4px mr-4px">{{ $t('duplicate') }}</span>
               </div>
               <div
-                class="flex-start items-center text-12px py-4px px-8px color hover:bg-[--dialog-tab-active] cursor-pointer"
+                class="flex-start items-center text-12px py-4px px-8px color hover:bg-[--dialog-list-hover] cursor-pointer"
                 @click.stop="toggleRepeat(0)"
               >
                 <span class="ml-4px mr-4px">{{ $t('once') }}</span>
@@ -75,7 +75,7 @@
           </template>
         </el-popover>
       </div>
-      <div class="flex-between mt-16px">
+      <div class="flex-between mt-24px">
         <span class="text-14px">{{ $t('triggerCondition') }}</span>
         <div class="flex-1"></div>
         <span class="text-12px color-[--third-text]"
@@ -106,7 +106,7 @@
                 <span class="ml-4px mr-4px">{{ $t('ltPrice') }}</span>
               </template>
               <Icon
-                :name="!showDirectionPop ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
+                :name="!showDirectionPop ? 'radix-icons:triangle-down': 'radix-icons:triangle-up'"
                 class="text-16px color-[--main-text]"
               />
             </div>
@@ -114,14 +114,14 @@
           <template #default>
             <div class="py-4px [&&]:m--12px flex flex-col">
               <div
-                class="flex-start items-center text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer"
+                class="flex-start items-center text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-list-hover] cursor-pointer"
                 @click.stop="toggleDirection('up')"
               >
                 <Icon class="text-16px" name="custom:arrow-up" />
                 <span class="ml-4px mr-4px">{{ $t('gtPrice') }}</span>
               </div>
               <div
-                class="flex-start items-center text-12px py-4px px-8px color hover:bg-[--dialog-tab-active] cursor-pointer"
+                class="flex-start items-center text-12px py-4px px-8px color hover:bg-[--dialog-list-hover] cursor-pointer"
                 @click.stop="toggleDirection('down')"
               >
                 <Icon class="text-16px" name="custom:arrow-down" />
@@ -135,6 +135,8 @@
           v-model="form.warning_price"
           :placeholder="$t('placeholderNotify')"
           @input="onInput"
+          @focus="onFocus"
+          @blur="onBlur"
         ></el-input>
         <el-button
           type="primary"
@@ -160,11 +162,11 @@
             class="radio-item"
             :class="{ 'no-checked': customRatio }"
             style="border-radius: 4px"
-            >{{form.direction == 'up'? '+': '-' }}{{ item }}%</label
+            >{{ form.direction == 'up' ? '+' : '-' }}{{ item }}%</label
           >
         </div>
         <div class="slippage-input flex-1">
-          <span class="color-[--main-text] mr-5px">{{form.direction == 'up'? '+': '-' }}</span>
+          <span class="color-[--main-text] mr-5px">{{ form.direction == 'up' ? '+' : '-' }}</span>
           <el-input-number
             v-model="customRatio"
             class="bg-[--border] rounded-4px"
@@ -177,6 +179,7 @@
             controls-position="right"
             :controls="false"
             clearable
+            @focus="onFocus1"
             @change="changeCustomRatio"
           />
           <span class="color-[--main-text]">%</span>
@@ -192,11 +195,17 @@
             class="item"
             v-for="(item, $index) in filterRemindList"
             :keys="$index"
-            @click.stop.prevent="removeNotify(item.ids)"
+            @click.stop.prevent="removeNotify(item.ids, 1)"
           >
             <div class="flex-between parent cursor-pointer">
+            <NuxtLink
+                :to="`/token/${item.token}-${item.chain}`"
+                class="flex no-underline items-center"
+                @click.stop.prevent="visible = false"
+              >
               <token-img :row="item" tokenClass="w-32px h-32px" />
               <span class="text-16px font-500 ml-8px">{{ item.symbol }}</span>
+            </NuxtLink>
               <div class="flex-1"></div>
               <Icon class="delete text-16px cursor-pointer" name="ic:baseline-delete" />
             </div>
@@ -205,7 +214,7 @@
                 class="flex-start items-center text-14px py-8px px-8px color-[--main-text] hover:bg-[--dialog-list-hover] cursor-pointer"
                 v-for="(i, index) in item?.children"
                 :key="index"
-                @click.stop.prevent="removeNotify([i.id])"
+                @click.stop.prevent="removeNotify([i.id], 0)"
               >
                 <Icon
                   class="text-16px"
@@ -217,9 +226,16 @@
                 <span class="ml-4px"
                   >${{ formatNumber(i.warning_price || 0, { decimals: 4, limit: 6 }) }}</span
                 >
-                <span class="color-[--down-color] ml-4px">{{
-                  i.is_repeatable == 0 ? $t('once') : $t('duplicate')
-                }}</span>
+                <span
+                  class="color-[--third-text] ml-4px"
+                  v-if="i.is_repeatable == 0 && i?.notified_times >= 1"
+                >
+                  {{ $t('expired2') }}
+                </span>
+                <span class="color-[--down-color] ml-4px" v-else>
+                  {{ i.is_repeatable == 0 ? $t('once') : $t('duplicate') }}
+                </span>
+
                 <div class="flex-1"></div>
                 <Icon class="delete-children text-14px cursor-pointer" name="ic:baseline-delete" />
               </li>
@@ -244,7 +260,7 @@
 
 <script setup lang="ts">
 import { markRaw } from 'vue'
-import { _addNotify, _removeNotify , type Item} from '@/api/remind'
+import { _addNotify, _removeNotify, type Item } from '@/api/remind'
 import { Warning } from '@element-plus/icons-vue'
 const props = defineProps({
   modelValue: Boolean,
@@ -256,7 +272,7 @@ const botStore = useBotStore()
 const { t } = useI18n()
 const { mode } = storeToRefs(useGlobalStore())
 const remindStore = useRemindStore()
-const { remindList, loadingRemind, len } = storeToRefs(remindStore)
+const { remindList, loadingRemind, len, remindCount} = storeToRefs(remindStore)
 const { getNotifyList } = remindStore
 const route = useRoute()
 const visible = computed({
@@ -266,7 +282,7 @@ const visible = computed({
 const tokenStore = useTokenStore()
 const deny = shallowRef(false)
 const ratio = shallowRef(0)
-const customRatio = shallowRef(0)
+const customRatio = shallowRef<number | null>(null)
 const selected = shallowRef(false)
 
 const followStore = useFollowStore()
@@ -311,11 +327,19 @@ const filterRemindList = computed(() => {
     return remindList.value || []
   }
 })
+watch(remindCount, (val) => {
+  if (val && visible.value) {
+    init()
+  }
+})
 watch(
   () => visible.value,
   (val) => {
     if (val) {
       init()
+    } else {
+      showRepeatPop.value = false
+      showDirectionPop.value = false
     }
   }
 )
@@ -341,8 +365,7 @@ watch(
   }
 )
 
-onMounted(() => {
-})
+onMounted(() => {})
 function init() {
   form.warning_price = formatDec(tokenStore?.price || 0, 4)
   form.direction = 'up'
@@ -373,7 +396,7 @@ function allowNotify() {
   }
 }
 function onSubmit() {
-  if (remindList.value?.length >= 100) {
+  if (len.value >= 100) {
     ElMessage.error(t('alertTip2'))
     return
   }
@@ -391,7 +414,7 @@ function onSubmit() {
     warning_price: Number(form.warning_price || 0),
   }
   crateLoading.value = true
-  _addNotify(data,currentAddress.value)
+  _addNotify(data, currentAddress.value)
     .then((res) => {
       ElMessage.success(t('success'))
       getNotifyList()
@@ -404,8 +427,8 @@ function onSubmit() {
       crateLoading.value = false
     })
 }
-function removeNotify(ids: number[]) {
-  ElMessageBox.confirm(t('deleteAlert'), t('tips'), {
+function removeNotify(ids: number[], type = 0) {
+  ElMessageBox.confirm(type == 1 ? t('deleteGroupAlert') : t('deleteAlert'), t('tips'), {
     type: 'warning',
     icon: markRaw(Warning),
     confirmButtonText: t('confirm'),
@@ -444,12 +467,12 @@ function changeRatio() {
     if (form.direction == 'up') {
       price = (1 + ratio.value / 100) * Number(tokenStore?.price || 0)
     } else {
-      price= (1 - ratio.value / 100) * Number(tokenStore?.price || 0)
+      price = (1 - ratio.value / 100) * Number(tokenStore?.price || 0)
     }
   } else {
     price = Number(tokenStore?.price || 0)
   }
-  form.warning_price = formatDec(price || 0 , 4)
+  form.warning_price = formatDec(price || 0, 4)
 }
 function changeCustomRatio() {
   if (customRatio.value) {
@@ -465,11 +488,31 @@ function changeCustomRatio() {
 }
 
 const onInput = (val: string) => {
-  // 只保留数字和小数点
-  form.warning_price = Number(val.replace(/[^0-9.]/g, '') || 0)
+  // 允许一个小数点，允许小数点后输入 0
+  const cleaned = val
+    .replace(/[^0-9.]/g, '') // 去掉非数字和小数点
+    .replace(/^0+(\d)/, '$1') // 去掉多余的前导0（但保留单个0）
+    .replace(/(\..*?)\..*/g, '$1') // 只保留第一个小数点
+
+  form.warning_price = cleaned
+  // form.warning_price = Number(val.replace(/[^0-9.]/g, '') || 0)
+}
+const onBlur = () => {
+  const num = Number(form.warning_price)
+  form.warning_price = isNaN(num) ? 0 : num
 }
 const openConnect = () => {
   botStore.changeConnectVisible(true)
+}
+const onFocus = () => {
+  if (Number(form.warning_price) == 0) {
+    form.warning_price = ''
+  }
+}
+const onFocus1 = () => {
+  if (customRatio.value === 0 || customRatio.value === null) {
+    customRatio.value = null // 不显示 0
+  }
 }
 </script>
 

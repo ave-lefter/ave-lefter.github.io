@@ -1,7 +1,7 @@
 export interface Notify {
   address: string
   chain: string
-  create_time: number
+  create_time: string | number
   current_price: number
   id: number
   is_deleted: number
@@ -13,20 +13,21 @@ export interface Notify {
   token: string
   warning_price: number
   direction: string
+  token_address?: string
 }
 
 export interface Item {
-  id?: number
+  id: number
   address?: string
   user_address?: string
   token: string
   symbol: string
   chain: string
   warning_price: number
-  create_time?: number
+  create_time?: string | number
   last_notify_time?: number
   is_repeatable: number
-  notified_times?: number
+  notified_times: number
   is_deleted?: number
   current_price: number
   direction: string
@@ -37,7 +38,7 @@ export interface GroupedItem {
   token: string
   chain: string
   symbol: string
-  create_time: number
+  create_time?: string | number
   logo_url: string
   ids: number[]
   children: Item[]
@@ -51,7 +52,7 @@ export interface PriceNotifyItem {
   user_notify_setting: {
     address: string
     chain: string
-    create_time: number
+    create_time?: string | number
     current_price: number
     direction: 'up' | 'down'
     symbol: string
@@ -61,7 +62,7 @@ export interface PriceNotifyItem {
 }
 export function _getNotifyList(address: string): Promise<Notify[]> {
   const { $api } = useNuxtApp()
-  return $api(`/v1api/v2/priceInfo/notify`, {
+  return $api(`/v1api/v2/priceInfo/notify/v2`, {
     method: 'get',
     query: {
       userAddress: address,
@@ -103,6 +104,16 @@ export function _getNotifyHistoryList(address: string): Promise<Notify[]> {
 export function _getNotify(address: string): Promise<PriceNotify> {
   const { $api } = useNuxtApp()
   return $api(`/v1api/v2/priceInfo`, {
+    method: 'post',
+    body: {
+      user_address: address,
+    },
+  })
+}
+
+export function _deleteNotifyHistory(address: string) {
+  const { $api } = useNuxtApp()
+  return $api(`/v1api/v2/priceInfo/notify/history/delete`, {
     method: 'post',
     body: {
       user_address: address,
