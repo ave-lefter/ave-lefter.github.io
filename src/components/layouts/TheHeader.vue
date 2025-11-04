@@ -305,7 +305,8 @@ const list = computed(() => {
     // {id: 'index', name: t('markets'), src: 'https://ave.ai/' + query, target: '_blank'},
     { id: 'pump', name: t('pump1'), src: '/pump' },
     { id: 'follow', name: t('follow'), src: '/follow' },
-    {id: 'smart', name: t('smarter2'), src: '/smart', target: '_self'},
+    { id: 'perp', name: t('perp'), src: '/perp' },
+    { id: 'smart', name: t('smarter2'), src: '/smart', target: '_self' },
     {id: 'address', name: t('balances'), src: '/address', target: '_self'},
   ]
   return menues
