@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nuxt build --dotenv .env.production",
     "dev": "nuxt dev --dotenv .env.development",
+    "devprod": "nuxt dev --dotenv .env.production",
     "generate": "nuxt generate --dotenv .env.production",
     "preview": "nuxt preview --dotenv .env.production",
     "postinstall": "nuxt prepare",

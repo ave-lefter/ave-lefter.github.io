@@ -30,8 +30,10 @@ const components = {
   volume: activityComponent,
   // heaven_pump: pumpComponent,
   // xdyorswap_pump: pumpComponent,
-  pumplive: liveComponent
+  pumplive: liveComponent,
+  clanker: activityComponent
 }
+
 const walletStore = useWalletStore()
 const botStore = useBotStore()
 const globalStore = useGlobalStore()
@@ -47,6 +49,10 @@ const isPump = computed(()=>{
     return currentChainObj.value.categories.find(el=>el.category === activeTab.value)?.is_pump
   }
   return 0
+})
+
+const _activityComponent = computed(() => {
+  return components?.[activeTab.value as keyof typeof components] || activityComponent
 })
 const walletAddress = computed(() => {
   return botStore.evmAddress || walletStore.address
@@ -272,9 +278,10 @@ const height = computed(() => {
   return 'calc(100vh - 185px)'
 })
 
-const needAmmList = computed(()=>{
-  return ['gainer', 'hot', 'new', 'inclusion','binance_alpha','xstocks'].includes(activeTab.value)
-})
+// const needAmmList = computed(()=>{
+//   return ['gainer', 'hot', 'new', 'inclusion','binance_alpha','xstocks', 'clanker'].includes(activeTab.value)
+// })
+
 </script>
 
 <template>
@@ -290,14 +297,14 @@ const needAmmList = computed(()=>{
       />
       <KeepAlive :max="6">
         <component
-          :is="isPump?pumpComponent:components[activeTab as keyof typeof components]"
+          :is="isPump?pumpComponent:_activityComponent"
           ref="dynamicComponentRef"
           :height="height"
           :listMapFunction="listMapFunction"
           :activeChain="activeChain"
           :activeTab="activeTab"
           :activeSubTab="activeSubTab"
-          v-bind="needAmmList ? { ammList: currentChainObj?.swaps || [] } : {}"
+          v-bind="!isPump ? { ammList: currentChainObj?.swaps || [] } : {}"
         />
       </KeepAlive>
     </div>

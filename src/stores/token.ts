@@ -45,6 +45,7 @@ export const useTokenStore = defineStore('token', () => {
   const totalHolders = shallowRef<GetTotalHoldersResponse[]>([])
   const price = computed(() => tokenPrice.value || token.value?.current_price_usd)
   const priceChange = computed(() => tokenPriceChange.value || pair.value?.price_change || token.value?.price_change)
+  const gasPrice = ref(0)
 
   const placeOrderUpdate = ref(0)
   const placeOrderSuccess = ref(0)
@@ -97,7 +98,7 @@ export const useTokenStore = defineStore('token', () => {
       status =
         (token?.value?.risk_level ?? 0) >= 0 &&
         !token?.value?.logo_url &&
-        !token?.value?.is_audited
+        !tokenInfo?.value?.is_audited
     }
     return status
   })
@@ -275,6 +276,7 @@ export const useTokenStore = defineStore('token', () => {
     tokenPrice,
     circulation,
     marketCap,
+    gasPrice,
     reset,
     switchPair,
     _getTotalHolders,

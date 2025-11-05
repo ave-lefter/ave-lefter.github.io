@@ -513,5 +513,7 @@
   "holdersChange2": "Holder Changs em {n}",
   "lockAmount": "Quantidade Bloqueada",
   "transferToken": "Selecione Token de transferência",
-  "depositTip": "* Endereço atual EVM Chain Universal"
+  "depositTip": "* Endereço atual EVM Chain Universal",
+  "buySetting": "comprar configuração",
+  "sellSetting": "configuração de venda"
 }

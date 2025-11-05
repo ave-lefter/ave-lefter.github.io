@@ -5,8 +5,7 @@
     <NuxtLink to="/" class="flex items-center gap-4px">
       <img height="26" src="~/assets/images/avedex_mobile_logo.png" >
       <div class="flex items-end gap-5px">
-        <Icon name="custom:name" class="color-[--d-FFF-l-000] text-14px"/>
-        <Icon name="custom:pro" class="text-8px"/>
+        <Icon name="custom:ave-ai" class="color-[--d-FFF-l-000] text-14px"/>
       </div>
     </NuxtLink>
     <!-- <a :href="homeUrl" target="_blank" class="flex"><img height="26" src="~/assets/images/avedex_mobile_logo.png" ></a> -->
@@ -150,7 +149,61 @@
         </div>
       </div>
     </el-popover>
-    <div
+    <el-popover trigger="click" placement="bottom-end">
+      <template #reference>
+        <div
+          class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px flex items-center cursor-pointer hover:opacity-80"
+        >
+          <Icon
+            class="text-16px color-[--secondary-text]"
+            name="custom:pump-setting"
+          />
+        </div>
+      </template>
+      <template #default>
+        <div class="flex items-center justify-between mb-16px cursor-pointer" @click="globalStore.audioSettings.active = 'notice'">
+         <div class="flex items-center gap-8px">
+          <Icon name="custom:alert" class="text-16px"/>
+          {{ $t('pushSettings') }}
+         </div>
+          <Icon name="ep:arrow-right"/>
+        </div>
+        <el-dropdown
+          trigger="click"
+          popper-class="dropdown-lang"
+          class="w-full"
+          @command="langStore.setLanguage"
+        >
+          <div class="flex flex-1 items-center justify-between mb-16px cursor-pointer">
+              <div class="flex items-center gap-8px">
+                <Icon name="material-symbols:language" class="text-16px"/>
+                {{locales.find(i=>i.code === langStore.locale)?.name}}
+              </div>
+              <Icon name="ep:arrow-right"/>
+            </div>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item
+                v-for="(item, $index) in locales"
+                :key="$index"
+                :command="item?.code"
+                :class="{ active: langStore.locale == item.code }"
+              >
+                {{ item?.name }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        <div class="flex items-center justify-between cursor-pointer" @click="botTipDialogRef && botTipDialogRef?.openBotTipDialog()">
+          <div class="flex items-center gap-8px">
+            <Icon name="custom:rockets" class="text-16px"/>
+          {{ $t('newFeature') }}
+          </div>
+          <Icon name="ep:arrow-right"/>
+        </div>
+      </template>
+    </el-popover>
+    <!-- <div
       class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px flex items-center cursor-pointer hover:opacity-80"
       @click="globalStore.audioSettings.active = 'notice'"
     >
@@ -158,9 +211,9 @@
         class="text-20px color-[--secondary-text]"
         name="custom:alert"
       />
-    </div>
+    </div> -->
     <Notice/>
-    <el-dropdown
+    <!-- <el-dropdown
       trigger="click"
       placement="bottom"
       popper-class="dropdown-lang"
@@ -189,7 +242,7 @@
           </el-dropdown-item>
         </el-dropdown-menu>
       </template>
-    </el-dropdown>
+    </el-dropdown> -->
     <a
       class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px flex items-center"
       href=""
@@ -200,10 +253,10 @@
         :name="themeStore.isDark ? 'custom:dark' : 'custom:light'"
       />
     </a>
-    <dialog-search ref="dialogSearchRef" v-model="dialogVisible_search"/>
+    <dialog-search ref="dialogSearchRef"/>
     <!-- <component :is="connectWalletCom" v-model="botStore.connectVisible" /> -->
     <ConnectWalletCom />
-    <BotTipDialog/>
+    <BotTipDialog ref="botTipDialogRef"/>
     <AudioSettings/>
     <audio ref='audioElement' controls :src='audioUrl' class="hidden"/>
   </header>
@@ -234,6 +287,7 @@ const langStore = useLocaleStore()
 const {t } = useI18n()
 const globalStore = useGlobalStore()
 const  appDownloadVisible = shallowRef(false)
+const botTipDialogRef = useTemplateRef('botTipDialogRef')
 const list = computed(() => {
   // let query = ''
   // if (botStore.accessToken && botStore.refreshToken) {
@@ -258,7 +312,7 @@ const homeUrl = computed(() => {
   return 'https://ave.ai/' + query
 })
 
-const dialogVisible_search = shallowRef(false)
+// const dialogVisible_search = shallowRef(false)
 
 // const lazyComponent = shallowRef<Component | null>(null)
 // const loadComponent = async () => {
@@ -305,7 +359,7 @@ watch(()=>wsStore.wsResult[WSEventType.TGBOT],(subscribeResult:ITGBotResponse)=>
 })
 
 async function showDialog() {
-  dialogVisible_search.value = !dialogVisible_search.value
+  globalStore.dialogVisible_search = !globalStore.dialogVisible_search
   // 自动粘贴剪切板
   const clipboard = await navigator.clipboard.readText()
   const isValid = clipboard && ['eth', 'solana','tron','sui','ton','brc20'].some(i => isValidAddress(clipboard, i))

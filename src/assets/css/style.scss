@@ -242,3 +242,53 @@ debox-chat-widget {
     }
   }
 }
+.bot-manage-table{
+    &.el-table {
+    .el-table__row > td:first-child {
+      .cell {
+          display: flex;
+          align-items: center;
+        }
+    }
+  }
+}
+.delete_confirm.el-message-box {
+  width: 420px;
+  padding: 20px;
+  .el-message-box__title{
+    font-size: 20px;
+  }
+  .el-message-box__headerbtn {
+    top: 7px;
+    .el-message-box__close{
+      font-size: 20px;
+    }
+  }
+  .el-message-box__status.el-icon{
+    font-size: 36px;
+    font-weight: bolder;
+  }
+  .el-message-box__btns{
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    button {
+      flex:1;
+      height: 48px;
+    }
+  }
+.el-message-box__content .el-message-box__container{
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+}
+.dialog-connect1.el-dialog {
+  padding: 20px;
+  .el-dialog__header{
+    padding-bottom: 0;
+  }
+}

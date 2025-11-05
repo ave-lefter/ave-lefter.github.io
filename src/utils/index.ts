@@ -8,10 +8,17 @@ import TonWeb from 'tonweb'
 import IconUnknown from '@/assets/images/icon-unknown.png'
 import { useRemarksStore } from '~/stores/remarks'
 import Cookies from 'js-cookie'
-import { JsonRpcProvider, formatUnits as ethersFormatUnits, parseUnits as ethersParseUnits, FixedNumber, Interface, type JsonFragment } from 'ethers'
-import type {GetHotTokensResponse} from '~/api/token'
+import {
+  JsonRpcProvider,
+  formatUnits as ethersFormatUnits,
+  parseUnits as ethersParseUnits,
+  FixedNumber,
+  Interface,
+  type JsonFragment,
+} from 'ethers'
+import type { GetHotTokensResponse } from '~/api/token'
 import BigNumber from 'bignumber.js'
-import type {SearchHot} from '~/api/types/search'
+import type { SearchHot } from '~/api/types/search'
 import type { ConfigType } from 'dayjs'
 import { useStorage } from '@vueuse/core'
 import type { Size, SizeObj, pumpObjColor } from '~/api/types/pump'
@@ -19,6 +26,7 @@ import FingerprintJs from '@fingerprintjs/fingerprintjs'
 import { UniChainsV4 } from './wallet/utils/abi'
 import type { MessageHandler } from 'element-plus'
 export * from './wallet/utils/index'
+import CryptoJS from 'crypto-js'
 
 export function isJSON(str: string) {
   try {
@@ -125,7 +133,7 @@ export function getAddressAndChainFromId(id: string, type: number = 0) {
 }
 
 // 传去 时间长度 返回 格式化的时间
-export function formatTime(time: number | string,isMaxDayUnit=false) {
+export function formatTime(time: number | string, isMaxDayUnit = false) {
   if (!time) {
     return 0
   }
@@ -148,12 +156,12 @@ export function formatTime(time: number | string,isMaxDayUnit=false) {
     return `${Math.floor(time / 3600 / 24)}d`
   }
   if (time < 3600 * 24 * 30 * 12) {
-    return `${Math.floor(time / 3600 / 24 / 30 )}M`
+    return `${Math.floor(time / 3600 / 24 / 30)}M`
   }
   return `${Math.floor(time / 3600 / 24 / 30 / 12)}y`
 }
 
-export function formatTimeFromNow(val: number | string, isNum = false,isMaxDayUnit=false) {
+export function formatTimeFromNow(val: number | string, isNum = false, isMaxDayUnit = false) {
   let timeStamp: number | string = Number(Number(val) * 1000)
   if (!timeStamp) {
     timeStamp = val
@@ -166,7 +174,7 @@ export function formatTimeFromNow(val: number | string, isNum = false,isMaxDayUn
   if (isNum) {
     return time
   }
-  return formatTime(time,isMaxDayUnit)
+  return formatTime(time, isMaxDayUnit)
 }
 
 export function formatUrl(url: string) {
@@ -181,7 +189,9 @@ export function formatUrl(url: string) {
 
 export function getChainInfo(chain: string, isChainId = false) {
   const chainConfig = useConfigStore().chainConfig
-  const chainInfo = chainConfig?.find((item) => (isChainId ? item.chain_id : item.net_name) === chain)
+  const chainInfo = chainConfig?.find(
+    (item) => (isChainId ? item.chain_id : item.net_name) === chain
+  )
   if (!chainInfo) {
     return {} as Record<string, any>
   }
@@ -236,7 +246,7 @@ export function getAi(i: {
 }) {
   const $t = getGlobalT()
   if (!i.tag) {
-    if ((i.smart_money_buy_count_24h??0) > 0 || (i.smart_money_sell_count_24h??0) > 0) {
+    if ((i.smart_money_buy_count_24h ?? 0) > 0 || (i.smart_money_sell_count_24h ?? 0) > 0) {
       return $t('smart_money_tips', {
         b: i.smart_money_buy_count_24h,
         s: i.smart_money_sell_count_24h,
@@ -457,17 +467,22 @@ export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
     try {
       return 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(defaultSvg)))
     } catch (err) {
-      console.log(err, chain,text)
+      console.log(err, chain, text)
       return ''
     }
   }
   return '/icon-default.png'
 }
-export function getSymbolDefaultIcon(tokenInfo: {
-  symbol?: string
-  chain: string
-  logo_url?: string
-}| undefined , type= 'circle') {
+export function getSymbolDefaultIcon(
+  tokenInfo:
+    | {
+        symbol?: string
+        chain: string
+        logo_url?: string
+      }
+    | undefined,
+  type = 'circle'
+) {
   const domain = useConfigStore().token_logo_url
   if (tokenInfo && tokenInfo.logo_url !== undefined && tokenInfo.logo_url !== '') {
     if (/^https?:\/\//.test(tokenInfo.logo_url)) {
@@ -544,7 +559,7 @@ export function getWSMessage(e: MessageEvent) {
   return null
 }
 
-export function verifyLogin(isBot=false) {
+export function verifyLogin(isBot = false) {
   const botStore = useBotStore()
   const walletStore = useWalletStore()
   const userInfo = botStore.userInfo
@@ -637,7 +652,7 @@ export const evm_utils = {
     }
     const valueStr = String(arg?.[0] ?? '')
     return ethersParseUnits(valueStr, decimals)
-  }
+  },
 }
 export function filterGas(num: number, chain?: string) {
   if (chain === 'bsc') {
@@ -829,40 +844,39 @@ export function usePumpTableDataFetching(key = '') {
       lstx: '', //卖出交易数
       rstx: '',
       has_sm: 0,
-      sm_list: []
+      sm_list: [],
     },
     localStorage,
     { mergeDefaults: true }
   )
 }
 
-export function _isString(val: any){
-  return  typeof val === 'string'
+export function _isString(val: any) {
+  return typeof val === 'string'
 }
 
-export function _isArray(val:any) {
+export function _isArray(val: any) {
   return Array.isArray(val)
 }
 
-
-export function getSwapSize(type: Size):SizeObj {
-  const obj:Record<Size, SizeObj> = {
+export function getSwapSize(type: Size): SizeObj {
+  const obj: Record<Size, SizeObj> = {
     mini: {
-      flash:'6px',
-      text: '10px'
+      flash: '6px',
+      text: '10px',
     },
     small: {
-      flash:'8px',
-      text: '12px'
+      flash: '8px',
+      text: '12px',
     },
     medium: {
-      flash:'10px',
-      text: '14px'
+      flash: '10px',
+      text: '14px',
     },
     large: {
-      flash:'12px',
-      text: '16px'
-    }
+      flash: '12px',
+      text: '16px',
+    },
   }
   return obj[type] || ''
 }
@@ -879,12 +893,14 @@ export function formatUnits(n: number | string, decimals = 0) {
 }
 
 export function parseUnits(n: number | string, decimals = 0) {
-  return new BigNumber(new BigNumber(n).times(new BigNumber(10).pow(new BigNumber(decimals || 0))).toFixed(0))
+  return new BigNumber(
+    new BigNumber(n).times(new BigNumber(10).pow(new BigNumber(decimals || 0))).toFixed(0)
+  )
 }
 
 export function getTronWeb(account: string) {
   const tronWeb = new TronWeb({
-    fullHost: 'https://api.trongrid.io'
+    fullHost: 'https://api.trongrid.io',
   })
   tronWeb.setAddress(account)
   return tronWeb
@@ -894,13 +910,15 @@ export function getWalletTronWeb(): typeof window.tronWeb {
   const walletStore = useWalletStore()
   const tronWebObj: Record<string, any> = {
     'Bitget Wallet': window.bitkeep?.tronWeb,
-    'OKX Wallet': window.okxwallet?.tronLink?.tronWeb
+    'OKX Wallet': window.okxwallet?.tronLink?.tronWeb,
   }
   const walletName = walletStore.walletName
   if (tronWebObj[walletName]) {
     return tronWebObj[walletName]
   }
-  return (walletStore.provider as any)?._wallet?.tronWeb || window.tronWeb || window.tronLink?.tronWeb
+  return (
+    (walletStore.provider as any)?._wallet?.tronWeb || window.tronWeb || window.tronLink?.tronWeb
+  )
 }
 
 export function abiToJson(abi: string | string[]): JsonFragment[] {
@@ -918,7 +936,9 @@ export async function getDeviceId() {
   if (localStorage.getItem('device_id')) {
     return Promise.resolve(localStorage.getItem('device_id'))
   }
-  const deviceId = await FingerprintJs.load().then((fp: any) => fp.get()).then(async (data: { visitorId: string }) => data.visitorId)
+  const deviceId = await FingerprintJs.load()
+    .then((fp: any) => fp.get())
+    .then(async (data: { visitorId: string }) => data.visitorId)
   localStorage.setItem('device_id', deviceId)
   return deviceId
 }
@@ -947,17 +967,21 @@ export function setRefCodeToCookie() {
     document.cookie = `refCode=${ref};domain=${domain};path=/;expires=${new Date(Date.now() + 12 * 60 * 60 * 1000).toUTCString()}`
   }
   if (utm_source || eid || pid || ref) {
-      Cookies.set('refInfo', JSON.stringify({
+    Cookies.set(
+      'refInfo',
+      JSON.stringify({
         utm_source,
         eid,
         pid,
         code: ref,
         // id: id
-      }), { expires: 0.5 })
+      }),
+      { expires: 0.5 }
+    )
   }
 }
 
-export function getMedias(appendix: string | undefined,t:ReturnType<typeof useI18n>['t']) {
+export function getMedias(appendix: string | undefined, t: ReturnType<typeof useI18n>['t']) {
   if (!appendix) return []
   if (isJSON(appendix)) {
     const obj = JSON.parse(appendix)
@@ -981,7 +1005,18 @@ export function getMedias(appendix: string | undefined,t:ReturnType<typeof useI1
   }
   return []
 }
-export  type PlatformsType = 'pump' | 'bonk' | 'moonshot' | 'raydium' | 'believe' | 'jupstudio' | 'moon_new' | 'cookingcity'| 'fourmeme' | 'bags' | 'heaven'
+export type PlatformsType =
+  | 'pump'
+  | 'bonk'
+  | 'moonshot'
+  | 'raydium'
+  | 'believe'
+  | 'jupstudio'
+  | 'moon_new'
+  | 'cookingcity'
+  | 'fourmeme'
+  | 'bags'
+  | 'heaven'
 const pumpColorsMap: Record<PlatformsType, string> = {
   pump: '#55D592',
   bonk: '#FF5E1F',
@@ -998,64 +1033,63 @@ const pumpColorsMap: Record<PlatformsType, string> = {
 export function getBgColor(platform: string): string {
   return pumpColorsMap[platform as PlatformsType] || '#FFA622'
 }
- export const pumpMap: Record<PlatformsType, pumpObjColor> = {
-   pump: {
-     color: '#55D592',
-     bg: '--d-172521-l-DEF4EF',
-   },
-   bonk: {
-     color: '#FF5E1F',
-     bg: '--d-281915-l-F7E2DD',
-   },
-   moonshot: {
-     color: '#DFFF17',
-     bg: '--d-252914-l-F3FADC',
-   },
+export const pumpMap: Record<PlatformsType, pumpObjColor> = {
+  pump: {
+    color: '#55D592',
+    bg: '--d-172521-l-DEF4EF',
+  },
+  bonk: {
+    color: '#FF5E1F',
+    bg: '--d-281915-l-F7E2DD',
+  },
+  moonshot: {
+    color: '#DFFF17',
+    bg: '--d-252914-l-F3FADC',
+  },
 
-   raydium: {
-     color: '#FDB32C',
-     bg: '--d-282116-l-F7EFDF',
-   },
-   believe: {
-     color: '#00E043',
-     bg: '--d-0E2619-l-D1F5E3',
-   },
-   jupstudio: {
-     color: '#FEB069',
-     bg: '--d-28211D-l-F7EEE9',
-   },
-   moon_new: {
-     color: '#FF75FF',
-     bg: '--d-281B2C-l-F7E5FF',
-   },
-   cookingcity: {
-     color: '#6C416F',
-     bg: '--d-19161D-l-E1DDE9',
-   },
-   fourmeme: {
-     color: '#55D592',
-     bg: '--d-172521-l-DEF4EF',
-   },
-   bags: {
-     color: '#00D62B',
-     bg: '--d-281915-l-D1F4DF',
-   },
-   heaven: {
-     color: '#D5AF74',
-     bg: '--d-24211E-l-F1EEEA',
-   },
- }
+  raydium: {
+    color: '#FDB32C',
+    bg: '--d-282116-l-F7EFDF',
+  },
+  believe: {
+    color: '#00E043',
+    bg: '--d-0E2619-l-D1F5E3',
+  },
+  jupstudio: {
+    color: '#FEB069',
+    bg: '--d-28211D-l-F7EEE9',
+  },
+  moon_new: {
+    color: '#FF75FF',
+    bg: '--d-281B2C-l-F7E5FF',
+  },
+  cookingcity: {
+    color: '#6C416F',
+    bg: '--d-19161D-l-E1DDE9',
+  },
+  fourmeme: {
+    color: '#55D592',
+    bg: '--d-172521-l-DEF4EF',
+  },
+  bags: {
+    color: '#00D62B',
+    bg: '--d-281915-l-D1F4DF',
+  },
+  heaven: {
+    color: '#D5AF74',
+    bg: '--d-24211E-l-F1EEEA',
+  },
+}
 
 export function getPumpBgColor(platform: string): pumpObjColor {
-
-    const item = pumpMap[platform as PlatformsType]
-    if (!item) {
-      return { color: '#55D592', bg: resolveColor('--d-172521-l-DEF4EF') }
-    }
-    return {
-      ...item,
-      bg: resolveColor(item.bg),
-    }
+  const item = pumpMap[platform as PlatformsType]
+  if (!item) {
+    return { color: '#55D592', bg: resolveColor('--d-172521-l-DEF4EF') }
+  }
+  return {
+    ...item,
+    bg: resolveColor(item.bg),
+  }
 }
 function resolveColor(value: string): string {
   if (value.startsWith('--')) {
@@ -1063,7 +1097,16 @@ function resolveColor(value: string): string {
   }
   return value
 }
-type PlatformType = 'pump.fun' | 'letsbonk.fun' | 'dexscreener.com' | 'raydium.io' | 'believe.app' | 'jup.ag' | 'moonshot.com' | 'cookingcity' | 'fourmeme'
+type PlatformType =
+  | 'pump.fun'
+  | 'letsbonk.fun'
+  | 'dexscreener.com'
+  | 'raydium.io'
+  | 'believe.app'
+  | 'jup.ag'
+  | 'moonshot.com'
+  | 'cookingcity'
+  | 'fourmeme'
 const pumpColorMap: Record<PlatformType, string> = {
   'pump.fun': '#55D592',
   'letsbonk.fun': '#FF5E1F',
@@ -1143,3 +1186,37 @@ class MessageQueue {
 }
 
 export const messageQueue = new MessageQueue()
+
+export function decryptMsg(cipherBase64: string, guid: string): string {
+  // 1. 生成 key (SHA256(guid))
+  const key = CryptoJS.SHA256(guid)
+  // 2. IV = key 前 16 字节
+  const iv = CryptoJS.lib.WordArray.create(key.words.slice(0, 4)) // 4*4字节 = 16字节
+  // 3. Base64 解码密文
+  const cipherParams = CryptoJS.enc.Base64.parse(cipherBase64)
+  // 4. AES-CBC 解密
+  const decrypted = CryptoJS.AES.decrypt({ ciphertext: cipherParams } as any, key, {
+    mode: CryptoJS.mode.CBC,
+    iv,
+    padding: CryptoJS.pad.Pkcs7,
+  })
+
+  // 5. 得到 Base64 编码的明文
+  const base64Str = decrypted.toString(CryptoJS.enc.Utf8)
+
+  // 6. Base64 解码 → 原始明文
+  return CryptoJS.enc.Base64.parse(base64Str).toString(CryptoJS.enc.Utf8)
+}
+
+export function getTwitterSeconds(time: number, unit: string) {
+  if (!time || time <= 0) {
+    return 0
+  }
+  if (unit === 'm') {
+    return time * 60
+  } else if (unit === 'h') {
+    return time * 60 * 60
+  } else {
+    return time
+  }
+}

@@ -513,5 +513,7 @@
   "holdersChange2": "Changs de titular en {n}",
   "lockAmount": "Cantidad bloqueada",
   "transferToken": "Seleccione Token de transferencia",
-  "depositTip": "* Dirección actual EVM Cadena Universal"
+  "depositTip": "* Dirección actual EVM Cadena Universal",
+  "buySetting": "comprar configuración",
+  "sellSetting": "vender configuración"
 }

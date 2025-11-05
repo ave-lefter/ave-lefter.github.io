@@ -136,7 +136,7 @@ watch(
       resetPnl()
     }
     if (addresses.value?.length) {
-      subBalanceChange()
+      botStore.subBalanceChange()
     }
   },
   {
@@ -150,20 +150,20 @@ watch(
     setTokenBalance(val, true)
   }
 )
-function subBalanceChange() {
-  wsStore.send({
-    jsonrpc: '2.0',
-    method: 'unsubscribe',
-    params: ['asset'],
-    id: 1,
-  })
-  wsStore.send({
-    jsonrpc: '2.0',
-    method: 'subscribe',
-    params: ['asset', addresses.value],
-    id: 1,
-  })
-}
+// function subBalanceChange() {
+//   wsStore.send({
+//     jsonrpc: '2.0',
+//     method: 'unsubscribe',
+//     params: ['asset'],
+//     id: 1,
+//   })
+//   wsStore.send({
+//     jsonrpc: '2.0',
+//     method: 'subscribe',
+//     params: ['asset', addresses.value],
+//     id: 1,
+//   })
+// }
 
 const onDragStop = (x: number, y: number) => {
   pnlBoundingRect.value.x = x

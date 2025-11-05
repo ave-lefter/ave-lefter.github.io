@@ -190,28 +190,28 @@ provide('documentVisible', documentVisible)
 
 watch(() => addresses.value, () => {
   if (addresses.value?.length) {
-    subBalanceChange()
+    botStore.subBalanceChange()
   }
 }, {
   immediate: true
 })
 
-function subBalanceChange() {
-  wsStore.send({
-    jsonrpc: '2.0',
-    method: 'unsubscribe',
-    params: [
-      'asset'
-    ],
-    id: 1
-  })
-  wsStore.send({
-    jsonrpc: '2.0',
-    method: 'subscribe',
-    params: ['asset', addresses.value],
-    id: 1,
-  })
-}
+// function subBalanceChange() {
+//   wsStore.send({
+//     jsonrpc: '2.0',
+//     method: 'unsubscribe',
+//     params: [
+//       'asset'
+//     ],
+//     id: 1
+//   })
+//   wsStore.send({
+//     jsonrpc: '2.0',
+//     method: 'subscribe',
+//     params: ['asset', addresses.value],
+//     id: 1,
+//   })
+// }
 
 // 订阅画像
 function subscribePortrait() {
@@ -308,19 +308,20 @@ function addVisit() {
   if(tokenStore.tokenInfo){
     const {logo_url,symbol,chain,token} = tokenStore.tokenInfo.token
     const index = globalStore.lastVisitTokens.findIndex(item => item.id === token+'-'+chain)
-    if(index !== -1){
-      globalStore.lastVisitTokens.splice(index, 1)
-    } else if(globalStore.lastVisitTokens.length >= 20){
-      globalStore.lastVisitTokens.pop()
+    if(index === -1){
+      if(globalStore.lastVisitTokens.length >= 20){
+        globalStore.lastVisitTokens.pop()
+      }
+        globalStore.lastVisitTokens.unshift({
+        id:token+'-'+chain,
+        logo_url,
+        symbol,
+        price_change: tokenStore.priceChange,
+        circulation: tokenStore.circulation.toString(),
+        price: tokenStore.price || 0,
+      })
     }
-    globalStore.lastVisitTokens.unshift({
-      id:token+'-'+chain,
-      logo_url,
-      symbol,
-      price_change: tokenStore.priceChange,
-      circulation: tokenStore.circulation.toString(),
-      price: tokenStore.price || 0,
-    })
+    
     usePriceV2Store().sendPriceWs()
   }
 }

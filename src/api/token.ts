@@ -400,11 +400,15 @@ export function getTokenTxs(query: {
 }): Promise<IGetTokenTxsResponse[]> {
   const address=localStorage.bot_evmAddress || localStorage.walletAddress
   const {$api} = useNuxtApp()
+  const query1 = {...query}
+  if (query1.tag_type === 'all') {
+    query1.tag_type = ''
+  }
   return $api('/v2api/token_info/v1/token/txs', {
     method: 'get',
     query:{
       address,
-      ...query,
+      ...query1,
       history:1
     }
   })
@@ -600,10 +604,10 @@ export function getUserTxs(token_id: string, address: string) {
   })
 }
 
-export function getTokensPrice(tokenIds: string[]) {
+export const getTokensPrice = createCacheRequest(function(tokenIds: string[]) {
   const ids = tokenIds.map(i => {
     const [token, chain] = getAddressAndChainFromId(i, 1)
-    if (token && chain && token === NATIVE_TOKEN) {
+    if (token && chain && (token === NATIVE_TOKEN || token === 'sol')) {
       const chainInfo = getChainInfo(chain)
       return chainInfo.wmain_wrapper + '-' + chain
     }
@@ -618,7 +622,7 @@ export function getTokensPrice(tokenIds: string[]) {
   }).then(async res => {
     return ids.map(i => res[i])
   })
-}
+}, 3000)
 
 export interface GetTokenDetailsLineResponse {
   time: number;

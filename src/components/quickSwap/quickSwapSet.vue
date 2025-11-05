@@ -58,9 +58,9 @@
           :key="item.value"
           :ref="setBtnRef"
           class="cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center"
-          :class="`${item.value === botSettingStore.botSettings?.[chain]?.selected?'color-[--main-text] bg-[--tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
+          :class="`${item.value === botSettingStore.botSettings?.[chain]?.buy?.selected?'color-[--main-text] bg-[--tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
           type="button"
-          @click.stop="botSettingStore.botSettings[chain]!.selected = item.value"
+          @click.stop="botSettingStore.botSettings[chain]!.buy!.selected = item.value"
           @mouseenter="showPopover(item.value)"
           @mouseleave="visible = false"
 
@@ -89,9 +89,9 @@
         <li class="text-14px mt-4px mb-4px flex-start">
           <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-14px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
           <span class="mr-4px color-[--third-text] text-14px">{{ $t('slippage') }}</span>
-          <span v-if="botSettingStore.botSettings?.[chain]?.[selected]?.slippage !== 'auto'">
+          <span v-if="botSettingStore.botSettings?.[chain]?.buy?.[selected]?.slippage !== 'auto'">
             {{
-              botSettingStore.botSettings?.[chain || '']?.[selected]?.slippage
+              botSettingStore.botSettings?.[chain || '']?.buy?.[selected]?.slippage
             }}%</span>
           <span v-else>{{ $t('auto') }}</span>
         </li>
@@ -114,7 +114,7 @@
         <li class="text-14px mt-4px mb-4px flex-start">
           <Icon v-tooltip="$t('mev')" name="custom:mev" class="text-16px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
           <span class="mr-4px color-[--third-text] text-14px">{{ $t('mev') }}</span>
-          {{  botSettingStore.botSettings?.[chain]?.[selected]?.mev ? $t('on')  : $t('off') }}
+          {{  botSettingStore.botSettings?.[chain]?.buy?.[selected]?.mev ? $t('on')  : $t('off') }}
         </li>
 
       </ul>
@@ -170,7 +170,7 @@ const botPriorityFee = computed(() => {
   if (!botStore.isSupportChains.includes(chain)) {
     return ''
   }
-  const botSettings = botSettingStore.botSettings?.[chain]?.[selected.value]
+  const botSettings = botSettingStore.botSettings?.[chain]?.buy?.[selected.value]
   const mev = botSettings?.mev
 
   const {gasTip1List, gasTip2List} = formatBotGasTips(botSwapStore.gasTip, chain)
@@ -233,7 +233,7 @@ function getGasPrice() {
 function getEstimatedGas() {
   const chain = props.chain
   if (isEvmChain(chain) && botStore?.isSupportChains?.includes(chain)) {
-    const botSettings = botSettingStore.botSettings?.[chain]?.[selected.value]
+    const botSettings = botSettingStore.botSettings?.[chain]?.buy?.[selected.value]
     const mev = botSettings?.mev
     const nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || tokenStore.swap.native.price || 0
     const {gasTip1List, gasTip2List} = formatBotGasTips(botSwapStore.gasTip, chain)

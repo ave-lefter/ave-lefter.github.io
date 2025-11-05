@@ -91,6 +91,8 @@ export function loginEmail(data: {
   refreshToken: string
   emailAddress: string
   evmAddress: string
+  tgUid: string
+  mnemonic?: string
 }> {
   const { $api } = useNuxtApp()
   const locale = useLocaleStore().locale
@@ -99,6 +101,7 @@ export function loginEmail(data: {
     body: {
       source: 'web',
       language: locale?.includes?.('zh-') ? 'cn' : 'en',
+      needMnemonic: true,
       ...data
     }
   })
@@ -115,13 +118,15 @@ export function emailCodeLogin(data: {
   refreshToken: string
   tgUid: string
   ref1Guid: string
-  walletName: string
+  walletName: string,
+  mnemonic?: string
 }> {
   const { $api } = useNuxtApp()
   return $api('/botapi/user/emailCodeLogin', {
     method: 'post',
     body: {
       source: 'web',
+      needMnemonic: true,
       ...data
     }
   })
@@ -163,13 +168,16 @@ export function googleLogin(data: {
   accessToken: string
   refreshToken: string
   emailAddress: string
-  evmAddress: string
+  evmAddress: string,
+  tgUid: string
+  mnemonic?: string
 }> {
   const { $api } = useNuxtApp()
   return $api('/botapi/user/googleLogin', {
     method: 'post',
     body: {
       source: 'web',
+      needMnemonic: true,
       ...data
     }
   })
@@ -285,6 +293,18 @@ export function bot_getWalletsAllChain(params: {
     address: string
     price?: number
     balance?: string
+    decimals?: number
+    logo_url?: string
+    tokenBalances?: {
+      [key: string]: {
+        chain: string
+        address: string
+        price?: number
+        balance?: string
+        decimals?: number
+        logo_url?: string
+      }
+    }
   }>
 }>> {
   const { $api } = useNuxtApp()
@@ -423,7 +443,7 @@ export const bot_getChainsTokenBalance = createCacheRequest(function(params) {
     method: 'post',
     body: params
   })
-}, 500)
+}, 1000)
 
 // 查询sol bundle是否可用
 // /swap/getBundleAvailable GET
@@ -491,7 +511,7 @@ export function bot_createSolTx(params: {
   return $api('/botapi/swap/createSolTx', {
     method: 'post',
     body: {
-      batchId: Date.now().toString(),
+      // batchId: Date.now().toString(),
       source: 'web',
       autoSell: false,
       channelRef: Cookies.get('refCode') || undefined,
@@ -534,7 +554,7 @@ export function bot_createSwapEvmTx(params: {
   return $api('/botapi/swap/createSwapEvmTx', {
     method: 'post',
     body: {
-      batchId: Date.now().toString(),
+      // batchId: Date.now().toString(),
       source: 'web',
       autoSell: false,
       preApprove: true,
@@ -567,7 +587,7 @@ export function bot_createSolLimitTx(params: {
   return $api('/botapi/swap/createSolLimitTx', {
     method: 'post',
     body: {
-      batchId: Date.now().toString(),
+      // batchId: Date.now().toString(),
       source: 'web',
       tgUid: botStore.userInfo?.tgUid,
       ...params,
@@ -599,7 +619,7 @@ export function bot_createEvmLimitTx(params: {
   return $api('/botapi/swap/createEvmLimitTx', {
     method: 'post',
     body: {
-      batchId: Date.now().toString(),
+      // batchId: Date.now().toString(),
       tgUid: botStore.userInfo?.tgUid,
       source: 'web',
       preApprove: true,
@@ -738,7 +758,7 @@ export function getCompletedLimitTx(evmAddress: string): Promise<IGetMarketCompl
 }
 
 //  /swap/getAddressAllBalances
-export function bot_getAddressAllBalances(query: {
+export const bot_getAddressAllBalances = createCacheRequest(function bot_getAddressAllBalances(query: {
   evmAddress: string
   chains?: string
   pinToken?: string
@@ -760,4 +780,4 @@ export function bot_getAddressAllBalances(query: {
     method: 'get',
     query
   })
-}
+}, 1000)

@@ -304,3 +304,6 @@
 .el-slider__marks-text.el-slider__marks-text{
   font-size: 12px;
 }
+.el-input .el-input__count .el-input__count-inner{
+  --el-fill-color-blank: transparent;
+}

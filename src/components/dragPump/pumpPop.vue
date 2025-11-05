@@ -9,7 +9,7 @@ import SuffixIcon from '../suffixIcon.vue'
 import PumpFilter from '~/pages/pump/pumpFilter.vue'
 import { _getPumpList } from '~/api/pump'
 
-let timer = { id: null }
+let timer: { id: number | null } = { id: null }
 const pumpAudio = useTemplateRef('pumpAudio')
 const isPaused = ref(false)
 const loading = ref(false)
@@ -120,6 +120,7 @@ watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
       if (val.token == i.target_token) {
         return {
           ...i,
+          ...val,
           logo_url: val.logo_url,
           name: val.name,
           symbol: val.symbol
@@ -133,7 +134,7 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val: WSPump[]) => {
   if (Array.isArray(val)) {
     const rTime = Date.now()
     const list = val
-    .filter(el=> el.state === activeTab.value)
+    .filter(el=> el.state === getActiveTab(activeTab.value))
     .filter(el => el.chain === pumpStore.activeChain)
     .map(i => ({
       ...i,
@@ -198,7 +199,14 @@ function subscribe() {
     id: 1,
   })
 }
-
+function getActiveTab(activeTab: 'new'| 'soon' | 'graduated') {
+  const obj = {
+    new: 'new',
+    soon: 'migrating',
+    graduated: 'migrated',
+  }
+  return obj[activeTab] || ''
+}
 const debouncedSearch = useDebounceFn(() => {
   init(true)
 }, 500)
@@ -256,9 +264,9 @@ function getPump(params: Record<string, any>, isFilter = false) {
     })
     .finally(() => {
       loading.value = false
-      // timer = requestTimeout(5000, () => {
-      //   updatePump(finalParams)
-      // })
+      timer = requestTimeout(5000, () => {
+        updatePump(finalParams)
+      })
     })
 }
 
@@ -459,7 +467,7 @@ function getFilterData(list, conditions) {
       <PlatformSelect />
       <div class="flex-1 mt--12px mb--16px drag-handle" />
       <div class="flex items-center">
-        <Setting :chain="pumpStore.activeChain">
+        <Setting :chain="pumpStore.activeChain" :pumpConfig="pumpStore.pumpConfig" isFloat>
           <template #default="{ visible }">
             <div
 v-tooltip="$t('customize')"
@@ -499,7 +507,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
       <div class="flex items-center gap-8px">
         <signal-quick-buy-input v-model="quickBuyValue" size="small" class="[--el-border-color:transparent]" style="--el-input-bg-color:var(--d-151A22-l-E8F1FF);--el-text-color-regular:var(--d-8CA0C3-l-566275);--el-input-icon-color:var(--d-8CA0C3-l-566275)" />
         <el-select
-          v-model="botSettingStore.botSettings[pumpStore.activeChain]!.selected" fit-input-width size="small"
+          v-model="botSettingStore.botSettings[pumpStore.activeChain]!.buy!.selected" fit-input-width size="small"
           :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px]" popper-class="small-select">
           <el-option v-for="item in BotSettingsArr" :key="item.value" :value="item.value" :label="item.label" />
         </el-select>
@@ -547,6 +555,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
           </template>
         </el-input>
         <PumpFilter
+          :key="`pumpFilter_${pumpStore.activeChain}_${activeTab}`"
           hideReferenceText :storage="`pumpFilter_${pumpStore.activeChain}_${activeTab}`"
           @update:filterData="confirmFilter" />
       </div>

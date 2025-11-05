@@ -27,7 +27,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     buyValueList: ['0.1', '0.5', '1', '5'],
     sellPerList: ['25', '50', '75', '100'],
     isAutoSellConfig: false,
-    //  autoSellConfig: [] as Array<{open: boolean, priceChange: number, sellRatio: number, type: 'default' | 'trailing' | 'migrated' | 'devsell', isUp?: boolean}>,
+
   }
   const chains = useBotStore().isSupportChains
   type Setting = typeof defaultSettings
@@ -37,6 +37,18 @@ export const useBotSettingStore = defineStore('botSetting', () => {
       s1: Setting
       s2: Setting
       s3: Setting
+      buy?: {
+        selected: BotSettingKey
+        s1: Setting
+        s2: Setting
+        s3: Setting
+      }
+      sell?: {
+        selected: BotSettingKey
+        s1: Setting
+        s2: Setting
+        s3: Setting
+      }
     }
   } = {
   }
@@ -49,10 +61,43 @@ export const useBotSettingStore = defineStore('botSetting', () => {
       selected: 's1',
       s1: s,
       s2: s,
-      s3: s
+      s3: s,
+      buy: {
+        selected: 's1',
+        s1: s,
+        s2: s,
+        s3: s,
+      },
+      sell: {
+        selected: 's1',
+        s1: s,
+        s2: s,
+        s3: s,
+      },
     }
   })
   const botSettings = useLocalStorage('bot_settings_v3', settings, { mergeDefaults: (storageValue, defaults) => deepMerge(defaults, storageValue) })
+  chains.forEach(chain => {
+    if (botSettings.value[chain]) {
+      let settings = botSettings.value[chain]
+      if (!botSettings.value[chain].buy) {
+        botSettings.value[chain].buy = {
+          selected: settings.selected,
+          s1: settings.s1,
+          s2: settings.s2,
+          s3: settings.s3,
+        }
+      }
+      if (!botSettings.value[chain].sell) {
+        botSettings.value[chain].sell = {
+          selected: settings.selected,
+          s1: settings.s1,
+          s2: settings.s2,
+          s3: settings.s3,
+        }
+      }
+    }
+  })
 
   const autoSellConfigs = useLocalStorage('bot_autoSellConfigs', {
     autoSell: false,

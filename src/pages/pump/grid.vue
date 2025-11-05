@@ -1,41 +1,43 @@
 <template>
   <div @click.stop.prevent :key="key">
-    <span class="text-12px color-[--main-text]">{{ $t('threeLayout') }}</span>
-    <Draggable
-      v-model="list"
-      group="list"
-      class="flex gap-12px items-center justify-center mt-8px"
-      item-key="id"
-    >
-      <template #item="{ element }">
-        <div
-          class="border-1px border-solid border-[--border]  py-13px relative flex-1 text-center"
-          :style="{
-            'border-color': pumpSetting.grid[element.id].show ? '#3F80F7' : 'var(--border)',
-          }"
-        >
-          <Icon
-            name="custom:move"
-            class="color-[--icon-color] text-7px cursor-pointer font-bold absolute left-[4px] top-[4px]"
-          />
-          <Icon
-            name="custom:key-visible"
-            class="color-[--icon-color] text-8px cursor-pointer font-bold absolute right-[4px] top-[4px]"
-            v-if="pumpSetting.grid[element.id].show"
-            @click.stop.prevent="pumpSetting.grid[element.id].show = false"
-          />
-          <Icon
-            name="custom:key-invisible"
-            class="color-[--icon-color] text-8px cursor-pointer font-bold absolute right-[4px] top-[4px]"
-            v-else
-            @click.stop.prevent="pumpSetting.grid[element.id].show = true"
-          />
-          <span
-            :style="{ color: pumpSetting.grid[element.id].show ? '#3F80F7' : 'var(--third-text)' }"
-            >{{ $t(element.name) }}</span>
-        </div>
-      </template>
-    </Draggable>
+    <template v-if="!isFloat">
+      <span class="text-12px color-[--main-text]">{{ $t('threeLayout') }}</span>
+      <Draggable
+        v-model="list"
+        group="list"
+        class="flex gap-12px items-center justify-center mt-8px"
+        item-key="id"
+      >
+        <template #item="{ element }">
+          <div
+            class="border-1px border-solid border-[--border]  py-13px relative flex-1 text-center"
+            :style="{
+              'border-color': pumpSetting.grid[element.id].show ? '#3F80F7' : 'var(--border)',
+            }"
+          >
+            <Icon
+              name="custom:move"
+              class="color-[--icon-color] text-7px cursor-pointer font-bold absolute left-[4px] top-[4px]"
+            />
+            <Icon
+              name="custom:key-visible"
+              class="color-[--icon-color] text-8px cursor-pointer font-bold absolute right-[4px] top-[4px]"
+              v-if="pumpSetting.grid[element.id].show"
+              @click.stop.prevent="pumpSetting.grid[element.id].show = false"
+            />
+            <Icon
+              name="custom:key-invisible"
+              class="color-[--icon-color] text-8px cursor-pointer font-bold absolute right-[4px] top-[4px]"
+              v-else
+              @click.stop.prevent="pumpSetting.grid[element.id].show = true"
+            />
+            <span
+              :style="{ color: pumpSetting.grid[element.id].show ? '#3F80F7' : 'var(--third-text)' }"
+              >{{ $t(element.name) }}</span>
+          </div>
+        </template>
+      </Draggable>
+    </template>
     <span class="text-12px color-[--main-text mt-30px block">{{ $t('detailsAfterPurchase') }}</span>
     <div class="tabs pb-10px mt-8px">
       <button
@@ -56,6 +58,14 @@
 import Draggable from 'vuedraggable'
 const globalStore = useGlobalStore()
 const { pumpSetting, lang } = storeToRefs(globalStore)
+const props = withDefaults(
+  defineProps<{
+    isFloat?: boolean
+  }>(),
+  {
+    isFloat: false
+  }
+)
 const { t } = useI18n()
 const key = shallowRef(0)
 // 可写的 computed
@@ -104,6 +114,7 @@ watch(() => lang.value, (val) => {
   button {
     border: 1px solid var(--border);
     // font-size: 14px;
+    white-space: nowrap;
     color: var(--third-text);
     letter-spacing: 0;
     font-weight: 400;
