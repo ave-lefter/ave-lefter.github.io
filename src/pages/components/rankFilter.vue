@@ -72,6 +72,27 @@ function confirm(data:Record<string,any>) {
   }
   visible.value=false
 }
+
+function handleBlur(props: string[], val: string, index: number) {
+    const key = props[index] || ''
+    if (tempFilter.value[props[0]] && tempFilter.value[props[1]]){
+      if (
+        index === 0 &&
+        Number.parseFloat(tempFilter.value[key]) >=
+        Number.parseFloat(tempFilter.value[props[1]])
+      ) {
+        tempFilter.value[key] = tempFilter.value[props[1]]
+      }
+
+      if (
+        index === 1 &&
+        Number.parseFloat(tempFilter.value[key]) <=
+        Number.parseFloat(tempFilter.value[props[0]])
+      ) {
+        tempFilter.value[key] = tempFilter.value[props[0]]
+      }
+    }
+  }
 </script>
 
 <template>
@@ -100,7 +121,7 @@ function confirm(data:Record<string,any>) {
         <span class="text-14px block border pb-10px">{{ $t('FilterSetting') }}</span>
         <div v-if="dexVisible" class="flex items-center justify-between text-12px mb-16px">
           <span class="color-[--secondary-text]">{{ $t('dexSelect') }}</span>
-          <el-select v-model.trim="tempFilter.amm" :teleported="false" class="[&&]:w-206px" :suffix-icon="SuffixIcon">
+          <el-select v-model="tempFilter.amm" :teleported="false" class="[&&]:w-206px" :suffix-icon="SuffixIcon">
             <template #label="{label,value}">
              <div class="flex items-center gap-4px">
               <img v-if="value!==' '" class="w-16px h-16px rounded-full" :src="`${globalStore.token_logo_url}swap/${value}.jpeg`" alt="">
@@ -158,6 +179,7 @@ function confirm(data:Record<string,any>) {
               class="w-106px"
               :placeholder="$t('minor')"
               clearable
+              @blur="(val) => handleBlur(['created_at_min', 'created_at_max'], val, 0)"
             >
               <template #suffix>
                 <span>min</span>
@@ -169,6 +191,7 @@ function confirm(data:Record<string,any>) {
                class="w-106px"
               :placeholder="$t('max1')"
               clearable
+              @blur="(val) => handleBlur(['created_at_min', 'created_at_max'], val, 1)"
             >
               <template #suffix>
                 <span>min</span>
@@ -183,10 +206,11 @@ function confirm(data:Record<string,any>) {
             <span class="color-[--secondary-text]">DEV%</span>
             <div class="flex items-center gap-8px">
               <el-input
-                v-model.trim.number="tempFilter.created_at_min"
+                v-model.trim.number="tempFilter.dev_balance_ratio_cur_min"
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['dev_balance_ratio_cur_min', 'dev_balance_ratio_cur_max'], val, 0)"
               >
                 <template #suffix>
                   <span>%</span>
@@ -194,10 +218,11 @@ function confirm(data:Record<string,any>) {
               </el-input>
               <span class="color-[--third-text]">~</span>
               <el-input
-                v-model.trim.number="tempFilter.created_at_max"
+                v-model.trim.number="tempFilter.dev_balance_ratio_cur_max"
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                 @blur="(val) => handleBlur(['dev_balance_ratio_cur_min', 'dev_balance_ratio_cur_max'], val, 1)"
               >
                 <template #suffix>
                   <span>%</span>
@@ -214,6 +239,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['holders_min', 'holders_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
               <el-input
@@ -221,6 +247,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                @blur="(val) => handleBlur(['holders_min', 'holders_max'], val, 1)"
               />
             </div>
           </div>
@@ -240,6 +267,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['makers_min', 'makers_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
               <el-input
@@ -247,6 +275,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                @blur="(val) => handleBlur(['makers_min', 'makers_max'], val, 1)"
               />
             </div>
           </div>
@@ -259,6 +288,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['holders_top10_ratio_min', 'holders_top10_ratio_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
               <el-input
@@ -266,6 +296,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                @blur="(val) => handleBlur(['holders_top10_ratio_min', 'holders_top10_ratio_max'], val, 1)"
               />
             </div>
           </div>
@@ -278,6 +309,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['sniper_tx_count_min', 'sniper_tx_count_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
               <el-input
@@ -285,6 +317,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                @blur="(val) => handleBlur(['sniper_tx_count_min', 'sniper_tx_count_max'], val, 1)"
               />
             </div>
           </div>
@@ -297,6 +330,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['smart_money_buy_count_24h_min', 'smart_money_buy_count_24h_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
               <el-input
@@ -304,6 +338,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                @blur="(val) => handleBlur(['smart_money_buy_count_24h_min', 'smart_money_buy_count_24h_max'], val, 1)"
               />
             </div>
           </div>
@@ -316,6 +351,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['smart_money_sell_count_24h_min', 'smart_money_sell_count_24h_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
               <el-input
@@ -323,6 +359,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                @blur="(val) => handleBlur(['smart_money_sell_count_24h_min', 'smart_money_sell_count_24h_max'], val, 1)"
               />
             </div>
           </div>
@@ -335,6 +372,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['insider_balance_ratio_cur_min', 'insider_balance_ratio_cur_max'], val, 0)"
               >
                 <template #suffix>
                   <span>%</span>
@@ -346,6 +384,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                @blur="(val) => handleBlur(['insider_balance_ratio_cur_min', 'insider_balance_ratio_cur_max'], val, 1)"
               >
                 <template #suffix>
                   <span>%</span>
@@ -364,6 +403,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['progress_min', 'progress_max'], val, 0)"
               >
                 <template #suffix>
                   <span>%</span>
@@ -375,6 +415,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                @blur="(val) => handleBlur(['progress_min', 'progress_max'], val, 1)"
               >
                 <template #suffix>
                   <span>%</span>
@@ -391,6 +432,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['marketcap_min', 'marketcap_max'], val, 0)"
               >
                 <template #suffix>
                   <span>$</span>
@@ -402,6 +444,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                @blur="(val) => handleBlur(['marketcap_min', 'marketcap_max'], val, 1)"
               >
                 <template #suffix>
                   <span>$</span>
@@ -418,6 +461,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['tvl_min', 'tvl_max'], val, 0)"
               >
                 <template #suffix>
                   <span>$</span>
@@ -429,6 +473,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                @blur="(val) => handleBlur(['tvl_min', 'tvl_max'], val, 1)"
               >
                 <template #suffix>
                   <span>$</span>
@@ -448,6 +493,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['volume_u_min', 'volume_u_max'], val, 0)"
               >
                 <template #suffix>
                   <span>$</span>
@@ -459,6 +505,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                @blur="(val) => handleBlur(['volume_u_min', 'volume_u_max'], val, 1)"
               >
                 <template #suffix>
                   <span>$</span>
@@ -481,6 +528,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
+                @blur="(val) => handleBlur(['tx_min', 'tx_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
               <el-input
@@ -488,6 +536,7 @@ function confirm(data:Record<string,any>) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
+                @blur="(val) => handleBlur(['tx_min', 'tx_max'], val, 1)"
               />
             </div>
           </div>
