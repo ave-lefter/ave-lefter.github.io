@@ -292,3 +292,15 @@ debox-chat-widget {
     padding-bottom: 0;
   }
 }
+
+.ton-connect-btn.ton-connect-btn.ton-connect-btn tc-root {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+[data-tc-list-notifications="true"], [data-tc-actions-modal-container="true"] {
+  display: none !important;
+}

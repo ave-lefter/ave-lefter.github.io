@@ -177,7 +177,7 @@
                 <span>{{ depositChainInfo?.address || '' }}</span>
                 <Icon v-if="depositChainInfo?.address" v-copy="depositChainInfo?.address" name="bxs:copy" class="ml-5px mb--1px clickable" @click.stop />
               </div>
-              <div v-if="depositChain!=='solana'" class="flex-center flex-col">
+              <div v-if="!['solana', 'ton']?.includes(depositChain)" class="flex-center flex-col">
                 <div class="text-12px color-[--secondary-text]" style="display: flex; align-items: center; word-break: break-all; line-height: 1.2; padding: 26px 20px 0px;">
                   {{ t('depositTip') }}
                 </div>
@@ -218,8 +218,8 @@
             <el-form-item :label="t('transferToken')" label-position="top" >
                 <el-select-v2
                   v-model="withdrawForm.token"
-                  filterable
                   v-loading="select2Loading"
+                  filterable
                   :item-height="48"
                   size="large"
                   class="chains-select"
@@ -291,6 +291,11 @@
                 </span>
                 <span class="text-12px font-400 color-#3F80F7 clickable ml-10px" @click.stop="handleMax">{{ t('max') }}</span>
               </div>
+            </el-form-item>
+            <el-form-item v-if="withdrawForm.chain === 'ton'" :label="`memo(${$t('optional')})`" label-position="top" prop="memo">
+              <el-input v-model="withdrawForm.memo"
+                style="border-radius: 4px;--el-input-height:48px;"
+                clearable placeholder="" />
             </el-form-item>
             <!-- <div class="font-400 text-12px lh-[100%] color-#FFBE3C text-center mt-45px">{{ t('withdrawTip') }}</div> -->
             <el-button native-type="submit" style="width: 100%; margin-top: 25px" size="large" type="primary"
@@ -577,7 +582,7 @@ function getUserBalanceDetails(){
     const data=res?.data||[]
     let exists=false
     if(data.length){
-      balanceList.value =data.map(i=>{
+      balanceList.value = data.map(i=>{
         return {
           ...i,
           label: i.symbol,
@@ -762,12 +767,12 @@ function handleWithdraw2() {
         batchId: Date.now().toString(),
         chain: withdrawForm.chain,
         creatorAddress: withdrawChainInfo?.value?.address || '',
-        tokenAddress: withdrawChainInfo2?.value?.token === NATIVE_TOKEN?(chainMainToken[withdrawForm.chain]||withdrawChainInfo2?.value?.token) :withdrawChainInfo2?.value?.token,
+        tokenAddress: (withdrawChainInfo2?.value?.token === NATIVE_TOKEN?(chainMainToken[withdrawForm.chain]||withdrawChainInfo2?.value?.token) :withdrawChainInfo2?.value?.token) || '',
         //  tokenAddress: chainMainToken[withdrawForm.chain] || NATIVE_TOKEN,
         tgUid: botStore?.userInfo?.tgUid,
         amount: utils.parseUnits(amount || 0, decimals.value).toString(),
         transferTo: withdrawForm.address,
-        memo: '',
+        memo: withdrawForm.memo,
         emailCode: emailCode.value,
         authCode: authCode.value,
         gasTip: 0,

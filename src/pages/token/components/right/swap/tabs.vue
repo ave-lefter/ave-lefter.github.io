@@ -18,7 +18,7 @@ defineProps({
 })
 const emit = defineEmits(['update:activeTab'])
 
-const SupportChains = ['sui', 'solana', 'tron']
+const SupportChains = ['sui', 'solana', 'tron', 'ton']
 
 const tabs = computed(() => {
   return [

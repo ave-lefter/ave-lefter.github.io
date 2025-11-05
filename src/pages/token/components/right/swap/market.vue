@@ -67,7 +67,7 @@
       :disabled="(priceImpactV && priceImpactV?.gt?.(0.4)) || !checkAmount() || !fromAmount || !toAmount"
       native-type="submit"
     >
-      <span v-if="Number(swapStore.fromToken.balance) === 0 || Number(swapStore.fromToken.balance) < Number(fromAmount) || walletStore.address === '' || ((swapStore.isERC314 || swapStore.isFourMeme || swapStore.isFlap || swapStore.isSunPump > 0 || swapStore.isDyorswapfun || swapStore.isXflapswap) && swapStore.token2.address !== NATIVE_TOKEN) || ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112') ">
+      <span v-if="Number(swapStore.fromToken.balance) === 0 || Number(swapStore.fromToken.balance) < Number(fromAmount) || walletStore.address === '' || ((swapStore.isERC314 || swapStore.isFourMeme || swapStore.isFlap || swapStore.isSunPump > 0 || swapStore.isDyorswapfun || swapStore.isXflapswap) && swapStore.token2.address !== NATIVE_TOKEN) || ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112') || isInsufficientTon">
         {{ checkAmountMessage() }}
       </span>
       <span v-else-if="priceImpactV && priceImpactV?.gt?.(0.4)">
@@ -84,7 +84,7 @@
         <Icon class="ml-2px color-[--secondary-text]! clickable" name="material-symbols:help-outline" @click.stop="alertTips($t('slippage'), $t('minimumReceivedTips'))" />
         <span style="flex: 1"/>
         <SlippageSet v-if="chain === 'solana'" v-model:slippage="solanaSlippage" :canSetAuto="false"/>
-        <SlippageSet v-else-if="chain === 'sui'" v-model:slippage="suiTonSlippage" :canSetAuto="false"/>
+        <SlippageSet v-else-if="['sui', 'ton']?.includes(chain)" v-model:slippage="suiTonSlippage" :canSetAuto="false"/>
         <SlippageSet v-else v-model:slippage="customSlippage" :autoSlippage="autoSlippageValue"/>
       </li>
       <li v-show="(fromAmount && toAmount)">
@@ -113,10 +113,19 @@
             @click.stop="alertTips($t('tokenRoute'), $t('tokenRouteTips'))"
           />
         </div>
-        <div v-if="chain === 'solana' || chain === 'sui'">
+        <div v-if="['solana', 'sui']?.includes(chain)">
           <template v-for="(i, k) in [swapStore.fromToken, swapStore.toToken]" :key="k">
             <img v-if="k !== 0" style="width: 0.3rem; margin: 0.02rem 0.1rem 0" src="@/assets/images/arrow-right.svg" alt="" srcset="">
             <span v-if="i.symbol">{{ i.symbol }}</span>
+          </template>
+        </div>
+        <div v-else-if="chain === 'ton'" class="path-list">
+          <template v-for="(i, k) in swapRouterPath" :key="k">
+            <span v-if="i.symbol">{{ i.symbol }}</span>
+            <div v-if="i.nextAmm && i.nextAmm !== 'unknown'" class="path-amm">
+              <img class="icon-amm-logo rounded" :src="`${configStore.token_logo_url}swap/${i.nextAmm}.jpeg`" alt="" srcset="" onerror="this.src='/icon-default.png'">
+              <img style="width: 15px; margin: 1px 5px 0" src="@/assets/images/arrow-right.svg" alt="" srcset="">
+            </div>
           </template>
         </div>
         <div v-else-if="swapQuoteInfo?.toWrapper === 1 || swapQuoteInfo?.toWrapper === 2">
@@ -136,7 +145,7 @@
           <i v-if="listRouter.length>0" class="select-token iconfont icon-collapse-down"/>
         </div>
       </li>
-      <li v-if="chain !== 'solana' && chain !=='tron' && chain !=='sui' && Number(estimatedFee) > 0">
+      <li v-if="!['solana', 'sui', 'ton', 'tron']?.includes(chain) && Number(estimatedFee) > 0">
         <div class="swap-label_item-left">{{ $t('estimatedGas') }}</div>
         <div>≈ ${{ estimatedFee }}</div>
       </li>
@@ -181,6 +190,8 @@ import { useLocalStorage, useCountdown } from '@vueuse/core'
 import { recordTransaction, updateTransaction } from '~/api/tracking'
 import { sui_signAndExecuteTransactionBlock } from '@/utils/wallet/sui'
 import { getSolanaSwapQuoteTransaction, sendSolanaSwapTransaction } from '@/utils/wallet/solana'
+import { getTonSwap } from '~/api/swap/ton'
+import { getTonTokenTransferMsg, sendTonTransaction } from '~/utils/wallet/ton'
 
 
 const { t } = useI18n()
@@ -259,8 +270,10 @@ const swapInfo = ref<{
   isAmountOut: false,
 })
 
-const suiQuoteResponse: any = {}
-const solanaQuoteResponse: any = {}
+let suiQuoteResponse: any = {}
+let solanaQuoteResponse: any = {}
+
+let tonQuoteResponse: any = {}
 
 const gasPrice = ref('0')
 const nativePrice = ref<number | string>('0')
@@ -307,6 +320,9 @@ const priceImpactV = computed(() => {
   }
   if (chain === 'sui') {
     return new BigNumber(priceImpactSui.value || 0)
+  }
+  if (chain === 'ton') {
+    return new BigNumber(priceImpactTon.value || 0)
   }
   const routerPath = swapQuoteInfo.value.routerPath
   const fromToken = routerPath?.length > 0 ? routerPath?.[0] : (swapQuoteInfo.value.fromToken || null)
@@ -452,6 +468,17 @@ const isOnlyGetAmountsOut = computed(() => {
   const isFourMemeOnlyGetAmountsOut = tokenStore?.pairs?.[0]?.amm && ['fourmeme', 'fourmemev2']?.includes(tokenStore?.pairs?.[0]?.amm)
   const isOneWaySwap = tokenStore?.pairs?.[0]?.amm && ammList.includes(tokenStore?.pairs?.[0]?.amm)
   return swapStore.chain === 'ton' || swapStore.chain === 'sui' || isOneWaySwap || isFourMemeOnlyGetAmountsOut || swapStore.isDyorswapfun || swapStore.isXflapswap
+})
+
+const isInsufficientTon = computed(() => {
+  if (chain.value === 'ton') {
+    const tonAmount = tonQuoteResponse?.totalTransferAmount || 0
+    const tonBalance = swapStore.userBalanceTokens?.find?.(i => i.address === NATIVE_TOKEN)?.initBalance || 0
+    if (tonAmount && new BigNumber(tonAmount).gt(tonBalance)) {
+      return true
+    }
+  }
+  return false
 })
 
 const countdownSeconds = 15
@@ -676,6 +703,11 @@ async function dealGetQuoteInfo(isAmount: boolean, chain: string) {
       if (!isPumpCanSwap) {
         return
       }
+    }
+
+    if (chain === 'ton') {
+      quoteTon(isAmount, chain)
+      return
     }
 
     quoteLoading.value = true
@@ -940,7 +972,7 @@ async function quoteSui(isAmount: boolean, chain: string) {
     return getSuiQuote(params).then(res => {
       console.log('suiQuoteResponse', res)
       if (res.returnAmount && res.returnAmountWithDecimal || res.amount_out) {
-        suiQuoteResponse.value = res
+        suiQuoteResponse = res
         console.log('amountIn', res.routeInfo)
         // if (res.routeInfo?.isExactOut) {
         //   this.fromAmount = res.routeInfo?.amountOut?.amount?.toFixed() || '0'
@@ -959,6 +991,49 @@ async function quoteSui(isAmount: boolean, chain: string) {
       getSwapTx(false)
       quoteLoading.value = false
       // this.quoteSolanaPreParams = {}
+      return res
+    }).catch(err => {
+      console.log(err)
+      handleError(err?.error || err)
+      return Promise.resolve('')
+    }).finally(() => {
+      setTimeout(() => {
+        quoteLoading.value = false
+        countDownFinishReset()
+      }, 800)
+    })
+  }
+}
+
+async function quoteTon(isAmount: boolean, chain: string) {
+  if (chain === 'ton') {
+    const fromDecimals = swapStore.fromToken.decimals || swapStore.fromToken?.decimal
+    const toDecimals = swapStore.toToken.decimals || swapStore.toToken?.decimal
+    const a = swapStore.fromToken.address === NATIVE_TOKEN ? (new BigNumber(fromAmount.value || 0)).times('0.997') : (new BigNumber(fromAmount.value || 0))
+    const params = {
+      inputToken: swapStore.fromToken.address,
+      outputToken: swapStore.toToken.address,
+      inputTokenAmount: parseUnits(
+          a.toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${fromDecimals}})?`))?.[0] || 0,
+          fromDecimals
+        ).toFixed(0),
+      slippageBps: new BigNumber(suiTonSlippage.value).times(100).toFixed(0)
+    }
+    quoteLoading.value = true
+    return getTonSwap(params).then(res => {
+      console.log('tonQuoteResponse', res)
+      if (res.amountOut && res.payload) {
+        tonQuoteResponse = res
+        if (isAmount) {
+          // this.toAmount = utils.formatUnits(res.amountOut || '0', toDecimals || this.toToken?.decimals)
+          toAmount.value = formatUnits(res.amountOut || '0', toDecimals || swapStore.toToken?.decimals)
+        }
+        quoteSwapTokenPrice()
+      } else {
+        handleError('can not get quote')
+      }
+      getSwapTx(false)
+      quoteLoading.value = false
       return res
     }).catch(err => {
       console.log(err)
@@ -1030,14 +1105,14 @@ function quoteSolana(isAmount: boolean, chain: string) {
     return getSolanaSwapQuoteTransaction(params).then((res: { routeInfo: { amountOut: { amount: number } }; transaction: any; outAmount: any; inAmount: any }) => {
       console.log('solanaQuoteResponse', res)
       if (res.routeInfo && res.transaction) {
-        solanaQuoteResponse.value = res
+        solanaQuoteResponse = res
         console.log('amountOut', res.routeInfo?.amountOut?.amount?.toFixed() || '0')
         toAmount.value = res.routeInfo?.amountOut?.amount?.toFixed() || '0'
         quoteSwapTokenPrice()
       } else {
         if (isAmount) {
           if (res.outAmount) {
-            solanaQuoteResponse.value = res
+            solanaQuoteResponse = res
             toAmount.value =  formatUnits(res.outAmount || '0', toDecimals || swapStore.toToken?.decimals)
             quoteSwapTokenPrice()
           } else {
@@ -1045,7 +1120,7 @@ function quoteSolana(isAmount: boolean, chain: string) {
           }
         } else {
           if (res.inAmount) {
-            solanaQuoteResponse.value = res
+            solanaQuoteResponse = res
             fromAmount.value =  formatUnits(res.inAmount || '0',fromDecimals || swapStore.fromToken?.decimals)
             quoteSwapTokenPrice()
           } else {
@@ -1111,6 +1186,14 @@ function checkAmount() {
   const isPump = ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112')
   const isBscPump = (swapStore.isFourMeme || swapStore.isFlap || swapStore.isDyorswapfun || swapStore.isXflapswap) && swapStore.token2.address !== NATIVE_TOKEN
   const isTronPump = swapStore.isSunPump > 0 && swapStore.token2.address !== NATIVE_TOKEN
+
+  if (swapStore.chain === 'ton') {
+    const tonAmount = tonQuoteResponse?.totalTransferAmount || 0
+    const tonBalance = swapStore.userBalanceTokens?.find?.(i => i.address === NATIVE_TOKEN)?.initBalance || 0
+    if (tonAmount && new BigNumber(tonAmount).gt(tonBalance)) {
+      return false
+    }
+  }
   return !(
     Number(fromTokenBalance) === 0 ||
     Number(fromTokenBalance) < Number(fromAmount.value) ||
@@ -1203,7 +1286,7 @@ function _getNativeTokenPrice() {
 }
 function _getGasPrice() {
   const chain = walletStore.chain
-  if (chain === 'solana') {
+  if (['solana', 'ton', 'sui', 'tron'].includes(chain)) {
     return
   }
   const chain1 = swapStore.token1.chain
@@ -1317,7 +1400,7 @@ function selectedRouter(_swapPathList = swapPathList.value) {
 
 function supportChain() {
   const chain = walletStore.chain
-  const swapChains = (Object.keys(SwapContracts)).concat(['solana', 'sui'])
+  const swapChains = (Object.keys(SwapContracts)).concat(['solana', 'sui', 'ton'])
   const c1 = swapStore.token1.chain
   const c2 = swapStore.token2.chain
   if (c1 && !swapChains?.includes?.(c1)) {
@@ -1374,7 +1457,7 @@ function _getPriceImpact(swapQuoteInfo: { routerPath: any; from_price: number; t
 
 function checkSupportChainMessage() {
   const chain = walletStore.chain
-  const swapChains = (Object.keys(SwapContracts)).concat(['solana', 'sui'])
+  const swapChains = (Object.keys(SwapContracts)).concat(['solana', 'sui', 'ton'])
   const chainInfo = getChainInfo(chain)
   const chainName = chainInfo?.name || ''
   const c1 = swapStore.token1.chain
@@ -1489,6 +1572,13 @@ function checkAmountMessage() {
   } else if (String(fromAmount.value) === '0') {
     return t('AmountCannotBeZero')
   }
+  if (swapStore.chain === 'ton') {
+  const tonAmount = tonQuoteResponse?.totalTransferAmount || 0
+  const tonBalance = swapStore.userBalanceTokens?.find?.(i => i.address === NATIVE_TOKEN)?.initBalance || 0
+  if (tonAmount && new BigNumber(tonAmount).gt(tonBalance)) {
+    return t('tonInsufficientBalance')
+  }
+}
 }
 
 function getSwapTx(isOpenSwap = true) {
@@ -1541,6 +1631,25 @@ function getSwapTx(isOpenSwap = true) {
     if (isOpenSwap) {
       dialogVisibleSwap.value = true
     }
+  } else if (swapStore.chain === 'ton') {
+    const _swapRouterPath = [swapStore.fromToken, swapStore.toToken].map((i, k)=> {
+      return {
+        symbol: i.symbol,
+        nextAmm: k === 0 ? (tonQuoteResponse?.dex || '') : ''
+      }
+    })
+    swapInfo.value = {
+      swapRouterPath: _swapRouterPath,
+      fromAmount: fromAmount.value,
+      toAmount: toAmount.value,
+      fromToken: swapStore.fromToken,
+      toToken: swapStore.toToken,
+      isAmountOut: false
+    }
+    if (isOpenSwap) {
+      dialogVisibleSwap.value = true
+    }
+    swapRouterPath.value = _swapRouterPath
   } else if ((swapQuoteInfo.value?.isSunPump || 0) > 0) {
     loadingSwap.value = true
     sunPumpSwap(swapQuoteInfo.value as any, slippage.value).then(async (res) => {
@@ -1685,7 +1794,7 @@ function getAvgPrice() {
       _fromAmount = new BigNumber(_fromAmount).times(100 + tax).div(100)
     }
   }
-  const isPrice = ['solana', 'sui'].includes(chain.value)
+  const isPrice = ['solana', 'sui', 'ton'].includes(chain.value)
   const fromPrice = isPrice ? swapTokenPrice.value[0] : swapQuoteInfo.value.from_price
   const toPrice = isPrice ? swapTokenPrice.value[1] :  swapQuoteInfo.value.to_price
   if (!fromPrice || !toPrice) {
@@ -1726,6 +1835,10 @@ async function submitSwap(_swapSubmitInfo = swapSubmitInfo.value) {
     }
     if (chain.value === 'sui') {
       submitSuiSwap()
+      return
+    }
+    if (chain.value === 'ton') {
+      submitTonSwap()
       return
     }
     loadingConfirmSwap.value = true
@@ -1886,7 +1999,7 @@ async function submitSolanaSwap() {
       }
     }, 6000)
     // const isSwap = true
-    sendSolanaSwapTransaction(solanaQuoteResponse.value).then((res: { hash: string | undefined; wait: () => any }) => {
+    sendSolanaSwapTransaction(solanaQuoteResponse).then((res: { hash: string | undefined; wait: () => any }) => {
       console.log('---confirm transaction---', res)
       swapInfo.value.transaction = res.hash
       recordTransaction({
@@ -2026,7 +2139,7 @@ async function submitSuiSwap() {
     }, 6000)
     const isSwap = true
     buildSuiTx({
-      quoteResponse: suiQuoteResponse.value,
+      quoteResponse: suiQuoteResponse,
       slippage: new BigNumber(suiTonSlippage.value).div(100).toNumber(), // this.tonSlippage
     }).then((res: { tx: any }) => {
       console.log('res', res)
@@ -2159,6 +2272,159 @@ async function submitSuiSwap() {
     loadingSwap.value = false
     loadingConfirmSwap.value = false
     handleError(err, 'solana')
+  }
+}
+
+async function submitTonSwap() {
+  try {
+    loadingConfirmSwap.value = true
+    loadingSwap.value = true
+    // let price1 = this.baseToken?.token?.current_price_usd || 0
+    // let isRetryQuote = this.tonSwapBaseTokenPrice ? new BigNumber(price1).minus(this.tonSwapBaseTokenPrice).times(100).div(this.tonSwapBaseTokenPrice).abs().gt(this.tonSlippage) : true
+    // console.log('price', price1, this.solanaSwapBaseTokenPrice, isRetryQuote)
+    // if (isRetryQuote) {
+    //   await this.quoteTon(this.isAmount, 'ton')
+    // }
+    activeShow.value = 2
+    const _swapInfo = swapInfo.value
+    const txInfo = {
+      from_address: _swapInfo.fromToken.address,
+      from_symbol: _swapInfo.fromToken.symbol,
+      from_amount: _swapInfo?.fromAmount,
+      from_decimals: _swapInfo?.fromToken.decimals,
+      to_address: _swapInfo.toToken.address,
+      to_symbol: _swapInfo.toToken.symbol,
+      to_amount: _swapInfo?.toAmount,
+      to_decimals: _swapInfo?.toToken.decimals,
+      chain: 'ton',
+      transaction: '',
+      wallet_address: walletStore.address,
+    }
+    console.log('txInfo', txInfo)
+    // let tx = {}
+    setTimeout(() => {
+      if (!dialogVisibleSwap.value) {
+        loadingSwap.value = false
+        loadingConfirmSwap.value = false
+      }
+    }, 6000)
+    const isSwap = true
+    const transaction: Array<{
+      address: string
+      amount: string
+      payload?: string
+    }> = [{
+      address: tonQuoteResponse?.to,
+      amount: tonQuoteResponse?.totalTransferAmount,
+      payload: tonQuoteResponse?.payload
+    }]
+    const feeMsg = await getTonTokenTransferMsg(txInfo as any)
+    if (feeMsg) {
+      transaction.push(feeMsg)
+    }
+    sendTonTransaction(transaction).then(res => {
+      console.log('---confirm transaction---', res)
+      swapInfo.value.transaction = res.hash
+      recordTransaction({
+        chain: 'ton',
+        destination: 'wallet rpc',
+        type: 10,
+        tx_hash: res.hash,
+        status: 1,
+        wallet: walletStore.address,
+        out_token: txInfo.to_address,
+        out_amount: swapInfo.value.toAmount,
+        in_token: txInfo.from_address,
+        in_amount: swapInfo.value.fromAmount
+      })
+      if (isSwap) {
+        txInfo.transaction = res.hash
+        // tx = {
+        //   time: parseInt(Date.now() / 1000),
+        //   id: txInfo.transaction,
+        //   chain: this.netId,
+        //   transaction: res.hash,
+        //   from_address: txInfo.from_address,
+        //   from_price_eth: 0,
+        //   from_price_usd: '',
+        //   from_symbol: swapInfo.fromToken.symbol,
+        //   from_amount: swapInfo.fromAmount,
+        //   to_address: txInfo.to_address,
+        //   to_price_eth: 0,
+        //   to_price_usd: '',
+        //   to_symbol: swapInfo.toToken.symbol,
+        //   to_amount: swapInfo.toAmount,
+        //   is_merged: 0,
+        //   wallet_address: this.$store.state.currentAccount || '',
+        //   from_address_logo_url: swapInfo.fromToken.logo_url,
+        //   to_address_logo_url: swapInfo.toToken.logo_url,
+        // }
+        // this.tonTxs.unshift(tx)
+        // this.tonTxs = this.tonTxs?.slice?.(0, 500)
+      }
+      loadingSwap.value = false
+      loadingConfirmSwap.value = false
+
+      fromAmount.value = ''
+      toAmount.value = ''
+      percentStepRef.value?.handleClick?.(0)
+      // dialogVisibleSwap.value = false
+      activeShow.value = 3
+      return res.wait()
+    }).then(async res => {
+      console.log('----transaction---', res)
+      if (res) {
+        updateTransaction({
+          chain: 'ton',
+          tx_hash: res?.hash,
+          status: 100
+        })
+        ElNotification({ type: 'success', message: t('tradeSuccess') })
+        swapStore.getTokenDetails()
+        swapStore.getUserTokenList()
+        // let amountChange = await getTonTransactionTokenChange(res)
+        if (isSwap) {
+          // this.tonTxs = this.tonTxs.slice().map(item => {
+          //   let i = {...item}
+          //   if (item.transaction === res?.hash) {
+          //     i.is_merged = 1
+          //     i.time = res?.timestamp
+          //     i.event_id = res?.event_id
+          //     i = {...i, ...amountChange}
+          //   }
+          //   return i
+          // })
+          // this.getUserAllTxs(tx)
+        }
+        // this.getGasBalance()
+      } else {
+        updateTransaction({
+          chain: 'ton',
+          tx_hash: txInfo.transaction,
+          status: -100
+        })
+        ElNotification({ type: 'error', message: t('tradeFail') })
+      }
+      return res
+    }).catch((err) => {
+      console.warn('ton error', err)
+      if ((err || err?.message) === 'Timeout') {
+        ElNotification({ type: 'error', message: t('timeout_error') })
+      } else if ((err || err?.message) === 'Swap fail') {
+        ElNotification({ type: 'error', message: t('tradeFail') })
+      } else {
+        handleError(err)
+      }
+      activeShow.value = 1
+      loadingSwap.value = false
+      loadingConfirmSwap.value = false
+      resetCountdown()
+    })
+  } catch (err) {
+    activeShow.value = 1
+    loadingSwap.value = false
+    loadingConfirmSwap.value = false
+    handleError(err)
   }
 }
 

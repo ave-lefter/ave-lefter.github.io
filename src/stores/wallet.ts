@@ -5,11 +5,13 @@ import { walletConnect } from '~/utils/wallet/wc'
 import { getSolanaWallets, connectSolanaWallet, type Wallet } from '~/utils/wallet/solana'
 import { getTronWalletAdapters, connectTronWallet } from '~/utils/wallet/tron'
 import { getSuiWallets, connectSuiWallet } from '~/utils/wallet/sui'
+import { initTonWallet } from '~/utils/wallet/ton'
 import { useLocalStorage } from '@vueuse/core'
 import { BrowserProvider } from 'ethers'
 import { decodeUTF8 } from 'tweetnacl-util'
 import bs58 from 'bs58'
 import type { Wallet as SuiWallet } from '~/utils/wallet/sui'
+import { TonConnectUI } from '@tonconnect/ui'
 type TronWalletAdapter = ReturnType<typeof getTronWalletAdapters>[number]
 
 export const useWalletStore = defineStore('wallet', () => {
@@ -17,7 +19,7 @@ export const useWalletStore = defineStore('wallet', () => {
   const chain = useLocalStorage('walletChain', '')
   const walletName = useLocalStorage('walletName', '')
   const walletSignature = useLocalStorage('walletSignature', {} as Record<string, string>)
-  const provider = shallowRef<(EIP6963ProviderDetail<any>['provider'] | Wallet | TronWalletAdapter | SuiWallet) & {disconnect?: () => void} | null>(null)
+  const provider = shallowRef<(EIP6963ProviderDetail<any>['provider'] | Wallet | TronWalletAdapter | SuiWallet | TonConnectUI) & {disconnect?: () => void} | null>(null)
   const evmWalletMap = shallowRef<EIP6963ProviderResponse>(new Map())
   const solanaWallets = shallowRef<Wallet[]>([])
   const tronWalletAdapters = shallowRef<TronWalletAdapter[]>([])
@@ -223,6 +225,10 @@ export const useWalletStore = defineStore('wallet', () => {
       if (wallet) {
         connectSuiWallet(wallet)
       }
+    }
+    // ton init
+    if (address.value && chain.value === 'ton' && walletName.value) {
+      initTonWallet()
     }
   }
 

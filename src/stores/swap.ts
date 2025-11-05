@@ -101,7 +101,7 @@ export const useSwapStore = defineStore('swap', () => {
     return walletStore.chain || getAddressAndChainFromId(route.params.id as string).chain || ''
   })
 
-  const userBalanceTokens = ref<(SwapToken & { value: number | string })[]>([])
+  const userBalanceTokens = ref<(SwapToken & { value: number | string; initBalance?: string | number })[]>([])
 
   const swapTokens = computed(() => {
     const list = [...(userBalanceTokens.value?.slice?.() || [])]
@@ -257,12 +257,12 @@ export const useSwapStore = defineStore('swap', () => {
       return
     }
     getUserSwapTokenList().then(res => {
-      if (chain === 'solana') {
+      if (chain === 'solana' || chain === 'ton' || chain === 'sui') {
         userBalanceTokens.value = res?.map?.(i => ({...i}))
       } else {
         userBalanceTokens.value = (res?.map(i => ({...i, id: i.token + '-' + i.chain, address: i.token}))?.filter?.(i => (i.risk_score || 0) < 60 && (i.risk_level || 0) >= 0 && i.flag !== 'blacklist' && i.symbol !== '' && i.flag !== 'lp') || [])?.filter(j => !!Number(j.value))
       }
-      if (userBalanceTokens.value.length > 0 && chain !== 'solana' && chain !== 'sui' && (/^0x[0-9a-zA-Z]{40}$/.test(address) || isValidAddress(address, 'tron'))) {
+      if (userBalanceTokens.value.length > 0 && chain !== 'solana' && chain !== 'sui' && chain !== 'ton' && (/^0x[0-9a-zA-Z]{40}$/.test(address) || isValidAddress(address, 'tron'))) {
         getBalanceList(userBalanceTokens.value.map(i => i.token || ''), chain).then(res1 => {
           userBalanceTokens.value = userBalanceTokens.value?.map?.((i, k) => ({...i, value: formatUnits(res1[k], i?.decimals || 0)}))?.filter(j => !!Number(j.value))
         })
@@ -416,6 +416,7 @@ export const useSwapStore = defineStore('swap', () => {
 
   function init() {
     const [token, chain1] = getAddressAndChainFromId(route.params?.id as string, 1)
+    console.log(token, chain1, 'init')
     const chain = walletStore.chain
     if (token && (token !== token1.value.address)) {
       token1.value = {

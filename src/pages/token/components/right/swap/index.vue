@@ -21,7 +21,7 @@ watch([() => tokenStore.token?.token || '', () => walletStore.chain, () => walle
 
 
 onMounted(() => {
-  swapStore.init()
+  // swapStore.init()
 })
 
 </script>

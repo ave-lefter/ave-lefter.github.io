@@ -49,6 +49,7 @@ import { ArrowLeft } from '@element-plus/icons-vue'
 import emailRegisterAndLogin from './emailRegisterAndLogin.vue'
 import botMnemonicPhrase from './botMnemonicPhrase.vue'
 import { useStorage } from '@vueuse/core'
+// import { getTonWallets } from '~/utils/wallet/ton'
 const emailRegisterType = ref('login')
 const botStore = useBotStore()
 const themeStore = useThemeStore()
@@ -104,6 +105,7 @@ watch(() => botStore.connectVisible, (val) => {
       emailRegisterType.value = 'login'
     })
   }
+  // getTonWallets()
 })
 
 defineExpose({ emailRegisterType })

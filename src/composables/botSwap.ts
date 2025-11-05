@@ -191,7 +191,7 @@ export function useBotSwap(type: number = 0, isBatch = false) {
   const allowance = ref<number | string>(0)
 
   async function getAllowance(token: string, chain: string = getChain()) {
-    if (chain === 'solana' || token === NATIVE_TOKEN) {
+    if (getChainInfo(chain)?.vm_type !== 'evm' || token === NATIVE_TOKEN ) {
       allowance.value = MAX_UINT_AMOUNT
       return MAX_UINT_AMOUNT
     }

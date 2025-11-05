@@ -2,6 +2,8 @@ import type { TokenInfo, TokenInfoExtra, WalletTokenInfo } from './types/token'
 import { getAddressAndChainFromId, getChainInfo } from '@/utils'
 import { NATIVE_TOKEN } from '@/utils/constants'
 import { createCacheRequest } from '#imports'
+import { getTonTokenList } from '~/utils/wallet/ton'
+import { getTokenPnl } from './bot'
 
 // const testDomain = 'https://0ftrfsdb.xyz'
 
@@ -607,7 +609,7 @@ export function getUserTxs(token_id: string, address: string) {
 export const getTokensPrice = createCacheRequest(function(tokenIds: string[]) {
   const ids = tokenIds.map(i => {
     const [token, chain] = getAddressAndChainFromId(i, 1)
-    if (token && chain && (token === NATIVE_TOKEN || token === 'sol')) {
+    if (token && chain && BotNativeTokens?.includes(token)) {
       const chainInfo = getChainInfo(chain)
       return chainInfo.wmain_wrapper + '-' + chain
     }
@@ -862,6 +864,42 @@ export const bot_getUserWalletTxInfo = createCacheRequest(async function(query: 
   user_token: string;
   chain: string;
 }): Promise<Array<WalletTokenInfo>>  {
+  if (query.chain === 'ton') {
+    return getTonTokenList(query.user_address, query.user_token).then(async res => {
+      let item = res[0]
+      return getTokenPnl({
+        chain: query.chain,
+        token: query.user_token,
+        walletAddress: query.user_address,
+        balance: item?.balance || '0',
+        days: 30
+      }).then(async res => {
+        return [{
+          token: query.user_token,
+          chain: query.chain,
+          logo_url: item?.logo_url || '',
+          symbol: item?.symbol || '',
+          total_profit: res?.profit || '0',
+          unrealized_profit: res?.profitUnrealized || '0',
+          realized_profit: res?.profitUnrealized || '0',
+          balance_amount: item?.balance || '0',
+          balance_usd: item?.balance_usd || '0',
+          total_profit_ratio: res?.profitRatio || '0',
+          unrealized_ratio: res?.unrealizedRatio || '0',
+          realized_ratio: res?.realizeRatio || '0',
+          total_purchase_usd: res?.totalBuyUsd || '0',
+          total_sold_usd: res?.totalSellUsd || '0',
+          balance_ratio: res?.balanceRatio || '0',
+          average_purchase_price_usd: res?.avgBuyPrice || '0',
+          average_sold_price_usd: res?.avgSellPrice || '0',
+          total_purchase: res?.totalBuyAmount || '0',
+          bought: res?.totalBuyAmount || '0',
+          total_sold: res?.totalSellAmount || '0',
+          sold: res?.totalSellAmount || '0',
+        }]
+      })
+    })
+  }
   const { $api } = useNuxtApp()
   return $api('/v2api/walletinfo/v1/usertx', {
     method: 'get',

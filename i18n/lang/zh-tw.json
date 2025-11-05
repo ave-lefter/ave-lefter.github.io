@@ -1441,8 +1441,8 @@
   "roundUpDisplay": "取整展示",
   "twitterTime": "推文時間",
   "pushSettings": "推送設置",
-  "newFeature":"新功能",
-  "CreatePair":"創建池子",
+  "newFeature": "新功能",
+  "CreatePair": "創建池子",
   "buySetting": "買入設置",
   "sellSetting": "賣出設置",
   "walletList": "錢包清單",
@@ -1466,5 +1466,7 @@
   "refresh": "刷新",
   "mainToken": "主幣",
   "botCancelAllOrder": "確認取消所有錢包的當前掛單",
-  "or":"或者"
+  "or":"或者",
+  "optional": "可選",
+  "tonInsufficientBalance": "TON 餘額不足"
 }
