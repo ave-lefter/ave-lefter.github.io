@@ -1482,5 +1482,7 @@
   "backToTop": "Back to top",
   "decimalsDisplay": "Decimals Display",
   "roundUpDisplay": "Round up Display",
-  "twitterTime": "Twitter Time"
+  "twitterTime": "Twitter Time",
+  "optional": "Optional",
+  "tonInsufficientBalance": "Insufficient TON"
 }

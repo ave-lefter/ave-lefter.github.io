@@ -77,6 +77,14 @@
           <span v-if="item?.features" class="ml-auto color-[--third-text] text-14px">{{ $t('detected') }}</span>
         </li>
       </ul>
+      <ul v-if="chain === 'ton'">
+        <li id="ton-connect-btn" class="flex items-center mb-10px bg-[--border] h-48px rd-6px px-12px clickable" @click.stop="_connectTonWallet">
+          <!-- <img :src="item.icon" class="mr-10px rd-5px" width="32" lazy alt=""> -->
+          <img :src="`${configStore.token_logo_url}chain/ton.png`" class="rd-50% mr-10px" width="32" lazy alt="">
+          <span>TON Connect</span>
+          <!-- <span v-if="item?.features" class="ml-auto color-[--third-text] text-14px">{{ $t('detected') }}</span> -->
+        </li>
+      </ul>
     </el-scrollbar>
 
   </div>
@@ -87,6 +95,7 @@ import { ArrowLeft } from '@element-plus/icons-vue'
 import { connectSolanaWallet } from '~/utils/wallet/solana'
 import { connectTronWallet } from '~/utils/wallet/tron'
 import { connectSuiWallet } from '~/utils/wallet/sui'
+import { connectTonWallet } from '~/utils/wallet/ton'
 
 const botStore = useBotStore()
 const configStore = useConfigStore()
@@ -96,7 +105,7 @@ const queryChain = ref('')
 const chains = computed(() => {
   return configStore.chainConfig?.filter?.(i => {
     const reg = new RegExp(queryChain.value, 'i')
-    return (i.vm_type === 'evm' || i.net_name === 'tron' || i.net_name === 'solana' || i.net_name === 'sui') && (reg.test(i.name || '') || reg.test(i.net_name))
+    return (i.vm_type === 'evm' || i.net_name === 'tron' || i.net_name === 'solana' || i.net_name === 'sui' || i.net_name === 'ton') && (reg.test(i.name || '') || reg.test(i.net_name))
   })
 })
 
@@ -148,6 +157,17 @@ function _connectSuiWallet(item: typeof walletStore.suiWallets[number]) {
   })
 }
 
+function _connectTonWallet() {
+  connectTonWallet('ton-connect-btn')?.then((res) => {
+    console.log('connectSuiWallet res', res)
+    if (res) {
+      botStore.connectWalletTab = 0
+      botStore.connectVisible = false
+      // _signMessageForFavorite()
+    }
+  })
+}
+
 async function _signMessageForFavorite() {
   await sleep(1000)
   walletStore.signMessageForFavorite()
@@ -156,6 +176,17 @@ async function _signMessageForFavorite() {
 
 </script>
 
-<style>
+<style lang="scss">
+#tc-widget-root [data-tc-wallets-modal-container="true"] {
+  z-index: 3000;
+}
+tc-root {
+  & > button {
+    opacity: 0;
+  }
+  > .go3572451881 {
+    display: none;
+  }
+}
 
 </style>
