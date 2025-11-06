@@ -67,7 +67,7 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
   const send = (msg: {
     type: 'subscribe' | 'unsubscribe' | 'ping' | 'pong'
     channel?: string
-    time: string
+    time?: string
   }, options?: WSOptions) => {
     if (!wsInstance.value) {
       // 如果 WebSocket 未初始化，则自动调用 init 初始化

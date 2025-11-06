@@ -1466,7 +1466,8 @@
   "refresh": "刷新",
   "mainToken": "主幣",
   "botCancelAllOrder": "確認取消所有錢包的當前掛單",
-  "or":"或者",
+  "or": "或者",
+  "perp": "合約",
   "optional": "可選",
   "tonInsufficientBalance": "TON 餘額不足"
 }
