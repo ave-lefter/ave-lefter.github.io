@@ -75,7 +75,7 @@ function confirm(data:Record<string,any>) {
 
 function handleBlur(props2: string[], val: string, index: number) {
     const key = props2[index] || ''
-    if (tempFilter.value[props2[0]] && tempFilter.value[props2[1]]){
+    if (typeof tempFilter.value[props2[0]] !== 'undefined' && typeof tempFilter.value[props2[1]] !== 'undefined'){
       if (
         index === 0 &&
         Number.parseFloat(tempFilter.value[key]) >=
