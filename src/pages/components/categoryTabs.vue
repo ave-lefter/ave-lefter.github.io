@@ -267,7 +267,7 @@ watch(()=>props.categories,()=>{
           </button>
         </div>
         <div class="flex items-center">
-          <RankFilter :storageKey="configMap[activeTab as keyof typeof configMap]?.storageKey"  :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns" :ammList="ammList"/>
+          <RankFilter v-if="activeTab==='hot'" :storageKey="configMap[activeTab as keyof typeof configMap]?.storageKey"  :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns" :ammList="ammList"/>
           <el-switch v-if="isSupportedChain" v-model="globalStore.rankCommon.quickVisible" class="mr-2" />
           <QuickSwapSet
             v-if="globalStore.rankCommon.quickVisible&&isSupportedChain"

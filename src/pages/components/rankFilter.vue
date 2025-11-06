@@ -107,7 +107,7 @@ function handleBlur(props2: string[], val: string, index: number) {
       append-to-body
     >
     <template #reference>
-        <div :class="['filter-btn mr-2', { active: visible }, filterNumber > 0 ? 'hight': '']">
+        <div :class="['filter-btn mr-2 hight', { active: visible }, filterNumber > 0 ? 'hight': '']">
           <Icon
             id="custom-filter"
             name="custom:filter"
@@ -239,7 +239,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
-                @blur="(val) => handleBlur(['holders_min', 'holders_max'], val, 0)"
+                @blur="(val) => handleBlur(['holder_min', 'holder_max'], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
               <el-input
@@ -247,7 +247,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
-                @blur="(val) => handleBlur(['holders_min', 'holders_max'], val, 1)"
+                @blur="(val) => handleBlur(['holder_min', 'holder_max'], val, 1)"
               />
             </div>
           </div>
@@ -267,7 +267,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
-                @blur="(val) => handleBlur(['makers_min', 'makers_max'], val, 0)"
+                @blur="(val) => handleBlur([`makers_${tempFilter.activeInterval}_min`, `makers_${tempFilter.activeInterval}_max`], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
               <el-input
@@ -275,7 +275,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
-                @blur="(val) => handleBlur(['makers_min', 'makers_max'], val, 1)"
+                @blur="(val) => handleBlur([`makers_${tempFilter.activeInterval}_min`, `makers_${tempFilter.activeInterval}_max`], val, 1)"
               />
             </div>
           </div>
@@ -493,7 +493,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
-                @blur="(val) => handleBlur(['volume_u_min', 'volume_u_max'], val, 0)"
+                @blur="(val) => handleBlur([`volume_u_${tempFilter.activeInterval}_min`, `volume_u_${tempFilter.activeInterval}_max`], val, 0)"
               >
                 <template #suffix>
                   <span>$</span>
@@ -505,7 +505,7 @@ function handleBlur(props2: string[], val: string, index: number) {
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
-                @blur="(val) => handleBlur(['volume_u_min', 'volume_u_max'], val, 1)"
+                @blur="(val) => handleBlur([`volume_u_${tempFilter.activeInterval}_min`, `volume_u_${tempFilter.activeInterval}_max`], val, 1)"
               >
                 <template #suffix>
                   <span>$</span>
@@ -528,15 +528,15 @@ function handleBlur(props2: string[], val: string, index: number) {
                 class="w-106px"
                 :placeholder="$t('minor')"
                 clearable
-                @blur="(val) => handleBlur(['tx_min', 'tx_max'], val, 0)"
+                @blur="(val) => handleBlur([`tx_${tempFilter.activeInterval}_count_min`, `tx_${tempFilter.activeInterval}_count_max`], val, 0)"
               />
               <span class="color-[--third-text]">~</span>
               <el-input
-                v-model.trim.number="tempFilter[`tx_${tempFilter.activeInterval}_count_min`]"
+                v-model.trim.number="tempFilter[`tx_${tempFilter.activeInterval}_count_max`]"
                 class="w-106px"
                 :placeholder="$t('max1')"
                 clearable
-                @blur="(val) => handleBlur(['tx_min', 'tx_max'], val, 1)"
+                @blur="(val) => handleBlur([`tx_${tempFilter.activeInterval}_count_min`, `tx_${tempFilter.activeInterval}_count_max`], val, 1)"
               />
             </div>
           </div>
@@ -579,7 +579,10 @@ function handleBlur(props2: string[], val: string, index: number) {
   height: 26px;
   position: relative;
   &.hight{
-    color: var(--main-text)
+    color: var(--main-text);
+    .iconify {
+      color: var(--main-text);
+    }
   }
 
   img {

@@ -107,7 +107,7 @@ function initOrUpdateChart() {
                     name: 'Evaporation',
                     type: 'bar',
                     itemStyle:{
-                        color:'#383F4B'
+                        color:getCssVariable('--icon-color')
                     },
                     data:barData
                 },
