@@ -144,7 +144,7 @@ watch(()=>props.activeChain, () => {
 })
 function getPumpIcon(isPump: boolean) {
   if (isPump) {
-    return 'custom:pump-active'
+    return themeStore.isDark ? 'custom:pump-active' : 'custom:pump-white'
   }
   if (themeStore.isDark) {
     return 'custom:pump'
