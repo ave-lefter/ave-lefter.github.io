@@ -1,6 +1,12 @@
 <template>
   <div class="bg-[--d-101114-l-F6F9FF] h-64px flex-start items-center justify-start py-7px px-12px">
-    <el-popover popper-class="[--el-popover-bg-color:--border]">
+    <el-popover
+      popper-class="[--el-popover-bg-color:--border]"
+      :width="640"
+      placement="bottom-start"
+      trigger="click"
+      popper-style="padding: 0px"
+    >
       <template #reference>
         <div
           class="flex items-center px-4px py-4px cursor-pointer rounded-4px hover:bg-[--d-1B1D21-l-E8F1FF]"
@@ -17,7 +23,7 @@
         </div>
       </template>
       <template #default>
-        <div class="py-4px [&&]:m--12px flex flex-col">11111111</div>
+        <Search></Search>
       </template>
     </el-popover>
 
@@ -74,8 +80,33 @@
 </template>
 
 <script lang="ts" setup>
-import search from './search'
+import Search from './search'
+import { usePerpWsPubStore } from '@/stores/perp/wsPub'
 const isRotate = shallowRef(false)
+const perpWsPubStore = usePerpWsPubStore()
+const wsResultTickerAll1s = computed(() => {
+  return perpWsPubStore.wsResult['ticker.all.1s'] || {}
+})
+watch(
+  () => wsResultTickerAll1s.value,
+  (newVal) => {
+    if (newVal) {
+      console.log('-------tickerAll1s------', newVal)
+    }
+  }
+)
+onMounted(() => {
+  perpWsPubStore.send({
+    type: 'unsubscribe',
+    channel: 'ticker.all.1s',
+  })
+  setTimeout(() => {
+    perpWsPubStore.send({
+      type: 'subscribe',
+      channel: 'ticker.all.1s',
+    })
+  }, 500)
+})
 </script>
 
 <style lang="scss" scoped></style>

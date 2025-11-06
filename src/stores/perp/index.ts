@@ -8,12 +8,12 @@ type PerpMetadata = Awaited<ReturnType<typeof _getPerpMetadata>>
 const sdk = new EdgeXSDK({
   // clientId: 'your-client-id',
 })
-
 export const usePerpStore = defineStore('perp', () => {
   const metadata = shallowRef<PerpMetadata | null>(null)
   const walletStore = useWalletStore()
   const _apiKeys = useLocalStorage<{[key: string]: ApiKeyData | null}>('perp_apiKeys', { })
   const _l2KeyPair = useLocalStorage<{[key: string]: L2KeyPair | null}>('perp_l2KeyPair', {})
+  const loadingPerpMetadata = shallowRef(false)
 
   const apiKeys = computed(() => {
     if (!walletStore.address) {
@@ -30,9 +30,12 @@ export const usePerpStore = defineStore('perp', () => {
   })
 
   function getPerpMetadata() {
+    loadingPerpMetadata.value = true
     _getPerpMetadata().then(res => {
       sdk.setMetadata(res)
       metadata.value = res
+    }).finally(() => {
+      loadingPerpMetadata.value = false
     })
   }
 
@@ -119,6 +122,7 @@ export const usePerpStore = defineStore('perp', () => {
     setL2KeyPair,
     generateEdgeXAuthHeaders,
     signAndGenerateAPIKeys,
-    signAndGenerateL2KeyPair
+    signAndGenerateL2KeyPair,
+    loadingPerpMetadata
   }
 })
