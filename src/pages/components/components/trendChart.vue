@@ -8,6 +8,7 @@ let timer:number
 const chartDom = useTemplateRef('chartDom')
 const chartInstance = shallowRef<echarts.ECharts>()
 const globalStore = useGlobalStore()
+const themeStore = useThemeStore()
 const props = defineProps<{
     list:KlineDatum[]
 }>()
@@ -24,6 +25,11 @@ const observer = new IntersectionObserver(entries=>{
 
 watch(()=>props.list,()=>{
     if(isIntersecting.value && chartDom.value&&props.list?.length){
+        initOrUpdateChart()
+    }
+})
+watch(()=>themeStore.isDark,()=>{
+    if(chartInstance.value){
         initOrUpdateChart()
     }
 })
