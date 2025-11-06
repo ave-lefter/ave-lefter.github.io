@@ -73,23 +73,23 @@ function confirm(data:Record<string,any>) {
   visible.value=false
 }
 
-function handleBlur(props: string[], val: string, index: number) {
-    const key = props[index] || ''
-    if (tempFilter.value[props[0]] && tempFilter.value[props[1]]){
+function handleBlur(props2: string[], val: string, index: number) {
+    const key = props2[index] || ''
+    if (tempFilter.value[props2[0]] && tempFilter.value[props2[1]]){
       if (
         index === 0 &&
         Number.parseFloat(tempFilter.value[key]) >=
-        Number.parseFloat(tempFilter.value[props[1]])
+        Number.parseFloat(tempFilter.value[props2[1]])
       ) {
-        tempFilter.value[key] = tempFilter.value[props[1]]
+        tempFilter.value[key] = tempFilter.value[props2[1]]
       }
 
       if (
         index === 1 &&
         Number.parseFloat(tempFilter.value[key]) <=
-        Number.parseFloat(tempFilter.value[props[0]])
+        Number.parseFloat(tempFilter.value[props2[0]])
       ) {
-        tempFilter.value[key] = tempFilter.value[props[0]]
+        tempFilter.value[key] = tempFilter.value[props2[0]]
       }
     }
   }
@@ -179,7 +179,7 @@ function handleBlur(props: string[], val: string, index: number) {
               class="w-106px"
               :placeholder="$t('minor')"
               clearable
-              @blur="(val) => handleBlur(['created_at_min', 'created_at_max'], val, 0)"
+              @blur="(val) => handleBlur(['created_at_max', 'created_at_min'], val, 0)"
             >
               <template #suffix>
                 <span>min</span>
@@ -191,7 +191,7 @@ function handleBlur(props: string[], val: string, index: number) {
                class="w-106px"
               :placeholder="$t('max1')"
               clearable
-              @blur="(val) => handleBlur(['created_at_min', 'created_at_max'], val, 1)"
+              @blur="(val) => handleBlur(['created_at_max', 'created_at_min'], val, 1)"
             >
               <template #suffix>
                 <span>min</span>
