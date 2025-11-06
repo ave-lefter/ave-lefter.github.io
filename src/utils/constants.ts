@@ -19,6 +19,8 @@ export function getNativeToken(chain: string) {
     ton: 'TON',
   } as any)[chain] || NATIVE_TOKEN
 }
+
+export const BotNativeTokens = ['sol', 'TON', NATIVE_TOKEN]
 export const MAIN_COIN: {
   [key: string]: string
 } = {
@@ -117,7 +119,7 @@ export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
 
 export const defaultPaginationParams = {
   pageNO: 1,
-  pageSize: 10,
+  pageSize: 20,
   loaded: false,
   finished: false,
 }

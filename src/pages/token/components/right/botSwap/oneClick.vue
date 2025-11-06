@@ -87,7 +87,7 @@ import BigNumber from 'bignumber.js'
 import { NATIVE_TOKEN } from '@/utils/constants'
 import { formatBotGasTips } from '@/utils/bot'
 import { useBotSwap } from '~/composables/botSwap'
-import { bot_createSolTx, bot_createSwapEvmTx } from '@/api/bot'
+import { bot_createSolTx, bot_createSwapEvmTx, bot_createSwapTonTx } from '@/api/bot'
 import RefreshBalance from './refreshBalance.vue'
 import SlippageSetMarket from './slippageSetMarket.vue'
 import type { BotChain, BotSettingKey } from '~/utils/types'
@@ -222,13 +222,13 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
   }
   const native = chainMainToken?.[chain] || NATIVE_TOKEN
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
-  if (chain === 'solana') {
-    const botSettings = botSettingStore.botSettings?.solana?.[type]
+  if (chain === 'solana' || chain === 'ton') {
+    const botSettings = botSettingStore.botSettings?.[chain]?.[type]
     const selected = botSettings?.selected as BotSettingKey
     const botSetting = botSettings?.[selected]
     const mev = botSetting?.mev
     const slippage = botSetting?.slippage || '9'
-    const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, 'solana')
+    const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
     const settings = mev ? botSetting?.gas[0] : botSetting?.gas[1]
     let priorityFee = settings?.customFee || gasTips?.[settings?.level as number] || '0.002'
@@ -236,9 +236,10 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       priorityFee = '0.002'
     }
     const botPriorityFee = new BigNumber(priorityFee).times(10 ** 9).toFixed(0)
+    const batchId = Date.now().toString()
     const data = {
-      batchId: Date.now().toString(),
       swapList: [{
+        batchId,
         creatorAddress: walletAddress || '',
         inAmount: new BigNumber(amount || 0).times(10 ** (fromToken?.decimals || 0)).toFixed(0),
       }],
@@ -255,7 +256,11 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellPriorityFee: botPriorityFee
     }
-    bot_createSolTx(data).then(res => {
+    const bot_createTx = {
+      solana: bot_createSolTx,
+      ton: bot_createSwapTonTx
+    }
+    bot_createTx[chain](data).then(res => {
       if (res) {
         let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
           // this.$store.state.bot.historyUpdate++
@@ -269,20 +274,23 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             loadingSwapSell.value[index] = false
           }
         }, 500)
-        const chain = 'solana'
         const txInfo: any = res?.[0] || {}
+        const recordTxUrlObj = {
+          solana: '/botapi/swap/createSolTx',
+          ton: '/botapi/swap/createSwapTonTx',
+        }
         recordTxV2({
           txInfo,
           chain: chain,
-          destination: chain === 'solana' ? '/botapi/swap/createSolTx' : '/botapi/swap/createSwapEvmTx' ,
+          destination: recordTxUrlObj?.[chain] || '/botapi/swap/createSwapEvmTx' ,
           type: 10
         })
         const batchIdObj = {
           [txInfo?.batchId]: txInfo?.id
         }
         const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
-          const batchId = subscribeResult.batchId
-          if (batchId === data.batchId) {
+          const _batchId = subscribeResult.batchId
+          if (_batchId === batchId) {
             if (Timer) {
               clearTimeout(Timer)
               Timer = null
@@ -291,7 +299,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             if (subscribeResult?.txList?.[0]?.success) {
               ElNotification({ type: 'success', message: t('tradeSuccess') })
               const txInfo = subscribeResult?.txList?.[0]
-              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
+              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[_batchId] || '')
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
             }

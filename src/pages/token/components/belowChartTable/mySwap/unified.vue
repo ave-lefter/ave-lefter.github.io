@@ -299,7 +299,7 @@ const currentChain = computed(() => {
 })
 
 const currentTokenAddress = computed(() => {
-  return props.currentToken ? String(route.params.id).split('-')[0] : ''
+  return props.currentToken ? getAddressAndChainFromId((route.params.id as string) || '')?.address || '' : ''
 })
 
 const filterConditions = ref<any>({

@@ -2,6 +2,7 @@ import Cookies from 'js-cookie'
 import BigNumber from 'bignumber.js'
 import type { BotChain } from '~/utils/types'
 import { createCacheRequest } from '#imports'
+import { getTonWalletBalance } from '~/utils/wallet/ton'
 
 export function login(data: {
   username?: string
@@ -399,10 +400,14 @@ export const bot_getTokenBalance = createCacheRequest(function(data: {
     method: 'post',
     body: data
   }).then(res => {
-    return res?.map((i: { balance: any; decimals: number; token: string }) => {
-      const balance = i.balance
+    return Promise.all(res?.map(async (i: { balance: any; decimals: number; token: string }) => {
+      let balance = i.balance
+      if (data.chain === 'ton') {
+        balance = await getTonWalletBalance({token: i.token, wallet: data.walletAddress}).catch(async () => 0)
+      }
       const decimals = i.decimals || 0
-      const token = i.token === 'sol' ? 'So11111111111111111111111111111111111111112' : i.token
+      let token = i.token === 'sol' ? 'So11111111111111111111111111111111111111112' : i.token
+      token = token === 'TON' ? NATIVE_TOKEN : token
       return {
         ...i,
         initBalance: balance,
@@ -410,7 +415,7 @@ export const bot_getTokenBalance = createCacheRequest(function(data: {
         chain: data.chain || '',
         token
       }
-    })
+    }))
   })
 }, 500)
 
@@ -442,6 +447,17 @@ export const bot_getChainsTokenBalance = createCacheRequest(function(params) {
   return  $api('/botapi/swap/getChainsTokenBalance', {
     method: 'post',
     body: params
+  }).then(res => {
+    return Promise.all((res || []).map(async (i: { chain: string; token: any; walletAddress: any; balance: any }) => {
+      if (i.chain === 'ton') {
+        return {
+          ...i,
+          balance: await getTonWalletBalance({token: i.token, wallet: i.walletAddress}).catch(async () => 0) || i?.balance || 0
+        }
+      } else {
+        return {...i}
+      }
+    }))
   })
 }, 1000)
 
@@ -521,6 +537,33 @@ export function bot_createSolTx(params: {
   })
 }
 
+// 创建 Ton 市价交易
+export function bot_createSwapTonTx(params: {
+  batchId?: string
+  swapList: Array<{
+    creatorAddress: string
+    inAmount: string
+  }>
+  inTokenAddress: string
+  outTokenAddress: string
+  swapType: 1 | 2
+  slippage: number
+}) {
+  const { $api } = useNuxtApp()
+  const botStore = useBotStore()
+  return $api('/botapi/swap/createSwapTonTx', {
+    method: 'post',
+    body: {
+      // batchId: Date.now().toString(),
+      source: 'web',
+      autoSell: false,
+      channelRef: Cookies.get('refCode') || undefined,
+      tgUid: botStore.userInfo?.tgUid,
+      ...params,
+    }
+  })
+}
+
 
 // 创建Evm交易
 export function bot_createSwapEvmTx(params: {
@@ -573,6 +616,7 @@ export function bot_createSolLimitTx(params: {
     inAmount: string
   }>
   tokenAddress: string
+  baseTokenAddress: string
   swapType: 5 | 6
   isPrivate: boolean
   priceLimit: string
@@ -585,6 +629,34 @@ export function bot_createSolLimitTx(params: {
   const { $api } = useNuxtApp()
   const botStore = useBotStore()
   return $api('/botapi/swap/createSolLimitTx', {
+    method: 'post',
+    body: {
+      // batchId: Date.now().toString(),
+      source: 'web',
+      tgUid: botStore.userInfo?.tgUid,
+      ...params,
+    }
+  })
+}
+
+//  创建 TON 限价交易
+export function bot_createTonLimitSwap(params: {
+  batchId?: string
+  swapList: Array<{
+    creatorAddress: string
+    inAmount: string
+  }>
+  tokenAddress: string
+  baseTokenAddress: string
+  swapType: 5 | 6
+  isPrivate: boolean
+  priceLimit: string
+  slippage: number
+  autoSlippage?: boolean
+}) {
+  const { $api } = useNuxtApp()
+  const botStore = useBotStore()
+  return $api('/botapi/swap/createTonLimitSwap', {
     method: 'post',
     body: {
       // batchId: Date.now().toString(),
@@ -781,3 +853,38 @@ export const bot_getAddressAllBalances = createCacheRequest(function bot_getAddr
     query
   })
 }, 1000)
+
+// 3.10 计算pnl
+// 功能说明：计算盈利
+export function getTokenPnl(body: {
+  chain: string
+  token: string
+  walletAddress: string
+  balance: string
+  days: number
+}): Promise<{
+  balance: string
+  chain: string
+  profit: string
+  profitRealized: string
+  profitUnrealized: string
+  token: string
+  walletAddress: string
+  avgBuyPrice: string
+  avgSellPrice: string
+  balanceRatio: string
+  realizeRatio: string
+  unrealizedRatio: string
+  totalSellUsd: string
+  totalBuyUsd: string
+  profitRatio: string
+  totalBuyAmount: string
+  totalSellAmount: string
+
+}> {
+  const {$api} = useNuxtApp()
+  return $api('/aveswap/v1/swap/getTokenPnl', {
+    method: 'post',
+    body
+  })
+}

@@ -47,7 +47,7 @@
 <script setup>
 import TokenColumn from '@/components/tokenColumn.vue'
 import AveEmpty from '@/components/aveEmpty.vue'
-import { getUserTokenList } from '@/api/wallet'
+import { getUserSwapTokenList } from '@/api/swap'
 // import { getUserSwapTokenList, getBalanceList } from '@/api/swap'
 const route = useRoute()
 const botStore = useBotStore()
@@ -141,13 +141,13 @@ const currentUserTokenList = computed(() => {
 // }
 
 async function _getUserTokenList(address, chain) {
-  const result = await getUserTokenList(address, chain)
+  const result = await getUserSwapTokenList(address, chain)
   const tokenList = result.map((i) => ({
     ...i,
     id: i.token,
-    quote: i.current_price_usd * i.value || 0,
+    quote: i.current_price_usd * (i.value || i.balance) || 0,
     price: i.current_price_usd,
-    amount: i.value,
+    amount: i.value || i.balance,
     address: i.token,
   }))
   userTokenList.value = tokenList
@@ -164,7 +164,7 @@ const tableRowClick = (row) => {
   router.push({
     name: 'Token',
     params: { id: row.id + '-' + row.chain },
-    query: { from: route.name },
+    // query: { from: route.name },
   })
 }
 </script>

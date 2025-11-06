@@ -1481,5 +1481,7 @@
   "mainToken": "主币",
   "botCancelAllOrder": "确认取消所有钱包的当前挂单",
   "or": "或者",
-  "perp": "合约"
+  "perp": "合约",
+  "optional": "可选",
+  "tonInsufficientBalance": "TON 余额不足"
 }

@@ -1483,5 +1483,7 @@
   "decimalsDisplay": "Decimals Display",
   "roundUpDisplay": "Round up Display",
   "twitterTime": "Twitter Time",
-  "perp": "Perp"
+  "perp": "Perp",
+  "optional": "Optional",
+  "tonInsufficientBalance": "Insufficient TON"
 }
