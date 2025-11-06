@@ -64,3 +64,30 @@ export function getMultiContractInfo(body) {
     body
   })
 }
+interface Datum {
+  chain:      string;
+  kline_data: KlineDatum[];
+  token:      string;
+}
+
+export interface KlineDatum {
+  c:   string;
+  h:   string;
+  l:   string;
+  o:   string;
+  t:   number;
+  tag: string;
+  vol: string;
+}
+
+export function klinePreviews(query:{
+  category:string
+  interval:number
+  pair_ids:string
+}):Promise<Datum[]> {
+  const {$api} = useNuxtApp()
+  return $api('/v2api/token_info/v1/kline/previews', {
+    method: 'get',
+    query
+  })
+}

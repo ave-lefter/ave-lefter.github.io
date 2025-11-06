@@ -194,3 +194,14 @@ export const SwapType = {
   LIMIT_BUY: 5,
   LIMIT_SELL: 6,
 }
+
+export const CategroyTabsCacheKey = {
+  hot:'hotRanks',
+  new:'newRanks',
+  gainer:'gainerRanks',
+  pump:'pumpRanks',
+  inclusion:'inclusionRanks',
+  binance_alpha:'binance_alphaRanks',
+  xstocks:'xstocksRanks',
+  volume:'volumeRanks',
+}

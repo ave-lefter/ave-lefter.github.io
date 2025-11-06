@@ -5,9 +5,8 @@ import hot from './components/hotRank/hot.vue'
 import newRank from './components/newRank/new.vue'
 import inclusionRank from './components/inclusionRank/inclusion.vue'
 import gainer from './components/gainerRank/gainer.vue'
-import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
+import { getTreasureConfig, klinePreviews, type IGetTreasureConfig } from '~/api/market'
 
-import { v4 as uuidv4 } from 'uuid'
 import { trackRef } from '~/api/tracking'
 
 const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
@@ -214,7 +213,6 @@ function listMapFunction(i: Record<string, any>) {
   }
   return {
     ...i,
-    rowKey:uuidv4(),
     id: `${i.target_token}-${i.chain}`,
     pair_id: `${i.pair}-${i.chain}`,
     token: i.target_token,
@@ -294,6 +292,7 @@ const height = computed(() => {
         v-model:activeTab="activeTab"
         v-model:activeChain="activeChain"
         :categories="currentChainObj?.categories || []"
+        :ammList="currentChainObj?.swaps || []"
         :chains="chains"
       />
       <KeepAlive :max="6">
