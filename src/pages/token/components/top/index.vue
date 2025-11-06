@@ -215,7 +215,7 @@
               >
                 <el-image
                   v-tooltip="$t(`${i.tag}`)"
-                  class="token-icon-tag cursor-pointer h-100%"
+                  class="token-icon-tag cursor-pointer h-100% max-w-16px"
                   :src="formatIconTag(i.tag)"
                   lazy
                 >
