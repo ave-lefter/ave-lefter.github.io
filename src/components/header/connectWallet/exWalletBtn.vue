@@ -31,6 +31,23 @@
         {{ $t('disconnect') }}
       </el-button>
     </div> -->
+    <!-- <div>
+      <div class="flex items-center p-8px mb-12px color-[--main-text] clickable" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}`);showExWallet=false">
+        <img class="rd-50% mr-5px" height="32" :src="generateAvatarIcon(walletStore?.address || '')" alt="">
+        <span class="text-16px mr-3px">{{ currentAccountSplit || '' }}</span>
+        <Icon
+          v-copy="walletStore.address"
+          name="bxs:copy"
+          class="text-12px clickable color-[--secondary-text]"
+          @click.stop.prevent
+        />
+        <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px color-[--secondary-text]" />
+      </div>
+      <div class="tabs">
+        <button>链上钱包</button>
+        <button>永续合约</button>
+      </div>
+    </div> -->
     <ul class="tg-wallet-list_footer flex flex-col gap-10px">
       <li class="flex justify-between h-40px px-8px clickable" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}`);showExWallet=false">
         <div class="color-[--main-text] flex items-center gap-8px" >
@@ -59,6 +76,18 @@
           <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
         </div>
       </li>
+      <li class="flex justify-between h-40px px-8px clickable" @click.stop="perpStore.login">
+        <div class="color-[--main-text] flex items-center gap-8px">
+          <Icon name="custom:log-out" class="text-16px" />
+          <span class="text-14px">永续合约</span>
+        </div>
+        <div class="color-[--secondary-text] flex items-center gap-4px">
+          <span class="text-12px" :class="{'color-[--up-color]': perpStore.isLogin}">
+            {{ perpStore.isLogin ? '已登录' : '未登录' }}
+          </span>
+          <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
+        </div>
+      </li>
       <li class="flex justify-between h-40px px-8px clickable" @click.stop="walletStore.disconnect()">
         <div class="color-[--main-text] flex items-center gap-8px">
           <Icon name="custom:log-out" class="text-16px" />
@@ -73,12 +102,17 @@
 </template>
 
 <script setup lang='ts'>
+import { usePerpStore } from '~/stores/perp'
 const walletStore = useWalletStore()
 const configStore = useConfigStore()
 const showExWallet = ref(false)
+const perpStore = usePerpStore()
 const currentAccountSplit = computed(() => {
   return walletStore.address?.replace?.(new RegExp('(.{4})(.+)(.{4})'), '$1...$3') || ''
 })
+
+// const activeTab = ref(1)
+
 
 </script>
 

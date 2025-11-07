@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia'
-import { getPerpMetadata as _getPerpMetadata } from '@/api/perp'
+import { getPerpMetadata as _getPerpMetadata, onboardSite } from '@/api/perp'
 import { EdgeXSDK, type ApiKeyData, type L2KeyPair } from '@edgex-fe/typescript-sdk'
 import { useLocalStorage } from '@vueuse/core'
+import { usePerpWsPubStore } from './wsPub'
+import { usePerpWsPrivateStore } from './wsPrivate'
 
 type PerpMetadata = Awaited<ReturnType<typeof _getPerpMetadata>>
+type UserInfo = Awaited<ReturnType<typeof onboardSite>>['dataList'][0]
 
 const sdk = new EdgeXSDK({
   // clientId: 'your-client-id',
@@ -12,58 +15,105 @@ const sdk = new EdgeXSDK({
 export const usePerpStore = defineStore('perp', () => {
   const metadata = shallowRef<PerpMetadata | null>(null)
   const walletStore = useWalletStore()
-  const _apiKeys = useLocalStorage<{[key: string]: ApiKeyData | null}>('perp_apiKeys', { })
-  const _l2KeyPair = useLocalStorage<{[key: string]: L2KeyPair | null}>('perp_l2KeyPair', {})
+  const userInfo = ref<null | UserInfo>(null)
+  const accountList = shallowRef<UserInfo[]>([])
+  const _perpKeys = useLocalStorage<{[key: string]: {apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string }}>('perp_keys', {})
 
   const apiKeys = computed(() => {
     if (!walletStore.address) {
       return null
     }
-    return _apiKeys.value?.[walletStore.address] || null
+    return _perpKeys.value?.[walletStore.address]?.apiKeys || null
   })
 
   const l2KeyPair = computed(() => {
     if (!walletStore.address) {
       return null
     }
-    return _l2KeyPair.value?.[walletStore.address] || null
+    return _perpKeys.value?.[walletStore.address]?.l2KeyPair || null
+  })
+
+  const perpKeys = computed(() => {
+    return _perpKeys.value?.[walletStore.address] || null
+  })
+
+  const isLogin = computed(() => {
+    return !!apiKeys.value && !!l2KeyPair.value
   })
 
   function getPerpMetadata() {
     _getPerpMetadata().then(res => {
       sdk.setMetadata(res)
       metadata.value = res
+      getOnboardSite().then(() => {
+        usePerpWsPrivateStore().init()
+      })
     })
+    usePerpWsPubStore().init()
   }
 
   function setApiKeys(ak: ApiKeyData, address: string = walletStore.address) {
-    _apiKeys.value = {
-      ..._apiKeys.value,
-      [address]: ak
+    if (!_perpKeys.value?.[address]) {
+      _perpKeys.value[address] = {} as any
+    }
+    _perpKeys.value = {
+      ..._perpKeys.value,
+      [address]: {
+        ..._perpKeys.value?.[address],
+        apiKeys: ak
+      }
     }
   }
 
   function setL2KeyPair(lp: L2KeyPair, address: string = walletStore.address) {
-    _l2KeyPair.value = {
-      ..._l2KeyPair.value,
-      [address]: lp
+    if (!_perpKeys.value?.[address]) {
+      _perpKeys.value[address] = {} as any
+    }
+    _perpKeys.value = {
+      ..._perpKeys.value,
+      [address]: {
+        ..._perpKeys.value?.[address],
+        l2KeyPair: lp
+      }
     }
   }
 
-  function generateEdgeXAuthHeaders({
-    method,
-    path,
-    params,
-  }: {
+  function setApiSignature(apiSignature: string, address: string = walletStore.address) {
+    if (!_perpKeys.value?.[address]) {
+      _perpKeys.value[address] = {} as any
+    }
+    _perpKeys.value = {
+      ..._perpKeys.value,
+      [address]: {
+        ..._perpKeys.value?.[address],
+        apiSignature
+      }
+    }
+  }
+
+  function setStarkSignature(starkSignature: string, address: string = walletStore.address) {
+    if (!_perpKeys.value?.[address]) {
+      _perpKeys.value[address] = {} as any
+    }
+    _perpKeys.value = {
+      ..._perpKeys.value,
+      [address]: {
+        ..._perpKeys.value?.[address],
+        starkSignature
+      }
+    }
+  }
+
+  function generateEdgeXAuthHeaders(data: {
     method: string
     path: string
-    params?: { [key: string]: string }
+    params?: { [key: string]: string },
+    body?: { [key: string]: string },
+    timestamp?: string
   }) {
     return sdk.createAuthHeaders({
-      method: method,
-      path: path,
       timestamp: Date.now().toString(),
-      params: params, // 可选的查询参数
+      ...data
     })
   }
 
@@ -82,6 +132,7 @@ export const usePerpStore = defineStore('perp', () => {
     return walletStore.signMessage(message)?.then(async signature => {
       // 生成 API 密钥
       const apiKeys = sdk.generateApiKeyFromSignature(signature)
+      setApiSignature(signature)
       sdk.setApiKeys(apiKeys)
       setApiKeys(apiKeys, walletStore.address)
       return apiKeys
@@ -102,9 +153,38 @@ export const usePerpStore = defineStore('perp', () => {
     return walletStore.signMessage(message)?.then(async signature => {
       // 生成 API 密钥
       const result = sdk.generateL2KeyPairFromSignature(signature)
+      setStarkSignature(signature)
       sdk.setL2KeyPair(result)
       setL2KeyPair(result, walletStore.address)
       return result
+    })
+  }
+
+  function login() {
+    return signAndGenerateAPIKeys().then(async() => {
+      await sleep(500)
+      return signAndGenerateL2KeyPair().then(() => {
+        return getOnboardSite()
+      })
+    })
+  }
+
+  async function getOnboardSite() {
+    if (!perpKeys.value?.apiSignature || !perpKeys.value?.l2KeyPair) {
+      return []
+    }
+    if (apiKeys.value) {
+      sdk.setApiKeys(apiKeys.value)
+    }
+    if (l2KeyPair.value) {
+      sdk.setL2KeyPair(l2KeyPair.value)
+    }
+    return onboardSite().then(async res => {
+      if (res) {
+        accountList.value = res?.dataList || []
+        userInfo.value = res?.dataList?.[0] || null
+      }
+      return res
     })
   }
 
@@ -114,6 +194,10 @@ export const usePerpStore = defineStore('perp', () => {
     metadata,
     apiKeys,
     l2KeyPair,
+    perpKeys,
+    isLogin,
+    userInfo,
+    login,
     getPerpMetadata,
     setApiKeys,
     setL2KeyPair,

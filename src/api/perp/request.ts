@@ -1,3 +1,5 @@
+import { usePerpStore } from '~/stores/perp'
+
 export const PerpBaseUrl = 'https://testnet.edgex.exchange'
 
 // API响应类型
@@ -15,12 +17,20 @@ function getApi() {
       'Content-Type': 'application/json',
     },
     onRequest({ options, request }) {
-      // const url = request as string
-      // if (url?.includes('botapi')) {
-      //   botOnRequest({ options, request })
-      // } else {
-      //   onRequest({ options, request })
-      // }
+      const perpStore = usePerpStore()
+      const url = request as string
+      if (url?.includes('onboardSite')) {
+        options.headers = new Headers(options.headers)
+        const headers = perpStore.generateEdgeXAuthHeaders({
+          method: options.method || 'GET',
+          path: url,
+          body: (options.body as any) || undefined,
+          params: (options.query as any) || undefined
+        })
+        Object.keys(headers).forEach(key => {
+          options.headers.set(key, headers[key])
+        })
+      }
     },
     onResponse({ response, request, options }) {
       // const url = request as string
