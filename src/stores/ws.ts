@@ -32,7 +32,7 @@ export const useWSStore = defineStore('ws', () => {
     [WSEventType.SIGNALSV2_PUBLIC_MONITOR]: null,
     [WSEventType.PRICE_EXTRA]: null,
     [WSEventType.SIMPLE_TX]: null,
-    [WSEventType.PUBLIC_PORTRAIT]:null
+    [WSEventType.PUBLIC_PORTRAIT]: null
   })
 
   // 将 createWebSocket 重命名为 init

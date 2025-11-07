@@ -2,91 +2,91 @@
   <div class="histrory">
     <div class="top h-39px">
       <span>合约</span>
-      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('tx_volume_u_24h')">
+      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('lastPrice')">
         价格
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
-            ${getActiveClass(-1, 'tx_volume_u_24h', 'b')}
+            ${getActiveClass(-1, 'lastPrice', 'b')}
             `"
-            @click.stop="switchSort('tx_volume_u_24h', -1)"
+            @click.stop="switchSort('lastPrice', -1)"
           />
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer
-            ${getActiveClass(1, 'tx_volume_u_24h', 't')}
+            ${getActiveClass(1, 'lastPrice', 't')}
             `"
-            @click.stop="switchSort('tx_volume_u_24h', 1)"
+            @click.stop="switchSort('lastPrice', 1)"
           />
         </div>
       </div>
-      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('pool_size')">
+      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('priceChangePercent')">
         24H涨跌幅
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
-            ${getActiveClass(-1, 'pool_size', 'b')}
+            ${getActiveClass(-1, 'priceChangePercent', 'b')}
             `"
-            @click.stop="switchSort('pool_size', -1)"
+            @click.stop="switchSort('priceChangePercent', -1)"
           />
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer
-            ${getActiveClass(1, 'pool_size', 't')}
+            ${getActiveClass(1, 'priceChangePercent', 't')}
             `"
-            @click.stop="switchSort('pool_size', 1)"
+            @click.stop="switchSort('priceChangePercent', 1)"
           />
         </div>
       </div>
       <div
         class="flex-end cursor-pointer select-none"
-        @click.stop="switchSort('current_price_usd')"
+        @click.stop="switchSort('size')"
       >
         交易量
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
-            ${getActiveClass(-1, 'current_price_usd', 'b')}
+            ${getActiveClass(-1, 'size', 'b')}
             `"
-            @click.stop="switchSort('current_price_usd', -1)"
+            @click.stop="switchSort('size', -1)"
           />
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer
-            ${getActiveClass(1, 'current_price_usd', 't')}
+            ${getActiveClass(1, 'size', 't')}
             `"
-            @click.stop="switchSort('current_price_usd', 1)"
+            @click.stop="switchSort('size', 1)"
           />
         </div>
       </div>
-      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('holders')">
+      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('openInterest')">
         未平仓合约
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
-            ${getActiveClass(-1, 'holders', 'b')}
+            ${getActiveClass(-1, 'openInterest', 'b')}
             `"
-            @click.stop="switchSort('holders', -1)"
+            @click.stop="switchSort('openInterest', -1)"
           />
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer
-            ${getActiveClass(1, 'holders', 't')}
+            ${getActiveClass(1, 'openInterest', 't')}
             `"
-            @click.stop="switchSort('holders', 1)"
+            @click.stop="switchSort('openInterest', 1)"
           />
         </div>
       </div>
-      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('holders')">
+      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('fundingRate')">
         资金费率
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
-            ${getActiveClass(-1, 'holders', 'b')}
+            ${getActiveClass(-1, 'fundingRate', 'b')}
             `"
-            @click.stop="switchSort('holders', -1)"
+            @click.stop="switchSort('fundingRate', -1)"
           />
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer
-            ${getActiveClass(1, 'holders', 't')}
+            ${getActiveClass(1, 'fundingRate', 't')}
             `"
-            @click.stop="switchSort('holders', 1)"
+            @click.stop="switchSort('fundingRate', 1)"
           />
         </div>
       </div>
@@ -100,19 +100,19 @@
     >
       <ul class="content">
         <li v-for="(row, $index) in tokens1" :key="$index">
-          <NuxtLink
-            :to="`/token/${row.token}-${row.chain}`"
+          <a
+            href=""
             class="flex no-underline h-50p"
-            @click.stop="$emit('close')"
+            @click.stop.prevent="tableRowClick(row)"
           >
             <div class="token-info">
-              <div v-if="getSymbolDefaultIcon(row)" class="icon-token-container relative">
-                <el-image class="token-icon" :src="getSymbolDefaultIcon(row)" lazy>
+              <div class="icon-token-container relative">
+                <el-image class="token-icon" :src="row?.iconUrl" lazy>
                   <template #error>
-                    <img class="token-icon" :src="getChainDefaultIcon(row.chain, row.symbol)" />
+                    <img class="token-icon" :src="getChainDefaultIcon()" />
                   </template>
                   <template #placeholder>
-                    <img class="token-icon" :src="getChainDefaultIcon(row.chain, row.symbol)" />
+                    <img class="token-icon" :src="getChainDefaultIcon()" />
                   </template>
                 </el-image>
               </div>
@@ -128,27 +128,21 @@
                 </div>
               </div>
             </div>
-            <template v-if="Number(row.current_price_usd) > 0">
-              <div :class="row.tx_volume_u_24h > 0 ? 'color-[--main-text]' : ''">
-                ${{ formatNumber(row?.tx_volume_u_24h || 0, 2) }}
-              </div>
-              <div :class="row.tx_volume_u_24h > 0 ? 'color-[--main-text]' : ''">
-                ${{ formatNumber(row?.tx_volume_u_24h || 0, 2) }}
-              </div>
-              <div :class="row.tx_volume_u_24h > 0 ? 'color-[--main-text]' : ''">
-                ${{ formatNumber(row?.tx_volume_u_24h || 0, 2) }}
-              </div>
-              <div :class="row.tx_volume_u_24h > 0 ? 'color-[--main-text]' : ''">
-                ${{ formatNumber(row?.tx_volume_u_24h || 0, 2) }}
-              </div>
-              <div :class="row.tx_volume_u_24h > 0 ? 'color-[--main-text]' : ''">
-                ${{ formatNumber(row?.tx_volume_u_24h || 0, 2) }}
-              </div>
-            </template>
-            <div v-else class="flex-end" style="flex: 2">
-              --
+            <div :class="Number(row?.lastPrice ) > 0 ? 'color-[--main-text]' : ''">
+              {{ formatNumber(row.lastPrice || 0) }}
             </div>
-          </NuxtLink>
+            <div :class="Number(row.priceChangePercent )> 0 ? 'color-[--main-text]' : ''">
+              ${{ formatNumber(row?.priceChangePercent || 0, 2) }}
+            </div>
+            <div :class="Number(row.size ) > 0 ? 'color-[--main-text]' : ''">
+              ${{ formatNumber(row?.size || 0, 2) }}
+            </div>
+            <div :class="Number(row.openInterest) > 0 ? 'color-[--main-text]' : ''">
+              ${{ formatNumber(row?.openInterest || 0, 2) }}
+            </div>
+            <div :class="Number(row.fundingRate)> 0 || Number(row.fundingInterestRate) > 0 ?'color-[--main-text]' : ''">{{ formatNumber( Number(row?.fundingRate || row.fundingInterestRate)* 100 || 0)}}%
+            </div>
+          </a>
         </li>
       </ul>
     </el-scrollbar>
@@ -165,15 +159,16 @@
 import emptyWhite from '@/assets/images/empty-white.svg'
 import emptyDark from '@/assets/images/empty-black.svg'
 import { formatNumber } from '@/utils/formatNumber'
-import type { GetHotTokensResponse } from '@/api/token'
-import type { SearchHot } from '@/api/types/search'
-import { getMCap } from '~/utils'
-import { getSymbolDefaultIcon, getChainDefaultIcon, formatDate } from '@/utils/index'
-// import CountDown from './countDown.vue'
+
+
+import { getChainDefaultIcon } from '@/utils/index'
+import { type PerpInfo } from '@/api/types/perp'
+
+
 const themeStore = useThemeStore()
 const props = defineProps({
   tokens: {
-    type: Array<GetHotTokensResponse | SearchHot>,
+    type:  Array as () => PerpInfo[],
     default: () => [],
   },
   loading: {
@@ -187,38 +182,17 @@ const props = defineProps({
 })
 const emit = defineEmits(['close', 'filter', 'sortChange', 'done'])
 const $router = useRouter()
-const { token_logo_url } = useConfigStore()
+
 
 type SortValue = 0 | -1 | 1
 const activeSort = shallowRef<SortValue>(0)
 const sortBy = shallowRef<string>('')
-const isShowDate = shallowRef<boolean>(false)
-const popoverVisible = shallowRef(false)
-const openTimeList = shallowRef([
-  { text: '> $100', value: '100' },
-  { text: '> $1000', value: '1000' },
-  { text: '> $10K', value: '10000' },
-  { text: '> $100K', value: '100000' },
-])
-const isFilterHighlight = shallowRef(false)
-function confirm(params?: [string, string]) {
-  if (!params || !params.some((el) => !!el)) {
-    isFilterHighlight.value = false
-    popoverVisible.value = false
-    emit('filter', '')
-    return
-  }
-  isFilterHighlight.value = true
-  popoverVisible.value = false
-  emit('filter', params[0])
-}
+
 
 const tokens1 = computed(() => {
   const list = props.tokens?.slice(0)
   if (activeSort.value === 0 || sortBy.value === '') {
     return props.tokens
-  } else if (sortBy.value == 'mcap') {
-    return list?.sort((a, b) => (Number(getMCap(b)) - Number(getMCap(a))) * activeSort.value)
   } else {
     return list?.sort(
       (a, b) => ((b[sortBy.value] || 0) - (a[sortBy.value] || 0)) * activeSort.value
@@ -229,10 +203,10 @@ const tokens1 = computed(() => {
 const isLoading = computed(() => {
   return props.loading
 })
-function tableRowClick(id: string) {
+function tableRowClick(row: PerpInfo) {
   $router.push({
-    name: 'token-id',
-    params: { id: id },
+    name: 'perp-id',
+    params: { name: row.contractName },
   })
   emit('close')
 }

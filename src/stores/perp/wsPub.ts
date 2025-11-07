@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
 import WS, { type WSOptions } from '@/utils/ws'
+import { WSPerpEventType } from '~/utils/constants'
 
 function getWSMessage(e: MessageEvent): {
   sid?: string // 会话ID
@@ -21,12 +22,12 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
   // 使用 shallowRef 代替 ref，WebSocket 本身是非响应式的
   const wsInstance = shallowRef<WS | null>(null)
   const isConnected = shallowRef(false)
-  const wsHost = 'wss://quote-testnet.edgex.exchange'
+  const wsHost = 'wss://quote.edgex.exchange'
   // const WS_URL = `wss://quote.edgex.exchange/api/v1/public/ws`
 
 
-  const wsResult = reactive<Record<(typeof WSEventType)[keyof typeof WSEventType], any>>({
-
+  const wsResult = reactive<Record<(typeof WSPerpEventType)[keyof typeof WSPerpEventType], any>>({
+    [WSPerpEventType.TICKER_ALL_1S]: null,
   })
 
   // 将 createWebSocket 重命名为 init
