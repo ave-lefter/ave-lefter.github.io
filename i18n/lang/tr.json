@@ -510,5 +510,9 @@
   "transferToken": "Aktarma jetonunu seçin",
   "depositTip": "* Mevcut Adres EVM Zinciri Universal",
   "buySetting": "kurulumu satın al",
-  "sellSetting": "kurulumu sat"
+  "sellSetting": "kurulumu sat",
+  "pasteAddress2": "Sözleşme adresi otomatik doldurmayı kapatmak için tıklayın",
+  "pasteText2": "Metin içeriği otomatik doldurmayı kapatmak için tıklayın",
+  "pasteAddress1": "Sözleşme adresi otomatik doldurmayı açmak için tıklayın",
+  "pasteText1": "Metin içeriği otomatik tamamlamayı açmak için tıklayın"
 }
