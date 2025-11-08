@@ -8,6 +8,8 @@ import { MultiContract, MultiProvider, getFeeAddress, getSigner } from '~/utils/
 import { Contract } from 'ethers'
 import { TronContract, confirmTronTx } from '~/utils/wallet/utils/tronContract'
 import { getFeeIn } from '~/utils'
+import { getTonTokenBalance, getTonTokenList } from '~/utils/wallet/ton'
+import { getTonTokenInfo } from './ton'
 
 export * from './sui'
 
@@ -28,8 +30,9 @@ export interface GetUserBalanceResponse {
   risk_level: number
   risk_score: number
 }
+export type GetUserBalanceResponseResult = { data: GetUserBalanceResponse[] ; total: number ;pageNo: number; pageSize: number }
 
-export const getUserBalance = createCacheRequest(function(
+export const getUserBalance = createCacheRequest(async function(
   {
     pageNO = 1,
     pageSize = 10,
@@ -38,18 +41,54 @@ export const getUserBalance = createCacheRequest(function(
     sort_dir = 'desc',
     hide_risk = 1,
     hide_small = 0
-  }): Promise<{ data: GetUserBalanceResponse[] ; total: number ;pageNo: number; pageSize: number }> {
-  const { $api } = useNuxtApp()
-  return $api('/v2api/user_balance/v1/swap/balance', {
-    method: 'post',
-    body: {
-      user_ids, //钱包ID
-      sort,     // 排序字段，支持：balance_usd、total_profit
-      sort_dir, //desc:倒序，asc:正序
-      pageSize,
-      pageNO,
-      hide_risk,  //是否隐藏高分险。0:不隐藏高风险; 1：隐藏高分险;
-      hide_small  //是否隐藏小额。 大于0时:balance_usd > hide_small; 其他：不参与过滤
+  }): Promise<GetUserBalanceResponseResult> {
+  let tonAddressId = user_ids.find((i: string) => i?.endsWith?.('-ton'))
+  let otherUserIds = user_ids?.filter((i: string) => !i?.endsWith?.('-ton'))
+  let tonTokenList: any[] = []
+  let _tokens: any = {
+    data: [],
+    total: tonTokenList?.length || 0,
+    pageNo: 1,
+    pageSize
+  }
+  return Promise.all([(async () => {
+    if (tonAddressId && pageNO === 1) {
+      tonTokenList = await getTonTokenList(getAddressAndChainFromId(tonAddressId)?.address).catch(async () => [])
+      tonTokenList = tonTokenList?.map(i => ({...i, total_profit: '0', total_profit_ratio: '--', average_purchase_price_usd: '--' }))?.filter(i => {
+         return new BigNumber(i?.balance_usd || 0).gte(hide_small || 0)
+      })
+    }
+    return tonTokenList
+  })(), (async () => {
+    const { $api } = useNuxtApp()
+    if (otherUserIds?.length > 0) {
+      _tokens = await $api('/v2api/user_balance/v1/swap/balance', {
+        method: 'post',
+        body: {
+          user_ids, //钱包ID
+          sort,     // 排序字段，支持：balance_usd、total_profit
+          sort_dir, //desc:倒序，asc:正序
+          pageSize,
+          pageNO,
+          hide_risk,  //是否隐藏高分险。0:不隐藏高风险; 1：隐藏高分险;
+          hide_small  //是否隐藏小额。 大于0时:balance_usd > hide_small; 其他：不参与过滤
+        }
+      })
+    }
+    return _tokens
+  })()]).then(async (res) => {
+    console.log('tonTokenList', tonTokenList, res)
+    console.log('_tokens', _tokens)
+    if (tonTokenList?.length > 0) {
+      return {
+        ..._tokens,
+        data: [...(_tokens.data || []), ...tonTokenList].sort((a, b) => {
+          return (b[sort] - a[sort]) * (sort_dir === 'desc' ? 1 : 1)
+        }),
+        total: _tokens.total + tonTokenList?.length
+      }
+    } else {
+      return _tokens
     }
   })
 }, 1000)
@@ -153,6 +192,13 @@ export function getUserSwapTokenList(address = useWalletStore().address, chain =
   if (chain === 'solana') {
     return getSolanaTokensBalance(address) as any
   }
+  if (chain === 'ton') {
+    if (isValidAddress(address, 'ton')) {
+      return getTonTokenList(address) as any
+    } else {
+      return Promise.resolve([])
+    }
+  }
   const { $api } = useNuxtApp()
   return $api('/v1api/v3/users/balance/token', {
     method: 'get',
@@ -169,7 +215,7 @@ export const getTokenDetails= createCacheRequest(async function (data1: {
   spender?: string
 }) {
   const { tokenAddress, chain, spender } = data1
-  const canSwapChain = isEvmChain(chain) || chain === 'solana' || chain === 'tron' || chain === 'sui'
+  const canSwapChain = isEvmChain(chain) || chain === 'solana' || chain === 'tron' || chain === 'sui' || chain === 'ton'
   const account = useWalletStore().address
   if (!chain || !tokenAddress || !canSwapChain) {
     return {
@@ -289,6 +335,13 @@ export const getTokenDetails= createCacheRequest(async function (data1: {
       address: tokenAddress,
       initBalance: balance.toString(),
       chain: chain,
+      allowance: MAX_UINT_AMOUNT
+    }
+  }
+  if (chain === 'ton') {
+    let tokenInfo = await getTonTokenInfo(account, tokenAddress)
+    return {
+      ...tokenInfo,
       allowance: MAX_UINT_AMOUNT
     }
   }
@@ -435,6 +488,9 @@ export async function getBalance(tokenAddress: string, chain = useWalletStore().
     const balance = tokenDetails?.value[0]?.account?.data?.parsed?.info?.tokenAmount?.amount || 0
     return new BigNumber(balance).toFixed(0)
   }
+  if (chain === 'ton') {
+    return getTokenDetails({tokenAddress, chain: 'ton'}).then(async res => res?.balance || '0')
+  }
   if (!/^0x[0-9a-zA-Z]{40}$/.test(account)) {
     return '0'
   }
@@ -516,6 +572,20 @@ export async function getBalanceAndAllowance(tokenAddress: string, spender = get
     return {
       allowance: new BigNumber(MAX_UINT_AMOUNT),
       balance: balance
+    }
+  }
+  if (chain === 'ton') {
+    if (isValidAddress(account, 'ton')) {
+      let balance = await getTonTokenBalance(account, tokenAddress)
+      return {
+        balance: new BigNumber(balance as string),
+        allowance: new BigNumber(MAX_UINT_AMOUNT)
+      }
+    } else {
+      return {
+        balance: new BigNumber(0),
+        allowance: new BigNumber(MAX_UINT_AMOUNT)
+      }
     }
   }
   let balance = new BigNumber(0)

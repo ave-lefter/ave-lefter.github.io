@@ -2,7 +2,7 @@
 import BigNumber from 'bignumber.js'
 import {ElNotification} from 'element-plus'
 import {useStorage} from '@vueuse/core'
-import {bot_createSolTx, bot_createSwapEvmTx, bot_getTokenBalance} from '~/api/bot'
+import {bot_createSolTx, bot_createSwapEvmTx, bot_createSwapTonTx, bot_getTokenBalance} from '~/api/bot'
 import { formatBotGasTips } from '~/utils/bot'
 import type { BotChain, BotSettingKey } from '~/utils/types'
 import useWalletSwap from './quickSwap/wallet'
@@ -115,7 +115,7 @@ async function submitSwap(amount: string) {
       return
     }
   }
-  const {gasTip1List, gasTip2List} = formatBotGasTips(useBotSwapStore().gasTip, 'solana')
+  const {gasTip1List, gasTip2List} = formatBotGasTips(useBotSwapStore().gasTip, chain)
   const gasTips = currentBotSetting?.mev ? gasTip1List : gasTip2List
   const settings = currentBotSetting?.mev ? currentBotSetting?.gas[0] : currentBotSetting?.gas?.[1]
   let data: any = {}
@@ -125,7 +125,7 @@ async function submitSwap(amount: string) {
       priorityFee = '0.002'
     }
     data.priorityFee = new BigNumber(priorityFee).times(10 ** 9).toFixed(0)
-  } else {
+  } else if (chain !== 'ton') {
     const gasPrice = Number(settings?.customFee) === 0 ? '0' : (settings?.customFee || gasTips?.[settings?.level as number] || '3')
     data.gasTip = Number(new BigNumber(gasPrice).times(10 ** 9).toFixed(0))
     data.contractType = 0
@@ -137,10 +137,11 @@ async function submitSwap(amount: string) {
   if (!creatorAddress) {
     return
   }
+  const batchId = Date.now().toString()
   data = {
     ...data,
-    batchId: Date.now().toString(),
     swapList: [{
+      batchId,
       creatorAddress,
       inAmount: new BigNumber(amount || 0)
         .times(10 ** nativeToken.value.decimals || 0).toFixed(0)
@@ -157,8 +158,14 @@ async function submitSwap(amount: string) {
     autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
     autoSellPriorityFee: isSolana ? data.priorityFee : data.gasTip
   }
-  const tx = isSolana ? bot_createSolTx(data) : bot_createSwapEvmTx(data)
-  tx.then(res => handleTxSuccess(res, data.batchId))
+
+  let tx = bot_createSwapEvmTx
+  if (isSolana) {
+    tx = bot_createSolTx as any
+  } else if (chain === 'ton') {
+    tx = bot_createSwapTonTx
+  }
+  tx(data).then(res => handleTxSuccess(res, batchId))
     .catch(err => {
       handleBotError(err || 'swap error')
       loadingSwap.value = false
@@ -176,12 +183,18 @@ function handleTxSuccess(res: any, _batchId: string) {
     }, 500)
     const chain = props.row.chain
     const txInfo: any = res?.[0] || {}
+    const recordTxUrlObj = {
+      solana: '/botapi/swap/createSolTx',
+      ton: '/botapi/swap/createSwapTonTx',
+    }
+
     recordTxV2({
       txInfo,
       chain: chain,
-      destination: chain === 'solana' ? '/botapi/swap/createSolTx' : '/botapi/swap/createSwapEvmTx' ,
+      destination: recordTxUrlObj?.[chain as 'solana' | 'ton'] || '/botapi/swap/createSwapEvmTx' ,
       type: 10
     })
+
     const batchIdObj = {
       [txInfo?.batchId]: txInfo?.id
     }

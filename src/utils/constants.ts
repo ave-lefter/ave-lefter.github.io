@@ -19,6 +19,8 @@ export function getNativeToken(chain: string) {
     ton: 'TON',
   } as any)[chain] || NATIVE_TOKEN
 }
+
+export const BotNativeTokens = ['sol', 'TON', NATIVE_TOKEN]
 export const MAIN_COIN: {
   [key: string]: string
 } = {
@@ -117,7 +119,7 @@ export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
 
 export const defaultPaginationParams = {
   pageNO: 1,
-  pageSize: 10,
+  pageSize: 20,
   loaded: false,
   finished: false,
 }
@@ -191,4 +193,15 @@ export const SwapType = {
   SELL: 2,
   LIMIT_BUY: 5,
   LIMIT_SELL: 6,
+}
+
+export const CategroyTabsCacheKey = {
+  hot:'hotRanks',
+  new:'newRanks',
+  gainer:'gainerRanks',
+  pump:'pumpRanks',
+  inclusion:'inclusionRanks',
+  binance_alpha:'binance_alphaRanks',
+  xstocks:'xstocksRanks',
+  volume:'volumeRanks',
 }

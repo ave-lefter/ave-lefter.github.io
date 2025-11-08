@@ -98,7 +98,7 @@ export const useTokenStore = defineStore('token', () => {
       status =
         (token?.value?.risk_level ?? 0) >= 0 &&
         !token?.value?.logo_url &&
-        !token?.value?.is_audited
+        !tokenInfo?.value?.is_audited
     }
     return status
   })

@@ -29,7 +29,7 @@
       <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-12px color-[--third-text] ml-auto mr-4px cursor-pointer" />
       <span>{{ botPriorityFee }} SOL</span>
     </template>
-    <template v-if="activeTab === 'buy' && swapType === 'market' && (botSettings?.[chain || ''] || botSettings?.[chain || '']?.[activeTab])">
+    <template v-if="chain !== 'ton' && activeTab === 'buy' && swapType === 'market' && (botSettings?.[chain || ''] || botSettings?.[chain || '']?.[activeTab])">
       <span class="mr-4px ml-auto color-[--third-text]">{{ $t('autoSellHalf') }}</span>
       <el-switch
         v-model="botSettingStore.autoSellConfigs.autoSell"
@@ -103,7 +103,7 @@ function getEstimatedGas() {
     const botSettings = botSettingStore.botSettings?.[chain]?.[props.activeTab]?.[selected]
     const mev = botSettings?.mev
     const _nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || 0
-    const nativePrice = (tokenStore.swap.payToken.address === 'sol' || tokenStore.swap.token.address === NATIVE_TOKEN) ? _nativePrice : tokenStore.swap.payToken.price || 0
+    const nativePrice = BotNativeTokens?.includes(tokenStore.swap.payToken.address || '') ? _nativePrice : tokenStore.swap.payToken.price || 0
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
     const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]

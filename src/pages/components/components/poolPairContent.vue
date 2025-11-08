@@ -244,13 +244,14 @@ function addTokenFavorite(row, newGroupId: number) {
               </div>
             </template>
           </el-tooltip>
-          <Icon
+          <!-- <Icon
             v-if="enableKline"
             v-tooltip="!activeKline?$t('kline'):$t('hidekline')"
             name="custom:kline" class="text-12px ml-4px hover:color-[--secondary-text]"
             :class="activeKline ? 'color-[--secondary-text]' : 'color-[--third-text]'"
             @click.self.stop="toggleKline"
-          />
+          /> -->
+          <Icon v-if="row.headline" v-tooltip="row.headline" class="ml-4px" name="custom:ai"/>
         </div>
         <div class="flex items-center lh-12px">
           <div

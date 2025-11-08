@@ -292,7 +292,8 @@ function  getLimitAllowance() {
   const limitFromToken = swapStore.activeTab === 0 ? swapStore.token2 : swapStore.token1
   if (walletStore.chain && walletStore.chain === limitFromToken.chain && limitFromToken.address) {
     const chain = limitFromToken.chain || walletStore.chain
-    if (chain === 'solana') {
+
+    if (['solana', 'ton', 'sui'].includes(chain)) {
       return
     }
     const limitContract = LimitContracts[chain]

@@ -2,7 +2,7 @@
 import THead from './tHead.vue'
 import {getUserBalance, type GetUserBalanceResponse} from '~/api/swap'
 import type {IAssetResponse, IPriceV2Response} from '~/api/types/ws'
-import {bot_createSolTx, bot_createSwapEvmTx, bot_getTokenBalance} from '~/api/bot'
+import {bot_createSolTx, bot_createSwapEvmTx, bot_createSwapTonTx, bot_getTokenBalance} from '~/api/bot'
 import {ElNotification} from 'element-plus'
 import {formatBotGasTips} from '~/utils/bot'
 import BigNumber from 'bignumber.js'
@@ -269,7 +269,7 @@ const listStatus = shallowRef({
   finished: false,
   loading: false,
   pageNo: 1,
-  pageSize: 10
+  pageSize: 20
 })
 const listData = shallowRef<(GetUserBalanceResponse & { index: string })[]>([])
 
@@ -433,10 +433,11 @@ async function submitSwap(balance: number, row: GetUserBalanceResponse & { index
   if (!creatorAddress) {
     return
   }
+  const batchId = Date.now().toString()
   data = {
     ...data,
-    batchId: Date.now().toString(),
     swapList: [{
+      batchId,
       creatorAddress,
       inAmount: new BigNumber(balance || 0)
         .times(10 ** row.decimals || 0).toFixed(0)
@@ -448,8 +449,13 @@ async function submitSwap(balance: number, row: GetUserBalanceResponse & { index
     slippage: slippage !== 'auto'
       ? Number(new BigNumber(slippage || '9').times(100).toFixed(0)) : 900
   }
-  const tx = isSolana ? bot_createSolTx(data) : bot_createSwapEvmTx(data)
-  tx.then(res => handleTxSuccess(res, data.batchId, row.index, row))
+  let tx = bot_createSwapEvmTx
+  if (isSolana) {
+    tx = bot_createSolTx as any
+  } else if (row.chain === 'ton') {
+    tx = bot_createSwapTonTx
+  }
+  tx(data).then(res => handleTxSuccess(res, batchId, row.index, row))
     .catch(err => {
       handleBotError(err || 'swap error')
       loadingSwap.value[row.index] = false
@@ -465,12 +471,19 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
     }, 500)
     const chain = row?.chain || ''
     const txInfo: any = res?.[0] || {}
+
+    const recordTxUrlObj = {
+      solana: '/botapi/swap/createSolTx',
+      ton: '/botapi/swap/createSwapTonTx',
+    }
+
     recordTxV2({
       txInfo,
       chain: chain,
-      destination: chain === 'solana' ? '/botapi/swap/createSolTx' : '/botapi/swap/createSwapEvmTx' ,
+      destination: recordTxUrlObj?.[chain as 'solana' | 'ton'] || '/botapi/swap/createSwapEvmTx' ,
       type: 10
     })
+
     const batchIdObj = {
       [txInfo?.batchId]: txInfo?.id
     }

@@ -8,6 +8,7 @@
   <TokenDetails/>
   <!-- 手动引入 custom:checked -->
   <Icon style="display: none;" name="custom:checked" />
+
 </template>
 
 <script setup lang='ts'>

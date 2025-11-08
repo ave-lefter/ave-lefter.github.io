@@ -10,7 +10,7 @@
           <el-dropdown placement="bottom" trigger="click" @visible-change="visible => show = visible">
             <div class="inline-flex items-center clickable">
               <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50%" height="20"  alt="" srcset="" >
-              <Icon class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
+              <Icon v-if="swapBaseTokens?.length > 1" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
             </div>
             <template #dropdown>
               <el-dropdown-menu>
@@ -60,7 +60,7 @@
           <el-dropdown placement="bottom" trigger="click" @visible-change="visible => show = visible">
             <div class="inline-flex items-center clickable text-12px ml-4px">
               <span>{{ tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }}</span>
-              <Icon class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
+              <Icon v-if="swapBaseTokens?.length > 1" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
             </div>
             <template #dropdown>
               <el-dropdown-menu>
@@ -110,7 +110,7 @@
         </el-input>
       </div>
     </template>
-    <AutoSellSet v-if="activeTab === 'buy' && swapType==='market'" class="mt-15px" />
+    <AutoSellSet v-if="activeTab === 'buy' && swapType==='market' && chain !=='ton'" class="mt-15px" />
     <template v-if="isSupportSwap">
       <el-button v-if="!isApprove" :color="swapButtonColor" class="submit-btn" native-type="button" :loading="loadingApprove || loadingSwap || loadingAllowance" :disabled="Number(fromToken.balance) < Number(fromAmount)" @click.stop="approve">{{ Number(fromToken.balance) === 0 || Number(fromToken.balance) < Number(fromAmount) ? (checkAmountMessage() || $t('approve')) : $t('approve') }}</el-button>
 
@@ -172,7 +172,7 @@ import { debounce } from 'lodash-es'
 import { getAddressAndChainFromId, isEvmChain, getRpcProvider } from '@/utils'
 import { ElMessageBox } from 'element-plus'
 import { useBotSwap } from '~/composables/botSwap'
-import { bot_createSolTx, bot_createSwapEvmTx, bot_createSolLimitTx, bot_createEvmLimitTx } from '@/api/bot'
+import { bot_createSolTx, bot_createSwapEvmTx, bot_createSolLimitTx, bot_createEvmLimitTx, bot_createSwapTonTx, bot_createTonLimitSwap } from '@/api/bot'
 import RefreshBalance from './refreshBalance.vue'
 import { formatDec, formatNumber } from '@/utils/formatNumber'
 import { useEventBus } from '@vueuse/core'
@@ -353,11 +353,15 @@ function getAddressFromChain(chain: BotChain, addresses: typeof botStore.walletL
 }
 
 function getAddressFromChainBalance(chain: BotChain, addresses: typeof botStore.walletList[number]['addresses'], token?: string) {
-  if (token === NATIVE_TOKEN || token === 'sol' || !token) {
+  if (BotNativeTokens?.includes(token || '') || !token) {
     return getAddressFromChain(chain, addresses)?.balance || 0
   }
   return getAddressFromChain(chain, addresses)?.tokenBalances?.[token]?.balance || 0
 }
+
+const swapBaseTokens = computed(() => {
+  return (botSwapStore?.botSwapBaseTokens?.[chain.value || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)
+})
 
 const totalSelectWalletBalance = computed(() => {
   const chain = getChain()
@@ -533,7 +537,7 @@ async function quoteBot(chain: string, type = props.activeTab, isGetPrice = true
 
   const payToken = tokenStore.swap.payToken
 
-  const payTokenPrice = (['sol', NATIVE_TOKEN].includes(payToken?.address || '') ? nativePrice : tokenStore.swap.payToken.price) || 0
+  const payTokenPrice = (BotNativeTokens?.includes(payToken?.address || '') ? nativePrice : tokenStore.swap.payToken.price) || 0
 
   let price: number = tokenStore.price || tokenStore.swap.token?.price || 0
   if (props.swapType === 'limit') {
@@ -561,7 +565,6 @@ async function quoteBot(chain: string, type = props.activeTab, isGetPrice = true
     swapQuoteInfo.from_price = fromPrice || 0
     swapQuoteInfo.to_price = toPrice || 0
     quoteLoading.value = false
-    console.log('swapQuoteInfo', swapQuoteInfo)
     return
   }
 }
@@ -676,13 +679,13 @@ async function submitBotSwap() {
   const native = tokenStore.swap.payToken?.address || chainMainToken?.[chain] || NATIVE_TOKEN
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
   const isBatchSell = botSwapStore.botSwapSelectedWallets.length > 1 && props.activeTab === 'sell'
-  if (chain === 'solana') {
+  if (chain === 'solana' || chain === 'ton') {
     // let mev = this.botSettings?.solana?.mev
-    const selected = botSettingStore?.botSettings?.solana?.[props.activeTab]?.selected || botSettingStore?.botSettings?.solana?.selected || 's1'
-    const botSettings = botSettingStore.botSettings?.solana?.[props.activeTab]?.[selected]
+    const selected = botSettingStore?.botSettings?.[chain]?.[props.activeTab]?.selected || botSettingStore?.botSettings?.[chain]?.selected || 's1'
+    const botSettings = botSettingStore.botSettings?.[chain]?.[props.activeTab]?.[selected]
     const mev = botSettings?.mev
 
-    const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, 'solana')
+    const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
     const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]
     let priorityFee = settings?.customFee || gasTips?.[settings?.level as number] || '0.002'
@@ -694,7 +697,7 @@ async function submitBotSwap() {
     // botPriorityFee = botPriorityFee.lt(min) ? min : botPriorityFee.toFixed(0)
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
-    const slippage = botSettingStore.botSettings?.solana?.[botSettingStore.botSettings?.solana?.selected]?.slippage || 9
+    const slippage = botSettingStore.botSettings?.[chain]?.[botSettingStore.botSettings?.[chain]?.selected]?.slippage || 9
     const batchId = Date.now().toString()
     const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
       const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
@@ -724,10 +727,13 @@ async function submitBotSwap() {
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellPriorityFee: botPriorityFee
     }
-
-    bot_createSolTx(data).then(res => {
+    const bot_createTx = {
+      solana: bot_createSolTx,
+      ton: bot_createSwapTonTx
+    }
+    bot_createTx[chain](data).then(res => {
       if (res) {
-        const chain = 'solana'
+        // const chain = 'solana'
         const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
         res?.forEach?.((txInfo: any) => {
           const walletName = botStore.walletList?.find?.(j => j?.addresses?.find?.(k => k?.chain === chain)?.address === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
@@ -757,10 +763,16 @@ async function submitBotSwap() {
               return
             }
           }
+
+          const recordTxUrlObj = {
+            solana: '/botapi/swap/createSolTx',
+            ton: '/botapi/swap/createSwapTonTx',
+          }
+
           recordTxV2({
             txInfo,
             chain: chain,
-            destination: chain === 'solana' ? '/botapi/swap/createSolTx' : '/botapi/swap/createSwapEvmTx' ,
+            destination: recordTxUrlObj?.[chain] || '/botapi/swap/createSwapEvmTx' ,
             type: 10
           })
           const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
@@ -931,13 +943,13 @@ function submitBotLimit() {
   const native = tokenStore.swap.payToken?.address || chainMainToken?.[chain] || NATIVE_TOKEN
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
   const isBatchSell = botSwapStore.botSwapSelectedWallets.length > 1 && props.activeTab === 'sell'
-  if (chain === 'solana') {
+  if (chain === 'solana' || chain === 'ton') {
     // let mev = this.botSettings?.solana?.mev
-    const selected = botSettingStore?.botSettings?.solana?.[props.activeTab]?.selected || botSettingStore.botSettings?.solana?.selected || 's1'
-    const botSettings = botSettingStore.botSettings?.solana?.[selected]
+    const selected = botSettingStore?.botSettings?.[chain]?.[props.activeTab]?.selected || botSettingStore.botSettings?.[chain]?.selected || 's1'
+    const botSettings = botSettingStore.botSettings?.[chain]?.[selected]
     const mev = botSettings?.mev
 
-    const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, 'solana')
+    const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
     const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]
     let priorityFee = settings?.customFee || gasTips?.[settings?.level as number] || '0.002'
@@ -950,7 +962,7 @@ function submitBotLimit() {
     // botPriorityFee = botPriorityFee.lt(min) ? min : botPriorityFee.toFixed(0)
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     // const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.native
-    const slippage = botSettingStore.botSettings?.solana?.[botSettingStore.botSettings?.solana?.selected]?.slippage || 9
+    const slippage = botSettingStore.botSettings?.[chain]?.[botSettingStore.botSettings?.[chain]?.selected]?.slippage || 9
     const batchId = Date.now().toString()
     const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
       const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
@@ -976,12 +988,17 @@ function submitBotLimit() {
       slippage: slippage !== 'auto' ? Number(new BigNumber(slippage).times(100).toFixed(0)) : 900,
       autoSlippage: slippage === 'auto'
     }
-    bot_createSolLimitTx(data).then(res => {
+
+    const bot_createLimitTx = {
+      solana: bot_createSolLimitTx,
+      ton: bot_createTonLimitSwap
+    }
+    bot_createLimitTx[chain](data).then(res => {
       if (res) {
         const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
         res?.forEach?.((txInfo: any) => {
           console.log('txInfo', txInfo, botStore.walletList)
-          const walletName = botStore.walletList?.find?.(j => j?.addresses?.find?.(k => k?.chain === 'solana')?.address === txInfo?.creatorAddress)?.name || ''
+          const walletName = botStore.walletList?.find?.(j => j?.addresses?.find?.(k => k?.chain === chain)?.address === txInfo?.creatorAddress)?.name || ''
           console.log('walletName', walletName)
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
             // this.$store.state.bot.limitHistoryUpdate++
@@ -1015,10 +1032,16 @@ function submitBotLimit() {
               return
             }
           }
+
+          const recordTxUrlObj = {
+            solana: '/botapi/swap/createSolLimitTx',
+            ton: '/botapi/swap/createTonLimitSwap',
+          }
+
           recordTxV2({
             txInfo,
             chain: chain,
-            destination: '/botapi/swap/createSolLimitTx',
+            destination: recordTxUrlObj?.[chain] || '/botapi/swap/createEvmLimitTx',
             type: 20
           })
           const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
