@@ -125,7 +125,7 @@ const { hotList,dialogVisible_search,dialogSearchText:query } = storeToRefs(useG
 const {currentAddress} =storeToRefs(useFollowStore())
 
 const openPasteAddress = useStorage('openPasteAddress', true, localStorage)
-const openPasteText = useStorage('openPasteText', true, localStorage)
+const openPasteText = useStorage('openPasteText', false, localStorage)
 // const { modelValue } = defineProps({
 //   modelValue: Boolean,
 // })

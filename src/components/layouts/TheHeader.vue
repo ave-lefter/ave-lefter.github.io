@@ -292,7 +292,7 @@ const  appDownloadVisible = shallowRef(false)
 const botTipDialogRef = useTemplateRef('botTipDialogRef')
 
 const openPasteAddress = useStorage('openPasteAddress', true, localStorage)
-const openPasteText = useStorage('openPasteText', true, localStorage)
+const openPasteText = useStorage('openPasteText', false, localStorage)
 
 const list = computed(() => {
   // let query = ''
