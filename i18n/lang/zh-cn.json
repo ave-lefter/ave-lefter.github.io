@@ -1458,8 +1458,8 @@
   "twitterTime": "推文时间",
   "useChainWallet": "请使用链钱包交互当前代币",
   "pushSettings": "推送设置",
-  "newFeature": "新功能",
-  "CreatePair": "创建池子",
+  "newFeature":  "新功能",
+  "CreatePair":  "创建池子",
   "buySetting": "买入设置",
   "sellSetting": "卖出设置",
   "walletList": "钱包列表",
@@ -1485,5 +1485,9 @@
   "botCancelAllOrder": "确认取消所有钱包的当前挂单",
   "or":"或者",
   "optional": "可选",
-  "tonInsufficientBalance": "TON 余额不足"
+  "tonInsufficientBalance": "TON 余额不足",
+  "pasteAddress2": "点击关闭合约地址自动填充",
+  "pasteText2": "点击关闭文本内容自动填充",
+  "pasteAddress1": "点击打开合约地址自动填充",
+  "pasteText1": "点击打开文本内容自动填充"
 }

@@ -1487,5 +1487,9 @@
   "roundUpDisplay": "Round up Display",
   "twitterTime": "Twitter Time",
   "optional": "Optional",
-  "tonInsufficientBalance": "Insufficient TON"
+  "tonInsufficientBalance": "Insufficient TON",
+  "pasteAddress2": "Click to turn off contract address autofill",
+  "pasteText2": "Click to turn off text content autofill",
+  "pasteAddress1": "Click to open contract address autofill",
+  "pasteText1": "Click to turn on text content autocomplete"
 }

@@ -1380,5 +1380,9 @@
   "MaxWalletAmount": "1ウォレットあたりの最大数量",
   "riskRemoved": "リスク解除",
   "buySetting": "セットアップを購入する",
-  "sellSetting": "販売セットアップ"
+  "sellSetting": "販売セットアップ",
+  "pasteAddress2": "クリックして契約住所の自動入力をオフにします",
+  "pasteText2": "クリックしてテキストコンテンツの自動入力をオフにします",
+  "pasteAddress1": "クリックして契約住所の自動入力を開きます",
+  "pasteText1": "クリックしてテキスト コンテンツのオートコンプリートをオンにします"
 }

@@ -515,5 +515,9 @@
   "transferToken": "Selecione Token de transferência",
   "depositTip": "* Endereço atual EVM Chain Universal",
   "buySetting": "comprar configuração",
-  "sellSetting": "configuração de venda"
+  "sellSetting": "configuração de venda",
+  "pasteAddress2": "Clique para desativar o preenchimento automático do endereço do contrato",
+  "pasteText2": "Clique para desativar o preenchimento automático de conteúdo de texto",
+  "pasteAddress1": "Clique para abrir o preenchimento automático do endereço do contrato",
+  "pasteText1": "Clique para ativar o preenchimento automático de conteúdo de texto"
 }

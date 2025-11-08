@@ -1444,8 +1444,8 @@
   "roundUpDisplay": "取整展示",
   "twitterTime": "推文時間",
   "pushSettings": "推送設置",
-  "newFeature": "新功能",
-  "CreatePair": "創建池子",
+  "newFeature":  "新功能",
+  "CreatePair":  "創建池子",
   "buySetting": "買入設置",
   "sellSetting": "賣出設置",
   "walletList": "錢包清單",
@@ -1471,5 +1471,9 @@
   "botCancelAllOrder": "確認取消所有錢包的當前掛單",
   "or":"或者",
   "optional": "可選",
-  "tonInsufficientBalance": "TON 餘額不足"
+  "tonInsufficientBalance": "TON 餘額不足",
+  "pasteAddress2": "點擊關閉合約地址自動填充",
+  "pasteText2": "點擊關閉文本內容自動填充",
+  "pasteAddress1": "點擊打開合約地址自動填充",
+  "pasteText1": "點擊打開文本內容自動填充"
 }
