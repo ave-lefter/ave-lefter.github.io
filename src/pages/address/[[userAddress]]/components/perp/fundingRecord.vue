@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { SuffixIcon } from '#components'
 import dayjs from 'dayjs'
 
 const { t } = useI18n()
-const typeDict = {
+const typeDict = computed(()=>({
   ORDER_TYPE_NORMAL_DEPOSIT:{
     value:'ORDER_TYPE_NORMAL_DEPOSIT',
     label:t('normalDeposit')
@@ -31,7 +32,13 @@ const typeDict = {
     value:'ORDER_TYPE_INTERNAL_DEPOSIT',
     label:t('internalDeposit')
   }
-}
+}))
+const searchParams = ref({
+  typeList:'ALL',
+  startTime:'',
+  endTime:''
+})
+const typeOptions = computed(()=>[{label:t('all'),value:'ALL'}].concat(Object.values(typeDict.value)))
 const statusDict = {
   6:t('success'),
 }
@@ -60,9 +67,54 @@ function counterpartyAccount(sender:string,receiver:string) {
   if(sender === '0' && receiver === '0') return '--'
   return sender || receiver
 }
+const disabledStartDate = (date:Date)=>{
+    if(searchParams.value.endTime){
+    return dayjs(date).isAfter(dayjs(Number(searchParams.value.endTime)*1000)) 
+    }
+    return false
+}
+const disabledEndDate = (date:Date)=>{
+  if(searchParams.value.startTime){
+    return dayjs(date).isBefore(dayjs(Number(searchParams.value.startTime)*1000))
+  }
+  return false
+}
 </script>
 
 <template>
+  <div class="flex items-center justify-end gap-8px mb-16px">
+    <el-select v-model="searchParams.typeList" size="small" class="[&&]:[--el-select-width:110px]" popper-class="[--el-font-size-base:12px]" :suffix-icon="SuffixIcon">
+      <template #prefix>
+        <span>{{ t('type') }}</span>
+      </template>
+      <el-option v-for="item in typeOptions" :key="item.value"  :label="item.label" :value="item.value"/>
+    </el-select>
+    <div class="flex items-center gap-4px text-12px">
+        <el-date-picker
+          v-model="searchParams.startTime"
+          size="small"
+          :disabled-date="disabledStartDate"
+          class="[--el-font-size-base:12px] [&&]:[--el-date-editor-width:120px]"
+          range-separator="To"
+          format="YYYY-MM-DD"
+          :placeholder="t('startTime')"
+          value-format="X"
+          :teleported="false"
+        />
+        {{ $t('to') }}
+        <el-date-picker
+          v-model="searchParams.endTime"
+          size="small"
+          :disabled-date="disabledEndDate"
+          class="[--el-font-size-base:12px] [&&]:[--el-date-editor-width:120px]"
+          range-separator="To"
+          format="YYYY-MM-DD"
+          :placeholder="t('endTime')"
+          value-format="X"
+          :teleported="false"
+        />
+      </div>
+  </div>
   <el-table :data="list" header-row-class-name="text-12px sticky top-0 z-10 font-500" cell-class-name="color-[--main-text] text-12px" row-class-name="cursor-pointer">
       <el-table-column :label="t('tradeTime')" prop="time" >
         <template #default="{ row }">
@@ -84,7 +136,7 @@ function counterpartyAccount(sender:string,receiver:string) {
           {{ formatNumber(row.amount) }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('coin')" prop="coin" />
+      <el-table-column :label="t('tokenName')" prop="coin" />
       <el-table-column :label="t('fee')" prop="fee" >
         <template #default="{ row }">
           <template v-if="row.fee || row.fee===0">${{ formatNumber(row.fee) }}</template>
@@ -99,7 +151,9 @@ function counterpartyAccount(sender:string,receiver:string) {
         </el-table-column>
       <el-table-column :label="t('tradeId')" prop="txId" >
         <template #default="{ row }">
-          {{row.txId.slice(0,4)+'...' + row.txId.slice(-4)}}<Icon name="custom:share1" class="color-[--thrid-color] ml-4px" @click="jumpToTx(row.chainId,row.txId)"/>
+          <div class="flex items-center gap-4px">
+            {{row.txId.slice(0,4)+'...' + row.txId.slice(-4)}}<Icon name="custom:share1" class="color-[--third-text] hover:color-[--main-text]" @click="jumpToTx(row.chainId,row.txId)"/>
+          </div>
         </template>
       </el-table-column>
     </el-table>
