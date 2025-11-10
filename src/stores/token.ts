@@ -34,11 +34,38 @@ export const useTokenStore = defineStore('token', () => {
   const token = computed(() => tokenInfo.value?.token)
   const pairs = computed(() => tokenInfo.value?.pairs)
   const pairAddress = useSessionStorage('token_pairAddress', '')
+  const selectedToken =  useSessionStorage('token_selectedToken', false)
   const pair = computed(() => {
     if (pairAddress.value) {
       return pairs.value?.find(pair => pair.pair === pairAddress.value) || null
     }
     return pairs.value?.[0] || null
+  })
+
+  const tokenAllPair = computed(() => {
+    if (!SupportTokenKlineChains?.includes?.(token.value?.chain || '')) {
+      return null
+    }
+    const _pairs = tokenInfo.value?.pairs
+    const init_reserve = _pairs?.reduce((pre, item) => {
+      return new BigNumber(pre || 0).plus(item.target_token === item.token0_address ? item.init_reserve0 : item.init_reserve1).toFixed()
+    }, '0')
+    const reserve = _pairs?.reduce((pre, item) => {
+      return new BigNumber(pre || 0).plus(item.target_token === item.token0_address ? item.reserve0 : item.reserve1).toFixed()
+    }, '0')
+
+    const reserveU = _pairs?.reduce((pre, item) => {
+      return new BigNumber(pre || 0).plus(item.target_token === item.token0_address ? new BigNumber(item.reserve1 || 0).times(item.token1_price_usd || 0) : new BigNumber(item.reserve0 || 0).times(item.token0_price_usd || 0)).toFixed()
+    }, '0')
+    return {
+      token: token.value?.token,
+      symbol: token.value?.symbol,
+      chain: token.value?.chain,
+      init_reserve,
+      reserve,
+      price: price.value || 0,
+      reserveU
+    }
   })
   const tokenPrice = shallowRef(0)
   const tokenPriceChange = shallowRef(0)
@@ -106,8 +133,15 @@ export const useTokenStore = defineStore('token', () => {
     return (token?.value?.risk_level ?? 0) < 0 || warningStatus.value
   })
 
-  function switchPair(pair1: TokenInfo['pairs'][0]['pair']) {
+  function switchPair(pair1: TokenInfo['pairs'][0]['pair'] | boolean) {
     const pairs = tokenInfo.value?.pairs || []
+    if (typeof pair1 === 'boolean') {
+      pairAddress.value = pairs?.[0]?.pair
+      selectedToken.value = pair1
+      return
+    } else {
+      selectedToken.value = false
+    }
     if (!pairs) return
     const isPair = pairs?.some(pair2 => pair2.pair === pair1)
     if (isPair) {
@@ -269,7 +303,9 @@ export const useTokenStore = defineStore('token', () => {
     tokenInfoExtra,
     token,
     pairs,
+    tokenAllPair,
     pairAddress,
+    selectedToken,
     pair,
     price,
     priceChange,

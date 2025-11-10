@@ -117,6 +117,8 @@ export const ProvideType = {
 export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer','fsc']
 export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
 
+export const SupportTokenKlineChains = ['juchain', 'arbitrum', 'optimism']
+
 export const defaultPaginationParams = {
   pageNO: 1,
   pageSize: 20,
