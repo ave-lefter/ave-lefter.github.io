@@ -191,6 +191,26 @@ export const useBotSwapStore = defineStore('botSwap', () => {
         price: 1,
         logo_url: 'token_icon/solana/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v.png'
       },
+    ],
+    ton: [
+      {
+        chain: 'ton',
+        balance: '0',
+        symbol: 'TON',
+        decimals: 9,
+        address: 'TON',
+        price: 1,
+        logo_url: 'token_icon/ton/EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c.png'
+      },
+      // {
+      //   chain: 'ton',
+      //   balance: '0',
+      //   symbol: 'USD₮',
+      //   decimals: 6,
+      //   address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+      //   price: 1,
+      //   logo_url: 'token_icon/ton/EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs.png'
+      // }
     ]
   })
 

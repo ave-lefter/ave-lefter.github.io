@@ -35,7 +35,7 @@ export const useBotStore = defineStore('bot', () => {
   const walletStore = useWalletStore()
   const configStore = useConfigStore()
   const tokenStore = useTokenStore()
-  const isSupportChains = ['eth', 'bsc', 'solana', 'base', 'xlayer'] as const
+  const isSupportChains = ['eth', 'bsc', 'solana', 'base', 'xlayer', 'ton'] as const
   const isSupportEvmChains = computed(() => {
     const chainConfig = configStore.chainConfig
     const isEvmChainWallet = getChainInfo(walletStore.chain)?.vm_type === 'evm'
@@ -114,7 +114,8 @@ export const useBotStore = defineStore('bot', () => {
       return res?.map((i: { balance: any; decimals: any; decimal: any; token: string; chain: any }) => {
         const balance = i.balance
         const decimals = i.decimals || i.decimal || 0
-        const token = i.token === 'sol' ? 'So11111111111111111111111111111111111111112' : i.token
+        let token = i.token === 'sol' ? 'So11111111111111111111111111111111111111112' : i.token
+        token = token === 'TON' ? NATIVE_TOKEN : token
         return {
           ...i,
           initBalance: balance,
@@ -132,7 +133,7 @@ export const useBotStore = defineStore('bot', () => {
     for(let k = 0; k < walletList.value.length; k++) {
       let i = walletList.value[k]
       let _item: typeof item | string = item
-      if (item?.address === NATIVE_TOKEN || item?.address === 'sol') {
+      if (BotNativeTokens?.includes(item?.address || '')) {
         _item = item.chain
       }
       _getUserAllChainBalance(i?.addresses || [], _item)
@@ -547,7 +548,7 @@ export const useBotStore = defineStore('bot', () => {
       const token = data?.transfer?.token
       const chain = data?.transfer?.chain
       const wrapToken = getChainInfo(chain)?.wmain_wrapper
-      if (token && (token === NATIVE_TOKEN || token === 'sol' || token === wrapToken)) {
+      if (token && (BotNativeTokens?.includes(token || '') || token === wrapToken)) {
         const walletAddress = data?.client_address || ''
         // const isHasWallet = userInfo.value.addresses?.some?.(i => i?.address === walletAddress)
         const isHasWallet = walletList?.value?.some?.(i => i?.addresses?.some?.(j => j?.address === walletAddress))

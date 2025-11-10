@@ -776,5 +776,9 @@
   "upToNotifyUser": "{symbol} вырос на {rate}%",
   "downToNotifyUser": "{symbol} упал на {rate}%",
   "createNotify": "Tạo cảnh báo",
-  "placeholderNotify": "giá"
+  "placeholderNotify": "giá",
+  "pasteAddress2": "Nhấp để tắt tính năng tự động điền địa chỉ hợp đồng",
+  "pasteText2": "Nhấn để tắt tính năng tự động điền nội dung văn bản",
+  "pasteAddress1": "Nhấp để mở tự động điền địa chỉ hợp đồng",
+  "pasteText1": "Bấm để bật tính năng tự động hoàn thành nội dung văn bản"
 }

@@ -13,6 +13,7 @@ import {
   getActivityDefaultColumns,
   getActivityOptions,
 } from './activity/columnRender/columusService'
+import RankFilter from './rankFilter.vue'
 
 const emit = defineEmits<{
   (e: 'update:activeTab' | 'update:activeChain' | 'update:activeSubTab', value: string): void
@@ -24,6 +25,7 @@ const props = defineProps<{
   chains: IGetTreasureConfig[]
   activeChain: string
   activeSubTab: string
+  ammList: IGetTreasureConfig['swaps']
 }>()
 // const { t } = useI18n()
 const intervals = computed(() => {
@@ -46,7 +48,7 @@ const configMap = computed(() => {
     if(cur.is_pump && cur.category !== 'pump'){
       prev[cur.category] = {
         icon: '',
-        storageKey: `${cur.category}TableColumns`,
+        storageKey: `${cur.category}Ranks`,
         getDefaultColumns: getPumpDefault,
         getOptions: getPumpOptions,
       }
@@ -56,123 +58,60 @@ const configMap = computed(() => {
   return {
     hot: {
       icon: 'custom:hot',
-      storageKey: 'hotUserTableColumns',
+      storageKey: CategroyTabsCacheKey.hot,
       getDefaultColumns: getHotDefaultColumns,
       getOptions: getHotOptions,
       class: isHot.value ? 'color-[--yellow]' : '',
     },
     new: {
       icon: 'custom:new',
-      storageKey: 'newTableColumns',
+      storageKey: CategroyTabsCacheKey.new,
       getDefaultColumns: getNewDefaultColumns,
       getOptions: getNewOptions,
       class: isNew.value ? 'color-#85E12F' : '',
     },
     gainer: {
       icon: 'custom:gainer',
-      storageKey: 'gainUserTableColumns',
+      storageKey: CategroyTabsCacheKey.gainer,
       getDefaultColumns: getGainDefaultColumns,
       getOptions: getGainOptions,
       class: props.activeTab === 'gainer' ? 'color-#22C55E' : '',
     },
     pump: {
       icon: getPumpIcon(isPump.value),
-      storageKey: 'pumpTableColumns',
+      storageKey: CategroyTabsCacheKey.pump,
       getDefaultColumns: getPumpDefault,
       getOptions: getPumpOptions,
       class: '',
     },
-    // bonk_pump: {
-    //   icon: '',
-    //   storageKey: 'bonk_pumpTableColumns',
-    //   getDefaultColumns: getPumpDefault,
-    //   getOptions: getPumpOptions,
-    //   class: '',
-    // },
-    // four: {
-    //   icon: '',
-    //   storageKey: 'fourTableColumns',
-    //   getDefaultColumns: getPumpDefault,
-    //   getOptions: getPumpOptions,
-    //   class: '',
-    // },
-    // bonk: {
-    //   icon: '',
-    //   storageKey: 'bonkTableColumns',
-    //   getDefaultColumns: getPumpDefault,
-    //   getOptions: getPumpOptions,
-    //   class: '',
-    // },
-    // moonshot: {
-    //   icon: '',
-    //   storageKey: 'moonshotTableColumns',
-    //   getDefaultColumns: getPumpDefault,
-    //   getOptions: getPumpOptions,
-    //   class: '',
-    // },
-    // Studio: {
-    //   icon: '',
-    //   storageKey: 'StudioTableColumns',
-    //   getDefaultColumns: getPumpDefault,
-    //   getOptions: getPumpOptions,
-    //   class: '',
-    // },
-    // novabits: {
-    //   icon: '',
-    //   storageKey: 'novabitsTableColumns',
-    //   getDefaultColumns: getPumpDefault,
-    //   getOptions: getPumpOptions,
-    //   class: '',
-    // },
-    // heaven_pump:{
-    //   icon:'',
-    //   storageKey:'heaven_pumpTableColumns',
-    //   getDefaultColumns:getPumpDefault,
-    //   getOptions:getPumpOptions,
-    //   class:''
-    // },
     inclusion: {
       icon: 'custom:inclusion',
-      storageKey: 'inclusionTableColumns',
+      storageKey: CategroyTabsCacheKey.inclusion,
       getDefaultColumns: getInclusionDefaultColumns,
       getOptions: getInclusionOptions,
       class: isInclusion.value ? 'color-#B43BFF' : '',
     },
     binance_alpha: {
       icon: '',
-      storageKey: 'binance_alphaTableColumns',
-      getDefaultColumns: getActivityDefaultColumns,
-      getOptions: getActivityOptions,
-      class: '',
-    },
-    cto: {
-      icon: '',
-      storageKey: 'ctoTableColumns',
+      storageKey: CategroyTabsCacheKey.binance_alpha,
       getDefaultColumns: getActivityDefaultColumns,
       getOptions: getActivityOptions,
       class: '',
     },
     xstocks: {
       icon: '',
-      storageKey: 'xstocksTableColumns',
+      storageKey: CategroyTabsCacheKey.xstocks,
       getDefaultColumns: getActivityDefaultColumns,
       getOptions: getActivityOptions,
       class: '',
     },
     volume:{
       icon:'',
-      storageKey:'volumeTableColumns',
+      storageKey:CategroyTabsCacheKey.volume,
       getDefaultColumns:getActivityDefaultColumns,
       getOptions:getActivityOptions,
       class:''
     },
-    // xdyorswap_pump:{
-    //   icon:'',
-    //   storageKey:'xdyorswap_pumpTableColumns',
-    //   getDefaultColumns:getPumpDefault,
-    //   getOptions:getPumpOptions,
-    //   class:''
-    // },
     pumplive:{
       icon: 'custom:video',
       storageKey: '',
@@ -205,7 +144,7 @@ watch(()=>props.activeChain, () => {
 })
 function getPumpIcon(isPump: boolean) {
   if (isPump) {
-    return 'custom:pump-active'
+    return themeStore.isDark ? 'custom:pump-active' : 'custom:pump-white'
   }
   if (themeStore.isDark) {
     return 'custom:pump'
@@ -328,12 +267,14 @@ watch(()=>props.categories,()=>{
           </button>
         </div>
         <div class="flex items-center">
+          <RankFilter v-if="activeTab==='hot'" :storageKey="configMap[activeTab as keyof typeof configMap]?.storageKey"  :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns" :ammList="ammList"/>
           <el-switch v-if="isSupportedChain" v-model="globalStore.rankCommon.quickVisible" class="mr-2" />
           <QuickSwapSet
             v-if="globalStore.rankCommon.quickVisible&&isSupportedChain"
             v-model:quickBuyValue="globalStore.rankCommon.quickBuyValue"
             :class=" props.activeTab =='pumplive'? '': 'mr-12px'"
             :settingsButtonVisible="false"
+            :quickTextVisible="false"
             :chain="(activeChain==='AllChains'?'':activeChain)"
           />
           <BlackList  v-if="props.activeTab !=='pumplive'"/>
@@ -341,7 +282,7 @@ watch(()=>props.categories,()=>{
             v-if="configMap[activeTab as keyof typeof configMap]"
             class="ml-4px"
             :activeTab="props.activeTab"
-            :storageKey="configMap[activeTab as keyof typeof configMap].storageKey"
+            :storageKey="configMap[activeTab as keyof typeof configMap]?.storageKey"
             :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns"
             :getOptions="configMap[activeTab as keyof typeof configMap].getOptions"
           />

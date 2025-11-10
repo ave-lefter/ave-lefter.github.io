@@ -524,5 +524,9 @@
   "upToNotifyUser": "{sembol} hızla {oran}%'ye yükselir, mevcut fiyat ${price}",
   "downToNotifyUser": "{sembol} hızla {oran}%'ye düşer, mevcut fiyat ${price}",
   "createNotify": "Uyarı Oluştur",
-  "placeholderNotify": "fiyat"
+  "placeholderNotify": "fiyat",
+  "pasteAddress2": "Sözleşme adresi otomatik doldurmayı kapatmak için tıklayın",
+  "pasteText2": "Metin içeriği otomatik doldurmayı kapatmak için tıklayın",
+  "pasteAddress1": "Sözleşme adresi otomatik doldurmayı açmak için tıklayın",
+  "pasteText1": "Metin içeriği otomatik tamamlamayı açmak için tıklayın"
 }

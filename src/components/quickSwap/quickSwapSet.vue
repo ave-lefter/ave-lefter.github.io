@@ -1,12 +1,18 @@
 <template>
   <div class="items-center inline-flex">
-    <span class="w-14px h-14px bg-[--secondary-text] rounded-full flex items-center justify-center">
+    <span v-if="quickTextVisible" class="w-14px h-14px bg-[--secondary-text] rounded-full flex items-center justify-center mr-5px">
       <Icon
         class="color-[--main-bg] text-10px"
         name="mynaui:lightning-solid"
       />
     </span>
-    <span class="ml-5px mr-5px color-[--secondary-text] text-12px">{{ $t('quick') }}</span>
+    <span v-else v-tooltip="$t('quick')" class="w-14px h-14px bg-[--secondary-text] rounded-full flex items-center justify-center mr-5px">
+      <Icon
+        class="color-[--main-bg] text-10px"
+        name="mynaui:lightning-solid"
+      />
+    </span>
+    <span v-if="quickTextVisible" class="mr-5px color-[--secondary-text] text-12px">{{ $t('quick') }}</span>
     <el-input
       v-model.trim="quickBuyValue1"
       style="
@@ -135,9 +141,11 @@ const props = withDefaults(defineProps<{
   quickBuyValue?: string
   showQuickAmount?: boolean
   settingsButtonVisible?:boolean
+  quickTextVisible?:boolean
 }>(), {
   quickBuyValue: '0.01',
-  settingsButtonVisible:true
+  settingsButtonVisible:true,
+  quickTextVisible:true
 })
 const globalStore = useGlobalStore()
 const gasPrice = shallowRef(0)

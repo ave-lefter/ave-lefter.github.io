@@ -1439,7 +1439,10 @@
   "myToken": "My Token",
   "tweetSearchContractAddress": "Search contract address",
   "tweetSearchContractAddress2": "Search token name",
-  "tweetSearchContractAddress3": "Google search name",
+  "tweetSearchContractAddress3": "Search name and contract",
+  "trendChart": "Trend Chart",
+  "dexSelect": "Dex Select",
+  "intervalSelect": "Interval Select",
   "tweetSearchContractAddress4": "Site search token name",
   "aveBotSwapWallet": "Ave Bot Swap Wallet",
   "mnemonicTip": "The balance in your {chain} wallet is 0, Please recharge",
@@ -1511,5 +1514,15 @@
   "deleteAlert": "Delete  the current alert!",
   "deleteGroupAlert": "Delete all Alerts for the current currency!",
   "clearAll": "Clear All",
-  "expired2": "Expired"
+  "expired2": "Expired",
+  "optional": "Optional",
+  "tonInsufficientBalance": "Insufficient TON",
+  "pasteAddress2": "Click to turn off contract address autofill",
+  "pasteText2": "Click to turn off text content autofill",
+  "pasteAddress1": "Click to open contract address autofill",
+  "pasteText1": "Click to turn on text content autocomplete",
+  "generateTokenAnalysis": "Generate Analysis",
+  "tokenAnalysis": "Token Analysis",
+  "generateScore": "Generate Score",
+  "tokenScore": "Token Score"
 }

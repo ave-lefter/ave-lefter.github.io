@@ -529,5 +529,9 @@
   "upToNotifyUser": "{symbol} sube rápidamente a {rate}%, el precio actual es ${price}",
   "downToNotifyUser": "{symbol} baja rápidamente a {rate}%, el precio actual es ${price}",
   "createNotify": "Crear alerta",
-  "placeholderNotify": "Precio"
+  "placeholderNotify": "Precio",
+  "pasteAddress2": "Haga clic para desactivar el autocompletar de la dirección del contrato",
+  "pasteText2": "Haga clic para desactivar el autocompletado de contenido de texto",
+  "pasteAddress1": "Haga clic para abrir el autocompletar de la dirección del contrato",
+  "pasteText1": "Haga clic para activar el autocompletado de contenido de texto"
 }
