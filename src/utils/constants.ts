@@ -117,7 +117,7 @@ export const ProvideType = {
 export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer','fsc']
 export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
 
-export const SupportTokenKlineChains = ['pulsechain', 'linea', 'pgpchain', 'gatechain', 'movachain', 'morph', 'gatelayer', 'plasma', 'origins', 'eni', 'kasplex', 'abstract', 'nadidepin', 'juchain', 'sonic', 'hyperliquid', 'hyperevm', 'polygon', 'fsc', 'core', 'arbitrum', 'optimism', 'cronos', 'cube']
+export const SupportTokenKlineChains = ['juchain', 'arbitrum', 'optimism']
 
 export const defaultPaginationParams = {
   pageNO: 1,
