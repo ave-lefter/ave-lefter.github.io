@@ -276,6 +276,7 @@ import { useStorage } from '@vueuse/core'
 
 // import connectWallet from '@/components/header/connectWallet/index.vue'
 // const connectWallet = shallowRef<Component | null>(null)
+const { getNotifyList } = useRemindStore()
 const audioUrl = ref('')
 const audioElement = useTemplateRef('audioElement')
 const dialogSearchRef = useTemplateRef('dialogSearchRef')
@@ -332,7 +333,8 @@ const openConnect = () => {
   botStore.changeConnectVisible(true)
 }
 const showAnimation = ref(false)
-onMounted(()=>{
+onMounted(() => {
+  getNotifyList()
   showAnimation.value = true
   setTimeout(()=>{
     showAnimation.value = false
