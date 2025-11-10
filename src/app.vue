@@ -18,6 +18,8 @@
   import type {GetHotTokensResponse} from '~/api/token'
   import {ProvideType} from '~/utils/constants'
   import { setRefCodeToCookie } from './utils'
+  import { usePerpWsPubStore } from './stores/perp/wsPub'
+  import { usePerpStore } from './stores/perp'
   const elementLocale = shallowRef(en)
 
   const elementLocaleMap: Map<string, typeof en> = new Map()
@@ -68,6 +70,8 @@
     useRemarksStore().initRemarks()
     useBotSwapStore().sendNativePriceWs()
     useWalletStore().initWallet()
+    usePerpStore().getPerpMetadata()
+    usePerpWsPubStore().init()
     setRefCodeToCookie()
   }
 
