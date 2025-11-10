@@ -435,7 +435,7 @@
   "sell1": "卖",
   "address": "地址",
   "allAccounts": "所有账户",
-  "deposit": "充值",
+  "deposit": "提现",
   "withdraw": "提现",
   "plsEnterAmount": "请输入数量",
   "logout": "退出",
@@ -1488,7 +1488,6 @@
   "optional": "可选",
   "tonInsufficientBalance": "TON 余额不足",
   "chainWallet2": "链上钱包",
-  "perp":"永续合约",
   "totalAssets":"总资产",
   "todayPnl":"今日盈亏",
   "totalVolume":"合约总交易量",
@@ -1540,5 +1539,12 @@
   "fee":"手续费",
   "counterpartyAccount":"对手方账号",
   "tradeId":"交易ID",
-  "receive":"领取"
+  "receive":"领取",
+  "normalDeposit":"普通充值",
+  "crossDeposit":"跨链充值",
+  "normalWithdraw":"普通提现",
+  "crossWithdraw":"跨链提现",
+  "fastWithdraw":"快速提现",
+  "internalWithdraw":"内部提现",
+  "internalDeposit":"内部充值"
 }

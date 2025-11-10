@@ -8,7 +8,7 @@ const activeName = ref('wallet')
 </script>
 
 <template>
-  <el-tabs v-if="walletStore.address" v-model="activeName" class="flex-1 bg-[--main-bg] [--el-text-color-primary:--third-text] [--el-color-primary:--main-text] [--el-border-color-light:--main-divider] pt-14px">
+  <el-tabs v-if="walletStore.address" v-model="activeName" class="flex-1 bg-[--main-bg] [--el-text-color-primary:--third-text] [--el-color-primary:--main-text] [--el-border-color-light:--main-divider] pt-14px" style="min-height: calc(100vh - 92px);">
     <el-tab-pane :label="t('chainWallet2')" name="wallet">
       <WalletAssets style="max-height:auto;"/>
     </el-tab-pane>

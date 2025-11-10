@@ -7,12 +7,14 @@ import PerpTable from './perpTable.vue'
 </script>
 
 <template>
-  <div>
-    <div class="flex gap-8px mb-40px px-16px">
+  <div class="pb-32px">
+    <div class="flex gap-8px mb-28px px-16px">
       <Overview/>
       <BalancePnl/>
     </div>
-    <PerpTable/>
+    <div class="px-16px">
+      <PerpTable/>
+    </div>
   </div>
 </template>
 
