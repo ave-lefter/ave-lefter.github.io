@@ -1524,5 +1524,6 @@
   "generateTokenAnalysis": "Generate Analysis",
   "tokenAnalysis": "Token Analysis",
   "generateScore": "Generate Score",
-  "tokenScore": "Token Score"
+  "tokenScore": "Token Score",
+  "allPairsTips": "Aggregation mode: Displays the accumulated results of the number and initial value of the token in all pools, which is different from the data of a single pool."
 }

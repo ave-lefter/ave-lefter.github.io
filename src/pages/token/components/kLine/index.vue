@@ -16,7 +16,7 @@
 <script setup lang='ts'>
 import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, VisiblePlotsSet, LanguageCode, ChartingLibraryFeatureset, SubscribeBarsCallback, LibrarySymbolInfo } from '~/types/tradingview/charting_library'
 import { getTimezone, formatDecimals, getSwapInfo, getAddressAndChainFromId, getWSMessage } from '@/utils'
-import { getKlineHistoryData } from '@/api/token'
+import { getKlineHistoryData, getTokenKlineHistory } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
 import { switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, buildOrUpdateLastBarFromTx, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark } from './utils'
 import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
@@ -95,6 +95,10 @@ watch(pair, (val) => {
   switchTokenKline()
 })
 
+watch(() => tokenStore.selectedToken, () => {
+  switchTokenKline()
+})
+
 function switchTokenKline() {
   isReadyLine = false
   resetLimitPriceLineId()
@@ -112,7 +116,7 @@ function switchTokenKline() {
     if (_widget) {
       _widget?.resetCache?.()
       _widget?.activeChart?.()?.clearMarks?.()
-      _widget?.setSymbol?.(symbol.value + '---' + token.value + val, resolution.value as ResolutionString, () => {
+      _widget?.setSymbol?.(symbol.value + '---' + token.value + val + (tokenStore.selectedToken ? '1' : '0'), resolution.value as ResolutionString, () => {
         isReadyLine = true
         // createHeaderButton()
       })
@@ -509,15 +513,23 @@ async function initChart() {
             }
           }
           const interval = switchResolution(resolution)
-          const params = {
+          const params: any = {
             interval: interval,
-            pair_id: pair.value + '-' + chain.value,
-            token_id: pair.value ? undefined : token.value,
+            // pair_id: pair.value + '-' + chain.value,
+            token_id: token.value,
             from,
             to: firstDataRequest ? 0 : Math.max(to, firstBarTime || 0)
           }
+          const isTokenKline = SupportTokenKlineChains?.includes?.(chain.value) && !props.isRank && 'tokenAllPair' in tokenStore && tokenStore?.tokenAllPair && tokenStore?.selectedToken
+
+          console.log('[getBars] isTokenKline', isTokenKline)
+          if (!isTokenKline) {
+            params.pair_id = pair.value + '-' + chain.value
+            delete params.token_id
+          }
           loading = true
-          getKlineHistoryData(params).then(res => {
+          const getKlineFunc = isTokenKline ? getTokenKlineHistory : getKlineHistoryData
+          getKlineFunc(params).then(res => {
             const bars1 = res?.kline_data || []
             const bars = bars1?.map?.(i => ({
               time: i.time * 1000,
