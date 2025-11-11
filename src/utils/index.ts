@@ -504,7 +504,10 @@ export function formatImgUrl(type: string, src: string) {
   const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
   return `${urlPrefix}${type}/${src}.png`
 }
-
+export function formatPerpIcon(src: string) {
+  const urlPrefix ='https://static.edgex.exchange/icons/coin/'
+  return src && src !== 'unknown' ? `${urlPrefix}signals/${src}.svg` : IconUnknown
+}
 export function deepMerge(target: any, source: any) {
   if (Array.isArray(target) && Array.isArray(source)) {
     // 如果是数组，直接覆盖
