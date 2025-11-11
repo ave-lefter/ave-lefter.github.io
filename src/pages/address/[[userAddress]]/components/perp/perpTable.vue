@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Holding from './holding.vue'
 const {t} = useI18n()
 const activeName = ref('holding')
 const tabs = computed(()=>{
@@ -11,7 +12,7 @@ const tabs = computed(()=>{
 })
 const activeComponent = computed(()=>{
   return ({
-    holding:defineAsyncComponent(()=>import('./holding.vue')),
+    holding:Holding,
     orders:defineAsyncComponent(()=>import('./orders.vue')),
     fundingRate:defineAsyncComponent(()=>import('./fundingRate.vue')),
     fundingRecord:defineAsyncComponent(()=>import('./fundingRecord.vue')),

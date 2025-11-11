@@ -1546,5 +1546,6 @@
   "crossWithdraw":"跨链提现",
   "fastWithdraw":"快速提现",
   "internalWithdraw":"内部提现",
-  "internalDeposit":"内部充值"
+  "internalDeposit":"内部充值",
+  "direction":"方向"
 }
