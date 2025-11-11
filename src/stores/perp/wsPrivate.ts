@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
 import WS, { type WSOptions } from '@/utils/ws'
 import { usePerpStore } from './index'
+import { WSHost } from './constants'
 
 function getWSMessage(e: MessageEvent): {
   sid?: string // 会话ID
@@ -22,8 +23,9 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
   // 使用 shallowRef 代替 ref，WebSocket 本身是非响应式的
   const wsInstance = shallowRef<WS | null>(null)
   const isConnected = shallowRef(false)
-  const wsHost = 'wss://quote-testnet.edgex.exchange'
+  // const WSHost = 'wss://quote-testnet.edgex.exchange'
   // const WS_URL = `wss://quote.edgex.exchange/api/v1/public/ws`
+  // const WSHost = 'wss://quote.edgex.exchange'
 
   const perpStore = usePerpStore()
 
@@ -38,7 +40,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
       path: `/api/v1/private/ws`,
       timestamp,
       accountId,
-      url: `${wsHost}/api/v1/private/ws?accountId=${accountId}&timestamp=${timestamp}`
+      url: `${WSHost}/api/v1/private/ws?accountId=${accountId}&timestamp=${timestamp}`
     }
     const headers = perpStore.generateEdgeXAuthHeaders({
       method: 'GET',
@@ -54,7 +56,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
     }
     const wssSignSignature = btoa(JSON.stringify(wssSignParam)).replace(/=/g, '')
     return {
-      url: `${wsHost}/api/v1/private/ws?accountId=${accountId}&timestamp=${timestamp}`,
+      url: `${WSHost}/api/v1/private/ws?accountId=${accountId}&timestamp=${timestamp}`,
       protocols: wssSignSignature
     }
 

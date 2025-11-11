@@ -117,7 +117,7 @@ export const usePerpStore = defineStore('perp', () => {
     })
   }
 
-
+  const apiSignatureLoading = ref<boolean>(false)
   async function signAndGenerateAPIKeys() {
     let walletStore = useWalletStore()
     if (!walletStore.provider) {
@@ -129,16 +129,22 @@ export const usePerpStore = defineStore('perp', () => {
 
     let metaConfig = metadata.value?.global
     const message = `action: ${metaConfig?.appName || ''} Onboard\nonlySignOn: ${metaConfig?.appOnlySignOn}`
+    apiSignatureLoading.value = true
     return walletStore.signMessage(message)?.then(async signature => {
       // 生成 API 密钥
       const apiKeys = sdk.generateApiKeyFromSignature(signature)
       setApiSignature(signature)
       sdk.setApiKeys(apiKeys)
       setApiKeys(apiKeys, walletStore.address)
+      apiSignatureLoading.value = false
       return apiKeys
+    }).catch((err) => {
+      apiSignatureLoading.value = false
+      return Promise.reject(err)
     })
   }
 
+  const starkSignatureLoading = ref<boolean>(false)
   async function signAndGenerateL2KeyPair() {
     let walletStore = useWalletStore()
     if (!walletStore.provider) {
@@ -150,13 +156,18 @@ export const usePerpStore = defineStore('perp', () => {
     let metaConfig = metadata.value?.global
     let clientAccountId = 'main'
     const message = `name: ${metaConfig?.appName}\nenvId: ${metaConfig?.appEnv}\naction: L2 Key\nonlySignOn: ${metaConfig?.appOnlySignOn}\nclientAccountId: ${clientAccountId}`
+    starkSignatureLoading.value = true
     return walletStore.signMessage(message)?.then(async signature => {
       // 生成 API 密钥
       const result = sdk.generateL2KeyPairFromSignature(signature)
       setStarkSignature(signature)
       sdk.setL2KeyPair(result)
       setL2KeyPair(result, walletStore.address)
+      starkSignatureLoading.value = false
       return result
+    }).catch((err) => {
+      starkSignatureLoading.value = false
+      return Promise.reject(err)
     })
   }
 
@@ -188,8 +199,6 @@ export const usePerpStore = defineStore('perp', () => {
     })
   }
 
-
-
   return {
     metadata,
     apiKeys,
@@ -197,6 +206,8 @@ export const usePerpStore = defineStore('perp', () => {
     perpKeys,
     isLogin,
     userInfo,
+    apiSignatureLoading,
+    starkSignatureLoading,
     login,
     getPerpMetadata,
     setApiKeys,

@@ -1524,5 +1524,8 @@
   "generateScore": "生成评分",
   "tokenScore": "Token评分",
   "allPairsTips": "聚合模式：展示该代币在所有池子的数量与初始值累加结果，区别于单一池子数据",
-  "perp": "合约"
+  "perp": "合约",
+  "minDeposit": "最少充值${amount} ",
+  "depositTxSubmitted": "充值交易已提交",
+  "depositSuccess": "充值成功"
 }
