@@ -57,7 +57,9 @@ export const WSEventType = {
   PUBLIC_PORTRAIT: 'public_portrait',
   SIMPLE_TX: 'simple_tx'
 }
-
+export const WSPerpEventType = {
+  TICKER_ALL_1S: 'ticker.all.1s'
+}
 export const MAX_UINT_AMOUNT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 export const MIN_BALANCE: Record<string, number> = {

@@ -2,18 +2,24 @@ import { defineStore } from 'pinia'
 import { getPerpMetadata as _getPerpMetadata } from '@/api/perp'
 import { EdgeXSDK, type ApiKeyData, type L2KeyPair } from '@edgex-fe/typescript-sdk'
 import { useLocalStorage } from '@vueuse/core'
+import { type PerpInfo } from '@/api/types/perp'
+
 
 type PerpMetadata = Awaited<ReturnType<typeof _getPerpMetadata>>
+type ContractInfo = PerpMetadata['contractList'][number]
 
 const sdk = new EdgeXSDK({
   // clientId: 'your-client-id',
 })
-
 export const usePerpStore = defineStore('perp', () => {
+  const route= useRoute()
   const metadata = shallowRef<PerpMetadata | null>(null)
+  const contractList = ref<Array<PerpInfo>>([])
+
   const walletStore = useWalletStore()
   const _apiKeys = useLocalStorage<{[key: string]: ApiKeyData | null}>('perp_apiKeys', { })
   const _l2KeyPair = useLocalStorage<{[key: string]: L2KeyPair | null}>('perp_l2KeyPair', {})
+  const loadingPerpMetadata = shallowRef(false)
 
   const apiKeys = computed(() => {
     if (!walletStore.address) {
@@ -28,11 +34,32 @@ export const usePerpStore = defineStore('perp', () => {
     }
     return _l2KeyPair.value?.[walletStore.address] || null
   })
-
+  const contractName = computed(() => {
+    console.log('-----------contractName--------', (route.params.name as string) || 'BTCUSD')
+    return (route.params.name as string) || 'BTCUSD'
+  })
+  const perp = computed(() => {
+    return contractList?.value?.find((item) => item.contractName === contractName.value) || null
+  })
+    const contractId = computed(() => {
+      return perp?.value?.contractId || ''
+    })
   function getPerpMetadata() {
+    loadingPerpMetadata.value = true
     _getPerpMetadata().then(res => {
       sdk.setMetadata(res)
       metadata.value = res
+      res.contractList =
+        res?.contractList?.map((item) => ({
+          ...item,
+          iconUrl: res?.coinList?.find((coin) => coin.coinId === item.baseCoinId)?.iconUrl || '',
+          baseCoinName:
+            res?.coinList?.find((coin) => coin.coinId === item.baseCoinId)?.coinName || '',
+          quoteCoinName:
+            res?.coinList?.find((coin) => coin.coinId === item.quoteCoinId)?.coinName || '',
+        })) || []
+    }).finally(() => {
+      loadingPerpMetadata.value = false
     })
   }
 
@@ -119,6 +146,10 @@ export const usePerpStore = defineStore('perp', () => {
     setL2KeyPair,
     generateEdgeXAuthHeaders,
     signAndGenerateAPIKeys,
-    signAndGenerateL2KeyPair
+    signAndGenerateL2KeyPair,
+    loadingPerpMetadata,
+    contractList,
+    perp,
+    contractName
   }
 })
