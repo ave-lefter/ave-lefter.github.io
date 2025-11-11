@@ -16,9 +16,8 @@ const typeDict = computed(()=>{
       prev[cur.contractId] = cur.contractName
       return prev
     },{} as Record<string,string>) || {}
-    return [{
-      'ALL':t('all')
-    }].concat(contractMap)
+      contractMap.ALL = t('all')
+      return contractMap
 })
 const typeOptions = computed(()=>{
   const contractList =  perpStore.metadata?.contractList?.map?.(item=>{
@@ -30,7 +29,7 @@ const typeOptions = computed(()=>{
   return [{
     label:t('all'),
     value:'ALL'
-  }].concat(contractList)
+  }].concat(contractList || [])
 })
 const list = [
   {
@@ -288,7 +287,7 @@ const disabledEndDate = (date:Date)=>{
           {{ dayjs(+row.fundingTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('recordType')" prop="recordType" >
+      <el-table-column align="right" :label="t('perp')" prop="contractId" >
         <template #default="{ row }">
           {{ typeDict[row.contractId] }}
         </template>
