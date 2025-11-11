@@ -1547,5 +1547,8 @@
   "fastWithdraw":"快速提现",
   "internalWithdraw":"内部提现",
   "internalDeposit":"内部充值",
-  "direction":"方向"
+  "direction":"方向",
+  "short": "做空",
+  "long": "做多",
+  "success2": "成功"
 }

@@ -7,23 +7,30 @@ const perpStore = usePerpStore()
 const { t } = useI18n()
 const searchParams = ref({
   filterTypeList:'SETTLE_FUNDING_FEE',
-  filterContractIdList:'',
+  filterContractIdList:'ALL',
   filterStartCreatedTimeInclusive:'',
   filterEndCreatedTimeExclusive:''
 })
 const typeDict = computed(()=>{
-    return perpStore.metadata?.contractList?.reduce?.((prev,cur)=>{
+    const contractMap =  perpStore.metadata?.contractList?.reduce?.((prev,cur)=>{
       prev[cur.contractId] = cur.contractName
       return prev
     },{} as Record<string,string>) || {}
+    return [{
+      'ALL':t('all')
+    }].concat(contractMap)
 })
 const typeOptions = computed(()=>{
-  return perpStore.metadata?.contractList?.map?.(item=>{
+  const contractList =  perpStore.metadata?.contractList?.map?.(item=>{
     return {
       label:item.contractName,
       value:item.contractId
     }
   })
+  return [{
+    label:t('all'),
+    value:'ALL'
+  }].concat(contractList)
 })
 const list = [
   {
@@ -227,14 +234,6 @@ const list = [
     'updatedTime': '1762776587443'
   }
 ]
-function jumpToTx(chainId:string,txId:string){
-  const chainInfo = getChainInfo(chainId,true)
-  window.open(formatExplorerUrl(chainInfo?.net_name,txId,'tx'),'_blank')
-}
-function counterpartyAccount(sender:string,receiver:string) {
-  if(sender === '0' && receiver === '0') return '--'
-  return sender || receiver
-}
 const disabledStartDate = (date:Date)=>{
     if(searchParams.value.filterEndCreatedTimeExclusive){
     return dayjs(date).isAfter(dayjs(Number(searchParams.value.filterEndCreatedTimeExclusive)*1000)) 
@@ -296,7 +295,7 @@ const disabledEndDate = (date:Date)=>{
       </el-table-column>
       <el-table-column align="right" :label="t('direction')" prop="direction">
         <template #default="{ row }">
-          做空
+          <span :class="row.fundingPositionSize > 0 ? 'color-[--up-color]' : 'color-[--down-color]'">{{row.fundingPositionSize > 0 ? t('long') : t('short')}}</span>
         </template>
       </el-table-column>
       <el-table-column align="right" :label="t('contractSize')" prop="contractSize" >

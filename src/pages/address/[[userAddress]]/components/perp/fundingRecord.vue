@@ -40,7 +40,7 @@ const searchParams = ref({
 })
 const typeOptions = computed(()=>[{label:t('all'),value:'ALL'}].concat(Object.values(typeDict.value)))
 const statusDict = {
-  6:t('success'),
+  6:t('success2'),
 }
 const list = [
   {
@@ -109,7 +109,7 @@ const disabledEndDate = (date:Date)=>{
           class="[--el-font-size-base:12px] [&&]:[--el-date-editor-width:120px]"
           range-separator="To"
           format="YYYY-MM-DD"
-          :placeholder="t('endTime')"
+          :placeholder="t('endTime2')"
           value-format="X"
           :teleported="false"
         />
@@ -128,7 +128,9 @@ const disabledEndDate = (date:Date)=>{
       </el-table-column>
       <el-table-column :label="t('status')" prop="status">
         <template #default="{ row }">
-          {{ statusDict[row.status as keyof typeof statusDict] }}
+          <span :class="row.status === 6 ? 'color-[--up-color]' : 'color-[--down-color]'">
+            {{ statusDict[row.status as keyof typeof statusDict] || t('failed') }}
+          </span>
         </template>
       </el-table-column>
       <el-table-column :label="t('amount')" prop="amount" >
