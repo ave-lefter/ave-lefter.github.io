@@ -29,6 +29,8 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
     })
     const token = computed(()=>tokenInfo.value?.token)
     const pair = computed(()=>tokenInfo.value?.pairs?.[0])
+
+    const selectedToken = ref(false)
     const currentGroup = computed(() => {
       return groupId.value == 0
         ? t('defaultGroup')
@@ -42,7 +44,7 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
         .minus(token.value?.burn_amount_dec || 0)
       return circulation.lt(0) ? new BigNumber(0) : circulation
     })
-  
+
     const marketCap = computed(() => {
       return new BigNumber(price.value || 0).times(circulation.value || 0).toFixed() || '0'
     })
@@ -112,6 +114,7 @@ export const useRankKlineStore = defineStore('rankKline',()=>{
         selectedGroup,
         token,
         pair,
+        selectedToken,
         twitterType,
         currentGroup,
         editableGroup,

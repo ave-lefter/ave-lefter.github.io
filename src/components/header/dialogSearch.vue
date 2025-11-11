@@ -55,15 +55,25 @@
       </div>
     </div>
     <div class="tabs mt-20px px-20px">
-      <button
-        v-for="item in tabs"
-        :key="item.id"
-        class="tab-button clickable-btn px-0 mr-24px"
-        :class="{ active: tabActive === item.id }"
-        @click="tabActive = item.id"
-      >
-        {{ item.name }}
-      </button>
+      <div class="flex items-center">
+        <button
+          v-for="item in tabs"
+          :key="item.id"
+          class="tab-button clickable-btn px-0 mr-24px"
+          :class="{ active: tabActive === item.id }"
+          @click="tabActive = item.id"
+        >
+          {{ item.name }}
+        </button>
+      </div>
+      <div class="copyBtn flex items-center gap-12px">
+        <div class="inline-block w-16px h-16px" @click="openPasteAddress = !openPasteAddress">
+          <Icon name="custom:paste-address" class="inline-block clickable text-16px" :class="!openPasteAddress?'color-[--third-text]':'color-[--main-text]'" v-tooltip="!openPasteAddress?$t('pasteAddress1'):$t('pasteAddress2')"/>
+        </div>
+        <div class="inline-block w-16px h-16px" @click="openPasteText = !openPasteText">
+          <Icon name="custom:paste-text" class="inline-block clickable text-16px" :class="!openPasteText?'color-[--third-text]':'color-[--main-text]'" v-tooltip="!openPasteText?$t('pasteText1'):$t('pasteText2')"/>
+        </div>
+      </div>
     </div>
     <div class="search-content">
       <template v-if="query === ''">
@@ -109,9 +119,13 @@ import { ElMessageBox, type ElInput } from 'element-plus'
 import { ProvideType } from '~/utils/constants'
 import { getHotTokens, type GetHotTokensResponse } from '@/api/token'
 import type {IPriceV2Response} from '~/api/types/ws'
+import { useStorage } from '@vueuse/core'
 import ChainTabs from './chainTabs/index.vue'
 const { hotList,dialogVisible_search,dialogSearchText:query } = storeToRefs(useGlobalStore())
 const {currentAddress} =storeToRefs(useFollowStore())
+
+const openPasteAddress = useStorage('openPasteAddress', true, localStorage)
+const openPasteText = useStorage('openPasteText', false, localStorage)
 // const { modelValue } = defineProps({
 //   modelValue: Boolean,
 // })
@@ -372,7 +386,8 @@ defineExpose({
 <style lang="scss" scoped>
 .tabs {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  justify-content:space-between;
   .tab-button {
     background: transparent;
     display: flex;

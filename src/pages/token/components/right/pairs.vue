@@ -9,9 +9,33 @@
     </thead>
     <tbody>
       <tr
+        v-if="tokenAllPair"
+        :class="{ active: tokenStore.selectedToken }"
+        @click.stop="tokenStore.switchPair(true)"
+      >
+        <td>
+          <div class="main flex justify-start items-center">
+            <span>{{ tokenAllPair?.symbol || '' }}</span>
+            <Icon v-tooltip="{ content: $t('allPairsTips'), props: { placement: 'top-start',  'popper-class':'max-w-250px', 'arrow-offset': '12' }}" name="solar:dollar-bold" class="color-#FFA622 text-14px ml-4px" />
+          </div>
+          <div class="minor">[All Pools]</div>
+        </td>
+        <td>
+          <div class="main">{{ formatNumber((tokenAllPair?.reserve) || 0, 2) }}</div>
+          <div class="minor">/<template v-if="tokenAllPair.init_reserve">{{ formatNumber(tokenAllPair.init_reserve || 0, 2) }}</template><template v-else>--</template>
+          </div>
+        </td>
+        <td>
+          <div class="text-right">
+            <div class="main" v-html="'$' + formatNumber(tokenAllPair.price || 0, 2)" />
+            <div class="main" v-html="'$' + formatNumber(tokenAllPair.reserveU || 0, 2)" />
+          </div>
+        </td>
+      </tr>
+      <tr
         v-for="(item, index) in ((show ? pairs : pairs?.slice?.(0, 1)) || [])"
         :key="item.pair"
-        :class="{ active: tokenStore.pairAddress === item.pair }"
+        :class="{ active: tokenStore.pairAddress === item.pair && (!tokenStore.selectedToken || !tokenAllPair) }"
         @click.stop="tokenStore.switchPair(item.pair)"
       >
         <td>
@@ -96,6 +120,10 @@ const pairs = computed(() => {
     ammName: i.amm === 'unknown' ? i.amm : getSwapInfo(i.chain, i.amm)?.show_name || i.amm,
     isUp: new BigNumber(i.reserve1).gt(i.init_reserve1)
   }))
+})
+
+const tokenAllPair = computed(() => {
+  return tokenStore.tokenAllPair
 })
 
 </script>

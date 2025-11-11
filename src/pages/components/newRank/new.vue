@@ -37,7 +37,6 @@ import {
   DexHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
-import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
 import dayjs from 'dayjs'
 
@@ -90,7 +89,7 @@ const pageInfo = ref({
 })
 const loading = shallowRef(false)
 const storageKey = computed(()=>{
-  return props.activeTab + 'TableColumns'
+  return CategroyTabsCacheKey.new
 })
 let columns = useStorage(storageKey.value, getNewDefaultColumns(t))
 watch(()=>props.activeTab,()=>{
@@ -318,7 +317,7 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" :style="`height:${height}`">
     <AveTable
-    rowKey="rowKey"
+    row-key="pair_id"
       :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"

@@ -3,7 +3,7 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
       {
         title: t('basicInfo'),
         list: [
-          'headline',
+          // 'headline',
           'mCapContent',
           'liquidityContent',
           'holdersContent',
@@ -49,13 +49,13 @@ export function getPumpOptions(t: ReturnType<typeof useI18n>['t']) {
         render: 'poolPairContent',
         minWidth:320
       },
-      {
-        title:t('aiSummary'),
-        isVisible: true,
-        key:'headline',
-        render:'headline',
-        minWidth:232,
-      },
+      // {
+      //   title:t('trendChart'),
+      //   isVisible: true,
+      //   key:'trendChart',
+      //   render:'trendChart',
+      //   minWidth:232,
+      // },
       {
         title: t('smarter1'),
         key: 'smart_money_buy_volume_24h',

@@ -7,6 +7,15 @@ const props = defineProps<{
   activeChain: string
 }>()
 const searchKey = shallowRef('')
+const quickOptions = computed(() => {
+  const chainList = ['solana','bsc','xlayer']
+  if(!chainList.includes(_activeChain.value) && _activeChain.value !== 'AllChains'){
+    chainList.push(_activeChain.value)
+  }
+  return chainList.map(el=>{
+    return props.list.find(item=>item.net_name===el) || {net_name:el}
+  })
+})
 const searchResult = computed(() => {
   if (!searchKey.value) return props.list
   return props.list.filter((el) => {
@@ -38,7 +47,7 @@ const currentChain = computed(() => {
   <el-select
     v-model="_activeChain"
     :suffix-icon="SuffixIcon"
-    class="[&&]:w-120px shrink-0"
+    class="[&&]:[--el-select-width:auto] shrink-0"
   >
     <template #header>
       <el-input
@@ -51,20 +60,19 @@ const currentChain = computed(() => {
         </template>
       </el-input>
     </template>
-    <template #label>
-      <div class="flex items-center gap-4px">
-        <template v-if="currentChain.chain_id === '-1'">
-          <Icon name="custom:chain" class="color-[--main-text]" />
-          {{ $t('allChain') }}
-        </template>
-        <template v-else>
+    <template #prefix>
+      <div class="flex items-center gap-4px" @click.stop>
+        <div class="px-2px rounded-4px text-12px color-[--main-text] lh-16px" :class="_activeChain === 'AllChains' ? 'bg-[--tab-active-bg]' : ''" @click="_activeChain='AllChains'">
+          {{ $t('all') }}
+        </div>
+        <div v-for="item in quickOptions" :key="item.net_name" v-tooltip="item.name||item.net_name"
+        class="flex items-center p-2px rounded-4px" :class="item.net_name === _activeChain ? 'bg-[--tab-active-bg]' : ''" @click="_activeChain=item.net_name">
           <img
-            :src="`${configStore.token_logo_url}chain/${currentChain.net_name}.png`"
+            :src="`${configStore.token_logo_url}chain/${item.net_name}.png`"
             alt=""
             class="rounded-full w-16px h-16px"
           >
-          {{ currentChain.name }}
-        </template>
+        </div>
       </div>
     </template>
     <el-option

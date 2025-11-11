@@ -195,7 +195,7 @@ import Remark from './remark.vue'
 import { getCurrentInstance } from 'vue'
 import BigNumber from 'bignumber.js'
 import { Warning } from '@element-plus/icons-vue'
-
+import { markRaw } from 'vue'
 
 defineProps({
   tableData: {
@@ -233,7 +233,7 @@ async function removeWallet(item: Wallet) {
     if (Number(item?.balance) > 0) {
       ElMessageBox.confirm(t('walletRemoveTip1'), t('walletRemove'), {
         type: 'warning',
-        icon: Warning,
+        icon: markRaw(Warning),
         confirmButtonText: t('confirm'),
         cancelButtonText: t('cancel'),
         customClass: `${mode.value} delete_confirm`,
@@ -249,7 +249,7 @@ async function removeWallet(item: Wallet) {
 function confirmRemoveWallet(item: Wallet) {
   ElMessageBox.confirm(t('walletRemoveTip2'), t('walletRemove'), {
     type: 'warning',
-    icon: Warning,
+    icon: markRaw(Warning),
     confirmButtonText: t('confirm'),
     cancelButtonText: t('cancel'),
     customClass: `${mode.value} delete_confirm`,

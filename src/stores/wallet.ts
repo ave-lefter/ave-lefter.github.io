@@ -50,6 +50,12 @@ export const useWalletStore = defineStore('wallet', () => {
       if (index >= 0) {
         wallets[index].icon = value.info.icon
         wallets[index].provider = value.provider
+      } else {
+        wallets.push({
+          name: value.info.name,
+          icon: value.info.icon,
+          provider: value.provider
+        })
       }
     }
     return wallets?.sort((a, b) => {
