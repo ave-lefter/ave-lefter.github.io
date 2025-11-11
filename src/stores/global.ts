@@ -246,7 +246,8 @@ export const useGlobalStore = defineStore('global', () => {
 
   const hotList = shallowRef<GetHotTokensResponse[]>([])
   const showImport = shallowRef(false)
- const showBotRecord = shallowRef(false)
+  const showBotRecord = shallowRef(false)
+
 
   //  点击图表显示交易历史
    const isClickKlineFilter = useStorage('isClickKlineFilter', true)

@@ -272,8 +272,11 @@ import BotTipDialog from './components/botTipDialog.vue'
 import ClipboardToken from './components/clipboardToken.vue'
 import AudioSettings from './components/audioSettings.vue'
 import type { ITGBotResponse } from '~/api/types/ws'
+import { useStorage } from '@vueuse/core'
+
 // import connectWallet from '@/components/header/connectWallet/index.vue'
 // const connectWallet = shallowRef<Component | null>(null)
+const { getNotifyList } = useRemindStore()
 const audioUrl = ref('')
 const audioElement = useTemplateRef('audioElement')
 const dialogSearchRef = useTemplateRef('dialogSearchRef')
@@ -288,6 +291,10 @@ const {t } = useI18n()
 const globalStore = useGlobalStore()
 const  appDownloadVisible = shallowRef(false)
 const botTipDialogRef = useTemplateRef('botTipDialogRef')
+
+const openPasteAddress = useStorage('openPasteAddress', true, localStorage)
+const openPasteText = useStorage('openPasteText', false, localStorage)
+
 const list = computed(() => {
   // let query = ''
   // if (botStore.accessToken && botStore.refreshToken) {
@@ -327,7 +334,8 @@ const openConnect = () => {
   botStore.changeConnectVisible(true)
 }
 const showAnimation = ref(false)
-onMounted(()=>{
+onMounted(() => {
+  getNotifyList()
   showAnimation.value = true
   setTimeout(()=>{
     showAnimation.value = false
@@ -364,8 +372,12 @@ async function showDialog() {
   // 自动粘贴剪切板
   const clipboard = await navigator.clipboard.readText()
   const isValid = clipboard && ['eth', 'solana','tron','sui','ton','brc20'].some(i => isValidAddress(clipboard, i))
-  if(isValid && dialogSearchRef.value){
-    dialogSearchRef.value.setQuery(clipboard)
+  if(dialogSearchRef.value){
+    if(isValid&&openPasteAddress.value){
+      dialogSearchRef.value.setQuery(clipboard)
+    }else if(!isValid&&openPasteText.value){
+      dialogSearchRef.value.setQuery(clipboard)
+    }
   }
 }
 </script>

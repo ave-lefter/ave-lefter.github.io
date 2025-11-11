@@ -2,16 +2,16 @@
   <el-popover
     v-model:visible="visible"
     placement="bottom-end"
-    :width="360"
+    :width="450"
     trigger="click"
-    :popper-style="`--el-popover-padding: 0; --el-bg-color-overlay: ${ themeStore.isDark ? '#222' : '#FFF'}`"
+    popper-class="[--el-popover-bg-color:--border]"
   >
     <template #reference>
       <div
         class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px flex items-center"
         @click.stop="visitSysNotice"
       >
-        <el-badge :is-dot="limitOrderUnRead||!isLatestExperienced" class="h-20px" color="#F6465D">
+        <el-badge :is-dot="limitOrderUnRead||!isLatestExperienced || newRemind" class="h-20px" color="#F6465D">
           <Icon
             class="text-20px text-[--secondary-text] cursor-pointer"
             name="material-symbols:notifications"
@@ -24,7 +24,7 @@
         <a
           href="javascript:;"
           :class="`decoration-none text-14px lh-16px pb-12px text-center b-b-solid b-b-2px
-         ${!isLimitOrder ? 'color-[--main-text] b-b-[--main-text]':'b-b-transparent color-[--third-text]'}`"
+         ${activeTab == 'notice' ? 'color-[--main-text] b-b-[--main-text]':'b-b-transparent color-[--third-text]'}`"
           @click="activeTab = 'notice'"
         >
           {{ $t('notice') }}
@@ -39,12 +39,29 @@
         >
           {{ $t('limitOrder') }}
         </a>
+        <a
+          href="javascript:;"
+          :class="`decoration-none text-14px lh-16px pb-12px text-center b-b-solid b-b-2px
+         ${activeTab == 'remind' ? 'color-[--main-text] b-b-[--main-text]':'b-b-transparent color-[--third-text]'}`"
+          @click="switchRemind"
+        >
+         {{ $t('alerts') }}
+        </a>
+        <div class="flex-1"></div>
+          <a
+          v-if="activeTab == 'remind'"
+          href="javascript:;"
+          class="decoration-none text-12px lh-16px pb-12px text-center b-b-solid b-b-2px b-b-transparent color-[--third-text] hover:opacity-90"
+          @click="deleteNotifyHistory"
+        >
+         {{ $t('clearAll') }}
+        </a>
       </div>
       <el-scrollbar
         max-height="500px"
       >
         <ul
-          v-show="!isLimitOrder"
+          v-show="activeTab == 'notice'"
           class="pr-20px flex flex-col gap-30px"
         >
           <li
@@ -114,6 +131,72 @@
             <div class="color-[--third-text] text-12px">{{ formatDate((item?.updateTime) || item?.createTime) }}</div>
           </li>
         </ul>
+        <div class="min-h-400px" v-if="activeTab == 'remind'">
+          <div class="item" v-for="(item, $index) in remindHistoryList" :keys="$index">
+            <div class="flex-between items-center parent cursor-pointer">
+              <NuxtLink
+                :to="`/token/${item.token_address}-${item.chain}`"
+                class="flex no-underline items-center"
+                @click.stop.prevent="visible = false"
+              >
+              <token-img :row="item" />
+              <span class="text-16px font-500 ml-8px ellipsis">{{ item.symbol }}</span>
+            </NuxtLink>
+
+              <Icon
+                class="text-16px"
+                :name="`custom:${item.direction == 'up' ? 'arrow-up' : 'arrow-down'}`"
+              />
+              <span class="ml-4px text-14px" :class="item.direction == 'up'? 'color-[--up-color]':'color-[--down-color]'">{{
+                item.direction == 'up' ? $t('gtPrice') : $t('ltPrice')
+              }}</span>
+              <span class="ml-4px text-14px"
+                >${{ formatNumber(item.warning_price || 0, { decimals: 4, limit: 6 }) }}</span
+              >
+              <span class="color-[--down-color] ml-4px text-14px"
+                >({{ item.is_repeatable == 1 ? $t('duplicate'): $t('once')}})</span
+              >
+              <div class="flex-1"></div>
+              <!-- <span class="color-[--third-text] text-12px">{{ formatTimeFromNow(item.create_time) }}</span> -->
+              <span class="color-[--third-text] text-12px"v-if="!(item?.create_time)"> - </span>
+              <TimerCount
+                v-else-if="
+                  Number(formatTimeFromNow(item?.create_time, true)) < 60
+                "
+                :key="`${item.create_time}`"
+                :timestamp="Number(item.create_time)"
+                :end-time="60"
+              >
+                <template #default="{ seconds }">
+                  <span class="color-#FFA622 text-12px">
+                    <template v-if="seconds < 60"> {{ seconds }}s </template>
+                    <template v-else>
+                      {{ formatTimeFromNow(item.create_time) }}
+                    </template>
+                  </span>
+                </template>
+              </TimerCount>
+              <span
+                class="color-[--third-text] text-12px"
+                v-else
+              >
+                {{
+                  formatTimeFromNow(
+                    Number(item?.create_time)
+                  )
+
+                }}
+              </span>
+            </div>
+          </div>
+          <div
+            v-if="remindHistoryList?.length == 0 && !loadingRemindHistory"
+            class="empty text-14px color-[--icon-color] flex items-center justify-center flex-col mt-100px "
+          >
+            <Icon class="text-40px" name="custom:bell" />
+            <span class="mt-10px">{{ $t('emptyAlert') }}</span>
+          </div>
+        </div>
       </el-scrollbar>
     </div>
   </el-popover>
@@ -131,6 +214,7 @@ const {formatUnits} = evm_utils
 const ACTIVE_ENUM = {
   notice: 'notice',
   limitOrder: 'limitOrder',
+  remind: 'remind'
 } as const
 
 interface ICompletedLimitTx extends IGetMarketCompletedLimitResponse {
@@ -141,7 +225,7 @@ interface ICompletedLimitTx extends IGetMarketCompletedLimitResponse {
 }
 
 type ActiveTab = keyof typeof ACTIVE_ENUM
-
+const followStore = useFollowStore()
 const lastExperienceTime = useStorage('lastExperienceTime', 0, localStorage)
 const themeStore = useThemeStore()
 const wsStore = useWSStore()
@@ -154,6 +238,10 @@ const announceList = ref<any[]>([])
 const completedLimitTx = shallowRef<ICompletedLimitTx[]>([])
 
 const globalStore = useGlobalStore()
+const remindStore = useRemindStore()
+const { remindCount, newRemind, remindHistoryList,loadingRemindHistory } = storeToRefs(remindStore)
+const { getNotifyHistoryList, deleteNotifyHistory } = remindStore
+
 const limitOrderUnRead = computed(() => completedLimitTx.value?.some(i => visitedTime.value < (i.blockTime || Number(i.batchId) / 1000)))
 const isLimitOrder = computed(() => activeTab.value === ACTIVE_ENUM.limitOrder)
 const isBotLogin = computed(() => botStore.userInfo && botStore.userInfo.name)
@@ -163,6 +251,26 @@ const isLatestExperienced = computed(() => {
     || String(lastExperienceTime.value) === String(globalStore.latestNotice.time)
 })
 
+const currentAddress = computed(() => {
+  return followStore.currentAddress || ''
+})
+watch(remindCount, (val) => {
+  if (val && activeTab.value == 'remind') {
+    setTimeout(() => {
+      getNotifyHistoryList()
+    }, 500);
+  }
+})
+watch(
+  () => currentAddress.value,
+  (val) => {
+    if (val) {
+      getNotifyHistoryList()
+    } else {
+      remindHistoryList.value = []
+    }
+  }
+)
 watch(visible, (val) => {
   if (!val) {
     lastVisitedTime.value = visitedTime.value
@@ -249,4 +357,39 @@ async function getLatestNotice() {
 function visitSysNotice() {
   lastExperienceTime.value = globalStore.latestNotice.time
 }
+function switchRemind() {
+  activeTab.value = 'remind'
+  newRemind.value = false
+  getNotifyHistoryList()
+}
 </script>
+<style lang="scss" scoped>
+.item {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  margin-top: 12px;
+  padding-right: 15px;
+  .parent {
+    &:hover {
+      .delete {
+        color: var(--down-color);
+      }
+    }
+  }
+  ul li {
+    &:hover {
+      .delete-children {
+        display: block;
+        color: var(--down-color);
+      }
+    }
+  }
+
+  .delete {
+    color: var(--third-text);
+  }
+  .delete-children {
+    display: none;
+  }
+}
+</style>

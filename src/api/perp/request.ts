@@ -1,4 +1,18 @@
-export const PerpBaseUrl = 'https://testnet.edgex.exchange'
+import { usePerpStore } from '~/stores/perp'
+
+function getBestApiDomain () {
+  // const baseUrl = 'https://0ftrfsdb.xyz'
+  const apiDomain = localStorage.getItem('apiDomain')
+  if (apiDomain && isJSON(apiDomain)) {
+    return JSON.parse(apiDomain)?.domain
+  }
+  return 'https://mayeas023.com'
+  // return 'https://pro.edgex.exchange'
+}
+
+
+// export const PerpBaseUrl = 'https://testnet.edgex.exchange'
+export const PerpBaseUrl = getBestApiDomain() + '/perp/edgex'
 
 // API响应类型
 interface EdgeXApiResponse<T = any> {
@@ -21,6 +35,28 @@ function getApi() {
       // } else {
       //   onRequest({ options, request })
       // }
+      const newBase = getBestApiDomain() + '/perp/edgex'
+      if (newBase && options.baseURL !== newBase) {
+        options.baseURL = newBase
+      }
+      const perpStore = usePerpStore()
+      const walletStore = useWalletStore()
+      const url = request as string
+      options.headers = new Headers(options.headers)
+      if (walletStore.address) {
+        options.headers.set('l1address', walletStore.address)
+      }
+      if (url?.includes('onboardSite')) {
+        const headers = perpStore.generateEdgeXAuthHeaders({
+          method: options.method || 'GET',
+          path: url,
+          body: (options.body as any) || undefined,
+          params: (options.query as any) || undefined
+        })
+        Object.keys(headers).forEach(key => {
+          options.headers.set(key, headers[key])
+        })
+      }
     },
     onResponse({ response, request, options }) {
       // const url = request as string
