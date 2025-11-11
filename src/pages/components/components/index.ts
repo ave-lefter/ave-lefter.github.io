@@ -44,4 +44,6 @@ export { default as SnipersContent } from './snipersContent.vue'
 export { default as Top10PositionsContent } from './top10PositionsContent.vue'
 export { default as TokenPage } from './tokenPage/tokenPage.vue'
 export { default as DexHeader } from './dexHeader.vue'
+export { default as TrendChart } from './trendChart.vue'
+export { default as TrendChartHeader } from './trendChartHeader.vue'
 

@@ -1380,5 +1380,9 @@
   "MaxWalletAmount": "최대 지갑 수량",
   "riskRemoved": "위험 해제",
   "buySetting": "설정 구매",
-  "sellSetting": "판매 설정"
+  "sellSetting": "판매 설정",
+  "pasteAddress2": "계약 주소 자동 완성을 끄려면 클릭하세요.",
+  "pasteText2": "텍스트 내용 자동 완성을 끄려면 클릭하세요.",
+  "pasteAddress1": "계약 주소 자동 완성을 열려면 클릭하세요.",
+  "pasteText1": "텍스트 내용 자동 완성을 켜려면 클릭하세요."
 }

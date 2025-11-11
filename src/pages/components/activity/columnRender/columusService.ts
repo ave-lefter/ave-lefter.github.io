@@ -3,7 +3,7 @@ export function getActivityOptions(t: ReturnType<typeof useI18n>['t']) {
     {
       title: t('basicInfo'),
       list: [
-        'headline',
+        // 'headline',
         'mCapContent',
         'liquidityContent',
         'holdersContent',
@@ -40,13 +40,13 @@ export function getActivityDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
       render: 'poolPairContent',
       minWidth:320
     },
-    {
-      title:t('aiSummary'),
-      isVisible: true,
-      key:'headline',
-      render:'headline',
-      minWidth:232,
-    },
+    // {
+    //   title:t('trendChart'),
+    //   isVisible: true,
+    //   key:'trendChart',
+    //   render:'trendChart',
+    //   minWidth:232,
+    // },
     {
       title: t('mCap'),
       isVisible: true,

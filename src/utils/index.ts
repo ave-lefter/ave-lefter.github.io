@@ -1220,3 +1220,78 @@ export function getTwitterSeconds(time: number, unit: string) {
     return time
   }
 }
+
+export function sendNotify(result: any) {
+    const { $i18n } = useNuxtApp()
+  // console.log('------------------sendNotify---------------', result)
+  const res = result[0]
+  const rate =
+    res?.user_notify_setting?.current_price > 0
+      ? formatNumber2(
+          ((res?.notify_trigger_price - res?.user_notify_setting?.current_price) /
+            res?.user_notify_setting?.current_price) *
+            100 || 0
+        )
+      : 0
+  // const content = `${res?.user_notify_setting?.symbol}快速{res?.notify_trigger_price - res?.user_notify_setting?.current_price > 0 ? '上涨' : '下跌'}${rate}%,当前价位$${formatNumber2(res?.notify_trigger_price || 0)}` || ''
+  let content = ''
+  if (res?.notify_trigger_price - res?.user_notify_setting?.current_price > 0) {
+    content = $i18n.t('upToNotifyUser', {
+      symbol: res?.user_notify_setting?.symbol,
+      rate: rate,
+      price: formatNumber2(res?.notify_trigger_price || 0),
+    })
+  } else {
+    content = $i18n.t('downToNotifyUser', {
+      symbol: res?.user_notify_setting?.symbol,
+      rate: rate,
+      price: formatNumber2(res?.notify_trigger_price || 0),
+    })
+  }
+  const options = {
+    body: content,
+    icon: new URL('@/assets/images/logo.svg', import.meta.url).href,
+    lang: localStorage.getItem('language') || 'en',
+  }
+  if (window.Notification && Notification.permission === 'granted') {
+    var n = new Notification($i18n.t('alerts'), options)
+    n.onclick = (event) => {
+      event.preventDefault() // 阻止浏览器聚焦于 Notification 的标签页
+      window.open(
+        `https://ave.ai/token/${res?.user_notify_setting?.token}-${res?.user_notify_setting?.chain}`,
+        '_blank'
+      )
+    }
+  }
+  // 如果用户没有选择是否显示通知
+  // 注：因为在 Chrome 中我们无法确定 permission 属性是否有值，因此
+  // 检查该属性的值是否是 'default' 是不安全的。
+  else if (window.Notification && Notification.permission !== 'denied') {
+    Notification.requestPermission(function (status) {
+      if (Notification.permission !== status) {
+        Notification.permission = status
+      }
+
+      // 如果用户同意了
+      if (status === 'granted') {
+        var n = new Notification($i18n.t('alerts'), options)
+        n.onclick = (event) => {
+          event.preventDefault() // 阻止浏览器聚焦于 Notification 的标签页
+          window.open(
+            `https://pro.ave.ai/token/${res?.user_notify_setting?.token}-${res?.user_notify_setting?.chain}`,
+            '_blank'
+          )
+        }
+      }
+      // 否则，我们可以让步的使用常规模态的 alert
+      // else {
+      //   alert('Hi!')
+      // }
+    })
+  }
+  // 如果用户拒绝接受通知
+  else {
+    // 我们可以让步的使用常规模态的 alert
+    // alert('Hi!')
+  }
+}

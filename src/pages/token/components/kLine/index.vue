@@ -2,6 +2,7 @@
   <div class="relative" :style="{height: `${isRank ? 390 : kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
     <UnknownRisk v-show="isReady" :isRank="isRank" @refresh="refresh" />
+    <DialogRemind v-model="dialogVisible_remind" />
   </div>
   <div
     v-if="!isRank"
@@ -15,7 +16,7 @@
 <script setup lang='ts'>
 import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, VisiblePlotsSet, LanguageCode, ChartingLibraryFeatureset, SubscribeBarsCallback, LibrarySymbolInfo } from '~/types/tradingview/charting_library'
 import { getTimezone, formatDecimals, getSwapInfo, getAddressAndChainFromId, getWSMessage } from '@/utils'
-import { getKlineHistoryData } from '@/api/token'
+import { getKlineHistoryData, getTokenKlineHistory } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
 import { switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, buildOrUpdateLastBarFromTx, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark } from './utils'
 import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
@@ -25,6 +26,7 @@ import { useKlineMarks } from './mark'
 import {DefaultHeight, WSSimpleTxChain} from '~/utils/constants'
 import { TW_STUDY } from './constant'
 import UnknownRisk from './unknownRisk.vue'
+import DialogRemind from './dialogRemind.vue'
 import dayjs from 'dayjs'
 
 const props = defineProps<{
@@ -45,6 +47,14 @@ const klinePair = ref('')
 const isReady = ref(false)
 let isReadyLine = false
 let isHeaderReady = false
+const dialogVisible_remind = ref(false)
+const Book = reactive({
+  title: '1111',
+  author: {
+    name:'托儿列夫'
+  },
+  year: 50
+})
 
 const chain = computed(() => {
   return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
@@ -85,6 +95,10 @@ watch(pair, (val) => {
   switchTokenKline()
 })
 
+watch(() => tokenStore.selectedToken, () => {
+  switchTokenKline()
+})
+
 function switchTokenKline() {
   isReadyLine = false
   resetLimitPriceLineId()
@@ -102,7 +116,7 @@ function switchTokenKline() {
     if (_widget) {
       _widget?.resetCache?.()
       _widget?.activeChart?.()?.clearMarks?.()
-      _widget?.setSymbol?.(symbol.value + '---' + token.value + val, resolution.value as ResolutionString, () => {
+      _widget?.setSymbol?.(symbol.value + '---' + token.value + val + (tokenStore.selectedToken ? '1' : '0'), resolution.value as ResolutionString, () => {
         isReadyLine = true
         // createHeaderButton()
       })
@@ -224,6 +238,7 @@ function createHeaderButton() {
   })
   headerBtns = []
   createToggleButton()
+  createTogglePriceWarningButton()
   createMarkButton(_widget, headerBtns)
 }
 
@@ -244,6 +259,24 @@ function createToggleButton() {
     showMarket.value = !showMarket.value
 
     updateButtonContent()
+    // resetChart()
+    _widget?.resetCache?.()
+    _widget?.activeChart?.().resetData?.()
+  }
+  updateButtonContent()
+  headerBtns.push(btn)
+}
+// 创建价格提醒按钮
+function createTogglePriceWarningButton() {
+  const btn = _widget?.createButton({ align: 'right', useTradingViewStyle: false })
+  if (!btn) return
+
+  const updateButtonContent = () => {
+    btn.innerHTML = `<div style="display: flex;align-items: center;cursor:pointer;padding: 7px 5px 7px 0;border-radius: 6px;" onMouseOver="this.style.background='none'"  onMouseLeave="this.style.background='none'"><img width="18" height="18" src="https://ave.s3.ap-east-1.amazonaws.com/im/alert.png" /></div>`
+  }
+
+  btn.onclick = () => {
+    dialogVisible_remind.value = !dialogVisible_remind.value
     // resetChart()
     _widget?.resetCache?.()
     _widget?.activeChart?.().resetData?.()
@@ -480,15 +513,23 @@ async function initChart() {
             }
           }
           const interval = switchResolution(resolution)
-          const params = {
+          const params: any = {
             interval: interval,
-            pair_id: pair.value + '-' + chain.value,
-            token_id: pair.value ? undefined : token.value,
+            // pair_id: pair.value + '-' + chain.value,
+            token_id: token.value,
             from,
             to: firstDataRequest ? 0 : Math.max(to, firstBarTime || 0)
           }
+          const isTokenKline = SupportTokenKlineChains?.includes?.(chain.value) && !props.isRank && 'tokenAllPair' in tokenStore && tokenStore?.tokenAllPair && tokenStore?.selectedToken
+
+          console.log('[getBars] isTokenKline', isTokenKline)
+          if (!isTokenKline) {
+            params.pair_id = pair.value + '-' + chain.value
+            delete params.token_id
+          }
           loading = true
-          getKlineHistoryData(params).then(res => {
+          const getKlineFunc = isTokenKline ? getTokenKlineHistory : getKlineHistoryData
+          getKlineFunc(params).then(res => {
             const bars1 = res?.kline_data || []
             const bars = bars1?.map?.(i => ({
               time: i.time * 1000,

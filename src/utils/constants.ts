@@ -117,6 +117,8 @@ export const ProvideType = {
 export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer','fsc']
 export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
 
+export const SupportTokenKlineChains = ['juchain', 'arbitrum', 'optimism']
+
 export const defaultPaginationParams = {
   pageNO: 1,
   pageSize: 20,
@@ -193,4 +195,15 @@ export const SwapType = {
   SELL: 2,
   LIMIT_BUY: 5,
   LIMIT_SELL: 6,
+}
+
+export const CategroyTabsCacheKey = {
+  hot:'hotRanks',
+  new:'newRanks',
+  gainer:'gainerRanks',
+  pump:'pumpRanks',
+  inclusion:'inclusionRanks',
+  binance_alpha:'binance_alphaRanks',
+  xstocks:'xstocksRanks',
+  volume:'volumeRanks',
 }

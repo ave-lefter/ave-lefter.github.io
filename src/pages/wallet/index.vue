@@ -113,6 +113,7 @@ import { ElMessage } from 'element-plus'
 import { decryptMsg } from '@/utils/index'
 import { useStorage, useThrottleFn, useDebounceFn } from '@vueuse/core'
 import { Warning } from '@element-plus/icons-vue'
+import { markRaw } from 'vue'
 defineExpose({
   getMultiWalletsAllChain,
 })
@@ -302,7 +303,7 @@ function refresh() {
 const goOn = () => {
   ElMessageBox.confirm(t('lastChance'), t('tips'), {
     type: 'warning',
-    icon: Warning,
+    icon: markRaw(Warning),
     confirmButtonText: t('saved'),
     cancelButtonText: t('cancel'),
     customClass: `${mode.value} delete_confirm`,
