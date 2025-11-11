@@ -1,0 +1,32 @@
+export type PerpInfo = {
+  contractId: string
+  contractName: string
+  priceChange: string
+  priceChangePercent: string
+  trades: string
+  size: string
+  value: string
+  high: string
+  low: string
+  open: string
+  close: string
+  highTime: string
+  lowTime: string
+  startTime: string
+  endTime: string
+  lastPrice: string
+  indexPrice: string
+  oraclePrice: string
+  openInterest: string
+  fundingRate: string
+  fundingTime: string
+  nextFundingTime: string
+  bestAskPrice?: string
+  bestBidPrice?: string
+  iconUrl: string
+  displayMaxLeverage: string
+  fundingInterestRate?: string
+  baseCoinName: string
+  quoteCoinName: string
+  nextFundingTime: string
+}
