@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
 import WS, { type WSOptions } from '@/utils/ws'
-import { WSPerpEventType, WSPerpHost } from '~/utils/constants'
+import { usePerpStore } from './index'
+import { WSPerpHost } from '@/utils/constants'
 
 function getWSMessage(e: MessageEvent): {
   sid?: string // 会话ID
@@ -18,26 +19,57 @@ function getWSMessage(e: MessageEvent): {
   return null
 }
 
-export const usePerpWsPubStore = defineStore('perpWsPub', () => {
+export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
   // 使用 shallowRef 代替 ref，WebSocket 本身是非响应式的
   const wsInstance = shallowRef<WS | null>(null)
   const isConnected = shallowRef(false)
   // const WSHost = 'wss://quote-testnet.edgex.exchange'
-  // const WSHost = 'wss://quote.edgex.exchange'
   // const WS_URL = `wss://quote.edgex.exchange/api/v1/public/ws`
+  // const WSHost = 'wss://quote.edgex.exchange'
 
+  const perpStore = usePerpStore()
 
-  const wsResult = reactive<Record<(typeof WSPerpEventType)[keyof typeof WSPerpEventType], any>>({
-    [WSPerpEventType.TICKER_ALL_1S]: null
+  const wsResult = reactive<Record<(typeof WSEventType)[keyof typeof WSEventType], any>>({
 
   })
+
+  function getWSURLAndHeaders() {
+    const accountId = perpStore.userInfo?.id || ''
+    const timestamp = Date.now().toString()
+    const wsOptions = {
+      path: `/api/v1/private/ws`,
+      timestamp,
+      accountId,
+      url: `${WSPerpHost}/api/v1/private/ws?accountId=${accountId}&timestamp=${timestamp}`
+    }
+    const headers = perpStore.generateEdgeXAuthHeaders({
+      method: 'GET',
+      path: wsOptions.path,
+      params: {
+        accountId,
+        timestamp
+      }
+    })
+
+    const wssSignParam = {
+      ...headers
+    }
+    const wssSignSignature = btoa(JSON.stringify(wssSignParam)).replace(/=/g, '')
+    return {
+      url: `${WSPerpHost}/api/v1/private/ws?accountId=${accountId}&timestamp=${timestamp}`,
+      protocols: wssSignSignature
+    }
+
+  }
 
   // 将 createWebSocket 重命名为 init
   const init = (options?: WSOptions) => {
     if (wsInstance.value) return  // 防止重复创建 WebSocket 实例
     // ?timestamp=${Date.now()}
-    const WS_URL = `${WSPerpHost}/api/v1/public/ws?timestamp=${Date.now()}`
-    wsInstance.value = new WS({url: WS_URL, pingMsg: `{"type":"ping","time":"${Date.now()}"}`, ...(options || {})})
+    if (!perpStore.userInfo?.id) {
+      return
+    }
+    wsInstance.value = new WS({...getWSURLAndHeaders(), pingMsg: `{"type":"ping","time":"${Date.now()}"}`, ...(options || {})})
 
     wsInstance.value.onopen(() => {
       isConnected.value = true
@@ -74,8 +106,7 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
   }, options?: WSOptions) => {
     if (!wsInstance.value) {
       // 如果 WebSocket 未初始化，则自动调用 init 初始化
-      const WS_URL = `${WSPerpHost}/api/v1/public/ws?timestamp=${Date.now()}`
-      init(options || { url: WS_URL })  // 默认空 URL，或者你可以传递默认的初始化选项
+      init(options || getWSURLAndHeaders())  // 默认空 URL，或者你可以传递默认的初始化选项
     }
     wsInstance.value?.send(msg)
     return wsInstance.value
@@ -83,9 +114,8 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
 
   function getWSInstance() {
      if (!wsInstance.value) {
-      const WS_URL = `${WSPerpHost}/api/v1/public/ws?timestamp=${Date.now()}`
       // 如果 WebSocket 未初始化，则自动调用 init 初始化
-      init({ url: WS_URL })  // 默认空 URL，或者你可以传递默认的初始化选项
+      init(getWSURLAndHeaders())  // 默认空 URL，或者你可以传递默认的初始化选项
     }
     return wsInstance.value
   }

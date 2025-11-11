@@ -895,7 +895,7 @@ export function formatUnits(n: number | string, decimals = 0) {
   return new BigNumber(n).div(new BigNumber(10).pow(new BigNumber(decimals || 0))).toFixed()
 }
 
-export function parseUnits(n: number | string, decimals = 0) {
+export function parseUnits(n: number | string, decimals: number | string = 0) {
   return new BigNumber(
     new BigNumber(n).times(new BigNumber(10).pow(new BigNumber(decimals || 0))).toFixed(0)
   )
