@@ -393,7 +393,7 @@ watch(activeTab, (val) => {
   }
 })
 onMounted(() => {
-  getHoldersList()
+  //getHoldersList()
 })
 onActivated(() => {
   if(activeTab.value === '-100' && !selfAddress.value) {
