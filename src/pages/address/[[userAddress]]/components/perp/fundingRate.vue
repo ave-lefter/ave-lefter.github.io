@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { SuffixIcon } from '#components'
 import dayjs from 'dayjs'
+import { getPositionTransactionPage, type PositionTransactionPageResponse } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 
 const perpStore = usePerpStore()
 const { t } = useI18n()
+const listData = shallowRef<PositionTransactionPageResponse[]>([])
 const searchParams = ref({
+  size:10,
   filterTypeList:'SETTLE_FUNDING_FEE',
   filterContractIdList:'ALL',
   filterStartCreatedTimeInclusive:'',
@@ -31,208 +34,6 @@ const typeOptions = computed(()=>{
     value:'ALL'
   }].concat(contractList || [])
 })
-const list = [
-  {
-    'id': '682913270562031572',
-    'userId': '682587604402569474',
-    'accountId': '682587604448707540',
-    'coinId': '1000',
-    'contractId': '10000001',
-    'type': 'SETTLE_FUNDING_FEE',
-    'deltaOpenSize': '0',
-    'deltaOpenValue': '0',
-    'deltaOpenFee': '0',
-    'deltaFundingFee': '-0.005301',
-    'beforeOpenSize': '0.001',
-    'beforeOpenValue': '106.422900',
-    'beforeOpenFee': '-0.040440',
-    'beforeFundingFee': '-0.015851',
-    'fillCloseSize': '',
-    'fillCloseValue': '',
-    'fillCloseFee': '',
-    'fillOpenSize': '',
-    'fillOpenValue': '',
-    'fillOpenFee': '',
-    'fillPrice': '',
-    'liquidateFee': '',
-    'realizePnl': '',
-    'isLiquidate': false,
-    'isDeleverage': false,
-    'fundingTime': '1762819200000',
-    'fundingRate': '0.00005000',
-    'fundingIndexPrice': '106006.378880724',
-    'fundingOraclePrice': '106010.0895143114030361175537109375',
-    'fundingPositionSize': '0.001',
-    'orderId': '0',
-    'orderFillTransactionId': '0',
-    'collateralTransactionId': '682913270562030548',
-    'forceTradeId': '0',
-    'extraType': '',
-    'extraDataJson': '',
-    'censorStatus': 'L2_APPROVED',
-    'censorTxId': '43833758',
-    'censorTime': '1762819200205',
-    'censorFailCode': '',
-    'censorFailReason': '',
-    'l2TxId': '44036974',
-    'l2RejectTime': '0',
-    'l2RejectCode': '',
-    'l2RejectReason': '',
-    'l2ApprovedTime': '1762819658475',
-    'createdTime': '1762819200205',
-    'updatedTime': '1762819670143'
-  },
-  {
-    'id': '682852870562777044',
-    'userId': '682587604402569474',
-    'accountId': '682587604448707540',
-    'coinId': '1000',
-    'contractId': '10000001',
-    'type': 'SETTLE_FUNDING_FEE',
-    'deltaOpenSize': '0',
-    'deltaOpenValue': '0',
-    'deltaOpenFee': '0',
-    'deltaFundingFee': '-0.005289',
-    'beforeOpenSize': '0.001',
-    'beforeOpenValue': '106.422900',
-    'beforeOpenFee': '-0.040440',
-    'beforeFundingFee': '-0.010562',
-    'fillCloseSize': '',
-    'fillCloseValue': '',
-    'fillCloseFee': '',
-    'fillOpenSize': '',
-    'fillOpenValue': '',
-    'fillOpenFee': '',
-    'fillPrice': '',
-    'liquidateFee': '',
-    'realizePnl': '',
-    'isLiquidate': false,
-    'isDeleverage': false,
-    'fundingTime': '1762804800000',
-    'fundingRate': '0.00005000',
-    'fundingIndexPrice': '105815.678578784',
-    'fundingOraclePrice': '105793.96956600248813629150390625',
-    'fundingPositionSize': '0.001',
-    'orderId': '0',
-    'orderFillTransactionId': '0',
-    'collateralTransactionId': '682852870562776020',
-    'forceTradeId': '0',
-    'extraType': '',
-    'extraDataJson': '',
-    'censorStatus': 'L2_APPROVED',
-    'censorTxId': '43780322',
-    'censorTime': '1762804800204',
-    'censorFailCode': '',
-    'censorFailReason': '',
-    'l2TxId': '43983538',
-    'l2RejectTime': '0',
-    'l2RejectCode': '',
-    'l2RejectReason': '',
-    'l2ApprovedTime': '1762805401982',
-    'createdTime': '1762804800204',
-    'updatedTime': '1762805412032'
-  },
-  {
-    'id': '682792472090249172',
-    'userId': '682587604402569474',
-    'accountId': '682587604448707540',
-    'coinId': '1000',
-    'contractId': '10000001',
-    'type': 'SETTLE_FUNDING_FEE',
-    'deltaOpenSize': '0',
-    'deltaOpenValue': '0',
-    'deltaOpenFee': '0',
-    'deltaFundingFee': '-0.005253',
-    'beforeOpenSize': '0.001',
-    'beforeOpenValue': '106.422900',
-    'beforeOpenFee': '-0.040440',
-    'beforeFundingFee': '-0.005309',
-    'fillCloseSize': '',
-    'fillCloseValue': '',
-    'fillCloseFee': '',
-    'fillOpenSize': '',
-    'fillOpenValue': '',
-    'fillOpenFee': '',
-    'fillPrice': '',
-    'liquidateFee': '',
-    'realizePnl': '',
-    'isLiquidate': false,
-    'isDeleverage': false,
-    'fundingTime': '1762790400000',
-    'fundingRate': '0.00005000',
-    'fundingIndexPrice': '105073.673452809',
-    'fundingOraclePrice': '105046.823439188301563262939453125',
-    'fundingPositionSize': '0.001',
-    'orderId': '0',
-    'orderFillTransactionId': '0',
-    'collateralTransactionId': '682792472090248148',
-    'forceTradeId': '0',
-    'extraType': '',
-    'extraDataJson': '',
-    'censorStatus': 'L2_APPROVED',
-    'censorTxId': '43711279',
-    'censorTime': '1762790400204',
-    'censorFailCode': '',
-    'censorFailReason': '',
-    'l2TxId': '43914495',
-    'l2RejectTime': '0',
-    'l2RejectCode': '',
-    'l2RejectReason': '',
-    'l2ApprovedTime': '1762790710503',
-    'createdTime': '1762790400204',
-    'updatedTime': '1762790722930'
-  },
-  {
-    'id': '682732075563878356',
-    'userId': '682587604402569474',
-    'accountId': '682587604448707540',
-    'coinId': '1000',
-    'contractId': '10000001',
-    'type': 'SETTLE_FUNDING_FEE',
-    'deltaOpenSize': '0',
-    'deltaOpenValue': '0',
-    'deltaOpenFee': '0',
-    'deltaFundingFee': '-0.005309',
-    'beforeOpenSize': '0.001',
-    'beforeOpenValue': '106.422900',
-    'beforeOpenFee': '-0.040440',
-    'beforeFundingFee': '0',
-    'fillCloseSize': '',
-    'fillCloseValue': '',
-    'fillCloseFee': '',
-    'fillOpenSize': '',
-    'fillOpenValue': '',
-    'fillOpenFee': '',
-    'fillPrice': '',
-    'liquidateFee': '',
-    'realizePnl': '',
-    'isLiquidate': false,
-    'isDeleverage': false,
-    'fundingTime': '1762776000000',
-    'fundingRate': '0.00005000',
-    'fundingIndexPrice': '106176.649234653',
-    'fundingOraclePrice': '106176.505000330507755279541015625',
-    'fundingPositionSize': '0.001',
-    'orderId': '0',
-    'orderFillTransactionId': '0',
-    'collateralTransactionId': '682732075563877332',
-    'forceTradeId': '0',
-    'extraType': '',
-    'extraDataJson': '',
-    'censorStatus': 'L2_APPROVED',
-    'censorTxId': '43601637',
-    'censorTime': '1762776000203',
-    'censorFailCode': '',
-    'censorFailReason': '',
-    'l2TxId': '43804853',
-    'l2RejectTime': '0',
-    'l2RejectCode': '',
-    'l2RejectReason': '',
-    'l2ApprovedTime': '1762776574291',
-    'createdTime': '1762776000203',
-    'updatedTime': '1762776587443'
-  }
-]
 const disabledStartDate = (date:Date)=>{
     if(searchParams.value.filterEndCreatedTimeExclusive){
     return dayjs(date).isAfter(dayjs(Number(searchParams.value.filterEndCreatedTimeExclusive)*1000)) 
@@ -245,11 +46,33 @@ const disabledEndDate = (date:Date)=>{
   }
   return false
 }
+
+const getList = async ()=>{
+  const params = Object.create(null)
+  Object.keys(searchParams.value).forEach((key:string)=>{
+    const val = searchParams.value[key] as any
+    if(val){
+      if(['filterStartCreatedTimeInclusive','filterEndCreatedTimeExclusive'].includes(key)){
+        params[key] = val*1000
+      } else if(val !== 'ALL'){
+        params[key] = val
+      }
+    }
+  })
+  const res = await getPositionTransactionPage({
+    ...params,size:10
+  })
+  listData.value = res.dataList || []
+}
+
+onMounted(()=>{
+  getList()
+})
 </script>
 
 <template>
   <div class="flex items-center justify-end gap-8px mb-16px">
-    <el-select v-model="searchParams.filterContractIdList" size="small" class="[&&]:[--el-select-width:110px]" popper-class="[--el-font-size-base:12px]" :suffix-icon="SuffixIcon">
+    <el-select v-model="searchParams.filterContractIdList" size="small" class="[&&]:[--el-select-width:110px]" popper-class="[--el-font-size-base:12px]" :suffix-icon="SuffixIcon" @change="getList">
       <template #prefix>
         <span>{{ t('type') }}</span>
       </template>
@@ -266,6 +89,7 @@ const disabledEndDate = (date:Date)=>{
           :placeholder="t('startTime')"
           value-format="X"
           :teleported="false"
+          @change="getList"
         />
         {{ $t('to') }}
         <el-date-picker
@@ -278,10 +102,11 @@ const disabledEndDate = (date:Date)=>{
           :placeholder="t('endTime1')"
           value-format="X"
           :teleported="false"
+          @change="getList"
         />
       </div>
   </div>
-  <el-table :data="list" header-row-class-name="text-12px sticky top-0 z-10 font-500" cell-class-name="color-[--main-text] text-12px" row-class-name="cursor-pointer">
+  <el-table :data="listData" header-row-class-name="text-12px sticky top-0 z-10 font-500" cell-class-name="color-[--main-text] text-12px" row-class-name="cursor-pointer">
       <el-table-column :label="t('tradeTime')" prop="fundingTime" >
         <template #default="{ row }">
           {{ dayjs(+row.fundingTime).format('YYYY-MM-DD HH:mm:ss') }}
@@ -309,7 +134,7 @@ const disabledEndDate = (date:Date)=>{
       </el-table-column>
       <el-table-column align="right" :label="t('fundingRate')" prop="fundingRate" >
         <template #default="{ row }">
-         {{ row.fundingRate * 100 }}%
+         {{ formatNumber(row.fundingRate * 100) }}%
         </template>
       </el-table-column>
       <el-table-column align="right" :label="t('oraclePrice')" prop="fundingOraclePrice" >

@@ -1,5 +1,5 @@
 import { perpApi as api } from './request'
-import { type Metadata } from '@edgex-fe/typescript-sdk'
+import type { Metadata } from '@edgex-fe/typescript-sdk'
 
 import localforage from 'localforage'
 import { getAddress } from 'ethers'
@@ -72,5 +72,178 @@ export async function onboardSite(): Promise<{
       l2KeyYCoordinate: '0x' + perpStore.l2KeyPair?.l2PublicKeyY,
       clientAccountId: 'main'
     }
+  })
+}
+
+export interface PositionTransactionPageResponse {
+  id:                      string;
+  userId:                  string;
+  accountId:               string;
+  coinId:                  string;
+  contractId:              string;
+  type:                    string;
+  deltaOpenSize:           string;
+  deltaOpenValue:          string;
+  deltaOpenFee:            string;
+  deltaFundingFee:         string;
+  beforeOpenSize:          string;
+  beforeOpenValue:         string;
+  beforeOpenFee:           string;
+  beforeFundingFee:        string;
+  fillCloseSize:           string;
+  fillCloseValue:          string;
+  fillCloseFee:            string;
+  fillOpenSize:            string;
+  fillOpenValue:           string;
+  fillOpenFee:             string;
+  fillPrice:               string;
+  liquidateFee:            string;
+  realizePnl:              string;
+  isLiquidate:             boolean;
+  isDeleverage:            boolean;
+  fundingTime:             string;
+  fundingRate:             string;
+  fundingIndexPrice:       string;
+  fundingOraclePrice:      string;
+  fundingPositionSize:     string;
+  orderId:                 string;
+  orderFillTransactionId:  string;
+  collateralTransactionId: string;
+  forceTradeId:            string;
+  extraType:               string;
+  extraDataJson:           string;
+  censorStatus:            string;
+  censorTxId:              string;
+  censorTime:              string;
+  censorFailCode:          string;
+  censorFailReason:        string;
+  l2TxId:                  string;
+  l2RejectTime:            string;
+  l2RejectCode:            string;
+  l2RejectReason:          string;
+  l2ApprovedTime:          string;
+  createdTime:             string;
+  updatedTime:             string;
+}
+// 资产-资金费率
+export async function getPositionTransactionPage(params:{
+  filterTypeList:string
+  size:number
+  filterStartCreatedTimeInclusive?:string
+  filterEndCreatedTimeExclusive?:string
+  filterContractIdList?:string
+}):Promise<{dataList:PositionTransactionPageResponse[]}> {
+  const perpStore = usePerpStore()
+  return api('/api/v1/private/account/getPositionTransactionPage', {
+    method: 'get',
+    query: {
+      ...params,
+      accountId:perpStore.userInfo?.id
+    }
+  })
+}
+
+// 资产-资金记录
+export async function getAllOrdersPage(params:{
+  size:number
+  typeList?:string
+  startTime?:string
+  endTime?:string
+}){
+  const perpStore = usePerpStore()
+  return api('/api/v1/private/assets/getAllOrdersPage', {
+    method: 'get',
+    query: {
+      ...params,
+      accountId:perpStore.userInfo?.id
+    }
+  })
+}
+
+export interface ProfitResponse {
+  userId:           string;
+  totalEquity:      string;
+  profit:           string;
+  profitRate:       string;
+  withdraw:         string;
+  deposit:          string;
+  totalWithdraw:    string;
+  totalDeposit:     string;
+  transaction:      string;
+  totalTransaction: string;
+  maxDrawdown:      string;
+  totalProfit:      string;
+  accountList:      AccountList[];
+}
+
+export interface AccountList {
+  accountId:                string;
+  totalEquity:              string;
+  profit:                   string;
+  deposit:                  string;
+  withdraw:                 string;
+  collateralAssetModelList: CollateralAssetModelList[];
+  positionAssetList:        PositionAssetList[];
+  assetOrderModelList:      any[];
+}
+
+export interface CollateralAssetModelList {
+  userId:                   string;
+  accountId:                string;
+  coinId:                   string;
+  totalEquity:              string;
+  totalPositionValueAbs:    string;
+  initialMarginRequirement: string;
+  starkExRiskValue:         string;
+  pendingWithdrawAmount:    string;
+  pendingTransferOutAmount: string;
+  orderFrozenAmount:        string;
+  availableAmount:          string;
+}
+
+export interface PositionAssetList {
+  userId:                   string;
+  accountId:                string;
+  coinId:                   string;
+  contractId:               string;
+  positionValue:            string;
+  maxLeverage:              string;
+  initialMarginRequirement: string;
+  starkExRiskRate:          string;
+  starkExRiskValue:         string;
+  avgEntryPrice:            string;
+  liquidatePrice:           string;
+  bankruptPrice:            string;
+  worstClosePrice:          string;
+  unrealizePnl:             string;
+  termRealizePnl:           string;
+  totalRealizePnl:          string;
+}
+// 资产-总资产
+export async function profit():Promise<ProfitResponse>{
+  const perpStore = usePerpStore()
+  return api('/api/v1/private/user/day/profit', {
+    method: 'get',
+    query: {
+      userId:perpStore.userInfo?.id
+    }
+  })
+}
+
+// 资产-周积分
+export async function ranking(){
+  return api('https://award.edgex.exchange/api/points/ranking', {
+    method: 'post',
+    body: {
+      needpage:0,
+      pagecount:15,
+      type:2
+    }
+  })
+}
+// 资产-总积分
+export async function totalPoints(){
+  return api('https://award.edgex.exchange/api/points/info', {
+    method: 'post'
   })
 }

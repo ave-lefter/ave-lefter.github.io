@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { SuffixIcon } from '#components'
 import dayjs from 'dayjs'
+import { getAllOrdersPage } from '~/api/perp'
 
 const { t } = useI18n()
+const listData = shallowRef<any[]>([])
 const typeDict = computed(()=>({
   ORDER_TYPE_NORMAL_DEPOSIT:{
     value:'ORDER_TYPE_NORMAL_DEPOSIT',
@@ -42,23 +44,6 @@ const typeOptions = computed(()=>[{label:t('all'),value:'ALL'}].concat(Object.va
 const statusDict = {
   6:t('success2'),
 }
-const list = [
-  {
-    'orderId': '1172415724396740608',
-    'time': '1762754491',
-    'type': 'ORDER_TYPE_CROSS_DEPOSIT',
-    'status': 6,
-    'amount': '21.543289060371890153',
-    'fee': '',
-    'txId': '0xb05e9e5e7c8354b3cb5e40a4387c16d14bc8d45538dd062a7fb64c3417398c51',
-    'chain': 'BNB Chain',
-    'address': '0x59A2a187C5B09fE0F1D5eC0dDB7adf7d1228F1aa',
-    'coin': 'USDT',
-    'chainId': '56',
-    'transferSenderAccountId': '0',
-    'transferReceiverAccountId': '0'
-  }
-]
 function jumpToTx(chainId:string,txId:string){
   const chainInfo = getChainInfo(chainId,true)
   window.open(formatExplorerUrl(chainInfo?.net_name,txId,'tx'),'_blank')
@@ -79,11 +64,34 @@ const disabledEndDate = (date:Date)=>{
   }
   return false
 }
+
+const getList = async ()=>{
+  const params = Object.create(null)
+  Object.keys(searchParams.value).forEach((key:string)=>{
+    const val = searchParams.value[key] as any
+    if(val){
+      if(['startTime','endTime'].includes(key)){
+        params[key] = val*1000
+      } else if(val !== 'ALL'){
+        params[key] = val
+      }
+    }
+  })
+  const res = await getAllOrdersPage({
+    ...params,
+    size:10
+  })
+  listData.value = res?.dataList || []
+}
+
+onMounted(()=>{
+  getList()
+})
 </script>
 
 <template>
   <div class="flex items-center justify-end gap-8px mb-16px">
-    <el-select v-model="searchParams.typeList" size="small" class="[&&]:[--el-select-width:110px]" popper-class="[--el-font-size-base:12px]" :suffix-icon="SuffixIcon">
+    <el-select v-model="searchParams.typeList" size="small" class="[&&]:[--el-select-width:110px]" popper-class="[--el-font-size-base:12px]" :suffix-icon="SuffixIcon" @change="getList">
       <template #prefix>
         <span>{{ t('type') }}</span>
       </template>
@@ -100,6 +108,7 @@ const disabledEndDate = (date:Date)=>{
           :placeholder="t('startTime')"
           value-format="X"
           :teleported="false"
+          @change="getList"
         />
         {{ $t('to') }}
         <el-date-picker
@@ -112,10 +121,11 @@ const disabledEndDate = (date:Date)=>{
           :placeholder="t('endTime2')"
           value-format="X"
           :teleported="false"
+          @change="getList"
         />
       </div>
   </div>
-  <el-table :data="list" header-row-class-name="text-12px sticky top-0 z-10 font-500" cell-class-name="color-[--main-text] text-12px" row-class-name="cursor-pointer">
+  <el-table :data="listData" header-row-class-name="text-12px sticky top-0 z-10 font-500" cell-class-name="color-[--main-text] text-12px" row-class-name="cursor-pointer">
       <el-table-column :label="t('tradeTime')" prop="time" >
         <template #default="{ row }">
           {{ dayjs(row.time*1000).format('YYYY-MM-DD HH:mm:ss') }}
