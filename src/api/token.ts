@@ -5,7 +5,7 @@ import { createCacheRequest } from '#imports'
 import { getTonTokenList } from '~/utils/wallet/ton'
 import { getTokenPnl } from './bot'
 
-// const testDomain = 'https://0ftrfsdb.xyz'
+// const testDomain = 'https://api.test.phaetd8l.com'
 
 // export function getTokenInfo(id: string): Promise<null | TokenInfo> {
 //   const {address, chain} = getAddressAndChainFromId(id)
