@@ -1,5 +1,9 @@
 <template>
   <div class="perp-deposit">
+    <div class="flex items-center color-[--yellow] text-12px mb-15px">
+      <Icon name="carbon:warning-filled" class="text-14px  color-[--yellow] mr-3px mb--1px" />
+      <span>请勿使用无私钥钱包进行充值，否则会导致资金损失且无法追回。</span>
+    </div>
     <el-select
       v-model="depositForm.token"
       placeholder="Select"
@@ -7,7 +11,7 @@
       size="large"
     >
       <template #prefix>
-        <div class="color-[--third-color]">{{ $t('token') }}</div>
+        <div class="color-[--third-text]">{{ $t('token') }}</div>
       </template>
       <template #label="{value, label}">
         <div class="inline-flex items-center vertical-middle">
@@ -34,12 +38,12 @@
       size="large"
     >
       <template #prefix>
-        <div class="color-[--third-color]">选链</div>
+        <div class="color-[--third-text]">{{ $t('chain1') }}</div>
       </template>
       <template #label="{value, label}">
         <div class="inline-flex items-center vertical-middle">
           <img :src="chains.find(item => item.chainId === value)?.chainIconUrl" class="rd-50% mr-5px" width="24" lazy alt="">
-          <span>{{ label || '' }}</span>
+          <span>{{ chains.find(item => item.chainId === value)?.chain || getChainInfo(value, true)?.name || label || '' }}</span>
         </div>
       </template>
       <el-option
@@ -59,27 +63,25 @@
       size="large"
       @input="value => depositForm.amount = value.replace(/\-|[^\d.]/g, '')">
       <template #prefix>
-        <div class="color-[--third-color]">{{ $t('amount') }}</div>
+        <div class="color-[--third-text]">{{ $t('amount') }}</div>
       </template>
       <template #suffix>
-        <button class="color-[--primary-color] border-none bg-transparent clickable text-14px" @click="depositForm.amount = balance">{{ $t('max') }}</button>
+        <button class="color-[--primary-color] border-none bg-transparent clickable text-14px" @click.stop="depositForm.amount = balance">{{ $t('max') }}</button>
       </template>
     </el-input>
     <div class="text-12px color-[--third-text] mt-8px text-right">
-      <span>可用资产: </span><span>{{ formatNumber(balance, 3) }} {{ tokenInfo?.token || '' }}</span>
+      <span>{{ $t('availableBalance') }}: </span><span>{{ formatNumber(balance, 3) }} {{ depositForm?.token || '' }}</span>
     </div>
     <div class="text-14px flex items-center justify-between mt-32px rd-4px">
       <span class="color-[--secondary-text]">到账时间</span>
       <span class="color-[--main-text]">≈ 2分钟</span>
     </div>
     <div class="text-14px flex items-center justify-between mt-16px rd-4px">
-      <span class="color-[--secondary-text]">总资产</span>
-      <span class="color-[--main-text]">{{ formatNumber(balance, 3) }} {{ tokenInfo?.token || '' }}</span>
+      <span class="color-[--secondary-text]">{{ $t('totalBalance1') }}</span>
+      <span class="color-[--main-text]">${{ formatNumber(perpStore.collateral?.[0]?.amount || 0, 3) }}</span>
     </div>
     <el-button v-if="isCanDeposit" type="primary" size="large" class="w-full text-16px h-48px rd-8px mt-20px" :loading="loading" @click.stop="handleDeposit">充值确认</el-button>
     <button v-else disabled class="w-full text-16px h-48px bg-[--border] color-[--secondary-text] flex items-center justify-center border-none rd-8px mt-20px cursor-not-allowed">充值确认</button>
-
-
   </div>
 </template>
 
@@ -104,7 +106,7 @@ const walletStore = useWalletStore()
 const { t } = useI18n()
 
 const depositForm = reactive<{
-  chain: string
+  chain: string | undefined
   token: string
   amount: string | number
 }>({
@@ -190,16 +192,14 @@ const chains = computed(() => {
 
 watch(chains, (val) => {
   if (val.length) {
+    if (val?.some(i => i.chainId === depositForm.chain)) return
     depositForm.chain = val[0].chainId
   }
 })
 
-const tokenInfo = computed(() => {
-  return (perpStore.metadata?.multiChain?.chainList || []).find(i => i.chainId === depositForm.chain)?.tokenList?.find(i => i.tokenAddress === depositForm.token)
-})
 
 const isCanDeposit = computed(() => {
-  return depositForm.chain && depositForm.token && depositForm.amount
+  return depositForm.chain && depositForm.token && depositForm.amount && (perpStore.metadata?.multiChain?.chainList || [])?.some?.(i => i.chainId === depositForm.chain)
 })
 
 watch(() => depositForm.token, () => {
@@ -208,12 +208,15 @@ watch(() => depositForm.token, () => {
 })
 
 function init() {
-  const chain = getChainInfo(walletStore.chain)?.chain_id || (perpStore.metadata?.multiChain.chainList || [])?.[0]?.chainId
-  // if (depositForm.chain) return
+  const chainList = (perpStore.metadata?.multiChain.chainList || [])
+  const chain = getChainInfo(walletStore.chain)?.chain_id || chainList?.[0]?.chainId
   depositForm.token = 'USDT'
-  depositForm.chain = chain
-
-  getTokenBalance()
+  if (chainList?.some(i => i.chainId === chain)) {
+    depositForm.chain = chain
+    getTokenBalance()
+  } else {
+    depositForm.chain = undefined
+  }
   // getAllowance()
 }
 
@@ -239,16 +242,11 @@ watch(() => depositForm.chain, (val) => {
 const loading = ref(false)
 async function handleDeposit() {
   if (!isCanDeposit.value) return
-  const minDeposit = perpStore.metadata?.multiChain?.minDeposit || 0
-  if (new BigNumber(depositForm.amount || 0).lt(minDeposit)) {
-    ElMessage.error(t('minDeposit', { amount: minDeposit }))
-    // ElNotification({
-    //   title: 'Error',
-    //   message: t('minDeposit', { amount: minDeposit }),
-    //   type: 'error'
-    // })
-    return
-  }
+  // const minDeposit = perpStore.metadata?.multiChain?.minDeposit || 0
+  // if (new BigNumber(depositForm.amount || 0).lt(minDeposit)) {
+  //   ElMessage.error(t('minDeposit', { amount: minDeposit }))
+  //   return
+  // }
   loading.value = true
   const isApprove = await getIsApprove()
   const tokenInfo = getTokenInfo()
@@ -276,7 +274,7 @@ async function handleDeposit() {
     return res.wait()
   }).then((res) => {
     console.log(res)
-    ElNotification({ type: 'success', message:  t('depositSuccess') })
+    ElNotification({ type: 'success', message:  t('depositComplete') })
     emit('success', res)
     loading.value = false
   }).catch(err => {
@@ -299,6 +297,9 @@ onMounted(() => {
   }
   :deep() .el-input__inner {
     text-align: right;
+  }
+  :deep() .el-select.el-select .el-select__wrapper {
+    font-size: 14px;
   }
 }
 

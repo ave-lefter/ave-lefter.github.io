@@ -125,7 +125,7 @@
                 <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
               </div>
             </li>
-            <li class="flex justify-between h-40px clickable">
+            <li class="flex justify-between h-40px clickable" @click.stop="withdraw">
               <div class="color-[--main-text] flex items-center gap-8px">
                 <Icon name="solar:upload-outline" class="text-18px" />
                 <span class="text-14px">{{ $t('withdraw') }}</span>
@@ -159,7 +159,9 @@ const activeTab = ref(0)
 const balance = ref('0')
 const nativePrice = ref<number | string>(0)
 
-const prepBalance = ref<number | string>(0)
+const prepBalance = computed(() => {
+  return perpStore.collateral?.[0]?.amount || 0
+})
 
 const balanceUsd = computed(() => {
   return new BigNumber(balance.value || 0).times(nativePrice.value || 0).toFixed(2)
@@ -184,7 +186,7 @@ watch(showExWallet, (val) => {
 })
 
 // const loginDialogVisible = ref(false)
-const { dialogVisible, login, deposit } = usePerp()
+const { dialogVisible, login, deposit, withdraw } = usePerp()
 
 function updateVisible(value: boolean) {
   if (!value && dialogVisible.value) {
