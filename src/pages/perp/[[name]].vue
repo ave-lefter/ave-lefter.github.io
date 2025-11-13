@@ -31,7 +31,7 @@
                   "
                 >
                   <div>
-                    <KLine ref="klineContainer" @refresh="refresh"/>
+                    <Kline ref="klineContainer" />
                   </div>
                 </div>
                 <Bottom class="min-h-300px rounded-4px bg-[--d-000-l-F6F6F6]" />
@@ -47,12 +47,11 @@
 
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core'
-import { getTokenInfo, getTokenInfoExtra } from '~/api/token'
 import { useTokenStore } from '~/stores/token'
 import Top from './components/top/index.vue'
 import TokenRight from './components/right/index.vue'
 import Bottom from './components/bottom/index.vue'
-import KLine from './components/kLine/index.vue'
+import Kline from './components/kline/index.vue'
 // import {OrderBook} from './components/orderBook'
 
 definePageMeta({
@@ -63,7 +62,6 @@ definePageMeta({
 })
 const route = useRoute()
 const localeStore = useLocaleStore()
-const tagStore = useTagStore()
 const tokenStore = useTokenStore()
 const scrollbarHeight = computed(() => {
   if (tokenStore.isShowWaring) {
@@ -164,35 +162,8 @@ watch(
     immediate: true,
   }
 )
-
-function _getTokenInfo() {
-  const id = route.params.id as string
-  return getTokenInfo(id).then((res) => {
-    tokenStore.tokenInfo = res
-    tokenStore.pairAddress = res?.pairs?.[0].pair || ''
-  })
-}
 function init(isRefresh = false) {
-  tokenStore.tokenPrice = 0
-  _getTokenInfo().then(() => {
-    if (!isRefresh) {
-      addVisit()
-    }
-  })
-
-  // wsStore.onmessageTxUpdateToken()
-  tokenStore._getTotalHolders(route.params.id as string)
-  tagStore.getTagArr()
-  tokenStore.twitterType = 0
-  tokenStore.getXType(route.params.id as string)
 }
-
-watch(
-  () => route.params.id,
-  () => {
-    init()
-  }
-)
 
 function visibilitychangeFn() {
   console.log(`页面是否隐藏: ${document.hidden}`)
@@ -225,31 +196,6 @@ onBeforeRouteLeave(() => {
   document.removeEventListener('visibilitychange', visibilitychangeFn)
 })
 
-function refresh() {
-  init(true)
-}
-
-function addVisit() {
-  if (tokenStore.tokenInfo) {
-    const { logo_url, symbol, chain, token } = tokenStore.tokenInfo.token
-    const index = globalStore.lastVisitTokens.findIndex((item) => item.id === token + '-' + chain)
-    if (index === -1) {
-      if (globalStore.lastVisitTokens.length >= 20) {
-        globalStore.lastVisitTokens.pop()
-      }
-      globalStore.lastVisitTokens.unshift({
-        id: token + '-' + chain,
-        logo_url,
-        symbol,
-        price_change: tokenStore.priceChange,
-        circulation: tokenStore.circulation.toString(),
-        price: tokenStore.price || 0,
-      })
-    }
-
-    usePriceV2Store().sendPriceWs()
-  }
-}
 </script>
 
 <style scoped>

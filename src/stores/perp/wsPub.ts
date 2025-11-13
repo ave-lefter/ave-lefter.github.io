@@ -28,8 +28,8 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
 
 
   const wsResult = reactive<Record<(typeof WSPerpEventType)[keyof typeof WSPerpEventType], any>>({
-    [WSPerpEventType.TICKER_ALL_1S]: null
-
+    [WSPerpEventType.TICKER_ALL_1S]: null,
+    [WSPerpEventType.KLINE]: null,
   })
 
   // 将 createWebSocket 重命名为 init
@@ -51,9 +51,12 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
       if (msg.type === 'ping') {
         send({ type: 'pong', time: msg.time })
       } else {
-        if (msg.type === 'quote-event' && msg.channel) {
+        if (msg.type === 'quote-event' && msg.channel?.startsWith(WSPerpEventType.KLINE)) {
+          // console.log('----------kline-----', msg)
+          wsResult[WSPerpEventType.KLINE] = msg.content
+        }else if (msg.type === 'quote-event' && msg.channel) {
           wsResult[msg.channel] = msg.content
-        } else {
+        }  else {
           wsResult[msg.type] = msg
         }
       }
