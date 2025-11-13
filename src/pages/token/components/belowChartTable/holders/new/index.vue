@@ -116,7 +116,7 @@
 
       </li>
       <li>
-        <div>{{ $t('totalPnL') }}</div>
+        <div>{{ $t('unrealizedProfit') }}</div>
         <div
           :class="
             !Number(totalProfit || 0)
