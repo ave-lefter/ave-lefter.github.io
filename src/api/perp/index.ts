@@ -74,3 +74,47 @@ export async function onboardSite(): Promise<{
     }
   })
 }
+
+
+
+export interface PerpKline {
+  dataList:KlineInfo[]
+}
+
+export interface KlineInfo {
+  klineId: string
+  contractId: string
+  contractName: string
+  klineType: string
+  klineTime: string
+  priceType: string
+  trades: string
+  size: string
+  value: string
+  high: string
+  low: string
+  open: string
+  close: string
+  makerBuySize: string
+  makerBuyValue: string
+  time: number
+  volume: string
+}
+// kline
+export async function _getPerpKline(params: {
+  contractId: string
+  klineType: string
+  filterBeginKlineTimeInclusive: number
+  filterEndKlineTimeExclusive: number
+  priceType: string
+}): Promise<PerpKline> {
+  return api('/api/v1/public/quote/getKline', {
+    method: 'get',
+    query: params,
+  })
+}
+export interface OrderBook {
+  price: string
+  size: string
+  sum: string
+}

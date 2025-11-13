@@ -22,7 +22,9 @@ export const usePerpStore = defineStore('perp', () => {
   const walletStore = useWalletStore()
   const userInfo = ref<null | UserInfo>(null)
   const accountList = shallowRef<UserInfo[]>([])
-  const _perpKeys = useLocalStorage<{[key: string]: {apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string }}>('perp_keys', {})
+  const _perpKeys = useLocalStorage<{ [key: string]: { apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string } }>('perp_keys', {})
+  const lastPrice= shallowRef(0)
+  const resolution = useLocalStorage('tv_resolution', '15')
 
   const apiKeys = computed(() => {
     if (!walletStore.address) {
@@ -51,9 +53,9 @@ export const usePerpStore = defineStore('perp', () => {
   const perp = computed(() => {
     return contractList?.value?.find((item) => item.contractName === contractName.value) || null
   })
-    const contractId = computed(() => {
-      return perp?.value?.contractId || ''
-    })
+  const contractId = computed(() => {
+    return perp?.value?.contractId || '10000001'
+  })
   function getPerpMetadata() {
     loadingPerpMetadata.value = true
     _getPerpMetadata().then(res => {
@@ -243,6 +245,8 @@ export const usePerpStore = defineStore('perp', () => {
     loadingPerpMetadata,
     contractList,
     perp,
-    contractName
+    contractName,
+    contractId,
+    resolution
   }
 })

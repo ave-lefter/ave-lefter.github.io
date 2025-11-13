@@ -62,9 +62,7 @@
 
     <div class="ml-16px">
       <span class="text-12px block text-left color-[--third-text]">预言机价格</span>
-      <span class="text-12px block text-left color-[--main-text] mt-2px">{{
-        formatNumber(perp?.oraclePrice || 0)
-      }}</span>
+      <span class="text-12px block text-left color-[--main-text] mt-2px">{{formatNumber(perp?.oraclePrice || 0)}}</span>
     </div>
 
     <div class="ml-16px">

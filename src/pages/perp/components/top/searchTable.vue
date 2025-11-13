@@ -107,7 +107,7 @@
           >
             <div class="token-info">
               <div class="icon-token-container relative">
-                <el-image class="token-icon" :src="row?.iconUrl" lazy>
+                <el-image class="token-icon" :src="row?.iconUrl">
                   <template #error>
                     <img class="token-icon" :src="getChainDefaultIcon()" />
                   </template>
@@ -134,8 +134,8 @@
             <div :class="Number(row.priceChangePercent )> 0 ? 'color-[--main-text]' : ''">
               ${{ formatNumber(row?.priceChangePercent || 0, 2) }}
             </div>
-            <div :class="Number(row.size ) > 0 ? 'color-[--main-text]' : ''">
-              ${{ formatNumber(row?.size || 0, 2) }}
+            <div :class="Number(row.value ) > 0 ? 'color-[--main-text]' : ''">
+              ${{ formatNumber(row?.value || 0, 2) }}
             </div>
             <div :class="Number(row.openInterest) > 0 ? 'color-[--main-text]' : ''">
               ${{ formatNumber(row?.openInterest || 0, 2) }}
@@ -185,8 +185,8 @@ const $router = useRouter()
 
 
 type SortValue = 0 | -1 | 1
-const activeSort = shallowRef<SortValue>(0)
-const sortBy = shallowRef<string>('')
+const activeSort = shallowRef<SortValue>(1)
+const sortBy = shallowRef<string>('value')
 
 
 const tokens1 = computed(() => {

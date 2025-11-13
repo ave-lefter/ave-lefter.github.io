@@ -28,5 +28,23 @@ export type PerpInfo = {
   fundingInterestRate?: string
   baseCoinName: string
   quoteCoinName: string
-  nextFundingTime: string
+  baseCoinId: string
+  quoteCoinId: string
+  displayDigitMerge: string
+}
+export type CoinInfo = {
+  coinId: string
+  coinName: string
+  stepSize: string
+  showStepSize: string
+  iconUrl: string
+  // starkExAssetId?: string | undefined
+  // starkExResolution?: string | undefined
+}
+export type Trade = {
+  time: number
+  contractId: string
+  isBuyerMaker: true
+  size: string
+  price: string
 }

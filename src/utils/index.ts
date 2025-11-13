@@ -561,6 +561,16 @@ export function getWSMessage(e: MessageEvent) {
   }
   return null
 }
+export function getWSPerpMessage(e: MessageEvent) {
+  if (e.data === 'pong') {
+    return null
+  }
+  if (isJSON(e.data)) {
+    const result = JSON.parse(e.data || {}) || {}
+    return result
+  }
+  return null
+}
 
 export function verifyLogin(isBot = false) {
   const botStore = useBotStore()

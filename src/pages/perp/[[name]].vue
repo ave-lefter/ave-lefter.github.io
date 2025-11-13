@@ -25,14 +25,21 @@
               </div>
               <el-scrollbar :height="scrollbarHeight">
                 <div
-                  :class="orderBookVisible ? 'grid gap-1px' : 'grid grid-cols-1 gap-1px'"
-                  :style="
-                    orderBookVisible ? { gridTemplateColumns: `1fr 4px ${orderBookWidth}px` } : {}
+                  class="grid gap-1px"
+                  :style="{ gridTemplateColumns: `1fr 4px ${orderBookWidth}px` }
                   "
                 >
                   <div>
-                    <KLine ref="klineContainer" @refresh="refresh"/>
+                    <Kline ref="klineContainer" />
                   </div>
+                  <!-- 订单簿拖动条 -->
+                  <div
+                    class="cursor-col-resize bg-[--d-222-l-F2F2F2] hover:bg-[--d-666-l-CCC] flex flex-col items-center justify-center gap-1px w-4px"
+                    @mousedown.stop.prevent="dragOrderBook"
+                  >
+                    <span v-for="i in 4" :key="i" class="bg-[--d-444-l-999] w-2px h-2px rounded-full"/>
+                  </div>
+                  <OrderBook :kline-height="klineHeight + 3" />
                 </div>
                 <Bottom class="min-h-300px rounded-4px bg-[--d-000-l-F6F6F6]" />
               </el-scrollbar>
@@ -47,13 +54,12 @@
 
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core'
-import { getTokenInfo, getTokenInfoExtra } from '~/api/token'
 import { useTokenStore } from '~/stores/token'
 import Top from './components/top/index.vue'
 import TokenRight from './components/right/index.vue'
 import Bottom from './components/bottom/index.vue'
-import KLine from './components/kLine/index.vue'
-// import {OrderBook} from './components/orderBook'
+import Kline from './components/kline/index.vue'
+import OrderBook from './components/orderBook/index.vue'
 
 definePageMeta({
   name: 'perp-id',
@@ -63,7 +69,6 @@ definePageMeta({
 })
 const route = useRoute()
 const localeStore = useLocaleStore()
-const tagStore = useTagStore()
 const tokenStore = useTokenStore()
 const scrollbarHeight = computed(() => {
   if (tokenStore.isShowWaring) {
@@ -87,10 +92,6 @@ const addresses = computed(() => {
   return []
 })
 const wsStore = useWSStore()
-
-// 订单簿显示状态 - 使用本地存储保持状态
-const orderBookVisible = useStorage('orderBookVisible', false)
-provide('orderBookVisible', orderBookVisible)
 
 // 点击 k 线的日期筛选
 const klineDateFilter = ref<string[]>([])
@@ -164,35 +165,8 @@ watch(
     immediate: true,
   }
 )
-
-function _getTokenInfo() {
-  const id = route.params.id as string
-  return getTokenInfo(id).then((res) => {
-    tokenStore.tokenInfo = res
-    tokenStore.pairAddress = res?.pairs?.[0].pair || ''
-  })
-}
 function init(isRefresh = false) {
-  tokenStore.tokenPrice = 0
-  _getTokenInfo().then(() => {
-    if (!isRefresh) {
-      addVisit()
-    }
-  })
-
-  // wsStore.onmessageTxUpdateToken()
-  tokenStore._getTotalHolders(route.params.id as string)
-  tagStore.getTagArr()
-  tokenStore.twitterType = 0
-  tokenStore.getXType(route.params.id as string)
 }
-
-watch(
-  () => route.params.id,
-  () => {
-    init()
-  }
-)
 
 function visibilitychangeFn() {
   console.log(`页面是否隐藏: ${document.hidden}`)
@@ -225,31 +199,6 @@ onBeforeRouteLeave(() => {
   document.removeEventListener('visibilitychange', visibilitychangeFn)
 })
 
-function refresh() {
-  init(true)
-}
-
-function addVisit() {
-  if (tokenStore.tokenInfo) {
-    const { logo_url, symbol, chain, token } = tokenStore.tokenInfo.token
-    const index = globalStore.lastVisitTokens.findIndex((item) => item.id === token + '-' + chain)
-    if (index === -1) {
-      if (globalStore.lastVisitTokens.length >= 20) {
-        globalStore.lastVisitTokens.pop()
-      }
-      globalStore.lastVisitTokens.unshift({
-        id: token + '-' + chain,
-        logo_url,
-        symbol,
-        price_change: tokenStore.priceChange,
-        circulation: tokenStore.circulation.toString(),
-        price: tokenStore.price || 0,
-      })
-    }
-
-    usePriceV2Store().sendPriceWs()
-  }
-}
 </script>
 
 <style scoped>
