@@ -58,7 +58,7 @@
   "phoneyPool": "Suspected fake pool",
   "tokenInfo": "Token Info",
   "devTokens": "Dev Tokens",
-  "devTokenSummary": "The following information summarizes all tokens issued by the developer and their current status",
+  "devTokenSummary": "All tokens issued and the developer current status",
   "totalTokens": "Total Tokens",
   "migrated": "Migrated",
   "notMigrated": "Not Migrated",
