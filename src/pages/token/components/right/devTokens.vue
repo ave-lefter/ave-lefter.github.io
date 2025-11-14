@@ -19,7 +19,7 @@
         </li>
         <li class="flex justify-between mb-12px">
           <span class="color-[--third-text]">{{ $t('migrationRate') }}</span>
-          <span class="color-[--secondary-text]  max-w-185px"><span class="color-[--yellow]">{{ tokenObj.total_tokens ? ((tokenObj.total_migrated ?? 0) / tokenObj.total_tokens * 100).toFixed(2) : 0 }}%</span>({{ tokenObj.total_migrated ?? 0 }}/{{ tokenObj.total_tokens ?? 0 }})</span>
+          <span class="color-[--secondary-text]  max-w-185px"><span class="color-[--yellow]">{{ tokenObj.total_tokens ? ((tokenObj.total_migrated ?? 0) / tokenObj.total_tokens * 100).toFixed(2) : 0 }}%</span> ({{ tokenObj.total_migrated ?? 0 }}/{{ tokenObj.total_tokens ?? 0 }})</span>
         </li>
         <li class="flex justify-between mb-12px">
           <span class="color-[--third-text]">{{ $t('dev') }}</span>
@@ -49,9 +49,8 @@
               <span>{{ $t('volumeOneHour') }}</span>
             </div>
           </div>
-          <el-scrollbar class="list">
+          <el-scrollbar v-if="tableList.length > 0" class="list">
             <ul
-              v-if="tableList.length > 0"
               v-infinite-scroll="getRugPullList"
               :infinite-scroll-disabled="loadingRun || finished"
               :infinite-scroll-distance="500"
@@ -152,6 +151,7 @@
             v-if="(!tableList || tableList?.length === 0) && !loadingRun"
             :image-size="100"
             :image="themeStore.theme === 'light' ? emptyWhite : emptyDark"
+            class="empty-text-12"
           />
         </div>
       </div>
@@ -254,8 +254,10 @@ async function getRugPullList() {
     }
   } catch (err) {
     console.error(err)
+    tableList.value=[]
     finished.value = true
   } finally {
+    tableList.value=[]
     loadingRun.value = false
   }
 }
@@ -424,5 +426,9 @@ async function getRugPullList() {
   :deep() .el-progress-bar__outer {
     --el-border-color-lighter: var(--dialog-divider);
   }
+}
+.empty-text-12 {
+  transform: scale(0.8);
+  padding-top: 8px;
 }
 </style>
