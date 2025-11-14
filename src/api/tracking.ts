@@ -58,7 +58,7 @@ export function updateTransaction(data: any) {
 
 // 推广埋点
 // 推广追踪系统接口
-// POST   https://0ftrfsdb.xyz/v2api/trace/v1/log
+// POST   https://api.test.phaetd8l.com/v2api/trace/v1/log
 // 请求参数：
 // {
 //     "trace_items": [
