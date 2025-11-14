@@ -55,7 +55,7 @@ export function tgLogin() {
   const config = useRuntimeConfig()
   const baseUrl = config?.public?.apiBase as string
   // test
-  if (baseUrl === 'https://0ftrfsdb.xyz') {
+  if (baseUrl === 'https://api.test.phaetd8l.com') {
     url = 'https://t.me/ave_sniper_bot?start=lg-'
   }
 
