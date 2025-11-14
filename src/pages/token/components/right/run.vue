@@ -1,14 +1,54 @@
 <template>
   <div class="pop-right color-[--main-text]">
     <div class="content" style="overflow-x: hidden; overflow-y: auto">
+      <div class="text-12px color-[--third-text] my-2 mt-1">
+        以下信息汇总了开发者发行的所有代币及其当前状态
+      </div>
+      <ol class="text-12px mb-2">
+        <li class="flex justify-between mb-12px">
+          <span class="color-[--third-text]">总代币</span>
+          <span class="color-[--secondary-text] max-w-75px">{{ tokenObj.total_tokens ?? 0 }}</span>
+        </li>
+        <li class="flex justify-between mb-12px">
+          <span class="color-[--third-text]">已迁移</span>
+          <span class="color-[--pump-green] max-w-75px">{{ tokenObj.total_migrated ?? 0 }}</span>
+        </li>
+        <li class="flex justify-between mb-12px">
+          <span class="color-[--third-text]">未迁移</span>
+          <span class="color-[--signal-red] max-w-75px">{{ tokenObj.total_non_migrated ?? 0 }}</span>
+        </li>
+        <li class="flex justify-between mb-12px">
+          <span class="color-[--third-text]">迁移率</span>
+          <span class="color-[--secondary-text]  max-w-185px"><span class="color-[--yellow]">{{ tokenObj.total_tokens ? ((tokenObj.total_migrated ?? 0) / tokenObj.total_tokens * 100).toFixed(2) : 0 }}%</span>({{ tokenObj.total_migrated ?? 0 }}/{{ tokenObj.total_tokens ?? 0 }})</span>
+        </li>
+        <li class="flex justify-between mb-12px">
+          <span class="color-[--third-text]">{{ $t('dev') }}</span>
+          <div class="flex items-center justify-end color-[--secondary-text]">
+            <a
+              class="clickable color-[--secondary-text] hover:color-[--main-text] text-decoration-none"
+              :href="
+                formatExplorerUrl(token?.chain as string, tokenObj.dev_address || '', 'address')
+              "
+              target="_blank"
+            >
+              {{ formatAddress(tokenObj.dev_address || '') }}</a
+            >
+            <Icon
+              v-copy="tokenObj.dev_address"
+              name="bxs:copy"
+              class="ml-5px clickable color-[--third-text]"
+            />
+          </div>
+        </li>
+      </ol>
       <div class="right-container run">
         <div class="relative">
-          <div v-if="tableList.length > 0" class="top" >
-            <span class="flex-start">{{ $t('tokenMethod') }}</span>
+          <div v-if="tableList.length > 0" class="top mt-2" >
+            <span class="flex-start">{{ $t('token') }}</span>
             <span>迁移</span>
-            <span>{{ $t('runPullTime') }}</span>
+            <span>{{$t('mcap')}}/池子</span>
             <div class="flex items-center justify-end">
-              <span>{{ $t('time') }}</span>
+              <span>1h成交额</span>
             </div>
           </div>
           <el-scrollbar class="list">
@@ -45,7 +85,7 @@
                             background: getChainDefaultIconColor(row?.Chain),
                           }"
                         >
-                          {{ row.Symbol?.slice(0, 1)?.toUpperCase?.() || '' }}
+                          {{ row.symbol?.slice(0, 1)?.toUpperCase?.() || '' }}
                         </div>
                       </template>
                       <template #placeholder>
@@ -61,9 +101,9 @@
                       </template>
                     </el-image>
                     <img
-                      v-if="row?.network || row?.Chain"
+                      v-if="row?.network || row?.chain"
                       class="icon-svg icon-symbol"
-                      :src="`${token_logo_url}chain/${row.Chain}.png`"
+                      :src="`${token_logo_url}chain/${row.chain}.png`"
                       :width="10"
                       alt=""
                       onerror="this.src='/icon-default.png'"
@@ -73,83 +113,36 @@
                   <div @click.stop>
                     <div class="flex-start">
                       <span class="token-symbol ellipsis color-[--main-text]">
-                        {{ row.Symbol }}
+                        {{ row.symbol }}
+
                       </span>
                       <Icon
-                        v-copy="row.Token"
+                        v-copy="row.token"
                         name="bxs:copy"
                         class="text-12px ml-2px cursor-pointer color-[--third-text]"
                         @click.stop.prevent
                       />
-                      <a
-                        class="media-item ml-2px text-10px"
-                        :href="`https://x.com/search?q=($${row.Symbol} OR ${row.token})&src=typed_query&f=live`"
-                        target="_blank"
-                      >
-                        <i class="iconfont icon-search text-10px" />
-                      </a>
-                      <div
-                        v-if="row?.medias?.length > 0"
-                        class="media-list flex-start text-12px"
-                        @click.stop
-                      >
-                        <template v-for="(item, index) in row?.medias" :key="index">
-                          <div v-if="item.url" v-tooltip="item.url" class="ml-2px">
-                            <span v-if="item.name === 'QQ'" class="media-item">
-                              <!-- <i class="iconfont icon-QQ text-12px"></i> -->
-                              <Icon
-                                :name="`custom:${item.icon}`"
-                                class="text-[--third-text] h-12px w-12px"
-                              />
-                            </span>
-
-                            <a v-else class="media-item text-12px" :href="item.url" target="_blank">
-                              <!-- <i
-                                  class="iconfont text-12px"
-                                  :class="`icon-${item.icon}`"
-                                ></i> -->
-                              <Icon
-                                :name="`custom:${item.icon}`"
-                                class="text-[--third-text] h-12px w-12px"
-                              />
-                            </a>
-                          </div>
-                        </template>
-                      </div>
                     </div>
                     <div class="font-1 mt-2px flex-start" style="min-width: 110%">
                       <span
                         class="mini font-10"
-                        :style="{ color: filterType(row.RunAwayType).color }"
                       >
-                        {{ filterType(row.RunAwayType).text }}
+                        1h
                       </span>
                     </div>
                   </div>
                 </div>
                 <span>
-                  <Icon v-if="1" name="material-symbols:check-circle-outline" class="text-[14px] text-[--signal-green]" />
-                  <Icon v-if="0" name="material-symbols:x-circle-outline" class="text-[14px] text-[--signal-red]" />
+                  <Icon v-if="row.migrated" name="material-symbols:check-circle-outline" class="text-[14px] text-[--signal-green]" />
+                  <Icon v-else name="material-symbols:x-circle-outline" class="text-[14px] text-[--signal-red]" />
                 </span>
-                <!-- //跑路时长 -->
                 <span>
-                  {{
-                    row.DevRunAwayTime - row.PublishAt > 0
-                      ? formatTime(row.DevRunAwayTime - row.PublishAt)
-                      : '--'
-                  }}
+                  ${{ formatNumber(row.market_cap || 0, 2) }}
+                  ${{ formatNumber(row.tvl || 0, 2) }}
                 </span>
-
                 <span>
-                  {{
-                    dayjs(row?.PublishAt * 1000).fromNow()
-                  }}
+                  ${{ formatNumber(row.volume_u_1h || 0, 2) }}
                 </span>
-                <div class="flex-end">
-                  <a class="a-gray" href="" @click.stop.prevent="goLink(row)">
-                    <i class="iconfont icon-a-sol-dark" />
-                  </a>
-                </div>
               </li>
             </ul>
           </el-scrollbar>
@@ -173,18 +166,26 @@
 <script lang="ts" setup>
 import emptyWhite from '@/assets/images/empty-white.svg'
 import emptyDark from '@/assets/images/empty-black.svg'
-import { _getDevList, type MediaAppendix } from '@/api/run'
+import { _getDevList } from '@/api/run'
 import {
-  isJSON,
   formatTime,
 } from '@/utils/index'
 // import { formatNumber } from '@/utils/formatNumber'
 import dayjs from 'dayjs'
 const { token_logo_url } = useConfigStore()
 
-// const tokenStore = useTokenStore()
+const tokenStore = useTokenStore()
 const themeStore = useThemeStore()
 const { t } = useI18n()
+const token = computed(() => tokenStore.token)
+
+interface TokenObj {
+  dev_address?: string
+  total_migrated?: number
+  total_non_migrated?: number
+  total_tokens?: number
+}
+const tokenObj = ref<TokenObj>({})
 const tableList = ref<any[]>([{}])
 const pageNO = ref(1)
 const pageSize = ref(5)
@@ -213,65 +214,13 @@ watch(
   }
 )
 
-function filterType(type: string) {
-  const obj: Record<string, any> = {
-    shitcoin: {
-      text: t('shitcoin'),
-      color: '#F6465D',
-    },
-    unknown: {
-      text: t('unKnown'),
-      color: '#F6465D',
-    },
-  }
-  return obj[type] || ''
-}
-
-function goLink(item: any) {
-  window.open((router as any).formatExplorerUrl(item.chain, item.token))
-}
-
 function tableRowClick(item: any) {
   router.push({ name: 'Token', params: { id: `${item.Token}-${item.chain}` } })
 }
 
-function formatUrl(url: string) {
-  if (!url) {
-    return ''
-  }
-  // if (/^http(s?):\/\//.test(url)) {
-  //   return url
-  // }
-  if (url?.includes('://')) {
-    return url
-  }
-  return 'https://' + url
-}
-function getMedias(appendix: string) {
-  if (!appendix) return []
-  let obj: MediaAppendix = {}
-  if (typeof appendix === 'string' && isJSON(appendix)) {
-    obj = JSON.parse(appendix)
-  } else if (typeof appendix === 'object') {
-    obj = appendix
-  }
-  const arr = []
-  if (obj?.website)
-    arr.push({
-      name: t('website'),
-      icon: 'web',
-      url: formatUrl(obj.website),
-    })
-  if (obj?.btok) arr.push({ name: 'Btok', icon: 'btok', url: formatUrl(obj.btok) })
-  if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
-  if (obj?.telegram) arr.push({ name: 'Telegram', icon: 'tg', url: formatUrl(obj.telegram) })
-  if (obj?.twitter)
-    arr.push({
-      name: 'Twitter',
-      icon: 'twitter',
-      url: formatUrl(obj.twitter),
-    })
-  return arr
+
+function formatAddress(address: string) {
+  return address.slice(0, 4) + '...' + address.slice(-4)
 }
 async function getRugPullList() {
   if (loadingRun.value) return
@@ -284,15 +233,17 @@ async function getRugPullList() {
     }
     const res = await _getDevList(data)
     if (pageNO.value === 1) tableList.value = []
-
+    const {dev_address, total_migrated, total_non_migrated, total_tokens} = res
+    tokenObj.value = {
+      dev_address,
+      total_migrated,
+      total_non_migrated,
+      total_tokens
+    }
     const list =
-      res?.dev_stats?.map((i: any) => ({
+      res?.infos?.map((i: any) => ({
         ...i,
-        chain: i.Chain,
-        symbol: i.Symbol,
-        token: i.Token,
-        logo_url: i.LogoURL || '',
-        medias: getMedias(i.Appendix),
+        chain: token.value?.chain,
         DevRunAwayTime:
           i?.DevRunAwayTime !== '1970-01-01T00:00:00Z' &&
           i?.DevRunAwayTime !== '0001-01-01T00:00:00Z'
@@ -303,7 +254,6 @@ async function getRugPullList() {
             ? new Date(i.PublishAt).getTime() / 1000
             : 0,
       })) || []
-
     tableList.value.push(...list)
     if (list.length < pageSize.value) {
       finished.value = true
@@ -350,11 +300,11 @@ async function getRugPullList() {
       }
     }
     > :nth-child(1) {
-      flex: 1.5;
+      flex: 2;
       white-space: nowrap;
     }
     > :nth-child(2) {
-      flex: 1;
+      flex: 0.5;
       text-align: right;
       white-space: nowrap;
     }
@@ -394,10 +344,10 @@ async function getRugPullList() {
         }
       }
       > :nth-child(1) {
-        flex: 1.5;
+        flex: 2;
       }
       > :nth-child(2) {
-        flex: 1;
+        flex: 0.5;
         text-align: right;
       }
       > :nth-child(3) {
@@ -434,6 +384,37 @@ async function getRugPullList() {
   }
 }
 .pop-right {
+  ol {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    & > :nth-child(1),
+    & > :nth-child(2),
+    & > :nth-child(3) {
+      grid-column: span 2;
+    }
+    & > :nth-child(4) {
+      grid-column: span 3;
+    }
+    & > :nth-child(5) {
+      grid-column: span 3;
+    }
+    li {
+      background: var(--main-input-button-bg);
+      border-radius: 4px;
+      padding: 8px;
+      flex-direction: column-reverse;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0;
+      & > :first-child {
+        margin-top: 6px;
+      }
+    }
+  }
   .right-container {
     padding-top: 0;
     border-radius: 0;

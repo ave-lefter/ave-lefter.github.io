@@ -251,49 +251,7 @@
       </el-dialog>
     </div>
     <div v-else-if="activeTab == 'devBit'">
-      <div class="text-12px color-[--third-text] my-2 mt-1">
-        以下信息汇总了开发者发行的所有代币及其当前状态
-      </div>
-      <ol class="text-12px mb-2">
-        <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">总代币</span>
-          <span class="color-[--secondary-text] ellipsis max-w-75px">106</span>
-        </li>
-        <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">已迁移</span>
-          <span class="color-[--pump-green] ellipsis max-w-75px">43</span>
-        </li>
-        <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">未迁移</span>
-          <span class="color-[--signal-red] ellipsis max-w-75px">45</span>
-        </li>
-        <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">迁移率</span>
-          <span class="color-[--secondary-text] ellipsis max-w-75px"><span class="color-[--yellow]">16%</span>(13/122)</span>
-        </li>
-        <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">{{ $t('dev') }}</span>
-          <div class="flex items-center justify-end color-[--secondary-text]">
-            <a
-              class="clickable color-[--secondary-text] hover:color-[--main-text] text-decoration-none"
-              :href="
-                formatExplorerUrl(token?.chain as string, tokenStore?.pairAddress || '', 'address')
-              "
-              target="_blank"
-            >
-              {{ formatAddress(tokenStore?.pairAddress || '') }}</a
-            >
-            <Icon
-              v-copy="tokenStore?.pairAddress"
-              name="bxs:copy"
-              class="ml-5px clickable color-[--third-text]"
-            />
-          </div>
-        </li>
-      </ol>
-      <div class="mt-2">
-        <Run />
-      </div>
+      <Run />
     </div>
   </div>
 </template>
