@@ -2,23 +2,23 @@
   <div class="pop-right color-[--main-text]">
     <div class="content" style="overflow-x: hidden; overflow-y: auto">
       <div class="text-12px color-[--third-text] my-2 mt-1">
-        以下信息汇总了开发者发行的所有代币及其当前状态
+        {{ $t('devTokenSummary') }}
       </div>
       <ol class="text-12px mb-2">
         <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">总代币</span>
+          <span class="color-[--third-text]">{{ $t('totalTokens') }}</span>
           <span class="color-[--secondary-text] max-w-75px">{{ tokenObj.total_tokens ?? 0 }}</span>
         </li>
         <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">已迁移</span>
+          <span class="color-[--third-text]">{{ $t('migrated') }}</span>
           <span class="color-[--pump-green] max-w-75px">{{ tokenObj.total_migrated ?? 0 }}</span>
         </li>
         <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">未迁移</span>
+          <span class="color-[--third-text]">{{ $t('notMigrated') }}</span>
           <span class="color-[--signal-red] max-w-75px">{{ tokenObj.total_non_migrated ?? 0 }}</span>
         </li>
         <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">迁移率</span>
+          <span class="color-[--third-text]">{{ $t('migrationRate') }}</span>
           <span class="color-[--secondary-text]  max-w-185px"><span class="color-[--yellow]">{{ tokenObj.total_tokens ? ((tokenObj.total_migrated ?? 0) / tokenObj.total_tokens * 100).toFixed(2) : 0 }}%</span>({{ tokenObj.total_migrated ?? 0 }}/{{ tokenObj.total_tokens ?? 0 }})</span>
         </li>
         <li class="flex justify-between mb-12px">
@@ -26,9 +26,7 @@
           <div class="flex items-center justify-end color-[--secondary-text]">
             <a
               class="clickable color-[--secondary-text] hover:color-[--main-text] text-decoration-none"
-              :href="
-                formatExplorerUrl(token?.chain as string, tokenObj.dev_address || '', 'address')
-              "
+              :href="formatExplorerUrl(token?.chain as string, tokenObj.dev_address || '', 'address')"
               target="_blank"
             >
               {{ formatAddress(tokenObj.dev_address || '') }}</a
@@ -45,10 +43,10 @@
         <div class="relative">
           <div v-if="tableList.length > 0" class="top mt-2" >
             <span class="flex-start">{{ $t('token') }}</span>
-            <span>迁移</span>
-            <span>{{$t('mcap')}}/池子</span>
+            <span>{{ $t('migration') }}</span>
+            <span>{{$t('mcap')}}/{{ $t('pair') }}</span>
             <div class="flex items-center justify-end">
-              <span>1h成交额</span>
+              <span>{{ $t('volumeOneHour') }}</span>
             </div>
           </div>
           <el-scrollbar class="list">
@@ -123,11 +121,9 @@
                         @click.stop.prevent
                       />
                     </div>
-                    <div class="font-1 mt-2px flex-start" style="min-width: 110%">
-                      <span
-                        class="mini font-10"
-                      >
-                        1h
+                    <div class="font-1 mt-2px flex-start">
+                      <span class="mini font-10">
+                        {{ dayjs(row?.createdAt * 1000).fromNow() }}
                       </span>
                     </div>
                   </div>
@@ -138,7 +134,7 @@
                 </span>
                 <span>
                   ${{ formatNumber(row.market_cap || 0, 2) }}
-                  ${{ formatNumber(row.tvl || 0, 2) }}
+                  <span class="block color-[--third-text]">${{ formatNumber(row.tvl || 0, 2) }}</span>
                 </span>
                 <span>
                   ${{ formatNumber(row.volume_u_1h || 0, 2) }}
@@ -167,16 +163,11 @@
 import emptyWhite from '@/assets/images/empty-white.svg'
 import emptyDark from '@/assets/images/empty-black.svg'
 import { _getDevList } from '@/api/run'
-import {
-  formatTime,
-} from '@/utils/index'
-// import { formatNumber } from '@/utils/formatNumber'
 import dayjs from 'dayjs'
 const { token_logo_url } = useConfigStore()
 
 const tokenStore = useTokenStore()
 const themeStore = useThemeStore()
-const { t } = useI18n()
 const token = computed(() => tokenStore.token)
 
 interface TokenObj {
@@ -244,14 +235,9 @@ async function getRugPullList() {
       res?.infos?.map((i: any) => ({
         ...i,
         chain: token.value?.chain,
-        DevRunAwayTime:
-          i?.DevRunAwayTime !== '1970-01-01T00:00:00Z' &&
-          i?.DevRunAwayTime !== '0001-01-01T00:00:00Z'
-            ? new Date(i.DevRunAwayTime).getTime() / 1000
-            : 0,
-        PublishAt:
-          i?.PublishAt !== '1970-01-01T00:00:00Z' && i?.PublishAt !== '0001-01-01T00:00:00Z'
-            ? new Date(i.PublishAt).getTime() / 1000
+        createdAt:
+          i?.created_at !== '1970-01-01T00:00:00Z' && i?.created_at !== '0001-01-01T00:00:00Z'
+            ? new Date(i.created_at).getTime() / 1000
             : 0,
       })) || []
     tableList.value.push(...list)
@@ -309,7 +295,7 @@ async function getRugPullList() {
       white-space: nowrap;
     }
     > :nth-child(3) {
-      flex: 1;
+      flex: 1.5;
       text-align: right;
     }
     > :nth-child(4) {
@@ -318,7 +304,7 @@ async function getRugPullList() {
     }
   }
   .list {
-    height: calc(100vh - 815px);
+    height: calc(100vh - 600px);
     overflow: auto;
   }
   // color: var(--custom-font-1-color);
@@ -351,7 +337,7 @@ async function getRugPullList() {
         text-align: right;
       }
       > :nth-child(3) {
-        flex: 1;
+        flex: 1.5;
         text-align: right;
       }
       > :nth-child(4) {

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="!isRank" class="flex-between">
-      <div class="tabHeader text-16px py-12px flex flex-row gap-2 color-[--third-text]">
+      <div class="tabHeader text-14px py-12px flex flex-row gap-2 color-[--third-text]">
         <div
           v-for="item in headerTabs"
           :key="item.id"
@@ -9,6 +9,7 @@
           @click.stop="activeTab = item.id"
         >
           {{ item.name }}
+          <span v-if="item.id === 'devBit'">({{ totalTokens }})</span>
         </div>
       </div>
 
@@ -251,20 +252,23 @@
       </el-dialog>
     </div>
     <div v-else-if="activeTab == 'devBit'">
-      <Run />
+      <DevTokens />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Run from './run.vue'
+import { _getDevList } from '@/api/run'
+import DevTokens from './DevTokens.vue'
 import { formatDate, formatExplorerUrl, isJSON } from '@/utils/index'
 import { useTokenStore } from '~/stores/token'
+import { useWindowSize } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
 const aiSummary = inject<Ref<{ summary: string; headline: string }>>('aiSummary')
 const props = defineProps<{
   isRank?: boolean
 }>()
+const { height } = useWindowSize()
 const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const checkStore = useCheckStore()
 const pair = computed(() => tokenStore.pair)
@@ -274,11 +278,12 @@ const tokenInfoExtra = computed(() => tokenStore.tokenInfoExtra)
 const localeStore = useLocaleStore()
 const { t } = useI18n()
 const showAll = ref(false)
+const totalTokens = ref(0)
 const active = shallowRef(props.isRank ? 'col' : 'grid')
 const activeTab = shallowRef('info')
 const headerTabs = [
   { id: 'info', name: t('tokenInfo') },
-  { id: 'devBit', name: '开发者代币' },
+  { id: 'devBit', name: t('devTokens') },
 ]
 const tabs = [
   { id: 'grid', icon: 'grid', name: 'grid' },
@@ -293,13 +298,32 @@ const supportObj: Record<string, string> = {
   solana: 'SOL',
   optimism: 'OP',
 }
+
+const route = useRoute()
+const id = computed(() => route.params.id as string)
+
+async function getRugPullList() {
+  const data = {
+    token_id: id.value,
+    pageNO: 1,
+    pageSize: 1,
+  }
+  const res = await _getDevList(data)
+  totalTokens.value = res.total_tokens
+}
+
+onMounted(() => {
+  if (route.params.id) {
+    getRugPullList()
+  }
+})
+
 // function filterSuppportChains(chain: string) {
 //   return supportObj[chain] || ''
 // }
 const dialog_bubble = shallowRef(false)
 const dialog_analysis = shallowRef(false)
 
-const route = useRoute()
 const addressAndChain = computed(() => {
   const id = route.params.id as string
   if (id) {
@@ -398,20 +422,18 @@ const headlineArr = computed(() => {
   background: var(--main-list-hover);
   padding: 2px;
   border-radius: 4px;
-  font-size: 12px;
-  height: 28px;
+  height: 24px;
   span.item {
-    font-size: 14px;
+    font-size: 12px;
     color: var(--third-text);
     cursor: pointer;
     border-radius: 2px;
-    height: 24px;
-    width: 24px;
+    height: 22px;
+    width: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    font-weight: bolder;
     & + .item {
       margin-left: 2px;
     }
