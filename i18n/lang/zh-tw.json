@@ -1509,5 +1509,7 @@
   "tokenAnalysis": "Token分析報告",
   "generateScore": "生成評分",
   "tokenScore": "Token評分",
-  "allPairsTips": "聚合模式：展示該代幣在所有池子的數量與初始值累加結果，區別於單一池子數據"
+  "allPairsTips": "聚合模式：展示該代幣在所有池子的數量與初始值累加結果，區別於單一池子數據",
+  "favoritesGroup": "自選分組",
+  "groupDetails": "分組詳情"
 }
