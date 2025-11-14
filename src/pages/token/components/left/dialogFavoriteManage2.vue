@@ -5,13 +5,14 @@ import {
   getFavoriteList,
   type GetUserFavoriteGroupsResponse,
   moveFavoriteGroup,
-  changeFavoritesIndex, editTokenFavRemark,getGroupChangeIndex,changeFavoriteGroupName,removeFavoriteGroup,batchDeleteFavorite
+  changeFavoritesIndex, editTokenFavRemark,getGroupChangeIndex,changeFavoriteGroupName,removeFavoriteGroup,batchDeleteFavorite,removeFavorite
 } from '~/api/fav'
 import {confirmChangeName} from '~/composables/fav'
 import TokenImg from '~/components/tokenImg.vue'
 import {useEventBus} from '@vueuse/core'
 import {BusEventType} from '~/utils/constants'
 import {VueDraggableNext} from 'vue-draggable-next'
+import type { CheckboxValueType } from 'element-plus'
 
 const props = defineProps({
   list: {
@@ -47,10 +48,17 @@ const listStatus = shallowRef({
 })
 const drag=ref(false)
 
-const checkedAll=shallowRef(false)
-const checkedList=ref([])
-watch(checkedList, (val) => {
-  console.log('checkedList', val)
+const checkAll=shallowRef(false)
+const isIndeterminate = ref(true)
+const checkedList=ref(<any[]>[])
+watch([checkedList,favoritesList], (val) => {
+  console.log('checkedList,favoritesList', val,checkedList.value, favoritesList.value)
+  const newVal1=val[0]
+  const newVal2=val[1]
+  newVal1.length === newVal2.length && newVal2.length>0
+    ? (checkAll.value = true)
+    : (checkAll.value = false)
+  isIndeterminate.value = newVal1.length > 0 && newVal1.length < newVal2.length
 })
 onMounted(() => {
   _getFavoriteList()
@@ -59,13 +67,20 @@ onMounted(() => {
 function setActiveTab(val: number) {
   activeTab.value = val
   resetAndGet()
+  checkedList.value=[]
+  checkAll.value=false
+  isIndeterminate.value=false
 }
 
 watch(() => [walletAddress.value, props.visible], () => {
   resetAndGet()
+  checkedList.value=[]
+  checkAll.value=false
+  isIndeterminate.value=false
 })
 
 async function _getFavoriteList() {
+  console.log('_getFavoriteList', listStatus.value.loading)
   if (listStatus.value.loading) {
     return
   }
@@ -86,6 +101,7 @@ async function _getFavoriteList() {
     } else {
       favoritesList.value = [...favoritesList.value, ...newItems]
     }
+    console.log('_getFavoriteList', res)
     if (res?.length === 0) {
       listStatus.value.finished = true
     }
@@ -173,6 +189,9 @@ async function handleEditRemark(item: GetFavListResponse) {
   const {value} = await ElMessageBox.prompt('', t('enterRemark'), {
     confirmButtonText: t('confirm1'),
     cancelButtonText: t('cancel'),
+    customClass:'w-320px p-16px inputPop',
+    cancelButtonClass:'w-140px h-30px',
+    confirmButtonClass:'w-140px h-30px ml-8px!',
     inputValidator: val => {
       if (val?.length > 50) {
         return t('maximum10characters')
@@ -295,21 +314,44 @@ function batchDelete() {
     ElMessage.success(t('success'))
     resetAndGet()
     checkedList.value = []
-    checkedAll.value = false
+    checkAll.value = false
+    isIndeterminate.value = false
     favDialogEvent.emit({
-      type: 'batchDeleteFavorite',
+      type: 'delete',
     })
   }).catch((e) => {
      ElMessage.error(String(e))
   })
+}
+
+const handleCheckAllChange = (val: CheckboxValueType) => {
+  checkedList.value = val ? favoritesList.value.map(i => i.token+'-' + i.chain  ) : []
+  isIndeterminate.value = false
+}
+
+function removeTokenFavorite(row:any) {
+  removeFavorite(`${row.token}-${row.chain}`, walletAddress.value)
+    .then(() => {
+      favDialogEvent.emit({
+        type: 'delete',
+      })
+      resetAndGet()
+      // TODO: 
+      ElMessage.success(t('cancelled1'))
+      props.getData()
+    })
+    .catch((err) => {
+      console.log(err)
+    })
 }
 </script>
    <!-- @start="drag = true"
               @end="drag = false" -->
 <template>
   <div class="flex h-420px">
-    <div class="w-240px h-full p-20px">
-      <div class="font-500 text-20px lh-[100%] mb-10px">{{ t('favoritesGroup') }}</div>
+    <div class="w-240px h-full py-20px">
+      <div class="font-500 text-20px lh-[100%] mb-10px px-20px">{{ t('favoritesGroup') }}</div>
+    <!-- listStatus:{{ JSON.stringify(listStatus) }} -->
       <div class="h-[310px]">
         <el-scrollbar wrap-class="mb-0px">
             <VueDraggableNext
@@ -321,11 +363,11 @@ function batchDelete() {
                 handle=".handle1"
                 @end="dragEnd"
               >
-              <li v-for="item in sortOptions" :key="item?.show_index" :class="`flex-between font-400 py-12px px-8px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-pointer ${activeTab===item.group_id && 'bg-[--dialog-list-hover]'}`"
+              <li v-for="item in sortOptions" :key="item?.show_index" :class="`dragItem flex-between font-400 py-12px px-20px hover:bg-[--d-2A2A2A-l-F2F2F2] cursor-pointer ${activeTab===item.group_id && 'bg-[--dialog-list-hover]'}`"
               @click="setActiveTab(item.group_id)"
               >
                 <span>{{ item?.name }}</span>
-                <div class="flex items-center gap-8px">
+                <div class="flex items-center gap-8px dragItemIcons invisible">
                   <Icon v-if="item?.group_id" name="material-symbols:dehaze" class="text-16px text-[--third-text] cursor-move handle1"/>
                   <Icon v-if="item?.group_id" name="bxs:edit-alt" class="text-13px clickable color-[--third-text]"
                   @click.stop.prevent="rename(item)" />
@@ -338,9 +380,11 @@ function batchDelete() {
               </VueDraggableNext>
         </el-scrollbar>
       </div>
-      <el-button type="primary" color="#3F80F7" class="w-100% h-40px" @click="_confirmChangeName">{{ t('newGroup') }}</el-button>
+      <div class="flex items-center px-20px">
+        <el-button type="primary" color="#3F80F7" class="w-100% h-40px" @click="_confirmChangeName">{{ t('newGroup') }}</el-button>
+      </div>
     </div>
-    <div class="w-480px h-full p-20px bg-[--secondary-bg]">
+    <div class="w-480px h-full py-20px bg-[--secondary-bg]">
       <div class="font-500 text-20px lh-[100%] mb-20px">{{ t('groupDetails') }}</div>
       <!-- <div class="flex items-center whitespace-nowrap overflow-x-auto scrollbar-hide mb-12px">
         <a
@@ -354,15 +398,16 @@ function batchDelete() {
         </a>
       </div> -->
        <el-checkbox-group v-model="checkedList">
-      <el-table
-        id="table_fav"
-        ref="table_ref"
-        v-loading="listStatus.loading"
+            <!-- v-loading="listStatus.loading"
         v-infinite-scroll="_getFavoriteList"
         :infinite-scroll-disabled="listStatus.loading || listStatus.finished"
         infinite-scroll-distance="200"
         :infinite-scroll-delay="10"
-        :infinite-scroll-immediate="false"
+        :infinite-scroll-immediate="false" -->
+      <el-table
+        id="table_fav"
+        ref="table_ref"
+    
         :data="favoritesList"
         height="280px"
         class="w-full table-container [&&]:text-12px"
@@ -376,7 +421,7 @@ function batchDelete() {
         >
           <template #default="{ row }">
             <div class="flex items-center">
-              <el-checkbox :value="row?.token" size="large" />
+              <el-checkbox :value="row?.token+'-'+row?.chain" size="large" />
               <TokenImg
                 class="mr-8px"
                 :row="row"
@@ -391,7 +436,7 @@ function batchDelete() {
           </template>
         </el-table-column>
         <el-table-column
-          :label="$t('changeGroup')" align="center">
+          :label="$t('changeGroup')" align="right">
           <template #default="{ row }">
             <el-select
               v-model="row.activeGroup"
@@ -453,6 +498,8 @@ function batchDelete() {
                 @click.stop="_changeFavoritesIndex(row, $index, 1)" />
               <Icon name="bxs:edit-alt" class="text-13px clickable color-[--main-text]"
                 @click.stop.prevent="handleEditRemark(row)" />
+              <Icon name="bx:bxs-trash-alt" class="text-13px clickable color-[--main-text]"
+                  @click.stop.prevent="removeTokenFavorite(row)" />
             </div>
             <!-- <el-button
               link
@@ -486,16 +533,30 @@ function batchDelete() {
             </span> -->
           </template>
         </el-table-column>
+        <template #append>
+          <div
+            v-infinite-scroll="_getFavoriteList"
+            class="text-0 lh-0 h-0"
+            :infinite-scroll-disabled="listStatus.loading || listStatus.finished"
+            :infinite-scroll-distance="20"
+            :infinite-scroll-delay="200"
+            :infinite-scroll-immediate="true"
+          />
+          <div v-if="listStatus.loading && favoritesList?.length > 0"  class="text-center px-0 pt-15px pb-10px text-12px color-[--third-text]">{{ $t('loading') }} </div>
+          <div v-else-if="listStatus.finished && favoritesList?.length > 0" class="text-center px-0 pt-15px pb-10px text-12px color-[--third-text]">{{ $t('noMore') }}</div>
+        </template>
       </el-table>
       </el-checkbox-group>
-      <div
+      <!-- <div
         v-if="listStatus.pageNo!==1 && listStatus.loading"
         class="flex justify-center items-center py-15px text-12px">
         <span>{{ $t('loading') }}</span>
-      </div>
-      <div class="flex-between h-80px">
-        <el-checkbox v-model="checkedAll" :label="t('selectAll')" size="large" />
-        <el-button type="primary" color="#3F80F7" class="h-40px" @click="batchDelete">批量删除</el-button>
+      </div> -->
+    
+      <div class="flex-between h-80px px-20px">
+        <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate"
+    @change="handleCheckAllChange" :label="t('selectAll')" size="large" />
+        <el-button type="primary" color="#3F80F7" class="h-40px" @click="batchDelete" :disabled="!checkedList.length">批量删除</el-button>
       </div>
     </div>
   </div>
@@ -513,14 +574,21 @@ function batchDelete() {
     font-size: 12px;
   }
   :deep() .el-table__cell,.el-table__row {
+    padding-left: 20px;
+    padding-right: 20px;
     .cell{
       &:first-child {
         padding-left: 0px;
       }
       &:last-child {
-        padding-right: 0px;
+        padding-right: 10px;
       }
     }
+  }
+}
+.dragItem:hover{
+  .dragItemIcons{
+    visibility: visible;
   }
 }
 </style>

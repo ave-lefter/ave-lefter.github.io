@@ -98,7 +98,7 @@ export const NATIVE_TOKENS = [
 ]
 
 export interface IFavDialogEventArgs {
-  type: 'confirmSwitchGroup' | 'remark' | 'order' | 'changeFavoriteGroupName'|'removeFavoriteGroup',
+  type: 'confirmSwitchGroup' | 'remark' | 'order' | 'changeFavoriteGroupName'|'removeFavoriteGroup' |'delete',
   tokenId?: string,
   groupId?: string,
 }

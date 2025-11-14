@@ -301,6 +301,9 @@ debox-chat-widget {
   }
   .el-message-box__header{
     padding: 0;
+    .el-message-box__close{
+      color:var(--main-text)
+    }
     .el-message-box__title{
       font-size: 14px;
       font-weight: 400;
@@ -311,9 +314,11 @@ debox-chat-widget {
       height: 56px;
     }
   }
- 
+  .el-message-box__content{
+      padding-top: 20px;
+  }
   .el-message-box__input{
-    padding-top: 8px;
+    padding-top: 0px;
   }
   .el-message-box__btns{
     padding-top: 20px;

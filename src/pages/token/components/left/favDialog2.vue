@@ -56,6 +56,7 @@ const Component = computed(() => {
     v-model="show"
     append-to-body
     :show-close="true"
+    align-center
     width="720px"
     :class="`${theme} [--el-message-close-size:24px] favDialog2`"
   >
