@@ -340,13 +340,7 @@
   "insufficentGasSOL": "No hay suficiente SOL para pagar la tarifa de gas",
   "insufficentFundsSol": "Saldo de SOL insuficiente",
   "networkIsUnstable": "La red es inestable, intenta de nuevo más tarde.",
-  "swapUnknownError": "\"Fallo en la compra...
-
-Prueba lo siguiente para intentar de nuevo:
-
-Aumenta manualmente el deslizamiento
-Cambia el token de compra o venta
-Restablece la cantidad de compra, etc.\"",
+  "swapUnknownError": "\"Fallo en la compra...\n\nPrueba lo siguiente para intentar de nuevo:\n\nAumenta manualmente el deslizamiento\nCambia el token de compra o venta\nRestablece la cantidad de compra, etc.\"",
   "unknownError": "Error desconocido, estas transacciones pueden no estar soportadas actualmente",
   "noMatchingRoute": "No se encontró ruta compatible, este tipo de intercambio puede no estar soportado actualmente",
   "tradeFail": "Operación fallida",
