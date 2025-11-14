@@ -257,7 +257,7 @@ async function getRugPullList() {
     tableList.value=[]
     finished.value = true
   } finally {
-    tableList.value=[]
+    // tableList.value=[]
     loadingRun.value = false
   }
 }
