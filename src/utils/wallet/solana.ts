@@ -156,7 +156,7 @@ export function connectSolanaWallet(wallet: Wallet) {
 
 export function getSolanaConnection() {
   let domain = getBestApiDomain()
-  if (domain === 'https://0ftrfsdb.xyz') {
+  if (domain === 'https://api.test.phaetd8l.com') {
     domain = 'https://mayeas023.com'
   }
   return new Connection(`${domain}/ave_nodes/rpc/solana/sendFastSwapTx`, { commitment: 'confirmed', wsEndpoint: 'wss://solana.twnodes.com' })

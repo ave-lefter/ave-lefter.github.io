@@ -95,8 +95,8 @@ export async function getApiDomainAndSave() {
 export function getBestApiDomain () {
   const config = useRuntimeConfig()
   const baseUrl = config?.public?.apiBase as string
-  if (baseUrl === 'https://0ftrfsdb.xyz') {
-    return 'https://0ftrfsdb.xyz'
+  if (baseUrl === 'https://api.test.phaetd8l.com') {
+    return 'https://api.test.phaetd8l.com'
   }
   const apiDomain = localStorage.getItem('apiDomain')
   if (apiDomain && isJSON(apiDomain)) {
