@@ -51,3 +51,17 @@ export function _getRugPullList(params: {
     query: params,
   })
 }
+
+export function _getDevList(params: {
+  token_id: string
+  pageNO: number
+  pageSize: number
+}) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token_info/v1/token/dev', {
+    method: 'get',
+    query: params,
+  })
+}
+
+
