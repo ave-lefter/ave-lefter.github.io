@@ -5,7 +5,7 @@ import {
   getFavoriteList,
   type GetUserFavoriteGroupsResponse,
   moveFavoriteGroup,
-  changeFavoritesIndex, editTokenFavRemark,getGroupChangeIndex,changeFavoriteGroupName,removeFavoriteGroup
+  changeFavoritesIndex, editTokenFavRemark,getGroupChangeIndex,changeFavoriteGroupName,removeFavoriteGroup,batchDeleteFavorite
 } from '~/api/fav'
 import {confirmChangeName} from '~/composables/fav'
 import TokenImg from '~/components/tokenImg.vue'
@@ -48,7 +48,10 @@ const listStatus = shallowRef({
 const drag=ref(false)
 
 const checkedAll=shallowRef(false)
-
+const checkedList=ref([])
+watch(checkedList, (val) => {
+  console.log('checkedList', val)
+})
 onMounted(() => {
   _getFavoriteList()
 })
@@ -283,6 +286,23 @@ async function _removeFavoriteGroup(item: GetUserFavoriteGroupsResponse) {
 
   }
 }
+
+function batchDelete() {
+  batchDeleteFavorite({
+    address: walletAddress.value,
+    token_ids: checkedList.value
+  }).then(() => {
+    ElMessage.success(t('success'))
+    resetAndGet()
+    checkedList.value = []
+    checkedAll.value = false
+    favDialogEvent.emit({
+      type: 'batchDeleteFavorite',
+    })
+  }).catch((e) => {
+     ElMessage.error(String(e))
+  })
+}
 </script>
    <!-- @start="drag = true"
               @end="drag = false" -->
@@ -333,6 +353,7 @@ async function _removeFavoriteGroup(item: GetUserFavoriteGroupsResponse) {
           {{ item.name }}
         </a>
       </div> -->
+       <el-checkbox-group v-model="checkedList">
       <el-table
         id="table_fav"
         ref="table_ref"
@@ -355,6 +376,7 @@ async function _removeFavoriteGroup(item: GetUserFavoriteGroupsResponse) {
         >
           <template #default="{ row }">
             <div class="flex items-center">
+              <el-checkbox :value="row?.token" size="large" />
               <TokenImg
                 class="mr-8px"
                 :row="row"
@@ -465,6 +487,7 @@ async function _removeFavoriteGroup(item: GetUserFavoriteGroupsResponse) {
           </template>
         </el-table-column>
       </el-table>
+      </el-checkbox-group>
       <div
         v-if="listStatus.pageNo!==1 && listStatus.loading"
         class="flex justify-center items-center py-15px text-12px">
@@ -472,7 +495,7 @@ async function _removeFavoriteGroup(item: GetUserFavoriteGroupsResponse) {
       </div>
       <div class="flex-between h-80px">
         <el-checkbox v-model="checkedAll" :label="t('selectAll')" size="large" />
-        <el-button type="primary" color="#3F80F7" class="h-40px" @click="_confirmChangeName">批量删除</el-button>
+        <el-button type="primary" color="#3F80F7" class="h-40px" @click="batchDelete">批量删除</el-button>
       </div>
     </div>
   </div>
@@ -488,6 +511,16 @@ async function _removeFavoriteGroup(item: GetUserFavoriteGroupsResponse) {
   --el-table-bg-color: transparent;
   :deep() .el-table__header-wrapper {
     font-size: 12px;
+  }
+  :deep() .el-table__cell,.el-table__row {
+    .cell{
+      &:first-child {
+        padding-left: 0px;
+      }
+      &:last-child {
+        padding-right: 0px;
+      }
+    }
   }
 }
 </style>
