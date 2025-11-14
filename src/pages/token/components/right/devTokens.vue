@@ -1,44 +1,46 @@
 <template>
   <div class="pop-right color-[--main-text]">
-    <div class="content" style="overflow-x: hidden; overflow-y: auto">
+    <div class="content overflow-y-auto overflow-x-hidden">
       <div class="text-12px color-[--third-text] my-2 mt-1">
         {{ $t('devTokenSummary') }}
       </div>
-      <ol class="text-12px mb-2">
-        <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">{{ $t('totalTokens') }}</span>
-          <span class="color-[--secondary-text] max-w-75px">{{ tokenObj.total_tokens ?? 0 }}</span>
-        </li>
-        <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">{{ $t('migrated') }}</span>
-          <span class="color-[--pump-green] max-w-75px">{{ tokenObj.total_migrated ?? 0 }}</span>
-        </li>
-        <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">{{ $t('notMigrated') }}</span>
-          <span class="color-[--signal-red] max-w-75px">{{ tokenObj.total_non_migrated ?? 0 }}</span>
-        </li>
-        <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">{{ $t('migrationRate') }}</span>
-          <span class="color-[--secondary-text]  max-w-185px"><span class="color-[--yellow]">{{ tokenObj.total_tokens ? ((tokenObj.total_migrated ?? 0) / tokenObj.total_tokens * 100).toFixed(2) : 0 }}%</span> ({{ tokenObj.total_migrated ?? 0 }}/{{ tokenObj.total_tokens ?? 0 }})</span>
-        </li>
-        <li class="flex justify-between mb-12px">
-          <span class="color-[--third-text]">{{ $t('dev') }}</span>
-          <div class="flex items-center justify-end color-[--secondary-text]">
-            <a
-              class="clickable color-[--secondary-text] hover:color-[--main-text] text-decoration-none"
-              :href="formatExplorerUrl(token?.chain as string, tokenObj.dev_address || '', 'address')"
-              target="_blank"
-            >
-              {{ formatAddress(tokenObj.dev_address || '') }}</a
-            >
-            <Icon
-              v-copy="tokenObj.dev_address"
-              name="bxs:copy"
-              class="ml-5px clickable color-[--third-text]"
-            />
-          </div>
-        </li>
-      </ol>
+      <div class="mr-15px overflow-x-hidden">
+        <ol class="text-12px mb-2">
+          <li class="flex justify-between mb-12px">
+            <span class="color-[--third-text]">{{ $t('totalTokens') }}</span>
+            <span class="color-[--secondary-text] max-w-75px">{{ tokenObj.total_tokens ?? 0 }}</span>
+          </li>
+          <li class="flex justify-between mb-12px">
+            <span class="color-[--third-text]">{{ $t('migrated') }}</span>
+            <span class="color-[--down-color] max-w-75px">{{ tokenObj.total_migrated ?? 0 }}</span>
+          </li>
+          <li class="flex justify-between mb-12px">
+            <span class="color-[--third-text]">{{ $t('notMigrated') }}</span>
+            <span class="color-[--up-color] max-w-75px">{{ tokenObj.total_non_migrated ?? 0 }}</span>
+          </li>
+          <li class="flex justify-between mb-12px">
+            <span class="color-[--third-text]">{{ $t('migrationRate') }}</span>
+            <span class="color-[--secondary-text]  max-w-185px"><span class="color-[--yellow]">{{ tokenObj.total_tokens ? ((tokenObj.total_migrated ?? 0) / tokenObj.total_tokens * 100).toFixed(2) : 0 }}%</span> ({{ tokenObj.total_migrated ?? 0 }}/{{ tokenObj.total_tokens ?? 0 }})</span>
+          </li>
+          <li class="flex justify-between mb-12px">
+            <span class="color-[--third-text]">{{ $t('dev') }}</span>
+            <div class="flex items-center justify-end color-[--secondary-text]">
+              <a
+                class="clickable color-[--secondary-text] hover:color-[--main-text] text-decoration-none"
+                :href="formatExplorerUrl(token?.chain as string, tokenObj.dev_address || '', 'address')"
+                target="_blank"
+              >
+                {{ formatAddress(tokenObj.dev_address || '') }}</a
+              >
+              <Icon
+                v-copy="tokenObj.dev_address"
+                name="bxs:copy"
+                class="ml-5px clickable color-[--third-text]"
+              />
+            </div>
+          </li>
+        </ol>
+      </div>
       <div class="right-container run">
         <div class="relative">
           <div v-if="tableList.length > 0" class="top mt-2" >
@@ -71,7 +73,7 @@
                 >
                   <div class="icon-token-container" style="margin-right: 10px">
                     <el-image
-                      class="token-icon w-24px h-24px rounded-100%"
+                      class="token-icon w-30px h-30px rounded-100%"
                       :src="getSymbolDefaultIcon(row)"
                     >
                       <template #error>
@@ -109,14 +111,14 @@
                   </div>
                   <div @click.stop>
                     <div class="flex-start">
-                      <span class="token-symbol ellipsis color-[--main-text]">
+                      <span class="token-symbol ellipsis mb-[2px] color-[--main-text]">
                         {{ row.symbol }}
 
                       </span>
                       <Icon
                         v-copy="row.token"
                         name="bxs:copy"
-                        class="text-12px ml-2px cursor-pointer color-[--third-text]"
+                        class="text-12px ml-6px -mt-3px cursor-pointer color-[--third-text]"
                         @click.stop.prevent
                       />
                     </div>
@@ -128,12 +130,12 @@
                   </div>
                 </div>
                 <span>
-                  <Icon v-if="row.migrated" name="material-symbols:check-circle-outline" class="text-[14px] text-[--signal-green]" />
-                  <Icon v-else name="material-symbols:x-circle-outline" class="text-[14px] text-[--signal-red]" />
+                  <Icon v-if="row.migrated" name="ic:outline-check-circle" class="text-[16px] text-[--up-color]" />
+                  <Icon v-else name="ic:outline-add-circle-outline" class="text-[16px] text-[--down-color] rotate-45" />
                 </span>
                 <span>
                   ${{ formatNumber(row.market_cap || 0, 2) }}
-                  <span class="block color-[--third-text]">${{ formatNumber(row.tvl || 0, 2) }}</span>
+                  <span class="block color-[--third-text] mt-[2px]">${{ formatNumber(row.tvl || 0, 2) }}</span>
                 </span>
                 <span>
                   ${{ formatNumber(row.volume_u_1h || 0, 2) }}
@@ -275,7 +277,7 @@ async function getRugPullList() {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 4px 0px 0px;
+    padding: 8px 15px 0px 0;
     font-size: 12px;
     > :nth-child(n) {
       padding: 0 0px;
@@ -308,6 +310,8 @@ async function getRugPullList() {
   .list {
     height: calc(100vh - 600px);
     overflow: auto;
+    margin-right: 0px;
+    padding-right: 15px;
   }
   // color: var(--custom-font-1-color);
   font-family: PingFang SC;

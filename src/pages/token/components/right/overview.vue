@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!isRank" class="flex-between">
+    <div v-if="!isRank" class="flex-between mr-15px">
       <div class="tabHeader text-14px py-12px flex flex-row gap-2 color-[--third-text]">
         <div
           v-for="item in headerTabs"
@@ -12,7 +12,6 @@
           <span v-if="item.id === 'devBit'">({{ totalTokens }})</span>
         </div>
       </div>
-
       <div v-if="activeTab == 'info'" class="tabs">
         <span
           v-for="item in tabs"
@@ -25,7 +24,7 @@
         </span>
       </div>
     </div>
-    <div v-if="activeTab == 'info'">
+    <div v-if="activeTab == 'info'" class="mr-15px overflow-x-hidden">
       <ul class="text-12px" :class="{ active: active == 'grid' }">
         <li class="flex justify-between mb-12px">
           <span class="color-[--third-text]">{{ $t('name') }}</span>
@@ -443,42 +442,14 @@ const headlineArr = computed(() => {
     }
   }
 }
-ol {
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
-  & > :nth-child(1),
-  & > :nth-child(2),
-  & > :nth-child(3) {
-    grid-column: span 2;
-  }
-  & > :nth-child(4) {
-    grid-column: span 3;
-  }
-  & > :nth-child(5) {
-    grid-column: span 3;
-  }
-  li {
-    background: var(--main-input-button-bg);
-    border-radius: 4px;
-    padding: 8px;
-    flex-direction: column-reverse;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0;
-    & > :first-child {
-      margin-top: 6px;
-    }
-  }
-}
 ul {
   &.active {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    display: inline-grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    // width: 100%;
+    overflow: hidden;
+    max-width: 100%;
     & > :last-child {
       grid-column: 1 / -1; /* 占满整行 */
       display: flex;

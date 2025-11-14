@@ -29,7 +29,7 @@
         <div class="p-15px pb-5px bg-[--secondary-bg] mt-1px">
           <Pairs />
         </div>
-        <Overview class="px-15px pb-10px bg-[--secondary-bg] mt-1px" />
+        <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg] mt-1px" />
         <div class=" bg-[--secondary-bg] flex-1" />
       </div>
     </el-scrollbar>
