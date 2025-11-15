@@ -311,6 +311,15 @@ async function getRugPullList() {
   totalTokens.value = res.total_tokens
 }
 
+watch(
+  () => route.params.id,
+  () => {
+    if (route.params.id) {
+      getRugPullList()
+    }
+  }
+)
+
 onMounted(() => {
   if (route.params.id) {
     getRugPullList()
