@@ -43,8 +43,10 @@ export const getUserBalance = createCacheRequest(async function(
     hide_small = 0
   }): Promise<GetUserBalanceResponseResult> {
   let tonAddressId = user_ids.find((i: string) => i?.endsWith?.('-ton'))
-  let otherUserIds = user_ids?.filter((i: string) => !i?.endsWith?.('-ton'))
+  let polygonAddressId = user_ids.find((i: string) => i?.endsWith?.('-polygon'))
+  let otherUserIds = user_ids?.filter((i: string) => !i?.endsWith?.('-ton') && !i?.endsWith?.('-polygon'))
   let tonTokenList: any[] = []
+  let polygonTokenList: any[] = []
   let _tokens: any = {
     data: [],
     total: tonTokenList?.length || 0,
@@ -59,6 +61,14 @@ export const getUserBalance = createCacheRequest(async function(
       })
     }
     return tonTokenList
+  })(),(async () => {
+    if (polygonAddressId && pageNO === 1) {
+      polygonTokenList = await getUserTokenBalanceList(getAddressAndChainFromId(polygonAddressId)?.address, 'polygon').catch(async () => [])
+      polygonTokenList = polygonTokenList?.map(i => ({...i, total_profit: '0', total_profit_ratio: '--', average_purchase_price_usd: '--' }))?.filter(i => {
+        return new BigNumber(i?.balance_usd || 0).gte(hide_small || 0)
+      })
+    }
+    return polygonTokenList
   })(), (async () => {
     const { $api } = useNuxtApp()
     if (otherUserIds?.length > 0) {
@@ -77,15 +87,13 @@ export const getUserBalance = createCacheRequest(async function(
     }
     return _tokens
   })()]).then(async (res) => {
-    console.log('tonTokenList', tonTokenList, res)
-    console.log('_tokens', _tokens)
-    if (tonTokenList?.length > 0) {
+    if (tonTokenList?.length > 0 || polygonTokenList?.length > 0) {
       return {
         ..._tokens,
-        data: [...(_tokens.data || []), ...tonTokenList].sort((a, b) => {
+        data: [...(_tokens.data || []), ...tonTokenList, ...polygonTokenList].sort((a, b) => {
           return (b[sort] - a[sort]) * (sort_dir === 'desc' ? 1 : 1)
         }),
-        total: _tokens.total + tonTokenList?.length
+        total: _tokens.total + tonTokenList?.length + polygonTokenList?.length
       }
     } else {
       return _tokens
@@ -652,6 +660,28 @@ export async function getBalanceList(tokenArr: string[], chain = useWalletStore(
 
   return balanceList.map(i => (i !== null && i) ? i.toString() : '0')
 }
+
+export const getUserTokenBalanceList = createCacheRequest(async function(address:string, chain:string) {
+  if (!address || !chain) {
+    return []
+  }
+  let userBalanceTokens: any[] = []
+  return getUserSwapTokenList(address, chain).then(res => {
+    userBalanceTokens = res?.map?.(i => ({...i, price: i?.current_price_usd || 0}))
+    if (userBalanceTokens.length > 0 && (/^0x[0-9a-zA-Z]{40}$/.test(address) || isValidAddress(address, 'tron'))) {
+      return getBalanceList(userBalanceTokens.map(i => i.token || ''), chain, address).then(async res1 => {
+        userBalanceTokens = userBalanceTokens?.map?.((i, k) => {
+          let _value = formatUnits(res1[k], i?.decimals || 0)
+          let _value_usd = new BigNumber(_value).times(i?.price || 0).toFixed()
+          return {...i, value: _value, value_usd: _value_usd, balance: _value, balance_usd: _value_usd}
+        })?.filter(j => !!Number(j.value))
+        return userBalanceTokens
+      })
+    } else {
+      return userBalanceTokens
+    }
+  })
+}, 2000)
 
 // query swap token
 export function getBestRouteV2(from_token: string, to_token: string, chain: string, max_hops = 3, max_routes = 6): Promise<Array<{

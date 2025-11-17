@@ -35,7 +35,7 @@ export const useBotStore = defineStore('bot', () => {
   const walletStore = useWalletStore()
   const configStore = useConfigStore()
   const tokenStore = useTokenStore()
-  const isSupportChains = ['eth', 'bsc', 'solana', 'base', 'xlayer', 'ton'] as const
+  const isSupportChains = ['eth', 'bsc', 'solana', 'base', 'xlayer', 'polygon', 'ton'] as const
   const isSupportEvmChains = computed(() => {
     const chainConfig = configStore.chainConfig
     const isEvmChainWallet = getChainInfo(walletStore.chain)?.vm_type === 'evm'
@@ -226,7 +226,7 @@ export const useBotStore = defineStore('bot', () => {
         if (!groups[chain]) groups[chain] = []
         groups[chain].push(item)
         return groups
-      }, {} as Record<string, Array<{ address: string; chain: string }>>)
+      }, {} as Record<string, Array<{ address: string; chain: string; token?: string }>>)
 
       // 逐个链处理
       for (const [chain, chainItems] of Object.entries(chainGroups)) {
@@ -235,9 +235,10 @@ export const useBotStore = defineStore('bot', () => {
           .filter(addr => addr.chain === chain)
           .map(addr => ({
             chain: addr.chain,
-            tokens: chainItems.map(item => item.address), // 合并当前链的所有token
+            tokens: chainItems.map(item => (item.address || item.token)), // 合并当前链的所有token
             walletAddress: addr.address
           }))
+
 
         if (balanceParams.length > 0) {
           const balanceRes = await getChainsTokenBalance(balanceParams);

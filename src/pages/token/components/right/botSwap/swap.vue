@@ -126,7 +126,7 @@
       <el-button v-if="!isApprove" :color="swapButtonColor" class="submit-btn" native-type="button" :loading="loadingApprove || loadingSwap || loadingAllowance" :disabled="Number(fromToken.balance) < Number(fromAmount)" @click.stop="approve">{{ Number(fromToken.balance) === 0 || Number(fromToken.balance) < Number(fromAmount) ? (checkAmountMessage() || $t('approve')) : $t('approve') }}</el-button>
 
       <el-button
-        v-else-if="activeTab === 'buy' && (Number(fromToken.balance) === 0 || Number(fromToken.balance) < Number(fromAmount))"
+        v-else-if="activeTab === 'buy' && (Number(fromToken?.balance) === 0 || Number(fromToken?.balance) < Number(fromAmount))"
         class="submit-btn"
         :color="swapButtonColor"
         native-type="button"
@@ -422,7 +422,7 @@ const totalSelectWalletBalance1 = computed(() => {
   // 去重 并去除 undefined 空字符
   const uniqueAddresses = Array.from(new Set(addresses?.filter(Boolean)))
   let balance = '0'
-  const token = tokenStore.swap.token
+  const token = tokenStore.swap?.token
   botStore.walletList?.forEach(i => {
     if (uniqueAddresses.includes(i.evmAddress)) {
       balance = new BigNumber(balance).plus(getAddressFromChainBalance(chain, i?.addresses, token?.address) || 0).toFixed()
@@ -451,7 +451,7 @@ const isApprove = computed(() => {
   if (['solana', 'ton'].includes(chain)) return true
   if (fromToken.value?.address === NATIVE_TOKEN) return true
 
-  const decimals = fromToken.value.decimals || 18
+  const decimals = fromToken.value?.decimals || 18
   const fromAmountBN = new BigNumber(amountNative.value || 0)
   const parsedAmount = new BigNumber(fromAmountBN.toFixed(decimals)).times(10 ** decimals)
   return parsedAmount.lte(allowance.value)
@@ -476,7 +476,7 @@ const isUsdcUsdt = computed(()=>{
 const handleMax = (balance: string | number, type: 'buy' | 'sell') => {
   if (botSwapStore.botSwapSelectedWallets?.length > 1) return
   const min = MIN_BALANCE[chain.value as 'bsc' | 'solana' | 'base' | 'eth'] || 0.01
-  const decimals = fromToken.value.decimals || 18
+  const decimals = fromToken.value?.decimals || 18
   const fromAmount = balance || 0
   const nativeTokens = ['sol', 'ton', NATIVE_TOKEN]
   if (type === 'buy') {
@@ -503,13 +503,13 @@ function handleAmount(item: { name: string; value: string }, type: 'buy' | 'sell
     amountNative.value = item.value
   } else if (type === 'sell') {
     const p = item.value
-    let a = tokenStore.swap.token.balance || 0
+    let a = tokenStore.swap.token?.balance || 0
     if (botSwapStore.botSwapSelectedWallets?.length > 1) {
       amountSellTokenPercent.value = new BigNumber(p).times(100).toFixed(0)
       a = totalSelectWalletBalance1.value
     }
     if (p) {
-      const decimals = tokenStore.swap.payToken.decimals || 0
+      const decimals = tokenStore.swap.payToken?.decimals || 0
       a = new BigNumber(a).times(p).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals}})?`))?.[0] || 0
       if (Number(a) === 0) {
         a = ''
@@ -524,12 +524,12 @@ function handleAmount(item: { name: string; value: string }, type: 'buy' | 'sell
 
 function setAmountToken() {
   const p = amountSellTokenPercent.value
-  let a = tokenStore.swap.token.balance || 0
+  let a = tokenStore.swap.token?.balance || 0
   if (botSwapStore.botSwapSelectedWallets?.length > 1) {
     a = totalSelectWalletBalance1.value
   }
   if (p) {
-    const decimals = tokenStore.swap.payToken.decimals || 0
+    const decimals = tokenStore.swap.payToken?.decimals || 0
     a = new BigNumber(a).times(p).div(100).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals}})?`))?.[0] || 0
     if (Number(a) === 0) {
       a = ''
@@ -683,7 +683,7 @@ const approve = async () => {
 }
 
 function checkAmount() {
-  const fromTokenBalance = fromToken.value.balance || 0
+  const fromTokenBalance = fromToken.value?.balance || 0
   const isBatchSell = botSwapStore.botSwapSelectedWallets.length > 1 && props.activeTab === 'sell'
   return !(
     ((Number(fromTokenBalance) < Number(fromAmount.value) && !isBatchSell) || (isBatchSell && Number(amountSellTokenPercent.value || 0) > 100)) ||
@@ -700,7 +700,7 @@ function checkAmountMessage() {
   } else if (loadingApprove.value) {
     return t('approve')
   }
-  const fromTokenBalance = fromToken.value.balance || 0
+  const fromTokenBalance = fromToken.value?.balance || 0
   if (botSwapStore.botSwapSelectedWallets.length > 1 && props.activeTab === 'sell' ) {
     if (Number(amountSellTokenPercent.value || 0) > 100) {
       return t('insufficientBalance')

@@ -127,7 +127,7 @@ const removeLeadingMinus = (str: string) => str.startsWith('-') ? str.slice(1) :
 const getWalletTxData = async () => {
   // const supportedChains = ['solana', 'bsc']
   const chain = walletStore.address ? walletStore.chain : activeTab.value
-  if (![...SupportFullDataChain, 'ton'].includes(chain)) {
+  if (![...SupportFullDataChain, 'ton', 'polygon'].includes(chain)) {
     walletTxData.value = null
     return
   }
