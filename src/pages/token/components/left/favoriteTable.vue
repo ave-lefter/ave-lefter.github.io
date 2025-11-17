@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import FavDialog from './favDialog.vue'
+import FavDialog from './favDialog2.vue'
 import {
   type GetUserFavoriteGroupsResponse,
   type GetFavListResponse,

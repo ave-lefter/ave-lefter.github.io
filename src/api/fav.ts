@@ -237,6 +237,13 @@ function getGroupChangeIndex(data: any): Promise<any> {
 }
 
 
+function batchDeleteFavorite(data: any): Promise<any> {
+  const { $api } = useNuxtApp()
+  return $api('/v1api/v3/tokens/favorite/delete/batch', {
+      method: 'post',
+    body: data
+  })
+}
 export {
   getUserFavoriteGroups,
   getFavoriteList,
@@ -256,5 +263,6 @@ export {
   getNewFavoriteList,
   getRemarksDetail,
   getGroupChangeIndex,
+  batchDeleteFavorite
 }
 export type { GetUserFavoriteGroupsResponse, GetFavListResponse }
