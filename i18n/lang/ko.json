@@ -1386,5 +1386,7 @@
   "pasteAddress1": "계약 주소 자동 완성을 열려면 클릭하세요.",
   "pasteText1": "텍스트 내용 자동 완성을 켜려면 클릭하세요.",
   "favoritesGroup": "즐겨찾는 그룹",
-  "groupDetails": "그룹 세부정보"
+  "groupDetails": "그룹 세부정보",
+  "batchDelete": "일괄 삭제",
+  "removeTokenTips": "선택한 다음을 삭제하시겠습니까?"
 }

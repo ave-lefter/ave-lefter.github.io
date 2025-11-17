@@ -306,7 +306,15 @@ async function _removeFavoriteGroup(item: GetUserFavoriteGroupsResponse) {
   }
 }
 
-function batchDelete() {
+async function batchDelete() {
+  await ElMessageBox.confirm(t('removeTokenTips'), t('tips'), {
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
+    customClass:'w-320px p-16px inputPop',
+    cancelButtonClass:'w-140px h-30px',
+    confirmButtonClass:'w-140px h-30px ml-8px!',
+    dangerouslyUseHTMLString: true,
+  })
   batchDeleteFavorite({
     address: walletAddress.value,
     token_ids: checkedList.value
@@ -385,7 +393,7 @@ function removeTokenFavorite(row:any) {
       </div>
     </div>
     <div class="w-480px h-full py-20px bg-[--secondary-bg]">
-      <div class="font-500 text-20px lh-[100%] mb-20px">{{ t('groupDetails') }}</div>
+      <div class="font-500 text-20px lh-[100%] mb-20px px-20px">{{ t('groupDetails') }}</div>
       <!-- <div class="flex items-center whitespace-nowrap overflow-x-auto scrollbar-hide mb-12px">
         <a
           v-for="(item,index) in list"
@@ -556,7 +564,7 @@ function removeTokenFavorite(row:any) {
       <div class="flex-between h-80px px-20px">
         <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate"
     @change="handleCheckAllChange" :label="t('selectAll')" size="large" />
-        <el-button type="primary" color="#3F80F7" class="h-40px" @click="batchDelete" :disabled="!checkedList.length">批量删除</el-button>
+        <el-button type="primary" color="#3F80F7" class="h-40px" @click="batchDelete" :disabled="!checkedList.length">{{ t('batchDelete') }}</el-button>
       </div>
     </div>
   </div>

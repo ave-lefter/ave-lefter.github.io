@@ -530,5 +530,7 @@
   "pasteAddress1": "Sözleşme adresi otomatik doldurmayı açmak için tıklayın",
   "pasteText1": "Metin içeriği otomatik tamamlamayı açmak için tıklayın",
   "favoritesGroup": "Favori Gruplar",
-  "groupDetails": "Grup ayrıntıları"
+  "groupDetails": "Grup ayrıntıları",
+  "batchDelete": "Toplu Silme",
+  "removeTokenTips": "Seçilen aşağıdakiler silinsin mi?"
 }

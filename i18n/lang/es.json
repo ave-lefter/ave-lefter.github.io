@@ -535,5 +535,7 @@
   "pasteAddress1": "Haga clic para abrir el autocompletar de la dirección del contrato",
   "pasteText1": "Haga clic para activar el autocompletado de contenido de texto",
   "favoritesGroup": "Grupos favoritos",
-  "groupDetails": "Detalles del grupo"
+  "groupDetails": "Detalles del grupo",
+  "batchDelete": "Eliminar por lotes",
+  "removeTokenTips": "¿Eliminar lo siguiente seleccionado?"
 }

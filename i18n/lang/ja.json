@@ -1386,5 +1386,7 @@
   "pasteAddress1": "クリックして契約住所の自動入力を開きます",
   "pasteText1": "クリックしてテキスト コンテンツのオートコンプリートをオンにします",
   "favoritesGroup": "好きなグループ",
-  "groupDetails": "グループ詳細"
+  "groupDetails": "グループ詳細",
+  "batchDelete": "一括削除",
+  "removeTokenTips": "選択したフォローを削除しますか?"
 }

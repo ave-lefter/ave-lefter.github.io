@@ -1527,5 +1527,7 @@
   "tokenScore": "Token Score",
   "allPairsTips": "Aggregation mode: Displays the accumulated results of the number and initial value of the token in all pools, which is different from the data of a single pool.",
   "favoritesGroup": "Favorite Groups",
-  "groupDetails": "Group details"
+  "groupDetails": "Group details",
+  "batchDelete": "Batch Delete",
+  "removeTokenTips": "Delete the selected following?"
 }
