@@ -1,5 +1,5 @@
 import { getSuiMethods, getSuiTokensBalance } from '~/utils/wallet/sui'
-import { ERC20ABI, SwapABI, QuoteABI, SunPump_Launchpad_ABI, SunPump_Router_ABI, Four_TokenManagerHelper_V2_ABI, ERC314ABI, Four_TokenManager_V1_ABI, Four_TokenManager_V2_ABI, WETHABI, getQuoteABI, UniChainsV4, getSwapMethod } from '~/utils/wallet/utils/abi'
+import { ERC20ABI, SwapABI, QuoteABI, SunPump_Launchpad_ABI, SunPump_Router_ABI, Four_TokenManagerHelper_V2_ABI, ERC314ABI, Four_TokenManager_V1_ABI, Four_TokenManager_V2_ABI, WETHABI, getQuoteABI, UniChainsV4, getSwapMethod, PopMeFun_ABI } from '~/utils/wallet/utils/abi'
 import { QuoteAddress } from '~/utils/wallet/utils/constants'
 import BigNumber from 'bignumber.js'
 import { PublicKey } from '@solana/web3.js'
@@ -1808,5 +1808,177 @@ export async function xFlapSwap({fromToken, toToken, fromAmount}: { fromToken: a
       isAmountOut: false
     },
     isXflapswap: true
+  }
+}
+
+
+export async function quoteCookPump({from_token, to_token, amountIn, amountOut}: { from_token: string; to_token: string; amountIn: string ; amountOut: string}, chain = useWalletStore().chain) {
+  if ([from_token, to_token].includes(NATIVE_TOKEN) && from_token !== to_token && (amountIn || amountOut)) {
+    let { _provider } = getProvider(chain)
+    let token = [from_token, to_token].find(i => i !== NATIVE_TOKEN)
+    const CookPumpABI = [
+      "function buyTokens(address token, uint256 minTokens, bool isInsurance, string memo) payable",
+      "function sellTokens(address token, uint256 tokenAmount, uint256 minEth)",
+      "function getTokenOutputAmount(address tokenAddress, uint256 inputAmount, bool isInsurance) view returns (uint256)",
+      "function getJuOutputAmount(address tokenAddress, uint256 inputAmount) view returns (uint256)"
+    ]
+    const CookPumpRoute = '0xaF2F76f06E27BE138Bd5310ec6553E2c93ec19F4'
+    let CookPumpToken = new Contract(CookPumpRoute, CookPumpABI, _provider)
+    let isBuy = from_token === NATIVE_TOKEN
+    if (amountIn) {
+      if (isBuy) {
+        return CookPumpToken.getTokenOutputAmount(token, amountIn, false).then(async res => res.toString())
+      } else {
+        return CookPumpToken.getJuOutputAmount(token, amountIn).then(async res => res.toString())
+      }
+    }
+  } else {
+    return false
+  }
+}
+
+export async function cookPumpSwap({fromToken, toToken, fromAmount}: { fromToken: any; toToken: any; fromAmount: string | number }, slippage: number | string, chain = useWalletStore().chain) {
+  let signer = await getSigner()
+  let token = [fromToken.address, toToken.address].find(i => i !== NATIVE_TOKEN)
+  let isBuy = fromToken.address === NATIVE_TOKEN
+  const CookPumpABI = [
+    "function buyTokens(address token, uint256 minTokens, bool isInsurance, string memo) payable",
+    "function sellTokens(address token, uint256 tokenAmount, uint256 minEth)",
+    "function getTokenOutputAmount(address tokenAddress, uint256 inputAmount, bool isInsurance) view returns (uint256)",
+    "function getJuOutputAmount(address tokenAddress, uint256 inputAmount) view returns (uint256)"
+  ]
+  const CookPumpRoute = '0xaF2F76f06E27BE138Bd5310ec6553E2c93ec19F4'
+  let CookPumpToken = new Contract(CookPumpRoute, CookPumpABI, signer)
+  let amountOut = toToken.amount
+  let amountOutMin = new BigNumber(amountOut).times(new BigNumber(100).minus(slippage)).div(100).toFixed(0)
+  if (isBuy) {
+    let gas = await CookPumpToken.buyTokens.estimateGas(token, amountOutMin, false, '', { value: fromAmount })
+    let gasLimit = new BigNumber(gas.toString()).times('100').div('10').toFixed()
+    return {
+      swap: () => CookPumpToken.buyTokens(token, amountOutMin, false, '', { gasLimit, value: fromAmount }),
+      swapCallStatic: () => CookPumpToken.buyTokens.staticCall(token, amountOutMin, false, '', { value: fromAmount }),
+      gasValue: gasLimit.toString(),
+      swapInfo: {
+        fromToken: fromToken,
+        toToken: toToken,
+        fromAmount: formatUnits(fromAmount, fromToken.decimals),
+        toAmount: formatUnits(toToken.amount, toToken.decimals),
+        fromTokenAmount: fromAmount,
+        toTokenAmount: toToken.amount,
+        isAmountOut: false
+      },
+      isCookPump: true
+    }
+  } else {
+    let gas = await CookPumpToken.sellTokens.estimateGas(token, fromAmount, amountOutMin)
+    let gasLimit = new BigNumber(gas.toString()).times('100').div('10').toFixed()
+    return {
+      swap: () => CookPumpToken.sellTokens(token, fromAmount, amountOutMin, { gasLimit }),
+      swapCallStatic: () =>  CookPumpToken.sellTokens.staticCall(token, fromAmount, amountOutMin, { gasLimit }),
+      gasValue: gasLimit.toString(),
+      swapInfo: {
+        fromToken: fromToken,
+        toToken: toToken,
+        fromAmount: formatUnits(fromAmount, fromToken.decimals),
+        toAmount: formatUnits(toToken.amount, toToken.decimals),
+        fromTokenAmount: fromAmount,
+        toTokenAmount: toToken.amount,
+        isAmountOut: false
+      },
+      isCookPump: true
+    }
+  }
+}
+
+export async function quotePopMeFun({from_token, to_token, amountIn, amountOut}: { from_token: string; to_token: string; amountIn: string ; amountOut: string}, chain = useWalletStore().chain) {
+  if ([from_token, to_token].includes(NATIVE_TOKEN) && from_token !== to_token && (amountIn || amountOut)) {
+    let { _provider } = getProvider(chain)
+    let token = [from_token, to_token].find(i => i !== NATIVE_TOKEN)
+    let popMeFunRoute = new Contract('0x198C8099E0c2CE323a5513769e294f349B015cEE', PopMeFun_ABI, _provider)
+    let isBuy = from_token === NATIVE_TOKEN
+    const $t = getGlobalT()
+    // "function tryBuy(address _token, uint256 _amount) view returns (uint256 tokenAmountOut, uint256 refund)",
+    // "function trySell(address _token, uint256 _amount) view returns (uint256 ethAmountOut)",
+    if (!amountIn) {
+      return false
+    }
+    if (isBuy) {
+      // if (amountIn && BigNumber.from(amountIn).lte('1000000000000000')) {
+      //   return Promise.reject(i18n.global.t('fourMemeBuyError'))
+      // }
+      return popMeFunRoute.tryBuy(token, amountIn || '0').then(async res => {
+        console.log('bug result', amountOut || '0', amountIn || '0', res)
+        if (amountIn) {
+          if (Number(res?.tokenAmountOut) === 0) {
+            return Promise.reject($t('fourMemeBuyError'))
+          }
+          return {...res, amountOut: res?.tokenAmountOut.toString()}
+        }
+      })
+    } else {
+      console.log('popMeFunRoute', popMeFunRoute)
+      console.log('sell', token, amountIn || '0')
+      return popMeFunRoute.trySell(token, amountIn || '0').then(async res => {
+        console.log('sell result', res)
+        return {...res, amountOut: res?.toString()}
+      }).catch(err => {
+        console.log('err', err.message)
+        if (err?.message?.includes('reverted with panic code 17')) {
+          // 卖出 token 数量过少，不足以支付手续费
+          return Promise.reject($t('fourMemeSellError'))
+        }
+        return Promise.reject(err)
+      })
+    }
+  } else {
+    return false
+  }
+}
+
+export async function popMeFunSwap({fromToken, toToken, fromAmount}: { fromToken: any; toToken: any; fromAmount: string | number }, slippage: number | string, chain = useWalletStore().chain) {
+  let signer = await getSigner()
+  let token = [fromToken.address, toToken.address].find(i => i !== NATIVE_TOKEN)
+  let isBuy = fromToken.address === NATIVE_TOKEN
+  let popMeFunRoute = new Contract('0x198C8099E0c2CE323a5513769e294f349B015cEE', PopMeFun_ABI, signer)
+  let amountOut = toToken.amount
+  let amountOutMin = new BigNumber(amountOut).times(new BigNumber(100).minus(slippage)).div(100).toFixed(0)
+  if (isBuy) {
+    //  "function buyToken(address _token, uint256 _amount, uint256 _minAmountOut) payable",
+    let gas = await popMeFunRoute.buyToken.estimateGas(token, fromAmount, amountOutMin, { value: fromAmount })
+    let gasLimit = new BigNumber(gas.toString()).times('100').div('10').toFixed()
+    return {
+      swap: () => popMeFunRoute.buyToken(token, fromAmount, amountOutMin, { gasLimit, value: fromAmount }),
+      swapCallStatic: () => popMeFunRoute.buyToken.staticCall(token, fromAmount, amountOutMin, { value: fromAmount }),
+      gasValue: gasLimit.toString(),
+      swapInfo: {
+        fromToken: fromToken,
+        toToken: toToken,
+        fromAmount: formatUnits(fromAmount, fromToken.decimals),
+        toAmount: formatUnits(toToken.amount, toToken.decimals),
+        fromTokenAmount: fromAmount,
+        toTokenAmount: toToken.amount,
+        isAmountOut: false
+      },
+      isPopMeFun: true
+    }
+  } else {
+    // "function sellToken(address _token, uint256 _amount, uint256 _minAmountOut)",
+    let gas = await popMeFunRoute.sellToken.estimateGas(token, fromAmount, amountOutMin)
+    let gasLimit = new BigNumber(gas.toString()).times('100').div('10').toFixed()
+    return {
+      swap: () => popMeFunRoute.sellToken(token, fromAmount, amountOutMin, { gasLimit }),
+      swapCallStatic: () =>  popMeFunRoute.sellToken.staticCall(token, fromAmount, amountOutMin, { gasLimit }),
+      gasValue: gasLimit.toString(),
+      swapInfo: {
+        fromToken: fromToken,
+        toToken: toToken,
+        fromAmount: formatUnits(fromAmount, fromToken.decimals),
+        toAmount: formatUnits(toToken.amount, toToken.decimals),
+        fromTokenAmount: fromAmount,
+        toTokenAmount: toToken.amount,
+        isAmountOut: false
+      },
+      isPopMeFun: true
+    }
   }
 }
