@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { profit, ranking, totalPoints, type ProfitResponse } from '~/api/perp'
+import { boxopen, profit, ranking, totalPoints } from '~/api/perp'
+import { usePerpStore } from '~/stores/perp'
 
 const {t} = useI18n()
-const totalAssets = ref<ProfitResponse>({} as ProfitResponse)
+const perpStore = usePerpStore()
 const loading = ref(false)
 const score = ref({
   isPermission:0,
@@ -10,11 +11,12 @@ const score = ref({
   points:0
 })
 
+const totalAssets = computed(()=>perpStore.totalAssets)
 const getTotalAssets = async ()=>{
   try{
     loading.value = true
     const res = await profit()
-    totalAssets.value = res || {}  
+    perpStore.totalAssets =  res || {}
   } finally{
     loading.value = false
   }
@@ -32,6 +34,16 @@ const getScore = async ()=>{
 const getTotalPoints = async ()=>{
   const res = await totalPoints()
   score.value.points = res.points || 0
+}
+
+const receiveScore = async()=>{
+  try {
+    await boxopen()
+  } catch (error) {
+    if(error instanceof Error){
+      ElMessage.error(error.message)
+    }
+  }
 }
 
 onMounted(()=>{
@@ -66,11 +78,11 @@ onMounted(()=>{
       </div>
       <div class="flex items-center gap-8px">
         <span class="text-12px lh-16px color-[--secondary-text]">{{ t('todayPnl') }}</span>
-        <span class="text-12px lh-16px color-[--main-text]">{{formatNumber(totalAssets.profit,{
+        <span class="text-12px lh-16px" :class="getColorClass(totalAssets.profit)">{{formatNumber(totalAssets.profit,{
           limit:20,
           decimals:2
         })}} USDT</span>
-        <span class="text-12px lh-16px color-[--secondary-text]">({{formatNumber(+totalAssets.profitRate*100,{
+        <span class="text-12px lh-16px color-[--secondary-text]" :class="getColorClass(totalAssets.profit)">({{formatNumber(+totalAssets.profitRate*100,{
           limit:20,
           decimals:2
         })}}%)</span>
@@ -89,11 +101,11 @@ onMounted(()=>{
       <div>
         <label class="text-12px lh-18px color-[--secondary-text]">{{ t('score2') }}</label>
         <div>
-          <span class="text-18px lh-24px color-[--up-color] font-500">+{{score.myPoint}}</span>
-          <span class="text-14px ml-8px lh-24px color-[--third-text]">本周 +{{score.myPoint}}</span>
+          <span class="text-18px lh-24px font-500" :class="getColorClass(score.myPoint)">{{addSign(score.myPoint)}}{{score.myPoint}}</span>
+          <span class="text-14px ml-8px lh-24px color-[--third-text]">本周 {{addSign(score.myPoint)}}{{score.myPoint}}</span>
         </div>
       </div>
-      <el-button :disabled="!score.isPermission" type="primary" size="small" class="w-56px  [--el-font-size-base:12px]">{{ t('receive') }}</el-button>
+      <el-button type="primary" size="small" class="w-56px  [--el-font-size-base:12px]" @click="receiveScore">{{ t('receive') }}</el-button>
     </div>
     <div class="flex items-center justify-between mb-16px">
       <span class="text-12px lh-18px color-[--secondary-text]">{{ t('todayVolume') }}</span>

@@ -13,7 +13,7 @@ const activeName = ref('wallet')
       <WalletAssets style="max-height:auto;"/>
     </el-tab-pane>
     <el-tab-pane :label="t('perp')" name="perp">
-      <PerpAssets />
+      <PerpAssets v-if="activeName==='perp'"/>
     </el-tab-pane>
   </el-tabs>
   <WalletAssets v-else/>

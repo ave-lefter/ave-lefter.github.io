@@ -244,6 +244,46 @@ export async function ranking(){
 // 资产-总积分
 export async function totalPoints(){
   return api('https://award.edgex.exchange/api/points/info', {
-    method: 'post'
+    method: 'post',
+    body:{}
+  })
+}
+
+// 资产-账户余额
+export async function assetDetail(type:string) {
+  const perpStore = usePerpStore()
+  return api('/api/v1/private/user/asset/detail',{
+    method:'get',
+    query:{
+      type,
+      userId:perpStore.userInfo?.id
+    }
+  })
+}
+
+// 领取积分
+export async function boxopen() {
+  return api('https://award.edgex.exchange/api/points/boxopen',{
+    method:'post',
+    body:{
+    }
+  })
+}
+
+// 当前委托
+export async function getActiveOrderPage(params:{
+  filterStatusList:string
+  filterStartCreatedTimeInclusive:string | number
+  filterEndCreatedTimeExclusive:string | number
+  filterContractIdList:string
+}){
+  const perpStore = usePerpStore()
+  return api('/api/v1/private/order/getActiveOrderPage',{
+    method:'get',
+    query:{
+      accountId:perpStore.userInfo?.id,
+      size:10,
+      ...params
+    }
   })
 }
