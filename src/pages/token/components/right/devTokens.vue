@@ -308,7 +308,7 @@ async function getRugPullList() {
     }
   }
   .list {
-    height: calc(100vh - 600px);
+    max-height: calc(100vh - 600px);
     overflow: auto;
     margin-right: 0px;
     padding-right: 15px;
