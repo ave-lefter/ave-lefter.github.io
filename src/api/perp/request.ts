@@ -22,6 +22,7 @@ interface EdgeXApiResponse<T = any> {
   timestamp?: number
 }
 
+const xAuthList = ['onboardSite','getPositionTransactionPage','getAllOrdersPage','profit','ranking','info', 'getCrossWithdrawSignInfo', 'createCrossWithdraw']
 function getApi() {
   return $fetch.create({
     baseURL: PerpBaseUrl,
@@ -46,7 +47,7 @@ function getApi() {
       if (walletStore.address) {
         options.headers.set('l1address', walletStore.address)
       }
-      if (url?.includes('onboardSite')) {
+      if (xAuthList.some(item=>url.includes(item))) {
         const headers = perpStore.generateEdgeXAuthHeaders({
           method: options.method || 'GET',
           path: url,

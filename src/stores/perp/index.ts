@@ -5,6 +5,7 @@ import { EdgeXSDK, type ApiKeyData, type L2KeyPair } from '@edgex-fe/typescript-
 import { useLocalStorage } from '@vueuse/core'
 import { usePerpWsPubStore } from './wsPub'
 import { usePerpWsPrivateStore } from './wsPrivate'
+import type { Collateral, Order, Position } from './type'
 
 type PerpMetadata = Awaited<ReturnType<typeof _getPerpMetadata>>
 type UserInfo = Awaited<ReturnType<typeof onboardSite>>['dataList'][0]
@@ -22,7 +23,10 @@ export const usePerpStore = defineStore('perp', () => {
   const walletStore = useWalletStore()
   const userInfo = ref<null | UserInfo>(null)
   const accountList = shallowRef<UserInfo[]>([])
-  const _perpKeys = useLocalStorage<{ [key: string]: { apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string } }>('perp_keys', {})
+  const collateral = ref<Collateral[]>([])
+  const position = ref<Position[]>([])
+  const order = ref<Order[]>([])
+  const _perpKeys = useLocalStorage<{[key: string]: {apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string }}>('perp_keys', {})
   const lastPrice= shallowRef(0)
   const resolution = useLocalStorage('tv_resolution', '15')
 
@@ -226,6 +230,10 @@ export const usePerpStore = defineStore('perp', () => {
     })
   }
 
+  function getSdk() {
+    return sdk
+  }
+
   return {
     metadata,
     apiKeys,
@@ -233,6 +241,9 @@ export const usePerpStore = defineStore('perp', () => {
     perpKeys,
     isLogin,
     userInfo,
+    collateral,
+    position,
+    order,
     apiSignatureLoading,
     starkSignatureLoading,
     login,
@@ -247,6 +258,7 @@ export const usePerpStore = defineStore('perp', () => {
     perp,
     contractName,
     contractId,
-    resolution
+    resolution,
+    getSdk
   }
 })
