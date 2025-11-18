@@ -861,7 +861,7 @@ onUnmounted(() => {
 })
 
 function handleFavDialogEvent({ tokenId, type, groupId }: IFavDialogEventArgs) {
-  if (type === 'changeFavoriteGroupName' || type === 'removeFavoriteGroup') {
+  if (type === 'changeFavoriteGroupName' || type === 'removeFavoriteGroup'|| type === 'delete') {
     getTokenUserFavoriteGroups()
   } else if (tokenId === id.value) {
     getTokenFavoriteCheck()

@@ -541,5 +541,9 @@
   "pasteAddress2": "Clique para desativar o preenchimento automático do endereço do contrato",
   "pasteText2": "Clique para desativar o preenchimento automático de conteúdo de texto",
   "pasteAddress1": "Clique para abrir o preenchimento automático do endereço do contrato",
-  "pasteText1": "Clique para ativar o preenchimento automático de conteúdo de texto"
+  "pasteText1": "Clique para ativar o preenchimento automático de conteúdo de texto",
+  "favoritesGroup": "Grupos favoritos",
+  "groupDetails": "Detalhes do grupo",
+  "batchDelete": "Exclusão em lote",
+  "removeTokenTips": "Excluir o seguinte selecionado?"
 }

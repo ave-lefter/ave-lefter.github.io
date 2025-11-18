@@ -6,6 +6,9 @@ function confirmChangeName(type = 'add') {
     ElMessageBox.prompt('', $i18n.t('enterGroupName'), {
       confirmButtonText: $i18n.t('confirm1'),
       cancelButtonText: $i18n.t('cancel'),
+      customClass:'w-320px p-16px inputPop',
+      cancelButtonClass:'w-140px h-30px',
+      confirmButtonClass:'w-140px h-30px ml-8px!',
       inputValidator: (value) => {
         if (!value) {
           reject()

@@ -541,5 +541,9 @@
   "pasteAddress2": "Haga clic para desactivar el autocompletar de la dirección del contrato",
   "pasteText2": "Haga clic para desactivar el autocompletado de contenido de texto",
   "pasteAddress1": "Haga clic para abrir el autocompletar de la dirección del contrato",
-  "pasteText1": "Haga clic para activar el autocompletado de contenido de texto"
+  "pasteText1": "Haga clic para activar el autocompletado de contenido de texto",
+  "favoritesGroup": "Grupos favoritos",
+  "groupDetails": "Detalles del grupo",
+  "batchDelete": "Eliminar por lotes",
+  "removeTokenTips": "¿Eliminar lo siguiente seleccionado?"
 }
