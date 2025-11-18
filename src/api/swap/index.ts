@@ -10,6 +10,7 @@ import { TronContract, confirmTronTx } from '~/utils/wallet/utils/tronContract'
 import { getFeeIn } from '~/utils'
 import { getTonTokenBalance, getTonTokenList } from '~/utils/wallet/ton'
 import { getTonTokenInfo } from './ton'
+import { getTokensPnl } from '../bot'
 
 export * from './sui'
 
@@ -55,16 +56,16 @@ export const getUserBalance = createCacheRequest(async function(
   }
   return Promise.all([(async () => {
     if (tonAddressId && pageNO === 1) {
-      tonTokenList = await getTonTokenList(getAddressAndChainFromId(tonAddressId)?.address).catch(async () => [])
-      tonTokenList = tonTokenList?.map(i => ({...i, total_profit: '0', total_profit_ratio: '--', average_purchase_price_usd: '--' }))?.filter(i => {
+      tonTokenList = await getTonTokenList(getAddressAndChainFromId(tonAddressId)?.address, 'all', true).catch(async () => [])
+      tonTokenList = tonTokenList?.map(i => ({...i, total_profit: i.total_profit || '0', total_profit_ratio: i.total_profit_ratio || '--', average_purchase_price_usd: i.average_purchase_price_usd || '--' }))?.filter(i => {
          return new BigNumber(i?.balance_usd || 0).gte(hide_small || 0)
       })
     }
     return tonTokenList
   })(),(async () => {
     if (polygonAddressId && pageNO === 1) {
-      polygonTokenList = await getUserTokenBalanceList(getAddressAndChainFromId(polygonAddressId)?.address, 'polygon').catch(async () => [])
-      polygonTokenList = polygonTokenList?.map(i => ({...i, total_profit: '0', total_profit_ratio: '--', average_purchase_price_usd: '--' }))?.filter(i => {
+      polygonTokenList = await getUserTokenBalanceList(getAddressAndChainFromId(polygonAddressId)?.address, 'polygon', true).catch(async () => [])
+      polygonTokenList = polygonTokenList?.map(i => ({...i, total_profit: i.total_profit || '0', total_profit_ratio: i.total_profit_ratio || '--', average_purchase_price_usd: i.average_purchase_price_usd || '--' }))?.filter(i => {
         return new BigNumber(i?.balance_usd || 0).gte(hide_small || 0)
       })
     }
@@ -661,7 +662,7 @@ export async function getBalanceList(tokenArr: string[], chain = useWalletStore(
   return balanceList.map(i => (i !== null && i) ? i.toString() : '0')
 }
 
-export const getUserTokenBalanceList = createCacheRequest(async function(address:string, chain:string) {
+export const getUserTokenBalanceList = createCacheRequest(async function(address:string, chain:string, isGetPnL = false) {
   if (!address || !chain) {
     return []
   }
@@ -675,6 +676,59 @@ export const getUserTokenBalanceList = createCacheRequest(async function(address
           let _value_usd = new BigNumber(_value).times(i?.price || 0).toFixed()
           return {...i, value: _value, value_usd: _value_usd, balance: _value, balance_usd: _value_usd}
         })?.filter(j => !!Number(j.value))
+        if (isGetPnL) {
+          try {
+            let _tokens = userBalanceTokens.map(i => {
+              return {
+                token: i.token || i.address,
+                balance: i.value || '0'
+              }
+            })
+            let nativeIndex = _tokens.findIndex(i => i.token === NATIVE_TOKEN)
+            if (nativeIndex >= 0) {
+              _tokens.splice(nativeIndex, 1)
+            }
+            let pnls = await getTokensPnl({
+              tokens: _tokens,
+              chain,
+              walletAddress: address,
+              days: 30
+            })
+            if (nativeIndex >= 0) {
+              pnls.splice(nativeIndex, 0, {
+                ...userBalanceTokens[nativeIndex],
+                token: NATIVE_TOKEN,
+                balance: userBalanceTokens[nativeIndex]?.value || '0',
+              } as any)
+            }
+            pnls = pnls?.map?.((res, k) => {
+              let item = userBalanceTokens[k]
+              return {
+                ...res,
+                total_profit: res?.profit || '--',
+                unrealized_profit: res?.profitUnrealized || '0',
+                realized_profit: res?.profitUnrealized || '0',
+                balance_amount: item?.balance || item?.value || '0',
+                balance_usd: item?.balance_usd || '0',
+                total_profit_ratio: res?.profitRatio || '--',
+                unrealized_ratio: res?.unrealizedRatio || '0',
+                realized_ratio: res?.realizeRatio || '0',
+                total_purchase_usd: res?.totalBuyUsd || '0',
+                total_sold_usd: res?.totalSellUsd || '0',
+                balance_ratio: res?.balanceRatio || '0',
+                average_purchase_price_usd: res?.avgBuyPrice || '--',
+                average_sold_price_usd: res?.avgSellPrice || '0',
+                total_purchase: res?.totalBuyAmount || '0',
+                bought: res?.totalBuyAmount || '0',
+                total_sold: res?.totalSellAmount || '0',
+                sold: res?.totalSellAmount || '0',
+              }
+            })
+            userBalanceTokens = userBalanceTokens?.map?.((i, k) => ({...i, ...(pnls[k] || {})}))
+          } catch (err) {
+            console.log(err)
+          }
+        }
         return userBalanceTokens
       })
     } else {

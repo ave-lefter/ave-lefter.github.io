@@ -923,3 +923,40 @@ export function getTokenPnl(body: {
     body
   })
 }
+
+// 3.10 批量计算 pnl
+// 功能说明：计算盈利
+export function getTokensPnl(body: {
+  chain: string
+  tokens: Array<{
+    token: string
+    balance: string
+  }>
+  walletAddress: string
+  days: number
+}): Promise<Array<{
+  balance: string
+  chain: string
+  profit: string
+  profitRealized: string
+  profitUnrealized: string
+  token: string
+  walletAddress: string
+  avgBuyPrice: string
+  avgSellPrice: string
+  balanceRatio: string
+  realizeRatio: string
+  unrealizedRatio: string
+  totalSellUsd: string
+  totalBuyUsd: string
+  profitRatio: string
+  totalBuyAmount: string
+  totalSellAmount: string
+
+}>> {
+  const {$api} = useNuxtApp()
+  return $api('/aveswap/v1/swap/getTokensPnl', {
+    method: 'post',
+    body
+  })
+}

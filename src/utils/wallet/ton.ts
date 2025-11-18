@@ -4,6 +4,7 @@ import { getTokensPrice } from '@/api/token'
 import { createSequentialThrottle } from '@/utils/createSequentialThrottle'
 import BigNumber from 'bignumber.js'
 import { TonConnectUI, THEME, type Locales } from '@tonconnect/ui'
+import { getTokensPnl } from '~/api/bot'
 
 const { JettonMinter, JettonWallet} = TonWeb.token.jetton
 
@@ -162,7 +163,7 @@ export const getTonApiBalances = (address: string) => {
   return getTonBalance(address, 1)
 }
 
-export async function getTonTokenList(address: string, _token = 'all') {
+export async function getTonTokenList(address: string, _token = 'all', isGetPnL = false) {
   let tokens: JettonBalance[] = []
   let tonBalance = 0
   if (_token !== 'all') {
@@ -206,6 +207,57 @@ export async function getTonTokenList(address: string, _token = 'all') {
   })
   if (_token && _token !== 'all') {
     tokenList = tokenList?.filter?.(i => i.token === _token) || []
+  }
+  if (isGetPnL) {
+    try {
+      let _tokens = tokenList.map(i => {
+        return {
+          token: i.token || i.address,
+          balance: i.balance || '0'
+        }
+      })
+      let nativeIndex = tokenList.findIndex(i => i.token === NATIVE_TOKEN)
+      if (nativeIndex >= 0) {
+        _tokens.splice(nativeIndex, 1)
+      }
+      let pnls = await getTokensPnl({
+        tokens: _tokens,
+        chain: 'ton',
+        walletAddress: address,
+        days: 30
+      })
+      if (nativeIndex >= 0) {
+        pnls.splice(nativeIndex, 0, {
+          ...tokenList[nativeIndex],
+        } as any)
+      }
+      pnls = pnls?.map?.((res, k) => {
+        let item = tokenList[k]
+        return {
+          ...res,
+          total_profit: res?.profit || '--',
+          unrealized_profit: res?.profitUnrealized || '0',
+          realized_profit: res?.profitUnrealized || '0',
+          balance_amount: item?.balance || '0',
+          balance_usd: item?.balance_usd || '0',
+          total_profit_ratio: res?.profitRatio || '--',
+          unrealized_ratio: res?.unrealizedRatio || '0',
+          realized_ratio: res?.realizeRatio || '0',
+          total_purchase_usd: res?.totalBuyUsd || '0',
+          total_sold_usd: res?.totalSellUsd || '0',
+          balance_ratio: res?.balanceRatio || '0',
+          average_purchase_price_usd: res?.avgBuyPrice || '--',
+          average_sold_price_usd: res?.avgSellPrice || '0',
+          total_purchase: res?.totalBuyAmount || '0',
+          bought: res?.totalBuyAmount || '0',
+          total_sold: res?.totalSellAmount || '0',
+          sold: res?.totalSellAmount || '0',
+        }
+      })
+      tokenList = tokenList?.map?.((i, k) => ({...i, ...(pnls[k] || {})}))
+    } catch (err) {
+      console.log(err)
+    }
   }
   return tokenList
 }
