@@ -5,6 +5,7 @@ import { EdgeXSDK, type ApiKeyData, type L2KeyPair } from '@edgex-fe/typescript-
 import { useLocalStorage } from '@vueuse/core'
 import { usePerpWsPubStore } from './wsPub'
 import { usePerpWsPrivateStore } from './wsPrivate'
+import type { Collateral, Order, Position } from './type'
 
 type PerpMetadata = Awaited<ReturnType<typeof _getPerpMetadata>>
 type UserInfo = Awaited<ReturnType<typeof onboardSite>>['dataList'][0]
@@ -17,13 +18,18 @@ const sdk = new EdgeXSDK({
 export const usePerpStore = defineStore('perp', () => {
   const route= useRoute()
   const metadata = shallowRef<PerpMetadata | null>(null)
-  const contractList = ref<Array<PerpInfo>>([])
+  // const contractList = ref<Array<PerpInfo>>([])
+  const contractList = useLocalStorage<PerpInfo[]>('contractList', [])
   const loadingPerpMetadata = shallowRef(false)
   const walletStore = useWalletStore()
   const userInfo = ref<null | UserInfo>(null)
   const accountList = shallowRef<UserInfo[]>([])
+  const collateral = ref<Collateral[]>([])
+  const position = ref<Position[]>([])
+  const order = ref<Order[]>([])
   const _perpKeys = useLocalStorage<{[key: string]: {apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string }}>('perp_keys', {})
   const totalAssets = ref<ProfitResponse>({} as ProfitResponse)
+  const lastPrice= shallowRef(0)
 
   const apiKeys = computed(() => {
     if (!walletStore.address) {
@@ -52,9 +58,9 @@ export const usePerpStore = defineStore('perp', () => {
   const perp = computed(() => {
     return contractList?.value?.find((item) => item.contractName === contractName.value) || null
   })
-    const contractId = computed(() => {
-      return perp?.value?.contractId || ''
-    })
+  const contractId = computed(() => {
+    return perp?.value?.contractId || '10000001'
+  })
   function getPerpMetadata() {
     loadingPerpMetadata.value = true
     _getPerpMetadata().then(res => {
@@ -225,6 +231,10 @@ export const usePerpStore = defineStore('perp', () => {
     })
   }
 
+  function getSdk() {
+    return sdk
+  }
+
   return {
     metadata,
     apiKeys,
@@ -232,6 +242,9 @@ export const usePerpStore = defineStore('perp', () => {
     perpKeys,
     isLogin,
     userInfo,
+    collateral,
+    position,
+    order,
     apiSignatureLoading,
     starkSignatureLoading,
     login,
@@ -245,6 +258,8 @@ export const usePerpStore = defineStore('perp', () => {
     contractList,
     perp,
     contractName,
-    totalAssets
+    totalAssets,
+    contractId,
+    getSdk
   }
 })

@@ -1566,5 +1566,9 @@
   "allPairsTips": "聚合模式：展示該代幣在所有池子的數量與初始值累加結果，區別於單一池子數據",
   "minDeposit": "最少充值${amount}",
   "depositTxSubmitted": "充值交易已提交",
-  "depositSuccess": "充值成功"
+  "depositSuccess": "充值成功",
+  "chain1": "選鏈",
+  "availableBalance": "可用資產",
+  "totalBalance1": "總資產",
+  "depositComplete": "充值交易已確認"
 }

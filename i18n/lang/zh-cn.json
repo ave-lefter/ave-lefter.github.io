@@ -1611,5 +1611,9 @@
   "closeSize":"平仓数量",
   "closed":"已平仓",
   "avgPrice2":"平仓均价",
-  "termCount":"持仓周期"
+  "termCount":"持仓周期",
+  "chain1": "选链",
+  "availableBalance": "可用资产",
+  "totalBalance1": "总资产",
+  "depositComplete": "充值交易已确认"
 }

@@ -3,14 +3,15 @@ import { shallowRef } from 'vue'
 import WS, { type WSOptions } from '@/utils/ws'
 import { usePerpStore } from './index'
 import { WSPerpHost } from '@/utils/constants'
+import type { Collateral, Position, Order } from './type'
 
 function getWSMessage(e: MessageEvent): {
   sid?: string // 会话ID
-  type: 'connected' | 'subscribed' | 'unsubscribed' | 'quote-event' | 'ping' | 'pong' | 'error' // 响应类型
+  type: 'connected' | 'subscribed' | 'unsubscribed' | 'quote-event' | 'ping' | 'pong' | 'error' | 'trade-event' | 'assets-event' // 响应类型
   channel?: string // 频道名称
   request?: string // 原始请求（可选）
   content?: any // 响应内容
-  time: string // 时间戳
+  time?: string // 时间戳
 } | null {
   if (isJSON(e.data)) {
     const result = JSON.parse(e.data || {})
@@ -88,6 +89,25 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
         } else {
           wsResult[msg.type] = msg
         }
+        // 处理用户数据更新
+      if (msg.type === 'trade-event' || msg.type === 'assets-event') {
+        const { collateral, position, order } = msg.content?.data || {};
+
+        // 更新资产信息
+        if (collateral as Collateral[]) {
+          updateCollateralInfo(collateral)
+        }
+
+        // 更新持仓信息
+        if (position as Position) {
+          updatePositionInfo(position)
+        }
+
+        // 更新订单信息
+        if (order as Order) {
+          updateOrderInfo(order)
+        }
+      }
       }
     }, 'perpWsPub')
   }
@@ -113,7 +133,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
   }
 
   function getWSInstance() {
-     if (!wsInstance.value) {
+    if (!wsInstance.value) {
       // 如果 WebSocket 未初始化，则自动调用 init 初始化
       init(getWSURLAndHeaders())  // 默认空 URL，或者你可以传递默认的初始化选项
     }
@@ -125,6 +145,18 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
     isConnected.value = false
     wsInstance.value?.close()
     wsInstance.value = null
+  }
+
+  function updateCollateralInfo(collateral: Collateral[]) {
+    perpStore.collateral = collateral
+  }
+
+  function updatePositionInfo(position: Position[]) {
+    perpStore.position = position
+  }
+
+  function updateOrderInfo(order: Order[]) {
+    perpStore.order = order
   }
 
   return {

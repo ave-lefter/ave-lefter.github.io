@@ -22,7 +22,7 @@ interface EdgeXApiResponse<T = any> {
   timestamp?: number
 }
 
-const xAuthList = ['onboardSite','getPositionTransactionPage','getAllOrdersPage','profit','ranking','info','asset/detail','boxopen','getActiveOrderPage']
+const xAuthList = ['onboardSite','getPositionTransactionPage','getAllOrdersPage','profit','ranking','info', 'getCrossWithdrawSignInfo', 'createCrossWithdraw']
 const authorizationList = ['ranking','info','boxopen']
 function getApi() {
   return $fetch.create({

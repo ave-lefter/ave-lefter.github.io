@@ -1582,5 +1582,9 @@
   "allPairsTips": "Aggregation mode: Displays the accumulated results of the number and initial value of the token in all pools, which is different from the data of a single pool.",
   "minDeposit": "Minimum deposit ${amount}",
   "depositTxSubmitted": "Deposit transaction has been submitted",
-  "depositSuccess": "Deposit successful"
+  "depositSuccess": "Deposit successful",
+  "chain1": "Chain",
+  "availableBalance": "Available",
+  "totalBalance1": "Total Balance",
+  "depositComplete": "Deposit transaction confirmed"
 }
