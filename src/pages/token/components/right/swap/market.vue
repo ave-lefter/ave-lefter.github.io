@@ -1570,9 +1570,6 @@ function checkSupportChainMessage() {
   const c2 = swapStore.token2.chain
   const c1Name = getChainInfo(c1)?.name
   const c2Name = getChainInfo(c2)?.name
-  console.log('c1Name', c1, c1Name)
-  console.log('c2Name', c2, c2Name)
-  console.log('swapChains', swapChains)
   if (c1 && !swapChains?.includes?.(c1)) {
     return t('noSupportChain', {chain: c1Name})
   }
