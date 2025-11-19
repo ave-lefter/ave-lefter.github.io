@@ -394,7 +394,7 @@ watch(
 watch(
   () => perpWsPubStore.wsResult[WSPerpEventType.DEPTH],
   (val) => {
-    console.log('-------val----', val)
+    // console.log('-------val----', val)
     const result = val.data?.[0]
     const arr_buy = Array.isArray(result?.bids)
       ? result?.bids?.map((i) => ({ ...i, sum: i?.size || '0' }))

@@ -57,9 +57,9 @@ import { useStorage } from '@vueuse/core'
 import { useTokenStore } from '~/stores/token'
 import Top from './components/top/index.vue'
 import TokenRight from './components/right/index.vue'
-import Bottom from './components/bottom/index.vue'
 import Kline from './components/kline/index.vue'
 import OrderBook from './components/orderBook/index.vue'
+import Bottom from './components/bottom/index.vue'
 
 definePageMeta({
   name: 'perp-id',
