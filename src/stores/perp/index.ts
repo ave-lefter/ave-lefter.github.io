@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { type PerpInfo } from '@/api/types/perp'
-import { getPerpMetadata as _getPerpMetadata, onboardSite } from '@/api/perp'
+import type { PerpInfo } from '@/api/types/perp'
+import { getPerpMetadata as _getPerpMetadata, onboardSite, type ProfitResponse } from '@/api/perp'
 import { EdgeXSDK, type ApiKeyData, type L2KeyPair } from '@edgex-fe/typescript-sdk'
 import { useLocalStorage } from '@vueuse/core'
 import { usePerpWsPubStore } from './wsPub'
@@ -27,6 +27,7 @@ export const usePerpStore = defineStore('perp', () => {
   const position = ref<Position[]>([])
   const order = ref<Order[]>([])
   const _perpKeys = useLocalStorage<{[key: string]: {apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string }}>('perp_keys', {})
+  const totalAssets = ref<ProfitResponse>({} as ProfitResponse)
   const lastPrice= shallowRef(0)
   const resolution = useLocalStorage('tv_resolution', '15')
 
@@ -150,7 +151,7 @@ export const usePerpStore = defineStore('perp', () => {
 
   const apiSignatureLoading = ref<boolean>(false)
   async function signAndGenerateAPIKeys() {
-    let walletStore = useWalletStore()
+    const walletStore = useWalletStore()
     if (!walletStore.provider) {
       return
     }
@@ -158,7 +159,7 @@ export const usePerpStore = defineStore('perp', () => {
       return apiKeys.value
     }
 
-    let metaConfig = metadata.value?.global
+    const metaConfig = metadata.value?.global
     const message = `action: ${metaConfig?.appName || ''} Onboard\nonlySignOn: ${metaConfig?.appOnlySignOn}`
     apiSignatureLoading.value = true
     return walletStore.signMessage(message)?.then(async signature => {
@@ -177,15 +178,15 @@ export const usePerpStore = defineStore('perp', () => {
 
   const starkSignatureLoading = ref<boolean>(false)
   async function signAndGenerateL2KeyPair() {
-    let walletStore = useWalletStore()
+    const walletStore = useWalletStore()
     if (!walletStore.provider) {
       return
     }
     if (l2KeyPair.value) {
       return l2KeyPair.value
     }
-    let metaConfig = metadata.value?.global
-    let clientAccountId = 'main'
+    const metaConfig = metadata.value?.global
+    const clientAccountId = 'main'
     const message = `name: ${metaConfig?.appName}\nenvId: ${metaConfig?.appEnv}\naction: L2 Key\nonlySignOn: ${metaConfig?.appOnlySignOn}\nclientAccountId: ${clientAccountId}`
     starkSignatureLoading.value = true
     return walletStore.signMessage(message)?.then(async signature => {
@@ -257,6 +258,7 @@ export const usePerpStore = defineStore('perp', () => {
     contractList,
     perp,
     contractName,
+    totalAssets,
     contractId,
     resolution,
     getSdk

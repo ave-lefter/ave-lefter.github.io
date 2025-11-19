@@ -22,7 +22,8 @@ interface EdgeXApiResponse<T = any> {
   timestamp?: number
 }
 
-const xAuthList = ['onboardSite','getPositionTransactionPage','getAllOrdersPage','profit','ranking','info', 'getCrossWithdrawSignInfo', 'createCrossWithdraw']
+const xAuthList = ['onboardSite','getPositionTransactionPage','getAllOrdersPage','profit','ranking','info', 'getCrossWithdrawSignInfo', 'createCrossWithdraw','asset/detail','getActiveOrderPage']
+const authorizationList = ['ranking','info','boxopen']
 function getApi() {
   return $fetch.create({
     baseURL: PerpBaseUrl,
@@ -42,10 +43,14 @@ function getApi() {
       }
       const perpStore = usePerpStore()
       const walletStore = useWalletStore()
-      const url = request as string
+      let url = request as string
       options.headers = new Headers(options.headers)
       if (walletStore.address) {
         options.headers.set('l1address', walletStore.address)
+      }
+      if (authorizationList.some(item=>url.includes(item))) {
+        options.headers.set('Authorization', 'Bearer 0')
+        url=url.replace('https://award.edgex.exchange/api','')
       }
       if (xAuthList.some(item=>url.includes(item))) {
         const headers = perpStore.generateEdgeXAuthHeaders({
@@ -61,8 +66,7 @@ function getApi() {
     },
     onResponse({ response, request, options }) {
       // const url = request as string
-      // console.log('response', response._data);
-      if (response?._data?.code === 'SUCCESS') {
+      if (response?._data?.code === 'SUCCESS' || response._data?.msg?.toUpperCase?.() === 'SUCCESS') {
         (response._data as EdgeXApiResponse<any>) = response._data.data
       } else {
         throw new Error(response?._data?.msg)
