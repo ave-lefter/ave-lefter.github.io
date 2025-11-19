@@ -18,8 +18,7 @@ const sdk = new EdgeXSDK({
 export const usePerpStore = defineStore('perp', () => {
   const route= useRoute()
   const metadata = shallowRef<PerpMetadata | null>(null)
-  // const contractList = ref<Array<PerpInfo>>([])
-  const contractList = useLocalStorage<PerpInfo[]>('contractList', [])
+  const contractList = ref<Array<PerpInfo>>([])
   const loadingPerpMetadata = shallowRef(false)
   const walletStore = useWalletStore()
   const userInfo = ref<null | UserInfo>(null)
@@ -30,6 +29,7 @@ export const usePerpStore = defineStore('perp', () => {
   const _perpKeys = useLocalStorage<{[key: string]: {apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string }}>('perp_keys', {})
   const totalAssets = ref<ProfitResponse>({} as ProfitResponse)
   const lastPrice= shallowRef(0)
+  const resolution = useLocalStorage('tv_resolution', '15')
 
   const apiKeys = computed(() => {
     if (!walletStore.address) {
@@ -260,6 +260,7 @@ export const usePerpStore = defineStore('perp', () => {
     contractName,
     totalAssets,
     contractId,
+    resolution,
     getSdk
   }
 })

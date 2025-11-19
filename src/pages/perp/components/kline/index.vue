@@ -13,7 +13,7 @@
 
 <script setup lang='ts'>
 import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, VisiblePlotsSet, LanguageCode, ChartingLibraryFeatureset, SubscribeBarsCallback, LibrarySymbolInfo } from '~/types/tradingview/charting_library'
-import { getTimezone, formatDecimals, getSwapInfo, getAddressAndChainFromId, getWSPerpMessage } from '@/utils'
+import { getTimezone, formatDecimals, getAddressAndChainFromId, getWSPerpMessage } from '@/utils'
 import { formatNumber } from '@/utils/formatNumber'
 import { switchPerpResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, updatePerpLastBar, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark } from './utils'
 import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
@@ -23,10 +23,9 @@ import { TW_STUDY } from './constant'
 import dayjs from 'dayjs'
 import { _getPerpKline, type KlineInfo } from '@/api/perp/index'
 import { usePerpStore } from '@/stores/perp'
-const { contractId, contractName } = storeToRefs(usePerpStore())
+const { contractId, contractName, resolution, perp } = storeToRefs(usePerpStore())
 import { usePerpWsPubStore } from '@/stores/perp/wsPub'
 const perpWsPubStore = usePerpWsPubStore()
-
 const props = defineProps<{
   isRank?:boolean
 }>()
@@ -53,10 +52,11 @@ const symbol = computed(() => {
 
 let loading = false
 
-watch(() => contractId.value, (val) => {
+watch(() => contractId.value, (val,old) => {
   if (!val) return
   if (_widget?.activeChart()) {
     _widget?.activeChart()?.removeAllShapes?.()
+    _widget?.resetCache?.()
     switchTokenKline()
   }
 })
@@ -65,12 +65,6 @@ function switchTokenKline() {
   resetLimitPriceLineId()
   resetAvgPriceLineId()
   if (isReady.value && route.name === 'perp-id') {
-    // const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
-    // const preResolutions = localStorage.getItem(QUICK_KEY)
-    // const nextResolutions = localStorage.getItem(QUICK_KEY)
-    // if (preResolutions !== nextResolutions) {
-    //     resetChart()
-    // }
     if (_widget) {
       _widget?.resetCache?.()
       _widget?.activeChart?.()?.clearMarks?.()
@@ -103,7 +97,7 @@ let lastPairPrice = 0
 // const LLJEFFY_#_240
 const listenerGuidMap = new Map()
 
-const resolution = shallowRef(localStorage.getItem('tv_resolution') || '15')
+// const resolution = shallowRef(localStorage.getItem('tv_resolution') || '15')
 const themeStore = useThemeStore()
 let _widget: null | IChartingLibraryWidget = null
 
@@ -396,7 +390,8 @@ async function initChart() {
               high: i.high,
               low: i.low,
               close: i.close,
-              volume: Number(i.value || 0) ,
+              volume: Number(i.value || 0),
+              type: i.close > i.open ? 'buy': 'sell'
             })) || []
              console.log('------res-1--------',bars)
             if (firstDataRequest) {
@@ -570,6 +565,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
         low: i.low,
         close: i.close,
         volume: Number(i.value || 0),
+        type: i.close > i.open ? 'buy': 'sell'
       }))[0]
       const bar = wsData as KLineBar
       // const msInterval = switchResolution(resolution)

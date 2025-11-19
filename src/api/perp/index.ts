@@ -325,3 +325,8 @@ export async function _getPerpKline(params: {
     query: params,
   })
 }
+export interface OrderBook {
+  price: string
+  size: string
+  sum: string
+}

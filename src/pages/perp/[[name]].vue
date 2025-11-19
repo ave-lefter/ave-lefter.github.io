@@ -25,14 +25,21 @@
               </div>
               <el-scrollbar :height="scrollbarHeight">
                 <div
-                  :class="orderBookVisible ? 'grid gap-1px' : 'grid grid-cols-1 gap-1px'"
-                  :style="
-                    orderBookVisible ? { gridTemplateColumns: `1fr 4px ${orderBookWidth}px` } : {}
+                  class="grid gap-1px"
+                  :style="{ gridTemplateColumns: `1fr 4px ${orderBookWidth}px` }
                   "
                 >
                   <div>
                     <Kline ref="klineContainer" />
                   </div>
+                  <!-- 订单簿拖动条 -->
+                  <div
+                    class="cursor-col-resize bg-[--d-222-l-F2F2F2] hover:bg-[--d-666-l-CCC] flex flex-col items-center justify-center gap-1px w-4px"
+                    @mousedown.stop.prevent="dragOrderBook"
+                  >
+                    <span v-for="i in 4" :key="i" class="bg-[--d-444-l-999] w-2px h-2px rounded-full"/>
+                  </div>
+                  <OrderBook :kline-height="klineHeight + 3" />
                 </div>
                 <Bottom class="min-h-300px rounded-4px bg-[--d-000-l-F6F6F6]" />
               </el-scrollbar>
@@ -52,7 +59,7 @@ import Top from './components/top/index.vue'
 import TokenRight from './components/right/index.vue'
 import Bottom from './components/bottom/index.vue'
 import Kline from './components/kline/index.vue'
-// import {OrderBook} from './components/orderBook'
+import OrderBook from './components/orderBook/index.vue'
 
 definePageMeta({
   name: 'perp-id',
@@ -85,10 +92,6 @@ const addresses = computed(() => {
   return []
 })
 const wsStore = useWSStore()
-
-// 订单簿显示状态 - 使用本地存储保持状态
-const orderBookVisible = useStorage('orderBookVisible', false)
-provide('orderBookVisible', orderBookVisible)
 
 // 点击 k 线的日期筛选
 const klineDateFilter = ref<string[]>([])

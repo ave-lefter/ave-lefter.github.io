@@ -50,9 +50,10 @@ type SortValue = 0 | -1 | 1
 const activeSort = shallowRef<SortValue>(0)
 
 const filteredList = computed(() => {
-  let arr = props.list?.slice(0) || []
+  const result = props.list?.slice(0) || []
+  let arr = result?.filter(i=> Number(i.lastPrice) > 0 && Number(i.value) > 0 && Number(i.openInterest) > 0 )
   if (!query.value) {
-    arr = props.list?.slice(0)
+    arr = arr
   } else {
     arr = arr.filter(
       (item) =>
