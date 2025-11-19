@@ -4,6 +4,7 @@ import { SuffixIcon } from '#components'
 import dayjs from 'dayjs'
 import { usePerpStore } from '@/stores/perp'
 const { contractId } = storeToRefs(usePerpStore())
+const walletStore = useWalletStore()
 
 const { t } = useI18n()
 const perpStore = usePerpStore()
@@ -52,11 +53,18 @@ const getList = async () => {}
         >
       </div>
       <div class="flex items-center justify-end gap-12px">
-         <el-checkbox v-model="isCurrentId" label="显示所有合约" />
-         <el-button  type="primary">全部平仓</el-button>
-
+         <el-checkbox class="checkbox-sm" v-model="isCurrentId" label="显示所有合约"/>
+         <el-button class="close-position" v-if="selectTab == 'holding'">全部平仓</el-button>
+         <el-button class="close-position" v-else-if="selectTab == 'currentOrder'">全部取消</el-button>
+         <el-button class="close-position" v-else="selectTab == 'currentOrder'" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}?t=${selectTab}`)">查看全部</el-button>
       </div>
     </div>
     <component :is="componentsMap[selectTab]" :searchParams="searchParams" />
   </div>
 </template>
+<style lang="scss" scoped>
+.close-position{
+  height: 24px;
+  font-size: 12px;
+}
+</style>

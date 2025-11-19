@@ -41,7 +41,8 @@
                   </div>
                   <OrderBook :kline-height="klineHeight + 3" />
                 </div>
-                <Bottom class="min-h-300px rounded-4px bg-[--d-000-l-F6F6F6]" />
+
+                <Bottom class="rounded-4px bg-[--d-000-l-F6F6F6]" :style="{ minHeight: height + 'px' }"/>
               </el-scrollbar>
             </div>
           </div>
@@ -60,27 +61,20 @@ import TokenRight from './components/right/index.vue'
 import Kline from './components/kline/index.vue'
 import OrderBook from './components/orderBook/index.vue'
 import Bottom from './components/bottom/index.vue'
-
 definePageMeta({
   name: 'perp-id',
   key: (route) => {
     return route.name as string
   },
 })
-const route = useRoute()
-const localeStore = useLocaleStore()
 const tokenStore = useTokenStore()
 const scrollbarHeight = computed(() => {
-  if (tokenStore.isShowWaring) {
-    if (globalStore.tokenHistoryVisible) {
-      return 'calc(100vh - 230px)'
-    }
-    return 'calc(100vh - 198px)'
-  }
   if (globalStore.tokenHistoryVisible) {
     return 'calc(100vh - 190px)'
   }
-  return 'calc(100vh - 158px)'
+})
+const height = computed(() => {
+  return tokenStore.commonHeight - 190
 })
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
