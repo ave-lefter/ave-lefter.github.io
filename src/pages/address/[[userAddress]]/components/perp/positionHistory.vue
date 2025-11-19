@@ -69,7 +69,6 @@ const getPnl = (row: any) => {
     :data="listData"
     header-row-class-name="text-12px sticky top-0 z-10 font-500"
     cell-class-name="color-[--main-text] text-12px"
-    row-class-name="cursor-pointer"
   >
     <el-table-column :width="150" :label="t('perp')" prop="contractId">
       <template #default="{ row }">

@@ -135,17 +135,17 @@ onMounted(() => {
               >{{ addSign(score.myPoint) }}{{ score.myPoint }}</span
             >
             <span class="text-14px ml-8px lh-24px color-[--third-text]"
-              >本周 {{ addSign(score.myPoint) }}{{ score.myPoint }}</span
+              >{{ t('thisWeek') }} {{ addSign(score.myPoint) }}{{ score.myPoint }}</span
             >
           </div>
         </div>
-        <el-button
+        <!-- <el-button
           type="primary"
           size="small"
           class="w-56px [--el-font-size-base:12px]"
           @click="receiveScore"
           >{{ t('receive') }}</el-button
-        >
+        > -->
       </div>
       <div class="flex items-center justify-between mb-16px">
         <span class="text-12px lh-18px color-[--secondary-text]">{{ t('todayVolume') }}</span>

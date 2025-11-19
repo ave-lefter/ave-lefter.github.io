@@ -28,6 +28,20 @@ const searchParams = ref({
   filterStartCreatedTimeInclusive: '',
   filterEndCreatedTimeExclusive: '',
 })
+const filteredSearchParams = computed(() => {
+  const params = { ...searchParams.value }
+  if (params.filterContractIdList === 'ALL') {
+    delete params.filterContractIdList
+  }
+  for (const key in params) {
+    if (Object.prototype.hasOwnProperty.call(params, key)) {
+      if (!params[key]) {
+        delete params[key]
+      }
+    }
+  }
+  return params
+})
 const typeOptions = computed(() => {
   const contractList = perpStore.metadata?.contractList?.map?.((item) => {
     return {
@@ -124,6 +138,6 @@ const getList = async () => {}
         </div>
       </div>
     </div>
-    <component :is="componentsMap[selectTab]" :searchParams="searchParams" />
+    <component :is="componentsMap[selectTab]" :searchParams="filteredSearchParams" />
   </div>
 </template>
