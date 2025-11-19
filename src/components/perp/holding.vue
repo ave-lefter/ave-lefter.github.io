@@ -81,8 +81,7 @@ onMounted(() => {
     fit
     :data="listData"
     header-row-class-name="text-12px sticky top-0 z-10 font-500"
-    cell-class-name="color-[--main-text] text-12px "
-    row-class-name="cursor-pointer"
+    cell-class-name="color-[--main-text] text-12px"
   >
     <el-table-column :label="t('perp')" prop="perp">
       <template #default="{ row }">

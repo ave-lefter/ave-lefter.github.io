@@ -1615,5 +1615,8 @@
   "chain1": "选链",
   "availableBalance": "可用资产",
   "totalBalance1": "总资产",
-  "depositComplete": "充值交易已确认"
+  "depositComplete": "充值交易已确认",
+  "thisWeek": "本周",
+  "tradeSize":"成交数量",
+  "tradePrice":"成交价格"
 }

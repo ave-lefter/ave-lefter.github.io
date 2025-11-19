@@ -330,3 +330,47 @@ export interface OrderBook {
   size: string
   sum: string
 }
+
+export async function cancelOrderById(orderId:string) {
+  const perpStore = usePerpStore()
+  return api('/api/v1/private/order/cancelOrderById', {
+    method: 'post',
+    body: {
+      accountId:perpStore.userInfo?.id,
+      orderIdList:[orderId]
+    },
+  })
+}
+
+export async function getHistoryOrderFillTransactionPage(params) {
+  const perpStore = usePerpStore()
+  return api('/api/v1/private/order/getHistoryOrderFillTransactionPage', {
+    method: 'get',
+    query: {
+      accountId:perpStore.userInfo?.id,
+      ...params
+    },
+  })
+}
+
+export async function getHistoryOrderPage(params) {
+  const perpStore = usePerpStore()
+  return api('/api/v1/private/order/getHistoryOrderPage', {
+    method: 'get',
+    query: {
+      accountId:perpStore.userInfo?.id,
+      ...params
+    },
+  })
+}
+
+export async function getPositionTermPage(params) {
+  const perpStore = usePerpStore()
+  return api('/api/v1/private/account/getPositionTermPage', {
+    method: 'get',
+    query: {
+      accountId:perpStore.userInfo?.id,
+      ...params
+    },
+  })
+}
