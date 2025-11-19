@@ -15,8 +15,8 @@ importers:
         specifier: ^0.0.8
         version: 0.0.8(react@19.1.0)
       '@edgex-fe/typescript-sdk':
-        specifier: ^0.1.2
-        version: 0.1.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.3)
+        specifier: ^0.1.3
+        version: 0.1.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.3)
       '@element-plus/icons-vue':
         specifier: ^2.3.1
         version: 2.3.1(vue@3.5.13(typescript@5.8.3))
@@ -1067,8 +1067,8 @@ packages:
     resolution: {integrity: sha512-KrkT6qO5NxqNfy68sBl6CTSoJ4SNDIS5iQArkibhlbGU4LaDukZ3q2HIkh8aUKDio6o4itU4xDR7t82Y2eP1Bg==}
     engines: {node: '>=14'}
 
-  '@edgex-fe/typescript-sdk@0.1.2':
-    resolution: {integrity: sha512-7lXpJj0XfFenvgPRAWMQnUUc4wOTarPR+ALSDR1f4TV+9LCoJvkUDRgstmBMY9Gqrq52BCJfpYI74SNaV91LHw==}
+  '@edgex-fe/typescript-sdk@0.1.3':
+    resolution: {integrity: sha512-STV6ugxXDpAFNbax7InJNiT71KRcTpXwsL/SzbuWmv3QLTSoxL3ug3gvBB8b6LlNIc9kIvs05pR5XXbepsi53A==}
     peerDependencies:
       typescript: '>=4.5.0'
     peerDependenciesMeta:
@@ -11483,7 +11483,7 @@ snapshots:
       gonzales-pe: 4.3.0
       node-source-walk: 6.0.2
 
-  '@edgex-fe/typescript-sdk@0.1.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.3)':
+  '@edgex-fe/typescript-sdk@0.1.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.3)':
     dependencies:
       axios: 1.8.3
       big.js: 7.0.1
@@ -11856,7 +11856,7 @@ snapshots:
       undici: 6.21.2
       unique-string: 2.0.0
       wrap-ansi: 7.0.0
-      ws: 8.18.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - encoding
