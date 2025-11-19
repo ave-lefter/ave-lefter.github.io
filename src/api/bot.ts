@@ -108,6 +108,40 @@ export function loginEmail(data: {
   })
 }
 
+// 人机校验
+export function loginEmailV2(data: {
+  email: string
+  password: string
+  captchaScene: string
+  captchaParam: string
+}): Promise<{
+  accessToken: string
+  refreshToken: string
+  emailAddress: string
+  evmAddress: string
+  tgUid: string
+  mnemonic?: string
+}> {
+  const { $api } = useNuxtApp()
+  const locale = useLocaleStore().locale
+  const body = {
+    source: 'web',
+    language: locale?.includes?.('zh-') ? 'cn' : 'en',
+    needMnemonic: true,
+    ...data
+  }
+  Reflect.deleteProperty(body, 'captchaScene')
+  Reflect.deleteProperty(body, 'captchaParam')
+  return $api('/botapi/user/emailLoginV2', {
+    method: 'post',
+    headers: {
+      'X-Captcha-Scene': data.captchaScene,
+      'X-Captcha-Param': data.captchaParam
+    },
+    body: body
+  })
+}
+
 // 邮箱验证码登录
 export function emailCodeLogin(data: {
   email: string
