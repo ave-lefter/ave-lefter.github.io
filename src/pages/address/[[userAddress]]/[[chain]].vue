@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import WalletAssets from './components/walletAssets.vue'
-import PerpAssets from './components/perp/perpAssets.vue'
-
+import PerpAssets from '@/components/perp/perpAssets.vue'
+const route = useRoute()
 const { t } = useI18n()
 const walletStore = useWalletStore()
-const activeName = ref('wallet')
+const activeName = ref(route.query.t ?'perp' :'wallet')
 </script>
 
 <template>

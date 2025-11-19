@@ -2,7 +2,7 @@
 import { SuffixIcon } from '#components'
 import dayjs from 'dayjs'
 import { usePerpStore } from '~/stores/perp'
-
+const route = useRoute()
 const { t } = useI18n()
 const perpStore = usePerpStore()
 const tabs = ref([
@@ -21,7 +21,7 @@ const componentsMap = {
   closePnl: defineAsyncComponent(() => import('./closePnl.vue')),
   positionHistory: defineAsyncComponent(() => import('./positionHistory.vue')),
 }
-const selectTab = ref('currentOrder')
+const selectTab = ref(route.query.t && route.query.t !=='holding'? route.query.t : 'currentOrder')
 const searchParams = ref({
   size: 10,
   filterContractIdList: 'ALL',
