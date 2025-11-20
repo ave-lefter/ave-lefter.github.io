@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SuffixIcon } from '#components'
 import dayjs from 'dayjs'
+import { BigNumber } from 'tronweb'
 import { getPositionTransactionPage, type PositionTransactionPageResponse } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 
@@ -154,15 +155,17 @@ onMounted(() => {
     </el-table-column>
     <el-table-column align="right" :label="t('contractSize')" prop="contractSize">
       <template #default="{ row }">
-        {{ formatNumber(row.fundingPositionSize)
+        {{ formatNumber(new BigNumber(row.fundingPositionSize).abs().toString())
         }}{{ typeDict[row.contractId]?.replace?.('USD', '') }}
       </template>
     </el-table-column>
     <el-table-column align="right" :label="t('fundingFee')" prop="deltaFundingFee">
-      <template #default="{ row }"> {{ formatNumber(row.deltaFundingFee) }}USD </template>
+      <template #default="{ row }">
+        {{ formatNumber(new BigNumber(row.deltaFundingFee).abs().toString()) }}USD
+      </template>
     </el-table-column>
     <el-table-column align="right" :label="t('fundingRate')" prop="fundingRate">
-      <template #default="{ row }"> {{ formatNumber(row.fundingRate * 100) }}% </template>
+      <template #default="{ row }"> {{ formatNumber(Math.abs(row.fundingRate) * 100) }}% </template>
     </el-table-column>
     <el-table-column align="right" :label="t('oraclePrice')" prop="fundingOraclePrice">
       <template #default="{ row }">

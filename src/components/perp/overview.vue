@@ -69,6 +69,7 @@ onMounted(() => {
         </el-button>
         <el-button
           class="w-100px h-32px [&&]:m-l-8px [--el-font-size-base:12px]"
+          style="--el-button-active-border-color: transparent"
           size="small"
           @click="withdraw"
         >

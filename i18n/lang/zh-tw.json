@@ -1570,6 +1570,9 @@
   "latestPrice": "最新价格",
   "orderType":"订单类型",
   "takeProfitLimit":"限价条件单",
+  "takeProfitMarket":"市价条件单",
+  "stop_limit":"限价止损单",
+  "stop_market":"市价止损单",
   "validityPeriod2":"有效截止时间",
   "immediateOrCancel":"立即成交或取消",
   "validityPeriod3":"GTT（一直有效至过期）：该订单将持续有效直到被完全成交或被取消。",
@@ -1590,5 +1593,6 @@
   "availableBalance": "可用资产",
   "totalBalance1": "总资产",
   "depositComplete": "充值交易已确认",
-  "thisWeek": "本周"
+  "thisWeek": "本周",
+  "autoDeleverageTips":"自动减仓序列中的当前仓位由实心条表示。实心条越多，您的仓位自动减仓的可能性就越大。"
 }

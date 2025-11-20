@@ -1,13 +1,17 @@
 <script setup lang="ts">
+import BigNumber from 'bignumber.js'
+import { getAccountDeleverageLight } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
 import { usePerpWsPubStore } from '~/stores/perp/wsPub'
 
+let timer: { id: number | null } = { id: null }
 const { t } = useI18n()
 const perpStore = usePerpStore()
 const wsPrivateStore = usePerpWsPrivateStore()
 const wsPublicStore = usePerpWsPubStore()
 const listData = shallowRef()
+const contractLevelMap = shallowRef({})
 
 const typeDict = computed(() => {
   const contractMap =
@@ -33,16 +37,29 @@ watch(
   () => wsPublicStore.wsResult[WSPerpEventType.TICKER_ALL_1S],
   (val) => {
     listData.value.forEach((el) => {
-      console.log('el', el)
       const updateData = val.data?.find?.((item) => item.contractId === el.contractId)
       if (updateData) {
         el.oraclePrice = updateData.oraclePrice
-        el.unrealizedPnl =
-          updateData.oraclePrice * el.openSize -
-          el.openValue -
-          Math.abs(+el.openFee) -
-          Math.abs(+el.fundingFee)
-        el.unrealizedPnlRate = (el.unrealizedPnl / el.openValue) * 1000
+        const profitWithFee =
+          el.openValue > 0
+            ? new BigNumber(updateData.oraclePrice)
+                .multipliedBy(new BigNumber(el.openSize).abs())
+                .minus(new BigNumber(el.openValue).abs())
+            : new BigNumber(el.openValue)
+                .abs()
+                .minus(
+                  new BigNumber(updateData.oraclePrice).multipliedBy(
+                    new BigNumber(el.openSize).abs()
+                  )
+                )
+        el.unrealizedPnl = profitWithFee
+          .minus(new BigNumber(el.openFee).abs())
+          .minus(new BigNumber(el.fundingFee).abs())
+          .toString()
+        el.unrealizedPnlRate = new BigNumber(el.unrealizedPnl)
+          .div(new BigNumber(el.openValue).abs())
+          .multipliedBy(1000)
+          .toString()
       }
     })
   }
@@ -62,6 +79,12 @@ watch(
   { immediate: true }
 )
 
+const getContractLevelMap = async () => {
+  const res = await getAccountDeleverageLight()
+  contractLevelMap.value = res?.positionContractIdToLightNumberMap || {}
+}
+
+getContractLevelMap()
 onMounted(() => {
   wsPublicStore.send({
     type: 'unsubscribe',
@@ -73,6 +96,15 @@ onMounted(() => {
       channel: 'ticker.all.1s',
     })
   }, 500)
+  timer = requestTimeout(5000, () => {
+    getContractLevelMap()
+  })
+})
+
+onUnmounted(() => {
+  if (timer.id) {
+    cancelAnimationFrame(timer.id)
+  }
 })
 </script>
 
@@ -87,8 +119,17 @@ onMounted(() => {
       <template #default="{ row }">
         <div class="flex items-center text-14px lh-18px color-[--main-text] gap-4px mb-4px">
           {{ typeDict[row.contractId] }}
-          <div class="flex items-center gap-2px">
-            <span v-for="i in 5" :key="i" class="w-2px bg-[--up-color] h-10px" />
+          <div
+            v-tooltip="t('autoDeleverageTips')"
+            v-if="typeof contractLevelMap[row.contractId] === 'number'"
+            class="flex items-center gap-2px [&>span]:bg-[#3b3b3b] data-[active=on]:[&>span:nth-child(1)]:bg-[#08BA4E] data-[active=on]:[&>span:nth-child(2)]:bg-[#409F4B] data-[active=on]:[&>span:nth-child(3)]:bg-[#7F8147] data-[active=on]:[&>span:nth-child(4)]:bg-[#B36844] data-[active=on]:[&>span:nth-child(5)]:bg-[#F1493F]"
+          >
+            <span
+              v-for="i in 5"
+              :key="i"
+              class="w-2px h-10px"
+              :data-active="contractLevelMap[row.contractId] > i ? 'on' : 'off'"
+            />
           </div>
         </div>
         <div class="text-10px lh-14px" :class="getColorClass(row.openValue)">
@@ -98,23 +139,31 @@ onMounted(() => {
     </el-table-column>
     <el-table-column :width="100" align="right" :label="t('amount')" prop="openSize">
       <template #default="{ row }">
-        {{ formatNumber(Math.abs(row.openSize)) }}
+        {{ formatNumber(row.openSize.replace('-', '')) }}
       </template>
     </el-table-column>
     <el-table-column align="right" :label="t('contractValue')" prop="openValue">
       <template #default="{ row }">
         {{
-          formatNumber(row.oraclePrice ? row.openSize * row.oraclePrice : row.openValue, {
-            limit: 20,
-            decimals: 2,
-          })
+          formatNumber(
+            row.oraclePrice
+              ? new BigNumber(row.openSize)
+                  .multipliedBy(row.oraclePrice)
+                  .toString()
+                  .replace('-', '')
+              : row.openValue.replace('-', ''),
+            {
+              limit: 20,
+              decimals: 2,
+            }
+          )
         }}
       </template>
     </el-table-column>
     <el-table-column align="right" :label="t('entryPrice')" prop="entryPrice">
       <template #default="{ row }">
         {{
-          formatNumber(row.openValue / row.openSize, {
+          formatNumber(new BigNumber(row.openValue).div(row.openSize).toString(), {
             limit: 20,
           })
         }}
@@ -183,10 +232,10 @@ onMounted(() => {
     </el-table-column>
     <el-table-column align="right" :label="t('closePosition')" prop="closePosition">
       <template #default="{ row }">
-        <el-button size="small">
+        <el-button size="small" style="--el-button-active-border-color: transparent">
           {{ $t('limit') }}
         </el-button>
-        <el-button size="small">
+        <el-button size="small" style="--el-button-active-border-color: transparent">
           {{ $t('market') }}
         </el-button>
       </template>
