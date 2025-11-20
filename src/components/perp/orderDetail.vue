@@ -31,6 +31,13 @@ const getList = async () => {
 }
 
 getList()
+
+watch(
+  () => props.searchParams,
+  () => {
+    getList()
+  }
+)
 </script>
 
 <template>

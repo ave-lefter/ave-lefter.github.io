@@ -374,3 +374,13 @@ export async function getPositionTermPage(params) {
     },
   })
 }
+
+export async function getAccountDeleverageLight() {
+  const perpStore = usePerpStore()
+  return api('/api/v1/private/account/getAccountDeleverageLight', {
+    method: 'get',
+    query: {
+      accountId:perpStore.userInfo?.id
+    },
+  })
+}

@@ -185,7 +185,7 @@ onMounted(() => {
           {{ row.txId.slice(0, 4) + '...' + row.txId.slice(-4)
           }}<Icon
             name="custom:share1"
-            class="color-[--third-text] hover:color-[--main-text]"
+            class="color-[--third-text] hover:color-[--main-text] cursor-pointer"
             @click="jumpToTx(row.chainId, row.txId)"
           />
         </div>

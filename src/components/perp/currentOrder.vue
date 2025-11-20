@@ -37,6 +37,13 @@ const cancelOrder = async (orderId: string) => {
   getList()
   ElMessage.success(t('cancelledOrderSuccessfully'))
 }
+
+watch(
+  () => props.searchParams,
+  () => {
+    getList()
+  }
+)
 </script>
 
 <template>

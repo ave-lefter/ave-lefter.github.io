@@ -12,6 +12,11 @@ const listData = shallowRef()
 const triggerPriceTypeMap = {
   LAST_PRICE: t('latestPrice'),
   TAKE_PROFIT_LIMIT: t('takeProfitLimit'),
+  LIMIT: t('limit'),
+  MARKET: t('market'),
+  STOP_LIMIT: t('stop_limit'),
+  STOP_MARKET: t('stop_market'),
+  TAKE_PROFIT_MARKET: t('takeProfitMarket'),
 }
 const typeDict = computed(() => {
   const contractMap =
@@ -41,6 +46,13 @@ const cancelOrder = async (orderId: string) => {
   getList()
   ElMessage.success(t('cancelledOrderSuccessfully'))
 }
+
+watch(
+  () => props.searchParams,
+  () => {
+    getList()
+  }
+)
 </script>
 
 <template>

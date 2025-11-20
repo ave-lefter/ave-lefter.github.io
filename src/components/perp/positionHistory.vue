@@ -1,47 +1,16 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import { getPositionTermPage } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 
+const props = defineProps<{
+  searchParams: {
+    size: number
+  }
+}>()
 const { t } = useI18n()
 const perpStore = usePerpStore()
-const listData = shallowRef([
-  {
-    userId: '682587604402569474',
-    accountId: '682587604448707540',
-    coinId: '1000',
-    contractId: '10000001',
-    termCount: 2,
-    cumOpenSize: '0.001',
-    cumOpenValue: '102.091900',
-    cumOpenFee: '-0.038794',
-    cumCloseSize: '-0.001',
-    cumCloseValue: '-102.481900',
-    cumCloseFee: '-0.038943',
-    cumFundingFee: '-0.015429',
-    cumLiquidateFee: '0',
-    createdTime: '1763002209996',
-    updatedTime: '1763040580648',
-    currentLeverage: '10',
-  },
-  {
-    userId: '682587604402569474',
-    accountId: '682587604448707540',
-    coinId: '1000',
-    contractId: '10000064',
-    termCount: 1,
-    cumOpenSize: '-0.10',
-    cumOpenValue: '-99.958000',
-    cumOpenFee: '-0.037984',
-    cumCloseSize: '0.10',
-    cumCloseValue: '97.964000',
-    cumCloseFee: '-0.037226',
-    cumFundingFee: '-0.006524',
-    cumLiquidateFee: '0',
-    createdTime: '1762825133152',
-    updatedTime: '1762870836603',
-    currentLeverage: '10',
-  },
-])
+const listData = shallowRef()
 
 const typeDict = computed(() => {
   const contractMap =
@@ -61,6 +30,18 @@ const getPnl = (row: any) => {
     ? Math.abs(row.cumCloseValue) - Math.abs(row.cumOpenValue)
     : Math.abs(row.cumOpenValue) - Math.abs(row.cumCloseValue)
 }
+
+const getList = async () => {
+  const res = await getPositionTermPage({
+    ...props.searchParams,
+    size: 10,
+  })
+  listData.value = res.dataList.filter((el) => Math.abs(el.cumCloseSize) > 0)
+}
+
+onMounted(() => {
+  getList()
+})
 </script>
 
 <template>
