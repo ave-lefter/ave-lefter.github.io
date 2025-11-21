@@ -1594,5 +1594,6 @@
   "totalBalance1": "总资产",
   "depositComplete": "充值交易已确认",
   "thisWeek": "本周",
-  "autoDeleverageTips":"自动减仓序列中的当前仓位由实心条表示。实心条越多，您的仓位自动减仓的可能性就越大。"
+  "autoDeleverageTips":"自动减仓序列中的当前仓位由实心条表示。实心条越多，您的仓位自动减仓的可能性就越大。",
+  "stopTips":"*由於行情變動快，止損觸發價不宜離預估強平價過近，避免觸發失敗"
 }
