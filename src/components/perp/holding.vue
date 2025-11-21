@@ -42,7 +42,7 @@ const filterListData = computed(() => {
       return i
     }
   })
-  return listData.value || []
+  return result || []
 })
 watch(
   () => wsPrivateStore.wsResult,
