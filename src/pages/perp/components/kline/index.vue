@@ -15,7 +15,7 @@
 import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, VisiblePlotsSet, LanguageCode, ChartingLibraryFeatureset, SubscribeBarsCallback, LibrarySymbolInfo } from '~/types/tradingview/charting_library'
 import { getTimezone, formatDecimals, getAddressAndChainFromId, getWSPerpMessage } from '@/utils'
 import { formatNumber } from '@/utils/formatNumber'
-import { switchPerpResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, updatePerpLastBar, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark } from './utils'
+import { switchPerpResolution,switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, updatePerpLastBar, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark } from './utils'
 import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
 import type { KLineBar } from './types'
 import {DefaultHeight, WSPerpEventType} from '~/utils/constants'
@@ -39,6 +39,8 @@ const token = computed(() => {
 })
 const isReady = ref(false)
 let isReadyLine = false
+const snapshotCache = ref<Record<string, KlineInfo[]>>({})
+
 const chain = computed(() => {
   return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
 })
@@ -410,6 +412,30 @@ async function initChart() {
             setTimeout(() => {
               useEventBus('klineDataReady').emit()
             }, 10)
+          }).catch((err) => {
+            const key = `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`
+            const bars = snapshotCache.value[key] || [];
+            console.log('--getBars--bars-------', snapshotCache.value)
+            if (bars?.length > 0) {
+              console.log('--------44------',bars)
+              onResult(bars, { noData: !bars?.length});
+            } else {
+              if (firstDataRequest) {
+                const price = perp.value?.lastPrice
+                const volume = perp.value?.value
+                const fakeBar = {
+                  time: from * 1000,
+                  open: price,
+                  high: price,
+                  low: price,
+                  close: price,
+                  volume: volume
+                }
+                setTimeout(() => onResult([fakeBar], { noData: false }), 100)
+              } else {
+                onResult([], { noData: true, nextTime: undefined })
+              }
+            }
           }).finally(() => {
             loading = false
           })
@@ -528,7 +554,25 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
     const { channel, content: { data, dataType } = {}, type } = msg || {}
     const interval = switchPerpResolution(resolution)
     if(channel == `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`){
-        // console.log('--------msg-----------',msg)
+      // console.log('--------msg-----------',msg)
+
+      if (data?.length > 0 && !loading && dataType === 'Snapshot') {
+        const key = `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`
+        const bars = data.reverse().map(i => ({
+          time: Number(i.klineTime),
+          open: i.open,
+          high: i.high,
+          low: i.low,
+          close: i.close,
+          volume: Number(i.value || 0),
+        }))
+        snapshotCache.value[key] = bars
+        // if (onResetCacheNeededCallback) {
+        //   onResetCacheNeededCallback()
+        // }
+        bars.forEach(bar => onTick(bar));
+      }
+
       if (data?.length > 0 && !loading && dataType === 'changed') {
         // const _pair = 'pair' in tx ? tx.pair : tx.pair_address
         // const _price = 'price_u' in tx ? Number(tx.price_u || 0) : Number(tx.from_address?.toLowerCase?.() === tokenStore.token?.token?.toLowerCase?.() ? tx.from_price_usd : tx.to_price_usd) || 0
