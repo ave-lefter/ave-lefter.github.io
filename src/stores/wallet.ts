@@ -12,6 +12,7 @@ import { decodeUTF8 } from 'tweetnacl-util'
 import bs58 from 'bs58'
 import type { Wallet as SuiWallet } from '~/utils/wallet/sui'
 import { TonConnectUI } from '@tonconnect/ui'
+import { usePerpStore } from './perp/index'
 type TronWalletAdapter = ReturnType<typeof getTronWalletAdapters>[number]
 
 export const useWalletStore = defineStore('wallet', () => {
@@ -106,6 +107,8 @@ export const useWalletStore = defineStore('wallet', () => {
     chain.value = ''
     walletName.value = ''
     provider.value?.disconnect?.()
+    usePerpStore().resetUserInfo()
+
     setTimeout(() => {
       provider.value = null
     }, 100)

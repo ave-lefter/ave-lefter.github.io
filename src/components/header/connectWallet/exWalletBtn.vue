@@ -160,7 +160,19 @@ const balance = ref('0')
 const nativePrice = ref<number | string>(0)
 
 const prepBalance = computed(() => {
-  return perpStore.collateral?.[0]?.amount || 0
+  const amount = perpStore.collateral?.[0]?.amount || 0
+  const positions = perpStore.position || []
+  const contractList = perpStore.contractList
+  const positionsAmount = positions.reduce((prev, cur) => {
+    const contract = contractList.find(item => item.contractId === cur.contractId)
+    const price = contract?.lastPrice || 0
+    let value = new BigNumber(price || 0).times(new BigNumber(cur?.openSize || 0))
+    if (new BigNumber(price).isZero()) {
+      value = new BigNumber(cur?.openValue || 0)
+    }
+    return prev.plus(value)
+  }, new BigNumber(0))
+  return new BigNumber(amount).plus(positionsAmount).toFixed(2)
 })
 
 const balanceUsd = computed(() => {
