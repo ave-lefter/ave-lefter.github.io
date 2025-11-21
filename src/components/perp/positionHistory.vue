@@ -39,9 +39,7 @@ const getList = async () => {
   listData.value = res.dataList.filter((el) => Math.abs(el.cumCloseSize) > 0)
 }
 
-onMounted(() => {
-  getList()
-})
+getList()
 </script>
 
 <template>
@@ -54,7 +52,7 @@ onMounted(() => {
     <el-table-column :width="150" :label="t('perp')" prop="contractId">
       <template #default="{ row }">
         <span class="text-14px">{{ typeDict[row.contractId] }}</span>
-        <div :class="getColorClass(row.cumOpenSize)">
+        <div class="text-10px lh-14px" :class="getColorClass(row.cumOpenSize)">
           {{ row.cumOpenSize > 0 ? t('long') : t('short') }}
         </div>
       </template>
@@ -101,8 +99,10 @@ onMounted(() => {
     </el-table-column>
     <el-table-column align="right" :label="t('pnl')">
       <template #default="{ row }">
-        <div :class="getColorClass(getPnl(row))">{{ formatNumber(getPnl(row)) }}</div>
-        <div :class="getColorClass(getPnl(row))">
+        <div class="lh-18px" :class="getColorClass(getPnl(row))">
+          {{ formatNumber(getPnl(row)) }}
+        </div>
+        <div class="lh-18px" :class="getColorClass(getPnl(row))">
           {{
             formatNumber((getPnl(row) / Math.abs(row.cumOpenValue)) * 100, {
               limit: 20,

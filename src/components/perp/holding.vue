@@ -227,7 +227,9 @@ onUnmounted(() => {
             }}
           </span>
         </template>
-        <el-button size="small" v-else> + {{ $t('add') }} </el-button>
+        <el-button size="small" style="--el-button-active-border-color: transparent" v-else>
+          + {{ $t('add') }}
+        </el-button>
       </template>
     </el-table-column>
     <el-table-column align="right" :label="t('closePosition')" prop="closePosition">
