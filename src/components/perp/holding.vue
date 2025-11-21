@@ -5,7 +5,7 @@ import { usePerpStore } from '~/stores/perp'
 import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
 import { usePerpWsPubStore } from '~/stores/perp/wsPub'
 const props = defineProps<{
-  searchParams: any
+  searchParams?: any
 }>()
 let timer: { id: number | null } = { id: null }
 const { t } = useI18n()
@@ -30,11 +30,11 @@ const typeDict = computed(() => {
 
 const filterListData = computed(() => {
   const result = listData.value?.filter(i => {
-    if (props.searchParams?.filterContractIdList && i.contractId === props.searchParams.filterContractIdList || !props.searchParams.filterContractIdList) {
+    if (props?.searchParams?.filterContractIdList && i.contractId === props?.searchParams?.filterContractIdList || !props.searchParams?.filterContractIdList) {
       return i
     }
   })
-  return listData.value || []
+  return result || []
 })
 watch(
   () => wsPrivateStore.wsResult,
