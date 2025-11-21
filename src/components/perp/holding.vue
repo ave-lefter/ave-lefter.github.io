@@ -7,7 +7,7 @@ import { usePerpWsPubStore } from '~/stores/perp/wsPub'
 import StopProfitLoss from './stopProfitLoss.vue'
 
 const props = defineProps<{
-  searchParams: any
+  searchParams?: any
 }>()
 let timer: { id: number | null } = { id: null }
 const { t } = useI18n()
@@ -33,12 +33,8 @@ const typeDict = computed(() => {
 })
 
 const filterListData = computed(() => {
-  const result = listData.value?.filter((i) => {
-    if (
-      (props.searchParams?.filterContractIdList &&
-        i.contractId === props.searchParams.filterContractIdList) ||
-      !props.searchParams.filterContractIdList
-    ) {
+  const result = listData.value?.filter(i => {
+    if (props?.searchParams?.filterContractIdList && i.contractId === props?.searchParams?.filterContractIdList || !props.searchParams?.filterContractIdList) {
       return i
     }
   })
