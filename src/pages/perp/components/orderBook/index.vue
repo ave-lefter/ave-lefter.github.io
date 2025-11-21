@@ -313,6 +313,7 @@ const coinList = computed(() => {
 
 const base = computed(() => {
   const baseCoinId = perp.value?.baseCoinId || ''
+    console.log('---baseCoinId-----------',baseCoinId)
   return coinList.value?.find((i) => i.coinId == baseCoinId) ?? null
 })
 const quote = computed(() => {
@@ -333,12 +334,19 @@ const maxSellSum = computed(() => {
   return Math.max(...sellList.value.map((i) => Number(i.sum)))
 })
 const progress = computed(() => {
-  if (maxBuySum.value + maxSellSum.value > 0) {
-    return Math.min((maxBuySum.value / (maxBuySum.value + maxSellSum.value)) * 100, 100)
+  const totalBuySum = buyList.value.reduce((acc, item) => {
+    return acc + Number(item.sum);
+  }, 0)
+  const totalSellSum: number = sellList.value.reduce((acc, item) => {
+    return acc + Number(item.sum)
+  }, 0)
+  if (totalBuySum + totalSellSum > 0) {
+    return Math.min((totalBuySum / (totalBuySum + totalSellSum)) * 100, 100)
   } else {
     return 0
   }
 })
+
 const windowWidth = ref(window.innerWidth)
 const updateWidth = () => {
   windowWidth.value = window.innerWidth
@@ -411,10 +419,12 @@ watch(
         sellList.value = arr_sell
       } else if (val.dataType === 'changed') {
         if (arr_buy?.length > 0) {
-          wsBuyCache.value = mergeData(arr_buy, wsBuyCache.value)
+          const wsBuy = mergeDepth(arr_buy, step.value, 'bids')
+          wsBuyCache.value = mergeData(wsBuy, wsBuyCache.value)
         }
         if (arr_sell?.length > 0) {
-          wsSellCache.value = mergeData(arr_sell, wsSellCache.value)
+          const wsSell = mergeDepth(arr_sell, step.value, 'asks')
+          wsSellCache.value = mergeData(wsSell, wsSellCache.value)
         }
         updateViews()
       }
@@ -454,29 +464,32 @@ const updateViews = useThrottleFn(() => {
   const num = Math.floor(Number(height.value) / 24)
   if (wsBuyCache.value?.length > 0) {
     buyList.value = mergeData(wsBuyCache.value, buyList.value)
-    buyList.value = mergeDepth(buyList.value, step.value, 'bids')
-    if (buyList.value.length > num) {
+      // buyList.value = buyList.value?.filter(i=> Number(i.price) <= Number(perp.value?.lastPrice))
       buyList.value = buyList.value.slice(0, num)
-    }
+
     wsBuyCache.value.length = 0
     triggerRef(buyList)
   }
 
   if (wsSellCache.value?.length > 0) {
-    sellList.value = mergeData(wsSellCache.value, buyList.value)
-    sellList.value = mergeDepth(sellList.value, step.value, 'asks')
+    sellList.value = mergeData(wsSellCache.value, sellList.value)
     if (sellList.value.length > num) {
-      sellList.value = sellList.value.slice(0, num)
+      // sellList.value = sellList.value?.filter(i=> Number(i.price) >= Number(perp.value?.lastPrice))
+      sellList.value = sellList.value.slice(0,num)
     }
     wsSellCache.value.length = 0
     triggerRef(sellList)
   }
-}, 300)
+}, 200)
 
 // WebSocket 相关功能
 onMounted(() => {
   // onTxsLiqMessage()
   // 如果组件挂载时 orderBook 已经打开，则获取数据
+
+  unit.value = base.value ?? null
+  step.value = Number(stepSizeList.value[0] ?? 0)
+
   window.addEventListener('resize', updateWidth)
   if (activeTab.value === 'orderbook') {
     subscribeOrderbook()
@@ -534,15 +547,21 @@ function mergeData(newArr: OrderBook[], wsCache: OrderBook[]) {
     map.set(item.price, { ...item })
   })
   newArr.forEach((item) => {
-    if (map.has(item.price)) {
-      const old = map.get(item.price)
-      map.set(item.price, {
-        price: item.price,
-        size: item.size, // size 覆盖
-        sum: (Number(old.sum) + Number(item.sum)).toString(), // sum 累加
-      })
+    if (Number(item.size)  === 0) {
+        map.delete(item.price);
     } else {
-      map.set(item.price, { ...item })
+      if (map.has(item.price)) {
+        const old = map.get(item.price)
+        map.set(item.price, {
+          price: item.price,
+          size: item.size, // size 覆盖
+          sum: (Number(old.sum) + Number(item.sum)).toString(), // sum 累加
+        })
+      } else {
+        if (Number(item.size)  > 0) {
+          map.set(item.price, { ...item })
+        }
+      }
     }
   })
   const arr = Array.from(map.values())
@@ -573,8 +592,12 @@ function mergeDepth(list: OrderBook[], step: number, type: 'asks' | 'bids'): Ord
       }
     }
 
-    // 合并 size
-    map.set(mergedPrice, (map.get(mergedPrice) || 0) + s)
+    if (Number(item.size) === 0) {
+      map.delete(mergedPrice)
+    } else {
+      // 合并 size
+      map.set(mergedPrice, (map.get(mergedPrice) || 0) + s)
+    }
   }
 
   // Map → 数组
