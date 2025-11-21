@@ -320,7 +320,7 @@ export async function _getPerpKline(params: {
   filterEndKlineTimeExclusive: number
   priceType: string
 }): Promise<PerpKline> {
-  return api('/api/v1/public/quote/getKline', {
+  return api('/api/v1/public/quote/getKline1', {
     method: 'get',
     query: params,
   })

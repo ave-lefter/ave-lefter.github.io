@@ -121,7 +121,7 @@ export async function crossWithdraw(data: {tokenAddress: string; amount: string;
   const crossWithdrawInput: CrossWithdrawInput = {
     accountId: accountId,           // 账户ID
     coinId: '1000',                         // 币种ID (1000 = USDT)
-    amount: new BigNumber(amount).toFixed(),                        // amount,                         // 提现金额
+    amount: new BigNumber(amount).minus(new BigNumber(fee)).toFixed(),                        // amount,                         // 提现金额
     ethAddress: getAddress(walletStore.address), // 目标地址
     erc20Address: getAddress(tokenAddress), // ERC20代币合约地址
     lpAccountId: lpAccountId,      // 流动性提供者账户ID
@@ -134,9 +134,7 @@ export async function crossWithdraw(data: {tokenAddress: string; amount: string;
   const networkId = crossWithdrawInput.chainId
   const sdk = perpStore.getSdk()
   const { params, headers } = await sdk.generateCrossWithdrawParams(crossWithdrawInput, networkId)
-  params.amount = new BigNumber(amount).minus(new BigNumber(params.fee)).toFixed()
-  console.log('params', params)
-  console.log('headers', headers)
+  console.log('params', params, headers)
   return api('/api/v1/private/assets/createCrossWithdraw', {
     // headers,
     method: 'POST',
