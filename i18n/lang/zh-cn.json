@@ -1622,5 +1622,11 @@
   "thisWeek": "本周",
   "tradeSize":"成交数量",
   "tradePrice":"成交价格",
-  "autoDeleverageTips":"自动减仓序列中的当前仓位由实心条表示。实心条越多，您的仓位自动减仓的可能性就越大。"
+  "autoDeleverageTips":"自动减仓序列中的当前仓位由实心条表示。实心条越多，您的仓位自动减仓的可能性就越大。",
+  "takeProfitStopLoss2":"仓位止盈止损",
+  "marketStop":"市价止盈",
+  "limitStop":"限价止盈",
+  "marketStop2":"市价止损",
+  "limitStop2":"限价止损",
+  "stopTips":"*由于行情变动快，止损触发价不宜离预估强平价过近，避免触发失败"
 }

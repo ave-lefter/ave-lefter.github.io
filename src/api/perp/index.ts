@@ -384,3 +384,14 @@ export async function getAccountDeleverageLight() {
     },
   })
 }
+
+export async function createOrder(params) {
+  const perpStore = usePerpStore()
+  return api('/api/v1/private/order/createOrder', {
+    method: 'post',
+    body: {
+      accountId:perpStore.userInfo?.id,
+      ...params
+    },
+  })
+}

@@ -4,6 +4,7 @@ import { getAccountDeleverageLight } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
 import { usePerpWsPubStore } from '~/stores/perp/wsPub'
+import StopProfitLoss from './stopProfitLoss.vue'
 
 let timer: { id: number | null } = { id: null }
 const { t } = useI18n()
@@ -12,6 +13,8 @@ const wsPrivateStore = usePerpWsPrivateStore()
 const wsPublicStore = usePerpWsPubStore()
 const listData = shallowRef()
 const contractLevelMap = shallowRef({})
+const stopProfitLossVisible = ref(false)
+const stopProfitLossRow = ref<any>(null)
 
 const typeDict = computed(() => {
   const contractMap =
@@ -85,6 +88,11 @@ const getContractLevelMap = async () => {
 }
 
 getContractLevelMap()
+
+const showStopProfitLoss = (row) => {
+  stopProfitLossRow.value = row
+  stopProfitLossVisible.value = true
+}
 onMounted(() => {
   wsPublicStore.send({
     type: 'unsubscribe',
@@ -227,7 +235,12 @@ onUnmounted(() => {
             }}
           </span>
         </template>
-        <el-button size="small" style="--el-button-active-border-color: transparent" v-else>
+        <el-button
+          size="small"
+          style="--el-button-active-border-color: transparent"
+          @click="showStopProfitLoss(row)"
+          v-else
+        >
           + {{ $t('add') }}
         </el-button>
       </template>
@@ -243,4 +256,5 @@ onUnmounted(() => {
       </template>
     </el-table-column>
   </el-table>
+  <StopProfitLoss v-model:visible="stopProfitLossVisible" :row="stopProfitLossRow" />
 </template>

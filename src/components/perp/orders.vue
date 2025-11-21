@@ -2,6 +2,7 @@
 import { SuffixIcon } from '#components'
 import dayjs from 'dayjs'
 import { usePerpStore } from '~/stores/perp'
+import { useStorage } from '@vueuse/core'
 const route = useRoute()
 const { t } = useI18n()
 const perpStore = usePerpStore()
@@ -21,27 +22,30 @@ const componentsMap = {
   closePnl: defineAsyncComponent(() => import('./closePnl.vue')),
   positionHistory: defineAsyncComponent(() => import('./positionHistory.vue')),
 }
-const selectTab = ref(route.query.t && route.query.t !=='holding'? route.query.t : 'currentOrder')
-const searchParams = ref({
-  size: 10,
-  filterContractIdList: 'ALL',
-  filterStartCreatedTimeInclusive: '',
-  filterEndCreatedTimeExclusive: '',
-})
-const filteredSearchParams = computed(() => {
-  const params = { ...searchParams.value }
-  if (params.filterContractIdList === 'ALL') {
-    delete params.filterContractIdList
-  }
-  for (const key in params) {
-    if (Object.prototype.hasOwnProperty.call(params, key)) {
-      if (!params[key]) {
-        delete params[key]
+const selectTab = ref(route.query.t && route.query.t !== 'holding' ? route.query.t : 'currentOrder')
+const searchParams = useStorage(
+  'perp-orders-searchParams',
+  Object.keys(componentsMap).reduce(
+    (prev, cur) => {
+      prev[cur] = {
+        size: 10,
+        filterContractIdList: 'ALL',
+        filterStartCreatedTimeInclusive: '',
+        filterEndCreatedTimeExclusive: '',
       }
-    }
-  }
-  return params
-})
+      return prev
+    },
+    {} as Record<
+      string,
+      {
+        size: number
+        filterContractIdList: string
+        filterStartCreatedTimeInclusive: string
+        filterEndCreatedTimeExclusive: string
+      }
+    >
+  )
+)
 const typeOptions = computed(() => {
   const contractList = perpStore.metadata?.contractList?.map?.((item) => {
     return {
@@ -73,8 +77,20 @@ const disabledEndDate = (date: Date) => {
   }
   return false
 }
-
-const getList = async () => {}
+const filteredSearchParams = (key: keyof typeof searchParams.value) => {
+  const params = { ...searchParams.value[key] }
+  if (params.filterContractIdList === 'ALL') {
+    delete params.filterContractIdList
+  }
+  for (const key in params) {
+    if (Object.prototype.hasOwnProperty.call(params, key)) {
+      if (!params[key]) {
+        delete params[key]
+      }
+    }
+  }
+  return params
+}
 </script>
 
 <template>
@@ -92,12 +108,11 @@ const getList = async () => {}
       </div>
       <div class="flex items-center justify-end gap-8px">
         <el-select
-          v-model="searchParams.filterContractIdList"
+          v-model="searchParams[selectTab].filterContractIdList"
           size="small"
           class="[&&]:[--el-select-width:110px]"
           popper-class="[--el-font-size-base:12px]"
           :suffix-icon="SuffixIcon"
-          @change="getList"
         >
           <template #prefix>
             <span>{{ t('type') }}</span>
@@ -111,7 +126,7 @@ const getList = async () => {}
         </el-select>
         <div class="flex items-center gap-4px text-12px">
           <el-date-picker
-            v-model="searchParams.filterStartCreatedTimeInclusive"
+            v-model="searchParams[selectTab].filterStartCreatedTimeInclusive"
             size="small"
             :disabled-date="disabledStartDate"
             class="[--el-font-size-base:12px] [&&]:[--el-date-editor-width:120px]"
@@ -120,11 +135,10 @@ const getList = async () => {}
             :placeholder="t('startTime')"
             value-format="X"
             :teleported="false"
-            @change="getList"
           />
           {{ $t('to') }}
           <el-date-picker
-            v-model="searchParams.filterEndCreatedTimeExclusive"
+            v-model="searchParams[selectTab].filterEndCreatedTimeExclusive"
             size="small"
             :disabled-date="disabledEndDate"
             class="[--el-font-size-base:12px] [&&]:[--el-date-editor-width:120px]"
@@ -133,11 +147,10 @@ const getList = async () => {}
             :placeholder="t('endTime1')"
             value-format="X"
             :teleported="false"
-            @change="getList"
           />
         </div>
       </div>
     </div>
-    <component :is="componentsMap[selectTab]" :searchParams="filteredSearchParams" />
+    <component :is="componentsMap[selectTab]" :searchParams="filteredSearchParams(selectTab)" />
   </div>
 </template>
