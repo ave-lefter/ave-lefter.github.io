@@ -27,14 +27,19 @@ const componentsMap = {
   positionHistory: defineAsyncComponent(() => import('@/components/perp/positionHistory.vue')),
 }
 const selectTab = ref('holding')
-const isCurrentId = shallowRef(false)
+const isAll = shallowRef(true)
 const searchParams = ref({
   size: 10,
-  filterContractIdList: isCurrentId? contractId.value : 'ALL',
+  filterContractIdList: isAll ? '': contractId.value,
 })
-// watch(() => contractId.value, () => {
 
-// })
+watch(() => isAll.value, (val) => {
+  if (val) {
+    searchParams.value.filterContractIdList= ''
+  } else {
+    searchParams.value.filterContractIdList = contractId.value
+  }
+})
 
 const getList = async () => {}
 </script>
@@ -53,7 +58,7 @@ const getList = async () => {}
         >
       </div>
       <div class="flex items-center justify-end gap-12px">
-         <el-checkbox class="checkbox-sm" v-model="isCurrentId" label="显示所有合约"/>
+         <el-checkbox class="checkbox-sm" v-model="isAll" label="显示所有合约"/>
          <el-button class="close-position" v-if="selectTab == 'holding'">全部平仓</el-button>
          <el-button class="close-position" v-else-if="selectTab == 'currentOrder'">全部取消</el-button>
          <el-button class="close-position" v-else="selectTab == 'currentOrder'" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}?t=${selectTab}`)">查看全部</el-button>
