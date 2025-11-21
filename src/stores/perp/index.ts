@@ -143,6 +143,9 @@ export const usePerpStore = defineStore('perp', () => {
     body?: { [key: string]: string },
     timestamp?: string
   }) {
+    if (!perpKeys.value?.apiSignature || !perpKeys.value?.l2KeyPair) {
+      return {}
+    }
     return sdk.createAuthHeaders({
       timestamp: Date.now().toString(),
       ...data
@@ -226,9 +229,19 @@ export const usePerpStore = defineStore('perp', () => {
       if (res) {
         accountList.value = res?.dataList || []
         userInfo.value = res?.dataList?.[0] || null
+        usePerpWsPrivateStore().init()
       }
       return res
     })
+  }
+
+  function resetUserInfo() {
+    userInfo.value = null
+    accountList.value = []
+    collateral.value = []
+    position.value = []
+    order.value = []
+    usePerpWsPrivateStore().close?.()
   }
 
   function getSdk() {
@@ -240,6 +253,7 @@ export const usePerpStore = defineStore('perp', () => {
     apiKeys,
     l2KeyPair,
     perpKeys,
+    _perpKeys,
     isLogin,
     userInfo,
     collateral,
@@ -249,6 +263,7 @@ export const usePerpStore = defineStore('perp', () => {
     starkSignatureLoading,
     login,
     getPerpMetadata,
+    getOnboardSite,
     setApiKeys,
     setL2KeyPair,
     generateEdgeXAuthHeaders,
@@ -261,6 +276,7 @@ export const usePerpStore = defineStore('perp', () => {
     totalAssets,
     contractId,
     resolution,
-    getSdk
+    getSdk,
+    resetUserInfo
   }
 })
