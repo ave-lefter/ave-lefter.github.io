@@ -4,7 +4,9 @@ import { getAccountDeleverageLight } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
 import { usePerpWsPubStore } from '~/stores/perp/wsPub'
-
+const props = defineProps<{
+  searchParams: any
+}>()
 let timer: { id: number | null } = { id: null }
 const { t } = useI18n()
 const perpStore = usePerpStore()
@@ -26,12 +28,20 @@ const typeDict = computed(() => {
   return contractMap
 })
 
+const filterListData = computed(() => {
+  const result = listData.value?.filter(i => {
+    if (props.searchParams?.filterContractIdList && i.contractId === props.searchParams.filterContractIdList || !props.searchParams.filterContractIdList) {
+      return i
+    }
+  })
+  return listData.value || []
+})
 watch(
   () => wsPrivateStore.wsResult,
   (val) => {
     listData.value = val['trade-event']?.content?.data?.position || []
   },
-  { immediate: true }
+  { immediate: true, deep: true }
 )
 watch(
   () => wsPublicStore.wsResult[WSPerpEventType.TICKER_ALL_1S],
@@ -111,7 +121,7 @@ onUnmounted(() => {
 <template>
   <el-table
     fit
-    :data="listData"
+    :data="filterListData"
     header-row-class-name="text-12px sticky top-0 z-10 font-500"
     cell-class-name="color-[--main-text] text-12px"
   >

@@ -2,7 +2,7 @@
 import Holding from './holding.vue'
 const route = useRoute()
 const { t } = useI18n()
-const activeName = ref(route.query.t == 'orders' ? 'orders' : 'holding')
+const activeName = ref(route.query.t ? 'orders' : 'holding')
 const tabs = computed(() => {
   return [
     { label: t('holding'), value: 'holding' },
