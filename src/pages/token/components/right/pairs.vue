@@ -118,7 +118,7 @@ const pairs = computed(() => {
   return tokenStore.pairs?.map(i => ({
     ...i,
     ammName: i.amm === 'unknown' ? i.amm : getSwapInfo(i.chain, i.amm)?.show_name || i.amm,
-    isUp: new BigNumber(i.reserve1).gt(i.init_reserve1)
+    isUp: i.target_token === i.token0_address ? new BigNumber(i.reserve1).gt(i.init_reserve1) : new BigNumber(i.reserve0).gt(i.init_reserve0),
   }))
 })
 

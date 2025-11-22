@@ -497,13 +497,13 @@ export const bot_getChainsTokenBalance = createCacheRequest(function(params) {
 
 // 查询sol bundle是否可用
 // /swap/getBundleAvailable GET
-export function bot_getBundleAvailable() {
+export async function bot_getBundleAvailable() {
   // const { $api } = useNuxtApp()
   // return  $api('/botapi/swap/getBundleAvailable', {
   //   method: 'get',
   //   query: {}
   // })
-  return Promise.resolve(true)
+  return true
 }
 // 预授权代币
 export function bot_approve(data: {
