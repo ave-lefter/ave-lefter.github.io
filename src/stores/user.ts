@@ -13,6 +13,7 @@ import {
   // confirmAuthSetting,
   // getUserInfoByGuid,
   bindEmailAccount,
+  loginEmailV2,
   // getBotWallets,
 } from '@/api/bot'
 export const useUserStore = defineStore('user', () => {
@@ -66,9 +67,9 @@ export const useUserStore = defineStore('user', () => {
       getUserInfo()
 
     },
-    async loginEmail(data: Parameters<typeof loginEmail>[0]) {
+    async loginEmail(data: Parameters<typeof loginEmailV2>[0]) {
       walletStore.disconnect()
-      const res = await loginEmail(data)
+      const res = await loginEmailV2(data)
       accessToken.value = res.accessToken
       refreshToken.value = res.refreshToken
       evmAddress.value = res.evmAddress

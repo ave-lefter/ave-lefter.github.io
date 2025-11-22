@@ -46,7 +46,7 @@ function getApi() {
         if (isRefToken) {
           return api(request, options)
         }
-      } else if (err?.response?.status === 403) {
+      } else if (err?.response?.status === 403 && !(request as string)?.includes('loginEmailV2')) {
         // onResponseError({response: err?.response} as MyFetchContext)
         const aveToken = await updateAveToken()
         if (aveToken) {

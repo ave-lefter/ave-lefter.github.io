@@ -128,13 +128,27 @@
         </label>
       </el-form-item>
       <el-form-item class="mb-10px!">
+        <div v-if="cType === 'login' && loginType === 'password'" id="captcha-element" class="mb-10px'" />
         <el-button
+          v-show="cType === 'login' && loginType === 'password'"
+          id="captcha-button"
           class="h-48px!"
           type="primary"
           size="large"
           :disabled="cType == 'register' && !form.agree"
           :loading="loading"
           style="width: 100%;"
+          @click="submitForm"
+          >{{ $t("startSubmit") }}</el-button
+        >
+        <el-button
+          v-show="!(cType === 'login' && loginType === 'password')"
+          class="h-48px!"
+          type="primary"
+          size="large"
+          :disabled="cType == 'register' && !form.agree"
+          :loading="loading"
+          style="width: 100%;margin-left: 0;"
           @click="submitForm"
           >{{ $t("startSubmit") }}</el-button
         >
@@ -374,43 +388,74 @@ function sendVerificationCode() {
   startCountdown()
 }
 
+const captchaVerifyParam = ref('')
+const { initCaptcha, SceneId } = useAliyunCaptcha({
+  element: '#captcha-element',
+  button: '#captcha-button',
+  slideStyle: {
+    width: 460,
+    height: 48
+  },
+  success: (captchaVerifyParams) => {
+    captchaVerifyParam.value = captchaVerifyParams
+    _login()
+  },
+  fail: (error) => {
+    console.log(error)
+    initCaptcha()
+    loading.value = false
+  }
+})
+
 function login() {
   formRef?.value?.validate((valid) => {
     if (valid) {
       // const lang = localStorage.language || Cookies.get("language") || "en";
-      const req =
-        loginType.value === 'password'
-          ? userStore.loginEmail({
-              email: form.email,
-              password: sha256(form.password).toString(),
-              // language: lang == "zh-cn" || lang == "zh-tw" ? "cn" : "en",
-            })
-          : userStore.emailCodeLogin({
-              email: form.email,
-              code: form.verificationCode,
-              refCode: form.refCode || refCode.value,
-              // language: lang == "zh-cn" || lang == "zh-tw" ? "cn" : "en",
-            })
-      req
-        .then(() => {
-          loading.value = false
-          // store.commit("changeConnectVisible", false);
-          if (!botStore.mnemonic) {
-            botStore.changeConnectVisible(false)
-          }
-        })
-        .catch((err) => {
-          // store.commit('showMessage', { type: 'error', text: err });
-          ElMessage.error(String(err))
-        })
-        .finally(() => {
-          loading.value = false
-        })
+      if (loginType.value === 'password') {
+        loading.value = true
+        return
+      }
+      _login()
     } else {
       console.log('登录失败')
       loading.value = false
     }
   })
+}
+
+function _login() {
+  loading.value = true
+  const req =
+    loginType.value === 'password'
+      ? userStore.loginEmail({
+          email: form.email,
+          password: sha256(form.password).toString(),
+          // language: lang == "zh-cn" || lang == "zh-tw" ? "cn" : "en",
+          captchaScene: SceneId,
+          captchaParam: captchaVerifyParam.value
+        })
+      : userStore.emailCodeLogin({
+          email: form.email,
+          code: form.verificationCode,
+          refCode: form.refCode || refCode.value,
+          // language: lang == "zh-cn" || lang == "zh-tw" ? "cn" : "en",
+        })
+  req
+    .then(() => {
+      loading.value = false
+      // store.commit("changeConnectVisible", false);
+      if (!botStore.mnemonic) {
+        botStore.changeConnectVisible(false)
+      }
+    })
+    .catch((err) => {
+      // store.commit('showMessage', { type: 'error', text: err });
+      ElMessage.error(String(err))
+    })
+    .finally(() => {
+      loading.value = false
+      initCaptcha()
+    })
 }
 
 function register() {
@@ -552,6 +597,7 @@ onMounted(() => {
   } else {
     initGoogleLogin()
   }
+  initCaptcha()
 })
 
 watch(
