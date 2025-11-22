@@ -108,7 +108,6 @@ export const useWalletStore = defineStore('wallet', () => {
     walletName.value = ''
     provider.value?.disconnect?.()
     usePerpStore().resetUserInfo()
-
     setTimeout(() => {
       provider.value = null
     }, 100)
@@ -122,6 +121,7 @@ export const useWalletStore = defineStore('wallet', () => {
     chain.value = ''
     walletName.value = ''
     provider.value?.disconnect?.()
+    usePerpStore().resetUserInfo()
     setTimeout(() => {
       provider.value = null
     }, 100)
