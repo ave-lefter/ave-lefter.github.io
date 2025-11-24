@@ -1617,5 +1617,6 @@
   "limitClose":"Limit Close",
   "all2":"All",
   "closePrice":"Close Price",
-  "midPrice":"Mid Price"
+  "midPrice":"Mid Price",
+  "cancelOrder":"Cancel Order"
 }

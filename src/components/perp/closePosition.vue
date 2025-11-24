@@ -1,21 +1,23 @@
 <script setup lang="ts">
 const props = defineProps<{
   row: any
-  token: string
+  token?: string
 }>()
 const themeStore = useThemeStore()
 const visible = defineModel<boolean>('visible')
 const { t } = useI18n()
 const formData = ref({})
 const closePercent = ref(0)
+const isLimit = computed(() => {
+  return props.row.operation === 'limit'
+})
 const title = computed(() => {
-  return props.row.operation === 'limit' ? t('limitClose') : t('marketClose')
+  return isLimit.value ? t('limitClose') : t('marketClose')
 })
 </script>
 
 <template>
   <el-dialog append-to-body v-model="visible" :title="title" width="450px">
-    {{ console.log(props.row, 'props.row') }}
     <div class="flex items-center font-bold h-21px mb-16px">
       {{ props.token }} · {{ t('all2')
       }}<span class="ml-4px font-normal" :class="getColorClass(props.row.openValue)">
@@ -34,15 +36,17 @@ const title = computed(() => {
         USD</span
       >
     </div>
-    <div class="color-[--third-text] mb-8px">
-      {{ t('closePrice') }}
-    </div>
-    <el-input v-model="formData.closePrice" class="mb-16px">
-      <template #suffix>
-        <span class="color-[--third-text] mx-4px">|</span>
-        <span class="color-[--up-color]">{{ t('midPrice') }}</span>
-      </template>
-    </el-input>
+    <template v-if="isLimit">
+      <div class="color-[--third-text] mb-8px">
+        {{ t('closePrice') }}
+      </div>
+      <el-input v-model="formData.closePrice" class="mb-16px">
+        <template #suffix>
+          <span class="color-[--third-text] mx-4px">|</span>
+          <span class="color-[--up-color]">{{ t('midPrice') }}</span>
+        </template>
+      </el-input>
+    </template>
     <div class="color-[--third-text] justify-between mb-8px">
       {{ t('closeSize') }}
     </div>

@@ -9,7 +9,7 @@ const { mode } = storeToRefs(useGlobalStore())
 const perpStore = usePerpStore()
 const { t } = useI18n()
 const props = defineProps<{
-  searchParams: any,
+  searchParams: any
 }>()
 const wsPrivateStore = usePerpWsPrivateStore()
 const { isCancelOrder } = storeToRefs(usePerpStore())
@@ -132,24 +132,25 @@ watch(
   () => isCancelOrder.value,
   (val) => {
     if (val) {
-        ElMessageBox.confirm('确认是否取消所有委托订单?', '取消全部委托', {
-          type: 'warning',
-          icon: markRaw(Warning),
-          confirmButtonText: t('confirm'),
-          cancelButtonText: t('cancel'),
-          customClass: `${mode.value} delete_confirm`,
-        })
-          .then(() => {
-            const ids = listData.value?.map(i => i.id)
-            cancelOrderById(ids).then(() => {
+      ElMessageBox.confirm('确认是否取消所有委托订单?', '取消全部委托', {
+        type: 'warning',
+        icon: markRaw(Warning),
+        confirmButtonText: t('confirm'),
+        cancelButtonText: t('cancel'),
+        customClass: `${mode.value} delete_confirm`,
+      })
+        .then(() => {
+          const ids = listData.value?.map((i) => i.id)
+          cancelOrderById(ids)
+            .then(() => {
               ElMessage.success(t('cancelledOrderSuccessfully'))
             }).finally(() => {
               isCancelOrder.value = false
             })
-          })
-          .catch((err) => {
-            console.log(err)
-          })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     }
   }
 )

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import { cancelOrderById } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 
 const perpStore = usePerpStore()
 const themeStore = useThemeStore()
-const props = defineProps<{
-  orderList: any[]
-}>()
+const orderList = defineModel<any[]>('orderList')
 const emit = defineEmits(['add'])
 const visible = defineModel<boolean>('visible')
 const { t } = useI18n()
@@ -31,12 +30,25 @@ const typeDict = computed(() => {
   contractMap.ALL = t('all')
   return contractMap
 })
+
+const cancelOrder = async (id?: string) => {
+  ElMessageBox.confirm(t('botCancelOrder'), t('cancelOrder'), {
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
+    type: 'warning',
+  }).then(async () => {
+    const ids = id ? [id] : orderList?.value?.map?.((item) => item.id) || []
+    await cancelOrderById(ids)
+    ElMessage.success(t('cancelledOrderSuccessfully'))
+    orderList.value = orderList.value?.filter?.((item) => !ids.includes(item.id)) || []
+  })
+}
 </script>
 
 <template>
   <el-dialog append-to-body v-model="visible" :title="t('stopLimit')" width="680px">
     <el-table
-      :data="props.orderList"
+      :data="orderList"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
       cell-class-name="color-[--main-text] text-12px"
       fit
@@ -88,7 +100,11 @@ const typeDict = computed(() => {
       </el-table-column>
       <el-table-column :width="50" align="right" :label="t('operate')" prop="operate">
         <template #default="{ row }">
-          <Icon name="custom:delete" class="w-14px h-14px color-[--third-text] cursor-pointer" />
+          <Icon
+            name="custom:delete"
+            class="w-14px h-14px color-[--third-text] cursor-pointer"
+            @click="cancelOrder(row.id)"
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -100,7 +116,7 @@ const typeDict = computed(() => {
       >
         {{ $t('add') }}
       </el-button>
-      <el-button type="primary" class="m-l-auto [&&]:w-88px">
+      <el-button type="primary" class="m-l-auto [&&]:w-88px" @click="cancelOrder()">
         {{ $t('cancelAll') }}
       </el-button>
     </div>

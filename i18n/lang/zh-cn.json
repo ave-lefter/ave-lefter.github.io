@@ -1634,5 +1634,6 @@
   "limitClose":"限价平仓",
   "all2":"全仓",
   "closePrice":"平仓价格",
-  "midPrice":"中间价"
+  "midPrice":"中间价",
+  "cancelOrder":"取消订单"
 }

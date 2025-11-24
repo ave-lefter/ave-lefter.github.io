@@ -1601,5 +1601,6 @@
   "limitClose":"限價平倉",
   "all2":"全倉",
   "closePrice":"平倉價格",
-  "midPrice":"中間價"
+  "midPrice":"中間價",
+  "cancelOrder":"取消訂單"
 }
