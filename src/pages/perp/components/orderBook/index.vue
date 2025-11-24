@@ -159,7 +159,7 @@
           </div>
           <List
             v-if="activeLayoutTab == 'all' || activeLayoutTab == 'sell'"
-            :list="sellList"
+            :list="sellList?.slice(0,num)"
             type="sell"
             :height="height"
             :unit="unit"
@@ -182,7 +182,7 @@
           </div>
           <List
             v-if="activeLayoutTab == 'all' || activeLayoutTab == 'buy'"
-            :list="buyList"
+            :list="buyList?.slice(0,num)"
             type="buy"
             :height="height"
             :unit="unit"
@@ -237,6 +237,8 @@ import { usePerpStore } from '@/stores/perp'
 import { type Trade, type CoinInfo } from '@/api/types/perp'
 const { contractId, perp, resolution, metadata } = storeToRefs(usePerpStore())
 const perpWsPubStore = usePerpWsPubStore()
+import { DecimalExtensions } from "@/utils/decimalExtensions"
+import BigNumber from "bignumber.js"
 
 const props = defineProps<{
   klineHeight?: number
@@ -313,6 +315,7 @@ const coinList = computed(() => {
 
 const base = computed(() => {
   const baseCoinId = perp.value?.baseCoinId || ''
+    console.log('---baseCoinId-----------',baseCoinId)
   return coinList.value?.find((i) => i.coinId == baseCoinId) ?? null
 })
 const quote = computed(() => {
@@ -326,6 +329,9 @@ const unitList = computed(() => {
 const stepSizeList = computed(() => {
   return perp.value?.displayDigitMerge?.split(',') || []
 })
+const num = computed(() => {
+ return Math.floor(Number(height.value) / 24)
+})
 const maxBuySum = computed(() => {
   return Math.max(...buyList.value.map((i) => Number(i.sum)))
 })
@@ -333,12 +339,19 @@ const maxSellSum = computed(() => {
   return Math.max(...sellList.value.map((i) => Number(i.sum)))
 })
 const progress = computed(() => {
-  if (maxBuySum.value + maxSellSum.value > 0) {
-    return Math.min((maxBuySum.value / (maxBuySum.value + maxSellSum.value)) * 100, 100)
+  const totalBuySum = buyList.value.reduce((acc, item) => {
+    return acc + Number(item.sum);
+  }, 0)
+  const totalSellSum: number = sellList.value.reduce((acc, item) => {
+    return acc + Number(item.sum)
+  }, 0)
+  if (totalBuySum + totalSellSum > 0) {
+    return Math.min((totalBuySum / (totalBuySum + totalSellSum)) * 100, 100)
   } else {
     return 0
   }
 })
+
 const windowWidth = ref(window.innerWidth)
 const updateWidth = () => {
   windowWidth.value = window.innerWidth
@@ -411,10 +424,10 @@ watch(
         sellList.value = arr_sell
       } else if (val.dataType === 'changed') {
         if (arr_buy?.length > 0) {
-          wsBuyCache.value = mergeData(arr_buy, wsBuyCache.value)
+          wsBuyCache.value = wsBuyCache.value?.concat(arr_buy)
         }
         if (arr_sell?.length > 0) {
-          wsSellCache.value = mergeData(arr_sell, wsSellCache.value)
+          wsSellCache.value = wsSellCache.value?.concat(arr_sell)
         }
         updateViews()
       }
@@ -451,32 +464,35 @@ const updateHistoryViews = useThrottleFn(() => {
 }, 300)
 const updateViews = useThrottleFn(() => {
   if (wsBuyCache.value.length === 0 && wsSellCache.value.length === 0) return
-  const num = Math.floor(Number(height.value) / 24)
   if (wsBuyCache.value?.length > 0) {
-    buyList.value = mergeData(wsBuyCache.value, buyList.value)
-    buyList.value = mergeDepth(buyList.value, step.value, 'bids')
-    if (buyList.value.length > num) {
-      buyList.value = buyList.value.slice(0, num)
+    const buy = buyList.value.concat(wsBuyCache.value)
+    buyList.value = mergeDepthWithStep(buy, String(step.value), true)
+    if (buyList.value.length > 200) {
+      buyList.value = buyList.value?.slice(0, 200)
     }
+
     wsBuyCache.value.length = 0
     triggerRef(buyList)
   }
 
   if (wsSellCache.value?.length > 0) {
-    sellList.value = mergeData(wsSellCache.value, buyList.value)
-    sellList.value = mergeDepth(sellList.value, step.value, 'asks')
-    if (sellList.value.length > num) {
-      sellList.value = sellList.value.slice(0, num)
+     const sell = sellList.value.concat(wsSellCache.value)
+     sellList.value = mergeDepthWithStep(sell, String(step.value), false)
+    if (sellList.value.length > 200) {
+      sellList.value = sellList.value?.slice(0,200)
     }
     wsSellCache.value.length = 0
     triggerRef(sellList)
   }
-}, 300)
+}, 500)
 
 // WebSocket 相关功能
 onMounted(() => {
   // onTxsLiqMessage()
   // 如果组件挂载时 orderBook 已经打开，则获取数据
+  unit.value = base.value ?? null
+  step.value = Number(stepSizeList.value[0] ?? 0)
+
   window.addEventListener('resize', updateWidth)
   if (activeTab.value === 'orderbook') {
     subscribeOrderbook()
@@ -528,72 +544,67 @@ function subscribeHistory() {
     })
   }, 500)
 }
-function mergeData(newArr: OrderBook[], wsCache: OrderBook[]) {
-  const map = new Map()
-  wsCache.forEach((item) => {
-    map.set(item.price, { ...item })
-  })
-  newArr.forEach((item) => {
-    if (map.has(item.price)) {
-      const old = map.get(item.price)
-      map.set(item.price, {
-        price: item.price,
-        size: item.size, // size 覆盖
-        sum: (Number(old.sum) + Number(item.sum)).toString(), // sum 累加
-      })
-    } else {
-      map.set(item.price, { ...item })
+
+ function mergeDepthWithStep(
+  list: OrderBook[],
+  step: string,
+  isDown: boolean
+) {
+  const map = new Map<
+    string,
+    {
+      price: string; // 规整后的 price
+      size: string;  // 最新 size
+      sum: BigNumber; // 累计值
     }
-  })
-  const arr = Array.from(map.values())
-  const result = arr?.filter((i) => Number(i.size) > 0)
-  result?.sort((a, b) => Number(b.price) - Number(a.price))
-  return result
-}
-function mergeDepth(list: OrderBook[], step: number, type: 'asks' | 'bids'): OrderBook[] {
-  const map = new Map<number, number>()
+  >();
 
   for (const item of list) {
-    const p = Number(item.price)
-    const s = Number(item.size)
-    let mergedPrice = 0
+    const mergedPrice = DecimalExtensions.digitMergeNumber(
+      item.price,
+      step,
+      isDown
+    );
 
-    if (type === 'asks') {
-      // 卖盘：向上合并
-      mergedPrice = Math.ceil(p / step) * step
-    } else {
-      // 买盘：向下主，但 ≥0.5 step 进位
-      const lower = Math.floor(p / step) * step
-      const upper = lower + step
+    const incomingSize = new BigNumber(item.size);
+    const incomingSum = new BigNumber(item.sum ?? item.size);
 
-      if (p - lower >= step / 2) {
-        mergedPrice = upper
-      } else {
-        mergedPrice = lower
-      }
+    // size = 0 → 删除该价位
+    if (incomingSize.isZero()) {
+      map.delete(mergedPrice);
+      continue;
     }
 
-    // 合并 size
-    map.set(mergedPrice, (map.get(mergedPrice) || 0) + s)
+    if (!map.has(mergedPrice)) {
+      // 首次出现
+      map.set(mergedPrice, {
+        price: mergedPrice,
+        size: incomingSize.toFixed(),
+        sum: incomingSum
+      });
+    } else {
+      // 已存在 → size 用最新的覆盖，sum 增量累加
+      const old = map.get(mergedPrice)!;
+
+      map.set(mergedPrice, {
+        price: mergedPrice,
+        size: incomingSize.toFixed(),     // ✔ 覆盖旧 size
+        sum: old.sum.plus(incomingSum)    // ✔ 累加 sum
+      });
+    }
   }
 
-  // Map → 数组
-  const merged = Array.from(map, ([price, size]) => ({ price, size }))
-
-  // 排序（asks 从低到高，bids 从高到低）
-  merged.sort((a, b) => (type === 'asks' ? a.price - b.price : b.price - a.price))
-
-  // 累计 sum 并输出 string 类型
-  let cum = 0
-
-  return merged.map((item) => {
-    cum += item.size
-    return {
-      price: String(item.price),
-      size: String(item.size),
-      sum: String(cum),
-    }
-  })
+  const result = [...map.values()].map(i => ({
+    price: i.price,
+    size: i.size,
+    sum: i.sum.toFixed()
+  }));
+   if (isDown) {
+   // isDown: true  买盘   价格从高到低排序
+  return result.sort((a, b) => new BigNumber(b.price).comparedTo(new BigNumber(a.price)))
+   } else {
+   return result.sort((a, b) => new BigNumber(a.price).comparedTo(new BigNumber(b.price)))
+   }
 }
 
 function setActiveTab(val: string, index: number) {

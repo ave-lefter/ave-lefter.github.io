@@ -1,3 +1,6 @@
+import type { Metadata } from '@edgex-fe/typescript-sdk'
+type ContractInfo = Metadata['contractList'][number]
+
 export type PerpInfo = {
   contractId: string
   contractName: string
@@ -31,7 +34,7 @@ export type PerpInfo = {
   baseCoinId: string
   quoteCoinId: string
   displayDigitMerge: string
-}
+} & ContractInfo
 export type CoinInfo = {
   coinId: string
   coinName: string

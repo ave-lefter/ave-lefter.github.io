@@ -28,7 +28,7 @@ export const usePerpStore = defineStore('perp', () => {
   const order = ref<Order[]>([])
   const _perpKeys = useLocalStorage<{[key: string]: {apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string }}>('perp_keys', {})
   const totalAssets = ref<ProfitResponse>({} as ProfitResponse)
-  const lastPrice= shallowRef(0)
+  const lastPrice = shallowRef(0)
   const resolution = useLocalStorage('tv_resolution', '15')
 
   const apiKeys = computed(() => {
@@ -51,6 +51,11 @@ export const usePerpStore = defineStore('perp', () => {
   const isLogin = computed(() => {
     return !!apiKeys.value && !!l2KeyPair.value
   })
+
+  const isConnectLogin = computed(() => {
+    return walletStore.address && isLogin.value
+  })
+
   const contractName = computed(() => {
     console.log('-----------contractName--------', (route.params.name as string) || 'BTCUSD')
     return (route.params.name as string) || 'BTCUSD'
@@ -143,6 +148,9 @@ export const usePerpStore = defineStore('perp', () => {
     body?: { [key: string]: string },
     timestamp?: string
   }) {
+    if (!perpKeys.value?.apiSignature || !perpKeys.value?.l2KeyPair) {
+      return {}
+    }
     return sdk.createAuthHeaders({
       timestamp: Date.now().toString(),
       ...data
@@ -226,9 +234,19 @@ export const usePerpStore = defineStore('perp', () => {
       if (res) {
         accountList.value = res?.dataList || []
         userInfo.value = res?.dataList?.[0] || null
+        usePerpWsPrivateStore().init()
       }
       return res
     })
+  }
+
+  function resetUserInfo() {
+    userInfo.value = null
+    accountList.value = []
+    collateral.value = []
+    position.value = []
+    order.value = []
+    usePerpWsPrivateStore().close?.()
   }
 
   function getSdk() {
@@ -240,7 +258,9 @@ export const usePerpStore = defineStore('perp', () => {
     apiKeys,
     l2KeyPair,
     perpKeys,
+    _perpKeys,
     isLogin,
+    isConnectLogin,
     userInfo,
     collateral,
     position,
@@ -249,6 +269,7 @@ export const usePerpStore = defineStore('perp', () => {
     starkSignatureLoading,
     login,
     getPerpMetadata,
+    getOnboardSite,
     setApiKeys,
     setL2KeyPair,
     generateEdgeXAuthHeaders,
@@ -261,6 +282,7 @@ export const usePerpStore = defineStore('perp', () => {
     totalAssets,
     contractId,
     resolution,
-    getSdk
+    getSdk,
+    resetUserInfo
   }
 })

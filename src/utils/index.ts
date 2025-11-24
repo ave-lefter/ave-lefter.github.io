@@ -692,7 +692,8 @@ export function filterGas(num: number, chain?: string) {
     }
   }
 }
-export function addSign(val: number) {
+export function addSign(_val: number | string) {
+  const val = Number(_val)
   if (val > 0) {
     return '+'
   } else if (val < 0) {
