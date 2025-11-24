@@ -830,7 +830,7 @@ function showBubbleTooltip(row: PumpObj, e: MouseEvent) {
   $tooltip.show({
     content: `<iframe
                   style='width:400px; height:400px;  border:none; overflow: hidden;'
-                  src='https://app.insightx.network/bubblemaps/${row.chain === 'bsc' ? 56 : row.chain}/${row.target_token}'
+                  src='https://app.insightx.network/bubblemaps/${row.chain === 'bsc' ? 56 : row.chain}/${row.target_token}?embed_id=9Pt12qHMl1KDeK'
                   allow='clipboard-write'
                 ></iframe>`,
     target: e.target as HTMLElement,
