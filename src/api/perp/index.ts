@@ -39,7 +39,18 @@ export async function onboardSite(): Promise<{
       isSetMaxLeverage: boolean
       maxLeverage: string
     }
-    contractIdToTradeSetting: {}
+    contractIdToTradeSetting: {
+      [key: string]: {
+        isSetFeeRate: boolean
+        takerFeeRate: string
+        makerFeeRate: string
+        isSetFeeDiscount: boolean
+        takerFeeDiscount: string
+        makerFeeDiscount: string
+        isSetMaxLeverage: boolean
+        maxLeverage: string
+      }
+    }
     maxLeverageLimit: string
     createOrderPerMinuteLimit: number
     createOrderDelayMillis: number
@@ -397,6 +408,59 @@ export async function createOrder(params) {
     body: {
       accountId:perpStore.userInfo?.id,
       ...params
+    },
+  })
+}
+
+// /api/v1/private/account/getAccountById
+export async function getAccountById(): Promise<{
+  id: string
+  userId: string
+  ethAddress: string
+  l2Key: string
+  l2KeyYCoordinate: string
+  clientAccountId: string
+  isSystemAccount: boolean
+  defaultTradeSetting: {
+    isSetFeeRate: boolean
+    takerFeeRate: string
+    makerFeeRate: string
+    isSetFeeDiscount: boolean
+    takerFeeDiscount: string
+    makerFeeDiscount: string
+    isSetMaxLeverage: boolean
+    maxLeverage: string
+  }
+  contractIdToTradeSetting: {
+    [key: string]: {
+      isSetFeeRate: boolean
+      takerFeeRate: string
+      makerFeeRate: string
+      isSetFeeDiscount: boolean
+      takerFeeDiscount: string
+      makerFeeDiscount: string
+      isSetMaxLeverage: boolean
+      maxLeverage: string
+    }
+  }
+  maxLeverageLimit: string
+  createOrderPerMinuteLimit: number
+  createOrderDelayMillis: number
+  extraType: string
+  extraDataJson: string
+  status: string
+  isLiquidating: boolean
+  createdTime: string
+  updatedTime: string
+} | null> {
+  const perpStore = usePerpStore()
+  if (!perpStore.userInfo?.id) {
+    return null
+  }
+  return api('/api/v1/private/order/createOrder', {
+    method: 'post',
+    body: {
+      accountId: perpStore.userInfo?.id
     },
   })
 }
