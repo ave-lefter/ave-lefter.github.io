@@ -28,20 +28,18 @@ const searchParams = useStorage(
   Object.keys(componentsMap).reduce(
     (prev, cur) => {
       prev[cur] = {
-        size: 10,
         filterContractIdList: 'ALL',
-        filterStartCreatedTimeInclusive: '',
-        filterEndCreatedTimeExclusive: '',
+        filterStartCreatedTimeInclusive: dayjs().subtract(7, 'd').startOf('day').unix(),
+        filterEndCreatedTimeExclusive: dayjs().endOf('day').unix(),
       }
       return prev
     },
     {} as Record<
       string,
       {
-        size: number
         filterContractIdList: string
-        filterStartCreatedTimeInclusive: string
-        filterEndCreatedTimeExclusive: string
+        filterStartCreatedTimeInclusive: number
+        filterEndCreatedTimeExclusive: number
       }
     >
   )
@@ -86,6 +84,10 @@ const filteredSearchParams = (key: keyof typeof searchParams.value) => {
     if (Object.prototype.hasOwnProperty.call(params, key)) {
       if (!params[key]) {
         delete params[key]
+      } else if (
+        ['filterStartCreatedTimeInclusive', 'filterEndCreatedTimeExclusive'].includes(key)
+      ) {
+        params[key] = params[key] * 1000
       }
     }
   }
@@ -94,7 +96,7 @@ const filteredSearchParams = (key: keyof typeof searchParams.value) => {
 </script>
 
 <template>
-  <div class="px-16px">
+  <div>
     <div class="flex items-center justify-between mb-16px">
       <div class="flex items-center">
         <span
@@ -134,6 +136,7 @@ const filteredSearchParams = (key: keyof typeof searchParams.value) => {
             format="YYYY-MM-DD"
             :placeholder="t('startTime')"
             value-format="X"
+            :clearable="false"
             :teleported="false"
           />
           {{ $t('to') }}
@@ -146,6 +149,7 @@ const filteredSearchParams = (key: keyof typeof searchParams.value) => {
             format="YYYY-MM-DD"
             :placeholder="t('endTime1')"
             value-format="X"
+            :clearable="false"
             :teleported="false"
           />
         </div>

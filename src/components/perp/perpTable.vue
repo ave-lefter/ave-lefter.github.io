@@ -28,5 +28,7 @@ const activeComponent = computed(() => {
   >
     <el-tab-pane v-for="el in tabs" :key="el.value" :label="el.label" :name="el.value" />
   </el-tabs>
-  <component :is="activeComponent" />
+  <div class="min-h-400px">
+    <component :is="activeComponent" />
+  </div>
 </template>

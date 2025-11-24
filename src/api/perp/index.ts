@@ -138,7 +138,8 @@ export async function getPositionTransactionPage(params:{
     method: 'get',
     query: {
       ...params,
-      accountId:perpStore.userInfo?.id
+      accountId:perpStore.userInfo?.id,
+      size:10
     }
   })
 }
@@ -155,7 +156,8 @@ export async function getAllOrdersPage(params:{
     method: 'get',
     query: {
       ...params,
-      accountId:perpStore.userInfo?.id
+      accountId:perpStore.userInfo?.id,
+      size:10
     }
   })
 }
@@ -347,6 +349,7 @@ export async function getHistoryOrderFillTransactionPage(params) {
   return api('/api/v1/private/order/getHistoryOrderFillTransactionPage', {
     method: 'get',
     query: {
+      size:10,
       accountId:perpStore.userInfo?.id,
       ...params
     },
@@ -358,6 +361,7 @@ export async function getHistoryOrderPage(params) {
   return api('/api/v1/private/order/getHistoryOrderPage', {
     method: 'get',
     query: {
+      size:10,
       accountId:perpStore.userInfo?.id,
       ...params
     },
@@ -369,6 +373,7 @@ export async function getPositionTermPage(params) {
   return api('/api/v1/private/account/getPositionTermPage', {
     method: 'get',
     query: {
+      size:10,
       accountId:perpStore.userInfo?.id,
       ...params
     },

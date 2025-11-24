@@ -1,0 +1,108 @@
+<script setup lang="ts">
+import dayjs from 'dayjs'
+import { usePerpStore } from '~/stores/perp'
+
+const perpStore = usePerpStore()
+const themeStore = useThemeStore()
+const props = defineProps<{
+  orderList: any[]
+}>()
+const emit = defineEmits(['add'])
+const visible = defineModel<boolean>('visible')
+const { t } = useI18n()
+const triggerPriceTypeMap = {
+  LAST_PRICE: t('latestPrice'),
+  TAKE_PROFIT_LIMIT: t('takeProfitLimit'),
+  LIMIT: t('limit'),
+  MARKET: t('market'),
+  STOP_LIMIT: t('stop_limit'),
+  STOP_MARKET: t('stop_market'),
+  TAKE_PROFIT_MARKET: t('takeProfitMarket'),
+}
+const typeDict = computed(() => {
+  const contractMap =
+    perpStore.metadata?.contractList?.reduce?.(
+      (prev, cur) => {
+        prev[cur.contractId] = cur.contractName
+        return prev
+      },
+      {} as Record<string, string>
+    ) || {}
+  contractMap.ALL = t('all')
+  return contractMap
+})
+</script>
+
+<template>
+  <el-dialog append-to-body v-model="visible" :title="t('stopLimit')" width="680px">
+    <el-table
+      :data="props.orderList"
+      header-row-class-name="text-12px sticky top-0 z-10 font-500"
+      cell-class-name="color-[--main-text] text-12px"
+      fit
+    >
+      <el-table-column :label="t('No')" type="index"></el-table-column>
+      <el-table-column :width="80" align="right" :label="t('orderType')" prop="orderType">
+        <template #default="{ row }">
+          <span v-if="row.type.includes('STOP')" class="color-[--down-color]">
+            {{ $t('stopLoss') }}
+          </span>
+          <span v-else-if="row.type.includes('PROFIT')" class="color-[--up-color]">
+            {{ $t('takeProfit') }}
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column :width="100" align="right" :label="t('orderSize')" prop="size">
+        <template #default="{ row }">
+          {{ formatNumber(row.size) }} {{ typeDict[row.contractId].replace('USD', '') }}
+        </template>
+      </el-table-column>
+      <el-table-column align="right" :label="t('triggerPrice')" prop="triggerPrice">
+        <template #default="{ row }">
+          {{ row.triggerSign
+          }}{{
+            formatNumber(row.triggerPrice, {
+              limit: 20,
+              decimals: 1,
+            })
+          }}
+          {{ triggerPriceTypeMap[row.triggerPriceType as keyof typeof triggerPriceTypeMap] }}
+        </template>
+      </el-table-column>
+      <el-table-column :width="90" align="right" :label="t('delegatePrice')" prop="price">
+        <template #default="{ row }">
+          {{
+            row.type.includes('LIMIT')
+              ? formatNumber(row.price, {
+                  decimals: 2,
+                  limit: 20,
+                })
+              : t('market')
+          }}
+        </template>
+      </el-table-column>
+      <el-table-column :width="140" align="right" :label="t('orderTime')" prop="createdTime">
+        <template #default="{ row }">
+          {{ dayjs(Number(row.createdTime)).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+      </el-table-column>
+      <el-table-column :width="50" align="right" :label="t('operate')" prop="operate">
+        <template #default="{ row }">
+          <Icon name="custom:delete" class="w-14px h-14px color-[--third-text] cursor-pointer" />
+        </template>
+      </el-table-column>
+    </el-table>
+    <div class="mt-20px flex justify-end">
+      <el-button
+        class="m-l-auto [&&]:w-88px"
+        :color="themeStore.isDark ? '#333' : '#F2F2F2'"
+        @click="emit('add')"
+      >
+        {{ $t('add') }}
+      </el-button>
+      <el-button type="primary" class="m-l-auto [&&]:w-88px">
+        {{ $t('cancelAll') }}
+      </el-button>
+    </div>
+  </el-dialog>
+</template>
