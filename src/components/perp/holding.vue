@@ -16,12 +16,10 @@ const { t } = useI18n()
 const perpStore = usePerpStore()
 const wsPrivateStore = usePerpWsPrivateStore()
 const wsPublicStore = usePerpWsPubStore()
-const listData = shallowRef()
 const contractLevelMap = shallowRef({})
 const stopProfitLossVisible = ref(false)
 const stopProfitLossRow = ref<any>(null)
 const stopTableVisible = ref(false)
-const orderList = shallowRef([])
 const closePositionVisible = ref(false)
 
 const typeDict = computed(() => {
@@ -38,7 +36,7 @@ const typeDict = computed(() => {
 })
 
 const filterListData = computed(() => {
-  const result = listData.value?.filter((i) => {
+  const result = perpStore.position?.filter((i) => {
     if (
       (props?.searchParams?.filterContractIdList &&
         i.contractId === props?.searchParams?.filterContractIdList) ||
@@ -50,17 +48,9 @@ const filterListData = computed(() => {
   return result || []
 })
 watch(
-  () => wsPrivateStore.wsResult,
-  (val) => {
-    listData.value = val['trade-event']?.content?.data?.position || []
-    orderList.value = val['trade-event']?.content?.data?.order || []
-  },
-  { immediate: true, deep: true }
-)
-watch(
   () => wsPublicStore.wsResult[WSPerpEventType.TICKER_ALL_1S],
   (val) => {
-    listData.value.forEach((el) => {
+    perpStore.position.forEach((el) => {
       const updateData = val.data?.find?.((item) => item.contractId === el.contractId)
       if (updateData) {
         el.oraclePrice = updateData.oraclePrice
@@ -91,14 +81,16 @@ watch(
 watch(
   () => perpStore.totalAssets?.accountList,
   (val) => {
-    const positionAssetList = val?.[0]?.positionAssetList || []
-    listData.value.forEach((el) => {
-      const positionAsset = positionAssetList.find((item) => item.contractId === el.contractId)
-      if (positionAsset) {
-        el.maxLeverage = positionAsset.maxLeverage
-        el.liquidatePrice = positionAsset.liquidatePrice
-      }
-    })
+    if (val) {
+      const positionAssetList = val?.[0]?.positionAssetList || []
+      perpStore.position.forEach((el) => {
+        const positionAsset = positionAssetList.find((item) => item.contractId === el.contractId)
+        if (positionAsset) {
+          el.maxLeverage = positionAsset.maxLeverage
+          el.liquidatePrice = positionAsset.liquidatePrice
+        }
+      })
+    }
   },
   { immediate: true }
 )
@@ -118,7 +110,7 @@ const stopTable = (row) => {
   stopProfitLossRow.value = row
   stopTableVisible.value = true
   const isLong = row.openValue > 0
-  orderList.value = orderList.value.map((el) => {
+  perpStore.order = perpStore.order.map((el) => {
     // 止盈
     const isProfit = el.type.includes('PROFIT')
     let triggerSign = ''
@@ -179,7 +171,7 @@ onUnmounted(() => {
       cell-class-name="color-[--main-text] text-12px"
     >
       <template #empty>
-        <AveEmpty v-if="listData?.length === 0" class="pt-[40px]" />
+        <AveEmpty v-if="perpStore.positionlength === 0" class="pt-[40px]" />
         <span v-else />
       </template>
       <el-table-column :label="t('perp')" prop="perp">
@@ -278,7 +270,7 @@ onUnmounted(() => {
       <el-table-column align="right" :label="t('takeProfitStopLoss')" prop="takeProfitStopLoss">
         <template #default="{ row }">
           <el-button
-            v-if="orderList.length > 0"
+            v-if="perpStore.order.length > 0"
             size="small"
             style="--el-button-active-border-color: transparent"
             @click="stopTable(row)"
@@ -315,7 +307,11 @@ onUnmounted(() => {
     </el-table>
   </div>
   <StopProfitLoss v-model:visible="stopProfitLossVisible" :row="stopProfitLossRow" />
-  <StopTable :orderList="orderList" v-model:visible="stopTableVisible" @add="addStop" />
+  <StopTable
+    v-model:orderList="perpStore.order"
+    v-model:visible="stopTableVisible"
+    @add="addStop"
+  />
   <ClosePosition
     :token="typeDict[stopProfitLossRow?.contractId]"
     :row="stopProfitLossRow || {}"

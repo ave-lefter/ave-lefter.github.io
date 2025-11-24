@@ -38,7 +38,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
     const accountId = perpStore.userInfo?.id || ''
     const timestamp = Date.now().toString()
     const wsOptions = {
-      path: `/api/v1/private/ws`,
+      path: '/api/v1/private/ws',
       timestamp,
       accountId,
       url: `${WSPerpHost}/api/v1/private/ws?accountId=${accountId}&timestamp=${timestamp}`
@@ -91,20 +91,20 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
         }
         // 处理用户数据更新
       if (msg.type === 'trade-event' || msg.type === 'assets-event') {
-        const { collateral, position, order } = msg.content?.data || {};
+        const { collateral, position, order } = msg.content?.data || {}
 
         // 更新资产信息
-        if (collateral as Collateral[]) {
+        if (msg.content?.event === 'Snapshot' && collateral as Collateral[]) {
           updateCollateralInfo(collateral)
         }
 
         // 更新持仓信息
-        if (position as Position) {
+        if (msg.content?.event === 'Snapshot' && position as Position) {
           updatePositionInfo(position)
         }
 
         // 更新订单信息
-        if (order as Order) {
+        if (msg.content?.event === 'Snapshot' && order as Order) {
           updateOrderInfo(order)
         }
       }

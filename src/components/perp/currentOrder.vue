@@ -62,7 +62,7 @@ const getList = async () => {
 getList()
 
 const cancelOrder = async (orderId: string) => {
-  await cancelOrderById(orderId)
+  await cancelOrderById([orderId])
   getList()
   ElMessage.success(t('cancelledOrderSuccessfully'))
 }
