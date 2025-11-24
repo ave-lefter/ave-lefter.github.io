@@ -2,12 +2,16 @@
 import dayjs from 'dayjs'
 import { cancelOrderById, getActiveOrderPage } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
-
+import { Warning } from '@element-plus/icons-vue'
+import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
+const { mode } = storeToRefs(useGlobalStore())
 const perpStore = usePerpStore()
 const { t } = useI18n()
 const props = defineProps<{
   searchParams: any
 }>()
+const wsPrivateStore = usePerpWsPrivateStore()
+const { isCancelOrder } = storeToRefs(usePerpStore())
 const listData = shallowRef()
 const listStatus = ref({
   loading: false,
@@ -58,15 +62,12 @@ const getList = async () => {
     listStatus.value.loading = false
   }
 }
-
 getList()
-
-const cancelOrder = async (orderId: string) => {
-  await cancelOrderById([orderId])
+const cancelOrder = async (orderIds: string[]) => {
+  await cancelOrderById(orderIds)
   getList()
   ElMessage.success(t('cancelledOrderSuccessfully'))
 }
-
 watch(
   () => props.searchParams,
   () => {
@@ -76,6 +77,42 @@ watch(
     listStatus.value.error = false
     listStatus.value.loading = false
     getList()
+  }
+)
+// watch(
+//   () => wsPrivateStore.wsResult,
+//   (val) => {
+//     listData.value = val['trade-event']?.content?.data?.order?.filter(i=> i.status !=='CANCELED') || []
+//     perpStore.orderList = listData.value
+//   },
+//   { immediate: true, deep: true }
+// )
+watch(
+  () => isCancelOrder.value,
+  (val) => {
+    if (val) {
+      ElMessageBox.confirm('确认是否取消所有委托订单?', '取消全部委托', {
+        type: 'warning',
+        icon: markRaw(Warning),
+        confirmButtonText: t('confirm'),
+        cancelButtonText: t('cancel'),
+        customClass: `${mode.value} delete_confirm`,
+      })
+        .then(() => {
+          const ids = listData.value?.map((i) => i.id)
+          cancelOrderById(ids)
+            .then(() => {
+              ElMessage.success(t('cancelledOrderSuccessfully'))
+              getList()
+            })
+            .finally(() => {
+              isCancelOrder.value = false
+            })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
   }
 )
 </script>
@@ -167,7 +204,7 @@ watch(
           <el-button
             size="small"
             style="--el-button-active-border-color: transparent"
-            @click="cancelOrder(row.id)"
+            @click="cancelOrder([row.id])"
             >{{ t('cancel') }}</el-button
           >
         </template>

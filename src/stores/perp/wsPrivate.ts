@@ -106,6 +106,13 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
         // 更新订单信息
         if (msg.content?.event === 'Snapshot' && order as Order) {
           updateOrderInfo(order)
+        } else if(msg.content?.event === 'ORDER_UPDATE' && order as Order) {
+          const canceledOrder = order.filter((i) => i.status === 'CANCELED')
+          if(canceledOrder.length > 0){
+            perpStore.order = perpStore.order.filter((i) => !canceledOrder.includes(i.id))
+          } else {
+            perpStore.order.push(...order)
+          }
         }
       }
       }
