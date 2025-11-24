@@ -26,6 +26,9 @@ export const usePerpStore = defineStore('perp', () => {
   const collateral = ref<Collateral[]>([])
   const position = ref<Position[]>([])
   const order = ref<Order[]>([])
+  const orderList = ref([])
+
+  const isCancelOrder = shallowRef(false)
   const _perpKeys = useLocalStorage<{[key: string]: {apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string }}>('perp_keys', {})
   const totalAssets = ref<ProfitResponse>({} as ProfitResponse)
   const lastPrice = shallowRef(0)
@@ -283,6 +286,8 @@ export const usePerpStore = defineStore('perp', () => {
     contractId,
     resolution,
     getSdk,
-    resetUserInfo
+    resetUserInfo,
+    orderList,
+    isCancelOrder
   }
 })

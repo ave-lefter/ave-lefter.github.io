@@ -344,13 +344,13 @@ export interface OrderBook {
   sum: string
 }
 
-export async function cancelOrderById(orderId:string) {
+export async function cancelOrderById(orderIds:string[]) {
   const perpStore = usePerpStore()
   return api('/api/v1/private/order/cancelOrderById', {
     method: 'post',
     body: {
-      accountId:perpStore.userInfo?.id,
-      orderIdList:[orderId]
+      accountId: perpStore.userInfo?.id,
+      orderIdList: orderIds,
     },
   })
 }
