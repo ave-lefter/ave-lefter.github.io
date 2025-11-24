@@ -3,7 +3,7 @@ import Holding from '@/components/perp/holding.vue'
 import { SuffixIcon } from '#components'
 import dayjs from 'dayjs'
 import { usePerpStore } from '@/stores/perp'
-const { contractId } = storeToRefs(usePerpStore())
+const { contractId ,isCancelOrder} = storeToRefs(usePerpStore())
 const walletStore = useWalletStore()
 
 const { t } = useI18n()
@@ -72,11 +72,11 @@ const getList = async () => {}
       <div class="flex items-center justify-end gap-12px">
          <el-checkbox class="checkbox-sm" v-model="isAll" label="显示所有合约"/>
          <el-button class="close-position" v-if="selectTab == 'holding'">全部平仓</el-button>
-         <el-button class="close-position" v-else-if="selectTab == 'currentOrder' ">全部取消</el-button>
+         <el-button class="close-position" v-else-if="selectTab == 'currentOrder'" :disabled="perpStore.orderList?.length ==0" @click.stop.prevent="isCancelOrder = true">全部取消</el-button>
          <el-button class="close-position" v-else="selectTab == 'currentOrder'" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}?t=${selectTab}`)">查看全部</el-button>
       </div>
     </div>
-    <component :is="componentsMap[selectTab]" :searchParams="filteredSearchParams(selectTab)" />
+    <component :is="componentsMap[selectTab]" :searchParams="filteredSearchParams(selectTab)"/>
   </div>
 </template>
 <style lang="scss" scoped>
