@@ -32,15 +32,27 @@ const searchParams = ref({
   size: 10,
   filterContractIdList: isAll ? '': contractId.value,
 })
-
+const filteredSearchParams = (key: keyof typeof searchParams.value) => {
+  const params = { ...searchParams.value[key] }
+  if (params.filterContractIdList === 'ALL') {
+    delete params.filterContractIdList
+  }
+  for (const key in params) {
+    if (Object.prototype.hasOwnProperty.call(params, key)) {
+      if (!params[key]) {
+        delete params[key]
+      }
+    }
+  }
+  return params
+}
 watch(() => isAll.value, (val) => {
   if (val) {
-    searchParams.value.filterContractIdList= ''
+    searchParams.value.filterContractIdList = ''
   } else {
     searchParams.value.filterContractIdList = contractId.value
   }
 })
-
 const getList = async () => {}
 </script>
 
@@ -60,11 +72,11 @@ const getList = async () => {}
       <div class="flex items-center justify-end gap-12px">
          <el-checkbox class="checkbox-sm" v-model="isAll" label="显示所有合约"/>
          <el-button class="close-position" v-if="selectTab == 'holding'">全部平仓</el-button>
-         <el-button class="close-position" v-else-if="selectTab == 'currentOrder'">全部取消</el-button>
+         <el-button class="close-position" v-else-if="selectTab == 'currentOrder' ">全部取消</el-button>
          <el-button class="close-position" v-else="selectTab == 'currentOrder'" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}?t=${selectTab}`)">查看全部</el-button>
       </div>
     </div>
-    <component :is="componentsMap[selectTab]" :searchParams="searchParams" />
+    <component :is="componentsMap[selectTab]" :searchParams="filteredSearchParams(selectTab)" />
   </div>
 </template>
 <style lang="scss" scoped>
