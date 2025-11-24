@@ -5,6 +5,8 @@ import { usePerpStore } from '~/stores/perp'
 import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
 import { usePerpWsPubStore } from '~/stores/perp/wsPub'
 import StopProfitLoss from './stopProfitLoss.vue'
+import StopTable from './stopTable.vue'
+import ClosePosition from './closePosition.vue'
 
 const props = defineProps<{
   searchParams?: any
@@ -18,6 +20,9 @@ const listData = shallowRef()
 const contractLevelMap = shallowRef({})
 const stopProfitLossVisible = ref(false)
 const stopProfitLossRow = ref<any>(null)
+const stopTableVisible = ref(false)
+const orderList = shallowRef([])
+const closePositionVisible = ref(false)
 
 const typeDict = computed(() => {
   const contractMap =
@@ -33,8 +38,12 @@ const typeDict = computed(() => {
 })
 
 const filterListData = computed(() => {
-  const result = listData.value?.filter(i => {
-    if (props?.searchParams?.filterContractIdList && i.contractId === props?.searchParams?.filterContractIdList || !props.searchParams?.filterContractIdList) {
+  const result = listData.value?.filter((i) => {
+    if (
+      (props?.searchParams?.filterContractIdList &&
+        i.contractId === props?.searchParams?.filterContractIdList) ||
+      !props.searchParams?.filterContractIdList
+    ) {
       return i
     }
   })
@@ -44,6 +53,7 @@ watch(
   () => wsPrivateStore.wsResult,
   (val) => {
     listData.value = val['trade-event']?.content?.data?.position || []
+    orderList.value = val['trade-event']?.content?.data?.order || []
   },
   { immediate: true, deep: true }
 )
@@ -104,6 +114,39 @@ const showStopProfitLoss = (row) => {
   stopProfitLossRow.value = row
   stopProfitLossVisible.value = true
 }
+const stopTable = (row) => {
+  stopProfitLossRow.value = row
+  stopTableVisible.value = true
+  const isLong = row.openValue > 0
+  orderList.value = orderList.value.map((el) => {
+    // 止盈
+    const isProfit = el.type.includes('PROFIT')
+    let triggerSign = ''
+    if (isLong) {
+      triggerSign = isProfit ? '≥' : '≤'
+    } else {
+      triggerSign = isProfit ? '≤' : '≥'
+    }
+    return {
+      ...el,
+      // 做多
+      triggerSign,
+    }
+  })
+}
+const closePosition = (row, operation) => {
+  closePositionVisible.value = true
+  stopProfitLossRow.value = {
+    ...row,
+    operation,
+  }
+}
+
+const addStop = () => {
+  stopTableVisible.value = false
+  stopProfitLossVisible.value = true
+}
+
 onMounted(() => {
   wsPublicStore.send({
     type: 'unsubscribe',
@@ -128,144 +171,154 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <el-table
-    fit
-    :data="filterListData"
-    header-row-class-name="text-12px sticky top-0 z-10 font-500"
-    cell-class-name="color-[--main-text] text-12px"
-  >
-    <el-table-column :label="t('perp')" prop="perp">
-      <template #default="{ row }">
-        <div class="flex items-center text-14px lh-18px color-[--main-text] gap-4px mb-4px">
-          {{ typeDict[row.contractId] }}
-          <div
-            v-tooltip="t('autoDeleverageTips')"
-            v-if="typeof contractLevelMap[row.contractId] === 'number'"
-            class="flex items-center gap-2px [&>span]:bg-[#3b3b3b] data-[active=on]:[&>span:nth-child(1)]:bg-[#08BA4E] data-[active=on]:[&>span:nth-child(2)]:bg-[#409F4B] data-[active=on]:[&>span:nth-child(3)]:bg-[#7F8147] data-[active=on]:[&>span:nth-child(4)]:bg-[#B36844] data-[active=on]:[&>span:nth-child(5)]:bg-[#F1493F]"
-          >
-            <span
-              v-for="i in 5"
-              :key="i"
-              class="w-2px h-10px"
-              :data-active="contractLevelMap[row.contractId] > i ? 'on' : 'off'"
-            />
+  <div class="relative min-h-400px bg-[--secondary-bg]">
+    <el-table
+      fit
+      :data="filterListData"
+      header-row-class-name="text-12px sticky top-0 z-10 font-500"
+      cell-class-name="color-[--main-text] text-12px"
+    >
+      <template #empty>
+        <AveEmpty v-if="listData?.length === 0" class="pt-[40px]" />
+        <span v-else />
+      </template>
+      <el-table-column :label="t('perp')" prop="perp">
+        <template #default="{ row }">
+          <div class="flex items-center text-14px lh-18px color-[--main-text] gap-4px mb-4px">
+            {{ typeDict[row.contractId] }}
+            <div
+              v-tooltip="t('autoDeleverageTips')"
+              v-if="typeof contractLevelMap[row.contractId] === 'number'"
+              class="flex items-center gap-2px [&>span]:bg-[#3b3b3b] data-[active=on]:[&>span:nth-child(1)]:bg-[#08BA4E] data-[active=on]:[&>span:nth-child(2)]:bg-[#409F4B] data-[active=on]:[&>span:nth-child(3)]:bg-[#7F8147] data-[active=on]:[&>span:nth-child(4)]:bg-[#B36844] data-[active=on]:[&>span:nth-child(5)]:bg-[#F1493F]"
+            >
+              <span
+                v-for="i in 5"
+                :key="i"
+                class="w-2px h-10px"
+                :data-active="contractLevelMap[row.contractId] > i ? 'on' : 'off'"
+              />
+            </div>
           </div>
-        </div>
-        <div class="text-10px lh-14px" :class="getColorClass(row.openValue)">
-          {{ row.openValue > 0 ? t('long') : t('short') }} {{ row.maxLeverage }}x
-        </div>
-      </template>
-    </el-table-column>
-    <el-table-column :width="100" align="right" :label="t('amount')" prop="openSize">
-      <template #default="{ row }">
-        {{ formatNumber(row.openSize.replace('-', '')) }}
-      </template>
-    </el-table-column>
-    <el-table-column align="right" :label="t('contractValue')" prop="openValue">
-      <template #default="{ row }">
-        {{
-          formatNumber(
-            row.oraclePrice
-              ? new BigNumber(row.openSize)
-                  .multipliedBy(row.oraclePrice)
-                  .toString()
-                  .replace('-', '')
-              : row.openValue.replace('-', ''),
-            {
+          <div class="text-10px lh-14px" :class="getColorClass(row.openValue)">
+            {{ row.openValue > 0 ? t('long') : t('short') }} {{ getLeverageFromContractId(row.contractId) || row.maxLeverage }}x
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column :width="100" align="right" :label="t('amount')" prop="openSize">
+        <template #default="{ row }">
+          {{ formatNumber(row.openSize.replace('-', '')) }}
+        </template>
+      </el-table-column>
+      <el-table-column align="right" :label="t('contractValue')" prop="openValue">
+        <template #default="{ row }">
+          {{
+            formatNumber(
+              row.oraclePrice
+                ? new BigNumber(row.openSize)
+                    .multipliedBy(row.oraclePrice)
+                    .toString()
+                    .replace('-', '')
+                : row.openValue.replace('-', ''),
+              {
+                limit: 20,
+                decimals: 2,
+              }
+            )
+          }}
+        </template>
+      </el-table-column>
+      <el-table-column align="right" :label="t('entryPrice')" prop="entryPrice">
+        <template #default="{ row }">
+          {{
+            formatNumber(new BigNumber(row.openValue).div(row.openSize).toString(), {
               limit: 20,
-              decimals: 2,
-            }
-          )
-        }}
-      </template>
-    </el-table-column>
-    <el-table-column align="right" :label="t('entryPrice')" prop="entryPrice">
-      <template #default="{ row }">
-        {{
-          formatNumber(new BigNumber(row.openValue).div(row.openSize).toString(), {
-            limit: 20,
-          })
-        }}
-      </template>
-    </el-table-column>
-    <el-table-column align="right" :label="t('oraclePrice')" prop="oraclePrice">
-      <template #default="{ row }">
-        {{
-          formatNumber(row.oraclePrice, {
-            limit: 20,
-            decimals: 1,
-          })
-        }}
-      </template>
-    </el-table-column>
-    <el-table-column align="right" :label="t('estimatedLiquidationPrice')" prop="liquidatePrice">
-      <template #default="{ row }">
-        {{
-          formatNumber(row.liquidatePrice, {
-            limit: 20,
-            decimals: 1,
-          })
-        }}
-      </template>
-    </el-table-column>
-    <el-table-column align="right" :label="t('unrealizedPnl')" prop="unrealizedPnl">
-      <template #default="{ row }">
-        <div class="text-12px lh-18px flex flex-col gap-4px">
-          <span :class="getColorClass(row.unrealizedPnl)"
-            >{{ addSign(row.unrealizedPnl)
-            }}{{ formatNumber(Math.abs(row.unrealizedPnl), 2) }}</span
-          >
-          <span :class="getColorClass(row.unrealizedPnlRate)"
-            >({{ addSign(row.unrealizedPnlRate)
-            }}{{ formatNumber(Math.abs(row.unrealizedPnlRate), 2) }}%)</span
-          >
-        </div>
-      </template>
-    </el-table-column>
-    <el-table-column align="right" :label="t('fundingFee')" prop="fundingFee">
-      <template #default="{ row }">
-        {{ formatNumber(row.fundingFee, 2) }}
-      </template>
-    </el-table-column>
-    <el-table-column align="right" :label="t('takeProfitStopLoss')" prop="takeProfitStopLoss">
-      <template #default="{ row }">
-        <template v-if="row.openTp || row.openSl">
-          <span class="color-[--up-color]">{{
-            formatNumber(row.openTp.triggerPrice, {
+            })
+          }}
+        </template>
+      </el-table-column>
+      <el-table-column align="right" :label="t('oraclePrice')" prop="oraclePrice">
+        <template #default="{ row }">
+          {{
+            formatNumber(row.oraclePrice, {
               limit: 20,
               decimals: 1,
             })
-          }}</span
-          ><span class="color-[--icon-color] mx-4px">/</span
-          ><span class="color-[--down-color]">
-            {{
-              formatNumber(row.openSl.triggerPrice, {
-                limit: 20,
-                decimals: 1,
-              })
-            }}
-          </span>
+          }}
         </template>
-        <el-button
-          size="small"
-          style="--el-button-active-border-color: transparent"
-          @click="showStopProfitLoss(row)"
-          v-else
-        >
-          + {{ $t('add') }}
-        </el-button>
-      </template>
-    </el-table-column>
-    <el-table-column align="right" :label="t('closePosition')" prop="closePosition">
-      <template #default="{ row }">
-        <el-button size="small" style="--el-button-active-border-color: transparent">
-          {{ $t('limit') }}
-        </el-button>
-        <el-button size="small" style="--el-button-active-border-color: transparent">
-          {{ $t('market') }}
-        </el-button>
-      </template>
-    </el-table-column>
-  </el-table>
+      </el-table-column>
+      <el-table-column align="right" :label="t('estimatedLiquidationPrice')" prop="liquidatePrice">
+        <template #default="{ row }">
+          {{
+            formatNumber(row.liquidatePrice, {
+              limit: 20,
+              decimals: 1,
+            })
+          }}
+        </template>
+      </el-table-column>
+      <el-table-column align="right" :label="t('unrealizedPnl')" prop="unrealizedPnl">
+        <template #default="{ row }">
+          <div class="text-12px lh-18px flex flex-col gap-4px">
+            <span :class="getColorClass(row.unrealizedPnl)"
+              >{{ addSign(row.unrealizedPnl)
+              }}{{ formatNumber(Math.abs(row.unrealizedPnl), 2) }}</span
+            >
+            <span :class="getColorClass(row.unrealizedPnlRate)"
+              >({{ addSign(row.unrealizedPnlRate)
+              }}{{ formatNumber(Math.abs(row.unrealizedPnlRate), 2) }}%)</span
+            >
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column align="right" :label="t('fundingFee')" prop="fundingFee">
+        <template #default="{ row }">
+          {{ formatNumber(row.fundingFee, 2) }}
+        </template>
+      </el-table-column>
+      <el-table-column align="right" :label="t('takeProfitStopLoss')" prop="takeProfitStopLoss">
+        <template #default="{ row }">
+          <el-button
+            v-if="orderList.length > 0"
+            size="small"
+            style="--el-button-active-border-color: transparent"
+            @click="stopTable(row)"
+          >
+            {{ $t('detail') }}
+          </el-button>
+          <el-button
+            size="small"
+            style="--el-button-active-border-color: transparent"
+            @click="showStopProfitLoss(row)"
+          >
+            + {{ $t('add') }}
+          </el-button>
+        </template>
+      </el-table-column>
+      <el-table-column align="right" :label="t('closePosition')" prop="closePosition">
+        <template #default="{ row }">
+          <el-button
+            size="small"
+            style="--el-button-active-border-color: transparent"
+            @click="closePosition(row, 'limit')"
+          >
+            {{ $t('limit') }}
+          </el-button>
+          <el-button
+            size="small"
+            style="--el-button-active-border-color: transparent"
+            @click="closePosition(row, 'market')"
+          >
+            {{ $t('market') }}
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
   <StopProfitLoss v-model:visible="stopProfitLossVisible" :row="stopProfitLossRow" />
+  <StopTable :orderList="orderList" v-model:visible="stopTableVisible" @add="addStop" />
+  <ClosePosition
+    :token="typeDict[stopProfitLossRow?.contractId]"
+    :row="stopProfitLossRow || {}"
+    v-model:visible="closePositionVisible"
+  />
 </template>

@@ -1611,5 +1611,11 @@
   "depositComplete": "Deposit transaction confirmed",
   "thisWeek": "This Week",
   "autoDeleverageTips": "The current position in the auto deleverage sequence is represented by a solid bar. The more solid bars, the higher the likelihood of your position being automatically deleveraged.",
-  "stopTips":"*Due to rapid market changes, the stop trigger price should not be too close to the estimated liquidation price to avoid failure to trigger"
+  "stopTips":"*Due to rapid market changes, the stop trigger price should not be too close to the estimated liquidation price to avoid failure to trigger",
+  "No":"No",
+  "marketClose":"Market Close",
+  "limitClose":"Limit Close",
+  "all2":"All",
+  "closePrice":"Close Price",
+  "midPrice":"Mid Price"
 }

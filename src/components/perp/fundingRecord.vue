@@ -2,9 +2,16 @@
 import { SuffixIcon } from '#components'
 import dayjs from 'dayjs'
 import { getAllOrdersPage } from '~/api/perp'
+import { useStorage } from '@vueuse/core'
 
 const { t } = useI18n()
 const listData = shallowRef<any[]>([])
+const listStatus = ref({
+  loading: false,
+  finished: false,
+  error: false,
+})
+const offsetData = ref('')
 const typeDict = computed(() => ({
   ORDER_TYPE_NORMAL_DEPOSIT: {
     value: 'ORDER_TYPE_NORMAL_DEPOSIT',
@@ -35,10 +42,10 @@ const typeDict = computed(() => ({
     label: t('internalDeposit'),
   },
 }))
-const searchParams = ref({
+const searchParams = useStorage('fundingRecord', {
   typeList: 'ALL',
-  startTime: '',
-  endTime: '',
+  startTime: dayjs().subtract(7, 'd').startOf('day').unix(),
+  endTime: dayjs().endOf('day').unix(),
 })
 const typeOptions = computed(() =>
   [{ label: t('all'), value: 'ALL' }].concat(Object.values(typeDict.value))
@@ -68,27 +75,52 @@ const disabledEndDate = (date: Date) => {
 }
 
 const getList = async () => {
+  if (listStatus.value.loading || listStatus.value.finished) {
+    return
+  }
   const params = Object.create(null)
   Object.keys(searchParams.value).forEach((key: string) => {
     const val = searchParams.value[key] as any
     if (val) {
-      if (['startTime', 'endTime'].includes(key)) {
-        params[key] = val * 1000
-      } else if (val !== 'ALL') {
+      if (val !== 'ALL') {
         params[key] = val
       }
     }
   })
-  const res = await getAllOrdersPage({
-    ...params,
-    size: 10,
-  })
-  listData.value = res?.dataList || []
+  if (offsetData.value) {
+    params.offsetData = offsetData.value
+  }
+  try {
+    listStatus.value.loading = true
+    const res = await getAllOrdersPage(params)
+    let list = res.dataList || []
+    if (offsetData.value) {
+      list = listData.value.concat(list)
+    }
+    if (!res.nextPageOffsetData) {
+      listStatus.value.finished = true
+    }
+    offsetData.value = res.nextPageOffsetData
+    listData.value = list
+  } catch (error) {
+    listStatus.value.error = true
+    ElMessage.error(error.message)
+    console.error(error)
+  } finally {
+    listStatus.value.loading = false
+  }
 }
 
-onMounted(() => {
+getList()
+
+const reset = () => {
+  offsetData.value = ''
+  listData.value = []
+  listStatus.value.finished = false
+  listStatus.value.error = false
+  listStatus.value.loading = false
   getList()
-})
+}
 </script>
 
 <template>
@@ -99,7 +131,7 @@ onMounted(() => {
       class="[&&]:[--el-select-width:110px]"
       popper-class="[--el-font-size-base:12px]"
       :suffix-icon="SuffixIcon"
-      @change="getList"
+      @change="reset"
     >
       <template #prefix>
         <span>{{ t('type') }}</span>
@@ -122,7 +154,8 @@ onMounted(() => {
         :placeholder="t('startTime')"
         value-format="X"
         :teleported="false"
-        @change="getList"
+        :clearable="false"
+        @change="reset"
       />
       {{ $t('to') }}
       <el-date-picker
@@ -135,61 +168,78 @@ onMounted(() => {
         :placeholder="t('endTime2')"
         value-format="X"
         :teleported="false"
-        @change="getList"
+        :clearable="false"
+        @change="reset"
       />
     </div>
   </div>
-  <el-table
-    :data="listData"
-    header-row-class-name="text-12px sticky top-0 z-10 font-500"
-    cell-class-name="color-[--main-text] text-12px"
+  <div
+    class="relative min-h-400px bg-[--secondary-bg]"
+    v-infinite-scroll="getList"
+    :infinite-scroll-delay="200"
+    :infinite-scroll-disabled="listStatus.loading || listStatus.finished || listStatus.error"
+    :infinite-scroll-immediate="false"
+    :infinite-scroll-distance="300"
   >
-    <el-table-column :label="t('tradeTime')" prop="time">
-      <template #default="{ row }">
-        {{ dayjs(row.time * 1000).format('YYYY-MM-DD HH:mm:ss') }}
+    <el-table
+      :data="listData"
+      header-row-class-name="text-12px sticky top-0 z-10 font-500"
+      cell-class-name="color-[--main-text] text-12px"
+    >
+      <template #empty>
+        <AveEmpty v-if="!listStatus.loading && listData?.length === 0" class="pt-[40px]" />
+        <span v-else />
       </template>
-    </el-table-column>
-    <el-table-column :label="t('recordType')" prop="recordType">
-      <template #default="{ row }">
-        {{ typeDict[row.type as keyof typeof typeDict]?.label }}
-      </template>
-    </el-table-column>
-    <el-table-column :label="t('status')" prop="status">
-      <template #default="{ row }">
-        <span :class="row.status === 6 ? 'color-[--up-color]' : 'color-[--down-color]'">
-          {{ statusDict[row.status as keyof typeof statusDict] || t('failed') }}
-        </span>
-      </template>
-    </el-table-column>
-    <el-table-column :label="t('amount')" prop="amount">
-      <template #default="{ row }">
-        {{ formatNumber(row.amount) }}
-      </template>
-    </el-table-column>
-    <el-table-column :label="t('tokenName')" prop="coin" />
-    <el-table-column :label="t('fee')" prop="fee">
-      <template #default="{ row }">
-        <template v-if="row.fee || row.fee === 0">${{ formatNumber(row.fee) }}</template>
-        <template v-else>--</template>
-      </template>
-    </el-table-column>
-    <el-table-column :label="t('chain')" prop="chain" />
-    <el-table-column :label="t('counterpartyAccount')" prop="transferSenderAccountId">
-      <template #default="{ row }">
-        {{ counterpartyAccount(row.transferSenderAccountId, row.transferReceiverAccountId) }}
-      </template>
-    </el-table-column>
-    <el-table-column :label="t('tradeId')" prop="txId">
-      <template #default="{ row }">
-        <div class="flex items-center gap-4px">
-          {{ row.txId.slice(0, 4) + '...' + row.txId.slice(-4)
-          }}<Icon
-            name="custom:share1"
-            class="color-[--third-text] hover:color-[--main-text] cursor-pointer"
-            @click="jumpToTx(row.chainId, row.txId)"
-          />
-        </div>
-      </template>
-    </el-table-column>
-  </el-table>
+      <el-table-column :label="t('tradeTime')" prop="time">
+        <template #default="{ row }">
+          {{ dayjs(row.time * 1000).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="t('recordType')" prop="recordType">
+        <template #default="{ row }">
+          {{ typeDict[row.type as keyof typeof typeDict]?.label }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="t('status')" prop="status">
+        <template #default="{ row }">
+          <span :class="row.status === 6 ? 'color-[--up-color]' : 'color-[--down-color]'">
+            {{ statusDict[row.status as keyof typeof statusDict] || t('failed') }}
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="t('amount')" prop="amount">
+        <template #default="{ row }">
+          {{ formatNumber(row.amount) }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="t('tokenName')" prop="coin" />
+      <el-table-column :label="t('fee')" prop="fee">
+        <template #default="{ row }">
+          <template v-if="row.fee || row.fee === 0">${{ formatNumber(row.fee) }}</template>
+          <template v-else>--</template>
+        </template>
+      </el-table-column>
+      <el-table-column :label="t('chain')" prop="chain" />
+      <el-table-column :label="t('counterpartyAccount')" prop="transferSenderAccountId">
+        <template #default="{ row }">
+          {{ counterpartyAccount(row.transferSenderAccountId, row.transferReceiverAccountId) }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="t('tradeId')" prop="txId">
+        <template #default="{ row }">
+          <div class="flex items-center gap-4px">
+            {{ row.txId.slice(0, 4) + '...' + row.txId.slice(-4)
+            }}<Icon
+              name="custom:share1"
+              class="color-[--third-text] hover:color-[--main-text] cursor-pointer"
+              @click="jumpToTx(row.chainId, row.txId)"
+            />
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div class="mt-[2px] mb-[5px] py-[10px] text-[12px] text-center color-[--third-text]">
+      <span v-if="listStatus.loading && offsetData">{{ t('loading') }}</span>
+    </div>
+  </div>
 </template>

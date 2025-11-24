@@ -10,8 +10,18 @@ const props = defineProps<{
 const perpStore = usePerpStore()
 const themeStore = useThemeStore()
 const { t } = useI18n()
-const formData = ref({})
-const tempData = ref({})
+const formData = ref({
+  size: undefined,
+})
+const tempData = ref({
+  tpPrice: '',
+  slPrice: '',
+  tpType: 'market',
+  slType: 'market',
+  tpPercent: 0,
+  slPercent: 0,
+  sizePercent: 0,
+})
 // {
 //   "price": "0",
 //   "size": "0.001",
@@ -51,6 +61,10 @@ const typeDict = computed(() => {
   contractMap.ALL = t('all')
   return contractMap
 })
+
+const sizePercentChange = (val: number) => {
+  formData.value.size = (val / 100) * (props.row.openSize ? Math.abs(props.row.openSize) : 0)
+}
 </script>
 
 <template>
@@ -86,13 +100,17 @@ const typeDict = computed(() => {
     <div>
       <el-dropdown trigger="click">
         <span class="flex items-center gap-4px cursor-pointer">
-          <span>市价止盈</span>
+          <span>{{ tempData.tpType === 'market' ? t('marketStop') : t('limitStop') }}</span>
           <SuffixIcon />
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item>{{ t('marketStop') }}</el-dropdown-item>
-            <el-dropdown-item>{{ t('limitStop') }}</el-dropdown-item>
+            <el-dropdown-item @click="tempData.tpType = 'market'">{{
+              t('marketStop')
+            }}</el-dropdown-item>
+            <el-dropdown-item @click="tempData.tpType = 'limit'">{{
+              t('limitStop')
+            }}</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -100,46 +118,56 @@ const typeDict = computed(() => {
         <el-input class="flex-1" :placeholder="t('triggerPrice')">
           <template #suffix>
             <el-dropdown trigger="click">
-              <span class="flex items-center gap-4px cursor-pointer">
-                <span>最新</span>
+              <span class="flex items-center gap-4px cursor-pointer text-12px">
+                <span>{{
+                  tempData.tpPrice === 'latest' ? t('latestPrice') : t('indexPrice')
+                }}</span>
                 <SuffixIcon />
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item>{{ t('latestPrice') }}</el-dropdown-item>
-                  <el-dropdown-item>{{ t('indexPrice') }}</el-dropdown-item>
+                  <el-dropdown-item @click="tempData.tpPrice = 'latest'">{{
+                    t('latestPrice')
+                  }}</el-dropdown-item>
+                  <el-dropdown-item @click="tempData.tpPrice = 'index'">{{
+                    t('indexPrice')
+                  }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
           </template>
         </el-input>
-        <el-input class="w-100px" :placeholder="t('RIO')">
+        <el-input class="w-100px text-12px" :placeholder="t('RIO')">
           <template #suffix> % </template>
         </el-input>
       </div>
       <el-slider
-        v-model="tempData.percent"
+        v-model="tempData.tpPercent"
         :min="0"
         :max="200"
         :step="1"
         :marks="{
-          0: '0',
-          50: '50',
-          100: '100',
-          150: '150',
-          200: '200',
+          0: '0%',
+          50: '50%',
+          100: '100%',
+          150: '150%',
+          200: '200%',
         }"
-        class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] mx-4px"
+        class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
       />
       <el-dropdown trigger="click">
         <span class="flex items-center gap-4px mt-49px cursor-pointer">
-          <span>市价止盈</span>
+          <span>{{ tempData.slType === 'market' ? t('marketStop') : t('limitStop') }}</span>
           <SuffixIcon />
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item>{{ t('marketStop') }}</el-dropdown-item>
-            <el-dropdown-item>{{ t('limitStop') }}</el-dropdown-item>
+            <el-dropdown-item @click="tempData.slType = 'market'">{{
+              t('marketStop2')
+            }}</el-dropdown-item>
+            <el-dropdown-item @click="tempData.slType = 'limit'">{{
+              t('limitStop2')
+            }}</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -147,61 +175,71 @@ const typeDict = computed(() => {
         <el-input class="flex-1" :placeholder="t('triggerPrice')">
           <template #suffix>
             <el-dropdown trigger="click">
-              <span class="flex items-center gap-4px cursor-pointer">
-                <span>最新</span>
+              <span class="flex items-center gap-4px cursor-pointer text-12px">
+                <span>{{
+                  tempData.slPrice === 'latest' ? t('latestPrice') : t('indexPrice')
+                }}</span>
                 <SuffixIcon />
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item>{{ t('latestPrice') }}</el-dropdown-item>
-                  <el-dropdown-item>{{ t('indexPrice') }}</el-dropdown-item>
+                  <el-dropdown-item @click="tempData.slPrice = 'latest'">{{
+                    t('latestPrice')
+                  }}</el-dropdown-item>
+                  <el-dropdown-item @click="tempData.slPrice = 'index'">{{
+                    t('indexPrice')
+                  }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
           </template>
         </el-input>
-        <el-input class="w-100px" :placeholder="t('RIO')">
+        <el-input class="w-100px text-12px" :placeholder="t('RIO')">
           <template #suffix> % </template>
         </el-input>
       </div>
       <el-slider
-        v-model="tempData.percent"
+        v-model="tempData.slPercent"
         :min="0"
         :max="200"
         :step="1"
         :marks="{
-          0: '0',
-          50: '50',
-          100: '100',
-          150: '150',
-          200: '200',
+          0: '0%',
+          50: '50%',
+          100: '100%',
+          150: '150%',
+          200: '200%',
         }"
-        class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] mx-4px"
+        class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
       />
       <div class="mt-53px mb-16px">
-        <el-input :placeholder="t('orderSize')" />
+        <el-input :placeholder="t('orderSize')" v-model="formData.size" />
       </div>
       <el-slider
-        v-model="tempData.percent"
+        v-model="tempData.sizePercent"
         :min="0"
         :max="200"
         :step="1"
         :marks="{
-          0: '0',
-          50: '50',
-          100: '100',
-          150: '150',
-          200: '200',
+          0: '0%',
+          50: '50%',
+          100: '100%',
+          150: '150%',
+          200: '200%',
         }"
-        class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] mx-4px"
+        class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
+        @change="sizePercentChange"
       />
       <div class="mt-53px flex items-center justify-between">
         <span class="color-[--third-text]">{{ t('contractSize') }}</span>
-        <span>{{ props.row.openSize }}{{ typeDict[props.row.contractId].replace('USD', '') }}</span>
+        <span
+          >{{ Math.abs(props.row.openSize)
+          }}{{ typeDict[props.row.contractId].replace('USD', '') }}</span
+        >
       </div>
       <div class="mt-16px mb-40px flex items-center justify-between">
         <span class="color-[--third-text]">{{ t('orderSize') }}</span>
-        <span>{{ props.row.openSize }}{{ typeDict[props.row.contractId].replace('USD', '') }}</span>
+        <span>{{ formData.size }}{{ typeDict[props.row.contractId].replace('USD', '') }}</span>
       </div>
       <div class="flex">
         <el-button class="h-30px flex-1 m-l-auto" :color="themeStore.isDark ? '#333' : '#F2F2F2'">

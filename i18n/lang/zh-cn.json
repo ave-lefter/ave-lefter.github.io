@@ -1628,5 +1628,11 @@
   "limitStop":"限价止盈",
   "marketStop2":"市价止损",
   "limitStop2":"限价止损",
-  "stopTips":"*由于行情变动快，止损触发价不宜离预估强平价过近，避免触发失败"
+  "stopTips":"*由于行情变动快，止损触发价不宜离预估强平价过近，避免触发失败",
+  "No":"编号",
+  "marketClose":"市价平仓",
+  "limitClose":"限价平仓",
+  "all2":"全仓",
+  "closePrice":"平仓价格",
+  "midPrice":"中间价"
 }

@@ -27,6 +27,7 @@ import { UniChainsV4 } from './wallet/utils/abi'
 import type { MessageHandler } from 'element-plus'
 export * from './wallet/utils/index'
 import CryptoJS from 'crypto-js'
+import { usePerpStore } from '~/stores/perp'
 
 export function isJSON(str: string) {
   try {
@@ -1308,4 +1309,16 @@ export function sendNotify(result: any) {
     // 我们可以让步的使用常规模态的 alert
     // alert('Hi!')
   }
+}
+
+
+export function getLeverageFromContractId(contractId: string) {
+  const perpStore = usePerpStore()
+  const userInfo = perpStore.userInfo
+  const contractIdToTradeSetting = userInfo?.contractIdToTradeSetting
+  const tradeSetting = contractIdToTradeSetting?.[contractId]
+  if (tradeSetting && tradeSetting?.isSetMaxLeverage) {
+    return tradeSetting?.maxLeverage || perpStore.perp?.defaultLeverage
+  }
+  return perpStore.perp?.defaultLeverage
 }
