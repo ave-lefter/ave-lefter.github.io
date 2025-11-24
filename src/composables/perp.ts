@@ -1,9 +1,81 @@
 import Perp from '@/components/header/connectWallet/perp/index.vue'
 import Deposit from '@/components/header/connectWallet/perp/deposit.vue'
 import Withdraw from '@/components/header/connectWallet/perp/withdraw.vue'
+import { usePerpStore } from '~/stores/perp'
+import BigNumber from 'bignumber.js'
 
 export function usePerp() {
   const dialogVisible = ref(false)
+  const perpStore = usePerpStore()
+
+  const perpPositions = computed(() => {
+    const positions = perpStore.position || []
+    const contractList = perpStore.contractList
+    return positions?.map?.(i => {
+      const contract = contractList.find(item => item.contractId === i.contractId)
+      const price = contract?.oraclePrice || 0
+      const value = new BigNumber(price || 0).times(new BigNumber(i?.openSize || 0))
+      const riskTierList = contract?.riskTierList || []
+      const maintenanceMarginRequirementObj = riskTierList?.find?.(j => new BigNumber(value).lte(j?.positionValueUpperBound || 0))
+      const initialMarginRequirementObj = riskTierList?.find?.(j => new BigNumber(i.openValue || 0).lte(j?.positionValueUpperBound || 0))
+      return {
+        ...i,
+        ...contract,
+        maintenanceMarginRequirementObj,
+        initialMarginRequirementObj
+      }
+    })
+  })
+
+  const prepBalance = computed(() => {
+    const amount = perpStore.collateral?.[0]?.amount || 0
+    const positionsAmount = perpPositions.value.reduce((prev, cur) => {
+      const price = cur?.oraclePrice || 0
+      let value = new BigNumber(price || 0).times(new BigNumber(cur?.openSize || 0))
+      if (new BigNumber(price).isZero()) {
+        value = new BigNumber(cur?.openValue || 0)
+      }
+      return prev.plus(value)
+    }, new BigNumber(0))
+    return new BigNumber(amount).plus(positionsAmount).toFixed(2)
+  })
+
+  const unrealizedPnl = computed(() => {
+    return perpPositions.value.reduce((prev, cur) => {
+      // const contract = contractList.find(item => item.contractId === cur.contractId)
+      const oraclePrice = cur?.oraclePrice || 0
+      const profit = Number(cur?.openValue) >= 0
+        ? new BigNumber(oraclePrice).times(new BigNumber(cur?.openSize || 0).abs()).minus(new BigNumber(cur.openValue).abs())
+        : new BigNumber(cur.openValue || 0).abs().minus(new BigNumber(oraclePrice).times(new BigNumber(cur.openSize).abs()))
+      // const _unrealizedPnl = profit.minus(new BigNumber(cur.openFee || 0).abs()).minus(new BigNumber(cur.fundingFee || 0).abs()).toFixed()
+      return prev.plus(profit)
+    }, new BigNumber(0)).toFixed()
+  })
+
+  const initMarginRequirement = computed(() => {
+    return perpPositions.value.reduce((prev, cur) => {
+      const price = cur?.oraclePrice || 0
+      const openSize = cur?.openSize || 0
+      // const maintenanceMarginRate = cur.initialMarginRequirementObj?.maintenanceMarginRate || 1
+      const maxLeverage = cur.initialMarginRequirementObj?.maxLeverage || 1
+      const initialMarginRate = new BigNumber(1).div(maxLeverage)
+      const value = new BigNumber(price || 0).times(new BigNumber(openSize))
+      const _initialMarginRequirement = initialMarginRate.times(value.abs())
+      return prev.plus(_initialMarginRequirement)
+    }, new BigNumber(0)).toFixed()
+  })
+
+  const maintenanceMarginRequirement = computed(() => {
+    return perpPositions.value.reduce((prev, cur) => {
+      const price = cur?.oraclePrice || 0
+      const openSize = cur?.openSize || 0
+      const maintenanceMarginRate = cur.maintenanceMarginRequirementObj?.maintenanceMarginRate || 1
+      const value = new BigNumber(maintenanceMarginRate).times(openSize).times(price)
+      return prev.plus(value)
+    }, new BigNumber(0)).toFixed()
+  })
+
+
   function login() {
     const { $dialog } = useNuxtApp()
     dialogVisible.value = true
@@ -109,6 +181,10 @@ export function usePerp() {
 
   return {
     dialogVisible,
+    prepBalance,
+    unrealizedPnl,
+    initMarginRequirement,
+    maintenanceMarginRequirement,
     login,
     deposit,
     withdraw

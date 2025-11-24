@@ -72,6 +72,7 @@ const scrollbarHeight = computed(() => {
   if (globalStore.tokenHistoryVisible) {
     return 'calc(100vh - 190px)'
   }
+  return ''
 })
 const height = computed(() => {
   return tokenStore.commonHeight - 190
