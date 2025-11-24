@@ -17,10 +17,10 @@
         >
             <!-- 整行渐变背景 -->
             <div
-              class="absolute inset-0 pointer-events-none"
+              class="absolute inset-0 pointer-events-none mb-1px"
               :style="{
                 backgroundColor: getFullRowGradient(row),
-                transform: `scaleX(${getAmountBarWidthPercent(row)})`,
+                transform: `scaleX(${getAmountBarWidthPercent(row, index)})`,
                 transformOrigin: 'right',
               }"
             />
@@ -66,7 +66,7 @@ const props = defineProps<{
 }>()
 const { t } = useI18n()
 const filterTableList = computed(() => {
-  return  props.list?.length >0?  props.list :  Array.from({ length: 200 }, () => ({ price: '0', size: '0', sum: '0' }));
+  return  props.list?.length >0? (props.type=='sell'? props.list?.reverse(): props.list) :  Array.from({ length: 200 }, () => ({ price: '0', size: '0', sum: '0' }));
 })
 // 整行渐变背景（优化版本）
 function getFullRowGradient(row: OrderBook) {
@@ -79,9 +79,19 @@ function getFullRowGradient(row: OrderBook) {
   }
   return map[str] || map['true-true']
 }
-function getAmountBarWidthPercent(row: OrderBook) {
-  const maxSum = Math.max(...filterTableList.value.map(i => Number(i.sum)))
-  const width = Math.min(Number(row.sum) / maxSum, 1)
+function getAmountBarWidthPercent(row: OrderBook, $index) {
+  // const maxSum = Math.max(...filterTableList.value.map(i => Number(i.sum)))
+  const totalSum = filterTableList.value.reduce((acc, item) => {
+    return acc + Number(item.sum);
+  }, 0)
+  const currentSum = filterTableList.value.reduce((acc, item, index) => {
+    if (index < $index) {
+    return acc + Number(item.sum);
+  }
+  return acc;
+  }, 0)
+  const width = props.type=='sell'? Math.min(Number(totalSum - currentSum) / totalSum, 1):  Math.min(Number(currentSum) / totalSum, 1)
+
   return width.toFixed(3)
 }
 // 新增：固定小数位格式化方法
