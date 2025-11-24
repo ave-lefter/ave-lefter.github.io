@@ -175,7 +175,9 @@ onMounted(() => {
       <div class="flex items-center justify-between">
         <span class="text-12px lh-18px color-[--secondary-text]">{{ t('maxDrawdown') }}</span>
         <span class="text-14px lh-18px color-[--main-text]">{{
-          totalAssets.maxDrawdown === '-1' ? '--' : totalAssets.maxDrawdown
+          totalAssets.maxDrawdown === '-1'
+            ? '--'
+            : formatNumber(totalAssets.maxDrawdown, 4) * 100 + '%'
         }}</span>
       </div>
     </div>

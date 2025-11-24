@@ -112,6 +112,10 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
             perpStore.order = perpStore.order.filter((i) => !canceledOrder.includes(i.id))
           } else {
             perpStore.order.push(...order)
+            // 更新持仓
+            if(position?.length > 0){
+              updatePositionInfo(position)
+            }
           }
         }
       }
