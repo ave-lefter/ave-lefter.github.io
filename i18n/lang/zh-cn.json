@@ -790,6 +790,7 @@
   "noAlert": "下次不再提醒",
   "quickBuyMsg": "你即将买入{s}，买入金额为{a} {m}",
   "signal": "信号广场",
+  "marketNav": "市场导航",
   "poolPair": "配对",
   "tokenGroup": "代币分组",
   "customToken": "自选",

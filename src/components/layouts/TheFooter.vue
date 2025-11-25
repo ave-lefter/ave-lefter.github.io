@@ -14,7 +14,8 @@
         <span class="color-[--secondary-text]">{{ showPrice.symbol }}</span>
         <span :class="`${showPrice.isUp ? 'color-[--up-color]' : 'color-[--down-color]'}`">{{'$'+formatDec(showPrice?.current_price_usd || 0, 2)}}</span>
       </NuxtLink>
-       <el-popover popper-style="padding: 12px;min-width: 132px" width="132" placement="top" :teleported="false">
+
+      <el-popover popper-style="padding: 12px;min-width: 132px" width="132" placement="top" :teleported="false">
         <template #reference>
           <Icon name="custom:set-up" class="text-12px ml-2px color-[--main-text]" />
         </template>
@@ -36,6 +37,8 @@
           </NuxtLink>
         </div>
       </el-popover>
+
+
       <div class="flex items-center gap-4px mx-12px cursor-pointer hover:color-[--main-text]" :class="dragPumpStore.visible?'color-[--main-text]':'color-[--secondary-text]'" @click="dragPumpStore.visible=!dragPumpStore.visible">
         <Icon name="custom:pump-icon"/>
         {{ $t('pump1') }}
@@ -48,7 +51,7 @@
         <div
           id="monitor"
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
-          :class="visible?'color-[--main-text]':'color-[--secondary-text]'" 
+          :class="visible?'color-[--main-text]':'color-[--secondary-text]'"
           @click="visible=!visible"
         >
           <Icon
@@ -60,7 +63,7 @@
       <el-badge :is-dot="isDoted">
         <div
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
-          :class="signalStore.signalVisible?'color-[--main-text]':'color-[--secondary-text]'" 
+          :class="signalStore.signalVisible?'color-[--main-text]':'color-[--secondary-text]'"
           @click="signalStore.signalVisible=!signalStore.signalVisible"
         >
           <Icon
@@ -69,6 +72,18 @@
           {{ $t('signal') }}
         </div>
       </el-badge>
+      <el-popover popper-style="padding: 0;border-radius: 8px;" width="auto" :visible="true" placement="top" :teleported="false" trigger="hover">
+        <template #reference>
+          <div
+            class="flex items-center gap-4px cursor-pointer hover:color-[--main-text] ml-12px"
+            :class="'color-[--secondary-text]'"
+          >
+            <Icon name="mdi:compass" class="text-14px" />
+            {{ $t('marketNav') }}
+          </div>
+        </template>
+        <MarketNav />
+      </el-popover>
     </div>
     <ul class="right">
       <li class="color-[--secondary-text] hover:color-[--main-text]">
@@ -140,7 +155,6 @@
 </template>
 
 <script setup lang='tsx'>
-import ring from '@/assets/audio/ring.wav'
 import { cloneDeep, first, throttle  } from 'lodash-es'
 import { formatDec } from '~/utils/formatNumber'
 import { getTokensPrice } from '@/api/token'
@@ -305,13 +319,13 @@ function signalToast(val:GetSignalV2ListResponse) {
     icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
     placement:globalStore.audioSettings.notice.position as any,
     message:()=>(
-      <div 
+      <div
         class='inline-flex items-center gap-4px text-12px cursor-pointer'
         onClick={()=>{
         navigateTo(`/token/${val.token}-${val.chain}`)
         }}
       >
-         {actionsCount === 1 && <UserAvatar 
+         {actionsCount === 1 && <UserAvatar
             wallet_logo={{logo:firstAction?.wallet_logo,name:firstAction?.wallet_alias}}
             address={firstAction.wallet_address}
             chain={val.chain}
@@ -321,11 +335,11 @@ function signalToast(val:GetSignalV2ListResponse) {
             formatNumber(actionsVol,1)
           }{
             firstAction.quote_token_symbol.toUpperCase() === 'USDC'
-              ? 'U' 
+              ? 'U'
               : firstAction.quote_token_symbol
           }</span>{t('of')}
         <TokenImg row={{logo_url:val.logo,chain:'',symbol:val.symbol}} token-class="w-16px h-16px" />
-        {val.symbol} 
+        {val.symbol}
       </div>
     )
   })
@@ -360,13 +374,13 @@ function monitorToast(val:IMonitorWsResponse[]) {
       icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
       placement:globalStore.audioSettings.notice.position as any,
       message:()=>(
-        <div 
+        <div
           class='inline-flex items-center gap-4px text-12px cursor-pointer'
           onClick={()=>{
             navigateTo(`/token/${getIsBuy(item)?item.to_address:item.from_address}-${item.chain}`)
           }}
         >
-          <UserAvatar 
+          <UserAvatar
               wallet_logo={{logo:item.maker_logo,name:item.maker_alias}}
               address={item.maker_address}
               chain={item.chain}

@@ -783,6 +783,7 @@
   "noAlert": "No reminder next time",
   "quickBuyMsg": "You are about to buy {s}, and the purchase amount is {a} {m}",
   "signal": "Signal Plaza",
+  "marketNav": "Market Nav",
   "poolPair": "Pair",
   "tokenGroup": "Token grouping",
   "follow": "Follow",
