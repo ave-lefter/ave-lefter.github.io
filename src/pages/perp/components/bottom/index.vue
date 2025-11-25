@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import Holding from '@/components/perp/holding.vue'
+import ClosePositionDialog from './closePositionDialog.vue'
 import { usePerpStore } from '@/stores/perp'
 import { useStorage } from '@vueuse/core'
-const { contractId, isCancelOrder } = storeToRefs(usePerpStore())
+
+const { contractId, isCancelOrder, position } = storeToRefs(usePerpStore())
 const walletStore = useWalletStore()
 const { t } = useI18n()
 const perpStore = usePerpStore()
+const dialogVisible= shallowRef(true)
 const tabs = computed(() => {
   return [
     { label: t('holding'), value: 'holding' },
@@ -87,7 +90,7 @@ const getList = async () => {}
       </div>
       <div class="flex items-center justify-end gap-12px">
         <el-checkbox class="checkbox-sm" v-model="isAll" label="显示所有合约" />
-        <el-button class="close-position" v-if="selectTab == 'holding'">全部平仓</el-button>
+        <el-button class="close-position" v-if="selectTab == 'holding'"   :disabled="position?.length == 0" @click.stop.prevent="dialogVisible = true">全部平仓</el-button>
         <el-button
           class="close-position"
           v-else-if="selectTab == 'currentOrder'"
@@ -106,6 +109,7 @@ const getList = async () => {}
       </div>
     </div>
     <component :is="componentsMap[selectTab]" :searchParams="filteredSearchParams(selectTab)" />
+    <close-position-dialog v-model="dialogVisible" />
   </div>
 </template>
 <style lang="scss" scoped>
