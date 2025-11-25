@@ -98,11 +98,11 @@
               @click.stop="showDirectionPop = !showDirectionPop"
             >
               <template v-if="form.direction == 'up'">
-                <Icon class="text-16px" name="custom:arrow-up" />
+                <Icon class="text-16px color-[--up-color]" name="custom:arrow-up" />
                 <span class="ml-4px mr-4px">{{ $t('gtPrice') }}</span>
               </template>
               <template v-else>
-                <Icon class="text-16px" name="custom:arrow-down" />
+                <Icon class="text-16px color-[--down-color]" name="custom:arrow-down" />
                 <span class="ml-4px mr-4px">{{ $t('ltPrice') }}</span>
               </template>
               <Icon

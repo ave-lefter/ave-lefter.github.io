@@ -13,23 +13,28 @@
     </template>
     <div class="content">
       <ul>
-        <li class="mb-20px" v-for="(item, $index) in position" :key="$index">
+        <li class="mb-15px" v-for="(item, $index) in position" :key="$index">
           <div>
-            <span>卖</span> <span class="ml-5px"> {{ typeDict[item.contractId] }}</span>
-            <span class="ml-5px">
+            <span class="bg-[--up-color] rounded-4px px-2px text-10px">{{ $t('buy1') }}</span>
+            <span class="ml-5px text-14px color-[--third-text]">
+              {{ typeDict[item.contractId] }}</span
+            >
+            <span class="ml-5px color-[--secondary-text] text-12px">
               {{ getLeverageFromContractId(item.contractId) || item.maxLeverage }}x</span
             >
           </div>
-          <div class="flex-between">
-            <span>数量</span>
-            {{ formatNumber(item.openSize.replace('-', '')) }}
+          <div class="flex-between mt-5px">
+            <span class="color-[--secondary-text] text-12px">{{ $t('amount') }}</span>
+            <span class="color-[--third-text] text-12px">{{
+              formatNumber(item.openSize.replace('-', ''))
+            }}</span>
           </div>
         </li>
       </ul>
 
       <el-alert
         type="warning"
-        title="您的市价平仓可能会造成价格波动，请确认后继续您的交易"
+        :title="$t('closePositionTip')"
         :closable="false"
         show-icon
         :style="{
@@ -77,9 +82,7 @@ const typeDict = computed(() => {
   contractMap.ALL = t('all')
   return contractMap
 })
-function submit() {
-    
- }
+function submit() {}
 </script>
 
 <style lang="scss" scoped></style>

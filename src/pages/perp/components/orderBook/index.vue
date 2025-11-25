@@ -43,6 +43,7 @@
             :class="[
               'shrink-0 px-2px py-2px rounded-1px border-none cursor-pointer text-16px leading-none h-16px w-16px flex items-center',
             ]"
+            v-tooltip="tab.label"
             @click="activeLayoutTab = tab.value"
           >
             <Icon
@@ -145,15 +146,15 @@
           <div
             class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px mt-8px mb-4px text-12px color-[--d-5A5E64-l-A9B0BC]"
           >
-            <div class="min-w-0 text-left">价格({{ quote?.coinName }})</div>
+            <div class="min-w-0 text-left">{{ $t('price') }}({{ quote?.coinName }})</div>
             <div class="text-right text-nowrap min-w-0">
               <div class="flex items-center justify-end gap-2px">
-                <span>数量({{ unit?.coinName }})</span>
+                <span>{{ $t('amount') }}({{ unit?.coinName }})</span>
               </div>
             </div>
             <div class="text-right text-nowrap min-w-0">
               <div class="flex items-center justify-end gap-2px">
-                <span>累计({{ unit?.coinName }})</span>
+                <span>{{ $t('total') }}({{ unit?.coinName }})</span>
               </div>
             </div>
           </div>
@@ -172,13 +173,16 @@
             >
             <Icon
               class="text-16px"
+              :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
               :name="`custom:${Number(perp?.priceChange) > 0 ? 'arrow-up' : 'arrow-down'}`"
             />
             <div class="flex-1"></div>
-            <Icon class="text-14px color-[--third-text]" name="custom:perp-flag" />
-            <span class="text-12px color-[--third-text] ml-4px">
-              {{ formatNumber(perp?.oraclePrice || 0) }}</span
-            >
+            <div class="flex-end border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('oraclePriceTooltip')">
+              <Icon class="text-14px color-[--third-text]" name="custom:perp-flag" />
+              <span class="text-12px color-[--third-text] ml-4px">
+                {{ formatNumber(perp?.oraclePrice || 0) }}</span
+              >
+            </div>
           </div>
           <List
             v-if="activeLayoutTab == 'all' || activeLayoutTab == 'buy'"
@@ -192,7 +196,7 @@
       <div
         class="range-container z-10 absolute bottom-0 py-16px px-10px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]"
       >
-        <span class="text-10px color-[--up-color]">买</span>
+        <span class="text-10px color-[--up-color]">{{ $t('buy1') }}</span>
         <div class="range ml-4px mr-4px">
           <span class="left" :style="{ width: formatNumber(progress || 0, 1) + '%' }">
             {{ formatNumber(progress, 1) }}%
@@ -201,22 +205,22 @@
             {{ formatNumber(100 - progress, 1) }}%
           </span>
         </div>
-        <span class="text-10px color-[--down-color]">卖</span>
+        <span class="text-10px color-[--down-color]">{{ $t('sell1') }}</span>
       </div>
     </template>
      <div v-else class="mx-12px pb-12px">
       <div
         class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px mt-8px mb-4px text-12px color-[--d-5A5E64-l-A9B0BC]"
       >
-        <div class="min-w-0 text-left">价格({{ quote?.coinName }})</div>
+        <div class="min-w-0 text-left">{{ $t('price') }}({{ quote?.coinName }})</div>
         <div class="text-right text-nowrap min-w-0">
           <div class="flex items-center justify-end gap-2px">
-            <span>数量({{ base?.coinName }})</span>
+            <span>{{ $t('amount') }}({{ base?.coinName }})</span>
           </div>
         </div>
         <div class="text-right text-nowrap min-w-0">
           <div class="flex items-center justify-end gap-2px">
-            <span>时间</span>
+            <span>{{ $t('time') }}</span>
           </div>
         </div>
       </div>
@@ -272,11 +276,11 @@ const tableView = ref({
 const tabs = computed(() => {
   return [
     {
-      label: '订单薄',
+      label: t('orderBook'),
       value: 'orderbook',
     },
     {
-      label: '最近交易',
+      label: t('lastTx'),
       value: 'history',
     },
   ]
@@ -284,15 +288,15 @@ const tabs = computed(() => {
 const tabsLayout = computed(() => {
   return [
     {
-      label: '订单薄',
+      label: t('orderBook'),
       value: 'all',
     },
     {
-      label: '买入',
+      label: t('buy'),
       value: 'buy',
     },
     {
-      label: '卖出',
+      label: t('sell'),
       value: 'sell',
     },
   ]
@@ -302,7 +306,7 @@ const height = computed(() => {
   if(activeTab.value === 'history') {
     return (h - 100)
   } else if (activeLayoutTab.value === 'all') {
-    return (h - 100) / 2
+    return (h - 100 - 55-60 ) / 2
   } else {
     return h - 200
   }

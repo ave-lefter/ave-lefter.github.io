@@ -17,7 +17,7 @@
         >
             <!-- 整行渐变背景 -->
             <div
-              class="absolute inset-0 pointer-events-none mb-1px"
+              class="absolute inset-0 pointer-events-none mb-2px"
               :style="{
                 backgroundColor: getFullRowGradient(row),
                 transform: `scaleX(${getAmountBarWidthPercent(row, index)})`,
