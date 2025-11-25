@@ -313,7 +313,7 @@ onUnmounted(() => {
     @add="addStop"
   />
   <ClosePosition
-    :token="typeDict[stopProfitLossRow?.contractId]"
+    :token="typeDict[stopProfitLossRow?.contractId] || ''"
     :row="stopProfitLossRow || {}"
     v-model:visible="closePositionVisible"
   />
