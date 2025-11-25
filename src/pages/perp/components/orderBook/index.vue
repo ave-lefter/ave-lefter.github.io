@@ -235,7 +235,7 @@ import History from './history.vue'
 import { usePerpWsPubStore } from '@/stores/perp/wsPub'
 import { usePerpStore } from '@/stores/perp'
 import { type Trade, type CoinInfo } from '@/api/types/perp'
-const { contractId, perp, resolution, metadata } = storeToRefs(usePerpStore())
+const { contractId, perp, resolution, metadata, unit ,unitList, base, quote} = storeToRefs(usePerpStore())
 const perpWsPubStore = usePerpWsPubStore()
 import { DecimalExtensions } from "@/utils/decimalExtensions"
 import BigNumber from "bignumber.js"
@@ -253,7 +253,6 @@ const level = shallowRef(200)
 const wsBuyCache = ref<OrderBook[]>([])
 const wsSellCache = ref<OrderBook[]>([])
 const showUnitPop = shallowRef(false)
-const unit = ref<CoinInfo | null>(null)
 const step = shallowRef(0)
 const showStepPop = shallowRef(false)
 const historyList = ref<Trade[]>([])
@@ -309,22 +308,7 @@ const height = computed(() => {
   }
 })
 
-const coinList = computed(() => {
-  return metadata?.value?.coinList || []
-})
 
-const base = computed(() => {
-  const baseCoinId = perp.value?.baseCoinId || ''
-    console.log('---baseCoinId-----------',baseCoinId)
-  return coinList.value?.find((i) => i.coinId == baseCoinId) ?? null
-})
-const quote = computed(() => {
-  const quoteCoinId = perp.value?.quoteCoinId || ''
-  return coinList.value?.find((i) => i.coinId == quoteCoinId) ?? null
-})
-const unitList = computed(() => {
-  return [base.value, quote.value]?.filter(Boolean)
-})
 
 const stepSizeList = computed(() => {
   return perp.value?.displayDigitMerge?.split(',') || []
