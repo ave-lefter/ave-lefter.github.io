@@ -25,9 +25,9 @@ import type { Size, SizeObj, pumpObjColor } from '~/api/types/pump'
 import FingerprintJs from '@fingerprintjs/fingerprintjs'
 import { UniChainsV4 } from './wallet/utils/abi'
 import type { MessageHandler } from 'element-plus'
-export * from './wallet/utils/index'
 import CryptoJS from 'crypto-js'
 import { usePerpStore } from '~/stores/perp'
+export * from './wallet/utils/index'
 
 export function isJSON(str: string) {
   try {
@@ -788,8 +788,8 @@ export function getMCap(row: GetHotTokensResponse | SearchHot) {
   return amount.gt(0) ? amount.multipliedBy(row.current_price_usd).toString() : '0'
 }
 
-export function formatCountdown(time: ConfigType, isSecond = true) {
-  const seconds = Math.abs(dayjs(time).diff(dayjs(), 's'))
+export function formatCountdown(time: ConfigType, isSecond = true,defaultSeconds?:number) {
+  const seconds = defaultSeconds || Math.abs(dayjs(time).diff(dayjs(), 's'))
   if (seconds < 60) {
     return `${seconds}s`
   } else if (seconds < 3600) {
@@ -1269,7 +1269,7 @@ export function sendNotify(result: any) {
     lang: localStorage.getItem('language') || 'en',
   }
   if (window.Notification && Notification.permission === 'granted') {
-    var n = new Notification($i18n.t('alerts'), options)
+    const n = new Notification($i18n.t('alerts'), options)
     n.onclick = (event) => {
       event.preventDefault() // 阻止浏览器聚焦于 Notification 的标签页
       window.open(
@@ -1289,7 +1289,7 @@ export function sendNotify(result: any) {
 
       // 如果用户同意了
       if (status === 'granted') {
-        var n = new Notification($i18n.t('alerts'), options)
+        const n = new Notification($i18n.t('alerts'), options)
         n.onclick = (event) => {
           event.preventDefault() // 阻止浏览器聚焦于 Notification 的标签页
           window.open(

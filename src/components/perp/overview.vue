@@ -105,9 +105,7 @@ onMounted(() => {
           }}
           USDT</span
         >
-        <span
-          class="text-12px lh-16px color-[--secondary-text]"
-          :class="getColorClass(totalAssets.profit)"
+        <span class="text-12px lh-16px" :class="getColorClass(totalAssets.profit)"
           >({{
             formatNumber(+totalAssets.profitRate * 100, {
               limit: 20,
