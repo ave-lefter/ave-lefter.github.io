@@ -2,7 +2,6 @@
 import { SuffixIcon } from '#components'
 import dayjs from 'dayjs'
 import { usePerpStore } from '~/stores/perp'
-import { useStorage } from '@vueuse/core'
 const route = useRoute()
 const { t } = useI18n()
 const perpStore = usePerpStore()
@@ -23,8 +22,7 @@ const componentsMap = {
   positionHistory: defineAsyncComponent(() => import('./positionHistory.vue')),
 }
 const selectTab = ref(route.query.t && route.query.t !== 'holding' ? route.query.t : 'currentOrder')
-const searchParams = useStorage(
-  'perp-orders-searchParams',
+const searchParams = ref(
   Object.keys(componentsMap).reduce(
     (prev, cur) => {
       prev[cur] = {

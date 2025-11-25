@@ -4,7 +4,6 @@ import dayjs from 'dayjs'
 import { BigNumber } from 'tronweb'
 import { getPositionTransactionPage, type PositionTransactionPageResponse } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
-import { useStorage } from '@vueuse/core'
 
 const perpStore = usePerpStore()
 const { t } = useI18n()
@@ -15,7 +14,7 @@ const listStatus = ref({
   error: false,
 })
 const offsetData = ref('')
-const searchParams = useStorage('fundingRate', {
+const searchParams = ref({
   filterTypeList: 'SETTLE_FUNDING_FEE',
   filterContractIdList: 'ALL',
   filterStartCreatedTimeInclusive: dayjs().subtract(7, 'd').startOf('day').unix(),
