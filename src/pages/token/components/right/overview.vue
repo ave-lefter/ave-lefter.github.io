@@ -280,10 +280,12 @@ const showAll = ref(false)
 const totalTokens = ref(0)
 const active = shallowRef(props.isRank ? 'col' : 'grid')
 const activeTab = shallowRef('info')
-const headerTabs = [
-  { id: 'info', name: t('tokenInfo') },
-  { id: 'devBit', name: t('devTokens') },
-]
+const headerTabs = computed(() => {
+  return [
+    { id: 'info', name: t('tokenInfo') },
+    { id: 'devBit', name: t('devTokens') }
+  ]
+})
 const tabs = [
   { id: 'grid', icon: 'grid', name: 'grid' },
   { id: 'col', icon: 'col', name: 'col' },
