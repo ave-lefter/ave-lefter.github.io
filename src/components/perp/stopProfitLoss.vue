@@ -113,7 +113,7 @@ const sizePercentChange = (val: number) => {
             <SuffixIcon />
           </span>
           <template #dropdown>
-            <el-dropdown-menu>
+            <el-dropdown-menu class="[--el-font-size-base:12px]">
               <el-dropdown-item @click="tpForm.type = 'TAKE_PROFIT_MARKET'">{{
                 t('marketStop')
               }}</el-dropdown-item>
@@ -141,7 +141,7 @@ const sizePercentChange = (val: number) => {
                   <SuffixIcon />
                 </span>
                 <template #dropdown>
-                  <el-dropdown-menu>
+                  <el-dropdown-menu class="[--el-font-size-base:12px]">
                     <el-dropdown-item @click="tpForm.triggerPriceType = 'LAST_PRICE'">{{
                       t('latestPrice')
                     }}</el-dropdown-item>
@@ -175,7 +175,7 @@ const sizePercentChange = (val: number) => {
             150: '150%',
             200: '200%',
           }"
-          class="mb-30px [&&]:[--el-slider-button-size:8px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
+          class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
         />
         <el-input-number
           v-if="tpForm.type === 'TAKE_PROFIT_LIMIT'"
@@ -193,7 +193,7 @@ const sizePercentChange = (val: number) => {
             <SuffixIcon />
           </span>
           <template #dropdown>
-            <el-dropdown-menu>
+            <el-dropdown-menu class="[--el-font-size-base:12px]">
               <el-dropdown-item @click="slForm.type = 'STOP_MARKET'">{{
                 t('marketStop2')
               }}</el-dropdown-item>
@@ -221,7 +221,7 @@ const sizePercentChange = (val: number) => {
                   <SuffixIcon />
                 </span>
                 <template #dropdown>
-                  <el-dropdown-menu>
+                  <el-dropdown-menu class="[--el-font-size-base:12px]">
                     <el-dropdown-item @click="slForm.triggerPriceType = 'LAST_PRICE'">{{
                       t('latestPrice')
                     }}</el-dropdown-item>
@@ -255,7 +255,7 @@ const sizePercentChange = (val: number) => {
             150: '150%',
             200: '200%',
           }"
-          class="mb-30px [&&]:[--el-slider-button-size:8px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
+          class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
         />
         <el-input-number
           v-if="slForm.type === 'STOP_LIMIT'"
@@ -294,7 +294,7 @@ const sizePercentChange = (val: number) => {
             75: '75%',
             100: '100%',
           }"
-          class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
+          class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
           @change="sizePercentChange"
         />
         <div class="mt-53px flex items-center justify-between">
@@ -322,6 +322,11 @@ const sizePercentChange = (val: number) => {
 </template>
 <style scoped lang="scss">
 :deep(.el-slider__marks-text) {
-  margin-top: 7px;
+  margin-top: 10px;
+}
+:deep(.el-slider__marks-stop) {
+  width: 8px;
+  height: 8px;
+  top: -3px;
 }
 </style>
