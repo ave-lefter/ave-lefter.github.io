@@ -1537,5 +1537,6 @@
   "favoritesGroup": "Favorite Groups",
   "groupDetails": "Group details",
   "batchDelete": "Batch Delete",
-  "removeTokenTips": "Delete the selected following?"
+  "removeTokenTips": "Delete the selected following?",
+  "blackListPlaceHolder": "Enter developer address, token contract, and keywords"
 }

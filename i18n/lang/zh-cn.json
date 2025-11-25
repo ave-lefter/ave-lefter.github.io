@@ -1535,5 +1535,6 @@
   "favoritesGroup": "自选分组",
   "groupDetails": "分组详情",
   "batchDelete": "批量删除",
-  "removeTokenTips": "是否删除所选关注?"
+  "removeTokenTips": "是否删除所选关注?",
+  "blackListPlaceHolder": "输入开发者地址、代币合约和关键词"
 }

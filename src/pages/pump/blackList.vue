@@ -30,7 +30,7 @@
           ref="inputSearch"
           v-model.trim="query"
           class="search-input px-20px"
-          :placeholder="$t('enterAddress/token')"
+          :placeholder="$t('blackListPlaceHolder')"
           clearable
           autofocus
           size="large"
@@ -111,7 +111,8 @@
           <ul class="content1 mb-20px">
             <li v-for="(row, $index) in list" :key="$index">
               <a href="" class="flex no-underline h-50px" @click.stop.prevent>
-                <div>{{ row.address }}</div>
+                <div class="flex-start" v-if="row.type == 'dev' || row.type == 'ca'">{{ row.address?.slice(0,4) + '...'+ row.address?.slice(-4)}}<Icon v-copy="row.address" name="bxs:copy" class="ml-5px clickable color-[--third-text]" @click.stop.prevent /></div>
+                <div v-else>{{ row.address }}</div>
                 <div>
                   <template v-if="row.type == 'dev'">{{ $t('dev') }}</template>
                   <template v-else-if="row.type == 'ca'">{{ $t('ca') }}</template>
@@ -227,6 +228,7 @@ function add(item: { value:  'dev' | 'ca' | 'keyword' }) {
       return
     }
   }
+  visible_popper.value = false
   if (pumpBlackList.value) {
     const findIndex = pumpBlackList.value?.findIndex(
       (i) => query.value == i.address && i.type == item.value
