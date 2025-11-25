@@ -103,7 +103,7 @@
                       v-if="row?.network || row?.chain"
                       class="icon-svg icon-symbol"
                       :src="`${token_logo_url}chain/${row.chain}.png`"
-                      :width="10"
+                      :width="12"
                       alt=""
                       onerror="this.src='/icon-default.png'"
                       srcset=""
@@ -370,8 +370,8 @@ async function getRugPullList() {
     margin-right: 4px;
     .icon-symbol {
       position: absolute;
-      left: 15px;
-      top: 15px;
+      left: 17px;
+      top: 17px;
     }
   }
 }
