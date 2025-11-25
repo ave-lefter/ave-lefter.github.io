@@ -8,7 +8,7 @@ const { contractId, isCancelOrder, position } = storeToRefs(usePerpStore())
 const walletStore = useWalletStore()
 const { t } = useI18n()
 const perpStore = usePerpStore()
-const dialogVisible= shallowRef(true)
+const dialogVisible= shallowRef(false)
 const tabs = computed(() => {
   return [
     { label: t('holding'), value: 'holding' },

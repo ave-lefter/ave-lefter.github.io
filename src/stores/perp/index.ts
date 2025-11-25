@@ -6,6 +6,7 @@ import { useLocalStorage } from '@vueuse/core'
 import { usePerpWsPubStore } from './wsPub'
 import { usePerpWsPrivateStore } from './wsPrivate'
 import type { Collateral, Order, Position } from './type'
+import { type CoinInfo } from '@/api/types/perp'
 
 type PerpMetadata = Awaited<ReturnType<typeof _getPerpMetadata>>
 type UserInfo = Awaited<ReturnType<typeof onboardSite>>['dataList'][0]
@@ -33,6 +34,7 @@ export const usePerpStore = defineStore('perp', () => {
   const totalAssets = ref<ProfitResponse>({} as ProfitResponse)
   const lastPrice = shallowRef(0)
   const resolution = useLocalStorage('tv_resolution', '15')
+  const unit = ref<CoinInfo | null>(null)
 
   const apiKeys = computed(() => {
     if (!walletStore.address) {
@@ -68,6 +70,22 @@ export const usePerpStore = defineStore('perp', () => {
   })
   const contractId = computed(() => {
     return perp?.value?.contractId || '10000001'
+  })
+
+  const coinList = computed(() => {
+    return metadata?.value?.coinList || []
+  })
+
+  const base = computed(() => {
+    const baseCoinId = perp.value?.baseCoinId || ''
+    return coinList.value?.find((i) => i.coinId == baseCoinId) ?? null
+  })
+  const quote = computed(() => {
+    const quoteCoinId = perp.value?.quoteCoinId || ''
+    return coinList.value?.find((i) => i.coinId == quoteCoinId) ?? null
+  })
+  const unitList = computed(() => {
+    return [base.value, quote.value]?.filter(Boolean)
   })
   function getPerpMetadata() {
     loadingPerpMetadata.value = true
@@ -288,6 +306,10 @@ export const usePerpStore = defineStore('perp', () => {
     getSdk,
     resetUserInfo,
     orderList,
-    isCancelOrder
+    isCancelOrder,
+    unit,
+    unitList,
+    base,
+    quote
   }
 })
