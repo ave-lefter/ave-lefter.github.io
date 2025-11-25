@@ -1,22 +1,22 @@
 <script setup lang="ts">
 import Holding from '@/components/perp/holding.vue'
-import { SuffixIcon } from '#components'
-import dayjs from 'dayjs'
 import { usePerpStore } from '@/stores/perp'
-const { contractId ,isCancelOrder} = storeToRefs(usePerpStore())
+import { useStorage } from '@vueuse/core'
+const { contractId, isCancelOrder } = storeToRefs(usePerpStore())
 const walletStore = useWalletStore()
-
 const { t } = useI18n()
 const perpStore = usePerpStore()
-const tabs = ref([
-   {label:t('holding'),value:'holding'},
-  { label: t('currentOrder'), value: 'currentOrder' },
-  { label: t('conditionOrder'), value: 'conditionOrder' },
-  { label: t('orderDetail'), value: 'orderDetail' },
-  { label: t('historyOrder'), value: 'historyOrder' },
-  { label: t('closePnl'), value: 'closePnl' },
-  { label: t('positionHistory'), value: 'positionHistory' },
-])
+const tabs = computed(() => {
+  return [
+    { label: t('holding'), value: 'holding' },
+    { label: t('currentOrder'), value: 'currentOrder' },
+    // { label: t('conditionOrder'), value: 'conditionOrder' },
+    { label: t('orderDetail'), value: 'orderDetail' },
+    { label: t('historyOrder'), value: 'historyOrder' },
+    { label: t('closePnl'), value: 'closePnl' },
+    { label: t('positionHistory'), value: 'positionHistory' },
+  ]
+})
 const componentsMap = {
   holding: Holding,
   currentOrder: defineAsyncComponent(() => import('@/components/perp/currentOrder.vue')),
@@ -28,10 +28,23 @@ const componentsMap = {
 }
 const selectTab = ref('holding')
 const isAll = shallowRef(true)
-const searchParams = ref({
-  size: 10,
-  filterContractIdList: isAll ? '': contractId.value,
-})
+const searchParams = useStorage(
+  'perp-kline-searchParams',
+  Object.keys(componentsMap).reduce(
+    (prev, cur) => {
+      prev[cur] = {
+        filterContractIdList: 'ALL',
+      }
+      return prev
+    },
+    {} as Record<
+      string,
+      {
+        filterContractIdList: string
+      }
+    >
+  )
+)
 const filteredSearchParams = (key: keyof typeof searchParams.value) => {
   const params = { ...searchParams.value[key] }
   if (params.filterContractIdList === 'ALL') {
@@ -46,13 +59,16 @@ const filteredSearchParams = (key: keyof typeof searchParams.value) => {
   }
   return params
 }
-watch(() => isAll.value, (val) => {
-  if (val) {
-    searchParams.value.filterContractIdList = ''
-  } else {
-    searchParams.value.filterContractIdList = contractId.value
+watch(
+  () => isAll.value,
+  (val) => {
+    if (val) {
+      searchParams.value[selectTab.value].filterContractIdList = 'ALL'
+    } else {
+      searchParams.value[selectTab.value].filterContractIdList = contractId.value
+    }
   }
-})
+)
 const getList = async () => {}
 </script>
 
@@ -70,17 +86,30 @@ const getList = async () => {}
         >
       </div>
       <div class="flex items-center justify-end gap-12px">
-         <el-checkbox class="checkbox-sm" v-model="isAll" label="显示所有合约"/>
-         <el-button class="close-position" v-if="selectTab == 'holding'">全部平仓</el-button>
-         <el-button class="close-position" v-else-if="selectTab == 'currentOrder'" :disabled="perpStore.orderList?.length ==0" @click.stop.prevent="isCancelOrder = true">全部取消</el-button>
-         <el-button class="close-position" v-else="selectTab == 'currentOrder'" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}?t=${selectTab}`)">查看全部</el-button>
+        <el-checkbox class="checkbox-sm" v-model="isAll" label="显示所有合约" />
+        <el-button class="close-position" v-if="selectTab == 'holding'">全部平仓</el-button>
+        <el-button
+          class="close-position"
+          v-else-if="selectTab == 'currentOrder'"
+          :disabled="perpStore.orderList?.length == 0"
+          @click.stop.prevent="isCancelOrder = true"
+          >全部取消</el-button
+        >
+        <el-button
+          class="close-position"
+          v-else="selectTab == 'currentOrder'"
+          @click.stop="
+            $router.push(`/address/${walletStore.address}/${walletStore.chain}?t=${selectTab}`)
+          "
+          >查看全部</el-button
+        >
       </div>
     </div>
-    <component :is="componentsMap[selectTab]" :searchParams="filteredSearchParams(selectTab)"/>
+    <component :is="componentsMap[selectTab]" :searchParams="filteredSearchParams(selectTab)" />
   </div>
 </template>
 <style lang="scss" scoped>
-.close-position{
+.close-position {
   height: 24px;
   font-size: 12px;
 }
