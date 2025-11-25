@@ -1,11 +1,28 @@
 <script setup lang="ts">
 import WalletAssets from './components/walletAssets.vue'
 import PerpAssets from '@/components/perp/perpAssets.vue'
-import { useStorage } from '@vueuse/core'
+import { useEventBus, useStorage } from '@vueuse/core'
+
+const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
 const route = useRoute()
 const { t } = useI18n()
 const walletStore = useWalletStore()
 const activeName = route.query.t ? ref('perp') : useStorage('assetsActive', 'wallet')
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
+}
+
+scrollTopEvent.on(() => {
+  scrollToTop()
+})
+
+onUnmounted(() => {
+  scrollTopEvent.off(scrollToTop)
+})
 </script>
 
 <template>

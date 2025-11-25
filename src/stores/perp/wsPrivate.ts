@@ -4,6 +4,7 @@ import WS, { type WSOptions } from '@/utils/ws'
 import { usePerpStore } from './index'
 import { WSPerpHost } from '@/utils/constants'
 import type { Collateral, Position, Order } from './type'
+import { profit } from '~/api/perp'
 
 function getWSMessage(e: MessageEvent): {
   sid?: string // 会话ID
@@ -108,10 +109,13 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
           updateOrderInfo(order)
         } else if(msg.content?.event === 'ORDER_UPDATE' && order as Order) {
           const canceledOrder = order.filter((i) => i.status === 'CANCELED')
+          // 取消订单
           if(canceledOrder.length > 0){
             perpStore.order = perpStore.order.filter((i) => !canceledOrder.includes(i.id))
           } else {
+            // 加仓、平仓、止盈、止损
             perpStore.order.push(...order)
+            getTotalAssets()
             // 更新持仓
             if(position?.length > 0){
               updatePositionInfo(position)
@@ -168,6 +172,11 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
 
   function updateOrderInfo(order: Order[]) {
     perpStore.order = order
+  }
+
+  async function getTotalAssets() {
+    const res = await profit()
+    perpStore.totalAssets = res || {}
   }
 
   return {
