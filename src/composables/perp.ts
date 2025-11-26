@@ -1,8 +1,10 @@
 import Perp from '@/components/header/connectWallet/perp/index.vue'
 import Deposit from '@/components/header/connectWallet/perp/deposit.vue'
 import Withdraw from '@/components/header/connectWallet/perp/withdraw.vue'
+import CreateOrder from '~/pages/perp/components/right/createOrder.vue'
 import { usePerpStore } from '~/stores/perp'
 import BigNumber from 'bignumber.js'
+import type { PerpOrderParams } from '~/api/perp/typs'
 
 export function usePerp() {
   const dialogVisible = ref(false)
@@ -140,7 +142,6 @@ export function usePerp() {
         }
       }
     })
-
   }
 
   function withdraw() {
@@ -179,6 +180,47 @@ export function usePerp() {
     })
   }
 
+  // const createOrderDialogTitle = ref('')
+  function createPerpOrder(orderParams: PerpOrderParams) {
+    const { $dialog } = useNuxtApp()
+    // const $t = getGlobalT()
+    dialogVisible.value = true
+    $dialog.show({
+      content: {
+        is: CreateOrder,
+        props: {
+          'onSuccess': () => {
+            $dialog.hide()
+          },
+          'onCancel': () => {
+            $dialog.hide()
+          },
+          getVisible: () => dialogVisible,
+          orderParams
+        }
+      },
+      props: {
+        width: '450px',
+        class: 'perp-dialog',
+        title: '',
+        'onOpened': () => {
+          console.log('open')
+          dialogVisible.value = true
+          // $dialog.updateContentProps({
+          //   visible: true
+          // })
+        },
+        'onClosed': () => {
+          console.log('close')
+          dialogVisible.value = false
+          // $dialog.updateContentProps({
+          //   visible: false
+          // })
+        }
+      }
+    })
+  }
+
   return {
     dialogVisible,
     prepBalance,
@@ -187,7 +229,9 @@ export function usePerp() {
     maintenanceMarginRequirement,
     login,
     deposit,
-    withdraw
+    withdraw,
+    // createOrderDialogTitle,
+    createPerpOrder
   }
 }
 

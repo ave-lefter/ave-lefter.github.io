@@ -1,8 +1,9 @@
 import { Contract, getAddress } from 'ethers'
 import { usePerpStore } from '~/stores/perp'
-import { type ETHWithdrawInput, type CrossWithdrawInput } from '@edgex-fe/typescript-sdk'
+import { type ETHWithdrawInput, type CrossWithdrawInput, type TradeOrderParams } from '@edgex-fe/typescript-sdk'
 import { perpApi as api } from './request'
 import BigNumber from 'bignumber.js'
+import type { PerpOrderParams } from './typs'
 
 export const PerpABI = [
   "function allowance(address owner, address spender) view returns (uint256)",
@@ -141,5 +142,80 @@ export async function crossWithdraw(data: {tokenAddress: string; amount: string;
     body: params
   })
 }
+
+// 创建订单
+export async function createOrder(data: PerpOrderParams) {
+  const perpStore = usePerpStore()
+  const accountId = data?.accountId || perpStore.userInfo?.id || ''
+  const contractId = data?.contractId || ''
+  const type = data.type
+  const tradeParams: TradeOrderParams = {
+    price: type === 'LIMIT' ? data.price.toString () : '0', // Market orders pass price as 0
+    size: data?.size || '1',                  // 订单数量
+    type: type,                // 订单类型: LIMIT | MARKET
+    timeInForce: type === 'LIMIT' ? 'GOOD_TIL_CANCEL' : 'IMMEDIATE_OR_CANCEL',
+    reduceOnly: data?.reduceOnly || false,
+    isPositionTpsl: data?.isPositionTpsl || false,        // 是否为止盈止损单
+    isSetOpenTp: data?.isSetOpenTp || false,           // 是否设置开仓止盈
+    isSetOpenSl: data?.isSetOpenSl || false,           // 是否设置开仓止损
+    contractId: contractId,       // 合约ID (AVAXUSD)
+    side: data?.side,                  // 买卖方向: BUY | SELL
+    triggerPrice: data?.triggerPrice || '',             // 触发价格 (条件单)
+    triggerPriceType: data?.triggerPriceType || 'LAST_PRICE', // 触发价格类型
+    extraType: data?.extraType || '',                // 额外类型
+    extraDataJson: data?.extraDataJson || '',            // 额外数据
+    accountId: accountId, // 账户ID
+  }
+
+  const contractList = perpStore.contractList || []
+  const contractInfo = contractList.find(i => i.contractId === contractId)
+
+  const {takerFeeRate, makerFeeRate} = getFeeRate(contractId)
+  // 获取合约信息
+  const symbolInfo = {
+    contractId: data?.contractId || '',
+    symbol: contractInfo?.contractName || '',
+    contractName: contractInfo?.contractName || '',
+    oraclePrice: contractInfo?.oraclePrice || '0',
+    tickSize: contractInfo?.tickSize || '0.0001',
+    takerFeeRate: takerFeeRate,
+    makerFeeRate: makerFeeRate,
+  }
+
+  // 链信息
+  const chainInfo = {
+    chainId: '1',
+  }
+
+  // 账户信息
+  const accountInfo = {
+    accountId: accountId,
+  }
+  console.log('tradeParams', {
+    tradeParams,
+    symbolInfo,
+    chainInfo,
+    accountInfo,
+    requestPath: '/api/v1/private/order/createOrder',
+    requestMethod: 'POST',
+  })
+  const sdk = perpStore.getSdk()
+  // 生成交易参数和签名
+  const { headers, params } = await sdk.generateTradeParams({
+    tradeParams,
+    symbolInfo,
+    chainInfo,
+    accountInfo,
+    requestPath: '/api/v1/private/order/createOrder',
+    requestMethod: 'POST',
+  })
+
+  return api('/api/v1/private/order/createOrder', {
+    headers,
+    method: 'POST',
+    body: params
+  })
+}
+
 
 

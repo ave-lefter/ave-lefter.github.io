@@ -1649,5 +1649,7 @@
   "markets1": "合约",
   "closePositionTip": "您的市价平仓可能会造成价格波动，请确认后继续您的交易",
   "closePositionAll": "全部平仓",
-  "viewAll": "查看全部"
+  "viewAll": "查看全部",
+  "value1": "价值",
+  "margin": "保证金"
 }

@@ -100,7 +100,7 @@ const getContractLevelMap = async () => {
   contractLevelMap.value = res?.positionContractIdToLightNumberMap || {}
 }
 
-getContractLevelMap()
+// getContractLevelMap()
 
 const showStopProfitLoss = (row) => {
   stopProfitLossRow.value = row
@@ -150,6 +150,7 @@ onMounted(() => {
       channel: 'ticker.all.1s',
     })
   }, 500)
+  getContractLevelMap()
   timer = requestTimeout(5000, () => {
     getContractLevelMap()
   })
