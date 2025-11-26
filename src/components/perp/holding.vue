@@ -7,6 +7,7 @@ import { usePerpWsPubStore } from '~/stores/perp/wsPub'
 import StopProfitLoss from './stopProfitLoss.vue'
 import StopTable from './stopTable.vue'
 import ClosePosition from './closePosition.vue'
+import { WSPerpEventType } from '~/utils/constants'
 
 const props = defineProps<{
   searchParams?: any
