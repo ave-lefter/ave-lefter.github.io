@@ -165,7 +165,9 @@ watch(
       </el-table-column>
       <el-table-column align="right" :label="t('termCount')">
         <template #default="{ row }">
-          {{ formatTime(dayjs(+row.updatedTime).diff(dayjs(+row.createdTime), 's')) }}
+          {{
+            formatCountdown(0, false, dayjs(+row.updatedTime).diff(dayjs(+row.createdTime), 's'))
+          }}
         </template>
       </el-table-column>
       <el-table-column align="right" :label="t('openTime2')">

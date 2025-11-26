@@ -2,7 +2,6 @@
 import { SuffixIcon } from '#components'
 import dayjs from 'dayjs'
 import { getAllOrdersPage } from '~/api/perp'
-import { useStorage } from '@vueuse/core'
 
 const { t } = useI18n()
 const listData = shallowRef<any[]>([])
@@ -42,7 +41,7 @@ const typeDict = computed(() => ({
     label: t('internalDeposit'),
   },
 }))
-const searchParams = useStorage('fundingRecord', {
+const searchParams = ref({
   typeList: 'ALL',
   startTime: dayjs().subtract(7, 'd').startOf('day').unix(),
   endTime: dayjs().endOf('day').unix(),

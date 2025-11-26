@@ -192,7 +192,8 @@ onUnmounted(() => {
             </div>
           </div>
           <div class="text-10px lh-14px" :class="getColorClass(row.openValue)">
-            {{ row.openValue > 0 ? t('long') : t('short') }} {{ getLeverageFromContractId(row.contractId) || row.maxLeverage }}x
+            {{ row.openValue > 0 ? t('long') : t('short') }}
+            {{ getLeverageFromContractId(row.contractId) || row.maxLeverage }}x
           </div>
         </template>
       </el-table-column>

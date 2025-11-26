@@ -63,19 +63,29 @@ const title = computed(() => {
         150: '150%',
         200: '200%',
       }"
-      class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-406px"
+      class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-406px"
     />
     <div class="color-[--third-text] flex justify-between mt-38px mb-8px">
       {{ t('profit1') }}
       <span>- 0.98 USD</span>
     </div>
     <div class="flex mt-20px text-16px">
-      <el-button class="h-48px flex-1 m-l-auto" :color="themeStore.isDark ? '#333' : '#F2F2F2'">
+      <el-button class="h-30px flex-1 m-l-auto" :color="themeStore.isDark ? '#333' : '#F2F2F2'">
         {{ $t('reset') }}
       </el-button>
-      <el-button type="primary" class="h-48px flex-1 m-l-auto">
+      <el-button type="primary" class="h-30px flex-1 m-l-auto">
         {{ $t('confirm') }}
       </el-button>
     </div>
   </el-dialog>
 </template>
+<style scoped lang="scss">
+:deep(.el-slider__marks-text) {
+  margin-top: 10px;
+}
+:deep(.el-slider__marks-stop) {
+  width: 8px;
+  height: 8px;
+  top: -3px;
+}
+</style>
