@@ -23,8 +23,8 @@ import { TW_STUDY } from './constant'
 import dayjs from 'dayjs'
 import { _getPerpKline, type KlineInfo } from '@/api/perp/index'
 import { usePerpStore } from '@/stores/perp'
-const { contractId, contractName, resolution, perp } = storeToRefs(usePerpStore())
 import { usePerpWsPubStore } from '@/stores/perp/wsPub'
+const { contractId, contractName, resolution, perp } = storeToRefs(usePerpStore())
 const perpWsPubStore = usePerpWsPubStore()
 const props = defineProps<{
   isRank?:boolean
@@ -80,7 +80,7 @@ function switchTokenKline() {
 }
 
 const price = 0
-const wsStore = useWSStore()
+// const wsStore = useWSStore()
 const localeStore = useLocaleStore()
 
 // const marks = shallowRef([{ id: 'trade', name: '我的' }])
@@ -452,7 +452,7 @@ async function initChart() {
           return
         }
 
-        const ws =perpWsPubStore.send({ type: 'subscribe', channel: `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`})
+        const ws = perpWsPubStore.send({ type: 'subscribe', channel: `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`})
         onWsKline(resolution, onTick, ws)
         listenerGuidMap.set(`${contractId.value}.${interval}`, { type: 'subscribe', channel: `${WSPerpEventType.KLINE}.${contractId.value}.${interval}` })
       },

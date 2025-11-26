@@ -251,6 +251,9 @@ export const usePerpStore = defineStore('perp', () => {
     if (l2KeyPair.value) {
       sdk.setL2KeyPair(l2KeyPair.value)
     }
+    if (!metadata.value) {
+      return []
+    }
     return onboardSite().then(async res => {
       if (res) {
         accountList.value = res?.dataList || []

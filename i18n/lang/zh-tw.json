@@ -1616,5 +1616,9 @@
   "markets1": "合约",
   "closePositionTip": "您的市價平倉可能會造成價格波動，請確認後繼續您的交易",
   "closePositionAll": "全部平倉",
-  "viewAll": "查看全部"
+  "viewAll": "查看全部",
+  "value1": "價值",
+  "long": "做多",
+  "short": "做空",
+  "margin": "保證金"
 }

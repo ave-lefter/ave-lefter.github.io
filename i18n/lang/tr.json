@@ -529,5 +529,6 @@
   "pasteText2": "Metin içeriği otomatik doldurmayı kapatmak için tıklayın",
   "pasteAddress1": "Sözleşme adresi otomatik doldurmayı açmak için tıklayın",
   "pasteText1": "Metin içeriği otomatik tamamlamayı açmak için tıklayın",
-  "deposit": "tamamlamak"
+  "deposit": "tamamlamak",
+  "value1": "değer"
 }

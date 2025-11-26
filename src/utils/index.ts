@@ -1312,13 +1312,13 @@ export function sendNotify(result: any) {
 }
 
 
-export function getLeverageFromContractId(contractId: string) {
-  const perpStore = usePerpStore()
-  const userInfo = perpStore.userInfo
-  const contractIdToTradeSetting = userInfo?.contractIdToTradeSetting
-  const tradeSetting = contractIdToTradeSetting?.[contractId]
-  if (tradeSetting && tradeSetting?.isSetMaxLeverage) {
-    return tradeSetting?.maxLeverage || perpStore.perp?.defaultLeverage
-  }
-  return perpStore.perp?.defaultLeverage
-}
+// export function getLeverageFromContractId(contractId: string) {
+//   const perpStore = usePerpStore()
+//   const userInfo = perpStore.userInfo
+//   const contractIdToTradeSetting = userInfo?.contractIdToTradeSetting
+//   const tradeSetting = contractIdToTradeSetting?.[contractId]
+//   if (tradeSetting && tradeSetting?.isSetMaxLeverage) {
+//     return tradeSetting?.maxLeverage || perpStore.perp?.defaultLeverage
+//   }
+//   return perpStore.perp?.defaultLeverage
+// }

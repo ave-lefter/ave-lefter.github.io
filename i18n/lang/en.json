@@ -1632,5 +1632,9 @@
   "markets1": "Markets",
   "closePositionTip": "Your market close order may cause price fluctuations. Please confirm before proceeding with your trade.",
   "closePositionAll": "closeAll",
-  "viewAll": "View All"
+  "viewAll": "View All",
+  "value1": "value",
+  "long": "Long",
+  "short": "Short",
+  "margin": "Margin"
 }
