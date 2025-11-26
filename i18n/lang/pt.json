@@ -545,5 +545,7 @@
   "favoritesGroup": "Grupos favoritos",
   "groupDetails": "Detalhes do grupo",
   "batchDelete": "Exclusão em lote",
-  "removeTokenTips": "Excluir o seguinte selecionado?"
+  "removeTokenTips": "Excluir o seguinte selecionado?",
+  "pairsLink": "Vá para o navegador blockchain",
+  "searchSameAmm": "Ver pools semelhantes"
 }

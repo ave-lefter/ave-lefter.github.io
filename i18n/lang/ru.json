@@ -791,5 +791,7 @@
   "favoritesGroup": "Любимые группы",
   "groupDetails": "Детали группы",
   "batchDelete": "Пакетное удаление",
-  "removeTokenTips": "Удалить выбранное следующее?"
+  "removeTokenTips": "Удалить выбранное следующее?",
+  "pairsLink": "Перейти в блокчейн-браузер",
+  "searchSameAmm": "Посмотреть похожие бассейны"
 }

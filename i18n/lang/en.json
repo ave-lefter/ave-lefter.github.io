@@ -1538,5 +1538,7 @@
   "groupDetails": "Group details",
   "batchDelete": "Batch Delete",
   "removeTokenTips": "Delete the selected following?",
-  "blackListPlaceHolder": "Enter developer address, token contract, and keywords"
+  "blackListPlaceHolder": "Enter developer address, token contract, and keywords",
+  "pairsLink": "Jump to blockchain browser",
+  "searchSameAmm": "View similar pools"
 }

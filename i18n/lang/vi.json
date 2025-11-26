@@ -792,5 +792,7 @@
   "favoritesGroup": "Nhóm yêu thích",
   "groupDetails": "Chi tiết nhóm",
   "batchDelete": "Xóa hàng loạt",
-  "removeTokenTips": "Xóa nội dung đã chọn sau đây?"
+  "removeTokenTips": "Xóa nội dung đã chọn sau đây?",
+  "pairsLink": "Chuyển đến trình duyệt blockchain",
+  "searchSameAmm": "Xem các nhóm tương tự"
 }

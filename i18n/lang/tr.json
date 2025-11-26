@@ -540,5 +540,7 @@
   "favoritesGroup": "Favori Gruplar",
   "groupDetails": "Grup ayrıntıları",
   "batchDelete": "Toplu Silme",
-  "removeTokenTips": "Seçilen aşağıdakiler silinsin mi?"
+  "removeTokenTips": "Seçilen aşağıdakiler silinsin mi?",
+  "pairsLink": "Blockchain tarayıcısına atla",
+  "searchSameAmm": "Benzer havuzları görüntüle"
 }

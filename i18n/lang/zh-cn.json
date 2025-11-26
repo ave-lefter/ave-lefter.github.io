@@ -1536,5 +1536,7 @@
   "groupDetails": "分组详情",
   "batchDelete": "批量删除",
   "removeTokenTips": "是否删除所选关注?",
-  "blackListPlaceHolder": "输入开发者地址、代币合约和关键词"
+  "blackListPlaceHolder": "输入开发者地址、代币合约和关键词",
+  "pairsLink": "跳转区块链浏览器",
+  "searchSameAmm": "查看同类型池子"
 }
