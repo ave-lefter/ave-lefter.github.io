@@ -39,6 +39,7 @@ const token = computed(() => {
 })
 const isReady = ref(false)
 let isReadyLine = false
+let isFirst = true
 const snapshotCache = ref<Record<string, KlineInfo[]>>({})
 
 const chain = computed(() => {
@@ -375,6 +376,7 @@ async function initChart() {
           }
           loading = true
           _getPerpKline(params).then(res => {
+            isFirst = false
             const result = res?.dataList?.reverse() || []
             const bars1 = result?.map(i => ({
               ...i,
@@ -556,7 +558,8 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
     if(channel == `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`){
       // console.log('--------msg-----------',msg)
 
-      if (data?.length > 0 && !loading && dataType === 'Snapshot') {
+      if (data?.length > 0 && !loading && dataType === 'Snapshot' && isFirst) {
+
         const key = `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`
         const bars = data.reverse().map(i => ({
           time: Number(i.klineTime),
@@ -571,6 +574,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
         //   onResetCacheNeededCallback()
         // }
         bars.forEach(bar => onTick(bar));
+        isFirst = false
       }
 
       if (data?.length > 0 && !loading && dataType === 'changed') {
