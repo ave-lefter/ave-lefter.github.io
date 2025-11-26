@@ -25,7 +25,7 @@
             <span class="color-[--main-text] text-18px font-500 block">{{
               perp?.contractName
             }}</span>
-            <span class="color-[--third-text] text-12px mt-2px">永续</span>
+            <span class="color-[--third-text] text-12px mt-2px">{{ $t('perpetual') }}</span>
           </div>
           <Icon
             :name="visible ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
@@ -44,29 +44,29 @@
         :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
         >{{ formatNumber(perp?.lastPrice || 0) }}</span
       >
-      <span
+      <!-- <span
         class="text-12px block text-left mt-2px"
         :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
         >{{ formatNumber(perp?.priceChange || 0) }}&nbsp;&nbsp;{{
           formatNumber(Number(perp?.priceChangePercent) * 100 || 0)
         }}%</span
-      >
+      > -->
     </div>
     <div class="ml-16px w-0 border-l-[--icon-color] border-l-solid h-28px"></div>
     <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]">指数价格</span>
+      <span class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('indexPriceTooltip')">{{ $t('indexPrice') }}</span>
       <span class="text-12px block text-left color-[--main-text] leading-16px mt-2px">
         {{ formatNumber(perp?.indexPrice || 0) }}</span
       >
     </div>
 
     <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]">预言机价格</span>
+      <span class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('oraclePriceTooltip')">{{ $t('oraclePrice') }}</span>
       <span class="text-12px block text-left color-[--main-text] mt-2px">{{formatNumber(perp?.oraclePrice || 0)}}</span>
     </div>
 
     <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]">24h涨跌</span>
+      <span class="text-12px block text-left color-[--third-text]">{{ $t('24HChange') }}</span>
       <span
         class="text-12px block text-left color-[--main-text] mt-2px"
         :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
@@ -77,14 +77,14 @@
     </div>
 
     <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]">24h最高价</span>
+      <span class="text-12px block text-left color-[--third-text]">{{ $t('24HHighPrice') }}</span>
       <span class="text-12px block text-left color-[--secondary-text] mt-2px">{{
         formatNumber(perp?.high || 0)
       }}</span>
     </div>
 
     <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]">24h最低价</span>
+      <span class="text-12px block text-left color-[--third-text]">{{ $t('24HLowestPrice') }}</span>
       <span class="text-12px block text-left color-[--secondary-text] mt-2px">{{
         formatNumber(perp?.low || 0)
       }}</span>
@@ -92,7 +92,7 @@
 
     <div class="ml-16px">
       <span class="text-12px block text-left color-[--third-text]"
-        >24h交易额({{ perp?.quoteCoinName }})</span
+        >{{ $t('24HVolume') }}({{ perp?.quoteCoinName }})</span
       >
       <span class="text-12px block text-left color-[--secondary-text] mt-2px">{{
         formatNumber(perp?.value || 0)
@@ -101,7 +101,7 @@
 
     <div class="ml-16px">
       <span class="text-12px block text-left color-[--third-text]"
-        >24h交易量({{ perp?.baseCoinName }})</span
+        >{{ $t('24HAmount') }}({{ perp?.baseCoinName }})</span
       >
       <span class="text-12px block text-left color-[--secondary-text] mt-2px">{{
         formatNumber(perp?.size || 0)
@@ -110,7 +110,7 @@
 
     <div class="ml-16px">
       <span class="text-12px block text-left color-[--third-text]"
-        >未平仓合约({{ perp?.quoteCoinName }})</span
+        >{{ $t('openInterest') }}({{ perp?.quoteCoinName }})</span
       >
       <span class="text-12px block text-left color-[--main-text] mt-2px">{{
         perp?.openInterest
@@ -118,7 +118,7 @@
     </div>
 
     <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]">资金费率/倒计时</span>
+      <span class="text-12px block text-left color-[--third-text]">{{ $t('fundingRate') }}/{{ $t('countdown') }}</span>
       <span class="text-12px block text-left color-[--main-text] mt-2px"
         >{{ formatNumber(Number(perp?.fundingRate) * 100 || 0) }}%
 

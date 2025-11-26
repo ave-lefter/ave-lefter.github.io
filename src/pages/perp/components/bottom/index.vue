@@ -90,13 +90,13 @@ const getList = async () => {}
       </div>
       <div class="flex items-center justify-end gap-12px">
         <el-checkbox class="checkbox-sm" v-model="isAll" label="显示所有合约" />
-        <el-button class="close-position" v-if="selectTab == 'holding'"   :disabled="position?.length == 0" @click.stop.prevent="dialogVisible = true">全部平仓</el-button>
+        <el-button class="close-position" v-if="selectTab == 'holding'"   :disabled="position?.length == 0" @click.stop.prevent="dialogVisible = true">{{ $t('closePositionAll') }}</el-button>
         <el-button
           class="close-position"
           v-else-if="selectTab == 'currentOrder'"
           :disabled="perpStore.orderList?.length == 0"
           @click.stop.prevent="isCancelOrder = true"
-          >全部取消</el-button
+          >{{ $t('cancelAll') }}</el-button
         >
         <el-button
           class="close-position"
@@ -104,7 +104,7 @@ const getList = async () => {}
           @click.stop="
             $router.push(`/address/${walletStore.address}/${walletStore.chain}?t=${selectTab}`)
           "
-          >查看全部</el-button
+          >{{ $t('viewAll') }}</el-button
         >
       </div>
     </div>

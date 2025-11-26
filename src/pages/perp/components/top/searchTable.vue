@@ -1,9 +1,9 @@
 <template>
   <div class="histrory">
     <div class="top h-39px">
-      <span>合约</span>
+      <span>{{ $t('markets1') }}</span>
       <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('lastPrice')">
-        价格
+        {{ $t('price') }}
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('priceChangePercent')">
-        24H涨跌幅
+        {{ $t('24HChange') }}
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
@@ -40,7 +40,7 @@
         class="flex-end cursor-pointer select-none"
         @click.stop="switchSort('size')"
       >
-        交易量
+        {{ $t('amountB') }}
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
@@ -57,7 +57,7 @@
         </div>
       </div>
       <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('openInterest')">
-        未平仓合约
+        {{ $t('openInterest') }}
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
@@ -74,7 +74,7 @@
         </div>
       </div>
       <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('fundingRate')">
-        资金费率
+        {{ $t('fundingRate') }}
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
@@ -131,8 +131,8 @@
             <div :class="Number(row?.lastPrice ) > 0 ? 'color-[--main-text]' : ''">
               {{ formatNumber(row.lastPrice || 0) }}
             </div>
-            <div :class="Number(row.priceChangePercent )> 0 ? 'color-[--main-text]' : ''">
-              ${{ formatNumber(row?.priceChangePercent || 0, 2) }}
+            <div :class="Number(row.priceChangePercent )> 0 ? 'color-[--up-color]' : 'color-[--down-color]'">
+              {{ formatNumber( Number(row?.priceChangePercent) * 100 || 0, 2) }}%
             </div>
             <div :class="Number(row.value ) > 0 ? 'color-[--main-text]' : ''">
               ${{ formatNumber(row?.value || 0, 2) }}
