@@ -1522,5 +1522,6 @@
   "groupDetails": "分組詳情",
   "batchDelete": "批量刪除",
   "removeTokenTips": "是否刪除所選關注?",
-  "blackListPlaceHolder": "輸入開發者地址、代幣合約和關鍵字"
+  "blackListPlaceHolder": "輸入開發者地址、代幣合約和關鍵字",
+  "overLimit": "超過上限，建議確認是否誤填"
 }

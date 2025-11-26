@@ -33,8 +33,19 @@
       </div>
       <div class="tabs mt-10px">
         <button v-for="(item, index) in tabs1" :key="index" class="tab-item" type="button"  @click.stop="handleAmount(item, 'buy')">
-          <img class="mr-5px" :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" style="border-radius: 50%;" height="14"  alt="" srcset="" >
-          <span>{{ item.name }}</span>
+          <!-- <img class="mr-5px" :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" style="border-radius: 50%;" height="14"  alt="" srcset="" > -->
+          <span v-if="!editMode">{{ item.name }}</span>
+          <el-input
+            style="--el-input-inner-height:24px;--el-input-bg-color:transparent;--el-input-border-color:transparent;--el-input-hover-border-color:transparent;--el-input-focus-border-color:transparent"
+            class="text-center w-full h-full" 
+            size="small" 
+            v-model="tabs1Ref[index].value"
+            @blur="tabs1Ref[index].value = tabs1Ref[index].value?.replace?.(/\-|[^\d.]/g, '')"
+            v-else-if="tabs1Ref[index]" 
+           />
+        </button>
+        <button class="tab-item h-30px basis-[26px]! grow-0! shrink-0!" type="button" @click="handleEdit(tabs1Ref, 'buy')">
+          <Icon :name="editMode ? 'custom:select' : 'custom:remark'"/>
         </button>
       </div>
     </template>
@@ -134,7 +145,25 @@
         native-type="button"
         @click.stop="submitBotSwap"
       >
-        {{ checkAmountMessage() || (activeTab === 'buy' ? $t('buy') : ($t('sell') + (Number(amountTokenOut || 0) > 0 ? `≈ ${ formatNumber(amountTokenOut || 0) } ${tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }` : ''))) }}
+      <template v-if="checkAmountMessage()">
+            {{ checkAmountMessage() }}
+          </template>
+        <template v-else-if="!isBuyTab">
+          {{ checkAmountMessage() || (isBuyTab ? $t('buy') : ($t('sell') + (Number(amountTokenOut || 0) > 0 ? `≈ ${ formatNumber(amountTokenOut || 0) } ${tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }` : ''))) }}
+        </template>
+          <div class="flex items-center gap-4px" v-else>
+            {{$t('buy') }}
+            <span>|</span>
+            <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50%" height="12"  alt="" srcset="" >
+            <span>{{ submitAmount }}
+              <template v-if="!isUsdcUsdt">
+                (${{submitAmountUsd}})
+              </template>
+            </span>
+            <span>|</span>
+            <span>{{formatNumber(amountNativeOut || 0)}}
+            </span>
+          </div>
       </el-button>
       <BottomSetting :activeTab="activeTab" :swapType="swapType" :gasPrice="gasPrice" />
     </template>
@@ -204,6 +233,8 @@ const props = defineProps<{
   tabs2: Array<{ name: string; value: string }>
 }>()
 
+const tabs1Ref = ref(props.tabs1)
+const tabs2Ref = ref(props.tabs2)
 const emit = defineEmits(['getTokenBalance', 'update:botSettings'])
 
 const { t } = useI18n()
@@ -285,6 +316,13 @@ watch(isPriceLimit, (val) => {
       priceLimit.value = formatDec(new BigNumber(priceLimit.value || 0).div(tokenStore.circulation || 1).toFixed(), 4)
     }
   }
+})
+
+watch(()=>props.tabs1, (val) => {
+  tabs1Ref.value = val
+})
+watch(()=>props.tabs2, (val) => {
+  tabs2Ref.value = val
 })
 
 useEventBus('klineDataReady').on(() => {
@@ -419,6 +457,20 @@ const isApprove = computed(() => {
   return parsedAmount.lte(allowance.value)
 })
 
+const submitAmount = computed(()=>{
+  return formatNumber(amountNative.value,{limit:20})
+})
+
+const submitAmountUsd = computed(()=>{
+  if(!amountNative.value) return '0'
+  const result =  new BigNumber(amountNative.value).multipliedBy(tokenStore.swap.payToken.price)
+  return formatNumber(result.toString())
+})
+
+const isUsdcUsdt = computed(()=>{
+  return tokenStore.swap.payToken.symbol?.toUpperCase?.() === 'USDC' || tokenStore.swap.payToken.symbol?.toUpperCase?.() === 'USDT'
+})
+
 
 // 方法
 const handleMax = (balance: string | number, type: 'buy' | 'sell') => {
@@ -446,6 +498,7 @@ const handleMax = (balance: string | number, type: 'buy' | 'sell') => {
 }
 
 function handleAmount(item: { name: string; value: string }, type: 'buy' | 'sell') {
+  if(editMode.value) return
   if (type === 'buy') {
     amountNative.value = item.value
   } else if (type === 'sell') {
@@ -591,6 +644,10 @@ function getChain() {
 const isSupportSwap = computed(() => {
   const chain = getChain()
   return botStore.accessToken && botStore?.isSupportChains?.includes?.(chain)
+})
+
+const isBuyTab = computed(() => {
+  return props.activeTab === 'buy'
 })
 
 const _getAllowance = () => getAllowance(fromToken.value?.address || '')
@@ -1283,6 +1340,13 @@ onMounted(() => {
   }
 })
 
+const editMode = ref(false)
+function handleEdit(value,type) {
+  editMode.value = !editMode.value
+  const botSetting = (botSettingStore?.botSettings?.[chain.value]?.buy || {}) as typeof botSettingStore.botSettings.solana
+  botSettingStore.botSettings[chain.value][type][botSetting.selected].buyValueList = value.map(el=>el.value)
+}
+
 </script>
 <style lang="scss" scoped>
   .tabs {
@@ -1295,7 +1359,8 @@ onMounted(() => {
     .tab-item {
       border: 1px solid transparent;
       display: flex;
-      padding: 7px 0;
+      // padding: 7px 0;
+      line-height: 26px;
       justify-content: center;
       align-items: center;
       flex: 1;
@@ -1304,7 +1369,7 @@ onMounted(() => {
       cursor: pointer;
       color: var(--secondary-text);
       & + .tab-item {
-        margin-left: 10px;
+        margin-left: 1px;
       }
       &.active {
         border-color: transparent;
