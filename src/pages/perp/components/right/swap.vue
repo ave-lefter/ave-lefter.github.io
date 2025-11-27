@@ -24,25 +24,138 @@
           </el-dropdown>
         </template>
       </el-input>
-      <div class="mt-16px px-3px w-full">
+      <div class="mt-24px px-3px w-full">
         <el-slider
           v-model="percent"
           :min="0"
           :max="100"
           :step="1"
           :marks="{
-            0: '',
-            25: '',
-            50: '',
-            75: '',
-            100: '',
+            0: '0%',
+            25: '25%',
+            50: '50%',
+            75: '75%',
+            100: '100%',
           }"
           :format-tooltip="value => `${value}%`"
-          class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] [&&]:[--el-slider-runway-bg-color:--icon-color] slider-box"
+          class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] [&&]:[--el-slider-runway-bg-color:--icon-color] slider-box"
           @input="value => sliderInput(value as number)"
         />
       </div>
+      <el-checkbox class="checkbox-sm" v-model="isChecked" label="止盈止损" />
+      <template v-if="isChecked">
+        <div class="flex items-center gap-10px mt-8px mb-16px">
+          <!-- 止盈 -->
+          <el-input-number
+            v-model.number="tpForm.triggerPrice"
+            :controls="false"
+            align="left"
+            class="flex-1"
+            :placeholder="t('triggerPrice')"
+          >
+            <template #suffix>
+              <el-dropdown trigger="click">
+                <span class="flex items-center gap-4px cursor-pointer text-12px">
+                  <span>{{
+                    tpForm.triggerPriceType === 'LAST_PRICE' ? t('latestPrice') : t('indexPrice')
+                  }}</span>
+                  <SuffixIcon />
+                </span>
+                <template #dropdown>
+                  <el-dropdown-menu class="[--el-font-size-base:12px]">
+                    <el-dropdown-item @click="tpForm.triggerPriceType = 'LAST_PRICE'">{{
+                      t('latestPrice')
+                    }}</el-dropdown-item>
+                    <el-dropdown-item @click="tpForm.triggerPriceType = 'INDEX_PRICE'">{{
+                      t('indexPrice')
+                    }}</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </template>
+          </el-input-number>
+          <el-input-number
+            v-model.number="tempData.tpPercent"
+            :controls="false"
+            align="left"
+            class="w-50px text-12px"
+            :placeholder="t('RIO')"
+          >
+            <template #suffix> % </template>
+          </el-input-number>
+        </div>
+        <el-slider
+          v-model="tempData.tpPercent"
+          :min="0"
+          :max="200"
+          :step="1"
+          :marks="{
+            0: '0%',
+            50: '50%',
+            100: '100%',
+            150: '150%',
+            200: '200%',
+          }"
+          class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
+        />
+
+        <div class="flex items-center gap-10px mt-8px mb-16px">
+          <!-- 止损 -->
+          <el-input-number
+            v-model.number="slForm.triggerPrice"
+            :controls="false"
+            align="left"
+            class="flex-1"
+            :placeholder="t('triggerPrice')"
+          >
+            <template #suffix>
+              <el-dropdown trigger="click">
+                <span class="flex items-center gap-4px cursor-pointer text-12px">
+                  <span>{{
+                    slForm.triggerPriceType === 'LAST_PRICE' ? t('latestPrice') : t('indexPrice')
+                  }}</span>
+                  <SuffixIcon />
+                </span>
+                <template #dropdown>
+                  <el-dropdown-menu class="[--el-font-size-base:12px]">
+                    <el-dropdown-item @click="slForm.triggerPriceType = 'LAST_PRICE'">{{
+                      t('latestPrice')
+                    }}</el-dropdown-item>
+                    <el-dropdown-item @click="slForm.triggerPriceType = 'INDEX_PRICE'">{{
+                      t('indexPrice')
+                    }}</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </template>
+          </el-input-number>
+          <el-input-number
+            v-model.number="tempData.slPercent"
+            :controls="false"
+            align="left"
+            class="w-100px text-12px"
+            :placeholder="t('RIO')"
+          >
+            <template #suffix> % </template>
+          </el-input-number>
+        </div>
+        <el-slider
+          v-model="tempData.slPercent"
+          :min="0"
+          :max="200"
+          :step="1"
+          :marks="{
+            0: '0%',
+            50: '50%',
+            100: '100%',
+            150: '150%',
+            200: '200%',
+          }"
+          class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
+        />
+      </template>
     </el-form-item>
+
     <el-form-item>
       <div class="w-full flex item-center">
         <el-button
@@ -125,7 +238,24 @@ const form = reactive({
 const show = ref(false)
 
 const percent = ref(0)
-
+const isChecked = ref(true)
+const tempData = ref({
+  tpPercent: null,
+  slPercent: null,
+  sizePercent: null,
+})
+const tpForm = ref({
+  triggerPrice: null,
+  triggerPriceType: 'LAST_PRICE',
+  price: null,
+  type: 'TAKE_PROFIT_MARKET',
+})
+const slForm = ref({
+  triggerPrice: null,
+  triggerPriceType: 'LAST_PRICE',
+  price: null,
+  type: 'STOP_MARKET',
+})
 const perpMargin = computed(() => {
   const contractId = perpStore.perp?.contractId || ''
   return getMarginFromContractId({ contractId: contractId, size: form.amount || '0' })
@@ -285,6 +415,14 @@ function sell() {
 }
 
 .slider-box :deep() {
+  .el-slider__marks-text {
+    margin-top: 10px;
+  }
+  .el-slider__marks-stop {
+    width: 8px;
+    height: 8px;
+    top: -3px;
+  }
   .el-slider__stop {
     --el-slider-height: 8px;
     // --el-slider-stop-bg-color: var(--icon-color);
