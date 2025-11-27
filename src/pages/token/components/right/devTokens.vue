@@ -12,11 +12,11 @@
           </li>
           <li class="flex justify-between mb-12px">
             <span class="color-[--third-text]">{{ $t('migrated') }}</span>
-            <span class="color-[--down-color] max-w-75px">{{ tokenObj.total_migrated ?? 0 }}</span>
+            <span class="color-[--up-color] max-w-75px">{{ tokenObj.total_migrated ?? 0 }}</span>
           </li>
           <li class="flex justify-between mb-12px">
             <span class="color-[--third-text]">{{ $t('notMigrated') }}</span>
-            <span class="color-[--up-color] max-w-75px">{{ tokenObj.total_non_migrated ?? 0 }}</span>
+            <span class="color-[--down-color] max-w-75px">{{ tokenObj.total_non_migrated ?? 0 }}</span>
           </li>
           <li class="flex justify-between mb-12px">
             <span class="color-[--third-text]">{{ $t('migrationRate') }}</span>
