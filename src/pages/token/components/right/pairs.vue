@@ -7,7 +7,7 @@
         <th>{{ $t('price') }}/{{ $t('poolCirculatingSupply') }}</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody >
       <tr
         v-if="tokenAllPair"
         :class="{ active: tokenStore.selectedToken }"
@@ -33,7 +33,7 @@
         </td>
       </tr>
       <tr
-        v-for="(item, index) in ((show ? pairs : pairs?.slice?.(0, 1)) || [])"
+        v-for="(item, index) in ((show ? pairs : pairs?.slice?.(0, isInModal? undefined: 1)) || [])"
         :key="item.pair"
         :class="{ active: tokenStore.pairAddress === item.pair && (!tokenStore.selectedToken || !tokenAllPair) }"
         @click.stop="tokenStore.switchPair(item.pair)"
@@ -85,7 +85,7 @@
                 </a>
               </template>
 
-               <el-popover v-else popper-class="[--el-popover-bg-color:--border]" placement="bottom" trigger="click">
+               <el-popover v-else popper-class="[--el-popover-bg-color:--border]" placement="bottom" trigger="hover">
                 <!-- v-tooltip="item.amm"  -->
                  <!-- v-tooltip="item.ammName" -->
                   <template #reference>
@@ -102,7 +102,7 @@
                   <div class="font-400 text-12px lh-16px">
                     <a v-if="(item.amm!=='unknown') && (!!item.ammName)" :href="item.swap_url + item.target_token" target="_blank">{{$t('pairsLink')}}</a>
                     <div class="cursor-pointer"  @click.stop.prevent="emit('openFilterModal',item.amm ==='unknown'?'unknown':item.ammName)">{{ $t('searchSameAmm') }}</div>
-                    {{ item.amm ==='unknown'?'unknown':item.ammName }}
+                    <!-- {{ item.amm ==='unknown'?'unknown':item.ammName }} -->
                   </div>
               </el-popover>
 
@@ -118,11 +118,13 @@
       </tr>
     </tbody>
   </table>
-  <div v-if="(pairs?.length || 0) > 1" class="collapse-button">
-    <button @click.stop.prevent="show = !show">
-      <Icon name="solar:alt-arrow-down-line-duotone" :class="show ? 'collapse' : 'expand'" class="text-20px font-bold color-[--third-text]" />
-    </button>
-  </div>
+  <template v-if="!isInModal">
+    <div v-if="(pairs?.length || 0) > 1" class="collapse-button">
+      <button @click.stop.prevent="show = !show">
+        <Icon name="solar:alt-arrow-down-line-duotone" :class="show ? 'collapse' : 'expand'" class="text-20px font-bold color-[--third-text]" />
+      </button>
+    </div>
+  </template>
   <el-dialog v-model="visible" width="600px" :title="'LP ' + $t('holdersDetail')" append-to-body>
     <LPHolders />
   </el-dialog>
