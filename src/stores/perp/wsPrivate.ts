@@ -3,7 +3,7 @@ import { shallowRef } from 'vue'
 import WS, { type WSOptions } from '@/utils/ws'
 import { usePerpStore } from './index'
 import { WSPerpHost } from '@/utils/constants'
-import type { Collateral, Position, Order } from './type'
+import type { Collateral, Position, Order, Withdraw, TransferOut } from './type'
 import { profit } from '~/api/perp'
 
 function getWSMessage(e: MessageEvent): {
@@ -92,7 +92,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
         }
         // 处理用户数据更新
       if (msg.type === 'trade-event' || msg.type === 'assets-event') {
-        const { collateral, position, order } = msg.content?.data || {}
+        const { collateral, position, order, withdraw, transferOut } = msg.content?.data || {}
 
         // 更新资产信息
         if (msg.content?.event === 'Snapshot' && collateral as Collateral[]) {
@@ -100,8 +100,18 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
         }
 
         // 更新持仓信息
-        if (msg.content?.event === 'Snapshot' && position as Position) {
+        if (msg.content?.event === 'Snapshot' && position as Position[]) {
           updatePositionInfo(position)
+        }
+
+        // 更新提币信息
+        if (msg.content?.event === 'Snapshot' && withdraw as Withdraw[]) {
+          perpStore.withdraw = withdraw
+        }
+
+        // 更新转出信息
+        if (msg.content?.event === 'Snapshot' && transferOut as TransferOut[]) {
+          perpStore.transferOut = transferOut
         }
 
         // 更新订单信息

@@ -70,12 +70,12 @@ definePageMeta({
 const tokenStore = useTokenStore()
 const scrollbarHeight = computed(() => {
   if (globalStore.tokenHistoryVisible) {
-    return 'calc(100vh - 190px)'
+    return 'calc(100vh - 160px)'
   }
   return ''
 })
 const height = computed(() => {
-  return tokenStore.commonHeight - 190
+  return tokenStore.commonHeight - 160
 })
 const globalStore = useGlobalStore()
 const botStore = useBotStore()

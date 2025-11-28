@@ -5,7 +5,7 @@ import { EdgeXSDK, type ApiKeyData, type L2KeyPair } from '@edgex-fe/typescript-
 import { useLocalStorage } from '@vueuse/core'
 import { usePerpWsPubStore } from './wsPub'
 import { usePerpWsPrivateStore } from './wsPrivate'
-import type { Collateral, Order, Position } from './type'
+import type { Collateral, Order, Position, TransferOut, Withdraw } from './type'
 import { type CoinInfo } from '@/api/types/perp'
 
 type PerpMetadata = Awaited<ReturnType<typeof _getPerpMetadata>>
@@ -27,6 +27,8 @@ export const usePerpStore = defineStore('perp', () => {
   const collateral = ref<Collateral[]>([])
   const position = ref<Position[]>([])
   const order = ref<Order[]>([])
+  const withdraw = ref<Withdraw[]>([])
+  const transferOut = ref<TransferOut[]>([])
   const orderList = ref([])
 
   const isCancelOrder = shallowRef(false)
@@ -289,6 +291,8 @@ export const usePerpStore = defineStore('perp', () => {
     collateral,
     position,
     order,
+    withdraw,
+    transferOut,
     apiSignatureLoading,
     starkSignatureLoading,
     login,

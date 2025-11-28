@@ -1651,5 +1651,6 @@
   "closePositionAll": "全部平仓",
   "viewAll": "查看全部",
   "value1": "价值",
-  "margin": "保证金"
+  "margin": "保证金",
+  "orderSubmitted": "订单已提交"
 }
