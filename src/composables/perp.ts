@@ -182,43 +182,48 @@ export function usePerp() {
 
   // const createOrderDialogTitle = ref('')
   function createPerpOrder(orderParams: PerpOrderParams) {
-    const { $dialog } = useNuxtApp()
-    // const $t = getGlobalT()
-    dialogVisible.value = true
-    $dialog.show({
-      content: {
-        is: CreateOrder,
-        props: {
-          'onSuccess': () => {
-            $dialog.hide()
-          },
-          'onCancel': () => {
-            $dialog.hide()
-          },
-          getVisible: () => dialogVisible,
-          orderParams
-        }
-      },
-      props: {
-        width: '450px',
-        class: 'perp-dialog',
-        title: '',
-        'onOpened': () => {
-          console.log('open')
-          dialogVisible.value = true
-          // $dialog.updateContentProps({
-          //   visible: true
-          // })
+    return new Promise((resolve, reject) => {
+      const { $dialog } = useNuxtApp()
+      // const $t = getGlobalT()
+      dialogVisible.value = true
+      $dialog.show({
+        content: {
+          is: CreateOrder,
+          props: {
+            'onSuccess': () => {
+              $dialog.hide()
+              resolve(true)
+            },
+            'onCancel': () => {
+              $dialog.hide()
+              resolve(false)
+            },
+            getVisible: () => dialogVisible,
+            orderParams
+          }
         },
-        'onClosed': () => {
-          console.log('close')
-          dialogVisible.value = false
-          // $dialog.updateContentProps({
-          //   visible: false
-          // })
+        props: {
+          width: '450px',
+          class: 'perp-dialog',
+          title: '',
+          'onOpened': () => {
+            console.log('open')
+            dialogVisible.value = true
+            // $dialog.updateContentProps({
+            //   visible: true
+            // })
+          },
+          'onClosed': () => {
+            console.log('close')
+            dialogVisible.value = false
+            // $dialog.updateContentProps({
+            //   visible: false
+            // })
+          }
         }
-      }
+      })
     })
+
   }
 
   return {

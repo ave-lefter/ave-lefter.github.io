@@ -2,7 +2,8 @@
   <el-tabs v-model="swapType" class="select-tabs mt-5px">
     <el-tab-pane v-for="(item, index) in types" :key="index" :label="item.name" :name="item.value"/>
   </el-tabs>
-  <el-form :model="form" label-width="auto">
+  <div class="text-12px color-[--third-text] mt-12px text-right">{{ $t('availableBalance') }}: {{ formatNumber(availableBalance, 4) }} USD</div>
+  <el-form ref="formRef" :model="form" label-width="auto" :rules="rules">
     <el-form-item label="" prop="amount">
       <el-input v-model="form.amount" placeholder="0.0" size="large"  clearable class="input-number mt-12px" input-style="text-align:right" @input="percent = 0"  @update:model-value="value => watchAmount(value)">
         <template #prepend>
@@ -24,34 +25,36 @@
           </el-dropdown>
         </template>
       </el-input>
-      <div class="mt-24px px-3px w-full">
-        <el-slider
-          v-model="percent"
-          :min="0"
-          :max="100"
-          :step="1"
-          :marks="{
-            0: '0%',
-            25: '25%',
-            50: '50%',
-            75: '75%',
-            100: '100%',
-          }"
-          :format-tooltip="value => `${value}%`"
-          class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] [&&]:[--el-slider-runway-bg-color:--icon-color] slider-box"
-          @input="value => sliderInput(value as number)"
-        />
-      </div>
-      <el-checkbox class="checkbox-sm" v-model="isChecked" label="止盈止损" />
+    </el-form-item>
+    <div class="mt-24px px-3px w-full">
+      <el-slider
+        v-model="percent"
+        :min="0"
+        :max="100"
+        :step="1"
+        :marks="{
+          0: '0%',
+          25: '25%',
+          50: '50%',
+          75: '75%',
+          100: '100%',
+        }"
+        :format-tooltip="value => `${value}%`"
+        class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] [&&]:[--el-slider-runway-bg-color:--icon-color] slider-box"
+        @input="value => sliderInput(value as number)"
+      />
+    </div>
+    <el-form-item style="margin-bottom: 0">
+      <el-checkbox v-model="isChecked" class="checkbox-sm" :label="$t('stopLimit')" />
       <template v-if="isChecked">
-        <div class="flex items-center gap-10px mt-8px mb-16px">
+        <div class="flex items-center gap-10px mt-8px mb-16px w-full">
           <!-- 止盈 -->
           <el-input-number
             v-model.number="tpForm.triggerPrice"
             :controls="false"
             align="left"
             class="flex-1"
-            :placeholder="t('triggerPrice')"
+            :placeholder="t('TP')"
           >
             <template #suffix>
               <el-dropdown trigger="click">
@@ -74,7 +77,7 @@
               </el-dropdown>
             </template>
           </el-input-number>
-          <el-input-number
+          <!-- <el-input-number
             v-model.number="tempData.tpPercent"
             :controls="false"
             align="left"
@@ -82,31 +85,33 @@
             :placeholder="t('RIO')"
           >
             <template #suffix> % </template>
-          </el-input-number>
+          </el-input-number> -->
         </div>
-        <el-slider
-          v-model="tempData.tpPercent"
-          :min="0"
-          :max="200"
-          :step="1"
-          :marks="{
-            0: '0%',
-            50: '50%',
-            100: '100%',
-            150: '150%',
-            200: '200%',
-          }"
-          class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
-        />
+        <div class="mb-30px px-3px w-full">
+          <el-slider
+            v-model="tempData.tpPercent"
+            :min="0"
+            :max="200"
+            :step="1"
+            :marks="{
+              0: '0%',
+              50: '50%',
+              100: '100%',
+              150: '150%',
+              200: '200%',
+            }"
+            class=" [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white]"
+          />
+        </div>
 
-        <div class="flex items-center gap-10px mt-8px mb-16px">
+        <div class="flex items-center gap-10px mt-8px mb-16px w-full">
           <!-- 止损 -->
           <el-input-number
             v-model.number="slForm.triggerPrice"
             :controls="false"
+             class="flex-1"
             align="left"
-            class="flex-1"
-            :placeholder="t('triggerPrice')"
+            :placeholder="t('SL')"
           >
             <template #suffix>
               <el-dropdown trigger="click">
@@ -129,7 +134,7 @@
               </el-dropdown>
             </template>
           </el-input-number>
-          <el-input-number
+          <!-- <el-input-number
             v-model.number="tempData.slPercent"
             :controls="false"
             align="left"
@@ -137,23 +142,29 @@
             :placeholder="t('RIO')"
           >
             <template #suffix> % </template>
-          </el-input-number>
+          </el-input-number> -->
         </div>
-        <el-slider
-          v-model="tempData.slPercent"
-          :min="0"
-          :max="200"
-          :step="1"
-          :marks="{
-            0: '0%',
-            50: '50%',
-            100: '100%',
-            150: '150%',
-            200: '200%',
-          }"
-          class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
-        />
+        <div class="mb-30px px-3px w-full">
+          <el-slider
+            v-model="tempData.slPercent"
+            :min="0"
+            :max="200"
+            :step="1"
+            :marks="{
+              0: '0%',
+              50: '50%',
+              100: '100%',
+              150: '150%',
+              200: '200%',
+            }"
+            class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white]"
+          />
+        </div>
       </template>
+    </el-form-item>
+
+    <el-form-item>
+      <el-checkbox v-model="form.reduceOnly" class="checkbox-sm" :label="$t('onlyReduce')" />
     </el-form-item>
 
     <el-form-item>
@@ -163,7 +174,7 @@
           color="var(--up-color)"
           native-type="button"
           size="large"
-          @click.stop="buy"
+          @click.stop="_createPerpOrder('BUY')"
         >
           {{ $t('buy') }}/{{ $t('long') }}
         </el-button>
@@ -172,7 +183,7 @@
           color="var(--down-color)"
           native-type="button"
           size="large"
-          @click.stop="sell"
+          @click.stop="_createPerpOrder('SELL')"
         >
           {{ $t('sell') }}/{{ $t('short') }}
         </el-button>
@@ -188,22 +199,22 @@
     </div>
     <div class="text-right">
       <div class="color-[--third-text] mb-5px"> {{ $t('sell') }}: </div>
-      <div class="font-500"> ≈ {{ formatNumber(form.amount, 4) }} {{ perpStore.unit?.coinName || '' }}</div>
+      <div class="font-500"> ≈ {{ formatNumber(amountSell, 4) }} {{ perpStore.unit?.coinName || '' }}</div>
     </div>
   </div>
   <el-divider style="--el-border-color: var(--main-divider);margin: 16px 0;" />
   <ul class="text-12px color-[--third-text]">
     <li class="flex items-center">
       <span class="mr-auto">{{ $t('margin') }}</span>
-      <span class="color-[--main-text]">{{ formatNumber(perpMargin, 4) }} USD</span>
+      <span class="color-[--up-color]">{{ form.reduceOnly ? '-' : formatNumber(perpMargin.buy, 2) }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ form.reduceOnly ? '-' : formatNumber(perpMargin.sell, 2) }}  USD</span>
     </li>
     <li class="flex items-center mt-8px">
       <span class="mr-auto">Max: </span>
-      <span class="color-[--up-color]">{{ formatNumber(maxAmount, 4) }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ formatNumber(maxAmount, 4) }}  USD</span>
+      <span class="color-[--up-color]">{{ form.reduceOnly ? '-' : formatNumber(maxAmountBuy, 4) }} {{  perpStore.unit?.coinName || ''  }}</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ form.reduceOnly ? '-' : formatNumber(maxAmountSell, 4) }}  {{  perpStore.unit?.coinName || ''  }}</span>
     </li>
-    <li class="flex items-center mt-8px">
+    <li v-if="!form.reduceOnly" class="flex items-center mt-8px">
       <span class="mr-auto">预估强平价</span>
-      <span class="color-[--up-color]">0.000 USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">0.000 USD</span>
+      <span class="color-[--up-color]">{{ formatNumber(liquidatePriceBuy, 4) }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ formatNumber(liquidatePriceSell, 4) }} USD</span>
     </li>
     <li class="flex items-center mt-8px">
       <span class="mr-auto">手续费</span>
@@ -216,6 +227,7 @@
 <script setup lang='ts'>
 import { usePerpStore } from '~/stores/perp'
 import BigNumber from 'bignumber.js'
+import type { FormInstance } from 'element-plus'
 
 const { t } = useI18n()
 const perpStore = usePerpStore()
@@ -224,7 +236,6 @@ const types = computed(() => {
   return [
     { value: 'LIMIT', name: t('limit') },
     { value: 'MARKET', name: t('market') },
-
   ] as const
 })
 
@@ -232,17 +243,41 @@ const { createPerpOrder } = usePerp()
 
 const form = reactive({
   amount: '',
-  reduceOnly: false,
-
+  reduceOnly: false
 })
+
+const formRef = useTemplateRef<FormInstance>('formRef')
+
+const rules = computed(() => ({
+  amount: [
+    { validator: (rule: any, value: string, callback: (error?: Error) => void) => {
+      if ((!value || value && new BigNumber(value).lte(0))) {
+        callback(new Error(isValue.value ? '请输入您的委托价值' : '请输入您的委托数量'))
+      } else {
+        callback()
+      }
+    }, trigger: 'change' },
+  ],
+}))
 const show = ref(false)
 
 const percent = ref(0)
-const isChecked = ref(true)
+const isChecked = ref(false)
 const tempData = ref({
-  tpPercent: null,
-  slPercent: null,
-  sizePercent: null,
+  tpPercent: undefined,
+  slPercent: undefined,
+  sizePercent: undefined,
+})
+
+watch(() => perpStore.perp?.contractId || '', (contractId) => {
+  if (contractId) {
+    form.amount = ''
+    tempData.value = {
+      tpPercent: undefined,
+      slPercent: undefined,
+      sizePercent: undefined,
+    }
+  }
 })
 const tpForm = ref({
   triggerPrice: null,
@@ -258,7 +293,26 @@ const slForm = ref({
 })
 const perpMargin = computed(() => {
   const contractId = perpStore.perp?.contractId || ''
-  return getMarginFromContractId({ contractId: contractId, size: form.amount || '0' })
+  const orderSize = getSize() || '0'
+  const orderPrice = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+  return {
+    buy: CoreCalculator.getCreateOrderCost({
+      contractId: contractId,
+      orderPrice: orderPrice,
+      orderSize: orderSize || '0',
+      orderSide: 'BUY'
+    }).toFixed(),
+    sell: CoreCalculator.getCreateOrderCost({
+      contractId: contractId,
+      orderPrice: orderPrice,
+      orderSize: orderSize || '0',
+      orderSide: 'SELL'
+    }).toFixed(),
+  }
+})
+
+const availableBalance = computed(() => {
+  return CoreCalculator.calculateAvailableBalance(perpStore.perp?.contractId || '') || '0'
 })
 
 const feeRate = computed(() => {
@@ -266,23 +320,63 @@ const feeRate = computed(() => {
   return { takerFeeRate: BigNumber(takerFeeRate).times(100).toFixed(), makerFeeRate: BigNumber(makerFeeRate).times(100).toFixed() }
 })
 
-const maxAmount = computed(() => {
-  const accountId = perpStore.userInfo?.id || ''
-  const _amount = perpStore.collateral?.find(item => item.accountId === accountId)?.amount
-  return _amount || '0'
+const maxAmountBuy = computed(() => {
+  let price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+  if (!isValue.value) {
+    price = '1'
+  }
+  return CoreCalculator.getMaxCreateOrderSize({
+    contractId: perpStore.perp?.contractId || '',
+    orderPrice: perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0',
+    orderSide: 'BUY',
+    reduceOnly: form.reduceOnly
+  }).times(price).toFixed()
+})
+
+const maxAmountSell = computed(() => {
+  let price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+  if (!isValue.value) {
+    price = '1'
+  }
+  return CoreCalculator.getMaxCreateOrderSize({
+    contractId: perpStore.perp?.contractId || '',
+    orderPrice: perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0',
+    orderSide: 'SELL',
+    reduceOnly: form.reduceOnly
+  }).times(price).toFixed()
+})
+
+
+const amountSell = computed(() => {
+  return formatMinSize(new BigNumber(maxAmountSell.value || '0').div(new BigNumber(maxAmountBuy.value || '0')).times(form.amount || '0').toFixed(), isValue.value)
+})
+
+const liquidatePriceBuy = computed(() => {
+  const price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+  const orderSize = getSize() || '0'
+  return CoreCalculator.getCreateOrderLiquidatePrice({
+    contractId: perpStore.perp?.contractId || '',
+    orderPrice: price,
+    orderSide: 'BUY',
+    orderSize
+  }).toFixed()
+})
+
+const liquidatePriceSell = computed(() => {
+  const price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+  const orderSize = getSize() || '0'
+  return CoreCalculator.getCreateOrderLiquidatePrice({
+    contractId: perpStore.perp?.contractId || '',
+    orderPrice: price,
+    orderSide: 'SELL',
+    orderSize
+  }).toFixed()
 })
 
 function sliderInput(percent: number) {
-  const accountId = perpStore.userInfo?.id || ''
-  const _amount = perpStore.collateral?.find(item => item.accountId === accountId)?.amount
-  if (isValue.value) {
-    const a = BigNumber(percent).times(_amount || '0').div(100).toFixed()
-    form.amount = formatMinSize(a)
-  } else {
-    const price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
-    const a = BigNumber(percent).times(_amount || '0').div(100).div(price).toFixed()
-    form.amount = formatMinSize(a)
-  }
+  const _amount = new BigNumber(maxAmountBuy.value || '0')
+  const a = BigNumber(percent).times(_amount || '0').div(100).toFixed()
+  form.amount = formatMinSize(a)
 }
 
 const isValue = computed(() => {
@@ -290,7 +384,11 @@ const isValue = computed(() => {
 })
 
 function watchAmount(value: string) {
-  form.amount = formatMinSize(value)
+  let _value = formatMinSize(value)
+  if (new BigNumber(_value).gt(new BigNumber(maxAmountBuy.value || '0'))) {
+    _value = maxAmountBuy.value || '0'
+  }
+  form.amount = _value
 }
 
 function formatMinSize(value: string, _isValue = isValue.value) {
@@ -340,25 +438,26 @@ function getSize() {
   }
 }
 
-function buy() {
-  // createPerpOrder, createOrderDialogTitle
-  createPerpOrder({
-    type: swapType.value,
-    size: getSize(),
-    price: perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0',
-    side: 'BUY',
-    contractId: perpStore.perp?.contractId || '',
-    reduceOnly: form.reduceOnly,
-    isPositionTpsl: false,
-    isSetOpenTp: false,
-    isSetOpenSl: false
+function _createPerpOrder(side: string) {
+  formRef.value?.validate((valid: boolean) => {
+    // isValid.value = false
+    if (valid) {
+      console.log(side, valid)
+      createPerpOrder({
+        type: swapType.value,
+        size: getSize(),
+        price: perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0',
+        side: side,
+        contractId: perpStore.perp?.contractId || '',
+        reduceOnly: form.reduceOnly,
+        isPositionTpsl: false,
+        isSetOpenTp: false,
+        isSetOpenSl: false
+      })
+    }
   })
-
 }
 
-function sell() {
-
-}
 
 </script>
 

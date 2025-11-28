@@ -1620,5 +1620,6 @@
   "value1": "價值",
   "long": "做多",
   "short": "做空",
-  "margin": "保證金"
+  "margin": "保證金",
+  "orderSubmitted": "訂單已提交"
 }

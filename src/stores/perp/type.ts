@@ -196,7 +196,7 @@ export interface TransferOut {
   l2Signature: {}                       // 提交L2的签名
   extraType: string                   // 附加类型
   extraDataJson: string               // 额外数据
-  status: 'SUCCESS_L2_APPROVED'         // 转账状态
+  status: 'SUCCESS_L2_APPROVED' | 'PENDING_CHECKING' | 'PENDING_CENSORING'     // 转账状态
   receiverTransferInId: string        // 收款方转账转入单ID
   collateralTransactionId: string     // 关联的抵押品明细ID
   censorTxId: string                  // 审查处理序号
@@ -215,7 +215,7 @@ export interface Order {
   accountId: string                   // 账户ID
   coinId: string                      // 抵押品币种ID
   contractId: string                  // 合约ID
-  side: 'BUY'                         // 买卖方向
+  side: 'BUY' | 'SELL'                        // 买卖方向
   price: string                       // 委托价格
   size: string                        // 委托数量
   clientOrderId: string               // 客户自定义ID
@@ -228,7 +228,7 @@ export interface Order {
   sourceKey: string                   // 来源key
   extraType: string                   // 附加类型
   extraDataJson: string               // 附加数据
-  status: 'PENDING_NEW'                 // 委托单状态
+  status: 'PENDING_NEW' | 'PENDING' | 'OPEN' | 'CANCELING' | 'UNTRIGGERED' | 'FILLED'             // 委托单状态
   cancelReason: 'USER_CANCEL'           // 委托单取消原因
   cumFillSize: string                 // 累计成交数量
   cumFillValue: string                // 累计成交价值
@@ -237,6 +237,13 @@ export interface Order {
   minFillPrice: string                // 最低成交价格
   createdTime: string                 // 创建时间
   updatedTime: string                   // 更新时间
+  triggerTime: string                 // 触发时间
+  cumFailSize: string
+  cumMatchSize: string
+  isWithoutMatch: boolean
+  withoutMatchFillValue: string
+  withoutMatchFillSize: string
+  marketLimitValue: string
 }
 
 // 成交明细列表

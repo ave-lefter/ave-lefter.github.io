@@ -1636,5 +1636,6 @@
   "value1": "value",
   "long": "Long",
   "short": "Short",
-  "margin": "Margin"
+  "margin": "Margin",
+  "orderSubmitted": "Order submitted"
 }

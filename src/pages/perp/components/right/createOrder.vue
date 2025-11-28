@@ -15,7 +15,7 @@
     </li>
     <li class="flex items-center justify-between mt-16px">
       <span class="color-[--third-text]">{{ $t('margin') }}</span>
-      <span>{{ formatNumber(getMarginFromContractId({ contractId: orderParams.contractId, size: orderParams.size }), 4) }} USD</span>
+      <span>{{ formatNumber(createOrderCost, 4) }} USD</span>
     </li>
     <li class="flex items-center justify-between mt-16px">
       <span class="color-[--third-text]">{{ $t('onlyReduce') }}</span>
@@ -54,8 +54,6 @@ const emit = defineEmits(['success', 'cancel'])
 const perpStore = usePerpStore()
 
 
-
-
 const orderTypes: ComputedRef<Record<PerpOrderParams['type'], string>> = computed(() => {
   return {
     MARKET: t('market'),
@@ -79,10 +77,24 @@ const maxLeverage = computed(() => {
   return getLeverageFromContractId(contractId)
 })
 
+const createOrderCost = computed(() => {
+  const contractId = props.orderParams.contractId || ''
+  const orderPrice = props.orderParams.price || '0'
+  const orderSize = props.orderParams.size
+  const orderSide = props.orderParams.side
+  return CoreCalculator.getCreateOrderCost({
+    contractId: contractId,
+    orderPrice: orderPrice,
+    orderSize: orderSize || '0',
+    orderSide: orderSide
+  }).toFixed()
+})
+
 function _createOrder() {
   console.log('createOrder', props.orderParams)
   createOrder(props.orderParams).then(res => {
-
+    emit('success', res)
+    ElNotification({ type: 'success', message:  t('orderSubmitted') })
   })
 }
 
