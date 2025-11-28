@@ -495,7 +495,12 @@ const _getDeployedTokens = async () => {
   }
   try {
     const res = await _getDevList(params)
-    let newList = res?.infos || []
+    let newList = (res?.infos || []).map((el) => {
+      return {
+        ...el,
+        chain: props.chain,
+      }
+    })
     if (tableData.value.pageNO > 1) {
       newList = tableData.value.deployedToken.concat(newList)
     }
