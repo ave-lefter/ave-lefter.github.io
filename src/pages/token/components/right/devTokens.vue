@@ -12,11 +12,11 @@
           </li>
           <li class="flex justify-between mb-12px">
             <span class="color-[--third-text]">{{ $t('migrated') }}</span>
-            <span class="color-[--down-color] max-w-75px">{{ tokenObj.total_migrated ?? 0 }}</span>
+            <span class="color-[--up-color] max-w-75px">{{ tokenObj.total_migrated ?? 0 }}</span>
           </li>
           <li class="flex justify-between mb-12px">
             <span class="color-[--third-text]">{{ $t('notMigrated') }}</span>
-            <span class="color-[--up-color] max-w-75px">{{ tokenObj.total_non_migrated ?? 0 }}</span>
+            <span class="color-[--down-color] max-w-75px">{{ tokenObj.total_non_migrated ?? 0 }}</span>
           </li>
           <li class="flex justify-between mb-12px">
             <span class="color-[--third-text]">{{ $t('migrationRate') }}</span>
@@ -64,14 +64,12 @@
                 v-for="(row, $index) in tableList"
                 :key="$index"
                 class="flex"
-                @click.stop="tableRowClick(row)"
               >
                 <div
                   class="token-info table-item_d"
                   style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
-                  @click.stop.prevent="tableRowClick(row)"
                 >
-                  <div class="icon-token-container" style="margin-right: 10px">
+                  <div class="icon-token-container cursor-pointer" style="margin-right: 10px" @click.stop.prevent="tableRowClick(row)">
                     <el-image
                       class="token-icon w-30px h-30px rounded-100%"
                       :src="getSymbolDefaultIcon(row)"
@@ -123,7 +121,7 @@
                       />
                     </div>
                     <div class="font-1 mt-2px flex-start">
-                      <span class="mini font-10">
+                      <span class="mini font-10" v-tooltip="dayjs(row?.createdAt * 1000).format('YYYY-MM-DD HH:mm:ss')">
                         {{ dayjs(row?.createdAt * 1000).fromNow() }}
                       </span>
                     </div>
@@ -208,7 +206,7 @@ watch(
 )
 
 function tableRowClick(item: any) {
-  router.push({ name: 'Token', params: { id: `${item.Token}-${item.chain}` } })
+  router.push({ name: 'token-id', params: { id: `${item.token}-${item.chain}` } })
 }
 
 
