@@ -51,12 +51,12 @@
               <span>{{ $t('volumeOneHour') }}</span>
             </div>
           </div>
-          <el-scrollbar v-if="tableList.length > 0" class="list">
+          <el-scrollbar v-if="tableList.length > 0" class="list hidden-scrollbar" :height="500">
             <ul
               v-infinite-scroll="getRugPullList"
               :infinite-scroll-disabled="loadingRun || finished"
-              :infinite-scroll-distance="500"
-              :infinite-scroll-delay="10"
+              :infinite-scroll-distance="20"
+              :infinite-scroll-delay="200"
               :infinite-scroll-immediate="true"
               class="content"
             >
