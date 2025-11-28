@@ -158,8 +158,8 @@ watch(
 
 <template>
   <div
-    class="relative min-h-400px bg-[--secondary-bg]"
     v-infinite-scroll="getList"
+    class="relative min-h-400px bg-[--secondary-bg]"
     :infinite-scroll-delay="200"
     :infinite-scroll-disabled="listStatus.loading || listStatus.finished || listStatus.error"
     :infinite-scroll-immediate="false"
@@ -197,7 +197,7 @@ watch(
           {{
             row.type.includes('LIMIT')
               ? formatNumber(row.price, {
-                  decimals: 2,
+                  decimals: 10,
                   limit: 20,
                 })
               : t('market')
@@ -211,7 +211,7 @@ watch(
             }}{{
               formatNumber(row.triggerPrice, {
                 limit: 20,
-                decimals: 1,
+                decimals: 10,
               })
             }}
             {{ triggerPriceTypeMap[row.triggerPriceType as keyof typeof triggerPriceTypeMap] }}
@@ -235,18 +235,18 @@ watch(
       </el-table-column>
       <el-table-column align="right" :label="t('takeProfitStopLoss')" prop="takeProfitStopLoss">
         <template #default="{ row }">
-          <span class="color-[--up-color]" v-if="row.openTp.triggerPrice">{{
+          <span v-if="row.openTp.triggerPrice" class="color-[--up-color]">{{
             formatNumber(row.openTp.triggerPrice, {
               limit: 20,
-              decimals: 1,
+              decimals: 10,
             })
           }}</span
           ><span v-else>--</span><span class="color-[--icon-color] mx-4px">/</span
-          ><span class="color-[--down-color]" v-if="row.openSl.triggerPrice">
+          ><span v-if="row.openSl.triggerPrice" class="color-[--down-color]">
             {{
               formatNumber(row.openSl.triggerPrice, {
                 limit: 20,
-                decimals: 1,
+                decimals: 10,
               })
             }}
           </span>

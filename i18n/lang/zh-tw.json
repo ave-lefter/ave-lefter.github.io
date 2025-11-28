@@ -1621,5 +1621,7 @@
   "long": "做多",
   "short": "做空",
   "margin": "保證金",
-  "orderSubmitted": "訂單已提交"
+  "orderSubmitted": "訂單已提交",
+  "TPPrice": "止盈價格",
+  "SLPrice": "止損價格"
 }

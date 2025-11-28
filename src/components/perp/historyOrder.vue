@@ -135,7 +135,7 @@ watch(
               ? t('market')
               : formatNumber(row.price, {
                   limit: 20,
-                  decimals: 2,
+                  decimals: 10,
                 })
           }}
         </template>
@@ -146,7 +146,7 @@ watch(
             --
           </template>
           <template v-else>
-            {{ row.type?.includes?.('STOP') ? '≤' : '≥' }}{{ formatNumber(row.triggerPrice, 1) }}
+            {{ row.type?.includes?.('STOP') ? '≤' : '≥' }}{{ formatNumber(row.triggerPrice, 10) }}
             {{ triggerPriceTypeMap[row.triggerPriceType as keyof typeof triggerPriceTypeMap] }}
           </template>
         </template>
@@ -235,6 +235,7 @@ watch(
           {{
             formatNumber(row.fillSize, {
               limit: 20,
+              decimals: 10,
             })
           }}
         </template>
@@ -244,7 +245,7 @@ watch(
           {{
             formatNumber(row.fillPrice, {
               limit: 20,
-              decimals: 2,
+              decimals: 10,
             })
           }}
         </template>

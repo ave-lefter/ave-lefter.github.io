@@ -1652,5 +1652,7 @@
   "viewAll": "查看全部",
   "value1": "价值",
   "margin": "保证金",
-  "orderSubmitted": "订单已提交"
+  "orderSubmitted": "订单已提交",
+  "TPPrice": "止盈价格",
+  "SLPrice": "止损价格"
 }

@@ -150,14 +150,15 @@ export async function createOrder(data: PerpOrderParams) {
   const contractId = data?.contractId || ''
   const type = data.type
   const tradeParams: TradeOrderParams = {
+    ...data,
     price: type === 'LIMIT' ? data.price.toString () : '0', // Market orders pass price as 0
     size: data?.size || '1',                  // 订单数量
     type: type,                // 订单类型: LIMIT | MARKET
     timeInForce: type === 'LIMIT' ? 'GOOD_TIL_CANCEL' : 'IMMEDIATE_OR_CANCEL',
-    reduceOnly: data?.reduceOnly || false,
-    isPositionTpsl: data?.isPositionTpsl || false,        // 是否为止盈止损单
-    isSetOpenTp: data?.isSetOpenTp || false,           // 是否设置开仓止盈
-    isSetOpenSl: data?.isSetOpenSl || false,           // 是否设置开仓止损
+    // reduceOnly: data?.reduceOnly || false,
+    // isPositionTpsl: data?.isPositionTpsl || false,        // 是否为止盈止损单
+    // isSetOpenTp: data?.isSetOpenTp || false,           // 是否设置开仓止盈
+    // isSetOpenSl: data?.isSetOpenSl || false,           // 是否设置开仓止损
     contractId: contractId,       // 合约ID (AVAXUSD)
     side: data?.side,                  // 买卖方向: BUY | SELL
     triggerPrice: data?.triggerPrice || '',             // 触发价格 (条件单)
@@ -165,6 +166,7 @@ export async function createOrder(data: PerpOrderParams) {
     extraType: data?.extraType || '',                // 额外类型
     extraDataJson: data?.extraDataJson || '',            // 额外数据
     accountId: accountId, // 账户ID
+
   }
 
   const contractList = perpStore.contractList || []
