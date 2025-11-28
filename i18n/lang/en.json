@@ -1637,5 +1637,7 @@
   "long": "Long",
   "short": "Short",
   "margin": "Margin",
-  "orderSubmitted": "Order submitted"
+  "orderSubmitted": "Order submitted",
+  "TPPrice": "TP Price",
+  "SLPrice": "SL Price"
 }

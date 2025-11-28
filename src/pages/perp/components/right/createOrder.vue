@@ -1,6 +1,6 @@
 <template>
   <div class="absolute top-20px left-20px flex items-center text-20px font-700">
-    <div :class="orderParams.side === 'BUY' ? 'bg-[--up-color]' : 'bg-[--down-color]'" class="text-12px p-2px rd-2px font-400 mr-5px">{{ orderParams.side === 'BUY' ? t('buy1') : t('sell1') }}</div>
+    <div :class="orderParams.side === 'BUY' ? 'bg-[--up-color]' : 'bg-[--down-color]'" class="text-12px p-2px rd-2px font-400 mr-5px color-[--white]">{{ orderParams.side === 'BUY' ? t('buy1') : t('sell1') }}</div>
     <div>{{ contractName || '' }}</div>
     <div class="text-16px color-[--third-text] ml-2px">{{ maxLeverage }}X</div>
   </div>
@@ -21,9 +21,17 @@
       <span class="color-[--third-text]">{{ $t('onlyReduce') }}</span>
       <span>{{ orderParams.reduceOnly ? t('yes') : t('no') }}</span>
     </li>
+    <li v-if="orderParams?.isSetOpenTp && orderParams?.openTp?.triggerPrice" class="flex items-center justify-between mt-16px">
+      <span class="color-[--third-text]">{{ $t('TPPrice') }}</span>
+      <span class="color-[--up-color]"> &gt;= {{ formatNumber(orderParams?.openTp?.triggerPrice || 0, 4) }}</span>
+    </li>
+    <li v-if="orderParams?.isSetOpenSl && orderParams?.openSl?.triggerPrice" class="flex items-center justify-between mt-16px">
+      <span class="color-[--third-text]">{{ $t('SLPrice') }}</span>
+      <span class="color-[--down-color]"> &lt;= {{ formatNumber(orderParams?.openSl?.triggerPrice || 0, 4) }}</span>
+    </li>
     <li class="flex items-center justify-between mt-16px">
       <el-button size="large" class="flex-1 min-h-48px rd-8px!" @click.stop.prevent="$emit('cancel')">{{ $t('cancel') }}</el-button>
-      <el-button size="large" type="primary" class="flex-1 min-h-48px rd-8px!" @click.stop.prevent="_createOrder">{{ $t('confirm') }}</el-button>
+      <el-button size="large" type="primary" class="flex-1 min-h-48px rd-8px!" :loading="loading" @click.stop.prevent="_createOrder">{{ $t('confirm') }}</el-button>
     </li>
   </ul>
 </template>
@@ -90,11 +98,17 @@ const createOrderCost = computed(() => {
   }).toFixed()
 })
 
+const loading = ref(false)
 function _createOrder() {
   console.log('createOrder', props.orderParams)
+  loading.value = true
   createOrder(props.orderParams).then(res => {
     emit('success', res)
     ElNotification({ type: 'success', message:  t('orderSubmitted') })
+  }).catch((err) => {
+    ElNotification({ type: 'error', message: err?.message })
+  }).finally(() => {
+    loading.value = false
   })
 }
 

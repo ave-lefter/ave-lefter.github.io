@@ -74,7 +74,7 @@ const sizePercentChange = (val: number) => {
 </script>
 
 <template>
-  <el-dialog append-to-body v-model="visible" :title="t('takeProfitStopLoss2')" width="500px">
+  <el-dialog v-model="visible" append-to-body :title="t('takeProfitStopLoss2')" width="500px">
     <div class="max-h-[calc(100vh-300px)] overflow-y-auto scrollbar-hide mx--16px px-16px">
       <div class="mb-19px flex items-center gap-8px text-14px font-bold color-[--main-text]">
         {{ typeDict[props.row.contractId] }}
@@ -269,8 +269,8 @@ const sizePercentChange = (val: number) => {
         <!-- 委托数量 -->
         <div class="mt-16px mb-16px">
           <el-input-number
-            class="[&&]:w-full"
             v-model.number="size"
+            class="[&&]:w-full"
             :controls="false"
             align="left"
             :placeholder="t('orderSize')"

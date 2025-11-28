@@ -137,7 +137,7 @@ watch(
       </el-table-column>
       <el-table-column :width="100" align="right" :label="t('orderSize')" prop="size">
         <template #default="{ row }">
-          {{ formatNumber(row.size) }} {{ typeDict[row.contractId].replace('USD', '') }}
+          {{ formatNumber(row.size, 10) }} {{ typeDict[row.contractId].replace('USD', '') }}
         </template>
       </el-table-column>
       <el-table-column :width="100" align="right" :label="t('delegatePrice')" prop="price">
@@ -145,7 +145,7 @@ watch(
           {{
             row.type.includes('LIMIT')
               ? formatNumber(row.price, {
-                  decimals: 2,
+                  decimals: 10,
                   limit: 20,
                 })
               : t('market')
@@ -158,7 +158,7 @@ watch(
           }}{{
             formatNumber(row.triggerPrice, {
               limit: 20,
-              decimals: 1,
+              decimals: 10,
             })
           }}
           {{ triggerPriceTypeMap[row.triggerPriceType as keyof typeof triggerPriceTypeMap] }}
@@ -186,7 +186,7 @@ watch(
           <span class="color-[--up-color]" v-if="row.openTp.triggerPrice">{{
             formatNumber(row.openTp.triggerPrice, {
               limit: 20,
-              decimals: 1,
+              decimals: 10,
             })
           }}</span
           ><span v-else>--</span><span class="color-[--icon-color] mx-4px">/</span
@@ -194,7 +194,7 @@ watch(
             {{
               formatNumber(row.openSl.triggerPrice, {
                 limit: 20,
-                decimals: 1,
+                decimals: 10,
               })
             }}
           </span>
