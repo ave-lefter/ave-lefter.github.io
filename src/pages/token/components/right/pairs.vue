@@ -85,7 +85,7 @@
                 </a>
               </template>
 
-               <el-popover v-else popper-class="[--el-popover-bg-color:--border]" placement="bottom" trigger="hover">
+               <el-popover v-else popper-class="[--el-popover-bg-color:--border] [--el-popover-padding:4px_0!important]" popper-style="width: auto;min-width: 104px;" placement="bottom" trigger="hover">
                 <!-- v-tooltip="item.amm"  -->
                  <!-- v-tooltip="item.ammName" -->
                   <template #reference>
@@ -99,9 +99,21 @@
                       >
                     </div>
                   </template>
-                  <div class="font-400 text-12px lh-16px">
-                    <a v-if="(item.amm!=='unknown') && (!!item.ammName)" :href="item.swap_url + item.target_token" target="_blank">{{$t('pairsLink')}}</a>
-                    <div class="cursor-pointer"  @click.stop.prevent="emit('openFilterModal',item.amm ==='unknown'?'unknown':item.ammName)">{{ $t('searchSameAmm') }}</div>
+                  <div class="font-400 text-12px lh-16px flex flex-col gap-4px text-center">
+                    <div class="flex items-center justify-center  px-10px py-4px"> 
+                      <Icon v-if="item.amm === 'unknown'" name="tdesign:help-circle-filled" class="mr-5px color-#848E9C text-20px" />
+                      <div v-else class="inline-flex">
+                        <img
+                          class="rounded-50% mr-5px h-16px w-16px"
+                          :src="formatIconSwap(item.amm)"
+                          onerror="this.src='/icon-default.png'"
+                          height="16"
+                        >
+                      </div>
+                      <span class="text-[--secondary-text]">{{ item.amm ==='unknown'?'unknown':item.ammName }}</span>
+                    </div>
+                    <a v-if="(item.amm!=='unknown') && (!!item.ammName)" :href="item.swap_url + item.target_token" target="_blank" class="hover:bg-[--dialog-tab-active-bg] px-10px py-4px">{{$t('pairsLink')}}</a>
+                    <div class="cursor-pointer hover:bg-[--dialog-tab-active-bg] px-10px py-4px"  @click.stop.prevent="emit('openFilterModal',item.amm ==='unknown'?'unknown':item.ammName)">{{ $t('searchSameAmm') }}</div>
                     <!-- {{ item.amm ==='unknown'?'unknown':item.ammName }} -->
                   </div>
               </el-popover>
@@ -156,17 +168,6 @@ const show = shallowRef(false)
 const percent = computed(() => (tokenStore?.tokenInfoExtra?.pair_lock_percent || 0) * 100 || 0)
 const visible = shallowRef(false)
 const pairs = computed(() => {
-  console.log('tokenAllPairpairs', tokenStore.pairs?.map(i => ({
-    ...i,
-    ammName: i.amm === 'unknown' ? i.amm : getSwapInfo(i.chain, i.amm)?.show_name || i.amm,
-    isUp: i.target_token === i.token0_address ? new BigNumber(i.reserve1).gt(i.init_reserve1) : new BigNumber(i.reserve0).gt(i.init_reserve0),
-  })).filter(i => {
-    if(!props.isInModal) {
-      return true
-    }else{
-      return props.search==='unknown' ? i.amm==='unknown' : i.ammName === props.search
-    }
-  }))
   return tokenStore.pairs?.map(i => ({
     ...i,
     ammName: i.amm === 'unknown' ? i.amm : getSwapInfo(i.chain, i.amm)?.show_name || i.amm,
@@ -181,7 +182,6 @@ const pairs = computed(() => {
 })
 
 const tokenAllPair = computed(() => {
-  console.log('tokenAllPair', tokenStore.tokenAllPair)
   return tokenStore.tokenAllPair
 })
 

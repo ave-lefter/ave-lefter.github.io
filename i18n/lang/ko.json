@@ -1397,6 +1397,6 @@
   "groupDetails": "그룹 세부정보",
   "batchDelete": "일괄 삭제",
   "removeTokenTips": "선택한 다음을 삭제하시겠습니까?",
-  "pairsLink": "블록체인 브라우저로 이동",
+  "pairsLink": "점프 블록 탐색기",
   "searchSameAmm": "유사한 풀 보기"
 }

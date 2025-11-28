@@ -1539,6 +1539,6 @@
   "batchDelete": "Batch Delete",
   "removeTokenTips": "Delete the selected following?",
   "blackListPlaceHolder": "Enter developer address, token contract, and keywords",
-  "pairsLink": "Jump to blockchain browser",
+  "pairsLink": "Jump block explorer",
   "searchSameAmm": "View similar pools"
 }

@@ -546,6 +546,6 @@
   "groupDetails": "Detalles del grupo",
   "batchDelete": "Eliminar por lotes",
   "removeTokenTips": "¿Eliminar lo siguiente seleccionado?",
-  "pairsLink": "Saltar al navegador blockchain",
+  "pairsLink": "Explorador de bloques de salto",
   "searchSameAmm": "Ver piscinas similares"
 }
