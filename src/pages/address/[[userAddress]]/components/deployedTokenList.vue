@@ -1,5 +1,5 @@
 <template>
-  <div class="mt_20">
+  <div class="mt-16px">
     <el-table
       ref="table_ref"
       :data="tableData"
@@ -10,7 +10,7 @@
       fit
       style="width: 100%"
       header-row-class-name="text-12px"
-      row-class-name="cursor-pointer color-[--d-F5F5F5-l-333]"
+      row-class-name="cursor-pointer color-[--secondary-text]"
       @row-click="onRowClick"
       @sort-change="handleSortChange"
     >
@@ -24,12 +24,27 @@
           fixed: 'left',
         }"
       />
-      <el-table-column :label="$t('migrated1')">
+      <el-table-column
+        :width="200"
+        sortable="custom"
+        :sort-orders="['descending', 'ascending', null]"
+        :label="$t('time')"
+        prop="created_at"
+      >
         <template #default="{ row }">
-          {{ row.migrated }}
+          <span v-tooltip="dayjs(row.created_at).format('YYYY-MM-DD HH:mm:ss')">{{
+            formatTimeFromNow(dayjs(row.created_at).unix())
+          }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :width="80" align="right" :label="$t('migrated1')">
+        <template #default="{ row }">
+          <img v-if="row.migrated" src="@/assets/images/select-box-circle-line.svg" alt="" />
+          <img v-else src="@/assets/images/close-circle-line.svg" alt="" />
         </template>
       </el-table-column>
       <el-table-column
+        align="right"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         :label="$t('walletMarketCap')"
@@ -38,6 +53,7 @@
         <template #default="{ row }"> ${{ formatNumber(row.market_cap, 2) }}</template>
       </el-table-column>
       <el-table-column
+        align="right"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         :label="$t('allTimeHigh')"
@@ -45,12 +61,17 @@
       >
         <template #default="{ row }"> ${{ formatNumber(row.all_time_high, 2) }}</template>
       </el-table-column>
-      <el-table-column :label="$t('holders')">
+      <el-table-column align="right" :label="$t('holders')">
         <template #default="{ row }">
           {{ formatNumber(row.holders || 0, 2) }}
         </template>
       </el-table-column>
-      <TotalProfitColumn :label="$t('profit3')" />
+      <el-table-column align="right" :label="$t('volumeOneHour')">
+        <template #default="{ row }">
+          {{ formatNumber(row.volume_u_1h || 0, 2) }}
+        </template>
+      </el-table-column>
+      <!-- <TotalProfitColumn :label="$t('profit3')" />
       <el-table-column :label="$t('Bonding Curve Progress')">
         <template #default="{ row }">
           <template v-if="!row.progress || row.progress === '--'"> -- </template>
@@ -62,7 +83,7 @@
             color="#FFA622"
           />
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
   </div>
 </template>
@@ -72,7 +93,7 @@ import AveEmpty from '@/components/aveEmpty.vue'
 import TokenColumn from '@/components/tokenColumn.vue'
 import TotalProfitColumn from './totalProfitColumn.vue'
 // import { formatNumber2 } from '@/utils/formatNumber'
-import type { RowEventHandlerParams } from 'element-plus'
+import { dayjs, type RowEventHandlerParams } from 'element-plus'
 
 const props = defineProps({
   tableData: {
