@@ -239,6 +239,7 @@ function createHeaderButton() {
   headerBtns = []
   createToggleButton()
   createTogglePriceWarningButton()
+  createResetBtn()
   createMarkButton(_widget, headerBtns)
 }
 
@@ -282,6 +283,20 @@ function createTogglePriceWarningButton() {
     _widget?.activeChart?.().resetData?.()
   }
   updateButtonContent()
+  headerBtns.push(btn)
+}
+
+function createResetBtn() {
+  const btn = _widget?.createButton({ align: 'right', useTradingViewStyle: false })
+  if (!btn) return
+  btn.innerHTML = `<div style="cursor:pointer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<path d="M15.2182 3.04349C13.7649 1.95145 11.9578 1.30436 10 1.30436C5.19744 1.30436 1.30437 5.197 1.30437 9.99998C1.30437 11.3595 1.61643 12.646 2.17263 13.7925L1.09227 14.549C0.394018 13.1844 0 11.6381 0 9.99998C0 4.47692 4.47711 0 9.99999 0C12.2907 0 14.4009 0.770215 16.0869 2.0652V0.650475C16.0869 0.29128 16.3765 0 16.7391 0C17.0996 0 17.3913 0.292122 17.3913 0.650475V3.69649C17.3913 3.87652 17.3191 4.03871 17.2015 4.15676C17.0822 4.27482 16.9195 4.34783 16.7404 4.34783H13.6944C13.3352 4.34783 13.0435 4.05826 13.0435 3.69567C13.0435 3.33563 13.3356 3.04351 13.6944 3.04351H15.2182V3.04349ZM4.78177 16.9565C6.23513 18.0486 8.04198 18.6957 9.99999 18.6957C14.8026 18.6957 18.6956 14.8021 18.6956 10C18.6956 8.89779 18.4906 7.84394 18.1169 6.87417L19.2136 6.1065C19.7202 7.30301 20 8.61839 20 10C20 15.5222 15.5227 20 10 20C7.70955 20 5.59912 19.2298 3.91308 17.9348V19.3487C3.91308 19.7087 3.62348 20 3.26089 20C2.90065 20 2.60873 19.7079 2.60873 19.3487V16.3026C2.60873 16.1235 2.68093 15.9605 2.79832 15.8432C2.91783 15.7252 3.08045 15.6521 3.25964 15.6521H6.30566C6.66508 15.6521 6.95657 15.9417 6.95657 16.3043C6.95657 16.6644 6.66444 16.9565 6.30566 16.9565H4.78177V16.9565Z" fill="#9CA1A8"/>
+</svg></div>`
+  btn.onclick = () => {
+    kHeight.value = DefaultHeight.KLINE
+    _widget?.resetCache?.()
+    _widget?.activeChart?.().resetData?.()
+  }
   headerBtns.push(btn)
 }
 
