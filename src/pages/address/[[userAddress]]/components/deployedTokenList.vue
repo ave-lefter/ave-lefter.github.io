@@ -25,6 +25,7 @@
         }"
       />
       <el-table-column
+        :width="200"
         sortable="custom"
         :sort-orders="['descending', 'ascending', null]"
         :label="$t('time')"
@@ -36,7 +37,7 @@
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="$t('migrated1')">
+      <el-table-column :width="80" align="right" :label="$t('migrated1')">
         <template #default="{ row }">
           <img v-if="row.migrated" src="@/assets/images/select-box-circle-line.svg" alt="" />
           <img v-else src="@/assets/images/close-circle-line.svg" alt="" />

@@ -8,11 +8,21 @@
         <div class="icon-token-container relative flex mr-2 lh-0">
           <TokenImg
             :row="{
-              logo_url: row.logo_url ? `${s3BaseUrl}${row.logo_url}`:'',
+              logo_url: row.logo_url ? `${s3BaseUrl}${row.logo_url}` : '',
               chain: row.chain || row.network,
               symbol: row.symbol,
             }"
             token-class="w-8 h-8"
+          />
+          <el-image
+            v-if="row.amm"
+            v-tooltip="row.amm"
+            class="rounded-100% bg-[--d-151A22-l-E8F1FF] chain border border-[#55D592] border-solid border-[1px]"
+            :style="{
+              'border-color': getPumpColor(row.issue_platform),
+            }"
+            style="position: absolute; width: 14px; height: 14px; bottom: 0; right: 0"
+            :src="`${s3BaseUrl}swap/${row.amm}.jpeg`"
           />
         </div>
         <div>
@@ -20,17 +30,26 @@
             <span class="token-symbol ellipsis text-sm mr-4px color-[--main-text]">
               {{ row.symbol }}
             </span>
-            <span v-if="row.last_txn_time&&row.last_txn_time!='--'" v-tooltip="formatDate(row.last_txn_time,'YYYY-MM-DD HH:mm:ss')" class="text-xs color-[--third-text]">{{ formatTimeFromNow(row.last_txn_time,false,true) }}</span>
+            <span
+              v-if="row.last_txn_time && row.last_txn_time != '--'"
+              v-tooltip="formatDate(row.last_txn_time, 'YYYY-MM-DD HH:mm:ss')"
+              class="text-xs color-[--third-text]"
+              >{{ formatTimeFromNow(row.last_txn_time, false, true) }}</span
+            >
             <Icon
               v-if="row.risk_score > 55 || row.risk_level < 0"
               name="mynaui:danger-triangle"
               class="text-[--down-color] text-3.5 ml-0.5 mt-[4px]"
             />
           </div>
-          <div v-if="row.token !== NATIVE_TOKEN" class="flex items-start mt-0.5 min-w-[110%]" @click.stop>
+          <div
+            v-if="row.token !== NATIVE_TOKEN"
+            class="flex items-start mt-0.5 min-w-[110%]"
+            @click.stop
+          >
             <span class="token-address text-xs color-[--third-text]">
               {{ row.token.slice(0, 4) + '...' + row.token.slice(-6) }}
-              <Icon v-copy="row.token" name="bxs:copy" class="mb--0.25 text-2.5 clickable"/>
+              <Icon v-copy="row.token" name="bxs:copy" class="mb--0.25 text-2.5 clickable" />
             </span>
           </div>
         </div>

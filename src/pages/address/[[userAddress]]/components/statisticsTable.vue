@@ -198,7 +198,7 @@ const trendQuery = ref({
   sort: 'block_time',
 })
 const deployedTokenQuery = ref({
-  sort: 'market_cap',
+  sort: 'created_at',
   sort_dir: 'desc',
 })
 const deployedTokenNum = ref([0, 0, 0])
