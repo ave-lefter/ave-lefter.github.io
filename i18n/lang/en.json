@@ -1638,6 +1638,12 @@
   "short": "Short",
   "margin": "Margin",
   "orderSubmitted": "Order submitted",
+  "adjustLeverage": "Adjust Leverage",
+  "currentLeverage": "Current Leverage",
+  "positionMargin": "Position Margin",
+  "maxPositionCurrentLeverage": "Max position at current leverage",
+  "adjustLeverageTip1": "Adjusting your leverage will affect the leverage of your current position and maker order.",
+  "adjustLeverageTip2": "You cannot change this contract trade max leverage before cancel all order. contract id is {name}",
   "TPPrice": "TP Price",
   "SLPrice": "SL Price"
 }

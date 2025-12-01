@@ -7,7 +7,10 @@ import { usePerpStore } from '~/stores/perp'
 
 // 获取metadata
 export async function getPerpMetadata(): Promise<Metadata> {
-  const cached: { data: any, timestamp: number } = (await localforage.getItem('perpMetadata')) ||  { data: null, timestamp: 0 }
+  const cached: { data: any; timestamp: number } = (await localforage.getItem('perpMetadata')) || {
+    data: null,
+    timestamp: 0,
+  }
   if (cached?.data && cached.timestamp > Date.now() - 10 * 60 * 1000) {
     return cached.data
   }
@@ -69,7 +72,7 @@ export async function onboardSite(): Promise<{
   if (!walletStore.address) {
     return {
       dataList: [],
-      nextPageOffsetData: ''
+      nextPageOffsetData: '',
     }
   }
   // api/v1/public/user/onboardSite
@@ -81,229 +84,227 @@ export async function onboardSite(): Promise<{
       signature: perpStore.perpKeys?.apiSignature,
       l2Key: '0x' + perpStore.l2KeyPair?.l2PublicKey,
       l2KeyYCoordinate: '0x' + perpStore.l2KeyPair?.l2PublicKeyY,
-      clientAccountId: 'main'
-    }
+      clientAccountId: 'main',
+    },
   })
 }
 
 export interface PositionTransactionPageResponse {
-  id:                      string;
-  userId:                  string;
-  accountId:               string;
-  coinId:                  string;
-  contractId:              string;
-  type:                    string;
-  deltaOpenSize:           string;
-  deltaOpenValue:          string;
-  deltaOpenFee:            string;
-  deltaFundingFee:         string;
-  beforeOpenSize:          string;
-  beforeOpenValue:         string;
-  beforeOpenFee:           string;
-  beforeFundingFee:        string;
-  fillCloseSize:           string;
-  fillCloseValue:          string;
-  fillCloseFee:            string;
-  fillOpenSize:            string;
-  fillOpenValue:           string;
-  fillOpenFee:             string;
-  fillPrice:               string;
-  liquidateFee:            string;
-  realizePnl:              string;
-  isLiquidate:             boolean;
-  isDeleverage:            boolean;
-  fundingTime:             string;
-  fundingRate:             string;
-  fundingIndexPrice:       string;
-  fundingOraclePrice:      string;
-  fundingPositionSize:     string;
-  orderId:                 string;
-  orderFillTransactionId:  string;
-  collateralTransactionId: string;
-  forceTradeId:            string;
-  extraType:               string;
-  extraDataJson:           string;
-  censorStatus:            string;
-  censorTxId:              string;
-  censorTime:              string;
-  censorFailCode:          string;
-  censorFailReason:        string;
-  l2TxId:                  string;
-  l2RejectTime:            string;
-  l2RejectCode:            string;
-  l2RejectReason:          string;
-  l2ApprovedTime:          string;
-  createdTime:             string;
-  updatedTime:             string;
+  id: string
+  userId: string
+  accountId: string
+  coinId: string
+  contractId: string
+  type: string
+  deltaOpenSize: string
+  deltaOpenValue: string
+  deltaOpenFee: string
+  deltaFundingFee: string
+  beforeOpenSize: string
+  beforeOpenValue: string
+  beforeOpenFee: string
+  beforeFundingFee: string
+  fillCloseSize: string
+  fillCloseValue: string
+  fillCloseFee: string
+  fillOpenSize: string
+  fillOpenValue: string
+  fillOpenFee: string
+  fillPrice: string
+  liquidateFee: string
+  realizePnl: string
+  isLiquidate: boolean
+  isDeleverage: boolean
+  fundingTime: string
+  fundingRate: string
+  fundingIndexPrice: string
+  fundingOraclePrice: string
+  fundingPositionSize: string
+  orderId: string
+  orderFillTransactionId: string
+  collateralTransactionId: string
+  forceTradeId: string
+  extraType: string
+  extraDataJson: string
+  censorStatus: string
+  censorTxId: string
+  censorTime: string
+  censorFailCode: string
+  censorFailReason: string
+  l2TxId: string
+  l2RejectTime: string
+  l2RejectCode: string
+  l2RejectReason: string
+  l2ApprovedTime: string
+  createdTime: string
+  updatedTime: string
 }
 // 资产-资金费率
-export async function getPositionTransactionPage(params:{
-  filterTypeList:string
-  size:number
-  filterStartCreatedTimeInclusive?:string
-  filterEndCreatedTimeExclusive?:string
-  filterContractIdList?:string
-}):Promise<{dataList:PositionTransactionPageResponse[]}> {
+export async function getPositionTransactionPage(params: {
+  filterTypeList: string
+  size: number
+  filterStartCreatedTimeInclusive?: string
+  filterEndCreatedTimeExclusive?: string
+  filterContractIdList?: string
+}): Promise<{ dataList: PositionTransactionPageResponse[] }> {
   const perpStore = usePerpStore()
   return api('/api/v1/private/account/getPositionTransactionPage', {
     method: 'get',
     query: {
       ...params,
-      accountId:perpStore.userInfo?.id,
-      size:10
-    }
+      accountId: perpStore.userInfo?.id,
+      size: 10,
+    },
   })
 }
 
 // 资产-资金记录
-export async function getAllOrdersPage(params:{
-  size:number
-  typeList?:string
-  startTime?:string
-  endTime?:string
-}){
+export async function getAllOrdersPage(params: {
+  size: number
+  typeList?: string
+  startTime?: string
+  endTime?: string
+}) {
   const perpStore = usePerpStore()
   return api('/api/v1/private/assets/getAllOrdersPage', {
     method: 'get',
     query: {
       ...params,
-      accountId:perpStore.userInfo?.id,
-      size:10
-    }
+      accountId: perpStore.userInfo?.id,
+      size: 10,
+    },
   })
 }
 
 export interface ProfitResponse {
-  userId:           string;
-  totalEquity:      string;
-  profit:           string;
-  profitRate:       string;
-  withdraw:         string;
-  deposit:          string;
-  totalWithdraw:    string;
-  totalDeposit:     string;
-  transaction:      string;
-  totalTransaction: string;
-  maxDrawdown:      string;
-  totalProfit:      string;
-  accountList:      AccountList[];
+  userId: string
+  totalEquity: string
+  profit: string
+  profitRate: string
+  withdraw: string
+  deposit: string
+  totalWithdraw: string
+  totalDeposit: string
+  transaction: string
+  totalTransaction: string
+  maxDrawdown: string
+  totalProfit: string
+  accountList: AccountList[]
 }
 
 export interface AccountList {
-  accountId:                string;
-  totalEquity:              string;
-  profit:                   string;
-  deposit:                  string;
-  withdraw:                 string;
-  collateralAssetModelList: CollateralAssetModelList[];
-  positionAssetList:        PositionAssetList[];
-  assetOrderModelList:      any[];
+  accountId: string
+  totalEquity: string
+  profit: string
+  deposit: string
+  withdraw: string
+  collateralAssetModelList: CollateralAssetModelList[]
+  positionAssetList: PositionAssetList[]
+  assetOrderModelList: any[]
 }
 
 export interface CollateralAssetModelList {
-  userId:                   string;
-  accountId:                string;
-  coinId:                   string;
-  totalEquity:              string;
-  totalPositionValueAbs:    string;
-  initialMarginRequirement: string;
-  starkExRiskValue:         string;
-  pendingWithdrawAmount:    string;
-  pendingTransferOutAmount: string;
-  orderFrozenAmount:        string;
-  availableAmount:          string;
+  userId: string
+  accountId: string
+  coinId: string
+  totalEquity: string
+  totalPositionValueAbs: string
+  initialMarginRequirement: string
+  starkExRiskValue: string
+  pendingWithdrawAmount: string
+  pendingTransferOutAmount: string
+  orderFrozenAmount: string
+  availableAmount: string
 }
 
 export interface PositionAssetList {
-  userId:                   string;
-  accountId:                string;
-  coinId:                   string;
-  contractId:               string;
-  positionValue:            string;
-  maxLeverage:              string;
-  initialMarginRequirement: string;
-  starkExRiskRate:          string;
-  starkExRiskValue:         string;
-  avgEntryPrice:            string;
-  liquidatePrice:           string;
-  bankruptPrice:            string;
-  worstClosePrice:          string;
-  unrealizePnl:             string;
-  termRealizePnl:           string;
-  totalRealizePnl:          string;
+  userId: string
+  accountId: string
+  coinId: string
+  contractId: string
+  positionValue: string
+  maxLeverage: string
+  initialMarginRequirement: string
+  starkExRiskRate: string
+  starkExRiskValue: string
+  avgEntryPrice: string
+  liquidatePrice: string
+  bankruptPrice: string
+  worstClosePrice: string
+  unrealizePnl: string
+  termRealizePnl: string
+  totalRealizePnl: string
 }
 // 资产-总资产
-export async function profit():Promise<ProfitResponse>{
+export async function profit(): Promise<ProfitResponse> {
   const perpStore = usePerpStore()
   return api('/api/v1/private/user/day/profit', {
     method: 'get',
     query: {
-      userId:perpStore.userInfo?.id
-    }
+      userId: perpStore.userInfo?.id,
+    },
   })
 }
 
 // 资产-周积分
-export async function ranking(){
+export async function ranking() {
   return api('https://award.edgex.exchange/api/points/ranking', {
     method: 'post',
     body: {
-      needpage:0,
-      pagecount:15,
-      type:2
-    }
+      needpage: 0,
+      pagecount: 15,
+      type: 2,
+    },
   })
 }
 // 资产-总积分
-export async function totalPoints(){
+export async function totalPoints() {
   return api('https://award.edgex.exchange/api/points/info', {
     method: 'post',
-    body:{}
+    body: {},
   })
 }
 
 // 资产-账户余额
-export async function assetDetail(type:string) {
+export async function assetDetail(type: string) {
   const perpStore = usePerpStore()
-  return api('/api/v1/private/user/asset/detail',{
-    method:'get',
-    query:{
+  return api('/api/v1/private/user/asset/detail', {
+    method: 'get',
+    query: {
       type,
-      userId:perpStore.userInfo?.id
-    }
+      userId: perpStore.userInfo?.id,
+    },
   })
 }
 
 // 领取积分
 export async function boxopen() {
-  return api('https://award.edgex.exchange/api/points/boxopen',{
-    method:'post',
-    body:{
-    }
+  return api('https://award.edgex.exchange/api/points/boxopen', {
+    method: 'post',
+    body: {},
   })
 }
 
 // 当前委托
-export async function getActiveOrderPage(params:{
-  filterStatusList:string
-  filterStartCreatedTimeInclusive:string | number
-  filterEndCreatedTimeExclusive:string | number
-  filterContractIdList:string
-}){
+export async function getActiveOrderPage(params: {
+  filterStatusList: string
+  filterStartCreatedTimeInclusive: string | number
+  filterEndCreatedTimeExclusive: string | number
+  filterContractIdList: string
+}) {
   const perpStore = usePerpStore()
-  return api('/api/v1/private/order/getActiveOrderPage',{
-    method:'get',
-    query:{
-      accountId:perpStore.userInfo?.id,
-      size:10,
-      ...params
-    }
+  return api('/api/v1/private/order/getActiveOrderPage', {
+    method: 'get',
+    query: {
+      accountId: perpStore.userInfo?.id,
+      size: 10,
+      ...params,
+    },
   })
 }
 
-
 export interface PerpKline {
-  dataList:KlineInfo[]
+  dataList: KlineInfo[]
 }
 
 export interface KlineInfo {
@@ -344,7 +345,7 @@ export interface OrderBook {
   sum: string
 }
 
-export async function cancelOrderById(orderIds:string[]) {
+export async function cancelOrderById(orderIds: string[]) {
   const perpStore = usePerpStore()
   return api('/api/v1/private/order/cancelOrderById', {
     method: 'post',
@@ -360,9 +361,9 @@ export async function getHistoryOrderFillTransactionPage(params) {
   return api('/api/v1/private/order/getHistoryOrderFillTransactionPage', {
     method: 'get',
     query: {
-      size:10,
-      accountId:perpStore.userInfo?.id,
-      ...params
+      size: 10,
+      accountId: perpStore.userInfo?.id,
+      ...params,
     },
   })
 }
@@ -372,9 +373,9 @@ export async function getHistoryOrderPage(params) {
   return api('/api/v1/private/order/getHistoryOrderPage', {
     method: 'get',
     query: {
-      size:10,
-      accountId:perpStore.userInfo?.id,
-      ...params
+      size: 10,
+      accountId: perpStore.userInfo?.id,
+      ...params,
     },
   })
 }
@@ -384,9 +385,9 @@ export async function getPositionTermPage(params) {
   return api('/api/v1/private/account/getPositionTermPage', {
     method: 'get',
     query: {
-      size:10,
-      accountId:perpStore.userInfo?.id,
-      ...params
+      size: 10,
+      accountId: perpStore.userInfo?.id,
+      ...params,
     },
   })
 }
@@ -400,7 +401,7 @@ export async function getAccountDeleverageLight(): Promise<{
   return api('/api/v1/private/account/getAccountDeleverageLight', {
     method: 'get',
     query: {
-      accountId:perpStore.userInfo?.id
+      accountId: perpStore.userInfo?.id,
     },
   })
 }
@@ -464,7 +465,18 @@ export async function getAccountById(): Promise<{
   return api('/api/v1/private/order/createOrder', {
     method: 'post',
     body: {
-      accountId: perpStore.userInfo?.id
+      accountId: perpStore.userInfo?.id,
+    },
+  })
+}
+//设置杠杆倍数
+export function updateLeverageSetting(params: { contractId : string, leverage: string}) {
+  const perpStore = usePerpStore()
+  return api('/api/v1/private/account/updateLeverageSetting', {
+    method: 'post',
+    body: {
+      accountId: perpStore.userInfo?.id,
+      ...params,
     },
   })
 }

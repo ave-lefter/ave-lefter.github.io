@@ -1622,6 +1622,12 @@
   "short": "做空",
   "margin": "保證金",
   "orderSubmitted": "訂單已提交",
+  "adjustLeverage": "調整杠杆",
+  "currentLeverage": "當前杠杆",
+  "positionMargin": "倉位保證金",
+  "maxPositionCurrentLeverage": "當前杠杆倍數最大可開",
+  "adjustLeverageTip1": "杠杆調整將同時影響當前倉位和掛單的杠杆倍數",
+  "adjustLeverageTip2": "在取消所有訂單之前，您不能更改此合約交易的最大杠杆。 合約{name}。",
   "TPPrice": "止盈價格",
   "SLPrice": "止損價格"
 }
