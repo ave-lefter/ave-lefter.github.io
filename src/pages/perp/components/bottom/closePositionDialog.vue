@@ -3,8 +3,8 @@
     v-model="visible"
     width="400px"
     class="dialog-box dialog-max dialog-remind dialog"
-    @close="visible = false"
     append-to-body
+    @close="visible = false"
   >
     <template #header>
       <div class="flex-start items-center">
@@ -13,14 +13,14 @@
     </template>
     <div class="content">
       <ul>
-        <li class="mb-15px" v-for="(item, $index) in position" :key="$index">
+        <li v-for="(item, $index) in position" :key="$index" class="mb-15px">
           <div>
             <span class="bg-[--up-color] rounded-4px px-2px text-10px">{{ $t('buy1') }}</span>
             <span class="ml-5px text-14px color-[--third-text]">
               {{ typeDict[item.contractId] }}</span
             >
             <span class="ml-5px color-[--secondary-text] text-12px">
-              {{ getLeverageFromContractId(item.contractId) || item.maxLeverage }}x</span
+              {{ getLeverageFromContractId(item.contractId) }}x</span
             >
           </div>
           <div class="flex-between mt-5px">

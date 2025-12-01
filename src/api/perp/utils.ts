@@ -151,7 +151,7 @@ export async function createOrder(data: PerpOrderParams) {
   const type = data.type
   const tradeParams: TradeOrderParams = {
     ...data,
-    price: type === 'LIMIT' ? data.price.toString () : '0', // Market orders pass price as 0
+    price: type?.includes('LIMIT') ? data.price.toString () : '0', // Market orders pass price as 0
     size: data?.size || '1',                  // 订单数量
     type: type,                // 订单类型: LIMIT | MARKET
     timeInForce: type === 'LIMIT' ? 'GOOD_TIL_CANCEL' : 'IMMEDIATE_OR_CANCEL',

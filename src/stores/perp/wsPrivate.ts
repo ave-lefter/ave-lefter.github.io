@@ -115,13 +115,15 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
         }
 
         // 更新订单信息
-        if (msg.content?.event === 'Snapshot' && order as Order) {
+        if (msg.content?.event === 'Snapshot' && order as Order[]) {
           updateOrderInfo(order)
-        } else if(msg.content?.event === 'ORDER_UPDATE' && order as Order) {
-          const canceledOrder = order.filter((i) => i.status === 'CANCELED')
+        } else if(msg.content?.event === 'ORDER_UPDATE' && order as Order[]) {
+          const canceledOrder: Order[] = (order as Order[]).filter((i) => i.status === 'CANCELED')
+          console.log('canceledOrder', canceledOrder)
           // 取消订单
           if(canceledOrder.length > 0){
-            perpStore.order = perpStore.order.filter((i) => !canceledOrder.includes(i.id))
+            perpStore.order = perpStore.order.filter((i) => !canceledOrder.some(j => j.id === i.id))
+            console.log('perpStore.order', perpStore.order)
           } else {
             // 加仓、平仓、止盈、止损
             perpStore.order.push(...order)
