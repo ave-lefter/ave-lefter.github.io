@@ -653,6 +653,7 @@ export class CoreCalculator {
     orderSide: string
     orderPrice: string
     orderSize: string
+    leverage?: string
   }) {
     const orderSize = new BigNumber(data.orderSize)
     const orderPrice = new BigNumber(data.orderPrice)
@@ -701,7 +702,7 @@ export class CoreCalculator {
 
     const openAmount = CoreCalculator._getOpenOrderFrozenAmount({
       oraclePrice: oraclePrice.toFixed(),
-      initialMarginRate: CoreCalculator.getInitialMarginRateWithMaxLeverage(CoreCalculator.getOpenMaxLeverage(data?.contractId || '0') || '0'),
+      initialMarginRate: CoreCalculator.getInitialMarginRateWithMaxLeverage(data.leverage || CoreCalculator.getOpenMaxLeverage(data?.contractId || '0') || '0'),
       orderOpenSize: model.openSize.toFixed(),
       orderOpenValue: model.openSize.times(orderPrice).toFixed(),
       feeRate: feeRate.toFixed()
@@ -709,7 +710,7 @@ export class CoreCalculator {
 
     const closeAmount = CoreCalculator._getCloseOrderFrozenAmount({
       oraclePrice: oraclePrice.toFixed(),
-      initialMarginRate: CoreCalculator.getInitialMarginRateWithMaxLeverage(CoreCalculator.getOpenMaxLeverage(data?.contractId || '0') || '0'),
+      initialMarginRate: CoreCalculator.getInitialMarginRateWithMaxLeverage(data.leverage ||CoreCalculator.getOpenMaxLeverage(data?.contractId || '0') || '0'),
       orderCloseSize: model.closeSize.toFixed(),
       orderCloseValue: model.closeSize.times(orderPrice).toFixed(),
       feeRate: feeRate.toFixed()
