@@ -222,10 +222,11 @@ export const getTokenDetails= createCacheRequest(async function (data1: {
   tokenAddress: string
   chain: string
   spender?: string
+  walletAddress?: string
 }) {
   const { tokenAddress, chain, spender } = data1
   const canSwapChain = isEvmChain(chain) || chain === 'solana' || chain === 'tron' || chain === 'sui' || chain === 'ton'
-  const account = useWalletStore().address
+  const account = data1.walletAddress || useWalletStore().address
   if (!chain || !tokenAddress || !canSwapChain) {
     return {
       symbol: '',

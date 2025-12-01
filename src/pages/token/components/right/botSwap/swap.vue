@@ -16,7 +16,7 @@
               <el-dropdown-menu>
                 <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)" :key="item.address" @click.stop="tokenStore.swap.payToken = item;$emit('getTokenBalance');amountNative='';amountNativeOut=''">
                   <img :src="`${configStore.token_logo_url}${item.logo_url}`" class="rd-50% mr-8px" height="16"  alt="" srcset="" >
-                  <span class="text-12px font-400">{{ item.symbol }}</span>
+                  <span class="text-12px font-400">{{ item?.symbol }}</span>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -37,11 +37,11 @@
           <span v-if="!editMode">{{ item.name }}</span>
           <el-input
             style="--el-input-inner-height:24px;--el-input-bg-color:transparent;--el-input-border-color:transparent;--el-input-hover-border-color:transparent;--el-input-focus-border-color:transparent"
-            class="text-center w-full h-full" 
-            size="small" 
+            class="text-center w-full h-full"
+            size="small"
             v-model="tabs1Ref[index].value"
             @blur="tabs1Ref[index].value = tabs1Ref[index].value?.replace?.(/\-|[^\d.]/g, '')"
-            v-else-if="tabs1Ref[index]" 
+            v-else-if="tabs1Ref[index]"
            />
         </button>
         <button class="tab-item h-30px basis-[26px]! grow-0! shrink-0!" type="button" @click="handleEdit(tabs1Ref, 'buy')">
@@ -77,7 +77,7 @@
               <el-dropdown-menu>
                 <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)" :key="item?.address" @click.stop="tokenStore.swap.payToken = item;$emit('getTokenBalance');amountToken='';amountTokenOut='';amountSellTokenPercent = ''">
                   <img :src="`${configStore.token_logo_url}${item.logo_url}`" class="rd-50% mr-8px" height="16"  alt="" srcset="" >
-                  <span class="text-12px font-400">{{ item.symbol }}</span>
+                  <span class="text-12px font-400">{{ item?.symbol }}</span>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -463,12 +463,12 @@ const submitAmount = computed(()=>{
 
 const submitAmountUsd = computed(()=>{
   if(!amountNative.value) return '0'
-  const result =  new BigNumber(amountNative.value).multipliedBy(tokenStore.swap.payToken.price)
+  const result =  new BigNumber(amountNative.value).times(tokenStore.swap.payToken?.price || '0')
   return formatNumber(result.toString())
 })
 
 const isUsdcUsdt = computed(()=>{
-  return tokenStore.swap.payToken.symbol?.toUpperCase?.() === 'USDC' || tokenStore.swap.payToken.symbol?.toUpperCase?.() === 'USDT'
+  return tokenStore.swap.payToken?.symbol?.toUpperCase?.() === 'USDC' || tokenStore.swap.payToken?.symbol?.toUpperCase?.() === 'USDT'
 })
 
 
@@ -482,7 +482,7 @@ const handleMax = (balance: string | number, type: 'buy' | 'sell') => {
   if (type === 'buy') {
     if (nativeTokens.includes(fromToken.value?.address || '')) {
       if (new BigNumber(balance).lt(min)) {
-        ElMessageBox.alert(t('balanceNotEnough', {n: min, s: fromToken.value.symbol}), t('tips'), {
+        ElMessageBox.alert(t('balanceNotEnough', {n: min, s: fromToken.value?.symbol}), t('tips'), {
           confirmButtonText: t('okay')
         })
         return
