@@ -4,6 +4,7 @@ import { cancelOrderById, getActiveOrderPage } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 import { Warning } from '@element-plus/icons-vue'
 import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
+import type { Order } from '~/stores/perp/type'
 const route =   useRoute()
 const { mode } = storeToRefs(useGlobalStore())
 const perpStore = usePerpStore()
@@ -13,7 +14,7 @@ const props = defineProps<{
 }>()
 const wsPrivateStore = usePerpWsPrivateStore()
 const { isCancelOrder } = storeToRefs(usePerpStore())
-const listData = shallowRef()
+const listData = shallowRef<Order[]>([])
 const listStatus = ref({
   loading: false,
   finished: false,
@@ -77,8 +78,14 @@ const getList = async () => {
   }
 }
 getList()
+const cancelOrderLoading = reactive<{ [key: string]: boolean }>({
+
+})
 const cancelOrder = async (orderIds: string[]) => {
-  await cancelOrderById(orderIds)
+  cancelOrderLoading[orderIds[0]] = true
+  await cancelOrderById(orderIds).finally(() => {
+    cancelOrderLoading[orderIds[0]] = false
+  })
   getList()
   ElMessage.success(t('cancelledOrderSuccessfully'))
 }
@@ -106,7 +113,8 @@ watch(
   () => wsPrivateStore.wsResult,
   (val) => {
     if (route.name == 'perp-id') {
-      let result = val['trade-event']?.content?.data?.order?.filter(i => i.status !== 'CANCELED') || []
+      let result: Order[] = val['trade-event']?.content?.data?.order || []
+      result = listData.value?.filter(i => !result.some(el => el.id === i.id)).concat(...result)?.filter(i => i.status !== 'CANCELED')
       result = result?.map?.((el) => {
         const isLong = el.side === 'SELL'
         // 止盈
@@ -275,7 +283,8 @@ watch(
           <el-button
             size="small"
             style="--el-button-active-border-color: transparent"
-            @click="cancelOrder([row.id])"
+            :loading="cancelOrderLoading[row.id]"
+            @click.stop="cancelOrder([row.id])"
             >{{ t('cancel') }}</el-button
           >
         </template>

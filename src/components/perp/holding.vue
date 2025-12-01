@@ -17,7 +17,9 @@ const { t } = useI18n()
 const perpStore = usePerpStore()
 const wsPrivateStore = usePerpWsPrivateStore()
 const wsPublicStore = usePerpWsPubStore()
-const contractLevelMap = shallowRef({})
+const contractLevelMap = shallowRef<{
+  [key: string]: number
+}>({})
 const stopProfitLossVisible = ref(false)
 const stopProfitLossRow = ref<any>(null)
 const stopTableVisible = ref(false)
@@ -155,6 +157,7 @@ onMounted(() => {
   timer = requestTimeout(5000, () => {
     getContractLevelMap()
   })
+
 })
 
 onUnmounted(() => {
@@ -173,7 +176,7 @@ onUnmounted(() => {
       cell-class-name="color-[--main-text] text-12px"
     >
       <template #empty>
-        <AveEmpty v-if="perpStore.positionlength === 0" class="pt-[40px]" />
+        <AveEmpty v-if="perpStore.position?.length === 0" class="pt-[40px]" />
         <span v-else />
       </template>
       <el-table-column :label="t('perp')" prop="perp">
@@ -181,8 +184,8 @@ onUnmounted(() => {
           <div class="flex items-center text-14px lh-18px color-[--main-text] gap-4px mb-4px">
             {{ typeDict[row.contractId] }}
             <div
-              v-tooltip="t('autoDeleverageTips')"
               v-if="typeof contractLevelMap[row.contractId] === 'number'"
+              v-tooltip="t('autoDeleverageTips')"
               class="flex items-center gap-2px [&>span]:bg-[#3b3b3b] data-[active=on]:[&>span:nth-child(1)]:bg-[#08BA4E] data-[active=on]:[&>span:nth-child(2)]:bg-[#409F4B] data-[active=on]:[&>span:nth-child(3)]:bg-[#7F8147] data-[active=on]:[&>span:nth-child(4)]:bg-[#B36844] data-[active=on]:[&>span:nth-child(5)]:bg-[#F1493F]"
             >
               <span
@@ -216,7 +219,7 @@ onUnmounted(() => {
                 : row.openValue.replace('-', ''),
               {
                 limit: 20,
-                decimals: 2,
+                decimals: getPricePrecision(row.contractId)
               }
             )
           }}
@@ -227,6 +230,7 @@ onUnmounted(() => {
           {{
             formatNumber(new BigNumber(row.openValue).div(row.openSize).toString(), {
               limit: 20,
+              decimals: getPricePrecision(row.contractId)
             })
           }}
         </template>
@@ -236,7 +240,7 @@ onUnmounted(() => {
           {{
             formatNumber(row.oraclePrice, {
               limit: 20,
-              decimals: 1,
+              decimals: getPricePrecision(row.contractId),
             })
           }}
         </template>
@@ -244,9 +248,14 @@ onUnmounted(() => {
       <el-table-column align="right" :label="t('estimatedLiquidationPrice')" prop="liquidatePrice">
         <template #default="{ row }">
           {{
-            formatNumber(row.liquidatePrice, {
+            formatNumber(CoreCalculator.getCreateOrderLiquidatePrice({
+              contractId: row.contractId,
+              orderPrice: new BigNumber(row.openValue).div(row.openSize).toString(),
+              orderSize: row.openSize,
+              orderSide: row.openSize > 0 ? 'BUY' : 'SELL',
+            }).toFixed() || row.liquidatePrice, {
               limit: 20,
-              decimals: 1,
+              decimals: getPricePrecision(row.contractId),
             })
           }}
         </template>
@@ -267,7 +276,7 @@ onUnmounted(() => {
       </el-table-column>
       <el-table-column align="right" :label="t('fundingFee')" prop="fundingFee">
         <template #default="{ row }">
-          {{ formatNumber(row.fundingFee, 2) }}
+          {{ formatNumber(row.fundingFee, getPricePrecision(row.contractId)) }}
         </template>
       </el-table-column>
       <el-table-column align="right" :label="t('takeProfitStopLoss')" prop="takeProfitStopLoss">
@@ -316,8 +325,8 @@ onUnmounted(() => {
     @add="addStop"
   />
   <ClosePosition
+    v-model:visible="closePositionVisible"
     :token="typeDict[stopProfitLossRow?.contractId] || ''"
     :row="stopProfitLossRow || {}"
-    v-model:visible="closePositionVisible"
   />
 </template>

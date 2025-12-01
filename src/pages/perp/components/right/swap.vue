@@ -418,8 +418,9 @@ function watchPrice(value: string) {
 }
 function watchAmount(value: string) {
   let _value = formatMinSize(value)
-  if (new BigNumber(_value).gt(new BigNumber(maxAmountBuy.value || '0'))) {
-    _value = maxAmountBuy.value || '0'
+  const _maxAmount = BigNumber.max(maxAmountBuy.value || '0', maxAmountSell.value || '0').toFixed()
+  if (new BigNumber(_value).gt(_maxAmount)) {
+    _value = _maxAmount || '0'
   }
   form.amount = _value
 }

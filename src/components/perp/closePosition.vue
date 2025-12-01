@@ -1,12 +1,30 @@
 <script setup lang="ts">
+import BigNumber from 'bignumber.js'
+import type { PerpOrderParams } from '~/api/perp/typs'
+import { createOrder } from '~/api/perp/utils'
+import type { Position } from '~/stores/perp/type'
 const props = defineProps<{
-  row: any
+  row: Position & { operation: 'market' | 'limit' }
   token?: string
 }>()
 const themeStore = useThemeStore()
 const visible = defineModel<boolean>('visible')
 const { t } = useI18n()
-const formData = ref({})
+const formData = reactive<{
+  closePrice?: string | number
+  closeSize?: string | number
+}>({
+  closePrice: undefined,
+  closeSize: undefined,
+})
+
+watch(visible, (val) => {
+  if (val) {
+    formData.closePrice = lastPrice.value
+    formData.closeSize = openSize.value
+    closePercent.value = 100
+  }
+})
 const closePercent = ref(0)
 const isLimit = computed(() => {
   return props.row.operation === 'limit'
@@ -14,23 +32,97 @@ const isLimit = computed(() => {
 const title = computed(() => {
   return isLimit.value ? t('limitClose') : t('marketClose')
 })
+
+const pricePrecision = computed(() => {
+  return getPricePrecision(props.row.contractId || '')
+})
+
+const quantityPrecision = computed(() => {
+  return getQuantityPrecision(props.row.contractId || '')
+})
+
+const symbolModel = computed(() => {
+  return CoreCalculator.getSymbolModel(props.row.contractId)
+})
+
+const maxLeverage = computed(() => {
+  return getLeverageFromContractId(props.row.contractId) || '1'
+})
+
+const openSize = computed(() => {
+  return props.row.openSize || '0'
+})
+
+const lastPrice = computed(() => {
+  return symbolModel.value?.lastPrice || '0'
+})
+
+function sizeChange(val: number) {
+  closePercent.value = new BigNumber(val || 0).times(100).div(new BigNumber(props.row?.openSize || '0').abs()).dp(0, BigNumber.ROUND_FLOOR).toNumber()
+}
+
+const closeSizePercentChange = (val: number) => {
+  formData.closeSize = new BigNumber(val || 0).div(100).times(new BigNumber(props.row?.openSize || '0').abs()).dp(quantityPrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+}
+
+const unrealizedPnl = computed(() => {
+  const cur = props.row
+  const oraclePrice = formData.closePrice || '0'
+  if (!cur || new BigNumber(oraclePrice).isZero()) return '0'
+  const profit = Number(cur?.openValue) >= 0
+    ? new BigNumber(oraclePrice).times(new BigNumber(cur?.openSize || 0).abs()).minus(new BigNumber(cur.openValue).abs())
+    : new BigNumber(cur.openValue || 0).abs().minus(new BigNumber(oraclePrice).times(new BigNumber(cur.openSize).abs()))
+  return profit.times(formData.closeSize || 0).div(openSize.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR)
+})
+
+const loading = ref(false)
+const disabled = computed(() => {
+  return new BigNumber(formData.closeSize || 0).isZero() || (isLimit.value && new BigNumber(formData.closePrice || 0).isZero())
+})
+function _createOrder() {
+  const row = props.row
+  if (formData.closePrice && BigNumber(formData.closeSize || '0').gt(0)) {
+    const data: PerpOrderParams = {
+      type: isLimit.value ? 'LIMIT' : 'MARKET',
+      size: String(formData.closeSize || '0'),
+      price: String(formData.closePrice || '0'),
+      side: 'SELL',
+      contractId: row?.contractId || '',
+      reduceOnly: false,
+      isPositionTpsl: false,
+      isSetOpenTp: false,
+      isSetOpenSl: false
+    }
+    loading.value = true
+    createOrder(data).then(res => {
+      console.log('createTpOrder result', res)
+      ElNotification({ type: 'success', message: isLimit.value ? '限价平仓订单已创建' : '市价平仓订单已成交' })
+      visible.value = false
+    }).catch((err) => {
+      ElNotification({ type: 'error', message: err?.message })
+    }).finally(() => {
+      loading.value = false
+    })
+  }
+}
+
 </script>
 
 <template>
-  <el-dialog append-to-body v-model="visible" :title="title" width="450px">
+  <el-dialog v-model="visible" append-to-body :title="title" width="450px">
     <div class="flex items-center font-bold h-21px mb-16px">
       {{ props.token }} · {{ t('all2')
       }}<span class="ml-4px font-normal" :class="getColorClass(props.row.openValue)">
-        {{ props.row.openValue > 0 ? t('long') : t('short') }} · {{ props.row.maxLeverage }}x
+        {{ BigNumber(props.row.openValue || 0).gt(0) ? t('long') : t('short') }} · {{ maxLeverage }}X
       </span>
     </div>
     <div class="flex items-center justify-between mb-16px">
       <span class="color-[--third-text]">{{ t('latestPrice') }}</span>
       <span class="color-[--main-text]"
         >{{
-          formatNumber(props.row.oraclePrice, {
+          formatNumber(lastPrice, {
             limit: 20,
-            decimals: 2,
+            decimals: pricePrecision,
           })
         }}
         USD</span
@@ -40,40 +132,42 @@ const title = computed(() => {
       <div class="color-[--third-text] mb-8px">
         {{ t('closePrice') }}
       </div>
-      <el-input v-model="formData.closePrice" class="mb-16px">
+      <el-input-number  v-model="formData.closePrice" :precision="pricePrecision" align="left" :controls="false" :min="0" class="mb-16px w-full!">
         <template #suffix>
           <span class="color-[--third-text] mx-4px">|</span>
-          <span class="color-[--up-color]">{{ t('midPrice') }}</span>
+          <span class="color-[--up-color] clickable" @click.stop="formData.closePrice = lastPrice">{{ t('midPrice') }}</span>
         </template>
-      </el-input>
+      </el-input-number>
     </template>
     <div class="color-[--third-text] justify-between mb-8px">
       {{ t('closeSize') }}
     </div>
-    <el-input v-model="formData.closeSize" class="mb-12px" />
+    <el-input-number v-model="formData.closeSize" :precision="quantityPrecision" align="left" :controls="false" class="mb-12px w-full!" :max="Math.abs(Number(row?.openSize || '0'))"
+            @change="(val) => sizeChange(val as number)" />
     <el-slider
       v-model="closePercent"
       :min="0"
-      :max="200"
+      :max="100"
       :step="1"
       :marks="{
         0: '0%',
+        25: '25%',
         50: '50%',
+        75: '75%',
         100: '100%',
-        150: '150%',
-        200: '200%',
       }"
       class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-406px"
+      @input="val => closeSizePercentChange(val as number)"
     />
     <div class="color-[--third-text] flex justify-between mt-38px mb-8px">
       {{ t('profit1') }}
-      <span>- 0.98 USD</span>
+      <span :class="BigNumber(unrealizedPnl).gte(0) ? 'color-[--up-color]' : 'color-[--down-color]'">{{ unrealizedPnl }} USD</span>
     </div>
     <div class="flex mt-20px text-16px">
       <el-button class="h-30px flex-1 m-l-auto" :color="themeStore.isDark ? '#333' : '#F2F2F2'">
         {{ $t('reset') }}
       </el-button>
-      <el-button type="primary" class="h-30px flex-1 m-l-auto">
+      <el-button type="primary" class="h-30px flex-1 m-l-auto" :disabled="disabled" :loading="loading" @click.stop="_createOrder">
         {{ $t('confirm') }}
       </el-button>
     </div>

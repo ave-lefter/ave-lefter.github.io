@@ -24,7 +24,7 @@
       </li>
       <li class="flex items-center justify-between mt-12px">
         <span class="color-[--third-text]">{{ $t('unrealizedPnl') }}</span>
-        <span class="font-500" :class="getColor(unrealizedPnl)">{{ addSign(unrealizedPnl) }}{{ formatNumber(unrealizedPnl, 3) }} USDT</span>
+        <span class="font-500" :class="getColor(unrealizedPnl)">{{ formatNumber(unrealizedPnl, 3) }} USDT</span>
       </li>
     </ul>
   </div>
