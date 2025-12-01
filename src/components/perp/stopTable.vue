@@ -66,7 +66,7 @@ const cancelOrder = async (id?: string) => {
       </el-table-column>
       <el-table-column :width="100" align="right" :label="t('orderSize')" prop="size">
         <template #default="{ row }">
-          {{ formatNumber(row.size) }} {{ typeDict[row.contractId].replace('USD', '') }}
+          {{ formatNumber(row.size, 10) }} {{ typeDict[row.contractId].replace('USD', '') }}
         </template>
       </el-table-column>
       <el-table-column align="right" :label="t('triggerPrice')" prop="triggerPrice">
@@ -75,7 +75,7 @@ const cancelOrder = async (id?: string) => {
           }}{{
             formatNumber(row.triggerPrice, {
               limit: 20,
-              decimals: 1,
+              decimals: 10,
             })
           }}
           {{ triggerPriceTypeMap[row.triggerPriceType as keyof typeof triggerPriceTypeMap] }}
@@ -86,7 +86,7 @@ const cancelOrder = async (id?: string) => {
           {{
             row.type.includes('LIMIT')
               ? formatNumber(row.price, {
-                  decimals: 2,
+                  decimals: 10,
                   limit: 20,
                 })
               : t('market')

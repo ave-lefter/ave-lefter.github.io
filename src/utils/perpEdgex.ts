@@ -17,7 +17,7 @@ function getDecimalScale(decimal: BigNumber | number | string) {
 }
 
 // 计算价格精度
-function getPricePrecision(contractId: string) {
+export function getPricePrecision(contractId: string) {
   const symbol = CoreCalculator.getSymbolModel(contractId)
   const tickSize = symbol?.tickSize || 0
   const tickSizeDecimal = new BigNumber(tickSize)
@@ -30,7 +30,7 @@ function getPricePrecision(contractId: string) {
 }
 
 // 计算数量精度
-function getQuantityPrecision(contractId: string) {
+export function getQuantityPrecision(contractId: string) {
   const symbol = CoreCalculator.getSymbolModel(contractId)
   const stepSize = symbol?.stepSize || 0
   const stepSizeDecimal = new BigNumber(stepSize)
@@ -40,6 +40,11 @@ function getQuantityPrecision(contractId: string) {
   } else {
     return getDecimalScale(stepSizeDecimal)
   }
+}
+
+// 排序
+function orderSortByTime(a: OrderModel, b: OrderModel) {
+  return BigNumber(b.createdTime || 0).minus(a.createdTime || 0).toNumber()
 }
 
 type OrderModel = ReturnType<typeof usePerpStore>['order'][0]
@@ -123,6 +128,7 @@ function isConditional(type: string): boolean {
 
 //  获取订单填充数据
 //  根据订单和当前仓位计算开仓和平仓部分
+
 function _getOrderFillData(data: {
   contractId: string
   orderModel: OrderModel
@@ -168,7 +174,7 @@ function _getOrderFillData(data: {
       orderLeftValue = orderLeftValue.decimalPlaces(Number(tokenStepSize), BigNumber.ROUND_FLOOR)
     }
   } else {
-    orderLeftValue = orderLeftSize.times(new BigNumber(orderModel.price || 0))
+    orderLeftValue = orderLeftSize.times(orderModel.price || 0)
   }
 
   let orderCloseSize = new BigNumber(0)
@@ -602,26 +608,6 @@ export class CoreCalculator {
      * orderFillFee = abs(orderCloseValue) x feeRate
      */
 
-        //   // 平仓损失
-        // BigDecimal orderLossValue = DecimalExtensions.subtract(
-        //     orderCloseValue,
-        //     DecimalExtensions.multiply(orderCloseSize, oraclePrice)
-        // );
-
-        // // 平仓成交后的减少的初始保证金
-        // BigDecimal orderInitialMarginRequirement = DecimalExtensions.multiply(
-        //     DecimalExtensions.multiply(orderCloseSize.abs(), oraclePrice),
-        //     initialMarginRate
-        // );
-
-        // // 手续费
-        // BigDecimal orderFillFee = DecimalExtensions.multiply(orderCloseValue.abs(), feeRate);
-
-        // return DecimalExtensions.add(
-        //     DecimalExtensions.subtract(orderLossValue, orderInitialMarginRequirement),
-        //     orderFillFee
-        // );
-
   static _getCloseOrderFrozenAmount(data: {
     oraclePrice: string
     initialMarginRate: string
@@ -655,13 +641,14 @@ export class CoreCalculator {
     orderSize: string
     leverage?: string
   }) {
-    const orderSize = new BigNumber(data.orderSize)
+
     const orderPrice = new BigNumber(data.orderPrice)
     const orderSide = data.orderSide
+    const orderSize = new BigNumber(data.orderSize)
     const contract = CoreCalculator.getSymbolModel(data.contractId)
     const perpStore = usePerpStore()
     const positionList = perpStore.position?.filter?.(item => item.contractId === data.contractId) || []
-    const positionOpenSize = positionList.length > 0 ? new BigNumber(positionList[0].openSize) : new BigNumber(0)
+    let positionOpenSize = positionList.length > 0 ? new BigNumber(positionList[0].openSize) : new BigNumber(0)
     // 订单排序
     const curOrder = {
       id: 0,
@@ -678,8 +665,8 @@ export class CoreCalculator {
       cumFee: '0',
       cumRealizedPnl: '0',
     }
-    let orderList = perpStore.order?.filter?.(item => item.contractId === data.contractId) || []
-    orderList = orderList.filter(item => item.status === 'UNTRIGGERED' && item.side !== orderSide)
+    let orderList = (perpStore.order?.filter?.(item => item.contractId === data.contractId && !item.isPositionTpsl) || [])?.sort(orderSortByTime)
+    orderList = orderList.filter(item => !(item.status === 'UNTRIGGERED' && item.side !== orderSide))
     for (let i = 0; i < orderList.length; i++) {
       const orderModel = orderList[i]
       if (orderSort(curOrder as any, orderModel) >= 0) {
@@ -688,9 +675,10 @@ export class CoreCalculator {
           orderModel,
           positionOpenSize: positionOpenSize.toFixed()
         })
-        positionOpenSize.plus(fillModel.closeSize).plus(fillModel.openSize)
+        positionOpenSize = positionOpenSize.plus(fillModel?.closeSize || 0).plus(fillModel?.openSize || 0)
       }
     }
+
 
     const model = _getOrderFillData({
       contractId: data.contractId,
@@ -716,7 +704,8 @@ export class CoreCalculator {
       feeRate: feeRate.toFixed()
     })
 
-    return BigNumber.max(new BigNumber(openAmount).plus(new BigNumber(closeAmount).abs()), 0).decimalPlaces(4, BigNumber.ROUND_DOWN)
+
+    return BigNumber.max(new BigNumber(openAmount).plus(new BigNumber(closeAmount)), 0).decimalPlaces(4, BigNumber.ROUND_DOWN)
   }
 
   /**
@@ -808,7 +797,7 @@ export class CoreCalculator {
     fillValue: string
     fillFee: string
   }) {
-    return new BigNumber(data.collateralTotalEquity).minus(data?.fillValue || 0).plus(new BigNumber(data.fillSize).times(data?.oraclePrice || 0)).plus(data?.fillFee || 0)
+    return new BigNumber(data?.collateralTotalEquity || 0).minus(data?.fillValue || 0).plus(new BigNumber(data.fillSize || '0').times(data?.oraclePrice || 0)).plus(data?.fillFee || 0)
   }
 
   /**
@@ -847,7 +836,7 @@ export class CoreCalculator {
 
 
   /**
-     * 预估强评价
+     * 预估强平价
      */
 
   static getCreateOrderLiquidatePrice(data: {
@@ -867,10 +856,10 @@ export class CoreCalculator {
     const collateralStarkExRiskValue = CoreCalculator.getStarkExRiskValue(contract?.quoteCoinId || '')
     const feeRate = CoreCalculator.getMaxTradeFeeRate(data.contractId)
     const allPositionList = perpStore.position || []
-    const positionOpenSize = new BigNumber(0)
+    let positionOpenSize = new BigNumber(0)
     for (let i = 0; i < allPositionList.length; i++) {
       if (allPositionList[i].contractId === data.contractId) {
-        positionOpenSize.plus(new BigNumber(allPositionList?.[i]?.openSize || 0))
+        positionOpenSize = positionOpenSize.plus(new BigNumber(allPositionList?.[i]?.openSize || 0))
       }
     }
 
@@ -887,8 +876,6 @@ export class CoreCalculator {
       fillValue: fillValue.toFixed(),
       fillFee: fillFee.toFixed()
     })
-
-
 
     const afterCollateralStarkExRiskValue = CoreCalculator.getCollateralStarkExRiskValueAfterFill({
       contractId: data.contractId,
@@ -1152,7 +1139,7 @@ export class CoreCalculator {
    *
    * @param accountId   账户ID
    * @param symbolModel 合约模型
-   * @param orderSide   订单方向（买/卖）
+   * @param orderSide   订单方向（买/卖）'BUY' | 'SELL'
    * @param inputLever  输入的杠杆
    * @return 最大可开数量
    */
@@ -1243,7 +1230,7 @@ export class CoreCalculator {
     let tmpOrderSide = ''
     let tmpPositionOpenSize = new BigNumber(0)
     let tmpContractOrderFrozenAmount = new BigNumber(0)
-    let orderList = (perpStore.order?.filter?.(item => item.contractId === data.contractId) || [])?.sort?.(orderSort)
+    let orderList = (perpStore.order?.filter?.(item => item.contractId === data.contractId) || [])?.sort?.(orderSortByTime)
 
     for (let i = 0; i < orderList.length; i++) {
       let orderModel = orderList[i]
@@ -1510,7 +1497,7 @@ export class CoreCalculator {
       let positionOpenSize = positionList.length === 0 ? new BigNumber(0) : new BigNumber(positionList[0].openSize)
 
       let orderFrozenAmount = new BigNumber(0)
-      const sortOrders = (perpStore.order || [])?.sort?.(orderSort)
+      const sortOrders = (perpStore.order || [])?.sort?.(orderSortByTime)
 
       for (let orderModel of sortOrders) {
         if (orderModel.contractId === data.contractId && orderModel.side === orderSide) {

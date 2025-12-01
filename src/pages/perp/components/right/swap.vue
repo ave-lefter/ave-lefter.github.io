@@ -1,14 +1,25 @@
 <template>
-  <el-tabs v-model="swapType" class="select-tabs mt-5px">
+  <el-tabs v-model="swapType" class="select-tabs mt-5px mb-12px">
     <el-tab-pane v-for="(item, index) in types" :key="index" :label="item.name" :name="item.value"/>
   </el-tabs>
-  <div class="text-12px color-[--third-text] mt-12px text-right">{{ $t('availableBalance') }}: {{ formatNumber(availableBalance, 4) }} USD</div>
-  <el-form ref="formRef" :model="form" label-width="auto" :rules="rules">
-    <el-form-item label="" prop="amount">
-      <el-input v-model="form.amount" placeholder="0.0" size="large"  clearable class="input-number mt-12px" input-style="text-align:right" @input="percent = 0"  @update:model-value="value => watchAmount(value)">
-        <template #prepend>
-          <span class="text-12px color-[--secondary-text]">{{ isValue ? $t('value1') :  $t('amount') }}</span>
+  <div class="text-12px color-[--third-text] mb-12px text-right">{{ $t('availableBalance') }}: {{ formatNumber(availableBalance, 4) }} USD</div>
+  <el-form ref="formRef" :model="form" label-width="auto" :rules="rules" @submit.prevent>
+    <el-form-item v-if="swapType === 'LIMIT'" label="" prop="price" style="margin-bottom: 15px;">
+      <el-input v-model="form.price" :placeholder="$t('price')" size="large"  clearable class="input-number" input-style="text-align:left"  @update:model-value="value => watchPrice(value)">
+        <template #append>
+          <div class="inline-flex items-center">
+            <span class="text-14px color-[--main-text]">USD</span>
+            <div class="h-8px w-1px b-l-[--third-text] b-l-1px b-l-solid mx-5px" />
+            <button type="button" class="text-14px color-[--up-color] border-none bg-transparent clickable p-0" @click.stop="form.price = (perpStore.perp?.lastPrice || '0')">中间价</button>
+          </div>
         </template>
+      </el-input>
+    </el-form-item>
+    <el-form-item label="" prop="amount">
+      <el-input v-model="form.amount" :placeholder="isValue ? $t('value1') :  $t('amount')" size="large"  clearable class="input-number" input-style="text-align:left" @input="percent = 0"  @update:model-value="value => watchAmount(value)">
+        <!-- <template #prepend>
+          <span class="text-12px color-[--secondary-text]">{{ isValue ? $t('value1') :  $t('amount') }}</span>
+        </template> -->
         <template #append>
           <el-dropdown placement="bottom" trigger="click" @visible-change="visible => show = visible">
             <div class="inline-flex items-center clickable">
@@ -26,7 +37,7 @@
         </template>
       </el-input>
     </el-form-item>
-    <div class="mt-24px px-3px w-full">
+    <div class="mt-20px px-3px w-full">
       <el-slider
         v-model="percent"
         :min="0"
@@ -49,15 +60,19 @@
       <template v-if="isChecked">
         <div class="flex items-center gap-10px mt-8px mb-16px w-full">
           <!-- 止盈 -->
-          <el-input-number
-            v-model.number="tpForm.triggerPrice"
+          <el-input
+            v-model="tpForm.triggerPrice"
             :controls="false"
             align="left"
-            class="flex-1"
+            class="flex-1 input-number"
             :placeholder="t('TP')"
+            size="large"
+            clearable
+            @update:model-value="value => watchPrice(value)"
           >
             <template #suffix>
-              <el-dropdown trigger="click">
+              <span class="text-12px color-[--main-text] pr-5px font-400">{{ t('latestPrice') }}</span>
+              <!-- <el-dropdown trigger="click">
                 <span class="flex items-center gap-4px cursor-pointer text-12px">
                   <span>{{
                     tpForm.triggerPriceType === 'LAST_PRICE' ? t('latestPrice') : t('indexPrice')
@@ -74,9 +89,9 @@
                     }}</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
-              </el-dropdown>
+              </el-dropdown> -->
             </template>
-          </el-input-number>
+          </el-input>
           <!-- <el-input-number
             v-model.number="tempData.tpPercent"
             :controls="false"
@@ -87,7 +102,7 @@
             <template #suffix> % </template>
           </el-input-number> -->
         </div>
-        <div class="mb-30px px-3px w-full">
+        <!-- <div class="mb-30px px-3px w-full">
           <el-slider
             v-model="tempData.tpPercent"
             :min="0"
@@ -102,19 +117,22 @@
             }"
             class=" [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white]"
           />
-        </div>
+        </div> -->
 
         <div class="flex items-center gap-10px mt-8px mb-16px w-full">
           <!-- 止损 -->
-          <el-input-number
-            v-model.number="slForm.triggerPrice"
+          <el-input
+            v-model="slForm.triggerPrice"
             :controls="false"
-             class="flex-1"
+             class="flex-1 input-number"
             align="left"
+            size="large"
             :placeholder="t('SL')"
+            @update:model-value="value => watchPrice(value)"
           >
             <template #suffix>
-              <el-dropdown trigger="click">
+              <span class="text-12px color-[--main-text] pr-5px font-400">{{ t('latestPrice') }}</span>
+              <!-- <el-dropdown trigger="click">
                 <span class="flex items-center gap-4px cursor-pointer text-12px">
                   <span>{{
                     slForm.triggerPriceType === 'LAST_PRICE' ? t('latestPrice') : t('indexPrice')
@@ -131,9 +149,9 @@
                     }}</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
-              </el-dropdown>
+              </el-dropdown> -->
             </template>
-          </el-input-number>
+          </el-input>
           <!-- <el-input-number
             v-model.number="tempData.slPercent"
             :controls="false"
@@ -144,7 +162,7 @@
             <template #suffix> % </template>
           </el-input-number> -->
         </div>
-        <div class="mb-30px px-3px w-full">
+        <!-- <div class="mb-30px px-3px w-full">
           <el-slider
             v-model="tempData.slPercent"
             :min="0"
@@ -159,7 +177,7 @@
             }"
             class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white]"
           />
-        </div>
+        </div> -->
       </template>
     </el-form-item>
 
@@ -195,11 +213,11 @@
   <div class="flex items-center justify-between text-12px font-400 mt-8px color-[--main-text]">
     <div class="text-left">
       <div class="color-[--third-text] mb-5px"> {{ $t('buy') }}: </div>
-      <div class="font-500"> ≈ {{ formatNumber(form.amount, 4) }} {{ perpStore.unit?.coinName || '' }}</div>
+      <div class="font-500"> ≈ {{ form.reduceOnly ? '0' :formatNumber(form.amount, 4) }} {{ perpStore.unit?.coinName || '' }}</div>
     </div>
     <div class="text-right">
       <div class="color-[--third-text] mb-5px"> {{ $t('sell') }}: </div>
-      <div class="font-500"> ≈ {{ formatNumber(amountSell, 4) }} {{ perpStore.unit?.coinName || '' }}</div>
+      <div class="font-500"> ≈ {{ form.reduceOnly ? '0' : formatNumber(amountSell, 4) }} {{ perpStore.unit?.coinName || '' }}</div>
     </div>
   </div>
   <el-divider style="--el-border-color: var(--main-divider);margin: 16px 0;" />
@@ -228,10 +246,11 @@
 import { usePerpStore } from '~/stores/perp'
 import BigNumber from 'bignumber.js'
 import type { FormInstance } from 'element-plus'
+import type { PerpOrderParams } from '~/api/perp/typs'
 
 const { t } = useI18n()
 const perpStore = usePerpStore()
-const swapType = shallowRef<'LIMIT' | 'MARKET'>('LIMIT')
+const swapType = shallowRef<'LIMIT' | 'MARKET'>('MARKET')
 const types = computed(() => {
   return [
     { value: 'LIMIT', name: t('limit') },
@@ -242,6 +261,7 @@ const types = computed(() => {
 const { createPerpOrder } = usePerp()
 
 const form = reactive({
+  price: '',
   amount: '',
   reduceOnly: false
 })
@@ -249,6 +269,15 @@ const form = reactive({
 const formRef = useTemplateRef<FormInstance>('formRef')
 
 const rules = computed(() => ({
+  price: [
+    { validator: (rule: any, value: string, callback: (error?: Error) => void) => {
+      if ((!value || value && new BigNumber(value).lte(0))) {
+        callback(new Error('请输入您的委托价格'))
+      } else {
+        callback()
+      }
+    }, trigger: 'change' },
+  ],
   amount: [
     { validator: (rule: any, value: string, callback: (error?: Error) => void) => {
       if ((!value || value && new BigNumber(value).lte(0))) {
@@ -271,24 +300,24 @@ const tempData = ref({
 
 watch(() => perpStore.perp?.contractId || '', (contractId) => {
   if (contractId) {
+    form.price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || ''
     form.amount = ''
     tempData.value = {
       tpPercent: undefined,
       slPercent: undefined,
       sizePercent: undefined,
     }
+    formRef.value?.resetFields()
   }
 })
-const tpForm = ref({
-  triggerPrice: null,
+const tpForm = reactive({
+  triggerPrice: undefined,
   triggerPriceType: 'LAST_PRICE',
-  price: null,
   type: 'TAKE_PROFIT_MARKET',
 })
-const slForm = ref({
-  triggerPrice: null,
+const slForm = reactive({
+  triggerPrice: undefined,
   triggerPriceType: 'LAST_PRICE',
-  price: null,
   type: 'STOP_MARKET',
 })
 const perpMargin = computed(() => {
@@ -383,10 +412,15 @@ const isValue = computed(() => {
   return perpStore.unit?.coinId === perpStore.perp?.quoteCoinId
 })
 
+
+function watchPrice(value: string) {
+  form.price = formatMinSize(value, true)
+}
 function watchAmount(value: string) {
   let _value = formatMinSize(value)
-  if (new BigNumber(_value).gt(new BigNumber(maxAmountBuy.value || '0'))) {
-    _value = maxAmountBuy.value || '0'
+  const _maxAmount = BigNumber.max(maxAmountBuy.value || '0', maxAmountSell.value || '0').toFixed()
+  if (new BigNumber(_value).gt(_maxAmount)) {
+    _value = _maxAmount || '0'
   }
   form.amount = _value
 }
@@ -442,17 +476,41 @@ function _createPerpOrder(side: string) {
   formRef.value?.validate((valid: boolean) => {
     // isValid.value = false
     if (valid) {
-      console.log(side, valid)
-      createPerpOrder({
+      const data: PerpOrderParams = {
         type: swapType.value,
         size: getSize(),
-        price: perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0',
+        price: form.price || '0',
         side: side,
         contractId: perpStore.perp?.contractId || '',
         reduceOnly: form.reduceOnly,
         isPositionTpsl: false,
         isSetOpenTp: false,
         isSetOpenSl: false
+      }
+      if (tpForm.triggerPrice) {
+        data.isSetOpenTp = true
+        data.openTp = {
+          ...tpForm,
+          triggerPrice: new BigNumber(tpForm.triggerPrice || '0').toFixed(),
+          price: form.price || '0',
+          size: getSize(),
+          side: 'SELL'
+        }
+      }
+      if (slForm.triggerPrice) {
+        data.isSetOpenSl = true
+        data.openSl = {
+          ...slForm,
+          triggerPrice: new BigNumber(slForm.triggerPrice || '0').toFixed(),
+          price: form.price || '0',
+          size: getSize(),
+          side: 'SELL'
+        }
+      }
+      createPerpOrder(data).then(res => {
+        if (res) {
+          formRef.value?.resetFields()
+        }
       })
     }
   })
@@ -498,7 +556,7 @@ function _createPerpOrder(side: string) {
   --el-input-focus-border-color: transparent;
   --el-input-hover-border-color: transparent;
   // --el-input-bg-color: transparent;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 500;
   :deep() .el-input-group__append, .el-input-group__prepend {
     padding: 0 10px;
@@ -509,7 +567,7 @@ function _createPerpOrder(side: string) {
     padding: 0 12px;
   }
   :deep() .el-input__wrapper {
-    padding: 1px 0;
+    padding: 1px 0 1px 12px;
   }
 }
 

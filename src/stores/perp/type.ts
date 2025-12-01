@@ -228,7 +228,7 @@ export interface Order {
   sourceKey: string                   // 来源key
   extraType: string                   // 附加类型
   extraDataJson: string               // 附加数据
-  status: 'PENDING_NEW' | 'PENDING' | 'OPEN' | 'CANCELING' | 'UNTRIGGERED' | 'FILLED'             // 委托单状态
+  status: 'PENDING_NEW' | 'PENDING' | 'OPEN' | 'CANCELING' | 'UNTRIGGERED' | 'FILLED' | 'CANCELED'           // 委托单状态
   cancelReason: 'USER_CANCEL'           // 委托单取消原因
   cumFillSize: string                 // 累计成交数量
   cumFillValue: string                // 累计成交价值
@@ -244,6 +244,7 @@ export interface Order {
   withoutMatchFillValue: string
   withoutMatchFillSize: string
   marketLimitValue: string
+  isPositionTpsl: boolean                 // 是否为仓位止盈止损单
 }
 
 // 成交明细列表

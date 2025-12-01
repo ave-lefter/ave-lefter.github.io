@@ -392,7 +392,11 @@ export async function getPositionTermPage(params) {
   })
 }
 
-export async function getAccountDeleverageLight() {
+export async function getAccountDeleverageLight(): Promise<{
+  positionContractIdToLightNumberMap: {
+    [key: string]: number
+  }
+}> {
   const perpStore = usePerpStore()
   return api('/api/v1/private/account/getAccountDeleverageLight', {
     method: 'get',
@@ -402,16 +406,16 @@ export async function getAccountDeleverageLight() {
   })
 }
 
-export async function createOrder(params) {
-  const perpStore = usePerpStore()
-  return api('/api/v1/private/order/createOrder', {
-    method: 'post',
-    body: {
-      accountId: perpStore.userInfo?.id,
-      ...params,
-    },
-  })
-}
+// export async function createOrder(params) {
+//   const perpStore = usePerpStore()
+//   return api('/api/v1/private/order/createOrder', {
+//     method: 'post',
+//     body: {
+//       accountId:perpStore.userInfo?.id,
+//       ...params
+//     },
+//   })
+// }
 
 // /api/v1/private/account/getAccountById
 export async function getAccountById(): Promise<{

@@ -29,7 +29,7 @@ export const usePerpStore = defineStore('perp', () => {
   const order = ref<Order[]>([])
   const withdraw = ref<Withdraw[]>([])
   const transferOut = ref<TransferOut[]>([])
-  const orderList = ref([])
+  const orderList = ref<Order[]>([])
 
   const isCancelOrder = shallowRef(false)
   const _perpKeys = useLocalStorage<{[key: string]: {apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string }}>('perp_keys', {})
