@@ -39,7 +39,6 @@ const token = computed(() => {
 })
 const isReady = ref(false)
 let isReadyLine = false
-let isFirst = true
 const snapshotCache = ref<Record<string, KlineInfo[]>>({})
 
 const chain = computed(() => {
@@ -376,7 +375,6 @@ async function initChart() {
           }
           loading = true
           _getPerpKline(params).then(res => {
-            isFirst = false
             const result = res?.dataList?.reverse() || []
             const bars1 = result?.map(i => ({
               ...i,
@@ -415,13 +413,13 @@ async function initChart() {
               useEventBus('klineDataReady').emit()
             }, 10)
           }).catch((err) => {
-            const key = `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`
-            const bars = snapshotCache.value[key] || [];
-            console.log('--getBars--bars-------', snapshotCache.value)
-            if (bars?.length > 0) {
-              console.log('--------44------',bars)
-              onResult(bars, { noData: !bars?.length});
-            } else {
+            // const key = `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`
+            // const bars = snapshotCache.value[key] || [];
+            // console.log('--getBars--bars-------', snapshotCache.value)
+            // if (bars?.length > 0) {
+            //   console.log('--------44------',bars)
+            //   onResult(bars, { noData: !bars?.length});
+            // } else {
               if (firstDataRequest) {
                 const price = perp.value?.lastPrice
                 const volume = perp.value?.value
@@ -437,7 +435,7 @@ async function initChart() {
               } else {
                 onResult([], { noData: true, nextTime: undefined })
               }
-            }
+            // }
           }).finally(() => {
             loading = false
           })
@@ -558,7 +556,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
     if(channel == `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`){
       // console.log('--------msg-----------',msg)
 
-      if (data?.length > 0 && !loading && dataType === 'Snapshot' && isFirst) {
+      if (data?.length > 0 && !loading && dataType === 'Snapshot') {
 
         const key = `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`
         const bars = data.reverse().map(i => ({
@@ -569,12 +567,11 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
           close: i.close,
           volume: Number(i.value || 0),
         }))
-        snapshotCache.value[key] = bars
+        // snapshotCache.value[key] = bars
         // if (onResetCacheNeededCallback) {
         //   onResetCacheNeededCallback()
         // }
         bars.forEach(bar => onTick(bar));
-        isFirst = false
       }
 
       if (data?.length > 0 && !loading && dataType === 'changed') {
