@@ -40,7 +40,7 @@
 
     <div class="ml-16px">
       <span
-        class="text-20px font-700 block text-left"
+        class="text-20px font-700 block text-left min-w-100px"
         :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
         >{{ formatNumber(perp?.lastPrice || 0) }}</span
       >
@@ -53,94 +53,97 @@
       > -->
     </div>
     <div class="ml-16px w-0 border-l-[--icon-color] border-l-solid h-28px"></div>
-    <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('indexPriceTooltip')">{{ $t('indexPrice') }}</span>
-      <span class="text-12px block text-left color-[--main-text] leading-16px mt-2px">
-        {{ formatNumber(perp?.indexPrice || 0) }}</span
-      >
-    </div>
-
-    <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('oraclePriceTooltip')">{{ $t('oraclePrice') }}</span>
-      <span class="text-12px block text-left color-[--main-text] mt-2px">{{formatNumber(perp?.oraclePrice || 0)}}</span>
-    </div>
-
-    <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]">{{ $t('24HChange') }}</span>
-      <span
-        class="text-12px block text-left color-[--main-text] mt-2px"
-        :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
-        >{{ formatNumber(perp?.priceChange || 0) }}&nbsp;&nbsp;{{
-          formatNumber(Number(perp?.priceChangePercent) * 100 || 0)
-        }}%</span
-      >
-    </div>
-
-    <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]">{{ $t('24HHighPrice') }}</span>
-      <span class="text-12px block text-left color-[--secondary-text] mt-2px">{{
-        formatNumber(perp?.high || 0)
-      }}</span>
-    </div>
-
-    <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]">{{ $t('24HLowestPrice') }}</span>
-      <span class="text-12px block text-left color-[--secondary-text] mt-2px">{{
-        formatNumber(perp?.low || 0)
-      }}</span>
-    </div>
-
-    <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]"
-        >{{ $t('24HVolume') }}({{ perp?.quoteCoinName }})</span
-      >
-      <span class="text-12px block text-left color-[--secondary-text] mt-2px">{{
-        formatNumber(perp?.value || 0)
-      }}</span>
-    </div>
-
-    <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]"
-        >{{ $t('24HAmount') }}({{ perp?.baseCoinName }})</span
-      >
-      <span class="text-12px block text-left color-[--secondary-text] mt-2px">{{
-        formatNumber(perp?.size || 0)
-      }}</span>
-    </div>
-
-    <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]"
-        >{{ $t('openInterest') }}({{ perp?.quoteCoinName }})</span
-      >
-      <span class="text-12px block text-left color-[--main-text] mt-2px">{{
-        perp?.openInterest
-      }}</span>
-    </div>
-
-    <div class="ml-16px">
-      <span class="text-12px block text-left color-[--third-text]">{{ $t('fundingRate') }}/{{ $t('countdown') }}</span>
-      <span class="text-12px block text-left color-[--main-text] mt-2px"
-        >{{ formatNumber(Number(perp?.fundingRate) * 100 || 0) }}%
-
-        <TimerCount
-          v-if="perp?.nextFundingTime"
-          :key="`${perp?.nextFundingTime}`"
-          :timestamp="Number(perp?.nextFundingTime)"
-          :end-time="Date.now()"
+    <Swipe>
+      <div class="ml-16px whitespace-nowrap item">
+        <span class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('indexPriceTooltip')">{{ $t('indexPrice') }}</span>
+        <span class="text-12px block text-left color-[--main-text] leading-16px mt-2px">
+          {{ formatNumber(perp?.indexPrice || 0) }}</span
         >
-          <template #default="{ formattedData: { days, hours, minutes, seconds } }">
-            <span class="color-#FFA622">
-              {{ hours || '00' }}:{{ minutes || '00' }}:{{ seconds  || '00'}}
-            </span>
-          </template>
-        </TimerCount>
-      </span>
-    </div>
+      </div>
+
+      <div class="ml-16px whitespace-nowrap item">
+        <span class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('oraclePriceTooltip')">{{ $t('oraclePrice') }}</span>
+        <span class="text-12px block text-left color-[--main-text] mt-2px">{{formatNumber(perp?.oraclePrice || 0)}}</span>
+      </div>
+
+      <div class="ml-16px whitespace-nowrap item">
+        <span class="text-12px block text-left color-[--third-text]">{{ $t('24HChange') }}</span>
+        <span
+          class="text-12px block text-left color-[--main-text] mt-2px"
+          :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
+          >{{ formatNumber(perp?.priceChange || 0) }}&nbsp;&nbsp;{{
+            formatNumber(Number(perp?.priceChangePercent) * 100 || 0)
+          }}%</span
+        >
+      </div>
+
+      <div class="ml-16px whitespace-nowrap item">
+        <span class="text-12px block text-left color-[--third-text]">{{ $t('24HHighPrice') }}</span>
+        <span class="text-12px block text-left color-[--secondary-text] mt-2px">{{
+          formatNumber(perp?.high || 0)
+        }}</span>
+      </div>
+
+      <div class="ml-16px whitespace-nowrap item">
+        <span class="text-12px block text-left color-[--third-text]">{{ $t('24HLowestPrice') }}</span>
+        <span class="text-12px block text-left color-[--secondary-text] mt-2px">{{
+          formatNumber(perp?.low || 0)
+        }}</span>
+      </div>
+
+      <div class="ml-16px whitespace-nowrap item">
+        <span class="text-12px block text-left color-[--third-text]"
+          >{{ $t('24HVolume') }}({{ perp?.quoteCoinName }})</span
+        >
+        <span class="text-12px block text-left color-[--secondary-text] mt-2px">{{
+          formatNumber(perp?.value || 0)
+        }}</span>
+      </div>
+
+      <div class="ml-16px whitespace-nowrap item">
+        <span class="text-12px block text-left color-[--third-text]"
+          >{{ $t('24HAmount') }}({{ perp?.baseCoinName }})</span
+        >
+        <span class="text-12px block text-left color-[--secondary-text] mt-2px">{{
+          formatNumber(perp?.size || 0)
+        }}</span>
+      </div>
+
+      <div class="ml-16px whitespace-nowrap item">
+        <span class="text-12px block text-left color-[--third-text]"
+          >{{ $t('openInterest') }}({{ perp?.quoteCoinName }})</span
+        >
+        <span class="text-12px block text-left color-[--main-text] mt-2px">{{
+          perp?.openInterest
+        }}</span>
+      </div>
+
+      <div class="ml-16px whitespace-nowrap item">
+        <span class="text-12px block text-left color-[--third-text]">{{ $t('fundingRate') }}/{{ $t('countdown') }}</span>
+        <span class="text-12px block text-left color-[--main-text] mt-2px"
+          >{{ formatNumber(Number(perp?.fundingRate) * 100 || 0) }}%
+
+          <TimerCount
+            v-if="perp?.nextFundingTime"
+            :key="`${perp?.nextFundingTime}`"
+            :timestamp="Number(perp?.nextFundingTime)"
+            :end-time="Date.now()"
+          >
+            <template #default="{ formattedData: { days, hours, minutes, seconds } }">
+              <span class="color-#FFA622">
+                {{ hours || '00' }}:{{ minutes || '00' }}:{{ seconds  || '00'}}
+              </span>
+            </template>
+          </TimerCount>
+        </span>
+      </div>
+    </Swipe>
   </div>
 </template>
 
 <script lang="ts" setup>
 import Search from './search.vue'
+import Swipe from './swipe.vue'
 import { usePerpWsPubStore } from '@/stores/perp/wsPub'
 import { type PerpInfo } from '@/api/types/perp'
 import { usePerpStore } from '@/stores/perp'
@@ -198,4 +201,6 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+</style>
