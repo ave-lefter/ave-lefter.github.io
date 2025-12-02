@@ -52,14 +52,15 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  min: 1,
+  min: 0,
   max: Infinity,
   step: 1,
   longPressSpeed: 120
 })
 
 const emits = defineEmits<{
-  "update:modelValue": [number]
+  "update:modelValue": [number],
+  "change": [number],
 }>()
 
 // 输入框的本地值
@@ -113,19 +114,35 @@ function stop() {
 
 // 输入监听（只允许数字）
 function onInput(e: Event) {
-  const val = (e.target as HTMLInputElement).value.replace(/[^\d]/g, "")
+  const target = e.target as HTMLInputElement;
+  let val = target.value.replace(/[^\d]/g, "");
+
+  // 如果最大值是 0~9 的一位数
+  if (props.max < 10) {
+    val = val.slice(0, 1) // 限制只能一位
+  }
+
+  // 阻止最终结果超过 max（关键逻辑）
+  if (Number(val) > props.max) {
+    val = inputValue.value // 回退成上一次合法值
+  }
+  const num = Number(val)
   inputValue.value = val
+  target.value = val // 关键：同步回到输入框，不然 UI 显示不及时
+  emits("change", num)
 }
 
 // 失焦后校验 + 同步
 function onBlur() {
-  let num = Number(inputValue.value || props.min)
+  let num = Number(inputValue.value)
 
   // 范围限制
-  if (num < props.min!) num = props.min!
-  if (num > props.max!) num = props.max!
-
+  if (num) {
+    if (num < props.min!) num = props.min!
+    if (num > props.max!) num = props.max!
+  }
   update(num)
+  emits("change", num)
 }
 </script>
 

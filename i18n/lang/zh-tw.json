@@ -1628,6 +1628,9 @@
   "maxPositionCurrentLeverage": "當前杠杆倍數最大可開",
   "adjustLeverageTip1": "杠杆調整將同時影響當前倉位和掛單的杠杆倍數",
   "adjustLeverageTip2": "在取消所有訂單之前，您不能更改此合約交易的最大杠杆。 合約{name}。",
+  "adjustLeverageTip3": "杠杆倍数过低，账户中保证金不足，请重新调整杠杆倍数",
+  "adjustLeverageTip4": "調整後，倉位佔用保證金將新增{num} USD",
+  "adjustLeverageTip5": "調整後，倉位佔用保證金將减少{num} USD",
   "TPPrice": "止盈價格",
   "SLPrice": "止損價格"
 }
