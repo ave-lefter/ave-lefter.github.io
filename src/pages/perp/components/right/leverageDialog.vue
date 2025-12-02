@@ -3,8 +3,8 @@
     v-model="visible"
     width="400px"
     class="dialog-box dialog-max dialog-remind dialog"
-    @close="visible = false"
     append-to-body
+    @close="visible = false"
   >
     <template #header>
       <div class="flex-start items-center">
@@ -16,7 +16,7 @@
         <span class="text-14px font-700 font-bold">{{ perp?.contractName }}</span>
         <span class="color-[--secondary-text] ml-8px">{{ $t('currentLeverage') }}:{{ defaultLeverage }}X</span>
       </div>
-      <Step class="mt-19px" v-model="leverage" :max="max" @change="change"/>
+      <Step v-model="leverage" class="mt-19px" :max="max" @change="change"/>
       <div class="mt-20px mb-30px px-3px w-full">
         <el-slider
           v-model="leverage"
@@ -25,8 +25,8 @@
           :step="1"
           :marks="marks"
           :format-tooltip="(value)=> value+'X'"
-          @input="change"
           class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] slider-box"
+          @input="change"
         />
       </div>
      <div class="text-14px flex-between mt-48px">
@@ -43,8 +43,8 @@
       <div v-if="currentOrderList?.length >0" class="text-14px  mt-24px color-[--yellow] flex-start items-start">
         <Icon  name="majesticons:info-circle" class="text-24px mr-10px"/>
         <div>
-          <div class="mb-10px" v-if="compareDefaultMargin !==0 && leverage">
-            <span class="block" :class="compareDefaultMargin > 0? 'color-[--down-color]':'color-[--up-color]'" v-if="Number(currentMargin) < Number(prepBalance)">
+          <div v-if="compareDefaultMargin !==0 && leverage" class="mb-10px">
+            <span v-if="Number(currentMargin) < Number(prepBalance)" class="block" :class="compareDefaultMargin > 0? 'color-[--down-color]':'color-[--up-color]'">
               {{ compareDefaultMargin > 0 ? $t('adjustLeverageTip4', {num:formatNumber(Math.abs(compareDefaultMargin), { decimals: 0, limit: 10})}): $t('adjustLeverageTip5', {num:formatNumber(Math.abs(compareDefaultMargin), { decimals: 0, limit: 10})}) }}
             </span>
             <span v-else>
@@ -59,7 +59,7 @@
         <el-button class="flex-1" style="height: 48px" @click.stop.prevent="visible = false">
           {{ $t('cancel') }}
         </el-button>
-        <el-button class="flex-1" style="height: 48px" type="primary" @click.stop.prevent="submit" :disabled="currentOrderList?.length >0" :loading="loading">
+        <el-button class="flex-1" style="height: 48px" type="primary" :disabled="currentOrderList?.length >0" :loading="loading" @click.stop.prevent="submit">
           {{ $t('confirm') }}
         </el-button>
       </div>

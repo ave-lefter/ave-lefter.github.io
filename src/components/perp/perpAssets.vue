@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import { usePerpStore } from '~/stores/perp'
 import BalancePnl from './balancePnl.vue'
 import Overview from './overview.vue'
 import PerpTable from './perpTable.vue'
-
+const perpStore = usePerpStore()
 
 </script>
 
 <template>
-  <div class="pb-32px">
+  <div :key="Number(perpStore.isLogin)" class="pb-32px">
     <div class="flex gap-8px mb-28px px-16px">
       <Overview/>
       <BalancePnl/>

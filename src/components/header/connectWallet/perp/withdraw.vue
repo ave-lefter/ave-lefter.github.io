@@ -54,7 +54,7 @@
       </el-option>
     </el-select>
     <div class="flex items-center justify-between mb-16px text-14px bg-[--border] h-40px rd-6px px-12px">
-      <span class="color-[--third-text]">资金池余额</span>
+      <span class="color-[--third-text]">{{ $t('poolBalance') }}</span>
       <span>{{ poolBalance }} {{ withdrawForm?.token || '' }}</span>
     </div>
     <el-input v-model="withdrawForm.amount"
@@ -77,34 +77,34 @@
       <span class="color-[--main-text]">≈ 2分钟</span>
     </div> -->
     <div v-if="withdrawForm.chain === '1'" class="text-14px flex items-center justify-between mt-16px rd-4px">
-      <span class="color-[--secondary-text]">提现金额</span>
+      <span class="color-[--secondary-text]">{{ $t('withdrawAmount') }}</span>
       <span class="color-[--main-text]">{{ formatNumber(withdrawForm.amount, 3) }} {{ withdrawForm?.token || '' }}</span>
     </div>
     <template v-else>
       <div class="text-14px flex items-center justify-between mt-16px rd-4px">
-        <span class="color-[--secondary-text]">手续费/费率</span>
+        <span class="color-[--secondary-text]">{{ $t('fee') }}/{{ $t('feeRate') }}</span>
         <span class="color-[--main-text]">{{ formatNumber(fee, 3) }} {{ withdrawForm?.token || '' }} / {{ formatNumber(feeRate, 3) }}%</span>
       </div>
       <div class="text-14px flex items-center justify-between mt-16px rd-4px">
-        <span class="color-[--secondary-text]">到账金额</span>
+        <span class="color-[--secondary-text]">{{ $t('amountReceive') }}</span>
         <span class="color-[--main-text]">{{ formatNumber(receiveAmount, 3) }} {{ withdrawForm?.token || '' }}</span>
       </div>
     </template>
-    <el-button v-if="isCanWithdraw" type="primary" size="large" class="w-full text-16px h-48px rd-8px mt-20px" :loading="loading" @click.stop="handleWithdraw">提现确认</el-button>
-    <button v-else disabled class="w-full text-16px h-48px bg-[--border] color-[--secondary-text] flex items-center justify-center border-none rd-8px mt-20px cursor-not-allowed">提现确认</button>
+    <el-button v-if="isCanWithdraw" type="primary" size="large" class="w-full text-16px h-48px rd-8px mt-20px" :loading="loading" @click.stop="handleWithdraw">{{ $t('confirmWithdrawal') }}</el-button>
+    <button v-else disabled class="w-full text-16px h-48px bg-[--border] color-[--secondary-text] flex items-center justify-center border-none rd-8px mt-20px cursor-not-allowed">{{ $t('confirmWithdrawal') }}</button>
     <div v-if="withdrawForm.chain === '1'" class="mt-16px font-400">
       <div class="flex items-center color-[--main-text] text-12px mb-8px">
         <Icon name="carbon:warning-filled" class="text-14px mr-3px mb--1px" />
-        <span>提现说明</span>
+        <span>{{ $t('withdrawTipsTitle') }}</span>
       </div>
-      <div class="text-12px color-[--secondary-text] lh-16px">普通提现是一个两步过程。 此步骤将发起您的提现请求，并将在 Layer2 进行处理。 一旦资金准备就绪（可能需要最多 4 小时），您将收到一条将资金提现到钱包的通知。受链同步等情况影响下，时长可能到 48 小时。您需要自行承担交易 gas 费用。</div>
+      <div class="text-12px color-[--secondary-text] lh-16px">{{ $t('withdrawTips') }}</div>
     </div>
     <div v-else class="mt-16px font-400">
       <div class="flex items-center color-[--main-text] text-12px mb-8px">
         <Icon name="carbon:warning-filled" class="text-14px mr-3px mb--1px" />
-        <span>跨链提现说明</span>
+        <span>{{ $t('crossWithdrawIntro') }}</span>
       </div>
-      <div class="text-12px color-[--secondary-text] lh-16px">跨链提币需在 L2（通过零知识证明）进行验证。提币过程最多约需2小时。相关链的资产池中需有充足的资金来处理跨链提币，其间还将产生矿工费。 Ave 将收取一定的手续费作为矿工费。</div>
+      <div class="text-12px color-[--secondary-text] lh-16px">{{ $t('crossWithdrawDesc') }} </div>
     </div>
 
   </div>

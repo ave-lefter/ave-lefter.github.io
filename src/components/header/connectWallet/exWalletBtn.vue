@@ -111,7 +111,7 @@
       </div>
       <div v-show="activeTab === 1" class="pb-8px pt-20px px-8px min-h-200px relative">
         <template v-if="perpStore.isLogin">
-          <div class="text-14px font-400">合约资产</div>
+          <div class="text-14px font-400">{{ $t('perpBalance') }}</div>
           <div class="flex items-center text-24px font-700 mt-8px">
             <span>${{ formatNumber(prepBalance, 2) }}</span>
           </div>
@@ -137,7 +137,7 @@
           </ul>
         </template>
 
-        <el-button v-else type="primary" class="min-h-42px absolute top-50% left-50% translate--50%" @click.stop="login">登录合约账户</el-button>
+        <el-button v-else type="primary" class="min-h-42px absolute top-50% left-50% translate--50%" @click.stop="login">{{ $t('loginPerpAccount') }}</el-button>
       </div>
     </div>
   </el-popover>

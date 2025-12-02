@@ -4,7 +4,8 @@ import { usePerpStore } from '~/stores/perp'
 
 const { t } = useI18n()
 const perpStore = usePerpStore()
-const { deposit, withdraw } = usePerp()
+const walletStore = useWalletStore()
+const { deposit, withdraw, connectAndLogin } = usePerp()
 const loading = ref(false)
 const score = ref({
   isPermission: 0,
@@ -47,6 +48,7 @@ const receiveScore = async () => {
   }
 }
 
+
 onMounted(() => {
   getTotalAssets()
   getScore()
@@ -58,7 +60,7 @@ onMounted(() => {
   <div class="px-16px py-24px w-480px bg-[--secondary-bg]">
     <div class="flex justify-between mb-24px">
       <span class="text-24px lh-30px color-[--main-text] font-500">{{ t('totalAssets') }}</span>
-      <div>
+      <div v-if="perpStore.isLogin">
         <el-button
           class="w-100px h-32px m-l-auto [--el-font-size-base:12px]"
           type="primary"
@@ -76,6 +78,11 @@ onMounted(() => {
           {{ t('withdraw') }}
         </el-button>
       </div>
+      <template v-else>
+        <el-button v-if="!walletStore.address" type="primary" @click="connectAndLogin">{{ $t('connectWallet') }}</el-button>
+        <el-button v-if="walletStore.address && !perpStore.isLogin" type="primary" @click="connectAndLogin">{{ $t('loginPerpAccount') }}</el-button>
+      </template>
+
     </div>
     <div>
       <div class="flex items-center gap-8px mb-8px">
