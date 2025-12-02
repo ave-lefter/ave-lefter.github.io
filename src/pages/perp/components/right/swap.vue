@@ -60,19 +60,19 @@
       <template v-if="isChecked">
         <div class="flex items-center gap-10px mt-8px mb-16px w-full">
           <!-- 止盈 -->
-          <el-input
+          <el-input-number
             v-model="tpForm.triggerPrice"
             :controls="false"
             align="left"
+            :precision="pricePrecision"
             class="flex-1 input-number"
             :placeholder="t('TP')"
             size="large"
             clearable
-            @update:model-value="value => watchPrice(value)"
+            @update:model-value="value => tpPriceChange(value)"
           >
-            <template #suffix>
-              <span class="text-12px color-[--main-text] pr-5px font-400">{{ t('latestPrice') }}</span>
-              <!-- <el-dropdown trigger="click">
+            <!-- <template #suffix>
+              <el-dropdown trigger="click">
                 <span class="flex items-center gap-4px cursor-pointer text-12px">
                   <span>{{
                     tpForm.triggerPriceType === 'LAST_PRICE' ? t('latestPrice') : t('indexPrice')
@@ -89,22 +89,26 @@
                     }}</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
-              </el-dropdown> -->
-            </template>
-          </el-input>
-          <!-- <el-input-number
+              </el-dropdown>
+            </template> -->
+          </el-input-number>
+          <el-input-number
             v-model.number="tempData.tpPercent"
+            :min="0"
+            :precision="0"
             :controls="false"
             align="left"
-            class="w-50px text-12px"
+            size="large"
+            class="w-80px! text-12px"
             :placeholder="t('RIO')"
+            @update:model-value="val => tpPercentChange(val as number, 1)"
           >
             <template #suffix> % </template>
-          </el-input-number> -->
+          </el-input-number>
         </div>
-        <!-- <div class="mb-30px px-3px w-full">
+        <div class="mb-30px px-3px w-full">
           <el-slider
-            v-model="tempData.tpPercent"
+            v-model="tempData.tpPercent1"
             :min="0"
             :max="200"
             :step="1"
@@ -115,24 +119,25 @@
               150: '150%',
               200: '200%',
             }"
-            class=" [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white]"
+            class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] [&&]:[--el-slider-runway-bg-color:--icon-color] slider-box"
+            @change="val => tpPercentChange(val as number)"
           />
-        </div> -->
+        </div>
 
         <div class="flex items-center gap-10px mt-8px mb-16px w-full">
           <!-- 止损 -->
-          <el-input
+          <el-input-number
             v-model="slForm.triggerPrice"
             :controls="false"
+            :precision="pricePrecision"
              class="flex-1 input-number"
             align="left"
             size="large"
             :placeholder="t('SL')"
-            @update:model-value="value => watchPrice(value)"
+            @update:model-value="value => slPriceChange(value)"
           >
-            <template #suffix>
-              <span class="text-12px color-[--main-text] pr-5px font-400">{{ t('latestPrice') }}</span>
-              <!-- <el-dropdown trigger="click">
+            <!-- <template #suffix>
+              <el-dropdown trigger="click">
                 <span class="flex items-center gap-4px cursor-pointer text-12px">
                   <span>{{
                     slForm.triggerPriceType === 'LAST_PRICE' ? t('latestPrice') : t('indexPrice')
@@ -149,22 +154,26 @@
                     }}</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
-              </el-dropdown> -->
-            </template>
-          </el-input>
-          <!-- <el-input-number
+              </el-dropdown>
+            </template> -->
+          </el-input-number>
+          <el-input-number
             v-model.number="tempData.slPercent"
+            :min="0"
             :controls="false"
+            :precision="0"
             align="left"
-            class="w-100px text-12px"
+            class="w-80px! text-12px"
+            size="large"
             :placeholder="t('RIO')"
+            @update:model-value="val => slPercentChange(val as number, 1)"
           >
             <template #suffix> % </template>
-          </el-input-number> -->
+          </el-input-number>
         </div>
-        <!-- <div class="mb-30px px-3px w-full">
+        <div class="mb-30px px-3px w-full">
           <el-slider
-            v-model="tempData.slPercent"
+            v-model="tempData.slPercent1"
             :min="0"
             :max="200"
             :step="1"
@@ -175,9 +184,10 @@
               150: '150%',
               200: '200%',
             }"
-            class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white]"
+            class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] [&&]:[--el-slider-runway-bg-color:--icon-color] slider-box"
+            @change="val => slPercentChange(val as number)"
           />
-        </div> -->
+        </div>
       </template>
     </el-form-item>
 
@@ -224,7 +234,7 @@
   <ul class="text-12px color-[--third-text]">
     <li class="flex items-center">
       <span class="mr-auto">{{ $t('margin') }}</span>
-      <span class="color-[--up-color]">{{ form.reduceOnly ? '-' : formatNumber(perpMargin.buy, 2) }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ form.reduceOnly ? '-' : formatNumber(perpMargin.sell, 2) }}  USD</span>
+      <span class="color-[--up-color]">{{ !form.reduceOnly && BigNumber(form.amount).gt(0) ?  formatNumber(perpMargin.buy, 2)  : '-'}} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ !form.reduceOnly && BigNumber(form.amount).gt(0) ?  formatNumber(perpMargin.sell, 2)  : '-' }}  USD</span>
     </li>
     <li class="flex items-center mt-8px">
       <span class="mr-auto">Max: </span>
@@ -232,7 +242,7 @@
     </li>
     <li v-if="!form.reduceOnly" class="flex items-center mt-8px">
       <span class="mr-auto">预估强平价</span>
-      <span class="color-[--up-color]">{{ formatNumber(liquidatePriceBuy, 4) }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ formatNumber(liquidatePriceSell, 4) }} USD</span>
+      <span class="color-[--up-color]">{{ BigNumber(form.amount).gt(0) ? formatNumber(liquidatePriceBuy, 4) : '-' }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ BigNumber(form.amount).gt(0) ? formatNumber(liquidatePriceSell, 4) : '-' }} USD</span>
     </li>
     <li class="flex items-center mt-8px">
       <span class="mr-auto">手续费</span>
@@ -292,30 +302,63 @@ const show = ref(false)
 
 const percent = ref(0)
 const isChecked = ref(false)
-const tempData = ref({
-  tpPercent: undefined,
-  slPercent: undefined,
-  sizePercent: undefined,
+const tempData = reactive({
+  tpPercent: 0,
+  tpPercent1: 0,
+  slPercent: 0,
+  slPercent1: 0,
+  sizePercent: 0,
 })
+
+const contractId = computed(() => {
+  return perpStore.perp?.contractId || ''
+})
+
+const pricePrecision = computed(() => {
+  return getPricePrecision(contractId.value || '')
+})
+
+const quantityPrecision = computed(() => {
+  return getQuantityPrecision(contractId.value || '')
+})
+
+const maxLeverage = computed(() => {
+  return getLeverageFromContractId(contractId.value || '') || 1
+})
+
+const lastPrice = computed(() => {
+  return CoreCalculator.getSymbolModel(contractId.value || '')?.lastPrice || '0'
+})
+
 
 watch(() => perpStore.perp?.contractId || '', (contractId) => {
   if (contractId) {
     form.price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || ''
     form.amount = ''
-    tempData.value = {
-      tpPercent: undefined,
-      slPercent: undefined,
-      sizePercent: undefined,
+    tempData.tpPercent = 0
+    tempData.tpPercent1 = 0
+    tempData.slPercent = 0
+    tempData.slPercent1 = 0
+    tempData.sizePercent = 0
+    if (formRef.value) {
+      formRef.value.resetFields()
     }
-    formRef.value?.resetFields()
   }
 })
-const tpForm = reactive({
+const tpForm = reactive<{
+  triggerPrice?: string | number
+  triggerPriceType: string
+  type: string
+}>({
   triggerPrice: undefined,
   triggerPriceType: 'LAST_PRICE',
   type: 'TAKE_PROFIT_MARKET',
 })
-const slForm = reactive({
+const slForm = reactive<{
+  triggerPrice?: string | number
+  triggerPriceType: string
+  type: string
+}>({
   triggerPrice: undefined,
   triggerPriceType: 'LAST_PRICE',
   type: 'STOP_MARKET',
@@ -472,6 +515,35 @@ function getSize() {
   }
 }
 
+
+const tpPercentChange = (val: number, type = 0) => {
+  if (type === 1) {
+    tempData.tpPercent1 = Math.min(Math.max(val, 0), 200)
+  } else {
+    tempData.tpPercent = val
+  }
+  tpForm.triggerPrice = new BigNumber(val || 0).div(100).div(maxLeverage.value).plus(1).times(lastPrice.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+}
+
+function tpPriceChange(val?: number | string) {
+  tempData.tpPercent = new BigNumber(val || 0).minus(lastPrice.value).div(lastPrice.value).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
+  tempData.tpPercent1 = Math.min(Math.max(tempData.tpPercent, 0), 200)
+}
+
+const slPercentChange = (val: number, type = 0) => {
+  if (type === 1) {
+    tempData.slPercent1 = Math.min(Math.max(val, 0), 200)
+  } else {
+    tempData.slPercent = val
+  }
+  slForm.triggerPrice = new BigNumber(val || 0).negated().div(100).div(maxLeverage.value).plus(1).times(lastPrice.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+}
+
+function slPriceChange(val?: number) {
+  tempData.slPercent = new BigNumber(val || 0).minus(lastPrice.value).negated().div(lastPrice.value).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
+  tempData.slPercent1 = Math.min(Math.max(tempData.slPercent, 0), 200)
+}
+
 function _createPerpOrder(side: string) {
   formRef.value?.validate((valid: boolean) => {
     // isValid.value = false
@@ -491,7 +563,7 @@ function _createPerpOrder(side: string) {
         data.isSetOpenTp = true
         data.openTp = {
           ...tpForm,
-          triggerPrice: new BigNumber(tpForm.triggerPrice || '0').toFixed(),
+          triggerPrice: new BigNumber(tpForm?.triggerPrice || '0').toFixed(),
           price: form.price || '0',
           size: getSize(),
           side: 'SELL'
@@ -501,7 +573,7 @@ function _createPerpOrder(side: string) {
         data.isSetOpenSl = true
         data.openSl = {
           ...slForm,
-          triggerPrice: new BigNumber(slForm.triggerPrice || '0').toFixed(),
+          triggerPrice: new BigNumber(slForm?.triggerPrice || '0').toFixed(),
           price: form.price || '0',
           size: getSize(),
           side: 'SELL'

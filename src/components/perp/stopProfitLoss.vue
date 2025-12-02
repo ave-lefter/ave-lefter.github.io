@@ -137,7 +137,7 @@ function sizeChange(val: number) {
 
 const loading = ref(false)
 const disabled = computed(() => {
-  return !size.value || !tpForm.triggerPrice || !slForm.triggerPrice || (tpForm.type?.includes('LIMIT') && !tpForm.price) || (slForm.type?.includes('LIMIT') && !slForm.price)
+  return !size.value || !(tpForm.triggerPrice || slForm.triggerPrice) || (tpForm.type?.includes('LIMIT') && !tpForm.price) || (slForm.type?.includes('LIMIT') && !slForm.price)
 })
 function _createOrder() {
   loading.value = true

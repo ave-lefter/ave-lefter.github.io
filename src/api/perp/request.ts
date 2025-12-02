@@ -45,6 +45,13 @@ function getApi() {
       const walletStore = useWalletStore()
       let url = request as string
       options.headers = new Headers(options.headers)
+      // 请求头 语言
+      let language: string = localStorage.getItem('language') || 'en'
+      if (language?.includes('zh')) {
+        language = 'cn'
+      }
+      // headers.lang = language
+      options.headers.set('lang', language)
       if (walletStore.address) {
         options.headers.set('l1address', walletStore.address)
       }
