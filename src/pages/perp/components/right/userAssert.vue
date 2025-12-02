@@ -7,6 +7,10 @@
       <el-button :key="themeStore.theme" class="flex-1" color="var(--main-input-button-bg)" size="large" @click.stop="withdraw">{{ $t('withdraw') }}</el-button>
     </div>
     <ul class="mt-15px text-12px font-400 color-[--main-text]">
+      <li class="flex items-center mb-12px">
+        <Progress :progress="marginRatio" />
+        <span v-tooltip.raw="`<div style='max-width: 200px'>${$t('marginRatioTips')}</div>`" class="ml-5px underline underline-dotted cursor-help" :style="getStyles">{{ formatNumber(marginRatio, 2) }}%</span>
+      </li>
       <li class="flex items-center justify-between">
         <span class="color-[--third-text]">{{ $t('totalAssets') }}</span>
         <NuxtLink class="flex items-center clickable font-500" :to="`/address/${walletStore.address}/${walletStore.chain}`">
@@ -33,6 +37,7 @@
 <script lang="ts" setup>
 import PerpConnect from '@/components/header/connectWallet/perp/connect.vue'
 import BigNumber from 'bignumber.js'
+import Progress from './progress.vue'
 import { usePerpStore } from '~/stores/perp'
 const themeStore = useThemeStore()
 const perpStore = usePerpStore()
@@ -43,9 +48,33 @@ function getColor(n: number | string) {
   if (_n.gte(0)) {
     return 'color-[--up-color]'
   } else {
-    return 'color[--down-color]'
+    return 'color-[--down-color]'
   }
 }
+
+const marginRatio = computed(() => {
+  return  new BigNumber(maintenanceMarginRequirement.value).div(prepBalance.value).times(100).toNumber()
+})
+const colorSections = {
+  green: '#12B886',
+  yellow: '#FFA622',
+  red: '#F6465D'
+}
+const getStyles = computed(() => {
+  if (marginRatio.value < 40) {
+    return {
+      color: colorSections.green
+    }
+  } else if (marginRatio.value <= 60) {
+    return {
+      color: colorSections.yellow
+    }
+  } else  {
+    return {
+      color: colorSections.red
+    }
+  }
+})
 
 </script>
 

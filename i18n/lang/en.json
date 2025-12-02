@@ -1683,5 +1683,6 @@
   "initialMargin": "Initial Margin",
   "maintenanceMargin": "Maintenance Margin",
   "cross": "Cross",
-  "perpBalance": "Perp Assets"
+  "perpBalance": "Perp Assets",
+  "marginRatioTips": "Margin Ratio <br> Margin Ratio = Maintenance Margin / Margin Balance. Your positions will be liquidated once Margin Ratio reaches 100%."
 }

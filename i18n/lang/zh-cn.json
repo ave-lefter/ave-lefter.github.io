@@ -1698,5 +1698,6 @@
   "initialMargin": "初始保证金",
   "maintenanceMargin": "维持保证金",
   "cross": "全仓模式",
-  "perpBalance": "合约资产"
+  "perpBalance": "合约资产",
+  "marginRatioTips": "风险率 <br> 风险率=所有仓位维持保证金/总资产,当风险率大于等于100%时,您的仓位将会触发强制平仓。"
 }
