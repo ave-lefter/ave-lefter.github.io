@@ -1541,5 +1541,7 @@
   "blackListPlaceHolder": "Enter developer address, token contract, and keywords",
   "overLimit": "Over limit, please confirm if it is filled incorrectly",
   "pairsLink": "Jump block explorer",
-  "searchSameAmm": "View similar pools"
+  "searchSameAmm": "View similar pools",
+  "top24hAddress": "Top 24h Active Address",
+  "whale": "Whale"
 }

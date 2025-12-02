@@ -4,9 +4,9 @@ import {
   type GetSignalV2ListResponse,
   type IActionItem,
   type IActionV3Item,
-  type ISignalFilter
+  type ISignalFilter,
 } from '~/api/signal'
-import {useStorage, useThrottleFn, useWindowSize} from '@vueuse/core'
+import { useStorage, useThrottleFn, useWindowSize } from '@vueuse/core'
 import QuickSwapButton from '~/components/quickSwap/quickSwapButton.vue'
 
 const globalStore = useGlobalStore()
@@ -14,7 +14,7 @@ const localeStore = useLocaleStore()
 const props = defineProps<{
   activeChain: string
   quickBuyValue: string
-  scrollbarHeight:number
+  scrollbarHeight: number
 }>()
 const listData = shallowRef<GetSignalV2ListResponse[]>([])
 const filterSignalList = computed(() => {
@@ -23,7 +23,7 @@ const filterSignalList = computed(() => {
 const listStatus = ref({
   loading: false,
   finished: false,
-  error: false
+  error: false,
 })
 const pageParams = shallowRef({
   pageNO: 1,
@@ -41,21 +41,28 @@ defineExpose({
   setSelectId: (val: undefined) => {
     selectId.value = val
   },
-  updateListData(callback: (p: GetSignalV2ListResponse<IActionItem | IActionV3Item>[]) => GetSignalV2ListResponse<IActionItem | IActionV3Item>[]) {
+  updateListData(
+    callback: (
+      p: GetSignalV2ListResponse<IActionItem | IActionV3Item>[]
+    ) => GetSignalV2ListResponse<IActionItem | IActionV3Item>[]
+  ) {
     listData.value = callback(listData.value)
   },
-  setScrollTop(scrollTop: number){
-    if(scrollbar.value){
+  setScrollTop(scrollTop: number) {
+    if (scrollbar.value) {
       scrollbar.value.scrollTo({
         top: scrollTop,
-        behavior: 'smooth'
+        behavior: 'smooth',
       })
     }
+  },
+})
+watch(
+  () => props.activeChain,
+  () => {
+    resetAndGet()
   }
-})
-watch(() => props.activeChain, () => {
-  resetAndGet()
-})
+)
 
 async function fetchSignalList() {
   if (listStatus.value.loading || listStatus.value.finished) {
@@ -67,7 +74,7 @@ async function fetchSignalList() {
       ...tempQueryParams.value,
       ...pageParams.value,
       fold: false,
-      chain: props.activeChain
+      chain: props.activeChain,
     })
     if (pageParams.value.pageNO === 1) {
       listData.value = res || []
@@ -89,9 +96,12 @@ async function fetchSignalList() {
 }
 
 const localStore = useLocaleStore()
-watch(() => localStore.locale, () => {
-  resetAndGet()
-})
+watch(
+  () => localStore.locale,
+  () => {
+    resetAndGet()
+  }
+)
 
 function resetAndGet() {
   listData.value = []
@@ -132,44 +142,60 @@ function cancelHide() {
 // const isShowDate = ref(true)
 const scrollbar = useTemplateRef('scrollbar')
 
-const onScroll = useThrottleFn(({scrollTop}: { scrollTop: number }) => {
-  if (scrollbar.value) {
-    const scrollElement = scrollbar.value.wrapRef
-    if (scrollElement && scrollElement.scrollHeight - scrollTop - props.scrollbarHeight < 30) {
-      fetchSignalList()
+const onScroll = useThrottleFn(
+  ({ scrollTop }: { scrollTop: number }) => {
+    if (scrollbar.value) {
+      const scrollElement = scrollbar.value.wrapRef
+      if (scrollElement && scrollElement.scrollHeight - scrollTop - props.scrollbarHeight < 30) {
+        fetchSignalList()
+      }
     }
-  }
-}, 100, true, false)
+  },
+  100,
+  true,
+  false
+)
 
 const signalAudio = useTemplateRef('signalAudio')
 const wsStore = useWSStore()
-const audioUrl = computed(()=>{
-  return audioNameToResource[globalStore.audioSettings.audio.signal as keyof typeof audioNameToResource]
-  || audioNameToResource.Bar
+const audioUrl = computed(() => {
+  return (
+    audioNameToResource[
+      globalStore.audioSettings.audio.signal as keyof typeof audioNameToResource
+    ] || audioNameToResource.Bar
+  )
 })
 // const shouldAlert = useStorage('shouldAlert', '1')
-watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], ({msg: _signalData}: {
-  msg: GetSignalV2ListResponse
-}) => {
-  listData.value.unshift(_signalData)
-  if (globalStore.audioSettings.audio.signal && signalAudio.value && filterCallback(_signalData)) {
-    signalAudio.value.currentTime = 0
-    signalAudio.value.play()
-  }
-})
-
-watch(()=>globalStore.audioSettings.audio.signal,val=>{
-  if(val){
-   setTimeout(()=>{
-    if(signalAudio.value){
+watch(
+  () => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR],
+  ({ msg: _signalData }: { msg: GetSignalV2ListResponse }) => {
+    listData.value.unshift(_signalData)
+    if (
+      globalStore.audioSettings.audio.signal &&
+      signalAudio.value &&
+      filterCallback(_signalData)
+    ) {
+      signalAudio.value.currentTime = 0
       signalAudio.value.play()
     }
-   })
   }
-})
+)
+
+watch(
+  () => globalStore.audioSettings.audio.signal,
+  (val) => {
+    if (val) {
+      setTimeout(() => {
+        if (signalAudio.value) {
+          signalAudio.value.play()
+        }
+      })
+    }
+  }
+)
 
 function filterCallback(el: GetSignalV2ListResponse) {
-  const {token, history_count, mc_curr} = tempQueryParams.value
+  const { token, history_count, mc_curr } = tempQueryParams.value
   const tokenMatched = !token || el.token === token
   const countMatched = el.history_count > (history_count || 0)
   const mcMatched = !mc_curr || Number(el.mc_cur) < mc_curr
@@ -177,22 +203,20 @@ function filterCallback(el: GetSignalV2ListResponse) {
 }
 
 const canDrag = shallowRef(false)
-const {width: winWidth} = useWindowSize()
+const { width: winWidth } = useWindowSize()
 const widthConfig = [304, 404]
 const width = useStorage('signalLefWid', winWidth.value < 1920 ? widthConfig[0] : widthConfig[1])
 
 function drag(e: MouseEvent) {
   let dx = e.clientX
   canDrag.value = true
-  document.onmousemove = e => {
+  document.onmousemove = (e) => {
     if (!canDrag.value) {
       return
     }
-    const {clientX} = e
+    const { clientX } = e
 
-    const _width = clientX < dx
-      ? width.value - (dx - clientX)
-      : width.value + clientX - dx
+    const _width = clientX < dx ? width.value - (dx - clientX) : width.value + clientX - dx
     if (_width >= widthConfig[0] && _width <= widthConfig[1]) {
       width.value = _width
     }
@@ -210,7 +234,7 @@ const selectId = shallowRef()
 const emit = defineEmits(['setToken'])
 
 function selectSignal(id: number, token: string) {
-  if(selectId.value === id){
+  if (selectId.value === id) {
     selectId.value = undefined
     emit('setToken', '')
   } else {
@@ -230,16 +254,16 @@ function openTokenDetail(el: IActionItem) {
       logo_url: currentSignal.value.logo,
       chain: props.activeChain,
       address: currentSignal.value.token,
-      remark: ''
+      remark: '',
     },
     pairInfo: {
       target_token: currentSignal.value.token,
       token0_address: el.quote_token_address,
       token0_symbol: el.quote_token_symbol,
       token1_symbol: currentSignal.value.symbol,
-      pairAddress: ''
+      pairAddress: '',
     },
-    user_address: el.wallet_address
+    user_address: el.wallet_address,
   })
 }
 </script>
@@ -252,57 +276,53 @@ function openTokenDetail(el: IActionItem) {
       :height="scrollbarHeight"
       @scroll="onScroll"
     >
-      <AveEmpty
-        v-if="!filterSignalList.length&&!listStatus.loading"
-        class="pt-100px"
-      />
-      <div
-        class="flex flex-col gap-4px ml-4px"
-      >
+      <AveEmpty v-if="!filterSignalList.length && !listStatus.loading" class="pt-100px" />
+      <div class="flex flex-col gap-4px ml-4px">
         <div
-          v-for="({
-          history_count,
-          tag,
-          action_count,
-          signal_time,
-          symbol,
-          chain,
-          logo,
-          token,
-          issue_platform,
-          token_create_time,
-          top10_ratio,
-          insider_ratio,
-          dev_ratio,
-          max_price_change,
-          first_signal_time,
-          mc,
-          mc_cur,
-          headline,
-          id
-        },index) in filterSignalList"
+          v-for="(
+            {
+              history_count,
+              tag,
+              action_count,
+              signal_time,
+              symbol,
+              chain,
+              logo,
+              token,
+              issue_platform,
+              token_create_time,
+              top10_ratio,
+              holders_cur,
+              first_signal_time,
+              mc,
+              mc_cur,
+              headline,
+              id,
+            },
+            index
+          ) in filterSignalList"
           :key="index"
-          class="p-12px  bg-[--secondary-bg] hover:bg-[--main-list-hover] cursor-pointer transition-colors"
-          :class="selectId===id?'bg-[--main-list-hover]':''"
-          @click="selectSignal(id,token)"
+          class="p-12px bg-[--secondary-bg] hover:bg-[--main-list-hover] cursor-pointer transition-colors"
+          :class="selectId === id ? 'bg-[--main-list-hover]' : ''"
+          @click="selectSignal(id, token)"
         >
           <div class="mb-22px flex justify-between">
             <div class="flex items-center gap-8px">
               <div
-                  class="flex items-center gap-4px relative ml--20px p-6px h-26px color-[--main-text] lh-14px rounded-rt-3px rounded-rb-3px bg-[--tab-active-bg]"
+                class="flex items-center gap-4px relative ml--20px p-6px h-26px color-[--main-text] lh-14px rounded-rt-3px rounded-rb-3px bg-[--tab-active-bg]"
               >
                 <span
                   class="absolute bottom--4px left--4px w-0 h-0 border-t-solid border-t-4px border-t-transparent border-r-4px border-r-solid border-r-transparent border-l-4px border-l-solid border-l-#333 transform-scale-x-[-1] transform-scale-y-[-1]"
                 />
-                <Icon name="custom:alert"/>
+                <Icon name="custom:alert" />
                 {{ history_count }}
               </div>
               <div
                 class="flex items-center gap-4px px-8px py-6px rounded-4px h-26px text-12px lh-12px color-#12B886 bg-#12B8861A"
-                @mouseenter.stop="showPopover($event,filterSignalList[index])"
+                @mouseenter.stop="showPopover($event, filterSignalList[index])"
                 @mouseleave.stop="scheduleHide"
               >
-                <img class="w-14px h-14px rounded-full" :src="formatIconTag(tag)" alt="">
+                <img class="w-14px h-14px rounded-full" :src="formatIconTag(tag)" alt="" />
                 {{ action_count }}{{ $t('smart_money_trade') }}{{ $t(tag) }}
               </div>
             </div>
@@ -310,17 +330,15 @@ function openTokenDetail(el: IActionItem) {
               v-tooltip="formatDate(signal_time, 'MM/DD HH:mm:ss')"
               class="flex items-center gap-4px color-[--third-text] hover:color-[--main-text] cursor-pointer"
             >
-              <Icon
-                name="custom:clock"
-                class="text-14px"
-              />
+              <Icon name="custom:clock" class="text-14px" />
               <TimerCount
                 v-if="signal_time && Number(formatTimeFromNow(signal_time, true)) < 60"
-                :key="signal_time" :timestamp="signal_time" :end-time="60">
+                :key="signal_time"
+                :timestamp="signal_time"
+                :end-time="60"
+              >
                 <template #default="{ seconds }">
-                  <div v-if="seconds < 60" class="color-#FFA622 text-12px">
-                    {{ seconds }}s
-                  </div>
+                  <div v-if="seconds < 60" class="color-#FFA622 text-12px">{{ seconds }}s</div>
                   <div v-else class="text-12px">
                     {{ formatTimeFromNow(signal_time) }}
                   </div>
@@ -333,16 +351,14 @@ function openTokenDetail(el: IActionItem) {
           </div>
           <div class="flex justify-between mb-18px">
             <div class="flex items-center gap-8px">
-              <div
-                @click.stop="navigateTo(`/token/${token}-${chain}`)"
-              >
+              <div @click.stop="navigateTo(`/token/${token}-${chain}`)">
                 <TokenImg
                   token-class="w-36px h-36px"
                   chain-class="w-14px h-14px"
                   :row="{
-                   symbol,
-                   chain,
-                   logo_url:logo
+                    symbol,
+                    chain,
+                    logo_url: logo,
                   }"
                 />
               </div>
@@ -351,16 +367,15 @@ function openTokenDetail(el: IActionItem) {
                   <span
                     class="text-16px font-500 color-[--main-text]"
                     @click.stop="navigateTo(`/token/${token}-${chain}`)"
-                  >{{ symbol }}</span>
+                    >{{ symbol }}</span
+                  >
                   <a
                     class="text-10px flex items-center justify-center"
                     :href="`https://x.com/search?q=($${symbol} OR ${token})&src=typed_query&f=live`"
                     target="_blank"
                     @click.stop
                   >
-                    <Icon
-                      name="hugeicons:search-01"
-                    />
+                    <Icon name="hugeicons:search-01" />
                   </a>
                   <img
                     v-if="issue_platform"
@@ -370,44 +385,52 @@ function openTokenDetail(el: IActionItem) {
                     height="10"
                     class="rounded-full"
                     alt=""
-                  >
+                  />
                 </div>
                 <div class="flex items-center gap-4px">
-                  <div v-tooltip="formatDate(token_create_time,'MM/DD HH:mm:ss')">
+                  <div v-tooltip="formatDate(token_create_time, 'MM/DD HH:mm:ss')">
                     <TimerCount
-                      v-if="token_create_time && Number(formatTimeFromNow(token_create_time, true)) < 60"
-                      :key="token_create_time" :timestamp="token_create_time" :end-time="60">
+                      v-if="
+                        token_create_time && Number(formatTimeFromNow(token_create_time, true)) < 60
+                      "
+                      :key="token_create_time"
+                      :timestamp="token_create_time"
+                      :end-time="60"
+                    >
                       <template #default="{ seconds }">
-                    <span v-if="seconds < 60" class="color-#FFA622 text-12px">
-                      {{ seconds }}s
-                    </span>
+                        <span v-if="seconds < 60" class="color-#FFA622 text-12px">
+                          {{ seconds }}s
+                        </span>
                         <span v-else class="color-[--third-text] text-12px">
-                      {{ formatTimeFromNow(token_create_time) }}
-                    </span>
+                          {{ formatTimeFromNow(token_create_time) }}
+                        </span>
                       </template>
                     </TimerCount>
                     <div v-else class="color-[--third-text] text-12px">
                       {{ formatTimeFromNow(token_create_time) }}
                     </div>
                   </div>
-                  <span
+                  <span v-copy="token" class="text-12px cursor-pointer color-[--third-text]"
+                    >{{ token.slice(0, 4) }}...{{ token.slice(-4) }}</span
+                  >
+                  <Icon
                     v-copy="token"
-                    class="text-12px cursor-pointer color-[--third-text]">{{
-                      token.slice(0, 4)
-                    }}...{{ token.slice(-4) }}</span>
-                  <Icon v-copy="token" name="bxs:copy" class="cursor-pointer text-12px color-[--third-text]"/>
+                    name="bxs:copy"
+                    class="cursor-pointer text-12px color-[--third-text]"
+                  />
                   <div
                     v-if="Number(top10_ratio) > 0"
                     class="text-10px flex items-center gap-2px color-[--third-text]"
                     :class="{
-                    'color-#F6465D':Number(top10_ratio) > 30
-                }"
+                      'color-#F6465D': Number(top10_ratio) > 30,
+                    }"
                   >
-                    <Icon
-                      class="text-11px"
-                      name="custom:top"
-                    />
+                    <Icon class="text-11px" name="custom:top" />
                     {{ formatNumber(top10_ratio || 0, 1) }}%
+                  </div>
+                  <div class="text-10px flex items-center gap-2px color-[--main-text]">
+                    <Icon name="ic:baseline-people-alt" class="color-#12B886" />
+                    {{ holders_cur }}
                   </div>
                   <!--  <div-->
                   <!--    v-if="Number(insider_ratio) > 0"-->
@@ -434,27 +457,25 @@ function openTokenDetail(el: IActionItem) {
                 </div>
               </div>
             </div>
-            <div>
+            <!-- <div>
               <div class="color-[--secondary-text] mb-8px text-12px text-right">
                 {{ $t('MaximumIncrease') }}
               </div>
               <div
                 class="py-4px px-8px min-w-67px text-center rounded-tl-2 rounded-br-[10px] text-[24px] leading-[24px] text-white font-500 bg-#12B886"
               >
-                {{ Number(max_price_change) < 1 ? '<1' : Math.ceil(Number(max_price_change)) + 'X' }}
+                {{
+                  Number(max_price_change) < 1 ? '<1' : Math.ceil(Number(max_price_change)) + 'X'
+                }}
               </div>
-            </div>
+            </div> -->
           </div>
           <div class="flex justify-between items-end text-12px lh-16px">
             <div class="flex flex-col gap-8px">
               <div class="flex-1 flex">
                 <div class="color-[--third-text] w-80px">{{ $t('CurrentAlert') }}</div>
                 <div class="color-[--secondary-text]">
-                  {{
-                    first_signal_time
-                      ? formatDate(first_signal_time, 'MM/DD HH:mm:ss')
-                      : '--'
-                  }}
+                  {{ first_signal_time ? formatDate(first_signal_time, 'MM/DD HH:mm:ss') : '--' }}
                 </div>
               </div>
               <div class="flex-1 flex">
@@ -462,21 +483,25 @@ function openTokenDetail(el: IActionItem) {
                   {{ $t('CurrentMC') }}
                 </div>
                 <div class="flex items-center gap-4px color-[--d-F5F5F5-l-333]">
-              <span
-                :class="{
-                'color-#12B886':Number(mc_cur)>Number(mc),
-                'color-#F6465D':Number(mc_cur)<Number(mc),
-              }">${{ formatNumber(mc_cur, 1) }}</span>
+                  <span
+                    :class="{
+                      'color-#12B886': Number(mc_cur) > Number(mc),
+                      'color-#F6465D': Number(mc_cur) < Number(mc),
+                    }"
+                    >${{ formatNumber(mc_cur, 1) }}</span
+                  >
                   <img
-                    v-if="Number(mc_cur)>Number(mc)"
+                    v-if="Number(mc_cur) > Number(mc)"
                     src="@/assets/images/increase.svg"
+                    class="moving-up"
                     alt=""
-                  >
+                  />
                   <img
-                    v-else-if="Number(mc_cur)<Number(mc)"
+                    v-else-if="Number(mc_cur) < Number(mc)"
                     src="@/assets/images/decrease.svg"
+                    class="moving-down"
                     alt=""
-                  >
+                  />
                 </div>
               </div>
             </div>
@@ -548,28 +573,28 @@ function openTokenDetail(el: IActionItem) {
               mainNameVisible
             />
           </div>
-          <div
-            v-if="headline"
-            v-tooltip="headline"
-            class="flex items-center gap-8px mt-12px"
-           >
-            <Icon name="custom:ai" class="shrink-0"/>
-            <div class="color-[--main-text] text-12px whitespace-nowrap overflow-hidden text-ellipsis">
+          <div v-if="headline" v-tooltip="headline" class="flex items-center gap-8px mt-12px">
+            <Icon name="custom:ai" class="shrink-0" />
+            <div
+              class="color-[--main-text] text-12px whitespace-nowrap overflow-hidden text-ellipsis"
+            >
               {{ headline }}
             </div>
           </div>
         </div>
       </div>
-      <div v-if="listStatus.loading" class="flex py-10px justify-center text-12px text-[--third-text]">{{
-          $t('loading')
-        }}
+      <div
+        v-if="listStatus.loading"
+        class="flex py-10px justify-center text-12px text-[--third-text]"
+      >
+        {{ $t('loading') }}
       </div>
     </el-scrollbar>
     <div
       class="mt-8px cursor-col-resize bg-[--icon-color] gap-1px hover:bg-[--third-text] flex flex-col items-center justify-center w-6px"
       @mousedown.stop.prevent="drag"
     >
-      <span v-for="i in 3" :key="i" class="bg-[--secondary-text] w-2px h-2px rounded-full"/>
+      <span v-for="i in 3" :key="i" class="bg-[--secondary-text] w-2px h-2px rounded-full" />
     </div>
   </div>
   <!--  actions -->
@@ -582,11 +607,7 @@ function openTokenDetail(el: IActionItem) {
     virtual-triggering
     append-to-body
   >
-    <div
-      class="p-12px"
-      @mouseenter="cancelHide"
-      @mouseleave="hidePopover"
-    >
+    <div class="p-12px" @mouseenter="cancelHide" @mouseleave="hidePopover">
       <div class="flex color-[--third-text] text-12px mb-8px">
         <div class="flex-1">
           {{ $t('wallet') }}
@@ -604,29 +625,35 @@ function openTokenDetail(el: IActionItem) {
       </div>
       <div class="flex flex-col gap-12px">
         <div
-          v-for="({
-          wallet_alias,
-          wallet_address,
-          quote_token_amount,
-          quote_token_symbol,
-          quote_token_volume,
-          action_time
-        },idx) in currentSignal.actions"
+          v-for="(
+            {
+              wallet_alias,
+              wallet_address,
+              quote_token_amount,
+              quote_token_symbol,
+              quote_token_volume,
+              action_time,
+            },
+            idx
+          ) in currentSignal.actions"
           :key="idx"
           class="flex color-[--secondary-text] text-12px lh-14px cursor-pointer"
           @click="openTokenDetail(currentSignal.actions[idx])"
         >
           <div class="flex-1 flex items-center">
-            <span class="w-10px h-10px rounded-full bg-#37B270 mr-4px"/>
-            <span class="color-[--main-text] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px">{{
-                wallet_alias || $t('wallet')
-              }}</span>
+            <span class="w-10px h-10px rounded-full bg-#37B270 mr-4px" />
+            <span
+              class="color-[--main-text] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px"
+              >{{ wallet_alias || $t('wallet') }}</span
+            >
             <span class="color-[--secondary-text]">(*{{ wallet_address.slice(-4) }})</span>
           </div>
           <div class="flex-1 color-#12B886">
-            {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : '' }}{{ formatNumber(quote_token_amount, 2) }} {{
-              quote_token_symbol
-            }}<span class="color-[--secondary-text]">(${{ formatNumber(quote_token_volume, 0) }})</span>
+            {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : ''
+            }}{{ formatNumber(quote_token_amount, 2) }} {{ quote_token_symbol
+            }}<span class="color-[--secondary-text]"
+              >(${{ formatNumber(quote_token_volume, 0) }})</span
+            >
           </div>
           <div class="w-40px flex justify-end">
             <!-- <template v-if="isShowDate">
@@ -642,12 +669,44 @@ function openTokenDetail(el: IActionItem) {
     </div>
   </el-popover>
   <audio
-    ref="signalAudio" controls style="display: none"
+    ref="signalAudio"
+    controls
+    style="display: none"
     :src="audioUrl"
-    :volume="+globalStore.audioSettings.audio.signal/100 || 0.5"
+    :volume="+globalStore.audioSettings.audio.signal / 100 || 0.5"
   />
 </template>
 
 <style scoped lang="scss">
+.moving-down {
+  animation: bounceDown 1s ease-in-out infinite;
+}
 
+.moving-up {
+  animation: bounceUp 1s ease-in-out infinite;
+}
+
+@keyframes bounceDown {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(2px);
+    opacity: 0.7;
+  }
+}
+
+@keyframes bounceUp {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-2px);
+    opacity: 0.7;
+  }
+}
 </style>

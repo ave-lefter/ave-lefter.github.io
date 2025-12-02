@@ -1,43 +1,44 @@
 <script setup lang="ts">
-import type {GetSignalV2ListResponse, IActionItem, IActionV3Item} from '~/api/signal'
+import type { GetSignalV2ListResponse, IActionItem, IActionV3Item } from '~/api/signal'
 import QuickSwapButton from '~/components/quickSwap/quickSwapButton.vue'
-import UserAvatar from '~/components/userAvatar.vue'
 import XIcon from '~/components/xPopup/xIcon.vue'
 
-const props = withDefaults(defineProps<{
-  footer?: boolean,
-  item: GetSignalV2ListResponse<IActionItem | IActionV3Item>,
-  isWalletAll?: boolean
-  filterToken?: string
-  filter?: (token: string) => void
-  activeChain: string
-  quickBuyValue?: string
-}>(), {
-  footer: true,
-  filterToken: '',
-  filter: () => {
-  },
-  quickBuyValue: '0.01'
-})
+const props = withDefaults(
+  defineProps<{
+    footer?: boolean
+    item: GetSignalV2ListResponse<IActionItem | IActionV3Item>
+    isWalletAll?: boolean
+    filterToken?: string
+    filter?: (token: string) => void
+    activeChain: string
+    quickBuyValue?: string
+  }>(),
+  {
+    footer: true,
+    filterToken: '',
+    filter: () => {},
+    quickBuyValue: '0.01',
+  }
+)
 const emit = defineEmits(['openDrawer'])
 const localeStore = useLocaleStore()
-const themeStore = useThemeStore()
+// const themeStore = useThemeStore()
 
-function getGradientBackground(history_count: number) {
-  if (history_count >= 5) {
-    return themeStore.isDark
-      ? 'bg-[linear-gradient(287.62deg,#8B4FDD_12.05%,#12B886_87.95%)]'
-      : 'bg-[linear-gradient(260.98deg,#8B4FDD_6.85%,#12B886_85.21%)] color-#FFF'
-  }
-  return themeStore.isDark
-    ? 'bg-[linear-gradient(287.62deg,#8B4FDD2A_12.05%,#12B8862A_87.95%)]'
-    : 'bg-[linear-gradient(260.98deg,#8B4FDD2A_6.85%,#12B8862A_85.21%)]'
-}
+// function getGradientBackground(history_count: number) {
+//   if (history_count >= 5) {
+//     return themeStore.isDark
+//       ? 'bg-[linear-gradient(287.62deg,#8B4FDD_12.05%,#12B886_87.95%)]'
+//       : 'bg-[linear-gradient(260.98deg,#8B4FDD_6.85%,#12B886_85.21%)] color-#FFF'
+//   }
+//   return themeStore.isDark
+//     ? 'bg-[linear-gradient(287.62deg,#8B4FDD2A_12.05%,#12B8862A_87.95%)]'
+//     : 'bg-[linear-gradient(260.98deg,#8B4FDD2A_6.85%,#12B8862A_85.21%)]'
+// }
 
 const increasedOrDecreased = computed(() => {
   return {
     increase: Number(props.item.mc_cur) > Number(props.item.mc),
-    decrease: Number(props.item.mc_cur) < Number(props.item.mc)
+    decrease: Number(props.item.mc_cur) < Number(props.item.mc),
   }
 })
 
@@ -52,16 +53,16 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
       logo_url: props.item.logo,
       chain: props.activeChain,
       address: props.item.token,
-      remark: ''
+      remark: '',
     },
     pairInfo: {
       target_token: props.item.token,
       token0_address: el.quote_token_address,
       token0_symbol: el.quote_token_symbol,
       token1_symbol: props.item.symbol,
-      pairAddress: ''
+      pairAddress: '',
     },
-    user_address: el.wallet_address
+    user_address: el.wallet_address,
   })
 }
 </script>
@@ -71,18 +72,15 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
     <div class="flex justify-between">
       <div class="flex flex-1 flex-col gap-12px">
         <div class="flex items-center gap-8px">
-          <div
-            class="cursor-pointer"
-            @click="navigateTo(`/token/${item.token}-${item.chain}`)"
-          >
+          <div class="cursor-pointer" @click="navigateTo(`/token/${item.token}-${item.chain}`)">
             <TokenImg
               token-class="w-36px h-36px"
               chain-class="w-14px h-14px"
               :row="{
-                  symbol:item.symbol,
-                   chain:item.chain,
-                   logo_url:item.logo
-                }"
+                symbol: item.symbol,
+                chain: item.chain,
+                logo_url: item.logo,
+              }"
             />
           </div>
           <div>
@@ -90,65 +88,73 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
               <span
                 class="text-16px font-500 color-[--main-text] mr-8px cursor-pointer max-w-140px truncate"
                 @click="navigateTo(`/token/${item.token}-${item.chain}`)"
-              >{{ item.symbol }}</span>
+                >{{ item.symbol }}</span
+              >
               <a
                 class="mr-4px w-12px h-12px rounded-2px bg-[--secondary-bg] flex items-center justify-center text-10px [&&]:color-[--third-text]"
                 :href="`https://x.com/search?q=($${item.symbol} OR ${item.token})&src=typed_query&f=live`"
                 target="_blank"
               >
-                <Icon
-                  name="hugeicons:search-01"
-                />
+                <Icon name="hugeicons:search-01" />
               </a>
               <div
-                  v-if="item.issue_platform"
-                class="mr-4px w-12px h-12px rounded-2px bg-[--secondary-bg] flex items-center justify-center">
+                v-if="item.issue_platform"
+                class="mr-4px w-12px h-12px rounded-2px bg-[--secondary-bg] flex items-center justify-center"
+              >
                 <img
-                    v-tooltip="item.issue_platform"
+                  v-tooltip="item.issue_platform"
                   :src="formatIconTag(item.issue_platform)"
                   width="10"
                   height="10"
                   class="rounded-full"
                   alt=""
-                >
+                />
               </div>
             </div>
             <div class="flex items-center color-[--third-text] gap-4px">
-              <div v-tooltip="formatDate(item.token_create_time,'MM/DD HH:mm:ss')">
+              <div v-tooltip="formatDate(item.token_create_time, 'MM/DD HH:mm:ss')">
                 <TimerCount
-                  v-if="item.token_create_time && Number(formatTimeFromNow(item.token_create_time, true)) < 60"
-                  :key="item.token_create_time" :timestamp="item.token_create_time" :end-time="60">
+                  v-if="
+                    item.token_create_time &&
+                    Number(formatTimeFromNow(item.token_create_time, true)) < 60
+                  "
+                  :key="item.token_create_time"
+                  :timestamp="item.token_create_time"
+                  :end-time="60"
+                >
                   <template #default="{ seconds }">
-                  <span v-if="seconds < 60" class="color-#FFA622 text-12px">
-                    {{ seconds }}s
-                  </span>
+                    <span v-if="seconds < 60" class="color-#FFA622 text-12px">
+                      {{ seconds }}s
+                    </span>
                     <span v-else class="color-[--third-text] text-12px">
-                    {{ formatTimeFromNow(item.token_create_time) }}
-                  </span>
+                      {{ formatTimeFromNow(item.token_create_time) }}
+                    </span>
                   </template>
                 </TimerCount>
                 <div v-else class="color-[--third-text] text-12px">
                   {{ formatTimeFromNow(item.token_create_time) }}
                 </div>
               </div>
-              <span
-                v-copy="item.token"
-                class="text-12px cursor-pointer">{{
-                  item.token.slice(0, 4)
-                }}...{{ item.token.slice(-4) }}</span>
-              <Icon v-copy="item.token" name="bxs:copy" class="cursor-pointer text-12px"/>
-              <XPopup v-if="item.twitter_url" :tokenId="item.token + '-' + item.chain" :type="item.twitter_type">
+              <span v-copy="item.token" class="text-12px cursor-pointer"
+                >{{ item.token.slice(0, 4) }}...{{ item.token.slice(-4) }}</span
+              >
+              <Icon v-copy="item.token" name="bxs:copy" class="cursor-pointer text-12px" />
+              <XPopup
+                v-if="item.twitter_url"
+                :tokenId="item.token + '-' + item.chain"
+                :type="item.twitter_type"
+              >
                 <a
                   :href="item.twitter_url"
                   target="_blank"
                   class="mr-4px w-12px h-12px rounded-2px bg-[--secondary-bg] flex items-center justify-center clickable"
                 >
-                   <XIcon
-                      v-if="[1, 2, 3].includes(item.twitter_type)"
-                      :type="item.twitter_type"
-                      class="text-12px"
-                    />
-                  <Icon v-else name="custom:twitter" class="text-10px"/>
+                  <XIcon
+                    v-if="[1, 2, 3].includes(item.twitter_type)"
+                    :type="item.twitter_type"
+                    class="text-12px"
+                  />
+                  <Icon v-else name="custom:twitter" class="text-10px" />
                 </a>
               </XPopup>
               <PumpLive v-if="item?.is_streaming" :tokenId="item.token + '-' + item.chain" />
@@ -158,24 +164,16 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
         <el-row class="text-12px">
           <el-col :span="9">
             <div class="color-[--third-text] mb-4px">{{ $t('24Volume') }}</div>
-            <div class="color-[--main-text]">
-              ${{ formatNumber(item.tx_volume_u_24h || 0, 1) }}
-            </div>
+            <div class="color-[--main-text]">${{ formatNumber(item.tx_volume_u_24h || 0, 1) }}</div>
           </el-col>
-          <el-col
-            :span="15"
-            class="[&&]:flex items-center"
-          >
+          <el-col :span="15" class="[&&]:flex items-center">
             <div>
               <div class="color-[--third-text] mb-4px">
                 {{ $t('AlertMC') }}
               </div>
               <div class="flex items-center color-[--main-text]">
                 ${{ formatNumber(item.mc, 1) }}
-                <Icon
-                  name="material-symbols:arrow-right-alt"
-                  class="mx-6px color-[--third-text]"
-                />
+                <Icon name="material-symbols:arrow-right-alt" class="mx-6px color-[--third-text]" />
               </div>
             </div>
             <div>
@@ -183,54 +181,57 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
                 {{ $t('CurrentMC') }}
               </div>
               <div class="flex items-center gap-4px color-[--main-text]">
-              <span
-                :class="{
-                'color-#12B886':increasedOrDecreased.increase,
-                'color-#F6465D':increasedOrDecreased.decrease,
-              }">${{ formatNumber(item.mc_cur, 1) }}</span>
+                <span
+                  :class="{
+                    'color-#12B886': increasedOrDecreased.increase,
+                    'color-#F6465D': increasedOrDecreased.decrease,
+                  }"
+                  >${{ formatNumber(item.mc_cur, 1) }}</span
+                >
                 <img
                   v-if="increasedOrDecreased.increase"
                   src="@/assets/images/increase.svg"
                   alt=""
-                >
+                  class="moving-down"
+                />
                 <img
                   v-else-if="increasedOrDecreased.decrease"
                   src="@/assets/images/decrease.svg"
                   alt=""
-                >
+                  class="moving-up"
+                />
               </div>
             </div>
           </el-col>
         </el-row>
       </div>
       <div class="flex flex-col justify-between items-end">
-        <div
-          class="flex items-center color-[--third-text] text-12px"
-        >
+        <div class="flex items-center color-[--third-text] text-12px">
           <div
-            v-tooltip="filterToken?$t('CancelFilter'):$t('FilterCurrentToken')"
+            v-tooltip="filterToken ? $t('CancelFilter') : $t('FilterCurrentToken')"
             class="mr-8px w-12px h-12px rounded-2px bg-[--secondary-bg] flex items-center justify-center hover:color-[--main-text] cursor-pointer"
-            :class="filterToken===item.token ? 'color-[--main-text]':''"
-            @click="filter(filterToken?'':item.token);"
+            :class="filterToken === item.token ? 'color-[--main-text]' : ''"
+            @click="filter(filterToken ? '' : item.token)"
           >
-            <Icon name="custom:filter"/>
+            <Icon name="custom:filter" />
           </div>
           <div
-            v-tooltip="formatDate(item.signal_time,'YYYY-MM-DD HH:mm:ss')"
+            v-tooltip="formatDate(item.signal_time, 'YYYY-MM-DD HH:mm:ss')"
             class="color-[--third-text] hover:color-[--main-text] flex items-center gap-2px"
           >
-            <Icon name="custom:clock" class="text-10px mr-2px"/>
+            <Icon name="custom:clock" class="text-10px mr-2px" />
             <div>
               <TimerCount
                 v-if="item.signal_time && Number(formatTimeFromNow(item.signal_time, true)) < 60"
-                :key="item.signal_time" :timestamp="item.signal_time" :end-time="60">
+                :key="item.signal_time"
+                :timestamp="item.signal_time"
+                :end-time="60"
+              >
                 <template #default="{ seconds }">
-                <span v-if="seconds < 60" class="color-#FFA622 text-12px">
-                  {{ seconds }}s
-                </span>
+                  <span v-if="seconds < 60" class="color-#FFA622 text-12px"> {{ seconds }}s </span>
                   <span v-else class="text-12px">
-                  {{ formatTimeFromNow(item.signal_time) }}
-                </span>
+                    {{ formatTimeFromNow(item.signal_time) }}
+                  </span>
                 </template>
               </TimerCount>
               <div v-else class="text-12px">
@@ -240,22 +241,33 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
           </div>
         </div>
         <div
+          class="flex items-center justify-center h-32px w-83px bg-#12B8861A rounded-4px text-24px font-500"
+        >
+          {{
+            Number(item.max_price_change) < 1
+              ? '<1'
+              : Math.ceil(Number(item.max_price_change)) + 'X'
+          }}
+        </div>
+        <!-- <div
           class="flex items-center lh-24px py-4px px-8px rounded-4px"
           :class="getGradientBackground(item.history_count)"
         >
           <Icon name="custom:alert" class="mr-3px"/>
           {{ item.history_count }}
           <span class="text-16px ml-4px">{{ $t(item.tag) }}</span>
-        </div>
+        </div> -->
         <div class="flex items-center gap-4px">
           <div
-            class="px-4px py-2px text-12px rounded-2px bg-[--secondary-bg] flex items-center justify-center color-[--main-text]">
-            <Icon name="ic:baseline-people-alt" class="mr-4px color-#12B886"/>
+            class="px-4px py-2px text-12px rounded-2px bg-[--secondary-bg] flex items-center justify-center color-[--main-text]"
+          >
+            <Icon name="ic:baseline-people-alt" class="mr-4px color-#12B886" />
             {{ item.holders_cur }}
           </div>
           <div
-            class="px-4px py-2px text-12px rounded-2px bg-[--secondary-bg] flex items-center justify-center color-[--main-text]">
-            <img :src="formatIconTag(item.tag)" class="mr-4px w-12px h-12px" alt="">
+            class="px-4px py-2px text-12px rounded-2px bg-[--secondary-bg] flex items-center justify-center color-[--main-text]"
+          >
+            <img :src="formatIconTag(item.tag)" class="mr-4px w-12px h-12px" alt="" />
             {{ item.actions.length }}
           </div>
           <!--<div-->
@@ -271,7 +283,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
         </div>
       </div>
     </div>
-    <div class="m-12px bg-[--secondary-bg] h-1px"/>
+    <div class="m-12px bg-[--secondary-bg] h-1px" />
     <div class="flex color-[--third-text] text-12px mb-8px">
       <div class="flex-[2]">
         {{ $t('wallet') }}
@@ -288,26 +300,42 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
     </div>
     <div class="flex-1">
       <div
-        v-for="({
-              wallet_alias,
-              wallet_address,
-              quote_token_amount,
-              quote_token_symbol,
-              quote_token_volume,
-              action_time,
-              token_balance_usd,
-              wallet_logo
-            },$index) in (isWalletAll? item.actions : item.actions.slice(0,3))"
+        v-for="(
+          {
+            wallet_alias,
+            wallet_address,
+            quote_token_amount,
+            quote_token_symbol,
+            quote_token_volume,
+            action_time,
+            token_balance_usd,
+            wallet_logo,
+          },
+          $index
+        ) in isWalletAll ? item.actions : item.actions.slice(0, 3)"
         :key="$index"
         class="flex color-[--secondary-text] text-12px h-40px items-center cursor-pointer"
         @click="openTokenDetail(item.actions[$index])"
       >
         <div class="flex-[2] flex items-center">
-          <UserRemark :key="wallet_address" :address="wallet_address" :chain="activeChain" :remark="wallet_alias || ''" :showIcon="true" :teleported="true" :wallet_logo="{logo:wallet_logo,name:wallet_alias, url: ''}" iconSize="24px" avatar-class="mr-4px" :formatAddress="(address) => `(*${ address.slice(-4) })`" :showAddress="false">
-            <template #default="{remark}">
-              <span class="color-[--secondary-text] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px">{{
-                remark || $t('wallet')
-              }}</span><span class="color-[--third-text]">(*{{ wallet_address.slice(-4) }})</span>
+          <UserRemark
+            :key="wallet_address"
+            :address="wallet_address"
+            :chain="activeChain"
+            :remark="wallet_alias || ''"
+            :showIcon="true"
+            :teleported="true"
+            :wallet_logo="{ logo: wallet_logo, name: wallet_alias, url: '' }"
+            iconSize="24px"
+            avatar-class="mr-4px"
+            :formatAddress="(address) => `(*${address.slice(-4)})`"
+            :showAddress="false"
+          >
+            <template #default="{ remark }">
+              <span
+                class="color-[--secondary-text] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px"
+                >{{ remark || $t('wallet') }}</span
+              ><span class="color-[--third-text]">(*{{ wallet_address.slice(-4) }})</span>
             </template>
           </UserRemark>
           <!-- <UserAvatar
@@ -321,54 +349,48 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
             }}</span><span class="color-[--d-999-l-666]">(*{{ wallet_address.slice(-4) }})</span>-->
         </div>
         <div class="w-100px text-right color-#12B886">
-          {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : '' }}<span
-          v-tooltip="'$'+formatNumber(quote_token_volume, 2)"
-          class="decoration-underline decoration-dotted underline-offset-2px"
-        >
-          {{ formatNumber(quote_token_amount, 2) }} {{
-            quote_token_symbol.toUpperCase() === 'USDC' ? 'U' : quote_token_symbol
-          }}
-        </span>
+          {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : ''
+          }}<span
+            v-tooltip="'$' + formatNumber(quote_token_volume, 2)"
+            class="decoration-underline decoration-dotted underline-offset-2px"
+          >
+            {{ formatNumber(quote_token_amount, 2) }}
+            {{ quote_token_symbol.toUpperCase() === 'USDC' ? 'U' : quote_token_symbol }}
+          </span>
           <!--<span class="color-[&#45;&#45;d-999-l-666]">(${{ formatNumber(quote_token_volume, 0) }})</span>-->
         </div>
         <div v-if="!filterToken" class="flex-1 text-right">
-            <span
-              v-if="!token_balance_usd || Number(token_balance_usd)===0"
-              class="color-#F6465D"
-            >
-              {{ $t('soldAll') }}
-            </span>
-          <template v-else>
-            ${{ formatNumber(token_balance_usd, 2) }}
-          </template>
+          <span v-if="!token_balance_usd || Number(token_balance_usd) === 0" class="color-#F6465D">
+            {{ $t('soldAll') }}
+          </span>
+          <template v-else> ${{ formatNumber(token_balance_usd, 2) }} </template>
         </div>
-        <div
-          class="w-40px text-right"
-        >
-            <span v-tooltip="formatDate(action_time * 1000, 'MM/DD HH:mm:ss')">{{
-                formatTimeFromNow(action_time)
-              }}</span>
+        <div class="w-40px text-right">
+          <span v-tooltip="formatDate(action_time * 1000, 'MM/DD HH:mm:ss')">{{
+            formatTimeFromNow(action_time)
+          }}</span>
         </div>
       </div>
     </div>
     <div
-      v-if="item.actions.length>3 && !isWalletAll"
+      v-if="item.actions.length > 3 && !isWalletAll"
       class="flex justify-center"
-      @click="emit('openDrawer',item)"
+      @click="emit('openDrawer', item)"
     >
       <Icon
         name="material-symbols:keyboard-double-arrow-down-rounded"
         class="color-[--third-text] hover:color-[--main-text] cursor-pointer"
       />
     </div>
-    <div class="m-12px bg-[--secondary-bg] h-1px"/>
-    <div
-      v-if="footer"
-      class="flex justify-between"
-    >
+    <div class="m-12px bg-[--secondary-bg] h-1px" />
+    <div v-if="footer" class="flex justify-between">
       <div class="flex-1 flex items-center color-[--third-text] gap-6px text-12px">
         <template
-          v-if="item.self_wallet_info?.total_purchase_usd && Number(item.self_wallet_info?.total_purchase_usd)!==0">
+          v-if="
+            item.self_wallet_info?.total_purchase_usd &&
+            Number(item.self_wallet_info?.total_purchase_usd) !== 0
+          "
+        >
           {{ $t('mySwap') }}
           <el-row class="text-12px flex-1 text-center">
             <el-col :span="8">
@@ -377,9 +399,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
                 ${{ formatNumber(item.self_wallet_info?.total_purchase_usd || 0, 1) }}
               </div>
             </el-col>
-            <el-col
-              :span="8"
-            >
+            <el-col :span="8">
               <div class="color-[--third-text] mb-4px">
                 {{ $t('sold') }}
               </div>
@@ -387,9 +407,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
                 ${{ formatNumber(item.self_wallet_info?.total_sold_usd || 0, 1) }}
               </div>
             </el-col>
-            <el-col
-              :span="8"
-            >
+            <el-col :span="8">
               <div class="color-[--third-text] mb-4px">
                 {{ $t('balance1') }}
               </div>
@@ -411,5 +429,35 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
 </template>
 
 <style scoped lang="scss">
+.moving-down {
+  animation: bounceDown 1s ease-in-out infinite;
+}
 
+.moving-up {
+  animation: bounceUp 1s ease-in-out infinite;
+}
+
+@keyframes bounceDown {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(2px);
+    opacity: 0.7;
+  }
+}
+
+@keyframes bounceUp {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-2px);
+    opacity: 0.7;
+  }
+}
 </style>

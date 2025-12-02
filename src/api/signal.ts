@@ -164,3 +164,10 @@ export function getSignalV3List(query: {
     query
   })
 }
+
+export function getActiveAddressRank(): Promise<IActionV3Item[]> {
+  const {$api} = useNuxtApp()
+  return $api('/v2api/signals/v2/active_address_rank', {
+    method: 'get'
+  })
+}
