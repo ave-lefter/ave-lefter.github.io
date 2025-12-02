@@ -10,6 +10,9 @@ export function usePerp() {
   const dialogVisible = ref(false)
   const perpStore = usePerpStore()
 
+  const walletStore = useWalletStore()
+  const botStore = useBotStore()
+
   const perpPositions = computed(() => {
     const positions = perpStore.position || []
     const contractList = perpStore.contractList
@@ -80,6 +83,7 @@ export function usePerp() {
 
   function login() {
     const { $dialog } = useNuxtApp()
+    const $t = getGlobalT()
     dialogVisible.value = true
     $dialog.show({
       content: {
@@ -94,7 +98,7 @@ export function usePerp() {
       props: {
         width: '450px',
         class: 'perp-dialog',
-        title: '登录合约账户',
+        title: $t('loginPerpAccount'),
         'onOpened': () => {
           console.log('open')
           dialogVisible.value = true
@@ -103,6 +107,31 @@ export function usePerp() {
           console.log('close')
           dialogVisible.value = false
         }
+      }
+    })
+  }
+
+  function connectAndLogin() {
+    if (walletStore.address) {
+      if (!perpStore.isLogin) {
+        login()
+      }
+      return
+    }
+    botStore.changeConnectVisible(true, 1)
+    const unwatch = watch(() => walletStore.address, (res) => {
+      if (res && walletStore.walletSignature?.[walletStore?.address || '']) {
+        unwatch()
+        if (!perpStore.isLogin) {
+          login()
+        }
+      }
+    })
+
+    const unwatch2 = watch(() => botStore.connectVisible, (res) => {
+      if (!res) {
+        unwatch()
+        unwatch2()
       }
     })
   }
@@ -233,6 +262,7 @@ export function usePerp() {
     initMarginRequirement,
     maintenanceMarginRequirement,
     login,
+    connectAndLogin,
     deposit,
     withdraw,
     // createOrderDialogTitle,

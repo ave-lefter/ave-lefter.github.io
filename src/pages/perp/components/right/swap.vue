@@ -10,7 +10,7 @@
           <div class="inline-flex items-center">
             <span class="text-14px color-[--main-text]">USD</span>
             <div class="h-8px w-1px b-l-[--third-text] b-l-1px b-l-solid mx-5px" />
-            <button type="button" class="text-14px color-[--up-color] border-none bg-transparent clickable p-0" @click.stop="form.price = (perpStore.perp?.lastPrice || '0')">中间价</button>
+            <button type="button" class="text-14px color-[--up-color] border-none bg-transparent clickable p-0" @click.stop="form.price = (perpStore.perp?.lastPrice || '0')">{{ $t('midPrice') }}</button>
           </div>
         </template>
       </el-input>
@@ -241,12 +241,12 @@
       <span class="color-[--up-color]">{{ form.reduceOnly ? '-' : formatNumber(maxAmountBuy, 4) }} {{  perpStore.unit?.coinName || ''  }}</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ form.reduceOnly ? '-' : formatNumber(maxAmountSell, 4) }}  {{  perpStore.unit?.coinName || ''  }}</span>
     </li>
     <li v-if="!form.reduceOnly" class="flex items-center mt-8px">
-      <span class="mr-auto">预估强平价</span>
+      <span class="mr-auto">{{ $t('estimatedLiquidationPrice') }}</span>
       <span class="color-[--up-color]">{{ BigNumber(form.amount).gt(0) ? formatNumber(liquidatePriceBuy, 4) : '-' }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ BigNumber(form.amount).gt(0) ? formatNumber(liquidatePriceSell, 4) : '-' }} USD</span>
     </li>
     <li class="flex items-center mt-8px">
-      <span class="mr-auto">手续费</span>
-      <span class="color-[--up-color]">接单 {{ formatNumber(feeRate.takerFeeRate) }}%</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">挂单 {{ formatNumber(feeRate.makerFeeRate) }}%</span>
+      <span class="mr-auto">{{ $t('fee') }}</span>
+      <span class="color-[--up-color]">{{ $t('taker') }} {{ formatNumber(feeRate.takerFeeRate) }}%</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ $t('maker') }} {{ formatNumber(feeRate.makerFeeRate) }}%</span>
     </li>
   </ul>
 
@@ -282,7 +282,7 @@ const rules = computed(() => ({
   price: [
     { validator: (rule: any, value: string, callback: (error?: Error) => void) => {
       if ((!value || value && new BigNumber(value).lte(0))) {
-        callback(new Error('请输入您的委托价格'))
+        callback(new Error(t('plsEnterPrice')))
       } else {
         callback()
       }
@@ -291,7 +291,7 @@ const rules = computed(() => ({
   amount: [
     { validator: (rule: any, value: string, callback: (error?: Error) => void) => {
       if ((!value || value && new BigNumber(value).lte(0))) {
-        callback(new Error(isValue.value ? '请输入您的委托价值' : '请输入您的委托数量'))
+        callback(new Error(isValue.value ? t('plsEnterOrderValue') : t('plsEnterOrderAmount')))
       } else {
         callback()
       }
