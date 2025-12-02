@@ -16,7 +16,7 @@
         <span class="text-14px font-700 font-bold">{{ perp?.contractName }}</span>
         <span class="color-[--secondary-text] ml-8px">{{ $t('currentLeverage') }}:{{ defaultLeverage }}X</span>
       </div>
-      <Step class="mt-19px" v-model="leverage" :min="1" :max="100" />
+      <Step class="mt-19px" v-model="leverage" :max="max" @change="change"/>
       <div class="mt-20px mb-30px px-3px w-full">
         <el-slider
           v-model="leverage"
@@ -25,22 +25,35 @@
           :step="1"
           :marks="marks"
           :format-tooltip="(value)=> value+'X'"
+          @input="change"
           class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] slider-box"
         />
       </div>
      <div class="text-14px flex-between mt-48px">
       <span class="color-[--third-text]">{{ $t('positionMargin') }}</span>
-      <span>{{ formatNumber(orderCost.toString(), { decimals: 0, limit: 10}) }}USD</span>
+      <span>{{ formatNumber(defaultMargin, { decimals: 0, limit: 10}) }}USD</span>
      </div>
      <div class="text-14px flex-between mt-24px">
       <span class="color-[--third-text]">{{ $t('maxPositionCurrentLeverage') }}</span>
       <span>{{ formatNumber(defaultLeverageNum.toString(), { decimals: 0, limit: 10}) }}USD</span>
      </div>
-      <div class="text-14px flex-between mt-24px">
+      <div class="text-14px color-[--third-text] flex-between mt-24px">
         {{ $t('adjustLeverageTip1') }}
       </div>
-      <div v-if="currentOrderList?.length >0" class="text-14px flex-between mt-24px color-[--yellow]">
-        *{{ $t('adjustLeverageTip2', {name:perp?.contractName}) }}
+      <div v-if="currentOrderList?.length >0" class="text-14px  mt-24px color-[--yellow] flex-start items-start">
+        <Icon  name="majesticons:info-circle" class="text-24px mr-10px"/>
+        <div>
+          <div class="mb-10px" v-if="compareDefaultMargin !==0 && leverage">
+            <span class="block" :class="compareDefaultMargin > 0? 'color-[--down-color]':'color-[--up-color]'" v-if="Number(currentMargin) < Number(prepBalance)">
+              {{ compareDefaultMargin > 0 ? $t('adjustLeverageTip4', {num:formatNumber(Math.abs(compareDefaultMargin), { decimals: 0, limit: 10})}): $t('adjustLeverageTip5', {num:formatNumber(Math.abs(compareDefaultMargin), { decimals: 0, limit: 10})}) }}
+            </span>
+            <span v-else>
+            {{ $t('adjustLeverageTip3') }}
+            </span>
+          </div>
+          <span>{{ $t('adjustLeverageTip2', {name:perp?.contractName}) }}</span>
+        </div>
+
       </div>
       <div class="text-center mt-30px flex-between">
         <el-button class="flex-1" style="height: 48px" @click.stop.prevent="visible = false">
@@ -71,6 +84,7 @@ const visible = computed({
   get: () => props.modelValue ?? false,
   set: (val) => emit('update:modelValue', val),
 })
+const { prepBalance } = usePerp()
 const { position, metadata, perp, contractId, userInfo } = storeToRefs(usePerpStore())
 const { getOnboardSite } = usePerpStore()
 const { t } = useI18n()
@@ -78,26 +92,14 @@ const wsPrivateStore = usePerpWsPrivateStore()
 const leverage = shallowRef(1)
 const segments = 5
 const currentOrderList= ref([])
-const loading= shallowRef(false)
-const isPosition = computed(() => {
-  return  position?.value?.filter((i) => i.contractId == contractId.value) || []
-})
-const orderCost = computed(() => {
-  const num = CoreCalculator.getMaxCreateOrderSize({
-    contractId: perp?.value?.contractId || '',
-    orderPrice: perp?.value?.lastPrice || '0',
-    orderSide: 'BUY',
-    reduceOnly: false
-  }).toFixed()
-  // console.log('-------orderCost--------', num)
-  const data = {
-    contractId: contractId.value,
-    orderSide: 'BUY',
-    orderPrice: perp?.value?.lastPrice || '',
-    orderSize: num.toString(),
-    leverage: defaultLeverage.value
+const loading = shallowRef(false)
+const currentMargin = shallowRef('0')
+const compareDefaultMargin= shallowRef(0)
+const defaultMargin = computed(() => {
+  if (defaultLeverage.value) {
+    return getMargin(defaultLeverage.value)
   }
- return CoreCalculator.getCreateOrderCost(data)
+  return '0'
 })
 const defaultLeverageNum = computed(() => {
   const data = {
@@ -141,6 +143,28 @@ watch(
   },
   { immediate: true, deep: true }
 )
+function getMargin(leverage: string) {
+  const list = position?.value?.filter((i) => i.contractId == contractId.value) || []
+  const num = list.reduce((acc, cur) => acc + Number(cur?.openSize), 0)
+  const data = {
+    contractId: contractId.value,
+    orderSide: 'BUY',
+    orderPrice: perp?.value?.lastPrice || '',
+    orderSize: String(num),
+    leverage: leverage
+  }
+  const result = CoreCalculator.getCreateOrderCost(data)?.toString()
+ return result
+}
+function change(val: number | number[]) {
+  if (val) {
+    currentMargin.value = getMargin(String(val))
+    compareDefaultMargin.value = Number(currentMargin.value) - Number(defaultMargin.value)
+  } else {
+    currentMargin.value = '0'
+    compareDefaultMargin.value= 0
+  }
+}
 function submit() {
   if (!userInfo.value?.id) {
     ElMessage.error(t('connectWalletFirst'))
