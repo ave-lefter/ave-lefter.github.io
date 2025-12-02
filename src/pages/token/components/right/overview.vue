@@ -226,7 +226,7 @@
           class="mt-20px"
           style="width: 50vw; border: none"
           :style="{ height: height - 350 + 'px' }"
-          :src="`https://apptest.creditlink.info/tokenScore?chain=${supportObj[chain]}&address=${tokenAddress}&model=${mode}&platform=ave.ai`"
+          :src="`https://app.creditlink.info/tokenScore?chain=${supportObj[chain]}&address=${tokenAddress}&model=${mode}&platform=ave.ai`"
           allow="clipboard-write"
         />
       </el-dialog>
@@ -245,7 +245,7 @@
           class="mt-20px"
           style="width: 80vw; border: none"
           :style="{ height: height - 350 + 'px' }"
-          :src="`https://apptest.creditlink.info/tokenAnalyse?chain=${supportObj[chain]}&address=${tokenAddress}&model=${mode}&platform=ave.ai`"
+          :src="`https://app.creditlink.info/tokenAnalyse?chain=${supportObj[chain]}&address=${tokenAddress}&model=${mode}&platform=ave.ai`"
           allow="clipboard-write"
         />
       </el-dialog>
