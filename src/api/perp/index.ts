@@ -4,6 +4,7 @@ import type { Metadata } from '@edgex-fe/typescript-sdk'
 import localforage from 'localforage'
 import { getAddress } from 'ethers'
 import { usePerpStore } from '~/stores/perp'
+import type { Order } from '~/stores/perp/type'
 
 // 获取metadata
 export async function getPerpMetadata(): Promise<Metadata> {
@@ -291,7 +292,10 @@ export async function getActiveOrderPage(params: {
   filterStartCreatedTimeInclusive: string | number
   filterEndCreatedTimeExclusive: string | number
   filterContractIdList: string
-}) {
+}): Promise<{
+  dataList: Array<Order>
+  nextPageOffsetData: string
+}> {
   const perpStore = usePerpStore()
   return api('/api/v1/private/order/getActiveOrderPage', {
     method: 'get',
