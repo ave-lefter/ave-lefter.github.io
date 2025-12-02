@@ -91,8 +91,8 @@ const cancelOrder = async (orderIds: string[]) => {
 }
 watch(
   () => props.searchParams,
-  (val,old) => {
-    if (route.name == 'perp-id') {
+  (val) => {
+    if (route.name === 'perp-id') {
       console.log('-------val----',val)
       if (val?.filterContractIdList) {
         listData.value = perpStore.orderList?.filter(i => i.contractId == val?.filterContractIdList) || []
@@ -112,9 +112,9 @@ watch(
 watch(
   () => wsPrivateStore.wsResult,
   (val) => {
-    if (route.name == 'perp-id') {
+    if (route.name === 'perp-id') {
       let result: Order[] = val['trade-event']?.content?.data?.order || []
-      result = listData.value?.filter(i => !result.some(el => el.id === i.id)).concat(...result)?.filter(i => i.status !== 'CANCELED')
+      result = perpStore.order?.filter(i => !result.some(el => el.id === i.id)).concat(...result)?.filter(i => i.status !== 'CANCELED')
       result = result?.map?.((el) => {
         const isLong = el.side === 'SELL'
         // 止盈

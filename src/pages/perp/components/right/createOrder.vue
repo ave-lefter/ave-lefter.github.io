@@ -7,7 +7,7 @@
   <ul class="mt-30px text-14px color-[--main-text]">
     <li class="flex items-center justify-between">
       <span class="color-[--third-text]">{{ $t('price') }}</span>
-      <span>{{ orderTypes[orderParams.type] }}</span>
+      <span>{{ orderParams.type?.includes('LIMIT') ? formatNumber(orderParams.price, 10) : orderTypes[orderParams.type] }}</span>
     </li>
     <li class="flex items-center justify-between mt-16px">
       <span class="color-[--third-text]">{{ $t('amount') }}</span>
@@ -23,11 +23,11 @@
     </li>
     <li v-if="orderParams?.isSetOpenTp && orderParams?.openTp?.triggerPrice" class="flex items-center justify-between mt-16px">
       <span class="color-[--third-text]">{{ $t('TPPrice') }}</span>
-      <span class="color-[--up-color]"> &gt;= {{ formatNumber(orderParams?.openTp?.triggerPrice || 0, 4) }}</span>
+      <span class="color-[--up-color]"> &gt;= {{ formatNumber(orderParams?.openTp?.triggerPrice || 0, 10) }}</span>
     </li>
     <li v-if="orderParams?.isSetOpenSl && orderParams?.openSl?.triggerPrice" class="flex items-center justify-between mt-16px">
       <span class="color-[--third-text]">{{ $t('SLPrice') }}</span>
-      <span class="color-[--down-color]"> &lt;= {{ formatNumber(orderParams?.openSl?.triggerPrice || 0, 4) }}</span>
+      <span class="color-[--down-color]"> &lt;= {{ formatNumber(orderParams?.openSl?.triggerPrice || 0, 10) }}</span>
     </li>
     <li class="flex items-center justify-between mt-16px">
       <el-button size="large" class="flex-1 min-h-48px rd-8px!" @click.stop.prevent="$emit('cancel')">{{ $t('cancel') }}</el-button>
