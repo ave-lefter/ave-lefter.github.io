@@ -449,7 +449,7 @@ const updateHistoryViews = useThrottleFn(() => {
     wsHistoryCache.value.length = 0
     triggerRef(historyList)
   }
-}, 300)
+}, 200)
 const updateViews = useThrottleFn(() => {
   if (wsBuyCache.value.length === 0 && wsSellCache.value.length === 0) return
   if (wsBuyCache.value?.length > 0) {
@@ -472,7 +472,7 @@ const updateViews = useThrottleFn(() => {
     wsSellCache.value.length = 0
     triggerRef(sellList)
   }
-}, 500)
+}, 200)
 
 // WebSocket 相关功能
 onMounted(() => {
