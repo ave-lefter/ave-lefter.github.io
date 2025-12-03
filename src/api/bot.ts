@@ -994,6 +994,9 @@ export function getTokensPnl(body: {
 
 }>> {
   const {$api} = useNuxtApp()
+  if (!body.tokens?.length) {
+    return Promise.resolve([])
+  }
   return $api('/aveswap/v1/swap/getTokensPnl', {
     method: 'post',
     body

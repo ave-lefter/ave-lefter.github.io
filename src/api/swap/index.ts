@@ -708,7 +708,7 @@ export const getUserTokenBalanceList = createCacheRequest(async function(address
                 ...res,
                 total_profit: res?.profit || '--',
                 unrealized_profit: res?.profitUnrealized || '0',
-                realized_profit: res?.profitUnrealized || '0',
+                realized_profit: res?.profitRealized || '0',
                 balance_amount: item?.balance || item?.value || '0',
                 balance_usd: item?.balance_usd || '0',
                 total_profit_ratio: res?.profitRatio || '--',

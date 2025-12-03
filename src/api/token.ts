@@ -939,7 +939,7 @@ export const bot_getUserWalletTxInfo = createCacheRequest(async function(query: 
           symbol: item?.symbol || '',
           total_profit: res?.profit || '0',
           unrealized_profit: res?.profitUnrealized || '0',
-          realized_profit: res?.profitUnrealized || '0',
+          realized_profit: res?.profitRealized || '0',
           balance_amount: item?.balance || '0',
           balance_usd: item?.balance_usd || '0',
           total_profit_ratio: res?.profitRatio || '0',
@@ -975,9 +975,9 @@ export const bot_getUserWalletTxInfo = createCacheRequest(async function(query: 
           symbol: item?.symbol || '',
           total_profit: res?.profit || '0',
           unrealized_profit: res?.profitUnrealized || '0',
-          realized_profit: res?.profitUnrealized || '0',
-          balance_amount: item?.value || '0',
-          balance_usd: item?.value_usd || '0',
+          realized_profit: res?.profitRealized || '0',
+          balance_amount: item?.balance || '0',
+          balance_usd: item?.balance_usd || '0',
           total_profit_ratio: res?.profitRatio || '0',
           unrealized_ratio: res?.unrealizedRatio || '0',
           realized_ratio: res?.realizeRatio || '0',
@@ -988,6 +988,8 @@ export const bot_getUserWalletTxInfo = createCacheRequest(async function(query: 
           average_sold_price_usd: res?.avgSellPrice || '0',
           total_purchase: res?.totalBuyAmount || '0',
           bought: res?.totalBuyAmount || '0',
+          total_sold: res?.totalSellAmount || '0',
+          sold: res?.totalSellAmount || '0',
         }]
       })
     })
