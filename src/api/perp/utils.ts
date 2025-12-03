@@ -53,6 +53,27 @@ export const deposit = async (tokenAddress: string, amount: string) => {
   })
 }
 
+export const ETHWithdrawContract = async () => {
+  const walletStore = useWalletStore()
+  const chain = walletStore.chain
+  if (chain !== 'eth') {
+    return Promise.reject('请把钱包切换到 eth 链再提取')
+  }
+  const chain_id = getChainInfo(chain).chain_id
+  const perpStore = usePerpStore()
+  const tokenAddress = '0xdAC17F958D2ee523a2206206994597C13D831ec7'
+  const tokenInfo = perpStore.metadata?.multiChain?.chainList?.find(item => Number(item.chainId) === Number(chain_id))?.tokenList?.find?.(i => i.tokenAddress === tokenAddress)
+  console.log('tokenInfo', tokenInfo)
+  const signer = await getSigner()
+  const ERC20 = new Contract(tokenInfo?.contractAddress || '', PerpABI, signer)
+  const ownerKey = perpStore.userInfo?.ethAddress || walletStore.address || ''
+  const coinId = perpStore.metadata?.multiChain.coinId || '1000'
+  const assetType =  perpStore.metadata?.coinList?.find(i => i.coinId === coinId)?.starkExAssetId || '0x0'
+  return ERC20.withdraw.estimateGas(ownerKey, assetType).then(gas => {
+    console.log('gas', gas)
+    return ERC20.withdraw(tokenAddress, assetType, { gasLimit: (gas * 2n).toString() })
+  })
+}
 
 export const withdraw = async (params: { tokenAddress: string; amount: string; chain: string }) => {
   if (Number(params.chain) === 1) {

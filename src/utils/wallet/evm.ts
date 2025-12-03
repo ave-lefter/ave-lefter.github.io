@@ -51,7 +51,7 @@ export function handleAccountsChanged (accounts: string[]) {
     resetWallet()
   } else if (accounts[0] !== address) {
     walletStore.address = accounts[0]
-    // window.location.reload()
+    window.location.reload()
   }
 }
 

@@ -1,9 +1,10 @@
 <template>
   <div
     class="flex bg-[--main-divider] gap-1px flex min-w-0 w-full"
-    style="min-height: calc(100vh - 92px- 64px)"
+    style="min-height: calc(100vh - 92px - 64px)"
   >
     <div class="flex-1">
+      <WithdrawAlert />
       <div class="flex flex-1">
         <div class="flex-1 min-w-0">
           <div class="flex gap-1px">
@@ -61,6 +62,7 @@ import TokenRight from './components/right/index.vue'
 import Kline from './components/kline/index.vue'
 import OrderBook from './components/orderBook/index.vue'
 import Bottom from './components/bottom/index.vue'
+import WithdrawAlert from '~/components/perp/withdrawAlert.vue'
 definePageMeta({
   name: 'perp-id',
   key: (route) => {
@@ -70,7 +72,7 @@ definePageMeta({
 const tokenStore = useTokenStore()
 const scrollbarHeight = computed(() => {
   if (globalStore.tokenHistoryVisible) {
-    return 'calc(100vh - 160px)'
+    return 'calc(100vh - 95px)'
   }
   return ''
 })

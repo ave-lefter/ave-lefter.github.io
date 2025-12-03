@@ -1704,5 +1704,7 @@
   "watchWalletNotSupportedPerp": "观察者钱包不支持合约功能",
   "noevmWalletNotSupportedPerp": "非 evm 钱包不支持合约功能",
   "minWithdraw": "最少提现{amount}",
-  "withdrawTooSmall": "提现金额过小"
+  "withdrawTooSmall": "提现金额过小",
+  "canPerpWithdraw": "你有 {n} USD 待提现",
+  "claimedSuccess": "领取成功"
 }

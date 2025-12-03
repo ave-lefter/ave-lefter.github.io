@@ -2,6 +2,7 @@
 import { SuffixIcon } from '#components'
 import dayjs from 'dayjs'
 import { getAllOrdersPage } from '~/api/perp'
+import { getPerpStatus } from './utils'
 
 const { t } = useI18n()
 const listData = shallowRef<any[]>([])
@@ -201,8 +202,8 @@ const reset = () => {
       </el-table-column>
       <el-table-column :label="t('status')" prop="status">
         <template #default="{ row }">
-          <span :class="row.status === 6 ? 'color-[--up-color]' : 'color-[--down-color]'">
-            {{ statusDict[row.status as keyof typeof statusDict] || t('failed') }}
+          <span :class="getPerpStatus(row.type, row.status, false) !== 'Failed' ? 'color-[--up-color]' : 'color-[--down-color]'">
+            {{ getPerpStatus(row.type, row.status) || t('failed') }}
           </span>
         </template>
       </el-table-column>
@@ -226,7 +227,7 @@ const reset = () => {
       </el-table-column>
       <el-table-column :label="t('tradeId')" prop="txId">
         <template #default="{ row }">
-          <div class="flex items-center gap-4px">
+          <div v-if="row.txId" class="flex items-center gap-4px">
             {{ row.txId.slice(0, 4) + '...' + row.txId.slice(-4)
             }}<Icon
               name="custom:share1"

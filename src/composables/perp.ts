@@ -268,12 +268,17 @@ export function usePerp() {
 
   }
 
+  const isCanNormalWithdrawableAmount = computed(() => {
+    return walletStore.address && walletStore.provider && perpStore.isLogin && new BigNumber(perpStore.normalWithdrawableAmount || '0').gt(0)
+  })
+
   return {
     dialogVisible,
     prepBalance,
     unrealizedPnl,
     initMarginRequirement,
     maintenanceMarginRequirement,
+    isCanNormalWithdrawableAmount,
     login,
     connectAndLogin,
     deposit,
