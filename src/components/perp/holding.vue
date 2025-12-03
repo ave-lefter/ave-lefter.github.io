@@ -279,7 +279,7 @@ onUnmounted(() => {
           {{ formatNumber(row.fundingFee, getPricePrecision(row.contractId)) }}
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('takeProfitStopLoss')" prop="takeProfitStopLoss">
+      <el-table-column :width="150" align="right" :label="t('takeProfitStopLoss')" prop="takeProfitStopLoss">
         <template #default="{ row }">
           <el-button
             v-if="perpStore.order.length > 0"
@@ -298,7 +298,7 @@ onUnmounted(() => {
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('closePosition')" prop="closePosition">
+      <el-table-column :width="150" align="right" :label="t('closePosition')" prop="closePosition">
         <template #default="{ row }">
           <el-button
             size="small"
