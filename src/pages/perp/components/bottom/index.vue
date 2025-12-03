@@ -4,15 +4,15 @@ import ClosePositionDialog from './closePositionDialog.vue'
 import { usePerpStore } from '@/stores/perp'
 import { useStorage } from '@vueuse/core'
 
-const { contractId, isCancelOrder, position } = storeToRefs(usePerpStore())
+const { contractId, isCancelOrder, position, orderList,order } = storeToRefs(usePerpStore())
 const walletStore = useWalletStore()
 const { t } = useI18n()
 const perpStore = usePerpStore()
 const dialogVisible= shallowRef(false)
 const tabs = computed(() => {
   return [
-    { label: t('holding'), value: 'holding' },
-    { label: t('currentOrder'), value: 'currentOrder' },
+    { label: t('holding')+`(${positionLength.value})`, value: 'holding' },
+    { label: t('currentOrder') + `(${orderListLength.value})`, value: 'currentOrder' },
     // { label: t('conditionOrder'), value: 'conditionOrder' },
     { label: t('orderDetail'), value: 'orderDetail' },
     { label: t('historyOrder'), value: 'historyOrder' },
@@ -62,6 +62,30 @@ const filteredSearchParams = (key: keyof typeof searchParams.value) => {
   }
   return params
 }
+const positionLength = computed(() => {
+  const result = position?.value?.filter(i => {
+    if (!isAll.value) {
+      if (i.contractId == contractId.value) {
+        return i
+      }
+    } else {
+      return i
+    }
+  })
+  return result?.length
+})
+const orderListLength = computed(() => {
+  const result = order?.value?.filter(i => {
+    if (!isAll.value) {
+      if (i.contractId == contractId.value) {
+        return i
+      }
+    } else {
+      return i
+    }
+  })
+  return result?.length
+})
 watch(
   () => isAll.value,
   (val) => {
@@ -89,7 +113,7 @@ const getList = async () => {}
         >
       </div>
       <div class="flex items-center justify-end gap-12px">
-        <el-checkbox class="checkbox-sm" v-model="isAll" label="显示所有合约" />
+        <el-checkbox class="checkbox-sm" v-model="isAll" :label="$t('showAllPositions')" />
         <el-button class="close-position" v-if="selectTab == 'holding'"   :disabled="position?.length == 0" @click.stop.prevent="dialogVisible = true">{{ $t('closePositionAll') }}</el-button>
         <el-button
           class="close-position"
