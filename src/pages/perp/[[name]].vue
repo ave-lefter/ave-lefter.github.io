@@ -4,7 +4,6 @@
     style="min-height: calc(100vh - 92px- 64px)"
   >
     <div class="flex-1">
-      <Top />
       <div class="flex flex-1">
         <div class="flex-1 min-w-0">
           <div class="flex gap-1px">
@@ -26,20 +25,21 @@
               <el-scrollbar :height="scrollbarHeight">
                 <div
                   class="grid gap-1px"
-                  :style="{ gridTemplateColumns: `1fr 4px ${orderBookWidth}px` }
+                  :style="{ gridTemplateColumns: `1fr 1px ${orderBookWidth}px` }
                   "
                 >
                   <div>
+                    <Top />
                     <Kline ref="klineContainer" />
                   </div>
                   <!-- 订单簿拖动条 -->
                   <div
-                    class="cursor-col-resize bg-[--d-222-l-F2F2F2] hover:bg-[--d-666-l-CCC] flex flex-col items-center justify-center gap-1px w-4px"
+                    class="cursor-col-resize bg-[--d-222-l-F2F2F2] hover:bg-[--d-666-l-CCC] flex flex-col items-center justify-center gap-1px w-1px"
                     @mousedown.stop.prevent="dragOrderBook"
                   >
                     <span v-for="i in 4" :key="i" class="bg-[--d-444-l-999] w-2px h-2px rounded-full"/>
                   </div>
-                  <OrderBook :kline-height="klineHeight + 3" />
+                  <OrderBook :kline-height="klineHeight + 64" />
                 </div>
 
                 <Bottom class="rounded-4px bg-[--d-000-l-F6F6F6]" :style="{ minHeight: height + 'px' }"/>
