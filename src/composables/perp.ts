@@ -82,8 +82,21 @@ export function usePerp() {
 
 
   function login() {
-    const { $dialog } = useNuxtApp()
     const $t = getGlobalT()
+    if (!walletStore.address) {
+      ElMessage.error($t('connectWalletFirst'))
+      return
+    }
+    if (!walletStore.provider && walletStore.address) {
+      ElMessage.error($t('watchWalletNotSupportedPerp'))
+      return
+    }
+    if (walletStore.address && isEvmChain(walletStore.chain)) {
+      ElMessage.error($t('noevmWalletNotSupportedPerp'))
+      return
+
+    }
+    const { $dialog } = useNuxtApp()
     dialogVisible.value = true
     $dialog.show({
       content: {

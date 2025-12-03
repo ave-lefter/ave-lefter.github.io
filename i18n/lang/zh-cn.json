@@ -1700,5 +1700,9 @@
   "cross": "全仓模式",
   "perpBalance": "合约资产",
   "marginRatioTips": "风险率 <br> 风险率=所有仓位维持保证金/总资产,当风险率大于等于100%时,您的仓位将会触发强制平仓。",
-  "showAllPositions": "显示所有合约"
+  "showAllPositions": "显示所有合约",
+  "watchWalletNotSupportedPerp": "观察者钱包不支持合约功能",
+  "noevmWalletNotSupportedPerp": "非 evm 钱包不支持合约功能",
+  "minWithdraw": "最少提现{amount}",
+  "withdrawTooSmall": "提现金额过小"
 }
