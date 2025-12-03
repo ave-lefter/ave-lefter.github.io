@@ -95,8 +95,12 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
         const { collateral, position, order, withdraw, transferOut } = msg.content?.data || {}
 
         // 更新资产信息
-        if (msg.content?.event === 'Snapshot' && collateral as Collateral[]) {
-          updateCollateralInfo(collateral)
+        if (collateral as Collateral[]) {
+          if (msg.content?.event === 'Snapshot') {
+            updateCollateralInfo(collateral)
+          } else if (msg.content?.event === 'ORDER_UPDATE' && (collateral as Collateral[])?.length > 0) {
+            updateCollateralInfo(collateral)
+          }
         }
 
         // 更新持仓信息

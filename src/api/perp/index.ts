@@ -484,3 +484,18 @@ export function updateLeverageSetting(params: { contractId : string, leverage: s
     },
   })
 }
+
+// 查询用户普通提现可提金额
+export async function getNormalWithdrawableAmount(address: string = useWalletStore().address): Promise<{ amount: string }> {
+  const perpStore = usePerpStore()
+  if (!address || !perpStore.isLogin) {
+    return { amount: '0' }
+  }
+  return api('/api/v1/private/assets/getNormalWithdrawableAmount', {
+    method: 'get',
+    query: {
+      address: address,
+    },
+  })
+}
+

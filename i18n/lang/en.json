@@ -1689,5 +1689,8 @@
   "watchWalletNotSupportedPerp": "Watch wallet does not support perp",
   "noevmWalletNotSupportedPerp": "Non-evm wallets do not support contract functions",
   "minWithdraw": "Minimum withdrawal {amount}",
-  "withdrawTooSmall": "Withdrawal amount is too small"
+  "withdrawTooSmall": "Withdrawal amount is too small",
+  "canPerpWithdraw": "You have {n} USD to withdraw",
+  "claimedSuccess": "Received successfully",
+  "success2": "Success"
 }

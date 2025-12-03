@@ -207,7 +207,7 @@ watch(chains, (val) => {
 
 const isCanWithdraw = computed(() => {
   const amount = new BigNumber(withdrawForm.amount || 0)
-  return withdrawForm.chain && withdrawForm.token && withdrawForm.amount && (perpStore.metadata?.multiChain?.chainList || [])?.some?.(i => i.chainId === withdrawForm.chain) && amount.lte(poolBalance.value) && amount.lte(balance.value)
+  return withdrawForm.chain && withdrawForm.token && withdrawForm.amount && (perpStore.metadata?.multiChain?.chainList || [])?.some?.(i => i.chainId === withdrawForm.chain) && (poolBalance.value === '∞' || amount.lte(poolBalance.value)) && amount.lte(balance.value)
 })
 
 watch(() => withdrawForm.token, () => {
@@ -222,7 +222,7 @@ const feeRate = computed(() => {
 })
 
 const receiveAmount = computed(() => {
-  return BigNumber.max(BigNumber(withdrawForm.amount || 0).minus(fee.value || 0), 0)
+  return BigNumber.max(BigNumber(withdrawForm.amount || 0).minus(fee.value || 0), 0).toFixed()
 })
 function _getCrossWithdrawSignInfo() {
   fee.value = '0'

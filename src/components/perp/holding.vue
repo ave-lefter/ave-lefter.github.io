@@ -168,10 +168,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="relative min-h-400px bg-[--secondary-bg]">
+  <div class="relative bg-[--secondary-bg]">
     <el-table
       fit
       :data="filterListData"
+      height="400"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
       cell-class-name="color-[--main-text] text-12px"
     >

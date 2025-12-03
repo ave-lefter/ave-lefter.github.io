@@ -38,6 +38,8 @@ export const usePerpStore = defineStore('perp', () => {
   const resolution = useLocalStorage('tv_resolution', '15')
   const unit = ref<CoinInfo | null>(null)
 
+  const normalWithdrawableAmount = ref('0')
+
   const apiKeys = computed(() => {
     if (!walletStore.address) {
       return null
@@ -317,6 +319,7 @@ export const usePerpStore = defineStore('perp', () => {
     unit,
     unitList,
     base,
-    quote
+    quote,
+    normalWithdrawableAmount
   }
 })
