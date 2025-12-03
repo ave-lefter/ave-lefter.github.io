@@ -70,7 +70,7 @@
       </template>
     </el-input>
     <div class="text-12px color-[--third-text] mt-8px text-right">
-      <span>{{ $t('availableBalance') }}: </span><span>{{ formatNumber(balance, 3) }} {{ withdrawForm?.token || '' }}</span>
+      <span>{{ $t('availableBalance') }}: </span><span>{{ balance }} {{ withdrawForm?.token || '' }}</span>
     </div>
     <!-- <div class="text-14px flex items-center justify-between mt-32px rd-4px">
       <span class="color-[--secondary-text]">到账时间</span>
@@ -142,7 +142,7 @@ const withdrawForm = reactive<{
 
 
 const balance = computed(() => {
-  return perpStore.collateral?.[0]?.amount || '0'
+  return BigNumber(CoreCalculator.getCollateralAvailableAmount('1000') || '0').dp(6, BigNumber.ROUND_FLOOR).toString()
 })
 
 
@@ -222,7 +222,7 @@ const feeRate = computed(() => {
 })
 
 const receiveAmount = computed(() => {
-  return new BigNumber(withdrawForm.amount || 0).minus(fee.value || 0).toFixed()
+  return BigNumber.max(BigNumber(withdrawForm.amount || 0).minus(fee.value || 0), 0)
 })
 function _getCrossWithdrawSignInfo() {
   fee.value = '0'
@@ -276,8 +276,12 @@ const loading = ref(false)
 async function handleWithdraw() {
   if (!isCanWithdraw.value) return
   const minWithdraw = perpStore.metadata?.multiChain?.minWithdraw || 0
+  if (BigNumber(withdrawForm.amount || 0).lte(fee.value || 0)) {
+    ElMessage.error(t('withdrawTooSmall'))
+    return
+  }
   if (new BigNumber(withdrawForm.amount || 0).lt(minWithdraw)) {
-    ElMessage.error(t('minDeposit', { amount: minWithdraw }))
+    ElMessage.error(t('minWithdraw', { amount: minWithdraw }))
     // ElNotification({
     //   title: 'Error',
     //   message: t('minDeposit', { amount: minDeposit }),
