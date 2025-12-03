@@ -47,7 +47,7 @@
 <script setup>
 import TokenColumn from '@/components/tokenColumn.vue'
 import AveEmpty from '@/components/aveEmpty.vue'
-import { getUserSwapTokenList } from '@/api/swap'
+import { getUserTokenBalanceList } from '@/api/swap'
 // import { getUserSwapTokenList, getBalanceList } from '@/api/swap'
 const route = useRoute()
 const botStore = useBotStore()
@@ -93,8 +93,8 @@ const balanceTokens = computed(() => {
       i.flag !== 'blacklist' &&
       i.flag !== 'lp' &&
       i.risk_score < 60 &&
-      i.risk_level >= 0 &&
-      i.is_hidden == false
+      i.risk_level >= 0
+      // && i.is_hidden == false
   )
   return data
 })
@@ -141,7 +141,7 @@ const currentUserTokenList = computed(() => {
 // }
 
 async function _getUserTokenList(address, chain) {
-  const result = await getUserSwapTokenList(address, chain)
+  const result = await getUserTokenBalanceList(address, chain)
   const tokenList = result.map((i) => ({
     ...i,
     id: i.token,
@@ -152,6 +152,7 @@ async function _getUserTokenList(address, chain) {
   }))
   userTokenList.value = tokenList
 }
+
 
 function init() {
   _getUserTokenList(userAddress.value, chain.value)

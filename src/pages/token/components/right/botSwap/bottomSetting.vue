@@ -103,7 +103,7 @@ function getEstimatedGas() {
     const botSettings = botSettingStore.botSettings?.[chain]?.[props.activeTab]?.[selected]
     const mev = botSettings?.mev
     const _nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || 0
-    const nativePrice = BotNativeTokens?.includes(tokenStore.swap.payToken.address || '') ? _nativePrice : tokenStore.swap.payToken.price || 0
+    const nativePrice = BotNativeTokens?.includes(tokenStore.swap.payToken?.address || '') ? _nativePrice : tokenStore.swap.payToken?.price || 0
     const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
     const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]

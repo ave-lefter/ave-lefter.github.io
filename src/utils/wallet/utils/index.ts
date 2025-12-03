@@ -34,7 +34,7 @@ export function getProvider(chain: string) {
     _provider = new BrowserProvider((walletStore.provider || (window as any)?.ethereum) as Eip1193Provider)
   } else {
     const rpcUrl = chainInfo?.rpc_url || ''
-    _provider = new JsonRpcProvider(rpcUrl, chainId)
+    _provider = new JsonRpcProvider(rpcUrl, Number(chainId))
   }
   return {_provider, chainInfo}
 }

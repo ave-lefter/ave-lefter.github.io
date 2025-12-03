@@ -9,6 +9,7 @@ import { useSessionStorage } from '@vueuse/core'
 import type { WalletTokenInfo } from '~/api/types/token'
 import type { IPriceV2Response } from '~/api/types/ws'
 import SelectWallet from '../selectWallet.vue'
+import BigNumber from 'bignumber.js'
 
 // const props = defineProps({
 //   currentActiveTab: {
@@ -55,7 +56,7 @@ const totalProfit = computed(() => {
   return walletTxData.value ? parseFloat(walletTxData.value.total_profit || 0) : 0
 })
 const profitPercentage = computed(() => {
-  return walletTxData.value ? parseFloat((walletTxData.value.total_profit_ratio * 100).toString() || '0') : 0
+  return walletTxData.value ? BigNumber(walletTxData.value.total_profit_ratio || 0).times(100).toFixed() : 0
 })
 
 const tokenSymbol = computed(() => {
@@ -67,7 +68,7 @@ const realizedProfit = computed(() => {
 
 const realizedProfitPercentage = computed(() => {
   const ratio = walletTxData.value && walletTxData.value.realized_ratio !== '--' ?
-    parseFloat((walletTxData.value.realized_ratio * 100).toString() || '0') : 0
+    (BigNumber(walletTxData.value?.realized_ratio || 0).times(100).toString()) : 0
   return ratio
 })
 
@@ -127,7 +128,7 @@ const removeLeadingMinus = (str: string) => str.startsWith('-') ? str.slice(1) :
 const getWalletTxData = async () => {
   // const supportedChains = ['solana', 'bsc']
   const chain = walletStore.address ? walletStore.chain : activeTab.value
-  if (![...SupportFullDataChain, 'ton'].includes(chain)) {
+  if (![...SupportFullDataChain, 'ton', 'polygon'].includes(chain)) {
     walletTxData.value = null
     return
   }

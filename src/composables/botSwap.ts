@@ -52,7 +52,7 @@ export function useBotSwap(type: number = 0, isBatch = false) {
     }
     let payToken = tokenStore.swap.payToken
     let token1 = chainMainToken[chain] || NATIVE_TOKEN
-    let payTokenAddress = payToken.chain !== chain ? token1 : (payToken?.address || NATIVE_TOKEN)
+    let payTokenAddress = payToken?.chain !== chain ? token1 : (payToken?.address || NATIVE_TOKEN)
     bot_getTokenBalance({
       chain: chain,
       tokens: [address, token1, payTokenAddress],
@@ -63,7 +63,7 @@ export function useBotSwap(type: number = 0, isBatch = false) {
       const t3 = tokens[2]
       tokenStore.swap.token = {...tokenStore.token, ...t1, address: (t1.token || t1.address), chain: chain}
       tokenStore.swap.native = {...t2, symbol: getChainInfo(chain)?.main_name, chain: chain, address: t2.token || t2.address, decimals: t2?.decimals || t2?.decimal}
-      tokenStore.swap.payToken = {...tokenStore.swap.payToken, ...t3}
+      tokenStore.swap.payToken = {...tokenStore.swap.payToken, ...t3, address: (t3.token || t3.address)}
       _getTokensPrice(true)
       botStore?.getUserAllChainBalance(tokenStore.swap.payToken as {address: string, chain: string})
       botStore?.getUserAllChainBalance(tokenStore.swap.token as {address: string, chain: string})
@@ -175,7 +175,7 @@ export function useBotSwap(type: number = 0, isBatch = false) {
       walletAddress: walletAddress
     }).then(tokens => {
       const t3 = tokens[0]
-      tokenStore.swap.payToken = {...payToken, ...t3}
+      tokenStore.swap.payToken = {...payToken, ...t3, address: (t3.token || t3.address)}
     }).finally(() => {
       loading.value = false
     })
