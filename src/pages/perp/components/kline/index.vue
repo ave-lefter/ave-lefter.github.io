@@ -40,7 +40,7 @@ const token = computed(() => {
 const isReady = ref(false)
 let isReadyLine = false
 const snapshotCache = ref<Record<string, KlineInfo[]>>({})
-
+const isCatch = shallowRef(false)
 const chain = computed(() => {
   return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
 })
@@ -56,6 +56,7 @@ let loading = false
 
 watch(() => contractId.value, (val,old) => {
   if (!val) return
+  isCatch.value = false
   if (_widget?.activeChart()) {
     _widget?.activeChart()?.removeAllShapes?.()
     _widget?.resetCache?.()
@@ -413,6 +414,7 @@ async function initChart() {
               useEventBus('klineDataReady').emit()
             }, 10)
           }).catch((err) => {
+            isCatch.value = true
             // const key = `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`
             // const bars = snapshotCache.value[key] || [];
             // console.log('--getBars--bars-------', snapshotCache.value)
@@ -556,7 +558,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
     if(channel == `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`){
       // console.log('--------msg-----------',msg)
 
-      if (data?.length > 0 && !loading && dataType === 'Snapshot') {
+      if (data?.length > 0 && !loading && dataType === 'Snapshot' && isCatch.value) {
 
         const key = `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`
         const bars = data.reverse().map(i => ({
@@ -615,7 +617,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
       const bar = wsData as KLineBar
       // const msInterval = switchResolution(resolution)
       // const bar = updatePerpLastBar(wsData, contractId.value, lastBar, msInterval) as KLineBar
-        onTick(bar)
+        // onTick(bar)
       }
     }
   }, 'kline')
