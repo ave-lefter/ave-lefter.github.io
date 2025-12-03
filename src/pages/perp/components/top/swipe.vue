@@ -45,7 +45,6 @@ const scrollRight = () => {
   scrollRef.value.scrollBy({ left: 200, behavior: 'smooth' })
 }
 watch(width, () => {
-  console.log('------111-----')
    checkArrows()
 })
 
