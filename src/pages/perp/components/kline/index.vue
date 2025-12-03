@@ -617,7 +617,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
       const bar = wsData as KLineBar
       // const msInterval = switchResolution(resolution)
       // const bar = updatePerpLastBar(wsData, contractId.value, lastBar, msInterval) as KLineBar
-        // onTick(bar)
+        onTick(bar)
       }
     }
   }, 'kline')
