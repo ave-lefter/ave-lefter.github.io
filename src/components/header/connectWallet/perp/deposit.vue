@@ -78,7 +78,7 @@
     </div>
     <div class="text-14px flex items-center justify-between mt-16px rd-4px">
       <span class="color-[--secondary-text]">{{ $t('totalBalance1') }}</span>
-      <span class="color-[--main-text]">${{ formatNumber(perpStore.collateral?.[0]?.amount || 0, 3) }}</span>
+      <span class="color-[--main-text]">${{ availableBalance }}</span>
     </div>
     <el-button v-if="isCanDeposit" type="primary" size="large" class="w-full text-16px h-48px rd-8px mt-20px" :loading="loading" @click.stop="handleDeposit">{{ $t('confirmDeposit') }}</el-button>
     <button v-else disabled class="w-full text-16px h-48px bg-[--border] color-[--secondary-text] flex items-center justify-center border-none rd-8px mt-20px cursor-not-allowed">{{ $t('confirmDeposit') }}</button>
@@ -121,6 +121,10 @@ const balanceObj = ref<{
 
 const balance = computed(() => {
   return balanceObj.value?.[depositForm.token + '-' + depositForm.chain] || 0
+})
+
+const availableBalance = computed(() => {
+  return BigNumber(CoreCalculator.getCollateralAvailableAmount('1000') || '0').dp(6, BigNumber.ROUND_FLOOR).toString()
 })
 
 const getTokenBalance = async() => {
@@ -242,11 +246,11 @@ watch(() => depositForm.chain, (val) => {
 const loading = ref(false)
 async function handleDeposit() {
   if (!isCanDeposit.value) return
-  // const minDeposit = perpStore.metadata?.multiChain?.minDeposit || 0
-  // if (new BigNumber(depositForm.amount || 0).lt(minDeposit)) {
-  //   ElMessage.error(t('minDeposit', { amount: minDeposit }))
-  //   return
-  // }
+  const minDeposit = perpStore.metadata?.multiChain?.minDeposit || 0
+  if (new BigNumber(depositForm.amount || 0).lt(minDeposit)) {
+    ElMessage.error(t('minDeposit', { amount: minDeposit }))
+    return
+  }
   loading.value = true
   const isApprove = await getIsApprove()
   const tokenInfo = getTokenInfo()

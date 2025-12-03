@@ -1684,5 +1684,9 @@
   "maintenanceMargin": "Maintenance Margin",
   "cross": "Cross",
   "perpBalance": "Perp Assets",
-  "marginRatioTips": "Margin Ratio <br> Margin Ratio = Maintenance Margin / Margin Balance. Your positions will be liquidated once Margin Ratio reaches 100%."
+  "marginRatioTips": "Margin Ratio <br> Margin Ratio = Maintenance Margin / Margin Balance. Your positions will be liquidated once Margin Ratio reaches 100%.",
+  "watchWalletNotSupportedPerp": "Watch wallet does not support perp",
+  "noevmWalletNotSupportedPerp": "Non-evm wallets do not support contract functions",
+  "minWithdraw": "Minimum withdrawal {amount}",
+  "withdrawTooSmall": "Withdrawal amount is too small"
 }

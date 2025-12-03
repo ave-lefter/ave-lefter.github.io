@@ -1,6 +1,6 @@
 <template>
-  <el-scrollbar class="bg-[--secondary-bg]" height="calc(100vh - 160px)">
-    <div class="relative p-12px" style="min-height: calc(100vh - 160px)">
+  <el-scrollbar class="bg-[--secondary-bg]" height="calc(100vh - 96px)">
+    <div class="relative p-12px" style="min-height: calc(100vh - 96px)">
       <UserAssert />
       <template v-if="perpStore.isConnectLogin">
         <el-divider style="--el-border-color: var(--main-divider);margin: 16px 0;" />
