@@ -91,7 +91,7 @@ export function usePerp() {
       ElMessage.error($t('watchWalletNotSupportedPerp'))
       return
     }
-    if (walletStore.address && isEvmChain(walletStore.chain)) {
+    if (walletStore.address && !isEvmChain(walletStore.chain)) {
       ElMessage.error($t('noevmWalletNotSupportedPerp'))
       return
 
