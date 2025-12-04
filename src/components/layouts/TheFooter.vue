@@ -48,7 +48,7 @@
         <div
           id="monitor"
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
-          :class="visible?'color-[--main-text]':'color-[--secondary-text]'" 
+          :class="visible?'color-[--main-text]':'color-[--secondary-text]'"
           @click="visible=!visible"
         >
           <Icon
@@ -60,7 +60,7 @@
       <el-badge :is-dot="isDoted">
         <div
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
-          :class="signalStore.signalVisible?'color-[--main-text]':'color-[--secondary-text]'" 
+          :class="signalStore.signalVisible?'color-[--main-text]':'color-[--secondary-text]'"
           @click="signalStore.signalVisible=!signalStore.signalVisible"
         >
           <Icon
@@ -71,6 +71,13 @@
       </el-badge>
     </div>
     <ul class="right">
+      <li class="color-[--secondary-text] hover:color-[--main-text]">
+        <a target="_blank" href="https://cloud.tencent.com/" class="flex-center">
+          <Icon name="custom:tencent-cloud" class="text-14px  mr-2px hover:color-[#0052D9]" />
+          <!-- <img v-if="isDark" src="@/assets/images/tradingView-dark.svg" alt="" height="12" />
+          <img v-else src="@/assets/images/tradingView-light.svg" alt="" height="12" /> -->
+        </a>
+      </li>
       <li class="color-[--secondary-text] hover:color-[--main-text]">
         <a target="_blank" href="https://www.tradingview.com/" class="flex-center">
           <Icon name="simple-icons:tradingview" class="text-18px mr-2px" />TradingView
@@ -305,13 +312,13 @@ function signalToast(val:GetSignalV2ListResponse) {
     icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
     placement:globalStore.audioSettings.notice.position as any,
     message:()=>(
-      <div 
+      <div
         class='inline-flex items-center gap-4px text-12px cursor-pointer'
         onClick={()=>{
         navigateTo(`/token/${val.token}-${val.chain}`)
         }}
       >
-         {actionsCount === 1 && <UserAvatar 
+         {actionsCount === 1 && <UserAvatar
             wallet_logo={{logo:firstAction?.wallet_logo,name:firstAction?.wallet_alias}}
             address={firstAction.wallet_address}
             chain={val.chain}
@@ -321,11 +328,11 @@ function signalToast(val:GetSignalV2ListResponse) {
             formatNumber(actionsVol,1)
           }{
             firstAction.quote_token_symbol.toUpperCase() === 'USDC'
-              ? 'U' 
+              ? 'U'
               : firstAction.quote_token_symbol
           }</span>{t('of')}
         <TokenImg row={{logo_url:val.logo,chain:'',symbol:val.symbol}} token-class="w-16px h-16px" />
-        {val.symbol} 
+        {val.symbol}
       </div>
     )
   })
@@ -360,13 +367,13 @@ function monitorToast(val:IMonitorWsResponse[]) {
       icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
       placement:globalStore.audioSettings.notice.position as any,
       message:()=>(
-        <div 
+        <div
           class='inline-flex items-center gap-4px text-12px cursor-pointer'
           onClick={()=>{
             navigateTo(`/token/${getIsBuy(item)?item.to_address:item.from_address}-${item.chain}`)
           }}
         >
-          <UserAvatar 
+          <UserAvatar
               wallet_logo={{logo:item.maker_logo,name:item.maker_alias}}
               address={item.maker_address}
               chain={item.chain}
