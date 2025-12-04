@@ -1690,7 +1690,15 @@
   "noevmWalletNotSupportedPerp": "Non-evm wallets do not support contract functions",
   "minWithdraw": "Minimum withdrawal {amount}",
   "withdrawTooSmall": "Withdrawal amount is too small",
-  "canPerpWithdraw": "You have {n} USD to withdraw",
+  "canPerpWithdraw": "The withdrawal request has been confirmed. Please proceed with the withdrawal to your wallet. Withdrawal Amount: {n} USDT\n",
   "claimedSuccess": "Received successfully",
-  "success2": "Success"
+  "success2": "Success",
+  "claim": "Claim",
+  "longExpectedProfitUSD": "Long Expected Profit {n} USD",
+  "shortExpectedProfitUSD": "Short Expected Profit {n} USD",
+  "longExpectedLossUSD": "Long expected loss {n} USD",
+  "shortExpectedLossUSD": "Expected loss from shorting {n} USDT",
+  "expectedLossUSD": "Expected Loss {n} USD",
+  "expectedProfitUSD": "Expected Profit {n} USD",
+  "takeProfitStopLoss2": "Position TP/SL"
 }

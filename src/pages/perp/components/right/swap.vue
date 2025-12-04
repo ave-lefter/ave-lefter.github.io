@@ -94,7 +94,6 @@
           </el-input-number>
           <el-input-number
             v-model.number="tempData.tpPercent"
-            :min="0"
             :precision="0"
             :controls="false"
             align="left"
@@ -123,6 +122,7 @@
             @change="val => tpPercentChange(val as number)"
           />
         </div>
+        <el-alert v-if="tpMsg" style="--el-alert-title-font-size:12px;--el-alert-padding:5px 10px;margin: 10px 0" :title="tpMsg" type="success"  :closable="false" />
 
         <div class="flex items-center gap-10px mt-8px mb-16px w-full">
           <!-- 止损 -->
@@ -159,7 +159,6 @@
           </el-input-number>
           <el-input-number
             v-model.number="tempData.slPercent"
-            :min="0"
             :controls="false"
             :precision="0"
             align="left"
@@ -188,6 +187,7 @@
             @change="val => slPercentChange(val as number)"
           />
         </div>
+        <el-alert v-if="slMsg" style="--el-alert-title-font-size:12px;--el-alert-padding:5px 10px;margin: 10px 0" :title="slMsg" type="error"  :closable="false" />
       </template>
     </el-form-item>
 
@@ -515,6 +515,42 @@ function getSize() {
   }
 }
 
+const tpMsg = computed(() => {
+  if (BigNumber(form.amount || 0).lte(0) || BigNumber(tpForm.triggerPrice || 0).lte(0)) {
+    return ''
+  }
+
+  const price = swapType.value === 'LIMIT' ? form.price : lastPrice.value
+  if (!price) {
+    return ''
+  }
+
+  const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(getSize() || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
+  if (BigNumber(tpForm.triggerPrice || 0).gt(price)) {
+    return t('longExpectedProfitUSD', {n : profit})
+  } else {
+    return t('shortExpectedProfitUSD', {n : profit})
+  }
+})
+
+const slMsg = computed(() => {
+  if (BigNumber(form.amount || 0).lte(0) || BigNumber(slForm.triggerPrice || 0).lte(0)) {
+    return ''
+  }
+
+  const price = swapType.value === 'LIMIT' ? form.price : lastPrice.value
+  if (!price) {
+    return ''
+  }
+
+  const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(getSize() || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
+  if (BigNumber(slForm.triggerPrice || 0).lt(price)) {
+    return t('longExpectedLossUSD', {n : profit})
+  } else {
+    return t('shortExpectedLossUSD', {n : profit})
+  }
+})
+
 
 const tpPercentChange = (val: number, type = 0) => {
   if (type === 1) {
@@ -532,15 +568,15 @@ function tpPriceChange(val?: number | string) {
 
 const slPercentChange = (val: number, type = 0) => {
   if (type === 1) {
-    tempData.slPercent1 = Math.min(Math.max(val, 0), 200)
+    tempData.slPercent1 = Math.min(Math.max(-val, 0), 200)
   } else {
-    tempData.slPercent = val
+    tempData.slPercent = -val
   }
   slForm.triggerPrice = new BigNumber(val || 0).negated().div(100).div(maxLeverage.value).plus(1).times(lastPrice.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
 }
 
 function slPriceChange(val?: number) {
-  tempData.slPercent = new BigNumber(val || 0).minus(lastPrice.value).negated().div(lastPrice.value).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
+  tempData.slPercent = new BigNumber(val || 0).minus(lastPrice.value).div(lastPrice.value).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
   tempData.slPercent1 = Math.min(Math.max(tempData.slPercent, 0), 200)
 }
 

@@ -21,7 +21,7 @@ const formData = reactive<{
 watch(visible, (val) => {
   if (val) {
     formData.closePrice = lastPrice.value
-    formData.closeSize = openSize.value
+    formData.closeSize = BigNumber(openSize.value || '0').abs().dp(quantityPrecision.value, BigNumber.ROUND_FLOOR).toNumber()
     closePercent.value = 100
   }
 })
@@ -69,10 +69,10 @@ const unrealizedPnl = computed(() => {
   const cur = props.row
   const oraclePrice = formData.closePrice || '0'
   if (!cur || new BigNumber(oraclePrice).isZero()) return '0'
-  const profit = Number(cur?.openValue) >= 0
+  const profit = Number(cur?.openSize) >= 0
     ? new BigNumber(oraclePrice).times(new BigNumber(cur?.openSize || 0).abs()).minus(new BigNumber(cur.openValue).abs())
     : new BigNumber(cur.openValue || 0).abs().minus(new BigNumber(oraclePrice).times(new BigNumber(cur.openSize).abs()))
-  return profit.times(formData.closeSize || 0).div(openSize.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR)
+  return profit.times(formData.closeSize || 0).div(new BigNumber(cur?.openSize || 0).abs()).dp(pricePrecision.value, BigNumber.ROUND_FLOOR)
 })
 
 const loading = ref(false)
@@ -86,7 +86,7 @@ function _createOrder() {
       type: isLimit.value ? 'LIMIT' : 'MARKET',
       size: String(formData.closeSize || '0'),
       price: String(formData.closePrice || '0'),
-      side: 'SELL',
+      side:  BigNumber(row?.openSize || '0').gte(0) ? 'SELL' : 'BUY',
       contractId: row?.contractId || '',
       reduceOnly: false,
       isPositionTpsl: false,
@@ -142,8 +142,7 @@ function _createOrder() {
     <div class="color-[--third-text] justify-between mb-8px">
       {{ t('closeSize') }}
     </div>
-    <el-input-number v-model="formData.closeSize" :precision="quantityPrecision" align="left" :controls="false" class="mb-12px w-full!" :max="Math.abs(Number(row?.openSize || '0'))"
-            @change="(val) => sizeChange(val as number)" />
+    <el-input-number v-model="formData.closeSize" :precision="quantityPrecision" align="left" :controls="false" class="mb-12px w-full!" :max="Math.abs(Number(row?.openSize || '0'))" @change="(val) => sizeChange(val as number)" />
     <el-slider
       v-model="closePercent"
       :min="0"

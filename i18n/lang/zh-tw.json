@@ -1674,7 +1674,15 @@
   "noevmWalletNotSupportedPerp": "非 evm 錢包不支持合約功能",
   "minWithdraw": "最少提現{amount}",
   "withdrawTooSmall": "提現金額過小",
-  "canPerpWithdraw": "你有 {n} USD 待提現",
+  "canPerpWithdraw": "提款請求已確認，請繼續提款到您的錢包。\n提款金額: {n} USDT",
   "claimedSuccess": "領取成功",
-  "success2": "成功"
+  "success2": "成功",
+  "claim": "領取",
+  "longExpectedProfitUSD": "做多預計盈利 {n} USD",
+  "shortExpectedProfitUSD": "做空預計盈利 {n} USD",
+  "longExpectedLossUSD": "做多預計虧損 {n} USD",
+  "shortExpectedLossUSD": "做空預計虧損 {n} USDT",
+  "expectedLossUSD": "預計虧損 {n} USD",
+  "expectedProfitUSD": "預計盈利 {n} USD",
+  "takeProfitStopLoss2": "倉位止盈止損"
 }

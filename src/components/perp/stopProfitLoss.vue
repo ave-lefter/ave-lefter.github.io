@@ -65,6 +65,10 @@ watch(visible, (val) => {
   }
 })
 
+const isLong = computed(() => {
+  return props.row?.openSize && new BigNumber(props.row?.openSize || '0').gt(0)
+})
+
 const typeDict = computed(() => {
   const contractMap =
     perpStore.metadata?.contractList?.reduce?.(
@@ -98,17 +102,62 @@ const openPrice = computed(() => {
   return new BigNumber(props.row?.openValue || 0).div(props.row?.openSize || 0)
 })
 
+const tpMsg = computed(() => {
+  if (BigNumber(size.value || 0).lte(0) || BigNumber(tpForm.triggerPrice || 0).lte(0)) {
+    return ''
+  }
+
+  const price = tpForm.type?.includes('LIMIT') ? slForm.price : lastPrice.value
+  if (!price) {
+    return ''
+  }
+
+  const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(size.value || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
+  if (BigNumber(tpForm.triggerPrice || 0).gte(price) && isLong.value || BigNumber(tpForm.triggerPrice || 0).lte(price) && !isLong.value) {
+    return t('expectedProfitUSD', {n : profit})
+  } else {
+    return t('expectedLossUSD', {n : profit})
+  }
+})
+
+const slMsg = computed(() => {
+  if (BigNumber(size.value || 0).lte(0) || BigNumber(slForm.triggerPrice || 0).lte(0)) {
+    return ''
+  }
+
+  const price = slForm.type?.includes('LIMIT') ? slForm.price : lastPrice.value
+  if (!price) {
+    return ''
+  }
+
+  const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(size.value || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
+  if (BigNumber(slForm.triggerPrice || 0).lt(price) && isLong.value || BigNumber(slForm.triggerPrice || 0).gt(price) && !isLong.value) {
+    return t('expectedLossUSD', {n : profit})
+  } else {
+    return t('expectedProfitUSD', {n : profit})
+  }
+})
+
 const tpPercentChange = (val: number, type = 0) => {
   if (type === 1) {
     tempData.tpPercent1 = Math.min(Math.max(val, 0), 200)
   } else {
     tempData.tpPercent = val
   }
-  tpForm.triggerPrice = new BigNumber(val || 0).div(100).div(maxLeverage.value).plus(1).times(openPrice.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+  if (isLong.value) {
+    tpForm.triggerPrice = new BigNumber(val || 0).div(100).div(maxLeverage.value).plus(1).times(openPrice.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+  } else {
+    tpForm.triggerPrice = new BigNumber(val || 0).negated().div(100).div(maxLeverage.value).plus(1).times(openPrice.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+  }
 }
 
 function tpPriceChange(val: number | string) {
-  tempData.tpPercent = new BigNumber(val || 0).minus(openPrice.value).div(openPrice.value).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
+  if (isLong.value) {
+    tempData.tpPercent = new BigNumber(val || 0).minus(openPrice.value).div(openPrice.value).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
+  } else {
+    tempData.tpPercent = new BigNumber(val || 0).minus(openPrice.value).negated().div(openPrice.value).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
+  }
+
   tempData.tpPercent1 = Math.min(Math.max(tempData.tpPercent, 0), 200)
 }
 
@@ -118,11 +167,20 @@ const slPercentChange = (val: number, type = 0) => {
   } else {
     tempData.slPercent = val
   }
-  slForm.triggerPrice = new BigNumber(val || 0).negated().div(100).div(maxLeverage.value).plus(1).times(openPrice.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+  if (isLong.value) {
+    slForm.triggerPrice = new BigNumber(val || 0).negated().div(100).div(maxLeverage.value).plus(1).times(openPrice.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+  } else {
+    slForm.triggerPrice = new BigNumber(val || 0).div(100).div(maxLeverage.value).plus(1).times(openPrice.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+  }
 }
 
 function slPriceChange(val: number) {
-  tempData.slPercent = new BigNumber(val || 0).minus(openPrice.value).negated().div(openPrice.value).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
+  if (isLong.value) {
+    tempData.slPercent = new BigNumber(val || 0).minus(openPrice.value).negated().div(openPrice.value).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
+  } else {
+    tempData.slPercent = new BigNumber(val || 0).minus(openPrice.value).div(openPrice.value).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
+  }
+
   tempData.slPercent1 = Math.min(Math.max(tempData.slPercent, 0), 200)
 }
 
@@ -269,7 +327,8 @@ function _createSlOrder() {
             align="left"
             class="flex-1"
             :placeholder="t('triggerPrice')"
-            :min="Number(lastPrice)"
+            :min="isLong ? Number(lastPrice) : undefined"
+            :max="!isLong ? Number(lastPrice) : undefined"
             @change="(val) => tpPriceChange(val as number)"
           >
             <!-- <template #suffix>
@@ -328,6 +387,7 @@ function _createSlOrder() {
           class="text-12px [&&]:w-full"
           :placeholder="t('price')"
         />
+        <el-alert v-if="tpMsg" style="--el-alert-title-font-size:12px;--el-alert-padding:5px 10px;margin: 10px 0" :title="tpMsg" type="success"  :closable="false" />
 
         <!-- 止损 -->
         <el-dropdown trigger="click">
@@ -354,7 +414,8 @@ function _createSlOrder() {
             align="left"
             class="flex-1"
             :placeholder="t('triggerPrice')"
-            :max="Number(lastPrice)"
+            :min="!isLong ? Number(lastPrice) : undefined"
+            :max="isLong ? Number(lastPrice) : undefined"
             @change="(val) => slPriceChange(val as number)"
           >
             <!-- <template #suffix>
@@ -413,6 +474,7 @@ function _createSlOrder() {
           class="text-12px [&&]:w-full"
           :placeholder="t('price')"
         />
+        <el-alert v-if="slMsg" style="--el-alert-title-font-size:12px;--el-alert-padding:5px 10px;margin: 10px 0" :title="slMsg" type="error"  :closable="false" />
 
         <!-- 委托数量 -->
         <div class="mt-16px mb-16px">

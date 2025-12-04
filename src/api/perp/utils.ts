@@ -65,13 +65,13 @@ export const ETHWithdrawContract = async () => {
   const tokenInfo = perpStore.metadata?.multiChain?.chainList?.find(item => Number(item.chainId) === Number(chain_id))?.tokenList?.find?.(i => i.tokenAddress === tokenAddress)
   console.log('tokenInfo', tokenInfo)
   const signer = await getSigner()
-  const ERC20 = new Contract(tokenInfo?.contractAddress || '', PerpABI, signer)
+  const ERC20 = new Contract(perpStore?.metadata?.global?.starkExContractAddress || '', PerpABI, signer)
   const ownerKey = perpStore.userInfo?.ethAddress || walletStore.address || ''
   const coinId = perpStore.metadata?.multiChain.coinId || '1000'
   const assetType =  perpStore.metadata?.coinList?.find(i => i.coinId === coinId)?.starkExAssetId || '0x0'
   return ERC20.withdraw.estimateGas(ownerKey, assetType).then(gas => {
     console.log('gas', gas)
-    return ERC20.withdraw(tokenAddress, assetType, { gasLimit: (gas * 2n).toString() })
+    return ERC20.withdraw(ownerKey, assetType, { gasLimit: (gas * 2n).toString() })
   })
 }
 
