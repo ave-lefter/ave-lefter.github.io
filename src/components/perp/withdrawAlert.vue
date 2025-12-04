@@ -1,13 +1,13 @@
 <template>
   <el-alert
     v-if="isCanNormalWithdrawableAmount"
-    type="warning"
+    type="success"
     :closable="false"
     style="--el-alert-icon-large-size: 20px"
   >
     <div class="flex items-center justify-center w-[calc(100vw-100px)]">
-      <span class="text-12px mr-10px">{{ $t('canPerpWithdraw', {}) }}</span>
-      <el-button type="primary" size="small" :loading="loading"  @click="_ETHWithdrawContract">{{ $t('receive') }}</el-button>
+      <span class="text-12px mr-10px">{{ $t('canPerpWithdraw', {n: formatNumber(perpStore.normalWithdrawableAmount, 3)}) }}</span>
+      <el-button type="primary" size="small" :loading="loading"  @click="_ETHWithdrawContract">{{ $t('claim') }}</el-button>
     </div>
   </el-alert>
 </template>

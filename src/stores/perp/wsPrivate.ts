@@ -134,7 +134,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
             getTotalAssets()
             // 更新持仓
             if(position?.length > 0){
-              updatePositionInfo(position)
+              updatePositionInfo(position, true)
             }
           }
         }
@@ -182,8 +182,12 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
     perpStore.collateral = collateral
   }
 
-  function updatePositionInfo(position: Position[]) {
-    perpStore.position = position
+  function updatePositionInfo(position: Position[], update = false) {
+    if (update) {
+      perpStore.position = position.concat(perpStore.position.filter((i) => !position.some((j) => j.contractId === i.contractId)))?.filter((i) => Number(i.openSize) !== 0)
+    } else {
+      perpStore.position = position
+    }
   }
 
   function updateOrderInfo(order: Order[]) {
