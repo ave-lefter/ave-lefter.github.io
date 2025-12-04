@@ -32,7 +32,8 @@ export const useWSStore = defineStore('ws', () => {
     [WSEventType.SIGNALSV2_PUBLIC_MONITOR]: null,
     [WSEventType.PRICE_EXTRA]: null,
     [WSEventType.SIMPLE_TX]: null,
-    [WSEventType.PUBLIC_PORTRAIT]:null
+    [WSEventType.PUBLIC_PORTRAIT]: null,
+    [WSEventType.PUMP_MIGRATED]: null
   })
 
   // 将 createWebSocket 重命名为 init
@@ -53,10 +54,10 @@ export const useWSStore = defineStore('ws', () => {
       const { event, data } = msg
       if (event === WSEventType.TGBOT) {
         wsResult[event] = data?.msg
-      }else if (event === WSEventType.ASSET) {
+      } else if (event === WSEventType.ASSET) {
         wsResult[event] = data
         botStore.updateBalance(data)
-      }else if (event === WSEventType.MONITOR) {
+      } else if (event === WSEventType.MONITOR || event === WSEventType.PUMP_MIGRATED) {
         wsResult[event] = data?.msg
       } else if (event === WSEventType.TX) {
         const tx: WSTx = data?.tx
