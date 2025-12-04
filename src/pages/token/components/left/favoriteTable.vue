@@ -331,7 +331,7 @@ function toggleMode(mode: string) {
             </div>
             <div class="flex-1 text-12px text-right">
               <div v-if="favoriteCondition.currentMode!=='mcap'">${{ formatNumber(row.current_price_usd || 0, 4) }}</div>
-              <div v-else>${{ formatNumber(row.pool_circulating_supply || 0, 4) }}</div>
+              <div v-else>${{ formatNumber(row.pool_circulating_supply || 0, 2) }}</div>
               <div
                 :class="`flex-1 text-right text-12px
                 ${getColorClass(row.price_change)}
