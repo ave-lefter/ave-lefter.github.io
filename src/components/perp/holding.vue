@@ -113,21 +113,28 @@ const stopTable = (row) => {
   stopProfitLossRow.value = row
   stopTableVisible.value = true
   const isLong = row.openValue > 0
-  perpStore.order = perpStore.order.map((el) => {
-    // 止盈
-    const isProfit = el.type.includes('PROFIT')
-    let triggerSign = ''
-    if (isLong) {
-      triggerSign = isProfit ? '≥' : '≤'
-    } else {
-      triggerSign = isProfit ? '≤' : '≥'
-    }
-    return {
-      ...el,
-      // 做多
-      triggerSign,
-    }
-  })
+  perpStore.order = perpStore.order
+    .filter((el) => {
+      return (
+        el.contractId === row.contractId &&
+        ['TAKE_PROFIT_LIMIT', 'STOP_LIMIT', 'TAKE_PROFIT_MARKET', 'STOP_MARKET'].includes(el.type)
+      )
+    })
+    .map((el) => {
+      // 止盈
+      const isProfit = el.type.includes('PROFIT')
+      let triggerSign = ''
+      if (isLong) {
+        triggerSign = isProfit ? '≥' : '≤'
+      } else {
+        triggerSign = isProfit ? '≤' : '≥'
+      }
+      return {
+        ...el,
+        // 做多
+        triggerSign,
+      }
+    })
 }
 const closePosition = (row, operation) => {
   closePositionVisible.value = true
@@ -157,7 +164,6 @@ onMounted(() => {
   timer = requestTimeout(5000, () => {
     getContractLevelMap()
   })
-
 })
 
 onUnmounted(() => {
@@ -220,7 +226,7 @@ onUnmounted(() => {
                 : row.openValue.replace('-', ''),
               {
                 limit: 20,
-                decimals: getPricePrecision(row.contractId)
+                decimals: getPricePrecision(row.contractId),
               }
             )
           }}
@@ -231,7 +237,7 @@ onUnmounted(() => {
           {{
             formatNumber(new BigNumber(row.openValue).div(row.openSize).toString(), {
               limit: 20,
-              decimals: getPricePrecision(row.contractId)
+              decimals: getPricePrecision(row.contractId),
             })
           }}
         </template>
@@ -249,15 +255,18 @@ onUnmounted(() => {
       <el-table-column align="right" :label="t('estimatedLiquidationPrice')" prop="liquidatePrice">
         <template #default="{ row }">
           {{
-            formatNumber(CoreCalculator.getCreateOrderLiquidatePrice({
-              contractId: row.contractId,
-              orderPrice: new BigNumber(row.openValue).div(row.openSize).toString(),
-              orderSize: row.openSize,
-              orderSide: row.openSize > 0 ? 'BUY' : 'SELL',
-            }).toFixed() || row.liquidatePrice, {
-              limit: 20,
-              decimals: getPricePrecision(row.contractId),
-            })
+            formatNumber(
+              CoreCalculator.getCreateOrderLiquidatePrice({
+                contractId: row.contractId,
+                orderPrice: new BigNumber(row.openValue).div(row.openSize).toString(),
+                orderSize: row.openSize,
+                orderSide: row.openSize > 0 ? 'BUY' : 'SELL',
+              }).toFixed() || row.liquidatePrice,
+              {
+                limit: 20,
+                decimals: getPricePrecision(row.contractId),
+              }
+            )
           }}
         </template>
       </el-table-column>
@@ -280,7 +289,12 @@ onUnmounted(() => {
           {{ formatNumber(row.fundingFee, getPricePrecision(row.contractId)) }}
         </template>
       </el-table-column>
-      <el-table-column :width="150" align="right" :label="t('takeProfitStopLoss')" prop="takeProfitStopLoss">
+      <el-table-column
+        :width="150"
+        align="right"
+        :label="t('takeProfitStopLoss')"
+        prop="takeProfitStopLoss"
+      >
         <template #default="{ row }">
           <el-button
             v-if="perpStore.order.length > 0"
