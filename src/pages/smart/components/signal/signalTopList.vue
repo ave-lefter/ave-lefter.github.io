@@ -8,11 +8,29 @@ const props = defineProps<{
   dialogValues: {
     visible: boolean
     loading: boolean
-    list: ITopSignal[]
-    type: 'top' | 'active'
+    type: 'topList' | 'activeList'
+    pageNO: number
+    pageSize: number
+    topList: ITopSignal[]
+    activeList: {
+      user_address: string
+      pnl: number
+      rank: number
+      win_rate: string
+      wallet_logo: string
+    }[]
+    has_more: boolean
+    tag: number[]
   }
+  activeChain: string
 }>()
 const scrollRef = useTemplateRef('scrollRef')
+const tag = defineModel<number[]>('tag')
+const checkBoxList = ref([
+  { label: 30, text: t('smarter') },
+  { label: 31, text: 'KOL' },
+  { label: 39, text: t('whale') },
+])
 defineExpose({
   setScrollTop(scrollTop: number) {
     if (scrollRef.value) {
@@ -25,7 +43,7 @@ defineExpose({
 })
 const flexColumns = ['flex-1', 'w-64px text-right', 'w-72px text-right', 'w-60px text-right']
 const activeColumns = ['flex-1', 'flex-1 text-right', 'flex-1 text-right']
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'loadMore'])
 const elseHeight = computed(() => {
   let substractHeight = 302
   const tokenHisHeight = 33
@@ -33,7 +51,7 @@ const elseHeight = computed(() => {
   if (globalStore.tokenHistoryVisible) {
     substractHeight += tokenHisHeight
   }
-  if (props.dialogValues.type === 'active') {
+  if (props.dialogValues.type === 'activeList') {
     substractHeight += activeCheckHeight
   }
   return substractHeight
@@ -45,9 +63,10 @@ const onScroll = useThrottleFn(
       const scrollElement = scrollRef.value.wrapRef
       if (
         scrollElement &&
-        scrollElement.scrollHeight - scrollTop - (window.innerHeight - elseHeight.value) < 30
+        scrollElement.scrollHeight - scrollTop - (window.innerHeight - elseHeight.value) < 30 &&
+        props.dialogValues.has_more
       ) {
-        console.log('end')
+        emit('loadMore')
       }
     }
   },
@@ -58,7 +77,7 @@ const onScroll = useThrottleFn(
 </script>
 <template>
   <div
-    v-show="dialogValues.visible && dialogValues.type === 'top'"
+    v-show="dialogValues.visible && dialogValues.type === 'topList'"
     class="w-360px p-12px bg-[--secondary-bg]"
   >
     <div
@@ -87,7 +106,7 @@ const onScroll = useThrottleFn(
       class="mx--12px px-12px"
     >
       <div
-        v-for="(row, $index) in dialogValues.list"
+        v-for="(row, $index) in dialogValues.topList"
         :key="row.token"
         class="flex items-center h-32px mb-4px"
       >
@@ -129,7 +148,7 @@ const onScroll = useThrottleFn(
   </div>
   <div
     class="w-360px p-12px bg-[--secondary-bg]"
-    v-show="dialogValues.visible && dialogValues.type === 'active'"
+    v-show="dialogValues.visible && dialogValues.type === 'activeList'"
   >
     <div
       class="flex justify-between items-center text-14px lh-16px pb-16px border-b-1px border-b-solid border-b-[--main-divider] mb-12px"
@@ -137,16 +156,15 @@ const onScroll = useThrottleFn(
       {{ $t('top24hAddress') }}
       <Icon name="material-symbols:close" class="cursor-pointer" @click="emit('close')" />
     </div>
-    <ElCheckboxGroup class="flex justify-center mb-16px">
-      <ElCheckbox class="[&&]:[--el-checkbox-font-size:12px] [--el-checkbox-height:15px]">{{
-        t('smarter')
-      }}</ElCheckbox>
-      <ElCheckbox class="[&&]:[--el-checkbox-font-size:12px] [--el-checkbox-height:15px]">
-        KOL
-      </ElCheckbox>
-      <ElCheckbox class="[&&]:[--el-checkbox-font-size:12px] [--el-checkbox-height:15px]">{{
-        t('whale')
-      }}</ElCheckbox>
+    <ElCheckboxGroup v-model="tag" class="flex justify-center mb-16px">
+      <ElCheckbox
+        v-for="item in checkBoxList"
+        :key="item.label"
+        :label="item.label"
+        :disabled="tag?.length === 1 && tag?.includes?.(item.label)"
+        class="[&&]:[--el-checkbox-font-size:12px] [--el-checkbox-height:15px]"
+        >{{ item.text }}</ElCheckbox
+      >
     </ElCheckboxGroup>
     <div class="flex items-center text-12px lh-16px color-[--third-text] mb-8px">
       <span :class="activeColumns[0]">
@@ -166,32 +184,44 @@ const onScroll = useThrottleFn(
       @scroll="onScroll"
     >
       <div
-        v-for="row in dialogValues.list"
-        :key="row.token"
+        v-for="row in dialogValues.activeList"
+        :key="row.user_address"
         class="flex items-center h-32px mb-4px"
       >
         <div
           class="flex items-center text-12px gap-8px cursor-pointer"
           :class="activeColumns[0]"
-          @click="navigateTo(`/token/${row.token}-${row.chain}`)"
+          @click="navigateTo(`/address/${row.user_address}/${props.activeChain}`)"
         >
-          <TokenImg
-            chain-class="hidden"
+          <UserAvatar
+            iconSize="24px"
             :row="{
-              chain: row.chain,
-              symbol: row.symbol,
-              logo_url: row.logo_url,
+              address: row.user_address,
+              logo: row.wallet_logo,
             }"
           />
-          <span class="shrink-0 truncate max-w-68px">{{ row.symbol }}</span>
+          {{ row.user_address.slice(0, 4) }}...{{ row.user_address.slice(-4) }}
         </div>
-        <div class="color-[--main-text] text-12px" :class="activeColumns[1]">$45.9K</div>
+        <div class="text-12px" :class="[activeColumns[1], getColorClass(row.pnl)]">
+          {{ addSign(row.pnl) }}${{ formatNumber(Math.abs(row.pnl), 2) }}
+        </div>
         <div
           class="color-[--secondary-text] text-12px color-[--up-color]"
           :class="activeColumns[2]"
         >
-          54.4%
+          {{ formatNumber(row.win_rate, 1) }}%
         </div>
+      </div>
+      <template v-if="!dialogValues.loading && dialogValues.activeList.length === 0">
+        <AveEmpty class="mt-20px">
+          <span class="text-12px color-[--third-text]">{{ $t('noActiveWallet') }}</span>
+        </AveEmpty>
+      </template>
+      <div
+        v-if="dialogValues.loading"
+        class="flex py-10px justify-center text-12px text-[--third-text]"
+      >
+        {{ $t('loading') }}
       </div>
     </el-scrollbar>
   </div>

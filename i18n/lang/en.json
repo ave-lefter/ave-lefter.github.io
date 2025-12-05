@@ -1543,5 +1543,6 @@
   "pairsLink": "Jump block explorer",
   "searchSameAmm": "View similar pools",
   "top24hAddress": "Top 24h Active Address",
-  "whale": "Whale"
+  "whale": "Whale",
+  "noActiveWallet": "No active wallet"
 }

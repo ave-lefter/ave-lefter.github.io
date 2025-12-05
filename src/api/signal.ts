@@ -146,7 +146,6 @@ export interface IActionV3Item {
   quote_token_volume: string;
   action_time: number;
   token_balance_usd: string;
-  i
 }
 
 /**
@@ -165,9 +164,19 @@ export function getSignalV3List(query: {
   })
 }
 
-export function getActiveAddressRank(): Promise<IActionV3Item[]> {
+export function getActiveAddressRank(query): Promise<{
+  items:{
+    user_address: string;
+    pnl:          number;
+    rank:         number;
+    win_rate:     string;
+    wallet_logo:  string;
+  }[]
+  has_more: boolean
+}> {
   const {$api} = useNuxtApp()
-  return $api('/v2api/signals/v2/active_address_rank', {
-    method: 'get'
+  return $api('https://api.test.phaetd8l.com/v2api/signals/v2/wallets_rank', {
+    method: 'get',
+    query
   })
 }

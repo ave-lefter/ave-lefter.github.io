@@ -17,13 +17,29 @@ import SignalTopList from './signalTopList.vue'
 const dialogValues = ref<{
   visible: boolean
   loading: boolean
-  list: ITopSignal[]
-  type: 'top' | 'active'
+  type: 'topList' | 'activeList'
+  pageNO: number
+  pageSize: number
+  topList: ITopSignal[]
+  activeList: {
+    user_address: string
+    pnl: number
+    rank: number
+    win_rate: string
+    wallet_logo: string
+  }[]
+  has_more: boolean
+  tag: number[]
 }>({
   visible: false,
   loading: false,
-  list: [],
-  type: 'top',
+  topList: [],
+  activeList: [],
+  type: 'topList',
+  pageNO: 1,
+  pageSize: 100,
+  has_more: true,
+  tag: [30, 31, 39],
 })
 const showResetBtn = defineModel<boolean>('showResetBtn')
 const props = defineProps<{
@@ -207,23 +223,86 @@ function scrollToTop() {
   }
 }
 
-async function setDialogVisible(type: 'top' | 'active') {
+async function setDialogVisible(type: 'topList' | 'activeList') {
   dialogValues.value.type = type
   dialogValues.value.visible = true
-  if (dialogValues.value.visible && dialogValues.value.list.length === 0) {
+  dialogValues.value.pageNO = 1
+  const isTopList = type === 'topList'
+  if (isTopList) {
+    getTopListData()
+  } else {
+    getActiveListData()
+  }
+}
+
+async function getTopListData() {
+  if (dialogValues.value.visible && dialogValues.value.topList.length === 0) {
     dialogValues.value.loading = true
     try {
       const res = await getTopSignal()
-      dialogValues.value.list = res || []
+      dialogValues.value.topList = res || []
     } finally {
       dialogValues.value.loading = false
     }
   }
 }
 
+async function getActiveListData() {
+  dialogValues.value.loading = true
+  try {
+    const res = await getActiveAddressRank({
+      pageNO: dialogValues.value.pageNO,
+      pageSize: dialogValues.value.pageSize,
+      chain: props.activeChain,
+      tag: dialogValues.value.tag.join(','),
+    })
+    dialogValues.value.has_more = res.has_more
+    dialogValues.value.activeList =
+      dialogValues.value.pageNO === 1 ? res.items : [...dialogValues.value.activeList, ...res.items]
+    if (res.has_more) {
+      dialogValues.value.pageNO++
+    }
+  } finally {
+    dialogValues.value.loading = false
+  }
+}
+
+function initPoll() {
+  return requestTimeout(1000 * 60 * 5, async () => {
+    if (dialogValues.value.loading) {
+      return
+    }
+    const res = await getActiveAddressRank({
+      pageNO: 1,
+      pageSize: dialogValues.value.activeList.length,
+      chain: props.activeChain,
+      tag: dialogValues.value.tag.join(','),
+    })
+    dialogValues.value.activeList = res.items || []
+  })
+}
+
+let rafResult = initPoll()
+
+onUnmounted(() => {
+  cancelAnimationFrame(rafResult.id!)
+})
+
 defineExpose({
   setFilterToken,
 })
+
+watch(
+  () => [dialogValues.value.tag, props.activeChain],
+  () => {
+    cancelAnimationFrame(rafResult.id!)
+    dialogValues.value.pageNO = 1
+    dialogValues.value.activeList = []
+    dialogValues.value.has_more = true
+    getActiveListData()
+    rafResult = initPoll()
+  }
+)
 </script>
 
 <template>
@@ -232,13 +311,13 @@ defineExpose({
     <div class="flex items-center gap-16px">
       <span
         class="transition-all transition-duration-300 px-8px py-6px rounded-4px bg-#FFA6221A text-12px color-#FFA622 cursor-pointer hover:bg-#FFA622 hover:color-#333"
-        @click="setDialogVisible('top')"
+        @click="setDialogVisible('topList')"
       >
         {{ $t('SignalTopList') }}
       </span>
       <span
         class="transition-all transition-duration-300 px-8px py-6px rounded-4px bg-#FFA6221A text-12px color-#FFA622 cursor-pointer hover:bg-#FFA622 hover:color-#333"
-        @click="setDialogVisible('active')"
+        @click="setDialogVisible('activeList')"
       >
         {{ $t('top24hAddress') }}
       </span>
@@ -247,8 +326,11 @@ defineExpose({
   <div class="flex pt-4px bg-[--main-bg]">
     <SignalTopList
       ref="topListRef"
+      v-model:tag="dialogValues.tag"
       :dialogValues="dialogValues"
+      :activeChain="activeChain"
       @close="dialogValues.visible = false"
+      @loadMore="getActiveListData"
     />
     <SignalLeftList
       ref="signalLeftList"

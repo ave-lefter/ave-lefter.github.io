@@ -1,21 +1,38 @@
 <script setup lang="ts">
-import type {GetSignalV2ListResponse} from '~/api/signal'
+import type { GetSignalV2ListResponse } from '~/api/signal'
 
-withDefaults(defineProps<{
-  signalList?: Array<GetSignalV2ListResponse>
-  quickBuyValue: string
-}>(), {
-  signalList() {
-    return []
-  },
-})
+withDefaults(
+  defineProps<{
+    signalList?: Array<GetSignalV2ListResponse>
+    quickBuyValue: string
+  }>(),
+  {
+    signalList() {
+      return []
+    },
+  }
+)
 const botStore = useBotStore()
 </script>
 
 <template>
   <div class="flex flex-col gap-12px">
     <div
-      v-for="({chain,logo,symbol,id,token,issue_platform,mc_cur,signal_time,price_change_24h},index) in signalList"
+      v-for="(
+        {
+          chain,
+          logo,
+          symbol,
+          id,
+          token,
+          issue_platform,
+          mc_cur,
+          signal_time,
+          price_change_24h,
+          headline,
+        },
+        index
+      ) in signalList"
       :key="id"
       class="pb-12px border-b-1px border-b-solid border-b-[--main-list-hover] cursor-pointer"
       @click="navigateTo(`/token/${token}-${chain}`)"
@@ -28,9 +45,9 @@ const botStore = useBotStore()
                 token-class="w-32px h-32px"
                 :row="{
                   chain,
-                  logo_url:logo,
-                  symbol
-              }"
+                  logo_url: logo,
+                  symbol,
+                }"
               />
             </template>
             <template #content>
@@ -38,27 +55,26 @@ const botStore = useBotStore()
                 token-class="w-240px h-240px [&&]:mr-0 rounded-16px"
                 :row="{
                   chain,
-                  logo_url:logo,
-                  symbol
-              }"
+                  logo_url: logo,
+                  symbol,
+                }"
               />
             </template>
-         </el-tooltip>
-          
+          </el-tooltip>
+
           <div class="flex flex-col gap-4px">
             <span
-                class="font-500 color-[--main-text] text-16px cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis max-w-90px"
-            >{{ symbol }}</span>
+              class="font-500 color-[--main-text] text-16px cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis max-w-90px"
+              >{{ symbol }}</span
+            >
             <div class="color-[--d-666-l-999] flex items-center gap-8px">
-              <Icon v-copy="token" name="bxs:copy" class="clickable text-10px"/>
+              <Icon v-copy="token" name="bxs:copy" class="clickable text-10px" />
               <a
                 class="text-10px"
                 :href="`https://x.com/search?q=($${symbol} OR ${token})&src=typed_query&f=live`"
                 target="_blank"
               >
-                <Icon
-                  name="hugeicons:search-01"
-                />
+                <Icon name="hugeicons:search-01" />
               </a>
               <img
                 v-if="issue_platform"
@@ -68,11 +84,12 @@ const botStore = useBotStore()
                 height="10"
                 class="rounded-full"
                 alt=""
-              >
+              />
+              <Icon v-if="headline" v-tooltip="headline" name="custom:ai" class="text-12px" />
             </div>
           </div>
         </div>
-        <div/>
+        <div />
         <QuickSwap
           :quickBuyValue="quickBuyValue"
           :row="signalList[index]"
@@ -82,35 +99,45 @@ const botStore = useBotStore()
       <div class="flex justify-between">
         <div class="flex color-[--third-text] text-12px">
           {{ $t('mCap') }}
-          <span class="color-[--main-text] ml-4px">
-            ${{ formatNumber(mc_cur, 1) }}
-          </span>
+          <span class="color-[--main-text] ml-4px"> ${{ formatNumber(mc_cur, 1) }} </span>
           <span class="ml-8px">24h</span>
-          <span
-          class="ml-4px"    
-          :class="getColorClass(price_change_24h)"
-          >{{ addSign(price_change_24h) }}{{ formatNumber(Math.abs(price_change_24h), 2) }}%</span>
+          <span class="ml-4px" :class="getColorClass(price_change_24h)"
+            >{{ addSign(price_change_24h) }}{{ formatNumber(Math.abs(price_change_24h), 2) }}%</span
+          >
         </div>
         <TimerCount
           v-if="signal_time && Number(formatTimeFromNow(signal_time, true)) < 60"
-          :key="signal_time" :timestamp="signal_time" :end-time="60">
+          :key="signal_time"
+          :timestamp="signal_time"
+          :end-time="60"
+        >
           <template #default="{ seconds }">
-              <span v-if="seconds < 60" v-tooltip="formatDate(signal_time,'MM/DD HH:mm:ss')" class="color-[--yellow] text-12px">
-                {{ seconds }}s
-              </span>
-            <span v-else v-tooltip="formatDate(signal_time,'MM/DD HH:mm:ss')" class="color-[--third-text] text-12px">
-                {{ formatTimeFromNow(signal_time) }}
-              </span>
+            <span
+              v-if="seconds < 60"
+              v-tooltip="formatDate(signal_time, 'MM/DD HH:mm:ss')"
+              class="color-[--yellow] text-12px"
+            >
+              {{ seconds }}s
+            </span>
+            <span
+              v-else
+              v-tooltip="formatDate(signal_time, 'MM/DD HH:mm:ss')"
+              class="color-[--third-text] text-12px"
+            >
+              {{ formatTimeFromNow(signal_time) }}
+            </span>
           </template>
         </TimerCount>
-        <span v-else v-tooltip="formatDate(signal_time,'MM/DD HH:mm:ss')" class="color-[--third-text] text-12px">
-            {{ formatTimeFromNow(signal_time) }}
+        <span
+          v-else
+          v-tooltip="formatDate(signal_time, 'MM/DD HH:mm:ss')"
+          class="color-[--third-text] text-12px"
+        >
+          {{ formatTimeFromNow(signal_time) }}
         </span>
       </div>
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>
