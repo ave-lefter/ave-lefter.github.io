@@ -1398,5 +1398,7 @@
   "batchDelete": "일괄 삭제",
   "removeTokenTips": "선택한 다음을 삭제하시겠습니까?",
   "pairsLink": "점프 블록 탐색기",
-  "searchSameAmm": "유사한 풀 보기"
+  "searchSameAmm": "유사한 풀 보기",
+  "pumpCompleted": "완료",
+  "innerDiskTime": "내부 디스크 시간"
 }

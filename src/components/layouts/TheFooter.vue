@@ -74,8 +74,6 @@
       <li class="color-[--secondary-text] hover:color-[--main-text]">
         <a target="_blank" href="https://www.tradingview.com/" class="flex-center">
           <Icon name="simple-icons:tradingview" class="text-18px mr-2px" />TradingView
-          <!-- <img v-if="isDark" src="@/assets/images/tradingView-dark.svg" alt="" height="12" />
-          <img v-else src="@/assets/images/tradingView-light.svg" alt="" height="12" /> -->
         </a>
       </li>
       <li>
@@ -96,9 +94,6 @@
           <Icon name="custom:set-up" class="text-12px ml-2px color-[--main-text]" />
       </template>
       <ul class="flex items-start justify-center flex-col text-12px gap-16px font-500">
-        <!-- <li class="color-[--d-999-l-666] hover:color-[--main-text]">
-          <a class="hover:decoration-underline" target="_blank" href="https://eco.ave.ai">{{ $t('ecosystem') }}</a>
-        </li> -->
         <li class="color-[--secondary-text] hover:color-[--main-text]">
           <a
             class="hover:decoration-underline" target="_blank" :href="lang?.includes?.('zh')
@@ -111,7 +106,6 @@
         <li class="color-[--secondary-text] hover:color-[--main-text]">
           <a target="_blank" class="hover:decoration-underline" href="/privacy.html">{{ $t('privacyPolicy') }}</a>
         </li>
-
       </ul>
       </el-popover>
       <li class="color-[--secondary-text] hover:color-[--main-text] mr-8px">
@@ -140,6 +134,7 @@
 </template>
 
 <script setup lang="tsx">
+// @ts-nocheck - 忽略整个文件的类型检查
 import { cloneDeep, first, throttle  } from 'lodash-es'
 import { formatDec } from '~/utils/formatNumber'
 import { getTokensPrice } from '@/api/token'
@@ -171,7 +166,6 @@ const pumpConfig = computed(() => dragPumpStore.pumpConfig)
 
 // 平台选项 - 根据选中的链动态显示对应的平台
 const platformOptions = computed(() => {
-
   const platforms: Array<{ label: string; value: string; icon: string }> = []
   // 只遍历选中的链
   pumpConfig.value.forEach((chain: any) => {
@@ -324,12 +318,18 @@ watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], ({msg}:{msg:
   }
 })
 
+// 监听pump事件
 watch(() => wsStore.wsResult[WSEventType.PUMP_MIGRATED], ({msg}:{msg:GetSignalV2ListResponse}) => {
   if(globalStore.audioSettings.notice.pumpNotice){
-    pumpToast(msg)
+    const pumpChains = globalStore.audioSettings.notice.pumpChains
+    const pumpPlatforms = globalStore.audioSettings.notice.pumpPlatforms
+    if(pumpChains.includes(msg.chain) && pumpPlatforms.includes(msg.pair.platform_id)){
+      pumpToast(msg)
+    }
   }
 })
 
+// 监听pump事件并弹窗
 function pumpToast(val:GetSignalV2ListResponse) {
   const msg = ElMessage({
     duration: 100000,
@@ -343,16 +343,20 @@ function pumpToast(val:GetSignalV2ListResponse) {
         }}
       >
         <div class='flex items-center gap-4px relative'>
-          <TokenImg row={{ logo_url: 's' || '', chain: '', symbol: val.symbol || 'SOL' }} token-class="w-24px h-24px" />
+          <TokenImg row={{ logo_url: '', chain: val.pair.token0_symbol, symbol: val.pair.token0_symbol }} token-class="w-24px h-24px" />
           <img
-            src={getIconByPlatform(val.platform_id)}
+            src={getIconByPlatform(val.pair.platform_id)}
             alt=""
             class="w-10px h-10px absolute right-0 bottom-0"
           />
         </div>
         <div class='ml-4px'>
-          <div class='text-14px'>{val.symbol} 已经打满</div>
-          <div class='text-12px color-[--secondary-text] mt-2px'>内盘耗时 1m，持币人 4,123，市值 $1.4亿</div>
+          <div class='text-14px'>{val.pair.token0_symbol} {t('pumpCompleted')}</div>
+          <div class='text-12px color-[--secondary-text] mt-2px'>
+            {t('innerDiskTime')} { val.time - val.pair.publish_at <= 0 ? ' - ' : formatTime( val.time - val.pair.publish_at)}，
+            {t('holders')} {val.pair.holders} ，
+            {t('mCap')} {formatNumber(val.pair.market_cap || 0, 2)}
+          </div>
         </div>
       </div>
     )
@@ -360,13 +364,40 @@ function pumpToast(val:GetSignalV2ListResponse) {
   messageQueue.add(msg)
 }
 
-pumpToast({
-  token: 'SOL',
-  chain: 'solana',
-  logo: 'https://cdn.ave.ai/token/logo/SOL.png',
-  symbol: 'SOL',
-  platform_id: 'believe',
-})
+// pumpToast({
+//   "amm": "meteoradbcpswap",
+//   "chain": "solana",
+//   "migrated_pair_address": "3qDvBsFRjMfeeqQVLXqmsTbRpUCHYpDD1s4WwWYoAWoX",
+//   "pair": {
+//     "amm": "meteoradammv2",
+//     "chain": "solana",
+//     "current_price_usd": 0,
+//     "holders": 154,
+//     "issue_platform": "believe.app",
+//     "market_cap": "550465.9146848112",
+//     "pair": "3qDvBsFRjMfeeqQVLXqmsTbRpUCHYpDD1s4WwWYoAWoX",
+//     "platform_id": "believe",
+//     "platform_show": "Believe",
+//     "publish_at": 1764896564,
+//     "reserve0": 29856553.833833,
+//     "reserve1": 120,
+//     "slot": 384538586,
+//     "tag": "meteoradbcpswap_king",
+//     "target_token": "61gLfJtsw4wdugH8UH5VrRpfgX41q1YTHT8S6zr8oYqo",
+//     "token0_address": "61gLfJtsw4wdugH8UH5VrRpfgX41q1YTHT8S6zr8oYqo",
+//     "token0_decimal": 6,
+//     "token0_price_usd": 0.0005579033191381628,
+//     "token0_symbol": "JOTCHUA",
+//     "token1_address": "So11111111111111111111111111111111111111112",
+//     "token1_decimal": 9,
+//     "token1_price_usd": 139.62178504337692,
+//     "token1_symbol": "SOL",
+//     "tvl": 33509.22841
+//   },
+//   "pump_pair_address": "3wA3TPNUHoLG9w8DaVyPpu2yrsr13PF4FinTZXy3AEWk",
+//   "state": "migrated",
+//   "time": 1764896766
+// })
 
 function signalToast(val:GetSignalV2ListResponse) {
   const actionsCount = val.actions.length

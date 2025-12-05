@@ -794,5 +794,7 @@
   "batchDelete": "Xóa hàng loạt",
   "removeTokenTips": "Xóa nội dung đã chọn sau đây?",
   "pairsLink": "Trình khám phá khối nhảy",
-  "searchSameAmm": "Xem các nhóm tương tự"
+  "searchSameAmm": "Xem các nhóm tương tự",
+  "pumpCompleted": "Đã hoàn thành",
+  "innerDiskTime": "Thời gian đĩa trong"
 }

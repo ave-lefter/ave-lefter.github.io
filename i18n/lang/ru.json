@@ -1,6 +1,6 @@
 {
   "connectWallet": "Подключить",
-  "smart_money_tips": "卖出{s}次",
+  "smart_money_tips": "Продать{s} раз",
   "kol_sell_tips": "Недавние продажи KOL",
   "noData": "Нет данных",
   "kol_buy_tips": "Недавние покупки KOL",
@@ -780,8 +780,8 @@
   "settingNotify": "Настройка оповещений",
   "repeatNotify": "Повторять оповещения",
   "createRecord": "Создать запись",
-  "upToNotifyUser": "当前价位${price}",
-  "downToNotifyUser": "当前价位${price}",
+  "upToNotifyUser": "текущая цена${price}",
+  "downToNotifyUser": "текущая цена${price}",
   "createNotify": "Создать оповещение",
   "placeholderNotify": "цена",
   "pasteAddress2": "Нажмите, чтобы отключить автозаполнение адреса контракта",
@@ -793,5 +793,7 @@
   "batchDelete": "Пакетное удаление",
   "removeTokenTips": "Удалить выбранное следующее?",
   "pairsLink": "Исследователь блоков прыжков",
-  "searchSameAmm": "Посмотреть похожие бассейны"
+  "searchSameAmm": "Посмотреть похожие бассейны",
+  "pumpCompleted": "Завершено",
+  "innerDiskTime": "Внутреннее время диска"
 }

@@ -1540,5 +1540,7 @@
   "blackListPlaceHolder": "输入开发者地址、代币合约和关键词",
   "overLimit": "超过上限，建议确认是否误填",
   "pairsLink": "跳转区块浏览器",
-  "searchSameAmm": "查看同类型池子"
+  "searchSameAmm": "查看同类型池子",
+  "pumpCompleted": "已完成",
+  "innerDiskTime": "内盘用时"
 }
