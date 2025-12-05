@@ -547,5 +547,13 @@
   "batchDelete": "Eliminar por lotes",
   "removeTokenTips": "¿Eliminar lo siguiente seleccionado?",
   "pairsLink": "Explorador de bloques de salto",
-  "searchSameAmm": "Ver piscinas similares"
+  "searchSameAmm": "Ver piscinas similares",
+  "takeProfitAndStopLoss1": "duplicar",
+  "takeProfitAndStopLoss2": "¿Duplicar el capital&Detener la pérdida a la mitad",
+  "takeProfitAndStopLoss0": "Take Profit y Stop Loss personalizados",
+  "takeProfitAndStopLoss3": "¿Doblar todo&Medio stop loss",
+  "takeProfitAndStopLoss4": "¿Duplicar el capital&¿Triplicar el importe total&Detener la pérdida a la mitad",
+  "takeProfitAndStopLoss6": "¿40% de ganancia&Mover la toma de ganancias y detener el retroceso de pérdidas al 60% en total",
+  "takeProfitAndStopLoss5": "¿10 veces obtener ganancias&Mover la toma de ganancias y detener la pérdida de retroceso 40% en total",
+  "defaultPolicy": "Política predeterminada"
 }

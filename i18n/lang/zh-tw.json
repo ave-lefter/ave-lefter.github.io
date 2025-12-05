@@ -1525,5 +1525,13 @@
   "blackListPlaceHolder": "輸入開發者地址、代幣合約和關鍵字",
   "overLimit": "超過上限，建議確認是否誤填",
   "pairsLink": "跳轉區塊瀏覽器",
-  "searchSameAmm": "查看同類型池子"
+  "searchSameAmm": "查看同類型池子",
+  "takeProfitAndStopLoss1": "翻倍全出",
+  "takeProfitAndStopLoss2": "翻倍出本&跌半止損",
+  "takeProfitAndStopLoss0": "自定義止盈止損",
+  "takeProfitAndStopLoss3": "翻倍全出&跌半止損",
+  "takeProfitAndStopLoss4": "翻倍出本&三倍全出&跌半止損",
+  "takeProfitAndStopLoss6": "40%止盈&移動止盈止損回撤60%全出",
+  "takeProfitAndStopLoss5": "10倍止盈?移動止盈止損回撤40%全出",
+  "defaultPolicy": "默認策略"
 }

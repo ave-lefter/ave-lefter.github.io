@@ -1398,5 +1398,13 @@
   "batchDelete": "일괄 삭제",
   "removeTokenTips": "선택한 다음을 삭제하시겠습니까?",
   "pairsLink": "점프 블록 탐색기",
-  "searchSameAmm": "유사한 풀 보기"
+  "searchSameAmm": "유사한 풀 보기",
+  "takeProfitAndStopLoss1": "더블 아웃",
+  "takeProfitAndStopLoss2": "자본금을 두 배로 늘리나요&손실을 절반으로 막으세요",
+  "takeProfitAndStopLoss0": "맞춤형 이익실현 및 손절매",
+  "takeProfitAndStopLoss3": "모두 두 배로&하프 스톱 손실",
+  "takeProfitAndStopLoss4": "자본을 두 배로 늘리나요&전체 금액을 세 배로 늘리나요&손실을 반으로 막으세요",
+  "takeProfitAndStopLoss6": "40%가 이익을 얻나요&이익실현 및 손절가 되돌림 60% 모두 이동",
+  "takeProfitAndStopLoss5": "10배 이익을 얻나요&이익실현 및 손절가 되돌림 40% 모두 이동",
+  "defaultPolicy": "기본 정책"
 }

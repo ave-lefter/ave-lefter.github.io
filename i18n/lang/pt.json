@@ -547,5 +547,13 @@
   "batchDelete": "Exclusão em lote",
   "removeTokenTips": "Excluir o seguinte selecionado?",
   "pairsLink": "Explorador de blocos de salto",
-  "searchSameAmm": "Ver pools semelhantes"
+  "searchSameAmm": "Ver pools semelhantes",
+  "takeProfitAndStopLoss1": "Dobrar",
+  "takeProfitAndStopLoss2": "Dobrar o capital&Pare a perda pela metade",
+  "takeProfitAndStopLoss0": "Take Profit e Stop Loss personalizados",
+  "takeProfitAndStopLoss3": "Duplicar tudo&Meio stop loss",
+  "takeProfitAndStopLoss4": "Dobrar o capital&Triplicar o valor total&Pare a perda pela metade",
+  "takeProfitAndStopLoss6": "40% realizam lucro&Movendo a retração de take-profit e stop loss de 60% no total",
+  "takeProfitAndStopLoss5": "10 vezes obter lucro&Movendo a retração de take-profit e stop loss de 40% no total",
+  "defaultPolicy": "Política padrão"
 }

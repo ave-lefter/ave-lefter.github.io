@@ -1,16 +1,29 @@
 <template>
   <div v-show="botStore.userInfo?.evmAddress">
-    <div class="flex items-center">
-      <el-checkbox v-model="isAutoSellConfig" class="auto-sell-checkbox"><span class="font-400 color-#3F80F7 text-14px">{{ $t('advancedTrading') }}</span></el-checkbox>
-      <Icon
-        v-tooltip.raw="{
-        content: $t('advancedTradingTips'),
-        props: {
-          'popper-class': 'max-w-500px'
-        }
-      }" name="material-symbols:help-rounded" class="text-14px color-[--icon-color] cursor-pointer ml-3px" />
+    <div class="flex-between">
+      <div class="flex items-center">
+        <el-checkbox v-model="isAutoSellConfig" class="auto-sell-checkbox"><span class="font-400 color-#3F80F7 text-14px">{{ $t('advancedTrading') }}</span></el-checkbox>
+        <Icon
+          v-tooltip.raw="{
+          content: $t('advancedTradingTips'),
+          props: {
+            'popper-class': 'max-w-500px'
+          }
+        }" name="material-symbols:help-rounded" class="text-14px color-[--icon-color] cursor-pointer ml-3px" />
+      </div>
+      <div class="flex items-center gap-5px">
+        <el-select v-model="botSettingStore.autoSellConfigs.autoSellConfigName" :placeholder="t('defaultPolicy')" style="width: 110px" @change="changeAutoSellConfig" placement="right-end">
+          <el-option
+            v-for="item in autoSellConfigOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+         <SlippageSet :canSetAuto="true" :isAutoSell="true" :showAutoSell="true" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"  />
+      </div>
     </div>
-    <ul v-show="isAutoSellConfig">
+    <ul v-show="botSettingStore.autoSellConfigs.isAutoSellConfig">
       <li v-for="(item, index) in autoSellConfig" :key="index" class="mt-8px flex items-center gap-4px">
         <el-input-number v-model="item.priceChange" class="input-number-limit" :min="1" :controls="false" placeholder="--" @update:model-value="triggerAutoSellConfig">
           <template #prefix>
@@ -43,19 +56,25 @@
 </template>
 
 <script setup lang='ts'>
+
 import { cloneDeep } from 'lodash-es'
+import SlippageSet from '~/pages/token/components/right/botSwap/slippageSet.vue'
 const botStore = useBotStore()
 const botSettingStore = useBotSettingStore()
-
+const route = useRoute()
+const tokenStore = useTokenStore()
+const { t } = useI18n()
 const isAutoSellConfig = computed({
   get() {
-    return botSettingStore?.autoSellConfigs?.isAutoSellConfig
+    console.log('isAutoSellConfig',botSettingStore.autoSellConfigs.autoSellConfigName)
+    return (botSettingStore?.autoSellConfigs as any)?.['isAutoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName]
+    // return botSettingStore?.autoSellConfigs?.isAutoSellConfig
   },
   set(val) {
     const setting = cloneDeep(botSettingStore.autoSellConfigs)
     if (setting) {
-      setting.isAutoSellConfig = val as boolean
-      if (!setting.autoSellConfig?.length && val) {
+      setting['isAutoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName] = val as boolean
+      if (!setting['autoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName]?.length && val) {
         setting.autoSellConfig = [
           {
             open: true,
@@ -80,8 +99,9 @@ const autoSellConfig = computed<Array<{
   isUp: boolean
 }>>({
   get() {
-    const setting = botSettingStore.autoSellConfigs
-    const config = setting?.autoSellConfig
+    const setting:any = botSettingStore.autoSellConfigs
+    const config = setting?.['autoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName]
+    // const config = setting?.autoSellConfig
     if (Number(config?.length) > 0) {
       return config?.map?.(i => {
         return {
@@ -98,7 +118,7 @@ const autoSellConfig = computed<Array<{
   set(val) {
     const setting = cloneDeep(botSettingStore.autoSellConfigs)
     if (setting) {
-      setting.autoSellConfig = val?.map?.(i => {
+      setting['autoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName] = val?.map?.(i => {
         return {
           open: i.open,
           priceChange: i.isUp ? Number(i?.priceChange || 0) * 100 : Number(i?.priceChange || 0) * -100,
@@ -112,6 +132,52 @@ const autoSellConfig = computed<Array<{
       }
     }
   }
+})
+const changeAutoSellConfig = (value:any) => {
+   ['','1','2','3','4','5','6'].forEach((item) => {
+    if(item!==value){
+      if((botSettingStore.autoSellConfigs as any)?.['isAutoSellConfig'+item]!==undefined){
+        (botSettingStore.autoSellConfigs as any)['isAutoSellConfig'+item] = false
+      }
+      // (botSettingStore.autoSellConfigs as any)['isAutoSellConfig'+item] = false
+    }else{
+      (botSettingStore.autoSellConfigs as any)['isAutoSellConfig'+item] = true
+    }
+  })
+}
+const autoSellConfigOption=[
+    {
+      value: '',
+      label: t('takeProfitAndStopLoss0')
+    },
+    {
+      value: '1',
+      label: t('takeProfitAndStopLoss1')
+    },
+    {
+      value: '2',
+      label: t('takeProfitAndStopLoss2')
+    },
+    {
+      value: '3',
+      label: t('takeProfitAndStopLoss3')
+    },
+    {
+      value: '4',
+      label: t('takeProfitAndStopLoss4')
+    },
+    {
+      value: '5',
+      label: t('takeProfitAndStopLoss5')
+    },
+    {
+      value: '6',
+      label: t('takeProfitAndStopLoss6')
+    },
+]
+
+const chain = computed(() => {
+  return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as BotChain
 })
 
 // 自动卖出 type -> "default"(一般限价单), "trailing"(移动止盈止损)，"migrated"(上外盘),"devsell"(开发者卖出跟卖)

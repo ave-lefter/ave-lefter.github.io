@@ -794,5 +794,13 @@
   "batchDelete": "Xóa hàng loạt",
   "removeTokenTips": "Xóa nội dung đã chọn sau đây?",
   "pairsLink": "Trình khám phá khối nhảy",
-  "searchSameAmm": "Xem các nhóm tương tự"
+  "searchSameAmm": "Xem các nhóm tương tự",
+  "takeProfitAndStopLoss1": "Nhân đôi",
+  "takeProfitAndStopLoss2": "Gấp đôi vốn&Dừng lỗ một nửa",
+  "takeProfitAndStopLoss0": "Tùy chỉnh chốt lời và dừng lỗ",
+  "takeProfitAndStopLoss3": "Nhân đôi tất cả&Dừng lỗ một nửa",
+  "takeProfitAndStopLoss4": "Nhân đôi vốn ra&Gấp ba toàn bộ số tiền&Dừng lỗ một nửa",
+  "takeProfitAndStopLoss6": "40% chốt lãi&Chuyển động chốt lãi và dừng lỗ thoái lui 60%",
+  "takeProfitAndStopLoss5": "10 lần chốt lãi&Chuyển động chốt lãi và dừng lỗ thoái lui 40%",
+  "defaultPolicy": "Chính sách mặc định"
 }

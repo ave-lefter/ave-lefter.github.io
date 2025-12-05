@@ -1541,5 +1541,13 @@
   "blackListPlaceHolder": "Enter developer address, token contract, and keywords",
   "overLimit": "Over limit, please confirm if it is filled incorrectly",
   "pairsLink": "Jump block explorer",
-  "searchSameAmm": "View similar pools"
+  "searchSameAmm": "View similar pools",
+  "takeProfitAndStopLoss1": "Double out",
+  "takeProfitAndStopLoss2": "Double the capital&Stop the loss by half",
+  "takeProfitAndStopLoss0": "Customized take profit and stop loss",
+  "takeProfitAndStopLoss3": "Double all out&Half stop loss",
+  "takeProfitAndStopLoss4": "Double the capital out&Triple out the whole amount&Stop the loss in half",
+  "takeProfitAndStopLoss6": "40% take profit&Moving take profit and stop loss retracement 60% all out",
+  "takeProfitAndStopLoss5": "10 times take profit&Moving take profit and stop loss retracement 40% all out",
+  "defaultPolicy": "Default policy"
 }
