@@ -76,7 +76,7 @@ function onSelect(item: { text: string; value: string }) {
       <Icon
         name="custom:filter"
         class="text-10px cursor-pointer"
-        :class="isFilterHighlight ? 'color-[--secondary-text]' : ''"
+        :class="isFilterHighlight ? 'color-[--primary-color]' : ''"
       />
     </template>
     <template #default>

@@ -18,7 +18,6 @@ const hotSettings = ref({
   isBlacklist:globalStore.pumpSetting.isBlacklist
 })
 
-const themeStore = useThemeStore()
 const hotOptions = computed(() => props.getOptions(t))
 
 const initColumns = ref([])
@@ -60,7 +59,16 @@ const handleConfirm = () => {
   globalStore.pumpSetting.isBlacklist = hotSettings.value.isBlacklist
 }
 
-const handleReset = () => {
+const handleReset = async () => {
+  const filterOptions = globalStore.rankConditions[globalStore.rankActiveTab]?.filter
+  const hasFilter = Object.entries(filterOptions).some(([,value])=>{
+    return !!value
+  })
+  if(hasFilter){
+   await ElMessageBox.confirm(t('resetTips'),{
+    title:t('confirmAgain')
+   })
+  }
   dialogVisible.value = false
   storeColumns.value = props.getDefaultColumns(t)
   modelColumns.value = props.getDefaultColumns(t)
@@ -185,62 +193,8 @@ function handleSelectChild(childItem, renderKey:string) {
   </div>
 </template>
 
-<style>
-/* :root {
-  --columns-toolbar-button-bg: #222;
-  --columns-toolbar-button-color: #fff;
-  --columns-toolbar-text-color: #000;
-  --columns-toolbar-checkbox-color: #000;
-  --columns-draggable-box-bg: #f2f2f2;
-  --columns-options-list-item-bg: #f2f2f2;
-  --columns-options-list-item-bg-select: rgba(40, 109, 255, 0.1);
-  --columns-options-list-item-color: #333;
-  --columns-options-list-item-color-select: var(--primary-color);
-  --columns-toolbar-vector-title-color: var(--primary-color);
-  --columns-draggable-columns-bg: #333;
-}
-
-.dark {
-  --columns-toolbar-button-bg: #fff;
-  --columns-toolbar-button-color: #222;
-  --columns-toolbar-text-color: #fff;
-  --columns-toolbar-checkbox-color: #fff;
-  --columns-draggable-box-bg: #333;
-  --columns-options-list-item-bg: #333;
-  --columns-options-list-item-bg-select: #999;
-  --columns-options-list-item-color: #999;
-  --columns-options-list-item-color-select: #fff;
-  --columns-toolbar-vector-title-color: #fff;
-  --columns-draggable-columns-bg: #999;
-} */
-</style>
 
 <style lang="scss" scoped>
-// .toolbar-vector-title {
-//   margin-left: 0.25rem;
-//   font-size: 0.75rem;
-//   color: var(--columns-toolbar-vector-title-color);
-//   cursor: pointer;
-// }
-
-// .toolbar-vector {
-//   width: 16px;
-//   height: 16px;
-//   cursor: pointer;
-//   color: var(--custom-text-5-color);
-// }
-
-// .content-bg {
-//   // padding: 1.25rem;
-//   // background: var(--columns-toolbar-button-color);
-//   // background: var(--a-popup-bg-color);
-// }
-
-// .toolbar-vector-container {
-//   cursor: pointer;
-//   min-width: 63px;
-// }
-
 .draggable-box-bg {
   padding: 1.25rem;
   min-height: 8.25rem;
@@ -304,39 +258,6 @@ function handleSelectChild(childItem, renderKey:string) {
     }
   }
 }
-
-// .button-container {
-//   display: flex;
-//   flex-direction: row-reverse;
-//   margin-top: 30px;
-// }
-
-// .reset-button {
-//   display: flex;
-//   width: 13.3125rem;
-//   height: 2.5rem;
-//   padding: 0.5rem 2.5rem;
-//   justify-content: center;
-//   align-items: center;
-//   border-radius: 0.375rem;
-//   background: var(--border);
-//   color: var(--main-text);
-//   cursor: pointer;
-//   margin-right: 20px;
-// }
-
-// .confirm-button {
-//   display: flex;
-//   width: 13.3125rem;
-//   height: 2.5rem;
-//   padding: 0.5rem 2.5rem;
-//   justify-content: center;
-//   align-items: center;
-//   border-radius: 0.375rem;
-//   background: var(--primary-color);
-//   color: var(--white);
-//   cursor: pointer;
-// }
 
 .columns-bg {
   padding: 15px;
