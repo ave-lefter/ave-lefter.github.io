@@ -143,6 +143,8 @@ export const useSwapStore = defineStore('swap', () => {
   const isSunPump = ref(0)
   const isDyorswapfun = ref(false)
   const isXflapswap = ref(false)
+  const isCookPump = ref(false)
+  const isPopMeFun = ref(false)
   const amm = ref('')
 
   const limitSolanaPriceU = ref<number | string>(0)
@@ -167,7 +169,7 @@ export const useSwapStore = defineStore('swap', () => {
         }).sort((a) => (a.token === NATIVE_TOKEN ? -1 : 1))
       }
       const isSameToken = token1.value.address === token2.value.address
-      const isSpecialCase = (isERC314.value || isFourMeme.value || isFlap.value || isSunPump.value > 0 || isDyorswapfun.value || isXflapswap.value) && token2.value.address !== NATIVE_TOKEN
+      const isSpecialCase = (isERC314.value || isFourMeme.value || isFlap.value || isSunPump.value > 0 || isDyorswapfun.value || isXflapswap.value || isCookPump.value || isPopMeFun.value) && token2.value.address !== NATIVE_TOKEN
       const isSolanaPumpCase = (isPump.value || isMoonshot.value) && chain === 'solana' && token2.value.address === 'So11111111111111111111111111111111111111112'
       const isSui = chain === 'sui' && (token2.value.address !== '0x2::sui::SUI' && token2.value.address !== NATIVE_TOKEN)
       if ((!token2.value.address || isSameToken || token2.value.chain !== chain || isSpecialCase || isSolanaPumpCase || isSui) && tokens.value.length > 0) {
@@ -178,7 +180,7 @@ export const useSwapStore = defineStore('swap', () => {
         if (token1.value.address === token.address) {
           token = index === 0 ? (tokens.value[1] ?? tokens.value[0]) : tokens.value[0]
         }
-        if (isERC314.value || isPump.value || isMoonshot.value || isFourMeme.value || isFlap.value || isSunPump.value > 0 || isSui || isDyorswapfun.value || isXflapswap.value) {
+        if (isERC314.value || isPump.value || isMoonshot.value || isFourMeme.value || isFlap.value || isSunPump.value > 0 || isSui || isDyorswapfun.value || isXflapswap.value || isCookPump.value || isPopMeFun.value) {
           const token = tokens.value?.slice?.().find(i => (i.address === NATIVE_TOKEN || i.address === 'So11111111111111111111111111111111111111112' || i.address === '0x2::sui::SUI'))
           if (token) {
             token2.value = {...(token as typeof token2.value)}
@@ -357,6 +359,17 @@ export const useSwapStore = defineStore('swap', () => {
         } else {
           isSunPump.value = 0
         }
+        if (pairInfo?.amm?.includes('cookpump')) {
+          isCookPump.value = true
+        } else {
+          isCookPump.value = false
+        }
+        // popmefun
+        if (pairInfo?.amm === 'popmefun') {
+          isPopMeFun.value = true
+        } else {
+          isPopMeFun.value = false
+        }
         amm.value = pairInfo?.amm || ''
         _getSolanaPumpInfo(callback).catch(async() => false)
         // this.quoteLimitSolana()
@@ -465,6 +478,8 @@ export const useSwapStore = defineStore('swap', () => {
     isSunPump,
     isDyorswapfun,
     isXflapswap,
+    isCookPump,
+    isPopMeFun,
     userBalanceTokens,
     getTokenDetails: _getTokenDetails,
     getToken2Info: _getToken2Info,

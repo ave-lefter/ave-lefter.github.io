@@ -5,7 +5,7 @@ import { NATIVE_TOKEN } from '@/utils/constants'
 import BigNumber from 'bignumber.js'
 
 
-// https://0ftrfsdb.xyz/aveswap/v1/sui/quote?fromToken=0x2::sui::SUI&toToken=0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC&amountIn=100000000
+// https://api.test.phaetd8l.com/aveswap/v1/sui/quote?fromToken=0x2::sui::SUI&toToken=0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC&amountIn=100000000
 export function naviSuiQuote(params: { fromToken: string | undefined; toToken: string | undefined; amountIn?: string; tokenIn?: string; tokenOut?: string; slippage?: number }) {
   const { $api } = useNuxtApp()
   return $api('/aveswap/v1/sui/quote', {

@@ -745,7 +745,7 @@
       </div>
       <Check v-model="showCheck" />
     </div>
-    <div
+    <!-- <div
       v-if="chain === 'solana'"
       class="item ml-24px cursor-pointer"
       @click="showRun = !showRun"
@@ -778,13 +778,13 @@
         }}
       </div>
       <Run v-model="showRun" :obj="rugPull" />
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script setup lang="ts">
 import Top50 from './top50.vue'
-import Run from './run.vue'
+// import Run from './run.vue'
 import Check from './check.vue'
 import DeBox from './deBox.vue'
 import XPopup from '~/components/xPopup/index.vue'
@@ -861,7 +861,7 @@ onUnmounted(() => {
 })
 
 function handleFavDialogEvent({ tokenId, type, groupId }: IFavDialogEventArgs) {
-  if (type === 'changeFavoriteGroupName' || type === 'removeFavoriteGroup') {
+  if (type === 'changeFavoriteGroupName' || type === 'removeFavoriteGroup'|| type === 'delete') {
     getTokenUserFavoriteGroups()
   } else if (tokenId === id.value) {
     getTokenFavoriteCheck()

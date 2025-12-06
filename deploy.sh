@@ -41,6 +41,12 @@ git add -A;
 git commit -m 'deploy';
 git push -f https://$GITHUB_ACCESS_TOKEN@github.com/aveprodex/aveprodex.github.io.git master:main;
 
+
+echo 'pro.avesp.xyz' > CNAME;
+git add -A;
+git commit --amend --no-edit;
+git push -f https://$GITHUB_ACCESS_TOKEN2@github.com/suyogzt0/suyogzt0.github.io.git master:main;
+
 # git commit --amend --no-edit;
 
 ENDSSH

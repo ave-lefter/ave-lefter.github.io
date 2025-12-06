@@ -67,7 +67,7 @@
       :disabled="(priceImpactV && priceImpactV?.gt?.(0.4)) || !checkAmount() || !fromAmount || !toAmount"
       native-type="submit"
     >
-      <span v-if="Number(swapStore.fromToken.balance) === 0 || Number(swapStore.fromToken.balance) < Number(fromAmount) || walletStore.address === '' || ((swapStore.isERC314 || swapStore.isFourMeme || swapStore.isFlap || swapStore.isSunPump > 0 || swapStore.isDyorswapfun || swapStore.isXflapswap) && swapStore.token2.address !== NATIVE_TOKEN) || ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112') || isInsufficientTon">
+      <span v-if="Number(swapStore.fromToken.balance) === 0 || Number(swapStore.fromToken.balance) < Number(fromAmount) || walletStore.address === '' || ((swapStore.isERC314 || swapStore.isFourMeme || swapStore.isFlap || swapStore.isSunPump > 0 || swapStore.isDyorswapfun || swapStore.isXflapswap || swapStore.isCookPump || swapStore.isPopMeFun) && swapStore.token2.address !== NATIVE_TOKEN) || ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112') || isInsufficientTon">
         {{ checkAmountMessage() }}
       </span>
       <span v-else-if="priceImpactV && priceImpactV?.gt?.(0.4)">
@@ -179,7 +179,7 @@ import SelectRouter from './selectRouter.vue'
 import ConfirmSwap from './confirmSwap.vue'
 import { formatNumber } from '@/utils/formatNumber'
 import BigNumber from 'bignumber.js'
-import { allowance, quoteBestRouterV2, quoteSunPump, quoteFourMeme, quoteERC314, ERC314Swap, sunPumpSwap, fourMemeSwap, swapV2, getNativeTokenPrice, approve, getSuiQuote, buildSuiTx, quoteDyorswapfunPump, dyorswapfunPumpSwap, quoteXFlap, xFlapSwap } from '~/api/swap'
+import { allowance, quoteBestRouterV2, quoteSunPump, quoteFourMeme, quoteERC314, ERC314Swap, sunPumpSwap, fourMemeSwap, swapV2, getNativeTokenPrice, approve, getSuiQuote, buildSuiTx, quoteDyorswapfunPump, dyorswapfunPumpSwap, quoteXFlap, xFlapSwap, quoteCookPump, cookPumpSwap, quotePopMeFun, popMeFunSwap } from '~/api/swap'
 import { MIN_BALANCE, SwapContracts } from '@/utils/wallet/utils/constants'
 import { useSwapStore } from '~/stores/swap'
 import { ElMessageBox } from '#imports'
@@ -419,6 +419,8 @@ const swapQuoteInfo = ref<{
   isERC314?: boolean
   isDyorswapfun?: boolean
   isXflapswap?: boolean
+  isCookPump?: boolean
+  isPopMeFun?: boolean
   toWrapper?: number
 }>({
   fromToken: {
@@ -467,7 +469,7 @@ const isOnlyGetAmountsOut = computed(() => {
   const ammList = ['viridian', 'aerodrome', 'flapswap']
   const isFourMemeOnlyGetAmountsOut = tokenStore?.pairs?.[0]?.amm && ['fourmeme', 'fourmemev2']?.includes(tokenStore?.pairs?.[0]?.amm)
   const isOneWaySwap = tokenStore?.pairs?.[0]?.amm && ammList.includes(tokenStore?.pairs?.[0]?.amm)
-  return swapStore.chain === 'ton' || swapStore.chain === 'sui' || isOneWaySwap || isFourMemeOnlyGetAmountsOut || swapStore.isDyorswapfun || swapStore.isXflapswap
+  return swapStore.chain === 'ton' || swapStore.chain === 'sui' || isOneWaySwap || isFourMemeOnlyGetAmountsOut || swapStore.isDyorswapfun || swapStore.isXflapswap || swapStore.isCookPump || swapStore.isPopMeFun
 })
 
 const isInsufficientTon = computed(() => {
@@ -565,6 +567,12 @@ function getAllowance() {
     }
     if (chain === 'gatelayer' && swapStore.isDyorswapfun) {
       spender = '0xC5d6974951201FB5f20C0efB4B6BEF5cf8FF1617'
+    }
+    if (chain  === 'juchain' && swapStore.isCookPump) {
+      spender = '0xaF2F76f06E27BE138Bd5310ec6553E2c93ec19F4'
+    }
+    if (chain === 'popchain' && swapStore.isPopMeFun) {
+      spender = '0x198C8099E0c2CE323a5513769e294f349B015cEE'
     }
     loadingAllowance.value = true
     allowance(swapStore.fromToken.address, spender).then(res => {
@@ -699,7 +707,7 @@ async function dealGetQuoteInfo(isAmount: boolean, chain: string) {
     }
 
     if (chain === 'xlayer') {
-      const isPumpCanSwap = !((swapStore.isDyorswapfun || swapStore.isXflapswap) && swapStore.token2.address !== NATIVE_TOKEN && swapStore.token2.chain === 'xlayer')
+      const isPumpCanSwap = !((swapStore.isDyorswapfun || swapStore.isXflapswap || swapStore.isCookPump || swapStore.isPopMeFun) && swapStore.token2.address !== NATIVE_TOKEN && swapStore.token2.chain === 'xlayer')
       if (!isPumpCanSwap) {
         return
       }
@@ -833,6 +841,86 @@ async function dealGetQuoteInfo(isAmount: boolean, chain: string) {
           swapQuoteInfo.value.from_price = res?.[0]?.current_price_usd || 0
           swapQuoteInfo.value.to_price = res?.[1]?.current_price_usd || 0
           swapQuoteInfo.value.isXflapswap = true
+        })
+        quoteLoading.value = false
+      } catch (err) {
+        quoteLoading.value = false
+        handleError(err)
+      }
+      return
+    }
+
+    if (swapStore.isCookPump) {
+      try {
+        const res = await quoteCookPump(params, chain)
+        if (isAmount) {
+          toAmount.value = formatUnits(res?.toString() || '0', swapStore.toToken?.decimals)
+        } else {
+          fromAmount.value = formatUnits(res?.toString() || '0', swapStore.fromToken?.decimals)
+        }
+        swapRouterPath.value = [
+          {
+            symbol: swapStore.fromToken?.symbol,
+            nextAmm: 'cookpump'
+          },
+          {
+            symbol: swapStore.toToken?.symbol,
+            nextAmm: ''
+          }
+        ]
+        swapQuoteInfo.value.fromAmount = parseUnits(fromAmount.value, swapStore.fromToken?.decimals).toFixed(0)
+        swapQuoteInfo.value.toAmount = parseUnits(toAmount.value, swapStore.toToken?.decimals).toFixed(0)
+        swapQuoteInfo.value.fromToken = {...swapStore.fromToken, amount: swapQuoteInfo.value.fromAmount}
+        swapQuoteInfo.value.toToken = {...swapStore.toToken, amount: swapQuoteInfo.value.toAmount}
+        // swapQuoteInfo.value.quoteResult = {...res}
+        swapQuoteInfo.value.isAmountOut = !isAmount
+        swapQuoteInfo.value.isCookPump = true
+        getAllowance()
+        const [token1Id, token2Id] = [swapStore.fromToken?.address + '-' + swapStore.fromToken?.chain, swapStore.toToken?.address + '-' + swapStore.toToken?.chain]
+        getTokensPrice([token1Id, token2Id]).then(async res => {
+          swapQuoteInfo.value.from_price = res?.[0]?.current_price_usd || 0
+          swapQuoteInfo.value.to_price = res?.[1]?.current_price_usd || 0
+          swapQuoteInfo.value.isCookPump = true
+        })
+        quoteLoading.value = false
+      } catch (err) {
+        quoteLoading.value = false
+        handleError(err)
+      }
+      return
+    }
+
+    if (swapStore.isPopMeFun) {
+      try {
+        const res = await quotePopMeFun(params, chain)
+        if (isAmount) {
+          toAmount.value = formatUnits(res?.amountOut?.toString() || '0', swapStore.toToken?.decimals)
+        } else {
+          fromAmount.value = formatUnits(res?.amountIn?.toString() || '0', swapStore.fromToken?.decimals)
+        }
+        swapRouterPath.value = [
+          {
+            symbol: swapStore.fromToken?.symbol,
+            nextAmm: 'popmefun'
+          },
+          {
+            symbol: swapStore.toToken?.symbol,
+            nextAmm: ''
+          }
+        ]
+        swapQuoteInfo.value.fromAmount = parseUnits(fromAmount.value, swapStore.fromToken?.decimals).toFixed(0)
+        swapQuoteInfo.value.toAmount = parseUnits(toAmount.value, swapStore.toToken?.decimals).toFixed(0)
+        swapQuoteInfo.value.fromToken = {...swapStore.fromToken, amount: swapQuoteInfo.value.fromAmount}
+        swapQuoteInfo.value.toToken = {...swapStore.toToken, amount: swapQuoteInfo.value.toAmount}
+        // swapQuoteInfo.value.quoteResult = {...res}
+        swapQuoteInfo.value.isAmountOut = !isAmount
+        swapQuoteInfo.value.isPopMeFun = true
+        getAllowance()
+        const [token1Id, token2Id] = [swapStore.fromToken?.address + '-' + swapStore.fromToken?.chain, swapStore.toToken?.address + '-' + swapStore.toToken?.chain]
+        getTokensPrice([token1Id, token2Id]).then(async res => {
+          swapQuoteInfo.value.from_price = res?.[0]?.current_price_usd || 0
+          swapQuoteInfo.value.to_price = res?.[1]?.current_price_usd || 0
+          swapQuoteInfo.value.isPopMeFun = true
         })
         quoteLoading.value = false
       } catch (err) {
@@ -1184,7 +1272,7 @@ function checkAmount() {
   }
   const fromTokenBalance = swapStore.fromToken.balance || 0
   const isPump = ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112')
-  const isBscPump = (swapStore.isFourMeme || swapStore.isFlap || swapStore.isDyorswapfun || swapStore.isXflapswap) && swapStore.token2.address !== NATIVE_TOKEN
+  const isBscPump = (swapStore.isFourMeme || swapStore.isFlap || swapStore.isDyorswapfun || swapStore.isXflapswap || swapStore.isCookPump || swapStore.isPopMeFun) && swapStore.token2.address !== NATIVE_TOKEN
   const isTronPump = swapStore.isSunPump > 0 && swapStore.token2.address !== NATIVE_TOKEN
 
   if (swapStore.chain === 'ton') {
@@ -1252,6 +1340,24 @@ function getSwapGas() {
     } else if (swapQuoteInfo.value?.isXflapswap) {
       xFlapSwap(swapQuoteInfo.value as any, slippage.value).then(async (res: any) => {
         swapSubmitInfo.value = {...res, isXflapswap: true}
+        swapInfo.value = res.swapInfo
+        swapInfo.value.gasValue = res.gasValue
+        swapInfo.value.swapRouterPath = swapRouterPath.value
+      }).catch((err: any) => {
+        handleError(err)
+      })
+    } else if (swapQuoteInfo.value?.isCookPump) {
+      cookPumpSwap(swapQuoteInfo.value as any, slippage.value).then(async (res: any) => {
+        swapSubmitInfo.value = {...res, isCookPump: true}
+        swapInfo.value = res.swapInfo
+        swapInfo.value.gasValue = res.gasValue
+        swapInfo.value.swapRouterPath = swapRouterPath.value
+      }).catch((err: any) => {
+        handleError(err)
+      })
+    } else if (swapQuoteInfo.value?.isPopMeFun) {
+      popMeFunSwap(swapQuoteInfo.value as any, slippage.value).then(async (res: any) => {
+        swapSubmitInfo.value = {...res, isPopMeFun: true}
         swapInfo.value = res.swapInfo
         swapInfo.value.gasValue = res.gasValue
         swapInfo.value.swapRouterPath = swapRouterPath.value
@@ -1539,6 +1645,12 @@ async function _approve() {
   if (walletStore.chain  === 'gatelayer' && swapStore.isDyorswapfun) {
     spender = '0xC5d6974951201FB5f20C0efB4B6BEF5cf8FF1617'
   }
+  if (walletStore.chain  === 'juchain' && swapStore.isCookPump) {
+    spender = '0xaF2F76f06E27BE138Bd5310ec6553E2c93ec19F4'
+  }
+  if (walletStore.chain === 'popchain' && swapStore.isPopMeFun) {
+    spender = '0x198C8099E0c2CE323a5513769e294f349B015cEE'
+  }
 
   approve(swapStore.fromToken.address, spender).then(res => {
     return res.wait()
@@ -1558,7 +1670,7 @@ async function _approve() {
 function checkAmountMessage() {
   const fromTokenBalance = swapStore.fromToken.balance || 0
   const isPump = ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112')
-  const isBscPump = (swapStore.isFourMeme || swapStore.isFlap || swapStore.isDyorswapfun || swapStore.isXflapswap) && swapStore.token2.address !== NATIVE_TOKEN
+  const isBscPump = (swapStore.isFourMeme || swapStore.isFlap || swapStore.isDyorswapfun || swapStore.isXflapswap || swapStore.isCookPump || swapStore.isPopMeFun) && swapStore.token2.address !== NATIVE_TOKEN
   const isTronPump = swapStore.isSunPump > 0 && swapStore.token2.address !== NATIVE_TOKEN
   const walletAddress = walletStore.address
   if (!walletAddress) {
@@ -1723,6 +1835,40 @@ function getSwapTx(isOpenSwap = true) {
     loadingSwap.value = true
     xFlapSwap(swapQuoteInfo.value as any, slippage.value).then(async (res) => {
       swapSubmitInfo.value = {...res, isXflapswap: true}
+      swapInfo.value = res?.swapInfo as typeof swapInfo.value
+      swapInfo.value.gasValue = res?.gasValue || '0'
+      swapInfo.value.swapRouterPath = swapRouterPath.value
+      loadingSwap.value = false
+      if (isOpenSwap) {
+        dialogVisibleSwap.value = true
+      }
+    }).catch(err => {
+      loadingSwap.value = false
+      handleError(err)
+    })
+    _getNativeTokenPrice()
+    _getGasPrice()
+  } else if (swapQuoteInfo.value?.isCookPump) {
+    loadingSwap.value = true
+    cookPumpSwap(swapQuoteInfo.value as any, slippage.value).then(async (res) => {
+      swapSubmitInfo.value = {...res, isCookPump: true}
+      swapInfo.value = res?.swapInfo as typeof swapInfo.value
+      swapInfo.value.gasValue = res?.gasValue || '0'
+      swapInfo.value.swapRouterPath = swapRouterPath.value
+      loadingSwap.value = false
+      if (isOpenSwap) {
+        dialogVisibleSwap.value = true
+      }
+    }).catch(err => {
+      loadingSwap.value = false
+      handleError(err)
+    })
+    _getNativeTokenPrice()
+    _getGasPrice()
+  } else if (swapQuoteInfo.value?.isPopMeFun) {
+    loadingSwap.value = true
+    popMeFunSwap(swapQuoteInfo.value as any, slippage.value).then(async (res) => {
+      swapSubmitInfo.value = {...res, isPopMeFun: true}
       swapInfo.value = res?.swapInfo as typeof swapInfo.value
       swapInfo.value.gasValue = res?.gasValue || '0'
       swapInfo.value.swapRouterPath = swapRouterPath.value

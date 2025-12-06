@@ -1,5 +1,5 @@
 import { getSuiMethods, getSuiTokensBalance } from '~/utils/wallet/sui'
-import { ERC20ABI, SwapABI, QuoteABI, SunPump_Launchpad_ABI, SunPump_Router_ABI, Four_TokenManagerHelper_V2_ABI, ERC314ABI, Four_TokenManager_V1_ABI, Four_TokenManager_V2_ABI, WETHABI, getQuoteABI, UniChainsV4, getSwapMethod } from '~/utils/wallet/utils/abi'
+import { ERC20ABI, SwapABI, QuoteABI, SunPump_Launchpad_ABI, SunPump_Router_ABI, Four_TokenManagerHelper_V2_ABI, ERC314ABI, Four_TokenManager_V1_ABI, Four_TokenManager_V2_ABI, WETHABI, getQuoteABI, UniChainsV4, getSwapMethod, PopMeFun_ABI } from '~/utils/wallet/utils/abi'
 import { QuoteAddress } from '~/utils/wallet/utils/constants'
 import BigNumber from 'bignumber.js'
 import { PublicKey } from '@solana/web3.js'
@@ -10,6 +10,7 @@ import { TronContract, confirmTronTx } from '~/utils/wallet/utils/tronContract'
 import { getFeeIn } from '~/utils'
 import { getTonTokenBalance, getTonTokenList } from '~/utils/wallet/ton'
 import { getTonTokenInfo } from './ton'
+import { getTokensPnl } from '../bot'
 
 export * from './sui'
 
@@ -43,8 +44,10 @@ export const getUserBalance = createCacheRequest(async function(
     hide_small = 0
   }): Promise<GetUserBalanceResponseResult> {
   let tonAddressId = user_ids.find((i: string) => i?.endsWith?.('-ton'))
-  let otherUserIds = user_ids?.filter((i: string) => !i?.endsWith?.('-ton'))
+  let polygonAddressId = user_ids.find((i: string) => i?.endsWith?.('-polygon'))
+  let otherUserIds = user_ids?.filter((i: string) => !i?.endsWith?.('-ton') && !i?.endsWith?.('-polygon'))
   let tonTokenList: any[] = []
+  let polygonTokenList: any[] = []
   let _tokens: any = {
     data: [],
     total: tonTokenList?.length || 0,
@@ -53,12 +56,20 @@ export const getUserBalance = createCacheRequest(async function(
   }
   return Promise.all([(async () => {
     if (tonAddressId && pageNO === 1) {
-      tonTokenList = await getTonTokenList(getAddressAndChainFromId(tonAddressId)?.address).catch(async () => [])
-      tonTokenList = tonTokenList?.map(i => ({...i, total_profit: '0', total_profit_ratio: '--', average_purchase_price_usd: '--' }))?.filter(i => {
+      tonTokenList = await getTonTokenList(getAddressAndChainFromId(tonAddressId)?.address, 'all', true).catch(async () => [])
+      tonTokenList = tonTokenList?.map(i => ({...i, total_profit: i.total_profit || '0', total_profit_ratio: i.total_profit_ratio || '--', average_purchase_price_usd: i.average_purchase_price_usd || '--' }))?.filter(i => {
          return new BigNumber(i?.balance_usd || 0).gte(hide_small || 0)
       })
     }
     return tonTokenList
+  })(),(async () => {
+    if (polygonAddressId && pageNO === 1) {
+      polygonTokenList = await getUserTokenBalanceList(getAddressAndChainFromId(polygonAddressId)?.address, 'polygon', true).catch(async () => [])
+      polygonTokenList = polygonTokenList?.map(i => ({...i, total_profit: i.total_profit || '0', total_profit_ratio: i.total_profit_ratio || '--', average_purchase_price_usd: i.average_purchase_price_usd || '--' }))?.filter(i => {
+        return new BigNumber(i?.balance_usd || 0).gte(hide_small || 0)
+      })
+    }
+    return polygonTokenList
   })(), (async () => {
     const { $api } = useNuxtApp()
     if (otherUserIds?.length > 0) {
@@ -77,15 +88,13 @@ export const getUserBalance = createCacheRequest(async function(
     }
     return _tokens
   })()]).then(async (res) => {
-    console.log('tonTokenList', tonTokenList, res)
-    console.log('_tokens', _tokens)
-    if (tonTokenList?.length > 0) {
+    if (tonTokenList?.length > 0 || polygonTokenList?.length > 0) {
       return {
         ..._tokens,
-        data: [...(_tokens.data || []), ...tonTokenList].sort((a, b) => {
+        data: [...(_tokens.data || []), ...tonTokenList, ...polygonTokenList].sort((a, b) => {
           return (b[sort] - a[sort]) * (sort_dir === 'desc' ? 1 : 1)
         }),
-        total: _tokens.total + tonTokenList?.length
+        total: _tokens.total + tonTokenList?.length + polygonTokenList?.length
       }
     } else {
       return _tokens
@@ -213,10 +222,11 @@ export const getTokenDetails= createCacheRequest(async function (data1: {
   tokenAddress: string
   chain: string
   spender?: string
+  walletAddress?: string
 }) {
   const { tokenAddress, chain, spender } = data1
   const canSwapChain = isEvmChain(chain) || chain === 'solana' || chain === 'tron' || chain === 'sui' || chain === 'ton'
-  const account = useWalletStore().address
+  const account = data1.walletAddress || useWalletStore().address
   if (!chain || !tokenAddress || !canSwapChain) {
     return {
       symbol: '',
@@ -652,6 +662,81 @@ export async function getBalanceList(tokenArr: string[], chain = useWalletStore(
 
   return balanceList.map(i => (i !== null && i) ? i.toString() : '0')
 }
+
+export const getUserTokenBalanceList = createCacheRequest(async function(address:string, chain:string, isGetPnL = false) {
+  if (!address || !chain) {
+    return []
+  }
+  let userBalanceTokens: any[] = []
+  return getUserSwapTokenList(address, chain).then(res => {
+    userBalanceTokens = res?.map?.(i => ({...i, price: i?.current_price_usd || 0}))
+    if (userBalanceTokens.length > 0 && (/^0x[0-9a-zA-Z]{40}$/.test(address) || isValidAddress(address, 'tron'))) {
+      return getBalanceList(userBalanceTokens.map(i => i.token || ''), chain, address).then(async res1 => {
+        userBalanceTokens = userBalanceTokens?.map?.((i, k) => {
+          let _value = formatUnits(res1[k], i?.decimals || 0)
+          let _value_usd = new BigNumber(_value).times(i?.price || 0).toFixed()
+          return {...i, value: _value, value_usd: _value_usd, balance: _value, balance_usd: _value_usd}
+        })?.filter(j => !!Number(j.value))
+        if (isGetPnL) {
+          try {
+            let _tokens = userBalanceTokens.map(i => {
+              return {
+                token: i.token || i.address,
+                balance: i.value || '0'
+              }
+            })
+            let nativeIndex = _tokens.findIndex(i => i.token === NATIVE_TOKEN)
+            if (nativeIndex >= 0) {
+              _tokens.splice(nativeIndex, 1)
+            }
+            let pnls = await getTokensPnl({
+              tokens: _tokens,
+              chain,
+              walletAddress: address,
+              days: 30
+            })
+            if (nativeIndex >= 0) {
+              pnls.splice(nativeIndex, 0, {
+                ...userBalanceTokens[nativeIndex],
+                token: NATIVE_TOKEN,
+                balance: userBalanceTokens[nativeIndex]?.value || '0',
+              } as any)
+            }
+            pnls = pnls?.map?.((res, k) => {
+              let item = userBalanceTokens[k]
+              return {
+                ...res,
+                total_profit: res?.profit || '--',
+                unrealized_profit: res?.profitUnrealized || '0',
+                realized_profit: res?.profitRealized || '0',
+                balance_amount: item?.balance || item?.value || '0',
+                balance_usd: item?.balance_usd || '0',
+                total_profit_ratio: res?.profitRatio || '--',
+                unrealized_ratio: res?.unrealizedRatio || '0',
+                realized_ratio: res?.realizeRatio || '0',
+                total_purchase_usd: res?.totalBuyUsd || '0',
+                total_sold_usd: res?.totalSellUsd || '0',
+                balance_ratio: res?.balanceRatio || '0',
+                average_purchase_price_usd: res?.avgBuyPrice || '--',
+                average_sold_price_usd: res?.avgSellPrice || '0',
+                total_purchase: res?.totalBuyAmount || '0',
+                bought: res?.totalBuyAmount || '0',
+                total_sold: res?.totalSellAmount || '0',
+                sold: res?.totalSellAmount || '0',
+              }
+            })
+            userBalanceTokens = userBalanceTokens?.map?.((i, k) => ({...i, ...(pnls[k] || {})}))
+          } catch (err) {
+            console.log(err)
+          }
+        }
+        return userBalanceTokens
+      })
+    } else {
+      return userBalanceTokens
+    }
+  })
+}, 2000)
 
 // query swap token
 export function getBestRouteV2(from_token: string, to_token: string, chain: string, max_hops = 3, max_routes = 6): Promise<Array<{
@@ -1808,5 +1893,177 @@ export async function xFlapSwap({fromToken, toToken, fromAmount}: { fromToken: a
       isAmountOut: false
     },
     isXflapswap: true
+  }
+}
+
+
+export async function quoteCookPump({from_token, to_token, amountIn, amountOut}: { from_token: string; to_token: string; amountIn: string ; amountOut: string}, chain = useWalletStore().chain) {
+  if ([from_token, to_token].includes(NATIVE_TOKEN) && from_token !== to_token && (amountIn || amountOut)) {
+    let { _provider } = getProvider(chain)
+    let token = [from_token, to_token].find(i => i !== NATIVE_TOKEN)
+    const CookPumpABI = [
+      "function buyTokens(address token, uint256 minTokens, bool isInsurance, string memo) payable",
+      "function sellTokens(address token, uint256 tokenAmount, uint256 minEth)",
+      "function getTokenOutputAmount(address tokenAddress, uint256 inputAmount, bool isInsurance) view returns (uint256)",
+      "function getJuOutputAmount(address tokenAddress, uint256 inputAmount) view returns (uint256)"
+    ]
+    const CookPumpRoute = '0xaF2F76f06E27BE138Bd5310ec6553E2c93ec19F4'
+    let CookPumpToken = new Contract(CookPumpRoute, CookPumpABI, _provider)
+    let isBuy = from_token === NATIVE_TOKEN
+    if (amountIn) {
+      if (isBuy) {
+        return CookPumpToken.getTokenOutputAmount(token, amountIn, false).then(async res => res.toString())
+      } else {
+        return CookPumpToken.getJuOutputAmount(token, amountIn).then(async res => res.toString())
+      }
+    }
+  } else {
+    return false
+  }
+}
+
+export async function cookPumpSwap({fromToken, toToken, fromAmount}: { fromToken: any; toToken: any; fromAmount: string | number }, slippage: number | string, chain = useWalletStore().chain) {
+  let signer = await getSigner()
+  let token = [fromToken.address, toToken.address].find(i => i !== NATIVE_TOKEN)
+  let isBuy = fromToken.address === NATIVE_TOKEN
+  const CookPumpABI = [
+    "function buyTokens(address token, uint256 minTokens, bool isInsurance, string memo) payable",
+    "function sellTokens(address token, uint256 tokenAmount, uint256 minEth)",
+    "function getTokenOutputAmount(address tokenAddress, uint256 inputAmount, bool isInsurance) view returns (uint256)",
+    "function getJuOutputAmount(address tokenAddress, uint256 inputAmount) view returns (uint256)"
+  ]
+  const CookPumpRoute = '0xaF2F76f06E27BE138Bd5310ec6553E2c93ec19F4'
+  let CookPumpToken = new Contract(CookPumpRoute, CookPumpABI, signer)
+  let amountOut = toToken.amount
+  let amountOutMin = new BigNumber(amountOut).times(new BigNumber(100).minus(slippage)).div(100).toFixed(0)
+  if (isBuy) {
+    let gas = await CookPumpToken.buyTokens.estimateGas(token, amountOutMin, false, '', { value: fromAmount })
+    let gasLimit = new BigNumber(gas.toString()).times('100').div('10').toFixed()
+    return {
+      swap: () => CookPumpToken.buyTokens(token, amountOutMin, false, '', { gasLimit, value: fromAmount }),
+      swapCallStatic: () => CookPumpToken.buyTokens.staticCall(token, amountOutMin, false, '', { value: fromAmount }),
+      gasValue: gasLimit.toString(),
+      swapInfo: {
+        fromToken: fromToken,
+        toToken: toToken,
+        fromAmount: formatUnits(fromAmount, fromToken.decimals),
+        toAmount: formatUnits(toToken.amount, toToken.decimals),
+        fromTokenAmount: fromAmount,
+        toTokenAmount: toToken.amount,
+        isAmountOut: false
+      },
+      isCookPump: true
+    }
+  } else {
+    let gas = await CookPumpToken.sellTokens.estimateGas(token, fromAmount, amountOutMin)
+    let gasLimit = new BigNumber(gas.toString()).times('100').div('10').toFixed()
+    return {
+      swap: () => CookPumpToken.sellTokens(token, fromAmount, amountOutMin, { gasLimit }),
+      swapCallStatic: () =>  CookPumpToken.sellTokens.staticCall(token, fromAmount, amountOutMin, { gasLimit }),
+      gasValue: gasLimit.toString(),
+      swapInfo: {
+        fromToken: fromToken,
+        toToken: toToken,
+        fromAmount: formatUnits(fromAmount, fromToken.decimals),
+        toAmount: formatUnits(toToken.amount, toToken.decimals),
+        fromTokenAmount: fromAmount,
+        toTokenAmount: toToken.amount,
+        isAmountOut: false
+      },
+      isCookPump: true
+    }
+  }
+}
+
+export async function quotePopMeFun({from_token, to_token, amountIn, amountOut}: { from_token: string; to_token: string; amountIn: string ; amountOut: string}, chain = useWalletStore().chain) {
+  if ([from_token, to_token].includes(NATIVE_TOKEN) && from_token !== to_token && (amountIn || amountOut)) {
+    let { _provider } = getProvider(chain)
+    let token = [from_token, to_token].find(i => i !== NATIVE_TOKEN)
+    let popMeFunRoute = new Contract('0x198C8099E0c2CE323a5513769e294f349B015cEE', PopMeFun_ABI, _provider)
+    let isBuy = from_token === NATIVE_TOKEN
+    const $t = getGlobalT()
+    // "function tryBuy(address _token, uint256 _amount) view returns (uint256 tokenAmountOut, uint256 refund)",
+    // "function trySell(address _token, uint256 _amount) view returns (uint256 ethAmountOut)",
+    if (!amountIn) {
+      return false
+    }
+    if (isBuy) {
+      // if (amountIn && BigNumber.from(amountIn).lte('1000000000000000')) {
+      //   return Promise.reject(i18n.global.t('fourMemeBuyError'))
+      // }
+      return popMeFunRoute.tryBuy(token, amountIn || '0').then(async res => {
+        console.log('bug result', amountOut || '0', amountIn || '0', res)
+        if (amountIn) {
+          if (Number(res?.tokenAmountOut) === 0) {
+            return Promise.reject($t('fourMemeBuyError'))
+          }
+          return {...res, amountOut: res?.tokenAmountOut.toString()}
+        }
+      })
+    } else {
+      console.log('popMeFunRoute', popMeFunRoute)
+      console.log('sell', token, amountIn || '0')
+      return popMeFunRoute.trySell(token, amountIn || '0').then(async res => {
+        console.log('sell result', res)
+        return {...res, amountOut: res?.toString()}
+      }).catch(err => {
+        console.log('err', err.message)
+        if (err?.message?.includes('reverted with panic code 17')) {
+          // 卖出 token 数量过少，不足以支付手续费
+          return Promise.reject($t('fourMemeSellError'))
+        }
+        return Promise.reject(err)
+      })
+    }
+  } else {
+    return false
+  }
+}
+
+export async function popMeFunSwap({fromToken, toToken, fromAmount}: { fromToken: any; toToken: any; fromAmount: string | number }, slippage: number | string, chain = useWalletStore().chain) {
+  let signer = await getSigner()
+  let token = [fromToken.address, toToken.address].find(i => i !== NATIVE_TOKEN)
+  let isBuy = fromToken.address === NATIVE_TOKEN
+  let popMeFunRoute = new Contract('0x198C8099E0c2CE323a5513769e294f349B015cEE', PopMeFun_ABI, signer)
+  let amountOut = toToken.amount
+  let amountOutMin = new BigNumber(amountOut).times(new BigNumber(100).minus(slippage)).div(100).toFixed(0)
+  if (isBuy) {
+    //  "function buyToken(address _token, uint256 _amount, uint256 _minAmountOut) payable",
+    let gas = await popMeFunRoute.buyToken.estimateGas(token, fromAmount, amountOutMin, { value: fromAmount })
+    let gasLimit = new BigNumber(gas.toString()).times('100').div('10').toFixed()
+    return {
+      swap: () => popMeFunRoute.buyToken(token, fromAmount, amountOutMin, { gasLimit, value: fromAmount }),
+      swapCallStatic: () => popMeFunRoute.buyToken.staticCall(token, fromAmount, amountOutMin, { value: fromAmount }),
+      gasValue: gasLimit.toString(),
+      swapInfo: {
+        fromToken: fromToken,
+        toToken: toToken,
+        fromAmount: formatUnits(fromAmount, fromToken.decimals),
+        toAmount: formatUnits(toToken.amount, toToken.decimals),
+        fromTokenAmount: fromAmount,
+        toTokenAmount: toToken.amount,
+        isAmountOut: false
+      },
+      isPopMeFun: true
+    }
+  } else {
+    // "function sellToken(address _token, uint256 _amount, uint256 _minAmountOut)",
+    let gas = await popMeFunRoute.sellToken.estimateGas(token, fromAmount, amountOutMin)
+    let gasLimit = new BigNumber(gas.toString()).times('100').div('10').toFixed()
+    return {
+      swap: () => popMeFunRoute.sellToken(token, fromAmount, amountOutMin, { gasLimit }),
+      swapCallStatic: () =>  popMeFunRoute.sellToken.staticCall(token, fromAmount, amountOutMin, { gasLimit }),
+      gasValue: gasLimit.toString(),
+      swapInfo: {
+        fromToken: fromToken,
+        toToken: toToken,
+        fromAmount: formatUnits(fromAmount, fromToken.decimals),
+        toAmount: formatUnits(toToken.amount, toToken.decimals),
+        fromTokenAmount: fromAmount,
+        toTokenAmount: toToken.amount,
+        isAmountOut: false
+      },
+      isPopMeFun: true
+    }
   }
 }

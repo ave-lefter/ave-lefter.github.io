@@ -27,12 +27,18 @@
           <component :is="SwapCom" />
         </div>
         <div class="p-15px pb-5px bg-[--secondary-bg] mt-1px">
-          <Pairs />
+          <Pairs @openFilterModal="openFilterModal"/>
         </div>
-        <Overview class="px-15px pb-10px bg-[--secondary-bg] mt-1px" />
+        <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg] mt-1px" />
         <div class=" bg-[--secondary-bg] flex-1" />
       </div>
     </el-scrollbar>
+    <el-dialog v-model="dialogVisible" :title="searchAmm" width="480">
+      <Pairs :search="searchAmm" :isInModal="true"/>
+      <template #footer>
+          <el-button type="primary" @click="dialogVisible = false" block class="w-full h-[48px]" size="large">{{ $t('confirm') }}</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -45,6 +51,9 @@ import Overview from './overview.vue'
 import BotSwap from './botSwap/index.vue'
 const Swap = defineAsyncComponent(() => import('./swap/index.vue'))
 
+const dialogVisible = shallowRef(false)
+
+const searchAmm=shallowRef('')
 const walletStore = useWalletStore()
 
 const SwapCom = computed(() => {
@@ -62,4 +71,10 @@ const tabs: { id: '5m' | '1h' | '4h' | '24h'; name: string }[] = [
   { id: '24h', name: '24H' },
 ]
 const tabActive = useLocalStorage('token_tab_active', '24h') as RemovableRef<'5m' | '1h' | '4h' | '24h'>
+
+const openFilterModal = (search:string) => {
+  console.log('openFilterModal',search)
+  dialogVisible.value=true
+  searchAmm.value=search
+}
 </script>

@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import type { BotChain } from '~/utils/types'
 import { createCacheRequest } from '#imports'
 import { getTonWalletBalance } from '~/utils/wallet/ton'
+import { getBalance, getBalanceList, getTokenDetails } from './swap'
 
 export function login(data: {
   username?: string
@@ -105,6 +106,40 @@ export function loginEmail(data: {
       needMnemonic: true,
       ...data
     }
+  })
+}
+
+// 人机校验
+export function loginEmailV2(data: {
+  email: string
+  password: string
+  captchaScene: string
+  captchaParam: string
+}): Promise<{
+  accessToken: string
+  refreshToken: string
+  emailAddress: string
+  evmAddress: string
+  tgUid: string
+  mnemonic?: string
+}> {
+  const { $api } = useNuxtApp()
+  const locale = useLocaleStore().locale
+  const body = {
+    source: 'web',
+    language: locale?.includes?.('zh-') ? 'cn' : 'en',
+    needMnemonic: true,
+    ...data
+  }
+  Reflect.deleteProperty(body, 'captchaScene')
+  Reflect.deleteProperty(body, 'captchaParam')
+  return $api('/botapi/user/emailLoginV2', {
+    method: 'post',
+    headers: {
+      'X-Captcha-Scene': data.captchaScene,
+      'X-Captcha-Param': data.captchaParam
+    },
+    body: body
   })
 }
 
@@ -390,11 +425,25 @@ export function bot_updateWebConfig(data: { chain?: string, webConfig?: string }
 //   })
 // }
 
-export const bot_getTokenBalance = createCacheRequest(function(data: {
+export const bot_getTokenBalance = createCacheRequest(async function(data: {
   chain: string
   walletAddress: string
   tokens: string[]
 }) {
+  if (data.chain === 'polygon') {
+    await sleep(500)
+    return Promise.all(data.tokens.map(async (i: string) => {
+      return {
+        token: i,
+        chain: data.chain,
+        ...(await getTokenDetails({
+          tokenAddress: i,
+          chain: data.chain,
+          walletAddress: data.walletAddress
+        }))
+      }
+    }))
+  }
   const { $api } = useNuxtApp()
   return $api('/botapi/swap/getTokenBalance', {
     method: 'post',
@@ -442,33 +491,58 @@ export const bot_getApprove = createCacheRequest(function(params: {
   })
 }, 500)
 
-export const bot_getChainsTokenBalance = createCacheRequest(function(params) {
+export const bot_getChainsTokenBalance = createCacheRequest(async function(params: Array<{
+  chain: string
+  tokens: string[]
+  walletAddress: string
+}>) {
   const { $api } = useNuxtApp()
-  return  $api('/botapi/swap/getChainsTokenBalance', {
+  let exChains = ['polygon']
+  let paramsChains = params?.filter((i) => !exChains.includes(i.chain)) || []
+  let res1 = paramsChains?.length > 0 ? await $api('/botapi/swap/getChainsTokenBalance', {
     method: 'post',
-    body: params
-  }).then(res => {
-    return Promise.all((res || []).map(async (i: { chain: string; token: any; walletAddress: any; balance: any }) => {
-      if (i.chain === 'ton') {
-        return {
-          ...i,
-          balance: await getTonWalletBalance({token: i.token, wallet: i.walletAddress}).catch(async () => 0) || i?.balance || 0
-        }
-      } else {
-        return {...i}
+    body: paramsChains
+  }) : []
+  const res = (res1 || [])
+  let paramsExChains = params?.filter((i) => exChains.includes(i.chain)) || []
+  if (paramsExChains?.length > 0) {
+    paramsExChains.forEach((i) => {
+      let k = params.findIndex((j) => j.chain === i.chain)
+      res.splice(k, 0, {
+        chain: i.chain,
+        token: i.tokens[0],
+        walletAddress: i.walletAddress,
+        balance: 0
+      })
+    })
+  }
+
+  return Promise.all((res || []).map(async (i: { chain: string; token: any; walletAddress: any; balance: any }) => {
+    if (i.chain === 'ton') {
+      return {
+        ...i,
+        balance: await getTonWalletBalance({token: i.token, wallet: i.walletAddress}).catch(async () => 0) || i?.balance || 0
       }
-    }))
-  })
+    } else if (i.chain === 'polygon') {
+      return {
+        ...i,
+        ...(await getTokenDetails({tokenAddress: i.token, chain: i.chain, walletAddress: i.walletAddress}).then(async res => ({...res, balance: res?.initBalance || 0})).catch(async () => ({balance: 0})))
+      }
+    } else {
+      return {...i}
+    }
+  }))
 }, 1000)
 
 // 查询sol bundle是否可用
 // /swap/getBundleAvailable GET
-export function bot_getBundleAvailable() {
-  const { $api } = useNuxtApp()
-  return  $api('/botapi/swap/getBundleAvailable', {
-    method: 'get',
-    query: {}
-  })
+export async function bot_getBundleAvailable() {
+  // const { $api } = useNuxtApp()
+  // return  $api('/botapi/swap/getBundleAvailable', {
+  //   method: 'get',
+  //   query: {}
+  // })
+  return true
 }
 // 预授权代币
 export function bot_approve(data: {
@@ -884,6 +958,46 @@ export function getTokenPnl(body: {
 }> {
   const {$api} = useNuxtApp()
   return $api('/aveswap/v1/swap/getTokenPnl', {
+    method: 'post',
+    body
+  })
+}
+
+// 3.10 批量计算 pnl
+// 功能说明：计算盈利
+export function getTokensPnl(body: {
+  chain: string
+  tokens: Array<{
+    token: string
+    balance: string
+  }>
+  walletAddress: string
+  days: number
+}): Promise<Array<{
+  balance: string
+  chain: string
+  profit: string
+  profitRealized: string
+  profitUnrealized: string
+  token: string
+  walletAddress: string
+  avgBuyPrice: string
+  avgSellPrice: string
+  balanceRatio: string
+  realizeRatio: string
+  unrealizedRatio: string
+  totalSellUsd: string
+  totalBuyUsd: string
+  profitRatio: string
+  totalBuyAmount: string
+  totalSellAmount: string
+
+}>> {
+  const {$api} = useNuxtApp()
+  if (!body.tokens?.length) {
+    return Promise.resolve([])
+  }
+  return $api('/aveswap/v1/swap/getTokensPnl', {
     method: 'post',
     body
   })

@@ -116,7 +116,7 @@
 
       </li>
       <li>
-        <div>{{ $t('totalPnL') }}</div>
+        <div>{{ $t('unrealizedProfit') }}</div>
         <div
           :class="
             !Number(totalProfit || 0)
@@ -393,7 +393,7 @@ watch(activeTab, (val) => {
   }
 })
 onMounted(() => {
-  getHoldersList()
+  //getHoldersList()
 })
 onActivated(() => {
   if(activeTab.value === '-100' && !selfAddress.value) {

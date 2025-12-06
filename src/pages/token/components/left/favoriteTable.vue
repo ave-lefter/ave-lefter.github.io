@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import FavDialog from './favDialog.vue'
+import FavDialog from './favDialog2.vue'
 import {
   type GetUserFavoriteGroupsResponse,
   type GetFavListResponse,
@@ -12,7 +12,7 @@ import THead from './tHead.vue'
 import type { IPriceV2Response } from '~/api/types/ws'
 import { useEventBus } from '@vueuse/core'
 import { BusEventType, type IFavDialogEventArgs } from '~/utils/constants'
-
+import { useLocalStorage ,useStorage} from '@vueuse/core'
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 topEventBus.on(refresh)
 const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
@@ -70,6 +70,7 @@ const editVisible = shallowRef(false)
 const loading = shallowRef(false)
 const userFavoriteGroups = shallowRef<GetUserFavoriteGroupsResponse[]>([])
 const activeTab = shallowRef(0)
+const favoriteCondition = useStorage('favoriteCondition', {currentMode:'mcap'})
 const sort = shallowRef<{
   activeSort: number
   sortBy: 'symbol' | 'current_price_usd' | 'price_change' | null
@@ -86,6 +87,7 @@ const listStatus = ref({
 const favoritesList = shallowRef<
   (GetFavListResponse & {
     id: string
+    pool_circulating_supply: number
   })[]
 >([])
 const columns = computed(() => {
@@ -97,8 +99,9 @@ const columns = computed(() => {
       sort: true,
     },
     {
-      label: t('price') + '/' + t('Chg'),
-      value: 'current_price_usd',
+      label: (favoriteCondition.value.currentMode==='mcap'?t('mCap'):t('price')) + '{currentMode}/' + t('Chg'),
+      value: favoriteCondition.value.currentMode === 'mcap' ? 'pool_circulating_supply' : 'current_price_usd',
+      currentMode: favoriteCondition.value.currentMode,
       flex: 'flex-1 justify-end',
       sort: true,
     },
@@ -199,6 +202,7 @@ async function loadMoreFavorites() {
         .map((i) => ({
           ...i,
           id: i.token + '-' + i.chain,
+          pool_circulating_supply: (i.total - i.lock_amount - i.burn_amount - i.other_amount) * i.current_price_usd,
         }))
         .filter(
           (i) =>
@@ -234,6 +238,14 @@ async function loadMoreFavorites() {
 function resetListStatus() {
   listStatus.value.finished = false
   listStatus.value.pageNo = 1
+}
+function toggleMode(mode: string) {
+  if(favoriteCondition.value.currentMode === 'mcap'){
+    favoriteCondition.value.currentMode = 'price'
+  }else{
+    favoriteCondition.value.currentMode = 'mcap'
+  }
+  console.log('toggleMode', mode)
 }
 </script>
 
@@ -273,7 +285,7 @@ function resetListStatus() {
         @click.self="onEdit"
       />
     </div>
-    <THead v-model:sort="sort" :columns="columns" />
+    <THead v-model:sort="sort" :columns="columns" :toggleMode="toggleMode"/>
     <el-scrollbar ref="otherListArea" :height="scrollbarHeight">
       <div
         v-infinite-scroll="loadMoreFavorites"
@@ -318,7 +330,8 @@ function resetListStatus() {
               </div>
             </div>
             <div class="flex-1 text-12px text-right">
-              <div>${{ formatNumber(row.current_price_usd || 0, 4) }}</div>
+              <div v-if="favoriteCondition.currentMode!=='mcap'">${{ formatNumber(row.current_price_usd || 0, 4) }}</div>
+              <div v-else>${{ formatNumber(row.pool_circulating_supply || 0, 2) }}</div>
               <div
                 :class="`flex-1 text-right text-12px
                 ${getColorClass(row.price_change)}

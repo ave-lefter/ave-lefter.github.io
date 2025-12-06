@@ -8,6 +8,10 @@ export function botOnRequest({ options, request }: MyFetchContext){
   const url = request as string
   const lang1 = (lang == 'zh-cn' || lang == 'zh-tw') ? 'cn' : 'en'
   options.headers.set('lang', lang1)
+  const ave_token = localStorage.getItem('ave_token')
+  if (ave_token) {
+    options.headers.set('X-Auth', ave_token)
+  }
   if (url?.includes('refreshNewToken') && botStore.refreshToken) {
     options.headers.set('Authorization', `Bearer ${botStore.refreshToken}`)
   } else if (!url?.includes('login') && botStore.accessToken) {

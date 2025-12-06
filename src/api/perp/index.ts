@@ -402,6 +402,11 @@ export async function getAccountDeleverageLight(): Promise<{
   }
 }> {
   const perpStore = usePerpStore()
+  if (!(perpStore.isLogin && perpStore.userInfo?.id)) {
+    return {
+      positionContractIdToLightNumberMap: {}
+    }
+  }
   return api('/api/v1/private/account/getAccountDeleverageLight', {
     method: 'get',
     query: {

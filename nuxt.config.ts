@@ -108,6 +108,7 @@ export default defineNuxtConfig({
     '@/plugins/tooltip.client.ts',
     '@/plugins/popover.client.ts',
     '@/plugins/dialog.client.ts',
+    '@/plugins/aliyun-captcha.client.ts',
   ],
   // unocss: {
   //   nuxtLayers: true,

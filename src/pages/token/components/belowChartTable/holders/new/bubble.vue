@@ -29,7 +29,7 @@
     "
     :src="`https://app.insightx.network/bubblemaps/${
         chain == 'bsc' ? 56 : chain
-    }/${tokenAddress}`"
+    }/${tokenAddress}?embed_id=9Pt12qHMl1KDeK`"
     allow="clipboard-write"
     />
   </el-dialog>
