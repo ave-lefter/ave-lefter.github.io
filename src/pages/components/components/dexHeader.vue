@@ -26,7 +26,7 @@ const popoverVisible = ref(false)
 const searchKey = ref('')
 const filteredAmmList = computed(()=>{
     return ammOptions.value.filter((el)=>{
-        return el.show_name && el.show_name.includes(searchKey.value)
+        return el.show_name && el.show_name.toLowerCase().includes(searchKey.value.toLowerCase())
     })
 })
 const scrollbarRef = ref<InstanceType<typeof ElScrollbar>>()
