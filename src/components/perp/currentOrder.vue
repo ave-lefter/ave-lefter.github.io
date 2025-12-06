@@ -114,7 +114,7 @@ watch(
   (val) => {
     if (route.name === 'perp-id') {
       let result: Order[] = val['trade-event']?.content?.data?.order || []
-      result = perpStore.order?.filter(i => !result.some(el => el.id === i.id)).concat(...result)?.filter(i => i.status !== 'CANCELED')
+      result = perpStore.order?.filter(i => !result.some(el => el.id === i.id)).concat(...result)?.filter(i => i.status !== 'CANCELED' && i.type !== 'MARKET')
       result = result?.map?.((el) => {
         const isLong = el.side === 'SELL'
         // 止盈

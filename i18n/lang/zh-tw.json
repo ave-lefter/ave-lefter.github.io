@@ -1684,5 +1684,8 @@
   "shortExpectedLossUSD": "做空預計虧損 {n} USDT",
   "expectedLossUSD": "預計虧損 {n} USD",
   "expectedProfitUSD": "預計盈利 {n} USD",
-  "takeProfitStopLoss2": "倉位止盈止損"
+  "takeProfitStopLoss2": "倉位止盈止損",
+  "closePositionSubmitted": "市價平倉訂單已成交",
+  "marketPriceClosePosition": "確定以市價平倉以下倉位嗎",
+  "limitPriceClosePosition": "限價平倉訂單已創建"
 }

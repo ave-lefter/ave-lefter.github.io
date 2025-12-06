@@ -219,7 +219,7 @@ export interface Order {
   price: string                       // 委托价格
   size: string                        // 委托数量
   clientOrderId: string               // 客户自定义ID
-  type: 'LIMIT'                         // 委托单类型
+  type: 'LIMIT' | 'MARKET'                                      // 委托单类型
   timeInForce: 'GTC'                    // 委托单执行策略
   reduceOnly: false                     // 是否是只减仓委托
   triggerPrice: string                // 触发价格

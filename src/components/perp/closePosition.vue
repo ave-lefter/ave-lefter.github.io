@@ -96,7 +96,7 @@ function _createOrder() {
     loading.value = true
     createOrder(data).then(res => {
       console.log('createTpOrder result', res)
-      ElNotification({ type: 'success', message: isLimit.value ? '限价平仓订单已创建' : '市价平仓订单已成交' })
+      ElNotification({ type: 'success', message: isLimit.value ? t('limitPriceClosePosition') : t('closePositionSubmitted') })
       visible.value = false
     }).catch((err) => {
       ElNotification({ type: 'error', message: err?.message })

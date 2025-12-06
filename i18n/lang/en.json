@@ -1700,5 +1700,8 @@
   "shortExpectedLossUSD": "Expected loss from shorting {n} USDT",
   "expectedLossUSD": "Expected Loss {n} USD",
   "expectedProfitUSD": "Expected Profit {n} USD",
-  "takeProfitStopLoss2": "Position TP/SL"
+  "takeProfitStopLoss2": "Position TP/SL",
+  "closePositionSubmitted": "The market price closing order has been completed",
+  "marketPriceClosePosition": "Are you sure you want to close the following positions at market prices?",
+  "limitPriceClosePosition": "Limit closing order has been created"
 }

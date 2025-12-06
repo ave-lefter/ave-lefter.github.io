@@ -1713,5 +1713,8 @@
   "longExpectedLossUSD": "做多预计亏损 {n} USD",
   "shortExpectedLossUSD": "做空预计亏损 {n} USDT",
   "expectedLossUSD": "预计亏损 {n} USD",
-  "expectedProfitUSD": "预计盈利 {n} USD"
+  "expectedProfitUSD": "预计盈利 {n} USD",
+  "closePositionSubmitted": "市价平仓订单已成交",
+  "marketPriceClosePosition": "确定以市价平仓以下仓位吗",
+  "limitPriceClosePosition": "限价平仓订单已创建"
 }
