@@ -2,7 +2,6 @@
 import BigNumber from 'bignumber.js'
 import { getAccountDeleverageLight } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
-import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
 import { usePerpWsPubStore } from '~/stores/perp/wsPub'
 import StopProfitLoss from './stopProfitLoss.vue'
 import StopTable from './stopTable.vue'
@@ -15,7 +14,6 @@ const props = defineProps<{
 let timer: { id: number | null } = { id: null }
 const { t } = useI18n()
 const perpStore = usePerpStore()
-const wsPrivateStore = usePerpWsPrivateStore()
 const wsPublicStore = usePerpWsPubStore()
 const contractLevelMap = shallowRef<{
   [key: string]: number
@@ -70,8 +68,8 @@ watch(
                   )
                 )
         el.unrealizedPnl = profitWithFee
-          .minus(new BigNumber(el.openFee).abs())
-          .minus(new BigNumber(el.fundingFee).abs())
+          // .minus(new BigNumber(el.openFee).abs())
+          // .minus(new BigNumber(el.fundingFee).abs())
           .toString()
         el.unrealizedPnlRate = new BigNumber(el.unrealizedPnl)
           .div(new BigNumber(el.openValue).abs())
