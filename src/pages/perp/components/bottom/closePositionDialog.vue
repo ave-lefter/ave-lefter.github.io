@@ -8,7 +8,7 @@
   >
     <template #header>
       <div class="flex-start items-center">
-        <span class="text-20px font-500 cursor-pointer">确定以市价平仓以下仓位吗</span>
+        <span class="text-20px font-500 cursor-pointer">{{ t('marketPriceClosePosition') }}</span>
       </div>
     </template>
     <div class="content">
@@ -20,7 +20,7 @@
               {{ typeDict[item.contractId] }}</span
             >
             <span class="ml-5px color-[--secondary-text] text-12px">
-              {{ getLeverageFromContractId(item.contractId) }}x</span
+              {{ getLeverageFromContractId(item.contractId) }}X</span
             >
           </div>
           <div class="flex-between mt-5px">
@@ -48,7 +48,7 @@
         <el-button class="flex-1" style="height: 48px" @click.stop.prevent="visible = false">
           {{ $t('cancel') }}
         </el-button>
-        <el-button class="flex-1" style="height: 48px" type="primary" @click.stop.prevent="submit">
+        <el-button class="flex-1" style="height: 48px" type="primary" :loading="loading" @click.stop.prevent="submit">
           {{ $t('confirm') }}
         </el-button>
       </div>
@@ -58,6 +58,10 @@
 
 <script setup lang="ts">
 import { usePerpStore } from '~/stores/perp'
+import { createOrder } from '~/api/perp/utils'
+import type { Position } from '~/stores/perp/type'
+import type { PerpOrderParams } from '~/api/perp/typs'
+import BigNumber from 'bignumber.js'
 const props = defineProps({
   modelValue: Boolean,
 })
@@ -82,7 +86,42 @@ const typeDict = computed(() => {
   contractMap.ALL = t('all')
   return contractMap
 })
-function submit() {}
+
+const loading = ref(false)
+
+function _createOrder(position: Position) {
+  const symbol = typeDict.value[position.contractId] + ' ' + getLeverageFromContractId(position.contractId) + 'X '
+  const data: PerpOrderParams = {
+    type: 'MARKET',
+    size: BigNumber(position.openSize || '0').abs().toFixed(),
+    price: String('0'),
+    side:  BigNumber(position?.openSize || '0').gte(0) ? 'SELL' : 'BUY',
+    contractId: position?.contractId || '',
+    reduceOnly: false,
+    isPositionTpsl: false,
+    isSetOpenTp: false,
+    isSetOpenSl: false
+  }
+  return createOrder(data).then(async res => {
+    console.log('createTpOrder result', res)
+    ElNotification({ type: 'success', message: symbol + t('closePositionSubmitted') })
+    return res
+  }).catch(async (err) => {
+    ElNotification({ type: 'error', message: err?.message })
+    return ''
+  })
+}
+
+function submit() {
+  loading.value = true
+  Promise.all(position.value.map(item => _createOrder(item))).then((res) => {
+    if (res?.every(i => i)) {
+      visible.value = false
+    }
+  }).finally(() => {
+    loading.value = false
+  })
+}
 </script>
 
 <style lang="scss" scoped></style>

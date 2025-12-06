@@ -91,54 +91,54 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
           wsResult[msg.type] = msg
         }
         // 处理用户数据更新
-      if (msg.type === 'trade-event' || msg.type === 'assets-event') {
-        const { collateral, position, order, withdraw, transferOut } = msg.content?.data || {}
+        if (msg.type === 'trade-event' || msg.type === 'assets-event') {
+          const { collateral, position, order, withdraw, transferOut } = msg.content?.data || {}
 
-        // 更新资产信息
-        if (collateral as Collateral[]) {
-          if (msg.content?.event === 'Snapshot') {
-            updateCollateralInfo(collateral)
-          } else if (msg.content?.event === 'ORDER_UPDATE' && (collateral as Collateral[])?.length > 0) {
-            updateCollateralInfo(collateral)
+          // 更新资产信息
+          if (collateral as Collateral[]) {
+            if (msg.content?.event === 'Snapshot') {
+              updateCollateralInfo(collateral)
+            } else if (msg.content?.event === 'ORDER_UPDATE' && (collateral as Collateral[])?.length > 0) {
+              updateCollateralInfo(collateral)
+            }
           }
-        }
 
-        // 更新持仓信息
-        if (msg.content?.event === 'Snapshot' && position as Position[]) {
-          updatePositionInfo(position)
-        }
+          // 更新提币信息
+          if (msg.content?.event === 'Snapshot' && withdraw as Withdraw[]) {
+            perpStore.withdraw = withdraw
+          }
 
-        // 更新提币信息
-        if (msg.content?.event === 'Snapshot' && withdraw as Withdraw[]) {
-          perpStore.withdraw = withdraw
-        }
+          // 更新转出信息
+          if (msg.content?.event === 'Snapshot' && transferOut as TransferOut[]) {
+            perpStore.transferOut = transferOut
+          }
 
-        // 更新转出信息
-        if (msg.content?.event === 'Snapshot' && transferOut as TransferOut[]) {
-          perpStore.transferOut = transferOut
-        }
+          // 更新订单信息
+          if (msg.content?.event === 'Snapshot' && order as Order[]) {
+            updateOrderInfo(order)
+          } else if(msg.content?.event === 'ORDER_UPDATE' && order as Order[]) {
+            const canceledOrder: Order[] = (order as Order[]).filter((i) => i.status === 'CANCELED')
+            console.log('canceledOrder', canceledOrder)
+            // 取消订单
+            if(canceledOrder.length > 0){
+              perpStore.order = perpStore.order.filter((i) => !canceledOrder.some(j => j.id === i.id) && i.type !== 'MARKET')
+              console.log('perpStore.order', perpStore.order)
+            } else {
+              // 加仓、平仓、止盈、止损
+              perpStore.order.push(...((order as Order[])?.filter(i => i.type !== 'MARKET') || []))
+              getTotalAssets()
+            }
+          }
 
-        // 更新订单信息
-        if (msg.content?.event === 'Snapshot' && order as Order[]) {
-          updateOrderInfo(order)
-        } else if(msg.content?.event === 'ORDER_UPDATE' && order as Order[]) {
-          const canceledOrder: Order[] = (order as Order[]).filter((i) => i.status === 'CANCELED')
-          console.log('canceledOrder', canceledOrder)
-          // 取消订单
-          if(canceledOrder.length > 0){
-            perpStore.order = perpStore.order.filter((i) => !canceledOrder.some(j => j.id === i.id))
-            console.log('perpStore.order', perpStore.order)
-          } else {
-            // 加仓、平仓、止盈、止损
-            perpStore.order.push(...order)
-            getTotalAssets()
-            // 更新持仓
-            if(position?.length > 0){
+          // 更新持仓信息
+          if (position as Position[]) {
+            if (msg.content?.event === 'Snapshot') {
+              updatePositionInfo(position)
+            } else if (msg.content?.event === 'ORDER_UPDATE' && (position as Position[])?.length > 0) {
               updatePositionInfo(position, true)
             }
           }
         }
-      }
       }
     }, 'perpWsPub')
   }
@@ -188,6 +188,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
     } else {
       perpStore.position = position
     }
+    perpStore.order = perpStore.order?.filter?.((i) => position.some((j) => j.contractId === i.contractId) && i.type !== 'MARKET') || []
   }
 
   function updateOrderInfo(order: Order[]) {

@@ -331,10 +331,11 @@ const lastPrice = computed(() => {
 })
 
 
-watch(() => perpStore.perp?.contractId || '', (contractId) => {
-  if (contractId) {
+watch([() => perpStore.perp?.contractId || '', maxLeverage], () => {
+  if (perpStore.perp?.contractId) {
     form.price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || ''
     form.amount = ''
+    percent.value = 0
     tempData.tpPercent = 0
     tempData.tpPercent1 = 0
     tempData.slPercent = 0
@@ -345,6 +346,8 @@ watch(() => perpStore.perp?.contractId || '', (contractId) => {
     }
   }
 })
+
+
 const tpForm = reactive<{
   triggerPrice?: string | number
   triggerPriceType: string

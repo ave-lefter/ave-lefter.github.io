@@ -4,12 +4,12 @@ import ClosePositionDialog from './closePositionDialog.vue'
 import { usePerpStore } from '@/stores/perp'
 import { useStorage } from '@vueuse/core'
 
-const { contractId, isCancelOrder, position, orderList,order } = storeToRefs(usePerpStore())
+const { contractId, isCancelOrder, position ,order } = storeToRefs(usePerpStore())
 const walletStore = useWalletStore()
 const { t } = useI18n()
 const perpStore = usePerpStore()
 const dialogVisible= shallowRef(false)
-const tabs = computed(() => {
+const tabs = computed<Array<{ label: string; value: keyof typeof componentsMap }>>(() => {
   return [
     { label: t('holding')+`(${positionLength.value})`, value: 'holding' },
     { label: t('currentOrder') + `(${orderListLength.value})`, value: 'currentOrder' },
@@ -28,8 +28,8 @@ const componentsMap = {
   historyOrder: defineAsyncComponent(() => import('@/components/perp/historyOrder.vue')),
   closePnl: defineAsyncComponent(() => import('@/components/perp/closePnl.vue')),
   positionHistory: defineAsyncComponent(() => import('@/components/perp/positionHistory.vue')),
-}
-const selectTab = ref('holding')
+} as const
+const selectTab = ref<keyof typeof componentsMap>('holding')
 const isAll = shallowRef(true)
 const searchParams = useStorage(
   'perp-kline-searchParams',
@@ -51,12 +51,12 @@ const searchParams = useStorage(
 const filteredSearchParams = (key: keyof typeof searchParams.value) => {
   const params = { ...searchParams.value[key] }
   if (params.filterContractIdList === 'ALL') {
-    delete params.filterContractIdList
+    Reflect.deleteProperty(params, 'filterContractIdList')
   }
   for (const key in params) {
     if (Object.prototype.hasOwnProperty.call(params, key)) {
-      if (!params[key]) {
-        delete params[key]
+      if (!params[key as 'filterContractIdList']) {
+        Reflect.deleteProperty(params, key)
       }
     }
   }
@@ -96,7 +96,7 @@ watch(
     }
   }
 )
-const getList = async () => {}
+
 </script>
 
 <template>
@@ -113,18 +113,18 @@ const getList = async () => {}
         >
       </div>
       <div class="flex items-center justify-end gap-12px">
-        <el-checkbox class="checkbox-sm" v-model="isAll" :label="$t('showAllPositions')" />
-        <el-button class="close-position" v-if="selectTab == 'holding'"   :disabled="position?.length == 0" @click.stop.prevent="dialogVisible = true">{{ $t('closePositionAll') }}</el-button>
+        <el-checkbox v-model="isAll" class="checkbox-sm" :label="$t('showAllPositions')" />
+        <el-button v-if="selectTab == 'holding'" class="close-position"   :disabled="position?.length == 0" @click.stop.prevent="dialogVisible = true">{{ $t('closePositionAll') }}</el-button>
         <el-button
-          class="close-position"
           v-else-if="selectTab == 'currentOrder'"
+          class="close-position"
           :disabled="perpStore.orderList?.length == 0"
           @click.stop.prevent="isCancelOrder = true"
           >{{ $t('cancelAll') }}</el-button
         >
         <el-button
+          v-else-if="walletStore.address && walletStore.chain"
           class="close-position"
-          v-else="selectTab == 'currentOrder'"
           @click.stop="
             $router.push(`/address/${walletStore.address}/${walletStore.chain}?t=${selectTab}`)
           "
