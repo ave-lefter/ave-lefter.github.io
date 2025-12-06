@@ -35,7 +35,7 @@
      </div>
      <div class="text-14px flex-between mt-24px">
       <span class="color-[--third-text]">{{ $t('maxPositionCurrentLeverage') }}</span>
-      <span>{{ formatNumber(defaultLeverageNum.toString(), { decimals: 0, limit: 10}) }}USD</span>
+      <span>{{ Number(defaultLeverageNum) > 10**12 ? "∞": formatNumber(defaultLeverageNum, { decimals: 0, limit: 10})+'USD' }}</span>
      </div>
       <div class="text-14px color-[--third-text] flex-between mt-24px">
         {{ $t('adjustLeverageTip1') }}
@@ -109,7 +109,8 @@ const defaultLeverageNum = computed(() => {
     inputLever: String(leverage.value)
   }
   const num = CoreCalculator.getRiskLimitTierMaxOpenQuantityWithLever(data)
-  return num.times(perp?.value?.oraclePrice || 0)
+  const result = num.times(perp?.value?.oraclePrice || 0)?.toString()
+  return result
 })
 const max = computed(() => {
   return Number(perp.value?.displayMaxLeverage || 0)
