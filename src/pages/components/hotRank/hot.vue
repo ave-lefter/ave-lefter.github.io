@@ -195,6 +195,9 @@ watch(()=>[globalStore.rankCommon.activeInterval],()=>{
 
 function getKlinePreviews() {
   const pair_ids = listData.value.map(el=>el.pair_id).toString()
+  if(!pair_ids.length){
+    return
+  }
   return klinePreviews({
     category:'u',
     interval:({

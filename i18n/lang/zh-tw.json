@@ -1525,5 +1525,7 @@
   "blackListPlaceHolder": "輸入開發者地址、代幣合約和關鍵字",
   "overLimit": "超過上限，建議確認是否誤填",
   "pairsLink": "跳轉區塊瀏覽器",
-  "searchSameAmm": "查看同類型池子"
+  "searchSameAmm": "查看同類型池子",
+  "resetTips": "重置將隱藏您自定義的字段，列表恢復默認顯示。篩選條件仍生效。 確認重置嗎?",
+  "confirmAgain": "二次确认"
 }
