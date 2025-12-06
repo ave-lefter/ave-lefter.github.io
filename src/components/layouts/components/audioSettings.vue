@@ -282,6 +282,7 @@ function toggleAllPlatforms() {
           </div>
           <div>
             <el-checkbox
+              v-if="audioSettings.notice.pumpChains.length > 0"
               :model-value="isAllPlatformsSelected"
               :indeterminate="isIndeterminatePlatforms"
               class="mb-2px mt-4px"

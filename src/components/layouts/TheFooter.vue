@@ -319,7 +319,8 @@ watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], ({msg}:{msg:
 })
 
 // 监听pump事件
-watch(() => wsStore.wsResult[WSEventType.PUMP_MIGRATED], ({msg}:{msg:GetSignalV2ListResponse}) => {
+watch(() => wsStore.wsResult[WSEventType.PUMP_MIGRATED], (msg:GetSignalV2ListResponse) => {
+  console.log('wsStore.wsResult[WSEventType.PUMP_MIGRATED]', JSON.parse(JSON.stringify(msg)))
   if(globalStore.audioSettings.notice.pumpNotice){
     const pumpChains = globalStore.audioSettings.notice.pumpChains
     const pumpPlatforms = globalStore.audioSettings.notice.pumpPlatforms
@@ -331,29 +332,34 @@ watch(() => wsStore.wsResult[WSEventType.PUMP_MIGRATED], ({msg}:{msg:GetSignalV2
 
 // 监听pump事件并弹窗
 function pumpToast(val:GetSignalV2ListResponse) {
+  const getSymbol = ()=>{
+    if(val.pair.target_token == val.pair.token0_address){
+      return val.pair.token0_symbol
+    }
+    return val.pair.token1_symbol
+  }
   const msg = ElMessage({
-    duration: 100000,
     icon: <img src={bellImg3} alt="" class="w-16px h-16px" />,
     placement: globalStore.audioSettings.notice.position as any,
     message: () => (
       <div
         class='inline-flex items-center gap-4px text-12px cursor-pointer'
         onClick={() => {
-          navigateTo(`/token/${val.token}-${val.chain}`)
+          navigateTo(`/token/${val.pair.target_token}-${val.chain}`)
         }}
       >
         <div class='flex items-center gap-4px relative'>
-          <TokenImg row={{ logo_url: '', chain: val.pair.token0_symbol, symbol: val.pair.token0_symbol }} token-class="w-24px h-24px" />
+          <TokenImg row={{ logo_url: val.pair.logo_url, chain: val.chain, symbol: getSymbol() }} token-class="w-28px h-28px" />
           <img
             src={getIconByPlatform(val.pair.platform_id)}
             alt=""
-            class="w-10px h-10px absolute right-0 bottom-0"
+            class="w-12px h-12px absolute right-0 bottom-0"
           />
         </div>
         <div class='ml-4px'>
-          <div class='text-14px'>{val.pair.token0_symbol} {t('pumpCompleted')}</div>
+          <div class='text-14px'>{getSymbol()} {t('pumpCompleted')}</div>
           <div class='text-12px color-[--secondary-text] mt-2px'>
-            {t('innerDiskTime')} { val.time - val.pair.publish_at <= 0 ? ' - ' : formatTime( val.time - val.pair.publish_at)}，
+            {t('innerDiskTime')} { val.time - val.pair.publish_at <= 0  || !val.pair.publish_at ? ' - ' : formatTime( val.time - val.pair.publish_at)}，
             {t('holders')} {val.pair.holders} ，
             {t('mCap')} {formatNumber(val.pair.market_cap || 0, 2)}
           </div>
@@ -363,41 +369,6 @@ function pumpToast(val:GetSignalV2ListResponse) {
   })
   messageQueue.add(msg)
 }
-
-// pumpToast({
-//   "amm": "meteoradbcpswap",
-//   "chain": "solana",
-//   "migrated_pair_address": "3qDvBsFRjMfeeqQVLXqmsTbRpUCHYpDD1s4WwWYoAWoX",
-//   "pair": {
-//     "amm": "meteoradammv2",
-//     "chain": "solana",
-//     "current_price_usd": 0,
-//     "holders": 154,
-//     "issue_platform": "believe.app",
-//     "market_cap": "550465.9146848112",
-//     "pair": "3qDvBsFRjMfeeqQVLXqmsTbRpUCHYpDD1s4WwWYoAWoX",
-//     "platform_id": "believe",
-//     "platform_show": "Believe",
-//     "publish_at": 1764896564,
-//     "reserve0": 29856553.833833,
-//     "reserve1": 120,
-//     "slot": 384538586,
-//     "tag": "meteoradbcpswap_king",
-//     "target_token": "61gLfJtsw4wdugH8UH5VrRpfgX41q1YTHT8S6zr8oYqo",
-//     "token0_address": "61gLfJtsw4wdugH8UH5VrRpfgX41q1YTHT8S6zr8oYqo",
-//     "token0_decimal": 6,
-//     "token0_price_usd": 0.0005579033191381628,
-//     "token0_symbol": "JOTCHUA",
-//     "token1_address": "So11111111111111111111111111111111111111112",
-//     "token1_decimal": 9,
-//     "token1_price_usd": 139.62178504337692,
-//     "token1_symbol": "SOL",
-//     "tvl": 33509.22841
-//   },
-//   "pump_pair_address": "3wA3TPNUHoLG9w8DaVyPpu2yrsr13PF4FinTZXy3AEWk",
-//   "state": "migrated",
-//   "time": 1764896766
-// })
 
 function signalToast(val:GetSignalV2ListResponse) {
   const actionsCount = val.actions.length

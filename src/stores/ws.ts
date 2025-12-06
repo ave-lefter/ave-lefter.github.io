@@ -57,8 +57,11 @@ export const useWSStore = defineStore('ws', () => {
       } else if (event === WSEventType.ASSET) {
         wsResult[event] = data
         botStore.updateBalance(data)
-      } else if (event === WSEventType.MONITOR || event === WSEventType.PUMP_MIGRATED) {
+      } else if (event === WSEventType.MONITOR) {
         wsResult[event] = data?.msg
+      } else if (event === WSEventType.PUMP_MIGRATED) {
+        //内外盘提示
+        wsResult[event] = data?.msgs[0]
       } else if (event === WSEventType.TX) {
         const tx: WSTx = data?.tx
         // 更新价格 交易数和交易额
