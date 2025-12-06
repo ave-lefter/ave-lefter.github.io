@@ -331,21 +331,31 @@ const lastPrice = computed(() => {
 })
 
 
-watch([() => perpStore.perp?.contractId || '', maxLeverage], () => {
-  if (perpStore.perp?.contractId) {
-    form.price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || ''
-    form.amount = ''
-    percent.value = 0
-    tempData.tpPercent = 0
-    tempData.tpPercent1 = 0
-    tempData.slPercent = 0
-    tempData.slPercent1 = 0
-    tempData.sizePercent = 0
-    if (formRef.value) {
-      formRef.value.resetFields()
-    }
+watch(() => perpStore.perp?.contractId || '', (contractId) => {
+  if (contractId) {
+    resetForm()
+    form.price = CoreCalculator.getSymbolModel(contractId || '')?.lastPrice || '0'
   }
 })
+
+watch(maxLeverage, () => {
+  resetForm()
+})
+
+function resetForm() {
+  // form.price = ''
+  // form.amount = ''
+  if (formRef.value) {
+    formRef.value.resetFields()
+  }
+  percent.value = 0
+  tempData.tpPercent = 0
+  tempData.tpPercent1 = 0
+  tempData.slPercent = 0
+  tempData.slPercent1 = 0
+  tempData.sizePercent = 0
+
+}
 
 
 const tpForm = reactive<{
@@ -480,7 +490,7 @@ function formatMinSize(value: string, _isValue = isValue.value) {
     return _amount
   }
   // 格式化 最小单位
-  const { tickSize, stepSize } = perpStore.perp || {}
+  const { tickSize, stepSize } = CoreCalculator.getSymbolModel(perpStore.perp?.contractId || '') || {}
   if (_isValue) {
     if (new BigNumber(_amount).lt(tickSize || '0')) {
       return  tickSize ||'0'
@@ -620,7 +630,7 @@ function _createPerpOrder(side: string) {
       }
       createPerpOrder(data).then(res => {
         if (res) {
-          formRef.value?.resetFields()
+          resetForm()
         }
       })
     }
