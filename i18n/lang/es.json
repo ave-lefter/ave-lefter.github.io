@@ -547,5 +547,7 @@
   "batchDelete": "Eliminar por lotes",
   "removeTokenTips": "¿Eliminar lo siguiente seleccionado?",
   "pairsLink": "Explorador de bloques de salto",
-  "searchSameAmm": "Ver piscinas similares"
+  "searchSameAmm": "Ver piscinas similares",
+  "deposit": "completar",
+  "value1": "valor"
 }

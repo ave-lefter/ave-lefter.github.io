@@ -547,5 +547,7 @@
   "batchDelete": "Exclusão em lote",
   "removeTokenTips": "Excluir o seguinte selecionado?",
   "pairsLink": "Explorador de blocos de salto",
-  "searchSameAmm": "Ver pools semelhantes"
+  "searchSameAmm": "Ver pools semelhantes",
+  "deposit": "recarregar",
+  "value1": "valor"
 }

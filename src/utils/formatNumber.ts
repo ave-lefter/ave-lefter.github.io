@@ -201,7 +201,7 @@ export function formatNumber(n: string | number, config: { decimals?: number; l?
   const decimals = config1?.decimals ?? 4
   const l = config1?.l || 4
   const limit = config1?.limit
-  const unit = limit ? 10 ** limit : 10000
+  const unit = limit ? 10 ** limit : 100000
   return formatNumber2(n, decimals, l, unit, config1?.locale)
 }
 

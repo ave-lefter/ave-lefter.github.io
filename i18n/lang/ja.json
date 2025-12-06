@@ -1398,5 +1398,6 @@
   "batchDelete": "一括削除",
   "removeTokenTips": "選択したフォローを削除しますか?",
   "pairsLink": "ジャンプブロックエクスプローラー",
-  "searchSameAmm": "類似したプールを表示"
+  "searchSameAmm": "類似したプールを表示",
+  "value1": "価値"
 }
