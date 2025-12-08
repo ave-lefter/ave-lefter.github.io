@@ -144,7 +144,7 @@
         <div class="text-12px">
           <!-- 表格头部 -->
           <div
-            class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px mt-8px mb-4px text-12px color-[--d-5A5E64-l-A9B0BC]"
+            class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px mt-8px mb-4px text-12px color-[--d-5A5E64-l-A9B0BC] mb-8px"
           >
             <div class="min-w-0 text-left">{{ $t('price') }}({{ quote?.coinName }})</div>
             <div class="text-right text-nowrap min-w-0">
@@ -306,7 +306,7 @@ const height = computed(() => {
   if(activeTab.value === 'history') {
     return (h - 100)
   } else if (activeLayoutTab.value === 'all') {
-    return (h - 100 - 55-60 ) / 2
+    return (h - 100 - 55-60-5 ) / 2
   } else {
     return h - 200
   }

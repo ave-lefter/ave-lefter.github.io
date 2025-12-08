@@ -1,16 +1,16 @@
 <template>
   <div class="flex-1" :style="{width:swipeWidth+ 'px' }">
     <div class="relative scroll-wrapper">
-      <div v-if="showLeft" @click="scrollLeft" class="absolute left-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-r from-[--main-bg] to-transparent flex justify-center items-center cursor-pointer">
-        <Icon name="material-symbols:arrow-back-ios-new-rounded" class="color-[--secondary-text]"/>
+      <div v-if="showLeft" @click="scrollLeft" class="absolute left-0 top-0 bottom-0 px-13px z-10 bg-[--secondary-bg] flex justify-center items-center cursor-pointer">
+        <Icon name="material-symbols:arrow-back-ios-new-rounded" class="color-[--third-text]"/>
       </div>
 
       <div ref="scrollRef" @scroll="checkArrows" class="scroll-container flex gap-4 h-full">
         <slot></slot>
       </div>
 
-      <div v-if="showRight" @click="scrollRight" class="absolute right-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-[--main-bg] to-transparent flex justify-center items-center cursor-pointer">
-        <Icon name="material-symbols:arrow-forward-ios"  class="color-[--secondary-text]"/>
+      <div v-if="showRight" @click="scrollRight" class="absolute right-0 top-0 bottom-0 px-13px z-10 bg-[--secondary-bg] flex justify-center items-center cursor-pointer">
+        <Icon name="material-symbols:arrow-forward-ios"  class="color-[--third-text]"/>
       </div>
     </div>
   </div>
