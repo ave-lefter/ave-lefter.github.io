@@ -2,18 +2,21 @@
   <!-- 表格 -->
   <div class="text-12px">
     <!-- 表格内容 -->
-    <UseVirtualList
+    <!-- <UseVirtualList
       :key="height"
       :list="filterTableList"
       :options="{ itemHeight: 24, overscan: 5 }"
       style="margin-right: -12px; padding-right: 12px"
       class="scrollbar-hide"
       :height="`${height}px`"
-    >
+    > -->
       <!-- 表格内容 -->
-      <template #default="{ data: row, index }">
+      <!-- <template #default="{ data: row, index }"> -->
         <div
+          v-for="(row, index) in filterTableList"
+          :key="index"
           class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0 text-12px"
+
         >
             <!-- 整行渐变背景 -->
             <div
@@ -46,9 +49,8 @@
             </div>
 
         </div>
-      </template>
-      <!-- </div> -->
-    </UseVirtualList>
+      <!-- </template> -->
+    <!-- </UseVirtualList> -->
   </div>
 </template>
 
