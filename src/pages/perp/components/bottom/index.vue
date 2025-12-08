@@ -100,8 +100,8 @@ watch(
 </script>
 
 <template>
-  <div class="px-16px pt-12px">
-    <div class="flex items-center justify-between mb-16px">
+  <div class="pt-12px bg-[--secondary-bg]">
+    <div class="flex items-center justify-between mb-16px px-14px">
       <div class="flex items-center">
         <span
           v-for="tab in tabs"

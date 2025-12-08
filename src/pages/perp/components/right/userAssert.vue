@@ -9,7 +9,7 @@
     <ul class="mt-15px text-12px font-400 color-[--main-text]">
       <li class="flex items-center mb-12px">
         <Progress :progress="marginRatio" />
-        <span v-tooltip.raw="`<div style='max-width: 200px'>${$t('marginRatioTips')}</div>`" class="ml-5px underline underline-dotted cursor-help" :style="getStyles">{{ formatNumber(marginRatio, 2) }}%</span>
+        <span v-tooltip.raw="`<div style='max-width: 200px'>${$t('marginRatioTips')}</div>`" class="ml-5px underline underline-dotted cursor-pointer" :style="getStyles">{{ formatNumber(marginRatio, 2) }}%</span>
       </li>
       <li class="flex items-center justify-between">
         <span class="color-[--third-text]">{{ $t('totalAssets') }}</span>

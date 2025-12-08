@@ -29,7 +29,7 @@
           </div>
           <Icon
             :name="visible ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
-            class="text-18px color-[--main-text]"
+            class="text-18px color-[--main-text] ml-12px"
           />
         </div>
       </template>

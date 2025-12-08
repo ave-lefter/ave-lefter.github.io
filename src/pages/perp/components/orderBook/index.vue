@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-[--d-0B0D12-l-F6F9FF] relative rounded-2px text-14px pt-12px flex flex-col overflow-hidden"
+    class="bg-[--secondary-bg] relative rounded-2px text-14px pt-12px flex flex-col overflow-hidden"
     :style="{ height: `${klineHeight || 200}px` }"
   >
     <div class="mx-12px pb-12px flex">
