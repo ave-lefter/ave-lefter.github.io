@@ -12,13 +12,14 @@
         }" name="material-symbols:help-rounded" class="text-14px color-[--icon-color] cursor-pointer ml-3px" />
       </div>
       <div class="flex items-center gap-5px">
-        <el-select v-model="botSettingStore.autoSellConfigs.autoSellConfigName" :placeholder="t('defaultPolicy')" style="width: 110px" @change="changeAutoSellConfig" placement="right-end">
+        <el-select v-model="autoSellConfigName" :placeholder="t('defaultPolicy')" style="width: 110px" @change="changeAutoSellConfig" placement="bottom-end">
           <el-option
             v-for="item in autoSellConfigOption"
             :key="item.value"
             :label="item.label"
             :value="item.value"
-          />
+          >
+          </el-option>
         </el-select>
          <SlippageSet :canSetAuto="true" :isAutoSell="true" :showAutoSell="true" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"  />
       </div>
@@ -66,12 +67,11 @@ const tokenStore = useTokenStore()
 const { t } = useI18n()
 const isAutoSellConfig = computed({
   get() {
-    console.log('isAutoSellConfig',botSettingStore.autoSellConfigs.autoSellConfigName)
     return (botSettingStore?.autoSellConfigs as any)?.['isAutoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName]
     // return botSettingStore?.autoSellConfigs?.isAutoSellConfig
   },
   set(val) {
-    const setting = cloneDeep(botSettingStore.autoSellConfigs)
+    const setting = cloneDeep(botSettingStore.autoSellConfigs) as any
     if (setting) {
       setting['isAutoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName] = val as boolean
       if (!setting['autoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName]?.length && val) {
@@ -116,7 +116,7 @@ const autoSellConfig = computed<Array<{
     return []
   },
   set(val) {
-    const setting = cloneDeep(botSettingStore.autoSellConfigs)
+    const setting = cloneDeep(botSettingStore.autoSellConfigs) as any
     if (setting) {
       setting['autoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName] = val?.map?.(i => {
         return {
@@ -133,48 +133,61 @@ const autoSellConfig = computed<Array<{
     }
   }
 })
+
+const autoSellConfigName=computed({
+  get() {
+    return botSettingStore.autoSellConfigs.autoSellConfigName || '0'
+  },
+  set(val) {
+   botSettingStore.autoSellConfigs.autoSellConfigName = val ==='0' ? '' : val
+  }
+})
+
 const changeAutoSellConfig = (value:any) => {
-   ['','1','2','3','4','5','6'].forEach((item) => {
+  ['0','1','2','3','4','5','6'].forEach((item) => {
     if(item!==value){
-      if((botSettingStore.autoSellConfigs as any)?.['isAutoSellConfig'+item]!==undefined){
-        (botSettingStore.autoSellConfigs as any)['isAutoSellConfig'+item] = false
+      if((botSettingStore.autoSellConfigs as any)?.['isAutoSellConfig'+(item==='0'?'':item)]!==undefined){
+        (botSettingStore.autoSellConfigs as any)['isAutoSellConfig'+(item==='0'?'':item)] = false
       }
       // (botSettingStore.autoSellConfigs as any)['isAutoSellConfig'+item] = false
     }else{
-      (botSettingStore.autoSellConfigs as any)['isAutoSellConfig'+item] = true
+      (botSettingStore.autoSellConfigs as any)['isAutoSellConfig'+(item==='0'?'':item)] = true
     }
   })
+  console.log('changeAutoSellConfig',value)
 }
-const autoSellConfigOption=[
-    {
-      value: '',
-      label: t('takeProfitAndStopLoss0')
-    },
-    {
-      value: '1',
-      label: t('takeProfitAndStopLoss1')
-    },
-    {
-      value: '2',
-      label: t('takeProfitAndStopLoss2')
-    },
-    {
-      value: '3',
-      label: t('takeProfitAndStopLoss3')
-    },
-    {
-      value: '4',
-      label: t('takeProfitAndStopLoss4')
-    },
-    {
-      value: '5',
-      label: t('takeProfitAndStopLoss5')
-    },
-    {
-      value: '6',
-      label: t('takeProfitAndStopLoss6')
-    },
-]
+const autoSellConfigOption=computed(() => {
+  return [
+      {
+        value: '0',
+        label: t('takeProfitAndStopLoss0')
+      },
+      {
+        value: '1',
+        label: t('takeProfitAndStopLoss1')
+      },
+      {
+        value: '2',
+        label: t('takeProfitAndStopLoss2')
+      },
+      {
+        value: '3',
+        label: t('takeProfitAndStopLoss3')
+      },
+      {
+        value: '4',
+        label: t('takeProfitAndStopLoss4')
+      },
+      {
+        value: '5',
+        label: t('takeProfitAndStopLoss5')
+      },
+      {
+        value: '6',
+        label: t('takeProfitAndStopLoss6')
+      },
+  ]
+})
 
 const chain = computed(() => {
   return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as BotChain

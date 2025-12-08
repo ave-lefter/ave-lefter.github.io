@@ -1533,5 +1533,11 @@
   "takeProfitAndStopLoss4": "翻倍出本&三倍全出&跌半止損",
   "takeProfitAndStopLoss6": "40%止盈&移動止盈止損回撤60%全出",
   "takeProfitAndStopLoss5": "10倍止盈?移動止盈止損回撤40%全出",
-  "defaultPolicy": "默認策略"
+  "defaultPolicy": "默認策略",
+  "takeProfitAndStopLossTips1": "翻倍全出 是指倉位盈利達到 100% 時，系統自動全倉平倉。",
+  "takeProfitAndStopLossTips2": "翻倍出本 是指盈利達 100% 時平倉 50% 出本；跌半止損 是指虧損達 50% 時自動全倉平倉。",
+  "takeProfitAndStopLossTips3": "翻倍全出 是指盈利達 100% 時全倉平倉；跌半止損 是指虧損達 50% 時自動全倉平倉。",
+  "takeProfitAndStopLossTips4": "翻倍出本 (100% 盈利平倉 50%)；三倍全出 (剩餘倉位 300% 盈利全平)；跌半止損 (50% 虧損全平)。",
+  "takeProfitAndStopLossTips5": "10倍止盈 (1000% 盈利全平)；移動止盈 是指價格從最高點回撤 40% 時，自動全倉平倉。",
+  "takeProfitAndStopLossTips6": "40%止盈 (40% 盈利全平)；移動止盈 是指價格從最高點回撤 60% 時，自動全倉平倉。"
 }

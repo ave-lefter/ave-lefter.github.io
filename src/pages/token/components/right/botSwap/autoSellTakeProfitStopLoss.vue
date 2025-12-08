@@ -2,7 +2,7 @@
   <div>
     <div class="slippage-label mt-15px">
       <span class="mr-5px">{{ title }}</span>
-      <Icon v-tooltip="$t('takeProfitAndStopLossTips')" class="text-15px color-[--icon-color] clickable mr-auto"
+      <Icon v-tooltip="tooltipText" class="text-15px color-[--icon-color] clickable mr-auto"
         name="material-symbols:help-rounded" />
       <el-switch v-model="autoSellConfigs['isAutoSellConfig'+name]" size="small" class="ml-2px"
         style="--el-switch-on-color: #3c6cf6" />
@@ -76,7 +76,7 @@ const props = defineProps({
     required: false,
   }
 })
-
+const { t } = useI18n()
 const botSettingStore = useBotSettingStore()
 watch(
   () => props.autoSellConfigs['isAutoSellConfig'+props.name],
@@ -95,6 +95,24 @@ watch(
     }
   }
 )
+
+const tooltipText=computed(()=>{
+  const texts={
+    '':t('takeProfitAndStopLossTips'),
+    '1':t('takeProfitAndStopLossTips1'),
+    '2':t('takeProfitAndStopLossTips2'),
+    '3':t('takeProfitAndStopLossTips3'),
+    '4':t('takeProfitAndStopLossTips4'),
+    '5':t('takeProfitAndStopLossTips5'),
+    '6':t('takeProfitAndStopLossTips6'),
+  }
+  if(typeof props.name ==='string' && props.name in texts){
+    return texts[props.name as keyof typeof texts]
+  }else{
+    return texts['']
+  }
+})
+
 
 function addStopProfit() {
   props.autoSellConfigs?.['autoSellConfig'+props.name].push({

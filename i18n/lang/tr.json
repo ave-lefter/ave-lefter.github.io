@@ -550,5 +550,11 @@
   "takeProfitAndStopLoss4": "Sermayeyi ikiye katlamak mı&Tüm tutarı üçe katlamak mı&Kaybı yarı yarıya durdurun",
   "takeProfitAndStopLoss6": "Yüzde 40 kar mı alıyor&Hareketli kar alma ve zararı durdurma gerilemesi %60",
   "takeProfitAndStopLoss5": "10 kere kar alır mısın&Hareketli kar alma ve zararı durdurma gerilemesi %40",
-  "defaultPolicy": "Varsayılan politika"
+  "defaultPolicy": "Varsayılan politika",
+  "takeProfitAndStopLossTips1": "Double out, pozisyon karı %100'e ulaştığında sistemin tüm pozisyonları otomatik olarak kapatması anlamına gelir.",
+  "takeProfitAndStopLossTips2": "Sermayeyi ikiye katlamak, kâr %100'e ulaştığında pozisyonu kapatmak ve sermayenin %50'sini ödemek anlamına gelir; Kaybı yarıda durdurma, kayıp %50'ye ulaştığında tüm pozisyonun otomatik olarak kapatılması anlamına gelir.",
+  "takeProfitAndStopLossTips3": "Çifte all-out, kâr %100'e ulaştığında tüm pozisyonların kapatılacağı anlamına gelir; Yarı durdurma kaybı, kayıp %50'ye ulaştığında tüm pozisyonların otomatik olarak kapatılacağı anlamına gelir.",
+  "takeProfitAndStopLossTips4": "İkiye katlama (%100 kâr ve pozisyonun %50'si kapatılır); Üçe katlama (kalan pozisyon %300'dür ve kârın tamamı kapatılmıştır); Yarım durdurma kaybı (kayıpların %50'si tamamen kapatılmıştır).",
+  "takeProfitAndStopLossTips5": "10 kez kâr alın (%1000 kâr, tamamı eşit); Hareketli kâr alma, fiyat en yüksek noktadan %40 geri çekildiğinde tüm pozisyonların otomatik olarak kapatılacağı anlamına gelir.",
+  "takeProfitAndStopLossTips6": "%40 kar al (%40 kar kapanışı); Sondaki kar alma, fiyat en yüksek noktadan %60 geri çekildiğinde tüm pozisyonların otomatik olarak kapatılacağı anlamına gelir."
 }
