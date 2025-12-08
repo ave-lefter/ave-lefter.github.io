@@ -442,10 +442,16 @@ async function handleSellAmount(item: string, index: number) {
     return
   }
   const chain = getChain()
+  const chainMainToken: Record<string, string> = {
+    solana: 'sol',
+    ton: 'TON',
+  }
+  const native = chainMainToken?.[chain] || NATIVE_TOKEN
   const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
   loadingSwapSell.value[index] = true
   await checkApproveAndApprove({
-    token: token.address,
+    inToken: token.address,
+    outToken: native,
     chain: chain,
     owner: walletAddress
   }).finally(() => {
