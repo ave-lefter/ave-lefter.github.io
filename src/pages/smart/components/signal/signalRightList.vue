@@ -1,79 +1,94 @@
 <script setup lang="ts">
 import {
+  getSignalKline,
   getSignalV2List,
   type GetSignalV2ListResponse,
   getSignalV3List,
   type IActionItem,
-  type IActionV3Item
+  type IActionV3Item,
 } from '~/api/signal'
-import {useThrottleFn} from '@vueuse/core'
+import { useThrottleFn } from '@vueuse/core'
 import SignalRightItem from '~/pages/smart/components/signal/signalRightItem.vue'
 
 const filterToken = shallowRef('')
 const props = defineProps<{
   activeChain: string
   quickBuyValue: string
-  scrollbarHeight:number
+  scrollbarHeight: number
 }>()
 const listData = shallowRef<GetSignalV2ListResponse<IActionItem | IActionV3Item>[]>([])
+const signalKlineData = shallowRef({})
 const listStatus = ref({
   loading: false,
   finished: false,
-  error: false
+  error: false,
 })
 const pageParams = shallowRef({
   pageNO: 1,
-  pageSize: 20,
+  pageSize: 15,
 })
 
 const scrollbar = useTemplateRef('scrollbar')
 
-const onScroll = useThrottleFn(({scrollTop}: { scrollTop: number }) => {
-  if (scrollbar.value) {
-    const scrollElement = scrollbar.value.wrapRef
-    if (scrollElement && scrollElement.scrollHeight - scrollTop - props.scrollbarHeight < 30) {
-      fetchSignalList()
+const onScroll = useThrottleFn(
+  ({ scrollTop }: { scrollTop: number }) => {
+    if (scrollbar.value) {
+      const scrollElement = scrollbar.value.wrapRef
+      if (scrollElement && scrollElement.scrollHeight - scrollTop - props.scrollbarHeight < 30) {
+        fetchSignalList()
+      }
     }
-  }
-}, 100, true, false)
+  },
+  100,
+  true,
+  false
+)
 
-watch(() => [props.activeChain, filterToken.value], () => {
-  listData.value = []
-  pageParams.value.pageNO = 1
-  listStatus.value.finished = false
-  listStatus.value.loading = false
-  listStatus.value.error = false
-  fetchSignalList()
-})
-const wsStore = useWSStore()
-watch(() => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR], ({msg: _signalData}: {
-  msg: GetSignalV2ListResponse
-}) => {
-  const index = listData.value.findIndex(el => el.token === _signalData.token && el.chain === _signalData.chain)
-  const filterTokenFlag = (!filterToken.value || filterToken.value === _signalData.token)
-  if (index === -1 && filterTokenFlag) {
-    listData.value.unshift(_signalData)
-  } else if (filterTokenFlag) {
-    listData.value.splice(index, 1)
-    listData.value.unshift(_signalData)
+watch(
+  () => [props.activeChain, filterToken.value],
+  () => {
+    listData.value = []
+    pageParams.value.pageNO = 1
+    listStatus.value.finished = false
+    listStatus.value.loading = false
+    listStatus.value.error = false
+    fetchSignalList()
   }
-})
+)
+const wsStore = useWSStore()
+watch(
+  () => wsStore.wsResult[WSEventType.SIGNALSV2_PUBLIC_MONITOR],
+  ({ msg: _signalData }: { msg: GetSignalV2ListResponse }) => {
+    const index = listData.value.findIndex(
+      (el) => el.token === _signalData.token && el.chain === _signalData.chain
+    )
+    const filterTokenFlag = !filterToken.value || filterToken.value === _signalData.token
+    if (index === -1 && filterTokenFlag) {
+      listData.value.unshift(_signalData)
+    } else if (filterTokenFlag) {
+      listData.value.splice(index, 1)
+      listData.value.unshift(_signalData)
+    }
+
+    _getSignalKline([_signalData.token])
+  }
+)
 
 const botStore = useBotStore()
 
 function getListApi(): Promise<GetSignalV2ListResponse<IActionItem | IActionV3Item>[]> {
   return filterToken.value
     ? getSignalV2List({
-      ...pageParams.value,
-      chain: props.activeChain,
-      fold: false,
-      token: filterToken.value
-    })
+        ...pageParams.value,
+        chain: props.activeChain,
+        fold: false,
+        token: filterToken.value,
+      })
     : getSignalV3List({
-      ...pageParams.value,
-      chain: props.activeChain,
-      wallet_address: botStore.getWalletAddress(props.activeChain)
-    })
+        ...pageParams.value,
+        chain: props.activeChain,
+        wallet_address: botStore.getWalletAddress(props.activeChain),
+      })
 }
 
 async function fetchSignalList() {
@@ -93,6 +108,9 @@ async function fetchSignalList() {
     if (!finished) {
       pageParams.value.pageNO++
     }
+
+    const tokens = Array.from(new Set((res || []).map((el) => el.token)))
+    _getSignalKline(tokens)
   } catch (e) {
     console.log(e, 'error')
     listStatus.value.error = true
@@ -110,17 +128,21 @@ defineExpose({
   setToken: (val: string) => {
     filterToken.value = val
   },
-  updateListData(callback: (p: GetSignalV2ListResponse<IActionItem | IActionV3Item>[]) => GetSignalV2ListResponse<IActionItem | IActionV3Item>[]) {
+  updateListData(
+    callback: (
+      p: GetSignalV2ListResponse<IActionItem | IActionV3Item>[]
+    ) => GetSignalV2ListResponse<IActionItem | IActionV3Item>[]
+  ) {
     listData.value = callback(listData.value)
   },
-  setScrollTop(scrollTop: number){
-    if(scrollbar.value){
+  setScrollTop(scrollTop: number) {
+    if (scrollbar.value) {
       scrollbar.value.scrollTo({
         top: scrollTop,
-        behavior: 'smooth'
+        behavior: 'smooth',
       })
     }
-  }
+  },
 })
 
 const emit = defineEmits(['setResetBtn'])
@@ -137,20 +159,37 @@ function openDrawer(item: GetSignalV2ListResponse<IActionItem | IActionV3Item>) 
   visible.value = true
   currentSignal.value = item
 }
+
+async function _getSignalKline(tokens: string[], duration = 4 * 60) {
+  try {
+    const res =
+      (await getSignalKline({
+        duration,
+        chain: props.activeChain,
+        tokens,
+      })) || []
+    const result = Object.create(null)
+    res.forEach((el) => {
+      result[el.t] = el
+    })
+    signalKlineData.value = {
+      ...signalKlineData.value,
+      ...result,
+    }
+  } catch (error) {
+    console.log(error, 'error')
+  }
+}
 </script>
 
 <template>
-  <el-scrollbar
-    ref="scrollbar"
-    class="flex-1"
-    :height="scrollbarHeight"
-    @scroll="onScroll"
-  >
+  <el-scrollbar ref="scrollbar" class="flex-1" :height="scrollbarHeight" @scroll="onScroll">
     <div class="flex flex-wrap gap-2px">
       <SignalRightItem
-        v-for="(item,index) in listData"
+        v-for="(item, index) in listData"
         :key="index"
-        :class="item.actions.length > 3 ? 'border-#3F80F7':'hover:border-#3F80F7'"
+        :signalKlineData="signalKlineData"
+        :class="item.actions.length > 3 ? 'border-#3F80F7' : 'hover:border-#3F80F7'"
         class="border-1px border-solid border-[--main-divider] transition-colors transition-.3s"
         :item="item"
         :filterToken="filterToken"
@@ -158,18 +197,17 @@ function openDrawer(item: GetSignalV2ListResponse<IActionItem | IActionV3Item>) 
         :activeChain="activeChain"
         :quickBuyValue="quickBuyValue"
         @openDrawer="openDrawer"
+        @updateSignalKline="_getSignalKline"
       />
     </div>
-    <div v-if="listStatus.loading" class="flex py-10px justify-center text-12px text-[--third-text]">{{
-        $t('loading')
-      }}
+    <div
+      v-if="listStatus.loading"
+      class="flex py-10px justify-center text-12px text-[--third-text]"
+    >
+      {{ $t('loading') }}
     </div>
   </el-scrollbar>
-  <el-drawer
-    v-model="visible"
-    append-to-body
-    :size="480"
-  >
+  <el-drawer v-model="visible" append-to-body :size="480">
     <template #header>
       <span class="color-[--main-text] text-20px">{{ $t('SignalDetail') }}</span>
     </template>
@@ -185,6 +223,4 @@ function openDrawer(item: GetSignalV2ListResponse<IActionItem | IActionV3Item>) 
   </el-drawer>
 </template>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

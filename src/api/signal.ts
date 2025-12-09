@@ -180,3 +180,15 @@ export function getActiveAddressRank(query): Promise<{
     query
   })
 }
+
+export async function getSignalKline({duration=4*60,...body}):Promise<{
+  k:string[][]
+  p:{t:string,e:string[][]}
+  t:string
+}[]> {
+  const {$api} = useNuxtApp()
+  return $api(`https://api.test.phaetd8l.com/v2api/signals/v2/kline?duration=${duration}`, {
+    method: 'post',
+    body
+  })
+}

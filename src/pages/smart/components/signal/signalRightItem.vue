@@ -2,6 +2,7 @@
 import type { GetSignalV2ListResponse, IActionItem, IActionV3Item } from '~/api/signal'
 import QuickSwapButton from '~/components/quickSwap/quickSwapButton.vue'
 import XIcon from '~/components/xPopup/xIcon.vue'
+import LineChart from './lineChart.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -12,16 +13,33 @@ const props = withDefaults(
     filter?: (token: string) => void
     activeChain: string
     quickBuyValue?: string
+    signalKlineData?: Record<
+      string,
+      {
+        k: string[][]
+        p: { t: string; e: string[][] }
+        t: string
+      }
+    >
   }>(),
   {
     footer: true,
     filterToken: '',
     filter: () => {},
     quickBuyValue: '0.01',
+    signalKlineData: undefined,
   }
 )
-const emit = defineEmits(['openDrawer'])
+const emit = defineEmits(['openDrawer', 'updateSignalKline'])
 const localeStore = useLocaleStore()
+const timeOptions = ref([
+  { label: '15M', value: 15 },
+  { label: '1H', value: 60 },
+  { label: '4H', value: 4 * 60 },
+  { label: '24H', value: 24 * 60 },
+  { label: '7D', value: 7 * 24 * 60 },
+])
+const selectTime = ref(timeOptions.value[2].value)
 // const themeStore = useThemeStore()
 
 // function getGradientBackground(history_count: number) {
@@ -64,6 +82,11 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
     },
     user_address: el.wallet_address,
   })
+}
+
+function setSelectTime(el: number) {
+  selectTime.value = el
+  emit('updateSignalKline', [props.item.token], el)
 }
 </script>
 
@@ -283,8 +306,28 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
         </div>
       </div>
     </div>
-    <div class="m-12px bg-[--secondary-bg] h-1px" />
-    <div class="flex color-[--third-text] text-12px mb-8px">
+    <div class="flex items-center my-16px">
+      <span
+        v-for="el in timeOptions"
+        :key="el.value"
+        class="flex-1 lh-22px text-12px flex items-center justify-center cursor-pointer"
+        :class="
+          selectTime === el.value
+            ? 'color-[--main-text] bg-[--main-list-hover]'
+            : 'text-[--third-text]'
+        "
+        @click="setSelectTime(el.value)"
+      >
+        {{ el.label }}
+      </span>
+    </div>
+    <LineChart
+      v-if="signalKlineData"
+      :dataList="signalKlineData[item.token]?.k || []"
+      :marks="signalKlineData[item.token]?.p?.e || []"
+      :type="signalKlineData[item.token]?.p?.t"
+    />
+    <div class="flex color-[--third-text] text-12px mb-8px mt-16px">
       <div class="flex-[2]">
         {{ $t('wallet') }}
       </div>
