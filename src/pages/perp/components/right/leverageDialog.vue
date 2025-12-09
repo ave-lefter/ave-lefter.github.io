@@ -31,17 +31,19 @@
       </div>
      <div class="text-14px flex-between mt-48px">
       <span class="color-[--third-text]">{{ $t('positionMargin') }}</span>
-      <span>{{ formatNumber(defaultMargin, { decimals: 0, limit: 10}) }}USD</span>
+      <span>{{ formatNumber(defaultMargin, { decimals: 0, limit: 10}) }}&nbsp;USD</span>
      </div>
      <div class="text-14px flex-between mt-24px">
       <span class="color-[--third-text]">{{ $t('maxPositionCurrentLeverage') }}</span>
-      <span>{{ Number(defaultLeverageNum) > 10**12 ? "∞": formatNumber(defaultLeverageNum, { decimals: 0, limit: 10})+'USD' }}</span>
+      <span>{{ Number(defaultLeverageNum) > 10**12 ? "∞": formatNumber(defaultLeverageNum, { decimals: 0, limit: 10})+'&nbsp;USD' }}</span>
      </div>
-      <div class="text-14px color-[--third-text] flex-between mt-24px">
-        {{ $t('adjustLeverageTip1') }}
+      <div class="text-12px color-[--yellow] flex-between mt-24px">
+        *{{ $t('adjustLeverageTip1') }}
       </div>
-      <div v-if="currentOrderList?.length >0" class="text-14px  mt-24px color-[--yellow] flex-start items-start">
-        <Icon  name="majesticons:info-circle" class="text-24px mr-10px"/>
+      <div v-if="currentOrderList?.length >0" class="text-12px  mt-24px color-[--yellow] flex-start items-start">
+        <el-icon style="vertical-align: middle" class="text-14px mr-5px">
+          <Warning />
+        </el-icon>
         <div>
           <div v-if="compareDefaultMargin !==0 && leverage" class="mb-10px">
             <span v-if="Number(currentMargin) < Number(prepBalance)" class="block" :class="compareDefaultMargin > 0? 'color-[--down-color]':'color-[--up-color]'">
@@ -74,6 +76,7 @@ import Step from './step.vue'
 import { updateLeverageSetting } from '@/api/perp'
 import { ElMessage } from 'element-plus'
 import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
+import { Warning } from '@element-plus/icons-vue'
 const props = defineProps({
   modelValue: Boolean,
 })
