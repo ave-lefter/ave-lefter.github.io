@@ -455,14 +455,14 @@ export const bot_getTokenBalance = createCacheRequest(async function(data: {
         balance = await getTonWalletBalance({token: i.token, wallet: data.walletAddress}).catch(async () => 0)
       }
       const decimals = i.decimals || 0
-      let token = i.token === 'sol' ? 'So11111111111111111111111111111111111111112' : i.token
-      token = token === 'TON' ? NATIVE_TOKEN : token
+      // let token = i.token === 'sol' ? 'So11111111111111111111111111111111111111112' : i.token
+      // token = token === 'TON' ? NATIVE_TOKEN : token
       return {
         ...i,
         initBalance: balance,
         balance: Number(decimals) === 0 ? balance : new BigNumber(balance).div(new BigNumber(10).pow(decimals || 0)).toFixed(),
         chain: data.chain || '',
-        token
+        // token
       }
     }))
   })
