@@ -39,7 +39,7 @@ const dialogValues = ref<{
   pageNO: 1,
   pageSize: 100,
   has_more: true,
-  tag: [30, 31, 39],
+  tag: [30],
 })
 const showResetBtn = defineModel<boolean>('showResetBtn')
 const props = defineProps<{
