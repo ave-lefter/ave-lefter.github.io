@@ -13,7 +13,7 @@
       </li>
       <li class="flex items-center justify-between">
         <span class="color-[--third-text]">{{ $t('totalAssets') }}</span>
-        <NuxtLink class="flex items-center clickable font-500" :to="`/address/${walletStore.address}/${walletStore.chain}`">
+        <NuxtLink class="flex items-center clickable font-500" :to="`/address/${walletStore.address}/${walletStore.chain}?active=perp`">
           <span>{{ prepBalance }} USDT</span>
           <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
         </NuxtLink>

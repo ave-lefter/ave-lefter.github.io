@@ -3,13 +3,13 @@
     class="flex bg-[--main-divider] gap-1px flex min-w-0 w-full"
     style="min-height: calc(100vh - 92px - 64px)"
   >
-    <div class="flex-1">
+    <div class="flex-1 max-w-100vw">
       <WithdrawAlert />
       <div class="flex flex-1">
         <div class="flex-1 min-w-0">
           <div class="flex gap-1px">
             <div class="flex-1 hide-scrollbar min-w-0 relative">
-              <div
+              <!-- <div
                 v-show="globalStore.showLeft"
                 class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left--11px hover:w-30px hover:left--31px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
                 @click="globalStore.$patch({ showLeft: false })"
@@ -22,7 +22,7 @@
                 @click="globalStore.$patch({ showLeft: true })"
               >
                 <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
-              </div>
+              </div> -->
               <el-scrollbar :height="scrollbarHeight">
                 <div
                   class="grid gap-1px"

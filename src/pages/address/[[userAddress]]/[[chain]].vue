@@ -23,6 +23,13 @@ scrollTopEvent.on(() => {
 onUnmounted(() => {
   scrollTopEvent.off(scrollToTop)
 })
+
+onMounted(() => {
+  const queryActive = (route.query.active || '') as string
+  if (queryActive && ['wallet', 'perp'].includes(queryActive)) {
+    activeName.value = queryActive
+  }
+})
 </script>
 
 <template>
