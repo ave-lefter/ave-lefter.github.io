@@ -91,7 +91,7 @@ watch(
         }
       })
       console.log('botSettingStore.autoSellConfigs.autoSellConfigName',JSON.stringify(props.name))
-      botSettingStore.autoSellConfigs.autoSellConfigName = props.name||''
+      props.autoSellConfigs.autoSellConfigName = props.name||''
     }
   }
 )

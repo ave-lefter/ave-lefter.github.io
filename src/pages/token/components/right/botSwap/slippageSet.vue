@@ -999,7 +999,7 @@ function confirmSubmit() {
     }
   }
   botSettingStore.clipboardQuickInput = cloneDeep(clipboardQuickInput.value)
-  console.log('setting', setting)
+  botSettingStore.autoSellConfigs.autoSellConfigName = autoSellConfigs.value.autoSellConfigName
   emit('onSubmit', setting)
   saveAutoSellConfigs()
   show.value = false

@@ -105,7 +105,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     }
   })
 
-  const autoSellConfigs = useLocalStorage('bot_autoSellConfigs_v1', {
+  const autoSellConfigs = useLocalStorage('bot_autoSellConfigs_v2', {
     autoSellConfigName:'',
     autoSell: false,
     // 自定义
@@ -287,23 +287,30 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     return autoSellConfigFn(autoSellConfigs.value.isAutoSellConfig6,autoSellConfigs.value.autoSellConfig6)
   })
 
-  const autoSellConfig_autoSell = computed(() => {
-    let autoSellConfigCurrent=null
-    if(!autoSellConfigs.value.autoSellConfigName){
-      autoSellConfigCurrent=autoSellConfig.value
-    }else if(autoSellConfigs.value.autoSellConfigName==='1'){
-      autoSellConfigCurrent=autoSellConfig1.value
-    }else if(autoSellConfigs.value.autoSellConfigName==='2'){
-      autoSellConfigCurrent=autoSellConfig2.value
-    }else if(autoSellConfigs.value.autoSellConfigName==='3'){
-      autoSellConfigCurrent=autoSellConfig3.value
-    }else if(autoSellConfigs.value.autoSellConfigName==='4'){
-      autoSellConfigCurrent=autoSellConfig4.value
-    }else if(autoSellConfigs.value.autoSellConfigName==='5'){
-      autoSellConfigCurrent=autoSellConfig5.value
-    }else if(autoSellConfigs.value.autoSellConfigName==='6'){
-      autoSellConfigCurrent=autoSellConfig6.value
+  function getAutoSellConfigCurrent() {
+    let autoSellConfigCurrent:Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default' | 'trailing' | 'migrated' | 'devsell', isUp?: boolean}> = []
+    if ((autoSellConfigs.value.autoSellConfigName === '') && autoSellConfigs.value.isAutoSellConfig) {
+      autoSellConfigCurrent = autoSellConfig.value
+    } else if ((autoSellConfigs.value.autoSellConfigName === '1') && autoSellConfigs.value.isAutoSellConfig1) {
+      autoSellConfigCurrent = autoSellConfig1.value
+    } else if ((autoSellConfigs.value.autoSellConfigName === '2') && autoSellConfigs.value.isAutoSellConfig2) {
+      autoSellConfigCurrent = autoSellConfig2.value
+    } else if ((autoSellConfigs.value.autoSellConfigName === '3') && autoSellConfigs.value.isAutoSellConfig3) {
+      autoSellConfigCurrent = autoSellConfig3.value
+    } else if ((autoSellConfigs.value.autoSellConfigName === '4') && autoSellConfigs.value.isAutoSellConfig4) {
+      autoSellConfigCurrent = autoSellConfig4.value
+    } else if ((autoSellConfigs.value.autoSellConfigName === '5') && autoSellConfigs.value.isAutoSellConfig5) {
+      autoSellConfigCurrent = autoSellConfig5.value
+    } else if ((autoSellConfigs.value.autoSellConfigName === '6') && autoSellConfigs.value.isAutoSellConfig6) {
+      autoSellConfigCurrent = autoSellConfig6.value
     }
+    return autoSellConfigCurrent
+  } 
+
+  const selectedAutoSellConfig = computed(getAutoSellConfigCurrent)
+
+  const autoSellConfig_autoSell = computed(() => {
+    const autoSellConfigCurrent=getAutoSellConfigCurrent()
     return autoSellConfigs.value.autoSell && !autoSellConfigCurrent?.some?.(i => i.type === 'default' && i.priceChange === 10000 && i.sellRatio === 5000)
   })
 
@@ -345,6 +352,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     autoSellConfig5,
     autoSellConfig6,
     autoSellConfig_autoSell,
+    selectedAutoSellConfig,
     clipboardQuickInput
   }
 })

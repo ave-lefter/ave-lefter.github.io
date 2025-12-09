@@ -1,6 +1,6 @@
 <template>
   <div v-show="botStore.userInfo?.evmAddress">
-    <div class="flex-between">
+    <div class="flex-between h-24px my--2px ">
       <div class="flex items-center">
         <el-checkbox v-model="isAutoSellConfig" class="auto-sell-checkbox"><span class="font-400 color-#3F80F7 text-14px">{{ $t('advancedTrading') }}</span></el-checkbox>
         <Icon
@@ -11,8 +11,10 @@
           }
         }" name="material-symbols:help-rounded" class="text-14px color-[--icon-color] cursor-pointer ml-3px" />
       </div>
-      <div class="flex items-center gap-5px">
-        <el-select v-model="autoSellConfigName" :placeholder="t('defaultPolicy')" style="width: 110px" @change="changeAutoSellConfig" placement="bottom-end">
+      <!-- <div class="flex items-center gap-5px"> -->
+      <div v-show="isAutoSellConfig" class="flex items-center gap-5px">
+        <el-select popper-class="w-selectAutoSell" v-model="autoSellConfigName" :placeholder="t('defaultPolicy')" style="width: 110px" @change="changeAutoSellConfig" placement="bottom-end" :persistent="true" size="small">
+          <li class="el-select-dropdown__item text-[--third-text]!">{{ t('defaultPolicy') }}</li>
           <el-option
             v-for="item in autoSellConfigOption"
             :key="item.value"
@@ -21,7 +23,7 @@
           >
           </el-option>
         </el-select>
-         <SlippageSet :canSetAuto="true" :isAutoSell="true" :showAutoSell="true" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"  />
+        <SlippageSet :canSetAuto="true" :isAutoSell="true" :showAutoSell="true" :chain="(tokenStore.tokenInfo?.token?.chain as BotChain)" :setting="botSettingStore?.botSettings[chain]"  />
       </div>
     </div>
     <ul v-show="botSettingStore.autoSellConfigs.isAutoSellConfig">
@@ -65,6 +67,7 @@ const botSettingStore = useBotSettingStore()
 const route = useRoute()
 const tokenStore = useTokenStore()
 const { t } = useI18n()
+const { autoSellConfigs, loadAutoSellConfigs, saveAutoSellConfigs } = useAutoSellConfig()
 const isAutoSellConfig = computed({
   get() {
     return (botSettingStore?.autoSellConfigs as any)?.['isAutoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName]
@@ -84,8 +87,15 @@ const isAutoSellConfig = computed({
           }
         ]
       }
+      if(!val){
+        setting.selectedAutoSellConfig=[]
+      }
       botSettingStore.autoSellConfigs = {
         ...setting
+      }
+      if(val){
+        loadAutoSellConfigs()
+        saveAutoSellConfigs()
       }
     }
   }
@@ -154,6 +164,8 @@ const changeAutoSellConfig = (value:any) => {
       (botSettingStore.autoSellConfigs as any)['isAutoSellConfig'+(item==='0'?'':item)] = true
     }
   })
+  loadAutoSellConfigs()
+  saveAutoSellConfigs()
   console.log('changeAutoSellConfig',value)
 }
 const autoSellConfigOption=computed(() => {
@@ -223,6 +235,8 @@ function deleteAutoSellConfig(index: number) {
 
 function triggerAutoSellConfig() {
   autoSellConfig.value = [...autoSellConfig.value]
+  loadAutoSellConfigs()
+  saveAutoSellConfigs()
 }
 
 </script>
@@ -250,5 +264,29 @@ function triggerAutoSellConfig() {
       text-align: right;
     }
   }
+}
+:deep() .el-select--small .el-select__wrapper.el-select__wrapper{
+  padding: 5px 8px !important; 
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0px;
+}
+</style>
+
+<style lang="scss">
+.w-selectAutoSell{
+  .el-select-dropdown__wrap{
+    .el-select__wrapper{
+    }
+    /* max-height: 300px !important; */
+  }
+  .el-select-dropdown__item{
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 24px;
+    height: 24px;
+  }
+  
 }
 </style>
