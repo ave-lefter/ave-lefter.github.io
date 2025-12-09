@@ -1543,5 +1543,6 @@
   "top24hAddress": "24小时活跃地址榜",
   "whale": "巨鲸",
   "7DayProfitLoss": "7天盈亏金额",
-  "noActiveWallet": "暂无活跃钱包"
+  "noActiveWallet": "暂无活跃钱包",
+  "smartMoneyAddress": "聪明钱地址"
 }

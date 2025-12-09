@@ -192,3 +192,11 @@ export async function getSignalKline({duration=4*60,...body}):Promise<{
     body
   })
 }
+
+export function getSignalActions(query:{time:string,chain:string,token:string}) {
+  const {$api} = useNuxtApp()
+  return $api('https://api.test.phaetd8l.com/v2api/signals/v2/tag/detail', {
+    method: 'get',
+    query
+  })
+}

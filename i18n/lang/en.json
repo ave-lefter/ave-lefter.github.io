@@ -1544,5 +1544,6 @@
   "searchSameAmm": "View similar pools",
   "top24hAddress": "Top 24h Active Address",
   "whale": "Whale",
-  "noActiveWallet": "No active wallet"
+  "noActiveWallet": "No active wallet",
+  "smartMoneyAddress": "Smart Money Address"
 }

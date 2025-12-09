@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  getSignalActions,
   getSignalKline,
   getSignalV2List,
   type GetSignalV2ListResponse,
@@ -27,6 +28,11 @@ const pageParams = shallowRef({
   pageNO: 1,
   pageSize: 15,
 })
+const actionDialogVisible = ref(false)
+const currentActions = shallowRef<IActionV3Item[]>([])
+const localeStore = useLocaleStore()
+const tokenDetailSStore = useTokenDetailsStore()
+const currentActionToken = ref('')
 
 const scrollbar = useTemplateRef('scrollbar')
 
@@ -122,7 +128,27 @@ async function fetchSignalList() {
 
 onMounted(() => {
   fetchSignalList()
+  document.addEventListener('click', openActionDialog)
 })
+
+onUnmounted(() => {
+  document.removeEventListener('click', openActionDialog)
+})
+
+const openActionDialog = async (e: MouseEvent) => {
+  if (e.target && 'id' in e.target && e?.target.id === 'tooltipMark') {
+    const time = e.target.dataset.time
+    const token = e.target.dataset.token
+    currentActionToken.value = token
+    actionDialogVisible.value = true
+    const res = await getSignalActions({
+      time,
+      token,
+      chain: props.activeChain,
+    })
+    currentActions.value = res
+  }
+}
 
 defineExpose({
   setToken: (val: string) => {
@@ -180,6 +206,30 @@ async function _getSignalKline(tokens: string[], duration = 4 * 60) {
     console.log(error, 'error')
   }
 }
+
+function openTokenDetail(el: IActionV3Item) {
+  const item = listData.value.find((el) => el.token === currentActionToken.value)
+  if (!item) return
+  tokenDetailSStore.$patch({
+    drawerVisible: true,
+    tokenInfo: {
+      id: item.token + '-' + props.activeChain,
+      symbol: item.symbol,
+      logo_url: item.logo,
+      chain: props.activeChain,
+      address: item.token,
+      remark: '',
+    },
+    pairInfo: {
+      target_token: item.token,
+      token0_address: el.quote_token_address,
+      token0_symbol: el.quote_token_symbol,
+      token1_symbol: item.symbol,
+      pairAddress: '',
+    },
+    user_address: el.wallet_address,
+  })
+}
 </script>
 
 <template>
@@ -221,6 +271,95 @@ async function _getSignalKline(tokens: string[], duration = 4 * 60) {
       />
     </template>
   </el-drawer>
+  <el-dialog v-model="actionDialogVisible" :title="$t('smartMoneyAddress')" width="540px">
+    <div class="flex color-[--third-text] text-12px mb-8px mt-16px">
+      <div class="flex-[2]">
+        {{ $t('wallet') }}
+      </div>
+      <div class="w-100px text-right">
+        {{ $t('operate') }}
+      </div>
+      <div v-if="!filterToken" class="flex-1 text-right">
+        {{ $t('balance1') }}
+      </div>
+      <div class="flex-1 text-right">
+        {{ $t('time') }}
+      </div>
+    </div>
+    <div class="flex-1">
+      <div
+        v-for="(
+          {
+            wallet_alias,
+            wallet_address,
+            quote_token_amount,
+            quote_token_symbol,
+            quote_token_volume,
+            action_time,
+            token_balance_usd,
+            wallet_logo,
+          },
+          $index
+        ) in currentActions"
+        :key="$index"
+        class="flex color-[--secondary-text] text-12px h-40px items-center cursor-pointer"
+        @click="openTokenDetail(currentActions[$index])"
+      >
+        <div class="flex-[2] flex items-center">
+          <UserRemark
+            :key="wallet_address"
+            :address="wallet_address"
+            :chain="activeChain"
+            :remark="wallet_alias || ''"
+            :showIcon="true"
+            :teleported="true"
+            :wallet_logo="{ logo: wallet_logo, name: wallet_alias, url: '' }"
+            iconSize="24px"
+            avatar-class="mr-8px"
+            :formatAddress="(address) => `${address.slice(0, 4)}...${address.slice(-4)}`"
+            :showAddress="false"
+          >
+            <template #default>
+              <!-- <span
+                class="color-[--secondary-text] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px"
+                >{{ remark || $t('wallet') }}</span
+              > -->
+              <span class="color-[--main-text]"
+                >{{ wallet_address.slice(0, 4) }}...{{ wallet_address.slice(-4) }}</span
+              >
+              <Icon
+                name="bxs:copy"
+                class="ml-4px color-[--third-text]"
+                @click.stop.prevent
+                v-copy="wallet_address"
+              />
+            </template>
+          </UserRemark>
+        </div>
+        <div class="w-100px text-right color-#12B886">
+          {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : ''
+          }}<span
+            v-tooltip="'$' + formatNumber(quote_token_volume, 2)"
+            class="decoration-underline decoration-dotted underline-offset-2px"
+          >
+            {{ formatNumber(quote_token_amount, 2) }}
+            {{ quote_token_symbol.toUpperCase() === 'USDC' ? 'U' : quote_token_symbol }}
+          </span>
+        </div>
+        <div v-if="!filterToken" class="flex-1 text-right">
+          <span v-if="!token_balance_usd || Number(token_balance_usd) === 0" class="color-#F6465D">
+            {{ $t('soldAll') }}
+          </span>
+          <template v-else> ${{ formatNumber(token_balance_usd, 2) }} </template>
+        </div>
+        <div class="flex-1 text-right">
+          <span v-tooltip="formatDate(action_time * 1000, 'MM/DD HH:mm:ss')">{{
+            formatTimeFromNow(action_time)
+          }}</span>
+        </div>
+      </div>
+    </div>
+  </el-dialog>
 </template>
 
 <style scoped lang="scss"></style>

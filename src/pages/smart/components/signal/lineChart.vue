@@ -37,6 +37,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  token: {
+    type: String,
+    default: '',
+  },
 })
 
 const localeStore = useLocaleStore()
@@ -51,7 +55,7 @@ const markPoint = computed(() => {
     const xAxis = formatDate(y[0], 'MM-DD HH:mm')
     const yAxis = props.dataList?.find?.((i) => formatDate(i[0], 'MM-DD HH:mm') === xAxis)?.[1]
     let symbolUrl = themeStore.isDark ? buyDark : buyLight
-    console.log(idx, 'idx', props.marks)
+    // console.log(idx, 'idx', props.marks)
     if (idx === 0) {
       symbolUrl = buy
     }
@@ -79,11 +83,12 @@ const markPoint = computed(() => {
           color: 'var(--secondary-text)',
         },
         padding: [4, 8, 4, 8],
-        confine: true,
+        confine: false,
+        enterable: true,
         formatter: () => {
           return `
            <div class="color-[--main-text]">
-            <span class="decoration-underline decoration-dotted">${y[2]}${t(props.type)}</span>${t('buy')} $${formatNumber(y[1], 2)}
+            <span id="tooltipMark" class="decoration-underline decoration-dotted cursor-pointer" data-time=${y[0]} data-token=${props.token}>${y[2]}${t(props.type)}</span>${t('buy')} $${formatNumber(y[1], 2)}
            </div>
            <div>
              ${formatDate(y[0], 'YYYY-MM-DD HH:mm')}

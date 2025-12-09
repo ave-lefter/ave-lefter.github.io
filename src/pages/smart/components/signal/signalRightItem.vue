@@ -31,7 +31,6 @@ const props = withDefaults(
   }
 )
 const emit = defineEmits(['openDrawer', 'updateSignalKline'])
-const localeStore = useLocaleStore()
 const timeOptions = ref([
   { label: '15M', value: 15 },
   { label: '1H', value: 60 },
@@ -60,29 +59,12 @@ const increasedOrDecreased = computed(() => {
   }
 })
 
-const tokenDetailSStore = useTokenDetailsStore()
-
-function openTokenDetail(el: IActionItem | IActionV3Item) {
-  tokenDetailSStore.$patch({
-    drawerVisible: true,
-    tokenInfo: {
-      id: props.item.token + '-' + props.activeChain,
-      symbol: props.item.symbol,
-      logo_url: props.item.logo,
-      chain: props.activeChain,
-      address: props.item.token,
-      remark: '',
-    },
-    pairInfo: {
-      target_token: props.item.token,
-      token0_address: el.quote_token_address,
-      token0_symbol: el.quote_token_symbol,
-      token1_symbol: props.item.symbol,
-      pairAddress: '',
-    },
-    user_address: el.wallet_address,
-  })
-}
+const myTradeVisible = computed(() => {
+  return (
+    props.item.self_wallet_info?.total_purchase_usd &&
+    Number(props.item.self_wallet_info?.total_purchase_usd) !== 0
+  )
+})
 
 function setSelectTime(el: number) {
   selectTime.value = el
@@ -326,8 +308,9 @@ function setSelectTime(el: number) {
       :dataList="signalKlineData[item.token]?.k || []"
       :marks="signalKlineData[item.token]?.p?.e || []"
       :type="signalKlineData[item.token]?.p?.t"
+      :token="item.token"
     />
-    <div class="flex color-[--third-text] text-12px mb-8px mt-16px">
+    <!-- <div class="flex color-[--third-text] text-12px mb-8px mt-16px">
       <div class="flex-[2]">
         {{ $t('wallet') }}
       </div>
@@ -381,15 +364,6 @@ function setSelectTime(el: number) {
               ><span class="color-[--third-text]">(*{{ wallet_address.slice(-4) }})</span>
             </template>
           </UserRemark>
-          <!-- <UserAvatar
-            icon-size="24px"
-            :wallet_logo="{logo:wallet_logo,name:wallet_alias}"
-            :address="wallet_address"
-            :chain="activeChain"
-          />
-          <span class="ml-4px color-[--d-F5F5F5-l-333] whitespace-nowrap overflow-hidden text-ellipsis max-w-60px">{{
-              wallet_alias || $t('wallet')
-            }}</span><span class="color-[--d-999-l-666]">(*{{ wallet_address.slice(-4) }})</span>-->
         </div>
         <div class="w-100px text-right color-#12B886">
           {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : ''
@@ -400,7 +374,6 @@ function setSelectTime(el: number) {
             {{ formatNumber(quote_token_amount, 2) }}
             {{ quote_token_symbol.toUpperCase() === 'USDC' ? 'U' : quote_token_symbol }}
           </span>
-          <!--<span class="color-[&#45;&#45;d-999-l-666]">(${{ formatNumber(quote_token_volume, 0) }})</span>-->
         </div>
         <div v-if="!filterToken" class="flex-1 text-right">
           <span v-if="!token_balance_usd || Number(token_balance_usd) === 0" class="color-#F6465D">
@@ -424,47 +397,43 @@ function setSelectTime(el: number) {
         name="material-symbols:keyboard-double-arrow-down-rounded"
         class="color-[--third-text] hover:color-[--main-text] cursor-pointer"
       />
-    </div>
+    </div> -->
     <div class="m-12px bg-[--secondary-bg] h-1px" />
     <div v-if="footer" class="flex justify-between">
-      <div class="flex-1 flex items-center color-[--third-text] gap-6px text-12px">
-        <template
-          v-if="
-            item.self_wallet_info?.total_purchase_usd &&
-            Number(item.self_wallet_info?.total_purchase_usd) !== 0
-          "
-        >
-          {{ $t('mySwap') }}
-          <el-row class="text-12px flex-1 text-center">
-            <el-col :span="8">
-              <div class="color-[--third-text] mb-4px">{{ $t('bought') }}</div>
-              <div class="color-#12B886">
-                ${{ formatNumber(item.self_wallet_info?.total_purchase_usd || 0, 1) }}
-              </div>
-            </el-col>
-            <el-col :span="8">
-              <div class="color-[--third-text] mb-4px">
-                {{ $t('sold') }}
-              </div>
-              <div class="color-#F6465D">
-                ${{ formatNumber(item.self_wallet_info?.total_sold_usd || 0, 1) }}
-              </div>
-            </el-col>
-            <el-col :span="8">
-              <div class="color-[--third-text] mb-4px">
-                {{ $t('balance1') }}
-              </div>
-              <div class="color-[--main-text]">
-                ${{ formatNumber(item.self_wallet_info?.balance || 0, 1) }}
-              </div>
-            </el-col>
-          </el-row>
-        </template>
+      <div
+        v-if="myTradeVisible"
+        class="flex-1 flex items-center color-[--third-text] gap-6px text-12px"
+      >
+        {{ $t('mySwap') }}
+        <el-row class="text-12px flex-1 text-center">
+          <el-col :span="8">
+            <div class="color-[--third-text] mb-4px">{{ $t('bought') }}</div>
+            <div class="color-#12B886">
+              ${{ formatNumber(item.self_wallet_info?.total_purchase_usd || 0, 1) }}
+            </div>
+          </el-col>
+          <el-col :span="8">
+            <div class="color-[--third-text] mb-4px">
+              {{ $t('sold') }}
+            </div>
+            <div class="color-#F6465D">
+              ${{ formatNumber(item.self_wallet_info?.total_sold_usd || 0, 1) }}
+            </div>
+          </el-col>
+          <el-col :span="8">
+            <div class="color-[--third-text] mb-4px">
+              {{ $t('balance1') }}
+            </div>
+            <div class="color-[--main-text]">
+              ${{ formatNumber(item.self_wallet_info?.balance || 0, 1) }}
+            </div>
+          </el-col>
+        </el-row>
       </div>
       <QuickSwapButton
         :quick-buy-value="quickBuyValue"
         :row="item"
-        classNames="min-w-70px"
+        :classNames="`min-w-70px ${!myTradeVisible ? 'flex-1' : ''}`"
         mainNameVisible
       />
     </div>
