@@ -323,7 +323,7 @@ watch(() => wsStore.wsResult[WSEventType.PUMP_MIGRATED], (msg:GetSignalV2ListRes
     const pumpChains = globalStore.audioSettings.notice.pumpChains
     const pumpPlatforms = globalStore.audioSettings.notice.pumpPlatforms
     if(pumpChains.includes(msg.chain) && pumpPlatforms.includes(msg.pair.platform_id)){
-      pumpToast(msg)
+      setTimeout(() => { pumpToast(msg) }, 1000)
     }
   }
 })
