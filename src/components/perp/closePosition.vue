@@ -145,6 +145,7 @@ function _createOrder() {
     <el-input-number v-model="formData.closeSize" :precision="quantityPrecision" align="left" :controls="false" class="mb-12px w-full!" :max="Math.abs(Number(row?.openSize || '0'))" @change="(val) => sizeChange(val as number)" />
     <el-slider
       v-model="closePercent"
+      v-slider-active
       :min="0"
       :max="100"
       :step="1"
@@ -155,7 +156,7 @@ function _createOrder() {
         75: '75%',
         100: '100%',
       }"
-      class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-406px"
+      class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] ml-4px [&&]:w-406px"
       @input="val => closeSizePercentChange(val as number)"
     />
     <div class="color-[--third-text] flex justify-between mt-38px mb-8px">

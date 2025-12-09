@@ -366,6 +366,7 @@ function _createSlOrder() {
         </div>
         <el-slider
           v-model="tempData.tpPercent1"
+          v-slider-active
           :min="0"
           :max="200"
           :step="1"
@@ -376,7 +377,7 @@ function _createSlOrder() {
             150: '150%',
             200: '200%',
           }"
-          class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
+          class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] ml-4px [&&]:w-456px"
            @change="val => tpPercentChange(val as number)"
         />
         <el-input-number
@@ -453,6 +454,7 @@ function _createSlOrder() {
         </div>
         <el-slider
           v-model="tempData.slPercent1"
+          v-slider-active
           :min="0"
           :max="200"
           :step="1"
@@ -463,7 +465,7 @@ function _createSlOrder() {
             150: '150%',
             200: '200%',
           }"
-          class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
+          class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] ml-4px [&&]:w-456px"
          @change="val => slPercentChange(val as number)"
         />
         <el-input-number
@@ -491,6 +493,7 @@ function _createSlOrder() {
         </div>
         <el-slider
           v-model="tempData.sizePercent"
+          v-slider-active
           :min="0"
           :max="100"
           :step="1"
@@ -501,7 +504,7 @@ function _createSlOrder() {
             75: '75%',
             100: '100%',
           }"
-          class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] ml-4px [&&]:w-456px"
+          class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] ml-4px [&&]:w-456px"
           @change="val => sizePercentChange(val as number)"
         />
         <div class="mt-53px flex items-center justify-between">

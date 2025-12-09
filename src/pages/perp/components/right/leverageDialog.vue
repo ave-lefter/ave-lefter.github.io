@@ -20,12 +20,13 @@
       <div class="mt-20px mb-30px px-3px w-full">
         <el-slider
           v-model="leverage"
+          v-slider-active
           :min="min"
           :max="max"
           :step="1"
           :marks="marks"
           :format-tooltip="(value)=> value+'X'"
-          class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--white] slider-box"
+          class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] slider-box"
           @input="change"
         />
       </div>

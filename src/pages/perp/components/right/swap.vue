@@ -40,6 +40,7 @@
     <div class="mt-20px px-3px w-full">
       <el-slider
         v-model="percent"
+        v-slider-active
         :min="0"
         :max="100"
         :step="1"
@@ -108,6 +109,7 @@
         <div class="mb-30px px-3px w-full">
           <el-slider
             v-model="tempData.tpPercent1"
+            v-slider-active
             :min="0"
             :max="200"
             :step="1"
@@ -173,6 +175,7 @@
         <div class="mb-30px px-3px w-full">
           <el-slider
             v-model="tempData.slPercent1"
+            v-slider-active
             :min="0"
             :max="200"
             :step="1"
