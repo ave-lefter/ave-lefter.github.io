@@ -1,5 +1,5 @@
 <template>
-  <div class="relative" :style="{height: `${isRank ? 390 : kHeight}px`}">
+  <div class="relative" :style="{height: `${kHeight}px`}">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
   </div>
   <div
@@ -625,7 +625,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
 
 // 拖动缩放
 let isMask = false
-const kHeight = useStorage('kHeight', DefaultHeight.KLINE)
+const kHeight = useStorage('kHeightPerp',  Math.max(DefaultHeight.KLINE, 500))
 const wHeight = useWindowSize().height
 const dom = useTemplateRef('kline')
 function drag(e: MouseEvent) {

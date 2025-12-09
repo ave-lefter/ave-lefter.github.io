@@ -95,7 +95,7 @@ const klineDateFilter = ref<string[]>([])
 provide(ProvideType.KLINE_DATE_FILTER, klineDateFilter)
 
 // KLine 高度监听
-const klineHeight = useStorage('kHeight', DefaultHeight.KLINE)
+const klineHeight = useStorage('kHeightPerp', Math.max(DefaultHeight.KLINE, 500))
 // 订单簿宽度管理
 const DEFAULT_ORDERBOOK_WIDTH = 300
 const MAX_ORDERBOOK_WIDTH = 400
