@@ -1526,6 +1526,6 @@
   "overLimit": "超過上限，建議確認是否誤填",
   "pairsLink": "跳轉區塊瀏覽器",
   "searchSameAmm": "查看同類型池子",
-  "pumpCompleted": "已完成",
-  "innerDiskTime": "內盤用時"
+  "pumpCompleted": "已打滿",
+  "innerDiskTime": "內盤耗時"
 }

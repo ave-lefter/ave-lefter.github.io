@@ -134,11 +134,9 @@
 </template>
 
 <script setup lang="tsx">
-// @ts-nocheck - 忽略整个文件的类型检查
 import { cloneDeep, first, throttle  } from 'lodash-es'
 import { formatDec } from '~/utils/formatNumber'
 import { getTokensPrice } from '@/api/token'
-import { upColor, downColor } from '@/utils/constants'
 import type { GetSignalV2ListResponse } from '~/api/signal'
 import UserAvatar from '../userAvatar.vue'
 import type { IMonitorWsResponse } from '~/api/types/ws'
@@ -147,7 +145,7 @@ import bellImg3 from '@/assets/images/bell3.svg'
 import { TokenImg } from '#components'
 
 const {t} = useI18n()
-const {visible,hasRing} = storeToRefs(useMonitorStore())
+const {visible, hasRing} = storeToRefs(useMonitorStore())
 const signalStore = useSignalStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
@@ -349,11 +347,11 @@ function pumpToast(val:GetSignalV2ListResponse) {
         }}
       >
         <div class='flex items-center gap-4px relative'>
-          <TokenImg row={{ logo_url: val.pair.logo_url, chain: val.chain, symbol: getSymbol() }} token-class="w-28px h-28px" />
+          <TokenImg row={{ logo_url: val.pair.logo_url, chain: val.chain, symbol: getSymbol() }} token-class="w-28px h-28px" chainClass='hidden' />
           <img
             src={getIconByPlatform(val.pair.platform_id)}
             alt=""
-            class="w-12px h-12px absolute right-0 bottom-0"
+            class="w-13px h-13px absolute right-0 bottom-0"
           />
         </div>
         <div class='ml-4px'>
