@@ -398,7 +398,7 @@
   "3d": "3 dias",
   "7d": "7d",
   "noSToken": "Não suportado",
-  "minimumTransactionAmount": "O valor de venda da ordem de limite confiada não pode ser menor que ${n}",
+  "minimumTransactionAmount": "O valor de venda da ordem de limite confiável não pode ser menor que ${n}",
   "limitPriceTips": "O preço de compra da ordem de limite ({p1}) é maior que o preço atual ({p2})",
   "limitPriceTips1": "O preço de venda da ordem de limite ({p1}) é menor que o preço atual ({p2})",
   "tradeConfirmed": "Transação Confirmada",
@@ -547,5 +547,7 @@
   "batchDelete": "Exclusão em lote",
   "removeTokenTips": "Excluir o seguinte selecionado?",
   "pairsLink": "Explorador de blocos de salto",
-  "searchSameAmm": "Ver pools semelhantes"
+  "searchSameAmm": "Ver pools semelhantes",
+  "pumpCompleted": "Bomba concluída",
+  "innerDiskTime": "Tempo do disco interno"
 }

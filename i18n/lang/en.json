@@ -1426,6 +1426,7 @@
   "selectCorrectTimeRange": "Please select the correct time range",
   "monitorGlobalPush": "Monitor Global Push",
   "signalGlobalPush": "Signal Global Push",
+  "pumpNotice": "Pump Notice",
   "topLeft": "Top Left",
   "topMiddle": "Top Middle",
   "topRight": "Top Right",
@@ -1542,6 +1543,8 @@
   "overLimit": "Over limit, please confirm if it is filled incorrectly",
   "pairsLink": "Jump block explorer",
   "searchSameAmm": "View similar pools",
+  "pumpCompleted": "Pump Completed",
+  "innerDiskTime": "Inner Disk Time",
   "resetTips": "Reset will hide your custom fields and return to the default display. The filtering conditions remain unchanged. Are you sure to reset?",
   "confirmAgain": "Confirm again"
 }
