@@ -288,7 +288,7 @@ function setSelectTime(el: number) {
         </div>
       </div>
     </div>
-    <div class="flex items-center my-16px">
+    <div class="flex items-center mt-16px">
       <span
         v-for="el in timeOptions"
         :key="el.value"

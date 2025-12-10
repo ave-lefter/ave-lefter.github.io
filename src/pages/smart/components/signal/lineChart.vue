@@ -88,7 +88,7 @@ const markPoint = computed(() => {
         formatter: () => {
           return `
            <div class="color-[--main-text]">
-            <span id="tooltipMark" class="decoration-underline decoration-dotted cursor-pointer" data-time=${y[0]} data-token=${props.token}>${y[2]}${t(props.type)}</span>${t('buy')} $${formatNumber(y[1], 2)}
+            <span id="tooltipMark" class="decoration-underline decoration-dotted cursor-pointer" data-time=${y[0]} data-token=${props.token}>${y[2]}${t(props.type)}</span>${localeStore.locale === 'zh-cn' ? '' : ' '}${t('buy')} $${formatNumber(y[1], 2)}
            </div>
            <div>
              ${formatDate(y[0], 'YYYY-MM-DD HH:mm')}
@@ -151,9 +151,9 @@ function init() {
       show: false,
     },
     grid: {
-      left: '0', //图表距边框的距离
-      right: '0',
-      top: '0',
+      left: '12', //图表距边框的距离
+      right: '12',
+      top: '16',
       bottom: '0',
       containLabel: true,
     },
@@ -197,12 +197,37 @@ function init() {
     series: series.value,
   }
   myChart.value.setOption(option)
+  // if (series.value.markPoint.data.length > 0) {
+  //   autoShowMarkTooltip()
+  // }
 }
+
+// function autoShowMarkTooltip() {
+//   setTimeout(() => {
+//     // 显示第一个 markPoint
+//     const coordSys = myChart.value.getModel().getSeriesByIndex(0).coordinateSystem
+//     console.log(
+//       coordSys,
+//       markPoint.value[0]?.coord,
+//       myChart.value.convertToPixel({ seriesIndex: 0 }, markPoint.value[0]?.coord)
+//     )
+//     const xy = myChart.value.convertToPixel({ seriesIndex: 0 }, markPoint.value[0]?.coord)
+//     myChart.value.dispatchAction({
+//       type: 'showTip',
+//       seriesIndex: 0,
+//       dataIndex: 0,
+//       position: xy,
+//       tooltip: {
+//         formatter: 'content',
+//       },
+//     })
+//   }, 100)
+// }
 </script>
 
 <template>
-  <div class="m-0 text-left w-full">
-    <div ref="lineChartRef" class="w-351px h-63px" />
+  <div class="text-left">
+    <div ref="lineChartRef" class="w-375px h-63px ml--12px" />
   </div>
 </template>
 
