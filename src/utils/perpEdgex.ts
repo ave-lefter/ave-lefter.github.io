@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { usePerpStore } from '~/stores/perp'
+import type { Position } from '~/stores/perp/type'
 
 type RiskTierModel = ReturnType<typeof usePerpStore>['contractList'][0]['riskTierList'][0]
 
@@ -1538,9 +1539,9 @@ export class CoreCalculator {
     // - Collateral.pendingWithdrawAmount
     // - Collateral.pendingTransferOutAmount
     // - Collateral.orderFrozenAmount)
-  static getCollateralAvailableAmount(coinId: string) {
+  static getCollateralAvailableAmount(coinId: string, position?: Position[]) {
     const perpStore = usePerpStore()
-    const positionList = perpStore?.position || []
+    const positionList = position || perpStore?.position || []
     const collateralModel = (perpStore?.collateral || [])?.find(item => item.coinId === coinId)
     let collateralTotalEquity = new BigNumber(collateralModel?.amount || 0)
     let collateralPendingWithdrawAmount = CoreCalculator.getCollateralPendingWithdrawAmount(coinId)

@@ -3,7 +3,7 @@ import { usePerpStore } from '~/stores/perp'
 import { type ETHWithdrawInput, type CrossWithdrawInput, type TradeOrderParams } from '@edgex-fe/typescript-sdk'
 import { perpApi as api } from './request'
 import BigNumber from 'bignumber.js'
-import type { PerpOrderParams } from './typs'
+import type { PerpOrderParams } from './types'
 
 export const PerpABI = [
   "function allowance(address owner, address spender) view returns (uint256)",
@@ -25,15 +25,24 @@ export const allowance = (tokenAddress: string) => {
 
 export const approve = async (tokenAddress: string) => {
   const walletStore = useWalletStore()
-
   const chain = walletStore.chain
   const chain_id = getChainInfo(chain).chain_id
   const perpStore = usePerpStore()
   const tokenInfo = perpStore.metadata?.multiChain?.chainList?.find(item => item.chainId === chain_id)?.tokenList?.find?.(i => i.tokenAddress === tokenAddress)
   const signer = await getSigner()
   const ERC20 = new Contract(tokenAddress, PerpABI, signer)
-  return ERC20.approve.estimateGas(tokenInfo?.contractAddress || '', MAX_UINT_AMOUNT).then(gas => {
-    return ERC20.approve(tokenInfo?.contractAddress || '', MAX_UINT_AMOUNT, { gasLimit: (gas * 2n).toString() })
+  const spender = tokenInfo?.contractAddress || ''
+  const amount = MAX_UINT_AMOUNT
+  return ERC20.approve.estimateGas(spender, amount).then(gas => {
+    return ERC20.approve(spender, amount, { gasLimit: (gas * 2n).toString() })
+  }).catch(err => {
+    if (!(err?.code === 'CALL_EXCEPTION' || err?.message === 'execution reverted')) {
+      throw err
+    }
+    return ERC20.approve(spender, '0').then(res => res.wait()).then(async () =>{
+      const gas = await ERC20.approve.estimateGas(spender, MAX_UINT_AMOUNT)
+      return ERC20.approve(spender, MAX_UINT_AMOUNT, { gasLimit: (gas * 2n).toString() })
+    })
   })
 }
 

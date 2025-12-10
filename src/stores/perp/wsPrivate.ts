@@ -21,6 +21,8 @@ function getWSMessage(e: MessageEvent): {
   return null
 }
 
+const UPDATE_EVENTS = ['ORDER_UPDATE', 'WITHDRAW_UPDATE', 'DEPOSIT_UPDATE']
+
 export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
   // 使用 shallowRef 代替 ref，WebSocket 本身是非响应式的
   const wsInstance = shallowRef<WS | null>(null)
@@ -98,7 +100,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
           if (collateral as Collateral[]) {
             if (msg.content?.event === 'Snapshot') {
               updateCollateralInfo(collateral)
-            } else if (msg.content?.event === 'ORDER_UPDATE' && (collateral as Collateral[])?.length > 0) {
+            } else if (UPDATE_EVENTS?.includes(msg.content?.event) && (collateral as Collateral[])?.length > 0) {
               updateCollateralInfo(collateral)
             }
           }
@@ -134,7 +136,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
           if (position as Position[]) {
             if (msg.content?.event === 'Snapshot') {
               updatePositionInfo(position)
-            } else if (msg.content?.event === 'ORDER_UPDATE' && (position as Position[])?.length > 0) {
+            } else if (UPDATE_EVENTS?.includes(msg.content?.event) && (position as Position[])?.length > 0) {
               updatePositionInfo(position, true)
             }
           }

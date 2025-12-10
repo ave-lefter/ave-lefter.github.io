@@ -180,7 +180,7 @@
             <div class="flex-end border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('oraclePriceTooltip')">
               <Icon class="text-14px color-[--third-text]" name="custom:perp-flag" />
               <span class="text-12px color-[--third-text] ml-4px">
-                {{ formatNumber(perp?.oraclePrice || 0) }}</span
+                {{ formatNumber(perp?.oraclePrice || 0, 2) }}</span
               >
             </div>
           </div>
