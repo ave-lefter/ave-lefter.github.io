@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { getHistoryOrderFillTransactionPage } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 
+const walletStore = useWalletStore()
 const perpStore = usePerpStore()
 const { t } = useI18n()
 const props = defineProps<{
@@ -58,11 +59,12 @@ const getList = async () => {
     listStatus.value.loading = false
   }
 }
-
-getList()
+if (walletStore.address) {
+  getList()
+}
 
 watch(
-  () => props.searchParams,
+  () => [props.searchParams, walletStore.address],
   () => {
     // reset
     offsetData.value = ''

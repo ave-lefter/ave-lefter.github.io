@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { getPositionTransactionPage } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 
+const walletStore = useWalletStore()
 const { t } = useI18n()
 const props = defineProps<{
   searchParams: any
@@ -76,10 +77,12 @@ const getList = async () => {
   }
 }
 
-getList()
+if (walletStore.address) {
+  getList()
+}
 
 watch(
-  () => props.searchParams,
+  () => [props.searchParams, walletStore.address],
   () => {
     // reset
     offsetData.value = ''
