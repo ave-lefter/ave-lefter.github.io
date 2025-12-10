@@ -380,9 +380,9 @@ function signalToast(val:GetSignalV2ListResponse) {
   const actionsVol = val.actions.reduce((acc, curr) => acc + Number(curr.quote_token_amount), 0)
   const firstAction = val.actions[0]
   const msg = ElMessage({
-    icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
-    placement:globalStore.audioSettings.notice.position as any,
-    message:()=>(
+    icon: <img src={bellImg} alt="" class="w-16px h-16px"/>,
+    placement: globalStore.audioSettings.notice.position as any,
+    message: ()=>(
       <div
         class='inline-flex items-center gap-4px text-12px cursor-pointer'
         onClick={()=>{
