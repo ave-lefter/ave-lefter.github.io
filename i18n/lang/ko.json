@@ -1399,6 +1399,8 @@
   "removeTokenTips": "선택한 다음을 삭제하시겠습니까?",
   "pairsLink": "점프 블록 탐색기",
   "searchSameAmm": "유사한 풀 보기",
+  "pumpCompleted": "펌프 완료",
+  "innerDiskTime": "내부 디스크 시간",
   "takeProfitAndStopLoss1": "더블 아웃",
   "takeProfitAndStopLoss2": "자본금을 두 배로 늘리나요&손실을 절반으로 막으세요",
   "takeProfitAndStopLoss0": "맞춤형 이익실현 및 손절매",

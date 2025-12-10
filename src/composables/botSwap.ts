@@ -1,7 +1,7 @@
 import { debounce } from 'lodash-es'
 import { NATIVE_TOKEN, MAX_UINT_AMOUNT } from '@/utils/constants'
 import { getAddressAndChainFromId, getChainInfo, isEvmChain } from '@/utils'
-import { bot_getTokenBalance, bot_getApprove, bot_approve } from '@/api/bot'
+import { bot_getTokenBalance, bot_getApprove, bot_approve, bot_getApproveV2, bot_approveV2 } from '@/api/bot'
 import { getTokensPrice } from '@/api/token'
 import { ElNotification } from 'element-plus'
 
@@ -190,8 +190,8 @@ export function useBotSwap(type: number = 0, isBatch = false) {
   const loadingAllowance = ref(false)
   const allowance = ref<number | string>(0)
 
-  async function getAllowance(token: string, chain: string = getChain()) {
-    if (getChainInfo(chain)?.vm_type !== 'evm' || token === NATIVE_TOKEN ) {
+  async function getAllowance(inToken: string, outToken: string, chain: string = getChain()) {
+    if (getChainInfo(chain)?.vm_type !== 'evm' || inToken === NATIVE_TOKEN ) {
       allowance.value = MAX_UINT_AMOUNT
       return MAX_UINT_AMOUNT
     }
@@ -201,12 +201,17 @@ export function useBotSwap(type: number = 0, isBatch = false) {
     }
     const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
     loadingAllowance.value = true
-    return bot_getApprove({
-      token,
+    return bot_getApproveV2({
+      inToken,
+      outToken,
       chain,
       owner: walletAddress || ''
     }).then(async res => {
-      allowance.value = res
+      if (res === 1) {
+        allowance.value = MAX_UINT_AMOUNT
+      } else {
+        allowance.value = res
+      }
       return res
     }).finally(() => {
       loadingAllowance.value = false
@@ -226,13 +231,14 @@ export function useBotSwap(type: number = 0, isBatch = false) {
   }
 
   function _bot_approve(data: {
-    tokenAddress: string
+    inTokenAddress: string
+    outTokenAddress: string
     batchId: string
     chain: string
     creatorAddress: string[]
   }) {
     const d = {...data, tgUid: botStore?.userInfo?.tgUid}
-    return bot_approve(d).then(res => {
+    return bot_approveV2(d).then(res => {
       return {
         result: res,
         wait: () => {
@@ -245,7 +251,7 @@ export function useBotSwap(type: number = 0, isBatch = false) {
                 if (isFinish) {
                   return
                 }
-                getAllowance(d.tokenAddress, d.chain).then(res => {
+                getAllowance(d.inTokenAddress, d.outTokenAddress, d.chain).then(res => {
                   if (res === '0') {
                     fuc(resolve, reject)
                   } else {
@@ -277,18 +283,19 @@ export function useBotSwap(type: number = 0, isBatch = false) {
     })
   }
 
-  function checkApproveAndApprove (data: { chain?: string, token?: string, owner?: string } = {}) {
+  function checkApproveAndApprove (data: { chain?: string, inToken?: string, outToken?: string, owner?: string } = {}) {
     const chain = data?.chain
     if (!(chain && isEvmChain(chain))) {
       return Promise.resolve(MAX_UINT_AMOUNT)
     }
-    return getAllowance(data.token || '', chain).then(res => {
-      if (res === '0') {
+    return getAllowance(data.inToken || '', data.outToken || '', chain).then(res => {
+      if (Number(res) === 0) {
         const walletAddress = data.owner || botStore?.userInfo?.evmAddress || ''
         const d = {
           batchId: Date.now().toString(),
           chain: data.chain || '',
-          tokenAddress: data.token || '',
+          inTokenAddress: data.inToken || '',
+          outTokenAddress: data.outToken || '',
           creatorAddress: [walletAddress],
         }
         let notifyDom: null | ReturnType<typeof ElNotification> = null

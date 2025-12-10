@@ -1399,6 +1399,8 @@
   "removeTokenTips": "選択したフォローを削除しますか?",
   "pairsLink": "ジャンプブロックエクスプローラー",
   "searchSameAmm": "類似したプールを表示",
+  "pumpCompleted": "パンプ完了",
+  "innerDiskTime": "内盤時間",
   "takeProfitAndStopLoss1": "ダブルアウト",
   "takeProfitAndStopLoss2": "資本金2倍&損失を半分で止める",
   "takeProfitAndStopLoss0": "カスタマイズされたテイクプロフィットとストップロス",

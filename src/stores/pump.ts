@@ -1,7 +1,7 @@
 import { useStorage, useThrottleFn, useWindowSize } from '@vueuse/core'
 import type { ChainKey, PumpConfig, PumpObj, pumpData } from '~/api/types/pump'
 import { _getPumpConfig, _getPumpList } from '@/api/pump'
-import { usePumpTableDataFetching } from '@/utils/index'
+// import { usePumpTableDataFetching } from '@/utils/index'
 
 export const usePumpStore = defineStore('pumpStore', () => {
     const route = useRoute()
@@ -253,23 +253,23 @@ export const usePumpStore = defineStore('pumpStore', () => {
         graduated: '',
       },
     })
-      const pump_notice = useStorage('pump_notice2', {
-        solana: {
-          new: '',
-          soon: '',
-          graduated: '',
-        },
-        bsc: {
-          new: '',
-          soon: '',
-          graduated: '',
-        },
-        // xlayer: {
-        //   new: '',
-        //   soon: '',
-        //   graduated: '',
-        // },
-      },localStorage)
+    const pump_notice = useStorage('pump_notice2', {
+      solana: {
+        new: '',
+        soon: '',
+        graduated: '',
+      },
+      bsc: {
+        new: '',
+        soon: '',
+        graduated: '',
+      },
+      // xlayer: {
+      //   new: '',
+      //   soon: '',
+      //   graduated: '',
+      // },
+    },localStorage)
     const listData = shallowRef<PumpObj[]>([])
 
     return {

@@ -24,7 +24,7 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE,
+      // apiBase: process.env.NUXT_PUBLIC_API_BASE,
       ga: process.env.NUXT_PUBLIC_GA
     }
   },
@@ -215,7 +215,7 @@ export default defineNuxtConfig({
     workbox: {
       navigateFallback: null,
       globPatterns: ['**/*.{js,css,ico,png,jpg,jpeg,svg,webp,json,woff2,otf,ttf,woff}'],
-      maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 设置为 3 MiB
+      maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 设置为 10 MiB
       cleanupOutdatedCaches: true,
       runtimeCaching: [
         {

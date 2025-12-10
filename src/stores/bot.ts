@@ -134,7 +134,7 @@ export const useBotStore = defineStore('bot', () => {
       let i = walletList.value[k]
       let _item: typeof item | string = item
       if (BotNativeTokens?.includes(item?.address || '')) {
-        _item = item.chain
+        _item = item?.chain || ''
       }
       _getUserAllChainBalance(i?.addresses || [], _item)
     }
