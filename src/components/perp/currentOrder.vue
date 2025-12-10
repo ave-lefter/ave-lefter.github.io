@@ -184,7 +184,7 @@ watch(
     >
       <template #empty>
         <AveEmpty v-if="!listStatus.loading && listData?.length === 0" class="pt-[40px]">
-          <span class="text-12px">{{ $t('noData') }}</span>
+          <span class="text-12px">{{ $t('emptyNoData') }}</span>
         </AveEmpty>
         <span v-else />
       </template>

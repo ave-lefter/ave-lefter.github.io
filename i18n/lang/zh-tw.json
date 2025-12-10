@@ -1705,5 +1705,13 @@
   "marketPriceClosePosition": "確定以市價平倉以下倉位嗎",
   "limitPriceClosePosition": "限價平倉訂單已創建",
   "cancelAllOrderTips": "確認是否取消所有委託訂單?",
-  "cancelAllOrder": "取消全部委託"
+  "cancelAllOrder": "取消全部委託",
+  "normalDeposit": "普通充值",
+  "crossDeposit": "跨鏈充值",
+  "normalWithdraw": "普通提現",
+  "crossWithdraw": "跨鏈提現",
+  "fastWithdraw": "快速提現",
+  "internalWithdraw": "內部提現",
+  "internalDeposit": "內部充值",
+  "direction": "方向"
 }

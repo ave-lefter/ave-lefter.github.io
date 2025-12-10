@@ -8,7 +8,7 @@ const { t } = useI18n()
 const props = defineProps<{
   searchParams: any
 }>()
-const listData = shallowRef()
+const listData = shallowRef([])
 const listStatus = ref({
   loading: false,
   finished: false,
@@ -92,7 +92,7 @@ watch(
     >
       <template #empty>
         <AveEmpty v-if="!listStatus.loading && listData?.length === 0" class="pt-[40px]">
-          <span class="text-12px">{{ $t('noData') }}</span>
+          <span class="text-12px">{{ $t('emptyNoData') }}</span>
         </AveEmpty>
         <span v-else />
       </template>
