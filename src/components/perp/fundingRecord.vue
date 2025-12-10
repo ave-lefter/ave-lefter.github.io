@@ -187,7 +187,9 @@ const reset = () => {
       cell-class-name="color-[--main-text] text-12px"
     >
       <template #empty>
-        <AveEmpty v-if="!listStatus.loading && listData?.length === 0" class="pt-[40px]" />
+        <AveEmpty v-if="!listStatus.loading && listData?.length === 0" class="pt-[40px]">
+          <span class="text-12px">{{ $t('noData') }}</span>
+        </AveEmpty>
         <span v-else />
       </template>
       <el-table-column :label="t('tradeTime')" prop="time">
@@ -202,7 +204,13 @@ const reset = () => {
       </el-table-column>
       <el-table-column :label="t('status')" prop="status">
         <template #default="{ row }">
-          <span :class="getPerpStatus(row.type, row.status, false) !== 'Failed' ? 'color-[--up-color]' : 'color-[--down-color]'">
+          <span
+            :class="
+              getPerpStatus(row.type, row.status, false) !== 'Failed'
+                ? 'color-[--up-color]'
+                : 'color-[--down-color]'
+            "
+          >
             {{ getPerpStatus(row.type, row.status) || t('failed') }}
           </span>
         </template>

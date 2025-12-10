@@ -5,7 +5,7 @@ import { usePerpStore } from '~/stores/perp'
 import { Warning } from '@element-plus/icons-vue'
 import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
 import type { Order } from '~/stores/perp/type'
-const route =   useRoute()
+const route = useRoute()
 const { mode } = storeToRefs(useGlobalStore())
 const perpStore = usePerpStore()
 const { t } = useI18n()
@@ -78,9 +78,7 @@ const getList = async () => {
   }
 }
 getList()
-const cancelOrderLoading = reactive<{ [key: string]: boolean }>({
-
-})
+const cancelOrderLoading = reactive<{ [key: string]: boolean }>({})
 const cancelOrder = async (orderIds: string[]) => {
   cancelOrderLoading[orderIds[0]] = true
   await cancelOrderById(orderIds).finally(() => {
@@ -93,9 +91,10 @@ watch(
   () => props.searchParams,
   (val) => {
     if (route.name === 'perp-id') {
-      console.log('-------val----',val)
+      console.log('-------val----', val)
       if (val?.filterContractIdList) {
-        listData.value = perpStore.orderList?.filter(i => i.contractId == val?.filterContractIdList) || []
+        listData.value =
+          perpStore.orderList?.filter((i) => i.contractId == val?.filterContractIdList) || []
       } else {
         listData.value = perpStore.orderList
       }
@@ -114,22 +113,26 @@ watch(
   (val) => {
     if (route.name === 'perp-id') {
       let result: Order[] = val['trade-event']?.content?.data?.order || []
-      result = perpStore.order?.filter(i => !result.some(el => el.id === i.id)).concat(...result)?.filter(i => i.status !== 'CANCELED' && i.type !== 'MARKET')
-      result = result?.map?.((el) => {
-        const isLong = el.side === 'SELL'
-        // 止盈
-        const isProfit = el.type.includes('PROFIT')
-        let triggerSign = ''
-        if (isLong) {
-          triggerSign = isProfit ? '≥' : '≤'
-        } else {
-          triggerSign = isProfit ? '≤' : '≥'
-        }
-        return {
-          ...el,
-          triggerSign,
-        }
-      }) || []
+      result = perpStore.order
+        ?.filter((i) => !result.some((el) => el.id === i.id))
+        .concat(...result)
+        ?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET')
+      result =
+        result?.map?.((el) => {
+          const isLong = el.side === 'SELL'
+          // 止盈
+          const isProfit = el.type.includes('PROFIT')
+          let triggerSign = ''
+          if (isLong) {
+            triggerSign = isProfit ? '≥' : '≤'
+          } else {
+            triggerSign = isProfit ? '≤' : '≥'
+          }
+          return {
+            ...el,
+            triggerSign,
+          }
+        }) || []
       listData.value = result?.slice()
       perpStore.orderList = result?.slice()
     }
@@ -140,7 +143,7 @@ watch(
   () => isCancelOrder.value,
   (val) => {
     if (val) {
-      ElMessageBox.confirm('确认是否取消所有委托订单?', '取消全部委托', {
+      ElMessageBox.confirm(t('cancelAllOrderTips'), t('cancelAllOrder'), {
         type: 'warning',
         icon: markRaw(Warning),
         confirmButtonText: t('confirm'),
@@ -152,7 +155,8 @@ watch(
           cancelOrderById(ids)
             .then(() => {
               ElMessage.success(t('cancelledOrderSuccessfully'))
-            }).finally(() => {
+            })
+            .finally(() => {
               isCancelOrder.value = false
             })
         })
@@ -179,7 +183,9 @@ watch(
       cell-class-name="color-[--main-text] text-12px"
     >
       <template #empty>
-        <AveEmpty v-if="!listStatus.loading && listData?.length === 0" class="pt-[40px]" />
+        <AveEmpty v-if="!listStatus.loading && listData?.length === 0" class="pt-[40px]">
+          <span class="text-12px">{{ $t('noData') }}</span>
+        </AveEmpty>
         <span v-else />
       </template>
       <el-table-column :label="t('perp')" prop="contractId">
@@ -187,7 +193,7 @@ watch(
           <span class="text-14px">{{ typeDict[row.contractId] }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="route.name =='perp-id'" :label="t('type')" :width="100">
+      <el-table-column v-if="route.name == 'perp-id'" :label="t('type')" :width="100">
         <template #default="{ row }">
           <span v-if="row.type.includes('STOP')" class="color-[--down-color]">
             {{ $t('stopLoss') }}
@@ -195,7 +201,7 @@ watch(
           <span v-else-if="row.type.includes('PROFIT')" class="color-[--up-color]">
             {{ $t('takeProfit') }}
           </span>
-            <span v-else-if="row.type.includes('LIMIT')" >
+          <span v-else-if="row.type.includes('LIMIT')">
             {{ $t('limit') }}
           </span>
         </template>
@@ -212,9 +218,14 @@ watch(
           }}
         </template>
       </el-table-column>
-      <el-table-column v-if="route.name =='perp-id'" align="right" :label="t('triggerPrice')" prop="triggerPrice">
+      <el-table-column
+        v-if="route.name == 'perp-id'"
+        align="right"
+        :label="t('triggerPrice')"
+        prop="triggerPrice"
+      >
         <template #default="{ row }">
-          <template v-if="row.triggerPrice!=='' && row.triggerPrice > 0">
+          <template v-if="row.triggerPrice !== '' && row.triggerPrice > 0">
             {{ row.triggerSign
             }}{{
               formatNumber(row.triggerPrice, {
@@ -224,9 +235,7 @@ watch(
             }}
             {{ triggerPriceTypeMap[row.triggerPriceType as keyof typeof triggerPriceTypeMap] }}
           </template>
-          <template v-else>
-          --
-          </template>
+          <template v-else> -- </template>
         </template>
       </el-table-column>
       <el-table-column :width="150" align="right" :label="t('tradeVolume')" prop="contractSize">
@@ -264,7 +273,8 @@ watch(
       <el-table-column align="right" :label="t('orderId')" prop="id">
         <template #default="{ row }">
           <div class="flex items-center justify-end gap-4px">
-            {{ row.id?.slice(0,4)+ '...'+ row.id?.slice(-4) }}<Icon v-copy="row.id" name="bxs:copy" class="color-[#5A5E64]" />
+            {{ row.id?.slice(0, 4) + '...' + row.id?.slice(-4)
+            }}<Icon v-copy="row.id" name="bxs:copy" class="color-[#5A5E64]" />
           </div>
         </template>
       </el-table-column>

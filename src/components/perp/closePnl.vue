@@ -108,7 +108,9 @@ watch(
       cell-class-name="color-[--main-text] text-12px"
     >
       <template #empty>
-        <AveEmpty v-if="!listStatus.loading && listData?.length === 0" class="pt-[40px]" />
+        <AveEmpty v-if="!listStatus.loading && listData?.length === 0" class="pt-[40px]">
+          <span class="text-12px">{{ $t('noData') }}</span>
+        </AveEmpty>
         <span v-else />
       </template>
       <el-table-column :label="t('perp')" prop="contractId">

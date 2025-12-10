@@ -1732,5 +1732,7 @@
   "expectedProfitUSD": "预计盈利 {n} USD",
   "closePositionSubmitted": "市价平仓订单已成交",
   "marketPriceClosePosition": "确定以市价平仓以下仓位吗",
-  "limitPriceClosePosition": "限价平仓订单已创建"
+  "limitPriceClosePosition": "限价平仓订单已创建",
+  "cancelAllOrderTips": "确认是否取消所有委托订单?",
+  "cancelAllOrder": "取消全部委托"
 }

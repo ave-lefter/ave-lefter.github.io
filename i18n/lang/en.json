@@ -1719,5 +1719,7 @@
   "takeProfitStopLoss2": "Position TP/SL",
   "closePositionSubmitted": "The market price closing order has been completed",
   "marketPriceClosePosition": "Are you sure you want to close the following positions at market prices?",
-  "limitPriceClosePosition": "Limit closing order has been created"
+  "limitPriceClosePosition": "Limit closing order has been created",
+  "cancelAllOrderTips": "Are you sure you want to cancel all orders?",
+  "cancelAllOrder": "Cancel all orders"
 }

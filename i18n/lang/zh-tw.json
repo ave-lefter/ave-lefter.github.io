@@ -1703,5 +1703,7 @@
   "takeProfitStopLoss2": "倉位止盈止損",
   "closePositionSubmitted": "市價平倉訂單已成交",
   "marketPriceClosePosition": "確定以市價平倉以下倉位嗎",
-  "limitPriceClosePosition": "限價平倉訂單已創建"
+  "limitPriceClosePosition": "限價平倉訂單已創建",
+  "cancelAllOrderTips": "確認是否取消所有委託訂單?",
+  "cancelAllOrder": "取消全部委託"
 }

@@ -176,12 +176,13 @@ onUnmounted(() => {
     <el-table
       fit
       :data="filterListData"
-      height="400"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
       cell-class-name="color-[--main-text] text-12px"
     >
       <template #empty>
-        <AveEmpty v-if="perpStore.position?.length === 0" class="pt-[40px]" />
+        <AveEmpty v-if="perpStore.position?.length === 0" class="pt-[40px]">
+          <span class="text-12px">{{ $t('noData') }}</span>
+        </AveEmpty>
         <span v-else />
       </template>
       <el-table-column :label="t('perp')" prop="perp">
