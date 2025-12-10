@@ -96,7 +96,6 @@ export async function getApiDomainAndSave() {
 export function getBestApiDomain () {
   // const config = useRuntimeConfig()
   const baseUrl = import.meta.env.VITE_API_BASE
-   console.log('baseUrl', baseUrl)
   if (baseUrl === 'https://api.test.phaetd8l.com') {
     return 'https://api.test.phaetd8l.com'
   }
