@@ -1544,5 +1544,7 @@
   "pairsLink": "Jump block explorer",
   "searchSameAmm": "View similar pools",
   "pumpCompleted": "Pump Completed",
-  "innerDiskTime": "Inner Disk Time"
+  "innerDiskTime": "Inner Disk Time",
+  "resetTips": "Reset will hide your custom fields and return to the default display. The filtering conditions remain unchanged. Are you sure to reset?",
+  "confirmAgain": "Confirm again"
 }

@@ -1542,5 +1542,7 @@
   "pairsLink": "跳转区块浏览器",
   "searchSameAmm": "查看同类型池子",
   "pumpCompleted": "已打满",
-  "innerDiskTime": "内盘耗时"
+  "innerDiskTime": "内盘耗时",
+  "resetTips": "重置将隐藏您自定义的字段，列表恢复默认显示。筛选条件仍生效。 确认重置吗?",
+  "confirmAgain": "二次确认"
 }
