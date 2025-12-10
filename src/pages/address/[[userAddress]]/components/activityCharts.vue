@@ -1,9 +1,22 @@
 <template>
   <div>
-    <div class="flex justify-between mt-5 mb-2.5">
-      <h2 class="summary-title text-16px leading-5 font-500 text-[--main-text]">{{ $t('walletActivity') }}</h2>
+    <div class="flex justify-between mb-2.5">
+      <h2
+        class="summary-title text-16px leading-5 font-500 text-[--main-text] flex items-center cursor-pointer"
+        @click="isExpand = !isExpand"
+      >
+        {{ $t('walletActivity') }}
+        <Icon
+          :name="isExpand ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
+          class="text-16px ml-4px"
+        />
+      </h2>
     </div>
-    <div v-loading="loading" class="activity relative p-5 rounded-2 h-[220px] bg-[--secondary-bg]">
+    <div
+      v-if="isExpand"
+      v-loading="loading"
+      class="activity relative p-5 rounded-2 h-[220px] bg-[--secondary-bg] mb-24px"
+    >
       <template v-if="activity.dataset.source.length <= 0">
         <AveEmpty
           :style="{
@@ -67,6 +80,7 @@ const props = defineProps({
     default: '',
   },
 })
+const isExpand = ref(true)
 
 const activity = ref({
   grid: {
@@ -142,7 +156,8 @@ const activity = ref({
                           style="margin-right:8px;border-radius: 50%;"
                           src="${icon}" alt=""
                         />`
-                    }).join('')}
+                    })
+                    .join('')}
                   </div>
               </div>
               <div style="color:var(--third-text);font-size: 12px;">

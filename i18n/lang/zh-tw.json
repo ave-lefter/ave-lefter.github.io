@@ -1529,5 +1529,10 @@
   "pumpCompleted": "已打滿",
   "innerDiskTime": "內盤耗時",
   "resetTips": "重置將隱藏您自定義的字段，列表恢復默認顯示。篩選條件仍生效。 確認重置嗎?",
-  "confirmAgain": "二次确认"
+  "confirmAgain": "二次确认",
+  "totalAssets": "总资产",
+  "totalPnl": "当月总盈亏",
+  "preferredTokenMarketCap": "偏好的代币市值",
+  "profitTokenCount": "盈利代币数",
+  "totalTokenCount": "交易代币总数"
 }

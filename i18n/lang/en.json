@@ -1546,5 +1546,10 @@
   "pumpCompleted": "Pump Completed",
   "innerDiskTime": "Inner Disk Time",
   "resetTips": "Reset will hide your custom fields and return to the default display. The filtering conditions remain unchanged. Are you sure to reset?",
-  "confirmAgain": "Confirm again"
+  "confirmAgain": "Confirm again",
+  "totalAssets": "Total Assets",
+  "totalPnl": "Total PnL",
+  "preferredTokenMarketCap": "Preferred Token Market Cap",
+  "profitTokenCount": "Profit Token Count",
+  "totalTokenCount": "Total Token Count"
 }

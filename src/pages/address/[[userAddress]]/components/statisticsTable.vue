@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div
-      class="flex justify-between border-b-1px border-b-solid border-b-[--main-divider] mb-10px mt-20px"
-    >
+    <div class="flex justify-between border-b-1px border-b-solid border-b-[--main-divider] mb-10px">
       <div class="flex items-center gap-24px">
         <a
           v-for="(item, index) in tabs"

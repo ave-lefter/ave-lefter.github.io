@@ -71,8 +71,30 @@ export function getTokenDetailMarks(pair, params) {
 }
 
 // 钱包基础信息
+export interface IWalletInfo {
+  x_name:                string;
+  x_logo:                string;
+  x_url:                 string;
+  x_followers:           number;
+  is_wallet_address_fav: number;
+  remark:                string;
+  wallet_logo:           WalletLogo;
+  newTags:               any[];
+  wallet_age:            string;
+  last_txn_time:         Date;
+  is_follow_kol:         number;
+  follow_id:             number;
+}
+
+export interface WalletLogo {
+  name:      string;
+  url:       string;
+  logo:      string;
+  vip_logo:  string;
+  followers: number;
+}
 //https://tsgrysq47oqo.sg.larksuite.com/wiki/NeenwruPiiJWQDkgnOClkMn9guf?fromScene=spaceOverview
-export function getWalletBasicInfo(params) {
+export function getWalletBasicInfo(params): Promise<IWalletInfo> {
   const { $api } = useNuxtApp()
   return $api('/v2api/walletinfo/v2/info', {
     method: 'get',
