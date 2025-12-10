@@ -365,9 +365,17 @@ async function handleSellAmount(row: GetUserBalanceResponse & { index: string })
       ElNotification(({title: 'Error', type: 'error', message: t('insufficientBalance')}))
       return
     }
+    const chainMainToken = {
+      solana: 'sol',
+      ton: 'TON',
+    } as {
+      [key: string]: string
+    }
+    const native = chainMainToken[row.chain] || NATIVE_TOKEN
     await botSwapStore.checkApproveAndApprove({
       chain: row.chain,
-      token: row.token,
+      inToken: row.token,
+      outToken: native,
       owner: walletAddress
     })
     beforeSubmitSwap(balance, row)

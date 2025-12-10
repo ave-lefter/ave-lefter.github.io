@@ -491,6 +491,20 @@ export const bot_getApprove = createCacheRequest(function(params: {
   })
 }, 500)
 
+// 查询预授权状态 V2
+export const bot_getApproveV2 = createCacheRequest(function(params: {
+  inToken: string
+  outToken: string
+  chain: string
+  owner: string
+}) {
+  const { $api } = useNuxtApp()
+  return  $api('/botapi/swap/getApproveV2', {
+    method: 'get',
+    query: params
+  })
+}, 500)
+
 export const bot_getChainsTokenBalance = createCacheRequest(async function(params: Array<{
   chain: string
   tokens: string[]
@@ -554,6 +568,30 @@ export function bot_approve(data: {
   const { $api } = useNuxtApp()
   const botStore = useBotStore()
   return $api('/botapi/swap/preApprove', {
+    method: 'post',
+    body: {
+      // batchId: Date.now().toString(),
+      // chain: store.getters.botChain,
+      // creatorAddress: [store.getters.botWallet],
+      tgUid: botStore.userInfo?.tgUid,
+      noCb: false,
+      source: 'web',
+      ...data
+    }
+  })
+}
+
+// 预授权代币
+export function bot_approveV2(data: {
+  inTokenAddress: string
+  outTokenAddress: string
+  batchId: string
+  chain: string
+  creatorAddress: string[]
+}) {
+  const { $api } = useNuxtApp()
+  const botStore = useBotStore()
+  return $api('/botapi/swap/preApproveV2', {
     method: 'post',
     body: {
       // batchId: Date.now().toString(),
