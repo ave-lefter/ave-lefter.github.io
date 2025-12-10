@@ -63,6 +63,7 @@ import Kline from './components/kline/index.vue'
 import OrderBook from './components/orderBook/index.vue'
 import Bottom from './components/bottom/index.vue'
 import WithdrawAlert from '~/components/perp/withdrawAlert.vue'
+const { isCanNormalWithdrawableAmount } = usePerp()
 definePageMeta({
   name: 'perp-id',
   key: (route) => {
@@ -71,8 +72,8 @@ definePageMeta({
 })
 const tokenStore = useTokenStore()
 const scrollbarHeight = computed(() => {
-  if (globalStore.tokenHistoryVisible) {
-    return 'calc(100vh - 95px)'
+  if (isCanNormalWithdrawableAmount.value) {
+    return 'calc(100vh - 110px)'
   }
   return ''
 })
