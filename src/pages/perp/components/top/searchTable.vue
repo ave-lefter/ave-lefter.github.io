@@ -129,7 +129,7 @@
               </div>
             </div>
             <div :class="Number(row?.lastPrice ) > 0 ? 'color-[--main-text]' : ''">
-              {{ formatNumber(row.lastPrice || 0) }}
+              {{ formatNumber(row.lastPrice || 0, 2) }}
             </div>
             <div :class="Number(row.priceChangePercent )> 0 ? 'color-[--up-color]' : 'color-[--down-color]'">
               {{ formatNumber( Number(row?.priceChangePercent) * 100 || 0, 2) }}%

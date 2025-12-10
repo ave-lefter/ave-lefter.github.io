@@ -42,7 +42,7 @@
       <span
         class="text-20px font-700 block min-w-100px text-left"
         :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
-        >{{ formatNumber(perp?.lastPrice || 0) }}</span
+        >{{ formatNumber(perp?.lastPrice || 0,2) }}</span
       >
       <!-- <span
         class="text-12px block text-left mt-2px"
@@ -57,13 +57,13 @@
       <div class="ml-16px whitespace-nowrap item">
         <span class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('indexPriceTooltip')">{{ $t('indexPrice') }}</span>
         <span class="text-12px block text-left color-[--main-text] leading-16px mt-6px">
-          {{ formatNumber(perp?.indexPrice || 0) }}</span
+          {{ formatNumber(perp?.indexPrice || 0, 2) }}</span
         >
       </div>
 
       <div class="ml-16px whitespace-nowrap item">
         <span class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('oraclePriceTooltip')">{{ $t('oraclePrice') }}</span>
-        <span class="text-12px block text-left color-[--main-text] mt-6px">{{formatNumber(perp?.oraclePrice || 0)}}</span>
+        <span class="text-12px block text-left color-[--main-text] mt-6px">{{formatNumber(perp?.oraclePrice || 0,2)}}</span>
       </div>
 
       <div class="ml-16px whitespace-nowrap item">
@@ -121,12 +121,14 @@
       <div class="ml-16px whitespace-nowrap item">
         <span class="text-12px block text-left color-[--third-text]">{{ $t('fundingRate') }}/{{ $t('countdown') }}</span>
         <span class="text-12px block text-left color-[--main-text] mt-6px"
-          >{{ formatNumber(Number(perp?.fundingRate) * 100 || 0) }}%
-
+          >
+          <span :class="Number(perp?.fundingRate) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'">
+            {{ formatNumber(Number(perp?.fundingRate) * 100 || 0) }}%
+          </span>
           <TimerCount
             v-if="perp?.nextFundingTime"
             :key="`${perp?.nextFundingTime}`"
-            :timestamp="Number(perp?.nextFundingTime)"
+            :timestamp="Number(perp?.nextFundingTime)/1000"
             :end-time="Date.now()"
           >
             <template #default="{ formattedData: { days, hours, minutes, seconds } }">

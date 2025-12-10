@@ -5,7 +5,7 @@
         <Icon name="material-symbols:arrow-back-ios-new-rounded" class="color-[--third-text]"/>
       </div>
 
-      <div ref="scrollRef" @scroll="checkArrows" class="scroll-container flex gap-4 h-full">
+      <div ref="scrollRef" @scroll="checkArrows" class="scroll-container flex gap-4px h-full">
         <slot></slot>
       </div>
 
@@ -33,7 +33,7 @@ const checkArrows = () => {
   showRight.value = el.scrollWidth - el.clientWidth - el.scrollLeft > 1
 }
 const swipeWidth = computed(() => {
-  return width.value - 334 - 230 - 300-100
+  return width.value - 334 - 230 - 300-100 - 100
 })
 
 // 点击箭头滚动
