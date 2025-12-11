@@ -623,13 +623,21 @@ watch(step, (newStep) => {
   if (newStep === 1.1 && checkType.value === 'google') {
     initGoogleAuth()
   }
+  if(step.value === 1 && checkType.value === 'google'){
+    // 页面加载时确保默认选项被选中
+    otherChecksIndex.value = 0
+    // 使用 setTimeout 确保 DOM 完全渲染后再生成二维码
+    setTimeout(() => {
+      const item = otherChecks[otherChecksIndex.value]
+      if (item && googleQrCodeRef.value) {
+        generateQrCode(item.googlePlay, googleQrCodeRef.value)
+      }
+      if (item && item.apple && appleQrCodeRef.value) {
+        generateQrCode(item.apple, appleQrCodeRef.value)
+      }
+    }, 100)
+  }
 })
-
-// watch(() => props.visible, (newVal) => {
-//   if (!newVal) {
-//     step.value = 0
-//   }
-// })
 
 watch(() => userStore.email, (newVal) => {
   email.value = newVal
@@ -652,6 +660,12 @@ const generateQrCode = async (content: string, canvasRef: HTMLCanvasElement) => 
   if (!canvasRef || !content) return
 
   try {
+    // 清空 canvas 内容，确保重新绘制
+    const ctx = canvasRef.getContext('2d')
+    if (ctx) {
+      ctx.clearRect(0, 0, canvasRef.width, canvasRef.height)
+    }
+
     await QrCodeWithLogo.toCanvas({
       canvas: canvasRef,
       content: content,
@@ -662,13 +676,15 @@ const generateQrCode = async (content: string, canvasRef: HTMLCanvasElement) => 
       logo: ''
     })
   } catch (err) {
+    console.error('生成二维码失败:', err)
     ElMessage.error(String(err))
   }
 }
 
 // 监听 otherChecksIndex 变化，生成对应的二维码
-watch(otherChecksIndex, (newIndex) => {
-  nextTick(() => {
+watch(otherChecksIndex, (newIndex: number) => {
+  // 使用 setTimeout 确保 DOM 更新后再生成二维码
+  setTimeout(() => {
     const item = otherChecks[newIndex]
     if (item && googleQrCodeRef.value) {
       generateQrCode(item.googlePlay, googleQrCodeRef.value)
@@ -677,23 +693,7 @@ watch(otherChecksIndex, (newIndex) => {
     if (item && item.apple && appleQrCodeRef.value) {
       generateQrCode(item.apple, appleQrCodeRef.value)
     }
-  })
-})
-
-// 组件挂载时生成初始二维码
-onMounted(() => {
-  nextTick(() => {
-    const item = otherChecks[otherChecksIndex.value]
-    if (item && googleQrCodeRef.value) {
-      generateQrCode(item.googlePlay, googleQrCodeRef.value)
-    }
-    if (item && item.apple && appleQrCodeRef.value) {
-      generateQrCode(item.apple, appleQrCodeRef.value)
-    }
-  })
-})
-
-onMounted(async () => {
+  }, 50)
 })
 
 function goToTg() {
