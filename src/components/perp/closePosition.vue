@@ -67,12 +67,12 @@ const closeSizePercentChange = (val: number) => {
 
 const unrealizedPnl = computed(() => {
   const cur = props.row
-  const oraclePrice = formData.closePrice || '0'
-  if (!cur || new BigNumber(oraclePrice).isZero()) return '0'
+  const price = (isLimit.value ? formData.closePrice : lastPrice.value) || '0'
+  if (!cur || new BigNumber(price).isZero()) return '0'
   const profit = Number(cur?.openSize) >= 0
-    ? new BigNumber(oraclePrice).times(new BigNumber(cur?.openSize || 0).abs()).minus(new BigNumber(cur.openValue).abs())
-    : new BigNumber(cur.openValue || 0).abs().minus(new BigNumber(oraclePrice).times(new BigNumber(cur.openSize).abs()))
-  return profit.times(formData.closeSize || 0).div(new BigNumber(cur?.openSize || 0).abs()).dp(pricePrecision.value, BigNumber.ROUND_FLOOR)
+    ? new BigNumber(price).times(new BigNumber(cur?.openSize || 0).abs()).minus(new BigNumber(cur.openValue).abs())
+    : new BigNumber(cur.openValue || 0).abs().minus(new BigNumber(price).times(new BigNumber(cur.openSize).abs()))
+  return profit.dp(2, BigNumber.ROUND_FLOOR)
 })
 
 const loading = ref(false)
