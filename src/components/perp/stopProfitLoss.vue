@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { usePerpStore } from '~/stores/perp'
 import { useThemeStore } from '~/stores/theme'
 import { createOrder } from '~/api/perp/utils'
-import type { PerpOrderParams } from '~/api/perp/typs'
+import type { PerpOrderParams } from '~/api/perp/types'
 import type { Position } from '~/stores/perp/type'
 
 const visible = defineModel<boolean>('visible')

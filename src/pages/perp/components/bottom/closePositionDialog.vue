@@ -60,7 +60,7 @@
 import { usePerpStore } from '~/stores/perp'
 import { createOrder } from '~/api/perp/utils'
 import type { Position } from '~/stores/perp/type'
-import type { PerpOrderParams } from '~/api/perp/typs'
+import type { PerpOrderParams } from '~/api/perp/types'
 import BigNumber from 'bignumber.js'
 const props = defineProps({
   modelValue: Boolean,

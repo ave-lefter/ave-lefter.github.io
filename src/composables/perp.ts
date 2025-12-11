@@ -4,7 +4,7 @@ import Withdraw from '@/components/header/connectWallet/perp/withdraw.vue'
 import CreateOrder from '~/pages/perp/components/right/createOrder.vue'
 import { usePerpStore } from '~/stores/perp'
 import BigNumber from 'bignumber.js'
-import type { PerpOrderParams } from '~/api/perp/typs'
+import type { PerpOrderParams } from '~/api/perp/types'
 
 export function usePerp() {
   const dialogVisible = ref(false)

@@ -23,11 +23,11 @@
     </li>
     <li v-if="orderParams?.isSetOpenTp && orderParams?.openTp?.triggerPrice" class="flex items-center justify-between mt-16px">
       <span class="color-[--third-text]">{{ $t('TPPrice') }}</span>
-      <span class="color-[--up-color]"> &gt;= {{ formatNumber(orderParams?.openTp?.triggerPrice || 0, 10) }}</span>
+      <span class="color-[--up-color]"> &gt;= {{ formatNumber(orderParams?.openTp?.triggerPrice || 0, 10) }} USD</span>
     </li>
     <li v-if="orderParams?.isSetOpenSl && orderParams?.openSl?.triggerPrice" class="flex items-center justify-between mt-16px">
       <span class="color-[--third-text]">{{ $t('SLPrice') }}</span>
-      <span class="color-[--down-color]"> &lt;= {{ formatNumber(orderParams?.openSl?.triggerPrice || 0, 10) }}</span>
+      <span class="color-[--down-color]"> &lt;= {{ formatNumber(orderParams?.openSl?.triggerPrice || 0, 10) }} USD</span>
     </li>
     <li class="flex items-center justify-between mt-16px">
       <el-button size="large" class="flex-1 min-h-48px rd-8px!" @click.stop.prevent="$emit('cancel')">{{ $t('cancel') }}</el-button>
@@ -38,7 +38,7 @@
 
 <script setup lang='ts'>
 import { createOrder } from '~/api/perp/utils'
-import type { PerpOrderParams } from '~/api/perp/typs'
+import type { PerpOrderParams } from '~/api/perp/types'
 import { usePerpStore } from '~/stores/perp'
 const { t } = useI18n()
 

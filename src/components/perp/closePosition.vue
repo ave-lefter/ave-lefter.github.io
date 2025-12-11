@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BigNumber from 'bignumber.js'
-import type { PerpOrderParams } from '~/api/perp/typs'
+import type { PerpOrderParams } from '~/api/perp/types'
 import { createOrder } from '~/api/perp/utils'
 import type { Position } from '~/stores/perp/type'
 const props = defineProps<{

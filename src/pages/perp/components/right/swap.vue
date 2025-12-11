@@ -259,7 +259,8 @@
 import { usePerpStore } from '~/stores/perp'
 import BigNumber from 'bignumber.js'
 import type { FormInstance } from 'element-plus'
-import type { PerpOrderParams } from '~/api/perp/typs'
+import type { PerpOrderParams } from '~/api/perp/types'
+import { sw } from 'element-plus/es/locale/index.mjs'
 
 const { t } = useI18n()
 const perpStore = usePerpStore()
@@ -343,6 +344,15 @@ watch(() => perpStore.perp?.contractId || '', (contractId) => {
 
 watch(maxLeverage, () => {
   resetForm()
+})
+
+watch(swapType, () => {
+  tpForm.triggerPrice = undefined
+  slForm.triggerPrice = undefined
+  tempData.tpPercent = 0
+  tempData.tpPercent1 = 0
+  tempData.slPercent = 0
+  tempData.slPercent1 = 0
 })
 
 function resetForm() {
@@ -575,11 +585,18 @@ const tpPercentChange = (val: number, type = 0) => {
   } else {
     tempData.tpPercent = val
   }
-  tpForm.triggerPrice = new BigNumber(val || 0).div(100).div(maxLeverage.value).plus(1).times(lastPrice.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+  const price = swapType.value === 'LIMIT' ? form.price : lastPrice.value
+  tpForm.triggerPrice = new BigNumber(val || 0).div(100).div(maxLeverage.value).plus(1).times(price).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
 }
 
 function tpPriceChange(val?: number | string) {
-  tempData.tpPercent = new BigNumber(val || 0).minus(lastPrice.value).div(lastPrice.value).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
+  if (!val) {
+    tempData.tpPercent = 0
+    tempData.tpPercent1 = 0
+    return
+  }
+  const price = swapType.value === 'LIMIT' ? form.price : lastPrice.value
+  tempData.tpPercent = new BigNumber(val || 0).minus(price).div(price).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
   tempData.tpPercent1 = Math.min(Math.max(tempData.tpPercent, 0), 200)
 }
 
@@ -589,12 +606,19 @@ const slPercentChange = (val: number, type = 0) => {
   } else {
     tempData.slPercent = -val
   }
-  slForm.triggerPrice = new BigNumber(val || 0).negated().div(100).div(maxLeverage.value).plus(1).times(lastPrice.value).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+  const price = swapType.value === 'LIMIT' ? form.price : lastPrice.value
+  slForm.triggerPrice = new BigNumber(val || 0).negated().div(100).div(maxLeverage.value).plus(1).times(price).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
 }
 
 function slPriceChange(val?: number) {
-  tempData.slPercent = new BigNumber(val || 0).minus(lastPrice.value).div(lastPrice.value).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
-  tempData.slPercent1 = Math.min(Math.max(tempData.slPercent, 0), 200)
+  if (!val) {
+    tempData.slPercent = 0
+    tempData.slPercent1 = 0
+    return
+  }
+  const price = swapType.value === 'LIMIT' ? form.price : lastPrice.value
+  tempData.slPercent = new BigNumber(val || 0).minus(price).div(price).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
+  tempData.slPercent1 = Math.min(Math.max(-tempData.slPercent, 0), 200)
 }
 
 function _createPerpOrder(side: string) {
