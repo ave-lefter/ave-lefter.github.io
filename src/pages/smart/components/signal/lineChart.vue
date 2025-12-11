@@ -41,6 +41,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  isDay: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const localeStore = useLocaleStore()
@@ -68,12 +72,13 @@ const markPoint = computed(() => {
         color: 'transparent',
       },
       symbol: `image://${symbolUrl}`, // 替换为你的图标链接
-      symbolSize: [12, 12],
+      symbolSize: [24, 24],
       animation: true,
       label: {
         show: false,
       },
       tooltip: {
+        position: 'top',
         backgroundColor: getCssVariable('--main-input-button-bg'),
         trigger: 'item',
         borderWidth: 1,
@@ -178,7 +183,7 @@ function init() {
         alignMinLabel: 'left',
         alignMaxLabel: 'right',
         formatter: (value: string) => {
-          return formatDate(value, 'HH:mm')
+          return props.isDay ? formatDate(value, 'MM-DD') : formatDate(value, 'HH:mm')
         },
       },
       axisLine: { show: false },

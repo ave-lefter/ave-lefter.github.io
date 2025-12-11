@@ -336,6 +336,7 @@ function openTokenDetail(el: IActionItem | IActionV3Item) {
         :marks="signalKlineData[item.token]?.p?.e || []"
         :type="signalKlineData[item.token]?.p?.t"
         :token="item.token"
+        :isDay="selectTime === 7 * 24 * 60"
       />
     </template>
     <template v-else>

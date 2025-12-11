@@ -151,7 +151,7 @@ function getLevel(value: number) {
       </div>
       <span class="ml-8px">{{ $t('hot') }}</span>
     </div>
-    <div class="justify-between flex gap-3px">
+    <div class="justify-between flex gap-2px">
       <div v-for="el in hotList.slice(startIndex)" :key="el.time" class="relative w-6px h-6px">
         <i
           class="block w-full h-full bg-[--main-list-hover]"
