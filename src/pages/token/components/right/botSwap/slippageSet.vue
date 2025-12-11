@@ -488,249 +488,263 @@
             </div>
           </template>
         </div>
-        <div v-show="settingTab === 1">
-          <div class="flex items-center bg-#FFBE3C1A p-10px rd-4px text-12px mb-20px">
-            <Icon class="color-#FFBE3C text-14px" name="mdi:alert-circle" />
-            <span class="ml-4px">
-              {{ $t('autoSellTips') }}
-            </span>
-          </div>
-          <div class="slippage-label">
-            <span class="mr-5px">{{ $t('autoSellHalf') }}</span>
-            <Icon
-              v-tooltip="$t('autoSellHalfTips')"
-              class="text-15px color-[--icon-color] clickable mr-auto"
-              name="material-symbols:help-rounded"
-            />
-            <el-switch
-              v-model="autoSellConfigs.autoSell"
-              size="small"
-              class="ml-2px"
-              style="--el-switch-on-color: #3c6cf6"
-            />
-          </div>
-          <div class="slippage-label mt-15px">
-            <span class="mr-5px">{{ $t('DEVSEll') }}</span>
-            <Icon
-              v-tooltip="$t('devSellTips')"
-              class="text-15px color-[--icon-color] clickable mr-auto"
-              name="material-symbols:help-rounded"
-            />
-            <el-switch
-              v-model="autoSellConfigs.isAutoSellConfig_devsell"
-              size="small"
-              class="ml-2px"
-              style="--el-switch-on-color: #3c6cf6"
-            />
-          </div>
-          <div
-            v-show="autoSellConfigs.isAutoSellConfig_devsell"
-            class="flex items-center gap-20px mt-5px"
-          >
-            <el-select
-              v-model="autoSellConfigs.autoSellConfig_devsell!.priceChange"
-              placeholder="--"
-              class="input-number-limit"
-              size="default"
-            >
-              <template #prefix>
-                <div class="inline-flex items-center text-12px color-[--third-text]">
-                  <span>{{ $t('DEVSEll') }}</span
-                  ><span class="text-18px mt--3px">≥</span>
+          <div v-show="settingTab === 1">
+            <div class="flex items-center bg-#FFBE3C1A p-10px rd-4px text-12px mb-20px">
+              <Icon class="color-#FFBE3C text-14px" name="mdi:alert-circle" />
+              <span class="ml-4px">
+                {{ $t('autoSellTips') }}
+              </span>
+            </div>
+            <el-scrollbar max-height="537px" class="pr-10px" :always="false">
+              <div class="h-full overflow-hidden">
+                <div class="slippage-label" :class="autoSellConfigs.autoSell&&'color-[--main-text]!'">
+                  <span class="mr-5px">{{ $t('autoSellHalf') }}</span>
+                  <Icon
+                    v-tooltip="$t('autoSellHalfTips')"
+                    class="text-15px color-[--icon-color] clickable mr-auto"
+                    name="material-symbols:help-rounded"
+                  />
+                  <el-switch
+                    v-model="autoSellConfigs.autoSell"
+                    size="small"
+                    class="ml-2px"
+                    style="--el-switch-on-color: #3c6cf6"
+                  />
                 </div>
-              </template>
-              <el-option
-                v-for="item in [0, 25, 50]"
-                :key="item"
-                :label="item + '%'"
-                :value="item"
-              />
-            </el-select>
-            <el-input-number
-              v-model="autoSellConfigs.autoSellConfig_devsell!.sellRatio"
-              class="input-number-limit"
-              :min="1"
-              :max="100"
-              :controls="false"
-              placeholder="--"
-            >
-              <template #prefix>
-                <span class="text-12px color-[--third-text]">{{ $t('sellRatio') }}</span>
-              </template>
-              <template #suffix>
-                <span class="color-[--third-text]">%</span>
-              </template>
-            </el-input-number>
-          </div>
-          <div class="slippage-label mt-15px">
-            <span class="mr-5px">{{ $t('trailingStop') }}</span>
-            <Icon
-              v-tooltip="$t('trailingStopTips')"
-              class="text-15px color-[--icon-color] clickable mr-auto"
-              name="material-symbols:help-rounded"
-            />
-            <el-switch
-              v-model="autoSellConfigs.isAutoSellConfig_trailing"
-              size="small"
-              class="ml-2px"
-              style="--el-switch-on-color: #3c6cf6"
-            />
-          </div>
-          <div
-            v-show="autoSellConfigs.isAutoSellConfig_trailing"
-            class="flex items-center gap-20px mt-5px"
-          >
-            <el-input-number
-              v-model="autoSellConfigs.autoSellConfig_trailing!.priceChange"
-              class="input-number-limit"
-              :min="1"
-              :controls="false"
-              placeholder="--"
-            >
-              <template #prefix>
-                <span class="text-12px color-[--third-text]">{{ $t('pullback') }}</span>
-              </template>
-              <template #suffix>
-                <span class="color-[--third-text]">%</span>
-              </template>
-            </el-input-number>
-            <el-input-number
-              v-model="autoSellConfigs.autoSellConfig_trailing!.sellRatio"
-              class="input-number-limit"
-              :min="1"
-              :max="100"
-              :controls="false"
-              placeholder="--"
-            >
-              <template #prefix>
-                <span class="text-12px color-[--third-text]">{{ $t('sellRatio') }}</span>
-              </template>
-              <template #suffix>
-                <span class="color-[--third-text]">%</span>
-              </template>
-            </el-input-number>
-          </div>
-          <div class="slippage-label mt-15px">
-            <span class="mr-5px">{{ $t('listingOnDex') }}</span>
-            <Icon
-              v-tooltip="$t('listingOnDexTips')"
-              class="text-15px color-[--icon-color] clickable mr-auto"
-              name="material-symbols:help-rounded"
-            />
-            <el-switch
-              v-model="autoSellConfigs.isAutoSellConfig_migrated"
-              size="small"
-              class="ml-2px"
-              style="--el-switch-on-color: #3c6cf6"
-            />
-          </div>
-          <div
-            v-show="autoSellConfigs.isAutoSellConfig_migrated"
-            class="flex items-center gap-20px mt-5px"
-          >
-            <el-input-number
-              v-model="autoSellConfigs.autoSellConfig_migrated!.sellRatio"
-              class="input-number-limit"
-              :min="1"
-              :max="100"
-              :controls="false"
-              placeholder="--"
-            >
-              <template #prefix>
-                <span class="text-12px color-[--third-text]">{{ $t('sellRatio') }}</span>
-              </template>
-              <template #suffix>
-                <span class="color-[--third-text]">%</span>
-              </template>
-            </el-input-number>
-          </div>
-          <div class="slippage-label mt-15px">
-            <span class="mr-5px">{{ $t('takeProfitAndStopLoss') }}</span>
-            <Icon
-              v-tooltip="$t('takeProfitAndStopLossTips')"
-              class="text-15px color-[--icon-color] clickable mr-auto"
-              name="material-symbols:help-rounded"
-            />
-            <el-switch
-              v-model="autoSellConfigs.isAutoSellConfig"
-              size="small"
-              class="ml-2px"
-              style="--el-switch-on-color: #3c6cf6"
-            />
-          </div>
-          <ul v-show="autoSellConfigs.isAutoSellConfig">
-            <li
-              v-for="(item, index) in autoSellConfigs.autoSellConfig"
-              :key="index"
-              class="mt-10px flex items-center gap-4px"
-            >
-              <span v-if="item.isUp" class="color-#12B886 text-14px mr-10px">{{
-                $t('takeProfit')
-              }}</span>
-              <span v-else class="color-#F6465D text-14px mr-10px">{{ $t('stopLoss') }}</span>
-              <el-input-number
-                v-model="item.priceChange"
-                class="input-number-limit"
-                :min="1"
-                :controls="false"
-                placeholder="--"
-              >
-                <template #prefix>
-                  <div class="flex items-center">
-                    <Icon v-if="item.isUp" name="ri:arrow-up-long-fill" class="color-#12B886" />
-                    <Icon v-else name="ri:arrow-down-long-fill" class="color-#F6465D" />
-                    <span class="text-12px color-[--third-text]">{{
-                      item.isUp ? $t('rise') : $t('fall')
-                    }}</span>
-                  </div>
-                </template>
-                <template #suffix>
-                  <span class="color-[--third-text]">%</span>
-                </template>
-              </el-input-number>
-              <el-input-number
-                v-model="item.sellRatio"
-                class="input-number-limit"
-                :min="1"
-                :max="100"
-                :controls="false"
-                placeholder="--"
-              >
-                <template #prefix>
-                  <span class="text-12px color-[--third-text]">{{ $t('sell') }}</span>
-                </template>
-                <template #suffix>
-                  <span class="color-[--third-text]">%</span>
-                </template>
-              </el-input-number>
+                <div class="slippage-label mt-15px" :class="autoSellConfigs.isAutoSellConfig_devsell&&'color-[--main-text]!'">
+                  <span class="mr-5px">{{ $t('DEVSEll') }}</span>
+                  <Icon
+                    v-tooltip="$t('devSellTips')"
+                    class="text-15px color-[--icon-color] clickable mr-auto"
+                    name="material-symbols:help-rounded"
+                  />
+                  <el-switch
+                    v-model="autoSellConfigs.isAutoSellConfig_devsell"
+                    size="small"
+                    class="ml-2px"
+                    style="--el-switch-on-color: #3c6cf6"
+                  />
+                </div>
+                <div
+                  v-show="autoSellConfigs.isAutoSellConfig_devsell"
+                  class="flex items-center gap-20px mt-5px"
+                >
+                  <el-select
+                    v-model="autoSellConfigs.autoSellConfig_devsell!.priceChange"
+                    placeholder="--"
+                    class="input-number-limit"
+                    size="default"
+                  >
+                    <template #prefix>
+                      <div class="inline-flex items-center text-12px color-[--third-text]">
+                        <span>{{ $t('DEVSEll') }}</span
+                        ><span class="text-18px mt--3px">≥</span>
+                      </div>
+                    </template>
+                    <el-option
+                      v-for="item in [0, 25, 50]"
+                      :key="item"
+                      :label="item + '%'"
+                      :value="item"
+                    />
+                  </el-select>
+                  <el-input-number
+                    v-model="autoSellConfigs.autoSellConfig_devsell!.sellRatio"
+                    class="input-number-limit"
+                    :min="1"
+                    :max="100"
+                    :controls="false"
+                    placeholder="--"
+                  >
+                    <template #prefix>
+                      <span class="text-12px color-[--third-text]">{{ $t('sellRatio') }}</span>
+                    </template>
+                    <template #suffix>
+                      <span class="color-[--third-text]">%</span>
+                    </template>
+                  </el-input-number>
+                </div>
+                <div class="slippage-label mt-15px" :class="autoSellConfigs.isAutoSellConfig_trailing&&'color-[--main-text]!'">
+                  <span class="mr-5px">{{ $t('trailingStop') }}</span>
+                  <Icon
+                    v-tooltip="$t('trailingStopTips')"
+                    class="text-15px color-[--icon-color] clickable mr-auto"
+                    name="material-symbols:help-rounded"
+                  />
+                  <el-switch
+                    v-model="autoSellConfigs.isAutoSellConfig_trailing"
+                    size="small"
+                    class="ml-2px"
+                    style="--el-switch-on-color: #3c6cf6"
+                  />
+                </div>
+                <div
+                  v-show="autoSellConfigs.isAutoSellConfig_trailing"
+                  class="flex items-center gap-20px mt-5px"
+                >
+                  <el-input-number
+                    v-model="autoSellConfigs.autoSellConfig_trailing!.priceChange"
+                    class="input-number-limit"
+                    :min="1"
+                    :controls="false"
+                    placeholder="--"
+                  >
+                    <template #prefix>
+                      <span class="text-12px color-[--third-text]">{{ $t('pullback') }}</span>
+                    </template>
+                    <template #suffix>
+                      <span class="color-[--third-text]">%</span>
+                    </template>
+                  </el-input-number>
+                  <el-input-number
+                    v-model="autoSellConfigs.autoSellConfig_trailing!.sellRatio"
+                    class="input-number-limit"
+                    :min="1"
+                    :max="100"
+                    :controls="false"
+                    placeholder="--"
+                  >
+                    <template #prefix>
+                      <span class="text-12px color-[--third-text]">{{ $t('sellRatio') }}</span>
+                    </template>
+                    <template #suffix>
+                      <span class="color-[--third-text]">%</span>
+                    </template>
+                  </el-input-number>
+                </div>
+                <div class="slippage-label mt-15px" :class="autoSellConfigs.isAutoSellConfig_migrated&&'color-[--main-text]!'">
+                  <span class="mr-5px">{{ $t('listingOnDex') }}</span>
+                  <Icon
+                    v-tooltip="$t('listingOnDexTips')"
+                    class="text-15px color-[--icon-color] clickable mr-auto"
+                    name="material-symbols:help-rounded"
+                  />
+                  <el-switch
+                    v-model="autoSellConfigs.isAutoSellConfig_migrated"
+                    size="small"
+                    class="ml-2px"
+                    style="--el-switch-on-color: #3c6cf6"
+                  />
+                </div>
+                <div
+                  v-show="autoSellConfigs.isAutoSellConfig_migrated"
+                  class="flex items-center gap-20px mt-5px"
+                >
+                  <el-input-number
+                    v-model="autoSellConfigs.autoSellConfig_migrated!.sellRatio"
+                    class="input-number-limit"
+                    :min="1"
+                    :max="100"
+                    :controls="false"
+                    placeholder="--"
+                  >
+                    <template #prefix>
+                      <span class="text-12px color-[--third-text]">{{ $t('sellRatio') }}</span>
+                    </template>
+                    <template #suffix>
+                      <span class="color-[--third-text]">%</span>
+                    </template>
+                  </el-input-number>
+                </div>
+                <div class="slippage-label mt-15px" :class="(autoSellConfigs?.isAutoSellConfig||autoSellConfigs?.isAutoSellConfig1||autoSellConfigs?.isAutoSellConfig2||autoSellConfigs?.isAutoSellConfig3||autoSellConfigs?.isAutoSellConfig4||autoSellConfigs?.isAutoSellConfig5||autoSellConfigs?.isAutoSellConfig6)&&'color-[--main-text]!'">
+                  <span class="mr-5px text-16px">{{ $t('advancedTrading') }}</span>
+                </div>
+                <AutoSellTakeProfitStopLoss :autoSellConfigs="autoSellConfigs" :title="$t('takeProfitAndStopLoss0')" name=''/>
+                <AutoSellTakeProfitStopLoss :autoSellConfigs="autoSellConfigs" :title="$t('takeProfitAndStopLoss1')" name='1'/>
+                <AutoSellTakeProfitStopLoss :autoSellConfigs="autoSellConfigs" :title="$t('takeProfitAndStopLoss2')" name='2'/>
+                <AutoSellTakeProfitStopLoss :autoSellConfigs="autoSellConfigs" :title="$t('takeProfitAndStopLoss3')" name='3'/>
+                <AutoSellTakeProfitStopLoss :autoSellConfigs="autoSellConfigs" :title="$t('takeProfitAndStopLoss4')" name='4'/>
+                <AutoSellTakeProfitStopLoss :autoSellConfigs="autoSellConfigs" :title="$t('takeProfitAndStopLoss5')" name='5'/>
+                <AutoSellTakeProfitStopLoss :autoSellConfigs="autoSellConfigs" :title="$t('takeProfitAndStopLoss6')" name='6'/>
+              </div>
+            </el-scrollbar>
+            <!-- <div class="slippage-label mt-15px">
+              <span class="mr-5px">{{ $t('takeProfitAndStopLoss') }}</span>
               <Icon
-                class="text-16px ml-5px clickable color-[--third-text]"
-                name="bx:bxs-trash-alt"
-                @click.stop="autoSellConfigs.autoSellConfig.splice(index, 1)"
+                v-tooltip="$t('takeProfitAndStopLossTips')"
+                class="text-15px color-[--icon-color] clickable mr-auto"
+                name="material-symbols:help-rounded"
               />
-            </li>
-            <li class="flex gap-8px items-center text-14px mt-20px">
-              <button
-                class="flex-1 h-44px flex items-center justify-center clickable bg-#12B8861A color-#12B886 border-none rd-8px disabled:op-50 disabled:cursor-not-allowed"
-                type="button"
-                :disabled="autoSellConfigs.autoSellConfig?.length >= 5"
-                @click.stop="addStopProfit"
+              <el-switch
+                v-model="autoSellConfigs.isAutoSellConfig"
+                size="small"
+                class="ml-2px"
+                style="--el-switch-on-color: #3c6cf6"
+              />
+            </div>
+            <ul v-show="autoSellConfigs.isAutoSellConfig">
+              <li
+                v-for="(item, index) in autoSellConfigs.autoSellConfig"
+                :key="index"
+                class="mt-10px flex items-center gap-4px"
               >
-                <Icon class="text-16px" name="material-symbols:add-circle-outline-rounded" />
-                <span class="ml-5px">{{ $t('addTakeProfit') }}</span>
-              </button>
-              <button
-                class="flex-1 h-44px flex items-center justify-center clickable bg-#F6465D1A color-#F6465D border-none rd-8px disabled:op-50 disabled:cursor-not-allowed"
-                type="button"
-                :disabled="autoSellConfigs.autoSellConfig?.length >= 5"
-                @click.stop="addStopLoss"
-              >
-                <Icon class="text-16px" name="material-symbols:add-circle-outline-rounded" />
-                <span class="ml-5px">{{ $t('addStopLoss') }}</span>
-              </button>
-            </li>
-          </ul>
-        </div>
+                <span v-if="item.isUp" class="color-#12B886 text-14px mr-10px">{{
+                  $t('takeProfit')
+                }}</span>
+                <span v-else class="color-#F6465D text-14px mr-10px">{{ $t('stopLoss') }}</span>
+                <el-input-number
+                  v-model="item.priceChange"
+                  class="input-number-limit"
+                  :min="1"
+                  :controls="false"
+                  placeholder="--"
+                >
+                  <template #prefix>
+                    <div class="flex items-center">
+                      <Icon v-if="item.isUp" name="ri:arrow-up-long-fill" class="color-#12B886" />
+                      <Icon v-else name="ri:arrow-down-long-fill" class="color-#F6465D" />
+                      <span class="text-12px color-[--third-text]">{{
+                        item.isUp ? $t('rise') : $t('fall')
+                      }}</span>
+                    </div>
+                  </template>
+                  <template #suffix>
+                    <span class="color-[--third-text]">%</span>
+                  </template>
+                </el-input-number>
+                <el-input-number
+                  v-model="item.sellRatio"
+                  class="input-number-limit"
+                  :min="1"
+                  :max="100"
+                  :controls="false"
+                  placeholder="--"
+                >
+                  <template #prefix>
+                    <span class="text-12px color-[--third-text]">{{ $t('sell') }}</span>
+                  </template>
+                  <template #suffix>
+                    <span class="color-[--third-text]">%</span>
+                  </template>
+                </el-input-number>
+                <Icon
+                  class="text-16px ml-5px clickable color-[--third-text]"
+                  name="bx:bxs-trash-alt"
+                  @click.stop="autoSellConfigs.autoSellConfig.splice(index, 1)"
+                />
+              </li>
+              <li class="flex gap-8px items-center text-14px mt-20px">
+                <button
+                  class="flex-1 h-44px flex items-center justify-center clickable bg-#12B8861A color-#12B886 border-none rd-8px disabled:op-50 disabled:cursor-not-allowed"
+                  type="button"
+                  :disabled="autoSellConfigs.autoSellConfig?.length >= 5"
+                  @click.stop="addStopProfit"
+                >
+                  <Icon class="text-16px" name="material-symbols:add-circle-outline-rounded" />
+                  <span class="ml-5px">{{ $t('addTakeProfit') }}</span>
+                </button>
+                <button
+                  class="flex-1 h-44px flex items-center justify-center clickable bg-#F6465D1A color-#F6465D border-none rd-8px disabled:op-50 disabled:cursor-not-allowed"
+                  type="button"
+                  :disabled="autoSellConfigs.autoSellConfig?.length >= 5"
+                  @click.stop="addStopLoss"
+                >
+                  <Icon class="text-16px" name="material-symbols:add-circle-outline-rounded" />
+                  <span class="ml-5px">{{ $t('addStopLoss') }}</span>
+                </button>
+              </li>
+            </ul> -->
+          </div>
 
         <div class="form-submit">
           <el-button
@@ -756,7 +770,7 @@ import { formatBotGasTips } from '@/utils/bot'
 import { cloneDeep } from 'lodash-es'
 import { ElMessageBox } from 'element-plus'
 import type { BotChain, BotSettingKey } from '~/utils/types'
-
+import AutoSellTakeProfitStopLoss from './autoSellTakeProfitStopLoss.vue'
 const props = defineProps({
   canSetAuto: { type: Boolean, default: true },
   chain: { type: String as PropType<BotChain>, default: '' },
@@ -988,7 +1002,7 @@ function confirmSubmit() {
     }
   }
   botSettingStore.clipboardQuickInput = cloneDeep(clipboardQuickInput.value)
-  console.log('setting', setting)
+  botSettingStore.autoSellConfigs.autoSellConfigName = autoSellConfigs.value.autoSellConfigName
   emit('onSubmit', setting)
   saveAutoSellConfigs()
   show.value = false

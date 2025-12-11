@@ -1545,5 +1545,20 @@
   "pumpCompleted": "已打满",
   "innerDiskTime": "内盘耗时",
   "resetTips": "重置将隐藏您自定义的字段，列表恢复默认显示。筛选条件仍生效。 确认重置吗?",
-  "confirmAgain": "二次确认"
+  "confirmAgain": "二次确认",
+  "takeProfitAndStopLoss1": "翻倍全出",
+  "takeProfitAndStopLoss2": "翻倍出本&跌半止损",
+  "takeProfitAndStopLoss0": "自定义止盈止损",
+  "takeProfitAndStopLoss3": "翻倍全出&跌半止损",
+  "takeProfitAndStopLoss4": "翻倍出本&三倍全出&跌半止损",
+  "takeProfitAndStopLoss6": "40%止盈&移动止盈止损回撤60%全出",
+  "takeProfitAndStopLoss5": "10倍止盈&移动止盈止损回撤40%全出",
+  "defaultPolicy": "默认策略",
+  "takeProfitAndStopLossTips1": "翻倍全出 是指仓位盈利达到 100% 时，系统自动全仓平仓。",
+  "takeProfitAndStopLossTips2": "翻倍出本 是指盈利达 100% 时平仓 50% 出本；跌半止损 是指亏损达 50% 时自动全仓平仓。",
+  "takeProfitAndStopLossTips3": "翻倍全出 是指盈利达 100% 时全仓平仓；跌半止损 是指亏损达 50% 时自动全仓平仓。",
+  "takeProfitAndStopLossTips4": "翻倍出本 (100% 盈利平仓 50%)；三倍全出 (剩余仓位 300% 盈利全平)；跌半止损 (50% 亏损全平)。",
+  "takeProfitAndStopLossTips5": "10倍止盈 (1000% 盈利全平)；移动止盈 是指价格从最高点回撤 40% 时，自动全仓平仓。",
+  "takeProfitAndStopLossTips6": "40%止盈 (40% 盈利全平)；移动止盈 是指价格从最高点回撤 60% 时，自动全仓平仓。",
+  "advancedTradingStrategy": "高级交易策略"
 }

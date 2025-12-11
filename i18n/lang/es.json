@@ -572,5 +572,20 @@
   "pairsLink": "Explorador de bloques de salto",
   "searchSameAmm": "Ver piscinas similares",
   "pumpCompleted": "Bomba completada",
-  "innerDiskTime": "Tiempo de disco interno"
+  "innerDiskTime": "Tiempo de disco interno",
+  "takeProfitAndStopLoss1": "duplicar",
+  "takeProfitAndStopLoss2": "¿Duplicar el capital&Detener la pérdida a la mitad",
+  "takeProfitAndStopLoss0": "Take Profit y Stop Loss personalizados",
+  "takeProfitAndStopLoss3": "¿Doblar todo&Medio stop loss",
+  "takeProfitAndStopLoss4": "¿Duplicar el capital&¿Triplicar el importe total&Detener la pérdida a la mitad",
+  "takeProfitAndStopLoss6": "¿40% de ganancia&Mover la toma de ganancias y detener el retroceso de pérdidas al 60% en total",
+  "takeProfitAndStopLoss5": "¿10 veces obtener ganancias&Mover la toma de ganancias y detener la pérdida de retroceso 40% en total",
+  "defaultPolicy": "Política predeterminada",
+  "takeProfitAndStopLossTips1": "Duplicar significa que cuando el beneficio de la posición alcanza el 100%, el sistema cierra automáticamente todas las posiciones.",
+  "takeProfitAndStopLossTips2": "Duplicar el capital significa cerrar la posición y pagar el 50% del capital cuando la ganancia alcance el 100%; detener la pérdida a la mitad significa cerrar automáticamente toda la posición cuando la pérdida alcanza el 50%.",
+  "takeProfitAndStopLossTips3": "Doble máximo significa que todas las posiciones se cerrarán cuando la ganancia alcance el 100%; La pérdida de media parada significa que todas las posiciones se cerrarán automáticamente cuando la pérdida alcance el 50%.",
+  "takeProfitAndStopLossTips4": "Duplicar (100% de ganancia y 50% de la posición cerrada); Triplicar (la posición restante es del 300% y las ganancias están todas cerradas); Half stop loss (el 50% de la pérdida está totalmente cerrada).",
+  "takeProfitAndStopLossTips5": "10 veces la toma de ganancias (1000% de ganancia en todo momento); mover la toma de ganancias significa que todas las posiciones se cerrarán automáticamente cuando el precio retroceda un 40% desde el punto más alto.",
+  "takeProfitAndStopLossTips6": "40% de obtención de beneficios (40% de cierre de beneficios); La toma de ganancias final significa que todas las posiciones se cerrarán automáticamente cuando el precio retroceda un 60% desde el punto más alto.",
+  "advancedTradingStrategy": "Estrategia de venta avanzada"
 }

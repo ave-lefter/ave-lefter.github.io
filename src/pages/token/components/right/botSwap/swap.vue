@@ -783,7 +783,7 @@ async function submitBotSwap() {
       autoSell: isBuy ? botSettingStore.autoSellConfig_autoSell || false : false,
       slippage: slippage !== 'auto' ? Number(new BigNumber(slippage).times(100).toFixed(0)) : 900,
       autoSlippage: slippage === 'auto',
-      autoSellConfig: isBuy ? botSettingStore?.autoSellConfig : [],
+      autoSellConfig: isBuy ? botSettingStore?.selectedAutoSellConfig : [],
       autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellPriorityFee: botPriorityFee
@@ -899,7 +899,7 @@ async function submitBotSwap() {
       autoSell: isBuy ? botSettingStore.autoSellConfig_autoSell || false : false,
       slippage: slippage !== 'auto' ? Number(new BigNumber(slippage).times(100).toFixed(0)) : 900,
       autoSlippage: slippage === 'auto',
-      autoSellConfig: isBuy ? botSettingStore?.autoSellConfig : [],
+      autoSellConfig: isBuy ? botSettingStore?.selectedAutoSellConfig : [],
       autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellPriorityFee: gasTip
@@ -913,6 +913,7 @@ async function submitBotSwap() {
     // })).catch(() => {
     //   loadingSwap.value = false
     // })
+    // return console.log('bot_createTx[chain]',data)
     await checkApproveAndApprove({
       inToken: data.inTokenAddress,
       outToken: data.outTokenAddress,
