@@ -135,13 +135,13 @@
         <div class="w-1px bg-[--border]"/>
         <div class="w-437px pb-48px">
           <div class="google-authenticator-readme">
-            <div class="google-authenticator-readme-title">{{ t('bindGoogleAuthReadmeT1') }}</div>
-            <div class="google-authenticator-readme-content">{{ t('bindGoogleAuthReadmeP1') }}</div>
-            <div class="google-authenticator-readme-title">{{ t('bindGoogleAuthReadmeT2') }}</div>
-            <div class="google-authenticator-readme-content">{{ t('bindGoogleAuthReadmeP2') }}</div>
-            <div class="google-authenticator-readme-content">{{ t('more2FAApps') }}</div>
+            <div class="font-500 text-14px lh-20px color-[--main-text]">{{ t('bindGoogleAuthReadmeT1') }}</div>
+            <div class="font-400 text-14px lh-20px color-[--third-text] mb-23px">{{ t('bindGoogleAuthReadmeP1') }}</div>
+            <div class="font-500 text-14px lh-20px color-[--main-text]">{{ t('bindGoogleAuthReadmeT2') }}</div>
+            <div class="font-400 text-14px lh-20px color-[--third-text] mb-23px">{{ t('bindGoogleAuthReadmeP2') }}</div>
+            <div class="font-500 text-14px lh-20px color-[--main-text]">{{ t('more2FAApps') }}</div>
           </div>
-          <ul class="mb-15px color-[--third-text]">
+          <ul class="mb-15px mt-4px color-[--third-text]">
             <li
               v-for="item, index in otherChecks"
               :key="item.name"
