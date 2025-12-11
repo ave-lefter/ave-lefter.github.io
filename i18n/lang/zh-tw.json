@@ -1318,6 +1318,7 @@
   "cooling": "冷卻中",
   "googleAuth": "谷歌驗證",
   "emailAuth": "郵箱驗證",
+  "more2FAApps": "更多可選的二次驗證（2FA）應用",
   "emailAuthPlaceholder": "請輸入驗證碼",
   "googleAuthPlaceholder": "請輸入6位數驗證碼",
   "toAddress": "收款地址",

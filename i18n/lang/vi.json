@@ -752,6 +752,7 @@
   "emailAuthPlaceholder": "Vui lòng nhập mã xác minh",
   "googleAuthPlaceholder": "Vui lòng nhập mã xác minh 6 chữ số",
   "toAddress": "Nhận địa chỉ",
+  "more2FAApps": "Các ứng dụng xác thực hai yếu tố (2FA) tùy chọn khác",
   "fromAddress": "Địa chỉ thanh toán",
   "gasFee": "Phí khai thác",
   "network": "mạng",

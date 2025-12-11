@@ -1331,6 +1331,7 @@
   "emailAuthPlaceholder": "검증 코드 입력",
   "googleAuthPlaceholder": "6자리 검증 코드 입력",
   "toAddress": "받는 주소",
+  "more2FAApps": "더 많은 선택 가능한 2단계 인증(2FA) 애플리케이션",
   "fromAddress": "보내는 주소",
   "gasFee": "가스 요금",
   "network": "네트워크",

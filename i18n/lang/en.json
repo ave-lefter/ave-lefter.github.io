@@ -1331,6 +1331,7 @@
   "cooling": "Cooling",
   "googleAuth": "Google Verification",
   "emailAuth": "Email Verification",
+  "more2FAApps": "More optional two-factor authentication (2FA) applications",
   "emailAuthPlaceholder": "Please enter the verification code",
   "googleAuthPlaceholder": "Please enter a 6-digit verification code",
   "toAddress": "To",

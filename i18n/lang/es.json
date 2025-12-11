@@ -505,6 +505,7 @@
   "emailAuthPlaceholder": "Ingrese el código de verificación",
   "googleAuthPlaceholder": "Ingrese un código de verificación de 6 dígitos",
   "toAddress": "Dirección de recepción",
+  "more2FAApps": "Más aplicaciones opcionales de autenticación de dos factores (2FA)",
   "fromAddress": "Dirección de pago",
   "gasFee": "Tarifa del minero",
   "network": "red",

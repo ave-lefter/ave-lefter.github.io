@@ -1330,6 +1330,7 @@
   "cooling": "冷却中",
   "googleAuth": "谷歌验证",
   "emailAuth": "邮箱验证",
+  "more2FAApps": "更多可选的二次验证（2FA）应用",
   "emailAuthPlaceholder": "请输入验证码",
   "googleAuthPlaceholder": "请输入6位数验证码",
   "toAddress": "收款地址",
