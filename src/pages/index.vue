@@ -146,11 +146,11 @@ function listMapFunction(i: Record<string, any>) {
     signal_arr?.sort((a, b) => b.timestamp - a.timestamp)
     normal_tag = tag_arr.filter((i) => !i?.startsWith('signal'))
   }
-  if (i.tag) {
-    const tag = i.tag?.split(',') || []
-    const tag1 = tag.filter((i) => i !== 'pump' && i !== 'moonshot') || []
-    normal_tag = tag1.concat(normal_tag)
-  }
+  // if (i.tag) {
+  //   const tag = i.tag?.split(',') || []
+  //   const tag1 = tag.filter((i) => i !== 'pump' && i !== 'moonshot') || []
+  //   normal_tag = tag1.concat(normal_tag)
+  // }
   normal_tag =
     normal_tag?.map((i) => ({
       tag: i,
@@ -203,7 +203,7 @@ function listMapFunction(i: Record<string, any>) {
   }
   if (i.tag_ti) {
     const tagti = i.tag_ti?.split(',') || []
-    let tag_t = tagti?.filter((i) => i !== '' && i !== 'newcommunity')
+    let tag_t = tagti?.filter((i) => i !== '' && i !== 'newcommunity' && i !== 'pump' && i !== 'moonshot')
     tag_t = tag_t?.map((i) => ({
       tag: i,
       color: 'green',

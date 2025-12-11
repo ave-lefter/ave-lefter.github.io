@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="slippage-label mt-15px">
+    <div class="slippage-label mt-15px" :class="autoSellConfigs['isAutoSellConfig'+name]&&'color-[--main-text]!'">
       <span class="mr-5px">{{ title }}</span>
-      <Icon v-tooltip="$t('takeProfitAndStopLossTips')" class="text-15px color-[--icon-color] clickable mr-auto"
+      <Icon v-tooltip="tooltipText" class="text-15px color-[--icon-color] clickable mr-auto"
         name="material-symbols:help-rounded" />
       <el-switch v-model="autoSellConfigs['isAutoSellConfig'+name]" size="small" class="ml-2px"
         style="--el-switch-on-color: #3c6cf6" />
@@ -14,7 +14,7 @@
           $t('takeProfit')
         }}</span>
         <span v-else class="color-#F6465D text-14px mr-10px">{{ $t('stopLoss') }}</span>
-        <el-input-number v-model="item.priceChange" class="input-number-limit" :min="1" :controls="false"
+        <el-input-number v-model="item.priceChange" class="input-number-limit" :min="1" :controls="false" :disabled="!!name"
           placeholder="--">
           <template #prefix>
             <div class="flex items-center">
@@ -29,7 +29,7 @@
             <span class="color-[--third-text]">%</span>
           </template>
         </el-input-number>
-        <el-input-number v-model="item.sellRatio" class="input-number-limit" :min="1" :max="100" :controls="false"
+        <el-input-number v-model="item.sellRatio" class="input-number-limit" :min="1" :max="100" :controls="false" :disabled="!!name"
           placeholder="--">
           <template #prefix>
             <span class="text-12px color-[--third-text]">{{ $t('sell') }}</span>
@@ -38,10 +38,10 @@
             <span class="color-[--third-text]">%</span>
           </template>
         </el-input-number>
-        <Icon class="text-16px ml-5px clickable color-[--third-text]" name="bx:bxs-trash-alt"
+        <Icon v-if="!name" class="text-16px ml-5px clickable color-[--third-text]" name="bx:bxs-trash-alt"
           @click.stop="autoSellConfigs['autoSellConfig'+name].splice(index, 1)" />
       </li>
-      <li class="flex gap-8px items-center text-14px mt-20px">
+      <li v-if="!name" class="flex gap-8px items-center text-14px mt-20px">
         <button
           class="flex-1 h-44px flex items-center justify-center clickable bg-#12B8861A color-#12B886 border-none rd-8px disabled:op-50 disabled:cursor-not-allowed"
           type="button" :disabled="autoSellConfigs['autoSellConfig'+name]?.length >= 5" @click.stop="addStopProfit">
@@ -76,8 +76,43 @@ const props = defineProps({
     required: false,
   }
 })
-
 const { t } = useI18n()
+const botSettingStore = useBotSettingStore()
+watch(
+  () => props.autoSellConfigs['isAutoSellConfig'+props.name],
+  (val) => {
+    if(val){
+      ['','1','2','3','4','5','6'].forEach((item) => {
+        if(item!==props.name){
+          if((props.autoSellConfigs as any)?.['isAutoSellConfig'+item]!==undefined){
+            (props.autoSellConfigs as any)['isAutoSellConfig'+item] = false
+          }
+          // (botSettingStore.autoSellConfigs as any)['isAutoSellConfig'+item] = false
+        }
+      })
+      console.log('botSettingStore.autoSellConfigs.autoSellConfigName',JSON.stringify(props.name))
+      props.autoSellConfigs.autoSellConfigName = props.name||''
+    }
+  }
+)
+
+const tooltipText=computed(()=>{
+  const texts={
+    '':t('takeProfitAndStopLossTips'),
+    '1':t('takeProfitAndStopLossTips1'),
+    '2':t('takeProfitAndStopLossTips2'),
+    '3':t('takeProfitAndStopLossTips3'),
+    '4':t('takeProfitAndStopLossTips4'),
+    '5':t('takeProfitAndStopLossTips5'),
+    '6':t('takeProfitAndStopLossTips6'),
+  }
+  if(typeof props.name ==='string' && props.name in texts){
+    return texts[props.name as keyof typeof texts]
+  }else{
+    return texts['']
+  }
+})
+
 
 function addStopProfit() {
   props.autoSellConfigs?.['autoSellConfig'+props.name].push({
