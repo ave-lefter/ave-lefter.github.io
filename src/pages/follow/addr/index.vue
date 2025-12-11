@@ -21,7 +21,7 @@
     </div>
     <div class="m-table w-100% mt-12px flex-1 overflow-hidden bg-[--secondary-bg]">
       <el-table
-      ref="tableRef" v-loading="loading" class='' :data="filterDataSource" table-layout="fixed" row-class-name="group" height="calc(100% - 72px)"
+      ref="tableRef" v-loading="loading" class='' :data="filterDataSource" table-layout="fixed" row-class-name="group" :height="((pageData.total > 50) && shouldRenderChild && currentAddress) ? 'calc(100% - 84px)' : '100%'"
       :default-sort="defaultSort" @sort-change="handleSortChange" @row-click="tableRowClick">
         <template #empty>
           <div v-if="!loading && followStore.currentAddress" class="flex flex-col items-center justify-center py-30px">
