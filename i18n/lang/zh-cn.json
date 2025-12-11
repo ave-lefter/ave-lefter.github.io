@@ -48,6 +48,7 @@
   "closePosition": "平仓",
   "openPrice": "开盘价格",
   "24Exchange": "24H换手率",
+  "theChain": "所属链",
   "liquidityPair": "池子配对",
   "amount": "数量",
   "initial": "初始",

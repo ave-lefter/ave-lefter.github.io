@@ -52,6 +52,7 @@
   "openPrice": "Initial Price",
   "24Exchange": "Turnover%",
   "liquidityPair": "Pair",
+  "theChain": "Chain",
   "amount": "Amount",
   "initial": "Initial",
   "poolCirculatingSupply": "Liquidity",
