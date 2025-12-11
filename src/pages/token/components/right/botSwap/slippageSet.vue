@@ -497,7 +497,7 @@
             </div>
             <el-scrollbar max-height="537px" class="pr-10px" :always="false">
               <div class="h-full overflow-hidden">
-                <div class="slippage-label">
+                <div class="slippage-label" :class="autoSellConfigs.autoSell&&'color-[--main-text]!'">
                   <span class="mr-5px">{{ $t('autoSellHalf') }}</span>
                   <Icon
                     v-tooltip="$t('autoSellHalfTips')"
@@ -511,7 +511,7 @@
                     style="--el-switch-on-color: #3c6cf6"
                   />
                 </div>
-                <div class="slippage-label mt-15px">
+                <div class="slippage-label mt-15px" :class="autoSellConfigs.isAutoSellConfig_devsell&&'color-[--main-text]!'">
                   <span class="mr-5px">{{ $t('DEVSEll') }}</span>
                   <Icon
                     v-tooltip="$t('devSellTips')"
@@ -564,7 +564,7 @@
                     </template>
                   </el-input-number>
                 </div>
-                <div class="slippage-label mt-15px">
+                <div class="slippage-label mt-15px" :class="autoSellConfigs.isAutoSellConfig_trailing&&'color-[--main-text]!'">
                   <span class="mr-5px">{{ $t('trailingStop') }}</span>
                   <Icon
                     v-tooltip="$t('trailingStopTips')"
@@ -612,7 +612,7 @@
                     </template>
                   </el-input-number>
                 </div>
-                <div class="slippage-label mt-15px">
+                <div class="slippage-label mt-15px" :class="autoSellConfigs.isAutoSellConfig_migrated&&'color-[--main-text]!'">
                   <span class="mr-5px">{{ $t('listingOnDex') }}</span>
                   <Icon
                     v-tooltip="$t('listingOnDexTips')"
@@ -645,6 +645,9 @@
                       <span class="color-[--third-text]">%</span>
                     </template>
                   </el-input-number>
+                </div>
+                <div class="slippage-label mt-15px" :class="(autoSellConfigs?.isAutoSellConfig||autoSellConfigs?.isAutoSellConfig1||autoSellConfigs?.isAutoSellConfig2||autoSellConfigs?.isAutoSellConfig3||autoSellConfigs?.isAutoSellConfig4||autoSellConfigs?.isAutoSellConfig5||autoSellConfigs?.isAutoSellConfig6)&&'color-[--main-text]!'">
+                  <span class="mr-5px text-16px">{{ $t('advancedTrading') }}</span>
                 </div>
                 <AutoSellTakeProfitStopLoss :autoSellConfigs="autoSellConfigs" :title="$t('takeProfitAndStopLoss0')" name=''/>
                 <AutoSellTakeProfitStopLoss :autoSellConfigs="autoSellConfigs" :title="$t('takeProfitAndStopLoss1')" name='1'/>

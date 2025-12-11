@@ -288,7 +288,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
   })
 
   function getAutoSellConfigCurrent() {
-    let autoSellConfigCurrent:Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default' | 'trailing' | 'migrated' | 'devsell', isUp?: boolean}> = []
+    let autoSellConfigCurrent:Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default' | 'trailing' | 'migrated' | 'devsell', isUp?: boolean}> =  autoSellConfig.value
     if ((autoSellConfigs.value.autoSellConfigName === '') && autoSellConfigs.value.isAutoSellConfig) {
       autoSellConfigCurrent = autoSellConfig.value
     } else if ((autoSellConfigs.value.autoSellConfigName === '1') && autoSellConfigs.value.isAutoSellConfig1) {

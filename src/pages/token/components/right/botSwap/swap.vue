@@ -913,7 +913,7 @@ async function submitBotSwap() {
     // })).catch(() => {
     //   loadingSwap.value = false
     // })
-    return console.log('bot_createTx[chain]',data)
+    // return console.log('bot_createTx[chain]',data)
     await checkApproveAndApprove({
       inToken: data.inTokenAddress,
       outToken: data.outTokenAddress,

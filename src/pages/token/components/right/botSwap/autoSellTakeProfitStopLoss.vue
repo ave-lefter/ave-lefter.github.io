@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="slippage-label mt-15px">
+    <div class="slippage-label mt-15px" :class="autoSellConfigs['isAutoSellConfig'+name]&&'color-[--main-text]!'">
       <span class="mr-5px">{{ title }}</span>
       <Icon v-tooltip="tooltipText" class="text-15px color-[--icon-color] clickable mr-auto"
         name="material-symbols:help-rounded" />
