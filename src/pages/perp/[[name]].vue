@@ -75,7 +75,7 @@ const scrollbarHeight = computed(() => {
   if (isCanNormalWithdrawableAmount.value) {
     return 'calc(100vh - 110px)'
   }
-  return ''
+  return 'calc(100vh - 95px)'
 })
 const height = computed(() => {
   return tokenStore.commonHeight - 160

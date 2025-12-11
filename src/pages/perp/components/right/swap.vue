@@ -357,7 +357,8 @@ function resetForm() {
   tempData.slPercent = 0
   tempData.slPercent1 = 0
   tempData.sizePercent = 0
-
+  tpForm.triggerPrice = undefined
+  slForm.triggerPrice = undefined
 }
 
 

@@ -116,7 +116,7 @@ watch(
       result = perpStore.order
         ?.filter((i) => !result.some((el) => el.id === i.id))
         .concat(...result)
-        ?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET')
+        ?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET')?.sort((a, b) => Number(b.createdTime) - Number(a.createdTime))
       result =
         result?.map?.((el) => {
           const isLong = el.side === 'SELL'

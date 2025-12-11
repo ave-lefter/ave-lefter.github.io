@@ -120,14 +120,12 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
             updateOrderInfo(order)
           } else if(msg.content?.event === 'ORDER_UPDATE' && order as Order[]) {
             const canceledOrder: Order[] = (order as Order[]).filter((i) => i.status === 'CANCELED')
-            console.log('canceledOrder', canceledOrder)
             // 取消订单
             if(canceledOrder.length > 0){
               perpStore.order = perpStore.order.filter((i) => !canceledOrder.some(j => j.id === i.id) && i.type !== 'MARKET')
-              console.log('perpStore.order', perpStore.order)
             } else {
               // 加仓、平仓、止盈、止损
-              perpStore.order.push(...((order as Order[])?.filter(i => i.type !== 'MARKET') || []))
+              perpStore.order = perpStore.order?.filter((i) => !(order as Order[]).some((el) => el.id === i.id)).concat(...(order as Order[]))?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET')
               getTotalAssets()
             }
           }
