@@ -43,12 +43,20 @@ watch(
 )
 
 const { width } = useWindowSize()
-const startIndex = computed(() => {
+const responseObj = computed(() => {
   let _start = 0
+  let styleWidth = '918px'
   if (width.value < 1920) {
     _start = -hotList.value.length * 0.8
+  } else if (width.value < 2560) {
+    styleWidth = '1550px'
+  } else {
+    styleWidth = '2150px'
   }
-  return _start
+  return {
+    start: _start,
+    styleWidth,
+  }
 })
 async function fetchTimeline() {
   const res = await getTimeline(props.activeChain)
@@ -151,8 +159,12 @@ function getLevel(value: number) {
       </div>
       <span class="ml-8px">{{ $t('hot') }}</span>
     </div>
-    <div class="justify-between flex gap-2px">
-      <div v-for="el in hotList.slice(startIndex)" :key="el.time" class="relative w-6px h-6px">
+    <div class="justify-between flex" :style="{ width: responseObj.styleWidth }">
+      <div
+        v-for="el in hotList.slice(responseObj.start)"
+        :key="el.time"
+        class="relative w-6px h-6px"
+      >
         <i
           class="block w-full h-full bg-[--main-list-hover]"
           :class="getLevel(Number(el.volume))"

@@ -72,7 +72,7 @@ const markPoint = computed(() => {
         color: 'transparent',
       },
       symbol: `image://${symbolUrl}`, // 替换为你的图标链接
-      symbolSize: [24, 24],
+      symbolSize: [20, 20],
       animation: true,
       label: {
         show: false,
