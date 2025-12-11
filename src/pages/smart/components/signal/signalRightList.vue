@@ -26,7 +26,7 @@ const listStatus = ref({
 })
 const pageParams = shallowRef({
   pageNO: 1,
-  pageSize: 15,
+  pageSize: 20,
 })
 const actionDialogVisible = ref(false)
 const currentActions = shallowRef<IActionV3Item[]>([])
@@ -192,7 +192,7 @@ async function _getSignalKline(tokens: string[], duration = 4 * 60) {
       (await getSignalKline({
         duration,
         chain: props.activeChain,
-        tokens,
+        tokens: tokens.slice(0, 12),
       })) || []
     const result = Object.create(null)
     res.forEach((el) => {
@@ -201,6 +201,9 @@ async function _getSignalKline(tokens: string[], duration = 4 * 60) {
     signalKlineData.value = {
       ...signalKlineData.value,
       ...result,
+    }
+    if (tokens.length > 12) {
+      _getSignalKline(tokens.slice(12), duration)
     }
   } catch (error) {
     console.log(error, 'error')

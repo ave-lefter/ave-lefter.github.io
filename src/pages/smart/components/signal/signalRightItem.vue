@@ -39,18 +39,20 @@ const timeOptions = ref([
   { label: '7D', value: 7 * 24 * 60 },
 ])
 const selectTime = ref(timeOptions.value[2].value)
-// const themeStore = useThemeStore()
+const themeStore = useThemeStore()
+const localeStore = useLocaleStore()
 
-// function getGradientBackground(history_count: number) {
-//   if (history_count >= 5) {
-//     return themeStore.isDark
-//       ? 'bg-[linear-gradient(287.62deg,#8B4FDD_12.05%,#12B886_87.95%)]'
-//       : 'bg-[linear-gradient(260.98deg,#8B4FDD_6.85%,#12B886_85.21%)] color-#FFF'
-//   }
-//   return themeStore.isDark
-//     ? 'bg-[linear-gradient(287.62deg,#8B4FDD2A_12.05%,#12B8862A_87.95%)]'
-//     : 'bg-[linear-gradient(260.98deg,#8B4FDD2A_6.85%,#12B8862A_85.21%)]'
-// }
+function getGradientBackground(max_price_change: number) {
+  if (max_price_change > 3) {
+    return themeStore.isDark
+      ? 'bg-[linear-gradient(287.62deg,#8B4FDD_12.05%,#12B886_87.95%)]'
+      : 'bg-[linear-gradient(260.98deg,#8B4FDD_6.85%,#12B886_85.21%)] color-#FFF'
+  }
+  return 'bg-#12B8861A'
+  // return themeStore.isDark
+  //   ? 'bg-[linear-gradient(287.62deg,#8B4FDD2A_12.05%,#12B8862A_87.95%)]'
+  //   : 'bg-[linear-gradient(260.98deg,#8B4FDD2A_6.85%,#12B8862A_85.21%)]'
+}
 
 const increasedOrDecreased = computed(() => {
   return {
@@ -69,6 +71,30 @@ const myTradeVisible = computed(() => {
 function setSelectTime(el: number) {
   selectTime.value = el
   emit('updateSignalKline', [props.item.token], el)
+}
+
+const tokenDetailSStore = useTokenDetailsStore()
+
+function openTokenDetail(el: IActionItem | IActionV3Item) {
+  tokenDetailSStore.$patch({
+    drawerVisible: true,
+    tokenInfo: {
+      id: props.item.token + '-' + props.activeChain,
+      symbol: props.item.symbol,
+      logo_url: props.item.logo,
+      chain: props.activeChain,
+      address: props.item.token,
+      remark: '',
+    },
+    pairInfo: {
+      target_token: props.item.token,
+      token0_address: el.quote_token_address,
+      token0_symbol: el.quote_token_symbol,
+      token1_symbol: props.item.symbol,
+      pairAddress: '',
+    },
+    user_address: el.wallet_address,
+  })
 }
 </script>
 
@@ -246,7 +272,8 @@ function setSelectTime(el: number) {
           </div>
         </div>
         <div
-          class="flex items-center justify-center h-32px w-83px bg-#12B8861A rounded-4px text-24px font-500"
+          class="flex items-center justify-center h-32px w-83px rounded-4px text-24px font-500"
+          :class="getGradientBackground(Number(item.max_price_change))"
         >
           {{
             Number(item.max_price_change) < 1
@@ -288,116 +315,122 @@ function setSelectTime(el: number) {
         </div>
       </div>
     </div>
-    <div class="flex items-center mt-16px">
-      <span
-        v-for="el in timeOptions"
-        :key="el.value"
-        class="flex-1 lh-22px text-12px flex items-center justify-center cursor-pointer"
-        :class="
-          selectTime === el.value
-            ? 'color-[--main-text] bg-[--main-list-hover]'
-            : 'text-[--third-text]'
-        "
-        @click="setSelectTime(el.value)"
-      >
-        {{ el.label }}
-      </span>
-    </div>
-    <LineChart
-      v-if="signalKlineData"
-      :dataList="signalKlineData[item.token]?.k || []"
-      :marks="signalKlineData[item.token]?.p?.e || []"
-      :type="signalKlineData[item.token]?.p?.t"
-      :token="item.token"
-    />
-    <!-- <div class="flex color-[--third-text] text-12px mb-8px mt-16px">
-      <div class="flex-[2]">
-        {{ $t('wallet') }}
+    <template v-if="signalKlineData && !filterToken">
+      <div class="flex items-center mt-16px">
+        <span
+          v-for="el in timeOptions"
+          :key="el.value"
+          class="flex-1 lh-22px text-12px flex items-center justify-center cursor-pointer"
+          :class="
+            selectTime === el.value
+              ? 'color-[--main-text] bg-[--main-list-hover]'
+              : 'text-[--third-text]'
+          "
+          @click="setSelectTime(el.value)"
+        >
+          {{ el.label }}
+        </span>
       </div>
-      <div class="w-100px text-right">
-        {{ $t('operate') }}
-      </div>
-      <div v-if="!filterToken" class="flex-1 text-right">
-        {{ $t('balance1') }}
-      </div>
-      <div class="w-40px text-right">
-        {{ $t('time') }}
-      </div>
-    </div>
-    <div class="flex-1">
-      <div
-        v-for="(
-          {
-            wallet_alias,
-            wallet_address,
-            quote_token_amount,
-            quote_token_symbol,
-            quote_token_volume,
-            action_time,
-            token_balance_usd,
-            wallet_logo,
-          },
-          $index
-        ) in isWalletAll ? item.actions : item.actions.slice(0, 3)"
-        :key="$index"
-        class="flex color-[--secondary-text] text-12px h-40px items-center cursor-pointer"
-        @click="openTokenDetail(item.actions[$index])"
-      >
-        <div class="flex-[2] flex items-center">
-          <UserRemark
-            :key="wallet_address"
-            :address="wallet_address"
-            :chain="activeChain"
-            :remark="wallet_alias || ''"
-            :showIcon="true"
-            :teleported="true"
-            :wallet_logo="{ logo: wallet_logo, name: wallet_alias, url: '' }"
-            iconSize="24px"
-            avatar-class="mr-4px"
-            :formatAddress="(address) => `(*${address.slice(-4)})`"
-            :showAddress="false"
-          >
-            <template #default="{ remark }">
-              <span
-                class="color-[--secondary-text] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px"
-                >{{ remark || $t('wallet') }}</span
-              ><span class="color-[--third-text]">(*{{ wallet_address.slice(-4) }})</span>
-            </template>
-          </UserRemark>
+      <LineChart
+        :dataList="signalKlineData[item.token]?.k || []"
+        :marks="signalKlineData[item.token]?.p?.e || []"
+        :type="signalKlineData[item.token]?.p?.t"
+        :token="item.token"
+      />
+    </template>
+    <template v-else>
+      <div class="flex color-[--third-text] text-12px mb-8px mt-16px">
+        <div class="flex-[2]">
+          {{ $t('wallet') }}
         </div>
-        <div class="w-100px text-right color-#12B886">
-          {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : ''
-          }}<span
-            v-tooltip="'$' + formatNumber(quote_token_volume, 2)"
-            class="decoration-underline decoration-dotted underline-offset-2px"
-          >
-            {{ formatNumber(quote_token_amount, 2) }}
-            {{ quote_token_symbol.toUpperCase() === 'USDC' ? 'U' : quote_token_symbol }}
-          </span>
+        <div class="w-100px text-right">
+          {{ $t('operate') }}
         </div>
         <div v-if="!filterToken" class="flex-1 text-right">
-          <span v-if="!token_balance_usd || Number(token_balance_usd) === 0" class="color-#F6465D">
-            {{ $t('soldAll') }}
-          </span>
-          <template v-else> ${{ formatNumber(token_balance_usd, 2) }} </template>
+          {{ $t('balance1') }}
         </div>
         <div class="w-40px text-right">
-          <span v-tooltip="formatDate(action_time * 1000, 'MM/DD HH:mm:ss')">{{
-            formatTimeFromNow(action_time)
-          }}</span>
+          {{ $t('time') }}
         </div>
       </div>
-    </div>
-    <div
-      v-if="item.actions.length > 3 && !isWalletAll"
-      class="flex justify-center"
-      @click="emit('openDrawer', item)"
-    >
-      <Icon
-        name="material-symbols:keyboard-double-arrow-down-rounded"
-        class="color-[--third-text] hover:color-[--main-text] cursor-pointer"
-      />
-    </div> -->
+      <div class="flex-1">
+        <div
+          v-for="(
+            {
+              wallet_alias,
+              wallet_address,
+              quote_token_amount,
+              quote_token_symbol,
+              quote_token_volume,
+              action_time,
+              token_balance_usd,
+              wallet_logo,
+            },
+            $index
+          ) in isWalletAll ? item.actions : item.actions.slice(0, 3)"
+          :key="$index"
+          class="flex color-[--secondary-text] text-12px h-40px items-center cursor-pointer"
+          @click="openTokenDetail(item.actions[$index])"
+        >
+          <div class="flex-[2] flex items-center">
+            <UserRemark
+              :key="wallet_address"
+              :address="wallet_address"
+              :chain="activeChain"
+              :remark="wallet_alias || ''"
+              :showIcon="true"
+              :teleported="true"
+              :wallet_logo="{ logo: wallet_logo, name: wallet_alias, url: '' }"
+              iconSize="24px"
+              avatar-class="mr-4px"
+              :formatAddress="(address) => `(*${address.slice(-4)})`"
+              :showAddress="false"
+            >
+              <template #default="{ remark }">
+                <span
+                  class="color-[--secondary-text] whitespace-nowrap overflow-hidden text-ellipsis max-w-50px"
+                  >{{ remark || $t('wallet') }}</span
+                ><span class="color-[--third-text]">(*{{ wallet_address.slice(-4) }})</span>
+              </template>
+            </UserRemark>
+          </div>
+          <div class="w-100px text-right color-#12B886">
+            {{ $t('buy') }}{{ localeStore.locale === 'en' ? ' ' : ''
+            }}<span
+              v-tooltip="'$' + formatNumber(quote_token_volume, 2)"
+              class="decoration-underline decoration-dotted underline-offset-2px"
+            >
+              {{ formatNumber(quote_token_amount, 2) }}
+              {{ quote_token_symbol.toUpperCase() === 'USDC' ? 'U' : quote_token_symbol }}
+            </span>
+          </div>
+          <div v-if="!filterToken" class="flex-1 text-right">
+            <span
+              v-if="!token_balance_usd || Number(token_balance_usd) === 0"
+              class="color-#F6465D"
+            >
+              {{ $t('soldAll') }}
+            </span>
+            <template v-else> ${{ formatNumber(token_balance_usd, 2) }} </template>
+          </div>
+          <div class="w-40px text-right">
+            <span v-tooltip="formatDate(action_time * 1000, 'MM/DD HH:mm:ss')">{{
+              formatTimeFromNow(action_time)
+            }}</span>
+          </div>
+        </div>
+      </div>
+      <div
+        v-if="item.actions.length > 3 && !isWalletAll"
+        class="flex justify-center"
+        @click="emit('openDrawer', item)"
+      >
+        <Icon
+          name="material-symbols:keyboard-double-arrow-down-rounded"
+          class="color-[--third-text] hover:color-[--main-text] cursor-pointer"
+        />
+      </div>
+    </template>
     <div class="m-12px bg-[--secondary-bg] h-1px" />
     <div v-if="footer" class="flex justify-between">
       <div

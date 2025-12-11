@@ -723,7 +723,7 @@ function switchChain(chain: string) {
           {{ item.name }}
         </span>
       </div>
-      <div v-if="isActivity" class="flex">
+      <div v-if="isActivity" class="flex h-28px">
         <div class="flex items-center mr-24px">
           <Filter :filter-params="signalFilter" @onReset="onReset" @onConfirm="onConfirm" />
           <el-popover
@@ -801,20 +801,21 @@ function switchChain(chain: string) {
           />
           <AutoSellSetting class="ml-20px" :chain="activeChain" />
         </div>
-        <div class="p-2px rounded-4px bg-[--main-input-button-bg] flex color-[--third-text]">
+        <div
+          class="px-8px py-2px rounded-4px gap-4px bg-[--main-input-button-bg] flex color-[--third-text]"
+        >
           <div
-            v-for="{ label, value } in smartChains"
+            v-for="{ value } in smartChains"
             :key="value"
-            class="flex items-center justify-center gap-4px px-8px py-6px text-12px rounded-4px cursor-pointer"
+            class="flex items-center justify-center p-2px rounded-4px cursor-pointer"
             :class="`${activeChain === value ? 'bg-[--tab-active-bg] color-[--main-text]' : ''}`"
             @click="activeChain = value"
           >
             <img
-              class="w-16px h-16px rounded-full opacity-60"
+              class="w-20px h-20px rounded-full opacity-60 block"
               :src="`${configStore.token_logo_url}chain/${value}.png`"
               alt=""
             />
-            {{ label }}
           </div>
         </div>
       </div>

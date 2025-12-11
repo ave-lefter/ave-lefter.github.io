@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import dogCoinImg from 'assets/images/dogcoin.png'
-import {getTimeline, type Gold, type ITimeline} from '~/api/signal'
-import {useWindowSize} from '@vueuse/core'
+import { getTimeline, type Gold, type ITimeline } from '~/api/signal'
+import { useWindowSize } from '@vueuse/core'
 
 const emit = defineEmits(['updateFilterToken'])
 const timelineRef = ref()
@@ -10,11 +10,11 @@ const popoverRef = ref()
 const hideTimer = shallowRef<number>()
 const dogline = ref({
   visible: false,
-  data: [] as Gold[]
+  data: [] as Gold[],
 })
 const timeline = ref({
   visible: false,
-  data: {} as ITimeline
+  data: {} as ITimeline,
 })
 const hotList = shallowRef<ITimeline[]>([])
 const props = defineProps<{
@@ -24,20 +24,26 @@ const props = defineProps<{
 onMounted(() => {
   fetchTimeline()
 })
-watch(() => props.activeChain, () => {
-  fetchTimeline()
-})
+watch(
+  () => props.activeChain,
+  () => {
+    fetchTimeline()
+  }
+)
 
 const wsStore = useWSStore()
-watch(() => wsStore.wsResult[WSEventType.GOLD_SIGNAL], (val) => {
-  const {golds = [], ...rest} = val.msg
-  hotList.value.shift()
-  hotList.value.push(rest)
-  setGolds(golds, hotList.value)
-})
+watch(
+  () => wsStore.wsResult[WSEventType.GOLD_SIGNAL],
+  (val) => {
+    const { golds = [], ...rest } = val.msg
+    hotList.value.shift()
+    hotList.value.push(rest)
+    setGolds(golds, hotList.value)
+  }
+)
 
-const {width} = useWindowSize()
-const startIndex = computed(()=>{
+const { width } = useWindowSize()
+const startIndex = computed(() => {
   let _start = 0
   if (width.value < 1920) {
     _start = -hotList.value.length * 0.8
@@ -48,7 +54,7 @@ async function fetchTimeline() {
   const res = await getTimeline(props.activeChain)
   const data = res || []
   const golds: Gold[] = []
-  data.forEach(el => {
+  data.forEach((el) => {
     golds.push(...(el.golds || []))
     el.golds = []
   })
@@ -61,21 +67,18 @@ function setGolds(golds: Gold[] = [], data: ITimeline[]) {
     return Number(b.mc) - Number(a.mc)
   })
   const map: Record<string, any> = {}
-  sortedGolds.forEach(gold => {
+  sortedGolds.forEach((gold) => {
     if (!map[gold.token]) {
       map[gold.token] = gold
     }
   })
-  Object.values(map).forEach(gold => {
+  Object.values(map).forEach((gold) => {
     for (let idx = 0; idx < data.length; idx++) {
       const target = gold.first_signal_time
       const source = data[idx].time
       const sourceRight = data[idx + 1]?.time
       if (target > source && target < sourceRight) {
-        data[idx].golds =
-          data[idx].golds
-            ? data[idx].golds.concat(gold)
-            : [gold]
+        data[idx].golds = data[idx].golds ? data[idx].golds.concat(gold) : [gold]
         break
       }
     }
@@ -130,49 +133,54 @@ function getLevel(value: number) {
 
 <template>
   <div class="flex gap-16px items-center">
-    <div class="flex items-center text-12px" style="color:var(--secondary-text);">
+    <div class="flex items-center text-12px" style="color: var(--secondary-text)">
       <span class="mr-8px">{{ $t('normal') }}</span>
       <div class="flex items-center gap-2px">
         <div
-          v-for="(el,idx) in 4" :key="idx" class="w-8px h-8px rounded-2px bg-[--main-list-hover]"
-          :class="({
-              1:'bg-#286DFF opacity-20',
-              2:'bg-#286DFF opacity-50',
-              3:'bg-#286DFF'
-            })[idx]"/>
+          v-for="(el, idx) in 4"
+          :key="idx"
+          class="w-8px h-8px rounded-2px bg-[--main-list-hover]"
+          :class="
+            {
+              1: 'bg-#286DFF opacity-20',
+              2: 'bg-#286DFF opacity-50',
+              3: 'bg-#286DFF',
+            }[idx]
+          "
+        />
       </div>
       <span class="ml-8px">{{ $t('hot') }}</span>
     </div>
-    <div class="justify-between flex gap-2px">
-      <div
-        v-for="(el) in hotList.slice(startIndex)"
-        :key="el.time"
-        class="relative w-6px h-6px"
-      >
+    <div class="justify-between flex gap-3px">
+      <div v-for="el in hotList.slice(startIndex)" :key="el.time" class="relative w-6px h-6px">
         <i
           class="block w-full h-full bg-[--main-list-hover]"
           :class="getLevel(Number(el.volume))"
-          @mouseenter.stop="showLinePop($event,el)"
+          @mouseenter.stop="showLinePop($event, el)"
           @mouseleave.stop="hideLinePop"
         />
         <span
-          v-if="el.golds?.length>0"
+          v-if="el.golds?.length > 0"
           class="absolute top--26px left-50% ml--10px w-20px h-20px border-2px border-solid rounded-full bg-cover"
-          :class="({
-            gold:'border-#FFD700',
-            silver:'border-#E0E0E0',
-            bronze:'border-#C77B30'
-          })[el.golds?.[0]?.type]"
+          :class="
+            {
+              gold: 'border-#FFD700',
+              silver: 'border-#E0E0E0',
+              bronze: 'border-#C77B30',
+            }[el.golds?.[0]?.type]
+          "
           :style="{
-            backgroundImage:`url(${el.golds?.[0]?.logo
-            ? getSymbolDefaultIcon({
-              logo_url:el.golds?.[0]?.logo,
-              chain:el.golds?.[0]?.chain,
-              symbol:el.golds?.[0]?.symbol
-            })
-            :dogCoinImg})`
+            backgroundImage: `url(${
+              el.golds?.[0]?.logo
+                ? getSymbolDefaultIcon({
+                    logo_url: el.golds?.[0]?.logo,
+                    chain: el.golds?.[0]?.chain,
+                    symbol: el.golds?.[0]?.symbol,
+                  })
+                : dogCoinImg
+            })`,
           }"
-          @mouseenter.stop="showDogPop($event,el.golds||[])"
+          @mouseenter.stop="showDogPop($event, el.golds || [])"
           @mouseleave.stop="scheduleHide"
         />
       </div>
@@ -189,9 +197,7 @@ function getLevel(value: number) {
     <div class="text-12px">
       {{ formatDate(timeline.data.time || 0, 'MM-DD HH:mm') }}
     </div>
-    <div class="text-12px">
-      {{ $t('volume') }}：${{ formatNumber(timeline.data.volume,1) }}
-    </div>
+    <div class="text-12px">{{ $t('volume') }}：${{ formatNumber(timeline.data.volume, 1) }}</div>
   </el-popover>
   <el-popover
     ref="popoverRef"
@@ -201,11 +207,7 @@ function getLevel(value: number) {
     virtual-triggering
     append-to-body
   >
-    <div
-      class="w-full table text-12px"
-      @mouseenter="cancelHide"
-      @mouseleave="hideDogPop"
-    >
+    <div class="w-full table text-12px" @mouseenter="cancelHide" @mouseleave="hideDogPop">
       <div class="w-full table-row color-[--third-text] mb-6px">
         <div class="table-cell">{{ $t('FirstAlert') }}</div>
         <div class="table-cell">{{ $t('Token') }}</div>
@@ -215,7 +217,7 @@ function getLevel(value: number) {
         v-for="el in dogline.data"
         :key="el.token"
         class="w-full table-row cursor-pointer"
-        @click="emit('updateFilterToken',el.token)"
+        @click="emit('updateFilterToken', el.token)"
       >
         <div class="py-5px table-cell vertical-mid">
           <div class="flex items-center gap-4px">
@@ -223,26 +225,25 @@ function getLevel(value: number) {
               width="16"
               height="16"
               class="border-2px border-solid rounded-full"
-              :class="({
-                gold:'border-#FFD700',
-                silver:'border-#E0E0E0',
-                bronze:'border-#C77B30'
-              })[el.type]"
+              :class="
+                {
+                  gold: 'border-#FFD700',
+                  silver: 'border-#E0E0E0',
+                  bronze: 'border-#C77B30',
+                }[el.type]
+              "
               :src="
-                   el.logo
-                   ? getSymbolDefaultIcon({
-                    logo_url:el.logo,
-                    chain:el.chain,
-                    symbol:el.symbol
-                   })
-                   : dogCoinImg"
+                el.logo
+                  ? getSymbolDefaultIcon({
+                      logo_url: el.logo,
+                      chain: el.chain,
+                      symbol: el.symbol,
+                    })
+                  : dogCoinImg
+              "
               alt=""
-            >
-            {{
-              el.first_signal_time
-                ? formatDate(el.first_signal_time, 'MM-DD HH:mm:ss')
-                : '--'
-            }}
+            />
+            {{ el.first_signal_time ? formatDate(el.first_signal_time, 'MM-DD HH:mm:ss') : '--' }}
           </div>
         </div>
         <div class="py-5px table-cell vertical-mid">
@@ -251,22 +252,21 @@ function getLevel(value: number) {
               token-class="w-16px h-16px"
               chain-class="w-8px h-8px"
               :row="{
-                  chain:el.chain,
-                  logo_url:el.logo,
-                  symbol:el.symbol
-                }"
+                chain: el.chain,
+                logo_url: el.logo,
+                symbol: el.symbol,
+              }"
             />
             {{ el.symbol }}
-            <span style="color:#12B886">+{{ formatNumber(Number(el.price_change) * 100, 0) }}%</span>
+            <span style="color: #12b886"
+              >+{{ formatNumber(Number(el.price_change) * 100, 0) }}%</span
+            >
           </div>
         </div>
-        <div class="py-5px table-cell vertical-mid text-right">
-          ${{ formatNumber(el.mc, 1) }}
-        </div>
+        <div class="py-5px table-cell vertical-mid text-right">${{ formatNumber(el.mc, 1) }}</div>
       </div>
     </div>
   </el-popover>
 </template>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

@@ -147,6 +147,7 @@ function init() {
     myChart.value = echarts.init(lineChartRef.value)
   }
   const option = {
+    animation: false,
     legend: {
       show: false,
     },
@@ -170,9 +171,17 @@ function init() {
       axisTick: {
         show: false,
       },
+
       axisLabel: {
-        show: false,
+        show: true,
+        interval: Math.floor(dataX.value.length / 3) - 1,
+        alignMinLabel: 'left',
+        alignMaxLabel: 'right',
+        formatter: (value: string) => {
+          return formatDate(value, 'HH:mm')
+        },
       },
+      axisLine: { show: false },
       nameTextStyle: {
         fontSize: 10,
       },
@@ -227,7 +236,7 @@ function init() {
 
 <template>
   <div class="text-left">
-    <div ref="lineChartRef" class="w-375px h-63px ml--12px" />
+    <div ref="lineChartRef" class="w-375px h-80px ml--12px" />
   </div>
 </template>
 
