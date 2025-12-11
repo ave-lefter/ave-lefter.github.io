@@ -14,7 +14,7 @@ export function useAutoSellSettingContent() {
       sellRatio?: number | undefined
       type: 'default'
       isUp?: boolean | undefined
-    }[] = autoSellConfigs.value.autoSellConfig
+    }[] = (autoSellConfigs.value as any)?.['autoSellConfig'+botSettingStore.autoSellConfigs.autoSellConfigName||'']
     let k1 = 0
     let k2 = 0
     c.forEach((i) => {
@@ -28,16 +28,14 @@ export function useAutoSellSettingContent() {
     })
     return c || []
   })
-
-
   const isAutoSellConfig = computed(() => {
-    return botSettingStore.autoSellConfig_autoSell || botSettingStore.autoSellConfig?.length > 0
+    return botSettingStore.autoSellConfig_autoSell || botSettingStore?.selectedAutoSellConfig?.length > 0
   })
 
   return {
     autoSellConfig,
     isAutoSellConfig,
     botSettingStore,
-    autoSellConfigs
+    autoSellConfigs,
   }
 }

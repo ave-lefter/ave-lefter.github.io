@@ -796,5 +796,20 @@
   "pairsLink": "Trình khám phá khối nhảy",
   "searchSameAmm": "Xem các nhóm tương tự",
   "pumpCompleted": "Bơm hoàn thành",
-  "innerDiskTime": "Thời gian đĩa trong"
+  "innerDiskTime": "Thời gian đĩa trong",
+  "takeProfitAndStopLoss1": "Nhân đôi",
+  "takeProfitAndStopLoss2": "Gấp đôi vốn&Dừng lỗ một nửa",
+  "takeProfitAndStopLoss0": "Tùy chỉnh chốt lời và dừng lỗ",
+  "takeProfitAndStopLoss3": "Nhân đôi tất cả&Dừng lỗ một nửa",
+  "takeProfitAndStopLoss4": "Nhân đôi vốn ra&Gấp ba toàn bộ số tiền&Dừng lỗ một nửa",
+  "takeProfitAndStopLoss6": "40% chốt lãi&Chuyển động chốt lãi và dừng lỗ thoái lui 60%",
+  "takeProfitAndStopLoss5": "10 lần chốt lãi&Chuyển động chốt lãi và dừng lỗ thoái lui 40%",
+  "defaultPolicy": "Chính sách mặc định",
+  "takeProfitAndStopLossTips1": "Nhân đôi nghĩa là khi lợi nhuận vị thế đạt 100%, hệ thống sẽ tự động đóng tất cả các vị thế.",
+  "takeProfitAndStopLossTips2": "Gấp đôi số vốn có nghĩa là đóng vị thế và thanh toán 50% vốn khi lợi nhuận đạt 100%; dừng lỗ ở mức một nửa có nghĩa là tự động đóng toàn bộ vị thế khi mức lỗ đạt tới 50%.",
+  "takeProfitAndStopLossTips3": "Double all out có nghĩa là tất cả các vị thế sẽ bị đóng khi lợi nhuận đạt 100%; mất nửa điểm có nghĩa là tất cả các vị trí sẽ tự động đóng khi mức lỗ lên tới 50%.",
+  "takeProfitAndStopLossTips4": "Nhân đôi (100% lợi nhuận và 50% vị thế được đóng); Gấp ba lần (vị thế còn lại là 300% và lợi nhuận đã đóng hoàn toàn); Dừng lỗ một nửa (50% số tiền thua lỗ đã được đóng lại).",
+  "takeProfitAndStopLossTips5": "Chốt lãi 10 lần (lợi nhuận 1000% chẵn); di chuyển chốt lời có nghĩa là tất cả các vị thế sẽ tự động đóng khi giá thoái lui 40% so với điểm cao nhất.",
+  "takeProfitAndStopLossTips6": "Chốt lãi 40% (đóng lãi 40%); chốt lời theo sau có nghĩa là tất cả các vị thế sẽ tự động đóng khi giá thoái lui 60% so với điểm cao nhất.",
+  "advancedTradingStrategy": "Chiến lược bán nâng cao"
 }

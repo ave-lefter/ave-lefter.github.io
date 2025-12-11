@@ -27,6 +27,12 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     buyValueList: ['0.1', '0.5', '1', '5'],
     sellPerList: ['25', '50', '75', '100'],
     isAutoSellConfig: false,
+    isAutoSellConfig1: false,
+    isAutoSellConfig2: false,
+    isAutoSellConfig3: false,
+    isAutoSellConfig4: false,
+    isAutoSellConfig5: false,
+    isAutoSellConfig6: false,
 
   }
   const chains = useBotStore().isSupportChains
@@ -79,7 +85,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
   const botSettings = useLocalStorage('bot_settings_v3', settings, { mergeDefaults: (storageValue, defaults) => deepMerge(defaults, storageValue) })
   chains.forEach(chain => {
     if (botSettings.value[chain]) {
-      let settings = botSettings.value[chain]
+      const settings = botSettings.value[chain]
       if (!botSettings.value[chain].buy) {
         botSettings.value[chain].buy = {
           selected: settings.selected,
@@ -99,10 +105,34 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     }
   })
 
-  const autoSellConfigs = useLocalStorage('bot_autoSellConfigs', {
+  const autoSellConfigs = useLocalStorage('bot_autoSellConfigs_v2', {
+    autoSellConfigName:'',
     autoSell: false,
+    // 自定义
     isAutoSellConfig: false,
     autoSellConfig: [
+      {
+        open: true,
+        priceChange: 10000,
+        sellRatio: 5000,
+        type: 'default',
+        isUp: true
+      }
+    ] as Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default', isUp?: boolean}>,
+    // 翻倍全出
+    isAutoSellConfig1: false,
+    autoSellConfig1: [
+      {
+        open: true,
+        priceChange: 10000,
+        sellRatio: 10000,
+        type: 'default',
+        isUp: true
+      },
+    ] as Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default', isUp?: boolean}>,
+    // 翻倍出本&跌半止损
+    isAutoSellConfig2: false,
+    autoSellConfig2: [
       {
         open: true,
         priceChange: 10000,
@@ -114,7 +144,86 @@ export const useBotSettingStore = defineStore('botSetting', () => {
         open: true,
         priceChange: -5000,
         sellRatio: 10000,
-        type: "default",
+        type: 'default',
+        isUp: false
+      }
+    ] as Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default', isUp?: boolean}>,
+    // 翻倍全出&跌半止损
+    isAutoSellConfig3: false,
+    autoSellConfig3: [
+      {
+        open: true,
+        priceChange: 10000,
+        sellRatio: 10000,
+        type: 'default',
+        isUp: true
+      },
+      {
+        open: true,
+        priceChange: -5000,
+        sellRatio: 10000,
+        type: 'default',
+        isUp: false
+      }
+    ] as Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default', isUp?: boolean}>,
+    // 翻倍出本&三倍全出&跌半止损
+    isAutoSellConfig4: false,
+    autoSellConfig4: [
+      {
+        open: true,
+        priceChange: 10000,
+        sellRatio: 5000,
+        type: 'default',
+        isUp: true
+      },
+      {
+        open: true,
+        priceChange: 20000,
+        sellRatio: 10000,
+        type: 'default',
+        isUp: true
+      },
+      {
+        open: true,
+        priceChange: -5000,
+        sellRatio: 10000,
+        type: 'default',
+        isUp: false
+      }
+    ] as Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default', isUp?: boolean}>,
+    // 10倍止盈&移动止盈止损回撤40%全出
+    isAutoSellConfig5: false,
+    autoSellConfig5: [
+      {
+        open: true,
+        priceChange: 90000,
+        sellRatio: 10000,
+        type: 'default',
+        isUp: true
+      },
+      {
+        open: true,
+        priceChange: -4000,
+        sellRatio: 10000,
+        type: 'default',
+        isUp: false
+      }
+    ] as Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default', isUp?: boolean}>,
+    // 40%止盈&移动止盈止损回撤60%全出
+    isAutoSellConfig6: false,
+    autoSellConfig6: [
+      {
+        open: true,
+        priceChange: 4000,
+        sellRatio: 10000,
+        type: 'default',
+        isUp: true
+      },
+      {
+        open: true,
+        priceChange: -6000,
+        sellRatio: 10000,
+        type: 'default',
         isUp: false
       }
     ] as Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default', isUp?: boolean}>,
@@ -126,6 +235,8 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     autoSellConfig_migrated: null as {open: boolean, priceChange?: number, sellRatio?: number, type: 'migrated', isUp?: boolean} | null
   })
 
+
+
   const clipboardQuickInput = useLocalStorage<{
     [key in typeof chains[number]]?: string
   }>('bot_clipboardQuickInput', {
@@ -134,9 +245,8 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     bsc: '',
     solana: ''
   })
-
-  const autoSellConfig = computed(() => {
-    const c: Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default' | 'trailing' | 'migrated' | 'devsell', isUp?: boolean}> = autoSellConfigs.value.isAutoSellConfig ? (autoSellConfigs.value.autoSellConfig?.filter?.(i => i.priceChange && i.sellRatio && i.open) || []) : []
+  const autoSellConfigFn= (isAutoSellConfig: boolean,autoSellConfig: Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default' | 'trailing' | 'migrated' | 'devsell', isUp?: boolean}>) => {
+     const c: Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default' | 'trailing' | 'migrated' | 'devsell', isUp?: boolean}> = isAutoSellConfig ? (autoSellConfig?.filter?.(i => i.priceChange && i.sellRatio && i.open) || []) : []
     const c1 = autoSellConfigs.value.autoSellConfig_devsell
     if (autoSellConfigs.value.isAutoSellConfig_devsell && c1 && (c1.priceChange !== undefined) && c1.sellRatio && c1.open) {
       c.push(c1)
@@ -154,10 +264,54 @@ export const useBotSettingStore = defineStore('botSetting', () => {
       const { isUp, ...rest } = i
       return rest
     }) || []
+  }
+  const autoSellConfig = computed(() => {
+    return autoSellConfigFn(autoSellConfigs.value.isAutoSellConfig,autoSellConfigs.value.autoSellConfig)
+  })
+  const autoSellConfig1 = computed(() => {
+   return  autoSellConfigFn(autoSellConfigs.value.isAutoSellConfig1,autoSellConfigs.value.autoSellConfig1)
+  })
+  const autoSellConfig2 = computed(() => {
+    return autoSellConfigFn(autoSellConfigs.value.isAutoSellConfig2,autoSellConfigs.value.autoSellConfig2)
+  })
+  const autoSellConfig3 = computed(() => {
+    return autoSellConfigFn(autoSellConfigs.value.isAutoSellConfig3,autoSellConfigs.value.autoSellConfig3)
+  })
+  const autoSellConfig4 = computed(() => {
+    return autoSellConfigFn(autoSellConfigs.value.isAutoSellConfig4,autoSellConfigs.value.autoSellConfig4)
+  })
+  const autoSellConfig5 = computed(() => {
+    return autoSellConfigFn(autoSellConfigs.value.isAutoSellConfig5,autoSellConfigs.value.autoSellConfig5)
+  })
+  const autoSellConfig6 = computed(() => {
+    return autoSellConfigFn(autoSellConfigs.value.isAutoSellConfig6,autoSellConfigs.value.autoSellConfig6)
   })
 
+  function getAutoSellConfigCurrent() {
+    let autoSellConfigCurrent:Array<{open: boolean, priceChange?: number, sellRatio?: number, type: 'default' | 'trailing' | 'migrated' | 'devsell', isUp?: boolean}> =  autoSellConfig.value
+    if ((autoSellConfigs.value.autoSellConfigName === '') && autoSellConfigs.value.isAutoSellConfig) {
+      autoSellConfigCurrent = autoSellConfig.value
+    } else if ((autoSellConfigs.value.autoSellConfigName === '1') && autoSellConfigs.value.isAutoSellConfig1) {
+      autoSellConfigCurrent = autoSellConfig1.value
+    } else if ((autoSellConfigs.value.autoSellConfigName === '2') && autoSellConfigs.value.isAutoSellConfig2) {
+      autoSellConfigCurrent = autoSellConfig2.value
+    } else if ((autoSellConfigs.value.autoSellConfigName === '3') && autoSellConfigs.value.isAutoSellConfig3) {
+      autoSellConfigCurrent = autoSellConfig3.value
+    } else if ((autoSellConfigs.value.autoSellConfigName === '4') && autoSellConfigs.value.isAutoSellConfig4) {
+      autoSellConfigCurrent = autoSellConfig4.value
+    } else if ((autoSellConfigs.value.autoSellConfigName === '5') && autoSellConfigs.value.isAutoSellConfig5) {
+      autoSellConfigCurrent = autoSellConfig5.value
+    } else if ((autoSellConfigs.value.autoSellConfigName === '6') && autoSellConfigs.value.isAutoSellConfig6) {
+      autoSellConfigCurrent = autoSellConfig6.value
+    }
+    return autoSellConfigCurrent
+  } 
+
+  const selectedAutoSellConfig = computed(getAutoSellConfigCurrent)
+
   const autoSellConfig_autoSell = computed(() => {
-    return autoSellConfigs.value.autoSell && !autoSellConfig.value?.some?.(i => i.type === 'default' && i.priceChange === 10000 && i.sellRatio === 5000)
+    const autoSellConfigCurrent=getAutoSellConfigCurrent()
+    return autoSellConfigs.value.autoSell && !autoSellConfigCurrent?.some?.(i => i.type === 'default' && i.priceChange === 10000 && i.sellRatio === 5000)
   })
 
   function watchBotSetting() {
@@ -191,7 +345,14 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     botSettings,
     autoSellConfigs,
     autoSellConfig,
+    autoSellConfig1,
+    autoSellConfig2,
+    autoSellConfig3,
+    autoSellConfig4,
+    autoSellConfig5,
+    autoSellConfig6,
     autoSellConfig_autoSell,
+    selectedAutoSellConfig,
     clipboardQuickInput
   }
 })

@@ -549,5 +549,20 @@
   "pairsLink": "Explorador de blocos de salto",
   "searchSameAmm": "Ver pools semelhantes",
   "pumpCompleted": "Bomba concluída",
-  "innerDiskTime": "Tempo do disco interno"
+  "innerDiskTime": "Tempo do disco interno",
+  "takeProfitAndStopLoss1": "Dobrar",
+  "takeProfitAndStopLoss2": "Dobrar o capital&Pare a perda pela metade",
+  "takeProfitAndStopLoss0": "Take Profit e Stop Loss personalizados",
+  "takeProfitAndStopLoss3": "Duplicar tudo&Meio stop loss",
+  "takeProfitAndStopLoss4": "Dobrar o capital&Triplicar o valor total&Pare a perda pela metade",
+  "takeProfitAndStopLoss6": "40% realizam lucro&Movendo a retração de take-profit e stop loss de 60% no total",
+  "takeProfitAndStopLoss5": "10 vezes obter lucro&Movendo a retração de take-profit e stop loss de 40% no total",
+  "defaultPolicy": "Política padrão",
+  "takeProfitAndStopLossTips1": "Duplicar significa que quando o lucro da posição atinge 100%, o sistema fecha automaticamente todas as posições.",
+  "takeProfitAndStopLossTips2": "Duplicar o capital significa fechar a posição e pagar 50% do capital quando o lucro atingir 100%; Stop Loss pela metade significa fechar automaticamente toda a posição quando a perda atingir 50%.",
+  "takeProfitAndStopLossTips3": "Double all-out significa que todas as posições serão fechadas quando o lucro atingir 100%; Half-stop loss significa que todas as posições serão fechadas automaticamente quando a perda atingir 50%.",
+  "takeProfitAndStopLossTips4": "Double out (100% de lucro e 50% da posição fechada); Triple out (a posição restante é de 300% e o lucro está todo fechado); Half stop loss (50% da perda está toda fechada).",
+  "takeProfitAndStopLossTips5": "Take Profit de 10 vezes (lucro igual a 1000%); mover o take-profit significa que todas as posições serão fechadas automaticamente quando o preço retroceder 40% do ponto mais alto.",
+  "takeProfitAndStopLossTips6": "Take Profit de 40% (fechamento de lucro de 40%); Trailing Take Profit significa que todas as posições serão fechadas automaticamente quando o preço retroceder 60% do ponto mais alto.",
+  "advancedTradingStrategy": "Estratégia de Venda Avançada"
 }
