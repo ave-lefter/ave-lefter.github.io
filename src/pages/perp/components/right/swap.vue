@@ -2,7 +2,7 @@
   <el-tabs v-model="swapType" class="select-tabs mt-5px mb-12px">
     <el-tab-pane v-for="(item, index) in types" :key="index" :label="item.name" :name="item.value"/>
   </el-tabs>
-  <div class="text-12px color-[--third-text] mb-12px text-right">{{ $t('availableBalance') }}: {{ formatNumber(availableBalance, 4) }} USD</div>
+  <div class="text-12px color-[--secondary-text] mb-12px text-right">{{ $t('availableBalance') }}: {{ formatNumber(availableBalance, 4) }} USD</div>
   <el-form ref="formRef" :model="form" label-width="auto" :rules="rules" @submit.prevent>
     <el-form-item v-if="swapType === 'LIMIT'" label="" prop="price" style="margin-bottom: 15px;">
       <el-input v-model="form.price" :placeholder="$t('price')" size="large"  clearable class="input-number" input-style="text-align:left"  @update:model-value="value => watchPrice(value)">
