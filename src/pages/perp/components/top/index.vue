@@ -119,12 +119,13 @@
       </div>
 
       <div class="ml-16px whitespace-nowrap item">
-        <span class="text-12px block text-left color-[--third-text]">{{ $t('fundingRate') }}/{{ $t('countdown') }}</span>
+        <span class="text-12px block text-left color-[--third-text]">{{ $t('fundingRate') }}&nbsp;/&nbsp;{{ $t('countdown') }}</span>
         <span class="text-12px block text-left color-[--main-text] mt-6px"
           >
           <span :class="Number(perp?.fundingRate) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'">
             {{ formatNumber(Number(perp?.fundingRate) * 100 || 0) }}%
           </span>
+          <span class="text-12px color-[--third-text]">&nbsp;/&nbsp;</span>
           <TimerCount
             v-if="perp?.nextFundingTime"
             :key="`${perp?.nextFundingTime}`"
