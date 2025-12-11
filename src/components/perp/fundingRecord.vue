@@ -33,12 +33,12 @@ const typeDict = computed(() => ({
     value: 'ORDER_TYPE_FAST_WITHDRAW',
     label: t('fastWithdraw'),
   },
-  ORDER_TYPE_INTERNAL_WITHDRAW: {
-    value: 'ORDER_TYPE_INTERNAL_WITHDRAW',
+  ORDER_TYPE_TRANSFER_OUT: {
+    value: 'ORDER_TYPE_TRANSFER_OUT',
     label: t('internalWithdraw'),
   },
-  ORDER_TYPE_INTERNAL_DEPOSIT: {
-    value: 'ORDER_TYPE_INTERNAL_DEPOSIT',
+  ORDER_TYPE_TRANSFER_IN: {
+    value: 'ORDER_TYPE_TRANSFER_IN',
     label: t('internalDeposit'),
   },
 }))

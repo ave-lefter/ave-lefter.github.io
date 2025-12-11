@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import BigNumber from 'bignumber.js'
 import { getAccountDeleverageLight } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
@@ -8,30 +8,28 @@ import StopTable from './stopTable.vue'
 import ClosePosition from './closePosition.vue'
 import { WSPerpEventType } from '~/utils/constants'
 
-const props = defineProps<{
-  searchParams?: any
-}>()
-let timer: { id: number | null } = { id: null }
+const props = defineProps({
+  searchParams: {
+    type: Object,
+    default: () => ({}),
+  },
+})
+let timer = { id: null }
 const { t } = useI18n()
 const perpStore = usePerpStore()
 const wsPublicStore = usePerpWsPubStore()
-const contractLevelMap = shallowRef<{
-  [key: string]: number
-}>({})
+const contractLevelMap = shallowRef({})
 const stopProfitLossVisible = ref(false)
-const stopProfitLossRow = ref<any>(null)
+const stopProfitLossRow = ref(null)
 const stopTableVisible = ref(false)
 const closePositionVisible = ref(false)
 
 const typeDict = computed(() => {
   const contractMap =
-    perpStore.metadata?.contractList?.reduce?.(
-      (prev, cur) => {
-        prev[cur.contractId] = cur.contractName
-        return prev
-      },
-      {} as Record<string, string>
-    ) || {}
+    perpStore.metadata?.contractList?.reduce?.((prev, cur) => {
+      prev[cur.contractId] = cur.contractName
+      return prev
+    }, {}) || {}
   contractMap.ALL = t('all')
   return contractMap
 })
@@ -55,21 +53,16 @@ watch(
       const updateData = val.data?.find?.((item) => item.contractId === el.contractId)
       if (updateData) {
         el.oraclePrice = updateData.oraclePrice
+        const resultVal = new BigNumber(updateData.oraclePrice).multipliedBy(
+          new BigNumber(el.openSize).abs()
+        )
         const profitWithFee =
           el.openValue > 0
-            ? new BigNumber(updateData.oraclePrice)
-                .multipliedBy(new BigNumber(el.openSize).abs())
-                .minus(new BigNumber(el.openValue).abs())
-            : new BigNumber(el.openValue)
-                .abs()
-                .minus(
-                  new BigNumber(updateData.oraclePrice).multipliedBy(
-                    new BigNumber(el.openSize).abs()
-                  )
-                )
+            ? resultVal.minus(new BigNumber(el.openValue).abs())
+            : new BigNumber(el.openValue).abs().minus(resultVal)
         el.unrealizedPnl = profitWithFee
-          // .minus(new BigNumber(el.openFee).abs())
-          // .minus(new BigNumber(el.fundingFee).abs())
+          // .plus(new BigNumber(el.openFee))
+          // .minus(new BigNumber(el.fundingFee))
           .toString()
         el.unrealizedPnlRate = new BigNumber(el.unrealizedPnl)
           .div(new BigNumber(el.openValue).abs())
@@ -172,7 +165,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="relative bg-[--secondary-bg]">
+  <div class="relative">
     <el-table
       fit
       :data="filterListData"
