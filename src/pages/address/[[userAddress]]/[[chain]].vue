@@ -159,10 +159,16 @@
       />
       <PnlCalendar
         class="w-448px bg-[--secondary-bg] p-16px"
+        :userAddress="userAddress"
+        :userChain="chain"
+      />
+      <Profit
+        class="flex-1 bg-[--secondary-bg] p-16px"
         :address="userAddress"
         :chain="chain"
+        :interval="interval"
+        :intervalText="intervalText"
       />
-      <Profit class="flex-1 bg-[--secondary-bg] p-16px" :address="userAddress" :chain="chain" />
       <Likes class="flex-1 bg-[--secondary-bg] p-16px" :address="userAddress" :chain="chain" />
     </div>
     <ActivityCharts :interval="interval" :address="userAddress" :chain="chain" />
@@ -184,6 +190,7 @@
   <PageBlank v-else />
 </template>
 <script setup>
+import dayjs from 'dayjs'
 import StatisticsTable from './components/statisticsTable.vue'
 import ActivityCharts from './components/activityCharts.vue'
 import PageBlank from './components/pageBlank.vue'
@@ -349,7 +356,7 @@ const _getWalletInfo = async () => {
     ...statistics.value,
     ...(res || {}),
   }
-  remark.value = res.remark || botStore.userInfo.value?.name
+  remark.value = res.remark || botStore.userInfo?.name
 }
 
 const _bindTwitter = async () => {

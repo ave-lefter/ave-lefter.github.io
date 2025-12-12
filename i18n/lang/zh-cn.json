@@ -1549,5 +1549,13 @@
   "totalPnl": "当月总盈亏",
   "preferredTokenMarketCap": "偏好的代币市值",
   "profitTokenCount": "盈利代币数",
-  "totalTokenCount": "交易代币总数"
+  "totalTokenCount": "交易代币总数",
+  "dailyProfit": "当日盈利",
+  "dailyLoss": "当日亏损",
+  "dailyTxns": "买入/卖出笔数",
+  "dailyVolume": "买入/卖出量",
+  "pnlCalendar": "盈亏日历",
+  "currentStreak": "当前连胜",
+  "maxStreak": "最高连胜",
+  "preferedTips":"该指标展示了您常购买代币的市值分布及对应的购买频次，帮助您了解自身的交易偏好。"
 }

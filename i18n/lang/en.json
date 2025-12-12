@@ -1551,5 +1551,13 @@
   "totalPnl": "Total PnL",
   "preferredTokenMarketCap": "Preferred Token Market Cap",
   "profitTokenCount": "Profit Token Count",
-  "totalTokenCount": "Total Token Count"
+  "totalTokenCount": "Total Token Count",
+  "dailyProfit": "Daily Profit",
+  "dailyLoss": "Daily Loss",
+  "dailyTxns": "Daily Txns",
+  "dailyVolume": "Daily Volume",
+  "pnlCalendar": "PnL Calendar",
+  "currentStreak": "Current Streak",
+  "maxStreak": "Max Streak",
+  "preferedTips": "This indicator shows the distribution of the market cap of the tokens you often buy and the corresponding purchase frequency, helping you understand your trading preferences."
 }

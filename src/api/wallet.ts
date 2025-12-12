@@ -235,4 +235,36 @@ export function getUserTokenList(address:string,chain:string) {
   })
 }
 
+export interface IProfitCalendarResponse {
+  days:    Day[];
+  summary: Summary;
+}
 
+export interface Day {
+  date:             Date;
+  profit:           number;
+  total_buy_count:  number;
+  total_sell_count: number;
+  buy_volume:       number;
+  sell_volume:      number;
+}
+
+export interface Summary {
+  month_total_profit:      number;
+  month_total_buy_count:   number;
+  month_total_sell_count:  number;
+  month_total_buy_volume:  number;
+  month_total_sell_volume: number;
+}
+// 获取盈亏日历
+export function getProfitCalendar(params:{
+  user_address:string
+  user_chain:string
+  date:string
+}):Promise<IProfitCalendarResponse> {
+  const { $api } = useNuxtApp()
+  return $api('https://api.test.phaetd8l.com/v2api/walletinfo/v2/calendar/pnl', {
+    method: 'get',
+    query: params,
+  })
+}

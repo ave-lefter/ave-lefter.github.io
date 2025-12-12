@@ -1,0 +1,161 @@
+<template>
+  <el-dialog v-model="visible" width="722px">
+    <template #header>
+      <div class="text-14px lh-20px color-[--main-text]">
+        {{ t('pnlCalendar') }}
+      </div>
+      <div class="flex items-center gap-4px absolute left-0 right-0 top-20px justify-center">
+        <Icon
+          name="material-symbols:arrow-back-ios-new-rounded"
+          class="cursor-pointer"
+          @click="handlePrevMonth"
+        />
+        <span>{{ dayjs(selectedDate).format('YYYY-MM') }}</span>
+        <Icon
+          name="material-symbols:arrow-forward-ios"
+          class="cursor-pointer"
+          :class="{
+            'cursor-not-allowed': nextDisabled,
+          }"
+          @click="handleNextMonth"
+        />
+      </div>
+    </template>
+
+    <!-- 当月总盈亏 -->
+    <div class="color-[--up-color] text-12px mb-12px">
+      {{ addSign(summary.month_total_profit) }}${{
+        formatNumber(Math.abs(summary.month_total_profit), 2)
+      }}
+    </div>
+    <div class="flex gap-2px mb-12px">
+      <div
+        class="h-4px rounded-2px bg-[--up-color]"
+        :style="`width:${((1 / 111) * 100).toFixed(1)}%`"
+      />
+      <div
+        class="h-4px rounded-2px bg-[--down-color]"
+        :style="`width:${((110 / 111) * 100).toFixed(1)}%`"
+      />
+    </div>
+    <div class="flex justify-between text-12px lh-16px mb-4px color-[--third-text] mb-24px">
+      <div>
+        <span class="color-[--up-color] text-12px"> 5 </span>/
+        <span class="color-[--up-color] text-12px"> $4582.45 </span>
+      </div>
+      <div>
+        <span class="color-[--down-color] text-12px"> 5 </span>/
+        <span class="color-[--down-color] text-12px"> $4582.45 </span>
+      </div>
+    </div>
+    <el-calendar :range="range">
+      <template #header>
+        <span />
+      </template>
+      <template #date-cell="{ data: { date } }">
+        <template v-if="dayjs(date).isSame(dayjs(selectedDate), 'month')">
+          <div
+            class="text-center h-full flex items-center flex-col justify-center"
+            :class="getColor(getPnl(date)).bg"
+          >
+            <span class="text-12px color-[--third-text] lh-14px">{{
+              dayjs(date).format('DD')
+            }}</span>
+            <div class="text-12px lh-14px mt-2px" :class="getColor(getPnl(date)).color">
+              {{ addSign(getPnl(date)) }}${{ formatNumber(Math.abs(getPnl(date)), 1) }}
+            </div>
+          </div>
+        </template>
+        <span v-else />
+      </template>
+    </el-calendar>
+    <div class="mt-12px flex items-center justify-between">
+      <div class="flex gap-16px text-12px">
+        <span>{{ t('currentStreak') }}:1d</span>
+        <span>{{ t('maxStreak') }}:2d</span>
+      </div>
+      <div class="flex items-center gap-4px">
+        <img height="26" src="~/assets/images/avedex_mobile_logo.png" />
+        <div class="flex items-end gap-5px">
+          <Icon name="custom:ave-ai" class="color-[--d-FFF-l-000] text-14px" />
+        </div>
+      </div>
+    </div>
+  </el-dialog>
+</template>
+<script setup>
+import dayjs from 'dayjs'
+import { getProfitCalendar } from '~/api/wallet'
+
+const visible = defineModel('visible')
+const props = defineProps({
+  getColor: {
+    type: Function,
+    required: true,
+  },
+  userAddress: {
+    type: String,
+    required: true,
+  },
+  userChain: {
+    type: String,
+    required: true,
+  },
+})
+const selectedDate = ref(dayjs().format('YYYY-MM-DD'))
+const dateMapToPnl = ref({})
+const summary = ref({})
+const { t } = useI18n()
+
+const nextDisabled = computed(() => {
+  return dayjs(selectedDate.value).isAfter(dayjs()) || dayjs(selectedDate.value).isSame(dayjs())
+})
+
+const range = computed(() => {
+  return [
+    dayjs(selectedDate.value).startOf('month').toDate(),
+    dayjs(selectedDate.value).endOf('month').toDate(),
+  ]
+})
+
+const getPnl = (date) => {
+  return dateMapToPnl.value[dayjs(date).format('YYYY-MM-DD')]?.profit || 0
+}
+const _getProfitCalendar = async () => {
+  const res = await getProfitCalendar({
+    user_address: props.userAddress,
+    user_chain: props.userChain,
+    date: selectedDate.value,
+  })
+  ;(res.days || []).forEach((item) => {
+    dateMapToPnl.value[item.date] = item
+  })
+  summary.value = res.summary || {}
+}
+
+watch(
+  () => visible.value,
+  (val) => {
+    if (val) {
+      _getProfitCalendar()
+    }
+  }
+)
+
+const handlePrevMonth = () => {
+  selectedDate.value = dayjs(selectedDate.value).subtract(1, 'month').format('YYYY-MM-DD')
+  _getProfitCalendar()
+}
+const handleNextMonth = () => {
+  if (nextDisabled.value) {
+    return
+  }
+  selectedDate.value = dayjs(selectedDate.value).add(1, 'month').format('YYYY-MM-DD')
+  _getProfitCalendar()
+}
+</script>
+<style scoped>
+:global(.el-calendar-table .el-calendar-day) {
+  height: 64px !important;
+}
+</style>
