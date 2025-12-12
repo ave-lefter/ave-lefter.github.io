@@ -38,6 +38,7 @@ const botStore = useBotStore()
 const tokenDetailsStore = useTokenDetailsStore()
 const globalStore = useGlobalStore()
 const route = useRoute()
+const walletStore = useWalletStore()
 const token = computed(() => {
   return (props.isRank && 'klineRow' in tokenStore) ? tokenStore.klineRow?.id : route.params.id as string
 })
@@ -65,7 +66,7 @@ const tokenAddress = computed(() => {
 })
 
 const user = computed(() => {
-  return botStore.userInfo?.addresses?.find?.(i => i.chain === chain.value)?.address || botStore?.userInfo?.evmAddress
+  return botStore.userInfo?.addresses?.find?.(i => i.chain === chain.value)?.address || botStore?.userInfo?.evmAddress || walletStore?.address
 })
 
 const symbol = computed(() => {
