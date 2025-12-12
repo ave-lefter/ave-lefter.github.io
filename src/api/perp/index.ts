@@ -5,6 +5,7 @@ import localforage from 'localforage'
 import { getAddress } from 'ethers'
 import { usePerpStore } from '~/stores/perp'
 import type { Order } from '~/stores/perp/type'
+import type { AccountInfo } from '~/utils/perp/types'
 
 // 获取metadata
 export async function getPerpMetadata(): Promise<Metadata> {
@@ -25,46 +26,7 @@ export async function getPerpMetadata(): Promise<Metadata> {
 }
 
 export async function onboardSite(): Promise<{
-  dataList: Array<{
-    id: string
-    userId: string
-    ethAddress: string
-    l2Key: string
-    l2KeyYCoordinate: string
-    clientAccountId: string
-    isSystemAccount: boolean
-    defaultTradeSetting: {
-      isSetFeeRate: boolean
-      takerFeeRate: string
-      makerFeeRate: string
-      isSetFeeDiscount: boolean
-      takerFeeDiscount: string
-      makerFeeDiscount: string
-      isSetMaxLeverage: boolean
-      maxLeverage: string
-    }
-    contractIdToTradeSetting: {
-      [key: string]: {
-        isSetFeeRate: boolean
-        takerFeeRate: string
-        makerFeeRate: string
-        isSetFeeDiscount: boolean
-        takerFeeDiscount: string
-        makerFeeDiscount: string
-        isSetMaxLeverage: boolean
-        maxLeverage: string
-      }
-    }
-    maxLeverageLimit: string
-    createOrderPerMinuteLimit: number
-    createOrderDelayMillis: number
-    extraType: string
-    extraDataJson: string
-    status: string
-    isLiquidating: boolean
-    createdTime: string
-    updatedTime: string
-  }>
+  dataList: Array<AccountInfo>
   nextPageOffsetData: string
 }> {
   const walletStore = useWalletStore()

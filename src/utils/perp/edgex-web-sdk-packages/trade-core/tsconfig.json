@@ -1,0 +1,12 @@
+{
+  "extends": "@edgex/typescript-config/base.json",
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ES6", "ESNext"],
+    "strict": true,
+    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "strictNullChecks": true
+  },
+  "include": ["./src"],
+  "exclude": ["dist", "build", "node_modules"]
+}
