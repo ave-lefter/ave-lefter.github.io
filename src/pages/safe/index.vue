@@ -148,11 +148,13 @@
               class="lh-22px text-13px cursor-pointer hover:color-[--main-text] list-disc list-inside"
               style="padding-left: 0.25rem; --list-disc-size: 0.15rem;"
               :class="otherChecksIndex === index ? 'color-[--main-text]' : ''"
-              @click="otherChecksIndex = index" >
-                <span class="-ml-8px text-14px">{{ item.name }}</span>
+              @mouseover="otherChecksIndex = index"
+              @mouseout="otherChecksIndex = null"
+            >
+              <span class="-ml-8px text-14px">{{ item.name }}</span>
             </li>
           </ul>
-          <div class="flex justify-between w-100% mb-23px">
+          <div v-if="otherChecksIndex !== null" class="flex justify-between w-100% mb-23px" >
             <div>
               <div class="flex items-center w-150px  justify-center gap-4px h-48px mb-10px">
                 <Icon name="custom:google-play" class="text-24px"/>
@@ -162,7 +164,7 @@
                 <canvas ref="googleQrCodeRef" class="w-150px h-150px block"></canvas>
               </div>
             </div>
-            <div v-if="otherChecks[otherChecksIndex].apple">
+            <div v-if="otherChecks[otherChecksIndex]?.apple">
               <div class="flex items-center w-150px  justify-center gap-4px h-48px mb-10px">
                 <Icon name="custom:apple" class="text-30px color-[--main-text]"/>
                 <span class="color-[--main-text] font-500 text-14px">App Store</span>
@@ -296,12 +298,12 @@ const count = ref(60)
 const timer = ref<any | null>(null)
 const router = useRouter()
 //其他验证方式
-const otherChecksIndex = ref(0)
+const otherChecksIndex = ref(null)
 const otherChecks = [
   {
     name: 'Microsoft Authenticator',
-    googlePlay: 'https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2',
-    apple: 'https://apps.apple.com/app/microsoft-authenticator/id938946594'
+    googlePlay: 'https://play.google.com/store/apps/details?id=com.azure.authenticator',
+    apple: 'https://apps.apple.com/us/app/microsoft-authenticator/id983156458'
   },{
     name: '2FA Authenticator (2FAS)',
     googlePlay: 'https://play.google.com/store/apps/details?id=com.twofasapp',
@@ -623,20 +625,7 @@ watch(step, (newStep) => {
   if (newStep === 1.1 && checkType.value === 'google') {
     initGoogleAuth()
   }
-  if(step.value === 1 && checkType.value === 'google'){
-    // 页面加载时确保默认选项被选中
-    otherChecksIndex.value = 0
-    // 使用 setTimeout 确保 DOM 完全渲染后再生成二维码
-    setTimeout(() => {
-      const item = otherChecks[otherChecksIndex.value]
-      if (item && googleQrCodeRef.value) {
-        generateQrCode(item.googlePlay, googleQrCodeRef.value)
-      }
-      if (item && item.apple && appleQrCodeRef.value) {
-        generateQrCode(item.apple, appleQrCodeRef.value)
-      }
-    }, 100)
-  }
+
 })
 
 watch(() => userStore.email, (newVal) => {
