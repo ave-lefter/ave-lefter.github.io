@@ -66,20 +66,20 @@
               <el-popover width="200px" popper-class="h-200px flex items-center justify-center" placement="bottom">
                   <template #reference>
                     <div class="flex items-center justify-center gap-4px w-200px h-48px border-rd-8px bg-[--border] clickable">
-                      <Icon name="custom:apple" class="text-30px color-[--main-text]"/>
-                      <span class="color-[--main-text] font-500 text-14px">App Store</span>
-                    </div>
-                  </template>
-                  <img src="@/assets/images/2faAppleQRCode.png" alt="" class="mx-auto w-188px h-188px block">
-              </el-popover>
-              <el-popover width="200px" popper-class="h-200px flex items-center justify-center" placement="bottom">
-                  <template #reference>
-                    <div class="flex items-center justify-center gap-4px w-200px h-48px border-rd-8px bg-[--border] clickable">
                       <Icon name="custom:google-play" class="text-24px"/>
                       <span class="color-[--main-text] font-500 text-14px">Google Play</span>
                     </div>
                   </template>
                   <img src="@/assets/images/2faGoogleQRCode.png" alt="" class="mx-auto w-188px h-188px block">
+              </el-popover>
+              <el-popover width="200px" popper-class="h-200px flex items-center justify-center" placement="bottom">
+                  <template #reference>
+                    <div class="flex items-center justify-center gap-4px w-200px h-48px border-rd-8px bg-[--border] clickable">
+                      <Icon name="custom:apple" class="text-30px color-[--main-text]"/>
+                      <span class="color-[--main-text] font-500 text-14px">App Store</span>
+                    </div>
+                  </template>
+                  <img src="@/assets/images/2faAppleQRCode.png" alt="" class="mx-auto w-188px h-188px block">
               </el-popover>
             </div>
             <el-button type="primary" class="w-full" size="large" @click="step = 1.1">{{ t('next') }}</el-button>
@@ -132,16 +132,54 @@
             </el-form>
           </template>
         </div>
-        <div class="w-1px h-216px bg-[--border]"/>
-        <div class="w-437px">
-          <div class="font-500 text-14px lh-20px color-[--main-text]">{{ t('bindGoogleAuthReadmeT1') }}</div>
-          <div class="font-400 text-14px lh-20px color-[--third-text] mb-23px">{{ t('bindGoogleAuthReadmeP1') }}</div>
-          <div class="font-500 text-14px lh-20px color-[--main-text]">{{ t('bindGoogleAuthReadmeT2') }}</div>
-          <div class="font-400 text-14px lh-20px color-[--third-text] mb-23px">{{ t('bindGoogleAuthReadmeP2') }}</div>
+        <div class="w-1px bg-[--border]"/>
+        <div class="w-437px pb-48px">
+          <div class="google-authenticator-readme">
+            <div class="font-500 text-14px lh-20px color-[--main-text]">{{ t('bindGoogleAuthReadmeT1') }}</div>
+            <div class="font-400 text-14px lh-20px color-[--third-text] mb-23px">{{ t('bindGoogleAuthReadmeP1') }}</div>
+            <div class="font-500 text-14px lh-20px color-[--main-text]">{{ t('bindGoogleAuthReadmeT2') }}</div>
+            <div class="font-400 text-14px lh-20px color-[--third-text] mb-23px">{{ t('bindGoogleAuthReadmeP2') }}</div>
+            <div class="font-500 text-14px lh-20px color-[--main-text]">{{ t('more2FAApps') }}</div>
+          </div>
+          <ul class="mb-15px mt-4px color-[--third-text]">
+            <li
+              v-for="item, index in otherChecks"
+              :key="item.name"
+              class="lh-22px text-13px cursor-pointer hover:color-[--main-text] list-disc list-inside"
+              style="padding-left: 0.25rem; --list-disc-size: 0.15rem;"
+              :class="otherChecksIndex === index ? 'color-[--main-text]' : ''"
+              @mouseover="otherChecksIndex = index"
+              @mouseout="otherChecksIndex = null"
+            >
+              <span class="-ml-8px text-14px">{{ item.name }}</span>
+            </li>
+          </ul>
+          <div v-if="otherChecksIndex !== null" class="flex justify-between w-100% mb-23px" >
+            <div>
+              <div class="flex items-center w-150px  justify-center gap-4px h-48px mb-10px">
+                <Icon name="custom:google-play" class="text-24px"/>
+                <span class="color-[--main-text] font-500 text-14px">Google Play</span>
+              </div>
+              <div>
+                <canvas ref="googleQrCodeRef" class="w-150px h-150px block"></canvas>
+              </div>
+            </div>
+            <div v-if="otherChecks[otherChecksIndex]?.apple">
+              <div class="flex items-center w-150px  justify-center gap-4px h-48px mb-10px">
+                <Icon name="custom:apple" class="text-30px color-[--main-text]"/>
+                <span class="color-[--main-text] font-500 text-14px">App Store</span>
+              </div>
+              <div>
+                <canvas ref="appleQrCodeRef" class="w-150px h-150px block"></canvas>
+              </div>
+            </div>
+          </div>
+
           <a
             class="decoration-underline font-500 text-14px lh-20px color-[--main-text]"
             href="https://doc.ave.ai/cn/ave.ai-jiao-cheng/gu-ge-yan-zheng-qi-an-zhuang-jiao-cheng"
-            target="_blank">{{ t('DbCheckContentContent12') }}</a>
+            target="_blank">{{ t('DbCheckContentContent12') }}
+          </a>
         </div>
       </div>
     </template>
@@ -257,8 +295,28 @@ const loading2 = ref(false)
 const loading3 = ref(false)
 const loading4 = ref(false)
 const count = ref(60)
-const timer = ref<NodeJS.Timeout | null>(null)
+const timer = ref<any | null>(null)
 const router = useRouter()
+//其他验证方式
+const otherChecksIndex = ref(null)
+const otherChecks = [
+  {
+    name: 'Microsoft Authenticator',
+    googlePlay: 'https://play.google.com/store/apps/details?id=com.azure.authenticator',
+    apple: 'https://apps.apple.com/us/app/microsoft-authenticator/id983156458'
+  },{
+    name: '2FA Authenticator (2FAS)',
+    googlePlay: 'https://play.google.com/store/apps/details?id=com.twofasapp',
+    apple: 'https://apps.apple.com/us/app/2fa-authenticator-2fas/id1217793794'
+  },{
+    name: 'Bitwarden Password Manager',
+    googlePlay: 'https://play.google.com/store/apps/details?id=com.x8bit.bitwarden',
+    apple: 'https://apps.apple.com/us/app/bitwarden-password-manager/id1137397744'
+  },{
+    name: 'Aegis Authenticator - 2FA App',
+    googlePlay: 'https://play.google.com/store/apps/details?id=com.beemdevelopment.aegis'
+  }
+]
 
 const bindGoogleAuthStep=computed(()=>{
   if(checkType.value!=='google') return 1
@@ -355,7 +413,7 @@ function validatePassword(rule: any, value: string, callback: (error?: Error) =>
 
 function confirmAuth() {
   const currentLanguage = lang.value.indexOf('zh') > -1 ? 'cn' : 'en'
-  googleAuthRef?.value?.validate((valid) => {
+  googleAuthRef?.value?.validate((valid: boolean) => {
     if (valid) {
       getUserInfoByGuid(googleAuth.value.tgUid).then(res => {
         if (!res?.authSetting) {
@@ -375,7 +433,7 @@ function confirmAuth() {
               // emit('action')
               googleAuth.value.authCode = ''
             }
-          }).catch(err => {
+          }).catch((err: any) => {
             ElMessage.error(String(err))
             // ElNotification({ title: 'Error', type: 'error', message: err })
           })
@@ -384,7 +442,7 @@ function confirmAuth() {
           // emit('action')
           googleAuth.value.authCode = ''
         }
-      }).catch(err => {
+      }).catch((err: any) => {
         ElMessage.error(String(err))
         // ElNotification({ title: 'Error', type: 'error', message: err })
       })
@@ -449,7 +507,7 @@ async function setChainQr() {
 
 function submitForm() {
   const currentLanguage = lang.value.indexOf('zh') > -1 ? 'cn' : 'en'
-  formRef?.value?.validate((valid) => {
+  formRef?.value?.validate((valid: boolean) => {
     if (valid) {
       loading.value = true
       userStore.bindEmailAccount({
@@ -476,11 +534,11 @@ function submitForm() {
           resetFields()
           resetCountdown()
           step.value = 0
-        }).catch(err => {
+        }).catch((err: any) => {
           ElMessage.error(String(err))
           // ElNotification({ title: 'Error', type: 'error', message: err })
         })
-      }).catch(err => {
+      }).catch((err: any) => {
         ElMessage.error(String(err))
         // ElNotification({ title: 'Error', type: 'error', message: err })
         loading.value = false
@@ -567,13 +625,8 @@ watch(step, (newStep) => {
   if (newStep === 1.1 && checkType.value === 'google') {
     initGoogleAuth()
   }
-})
 
-// watch(() => props.visible, (newVal) => {
-//   if (!newVal) {
-//     step.value = 0
-//   }
-// })
+})
 
 watch(() => userStore.email, (newVal) => {
   email.value = newVal
@@ -588,9 +641,48 @@ watch(() => evmAddress.value, (val) => {
   }
 },{immediate: true})
 
+const googleQrCodeRef = ref(null)
+const appleQrCodeRef = ref(null)
 
+// 生成二维码的方法
+const generateQrCode = async (content: string, canvasRef: HTMLCanvasElement) => {
+  if (!canvasRef || !content) return
 
-onMounted(async () => {
+  try {
+    // 清空 canvas 内容，确保重新绘制
+    const ctx = canvasRef.getContext('2d')
+    if (ctx) {
+      ctx.clearRect(0, 0, canvasRef.width, canvasRef.height)
+    }
+
+    await QrCodeWithLogo.toCanvas({
+      canvas: canvasRef,
+      content: content,
+      width: 150,
+      nodeQrCodeOptions: {
+        margin: 1,
+      },
+      logo: ''
+    })
+  } catch (err) {
+    console.error('生成二维码失败:', err)
+    ElMessage.error(String(err))
+  }
+}
+
+// 监听 otherChecksIndex 变化，生成对应的二维码
+watch(otherChecksIndex, (newIndex: number) => {
+  // 使用 setTimeout 确保 DOM 更新后再生成二维码
+  setTimeout(() => {
+    const item = otherChecks[newIndex]
+    if (item && googleQrCodeRef.value) {
+      generateQrCode(item.googlePlay, googleQrCodeRef.value)
+    }
+    // 只有当 item.apple 存在且 appleQrCodeRef.value 存在时才生成二维码
+    if (item && item.apple && appleQrCodeRef.value) {
+      generateQrCode(item.apple, appleQrCodeRef.value)
+    }
+  }, 50)
 })
 
 function goToTg() {
