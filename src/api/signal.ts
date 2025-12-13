@@ -165,15 +165,12 @@ export function getSignalV3List(query: {
 }
 
 export function getActiveAddressRank(query): Promise<{
-  items:{
-    user_address: string;
-    pnl:          number;
-    rank:         number;
-    win_rate:     string;
-    wallet_logo:  string;
-  }[]
-  has_more: boolean
-}> {
+  user_address: string;
+  pnl:          number;
+  rank:         number;
+  win_rate:     string;
+  wallet_logo:  string;
+}[]> {
   const {$api} = useNuxtApp()
   return $api('https://api.test.phaetd8l.com/v2api/signals/v2/wallets_rank', {
     method: 'get',

@@ -12,6 +12,7 @@ import { CanvasRenderer } from 'echarts/renderers'
 import buy from 'assets/images/mark/buy.png'
 import buyDark from 'assets/images/mark/buy-dark.png'
 import buyLight from 'assets/images/mark/buy-light.png'
+import dayjs from 'dayjs'
 
 // 注册使用组件
 echarts.use([
@@ -57,9 +58,14 @@ const dataX = computed(() => props.dataList?.map?.((i) => formatDate(i[0], 'MM-D
 const markPoint = computed(() => {
   return props.marks?.map?.((y: any, idx: number) => {
     const xAxis = formatDate(y[0], 'MM-DD HH:mm')
-    const yAxis = props.dataList?.find?.((i) => formatDate(i[0], 'MM-DD HH:mm') === xAxis)?.[1]
+    const yAxis = props.dataList?.find?.((i) => {
+      const compareTime = dayjs(i[0] * 1000)
+      const targetTime = dayjs(y[0] * 1000)
+      const isSame = compareTime.isSame(targetTime)
+      const isAfter = targetTime.isBefore(compareTime)
+      return isSame || isAfter
+    })?.[1]
     let symbolUrl = themeStore.isDark ? buyDark : buyLight
-    // console.log(idx, 'idx', props.marks)
     if (idx === 0) {
       symbolUrl = buy
     }

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useThrottleFn } from '@vueuse/core'
 import type { ITopSignal } from '~/api/signal'
 const globalStore = useGlobalStore()
 const { t } = useI18n()
@@ -56,24 +55,6 @@ const elseHeight = computed(() => {
   }
   return substractHeight
 })
-
-const onScroll = useThrottleFn(
-  ({ scrollTop }: { scrollTop: number }) => {
-    if (scrollRef.value) {
-      const scrollElement = scrollRef.value.wrapRef
-      if (
-        scrollElement &&
-        scrollElement.scrollHeight - scrollTop - (window.innerHeight - elseHeight.value) < 30 &&
-        props.dialogValues.has_more
-      ) {
-        emit('loadMore')
-      }
-    }
-  },
-  100,
-  true,
-  false
-)
 </script>
 <template>
   <div
@@ -147,8 +128,8 @@ const onScroll = useThrottleFn(
     </el-scrollbar>
   </div>
   <div
-    class="w-360px p-12px bg-[--secondary-bg]"
     v-show="dialogValues.visible && dialogValues.type === 'activeList'"
+    class="w-360px p-12px bg-[--secondary-bg]"
   >
     <div
       class="flex justify-between items-center text-14px lh-16px pb-16px border-b-1px border-b-solid border-b-[--main-divider] mb-12px"
@@ -181,7 +162,6 @@ const onScroll = useThrottleFn(
       ref="scrollRef"
       :height="`calc(100vh - ${elseHeight}px)`"
       class="mx--12px px-12px"
-      @scroll="onScroll"
     >
       <div
         v-for="row in dialogValues.activeList"
@@ -195,8 +175,9 @@ const onScroll = useThrottleFn(
         >
           <UserAvatar
             iconSize="24px"
-            :row="{
-              address: row.user_address,
+            :address="row.user_address"
+            :chain="props.activeChain"
+            :wallet_logo="{
               logo: row.wallet_logo,
             }"
           />
@@ -209,7 +190,7 @@ const onScroll = useThrottleFn(
           class="color-[--secondary-text] text-12px color-[--up-color]"
           :class="activeColumns[2]"
         >
-          {{ formatNumber(row.win_rate, 1) }}%
+          {{ formatNumber(row.win_rate * 100, 1) }}%
         </div>
       </div>
       <template v-if="!dialogValues.loading && dialogValues.activeList.length === 0">

@@ -331,10 +331,10 @@ function openTokenDetail(el: IActionV3Item) {
                 >{{ wallet_address.slice(0, 4) }}...{{ wallet_address.slice(-4) }}</span
               >
               <Icon
+                v-copy="wallet_address"
                 name="bxs:copy"
                 class="ml-4px color-[--third-text]"
                 @click.stop.prevent
-                v-copy="wallet_address"
               />
             </template>
           </UserRemark>

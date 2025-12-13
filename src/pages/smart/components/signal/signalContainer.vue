@@ -18,8 +18,6 @@ const dialogValues = ref<{
   visible: boolean
   loading: boolean
   type: 'topList' | 'activeList'
-  pageNO: number
-  pageSize: number
   topList: ITopSignal[]
   activeList: {
     user_address: string
@@ -28,7 +26,6 @@ const dialogValues = ref<{
     win_rate: string
     wallet_logo: string
   }[]
-  has_more: boolean
   tag: number[]
 }>({
   visible: false,
@@ -36,9 +33,6 @@ const dialogValues = ref<{
   topList: [],
   activeList: [],
   type: 'topList',
-  pageNO: 1,
-  pageSize: 100,
-  has_more: true,
   tag: [30],
 })
 const showResetBtn = defineModel<boolean>('showResetBtn')
@@ -226,7 +220,6 @@ function scrollToTop() {
 async function setDialogVisible(type: 'topList' | 'activeList') {
   dialogValues.value.type = type
   dialogValues.value.visible = true
-  dialogValues.value.pageNO = 1
   const isTopList = type === 'topList'
   if (isTopList) {
     getTopListData()
@@ -251,17 +244,10 @@ async function getActiveListData() {
   dialogValues.value.loading = true
   try {
     const res = await getActiveAddressRank({
-      pageNO: dialogValues.value.pageNO,
-      pageSize: dialogValues.value.pageSize,
       chain: props.activeChain,
-      tag: dialogValues.value.tag.join(','),
+      tags: dialogValues.value.tag.join(','),
     })
-    dialogValues.value.has_more = res.has_more
-    dialogValues.value.activeList =
-      dialogValues.value.pageNO === 1 ? res.items : [...dialogValues.value.activeList, ...res.items]
-    if (res.has_more) {
-      dialogValues.value.pageNO++
-    }
+    dialogValues.value.activeList = res || []
   } finally {
     dialogValues.value.loading = false
   }
@@ -278,7 +264,7 @@ function initPoll() {
       chain: props.activeChain,
       tag: dialogValues.value.tag.join(','),
     })
-    dialogValues.value.activeList = res.items || []
+    dialogValues.value.activeList = res || []
   })
 }
 
@@ -296,9 +282,7 @@ watch(
   () => [dialogValues.value.tag, props.activeChain],
   () => {
     cancelAnimationFrame(rafResult.id!)
-    dialogValues.value.pageNO = 1
     dialogValues.value.activeList = []
-    dialogValues.value.has_more = true
     getActiveListData()
     rafResult = initPoll()
   }
