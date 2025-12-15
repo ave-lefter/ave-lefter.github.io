@@ -5,13 +5,13 @@ import { EdgeXSDK, type ApiKeyData, type L2KeyPair } from '@edgex-fe/typescript-
 import { useLocalStorage } from '@vueuse/core'
 import { usePerpWsPubStore } from './wsPub'
 import { usePerpWsPrivateStore } from './wsPrivate'
-import type { Collateral, Order, Position, TransferOut, Withdraw } from './type'
+import type { Collateral, Order, TransferOut, Withdraw } from './type'
+import type { PositionEntry, OrderEntry, AccountInfo, TickerEntry } from '@/utils/perp/types'
 import { type CoinInfo } from '@/api/types/perp'
 import { type OrderBook } from '@/api/perp'
 
 type PerpMetadata = Awaited<ReturnType<typeof _getPerpMetadata>>
 type UserInfo = Awaited<ReturnType<typeof onboardSite>>['dataList'][0]
-type ContractInfo = PerpMetadata['contractList'][number]
 
 const sdk = new EdgeXSDK({
   // clientId: 'your-client-id',
@@ -23,16 +23,17 @@ export const usePerpStore = defineStore('perp', () => {
   const contractList = ref<Array<PerpInfo>>([])
   const loadingPerpMetadata = shallowRef(false)
   const walletStore = useWalletStore()
-  const userInfo = ref<null | UserInfo>(null)
-  const accountList = shallowRef<UserInfo[]>([])
+  const userInfo = ref<null | AccountInfo>(null)
+  const accountList = shallowRef<AccountInfo[]>([])
   const collateral = ref<Collateral[]>([])
-  const position = ref<Position[]>([])
-  const order = ref<Order[]>([])
+  const position = ref<PositionEntry[]>([])
+  const order = ref<OrderEntry[]>([])
   const withdraw = ref<Withdraw[]>([])
   const transferOut = ref<TransferOut[]>([])
-  const orderList = ref<Order[]>([])
+  const orderList = ref<OrderEntry[]>([])
   const buyList = ref<OrderBook[]>([])
   const sellList = ref<OrderBook[]>([])
+  const tickers = ref<TickerEntry[]>([])
 
   const isCancelOrder = shallowRef(false)
   const _perpKeys = useLocalStorage<{[key: string]: {apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string }}>('perp_keys', {})
@@ -94,6 +95,7 @@ export const usePerpStore = defineStore('perp', () => {
   const unitList = computed(() => {
     return [base.value, quote.value]?.filter(Boolean)
   })
+
   function getPerpMetadata() {
     loadingPerpMetadata.value = true
     _getPerpMetadata().then(res => {
@@ -310,6 +312,7 @@ export const usePerpStore = defineStore('perp', () => {
     signAndGenerateL2KeyPair,
     loadingPerpMetadata,
     contractList,
+    tickers,
     perp,
     contractName,
     totalAssets,

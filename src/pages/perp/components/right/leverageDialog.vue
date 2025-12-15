@@ -32,7 +32,7 @@
       </div>
      <div class="text-14px flex-between mt-48px">
       <span class="color-[--third-text]">{{ $t('positionMargin') }}</span>
-      <span>{{ formatNumber(defaultMargin, { decimals: 0, limit: 10}) }}&nbsp;USD</span>
+      <span>{{ formatNumber(defaultMargin, { decimals: 4, limit: 10}) }}&nbsp;USD</span>
      </div>
      <div class="text-14px flex-between mt-24px">
       <span class="color-[--third-text]">{{ $t('maxPositionCurrentLeverage') }}</span>
@@ -151,15 +151,23 @@ watch(
 function getMargin(leverage: string) {
   const list = position?.value?.filter((i) => i.contractId == contractId.value) || []
   const num = list.reduce((acc, cur) => acc + Number(cur?.openSize), 0)
-  const data = {
+  // const data = {
+  //   contractId: contractId.value,
+  //   orderSide: 'BUY',
+  //   orderPrice: perp?.value?.lastPrice || '',
+  //   orderSize: String(num),
+  //   leverage: leverage
+  // }
+  // const result = CoreCalculator.getCreateOrderCost(data)?.toString()
+  const result = calculateMargin({
     contractId: contractId.value,
-    orderSide: 'BUY',
-    orderPrice: perp?.value?.lastPrice || '',
-    orderSize: String(num),
-    leverage: leverage
-  }
-  const result = CoreCalculator.getCreateOrderCost(data)?.toString()
- return result
+    side: 'BUY',
+    price: Number(perp?.value?.lastPrice || 0),
+    size: num,
+    leverage,
+    feeRate: '0'
+  }).toFixed()
+  return result
 }
 function change(val: number | number[]) {
   if (val) {

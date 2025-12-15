@@ -237,7 +237,7 @@
   <ul class="text-12px color-[--third-text]">
     <li class="flex items-center">
       <span class="mr-auto">{{ $t('margin') }}</span>
-      <span class="color-[--up-color]">{{ !form.reduceOnly && BigNumber(form.amount).gt(0) ?  formatNumber(perpMargin.buy, 2)  : '-'}} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ !form.reduceOnly && BigNumber(form.amount).gt(0) ?  formatNumber(perpMargin.sell, 2)  : '-' }}  USD</span>
+      <span class="color-[--up-color]">{{ !form.reduceOnly && BigNumber(form.amount).gt(0) ?  formatNumber(perpMargin.buy, 4)  : '-'}} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ !form.reduceOnly && BigNumber(form.amount).gt(0) ?  formatNumber(perpMargin.sell, 4)  : '-' }}  USD</span>
     </li>
     <li class="flex items-center mt-8px">
       <span class="mr-auto">Max: </span>
@@ -260,7 +260,7 @@ import { usePerpStore } from '~/stores/perp'
 import BigNumber from 'bignumber.js'
 import type { FormInstance } from 'element-plus'
 import type { PerpOrderParams } from '~/api/perp/types'
-import { sw } from 'element-plus/es/locale/index.mjs'
+import { calculateMargin } from '~/utils/perp'
 
 const { t } = useI18n()
 const perpStore = usePerpStore()
@@ -393,19 +393,21 @@ const slForm = reactive<{
 const perpMargin = computed(() => {
   const contractId = perpStore.perp?.contractId || ''
   const orderSize = getSize() || '0'
-  const orderPrice = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+  // const orderPrice = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
   return {
-    buy: CoreCalculator.getCreateOrderCost({
+    buy: calculateMargin({
       contractId: contractId,
-      orderPrice: orderPrice,
-      orderSize: orderSize || '0',
-      orderSide: 'BUY'
+      size: Number(orderSize || '0'),
+      side: 'BUY',
+      price: swapType.value === 'LIMIT' ? Number(form.price || 0) : 0,
+      isMarketOrder: false
     }).toFixed(),
-    sell: CoreCalculator.getCreateOrderCost({
+    sell: calculateMargin({
       contractId: contractId,
-      orderPrice: orderPrice,
-      orderSize: orderSize || '0',
-      orderSide: 'SELL'
+      size: Number(orderSize || '0'),
+      side: 'SELL',
+      price: swapType.value === 'LIMIT' ? Number(form.price || 0) : 0,
+      isMarketOrder: false
     }).toFixed(),
   }
 })
@@ -424,10 +426,17 @@ const maxAmountBuy = computed(() => {
   if (!isValue.value) {
     price = '1'
   }
-  return CoreCalculator.getMaxCreateOrderSize({
+  // return CoreCalculator.getMaxCreateOrderSize({
+  //   contractId: perpStore.perp?.contractId || '',
+  //   orderPrice: perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0',
+  //   orderSide: 'BUY',
+  //   reduceOnly: form.reduceOnly
+  // }).times(price).toFixed()
+  return calculateMaxSize({
     contractId: perpStore.perp?.contractId || '',
-    orderPrice: perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0',
-    orderSide: 'BUY',
+    type: swapType.value,
+    side: 'BUY',
+    price: Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice )|| 0),
     reduceOnly: form.reduceOnly
   }).times(price).toFixed()
 })
@@ -437,10 +446,17 @@ const maxAmountSell = computed(() => {
   if (!isValue.value) {
     price = '1'
   }
-  return CoreCalculator.getMaxCreateOrderSize({
+  // return CoreCalculator.getMaxCreateOrderSize({
+  //   contractId: perpStore.perp?.contractId || '',
+  //   orderPrice: perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0',
+  //   orderSide: 'SELL',
+  //   reduceOnly: form.reduceOnly
+  // }).times(price).toFixed()
+  return calculateMaxSize({
     contractId: perpStore.perp?.contractId || '',
-    orderPrice: perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0',
-    orderSide: 'SELL',
+    type: swapType.value,
+    side: 'SELL',
+    price: Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice )|| 0),
     reduceOnly: form.reduceOnly
   }).times(price).toFixed()
 })
@@ -453,22 +469,34 @@ const amountSell = computed(() => {
 const liquidatePriceBuy = computed(() => {
   const price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
   const orderSize = getSize() || '0'
-  return CoreCalculator.getCreateOrderLiquidatePrice({
+  // return CoreCalculator.getCreateOrderLiquidatePrice({
+  //   contractId: perpStore.perp?.contractId || '',
+  //   orderPrice: price,
+  //   orderSide: 'BUY',
+  //   orderSize
+  // }).toFixed()
+  return calculateLiqPrice({
     contractId: perpStore.perp?.contractId || '',
-    orderPrice: price,
-    orderSide: 'BUY',
-    orderSize
+    side: 'BUY',
+    price: Number(price) || 0,
+    size: Number(orderSize || '0')
   }).toFixed()
 })
 
 const liquidatePriceSell = computed(() => {
   const price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
   const orderSize = getSize() || '0'
-  return CoreCalculator.getCreateOrderLiquidatePrice({
+  // return CoreCalculator.getCreateOrderLiquidatePrice({
+  //   contractId: perpStore.perp?.contractId || '',
+  //   orderPrice: price,
+  //   orderSide: 'SELL',
+  //   orderSize
+  // }).toFixed()
+  return calculateLiqPrice({
     contractId: perpStore.perp?.contractId || '',
-    orderPrice: price,
-    orderSide: 'SELL',
-    orderSize
+    side: 'SELL',
+    price: Number(price) || 0,
+    size: Number(orderSize || '0')
   }).toFixed()
 })
 
