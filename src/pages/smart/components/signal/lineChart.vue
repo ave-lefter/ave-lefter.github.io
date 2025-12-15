@@ -57,7 +57,7 @@ const language = computed(() => localeStore.locale)
 const dataX = computed(() => props.dataList?.map?.((i) => formatDate(i[0], 'MM-DD HH:mm')))
 const markPoint = computed(() => {
   return props.marks?.map?.((y: any, idx: number) => {
-    const xAxis = formatDate(y[0], 'MM-DD HH:mm')
+    const xAxis = formatDate(y[0], 'YYYY-MM-DD HH:mm')
     const yAxis = props.dataList?.find?.((i) => {
       const compareTime = dayjs(i[0] * 1000)
       const targetTime = dayjs(y[0] * 1000)
@@ -129,7 +129,7 @@ const series = computed(() => {
       focus: 'series',
     },
     data: props.dataList.map((j) => {
-      return j[1]
+      return [formatDate(j[0], 'YYYY-MM-DD HH:mm'), j[1]]
     }),
     // 曲线本身不显示tooltip
     tooltip: {
@@ -173,9 +173,9 @@ function init() {
       show: true,
     },
     xAxis: {
-      type: 'category',
-      data: dataX.value,
-      boundaryGap: ['0', '20'],
+      type: 'time',
+      // data: dataX.value,
+      // boundaryGap: ['0', '20'],
       splitLine: {
         show: false,
       },
@@ -196,6 +196,7 @@ function init() {
       nameTextStyle: {
         fontSize: 10,
       },
+      // scale: true,
     },
     yAxis: {
       type: 'value',
