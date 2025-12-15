@@ -407,6 +407,9 @@ const getWhaleTrendParams = () => {
     sort: trendQuery.value.sort,
     ...(trendQuery.value.volume_min && { volume_min: trendQuery.value.volume_min }),
     ...(trendQuery.value.volume_max && { volume_max: trendQuery.value.volume_max }),
+    ...(trendQuery.value.token && { token: trendQuery.value.token }),
+    ...(trendQuery.value.amount_min && { amount_min: trendQuery.value.amount_min }),
+    ...(trendQuery.value.amount_max && { amount_max: trendQuery.value.amount_max }),
   }
 
   const trendLen = trendQuery.value.checkedTrend?.length

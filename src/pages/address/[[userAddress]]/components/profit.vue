@@ -62,8 +62,13 @@
         />
         <div class="flex flex-col gap-4px text-12px color-[--main-text]">
           {{ item.symbol }}
-          <span :class="getColorClass(item.total_profit)"
+          <span
+            v-if="bestTokenFilter === BestTokenEnum.TOTAL_PROFIT"
+            :class="getColorClass(item.total_profit)"
             >+${{ formatNumber(item.total_profit, 2) }}</span
+          >
+          <span v-else :class="getColorClass(item.total_profit_ratio)"
+            >{{ Math.max(+formatNumber(item.total_profit_ratio, 1), 0.1) }}X</span
           >
         </div>
       </div>
@@ -100,7 +105,7 @@ const BestTokenEnum = {
   TOTAL_RATIO: 'total_profit_ratio',
   TOTAL_PROFIT: 'total_profit',
 }
-const bestTokenFilter = ref(BestTokenEnum.TOTAL_RATIO)
+const bestTokenFilter = ref(BestTokenEnum.TOTAL_PROFIT)
 const winProfit = ref({
   xAxis: {
     type: 'value',

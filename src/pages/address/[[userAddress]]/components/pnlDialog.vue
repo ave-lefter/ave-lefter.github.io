@@ -27,7 +27,6 @@
         formatNumber(Math.abs(summary.month_total_profit), 1)
       }}
     </div>
-    {{ console.log('percent', percent) }}
     <div class="flex gap-2px mb-12px">
       <div class="h-4px rounded-2px bg-[--up-color]" :style="`width:${percent.profit}%`" />
       <div class="h-4px rounded-2px bg-[--down-color]" :style="`width:${percent.loss}%`" />
@@ -69,7 +68,9 @@
     </el-calendar>
     <div class="mt-12px flex items-center justify-between">
       <div class="flex gap-16px text-12px">
-        <span>{{ t('currentStreak') }}:{{ summary.max_consecutive_win_days }}d</span>
+        <span v-if="isCurrentMonth"
+          >{{ t('currentStreak') }}:{{ summary.current_win_streak }}d</span
+        >
         <span>{{ t('maxStreak') }}:{{ summary.max_consecutive_win_days }}d</span>
       </div>
       <div class="flex items-center gap-4px">
@@ -106,8 +107,15 @@ const dateMapToPnl = ref({})
 const summary = ref({})
 const { t } = useI18n()
 
+const isCurrentMonth = computed(() => {
+  return selectedDate.value === dayjs().format('YYYY-MM-DD')
+})
+
 const nextDisabled = computed(() => {
-  return dayjs(selectedDate.value).isAfter(dayjs()) || dayjs(selectedDate.value).isSame(dayjs())
+  return (
+    dayjs(selectedDate.value).startOf('M').isAfter(dayjs().startOf('M')) ||
+    dayjs(selectedDate.value).startOf('M').isSame(dayjs().startOf('M'))
+  )
 })
 
 const range = computed(() => {

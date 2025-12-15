@@ -227,6 +227,58 @@
         </template>
       </el-table-column>
       <el-table-column align="right" :label="$t('amount')">
+        <template #header>
+          <el-popover
+            v-model:visible="filterForm.amount.visible"
+            :width="300"
+            trigger="click"
+            popper-style="--el-text-color-primary:--third-text"
+          >
+            <template #reference>
+              <div class="flex items-center justify-end">
+                <span>{{ $t('amount') }}</span>
+                <Icon
+                  name="custom:filter"
+                  class="cursor-pointer text-10px ml-3px"
+                  :class="
+                    props.trendQuery.amount_min && props.trendQuery.amount_max
+                      ? 'color-[--primary-color]'
+                      : 'color-[--third-text] hover:color-[--secondary-text]'
+                  "
+                />
+              </div>
+            </template>
+            <template #default>
+              <div class="text-14px font-400 mb-8px">
+                {{ $t('amount') }}
+              </div>
+              <div class="flex items-center mt-10px">
+                <el-input
+                  v-model.trim.number="filterForm.amount.amount_min"
+                  :placeholder="$t('minor')"
+                  clearable
+                />
+                <span class="ml-10px mr-10px">~</span>
+                <el-input
+                  v-model.trim.number="filterForm.amount.amount_max"
+                  :placeholder="$t('max1')"
+                  clearable
+                />
+              </div>
+              <div class="mt-10px flex">
+                <el-button class="h-30px m-l-auto min-w-70px flex-1" @click="resetAmount"
+                  >{{ $t('reset') }}
+                </el-button>
+                <el-button
+                  class="h-30px m-l-auto min-w-70px flex-1"
+                  type="primary"
+                  @click="confirmAmount"
+                  >{{ $t('confirm') }}
+                </el-button>
+              </div>
+            </template>
+          </el-popover>
+        </template>
         <template #default="{ row }">
           <div
             v-if="row?.event_type === 'ADD_LIQUIDITY' || row?.event_type === 'REMOVE_LIQUIDITY'"
@@ -384,7 +436,8 @@ const filterForm = ref({
   },
   amount: {
     visible: false,
-    value: [],
+    amount_min: '',
+    amount_max: '',
   },
 })
 
@@ -592,6 +645,26 @@ function confirmToken() {
     token: filterForm.value.token.value,
   })
   filterForm.value.token.visible = false
+}
+function resetAmount() {
+  filterForm.value.amount.amount_min = ''
+  filterForm.value.amount.amount_max = ''
+  emit('refreshWhaleTrendList', {
+    ...props.trendQuery,
+    amount_min: '',
+    amount_max: '',
+  })
+  filterForm.value.amount.visible = false
+}
+
+function confirmAmount() {
+  const { amount_max, amount_min } = filterForm.value.amount
+  emit('refreshWhaleTrendList', {
+    ...props.trendQuery,
+    amount_max,
+    amount_min,
+  })
+  filterForm.value.amount.visible = false
 }
 </script>
 <style lang="scss" scoped></style>

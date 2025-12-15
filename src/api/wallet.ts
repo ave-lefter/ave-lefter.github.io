@@ -19,7 +19,7 @@ export function getWhaleTokenList(params) {
 // 动态列表
 export function getWhaleTrendList(params) {
   const { $api } = useNuxtApp()
-  return $api('/v2api/walletinfo/v1/events', {
+  return $api('https://api.test.phaetd8l.com/v2api/walletinfo/v1/events', {
     method: 'get',
     query: params,
   })
