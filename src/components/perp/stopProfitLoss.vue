@@ -519,8 +519,8 @@ function _createSlOrder() {
           <span>{{ size }} {{ typeDict[props.row?.contractId || ''].replace('USD', '') }}</span>
         </div>
         <div class="flex">
-          <el-button class="h-30px flex-1 m-l-auto" :color="themeStore.isDark ? '#333' : '#F2F2F2'">
-            {{ $t('reset') }}
+          <el-button class="h-30px flex-1 m-l-auto" :color="themeStore.isDark ? '#333' : '#F2F2F2'" @click="visible=false">
+            {{ $t('cancel') }}
           </el-button>
           <el-button type="primary" class="h-30px flex-1 m-l-auto" :disabled="disabled" :loading="loading" @click="_createOrder">
             {{ $t('confirm') }}

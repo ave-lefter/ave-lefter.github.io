@@ -53,7 +53,7 @@
         <span>{{ item.chain || '' }}</span>
       </el-option>
     </el-select>
-    <div class="flex items-center justify-between mb-16px text-14px bg-[--border] h-40px rd-6px px-12px">
+    <div  class="flex items-center justify-between mb-16px text-14px bg-[--border] h-40px rd-6px px-12px">
       <span class="color-[--third-text]">{{ $t('poolBalance') }}</span>
       <span>{{ poolBalance }} {{ withdrawForm?.token || '' }}</span>
     </div>
@@ -168,7 +168,7 @@ const poolBalance = computed(() => {
   if (withdrawForm.chain == '1') {
     return '∞'
   }
-  return poolBalanceObj.value?.[withdrawForm.token + '-' + withdrawForm.chain] || 0
+  return formatNumber(poolBalanceObj.value?.[withdrawForm.token + '-' + withdrawForm.chain] || 0, { limit: 6, decimals: 0})
 })
 
 async function getPoolBalance() {
