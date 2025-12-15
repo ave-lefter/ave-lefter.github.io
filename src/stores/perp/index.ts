@@ -7,6 +7,7 @@ import { usePerpWsPubStore } from './wsPub'
 import { usePerpWsPrivateStore } from './wsPrivate'
 import type { Collateral, Order, Position, TransferOut, Withdraw } from './type'
 import { type CoinInfo } from '@/api/types/perp'
+import { type OrderBook } from '@/api/perp'
 
 type PerpMetadata = Awaited<ReturnType<typeof _getPerpMetadata>>
 type UserInfo = Awaited<ReturnType<typeof onboardSite>>['dataList'][0]
@@ -30,6 +31,8 @@ export const usePerpStore = defineStore('perp', () => {
   const withdraw = ref<Withdraw[]>([])
   const transferOut = ref<TransferOut[]>([])
   const orderList = ref<Order[]>([])
+  const buyList = ref<OrderBook[]>([])
+  const sellList = ref<OrderBook[]>([])
 
   const isCancelOrder = shallowRef(false)
   const _perpKeys = useLocalStorage<{[key: string]: {apiKeys: ApiKeyData; l2KeyPair: L2KeyPair; apiSignature: string; starkSignature: string }}>('perp_keys', {})
@@ -320,6 +323,8 @@ export const usePerpStore = defineStore('perp', () => {
     unitList,
     base,
     quote,
-    normalWithdrawableAmount
+    normalWithdrawableAmount,
+    buyList,
+    sellList,
   }
 })

@@ -1456,12 +1456,28 @@ export class CoreCalculator {
     } else {
       divisor = new BigNumber(0)
     }
-
     let maxOpenSizeAbs = new BigNumber(0)
     if (divisor.lte(new BigNumber(0))) {
       maxOpenSizeAbs = new BigNumber(0)
     } else {
-      maxOpenSizeAbs = BigNumber.max(availableAmount.div(divisor).decimalPlaces(getQuantityPrecision(data.contractId), BigNumber.ROUND_FLOOR), new BigNumber(0))
+      const precision = getQuantityPrecision(data.contractId)
+      if (precision < 0) {
+          maxOpenSizeAbs = BigNumber.max(
+            availableAmount
+              .div(divisor)
+              .times(10 ** precision)
+              .dp(0, BigNumber.ROUND_FLOOR)
+              .div(10 ** precision),
+            new BigNumber(0)
+          )
+      } else {
+        maxOpenSizeAbs = BigNumber.max(
+          availableAmount
+            .div(divisor)
+            .decimalPlaces(getQuantityPrecision(data.contractId), BigNumber.ROUND_FLOOR),
+          new BigNumber(0)
+        )
+      }
     }
 
     // 1. 保证金最大可开
