@@ -67,7 +67,7 @@ const selectedDate = ref(dayjs().format('YYYY-MM-DD'))
 const dateMapToPnl = ref({})
 const summary = ref({})
 const isChartView = ref(false)
-const chartInstance = ref(null)
+let chartInstance = null
 const chartContainer = useTemplateRef('chartContainer')
 const dialogCalendarVis = ref(false)
 
@@ -112,8 +112,8 @@ const getPnl = (date) => {
 }
 
 const initOrUpdateChart = () => {
-  if (!chartInstance.value) {
-    chartInstance.value = echarts.init(chartContainer.value)
+  if (!chartInstance) {
+    chartInstance = echarts.init(chartContainer.value)
   }
   const option = {
     grid: {
@@ -225,7 +225,7 @@ const initOrUpdateChart = () => {
       },
     },
   }
-  chartInstance.value.setOption(option)
+  chartInstance.setOption(option)
 }
 
 const updateIsChartView = (val) => {
