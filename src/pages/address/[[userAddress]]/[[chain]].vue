@@ -156,6 +156,8 @@
         :address="userAddress"
         :chain="chain"
         :intervalText="intervalText"
+        :interval="interval"
+        :txAnalysis="txAnalysis"
       />
       <PnlCalendar
         class="w-448px bg-[--secondary-bg] p-16px"
@@ -168,6 +170,7 @@
         :chain="chain"
         :interval="interval"
         :intervalText="intervalText"
+        @update:txAnalysis="txAnalysis = $event"
       />
       <Likes class="flex-1 bg-[--secondary-bg] p-16px" :address="userAddress" :chain="chain" />
     </div>
@@ -215,6 +218,7 @@ const scrollRef = useTemplateRef('scrollRef')
 const route = useRoute()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
+const txAnalysis = ref({})
 
 const cachedChain = useStorage('cachedChain', 'solana', sessionStorage)
 const shareComponent = useTemplateRef('shareComponent')

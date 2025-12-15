@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="visible" width="722px">
+  <el-dialog v-model="visible" append-to-body width="722px">
     <template #header>
       <div class="text-14px lh-20px color-[--main-text]">
         {{ t('pnlCalendar') }}
@@ -21,34 +21,32 @@
         />
       </div>
     </template>
-
     <!-- 当月总盈亏 -->
     <div class="color-[--up-color] text-12px mb-12px">
       {{ addSign(summary.month_total_profit) }}${{
-        formatNumber(Math.abs(summary.month_total_profit), 2)
+        formatNumber(Math.abs(summary.month_total_profit), 1)
       }}
     </div>
+    {{ console.log('percent', percent) }}
     <div class="flex gap-2px mb-12px">
-      <div
-        class="h-4px rounded-2px bg-[--up-color]"
-        :style="`width:${((1 / 111) * 100).toFixed(1)}%`"
-      />
-      <div
-        class="h-4px rounded-2px bg-[--down-color]"
-        :style="`width:${((110 / 111) * 100).toFixed(1)}%`"
-      />
+      <div class="h-4px rounded-2px bg-[--up-color]" :style="`width:${percent.profit}%`" />
+      <div class="h-4px rounded-2px bg-[--down-color]" :style="`width:${percent.loss}%`" />
     </div>
     <div class="flex justify-between text-12px lh-16px mb-4px color-[--third-text] mb-24px">
       <div>
-        <span class="color-[--up-color] text-12px"> 5 </span>/
-        <span class="color-[--up-color] text-12px"> $4582.45 </span>
+        <span class="color-[--up-color] text-12px">{{ summary.win_days_count }} </span>/
+        <span class="color-[--up-color] text-12px">
+          ${{ formatNumber(summary.total_profit_on_win_days, 1) }}
+        </span>
       </div>
       <div>
-        <span class="color-[--down-color] text-12px"> 5 </span>/
-        <span class="color-[--down-color] text-12px"> $4582.45 </span>
+        <span class="color-[--down-color] text-12px"> {{ summary.loss_days_count }} </span>/
+        <span class="color-[--down-color] text-12px">
+          ${{ formatNumber(Math.abs(summary.total_profit_on_loss_days), 1) }}
+        </span>
       </div>
     </div>
-    <el-calendar :range="range">
+    <el-calendar class="[&&]:[--el-calendar-cell-width:64px]" :range="range">
       <template #header>
         <span />
       </template>
@@ -71,8 +69,8 @@
     </el-calendar>
     <div class="mt-12px flex items-center justify-between">
       <div class="flex gap-16px text-12px">
-        <span>{{ t('currentStreak') }}:1d</span>
-        <span>{{ t('maxStreak') }}:2d</span>
+        <span>{{ t('currentStreak') }}:{{ summary.max_consecutive_win_days }}d</span>
+        <span>{{ t('maxStreak') }}:{{ summary.max_consecutive_win_days }}d</span>
       </div>
       <div class="flex items-center gap-4px">
         <img height="26" src="~/assets/images/avedex_mobile_logo.png" />
@@ -84,6 +82,7 @@
   </el-dialog>
 </template>
 <script setup>
+import BigNumber from 'bignumber.js'
 import dayjs from 'dayjs'
 import { getProfitCalendar } from '~/api/wallet'
 
@@ -116,6 +115,23 @@ const range = computed(() => {
     dayjs(selectedDate.value).startOf('month').toDate(),
     dayjs(selectedDate.value).endOf('month').toDate(),
   ]
+})
+
+const percent = computed(() => {
+  const { total_profit_on_win_days, total_profit_on_loss_days } = summary.value
+  const total = new BigNumber(total_profit_on_win_days).plus(Math.abs(total_profit_on_loss_days))
+  const profit = formatNumber(
+    new BigNumber(total_profit_on_win_days).div(total).multipliedBy(100).toString(),
+    1
+  )
+  const loss = formatNumber(
+    new BigNumber(Math.abs(total_profit_on_loss_days)).div(total).multipliedBy(100).toString(),
+    1
+  )
+  return {
+    profit: +profit,
+    loss: +loss,
+  }
 })
 
 const getPnl = (date) => {
@@ -154,8 +170,4 @@ const handleNextMonth = () => {
   _getProfitCalendar()
 }
 </script>
-<style scoped>
-:global(.el-calendar-table .el-calendar-day) {
-  height: 64px !important;
-}
-</style>
+<style scoped lang="scss"></style>

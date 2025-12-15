@@ -1542,5 +1542,6 @@
   "pnlCalendar": "盈亏日历",
   "currentStreak": "当前连胜",
   "maxStreak": "最高连胜",
-  "preferedTips":"该指标展示了您常购买代币的市值分布及对应的购买频次，帮助您了解自身的交易偏好。"
+  "preferedTips":"该指标展示了您常购买代币的市值分布及对应的购买频次，帮助您了解自身的交易偏好。",
+  "tokenAddress":"代幣地址"
 }

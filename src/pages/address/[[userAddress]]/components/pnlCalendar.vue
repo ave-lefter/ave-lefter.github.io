@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-calendar v-show="!isChartView">
+    <el-calendar v-show="!isChartView" class="[&&]:[--el-calendar-cell-width:44px]">
       <template #header>
         <PnlCalendarHeader
           v-model:dialogCalendarVis="dialogCalendarVis"
@@ -259,7 +259,6 @@ _getProfitCalendar()
 }
 
 :global(.el-calendar-table .el-calendar-day) {
-  height: 44px;
   padding: 2px;
   --el-calendar-selected-bg-color: transparent;
 }

@@ -34,7 +34,7 @@
       :series="winProfit.series"
     />
     <div
-      class="flex justify-between items-center text-3.5 leading-4.25 text-center text-[--main-text]"
+      class="flex justify-between items-center text-3.5 leading-4.25 text-center text-[--main-text] mb-12px"
     >
       <span>{{ t('bestToken2') }}({{ intervalText }})</span>
       <ButtonGroup
@@ -44,6 +44,30 @@
         @change="changeFilter"
       />
     </div>
+    <div class="flex items-center justify-between">
+      <div
+        v-for="item in txAnalysis.best_token?.slice?.(0, 3)"
+        :key="item.token"
+        class="flex items-center gap-4px cursor-pointer"
+        @click="navigateTo(`/token/${item.token}-${item.chain}`)"
+      >
+        <TokenImg
+          chain-class="hidden"
+          token-class="w-24px h-24px"
+          :row="{
+            token: item.token,
+            chain: item.chain,
+            logo_url: item.logo_url,
+          }"
+        />
+        <div class="flex flex-col gap-4px text-12px color-[--main-text]">
+          {{ item.symbol }}
+          <span :class="getColorClass(item.total_profit)"
+            >+${{ formatNumber(item.total_profit, 2) }}</span
+          >
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script setup>
@@ -51,6 +75,7 @@ import { getTxAnalysis } from '~/api/wallet'
 import AveCharts from '@/components/charts/aveCharts.vue'
 
 const { t } = useI18n()
+const emit = defineEmits(['update:txAnalysis'])
 
 const props = defineProps({
   interval: {
@@ -198,6 +223,7 @@ const onGetTxAnalysis = () => {
     .then((res) => {
       txAnalysis.value = res || {}
       formatWinProfit()
+      emit('update:txAnalysis', res || {})
     })
     .catch((err) => {
       console.log(err)

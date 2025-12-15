@@ -27,51 +27,64 @@
     </div>
     <div class="flex justify-between items-center color-[--secondary-text] text-12px mb-8px">
       {{ $t('winRate2') }}
-      <span class="text-[--up-color] text-24px lh-30px font-bold">76.83%</span>
+      <span class="text-[--up-color] text-24px lh-30px font-bold">
+        {{ formatNumber(txAnalysis.total_win_rate || 0, 2) }}%
+      </span>
     </div>
     <div
       class="flex justify-between items-center color-[--secondary-text] lh-20px text-12px mb-8px"
     >
       {{ props.intervalText }} {{ $t('amountU') }}
-      <span class="text-[--up-color] text-14px">443.27 SOL</span>
+      <span class="text-[--up-color] text-14px">
+        {{ totalData.volume }} {{ props.txAnalysis.main_token_symbol }}</span
+      >
     </div>
     <div
       class="flex justify-between items-center color-[--secondary-text] lh-20px text-12px mb-8px"
     >
       {{ props.intervalText }} {{ $t('txns') }}
       <span class="text-14px color-[--third-text]">
-        <span class="text-[--up-color]">19</span> /
-        <span class="text-[--down-color]">62</span>
+        <span class="text-[--up-color]">{{ props.txAnalysis.purchase }}</span> /
+        <span class="text-[--down-color]">{{ props.txAnalysis.sold }}</span>
       </span>
     </div>
     <div
       class="flex justify-between items-center color-[--secondary-text] lh-20px text-12px mb-8px"
     >
       {{ props.intervalText }} {{ $t('totalBuy2') }}
-      <span class="text-[--up-color] text-14px">443.27 SOL</span>
+      <span class="text-[--up-color] text-14px">
+        {{ totalData.purchase }}
+        {{ props.txAnalysis.main_token_symbol }}</span
+      >
     </div>
     <div
       class="flex justify-between items-center color-[--secondary-text] lh-20px text-12px mb-8px"
     >
       {{ props.intervalText }} {{ $t('totalSell2') }}
-      <span class="text-[--down-color] text-14px">443.27 SOL</span>
+      <span class="text-[--down-color] text-14px">
+        {{ totalData.sold }}
+        {{ props.txAnalysis.main_token_symbol }}</span
+      >
     </div>
     <div
       class="flex justify-between items-center color-[--secondary-text] lh-20px text-12px mb-8px"
     >
       {{ props.intervalText }} {{ $t('profitTokenCount') }}
-      <span class="text-[--up-color] text-14px">16</span>
+      <span class="text-[--up-color] text-14px">{{ profitData.takeProfitCount }}</span>
     </div>
     <div
       class="flex justify-between items-center color-[--secondary-text] lh-20px text-12px mb-8px"
     >
       {{ props.intervalText }} {{ $t('totalTokenCount') }}
-      <span class="text-[--up-color] text-14px">34</span>
+      <span class="text-[--up-color] text-14px">{{ profitData.totalCount }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
+import { BigNumber } from 'bignumber.js'
+import { getBalanceAnalysis } from '~/api/wallet'
+
 const globalStore = useGlobalStore()
 const props = defineProps({
   address: {
@@ -85,6 +98,14 @@ const props = defineProps({
   intervalText: {
     type: String,
     default: '',
+  },
+  interval: {
+    type: String,
+    default: '',
+  },
+  txAnalysis: {
+    type: Object,
+    default: () => ({}),
   },
 })
 const balanceAnalysis = ref({
@@ -104,6 +125,30 @@ const main_token_price = computed(() => {
   return globalStore.isUSDT ? 1 : Number(balanceAnalysis.value.main_token_price || 0)
 })
 
+const totalData = computed(() => {
+  const purchaseUsd = new BigNumber(props.txAnalysis.purchase_usd || 0)
+  const soldUsd = new BigNumber(props.txAnalysis.sold_usd || 0)
+  const resultUsd = purchaseUsd.plus(soldUsd)
+  const main_token_price = new BigNumber(props.txAnalysis.main_token_price || 0)
+  return {
+    volume: formatNumber(resultUsd.div(main_token_price).toString(), 2),
+    purchase: formatNumber(purchaseUsd.div(main_token_price).toString(), 2),
+    sold: formatNumber(soldUsd.div(main_token_price).toString(), 2),
+  }
+})
+
+const profitData = computed(() => {
+  const { profit_range = {} } = props.txAnalysis
+  const takeProfitCount =
+    profit_range.profit_above_500_percent +
+    profit_range.profit_200_500_percent +
+    profit_range.profit_0_200_percent
+  return {
+    totalCount: profit_range?.total_count || 0,
+    takeProfitCount,
+  }
+})
+
 const total_balance = computed(() => {
   const formatMap = {
     solana: 2,
@@ -118,6 +163,18 @@ const total_balance = computed(() => {
     limit: 20,
   })
 })
+
+const getBalance = async () => {
+  const params = {
+    user_address: props.address,
+    user_chain: props.chain,
+    interval: props.interval,
+  }
+  const res = await getBalanceAnalysis(params)
+  balanceAnalysis.value = res
+}
+
+getBalance()
 </script>
 
 <style scoped lang="scss"></style>
