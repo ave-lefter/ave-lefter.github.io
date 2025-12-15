@@ -247,6 +247,7 @@ import BigNumber from "bignumber.js"
 const props = defineProps<{
   klineHeight?: number
 }>()
+
 const { t } = useI18n()
 const route = useRoute()
 const level = shallowRef(200)
@@ -258,7 +259,8 @@ const step = shallowRef('0')
 const showStepPop = shallowRef(false)
 const historyList = ref<Trade[]>([])
 const wsHistoryCache = ref<Trade[]>([])
-
+const iniBuyList = ref<OrderBook[]>([])
+const initSellList = ref<OrderBook[]>([])
 
 // 状态管理
 const tabsContainer = ref<HTMLElement | null>(null)
@@ -361,6 +363,8 @@ watch(
       activeTab.value = 'orderbook'
       buyList.value = []
       sellList.value = []
+      iniBuyList.value = []
+      initSellList.value = []
       wsBuyCache.value = []
       wsSellCache.value = []
       if (activeTab.value === 'orderbook') {
@@ -407,6 +411,8 @@ watch(
       if (val.dataType === 'Snapshot') {
         buyList.value = arr_buy
         sellList.value = arr_sell
+        iniBuyList.value = arr_buy
+        initSellList.value = arr_buy
       } else if (val.dataType === 'changed') {
         if (arr_buy?.length > 0) {
           wsBuyCache.value = [
@@ -465,12 +471,15 @@ const updateViews = useThrottleFn(() => {
     if (buyList.value.length > 200) {
       buyList.value = buyList.value?.slice(0, 200)
     }
-    wsBuyCache.value = []
+    if(buyList.value?.length <5){
+      buyList.value = iniBuyList.value
+    }
     triggerRef(buyList)
+    wsBuyCache.value = []
   }
 
   if (wsSellCache.value?.length > 0) {
-    // console.log('---wsSellCache.value---------',wsSellCache.value)
+    console.log('---wsSellCache.value---------',wsSellCache.value)
     const sell = [
       ...sellList.value,
       ...wsSellCache.value
@@ -480,6 +489,9 @@ const updateViews = useThrottleFn(() => {
     //  console.log('----sellList.value-------------',sellList.value)
     if (sellList.value.length > 200) {
       sellList.value = sellList.value?.slice(0,200)
+    }
+    if(sellList.value?.length <5){
+      sellList.value = initSellList.value
     }
     triggerRef(sellList)
     wsSellCache.value = []

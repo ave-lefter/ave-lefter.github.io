@@ -1,6 +1,6 @@
 <template>
   <!-- 表格 -->
-  <div class="text-12px">
+  <div class="text-12px overflow-hidden" :style="{height: `${height}px`}">
     <!-- 表格内容 -->
     <!-- <UseVirtualList
       :key="height"
@@ -58,6 +58,7 @@
 import { UseVirtualList } from '@vueuse/components'
 import { type OrderBook } from '@/api/perp'
 import { type CoinInfo } from '@/api/types/perp'
+import BigNumber from "bignumber.js"
 const themeStore = useThemeStore()
 const props = defineProps<{
   klineHeight?: number
@@ -68,7 +69,20 @@ const props = defineProps<{
 }>()
 const { t } = useI18n()
 const filterTableList = computed(() => {
-  return  props.list?.length >0? (props.type=='sell'? props.list?.reverse(): props.list) :  Array.from({ length: 200 }, () => ({ price: '0', size: '0', sum: '0' }));
+  const result = [
+    ...props.list,
+    ...Array.from({ length: Math.max(0, 200 - props.list?.length) }, () => ({
+      price: '0',
+      size: '0',
+      sum: '0',
+    }))
+  ]
+  if (props.type == 'sell') {
+    result.sort((a, b) => new BigNumber(a.price).comparedTo(new BigNumber(b.price)))
+  } else {
+    result.sort((a, b) => new BigNumber(b.price).comparedTo(new BigNumber(a.price)))
+  }
+  return (props.type == 'sell'? result?.reverse(): result)
 })
 // 整行渐变背景（优化版本）
 function getFullRowGradient(row: OrderBook) {
@@ -83,18 +97,17 @@ function getFullRowGradient(row: OrderBook) {
 }
 function getAmountBarWidthPercent(row: OrderBook, $index) {
   // const maxSum = Math.max(...filterTableList.value.map(i => Number(i.sum)))
-  const totalSum = filterTableList.value.reduce((acc, item) => {
+  const totalSum = props.list.reduce((acc, item) => {
     return acc + Number(item.sum);
   }, 0)
-  const currentSum = filterTableList.value.reduce((acc, item, index) => {
+  const currentSum = props.list.reduce((acc, item, index) => {
     if (index < $index) {
     return acc + Number(item.sum);
   }
   return acc;
   }, 0)
   const width = props.type=='sell'? Math.min(Number(totalSum - currentSum) / totalSum, 1):  Math.min(Number(currentSum) / totalSum, 1)
-
-  return width.toFixed(3)
+  return Number(row.price) >0 ? width.toFixed(3) : 0
 }
 // 新增：固定小数位格式化方法
 function formatFixedDecimals(value: number, decimals: number): string {

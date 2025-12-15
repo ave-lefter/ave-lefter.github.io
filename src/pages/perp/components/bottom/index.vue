@@ -96,6 +96,13 @@ watch(
     }
   }
 )
+watch(
+  () => contractId.value,
+  (val) => {
+    isAll.value = true
+  }
+)
+
 
 </script>
 
