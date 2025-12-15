@@ -51,7 +51,7 @@ const activeSort = shallowRef<SortValue>(0)
 
 const filteredList = computed(() => {
   const result = props.list?.slice(0) || []
-  let arr = result?.filter(i=> Number(i.lastPrice) > 0 && Number(i.value) > 0 && Number(i.openInterest) > 0 )
+  let arr = result?.filter(i=> Number(i.lastPrice) > 0 && Number(i.value) > 0 && Number(i.openInterest) > 0 && i.enableDisplay == true )
   if (!query.value) {
     arr = arr
   } else {

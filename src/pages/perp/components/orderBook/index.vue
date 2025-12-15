@@ -239,7 +239,7 @@ import History from './history.vue'
 import { usePerpWsPubStore } from '@/stores/perp/wsPub'
 import { usePerpStore } from '@/stores/perp'
 import { type Trade, type CoinInfo } from '@/api/types/perp'
-const { contractId, perp, resolution, metadata, unit ,unitList, base, quote} = storeToRefs(usePerpStore())
+const { contractId, perp, resolution, metadata, unit ,unitList, base, quote, buyList, sellList} = storeToRefs(usePerpStore())
 const perpWsPubStore = usePerpWsPubStore()
 import { DecimalExtensions } from "@/utils/decimalExtensions"
 import BigNumber from "bignumber.js"
@@ -247,17 +247,14 @@ import BigNumber from "bignumber.js"
 const props = defineProps<{
   klineHeight?: number
 }>()
-
 const { t } = useI18n()
 const route = useRoute()
-const buyList = ref<OrderBook[]>([])
-const sellList = ref<OrderBook[]>([])
 const level = shallowRef(200)
 
 const wsBuyCache = ref<OrderBook[]>([])
 const wsSellCache = ref<OrderBook[]>([])
 const showUnitPop = shallowRef(false)
-const step = shallowRef(0)
+const step = shallowRef('0')
 const showStepPop = shallowRef(false)
 const historyList = ref<Trade[]>([])
 const wsHistoryCache = ref<Trade[]>([])
@@ -350,7 +347,7 @@ watch(
   (val) => {
     if (val) {
       unit.value = val ?? null
-      step.value = Number(stepSizeList.value[0] ?? 0)
+      step.value = stepSizeList.value[0] ?? '0'
     } else {
       unit.value = null
     }
@@ -412,10 +409,17 @@ watch(
         sellList.value = arr_sell
       } else if (val.dataType === 'changed') {
         if (arr_buy?.length > 0) {
-          wsBuyCache.value = wsBuyCache.value?.concat(arr_buy)
+          wsBuyCache.value = [
+            ...(wsBuyCache.value || []),
+            ...arr_buy
+          ]
         }
         if (arr_sell?.length > 0) {
-          wsSellCache.value = wsSellCache.value?.concat(arr_sell)
+          wsSellCache.value = [
+            ...(wsSellCache.value || []),
+            ...arr_sell
+          ]
+          // console.log('-----wsSellCache.value1----------',wsSellCache.value)
         }
         updateViews()
       }
@@ -453,24 +457,32 @@ const updateHistoryViews = useThrottleFn(() => {
 const updateViews = useThrottleFn(() => {
   if (wsBuyCache.value.length === 0 && wsSellCache.value.length === 0) return
   if (wsBuyCache.value?.length > 0) {
-    const buy = buyList.value.concat(wsBuyCache.value)
+    const buy = [
+      ...buyList.value,
+      ...wsBuyCache.value
+    ]
     buyList.value = mergeDepthWithStep(buy, String(step.value), true)
     if (buyList.value.length > 200) {
       buyList.value = buyList.value?.slice(0, 200)
     }
-
-    wsBuyCache.value.length = 0
+    wsBuyCache.value = []
     triggerRef(buyList)
   }
 
   if (wsSellCache.value?.length > 0) {
-     const sell = sellList.value.concat(wsSellCache.value)
-     sellList.value = mergeDepthWithStep(sell, String(step.value), false)
+    // console.log('---wsSellCache.value---------',wsSellCache.value)
+    const sell = [
+      ...sellList.value,
+      ...wsSellCache.value
+    ]
+    //  console.log('----sell-------------',sell)
+    sellList.value = mergeDepthWithStep(sell, String(step.value), false)
+    //  console.log('----sellList.value-------------',sellList.value)
     if (sellList.value.length > 200) {
       sellList.value = sellList.value?.slice(0,200)
     }
-    wsSellCache.value.length = 0
     triggerRef(sellList)
+    wsSellCache.value = []
   }
 }, 200)
 
@@ -479,7 +491,7 @@ onMounted(() => {
   // onTxsLiqMessage()
   // 如果组件挂载时 orderBook 已经打开，则获取数据
   unit.value = base.value ?? null
-  step.value = Number(stepSizeList.value[0] ?? 0)
+  step.value = stepSizeList.value[0] ?? '0'
 
   window.addEventListener('resize', updateWidth)
   if (activeTab.value === 'orderbook') {
@@ -628,7 +640,7 @@ function switchUnit(item: CoinInfo | null) {
   showUnitPop.value = false
 }
 function switchStep(item: string) {
-  step.value = Number(item)
+  step.value = item
   showStepPop.value = false
 }
 </script>
