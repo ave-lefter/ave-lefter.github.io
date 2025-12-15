@@ -16,7 +16,8 @@
       </el-input>
     </el-form-item>
     <el-form-item label="" prop="amount">
-      <el-input v-model="form.amount" :placeholder="isValue ? $t('value1') :  $t('amount')" size="large"  clearable class="input-number" input-style="text-align:left" @input="percent = 0"  @update:model-value="value => watchAmount(value)">
+      <div v-if="percent > 0" class="absolute z-4 bg-[--main-input-button-bg] top-50% translate-y--50% left-0 pl-15px pointer-events-none">{{ percent }}%</div>
+      <el-input v-model="form.amount" :placeholder="isValue ? $t('value1') :  $t('amount')" size="large"  clearable class="input-number" input-style="text-align:left" @input="percent = 0" @focus="percent = 0"  @update:model-value="value => watchAmount(value)">
         <!-- <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ isValue ? $t('value1') :  $t('amount') }}</span>
         </template> -->
@@ -55,6 +56,16 @@
         class="mb-30px [&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] [&&]:[--el-slider-runway-bg-color:--icon-color] slider-box"
         @input="value => sliderInput(value as number)"
       />
+    </div>
+    <div v-if="percent > 0" class="flex items-center justify-between text-12px font-400 mt-8px color-[--main-text]">
+      <div class="text-left">
+        <div class="color-[--third-text] mb-5px"> {{ $t('buy') }}: </div>
+        <div class="font-500"> ≈ {{ form.reduceOnly ? '0' : formatNumber(percentBuy, 4) }} {{ perpStore.unit?.coinName || '' }}</div>
+      </div>
+      <div class="text-right">
+        <div class="color-[--third-text] mb-5px"> {{ $t('sell') }}: </div>
+        <div class="font-500"> ≈ {{ form.reduceOnly ? '0' : formatNumber(percentSell, 4) }} {{ perpStore.unit?.coinName || '' }}</div>
+      </div>
     </div>
     <el-form-item style="margin-bottom: 0">
       <el-checkbox v-model="isChecked" class="checkbox-sm" :label="$t('stopLimit')" />
@@ -223,21 +234,12 @@
   </el-form>
 
 
-  <div class="flex items-center justify-between text-12px font-400 mt-8px color-[--main-text]">
-    <div class="text-left">
-      <div class="color-[--third-text] mb-5px"> {{ $t('buy') }}: </div>
-      <div class="font-500"> ≈ {{ form.reduceOnly ? '0' :formatNumber(form.amount, 4) }} {{ perpStore.unit?.coinName || '' }}</div>
-    </div>
-    <div class="text-right">
-      <div class="color-[--third-text] mb-5px"> {{ $t('sell') }}: </div>
-      <div class="font-500"> ≈ {{ form.reduceOnly ? '0' : formatNumber(amountSell, 4) }} {{ perpStore.unit?.coinName || '' }}</div>
-    </div>
-  </div>
+
   <el-divider style="--el-border-color: var(--main-divider);margin: 16px 0;" />
   <ul class="text-12px color-[--third-text]">
     <li class="flex items-center">
       <span class="mr-auto">{{ $t('margin') }}</span>
-      <span class="color-[--up-color]">{{ !form.reduceOnly && BigNumber(form.amount).gt(0) ?  formatNumber(perpMargin.buy, 4)  : '-'}} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ !form.reduceOnly && BigNumber(form.amount).gt(0) ?  formatNumber(perpMargin.sell, 4)  : '-' }}  USD</span>
+      <span class="color-[--up-color]">{{ !form.reduceOnly && BigNumber(getSize()).gt(0) ?  formatNumber(perpMargin.buy, 4)  : '-'}} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ !form.reduceOnly && BigNumber(getSize(1)).gt(0) ?  formatNumber(perpMargin.sell, 4)  : '-' }}  USD</span>
     </li>
     <li class="flex items-center mt-8px">
       <span class="mr-auto">Max: </span>
@@ -245,7 +247,7 @@
     </li>
     <li v-if="!form.reduceOnly" class="flex items-center mt-8px">
       <span class="mr-auto">{{ $t('estimatedLiquidationPrice') }}</span>
-      <span class="color-[--up-color]">{{ BigNumber(form.amount).gt(0) ? formatNumber(liquidatePriceBuy, 4) : '-' }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ BigNumber(form.amount).gt(0) ? formatNumber(liquidatePriceSell, 4) : '-' }} USD</span>
+      <span class="color-[--up-color]">{{ BigNumber(getSize()).gt(0) ? formatNumber(liquidatePriceBuy, 4) : '-' }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ BigNumber(getSize(1)).gt(0) ? formatNumber(liquidatePriceSell, 4) : '-' }} USD</span>
     </li>
     <li class="flex items-center mt-8px">
       <span class="mr-auto">{{ $t('fee') }}</span>
@@ -294,7 +296,7 @@ const rules = computed(() => ({
   ],
   amount: [
     { validator: (rule: any, value: string, callback: (error?: Error) => void) => {
-      if ((!value || value && new BigNumber(value).lte(0))) {
+      if ((!value || value && new BigNumber(value).lte(0)) && Number(percent.value) === 0) {
         callback(new Error(isValue.value ? t('plsEnterOrderValue') : t('plsEnterOrderAmount')))
       } else {
         callback()
@@ -334,11 +336,16 @@ const lastPrice = computed(() => {
   return CoreCalculator.getSymbolModel(contractId.value || '')?.lastPrice || '0'
 })
 
-
+const isContractChange = ref(false)
 watch(() => perpStore.perp?.contractId || '', (contractId) => {
   if (contractId) {
+    isContractChange.value = true
     resetForm()
     form.price = CoreCalculator.getSymbolModel(contractId || '')?.lastPrice || '0'
+    setTimeout(() => {
+      form.price = perpStore.perp?.lastPrice || '0'
+      isContractChange.value = false
+    }, 300)
   }
 })
 
@@ -392,19 +399,18 @@ const slForm = reactive<{
 })
 const perpMargin = computed(() => {
   const contractId = perpStore.perp?.contractId || ''
-  const orderSize = getSize() || '0'
   // const orderPrice = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
   return {
     buy: calculateMargin({
       contractId: contractId,
-      size: Number(orderSize || '0'),
+      size: Number(getSize() || '0'),
       side: 'BUY',
       price: swapType.value === 'LIMIT' ? Number(form.price || 0) : 0,
       isMarketOrder: false
     }).toFixed(),
     sell: calculateMargin({
       contractId: contractId,
-      size: Number(orderSize || '0'),
+      size: Number(getSize(1) || '0'),
       side: 'SELL',
       price: swapType.value === 'LIMIT' ? Number(form.price || 0) : 0,
       isMarketOrder: false
@@ -485,7 +491,7 @@ const liquidatePriceBuy = computed(() => {
 
 const liquidatePriceSell = computed(() => {
   const price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
-  const orderSize = getSize() || '0'
+  const orderSize = getSize(1) || '0'
   // return CoreCalculator.getCreateOrderLiquidatePrice({
   //   contractId: perpStore.perp?.contractId || '',
   //   orderPrice: price,
@@ -501,9 +507,13 @@ const liquidatePriceSell = computed(() => {
 })
 
 function sliderInput(percent: number) {
-  const _amount = new BigNumber(maxAmountBuy.value || '0')
-  const a = BigNumber(percent).times(_amount || '0').div(100).toFixed()
-  form.amount = formatMinSize(a)
+  // const _amount = new BigNumber(maxAmountBuy.value || '0')
+  // const a = BigNumber(percent).times(_amount || '0').div(100).toFixed()
+  // form.amount = formatMinSize(a)
+  form.amount = ''
+  if (formRef.value) {
+    formRef.value.resetFields()
+  }
 }
 
 const isValue = computed(() => {
@@ -512,7 +522,9 @@ const isValue = computed(() => {
 
 
 function watchPrice(value: string) {
-  form.price = formatMinSize(value, true)
+  if (!isContractChange.value) {
+    form.price = formatMinSize(value, true)
+  }
 }
 function watchAmount(value: string) {
   let _value = formatMinSize(value)
@@ -561,14 +573,44 @@ function switchPerpCoin(item: typeof perpStore.unit) {
   }
 }
 
-function getSize() {
+function getSize(type = 0) {
   if (isValue.value) {
     const price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+    if (percent.value > 0) {
+      let max = type === 1 ? (maxAmountSell.value || '0') : (maxAmountBuy.value || '0')
+      max = BigNumber(max).div(price).toFixed()
+      return calculateSizeFromRatio({
+        maxQty: max,
+        ratio: percent.value,
+        stepSize: perpStore.perp?.stepSize || '0'
+      })
+    }
     return formatDec(BigNumber(form.amount).div(price).toFixed(), 4)
   } else {
+    if (percent.value > 0) {
+      return calculateSizeFromRatio({
+        maxQty: type === 1 ? (maxAmountSell.value || '0') : (maxAmountBuy.value || '0'),
+        ratio: percent.value,
+        stepSize: perpStore.perp?.stepSize || '0'
+      })
+    }
     return form.amount
   }
 }
+
+const percentBuy = computed(() => {
+  if (isValue.value) {
+    return BigNumber(getSize()).times(lastPrice.value || '0').toFixed()
+  }
+  return getSize()
+})
+
+const percentSell = computed(() => {
+  if (isValue.value) {
+    return BigNumber(getSize(1)).times(lastPrice.value || '0').toFixed()
+  }
+  return getSize(1)
+})
 
 const tpMsg = computed(() => {
   if (BigNumber(form.amount || 0).lte(0) || BigNumber(tpForm.triggerPrice || 0).lte(0)) {
@@ -580,10 +622,11 @@ const tpMsg = computed(() => {
     return ''
   }
 
-  const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(getSize() || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
   if (BigNumber(tpForm.triggerPrice || 0).gt(price)) {
+    const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(getSize() || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
     return t('longExpectedProfitUSD', {n : profit})
   } else {
+    const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(getSize(1) || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
     return t('shortExpectedProfitUSD', {n : profit})
   }
 })
@@ -598,10 +641,11 @@ const slMsg = computed(() => {
     return ''
   }
 
-  const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(getSize() || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
   if (BigNumber(slForm.triggerPrice || 0).lt(price)) {
+    const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(getSize() || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
     return t('longExpectedLossUSD', {n : profit})
   } else {
+    const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(getSize(1) || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
     return t('shortExpectedLossUSD', {n : profit})
   }
 })
@@ -655,7 +699,7 @@ function _createPerpOrder(side: string) {
     if (valid) {
       const data: PerpOrderParams = {
         type: swapType.value,
-        size: getSize(),
+        size: getSize(side === 'BUY' ? 0 : 1),
         price: form.price || '0',
         side: side,
         contractId: perpStore.perp?.contractId || '',
@@ -670,8 +714,8 @@ function _createPerpOrder(side: string) {
           ...tpForm,
           triggerPrice: new BigNumber(tpForm?.triggerPrice || '0').toFixed(),
           price: form.price || '0',
-          size: getSize(),
-          side: 'SELL'
+          size: getSize(side === 'BUY' ? 0 : 1),
+          side: side === 'BUY' ? 'SELL' : 'BUY'
         }
       }
       if (slForm.triggerPrice) {
@@ -680,8 +724,8 @@ function _createPerpOrder(side: string) {
           ...slForm,
           triggerPrice: new BigNumber(slForm?.triggerPrice || '0').toFixed(),
           price: form.price || '0',
-          size: getSize(),
-          side: 'SELL'
+          size: getSize(side === 'BUY' ? 0 : 1),
+          side: side === 'BUY' ? 'SELL' : 'BUY'
         }
       }
       createPerpOrder(data).then(res => {
