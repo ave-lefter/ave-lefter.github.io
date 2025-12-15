@@ -42,7 +42,7 @@
       <span
         class="text-20px font-700 block min-w-100px text-left"
         :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
-        >{{ formatNumber(perp?.lastPrice || 0,2) }}</span
+        >{{ formatNumber(perp?.lastPrice || 0, 10) }}</span
       >
       <!-- <span
         class="text-12px block text-left mt-2px"
@@ -57,13 +57,13 @@
       <div class="ml-16px whitespace-nowrap item">
         <span class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('indexPriceTooltip')">{{ $t('indexPrice') }}</span>
         <span class="text-12px block text-left color-[--main-text] leading-16px mt-6px">
-          {{ formatNumber(perp?.indexPrice || 0, 2) }}</span
+          {{ formatNumber(perp?.indexPrice || 0, getPricePrecision(perp?.contractId || '')) }}</span
         >
       </div>
 
       <div class="ml-16px whitespace-nowrap item">
         <span class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('oraclePriceTooltip')">{{ $t('oraclePrice') }}</span>
-        <span class="text-12px block text-left color-[--main-text] mt-6px">{{formatNumber(perp?.oraclePrice || 0,2)}}</span>
+        <span class="text-12px block text-left color-[--main-text] mt-6px">{{formatNumber(perp?.oraclePrice || 0, getPricePrecision(perp?.contractId || ''))}}</span>
       </div>
 
       <div class="ml-16px whitespace-nowrap item">
@@ -151,7 +151,8 @@ import { usePerpWsPubStore } from '@/stores/perp/wsPub'
 import { type PerpInfo } from '@/api/types/perp'
 import { usePerpStore } from '@/stores/perp'
 import { WSPerpEventType } from '@/utils/constants'
-const { metadata, loadingPerpMetadata, contractList, perp } = storeToRefs(usePerpStore())
+import type { TickerEntry } from '~/utils/perp/types'
+const { metadata, loadingPerpMetadata, contractList, perp, tickers } = storeToRefs(usePerpStore())
 const perpWsPubStore = usePerpWsPubStore()
 const visible = shallowRef(false)
 watch(
@@ -174,6 +175,7 @@ watch(
       } else {
         contractList.value = val.data
       }
+      tickers.value = val.data
     } else if (val.dataType === 'changed' && WSPerpEventType.TICKER_ALL_1S == val.channel) {
       contractList.value =
         contractList.value?.map((i) => {
@@ -187,6 +189,16 @@ watch(
           }
           return i
         }) || []
+      tickers.value = tickers.value?.map((i) => {
+        const item = (val.data as TickerEntry[])?.find((y) => y?.contractId === i?.contractId)
+        if (item) {
+          i = {
+            ...i,
+            ...item,
+          }
+        }
+        return i
+      })
     }
   }
 )

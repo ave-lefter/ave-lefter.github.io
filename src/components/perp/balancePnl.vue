@@ -117,7 +117,7 @@ const initOrUpdateChart = () => {
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: '#17191C',
+      backgroundColor: getCssVariable('--d-17191C-l-FFF'),
       borderWidth: 0,
       axisPointer: {
         type: 'line',

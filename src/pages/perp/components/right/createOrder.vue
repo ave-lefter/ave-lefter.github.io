@@ -90,11 +90,18 @@ const createOrderCost = computed(() => {
   const orderPrice = props.orderParams.price || '0'
   const orderSize = props.orderParams.size
   const orderSide = props.orderParams.side
-  return CoreCalculator.getCreateOrderCost({
+  // return CoreCalculator.getCreateOrderCost({
+  //   contractId: contractId,
+  //   orderPrice: orderPrice,
+  //   orderSize: orderSize || '0',
+  //   orderSide: orderSide
+  // }).toFixed()
+  return calculateMargin({
     contractId: contractId,
-    orderPrice: orderPrice,
-    orderSize: orderSize || '0',
-    orderSide: orderSide
+    side: orderSide,
+    price: Number(orderPrice),
+    size: Number(orderSize || 0),
+    feeRate: '0'
   }).toFixed()
 })
 

@@ -3,7 +3,8 @@ import { shallowRef } from 'vue'
 import WS, { type WSOptions } from '@/utils/ws'
 import { usePerpStore } from './index'
 import { WSPerpHost } from '@/utils/constants'
-import type { Collateral, Position, Order, Withdraw, TransferOut } from './type'
+import type { Collateral, Withdraw, TransferOut } from './type'
+import type { PositionEntry, OrderEntry, AccountInfo } from '@/utils/perp/types'
 import { profit } from '~/api/perp'
 
 function getWSMessage(e: MessageEvent): {
@@ -111,30 +112,35 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
           }
 
           // 更新转出信息
-          if (msg.content?.event === 'Snapshot' && transferOut as TransferOut[]) {
-            perpStore.transferOut = transferOut
+          if (transferOut as TransferOut[]) {
+            const t = transferOut as TransferOut[]
+            if (msg.content?.event === 'Snapshot') {
+              perpStore.transferOut = t
+            } else {
+              perpStore.transferOut = (transferOut as TransferOut[]).concat(perpStore.transferOut?.filter((i) => !t.some((el) => el.id === i.id)))
+            }
           }
 
           // 更新订单信息
-          if (msg.content?.event === 'Snapshot' && order as Order[]) {
+          if (msg.content?.event === 'Snapshot' && order as OrderEntry[]) {
             updateOrderInfo(order)
-          } else if(msg.content?.event === 'ORDER_UPDATE' && order as Order[]) {
-            const canceledOrder: Order[] = (order as Order[]).filter((i) => i.status === 'CANCELED')
+          } else if(msg.content?.event === 'ORDER_UPDATE' && order as OrderEntry[]) {
+            const canceledOrder: OrderEntry[] = (order as OrderEntry[]).filter((i) => i.status === 'CANCELED')
             // 取消订单
             if(canceledOrder.length > 0){
               perpStore.order = perpStore.order.filter((i) => !canceledOrder.some(j => j.id === i.id) && i.type !== 'MARKET')
             } else {
               // 加仓、平仓、止盈、止损
-              perpStore.order = perpStore.order?.filter((i) => !(order as Order[]).some((el) => el.id === i.id)).concat(...(order as Order[]))?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET')
+              perpStore.order = perpStore.order?.filter((i) => !(order as OrderEntry[]).some((el) => el.id === i.id)).concat(...(order as OrderEntry[]))?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET')
               getTotalAssets()
             }
           }
 
           // 更新持仓信息
-          if (position as Position[]) {
+          if (position as PositionEntry[]) {
             if (msg.content?.event === 'Snapshot') {
               updatePositionInfo(position)
-            } else if (UPDATE_EVENTS?.includes(msg.content?.event) && (position as Position[])?.length > 0) {
+            } else if (UPDATE_EVENTS?.includes(msg.content?.event) && (position as PositionEntry[])?.length > 0) {
               updatePositionInfo(position, true)
             }
           }
@@ -182,7 +188,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
     perpStore.collateral = collateral
   }
 
-  function updatePositionInfo(position: Position[], update = false) {
+  function updatePositionInfo(position: PositionEntry[], update = false) {
     if (update) {
       perpStore.position = position.concat(perpStore.position.filter((i) => !position.some((j) => j.contractId === i.contractId)))?.filter((i) => Number(i.openSize) !== 0)
     } else {
@@ -191,7 +197,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
     perpStore.order = perpStore.order?.filter?.((i) => position.some((j) => j.contractId === i.contractId) && i.type !== 'MARKET') || []
   }
 
-  function updateOrderInfo(order: Order[]) {
+  function updateOrderInfo(order: OrderEntry[]) {
     perpStore.order = order
   }
 

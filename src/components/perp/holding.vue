@@ -53,17 +53,10 @@ watch(
       const updateData = val.data?.find?.((item) => item.contractId === el.contractId)
       if (updateData) {
         el.oraclePrice = updateData.oraclePrice
-        const resultVal = new BigNumber(updateData.oraclePrice).multipliedBy(
-          new BigNumber(el.openSize).abs()
-        )
-        const profitWithFee =
-          el.openValue > 0
-            ? resultVal.minus(new BigNumber(el.openValue).abs())
-            : new BigNumber(el.openValue).abs().minus(resultVal)
-        el.unrealizedPnl = profitWithFee
-          // .plus(new BigNumber(el.openFee))
-          // .minus(new BigNumber(el.fundingFee))
-          .toString()
+        const profitWithFee = BigNumber(0)
+          .minus(el.openValue)
+          .plus(BigNumber(el.openSize).multipliedBy(el.oraclePrice))
+        el.unrealizedPnl = profitWithFee.toString()
         el.unrealizedPnlRate = new BigNumber(el.unrealizedPnl)
           .div(new BigNumber(el.openValue).abs())
           .multipliedBy(1000)

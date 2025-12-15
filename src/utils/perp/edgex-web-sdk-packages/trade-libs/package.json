@@ -1,0 +1,31 @@
+{
+  "name": "@edgex/trade-libs",
+  "version": "0.1.0",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "lint": "eslint \"**/*.ts*\""
+  },
+  "devDependencies": {
+    "@edgex/typescript-config": "workspace:*",
+    "@types/es6-promisify": "^6.0.4"
+  },
+  "dependencies": {
+    "@edgex/utils": "workspace:*",
+    "axios": "^1.6.2",
+    "big.js": "^7.0.1",
+    "bignumber.js": "^9.3.1",
+    "bn.js": "^5.2.2",
+    "buffer": "^6.0.3",
+    "crypto-js": "^4.2.0",
+    "elliptic": "^6.6.1",
+    "es6-promisify": "^7.0.0",
+    "ethereum-cryptography": "^2.2.1",
+    "ethers": "^5.7.2",
+    "hash.js": "^1.1.7",
+    "query-string": "^7.1.3",
+    "uuid": "^13.0.0"
+  }
+}
