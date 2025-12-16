@@ -102,6 +102,16 @@ export enum TradeType {
 }
 
 /**
+ * 订单基准类型
+ * Order Basis Type
+ */
+export enum OrderBasis {
+  Size = "size",
+  Value = "value",
+  Margin = "margin",
+}
+
+/**
  * 工具函数：判断是否为条件订单
  */
 export function isConditionalOrder(type: OrderType): boolean {

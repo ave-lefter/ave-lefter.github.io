@@ -1,4 +1,4 @@
-import { RiskTier } from "./metadata.type";
+import { IRiskTier } from "./metadata.type";
 
 enum OrderType {
   /** 市价单 */
@@ -40,7 +40,6 @@ export interface OpenTpSl {
 export interface ITradeHistoryRaw {
   // Contract Information
   contractId: string;
-  contractName: string;
   symbol: string;
 
   // Price Information
@@ -111,7 +110,7 @@ export interface ITradeHistoryRaw {
   sizeStep: string;
 
   // Risk Tiers
-  riskTierList: RiskTier[];
+  riskTierList: IRiskTier[];
 
   // Fee Rates
   defaultTakerFeeRate: string;

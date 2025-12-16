@@ -1,4 +1,5 @@
-import type { IContract, PositionEntry, PositionTermListEntry } from "../../types";
+import type { IContract, PositionEntry, PositionTermListEntry } from "../../types"
+import { SymbolEntity } from "../entities/Symbol";
 import { Position } from "../entities/Position";
 import { PositionTerm } from "../entities/PositionTerm";
 
@@ -15,14 +16,14 @@ export class PositionFactory {
    * 3. 忽略找不到 Contract 的仓位数据
    *
    * @param entries 原始仓位数据列表
-   * @param contracts 合约配置列表
+   * @param symbols 合约配置列表
    */
-  static createPositionsFromRaw(entries: PositionEntry[], contracts: IContract[]): Position[] {
-    if (!entries || !contracts || entries.length === 0 || contracts.length === 0) {
+  static createPositionsFromRaw(entries: PositionEntry[], symbols: SymbolEntity[]): Position[] {
+    if (!entries || !symbols || entries.length === 0 || symbols.length === 0) {
       return [];
     }
 
-    const contractMap = new Map(contracts.map((c) => [c.contractId, c]));
+    const contractMap = new Map(symbols.map((c) => [c.contractId, c]));
 
     return entries
       .filter((entry) => Number(entry.openSize) !== 0)
@@ -47,18 +48,18 @@ export class PositionFactory {
   static createPositionTermsFromRaw(
     entries: PositionTermListEntry[],
     positions: Position[],
-    contracts: IContract[],
+    symbols: SymbolEntity[],
   ): PositionTerm[] {
-    if (!entries || !contracts || entries.length === 0) {
+    if (!entries || !symbols || entries.length === 0) {
       return [];
     }
 
-    const contractMap = new Map(contracts.map((c) => [c.contractId, c]));
+    const symboltMap = new Map(symbols.map((c) => [c.contractId, c]));
     const positionMap = new Map((positions || []).map((p) => [p.contractId, p]));
 
     return entries
       .map((entry) => {
-        const contract = contractMap.get(entry.contractId);
+        const contract = symboltMap.get(entry.contractId);
         if (!contract) return null;
 
         const position = positionMap.get(entry.contractId);

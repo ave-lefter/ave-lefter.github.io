@@ -1,19 +1,20 @@
 import BigNumber from "bignumber.js";
 import type { IContract as ISymbol, PositionTransactionEntry } from "../../types";
 import { toPercentString, toPrecisionString, toThousandString } from "../../utils";
+import { SymbolEntity } from "./Symbol";
 
 /**
  * 资金费用领域实体
  */
 export class FundingFee {
-  symbol: ISymbol;
+  symbol: SymbolEntity;
 
   constructor(
-    public symbols: ISymbol[],
+    public symbols: SymbolEntity[],
     public raw: PositionTransactionEntry,
   ) {
     // 从 symbols 数组中查找对应的交易对信息
-    const symbolMap = new Map<string, ISymbol>();
+    const symbolMap = new Map<string, SymbolEntity>();
     symbols.forEach((item) => {
       symbolMap.set(item.contractId, item);
     });
@@ -86,34 +87,6 @@ export class FundingFee {
   }
 
   // ============================================================================
-  // 从 symbol 获取的显示属性
-  // ============================================================================
-
-  get contractName() {
-    return this.symbol?.contractName || this.raw.contractId || "";
-  }
-
-  get baseCoin() {
-    return this.symbol?.baseCoin || "";
-  }
-
-  get quoteCoin() {
-    return this.symbol?.quoteCoin || "";
-  }
-
-  get sizePrecision() {
-    return this.symbol?.sizePrecision || 0;
-  }
-
-  get pricePrecision() {
-    return this.symbol?.pricePrecision || 0;
-  }
-
-  get pnlPrecision() {
-    return this.symbol?.pnlPrecision || 2;
-  }
-
-  // ============================================================================
   // 业务逻辑属性
   // ============================================================================
 
@@ -143,7 +116,7 @@ export class FundingFee {
    * 格式化后的资金费用（带单位）
    */
   get formattedFundingFeeWithUnit() {
-    return `${toThousandString(this.deltaFundingFee, 6)} ${this.quoteCoin}`;
+    return `${toThousandString(this.deltaFundingFee, 6)} ${this.symbol.quoteCoin}`;
   }
 
   /**

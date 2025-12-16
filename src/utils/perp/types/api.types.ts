@@ -524,15 +524,6 @@ export interface IMultiChainToken {
   fixedRate: string;
 }
 
-export interface IRiskTier {
-  tier: number;
-  positionValueUpperBound: string;
-  maxLeverage: string;
-  maintenanceMarginRate: string;
-  starkExRisk: string;
-  starkExUpperBound: string;
-}
-
 export interface IIndexPriceConfig {
   contractId: string;
   indexPriceExchangeInfoList: IIndexPriceExchangeInfo[];

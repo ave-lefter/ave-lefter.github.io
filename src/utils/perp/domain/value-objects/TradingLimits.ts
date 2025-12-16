@@ -5,7 +5,7 @@
  */
 
 import BigNumber from "bignumber.js";
-import type { RiskTier } from "../../types";
+import type { IRiskTier } from "../../types"
 import { MAX_POSITION_VALUE_SENTINEL } from "../constants";
 import { Leverage } from "./Leverage";
 
@@ -14,7 +14,7 @@ import { Leverage } from "./Leverage";
  */
 export class TradingLimits {
   /** 预排序的风险档位列表（从小到大） */
-  private readonly _sortedRiskTiers: RiskTier[];
+  private readonly _sortedRiskTiers: IRiskTier[];
 
   constructor(
     /** 可用保证金 */
@@ -22,7 +22,7 @@ export class TradingLimits {
     /** 当前杠杆 */
     public readonly leverage: Leverage,
     /** 风险档位列表 */
-    public readonly riskTiers: RiskTier[],
+    public readonly riskTiers: IRiskTier[],
     /** 合约最大持仓限制 */
     public readonly maxPositionSize: BigNumber | null,
     /** 合约最小下单量 */
@@ -42,7 +42,7 @@ export class TradingLimits {
   /**
    * 根据当前杠杆获取对应的风险档位
    */
-  getCurrentRiskTier(): RiskTier | null {
+  getCurrentRiskTier(): IRiskTier | null {
     if (!this._sortedRiskTiers || this._sortedRiskTiers.length === 0) {
       return null;
     }

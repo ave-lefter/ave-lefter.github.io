@@ -15,8 +15,14 @@
  */
 
 import BigNumber from "bignumber.js";
-import type { IContract as ISymbol } from "../../types";
-import type { OrderEntry } from "../../types";
+import type { IContract as ISymbol, OpenTpSlOrder, OrderEntry } from "../../types";
+import { getNumberPrecision } from "../../utils";
+import {
+  CONST_conditionalOrderType,
+  DEFAULT_MAKER_FEE_RATE,
+  DEFAULT_MAX_LEVERAGE,
+  DEFAULT_TAKER_FEE_RATE,
+} from "../constants";
 import { OrderValueCalculationError } from "../errors/DomainError";
 import {
   isCancelable,
@@ -30,6 +36,7 @@ import {
   TimeInForce,
   TriggerPriceType,
 } from "../value-objects/OrderEnums";
+import { SymbolEntity } from "./Symbol";
 
 /**
  * Order 聚合根（充血模型）
@@ -37,13 +44,166 @@ import {
  * 封装订单的所有业务逻辑和状态转换
  */
 export class Order {
-  private constructor(
-    public symbol: ISymbol,
-    public raw: OrderEntry,
-  ) {}
+  public symbol: SymbolEntity;
 
-  static fromRaw(symbol: ISymbol, raw: OrderEntry) {
+  private constructor(
+    symbol: ISymbol | SymbolEntity,
+    public raw: OrderEntry,
+  ) {
+    if (symbol instanceof SymbolEntity) {
+      this.symbol = symbol;
+    } else {
+      this.symbol = SymbolEntity.fromRaw(symbol);
+    }
+  }
+
+  static fromRaw(symbol: ISymbol | SymbolEntity, raw: OrderEntry) {
     return new Order(symbol, raw);
+  }
+
+  /**
+   * 订单排序比较器
+   * 1. 按 contractId 升序
+   * 2. 按照 side 排序 (BUY 在前, SELL 在后)
+   * 3. 如果 price 为 0 (市价单)，排在最前。
+   * 4. 如果是限价单：
+   *    - BUY: 价格降序 (买一价最高在前)
+   *    - SELL: 价格升序 (卖一价最低在前)
+   * 5. 按照提交撮合时间降序 (type 为条件单 取 triggerTime，其他为 createdTime)
+   * 6. 按照 id 升序
+   * 本质上就一句话，按照成交可能性从大到小排列
+   */
+  static comparator(a: Order | OrderEntry, b: Order | OrderEntry): number {
+    const aRaw = a instanceof Order ? a.raw : a;
+    const bRaw = b instanceof Order ? b.raw : b;
+
+    // 1. Contract ID 升序
+    const contractDiff = Number(aRaw.contractId) - Number(bRaw.contractId);
+    if (contractDiff !== 0) return contractDiff;
+
+    // 2. Side 排序: BUY (0) < SELL (1)
+    // 原始逻辑: { SELL: 1, BUY: -1 } -> BUY(-1) - SELL(1) = -2 (BUY first)
+    // 这里保持 BUY 在前，SELL 在后
+    const getSideVal = (side: string) => (side === "BUY" ? 0 : 1);
+    const sideDiff = getSideVal(aRaw.side) - getSideVal(bRaw.side);
+    if (sideDiff !== 0) return sideDiff;
+
+    const aPrice = Number(aRaw.price);
+    const bPrice = Number(bRaw.price);
+
+    // 3. 市价单优先 (Price == 0)
+    const aIsMarket = aPrice === 0;
+    const bIsMarket = bPrice === 0;
+    if (aIsMarket && !bIsMarket) return -1;
+    if (!aIsMarket && bIsMarket) return 1;
+
+    // 4. 价格排序
+    // BUY: 降序 (大在前) -> b - a
+    // SELL: 升序 (小在前) -> a - b
+    if (aRaw.side === "BUY") {
+      if (bPrice !== aPrice) return bPrice - aPrice;
+    } else {
+      // SELL
+      if (aPrice !== bPrice) return aPrice - bPrice;
+    }
+
+    // 5. 时间排序 (降序: 新在前)
+    // 条件单取 triggerTime, 普通单取 createdTime
+    const getTime = (o: OrderEntry) => {
+      const isConditional = CONST_conditionalOrderType.includes(o.type as OrderType);
+      return Number(isConditional ? o.triggerTime : o.createdTime);
+    };
+    const timeDiff = getTime(bRaw) - getTime(aRaw);
+    if (timeDiff !== 0) return timeDiff;
+
+    // 6. ID 升序
+    return aRaw.id.localeCompare(bRaw.id);
+  }
+
+  /**
+   * 排序订单列表
+   */
+  static sort(orderList: (Order | OrderEntry)[]): (Order | OrderEntry)[] {
+    return orderList.sort(Order.comparator);
+  }
+
+  /**
+   * 计算订单成交数据（开仓/平仓数量划分）
+   * @param positionOpenSize 当前仓位数量
+   */
+  getFillData(positionOpenSize: BigNumber) {
+    let orderLeftSize = BigNumber(0);
+    if (["PENDING", "OPEN", "CANCELING"].includes(this.status)) {
+      orderLeftSize = BigNumber(this.size)
+        .minus(this.raw.cumFailSize || 0)
+        .minus(this.raw.cumFillSize || 0);
+    } else {
+      orderLeftSize = BigNumber(this.raw.cumMatchSize || 0)
+        .minus(this.raw.cumFailSize || 0)
+        .minus(this.raw.cumFillSize || 0);
+    }
+
+    if (orderLeftSize.lte(0)) {
+      return {
+        closeSize: BigNumber(0),
+        closeValue: BigNumber(0),
+        openSize: BigNumber(0),
+        openValue: BigNumber(0),
+      };
+    }
+
+    let orderLeftValue = BigNumber(0);
+    if (!this.price || this.price == "0") {
+      // 市价单
+      orderLeftValue = BigNumber(
+        orderLeftSize
+          .multipliedBy(BigNumber(this.raw.marketLimitValue || 0))
+          .dividedBy(
+            BigNumber(this.size).toFixed(
+              getNumberPrecision(this.symbol.stepSize),
+              this.side == "BUY" ? BigNumber.ROUND_CEIL : BigNumber.ROUND_FLOOR,
+            ),
+          ),
+      );
+    } else {
+      orderLeftValue = orderLeftSize.multipliedBy(BigNumber(this.price));
+    }
+
+    let orderCloseSize = BigNumber(0);
+    if (this.side == "BUY" && positionOpenSize.lt(0)) {
+      orderCloseSize = BigNumber.min(positionOpenSize.abs(), orderLeftSize);
+    } else if (this.side == "SELL" && positionOpenSize.gt(0)) {
+      orderCloseSize = BigNumber(0).minus(BigNumber.min(positionOpenSize, orderLeftSize));
+    }
+
+    let orderOpenSize = BigNumber(0);
+    if (this.side == "BUY") {
+      orderOpenSize = BigNumber(orderLeftSize).minus(BigNumber(orderCloseSize));
+    } else {
+      orderOpenSize = BigNumber(orderLeftSize).negated().minus(BigNumber(orderCloseSize));
+    }
+
+    const orderCloseValue = BigNumber(
+      orderCloseSize
+        .multipliedBy(orderLeftValue)
+        .dividedBy(
+          orderLeftSize.toFixed(
+            getNumberPrecision(this.symbol.stepSize),
+            this.side == "BUY" ? BigNumber.ROUND_CEIL : BigNumber.ROUND_FLOOR,
+          ),
+        ),
+    );
+
+    const orderOpenValue =
+      this.side == "BUY"
+        ? orderLeftValue.minus(orderCloseValue)
+        : orderLeftValue.negated().minus(orderCloseValue);
+    return {
+      closeSize: orderCloseSize,
+      closeValue: orderCloseValue,
+      openSize: orderOpenSize,
+      openValue: orderOpenValue,
+    };
   }
 
   /**
@@ -335,54 +495,19 @@ export class Order {
     return this.raw.triggerPriceValue;
   }
 
-  /** 合约名称 */
-  get contractName(): string {
-    return this.symbol.contractName;
+  /** 最大杠杆 */
+  get maxLeverage(): string {
+    return this.raw.maxLeverage || DEFAULT_MAX_LEVERAGE;
   }
 
-  /** 交易对符号 */
-  get symbolName(): string {
-    return this.symbol.symbol;
+  /** Taker 手续费率 */
+  get takerFeeRate(): string {
+    return this.raw.takerFeeRate || DEFAULT_TAKER_FEE_RATE;
   }
 
-  /** 价格精度 */
-  get pricePrecision(): number {
-    return this.symbol.pricePrecision;
-  }
-
-  /** 数量精度 */
-  get sizePrecision(): number {
-    return this.symbol.sizePrecision;
-  }
-
-  /** 价格步长 */
-  get priceStep() {
-    return this.symbol.priceStep;
-  }
-
-  /** 数量步长 */
-  get sizeStep() {
-    return this.symbol.sizeStep;
-  }
-
-  /** 基础货币 */
-  get baseCoin(): string {
-    return this.symbol.baseCoin;
-  }
-
-  /** 计价货币 */
-  get quoteCoin(): string {
-    return this.symbol.quoteCoin;
-  }
-
-  /** 最小订单数量 */
-  get minOrderSize() {
-    return this.symbol.minOrderSize;
-  }
-
-  /** 最大订单数量 */
-  get maxOrderSize() {
-    return this.symbol.maxOrderSize;
+  /** Maker 手续费率 */
+  get makerFeeRate(): string {
+    return this.raw.makerFeeRate || DEFAULT_MAKER_FEE_RATE;
   }
 
   // ============================================================================
@@ -419,12 +544,12 @@ export class Order {
   // ============================================================================
 
   /** 开仓止盈订单 */
-  get openTp(): any {
+  get openTp(): OpenTpSlOrder | undefined {
     return this.raw.openTp;
   }
 
   /** 开仓止损订单 */
-  get openSl(): any {
+  get openSl(): OpenTpSlOrder | undefined {
     return this.raw.openSl;
   }
 
@@ -452,20 +577,20 @@ export class Order {
    */
   formatPrice(): string {
     if (!this.price) return "-";
-    return new BigNumber(this.price).toFixed(this.symbol.pricePrecision, BigNumber.ROUND_DOWN);
+    return this.symbol.formatPrice(this.price, "floor");
   }
 
   /**
    * 格式化数量显示
    */
   formatSize(): string {
-    return new BigNumber(this.size).toFixed(this.symbol.sizePrecision, BigNumber.ROUND_DOWN);
+    return this.symbol.formatSize(this.size);
   }
 
   /**
    * 格式化成交数量显示
    */
   formatFilledSize(): string {
-    return new BigNumber(this.raw.cumFillSize || "0").toFixed(this.symbol.sizePrecision, BigNumber.ROUND_DOWN);
+    return this.symbol.formatSize(this.cumFillSize);
   }
 }

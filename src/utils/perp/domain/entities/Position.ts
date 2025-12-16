@@ -1,15 +1,26 @@
 import BigNumber from "bignumber.js";
 import type { IContract as ISymbol, PositionEntry } from "../../types";
-import { bigNumberMultiply, toPrecisionString, toThousandString } from "../../utils";
-import { findRiskTier } from "../calculator/helper";
+import {
+  toThousandString,
+} from "../../utils";
 import { OrderSide, OrderType } from "../value-objects/OrderEnums";
-import { Order } from "./Order";
+import type { Order } from "./Order";
+import { SymbolEntity } from "./Symbol";
+import { PositionCalculationService } from "../services/PositionCalculationService";
 
 export class Position {
+  public symbol: SymbolEntity;
+
   constructor(
-    public symbol: ISymbol,
+    symbol: ISymbol | SymbolEntity,
     public raw: PositionEntry,
-  ) {}
+  ) {
+    if (symbol instanceof SymbolEntity) {
+      this.symbol = symbol;
+    } else {
+      this.symbol = SymbolEntity.fromRaw(symbol);
+    }
+  }
 
   get userId() {
     return this.raw.userId;
@@ -36,7 +47,7 @@ export class Position {
   }
 
   get sizeFormatted() {
-    return toPrecisionString(this.size, this.symbol.sizePrecision);
+    return this.symbol.formatSizeFormatted(this.size);
   }
 
   get openValue() {
@@ -99,6 +110,12 @@ export class Position {
     return this.raw.updatedTime;
   }
 
+  // TODO:
+  // get currentLeverage() {
+  //   // return this.raw.currentLeverage;
+  //   return "10"
+  // }
+
   get id() {
     return this.raw.id;
   }
@@ -134,7 +151,7 @@ export class Position {
   }
 
   get entryPriceFormatted() {
-    return toThousandString(this.entryPrice, this.symbol.pricePrecision, false);
+    return this.symbol.formatPriceFormatted(this.entryPrice, "round");
   }
   // 已平仓部分的盈亏
   get closedPositionTermPnl() {
@@ -175,7 +192,7 @@ export class Position {
   get realizedPnlFormatted() {
     const value = this.realizedPnl;
     const prefix = BigNumber(value).gte(0) ? "+" : "";
-    return prefix + toThousandString(value, this.symbol.pnlPrecision, false);
+    return prefix + this.symbol.formatPnL(value);
   }
 
   /**
@@ -205,7 +222,8 @@ export class Position {
   }
 
   get breakEvenPriceFormatted() {
-    return toThousandString(this.breakEvenPrice, this.symbol.pricePrecision, false);
+    // 盈亏平衡价是价格，应该遵循价格格式化逻辑
+    return this.symbol.formatPriceFormatted(this.breakEvenPrice, "floor");
   }
 
   /**
@@ -229,6 +247,42 @@ export class Position {
     if (openValueAbs.isZero()) return new BigNumber(0);
 
     return pnl.div(openValueAbs).multipliedBy(leverage).multipliedBy(100);
+  }
+
+  /**
+   * 格式化后的未实现盈亏率 (ROE)
+   * e.g. "20.50%"
+   */
+  getUnrealizedPnlRoeFormatted(oraclePrice: string | number, leverage: string | number): string {
+    const roe = this.getUnrealizedPnlRoe(oraclePrice, leverage).toNumber();
+    return `${toThousandString(roe, 2, false)}%`;
+  }
+
+  /**
+   * 计算最差平仓价，即平仓成交价格不能劣于这个价格。
+   * 注意：此价格没有考虑 维持保证金率降档问题，所以当有平仓降档情况时并不精确。
+   *
+   * @param oraclePrice 预言机价格
+   * @param collateralInfo 抵押品账户信息
+   * @param feeRate 手续费率
+   */
+  getWorstClosePrice(
+    oraclePrice: string | number | BigNumber,
+    collateralInfo: {
+      totalEquity: string | BigNumber;
+      starkExRiskValue: string | BigNumber;
+      pendingWithdrawAmount: string | BigNumber;
+      pendingTransferOutAmount: string | BigNumber;
+    },
+    feeRate: string | number,
+  ): BigNumber {
+    return PositionCalculationService.calculateWorstClosePrice(
+      oraclePrice,
+      this.openSize,
+      this.symbol,
+      collateralInfo,
+      feeRate
+    );
   }
 
   /**
@@ -279,8 +333,8 @@ export class Position {
    */
   getActualLeverage(oraclePrice: string | number, accountMaxLeverage: string | number): BigNumber {
     const value = new BigNumber(this.size).multipliedBy(oraclePrice).abs();
-    const riskTierList = this.symbol.riskTierList;
-    const currentTier = findRiskTier(value.toNumber(), riskTierList);
+    // findRiskTier's logic is now in this.symbol.getRiskTier
+    const currentTier = this.symbol.getRiskTier(value.toString());
 
     // Defensive: if tier not found, fallback to accountMaxLeverage (meaning no tier limit applied, or error)
     // Ideally risk tiers cover all ranges.
@@ -303,11 +357,31 @@ export class Position {
    */
   getStarkExRiskValue(oraclePrice: string | number): BigNumber {
     const value = new BigNumber(this.size).multipliedBy(oraclePrice).abs();
-    const riskTierList = this.symbol.riskTierList;
-    const currentTier = findRiskTier(value.toNumber(), riskTierList);
+    // findRiskTier's logic is now in this.symbol.getRiskTier
+    const currentTier = this.symbol.getRiskTier(value.toString());
 
     const starkExRiskRate = BigNumber(currentTier?.starkExRisk || 0).div(BigNumber(2).pow(32));
 
     return value.multipliedBy(starkExRiskRate);
+  }
+
+  /**
+   * 计算清算价格 (考虑分档情况)
+   */
+  getLiquidationPrice(
+    oraclePrice: string | number,
+    collateralInfo: {
+      totalEquity: string | BigNumber;
+      starkExRiskValue: string | BigNumber;
+      pendingWithdrawAmount: string | BigNumber;
+      pendingTransferOutAmount: string | BigNumber;
+    },
+  ): string {
+    return PositionCalculationService.calculateLiquidationPrice(
+      oraclePrice,
+      this.openSize,
+      this.symbol,
+      collateralInfo
+    );
   }
 }

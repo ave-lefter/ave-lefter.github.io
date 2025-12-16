@@ -1,4 +1,4 @@
-import { L2Signature } from "./trade-history.types";
+import { ITradeHistoryRaw, L2Signature } from "./trade-history.types";
 
 // Basic type aliases
 export type BigNumberString = string;
@@ -381,7 +381,7 @@ export interface UserSnapshot {
   transferOut: any[];
   order: OrderEntry[];
   orderFillTransaction: OrderFillTransactionEntry[];
-  tradeHistory: OrderEntry[];
+  tradeHistory: ITradeHistoryRaw[];
   fastWithdraw: any[];
   keys: Record<string, Record<string, { apiKey: ApiKeyCredentials; l2Key: L2Keypair }>>;
   taskWin: number;

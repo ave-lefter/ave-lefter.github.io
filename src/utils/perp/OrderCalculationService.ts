@@ -1,19 +1,17 @@
 import BigNumber from "bignumber.js";
-import type { OrderBookEntry } from "./domain/entities/Orderbook";
-import type { AccountInfo, IContract, IMetadata, OrderEntry, RiskTier } from "./types";
+import type { OrderBookEntry } from "./domain/entities/Orderbook"
+import type { AccountInfo, IContract, IMetadata, OrderEntry, IRiskTier } from "./types"
 import { toPrecisionString, toTickSizeRoundString } from "./utils";
-import {
-  calculateCreateOrderCost,
-  calculateCreateOrderLiquidatePrice,
-  calculateMaxCreateMarketOrderSize,
-  calculateMaxCreateOrderSize,
-  getMaxLeverage,
-} from "./domain/calculator";
+import { Account } from "./domain/entities/Account";
 import { TYPE_orderSide } from "./domain/constants";
 import { Position } from "./domain/entities/Position";
 import { Ticker } from "./domain/entities/Ticker";
 import { OrderType } from "./domain/value-objects/OrderEnums";
-import { OrderMarginService } from "./OrderMarginService";
+import { OrderTypeHelper } from "./domain/utils/OrderTypeHelper";
+import { OrderMarginService } from "./domain/services/OrderMarginService";
+import { OrderExecutionService } from "./domain/services/OrderExecutionService";
+import { RiskTier } from "./domain/entities/RiskTier";
+import { SymbolEntity } from "./domain/entities/Symbol";
 
 export interface OrderCalculationContext {
   contractId: string;
@@ -24,7 +22,7 @@ export interface OrderCalculationContext {
   collaterals: any[];
   withdraws: any[];
   transfers: any[];
-  symbolsList: IContract[];
+  symbolsList: SymbolEntity[];
   tickers: Map<string, Ticker>;
   orderBook?: { ask1: string; bid1: string };
 }
@@ -132,7 +130,7 @@ export class OrderCalculationService {
     const { size, price, side, type } = params;
     const orderPrice = this.getExecutionPrice(type, side, price, ctx.orderBook);
 
-    return calculateCreateOrderCost({
+    return OrderExecutionService.calculateCreateOrderCost({
       tickers: ctx.tickers,
       contractId: ctx.contractId,
       metadata: ctx.metadata,
@@ -148,19 +146,22 @@ export class OrderCalculationService {
 
   static calculateMaxSize(ctx: OrderCalculationContext, params: CalculateMaxSizeParams): BigNumber {
     const { type, side, price, reduceOnly } = params;
-    const contract = ctx.symbolsList.find((s) => s.contractId === ctx.contractId);
-    if (!contract) return BigNumber(0);
+    const symbol = ctx.symbolsList.find((s) => s.contractId === ctx.contractId)!;
+    if (!symbol) return BigNumber(0);
 
     const currentPrice = this.getExecutionPrice(type, side, price, ctx.orderBook);
-    const leverage = getMaxLeverage({
-      contractId: ctx.contractId,
-      account: ctx.account,
-      metadata: ctx.metadata,
-    });
+
+    let leverage: number;
+    if (ctx.account) {
+      leverage = Account.fromRaw(ctx.account).getEffectiveMaxLeverage(ctx.contractId, ctx.metadata);
+    } else {
+      const curContractIdToMetadata = ctx.metadata?.contractList?.find((i) => i.contractId === ctx.contractId);
+      leverage = Number(curContractIdToMetadata?.defaultLeverage);
+    }
 
     let riskCalcPrice = currentPrice;
     if ([OrderType.MARKET, OrderType.STOP_MARKET].includes(type as OrderType)) {
-      const ticker = ctx.tickers.get(contract.contractName);
+      const ticker = ctx.tickers.get(symbol.contractName);
       if (ticker && Number(ticker.oraclePrice) > 0) {
         riskCalcPrice = String(ticker.oraclePrice);
       }
@@ -168,17 +169,17 @@ export class OrderCalculationService {
 
     const riskLimitMax = this.calculateRiskLimitMaxSize(
       leverage,
-      contract.riskTierList,
+      symbol.riskTierList,
       riskCalcPrice,
-      contract.sizePrecision,
+      symbol.sizePrecision,
     );
 
-    const positionLimitMax = this.getMaxPositionSizeLimit(contract.maxPositionSize);
+    const positionLimitMax = this.getMaxPositionSizeLimit(symbol.maxPositionSize);
 
     let marginBasedMax = BigNumber(0);
 
     if ([OrderType.LIMIT, OrderType.STOP_LIMIT].includes(type as OrderType)) {
-      marginBasedMax = calculateMaxCreateOrderSize({
+      marginBasedMax = OrderExecutionService.calculateMaxCreateOrderSize({
         tickers: ctx.tickers,
         contractId: ctx.contractId,
         metadata: ctx.metadata,
@@ -195,7 +196,7 @@ export class OrderCalculationService {
       });
     } else {
       const { ask1 = "0", bid1 = "0" } = ctx.orderBook || {};
-      marginBasedMax = calculateMaxCreateMarketOrderSize({
+      marginBasedMax = OrderExecutionService.calculateMaxCreateMarketOrderSize({
         contractId: ctx.contractId,
         metadata: ctx.metadata,
         positionList: ctx.positions,
@@ -228,7 +229,7 @@ export class OrderCalculationService {
     const { side, price, size } = params;
 
     return BigNumber(
-      calculateCreateOrderLiquidatePrice({
+      OrderExecutionService.calculateCreateOrderLiquidatePrice({
         tickers: ctx.tickers,
         contractId: ctx.contractId,
         metadata: ctx.metadata,
@@ -250,6 +251,67 @@ export class OrderCalculationService {
     const { maxQty, ratio, stepSize } = params;
     const rawSize = BigNumber(maxQty).multipliedBy(ratio).dividedBy(100);
     return toTickSizeRoundString(rawSize.toNumber(), stepSize, true);
+  }
+
+  /**
+   * Get price for order calculation
+   *
+   * Returns the appropriate price to use for order-related calculations
+   * (order limits, input conversions, etc.)
+   *
+   * Rules:
+   * - MARKET orders and conditional MARKET orders use lastPrice
+   * - LIMIT orders use provided price, fallback to lastPrice if not available
+   *
+   * @param params Price parameters
+   * @returns Price as number for calculation purposes
+   */
+  static getCalculationPrice(params: {
+    orderType: OrderType | string;
+    isConditionalMarket: boolean;
+    limitPrice: string | number;
+    lastPrice: string | number;
+  }): number {
+    const { orderType, isConditionalMarket, limitPrice, lastPrice } = params;
+
+    const preferLastPrice = orderType === OrderType.MARKET || isConditionalMarket;
+
+    if (preferLastPrice) {
+      return Number(lastPrice) || 0;
+    }
+
+    return Number(limitPrice) || Number(lastPrice) || 0;
+  }
+
+  /**
+   * Get price for display/UI purposes
+   *
+   * Similar to getCalculationPrice, but designed for UI display scenarios.
+   * Supports choosing between oraclePrice and lastPrice for market orders.
+   *
+   * Rules:
+   * - MARKET orders and conditional MARKET orders use oraclePrice (if provided), fallback to lastPrice
+   * - LIMIT orders use provided price, fallback to oraclePrice/lastPrice if not available
+   *
+   * @param params Price parameters
+   * @returns Price for display purposes (string | number)
+   */
+  static getDisplayPrice(params: {
+    orderType: OrderType | string;
+    isConditionalMarket: boolean;
+    limitPrice: string | number;
+    oraclePrice?: string | number;
+    lastPrice: string | number;
+  }): string | number {
+    const { orderType, isConditionalMarket, limitPrice, oraclePrice, lastPrice } = params;
+
+    const preferMarketPrice = OrderTypeHelper.isMarketOrder(orderType) || isConditionalMarket;
+
+    if (preferMarketPrice) {
+      return oraclePrice || lastPrice || "";
+    }
+
+    return limitPrice || oraclePrice || lastPrice || "";
   }
 
   static calculateTPSLPriceFromROE(params: CalculateTPSLPriceFromROEParams): string {

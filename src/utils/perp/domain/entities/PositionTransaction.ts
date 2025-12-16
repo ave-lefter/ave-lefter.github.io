@@ -2,14 +2,23 @@ import type { IContract as ISymbol } from "../../types";
 import { toPrecisionString } from "../../utils";
 import type {
   PositionTransactionEntry,
-} from "../../types";
+} from "../../types"
 import BigNumber from "bignumber.js";
+import { SymbolEntity } from "./Symbol";
 
 export class PositionTransaction {
+  public symbol: SymbolEntity;
+
   constructor(
-    public symbol: ISymbol,
+    symbol: ISymbol | SymbolEntity,
     public raw: PositionTransactionEntry,
-  ) {}
+  ) {
+    if (symbol instanceof SymbolEntity) {
+      this.symbol = symbol;
+    } else {
+      this.symbol = SymbolEntity.fromRaw(symbol);
+    }
+  }
 
   get id() {
     return this.raw.id;
@@ -214,14 +223,14 @@ export class PositionTransaction {
 
   // 入场价格：beforeOpenValue / beforeOpenSize , 按照 contract.tickSize 取整。注意取整规则，卖出平多：向上取整；买入平空：向下取整
   get entryPrice() {
-    return toPrecisionString(
-      BigNumber(this.deltaOpenValue).minus(this.fillOpenValue).dividedBy(this.fillCloseSize),
-      this.symbol.pricePrecision,
-    );
+    const price = BigNumber(this.deltaOpenValue)
+      .minus(this.fillOpenValue)
+      .dividedBy(this.fillCloseSize);
+    return this.symbol.formatPrice(price);
   }
   // 出场价格：fillCloseValue / fillCloseSize, 按照 contract.tickSize 取整。注意取整规则，卖出平多：向下取整；买入平空：向上取整
   get exitPrice() {
-    return toPrecisionString(BigNumber(this.fillPrice), this.symbol.pricePrecision);
+    return this.symbol.formatPrice(this.fillPrice);
   }
 
   // 平仓价值：abs(fillCloseValue)
@@ -271,5 +280,61 @@ export class PositionTransaction {
     return Number(this.fillCloseSize) <= 0
       ? orderCloseValue.minus(orderOpenValue).minus(orderTradingFee).plus(orderFundingFee)
       : orderOpenValue.minus(orderCloseValue).minus(orderTradingFee).plus(orderFundingFee);
+  }
+
+  // --- PnL Calculation Helpers (Based on delta values, consistent with useClosePNLColumns) ---
+
+  get pnlOpenValue(): BigNumber {
+    return BigNumber(this.deltaOpenValue).minus(this.fillOpenValue).abs();
+  }
+
+  get pnlCloseValue(): BigNumber {
+    return BigNumber(this.fillCloseValue).plus(this.liquidateFee).abs();
+  }
+
+  get pnlFee(): BigNumber {
+    return BigNumber(this.deltaOpenFee)
+      .minus(this.fillOpenFee)
+      .minus(this.fillCloseFee)
+      .minus(this.liquidateFee);
+  }
+
+  get pnlOpenFee(): BigNumber {
+    return BigNumber(this.deltaOpenFee).minus(this.fillOpenFee);
+  }
+
+  get pnlCloseFee(): BigNumber {
+    return BigNumber(0).minus(this.fillCloseFee).minus(this.liquidateFee);
+  }
+
+  get pnlFundingFee(): BigNumber {
+    return BigNumber(0).minus(this.deltaFundingFee);
+  }
+
+  get pnlTotal(): BigNumber {
+    const openValue = this.pnlOpenValue;
+    const closeValue = this.pnlCloseValue;
+    const fee = this.pnlFee;
+    const fundingFee = this.pnlFundingFee;
+
+    if (Number(this.fillCloseSize) < 0) {
+      // 多仓平仓 (Sell)
+      return closeValue.minus(openValue).minus(fee).plus(fundingFee);
+    } else {
+      // 空仓平仓 (Buy)
+      return openValue.minus(closeValue).minus(fee).plus(fundingFee);
+    }
+  }
+
+  get pnlTotalRate(): BigNumber {
+    const totalPnl = this.pnlTotal;
+    // PnL Rate = (Total PnL / Close Value) * 100
+    if (BigNumber(this.fillCloseValue).isZero()) return BigNumber(0);
+
+    return totalPnl
+      .dividedBy(this.fillCloseValue)
+      .multipliedBy(100)
+      .abs()
+      .multipliedBy(totalPnl.gte(0) ? 1 : -1);
   }
 }
