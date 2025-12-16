@@ -52,7 +52,8 @@ export interface SearchHot {
   tx_amount_24h: number
   tx_count_24h: number
   tx_volume_u_24h: number
-  risk_level: number
+  risk_level: number,
+  badges: { tag: string, icon_url: string }[],
 }
 
 export interface SearchInfo {
