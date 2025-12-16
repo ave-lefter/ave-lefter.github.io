@@ -479,7 +479,7 @@ const updateViews = useThrottleFn(() => {
   }
 
   if (wsSellCache.value?.length > 0) {
-    console.log('---wsSellCache.value---------',wsSellCache.value)
+    // console.log('---wsSellCache.value---------',wsSellCache.value)
     const sell = [
       ...sellList.value,
       ...wsSellCache.value
