@@ -268,3 +268,15 @@ export function getProfitCalendar(params:{
     query: params,
   })
 }
+
+// 偏好代币分析
+export function marketcap_analysis(query:{
+  user_address:string
+  user_chain:string
+}) {
+  const { $api } = useNuxtApp()
+  return $api('https://api.test.phaetd8l.com/v2api/walletinfo/v2/marketcap_analysis', {
+    method: 'get',
+    query,
+  })
+}

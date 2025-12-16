@@ -13,7 +13,11 @@
       </template>
       <template #date-cell="{ data: { date } }">
         <template v-if="dayjs(date).isSame(dayjs(selectedDate), 'month')">
-          <div class="text-center h-full" :class="getColor(getPnl(date)).bg">
+          <div
+            class="text-center h-full"
+            :class="[getColor(getPnl(date)).bg, getPnl(date) !== 0 ? 'cursor-pointer' : '']"
+            @click="clickDay(date, $event)"
+          >
             <span class="text-12px color-[--third-text] lh-14px">{{
               dayjs(date).format('DD')
             }}</span>
@@ -40,7 +44,20 @@
       :getColor="getColor"
       :userAddress="userAddress"
       :userChain="userChain"
+      :formatterTooltip="formatterTooltip"
     />
+    <el-popover
+      ref="popoverRef"
+      :virtual-ref="buttonRef"
+      trigger="click"
+      :visible="popVisible"
+      virtual-triggering
+      :width="'auto'"
+      append-to-body
+      popper-style="--el-popover-bg-color: var(--tooltip);--el-bg-color-overlay:var(--tooltip)"
+    >
+      <div v-html="formatterTooltip({ value: dateMapToPnl[tooltipDate] })" />
+    </el-popover>
   </div>
 </template>
 
@@ -69,6 +86,9 @@ const summary = ref({})
 const isChartView = ref(false)
 let chartInstance = null
 const chartContainer = useTemplateRef('chartContainer')
+const buttonRef = ref(null)
+const popVisible = ref(false)
+const tooltipDate = ref('')
 const dialogCalendarVis = ref(false)
 
 const getColor = (value) => {
@@ -76,21 +96,25 @@ const getColor = (value) => {
     return {
       bg: 'bg-#12B88608',
       color: 'color-[--third-text]',
+      cssColor: getCssVariable('--third-text'),
     }
   } else if (value < 0) {
     return {
       bg: 'bg-#F6465D1A',
       color: 'color-[--down-color]',
+      cssColor: getCssVariable('--down-color'),
     }
   } else if (value > 2000) {
     return {
       bg: 'bg-#FFA6221A',
       color: 'color-[--yellow]',
+      cssColor: getCssVariable('--yellow'),
     }
   } else {
     return {
       bg: 'bg-#12B8861A',
       color: 'color-[--up-color]',
+      cssColor: getCssVariable('--up-color'),
     }
   }
 }
@@ -109,6 +133,36 @@ const _getProfitCalendar = async () => {
 
 const getPnl = (date) => {
   return dateMapToPnl.value[dayjs(date).format('YYYY-MM-DD')]?.profit || 0
+}
+
+const formatterTooltip = ({ value = {} }) => {
+  const timeStr = dayjs(value.date).format('YYYY-MM-DD')
+  const { profit, total_buy_count, total_sell_count, buy_volume, sell_volume } = value
+  return `
+          <div>
+            <div class="text-12px color-[--main-text] mb-12px">${timeStr}</div>
+            <div class="text-12px color-[--third-text] flex items-center gap-16px">
+              <div class="flex flex-col items-center gap-4px">
+                <span class="text-12px color-[--third-text] lh-16px">${profit > 0 ? t('dailyProfit') : t('dailyLoss')}</span>
+                <span class="text-12px lh-16px ${getColorClass(profit)}">$${formatNumber(Math.abs(profit), 2)}</span>
+              </div>
+              <div class="flex flex-col items-center gap-4px">
+                <span class="text-12px color-[--third-text] lh-16px">${t('dailyTxns')}</span>
+                <span class="text-12px lh-16px">
+                  <span class="color-[--up-color]">${total_buy_count}</span>/
+                  <span class="color-[--down-color]">${total_sell_count}</span>
+                </span>
+              </div>
+              <div class="flex flex-col items-center gap-4px">
+                <span class="text-12px color-[--third-text] lh-16px">${t('dailyVolume')}</span>
+                <span class="text-12px lh-16px">
+                  <span class="color-[--up-color]">$${formatNumber(Math.abs(buy_volume), 2)}</span>/
+                  <span class="color-[--down-color]">$${formatNumber(Math.abs(sell_volume), 2)}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        `
 }
 
 const initOrUpdateChart = () => {
@@ -179,7 +233,7 @@ const initOrUpdateChart = () => {
       barMaxWidth: 10,
       itemStyle: {
         color: (value) => {
-          return getCssVariable(value.value.profit > 0 ? '--up-color' : '--down-color')
+          return getColor(value.value.profit).cssColor
         },
       },
     },
@@ -194,35 +248,7 @@ const initOrUpdateChart = () => {
       borderWidth: 0,
       padding: 12,
       appendTo: 'body',
-      formatter: ({ value = {} }) => {
-        const timeStr = dayjs(value.date).format('YYYY-MM-DD')
-        const { profit, total_buy_count, total_sell_count, buy_volume, sell_volume } = value
-        return `
-          <div>
-            <div class="text-12px color-[--main-text] mb-12px">${timeStr}</div>
-            <div class="text-12px color-[--third-text] flex items-center gap-16px">
-              <div class="flex flex-col items-center gap-4px">
-                <span class="text-12px color-[--third-text] lh-16px">${profit > 0 ? t('dailyProfit') : t('dailyLoss')}</span>
-                <span class="text-12px lh-16px ${getColorClass(profit)}">$${formatNumber(Math.abs(profit), 2)}</span>
-              </div>
-              <div class="flex flex-col items-center gap-4px">
-                <span class="text-12px color-[--third-text] lh-16px">${t('dailyTxns')}</span>
-                <span class="text-12px lh-16px">
-                  <span class="color-[--up-color]">${total_buy_count}</span>/
-                  <span class="color-[--down-color]">${total_sell_count}</span>
-                </span>
-              </div>
-              <div class="flex flex-col items-center gap-4px">
-                <span class="text-12px color-[--third-text] lh-16px">${t('dailyVolume')}</span>
-                <span class="text-12px lh-16px">
-                  <span class="color-[--up-color]">$${formatNumber(Math.abs(buy_volume), 2)}</span>/
-                  <span class="color-[--down-color]">$${formatNumber(Math.abs(sell_volume), 2)}</span>
-                </span>
-              </div>
-            </div>
-          </div>
-        `
-      },
+      formatter: formatterTooltip,
     },
   }
   chartInstance.setOption(option)
@@ -236,6 +262,16 @@ const updateIsChartView = (val) => {
   }
 }
 
+const clickDay = (date, $event) => {
+  const pnl = getPnl(date)
+  popVisible.value = false
+  if (pnl !== 0) {
+    buttonRef.value = $event.currentTarget
+    popVisible.value = true
+    tooltipDate.value = dayjs(date).format('YYYY-MM-DD')
+  }
+}
+
 watch(
   () => themeStore.isDark,
   () => {
@@ -243,6 +279,19 @@ watch(
   }
 )
 _getProfitCalendar()
+
+const onClickOutside = (event) => {
+  if (buttonRef.value && !buttonRef.value.contains(event.target)) {
+    popVisible.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', onClickOutside)
+})
+onUnmounted(() => {
+  document.removeEventListener('click', onClickOutside)
+})
 </script>
 
 <style scoped lang="scss">
@@ -273,5 +322,8 @@ _getProfitCalendar()
   font-size: 12px;
   line-height: 20px;
   color: var(--third-text);
+}
+:global(.el-calendar-table .el-calendar-day:hover) {
+  cursor: default;
 }
 </style>

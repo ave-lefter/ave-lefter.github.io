@@ -53,12 +53,13 @@
         <template v-if="dayjs(date).isSame(dayjs(selectedDate), 'month')">
           <div
             class="text-center h-full flex items-center flex-col justify-center"
-            :class="getColor(getPnl(date)).bg"
+            :class="[props.getColor(getPnl(date)).bg, getPnl(date) !== 0 ? 'cursor-pointer' : '']"
+            @click="clickDay(date, $event)"
           >
             <span class="text-12px color-[--third-text] lh-14px">{{
               dayjs(date).format('DD')
             }}</span>
-            <div class="text-12px lh-14px mt-2px" :class="getColor(getPnl(date)).color">
+            <div class="text-12px lh-14px mt-2px" :class="props.getColor(getPnl(date)).color">
               {{ addSign(getPnl(date)) }}${{ formatNumber(Math.abs(getPnl(date)), 1) }}
             </div>
           </div>
@@ -80,6 +81,18 @@
         </div>
       </div>
     </div>
+    <el-popover
+      ref="popoverRef"
+      :virtual-ref="buttonRef"
+      trigger="click"
+      :visible="popVisible"
+      virtual-triggering
+      :width="'auto'"
+      append-to-body
+      popper-style="--el-popover-bg-color: var(--tooltip);--el-bg-color-overlay:var(--tooltip)"
+    >
+      <div v-html="props.formatterTooltip({ value: dateMapToPnl[tooltipDate] })" />
+    </el-popover>
   </el-dialog>
 </template>
 <script setup>
@@ -101,10 +114,17 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  formatterTooltip: {
+    type: Function,
+    required: true,
+  },
 })
 const selectedDate = ref(dayjs().format('YYYY-MM-DD'))
 const dateMapToPnl = ref({})
 const summary = ref({})
+const buttonRef = ref(null)
+const popVisible = ref(false)
+const tooltipDate = ref('')
 const { t } = useI18n()
 
 const isCurrentMonth = computed(() => {
@@ -177,5 +197,28 @@ const handleNextMonth = () => {
   selectedDate.value = dayjs(selectedDate.value).add(1, 'month').format('YYYY-MM-DD')
   _getProfitCalendar()
 }
+
+const clickDay = (date, $event) => {
+  const pnl = getPnl(date)
+  popVisible.value = false
+  if (pnl !== 0) {
+    buttonRef.value = $event.currentTarget
+    popVisible.value = true
+    tooltipDate.value = dayjs(date).format('YYYY-MM-DD')
+  }
+}
+
+const onClickOutside = (event) => {
+  if (buttonRef.value && !buttonRef.value.contains(event.target)) {
+    popVisible.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', onClickOutside)
+})
+onUnmounted(() => {
+  document.removeEventListener('click', onClickOutside)
+})
 </script>
 <style scoped lang="scss"></style>
