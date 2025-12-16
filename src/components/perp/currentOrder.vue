@@ -5,6 +5,7 @@ import { usePerpStore } from '~/stores/perp'
 import { Warning } from '@element-plus/icons-vue'
 import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
 import type { Order } from '~/stores/perp/type'
+import type { OrderEntry } from '@/utils/perp/types'
 const route = useRoute()
 const { mode } = storeToRefs(useGlobalStore())
 const perpStore = usePerpStore()
@@ -13,8 +14,8 @@ const props = defineProps<{
   searchParams: any
 }>()
 const wsPrivateStore = usePerpWsPrivateStore()
-const { isCancelOrder } = storeToRefs(usePerpStore())
-const listData = shallowRef<Order[]>([])
+const { isCancelOrder, order } = storeToRefs(usePerpStore())
+const listData = shallowRef< OrderEntry[]>([])
 const listStatus = ref({
   loading: false,
   finished: false,
@@ -87,16 +88,33 @@ const cancelOrder = async (orderIds: string[]) => {
   getList()
   ElMessage.success(t('cancelledOrderSuccessfully'))
 }
+const orderList = computed(() => {
+  const result = order.value?.toSorted((a, b) => Number(b.createdTime) - Number(a.createdTime))
+  return  result?.map?.((el) => {
+      const isLong = el.side === 'SELL'
+      // 止盈
+      const isProfit = el.type.includes('PROFIT')
+      let triggerSign = ''
+      if (isLong) {
+        triggerSign = isProfit ? '≥' : '≤'
+      } else {
+        triggerSign = isProfit ? '≤' : '≥'
+      }
+      return {
+        ...el,
+        triggerSign,
+      }
+  }) || []
+})
 watch(
   () => props.searchParams,
   (val) => {
     if (route.name === 'perp-id') {
-      console.log('-------val----', val)
       if (val?.filterContractIdList) {
         listData.value =
-          perpStore.orderList?.filter((i) => i.contractId == val?.filterContractIdList) || []
+          orderList?.value.filter((i) => i.contractId == val?.filterContractIdList) || []
       } else {
-        listData.value = perpStore.orderList
+        listData.value = orderList?.value
       }
     } else {
       offsetData.value = ''
@@ -108,37 +126,37 @@ watch(
     }
   }
 )
-watch(
-  () => wsPrivateStore.wsResult,
-  (val) => {
-    if (route.name === 'perp-id') {
-      let result: Order[] = val['trade-event']?.content?.data?.order || []
-      result = perpStore.order
-        ?.filter((i) => !result.some((el) => el.id === i.id))
-        .concat(...result)
-        ?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET')?.sort((a, b) => Number(b.createdTime) - Number(a.createdTime))
-      result =
-        result?.map?.((el) => {
-          const isLong = el.side === 'SELL'
-          // 止盈
-          const isProfit = el.type.includes('PROFIT')
-          let triggerSign = ''
-          if (isLong) {
-            triggerSign = isProfit ? '≥' : '≤'
-          } else {
-            triggerSign = isProfit ? '≤' : '≥'
-          }
-          return {
-            ...el,
-            triggerSign,
-          }
-        }) || []
-      listData.value = result?.slice()
-      perpStore.orderList = result?.slice()
-    }
-  },
-  { immediate: true, deep: true }
-)
+// watch(
+//   () => wsPrivateStore.wsResult,
+//   (val) => {
+//     if (route.name === 'perp-id') {
+//       let result: Order[] = val['trade-event']?.content?.data?.order || []
+//       result = perpStore.order
+//         ?.filter((i) => !result.some((el) => el.id === i.id))
+//         .concat(...result)
+//         ?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET')?.sort((a, b) => Number(b.createdTime) - Number(a.createdTime))
+//       result =
+//         result?.map?.((el) => {
+//           const isLong = el.side === 'SELL'
+//           // 止盈
+//           const isProfit = el.type.includes('PROFIT')
+//           let triggerSign = ''
+//           if (isLong) {
+//             triggerSign = isProfit ? '≥' : '≤'
+//           } else {
+//             triggerSign = isProfit ? '≤' : '≥'
+//           }
+//           return {
+//             ...el,
+//             triggerSign,
+//           }
+//         }) || []
+//       listData.value = result?.slice()
+//       perpStore.orderList = result?.slice()
+//     }
+//   },
+//   { immediate: true, deep: true }
+// )
 watch(
   () => isCancelOrder.value,
   (val) => {

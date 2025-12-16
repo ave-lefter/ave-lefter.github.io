@@ -512,7 +512,8 @@ function sliderInput(percent: number) {
   // form.amount = formatMinSize(a)
   form.amount = ''
   if (formRef.value) {
-    formRef.value.resetFields()
+    // formRef.value.resetFields()
+    formRef.value.clearValidate('amount')
   }
 }
 
