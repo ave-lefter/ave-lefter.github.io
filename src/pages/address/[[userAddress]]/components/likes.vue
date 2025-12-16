@@ -5,24 +5,29 @@
       <Icon v-tooltip="$t('preferedTips')" name="custom:infomation-line" />
     </div>
     <div class="text-24px font-700 lh-30px color-[--main-text] mb-24px">{{ mostLikeText }}</div>
-    <div class="flex justify-between text-14px mb-12px">
-      {{ $t('mCap') }}
-      <span>{{ $t('buyFrequency') }}</span>
-    </div>
-    <div
-      v-for="item in list"
-      :key="item.label"
-      class="flex items-center justify-between h-20px mb-8px"
-    >
-      <div class="color-[--secondary-text] text-14px w-108px lh-20px">{{ item.label }}</div>
-      <el-progress
-        class="flex-1 [&&]:[--el-border-color-lighter:#12B8860D]"
-        :percentage="item.percent"
-        :show-text="false"
-        :color="getCssVariable('--up-color')"
-      />
-      <div class="w-57px text-right color-[--main-text]">{{ item.count }}</div>
-    </div>
+    <template v-if="mostLikeText">
+      <div class="flex justify-between text-14px mb-12px">
+        {{ $t('mCap') }}
+        <span>{{ $t('buyFrequency') }}</span>
+      </div>
+      <div
+        v-for="item in list"
+        :key="item.label"
+        class="flex items-center justify-between h-20px mb-8px"
+      >
+        <div class="color-[--secondary-text] text-14px w-108px lh-20px">{{ item.label }}</div>
+        <el-progress
+          class="flex-1 [&&]:[--el-border-color-lighter:#12B8860D]"
+          :percentage="item.percent"
+          :show-text="false"
+          :color="getCssVariable('--up-color')"
+        />
+        <div class="w-57px text-right color-[--main-text]">{{ item.count }}</div>
+      </div>
+    </template>
+    <AveEmpty v-else class="pt-50px">
+      <span class="text-12px color-[--third-text]">{{ $t('emptyNoData') }}</span>
+    </AveEmpty>
   </div>
 </template>
 <script setup>

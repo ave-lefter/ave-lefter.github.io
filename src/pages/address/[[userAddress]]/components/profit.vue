@@ -46,6 +46,12 @@
     </div>
     <div class="flex items-center justify-between">
       <div
+        v-if="txAnalysis.best_token?.length <= 0"
+        class="text-12px flex-1 text-center color-[--third-text]"
+      >
+        {{ $t('emptyNoData') }}
+      </div>
+      <div
         v-for="item in txAnalysis.best_token?.slice?.(0, 3)"
         :key="item.token"
         class="flex items-center gap-4px cursor-pointer"
