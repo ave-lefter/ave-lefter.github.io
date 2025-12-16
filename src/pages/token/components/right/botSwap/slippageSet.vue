@@ -92,7 +92,7 @@
               <button
                 v-for="item in BotSettingsArr"
                 :key="item.value"
-                :class="{ active: item.value === botSetting?.buy.selected }"
+                :class="{ active: item.value === botSetting?.buy?.selected }"
                 type="button"
                 @click.stop="botSetting.buy.selected = item.value"
               >
@@ -802,11 +802,11 @@ const botSetting = ref(cloneDeep(props.setting ?? {}))
 
 const { autoSellConfigs, loadAutoSellConfigs, saveAutoSellConfigs } = useAutoSellConfig()
 
-const selected = computed(() => botSetting.value.selected)
+const selected = computed(() => botSetting.value?.selected)
 
-const selectedB = computed(() => botSetting.value.buy.selected)
+const selectedB = computed(() => botSetting.value?.buy?.selected)
 
-const selectedS = computed(() => botSetting.value.sell.selected)
+const selectedS = computed(() => botSetting.value?.sell?.selected)
 
 const settingTab = ref(0)
 const clipboardQuickInput = ref(cloneDeep(botSettingStore.clipboardQuickInput))
@@ -857,7 +857,7 @@ function initSlippage(type: 'buy' | 'sell', setIsAuto = true) {
 }
 
 watch(
-  () => botSetting.value.buy.selected,
+  () => botSetting.value?.buy?.selected,
   () => {
     if (show.value) {
       initSlippage('buy')
@@ -866,7 +866,7 @@ watch(
 )
 
 watch(
-  () => botSetting.value.sell.selected,
+  () => botSetting.value?.sell?.selected,
   () => {
     if (show.value) {
       initSlippage('sell')
@@ -875,7 +875,7 @@ watch(
 )
 
 watch(isAutoB, (val) => {
-  const selected = botSetting.value.buy.selected
+  const selected = botSetting.value?.buy?.selected
   if (val) {
     botSetting.value.buy[selected].slippageValue = undefined
   } else {
@@ -884,7 +884,7 @@ watch(isAutoB, (val) => {
 })
 
 watch(isAutoS, (val) => {
-  const selected = botSetting.value.sell.selected
+  const selected = botSetting.value?.sell?.selected
   if (val) {
     botSetting.value.sell[selected].slippageValue = undefined
   } else {
@@ -895,19 +895,19 @@ watch(isAutoS, (val) => {
 const priorityText = computed(() => [`🐢 ${t('slow')}`, `🚗 ${t('normal')}`, `🚄 ${t('fast')}`])
 
 // const priorityList = computed(() => {
-//   const selected = botSetting.value.selected
+//   const selected = botSetting.value?.selected
 //   const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore?.gasTip, props.chain)
 //   return botSetting.value[selected]?.mev ? gasTip1List : gasTip2List
 // })
 
 const priorityListB = computed(() => {
-  const selected = botSetting.value.buy.selected
+  const selected = botSetting.value?.buy?.selected
   const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore?.gasTip, props.chain)
   return botSetting.value.buy[selected]?.mev ? gasTip1List : gasTip2List
 })
 
 const priorityListS = computed(() => {
-  const selected = botSetting.value.sell.selected
+  const selected = botSetting.value?.sell?.selected
   const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore?.gasTip, props.chain)
   return botSetting.value.sell[selected]?.mev ? gasTip1List : gasTip2List
 })
@@ -926,13 +926,13 @@ const isCanMev = computed(() => {
 
 function changeSlippageB() {
   if (!show.value) return
-  const selected = botSetting.value.buy.selected
+  const selected = botSetting.value?.buy?.selected
   botSetting.value.buy[selected].customSlippage = undefined
 }
 
 function changeSlippageS() {
   if (!show.value) return
-  const selected = botSetting.value.sell.selected
+  const selected = botSetting.value?.sell?.selected
   botSetting.value.sell[selected].customSlippage = undefined
 }
 
@@ -945,22 +945,22 @@ function changeSlippageS() {
 
 function handleCustomSlippageB(val: number | undefined) {
   if (val) {
-    const selected = botSetting.value.buy.selected
+    const selected = botSetting.value?.buy?.selected
     botSetting.value.buy[selected].slippageValue = botSetting.value.buy[selected].customSlippage
   }
 }
 
 function handleCustomSlippageS(val: number | undefined) {
   if (val) {
-    const selected = botSetting.value.sell.selected
+    const selected = botSetting.value?.sell?.selected
     botSetting.value.sell[selected].slippageValue = botSetting.value.sell[selected].customSlippage
   }
 }
 
 function confirmSubmit() {
   const setting = cloneDeep(botSetting.value as (typeof botSettingStore.botSettings)['eth'])
-  const selectedB = botSetting.value.buy.selected as BotSettingKey
-  const selectedS = botSetting.value.sell.selected as BotSettingKey
+  const selectedB = botSetting.value?.buy?.selected as BotSettingKey
+  const selectedS = botSetting.value?.sell?.selected as BotSettingKey
 
   const slippageValueB = botSetting.value.buy[selectedB].slippageValue
   if (setting?.buy?.[selectedB]) {
@@ -1010,20 +1010,20 @@ function confirmSubmit() {
 
 function changePriorityFee(type: 'buy' | 'sell') {
   // 如果切换等级，同时取消自定义费
-  const selected = botSetting.value[type].selected
+  const selected = botSetting.value?.[type]?.selected
   const gas = botSetting.value[type][selected]?.gas?.[botSetting.value[type][selected].mev ? 0 : 1]
   if (gas) gas.customFee = ''
 }
 
 function watchCusTomPriorityFee(val: string, type: 'buy' | 'sell') {
-  const selected = botSetting.value[type].selected
+  const selected = botSetting.value?.[type]?.selected
   const gas = botSetting.value[type][selected]?.gas?.[botSetting.value[type][selected].mev ? 0 : 1]
   if (gas) gas.customFee = val
 }
 
 function handleBlurFee(type: 'buy' | 'sell') {
-  const selected = botSetting.value[type].selected
-  const gas = botSetting.value[type][selected]?.gas?.[botSetting.value[type][selected].mev ? 0 : 1]
+  const selected = botSetting.value?.[type]?.selected
+  const gas = botSetting.value[type]?.[selected]?.gas?.[botSetting.value[type][selected].mev ? 0 : 1]
   if (gas && new BigNumber(gas.customFee).lt(0)) {
     gas.customFee = ''
   }
@@ -1031,15 +1031,15 @@ function handleBlurFee(type: 'buy' | 'sell') {
 
 function handleBuyValue(value: string, index: number) {
   const v = value.replace(/-|[^\d.]/g, '')
-  const selected = botSetting.value.buy.selected
+  const selected = botSetting.value?.buy?.selected
   botSetting.value.buy[selected].buyValueList[index] = v
 }
 
 function handleBlurBuyValue(index: number) {
   // 限制合法性，可添加逻辑
   const decimals = 4
-  const selected = botSetting.value.buy.selected
-  const v = botSetting.value.buy[selected].buyValueList[index]
+  const selected = botSetting.value?.buy?.selected
+  const v = botSetting.value?.buy?.[selected]?.buyValueList?.[index]
   const v1 = new BigNumber(v || 0)
     .toFixed()
     ?.match?.(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals || 18}})?`))?.[0]
