@@ -77,7 +77,7 @@ export function usePerp() {
       const maintenanceMarginRate = cur.maintenanceMarginRequirementObj?.maintenanceMarginRate || 1
       const value = new BigNumber(maintenanceMarginRate).times(openSize).times(price)
       return prev.plus(value)
-    }, new BigNumber(0)).toFixed()
+    }, new BigNumber(0)).abs().toFixed()
   })
 
 

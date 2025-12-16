@@ -36,6 +36,7 @@
           <button
             v-for="(tab, index) in tabsLayout"
             :key="tab.value"
+            v-tooltip="tab.label"
             :style="{
               backgroundColor:
                 activeLayoutTab === tab.value ? 'var(--d-383F4B-l-CAD6EC)' : 'transparent',
@@ -43,7 +44,6 @@
             :class="[
               'shrink-0 px-2px py-2px rounded-1px border-none cursor-pointer text-16px leading-none h-16px w-16px flex items-center',
             ]"
-            v-tooltip="tab.label"
             @click="activeLayoutTab = tab.value"
           >
             <Icon
@@ -74,7 +74,7 @@
             />
           </button>
         </div>
-        <div class="flex-1"></div>
+        <div class="flex-1"/>
         <el-popover
           v-if="unitList?.length >= 0"
           popper-class="[--el-popover-bg-color:--border]"
@@ -176,8 +176,8 @@
               :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
               :name="`custom:${Number(perp?.priceChange) > 0 ? 'arrow-up' : 'arrow-down'}`"
             />
-            <div class="flex-1"></div>
-            <div class="flex-end border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('oraclePriceTooltip')">
+            <div class="flex-1"/>
+            <div v-tooltip="$t('oraclePriceTooltip')" class="flex-end border-b-dashed border-b-1px border-[--third-text]">
               <Icon class="text-14px color-[--third-text]" name="custom:perp-flag" />
               <span class="text-12px color-[--third-text] ml-4px">
                 {{ formatNumber(perp?.oraclePrice || 0, 2) }}</span
@@ -231,18 +231,18 @@
 
 <script setup lang="ts">
 import { triggerRef } from 'vue'
-import { type OrderBook } from '@/api/perp'
+import type { OrderBook } from '@/api/perp'
 import { useRoute } from 'vue-router'
 import { useThrottleFn } from '@vueuse/core'
 import List from './list.vue'
 import History from './history.vue'
 import { usePerpWsPubStore } from '@/stores/perp/wsPub'
 import { usePerpStore } from '@/stores/perp'
-import { type Trade, type CoinInfo } from '@/api/types/perp'
+import type { Trade, CoinInfo } from '@/api/types/perp'
+import { DecimalExtensions } from '@/utils/decimalExtensions'
+import BigNumber from 'bignumber.js'
 const { contractId, perp, resolution, metadata, unit ,unitList, base, quote, buyList, sellList} = storeToRefs(usePerpStore())
 const perpWsPubStore = usePerpWsPubStore()
-import { DecimalExtensions } from "@/utils/decimalExtensions"
-import BigNumber from "bignumber.js"
 
 const props = defineProps<{
   klineHeight?: number
@@ -252,8 +252,8 @@ const { t } = useI18n()
 const route = useRoute()
 const level = shallowRef(200)
 
-const wsBuyCache = ref<OrderBook[]>([])
-const wsSellCache = ref<OrderBook[]>([])
+const wsBuyCache = shallowRef<OrderBook[]>([])
+const wsSellCache = shallowRef<OrderBook[]>([])
 const showUnitPop = shallowRef(false)
 const step = shallowRef('0')
 const showStepPop = shallowRef(false)
@@ -327,7 +327,7 @@ const maxSellSum = computed(() => {
 })
 const progress = computed(() => {
   const totalBuySum = buyList.value.reduce((acc, item) => {
-    return acc + Number(item.sum);
+    return acc + Number(item.sum)
   }, 0)
   const totalSellSum: number = sellList.value.reduce((acc, item) => {
     return acc + Number(item.sum)
@@ -569,22 +569,22 @@ function subscribeHistory() {
       size: string;  // 最新 size
       sum: BigNumber; // 累计值
     }
-  >();
+  >()
 
   for (const item of list) {
     const mergedPrice = DecimalExtensions.digitMergeNumber(
       item.price,
       step,
       isDown
-    );
+    )
 
-    const incomingSize = new BigNumber(item.size);
-    const incomingSum = new BigNumber(item.sum ?? item.size);
+    const incomingSize = new BigNumber(item.size)
+    const incomingSum = new BigNumber(item.sum ?? item.size)
 
     // size = 0 → 删除该价位
     if (incomingSize.isZero()) {
-      map.delete(mergedPrice);
-      continue;
+      map.delete(mergedPrice)
+      continue
     }
 
     if (!map.has(mergedPrice)) {
@@ -593,16 +593,16 @@ function subscribeHistory() {
         price: mergedPrice,
         size: incomingSize.toFixed(),
         sum: incomingSum
-      });
+      })
     } else {
       // 已存在 → size 用最新的覆盖，sum 增量累加
-      const old = map.get(mergedPrice)!;
+      const old = map.get(mergedPrice)!
 
       map.set(mergedPrice, {
         price: mergedPrice,
         size: incomingSize.toFixed(),     // ✔ 覆盖旧 size
         sum: old.sum.plus(incomingSum)    // ✔ 累加 sum
-      });
+      })
     }
   }
 
@@ -610,7 +610,7 @@ function subscribeHistory() {
     price: i.price,
     size: i.size,
     sum: i.sum.toFixed()
-  }));
+  }))
    if (isDown) {
    // isDown: true  买盘   价格从高到低排序
   return result.sort((a, b) => new BigNumber(b.price).comparedTo(new BigNumber(a.price)))

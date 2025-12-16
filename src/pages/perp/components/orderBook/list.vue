@@ -31,20 +31,20 @@
             <div class="text-left min-w-0">
               <div class="color-[--d-5A5E64-l-A9B0BC]">
                 <span :class="type == 'sell' ? 'color-[--down-color]' : 'color-[--up-color]'">
-                  {{ Number(row?.price) >0 ? formatNumber(row?.price || 0) : '--' }}
+                  {{ Number(row?.price) >0 ? formatNumber(row?.price || 0, {limit: 8}) : '--' }}
                 </span>
               </div>
             </div>
 
             <div class="text-right text-nowrap min-w-0">
               <div class="font-medium truncate">
-                <span> {{ Number(row?.price) >0 ? formatNumber(unit?.coinName=='USD'? row?.size * row?.price : row?.size || 0) : '--' }} </span>
+                <span> {{ Number(row?.price) >0 ? formatNumber(unit?.coinName=='USD'? row?.size * row?.price : row?.size || 0, {limit: 8}) : '--' }} </span>
               </div>
             </div>
 
             <div class="text-right text-nowrap min-w-0">
               <div class="font-medium truncate">
-                <span> {{ Number(row?.price) >0? formatNumber(unit?.coinName=='USD'? row?.sum * row?.price: row?.sum || 0) : '--' }} </span>
+                <span> {{ Number(row?.price) >0? formatNumber(unit?.coinName=='USD'? row?.sum * row?.price: row?.sum || 0, {limit: 8}) : '--' }} </span>
               </div>
             </div>
 
@@ -56,9 +56,9 @@
 
 <script setup lang="ts">
 import { UseVirtualList } from '@vueuse/components'
-import { type OrderBook } from '@/api/perp'
-import { type CoinInfo } from '@/api/types/perp'
-import BigNumber from "bignumber.js"
+import type { OrderBook } from '@/api/perp'
+import type { CoinInfo } from '@/api/types/perp'
+import BigNumber from 'bignumber.js'
 const themeStore = useThemeStore()
 const props = defineProps<{
   klineHeight?: number
@@ -98,13 +98,13 @@ function getFullRowGradient(row: OrderBook) {
 function getAmountBarWidthPercent(row: OrderBook, $index) {
   // const maxSum = Math.max(...filterTableList.value.map(i => Number(i.sum)))
   const totalSum = props.list.reduce((acc, item) => {
-    return acc + Number(item.sum);
+    return acc + Number(item.sum)
   }, 0)
   const currentSum = props.list.reduce((acc, item, index) => {
     if (index < $index) {
-    return acc + Number(item.sum);
+    return acc + Number(item.sum)
   }
-  return acc;
+  return acc
   }, 0)
   const width = props.type=='sell'? Math.min(Number(totalSum - currentSum) / totalSum, 1):  Math.min(Number(currentSum) / totalSum, 1)
   return Number(row.price) >0 ? width.toFixed(3) : 0

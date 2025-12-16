@@ -24,7 +24,7 @@
       </li>
       <li class="flex items-center justify-between mt-12px">
         <span class="color-[--third-text]">{{ $t('maintenanceMargin') }}</span>
-        <span class="font-500">{{ formatNumber(maintenanceMarginRequirement, 3) }} USDT</span>
+        <span class="font-500">{{ formatNumber(maintenanceMarginRequirement, 4) }} USDT</span>
       </li>
       <li class="flex items-center justify-between mt-12px">
         <span class="color-[--third-text]">{{ $t('unrealizedPnl') }}</span>

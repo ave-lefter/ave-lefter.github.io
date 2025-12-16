@@ -267,6 +267,7 @@ export const usePerpStore = defineStore('perp', () => {
       if (res) {
         accountList.value = res?.dataList || []
         userInfo.value = res?.dataList?.[0] || null
+        usePerpWsPrivateStore().getTotalAssets()
         usePerpWsPrivateStore().init()
       }
       return res
