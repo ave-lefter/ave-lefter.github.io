@@ -72,7 +72,7 @@
           class="text-12px block text-left mt-6px"
           :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
           >{{ formatNumber(perp?.priceChange || 0) }}&nbsp;&nbsp;{{
-            formatNumber(Number(perp?.priceChangePercent) * 100 || 0)
+            formatNumber(Number(perp?.priceChangePercent) * 100 || 0, 2)
           }}%</span
         >
       </div>

@@ -212,6 +212,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
     init,
     send,
     close,
-    wsResult
+    wsResult,
+    getTotalAssets
   }
 })
