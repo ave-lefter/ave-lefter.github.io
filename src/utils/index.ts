@@ -1313,13 +1313,12 @@ export function sendNotify(result: any) {
 }
 
 
-// export function getLeverageFromContractId(contractId: string) {
-//   const perpStore = usePerpStore()
-//   const userInfo = perpStore.userInfo
-//   const contractIdToTradeSetting = userInfo?.contractIdToTradeSetting
-//   const tradeSetting = contractIdToTradeSetting?.[contractId]
-//   if (tradeSetting && tradeSetting?.isSetMaxLeverage) {
-//     return tradeSetting?.maxLeverage || perpStore.perp?.defaultLeverage
-//   }
-//   return perpStore.perp?.defaultLeverage
-// }
+// 获取小数位，分割 字符小数点
+export function getPrecision(num: number | string): number {
+  const val = Number(num);
+  if (isNaN(val)) {
+    return 0;
+  }
+  const strList = String(num).split(".");
+  return strList.length === 2 ? strList[1].length : 0;
+}

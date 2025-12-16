@@ -92,3 +92,9 @@ export const CONST_conditionalOrderType: readonly string[] = [
   "STOP_LIMIT",
   "TAKE_PROFIT_LIMIT",
 ];
+
+export const DEFAULT_MARKET_SLIPPAGE_BUFFER = 0.02;
+
+export const DEFAULT_MAX_LEVERAGE = "20";
+export const DEFAULT_TAKER_FEE_RATE = "0.0005";
+export const DEFAULT_MAKER_FEE_RATE = "0.0002";

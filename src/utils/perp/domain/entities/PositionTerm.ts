@@ -7,13 +7,22 @@ import {
   toThousandString,
 } from "../../utils";
 import { Position } from "./Position";
+import { SymbolEntity } from "./Symbol";
 
 export class PositionTerm {
+  public symbol: SymbolEntity;
+
   constructor(
-    public symbol: ISymbol,
+    symbol: ISymbol | SymbolEntity,
     public position: Position | undefined,
     public raw: PositionTermListEntry,
-  ) {}
+  ) {
+    if (symbol instanceof SymbolEntity) {
+      this.symbol = symbol;
+    } else {
+      this.symbol = SymbolEntity.fromRaw(symbol);
+    }
+  }
 
   get id() {
     return this.raw.id;
@@ -193,5 +202,54 @@ export class PositionTerm {
 
   get leverage() {
     return this.raw.currentLeverage || this.symbol?.defaultLeverage || "1";
+  }
+
+  // === Business Logic for PnL ===
+
+  get isFullClosed(): boolean {
+    return new BigNumber(this.cumCloseSize).plus(this.cumOpenSize).eq(0);
+  }
+
+  /**
+   * PnL without fees (Order PnL)
+   * Formula: -cumOpenValue - cumCloseValue (if full closed)
+   */
+  get termPnLWithoutFees(): BigNumber {
+    const base = new BigNumber(0).minus(this.cumOpenValue).minus(this.cumCloseValue);
+    if (this.isFullClosed) {
+      return base;
+    } else {
+      return base.plus(this.openValue);
+    }
+  }
+
+  /**
+   * Actual PnL (including fees)
+   * termPnLWithoutFees + cumOpenFee + cumCloseFee + cumFundingFee
+   */
+  get termPnLWithFees(): BigNumber {
+    return this.termPnLWithoutFees
+      .plus(this.cumOpenFee)
+      .plus(this.cumCloseFee)
+      .plus(this.cumFundingFee);
+  }
+
+  /**
+   * Calculate PnL Rate based on a specific PnL value
+   * (PnL / Initial Margin of the closed portion) * 100 * Leverage
+   */
+  calculatePnLRate(pnl: BigNumber): BigNumber {
+    if (!this.currentLeverage) return new BigNumber(0);
+
+    const closedOpenValue = this.isFullClosed
+      ? new BigNumber(this.cumOpenValue).abs()
+      : new BigNumber(this.cumOpenValue).abs().minus(new BigNumber(this.openValue).abs());
+
+    if (closedOpenValue.isZero()) return new BigNumber(0);
+
+    return pnl
+      .dividedBy(closedOpenValue)
+      .multipliedBy(100)
+      .multipliedBy(this.currentLeverage);
   }
 }

@@ -1,5 +1,5 @@
-import type { IContract as ISymbol } from "../../types";
-import type { OrderEntry } from "../../types";
+import type { IContract as ISymbol } from "../../types"
+import type { OrderEntry } from "../../types"
 import { Order } from "../entities/Order";
 import { OrderSide, OrderType, PositionSide, TimeInForce, TriggerPriceType } from "../value-objects/OrderEnums";
 import { Position } from "../entities/Position";

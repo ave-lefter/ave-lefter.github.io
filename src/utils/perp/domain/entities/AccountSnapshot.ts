@@ -1,5 +1,5 @@
 import type { AccountInfo, CollateralEntry, OrderEntry, PositionEntry } from "../../types";
-import type { AccountSnapshotData } from "../..//types";
+import type { AccountSnapshotData } from "../../types"
 
 export class AccountSnapshot {
   constructor(private readonly payload: AccountSnapshotData) {}

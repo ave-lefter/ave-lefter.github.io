@@ -241,12 +241,7 @@ onUnmounted(() => {
         <template #default="{ row }">
           {{
             formatNumber(
-              CoreCalculator.getCreateOrderLiquidatePrice({
-                contractId: row.contractId,
-                orderPrice: new BigNumber(row.openValue).div(row.openSize).toString(),
-                orderSize: row.openSize,
-                orderSide: row.openSize > 0 ? 'BUY' : 'SELL',
-              }).toFixed() || row.liquidatePrice,
+              getPositionLiqPrice(row.contractId) || row.liquidatePrice,
               {
                 limit: 20,
                 decimals: getPricePrecision(row.contractId),

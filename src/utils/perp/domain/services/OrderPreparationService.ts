@@ -18,14 +18,15 @@
 
 import type { IContract } from "../../types";
 import { toPrecisionString } from "../../utils";
+import { SymbolEntity } from "../entities/Symbol";
 import {
-  OrderValidationContext,
-  OrderValidationResult,
+  type OrderValidationContext,
+  type OrderValidationResult,
   OrderValidator,
 } from "../validators/OrderValidator";
 import { OrderType } from "../value-objects";
 import { OrderTypeConverter } from "./OrderTypeConverter";
-import { TwapEvaluationContext, TwapEvaluationResult, TwapEvaluator } from "./TwapEvaluator";
+import { type TwapEvaluationContext, type TwapEvaluationResult, TwapEvaluator } from "./TwapEvaluator";
 
 // TODO:
 type CreateOrderCommandParams = any;
@@ -37,7 +38,7 @@ export interface OrderPreparationContext {
   /** 是否已连接钱包并签名 */
   isWalletConnected: boolean;
   /** 合约信息 */
-  symbolInfo: IContract;
+  symbolInfo: SymbolEntity;
   /** 当前价格（用于类型转换） */
   currentPrice: number;
   /** 触发价格（原始，未转换） */

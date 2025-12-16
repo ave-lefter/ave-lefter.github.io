@@ -1,13 +1,23 @@
 import type { IContract } from "../../types";
 import type { OrderFillTransactionEntry } from "../../types";
+import BigNumber from "bignumber.js";
+import { SymbolEntity } from "./Symbol";
 
 export class FilledOrder {
-  private constructor(
-    public symbol: IContract,
-    public raw: OrderFillTransactionEntry,
-  ) {}
+  public symbol: SymbolEntity;
 
-  static fromRaw(symbol: IContract, raw: OrderFillTransactionEntry) {
+  private constructor(
+    symbol: IContract | SymbolEntity,
+    public raw: OrderFillTransactionEntry,
+  ) {
+    if (symbol instanceof SymbolEntity) {
+      this.symbol = symbol;
+    } else {
+      this.symbol = SymbolEntity.fromRaw(symbol);
+    }
+  }
+
+  static fromRaw(symbol: IContract | SymbolEntity, raw: OrderFillTransactionEntry) {
     return new FilledOrder(symbol, raw);
   }
 
@@ -173,5 +183,23 @@ export class FilledOrder {
 
   get from() {
     return this.raw.from;
+  }
+
+  // === Business Logic ===
+
+  get totalFee(): BigNumber {
+    return new BigNumber(this.fillFee || 0).plus(this.liquidateFee || 0);
+  }
+
+  formatFillFee(): string {
+    return this.symbol.formatQuoteValue(this.fillFee || 0);
+  }
+
+  formatLiquidateFee(): string {
+    return this.symbol.formatQuoteValue(this.liquidateFee || 0);
+  }
+
+  formatTotalFee(): string {
+    return this.symbol.formatQuoteValue(this.totalFee);
   }
 }

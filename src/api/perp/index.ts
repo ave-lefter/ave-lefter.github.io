@@ -6,9 +6,10 @@ import { getAddress } from 'ethers'
 import { usePerpStore } from '~/stores/perp'
 import type { Order } from '~/stores/perp/type'
 import type { AccountInfo } from '~/utils/perp/types'
+import type { IContract } from '~/utils/perp/types'
 
 // 获取metadata
-export async function getPerpMetadata(): Promise<Metadata> {
+export async function getPerpMetadata(): Promise<Metadata & { contractList: IContract[] }> {
   const cached: { data: any; timestamp: number } = (await localforage.getItem('perpMetadata')) || {
     data: null,
     timestamp: 0,
@@ -17,11 +18,38 @@ export async function getPerpMetadata(): Promise<Metadata> {
     return cached.data
   }
   return api('/api/v1/public/meta/getMetaData').then((res) => {
+    const res1 = res as Metadata
+    const coinList = (res as Metadata)?.coinList || []
+    const res2 =  {
+      ...res1,
+      contractList: res1?.contractList?.map((contract) => {
+        const baseCoinInfo = coinList.find((item: any) => item.coinId === contract.baseCoinId) || {}
+        const quoteCoinInfo = coinList.find((item: any) => item.coinId === contract.quoteCoinId) || {}
+        return {
+          ...contract,
+          symbol: contract.contractName,
+          pricePrecision: getPrecision(contract.tickSize),
+          priceStep: contract.tickSize,
+          sizePrecision: getPrecision(contract.stepSize),
+          sizeStep: contract.stepSize,
+          baseCoin: (baseCoinInfo as any).coinName,
+          // 显示精度
+          baseCoinPrecision: getPrecision((baseCoinInfo as any).showStepSize || 1),
+          // 计算精度
+          baseCoinRealPrecision: getPrecision((baseCoinInfo as any).stepSize || 1),
+          baseCoinIcon: (baseCoinInfo as any).iconUrl,
+          quoteCoinPrecision: getPrecision((quoteCoinInfo as any).showStepSize || 1),
+          pnlPrecision: 2,
+          quoteCoinRealPrecision: getPrecision((quoteCoinInfo as any).stepSize || 1),
+          quoteCoin: (quoteCoinInfo as any).coinName,
+          quoteCoinIcon: (quoteCoinInfo as any).iconUrl,
+        }})
+    }
     localforage.setItem('perpMetadata', {
-      data: res,
+      data: res2,
       timestamp: Date.now(),
     })
-    return res as any
+    return res2 as any
   })
 }
 

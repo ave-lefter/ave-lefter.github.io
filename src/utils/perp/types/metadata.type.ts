@@ -68,14 +68,13 @@ export interface ICoin {
 /**
  * Risk tier configuration for contracts
  */
-export interface RiskTier {
+export interface IRiskTier {
   tier: number;
   positionValueUpperBound: DecimalString;
   maxLeverage: DecimalString;
-  maintenanceMarginRate: DecimalString | number;
+  maintenanceMarginRate: DecimalString;
   starkExRisk: DecimalString;
   starkExUpperBound: DecimalString;
-  [key: string]: any;
 }
 
 /**
@@ -94,7 +93,7 @@ export interface IContract {
   minOrderSellPriceRatio: DecimalString;
   maxPositionSize: DecimalString;
   maxMarketPositionSize: DecimalString;
-  riskTierList: RiskTier[];
+  riskTierList: IRiskTier[];
   defaultTakerFeeRate: DecimalString;
   defaultMakerFeeRate: DecimalString;
   defaultLeverage: DecimalString;

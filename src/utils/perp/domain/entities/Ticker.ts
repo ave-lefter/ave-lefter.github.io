@@ -1,14 +1,27 @@
-import type { TickerEntry } from "../../types";
+import type { IContract as ISymbol, TickerEntry } from "../../types";
+import { toPrecisionString } from "../../utils";
+import { SymbolEntity } from "./Symbol";
 
 export class Ticker {
-  constructor(private readonly raw: TickerEntry) {}
+  public symbol: SymbolEntity;
 
-  static fromRaw(raw: TickerEntry): Ticker {
-    return new Ticker(raw);
+  constructor(
+    symbol: ISymbol | SymbolEntity,
+    private readonly raw: TickerEntry,
+  ) {
+    if (symbol instanceof SymbolEntity) {
+      this.symbol = symbol;
+    } else {
+      this.symbol = SymbolEntity.fromRaw(symbol);
+    }
   }
 
-  static fromEmpty(): Ticker {
-    return new Ticker({
+  static fromRaw(symbol: ISymbol | SymbolEntity, raw: TickerEntry): Ticker {
+    return new Ticker(symbol, raw);
+  }
+
+  static fromEmpty(symbol?: ISymbol | SymbolEntity): Ticker {
+    const emptyRaw = {
       contractId: "",
       contractName: "",
       priceChange: "",
@@ -33,8 +46,63 @@ export class Ticker {
       nextFundingTime: "",
       bestAskPrice: "",
       bestBidPrice: "",
-    } as TickerEntry);
+    } as TickerEntry;
+
+    // 如果没有提供 symbol，创建一个空的 SymbolEntity 防止崩溃
+    // 注意：实际业务中应该尽量提供 symbol
+    const safeSymbol = symbol || SymbolEntity.fromRaw({} as any);
+    return new Ticker(safeSymbol, emptyRaw);
   }
+
+  // ============================================================================
+  // 格式化方法 (Delegated to SymbolEntity)
+  // ============================================================================
+
+  get lastPriceFormatted(): string {
+    return this.symbol.formatPriceFormatted(this.lastPrice);
+  }
+
+  get indexPriceFormatted(): string {
+    return this.symbol.formatPriceFormatted(this.indexPrice);
+  }
+
+  get oraclePriceFormatted(): string {
+    return this.symbol.formatPriceFormatted(this.oraclePrice);
+  }
+
+  get highFormatted(): string {
+    return this.symbol.formatPriceFormatted(this.high);
+  }
+
+  get lowFormatted(): string {
+    return this.symbol.formatPriceFormatted(this.low);
+  }
+
+  get bestAskFormatted(): string {
+    return this.symbol.formatPriceFormatted(this.bestAskPrice);
+  }
+
+  get bestBidFormatted(): string {
+    return this.symbol.formatPriceFormatted(this.bestBidPrice);
+  }
+
+  get volumeFormatted(): string {
+    return this.symbol.formatSizeFormatted(this.volume24h);
+  }
+
+  get turnoverFormatted(): string {
+    return this.symbol.formatQuoteValue(this.turnover24h);
+  }
+
+  get priceChangePercentFormatted(): string {
+    const val = this.priceChangePercent;
+    const sign = val > 0 ? "+" : "";
+    return `${sign}${toPrecisionString(val * 100, 2)}%`;
+  }
+
+  // ============================================================================
+  // Getters
+  // ============================================================================
 
   get contractId(): string {
     return this.raw.contractId;
@@ -142,5 +210,9 @@ export class Ticker {
 
   get bestBidPrice(): number {
     return Number(this.raw.bestBidPrice || 0);
+  }
+
+  get openInterestUsdt(): number {
+    return (this.indexPrice || 0) * (this.openInterest || 0);
   }
 }

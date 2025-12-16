@@ -434,7 +434,7 @@ const maxAmountBuy = computed(() => {
   }
   // return CoreCalculator.getMaxCreateOrderSize({
   //   contractId: perpStore.perp?.contractId || '',
-  //   orderPrice: perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0',
+  //   orderPrice: (swapType.value === 'LIMIT' ? form.price : perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice )|| '0',
   //   orderSide: 'BUY',
   //   reduceOnly: form.reduceOnly
   // }).times(price).toFixed()
@@ -454,7 +454,7 @@ const maxAmountSell = computed(() => {
   }
   // return CoreCalculator.getMaxCreateOrderSize({
   //   contractId: perpStore.perp?.contractId || '',
-  //   orderPrice: perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0',
+  //   orderPrice: (swapType.value === 'LIMIT' ? form.price : perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice )|| '0',
   //   orderSide: 'SELL',
   //   reduceOnly: form.reduceOnly
   // }).times(price).toFixed()

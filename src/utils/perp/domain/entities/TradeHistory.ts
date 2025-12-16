@@ -1,4 +1,4 @@
-import type { ITradeHistoryRaw, L2Signature, OpenTpSl, RiskTier } from "../../types";
+import type { IContract, ITradeHistoryRaw, L2Signature, OpenTpSl, IRiskTier } from "../../types";
 import {
   isConditionalOrder,
   isLimitOrder,
@@ -6,6 +6,7 @@ import {
   OrderType,
   TimeInForce,
 } from "../value-objects/OrderEnums";
+import { SymbolEntity } from "./Symbol";
 
 /**
  * TradeHistory 实体类
@@ -13,9 +14,19 @@ import {
  * 封装交易历史的所有业务逻辑和状态
  */
 export class TradeHistory {
-  raw: ITradeHistoryRaw;
+  public symbol: SymbolEntity;
 
-  constructor() {}
+  constructor(
+    symbol: IContract | SymbolEntity,
+    public raw: ITradeHistoryRaw,
+  ) {
+    if (symbol instanceof SymbolEntity) {
+      this.symbol = symbol;
+    } else {
+      this.symbol = SymbolEntity.fromRaw(symbol);
+    }
+  }
+
   /**
    * 工具函数：判断是否为市价单
    */
@@ -55,28 +66,9 @@ export class TradeHistory {
     return this.raw.isPositionTpsl ?? false;
   }
 
-  /**
-   * 从原始数据创建 TradeHistory 实体
-   *
-   * @param raw - 原始数据
-   */
-  static fromRaw(raw: ITradeHistoryRaw): TradeHistory {
-    const instance = new TradeHistory();
-    instance.raw = raw;
-    return instance;
-  }
-
   // Contract Information getters
   get contractId(): string {
     return this.raw.contractId;
-  }
-
-  get contractName(): string {
-    return this.raw.contractName;
-  }
-
-  get symbol(): string {
-    return this.raw.symbol;
   }
 
   // Price Information getters
@@ -299,7 +291,7 @@ export class TradeHistory {
   }
 
   // Risk Tiers getter
-  get riskTierList(): RiskTier[] {
+  get riskTierList() {
     return this.raw.riskTierList;
   }
 
@@ -602,6 +594,10 @@ export class TradeHistory {
 
   get cumRealizePnl(): string {
     return this.raw.cumRealizePnl;
+  }
+
+  get formattedCumRealizePnl(): string {
+    return this.symbol.formatPnL(this.cumRealizePnl);
   }
 
   // Cumulative Match Information getters

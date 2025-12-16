@@ -6,7 +6,7 @@ import type {
   PositionTermListEntry,
   PositionTransactionEntry,
 } from "../../types";
-import type { OrderUpdateData } from "../../types";
+import { OrderUpdateData } from "../../types";
 
 export class OrderUpdate {
   constructor(private readonly payload: OrderUpdateData) {}

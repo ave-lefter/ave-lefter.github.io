@@ -5,6 +5,12 @@ import { OrderCalculationService } from './perp/OrderCalculationService'
 import { Position } from '@/utils/perp/domain/entities/Position'
 import { Order } from '@/utils/perp/domain/entities/Order'
 import { Ticker } from '@/utils/perp/domain/entities/Ticker'
+import { SymbolEntity } from '@/utils/perp/domain/entities/Symbol'
+import { Account } from './perp/domain/entities/Account'
+import { Collateral } from './perp/domain/entities/Collateral'
+import { PositionFactory } from './perp/domain/services/PositionFactory'
+import { AccountRiskService } from './perp/domain/services/AccountRiskService'
+import type { IContract } from './perp/types'
 
 export function getPrepData(contractId: string) {
   const perpStore = usePerpStore()
@@ -15,12 +21,8 @@ export function getPrepData(contractId: string) {
   const tickers = new Map()
   perpStore.tickers.forEach((ticker) => {
     let symbol = perpStore.contractList.find(item => item.contractId === ticker.contractId)
-    tickers.set(symbol?.contractName, new Ticker(ticker))
+    tickers.set(symbol?.contractName, new Ticker(SymbolEntity.fromRaw(symbol as any), ticker))
   })
-
-      //  .div(tmpOrder.maxLeverage)
-      //   .toFixed(6, BigNumber.ROUND_FLOOR);
-      // const tmpOrderFeeRate = Math.max(tmpOrder.takerFeeRate, tmpOrder.makerFeeRate);
 
   let _orders = orders.map(i => {
     let order = Order.fromRaw(symbol, i) as any
@@ -39,7 +41,7 @@ export function getPrepData(contractId: string) {
     collaterals: perpStore.collateral || [],
     withdraws: perpStore.withdraw || [],
     transfers: perpStore.transferOut || [],
-    symbolsList: metadata?.contractList || [],
+    symbolsList: (metadata?.contractList || [])?.map?.(i => SymbolEntity.fromRaw(i as any)) || [],
     tickers: tickers,
     orderBook: {
       ask1: symbol?.lastPrice || '0',
@@ -150,51 +152,6 @@ export function toTick(value: string | number, tick?: string | number) {
     .times(t).toString()
 }
 
-// * 计算可用余额
-export function calculateAvailableBalance(contractId: string) {
-  const perpStore = usePerpStore()
-  const contractList = perpStore?.contractList || []
-  const contract = contractList.find(item => item.contractId === contractId)
-  const clientAccountId = perpStore?.userInfo?.clientAccountId
-  const openLever = getLeverageFromContractId(contractId)
-}
-
-// /**
-//      * 计算可用余额
-//      */
-//     private void calculateAvailableBalance(SymbolModel symbol) {
-//         try {
-//             // 这里应该根据实际业务逻辑获取用户的可用余额
-//             // 暂时使用示例数据
-//             String quoteCoinId = symbol.quoteCoinId; // 计价币种，如USDT
-
-//             // 从PrivateData获取账户余额信息
-//             // 这里需要根据实际的数据结构来获取余额
-//             // 暂时设置为示例值
-
-//             String accountName = PrivateData.currentAccountData().clientAccountId;
-
-//             String openLever = CoreCalculator.getOpenMaxLeverage(
-//                     PrivateData.currentAccountData().id,
-//                     symbol.contractId
-//             );
-
-//             CollateralModel collateralModel = PrivateData.currentAccountData().collateralManager.getCollateralModel(quoteCoinId);
-//             BigDecimal availableAmount = CoreCalculator.getCollateralAvailableAmount(
-//                     PrivateData.currentAccountData().id,
-//                     collateralModel
-//             );
-//             String balance = DecimalExtensions.round(availableAmount, 2).toPlainString();
-
-//             TickerModel tickerModel = MetaData.getInstance().ticker.getTickerModel(symbol.contractId);
-//             String balanceText = "账户：" + accountName + "\n倍杠杆：" + openLever + "x" + "\n可用余额：" + balance + " " + "USD" + "\n最新价格：" + tickerModel.lastPrice + " USD" + "\n预言机价格：" + DecimalExtensions.floor(tickerModel.getOraclePriceDecimal(), symbol.pricePrecision).toPlainString() + " USD";
-
-//             availableBalance.postValue(balanceText);
-//         } catch (Exception e) {
-//             availableBalance.postValue("可用余额: 0.00 USDT");
-//         }
-//     }
-
 
 export function calculateMargin(params1: {
   contractId: string
@@ -269,4 +226,69 @@ export function calculateLiqPrice(params: {
     price: params.price,
     size: params.size
   })
+}
+
+export function getPositionLiqPrice(contractId: string) {
+  // const ctx  = {
+  //   contractId: params.contractId,
+  //   ...getPrepData(params.contractId)
+  // } as any
+  const ctx = getPrepData(contractId)
+  const perpStore = usePerpStore()
+  const metadata = perpStore.metadata as any
+  if (!metadata) return '0'
+  const contractList = perpStore.metadata?.contractList || []
+  // const { getTicker, tickers } = ctx.tickers
+  const tickers = ctx.tickers || []
+  const symbol = ctx.symbolsList?.find((s) => s.contractId === contractId) as typeof ctx.symbolsList[0]
+  const positionRaw = perpStore.position?.find((p) => p.contractId === contractId) as typeof perpStore.position[0]
+  const rawAccount = perpStore.userInfo
+  const order = perpStore.order || []
+  const collateralRaw = perpStore.collateral || []
+  const withdrawRaw = perpStore.withdraw || []
+  const transferOutRaw = perpStore.transferOut || []
+  /////////////////
+  const position = new Position(symbol, positionRaw)
+  const symbolsList = contractList?.map((c) => SymbolEntity.fromRaw(c as IContract)) || []
+  // const ticker = getTicker(position?.symbol?.contractName || "");
+  const ticker = tickers?.get(position?.symbol?.contractName || "")
+  // 无持仓时返回默认值
+  if (!position) {
+    return {
+      liqPrice: 0,
+      liqPriceFormatted: "-",
+    };
+  }
+  // Convert raw data to Entities
+  const account = rawAccount ? Account.fromRaw(rawAccount) : null;
+  const collateralList = (collateralRaw || []).map((c) => Collateral.fromRaw(c));
+  const positionList = PositionFactory.createPositionsFromRaw(perpStore.position || [], symbolsList);
+  if (!account) {
+    return {
+      liqPrice: 0,
+      liqPriceFormatted: "-",
+    };
+  }
+  // ==================== 计算抵押物信息 ====================
+  const collateralInfo = AccountRiskService.calculateCollateralStats({
+    contractId: position.contractId,
+    quoteCoinId: position.symbol.quoteCoinId,
+    positionList: positionList,
+    account: account,
+    metadata,
+    symbolsList,
+    withdraw: withdrawRaw,
+    transferOut: transferOutRaw,
+    collateral: collateralList,
+    orderList: order,
+    tickers,
+  })
+  // (清算价格)
+  let liqPrice = position.getLiquidationPrice(ticker?.oraclePrice, {
+    totalEquity: collateralInfo?.totalEquity,
+    starkExRiskValue: collateralInfo?.totalStarkExRiskValue,
+    pendingWithdrawAmount: collateralInfo?.totalPendingWithdrawAmount,
+    pendingTransferOutAmount: collateralInfo?.totalPendingTransferOutAmount,
+  })
+  return liqPrice;
 }
