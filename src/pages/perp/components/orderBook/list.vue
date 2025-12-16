@@ -69,7 +69,7 @@ const props = defineProps<{
 }>()
 const { t } = useI18n()
 const filterTableList = computed(() => {
-  const result = [
+  let result = [
     ...props.list,
     ...Array.from({ length: Math.max(0, 200 - props.list?.length) }, () => ({
       price: '0',
@@ -79,9 +79,18 @@ const filterTableList = computed(() => {
   ]
   if (props.type == 'sell') {
     result.sort((a, b) => new BigNumber(a.price).comparedTo(new BigNumber(b.price)))
+
   } else {
     result.sort((a, b) => new BigNumber(b.price).comparedTo(new BigNumber(a.price)))
   }
+  let acc = 0
+  result = result.map(item => {
+  acc += Number(item.sum)
+  return {
+    ...item,
+    sum: acc
+  }
+})
   return (props.type == 'sell'? result?.reverse(): result)
 })
 // 整行渐变背景（优化版本）
