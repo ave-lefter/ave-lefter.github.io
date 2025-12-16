@@ -79,8 +79,8 @@ watch(
 
 <template>
   <div
-    class="relative min-h-400px bg-[--secondary-bg]"
     v-infinite-scroll="getList"
+    class="relative min-h-400px bg-[--secondary-bg]"
     :infinite-scroll-delay="200"
     :infinite-scroll-disabled="listStatus.loading || listStatus.finished || listStatus.error"
     :infinite-scroll-immediate="false"
@@ -132,7 +132,7 @@ watch(
       <el-table-column align="right" :label="t('tradeType')" prop="orderSide">
         <template #default="{ row }">
           <span :class="row.orderSide === 'BUY' ? 'color-[--up-color]' : 'color-[--down-color]'">{{
-            row.side === 'BUY' ? t('buy') : t('sell')
+            row.orderSide === 'BUY' ? t('buy') : t('sell')
           }}</span>
         </template>
       </el-table-column>
