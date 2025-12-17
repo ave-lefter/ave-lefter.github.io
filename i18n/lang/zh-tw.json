@@ -1713,5 +1713,7 @@
   "fastWithdraw": "快速提現",
   "internalWithdraw": "內部提現",
   "internalDeposit": "內部充值",
-  "direction": "方向"
+  "direction": "方向",
+  "setTakeProfitOrderSuccess": "設置止盈訂單成功",
+  "setStopLossOrderSuccess": "設置止損訂單成功"
 }
