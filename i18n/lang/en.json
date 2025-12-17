@@ -1729,5 +1729,7 @@
   "fastWithdraw": "Fast Withdraw",
   "internalWithdraw": "Internal Withdraw",
   "internalDeposit": "Internal Deposit",
-  "direction": "Direction"
+  "direction": "Direction",
+  "setTakeProfitOrderSuccess": "Set take profit order successfully",
+  "setStopLossOrderSuccess": "Stop loss order set successfully"
 }

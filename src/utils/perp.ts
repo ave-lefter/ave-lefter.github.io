@@ -228,6 +228,7 @@ export function calculateLiqPrice(params: {
   })
 }
 
+// 仓位强平价
 export function getPositionLiqPrice(contractId: string) {
   // const ctx  = {
   //   contractId: params.contractId,

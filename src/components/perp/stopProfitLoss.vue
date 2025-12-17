@@ -186,7 +186,11 @@ function slPriceChange(val: number) {
 
 
 const sizePercentChange = (val: number) => {
-  size.value = new BigNumber(val || 0).div(100).times(new BigNumber(props.row?.openSize || '0').abs()).dp(quantityPrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+  if (quantityPrecision.value < 0) {
+    size.value = new BigNumber(val || 0).div(100).times(new BigNumber(props.row?.openSize || '0').abs().times(new BigNumber(10).pow(quantityPrecision.value))).dp(0, BigNumber.ROUND_FLOOR).div(new BigNumber(10).pow(quantityPrecision.value)).toNumber()
+  } else {
+    size.value = new BigNumber(val || 0).div(100).times(new BigNumber(props.row?.openSize || '0').abs()).dp(quantityPrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+  }
 }
 
 function sizeChange(val: number) {
@@ -219,7 +223,7 @@ function _createTpOrder() {
       size: String(size.value || '0'),
       triggerPrice: tpForm.triggerPrice.toString() || '0',
       price: String(tpForm.price || '0'),
-      side: 'SELL',
+      side: isLong.value ? 'SELL' : 'BUY',
       contractId: row?.contractId || '',
       reduceOnly: true,
       isPositionTpsl: true,
@@ -228,7 +232,7 @@ function _createTpOrder() {
     }
     return createOrder(data).then(res => {
       console.log('createTpOrder result', res)
-      ElNotification({ type: 'success', message:  '设置止盈订单成功' })
+      ElNotification({ type: 'success', message:  t('setTakeProfitOrderSuccess') })
       return Promise.resolve(res)
     }).catch((err) => {
       ElNotification({ type: 'error', message: err?.message })
@@ -246,7 +250,7 @@ function _createSlOrder() {
       size: String(size.value || '0'),
       triggerPrice: slForm.triggerPrice.toString() || '0',
       price: String(slForm.price || '0'),
-      side: 'SELL',
+      side: isLong.value ? 'SELL' : 'BUY',
       contractId: row?.contractId || '',
       reduceOnly: true,
       isPositionTpsl: true,
@@ -255,7 +259,7 @@ function _createSlOrder() {
     }
     return createOrder(data).then(res => {
       console.log('createSlOrder result', res)
-      ElNotification({ type: 'success', message:  '设置止损订单成功' })
+      ElNotification({ type: 'success', message:  t('setStopLossOrderSuccess') })
       return Promise.resolve(res)
     }).catch((err) => {
       ElNotification({ type: 'error', message: err?.message })
@@ -482,7 +486,9 @@ function _createSlOrder() {
         <div class="mt-16px mb-16px">
           <el-input-number
             v-model.number="size"
-            :precision="quantityPrecision"
+            :precision="quantityPrecision < 0 ? 0 : quantityPrecision"
+            :step="quantityPrecision < 0 ? 10 ** -quantityPrecision : 1"
+            :step-strictly="quantityPrecision < 0"
             class="[&&]:w-full"
             :controls="false"
             align="left"
