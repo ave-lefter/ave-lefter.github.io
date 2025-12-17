@@ -30,20 +30,21 @@ const typeDict = computed(() => {
 })
 
 const getPnl = (row: any) => {
-  if (row.beforeOpenValue > 0) {
-    return formatNumber(
-      Math.abs(row.fillCloseValue) -
-        Math.abs(row.beforeOpenValue) -
-        Math.abs(row.fillCloseFee) -
-        Math.abs(row.beforeOpenFee)
-    )
-  }
-  return formatNumber(
-    Math.abs(row.beforeOpenValue) -
-      Math.abs(row.fillCloseValue) -
-      Math.abs(row.fillCloseFee) -
-      Math.abs(row.beforeOpenFee)
-  )
+  return formatNumber(row.realizePnl - row.deltaOpenFee)
+  // if (row.beforeOpenValue > 0) {
+  //   return formatNumber(
+  //     Math.abs(row.fillCloseValue) -
+  //       Math.abs(row.beforeOpenValue) -
+  //       Math.abs(row.fillCloseFee) -
+  //       Math.abs(row.beforeOpenFee)
+  //   )
+  // }
+  // return formatNumber(
+  //   Math.abs(row.beforeOpenValue) -
+  //     Math.abs(row.fillCloseValue) -
+  //     Math.abs(row.fillCloseFee) -
+  //     Math.abs(row.beforeOpenFee)
+  // )
 }
 
 const getList = async () => {
@@ -97,8 +98,8 @@ watch(
 
 <template>
   <div
-    class="relative min-h-400px bg-[--secondary-bg]"
     v-infinite-scroll="getList"
+    class="relative min-h-400px bg-[--secondary-bg]"
     :infinite-scroll-delay="200"
     :infinite-scroll-disabled="listStatus.loading || listStatus.finished || listStatus.error"
     :infinite-scroll-immediate="false"
@@ -149,7 +150,7 @@ watch(
       <el-table-column :width="80" align="right" :label="t('tradeType')" prop="side">
         <template #default="{ row }">
           <span :class="row.type.includes('BUY') ? 'color-[--up-color]' : 'color-[--down-color]'">{{
-            row.type.includes('BUY') ? t('sell') : t('buy')
+            row.type.includes('BUY') ? t('buy') : t('sell')
           }}</span>
         </template>
       </el-table-column>

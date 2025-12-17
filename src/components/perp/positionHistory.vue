@@ -86,8 +86,8 @@ watch(
 
 <template>
   <div
-    class="relative min-h-400px bg-[--secondary-bg]"
     v-infinite-scroll="getList"
+    class="relative min-h-400px bg-[--secondary-bg]"
     :infinite-scroll-delay="200"
     :infinite-scroll-disabled="listStatus.loading || listStatus.finished || listStatus.error"
     :infinite-scroll-immediate="false"
@@ -115,13 +115,13 @@ watch(
       </el-table-column>
       <el-table-column align="right" :label="t('contractSize')" prop="contractSize">
         <template #default="{ row }">
-          {{ Math.abs(+formatNumber(row.cumOpenSize)) }}
+          {{ Math.abs(+formatNumber(row.cumOpenSize) || 0) }}
           {{ typeDict[row.contractId].replace('USD', '') }}
         </template>
       </el-table-column>
       <el-table-column align="right" :label="t('closeSize')">
         <template #default="{ row }">
-          {{ Math.abs(+formatNumber(row.cumCloseSize)) }}
+          {{ Math.abs(+formatNumber(row.cumCloseSize) || 0) }}
           {{ typeDict[row.contractId].replace('USD', '') }}
         </template>
       </el-table-column>
@@ -151,7 +151,7 @@ watch(
         </template>
       </el-table-column>
       <el-table-column align="right" :label="t('unrealizedPnl')">
-        <template #default="{ row }"> -- </template>
+        <template #default> -- </template>
       </el-table-column>
       <el-table-column align="right" :label="t('pnl')">
         <template #default="{ row }">
@@ -160,7 +160,7 @@ watch(
           </div>
           <div class="lh-18px" :class="getColorClass(getPnl(row))">
             {{
-              formatNumber((getPnl(row) / Math.abs(row.cumOpenValue)) * 100, {
+              formatNumber((getPnl(row) / Math.abs(row.cumOpenValue)) * 100 * row.currentLeverage, {
                 limit: 20,
                 decimals: 2,
               })
