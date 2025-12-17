@@ -172,6 +172,65 @@ function init() {
   const lastTime = sortedData.value?.[sortedData.value.length - 1]?.[0]
   const minTime = firstTime ? firstTime * 1000 : undefined
   const maxTime = lastTime ? lastTime * 1000 : undefined
+  const span =
+    typeof minTime === 'number' && typeof maxTime === 'number' && maxTime > minTime
+      ? maxTime - minTime
+      : undefined
+  const formatTs = (ts: number) => (props.isDay ? formatDate(ts, 'MM-DD') : formatDate(ts, 'HH:mm'))
+  // fallback：当取不到 ticks 时，仍保证最多显示 4 个（slot 去重）
+  let fallbackShownSlots = new Set<number>()
+  let fallbackLastSpanKey = `${minTime ?? ''}-${maxTime ?? ''}`
+  // 从 ECharts 实际生成的 tick 中挑选“最接近 4 个等分目标点”的 4 个 tick 来显示
+  // 目标点：min、min+1/3、min+2/3、max
+  let labelTickSet = new Set<number>()
+  const pickClosestTicks = (tickValues: number[], targets: number[]) => {
+    const inRange = tickValues.filter(
+      (v) => typeof v === 'number' && !Number.isNaN(v) && v >= targets[0] && v <= targets[3]
+    )
+    const used = new Set<number>()
+    const candidatesBySlot: Array<Array<{ v: number; diff: number }>> = [[], [], [], []]
+    const slotTarget = targets
+    if (!span || span <= 0) return []
+
+    for (const v of inRange) {
+      const r = (v - targets[0]) / span // 0..1
+      const clamped = Math.min(1, Math.max(0, r))
+      const slot = Math.min(3, Math.max(0, Math.round(clamped * 3)))
+      candidatesBySlot[slot].push({ v, diff: Math.abs(v - slotTarget[slot]) })
+    }
+    for (const list of candidatesBySlot) list.sort((a, b) => a.diff - b.diff)
+
+    // 贪心：先分配最确定的 slot，避免重复 tick 导致少于 4 个标签
+    const slotOrder = [0, 1, 2, 3].sort(
+      (a, b) =>
+        (candidatesBySlot[a][0]?.diff ?? Infinity) - (candidatesBySlot[b][0]?.diff ?? Infinity)
+    )
+    const picked: number[] = new Array(4).fill(undefined) as any
+
+    for (const s of slotOrder) {
+      for (const c of candidatesBySlot[s]) {
+        if (!used.has(c.v)) {
+          used.add(c.v)
+          picked[s] = c.v
+          break
+        }
+      }
+    }
+
+    // 若某些 slot 没选到（tick 太少），用范围内 tick 补齐
+    if (picked.some((x) => typeof x !== 'number')) {
+      const sorted = [...inRange].sort((a, b) => a - b)
+      for (let i = 0; i < 4; i++) {
+        if (typeof picked[i] === 'number') continue
+        const fallback = sorted.find((v) => !used.has(v))
+        if (fallback == null) break
+        used.add(fallback)
+        picked[i] = fallback
+      }
+    }
+
+    return picked.filter((v) => typeof v === 'number') as number[]
+  }
 
   const option = {
     animation: false,
@@ -190,16 +249,9 @@ function init() {
     },
     xAxis: {
       type: 'time',
-      // 尽量给出 4~5 个刻度，避免过密
-      splitNumber: 5,
       boundaryGap: false,
       min: minTime,
       max: maxTime,
-      // 保底最小间隔，避免数据很密时刻度拥挤
-      minInterval:
-        sortedData.value.length > 1
-          ? Math.floor(((lastTime ?? 0) - (firstTime ?? 0)) / 10) * 1000
-          : undefined,
       splitLine: {
         show: false,
       },
@@ -211,12 +263,30 @@ function init() {
         show: true,
         showMinLabel: true,
         showMaxLabel: true,
-        hideOverlap: true,
-        interval: 'auto',
+        // 固定四个标签，不让 ECharts 因为重叠而隐藏
+        hideOverlap: false,
         alignMinLabel: 'left',
         alignMaxLabel: 'right',
-        formatter: (value: string) => {
-          return props.isDay ? formatDate(value, 'MM-DD') : formatDate(value, 'HH:mm')
+        formatter: (value: string, index: number) => {
+          const ts = Number(value)
+          if (Number.isNaN(ts) || typeof span !== 'number' || span <= 0) return ''
+
+          // 优先：已成功从 ECharts ticks 中挑出 4 个目标 tick
+          if (labelTickSet.size) return labelTickSet.has(ts) ? formatTs(ts) : ''
+
+          // fallback：未拿到 ticks 时，用 slot 去重保证显示 4 个
+          const spanKey = `${minTime ?? ''}-${maxTime ?? ''}`
+          if (index === 0 || spanKey !== fallbackLastSpanKey) {
+            fallbackShownSlots = new Set<number>()
+            fallbackLastSpanKey = spanKey
+          }
+          const r = (ts - (minTime as number)) / span // 0..1
+          const clamped = Math.min(1, Math.max(0, r))
+          let slot = Math.round(clamped * 3) // 0..3
+          slot = Math.min(3, Math.max(0, slot))
+          if (fallbackShownSlots.has(slot)) return ''
+          fallbackShownSlots.add(slot)
+          return formatTs(ts)
         },
       },
       axisLine: { show: false },
@@ -244,7 +314,32 @@ function init() {
     },
     series: series.value,
   }
-  myChart.value.setOption(option)
+  // 先 setOption 让 ECharts 生成 ticks，再从 ticks 中挑选最接近 4 个目标点的 tick 来显示
+  myChart.value.clear()
+  myChart.value.setOption(option, { notMerge: true })
+  if (
+    typeof minTime === 'number' &&
+    typeof maxTime === 'number' &&
+    typeof span === 'number' &&
+    span > 0
+  ) {
+    const targets = [minTime, minTime + span / 3, minTime + (2 * span) / 3, maxTime]
+    try {
+      const axisModel: any = myChart.value.getModel().getComponent('xAxis', 0)
+      const ticks: any[] = axisModel?.axis?.scale?.getTicks?.() ?? []
+      const tickValues: number[] = ticks
+        .map((t) => (typeof t === 'number' ? t : t?.value))
+        .filter((v) => typeof v === 'number')
+      const picked = pickClosestTicks(tickValues, targets)
+      // 只有在确实挑出了 4 个（或至少 2 个）时才启用 tickSet；否则继续用 fallback
+      if (picked.length >= 2) labelTickSet = new Set<number>(picked)
+      myChart.value.setOption(option, { notMerge: true })
+    } catch {
+      // 如果内部 API 取 ticks 失败，继续走 fallback（slot 去重）
+      labelTickSet = new Set<number>()
+      myChart.value.setOption(option, { notMerge: true })
+    }
+  }
   // if (series.value.markPoint.data.length > 0) {
   //   autoShowMarkTooltip()
   // }
