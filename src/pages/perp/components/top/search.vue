@@ -58,8 +58,8 @@ const filteredList = computed(() => {
     arr = arr.filter(
       (item) =>
         item.contractName.toLowerCase().includes(query.value.toLowerCase()) ||
-        item.baseCoinName.toLowerCase().includes(query.value.toLowerCase()) ||
-        item.quoteCoinName.toLowerCase().includes(query.value.toLowerCase())
+        item.baseCoin.toLowerCase().includes(query.value.toLowerCase()) ||
+        item.quoteCoin.toLowerCase().includes(query.value.toLowerCase())
     )
   }
   if (activeSort.value === 0 || sortBy.value === '') {

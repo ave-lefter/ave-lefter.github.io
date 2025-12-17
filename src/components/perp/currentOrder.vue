@@ -3,8 +3,6 @@ import dayjs from 'dayjs'
 import { cancelOrderById, getActiveOrderPage } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 import { Warning } from '@element-plus/icons-vue'
-import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
-import type { Order } from '~/stores/perp/type'
 import type { OrderEntry } from '@/utils/perp/types'
 const route = useRoute()
 const { mode } = storeToRefs(useGlobalStore())
@@ -13,7 +11,6 @@ const { t } = useI18n()
 const props = defineProps<{
   searchParams: any
 }>()
-const wsPrivateStore = usePerpWsPrivateStore()
 const { isCancelOrder, order } = storeToRefs(usePerpStore())
 const listData = shallowRef< OrderEntry[]>([])
 const listStatus = ref({
@@ -78,7 +75,7 @@ const getList = async () => {
     listStatus.value.loading = false
   }
 }
-getList()
+// getList()
 const cancelOrderLoading = reactive<{ [key: string]: boolean }>({})
 const cancelOrder = async (orderIds: string[]) => {
   cancelOrderLoading[orderIds[0]] = true
@@ -124,39 +121,10 @@ watch(
       listStatus.value.loading = false
       getList()
     }
-  }
+  },
+  { immediate: true }
 )
-// watch(
-//   () => wsPrivateStore.wsResult,
-//   (val) => {
-//     if (route.name === 'perp-id') {
-//       let result: Order[] = val['trade-event']?.content?.data?.order || []
-//       result = perpStore.order
-//         ?.filter((i) => !result.some((el) => el.id === i.id))
-//         .concat(...result)
-//         ?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET')?.sort((a, b) => Number(b.createdTime) - Number(a.createdTime))
-//       result =
-//         result?.map?.((el) => {
-//           const isLong = el.side === 'SELL'
-//           // 止盈
-//           const isProfit = el.type.includes('PROFIT')
-//           let triggerSign = ''
-//           if (isLong) {
-//             triggerSign = isProfit ? '≥' : '≤'
-//           } else {
-//             triggerSign = isProfit ? '≤' : '≥'
-//           }
-//           return {
-//             ...el,
-//             triggerSign,
-//           }
-//         }) || []
-//       listData.value = result?.slice()
-//       perpStore.orderList = result?.slice()
-//     }
-//   },
-//   { immediate: true, deep: true }
-// )
+
 watch(
   () => isCancelOrder.value,
   (val) => {

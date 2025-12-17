@@ -29,8 +29,8 @@ export type PerpInfo = {
   iconUrl: string
   displayMaxLeverage: string
   fundingInterestRate?: string
-  baseCoinName: string
-  quoteCoinName: string
+  baseCoin: string
+  quoteCoin: string
   baseCoinId: string
   quoteCoinId: string
   displayDigitMerge: string
