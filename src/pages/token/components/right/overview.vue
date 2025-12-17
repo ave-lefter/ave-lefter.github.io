@@ -177,7 +177,7 @@
           </button>
         </div>
       </div>
-      <div class="flex-between color-[--secondary-text] text-center" v-if="supportObj[chain]">
+      <div v-if="supportObj[chain]" class="flex-between color-[--secondary-text] text-center">
         <a
           href=""
           class="bg flex-1 color-[--secondary-text] text-14px"

@@ -104,15 +104,15 @@ export const usePerpStore = defineStore('perp', () => {
       getOnboardSite().then(() => {
         usePerpWsPrivateStore().init()
       })
-      res.contractList =
-        res?.contractList?.map((item) => ({
-          ...item,
-          iconUrl: res?.coinList?.find((coin) => coin.coinId === item.baseCoinId)?.iconUrl || '',
-          baseCoinName:
-            res?.coinList?.find((coin) => coin.coinId === item.baseCoinId)?.coinName || '',
-          quoteCoinName:
-            res?.coinList?.find((coin) => coin.coinId === item.quoteCoinId)?.coinName || '',
-        })) || []
+      // res.contractList =
+      //   res?.contractList?.map((item) => ({
+      //     ...item,
+      //     iconUrl: res?.coinList?.find((coin) => coin.coinId === item.baseCoinId)?.iconUrl || '',
+      //     baseCoin:
+      //       res?.coinList?.find((coin) => coin.coinId === item.baseCoinId)?.coinName || '',
+      //     quoteCoin:
+      //       res?.coinList?.find((coin) => coin.coinId === item.quoteCoinId)?.coinName || '',
+      //   })) || []
     }).finally(() => {
       loadingPerpMetadata.value = false
     })

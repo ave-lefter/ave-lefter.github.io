@@ -26,11 +26,11 @@ export function getPrepData(contractId: string) {
 
   let _orders = orders.map(i => {
     let order = Order.fromRaw(symbol, i) as any
-    let { takerFeeRate, makerFeeRate } = getFeeRate(order.contractId)
-    let maxLeverage = getLeverageFromContractId(order.contractId)
-    order.maxLeverage = maxLeverage
-    order.takerFeeRate = takerFeeRate
-    order.makerFeeRate = makerFeeRate
+    // let { takerFeeRate, makerFeeRate } = getFeeRate(order.contractId)
+    // let maxLeverage = getLeverageFromContractId(order.contractId)
+    // order.maxLeverage = maxLeverage
+    // order.takerFeeRate = takerFeeRate
+    // order.makerFeeRate = makerFeeRate
     return order
   })
   return {
