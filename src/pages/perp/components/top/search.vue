@@ -30,7 +30,7 @@
 
 <script lang="ts" setup>
 import SearchTable from './searchTable.vue'
-import { type PerpInfo } from '@/api/types/perp'
+import type { PerpInfo } from '@/api/types/perp'
 import { getPerpMetadata as _getPerpMetadata } from '@/api/perp'
 
 const props = defineProps({
@@ -58,8 +58,8 @@ const filteredList = computed(() => {
     arr = arr.filter(
       (item) =>
         item.contractName.toLowerCase().includes(query.value.toLowerCase()) ||
-        item.baseCoin.toLowerCase().includes(query.value.toLowerCase()) ||
-        item.quoteCoin.toLowerCase().includes(query.value.toLowerCase())
+        item.baseCoinIcon.toLowerCase().includes(query.value.toLowerCase()) ||
+        item.quoteCoinIcon.toLowerCase().includes(query.value.toLowerCase())
     )
   }
   if (activeSort.value === 0 || sortBy.value === '') {

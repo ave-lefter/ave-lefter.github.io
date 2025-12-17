@@ -13,7 +13,7 @@
           class="flex items-center px-4px py-4px cursor-pointer rounded-4px hover:bg-[--d-1B1D21-l-E8F1FF] cursor-pointer"
           @click.stop.prevent="visible = !visible"
         >
-          <el-image class="token-icon w-32px max-h-32px" fit="cover" :src="perp?.iconUrl">
+          <el-image class="token-icon w-32px max-h-32px" fit="cover" :src="perp?.baseCoinIcon">
             <template #error>
               <img class="token-icon w-32px max-h-32px" :src="getChainDefaultIcon()" />
             </template>

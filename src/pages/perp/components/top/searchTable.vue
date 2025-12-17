@@ -107,7 +107,7 @@
           >
             <div class="token-info">
               <div class="icon-token-container relative">
-                <el-image class="token-icon" :src="row?.iconUrl">
+                <el-image class="token-icon" :src="row?.baseCoinIcon">
                   <template #error>
                     <img class="token-icon" :src="getChainDefaultIcon()" />
                   </template>
@@ -162,7 +162,7 @@ import { formatNumber } from '@/utils/formatNumber'
 
 
 import { getChainDefaultIcon } from '@/utils/index'
-import { type PerpInfo } from '@/api/types/perp'
+import type { PerpInfo } from '@/api/types/perp'
 
 
 const themeStore = useThemeStore()

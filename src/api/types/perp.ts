@@ -26,7 +26,7 @@ export type PerpInfo = {
   nextFundingTime: string
   bestAskPrice?: string
   bestBidPrice?: string
-  iconUrl: string
+  // iconUrl: string
   displayMaxLeverage: string
   fundingInterestRate?: string
   baseCoin: string
@@ -34,6 +34,8 @@ export type PerpInfo = {
   baseCoinId: string
   quoteCoinId: string
   displayDigitMerge: string
+  baseCoinIcon: string
+  quoteCoinIcon: string
 } & ContractInfo
 export type CoinInfo = {
   coinId: string
