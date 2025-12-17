@@ -36,13 +36,7 @@
       </div>
       <div v-if="tabActive === 0" class="import part">
         <p>{{ $t('bulkDesc1') }}</p>
-        <div class="example">
-          <!-- <div class="mr-5px">{{ $t('bulkExample') }}:</div> -->
-          <!-- <div>
-            <div>5meiN***8vGB:{{ $t('remark') }}1,</div>
-            <div>G8oaP***eLgf:{{ $t('remark') }}2</div>
-          </div> -->
-        </div>
+
         <el-select
           v-model="activeChain"
           class="chains-select [&&]:[--el-fill-color-blank:--border]"
@@ -104,7 +98,40 @@
           "
           @input="validateInput"
         />
-        <div class="error-message"><span v-if="!isValid">{{ errorMessage }}</span></div>
+        <div v-if="!isValid" class="error-message"><span>{{ errorMessage }}</span></div>
+        <div class="flex mt-10px mb-5px justify-between">
+          <div class="text-14px">添加至分组
+            <p v-if="showGroup" class="mt-4px">忽略原分组并添加至选定分组</p>
+          </div>
+          <el-switch v-model="showGroup" size="small" />
+        </div>
+        <div v-if="showGroup" class="mb-40px">
+          <el-select
+            v-model="selectedGroupId"
+            size="large"
+            class="chains-select !text-14px !mb-5px [&&]:[--el-fill-color-blank:--border]"
+            @click.stop
+          >
+            <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
+            <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
+          </el-select>
+          <div ref="addButtonRef" class="button black mt-5px !h-40px !leading-40px">
+            <Icon name="custom:add-icon" class="text-12px" />
+            {{ $t('newGroup') }}
+          </div>
+          <ProPopover
+            ref="proPopoverRef"
+            v-model="addGroupName"
+            :button-ref="addButtonRef || {}"
+            width="410px"
+            :label="$t('newGroup')"
+            :placeholder="$t('enterGroupName')"
+            prop="name"
+            :title="$t('newGroup')"
+            @onConfirm="handleAddGroup"
+          />
+        </div>
+
         <div class="button black" @click="getClipboardContent">{{ $t('paste') }}</div>
         <el-button
           class="width100 button"
@@ -224,23 +251,27 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   batchDeleteAddresses,
+  changeFavoriteGroupName2,
   bulkExportAttention,
   bulkImportAttention,
   getZeroBalanceAddresses,
+  getAttentionPageList,
+  getUserFavoriteGroups2,
+  addFavoriteGroup2
 } from '~/api/attention'
+import ProPopover from '@/pages/follow/components/proPopover.vue'
+
 import { ElMessage } from 'element-plus'
 import { generateAvatarIcon, getChainInfo, isValidAddress, evm_utils as utils } from '@/utils'
 import { ArrowDownBold } from '@element-plus/icons-vue'
 import SuffixIcon from './suffixIcon.vue'
-import { getAttentionPageList, getUserFavoriteGroups2} from '~/api/attention'
 const { mode, token_logo_url } = storeToRefs(useGlobalStore())
-const { currentAddress, showBatchAddressDetails } = storeToRefs(useFollowStore())
-
-const { updateNum3 } = storeToRefs(useFollowStore())
+const { addressGroups, currentAddress, updateNum3, showBatchAddressDetails } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
+const followStore = useFollowStore()
 const { t } = useI18n()
 const tabActive = ref(0)
 const favTotal = ref(0)
@@ -254,12 +285,41 @@ const loading = ref(false)
 const loadingDelete = ref(false)
 const zeroBalanceAddresses = ref('')
 const zeroBalanceList = ref([])
+const showGroup = ref(false)
+const proPopoverRef = ref()
+const addGroupName = ref('')
+const addButtonRef = ref()
+const selectedGroupId = ref(0)
 
 const emit = defineEmits(['refresh'])
 const exportNumber = computed(() => {
   const entries = JSON.parse(exportStr.value)
   return entries.length || 0
 })
+
+
+function handleConfirmEdit(currentEditGroup: number, remark:string) {
+  changeFavoriteGroupName2(remark, currentEditGroup).then(() => {
+    ElMessage.success(t('success'))
+    followStore.getUserFavoriteGroups2()
+  }).catch((e) => {
+     ElMessage.error(String(e))
+  })
+}
+
+function handleAddGroup(name:string) {
+  debugger;
+   if(followStore.addressGroups.map(i=>i.name).includes(name)){
+    ElMessage.error(t('groupExistT'))
+  }else{
+    addFavoriteGroup2(name).then(() => {
+     ElMessage.success(t('success'))
+     followStore.getUserFavoriteGroups2()
+   }).catch((e) => {
+      ElMessage.error(String(e))
+   })
+  }
+}
 
 watch(()=>showBatchAddressDetails.value, (val) => {
   if (!val) {
@@ -403,7 +463,7 @@ const handleBulkImportAttention = () => {
     return
   }
   loading.value = true
-  bulkImportAttention(arr)
+  bulkImportAttention(arr, undefined ,selectedGroupId.value)
     .then((res) => {
       console.log(res)
       ElMessage.success(t('success'))
@@ -642,8 +702,8 @@ const confirmBulkDelete = () => {
       .textarea {
         outline: none;
         width: 100%;
-        height: 328px;
-        padding: 16px 12px;
+        height: 280px;
+        padding: 12px;
         color: var(--third-text);
         border: 1px solid var(--dialog-divider);
         border-radius: 8px;
@@ -665,7 +725,7 @@ const confirmBulkDelete = () => {
         height: 48px;
         /* background-color: var(--d-FFF-l-222);
         color: var(--d-222-l-FAFAFA); */
-        font-size: 16px;
+        font-size: 14px;
         border-radius: 8px;
         text-align: center;
         &.black {

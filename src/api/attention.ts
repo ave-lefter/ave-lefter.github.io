@@ -41,7 +41,7 @@ interface IAddAttention2 {
   sell?: number
 }
 
-export function deleteMonitor(body:{ uid: string, address: string  }){ 
+export function deleteMonitor(body:{ uid: string, address: string  }){
   const { $api } = useNuxtApp()
   return $api('/v2api/fav_users/v1/user/deleteMonitor',{
     method: 'post',
@@ -397,7 +397,8 @@ interface BulkImportAttentionItem {
 
 export async function bulkImportAttention(
   addressArr: BulkImportAttentionItem[],
-  address: string = localStorage.bot_evmAddress || localStorage.walletAddress
+  address: string = localStorage.bot_evmAddress || localStorage.walletAddress,
+  group: number | undefined,
 ): Promise<any> {
   const arr: Array<{
     address: string
@@ -415,7 +416,7 @@ export async function bulkImportAttention(
   const { $api } = useNuxtApp()
   return $api('/v1api/v3/users/fav/batch_import', {
     method: 'post',
-    body: arr
+    body: {arr, group}
   }).catch((err: any) => console.log(err))
 }
 // 用户批量导出
