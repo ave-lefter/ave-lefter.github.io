@@ -1,8 +1,24 @@
 <template>
   <div class="w-full">
+    <div class="pb-16px pt-4px px-16px flex-start gap-48px">
+      <div>
+        <span class="text-12px color-[--secondary-text]">{{ $t('totalPnL') }}</span>
+        <span class="ml-16px text-18px" :class="Number(copyOrder?.totalProfitRatioAll)>0 ? 'color-[--up-color]':'color-[--down-color]' ">${{ formatNumber(copyOrder?.totalProfitAll || 0, 2) }}({{ formatNumber(copyOrder?.totalProfitRatioAll || 0, 2)  }}%)
+        </span>
+      </div>
+      <div>
+        <span class="text-12px color-[--secondary-text]">{{ $t('realizedProfit') }}</span>
+        <span class="ml-16px text-18px" :class="Number(copyOrder?.profitRealizedRatioAll)>0 ? 'color-[--up-color]':'color-[--down-color]' ">${{ formatNumber(copyOrder?.profitRealizedAll || 0, 2) }}({{ formatNumber(copyOrder?.profitRealizedRatioAll || 0, 2)  }}%)
+        </span>
+      </div>
+      <div>
+        <span class="text-12px color-[--secondary-text]">{{ $t('unrealizedProfit') }}</span>
+        <span class="ml-16px text-18px" :class="Number(copyOrder?.profitUnrealizedRatioAll)>0 ? 'color-[--up-color]':'color-[--down-color]' ">${{ formatNumber(copyOrder?.profitUnrealizedAll || 0, 2) }}({{ formatNumber(copyOrder?.profitUnrealizedRatioAll || 0, 2)  }}%)
+        </span>
+      </div>
+    </div>
     <el-table
       ref="tableRef"
-      :key="tableIndex"
       v-loading="loading"
       :data="tableData"
       :header-cell-style="{ fontSize: '12px' }"
@@ -17,101 +33,122 @@
         <span v-else />
       </template>
       <el-table-column
-        label="钱包"
+        :label="$t('wallet')"
         align="left"
         width="225"
         fixed="left"
         prop="token_profit_rate"
-        :min-width="110"
+        :min-width="80"
       >
-        <template #default="{ row }"> {{ row.wallet_address }} </template>
+        <template #default="{ row }">
+          <Icon name="custom:wallet-fill" class="text-14px color-[--main-text]" />
+          <span class="ml-4px color-[--main-text]">{{ 'Wallet' + row?.creatorAddress?.slice(-4) }}</span>
+        </template>
       </el-table-column>
 
-      <el-table-column label="任务" align="right" prop="token_profit_rate" :min-width="110">
-        <template #default="{ row }"> 22 </template>
+      <el-table-column :label="$t('task')" align="right" prop="token_profit_rate" :min-width="200">
+        <template #default="{ row }">
+          <div class="flex-end">
+          <UserAvatar class="mr-10px" iconSize="24px" iconChainSize="14px" :wallet_logo="{url: row?.followAddress, logo: row?.followIconUrl}" :address="row.followAddress" />
+            <UserRemark addressClass="token-symbol ellipsis color-[--main-text]" addressStyle="max-width: 70px" showAddressTitle :address="row.followAddress" :chain="row.chain" :remark="row.remark || row.followName" :wallet_logo="{url: row?.followAddress, logo: row?.followIconUrl}" :formatAddress="a=> '*' + a?.slice(-5)" @updateRemark="({remark}) => row.remark = remark"/>
+            <Icon
+              v-copy="row.followAddress"
+              name="bxs:copy"
+              class="text-12px cursor-pointer color-[--third-text] ml-5px"
+              @click.stop.prevent
+            />
+            <span v-if="row.status =='watching'" class="bg-[#12B8861A] color-[--up-color] px-4px rounded-2px ml-5px text-10px">{{ $t('status-watching') }}</span>
+            <span v-else-if="row.status =='pause'" class="bg-[#FFA6221A] color-[--yellow] px-4px rounded-2px ml-5px text-10px">{{ $t('status-paused') }}</span>
+            <span v-else-if="row.status =='cancelled'" class="bg-[#6666661a] color-[--third-text] px-4px rounded-2px ml-5px text-10px">{{ $t('cancelled1') }}</span>
+            <span v-else class="bg-[#e500001a] color-[--down-color] px-4px rounded-2px ml-5px text-10px">{{ $t('status-error') }}</span>
+          </div>
+        </template>
       </el-table-column>
-      <el-table-column label="链" align="right" prop="token_profit_rate" :min-width="110">
-        <template #default="{ row }"> {{ row.chain }} </template>
+      <el-table-column :label="$t('chain')" align="right" prop="token_profit_rate" :min-width="110">
+        <template #default="{ row }"> {{ getChainInfo(row?.chain)?.name }} </template>
       </el-table-column>
-      <el-table-column label="总买入" align="right" prop="token_profit_rate" :min-width="110">
-        <template #default="{ row }"> 22 </template>
+      <el-table-column :label="$t('unrealizedProfit')" align="right" prop="token_profit_rate" :min-width="110">
+        <template #default="{ row }">
+          <span :class="Number(row?.profitUnrealized)>0 ? 'color-[--up-color]':'color-[--down-color]' ">
+            ${{ formatNumber(row?.profitUnrealized || 0, 2) }}
+          </span>
+        </template>
       </el-table-column>
 
-      <el-table-column label="总卖出" align="right" prop="token_profit_rate" :min-width="110">
-        <template #default="{ row }"> 22 </template>
+      <el-table-column :label="$t('realizedProfit')" align="right" prop="token_profit_rate" :min-width="110">
+        <template #default="{ row }">
+          <span :class="Number(row?.profitRealized)>0 ? 'color-[--up-color]':'color-[--down-color]' ">
+            ${{ formatNumber(row?.profitRealized || 0, 2) }}
+          </span>
+        </template>
       </el-table-column>
-      <el-table-column label="买/卖" align="right" prop="token_profit_rate" :min-width="110">
-        <template #default="{ row }"> 22 </template>
+      <el-table-column :label="$t('winTokenTotal')" align="right" prop="token_profit_rate" :min-width="110">
+        <template #default="{ row }">
+          <div class="">
+            <span class="color-[--up-color]">{{ formatNumber(row?.winToken || 0, 2) }}</span>
+            /
+            <span class="color-[--secondary-text]">{{ formatNumber(row?.totalTokenCount || 0, 2) }}</span>
+          </div>
+        </template>
       </el-table-column>
 
-      <el-table-column label="已实现利润" align="right" prop="token_profit_rate" :min-width="110">
-        <template #default="{ row }"> 22 </template>
+      <el-table-column :label="$t('positionsValue')" align="right" prop="token_profit_rate" :min-width="110">
+        <template #default="{ row }">${{ formatNumber(row?.holdingUsd || 0, 2) }}</template>
       </el-table-column>
 
-      <el-table-column label="最近交易时间" align="right" prop="token_profit_rate" :min-width="110">
-        <template #default="{ row }"> 22 </template>
+      <el-table-column :label="$t('lastSwapTime')" align="right" prop="token_profit_rate" :min-width="110">
+        <template #default="{ row }">
+          {{ row?.lastSwap >0? formatDate(row?.lastSwap, 'YYYY-MM-DD HH:mm') : '--' }}
+        </template>
       </el-table-column>
 
-      <el-table-column align="right" :min-width="110" fixed="right">
+      <el-table-column align="right" :min-width="250" fixed="right">
         <template #header>
           <span class="mr-7px">{{ $t('operation') }}</span>
         </template>
         <template #default="{ row }">
           <div class="flex-end" @click.stop>
-            <a
-              class="trade"
-              href=""
-              @click.stop.prevent="copyTradeVisible = true"
-            >
-              <img src="@/assets/images/tg1.png" alt="" :width="12" />
-              {{ $t('copyTrade') }}
-            </a>
+            <Operate  :id="row.id" :chain="row.chain" :status="row.status" @updataRow= "(status)=>{ row.status= status}"/>
           </div>
         </template>
       </el-table-column>
     </el-table>
-    <TradeDialog v-model="copyTradeVisible" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core'
-import type { KolObj } from '@/api/types/kol'
+import { type CopyObj } from '@/api/copyTrade'
 import TradeDialog from '../tradeDialog.vue'
-const { copyTradeVisible } = storeToRefs(useCopyTradeStore())
-const props = defineProps({
-  tableData: {
-    type: Array,
-    default: () => {
-      return []
-    },
-  },
-  tableIndex: {
-    type: Number,
-    default: 0,
-  },
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-})
-const { tableData, tableIndex, loading } = toRefs(props)
+import Operate from '../operate.vue'
+const { copyTradeVisible, copyObj, copyOrderLoading, copyOrder  } = storeToRefs(useCopyTradeStore())
+
 const { t } = useI18n()
 const router = useRouter()
-
 const { height } = useWindowSize()
-const scrollbarHeight = computed(() => {
-  return useGlobalStore().tokenHistoryVisible ? 'calc(100vh - 182px)' : 'calc(100vh - 150px)'
+const tableData = computed(() => {
+  return copyOrder.value?.copyList  || []
 })
-function tableRowClick(row: KolObj) {
+const loading = computed(() => {
+  return copyOrderLoading.value
+})
+const scrollbarHeight = computed(() => {
+  return useGlobalStore().tokenHistoryVisible ? 'calc(100vh - 182px - 80px)' : 'calc(100vh - 150px -80px)'
+})
+function tableRowClick(row: CopyObj) {
+  copyObj.value = row
   const routeData = router.resolve({
     name: 'copy-trade-wallet',
     params: {
-      userAddress: row.wallet_address,
+      userAddress: row.followAddress,
       chain: row.chain,
     },
+    query: {
+      followAddress: row.followAddress,
+      creatorAddress: row.creatorAddress,
+      id: row.id
+    }
   })
-  console.log('-----routeData----',routeData,row.wallet_address,row.chain)
   window.open(routeData.href, '_blank')
 }
 </script>
@@ -142,7 +179,7 @@ function tableRowClick(row: KolObj) {
   justify-content: center;
   align-items: center;
   padding: 80px 0;
-  min-height: calc(100vh - 200px);
+  min-height: calc(100vh - 300px);
 }
 .ellipsis {
   max-width: 100%;

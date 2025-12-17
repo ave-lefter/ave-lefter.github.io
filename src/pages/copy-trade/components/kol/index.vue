@@ -514,22 +514,22 @@
               <div class="mr-40px">
                 <div class="flex-end">
                   <span class="text-12px mr-4px color-[--secondary-text]">
-                    {{ filterForm['profit_percent_num'].profit_obj.profit_above_900_percent_num.name }}
+                    {{ filterForm['profit_percent_num']?.profit_obj?.profit_above_900_percent_num?.name }}
                   </span>
                   <span
                     class="color-text-3 bg-smart"
-                    :class="row?.profit_above_900_percent_num > 0 ? `bg-${filterForm['profit_percent_num'].profit_obj.profit_above_900_percent_num.color}-1` : 'bg-gray-1'"
+                    :class="row?.profit_above_900_percent_num > 0 ? `bg-${filterForm['profit_percent_num']?.profit_obj?.profit_above_900_percent_num?.color}-1` : 'bg-gray-1'"
                   >
                     {{ formatNumber(row?.profit_above_900_percent_num || 0, 2) }}
                   </span>
                 </div>
                 <div class="mt-10px flex-end">
                   <span class="text-12px mr-4px color-[--secondary-text]">
-                    {{ filterForm['profit_percent_num'].profit_obj.profit_300_900_percent_num.name }}
+                    {{ filterForm['profit_percent_num'].profit_obj?.profit_300_900_percent_num.name }}
                   </span>
                   <span
                     class="color-text-3 bg-smart"
-                    :class="row?.profit_300_900_percent_num > 0 ? `bg-${filterForm['profit_percent_num'].profit_obj.profit_300_900_percent_num.color}-1` : 'bg-gray-1'"
+                    :class="row?.profit_300_900_percent_num > 0 ? `bg-${filterForm['profit_percent_num']?.profit_obj?.profit_300_900_percent_num.color}-1` : 'bg-gray-1'"
                   >
                     {{ formatNumber(row?.profit_300_900_percent_num || 0, 2) }}
                   </span>
@@ -538,7 +538,7 @@
               <div>
                 <div class="flex-end">
                   <span class="text-12px mr-4px color-[--secondary-text]">
-                    {{ filterForm['profit_percent_num'].profit_obj.profit_100_300_percent_num.name }}
+                    {{ filterForm['profit_percent_num']?.profit_obj?.profit_100_300_percent_num?.name }}
                   </span>
                   <span
                     class="color-text-3 bg-smart"
@@ -549,11 +549,11 @@
                 </div>
                 <div class="mt-10px flex-end">
                   <span class="text-12px mr-4px color-[--secondary-text]">
-                    {{ filterForm['profit_percent_num'].profit_obj.profit_10_100_percent_num.name }}
+                    {{ filterForm['profit_percent_num']?.profit_obj?.profit_10_100_percent_num.name }}
                   </span>
                   <span
                     class="color-text-3 bg-smart"
-                    :class="row?.profit_10_100_percent_num > 0 ? `bg-${filterForm['profit_percent_num'].profit_obj.profit_10_100_percent_num.color}-1` : 'bg-gray-1'"
+                    :class="row?.profit_10_100_percent_num > 0 ? `bg-${filterForm['profit_percent_num']?.profit_obj?.profit_10_100_percent_num.color}-1` : 'bg-gray-1'"
                   >
                     {{ formatNumber(row?.profit_10_100_percent_num || 0, 2) }}
                   </span>
@@ -659,13 +659,16 @@
             <span class="mr-7px">{{ $t('operation') }}</span>
           </template>
           <template #default="{ row }">
-            <div class="flex-end" @click.stop>
-              <a class="trade" :href="`https://t.me/AveSniperBot?start=fs-${row.chain}-${row.wallet_address}`"  target="_blank">
+           <div class="flex-end" @click.stop >
+              <a v-if="judgeIsCopyTrade(row)" href="" class="trade" @click.stop.prevent="jumpCopyTrade(row)">
                 <img src="@/assets/images/tg1.png" alt="" :width="12">
-                {{ $t('copyTrade') }}
+                 {{ $t('copiedTrade') }}
+              </a>
+              <a v-else href="" class="trade" @click.stop.prevent="copyTrade(row)">
+                <img src="@/assets/images/tg1.png" alt="" :width="12">
+                  {{ $t('copyTrade1') }}
               </a>
             </div>
-
           </template>
         </el-table-column>
       </el-table>
@@ -835,6 +838,7 @@ const props = defineProps({
 })
 const {activeTab,tableData,tableIndex, handleSortChange, conditions, pageNO, pageSize,isActiveFilter, handleFilterConfirm, handleSort, handleReset, filterForm, loading,openTimeList,activeInterval }= toRefs(props)
 const { t } = useI18n()
+const botStore = useBotStore()
 const router = useRouter()
 const buttonTagRef = ref<HTMLElement | null>(null)
 const toolTipTagVisible = shallowRef(false)
@@ -981,6 +985,50 @@ function scrollToTop() {
       top: 0,
       behavior: 'smooth',
     })
+  }
+}
+const { activeCopyAddress, copyTradeVisible, form, copyOrder } = storeToRefs(useCopyTradeStore())
+
+function judgeIsCopyTrade(row:KolObj) {
+  const supportAddress = activeCopyAddress.value?.[row.chain] || []
+  return supportAddress?.some(i => i?.toLowerCase() === row.wallet_address?.toLowerCase())
+}
+function getCopyTradeId(row:KolObj) {
+  const order = copyOrder.value?.copyList?.find(i=> i?.followAddress?.toLowerCase() === row.wallet_address?.toLowerCase() && i.chain == row.chain)
+  return order?.id || ''
+}
+
+function jumpCopyTrade(row: KolObj) {
+  const id = getCopyTradeId(row)
+  const currentUser = botStore?.userInfo?.addresses?.find?.((el) => row?.chain == el.chain)
+  if (id && currentUser?.address) {
+    console.log('----currentUser--------',currentUser)
+    const routeData = router.resolve({
+      name: 'copy-trade-wallet',
+      params: {
+        userAddress: row.wallet_address,
+        chain: row.chain,
+      },
+      query: {
+        followAddress: row.wallet_address,
+        creatorAddress: currentUser?.address,
+        id: id
+      }
+    })
+    window.open(routeData.href, '_blank')
+  } else {
+    const url =`https://t.me/AveSniperBot?start=fs-${row.chain}-${row.wallet_address}`
+    window.open(url, '_blank')
+  }
+}
+function copyTrade(row: KolObj) {
+  if (botStore.evmAddress) {
+    copyTradeVisible.value = true
+    form.value.followAddress = row.wallet_address
+    form.value.chain = row.chain
+  } else {
+    const url =`https://t.me/AveSniperBot?start=fs-${row.chain}-${row.wallet_address}`
+    window.open(url, '_blank')
   }
 }
 </script>

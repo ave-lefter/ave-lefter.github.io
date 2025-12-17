@@ -1,214 +1,175 @@
 <template>
   <div>
     <el-table
-      :key="tableIndex"
       ref="table_ref"
       :data="tableData"
-      :default-sort="{
-        prop: conditions.sort,
-        order: conditions.sort_dir ? conditions.sort_dir + 'ending' : null,
-      }"
       fit
       style="width: 100%"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
       cell-class-name="color-[--secondary-text]"
       row-class-name="cursor-pointer"
       @row-click="jumpBalance"
-      @sort-change="handleSortChange"
     >
       <template #empty>
-        <AveEmpty v-if="!loading && tableData.length===0" class="pt-[40px]"/>
-        <span v-else/>
+        <AveEmpty v-if="!loading && tableData.length === 0" class="pt-[40px]" />
+        <span v-else />
       </template>
-      <TokenColumn
-        :column-props="{
-          label: $t('walletToken')+'/'+$t('recentlyTrade'),
-          width: '210',
-          fixed: 'left',
-          sortable: 'custom',
-          sortOrders: ['descending', 'ascending', null],
-          prop: 'last_txn_time',
-        }"
-      >
-        <template v-if="isSelfAddress && (walletStore.walletName!=='WatchWallet')" #default="{ row }">
-          <Icon
-            name="bx:bxs-hide"
-            class="absolute top-0 left-0 hidden bxs-hide cursor-pointer color-[--secondary-text]"
-            @click.self.stop="hideToken(row)"
-          />
-        </template>
-      </TokenColumn>
-      <el-table-column
-        :label="$t('total_profit')"
-        :sort-orders="['descending', 'ascending', null]"
-        align="right"
-        prop="total_profit"
-        sortable="custom"
-      >
-        <template #default="{ row }">
-          <span v-if="row?.total_profit > 0" class="color-[--up-color]">
-            ${{ formatNumber(row?.total_profit || 0, 2) }}
-          </span>
-          <span v-else-if="row?.total_profit == 0">$0</span>
-          <span v-else-if="row?.total_profit == '--'">--</span>
-          <span v-else class="color-[--down-color]">
-            {{ '-$' + formatNumber(Math.abs(row?.total_profit) || 0, 2) }}
-          </span>
-          <span class="block lh-17px color-[--third-text]">
-            <template v-if="row?.total_profit_ratio == 0">0</template>
-            <template v-else-if="row?.total_profit_ratio == '--'">--</template>
-            <template v-else>
-              <span :style="{ color: row?.total_profit_ratio > 0 ? 'color-[--up-color]' : 'color-[--down-color]' }">
-                {{ formatNumber(row?.total_profit_ratio * 100 || 0, 2) }}%
-              </span>
-            </template>
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('total_unrealized_profit')"
-        :sort-orders="['descending', 'ascending', null]"
-        align="right"
-        prop="unrealized_profit"
-        sortable="custom"
-      >
-        <template #default="{ row }">
-          <div v-if="row?.unrealized_profit == 0 && row.balance_amount == 0" class="color-[--down-color] text-12px">
-            {{$t('sellAl')}}
-          </div>
-          <div v-else>
-            <span v-if="row?.unrealized_profit > 0" class="color-[--up-color]">
-              ${{ formatNumber(row?.unrealized_profit || 0, 2) }}
-            </span>
-            <span v-else-if="row?.unrealized_profit == 0">$0</span>
-            <span v-else-if="row?.unrealized_profit == '--'">--</span>
-            <span v-else class="color-[--down-color]">
-              {{ '-$' + formatNumber(Math.abs(row?.unrealized_profit) || 0, 2) }}
-            </span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('balance1')"
-        :sort-orders="['descending', 'ascending', null]"
-        align="right"
-        prop="balance_usd"
-        sortable="custom"
-      >
+      <el-table-column :label="$t('type')" align="left" fixed="left" v-if="type === 'success' || type === 'failed'">
         <template #header>
-          <span class="inline-flex items-center" >
-            {{ $t('balance1') }}
-            <Icon
-              name="custom:price"
-              :class="`${injecteIsVolUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer ml-3px`"
-              @click.stop.prevent="injecteIsVolUSDT=!injecteIsVolUSDT"
-            />
-          </span>
+          <span>{{ $t('type') }}</span>
+          <el-popover
+            v-model:visible="filterForm.type.visible"
+            placement="bottom"
+            :width="207"
+            trigger="click"
+          >
+            <template #reference>
+              <Icon
+                name="custom:filter"
+                class="cursor-pointer text-10px ml-3px"
+                :class="!trendQuery.checkAll ? 'color-[--primary-color]' : 'color-[--third-text]'"
+              />
+            </template>
+            <template #default>
+              <div>
+                <el-checkbox
+                  v-model="filterForm.type.checkAll"
+                  :indeterminate="filterForm.type.isIndeterminate"
+                  @change="handleCheckAllChange"
+                >
+                  {{ $t('all') }}
+                </el-checkbox>
+                <el-checkbox-group
+                  v-model="filterForm.type.checkedTrend"
+                  class="flex flex-col"
+                  @change="handleCheckedChange"
+                >
+                  <el-checkbox
+                    v-for="(item, $index) in trendTypeList"
+                    :key="$index"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                    {{ item.name }}
+                  </el-checkbox>
+                </el-checkbox-group>
+              </div>
+              <div class="mt-20px flex justify-between">
+                <el-button
+                  size="default"
+                  class="h-30px flex-1"
+                  @click.stop="cancel"
+                >
+                  {{ $t('cancel') }}
+                </el-button>
+                <el-button
+                  size="default"
+                  type="primary"
+                  class="h-30px flex-1"
+                  @click.stop="confirmTypeFilter"
+                >
+                  {{ $t('confirm') }}
+                </el-button>
+              </div>
+            </template>
+          </el-popover>
         </template>
         <template #default="{ row }">
-          <div v-if="row.balance_amount == 0 && row.total_sold > 0" class="color-[--down-color] text-12px">{{$t('sellAl')}}</div>
-          <div v-else>
-            <span v-if="row?.balance_usd == 0">0</span>
-            <span v-else-if="row?.balance_usd == '--'">--</span>
-            <span v-else class="flex justify-end">
-              <template v-if="!injecteIsVolUSDT">
-                {{
-                  row?.main_token_price == 0
-                    ? 0
-                    : formatNumber(row?.balance_usd / row?.main_token_price || 0, 2)
-                }}
-                <span class="text-12px color-[--d-999-l-666] ml-3px">{{ row?.main_token_symbol }}</span>
-              </template>
-              <template v-else>
-                {{ '$' + formatNumber(row?.balance_usd || 0, 2) }}
-              </template>
-            </span>
-            <span
-                class="block text-12px lh-17px color-[--third-text]"
-            >
-              <template v-if="row?.balance_amount == 0">0</template>
-              <template v-else-if="row?.balance_amount == '--'">--</template>
-              <template v-else>
-                {{ formatNumber(row?.balance_amount || 0, 2) }}
-              </template>
-            </span>
+          <span v-if="row.swapType ==7" class="bg-[#12B8861A] color-[--up-color] px-4px rounded-2px ml-5px text-10px"
+            >买入</span
+          >
+          <span v-else class="bg-[#F6465D1A] color-[--down-color] px-4px rounded-2px ml-5px text-10px">卖出</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('token')" align="left">
+        <template #default="{ row }">
+          <NuxtLink
+            class="px-10px flex items-center h-50px cursor-pointer hover:bg-[--dialog-bg]"
+            :to="`/token/${row.token}-${row.chain}`"
+          >
+            <div class="flex items-center flex-1">
+              <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+                <template #default>
+                  <TokenImg class="mr-8px" :row="row" />
+                </template>
+                <template #content>
+                  <TokenImg
+                    :row="row"
+                    chain-class="hidden"
+                    token-class="w-240px h-240px [&&]:mr-0 rounded-16px"
+                  />
+                </template>
+              </el-tooltip>
+              <div class="flex flex-col items-start">
+                <span class="text-12px flex items-center">
+                  {{ row.symbol }}
+                  <img
+                    v-if="row.issue_platform"
+                    v-tooltip="row.issue_platform"
+                    class="ml-5px w-10px h-10px rounded-full"
+                    :src="formatIconTag(row.issue_platform)"
+                    alt=""
+                  />
+                </span>
+              </div>
+            </div>
+          </NuxtLink>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('totalPnL')" align="right" prop="token_profit_rate" :min-width="110" v-if="type === 'token'">
+        <template #default="{ row }">
+          <div>
+            <div :class="!row?.totalProfit ? 'color-text-3' : ''">
+              ${{ row?.totalProfit > 0 ? formatNumber(row?.totalProfit || 0, 2) : 0 }}
+            </div>
+            <div class="text-12px">
+              <span v-if="row?.totalProfitRatio > 0" class="color-[--up-color]">
+                {{ formatNumber(row?.totalProfitRatio || 0,2) }}%
+              </span>
+              <span v-else-if="row?.totalProfitRatio < 0" class="color-[--down-color]">
+                {{ formatNumber(row?.totalProfitRatio || 0,2) }}%
+              </span>
+              <span v-else class="color-[--third-text]">0</span>
+            </div>
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('wallet_detail_total_buy_avg')" align="right">
+      <el-table-column :label="$t('positionsValue')" align="right" :min-width="110" v-if="type === 'success' || type === 'token'">
         <template #default="{ row }">
-          <span v-if="row?.total_purchase_usd == 0">0</span>
-          <span v-else-if="row?.total_purchase_usd == '--'">--</span>
-          <span v-else>
-            {{ '$' + formatNumber(row?.total_purchase_usd || 0, 2) }}
-          </span>
-          <span
-              class="block text-12px lh-17px color-[--third-text]"
-          >
-            <template v-if="row?.average_purchase_price_usd == 0">0</template>
-            <template v-else-if="row?.average_purchase_price_usd == '--'">--</template>
-            <template v-else>
-              {{ '$' + formatNumber(row?.average_purchase_price_usd || 0, 2) }}
-            </template>
-          </span>
+          <div :class="!row?.value ? 'color-text-3' : ''">
+            ${{ row?.value > 0 ? formatNumber(row?.value || 0, 2) : 0 }}
+          </div>
         </template>
       </el-table-column>
-
-      <el-table-column :label="$t('wallet_detail_total_sell_avg')" align="right">
+      <el-table-column :label="$t('price')" align="right" :min-width="110" v-if="type === 'success' || type === 'token'">
         <template #default="{ row }">
-          <span v-if="row?.total_sold_usd == 0">0</span>
-          <span v-else-if="row?.total_sold_usd == '--'">--</span>
-          <span v-else>
-            {{ '$' + formatNumber(row?.total_sold_usd || 0, 2) }}
-          </span>
-          <span
-              class="block text-12px lh-17px color-[--third-text]"
-          >
-            <template v-if="row?.average_sold_price_usd == 0">0</template>
-            <template v-else-if="row?.average_sold_price_usd == '--'">--</template>
-            <template v-else>
-              {{ '$' + formatNumber(row?.average_sold_price_usd || 0, 2) }}
-            </template>
-          </span>
+          <div :class="!row?.price ? 'color-text-3' : ''">
+            ${{ row?.price > 0 ? formatNumber(row?.price || row?.price || 0 ) : 0 }}
+          </div>
         </template>
       </el-table-column>
-
-      <el-table-column :label="$t('wallet_detail_transfer_in_out')" align="right">
+      <el-table-column :label="$t('amount')" align="right" :min-width="110">
         <template #default="{ row }">
-          <template v-if="row?.total_transfer_in_amount == 0">0</template>
-          <template v-else-if="row?.total_transfer_in_amount == '--'">--</template>
-          <span v-else class="color-[--up-color]">
-            {{ formatNumber(row?.total_transfer_in_amount || 0, 2) }}
-          </span>
-          <span
-              class="block lh-17px color-[--third-text]"
-          >
-            <template v-if="row?.total_transfer_out_amount == 0">0</template>
-            <template v-else-if="row?.total_transfer_out_amount == '--'">--</template>
-            <span v-else class="color-[--down-color]">
-              {{ formatNumber(row?.total_transfer_out_amount || 0, 2) }}
-            </span>
-          </span>
+          <div :class="!row?.amount ? 'color-text-3' : ''">
+            {{ row?.amount > 0 ? formatNumber(row?.amount || 0, 2) : 0 }}
+          </div>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('wallet_detail_tx_count')" align="right">
+      <el-table-column :label="$t('time')" align="right" :min-width="110">
         <template #default="{ row }">
-          <template v-if="row?.total_purchase == 0">0</template>
-          <template v-else-if="row?.total_purchase == '--'">--</template>
-          <span v-else class="color-[--up-color]">
-            {{ formatNumber(row?.total_purchase || 0, 2) }}
-          </span>
-          <span class="color-[--secondary-text]">/</span>
-          <template v-if="row?.total_sold == 0">0</template>
-          <template v-else-if="row?.total_sold == '--'">--</template>
-          <span v-else class="color-[--down-color]">
-            {{ formatNumber(row?.total_sold || 0, 2) }}
-          </span>
+          {{ Number(row?.lastSwap) >0? formatDate(row?.lastSwap || 0, 'YYYY-MM-DD HH:mm') : '--' }}
         </template>
       </el-table-column>
-      <el-table-column label="所属链" align="right">
+      <el-table-column :label="$t('reasonFailure')" align="right" v-if="type === 'failed'">
         <template #default="{ row }">
-           solana
+          <span class="color-[--down-color] text-12px">{{ row.errorLog }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('chain')" align="right">
+        <template #default="{ row }">
+          <div class="flex-end">
+            <ChainToken :chain="row.chain" :width="16" />
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -216,78 +177,119 @@
 </template>
 
 <script setup lang="ts">
-import TokenColumn from '@/components/tokenColumn.vue'
 import AveEmpty from '@/components/aveEmpty.vue'
+import { formatExplorerUrl } from '@/utils/index'
 const props = defineProps({
   tableData: {
     type: Array,
     default: () => [],
   },
-  tableIndex: {
-    type: Number,
-    default: 0,
-  },
-  handleSortChange: {
-    type: Function,
-    default: () => {},
-  },
-  conditions: {
-    type: Object,
-    default: () => {},
-  },
-  handleSort: {
-    type: Function,
-    default: () => {},
-  },
   loading: {
     type: Boolean,
     default: false,
   },
-  pageNO: {
-    type: Number,
-    default: 1,
+  type: {
+    type: String,
+    default: '',
   },
-  pageSize: {
-    type: Number,
-    default: 10,
-  },
-  isSelfAddress: Boolean,
+
   address: String,
 })
-
-const _emit = defineEmits(['hideToken'])
+const { tableData, loading, type, address } = toRefs(props)
+const emit = defineEmits(['search'])
+defineExpose({ reset })
+const { t } = useI18n()
 const hideTokenVisible = ref(false)
 const currentHideToken = ref({})
-const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
-const themeStore = useThemeStore()
-const walletStore = useWalletStore()
+const injecteIsVolUSDT = shallowRef(false)
 const tokenDetailSStore = useTokenDetailsStore()
 const route = useRoute()
 function jumpBalance(row) {
-  tokenDetailSStore.$patch({
-    drawerVisible: true,
-    tokenInfo: {
-      id: row.token + '-' + row.chain,
-      symbol: row.symbol,
-      logo_url: row.logo_url,
-      chain: row.chain,
-      address: row.token,
-      remark: '',
-    },
-    pairInfo: {
-      target_token: row.token,
-      token0_address: row.token,
-      token0_symbol: row.symbol,
-      token1_symbol: '',
-      pairAddress: '',
-    },
-    user_address: route.params.userAddress as string || useBotStore().getWalletAddress(row.chain) || useWalletStore().address,
-  })
+  if (type.value == 'token') {
+    tokenDetailSStore.$patch({
+      drawerVisible: true,
+      tokenInfo: {
+        id: row.token + '-' + row.chain,
+        symbol: row.symbol,
+        logo_url: row.logo_url,
+        chain: row.chain,
+        address: row.token,
+        remark: '',
+      },
+      pairInfo: {
+        target_token: row.token,
+        token0_address: row.token,
+        token0_symbol: row.symbol,
+        token1_symbol: '',
+        pairAddress: '',
+      },
+      user_address:
+        (route.params.userAddress as string) ||
+        useBotStore().getWalletAddress(row.chain) ||
+        useWalletStore().address,
+    })
+  } else {
+    const url = formatExplorerUrl(row?.chain as string, row?.followHash as string || row?.txHash as string, 'tx')
+    window.open(url)
+  }
+}
+const trendQuery = ref({
+  checkAll: true,
+})
+
+const filterForm = ref({
+  type: {
+    visible: false,
+    checkAll: false,
+    checkedTrend: [],
+    isIndeterminate: false,
+  },
+})
+const trendTypeList = computed(() => [
+  { id: 'buy', name: '买入' },
+  { id: 'sell', name: '卖出' },
+])
+function handleCheckAllChange(val) {
+  filterForm.value.type.checkedTrend = val ? trendTypeList.value?.map((i) => i.id) : []
+  filterForm.value.type.isIndeterminate = false
 }
 
-function hideToken(row) {
-  hideTokenVisible.value = true
-  currentHideToken.value = row
+function handleCheckedChange(val) {
+  const checkedCount = val.length
+  const checkAll = checkedCount === trendTypeList.value.length
+  const isIndeterminate = checkedCount > 0 && checkedCount < trendTypeList.value.length
+  filterForm.value.type.checkAll = checkAll
+  filterForm.value.type.isIndeterminate = isIndeterminate
+}
+
+function confirmTypeFilter() {
+  emit('search', { type: filterForm.value.type.checkAll? 'all': filterForm.value.type.checkedTrend })
+  filterForm.value.type.visible = false
+}
+function reset() {
+  filterForm.value.type.checkAll = true
+  filterForm.value.type.checkedTrend = ['buy', 'sell']
+  filterForm.value.type.isIndeterminate = true
+}
+function cancel() {
+  reset()
+  confirmTypeFilter()
+}
+const ERROR_MAP: Array<{ match: string; text: string }> = [
+  { match: 'insufficient gas', text: t('copyErrorLog2') },
+  { match: 'insufficient funds', text: t('copyErrorLog3') },
+  { match: 'token high risk', text: t('copyErrorLog4') },
+  { match: 'liquidity below', text: t('copyErrorLog5') },
+  { match: 'small in amount', text: t('copyErrorLog6') },
+  { match: 'slippage', text: t('copyErrorLog7') },
+  { match: 'simulate err', text: t('copyErrorLog8') },
+]
+
+function mapTradeErrorMessage(errorLog?: string) {
+  if (!errorLog) return t('copyErrorLog1')
+  const msg = errorLog.toLowerCase()
+  const found = ERROR_MAP.find(item => msg.includes(item.match))
+  return found?.text ?? t('copyErrorLog1')
 }
 </script>
 

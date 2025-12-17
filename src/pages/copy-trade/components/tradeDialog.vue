@@ -1,49 +1,51 @@
 <template>
   <el-drawer
     v-model="visible"
-    class="[&&]:bg-[--dialog-bg]"
+    class="[&&]:bg-[--dialog-bg] hidden-scrollbar"
     :size="720"
     header-class="!mb-5 [&&]:color-[--main-text]"
+    append-to-body
   >
     <template #header>
-      <span class="color-[--main-text]">钱包跟单</span>
+      <span class="color-[--main-text]">{{ $t('walletCopyTrade') }}</span>
     </template>
     <el-divider class="!m-0 !mb-5 !border-t-[--dialog-divider]" />
     <div class="px-20px">
-      <div class="text-14px flex-start">
-        <Icon name="custom:new-trade" class="text-12px mr-4px" />
-        <span>新手跟单模版</span>
-      </div>
-      <div class="flex-between gap-16px mt-8px">
-        <div
-          class="item bg-[--border] px-12px py-12px rounded-8px"
-          v-for="(item, $index) in strategyList"
-          :key="$index"
-        >
-          <div class="flex-between text-14px">
-            <span class="color-[--main-text]">{{ item.label }}</span>
-            <a href="" class="!color-[--yellow]">一键应用</a>
-          </div>
-          <div class="color-[--secondary-text] text-12px mt-12px leading-[1.5]">
-            {{ item.description }}
-          </div>
-        </div>
-      </div>
       <el-form
         ref="formRef"
-        class="hide-scrollbar"
+        class="mt-18px"
+        :rules="rules"
         :model="form"
         label-width="auto"
         autocomplete="off"
         label-position="left"
-        @submit.prevent
+        @submit.prevent="createFollowOrder"
       >
-        <el-scrollbar view-class="filter-height">
-          <el-form-item label="钱包地址" label-position="top" prop="followAddress">
-            <el-input v-model.trim="form.followAddress" clearable placeholder="请输入钱包地址" />
+        <el-scrollbar class="filter-height hidden-scrollbar">
+          <div class="text-14px flex-start">
+            <Icon name="custom:new-trade" class="text-12px mr-4px" />
+            <span>{{ $t('noviceOrderTemplate') }}</span>
+          </div>
+          <div class="flex-between gap-16px mt-8px mb-19px">
+            <div
+              class="item bg-[--border] px-12px py-12px rounded-8px hover:opacity-80"
+              v-for="(item, $index) in strategyList"
+              :key="$index"
+            >
+              <div class="flex-between text-14px">
+                <span class="color-[--main-text]">{{ item.label }}</span>
+                <a href="" class="!color-[--yellow]" @click.stop.prevent="apply(item.id)">{{ $t('oneClickApplication') }}</a>
+              </div>
+              <div class="color-[--secondary-text] text-12px mt-12px leading-[1.5]">
+                {{ item.description }}
+              </div>
+            </div>
+          </div>
+          <el-form-item :label="$t('walletAddress')" label-position="top" prop="followAddress">
+            <el-input v-model.trim="form.followAddress" clearable :placeholder="$t('enterAddress')" />
           </el-form-item>
-          <el-form-item label="所属公链" label-position="top">
-            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.chain" >
+          <el-form-item :label="$t('chain')" label-position="top">
+            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.chain">
               <template #prefix>
                 <ChainToken :chain="form.chain" :width="16" />
               </template>
@@ -60,7 +62,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="跟单方式" label-position="top" prop="buyType">
+          <el-form-item :label="$t('copyTradeMethod')" label-position="top">
             <div class="tabs">
               <button
                 v-for="item in tabs"
@@ -79,21 +81,37 @@
               </button>
             </div>
           </el-form-item>
-          <el-form-item label="" label-position="top" :prop="form.address">
+          <el-form-item prop="buyAmount">
             <template v-if="form.buyType === 2">
-            <el-input v-model.trim="form.buyAmount" clearable placeholder="0.00">
-              <template #suffix>
-                <span>{{ getChainInfo(form.chain || '')?.main_name }}</span>
-              </template>
-            </el-input>
+              <el-input
+                v-model.trim.number="form.buyAmount"
+                clearable
+                placeholder="0.00"
+                @input="(val) => onValidateInput(val, 'buyAmount')"
+              >
+                <template #suffix>
+                  <span>{{ getChainInfo(form.chain || '')?.main_name }}</span>
+                </template>
+              </el-input>
             </template>
             <template v-else-if="form.buyType === 3">
-              <el-input v-model.trim="form.maxBuyRatio" clearable placeholder="固定比例">
+              <el-input
+                v-model.trim="form.maxBuyRatio"
+                clearable
+                :placeholder="$t('fixedRatio')"
+                @input="(val) => onValidateInput(val, 'maxBuyRatio')"
+              >
                 <template #suffix>
                   <span>%</span>
                 </template>
               </el-input>
-              <el-input class="mt-10px" v-model.trim="form.buyAmount" clearable placeholder="最大买入金额">
+              <el-input
+                class="mt-10px"
+                v-model.trim="form.buyAmount"
+                clearable
+                :placeholder="$t('maxBuyAmount')"
+                @input="(val) => onValidateInput(val, 'buyAmount')"
+              >
                 <template #suffix>
                   <span>{{ getChainInfo(form.chain || '')?.main_name }}</span>
                 </template>
@@ -103,20 +121,17 @@
               <span class="text-12px color-[--main-text]"
                 >≈$
                 {{
-                  formatNumber(
-                    (currentUser?.price || 0) * Number(currentUser?.balance || 0),
-                    1
-                  )
+                  formatNumber((currentUser?.price || 0) * Number(currentUser?.balance || 0), 1)
                 }}</span
               >
               <span class="text-12px color-[--third-text]"
-                >可用余额: {{ formatNumber(currentUser?.balance || 0, 5) }}
+                >{{ $t('balance1') }}: {{ formatNumber(currentUser?.balance || 0, 5) }}
                 {{ getChainInfo(currentUser?.chain || '')?.main_name }}</span
               >
             </div>
           </el-form-item>
-          <el-form-item label="卖出方式" label-position="top" :prop="chain">
-            <el-select style="width: 100%" v-model="form.sellType">
+          <el-form-item :label="$t('buyType')" label-position="top">
+            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.sellType">
               <el-option
                 v-for="(item, $index) in sellTypeList"
                 :key="$index"
@@ -126,22 +141,38 @@
                 {{ item.name }}
               </el-option>
             </el-select>
-            <template v-if="form.sellType === 2">
-              <el-input class="mt-10px" v-model.trim="form.takeProfitRatio" clearable placeholder="止盈比例">
-                <template #suffix>
-                  <span>%</span>
-                </template>
-              </el-input>
-              <el-input class="mt-10px" v-model.trim="form.stopLossRatio" clearable placeholder="止损比例">
-                <template #suffix>
-                  <span>%</span>
-                </template>
-              </el-input>
-            </template>
           </el-form-item>
-          <el-form-item label="跳过已买入Token" label-position="left">
+          <template v-if="form.sellType === 2">
+            <el-form-item prop="takeProfitRatio">
+              <el-input
+                class="mt-10px"
+                v-model.trim="form.takeProfitRatio"
+                clearable
+                :placeholder="$t('takeProfitRatio')"
+                @input="(val) => onValidateInput(val, 'takeProfitRatio')"
+              >
+                <template #suffix>
+                  <span>%</span>
+                </template>
+              </el-input>
+            </el-form-item>
+            <el-form-item prop="stopLossRatio">
+              <el-input
+                class="mt-10px"
+                v-model.trim="form.stopLossRatio"
+                clearable
+                :placeholder="$t('stopLossRatio')"
+                @input="(val) => onValidateInput(val, 'stopLossRatio')"
+              >
+                <template #suffix>
+                  <span>%</span>
+                </template>
+              </el-input>
+            </el-form-item>
+          </template>
+          <el-form-item :label="$t('ignoreHeld')" label-position="left">
             <el-switch
-              v-model="form.buyOnce"
+              v-model="form.ignoreHeld"
               class="ml-auto"
               style="--el-switch-on-color: #3c6cf6; zoom: 0.9; height: 14px"
             />
@@ -149,12 +180,12 @@
           <el-form-item>
             <div class="w-full">
               <div class="flex-between">
-                <span class="text-16px">高级设置</span>
+                <span class="text-16px">{{ $t('advanced') }}</span>
                 <div
                   @click="isExpanded = !isExpanded"
                   class="flex-center cursor-pointer text-12px color-[--primary-color] ml-8px"
                 >
-                  <span>{{ isExpanded ? '收起' : '展开' }}</span>
+                  <span>{{ isExpanded ? $t('Collapse') : $t('Expand') }}</span>
                   <Icon
                     :name="isExpanded ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
                     class="text-16px"
@@ -165,28 +196,29 @@
                   <Icon
                     name="custom:refresh-left"
                     :class="resetLoading ? 'animate-spin' : ''"
-                  />重置
+                  />{{ $t('reset') }}
                 </el-button>
               </div>
               <transition name="fade" v-if="isExpanded">
                 <div>
                   <div class="flex-start item">
-                    <span class="flex-1">买入金额</span>
+                    <span class="flex-1">{{ $t('buyAmount') }}</span>
                     <el-input
-                      v-model.trim.number="form.buy_min"
+                      v-model.trim.number="advancedForm.minBuyValue"
                       class="flex-1"
                       :placeholder="$t('minor')"
                       clearable
                       @blur="
                         (e) =>
                           handleBlur(
-                            ['buy_min', 'buy_max'] as (keyof FormType)[],
+                            ['minBuyValue', 'maxBuyValue'] as (keyof FormType)[],
                             (e.target as HTMLInputElement).value,
                             0
                           )
                       "
                       @input="
-                        (val) => handleInput(['buy_min', 'buy_max'] as (keyof FormType)[], val, 0)
+                        (val) =>
+                          handleInput(['minBuyValue', 'maxBuyValue'] as (keyof FormType)[], val, 0)
                       "
                     >
                       <template #suffix>
@@ -195,20 +227,21 @@
                     </el-input>
                     <span class="gap px-4px">~</span>
                     <el-input
-                      v-model.trim.number="form.buy_max"
+                      v-model.trim.number="advancedForm.maxBuyValue"
                       class="flex-1"
                       :placeholder="$t('max1')"
                       clearable
                       @blur="
                         (e) =>
                           handleBlur(
-                            ['buy_min', 'buy_max'] as (keyof FormType)[],
+                            ['minBuyValue', 'maxBuyValue'] as (keyof FormType)[],
                             (e.target as HTMLInputElement).value,
                             1
                           )
                       "
                       @input="
-                        (val) => handleInput(['buy_min', 'buy_max'] as (keyof FormType)[], val, 1)
+                        (val) =>
+                          handleInput(['minBuyValue', 'maxBuyValue'] as (keyof FormType)[], val, 1)
                       "
                     >
                       <template #suffix>
@@ -217,22 +250,27 @@
                     </el-input>
                   </div>
                   <div class="flex-start item mt-16px">
-                    <span class="flex-1">代币市值</span>
+                    <span class="flex-1">{{ $t('tokenMCap') }}</span>
                     <el-input
-                      v-model.trim.number="form.buy_min"
+                      v-model.trim.number="advancedForm.minMarketCap"
                       class="flex-1"
                       :placeholder="$t('minor')"
                       clearable
                       @blur="
                         (e) =>
                           handleBlur(
-                            ['buy_min', 'buy_max'] as (keyof FormType)[],
+                            ['minMarketCap', 'maxMarketCap'] as (keyof FormType)[],
                             (e.target as HTMLInputElement).value,
                             0
                           )
                       "
                       @input="
-                        (val) => handleInput(['buy_min', 'buy_max'] as (keyof FormType)[], val, 0)
+                        (val) =>
+                          handleInput(
+                            ['minMarketCap', 'maxMarketCap'] as (keyof FormType)[],
+                            val,
+                            0
+                          )
                       "
                     >
                       <template #suffix>
@@ -241,20 +279,25 @@
                     </el-input>
                     <span class="gap px-4px">~</span>
                     <el-input
-                      v-model.trim.number="form.buy_max"
+                      v-model.trim.number="advancedForm.maxMarketCap"
                       class="flex-1"
                       :placeholder="$t('max1')"
                       clearable
                       @blur="
                         (e) =>
                           handleBlur(
-                            ['buy_min', 'buy_max'] as (keyof FormType)[],
+                            ['minMarketCap', 'maxMarketCap'] as (keyof FormType)[],
                             (e.target as HTMLInputElement).value,
                             1
                           )
                       "
                       @input="
-                        (val) => handleInput(['buy_min', 'buy_max'] as (keyof FormType)[], val, 1)
+                        (val) =>
+                          handleInput(
+                            ['minMarketCap', 'maxMarketCap'] as (keyof FormType)[],
+                            val,
+                            1
+                          )
                       "
                     >
                       <template #suffix>
@@ -263,96 +306,41 @@
                     </el-input>
                   </div>
                   <div class="flex-start item mt-16px">
-                    <span class="flex-1">代币创建时间</span>
-                    <el-input
-                      v-model.trim.number="form.buy_min"
-                      class="flex-1"
-                      :placeholder="$t('minor')"
-                      clearable
-                      @blur="
-                        (e) =>
-                          handleBlur(
-                            ['buy_min', 'buy_max'] as (keyof FormType)[],
-                            (e.target as HTMLInputElement).value,
-                            0
-                          )
-                      "
-                      @input="
-                        (val) => handleInput(['buy_min', 'buy_max'] as (keyof FormType)[], val, 0)
-                      "
-                    >
-                      <template #suffix>
-                        <span>$</span>
-                      </template>
-                    </el-input>
-                    <span class="gap px-4px">~</span>
-                    <el-input
-                      v-model.trim.number="form.buy_max"
-                      class="flex-1"
-                      :placeholder="$t('max1')"
-                      clearable
-                      @blur="
-                        (e) =>
-                          handleBlur(
-                            ['buy_min', 'buy_max'] as (keyof FormType)[],
-                            (e.target as HTMLInputElement).value,
-                            1
-                          )
-                      "
-                      @input="
-                        (val) => handleInput(['buy_min', 'buy_max'] as (keyof FormType)[], val, 1)
-                      "
-                    >
-                      <template #suffix>
-                        <span>$</span>
-                      </template>
-                    </el-input>
+                    <span class="flex-1">{{ $t('tokenCreationTime') }}</span>
+                    <DateTime ref="dateTime_Ref" @change="onDateTimeChange" />
                   </div>
                   <div class="flex-start item mt-16px">
-                    <span class="flex-1">跟单生效时间</span>
-                    <el-input
-                      v-model.trim.number="form.buy_min"
-                      class="flex-1"
-                      :placeholder="$t('minor')"
-                      clearable
-                      @blur="
-                        (e) =>
-                          handleBlur(
-                            ['buy_min', 'buy_max'] as (keyof FormType)[],
-                            (e.target as HTMLInputElement).value,
-                            0
-                          )
-                      "
-                      @input="
-                        (val) => handleInput(['buy_min', 'buy_max'] as (keyof FormType)[], val, 0)
-                      "
+                    <span class="flex-1">{{ $t('effectiveCopyTrade') }}</span>
+                    <ClockTime ref="clockTime_Ref" @change="onClockTimeChange" />
+                  </div>
+                  <div class="mt-16px">
+                    <div class="flex-between">
+                      <span class="text-14px">{{ $t('black') }}</span>
+                      <div class="flex-1"></div>
+                      <!-- <el-button class="reset !color-[--yellow]" type="primary">
+                        查看全部
+                        <Icon name="majesticons:arrow-right" />
+                      </el-button> -->
+                    </div>
+                    <div class="flex-start mb-5px" v-for="(token, index) in blacklist" :key="index">
+                      <el-input
+                        v-model.trim="blacklist[index].value"
+                        clearable
+                        :placeholder="$t('plsEnterAddress')"
+                        @blur="validateAddress(index)"
+                      ></el-input>
+                      <Icon
+                        class="text-18px text-[--third-text] cursor-pointer ml-30px hover:color-[--primary-color]"
+                        name="ic:baseline-delete"
+                        @click="removeRow(index)"
+                      />
+                    </div>
+                    <div
+                      class="bg-#3F80F71A flex items-center justify-center gap-8px rounded-8px mt-8px color-[--primary-color] px-12px py-12px cursor-pointer"
+                      @click.stop.prevent="addItem"
                     >
-                      <template #suffix>
-                        <span>$</span>
-                      </template>
-                    </el-input>
-                    <span class="gap px-4px">~</span>
-                    <el-input
-                      v-model.trim.number="form.buy_max"
-                      class="flex-1"
-                      :placeholder="$t('max1')"
-                      clearable
-                      @blur="
-                        (e) =>
-                          handleBlur(
-                            ['buy_min', 'buy_max'] as (keyof FormType)[],
-                            (e.target as HTMLInputElement).value,
-                            1
-                          )
-                      "
-                      @input="
-                        (val) => handleInput(['buy_min', 'buy_max'] as (keyof FormType)[], val, 1)
-                      "
-                    >
-                      <template #suffix>
-                        <span>$</span>
-                      </template>
-                    </el-input>
+                      <Icon name="majesticons:plus-circle-line" />{{ $t('addBlack') }}
+                    </div>
                   </div>
                 </div>
               </transition>
@@ -360,98 +348,199 @@
           </el-form-item>
           <el-form-item>
             <div class="w-full">
-              <div class="flex-between">
-                <span class="text-14px">黑名单代币</span>
-                <div class="flex-1"></div>
-                <el-button class="reset !color-[--yellow]" type="primary">
-                  查看全部
-                  <Icon name="majesticons:arrow-right" />
-                </el-button>
-              </div>
-              <div
-                class="bg-#3F80F71A flex items-center justify-center gap-8px rounded-8px mt-8px color-[--primary-color] px-12px py-12px cursor-pointer"
-              >
-                <Icon name="majesticons:plus-circle-line" />添加代币
-              </div>
-              <span class="text-14px">自动取消与暂停</span>
+              <span class="text-14px">{{ $t('cancelORPause') }}</span>
               <div class="color-[--third-text] text-12px leading-16px">
-                长时间资金不足且未交易，系统会默认该账户处于非活跃状态，会自动暂停策略执行
+                {{ $t('cancelORPauseTip') }}
               </div>
               <span class="text-14px color-[--yellow] flex-start gap-4px mt-16px"
-                ><Icon name="majesticons:info-circle" />提醒事项</span
+                ><Icon name="majesticons:info-circle" />{{ $t('warning') }}</span
               >
               <div class="color-[--yellow] text-12px leading-16px">
-                长时间资金不足且未交易，系统会默认该账户处于非活跃状态，会自动暂停策略执行
+                {{ $t('cancelORPauseTip') }}
               </div>
-              <QuickSwapSet
-                :chain="form.chain"
-                :settingsButtonVisible="true"
-              />
+              <Setting :chain="form.chain" :visible="visible" />
             </div>
           </el-form-item>
-          <el-button type="primary" class="w-full mt-30px" size="large">确认</el-button>
         </el-scrollbar>
       </el-form>
     </div>
+    <template #footer>
+      <div class="form-footer w-full bg-[--dialog-bg]" >
+        <el-button
+          type="primary"
+          size="large"
+          class="w-full"
+          :disabled="disabled"
+          @click.stop.prevent="createFollowOrder"
+          @keydown.enter.prevent="createFollowOrder"
+          :loading="loading"
+          >{{ $t('confirm') }}</el-button
+        >
+      </div>
+  </template>
   </el-drawer>
 </template>
 <script setup lang="ts">
 import SuffixIcon from '~/components/suffixIcon.vue'
 import { getChainInfo } from '@/utils'
-import QuickSwapSet from './quickSwapSet.vue'
+import Setting from './setting.vue'
+import DateTime from './dateTime.vue'
+import ClockTime from './clockTime.vue'
+import { _createFollowOrder } from '~/api/copyTrade'
+import BigNumber from 'bignumber.js'
+import { ElMessage, type FormInstance } from 'element-plus'
+import type { BotChain } from '~/utils/types'
+type TimeUnit = 'second' | 'minute' | 'hour' | 'day'
+const unitMs: Record<TimeUnit, number> = {
+  second: 1000,
+  minute: 60 * 1000,
+  hour: 60 * 60 * 1000,
+  day: 24 * 60 * 60 * 1000,
+}
 const route = useRoute()
 const { t } = useI18n()
 const botStore = useBotStore()
+const { setting, settingCopyTrade, form, advancedForm, blacklist, activeCopyAddress,type } = storeToRefs(useCopyTradeStore())
+const { getFollowingInfo } = useCopyTradeStore()
 const props = defineProps({
   modelValue: Boolean,
 })
 const emit = defineEmits(['update:modelValue'])
 interface FormType {
-  buy_min: string
-  buy_max: string
+  minBuyValue: string
+  maxBuyValue: string
+  minMarketCap: string
+  maxMarketCap: string
 }
-const form = ref({
-  followAddress: '',
-  buyType: 2, // 1:等比例买, 2:固定金额, 3:最大跟买
-  buyAmount: null,
-  maxBuyRatio: null,
-  sellType: 1,//0:手动卖(不跟单卖), 1:自动跟卖, 2:止盈止损
-  takeProfitRatio: null,
-  stopLossRatio: null,
-  buyOnce: false,
-  source: "web",
-  chain: 'bsc',
-  buy_min: '',
-  buy_max: '',
+//新手跟单低频策略
+const lowStrategy = ref({
+  buyType: 2,
+  buyAmount: 0.2,
+  sellType: 2,
+  takeProfitRatio: 100,
+  stopLossRatio: 50,
+  minBuyValue: '300',
+  minMarketCap: '300000',
+  // minTokenAge: 0,
+  // maxTokenAge: 10,
 })
+//新手跟单高频策略
+const highStrategy = ref({
+  buyType: 2,
+  buyAmount: 0.1,
+  sellType: 2,
+  takeProfitRatio: 100,
+  stopLossRatio: 50,
+
+  minBuyValue: '100',
+  minMarketCap: '45000',
+  // minTokenAge: 0,
+  // maxTokenAge: 10,
+})
+const formRef = useTemplateRef<FormInstance>('formRef')
+const loading = shallowRef(false)
 const isExpanded = shallowRef(false)
 const resetLoading = shallowRef(false)
 const visible = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),
 })
-
 const strategyList = ref([
   {
-    label: '高频高倍数策略',
-    value: 'high',
-    description:
-      '以更高交易频次获取短期价差。适用于能承受波动、追求效率与杠杆收益的用户。信号多、变化快，收益与风险同步放大。',
+    label: t('highStrategy'),
+    id: 'high',
+    description:t('highStrategyTip'),
   },
   {
-    label: '低频稳健策略',
-    value: 'low',
-    description:
-      '以低频交易锁定中长期趋势。节奏慢、容错高，更强调稳定回报与风控。适合偏好稳健、抗波动能力较低的用户。',
+    label: t('lowStrategy'),
+    id: 'low',
+    description:t('lowStrategyTip'),
   },
 ])
 const chain = shallowRef('solana')
-const active = ref('tag')
+const clockTime_Ref = ref<InstanceType<typeof ClockTime> | null>(null)
+const dateTime_Ref = ref<InstanceType<typeof DateTime> | null>(null)
+const disabled = computed(() => {
+  if (Number(currentUser.value?.balance) == 0 || !botStore.evmAddress) {
+    return true
+  }
+  if (!form.value.followAddress) {
+    return true
+  }
+  if (form.value.buyType === 2) {
+    if (!form.value.buyAmount) {
+      return true
+    }
+  }
+  if (form.value.buyType === 3) {
+    if (!form.value.buyAmount) {
+      return true
+    }
+    if (!form.value.maxBuyRatio) {
+      return true
+    }
+  }
+  return false
+})
+function validateAddress(index: number) {
+  const value = blacklist.value[index].value
+  const isValid = isValidAddress(value, form.value.chain)
+
+  const firstIndex = blacklist.value.findIndex((item, i) => item.value === value && i !== index)
+  if (firstIndex !== -1) {
+    blacklist.value.splice(index, 1)
+  }
+  if (!isValid) {
+    ElMessage.error(t('pleaseEnterCorrectAddress'))
+    blacklist.value?.splice(index, 1)
+  }
+}
+const validateAddressRule = (rule: any, value: string, callback: (arg0?: Error) => void) => {
+  if (value === '') {
+    callback(new Error(t('cannotBeEmpty')))
+  } else if (!isValidAddress(value, form.value.chain)) {
+    callback(new Error(t('pleaseEnterCorrectAddress')))
+  } else {
+    callback()
+  }
+}
+const validateRatioRule = (rule: any, value: string, callback: (arg0?: Error) => void) => {
+  if (form.value.sellType === 2) {
+    if (!form.value.takeProfitRatio) {
+      callback(new Error(t('cannotBeEmpty')))
+    } else if (!form.value.stopLossRatio) {
+      callback(new Error(t('cannotBeEmpty')))
+    } else {
+      callback()
+    }
+  } else {
+    callback()
+  }
+}
+
+const validateBuyAmountRule = (rule: any, value: string, callback: (arg0?: Error) => void) => {
+  if (!form.value.buyAmount) {
+    callback(new Error(t('cannotBeEmpty')))
+  } else if (form.value?.buyAmount && Number(form.value?.buyAmount || 0) > Number(currentUser.value?.balance || 0)) {
+    callback(new Error(t('insufficientBalance')))
+  } else {
+    callback()
+  }
+}
+const rules = computed(() => {
+  return {
+    followAddress: [{ validator: validateAddressRule, trigger: 'blur' }],
+    takeProfitRatio: [{ validator: validateRatioRule, trigger: 'blur' }],
+    stopLossRatio: [{ validator: validateRatioRule, trigger: 'blur' }],
+    buyAmount: [{ validator: validateBuyAmountRule, trigger: 'change' }],
+  }
+})
+
 const smartChains = computed(() => {
   // 如果是自己的钱包地址且为 bot 钱包那么展示所有的链，链钱包后面再改
   if (botStore.evmAddress) {
     const botChains = botStore.userInfo?.addresses?.filter?.((el) =>
-      SupportFullDataChain.includes(el.chain)
+      SupportFullDataChain.includes(el.chain) && el.chain !=='xlayer'
     )
     console.log('botChains', botChains)
     if (botChains && botChains.length > 0) {
@@ -470,64 +559,235 @@ const currentUser = computed(() => {
 const tabs = computed(() => {
   return [
     {
-      name: '固定金额',
+      name: t('fixedAmount'),
       id: 2,
-      tip: '单次投资金额无论跟单目标地址买入多少金额，每次跟单时将按设定的固定数量进行买入',
+      tip: t('fixedAmountTip'),
     },
     {
-      name: '最大跟买',
+      name: t('maxCopyTrade'),
       id: 3,
-      tip: ' 单次最大投资额若目标地址买入金额 ≥ 最大买入金额，以最大买入金额买入；若目标地址买入金额 < 最大买入金额，将按目标地址的买入金额进行跟单买入。',
+      tip: t('maxCopyTradeTip'),
     },
     {
-      name: '等比例买入',
+      name: t('buyRatio'),
       id: 1,
-      tip: '按比例跟买按设定比例进行买入。120% 表示按跟单买入金额的 1.2 倍进行买入。若您设置了最大买入金额，则跟单买入的最大值不会超过最大买入金额',
+      tip: t('buyRatioTip'),
     },
   ]
 })
-const sellTypeList = computed(()=>{
-  return[
+const sellTypeList = computed(() => {
+  return [
     {
-      name: '手动卖出',
-      id: 0
+      name: t('sellManually'),
+      id: 0,
     },
     {
-      name: '自动跟卖',
-      id: 1
+      name: t('sellAutomatically'),
+      id: 1,
     },
     {
-      name: '止盈止损',
+      name: t('stopLimit'),
       id: 2,
-    }
+    },
   ]
 })
+const tokenBlacklist = computed(() => {
+  return blacklist?.value?.map((i) => i.value) || []
+})
+watch(() => visible.value, (val) => {
+  if (type.value == 2) {
+    const copy_setting_default = localStorage.getItem('copy_setting_add')
+    if (copy_setting_default && JSON.parse(copy_setting_default)?.[form.value.chain]) {
+      settingCopyTrade.value[form.value.chain] = JSON.parse(copy_setting_default)[form.value.chain]
+    }
+  }
+})
+
 function reset() {
   resetLoading.value = true
   setTimeout(() => {
     resetLoading.value = false
+    if(advancedForm.value.maxBuyValue || advancedForm.value.minBuyValue) {
+      advancedForm.value.maxBuyValue = '0'
+      advancedForm.value.minBuyValue = '0'
+    }
+    if(advancedForm.value.maxMarketCap || advancedForm.value.minMarketCap) {
+      advancedForm.value.maxMarketCap = '0'
+      advancedForm.value.minMarketCap = '0'
+    }
+    if(advancedForm.value.enableAt || advancedForm.value.disableAt) {
+      advancedForm.value.enableAt = 0
+      advancedForm.value.disableAt = 0
+      clockTime_Ref.value?.reset()
+    }
+    if(advancedForm.value.maxTokenAge || advancedForm.value.minTokenAge) {
+      advancedForm.value.maxTokenAge = 0
+      advancedForm.value.minTokenAge = 0
+      dateTime_Ref.value?.reset()
+    }
+    if(blacklist.value?.length > 0) {
+      blacklist.value = []
+    }
   }, 500)
+}
+
+const onValidateInput = (val: string, type: string) => {
+  // 1️⃣ 只允许数字和 .
+  let value = val.replace(/[^\d.]/g, '')
+  // 2️⃣ 只允许一个小数点
+  const parts = value.split('.')
+  if (parts.length > 2) {
+    value = parts[0] + '.' + parts.slice(1).join('')
+  }
+  // 3️⃣ 小数点不能放在第一位（可选）
+  if (value.startsWith('.')) {
+    value = '0' + value
+  }
+  if (type === 'buyAmount') {
+    if ( Number(value) > Number(currentUser?.value?.balance || '0')) {
+      value = formatNumber(currentUser?.value?.balance || 0, 5)
+    }
+  }
+  form.value[type] = value
 }
 function handleInput(props: (keyof FormType)[], val: string, index: number) {
   const key = props[index]
   if (!key) return
-  form.value[key] = val.replace(/-|[^\d.]/g, '')
+  advancedForm.value[key] = val.replace(/-|[^\d.]/g, '')
 }
 function handleBlur(props: (keyof FormType)[], val: string, index: number) {
   const key = props[index] || ''
-  if (form.value[key]) {
+  if (advancedForm.value[key]) {
     if (index == 1) {
-      if (!form.value[props[0]]) return
-      if (Number.parseFloat(form.value[key]) <= Number.parseFloat(form.value[props[0]])) {
-        form.value[key] = form.value[props[0]]
+      if (!advancedForm.value[props[0]]) return
+      if (
+        Number.parseFloat(advancedForm.value[key]) <=
+        Number.parseFloat(advancedForm.value[props[0]])
+      ) {
+        advancedForm.value[key] = advancedForm.value[props[0]]
       }
     } else {
-      if (!form.value[props[1]]) return
-      if (Number.parseFloat(form.value[key]) >= Number.parseFloat(form.value[props[1]])) {
+      if (!advancedForm.value[props[1]]) return
+      if (
+        Number.parseFloat(advancedForm.value[key]) >=
+        Number.parseFloat(advancedForm.value[props[1]])
+      ) {
         // if (this.form[key] >= this.form[props[1]]) {
-        form.value[key] = form.value[props[1]]
+        advancedForm.value[key] = advancedForm.value[props[1]]
       }
     }
+  }
+}
+
+function createFollowOrder() {
+  const filtered = Object.fromEntries(
+    Object.entries(advancedForm.value).filter(
+      ([key, v]) =>  v && v !== '' && key !== 'tokenAgeRange'
+    )
+  )
+
+  if (advancedForm.value?.tokenAgeRange) {
+    const { startValue, startUnit, endValue, endUnit } = advancedForm.value?.tokenAgeRange
+    console.log('--------startValue--------',unitMs)
+    if (startValue || endValue) {
+      const startTime = Number(startValue || 0) * (unitMs[startUnit] || 0)
+      const endTime = Number(endValue || 0) * (unitMs[endUnit] || 0)
+      const now = Date.now()
+      if (startTime) {
+        filtered.minTokenAge = now + Number(startTime)
+      }
+      if (endTime) {
+        filtered.maxTokenAge = now + Number(endTime)
+      }
+    }
+  }
+
+  console.log('---filtered-------',filtered)
+  let data = {
+    ...filtered,
+    tgUid: botStore?.userInfo?.tgUid || '',
+    chain: form.value.chain,
+    creatorAddress: currentUser.value?.address || '',
+    followAddress: form.value.followAddress,
+    buyType: form.value.buyType,
+    buyAmount: new BigNumber(form.value.buyAmount || 0).multipliedBy(10 ** currentUser.value?.decimals!),
+    maxBuyRatio: Number(form.value.maxBuyRatio) * 100,
+    sellType: form.value.sellType,
+    takeProfitRatio: Number(form.value.takeProfitRatio) * 100,
+    stopLossRatio: Number(form.value.stopLossRatio) * 100,
+    ignoreHeld: form.value.ignoreHeld,
+
+    slippage: form.value.slippage * 100, //滑点
+    isPrivate: form.value.isPrivate, //防夹
+    priorityFee: form.value.priorityFee,
+    tokenBlacklist: tokenBlacklist?.value?.filter(Boolean),
+  }
+  // ...(form.value?.id ? { id: form.value.id } : {}),
+  formRef.value?.validate((valid) => {
+    if (valid) {
+      loading.value = true
+      _createFollowOrder(data)
+        .then((res) => {
+          if (form.value.id) {
+            ElMessage.success('修改跟单成功')
+          } else {
+            ElMessage.success('创建跟单成功')
+            activeCopyAddress.value[data.chain].push(data.followAddress)
+            localStorage.setItem('copy_setting_add', JSON.stringify({...settingCopyTrade.value}))
+          }
+          visible.value = false
+          getFollowingInfo()
+        })
+        .catch((err) => {
+          console.log('创建跟单错误', err.message)
+          ElMessage.error(err.message || err)
+        })
+        .finally(() => {
+          loading.value = false
+          console.log('创建跟单结束')
+        })
+    }
+  })
+}
+function addItem() {
+  blacklist.value.push({ id: blacklist.value?.length + 1, value: '' })
+}
+function removeRow(index: number) {
+  blacklist.value.splice(index, 1)
+}
+const onClockTimeChange = ([start, end]: string[]) => {
+  if (start) {
+    const [h, m] = start.split(':').map(Number)
+    advancedForm.value.enableAt = h
+  }
+  if (end) {
+    const [h, m] = end.split(':').map(Number)
+    advancedForm.value.disableAt = h
+  }
+}
+const onDateTimeChange = ({ startValue, startUnit, endValue, endUnit }: { startValue: number | null, startUnit: string, endValue:  number | null, endUnit: string }) => {
+  advancedForm.value.tokenAgeRange = { startValue, startUnit, endValue, endUnit }
+}
+function apply(type: 'low' | 'high') {
+  isExpanded.value = true
+  if (type == 'low') {
+    form.value.buyType = lowStrategy.value.buyType
+    form.value.buyAmount = lowStrategy.value.buyAmount
+    form.value.sellType = lowStrategy.value.sellType
+    form.value.takeProfitRatio = lowStrategy.value.takeProfitRatio
+    form.value.stopLossRatio = lowStrategy.value.stopLossRatio
+
+    advancedForm.value.minBuyValue = lowStrategy.value.minBuyValue
+    advancedForm.value.minMarketCap = lowStrategy.value.minMarketCap
+  } else {
+    form.value.buyType = highStrategy.value.buyType
+    form.value.buyAmount = highStrategy.value.buyAmount
+    form.value.sellType = highStrategy.value.sellType
+    form.value.takeProfitRatio = highStrategy.value.takeProfitRatio
+    form.value.stopLossRatio = highStrategy.value.stopLossRatio
+
+    advancedForm.value.minBuyValue = highStrategy.value.minBuyValue
+    advancedForm.value.minMarketCap = highStrategy.value.minMarketCap
   }
 }
 </script>
@@ -541,6 +801,15 @@ function handleBlur(props: (keyof FormType)[], val: string, index: number) {
 :deep().el-select__wrapper {
   background: var(--border);
   min-height: 48px;
+}
+:deep() .small .el-select__wrapper {
+  background: var(--border);
+  min-height: 40px;
+  width: 60px;
+  &.is-focused{
+    box-shadow: none;
+  }
+
 }
 .tabs {
   display: flex;

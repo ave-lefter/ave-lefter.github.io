@@ -4,8 +4,13 @@ import KOL from './components/kol/index.vue'
 import Trade from './components/trade/index.vue'
 import { getTopSignal, type ITopSignal } from '~/api/signal'
 import { _getKolList, _getSmartList } from '@/api/kol'
+
 import { useLocalStorage, useStorage } from '@vueuse/core'
 import type { ChainKey } from '~/api/types/pump'
+import TradeDialog from './components/tradeDialog.vue'
+const { copyTradeVisible, copyTradeAddVisible, copyOrder, type, form } = storeToRefs(useCopyTradeStore())
+const { getFollowingInfo, getFollowingAddress } = useCopyTradeStore()
+
 definePageMeta({
   name: 'copy-trade',
   key: (route) => {
@@ -14,11 +19,11 @@ definePageMeta({
 })
 const Version = 1
 const { t } = useI18n()
-
+const route = useRoute()
 const configStore = useConfigStore()
 const walletStore = useWalletStore()
 const botStore = useBotStore()
-
+const copyLoading = shallowRef(false)
 const smartChains = computed(() => {
   return ['solana', 'bsc'].map((value) => {
     return {
@@ -47,7 +52,7 @@ const filterConditions = useLocalStorage('filterConditionsSmart', {
   categoryList: ['cowboys', ''],
   version: Version,
 })
-const activeTab = shallowRef('cowboys')
+const activeTab = shallowRef(route?.query?.tab? route?.query?.tab: 'cowboys')
 const tableDataObj = ref({})
 const loading = shallowRef(false)
 const tableIndex = shallowRef(0)
@@ -85,7 +90,7 @@ const defaultConditions = ref({
   keyword: '',
 })
 const filterFormObj = ref({})
-
+const currentAddress = computed(() =>  botStore?.evmAddress || walletStore?.address ||'')
 const tabs = computed(
   () =>
     [
@@ -97,10 +102,14 @@ const tabs = computed(
         id: 'kol',
         name: t('kol'),
       },
-      {
-        id: 'copyTrade',
-        name: t('copyTrade'),
-      },
+      ...(botStore?.evmAddress
+        ? [
+            {
+              id: 'copyTrade',
+              name: t('copyTrade'),
+            },
+          ]
+        : [])
     ] as const
 )
 const openTimeList = computed(() => {
@@ -146,8 +155,29 @@ async function setDialogVisible() {
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 
 type TabId = (typeof tabs.value)[number]['id']
-
+watch(() => currentAddress.value, (val) => {
+  if (val) {
+    if (activeTab.value === 'copyTrade') {
+      getFollowingInfo()
+    }
+  } else {
+    copyOrder.value = {
+      totalProfitRatioAll: 0,
+      totalProfitAll: '0',
+      profitRealizedRatioAll: 0,
+      profitRealizedAll: '0',
+      profitUnrealizedRatioAll: 0,
+      profitUnrealizedAll:'0',
+      copyList: []
+    }
+    if (activeTab.value === 'copyTrade') {
+      activeTab.value = 'cowboys'
+    }
+  }
+})
 onMounted(() => {
+  getFollowingAddress()
+  getFollowingInfo()
   init()
 })
 function handleTabChange(tab: TabId) {
@@ -163,13 +193,15 @@ function handleTabChange(tab: TabId) {
     filterConditions.value.category = 'activity'
     filterConditions.value.categoryList = ['activity', '']
     signalSwitchFlag.value = true
-  } else {
+  }  else {
     filterConditions.value.category = tab
     filterConditions.value.categoryList = [tab, '']
   }
 
   // 只在非activity标签时初始化表单和获取数据
-  if (tab !== 'activity') {
+ if (tab === 'copyTrade') {
+    getFollowingInfo()
+  } else {
     initFilterForm()
     getSmartList()
   }
@@ -190,7 +222,7 @@ function handleIntervalChange(interval: string) {
   filterConditions.value[key].interval = interval
   getSmartList()
 }
-function init() {
+async function init() {
   // 页面初始化时清空所有搜索状态
   searchKeywords.value = {}
 
@@ -209,9 +241,12 @@ function init() {
       version: Version,
     }
   }
-
-  initFilterForm()
-  getSmartList()
+ if (activeTab.value === 'copyTrade') {
+    getFollowingInfo()
+  } else {
+    initFilterForm()
+    getSmartList()
+  }
 }
 function getSmartList(isSort = false) {
   // 只在数据变化时更新storage
@@ -707,6 +742,24 @@ function switchChain(chain: string) {
   initFilterForm()
   getSmartList()
 }
+function add() {
+  type.value =2
+  copyTradeAddVisible.value = true
+  form.value = {
+    followAddress: '',
+    buyType: 2, // 1:等比例买, 2:固定金额, 3:最大跟买
+    buyAmount: '',
+    maxBuyRatio: '',
+    sellType: 1, //0:手动卖(不跟单卖), 1:自动跟卖, 2:止盈止损
+    takeProfitRatio: '',
+    stopLossRatio: '',
+    ignoreHeld: false,
+    chain: 'bsc',
+    slippage: 9, //滑点
+    isPrivate: false, //防夹
+    priorityFee: '', //优先费/gas费
+  }
+}
 </script>
 
 <template>
@@ -723,7 +776,16 @@ function switchChain(chain: string) {
           {{ item.name }}
         </span>
       </div>
-     <el-button v-if="activeTab === 'copyTrade'" style="--el-button-bg-color: var(--x-blue)"> <Icon name="custom:wallet2" class="mr-4px text-12px"/> 新建钱包跟单</el-button>
+      <div class="flex-1"></div>
+      <template v-if="activeTab === 'copyTrade'">
+        <NuxtLink
+          :to="`/copy-trade/history`"
+          class="flex-start no-underline items-center color-[--main-text]"
+        >
+          <el-button class="text-14px"  style="--el-button-bg-color: var(--main-input-button-bg)"> <Icon name="custom:copy-trade-history" class="mr-4px text-16px"/>{{ $t('historyCopyTrade') }}</el-button>
+      </NuxtLink>
+    <el-button class="text-14px ml-12px"  style="--el-button-bg-color: var(--x-blue)" @click.stop.prevent="add"> <Icon name="custom:wallet-fill" class="mr-4px text-14px"/> {{ $t('createCopyTrade') }}</el-button>
+      </template>
       <div class="flex-end" v-else>
         <div class="p-2px rounded-4px bg-[--main-input-button-bg] flex color-[--third-text]">
           <div
@@ -754,7 +816,7 @@ function switchChain(chain: string) {
         </div>
       </div>
     </div>
-    <Trade v-if="activeTab === 'copyTrade'" :tableData="tableData" :loading="loading" :tableIndex="tableIndex"/>
+    <Trade v-if="activeTab === 'copyTrade'" />
     <KOL
       v-else
       ref="table_p"
@@ -774,6 +836,10 @@ function switchChain(chain: string) {
       :activeInterval="activeInterval"
       @handleSortChange="handleSortChange"
     />
+    <!-- 编辑 -->
+    <TradeDialog v-model="copyTradeVisible" />
+    <!-- 添加 -->
+    <TradeDialog v-model="copyTradeAddVisible" />
   </div>
 </template>
 

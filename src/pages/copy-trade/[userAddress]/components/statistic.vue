@@ -1,50 +1,27 @@
 <template>
-  <div class="p-5 flex justify-between mr-5 flex-1 rounded-2 bg-[--secondary-bg]">
-    <div>
-      <div class="flex gap-6 mb-5">
+  <div class="w-full">
+    <div class="flex-start">
+      <div class="flex gap-6">
         <UserAvatar
-          :key="statistics?.wallet_logo?.logo"
-          :wallet_logo="{
-            ...(statistics.wallet_logo || {}),
-            ...(address === botStore?.evmAddress ? { name: userInfo?.name } : {}),
-          }"
-          :address="address"
-          :chain="chain"
+          :key="copyObj?.followAddress"
+          :wallet_logo="{ url: copyObj?.followAddress, logo: copyObj?.followIconUrl }"
+          :address="followAddress"
+          :chain="selectChain"
           iconSize="60px"
         />
         <div>
           <div class="flex items-center mb-1.5">
             <UserRemark
-              :key="address"
+              v-if="address"
+              :key="followAddress"
               class="gap-1.5 text-6 leading-7.5 text-[--main-text]"
-              :address="address"
-              :remark="defaultRemark"
-              :chain="chain"
-              :wallet_logo="statistics.wallet_logo"
+              :address="followAddress"
+              :chain="selectChain"
+              :remark="copyObj?.followName"
               iconEditSize="16px"
               :maxRemarkLength="15"
-              @updateRemark="onGetWalletBasicInfo"
+              @updateRemark="({ remark }) => (copyObj.followName = remark)"
             />
-            <a
-              v-if="statistics.x_url"
-              class="flex items-center justify-center ml-6 gap-1 px-2 py-1 h-6 rounded text-3 cursor-pointer text-[--main-text] bg-gradient-to-r from-[rgba(18,184,134,0.2)] to-[rgba(139,79,221,0.2)]"
-              :href="statistics.x_url"
-              target="_blank"
-            >
-              <img v-if="isDark" :width="16" src="@/assets/images/connect-x-dark.png" alt="" >
-              <img v-else :width="16" src="@/assets/images//connect-x-light.png" alt="" >
-              {{ formatNumber(statistics.x_followers || 0, 2) }}
-            </a>
-            <a
-              v-else-if="isSelfAddress"
-              class="flex items-center justify-center ml-6 gap-1 px-2 py-1 h-6 rounded text-3 cursor-pointer text-[--main-text] bg-gradient-to-r from-[rgba(18,184,134,0.2)] to-[rgba(139,79,221,0.2)]"
-              @click="_bindTwitter"
-            >
-              <Icon
-                name="custom:twitterx"
-                class="text-3 text-[--main-text]"/>
-              {{ $t('connect') }}
-            </a>
           </div>
           <div class="flex items-center gap-2">
             <div class="statistic-address flex gap-2.5 cursor-pointer" @click="addressClick">
@@ -52,57 +29,88 @@
                 class="statistic-address-copy flex items-center justify-center px-2 py-1.75 h-6 rounded text-3 gap-1 text-[--third-text] bg-[--main-input-button-bg]"
               >
                 {{ addressText }}
-                <Icon v-copy="address" name="bxs:copy" class="text-2.5 clickable text-[--third-text]" />
+                <Icon
+                  v-copy="followAddress"
+                  name="bxs:copy"
+                  class="text-2.5 clickable text-[--third-text]"
+                />
               </div>
-            </div>
-            <div
-              class="flex items-center gap-1 px-2 py-0 h-6 rounded text-3 text-[--third-text] bg-[--main-input-button-bg]"
-            >
-              <Icon name="custom:cake" class="text5 text-[--third-text]" />
-              <span>{{ wallet_age?.value }}</span>
-              <span>{{ wallet_age?.unit || '' }}</span>
             </div>
           </div>
         </div>
       </div>
-      <div class="flex gap-2 items-center mb-5 text-6 leading-7.5 font-bold">
-        <strong class="text-6 leading-7.5 text-[--main-text]">
-          {{ uSymbol }}{{ total_balance }} {{ main_token_symbol }}
-        </strong>
-        <el-switch
-          :model-value="globalStore.isUSDT"
-          class="custom-switch"
-          :inactive-value="true"
-          :active-value="false"
-          @update:model-value="globalStore.isUSDT=!globalStore.isUSDT"
+      <div class="flex-1"></div>
+      <el-select
+        class="mr-9px"
+        :style="{ width: '120px' }"
+        :suffix-icon="SuffixIcon"
+        v-model="selectChain"
+        @change="change"
+      >
+        <template #prefix>
+          <ChainToken :chain="selectChain" :width="16" />
+        </template>
+        <el-option
+          v-for="{ chain: _chain } in smartChains"
+          :key="_chain"
+          :label="getChainInfo(_chain)?.name"
+          :value="_chain"
         >
-          <template #active-action>
-            <ChainToken :chain="chain" :width="16" />
-          </template>
-          <template #inactive-action>
-            <span
-              class="flex w-full h-full items-center justify-center text-2.5 rounded-full text-[--main-text] bg-[--icon-color]"
-              >$</span
-            >
-          </template>
-        </el-switch>
+          <div class="flex-start" style="gap: 4px">
+            <ChainToken :chain="_chain" :width="16" />
+            {{ getChainInfo(_chain)?.name }}
+          </div>
+        </el-option>
+      </el-select>
+      <Operate v-if="botStore.evmAddress" :id="copyObj?.id" :chain="props.chain" :status="copyObj.status" @updataRow= "updataRow"/>
+    </div>
+    <div class="flex mt-27px gap-12px">
+      <div
+        class="item bg-[--secondary-bg] px-24px py-24px rounded-8px flex-1 flex flex-col items-center"
+      >
+        <span class="text-14px color-[--third-text] block mb-10px">{{ $t('realizedProfit') }}</span>
+        <span v-if="Number(copyObj?.profitRealized)>0" class="text-18px color-[--up-color]">${{ formatNumber(copyObj?.profitRealized || 0, 2) }}</span>
+        <span v-else-if="Number(copyObj?.profitRealized)<0" class="text-18px color-[--down-color]">${{ formatNumber(copyObj?.profitRealized || 0, 2) }}</span>
+        <span v-else class="text-18px color-[--secondary-text]">0</span>
       </div>
-      <p class="m-0 mb-2 leading-5 text-3.5 text-[--secondary-text]">
-        {{ $t('totalPnL2') }}（{{ intervalText }}）
-        <AveNumber :value="statistics.profit" :signVisible="globalStore.isUSDT">
-          {{ formatNumber(Math.abs((statistics.profit ?? 0) / main_token_price), 2) }}
-          {{ main_token_symbol }}
-        </AveNumber>
-        <AveNumber :value="statistics.profit_ratio" class="ml-1">
-          {{ formatNumber(Math.abs((statistics?.profit_ratio ?? 0) * 100), 1) }}%
-        </AveNumber>
-      </p>
-      <p class="m-0 mb-2 leading-5 text-3.5 text-[--secondary-text]">
-        {{ $t('winRate2') }}（{{ intervalText }}）
-        <AveNumber :value="statistics.win_rate">
-          {{ formatNumber(Math.abs(statistics.win_rate ?? 0), 1) }}%
-        </AveNumber>
-      </p>
+      <div
+        class="item bg-[--secondary-bg] px-24px py-24px rounded-8px flex-1 flex flex-col items-center"
+      >
+        <span class="text-14px color-[--third-text] block mb-10px">{{ $t('unrealizedProfit') }}</span>
+        <span v-if="Number(copyObj?.profitUnrealized)>0" class="text-18px color-[--up-color]">${{ formatNumber(copyObj?.profitUnrealized || 0, 2) }}</span>
+        <span v-else-if="Number(copyObj?.profitUnrealized)<0" class="text-18px color-[--down-color]">${{ formatNumber(copyObj?.profitUnrealized || 0, 2) }}</span>
+        <span v-else class="text-18px color-[--secondary-text]">0</span>
+      </div>
+      <div
+        class="item bg-[--secondary-bg] px-24px py-24px rounded-8px flex-1 flex flex-col items-center"
+      >
+        <span class="text-14px color-[--third-text] block mb-10px">{{ $t('positionsValue') }}</span>
+        <span v-if="Number(copyObj?.holdingUsd)>0" class="text-18px color-[--main-text]">${{ formatNumber(copyObj?.holdingUsd || 0, 2) }}</span>
+        <span v-else class="text-18px color-[--secondary-text]">0</span>
+      </div>
+      <div
+        class="item bg-[--secondary-bg] px-24px py-24px rounded-8px flex-1 flex flex-col items-center"
+      >
+        <span class="text-14px color-[--third-text] block mb-10px">{{ $t('winTokenTotal') }}</span>
+        <div class="text-18px color-[--secondary-text]">
+          <span v-if="Number(copyObj?.winToken)>0"class="color-[--up-color]">{{ formatNumber(copyObj?.winToken || 0, 2) }}</span>
+          <span v-else class="color-[--secondary-text]">0</span>
+          /
+          <span v-if="Number(copyObj?.totalTokenCount)>0" class="color-[--secondary-text]">{{ formatNumber(copyObj?.totalTokenCount || 0, 2) }}</span>
+          <span v-else class="color-[--secondary-text]">0</span>
+        </div>
+      </div>
+      <div
+        class="item bg-[--secondary-bg] px-24px py-24px rounded-8px flex-1 flex flex-col items-center"
+      >
+        <span class="text-14px color-[--third-text] block mb-10px">{{ $t('lastSwapTime') }}</span>
+        <span class="text-18px color-[--main-text]" v-if="Number(copyObj?.createTime) >0">
+            {{ Number(copyObj?.createTime) >0? formatDate(copyObj?.createTime || 0, 'YYYY-MM-DD HH:mm') : '--' }}
+            ~
+            {{ Number(copyObj?.finishTime) >0? formatDate(copyObj?.finishTime || 0, 'YYYY-MM-DD HH:mm') : $t('today') }}
+        </span>
+        <span v-else class="text-18px color-[--secondary-text]">--</span>
+      </div>
     </div>
   </div>
 </template>
@@ -110,16 +118,16 @@
 <script setup lang="ts">
 //组件
 import dayjs from 'dayjs'
-import { getBalanceAnalysis, getWalletBasicInfo, bindTwitter } from '@/api/wallet'
+import { getBalanceAnalysis, bindTwitter } from '@/api/wallet'
 
 import UserRemark from '@/components/userRemark.vue'
 import UserAvatar from '@/components/userAvatar.vue'
-import Share from '@/components/share.vue'
-import AveEmpty from '@/components/aveEmpty.vue'
 
 import ChainToken from '@/components/chainToken.vue'
-import AveNumber from '../components/Number.vue'
-import { addAttention, deleteAttention } from '~/api/attention'
+import SuffixIcon from '~/components/suffixIcon.vue'
+import Operate from '~/pages/copy-trade/components/operate.vue'
+import { _getFollowInfoById } from '@/api/copyTrade'
+import { type CopyObj } from '@/api/copyTrade'
 
 const props = defineProps({
   chain: {
@@ -130,292 +138,139 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  interval: {
+  followAddress: {
     type: String,
     default: '',
-  },
-  isSelfAddress: Boolean,
-  intervalText: {
-    type: String,
-    default: '',
-  },
+  }
 })
+const { copyObj, copyOrder } = storeToRefs(useCopyTradeStore())
+const { getFollowingInfo } = useCopyTradeStore()
 
 const { t } = useI18n()
-
-const { address, chain, interval, intervalText } = toRefs(props)
+const route = useRoute()
+const router = useRouter()
+const { address, chain,followAddress } = toRefs(props)
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const walletStore = useWalletStore()
 const themeStore = useThemeStore()
-const shareComponent = useTemplateRef<InstanceType<typeof Share>>('shareComponent')
 
 const { userInfo } = storeToRefs(useBotStore())
-
-interface Statistics {
-  wallet_logo?: any
-  remark?: string
-  x_name?: string
-  x_url?: string
-  x_followers?: number
-  is_wallet_address_fav?: number
-  total_profit_ratio?: number
-  total_profit?: number | string
-  total_win_rate?: number | string
-  win_rate?: number
-  profit?: number
-  profit_ratio?: number
-  wallet_age?: number | string
-  [key: string]: any
-}
-
-// Ensure all required fields from GetTokenStatisticsResponse are present with default values
-// If GetTokenStatisticsResponse is exported from an API types file, import it here:
-
-const statistics = ref<Statistics>({
-  wallet_logo: {},
-  x_logo: '',
-  chain: '',
-  newTags: [],
-  balance_amount: 0,
-  // Add all other required fields from GetTokenStatisticsResponse with sensible defaults
-  // Example:
-  // fieldName: defaultValue,
-  // ...
-})
 
 const remark = ref({
   value: '',
   isEdit: false,
   loading: false,
 })
-
-const balanceAnalysis = ref<Awaited<ReturnType<typeof getBalanceAnalysis>>>({ profit: [], total_balance_without_risk: undefined })
-
-const pnl = computed(() => {
-  const profit: Array<{
-    time: string
-    value: string
-    negative?: boolean
-    absValue?: number
-  }> = balanceAnalysis.value.profit || []
-  const xData: any[] = []
-  profit.forEach((el) => {
-    xData.push(el.time)
-    el.negative = Number(el.value) < 0
-    el.absValue = Math.abs(Number(el.value))
-  })
-  console.log('pnl', xData)
-  return {
-    xAxis: {
-      data: xData,
-    },
-    dataset: {
-      source: profit,
-      dimensions: ['time', 'absValue'],
-    },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'line',
-        z: 0, // 层级（权重）
-        lineStyle: {
-          type: 'solid', // 将虚线改为实线
-          width: 10, // 设置背景的宽度
-          color: 'rgb(179, 179, 179,0.3)',
-        },
-      },
-      padding: 8,
-      backgroundColor: isDark.value ? 'rgba(0,0,0,.8)' : '#fff',
-      borderWidth: 0,
-      formatter: (params: { data: any }[]) => {
-        const tooltipData =
-          (params[0].data as {
-            value: number
-            absValue: number
-            time: string
-            negative?: boolean
-          }) || {}
-        let color,
-          sign = ''
-        if (tooltipData.value > 0) {
-          color = getCssVariable('--up-color')
-          sign = '+'
-        } else if (tooltipData.value < 0) {
-          color = getCssVariable('--down-color')
-          sign = '-'
-        }
-        return `<div style="font-size: 12px;">
-             <div>
-                 <span style="color:${color}">${sign}${uSymbol.value}${formatNumber(
-                   tooltipData?.absValue / main_token_price.value,
-                   1
-                 )}${main_token_symbol.value}</span>
-             </div>
-             <div>
-                  ${dayjs(tooltipData.time).format('MM/DD')}
-             </div>
-         </div>`
-      },
-    },
-    series: [
-      {
-        type: 'bar',
-        barMaxWidth: 10,
-        barMinHeight: 2,
-        itemStyle: {
-          color: (params: { value: { value: number; negative: any } }) => {
-            if (Math.abs(params.value?.value) > 0) {
-              return params.value?.negative ? getCssVariable('--down-color') : getCssVariable('--up-color')
-            }
-            return isDark.value ? '#999' : '#E5E5E5'
-          },
-        },
-      },
-    ],
+const selectChain = shallowRef('')
+const balanceAnalysis = ref<Awaited<ReturnType<typeof getBalanceAnalysis>>>({
+  profit: [],
+  total_balance_without_risk: undefined,
+})
+const smartChains = computed(() => {
+  // 如果是自己的钱包地址且为 bot 钱包那么展示所有的链，链钱包后面再改
+  const supportFullDataChain = copyOrder.value?.copyList?.filter((i) => i.followAddress== followAddress.value)?.map(i => i.chain) || []
+  if (botStore.evmAddress) {
+    const botChains = botStore.userInfo?.addresses?.filter?.((el) =>
+      supportFullDataChain?.includes(el.chain)
+    )
+    console.log('botChains', botChains)
+    if (botChains && botChains.length > 0) {
+      return botChains
+    }
   }
+  return [
+    {
+      chain: chain.value,
+    },
+  ]
 })
-
-const defaultRemark = computed(() => {
-  // const result =
-  //   (userInfo?.address === address ? token_user?.remark : statistics?.remark) || statistics.x_name
-
-  return statistics.value.remark //result
-})
-
-const isDark = computed(() => {
-  return themeStore.isDark
-})
-
 const addressText = computed(() => {
-  return address.value.slice(0, 4) + '...' + address.value.slice(-4)
+  return followAddress.value.slice(0, 4) + '...' + followAddress.value.slice(-4)
 })
 
 const selfAddress = computed(() => {
   return botStore?.evmAddress || walletStore?.address || ''
 })
 
-const wallet_age = computed(() => {
-  const _wallet_age = (statistics.value?.wallet_age || '') as string
-  return ['--', '0'].includes(_wallet_age)
-    ? { value: '--', unit: '' }
-    : getDuring(_wallet_age ? ((Number(_wallet_age) || 0) * 1000) : undefined)
-})
-
-// const injecteIsVolUSDT = inject<Ref<boolean>>('isVolUSDT')
-
-const total_balance = computed(() => {
-  const formatMap: Record<string, number> = {
-    solana: 2,
-    bsc: 4,
-    eth: 4,
-    base: 4,
+onMounted(async () => {
+  selectChain.value = chain.value
+  if (copyOrder.value?.copyList?.length == 0 || !copyOrder.value) {
+    await getFollowingInfo()
+    console.log('----copyOrder.value---',copyOrder.value)
+    copyObj.value = copyOrder.value?.copyList?.find((i) => i.chain === selectChain.value && i.followAddress== followAddress.value)
   }
-  const { total_balance_without_risk } = balanceAnalysis.value
-
-  return formatNumber((Number(total_balance_without_risk) || 0) / Number(main_token_price.value), {
-    decimals: globalStore.isUSDT ? 4 : formatMap[chain.value],
-    limit: 20,
-  })
+  console.log('--------------',copyObj.value?.id || route.query.id)
+  if (copyObj.value?.id || route.query.id) {
+    getFollowInfoById()
+  }
 })
-
-const main_token_price = computed(() => {
-  return globalStore.isUSDT ? 1 : Number((balanceAnalysis.value.main_token_price || 0))
-})
-
-const uSymbol = computed(() => {
-  return globalStore.isUSDT ? '$' : ''
-})
-
-const main_token_symbol = computed(() => {
-  return globalStore.isUSDT ? '' : balanceAnalysis.value.main_token_symbol
-})
-
-watch(
-  () => props.interval,
-  (newVal: any) => {
-    if (newVal) {
-      onGetBalanceAnalysis()
+async function change(val: string) {
+  copyObj.value = copyOrder.value?.copyList?.find((i) => i.chain === val && i.followAddress== followAddress.value)
+  console.log('------copyObj.value-----',copyObj.value)
+  if (copyObj.value?.id) {
+    getFollowInfoById()
+  } else {
+    reset()
+  }
+  const url = {
+    name: 'copy-trade-wallet',
+    params: {
+      userAddress: copyObj.value.followAddress,
+      chain: copyObj.value.chain,
+    },
+    query: {
+      followAddress: copyObj.value.followAddress,
+      creatorAddress: copyObj.value.creatorAddress,
+      id: copyObj.value.id,
+    },
+  }
+  navigateTo(url)
+}
+function getFollowInfoById() {
+  const data = {
+    id: copyObj.value?.id || route.query.id,
+    chain: copyObj.value?.chain || route.params.chain,
+  }
+  _getFollowInfoById(data).then((res) => {
+    copyObj.value = {
+      ...res,
+      lastSwap:
+        res?.lastSwap !== '1970-01-01T00:00:00Z' && res?.lastSwap !== '0001-01-01T00:00:00Z'
+          ? res.lastSwap
+          : '0',
     }
-  }
-)
-
-watch(
-  () => props.address,
-  (newVal: any) => {
-    if (newVal) {
-      onGetWalletBasicInfo()
-      onGetBalanceAnalysis()
-    }
-  }
-)
-
-onMounted(() => {
-  onGetWalletBasicInfo()
-  onGetBalanceAnalysis()
-})
-
-async function onGetWalletBasicInfo() {
-  const params = {
-    user_address: address.value,
-    self_address: selfAddress.value,
-    user_chain: chain.value,
-  }
-  const res = await getWalletBasicInfo(params)
-  console.log(res, 'res=>')
-  statistics.value = {
-    ...statistics.value,
-    ...(res || {}),
-  }
-  remark.value = res.remark || userInfo.value?.name
-}
-
-function _deleteAttention() {
-  if (!verifyLogin()) {
-    return
-  }
-  deleteAttention({
-    user_chain: chain.value,
-    user_address: address.value,
-    address: botStore.userInfo?.evmAddress || walletStore.address,
   })
-    .then(() => {
-      ElMessage.success(t('attention1Canceled'))
-      statistics.value.is_wallet_address_fav = 0
-    })
-    .catch((err) => {
-      ElMessage.error(err)
-    })
 }
-
-async function _addAttention() {
-  if (!verifyLogin()) {
-    return
+function updataRow() {
+  getFollowInfoById()
+}
+function reset() {
+  copyObj.value = {
+    followAddress: followAddress.value,
+    creatorAddress:address.value,
+    totalTokenCount: 0,
+    winToken: 0,
+    profitRealized: '0',
+    profitUnrealized: '0',
+    lastSwap: '0',
+    chain : selectChain.value
   }
-  addAttention({
-    user_chain: chain.value,
-    user_address: address.value,
-    address: botStore.userInfo?.evmAddress || walletStore.address,
-  })
-    .then(() => {
-      ElMessage.success(t('attention1Success'))
-      statistics.value.is_wallet_address_fav = 1
-    })
-    .catch((err) => {
-      ElMessage.error(err)
-    })
 }
-async function onGetBalanceAnalysis() {
-  const params = {
-    user_address: address.value,
-    user_chain: chain.value,
-    interval: interval.value,
-  }
-  getBalanceAnalysis(params).then((res) => {
-    balanceAnalysis.value = res
-  })
-
-}
+// async function onGetWalletBasicInfo() {
+//   const params = {
+//     user_address: address.value,
+//     self_address: selfAddress.value,
+//     user_chain: chain.value,
+//   }
+//   const res = await getWalletBasicInfo(params)
+//   console.log(res, 'res=>')
+//   statistics.value = {
+//     ...statistics.value,
+//     ...(res || {}),
+//   }
+//   remark.value = res.remark || userInfo.value?.name
+// }
 
 async function _bindTwitter() {
   if (!verifyLogin()) {
@@ -463,26 +318,7 @@ async function _bindTwitter() {
     })
 }
 
-function getDuring(time?: number) {
-  if (!time) return { value: '--', unit: '' } // Prevent infinite l
-  const minutes = Math.abs(dayjs().diff(time, 'minute', true))
-  // 单位换算表
-  const thresholds = [
-    { unit: t('min2'), limit: 60, value: minutes },
-    { unit: t('hours'), limit: 60, value: minutes / 60 },
-    { unit: t('days2'), limit: Infinity, value: minutes / (60 * 24) },
-  ]
-  const { value, unit } = thresholds.find((t) => t.value < t.limit) || {}
-  return { value: parseInt(String(value)), unit }
-}
-
-function mergeStatistics(data: any) {
-  const d = {
-    ...statistics.value,
-    ...data,
-  }
-  statistics.value = d
-}
+function mergeStatistics(data: any) {}
 defineExpose({
   mergeStatistics,
 })
@@ -500,7 +336,7 @@ function addressClick() {
 ::v-deep .el-switch__action {
   background-color: transparent;
 }
-::v-deep .max-w-42px{
+::v-deep .max-w-42px {
   max-width: 200px !important;
 }
 </style>
