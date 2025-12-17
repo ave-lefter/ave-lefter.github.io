@@ -12,8 +12,6 @@ import { CanvasRenderer } from 'echarts/renderers'
 import buy from 'assets/images/mark/buy.png'
 import buyDark from 'assets/images/mark/buy-dark.png'
 import buyLight from 'assets/images/mark/buy-light.png'
-import dayjs from 'dayjs'
-
 // 注册使用组件
 echarts.use([
   LineChart,
@@ -54,50 +52,63 @@ const { t } = useI18n()
 const lineChartRef = useTemplateRef('lineChartRef')
 const myChart = shallowRef()
 const language = computed(() => localeStore.locale)
-const dataX = computed(() => props.dataList?.map?.((i) => formatDate(i[0], 'MM-DD HH:mm')))
+// const dataX = computed(() => props.dataList?.map?.((i) => formatDate(i[0], 'MM-DD HH:mm')))
+const sortedData = computed(() => props.dataList?.toSorted?.((a, b) => a[0] - b[0]) ?? [])
 const markPoint = computed(() => {
-  return props.marks?.map?.((y: any, idx: number) => {
-    const xAxis = formatDate(y[0], 'YYYY-MM-DD HH:mm')
-    const yAxis = props.dataList?.find?.((i) => {
-      const compareTime = dayjs(i[0] * 1000)
-      const targetTime = dayjs(y[0] * 1000)
-      const isSame = compareTime.isSame(targetTime)
-      const isAfter = targetTime.isBefore(compareTime)
-      return isSame || isAfter
-    })?.[1]
-    let symbolUrl = themeStore.isDark ? buyDark : buyLight
-    if (idx === 0) {
-      symbolUrl = buy
+  const findNearestValue = (timestampSec: number) => {
+    if (!sortedData.value?.length) return undefined
+    const target = timestampSec * 1000
+    // 找到时间最近的点，保证 markPoint 落在折线上
+    let nearest = sortedData.value[0]
+    let minDiff = Math.abs(sortedData.value[0][0] * 1000 - target)
+    for (const item of sortedData.value) {
+      const diff = Math.abs(item[0] * 1000 - target)
+      if (diff < minDiff) {
+        minDiff = diff
+        nearest = item
+      }
     }
-    return {
-      name: t('buy'),
-      value: '',
-      coord: [xAxis, yAxis],
-      symbolOffset: [0, 0],
-      itemStyle: {
-        color: 'transparent',
-      },
-      symbol: `image://${symbolUrl}`, // 替换为你的图标链接
-      symbolSize: [20, 20],
-      animation: true,
-      label: {
-        show: false,
-      },
-      tooltip: {
-        position: 'top',
-        backgroundColor: getCssVariable('--main-input-button-bg'),
-        trigger: 'item',
-        borderWidth: 1,
-        borderColor: getCssVariable('--icon-color'),
-        textStyle: {
-          fontSize: 10,
-          color: 'var(--secondary-text)',
+    return nearest?.[1]
+  }
+
+  return props.marks
+    ?.toSorted?.((a, b) => b[0] - a[0])
+    ?.map?.((y: any, idx: number) => {
+      const xAxis = y[0] * 1000
+      const yAxis = findNearestValue(y[0])
+      let symbolUrl = themeStore.isDark ? buyDark : buyLight
+      if (idx === 0) {
+        symbolUrl = buy
+      }
+      return {
+        name: t('buy'),
+        value: '',
+        coord: [xAxis, yAxis],
+        symbolOffset: [0, 0],
+        itemStyle: {
+          color: 'transparent',
         },
-        padding: [4, 8, 4, 8],
-        confine: false,
-        enterable: true,
-        formatter: () => {
-          return `
+        symbol: `image://${symbolUrl}`, // 替换为你的图标链接
+        symbolSize: [20, 20],
+        animation: true,
+        label: {
+          show: false,
+        },
+        tooltip: {
+          position: 'top',
+          backgroundColor: getCssVariable('--main-input-button-bg'),
+          trigger: 'item',
+          borderWidth: 1,
+          borderColor: getCssVariable('--icon-color'),
+          textStyle: {
+            fontSize: 10,
+            color: 'var(--secondary-text)',
+          },
+          padding: [4, 8, 4, 8],
+          confine: false,
+          enterable: true,
+          formatter: () => {
+            return `
            <div class="color-[--main-text]">
             <span id="tooltipMark" class="decoration-underline decoration-dotted cursor-pointer" data-time=${y[0]} data-token=${props.token}>${y[2]}${t(props.type)}</span>${localeStore.locale === 'zh-cn' ? '' : ' '}${t('buy')} $${formatNumber(y[1], 2)}
            </div>
@@ -105,11 +116,11 @@ const markPoint = computed(() => {
              ${formatDate(y[0], 'YYYY-MM-DD HH:mm')}
            </div>
           `
+          },
+          appendToBody: true,
         },
-        appendToBody: true,
-      },
-    }
-  })
+      }
+    })
 })
 
 const series = computed(() => {
@@ -128,8 +139,8 @@ const series = computed(() => {
       disabled: true,
       focus: 'series',
     },
-    data: props.dataList.map((j) => {
-      return [formatDate(j[0], 'YYYY-MM-DD HH:mm'), j[1]]
+    data: sortedData.value.map((j) => {
+      return [j[0] * 1000, j[1]]
     }),
     // 曲线本身不显示tooltip
     tooltip: {
@@ -157,6 +168,11 @@ function init() {
   if (!myChart.value) {
     myChart.value = echarts.init(lineChartRef.value)
   }
+  const firstTime = sortedData.value?.[0]?.[0]
+  const lastTime = sortedData.value?.[sortedData.value.length - 1]?.[0]
+  const minTime = firstTime ? firstTime * 1000 : undefined
+  const maxTime = lastTime ? lastTime * 1000 : undefined
+
   const option = {
     animation: false,
     legend: {
@@ -174,8 +190,16 @@ function init() {
     },
     xAxis: {
       type: 'time',
-      // data: dataX.value,
-      // boundaryGap: ['0', '20'],
+      // 尽量给出 4~5 个刻度，避免过密
+      splitNumber: 5,
+      boundaryGap: false,
+      min: minTime,
+      max: maxTime,
+      // 保底最小间隔，避免数据很密时刻度拥挤
+      minInterval:
+        sortedData.value.length > 1
+          ? Math.floor(((lastTime ?? 0) - (firstTime ?? 0)) / 10) * 1000
+          : undefined,
       splitLine: {
         show: false,
       },
@@ -185,7 +209,10 @@ function init() {
 
       axisLabel: {
         show: true,
-        interval: Math.floor(dataX.value.length / 3) - 1,
+        showMinLabel: true,
+        showMaxLabel: true,
+        hideOverlap: true,
+        interval: 'auto',
         alignMinLabel: 'left',
         alignMaxLabel: 'right',
         formatter: (value: string) => {

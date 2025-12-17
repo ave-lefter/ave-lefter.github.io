@@ -37,6 +37,7 @@ const botStore = useBotStore()
           action_count,
           actions,
           token_create_time,
+          holders_cur,
         },
         index
       ) in signalList"
@@ -126,12 +127,19 @@ const botStore = useBotStore()
                   </span>
                 </template>
               </TimerCount>
+
               <div
                 v-else
                 v-tooltip="formatDate(token_create_time, 'MM/DD HH:mm:ss')"
                 class="color-[--third-text] text-12px"
               >
                 {{ formatTimeFromNow(token_create_time) }}
+              </div>
+              <div
+                class="px-4px py-2px text-12px rounded-2px bg-[--secondary-bg] flex items-center justify-center color-[--main-text]"
+              >
+                <Icon name="ic:baseline-people-alt" class="mr-4px color-#12B886" />
+                {{ holders_cur }}
               </div>
               <div
                 v-if="Number(top10_ratio) > 0"

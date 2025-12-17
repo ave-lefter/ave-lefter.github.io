@@ -707,6 +707,14 @@ function switchChain(chain: string) {
   initFilterForm()
   getSmartList()
 }
+
+function setActiveChain(value: string) {
+  if (value !== activeChain.value) {
+    signalContainerRef.value?.setFilterToken?.('')
+    signalFilter.value = { ...signalFilter.value, token: '' }
+  }
+  activeChain.value = value
+}
 </script>
 
 <template>
@@ -725,6 +733,14 @@ function switchChain(chain: string) {
       </div>
       <div v-if="isActivity" class="flex h-28px">
         <div class="flex items-center mr-24px">
+          <div
+            v-show="showResetBtn"
+            class="flex items-center text-12px gap-2px cursor-pointer mr-20px color-[--main-text]"
+            @click="signalContainerRef?.setFilterToken?.('')"
+          >
+            <Icon name="custom:reset" class="text-14px" />
+            {{ $t('reset') }}
+          </div>
           <Filter :filter-params="signalFilter" @onReset="onReset" @onConfirm="onConfirm" />
           <el-popover
             v-model:visible="audioVisible"
@@ -785,14 +801,7 @@ function switchChain(chain: string) {
               TG{{ $t('Subscription') }}
             </a>
           </div>
-          <div
-            v-show="showResetBtn"
-            class="flex items-center text-12px gap-2px cursor-pointer ml-20px color-[--main-text]"
-            @click="signalContainerRef?.setFilterToken?.('')"
-          >
-            <Icon name="custom:reset" class="text-14px" />
-            {{ $t('reset') }}
-          </div>
+
           <QuickSwapSet
             v-model:quickBuyValue="quickBuyValue"
             :chain="activeChain"
@@ -809,7 +818,7 @@ function switchChain(chain: string) {
             :key="value"
             class="flex items-center justify-center p-2px rounded-4px cursor-pointer"
             :class="`${activeChain === value ? 'bg-[--tab-active-bg] color-[--main-text]' : ''}`"
-            @click="activeChain = value"
+            @click="setActiveChain(value)"
           >
             <img
               class="w-20px h-20px rounded-full opacity-60 block"
@@ -853,8 +862,8 @@ function switchChain(chain: string) {
     </div>
 
     <SignalContainer
-      ref="signalContainerRef"
       v-if="isActivity"
+      ref="signalContainerRef"
       v-model:showResetBtn="showResetBtn"
       :activeChain="activeChain"
       :quickBuyValue="quickBuyValue"
