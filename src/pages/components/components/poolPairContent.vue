@@ -213,6 +213,24 @@ function addTokenFavorite(row, newGroupId: number) {
             class="rounded-full ml-4px"
             alt=""
           >
+          <template v-if="row.normal_tag?.length > 0">
+            <div
+              v-for="(i, index) in row.normal_tag"
+              :key="index"
+              v-tooltip="getTagTooltip(i)"
+              class="flex items-center ml-4px"
+            >
+              <img
+                class="w-12px h-12px"
+                :src="formatIconTag(i.tag)"
+                alt=""
+                onerror="this.src='/icon-default.png'"
+              >
+              <span v-if="i?.showText" :style="{color: i?.color=='green'? 'color-[--up-color]' : 'color-[--down-color]'}">
+                  {{ $t(i?.tag) }}
+              </span>
+            </div>
+          </template>
           <el-tooltip
             v-if="row?.lp_locked_percent > 0 && row?.lp_locked_percent <= 100"
             placement="top"

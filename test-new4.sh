@@ -18,7 +18,7 @@ touch .nojekyll
 git init --initial-branch=master
 git add -A
 git commit -m 'deploy'
-git remote add origin git@github.com:ave-test-new/ave-test-new.github.io.git
+git remote add origin git@github.com:ave-test-new4/ave-test-new4.github.io.git
 git push -f origin master:main
 
 cd -
