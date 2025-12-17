@@ -2,7 +2,7 @@
 import Holding from '@/components/perp/holding.vue'
 import ClosePositionDialog from './closePositionDialog.vue'
 import { usePerpStore } from '@/stores/perp'
-import { useStorage } from '@vueuse/core'
+import { useStorage, useLocalStorage } from '@vueuse/core'
 
 const { contractId, isCancelOrder, position ,order } = storeToRefs(usePerpStore())
 const walletStore = useWalletStore()
@@ -29,8 +29,14 @@ const componentsMap = {
   closePnl: defineAsyncComponent(() => import('@/components/perp/closePnl.vue')),
   positionHistory: defineAsyncComponent(() => import('@/components/perp/positionHistory.vue')),
 } as const
+type ComponentKey = keyof typeof componentsMap
+const selectedCurrentObject = useLocalStorage<Record<ComponentKey, boolean>>(
+  'perp-selected-current-object',
+  Object.fromEntries(
+    Object.keys(componentsMap).map(key => [key, true])
+  ) as Record<ComponentKey, boolean>
+)
 const selectTab = ref<keyof typeof componentsMap>('holding')
-const isAll = shallowRef(true)
 const searchParams = useStorage(
   'perp-kline-searchParams',
   Object.keys(componentsMap).reduce(
@@ -63,28 +69,15 @@ const filteredSearchParams = (key: keyof typeof searchParams.value) => {
   return params
 }
 const positionLength = computed(() => {
-  const result = position?.value?.filter(i => {
-    if (!isAll.value) {
-      if (i.contractId == contractId.value) {
-        return i
-      }
-    } else {
-      return i
-    }
-  })
+  const result = position?.value || []
   return result?.length
 })
 const orderListLength = computed(() => {
-  const result = order?.value?.filter(i => {
-    if (!isAll.value) {
-      if (i.contractId == contractId.value) {
-        return i
-      }
-    } else {
-      return i
-    }
-  })
+  const result = order?.value || []
   return result?.length
+})
+const isAll = computed(()=>{
+  return selectedCurrentObject.value[selectTab.value]  ? true: false
 })
 watch(
   () => isAll.value,
@@ -99,11 +92,23 @@ watch(
 watch(
   () => contractId.value,
   (val) => {
-    isAll.value = true
+    if (isAll.value) {
+      searchParams.value[selectTab.value].filterContractIdList = 'ALL'
+    } else {
+      searchParams.value[selectTab.value].filterContractIdList = val
+    }
   }
 )
-
-
+watch(
+  () => selectTab.value,
+  (val) => {
+    if (isAll.value) {
+      searchParams.value[val].filterContractIdList = 'ALL'
+    } else {
+      searchParams.value[val].filterContractIdList = contractId.value
+    }
+  }
+)
 </script>
 
 <template>
@@ -120,7 +125,7 @@ watch(
         >
       </div>
       <div class="flex items-center justify-end gap-12px">
-        <el-checkbox v-model="isAll" class="checkbox-sm" :label="$t('showAllPositions')" />
+        <el-checkbox v-model="selectedCurrentObject[selectTab]" class="checkbox-sm" :label="$t('showAllPositions')" />
         <el-button v-if="selectTab == 'holding'" class="close-position"   :disabled="position?.length == 0" @click.stop.prevent="dialogVisible = true">{{ $t('closePositionAll') }}</el-button>
         <el-button
           v-else-if="selectTab == 'currentOrder'"
