@@ -57,14 +57,14 @@
         @input="value => sliderInput(value as number)"
       />
     </div>
-    <div v-if="percent > 0" class="flex items-center justify-between text-12px font-400 mt-8px color-[--main-text]">
+    <div v-if="percent > 0" class="flex items-center justify-between text-12px font-400 mt-8px color-[--main-text] mb-8px">
       <div class="text-left">
         <div class="color-[--third-text] mb-5px"> {{ $t('buy') }}: </div>
-        <div class="font-500"> ≈ {{ form.reduceOnly ? '0' : formatNumber(percentBuy, 4) }} {{ perpStore.unit?.coinName || '' }}</div>
+        <div class="font-500"> ≈ {{ form.reduceOnly ? '0' : formatNumber(percentBuy, { decimals: 4, limit: 8}) }} {{ perpStore.unit?.coinName || '' }}</div>
       </div>
       <div class="text-right">
         <div class="color-[--third-text] mb-5px"> {{ $t('sell') }}: </div>
-        <div class="font-500"> ≈ {{ form.reduceOnly ? '0' : formatNumber(percentSell, 4) }} {{ perpStore.unit?.coinName || '' }}</div>
+        <div class="font-500"> ≈ {{ form.reduceOnly ? '0' : formatNumber(percentSell, { decimals: 4, limit: 8}) }} {{ perpStore.unit?.coinName || '' }}</div>
       </div>
     </div>
     <el-form-item style="margin-bottom: 0">
@@ -104,7 +104,7 @@
               </el-dropdown>
             </template> -->
           </el-input-number>
-          <el-input-number
+          <!-- <el-input-number
             v-model.number="tempData.tpPercent"
             :precision="0"
             :controls="false"
@@ -115,9 +115,9 @@
             @update:model-value="val => tpPercentChange(val as number, 1)"
           >
             <template #suffix> % </template>
-          </el-input-number>
+          </el-input-number> -->
         </div>
-        <div class="mb-30px px-3px w-full">
+        <!-- <div class="mb-30px px-3px w-full">
           <el-slider
             v-model="tempData.tpPercent1"
             v-slider-active
@@ -134,7 +134,7 @@
             class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] [&&]:[--el-slider-runway-bg-color:--icon-color] slider-box"
             @change="val => tpPercentChange(val as number)"
           />
-        </div>
+        </div> -->
         <el-alert v-if="tpMsg" style="--el-alert-title-font-size:12px;--el-alert-padding:5px 10px;margin: 10px 0" :title="tpMsg" type="success"  :closable="false" />
 
         <div class="flex items-center gap-10px mt-8px mb-16px w-full">
@@ -170,7 +170,7 @@
               </el-dropdown>
             </template> -->
           </el-input-number>
-          <el-input-number
+          <!-- <el-input-number
             v-model.number="tempData.slPercent"
             :controls="false"
             :precision="0"
@@ -181,9 +181,9 @@
             @update:model-value="val => slPercentChange(val as number, 1)"
           >
             <template #suffix> % </template>
-          </el-input-number>
+          </el-input-number> -->
         </div>
-        <div class="mb-30px px-3px w-full">
+        <!-- <div class="mb-30px px-3px w-full">
           <el-slider
             v-model="tempData.slPercent1"
             v-slider-active
@@ -200,7 +200,7 @@
             class="[&&]:[--el-slider-button-size:16px] [--el-color-white:--icon-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-border-color-light:var(--dialog-divider)] [&&]:[--el-slider-main-bg-color:--main-text] [&&]:[--el-slider-runway-bg-color:--icon-color] slider-box"
             @change="val => slPercentChange(val as number)"
           />
-        </div>
+        </div> -->
         <el-alert v-if="slMsg" style="--el-alert-title-font-size:12px;--el-alert-padding:5px 10px;margin: 10px 0" :title="slMsg" type="error"  :closable="false" />
       </template>
     </el-form-item>
@@ -243,7 +243,7 @@
     </li>
     <li class="flex items-center mt-8px">
       <span class="mr-auto">Max: </span>
-      <span class="color-[--up-color]">{{ form.reduceOnly ? '-' : formatNumber(maxAmountBuy, 4) }} {{  perpStore.unit?.coinName || ''  }}</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ form.reduceOnly ? '-' : formatNumber(maxAmountSell, 4) }}  {{  perpStore.unit?.coinName || ''  }}</span>
+      <span class="color-[--up-color]">{{ form.reduceOnly ? '-' : formatNumber(maxAmountBuy, { decimals: 4, limit: 8}) }} {{  perpStore.unit?.coinName || ''  }}</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ form.reduceOnly ? '-' : formatNumber(maxAmountSell, { decimals: 4, limit: 8}) }}  {{  perpStore.unit?.coinName || ''  }}</span>
     </li>
     <li v-if="!form.reduceOnly" class="flex items-center mt-8px">
       <span class="mr-auto">{{ $t('estimatedLiquidationPrice') }}</span>
@@ -614,7 +614,7 @@ const percentSell = computed(() => {
 })
 
 const tpMsg = computed(() => {
-  if (BigNumber(form.amount || 0).lte(0) || BigNumber(tpForm.triggerPrice || 0).lte(0)) {
+  if (BigNumber(getSize() || 0).lte(0) || BigNumber(tpForm.triggerPrice || 0).lte(0)) {
     return ''
   }
 
@@ -633,7 +633,7 @@ const tpMsg = computed(() => {
 })
 
 const slMsg = computed(() => {
-  if (BigNumber(form.amount || 0).lte(0) || BigNumber(slForm.triggerPrice || 0).lte(0)) {
+  if (BigNumber(getSize() || 0).lte(0) || BigNumber(slForm.triggerPrice || 0).lte(0)) {
     return ''
   }
 

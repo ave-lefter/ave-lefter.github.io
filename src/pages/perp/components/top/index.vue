@@ -93,7 +93,7 @@
 
       <div class="ml-16px whitespace-nowrap item">
         <span class="text-12px block text-left color-[--third-text]"
-          >{{ $t('24HVolume') }}({{ perp?.quoteCoinName }})</span
+          >{{ $t('24HVolume') }}({{ perp?.quoteCoin }})</span
         >
         <span class="text-12px block text-left color-[--secondary-text] mt-6px">{{
           formatNumber(perp?.value || 0)
@@ -102,7 +102,7 @@
 
       <div class="ml-16px whitespace-nowrap item">
         <span class="text-12px block text-left color-[--third-text]"
-          >{{ $t('24HAmount') }}({{ perp?.baseCoinName }})</span
+          >{{ $t('24HAmount') }}({{ perp?.baseCoin }})</span
         >
         <span class="text-12px block text-left color-[--secondary-text] mt-6px">{{
           formatNumber(perp?.size || 0)
@@ -111,7 +111,7 @@
 
       <div class="ml-16px whitespace-nowrap item">
         <span class="text-12px block text-left color-[--third-text]"
-          >{{ $t('openInterest') }}({{ perp?.quoteCoinName }})</span
+          >{{ $t('openInterest') }}({{ perp?.quoteCoin }})</span
         >
         <span class="text-12px block text-left color-[--main-text] mt-6px">{{
           perp?.openInterest
