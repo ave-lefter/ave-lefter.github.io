@@ -172,7 +172,7 @@ export function getActiveAddressRank(query): Promise<{
   wallet_logo:  string;
 }[]> {
   const {$api} = useNuxtApp()
-  return $api('https://api.test.phaetd8l.com/v2api/signals/v2/wallets_rank', {
+  return $api('/v2api/signals/v2/wallets_rank', {
     method: 'get',
     query
   })
@@ -184,7 +184,7 @@ export async function getSignalKline({duration=4*60,...body}):Promise<{
   t:string
 }[]> {
   const {$api} = useNuxtApp()
-  return $api(`https://api.test.phaetd8l.com/v2api/signals/v2/kline?duration=${duration}`, {
+  return $api(`/v2api/signals/v2/kline?duration=${duration}`, {
     method: 'post',
     body
   })
@@ -192,7 +192,7 @@ export async function getSignalKline({duration=4*60,...body}):Promise<{
 
 export function getSignalActions(query:{time:string,chain:string,token:string}) {
   const {$api} = useNuxtApp()
-  return $api('https://api.test.phaetd8l.com/v2api/signals/v2/tag/detail', {
+  return $api('/v2api/signals/v2/tag/detail', {
     method: 'get',
     query
   })
