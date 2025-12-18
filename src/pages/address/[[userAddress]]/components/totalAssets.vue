@@ -26,9 +26,9 @@
       </el-switch>
     </div>
     <div class="flex justify-between items-center color-[--secondary-text] text-12px mb-8px">
-      {{ $t('winRate2') }}
+      {{ props.intervalText }} {{ $t('winRate2') }}
       <span class="text-[--up-color] text-24px lh-30px font-bold">
-        {{ formatNumber(txAnalysis.total_win_rate || 0, 2) }}%
+        {{ formatNumber(txAnalysis.win_rate || 0, 2) }}%
       </span>
     </div>
     <div
