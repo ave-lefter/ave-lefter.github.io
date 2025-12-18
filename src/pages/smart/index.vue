@@ -711,7 +711,7 @@ function switchChain(chain: string) {
 function setActiveChain(value: string) {
   if (value !== activeChain.value) {
     signalContainerRef.value?.setFilterToken?.('')
-    signalFilter.value = { ...signalFilter.value, token: '' }
+    signalFilter.value.token=''
   }
   activeChain.value = value
 }
@@ -824,7 +824,7 @@ function setActiveChain(value: string) {
               class="w-20px h-20px rounded-full opacity-60 block"
               :src="`${configStore.token_logo_url}chain/${value}.png`"
               alt=""
-            />
+            >
           </div>
         </div>
       </div>
@@ -854,7 +854,7 @@ function setActiveChain(value: string) {
               class="w-16px h-16px rounded-full opacity-60"
               :src="`${configStore.token_logo_url}chain/${value}.png`"
               alt=""
-            />
+            >
             {{ label }}
           </div>
         </div>

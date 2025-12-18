@@ -107,6 +107,7 @@ function resetAndGet() {
   listData.value = []
   pageParams.value.pageNO = 1
   listStatus.value.finished = false
+  listStatus.value.loading = false
   listStatus.value.error = false
   fetchSignalList()
 }
@@ -322,7 +323,7 @@ function openTokenDetail(el: IActionItem) {
                 @mouseenter.stop="showPopover($event, filterSignalList[index])"
                 @mouseleave.stop="scheduleHide"
               >
-                <img class="w-14px h-14px rounded-full" :src="formatIconTag(tag)" alt="" />
+                <img class="w-14px h-14px rounded-full" :src="formatIconTag(tag)" alt="" >
                 {{ action_count }}{{ $t('smart_money_trade') }}{{ $t(tag) }}
               </div>
             </div>
@@ -385,7 +386,7 @@ function openTokenDetail(el: IActionItem) {
                     height="10"
                     class="rounded-full"
                     alt=""
-                  />
+                  >
                 </div>
                 <div class="flex items-center gap-4px">
                   <div v-tooltip="formatDate(token_create_time, 'MM/DD HH:mm:ss')">
@@ -495,13 +496,13 @@ function openTokenDetail(el: IActionItem) {
                     src="@/assets/images/increase.svg"
                     class="moving-up"
                     alt=""
-                  />
+                  >
                   <img
                     v-else-if="Number(mc_cur) < Number(mc)"
                     src="@/assets/images/decrease.svg"
                     class="moving-down"
                     alt=""
-                  />
+                  >
                 </div>
               </div>
             </div>
