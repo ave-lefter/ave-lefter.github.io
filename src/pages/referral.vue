@@ -1148,6 +1148,14 @@ onMounted(() => {
   --el-fill-color-blank: transparent;
   --d-222-l-F2F2F2: transparent;
   --d-111-l-FFF: transparent;
+  :deep(.el-pagination) {
+    margin-top: 0;
+    border-top: 1px solid transparent;
+    background-color: transparent;
+    --el-text-color-regular: #5A5E64;
+    --el-pagination-button-color: #5A5E64;
+    --el-pagination-bg-color: transparent;
+  }
 }
 
 .token-box {
