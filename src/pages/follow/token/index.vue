@@ -5,8 +5,11 @@ import { VueDraggableNext } from 'vue-draggable-next'
 import { formatNumber2 } from '~/utils/formatNumber'
 import { getChainDefaultIcon } from '~/utils'
 import ArcProgress from '~/components/arcProgress.vue'
-import { getNewFavoriteList, getUserFavoriteGroups, removeFavorite, removeFavoriteGroup, addFavoriteGroup, changeFavoriteGroupName, moveFavoriteGroup, editTokenFavRemark, getGroupChangeIndex } from '~/api/fav'
+import { getNewFavoriteList, getUserFavoriteGroups, removeFavorite, removeFavoriteGroup, addFavoriteGroup, changeFavoriteGroupName, moveFavoriteGroup, editTokenFavRemark, getGroupChangeIndex, batchDeleteFavorite } from '~/api/fav'
 import { WSEventType } from '~/utils/constants'
+import type { TableInstance } from 'element-plus'
+
+const tableRef = ref<TableInstance | null>(null)
 const {isDark} = storeToRefs(useGlobalStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -67,6 +70,37 @@ const addressValue = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
 
+
+// 12-16 批量取消
+const checkedList=ref(<any[]>[])
+const handleSelectionChange = (val: any[]) => {
+  console.log('handleSelectionChange', val)
+  checkedList.value=val.map(i => i?.token+'-' + i?.chain)
+}
+
+const batchDelete=async ()=>{
+  await ElMessageBox.confirm(t('removeTokenTips'), t('tips'), {
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
+    customClass:'w-320px p-16px inputPop',
+    cancelButtonClass:'w-140px h-30px',
+    confirmButtonClass:'w-140px h-30px ml-8px!',
+    dangerouslyUseHTMLString: true,
+  })
+  console.log('batchDelete', checkedList.value)
+  batchDeleteFavorite({
+    address: botStore.evmAddress || walletStore.address,
+    token_ids: checkedList.value
+  }).then(() => {
+    ElMessage.success(t('success'))
+    getList()
+    tableRef.value!.clearSelection()
+    checkedList.value = []
+  }).catch((e) => {
+     ElMessage.error(String(e))
+  })
+}
+
 watch(() => walletStore.walletSignature[walletStore.address], (newValue) => {
   if (newValue) {
     getList()
@@ -122,6 +156,8 @@ const setActiveTab = (val: number) => {
   activeTab.value = val
   pageData.value.page = 1
   getList()
+  tableRef.value!.clearSelection()
+  checkedList.value = []
 }
 
 // 删除分组
@@ -328,7 +364,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex-1 h-[calc(100%-76px)] flex flex-col">
+  <div class="flex-1 h-[calc(100%-76px)] flex flex-col relative">
+    <ul v-if="botStore.evmAddress || walletStore.address" class="w-operate">
+      <li :class="`btn btn1 ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</li>
+    </ul>
     <div v-if="botStore.evmAddress || walletStore.address"
       class="flex items-center px-16px mt-12px gap-8px overflow-x-auto scrollbar-hide">
       <div v-for="(item, index) in allTabsGroup" :key="item.value"
@@ -436,8 +475,9 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="w-100% mt-12px flex-1 overflow-hidden">
-      <el-table v-loading="loading" :height="pageData.total > 50 ? 'calc(100% - 72px)' : '100%'" :data="tableList" fit
-        @sort-change="handleSortChange" @row-click="tableRowClick">
+      <el-table ref="tableRef"
+ v-loading="loading" :height="pageData.total > 50 ? 'calc(100% - 72px)' : '100%'" :data="tableList" fit
+        @sort-change="handleSortChange" @row-click="tableRowClick" @selection-change="handleSelectionChange" :row-key="(row:any)=>`${row.token}-${row.chain}`">
         <template #empty>
           <div v-if="botStore.evmAddress || walletStore.address">
             <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
@@ -456,7 +496,7 @@ onBeforeUnmount(() => {
             </el-button>
           </AveEmpty>
         </template>
-
+        <el-table-column type="selection" width="22" fixed="left" reserve-selection/>
         <el-table-column :label="t('poolPair')" min-width="160" show-overflow-tooltip>
           <template #default="{ row, $index }">
             <NuxtLink :to="`/token/${row.token}-${row.chain}`" @click.stop.prevent>
@@ -643,6 +683,48 @@ onBeforeUnmount(() => {
 </style>
 
 <style lang="scss" scoped>
+.w-operate{
+  position: absolute;
+  top: -35px;
+  right: 0;
+  width: 50%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 12px;
+  padding-right: 16px;
+  /* border-bottom: 1px solid var(--d-222-l-EEE); */
+  li :deep() .el-checkbox__input{
+    margin-top: 2px;
+  }
+  li.btn {
+    display: flex;
+    padding: 0 8px;
+    height: 24px;
+    line-height: 24px;
+    cursor: pointer;
+    background-color: var(--main-input-button-bg);
+    justify-content: center;
+    align-items: center;
+    color: var(--secondary-text);
+    border-radius: 4px;
+    &.btn1{
+      height: 28px;
+      line-height: 28px;
+    }
+    &.warning{
+      background-color: #F6465D1A;
+      color: var(--down-color);
+    }
+    &.active {
+      color: #f5f5f5;
+      background-color: var(--d-333-l-0A0B0C);
+    }
+  }
+}
 :deep(.el-table .sort-caret) {
   border: solid 4px transparent;
 }

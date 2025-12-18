@@ -14,6 +14,8 @@
           <el-radio-button label="30D" :value="'30d'" />
         </el-radio-group>
       </li>
+      <li :class="`btn btn1 ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</li>
+      <!-- checkedList -->
     </ul>
     <div v-if="currentAddress" class="m-header flex-between px-16px items-start">
       <pro-groups v-if="!isMonitor" v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
@@ -21,8 +23,8 @@
     </div>
     <div class="m-table w-100% mt-12px flex-1 overflow-hidden bg-[--secondary-bg]">
       <el-table
-      ref="tableRef" v-loading="loading" class='' :data="filterDataSource" table-layout="fixed" row-class-name="group" :height="((pageData.total > 50) && shouldRenderChild && currentAddress) ? 'calc(100% - 84px)' : '100%'"
-      :default-sort="defaultSort" @sort-change="handleSortChange" @row-click="tableRowClick">
+      ref="tableRef" v-loading="loading" class='' :data="filterDataSource" table-layout="fixed" row-class-name="group" :height="((pageData.total > 50) && shouldRenderChild && currentAddress) ? 'calc(100% - 72px)' : '100%'"
+      :default-sort="defaultSort" @sort-change="handleSortChange" @row-click="tableRowClick"  @selection-change="handleSelectionChange" :row-key="(row:any)=>`${row?.user_address}-${row?.user_chain}`">
         <template #empty>
           <div v-if="!loading && followStore.currentAddress" class="flex flex-col items-center justify-center py-30px">
             <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
@@ -47,7 +49,8 @@
           </AveEmpty>
           <span v-else />
         </template>
-        <el-table-column :label="$t('wallet2')" width="215" fixed="left">
+        <el-table-column v-if="!isMonitor" type="selection" width="22" fixed="left" reserve-selection/>
+        <el-table-column :label="$t('wallet2')" width="215" :fixed="!isMonitor?false:'left'">
           <template #header>
             <span class="text-10px" style="opacity: 0">0</span>
             <span>{{ $t('wallet2') }}</span>
@@ -582,6 +585,7 @@ const reCreateChild = () => {
     shouldRenderChild.value = true
   })
 }
+
 const monitorNum=ref(0)
 
 const pageData1 = ref({
@@ -629,6 +633,67 @@ const dataSource2 = ref([] as Array<any>)
 
 const filterDataSource=computed(() => {
   return isMonitor.value?dataSource2.value:dataSource.value
+})
+
+
+// const checkAll=shallowRef(false)
+// const isIndeterminate = ref(true)
+// const handleCheckAllChange = (val: CheckboxValueType) => {
+//   checkedList.value = val ? filterDataSource.value.map(i => i?.user_address+'-' + i?.user_chain  ) : []
+//   isIndeterminate.value = false
+// }
+
+// watch([checkedList,filterDataSource], (val) => {
+//   console.log('checkedList,favoritesList', val,checkedList.value, filterDataSource.value)
+//   const newVal1=val[0]
+//   const newVal2=val[1]
+//   newVal1.length === newVal2.length && newVal2.length>0
+//     ? (checkAll.value = true)
+//     : (checkAll.value = false)
+//   isIndeterminate.value = newVal1.length > 0 && newVal1.length < newVal2.length
+// })
+
+// 12-16 批量取消
+const checkedList=ref(<any[]>[])
+const handleSelectionChange = (val: any[]) => {
+  console.log('handleSelectionChange', val)
+  checkedList.value=val.map(i => i?.user_address+'-' + i?.user_chain)
+}
+
+const batchDelete=async ()=>{
+  await ElMessageBox.confirm(t('removeTokenTips'), t('tips'), {
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
+    customClass:'w-320px p-16px inputPop',
+    cancelButtonClass:'w-140px h-30px',
+    confirmButtonClass:'w-140px h-30px ml-8px!',
+    dangerouslyUseHTMLString: true,
+  })
+  console.log('batchDelete', checkedList.value)
+  // batchDeleteFavorite({
+  //   address: walletAddress.value,
+  //   token_ids: checkedList.value
+  // }).then(() => {
+  //   ElMessage.success(t('success'))
+  //   resetAndGet()
+  //   checkedList.value = []
+  //   checkAll.value = false
+  //   isIndeterminate.value = false
+  //   favDialogEvent.emit({
+  //     type: 'delete',
+  //   })
+  // }).catch((e) => {
+  //    ElMessage.error(String(e))
+  // })
+}
+
+watch(() => conditions.value.group, (val) => {
+  checkedList.value = []
+  tableRef.value!.clearSelection()
+})
+watch(() => isMonitor.value, (val) => {
+  checkedList.value = []
+  tableRef.value!.clearSelection()
 })
 
 onMounted(async () => {
@@ -976,7 +1041,14 @@ function handleSort(val:any, dir='',sort:string) {
     align-items: center;
     color: var(--secondary-text);
     border-radius: 4px;
-
+    &.btn1{
+      height: 28px;
+      line-height: 28px;
+    }
+    &.warning{
+      background-color: #F6465D1A;
+      color: var(--down-color);
+    }
     &.active {
       color: #f5f5f5;
       background-color: var(--d-333-l-0A0B0C);
