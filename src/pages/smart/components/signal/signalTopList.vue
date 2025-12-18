@@ -3,6 +3,7 @@ import type { ITopSignal } from '~/api/signal'
 const globalStore = useGlobalStore()
 const { t } = useI18n()
 
+const remarksStore = useRemarksStore()
 const props = defineProps<{
   dialogValues: {
     visible: boolean
@@ -41,7 +42,7 @@ defineExpose({
   },
 })
 const flexColumns = ['flex-1', 'w-64px text-right', 'w-72px text-right', 'w-60px text-right']
-const activeColumns = ['flex-1', 'flex-1 text-right', 'flex-1 text-right']
+const activeColumns = ['flex-1', 'w-80px text-right', 'flex-1 text-right']
 const emit = defineEmits(['close', 'loadMore'])
 const elseHeight = computed(() => {
   let substractHeight = 302
@@ -169,7 +170,7 @@ const elseHeight = computed(() => {
         class="flex items-center h-32px mb-4px"
       >
         <div
-          class="flex items-center text-12px gap-8px cursor-pointer"
+          class="flex items-center text-12px gap-8px cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis"
           :class="activeColumns[0]"
           @click="navigateTo(`/address/${row.user_address}/${props.activeChain}`)"
         >
@@ -181,7 +182,31 @@ const elseHeight = computed(() => {
               logo: row.wallet_logo,
             }"
           />
-          {{ row.user_address.slice(0, 4) }}...{{ row.user_address.slice(-4) }}
+          <span
+            v-if="
+              remarksStore.getRemarkByAddress({
+                address: row.user_address,
+                chain: props.activeChain,
+              })
+            "
+            v-tooltip="
+              remarksStore.getRemarkByAddress({
+                address: row.user_address,
+                chain: props.activeChain,
+              })
+            "
+            class="whitespace-nowrap overflow-hidden text-ellipsis"
+          >
+            {{
+              remarksStore.getRemarkByAddress({
+                address: row.user_address,
+                chain: props.activeChain,
+              })
+            }}
+          </span>
+          <template v-else>
+            {{ row.user_address.slice(0, 4) }}...{{ row.user_address.slice(-4) }}
+          </template>
         </div>
         <div class="text-12px" :class="[activeColumns[1], getColorClass(row.pnl)]">
           {{ addSign(row.pnl) }}${{ formatNumber(Math.abs(row.pnl), 2) }}

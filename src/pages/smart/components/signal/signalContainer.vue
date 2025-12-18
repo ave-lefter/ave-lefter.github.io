@@ -291,7 +291,6 @@ watch(
 
 <template>
   <div class="flex justify-between p-16px pt-23px">
-    <TimeLine :activeChain="activeChain" @updateFilterToken="setFilterToken" />
     <div class="flex items-center gap-16px">
       <span
         class="transition-all transition-duration-300 px-8px py-6px rounded-4px bg-#FFA6221A text-12px color-#FFA622 cursor-pointer hover:bg-#FFA622 hover:color-#333"
@@ -306,6 +305,7 @@ watch(
         {{ $t('top24hAddress') }}
       </span>
     </div>
+    <TimeLine :activeChain="activeChain" @updateFilterToken="setFilterToken" />
   </div>
   <div class="flex pt-4px bg-[--main-bg]">
     <SignalTopList

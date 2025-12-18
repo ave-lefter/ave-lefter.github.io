@@ -141,24 +141,6 @@ function getLevel(value: number) {
 
 <template>
   <div class="flex gap-16px items-center">
-    <div class="flex items-center text-12px" style="color: var(--secondary-text)">
-      <span class="mr-8px">{{ $t('normal') }}</span>
-      <div class="flex items-center gap-2px">
-        <div
-          v-for="(el, idx) in 4"
-          :key="idx"
-          class="w-8px h-8px rounded-2px bg-[--main-list-hover]"
-          :class="
-            {
-              1: 'bg-#286DFF opacity-20',
-              2: 'bg-#286DFF opacity-50',
-              3: 'bg-#286DFF',
-            }[idx]
-          "
-        />
-      </div>
-      <span class="ml-8px">{{ $t('hot') }}</span>
-    </div>
     <div class="justify-between flex" :style="{ width: responseObj.styleWidth }">
       <div
         v-for="el in hotList.slice(responseObj.start)"
@@ -196,6 +178,24 @@ function getLevel(value: number) {
           @mouseleave.stop="scheduleHide"
         />
       </div>
+    </div>
+    <div class="flex items-center text-12px" style="color: var(--secondary-text)">
+      <span class="mr-8px">{{ $t('normal') }}</span>
+      <div class="flex items-center gap-2px">
+        <div
+          v-for="(el, idx) in 4"
+          :key="idx"
+          class="w-8px h-8px rounded-2px bg-[--main-list-hover]"
+          :class="
+            {
+              1: 'bg-#286DFF opacity-20',
+              2: 'bg-#286DFF opacity-50',
+              3: 'bg-#286DFF',
+            }[idx]
+          "
+        />
+      </div>
+      <span class="ml-8px">{{ $t('hot') }}</span>
     </div>
   </div>
   <el-popover

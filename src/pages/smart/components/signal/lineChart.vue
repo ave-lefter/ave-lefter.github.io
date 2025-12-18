@@ -90,7 +90,7 @@ const markPoint = computed(() => {
           color: 'transparent',
         },
         symbol: `image://${symbolUrl}`, // 替换为你的图标链接
-        symbolSize: [20, 20],
+        symbolSize: idx === 0 ? [40, 40] : [20, 20],
         animation: true,
         label: {
           show: false,
@@ -129,12 +129,12 @@ const series = computed(() => {
     type: 'line',
     z: 0,
     smooth: true,
-    symbolSize: 1,
+    showSymbol: false, // 不显示所有数据点
     itemStyle: {
       color: getCssVariable('--main-text'), // 折线点的颜色
     },
     lineStyle: {
-      width: 2,
+      width: 1,
     },
     emphasis: {
       disabled: true,
@@ -371,7 +371,7 @@ function init() {
 
 <template>
   <div class="text-left">
-    <div ref="lineChartRef" class="w-375px h-80px ml--12px" />
+    <div ref="lineChartRef" class="w-375px h-120px ml--12px" />
   </div>
 </template>
 
