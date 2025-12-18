@@ -74,8 +74,9 @@ const markPoint = computed(() => {
   return props.marks
     ?.toSorted?.((a, b) => b[0] - a[0])
     ?.map?.((y: any, idx: number) => {
-      const xAxis = y[0] * 1000
-      const yAxis = findNearestValue(y[0])
+      const timeValue = Math.min(y[0], sortedData.value[sortedData.value.length - 1][0])
+      const xAxis = timeValue * 1000
+      const yAxis = findNearestValue(timeValue)
       let symbolUrl = themeStore.isDark ? buyDark : buyLight
       if (idx === 0) {
         symbolUrl = buy
