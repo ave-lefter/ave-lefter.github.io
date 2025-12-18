@@ -25,8 +25,8 @@ import type { Size, SizeObj, pumpObjColor } from '~/api/types/pump'
 import FingerprintJs from '@fingerprintjs/fingerprintjs'
 import { UniChainsV4 } from './wallet/utils/abi'
 import type { MessageHandler } from 'element-plus'
-export * from './wallet/utils/index'
 import CryptoJS from 'crypto-js'
+export * from './wallet/utils/index'
 
 export function isJSON(str: string) {
   try {
@@ -1123,7 +1123,7 @@ export function getPumpColor(platform: string): string {
   return pumpColorMap[platform as PlatformType] || '#FFA622'
 }
 
-export function requestTimeout(interval: number, callback: () => void) {
+export function requestTimeout(interval: number, callback: () => void | Promise<void>) {
   const timerId: { id: number | null } = { id: null }
   let lastCallTime = performance.now()
   const request = () => {
@@ -1255,7 +1255,7 @@ export function sendNotify(result: any) {
     lang: localStorage.getItem('language') || 'en',
   }
   if (window.Notification && Notification.permission === 'granted') {
-    var n = new Notification($i18n.t('alerts'), options)
+    const n = new Notification($i18n.t('alerts'), options)
     n.onclick = (event) => {
       event.preventDefault() // 阻止浏览器聚焦于 Notification 的标签页
       window.open(
@@ -1275,7 +1275,7 @@ export function sendNotify(result: any) {
 
       // 如果用户同意了
       if (status === 'granted') {
-        var n = new Notification($i18n.t('alerts'), options)
+        const n = new Notification($i18n.t('alerts'), options)
         n.onclick = (event) => {
           event.preventDefault() // 阻止浏览器聚焦于 Notification 的标签页
           window.open(
