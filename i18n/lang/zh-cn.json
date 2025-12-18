@@ -1736,5 +1736,6 @@
   "cancelAllOrderTips": "确认是否取消所有委托订单?",
   "cancelAllOrder": "取消全部委托",
   "setTakeProfitOrderSuccess": "设置止盈订单成功",
-  "setStopLossOrderSuccess": "设置止损订单成功"
+  "setStopLossOrderSuccess": "设置止损订单成功",
+  "partialClose":"部分平仓"
 }

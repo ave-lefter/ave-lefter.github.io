@@ -1731,5 +1731,6 @@
   "internalDeposit": "Internal Deposit",
   "direction": "Direction",
   "setTakeProfitOrderSuccess": "Set take profit order successfully",
-  "setStopLossOrderSuccess": "Stop loss order set successfully"
+  "setStopLossOrderSuccess": "Stop loss order set successfully",
+  "partialClose":"Partial Close"
 }

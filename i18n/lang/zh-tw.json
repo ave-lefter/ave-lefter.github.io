@@ -1715,5 +1715,6 @@
   "internalDeposit": "內部充值",
   "direction": "方向",
   "setTakeProfitOrderSuccess": "設置止盈訂單成功",
-  "setStopLossOrderSuccess": "設置止損訂單成功"
+  "setStopLossOrderSuccess": "設置止損訂單成功",
+  "partialClose":"部分平倉"
 }

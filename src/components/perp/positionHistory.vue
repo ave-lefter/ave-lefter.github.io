@@ -2,6 +2,7 @@
 import dayjs from 'dayjs'
 import { getPositionTermPage } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
+import { Position } from '@/utils/perp/domain/entities/Position'
 
 const walletStore = useWalletStore()
 const props = defineProps<{
@@ -29,8 +30,17 @@ const typeDict = computed(() => {
   contractMap.ALL = t('all')
   return contractMap
 })
-
+const isPartialClose = (row: any) => {
+  return Math.abs(row.cumOpenSize) !== Math.abs(row.cumCloseSize)
+}
 const getPnl = (row: any) => {
+  if (isPartialClose(row)) {
+    return (
+      row.cumCloseSize *
+      (row.cumCloseValue / row.cumCloseSize - row.cumOpenValue / row.cumOpenSize) *
+      (row.cumOpenSize > 0 ? -1 : 1)
+    )
+  }
   return row.cumOpenSize > 0
     ? Math.abs(row.cumCloseValue) - Math.abs(row.cumOpenValue)
     : Math.abs(row.cumOpenValue) - Math.abs(row.cumCloseValue)
@@ -68,6 +78,30 @@ const getList = async () => {
 
 if (walletStore.address) {
   getList()
+}
+
+const getUnRealizedPnl = (row: any) => {
+  const positionRaw = perpStore.position?.find(
+    (p) => p.contractId === row.contractId
+  ) as (typeof perpStore.position)[0]
+  const ctx = getPrepData(row.contractId)
+  const symbol = ctx.symbolsList?.find(
+    (s) => s.contractId === row.contractId
+  ) as (typeof ctx.symbolsList)[0]
+  const position = new Position(symbol, positionRaw)
+  return [
+    position
+      .getUnrealizedPnl(
+        perpStore.contractList?.find((i) => i.contractId === row.contractId)?.oraclePrice || '0'
+      )
+      .toString(),
+    position
+      .getUnrealizedPnlRoe(
+        perpStore.contractList?.find((i) => i.contractId === row.contractId)?.oraclePrice || '0',
+        getLeverageFromContractId(row.contractId) || '1'
+      )
+      .toString(),
+  ]
 }
 
 watch(
@@ -127,7 +161,7 @@ watch(
       </el-table-column>
       <el-table-column align="right" :label="t('status')">
         <template #default="{ row }">
-          {{ Math.abs(row.cumOpenSize) === Math.abs(row.cumCloseSize) ? t('closed') : t('open') }}
+          {{ isPartialClose(row) ? t('partialClose') : t('closed') }}
         </template>
       </el-table-column>
       <el-table-column align="right" :label="t('openAvgPrice')">
@@ -151,7 +185,22 @@ watch(
         </template>
       </el-table-column>
       <el-table-column align="right" :label="t('unrealizedPnl')">
-        <template #default> -- </template>
+        <template #default="{ row }">
+          <template v-if="isPartialClose(row)">
+            <div class="lh-18px" :class="getColorClass(getUnRealizedPnl(row)[0])">
+              {{ formatNumber(getUnRealizedPnl(row)[0], 2) }}
+            </div>
+            <div class="lh-18px" :class="getColorClass(getUnRealizedPnl(row)[1])">
+              {{
+                formatNumber(getUnRealizedPnl(row)[1], {
+                  limit: 20,
+                  decimals: 2,
+                })
+              }}%
+            </div>
+          </template>
+          <template v-else>--</template>
+        </template>
       </el-table-column>
       <el-table-column align="right" :label="t('pnl')">
         <template #default="{ row }">
@@ -160,10 +209,16 @@ watch(
           </div>
           <div class="lh-18px" :class="getColorClass(getPnl(row))">
             {{
-              formatNumber((getPnl(row) / Math.abs(row.cumOpenValue)) * 100 * row.currentLeverage, {
-                limit: 20,
-                decimals: 2,
-              })
+              formatNumber(
+                (getPnl(row) /
+                  Math.abs(isPartialClose(row) ? row.cumCloseValue : row.cumOpenValue)) *
+                  100 *
+                  row.currentLeverage,
+                {
+                  limit: 20,
+                  decimals: 2,
+                }
+              )
             }}%
           </div>
         </template>
@@ -171,7 +226,13 @@ watch(
       <el-table-column align="right" :label="t('termCount')">
         <template #default="{ row }">
           {{
-            formatCountdown(0, false, dayjs(+row.updatedTime).diff(dayjs(+row.createdTime), 's'))
+            isPartialClose(row)
+              ? '--'
+              : formatCountdown(
+                  0,
+                  false,
+                  dayjs(+row.updatedTime).diff(dayjs(+row.createdTime), 's')
+                )
           }}
         </template>
       </el-table-column>
