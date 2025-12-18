@@ -60,7 +60,7 @@ const props = defineProps<{
   activeTab: string
   height: string
 }>()
-const {rankConditions} = storeToRefs(globalStore)
+const { rankConditions } = storeToRefs(globalStore)
 function setSortConditions(params: { sort: string; sort_dir: string }) {
   rankConditions.value[props.activeTab].sort = params
   pageInfo.value.pageNO = 1
@@ -95,21 +95,25 @@ const pageInfo = ref({
   total: 0,
 })
 const loading = shallowRef(false)
-const storageKey = computed(()=>{
-  return props.activeTab + 'TableColumns'
+const storageKey = computed(() => {
+  return props.activeTab + 'Ranks'
 })
 let columns = useStorage(storageKey.value, getPumpDefault(t))
-watch(()=>props.activeTab,()=>{
-  initCache()
-  columns = useStorage(storageKey.value, getPumpDefault(t))
-  // sortConditions.value.sort = ''
-  // sortConditions.value.sort_dir = ''
-  // filterForm.value = {}
-  pageInfo.value.pageNO = 1
-  _getTreasureList()
-},{
-  immediate:true
-})
+watch(
+  () => props.activeTab,
+  () => {
+    initCache()
+    columns = useStorage(storageKey.value, getPumpDefault(t))
+    // sortConditions.value.sort = ''
+    // sortConditions.value.sort_dir = ''
+    // filterForm.value = {}
+    pageInfo.value.pageNO = 1
+    _getTreasureList()
+  },
+  {
+    immediate: true,
+  }
+)
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
@@ -130,12 +134,15 @@ async function _getTreasureList(shouldLoading = true) {
       loading.value = true
     }
     const { total: _, ...rest } = pageInfo.value
-    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
-      if(prev[cur]){
-        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
-      }
-      return prev
-    },{...rankConditions.value[props.activeTab].filter})
+    const finalFilter = ['created_at_max', 'created_at_min'].reduce(
+      (prev, cur) => {
+        if (prev[cur]) {
+          prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+        }
+        return prev
+      },
+      { ...rankConditions.value[props.activeTab].filter }
+    )
     const res = await getTreasureList({
       category: props.activeSubTab,
       ...rest,
@@ -233,8 +240,8 @@ const filterMap = {
   quick: (el: any) => el.isVisible && globalStore.rankCommon.quickVisible,
   first_half_elapsed_time: (el: any) => el.isVisible && props.activeSubTab === 'pump_in_almost',
   second_half_elapsed_time: (el: any) => el.isVisible && props.activeSubTab === 'pump_in_almost',
-  progress:(el:any)=>el.isVisible && props.activeSubTab.includes('_in'),
-  headline:(el:any)=>el.isVisible && props.activeSubTab.includes('_out')
+  progress: (el: any) => el.isVisible && props.activeSubTab.includes('_in'),
+  headline: (el: any) => el.isVisible && props.activeSubTab.includes('_out'),
 }
 
 const visibleColumns = computed(() => {
@@ -320,13 +327,13 @@ const cellRenderer = computed(() => {
 })
 
 function initCache() {
-  if(!rankConditions.value[props.activeTab]){
+  if (!rankConditions.value[props.activeTab]) {
     rankConditions.value[props.activeTab] = {
-      sort:{
+      sort: {
         sort: '',
         sort_dir: '',
       },
-      filter:{}
+      filter: {},
     }
   }
 }
@@ -334,7 +341,7 @@ function initCache() {
 <template>
   <div v-loading="loading" :style="`height:${height}`">
     <AveTable
-     row-key="pair_id"
+      row-key="pair_id"
       :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
@@ -342,14 +349,14 @@ function initCache() {
       :row-height="81"
       fixed
       style="--el-bg-color: var(--secondary-bg)"
-       row-class="cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)]"
+      row-class="cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)]"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"
     >
       <template v-for="item in visibleColumns" :key="item.key" #[`header-${item.key}`]>
         <component
-        :is="headerRenderer[item.key as keyof typeof headerRenderer]"
+          :is="headerRenderer[item.key as keyof typeof headerRenderer]"
           :key="activeTab"
           :sortConditions="rankConditions[activeTab]?.sort"
           :setSortConditions="setSortConditions"
@@ -358,7 +365,11 @@ function initCache() {
           :activeInterval="item.activeInterval || globalStore.rankCommon.activeInterval"
         />
       </template>
-      <template v-for="item in visibleColumns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
+      <template
+        v-for="item in visibleColumns"
+        :key="item.key"
+        #[`cell-${item.key}`]="{ row, rowIndex }"
+      >
         <component
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"
