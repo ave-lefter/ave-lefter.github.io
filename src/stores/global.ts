@@ -181,6 +181,9 @@ export const useGlobalStore = defineStore('global', () => {
     notice:{
       monitor:false,
       signal:true,
+      pumpNotice:false,
+      pumpChains:[] as string[],
+      pumpPlatforms:[] as string[],
       position:'top'
     },
     audio:{

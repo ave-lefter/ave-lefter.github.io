@@ -4,6 +4,7 @@ import { NATIVE_TOKEN } from '@/utils/constants'
 import { createCacheRequest } from '#imports'
 import { getTonTokenList } from '~/utils/wallet/ton'
 import { getTokenPnl } from './bot'
+import { getUserTokenBalanceList } from './swap'
 
 // const testDomain = 'https://api.test.phaetd8l.com'
 
@@ -354,6 +355,7 @@ export interface GetHotTokensResponse {
   is_hot: number;
   launchpad: string;
   risk_level: number
+  badges: Array<{ tag: string; icon_url: string }>;
 }
 
 export function getHotTokens(): Promise<GetHotTokensResponse[]> {
@@ -938,7 +940,43 @@ export const bot_getUserWalletTxInfo = createCacheRequest(async function(query: 
           symbol: item?.symbol || '',
           total_profit: res?.profit || '0',
           unrealized_profit: res?.profitUnrealized || '0',
-          realized_profit: res?.profitUnrealized || '0',
+          realized_profit: res?.profitRealized || '0',
+          balance_amount: item?.balance || '0',
+          balance_usd: item?.balance_usd || '0',
+          total_profit_ratio: res?.profitRatio || '0',
+          unrealized_ratio: res?.unrealizedRatio || '0',
+          realized_ratio: res?.realizeRatio || '0',
+          total_purchase_usd: res?.totalBuyUsd || '0',
+          total_sold_usd: res?.totalSellUsd || '0',
+          balance_ratio: res?.balanceRatio || '0',
+          average_purchase_price_usd: res?.avgBuyPrice || '0',
+          average_sold_price_usd: res?.avgSellPrice || '0',
+          total_purchase: res?.totalBuyAmount || '0',
+          bought: res?.totalBuyAmount || '0',
+          total_sold: res?.totalSellAmount || '0',
+          sold: res?.totalSellAmount || '0',
+        }]
+      })
+    })
+  } else if (query.chain === 'polygon') {
+    return getUserTokenBalanceList(query.user_address, query.chain).then(async res => {
+      let item = res?.find(i => i.token === query.user_token)
+      return getTokenPnl({
+        chain: query.chain,
+        token: query.user_token,
+        walletAddress: query.user_address,
+        balance: item?.value || '0',
+        days: 30
+      }).then(async res => {
+        return [{
+          ...item,
+          token: query.user_token,
+          chain: query.chain,
+          logo_url: item?.logo_url || '',
+          symbol: item?.symbol || '',
+          total_profit: res?.profit || '0',
+          unrealized_profit: res?.profitUnrealized || '0',
+          realized_profit: res?.profitRealized || '0',
           balance_amount: item?.balance || '0',
           balance_usd: item?.balance_usd || '0',
           total_profit_ratio: res?.profitRatio || '0',

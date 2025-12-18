@@ -632,6 +632,7 @@ export function getRpcProvider(chain: string) {
   const RPC: Record<string, string> = {
     base: 'https://1rpc.io/base',
     eth: 'https://rpc.mevblocker.io',
+    // polygon: 'https://endpoints.omniatech.io/v1/matic/mainnet/public'
   }
   const rpcUrl = RPC?.[chain] || chainInfo?.rpc_url || ''
   return new JsonRpcProvider(rpcUrl, Number(chainInfo.chain_id))

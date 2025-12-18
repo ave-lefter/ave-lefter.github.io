@@ -52,8 +52,9 @@ export function handleBotError(err: any, notify: any = ElNotification) {
 
 export function tgLogin() {
   let url = 'https://t.me/AveSniperBot?start=lg-'
-  const config = useRuntimeConfig()
-  const baseUrl = config?.public?.apiBase as string
+  // const config = useRuntimeConfig()
+  // const baseUrl = config?.public?.apiBase as string
+  const baseUrl = import.meta.env.VITE_API_BASE
   // test
   if (baseUrl === 'https://api.test.phaetd8l.com') {
     url = 'https://t.me/ave_sniper_bot?start=lg-'

@@ -90,10 +90,15 @@
     </div>
     <ul class="right">
       <li class="color-[--secondary-text] hover:color-[--main-text]">
-        <a target="_blank" href="https://www.tradingview.com/" class="flex-center">
-          <Icon name="simple-icons:tradingview" class="text-18px mr-2px" />TradingView
+        <a target="_blank" href="https://cloud.tencent.com/" class="flex-center">
+          <Icon name="custom:tencent-cloud" class="text-14px mr-2px hover:color-[#0052D9]" />
           <!-- <img v-if="isDark" src="@/assets/images/tradingView-dark.svg" alt="" height="12" />
           <img v-else src="@/assets/images/tradingView-light.svg" alt="" height="12" /> -->
+        </a>
+      </li>
+      <li class="color-[--secondary-text] hover:color-[--main-text]">
+        <a target="_blank" href="https://www.tradingview.com/" class="flex-center">
+          <Icon name="simple-icons:tradingview" class="text-18px mr-2px" />TradingView
         </a>
       </li>
       <li>
@@ -118,9 +123,6 @@
           <Icon name="custom:set-up" class="text-12px ml-2px color-[--main-text]" />
         </template>
         <ul class="flex items-start justify-center flex-col text-12px gap-16px font-500">
-          <!-- <li class="color-[--d-999-l-666] hover:color-[--main-text]">
-          <a class="hover:decoration-underline" target="_blank" href="https://eco.ave.ai">{{ $t('ecosystem') }}</a>
-        </li> -->
           <li class="color-[--secondary-text] hover:color-[--main-text]">
             <a
               class="hover:decoration-underline"
@@ -173,15 +175,14 @@
 </template>
 
 <script setup lang="tsx">
-import ring from '@/assets/audio/ring.wav'
 import { cloneDeep, first, throttle } from 'lodash-es'
 import { formatDec } from '~/utils/formatNumber'
 import { getTokensPrice } from '@/api/token'
-import { upColor, downColor } from '@/utils/constants'
 import type { GetSignalV2ListResponse } from '~/api/signal'
 import UserAvatar from '../userAvatar.vue'
 import type { IMonitorWsResponse } from '~/api/types/ws'
 import bellImg from '@/assets/images/bell.svg'
+import bellImg3 from '@/assets/images/bell3.svg'
 import { TokenImg } from '#components'
 
 const { t } = useI18n()
@@ -190,7 +191,7 @@ const signalStore = useSignalStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const dragPumpStore = usePumpStore()
-
+const configStore = useConfigStore()
 const audioElement = ref<HTMLAudioElement | null>(null)
 const { lang } = storeToRefs(globalStore)
 const { token } = storeToRefs(useTokenStore())
@@ -198,6 +199,38 @@ const route = useRoute()
 const isEn = computed(() => {
   return lang.value === 'en'
 })
+
+// 获取pump配置
+const pumpConfig = computed(() => dragPumpStore.pumpConfig)
+
+// 平台选项 - 根据选中的链动态显示对应的平台
+const platformOptions = computed(() => {
+  const platforms: Array<{ label: string; value: string; icon: string }> = []
+  // 只遍历选中的链
+  pumpConfig.value.forEach((chain: any) => {
+    chain.platforms.forEach((platform: any) => {
+      // 去重
+      if (!platforms.find((p) => p.value === platform.platform)) {
+        platforms.push({
+          label: platform.platform_show,
+          value: platform.platform,
+          icon: platform.platform_icon,
+        })
+      }
+    })
+  })
+  return platforms
+})
+
+const getIconByPlatform = (platform: string) => {
+  const icon =
+    platformOptions.value
+      .find((p: any) => p.value === platform)
+      ?.icon.replace('/signals/', 'signals/') || ''
+  return `${configStore.token_logo_url}${icon}`
+}
+console.log('platformOptions', platformOptions.value)
+
 const addressAndChain = computed(() => {
   const id = route.params.id as string
   if (id) {
@@ -233,6 +266,12 @@ onMounted(() => {
     params: ['signalsv2_public_monitor', localStorage.getItem('signal_active_chain') || 'solana'],
     id: 1,
   })
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'subscribe',
+    params: ['pump_migrated'],
+    id: 1,
+  })
 })
 const initPage = () => {
   // Initialize the page or perform any setup tasks
@@ -256,17 +295,6 @@ const initPage = () => {
     data.value[3] = newVal.filter((i) => i.symbol === 'SOL')[0]
   })
 }
-const newData = computed(() => {
-  return data.value.map((item, idx) => {
-    if (idx === 2) {
-      return { ...item, hidden: addressAndChain.value.chain !== 'bsc' }
-    }
-    if (idx === 3) {
-      return { ...item, hidden: addressAndChain.value.chain === 'bsc' }
-    }
-    return item
-  })
-})
 
 const showPrice = computed(() => {
   if (addressAndChain.value.chain === 'bsc') {
@@ -338,6 +366,72 @@ watch(
     }
   }
 )
+
+// 监听pump事件
+watch(
+  () => wsStore.wsResult[WSEventType.PUMP_MIGRATED],
+  (msg: GetSignalV2ListResponse) => {
+    console.log('wsStore.wsResult[WSEventType.PUMP_MIGRATED]', JSON.parse(JSON.stringify(msg)))
+    if (globalStore.audioSettings.notice.pumpNotice) {
+      const pumpChains = globalStore.audioSettings.notice.pumpChains
+      const pumpPlatforms = globalStore.audioSettings.notice.pumpPlatforms
+      if (pumpChains.includes(msg.chain) && pumpPlatforms.includes(msg.pair.platform_id)) {
+        setTimeout(() => {
+          pumpToast(msg)
+        }, 1000)
+      }
+    }
+  }
+)
+
+// 监听pump事件并弹窗
+function pumpToast(val: GetSignalV2ListResponse) {
+  const getSymbol = () => {
+    if (val.pair.target_token == val.pair.token0_address) {
+      return val.pair.token0_symbol
+    }
+    return val.pair.token1_symbol
+  }
+  const msg = ElMessage({
+    icon: <img src={bellImg3} alt="" class="w-16px h-16px" />,
+    placement: globalStore.audioSettings.notice.position as any,
+    message: () => (
+      <div
+        class="inline-flex items-center gap-4px text-12px cursor-pointer"
+        onClick={() => {
+          navigateTo(`/token/${val.pair.target_token}-${val.chain}`)
+        }}
+      >
+        <div class="flex items-center gap-4px relative">
+          <TokenImg
+            row={{ logo_url: val.pair.logo_url, chain: val.chain, symbol: getSymbol() }}
+            token-class="w-28px h-28px"
+            chainClass="hidden"
+          />
+          <img
+            src={getIconByPlatform(val.pair.platform_id)}
+            alt=""
+            class="w-13px h-13px absolute right-0 bottom-0"
+          />
+        </div>
+        <div class="ml-4px">
+          <div class="text-14px">
+            {getSymbol()} {t('pumpCompleted')}
+          </div>
+          <div class="text-12px color-[--secondary-text] mt-2px">
+            {t('innerDiskTime')}{' '}
+            {val.time - val.pair.publish_at <= 0 || !val.pair.publish_at
+              ? ' - '
+              : formatTime(val.time - val.pair.publish_at)}
+            ，{t('holders')} {val.pair.holders} ，{t('mCap')}{' '}
+            {formatNumber(val.pair.market_cap || 0, 2)}
+          </div>
+        </div>
+      </div>
+    ),
+  })
+  messageQueue.add(msg)
+}
 
 function signalToast(val: GetSignalV2ListResponse) {
   const actionsCount = val.actions.length
