@@ -21,7 +21,7 @@ const formData = reactive<{
 watch(visible, (val) => {
   if (val) {
     formData.closePrice = lastPrice.value
-    formData.closeSize = BigNumber(openSize.value || '0').abs().dp(quantityPrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+    formData.closeSize = BigNumber(openSize.value || '0').abs().times(new BigNumber(10).pow(quantityPrecision.value)).dp(0, BigNumber.ROUND_FLOOR).div(new BigNumber(10).pow(quantityPrecision.value)).toNumber()
     closePercent.value = 100
   }
 })
@@ -142,7 +142,7 @@ function _createOrder() {
     <div class="color-[--third-text] justify-between mb-8px">
       {{ t('closeSize') }}
     </div>
-    <el-input-number v-model="formData.closeSize" :precision="quantityPrecision" align="left" :controls="false" class="mb-12px w-full!" :max="Math.abs(Number(row?.openSize || '0'))" @change="(val) => sizeChange(val as number)" />
+    <el-input-number v-model="formData.closeSize" :precision="quantityPrecision < 0 ? 0 : quantityPrecision" :step="quantityPrecision < 0 ? 10 ** -quantityPrecision : 1" :step-strictly="quantityPrecision < 0" align="left" :controls="false" class="mb-12px w-full!" :max="Math.abs(Number(row?.openSize || '0'))" @change="(val) => sizeChange(val as number)" />
     <el-slider
       v-model="closePercent"
       v-slider-active

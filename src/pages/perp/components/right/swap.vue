@@ -17,11 +17,25 @@
     </el-form-item>
     <el-form-item label="" prop="amount">
       <div v-if="percent > 0" class="absolute z-4 bg-[--main-input-button-bg] top-50% translate-y--50% left-0 pl-15px pointer-events-none">{{ percent }}%</div>
-      <el-input v-model="form.amount" :placeholder="isValue ? $t('value1') :  $t('amount')" size="large"  clearable class="input-number" input-style="text-align:left" @input="percent = 0" @focus="percent = 0"  @update:model-value="value => watchAmount(value)">
+      <el-input-number
+        v-model="form.amount"
+        :placeholder="isValue ? $t('value1') :  $t('amount')"
+        :precision="quantityPrecision < 0 ? 0 : quantityPrecision"
+        :step="quantityPrecision < 0 ? 10 ** -quantityPrecision : 1"
+        :step-strictly="quantityPrecision < 0"
+        class="[&&]:w-full"
+          :controls="false"
+        size="large"
+        clearable
+        align="left"
+        :max="BigNumber.max(maxAmountBuy || '0', maxAmountSell || '0').toNumber()"
+        @input="percent = 0"
+        @focus="percent = 0"
+        @change="value => watchAmount(String(value || '0'))">
         <!-- <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ isValue ? $t('value1') :  $t('amount') }}</span>
         </template> -->
-        <template #append>
+        <template #suffix>
           <el-dropdown placement="bottom" trigger="click" @visible-change="visible => show = visible">
             <div class="inline-flex items-center clickable">
               <span>{{  perpStore.unit?.coinName || ''  }}</span>
@@ -36,7 +50,7 @@
             </template>
           </el-dropdown>
         </template>
-      </el-input>
+      </el-input-number>
     </el-form-item>
     <div class="mt-20px px-3px w-full">
       <el-slider
@@ -276,9 +290,13 @@ const types = computed(() => {
 
 const { createPerpOrder } = usePerp()
 
-const form = reactive({
+const form = reactive<{
+  price: string
+  amount?: string
+  reduceOnly: boolean
+}>({
   price: '',
-  amount: '',
+  amount: undefined,
   reduceOnly: false
 })
 
@@ -366,7 +384,8 @@ function resetForm() {
   // form.price = ''
   // form.amount = ''
   if (formRef.value) {
-    formRef.value.resetFields()
+    form.amount = undefined
+    formRef.value.clearValidate('amount')
   }
   percent.value = 0
   tempData.tpPercent = 0
@@ -468,10 +487,6 @@ const maxAmountSell = computed(() => {
 })
 
 
-const amountSell = computed(() => {
-  return formatMinSize(new BigNumber(maxAmountSell.value || '0').div(new BigNumber(maxAmountBuy.value || '0')).times(form.amount || '0').toFixed(), isValue.value)
-})
-
 const liquidatePriceBuy = computed(() => {
   const price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
   const orderSize = getSize() || '0'
@@ -510,7 +525,7 @@ function sliderInput(percent: number) {
   // const _amount = new BigNumber(maxAmountBuy.value || '0')
   // const a = BigNumber(percent).times(_amount || '0').div(100).toFixed()
   // form.amount = formatMinSize(a)
-  form.amount = ''
+  form.amount = undefined
   if (formRef.value) {
     // formRef.value.resetFields()
     formRef.value.clearValidate('amount')
@@ -528,12 +543,12 @@ function watchPrice(value: string) {
   }
 }
 function watchAmount(value: string) {
-  let _value = formatMinSize(value)
-  const _maxAmount = BigNumber.max(maxAmountBuy.value || '0', maxAmountSell.value || '0').toFixed()
-  if (new BigNumber(_value).gt(_maxAmount)) {
-    _value = _maxAmount || '0'
-  }
-  form.amount = _value
+  // let _value = formatMinSize(value)
+  // const _maxAmount = BigNumber.max(maxAmountBuy.value || '0', maxAmountSell.value || '0').toFixed()
+  // if (new BigNumber(_value).gt(_maxAmount)) {
+  //   _value = _maxAmount || '0'
+  // }
+  // form.amount = _value
 }
 
 function formatMinSize(value: string, _isValue = isValue.value) {
@@ -586,7 +601,7 @@ function getSize(type = 0) {
         stepSize: perpStore.perp?.stepSize || '0'
       })
     }
-    return formatDec(BigNumber(form.amount).div(price).toFixed(), 4)
+    return formatDec(BigNumber(form.amount || '0').div(price).toFixed(), 4)
   } else {
     if (percent.value > 0) {
       return calculateSizeFromRatio({
@@ -595,7 +610,7 @@ function getSize(type = 0) {
         stepSize: perpStore.perp?.stepSize || '0'
       })
     }
-    return form.amount
+    return form.amount || '0'
   }
 }
 
