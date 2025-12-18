@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import type {GetTokenDetailsListResponse} from '~/api/token'
 
 const {t} = useI18n()
+const tokenDetailsStore = useTokenDetailsStore()
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
@@ -119,6 +120,12 @@ function filterType(type: 'swap_buy' | 'swap_sell' | 'AUTHORITY' | 'ADD_LIQUIDIT
 
 function tableRowClick(row: GetTokenDetailsListResponse) {
   window.open(formatExplorerUrl(row.chain, row.tx_hash, 'tx'))
+}
+
+function goToExplorer() {
+  const chain =  tokenDetailsStore.tokenInfo?.chain || ''
+  const address = tokenDetailsStore.user_address || ''
+  window.open(formatExplorerUrl(chain, address, 'address'))
 }
 </script>
 
@@ -262,8 +269,11 @@ function tableRowClick(row: GetTokenDetailsListResponse) {
     </div>
     <AveEmpty
       v-if="!loading && tableList.length === 0"
-      class="pt-50px"
-    />
+      class="pt-10px text-12px"
+    >
+      <p class=" mt-16px">{{ $t('onlyShow30DaysTransactions') }}</p>
+      <a class="block bg-[--primary-color] px-10px py-8px rounded text-[--white] cursor-pointer"  @click="goToExplorer">{{ $t('viewMoreTransactions') }}</a>
+    </AveEmpty>
   </div>
 </template>
 

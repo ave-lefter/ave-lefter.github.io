@@ -109,6 +109,7 @@ export const BusEventType = {
   // LEFT_DRAG: 'left-drag',
   SCROLL_TO_TOP: 'scroll-to-top',
   TOP_ADD_GROUP: 'top-add-group',
+  DEV_TOKENS_TAB: 'dev-tokens-tab',
 }
 
 export const ProvideType = {

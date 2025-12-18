@@ -83,6 +83,14 @@
                 </div>
               </template>
             </el-popover>
+
+            <el-tooltip
+              v-if="isAttention && !tableList.length"
+              :content="$t('noFollowedWalletPurchases')"
+              effect="light"
+            >
+              <Icon name="mdi:information" class="color-[--d-666-l-999] cursor-pointer text-14px ml-4px" />
+            </el-tooltip>
           </div>
         </template>
         <template #default="{ row, $index }">
