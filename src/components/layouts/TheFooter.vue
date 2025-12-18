@@ -72,6 +72,13 @@
     </div>
     <ul class="right">
       <li class="color-[--secondary-text] hover:color-[--main-text]">
+        <a target="_blank" href="https://cloud.tencent.com/" class="flex-center">
+          <Icon name="custom:tencent-cloud" class="text-14px  mr-2px hover:color-[#0052D9]" />
+          <!-- <img v-if="isDark" src="@/assets/images/tradingView-dark.svg" alt="" height="12" />
+          <img v-else src="@/assets/images/tradingView-light.svg" alt="" height="12" /> -->
+        </a>
+      </li>
+      <li class="color-[--secondary-text] hover:color-[--main-text]">
         <a target="_blank" href="https://www.tradingview.com/" class="flex-center">
           <Icon name="simple-icons:tradingview" class="text-18px mr-2px" />TradingView
         </a>
@@ -373,30 +380,29 @@ function signalToast(val:GetSignalV2ListResponse) {
   const actionsVol = val.actions.reduce((acc, curr) => acc + Number(curr.quote_token_amount), 0)
   const firstAction = val.actions[0]
   const msg = ElMessage({
-    icon: <img src={bellImg} alt="" class="w-16px h-16px" />,
+    icon: <img src={bellImg} alt="" class="w-16px h-16px"/>,
     placement: globalStore.audioSettings.notice.position as any,
-    message: () => (
+    message: ()=>(
       <div
         class='inline-flex items-center gap-4px text-12px cursor-pointer'
-        onClick={() => {
-          navigateTo(`/token/${val.token}-${val.chain}`)
+        onClick={()=>{
+        navigateTo(`/token/${val.token}-${val.chain}`)
         }}
       >
-        {actionsCount === 1 && (
-          <UserAvatar
-            wallet_logo={{ logo: firstAction?.wallet_logo, name: firstAction?.wallet_alias }}
+         {actionsCount === 1 && <UserAvatar
+            wallet_logo={{logo:firstAction?.wallet_logo,name:firstAction?.wallet_alias}}
             address={firstAction.wallet_address}
             chain={val.chain}
             iconSize='16px'
-          />
-        )}
-        <span>{actionsCount}{t('signalUnit')}{t(val.tag.replace('_buy', ''))}</span>
-        {t('justNow')}
-        <span class='color-[--up-color] ml--4px'>
-          {t('buy')}{isEn.value ? ' ' : ''}{formatNumber(actionsVol, 1)}{firstAction.quote_token_symbol.toUpperCase() === 'USDC' ? 'U' : firstAction.quote_token_symbol}
-        </span>
-        {t('of')}
-        <TokenImg row={{ logo_url: val.logo, chain: '', symbol: val.symbol }} token-class="w-16px h-16px" />
+        />}
+        <span>{actionsCount}{t('signalUnit')}{t(val.tag.replace('_buy',''))}</span>{t('justNow')}<span class='color-[--up-color] ml--4px'>{t('buy')}{isEn.value ? ' ':''}{
+            formatNumber(actionsVol,1)
+          }{
+            firstAction.quote_token_symbol.toUpperCase() === 'USDC'
+              ? 'U'
+              : firstAction.quote_token_symbol
+          }</span>{t('of')}
+        <TokenImg row={{logo_url:val.logo,chain:'',symbol:val.symbol}} token-class="w-16px h-16px" />
         {val.symbol}
       </div>
     )
