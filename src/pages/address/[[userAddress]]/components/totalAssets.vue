@@ -35,9 +35,7 @@
       class="flex justify-between items-center color-[--secondary-text] lh-20px text-12px mb-8px"
     >
       {{ props.intervalText }} {{ $t('amountU') }}
-      <span class="text-[--up-color] text-14px">
-        {{ totalData.volume }} {{ props.txAnalysis.main_token_symbol }}</span
-      >
+      <span class="text-[--up-color] text-14px"> {{ addUnit(totalData.volume) }}</span>
     </div>
     <div
       class="flex justify-between items-center color-[--secondary-text] lh-20px text-12px mb-8px"
@@ -52,19 +50,13 @@
       class="flex justify-between items-center color-[--secondary-text] lh-20px text-12px mb-8px"
     >
       {{ props.intervalText }} {{ $t('totalBuy2') }}
-      <span class="text-[--up-color] text-14px">
-        {{ totalData.purchase }}
-        {{ props.txAnalysis.main_token_symbol }}</span
-      >
+      <span class="text-[--up-color] text-14px"> {{ addUnit(totalData.purchase) }}</span>
     </div>
     <div
       class="flex justify-between items-center color-[--secondary-text] lh-20px text-12px mb-8px"
     >
       {{ props.intervalText }} {{ $t('totalSell2') }}
-      <span class="text-[--down-color] text-14px">
-        {{ totalData.sold }}
-        {{ props.txAnalysis.main_token_symbol }}</span
-      >
+      <span class="text-[--down-color] text-14px"> {{ addUnit(totalData.sold) }}</span>
     </div>
     <div
       class="flex justify-between items-center color-[--secondary-text] lh-20px text-12px mb-8px"
@@ -125,15 +117,22 @@ const main_token_price = computed(() => {
   return globalStore.isUSDT ? 1 : Number(balanceAnalysis.value.main_token_price || 0)
 })
 
+const getValue = (sourceVal) => {
+  return globalStore.isUSDT ? sourceVal : sourceVal.div(props.txAnalysis.main_token_price || 0)
+}
+
+const addUnit = (value) => {
+  return globalStore.isUSDT ? '$' + value : value + ' ' + props.txAnalysis.main_token_symbol
+}
+
 const totalData = computed(() => {
   const purchaseUsd = new BigNumber(props.txAnalysis.purchase_usd || 0)
   const soldUsd = new BigNumber(props.txAnalysis.sold_usd || 0)
   const resultUsd = purchaseUsd.plus(soldUsd)
-  const main_token_price = new BigNumber(props.txAnalysis.main_token_price || 0)
   return {
-    volume: formatNumber(resultUsd.div(main_token_price).toString(), 2),
-    purchase: formatNumber(purchaseUsd.div(main_token_price).toString(), 2),
-    sold: formatNumber(soldUsd.div(main_token_price).toString(), 2),
+    volume: formatNumber(getValue(resultUsd).toString(), 2),
+    purchase: formatNumber(getValue(purchaseUsd).toString(), 2),
+    sold: formatNumber(getValue(soldUsd).toString(), 2),
   }
 })
 
