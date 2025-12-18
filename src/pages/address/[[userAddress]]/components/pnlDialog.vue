@@ -22,7 +22,7 @@
       </div>
     </template>
     <!-- 当月总盈亏 -->
-    <div class="color-[--up-color] text-12px mb-12px">
+    <div class="text-12px mb-12px" :class="getColorClass(summary.month_total_profit)">
       {{ addSign(summary.month_total_profit) }}${{
         formatNumber(Math.abs(summary.month_total_profit), 1)
       }}

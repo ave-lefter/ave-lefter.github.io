@@ -64,7 +64,7 @@ const _marketcap_analysis = async () => {
     list.value.forEach((el) => {
       el.count = res[el.key]
       el.percent = (el.count / res.total_tokens) * 100
-      if (el.count > maxCount) {
+      if (el.count >= maxCount) {
         maxText = el.label
         maxCount = el.count
       }
