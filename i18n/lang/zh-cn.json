@@ -1562,5 +1562,7 @@
   "takeProfitAndStopLossTips4": "翻倍出本 (100% 盈利平仓 50%)；三倍全出 (剩余仓位 300% 盈利全平)；跌半止损 (50% 亏损全平)。",
   "takeProfitAndStopLossTips5": "10倍止盈 (1000% 盈利全平)；移动止盈 是指价格从最高点回撤 40% 时，自动全仓平仓。",
   "takeProfitAndStopLossTips6": "40%止盈 (40% 盈利全平)；移动止盈 是指价格从最高点回撤 60% 时，自动全仓平仓。",
-  "advancedTradingStrategy": "高级交易策略"
+  "advancedTradingStrategy": "高级交易策略",
+  "top100PurchaseAvg": "前100持仓均价",
+  "top100SellAvg": "前100卖出均价"
 }
