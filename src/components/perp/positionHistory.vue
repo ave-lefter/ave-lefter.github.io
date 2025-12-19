@@ -2,7 +2,9 @@
 import dayjs from 'dayjs'
 import { getPositionTermPage } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
-import { Position } from '@/utils/perp/domain/entities/Position'
+import BigNumber from 'bignumber.js'
+// import { PositionFactory, SymbolEntity } from '~/utils/perp/domain'
+// import type { IContract } from '~/utils/perp/types'
 
 const walletStore = useWalletStore()
 const props = defineProps<{
@@ -30,20 +32,38 @@ const typeDict = computed(() => {
   contractMap.ALL = t('all')
   return contractMap
 })
+
+// const positionTermsList = computed(() => {
+//   const symbolsList =
+//     (perpStore.metadata?.contractList || [])?.map((c) => SymbolEntity.fromRaw(c as IContract)) || []
+//   const positionList = PositionFactory.createPositionsFromRaw(perpStore.position || [], symbolsList)
+//   return PositionFactory.createPositionTermsFromRaw(listData.value, positionList, symbolsList)
+// })
 const isPartialClose = (row: any) => {
   return Math.abs(row.cumOpenSize) !== Math.abs(row.cumCloseSize)
 }
 const getPnl = (row: any) => {
+  const openValue =
+    perpStore.position.find((el) => el.contractId === row.contractId)?.openValue || 0
+  const base = new BigNumber(0).minus(row.cumOpenValue).minus(row.cumCloseValue)
   if (isPartialClose(row)) {
-    return (
-      row.cumCloseSize *
-      (row.cumCloseValue / row.cumCloseSize - row.cumOpenValue / row.cumOpenSize) *
-      (row.cumOpenSize > 0 ? -1 : 1)
-    )
+    return base.plus(openValue)
   }
-  return row.cumOpenSize > 0
-    ? Math.abs(row.cumCloseValue) - Math.abs(row.cumOpenValue)
-    : Math.abs(row.cumOpenValue) - Math.abs(row.cumCloseValue)
+  return base
+}
+
+const getPnlRatio = (row: any) => {
+  const pnl = getPnl(row)
+  if (!row.currentLeverage) return new BigNumber(0)
+  {
+    const openValue =
+      perpStore.position.find((el) => el.contractId === row.contractId)?.openValue || 0
+    const closedOpenValue = isPartialClose(row)
+      ? new BigNumber(row.cumOpenValue).abs().minus(new BigNumber(openValue).abs())
+      : new BigNumber(row.cumOpenValue).abs()
+    if (closedOpenValue.isZero()) return new BigNumber(0)
+    return pnl.dividedBy(closedOpenValue).multipliedBy(100).multipliedBy(row.currentLeverage)
+  }
 }
 
 const getList = async () => {
@@ -81,29 +101,19 @@ if (walletStore.address) {
 }
 
 const getUnRealizedPnl = (row: any) => {
-  const positionRaw = perpStore.position?.find(
-    (p) => p.contractId === row.contractId
-  ) as (typeof perpStore.position)[0]
-  const ctx = getPrepData(row.contractId)
-  const symbol = ctx.symbolsList?.find(
-    (s) => s.contractId === row.contractId
-  ) as (typeof ctx.symbolsList)[0]
-  const position = new Position(symbol, positionRaw)
-  return [
-    position
-      .getUnrealizedPnl(
-        perpStore.contractList?.find((i) => i.contractId === row.contractId)?.oraclePrice || '0'
-      )
-      .toString(),
-    position
-      .getUnrealizedPnlRoe(
-        perpStore.contractList?.find((i) => i.contractId === row.contractId)?.oraclePrice || '0',
-        getLeverageFromContractId(row.contractId) || '1'
-      )
-      .toString(),
-  ]
+  const oraclePrice =
+    perpStore.contractList?.find((i) => i.contractId === row.contractId)?.oraclePrice || 0
+  return BigNumber(row.openSize).multipliedBy(oraclePrice).minus(row.openValue).toString()
 }
 
+const getUnRealizedPnlRatio = (row: any) => {
+  const pnl = getUnRealizedPnl(row)
+  return BigNumber(pnl)
+    .dividedBy(BigNumber(row.openValue).abs())
+    .multipliedBy(100)
+    .multipliedBy(row.leverage)
+    .toString()
+}
 watch(
   () => [props.searchParams, walletStore.address],
   () => {
@@ -187,12 +197,12 @@ watch(
       <el-table-column align="right" :label="t('unrealizedPnl')">
         <template #default="{ row }">
           <template v-if="isPartialClose(row)">
-            <div class="lh-18px" :class="getColorClass(getUnRealizedPnl(row)[0])">
-              {{ formatNumber(getUnRealizedPnl(row)[0], 2) }}
+            <div class="lh-18px" :class="getColorClass(getUnRealizedPnl(row))">
+              {{ formatNumber(getUnRealizedPnl(row), 2) }}
             </div>
-            <div class="lh-18px" :class="getColorClass(getUnRealizedPnl(row)[1])">
+            <div class="lh-18px" :class="getColorClass(getUnRealizedPnlRatio(row))">
               {{
-                formatNumber(getUnRealizedPnl(row)[1], {
+                formatNumber(getUnRealizedPnlRatio(row), {
                   limit: 20,
                   decimals: 2,
                 })
@@ -204,21 +214,15 @@ watch(
       </el-table-column>
       <el-table-column align="right" :label="t('pnl')">
         <template #default="{ row }">
-          <div class="lh-18px" :class="getColorClass(getPnl(row))">
-            {{ formatNumber(getPnl(row)) }}
+          <div class="lh-18px" :class="getColorClass(getPnl(row).toString())">
+            {{ formatNumber(getPnl(row).toString()) }}
           </div>
-          <div class="lh-18px" :class="getColorClass(getPnl(row))">
+          <div class="lh-18px" :class="getColorClass(getPnlRatio(row).toString())">
             {{
-              formatNumber(
-                (getPnl(row) /
-                  Math.abs(isPartialClose(row) ? row.cumCloseValue : row.cumOpenValue)) *
-                  100 *
-                  row.currentLeverage,
-                {
-                  limit: 20,
-                  decimals: 2,
-                }
-              )
+              formatNumber(getPnlRatio(row).toString(), {
+                limit: 20,
+                decimals: 2,
+              })
             }}%
           </div>
         </template>
