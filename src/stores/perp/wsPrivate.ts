@@ -128,10 +128,10 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
             const canceledOrder: OrderEntry[] = (order as OrderEntry[]).filter((i) => i.status === 'CANCELED')
             // 取消订单
             if(canceledOrder.length > 0){
-              perpStore.order = perpStore.order.filter((i) => !canceledOrder.some(j => j.id === i.id) && i.type !== 'MARKET' && i.type !== 'FILLED')
+              perpStore.order = perpStore.order.filter((i) => !canceledOrder.some(j => j.id === i.id) && i.type !== 'MARKET' && i.status !== 'FILLED')
             } else {
               // 加仓、平仓、止盈、止损
-              perpStore.order = perpStore.order?.filter((i) => !(order as OrderEntry[]).some((el) => el.id === i.id)).concat(...(order as OrderEntry[]))?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET'&& i.type !== 'FILLED')
+              perpStore.order = perpStore.order?.filter((i) => !(order as OrderEntry[]).some((el) => el.id === i.id)).concat(...(order as OrderEntry[]))?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET'&& i.status !== 'FILLED')
               getTotalAssets()
             }
           }
@@ -194,7 +194,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
     } else {
       perpStore.position = position
     }
-    perpStore.order = perpStore.order?.filter?.((i) => position.some((j) => j.contractId === i.contractId) && i.type !== 'MARKET') || []
+    perpStore.order = perpStore.order?.filter?.((i) => position.some((j) => j.contractId === i.contractId) && i.type !== 'MARKET' && i.status !== 'FILLED') || []
   }
 
   function updateOrderInfo(order: OrderEntry[]) {
