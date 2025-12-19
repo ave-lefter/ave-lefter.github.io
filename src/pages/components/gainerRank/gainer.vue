@@ -51,7 +51,7 @@ const props = defineProps<{
   ammList: IGetTreasureConfig['swaps']
 }>()
 
-const {rankConditions} = storeToRefs(globalStore)
+const { rankConditions } = storeToRefs(globalStore)
 
 function setSortConditions(params: { sort: string; sort_dir: string }) {
   rankConditions.value.gainer.sort = params
@@ -69,7 +69,9 @@ function setFilterForm(...args: any[]) {
 
 const listData = ref<any[]>([])
 
-const tableDataCache = reactive<Record<string, { data: any[], total: number, timestamp: number }>>({})
+const tableDataCache = reactive<Record<string, { data: any[]; total: number; timestamp: number }>>(
+  {}
+)
 
 const filteredListData = computed(() => {
   if (globalStore.pumpSetting.isBlacklist) {
@@ -95,7 +97,7 @@ const pageInfo = ref({
 })
 
 const loading = shallowRef(false)
-const columns = useStorage('gainUserTableColumns', getGainDefaultColumns(t))
+const columns = useStorage(CategoryTabsCacheKey.gainer, getGainDefaultColumns(t))
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
@@ -115,7 +117,7 @@ onActivated(() => {
   const cacheKey = getCacheKey()
   const cachedData = tableDataCache[cacheKey]
 
-  if (cachedData && (Date.now() - cachedData.timestamp) < 10000) {
+  if (cachedData && Date.now() - cachedData.timestamp < 10000) {
     listData.value = cachedData.data
     pageInfo.value.total = cachedData.total
 
@@ -158,7 +160,7 @@ watch(
     const cacheKey = getCacheKey()
     const cachedData = tableDataCache[cacheKey]
 
-    if (cachedData && (Date.now() - cachedData.timestamp) < 30000) {
+    if (cachedData && Date.now() - cachedData.timestamp < 30000) {
       listData.value = cachedData.data
       pageInfo.value.total = cachedData.total
       pageInfo.value.pageNO = 1
@@ -196,12 +198,15 @@ async function _getTreasureList(shouldLoading = true) {
     }
 
     const { total: _, ...rest } = pageInfo.value
-    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
-      if(prev[cur]){
-        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
-      }
-      return prev
-    },{...rankConditions.value.gainer.filter})
+    const finalFilter = ['created_at_max', 'created_at_min'].reduce(
+      (prev, cur) => {
+        if (prev[cur]) {
+          prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+        }
+        return prev
+      },
+      { ...rankConditions.value.gainer.filter }
+    )
 
     const requestParams: any = {
       category: 'gainer',
@@ -238,7 +243,7 @@ async function _getTreasureList(shouldLoading = true) {
     tableDataCache[cacheKey] = {
       data: processedData,
       total: res.total,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     }
 
     if (shouldLoading) {
@@ -252,12 +257,12 @@ async function _getTreasureList(shouldLoading = true) {
     console.error('获取涨幅榜数据失败:', error)
     try {
       const res = await getPriceChangeTopTokens()
-      const processedData = Array.isArray(res) ? res : (res.data || [])
+      const processedData = Array.isArray(res) ? res : res.data || []
 
       // 应用链筛选
       let filteredData = processedData
       if (props.activeChain !== 'AllChains') {
-        filteredData = processedData.filter(item => item.chain === props.activeChain)
+        filteredData = processedData.filter((item) => item.chain === props.activeChain)
       }
 
       listData.value = filteredData.map(props.listMapFunction)
@@ -309,9 +314,10 @@ watch(
           volume_1h: item.volume_1h,
           volume_15m: item.volume_15m,
           volume_1m: item.volume_1m,
-          market_cap: el.current_price_usd && item.uprice
-            ? ((el.market_cap || 0) / el.current_price_usd) * item.uprice
-            : el.market_cap,
+          market_cap:
+            el.current_price_usd && item.uprice
+              ? ((el.market_cap || 0) / el.current_price_usd) * item.uprice
+              : el.market_cap,
         }
       }
       return el
