@@ -34,7 +34,7 @@ export function getPrepData(contractId: string) {
     return order
   })
   return {
-    positions: positions.map(i => (new Position(symbol, i))) || [],
+    positions: positions.map(i => (new Position(perpStore.contractList.find(item => item.contractId === i.contractId) as any, i))) || [],
     metadata: metadata,
     orders: _orders || [],
     account: perpStore.userInfo,
@@ -195,6 +195,8 @@ export function calculateMaxSize(params: {
     ...getPrepData(params.contractId)
   } as any
 
+  console.log('calculateMaxSize', orderCalculationContext)
+
   const calculateMaxSizeParams = {
     ...params
   }
@@ -292,4 +294,71 @@ export function getPositionLiqPrice(contractId: string) {
     pendingTransferOutAmount: collateralInfo?.totalPendingTransferOutAmount,
   })
   return liqPrice;
+}
+
+
+export function calculateAvailableBalance(contractId: string, quoteCoinId?: string) {
+  const perpStore = usePerpStore()
+  const rawAccount = perpStore.userInfo
+
+  if (!perpStore.metadata || !rawAccount) return '0'
+
+  const metadata = perpStore.metadata as any
+  const account = rawAccount ? Account.fromRaw(rawAccount) : null
+
+  const _quoteCoinId = quoteCoinId || metadata?.contractList?.find((c: { contractId: string }) => c.contractId === contractId)?.quoteCoinId
+
+  const contractList = metadata?.contractList || []
+  const order = perpStore.order || []
+  const collateralRaw = perpStore.collateral || []
+  const withdraw = perpStore.withdraw || []
+  const transferOut = perpStore.transferOut || []
+  const symbolsList = contractList?.map((c) => SymbolEntity.fromRaw(c as IContract)) || []
+  const collateralList = (collateralRaw || []).map((c) => Collateral.fromRaw(c))
+  const tickers = new Map()
+  perpStore.tickers.forEach((ticker) => {
+    let symbol = perpStore.contractList.find(item => item.contractId === ticker.contractId)
+    tickers.set(symbol?.contractName, new Ticker(SymbolEntity.fromRaw(symbol as any), ticker))
+  })
+  const collateralInfo = account
+    ? AccountRiskService.calculateCollateralStats({
+        contractId,
+        quoteCoinId: _quoteCoinId || '',
+        positionList: (perpStore.position || [])?.map(i => (new Position(perpStore.contractList.find(item => item.contractId === i.contractId) as any, i))) || [],
+        account,
+        metadata,
+        symbolsList,
+        withdraw,
+        transferOut,
+        collateral: collateralList,
+        orderList: order,
+        tickers,
+      })
+    : {
+        totalEquity: BigNumber(0),
+        totalInitialMarginRequirement: BigNumber(0),
+        totalStarkExRiskValue: BigNumber(0),
+        totalPendingWithdrawAmount: BigNumber(0),
+        totalPendingTransferOutAmount: BigNumber(0),
+        totalOrderFrozenAmount: BigNumber(0),
+      }
+    /**
+     * 计算可用余额
+     *
+     * 业务逻辑：
+     * - 可用余额 = 总权益 - 初始保证金要求 - 待提现金额 - 待转出金额 - 订单冻结金额
+     * - 确保余额不为负数
+     *
+     * @returns 可用余额
+     */
+    const balance = BigNumber.max(
+      0,
+      BigNumber(collateralInfo.totalEquity)
+        .minus(collateralInfo.totalInitialMarginRequirement)
+        .minus(collateralInfo.totalPendingWithdrawAmount)
+        .minus(collateralInfo.totalPendingTransferOutAmount)
+        .minus(collateralInfo.totalOrderFrozenAmount),
+    )
+
+    return balance
 }

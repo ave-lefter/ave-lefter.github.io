@@ -71,6 +71,7 @@
     </el-input>
     <div class="text-12px color-[--third-text] mt-8px text-right">
       <span>{{ $t('availableBalance') }}: </span><span>{{ formatNumber(balance, 3) }} {{ depositForm?.token || '' }}</span>
+      <span v-if="depositForm.amount && BigNumber(depositForm.amount).gt(0) && BigNumber(balance).minus(depositForm.amount || 0).gte(0)"> -> {{ formatNumber(BigNumber(balance).minus(depositForm.amount || 0).toFixed(), 6) }} {{ depositForm?.token || '' }}</span>
     </div>
     <div class="text-14px flex items-center justify-between mt-32px rd-4px">
       <span class="color-[--secondary-text]">{{ $t('arrivalTime') }}</span>
@@ -78,7 +79,9 @@
     </div>
     <div class="text-14px flex items-center justify-between mt-16px rd-4px">
       <span class="color-[--secondary-text]">{{ $t('totalBalance1') }}</span>
-      <span class="color-[--main-text]">${{ availableBalance }}</span>
+      <span class="color-[--main-text] ml-auto">{{ prepBalance }}</span>
+      <span v-if="depositForm.amount && BigNumber(depositForm.amount).gt(0) && BigNumber(prepBalance).plus(depositForm.amount || 0).gte(0)" class="color-[--main-text] ml-5px"> -> {{ formatNumber(BigNumber(prepBalance).plus(depositForm.amount || 0).toFixed(), 6) }}</span>
+      <span class="ml-3px">{{ depositForm?.token || '' }}</span>
     </div>
     <el-button v-if="isCanDeposit" type="primary" size="large" class="w-full text-16px h-48px rd-8px mt-20px" :loading="loading" @click.stop="handleDeposit">{{ $t('confirmDeposit') }}</el-button>
     <button v-else disabled class="w-full text-16px h-48px bg-[--border] color-[--secondary-text] flex items-center justify-center border-none rd-8px mt-20px cursor-not-allowed">{{ $t('confirmDeposit') }}</button>
@@ -123,8 +126,9 @@ const balance = computed(() => {
   return balanceObj.value?.[depositForm.token + '-' + depositForm.chain] || 0
 })
 
+const { prepBalance } = usePerp()
 const availableBalance = computed(() => {
-  return BigNumber(CoreCalculator.getCollateralAvailableAmount('1000') || '0').dp(6, BigNumber.ROUND_FLOOR).toString()
+  return BigNumber(calculateAvailableBalance('', '1000') || '0').dp(6, BigNumber.ROUND_FLOOR).toString()
 })
 
 const getTokenBalance = async() => {

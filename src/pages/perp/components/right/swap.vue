@@ -438,7 +438,7 @@ const perpMargin = computed(() => {
 })
 
 const availableBalance = computed(() => {
-  return CoreCalculator.calculateAvailableBalance(perpStore.perp?.contractId || '') || '0'
+  return calculateAvailableBalance(perpStore.perp?.contractId || '') || '0'
 })
 
 const feeRate = computed(() => {

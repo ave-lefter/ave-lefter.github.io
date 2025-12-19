@@ -71,7 +71,7 @@
     </el-input>
     <div class="text-12px color-[--third-text] mt-8px text-right">
       <span>{{ $t('availableBalance') }}: </span><span>{{ balance }} {{ withdrawForm?.token || '' }}</span>
-      <span v-if="withdrawForm.amount && BigNumber(withdrawForm.amount).gt(0) && remainBalance.gt(0)"> -> {{ remainBalance }} {{ withdrawForm?.token || '' }}</span>
+      <span v-if="withdrawForm.amount && BigNumber(withdrawForm.amount).gt(0) && remainBalance.gte(0)"> -> {{ remainBalance }} {{ withdrawForm?.token || '' }}</span>
     </div>
     <!-- <div class="text-14px flex items-center justify-between mt-32px rd-4px">
       <span class="color-[--secondary-text]">到账时间</span>
@@ -143,7 +143,7 @@ const withdrawForm = reactive<{
 
 
 const balance = computed(() => {
-  return BigNumber(CoreCalculator.getCollateralAvailableAmount('1000', perpStore.position) || '0').dp(6, BigNumber.ROUND_FLOOR).toString()
+  return BigNumber(calculateAvailableBalance('', '1000') || '0').dp(6, BigNumber.ROUND_FLOOR).toString()
 })
 
 const remainBalance = computed(() => {
