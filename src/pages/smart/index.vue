@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SignalContainer from './components/signal/signalContainer.vue'
 import KOL from './components/kol/index.vue'
-import { getTopSignal, type ITopSignal } from '~/api/signal'
+import Filter from './components/signal/filter.vue'
 import { _getKolList, _getSmartList } from '@/api/kol'
 import { useLocalStorage, useStorage } from '@vueuse/core'
 import type { ChainKey } from '~/api/types/pump'
@@ -11,7 +11,11 @@ const { t } = useI18n()
 const configStore = useConfigStore()
 const walletStore = useWalletStore()
 const botStore = useBotStore()
+const localeStore = useLocaleStore()
+const globalStore = useGlobalStore()
 
+const signalContainerRef =
+  useTemplateRef<InstanceType<typeof SignalContainer>>('signalContainerRef')
 const smartChains = computed(() => {
   return ['solana', 'bsc'].map((value) => {
     return {
@@ -20,18 +24,10 @@ const smartChains = computed(() => {
     }
   })
 })
-const activeChain = useStorage<ChainKey>('signal_active_chain','bsc')
+const isActivity = computed(() => activeTab.value === 'activity')
+const activeChain = useStorage<ChainKey>('signal_active_chain', 'bsc')
 const activeChain2 = shallowRef<ChainKey>('solana')
 
-const dialogValues = ref<{
-  visible: boolean
-  loading: boolean
-  list: ITopSignal[]
-}>({
-  visible: false,
-  loading: false,
-  list: [],
-})
 const intervalFilter = useLocalStorage('web_market_intervalFilter', {})
 const signalSwitchFlag = useLocalStorage('signalSwitchFlag', true)
 const filterConditions = useLocalStorage('filterConditionsSmart', {
@@ -79,6 +75,29 @@ const defaultConditions = ref({
 })
 const filterFormObj = ref({})
 
+const audioVisible = ref(false)
+const showResetBtn = shallowRef(false)
+// token: 筛选 token
+// history_count：筛选信号数，对应值2, 5, 15
+// 市值：mc_curr，市值过滤，
+// 市值方向：mc_curr_sign， 默认 > 大于号，可选 <
+const defaultSignalFilter = {
+  token: '',
+  history_count: undefined as undefined | number,
+  mc_curr: undefined as undefined | number,
+  mc_curr_sign: '<',
+}
+const signalFilter = useStorage('signalParams', {
+  ...defaultSignalFilter,
+})
+
+function onReset() {
+  signalFilter.value = { ...defaultSignalFilter }
+}
+function onConfirm(_filterParams: typeof defaultSignalFilter) {
+  signalFilter.value = { ..._filterParams }
+}
+
 const tabs = computed(
   () =>
     [
@@ -124,18 +143,6 @@ const tableData = computed(() => {
 const activeCategory1 = computed(() => filterConditions.value.category)
 const activeInterval = computed(() => intervalFilter?.value['global_interval'] || '7D')
 
-async function setDialogVisible() {
-  dialogValues.value.visible = !dialogValues.value.visible
-  if(dialogValues.value.visible && dialogValues.value.list.length === 0){
-    dialogValues.value.loading = true
-    try {
-      const res = await getTopSignal()
-      dialogValues.value.list = res || []
-    } finally {
-      dialogValues.value.loading = false
-    }
-  }
-}
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 
 type TabId = (typeof tabs.value)[number]['id']
@@ -210,7 +217,7 @@ function getSmartList(isSort = false) {
   // 只在数据变化时更新storage
   const currentKey = filterConditions?.value?.chain + '-' + filterConditions?.value?.category
   const conditions = filterConditions.value?.[currentKey] || ''
-  console.log('------conditions--------',currentKey)
+  console.log('------conditions--------', currentKey)
   const data = {
     ...conditions,
     chain: filterConditions?.value.chain,
@@ -435,7 +442,7 @@ function initFilterForm() {
     keyword: {
       visible: false,
       type: 'keyword',
-      keyword: searchKeywords.value[key] || '',  // 从内存状态获取keyword
+      keyword: searchKeywords.value[key] || '', // 从内存状态获取keyword
       sort_dir: conditions?.sort === 'keyword' ? conditions?.sort_dir || null : null,
     },
   }
@@ -508,7 +515,7 @@ function filterRange(prop) {
   }
   const range = rangeObj[prop]
   // let len = range?.length
-  if(prop === 'keyword') {
+  if (prop === 'keyword') {
     // 从内存状态检查搜索关键词是否激活
     return searchKeywords.value[key] && searchKeywords.value[key] !== ''
   }
@@ -613,7 +620,7 @@ function handleFilterConfirm(val) {
   resetSort()
   getSmartList()
 }
-function handleSort(val:string, dir: string) {
+function handleSort(val: string, dir: string) {
   const currentForm = filterFormObj.value[activeChain2.value + '-' + activeCategory1.value]
   if (val.type === 'profit_percent_num') {
     const profit_obj = currentForm?.['profit_percent_num']?.profit_obj
@@ -680,7 +687,7 @@ function handleReset(val) {
 function handleSortChange(row: { prop: string; order: 'ascending' | 'descending' | null }) {
   filterConditions.value[activeChain2.value + '-' + activeCategory1.value].sort = row?.prop
   filterConditions.value[activeChain2.value + '-' + activeCategory1.value].sort_dir =
-  row?.order?.replace?.('ending', '') || null
+    row?.order?.replace?.('ending', '') || null
   console.log('-----row-------', activeChain2.value + '-' + activeCategory1.value)
   // resetSort()
   getSmartList(true)
@@ -700,6 +707,14 @@ function switchChain(chain: string) {
   initFilterForm()
   getSmartList()
 }
+
+function setActiveChain(value: string) {
+  if (value !== activeChain.value) {
+    signalContainerRef.value?.setFilterToken?.('')
+    signalFilter.value.token=''
+  }
+  activeChain.value = value
+}
 </script>
 
 <template>
@@ -716,13 +731,77 @@ function switchChain(chain: string) {
           {{ item.name }}
         </span>
       </div>
-      <div v-if="activeTab === 'activity'" class="flex">
+      <div v-if="isActivity" class="flex h-28px">
         <div class="flex items-center mr-24px">
-          <span
-            class="transition-all transition-duration-300 px-8px py-6px rounded-4px bg-#FFA6221A text-12px color-#FFA622 cursor-pointer hover:bg-#FFA622 hover:color-#333"
-            @click="setDialogVisible"
-            >{{ $t('SignalTopList') }}</span
+          <div
+            v-show="showResetBtn"
+            class="flex items-center text-12px gap-2px cursor-pointer mr-20px color-[--main-text]"
+            @click="signalContainerRef?.setFilterToken?.('')"
           >
+            <Icon name="custom:reset" class="text-14px" />
+            {{ $t('reset') }}
+          </div>
+          <Filter :filter-params="signalFilter" @onReset="onReset" @onConfirm="onConfirm" />
+          <el-popover
+            v-model:visible="audioVisible"
+            trigger="click"
+            popper-class="el-select__popper"
+          >
+            <template #reference>
+              <div class="flex items-center text-12px ml-20px color-[--main-text] cursor-pointer">
+                <Icon
+                  :name="globalStore.audioSettings.audio.signal ? 'custom:ad' : 'custom:admute'"
+                  class="text-16px mr-4px color-[--secondary-text]"
+                />
+                {{ $t('NewSignalAlert') }}
+              </div>
+            </template>
+            <template #default>
+              <ul class="el-scrollbar__view el-select-dropdown__list [&&]:m--12px">
+                <li
+                  v-for="item in audioList"
+                  :key="item"
+                  class="el-select-dropdown__item hover:bg-[--border]"
+                  :class="{ 'bg-[--border]': globalStore.audioSettings.audio.signal === item }"
+                  @click="
+                    () => {
+                      globalStore.audioSettings.audio.signal = item
+                      audioVisible = false
+                    }
+                  "
+                >
+                  <span class="text-12px">{{ item || $t('close') }}</span>
+                </li>
+              </ul>
+            </template>
+          </el-popover>
+          <div class="flex items-center text-12px ml-20px color-[--main-text]">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+            >
+              <circle cx="7" cy="7" r="7" fill="#349EFF" />
+              <path
+                d="M6.0594 9.56109L6.165 7.96635L9.06051 5.3572C9.18895 5.24065 9.03435 5.18405 8.86453 5.28584L5.29021 7.54394L3.74422 7.05398C3.41267 6.95979 3.40886 6.72979 3.81986 6.56402L9.84088 4.24123C10.1161 4.11684 10.3801 4.30902 10.2745 4.73119L9.24913 9.56085C9.1773 9.90406 8.97013 9.98683 8.68353 9.82867L7.12256 8.67512L6.3724 9.40245C6.28559 9.48926 6.214 9.56085 6.0594 9.56085V9.56109Z"
+                fill="white"
+              />
+            </svg>
+            <a
+              v-if="!['zh-cn', 'zh-tw'].includes(localeStore.locale)"
+              href="https://t.me/AveSignalMonitor"
+              target="_blank"
+              class="ml-1 underline"
+            >
+              TG {{ $t('Subscription') }}
+            </a>
+            <a v-else href="https://t.me/AveSignalMonitorCN" target="_blank" class="underline ml-1">
+              TG{{ $t('Subscription') }}
+            </a>
+          </div>
+
           <QuickSwapSet
             v-model:quickBuyValue="quickBuyValue"
             :chain="activeChain"
@@ -731,20 +810,21 @@ function switchChain(chain: string) {
           />
           <AutoSellSetting class="ml-20px" :chain="activeChain" />
         </div>
-        <div class="p-2px rounded-4px bg-[--main-input-button-bg] flex color-[--third-text]">
+        <div
+          class="px-8px py-2px rounded-4px gap-4px bg-[--main-input-button-bg] flex color-[--third-text]"
+        >
           <div
-            v-for="{ label, value } in smartChains"
+            v-for="{ value } in smartChains"
             :key="value"
-            class="flex items-center justify-center gap-4px px-8px py-6px text-12px rounded-4px cursor-pointer"
+            class="flex items-center justify-center p-2px rounded-4px cursor-pointer"
             :class="`${activeChain === value ? 'bg-[--tab-active-bg] color-[--main-text]' : ''}`"
-            @click="activeChain = value"
+            @click="setActiveChain(value)"
           >
             <img
-              class="w-16px h-16px rounded-full opacity-60"
+              class="w-20px h-20px rounded-full opacity-60 block"
               :src="`${configStore.token_logo_url}chain/${value}.png`"
               alt=""
             >
-            {{ label }}
           </div>
         </div>
       </div>
@@ -760,7 +840,9 @@ function switchChain(chain: string) {
             {{ interval }}
           </div>
         </div>
-        <div class="p-2px rounded-4px bg-[--main-input-button-bg] flex ml-12px color-[--third-text]">
+        <div
+          class="p-2px rounded-4px bg-[--main-input-button-bg] flex ml-12px color-[--third-text]"
+        >
           <div
             v-for="{ label, value } in smartChains"
             :key="value"
@@ -780,11 +862,12 @@ function switchChain(chain: string) {
     </div>
 
     <SignalContainer
-      v-if="activeTab == 'activity'"
+      v-if="isActivity"
+      ref="signalContainerRef"
+      v-model:showResetBtn="showResetBtn"
       :activeChain="activeChain"
       :quickBuyValue="quickBuyValue"
-      :dialogValues="dialogValues"
-      @close="dialogValues.visible = false"
+      :filterParams="signalFilter"
     />
     <KOL
       v-else
@@ -810,7 +893,7 @@ function switchChain(chain: string) {
 
 <style scoped lang="scss">
 .active {
-  background: #3F80F7;
+  background: #3f80f7;
   color: #f5f5f5;
 }
 .interval-btns {

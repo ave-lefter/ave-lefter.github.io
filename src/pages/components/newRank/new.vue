@@ -51,7 +51,7 @@ const props = defineProps<{
   height: string
   ammList: IGetTreasureConfig['swaps']
 }>()
-const {rankConditions} = storeToRefs(globalStore)
+const { rankConditions } = storeToRefs(globalStore)
 function setSortConditions(params: { sort: string; sort_dir: string }) {
   rankConditions.value.new.sort = params
   pageInfo.value.pageNO = 1
@@ -88,16 +88,20 @@ const pageInfo = ref({
   total: 0,
 })
 const loading = shallowRef(false)
-const storageKey = computed(()=>{
-  return CategroyTabsCacheKey.new
+const storageKey = computed(() => {
+  return CategoryTabsCacheKey.new
 })
 let columns = useStorage(storageKey.value, getNewDefaultColumns(t))
-watch(()=>props.activeTab,()=>{
-  columns = useStorage(storageKey.value, getNewDefaultColumns(t))
-  console.log('watch new',columns,storageKey)
-},{
-  immediate:true
-})
+watch(
+  () => props.activeTab,
+  () => {
+    columns = useStorage(storageKey.value, getNewDefaultColumns(t))
+    console.log('watch new', columns, storageKey)
+  },
+  {
+    immediate: true,
+  }
+)
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
   navigateTo(`/token/${rowData.target_token}-${rowData.chain}`)
@@ -118,12 +122,15 @@ async function _getTreasureList(shouldLoading = true) {
       loading.value = true
     }
     const { total: _, ...rest } = pageInfo.value
-    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
-      if(prev[cur]){
-        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
-      }
-      return prev
-    },{...rankConditions.value.new.filter})
+    const finalFilter = ['created_at_max', 'created_at_min'].reduce(
+      (prev, cur) => {
+        if (prev[cur]) {
+          prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+        }
+        return prev
+      },
+      { ...rankConditions.value.new.filter }
+    )
     const res = await getTreasureList({
       category: props.activeTab,
       ...rest,
@@ -317,15 +324,15 @@ const cellRenderer = computed(() => {
 <template>
   <div v-loading="loading" :style="`height:${height}`">
     <AveTable
-    row-key="pair_id"
+      row-key="pair_id"
       :loading="loading"
       :data="filteredListData"
       :columns="visibleColumns"
       :header-height="40"
       :row-height="81"
       fixed
-     style="--el-bg-color: var(--secondary-bg)"
-       row-class="cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)]"
+      style="--el-bg-color: var(--secondary-bg)"
+      row-class="cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)]"
       :rowEventHandlers="{
         onClick: tableRowClick,
       }"
@@ -340,7 +347,11 @@ const cellRenderer = computed(() => {
           :ammList="item.key === 'dex' ? ammList : null"
         />
       </template>
-      <template v-for="item in visibleColumns" :key="item.key" #[`cell-${item.key}`]="{ row, rowIndex }">
+      <template
+        v-for="item in visibleColumns"
+        :key="item.key"
+        #[`cell-${item.key}`]="{ row, rowIndex }"
+      >
         <component
           :is="cellRenderer[item.key as keyof typeof cellRenderer]"
           class="text-14px"

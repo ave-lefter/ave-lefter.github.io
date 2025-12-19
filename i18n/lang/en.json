@@ -1553,6 +1553,10 @@
   "overLimit": "Over limit, please confirm if it is filled incorrectly",
   "pairsLink": "Jump block explorer",
   "searchSameAmm": "View similar pools",
+  "top24hAddress": "Top 24h Active Address",
+  "whale": "Whale",
+  "noActiveWallet": "No active wallet",
+  "smartMoneyAddress": "Smart Money Address",
   "pumpCompleted": "Pump Completed",
   "innerDiskTime": "Inner Disk Time",
   "resetTips": "Reset will hide your custom fields and return to the default display. The filtering conditions remain unchanged. Are you sure to reset?",
@@ -1571,5 +1575,6 @@
   "takeProfitAndStopLossTips4": "Double out (100% profit and 50% of the position is closed); Triple out (the remaining position is 300% and the profit is all closed); Half stop loss (50% of the loss is all closed).",
   "takeProfitAndStopLossTips5": "10 times take profit (1000% profit all-even); moving take profit means that all positions will be automatically closed when the price retraces 40% from the highest point.",
   "takeProfitAndStopLossTips6": "40% take profit (40% profit closing); trailing take profit means that all positions will be automatically closed when the price retraces 60% from the highest point.",
-  "advancedTradingStrategy": "Advanced Sell Strategy"
+  "advancedTradingStrategy": "Advanced Sell Strategy",
+  "canWithdraw": "Withdrawable"
 }

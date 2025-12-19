@@ -233,9 +233,12 @@ function subscribePortrait() {
 
 function _getTokenInfo() {
   const id = route.params.id as string
+  tokenStore.loadingToken = true
   return getTokenInfo(id).then(res => {
     tokenStore.tokenInfo = res
     tokenStore.pairAddress = res?.pairs?.[0].pair || ''
+  }).finally(() => {
+    tokenStore.loadingToken = false
   })
 }
 
@@ -321,7 +324,7 @@ function addVisit() {
         price: tokenStore.price || 0,
       })
     }
-    
+
     usePriceV2Store().sendPriceWs()
   }
 }

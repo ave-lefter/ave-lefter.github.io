@@ -199,7 +199,7 @@ export const SwapType = {
   LIMIT_SELL: 6,
 }
 
-export const CategroyTabsCacheKey = {
+export const CategoryTabsCacheKey = {
   hot:'hotRanks',
   new:'newRanks',
   gainer:'gainerRanks',

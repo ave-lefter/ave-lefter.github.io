@@ -40,7 +40,7 @@
                   >
                     {{
                       referralInfo?.refCode
-                        ? Math.round((referralInfo?.refRatio || 0) / 100) + '%'
+                        ? Math.round((referralInfo?.botRefRatio || referralInfo?.refRatio || 0) / 100) + '%'
                         : $t('viewAfterLogin')
                     }}
                   </td>
@@ -149,14 +149,14 @@
           <div>
             <div class="data-card_label">{{ $t('withdrawable') }}</div>
             <div class="text-20px lh-26px">
-              ${{ formatNumber(referralInfo?.totalWithdrawableAmount || 0) }}
+              ${{ formatNumber(referralInfo?.totalWithdrawableIncome || referralInfo?.totalWithdrawableAmount || 0) }}
             </div>
             <div class="data-card_label mt-24px">{{ $t('withdrawn') }}</div>
             <div class="text-20px lh-26px">
               ${{
                 formatNumber(
                   (referralInfo?.totalIncomeAmount || 0) -
-                    (referralInfo?.totalWithdrawableAmount || 0)
+                    (referralInfo?.totalWithdrawableIncome || referralInfo?.totalWithdrawableAmount || 0)
                 )
               }}
             </div>
@@ -177,18 +177,18 @@
             <div class="text-20px lh-26px">
               $ {{ formatNumber(referralInfo?.totalIncomeAmount || 0) }}
             </div>
-            <div v-show="(referralInfo?.channelRefRatio || 0) > 0" class="data-card_label mt-24px">
+            <div v-show="(referralInfo?.botChannelRefRatio || referralInfo?.channelRefRatio || 0) > 0" class="data-card_label mt-24px">
               {{ $t('totalChannelRebate') }}
             </div>
-            <div v-show="(referralInfo?.channelRefRatio || 0) > 0" class="text-20px lh-26px">
-              $ {{ formatNumber(referralInfo?.channelReferralIncomeAmount || 0) }}
+            <div v-show="(referralInfo?.botChannelRefRatio || referralInfo?.channelRefRatio || 0) > 0" class="text-20px lh-26px">
+              $ {{ formatNumber(referralInfo?.botSwapChannelIncome || referralInfo?.channelReferralIncomeAmount || 0) }}
             </div>
           </div>
         </li>
         <li class="data-card">
           <div>
             <div class="data-card_label">{{ $t('totalInvitees') }}</div>
-            <div class="text-20px lh-26px">{{ invitees || 0 }}</div>
+            <div class="text-20px lh-26px">{{ referralInfo?.totalInvitees || 0 }}</div>
             <div class="data-card_label mt-24px">{{ $t('swapInvitees24H') }}</div>
             <div class="text-20px lh-26px">{{ referralInfo?.swapInvitees24H || 0 }}</div>
           </div>
@@ -281,7 +281,7 @@
         <el-table-column prop="name" :label="$t('amount')">
           <template #default="{ row }">
             <div style="line-height: 1">
-              {{ formatNumber(formatAmount(row.value || 0, row.decimals || 0)) }} {{ row.symbol }}
+              {{ formatNumber(formatAmount(row.amount || row.value || 0, row.decimals || 0)) }} {{ row.symbol }}
             </div>
             <div
               style="
@@ -293,7 +293,7 @@
               "
             >
               ≈${{
-                formatNumber(
+                formatNumber(row.amountUSD ||
                   Number(formatAmount(row.value || 0, row.decimals || 0)) * Number(row.price || 0)
                 )
               }}
@@ -548,6 +548,11 @@ interface ReferralInfo {
   withdrawableList?: WithdrawableItem[]
   startTime?: string
   endTime?: string
+  botRefRatio?: number
+  botChannelRefRatio?: number
+  botSwapChannelIncome?: number
+  totalInvitees?: number
+  totalWithdrawableIncome?: number
 }
 
 interface InviteeItem {
@@ -1148,6 +1153,14 @@ onMounted(() => {
   --el-fill-color-blank: transparent;
   --d-222-l-F2F2F2: transparent;
   --d-111-l-FFF: transparent;
+  :deep(.el-pagination) {
+    margin-top: 0;
+    border-top: 1px solid transparent;
+    background-color: transparent;
+    --el-text-color-regular: #5A5E64;
+    --el-pagination-button-color: #5A5E64;
+    --el-pagination-bg-color: transparent;
+  }
 }
 
 .token-box {
