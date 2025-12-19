@@ -30,10 +30,8 @@ import {
   DexHeader,
 } from '../components/index'
 import { set } from 'lodash-es'
-import { addFavorite, removeFavorite } from '~/api/fav'
 import type { RowEventHandlerParams } from 'element-plus'
 import dayjs from 'dayjs'
-import { CategoryTabsCacheKey } from '~/utils/constants'
 
 const { t } = useI18n()
 const globalStore = useGlobalStore()
@@ -82,7 +80,7 @@ const pageInfo = ref({
 })
 const loading = shallowRef(false)
 const storageKey = computed(() => {
-  return CategoryTabsCacheKey[props.activeTab as keyof typeof CategoryTabsCacheKey]
+  return props.activeTab+'Ranks'
 })
 let columns = useStorage(storageKey.value, getActivityDefaultColumns(t))
 watch(
@@ -236,12 +234,15 @@ const filterMap = {
 }
 
 const visibleColumns = computed(() => {
-  return columns.value.filter((el) => {
+  if(storageKey.value){
+    return columns.value.filter((el) => {
     if (filterMap[el.key as keyof typeof filterMap]) {
       return filterMap[el.key as keyof typeof filterMap](el)
     }
     return el.isVisible
   })
+  }
+  return columns.value
 })
 
 const headerRenderer = computed(() => {
