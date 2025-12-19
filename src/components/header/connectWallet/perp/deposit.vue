@@ -124,7 +124,7 @@ const balance = computed(() => {
 })
 
 const availableBalance = computed(() => {
-  return BigNumber(CoreCalculator.getCollateralAvailableAmount('1000') || '0').dp(6, BigNumber.ROUND_FLOOR).toString()
+  return BigNumber(calculateAvailableBalance('', '1000') || '0').dp(6, BigNumber.ROUND_FLOOR).toString()
 })
 
 const getTokenBalance = async() => {
