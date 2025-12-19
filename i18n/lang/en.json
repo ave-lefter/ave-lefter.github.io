@@ -1568,5 +1568,6 @@
   "takeProfitAndStopLossTips4": "Double out (100% profit and 50% of the position is closed); Triple out (the remaining position is 300% and the profit is all closed); Half stop loss (50% of the loss is all closed).",
   "takeProfitAndStopLossTips5": "10 times take profit (1000% profit all-even); moving take profit means that all positions will be automatically closed when the price retraces 40% from the highest point.",
   "takeProfitAndStopLossTips6": "40% take profit (40% profit closing); trailing take profit means that all positions will be automatically closed when the price retraces 60% from the highest point.",
-  "advancedTradingStrategy": "Advanced Sell Strategy"
+  "advancedTradingStrategy": "Advanced Sell Strategy",
+  "canWithdraw": "Withdrawable"
 }
