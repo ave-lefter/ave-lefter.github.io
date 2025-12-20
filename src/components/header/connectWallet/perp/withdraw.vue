@@ -55,7 +55,7 @@
     </el-select>
     <div  class="flex items-center justify-between mb-16px text-14px bg-[--border] h-40px rd-6px px-12px">
       <span class="color-[--third-text]">{{ $t('poolBalance') }}</span>
-      <span>{{ poolBalance }} {{ withdrawForm?.token || '' }}</span>
+      <span>{{ poolBalance !== '∞' ? formatNumber(poolBalance, { limit: 6, decimals: 0}) : '0' }} {{ withdrawForm?.token || '' }}</span>
     </div>
     <el-input v-model="withdrawForm.amount"
       class="text-right"
@@ -168,12 +168,11 @@ const poolBalance = computed(() => {
   if (withdrawForm.chain == '1') {
     return '∞'
   }
-  return formatNumber(poolBalanceObj.value?.[withdrawForm.token + '-' + withdrawForm.chain] || 0, { limit: 6, decimals: 0})
+  return poolBalanceObj.value?.[withdrawForm.token + '-' + withdrawForm.chain] || 0
 })
 
 async function getPoolBalance() {
   if (!withdrawForm.token || !withdrawForm.chain) return
-  console.log('withdrawForm.chain', withdrawForm.chain)
   const chainInfo = perpStore.metadata?.multiChain?.chainList?.find(i => i.chainId === withdrawForm.chain)
   const tokenInfo = chainInfo?.tokenList?.find(i => i.token === withdrawForm.token)
   const decimals = tokenInfo?.decimals

@@ -79,7 +79,7 @@
     </div>
     <div class="text-14px flex items-center justify-between mt-16px rd-4px">
       <span class="color-[--secondary-text]">{{ $t('totalBalance1') }}</span>
-      <span class="color-[--main-text] ml-auto">{{ prepBalance }}</span>
+      <span class="color-[--main-text] ml-auto">{{ formatNumber(prepBalance, 4) }}</span>
       <span v-if="depositForm.amount && BigNumber(depositForm.amount).gt(0) && BigNumber(prepBalance).plus(depositForm.amount || 0).gte(0)" class="color-[--main-text] ml-5px"> -> {{ formatNumber(BigNumber(prepBalance).plus(depositForm.amount || 0).toFixed(), 6) }}</span>
       <span class="ml-3px">{{ depositForm?.token || '' }}</span>
     </div>

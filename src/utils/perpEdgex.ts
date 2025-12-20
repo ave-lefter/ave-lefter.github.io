@@ -9,7 +9,7 @@ type RiskTierModel = ReturnType<typeof usePerpStore>['contractList'][0]['riskTie
  * @param decimal BigDecimal值
  * @return 小数位数
  */
-function getDecimalScale(decimal: BigNumber | number | string) {
+export function getDecimalScale(decimal: BigNumber | number | string) {
   const str = decimal.toString()
   if (str.includes('.')) {
     return str.length - str.indexOf('.') - 1

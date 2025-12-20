@@ -42,7 +42,7 @@ export function usePerp() {
       }
       return prev.plus(value)
     }, new BigNumber(0))
-    return new BigNumber(amount).plus(positionsAmount).toFixed(2)
+    return new BigNumber(amount).plus(positionsAmount).toFixed()
   })
 
   const unrealizedPnl = computed(() => {

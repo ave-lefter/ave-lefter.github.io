@@ -261,7 +261,7 @@
     </li>
     <li v-if="!form.reduceOnly" class="flex items-center mt-8px">
       <span class="mr-auto">{{ $t('estimatedLiquidationPrice') }}</span>
-      <span class="color-[--up-color]">{{ BigNumber(getSize()).gt(0) ? formatNumber(liquidatePriceBuy, 4) : '-' }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ BigNumber(getSize(1)).gt(0) ? formatNumber(liquidatePriceSell, 4) : '-' }} USD</span>
+      <span class="color-[--up-color]">{{ BigNumber(getSize()).gt(0) ? formatNumber(liquidatePriceBuy, pricePrecision) : '-' }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ BigNumber(getSize(1)).gt(0) ? formatNumber(liquidatePriceSell, pricePrecision) : '-' }} USD</span>
     </li>
     <li class="flex items-center mt-8px">
       <span class="mr-auto">{{ $t('fee') }}</span>
@@ -419,20 +419,25 @@ const slForm = reactive<{
 const perpMargin = computed(() => {
   const contractId = perpStore.perp?.contractId || ''
   // const orderPrice = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+  const { takerFeeRate, makerFeeRate } = getFeeRate(perpStore.perp?.contractId || '')
   return {
     buy: calculateMargin({
       contractId: contractId,
       size: Number(getSize() || '0'),
       side: 'BUY',
       price: swapType.value === 'LIMIT' ? Number(form.price || 0) : 0,
-      isMarketOrder: false
+      isMarketOrder: false,
+      oraclePrice: Number(perpStore.perp?.oraclePrice || '0'),
+      feeRate: takerFeeRate,
     }).toFixed(),
     sell: calculateMargin({
       contractId: contractId,
       size: Number(getSize(1) || '0'),
       side: 'SELL',
       price: swapType.value === 'LIMIT' ? Number(form.price || 0) : 0,
-      isMarketOrder: false
+      isMarketOrder: false,
+      oraclePrice: Number(perpStore.perp?.oraclePrice || '0'),
+      feeRate: makerFeeRate
     }).toFixed(),
   }
 })

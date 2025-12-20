@@ -25,14 +25,25 @@ export function getPrepData(contractId: string) {
   })
 
   let _orders = orders.map(i => {
-    let order = Order.fromRaw(symbol, i) as any
+    // let order = Order.fromRaw(symbol, i) as any
     // let { takerFeeRate, makerFeeRate } = getFeeRate(order.contractId)
     // let maxLeverage = getLeverageFromContractId(order.contractId)
     // order.maxLeverage = maxLeverage
     // order.takerFeeRate = takerFeeRate
     // order.makerFeeRate = makerFeeRate
-    return order
+    return i
   })
+      // contractId: string;
+    // metadata: IMetadata;
+    // account: AccountInfo;
+    // positions: Position[];
+    // orders: OrderEntry[];
+    // collaterals: any[];
+    // withdraws: any[];
+    // transfers: any[];
+    // symbolsList: SymbolEntity[];
+    // tickers: Map<string, Ticker>;
+    // orderBook?: { ask1: string; bid1: string };
   return {
     positions: positions.map(i => (new Position(perpStore.contractList.find(item => item.contractId === i.contractId) as any, i))) || [],
     metadata: metadata,
@@ -167,7 +178,7 @@ export function calculateMargin(params1: {
   const _leverage = params1.leverage || getLeverageFromContractId(params1.contractId)
   const feeRate = getFeeRate(params1.contractId)
   const perpStore = usePerpStore()
-  const orderBook = perpStore.contractId === params1.contractId ? ( params1.side === 'BUY' ? perpStore.sellList : perpStore.buyList) : undefined
+  const orderBook = perpStore.contractId === params1.contractId ? (params1.side === 'BUY' ? perpStore.sellList : perpStore.buyList) : undefined
   // 准备参数
   const params = {
     side: params1.side || 'BUY', // 或 "LONG"
@@ -195,8 +206,6 @@ export function calculateMaxSize(params: {
     ...getPrepData(params.contractId)
   } as any
 
-  console.log('calculateMaxSize', orderCalculationContext)
-
   const calculateMaxSizeParams = {
     ...params
   }
@@ -209,7 +218,11 @@ export function calculateSizeFromRatio(params: {
   ratio: number
   stepSize: string
 }) {
-  return OrderCalculationService.calculateSizeFromRatio(params)
+  // return OrderCalculationService.calculateSizeFromRatio(params)
+  const { maxQty, ratio, stepSize } = params
+  const rawSize = BigNumber(maxQty).multipliedBy(ratio).dividedBy(100)
+  const ds = getDecimalScale(stepSize)
+  return rawSize.times(new BigNumber(10).pow(ds)).dp(0, BigNumber.ROUND_FLOOR).div(new BigNumber(10).pow(ds)).toFixed()
 }
 
 

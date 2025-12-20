@@ -14,13 +14,13 @@
       <li class="flex items-center justify-between">
         <span class="color-[--third-text]">{{ $t('totalAssets') }}</span>
         <NuxtLink class="flex items-center clickable font-500" :to="`/address/${walletStore.address}/${walletStore.chain}?active=perp`">
-          <span>{{ prepBalance }} USDT</span>
+          <span>{{ formatNumber(prepBalance, 4) }} USDT</span>
           <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
         </NuxtLink>
       </li>
       <li class="flex items-center justify-between mt-12px">
         <span class="color-[--third-text]">{{ $t('initialMargin') }}</span>
-        <span class="font-500">{{ formatNumber(initMarginRequirement, 3) }} USDT</span>
+        <span class="font-500">{{ formatNumber(initMarginRequirement, 4) }} USDT</span>
       </li>
       <li class="flex items-center justify-between mt-12px">
         <span class="color-[--third-text]">{{ $t('maintenanceMargin') }}</span>
@@ -28,7 +28,7 @@
       </li>
       <li class="flex items-center justify-between mt-12px">
         <span class="color-[--third-text]">{{ $t('unrealizedPnl') }}</span>
-        <span class="font-500" :class="getColor(unrealizedPnl)">{{ formatNumber(unrealizedPnl, 3) }} USDT</span>
+        <span class="font-500" :class="getColor(unrealizedPnl)">{{ formatNumber(unrealizedPnl, 2) }} USDT</span>
       </li>
     </ul>
   </div>
