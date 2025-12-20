@@ -1,6 +1,10 @@
 <template>
   <div>
-    <el-calendar v-show="!isChartView" class="[&&]:[--el-calendar-cell-width:44px]">
+    <el-calendar
+      v-show="!isChartView"
+      :model-value="new Date()"
+      class="[&&]:[--el-calendar-cell-width:44px]"
+    >
       <template #header>
         <PnlCalendarHeader
           v-model:dialogCalendarVis="dialogCalendarVis"
@@ -172,9 +176,10 @@ const initOrUpdateChart = () => {
   const option = {
     grid: {
       top: '10',
-      left: '25',
+      left: 0,
       right: '15',
-      bottom: '20',
+      bottom: 0,
+      containLabel: true,
     },
     xAxis: {
       type: 'category',
