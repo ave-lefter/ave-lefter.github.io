@@ -65,6 +65,13 @@
   "notMigrated": "Not Migrated",
   "migrationRate": "Migration Rate",
   "migration": "Migration",
+  "viewDevTokens": "View Dev Tokens",
+  "devTokensDisplayed": "Dev tokens are now displayed in the lower right corner",
+  "onlyShow30DaysTransactions": "Only show valid transactions within 30 days",
+  "viewMoreTransactions": "View more transaction records",
+  "noFollowedWalletPurchases": "Followed wallets currently have no purchase records on chain",
+  "copyContract": "Copy Address",
+  "copyTokenName": "Copy Name",
   "volumeOneHour": "1h Vol",
   "name": "Name",
   "createdTime": "Created time",
@@ -1546,6 +1553,10 @@
   "overLimit": "Over limit, please confirm if it is filled incorrectly",
   "pairsLink": "Jump block explorer",
   "searchSameAmm": "View similar pools",
+  "top24hAddress": "Top 24h Active Address",
+  "whale": "Whale",
+  "noActiveWallet": "No active wallet",
+  "smartMoneyAddress": "Smart Money Address",
   "pumpCompleted": "Pump Completed",
   "innerDiskTime": "Inner Disk Time",
   "resetTips": "Reset will hide your custom fields and return to the default display. The filtering conditions remain unchanged. Are you sure to reset?",
@@ -1566,5 +1577,6 @@
   "takeProfitAndStopLossTips6": "40% take profit (40% profit closing); trailing take profit means that all positions will be automatically closed when the price retraces 60% from the highest point.",
   "advancedTradingStrategy": "Advanced Sell Strategy",
   "top100PurchaseAvg": "Top100 Purchase Avg Price",
-  "top100SellAvg": "Top100 Sell Avg Price"
+  "top100SellAvg": "Top100 Sell Avg Price",
+  "canWithdraw": "Withdrawable"
 }

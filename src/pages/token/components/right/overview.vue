@@ -268,6 +268,8 @@ import { formatDate, formatExplorerUrl, isJSON } from '@/utils/index'
 import { useTokenStore } from '~/stores/token'
 import { useWindowSize } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
+import { BusEventType } from '@/utils/constants'
+import { useEventBus } from '@vueuse/core'
 
 const aiSummary = inject<Ref<{ summary: string; headline: string }>>('aiSummary')
 const props = defineProps<{
@@ -305,6 +307,12 @@ const supportObj: Record<string, string> = {
   solana: 'SOL',
   optimism: 'OP',
 }
+
+// 监听从 top 组件触发的查看 Dev 代币事件
+const devTokensEvent = useEventBus(BusEventType.DEV_TOKENS_TAB)
+devTokensEvent.on(() => {
+  activeTab.value = 'devBit'
+})
 
 // 计算是否应该显示所属链信息
 const shouldShowChainInfo = computed(() => {

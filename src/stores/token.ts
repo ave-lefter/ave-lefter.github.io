@@ -30,7 +30,7 @@ export const useTokenStore = defineStore('token', () => {
     {}
   )
   const collected = shallowRef(false)
-
+  const loadingToken = shallowRef(false)
   const token = computed(() => tokenInfo.value?.token)
   const pairs = computed(() => tokenInfo.value?.pairs)
   const pairAddress = useSessionStorage('token_pairAddress', '')
@@ -329,7 +329,8 @@ export const useTokenStore = defineStore('token', () => {
     commonHeight,
     twitterType,
     collected,
-    getXType: _getXType
+    getXType: _getXType,
+    loadingToken,
   }
 })
 
