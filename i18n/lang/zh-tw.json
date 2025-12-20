@@ -1558,5 +1558,7 @@
   "takeProfitAndStopLossTips5": "10倍止盈 (1000% 盈利全平)；移動止盈 是指價格從最高點回撤 40% 時，自動全倉平倉。",
   "takeProfitAndStopLossTips6": "40%止盈 (40% 盈利全平)；移動止盈 是指價格從最高點回撤 60% 時，自動全倉平倉。",
   "advancedTradingStrategy": "高級交易策略",
+  "top100PurchaseAvg": "前100持倉均價",
+  "top100SellAvg": "前100賣出均價",
   "canWithdraw": "可領取"
 }

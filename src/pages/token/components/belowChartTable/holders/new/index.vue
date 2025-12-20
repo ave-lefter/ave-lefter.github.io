@@ -21,6 +21,22 @@
         </a>
       </div>
     </div>
+    <div v-if="aggregateStats?.top100Ratio > 0 ||aggregateStats?.top100PurchaseAvg > 0 ||  aggregateStats?.top100SellAvg > 0" class="flex-start px-12px mb-12px text-12px">
+      <div>
+        <span class="color-[--third-text]">Top100:</span>
+        <span class="ml-4px">{{ formatNumber(aggregateStats?.top100Ratio * 100 || 0, 2) }}%</span>
+      </div>
+      <div class="ml-16px">
+        <span class="color-[--third-text]">{{ $t('top100PurchaseAvg') }}:</span>
+        <span class="ml-4px">${{ formatNumber(aggregateStats?.top100PurchaseAvg || 0, 2) }}</span>
+        <span v-if="Number(price) >0" class="ml-4px" :class="Number(aggregateStats?.top100PurchaseAvg) < Number(price) ? 'color-[--up-color]': 'color-[--down-color]'">({{ aggregateStats?.top100PurchaseAvg >0? formatNumber((Number(price) - Number(aggregateStats?.top100PurchaseAvg))/Number(aggregateStats?.top100PurchaseAvg) *100 || 0, 2)+'%' : 0 }})</span>
+      </div>
+      <div class="ml-16px">
+        <span class="color-[--third-text]">{{ $t('top100SellAvg') }}:</span>
+        <span class="ml-4px">${{ formatNumber(aggregateStats?.top100SellAvg || 0, 2) }}</span>
+        <span v-if="Number(price) >0" class="ml-4px" :class="Number(aggregateStats?.top100SellAvg) < Number(price) ? 'color-[--up-color]': 'color-[--down-color]'">({{aggregateStats?.top100SellAvg >0? formatNumber((Number(price) - Number(aggregateStats?.top100SellAvg))/Number(aggregateStats?.top100SellAvg) *100 || 0, 2)+'%' : 0 }})</span>
+      </div>
+    </div>
     <ul v-show="!['all']?.includes?.(activeTab)" class="section-4">
       <li>
         <div>{{ $t('balance1') }}</div>

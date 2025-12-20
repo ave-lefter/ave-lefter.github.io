@@ -1576,5 +1576,7 @@
   "takeProfitAndStopLossTips5": "10 times take profit (1000% profit all-even); moving take profit means that all positions will be automatically closed when the price retraces 40% from the highest point.",
   "takeProfitAndStopLossTips6": "40% take profit (40% profit closing); trailing take profit means that all positions will be automatically closed when the price retraces 60% from the highest point.",
   "advancedTradingStrategy": "Advanced Sell Strategy",
+  "top100PurchaseAvg": "Top100 Purchase Avg Price",
+  "top100SellAvg": "Top100 Sell Avg Price",
   "canWithdraw": "Withdrawable"
 }

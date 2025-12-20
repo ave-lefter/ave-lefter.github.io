@@ -15,6 +15,9 @@ export interface AggregateStats {
   all: number
   totalProfit: number
   totalProfitRatio: number
+  top100Ratio: number
+  top100PurchaseAvg: number
+  top100SellAvg: number
 }
 export interface HolderStat {
   holder: string
