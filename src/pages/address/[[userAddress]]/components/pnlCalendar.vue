@@ -218,14 +218,11 @@ const initOrUpdateChart = () => {
         color: () => getCssVariable('--third-text'),
         fontSize: 10,
         formatter: (value) => {
-          return formatNumber(value, 0)
+          return formatNumber(value, 2)
         },
       },
       splitLine: {
         show: true,
-        interval: (index, val) => {
-          console.log(index, val)
-        },
         lineStyle: {
           color: getCssVariable('--third-text'),
           type: 'dashed',
