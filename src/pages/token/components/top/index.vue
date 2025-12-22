@@ -414,28 +414,15 @@
               token?.token?.replace(new RegExp('(.{4})(.+)(.{4}$)'), '$1...$3')
             }}
           </a>
-          <el-popover width="" popper-class="[--el-popover-bg-color:--border] !min-w-[100px]">
-            <template #reference>
-              <span
-                class="media-item bg-btn cursor-pointer"
-              >
-                <Icon
-                  name="bxs:copy"
-                  class="ml-5px clickable"
-                />
-            </span>
-            </template>
-            <template #default>
-              <div class="py-4px [&&]:m--12px flex flex-col">
-                <span v-copy="token?.token" class="clickable text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
-                  {{ $t('copyContract') }}
-                </span>
-                <span v-copy="token?.symbol" class="clickable text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
-                  {{ $t('copyTokenName') }}
-                </span>
-              </div>
-            </template>
-          </el-popover>
+          <span
+            class="media-item bg-btn cursor-pointer"
+          >
+            <Icon
+              v-copy="token?.token"
+              name="bxs:copy"
+              class="ml-5px clickable"
+            />
+          </span>
           <span
             v-if="pair"
             v-tooltip="formatDate(pair?.created_at)"

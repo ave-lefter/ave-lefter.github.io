@@ -62,8 +62,6 @@
   "onlyShow30DaysTransactions": "Показывать только действительные транзакции за 30 дней",
   "viewMoreTransactions": "Просмотреть больше записей транзакций",
   "noFollowedWalletPurchases": "Отслеживаемые кошельки в настоящее время не имеют записей о покупках в сети",
-  "copyContract": "Копировать адрес контракта",
-  "copyTokenName": "Копировать имя",
   "volumeOneHour": "Объем 1ч",
   "name": "Название",
   "createdTime": "Время создания",
