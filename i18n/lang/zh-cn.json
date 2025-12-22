@@ -69,6 +69,7 @@
   "noFollowedWalletPurchases": "当前关注的钱包在链上暂无任何买入记录",
   "copyContract": "复制代币合约",
   "copyTokenName": "复制名称",
+  "addToGroup": "添加至分组",
   "volumeOneHour": "1h成交额",
   "name": "名称",
   "createdTime": "创建时间",

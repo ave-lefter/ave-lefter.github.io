@@ -68,6 +68,7 @@
   "noFollowedWalletPurchases": "フォローされたウォレットは現在チェーン上に購入記録がありません",
   "copyContract": "コントラクトアドレスをコピー",
   "copyTokenName": "名前をコピー",
+  "addToGroup": "グループに追加",
   "volumeOneHour": "1h取引高",
   "name": "名前",
   "createdTime": "作成時間",

@@ -63,6 +63,7 @@
     "noFollowedWalletPurchases": "Las billeteras seguidas actualmente no tienen registros de compra en cadena",
   "copyContract": "Copiar dirección del contrato",
   "copyTokenName": "Copiar nombre",
+  "addToGroup": "Agregar al grupo",
   "volumeOneHour": "1h Vol",
   "name": "Nombre",
   "createdTime": "Fecha de creación",

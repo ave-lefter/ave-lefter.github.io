@@ -100,8 +100,7 @@
         />
         <div v-if="!isValid" class="error-message"><span>{{ errorMessage }}</span></div>
         <div class="flex mt-10px mb-5px justify-between">
-          <div class="text-14px">添加至分组
-            <p v-if="showGroup" class="mt-4px">忽略原分组并添加至选定分组</p>
+          <div class="text-14px">{{ $t('addToGroup') }}
           </div>
           <el-switch v-model="showGroup" size="small" />
         </div>

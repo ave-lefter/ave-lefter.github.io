@@ -64,6 +64,7 @@
   "noFollowedWalletPurchases": "Отслеживаемые кошельки в настоящее время не имеют записей о покупках в сети",
   "copyContract": "Копировать адрес контракта",
   "copyTokenName": "Копировать имя",
+  "addToGroup": "Добавить в группу",
   "volumeOneHour": "Объем 1ч",
   "name": "Название",
   "createdTime": "Время создания",
