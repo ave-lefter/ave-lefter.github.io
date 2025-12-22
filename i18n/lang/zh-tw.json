@@ -59,6 +59,13 @@
   "notMigrated": "未遷移",
   "migrationRate": "遷移率",
   "migration": "遷移",
+  "viewDevTokens": "查看Dev創建代幣",
+  "devTokensDisplayed": "開發者代幣已在右下角展示",
+  "onlyShow30DaysTransactions": "僅展示30天內的有效交易",
+  "viewMoreTransactions": "查看更多交易記錄",
+  "noFollowedWalletPurchases": "當前關注的錢包在鏈上暫無任何買入記錄",
+  "copyContract": "複製代幣合約",
+  "copyTokenName": "複製名稱",
   "volumeOneHour": "1h成交額",
   "name": "名稱",
   "createdTime": "創建時間",
@@ -1529,6 +1536,9 @@
   "overLimit": "超過上限，建議確認是否誤填",
   "pairsLink": "跳轉區塊瀏覽器",
   "searchSameAmm": "查看同類型池子",
+  "top24hAddress": "24小時活躍地址榜",
+  "whale": "巨鯨",
+  "smartMoneyAddress": "聰明錢地址",
   "pumpCompleted": "已打滿",
   "innerDiskTime": "內盤耗時",
   "resetTips": "重置將隱藏您自定義的字段，列表恢復默認顯示。篩選條件仍生效。 確認重置嗎?",
@@ -1547,5 +1557,8 @@
   "takeProfitAndStopLossTips4": "翻倍出本 (100% 盈利平倉 50%)；三倍全出 (剩餘倉位 300% 盈利全平)；跌半止損 (50% 虧損全平)。",
   "takeProfitAndStopLossTips5": "10倍止盈 (1000% 盈利全平)；移動止盈 是指價格從最高點回撤 40% 時，自動全倉平倉。",
   "takeProfitAndStopLossTips6": "40%止盈 (40% 盈利全平)；移動止盈 是指價格從最高點回撤 60% 時，自動全倉平倉。",
-  "advancedTradingStrategy": "高級交易策略"
+  "advancedTradingStrategy": "高級交易策略",
+  "top100PurchaseAvg": "前100持倉均價",
+  "top100SellAvg": "前100賣出均價",
+  "canWithdraw": "可領取"
 }

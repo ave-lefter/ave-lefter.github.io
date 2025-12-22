@@ -146,7 +146,6 @@ export interface IActionV3Item {
   quote_token_volume: string;
   action_time: number;
   token_balance_usd: string;
-  i
 }
 
 /**
@@ -160,6 +159,40 @@ export function getSignalV3List(query: {
 }): Promise<GetSignalV2ListResponse<IActionV3Item>[]> {
   const {$api} = useNuxtApp()
   return $api('/v2api/signals/v2/public/list/v3', {
+    method: 'get',
+    query
+  })
+}
+
+export function getActiveAddressRank(query): Promise<{
+  user_address: string;
+  pnl:          number;
+  rank:         number;
+  win_rate:     string;
+  wallet_logo:  string;
+}[]> {
+  const {$api} = useNuxtApp()
+  return $api('/v2api/signals/v2/wallets_rank', {
+    method: 'get',
+    query
+  })
+}
+
+export async function getSignalKline({duration=4*60,...body}):Promise<{
+  k:string[][]
+  p:{t:string,e:string[][]}
+  t:string
+}[]> {
+  const {$api} = useNuxtApp()
+  return $api(`/v2api/signals/v2/kline?duration=${duration}`, {
+    method: 'post',
+    body
+  })
+}
+
+export function getSignalActions(query:{time:string,chain:string,token:string}) {
+  const {$api} = useNuxtApp()
+  return $api('/v2api/signals/v2/tag/detail', {
     method: 'get',
     query
   })
