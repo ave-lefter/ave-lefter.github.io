@@ -28,7 +28,7 @@
       </TimerCount>
     </div>
     <div v-else class="flex items-center bg-[--d-151A22-l-E8F1FF] py-8px px-24px radius-4px">
-      <span class="color-[--d-8CA0C3-l-566275] text-36px">{{ $t('unknownRisk') }}</span>
+      <span v-if="!tokenStore?.loadingToken" class="color-[--d-8CA0C3-l-566275] text-36px">{{ $t('unknownRisk') }}</span>
     </div>
   </div>
 </template>
