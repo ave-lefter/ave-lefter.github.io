@@ -66,8 +66,6 @@
   "onlyShow30DaysTransactions": "30日以内の有効な取引のみを表示",
   "viewMoreTransactions": "より多くの取引記録を表示",
   "noFollowedWalletPurchases": "フォローされたウォレットは現在チェーン上に購入記録がありません",
-  "copyContract": "コントラクトアドレスをコピー",
-  "copyTokenName": "名前をコピー",
   "volumeOneHour": "1h取引高",
   "name": "名前",
   "createdTime": "作成時間",

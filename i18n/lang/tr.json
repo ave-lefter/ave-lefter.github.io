@@ -55,8 +55,6 @@
   "onlyShow30DaysTransactions": "Sadece 30 gün içindeki geçerli işlemleri göster",
   "viewMoreTransactions": "Daha fazla işlem kaydı görüntüle",
   "noFollowedWalletPurchases": "Takip edilen cüzdanların şu anda zincirde satın alma kaydı yok",
-  "copyContract": "Sözleşme adresini kopyala",
-  "copyTokenName": "Adı kopyala",
   "volumeOneHour": "1s Hacim",
   "name": "Ad",
   "createdTime": "Oluşturulma Zamanı",
