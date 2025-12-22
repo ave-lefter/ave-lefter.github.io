@@ -410,13 +410,14 @@ export async function bulkImportAttention(
       address: address,
       remark: i.remark,
       user_address: i.user_address,
-      user_chain: i.user_chain
+      user_chain: i.user_chain,
+      group_id: group
     }
   })
   const { $api } = useNuxtApp()
   return $api('/v1api/v3/users/fav/batch_import', {
     method: 'post',
-    body: {arr, group}
+    body: arr
   }).catch((err: any) => console.log(err))
 }
 // 用户批量导出
