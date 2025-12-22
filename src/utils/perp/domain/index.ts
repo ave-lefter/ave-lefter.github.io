@@ -1,3 +1,4 @@
+export * from "./contexts";
 export * from "./entities";
 export * from "./errors/DomainError";
 export * from "./services";

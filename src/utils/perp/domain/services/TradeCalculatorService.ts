@@ -1,5 +1,12 @@
 import BigNumber from "bignumber.js";
 import { RiskTier } from "../entities/RiskTier";
+import {
+  calculateUnrealizedPnL,
+  calculateProfit as calcProfit,
+  calculateTargetPrice as calcTargetPrice,
+  calculateAveragePrice as calcAvgPrice,
+  type PositionSide,
+} from "../calculators";
 
 
 export interface CalculateProfitParams {
@@ -30,6 +37,10 @@ export interface CalculateLiquidationPriceParams {
 }
 
 export class TradeCalculatorService {
+  /**
+   * 计算盈亏金额
+   * 委托给 calculator 的纯函数
+   */
   static calculatePnl(params: {
     side: string;
     entryPrice: string | number;
@@ -37,21 +48,20 @@ export class TradeCalculatorService {
     size: string | number;
   }): BigNumber {
     const { side, entryPrice, exitPrice, size } = params;
-    const entry = new BigNumber(entryPrice);
-    const exit = new BigNumber(exitPrice);
-    const qty = new BigNumber(size);
-
     const isLong = side.toUpperCase() === "LONG" || side.toUpperCase() === "BUY";
+    const positionSide: PositionSide = isLong ? "LONG" : "SHORT";
 
-    if (isLong) {
-      return exit.minus(entry).multipliedBy(qty);
-    } else {
-      return entry.minus(exit).multipliedBy(qty);
-    }
+    return calculateUnrealizedPnL({
+      side: positionSide,
+      entryPrice: String(entryPrice),
+      markPrice: String(exitPrice),
+      size: String(size),
+    });
   }
 
   /**
-   * 计算盈亏
+   * 计算盈亏（含保证金和收益率）
+   * 委托给 calculator 的纯函数
    */
   static calculateProfit(params: CalculateProfitParams) {
     const { side, leverage, openPrice, closePrice, quantity } = params;
@@ -64,35 +74,26 @@ export class TradeCalculatorService {
       };
     }
 
-    const openPriceBN = BigNumber(openPrice);
-    const quantityBN = BigNumber(quantity);
-    const leverageBN = BigNumber(leverage);
-
-    // 1. 保证金计算：开仓价格 * 数量 / 杠杆
-    const margin = openPriceBN.multipliedBy(quantityBN).dividedBy(leverageBN);
-
-    // 2. 收益额计算
-    const profitAmount = this.calculatePnl({
-      side,
-      entryPrice: openPrice,
-      exitPrice: closePrice,
-      size: quantity,
+    const positionSide: PositionSide = side === "long" ? "LONG" : "SHORT";
+    const result = calcProfit({
+      side: positionSide,
+      entryPrice: String(openPrice),
+      exitPrice: String(closePrice),
+      size: String(quantity),
+      leverage: String(leverage),
     });
 
-    // 3. 收益率计算
-    const profitRate = margin.gt(0)
-      ? profitAmount.dividedBy(margin).multipliedBy(100)
-      : BigNumber(0);
-
+    // calcProfit 返回的已经是格式化的字符串，但为了保持接口兼容性，再次格式化
     return {
-      margin: margin.toFixed(2, BigNumber.ROUND_DOWN),
-      profitAmount: profitAmount.toFixed(2, BigNumber.ROUND_DOWN),
-      profitRate: profitRate.toFixed(2, BigNumber.ROUND_DOWN),
+      margin: BigNumber(result.margin).toFixed(2, BigNumber.ROUND_DOWN),
+      profitAmount: BigNumber(result.profitAmount).toFixed(2, BigNumber.ROUND_DOWN),
+      profitRate: BigNumber(result.profitRate).toFixed(2, BigNumber.ROUND_DOWN),
     };
   }
 
   /**
    * 计算目标价格
+   * 委托给 calculator 的纯函数
    */
   static calculateTargetPrice(params: CalculateTargetPriceParams) {
     const { side, leverage, openPrice, quantity, profit, profitType } = params;
@@ -104,34 +105,18 @@ export class TradeCalculatorService {
       if (!openPrice || !quantity || !profit || !leverage) return { closePrice: "0" };
     }
 
-    const openPriceBN = BigNumber(openPrice);
-    const quantityBN = BigNumber(quantity);
-    const profitBN = BigNumber(profit);
-    const leverageBN = BigNumber(leverage);
-
-    let closePrice;
-
-    if (profitType === "rate") {
-      const profitRatio = profitBN.dividedBy(100);
-      if (side === "long") {
-        closePrice = openPriceBN.multipliedBy(
-          BigNumber(1).plus(profitRatio.dividedBy(leverageBN)),
-        );
-      } else {
-        closePrice = openPriceBN.multipliedBy(
-          BigNumber(1).minus(profitRatio.dividedBy(leverageBN)),
-        );
-      }
-    } else {
-      if (side === "long") {
-        closePrice = profitBN.dividedBy(quantityBN).plus(openPriceBN);
-      } else {
-        closePrice = openPriceBN.minus(profitBN.dividedBy(quantityBN));
-      }
-    }
+    const positionSide: PositionSide = side === "long" ? "LONG" : "SHORT";
+    const result = calcTargetPrice({
+      side: positionSide,
+      entryPrice: String(openPrice),
+      size: String(quantity),
+      leverage: String(leverage),
+      targetProfit: String(profit),
+      profitType,
+    });
 
     return {
-      closePrice: closePrice.toFixed(2, BigNumber.ROUND_DOWN),
+      closePrice: result.toFixed(2, BigNumber.ROUND_DOWN),
     };
   }
 
@@ -230,32 +215,28 @@ export class TradeCalculatorService {
     };
   }
 
+  /**
+   * 计算加权平均价格
+   * 委托给 calculator 的纯函数
+   */
   static calculateAveragePrice(positionSizeList: Array<{ openPrice: string; quantity: string }>) {
     if (!positionSizeList || !Array.isArray(positionSizeList) || positionSizeList.length === 0) {
       return { avgPrice: "" };
     }
 
-    let totalValue = BigNumber(0);
-    let totalQuantity = BigNumber(0);
+    // 转换为 calculator 期望的格式，过滤无效数据
+    const entries = positionSizeList
+      .filter((p) => p.openPrice && p.quantity && p.openPrice !== "0" && p.quantity !== "0")
+      .map((p) => ({ price: p.openPrice, quantity: p.quantity }));
 
-    positionSizeList.forEach((position) => {
-      const { openPrice, quantity } = position;
-      if (!openPrice || !quantity || openPrice === "0" || quantity === "0") {
-        return;
-      }
-      const openPriceBN = BigNumber(openPrice);
-      const quantityBN = BigNumber(quantity);
-      const positionValue = openPriceBN.multipliedBy(quantityBN);
+    // 所有数据无效时，保持原有行为返回 "0.00"
+    if (entries.length === 0) {
+      return { avgPrice: "0.00" };
+    }
 
-      totalValue = totalValue.plus(positionValue);
-      totalQuantity = totalQuantity.plus(quantityBN);
-    });
+    const avgPrice = calcAvgPrice(entries, 2);
 
-    const avgPrice = totalQuantity.gt(0) ? totalValue.dividedBy(totalQuantity) : BigNumber(0);
-
-    return {
-      avgPrice: avgPrice.toFixed(2, BigNumber.ROUND_DOWN),
-    };
+    return { avgPrice };
   }
 
   static validateAvailableBalance(params: {

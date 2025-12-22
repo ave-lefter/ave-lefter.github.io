@@ -1,12 +1,11 @@
-import type { IContract } from "../../types";
-import type { OrderFillTransactionEntry } from "../../types";
 import BigNumber from "bignumber.js";
+import type { IContract, OrderFillTransactionEntry } from "../../types";
 import { SymbolEntity } from "./Symbol";
 
 export class FilledOrder {
   public symbol: SymbolEntity;
 
-  private constructor(
+  constructor(
     symbol: IContract | SymbolEntity,
     public raw: OrderFillTransactionEntry,
   ) {

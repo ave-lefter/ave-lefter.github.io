@@ -5,7 +5,7 @@
  */
 
 import BigNumber from "bignumber.js";
-import type { IRiskTier } from "../../types"
+import type { IRiskTier } from "../../types";
 import { MAX_POSITION_VALUE_SENTINEL } from "../constants";
 import { Leverage } from "./Leverage";
 

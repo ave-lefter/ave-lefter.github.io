@@ -18,7 +18,7 @@ export interface OrderInputContext {
  */
 export interface DerivedOrderState {
   size: string;
-  orderEqualVal: string;
+  orderValue: string;
   orderMargin: string;
 }
 
@@ -42,21 +42,20 @@ export class OrderInputCalculator {
 
     // 1. 计算价值 (Value = Size * Price)
     // 精度：按价格精度截断 (UI显示通常跟随 quote coin 精度，这里复用 pricePrecision 或需要独立的 quotePrecision)
-    // 根据原逻辑：state.orderEqualVal = ... toPrecisionString(orderValue, pricePrecision)
-    const orderValue = BigNumber(sizeNum).multipliedBy(priceNum);
-    const orderEqualVal = sizeNum && priceNum
-      ? toPrecisionString(orderValue, pricePrecision)
+    const valueBN = BigNumber(sizeNum).multipliedBy(priceNum);
+    const orderValue = sizeNum && priceNum
+      ? toPrecisionString(valueBN, pricePrecision)
       : "";
 
     // 2. 计算保证金 (Margin = Value / Leverage)
     // 精度：固定保留 2 位小数 (原逻辑：toPrecisionString(..., 2))
     const orderMargin = sizeNum && priceNum && leverage
-      ? toPrecisionString(orderValue.dividedBy(leverage), 2)
+      ? toPrecisionString(valueBN.dividedBy(leverage), 2)
       : "";
 
     return {
       size: String(size),
-      orderEqualVal,
+      orderValue,
       orderMargin,
     };
   }
@@ -85,12 +84,12 @@ export class OrderInputCalculator {
 
     // 特殊逻辑：如果价值为空，保证金也清空
     if (!valueNum) {
-      return { size: "", orderEqualVal: String(value), orderMargin: "" };
+      return { size: "", orderValue: String(value), orderMargin: "" };
     }
 
     return {
       size,
-      orderEqualVal: String(value),
+      orderValue: String(value),
       orderMargin,
     };
   }
@@ -105,17 +104,17 @@ export class OrderInputCalculator {
 
     // 1. 反推价值 (Value = Margin * Leverage)
     const valueNum = BigNumber(marginNum).multipliedBy(leverage);
-    const orderEqualVal = marginNum && leverage
+    const orderValue = marginNum && leverage
       ? toPrecisionString(valueNum, pricePrecision)
       : "";
 
     // 2. 再从价值推导数量
     // 复用 deriveFromValue 的逻辑，但保持 margin 原值
-    const derivedState = this.deriveFromValue(orderEqualVal, context);
+    const derivedState = this.deriveFromValue(orderValue, context);
 
     return {
       ...derivedState,
-      orderEqualVal, // 确保 value 是计算后的结果
+      orderValue, // 确保 value 是计算后的结果
       orderMargin: String(margin), // 保持用户输入的 margin 不变
     };
   }

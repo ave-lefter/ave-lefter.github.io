@@ -1,11 +1,6 @@
 import BigNumber from "bignumber.js";
 import type { IContract as ISymbol, PositionTermListEntry } from "../../types";
-import {
-  bigNumberMultiply,
-  toPrecisionString,
-  toPrecisionStringWithType,
-  toThousandString,
-} from "../../utils";
+import { toPrecisionStringWithType } from "../../utils";
 import { Position } from "./Position";
 import { SymbolEntity } from "./Symbol";
 
@@ -247,9 +242,6 @@ export class PositionTerm {
 
     if (closedOpenValue.isZero()) return new BigNumber(0);
 
-    return pnl
-      .dividedBy(closedOpenValue)
-      .multipliedBy(100)
-      .multipliedBy(this.currentLeverage);
+    return pnl.dividedBy(closedOpenValue).multipliedBy(100).multipliedBy(this.currentLeverage);
   }
 }

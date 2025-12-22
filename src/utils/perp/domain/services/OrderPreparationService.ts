@@ -15,8 +15,6 @@
  * 3. 评估 TWAP 需求
  * 4. 格式化订单大小
  */
-
-import type { IContract } from "../../types";
 import { toPrecisionString } from "../../utils";
 import { SymbolEntity } from "../entities/Symbol";
 import {
@@ -88,8 +86,8 @@ export class OrderPreparationService {
    */
   static prepare(
     params: CreateOrderCommandParams & {
-      maxBuyQTY?: string | number;
-      maxSellQTY?: string | number;
+      maxBuySize?: string | number;
+      maxSellSize?: string | number;
       showEqualValInput?: boolean;
       triggerPriceWithType?: number | string;
       isReverse?: boolean;
@@ -108,8 +106,8 @@ export class OrderPreparationService {
       size: params.size,
       triggerPrice: params.triggerPrice,
       reduceOnly: params.reduceOnly,
-      maxBuyQty: params.maxBuyQTY,
-      maxSellQty: params.maxSellQTY,
+      maxBuySize: params.maxBuySize,
+      maxSellSize: params.maxSellSize,
       showEqualValInput: params.showEqualValInput,
     });
 

@@ -49,27 +49,27 @@ export class OrderTypeHelper {
    * Check if order type is conditional (STOP_MARKET or STOP_LIMIT)
    */
   static isConditional(orderType: OrderType | string): boolean {
-    return (
-      orderType === OrderType.STOP_MARKET || orderType === OrderType.STOP_LIMIT
-    );
+    return orderType === OrderType.STOP_MARKET || orderType === OrderType.STOP_LIMIT;
   }
 
   /**
    * Check if order type is market order (MARKET or STOP_MARKET)
    */
   static isMarketOrder(orderType: OrderType | string): boolean {
-    return (
-      orderType === OrderType.MARKET || orderType === OrderType.STOP_MARKET
-    );
+    return orderType === OrderType.MARKET || orderType === OrderType.STOP_MARKET;
   }
 
   /**
    * Check if order type is limit order (LIMIT or STOP_LIMIT)
    */
   static isLimitOrder(orderType: OrderType | string): boolean {
-    return (
-      orderType === OrderType.LIMIT || orderType === OrderType.STOP_LIMIT
-    );
+    return orderType === OrderType.LIMIT || orderType === OrderType.STOP_LIMIT;
+  }
+
+  /**
+   * Check if order type is LADDER_ORDERS (segmented order)
+   */
+  static isLadderOrders(orderType: OrderType | string): boolean {
+    return orderType === OrderType.LADDER_ORDERS;
   }
 }
-

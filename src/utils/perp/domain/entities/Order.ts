@@ -46,7 +46,7 @@ import { SymbolEntity } from "./Symbol";
 export class Order {
   public symbol: SymbolEntity;
 
-  private constructor(
+  constructor(
     symbol: ISymbol | SymbolEntity,
     public raw: OrderEntry,
   ) {
@@ -123,7 +123,7 @@ export class Order {
   /**
    * 排序订单列表
    */
-  static sort(orderList: (Order | OrderEntry)[]): (Order | OrderEntry)[] {
+  static sort(orderList: Order[]): Order[] {
     return orderList.sort(Order.comparator);
   }
 
@@ -321,7 +321,10 @@ export class Order {
    * 判断是否为止盈止损单
    */
   isTpslOrder(): boolean {
-    return this.raw.isPositionTpsl ?? false;
+    if (this.raw.isPositionTpsl !== undefined && this.raw.isPositionTpsl !== null) {
+      return this.raw.isPositionTpsl;
+    }
+    return this.isSetOpenSl || this.isSetOpenTp;
   }
 
   /**

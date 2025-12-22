@@ -1,5 +1,8 @@
 import BigNumber from "bignumber.js";
-import { generateRandomClientId } from "@edgex/trade-libs";
+
+export function generateRandomClientId() {
+  return Math.random().toString().slice(2).replace(/^0+/, "");
+}
 
 /**
  * Service for TWAP (Time-Weighted Average Price) order calculations.
@@ -7,9 +10,11 @@ import { generateRandomClientId } from "@edgex/trade-libs";
 export class TwapCalculationService {
   /**
    * Calculate TWAP order split sizes.
-   * @param totalQty - Total order quantity
-   * @param maxSize - Maximum size per split order
-   * @returns Array of split order sizes
+   * 计算TWAP订单拆分
+   *
+   * @param totalQty - Total order quantity (总下单数量)
+   * @param maxSize - Maximum size per split order (最大单笔数量)
+   * @returns Array of split order sizes (拆分后的订单数量数组)
    */
   static calculateTwapSizes(totalQty: string | number, maxSize: string): string[] {
     const total = new BigNumber(totalQty);
@@ -33,6 +38,8 @@ export class TwapCalculationService {
 
   /**
    * Generate TWAP Group ID.
+   * 生成TWAP订单组ID
+   *
    * @returns TWAP Group ID
    */
   static generateTwapGroupId(): string {

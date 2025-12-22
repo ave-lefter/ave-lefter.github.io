@@ -1,7 +1,7 @@
-import type { IContract, PositionEntry, PositionTermListEntry } from "../../types"
-import { SymbolEntity } from "../entities/Symbol";
+import type { PositionEntry, PositionTermListEntry } from "../../types";
 import { Position } from "../entities/Position";
 import { PositionTerm } from "../entities/PositionTerm";
+import { SymbolEntity } from "../entities/Symbol";
 
 /**
  * Position Factory
