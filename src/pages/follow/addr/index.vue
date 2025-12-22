@@ -548,9 +548,8 @@ import {
   formatIconTag, getTagTooltip
 } from '@/utils/index'
 import { throttle } from 'lodash-es'
-import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor,deleteMonitor} from '~/api/attention'
+import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor,deleteMonitor,batchDeleteAddresses} from '~/api/attention'
 import type { TableInstance } from 'element-plus'
-
 const { mode, isDark } = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
 const $router = useRouter()
@@ -656,8 +655,15 @@ const filterDataSource=computed(() => {
 // 12-16 批量取消
 const checkedList=ref(<any[]>[])
 const handleSelectionChange = (val: any[]) => {
-  console.log('handleSelectionChange', val)
-  checkedList.value=val.map(i => i?.user_address+'-' + i?.user_chain)
+  // console.log('handleSelectionChange', val)
+  checkedList.value=val.map(i => {
+    return {
+      address:currentAddress.value,
+      user_chain:i.user_chain,
+      user_address:i.user_address,
+    }
+  })
+  // checkedList.value=val.map(i => i?.user_address+'-' + i?.user_chain)
 }
 
 const batchDelete=async ()=>{
@@ -670,21 +676,14 @@ const batchDelete=async ()=>{
     dangerouslyUseHTMLString: true,
   })
   console.log('batchDelete', checkedList.value)
-  // batchDeleteFavorite({
-  //   address: walletAddress.value,
-  //   token_ids: checkedList.value
-  // }).then(() => {
-  //   ElMessage.success(t('success'))
-  //   resetAndGet()
-  //   checkedList.value = []
-  //   checkAll.value = false
-  //   isIndeterminate.value = false
-  //   favDialogEvent.emit({
-  //     type: 'delete',
-  //   })
-  // }).catch((e) => {
-  //    ElMessage.error(String(e))
-  // })
+  batchDeleteAddresses(checkedList.value).then(() => {
+    ElMessage.success(t('success'))
+    init()
+    tableRef.value!.clearSelection()
+    checkedList.value = []
+  }).catch((e) => {
+     ElMessage.error(String(e))
+  })
 }
 
 watch(() => conditions.value.group, (val) => {

@@ -93,6 +93,7 @@ const batchDelete=async ()=>{
     token_ids: checkedList.value
   }).then(() => {
     ElMessage.success(t('success'))
+    pageData.value.page = 1
     getList()
     tableRef.value!.clearSelection()
     checkedList.value = []
