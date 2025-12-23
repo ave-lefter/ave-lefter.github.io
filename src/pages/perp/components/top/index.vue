@@ -1,24 +1,23 @@
 <template>
   <div class="bg-[--d-101114-l-F6F9FF] h-64px flex-start items-center justify-start py-7px px-12px">
     <el-popover
+      v-model:visible="visible"
       popper-class="[--el-popover-bg-color:--border]"
       :width="640"
       placement="bottom-start"
       trigger="click"
       popper-style="padding: 0px"
-      :visible="visible"
     >
       <template #reference>
         <div
           class="flex items-center px-4px py-4px cursor-pointer rounded-4px hover:bg-[--d-1B1D21-l-E8F1FF] cursor-pointer"
-          @click.stop.prevent="visible = !visible"
         >
           <el-image class="token-icon w-32px max-h-32px" fit="cover" :src="perp?.baseCoinIcon">
             <template #error>
-              <img class="token-icon w-32px max-h-32px" :src="getChainDefaultIcon()" />
+              <img class="token-icon w-32px max-h-32px" :src="getChainDefaultIcon()" >
             </template>
             <template #placeholder>
-              <img class="token-icon w-32px max-h-32px" :src="getChainDefaultIcon()" />
+              <img class="token-icon w-32px max-h-32px" :src="getChainDefaultIcon()" >
             </template>
           </el-image>
           <div class="ml-8px">
@@ -34,7 +33,7 @@
         </div>
       </template>
       <template #default>
-        <Search :list="contractList" :loading="loadingPerpMetadata" @close="visible = false"></Search>
+        <Search :list="contractList" :loading="loadingPerpMetadata" @close="visible = false"/>
       </template>
     </el-popover>
 
@@ -52,17 +51,17 @@
         }}%</span
       > -->
     </div>
-    <div class="w-0 border-l-[--icon-color] border-l-solid h-28px"></div>
+    <div class="w-0 border-l-[--icon-color] border-l-solid h-28px"/>
     <Swipe>
       <div class="ml-16px whitespace-nowrap item">
-        <span class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('indexPriceTooltip')">{{ $t('indexPrice') }}</span>
+        <span v-tooltip="$t('indexPriceTooltip')" class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]">{{ $t('indexPrice') }}</span>
         <span class="text-12px block text-left color-[--main-text] leading-16px mt-6px">
           {{ formatNumber(perp?.indexPrice || 0, getPricePrecision(perp?.contractId || '')) }}</span
         >
       </div>
 
       <div class="ml-16px whitespace-nowrap item">
-        <span class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]" v-tooltip="$t('oraclePriceTooltip')">{{ $t('oraclePrice') }}</span>
+        <span v-tooltip="$t('oraclePriceTooltip')" class="text-12px block text-left color-[--third-text] border-b-dashed border-b-1px border-[--third-text]">{{ $t('oraclePrice') }}</span>
         <span class="text-12px block text-left color-[--main-text] mt-6px">{{formatNumber(perp?.oraclePrice || 0, getPricePrecision(perp?.contractId || ''))}}</span>
       </div>
 
@@ -148,7 +147,7 @@
 import Search from './search.vue'
 import Swipe from './swipe.vue'
 import { usePerpWsPubStore } from '@/stores/perp/wsPub'
-import { type PerpInfo } from '@/api/types/perp'
+import type { PerpInfo } from '@/api/types/perp'
 import { usePerpStore } from '@/stores/perp'
 import { WSPerpEventType } from '@/utils/constants'
 import type { TickerEntry } from '~/utils/perp/types'

@@ -70,7 +70,6 @@ export const usePerpStore = defineStore('perp', () => {
   })
 
   const contractName = computed(() => {
-    console.log('-----------contractName--------', (route.params.name as string) || 'BTCUSD')
     return (route.params.name as string) || 'BTCUSD'
   })
   const perp = computed(() => {
@@ -104,6 +103,7 @@ export const usePerpStore = defineStore('perp', () => {
       getOnboardSite().then(() => {
         usePerpWsPrivateStore().init()
       })
+      contractList.value = res?.contractList || []
       // res.contractList =
       //   res?.contractList?.map((item) => ({
       //     ...item,

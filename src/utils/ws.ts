@@ -52,7 +52,7 @@ export default class WS {
     reconnectInterval = 2000,
     connectTimeout = 30000,
     maxQueueLength = 100,
-    queueTimeout = 15000,
+    queueTimeout = 300000,
     protocols,
     onopen,
     onclose,
@@ -122,7 +122,6 @@ export default class WS {
   private sendQueue() {
     const queueToSend = [...this.pendingQueue]
     this.pendingQueue = []
-
     queueToSend.forEach(({ msg, timestamp }) => {
       if (Date.now() - timestamp <= this.queueTimeout) {
         this.ws?.send(msg)
