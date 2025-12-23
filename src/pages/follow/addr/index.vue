@@ -702,6 +702,13 @@ const batchDelete=async ()=>{
      ElMessage.error(String(e))
   })
 }
+onActivated(() => {
+  console.log('onDeactivated2')
+  favHover.value = false;
+  checkedList.value = []
+  tableRef.value!.clearSelection()
+  clearTimeout(timeoutId);
+})
 
 watch(() => conditions.value.group, (val) => {
   checkedList.value = []

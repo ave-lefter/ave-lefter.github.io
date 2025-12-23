@@ -227,4 +227,8 @@ defineExpose({
 :deep() .el-checkbox.el-checkbox--small{
   height: 18px;
 }
+:deep() .el-checkbox__label{
+  display: inline-block;
+  white-space: break-spaces;
+}
 </style>

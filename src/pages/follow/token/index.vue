@@ -120,6 +120,14 @@ const handlerMouseoutFavHover=()=>{
   }, 3000);
 }
 
+onActivated(() => {
+  console.log('onDeactivated')
+  favHover.value = false;
+  checkedList.value = []
+  tableRef.value!.clearSelection()
+  clearTimeout(timeoutId);
+  // reCreateChild()
+})
 watch(() => walletStore.walletSignature[walletStore.address], (newValue) => {
   if (newValue) {
     getList()
@@ -492,7 +500,8 @@ onBeforeUnmount(() => {
         </div>
       </el-popover>
     </div>
-
+    {{favHover}}
+    {{checkedList.length}}
     <div class="w-100% mt-12px flex-1 overflow-hidden">
       <el-table ref="tableRef"
  v-loading="loading" :height="pageData.total > 50 ? 'calc(100% - 72px)' : '100%'" :data="tableList" fit
