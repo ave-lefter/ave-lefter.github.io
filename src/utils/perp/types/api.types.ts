@@ -1287,6 +1287,7 @@ export interface IAccount {
   l2Key: string;
   l2KeyYCoordinate: string;
   clientAccountId: string;
+  accountName: string;
   isSystemAccount: boolean;
   defaultTradeSetting: ITradeSetting;
   contractIdToTradeSetting: Record<string, any>;

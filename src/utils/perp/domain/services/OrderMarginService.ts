@@ -1,6 +1,7 @@
 import BigNumber from "bignumber.js";
-import type { OrderBookEntry } from "../../domain/entities/Orderbook"
+import type { OrderBookEntry } from "../../domain/entities/Orderbook";
 import { DEFAULT_MARKET_SLIPPAGE_BUFFER } from "../constants/trade.constants";
+import { calculateOpenOrderFrozenAmount as calcOpenFrozen } from "../calculators";
 
 // 构造函数参数接口
 interface OrderMarginServiceParams {
@@ -29,16 +30,24 @@ interface CalcOptions {
 }
 
 /**
- * 下单保证金计算服务
+ * 下单保证金计算服务（简单估算）
  *
+ * 与 OrderExecutionService.calculateOrderCost 的区别：
+ * - OrderMarginService: 简单估算，假设整个订单都是开仓，适合 UI 预估显示
+ * - calculateOrderCost: 精确计算，考虑现有持仓和挂单，区分开仓/平仓部分
+ *
+ * 使用场景：
+ * - 下单面板显示预估保证金
+ * - 用户输入时的实时反馈
+ * - 不需要精确到考虑已有挂单的场景
+ *
+ * 计算公式：
  * 保证金 = 开仓亏损 + 初始保证金 + 手续费
  *
- * 开仓亏损 = Max(0, 订单开仓价值 - 订单开仓数量 × 当前预言机价格)
+ * 其中：
+ * - 开仓亏损 = Max(0, 订单开仓价值 - 订单开仓数量 × 当前预言机价格)
  * - 订单开仓价值 = 委托价格 × 委托数量
- * - 委托价格：限价取用户输入的价格，市价取当前单边的委托价格
- *   - 市价单委托价格 = value / (size × (1 + slippageBuffer))
- *     - value = 委托单加权平均总价值 (USD)
- *     - size = 用户委托数量 (Token amount)
+ * - 委托价格：限价取用户输入的价格，市价取订单簿加权平均价格
  */
 export class OrderMarginService {
   private params: OrderMarginServiceParams;
@@ -66,69 +75,6 @@ export class OrderMarginService {
     this.leverage = BigNumber(params.leverage || 1);
     this.feeRate = BigNumber(params.feeRate || 0);
     this.orderbook = params.orderbook || [];
-  }
-
-  /**
-   * @description 计算委托单开仓冻结金额
-   * max(orderOpenValue - orderOpenSize x oraclePrice, 0) + abs(orderOpenValue) x feeRate + abs(orderOpenSize) x oraclePrice x (1 / leverage)
-   * @param {BigNumber} oraclePrice 预言机价格
-   * @param {BigNumber} initialMarginRate 仓位初始保证金率
-   * @param {BigNumber} orderOpenSize 当前委托单的开仓数量
-   * @param {BigNumber} orderOpenValue orderOpenSize x Order.price
-   * @param {BigNumber} feeRate 手续费率
-   * @return {BigNumber} 开仓冻结金额
-   */
-  static calculateOpenOrderFrozenAmount(
-    oraclePrice: string | BigNumber | number,
-    initialMarginRate: string | BigNumber,
-    orderOpenSize: string | BigNumber,
-    orderOpenValue: string | BigNumber,
-    feeRate: string | number,
-  ): BigNumber {
-    // 开仓损失(仅考虑亏损情况，不考虑盈利)：max(orderOpenValue - orderOpenSize x oraclePrice, 0)
-    const orderLossValue = BigNumber.max(
-      BigNumber(orderOpenValue).minus(BigNumber(orderOpenSize).multipliedBy(oraclePrice)),
-      0,
-    );
-    // 开仓后增加的初始保证金：abs(orderOpenSize) x oraclePrice x initialMarginRate
-    const orderInitialMarginRequirement = BigNumber(orderOpenSize)
-      .abs()
-      .multipliedBy(oraclePrice)
-      .multipliedBy(initialMarginRate);
-    // 开仓手续费
-    const orderFillFee = BigNumber(orderOpenValue).abs().multipliedBy(feeRate);
-    return orderLossValue.plus(orderInitialMarginRequirement).plus(orderFillFee);
-  }
-
-  /**
-   * @description 计算委托单平仓冻结金额
-   * max(orderCloseValue - orderCloseSize x oraclePrice + abs(orderCloseValue) x feeRate - abs(orderCloseSize) x oraclePrice x (1 / leverage), 0)
-   * @param {BigNumber} oraclePrice 预言机价格
-   * @param {BigNumber} initialMarginRate 仓位初始保证金率
-   * @param {BigNumber} orderCloseSize 当前委托单的平仓数量
-   * @param {BigNumber} orderCloseValue orderCloseSize x Order.price
-   * @param {BigNumber} feeRate 手续费率
-   * @return {BigNumber} 平仓冻结金额
-   */
-  static calculateCloseOrderFrozenAmount(
-    oraclePrice: string | BigNumber | number,
-    initialMarginRate: string | BigNumber,
-    orderCloseSize: string | BigNumber,
-    orderCloseValue: string | BigNumber,
-    feeRate: string | number,
-  ): BigNumber {
-    // 平仓损失：orderCloseValue - orderCloseSize x oraclePrice
-    const orderLossValue = BigNumber(orderCloseValue).minus(
-      BigNumber(orderCloseSize).multipliedBy(oraclePrice),
-    );
-    // 平仓成交后的 减少的初始保证金：abs(orderCloseSize) x oraclePrice x initialMarginRate
-    const orderInitialMarginRequirement = BigNumber(orderCloseSize)
-      .abs()
-      .multipliedBy(oraclePrice)
-      .multipliedBy(initialMarginRate);
-    // 手续费：abs(orderCloseValue) x orderFeeRate
-    const orderFillFee = BigNumber(orderCloseValue).abs().multipliedBy(feeRate);
-    return orderLossValue.minus(orderInitialMarginRequirement).plus(orderFillFee);
   }
 
   /**
@@ -261,14 +207,14 @@ export class OrderMarginService {
     // 计算初始保证金率
     const initialMarginRate = BigNumber(1).dividedBy(this.leverage);
 
-    // 复用静态方法计算总保证金
-    return OrderMarginService.calculateOpenOrderFrozenAmount(
-      this.oraclePrice,
-      initialMarginRate,
-      this.size,
-      orderOpenValue,
-      this.feeRate.toString(),
-    );
+    // 使用 calculator 计算总保证金
+    return calcOpenFrozen({
+      oraclePrice: this.oraclePrice.toString(),
+      initialMarginRate: initialMarginRate.toString(),
+      size: this.size.toString(),
+      value: orderOpenValue.toString(),
+      feeRate: this.feeRate.toString(),
+    });
   }
 
   /**

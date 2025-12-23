@@ -1,5 +1,5 @@
-import { OrderBasis } from "../value-objects/OrderEnums";
 import { toPrecisionString, toTickSizeRoundString } from "../../utils";
+import { OrderBasis } from "../value-objects/OrderEnums";
 
 /**
  * Order Basis Converter
@@ -78,4 +78,3 @@ export class OrderBasisConverter {
     return quantity;
   }
 }
-

@@ -98,6 +98,20 @@ export class Orderbook {
 
   /**
    * Calculate the number of order book levels that will be consumed by a market order.
+   *
+   * @param list - The order book list (asks for buy order, bids for sell order).
+   *               - For BUY order, provide ASKS (sellList).
+   *               - For SELL order, provide BIDS (buyList).
+   *               *** IMPORTANT ***: The list MUST be sorted in the order of execution priority.
+   *               - Asks (Sell List): Lowest price first (Ascending).
+   *               - Bids (Buy List): Highest price first (Descending).
+   *               *** Note on Frontend lists ***:
+   *               Frontend often renders Sell List (Asks) in REVERSE (High to Low) for visual stacking.
+   *               If passing such list, ensure you iterate correctly or reverse it back.
+   *               This function assumes standard execution order (best price first).
+   *
+   * @param orderSize - The size of the market order.
+   * @returns The number of levels consumed.
    */
   static calculateEatingLevels(
     list: OrderBookEntry[],
@@ -126,6 +140,11 @@ export class Orderbook {
 
   /**
    * Aggregate order book items based on depth degree (step).
+   *
+   * @param dataList - Raw order book list
+   * @param type - 'buy' (bids) or 'sell' (asks)
+   * @param degree - Aggregation step (e.g. 0.1, 1, 10)
+   * @returns Aggregated list
    */
   static aggregate(
     dataList: OrderBookEntry[],
@@ -207,6 +226,11 @@ export class Orderbook {
 
   /**
    * Map active user orders to the aggregated order book levels.
+   *
+   * @param list - The aggregated order book list
+   * @param activeOrders - User's active orders
+   * @param type - 'BUY' or 'SELL' (matches OrderSide)
+   * @param deepValue - Aggregation degree/step
    */
   static mapActiveOrders(
     list: OrderBookEntry[],

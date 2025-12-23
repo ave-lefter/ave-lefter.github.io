@@ -1,3 +1,4 @@
+import { IDeposit, ITransferIn, ITransferOut, IWithdraw } from "./api.types";
 import { ITradeHistoryRaw, L2Signature } from "./trade-history.types";
 
 // Basic type aliases
@@ -375,10 +376,10 @@ export interface UserSnapshot {
   position: PositionEntry[];
   positionTransaction: PositionTransactionEntry[];
   positionTermList: PositionTermListEntry[];
-  deposit: any[];
-  withdraw: any[];
-  transferIn: any[];
-  transferOut: any[];
+  deposit: IDeposit[];
+  withdraw: IWithdraw[];
+  transferIn: ITransferIn[];
+  transferOut: ITransferOut[];
   order: OrderEntry[];
   orderFillTransaction: OrderFillTransactionEntry[];
   tradeHistory: ITradeHistoryRaw[];

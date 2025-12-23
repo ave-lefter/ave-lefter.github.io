@@ -1,6 +1,6 @@
-import type { IContract as ISymbol } from "../../types"
-import type { OrderEntry } from "../../types"
+import type { IContract as ISymbol, OrderEntry } from "../../types"
 import { Order } from "../entities/Order";
+import { SymbolEntity } from "../entities/Symbol";
 import { OrderSide, OrderType, PositionSide, TimeInForce, TriggerPriceType } from "../value-objects/OrderEnums";
 import { Position } from "../entities/Position";
 import BigNumber from "bignumber.js";
@@ -16,9 +16,9 @@ export class OrderFactory {
   /**
    * 从 OrderEntry[] 和 Symbol[] 创建 Order[] 实体列表
    */
-  static createOrdersFromRaw(orderEntries: OrderEntry[], symbols: ISymbol[]): Order[] {
+  static createOrdersFromRaw(orderEntries: OrderEntry[], symbols: (ISymbol | SymbolEntity)[]): Order[] {
     // 创建 Symbol Map 以便快速查找
-    const symbolMap = new Map<string, ISymbol>();
+    const symbolMap = new Map<string, ISymbol | SymbolEntity>();
     symbols.forEach((symbol) => {
       symbolMap.set(symbol.contractId, symbol);
     });

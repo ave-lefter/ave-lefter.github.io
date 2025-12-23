@@ -1,7 +1,7 @@
-import { OrderType, OrderBasis } from "../value-objects/OrderEnums";
-import { TYPE_triggerPrice } from "../constants/trade.constants";
-import { getNumberPrecision, toPrecisionString, toTickSizeRoundString } from "../../utils";
 import BigNumber from "bignumber.js";
+import { getNumberPrecision, toPrecisionString, toTickSizeRoundString } from "../../utils";
+import { TYPE_triggerPrice } from "../constants/trade.constants";
+import { OrderBasis, OrderType } from "../value-objects/OrderEnums";
 
 /**
  * Market Order Calculator
@@ -15,15 +15,15 @@ export class MarketOrderCalculator {
    * This function converts user input (which could be in Size, Value, or Margin basis)
    * to actual order size for market order execution.
    *
-   * @param orderQty - User input quantity (could be size, value, or margin)
+   * @param orderSize - User input (could be size, value, or margin depending on orderBasis)
    * @param orderBasis - Current order basis type
    * @param lastPrice - Last price for calculation
    * @param sizePrecision - Size precision for formatting
    * @param maxLeverage - Maximum leverage
-   * @returns Actual order size as string, or original orderQty if already in Size basis
+   * @returns Actual order size as string, or original orderSize if already in Size basis
    */
   static calculateActualSizeFromOrderBasis(
-    orderQty: string,
+    orderSize: string,
     orderBasis: OrderBasis,
     lastPrice: number,
     sizePrecision: number,
@@ -31,67 +31,67 @@ export class MarketOrderCalculator {
   ): string {
     // If already in Size basis, return as is
     if (orderBasis === OrderBasis.Size) {
-      return orderQty;
+      return orderSize;
     }
 
     const lastPriceNum = Number(lastPrice);
     if (!lastPriceNum || lastPriceNum <= 0) {
-      return orderQty;
+      return orderSize;
     }
 
     // Use OrderInputCalculator for consistency
-    // Note: We need to handle the case where orderQty might be empty or invalid
+    // Note: We need to handle the case where orderSize might be empty or invalid
     if (orderBasis === OrderBasis.Value) {
-      // Match original logic: toPrecisionString(Number(orderQty) / lastPriceNum, sizePrecision)
+      // Match original logic: toPrecisionString(Number(orderSize) / lastPriceNum, sizePrecision)
       // OrderInputCalculator.deriveFromValue has additional validation that returns "" for empty values
       // For consistency with original behavior, we use direct calculation
-      const orderQtyNum = Number(orderQty);
-      if (!orderQtyNum || orderQtyNum <= 0) {
-        return orderQty; // Return original value if invalid
+      const orderSizeNum = Number(orderSize);
+      if (!orderSizeNum || orderSizeNum <= 0) {
+        return orderSize; // Return original value if invalid
       }
-      return toPrecisionString(orderQtyNum / lastPriceNum, sizePrecision);
+      return toPrecisionString(orderSizeNum / lastPriceNum, sizePrecision);
     }
 
     if (orderBasis === OrderBasis.Margin) {
       // From margin: actualSize = (margin * leverage) / price
-      const leveragedValue = Number(orderQty) * Number(maxLeverage || 1);
+      const leveragedValue = Number(orderSize) * Number(maxLeverage || 1);
       return toPrecisionString(leveragedValue / lastPriceNum, sizePrecision);
     }
 
-    return orderQty;
+    return orderSize;
   }
 
   /**
    * Calculate max value for Value/Margin basis
    *
-   * @param maxQTY - Maximum quantity
+   * @param maxSize - Maximum size
    * @param lastPrice - Last price
    * @returns Maximum value
    */
-  static calculateMaxValue(maxQTY: number | string, lastPrice: number): number {
-    return Number(maxQTY) * Number(lastPrice || 0);
+  static calculateMaxValue(maxSize: number | string, lastPrice: number): number {
+    return Number(maxSize) * Number(lastPrice || 0);
   }
 
   /**
-   * Calculate order quantity from rate percentage
+   * Calculate order size from rate percentage
    *
-   * This function calculates the order quantity based on a percentage rate
-   * of the maximum available quantity, considering the order basis.
+   * This function calculates the order size based on a percentage rate
+   * of the maximum available size, considering the order basis.
    *
    * @param rate - Percentage rate (0-100)
    * @param orderBasis - Current order basis type
-   * @param maxQTY - Maximum quantity
+   * @param maxSize - Maximum size
    * @param lastPrice - Last price
    * @param pricePrecision - Price precision
    * @param sizePrecision - Size precision
    * @param sizeStep - Size step
    * @param maxLeverage - Maximum leverage
-   * @returns Calculated order quantity as string
+   * @returns Calculated order size as string
    */
-  static calculateOrderQtyFromRate(
+  static calculateOrderSizeFromRate(
     rate: number,
     orderBasis: OrderBasis,
-    maxQTY: number | string,
+    maxSize: number | string,
     lastPrice: number,
     pricePrecision: number,
     sizePrecision: number,
@@ -99,23 +99,21 @@ export class MarketOrderCalculator {
     maxLeverage: number,
   ): string {
     if (orderBasis === OrderBasis.Value) {
-      const maxValue = this.calculateMaxValue(maxQTY, lastPrice);
+      const maxValue = this.calculateMaxValue(maxSize, lastPrice);
       const targetValue = (rate * maxValue) / 100;
       return targetValue ? toPrecisionString(targetValue, pricePrecision) : "";
     }
 
     if (orderBasis === OrderBasis.Margin) {
-      const maxValue = this.calculateMaxValue(maxQTY, lastPrice);
+      const maxValue = this.calculateMaxValue(maxSize, lastPrice);
       const targetValue = (rate * maxValue) / 100;
       const targetMargin = targetValue / Number(maxLeverage || 1);
-      return targetMargin
-        ? BigNumber(targetMargin).toFixed(2, BigNumber.ROUND_CEIL)
-        : "";
+      return targetMargin ? BigNumber(targetMargin).toFixed(2, BigNumber.ROUND_CEIL) : "";
     }
 
     // OrderBasis.Size
-    const targetSize = (rate * Number(maxQTY)) / 100;
-    return maxQTY ? toTickSizeRoundString(targetSize, sizeStep) : "";
+    const targetSize = (rate * Number(maxSize)) / 100;
+    return maxSize ? toTickSizeRoundString(targetSize, sizeStep) : "";
   }
 
   /**
@@ -159,4 +157,3 @@ export class MarketOrderCalculator {
     };
   }
 }
-

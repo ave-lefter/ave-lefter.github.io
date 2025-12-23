@@ -29,6 +29,8 @@ export enum OrderType {
   TAKE_PROFIT_MARKET = "TAKE_PROFIT_MARKET",
   /** 止盈限价单 */
   TAKE_PROFIT_LIMIT = "TAKE_PROFIT_LIMIT",
+  /** 分段订单 */
+  LADDER_ORDERS = "LADDER_ORDERS",
 }
 
 /**
@@ -102,12 +104,34 @@ export enum TradeType {
 }
 
 /**
- * 订单基准类型
+ * 分段订单分布模式
+ */
+export enum LadderOrderDistributionMode {
+  /** 平均分布 */
+  EQUAL = "equal",
+  /** 升序分布 */
+  ASCENDING = "ascending",
+  /** 降序分布 */
+  DESCENDING = "descending",
+  /** 随机分布 */
+  RANDOM = "random",
+}
+
+/**
+ * 订单计价类型
  * Order Basis Type
+ *
+ * 定义订单数量的基础类型：
+ * - Size: 以基础币种为单位（如 0.001 BTC）
+ * - Value: 以计价币种的价值为单位（如 100 USD）
+ * - Margin: 以计价币种的保证金为单位（如 10 USD）
  */
 export enum OrderBasis {
+  /** 数量（基础币种） */
   Size = "size",
+  /** 价值（计价币种） */
   Value = "value",
+  /** 保证金（计价币种） */
   Margin = "margin",
 }
 

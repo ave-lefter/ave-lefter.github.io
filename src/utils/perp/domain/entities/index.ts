@@ -17,3 +17,5 @@ export * from "./Ticker";
 export * from "./Trade";
 export * from "./TradeHistory";
 export * from "./RiskTier";
+export * from "./Withdraw";
+export * from "./TransferOut";

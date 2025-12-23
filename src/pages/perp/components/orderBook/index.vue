@@ -34,7 +34,7 @@
           class="flex-1 flex items-center gap-x-8px whitespace-nowrap overflow-x-auto scrollbar-hide"
         >
           <button
-            v-for="(tab, index) in tabsLayout"
+            v-for="(tab) in tabsLayout"
             :key="tab.value"
             v-tooltip="tab.label"
             :style="{
@@ -164,12 +164,13 @@
             type="sell"
             :height="height"
             :unit="unit"
+            :step="step"
           />
           <div class="mt-16px mb-16px flex items-center">
             <span
               class="text-20px font-700 block text-left"
               :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
-              >{{ formatNumber(perp?.lastPrice || 0) }}</span
+              >{{ formatNumber(perp?.lastPrice || 0, { decimals: pricePrecision ,limit: 8}) }}</span
             >
             <Icon
               class="text-16px"
@@ -180,7 +181,7 @@
             <div v-tooltip="$t('oraclePriceTooltip')" class="flex-end border-b-dashed border-b-1px border-[--third-text]">
               <Icon class="text-14px color-[--third-text]" name="custom:perp-flag" />
               <span class="text-12px color-[--third-text] ml-4px">
-                {{ formatNumber(perp?.oraclePrice || 0, 2) }}</span
+                {{ formatNumber(perp?.oraclePrice || 0, { decimals: pricePrecision, limit: 8}) }}</span
               >
             </div>
           </div>
@@ -190,6 +191,7 @@
             type="buy"
             :height="height"
             :unit="unit"
+            :step="step"
           />
         </div>
       </div>
@@ -266,6 +268,11 @@ const initSellList = ref<OrderBook[]>([])
 const tabsContainer = ref<HTMLElement | null>(null)
 const activeTab = shallowRef('orderbook')
 const activeLayoutTab = shallowRef('all')
+
+const pricePrecision = computed(() => {
+  return getPricePrecision(contractId.value || '')
+})
+
 
 // 表格视图状态
 const tableView = ref({

@@ -1732,5 +1732,6 @@
   "direction": "Direction",
   "setTakeProfitOrderSuccess": "Set take profit order successfully",
   "setStopLossOrderSuccess": "Stop loss order set successfully",
-  "partialClose":"Partial Close"
+  "partialClose": "Partial Close",
+  "minutes": " minutes"
 }

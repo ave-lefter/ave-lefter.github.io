@@ -2,6 +2,14 @@ import BigNumber from "bignumber.js";
 import { PositionSide } from "../value-objects/OrderEnums";
 import { getNumberPrecision, toTickSizeRoundString } from "../../utils";
 import { SymbolEntity } from "../entities/Symbol";
+import {
+  calculateTPSLTriggerPrice,
+  calculateROEFromPrice,
+  calculateUnrealizedPnL,
+  calculatePnLAtPrice,
+  calculatePriceFromPnL,
+  type PositionSide as CalcPositionSide,
+} from "../calculators";
 
 interface CollateralInfo {
   totalEquity: string | BigNumber;
@@ -15,7 +23,8 @@ interface CollateralInfo {
  */
 export class PositionCalculationService {
   /**
-   * Calculate Take Profit trigger price from ratio.
+   * 根据 ROE 计算止盈触发价
+   * 委托给 calculator 的纯函数
    */
   static calculateTpPriceFromRatio({
     entryPrice,
@@ -31,30 +40,27 @@ export class PositionCalculationService {
     priceStep: string;
   }): string | null {
     if (!entryPrice || !leverage) return null;
-    const entryPriceBN = new BigNumber(entryPrice);
-    const leverageBN = new BigNumber(leverage);
-    const ratioBN = new BigNumber(ratio);
+    if (BigNumber(leverage).isZero()) return null;
 
-    if (leverageBN.isZero()) return null;
+    const positionSide: CalcPositionSide =
+      side === PositionSide.LONG || side === "LONG" ? "LONG" : "SHORT";
 
-    const ratioDecimal = ratioBN.div(100).div(leverageBN);
-    const isLong = side === PositionSide.LONG || side === "LONG";
+    const result = calculateTPSLTriggerPrice({
+      entryPrice: String(entryPrice),
+      roe: String(ratio),
+      leverage: String(leverage),
+      positionSide,
+      isTakeProfit: true,
+      pricePrecision: getNumberPrecision(priceStep),
+    });
 
-    let calculatedPrice: BigNumber;
-    if (isLong) {
-      // Long TP: Price goes UP
-      calculatedPrice = entryPriceBN.multipliedBy(new BigNumber(1).plus(ratioDecimal));
-    } else {
-      // Short TP: Price goes DOWN
-      calculatedPrice = entryPriceBN.multipliedBy(new BigNumber(1).minus(ratioDecimal));
-    }
-
-    if (calculatedPrice.lt(0)) return null;
-    return toTickSizeRoundString(calculatedPrice.toNumber(), priceStep);
+    // 返回 null 而非 "0" 以保持原有接口行为
+    return result === "0" ? null : toTickSizeRoundString(Number(result), priceStep);
   }
 
   /**
-   * Calculate Stop Loss trigger price from ratio.
+   * 根据 ROE 计算止损触发价
+   * 委托给 calculator 的纯函数
    */
   static calculateSlPriceFromRatio({
     entryPrice,
@@ -70,37 +76,33 @@ export class PositionCalculationService {
     priceStep: string;
   }): string | null {
     if (!entryPrice || !leverage) return null;
-    const entryPriceBN = new BigNumber(entryPrice);
-    const leverageBN = new BigNumber(leverage);
-    const ratioBN = new BigNumber(ratio);
+    if (BigNumber(leverage).isZero()) return null;
 
-    if (leverageBN.isZero()) return null;
+    const positionSide: CalcPositionSide =
+      side === PositionSide.LONG || side === "LONG" ? "LONG" : "SHORT";
 
-    const ratioDecimal = ratioBN.div(100).div(leverageBN);
-    const isLong = side === PositionSide.LONG || side === "LONG";
+    const result = calculateTPSLTriggerPrice({
+      entryPrice: String(entryPrice),
+      roe: String(ratio),
+      leverage: String(leverage),
+      positionSide,
+      isTakeProfit: false,
+      pricePrecision: getNumberPrecision(priceStep),
+    });
 
-    let calculatedPrice: BigNumber;
-    if (isLong) {
-      // Long SL: Price goes DOWN
-      calculatedPrice = entryPriceBN.multipliedBy(new BigNumber(1).minus(ratioDecimal));
-    } else {
-      // Short SL: Price goes UP
-      calculatedPrice = entryPriceBN.multipliedBy(new BigNumber(1).plus(ratioDecimal));
-    }
-
-    if (calculatedPrice.lt(0)) return null;
-    return toTickSizeRoundString(calculatedPrice.toNumber(), priceStep);
+    return result === "0" ? null : toTickSizeRoundString(Number(result), priceStep);
   }
 
   /**
-   * Calculate PnL Ratio from Trigger Price.
+   * 根据触发价计算 ROE
+   * 委托给 calculator 的纯函数
    */
   static calculateRatioFromPrice({
     entryPrice,
     triggerPrice,
     leverage,
     side,
-    isTp // true for Take Profit, false for Stop Loss
+    isTp,
   }: {
     entryPrice: string | number;
     triggerPrice: string | number;
@@ -110,41 +112,21 @@ export class PositionCalculationService {
   }): string | null {
     if (!entryPrice || !triggerPrice || !leverage) return null;
 
-    const entryPriceBN = new BigNumber(entryPrice);
-    const triggerPriceBN = new BigNumber(triggerPrice);
-    const leverageBN = new BigNumber(leverage);
+    const positionSide: CalcPositionSide =
+      side === PositionSide.LONG || side === "LONG" ? "LONG" : "SHORT";
 
-    if (entryPriceBN.isZero() || leverageBN.isZero()) return null;
-
-    const isLong = side === PositionSide.LONG || side === "LONG";
-    let ratio: BigNumber;
-
-    if (isTp) {
-      // TP Ratio
-      if (isLong) {
-        // (Trigger - Entry) / Entry * Leverage
-        ratio = triggerPriceBN.minus(entryPriceBN).div(entryPriceBN).multipliedBy(leverageBN).multipliedBy(100);
-      } else {
-        // (Entry - Trigger) / Entry * Leverage
-        ratio = entryPriceBN.minus(triggerPriceBN).div(entryPriceBN).multipliedBy(leverageBN).multipliedBy(100);
-      }
-    } else {
-      // SL Ratio
-      if (isLong) {
-        // (Entry - Trigger) / Entry * Leverage
-        ratio = entryPriceBN.minus(triggerPriceBN).div(entryPriceBN).multipliedBy(leverageBN).multipliedBy(100);
-      } else {
-        // (Trigger - Entry) / Entry * Leverage
-        ratio = triggerPriceBN.minus(entryPriceBN).div(entryPriceBN).multipliedBy(leverageBN).multipliedBy(100);
-      }
-    }
-
-    return ratio.gt(0) ? ratio.toFixed(2) : null;
+    return calculateROEFromPrice({
+      entryPrice: String(entryPrice),
+      triggerPrice: String(triggerPrice),
+      leverage: String(leverage),
+      positionSide,
+      isTakeProfit: isTp,
+    });
   }
 
   /**
-   * Calculate Estimated PnL Amount from Trigger Price.
-   * Amount = Direction * (TriggerPrice - EntryPrice) * Volume
+   * 根据触发价计算预估盈亏金额
+   * 委托给 calculator 的纯函数
    */
   static calculatePnLAmountFromPrice({
     entryPrice,
@@ -152,7 +134,7 @@ export class PositionCalculationService {
     volume,
     side,
     pricePrecision,
-    isTp // true for TP (expect > 0), false for SL (expect < 0)
+    isTp,
   }: {
     entryPrice: string | number;
     triggerPrice: string | number;
@@ -163,27 +145,22 @@ export class PositionCalculationService {
   }): string | null {
     if (!entryPrice || !triggerPrice) return null;
 
-    const entryPriceBN = new BigNumber(entryPrice);
-    const triggerPriceBN = new BigNumber(triggerPrice);
-    const volumeBN = new BigNumber(volume || 0);
-    const isLong = side === PositionSide.LONG || side === "LONG";
-    const direction = isLong ? 1 : -1;
+    const positionSide: CalcPositionSide =
+      side === PositionSide.LONG || side === "LONG" ? "LONG" : "SHORT";
 
-    // Amount = Direction * (Trigger - Entry) * Volume
-    const amount = triggerPriceBN.minus(entryPriceBN).multipliedBy(direction).multipliedBy(volumeBN);
-
-    if (isTp) {
-      // TP: Expect amount > 0
-      return amount.gt(0) ? amount.toFixed(pricePrecision) : null;
-    } else {
-      // SL: Expect amount < 0, return absolute value
-      return amount.lt(0) ? amount.abs().toFixed(pricePrecision) : null;
-    }
+    return calculatePnLAtPrice({
+      entryPrice: String(entryPrice),
+      triggerPrice: String(triggerPrice),
+      size: String(volume || 0),
+      side: positionSide,
+      isTakeProfit: isTp,
+      precision: pricePrecision,
+    });
   }
 
   /**
-   * Calculate Trigger Price from PnL Amount.
-   * Price = Entry + (Amount / (Volume * Direction))
+   * 根据目标盈亏金额计算触发价
+   * 委托给 calculator 的纯函数
    */
   static calculatePriceFromPnLAmount({
     entryPrice,
@@ -191,7 +168,7 @@ export class PositionCalculationService {
     volume,
     side,
     priceStep,
-    isTp // true for TP (amount is positive), false for SL (amount is negative cost)
+    isTp,
   }: {
     entryPrice: string | number;
     amount: string | number;
@@ -202,30 +179,31 @@ export class PositionCalculationService {
   }): string | null {
     if (!entryPrice || !amount || !volume || Number(volume) === 0) return null;
 
-    const entryPriceBN = new BigNumber(entryPrice);
-    const amountBN = new BigNumber(amount);
-    const volumeBN = new BigNumber(volume);
-    const isLong = side === PositionSide.LONG || side === "LONG";
-    const direction = isLong ? 1 : -1;
+    const positionSide: CalcPositionSide =
+      side === PositionSide.LONG || side === "LONG" ? "LONG" : "SHORT";
 
-    // If SL, the input amount is positive (user sees absolute loss), but mathematically it's a loss.
-    const actualAmount = isTp ? amountBN : amountBN.negated();
+    const result = calculatePriceFromPnL({
+      entryPrice: String(entryPrice),
+      pnlAmount: String(amount),
+      size: String(volume),
+      side: positionSide,
+      isTakeProfit: isTp,
+      precision: getNumberPrecision(priceStep),
+    });
 
-    // Price = Entry + Amount / (Volume * Direction)
-    const calculatedPrice = entryPriceBN.plus(actualAmount.div(volumeBN.multipliedBy(direction)));
+    if (result === null || BigNumber(result).lte(0)) return "0";
 
-    if (calculatedPrice.lte(0)) return "0";
-
-    // Use floor for price step rounding (to match original logic `toTickSizeRoundString(..., true)`)
-    return toTickSizeRoundString(calculatedPrice.toNumber(), priceStep, true);
+    // 使用 floor 取整以匹配原有行为
+    return toTickSizeRoundString(Number(result), priceStep, true);
   }
 
   /**
-   * Calculate PnL (Profit and Loss) Amount
+   * 计算盈亏金额
+   * 委托给 calculator 的纯函数
    *
-   * Formula:
-   * - Long: (Exit Price - Entry Price) * Size
-   * - Short: (Entry Price - Exit Price) * Size
+   * 公式：
+   * - 多仓: (平仓价 - 开仓价) × 数量
+   * - 空仓: (开仓价 - 平仓价) × 数量
    */
   static calculatePnL({
     entryPrice,
@@ -238,17 +216,15 @@ export class PositionCalculationService {
     size: string | number | BigNumber;
     side: PositionSide | string;
   }): BigNumber {
-    const entry = new BigNumber(entryPrice);
-    const exit = new BigNumber(exitPrice);
-    const amount = new BigNumber(size);
+    const positionSide: CalcPositionSide =
+      side === PositionSide.LONG || side === "LONG" ? "LONG" : "SHORT";
 
-    const isLong = side === PositionSide.LONG || side === "LONG";
-
-    if (isLong) {
-      return exit.minus(entry).multipliedBy(amount);
-    } else {
-      return entry.minus(exit).multipliedBy(amount);
-    }
+    return calculateUnrealizedPnL({
+      side: positionSide,
+      entryPrice: String(entryPrice),
+      markPrice: String(exitPrice),
+      size: String(size),
+    });
   }
 
   /**

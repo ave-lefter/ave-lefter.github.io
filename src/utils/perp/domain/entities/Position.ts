@@ -1,12 +1,17 @@
 import BigNumber from "bignumber.js";
 import type { IContract as ISymbol, PositionEntry } from "../../types";
-import {
-  toThousandString,
-} from "../../utils";
+import { toThousandString, getNumberPrecision } from "../../utils";
 import { OrderSide, OrderType } from "../value-objects/OrderEnums";
 import type { Order } from "./Order";
 import { SymbolEntity } from "./Symbol";
-import { PositionCalculationService } from "../services/PositionCalculationService";
+import {
+  calculateUnrealizedPnL,
+  calculateROE,
+  calculateStarkExWorstClosePrice,
+  calculateStarkExLiquidationPrice,
+  type PositionSide,
+  type RiskTierInput,
+} from "../calculators";
 
 export class Position {
   public symbol: SymbolEntity;
@@ -195,6 +200,12 @@ export class Position {
     return prefix + this.symbol.formatPnL(value);
   }
 
+  get realizedPnlFormattedLong() {
+    const value = this.realizedPnl;
+    const prefix = BigNumber(value).gte(0) ? "+" : "";
+    return prefix + this.symbol.formatQuoteValue(value);
+  }
+
   /**
    * 盈亏平衡价
    * 多仓：盈亏平衡价 = [开仓均价 - (手续费 + 平仓盈亏 + 资金费) / 持仓数量] / (1 + 手续费率)
@@ -228,25 +239,34 @@ export class Position {
 
   /**
    * 计算未实现盈亏
-   * 公式：Position.value - Position.openValue
-   * Position.value = Position.openSize * oraclePrice
+   *
+   * 公式：
+   * - 多仓: (标记价格 - 开仓均价) × 数量
+   * - 空仓: (开仓均价 - 标记价格) × 数量
    */
   getUnrealizedPnl(oraclePrice: string | number): BigNumber {
-    const price = new BigNumber(oraclePrice).abs();
-    return new BigNumber(this.openSize).multipliedBy(price).minus(this.openValue);
+    return calculateUnrealizedPnL({
+      side: this.side as PositionSide,
+      entryPrice: this.entryPrice,
+      markPrice: String(oraclePrice),
+      size: String(this.size),
+    });
   }
 
   /**
    * 计算未实现盈亏率 (ROE)
-   * 公式：(未实现盈亏 / abs(开仓价值)) * 杠杆 * 100
+   *
+   * 公式：(未实现盈亏 / 保证金) × 100%
+   * 其中：保证金 = 开仓均价 × 数量 / 杠杆
    */
   getUnrealizedPnlRoe(oraclePrice: string | number, leverage: string | number): BigNumber {
-    const pnl = this.getUnrealizedPnl(oraclePrice);
-    const openValueAbs = new BigNumber(this.openValue).abs();
-
-    if (openValueAbs.isZero()) return new BigNumber(0);
-
-    return pnl.div(openValueAbs).multipliedBy(leverage).multipliedBy(100);
+    return calculateROE({
+      side: this.side as PositionSide,
+      entryPrice: this.entryPrice,
+      markPrice: String(oraclePrice),
+      size: String(this.size),
+      leverage: String(leverage),
+    });
   }
 
   /**
@@ -276,13 +296,17 @@ export class Position {
     },
     feeRate: string | number,
   ): BigNumber {
-    return PositionCalculationService.calculateWorstClosePrice(
+    const riskTiers = this.getRiskTiersForCalculator();
+    const pricePrecision = this.getPricePrecision();
+
+    return calculateStarkExWorstClosePrice({
       oraclePrice,
-      this.openSize,
-      this.symbol,
+      openSize: this.openSize,
+      riskTiers,
+      pricePrecision,
       collateralInfo,
-      feeRate
-    );
+      feeRate,
+    });
   }
 
   /**
@@ -377,11 +401,36 @@ export class Position {
       pendingTransferOutAmount: string | BigNumber;
     },
   ): string {
-    return PositionCalculationService.calculateLiquidationPrice(
+    const riskTiers = this.getRiskTiersForCalculator();
+
+    return calculateStarkExLiquidationPrice({
       oraclePrice,
-      this.openSize,
-      this.symbol,
-      collateralInfo
-    );
+      openSize: this.openSize,
+      riskTiers,
+      tickSize: this.symbol.tickSize,
+      collateralInfo,
+    });
+  }
+
+  /**
+   * 将 symbol 的 riskTierList 转换为 calculator 需要的格式
+   */
+  private getRiskTiersForCalculator(): RiskTierInput[] {
+    if (!this.symbol.riskTierList || this.symbol.riskTierList.length === 0) {
+      return [];
+    }
+
+    return this.symbol.riskTierList.map((tier) => ({
+      positionValueUpperBound: tier.positionValueUpperBound,
+      maintenanceMarginRate: tier.maintenanceMarginRate,
+      starkExRisk: tier.starkExRisk,
+    }));
+  }
+
+  /**
+   * 获取价格精度（tickSize 的小数位数）
+   */
+  private getPricePrecision(): number {
+    return getNumberPrecision(this.symbol.tickSize);
   }
 }

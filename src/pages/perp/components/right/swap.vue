@@ -10,7 +10,7 @@
           <div class="inline-flex items-center">
             <span class="text-14px color-[--main-text]">USD</span>
             <div class="h-8px w-1px b-l-[--third-text] b-l-1px b-l-solid mx-5px" />
-            <button type="button" class="text-14px color-[--up-color] border-none bg-transparent clickable p-0" @click.stop="form.price = (perpStore.perp?.lastPrice || '0')">{{ $t('midPrice') }}</button>
+            <button type="button" class="text-14px color-[--up-color] border-none bg-transparent clickable p-0" @click.stop="setMidPrice">{{ $t('midPrice') }}</button>
           </div>
         </template>
       </el-input>
@@ -261,7 +261,7 @@
     </li>
     <li v-if="!form.reduceOnly" class="flex items-center mt-8px">
       <span class="mr-auto">{{ $t('estimatedLiquidationPrice') }}</span>
-      <span class="color-[--up-color]">{{ BigNumber(getSize()).gt(0) ? formatNumber(liquidatePriceBuy, pricePrecision) : '-' }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ BigNumber(getSize(1)).gt(0) ? formatNumber(liquidatePriceSell, pricePrecision) : '-' }} USD</span>
+      <span class="color-[--up-color]">{{ BigNumber(getSize()).gt(0) ? formatNumber(liquidatePriceBuy, pricePrecision) : '-' }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ BigNumber(getSize(1)).gt(0) ? formatNumber(liquidatePriceSell, { decimals: pricePrecision, limit: 8}) : '-' }} USD</span>
     </li>
     <li class="flex items-center mt-8px">
       <span class="mr-auto">{{ $t('fee') }}</span>
@@ -419,31 +419,31 @@ const slForm = reactive<{
 const perpMargin = computed(() => {
   const contractId = perpStore.perp?.contractId || ''
   // const orderPrice = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
-  const { takerFeeRate, makerFeeRate } = getFeeRate(perpStore.perp?.contractId || '')
+  // const { takerFeeRate, makerFeeRate } = getFeeRate(perpStore.perp?.contractId || '')
   return {
     buy: calculateMargin({
       contractId: contractId,
       size: Number(getSize() || '0'),
       side: 'BUY',
       price: swapType.value === 'LIMIT' ? Number(form.price || 0) : 0,
-      isMarketOrder: false,
+      isMarketOrder: swapType.value !== 'LIMIT',
       oraclePrice: Number(perpStore.perp?.oraclePrice || '0'),
-      feeRate: takerFeeRate,
+      // feeRate: takerFeeRate,
     }).toFixed(),
     sell: calculateMargin({
       contractId: contractId,
       size: Number(getSize(1) || '0'),
       side: 'SELL',
       price: swapType.value === 'LIMIT' ? Number(form.price || 0) : 0,
-      isMarketOrder: false,
+      isMarketOrder: swapType.value !== 'LIMIT',
       oraclePrice: Number(perpStore.perp?.oraclePrice || '0'),
-      feeRate: makerFeeRate
+      // feeRate: makerFeeRate
     }).toFixed(),
   }
 })
 
 const availableBalance = computed(() => {
-  return calculateAvailableBalance(perpStore.perp?.contractId || '') || '0'
+  return calculateAvailableBalance(perpStore.perp?.contractId || '').toString() || '0'
 })
 
 const feeRate = computed(() => {
@@ -493,7 +493,7 @@ const maxAmountSell = computed(() => {
 
 
 const liquidatePriceBuy = computed(() => {
-  const price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+  const price = Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice )|| 0)
   const orderSize = getSize() || '0'
   // return CoreCalculator.getCreateOrderLiquidatePrice({
   //   contractId: perpStore.perp?.contractId || '',
@@ -506,11 +506,11 @@ const liquidatePriceBuy = computed(() => {
     side: 'BUY',
     price: Number(price) || 0,
     size: Number(orderSize || '0')
-  }).toFixed()
+  })
 })
 
 const liquidatePriceSell = computed(() => {
-  const price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+  const price = Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice )|| 0)
   const orderSize = getSize(1) || '0'
   // return CoreCalculator.getCreateOrderLiquidatePrice({
   //   contractId: perpStore.perp?.contractId || '',
@@ -523,7 +523,7 @@ const liquidatePriceSell = computed(() => {
     side: 'SELL',
     price: Number(price) || 0,
     size: Number(orderSize || '0')
-  }).toFixed()
+  })
 })
 
 function sliderInput(percent: number) {
@@ -617,6 +617,13 @@ function getSize(type = 0) {
     }
     return form.amount || '0'
   }
+}
+
+function setMidPrice() {
+  const ticker = perpStore.tickers?.find(i => i.contractId === perpStore?.contractId)
+  const bid1 =  ticker?.bestBidPrice || 0
+  const ask1 = ticker?.bestAskPrice || 0
+  return form.price = BigNumber(bid1).plus(ask1).dividedBy(2).toFixed()
 }
 
 const percentBuy = computed(() => {

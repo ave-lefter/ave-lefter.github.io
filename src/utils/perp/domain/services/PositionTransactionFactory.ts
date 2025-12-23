@@ -1,6 +1,6 @@
-import type { IContract, PositionTransactionEntry } from "../../types"
-import { SymbolEntity } from "../entities/Symbol";
+import type { PositionTransactionEntry } from "../../types";
 import { PositionTransaction } from "../entities/PositionTransaction";
+import { SymbolEntity } from "../entities/Symbol";
 
 /**
  * PositionTransaction Factory

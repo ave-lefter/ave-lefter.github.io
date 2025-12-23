@@ -10,6 +10,7 @@
  */
 
 import { TYPE_orderSide } from "../constants/trade.constants";
+import { OrderTypeHelper } from "../utils";
 
 /**
  * 订单验证上下文
@@ -30,9 +31,9 @@ export interface OrderValidationContext {
   /** 是否只减仓 */
   reduceOnly?: boolean;
   /** 最大买入数量 */
-  maxBuyQty?: string | number;
+  maxBuySize?: string | number;
   /** 最大卖出数量 */
-  maxSellQty?: string | number;
+  maxSellSize?: string | number;
   /** 是否显示等值输入 */
   showEqualValInput?: boolean;
 }
@@ -91,19 +92,19 @@ export class OrderValidator {
    *
    * 业务规则：
    * - 只减仓订单不能开设新仓位
-   * - 买单（只减仓）需要有空头仓位（maxSellQty > 0），用于平空
-   * - 卖单（只减仓）需要有多头仓位（maxBuyQty > 0），用于平多
+   * - 买单（只减仓）需要有空头仓位（maxSellSize > 0），用于平空
+   * - 卖单（只减仓）需要有多头仓位（maxBuySize > 0），用于平多
    */
   static validateReduceOnly(
     reduceOnly: boolean,
     side: string,
-    maxBuyQty?: string | number,
-    maxSellQty?: string | number,
+    maxBuySize?: string | number,
+    maxSellSize?: string | number,
   ): OrderValidationResult {
     if (
       reduceOnly &&
-      ((side === TYPE_orderSide.SELL && Number(maxSellQty) <= 0) ||
-        (side === TYPE_orderSide.BUY && Number(maxBuyQty) <= 0))
+      ((side === TYPE_orderSide.SELL && Number(maxSellSize) <= 0) ||
+        (side === TYPE_orderSide.BUY && Number(maxBuySize) <= 0))
     ) {
       return {
         isValid: false,
@@ -121,7 +122,7 @@ export class OrderValidator {
    * - 市价单需要有可用市场价格
    */
   static validatePrice(price: string | number, orderType: string): OrderValidationResult {
-    if (!Number(price)) {
+    if (!Number(price) && !OrderTypeHelper.isLadderOrders(orderType)) {
       return {
         isValid: false,
         errorKey: orderType.indexOf("MARKET") !== -1 ? "toastNoAvailablePrice" : "toastInputPrice",
@@ -192,8 +193,8 @@ export class OrderValidator {
     const reduceOnlyResult = this.validateReduceOnly(
       !!context.reduceOnly,
       context.side,
-      context.maxBuyQty,
-      context.maxSellQty,
+      context.maxBuySize,
+      context.maxSellSize,
     );
     if (!reduceOnlyResult.isValid) return reduceOnlyResult;
 

@@ -75,7 +75,7 @@
     </div>
     <div class="text-14px flex items-center justify-between mt-32px rd-4px">
       <span class="color-[--secondary-text]">{{ $t('arrivalTime') }}</span>
-      <span class="color-[--main-text]">≈ 2分钟</span>
+      <span class="color-[--main-text]">≈ 2{{ $t('minutes') }}</span>
     </div>
     <div class="text-14px flex items-center justify-between mt-16px rd-4px">
       <span class="color-[--secondary-text]">{{ $t('totalBalance1') }}</span>

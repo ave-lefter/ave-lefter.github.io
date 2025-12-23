@@ -31,20 +31,20 @@
             <div class="text-left min-w-0">
               <div class="color-[--d-5A5E64-l-A9B0BC]">
                 <span :class="type == 'sell' ? 'color-[--down-color]' : 'color-[--up-color]'">
-                  {{ Number(row?.price) >0 ? formatNumber(row?.price || 0, {limit: 8}) : '--' }}
+                  {{ Number(row?.price) >0 ? formatNumber(row?.price || 0, {limit: 8, decimals: pricePrecision}) : '--' }}
                 </span>
               </div>
             </div>
 
             <div class="text-right text-nowrap min-w-0">
               <div class="font-medium truncate">
-                <span> {{ Number(row?.price) >0 ? formatNumber(unit?.coinName=='USD'? row?.size * row?.price : row?.size || 0, {limit: 8}) : '--' }} </span>
+                <span> {{ getAmount(row) }} </span>
               </div>
             </div>
 
             <div class="text-right text-nowrap min-w-0">
               <div class="font-medium truncate">
-                <span> {{ Number(row?.price) >0? formatNumber(unit?.coinName=='USD'? row?.sum * row?.price: row?.sum || 0, {limit: 8}) : '--' }} </span>
+                <span> {{ getSum(row) }} </span>
               </div>
             </div>
 
@@ -59,6 +59,7 @@ import { UseVirtualList } from '@vueuse/components'
 import type { OrderBook } from '@/api/perp'
 import type { CoinInfo } from '@/api/types/perp'
 import BigNumber from 'bignumber.js'
+import { usePerpStore } from '~/stores/perp'
 const themeStore = useThemeStore()
 const props = defineProps<{
   klineHeight?: number
@@ -66,10 +67,12 @@ const props = defineProps<{
   list: Array<OrderBook>
   type: string
   unit: CoinInfo | null
+  step: number | string
 }>()
 const { t } = useI18n()
+const perpStore = usePerpStore()
 const filterTableList = computed(() => {
-  let result = [
+  let result: Array<OrderBook> = [
     ...props.list,
     ...Array.from({ length: Math.max(0, 200 - props.list?.length) }, () => ({
       price: '0',
@@ -78,21 +81,23 @@ const filterTableList = computed(() => {
     }))
   ]
   if (props.type == 'sell') {
-    result.sort((a, b) => new BigNumber(a.price).comparedTo(new BigNumber(b.price)))
+    result.sort((a, b) => new BigNumber(a.price).comparedTo(new BigNumber(b.price)) || 0)
 
   } else {
-    result.sort((a, b) => new BigNumber(b.price).comparedTo(new BigNumber(a.price)))
+    result.sort((a, b) => new BigNumber(b.price).comparedTo(new BigNumber(a.price)) || 0)
   }
-  let acc = 0
+  let acc = '0'
   result = result.map(item => {
-  acc += Number(item.sum)
-  return {
-    ...item,
-    sum: acc
-  }
-})
+    // acc += Number(item.sum)
+    acc = BigNumber(acc).plus(new BigNumber(item.sum)).toString()
+    return {
+      ...item,
+      sum: acc
+    }
+  })
   return (props.type == 'sell'? result?.reverse(): result)
 })
+
 // 整行渐变背景（优化版本）
 function getFullRowGradient(row: OrderBook) {
   const str = `${themeStore.isDark}-${props?.type == 'buy' ? true : false}`
@@ -118,6 +123,26 @@ function getAmountBarWidthPercent(row: OrderBook, $index) {
   const width = props.type=='sell'? Math.min(Number(totalSum - currentSum) / totalSum, 1):  Math.min(Number(currentSum) / totalSum, 1)
   return Number(row.price) >0 ? width.toFixed(3) : 0
 }
+
+const pricePrecision = computed(() => {
+  return getDecimalScale(props?.step)
+})
+
+const quantityPrecision = computed(() => {
+  return getQuantityPrecision(perpStore.perp?.contractId || '')
+})
+
+
+function getAmount(row: OrderBook) {
+  const isUSD = props.unit?.coinName=='USD'
+  return Number(row?.price) >0 ? formatNumber(isUSD ? BigNumber(row?.size || 0).times(row?.price || 0).toFixed() : row?.size || 0, {limit: 8, decimals: isUSD ? 2 : quantityPrecision.value || 8}) : '--'
+}
+
+function getSum(row: OrderBook) {
+   const isUSD = props.unit?.coinName=='USD'
+  return Number(row?.price) >0 ? formatNumber(isUSD ? BigNumber(row?.sum || 0).times(row?.price || 0).toFixed() : row?.sum || 0, {limit: 8, decimals: isUSD ? 2 : quantityPrecision.value || 8}) : '--'
+}
+
 // 新增：固定小数位格式化方法
 function formatFixedDecimals(value: number, decimals: number): string {
   if (isNaN(value) || value === 0) return '0.00'
