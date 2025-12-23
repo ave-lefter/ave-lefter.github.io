@@ -51,12 +51,6 @@ const option = computed(() => [
     color: '#8D47E7',
     label: 'TOP 100', // 替换为实际的翻译逻辑
     value: 'value3',
-  },
-  {
-    k: 4,
-    color: '#FFBF00',
-    label: '>10U', // 替换为实际的翻译逻辑
-    value: 'value4',
   }
 ])
 
