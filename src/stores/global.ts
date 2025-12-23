@@ -163,6 +163,12 @@ export const useGlobalStore = defineStore('global', () => {
     border: '',
   })
 
+  const batchRemarkFormData = useStorage('batchRemarkFormData', {
+    type: 1,
+    needAmount: true,
+    isUpdateExist: false,
+  })
+
   const hide_risk=shallowRef(1)
   const hide_small=shallowRef(0)
   const rankCommon = useStorage('rankCommon', {
@@ -362,6 +368,7 @@ export const useGlobalStore = defineStore('global', () => {
     dialogVisible_search,
     dialogSearchText,
     showImport,
-    showBotRecord
+    showBotRecord,
+    batchRemarkFormData
   }
 })

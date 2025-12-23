@@ -1576,5 +1576,12 @@
   "advancedTradingStrategy": "Advanced Sell Strategy",
   "top100PurchaseAvg": "Top100 Purchase Avg Price",
   "top100SellAvg": "Top100 Sell Avg Price",
-  "canWithdraw": "Withdrawable"
+  "canWithdraw": "Withdrawable",
+  "rank": "TOP",
+  "profit5": "PnL",
+  "profitAmount": "Profit amount",
+  "notUpdateExistRemark": "Remarks on the wallet will not be modified.",
+  "notUpdateExistRemarkTip": "Note: If unchecked, this will overwrite any existing remarks on the wallet. Please choose carefully.",
+  "preview": "Preview",
+  "top20Remarked": "TOP 20 Quick Remarks"
 }

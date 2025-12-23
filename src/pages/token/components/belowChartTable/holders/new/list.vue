@@ -1,5 +1,6 @@
 <template>
   <div class="holder-list">
+    <BatchRemark ref="proPopoverRef" v-model="batchRemarkData" :button-ref="addButtonRef || {}" width="248":title="$t('top20Remarked')" @onConfirm="handleAddGroup" @beforeEnter="beforeEnterBatchRemark"/>
     <el-table
       ref="holderListRef"
       v-loading="loading && !tableList.length"
@@ -89,8 +90,9 @@
               :content="$t('noFollowedWalletPurchases')"
               effect="light"
             >
-              <Icon name="mdi:information" class="color-[--d-666-l-999] cursor-pointer text-14px ml-4px" />
+              <Icon name="mdi:information" class="color-[--d-666-l-999] cursor-pointer text-14px ml-4px"/>
             </el-tooltip>
+          <Icon v-if="['buy24h','all','30',30].indexOf(tabActive)>-1" name="fe:edit" class="text-14px clickable" ref="addButtonRef"/>
           </div>
         </template>
         <template #default="{ row, $index }">
@@ -916,7 +918,7 @@
 import { deleteAttention, addAttention2 } from '~/api/attention'
 import BigNumber from 'bignumber.js'
 import { getChainInfo, formatDate, getAddressAndChainFromId, getTextWidth } from '@/utils/index'
-
+import BatchRemark from '../batchRemark.vue'
 import dayjs from 'dayjs'
 const tokenStore = useTokenStore()
 const props = defineProps({
@@ -964,6 +966,38 @@ const visible = shallowRef(false)
 const searchKeyword = shallowRef('')
 const keyword = shallowRef('')
 const holderListRef = useTemplateRef('holderListRef')
+
+// 批量备注
+const sortObj=ref<any>({})
+const addButtonRef = ref()
+const proPopoverRef = ref()
+const batchRemarkData=ref({
+  list:[],
+  symbol:token.value?.symbol
+} as {
+  list:any[],
+  symbol:string
+})
+const beforeEnterBatchRemark=() => {
+  const list = [...tableList.value]
+  console.log('beforeEnterBatchRemark1',list,props.tabActive,sortObj.value[props.tabActive])
+  batchRemarkData.value.symbol =token.value?.symbol ||''
+  batchRemarkData.value.list = list.slice(0, 20).map((item: any) => {
+    return {
+      total_profit:Math.trunc(item?.total_profit)||0,
+      user_address:item?.holder,
+      user_chain:item?.chain,
+      address: useFollowStore().currentAddress,
+    }
+  })||[]
+  console.log('beforeEnterBatchRemark', batchRemarkData.value.list )
+}
+
+const handleAddGroup=async () => {
+  console.log('handleAddGroup',batchRemarkData.value,)
+  handleSortChange(sortObj.value[props.tabActive])
+  proPopoverRef.value?.close?.()
+}
 
 const addressAndChain = computed(() => {
   const id = route.params.id as string
@@ -1080,6 +1114,7 @@ function handleFilterQuery(k: string) {
 // function goLink() { }
 function handleSortChange(obj:{prop: string, order:string }) {
   console.log('----------obj-------', obj)
+  sortObj.value[props.tabActive] = obj
   $emit('handleSortChange', obj)
 }
 function filterOriginAddress(address: string, type: string) {

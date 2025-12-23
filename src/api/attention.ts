@@ -307,6 +307,15 @@ export function updateWhaleRemark(body: any) {
   })
 }
 
+// update remark
+export function batchUpdateWhaleRemark(body: any) {
+  const { $api } = useNuxtApp()
+  return $api('/v1api/v3/users/remark/batch/set', {
+    method: 'post',
+    body,
+  })
+}
+
 // delete group
 export function changeIndexFavoriteGroup2(group: number[], address = localStorage.bot_evmAddress || localStorage.walletAddress) {
   if (!address || address === 'undefined') {
