@@ -49,7 +49,8 @@
       </div>
     </div>
     <div class="px-20px py-20px">
-      <Line v-if="dataList1.length > 0||loading1" class="w-440px h-210px relative mb-40px!" :dataList="dataList1" :loading="loading1" :showSeries="[false]"  :showLeft="false"/>
+      <Line v-if="dataList1.length > 0||loading1" class="w-440px h-210px relative mb-40px!" :dataList="dataList1" :loading="loading1" :showSeries="[false]"  :showLeft="false" :title="t('holdersChange')"/>
+      <Line v-if="dataList3.length > 0||loading2" class="w-440px h-210px relative mb-40px!" :dataList="dataList3" :loading="loading2" :showSeries="[false]"  :showLeft="false" :title="t('above10uHoldersChange')"/>
       <Line2 v-if="dataList2.length > 0" class="w-440px h-210px relative" :dataList="dataList2" :activeTime="activeTime" :loading="loading2" :showSeries="[true,true,true]"  :showLeft="showLeft"/>
     </div>
   </el-drawer>
@@ -105,6 +106,7 @@ const loading1= shallowRef<boolean>(false)
 const dataList1 = shallowRef<any[]>([])
 const loading2= shallowRef<boolean>(false)
 const dataList2 = shallowRef<any[]>([])
+const dataList3 = shallowRef<any[]>([])
 const {token} = storeToRefs(useTokenStore())
 const { evmAddress } = storeToRefs(useBotStore())
 const walletStore = useWalletStore()
@@ -170,6 +172,7 @@ function init1() {
           time: formatDate(new Date(Number(i?.time)*1000).getTime() , 'MM-DD HH:mm'),
         }
       })
+      console.log('dataList1.value', dataList1.value)
     }else{
       dataList1.value = []
     }
@@ -189,6 +192,7 @@ function init2() {
       replaceNegOne(arr,'top100_ratio')
       replaceNegOne(arr,'top50_ratio')
       replaceNegOne(arr,'top10_ratio')
+      replaceNegOne(arr,'HoldersAbove10Usd')
       dataList2.value = arr.map(i=>{
         return {
           ...i,
@@ -198,7 +202,15 @@ function init2() {
           time: formatDate(new Date(Number(i?.time)*1000).getTime() , 'MM-DD HH:mm'),
         }
       })
+      dataList3.value = arr.map(i=>{
+        return {
+          ...i,
+          value1: i.HoldersAbove10Usd,
+          time: formatDate(new Date(Number(i?.time)*1000).getTime() , 'MM-DD HH:mm'),
+        }
+      })
     }else{
+      dataList3.value = []
       dataList2.value = []
     }
   }).finally(() => {

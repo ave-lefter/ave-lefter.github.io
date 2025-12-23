@@ -56,11 +56,6 @@
   "onlyShow30DaysTransactions": "Solo mostrar transacciones válidas dentro de 30 días",
   "viewMoreTransactions": "Ver más registros de transacciones",
   "noFollowedWalletPurchases": "Las billeteras seguidas actualmente no tienen registros de compra en cadena",
-  "viewDevTokens": "Ver Tokens de Dev",
-  "devTokensDisplayed": "Los tokens de desarrollador ahora se muestran en la esquina inferior derecha",
-  "onlyShow30DaysTransactions": "Solo mostrar transacciones válidas dentro de 30 días",
-  "viewMoreTransactions": "Ver más registros de transacciones",
-  "noFollowedWalletPurchases": "Las billeteras seguidas actualmente no tienen registros de compra en cadena",
   "volumeOneHour": "1h Vol",
   "name": "Nombre",
   "createdTime": "Fecha de creación",
@@ -598,5 +593,6 @@
   "takeProfitAndStopLossTips4": "Duplicar (100% de ganancia y 50% de la posición cerrada); Triplicar (la posición restante es del 300% y las ganancias están todas cerradas); Half stop loss (el 50% de la pérdida está totalmente cerrada).",
   "takeProfitAndStopLossTips5": "10 veces la toma de ganancias (1000% de ganancia en todo momento); mover la toma de ganancias significa que todas las posiciones se cerrarán automáticamente cuando el precio retroceda un 40% desde el punto más alto.",
   "takeProfitAndStopLossTips6": "40% de obtención de beneficios (40% de cierre de beneficios); La toma de ganancias final significa que todas las posiciones se cerrarán automáticamente cuando el precio retroceda un 60% desde el punto más alto.",
-  "advancedTradingStrategy": "Estrategia de venta avanzada"
+  "advancedTradingStrategy": "Estrategia de venta avanzada",
+  "above10uHoldersChange": "Cambio de soportes > 10U"
 }
