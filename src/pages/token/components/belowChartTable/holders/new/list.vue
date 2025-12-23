@@ -948,7 +948,7 @@ const props = defineProps({
     default: false,
   }
 })
-const $emit = defineEmits(['filterAddress', 'handleSortChange', 'filterOriginAddress'])
+const $emit = defineEmits(['filterAddress', 'handleSortChange', 'filterOriginAddress','reLoad'])
 defineExpose({ sort,clearSort })
 const { tableList, loading } = toRefs(props)
 const { mode } = storeToRefs(useGlobalStore())
@@ -968,7 +968,6 @@ const keyword = shallowRef('')
 const holderListRef = useTemplateRef('holderListRef')
 
 // 批量备注
-const sortObj=ref<any>({})
 const addButtonRef = ref()
 const proPopoverRef = ref()
 const batchRemarkData=ref({
@@ -980,7 +979,6 @@ const batchRemarkData=ref({
 })
 const beforeEnterBatchRemark=() => {
   const list = [...tableList.value]
-  console.log('beforeEnterBatchRemark1',list,props.tabActive,sortObj.value[props.tabActive])
   batchRemarkData.value.symbol =token.value?.symbol ||''
   batchRemarkData.value.list = list.slice(0, 20).map((item: any) => {
     return {
@@ -994,8 +992,7 @@ const beforeEnterBatchRemark=() => {
 }
 
 const handleAddGroup=async () => {
-  console.log('handleAddGroup',batchRemarkData.value,)
-  handleSortChange(sortObj.value[props.tabActive])
+  $emit('reLoad')
   proPopoverRef.value?.close?.()
 }
 
@@ -1113,10 +1110,9 @@ function handleFilterQuery(k: string) {
 }
 // function goLink() { }
 function handleSortChange(obj:{prop: string, order:string }) {
-  console.log('----------obj-------', obj)
-  sortObj.value[props.tabActive] = obj
   $emit('handleSortChange', obj)
 }
+
 function filterOriginAddress(address: string, type: string) {
   $emit('filterOriginAddress', { address, type })
 }

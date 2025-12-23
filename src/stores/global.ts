@@ -166,7 +166,7 @@ export const useGlobalStore = defineStore('global', () => {
   const batchRemarkFormData = useStorage('batchRemarkFormData', {
     type: 1,
     needAmount: true,
-    isUpdateExist: false,
+    isUpdateExist: true,
   })
 
   const hide_risk=shallowRef(1)

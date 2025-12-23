@@ -29,7 +29,7 @@
       </el-form-item>
       <el-form-item prop="isUpdateExist" class="mb-12px!" size="small">
         <el-checkbox v-model="batchRemarkFormData.isUpdateExist" :label="t('notUpdateExistRemark')" :style="!batchRemarkFormData.isUpdateExist?'--el-checkbox-checked-text-color:var(--third-text)':''"/>
-        <div class="text-[--third-text] font-medium text-xs leading-[100%] mt-5px">{{t('notUpdateExistRemarkTip')}}</div>
+        <div v-if="!batchRemarkFormData.isUpdateExist" class="text-[--third-text] font-medium text-xs leading-[100%] mt-5px">{{t('notUpdateExistRemarkTip')}}</div>
       </el-form-item>
       <el-form-item class="mb-0px!">
         <div class="flex-between w-100%">
@@ -172,7 +172,7 @@ function handleSubmit(formEl: FormInstance | undefined) {
       console.log('handleSubmitdata',remarks,props.modelValue.list)
       // formRef.value?.resetFields()
       batchUpdateWhaleRemark({
-        update:batchRemarkFormData.value.isUpdateExist,
+        update:!batchRemarkFormData.value.isUpdateExist,
         remarks
       }).then((res: any) => {
         emits('onConfirm')

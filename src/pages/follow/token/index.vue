@@ -9,6 +9,8 @@ import { getNewFavoriteList, getUserFavoriteGroups, removeFavorite, removeFavori
 import { WSEventType } from '~/utils/constants'
 import type { TableInstance } from 'element-plus'
 
+
+let timeoutId: any = null;
 const tableRef = ref<TableInstance | null>(null)
 const {isDark} = storeToRefs(useGlobalStore())
 const botStore = useBotStore()
@@ -72,6 +74,8 @@ const addressValue = computed(() => {
 
 
 // 12-16 批量取消
+const favHover=ref(false)
+
 const checkedList=ref(<any[]>[])
 const handleSelectionChange = (val: any[]) => {
   console.log('handleSelectionChange', val)
@@ -100,6 +104,20 @@ const batchDelete=async ()=>{
   }).catch((e) => {
      ElMessage.error(String(e))
   })
+}
+const handlerMouseoverFavHover=()=>{
+  favHover.value=true
+  clearTimeout(timeoutId);
+}
+
+const handlerMouseoutFavHover=()=>{
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+  timeoutId = setTimeout(() => {
+    favHover.value = false; // 3 秒后将 favHover 设置为 false
+    console.log('favHover set to false');
+  }, 3000);
 }
 
 watch(() => walletStore.walletSignature[walletStore.address], (newValue) => {
@@ -366,9 +384,9 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="flex-1 h-[calc(100%-76px)] flex flex-col relative">
-    <ul v-if="botStore.evmAddress || walletStore.address" class="w-operate">
+    <!-- <ul v-if="botStore.evmAddress || walletStore.address" class="w-operate">
       <li :class="`btn btn1 ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</li>
-    </ul>
+    </ul> -->
     <div v-if="botStore.evmAddress || walletStore.address"
       class="flex items-center px-16px mt-12px gap-8px overflow-x-auto scrollbar-hide">
       <div v-for="(item, index) in allTabsGroup" :key="item.value"
@@ -497,8 +515,12 @@ onBeforeUnmount(() => {
             </el-button>
           </AveEmpty>
         </template>
-        <el-table-column type="selection" width="22" fixed="left" reserve-selection/>
+        <el-table-column v-if="favHover||checkedList.length" type="selection" width="22" fixed="left" reserve-selection/>
         <el-table-column :label="t('poolPair')" min-width="160" show-overflow-tooltip>
+          <template #header>
+            <div v-if="favHover||checkedList.length" :class="`batchDel mr-8px ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</div>
+            <span>{{ t('poolPair') }}</span>
+          </template>
           <template #default="{ row, $index }">
             <NuxtLink :to="`/token/${row.token}-${row.chain}`" @click.stop.prevent>
               <div class="flex items-center">
@@ -507,7 +529,7 @@ onBeforeUnmount(() => {
                 </span>
                 <Icon v-if="addressValue" name="material-symbols:kid-star"
                   class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 color-#ffbb19"
-                  @click.stop.prevent="collect(row)" />
+                  @click.stop.prevent="collect(row)" @mouseover="handlerMouseoverFavHover" @mouseout="handlerMouseoutFavHover" />
                 <div class="relative ml-3px">
                   <el-image class="w-32px h-32px rounded-full mt-6px" :src="getSymbolDefaultIcon({
                     chain: row?.chain,
@@ -726,6 +748,25 @@ onBeforeUnmount(() => {
     }
   }
 }
+.batchDel{
+  display: inline-block;
+  padding: 0 8px;
+  height: 24px;
+  line-height: 24px;
+  cursor: pointer;
+  background-color: var(--main-input-button-bg);
+  justify-content: center;
+  align-items: center;
+  color: var(--secondary-text);
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 12px;
+  &.warning{
+    background-color: #F6465D1A;
+    color: var(--down-color);
+  }
+}
+
 :deep(.el-table .sort-caret) {
   border: solid 4px transparent;
 }

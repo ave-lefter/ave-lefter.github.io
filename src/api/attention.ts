@@ -310,9 +310,13 @@ export function updateWhaleRemark(body: any) {
 // update remark
 export function batchUpdateWhaleRemark(body: any) {
   const { $api } = useNuxtApp()
+  const { initRemarks } = useRemarksStore()
   return $api('/v1api/v3/users/remark/batch/set', {
     method: 'post',
     body,
+  }).then(async res => {
+    initRemarks()
+    return res
   })
 }
 

@@ -14,7 +14,7 @@
           <el-radio-button label="30D" :value="'30d'" />
         </el-radio-group>
       </li>
-      <li :class="`btn btn1 ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</li>
+      <!-- <li :class="`btn btn1 ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</li> -->
       <!-- checkedList -->
     </ul>
     <div v-if="currentAddress" class="m-header flex-between px-16px items-start">
@@ -49,9 +49,10 @@
           </AveEmpty>
           <span v-else />
         </template>
-        <el-table-column v-if="!isMonitor" type="selection" width="22" fixed="left" reserve-selection/>
+        <el-table-column v-if="!isMonitor && (favHover||checkedList.length)" type="selection" width="22" fixed="left" reserve-selection/>
         <el-table-column :label="$t('wallet2')" width="215" :fixed="!isMonitor?false:'left'">
           <template #header>
+            <div v-if="favHover||checkedList.length" :class="`batchDel mr-8px ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</div>
             <span class="text-10px" style="opacity: 0">0</span>
             <span>{{ $t('wallet2') }}</span>
               <Icon
@@ -135,6 +136,7 @@
                       ?'color-#f45469'
                       :'color-[--d-666-l-696E7C]'} text-12px hover:color-#f45469`"
                 @click.self.stop="handleDeleteAttention(row)"
+                @mouseover="handlerMouseoverFavHover" @mouseout="handlerMouseoutFavHover"
               />
                <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mr-8px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
               <div class="flex flex-col justify-between h-32px">
@@ -653,6 +655,8 @@ const filterDataSource=computed(() => {
 // })
 
 // 12-16 批量取消
+const favHover=ref(false)
+let timeoutId: any = null;
 const checkedList=ref(<any[]>[])
 const handleSelectionChange = (val: any[]) => {
   // console.log('handleSelectionChange', val)
@@ -665,7 +669,20 @@ const handleSelectionChange = (val: any[]) => {
   })
   // checkedList.value=val.map(i => i?.user_address+'-' + i?.user_chain)
 }
+const handlerMouseoverFavHover=()=>{
+  favHover.value=true
+  clearTimeout(timeoutId);
+}
 
+const handlerMouseoutFavHover=()=>{
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+  timeoutId = setTimeout(() => {
+    favHover.value = false; // 3 秒后将 favHover 设置为 false
+    console.log('favHover set to false');
+  }, 3000);
+}
 const batchDelete=async ()=>{
   await ElMessageBox.confirm(t('removeTokenTips'), t('tips'), {
     confirmButtonText: t('confirm'),
@@ -1430,6 +1447,25 @@ a.trade {
     .sort-caret{
       border-width: 4px;
     }
+  }
+}
+
+.batchDel{
+  display: inline-block;
+  padding: 0 8px;
+  height: 24px;
+  line-height: 24px;
+  cursor: pointer;
+  background-color: var(--main-input-button-bg);
+  justify-content: center;
+  align-items: center;
+  color: var(--secondary-text);
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 12px;
+  &.warning{
+    background-color: #F6465D1A;
+    color: var(--down-color);
   }
 }
 </style>
