@@ -1716,5 +1716,6 @@
   "direction": "方向",
   "setTakeProfitOrderSuccess": "設置止盈訂單成功",
   "setStopLossOrderSuccess": "設置止損訂單成功",
-  "partialClose":"部分平倉"
+  "partialClose": "部分平倉",
+  "minutes": "分鐘"
 }
