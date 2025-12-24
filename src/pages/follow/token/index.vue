@@ -320,6 +320,9 @@ const collect = (row: any) => {
   removeFavorite(`${row.token}-${row.chain}`, addressValue.value)
     .then(() => {
       getList()
+      // const newList = checkedList.value.filter((item) => item !== `${row.token}-${row.chain}`)
+      // checkedList.value = newList
+      tableRef.value?.toggleRowSelection(row,false)
     })
     .catch((err) => {
       console.log(err)

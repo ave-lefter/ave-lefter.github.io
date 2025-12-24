@@ -659,7 +659,7 @@ const favHover=ref(false)
 let timeoutId: any = null;
 const checkedList=ref(<any[]>[])
 const handleSelectionChange = (val: any[]) => {
-  // console.log('handleSelectionChange', val)
+  console.log('handleSelectionChange', val)
   checkedList.value=val.map(i => {
     return {
       address:currentAddress.value,
@@ -937,6 +937,10 @@ function handleDeleteAttention(item:any) {
     ElMessage.success(t('success'))
     getTableList()
     updateNum1.value++
+    // const newList = checkedList.value.filter((i) => !(i.user_address === item.user_address && i.user_chain === item.user_chain))
+    // checkedList.value = newList
+    tableRef.value?.toggleRowSelection(item,false)
+    console.log('checkedList.value', checkedList.value)
   }).catch((e) => {
     ElMessage.error(String(e))
   })
