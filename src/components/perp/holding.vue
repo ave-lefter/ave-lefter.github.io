@@ -7,6 +7,7 @@ import StopProfitLoss from './stopProfitLoss.vue'
 import StopTable from './stopTable.vue'
 import ClosePosition from './closePosition.vue'
 import { WSPerpEventType } from '~/utils/constants'
+import { getLeverageFromContractId } from '~/utils/perp'
 
 const props = defineProps({
   searchParams: {
@@ -59,7 +60,8 @@ watch(
         el.unrealizedPnl = profitWithFee.toString()
         el.unrealizedPnlRate = new BigNumber(el.unrealizedPnl)
           .div(new BigNumber(el.openValue).abs())
-          .multipliedBy(1000)
+          .multipliedBy(100)
+          .multipliedBy(getLeverageFromContractId(el.contractId) || el.maxLeverage)
           .toString()
       }
     })
