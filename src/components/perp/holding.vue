@@ -47,6 +47,7 @@ const filterListData = computed(() => {
   })
   return result || []
 })
+
 watch(
   () => wsPublicStore.wsResult[WSPerpEventType.TICKER_ALL_1S],
   (val) => {
@@ -54,15 +55,20 @@ watch(
       const updateData = val.data?.find?.((item) => item.contractId === el.contractId)
       if (updateData) {
         el.oraclePrice = updateData.oraclePrice
-        const profitWithFee = BigNumber(0)
-          .minus(el.openValue)
-          .plus(BigNumber(el.openSize).multipliedBy(updateData.lastPrice))
-        el.unrealizedPnl = profitWithFee.toString()
-        el.unrealizedPnlRate = new BigNumber(el.unrealizedPnl)
-          .div(new BigNumber(el.openValue).abs())
-          .multipliedBy(100)
-          .multipliedBy(getLeverageFromContractId(el.contractId) || el.maxLeverage)
-          .toString()
+        // const profitWithFee = BigNumber(0)
+        //   .minus(el.openValue)
+        //   .plus(BigNumber(el.openSize).multipliedBy(el.oraclePrice))
+        // el.unrealizedPnl = profitWithFee.toString()
+        const price = updateData?.lastPrice || updateData?.oraclePrice || '0'
+        const profit = Number(el?.openSize) >= 0
+          ? new BigNumber(price).times(new BigNumber(el?.openSize || 0).abs()).minus(new BigNumber(el.openValue).abs())
+          : new BigNumber(el.openValue || 0).abs().minus(new BigNumber(price).times(new BigNumber(el.openSize).abs()))
+        el.unrealizedPnl = profit.dp(2, BigNumber.ROUND_FLOOR).toString()
+        // el.unrealizedPnlRate = new BigNumber(el.unrealizedPnl)
+        //   .div(new BigNumber(el.openValue).abs())
+        //   .multipliedBy(1000)
+        //   .toString()
+        el.unrealizedPnlRate = getPositionUnrealizedPnl(el.contractId)?.unrealizedPnlRoe
       }
     })
   }
@@ -213,7 +219,7 @@ onUnmounted(() => {
                 : row.openValue.replace('-', ''),
               {
                 limit: 20,
-                decimals: getPricePrecision(row.contractId),
+                decimals: 4,
               }
             )
           }}
@@ -225,6 +231,7 @@ onUnmounted(() => {
             formatNumber(new BigNumber(row.openValue).div(row.openSize).toString(), {
               limit: 20,
               decimals: getPricePrecision(row.contractId),
+              decimalsHasZero: false
             })
           }}
         </template>
@@ -235,6 +242,7 @@ onUnmounted(() => {
             formatNumber(row.oraclePrice, {
               limit: 20,
               decimals: getPricePrecision(row.contractId),
+              decimalsHasZero: false
             })
           }}
         </template>
@@ -242,10 +250,14 @@ onUnmounted(() => {
       <el-table-column align="right" :label="t('estimatedLiquidationPrice')" prop="liquidatePrice">
         <template #default="{ row }">
           {{
-            formatNumber(getPositionLiqPrice(row.contractId) || row.liquidatePrice, {
-              limit: 20,
-              decimals: getPricePrecision(row.contractId),
-            })
+            formatNumber(
+              getPositionLiqPrice(row.contractId) || row.liquidatePrice,
+              {
+                limit: 20,
+                decimals: getPricePrecision(row.contractId),
+                decimalsHasZero: false
+              }
+            )
           }}
         </template>
       </el-table-column>

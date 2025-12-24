@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 
 // 小于 0.1 数字的格式化
-export function formatDec(n: number | string, decimals = 3) {
+export function formatDec(n: number | string, decimals = 3, decimalsHasZero = true) {
   let n1 = Number(n) || 0
   let d = 0
   if (n1 < 0) {
@@ -14,6 +14,7 @@ export function formatDec(n: number | string, decimals = 3) {
   let t = decimals + d
   t =  t < 0 ? 0 : t
   const reg = new RegExp('(\\.\\d*?[^0]?)(0+$)')
+  t = decimalsHasZero ? t : decimals
   return BigNumber(Number(n) || 0)
     .toFixed(t, BigNumber.ROUND_FLOOR)
     .replace(reg, '$1')
@@ -43,7 +44,7 @@ function formatNum(num: string | number, decimals = Infinity, groupSeparator = '
 }
 
 
-function formatNumUnit(n: number | string, decimals = 3, unit = 1000000000, _locale?: string) {
+function formatNumUnit(n: number | string, decimals = 3, unit = 1000000000, _locale?: string, decimalsHasZero?: boolean) {
   let n1 = Number(n) || 0
   let pre = ''
   if (n1 < 0) {
@@ -58,27 +59,27 @@ function formatNumUnit(n: number | string, decimals = 3, unit = 1000000000, _loc
     }
     if (n1 >= 10 ** 24 && n1 >= unit) {
       n1 = n1 / 10 ** 24
-      return pre + formatNum(formatDec(n1, decimals), d) + '亿亿亿'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + '亿亿亿'
     }
     if (n1 >= 10 ** 20 && n1 >= unit) {
       n1 = n1 / 10 ** 20
-      return pre + formatNum(formatDec(n1, decimals), d) + '万亿亿'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + '万亿亿'
     }
     if (n1 >= 10 ** 16 && n1 >= unit) {
       n1 = n1 / 10 ** 16
-      return pre + formatNum(formatDec(n1, decimals), d) + '亿亿'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + '亿亿'
     }
     if (n1 >= 10 ** 12 && n1 >= unit) {
       n1 = n1 / 10 ** 12
-      return pre + formatNum(formatDec(n1, decimals), d) + '万亿'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + '万亿'
     }
     if (n1 >= 10 ** 8 && n1 >= unit) {
       n1 = n1 / 10 ** 8
-      return pre + formatNum(formatDec(n1, decimals), d) + '亿'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + '亿'
     }
     if (n1 >= 10 ** 4 && n1 >= unit) {
       n1 = n1 / 10 ** 4
-      return pre + formatNum(formatDec(n1, decimals), d) + '万'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + '万'
     }
   } else if (locale === 'zh-tw') {
     if (n1 >= 10 ** 28) {
@@ -86,27 +87,27 @@ function formatNumUnit(n: number | string, decimals = 3, unit = 1000000000, _loc
     }
     if (n1 >= 10 ** 24 && n1 >= unit) {
       n1 = n1 / 10 ** 24
-      return pre + formatNum(formatDec(n1, decimals), d) + '億億億'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + '億億億'
     }
     if (n1 >= 10 ** 20 && n1 >= unit) {
       n1 = n1 / 10 ** 20
-      return pre + formatNum(formatDec(n1, decimals), d) + '萬億億'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + '萬億億'
     }
     if (n1 >= 10 ** 16 && n1 >= unit) {
       n1 = n1 / 10 ** 16
-      return pre + formatNum(formatDec(n1, decimals), d) + '億億'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + '億億'
     }
     if (n1 >= 10 ** 12 && n1 >= unit) {
       n1 = n1 / 10 ** 12
-      return pre + formatNum(formatDec(n1, decimals), d) + '萬億'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + '萬億'
     }
     if (n1 >= 10 ** 8 && n1 >= unit) {
       n1 = n1 / 10 ** 8
-      return pre + formatNum(formatDec(n1, decimals), d) + '億'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + '億'
     }
     if (n1 >= 10 ** 4 && n1 >= unit) {
       n1 = n1 / 10 ** 4
-      return pre + formatNum(formatDec(n1, decimals), d) + '萬'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + '萬'
     }
   } else {
     if (n1 >= 10 ** 28) {
@@ -114,38 +115,38 @@ function formatNumUnit(n: number | string, decimals = 3, unit = 1000000000, _loc
     }
     if (n1 >= 10 ** 24 && n1 >= unit) {
       n1 = n1 / 10 ** 24
-      return pre + formatNum(formatDec(n1, decimals), d) + 'Y'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + 'Y'
     }
     if (n1 >= 10 ** 21 && n1 >= unit) {
       n1 = n1 / 10 ** 21
-      return pre + formatNum(formatDec(n1, decimals), d) + 'Z'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + 'Z'
     }
     if (n1 >= 10 ** 18 && n1 >= unit) {
       n1 = n1 / 10 ** 18
-      return pre + formatNum(formatDec(n1, decimals), d) + 'E'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + 'E'
     }
     if (n1 >= 10 ** 15 && n1 >= unit) {
       n1 = n1 / 10 ** 15
-      return pre + formatNum(formatDec(n1, decimals), d) + 'P'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + 'P'
     }
     if (n1 >= 10 ** 12 && n1 >= unit) {
       n1 = n1 / 10 ** 12
-      return pre + formatNum(formatDec(n1, decimals), d) + 'T'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + 'T'
     }
     if (n1 >= 10 ** 9 && n1 >= unit) {
       n1 = n1 / 10 ** 9
-      return pre + formatNum(formatDec(n1, decimals), d) + 'B'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + 'B'
     }
     if (n1 >= 10 ** 6 && n1 >= unit) {
       n1 = n1 / 10 ** 6
-      return pre + formatNum(formatDec(n1, decimals), d) + 'M'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + 'M'
     }
     if (n1 >= 10 ** 3 && n1 >= unit) {
       n1 = n1 / 10 ** 3
-      return pre + formatNum(formatDec(n1, decimals), d) + 'K'
+      return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d) + 'K'
     }
   }
-  return pre + formatNum(formatDec(n1, decimals), d)
+  return pre + formatNum(formatDec(n1, decimals, decimalsHasZero), d)
 }
 
 function formatNumShort(n: string | number, l = 4) {
@@ -182,7 +183,7 @@ export function formatNumberS(n: string | number, config: any = {}) {
   return formatNumber2(n, decimals, l, unit)
 }
 
-export function formatNumber2(n: string | number, decimals = 4, l = 4, unit: number = 0, _locale?: string) {
+export function formatNumber2(n: string | number, decimals = 4, l = 4, unit: number = 0, _locale?: string, decimalsHasZero?: boolean) {
   const n1 = Number(n)
   if (
     !isNaN(n1) &&
@@ -192,10 +193,10 @@ export function formatNumber2(n: string | number, decimals = 4, l = 4, unit: num
   ) {
     return '0'
   }
-  return formatNumShort(formatNumUnit(n, decimals, unit, _locale), l)
+  return formatNumShort(formatNumUnit(n, decimals, unit, _locale, decimalsHasZero), l)
 }
 
-export function formatNumber(n: string | number, config: { decimals?: number; l?: number; limit?: number, locale?: string } | number = {}) {
+export function formatNumber(n: string | number, config: { decimals?: number; l?: number; limit?: number, locale?: string, decimalsHasZero?: boolean } | number = {}) {
   let config1 = config
   if (typeof config === 'number') {
     config1 = {
@@ -208,7 +209,8 @@ export function formatNumber(n: string | number, config: { decimals?: number; l?
   const l = config1?.l || 4
   const limit = config1?.limit
   const unit = limit ? 10 ** limit : 100000
-  return formatNumber2(n, decimals, l, unit, config1?.locale)
+  const decimalsHasZero = config1?.decimalsHasZero === undefined ? true : config1?.decimalsHasZero
+  return formatNumber2(n, decimals, l, unit, config1?.locale, decimalsHasZero)
 }
 
 

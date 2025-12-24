@@ -516,3 +516,46 @@ export function calculateAvailableBalance(contractId: string, quoteCoinId?: stri
   //   return balance
   return accountRiskService.calculateAvailableBalance(quoteCoinId || _quoteCoinId)
 }
+
+// 仓位未结盈亏
+export function getPositionUnrealizedPnl(contractId: string, price?: string) {
+  const ctx = getPrepData(contractId)
+  const perpStore = usePerpStore()
+  const metadata = perpStore.metadata as any
+  const defaultValue = {
+    unrealizedPnl: '0',
+    unrealizedPnlRoe: '0',
+    unrealizedPnlRoeFormatted: '0%',
+  }
+  if (!metadata) return  defaultValue
+  const contractList = perpStore.metadata?.contractList || []
+  if (!contractList) return  defaultValue
+  // const { getTicker, tickers } = ctx.tickers
+  const tickers = ctx.tickers || []
+  const symbol = ctx.symbolsList?.find((s) => s.contractId === contractId) as typeof ctx.symbolsList[0]
+  if (!symbol) return defaultValue
+  const positionRaw = perpStore.position?.find((p) => p.contractId === contractId) as typeof perpStore.position[0]
+  /////////////////
+  const position = new Position(symbol, positionRaw)
+  if (!position?.symbol?.contractName) {
+    return defaultValue
+  }
+  // const ticker = getTicker(position?.symbol?.contractName || "");
+  const ticker = tickers?.get(position?.symbol?.contractName || "")
+  if (!ticker) {
+    return defaultValue
+  }
+  // 无持仓时返回默认值
+  if (!position) {
+    return defaultValue
+  }
+
+  const leverage = getLeverageFromContractId(contractId)
+  const _price = price || ticker?.lastPrice || ticker?.oraclePrice || 0
+  // (清算价格)
+  return {
+    unrealizedPnl: position?.getUnrealizedPnl?.(_price || '0')?.toFixed() || '0',
+    unrealizedPnlRoe: position.getUnrealizedPnlRoe(_price || '0', leverage || '1')?.toFixed() || '0',
+    unrealizedPnlRoeFormatted: position.getUnrealizedPnlRoeFormatted(_price || '0', leverage || '1'),
+  }
+}
