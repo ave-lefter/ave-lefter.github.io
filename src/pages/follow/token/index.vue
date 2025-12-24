@@ -500,8 +500,8 @@ onBeforeUnmount(() => {
         </div>
       </el-popover>
     </div>
-    {{favHover}}
-    {{checkedList.length}}
+    <!-- {{favHover}}
+    {{checkedList.length}} -->
     <div class="w-100% mt-12px flex-1 overflow-hidden">
       <el-table ref="tableRef"
  v-loading="loading" :height="pageData.total > 50 ? 'calc(100% - 72px)' : '100%'" :data="tableList" fit
