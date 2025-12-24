@@ -22,7 +22,7 @@ function getWSMessage(e: MessageEvent): {
   return null
 }
 
-const UPDATE_EVENTS = ['ORDER_UPDATE', 'WITHDRAW_UPDATE', 'DEPOSIT_UPDATE']
+const UPDATE_EVENTS = ['ORDER_UPDATE', 'WITHDRAW_UPDATE', 'DEPOSIT_UPDATE', 'TRANSFER_IN_UPDATE', 'TRANSFER_OUT_UPDATE']
 
 export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
   // 使用 shallowRef 代替 ref，WebSocket 本身是非响应式的

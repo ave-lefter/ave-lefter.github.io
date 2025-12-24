@@ -1733,5 +1733,8 @@
   "setTakeProfitOrderSuccess": "Set take profit order successfully",
   "setStopLossOrderSuccess": "Stop loss order set successfully",
   "partialClose": "Partial Close",
-  "minutes": " minutes"
+  "minutes": " minutes",
+  "depositApproveTips1": "Enable {token} on {chain}",
+  "depositApproveTips2": "You must enable {token} the first time you deposit on {chain}.",
+  "enableToken": "Enable {token}"
 }

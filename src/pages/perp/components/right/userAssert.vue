@@ -42,7 +42,7 @@ import { usePerpStore } from '~/stores/perp'
 const themeStore = useThemeStore()
 const perpStore = usePerpStore()
 const walletStore = useWalletStore()
-const { prepBalance, unrealizedPnl, maintenanceMarginRequirement, initMarginRequirement, deposit, withdraw } = usePerp()
+const { prepBalance, unrealizedPnl, maintenanceMarginRequirement, deposit, withdraw } = usePerp()
 function getColor(n: number | string) {
   const _n = new BigNumber(n)
   if (_n.gte(0)) {

@@ -1738,5 +1738,8 @@
   "setTakeProfitOrderSuccess": "设置止盈订单成功",
   "setStopLossOrderSuccess": "设置止损订单成功",
   "partialClose": "部分平仓",
-  "minutes": "分钟"
+  "minutes": "分钟",
+  "depositApproveTips1": "在{chain}上启用{token}",
+  "depositApproveTips2": "您首次在{chain}上存款时必须启用{token}。",
+  "enableToken": "启用 {token}"
 }

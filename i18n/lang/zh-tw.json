@@ -1717,5 +1717,8 @@
   "setTakeProfitOrderSuccess": "設置止盈訂單成功",
   "setStopLossOrderSuccess": "設置止損訂單成功",
   "partialClose": "部分平倉",
-  "minutes": "分鐘"
+  "minutes": "分鐘",
+  "depositApproveTips1": "在{chain}上啟用{token}",
+  "depositApproveTips2": "您首次在{chain}上存款時必須啟用{token}。",
+  "enableToken": "啟用 {token}"
 }

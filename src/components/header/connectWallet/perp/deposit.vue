@@ -73,6 +73,11 @@
       <span>{{ $t('availableBalance') }}: </span><span>{{ formatNumber(balance, 3) }} {{ depositForm?.token || '' }}</span>
       <span v-if="depositForm.amount && BigNumber(depositForm.amount).gt(0) && BigNumber(balance).minus(depositForm.amount || 0).gte(0)"> -> {{ formatNumber(BigNumber(balance).minus(depositForm.amount || 0).toFixed(), 6) }} {{ depositForm?.token || '' }}</span>
     </div>
+    <div v-if="!isApprove && isCanDeposit" class="flex flex-col items-center justify-center text-center mt-20px">
+      <div class="text-14px color-[--main-text]">{{ $t('depositApproveTips1', {chain: chainName, token: depositForm.token}) }}</div>
+      <div class="text-12px color-[--secondary-text] mt-5px">{{ $t('depositApproveTips2', {chain: chainName, token: depositForm.token}) }}</div>
+      <el-button type="primary" class="rd-8px mt-20px" :loading="loadingApprove" @click.stop="_approve">{{ $t('enableToken', {token: depositForm.token}) }}</el-button>
+    </div>
     <div class="text-14px flex items-center justify-between mt-32px rd-4px">
       <span class="color-[--secondary-text]">{{ $t('arrivalTime') }}</span>
       <span class="color-[--main-text]">≈ 2{{ $t('minutes') }}</span>
@@ -83,7 +88,7 @@
       <span v-if="depositForm.amount && BigNumber(depositForm.amount).gt(0) && BigNumber(prepBalance).plus(depositForm.amount || 0).gte(0)" class="color-[--main-text] ml-5px"> -> {{ formatNumber(BigNumber(prepBalance).plus(depositForm.amount || 0).toFixed(), 6) }}</span>
       <span class="ml-3px">{{ depositForm?.token || '' }}</span>
     </div>
-    <el-button v-if="isCanDeposit" type="primary" size="large" class="w-full text-16px h-48px rd-8px mt-20px" :loading="loading" @click.stop="handleDeposit">{{ $t('confirmDeposit') }}</el-button>
+    <el-button v-if="isApprove && isCanDeposit" type="primary" size="large" class="w-full text-16px h-48px rd-8px mt-20px" :loading="loading" @click.stop="handleDeposit">{{ $t('confirmDeposit') }}</el-button>
     <button v-else disabled class="w-full text-16px h-48px bg-[--border] color-[--secondary-text] flex items-center justify-center border-none rd-8px mt-20px cursor-not-allowed">{{ $t('confirmDeposit') }}</button>
   </div>
 </template>
@@ -150,10 +155,10 @@ const allowanceObj = ref<{
   [key: string]: string | number
 }>({})
 
-// const isApprove = computed(() => {
-//   const _allowance = allowanceObj.value?.[depositForm.token + '-' + depositForm.chain] || 0
-//   return new BigNumber(_allowance).gte(depositForm.amount || 0)
-// })
+const isApprove = computed(() => {
+  const _allowance = allowanceObj.value?.[depositForm.token + '-' + depositForm.chain] || 0
+  return new BigNumber(_allowance).gte(depositForm.amount || 0)
+})
 
 async function getIsApprove() {
   await getAllowance()
@@ -198,6 +203,16 @@ const chains = computed(() => {
   return (perpStore.metadata?.multiChain.chainList || [])?.filter(i => i.tokenList?.some(i => i.token === depositForm.token))
 })
 
+const chainName = computed(() => {
+  return chains.value.find(item => item.chainId === depositForm.chain)?.chain || getChainInfo(depositForm.chain || '', true)?.name || ''
+})
+
+watch(() => depositForm.chain, (val) => {
+  if (val) {
+    depositForm.amount = ''
+  }
+})
+
 watch(chains, (val) => {
   if (val.length) {
     if (val?.some(i => i.chainId === depositForm.chain)) return
@@ -212,7 +227,7 @@ const isCanDeposit = computed(() => {
 
 watch(() => depositForm.token, () => {
   getTokenBalance()
-  // getAllowance()
+  getAllowance()
 })
 
 function init() {
@@ -225,7 +240,7 @@ function init() {
   } else {
     depositForm.chain = undefined
   }
-  // getAllowance()
+  getAllowance()
 }
 
 watch(() => props.getVisible().value, (val) => {
@@ -241,20 +256,41 @@ watch(() => depositForm.chain, (val) => {
     switchEthereumChain(chain || '', walletStore.provider as any, [walletStore.address]).then((res) => {
       console.log('switchEthereumChain', res)
       getTokenBalance()
-      // getAllowance()
+      getAllowance()
     })
   }
 })
 
+const loadingApprove = ref(false)
+
+async function _approve() {
+  // const isApprove = await getIsApprove()
+  const tokenInfo = getTokenInfo()
+  loadingApprove.value = true
+  const notifyDom = ElNotification({ icon: h('div', {class: 'el-loading-spinner', style: '--el-loading-spinner-size: 24px'}, [h('svg', { viewBox: '0 0 50 50', class: 'circular' }, [h('circle', { class: 'path', style: 'stroke-width: 3', cx: '25', cy: '25', r: '20', fill: 'none' })])]), message: t('approving') + '...', duration: 0 })
+  approve(tokenInfo?.tokenAddress || '').then(res => {
+    return res.wait()
+  }).then(async res => {
+    notifyDom?.close?.()
+    ElNotification({ type: 'success', message:  t('approveSuccess') })
+    getAllowance()
+    return res
+  }).catch(err => {
+    notifyDom?.close?.()
+    // ElNotification({ type: 'error', message: err })
+    loadingApprove.value = false
+    handleError(err)
+  })
+}
 
 const loading = ref(false)
 async function handleDeposit() {
   if (!isCanDeposit.value) return
   const minDeposit = perpStore.metadata?.multiChain?.minDeposit || 0
-  if (new BigNumber(depositForm.amount || 0).lt(minDeposit)) {
-    ElMessage.error(t('minDeposit', { amount: minDeposit }))
-    return
-  }
+  // if (new BigNumber(depositForm.amount || 0).lt(minDeposit)) {
+  //   ElMessage.error(t('minDeposit', { amount: minDeposit }))
+  //   return
+  // }
   loading.value = true
   const isApprove = await getIsApprove()
   const tokenInfo = getTokenInfo()
@@ -276,7 +312,6 @@ async function handleDeposit() {
   }
 
   const amount = parseUnits(depositForm.amount || 0, tokenInfo?.decimals || 0).toFixed(0)
-  console.log('deposit', tokenInfo?.tokenAddress, depositForm.amount, amount)
   deposit(tokenInfo?.tokenAddress || '', amount).then(res => {
     ElNotification({ type: 'success', message:  t('depositTxSubmitted') })
     return res.wait()
