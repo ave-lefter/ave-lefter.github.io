@@ -55,7 +55,7 @@ watch(
         el.oraclePrice = updateData.oraclePrice
         const profitWithFee = BigNumber(0)
           .minus(el.openValue)
-          .plus(BigNumber(el.openSize).multipliedBy(el.oraclePrice))
+          .plus(BigNumber(el.openSize).multipliedBy(updateData.lastPrice))
         el.unrealizedPnl = profitWithFee.toString()
         el.unrealizedPnlRate = new BigNumber(el.unrealizedPnl)
           .div(new BigNumber(el.openValue).abs())
@@ -240,13 +240,10 @@ onUnmounted(() => {
       <el-table-column align="right" :label="t('estimatedLiquidationPrice')" prop="liquidatePrice">
         <template #default="{ row }">
           {{
-            formatNumber(
-              getPositionLiqPrice(row.contractId) || row.liquidatePrice,
-              {
-                limit: 20,
-                decimals: getPricePrecision(row.contractId),
-              }
-            )
+            formatNumber(getPositionLiqPrice(row.contractId) || row.liquidatePrice, {
+              limit: 20,
+              decimals: getPricePrecision(row.contractId),
+            })
           }}
         </template>
       </el-table-column>
