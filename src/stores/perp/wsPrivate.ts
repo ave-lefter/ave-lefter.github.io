@@ -194,7 +194,7 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
     } else {
       perpStore.position = position
     }
-    perpStore.order = perpStore.order?.filter?.((i) => position.some((j) => j.contractId === i.contractId) && i.type !== 'MARKET' && i.status !== 'FILLED') || []
+    perpStore.order = perpStore.order?.filter?.((i) => i.type !== 'MARKET' && i.status !== 'FILLED') || []
   }
 
   function updateOrderInfo(order: OrderEntry[]) {

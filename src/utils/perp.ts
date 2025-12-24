@@ -463,3 +463,56 @@ export function calculateAvailableBalance(contractId: string, quoteCoinId?: stri
   //   return balance
   return accountRiskService.calculateAvailableBalance(quoteCoinId || _quoteCoinId)
 }
+
+export function calcCollateralInfo() {
+  const perpStore = usePerpStore()
+  const rawAccount = perpStore.userInfo
+  const defaultC = {
+      totalEquity: BigNumber(0),
+      totalInitialMarginRequirement: BigNumber(0),
+      totalStarkExRiskValue: BigNumber(0),
+      totalPendingWithdrawAmount: BigNumber(0),
+      totalPendingTransferOutAmount: BigNumber(0),
+      totalOrderFrozenAmount: BigNumber(0),
+    }
+
+  if (!perpStore.metadata || !rawAccount) return defaultC
+
+  const metadata = perpStore.metadata as any
+  const account = rawAccount ? Account.fromRaw(rawAccount) : null
+
+  if (!account) return defaultC
+
+  const _quoteCoinId = '1000'
+
+  const contractList = metadata?.contractList || []
+  const order = perpStore.order || []
+  const collateralRaw = perpStore.collateral || []
+  const withdraw = perpStore.withdraw || []
+  const transferOut = perpStore.transferOut || []
+  const symbolsList = contractList?.map((c: IContract) => SymbolEntity.fromRaw(c as IContract)) || []
+  const collateralList = (collateralRaw || []).map((c) => Collateral.fromRaw(c))
+  const tickers = new Map()
+  perpStore.tickers.forEach((ticker) => {
+    let symbol = perpStore.contractList.find(item => item.contractId === ticker.contractId)
+    tickers.set(symbol?.contractName, new Ticker(SymbolEntity.fromRaw(symbol as any), ticker))
+  })
+
+  const accountRiskService = new AccountRiskService({
+    account: account,
+    collaterals: collateralList || [],
+    positions: (perpStore.position || [])?.map(i => (new Position(perpStore.contractList.find(item => item.contractId === i.contractId) as any, i))) || [],
+    orders: (order || []).map(i => (Order.fromRaw(perpStore.contractList.find(item => item.contractId === i.contractId) as any, i))) || [],
+    withdraws: (withdraw || []).map(i => (Withdraw.fromRaw(i as any))),
+    transferOuts: (transferOut || []).map(i => (TransferOut.fromRaw(i as any))),
+    metadata,
+    symbolsList,
+    tickers,
+  })
+
+  const collateralInfo = account
+    ? accountRiskService.calculateCollateralStats(_quoteCoinId)
+    : defaultC
+
+  return collateralInfo
+}
