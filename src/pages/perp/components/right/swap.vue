@@ -261,7 +261,7 @@
     </li>
     <li v-if="!form.reduceOnly" class="flex items-center mt-8px">
       <span class="mr-auto">{{ $t('estimatedLiquidationPrice') }}</span>
-      <span class="color-[--up-color]">{{ BigNumber(getSize()).gt(0) ? formatNumber(liquidatePriceBuy, pricePrecision) : '-' }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ BigNumber(getSize(1)).gt(0) ? formatNumber(liquidatePriceSell, { decimals: pricePrecision, limit: 8}) : '-' }} USD</span>
+      <span class="color-[--up-color]">{{ BigNumber(getSize()).gt(0) && BigNumber(liquidatePriceBuy).gt(0) ? formatNumber(liquidatePriceBuy, pricePrecision) : '-' }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ BigNumber(getSize(1)).gt(0) && BigNumber(liquidatePriceSell).gt(0) ? formatNumber(liquidatePriceSell, { decimals: pricePrecision, limit: 8}) : '-' }} USD</span>
     </li>
     <li class="flex items-center mt-8px">
       <span class="mr-auto">{{ $t('fee') }}</span>
@@ -428,7 +428,6 @@ const perpMargin = computed(() => {
       price: swapType.value === 'LIMIT' ? Number(form.price || 0) : 0,
       isMarketOrder: swapType.value !== 'LIMIT',
       oraclePrice: Number(perpStore.perp?.oraclePrice || '0'),
-      // feeRate: takerFeeRate,
     }).toFixed(),
     sell: calculateMargin({
       contractId: contractId,
@@ -437,7 +436,6 @@ const perpMargin = computed(() => {
       price: swapType.value === 'LIMIT' ? Number(form.price || 0) : 0,
       isMarketOrder: swapType.value !== 'LIMIT',
       oraclePrice: Number(perpStore.perp?.oraclePrice || '0'),
-      // feeRate: makerFeeRate
     }).toFixed(),
   }
 })
@@ -462,11 +460,12 @@ const maxAmountBuy = computed(() => {
   //   orderSide: 'BUY',
   //   reduceOnly: form.reduceOnly
   // }).times(price).toFixed()
+  const oraclePrice =  Number((swapType.value === 'LIMIT' ? form.price :  (perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice)) || 0)
   return calculateMaxSize({
     contractId: perpStore.perp?.contractId || '',
     type: swapType.value,
     side: 'BUY',
-    price: Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice )|| 0),
+    price: oraclePrice,
     reduceOnly: form.reduceOnly
   }).times(price).toFixed()
 })
@@ -482,18 +481,19 @@ const maxAmountSell = computed(() => {
   //   orderSide: 'SELL',
   //   reduceOnly: form.reduceOnly
   // }).times(price).toFixed()
+  const oraclePrice =  Number((swapType.value === 'LIMIT' ? form.price :  (perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice)) || 0)
   return calculateMaxSize({
     contractId: perpStore.perp?.contractId || '',
     type: swapType.value,
     side: 'SELL',
-    price: Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice )|| 0),
+    price: oraclePrice,
     reduceOnly: form.reduceOnly
   }).times(price).toFixed()
 })
 
 
 const liquidatePriceBuy = computed(() => {
-  const price = Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice )|| 0)
+  const price = Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice )|| 0)
   const orderSize = getSize() || '0'
   // return CoreCalculator.getCreateOrderLiquidatePrice({
   //   contractId: perpStore.perp?.contractId || '',
@@ -510,7 +510,7 @@ const liquidatePriceBuy = computed(() => {
 })
 
 const liquidatePriceSell = computed(() => {
-  const price = Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice )|| 0)
+  const price = Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice )|| 0)
   const orderSize = getSize(1) || '0'
   // return CoreCalculator.getCreateOrderLiquidatePrice({
   //   contractId: perpStore.perp?.contractId || '',

@@ -7,7 +7,6 @@ import { Ticker } from '@/utils/perp/domain/entities/Ticker'
 import { SymbolEntity } from '@/utils/perp/domain/entities/Symbol'
 import { Account } from './perp/domain/entities/Account'
 import { Collateral } from './perp/domain/entities/Collateral'
-import { PositionFactory } from './perp/domain/services/PositionFactory'
 import { AccountRiskService } from './perp/domain/services/AccountRiskService'
 import type { IContract } from './perp/types'
 import { Withdraw } from './perp/domain/entities/Withdraw'
@@ -63,6 +62,59 @@ export function getPrepData(contractId: string) {
       bid1: symbol?.lastPrice || '0',
     }
   }
+}
+
+export function calcCollateralInfo() {
+  const perpStore = usePerpStore()
+  const rawAccount = perpStore.userInfo
+  const defaultC = {
+      totalEquity: BigNumber(0),
+      totalInitialMarginRequirement: BigNumber(0),
+      totalStarkExRiskValue: BigNumber(0),
+      totalPendingWithdrawAmount: BigNumber(0),
+      totalPendingTransferOutAmount: BigNumber(0),
+      totalOrderFrozenAmount: BigNumber(0),
+    }
+
+  if (!perpStore.metadata || !rawAccount) return defaultC
+
+  const metadata = perpStore.metadata as any
+  const account = rawAccount ? Account.fromRaw(rawAccount) : null
+
+  if (!account) return defaultC
+
+  const _quoteCoinId = '1000'
+
+  const contractList = metadata?.contractList || []
+  const order = perpStore.order || []
+  const collateralRaw = perpStore.collateral || []
+  const withdraw = perpStore.withdraw || []
+  const transferOut = perpStore.transferOut || []
+  const symbolsList = contractList?.map((c: IContract) => SymbolEntity.fromRaw(c as IContract)) || []
+  const collateralList = (collateralRaw || []).map((c) => Collateral.fromRaw(c))
+  const tickers = new Map()
+  perpStore.tickers.forEach((ticker) => {
+    let symbol = perpStore.contractList.find(item => item.contractId === ticker.contractId)
+    tickers.set(symbol?.contractName, new Ticker(SymbolEntity.fromRaw(symbol as any), ticker))
+  })
+
+  const accountRiskService = new AccountRiskService({
+    account: account,
+    collaterals: collateralList || [],
+    positions: (perpStore.position || [])?.map(i => (new Position(perpStore.contractList.find(item => item.contractId === i.contractId) as any, i))) || [],
+    orders: (order || []).map(i => (Order.fromRaw(perpStore.contractList.find(item => item.contractId === i.contractId) as any, i))) || [],
+    withdraws: (withdraw || []).map(i => (Withdraw.fromRaw(i as any))),
+    transferOuts: (transferOut || []).map(i => (TransferOut.fromRaw(i as any))),
+    metadata,
+    symbolsList,
+    tickers,
+  })
+
+  const collateralInfo = account
+    ? accountRiskService.calculateCollateralStats(_quoteCoinId)
+    : defaultC
+
+  return collateralInfo
 }
 
 
@@ -167,7 +219,7 @@ export function toTick(value: string | number, tick?: string | number) {
     .times(t).toString()
 }
 
-
+// 计算保证金
 export function calculateMargin(params1: {
   contractId: string
   side: string
@@ -178,27 +230,28 @@ export function calculateMargin(params1: {
   leverage?: string
   feeRate?: string
 }) {
-  const symbol = CoreCalculator.getSymbolModel(params1.contractId)
+  // const symbol = CoreCalculator.getSymbolModel(params1.contractId)
   const _leverage = params1.leverage || getLeverageFromContractId(params1.contractId)
   const feeRate = getFeeRate(params1.contractId)
   const perpStore = usePerpStore()
-  const orderBook = perpStore.contractId === params1.contractId ? (params1.side === 'BUY' ? perpStore.sellList : perpStore.buyList) : undefined
+  // const orderBook = perpStore.contractId === params1.contractId ? (params1.side === 'BUY' ? perpStore.sellList : perpStore.buyList) : undefined
   // 准备参数
   const params = {
     side: params1.side || 'BUY', // 或 "LONG"
-    oraclePrice: params1.oraclePrice || symbol?.oraclePrice || '0',
-    price: params1.price || symbol?.oraclePrice || '0',
+    oraclePrice: params1.oraclePrice || '0',
+    price: params1.price || params1.oraclePrice || '0',
     size: params1.size || '0',
     leverage: _leverage || 0,
     feeRate: params1.feeRate || BigNumber.max(feeRate.takerFeeRate || 0, feeRate?.makerFeeRate || 0).toFixed(),
     isMarketOrder: params1.isMarketOrder || !params1.price,
-    orderBook: orderBook
+    // orderBook: orderBook?.slice(0, 10)?.toSorted?.((a, b) => Number(a.price) - Number(b.price))
   }
 
   const orderMarginService = new OrderMarginService(params)
   return orderMarginService.calcMargin(params1.side === 'BUY' ? 'LONG' : 'SHORT', { isMarketOrder: params.isMarketOrder })
 }
 
+// 计算最大下单量
 export function calculateMaxSize(params: {
   contractId: string
   type: string
@@ -263,7 +316,7 @@ export function calculateSizeFromRatio(params: {
   return rawSize.times(new BigNumber(10).pow(ds)).dp(0, BigNumber.ROUND_FLOOR).div(new BigNumber(10).pow(ds)).toFixed()
 }
 
-
+// 计算强平价
 export function calculateLiqPrice(params: {
   contractId: string
   side: string
@@ -394,7 +447,7 @@ export function getPositionLiqPrice(contractId: string) {
   return liqPrice;
 }
 
-
+// 可用余额
 export function calculateAvailableBalance(contractId: string, quoteCoinId?: string) {
   const perpStore = usePerpStore()
   const rawAccount = perpStore.userInfo
@@ -462,57 +515,4 @@ export function calculateAvailableBalance(contractId: string, quoteCoinId?: stri
 
   //   return balance
   return accountRiskService.calculateAvailableBalance(quoteCoinId || _quoteCoinId)
-}
-
-export function calcCollateralInfo() {
-  const perpStore = usePerpStore()
-  const rawAccount = perpStore.userInfo
-  const defaultC = {
-      totalEquity: BigNumber(0),
-      totalInitialMarginRequirement: BigNumber(0),
-      totalStarkExRiskValue: BigNumber(0),
-      totalPendingWithdrawAmount: BigNumber(0),
-      totalPendingTransferOutAmount: BigNumber(0),
-      totalOrderFrozenAmount: BigNumber(0),
-    }
-
-  if (!perpStore.metadata || !rawAccount) return defaultC
-
-  const metadata = perpStore.metadata as any
-  const account = rawAccount ? Account.fromRaw(rawAccount) : null
-
-  if (!account) return defaultC
-
-  const _quoteCoinId = '1000'
-
-  const contractList = metadata?.contractList || []
-  const order = perpStore.order || []
-  const collateralRaw = perpStore.collateral || []
-  const withdraw = perpStore.withdraw || []
-  const transferOut = perpStore.transferOut || []
-  const symbolsList = contractList?.map((c: IContract) => SymbolEntity.fromRaw(c as IContract)) || []
-  const collateralList = (collateralRaw || []).map((c) => Collateral.fromRaw(c))
-  const tickers = new Map()
-  perpStore.tickers.forEach((ticker) => {
-    let symbol = perpStore.contractList.find(item => item.contractId === ticker.contractId)
-    tickers.set(symbol?.contractName, new Ticker(SymbolEntity.fromRaw(symbol as any), ticker))
-  })
-
-  const accountRiskService = new AccountRiskService({
-    account: account,
-    collaterals: collateralList || [],
-    positions: (perpStore.position || [])?.map(i => (new Position(perpStore.contractList.find(item => item.contractId === i.contractId) as any, i))) || [],
-    orders: (order || []).map(i => (Order.fromRaw(perpStore.contractList.find(item => item.contractId === i.contractId) as any, i))) || [],
-    withdraws: (withdraw || []).map(i => (Withdraw.fromRaw(i as any))),
-    transferOuts: (transferOut || []).map(i => (TransferOut.fromRaw(i as any))),
-    metadata,
-    symbolsList,
-    tickers,
-  })
-
-  const collateralInfo = account
-    ? accountRiskService.calculateCollateralStats(_quoteCoinId)
-    : defaultC
-
-  return collateralInfo
 }

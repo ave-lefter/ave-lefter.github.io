@@ -14,8 +14,8 @@ export function formatDec(n: number | string, decimals = 3) {
   let t = decimals + d
   t =  t < 0 ? 0 : t
   const reg = new RegExp('(\\.\\d*?[^0]?)(0+$)')
-  return (Number(n) || 0)
-    .toFixed(t)
+  return BigNumber(Number(n) || 0)
+    .toFixed(t, BigNumber.ROUND_FLOOR)
     .replace(reg, '$1')
     .replace(new RegExp('\\.$'), '')
 }
@@ -210,4 +210,5 @@ export function formatNumber(n: string | number, config: { decimals?: number; l?
   const unit = limit ? 10 ** limit : 100000
   return formatNumber2(n, decimals, l, unit, config1?.locale)
 }
+
 
