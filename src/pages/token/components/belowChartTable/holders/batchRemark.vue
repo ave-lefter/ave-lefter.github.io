@@ -180,6 +180,8 @@ function handleSubmit(formEl: FormInstance | undefined) {
           message: t('success'),
           type: 'success'
         })
+      }).catch((e) => {
+        ElMessage.error(t('fail'))
       })
       close()
     } else {
