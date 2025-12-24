@@ -42,6 +42,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  interval: {
+    type: String,
+    default: '',
+  },
 })
 const list = ref([
   { label: '＜$100K', key: 'under_100k_count' },
@@ -58,6 +62,7 @@ const _marketcap_analysis = async () => {
     const res = await marketcap_analysis({
       user_address: props.address,
       user_chain: props.chain,
+      interval: props.interval,
     })
     let maxCount = 0
     let maxText = ''
@@ -78,7 +83,7 @@ const _marketcap_analysis = async () => {
 _marketcap_analysis()
 
 watch(
-  () => [props.address, props.chain],
+  () => [props.address, props.chain, props.interval],
   () => {
     _marketcap_analysis()
   }

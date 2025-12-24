@@ -319,7 +319,7 @@ function onGetEventsAnalysisDetail() {
         eventsDetail.value.events = eventsDetail.value.events.concat(events)
       }
       eventsPage.value.pageNO++
-      if (events?.length === 0) {
+      if (eventsDetail.value.events.length >= rest.txns) {
         eventsPage.value.finished = true
       }
     })

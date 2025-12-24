@@ -172,7 +172,12 @@
         :intervalText="intervalText"
         @update:txAnalysis="txAnalysis = $event"
       />
-      <Likes class="flex-1 bg-[--secondary-bg] p-16px" :address="userAddress" :chain="chain" />
+      <Likes
+        class="flex-1 bg-[--secondary-bg] p-16px"
+        :address="userAddress"
+        :chain="chain"
+        :interval="interval"
+      />
     </div>
     <ActivityCharts :interval="interval" :address="userAddress" :chain="chain" />
     <StatisticsTable
