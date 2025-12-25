@@ -476,7 +476,7 @@ const updateViews = useThrottleFn(() => {
     ]
     buyList.value = mergeDepthWithStep(buy, String(step.value), true)
     if (buyList.value.length > 200) {
-      buyList.value = buyList.value?.slice(0, 200)
+      buyList.value = buyList.value?.slice(0, num.value)
     }
     if(buyList.value?.length <5){
       buyList.value = iniBuyList.value
@@ -495,7 +495,7 @@ const updateViews = useThrottleFn(() => {
     sellList.value = mergeDepthWithStep(sell, String(step.value), false)
     //  console.log('----sellList.value-------------',sellList.value)
     if (sellList.value.length > 200) {
-      sellList.value = sellList.value?.slice(0,200)
+      sellList.value = sellList.value?.slice(0,num.value)
     }
     if(sellList.value?.length <5){
       sellList.value = initSellList.value
