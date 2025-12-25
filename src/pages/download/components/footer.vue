@@ -68,7 +68,7 @@
             <span>Google Play</span>
           </a>
           <a
-            href="https://ossaveai.com/oss/app/ave.ai.apk"
+            href="https://www.avedownload.com/app/ave.ai.2.3.07.c.apk"
             class="download-btn bg-[#161926] text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
             @click.stop.prevent="trackRefDownload('Android apk', $event)"
           >

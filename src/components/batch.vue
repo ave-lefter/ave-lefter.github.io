@@ -186,10 +186,20 @@
           </el-option>
         </el-select>
         <textarea v-model="exportStr" class="textarea" disabled />
-        <div class="button copy" @click="copyToClipboard">
+        <el-button
+          class="width100 button mt-30px"
+          block
+          size="large"
+          type="primary"
+          @click="copyToClipboard"
+        >
           {{ $t('copy') }}
           <span v-if="exportNumber > 0">({{ exportNumber }})</span>
-        </div>
+        </el-button>
+        <!-- <div class="button copy" @click="copyToClipboard">
+          {{ $t('copy') }}
+          <span v-if="exportNumber > 0">({{ exportNumber }})</span>
+        </div> -->
       </div>
       <div v-else-if="tabActive === 2" class="delete part">
         <p>{{ $t('bulkDeleteDesc') }}</p>
@@ -239,6 +249,7 @@
           class="width100 button mt-30px"
           block
           size="large"
+          type="primary"
           color="#3F80F7"
           :loading="loadingDelete"
           @click.stop="confirmBulkDelete"
@@ -292,7 +303,13 @@ const selectedGroupId = ref(0)
 
 const emit = defineEmits(['refresh'])
 const exportNumber = computed(() => {
-  const entries = JSON.parse(exportStr.value)
+  let entries = []
+  try {
+    entries = JSON.parse(exportStr.value)
+  } catch (e) {
+    entries=[]
+  }
+  // const entries = JSON.parse(exportStr.value)
   return entries.length || 0
 })
 

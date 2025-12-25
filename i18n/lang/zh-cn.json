@@ -67,9 +67,6 @@
   "onlyShow30DaysTransactions": "仅展示30天内的有效交易",
   "viewMoreTransactions": "查看更多交易记录",
   "noFollowedWalletPurchases": "当前关注的钱包在链上暂无任何买入记录",
-  "copyContract": "复制代币合约",
-  "copyTokenName": "复制名称",
-  "addToGroup": "添加至分组",
   "volumeOneHour": "1h成交额",
   "name": "名称",
   "createdTime": "创建时间",
@@ -1578,5 +1575,12 @@
   "advancedTradingStrategy": "高级交易策略",
   "top100PurchaseAvg": "前100持仓均价",
   "top100SellAvg": "前100卖出均价",
-  "canWithdraw": "可领取"
+  "canWithdraw": "可领取",
+  "rank": "榜",
+  "profit5": "盈利",
+  "profitAmount": "盈利金额",
+  "notUpdateExistRemark": "已备注的钱包不进行修改",
+  "notUpdateExistRemarkTip": "提示：若不勾选则会覆盖当前已备注过的钱包，请谨慎选择",
+  "preview": "预览",
+  "top20Remarked": "TOP 20快捷备注"
 }

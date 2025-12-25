@@ -574,5 +574,12 @@
   "takeProfitAndStopLossTips4": "Double out (100% de lucro e 50% da posição fechada); Triple out (a posição restante é de 300% e o lucro está todo fechado); Half stop loss (50% da perda está toda fechada).",
   "takeProfitAndStopLossTips5": "Take Profit de 10 vezes (lucro igual a 1000%); mover o take-profit significa que todas as posições serão fechadas automaticamente quando o preço retroceder 40% do ponto mais alto.",
   "takeProfitAndStopLossTips6": "Take Profit de 40% (fechamento de lucro de 40%); Trailing Take Profit significa que todas as posições serão fechadas automaticamente quando o preço retroceder 60% do ponto mais alto.",
-  "advancedTradingStrategy": "Estratégia de Venda Avançada"
+  "advancedTradingStrategy": "Estratégia de Venda Avançada",
+  "rank": "TOP",
+  "profit5": "PnL",
+  "profitAmount": "Valor do lucro",
+  "notUpdateExistRemark": "As observações na carteira não serão modificadas.",
+  "notUpdateExistRemarkTip": "Nota: Se desmarcada, substituirá quaisquer comentários existentes na carteira. \nPor favor escolha com cuidado.",
+  "preview": "Visualização",
+  "top20Remarked": "20 principais comentários rápidos"
 }

@@ -661,8 +661,24 @@ watch(() => withdrawForm.chain, (val) => {
 onMounted(() => {
   preLoadShareImg()
   getTransferGasFee()
+  preloadChainImages()
 })
 
+function preloadChainImages() {
+  const chains = ['solana', 'bsc', 'eth', 'base','xlayer','polygon','ton']
+  const imageSrcList=chains.map(c => `${token_logo_url.value}chain/${c}.png`)
+  imageSrcList.forEach(src => {
+      const existingLink = Array.from(document.head.getElementsByTagName('link')).find(link => link.href === src);
+      if (!existingLink) {
+          const link = document.createElement('link'); 
+          link.rel = 'preload'; 
+          link.as = 'image'; 
+          link.href = src; 
+          const firstChild = document.head.firstChild;
+          document.head.insertBefore(link, firstChild); 
+      }
+  });
+}
 function queryHash(){
   const chain = billObj.value.chain
   if (chain === 'solana') {

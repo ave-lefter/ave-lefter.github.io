@@ -168,6 +168,7 @@
             @handleSortChange="handleSortChange"
             @filterAddress="filterAddress"
             @filterOriginAddress="filterOriginAddress"
+            @reLoad="reLoad"
           />
           <!-- <el-tooltip
             v-if="['solana', 'bsc']?.includes(chain) && !show_bubble"
@@ -389,6 +390,11 @@ watch(activeTab, (val) => {
   // if (searchKeyword) {
   //   this.filterAddress(this.searchKeyword)
   // }
+  reLoad(val)
+})
+
+function reLoad(val=activeTab.value) {
+  console.log('reLoad', val)
   if (val === 'buy' || val === 'sell') {
     const prop = val === 'buy' ? 'ascending' : 'descending'
     holdersRef?.value?.sort('total_profit', prop)
@@ -407,7 +413,8 @@ watch(activeTab, (val) => {
       getHoldersList()
     }
   }
-})
+}
+
 onMounted(() => {
   //getHoldersList()
 })
@@ -485,7 +492,7 @@ function getHoldersList(sortObj?: { sort_by: string; order: string }) {
     })
 }
 function handleSortChange(obj: { prop: string; order: string }) {
-  getHoldersList({ sort_by: obj.prop, order: obj.order?.replace('ending', '') })
+  getHoldersList({ sort_by: obj?.prop, order: obj?.order?.replace('ending', '') })
 }
 function filterOriginAddress(row:{ address: string, type: string }) {
   if (searchOriginKeyword.value) {

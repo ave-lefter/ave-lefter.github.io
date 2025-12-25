@@ -68,7 +68,7 @@
       native-type="submit"
     >
       <span v-if="Number(swapStore.fromToken.balance) === 0 || Number(swapStore.fromToken.balance) < Number(fromAmount) || walletStore.address === '' || ((swapStore.isERC314 || swapStore.isFourMeme || swapStore.isFlap || swapStore.isSunPump > 0 || swapStore.isDyorswapfun || swapStore.isXflapswap || swapStore.isCookPump || swapStore.isPopMeFun) && swapStore.token2.address !== NATIVE_TOKEN) || ((swapStore.isPump || swapStore.isMoonshot) && swapStore.token2.address !== 'So11111111111111111111111111111111111111112') || isInsufficientTon">
-        {{ checkAmountMessage() }}
+        {{ checkAmountMessage() || ((swapStore.activeTab === 0 ? $t('buy') : $t('sell')) + ' ' + swapStore.token1?.symbol || '') }}
       </span>
       <span v-else-if="priceImpactV && priceImpactV?.gt?.(0.4)">
         {{ $t('priceImpactTooHigh') }}
