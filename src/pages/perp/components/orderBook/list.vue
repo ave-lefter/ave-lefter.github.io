@@ -89,7 +89,7 @@ const filterTableList = computed(() => {
   let acc = '0'
   result = result.map(item => {
     // acc += Number(item.sum)
-    acc = BigNumber(acc).plus(new BigNumber(item.sum)).toString()
+    acc = BigNumber(acc).plus(new BigNumber(item.size)).toString()
     return {
       ...item,
       sum: acc
