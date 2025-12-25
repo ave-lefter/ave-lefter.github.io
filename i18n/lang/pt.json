@@ -318,7 +318,7 @@
   "batchPlaceHolder": "Por favor, insira o endereço",
   "batchErrorMsg1": "Endereço inválido: {address}",
   "batchErrorMsg2": "O comprimento da observação não pode exceder {n} caracteres",
-  "batchErrorMsg3": "A quantidade de endereços não pode exceder {n}",
+  "batchErrorMsg3": "Limite de endereços seguidos atingido: A lista de observação tem {m} endereços, pendentes de importação {h}, total {t}/{n}",
   "bulkDesc1": "Preencha o endereço da carteira conforme o exemplo, um por linha, separado por vírgulas",
   "lastTxsTime1": "Último Comércio",
   "7dWinRate": "Taxa total de vitória de 7 dias",

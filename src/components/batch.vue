@@ -380,8 +380,7 @@ const getfavGroupsTotal = async () => {
 
 const getTotal = async (group) => {
   try {
-    const { total } = await getAttentionPageList({ address:currentAddress.value, pageSize:500, user_chain:activeChain.value, group });
-
+    const { total } = await getAttentionPageList({ address:currentAddress.value, pageSize:500, user_chain:'AllChains', group });
     return total;
   } catch (err) {
     // console.error('copy failed:', err)
@@ -422,8 +421,10 @@ const validateInput = () => {
   errorMessage.value = ''
   if (isJSON(importStr.value)) {
     const entries = JSON.parse(importStr.value)
+    console.log('favTotal.value', favTotal.value);
+    console.log('entries.length', entries.length);
     if (entries.length + favTotal.value > 500) {
-      errorMessage.value = t('batchErrorMsg3', { n: 500 })
+      errorMessage.value = t('batchErrorMsg3', { n: 500, m: favTotal.value, h: entries.length, t: favTotal.value + entries.length })
       isValid.value = false
       return
     }
@@ -442,9 +443,8 @@ const validateInput = () => {
     }
   } else {
     const entries = importStr.value.split(/\s*,\s*|\n/).filter(Boolean)
-
     if (entries.length + favTotal.value > 500) {
-      errorMessage.value = t('batchErrorMsg3', { n: 500 })
+      errorMessage.value = t('batchErrorMsg3', { n: 500, m: favTotal.value, h: entries.length, t: favTotal.value + entries.length })
       isValid.value = false
       return
     }

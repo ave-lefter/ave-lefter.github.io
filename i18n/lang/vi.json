@@ -498,7 +498,7 @@
   "batchPlaceHolder": "Vui lòng nhập địa chỉ",
   "batchErrorMsg1": "Địa chỉ không hợp lệ: {address}",
   "batchErrorMsg2": "Độ dài ghi chú không thể vượt quá {n} ký tự",
-  "batchErrorMsg3": "Số lượng địa chỉ không thể vượt quá {n}",
+  "batchErrorMsg3": "Đã đạt giới hạn địa chỉ theo dõi: Danh sách theo dõi có {m} địa chỉ, chờ nhập {h}, tổng cộng {t}/{n}",
   "bulkDesc1": "Nhập địa chỉ ví theo ví dụ mỗi dòng một địa chỉ phân cách bằng dấu phẩy",
   "attentionSearch": "Tìm địa chỉ theo dõi",
   "lastTxsTime1": "Giao dịch gần nhất",

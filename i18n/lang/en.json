@@ -842,7 +842,7 @@
   "deleteSuccess": "Successfully deleted {count} zero balance addresses",
   "batchErrorMsg1": "Invalid address: {address}",
   "batchErrorMsg2": "Remark length cannot exceed {n} characters",
-  "batchErrorMsg3": "Address count cannot exceed {n}",
+  "batchErrorMsg3": "Follow address limit reached: Watch list has {m} addresses, pending import {h}, total {t}/{n}",
   "zeroBalanceLoading": "Loading zero balance addresses...",
   "noZeroBalanceAddresses": "No addresses with zero balance found",
   "foundZeroBalanceAddresses": "Found {count} addresses with zero balance",
