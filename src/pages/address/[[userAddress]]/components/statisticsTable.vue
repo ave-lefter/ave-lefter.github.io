@@ -424,9 +424,11 @@ const getWhaleTrendParams = () => {
 
 const _getWhaleTrendList = async () => {
   tableData.value.loading = true
-  if (trendQuery.value.volume_min > trendQuery.value.volume_max) {
-    store.dispatch('showMessage', {
-      type: 'error',
+  const { volume_min, volume_max, amount_min, amount_max } = trendQuery.value
+  const volumeErr = volume_min && volume_max && volume_min > volume_max
+  const amountErr = amount_min && amount_max && amount_min > amount_max
+  if (volumeErr || amountErr) {
+    ElMessage.error({
       message: $t('maxGtMin'),
     })
     return
