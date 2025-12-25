@@ -135,10 +135,16 @@
               {{ formatNumber( Number(row?.priceChangePercent) * 100 || 0, 2) }}%
             </div>
             <div :class="Number(row.value ) > 0 ? 'color-[--main-text]' : ''">
-              ${{ formatNumber(row?.value || 0, 2) }}
+              ${{ formatNumber(row?.value || 0, {
+                decimals: 2,
+                locale: 'en'
+              }) }}
             </div>
             <div :class="Number(row.openInterest) > 0 ? 'color-[--main-text]' : ''">
-              ${{ formatNumber(row?.openInterest || 0, 2) }}
+              ${{ formatNumber(BigNumber(row?.openInterest || 0).times(row.indexPrice || 0).toFixed(), {
+                decimals: 2,
+                locale: 'en'
+              }) }}
             </div>
             <div :class="Number(row.fundingRate)> 0 || Number(row.fundingInterestRate) > 0 ?'color-[--main-text]' : ''">{{ formatNumber( Number(row?.fundingRate || row.fundingInterestRate)* 100 || 0)}}%
             </div>
@@ -159,7 +165,7 @@
 import emptyWhite from '@/assets/images/empty-white.svg'
 import emptyDark from '@/assets/images/empty-black.svg'
 import { formatNumber } from '@/utils/formatNumber'
-
+import BigNumber from 'bignumber.js'
 
 import { getChainDefaultIcon } from '@/utils/index'
 import type { PerpInfo } from '@/api/types/perp'

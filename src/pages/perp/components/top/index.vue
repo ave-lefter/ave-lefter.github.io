@@ -116,7 +116,7 @@
           >{{ $t('openInterest') }}({{ perp?.quoteCoin }})</span
         >
         <span class="text-12px block text-left color-[--main-text] mt-6px">{{
-          formatNumber(BigNumber(perp?.openInterest || 0).times(perp?.oraclePrice || perp?.lastPrice || 0)?.toFixed?.(), {
+          formatNumber(BigNumber(perp?.openInterest || 0).times(perp?.indexPrice || 0)?.toFixed?.(), {
             limit: 11,
             decimals: 2
           })

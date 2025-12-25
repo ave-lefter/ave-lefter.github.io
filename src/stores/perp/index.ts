@@ -43,6 +43,13 @@ export const usePerpStore = defineStore('perp', () => {
   const unit = ref<CoinInfo | null>(null)
 
   const normalWithdrawableAmount = ref('0')
+  const depthData = reactive<{
+    buyList: {price: string; size: string}[]
+    sellList: {price: string; size: string}[]
+  }>({
+    buyList: [],
+    sellList: [],
+  })
 
   const apiKeys = computed(() => {
     if (!walletStore.address) {
@@ -330,5 +337,6 @@ export const usePerpStore = defineStore('perp', () => {
     normalWithdrawableAmount,
     buyList,
     sellList,
+    depthData
   }
 })

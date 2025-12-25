@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
 import WS, { type WSOptions } from '@/utils/ws'
 import { WSPerpEventType, WSPerpHost } from '~/utils/constants'
+import { usePerpStore } from '.'
 
 function getWSMessage(e: MessageEvent): {
   sid?: string // 会话ID
@@ -57,6 +58,7 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
           wsResult[WSPerpEventType.KLINE] = msg.content
         } else if (msg.type === 'quote-event' && msg.channel?.startsWith(WSPerpEventType.DEPTH)) {
           wsResult[WSPerpEventType.DEPTH] = msg.content
+          // saveDepthData(msg.content)
         } else if (msg.type === 'quote-event' && msg.channel?.startsWith(WSPerpEventType.TRADES)) {
           // console.log('----------order-----', msg)
           wsResult[WSPerpEventType.TRADES] = msg.content
@@ -104,6 +106,46 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
     isConnected.value = false
     wsInstance.value?.close()
     wsInstance.value = null
+  }
+
+  function saveDepthData(val: {
+    channel: string
+    dataType: 'Snapshot' | 'changed'
+    data: {
+      asks: {price: string; size: string}[]
+      bids: {price: string; size: string}[]
+    }[]
+  }) {
+    const result = val.data?.[0]
+    const perpStore = usePerpStore()
+    const arr_buy = Array.isArray(result?.bids)
+      ? result?.bids
+      : []
+    const arr_sell = Array.isArray(result?.asks)
+      ? result?.asks
+      : []
+    if (
+      (result?.bids?.length > 0 || result?.asks?.length > 0) &&
+      `${WSPerpEventType.DEPTH}.${perpStore.perp?.contractId || ''}.200` == val.channel
+    ) {
+      if (val.dataType === 'Snapshot') {
+        perpStore.depthData.buyList = arr_buy?.slice?.(0, 100) || []
+        perpStore.depthData.sellList = arr_sell?.slice?.(0, 100) || []
+      } else if (val.dataType === 'changed') {
+        if (arr_buy?.length > 0) {
+          perpStore.depthData.buyList = [
+            ...(result.bids || []),
+            ...arr_buy
+          ]?.slice?.(0, 100) || []
+        }
+        if (arr_sell?.length > 0) {
+          perpStore.depthData.sellList = [
+            ...(result.asks || []),
+            ...arr_sell
+          ]?.slice?.(0, 100) || []
+        }
+      }
+    }
   }
 
   return {

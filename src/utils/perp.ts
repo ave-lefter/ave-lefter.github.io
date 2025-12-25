@@ -233,8 +233,8 @@ export function calculateMargin(params1: {
   // const symbol = CoreCalculator.getSymbolModel(params1.contractId)
   const _leverage = params1.leverage || getLeverageFromContractId(params1.contractId)
   const feeRate = getFeeRate(params1.contractId)
-  const perpStore = usePerpStore()
-  // const orderBook = perpStore.contractId === params1.contractId ? (params1.side === 'BUY' ? perpStore.sellList : perpStore.buyList) : undefined
+  // const perpStore = usePerpStore()
+  // const orderBook = perpStore.contractId === params1.contractId ? (params1.side === 'BUY' ? perpStore.depthData.sellList : perpStore.depthData.buyList) : undefined
   // 准备参数
   const params = {
     side: params1.side || 'BUY', // 或 "LONG"
