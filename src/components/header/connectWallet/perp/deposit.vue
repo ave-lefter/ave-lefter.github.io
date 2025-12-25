@@ -287,10 +287,10 @@ const loading = ref(false)
 async function handleDeposit() {
   if (!isCanDeposit.value) return
   const minDeposit = perpStore.metadata?.multiChain?.minDeposit || 0
-  // if (new BigNumber(depositForm.amount || 0).lt(minDeposit)) {
-  //   ElMessage.error(t('minDeposit', { amount: minDeposit }))
-  //   return
-  // }
+  if (new BigNumber(depositForm.amount || 0).lt(minDeposit)) {
+    ElMessage.error(t('minDeposit', { amount: minDeposit }))
+    return
+  }
   loading.value = true
   const isApprove = await getIsApprove()
   const tokenInfo = getTokenInfo()
