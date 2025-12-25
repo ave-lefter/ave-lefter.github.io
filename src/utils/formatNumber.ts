@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 
 // 小于 0.1 数字的格式化
-export function formatDec(n: number | string, decimals = 3, decimalsHasZero = true) {
+export function formatDec(n: number | string, decimals = 3, decimalsHasZero = false) {
   let n1 = Number(n) || 0
   let d = 0
   if (n1 < 0) {
@@ -14,7 +14,7 @@ export function formatDec(n: number | string, decimals = 3, decimalsHasZero = tr
   let t = decimals + d
   t =  t < 0 ? 0 : t
   const reg = new RegExp('(\\.\\d*?[^0]?)(0+$)')
-  t = decimalsHasZero ? t : decimals
+  t = decimalsHasZero ? decimals : t
   return BigNumber(Number(n) || 0)
     .toFixed(t, BigNumber.ROUND_FLOOR)
     .replace(reg, '$1')
@@ -209,7 +209,7 @@ export function formatNumber(n: string | number, config: { decimals?: number; l?
   const l = config1?.l || 4
   const limit = config1?.limit
   const unit = limit ? 10 ** limit : 100000
-  const decimalsHasZero = config1?.decimalsHasZero === undefined ? true : config1?.decimalsHasZero
+  const decimalsHasZero = config1?.decimalsHasZero ?? false
   return formatNumber2(n, decimals, l, unit, config1?.locale, decimalsHasZero)
 }
 

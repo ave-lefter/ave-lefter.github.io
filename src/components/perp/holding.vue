@@ -231,7 +231,7 @@ onUnmounted(() => {
             formatNumber(new BigNumber(row.openValue).div(row.openSize).toString(), {
               limit: 20,
               decimals: getPricePrecision(row.contractId),
-              decimalsHasZero: false
+              decimalsHasZero: true
             })
           }}
         </template>
@@ -242,7 +242,7 @@ onUnmounted(() => {
             formatNumber(row.oraclePrice, {
               limit: 20,
               decimals: getPricePrecision(row.contractId),
-              decimalsHasZero: false
+              decimalsHasZero: true
             })
           }}
         </template>
@@ -255,7 +255,7 @@ onUnmounted(() => {
               {
                 limit: 20,
                 decimals: getPricePrecision(row.contractId),
-                decimalsHasZero: false
+                decimalsHasZero: true
               }
             )
           }}
