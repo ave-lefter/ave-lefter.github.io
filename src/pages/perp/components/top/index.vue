@@ -95,7 +95,10 @@
           >{{ $t('24HVolume') }}({{ perp?.quoteCoin }})</span
         >
         <span class="text-12px block text-left color-[--secondary-text] mt-6px">{{
-          formatNumber(perp?.value || 0)
+          formatNumber(perp?.value || 0, {
+            limit: 11,
+            decimals: 2
+          })
         }}</span>
       </div>
 
@@ -113,7 +116,10 @@
           >{{ $t('openInterest') }}({{ perp?.quoteCoin }})</span
         >
         <span class="text-12px block text-left color-[--main-text] mt-6px">{{
-          perp?.openInterest
+          formatNumber(BigNumber(perp?.openInterest || 0).times(perp?.oraclePrice || perp?.lastPrice || 0)?.toFixed?.(), {
+            limit: 11,
+            decimals: 2
+          })
         }}</span>
       </div>
 
@@ -151,6 +157,7 @@ import type { PerpInfo } from '@/api/types/perp'
 import { usePerpStore } from '@/stores/perp'
 import { WSPerpEventType } from '@/utils/constants'
 import type { TickerEntry } from '~/utils/perp/types'
+import BigNumber from 'bignumber.js'
 const { metadata, loadingPerpMetadata, contractList, perp, tickers } = storeToRefs(usePerpStore())
 const perpWsPubStore = usePerpWsPubStore()
 const visible = shallowRef(false)
