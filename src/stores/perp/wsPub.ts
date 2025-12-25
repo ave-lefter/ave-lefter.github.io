@@ -58,7 +58,7 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
           wsResult[WSPerpEventType.KLINE] = msg.content
         } else if (msg.type === 'quote-event' && msg.channel?.startsWith(WSPerpEventType.DEPTH)) {
           wsResult[WSPerpEventType.DEPTH] = msg.content
-          // saveDepthData(msg.content)
+          saveDepthData(msg.content)
         } else if (msg.type === 'quote-event' && msg.channel?.startsWith(WSPerpEventType.TRADES)) {
           // console.log('----------order-----', msg)
           wsResult[WSPerpEventType.TRADES] = msg.content
@@ -128,21 +128,22 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
       (result?.bids?.length > 0 || result?.asks?.length > 0) &&
       `${WSPerpEventType.DEPTH}.${perpStore.perp?.contractId || ''}.200` == val.channel
     ) {
+      const count = 200
       if (val.dataType === 'Snapshot') {
-        perpStore.depthData.buyList = arr_buy?.slice?.(0, 100) || []
-        perpStore.depthData.sellList = arr_sell?.slice?.(0, 100) || []
+        perpStore.depthData.buyList = arr_buy?.slice?.(0, count) || []
+        perpStore.depthData.sellList = arr_sell?.slice?.(0, count) || []
       } else if (val.dataType === 'changed') {
         if (arr_buy?.length > 0) {
           perpStore.depthData.buyList = [
             ...(result.bids || []),
             ...arr_buy
-          ]?.slice?.(0, 100) || []
+          ]?.slice?.(0, count) || []
         }
         if (arr_sell?.length > 0) {
           perpStore.depthData.sellList = [
             ...(result.asks || []),
             ...arr_sell
-          ]?.slice?.(0, 100) || []
+          ]?.slice?.(0, count) || []
         }
       }
     }

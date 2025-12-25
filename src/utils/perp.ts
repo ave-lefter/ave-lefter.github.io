@@ -244,7 +244,7 @@ export function calculateMargin(params1: {
     leverage: _leverage || 0,
     feeRate: params1.feeRate || BigNumber.max(feeRate.takerFeeRate || 0, feeRate?.makerFeeRate || 0).toFixed(),
     isMarketOrder: params1.isMarketOrder || !params1.price,
-    // orderBook: orderBook?.slice(0, 10)?.toSorted?.((a, b) => Number(a.price) - Number(b.price))
+    // orderBook: orderBook?.toSorted?.((a, b) => Number(a.price) - Number(b.price))
   }
 
   const orderMarginService = new OrderMarginService(params)

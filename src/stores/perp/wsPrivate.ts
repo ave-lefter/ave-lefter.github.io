@@ -22,7 +22,7 @@ function getWSMessage(e: MessageEvent): {
   return null
 }
 
-const UPDATE_EVENTS = ['ORDER_UPDATE', 'WITHDRAW_UPDATE', 'DEPOSIT_UPDATE', 'TRANSFER_IN_UPDATE', 'TRANSFER_OUT_UPDATE']
+const UPDATE_EVENTS = ['ORDER_UPDATE', 'WITHDRAW_UPDATE', 'DEPOSIT_UPDATE', 'TRANSFER_IN_UPDATE', 'TRANSFER_OUT_UPDATE', 'ACCOUNT_UPDATE']
 
 export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
   // 使用 shallowRef 代替 ref，WebSocket 本身是非响应式的
@@ -95,7 +95,16 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
         }
         // 处理用户数据更新
         if (msg.type === 'trade-event' || msg.type === 'assets-event') {
-          const { collateral, position, order, withdraw, transferOut } = msg.content?.data || {}
+          const { account, collateral, position, order, withdraw, transferOut } = msg.content?.data || {}
+
+          // 更新资产信息
+          if (account as AccountInfo[] && account?.length > 0) {
+            if (msg.content?.event === 'Snapshot') {
+              perpStore.userInfo = account[0]
+            } else {
+              perpStore.userInfo = {...perpStore.userInfo, ...account[0]}
+            }
+          }
 
           // 更新资产信息
           if (collateral as Collateral[]) {
