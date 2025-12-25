@@ -1432,5 +1432,6 @@
   "notUpdateExistRemark": "지갑에 적힌 메모는 수정되지 않습니다.",
   "notUpdateExistRemarkTip": "참고: 선택을 취소하면 지갑에 있는 기존 메모를 덮어쓰게 됩니다. \n신중하게 선택해 주세요.",
   "preview": "시사",
-  "top20Remarked": "TOP 20 간략한 설명"
+  "top20Remarked": "TOP 20 간략한 설명",
+  "value1": "값"
 }

@@ -581,5 +581,7 @@
   "notUpdateExistRemark": "As observações na carteira não serão modificadas.",
   "notUpdateExistRemarkTip": "Nota: Se desmarcada, substituirá quaisquer comentários existentes na carteira. \nPor favor escolha com cuidado.",
   "preview": "Visualização",
-  "top20Remarked": "20 principais comentários rápidos"
+  "top20Remarked": "20 principais comentários rápidos",
+  "deposit": "recarregar",
+  "value1": "valor"
 }
