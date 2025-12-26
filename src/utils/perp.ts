@@ -203,7 +203,7 @@ export const getMarginFromContractId = (data: {contractId: string; size: string}
   return new BigNumber(maintenanceMarginRate).times(size).times(price).toFixed()
 }
 
-export function toTick(value: string | number, tick?: string | number) {
+export function toTick(value: string | number, tick?: string | number, roundingMode?: BigNumber.RoundingMode) {
   // tick 不存在 或 tick === 0 → 直接返回原值
   if (tick === undefined || tick === null || new BigNumber(tick).isZero()) {
     return new BigNumber(value).toFixed()
@@ -212,11 +212,13 @@ export function toTick(value: string | number, tick?: string | number) {
   const v = new BigNumber(value)
   const t = new BigNumber(tick)
 
+  const p = calcPrecision(tick)
+
   // v / t → floor → * t
   return v
     .div(t)
-    .integerValue(BigNumber.ROUND_FLOOR)
-    .times(t).toString()
+    .integerValue(roundingMode)
+    .times(t).times(new BigNumber(10).pow(p)).dp(0, BigNumber.ROUND_FLOOR).div(new BigNumber(10).pow(p)).toFixed()
 }
 
 // 计算保证金

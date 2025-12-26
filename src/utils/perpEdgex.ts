@@ -17,6 +17,16 @@ export function getDecimalScale(decimal: BigNumber | number | string) {
   return 0
 }
 
+export function calcPrecision(tickSize: string | number) {
+  const tickSizeDecimal = new BigNumber(tickSize || 0)
+  if (tickSizeDecimal.gt(1)) {
+    const reciprocal = new BigNumber(1).div(tickSizeDecimal)
+    return -getDecimalScale(reciprocal)
+  } else {
+    return getDecimalScale(tickSizeDecimal)
+  }
+}
+
 // 计算价格精度
 export function getPricePrecision(contractId: string) {
   const symbol = CoreCalculator.getSymbolModel(contractId)

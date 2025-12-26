@@ -5,15 +5,27 @@
   <div class="text-12px color-[--secondary-text] mb-12px text-right">{{ $t('availableBalance') }}: {{ formatNumber(availableBalance, 4) }} USD</div>
   <el-form ref="formRef" :model="form" label-width="auto" :rules="rules" @submit.prevent>
     <el-form-item v-if="swapType === 'LIMIT'" label="" prop="price" style="margin-bottom: 15px;">
-      <el-input v-model="form.price" :placeholder="$t('price')" size="large"  clearable class="input-number" input-style="text-align:left"  @update:model-value="value => watchPrice(value)">
-        <template #append>
+      <el-input-number
+        v-model="form.price"
+        :placeholder="$t('price')"
+        :precision="(pricePrecision < 0 ? 0 : pricePrecision)"
+        :step="(pricePrecision < 0 ? 10 ** -pricePrecision : 1)"
+        :step-strictly="pricePrecision < 0"
+        size="large"
+        clearable
+        class="[&&]:w-full"
+        :controls="false"
+        align="left"
+        @update:model-value="value => watchPrice(value || '0')"
+      >
+        <template #suffix>
           <div class="inline-flex items-center">
             <span class="text-14px color-[--main-text]">USD</span>
             <div class="h-8px w-1px b-l-[--third-text] b-l-1px b-l-solid mx-5px" />
             <button type="button" class="text-14px color-[--up-color] border-none bg-transparent clickable p-0" @click.stop="setMidPrice">{{ $t('midPrice') }}</button>
           </div>
         </template>
-      </el-input>
+      </el-input-number>
     </el-form-item>
     <el-form-item label="" prop="amount">
       <div v-if="percent > 0" class="absolute z-4 bg-[--main-input-button-bg] top-50% translate-y--50% left-0 pl-15px pointer-events-none">{{ percent }}%</div>
@@ -24,7 +36,7 @@
         :step="isValue ? 1 : (quantityPrecision < 0 ? 10 ** -quantityPrecision : 1)"
         :step-strictly="quantityPrecision < 0"
         class="[&&]:w-full"
-          :controls="false"
+        :controls="false"
         size="large"
         clearable
         align="left"
@@ -292,11 +304,11 @@ const types = computed(() => {
 const { createPerpOrder } = usePerp()
 
 const form = reactive<{
-  price: string
-  amount?: string
+  price?: number
+  amount?: number
   reduceOnly: boolean
 }>({
-  price: '',
+  price: undefined,
   amount: undefined,
   reduceOnly: false
 })
@@ -305,7 +317,7 @@ const formRef = useTemplateRef<FormInstance>('formRef')
 
 const rules = computed(() => ({
   price: [
-    { validator: (rule: any, value: string, callback: (error?: Error) => void) => {
+    { validator: (rule: any, value: number, callback: (error?: Error) => void) => {
       if ((!value || value && new BigNumber(value).lte(0))) {
         callback(new Error(t('plsEnterPrice')))
       } else {
@@ -360,9 +372,9 @@ watch(() => perpStore.perp?.contractId || '', (contractId) => {
   if (contractId) {
     isContractChange.value = true
     resetForm()
-    form.price = CoreCalculator.getSymbolModel(contractId || '')?.lastPrice || '0'
+    form.price = Number(CoreCalculator.getSymbolModel(contractId || '')?.oraclePrice || '0')
     setTimeout(() => {
-      form.price = perpStore.perp?.lastPrice || '0'
+      form.price = Number(perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice || '0')
       isContractChange.value = false
     }, 300)
   }
@@ -547,21 +559,21 @@ const isValue = computed(() => {
 })
 
 
-function watchPrice(value: string) {
+function watchPrice(value: string | number) {
   if (!isContractChange.value) {
-    form.price = formatMinSize(value, true)
+    form.price = Number(formatMinSize(String(value) || '0', true))
   }
 }
 function watchAmount(value: string) {
-  // let _value = formatMinSize(value)
-  // const _maxAmount = BigNumber.max(maxAmountBuy.value || '0', maxAmountSell.value || '0').toFixed()
-  // if (new BigNumber(_value).gt(_maxAmount)) {
-  //   _value = _maxAmount || '0'
-  // }
-  // form.amount = _value
+  const price = Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice )|| 0)
+  if (isValue.value) {
+    let _amount = BigNumber(value).div(price).toFixed()
+    _amount = formatMinSize(_amount, false)
+    form.amount = BigNumber(_amount).times(price).dp(2, BigNumber.ROUND_FLOOR).toNumber()
+  }
 }
 
-function formatMinSize(value: string, _isValue = isValue.value) {
+function formatMinSize(value: string, _isValue = isValue.value, roundingMode?: BigNumber.RoundingMode) {
   const _amount = value?.replace?.(/-|[^\d.]/g, '')
   if (_amount === '') {
     return ''
@@ -575,33 +587,34 @@ function formatMinSize(value: string, _isValue = isValue.value) {
     if (new BigNumber(_amount).lt(tickSize || '0')) {
       return  tickSize ||'0'
     }
-    return toTick(_amount, tickSize || '0')
+    return toTick(_amount, tickSize || '0', roundingMode)
   } else {
     if (new BigNumber(_amount).lt(stepSize || '0')) {
       return  stepSize ||'0'
     }
-    return toTick(_amount, stepSize || '0')
+    return toTick(_amount, stepSize || '0', roundingMode)
   }
 }
 
 function switchPerpCoin(item: typeof perpStore.unit) {
   perpStore.unit = item
   if (form.amount) {
-    const price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+    const price = Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice) || 0)
     const _isValue = perpStore.unit?.coinId === perpStore.perp?.quoteCoinId
     if (_isValue) {
-      const _amount = BigNumber(price).times(form.amount).toFixed()
-      form.amount = formatMinSize(_amount, _isValue)
+      let _amount = form.amount || '0'
+      _amount = formatMinSize(String(_amount), false)
+      form.amount = BigNumber(_amount).times(price).dp(2, BigNumber.ROUND_FLOOR).toNumber()
     } else {
       const _amount = BigNumber(form.amount).div(price).toFixed()
-      form.amount = formatMinSize(_amount, _isValue)
+      form.amount = Number(formatMinSize(_amount, _isValue))
     }
   }
 }
 
 function getSize(type = 0) {
   if (isValue.value) {
-    const price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+    const price = Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice) || 0)
     if (percent.value > 0) {
       let max = type === 1 ? (maxAmountSell.value || '0') : (maxAmountBuy.value || '0')
       max = BigNumber(max).div(price).toFixed()
@@ -611,7 +624,7 @@ function getSize(type = 0) {
         stepSize: perpStore.perp?.stepSize || '0'
       })
     }
-    return formatDec(BigNumber(form.amount || '0').div(price).toFixed(), 4)
+    return formatDec(BigNumber(form.amount || '0').div(price).times(10 ** pricePrecision.value).dp(0, BigNumber.ROUND_FLOOR).div(10 ** pricePrecision.value).toFixed(), 4)
   } else {
     if (percent.value > 0) {
       return calculateSizeFromRatio({
@@ -628,19 +641,21 @@ function setMidPrice() {
   const ticker = perpStore.tickers?.find(i => i.contractId === perpStore?.contractId)
   const bid1 =  ticker?.bestBidPrice || 0
   const ask1 = ticker?.bestAskPrice || 0
-  return form.price = BigNumber(bid1).plus(ask1).dividedBy(2).toFixed()
+  return form.price = BigNumber(bid1).plus(ask1).dividedBy(2).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
 }
 
 const percentBuy = computed(() => {
   if (isValue.value) {
-    return BigNumber(getSize()).times(lastPrice.value || '0').toFixed()
+    const price = Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice) || 0)
+    return BigNumber(getSize()).times(price || '0').toFixed()
   }
   return getSize()
 })
 
 const percentSell = computed(() => {
   if (isValue.value) {
-    return BigNumber(getSize(1)).times(lastPrice.value || '0').toFixed()
+    const price = Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice) || 0)
+    return BigNumber(getSize(1)).times(price || '0').toFixed()
   }
   return getSize(1)
 })
@@ -700,7 +715,7 @@ function tpPriceChange(val?: number | string) {
     tempData.tpPercent1 = 0
     return
   }
-  const price = swapType.value === 'LIMIT' ? form.price : lastPrice.value
+  const price = (swapType.value === 'LIMIT' ? form.price : lastPrice.value) || 0
   tempData.tpPercent = new BigNumber(val || 0).minus(price).div(price).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
   tempData.tpPercent1 = Math.min(Math.max(tempData.tpPercent, 0), 200)
 }
@@ -721,7 +736,7 @@ function slPriceChange(val?: number) {
     tempData.slPercent1 = 0
     return
   }
-  const price = swapType.value === 'LIMIT' ? form.price : lastPrice.value
+  const price = (swapType.value === 'LIMIT' ? form.price : lastPrice.value) || 0
   tempData.slPercent = new BigNumber(val || 0).minus(price).div(price).times(maxLeverage.value).times(100).dp(0, BigNumber.ROUND_FLOOR).toNumber()
   tempData.slPercent1 = Math.min(Math.max(-tempData.slPercent, 0), 200)
 }
@@ -732,8 +747,8 @@ function _createPerpOrder(side: string) {
     if (valid) {
       const data: PerpOrderParams = {
         type: swapType.value,
-        size: getSize(side === 'BUY' ? 0 : 1),
-        price: form.price || '0',
+        size: String(getSize(side === 'BUY' ? 0 : 1)),
+        price: String(form.price || '0'),
         side: side,
         contractId: perpStore.perp?.contractId || '',
         reduceOnly: form.reduceOnly,
@@ -746,8 +761,8 @@ function _createPerpOrder(side: string) {
         data.openTp = {
           ...tpForm,
           triggerPrice: new BigNumber(tpForm?.triggerPrice || '0').toFixed(),
-          price: form.price || '0',
-          size: getSize(side === 'BUY' ? 0 : 1),
+          price: String(form.price || '0'),
+          size: String(getSize(side === 'BUY' ? 0 : 1)),
           side: side === 'BUY' ? 'SELL' : 'BUY'
         }
       }
@@ -756,8 +771,8 @@ function _createPerpOrder(side: string) {
         data.openSl = {
           ...slForm,
           triggerPrice: new BigNumber(slForm?.triggerPrice || '0').toFixed(),
-          price: form.price || '0',
-          size: getSize(side === 'BUY' ? 0 : 1),
+          price: String(form.price || '0'),
+          size: String(getSize(side === 'BUY' ? 0 : 1)),
           side: side === 'BUY' ? 'SELL' : 'BUY'
         }
       }

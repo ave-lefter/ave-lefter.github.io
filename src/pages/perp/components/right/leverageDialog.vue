@@ -41,22 +41,19 @@
       <div class="text-12px color-[--yellow] flex-between mt-24px">
         *{{ $t('adjustLeverageTip1') }}
       </div>
-      <div v-if="!isCanEditLeverage" class="text-12px  mt-24px color-[--yellow] flex-start items-start">
+      <div v-if="!BigNumber(_compareDefaultMargin || 0)?.isZero() && leverage" class="text-12px  mt-24px color-[--yellow] flex-start items-start">
         <el-icon style="vertical-align: middle" class="text-14px mr-5px">
           <Warning />
         </el-icon>
-        <div>
-          <div v-if="compareDefaultMargin !==0 && leverage" class="mb-10px">
-            <span v-if="Number(currentMargin) < Number(prepBalance)" class="block" :class="compareDefaultMargin > 0? 'color-[--down-color]':'color-[--up-color]'">
-              {{ compareDefaultMargin > 0 ? $t('adjustLeverageTip4', {num:formatNumber(Math.abs(compareDefaultMargin), { decimals: 0, limit: 10})}): $t('adjustLeverageTip5', {num:formatNumber(Math.abs(compareDefaultMargin), { decimals: 0, limit: 10})}) }}
-            </span>
-            <span v-else>
-            {{ $t('adjustLeverageTip3') }}
-            </span>
-          </div>
-          <span>{{ $t('adjustLeverageTip2', {name:perp?.contractName}) }}</span>
+        <div class="mb-10px">
+          <span v-if="BigNumber(_compareDefaultMargin).lte(0) || BigNumber(_compareDefaultMargin).abs().lte(availableBalance)" class="block" :class="_compareDefaultMargin > 0? 'color-[--down-color]':'color-[--up-color]'">
+            {{ _compareDefaultMargin > 0 ? $t('adjustLeverageTip4', {num:formatNumber(Math.abs(_compareDefaultMargin), { decimals: 4, limit: 10})}): $t('adjustLeverageTip5', {num:formatNumber(Math.abs(_compareDefaultMargin), { decimals: 4, limit: 10})}) }}
+          </span>
+          <span v-else>
+          {{ $t('adjustLeverageTip3') }}
+          </span>
         </div>
-
+        <div v-if="!isCanEditLeverage" lass="text-12px  mt-24px color-[--yellow]">{{ $t('adjustLeverageTip2', {name:perp?.contractName}) }}</div>
       </div>
       <div class="text-center mt-30px flex-between">
         <el-button class="flex-1" style="height: 48px" @click.stop.prevent="visible = false">
@@ -78,6 +75,7 @@ import { updateLeverageSetting } from '@/api/perp'
 import { ElMessage } from 'element-plus'
 import { usePerpWsPrivateStore } from '~/stores/perp/wsPrivate'
 import { Warning } from '@element-plus/icons-vue'
+import BigNumber from 'bignumber.js'
 const props = defineProps({
   modelValue: Boolean,
 })
@@ -114,7 +112,7 @@ const defaultLeverageNum = computed(() => {
     inputLever: String(leverage.value)
   }
   const num = CoreCalculator.getRiskLimitTierMaxOpenQuantityWithLever(data)
-  const result = num.times(perp?.value?.oraclePrice || 0)?.toString()
+  const result = num.times(perp?.value?.oraclePrice || 0).toFixed()
   return result
 })
 const max = computed(() => {
@@ -126,6 +124,10 @@ const min = computed(() => {
 const defaultLeverage = computed(() => {
   return getLeverageFromContractId(contractId.value)
 })
+const availableBalance = computed(() => {
+  return calculateAvailableBalance(perpStore.perp?.contractId || '').toString() || '0'
+})
+
 const marks = computed(() => {
   const obj: Record<number, string> = {}
   const interval = (max.value - min.value) / segments
@@ -184,6 +186,22 @@ function getMargin(leverage: string) {
 
   return getPositionInitialMarginRequirement(contractId.value, perp?.value?.oraclePrice || '0', leverage).toFixed()
 }
+
+const _currentMargin = computed(() => {
+  if (leverage.value) {
+    return getMargin(String(leverage.value))
+  } else {
+    return '0'
+  }
+})
+
+const _compareDefaultMargin = computed(() => {
+  if (leverage.value) {
+    return Number(_currentMargin.value) - Number(defaultMargin.value)
+  } else {
+    return 0
+  }
+})
 function change(val: number | number[]) {
   if (val) {
     currentMargin.value = getMargin(String(val))
