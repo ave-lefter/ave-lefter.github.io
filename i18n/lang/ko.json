@@ -844,7 +844,7 @@
   "deleteSuccess": "잔액이 0인 주소 {count}개 삭제 성공",
   "batchErrorMsg1": "주소 유형이 잘못되었습니다: {address}",
   "batchErrorMsg2": "메모 길이는 {n}자를 초과할 수 없습니다",
-  "batchErrorMsg3": "주소 수는 {n}개를 초과할 수 없습니다",
+  "batchErrorMsg3": "팔로우 주소 한도에 도달했습니다: 관심 목록에 {m}개 주소, 가져오기 대기 중 {h}, 총 {t}/{n}",
   "zeroBalanceLoading": "잔액이 0인 주소를 가져오는 중...",
   "noZeroBalanceAddresses": "잔액이 0인 주소를 찾을 수 없습니다",
   "foundZeroBalanceAddresses": "잔액이 0인 주소 {count}개 찾음",

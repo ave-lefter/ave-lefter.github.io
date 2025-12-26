@@ -313,7 +313,7 @@
   "batchPlaceHolder": "Lütfen adresi girin",
   "batchErrorMsg1": "Geçersiz adres: {address}",
   "batchErrorMsg2": "Açıklama uzunluğu {n} karakteri geçemez",
-  "batchErrorMsg3": "Adres sayısı {n}/'i geçemez",
+  "batchErrorMsg3": "Takip edilen adres sınırına ulaşıldı: İzleme listesinde {m} adres var, içe aktarma bekleyen {h}, toplam {t}/{n}",
   "bulkDesc1": "Cüzdan adresini örneğe göre doldurun, her birini bir satıra yazın, virgülle ayırın",
   "lastTxsTime1": "Son Ticaret",
   "7dWinRate": "7 Günlük Toplam Kazanma Oranı",

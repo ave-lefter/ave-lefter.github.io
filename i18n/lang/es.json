@@ -328,7 +328,7 @@
   "batchPlaceHolder": "Por favor, introduzca la dirección",
   "batchErrorMsg1": "Dirección inválida: {address}",
   "batchErrorMsg2": "La longitud de la observación no puede exceder {n} caracteres",
-  "batchErrorMsg3": "La cantidad de direcciones no puede exceder {n}",
+  "batchErrorMsg3": "Límite de direcciones seguidas alcanzado: La lista de seguimiento tiene {m} direcciones, pendientes de importar {h}, total {t}/{n}",
   "bulkDesc1": "Complete la dirección de la billetera como se muestra en el ejemplo, una por línea, separada por comas",
   "lastTxsTime1": "Último Intercambio",
   "7dWinRate": "Tasa de ganancia total de 7 días",

@@ -45,6 +45,7 @@
           style="width: 100%"
           :teleported="false"
           :suffix-icon="SuffixIcon"
+          @change="validateInput"
         >
           <template #prefix>
             <img
@@ -98,8 +99,8 @@
           "
           @input="validateInput"
         />
-        <div v-if="!isValid" class="error-message"><span>{{ errorMessage }}</span></div>
-        <div class="flex mt-10px mb-5px justify-between">
+        <div v-if="!isValid" class="error-message mt-2"><span v-html="errorMessage"></span></div>
+        <div class="flex mt-10px mb-4px justify-between">
           <div class="text-14px">{{ $t('addToGroup') }}
           </div>
           <el-switch v-model="showGroup" size="small" />
@@ -345,6 +346,7 @@ watch(()=>showBatchAddressDetails.value, (val) => {
     zeroBalanceAddresses.value = ''
     zeroBalanceList.value = []
     favTotal.value = 0;
+    errorMessage.value = ''
   } else {
     getfavGroupsTotal();
   }
@@ -380,8 +382,7 @@ const getfavGroupsTotal = async () => {
 
 const getTotal = async (group) => {
   try {
-    const { total } = await getAttentionPageList({ address:currentAddress.value, pageSize:500, user_chain:activeChain.value, group });
-
+    const { total } = await getAttentionPageList({ address:currentAddress.value, pageSize:500, user_chain:'AllChains', group });
     return total;
   } catch (err) {
     // console.error('copy failed:', err)
@@ -422,8 +423,15 @@ const validateInput = () => {
   errorMessage.value = ''
   if (isJSON(importStr.value)) {
     const entries = JSON.parse(importStr.value)
+    console.log('favTotal.value', favTotal.value);
+    console.log('entries.length', entries.length);
     if (entries.length + favTotal.value > 500) {
-      errorMessage.value = t('batchErrorMsg3', { n: 500 })
+      errorMessage.value = '<span class="text-yellow-500">'
+      + t('batchErrorMsg3').split(':')[0]
+      + ', </span>'
+      + '<span class="text-[var(--main-text)]">'
+      + t('batchErrorMsg3', { n: 500, m: favTotal.value, h: entries.length, t: favTotal.value + entries.length }).split(':')[1].trim()
+      + '</span>'
       isValid.value = false
       return
     }
@@ -442,9 +450,13 @@ const validateInput = () => {
     }
   } else {
     const entries = importStr.value.split(/\s*,\s*|\n/).filter(Boolean)
-
     if (entries.length + favTotal.value > 500) {
-      errorMessage.value = t('batchErrorMsg3', { n: 500 })
+      errorMessage.value = '<span class="text-yellow-500">'
+      + t('batchErrorMsg3').split(':')[0]
+      + ', </span>'
+      + '<span class="text-[var(--main-text)]">'
+      + t('batchErrorMsg3', { n: 500, m: favTotal.value, h: entries.length, t: favTotal.value + entries.length }).split(':')[1].trim()
+      + '</span>'
       isValid.value = false
       return
     }

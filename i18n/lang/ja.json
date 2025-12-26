@@ -844,7 +844,7 @@
   "deleteSuccess": "成功削除 {count} 个零余额アドレス",
   "batchErrorMsg1": "无效的地址:{address}",
   "batchErrorMsg2": "备注长度不能超过{n}個文字",
-  "batchErrorMsg3": "アドレス数量不能超过 {n} 個",
+  "batchErrorMsg3": "フォローアドレスが上限に達しました: ウォッチリストに{m}個のアドレス、インポート待ち{h}、合計{t}/{n}",
   "zeroBalanceLoading": "正在获取零余额地址...",
   "noZeroBalanceAddresses": "零余额アドレスが見つかりません",
   "foundZeroBalanceAddresses": " {count} 個零余额アドレスが見つかります",

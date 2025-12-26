@@ -835,7 +835,7 @@
   "deleteSuccess": "成功刪除 {count} 個零餘額地址",
   "batchErrorMsg1": "無效的地址:{address}",
   "batchErrorMsg2": "備註長度不能超過{n}個字符",
-  "batchErrorMsg3": "地址數量不能超過 {n} 個",
+  "batchErrorMsg3": "關注地址已達上限: 關注列表已有{m}個地址, 待導入{h}, 總計{t}/{n}",
   "zeroBalanceLoading": "正在獲取零餘額地址...",
   "noZeroBalanceAddresses": "沒有找到零餘額地址",
   "foundZeroBalanceAddresses": "找到 {count} 個零餘額地址",
