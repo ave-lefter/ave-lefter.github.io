@@ -1,0 +1,1 @@
+import{aT as o}from"#entry";function i(i,r,n){return void 0===n&&(n=r,r=void 0),void 0!==n&&(n=(n=o(n))==n?n:0),void 0!==r&&(r=(r=o(r))==r?r:0),function(o,i,r){return o==o&&(void 0!==r&&(o=o<=r?o:r),void 0!==i&&(o=o>=i?o:i)),o}(o(i),r,n)}export{i as c};
