@@ -41,8 +41,8 @@
                 :width="16"
                 src="@/assets/images/connect-x-dark.png"
                 alt=""
-              />
-              <img v-else :width="16" src="@/assets/images//connect-x-light.png" alt="" />
+              >
+              <img v-else :width="16" src="@/assets/images//connect-x-light.png" alt="" >
               {{ formatNumber(statistics.x_followers || 0, 2) }}
             </a>
             <a
@@ -139,7 +139,7 @@
             <Share
               ref="shareComponent"
               type="walletDetailTop"
-              :statistics="statistics"
+              :statistics="{...statistics,...txAnalysis}"
               :address="userAddress"
               :chain="chain"
               classString="!color-[--white] [&&]:ml-0"

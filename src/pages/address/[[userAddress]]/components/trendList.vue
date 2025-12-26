@@ -241,7 +241,7 @@
                   name="custom:filter"
                   class="cursor-pointer text-10px ml-3px"
                   :class="
-                    props.trendQuery.amount_min && props.trendQuery.amount_max
+                    props.trendQuery.amount_min || props.trendQuery.amount_max
                       ? 'color-[--primary-color]'
                       : 'color-[--third-text] hover:color-[--secondary-text]'
                   "
@@ -318,7 +318,7 @@
                 name="custom:filter"
                 class="cursor-pointer text-10px ml-3px"
                 :class="
-                  trendQuery.volume_min && trendQuery.volume_max
+                  trendQuery.volume_min || trendQuery.volume_max
                     ? 'color-[--primary-color]'
                     : 'color-[--third-text]'
                 "
