@@ -20,18 +20,19 @@
       <el-input-number
         v-model="form.amount"
         :placeholder="isValue ? $t('value1') :  $t('amount')"
-        :precision="quantityPrecision < 0 ? 0 : quantityPrecision"
-        :step="quantityPrecision < 0 ? 10 ** -quantityPrecision : 1"
+        :precision="isValue ? 2 : (quantityPrecision < 0 ? 0 : quantityPrecision)"
+        :step="isValue ? 1 : (quantityPrecision < 0 ? 10 ** -quantityPrecision : 1)"
         :step-strictly="quantityPrecision < 0"
         class="[&&]:w-full"
           :controls="false"
         size="large"
         clearable
         align="left"
-        :max="BigNumber.max(maxAmountBuy || '0', maxAmountSell || '0').toNumber()"
+        :max="maxAmount"
         @input="percent = 0"
         @focus="percent = 0"
         @change="value => watchAmount(String(value || '0'))">
+      >
         <!-- <template #prepend>
           <span class="text-12px color-[--secondary-text]">{{ isValue ? $t('value1') :  $t('amount') }}</span>
         </template> -->
@@ -450,7 +451,7 @@ const feeRate = computed(() => {
 })
 
 const maxAmountBuy = computed(() => {
-  let price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+  let price = (swapType.value === 'LIMIT' ? form.price :  (perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice)) || '0'
   if (!isValue.value) {
     price = '1'
   }
@@ -460,7 +461,7 @@ const maxAmountBuy = computed(() => {
   //   orderSide: 'BUY',
   //   reduceOnly: form.reduceOnly
   // }).times(price).toFixed()
-  const oraclePrice =  Number((swapType.value === 'LIMIT' ? form.price :  (perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice)) || 0)
+  const oraclePrice = Number((swapType.value === 'LIMIT' ? form.price :  (perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice)) || 0)
   return calculateMaxSize({
     contractId: perpStore.perp?.contractId || '',
     type: swapType.value,
@@ -471,7 +472,7 @@ const maxAmountBuy = computed(() => {
 })
 
 const maxAmountSell = computed(() => {
-  let price = perpStore.perp?.lastPrice || perpStore.perp?.oraclePrice || '0'
+  let price = (swapType.value === 'LIMIT' ? form.price :  (perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice)) || '0'
   if (!isValue.value) {
     price = '1'
   }
@@ -489,6 +490,10 @@ const maxAmountSell = computed(() => {
     price: oraclePrice,
     reduceOnly: form.reduceOnly
   }).times(price).toFixed()
+})
+
+const maxAmount = computed(() => {
+  return BigNumber.max(maxAmountBuy.value || '0', maxAmountSell.value || '0').toNumber()
 })
 
 
