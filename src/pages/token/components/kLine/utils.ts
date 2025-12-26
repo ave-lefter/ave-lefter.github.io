@@ -438,6 +438,110 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
   }
 }
 
+export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | null, getIsReady: () => boolean, showMarket: Ref<boolean>) {
+  const lineIdObj = {
+    sell: '' as EntityId,
+    buy: '' as EntityId
+  }
+  let isCreating = false
+  const { t } = useI18n()
+  // 创建 限价价格线
+  async function createAvgPriceLine(price: number, isBuy: boolean) {
+    const _widget = getWidget()
+    const chart = _widget?.activeChart?.()
+    if (!_widget || !chart) return
+    if (showMarket.value) {
+      price = new BigNumber(price).times(useTokenStore().circulation || '0')?.toNumber()
+    }
+    const property = isBuy ? 'buy' : 'sell'
+    if (lineIdObj[property]) {
+      const line = chart?.getShapeById?.(lineIdObj[property])
+      if (line) {
+        if (!price) {
+          chart?.removeEntity?.(lineIdObj[property])
+          lineIdObj[property] = '' as EntityId
+          return
+        }
+        line?.setPoints?.([{ price: price, time: 0 }])
+        return
+      }
+    } else {
+      if (!price) return
+    }
+    if (isCreating) return
+    isCreating = true
+
+    const linecolor = getCssVariable(isBuy ? '--up-color' : '--down-color')
+    lineIdObj[property] = await chart?.createShape?.(
+      { price: price, time: 0 }, // 水平线的起始位置
+      {
+        shape: 'horizontal_line',
+        lock: true,
+        disableSelection: true, // 允许选中
+        disableSave: true,
+        disableUndo: true,
+        text: isBuy ? t('top100PurchaseAvg') : t('top100SellAvg'),
+        overrides: {
+          linecolor: linecolor,  // 线的颜色
+          linewidth: 1,          // 线的粗细
+          linestyle: 0        // 线的样式：0表示实线，1表示虚线 2 长虚线
+        },
+      }
+    )
+    isCreating = false
+    chart?.getShapeById?.(lineIdObj[property])?.setProperties?.({
+      textcolor: linecolor,
+      showLabel: true,
+      horzLabelsAlign: 'right',
+      vertLabelsAlign: 'bottom',
+      bold: true,
+      fontSize: 12,
+      // italic: true,
+    })
+  }
+
+  const avgPriceEvent = useEventBus<number>('top100Price')
+  avgPriceEvent.on((buyAvgPrice, sellAvgPrice) => {
+    console.log('--------avgPriceEvent---------', buyAvgPrice, sellAvgPrice)
+    createAvgPriceLinePoll(buyAvgPrice,sellAvgPrice)
+  })
+
+  function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  let avgPriceToken = 0  // 表示当前有效轮询的 token
+  const MAX_RETRY = 5
+  const INTERVAL = 2000
+
+  async function createAvgPriceLinePoll(buyAvgPrice: number, sellAvgPrice: number) {
+    const myToken = ++avgPriceToken  // 当前调用的唯一标识
+    let retry = 0
+
+    while (retry <= MAX_RETRY) {
+      // 被后续调用覆盖，直接退出
+      if (myToken !== avgPriceToken) return
+
+      const isReady = getIsReady()
+      if (isReady) {
+        await createAvgPriceLine(buyAvgPrice,true)
+        await sleep(100)
+        createAvgPriceLine(sellAvgPrice,false)
+        return
+      }
+
+      await sleep(INTERVAL)
+      retry++
+    }
+  }
+
+  return {
+    resetAvgPriceLineId: () => {
+      lineIdObj.buy = '' as EntityId
+      lineIdObj.sell = '' as EntityId
+    }
+  }
+}
 
 export function useAvgPriceLine(getWidget: () => IChartingLibraryWidget | null, getIsReady: () => boolean, showMarket: Ref<boolean>) {
   let lineId = '' as EntityId
