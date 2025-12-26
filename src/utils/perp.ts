@@ -535,6 +535,9 @@ export function getPositionUnrealizedPnl(contractId: string, price?: string) {
   const symbol = ctx.symbolsList?.find((s) => s.contractId === contractId) as typeof ctx.symbolsList[0]
   if (!symbol) return defaultValue
   const positionRaw = perpStore.position?.find((p) => p.contractId === contractId) as typeof perpStore.position[0]
+  if (!positionRaw) {
+    return defaultValue
+  }
   /////////////////
   const position = new Position(symbol, positionRaw)
   if (!position?.symbol?.contractName) {
@@ -558,4 +561,42 @@ export function getPositionUnrealizedPnl(contractId: string, price?: string) {
     unrealizedPnlRoe: position.getUnrealizedPnlRoe(_price || '0', leverage || '1')?.toFixed() || '0',
     unrealizedPnlRoeFormatted: position.getUnrealizedPnlRoeFormatted(_price || '0', leverage || '1'),
   }
+}
+
+// getInitialMarginRequirement
+export function getPositionInitialMarginRequirement(contractId: string, price?: string, leverage?: string) {
+  const ctx = getPrepData(contractId)
+  const perpStore = usePerpStore()
+  const metadata = perpStore.metadata as any
+  const defaultValue = BigNumber(0)
+  if (!metadata) return  defaultValue
+  const contractList = perpStore.metadata?.contractList || []
+  if (!contractList) return  defaultValue
+  // const { getTicker, tickers } = ctx.tickers
+  const tickers = ctx.tickers || []
+  const symbol = ctx.symbolsList?.find((s) => s.contractId === contractId) as typeof ctx.symbolsList[0]
+  if (!symbol) return defaultValue
+  const positionRaw = perpStore.position?.find((p) => p.contractId === contractId) as typeof perpStore.position[0]
+  if (!positionRaw) {
+    return defaultValue
+  }
+  /////////////////
+  const position = new Position(symbol, positionRaw)
+  if (!position?.symbol?.contractName) {
+    return defaultValue
+  }
+  // const ticker = getTicker(position?.symbol?.contractName || "");
+  const ticker = tickers?.get(position?.symbol?.contractName || "")
+  if (!ticker) {
+    return defaultValue
+  }
+  // 无持仓时返回默认值
+  if (!position) {
+    return defaultValue
+  }
+
+  const _leverage = leverage || getLeverageFromContractId(contractId)
+  const _price = price || ticker?.lastPrice || ticker?.oraclePrice || 0
+
+  return position.getInitialMarginRequirement(_price, _leverage || '0')
 }

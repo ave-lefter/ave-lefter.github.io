@@ -70,7 +70,7 @@
         <span
           class="text-12px block text-left mt-6px"
           :class="Number(perp?.priceChange) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"
-          >{{ formatNumber(perp?.priceChange || 0) }}&nbsp;&nbsp;{{
+          >{{ Number(perp?.priceChange || 0) > 0 ? '+' : '' }}{{ formatNumber(perp?.priceChange || 0) }}&nbsp;&nbsp;{{ Number(perp?.priceChangePercent || 0) > 0 ? '+' : '' }}{{
             formatNumber(Number(perp?.priceChangePercent) * 100 || 0, 2)
           }}%</span
         >
@@ -128,7 +128,7 @@
         <span class="text-12px block text-left color-[--main-text] mt-6px"
           >
           <span :class="Number(perp?.fundingRate) > 0 ? 'color-[--up-color]' : 'color-[--down-color]'">
-            {{ formatNumber(Number(perp?.fundingRate) * 100 || 0) }}%
+            {{ addSign(Number(perp?.fundingRate) * 100 || 0) }}{{ formatNumber(Number(perp?.fundingRate) * 100 || 0) }}%
           </span>
           <span class="text-12px color-[--third-text]">&nbsp;/&nbsp;</span>
           <TimerCount

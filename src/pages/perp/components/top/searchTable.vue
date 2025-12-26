@@ -93,8 +93,8 @@
     </div>
     <el-scrollbar
       v-if="tokens1?.length > 0 || isLoading"
-      class="hidden-scrollbar"
       v-loading="isLoading"
+      class="hidden-scrollbar"
       height="500px"
       max-height="calc(100vh - 200px)"
     >
@@ -109,10 +109,10 @@
               <div class="icon-token-container relative">
                 <el-image class="token-icon" :src="row?.baseCoinIcon">
                   <template #error>
-                    <img class="token-icon" :src="getChainDefaultIcon()" />
+                    <img class="token-icon" :src="getChainDefaultIcon()" >
                   </template>
                   <template #placeholder>
-                    <img class="token-icon" :src="getChainDefaultIcon()" />
+                    <img class="token-icon" :src="getChainDefaultIcon()" >
                   </template>
                 </el-image>
               </div>
@@ -132,7 +132,7 @@
               {{ formatNumber(row.lastPrice || 0, 8) }}
             </div>
             <div :class="Number(row.priceChangePercent )> 0 ? 'color-[--up-color]' : 'color-[--down-color]'">
-              {{ formatNumber( Number(row?.priceChangePercent) * 100 || 0, 2) }}%
+              {{ Number(row?.priceChangePercent || 0) > 0 ? '+' : '' }}{{ formatNumber( Number(row?.priceChangePercent) * 100 || 0, 2) }}%
             </div>
             <div :class="Number(row.value ) > 0 ? 'color-[--main-text]' : ''">
               ${{ formatNumber(row?.value || 0, {
@@ -146,7 +146,7 @@
                 locale: 'en'
               }) }}
             </div>
-            <div :class="Number(row.fundingRate)> 0 || Number(row.fundingInterestRate) > 0 ?'color-[--main-text]' : ''">{{ formatNumber( Number(row?.fundingRate || row.fundingInterestRate)* 100 || 0)}}%
+            <div :class="Number(row.fundingRate)> 0 || Number(row.fundingInterestRate) > 0 ?'color-[--main-text]' : ''">{{ (Number(row?.fundingRate || row.fundingInterestRate)* 100 || 0) > 0 ? '+' : '' }}{{ formatNumber( Number(row?.fundingRate || row.fundingInterestRate)* 100 || 0)}}%
             </div>
           </a>
         </li>
@@ -154,8 +154,8 @@
     </el-scrollbar>
     <div v-if="!isLoading && !tokens?.length" class="empty">
       <div>
-        <img :src="themeStore.theme === 'light' ? emptyWhite : emptyDark" />
-        <br />
+        <img :src="themeStore.theme === 'light' ? emptyWhite : emptyDark" >
+        <br >
         <span>{{ $t('noSearchResults') }}</span>
       </div>
     </div>

@@ -41,7 +41,7 @@
       <div class="text-12px color-[--yellow] flex-between mt-24px">
         *{{ $t('adjustLeverageTip1') }}
       </div>
-      <div v-if="currentOrderList?.length >0" class="text-12px  mt-24px color-[--yellow] flex-start items-start">
+      <div v-if="!isCanEditLeverage" class="text-12px  mt-24px color-[--yellow] flex-start items-start">
         <el-icon style="vertical-align: middle" class="text-14px mr-5px">
           <Warning />
         </el-icon>
@@ -62,7 +62,7 @@
         <el-button class="flex-1" style="height: 48px" @click.stop.prevent="visible = false">
           {{ $t('cancel') }}
         </el-button>
-        <el-button class="flex-1" style="height: 48px" type="primary" :disabled="currentOrderList?.length >0" :loading="loading" @click.stop.prevent="submit">
+        <el-button class="flex-1" style="height: 48px" type="primary" :disabled="!isCanEditLeverage" :loading="loading" @click.stop.prevent="submit">
           {{ $t('confirm') }}
         </el-button>
       </div>
@@ -90,6 +90,7 @@ const visible = computed({
 })
 const { prepBalance } = usePerp()
 const { position, metadata, perp, contractId, userInfo } = storeToRefs(usePerpStore())
+const perpStore = usePerpStore()
 const { getOnboardSite } = usePerpStore()
 const { t } = useI18n()
 const wsPrivateStore = usePerpWsPrivateStore()
@@ -140,17 +141,20 @@ watch(visible, (val) => {
     leverage.value = Number(defaultLeverage.value || 0)
   }
 })
-watch(
-  () => wsPrivateStore.wsResult,
-  (val) => {
-    currentOrderList.value = val['trade-event']?.content?.data?.order?.filter(i => i.status !== 'CANCELED' && i.contractId == contractId.value) || []
+// watch(
+//   () => wsPrivateStore.wsResult,
+//   (val) => {
+//     currentOrderList.value = val['trade-event']?.content?.data?.order?.filter(i => i.status !== 'CANCELED' && i.contractId == contractId.value) || []
 
-  },
-  { immediate: true, deep: true }
-)
+//   },
+//   { immediate: true, deep: true }
+// )
+const isCanEditLeverage = computed(() => {
+  return !perpStore.order?.some(i => i.contractId === contractId.value && i.status !== 'CANCELED')
+})
 function getMargin(leverage: string) {
-  const list = position?.value?.filter((i) => i.contractId == contractId.value) || []
-  const num = list.reduce((acc, cur) => acc + Number(cur?.openSize), 0)
+  // const list = position?.value?.filter((i) => i.contractId == contractId.value) || []
+  // const num = list.reduce((acc, cur) => acc + Number(cur?.openSize), 0)
   // const data = {
   //   contractId: contractId.value,
   //   orderSide: 'BUY',
@@ -159,15 +163,26 @@ function getMargin(leverage: string) {
   //   leverage: leverage
   // }
   // const result = CoreCalculator.getCreateOrderCost(data)?.toString()
-  const result = calculateMargin({
-    contractId: contractId.value,
-    side: 'BUY',
-    price: Number(perp?.value?.lastPrice || 0),
-    size: num,
-    leverage,
-    feeRate: '0'
-  }).toFixed()
-  return result
+
+  // calculateMargin({
+  //     contractId: contractId,
+  //     size: Number(getSize() || '0'),
+  //     side: 'BUY',
+  //     price: swapType.value === 'LIMIT' ? Number(form.price || 0) : 0,
+  //     isMarketOrder: swapType.value !== 'LIMIT',
+  //     oraclePrice: Number(perpStore.perp?.oraclePrice || '0'),
+  //   }).toFixed(),
+
+  // const result = calculateMargin({
+  //   contractId: contractId.value,
+  //   side: 'BUY',
+  //   price: 0,
+  //   size: num,
+  //   leverage,
+  //   oraclePrice: Number(perp?.value?.oraclePrice || 0),
+  // }).toFixed()
+
+  return getPositionInitialMarginRequirement(contractId.value, perp?.value?.oraclePrice || '0', leverage).toFixed()
 }
 function change(val: number | number[]) {
   if (val) {

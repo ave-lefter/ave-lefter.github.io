@@ -130,7 +130,7 @@ watch(
         <el-button
           v-else-if="selectTab == 'currentOrder'"
           class="close-position"
-          :disabled="perpStore.orderList?.length == 0"
+          :disabled="perpStore.order?.length == 0"
           @click.stop.prevent="isCancelOrder = true"
           >{{ $t('cancelAll') }}</el-button
         >

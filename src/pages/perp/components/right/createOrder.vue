@@ -40,6 +40,7 @@
 import { createOrder } from '~/api/perp/utils'
 import type { PerpOrderParams } from '~/api/perp/types'
 import { usePerpStore } from '~/stores/perp'
+import { calculateMargin, getLeverageFromContractId } from '~/utils/perp'
 const { t } = useI18n()
 
 const props = defineProps({
@@ -96,12 +97,13 @@ const createOrderCost = computed(() => {
   //   orderSize: orderSize || '0',
   //   orderSide: orderSide
   // }).toFixed()
+
   return calculateMargin({
     contractId: contractId,
     side: orderSide,
-    price: Number(orderPrice),
+    price: props.orderParams.type === 'LIMIT' ? Number(orderPrice) : 0,
     size: Number(orderSize || 0),
-    feeRate: '0'
+    oraclePrice: Number(perpStore.perp?.oraclePrice || '0'),
   }).toFixed()
 })
 
