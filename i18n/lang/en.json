@@ -1586,5 +1586,6 @@
   "notUpdateExistRemark": "Remarks on the wallet will not be modified.",
   "notUpdateExistRemarkTip": "Note: If unchecked, this will overwrite any existing remarks on the wallet. Please choose carefully.",
   "preview": "Preview",
-  "top20Remarked": "TOP 20 Quick Remarks"
+  "top20Remarked": "TOP 20 Quick Remarks",
+  "totalPair":"Total Liquidity"
 }

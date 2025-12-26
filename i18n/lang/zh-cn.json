@@ -1583,5 +1583,6 @@
   "notUpdateExistRemarkTip": "提示：若不勾选则会覆盖当前已备注过的钱包，请谨慎选择",
   "preview": "预览",
   "top20Remarked": "TOP 20快捷备注",
-  "addToGroup": "添加到分组"
+  "addToGroup": "添加到分组",
+  "totalPair":"总流动池"
 }

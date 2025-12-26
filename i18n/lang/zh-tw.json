@@ -1568,5 +1568,6 @@
   "notUpdateExistRemark": "已備註的錢包不進行修改",
   "notUpdateExistRemarkTip": "提示：若不勾選則會覆蓋當前已備註過的錢包，請謹慎選擇",
   "preview": "預覽",
-  "top20Remarked": "TOP 20快捷備註"
+  "top20Remarked": "TOP 20快捷備註",
+  "totalPair":"总流动池"
 }
