@@ -115,7 +115,7 @@ const filteredSearchParams = (key: keyof typeof searchParams.value) => {
           :suffix-icon="SuffixIcon"
         >
           <template #prefix>
-            <span>{{ t('type') }}</span>
+            <span>{{ t('perp') }}</span>
           </template>
           <el-option
             v-for="item in typeOptions"

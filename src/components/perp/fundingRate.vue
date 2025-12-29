@@ -124,7 +124,7 @@ const reset = () => {
       @change="reset"
     >
       <template #prefix>
-        <span>{{ t('type') }}</span>
+        <span>{{ t('perp') }}</span>
       </template>
       <el-option
         v-for="item in typeOptions"
@@ -164,8 +164,8 @@ const reset = () => {
     </div>
   </div>
   <div
-    class="relative min-h-400px bg-[--secondary-bg]"
     v-infinite-scroll="getList"
+    class="relative min-h-400px bg-[--secondary-bg]"
     :infinite-scroll-delay="200"
     :infinite-scroll-disabled="listStatus.loading || listStatus.finished || listStatus.error"
     :infinite-scroll-immediate="false"

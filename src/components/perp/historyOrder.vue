@@ -104,8 +104,8 @@ watch(
 
 <template>
   <div
-    class="relative min-h-400px bg-[--secondary-bg]"
     v-infinite-scroll="getList"
+    class="relative min-h-400px bg-[--secondary-bg]"
     :infinite-scroll-delay="200"
     :infinite-scroll-disabled="listStatus.loading || listStatus.finished || listStatus.error"
     :infinite-scroll-immediate="false"
@@ -151,7 +151,13 @@ watch(
             --
           </template>
           <template v-else>
-            {{ row.type?.includes?.('STOP') ? '≤' : '≥' }}{{ formatNumber(row.triggerPrice, 10) }}
+            <template v-if="row.side === 'BUY'">
+              {{ row.type?.includes?.('TAKE_PROFIT') ? '≤' : '≥' }}
+            </template>
+            <template v-else>
+              {{ row.type?.includes?.('TAKE_PROFIT') ? '≥' : '≤' }}
+            </template>
+            {{ formatNumber(row.triggerPrice, 10) }}
             {{ triggerPriceTypeMap[row.triggerPriceType as keyof typeof triggerPriceTypeMap] }}
           </template>
         </template>
@@ -165,8 +171,19 @@ watch(
       </el-table-column>
       <el-table-column :width="80" align="right" :label="t('orderType')" prop="orderType">
         <template #default="{ row }">
-          {{ row.type?.includes?.('MARKET') ? t('market') : ''
+          <!-- <template v-if="row.type==='TAKE_PROFIT_LIMIT'">
+           {{ t('takeProfitLimit') }}
+          </template> -->
+          <template v-if="row.type.includes('TAKE_PROFIT')">
+            {{ t('takeProfit') }}
+             </template>
+             <template v-else-if="row.type.includes('STOP')">
+            {{ t('stopLoss') }}
+             </template>
+             <template v-else>
+              {{ row.type?.includes?.('MARKET') ? t('market') : ''
           }}{{ row.type?.includes?.('LIMIT') ? t('limit') : '' }}
+             </template>
         </template>
       </el-table-column>
       <el-table-column :width="80" align="right" :label="t('tradeType2')" prop="tradeType2">
