@@ -46,20 +46,20 @@
       </div>
       <div class="tabs">
         <button class="tab-item clickable" :class="{'active': activeTab === 0}" @click.stop="activeTab = 0">
-          <span>链上钱包</span>
+          <span>{{ $t('chainWallet1') }}</span>
         </button>
         <button class="tab-item clickable" :class="{'active': activeTab === 1}" @click.stop="activeTab = 1">
-          <span>永续合约</span>
+          <span>{{ $t('perpetualContract') }}</span>
         </button>
       </div>
       <div v-show="activeTab === 0" class="pb-8px pt-20px px-8px">
-        <div class="text-14px font-400">插件钱包资产</div>
+        <div class="text-14px font-400">{{ $t('chainWalletBalance') }}</div>
         <div class="flex items-center text-24px font-700 mt-8px">
           <span>{{ formatNumber(balance, 3) }} {{ getChainInfo(walletStore.chain).main_name }}</span>
           <span class="text-18px color-[--secondary-text] ml-3px">(${{ formatNumber(balanceUsd, 2) }})</span>
         </div>
         <ul class="tg-wallet-list_footer flex flex-col gap-10px mt-20px">
-          <li class="flex justify-between h-40px clickable" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}`);showExWallet=false">
+          <li class="flex justify-between h-40px clickable" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}?active=wallet`);showExWallet=false">
             <div class="color-[--main-text] flex items-center gap-8px" >
               <Icon name="custom:wallet2" class="text-16px" />
               <span class="text-14px">{{ $t('myWallet1') }}</span>

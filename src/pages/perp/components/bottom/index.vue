@@ -11,8 +11,8 @@ const perpStore = usePerpStore()
 const dialogVisible= shallowRef(false)
 const tabs = computed<Array<{ label: string; value: keyof typeof componentsMap }>>(() => {
   return [
-    { label: t('holding')+`(${positionLength.value})`, value: 'holding' },
-    { label: t('currentOrder') + `(${orderListLength.value})`, value: 'currentOrder' },
+    { label: t('holding')+ (filterListData.value?.length > 0 ? `(${filterListData.value?.length})` : ''), value: 'holding' },
+    { label: t('currentOrder') + (order.value?.length > 0 ? `(${order.value?.length})` : ''), value: 'currentOrder' },
     // { label: t('conditionOrder'), value: 'conditionOrder' },
     { label: t('orderDetail'), value: 'orderDetail' },
     { label: t('historyOrder'), value: 'historyOrder' },
@@ -68,16 +68,17 @@ const filteredSearchParams = (key: keyof typeof searchParams.value) => {
   }
   return params
 }
-const positionLength = computed(() => {
-  const result = position?.value || []
-  return result?.length
+
+const filterListData = computed(() => {
+  const _searchParams = filteredSearchParams(selectTab.value)
+  const result = perpStore.position?.filter((i) => {
+    return (_searchParams?.filterContractIdList && i.contractId === _searchParams?.filterContractIdList) ||!_searchParams?.filterContractIdList
+  })
+  return result || []
 })
-const orderListLength = computed(() => {
-  const result = order?.value || []
-  return result?.length
-})
+
 const isAll = computed(()=>{
-  return selectedCurrentObject.value[selectTab.value]  ? true: false
+  return !!selectedCurrentObject.value?.[selectTab.value]
 })
 watch(
   () => isAll.value,
@@ -145,7 +146,7 @@ watch(
       </div>
     </div>
     <component :is="componentsMap[selectTab]" :searchParams="filteredSearchParams(selectTab)" />
-    <close-position-dialog v-model="dialogVisible" />
+    <close-position-dialog v-model="dialogVisible" :positions="filterListData" />
   </div>
 </template>
 <style lang="scss" scoped>

@@ -1649,7 +1649,7 @@
   "notUpdateExistRemarkTip": "提示：若不勾选则会覆盖当前已备注过的钱包，请谨慎选择",
   "preview": "预览",
   "top20Remarked": "TOP 20快捷备注",
-  "totalPair":"总流动池",
+  "totalPair": "总流动池",
   "minDeposit": "最少充值${amount} ",
   "depositTxSubmitted": "充值交易已提交",
   "depositSuccess": "充值成功",
@@ -1785,5 +1785,8 @@
   "minutes": "分钟",
   "depositApproveTips1": "在{chain}上启用{token}",
   "depositApproveTips2": "您首次在{chain}上存款时必须启用{token}。",
-  "enableToken": "启用 {token}"
+  "enableToken": "启用 {token}",
+  "chainWallet1": "链上钱包",
+  "perpetualContract": "永续合约",
+  "chainWalletBalance": "插件钱包资产"
 }

@@ -1641,7 +1641,7 @@
   "notUpdateExistRemarkTip": "Note: If unchecked, this will overwrite any existing remarks on the wallet. Please choose carefully.",
   "preview": "Preview",
   "top20Remarked": "TOP 20 Quick Remarks",
-  "totalPair":"Total Liquidity",
+  "totalPair": "Total Liquidity",
   "minDeposit": "Minimum deposit ${amount}",
   "depositTxSubmitted": "Deposit transaction has been submitted",
   "depositSuccess": "Deposit successful",
@@ -1782,5 +1782,8 @@
   "minutes": " minutes",
   "depositApproveTips1": "Enable {token} on {chain}",
   "depositApproveTips2": "You must enable {token} the first time you deposit on {chain}.",
-  "enableToken": "Enable {token}"
+  "enableToken": "Enable {token}",
+  "chainWallet1": "Chain Wallet",
+  "perpetualContract": "Perpetual Contract",
+  "chainWalletBalance": "Plugin wallet assets"
 }

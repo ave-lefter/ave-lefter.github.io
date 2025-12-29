@@ -37,13 +37,7 @@ const typeDict = computed(() => {
 
 const filterListData = computed(() => {
   const result = perpStore.position?.filter((i) => {
-    if (
-      (props?.searchParams?.filterContractIdList &&
-        i.contractId === props?.searchParams?.filterContractIdList) ||
-      !props.searchParams?.filterContractIdList
-    ) {
-      return i
-    }
+    return (props?.searchParams?.filterContractIdList && i.contractId === props?.searchParams?.filterContractIdList) || !props.searchParams?.filterContractIdList
   })
   return result || []
 })

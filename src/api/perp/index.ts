@@ -7,8 +7,12 @@ import { usePerpStore } from '~/stores/perp'
 import type { AccountInfo, OrderEntry } from '~/utils/perp/types'
 import type { IContract } from '~/utils/perp/types'
 
+interface Metadata1 extends Metadata {
+  contractList: IContract[]
+}
+
 // 获取metadata
-export async function getPerpMetadata(): Promise<Metadata & { contractList: IContract[] }> {
+export async function getPerpMetadata(): Promise<Metadata1> {
   const cached: { data: any; timestamp: number } = (await localforage.getItem('perpMetadata')) || {
     data: null,
     timestamp: 0,

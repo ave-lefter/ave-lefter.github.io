@@ -88,7 +88,7 @@ function _createOrder() {
       price: String(formData.closePrice || '0'),
       side:  BigNumber(row?.openSize || '0').gte(0) ? 'SELL' : 'BUY',
       contractId: row?.contractId || '',
-      reduceOnly: false,
+      reduceOnly: true,
       isPositionTpsl: false,
       isSetOpenTp: false,
       isSetOpenSl: false

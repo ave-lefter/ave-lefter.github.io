@@ -36,7 +36,7 @@
      </div>
      <div class="text-14px flex-between mt-24px">
       <span class="color-[--third-text]">{{ $t('maxPositionCurrentLeverage') }}</span>
-      <span>{{ Number(defaultLeverageNum) > 10**12 ? "∞": formatNumber(defaultLeverageNum, { decimals: 0, limit: 10})+'&nbsp;USD' }}</span>
+      <span>{{ Number(maxOpenQuantityWithLever) > 10**12 ? "∞": formatNumber(maxOpenQuantityWithLever, { decimals: 0, limit: 10})+'&nbsp;USD' }}</span>
      </div>
       <div class="text-12px color-[--yellow] flex-between mt-24px">
         *{{ $t('adjustLeverageTip1') }}
@@ -86,7 +86,7 @@ const visible = computed({
   get: () => props.modelValue ?? false,
   set: (val) => emit('update:modelValue', val),
 })
-const { prepBalance } = usePerp()
+// const { prepBalance } = usePerp()
 const { position, metadata, perp, contractId, userInfo } = storeToRefs(usePerpStore())
 const perpStore = usePerpStore()
 const { getOnboardSite } = usePerpStore()
@@ -126,6 +126,22 @@ const defaultLeverage = computed(() => {
 })
 const availableBalance = computed(() => {
   return calculateAvailableBalance(perpStore.perp?.contractId || '').toString() || '0'
+})
+
+const maxOpenQuantityWithLever = computed(() => {
+  const symbolModel = CoreCalculator.getSymbolModel(perpStore.perp?.contractId || '')
+  // 获取预言机价格，并在其基础上增加0.1%的溢价
+  const oraclePrice = new BigNumber(symbolModel?.oraclePrice || 0).times(1.001)
+
+  // 如果市场价格为零，则返回零（表示无法计算）
+  if (oraclePrice.isZero()) {
+    return new BigNumber(0)
+  }
+  const riskTierList = symbolModel?.riskTierList || []
+  // 根据杠杆获取风险限额档位的最大可开仓值
+  const contractRisk = CoreCalculator.getRiskTierModel(String(leverage.value), riskTierList)
+  // const riskMaxValue = new BigNumber(contractRisk?.positionValueUpperBound || 0)
+  return (contractRisk?.positionValueUpperBound || 0).toString()
 })
 
 const marks = computed(() => {
@@ -220,12 +236,12 @@ function submit() {
     leverage: String(leverage.value)
   }
   loading.value = true
-  updateLeverageSetting(data).then(res => {
+  updateLeverageSetting(data).then(() => {
     ElMessage.success(t('success'))
     getOnboardSite()
     visible.value = false
   }).catch(err => {
-    ElMessage.error(err)
+    ElMessage.error(err?.message)
   }).finally(() => {
     loading.value = false
   })

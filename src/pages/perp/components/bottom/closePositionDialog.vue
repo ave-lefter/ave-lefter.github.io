@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visible"
-    width="400px"
+    width="450px"
     class="dialog-box dialog-max dialog-remind dialog"
     append-to-body
     @close="visible = false"
@@ -13,7 +13,7 @@
     </template>
     <div class="content">
       <ul>
-        <li v-for="(item, $index) in position" :key="$index" class="mb-15px">
+        <li v-for="(item, $index) in positions" :key="$index" class="mb-15px">
           <div>
             <span class="bg-[--up-color] rounded-4px px-2px text-10px">{{ $t('buy1') }}</span>
             <span class="ml-5px text-14px color-[--third-text]">
@@ -23,11 +23,11 @@
               {{ getLeverageFromContractId(item.contractId) }}X</span
             >
           </div>
-          <div class="flex-between mt-5px">
+          <div class="flex-between mt-10px">
             <span class="color-[--secondary-text] text-12px">{{ $t('amount') }}</span>
             <span class="color-[--third-text] text-12px">{{
               formatNumber(item.openSize.replace('-', ''))
-            }}</span>
+            }} {{ getCoinName(item.contractId) }}</span>
           </div>
         </li>
       </ul>
@@ -42,6 +42,7 @@
           color: '#FFA622',
           border: 'none',
           fontSize: '12px',
+          '--el-alert-title-font-size': '12px'
         }"
       />
       <div class="text-center mt-30px flex-between">
@@ -64,6 +65,10 @@ import type { PerpOrderParams } from '~/api/perp/types'
 import BigNumber from 'bignumber.js'
 const props = defineProps({
   modelValue: Boolean,
+  positions: {
+    type: Array as () => Position[],
+    default: () => []
+  }
 })
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
@@ -72,7 +77,7 @@ const visible = computed({
   get: () => props.modelValue ?? false,
   set: (val) => emit('update:modelValue', val),
 })
-const { position, metadata } = storeToRefs(usePerpStore())
+const { metadata } = storeToRefs(usePerpStore())
 const { t } = useI18n()
 const typeDict = computed(() => {
   const contractMap =
@@ -87,6 +92,10 @@ const typeDict = computed(() => {
   return contractMap
 })
 
+function getCoinName(contractId: string) {
+  return (metadata.value?.contractList)?.find((i) => i.contractId === contractId)?.baseCoin || ''
+}
+
 const loading = ref(false)
 
 function _createOrder(position: Position) {
@@ -97,7 +106,7 @@ function _createOrder(position: Position) {
     price: String('0'),
     side:  BigNumber(position?.openSize || '0').gte(0) ? 'SELL' : 'BUY',
     contractId: position?.contractId || '',
-    reduceOnly: false,
+    reduceOnly: true,
     isPositionTpsl: false,
     isSetOpenTp: false,
     isSetOpenSl: false
@@ -114,7 +123,7 @@ function _createOrder(position: Position) {
 
 function submit() {
   loading.value = true
-  Promise.all(position.value.map(item => _createOrder(item))).then((res) => {
+  Promise.all(props.positions.map(item => _createOrder(item))).then((res) => {
     if (res?.every(i => i)) {
       visible.value = false
     }
