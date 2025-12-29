@@ -53,8 +53,8 @@
           {{ $t('adjustLeverageTip3') }}
           </span>
         </div>
-        <div v-if="!isCanEditLeverage" lass="text-12px  mt-24px color-[--yellow]">{{ $t('adjustLeverageTip2', {name:perp?.contractName}) }}</div>
       </div>
+      <div v-if="!isCanEditLeverage" class="text-12px mt-10px color-[--yellow]">{{ $t('adjustLeverageTip2', {name:perp?.contractName}) }}</div>
       <div class="text-center mt-30px flex-between">
         <el-button class="flex-1" style="height: 48px" @click.stop.prevent="visible = false">
           {{ $t('cancel') }}
@@ -135,7 +135,7 @@ const maxOpenQuantityWithLever = computed(() => {
 
   // 如果市场价格为零，则返回零（表示无法计算）
   if (oraclePrice.isZero()) {
-    return new BigNumber(0)
+    return '0'
   }
   const riskTierList = symbolModel?.riskTierList || []
   // 根据杠杆获取风险限额档位的最大可开仓值

@@ -28,7 +28,7 @@
       </el-input-number>
     </el-form-item>
     <el-form-item label="" prop="amount">
-      <div v-if="percent > 0" class="absolute z-4 bg-[--main-input-button-bg] top-50% translate-y--50% left-0 pl-15px pointer-events-none">{{ percent }}%</div>
+      <div v-if="percent > 0" class="absolute z-4 bg-[--main-input-button-bg] top-50% translate-y--50% left-1px pl-15px pointer-events-none">{{ percent }}%</div>
       <el-input-number
         v-model="form.amount"
         :placeholder="isValue ? $t('value1') :  $t('amount')"
