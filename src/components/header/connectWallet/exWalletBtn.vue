@@ -33,7 +33,7 @@
       </el-button>
     </div> -->
     <div class="color-[--main-text">
-      <div class="flex items-center p-8px mb-5px color-[--main-text] clickable" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}`);showExWallet=false">
+      <div class="flex items-center p-8px mb-5px color-[--main-text] clickable" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}?active=wallet`);showExWallet=false">
         <img class="rd-50% mr-5px" height="32" :src="generateAvatarIcon(walletStore?.address || '')" alt="">
         <span class="text-16px mr-3px">{{ currentAccountSplit || '' }}</span>
         <Icon
@@ -112,8 +112,11 @@
       <div v-show="activeTab === 1" class="pb-8px pt-20px px-8px min-h-200px relative">
         <template v-if="perpStore.isLogin">
           <div class="text-14px font-400">{{ $t('perpBalance') }}</div>
-          <div class="flex items-center text-24px font-700 mt-8px">
+          <div class="flex items-center text-24px font-700 mt-8px clickable" @click.stop="$router.push(`/address/${walletStore.address}/${walletStore.chain}?active=perp`);showExWallet=false">
             <span>${{ formatNumber(prepBalance, 2) }}</span>
+            <div class="color-[--secondary-text] flex items-center gap-4px ml-auto">
+              <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
+            </div>
           </div>
           <ul class="tg-wallet-list_footer flex flex-col gap-10px mt-20px">
             <li class="flex justify-between h-40px clickable" @click.stop="deposit">
