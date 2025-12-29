@@ -1785,5 +1785,7 @@
   "enableToken": "Enable {token}",
   "chainWallet1": "Chain Wallet",
   "perpetualContract": "Perpetual Contract",
-  "chainWalletBalance": "Plugin wallet assets"
+  "chainWalletBalance": "Plugin wallet assets",
+  "watchWalletUnSupportPerp": "We are currently observing wallet accounts and unable to open perpetual contracts. Please log out and use the plugin wallet to log in again and activate.",
+  "botUnSupportPerp": "Currently a Bot wallet account, unable to open perpetual contracts. Please log out and use the plugin wallet to log in again and activate."
 }

@@ -1767,5 +1767,7 @@
   "enableToken": "啟用 {token}",
   "chainWallet1": "鏈上錢包",
   "perpetualContract": "永續合約",
-  "chainWalletBalance": "插件錢包資產"
+  "chainWalletBalance": "插件錢包資產",
+  "watchWalletUnSupportPerp": "當前為觀察錢包帳戶，無法開通永續合約。 請退出後使用挿件錢包重新登入並開通。",
+  "botUnSupportPerp": "當前為Bot錢包帳戶，無法開通永續合約。 請退出後使用挿件錢包重新登入並開通。"
 }
