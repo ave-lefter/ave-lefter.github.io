@@ -263,11 +263,6 @@ export function calculateMaxSize(params: {
 }) {
   const perpStore = usePerpStore()
 
-  const orderCalculationContext = {
-    contractId: params.contractId,
-    ...getPrepData(params.contractId)
-  } as any
-
   const calculateMaxSizeParams = {
     ...params
   }

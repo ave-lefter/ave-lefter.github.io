@@ -618,15 +618,23 @@ function getSize(type = 0) {
   if (isValue.value) {
     const price = Number((swapType.value === 'LIMIT' ? form.price : perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice) || 0)
     if (percent.value > 0) {
-      let max = type === 1 ? (maxAmountSell.value || '0') : (maxAmountBuy.value || '0')
-      max = BigNumber(max).div(price).toFixed()
+      // let max = type === 1 ? (maxAmountSell.value || '0') : (maxAmountBuy.value || '0')
+      // max = BigNumber(max).div(price).toFixed()
+      const oraclePrice =  Number((swapType.value === 'LIMIT' ? form.price :  (perpStore.perp?.oraclePrice || perpStore.perp?.lastPrice)) || 0)
+      const max = calculateMaxSize({
+        contractId: perpStore.perp?.contractId || '',
+        type: swapType.value,
+        side: type === 1 ? 'SELL' : 'BUY',
+        price: oraclePrice,
+        reduceOnly: form.reduceOnly
+      }).toString()
       return calculateSizeFromRatio({
         maxQty: max,
         ratio: percent.value,
         stepSize: perpStore.perp?.stepSize || '0'
       })
     }
-    return formatDec(BigNumber(form.amount || '0').div(price).times(10 ** pricePrecision.value).dp(0, BigNumber.ROUND_FLOOR).div(10 ** pricePrecision.value).toFixed(), 4)
+    return formatDec(BigNumber(form.amount || '0').div(price).times(10 ** quantityPrecision.value).dp(0).div(10 ** quantityPrecision.value).toFixed(), 4)
   } else {
     if (percent.value > 0) {
       return calculateSizeFromRatio({
