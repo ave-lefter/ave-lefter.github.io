@@ -1788,5 +1788,7 @@
   "enableToken": "启用 {token}",
   "chainWallet1": "链上钱包",
   "perpetualContract": "永续合约",
-  "chainWalletBalance": "插件钱包资产"
+  "chainWalletBalance": "插件钱包资产",
+  "watchWalletUnSupportPerp": "当前为观察钱包账户，无法开通永续合约。请退出后使用插件钱包重新登录并开通。",
+  "botUnSupportPerp": "当前为 Bot 钱包账户，无法开通永续合约。请退出后使用插件钱包重新登录并开通。"
 }

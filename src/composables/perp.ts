@@ -5,14 +5,17 @@ import CreateOrder from '~/pages/perp/components/right/createOrder.vue'
 import { usePerpStore } from '~/stores/perp'
 import BigNumber from 'bignumber.js'
 import type { PerpOrderParams } from '~/api/perp/types'
+import { Warning } from '@element-plus/icons-vue'
+import { markRaw } from 'vue'
+
 
 export function usePerp() {
   const dialogVisible = ref(false)
   const perpStore = usePerpStore()
-
   const walletStore = useWalletStore()
   const botStore = useBotStore()
-
+  const { mode } = storeToRefs(useGlobalStore())
+  const { t } = useI18n()
   const perpPositions = computed(() => {
     const positions = perpStore.position || []
     const contractList = perpStore.contractList
@@ -88,7 +91,13 @@ export function usePerp() {
       return
     }
     if (!walletStore.provider && walletStore.address) {
-      ElMessage.error($t('watchWalletNotSupportedPerp'))
+      ElMessageBox.confirm(t('watchWalletUnSupportPerp'), t('tips'), {
+        type: 'warning',
+        icon: markRaw(Warning),
+        confirmButtonText: t('iKnown'),
+        showCancelButton: false,
+        customClass: `${mode.value} delete_confirm`,
+      })
       return
     }
     if (walletStore.address && !isEvmChain(walletStore.chain)) {
@@ -129,6 +138,16 @@ export function usePerp() {
       if (!perpStore.isLogin) {
         login()
       }
+      return
+    }
+    if (botStore.evmAddress) {
+      ElMessageBox.confirm(t('botUnSupportPerp'), t('tips'), {
+        type: 'warning',
+        icon: markRaw(Warning),
+        confirmButtonText: t('iKnown'),
+        showCancelButton: false,
+        customClass: `${mode.value} delete_confirm`,
+      })
       return
     }
     botStore.changeConnectVisible(true, 1)
