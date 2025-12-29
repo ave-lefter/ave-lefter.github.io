@@ -257,6 +257,11 @@ export const usePerpStore = defineStore('perp', () => {
     })
   }
 
+  function logout() {
+    _perpKeys.value = {}
+    resetUserInfo()
+  }
+
   async function getOnboardSite() {
     if (!perpKeys.value?.apiSignature || !perpKeys.value?.l2KeyPair) {
       return []
@@ -311,6 +316,7 @@ export const usePerpStore = defineStore('perp', () => {
     apiSignatureLoading,
     starkSignatureLoading,
     login,
+    logout,
     getPerpMetadata,
     getOnboardSite,
     setApiKeys,

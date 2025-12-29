@@ -1716,7 +1716,7 @@
   "perpDepositTips": "Do not use keyless wallets to make deposits. Depositing with a keyless wallet may result in irreversible loss of funds.",
   "arrivalTime": "Arrival Time",
   "confirmDeposit": "Confirm Deposit",
-  "perpAgreementTitle": "By continuing, you agree to the Terms and Conditions and acknowledge that you have read and understood the Agreement Disclaimer, as well as the following:",
+  "perpAgreementTitle": "By continuing, you agree to <span class=\"color-#3F80F7\">the Terms and Conditions and acknowledge </span> that you have read and understood <span class=\"color-#3F80F7\"> the Agreement Disclaimer</span>, as well as the following:",
   "perpAgreement1": "I understand that if leverage is used, the leverage size may change after entering the position.",
   "perpAgreement2": "I understand the rules and risks of using margin when using cross margin mode.",
   "perpAgreement3": "I understand the rules and risks associated with profit and loss settlement, bankruptcy, insurance and loss sharing.",
@@ -1787,5 +1787,6 @@
   "perpetualContract": "Perpetual Contract",
   "chainWalletBalance": "Plugin wallet assets",
   "watchWalletUnSupportPerp": "We are currently observing wallet accounts and unable to open perpetual contracts. Please log out and use the plugin wallet to log in again and activate.",
-  "botUnSupportPerp": "Currently a Bot wallet account, unable to open perpetual contracts. Please log out and use the plugin wallet to log in again and activate."
+  "botUnSupportPerp": "Currently a Bot wallet account, unable to open perpetual contracts. Please log out and use the plugin wallet to log in again and activate.",
+  "orderSizeError": "The order is marked as position reduction only and you are not allowed to open new positions"
 }

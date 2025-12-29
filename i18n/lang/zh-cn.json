@@ -1729,7 +1729,7 @@
   "perpDepositTips": "请勿使用无私钥钱包进行充值，否则会导致资金损失且无法追回。",
   "arrivalTime": "到账时间",
   "confirmDeposit": "充值确认",
-  "perpAgreementTitle": "继续操作即表示您同意条款和条件，并承认您已阅读并理解协议免责声明，以及以下内容: ",
+  "perpAgreementTitle": "继续操作即表示您同意<span class=\"color-#3F80F7\">条款和条件</span>，并承认您已阅读并理解<span class=\"color-#3F80F7\">协议免责声明</span>，以及以下内容: ",
   "perpAgreement1": "我知道如果使用杠杆，进入仓位后杠杆大小可能会变化。",
   "perpAgreement2": "我理解使用全仓模式下使用保证金的规则和风险。",
   "perpAgreement3": "我理解与盈亏结算、破产、保险及分摊亏损相关的规则和风险。",
@@ -1790,5 +1790,6 @@
   "perpetualContract": "永续合约",
   "chainWalletBalance": "插件钱包资产",
   "watchWalletUnSupportPerp": "当前为观察钱包账户，无法开通永续合约。请退出后使用插件钱包重新登录并开通。",
-  "botUnSupportPerp": "当前为 Bot 钱包账户，无法开通永续合约。请退出后使用插件钱包重新登录并开通。"
+  "botUnSupportPerp": "当前为 Bot 钱包账户，无法开通永续合约。请退出后使用插件钱包重新登录并开通。",
+  "orderSizeError": "该订单被标记为只减仓，您不被允许开设新仓位"
 }

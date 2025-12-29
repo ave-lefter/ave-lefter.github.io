@@ -1,6 +1,6 @@
 <template>
   <div v-show="step === 1" class="text-14px color-[--main-text] lh-20px">
-    <div>{{ $t('perpAgreementTitle') }} </div>
+    <div v-html="$t('perpAgreementTitle')"/>
     <ul class="bg-[--border] p-16px mt-16px">
       <li class="flex items-center">
         <Icon name="bi:check-circle-fill" class="text-16px mr-8px" />

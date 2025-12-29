@@ -87,11 +87,11 @@
     <div v-if="percent > 0" class="flex items-center justify-between text-12px font-400 mt-8px color-[--main-text] mb-8px">
       <div class="text-left">
         <div class="color-[--third-text] mb-5px"> {{ $t('buy') }}: </div>
-        <div class="font-500"> ≈ {{ form.reduceOnly ? '0' : formatNumber(percentBuy, { decimals: 4, limit: 8}) }} {{ perpStore.unit?.coinName || '' }}</div>
+        <div class="font-500"> ≈ {{ formatNumber(percentBuy, { decimals: 4, limit: 8}) }} {{ perpStore.unit?.coinName || '' }}</div>
       </div>
       <div class="text-right">
         <div class="color-[--third-text] mb-5px"> {{ $t('sell') }}: </div>
-        <div class="font-500"> ≈ {{ form.reduceOnly ? '0' : formatNumber(percentSell, { decimals: 4, limit: 8}) }} {{ perpStore.unit?.coinName || '' }}</div>
+        <div class="font-500"> ≈ {{ formatNumber(percentSell, { decimals: 4, limit: 8}) }} {{ perpStore.unit?.coinName || '' }}</div>
       </div>
     </div>
     <el-form-item style="margin-bottom: 0">
@@ -243,6 +243,7 @@
           color="var(--up-color)"
           native-type="button"
           size="large"
+          :disabled="BigNumber(getSize()).lte(0)"
           @click.stop="_createPerpOrder('BUY')"
         >
           {{ $t('buy') }}/{{ $t('long') }}
@@ -252,6 +253,7 @@
           color="var(--down-color)"
           native-type="button"
           size="large"
+          :disabled="BigNumber(getSize(1)).lte(0)"
           @click.stop="_createPerpOrder('SELL')"
         >
           {{ $t('sell') }}/{{ $t('short') }}
@@ -270,7 +272,7 @@
     </li>
     <li class="flex items-center mt-8px">
       <span class="mr-auto">Max: </span>
-      <span class="color-[--up-color]">{{ form.reduceOnly ? '-' : formatNumber(maxAmountBuy, { decimals: 4, limit: 8}) }} {{  perpStore.unit?.coinName || ''  }}</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ form.reduceOnly ? '-' : formatNumber(maxAmountSell, { decimals: 4, limit: 8}) }}  {{  perpStore.unit?.coinName || ''  }}</span>
+      <span class="color-[--up-color]">{{ formatNumber(maxAmountBuy, { decimals: 4, limit: 8}) }} {{  perpStore.unit?.coinName || ''  }}</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ formatNumber(maxAmountSell, { decimals: 4, limit: 8}) }}  {{  perpStore.unit?.coinName || ''  }}</span>
     </li>
     <li v-if="!form.reduceOnly" class="flex items-center mt-8px">
       <span class="mr-auto">{{ $t('estimatedLiquidationPrice') }}</span>
@@ -671,10 +673,10 @@ const tpMsg = computed(() => {
   }
 
   if (BigNumber(tpForm.triggerPrice || 0).gt(price)) {
-    const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(getSize() || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
+    const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(getSize() || 0).abs().dp(2).toFixed()
     return t('longExpectedProfitUSD', {n : profit})
   } else {
-    const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(getSize(1) || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
+    const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(getSize(1) || 0).abs().dp(2).toFixed()
     return t('shortExpectedProfitUSD', {n : profit})
   }
 })
@@ -690,10 +692,10 @@ const slMsg = computed(() => {
   }
 
   if (BigNumber(slForm.triggerPrice || 0).lt(price)) {
-    const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(getSize() || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
+    const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(getSize() || 0).abs().dp(2).toFixed()
     return t('longExpectedLossUSD', {n : profit})
   } else {
-    const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(getSize(1) || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
+    const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(getSize(1) || 0).abs().dp(2).toFixed()
     return t('shortExpectedLossUSD', {n : profit})
   }
 })
@@ -761,7 +763,7 @@ function _createPerpOrder(side: string) {
         data.openTp = {
           ...tpForm,
           triggerPrice: new BigNumber(tpForm?.triggerPrice || '0').toFixed(),
-          price: String(form.price || '0'),
+          price: '0',
           size: String(getSize(side === 'BUY' ? 0 : 1)),
           side: side === 'BUY' ? 'SELL' : 'BUY'
         }
@@ -771,10 +773,19 @@ function _createPerpOrder(side: string) {
         data.openSl = {
           ...slForm,
           triggerPrice: new BigNumber(slForm?.triggerPrice || '0').toFixed(),
-          price: String(form.price || '0'),
+          price: '0',
           size: String(getSize(side === 'BUY' ? 0 : 1)),
           side: side === 'BUY' ? 'SELL' : 'BUY'
         }
+      }
+      const curPosition = perpStore?.position?.find((i) => i.contractId === perpStore.perp?.contractId)
+
+      if (data.reduceOnly && !(data.reduceOnly && curPosition && curPosition.openSize && (data.side === 'BUY' && BigNumber(curPosition.openSize).lt(0) || data.side === 'SELL' && BigNumber(curPosition.openSize).gt(0)) && BigNumber(data.size || 0).lt(BigNumber(curPosition.openSize).abs()))) {
+        ElMessage({
+          message: t('orderSizeError'),
+          type: 'error'
+        })
+        return
       }
       createPerpOrder(data).then(res => {
         if (res) {

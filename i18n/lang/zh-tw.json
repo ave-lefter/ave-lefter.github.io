@@ -1698,7 +1698,7 @@
   "perpDepositTips": "請勿使用無私鑰錢包進行充值，否則會導致資金損失且無法追回。",
   "arrivalTime": "到賬時間",
   "confirmDeposit": "充值確認",
-  "perpAgreementTitle": "繼續操作即表示您同意條款和條件，並承認您已閱讀並理解協議免責聲明，以及以下內容:",
+  "perpAgreementTitle": "繼續操作即表示您同意<span class=\"color-#3F80F7\">條款和條件</span>，並承認您已閱讀並理解<span class=\"color-#3F80F7\">協議免責聲明</span>，以及以下內容:",
   "perpAgreement1": "我知道如果使用槓桿，進入倉位后杠桿大小可能會變化。",
   "perpAgreement2": "我理解使用全倉模式下使用保證金的規則和風險。",
   "perpAgreement3": "我理解與盈虧結算、破產、保險及分攤虧損相關的規則和風險。",

@@ -98,7 +98,7 @@
               <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
             </div>
           </li> -->
-          <li class="flex justify-between h-40px clickable" @click.stop="walletStore.disconnect()">
+          <li class="flex justify-between h-40px clickable" @click.stop="walletStore.disconnect();perpStore.logout()">
             <div class="color-[--main-text] flex items-center gap-8px">
               <Icon name="custom:log-out" class="text-16px" />
               <span class="text-14px">{{ $t('disconnect') }}</span>
@@ -129,6 +129,15 @@
               <div class="color-[--main-text] flex items-center gap-8px">
                 <Icon name="solar:upload-outline" class="text-18px" />
                 <span class="text-14px">{{ $t('withdraw') }}</span>
+              </div>
+              <div class="color-[--secondary-text] flex items-center gap-4px">
+                <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
+              </div>
+            </li>
+            <li class="flex justify-between h-40px clickable" @click.stop="perpStore.logout">
+              <div class="color-[--main-text] flex items-center gap-8px">
+                <Icon name="custom:log-out" class="text-16px" />
+                <span class="text-14px">{{ $t('logout') }}</span>
               </div>
               <div class="color-[--secondary-text] flex items-center gap-4px">
                 <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />

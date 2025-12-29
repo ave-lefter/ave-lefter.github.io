@@ -112,7 +112,7 @@ const tpMsg = computed(() => {
     return ''
   }
 
-  const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(size.value || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
+  const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(size.value || 0).abs().dp(2).toFixed()
   if (BigNumber(tpForm.triggerPrice || 0).gte(price) && isLong.value || BigNumber(tpForm.triggerPrice || 0).lte(price) && !isLong.value) {
     return t('expectedProfitUSD', {n : profit})
   } else {
@@ -130,7 +130,7 @@ const slMsg = computed(() => {
     return ''
   }
 
-  const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(size.value || 0).abs().dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toFixed()
+  const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(size.value || 0).abs().dp(2).toFixed()
   if (BigNumber(slForm.triggerPrice || 0).lt(price) && isLong.value || BigNumber(slForm.triggerPrice || 0).gt(price) && !isLong.value) {
     return t('expectedLossUSD', {n : profit})
   } else {

@@ -14,8 +14,8 @@
     <div class="content">
       <ul>
         <li v-for="(item, $index) in positions" :key="$index" class="mb-15px">
-          <div>
-            <span class="bg-[--up-color] rounded-4px px-2px text-10px">{{ $t('buy1') }}</span>
+          <div class="flex items-center">
+            <span class="rounded-4px w-16px h-16px text-10px inline-flex items-center justify-center" :class="BigNumber(item.openSize)?.gt(0) ? 'bg-[--up-color]' : 'bg-[--down-color]'">{{ BigNumber(item.openSize)?.gt(0) ? $t('buy1') : $t('sell1') }}</span>
             <span class="ml-5px text-14px color-[--third-text]">
               {{ typeDict[item.contractId] }}</span
             >
@@ -24,7 +24,7 @@
             >
           </div>
           <div class="flex-between mt-10px">
-            <span class="color-[--secondary-text] text-12px">{{ $t('amount') }}</span>
+            <span class="color-[--secondary-text] text-12px">{{ $t('orderSize') }}</span>
             <span class="color-[--third-text] text-12px">{{
               formatNumber(item.openSize.replace('-', ''))
             }} {{ getCoinName(item.contractId) }}</span>
