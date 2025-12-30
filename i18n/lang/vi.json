@@ -822,6 +822,7 @@
   "takeProfitAndStopLossTips5": "Chốt lãi 10 lần (lợi nhuận 1000% chẵn); di chuyển chốt lời có nghĩa là tất cả các vị thế sẽ tự động đóng khi giá thoái lui 40% so với điểm cao nhất.",
   "takeProfitAndStopLossTips6": "Chốt lãi 40% (đóng lãi 40%); chốt lời theo sau có nghĩa là tất cả các vị thế sẽ tự động đóng khi giá thoái lui 60% so với điểm cao nhất.",
   "advancedTradingStrategy": "Chiến lược bán nâng cao",
+  "above10uHoldersChange": "Thay đổi người nắm giữ > 10U",
   "rank": "TOP",
   "profit5": "lợi nhuận",
   "profitAmount": "Số tiền lãi",

@@ -1426,6 +1426,7 @@
   "takeProfitAndStopLossTips5": "テイクプロフィット 10 回 (オールイーブン利益 1000%)。テイクプロフィットの移動とは、価格が最高値から 40% 戻ったときにすべてのポジションが自動的にクローズされることを意味します。",
   "takeProfitAndStopLossTips6": "40% テイクプロフィット (40% 利益クロージング)。トレーリングテイクプロフィットとは、価格が最高値から 60% 戻ったときにすべてのポジションが自動的にクローズされることを意味します。",
   "advancedTradingStrategy": "高度な取引戦略",
+  "above10uHoldersChange": "ホルダー変更 > 10U",
   "rank": "TOP",
   "profit5": "利益",
   "profitAmount": "利益金額",
