@@ -58,6 +58,7 @@ const tabs = computed(() => {
   const arr: Array<{ label: string, value: string }> = []
   if (Array.isArray(totalHolders.value)) {
     totalHolders.value.forEach(i => {
+      console.log(i.type)
       const num = i.total_address!
       if (num > 0) {
         arr.push({
@@ -831,12 +832,23 @@ const collect = async (row: any,index:number) => {
         ref="tabsContainer"
         class="flex items-center whitespace-nowrap w-[80%] overflow-x-auto scrollbar-hide"
       >
+      <template v-for="(item,index) in tabs" :key="item.value">
         <a
-          v-for="(item,index) in tabs" :key="item.value" href="javascript:;" :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
-         ${activeTab === item.value ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
-          @click="setActiveTab(item.value,index)">
+          v-if="holdersTooltip(t)[item.type]"
+          v-tooltip="holdersTooltip(t)[item.type]"
+          href="javascript:;"
+          :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
+         ${activeTab === item.value ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`" @click="setActiveTab(item.value,index)">
           {{ item.label }}
         </a>
+        <a
+          v-else
+          href="javascript:;"
+          :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
+         ${activeTab === item.value ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`" @click="setActiveTab(item.value,index)">
+          {{ item.label }}
+        </a>
+      </template>
       </div>
       <div class="flex items-center gap-12px">
         <div v-show="isPausedTxs" class="flex items-center color-#FFA622 text-12px">

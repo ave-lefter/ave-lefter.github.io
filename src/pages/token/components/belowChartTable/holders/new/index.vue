@@ -5,20 +5,36 @@
       <div
         class="flex items-center whitespace-nowrap overflow-x-auto scrollbar-hide tab-width w-100%"
       >
+      <template v-for="item in tabs"
+      :key="item.value">
         <a
-          v-for="item in tabs"
-          :key="item.value"
-          href="javascript:;"
-          :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
-         ${
-           activeTab === item.value
-             ? 'bg-[--tab-active-bg] color-[--main-text]'
-             : 'color-[--third-text]'
-         }`"
-          @click="setActiveTab(item.value as typeof activeTab)"
-        >
-          {{ item.label }}
-        </a>
+        v-if="holdersTooltip(t)[item.type]"
+          v-tooltip="holdersTooltip(t)[item.type]"
+            href="javascript:;"
+            :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
+            ${
+              activeTab === item.value
+                ? 'bg-[--tab-active-bg] color-[--main-text]'
+                : 'color-[--third-text]'
+            }`"
+            @click="setActiveTab(item.value as typeof activeTab)"
+          >
+            {{ item.label }}
+          </a>
+          <a
+            v-else
+            href="javascript:;"
+            :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
+            ${
+              activeTab === item.value
+                ? 'bg-[--tab-active-bg] color-[--main-text]'
+                : 'color-[--third-text]'
+            }`"
+            @click="setActiveTab(item.value as typeof activeTab)"
+          >
+            {{ item.label }}
+          </a>
+      </template>
       </div>
     </div>
     <div v-if="aggregateStats?.top100Ratio > 0 ||aggregateStats?.top100PurchaseAvg > 0 ||  aggregateStats?.top100SellAvg > 0" class="flex-start px-12px mb-12px text-12px">
