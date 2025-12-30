@@ -132,7 +132,7 @@
             <Icon name="custom:follow" class="text-4" />
             {{ $t('follow') }}
           </a>
-          <a
+          <!-- <a
             class="flex items-center justify-center gap-1 px-4.5 bg-[--primary-color] text-3 leading-4 cursor-pointer rounded text-[--white]"
             @click="shareComponent && shareComponent.openDialog()"
           >
@@ -145,7 +145,7 @@
               classString="!color-[--white] [&&]:ml-0"
             />
             {{ $t('share') }}
-          </a>
+          </a> -->
         </div>
       </div>
     </div>
