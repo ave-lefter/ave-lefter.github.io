@@ -118,7 +118,7 @@ export function getTxAnalysis(params: {
   }>
 }>{
   const { $api } = useNuxtApp()
-  return $api('https://api.test.phaetd8l.com/v2api/walletinfo/v2/tx_analysis', {
+  return $api('https://api.test.phaetd8l.com/v2api/walletinfo/v2/tx_analysis_v2', {
     method: 'get',
     query: params,
   })
