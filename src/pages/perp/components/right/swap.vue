@@ -97,7 +97,7 @@
     <el-form-item style="margin-bottom: 0">
       <el-checkbox v-model="isChecked" class="checkbox-sm" :label="$t('stopLimit')" />
       <template v-if="isChecked">
-        <div class="flex items-center gap-10px mt-8px mb-16px w-full">
+        <div class="flex items-center gap-10px mt-8px mb-8px w-full">
           <!-- 止盈 -->
           <el-input-number
             v-model="tpForm.triggerPrice"
@@ -162,9 +162,9 @@
             @change="val => tpPercentChange(val as number)"
           />
         </div> -->
-        <el-alert v-if="tpMsg" style="--el-alert-title-font-size:12px;--el-alert-padding:5px 10px;margin: 10px 0" :title="tpMsg" type="success"  :closable="false" />
+        <el-alert v-if="tpMsg" style="--el-alert-title-font-size:12px;--el-alert-padding:5px 10px;margin: 0" :title="tpMsg" type="success"  :closable="false" />
 
-        <div class="flex items-center gap-10px mt-8px mb-16px w-full">
+        <div class="flex items-center gap-10px mt-8px mb-8px w-full">
           <!-- 止损 -->
           <el-input-number
             v-model="slForm.triggerPrice"
@@ -228,7 +228,7 @@
             @change="val => slPercentChange(val as number)"
           />
         </div> -->
-        <el-alert v-if="slMsg" style="--el-alert-title-font-size:12px;--el-alert-padding:5px 10px;margin: 10px 0" :title="slMsg" type="error"  :closable="false" />
+        <el-alert v-if="slMsg" style="--el-alert-title-font-size:12px;--el-alert-padding:5px 10px;margin:0" :title="slMsg" type="error"  :closable="false" />
       </template>
     </el-form-item>
 
@@ -680,11 +680,16 @@ const tpMsg = computed(() => {
     return ''
   }
 
+  // const curPosition = perpStore?.position?.find((i) => i.contractId === perpStore.perp?.contractId)
+  // let curSize = BigNumber(curPosition?.openSize || 0)
   if (BigNumber(tpForm.triggerPrice || 0).gt(price)) {
-    const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(getSize() || 0).abs().dp(2).toFixed()
+    const size = BigNumber(getSize() || 0)
+    const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(size).abs().dp(2).toFixed()
     return t('longExpectedProfitUSD', {n : profit})
   } else {
-    const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(getSize(1) || 0).abs().dp(2).toFixed()
+    // curSize = BigNumber(curPosition?.openSize || 0).times(-1)
+    const size = BigNumber(getSize(1) || 0)
+    const profit = BigNumber(tpForm.triggerPrice || 0).minus(price).times(size).abs().dp(2).toFixed()
     return t('shortExpectedProfitUSD', {n : profit})
   }
 })
@@ -699,11 +704,16 @@ const slMsg = computed(() => {
     return ''
   }
 
+  // const curPosition = perpStore?.position?.find((i) => i.contractId === perpStore.perp?.contractId)
+  // let curSize = BigNumber(curPosition?.openSize || 0)
   if (BigNumber(slForm.triggerPrice || 0).lt(price)) {
-    const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(getSize() || 0).abs().dp(2).toFixed()
+    const size = BigNumber(getSize() || 0)
+    const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(size).abs().dp(2).toFixed()
     return t('longExpectedLossUSD', {n : profit})
   } else {
-    const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(getSize(1) || 0).abs().dp(2).toFixed()
+    // curSize = BigNumber(curPosition?.openSize || 0).times(-1)
+    const size = BigNumber(getSize(1) || 0)
+    const profit = BigNumber(slForm.triggerPrice || 0).minus(price).times(size).abs().dp(2).toFixed()
     return t('shortExpectedLossUSD', {n : profit})
   }
 })
