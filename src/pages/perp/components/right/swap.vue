@@ -94,7 +94,7 @@
         <div class="font-500"> ≈ {{ formatNumber(percentSell, { decimals: 4, limit: 8}) }} {{ perpStore.unit?.coinName || '' }}</div>
       </div>
     </div>
-    <el-form-item style="margin-bottom: 0">
+    <el-form-item v-if="!form.reduceOnly" style="margin-bottom: 0">
       <el-checkbox v-model="isChecked" class="checkbox-sm" :label="$t('stopLimit')" />
       <template v-if="isChecked">
         <div class="flex items-center gap-10px mt-8px mb-8px w-full">
@@ -347,6 +347,12 @@ const tempData = reactive({
   slPercent: 0,
   slPercent1: 0,
   sizePercent: 0,
+})
+
+watch(() => form.reduceOnly, () => {
+  if (form.reduceOnly) {
+    isChecked.value = false
+  }
 })
 
 const contractId = computed(() => {
@@ -651,7 +657,12 @@ function setMidPrice() {
   const ticker = perpStore.tickers?.find(i => i.contractId === perpStore?.contractId)
   const bid1 =  ticker?.bestBidPrice || 0
   const ask1 = ticker?.bestAskPrice || 0
-  return form.price = BigNumber(bid1).plus(ask1).dividedBy(2).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+  form.price = BigNumber(bid1).plus(ask1).dividedBy(2).dp(pricePrecision.value, BigNumber.ROUND_FLOOR).toNumber()
+  setTimeout(() => {
+    if (formRef.value) {
+      formRef.value.clearValidate('price')
+    }
+  }, 100)
 }
 
 const percentBuy = computed(() => {
