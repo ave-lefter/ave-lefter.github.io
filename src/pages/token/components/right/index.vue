@@ -5,7 +5,11 @@
         <div class="p-15px bg-[--secondary-bg]">
           <PriceTabs v-model="tabActive" :tabs="tabs" />
           <template v-for="item in tabs" :key="item.id">
-            <VolumeStats v-if="tabActive === item.id" :tabActive="item.id" :tabActiveName="item.name" />
+            <VolumeStats
+              v-if="tabActive === item.id"
+              :tabActive="item.id"
+              :tabActiveName="item.name"
+            />
           </template>
         </div>
         <!-- <div class="flex items-center justify-around color-[--main-text] p-15px bg-[--secondary-bg] mt-4px">
@@ -27,22 +31,35 @@
           <component :is="SwapCom" />
         </div>
         <div class="p-15px pb-5px bg-[--secondary-bg] mt-1px">
-          <Pairs @openFilterModal="openFilterModal"/>
+          <div
+            class="flex justify-between border-b-1px border-b-solid border-b-[--main-divider] pb-8px mb-8px text-12px"
+          >
+            <span class="text-12px color-[--main-text]">{{ $t('totalPair') }}</span>
+            {{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
+          </div>
+          <Pairs @openFilterModal="openFilterModal" />
         </div>
         <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg] mt-1px" />
-        <div class=" bg-[--secondary-bg] flex-1" />
+        <div class="bg-[--secondary-bg] flex-1" />
       </div>
     </el-scrollbar>
     <el-dialog v-model="dialogVisible" :title="searchAmm" width="480">
-      <Pairs :search="searchAmm" :isInModal="true"/>
+      <Pairs :search="searchAmm" :isInModal="true" />
       <template #footer>
-          <el-button type="primary" @click="dialogVisible = false" block class="w-full h-[48px]" size="large">{{ $t('confirm') }}</el-button>
+        <el-button
+          type="primary"
+          block
+          class="w-full h-[48px]"
+          size="large"
+          @click="dialogVisible = false"
+          >{{ $t('confirm') }}</el-button
+        >
       </template>
     </el-dialog>
   </div>
 </template>
 
-<script setup lang='ts'>
+<script setup lang="ts">
 import { useLocalStorage, type RemovableRef } from '@vueuse/core'
 import PriceTabs from './priceTabs.vue'
 // import VolumeStats from './volumeStats.vue'
@@ -53,8 +70,9 @@ const Swap = defineAsyncComponent(() => import('./swap/index.vue'))
 
 const dialogVisible = shallowRef(false)
 
-const searchAmm=shallowRef('')
+const searchAmm = shallowRef('')
 const walletStore = useWalletStore()
+const tokenStore = useTokenStore()
 
 const SwapCom = computed(() => {
   if (walletStore.address) {
@@ -70,11 +88,13 @@ const tabs: { id: '5m' | '1h' | '4h' | '24h'; name: string }[] = [
   { id: '4h', name: '4H' },
   { id: '24h', name: '24H' },
 ]
-const tabActive = useLocalStorage('token_tab_active', '24h') as RemovableRef<'5m' | '1h' | '4h' | '24h'>
+const tabActive = useLocalStorage('token_tab_active', '24h') as RemovableRef<
+  '5m' | '1h' | '4h' | '24h'
+>
 
-const openFilterModal = (search:string) => {
-  console.log('openFilterModal',search)
-  dialogVisible.value=true
-  searchAmm.value=search
+const openFilterModal = (search: string) => {
+  console.log('openFilterModal', search)
+  dialogVisible.value = true
+  searchAmm.value = search
 }
 </script>

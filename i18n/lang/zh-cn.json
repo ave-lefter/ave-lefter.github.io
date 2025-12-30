@@ -844,7 +844,7 @@
   "deleteSuccess": "成功删除 {count} 个零余额地址",
   "batchErrorMsg1": "无效的地址:{address}",
   "batchErrorMsg2": "备注长度不能超过{n}个字符",
-  "batchErrorMsg3": "地址数量不能超过 {n} 个",
+  "batchErrorMsg3": "关注地址已达上限: 关注列表已有{m}个地址, 待导入{h}, 总计{t}/{n}",
   "zeroBalanceLoading": "正在获取零余额地址...",
   "noZeroBalanceAddresses": "没有找到零余额地址",
   "foundZeroBalanceAddresses": "找到 {count} 个零余额地址",
@@ -1576,5 +1576,14 @@
   "top100PurchaseAvg": "前100持仓均价",
   "top100SellAvg": "前100卖出均价",
   "canWithdraw": "可领取",
-  "above10uHoldersChange": ">10U持币地址数变化"
+  "above10uHoldersChange": ">10U持币地址数变化",
+  "rank": "榜",
+  "profit5": "盈利",
+  "profitAmount": "盈利金额",
+  "notUpdateExistRemark": "已备注的钱包不进行修改",
+  "notUpdateExistRemarkTip": "提示：若不勾选则会覆盖当前已备注过的钱包，请谨慎选择",
+  "preview": "预览",
+  "top20Remarked": "TOP 20快捷备注",
+  "addToGroup": "添加到分组",
+  "totalPair":"总流动池"
 }

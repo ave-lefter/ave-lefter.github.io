@@ -70,6 +70,7 @@ definePageMeta({
   },
 })
 const route = useRoute()
+const walletStore = useWalletStore()
 const localeStore  = useLocaleStore()
 const tagStore = useTagStore()
 const tokenStore = useTokenStore()
@@ -114,6 +115,9 @@ const aiSummary = shallowRef({summary:'', headline:''})
 
 // 订单簿拖动功能（更丝滑、可控制）
 let isDraggingOrderBook = false
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
 function dragOrderBook(e: MouseEvent) {
   e.preventDefault()
   let lastX = e.clientX
@@ -262,6 +266,7 @@ function init(isRefresh = false) {
   tagStore.getTagArr()
   tokenStore.twitterType = 0
   tokenStore.getXType(route.params.id as string)
+  useCheckStore().getContractCheckResult(route.params.id as string, walletAddress.value)
 }
 
 watch(() => route.params.id, () => {

@@ -56,6 +56,9 @@
   "onlyShow30DaysTransactions": "Mostrar apenas transações válidas dentro de 30 dias",
   "viewMoreTransactions": "Ver mais registros de transação",
   "noFollowedWalletPurchases": "Carteiras seguidas atualmente não têm registros de compra na cadeia",
+  "copyContract": "Copiar endereço do contrato",
+  "copyTokenName": "Copiar nome",
+  "addToGroup": "Adicionar ao grupo",
   "volumeOneHour": "Volume 1h",
   "name": "Nome",
   "createdTime": "Criação",
@@ -315,7 +318,7 @@
   "batchPlaceHolder": "Por favor, insira o endereço",
   "batchErrorMsg1": "Endereço inválido: {address}",
   "batchErrorMsg2": "O comprimento da observação não pode exceder {n} caracteres",
-  "batchErrorMsg3": "A quantidade de endereços não pode exceder {n}",
+  "batchErrorMsg3": "Limite de endereços seguidos atingido: A lista de observação tem {m} endereços, pendentes de importação {h}, total {t}/{n}",
   "bulkDesc1": "Preencha o endereço da carteira conforme o exemplo, um por linha, separado por vírgulas",
   "lastTxsTime1": "Último Comércio",
   "7dWinRate": "Taxa total de vitória de 7 dias",
@@ -572,5 +575,12 @@
   "takeProfitAndStopLossTips5": "Take Profit de 10 vezes (lucro igual a 1000%); mover o take-profit significa que todas as posições serão fechadas automaticamente quando o preço retroceder 40% do ponto mais alto.",
   "takeProfitAndStopLossTips6": "Take Profit de 40% (fechamento de lucro de 40%); Trailing Take Profit significa que todas as posições serão fechadas automaticamente quando o preço retroceder 60% do ponto mais alto.",
   "advancedTradingStrategy": "Estratégia de Venda Avançada",
-  "above10uHoldersChange": "Mudança de suportes > 10U"
+  "above10uHoldersChange": "Mudança de suportes > 10U",
+  "rank": "TOP",
+  "profit5": "PnL",
+  "profitAmount": "Valor do lucro",
+  "notUpdateExistRemark": "As observações na carteira não serão modificadas.",
+  "notUpdateExistRemarkTip": "Nota: Se desmarcada, substituirá quaisquer comentários existentes na carteira. \nPor favor escolha com cuidado.",
+  "preview": "Visualização",
+  "top20Remarked": "20 principais comentários rápidos"
 }

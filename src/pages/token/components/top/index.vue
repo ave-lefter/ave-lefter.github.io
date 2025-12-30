@@ -910,6 +910,15 @@ async function getRugPullList() {
   devToken.value = res
 }
 
+
+watch(
+  () => showCheck.value,
+  (val) => {
+    if (val) {
+      useCheckStore().getContractCheckResult(route.params.id as string, walletAddress.value)
+    }
+  }
+)
 watch(
   () => route.params.id,
   () => {
@@ -919,11 +928,6 @@ watch(
   }
 )
 
-onMounted(() => {
-  if (route.params.id) {
-    getRugPullList()
-  }
-})
 
 onUnmounted(() => {
   topEventBus.off(handleViewDevTokens)
@@ -1013,7 +1017,10 @@ onMounted(() => {
     getTokenFavoriteCheck()
     getTokenUserFavoriteGroups() //获取分组数组
   }
-  useCheckStore().getContractCheckResult(id.value, evmAddress?.value)
+  if (route.params.id) {
+    getRugPullList()
+  }
+  // useCheckStore().getContractCheckResult(id.value, walletAddress.value)
   if (chain.value == 'solana') {
     getRugPull()
   }
@@ -1037,7 +1044,7 @@ watch(
       getTokenFavoriteCheck()
       getTokenUserFavoriteGroups() //获取分组数组
     }
-    useCheckStore().getContractCheckResult(id.value, evmAddress.value)
+    // useCheckStore().getContractCheckResult(id.value, evmAddress.value)
     if (chain.value == 'solana') {
       getRugPull()
     }

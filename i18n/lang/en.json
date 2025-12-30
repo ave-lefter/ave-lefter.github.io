@@ -70,6 +70,9 @@
   "onlyShow30DaysTransactions": "Only show valid transactions within 30 days",
   "viewMoreTransactions": "View more transaction records",
   "noFollowedWalletPurchases": "Followed wallets currently have no purchase records on chain",
+  "copyContract": "Copy Address",
+  "copyTokenName": "Copy Name",
+  "addToGroup": "Add to Group",
   "volumeOneHour": "1h Vol",
   "name": "Name",
   "createdTime": "Created time",
@@ -839,7 +842,7 @@
   "deleteSuccess": "Successfully deleted {count} zero balance addresses",
   "batchErrorMsg1": "Invalid address: {address}",
   "batchErrorMsg2": "Remark length cannot exceed {n} characters",
-  "batchErrorMsg3": "Address count cannot exceed {n}",
+  "batchErrorMsg3": "Follow address limit reached: Watch list has {m} addresses, pending import {h}, total {t}/{n}",
   "zeroBalanceLoading": "Loading zero balance addresses...",
   "noZeroBalanceAddresses": "No addresses with zero balance found",
   "foundZeroBalanceAddresses": "Found {count} addresses with zero balance",
@@ -1577,5 +1580,13 @@
   "top100PurchaseAvg": "Top100 Purchase Avg Price",
   "top100SellAvg": "Top100 Sell Avg Price",
   "canWithdraw": "Withdrawable",
-  "above10uHoldersChange": "Holders Change > 10U"
+  "above10uHoldersChange": "Holders Change > 10U",
+  "rank": "TOP",
+  "profit5": "PnL",
+  "profitAmount": "Profit amount",
+  "notUpdateExistRemark": "Remarks on the wallet will not be modified.",
+  "notUpdateExistRemarkTip": "Note: If unchecked, this will overwrite any existing remarks on the wallet. Please choose carefully.",
+  "preview": "Preview",
+  "top20Remarked": "TOP 20 Quick Remarks",
+  "totalPair":"Total Liquidity"
 }

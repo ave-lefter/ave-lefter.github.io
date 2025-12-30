@@ -168,6 +168,7 @@
             @handleSortChange="handleSortChange"
             @filterAddress="filterAddress"
             @filterOriginAddress="filterOriginAddress"
+            @reLoad="reLoad"
           />
           <!-- <el-tooltip
             v-if="['solana', 'bsc']?.includes(chain) && !show_bubble"
@@ -236,7 +237,7 @@ import {
   type AggregateStats,
   type HolderStat,
 } from '@/api/holders'
-import { useLocalStorage } from '@vueuse/core'
+import { useEventBus, useLocalStorage } from '@vueuse/core'
 import List from './list.vue'
 import LineContent from './lineContent.vue'
 const holderListSortObj = useLocalStorage('holderListSortObj', {
@@ -270,6 +271,7 @@ const walletStore = useWalletStore()
 const { t } = useI18n()
 const activeTab = shallowRef<'all' | 'buy' |'sell' | 'buy24h' | 'sell24h' | '-100'>('all')
 const globalStore = useGlobalStore()
+const avgPriceEvent = useEventBus<number>('top100Price')
 
 // keyword: input value in the popover; searchKeyword: active search flag/value
 const searchKeyword = shallowRef('')
@@ -389,6 +391,11 @@ watch(activeTab, (val) => {
   // if (searchKeyword) {
   //   this.filterAddress(this.searchKeyword)
   // }
+  reLoad(val)
+})
+
+function reLoad(val=activeTab.value) {
+  console.log('reLoad', val)
   if (val === 'buy' || val === 'sell') {
     const prop = val === 'buy' ? 'ascending' : 'descending'
     holdersRef?.value?.sort('total_profit', prop)
@@ -407,7 +414,8 @@ watch(activeTab, (val) => {
       getHoldersList()
     }
   }
-})
+}
+
 onMounted(() => {
   //getHoldersList()
 })
@@ -476,6 +484,9 @@ function getHoldersList(sortObj?: { sort_by: string; order: string }) {
     .then((res) => {
       holderListObj.value[activeTab.value] = res?.holderStats || []
       aggregateStatsObj.value[activeTab.value] = res?.aggregateStats || {}
+      if(activeTab.value === 'all') {
+        avgPriceEvent.emit(res?.aggregateStats?.top100PurchaseAvg || 0, res?.aggregateStats?.top100SellAvg || 0)
+      }
     })
     .catch(() => {
       holderListObj.value[activeTab.value] = []
@@ -485,7 +496,7 @@ function getHoldersList(sortObj?: { sort_by: string; order: string }) {
     })
 }
 function handleSortChange(obj: { prop: string; order: string }) {
-  getHoldersList({ sort_by: obj.prop, order: obj.order?.replace('ending', '') })
+  getHoldersList({ sort_by: obj?.prop, order: obj?.order?.replace('ending', '') })
 }
 function filterOriginAddress(row:{ address: string, type: string }) {
   if (searchOriginKeyword.value) {

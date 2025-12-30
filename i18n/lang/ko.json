@@ -66,6 +66,9 @@
   "onlyShow30DaysTransactions": "30일 이내의 유효한 거래만 표시",
   "viewMoreTransactions": "더 많은 거래 기록 보기",
   "noFollowedWalletPurchases": "팔로우된 지갑은 현재 체인에 구매 기록이 없습니다",
+  "copyContract": "컨트랙트 주소 복사",
+  "copyTokenName": "이름 복사",
+  "addToGroup": "그룹에 추가",
   "volumeOneHour": "1h 거래량",
   "name": "이름",
   "createdTime": "생성 시간",
@@ -841,7 +844,7 @@
   "deleteSuccess": "잔액이 0인 주소 {count}개 삭제 성공",
   "batchErrorMsg1": "주소 유형이 잘못되었습니다: {address}",
   "batchErrorMsg2": "메모 길이는 {n}자를 초과할 수 없습니다",
-  "batchErrorMsg3": "주소 수는 {n}개를 초과할 수 없습니다",
+  "batchErrorMsg3": "팔로우 주소 한도에 도달했습니다: 관심 목록에 {m}개 주소, 가져오기 대기 중 {h}, 총 {t}/{n}",
   "zeroBalanceLoading": "잔액이 0인 주소를 가져오는 중...",
   "noZeroBalanceAddresses": "잔액이 0인 주소를 찾을 수 없습니다",
   "foundZeroBalanceAddresses": "잔액이 0인 주소 {count}개 찾음",
@@ -1423,5 +1426,12 @@
   "takeProfitAndStopLossTips5": "10배 이익 실현(1000% 이익 균등); 이익실현을 이동한다는 것은 가격이 최고점에서 40% 되돌릴 때 모든 포지션이 자동으로 닫히는 것을 의미합니다.",
   "takeProfitAndStopLossTips6": "40% 이익 실현(40% 이익 마감); 후행 이익실현은 가격이 최고점에서 60% 되돌릴 때 모든 포지션이 자동으로 닫히는 것을 의미합니다.",
   "advancedTradingStrategy": "고급 거래 전략",
-  "above10uHoldersChange": "홀더 변경 > 10U"
+  "above10uHoldersChange": "홀더 변경 > 10U",
+  "rank": "TOP",
+  "profit5": "이익",
+  "profitAmount": "이익금액",
+  "notUpdateExistRemark": "지갑에 적힌 메모는 수정되지 않습니다.",
+  "notUpdateExistRemarkTip": "참고: 선택을 취소하면 지갑에 있는 기존 메모를 덮어쓰게 됩니다. \n신중하게 선택해 주세요.",
+  "preview": "시사",
+  "top20Remarked": "TOP 20 간략한 설명"
 }

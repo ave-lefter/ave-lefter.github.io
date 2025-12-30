@@ -5,8 +5,13 @@ import { VueDraggableNext } from 'vue-draggable-next'
 import { formatNumber2 } from '~/utils/formatNumber'
 import { getChainDefaultIcon } from '~/utils'
 import ArcProgress from '~/components/arcProgress.vue'
-import { getNewFavoriteList, getUserFavoriteGroups, removeFavorite, removeFavoriteGroup, addFavoriteGroup, changeFavoriteGroupName, moveFavoriteGroup, editTokenFavRemark, getGroupChangeIndex } from '~/api/fav'
+import { getNewFavoriteList, getUserFavoriteGroups, removeFavorite, removeFavoriteGroup, addFavoriteGroup, changeFavoriteGroupName, moveFavoriteGroup, editTokenFavRemark, getGroupChangeIndex, batchDeleteFavorite } from '~/api/fav'
 import { WSEventType } from '~/utils/constants'
+import type { TableInstance } from 'element-plus'
+
+
+let timeoutId: any = null;
+const tableRef = ref<TableInstance | null>(null)
 const {isDark} = storeToRefs(useGlobalStore())
 const botStore = useBotStore()
 const walletStore = useWalletStore()
@@ -67,6 +72,62 @@ const addressValue = computed(() => {
   return botStore.evmAddress || walletStore.address
 })
 
+
+// 12-16 批量取消
+const favHover=ref(false)
+
+const checkedList=ref(<any[]>[])
+const handleSelectionChange = (val: any[]) => {
+  console.log('handleSelectionChange', val)
+  checkedList.value=val.map(i => i?.token+'-' + i?.chain)
+}
+
+const batchDelete=async ()=>{
+  await ElMessageBox.confirm(t('removeTokenTips'), t('tips'), {
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
+    customClass:'w-320px p-16px inputPop',
+    cancelButtonClass:'w-140px h-30px',
+    confirmButtonClass:'w-140px h-30px ml-8px!',
+    dangerouslyUseHTMLString: true,
+  })
+  console.log('batchDelete', checkedList.value)
+  batchDeleteFavorite({
+    address: botStore.evmAddress || walletStore.address,
+    token_ids: checkedList.value
+  }).then(() => {
+    ElMessage.success(t('success'))
+    pageData.value.page = 1
+    getList()
+    tableRef.value!.clearSelection()
+    checkedList.value = []
+  }).catch((e) => {
+     ElMessage.error(String(e))
+  })
+}
+const handlerMouseoverFavHover=()=>{
+  favHover.value=true
+  clearTimeout(timeoutId);
+}
+
+const handlerMouseoutFavHover=()=>{
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+  timeoutId = setTimeout(() => {
+    favHover.value = false; // 3 秒后将 favHover 设置为 false
+    console.log('favHover set to false');
+  }, 3000);
+}
+
+onActivated(() => {
+  console.log('onDeactivated')
+  favHover.value = false;
+  checkedList.value = []
+  tableRef.value!.clearSelection()
+  clearTimeout(timeoutId);
+  // reCreateChild()
+})
 watch(() => walletStore.walletSignature[walletStore.address], (newValue) => {
   if (newValue) {
     getList()
@@ -122,6 +183,8 @@ const setActiveTab = (val: number) => {
   activeTab.value = val
   pageData.value.page = 1
   getList()
+  tableRef.value!.clearSelection()
+  checkedList.value = []
 }
 
 // 删除分组
@@ -257,6 +320,9 @@ const collect = (row: any) => {
   removeFavorite(`${row.token}-${row.chain}`, addressValue.value)
     .then(() => {
       getList()
+      // const newList = checkedList.value.filter((item) => item !== `${row.token}-${row.chain}`)
+      // checkedList.value = newList
+      tableRef.value?.toggleRowSelection(row,false)
     })
     .catch((err) => {
       console.log(err)
@@ -328,7 +394,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex-1 h-[calc(100%-76px)] flex flex-col">
+  <div class="flex-1 h-[calc(100%-76px)] flex flex-col relative">
+    <!-- <ul v-if="botStore.evmAddress || walletStore.address" class="w-operate">
+      <li :class="`btn btn1 ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</li>
+    </ul> -->
     <div v-if="botStore.evmAddress || walletStore.address"
       class="flex items-center px-16px mt-12px gap-8px overflow-x-auto scrollbar-hide">
       <div v-for="(item, index) in allTabsGroup" :key="item.value"
@@ -434,10 +503,12 @@ onBeforeUnmount(() => {
         </div>
       </el-popover>
     </div>
-
+    <!-- {{favHover}}
+    {{checkedList.length}} -->
     <div class="w-100% mt-12px flex-1 overflow-hidden">
-      <el-table v-loading="loading" :height="pageData.total > 50 ? 'calc(100% - 72px)' : '100%'" :data="tableList" fit
-        @sort-change="handleSortChange" @row-click="tableRowClick">
+      <el-table ref="tableRef"
+ v-loading="loading" :height="pageData.total > 50 ? 'calc(100% - 72px)' : '100%'" :data="tableList" fit
+        @sort-change="handleSortChange" @row-click="tableRowClick" @selection-change="handleSelectionChange" :row-key="(row:any)=>`${row.token}-${row.chain}`">
         <template #empty>
           <div v-if="botStore.evmAddress || walletStore.address">
             <div v-if="!loading" class="flex flex-col items-center justify-center py-30px">
@@ -456,8 +527,12 @@ onBeforeUnmount(() => {
             </el-button>
           </AveEmpty>
         </template>
-
+        <el-table-column v-if="favHover||checkedList.length" type="selection" width="22" fixed="left" reserve-selection/>
         <el-table-column :label="t('poolPair')" min-width="160" show-overflow-tooltip>
+          <template #header>
+            <div v-if="favHover||checkedList.length" :class="`batchDel mr-8px ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</div>
+            <span>{{ t('poolPair') }}</span>
+          </template>
           <template #default="{ row, $index }">
             <NuxtLink :to="`/token/${row.token}-${row.chain}`" @click.stop.prevent>
               <div class="flex items-center">
@@ -466,7 +541,7 @@ onBeforeUnmount(() => {
                 </span>
                 <Icon v-if="addressValue" name="material-symbols:kid-star"
                   class="color-var(--d-999-l-666) h-16px w-16px clickable shrink-0 color-#ffbb19"
-                  @click.stop.prevent="collect(row)" />
+                  @click.stop.prevent="collect(row)" @mouseover="handlerMouseoverFavHover" @mouseout="handlerMouseoutFavHover" />
                 <div class="relative ml-3px">
                   <el-image class="w-32px h-32px rounded-full mt-6px" :src="getSymbolDefaultIcon({
                     chain: row?.chain,
@@ -643,6 +718,67 @@ onBeforeUnmount(() => {
 </style>
 
 <style lang="scss" scoped>
+.w-operate{
+  position: absolute;
+  top: -35px;
+  right: 0;
+  width: 50%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 12px;
+  padding-right: 16px;
+  /* border-bottom: 1px solid var(--d-222-l-EEE); */
+  li :deep() .el-checkbox__input{
+    margin-top: 2px;
+  }
+  li.btn {
+    display: flex;
+    padding: 0 8px;
+    height: 24px;
+    line-height: 24px;
+    cursor: pointer;
+    background-color: var(--main-input-button-bg);
+    justify-content: center;
+    align-items: center;
+    color: var(--secondary-text);
+    border-radius: 4px;
+    &.btn1{
+      height: 28px;
+      line-height: 28px;
+    }
+    &.warning{
+      background-color: #F6465D1A;
+      color: var(--down-color);
+    }
+    &.active {
+      color: #f5f5f5;
+      background-color: var(--d-333-l-0A0B0C);
+    }
+  }
+}
+.batchDel{
+  display: inline-block;
+  padding: 0 8px;
+  height: 24px;
+  line-height: 24px;
+  cursor: pointer;
+  background-color: var(--main-input-button-bg);
+  justify-content: center;
+  align-items: center;
+  color: var(--secondary-text);
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 12px;
+  &.warning{
+    background-color: #F6465D1A;
+    color: var(--down-color);
+  }
+}
+
 :deep(.el-table .sort-caret) {
   border: solid 4px transparent;
 }

@@ -106,7 +106,7 @@
         <label
           class="el-form-item__label icon mb-0 justify-between!"
         >
-          <a
+          <!-- <a
             class="gap-8px flex items-center clickable underline! color-[--main-text]"
             @click="loginType = loginType === 'password' ? 'email' : 'password'"
           >
@@ -115,12 +115,9 @@
                 ? $t("startVcodeLogin")
                 : $t("startPwdLogin")
             }}
-            <!-- <el-icon class="h-11.33px w-13.33px">
-              <Switch />
-            </el-icon> -->
-          </a>
+          </a> -->
           <a
-            class="gap-8px flex items-center clickable underline! color-[--main-text]"
+            class="gap-8px flex items-center clickable underline! color-[--main-text] ml-auto"
             @click.prevent="emit('update:c-type', 'reset')"
           >
             {{ $t("startForgetPassword") }}
@@ -266,7 +263,7 @@ const loading3 = ref(false)
 const loading4 = ref(true)
 const disabled4 = ref(true)
 const timer = ref<ReturnType<typeof setInterval> | undefined>(undefined)
-const loginType = ref('password')
+const loginType = ref('email')
 const showRefCode = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
 
