@@ -209,3 +209,13 @@ export const CategoryTabsCacheKey = {
   xstocks:'xstocksRanks',
   volume:'volumeRanks',
 }
+
+export const holdersTooltip = (t)=>({
+  30:t('smart'),
+   31:t('kol2'),
+   39:t('whale2'),
+   19:t('shot'),
+   35:t('bad'),
+   36:t('bindAddress'),
+   34:t('fishing'),
+})
