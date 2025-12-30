@@ -98,30 +98,37 @@ const showStopProfitLoss = (row) => {
 const stopTable = (row) => {
   stopProfitLossRow.value = row
   stopTableVisible.value = true
-  const isLong = row.openValue > 0
-  perpStore.order = perpStore.order
-    .filter((el) => {
-      return (
-        el.contractId === row.contractId &&
-        ['TAKE_PROFIT_LIMIT', 'STOP_LIMIT', 'TAKE_PROFIT_MARKET', 'STOP_MARKET'].includes(el.type)
-      )
-    })
-    .map((el) => {
-      // 止盈
-      const isProfit = el.type.includes('PROFIT')
-      let triggerSign = ''
-      if (isLong) {
-        triggerSign = isProfit ? '≥' : '≤'
-      } else {
-        triggerSign = isProfit ? '≤' : '≥'
-      }
-      return {
-        ...el,
-        // 做多
-        triggerSign,
-      }
-    })
+  // const isLong = row.openValue > 0
+  // perpStore.order = perpStore.order
+  //   .filter((el) => {
+  //     return (
+  //       el.contractId === row.contractId &&
+  //       ['TAKE_PROFIT_LIMIT', 'STOP_LIMIT', 'TAKE_PROFIT_MARKET', 'STOP_MARKET'].includes(el.type)
+  //     )
+  //   })
+  //   .map((el) => {
+  //     // 止盈
+  //     const isProfit = el.type.includes('PROFIT')
+  //     let triggerSign = ''
+  //     if (isLong) {
+  //       triggerSign = isProfit ? '≥' : '≤'
+  //     } else {
+  //       triggerSign = isProfit ? '≤' : '≥'
+  //     }
+  //     return {
+  //       ...el,
+  //       // 做多
+  //       triggerSign,
+  //     }
+  //   })
 }
+
+const orderList = computed(() => {
+  if (!stopProfitLossRow.value?.contractId) {
+    return []
+  }
+  return (perpStore.order?.filter?.((i) => i.contractId === stopProfitLossRow.value?.contractId && ['TAKE_PROFIT_LIMIT', 'STOP_LIMIT', 'TAKE_PROFIT_MARKET', 'STOP_MARKET'].includes(i.type)) || [])
+})
 const closePosition = (row, operation) => {
   closePositionVisible.value = true
   stopProfitLossRow.value = {
@@ -282,7 +289,7 @@ onUnmounted(() => {
       >
         <template #default="{ row }">
           <el-button
-            v-if="perpStore.order.length > 0"
+            v-if="perpStore.order?.some?.((el) => el?.contractId === row?.contractId)"
             size="small"
             style="--el-button-active-border-color: transparent"
             @click="stopTable(row)"
@@ -320,8 +327,8 @@ onUnmounted(() => {
   </div>
   <StopProfitLoss v-model:visible="stopProfitLossVisible" :row="stopProfitLossRow" />
   <StopTable
-    v-model:orderList="perpStore.order"
     v-model:visible="stopTableVisible"
+    :orderList="orderList"
     @add="addStop"
   />
   <ClosePosition

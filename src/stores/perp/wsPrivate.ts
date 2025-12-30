@@ -137,10 +137,40 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
             const canceledOrder: OrderEntry[] = (order as OrderEntry[]).filter((i) => i.status === 'CANCELED')
             // 取消订单
             if(canceledOrder.length > 0){
-              perpStore.order = perpStore.order.filter((i) => !canceledOrder.some(j => j.id === i.id) && i.type !== 'MARKET' && i.status !== 'FILLED')
+              perpStore.order = perpStore.order.filter((i) => !canceledOrder.some(j => j.id === i.id) && i.type !== 'MARKET' && i.status !== 'FILLED').map?.((el) => {
+                const isLong = el.side === 'SELL'
+                // 止盈
+                const isProfit = el.type.includes('PROFIT')
+                let triggerSign = ''
+                if (isLong) {
+                  triggerSign = isProfit ? '≥' : '≤'
+                } else {
+                  triggerSign = isProfit ? '≤' : '≥'
+                }
+                return {
+                  ...el,
+                  // 做多
+                  triggerSign,
+                }
+              })
             } else {
               // 加仓、平仓、止盈、止损
-              perpStore.order = perpStore.order?.filter((i) => !(order as OrderEntry[]).some((el) => el.id === i.id)).concat(...(order as OrderEntry[]))?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET'&& i.status !== 'FILLED')
+              perpStore.order = perpStore.order?.filter((i) => !(order as OrderEntry[]).some((el) => el.id === i.id)).concat(...(order as OrderEntry[]))?.filter((i) => i.status !== 'CANCELED' && i.type !== 'MARKET'&& i.status !== 'FILLED').map?.((el) => {
+                const isLong = el.side === 'SELL'
+                // 止盈
+                const isProfit = el.type.includes('PROFIT')
+                let triggerSign = ''
+                if (isLong) {
+                  triggerSign = isProfit ? '≥' : '≤'
+                } else {
+                  triggerSign = isProfit ? '≤' : '≥'
+                }
+                return {
+                  ...el,
+                  // 做多
+                  triggerSign,
+                }
+              })
               getTotalAssets()
             }
           }
@@ -203,11 +233,41 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
     } else {
       perpStore.position = position
     }
-    perpStore.order = perpStore.order?.filter?.((i) => i.type !== 'MARKET' && i.status !== 'FILLED') || []
+    perpStore.order = (perpStore.order?.filter?.((i) => i.type !== 'MARKET' && i.status !== 'FILLED') || [])?.map?.((el) => {
+      const isLong = el.side === 'SELL'
+      // 止盈
+      const isProfit = el.type.includes('PROFIT')
+      let triggerSign = ''
+      if (isLong) {
+        triggerSign = isProfit ? '≥' : '≤'
+      } else {
+        triggerSign = isProfit ? '≤' : '≥'
+      }
+      return {
+        ...el,
+        // 做多
+        triggerSign,
+      }
+    })
   }
 
   function updateOrderInfo(order: OrderEntry[]) {
-    perpStore.order = order
+    perpStore.order = order?.map?.((el) => {
+      const isLong = el.side === 'SELL'
+      // 止盈
+      const isProfit = el.type.includes('PROFIT')
+      let triggerSign = ''
+      if (isLong) {
+        triggerSign = isProfit ? '≥' : '≤'
+      } else {
+        triggerSign = isProfit ? '≤' : '≥'
+      }
+      return {
+        ...el,
+        // 做多
+        triggerSign,
+      }
+    })
   }
 
   async function getTotalAssets() {
