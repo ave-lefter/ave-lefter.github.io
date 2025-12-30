@@ -331,6 +331,14 @@ function onGetEventsAnalysisDetail() {
       eventsPage.value.loading = false
     })
 }
+
+watch(isExpand,val=>{
+if(val && activity.value.dataset.source.length > 0){
+  setTimeout(() => {
+    bindEchartsEvent()
+  }, 20)
+}
+})
 </script>
 
 <style scoped lang="scss">
