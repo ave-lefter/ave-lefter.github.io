@@ -218,4 +218,6 @@ export const holdersTooltip = (t)=>({
    35:t('bad'),
    36:t('bindAddress'),
    34:t('fishing'),
+   25:t('dev2'),
+   16:t('mouse')
 })

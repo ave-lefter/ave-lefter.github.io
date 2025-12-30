@@ -58,6 +58,7 @@ const tabs = computed(() => {
   const arr: Array<{ label: string, value: string }> = []
   if (Array.isArray(totalHolders.value)) {
     totalHolders.value.forEach(i => {
+      console.log(i.type)
       const num = i.total_address!
       if (num > 0) {
         arr.push({
