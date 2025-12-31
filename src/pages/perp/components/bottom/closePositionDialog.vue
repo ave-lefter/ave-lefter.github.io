@@ -99,10 +99,12 @@ function getCoinName(contractId: string) {
 const loading = ref(false)
 let _createOrderTime = 0
 async function _createOrder(position: Position) {
-  _createOrderTime++
-  if (_createOrderTime > 1) {
-    await sleep(_createOrderTime * 1000)
-    _createOrderTime = 0
+  if (props.positions?.length > 2) {
+     _createOrderTime++
+    if (_createOrderTime > 1) {
+      await sleep((_createOrderTime - 1) * 1000)
+      _createOrderTime = 0
+    }
   }
   const symbol = typeDict.value[position.contractId] + ' ' + getLeverageFromContractId(position.contractId) + 'X '
   const data: PerpOrderParams = {

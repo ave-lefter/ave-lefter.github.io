@@ -569,6 +569,7 @@ const isValue = computed(() => {
 
 function watchPrice(value: string | number) {
   if (!isContractChange.value) {
+    if (!Number(value)) return
     form.price = Number(formatMinSize(String(value) || '0', true))
   }
 }
