@@ -230,7 +230,7 @@ export interface PositionAssetList {
   totalRealizePnl: string
 }
 // 资产-总资产
-export async function profit(): Promise<ProfitResponse> {
+export const profit = createCacheRequest(async function(): Promise<ProfitResponse> {
   const perpStore = usePerpStore()
   return api('/api/v1/private/user/day/profit', {
     method: 'get',
@@ -238,7 +238,7 @@ export async function profit(): Promise<ProfitResponse> {
       userId: perpStore.userInfo?.id,
     },
   })
-}
+}, 500)
 
 // 资产-周积分
 export async function ranking() {

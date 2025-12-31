@@ -97,8 +97,13 @@ function getCoinName(contractId: string) {
 }
 
 const loading = ref(false)
-
-function _createOrder(position: Position) {
+let _createOrderTime = 0
+async function _createOrder(position: Position) {
+  _createOrderTime++
+  if (_createOrderTime > 1) {
+    await sleep(_createOrderTime * 1000)
+    _createOrderTime = 0
+  }
   const symbol = typeDict.value[position.contractId] + ' ' + getLeverageFromContractId(position.contractId) + 'X '
   const data: PerpOrderParams = {
     type: 'MARKET',
@@ -121,8 +126,19 @@ function _createOrder(position: Position) {
   })
 }
 
-function submit() {
+async function submit() {
   loading.value = true
+  // try {
+  //   for (let i = 0; i < props.positions.length; i++) {
+  //     await _createOrder(props.positions[i])
+  //     if (i < props.positions.length - 1) {
+  //       await sleep(300)
+  //     }
+  //   }
+  // } finally {
+  //   visible.value = false
+  //   loading.value = false
+  // }
   Promise.all(props.positions.map(item => _createOrder(item))).then((res) => {
     if (res?.every(i => i)) {
       visible.value = false
