@@ -618,5 +618,7 @@
   "notUpdateExistRemark": "Los comentarios sobre la billetera no serán modificados.",
   "notUpdateExistRemarkTip": "Nota: Si no está marcado, esto sobrescribirá cualquier comentario existente en la billetera. \nElija con cuidado.",
   "preview": "Avance",
-  "top20Remarked": "TOP 20 comentarios rápidos"
+  "top20Remarked": "TOP 20 comentarios rápidos",
+  "deposit": "completar",
+  "value1": "valor"
 }

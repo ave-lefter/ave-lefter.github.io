@@ -829,5 +829,6 @@
   "notUpdateExistRemark": "Nhận xét về ví sẽ không được sửa đổi.",
   "notUpdateExistRemarkTip": "Lưu ý: Nếu không được chọn, thao tác này sẽ ghi đè mọi nhận xét hiện có trên ví. \nHãy lựa chọn cẩn thận.",
   "preview": "Xem trước",
-  "top20Remarked": "TOP 20 nhận xét nhanh"
+  "top20Remarked": "TOP 20 nhận xét nhanh",
+  "value1": "giá trị"
 }

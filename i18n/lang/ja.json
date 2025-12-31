@@ -1433,5 +1433,6 @@
   "notUpdateExistRemark": "ウォレットのコメントは変更されません。",
   "notUpdateExistRemarkTip": "注: チェックを外した場合、ウォレット上の既存のコメントが上書きされます。\n慎重にお選びください。",
   "preview": "プレビュー",
-  "top20Remarked": "トップ 20 の簡単なコメント"
+  "top20Remarked": "トップ 20 の簡単なコメント",
+  "value1": "価値"
 }

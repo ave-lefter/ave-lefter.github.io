@@ -5,6 +5,7 @@
 .nitro
 .cache
 dist
+edgex-web-sdk-packages
 
 # Node dependencies
 node_modules

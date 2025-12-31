@@ -577,5 +577,7 @@
   "notUpdateExistRemark": "M-cüzdandaki açıklamalar değiştirilmeyecektir.",
   "notUpdateExistRemarkTip": "Not: İşaretlenmezse, bu, cüzdandaki mevcut açıklamaların üzerine yazılacaktır. \nLütfen dikkatlice seçin.",
   "preview": "Önizleme",
-  "top20Remarked": "EN İYİ 20 Kısa Açıklama"
+  "top20Remarked": "EN İYİ 20 Kısa Açıklama",
+  "deposit": "tamamlamak",
+  "value1": "değer"
 }
