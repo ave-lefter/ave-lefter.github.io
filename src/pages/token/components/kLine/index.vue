@@ -11,6 +11,46 @@
   >
     <span v-for="i in 4" :key="i" class="bg-[--icon-color] w-2px h-2px rounded-full"/>
   </div>
+  <div v-show="globalStore.klineSettingPop.visible" :style="globalStore.klineSettingPop.style" class="absolute p-20px bg-[--dialog-bg] rounded-8px w-320px text-14px" @click.stop>
+    <div class="flex justify-between items-center mb-16px">
+      {{ $t('chainToken') }}
+      <el-switch size="middle"/>
+    </div>
+    <div class="flex flex-wrap gap-row-16px">
+      <el-checkbox v-for="item in marksTabs" :key="item.id" class="flex-basis-1/3 [&&]:mr-0 [&&]:[--el-checkbox-height:16px]">
+        {{ item.name }}
+      </el-checkbox>
+    </div>
+    <div class="my-24px h-1px border-t-solid border-t-[--dialog-divider]"/>
+    <div class="flex flex-col gap-16px">
+      {{ $t('指标线') }}
+      <div>
+        <el-checkbox class="[&&]:[--el-checkbox-height:16px]">买均线</el-checkbox>
+        <div/>
+      </div>
+      <div>
+        <el-checkbox class="[&&]:[--el-checkbox-height:16px]">卖均线</el-checkbox>
+        <div/>
+      </div>
+    </div>
+    <div class="my-24px h-1px border-t-solid border-t-[--dialog-divider]"/>
+    <div class="flex flex-col gap-16px">
+      {{ $t('top100') }}
+      <div>
+        <el-checkbox class="[&&]:[--el-checkbox-height:16px]">买均线</el-checkbox>
+        <div/>
+      </div>
+      <div>
+        <el-checkbox class="[&&]:[--el-checkbox-height:16px]">卖均线</el-checkbox>
+        <div/>
+      </div>
+    </div>
+    <div class="flex justify-between items-center mt-16px">
+      {{ $t('点击图标筛选') }}
+      <el-switch size="middle"/>
+    </div>
+  </div>
+  
 </template>
 
 <script setup lang='ts'>
@@ -242,7 +282,8 @@ function createHeaderButton() {
   createToggleButton()
   createTogglePriceWarningButton()
   createResetBtn()
-  createMarkButton(_widget, headerBtns)
+  // createMarkButton(_widget, headerBtns)
+  createDisplayButton(_widget, headerBtns)
 }
 
 // 创建 市值/价格 切换按钮
@@ -303,7 +344,7 @@ function createResetBtn() {
 }
 
 
-const { createMarkButton, getMarks, marksTabs, wsTxUpdateMarks,profilingMarksCache } = useKlineMarks()
+const { getMarks, marksTabs, wsTxUpdateMarks,profilingMarksCache,createDisplayButton } = useKlineMarks()
 
 watch(marksTabs, () => {
   _createHeaderButton()
@@ -912,12 +953,21 @@ onBeforeUnmount(() => {
   isUnload = true
 })
 
+const clickHandler = ()=> {
+  console.log('debug')
+    globalStore.klineSettingPop.visible=false
+  }
 onMounted(() => {
   initChart()
   useVisibilityChange(() => {
     _widget?.resetCache?.()
     _widget?.activeChart?.().resetData?.()
   })
+  
+  document.addEventListener('click',clickHandler)
+})
+onUnmounted(()=>{
+  document.removeEventListener('click',clickHandler)
 })
 const emit = defineEmits(['refresh'])
 function refresh() {

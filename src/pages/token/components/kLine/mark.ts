@@ -34,6 +34,7 @@ export function useKlineMarks() {
   const localeStore = useLocaleStore()
   const botStore = useBotStore()
   const walletStore = useWalletStore()
+  const globalStore = useGlobalStore()
   // 创建打点数据
   const marksTabs = computed(() => {
     const arr = (botStore?.evmAddress || walletStore?.address) ? [{ id: 'trade', name: t('mine') }] : []
@@ -51,6 +52,22 @@ export function useKlineMarks() {
     30: false,
     31: true
   })
+
+  function createDisplayButton(_widget: IChartingLibraryWidget | null,headerBtns: HTMLElement[]){
+    const btn = _widget?.createButton()
+    if (!btn) return
+    btn.innerHTML = `<div style="cursor:pointer">${t('display')}</div>`
+    btn.onclick = () => {
+      const rect = btn.getBoundingClientRect()
+      globalStore.klineSettingPop.style = {
+        left: rect.left +'px',
+        top: rect.top +'px',
+      }
+      globalStore.klineSettingPop.visible = true
+    }
+    headerBtns.push(btn)
+    return btn.getBoundingClientRect()
+  }
 
   // 创建 打点 切换按钮
   function createMarkButton(_widget: IChartingLibraryWidget | null, headerBtns: HTMLElement[]) {
@@ -440,7 +457,8 @@ ${formatDate(entry.time, 'YYYY-MM-DD HH:mm')}
     createMarkButton,
     getMarks,
     wsTxUpdateMarks,
-    profilingMarksCache
+    profilingMarksCache,
+    createDisplayButton
   }
 }
 
