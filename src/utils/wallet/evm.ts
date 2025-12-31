@@ -30,7 +30,6 @@ export function bindEvmWalletEvent(provider: EIP6963ProviderDetail<any>['provide
   provider.on('chainChanged', (chainId: string | number) => {
     const walletStore = useWalletStore()
     const chainInfo = getChainInfo(Number(chainId).toString(), true)
-    console.log('chainChanged', walletStore.chain, chainInfo.net_name)
     if (walletStore.chain !== chainInfo.net_name) {
       walletStore.chain = chainInfo.net_name
       window.location.reload()
@@ -63,7 +62,20 @@ export function switchEthereumChain(chain: string, _provider: EIP6963ProviderDet
   if (accounts.length === 0) {
     return Promise.reject('please connect MetaMask')
   } else {
-    if (chainInfo && _provider) {
+    if (!chain && _provider) {
+      walletStore.provider = _provider
+      walletStore.address = accounts[0]
+      if (perpStore._perpKeys[walletStore.address]) {
+        perpStore.getOnboardSite()
+      }
+      bindEvmWalletEvent(_provider)
+      return _provider.request({
+        method: 'eth_chainId',
+      }).then(chainId => {
+        walletStore.chain = getChainInfo(Number(chainId).toString() as string, true).net_name
+        return Promise.resolve(true)
+      })
+    } else if (chainInfo && _provider) {
       const chainId = Number(chainInfo.chain_id)
       return _provider.request({
         method: 'wallet_switchEthereumChain',

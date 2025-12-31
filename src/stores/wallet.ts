@@ -67,11 +67,11 @@ export const useWalletStore = defineStore('wallet', () => {
     })
   })
 
-  function connectEvmWallet(item: string, chain?: string): Promise<boolean>
-  function connectEvmWallet(item: typeof evmWallets.value[number], chain?: string): Promise<boolean>
-  function connectEvmWallet(item: typeof evmWallets.value[number] | string, chain?: string) {
+  function connectEvmWallet(item: string, _chain?: string): Promise<boolean>
+  function connectEvmWallet(item: typeof evmWallets.value[number], _chain?: string): Promise<boolean>
+  function connectEvmWallet(item: typeof evmWallets.value[number] | string, _chain?: string) {
     if (typeof item === 'string') {
-      return walletConnect(chain || '', item)
+      return walletConnect(_chain || '', item)
     }
     provider.value = item.provider || null
     if (item.url && !provider.value) {
@@ -81,7 +81,7 @@ export const useWalletStore = defineStore('wallet', () => {
     if (item.provider !== null) {
       return (provider.value)?.request({ method: 'eth_requestAccounts' }).then((accounts) => {
         walletName.value = item.name
-        switchEthereumChain(chain || '', item.provider as EIP6963ProviderDetail<any>['provider'], accounts as string[])
+        switchEthereumChain(_chain || '', item.provider as EIP6963ProviderDetail<any>['provider'], accounts as string[])
         return Promise.resolve(true)
       }).catch((err) => {
         console.log('connectEvmWallet err', err)
@@ -185,10 +185,10 @@ export const useWalletStore = defineStore('wallet', () => {
     // evm init
     getEvmWalletList().then(() => {
       const extraName = ['WatchWallet', 'appCode']
-      if (!(address.value && chain.value && isEvmChain(chain.value) && walletName.value && !extraName.includes(walletName.value))) {
+      if (!(address.value && ((chain.value && isEvmChain(chain.value)) || (!chain.value && isValidAddress(address.value))) && walletName.value && !extraName.includes(walletName.value))) {
         return
       }
-      if (walletName.value && isEvmChain(chain.value)) {
+      if (walletName.value && (!chain.value || isEvmChain(chain.value))) {
         if (walletName.value.startsWith('wc:')) {
           // walletConnect(chain.value, walletName.value)
           connectEvmWallet(walletName.value, chain.value)
