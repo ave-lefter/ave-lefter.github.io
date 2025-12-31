@@ -8,6 +8,7 @@ export function botOnRequest({ options, request }: MyFetchContext){
   const url = request as string
   const lang1 = (lang == 'zh-cn' || lang == 'zh-tw') ? 'cn' : 'en'
   options.headers.set('lang', lang1)
+  options.headers.set('Ave-Platform', 'web')
   const ave_token = localStorage.getItem('ave_token')
   if (ave_token) {
     options.headers.set('X-Auth', ave_token)
