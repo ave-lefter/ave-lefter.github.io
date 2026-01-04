@@ -122,7 +122,7 @@ watch(
           <span class="text-14px">{{ typeDict[row.contractId] }}</span>
         </template>
       </el-table-column>
-      <el-table-column :width="120" align="right" :label="t('orderSize')">
+      <el-table-column :width="120" :label="t('Qty')">
         <template #default="{ row }">
           {{ formatNumber(row.beforeOpenSize) }} {{ typeDict[row.contractId].replace('USD', '') }}
         </template>

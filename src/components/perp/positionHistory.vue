@@ -157,7 +157,7 @@ watch(
           </div>
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('contractSize')" prop="contractSize">
+      <el-table-column :label="t('Qty')" prop="contractSize">
         <template #default="{ row }">
           {{ Math.abs(+formatNumber(row.cumOpenSize) || 0) }}
           {{ typeDict[row.contractId].replace('USD', '') }}

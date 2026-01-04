@@ -103,12 +103,12 @@ watch(
           <span class="text-14px">{{ typeDict[row.contractId] }}</span>
         </template>
       </el-table-column>
-      <el-table-column :width="100" align="right" :label="t('orderSize')" prop="fillSize">
+      <el-table-column :width="100" :label="t('filledQty')" prop="fillSize">
         <template #default="{ row }">
           {{ formatNumber(row.fillSize) }} {{ typeDict[row.contractId].replace('USD', '') }}
         </template>
       </el-table-column>
-      <el-table-column :width="100" align="right" :label="t('swapPrice')" prop="fillPrice">
+      <el-table-column :width="100" align="right" :label="t('filledPrice')" prop="fillPrice">
         <template #default="{ row }">
           {{
             formatNumber(row.fillPrice, {
@@ -136,7 +136,7 @@ watch(
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('tradeType2')" prop="tradeType2">
+      <el-table-column align="right" :label="t('filledType')" prop="tradeType2">
         <template #default="{ row }">
           {{ t('trades') }}
         </template>

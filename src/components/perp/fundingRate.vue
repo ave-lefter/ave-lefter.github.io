@@ -187,12 +187,12 @@ const reset = () => {
           {{ dayjs(+row.fundingTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('markets1')" prop="contractId">
+      <el-table-column  :label="t('markets1')" prop="contractId">
         <template #default="{ row }">
           {{ typeDict[row.contractId] }}
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('direction')" prop="direction">
+      <el-table-column :width="100" align="right" :label="t('direction')" prop="direction">
         <template #default="{ row }">
           <span
             :class="row.fundingPositionSize > 0 ? 'color-[--up-color]' : 'color-[--down-color]'"

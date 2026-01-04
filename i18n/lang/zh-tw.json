@@ -1780,5 +1780,9 @@
   "chainWalletBalance": "插件錢包資產",
   "watchWalletUnSupportPerp": "當前為觀察錢包帳戶，無法開通永續合約。 請退出後使用挿件錢包重新登入並開通。",
   "botUnSupportPerp": "當前為Bot錢包帳戶，無法開通永續合約。 請退出後使用挿件錢包重新登入並開通。",
-  "feeRate1": "手續費率"
+  "feeRate1": "手續費率",
+  "Qty":"数量",
+  "filledQty":"成交数量",
+  "filledPrice":"成交价格",
+  "filledType":"成交类型"
 }

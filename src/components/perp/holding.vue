@@ -203,7 +203,7 @@ onUnmounted(() => {
           </div>
         </template>
       </el-table-column>
-      <el-table-column :width="100" align="right" :label="t('amount')" prop="openSize">
+      <el-table-column :width="100" :label="t('Qty')" prop="openSize">
         <template #default="{ row }">
           {{ formatNumber(row.openSize.replace('-', '')) }}
         </template>

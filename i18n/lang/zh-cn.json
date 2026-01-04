@@ -1803,5 +1803,9 @@
   "watchWalletUnSupportPerp": "当前为观察钱包账户，无法开通永续合约。请退出后使用插件钱包重新登录并开通。",
   "botUnSupportPerp": "当前为 Bot 钱包账户，无法开通永续合约。请退出后使用插件钱包重新登录并开通。",
   "orderSizeError": "该订单被标记为只减仓，您不被允许开设新仓位",
-  "feeRate1": "手续费率"
+  "feeRate1": "手续费率",
+  "Qty":"数量",
+  "filledQty":"成交数量",
+  "filledPrice":"成交价格",
+  "filledType":"成交类型"
 }

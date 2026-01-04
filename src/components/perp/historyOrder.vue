@@ -129,12 +129,12 @@ watch(
           <span class="text-14px">{{ typeDict[row.contractId] }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('tradeVolume')" prop="contractSize">
+      <el-table-column :label="t('tradeVolume')" prop="contractSize">
         <template #default="{ row }">
           {{ formatNumber(row.cumMatchSize, 3) }}/{{ formatNumber(row.l2Size, 3) }}
         </template>
       </el-table-column>
-      <el-table-column :minWidth="100" align="right" :label="t('delegatePrice')" prop="fillPrice">
+      <el-table-column :minWidth="100" align="right" :label="t('price')" prop="fillPrice">
         <template #default="{ row }">
           {{
             row.type?.includes?.('MARKET')
@@ -187,7 +187,7 @@ watch(
              </template>
         </template>
       </el-table-column>
-      <el-table-column :min-width="80" align="right" :label="t('tradeType2')" prop="tradeType2">
+      <el-table-column :min-width="80" align="right" :label="t('filledType')" prop="tradeType2">
         <template #default="{ row }">
           {{ t('trades') }}
         </template>
@@ -214,7 +214,7 @@ watch(
           {{ row.reduceOnly ? t('yes') : t('no') }}
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('executionStrategy')" prop="reduceOnly" v-if="route.name !=='perp-id'">
+      <el-table-column v-if="route.name !=='perp-id'" align="right" :label="t('executionStrategy')" prop="reduceOnly">
         <template #default="{ row }">
           <div class="flex items-center justify-end gap-4px">
             {{ row.type?.includes?.('MARKET') ? t('immediateOrCancel') : t('validityPeriod2') }}
@@ -231,7 +231,7 @@ watch(
           </div>
         </template>
       </el-table-column>
-      <el-table-column :min-width="80" align="right" :label="t('operate')">
+      <el-table-column :min-width="80" align="right" :label="t('operation')">
         <template #default="{ row }">
           <el-button
             style="--el-button-active-border-color: transparent"

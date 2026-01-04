@@ -192,7 +192,7 @@ watch(
           </span>
         </template>
       </el-table-column>
-      <el-table-column :min-width="100" align="right" :label="t('delegatePrice')" prop="price">
+      <el-table-column :width="100" :label="t('price')" prop="price">
         <template #default="{ row }">
           {{
             row.type.includes('LIMIT')
@@ -274,7 +274,7 @@ watch(
           {{ dayjs(Number(row.expireTime)).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('operate')" prop="operate">
+      <el-table-column align="right" :label="t('operation')" prop="operate">
         <template #default="{ row }">
           <el-button
             size="small"

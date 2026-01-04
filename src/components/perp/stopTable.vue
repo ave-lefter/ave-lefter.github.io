@@ -46,14 +46,14 @@ const cancelOrder = async (id?: string) => {
 </script>
 
 <template>
-  <el-dialog append-to-body v-model="visible" :title="t('stopLimit')" width="680px">
+  <el-dialog v-model="visible" append-to-body :title="t('stopLimit')" width="680px">
     <el-table
       :data="orderList"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
       cell-class-name="color-[--main-text] text-12px"
       fit
     >
-      <el-table-column :label="t('No')" type="index"></el-table-column>
+      <el-table-column :label="t('No')" type="index"/>
       <el-table-column :width="80" align="right" :label="t('orderType')" prop="orderType">
         <template #default="{ row }">
           <span v-if="row.type.includes('STOP')" class="color-[--down-color]">
@@ -81,7 +81,7 @@ const cancelOrder = async (id?: string) => {
           {{ triggerPriceTypeMap[row.triggerPriceType as keyof typeof triggerPriceTypeMap] }}
         </template>
       </el-table-column>
-      <el-table-column :width="90" align="right" :label="t('delegatePrice')" prop="price">
+      <el-table-column :width="90" align="right" :label="t('price')" prop="price">
         <template #default="{ row }">
           {{
             row.type.includes('LIMIT')

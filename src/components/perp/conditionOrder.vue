@@ -137,12 +137,12 @@ watch(
           <span class="text-14px">{{ typeDict[row.contractId] }}</span>
         </template>
       </el-table-column>
-      <el-table-column :min-width="100" align="right" :label="t('orderSize')" prop="size">
+      <el-table-column :width="100" :label="t('Qty')" prop="size">
         <template #default="{ row }">
           {{ formatNumber(row.size, 10) }} {{ typeDict[row.contractId].replace('USD', '') }}
         </template>
       </el-table-column>
-      <el-table-column :min-width="100" align="right" :label="t('delegatePrice')" prop="price">
+      <el-table-column :min-width="100" align="right" :label="t('price')" prop="price">
         <template #default="{ row }">
           {{
             row.type.includes('LIMIT')
