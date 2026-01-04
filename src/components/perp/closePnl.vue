@@ -117,7 +117,7 @@ watch(
         </AveEmpty>
         <span v-else />
       </template>
-      <el-table-column :label="t('perp')" prop="contractId">
+      <el-table-column :label="t('markets1')" prop="contractId">
         <template #default="{ row }">
           <span class="text-14px">{{ typeDict[row.contractId] }}</span>
         </template>
@@ -147,7 +147,7 @@ watch(
           }}
         </template>
       </el-table-column>
-      <el-table-column :width="80" align="right" :label="t('tradeType')" prop="side">
+      <el-table-column :min-width="80" align="right" :label="t('tradeType')" prop="side">
         <template #default="{ row }">
           <span :class="row.type.includes('BUY') ? 'color-[--up-color]' : 'color-[--down-color]'">{{
             row.type.includes('BUY') ? t('buy') : t('sell')

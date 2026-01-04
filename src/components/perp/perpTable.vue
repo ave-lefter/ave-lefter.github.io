@@ -5,7 +5,7 @@ const { t } = useI18n()
 const activeName = ref(route.query.t ? 'orders' : 'holding')
 const tabs = computed(() => {
   return [
-    { label: t('holding'), value: 'holding' },
+    { label: t('position'), value: 'holding' },
     { label: t('orders'), value: 'orders' },
     { label: t('fundingRate'), value: 'fundingRate' },
     { label: t('fundingRecord'), value: 'fundingRecord' },

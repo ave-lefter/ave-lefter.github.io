@@ -180,7 +180,7 @@ onUnmounted(() => {
         </AveEmpty>
         <span v-else />
       </template>
-      <el-table-column :label="t('perp')" prop="perp">
+      <el-table-column :label="t('markets1')" prop="perp">
         <template #default="{ row }">
           <div class="flex items-center text-14px lh-18px color-[--main-text] gap-4px mb-4px">
             {{ typeDict[row.contractId] }}
@@ -305,7 +305,7 @@ onUnmounted(() => {
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column :width="150" align="right" :label="t('closePosition')" prop="closePosition">
+      <el-table-column :width="150" align="right" :label="t('operation')" prop="closePosition">
         <template #default="{ row }">
           <el-button
             size="small"

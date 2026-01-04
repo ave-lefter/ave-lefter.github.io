@@ -98,7 +98,7 @@ watch(
         </AveEmpty>
         <span v-else />
       </template>
-      <el-table-column :label="t('perp')" prop="contractId">
+      <el-table-column :label="t('markets1')" prop="contractId">
         <template #default="{ row }">
           <span class="text-14px">{{ typeDict[row.contractId] }}</span>
         </template>

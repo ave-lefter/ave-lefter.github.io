@@ -113,8 +113,8 @@ watch(
 
 <template>
   <div
-    class="relative min-h-400px bg-[--secondary-bg]"
     v-infinite-scroll="getList"
+    class="relative min-h-400px bg-[--secondary-bg]"
     :infinite-scroll-delay="200"
     :infinite-scroll-disabled="listStatus.loading || listStatus.finished || listStatus.error"
     :infinite-scroll-immediate="false"
@@ -132,17 +132,17 @@ watch(
         </AveEmpty>
         <span v-else />
       </template>
-      <el-table-column :label="t('perp')" prop="contractId">
+      <el-table-column :label="t('markets1')" prop="contractId">
         <template #default="{ row }">
           <span class="text-14px">{{ typeDict[row.contractId] }}</span>
         </template>
       </el-table-column>
-      <el-table-column :width="100" align="right" :label="t('orderSize')" prop="size">
+      <el-table-column :min-width="100" align="right" :label="t('orderSize')" prop="size">
         <template #default="{ row }">
           {{ formatNumber(row.size, 10) }} {{ typeDict[row.contractId].replace('USD', '') }}
         </template>
       </el-table-column>
-      <el-table-column :width="100" align="right" :label="t('delegatePrice')" prop="price">
+      <el-table-column :min-width="100" align="right" :label="t('delegatePrice')" prop="price">
         <template #default="{ row }">
           {{
             row.type.includes('LIMIT')
@@ -166,14 +166,14 @@ watch(
           {{ triggerPriceTypeMap[row.triggerPriceType as keyof typeof triggerPriceTypeMap] }}
         </template>
       </el-table-column>
-      <el-table-column :width="100" align="right" :label="t('tradeType')" prop="tradeType">
+      <el-table-column :min-width="100" align="right" :label="t('tradeType')" prop="tradeType">
         <template #default="{ row }">
           <span :class="row.side === 'BUY' ? 'color-[--up-color]' : 'color-[--down-color]'">{{
             row.side === 'BUY' ? t('buy') : t('sell')
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column :width="100" align="right" :label="t('orderType')" prop="orderType">
+      <el-table-column :min-width="100" align="right" :label="t('orderType')" prop="orderType">
         <template #default="{ row }">
           <span v-if="row.type.includes('STOP')" class="color-[--down-color]">
             {{ $t('stopLoss') }}
@@ -185,14 +185,14 @@ watch(
       </el-table-column>
       <el-table-column align="right" :label="t('takeProfitStopLoss')" prop="takeProfitStopLoss">
         <template #default="{ row }">
-          <span class="color-[--up-color]" v-if="row.openTp.triggerPrice">{{
+          <span v-if="row.openTp.triggerPrice" class="color-[--up-color]">{{
             formatNumber(row.openTp.triggerPrice, {
               limit: 20,
               decimals: 10,
             })
           }}</span
           ><span v-else>--</span><span class="color-[--icon-color] mx-4px">/</span
-          ><span class="color-[--down-color]" v-if="row.openSl.triggerPrice">
+          ><span v-if="row.openSl.triggerPrice" class="color-[--down-color]">
             {{
               formatNumber(row.openSl.triggerPrice, {
                 limit: 20,
@@ -221,7 +221,7 @@ watch(
           {{ dayjs(Number(row.l2ExpireTime)).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
-      <el-table-column :width="60" align="right" :label="t('operate')" prop="operate">
+      <el-table-column :min-width="60" align="right" :label="t('operation')" prop="operate">
         <template #default="{ row }">
           <el-button
             size="small"

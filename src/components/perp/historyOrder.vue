@@ -123,7 +123,7 @@ watch(
         </AveEmpty>
         <span v-else />
       </template>
-      <el-table-column :label="t('perp')" prop="contractId">
+      <el-table-column :label="t('markets1')" prop="contractId">
         <template #default="{ row }">
           <span class="text-14px">{{ typeDict[row.contractId] }}</span>
         </template>
@@ -133,7 +133,7 @@ watch(
           {{ formatNumber(row.cumMatchSize, 3) }}/{{ formatNumber(row.l2Size, 3) }}
         </template>
       </el-table-column>
-      <el-table-column :width="100" align="right" :label="t('delegatePrice')" prop="fillPrice">
+      <el-table-column :minWidth="100" align="right" :label="t('delegatePrice')" prop="fillPrice">
         <template #default="{ row }">
           {{
             row.type?.includes?.('MARKET')
@@ -162,14 +162,14 @@ watch(
           </template>
         </template>
       </el-table-column>
-      <el-table-column :width="80" align="right" :label="t('tradeType')" prop="side">
+      <el-table-column :min-width="80" align="right" :label="t('tradeType')" prop="side">
         <template #default="{ row }">
           <span :class="row.side === 'BUY' ? 'color-[--up-color]' : 'color-[--down-color]'">{{
             row.side === 'BUY' ? t('buy') : t('sell')
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column :width="80" align="right" :label="t('orderType')" prop="orderType">
+      <el-table-column :min-width="80" align="right" :label="t('orderType')" prop="orderType">
         <template #default="{ row }">
           <!-- <template v-if="row.type==='TAKE_PROFIT_LIMIT'">
            {{ t('takeProfitLimit') }}
@@ -186,12 +186,12 @@ watch(
              </template>
         </template>
       </el-table-column>
-      <el-table-column :width="80" align="right" :label="t('tradeType2')" prop="tradeType2">
+      <el-table-column :min-width="80" align="right" :label="t('tradeType2')" prop="tradeType2">
         <template #default="{ row }">
           {{ t('trades') }}
         </template>
       </el-table-column>
-      <el-table-column :width="80" align="right" :label="t('status')" prop="status">
+      <el-table-column :min-width="80" align="right" :label="t('status')" prop="status">
         <template #default="{ row }">
           {{ statusMap[row.status as keyof typeof statusMap] }}
         </template>
@@ -208,7 +208,7 @@ watch(
           {{ dayjs(Number(row.createdTime)).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
-      <el-table-column :width="80" align="right" :label="t('onlyReduce')" prop="reduceOnly">
+      <el-table-column :min-width="80" align="right" :label="t('onlyReduce')" prop="reduceOnly">
         <template #default="{ row }">
           {{ row.reduceOnly ? t('yes') : t('no') }}
         </template>
@@ -230,7 +230,7 @@ watch(
           </div>
         </template>
       </el-table-column>
-      <el-table-column :width="80" align="right" :label="t('operate')">
+      <el-table-column :min-width="80" align="right" :label="t('operate')">
         <template #default="{ row }">
           <el-button
             style="--el-button-active-border-color: transparent"

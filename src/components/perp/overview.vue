@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BigNumber from 'bignumber.js'
 import { boxopen, profit, ranking, totalPoints } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 
@@ -182,7 +183,7 @@ onMounted(() => {
         <span class="text-14px lh-18px color-[--main-text]">{{
           totalAssets.maxDrawdown === '-1'
             ? '--'
-            : formatNumber(totalAssets.maxDrawdown, 4) * 100 + '%'
+            : BigNumber(totalAssets.maxDrawdown).multipliedBy(100).toFixed(2) + '%'
         }}</span>
       </div>
     </div>

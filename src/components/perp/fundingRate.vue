@@ -124,7 +124,7 @@ const reset = () => {
       @change="reset"
     >
       <template #prefix>
-        <span>{{ t('perp') }}</span>
+        <span>{{ t('markets1') }}</span>
       </template>
       <el-option
         v-for="item in typeOptions"
@@ -187,7 +187,7 @@ const reset = () => {
           {{ dayjs(+row.fundingTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('perp')" prop="contractId">
+      <el-table-column align="right" :label="t('markets1')" prop="contractId">
         <template #default="{ row }">
           {{ typeDict[row.contractId] }}
         </template>
