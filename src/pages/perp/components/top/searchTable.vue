@@ -40,7 +40,7 @@
         class="flex-end cursor-pointer select-none"
         @click.stop="switchSort('value')"
       >
-        {{ $t('amountB') }}
+        {{ $t('vol') }}
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
