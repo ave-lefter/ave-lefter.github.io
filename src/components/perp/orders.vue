@@ -6,12 +6,20 @@ const route = useRoute()
 const { t } = useI18n()
 const perpStore = usePerpStore()
 const tabs = ref([
-  { label: t('currentOrder'), value: 'currentOrder' },
-  { label: t('conditionOrder'), value: 'conditionOrder' },
-  { label: t('orderDetail'), value: 'orderDetail' },
-  { label: t('historyOrder'), value: 'historyOrder' },
-  { label: t('closePnl'), value: 'closePnl' },
-  { label: t('positionHistory'), value: 'positionHistory' },
+  { get label(){
+    return t('currentOrder')
+  }, value: 'currentOrder' },
+  { get label(){
+    return t('conditionOrder')
+  }, value: 'conditionOrder' },
+  { get label(){
+    return t('orderDetail')
+  }, value: 'orderDetail' },
+  { get label(){
+    return t('historyOrder')
+  }, value: 'historyOrder' },
+  { get label(){ return t('closePnl') }, value: 'closePnl' },
+  { get label(){ return t('positionHistory') }, value: 'positionHistory' },
 ])
 const componentsMap = {
   currentOrder: defineAsyncComponent(() => import('./currentOrder.vue')),
