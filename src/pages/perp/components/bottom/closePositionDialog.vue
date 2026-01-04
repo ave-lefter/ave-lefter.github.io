@@ -24,7 +24,7 @@
             >
           </div>
           <div class="flex-between mt-10px">
-            <span class="color-[--secondary-text] text-12px">{{ $t('orderSize') }}</span>
+            <span class="color-[--secondary-text] text-12px">{{ $t('orderQuantity') }}</span>
             <span class="color-[--third-text] text-12px">{{
               formatNumber(item.openSize.replace('-', ''))
             }} {{ getCoinName(item.contractId) }}</span>
@@ -37,12 +37,14 @@
         :title="$t('closePositionTip')"
         :closable="false"
         show-icon
+        class="close-alert"
         :style="{
           backgroundColor: '#FFA6221A',
           color: '#FFA622',
           border: 'none',
           fontSize: '12px',
-          '--el-alert-title-font-size': '12px'
+          '--el-alert-title-font-size': '12px',
+          lineHeight: '1'
         }"
       />
       <div class="text-center mt-30px flex-between">
@@ -151,4 +153,8 @@ async function submit() {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .close-alert :deep(.el-alert__title) {
+    line-height: 1.2;
+  }
+</style>

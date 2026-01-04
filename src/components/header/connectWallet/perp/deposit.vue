@@ -2,7 +2,7 @@
   <div class="perp-deposit">
     <div class="flex items-center color-[--yellow] text-12px mb-15px">
       <Icon name="carbon:warning-filled" class="text-14px  color-[--yellow] mr-3px mb--1px" />
-      <span>{{ $t('perpDepositTips') }}</span>
+      <span class="flex-1">{{ $t('perpDepositTips') }}</span>
     </div>
     <el-select
       v-model="depositForm.token"
@@ -70,7 +70,7 @@
       </template>
     </el-input>
     <div class="text-12px color-[--third-text] mt-8px text-right">
-      <span>{{ $t('availableBalance') }}: </span><span>{{ formatNumber(balance, 3) }} {{ depositForm?.token || '' }}</span>
+      <span>{{ $t('available') }}: </span><span>{{ formatNumber(balance, 3) }} {{ depositForm?.token || '' }}</span>
       <span v-if="depositForm.amount && BigNumber(depositForm.amount).gt(0) && BigNumber(balance).minus(depositForm.amount || 0).gte(0)"> -> {{ formatNumber(BigNumber(balance).minus(depositForm.amount || 0).toFixed(), 6) }} {{ depositForm?.token || '' }}</span>
     </div>
     <div v-if="!isApprove && isCanDeposit" class="flex flex-col items-center justify-center text-center mt-20px">

@@ -56,7 +56,6 @@
   "viewMoreTransactions": "Daha fazla işlem kaydı görüntüle",
   "noFollowedWalletPurchases": "Takip edilen cüzdanların şu anda zincirde satın alma kaydı yok",
   "copyContract": "Sözleşme adresini kopyala",
-  "copyTokenName": "Adı kopyala",
   "addToGroup": "Gruba ekle",
   "volumeOneHour": "1s Hacim",
   "name": "Ad",
@@ -579,5 +578,6 @@
   "preview": "Önizleme",
   "top20Remarked": "EN İYİ 20 Kısa Açıklama",
   "deposit": "tamamlamak",
-  "value1": "değer"
+  "value1": "değer",
+  "action": "işletmek"
 }

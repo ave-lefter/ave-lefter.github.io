@@ -362,7 +362,7 @@ function _createSlOrder() {
             :controls="false"
             align="left"
             class="w-100px text-12px"
-            :placeholder="t('RIO')"
+            :placeholder="t('returnRate')"
             @update:model-value="val => tpPercentChange(val as number, 1)"
           >
             <template #suffix> % </template>
@@ -449,7 +449,7 @@ function _createSlOrder() {
             :controls="false"
             align="left"
             class="w-100px text-12px"
-            :placeholder="t('RIO')"
+            :placeholder="t('returnRate')"
             @update:model-value="val => slPercentChange(val as number, 1)"
           >
           <template #prefix><span class="color-[--main-text]">{{ BigNumber(tempData?.slPercent || 0).gt(0) ? '-' : '' }}</span></template>
@@ -492,7 +492,7 @@ function _createSlOrder() {
             class="[&&]:w-full"
             :controls="false"
             align="left"
-            :placeholder="t('orderSize')"
+            :placeholder="t('orderQuantity')"
             :max="Math.abs(Number(row?.openSize || '0'))"
             @change="(val) => sizeChange(val as number)"
           />
@@ -514,14 +514,14 @@ function _createSlOrder() {
           @change="val => sizePercentChange(val as number)"
         />
         <div class="mt-53px flex items-center justify-between">
-          <span class="color-[--third-text]">{{ t('contractSize') }}</span>
+          <span class="color-[--third-text]">{{ t('positionQty') }}</span>
           <span
             >{{ Math.abs(Number(props.row?.openSize || '0'))
             }} {{ typeDict[props.row?.contractId || ''].replace('USD', '') }}</span
           >
         </div>
         <div class="mt-16px mb-40px flex items-center justify-between">
-          <span class="color-[--third-text]">{{ t('orderSize') }}</span>
+          <span class="color-[--third-text]">{{ t('orderQuantity') }}</span>
           <span>{{ size || '0.0' }} {{ typeDict[props.row?.contractId || ''].replace('USD', '') }}</span>
         </div>
         <div class="flex">

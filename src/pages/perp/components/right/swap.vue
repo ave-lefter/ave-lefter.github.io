@@ -2,7 +2,7 @@
   <el-tabs v-model="swapType" class="select-tabs mt-5px mb-12px">
     <el-tab-pane v-for="(item, index) in types" :key="index" :label="item.name" :name="item.value"/>
   </el-tabs>
-  <div class="text-12px color-[--secondary-text] mb-12px text-right">{{ $t('availableBalance') }}: {{ formatNumber(availableBalance, 4) }} USD</div>
+  <div class="text-12px color-[--secondary-text] mb-12px text-right">{{ $t('available') }}: {{ formatNumber(availableBalance, 4) }} USD</div>
   <el-form ref="formRef" :model="form" label-width="auto" :rules="rules" @submit.prevent>
     <el-form-item v-if="swapType === 'LIMIT'" label="" prop="price" style="margin-bottom: 15px;">
       <el-input-number
@@ -105,7 +105,7 @@
             align="left"
             :precision="pricePrecision"
             class="flex-1 input-number"
-            :placeholder="t('TP')"
+            :placeholder="t('TP1')"
             size="large"
             clearable
             @update:model-value="value => tpPriceChange(value)"
@@ -173,7 +173,7 @@
              class="flex-1 input-number"
             align="left"
             size="large"
-            :placeholder="t('SL')"
+            :placeholder="t('SL1')"
             @update:model-value="value => slPriceChange(value)"
           >
             <!-- <template #suffix>
@@ -275,7 +275,7 @@
       <span class="color-[--up-color]">{{ formatNumber(maxAmountBuy, { decimals: 4, limit: 8}) }} {{  perpStore.unit?.coinName || ''  }}</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ formatNumber(maxAmountSell, { decimals: 4, limit: 8}) }}  {{  perpStore.unit?.coinName || ''  }}</span>
     </li>
     <li v-if="!form.reduceOnly" class="flex items-center mt-8px">
-      <span class="mr-auto">{{ $t('estimatedLiquidationPrice') }}</span>
+      <span class="mr-auto">{{ $t('estimatedLiquidationPrice1') }}</span>
       <span class="color-[--up-color]">{{ BigNumber(getSize()).gt(0) && BigNumber(liquidatePriceBuy).gt(0) ? formatNumber(liquidatePriceBuy, pricePrecision) : '-' }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ BigNumber(getSize(1)).gt(0) && BigNumber(liquidatePriceSell).gt(0) ? formatNumber(liquidatePriceSell, { decimals: pricePrecision, limit: 8}) : '-' }} USD</span>
     </li>
     <li class="flex items-center mt-8px">

@@ -274,7 +274,7 @@ watch(
           {{ dayjs(Number(row.expireTime)).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('operation')" prop="operate">
+      <el-table-column align="right" :label="t('action')" prop="operate">
         <template #default="{ row }">
           <el-button
             size="small"
