@@ -200,7 +200,7 @@ watch(
       <el-table-column align="right" :label="t('orderId')" prop="orderId">
         <template #default="{ row }">
           <div class="flex items-center justify-end gap-4px">
-            {{ row.id }}<Icon v-copy="row.id" name="bxs:copy" class="color-[#5A5E64]" />
+            {{ row.id.slice(0,4) }}...{{ row.id.slice(-4) }}<Icon v-copy="row.id" name="bxs:copy" class="color-[#5A5E64]" />
           </div>
         </template>
       </el-table-column>
