@@ -3,7 +3,7 @@
     <el-popover
       v-model:visible="visible"
       popper-class="[--el-popover-bg-color:--border]"
-      :width="640"
+      :width="750"
       placement="bottom-start"
       trigger="click"
       popper-style="padding: 0px"

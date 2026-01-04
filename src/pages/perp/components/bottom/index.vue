@@ -11,7 +11,7 @@ const perpStore = usePerpStore()
 const dialogVisible= shallowRef(false)
 const tabs = computed<Array<{ label: string; value: keyof typeof componentsMap }>>(() => {
   return [
-    { label: t('holding')+ (filterListData.value?.length > 0 ? `(${filterListData.value?.length})` : ''), value: 'holding' },
+    { label: t('positions')+ (filterListData.value?.length > 0 ? `(${filterListData.value?.length})` : ''), value: 'holding' },
     { label: t('currentOrder') + (order.value?.length > 0 ? `(${order.value?.length})` : ''), value: 'currentOrder' },
     // { label: t('conditionOrder'), value: 'conditionOrder' },
     { label: t('orderDetail'), value: 'orderDetail' },

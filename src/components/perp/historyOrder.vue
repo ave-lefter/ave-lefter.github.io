@@ -5,6 +5,7 @@ import { usePerpStore } from '~/stores/perp'
 
 const walletStore = useWalletStore()
 const perpStore = usePerpStore()
+const route = useRoute()
 const { t } = useI18n()
 const props = defineProps<{
   searchParams: any
@@ -213,7 +214,7 @@ watch(
           {{ row.reduceOnly ? t('yes') : t('no') }}
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('executionStrategy')" prop="reduceOnly">
+      <el-table-column align="right" :label="t('executionStrategy')" prop="reduceOnly" v-if="route.name !=='perp-id'">
         <template #default="{ row }">
           <div class="flex items-center justify-end gap-4px">
             {{ row.type?.includes?.('MARKET') ? t('immediateOrCancel') : t('validityPeriod2') }}
