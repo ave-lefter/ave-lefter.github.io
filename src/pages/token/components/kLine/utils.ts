@@ -539,8 +539,12 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
     resetAvgPriceLineId: () => {
       const _widget = getWidget()
       const chart = _widget?.activeChart?.()
-      chart?.removeEntity?.(lineIdObj.buy)
-      chart?.removeEntity?.(lineIdObj.sell)
+      if(lineIdObj.buy){
+        chart?.removeEntity?.(lineIdObj.buy)
+      }
+      if(lineIdObj.sell){
+        chart?.removeEntity?.(lineIdObj.sell)
+      }
       lineIdObj.buy = '' as EntityId
       lineIdObj.sell = '' as EntityId
     }
