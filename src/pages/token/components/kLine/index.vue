@@ -14,40 +14,58 @@
   <div v-show="globalStore.klineSettingPop.visible" :style="globalStore.klineSettingPop.style" class="absolute p-20px bg-[--dialog-bg] rounded-8px w-320px text-14px" @click.stop>
     <div class="flex justify-between items-center mb-16px">
       {{ $t('chainToken') }}
-      <el-switch size="middle"/>
+      <el-switch v-model="markVisible" class="[&&]:h-20px"/>
     </div>
-    <div class="flex flex-wrap gap-row-16px">
-      <el-checkbox v-for="item in marksTabs" :key="item.id" class="flex-basis-1/3 [&&]:mr-0 [&&]:[--el-checkbox-height:16px]">
+    <template v-if="markVisible">
+      <div class="flex flex-wrap gap-row-16px">
+      <el-checkbox v-for="item in marksTabs" :key="item.id" v-model="markTabsChecked[item.id]" class="flex-basis-1/3 [&&]:mr-0 [&&]:[--el-checkbox-height:16px]">
         {{ item.name }}
       </el-checkbox>
     </div>
     <div class="my-24px h-1px border-t-solid border-t-[--dialog-divider]"/>
     <div class="flex flex-col gap-16px">
-      {{ $t('指标线') }}
-      <div>
-        <el-checkbox class="[&&]:[--el-checkbox-height:16px]">买均线</el-checkbox>
-        <div/>
+      指标线
+      <div class="flex justify-between">
+        <el-checkbox v-model="markLinesChecked.buy.checked" class="[&&]:[--el-checkbox-height:16px]">买均线</el-checkbox>
+        <div ref="colorPickerTrigger" class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: markLinesChecked.buy.color}" @click.stop="openColorPicker"/>
       </div>
-      <div>
-        <el-checkbox class="[&&]:[--el-checkbox-height:16px]">卖均线</el-checkbox>
-        <div/>
+      <div class="flex justify-between">
+        <el-checkbox v-model="markLinesChecked.sell.checked" class="[&&]:[--el-checkbox-height:16px]">卖均线</el-checkbox>
+        <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: markLinesChecked.sell.color}" @click.stop="openColorPicker"/>
       </div>
     </div>
     <div class="my-24px h-1px border-t-solid border-t-[--dialog-divider]"/>
     <div class="flex flex-col gap-16px">
       {{ $t('top100') }}
-      <div>
-        <el-checkbox class="[&&]:[--el-checkbox-height:16px]">买均线</el-checkbox>
-        <div/>
+      <div class="flex justify-between">
+        <el-checkbox v-model="markLinesChecked.top100Buy.checked" class="[&&]:[--el-checkbox-height:16px]">持币大户买入均线</el-checkbox>
+        <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: markLinesChecked.top100Buy.color}" @click.stop="openColorPicker"/>
       </div>
-      <div>
-        <el-checkbox class="[&&]:[--el-checkbox-height:16px]">卖均线</el-checkbox>
-        <div/>
+      <div class="flex justify-between">
+        <el-checkbox v-model="markLinesChecked.top100Sell.checked" class="[&&]:[--el-checkbox-height:16px]">持币大户卖出均线</el-checkbox>
+        <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: markLinesChecked.top100Sell.color}" @click.stop="openColorPicker"/>
       </div>
     </div>
+    </template>
+    <el-tooltip
+    v-model:visible="colorPickerVisible"
+      :teleported="false"
+      placement="bottom"
+      trigger="click"
+      virtual-triggering
+      :virtual-ref="virtualRef!"
+    >
+     <template #content> 
+<el-color-picker-panel>
+  <template #append>
+    <el-button>Confirm</el-button>
+  </template>
+</el-color-picker-panel>
+     </template>
+    </el-tooltip>
     <div class="flex justify-between items-center mt-16px">
-      {{ $t('点击图标筛选') }}
-      <el-switch size="middle"/>
+      点击图标筛选
+      <el-switch v-model="globalStore.isClickKlineFilter" class="[&&]:h-20px"/>
     </div>
   </div>
   
@@ -85,6 +103,8 @@ const token = computed(() => {
 
 const klinePair = ref('')
 
+const colorPickerVisible = ref(false)
+const virtualRef = ref<HTMLElement | null>(null)
 const isReady = ref(false)
 let isReadyLine = false
 let isHeaderReady = false
@@ -344,7 +364,7 @@ function createResetBtn() {
 }
 
 
-const { getMarks, marksTabs, wsTxUpdateMarks,profilingMarksCache,createDisplayButton } = useKlineMarks()
+const { getMarks, marksTabs,markTabsChecked, wsTxUpdateMarks,profilingMarksCache,createDisplayButton,markLinesChecked,markVisible } = useKlineMarks()
 
 watch(marksTabs, () => {
   _createHeaderButton()
@@ -953,10 +973,16 @@ onBeforeUnmount(() => {
   isUnload = true
 })
 
-const clickHandler = ()=> {
-  console.log('debug')
-    globalStore.klineSettingPop.visible=false
-  }
+const openColorPicker = (e: MouseEvent) => {
+  virtualRef.value = e.currentTarget as unknown as HTMLElement
+  setTimeout(() => {
+    colorPickerVisible.value = true
+  }, 20)
+}
+
+const clickHandler = () => {
+  globalStore.klineSettingPop.visible = false
+}
 onMounted(() => {
   initChart()
   useVisibilityChange(() => {
