@@ -167,7 +167,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="relative">
+  <div class="relative min-h-400px bg-[--secondary-bg]">
     <el-table
       fit
       :data="filterListData"
