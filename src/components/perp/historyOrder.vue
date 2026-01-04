@@ -28,7 +28,7 @@ const triggerPriceTypeMap = {
 }
 const statusMap = {
   CANCELED: t('cancelled1'),
-  FILLED: t('completed'),
+  FILLED: t('filled'),
 }
 const typeDict = computed(() => {
   const contractMap =
@@ -231,7 +231,7 @@ watch(
           </div>
         </template>
       </el-table-column>
-      <el-table-column :min-width="80" align="right" :label="t('operation')">
+      <el-table-column :min-width="80" align="right" :label="t('action')">
         <template #default="{ row }">
           <el-button
             style="--el-button-active-border-color: transparent"

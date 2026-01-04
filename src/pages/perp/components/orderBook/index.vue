@@ -286,7 +286,7 @@ const tabs = computed(() => {
       value: 'orderbook',
     },
     {
-      label: t('lastTx'),
+      label: t('recentTrades'),
       value: 'history',
     },
   ]

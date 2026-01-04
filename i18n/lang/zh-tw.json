@@ -1801,5 +1801,8 @@
   "orderSizeError": "該訂單被標記為只減倉，您不被允許開設新倉位",
   "7DayProfitLoss": "7天盈虧金額",
   "pumpNotice": "內外盤提示",
-  "pause": "暫停"
+  "pause": "暫停",
+  "action": "操作",
+  "filled": "已完成",
+  "recentTrades": "最近交易"
 }

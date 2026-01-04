@@ -1547,7 +1547,7 @@
   "fundingRecord": "Funding Record",
   "contract": "Contract",
   "orderSize": "Order Size",
-  "contractValue": "Contract Value(USD)",
+  "contractValue": "Value(USD)",
   "entryPrice": "Entry Price",
   "oraclePrice": "Oracle Price",
   "estimatedLiquidationPrice": "Liq.Price",
@@ -1560,7 +1560,7 @@
   "historyOrder": "Order History",
   "closePnl": "Closed P&L",
   "positionHistory": "Position History",
-  "tradeVolume": "Trade Volume",
+  "tradeVolume": "Filled/Total",
   "tradeType": "Trade Type",
   "orderId": "Order No.",
   "orderTime": "Order Time",
@@ -1813,5 +1813,8 @@
   "positionQty": "Position Qty",
   "orderQuantity": "Order Quantity",
   "estimatedPL": "Estimated P&L",
-  "7DayProfitLoss": "7-day profit and loss amount"
+  "7DayProfitLoss": "7-day profit and loss amount",
+  "action": "Action",
+  "filled": "Filled",
+  "recentTrades": "Recent Trades"
 }

@@ -1801,10 +1801,10 @@
   "botUnSupportPerp": "当前为 Bot 钱包账户，无法开通永续合约。请退出后使用插件钱包重新登录并开通。",
   "orderSizeError": "该订单被标记为只减仓，您不被允许开设新仓位",
   "feeRate1": "手续费率",
-  "Qty":"数量",
-  "filledQty":"成交数量",
-  "filledPrice":"成交价格",
-  "filledType":"成交类型",
+  "Qty": "数量",
+  "filledQty": "成交数量",
+  "filledPrice": "成交价格",
+  "filledType": "成交类型",
   "available": "可用资产",
   "estimatedLiquidationPrice1": "预估强平价",
   "unrealizedPnl1": "未结盈亏",
@@ -1813,5 +1813,8 @@
   "returnRate": "收益率",
   "positionQty": "合约数量",
   "orderQuantity": "委托数量",
-  "estimatedPL": "预计盈亏"
+  "estimatedPL": "预计盈亏",
+  "action": "操作",
+  "filled": "已完成",
+  "recentTrades": "最近交易"
 }
