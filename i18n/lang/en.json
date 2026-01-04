@@ -1596,5 +1596,6 @@
   "bindAddress":"Using Jito Bundle, traders can determine transaction priority by tipping validators, ensuring sequential and atomic execution",
   "fishing":"Refers to other addresses that have sent the current token to this address, typically representing the distribution of chips",
   "dev2":"Token creator related addresses",
-  "mouse":"Addresses identified by the platform as obtaining chips through improper means (rat warehouse), typically related to DEV or insider addresses"
+  "mouse":"Addresses identified by the platform as obtaining chips through improper means (rat warehouse), typically related to DEV or insider addresses",
+  "devBestToken":"Top Tokens by DEV Holdings"
 }
