@@ -38,38 +38,38 @@
       </div>
       <div
         class="flex-end cursor-pointer select-none"
-        @click.stop="switchSort('size')"
+        @click.stop="switchSort('value')"
       >
         {{ $t('amountB') }}
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
-            ${getActiveClass(-1, 'size', 'b')}
+            ${getActiveClass(-1, 'value', 'b')}
             `"
-            @click.stop="switchSort('size', -1)"
+            @click.stop="switchSort('value', -1)"
           />
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer
-            ${getActiveClass(1, 'size', 't')}
+            ${getActiveClass(1, 'value', 't')}
             `"
-            @click.stop="switchSort('size', 1)"
+            @click.stop="switchSort('value', 1)"
           />
         </div>
       </div>
-      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('openInterest')">
+      <div class="flex-end cursor-pointer select-none" @click.stop="switchSort('openInterests')">
         {{ $t('openInterest') }}
         <div class="flex flex-col items-center justify-center ml-5px">
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer
-            ${getActiveClass(-1, 'openInterest', 'b')}
+            ${getActiveClass(-1, 'openInterests', 'b')}
             `"
-            @click.stop="switchSort('openInterest', -1)"
+            @click.stop="switchSort('openInterests', -1)"
           />
           <i
             :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer
-            ${getActiveClass(1, 'openInterest', 't')}
+            ${getActiveClass(1, 'openInterests', 't')}
             `"
-            @click.stop="switchSort('openInterest', 1)"
+            @click.stop="switchSort('openInterests', 1)"
           />
         </div>
       </div>
@@ -196,7 +196,11 @@ const sortBy = shallowRef<string>('value')
 
 
 const tokens1 = computed(() => {
-  const list = props.tokens?.slice(0)
+  let list = props.tokens?.slice(0)
+  list = list.map(i => ({
+    ...i,
+    openInterests: BigNumber(i?.openInterest || 0).times(i.indexPrice || 0).toFixed()
+  }))
   if (activeSort.value === 0 || sortBy.value === '') {
     return props.tokens
   } else {

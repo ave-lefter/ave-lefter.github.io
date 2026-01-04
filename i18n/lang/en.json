@@ -1692,7 +1692,7 @@
   "midPrice": "Mid Price",
   "cancelOrder": "Cancel Order",
   "oraclePriceTooltip": "The oracle price draws data from an external independent node service provider, which is used to calculate your liquidation price and position margin.",
-  "perpetual": "Perpetual",
+  "perpetual": "Perpetuals",
   "indexPriceTooltip": "The Index Price is a composite price derived from the weighted average calculation of prices across multiple major exchanges.",
   "24HChange": "24H Change",
   "24HHighPrice": "24H Highest Price",
