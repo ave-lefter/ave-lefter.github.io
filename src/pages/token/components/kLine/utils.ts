@@ -2,7 +2,7 @@
 import type { Mark, ChartingLibraryWidgetConstructor, IChartingLibraryWidget, EntityId, DrawingEventType } from '~/types/tradingview/charting_library'
 import { formatNumber, formatDec } from '@/utils/formatNumber'
 import type {  KLineBar, SimpleWSTx, WSTx } from './types'
-import { useDocumentVisibility, useEventBus } from '@vueuse/core'
+import { useDebounceFn, useDocumentVisibility, useEventBus, type RemovableRef } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
 import { bot_getUserPendingTx, bot_cancelLimitOrdersByBatch } from '~/api/token'
 import { RESOLUTION_KEY, QUICK_KEY } from './constant'
@@ -438,7 +438,28 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
   }
 }
 
-export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | null, getIsReady: () => boolean, showMarket: Ref<boolean>) {
+export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | null, getIsReady: () => boolean, showMarket: Ref<boolean>,linesChecked: RemovableRef<{
+    buy: {
+        checked: boolean;
+        color: string;
+    };
+    sell: {
+        checked: boolean;
+        color: string;
+    };
+    top100Buy: {
+        checked: boolean;
+        color: string;
+    };
+    top100Sell: {
+        checked: boolean;
+        color: string;
+    };
+}>) {
+  const avePriceCache = {
+    buyAvgPrice: 0,
+    sellAvgPrice: 0
+  }
   const lineIdObj = {
     sell: '' as EntityId,
     buy: '' as EntityId
@@ -454,6 +475,7 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
       price = new BigNumber(price).times(useTokenStore().circulation || '0')?.toNumber()
     }
     const property = isBuy ? 'buy' : 'sell'
+    const linecolor = isBuy ? (linesChecked.value.top100Buy.color) : (linesChecked.value.top100Sell.color)
     if (lineIdObj[property]) {
       const line = chart?.getShapeById?.(lineIdObj[property])
       if (line) {
@@ -463,6 +485,10 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
           return
         }
         line?.setPoints?.([{ price: price, time: 0 }])
+        line?.setProperties?.({
+          linecolor,
+          textcolor: linecolor,
+        })
         return
       }
     } else {
@@ -471,7 +497,7 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
     if (isCreating) return
     isCreating = true
 
-    const linecolor = getCssVariable(isBuy ? '--up-color' : '--down-color')
+    
     lineIdObj[property] = await chart?.createShape?.(
       { price: price, time: 0 }, // 水平线的起始位置
       {
@@ -484,7 +510,7 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
         overrides: {
           linecolor: linecolor,  // 线的颜色
           linewidth: 1,          // 线的粗细
-          linestyle: 0        // 线的样式：0表示实线，1表示虚线 2 长虚线
+          linestyle: 1        // 线的样式：0表示实线，1表示虚线 2 长虚线
         },
       }
     )
@@ -502,7 +528,8 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
 
   const avgPriceEvent = useEventBus<number>('top100Price')
   avgPriceEvent.on((buyAvgPrice, sellAvgPrice) => {
-    console.log('--------avgPriceEvent---------', buyAvgPrice, sellAvgPrice)
+    avePriceCache.buyAvgPrice = buyAvgPrice
+    avePriceCache.sellAvgPrice = sellAvgPrice
     createAvgPriceLinePoll(buyAvgPrice,sellAvgPrice)
   })
 
@@ -524,9 +551,13 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
 
       const isReady = getIsReady()
       if (isReady) {
-        await createAvgPriceLine(buyAvgPrice,true)
+        if(linesChecked.value.top100Buy.checked){
+          await createAvgPriceLine(buyAvgPrice,true)
+        }
         await sleep(100)
-        createAvgPriceLine(sellAvgPrice,false)
+        if(linesChecked.value.top100Sell.checked){
+          await createAvgPriceLine(sellAvgPrice,false)
+        }
         return
       }
 
@@ -534,6 +565,35 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
       retry++
     }
   }
+
+  watch(()=>linesChecked.value.top100Buy.checked,val=>{
+    if(val && avePriceCache.buyAvgPrice){
+      createAvgPriceLine(avePriceCache.buyAvgPrice,true)
+    } else {
+      createAvgPriceLine(0,true)
+    }
+  })
+
+  watch(()=>linesChecked.value.top100Sell.checked,val=>{
+    if(val && avePriceCache.sellAvgPrice){
+      createAvgPriceLine(avePriceCache.sellAvgPrice,false)
+    } else {
+      createAvgPriceLine(0,false)
+    }
+  })
+
+  watch(()=>linesChecked.value.top100Buy.color,()=>{
+    if(linesChecked.value.top100Buy.checked && avePriceCache.buyAvgPrice){
+      createAvgPriceLine(avePriceCache.buyAvgPrice,true)
+    }
+  })
+
+  watch(()=>linesChecked.value.top100Sell.color,useDebounceFn(()=>{
+    if(linesChecked.value.top100Sell.checked && avePriceCache.sellAvgPrice){
+      console.log('debug')
+      createAvgPriceLine(avePriceCache.sellAvgPrice,false)
+    }
+  },300))
 
   return {
     resetAvgPriceLineId: () => {

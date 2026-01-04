@@ -44,7 +44,7 @@ export function useKlineMarks() {
     })))
   })
 
-  const markVisible = useLocalStorage('tv_markVisible',true)
+  const markTabsVisible = useLocalStorage('tv_markTabsVisible',true)
   const markTabsChecked: RemovableRef<{ [key: string]: boolean }> = useLocalStorage('tv_markTabsChecked', {
     trade: true,
     16: false,
@@ -52,24 +52,6 @@ export function useKlineMarks() {
     25: true,
     30: false,
     31: true
-  })
-  const markLinesChecked= useLocalStorage('tv_markLines', {
-    'buy': {
-      checked:true,
-      color:'#12B886'
-    },
-    'sell': {
-      checked:true,
-      color:'#F6465D'
-    },
-    'top100Buy': {
-      checked:false,
-      color:'#0D6EFD'
-    },
-    'top100Sell': {
-      checked:false,
-      color:'#FD3E3E'
-    },
   })
 
   function createDisplayButton(_widget: IChartingLibraryWidget | null,headerBtns: HTMLElement[]){
@@ -79,7 +61,7 @@ export function useKlineMarks() {
     btn.onclick = () => {
       const rect = btn.getBoundingClientRect()
       globalStore.klineSettingPop.style = {
-        left: rect.left +'px',
+        left: rect.left - 320 + 44 +'px',
         top: rect.top + 34 +'px',
       }
       globalStore.klineSettingPop.visible = true
@@ -478,8 +460,7 @@ ${formatDate(entry.time, 'YYYY-MM-DD HH:mm')}
     wsTxUpdateMarks,
     profilingMarksCache,
     createDisplayButton,
-    markLinesChecked,
-    markVisible
+    markTabsVisible
   }
 }
 
