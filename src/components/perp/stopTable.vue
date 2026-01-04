@@ -48,13 +48,13 @@ const cancelOrder = async (id?: string) => {
 <template>
   <el-dialog v-model="visible" append-to-body :title="t('stopLimit')" width="800px">
     <el-table
-      :data="orderList"
+      :data="orderList?.toSorted((a,b)=> (b?.createdTime || 0) - (a?.createdTime || 0))"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
       cell-class-name="color-[--main-text] text-12px"
       fit
     >
-      <el-table-column :label="t('No')" type="index"/>
-      <el-table-column :width="80" align="right" :label="t('orderType')" prop="orderType">
+      <el-table-column width="50" :label="t('No')" type="index"/>
+      <el-table-column align="right" :label="t('orderType')" prop="orderType">
         <template #default="{ row }">
           <span v-if="row.type.includes('STOP')" class="color-[--down-color]">
             {{ $t('stopLoss') }}
@@ -64,12 +64,12 @@ const cancelOrder = async (id?: string) => {
           </span>
         </template>
       </el-table-column>
-      <el-table-column :width="100" align="right" :label="t('orderSize')" prop="size">
+      <el-table-column  align="right" :label="t('orderSize')" prop="size">
         <template #default="{ row }">
           {{ formatNumber(row.size, 10) }} {{ typeDict[row.contractId].replace('USD', '') }}
         </template>
       </el-table-column>
-      <el-table-column align="right" :label="t('triggerPrice')" prop="triggerPrice">
+      <el-table-column min-width="150" align="right" :label="t('triggerPrice')" prop="triggerPrice">
         <template #default="{ row }">
           {{ row.triggerSign
           }}{{
@@ -81,7 +81,7 @@ const cancelOrder = async (id?: string) => {
           {{ triggerPriceTypeMap[row.triggerPriceType as keyof typeof triggerPriceTypeMap] }}
         </template>
       </el-table-column>
-      <el-table-column :width="90" align="right" :label="t('price')" prop="price">
+      <el-table-column align="right" :label="t('price')" prop="price">
         <template #default="{ row }">
           {{
             row.type.includes('LIMIT')
@@ -93,12 +93,12 @@ const cancelOrder = async (id?: string) => {
           }}
         </template>
       </el-table-column>
-      <el-table-column :width="140" align="right" :label="t('orderTime')" prop="createdTime">
+      <el-table-column min-width="150"  align="right" :label="t('orderTime')" prop="createdTime">
         <template #default="{ row }">
           {{ dayjs(Number(row.createdTime)).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
-      <el-table-column :width="50" align="right" :label="t('operation')" prop="operate">
+      <el-table-column :width="100" align="right" :label="t('action')" prop="operate">
         <template #default="{ row }">
           <Icon
             name="custom:delete"
