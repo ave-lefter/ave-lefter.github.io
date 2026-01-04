@@ -333,7 +333,7 @@
   "tokenHolders": "Token Sahipleri",
   "24Volume": "24 Saatlik Hacim",
   "addLiquidity": "Likidite Ekle",
-  "stopLimit": "Stop Limit",
+  "stopLimit": "TP/SL",
   "pleaseSelectToken": "Seç",
   "max": "Maksimum",
   "selectToken": "Token Seç",

@@ -279,7 +279,7 @@
       <span class="color-[--up-color]">{{ BigNumber(getSize()).gt(0) && BigNumber(liquidatePriceBuy).gt(0) ? formatNumber(liquidatePriceBuy, pricePrecision) : '-' }} USD</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ BigNumber(getSize(1)).gt(0) && BigNumber(liquidatePriceSell).gt(0) ? formatNumber(liquidatePriceSell, { decimals: pricePrecision, limit: 8}) : '-' }} USD</span>
     </li>
     <li class="flex items-center mt-8px">
-      <span class="mr-auto">{{ $t('fee') }}</span>
+      <span class="mr-auto">{{ $t('feeRate1') }}</span>
       <span class="color-[--up-color]">{{ $t('taker') }} {{ formatNumber(feeRate.takerFeeRate) }}%</span><span class="color-[--icon-color] mx-2px">/</span><span class="color-[--down-color]">{{ $t('maker') }} {{ formatNumber(feeRate.makerFeeRate) }}%</span>
     </li>
   </ul>

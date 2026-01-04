@@ -520,7 +520,7 @@
   "tokenHolders": "Người nắm giữ",
   "24Volume": "KL 24h",
   "addLiquidity": "Thanh khoản",
-  "stopLimit": "Stop Limit",
+  "stopLimit": "TP/SL",
   "pleaseSelectToken": "Chọn",
   "max": "Tối đa",
   "selectToken": "Chọn token",
