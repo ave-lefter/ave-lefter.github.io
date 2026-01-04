@@ -403,7 +403,7 @@ async function initChart() {
               if (lastBar) {
                 lastBar.time = lastBar.time
               }
-              noData = bars?.length < 100
+              noData = bars?.length < 1
             }
             if (bars1?.length > 0) {
               firstBarTime = bars1?.[0]?.time || 0
