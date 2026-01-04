@@ -197,7 +197,7 @@ const reset = () => {
           {{ dayjs(row.time * 1000).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('recordType')" prop="recordType">
+      <el-table-column :label="t('type')" prop="recordType">
         <template #default="{ row }">
           {{ typeDict[row.type as keyof typeof typeDict]?.label }}
         </template>
