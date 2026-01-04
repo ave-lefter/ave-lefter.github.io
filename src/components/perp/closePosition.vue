@@ -160,7 +160,7 @@ function _createOrder() {
       @input="val => closeSizePercentChange(val as number)"
     />
     <div class="color-[--third-text] flex justify-between mt-38px mb-8px">
-      {{ t('profit1') }}
+      {{ t('estimatedPL') }}
       <span :class="BigNumber(unrealizedPnl).gte(0) ? 'color-[--up-color]' : 'color-[--down-color]'">{{ unrealizedPnl }} USD</span>
     </div>
     <div class="flex mt-20px text-16px">

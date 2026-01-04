@@ -253,7 +253,7 @@ watch(
       cell-class-name="color-[--main-text] text-12px"
       :data="detailData.list"
     >
-      <el-table-column :label="t('tradeSize')">
+      <el-table-column :label="t('filledQty')">
         <template #default="{ row }">
           {{
             formatNumber(row.fillSize, {
@@ -263,7 +263,7 @@ watch(
           }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('tradePrice')">
+      <el-table-column :label="t('filledPrice')">
         <template #default="{ row }">
           {{
             formatNumber(row.fillPrice, {
@@ -287,9 +287,9 @@ watch(
           }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('tradeNo')">
+      <el-table-column :label="t('tradeNo')" min-width="150" >
         <template #default="{ row }">
-          <div class="flex items-center justify-end gap-4px">
+          <div class="flex items-center justify-start gap-4px">
             {{ row.orderId.slice(0, 4) }}...{{ row.orderId.slice(-4) }}
             <Icon v-copy="row.orderId" name="bxs:copy" class="color-[#5A5E64]" />
           </div>

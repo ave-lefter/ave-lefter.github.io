@@ -1551,7 +1551,6 @@
   "oraclePrice": "预言机价格",
   "estimatedLiquidationPrice": "预估强平价",
   "unrealizedPnl": "未结盈亏",
-  "realizedPnl": "已结盈亏",
   "fundingFee": "资金费用",
   "takeProfitStopLoss": "止盈/止损",
   "currentOrder": "当前委托",
@@ -1691,8 +1690,6 @@
   "totalBalance1": "总资产",
   "depositComplete": "充值交易已确认",
   "thisWeek": "本周",
-  "tradeSize": "成交数量",
-  "tradePrice": "成交价格",
   "autoDeleverageTips": "自动减仓序列中的当前仓位由实心条表示。实心条越多，您的仓位自动减仓的可能性就越大。",
   "takeProfitStopLoss2": "仓位止盈止损",
   "marketStop": "市价止盈",
@@ -1807,5 +1804,14 @@
   "Qty":"数量",
   "filledQty":"成交数量",
   "filledPrice":"成交价格",
-  "filledType":"成交类型"
+  "filledType":"成交类型",
+  "available": "可用资产",
+  "estimatedLiquidationPrice1": "预估强平价",
+  "unrealizedPnl1": "未结盈亏",
+  "TP1": "止盈",
+  "SL1": "止损",
+  "returnRate": "收益率",
+  "positionQty": "合约数量",
+  "orderQuantity": "委托数量",
+  "estimatedPL": "预计盈亏"
 }
