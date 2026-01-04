@@ -127,7 +127,7 @@ const orderList = computed(() => {
   if (!stopProfitLossRow.value?.contractId) {
     return []
   }
-  return (perpStore.order?.filter?.((i) => i.contractId === stopProfitLossRow.value?.contractId && ['TAKE_PROFIT_LIMIT', 'STOP_LIMIT', 'TAKE_PROFIT_MARKET', 'STOP_MARKET'].includes(i.type)) || [])
+  return (perpStore.order?.filter?.((i) => i.contractId === stopProfitLossRow.value?.contractId && ['TAKE_PROFIT_LIMIT', 'STOP_LIMIT', 'TAKE_PROFIT_MARKET', 'STOP_MARKET'].includes(i.type)) || [])?.toSorted?.((a,b) => b.createdTime - a.createdTime)
 })
 const closePosition = (row, operation) => {
   closePositionVisible.value = true

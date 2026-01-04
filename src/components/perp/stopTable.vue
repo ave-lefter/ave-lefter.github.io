@@ -46,7 +46,7 @@ const cancelOrder = async (id?: string) => {
 </script>
 
 <template>
-  <el-dialog v-model="visible" append-to-body :title="t('stopLimit')" width="680px">
+  <el-dialog v-model="visible" append-to-body :title="t('stopLimit')" width="800px">
     <el-table
       :data="orderList"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
@@ -98,7 +98,7 @@ const cancelOrder = async (id?: string) => {
           {{ dayjs(Number(row.createdTime)).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
-      <el-table-column :width="50" align="right" :label="t('operate')" prop="operate">
+      <el-table-column :width="50" align="right" :label="t('operation')" prop="operate">
         <template #default="{ row }">
           <Icon
             name="custom:delete"
