@@ -1741,7 +1741,7 @@
   "perpAgreement1": "我知道如果使用杠杆，进入仓位后杠杆大小可能会变化。",
   "perpAgreement2": "我理解使用全仓模式下使用保证金的规则和风险。",
   "perpAgreement3": "我理解与盈亏结算、破产、保险及分摊亏损相关的规则和风险。",
-  "perpAgreement4": " 我明白如果我的持仓违反任何保证金维持要求，我的账户可能会被部分或完全强平",
+  "perpAgreement4": " 我明白如果我的持仓违反任何保证金维持要求，我的账户可能会被部分或完全强平。",
   "agreeAndContinue": "同意并继续",
   "perpSignTips": "您将收到2个签名请求。签名是免费的，不会触发任何交易。",
   "verifyOwnership": "验证所有权",
@@ -1817,5 +1817,6 @@
   "action": "操作",
   "filled": "已完成",
   "recentTrades": "最近交易",
-  "coin":"代币名称"
+  "coin": "代币名称",
+  "pluginWalletConnectedTips": "插件钱包已连接，请开通合约账户后进行交易"
 }

@@ -65,7 +65,7 @@
         </template>
       </el-input-number>
     </el-form-item>
-    <div class="mt-20px px-3px w-full">
+    <div class="mt-20px px-5px w-full">
       <el-slider
         v-model="percent"
         v-slider-active

@@ -14,7 +14,7 @@
       <li class="flex items-center justify-between">
         <span class="color-[--third-text]">{{ $t('totalAssets') }}</span>
         <NuxtLink class="flex items-center clickable font-500" :to="`/address/${walletStore.address}/${walletStore.chain}?active=perp`">
-          <span>{{ formatNumber(prepBalance, 4) }} USDT</span>
+          <span>{{ formatNumber(prepBalance, 4) }} USD</span>
           <Icon name="material-symbols:chevron-right-rounded" class="text-16px mr--5px" />
         </NuxtLink>
       </li>
@@ -24,11 +24,11 @@
       </li> -->
       <li class="flex items-center justify-between mt-12px">
         <span class="color-[--third-text]">{{ $t('maintenanceMargin') }}</span>
-        <span class="font-500">{{ formatNumber(maintenanceMarginRequirement, 4) }} USDT</span>
+        <span class="font-500">{{ formatNumber(maintenanceMarginRequirement, 4) }} USD</span>
       </li>
       <li class="flex items-center justify-between mt-12px">
         <span class="color-[--third-text]">{{ $t('unrealizedPnl1') }}</span>
-        <span class="font-500" :class="getColor(unrealizedPnl)">{{ formatNumber(unrealizedPnl, 2) }} USDT</span>
+        <span class="font-500" :class="getColor(unrealizedPnl)">{{ formatNumber(unrealizedPnl, 2) }} USD</span>
       </li>
     </ul>
   </div>
@@ -53,7 +53,7 @@ function getColor(n: number | string) {
 }
 
 const marginRatio = computed(() => {
-  return  new BigNumber(maintenanceMarginRequirement.value).div(prepBalance.value).times(100).toNumber()
+  return new BigNumber(maintenanceMarginRequirement.value).div(prepBalance.value).times(100).toNumber()
 })
 const colorSections = {
   green: '#12B886',
@@ -61,7 +61,7 @@ const colorSections = {
   red: '#F6465D'
 }
 const getStyles = computed(() => {
-  if (marginRatio.value < 40) {
+  if (!marginRatio.value || marginRatio.value < 40) {
     return {
       color: colorSections.green
     }
@@ -69,7 +69,7 @@ const getStyles = computed(() => {
     return {
       color: colorSections.yellow
     }
-  } else  {
+  } else {
     return {
       color: colorSections.red
     }

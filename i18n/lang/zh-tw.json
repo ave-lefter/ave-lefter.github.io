@@ -1805,5 +1805,6 @@
   "action": "操作",
   "filled": "已完成",
   "recentTrades": "最近交易",
-  "coin":"代币名称"
+  "coin": "代币名称",
+  "pluginWalletConnectedTips": "插件錢包已連接，請開通合約賬戶後進行交易"
 }

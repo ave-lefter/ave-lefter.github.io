@@ -1726,7 +1726,7 @@
   "perpAgreement1": "I understand that if leverage is used, the leverage size may change after entering the position.",
   "perpAgreement2": "I understand the rules and risks of using margin when using cross margin mode.",
   "perpAgreement3": "I understand the rules and risks associated with profit and loss settlement, bankruptcy, insurance and loss sharing.",
-  "perpAgreement4": "I understand that if my positions violate any margin maintenance requirements, my account may be partially or fully liquidated",
+  "perpAgreement4": "I understand that if my positions violate any margin maintenance requirements, my account may be partially or fully liquidated.",
   "agreeAndContinue": "Agree and continue",
   "perpSignTips": "You will receive 2 signature requests. Signing is free and does not trigger any transactions.",
   "verifyOwnership": "Verify ownership",
@@ -1817,5 +1817,6 @@
   "action": "Action",
   "filled": "Filled",
   "recentTrades": "Recent Trade",
-  "coin": "Coin"
+  "coin": "Coin",
+  "pluginWalletConnectedTips": "The plug-in wallet is connected, please Login to Perpetuals Account before trading."
 }
