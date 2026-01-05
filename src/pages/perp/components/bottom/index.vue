@@ -119,8 +119,8 @@ watch(
         <span
           v-for="tab in tabs"
           :key="tab.value"
-          class="text-12px px-8px lh-24px color-[--third-text] cursor-pointer rounded-4px"
-          :class="{ '[&&]:color-[--main-text] bg-[--tab-active-bg]': tab.value === selectTab }"
+          class="text-12px  lh-24px color-[--third-text] cursor-pointer border-b-2px border-b-solid border-transparent block mr-24px pb-10px"
+          :class="{ '[&&]:color-[--main-text] [&&]:border-[--main-text]': tab.value === selectTab }"
           @click="selectTab = tab.value"
           >{{ tab.label }}</span
         >
