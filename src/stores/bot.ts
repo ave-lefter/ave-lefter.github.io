@@ -56,7 +56,7 @@ export const useBotStore = defineStore('bot', () => {
   const subscribed = ref(false)
   const bundleAvailable = ref(false)
 
-  const connectVisible = useStorage('connectVisible', false, sessionStorage)
+  const connectVisible = ref(false)
   const connectWalletTab = ref(0)
   const walletList = ref<Awaited<ReturnType<typeof bot_getWalletsAllChain>>>([])
   const botSwapStore = useBotSwapStore()

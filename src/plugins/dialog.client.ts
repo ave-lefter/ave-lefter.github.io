@@ -61,7 +61,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       props = {}
     }: {
       content: any
-      props?: Partial<DialogProps> & { class?: string }
+      props?: Partial<DialogProps> & { class?: string; onClose?: () => void; onOpen?: () => void; onClosed?: () => void; onOpened?: () => void }
     }) {
       // 如果是 { is, props } 格式，分离组件和 props
       if (c && typeof c === 'object' && 'is' in c) {

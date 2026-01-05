@@ -56,7 +56,6 @@
   "viewMoreTransactions": "Daha fazla işlem kaydı görüntüle",
   "noFollowedWalletPurchases": "Takip edilen cüzdanların şu anda zincirde satın alma kaydı yok",
   "copyContract": "Sözleşme adresini kopyala",
-  "copyTokenName": "Adı kopyala",
   "addToGroup": "Gruba ekle",
   "volumeOneHour": "1s Hacim",
   "name": "Ad",
@@ -333,7 +332,7 @@
   "tokenHolders": "Token Sahipleri",
   "24Volume": "24 Saatlik Hacim",
   "addLiquidity": "Likidite Ekle",
-  "stopLimit": "Stop Limit",
+  "stopLimit": "TP/SL",
   "pleaseSelectToken": "Seç",
   "max": "Maksimum",
   "selectToken": "Token Seç",
@@ -577,5 +576,8 @@
   "notUpdateExistRemark": "M-cüzdandaki açıklamalar değiştirilmeyecektir.",
   "notUpdateExistRemarkTip": "Not: İşaretlenmezse, bu, cüzdandaki mevcut açıklamaların üzerine yazılacaktır. \nLütfen dikkatlice seçin.",
   "preview": "Önizleme",
-  "top20Remarked": "EN İYİ 20 Kısa Açıklama"
+  "top20Remarked": "EN İYİ 20 Kısa Açıklama",
+  "deposit": "tamamlamak",
+  "value1": "değer",
+  "action": "işletmek"
 }
