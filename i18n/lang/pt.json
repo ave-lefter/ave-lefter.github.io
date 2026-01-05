@@ -575,6 +575,7 @@
   "takeProfitAndStopLossTips5": "Take Profit de 10 vezes (lucro igual a 1000%); mover o take-profit significa que todas as posições serão fechadas automaticamente quando o preço retroceder 40% do ponto mais alto.",
   "takeProfitAndStopLossTips6": "Take Profit de 40% (fechamento de lucro de 40%); Trailing Take Profit significa que todas as posições serão fechadas automaticamente quando o preço retroceder 60% do ponto mais alto.",
   "advancedTradingStrategy": "Estratégia de Venda Avançada",
+  "above10uHoldersChange": "Mudança de suportes > 10U",
   "rank": "TOP",
   "profit5": "PnL",
   "profitAmount": "Valor do lucro",

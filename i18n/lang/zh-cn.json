@@ -1576,6 +1576,7 @@
   "top100PurchaseAvg": "前100持仓均价",
   "top100SellAvg": "前100卖出均价",
   "canWithdraw": "可领取",
+  "above10uHoldersChange": ">10U持币地址数变化",
   "rank": "榜",
   "profit5": "盈利",
   "profitAmount": "盈利金额",

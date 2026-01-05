@@ -18,6 +18,10 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  title: {
+    type: String,
+    default: ''
+  },
   loading: Boolean,
   showLeft: Boolean
 })
@@ -136,7 +140,7 @@ const init = () => {
         fontFamily: 'Poppins',
         fontWeight:400
       },
-      text: t('holdersChange'), // 替换为实际的翻译逻辑
+      text: props.title, // 替换为实际的翻译逻辑
     },
     tooltip: {
       trigger: 'axis',

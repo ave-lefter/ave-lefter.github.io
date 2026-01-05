@@ -38,7 +38,7 @@
             </svg>
             <span>App Store</span>
           </a>
-          <a
+          <!-- <a
             href="https://testflight.apple.com/join/BZ3XHS5f"
             target="_blank"
             class="download-btn bg-[#161926] text-white flex items-center justify-center py-3 px-6 rounded-lg hover:bg-opacity-80 transition duration-300"
@@ -50,7 +50,7 @@
               class="w-5 h-5 mr-2"
             >
             <span>TestFlight</span>
-          </a>
+          </a> -->
         </div>
         <div class="w-[15%]">
           <h3 class="text-sm mb-2">Android</h3>

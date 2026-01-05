@@ -1580,6 +1580,7 @@
   "top100PurchaseAvg": "Top100 Purchase Avg Price",
   "top100SellAvg": "Top100 Sell Avg Price",
   "canWithdraw": "Withdrawable",
+  "above10uHoldersChange": "Holders Change > 10U",
   "rank": "TOP",
   "profit5": "PnL",
   "profitAmount": "Profit amount",

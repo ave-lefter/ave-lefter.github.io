@@ -597,6 +597,14 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
 
   return {
     resetAvgPriceLineId: () => {
+      const _widget = getWidget()
+      const chart = _widget?.activeChart?.()
+      if(lineIdObj.buy){
+        chart?.removeEntity?.(lineIdObj.buy)
+      }
+      if(lineIdObj.sell){
+        chart?.removeEntity?.(lineIdObj.sell)
+      }
       lineIdObj.buy = '' as EntityId
       lineIdObj.sell = '' as EntityId
     }
@@ -1138,6 +1146,14 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
 
   return {
     resetBotAvgLineId: () => {
+      const _widget = getWidget()
+      const chart = _widget?.activeChart?.()
+      if(lineIdObj.buy){
+        chart?.removeEntity?.(lineIdObj.buy)
+      }
+      if(lineIdObj.sell){
+        chart?.removeEntity?.(lineIdObj.sell)
+      }
       lineIdObj.buy = '' as EntityId
       lineIdObj.sell = '' as EntityId
     }
