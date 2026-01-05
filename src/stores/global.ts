@@ -182,15 +182,22 @@ export const useGlobalStore = defineStore('global', () => {
     sort: 'created_timestamp',
     sort_dir: 'DESC',
   })
-  const audioSettings = useStorage('audioSettings',{
+  const audioSettings = useStorage('audioSettings-v02',{
     active:'',
     notice:{
       monitor:false,
+      monitorShowSimple:1,
+      monitorBorder:0,
+      monitorTh:[false,true,true,true],
+      // monitorTh:['walletUser','walletName','MC','createTime'],
+      quickBuy:true,
+      quickBuyAction:0,
       signal:true,
       pumpNotice:false,
       pumpChains:[] as string[],
       pumpPlatforms:[] as string[],
-      position:'top'
+      position:'top',
+      time:50
     },
     audio:{
       signal:'Bar',

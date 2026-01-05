@@ -829,5 +829,18 @@
   "notUpdateExistRemark": "Nhận xét về ví sẽ không được sửa đổi.",
   "notUpdateExistRemarkTip": "Lưu ý: Nếu không được chọn, thao tác này sẽ ghi đè mọi nhận xét hiện có trên ví. \nHãy lựa chọn cẩn thận.",
   "preview": "Xem trước",
-  "top20Remarked": "TOP 20 nhận xét nhanh"
+  "top20Remarked": "TOP 20 nhận xét nhanh",
+  "bugMC": "tại {n} MC",
+  "monitorShowType": "chế độ hiển thị",
+  "classic": "cổ điển",
+  "monitorCardBorder": "Viền thẻ",
+  "display2": "Trưng bày",
+  "hidden": "Ẩn giấu",
+  "monitorTh": "Mục tùy chỉnh",
+  "walletAvatar": "Hình đại diện ví",
+  "walletName": "Tên ví",
+  "tokenCreateTime": "Thời gian tạo mã thông báo",
+  "afterBuyAction": "Chi tiết mã thông báo sau khi mua",
+  "jump2": "Nhảy",
+  "noOpen": "Không mở"
 }

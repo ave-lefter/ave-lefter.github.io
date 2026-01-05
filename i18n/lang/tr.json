@@ -577,5 +577,18 @@
   "notUpdateExistRemark": "M-cüzdandaki açıklamalar değiştirilmeyecektir.",
   "notUpdateExistRemarkTip": "Not: İşaretlenmezse, bu, cüzdandaki mevcut açıklamaların üzerine yazılacaktır. \nLütfen dikkatlice seçin.",
   "preview": "Önizleme",
-  "top20Remarked": "EN İYİ 20 Kısa Açıklama"
+  "top20Remarked": "EN İYİ 20 Kısa Açıklama",
+  "bugMC": "{n} MC'de",
+  "monitorShowType": "ekran modu",
+  "classic": "klasik",
+  "monitorCardBorder": "Kart Çerçevesi",
+  "display2": "Görüntülemek",
+  "hidden": "Gizlenmiş",
+  "monitorTh": "Özel Ürünler",
+  "walletAvatar": "Cüzdan Avatarı",
+  "walletName": "Cüzdan Adı",
+  "tokenCreateTime": "Token CreateTime",
+  "afterBuyAction": "Satın Alma Sonrası Token Ayrıntıları",
+  "jump2": "Zıplamak",
+  "noOpen": "Açık Değil"
 }
