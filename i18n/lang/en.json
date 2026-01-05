@@ -1611,5 +1611,6 @@
   "afterBuyAction": "Token Details After Buy",
   "jump2": "Jump",
   "noOpen": "No Open",
-  "noticeDuration": "Notice Duration"
+  "noticeDuration": "Notice Duration",
+  "monitorThTip": "Choose at least one wallet avatar and wallet address"
 }

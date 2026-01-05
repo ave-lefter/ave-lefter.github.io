@@ -8,6 +8,7 @@ import { getPumpBgColor} from '@/utils/index'
 import {formatBotGasTips} from '@/utils/bot'
 import {isEvmChain, getRpcProvider} from '@/utils'
 import type { BotChain, BotSettingKey } from '~/utils/types'
+import QuickBuyInput from '~/components/monitor/components/quickBuyInput.vue'
 
 const { t } = useI18n()
 const globalStore = useGlobalStore()
@@ -123,6 +124,18 @@ const monitorTh=computed(()=>{
 })
 const handleChangeMonitorTh=(index:number)=>{
   console.log('handleChangeMonitorTh',index)
+  if(index==1 && (!audioSettings.value.notice.monitorTh[0])){
+    if(audioSettings.value.notice.monitorTh[1]) {
+      ElMessage.warning(t('monitorThTip'))
+      return
+    }
+  }
+  if(index==0 && (!audioSettings.value.notice.monitorTh[1])){
+    if(audioSettings.value.notice.monitorTh[0]) {
+      ElMessage.warning(t('monitorThTip'))
+      return
+    }
+  }
   audioSettings.value.notice.monitorTh[index] = !audioSettings.value.notice.monitorTh[index]
 }
 // </notice2.0>
@@ -427,22 +440,31 @@ function getEstimatedGas() {
               <div class="flex items-center"><span class="inline-block w-14px h-14px bg-[--secondary-text] rounded-full flex items-center justify-center mr-5px"><Icon class="color-[--main-bg] text-10px" name="mynaui:lightning-solid"/></span>{{ $t('quick') }}</div>
               <el-switch v-model="audioSettings.notice.quickBuy" class="[&&]:h-20px" />
             </div>
-            <div v-if="audioSettings.notice.quickBuy" class="mb-24px">
-              <button
-                v-for="item in BotSettingsArr"
-                :id="item.value"
-                :key="item.value"
-                :ref="setBtnRef"
-                class="cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center"
-                :class="`${item.value === botSettings?.[botSettingChain]?.buy?.selected?'color-[--main-text] bg-[--tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
-                type="button"
-                @click.stop="botSettings[botSettingChain]!.buy!.selected = item.value"
-                @mouseenter="showPopover(item.value)"
-                @mouseleave="visible = false"
-      
-              >
-                {{ item.label }}
-              </button>
+          
+            <div v-if="audioSettings.notice.quickBuy" class="mb-24px flex justify-between items-center">
+              <QuickBuyInput
+                v-model="audioSettings.notice.quickBuyValue"
+                :show-chain-icon="true"
+                :chain="botSettingChain"
+                input-style="width:192px"
+              />
+              <div class='bg-[--border] rounded-[4px]'>
+                <button
+                  v-for="item in BotSettingsArr"
+                  :id="item.value"
+                  :key="item.value"
+                  :ref="setBtnRef"
+                  class="cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center h-32px"
+                  :class="`${item.value === botSettings?.[botSettingChain]?.buy?.selected?'color-[--main-text] bg-[--dialog-tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
+                  type="button"
+                  @click.stop="botSettings[botSettingChain]!.buy!.selected = item.value"
+                  @mouseenter="showPopover(item.value)"
+                  @mouseleave="visible = false"
+        
+                >
+                  {{ item.label }}
+                </button>
+              </div>
             </div>
             <div class="flex justify-between items-center mb-24px">
               <span>{{ $t('afterBuyAction') }}</span>

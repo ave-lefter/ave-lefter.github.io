@@ -1608,5 +1608,6 @@
   "afterBuyAction": "买后代币详情",
   "jump2": "跳转",
   "noOpen": "不打开",
-  "noticeDuration": "通知展示时间"
+  "noticeDuration": "通知展示时间",
+  "monitorThTip": "钱包头像和钱包地址至少选一个"
 }

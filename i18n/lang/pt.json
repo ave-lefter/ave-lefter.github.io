@@ -596,5 +596,6 @@
   "afterBuyAction": "Detalhes do token após a compra",
   "jump2": "Pular",
   "noOpen": "Não aberto",
-  "noticeDuration": "Tempo de exibição da notificação"
+  "noticeDuration": "Tempo de exibição da notificação",
+  "monitorThTip": "Escolha pelo menos um avatar e endereço de carteira"
 }

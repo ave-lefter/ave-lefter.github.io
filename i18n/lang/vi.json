@@ -843,5 +843,6 @@
   "afterBuyAction": "Chi tiết mã thông báo sau khi mua",
   "jump2": "Nhảy",
   "noOpen": "Không mở",
-  "noticeDuration": "Thời gian hiển thị thông báo"
+  "noticeDuration": "Thời gian hiển thị thông báo",
+  "monitorThTip": "Chọn ít nhất một hình đại diện ví và địa chỉ ví"
 }

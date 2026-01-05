@@ -618,5 +618,6 @@
   "afterBuyAction": "Detalles del token después de la compra",
   "jump2": "Saltar",
   "noOpen": "No abierto",
-  "noticeDuration": "Tiempo de visualización de notificaciones"
+  "noticeDuration": "Tiempo de visualización de notificaciones",
+  "monitorThTip": "Elija al menos un avatar de billetera y una dirección de billetera"
 }

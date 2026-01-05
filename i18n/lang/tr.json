@@ -591,5 +591,6 @@
   "afterBuyAction": "Satın Alma Sonrası Token Ayrıntıları",
   "jump2": "Zıplamak",
   "noOpen": "Açık Değil",
-  "noticeDuration": "Bildirim görüntüleme süresi"
+  "noticeDuration": "Bildirim görüntüleme süresi",
+  "monitorThTip": "En az bir cüzdan avatarı ve cüzdan adresi seçin"
 }
