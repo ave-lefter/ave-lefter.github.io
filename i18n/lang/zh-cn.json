@@ -1600,5 +1600,6 @@
   "buyMa":"买均线",
   "sellMa":"卖均线",
   "whaleBuy": "持币大户买入均线",
-  "whaleSell": "持币大户卖出均线"
+  "whaleSell": "持币大户卖出均线",
+  "kolPosition":"KOL持仓"
 }

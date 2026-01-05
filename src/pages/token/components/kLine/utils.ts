@@ -6,6 +6,7 @@ import { useDebounceFn, useDocumentVisibility, useEventBus, type RemovableRef } 
 import BigNumber from 'bignumber.js'
 import { bot_getUserPendingTx, bot_cancelLimitOrdersByBatch, bot_getUserWalletTxInfo } from '~/api/token'
 import { RESOLUTION_KEY, QUICK_KEY } from './constant'
+import { _getHoldersList } from '~/api/holders'
 
 export const supportSecChains = ['solana', 'bsc', 'eth', 'base', 'tron']
 
@@ -526,12 +527,19 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
     })
   }
 
-  const avgPriceEvent = useEventBus<number>('top100Price')
-  avgPriceEvent.on((buyAvgPrice, sellAvgPrice) => {
-    avePriceCache.buyAvgPrice = buyAvgPrice
-    avePriceCache.sellAvgPrice = sellAvgPrice
-    createAvgPriceLinePoll(buyAvgPrice,sellAvgPrice)
-  })
+  // avgPriceEvent.on((buyAvgPrice, sellAvgPrice) => {
+  
+  // })
+  const tokenStore = useTokenStore()
+  watch(()=>tokenStore.token?.token,async()=>{
+    if(!tokenStore.token?.token) return
+   const res = await _getHoldersList({
+      token_id: tokenStore.token?.token +'-'+tokenStore.token?.chain
+    })
+    avePriceCache.buyAvgPrice = res.aggregateStats?.top100PurchaseAvg
+    avePriceCache.sellAvgPrice = res.aggregateStats?.top100SellAvg
+    createAvgPriceLinePoll(avePriceCache.buyAvgPrice,avePriceCache.sellAvgPrice)
+  },{immediate:true})
 
   function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -582,15 +590,14 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
     }
   })
 
-  watch(()=>linesChecked.value.top100Buy.color,()=>{
+  watch(()=>linesChecked.value.top100Buy.color,useDebounceFn(()=>{
     if(linesChecked.value.top100Buy.checked && avePriceCache.buyAvgPrice){
       createAvgPriceLine(avePriceCache.buyAvgPrice,true)
     }
-  })
+  },300))
 
   watch(()=>linesChecked.value.top100Sell.color,useDebounceFn(()=>{
     if(linesChecked.value.top100Sell.checked && avePriceCache.sellAvgPrice){
-      console.log('debug')
       createAvgPriceLine(avePriceCache.sellAvgPrice,false)
     }
   },300))
@@ -1060,6 +1067,10 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
           return
         }
         line?.setPoints?.([{ price: price, time: 0 }])
+        line?.setProperties?.({
+          linecolor,
+          textcolor: linecolor,
+        })
         return
       }
     } else {
@@ -1101,19 +1112,50 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
 
   const tokenStore = useTokenStore()
   const botStore = useBotStore()
-  watch(()=>tokenStore.token?.token,async(val)=>{
-    if(!val) return
-    if(!botStore.accessToken) return
+  const wsStore = useWSStore()
+  let timer:number | null = null
+  let lastUpdateTime = 0
+  const maxUpdateNum = 5
+  const getAvgPrice = async()=>{
     const res = await bot_getUserWalletTxInfo({
       user_address: botStore.userInfo?.addresses?.find(el=>el.chain===tokenStore.token?.chain)?.address||'',
       chain: tokenStore.token?.chain||'',
       user_token: tokenStore.token?.token||''
     })
-    console.log('res',res)
+    const needUpdate = +res?.[0]?.average_purchase_price_usd !== avePriceCache.buyAvgPrice || +res?.[0]?.average_sold_price_usd !== avePriceCache.sellAvgPrice
     avePriceCache.buyAvgPrice = +res?.[0]?.average_purchase_price_usd || 0
     avePriceCache.sellAvgPrice = +res?.[0]?.average_sold_price_usd || 0
-    createAvgPriceLinePoll(avePriceCache.buyAvgPrice,avePriceCache.sellAvgPrice)
-  },{immediate:true})
+    if(needUpdate){
+      createAvgPriceLinePoll(avePriceCache.buyAvgPrice,avePriceCache.sellAvgPrice)
+    }
+  }
+  watch(()=>[tokenStore.token?.token,botStore.userInfo],async([val])=>{
+    if(!val) return
+    if(!botStore.accessToken) return
+    getAvgPrice()
+  })
+
+  watch(() => wsStore.wsResult[WSEventType.TGBOT],val=>{
+    if(!val){
+      return
+    }
+    if (!timer) {
+    timer = window.setInterval(() => {
+      if (lastUpdateTime >= maxUpdateNum) {
+        if (timer) {
+          clearInterval(timer)
+          timer = null
+        }
+        lastUpdateTime = 0
+        return
+      }
+      getAvgPrice()
+      lastUpdateTime += 1
+    }, 2000)
+  } else {
+    lastUpdateTime = 0
+  }
+  })
 
   let avgPriceToken = 0  // 表示当前有效轮询的 token
   const MAX_RETRY = 5
@@ -1143,6 +1185,34 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
       retry++
     }
   }
+
+    watch(()=>linesChecked.value.buy.checked,val=>{
+    if(val && avePriceCache.buyAvgPrice){
+      createAvgPriceLine(avePriceCache.buyAvgPrice,true)
+    } else {
+      createAvgPriceLine(0,true)
+    }
+  })
+
+  watch(()=>linesChecked.value.sell.checked,val=>{
+    if(val && avePriceCache.sellAvgPrice){
+      createAvgPriceLine(avePriceCache.sellAvgPrice,false)
+    } else {
+      createAvgPriceLine(0,false)
+    }
+  })
+
+  watch(()=>linesChecked.value.buy.color,useDebounceFn(()=>{
+    if(linesChecked.value.buy.checked && avePriceCache.buyAvgPrice){
+      createAvgPriceLine(avePriceCache.buyAvgPrice,true)
+    }
+  },300))
+
+  watch(()=>linesChecked.value.sell.color,useDebounceFn(()=>{
+    if(linesChecked.value.sell.checked && avePriceCache.sellAvgPrice){
+      createAvgPriceLine(avePriceCache.sellAvgPrice,false)
+    }
+  },300))
 
   return {
     resetBotAvgLineId: () => {

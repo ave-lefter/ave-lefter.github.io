@@ -64,7 +64,7 @@ export function useKlineMarks() {
         left: rect.left - 320 + 44 +'px',
         top: rect.top + 34 +'px',
       }
-      globalStore.klineSettingPop.visible = true
+      globalStore.klineSettingPop.visible = !globalStore.klineSettingPop.visible
     }
     headerBtns.push(btn)
     return btn.getBoundingClientRect()

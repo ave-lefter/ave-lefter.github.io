@@ -27,7 +27,7 @@
       <div class="flex justify-between">
         <el-checkbox v-model="linesChecked.buy.checked" class="[&&]:[--el-checkbox-height:16px]">{{$t('buyMa')}}</el-checkbox>
          <el-tooltip trigger="click" :teleported="false">
-           <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: linesChecked.buy.color}" @click.stop="openColorPicker"/>
+           <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: linesChecked.buy.color}"/>
           <template #content>
             <el-color-picker-panel v-model="linesChecked.buy.color"/>
           </template>
@@ -37,13 +37,23 @@
       <div class="flex justify-between">
         <el-checkbox v-model="linesChecked.sell.checked" class="[&&]:[--el-checkbox-height:16px]">{{$t('sellMa')}}</el-checkbox>
          <el-tooltip trigger="click" :teleported="false">
-           <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: linesChecked.sell.color}" @click.stop="openColorPicker"/>
+           <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: linesChecked.sell.color}"/>
           <template #content>
             <el-color-picker-panel v-model="linesChecked.sell.color"/>
           </template>
         </el-tooltip>
        
       </div>
+       <!-- <div class="flex justify-between">
+        <el-checkbox v-model="linesChecked.kol.checked" class="[&&]:[--el-checkbox-height:16px]">{{$t('kolPosition')}}</el-checkbox>
+         <el-tooltip trigger="click" :teleported="false">
+           <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: linesChecked.kol.color}"/>
+          <template #content>
+            <el-color-picker-panel v-model="linesChecked.kol.color"/>
+          </template>
+        </el-tooltip>
+       
+      </div> -->
     </div>
     <div class="my-24px h-1px border-t-solid border-t-[--dialog-divider]"/>
     <div class="flex flex-col gap-16px">
@@ -51,7 +61,7 @@
       <div class="flex justify-between">
         <el-checkbox v-model="linesChecked.top100Buy.checked" class="[&&]:[--el-checkbox-height:16px]">{{$t('whaleBuy')}}</el-checkbox>
         <el-tooltip trigger="click" :teleported="false">
-          <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: linesChecked.top100Buy.color}" @click.stop="openColorPicker"/>
+          <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: linesChecked.top100Buy.color}"/>
           <template #content>
             <el-color-picker-panel v-model="linesChecked.top100Buy.color"/>
           </template>
@@ -61,7 +71,7 @@
       <div class="flex justify-between">
         <el-checkbox v-model="linesChecked.top100Sell.checked" class="[&&]:[--el-checkbox-height:16px]">{{$t('whaleSell')}}</el-checkbox>
         <el-tooltip trigger="click" :teleported="false">
-          <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: linesChecked.top100Sell.color}" @click.stop="openColorPicker"/>
+          <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: linesChecked.top100Sell.color}"/>
           <template #content>
             <el-color-picker-panel v-model="linesChecked.top100Sell.color"/>
           </template>
@@ -108,7 +118,7 @@ const walletStore = useWalletStore()
       color:'#12B886'
     },
     'sell': {
-      checked:true,
+      checked:false,
       color:'#F6465D'
     },
     'top100Buy': {
@@ -119,6 +129,10 @@ const walletStore = useWalletStore()
       checked:false,
       color:'#FD3E3E'
     },
+    kol: {
+      checked:false,
+      color:'#FFA622'
+    }
   })
 const token = computed(() => {
   return (props.isRank && 'klineRow' in tokenStore) ? tokenStore.klineRow?.id : route.params.id as string
@@ -126,8 +140,6 @@ const token = computed(() => {
 
 const klinePair = ref('')
 
-const colorPickerVisible = ref(false)
-const virtualRef = ref<HTMLElement | null>(null)
 const isReady = ref(false)
 let isReadyLine = false
 let isHeaderReady = false
@@ -852,6 +864,7 @@ async function initChart() {
   })
 
   _widget.subscribe('mouse_up', (e) => {
+    globalStore.klineSettingPop.visible = false
     if(performance.now() - mouseDownTime >=200){
       return
     }
@@ -1005,13 +1018,6 @@ function setIframeCssVar() {
 onBeforeUnmount(() => {
   isUnload = true
 })
-
-const openColorPicker = (e: MouseEvent) => {
-  virtualRef.value = e.currentTarget as unknown as HTMLElement
-  setTimeout(() => {
-    colorPickerVisible.value = true
-  }, 20)
-}
 
 const clickHandler = () => {
   globalStore.klineSettingPop.visible = false
