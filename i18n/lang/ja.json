@@ -67,7 +67,6 @@
   "viewMoreTransactions": "より多くの取引記録を表示",
   "noFollowedWalletPurchases": "フォローされたウォレットは現在チェーン上に購入記録がありません",
   "copyContract": "コントラクトアドレスをコピー",
-  "copyTokenName": "名前をコピー",
   "addToGroup": "グループに追加",
   "volumeOneHour": "1h取引高",
   "name": "名前",
@@ -1433,5 +1432,6 @@
   "notUpdateExistRemark": "ウォレットのコメントは変更されません。",
   "notUpdateExistRemarkTip": "注: チェックを外した場合、ウォレット上の既存のコメントが上書きされます。\n慎重にお選びください。",
   "preview": "プレビュー",
-  "top20Remarked": "トップ 20 の簡単なコメント"
+  "top20Remarked": "トップ 20 の簡単なコメント",
+  "value1": "価値"
 }
