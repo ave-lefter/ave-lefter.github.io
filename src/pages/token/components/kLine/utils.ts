@@ -4,7 +4,7 @@ import { formatNumber, formatDec } from '@/utils/formatNumber'
 import type {  KLineBar, SimpleWSTx, WSTx } from './types'
 import { useDebounceFn, useDocumentVisibility, useEventBus, type RemovableRef } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
-import { bot_getUserPendingTx, bot_cancelLimitOrdersByBatch } from '~/api/token'
+import { bot_getUserPendingTx, bot_cancelLimitOrdersByBatch, bot_getUserWalletTxInfo } from '~/api/token'
 import { RESOLUTION_KEY, QUICK_KEY } from './constant'
 
 export const supportSecChains = ['solana', 'bsc', 'eth', 'base', 'tron']
@@ -1003,5 +1003,144 @@ export function setWatermark(_widget: IChartingLibraryWidget | null) {
     }]
   })
   _watermark?.visibility().setValue(true)
+}
+
+export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | null, getIsReady: () => boolean, showMarket: Ref<boolean>,linesChecked: RemovableRef<{
+    buy: {
+        checked: boolean;
+        color: string;
+    };
+    sell: {
+        checked: boolean;
+        color: string;
+    };
+    top100Buy: {
+        checked: boolean;
+        color: string;
+    };
+    top100Sell: {
+        checked: boolean;
+        color: string;
+    };
+}>) {
+  const avePriceCache = {
+    buyAvgPrice: 0,
+    sellAvgPrice: 0
+  }
+  const lineIdObj = {
+    sell: '' as EntityId,
+    buy: '' as EntityId
+  }
+  let isCreating = false
+  const { t } = useI18n()
+  // 创建 限价价格线
+  async function createAvgPriceLine(price: number, isBuy: boolean) {
+    const _widget = getWidget()
+    const chart = _widget?.activeChart?.()
+    if (!_widget || !chart) return
+    if (showMarket.value) {
+      price = new BigNumber(price).times(useTokenStore().circulation || '0')?.toNumber()
+    }
+    const property = isBuy ? 'buy' : 'sell'
+    const linecolor = isBuy ? (linesChecked.value.buy.color) : (linesChecked.value.sell.color)
+    if (lineIdObj[property]) {
+      const line = chart?.getShapeById?.(lineIdObj[property])
+      if (line) {
+        if (!price) {
+          chart?.removeEntity?.(lineIdObj[property])
+          lineIdObj[property] = '' as EntityId
+          return
+        }
+        line?.setPoints?.([{ price: price, time: 0 }])
+        return
+      }
+    } else {
+      if (!price) return
+    }
+    if (isCreating) return
+    isCreating = true
+    lineIdObj[property] = await chart?.createShape?.(
+      { price: price, time: 0 }, // 水平线的起始位置
+      {
+        shape: 'horizontal_line',
+        lock: true,
+        disableSelection: true, // 允许选中
+        disableSave: true,
+        disableUndo: true,
+        text: isBuy ? t('buyPriceWithSlash') : t('sellPriceWithSlash'),
+        overrides: {
+          linecolor,  // 线的颜色
+          linewidth: 1,          // 线的粗细
+          linestyle: 1        // 线的样式：0表示实线，1表示虚线 2 长虚线
+        },
+      }
+    )
+    isCreating = false
+    chart?.getShapeById?.(lineIdObj[property])?.setProperties?.({
+      textcolor: linecolor,
+      showLabel: true,
+      horzLabelsAlign: 'right',
+      vertLabelsAlign: 'bottom',
+      bold: true,
+      fontSize: 12,
+      // italic: true,
+    })
+  }
+
+  function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  const tokenStore = useTokenStore()
+  const botStore = useBotStore()
+  watch(()=>tokenStore.token?.token,async(val)=>{
+    if(!val) return
+    if(!botStore.accessToken) return
+    const res = await bot_getUserWalletTxInfo({
+      user_address: botStore.userInfo?.addresses?.find(el=>el.chain===tokenStore.token?.chain)?.address||'',
+      chain: tokenStore.token?.chain||'',
+      user_token: tokenStore.token?.token||''
+    })
+    console.log('res',res)
+    avePriceCache.buyAvgPrice = +res?.[0]?.average_purchase_price_usd || 0
+    avePriceCache.sellAvgPrice = +res?.[0]?.average_sold_price_usd || 0
+    createAvgPriceLinePoll(avePriceCache.buyAvgPrice,avePriceCache.sellAvgPrice)
+  },{immediate:true})
+
+  let avgPriceToken = 0  // 表示当前有效轮询的 token
+  const MAX_RETRY = 5
+  const INTERVAL = 2000
+
+  async function createAvgPriceLinePoll(buyAvgPrice: number, sellAvgPrice: number) {
+    const myToken = ++avgPriceToken  // 当前调用的唯一标识
+    let retry = 0
+
+    while (retry <= MAX_RETRY) {
+      // 被后续调用覆盖，直接退出
+      if (myToken !== avgPriceToken) return
+
+      const isReady = getIsReady()
+      if (isReady) {
+        if(linesChecked.value.buy.checked){
+          await createAvgPriceLine(buyAvgPrice,true)
+        }
+        await sleep(100)
+        if(linesChecked.value.sell.checked){
+          await createAvgPriceLine(sellAvgPrice,false)
+        }
+        return
+      }
+
+      await sleep(INTERVAL)
+      retry++
+    }
+  }
+
+  return {
+    resetBotAvgLineId: () => {
+      lineIdObj.buy = '' as EntityId
+      lineIdObj.sell = '' as EntityId
+    }
+  }
 }
 

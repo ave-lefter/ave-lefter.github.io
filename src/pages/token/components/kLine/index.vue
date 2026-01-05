@@ -81,7 +81,7 @@ import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, 
 import { getTimezone, formatDecimals, getSwapInfo, getAddressAndChainFromId, getWSMessage } from '@/utils'
 import { getKlineHistoryData, getTokenKlineHistory } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
-import { switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, buildOrUpdateLastBarFromTx, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark, useTop100AvgPriceLine } from './utils'
+import { switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, buildOrUpdateLastBarFromTx, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark, useTop100AvgPriceLine, useBotAvgPriceLine } from './utils'
 import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
 import type { WSTx, KLineBar, SimpleWSTx } from './types'
 import BigNumber from 'bignumber.js'
@@ -188,6 +188,7 @@ function switchTokenKline() {
   resetLimitPriceLineId()
   resetAvgPriceLineId()
   resetTop100AvgPriceLineId()
+  resetBotAvgLineId()
   const val = pair.value
   if (isReady.value && route.name === 'token-id') {
     const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
@@ -983,9 +984,10 @@ function drag(e: MouseEvent) {
 
 const { resetLimitPriceLineId, subscribePriceMove } = useLimitPriceLine(() => _widget, () => isReadyLine, showMarket)
 
-const { resetAvgPriceLineId } = useAvgPriceLine(() => _widget, () => isReadyLine, showMarket,linesChecked)
+const { resetAvgPriceLineId } = useAvgPriceLine(() => _widget, () => isReadyLine, showMarket)
 const { resetAvgPriceLineId: resetTop100AvgPriceLineId } = useTop100AvgPriceLine(() => _widget,() => isReadyLine, showMarket,linesChecked)
 useBotLimitLine(() => _widget, () => isReadyLine, showMarket)
+const {resetBotAvgLineId}=useBotAvgPriceLine(() => _widget, () => isReadyLine, showMarket,linesChecked)
 
 
 function setIframeCssVar() {
