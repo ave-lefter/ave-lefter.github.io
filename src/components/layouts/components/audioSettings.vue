@@ -393,113 +393,90 @@ function getEstimatedGas() {
               <span>{{ $t('monitorGlobalPush') }}</span>
               <el-switch v-model="audioSettings.notice.monitor" class="[&&]:h-20px" />
             </div>
-            <div class="bg-[--dialog-list-hover] p-8px mb-24px rounded-[8px]">
-              <div v-if="audioSettings.notice.monitorShow===1" class="relative p-[15px_8px] flex gap-8px items-center border-[1px] border-solid border-transparent" :class="audioSettings.notice.monitorBorder&&'border-[var(--up-color)]! rounded-[8px]'">
-                <img class="" src="@/assets/images/pump/symbol.svg" width="40" alt="">
-                <div class="flex items-start justify-center flex-col gap-4px">
-                  <div class="flex items-center"><img v-if="audioSettings.notice.monitorTh[0]" class="w-16px h-16px rounded-[50%] mr-4px" src="@/assets/images/pump/user.svg" /><span v-if="audioSettings.notice.monitorTh[1]">Zoe&nbsp;</span><span class="color-[--up-color]">&nbsp;{{ $t('addPosition') }}</span>&nbsp;SENTIS</div>
-                  <div class="flex items-center"><img class="w-16px h-16px rounded-[50%] mr-4px" :src="`${configStore.token_logo_url}chain/bsc.png`" alt="" onerror="this.src='/icon-default.png'" srcset="" />
-                    <span><span class="color-[--up-color]">0.75 BNB</span><span v-if="audioSettings.notice.monitorTh[2]">&nbsp;{{ $t('bugMC',{n:'$34.6M'}) }}</span></span>
+            <template v-if="audioSettings.notice.monitor">
+              <div class="bg-[--dialog-list-hover] p-8px mb-24px rounded-[8px]">
+                <div v-if="audioSettings.notice.monitorShow===1" class="relative p-[15px_8px] flex gap-8px items-center border-[1px] border-solid border-transparent" :class="audioSettings.notice.monitorBorder&&'border-[var(--up-color)]! rounded-[8px]'">
+                  <img class="" src="@/assets/images/pump/symbol.svg" width="40" alt="">
+                  <div class="flex items-start justify-center flex-col gap-4px">
+                    <div class="flex items-center"><img v-if="audioSettings.notice.monitorTh[0]" class="w-16px h-16px rounded-[50%] mr-4px" src="@/assets/images/pump/user.svg" /><span v-if="audioSettings.notice.monitorTh[1]">Zoe&nbsp;</span><span class="color-[--up-color]">&nbsp;{{ $t('addPosition') }}</span>&nbsp;SENTIS</div>
+                    <div class="flex items-center"><img class="w-16px h-16px rounded-[50%] mr-4px" :src="`${configStore.token_logo_url}chain/bsc.png`" alt="" onerror="this.src='/icon-default.png'" srcset="" />
+                      <span><span class="color-[--up-color]">0.75 BNB</span><span v-if="audioSettings.notice.monitorTh[2]">&nbsp;{{ $t('bugMC',{n:'$34.6M'}) }}</span></span>
+                    </div>
                   </div>
+                  <Icon name="custom:close" class="text-16px color-[--third-text] absolute right-8px top-8px"/>
                 </div>
-                <Icon name="custom:close" class="text-16px color-[--third-text] absolute right-8px top-8px"/>
-              </div>
-              <div v-else class="relative flex items-center p-[15px_8px] border-[1px] border-solid border-transparent" :class="audioSettings.notice.monitorBorder&&'border-[--dialog-tab-active-bg]! rounded-[8px]'">
-                <img class="w-16px h-16px rounded-[50%] mr-4px" src="@/assets/images/pump/user.svg" />
-                <div class="flex items-center">
-                  <span><span>Zoe&nbsp;</span>{{ $t('createPosition') }}</span> 
-                  <span class="flex items-center">
-                    <span class="color-[--up-color]">&nbsp;1BNB</span><img class="w-16px h-16px rounded-[50%] mx-4px" src="@/assets/images/pump/m-symbol.svg" />{{$t('of')}}&nbsp;SENTIS
-                  </span>
+                <div v-else class="relative flex items-center p-[15px_8px] border-[1px] border-solid border-transparent" :class="audioSettings.notice.monitorBorder&&'border-[--dialog-tab-active-bg]! rounded-[8px]'">
+                  <img class="w-16px h-16px rounded-[50%] mr-4px" src="@/assets/images/pump/user.svg" />
+                  <div class="flex items-center">
+                    <span><span>Zoe&nbsp;</span>{{ $t('createPosition') }}</span> 
+                    <span class="flex items-center">
+                      <span class="color-[--up-color]">&nbsp;1BNB</span><img class="w-16px h-16px rounded-[50%] mx-4px" src="@/assets/images/pump/m-symbol.svg" />{{$t('of')}}&nbsp;SENTIS
+                    </span>
+                  </div>
+                  <Icon name="custom:close" class="text-16px color-[--third-text] absolute right-8px top-8px"/>
                 </div>
-                <Icon name="custom:close" class="text-16px color-[--third-text] absolute right-8px top-8px"/>
               </div>
-            </div>
-            <div class="flex justify-between items-center mb-24px">
-              <span>{{ $t('monitorShowType') }}</span>
-              <el-radio-group v-model="audioSettings.notice.monitorShow" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
-                <el-radio-button :label="t('classic')" :value="0" />
-                <el-radio-button :label="t('advance')" :value="1" />
-              </el-radio-group>
-              <!-- <el-switch v-model="audioSettings.notice.monitorShow" class="[&&]:h-20px" /> -->
-            </div>
-            <div class="flex justify-between items-center mb-24px">
-              <span>{{ $t('monitorCardBorder') }}</span>
-              <el-radio-group v-model="audioSettings.notice.monitorBorder" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
-                <el-radio-button :label="t('display2')" :value="1" />
-                <el-radio-button :label="t('hidden')" :value="0" />
-              </el-radio-group>
-            </div>
-            <div v-if="audioSettings.notice.monitorShow===1" class="flex flex-col mb-24px flex2122 gap-[12px]">
-              <span>{{ $t('monitorTh') }}</span>
-              <div class="flex items-center gap-[8px] flex-wrap">
-                <div v-for="({value,label},index) in monitorTh" :key="index" class="h-24px clickable rounded-[4px] bg-[--border] flex items-center justify-center px-12px" :class="value?'color-[--main-text]':'color-[--third-text]'" @click="()=>handleChangeMonitorTh(index)">{{ label }}</div>
+              <div class="flex justify-between items-center mb-24px">
+                <span>{{ $t('monitorShowType') }}</span>
+                <el-radio-group v-model="audioSettings.notice.monitorShow" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
+                  <el-radio-button :label="t('classic')" :value="0" />
+                  <el-radio-button :label="t('advance')" :value="1" />
+                </el-radio-group>
+                <!-- <el-switch v-model="audioSettings.notice.monitorShow" class="[&&]:h-20px" /> -->
               </div>
-            </div>
-            <div class="flex justify-between items-center mb-8px" :class="!audioSettings.notice.quickBuy&&'mb-24px!'">
-              <div class="flex items-center"><span class="inline-block w-14px h-14px bg-[--secondary-text] rounded-full flex items-center justify-center mr-5px"><Icon class="color-[--main-bg] text-10px" name="mynaui:lightning-solid"/></span>{{ $t('quick') }}</div>
-              <el-switch v-model="audioSettings.notice.quickBuy" class="[&&]:h-20px" />
-            </div>
-          
-            <div v-if="audioSettings.notice.quickBuy" class="mb-24px flex justify-between items-center">
-              <QuickBuyInput
-                v-model="audioSettings.notice.quickBuyValue"
-                :show-chain-icon="true"
-                :chain="botSettingChain"
-                input-style="width:192px"
-              />
-              <div class='bg-[--border] rounded-[4px]'>
-                <button
-                  v-for="item in BotSettingsArr"
-                  :id="item.value"
-                  :key="item.value"
-                  :ref="setBtnRef"
-                  class="cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center h-32px"
-                  :class="`${item.value === botSettings?.[botSettingChain]?.buy?.selected?'color-[--main-text] bg-[--dialog-tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
-                  type="button"
-                  @click.stop="botSettings[botSettingChain]!.buy!.selected = item.value"
-                  @mouseenter="showPopover(item.value)"
-                  @mouseleave="visible = false"
-        
-                >
-                  {{ item.label }}
-                </button>
+              <div class="flex justify-between items-center mb-24px">
+                <span>{{ $t('monitorCardBorder') }}</span>
+                <el-radio-group v-model="audioSettings.notice.monitorBorder" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
+                  <el-radio-button :label="t('display2')" :value="1" />
+                  <el-radio-button :label="t('hidden')" :value="0" />
+                </el-radio-group>
               </div>
-            </div>
-            <div class="flex justify-between items-center mb-24px">
-              <span>{{ $t('afterBuyAction') }}</span>
-              <el-radio-group v-model="audioSettings.notice.quickBuyAction" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
-                <el-radio-button :label="t('open')" :value="0" />
-                <el-radio-button :label="t('jump2')" :value="1" />
-                <el-radio-button :label="t('noOpen')" :value="2" />
-              </el-radio-group>
-            </div>
-            <div class="h-74px mb-24px">
-              <div class="flex justify-between items-center text-12px mt-24px mb-12px">
-                {{ $t('noticeDuration') }}
-                <el-input
-                  v-model.number="audioSettings.notice.time"
-                  class="w-60px [--el-input-height:28px] text-12px [--el-input-icon-color:--d-CCC-l-333] [--el-input-border-color:--d-333-l-F2F2F2]"
-                >
-                  <template #suffix><span class="color-[--third-text]">s</span></template>
-                </el-input>
+              <div v-if="audioSettings.notice.monitorShow===1" class="flex flex-col mb-24px flex2122 gap-[12px]">
+                <span>{{ $t('monitorTh') }}</span>
+                <div class="flex items-center gap-[8px] flex-wrap">
+                  <div v-for="({value,label},index) in monitorTh" :key="index" class="h-24px clickable rounded-[4px] bg-[--border] flex items-center justify-center px-12px" :class="value?'color-[--main-text]':'color-[--third-text]'" @click="()=>handleChangeMonitorTh(index)">{{ label }}</div>
+                </div>
               </div>
-              <div class="px-[4px]">
-                <el-slider
-                  v-model="audioSettings.notice.time"
-                  :min="1"
-                  :max="10"
-                  :step="3"
-                  :marks="{
-                    1: '1s',
-                    4: '4s',
-                    7: '7s',
-                    10: '10s',
-                  }"
-                  class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--primary-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-color-info:--third-text]"
+              <div class="flex justify-between items-center mb-8px" :class="!audioSettings.notice.quickBuy&&'mb-24px!'">
+                <div class="flex items-center"><span class="inline-block w-14px h-14px bg-[--secondary-text] rounded-full flex items-center justify-center mr-5px"><Icon class="color-[--main-bg] text-10px" name="mynaui:lightning-solid"/></span>{{ $t('quick') }}</div>
+                <el-switch v-model="audioSettings.notice.quickBuy" class="[&&]:h-20px" />
+              </div>
+              <div v-if="audioSettings.notice.quickBuy" class="mb-24px flex justify-between items-center">
+                <QuickBuyInput
+                  v-model="audioSettings.notice.quickBuyValue"
+                  :show-chain-icon="true"
+                  :chain="botSettingChain"
+                  input-style="width:192px"
                 />
+                <div class='bg-[--border] rounded-[4px]'>
+                  <button
+                    v-for="item in BotSettingsArr"
+                    :id="item.value"
+                    :key="item.value"
+                    :ref="setBtnRef"
+                    class="cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center h-32px"
+                    :class="`${item.value === botSettings?.[botSettingChain]?.buy?.selected?'color-[--main-text] bg-[--dialog-tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
+                    type="button"
+                    @click.stop="botSettings[botSettingChain]!.buy!.selected = item.value"
+                    @mouseenter="showPopover(item.value)"
+                    @mouseleave="visible = false"
+          
+                  >
+                    {{ item.label }}
+                  </button>
+                </div>
               </div>
-            </div>
+              <div class="flex justify-between items-center mb-24px">
+                <span>{{ $t('afterBuyAction') }}</span>
+                <el-radio-group v-model="audioSettings.notice.quickBuyAction" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
+                  <el-radio-button :label="t('open')" :value="0" />
+                  <el-radio-button :label="t('jump2')" :value="1" />
+                  <el-radio-button :label="t('noOpen')" :value="2" />
+                </el-radio-group>
+              </div>
+            </template>
+
+         
             <div class="flex justify-between items-center mb-24px">
               <span>{{ $t('signalGlobalPush') }}</span>
               <el-switch v-model="audioSettings.notice.signal" class="[&&]:h-20px" />
@@ -561,7 +538,7 @@ function getEstimatedGas() {
               </div>
             </div>
     
-            <div class="mb-20px">
+            <div class="mb-24px">
               <div class="lh-14px mb-14px">{{ $t('ToastPosition') }}</div>
               <div class="flex gap-x-8px gap-y-16px flex-wrap">
                 <div
@@ -587,6 +564,32 @@ function getEstimatedGas() {
                   </div>
                   {{ $t(item.label) }}
                 </div>
+              </div>
+            </div>
+            <div class="h-74px mb-20px">
+              <div class="flex justify-between items-center text-12px mt-24px mb-12px">
+                {{ $t('noticeDuration') }}
+                <el-input
+                  v-model.number="audioSettings.notice.time"
+                  class="w-60px [--el-input-height:28px] text-12px [--el-input-icon-color:--d-CCC-l-333] [--el-input-border-color:--d-333-l-F2F2F2]"
+                >
+                  <template #suffix><span class="color-[--third-text]">s</span></template>
+                </el-input>
+              </div>
+              <div class="px-[4px]">
+                <el-slider
+                  v-model="audioSettings.notice.time"
+                  :min="1"
+                  :max="10"
+                  :step="3"
+                  :marks="{
+                    1: '1s',
+                    4: '4s',
+                    7: '7s',
+                    10: '10s',
+                  }"
+                  class="[&&]:[--el-slider-button-size:8px] [--el-color-white:--primary-color] [&&]:[--el-slider-height:2px] [&&]:[--el-slider-button-wrapper-offset:-17px] [&&]:h-auto [&&]:[w-auto] [--el-color-info:--third-text]"
+                />
               </div>
             </div>
           </div>
