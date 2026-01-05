@@ -12,19 +12,19 @@
       @touchstart.prevent="start('minus')"
       @touchend="stop"
     >
-    <Icon name="majesticons:minus"  class="text-24px"></Icon>
+    <Icon name="majesticons:minus"  class="text-24px"/>
     </button>
-    <span class="flex-1"></span>
+    <span class="flex-1"/>
     <!--可输入的数字 -->
 
     <input
       name="step"
-      class="w-60px bg-transparent outline-none text-center border-none"
+      class="w-60px bg-transparent outline-none text-center border-none text-18px"
       :value="inputValue"
       @input="onInput"
       @blur="onBlur"
-    />X
-    <span class="flex-1"></span>
+    >X
+    <span class="flex-1"/>
     <!-- 加号按钮 -->
     <button
       class="color-[--main-text] transition-transform duration-100 cursor-pointer flex items-center justify-center active:scale-90 "
@@ -35,13 +35,13 @@
       @touchstart.prevent="start('plus')"
       @touchend="stop"
     >
-    <Icon name="majesticons:plus"  class="text-24px"></Icon>
+    <Icon name="majesticons:plus"  class="text-24px"/>
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue"
+import { ref, computed, watch } from 'vue'
 
 interface Props {
   modelValue: number
@@ -59,8 +59,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emits = defineEmits<{
-  "update:modelValue": [number],
-  "change": [number],
+  'update:modelValue': [number],
+  'change': [number],
 }>()
 
 // 输入框的本地值
@@ -78,7 +78,7 @@ const minDisabled = computed(() => props.modelValue <= props.min!)
 const maxDisabled = computed(() => props.modelValue >= props.max!)
 
 function update(v: number) {
-  emits("update:modelValue", v)
+  emits('update:modelValue', v)
 }
 
 // 点击加减
@@ -95,13 +95,13 @@ function plus() {
 let timer: any = null
 
 // 长按
-function start(type: "plus" | "minus") {
-  type === "minus" ? minus() : plus()
+function start(type: 'plus' | 'minus') {
+  type === 'minus' ? minus() : plus()
 
   stop()
 
   timer = setInterval(() => {
-    type === "minus" ? minus() : plus()
+    type === 'minus' ? minus() : plus()
   }, props.longPressSpeed)
 }
 
@@ -114,8 +114,8 @@ function stop() {
 
 // 输入监听（只允许数字）
 function onInput(e: Event) {
-  const target = e.target as HTMLInputElement;
-  let val = target.value.replace(/[^\d]/g, "");
+  const target = e.target as HTMLInputElement
+  let val = target.value.replace(/[^\d]/g, '')
 
   // 如果最大值是 0~9 的一位数
   if (props.max < 10) {
@@ -129,7 +129,7 @@ function onInput(e: Event) {
   const num = Number(val)
   inputValue.value = val
   target.value = val // 关键：同步回到输入框，不然 UI 显示不及时
-  emits("change", num)
+  emits('change', num)
 }
 
 // 失焦后校验 + 同步
@@ -142,7 +142,7 @@ function onBlur() {
     if (num > props.max!) num = props.max!
   }
   update(num)
-  emits("change", num)
+  emits('change', num)
 }
 </script>
 
