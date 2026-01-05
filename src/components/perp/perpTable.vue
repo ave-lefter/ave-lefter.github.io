@@ -32,3 +32,8 @@ const activeComponent = computed(() => {
     <component :is="activeComponent" />
   </div>
 </template>
+<style scoped lang="scss">
+  :deep(.el-table__cell){
+height: 60px;
+  }
+</style>

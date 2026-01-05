@@ -290,8 +290,8 @@ watch(
       <el-table-column :label="t('tradeNo')" min-width="150" >
         <template #default="{ row }">
           <div class="flex items-center justify-start gap-4px">
-            {{ row.matchOrderId.slice(0, 4) }}...{{ row.matchOrderId.slice(-4) }}
-            <Icon v-copy="row.matchOrderId" name="bxs:copy" class="color-[#5A5E64]" />
+            {{ row.matchFillId.slice(0, 4) }}...{{ row.matchFillId.slice(-4) }}
+            <Icon v-copy="row.matchFillId" name="bxs:copy" class="color-[#5A5E64]" />
           </div>
         </template>
       </el-table-column>
