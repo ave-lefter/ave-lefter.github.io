@@ -36,7 +36,7 @@ onMounted(() => {
   <el-tabs
     v-if="walletStore.address"
     v-model="activeName"
-    class="flex-1 bg-[--main-bg] [--el-text-color-primary:--third-text] [--el-color-primary:--main-text] [--el-border-color-light:--main-divider] pt-14px tabs"
+    class="flex-1 bg-[--main-bg] [--el-text-color-primary:--third-text] [--el-border-color-light:--main-divider] pt-14px tabs"
     style="min-height: calc(100vh - 92px)"
   >
     <el-tab-pane :label="t('chainWallet2')" name="wallet">
@@ -53,6 +53,12 @@ onMounted(() => {
   > :deep(.el-tabs__header) {
     padding-left: 16px;
     padding-right: 16px;
+  }
+  :deep(.el-tabs__active-bar){
+    background-color: var(--main-text);
+  }
+  :deep(.el-tabs__item.is-active) {
+    color: var(--main-text);
   }
 }
 </style>
