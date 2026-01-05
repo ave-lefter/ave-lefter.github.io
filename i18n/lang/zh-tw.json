@@ -1804,5 +1804,6 @@
   "pause": "暫停",
   "action": "操作",
   "filled": "已完成",
-  "recentTrades": "最近交易"
+  "recentTrades": "最近交易",
+  "coin":"代币名称"
 }

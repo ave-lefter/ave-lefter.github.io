@@ -142,7 +142,7 @@ onMounted(() => {
               >{{ addSign(score.myPoint) }}{{ score.myPoint }}</span
             >
             <span class="text-14px ml-8px lh-24px color-[--third-text]"
-              >{{ t('thisWeek') }} {{ addSign(score.myPoint) }}{{ score.myPoint }}</span
+              >{{ t('thisWeek') }} {{ addSign(score.myPoint) }}+{{ score.myPoint }}</span
             >
           </div>
         </div>

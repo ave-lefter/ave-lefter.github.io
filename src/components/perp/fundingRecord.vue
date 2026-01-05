@@ -220,7 +220,7 @@ const reset = () => {
           {{ formatNumber(row.amount) }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('tokenName')" prop="coin" />
+      <el-table-column :label="t('coin')" prop="coin" />
       <el-table-column :label="t('fee')" prop="fee">
         <template #default="{ row }">
           <template v-if="row.fee || row.fee === 0">${{ formatNumber(row.fee) }}</template>

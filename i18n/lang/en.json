@@ -499,7 +499,7 @@
   "totalSell": "Total Sell",
   "avgBuyPrice": " Avg Buy Price",
   "avgSellPrice": " Avg Sell Price",
-  "trades": "Trades",
+  "trades": "Trade",
   "me": "Me",
   "orderBook": "Order Book",
   "abnormalChips": "Abnormal Chips",
@@ -1568,7 +1568,7 @@
   "role": "Role",
   "tradeType2": "Trade Type",
   "tradeNo": "Trade Order No.",
-  "tradeTime": "Trade Time",
+  "tradeTime": "Transaction Time",
   "onlyReduce": "Reduce-Only",
   "executionStrategy": "Time-In-Force",
   "exitPrice": "Exit Price",
@@ -1816,5 +1816,6 @@
   "7DayProfitLoss": "7-day profit and loss amount",
   "action": "Action",
   "filled": "Filled",
-  "recentTrades": "Recent Trades"
+  "recentTrades": "Recent Trade",
+  "coin": "Coin"
 }
