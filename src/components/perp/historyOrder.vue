@@ -275,7 +275,7 @@ watch(
       </el-table-column>
       <el-table-column :label="t('role')">
         <template #default="{ row }">
-          {{ row.isMaker ? t('maker') : t('taker') }}
+          {{ row.direction }}
         </template>
       </el-table-column>
       <el-table-column :label="t('fee')">
