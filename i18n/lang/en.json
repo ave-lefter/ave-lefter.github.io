@@ -1610,5 +1610,6 @@
   "tokenCreateTime": "Token CreateTime",
   "afterBuyAction": "Token Details After Buy",
   "jump2": "Jump",
-  "noOpen": "No Open"
+  "noOpen": "No Open",
+  "noticeDuration": "Notice Duration"
 }

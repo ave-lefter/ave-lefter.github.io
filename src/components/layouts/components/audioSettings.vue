@@ -118,7 +118,7 @@ const monitorTh=computed(()=>{
     {value:audioSettings.value.notice.monitorTh[0],label:t('walletAvatar')},
     {value:audioSettings.value.notice.monitorTh[1],label:t('walletName')},
     {value:audioSettings.value.notice.monitorTh[2],label:t('MC')},
-    {value:audioSettings.value.notice.monitorTh[3],label:t('tokenCreateTime')},
+    // {value:audioSettings.value.notice.monitorTh[3],label:t('tokenCreateTime')},
   ]
 })
 const handleChangeMonitorTh=(index:number)=>{
@@ -381,20 +381,20 @@ function getEstimatedGas() {
               <el-switch v-model="audioSettings.notice.monitor" class="[&&]:h-20px" />
             </div>
             <div class="bg-[--dialog-list-hover] p-8px mb-24px rounded-[8px]">
-              <div v-if="audioSettings.notice.monitorShowSimple===1" class="relative p-[16px_8px] flex gap-8px items-center border-[1px] border-solid border-transparent" :class="audioSettings.notice.monitorBorder&&'border-[var(--up-color)]! rounded-[8px]'">
+              <div v-if="audioSettings.notice.monitorShow===1" class="relative p-[15px_8px] flex gap-8px items-center border-[1px] border-solid border-transparent" :class="audioSettings.notice.monitorBorder&&'border-[var(--up-color)]! rounded-[8px]'">
                 <img class="" src="@/assets/images/pump/symbol.svg" width="40" alt="">
                 <div class="flex items-start justify-center flex-col gap-4px">
-                  <div class="flex items-center"><img v-if="audioSettings.notice.monitorTh[0]" class="w-16px h-16px rounded-[50%] mr-4px" src="@/assets/images/pump/user.svg" /><span v-if="audioSettings.notice.monitorTh[1]">Zoe&nbsp;</span><span v-if="audioSettings.notice.monitorTh[3]">{{ $t('justNow') }}</span><span class="color-[--up-color]">&nbsp;{{ $t('addPosition') }}</span>&nbsp;SENTIS</div>
+                  <div class="flex items-center"><img v-if="audioSettings.notice.monitorTh[0]" class="w-16px h-16px rounded-[50%] mr-4px" src="@/assets/images/pump/user.svg" /><span v-if="audioSettings.notice.monitorTh[1]">Zoe&nbsp;</span><span class="color-[--up-color]">&nbsp;{{ $t('addPosition') }}</span>&nbsp;SENTIS</div>
                   <div class="flex items-center"><img class="w-16px h-16px rounded-[50%] mr-4px" :src="`${configStore.token_logo_url}chain/bsc.png`" alt="" onerror="this.src='/icon-default.png'" srcset="" />
                     <span><span class="color-[--up-color]">0.75 BNB</span><span v-if="audioSettings.notice.monitorTh[2]">&nbsp;{{ $t('bugMC',{n:'$34.6M'}) }}</span></span>
                   </div>
                 </div>
                 <Icon name="custom:close" class="text-16px color-[--third-text] absolute right-8px top-8px"/>
               </div>
-              <div v-else class="relative flex items-center p-[16px_8px] border-[1px] border-solid border-transparent" :class="audioSettings.notice.monitorBorder&&'border-[--dialog-tab-active-bg]! rounded-[8px]'">
+              <div v-else class="relative flex items-center p-[15px_8px] border-[1px] border-solid border-transparent" :class="audioSettings.notice.monitorBorder&&'border-[--dialog-tab-active-bg]! rounded-[8px]'">
                 <img class="w-16px h-16px rounded-[50%] mr-4px" src="@/assets/images/pump/user.svg" />
                 <div class="flex items-center">
-                  <span><span>Zoe&nbsp;</span>{{ $t('justNow') }}{{ $t('createPosition') }}</span> 
+                  <span><span>Zoe&nbsp;</span>{{ $t('createPosition') }}</span> 
                   <span class="flex items-center">
                     <span class="color-[--up-color]">&nbsp;1BNB</span><img class="w-16px h-16px rounded-[50%] mx-4px" src="@/assets/images/pump/m-symbol.svg" />{{$t('of')}}&nbsp;SENTIS
                   </span>
@@ -404,11 +404,11 @@ function getEstimatedGas() {
             </div>
             <div class="flex justify-between items-center mb-24px">
               <span>{{ $t('monitorShowType') }}</span>
-              <el-radio-group v-model="audioSettings.notice.monitorShowSimple" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
+              <el-radio-group v-model="audioSettings.notice.monitorShow" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
                 <el-radio-button :label="t('classic')" :value="0" />
                 <el-radio-button :label="t('advance')" :value="1" />
               </el-radio-group>
-              <!-- <el-switch v-model="audioSettings.notice.monitorShowSimple" class="[&&]:h-20px" /> -->
+              <!-- <el-switch v-model="audioSettings.notice.monitorShow" class="[&&]:h-20px" /> -->
             </div>
             <div class="flex justify-between items-center mb-24px">
               <span>{{ $t('monitorCardBorder') }}</span>
@@ -417,7 +417,7 @@ function getEstimatedGas() {
                 <el-radio-button :label="t('hidden')" :value="0" />
               </el-radio-group>
             </div>
-            <div v-if="audioSettings.notice.monitorShowSimple===1" class="flex flex-col mb-24px flex2122 gap-[12px]">
+            <div v-if="audioSettings.notice.monitorShow===1" class="flex flex-col mb-24px flex2122 gap-[12px]">
               <span>{{ $t('monitorTh') }}</span>
               <div class="flex items-center gap-[8px] flex-wrap">
                 <div v-for="({value,label},index) in monitorTh" :key="index" class="h-24px clickable rounded-[4px] bg-[--border] flex items-center justify-center px-12px" :class="value?'color-[--main-text]':'color-[--third-text]'" @click="()=>handleChangeMonitorTh(index)">{{ label }}</div>
@@ -454,7 +454,7 @@ function getEstimatedGas() {
             </div>
             <div class="h-74px mb-24px">
               <div class="flex justify-between items-center text-12px mt-24px mb-12px">
-                {{ $t('volume2') }}
+                {{ $t('noticeDuration') }}
                 <el-input
                   v-model.number="audioSettings.notice.time"
                   class="w-60px [--el-input-height:28px] text-12px [--el-input-icon-color:--d-CCC-l-333] [--el-input-border-color:--d-333-l-F2F2F2]"

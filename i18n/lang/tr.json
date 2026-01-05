@@ -590,5 +590,6 @@
   "tokenCreateTime": "Token CreateTime",
   "afterBuyAction": "Satın Alma Sonrası Token Ayrıntıları",
   "jump2": "Zıplamak",
-  "noOpen": "Açık Değil"
+  "noOpen": "Açık Değil",
+  "noticeDuration": "Bildirim görüntüleme süresi"
 }

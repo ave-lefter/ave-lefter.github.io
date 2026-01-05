@@ -842,5 +842,6 @@
   "tokenCreateTime": "Thời gian tạo mã thông báo",
   "afterBuyAction": "Chi tiết mã thông báo sau khi mua",
   "jump2": "Nhảy",
-  "noOpen": "Không mở"
+  "noOpen": "Không mở",
+  "noticeDuration": "Thời gian hiển thị thông báo"
 }

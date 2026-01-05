@@ -137,6 +137,7 @@
     </ul>
     <audio ref='audioElement' controls :src='audioUrl' style='display: none'/>
     <Batch @refresh="()=>{}"/>
+    <QuickSwap classNames='msgBuy hidden!' :row="quickSwapRow" :quickBuyValue="globalStore.audioSettings.notice.quickBuyValue"/>
   </footer>
 </template>
 
@@ -149,7 +150,8 @@ import UserAvatar from '../userAvatar.vue'
 import type { IMonitorWsResponse } from '~/api/types/ws'
 import bellImg from '@/assets/images/bell.svg'
 import bellImg3 from '@/assets/images/bell3.svg'
-import { TokenImg } from '#components'
+import { TokenImg,QuickSwap } from '#components'
+// import QuickSwap from '../quickSwapTsx.vue'
 
 const {t} = useI18n()
 const {visible, hasRing} = storeToRefs(useMonitorStore())
@@ -345,6 +347,7 @@ function pumpToast(val:GetSignalV2ListResponse) {
   }
   const msg = ElMessage({
     icon: <img src={bellImg3} alt="" class="w-16px h-16px" />,
+    duration: (globalStore.audioSettings.notice.time||0) * 1000,
     placement: globalStore.audioSettings.notice.position as any,
     message: () => (
       <div
@@ -375,6 +378,7 @@ function pumpToast(val:GetSignalV2ListResponse) {
   messageQueue.add(msg)
 }
 
+
 function signalToast(val:GetSignalV2ListResponse) {
   const actionsCount = val.actions.length
   const actionsVol = val.actions.reduce((acc, curr) => acc + Number(curr.quote_token_amount), 0)
@@ -382,6 +386,7 @@ function signalToast(val:GetSignalV2ListResponse) {
   const msg = ElMessage({
     icon: <img src={bellImg} alt="" class="w-16px h-16px"/>,
     placement: globalStore.audioSettings.notice.position as any,
+    duration: (globalStore.audioSettings.notice.time||0) * 1000,
     message: ()=>(
       <div
         class='inline-flex items-center gap-4px text-12px cursor-pointer'
@@ -432,11 +437,34 @@ watch(() => wsStore.wsResult[WSEventType.MONITOR], (val) => {
   }
 })
 
+const quickSwapRow=shallowRef<GetSignalV2ListResponse|null>(null)
+const quickSwapRef=ref<HTMLAudioElement|null>(null)
+
+const handleBotBuy=(e:MouseEvent,item:any) => {
+  e?.stopPropagation?.()
+  e?.preventDefault?.()
+  quickSwapRow.value={...item,...{target_token:item?.target_address,token0_address:item?.from_address,token1_address:item?.to_address,symbol:getIsBuy(item)?item.to_symbol:item.from_symbol}}
+  // quickSwapRef.value?.click()
+  const dom =document.querySelector('.msgBuy')
+  if(dom){
+    const event = new Event('click');
+    setTimeout(() => {
+      if(quickSwapRow.value){
+        dom.dispatchEvent(event);
+      }
+    },500)
+    // dom.click()
+  }
+  console.log('handleBotBuy', e,quickSwapRow.value,dom)
+}
+
 function monitorToast(val:IMonitorWsResponse[]) {
   val.forEach(item => {
     const msg = ElMessage({
-      icon:<img src={bellImg} alt="" class="w-16px h-16px"/>,
+      icon:<div></div>,
+      showClose:true,
       placement:globalStore.audioSettings.notice.position as any,
+      customClass:`p-[16px_8px] border-transparent monitorToast ${globalStore.audioSettings.notice.monitorBorder&&(globalStore.audioSettings.notice.monitorShow===1)&&`${getIsBuy(item)?'border-[--up-color]!':'border-[--down-color]!'} rounded-[8px]`} ${(globalStore.audioSettings.notice.monitorShow===1)&&'monitorToast2'}`,
       message:()=>(
         <div
           class='inline-flex items-center gap-4px text-12px cursor-pointer'
@@ -444,28 +472,84 @@ function monitorToast(val:IMonitorWsResponse[]) {
             navigateTo(`/token/${getIsBuy(item)?item.to_address:item.from_address}-${item.chain}`)
           }}
         >
-          <UserAvatar
-              wallet_logo={{logo:item.maker_logo,name:item.maker_alias}}
-              address={item.maker_address}
-              chain={item.chain}
-              iconSize='16px'
-          />
-          <span>{item.maker_alias || (item.maker_address.slice(0,4)+'...'+item.maker_address.slice(-4))}</span>
-          <span>{t('justNow')}<span class={getIsBuy(item)?'color-[--up-color]':'color-[--down-color]'}>{
-            getIsBuy(item)?t('buy'):t('sell')
-            }{isEn.value ? ' ':''}{
-              formatNumber(getIsBuy(item)?item.from_amount:item.to_amount,1)
-            }{
-              getIsBuy(item)?item.from_symbol:item.to_symbol
-            }</span>{t('of')}</span>
-          <TokenImg row={{logo_url:getIsBuy(item)?item.to_logo:item.from_logo,chain:'',symbol:getIsBuy(item)?item.to_symbol:item.from_symbol}} token-class="w-16px h-16px" />
-          {getIsBuy(item)?item.to_symbol:item.from_symbol}
+        {globalStore.audioSettings.notice.monitorShow===0?(<>
+            <UserAvatar
+                wallet_logo={{logo:item.maker_logo,name:item.maker_alias}}
+                address={item.maker_address}
+                chain={item.chain}
+                iconSize='16px'
+            />
+            <span>{item.maker_alias || (item.maker_address.slice(0,4)+'...'+item.maker_address.slice(-4))}</span>
+            <span>
+              {getIsBuy(item)?t('buy'):t('sell')}&nbsp;
+              <span class={getIsBuy(item)?'color-[--up-color]':'color-[--down-color]'}>
+                {formatNumber(getIsBuy(item)?item.from_amount:item.to_amount,1)}
+                {getIsBuy(item)?item.from_symbol:item.to_symbol}
+              </span>
+            </span>
+            <TokenImg row={{logo_url:getIsBuy(item)?item.to_logo:item.from_logo,chain:'',symbol:getIsBuy(item)?item.to_symbol:item.from_symbol}} token-class="w-16px h-16px" />
+            {getIsBuy(item)?item.to_symbol:item.from_symbol}
+          </>):(<div class='flex gap-8px items-center'>
+            <TokenImg row={{logo_url:getIsBuy(item)?item.to_logo:item.from_logo,chain:item.chain,symbol:getIsBuy(item)?item.to_symbol:item.from_symbol}} token-class="w-40px h-40px" />
+            <div class="flex items-start justify-center flex-col gap-4px">
+              <div class="flex items-center">
+                {globalStore.audioSettings.notice.monitorTh[0]&&<UserAvatar
+                  wallet_logo={{logo:item.maker_logo,name:item.maker_alias}}
+                  address={item.maker_address}
+                  chain={item.chain}
+                  iconSize='16px'
+                  class="mr-4px"
+                />}
+                {/* <span v-if="audioSettings.notice.monitorTh[1]">Zoe&nbsp;</span> */}
+                {globalStore.audioSettings.notice.monitorTh[1]&&<span>{item.maker_alias || (item.maker_address.slice(0,4)+'...'+item.maker_address.slice(-4))}&nbsp;</span>}
+                {/* {globalStore.audioSettings.notice.monitorTh[3]&&<span>{t('justNow')}</span>} */}
+                <span><span class={getIsBuy(item)?'color-[--up-color]':'color-[--down-color]'}>&nbsp;{
+                  getIsBuy(item)?t('buy'):t('sell')
+                  }&nbsp;</span></span>
+                  {getIsBuy(item)?item.to_symbol:item.from_symbol}
+              </div>
+              <div class="flex items-center">
+                <el-image class="w-16px h-16px rounded-[50%] mr-4px" src={`${configStore.token_logo_url}chain/${item.chain}.png`}>
+                  {
+                    {
+                      error: () => <img src="/icon-default.png" class="w-16px h-16px" alt="" />
+                    }
+                  }
+                </el-image>
+                <span>
+                  <span class={getIsBuy(item)?'color-[--up-color]':'color-[--down-color]'}>{isEn.value ? ' ':''}{
+                    formatNumber(getIsBuy(item)?item.from_amount:item.to_amount,1)
+                  }{
+                    getIsBuy(item)?item.from_symbol:item.to_symbol
+                  }</span>
+                  {globalStore.audioSettings.notice.monitorTh[2]&&<span >&nbsp;{t('bugMC',{n:Number(item?.target_mcap)?('$'+formatNumberS(item?.target_mcap || 0,{
+                    decimals:0,
+                    limit:3
+                  })):'--'})} </span>}
+                </span>
+              </div>
+            </div>
+            <el-button class='quickBuyBtn h-[24px]'style={{'--el-fill-color-light': '#12B8861A','--el-fill-color':'#12B8861A','--el-button-text-color':'#12B886'} } onClick={(e:any)=>handleBotBuy(e,item)} text  bg>
+              {t('buy')}
+            </el-button>
+            {/* <QuickSwap
+              quickBuyValue={globalStore.audioSettings.notice.quickBuyValue}
+              row={{target_token:item?.target_address,token0_address:item?.from_address,token1_address:item?.to_address,symbol:getIsBuy(item)?item.from_symbol:item.to_symbol,chain:item.chain as BotChain}}
+            /> */}
+            {/* <QuickSwap
+              quickBuyValue={globalStore.audioSettings.notice.quickBuyValue}
+              row={{...item,...{target_token:item?.target_address,token0_address:item?.from_address,token1_address:item?.to_address,symbol:getIsBuy(item)?item.from_symbol:item.to_symbol}}}
+            /> */}
+          </div>)}
         </div>
-      )
+      ),
+      duration: 0,
+      // duration: (globalStore.audioSettings.notice.time||0) * 1000,
     })
     messageQueue.add(msg)
   })
 }
+
 function getIsBuy(item: { position_type?: string | number; tx_type?: string | number }) {
   // console.log('item', item)
   if (item.position_type !== undefined) {
@@ -504,6 +588,25 @@ const audioUrl = computed(()=>{
     gap: 8px;
     justify-content: flex-end;
     align-items: center;
+  }
+}
+</style>
+<style lang="scss">
+.monitorToast2{
+  .el-icon.el-message__closeBtn{
+    position: relative;
+    top: -20px;
+    right: 0;
+  }
+  .quickBuyBtn{
+    position: relative;
+    top: 10px;
+    right: -20px;
+  }
+}
+.monitorToast{
+  .el-icon.el-message__icon{
+    display: none;
   }
 }
 </style>

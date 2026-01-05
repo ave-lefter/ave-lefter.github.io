@@ -1592,5 +1592,6 @@
   "tokenCreateTime": "代币創建時間",
   "afterBuyAction": "買後代幣詳情",
   "jump2": "跳轉",
-  "noOpen": "不打開"
+  "noOpen": "不打開",
+  "noticeDuration": "通知展示時間"
 }

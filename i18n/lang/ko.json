@@ -1446,5 +1446,6 @@
   "tokenCreateTime": "토큰 생성 시간",
   "afterBuyAction": "구매 후 토큰 세부정보",
   "jump2": "도약",
-  "noOpen": "열림 없음"
+  "noOpen": "열림 없음",
+  "noticeDuration": "알림 표시 시간"
 }

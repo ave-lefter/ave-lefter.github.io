@@ -33,6 +33,8 @@ const props = withDefaults(defineProps<{
   size: '14px',
   buttonType: 0
 })
+console.log('quickSwap',props.row)
+
 const botStore = useBotStore()
 const loadingSwap = shallowRef(false)
 const visible = shallowRef(false)
@@ -41,6 +43,7 @@ const noReminderQuickBuy = useStorage('noReminderQuickBuy', false)
 const emit = defineEmits(['submitSwap','jump'])
 
 function submitBotSwap() {
+  // return console.log('submitBotSwap')
   emit('submitSwap')
   if (!verifyLogin()) {
     return
@@ -242,7 +245,7 @@ async function getTokenBalance(chain: string) {
 
 <template>
   <template v-if="buttonType === 0">
-    <el-button
+  <el-button
     :disabled="!Number(quickBuyValue)"
     :loading="loadingSwap || loadingWalletSwap"
     :color="buttonBg"

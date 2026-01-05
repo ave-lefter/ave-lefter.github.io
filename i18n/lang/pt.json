@@ -595,5 +595,6 @@
   "tokenCreateTime": "Tempo de criação de token",
   "afterBuyAction": "Detalhes do token após a compra",
   "jump2": "Pular",
-  "noOpen": "Não aberto"
+  "noOpen": "Não aberto",
+  "noticeDuration": "Tempo de exibição da notificação"
 }

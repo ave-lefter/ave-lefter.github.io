@@ -1595,7 +1595,7 @@
   "fishing": "指其他地址向该地址发送过当前代币，通常代表筹码的分发",
   "dev2": "指代币创建者相关地址",
   "mouse": "通过非正当手段方式获得筹码，被平台判断为老鼠仓地址，通常与DEV或内幕地址相关",
-  "bugMC": "买入市值 {n}",
+  "bugMC": "市值 {n}",
   "monitorShowType": "显示模式",
   "classic": "经典",
   "monitorCardBorder": "卡片边框",
@@ -1607,5 +1607,6 @@
   "tokenCreateTime": "代币创建时间",
   "afterBuyAction": "买后代币详情",
   "jump2": "跳转",
-  "noOpen": "不打开"
+  "noOpen": "不打开",
+  "noticeDuration": "通知展示时间"
 }
