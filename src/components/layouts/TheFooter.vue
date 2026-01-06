@@ -476,7 +476,7 @@ function monitorToast(val:IMonitorWsResponse[]) {
       icon:<div></div>,
       showClose:true,
       placement:globalStore.audioSettings.notice.position as any,
-      customClass:`p-[15px_8px] border-transparent monitorToast ${globalStore.audioSettings.notice.monitorBorder&&(globalStore.audioSettings.notice.monitorShow===1)&&`${getIsBuy(item)?'border-[--up-color]!':'border-[--down-color]!'} rounded-[8px]`} ${(globalStore.audioSettings.notice.monitorShow===1)&&'monitorToast2'}`,
+      customClass:`p-[15px_8px] border-transparent rounded-[8px] monitorToast ${globalStore.audioSettings.notice.monitorBorder&&(globalStore.audioSettings.notice.monitorShow===1)&&`${getIsBuy(item)?'border-[--up-color]!':'border-[--down-color]!'}`} ${globalStore.audioSettings.notice.monitorBorder&&(globalStore.audioSettings.notice.monitorShow===0)&&`border-[--dialog-tab-active-bg]!`} ${(globalStore.audioSettings.notice.monitorShow===1)&&'monitorToast2'}`,
       message:()=>(
         <div
           class='inline-flex items-center gap-4px text-12px cursor-pointer'
@@ -521,13 +521,14 @@ function monitorToast(val:IMonitorWsResponse[]) {
                   {getIsBuy(item)?item.to_symbol:item.from_symbol}
               </div>
               <div class="flex items-center">
-                <el-image class="w-16px h-16px rounded-[50%] mr-4px" src={`${configStore.token_logo_url}chain/${item.chain}.png`}>
+                {/* <el-image class="w-16px h-16px rounded-[50%] mr-4px" src={`${configStore.token_logo_url}chain/${item.chain}.png`}>
                   {
                     {
                       error: () => <img src="/icon-default.png" class="w-16px h-16px" alt="" />
                     }
                   }
-                </el-image>
+                </el-image> */}
+                <img src={`${configStore.token_logo_url}chain/${item.chain}.png`} class="rd-50% w-16px h-16px mr-4px" width="16" alt=""/>
                 <span>
                   <span class={getIsBuy(item)?'color-[--up-color]':'color-[--down-color]'}>{isEn.value ? ' ':''}{
                     formatNumber(getIsBuy(item)?item.from_amount:item.to_amount,1)
@@ -541,9 +542,9 @@ function monitorToast(val:IMonitorWsResponse[]) {
                 </span>
               </div>
             </div>
-            {globalStore.audioSettings.notice.quickBuy&&getIsBuy(item)&&<el-button class='quickBuyBtn h-[24px]'style={{'--el-fill-color-light': '#12B8861A','--el-fill-color':'#12B8861A','--el-button-text-color':'#12B886'} } onClick={(e:any)=>handleBotBuy(e,item)} text bg>
+            {globalStore.audioSettings.notice.quickBuy&&getIsBuy(item)&&<div class='quickBuyBtn flex items-center h-[24px] bg-#12B8861A text-#12B886 rounded-[4px] font-normal text-[14px] leading-[16px] px-8px clickable' onClick={(e:any)=>handleBotBuy(e,item)}>
               {t('buy')}
-            </el-button>}
+            </div>}
           </div>)}
         </div>
       ),
