@@ -188,7 +188,7 @@ export const useGlobalStore = defineStore('global', () => {
       monitor:false,
       monitorShow:1,
       monitorBorder:0,
-      monitorTh:[false,true,true],
+      monitorTh:[true,true,true],
       // monitorTh:['walletUser','walletName','MC','createTime'],
       quickBuy:true,
       quickBuyValue:'0.01',

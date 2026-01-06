@@ -403,7 +403,10 @@ function getEstimatedGas() {
                       <span><span class="color-[--up-color]">0.75 BNB</span><span v-if="audioSettings.notice.monitorTh[2]">&nbsp;{{ $t('bugMC',{n:'$34.6M'}) }}</span></span>
                     </div>
                   </div>
-                  <Icon name="custom:close" class="text-16px color-[--third-text] absolute right-8px top-8px"/>
+                  <div v-if="audioSettings.notice.quickBuy" class='quickBuyBtn flex items-center h-[24px] bg-#12B8861A text-#12B886 rounded-[4px] font-normal text-[14px] leading-[16px] px-8px clickable absolute right-8px top-32px'>
+                    {{t('buy')}}
+                  </div>
+                  <Icon name="custom:close" class="text-16px color-[--third-text] absolute right-8px top-26px" :class="audioSettings.notice.quickBuy&&'top-8px!'"/>
                 </div>
                 <div v-else class="relative flex items-center p-[15px_8px] border-[1px] border-solid border-transparent" :class="audioSettings.notice.monitorBorder&&'border-[--dialog-tab-active-bg]! rounded-[8px]'">
                   <img class="w-16px h-16px rounded-[50%] mr-4px" src="@/assets/images/pump/user.svg" />
@@ -413,7 +416,7 @@ function getEstimatedGas() {
                       <span class="color-[--up-color]">&nbsp;1BNB</span><img class="w-16px h-16px rounded-[50%] mx-4px" src="@/assets/images/pump/m-symbol.svg" />{{$t('of')}}&nbsp;SENTIS
                     </span>
                   </div>
-                  <Icon name="custom:close" class="text-16px color-[--third-text] absolute right-8px top-8px"/>
+                  <Icon name="custom:close" class="text-16px color-[--third-text] absolute right-8px top-14px"/>
                 </div>
               </div>
               <div class="flex justify-between items-center mb-24px">
@@ -448,13 +451,13 @@ function getEstimatedGas() {
                   :chain="botSettingChain"
                   input-style="width:192px"
                 />
-                <div class='bg-[--border] rounded-[4px]'>
+                <div class='bg-[--border] rounded-[4px] p-2px'>
                   <button
                     v-for="item in BotSettingsArr"
                     :id="item.value"
                     :key="item.value"
                     :ref="setBtnRef"
-                    class="cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center h-32px"
+                    class="cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center h-28px"
                     :class="`${item.value === botSettings?.[botSettingChain]?.buy?.selected?'color-[--main-text] bg-[--dialog-tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
                     type="button"
                     @click.stop="botSettings[botSettingChain]!.buy!.selected = item.value"
