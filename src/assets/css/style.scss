@@ -345,3 +345,6 @@ debox-chat-widget {
 [data-tc-list-notifications="true"], [data-tc-actions-modal-container="true"] {
   display: none !important;
 }
+.checkbox-sm .el-checkbox__label {
+  font-size: 12px;
+}

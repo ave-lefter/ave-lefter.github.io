@@ -501,7 +501,7 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
   }
 
   const avgPriceEvent = useEventBus<number>('top100Price')
-  avgPriceEvent.on((buyAvgPrice, sellAvgPrice) => {
+  avgPriceEvent.on(async(buyAvgPrice, sellAvgPrice) => {
     console.log('--------avgPriceEvent---------', buyAvgPrice, sellAvgPrice)
     createAvgPriceLinePoll(buyAvgPrice,sellAvgPrice)
   })
@@ -537,6 +537,14 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
 
   return {
     resetAvgPriceLineId: () => {
+      const _widget = getWidget()
+      const chart = _widget?.activeChart?.()
+      if(lineIdObj.buy){
+        chart?.removeEntity?.(lineIdObj.buy)
+      }
+      if(lineIdObj.sell){
+        chart?.removeEntity?.(lineIdObj.sell)
+      }
       lineIdObj.buy = '' as EntityId
       lineIdObj.sell = '' as EntityId
     }

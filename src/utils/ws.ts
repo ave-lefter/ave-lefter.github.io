@@ -7,6 +7,7 @@ export interface WSOptions {
   connectTimeout?: number
   maxQueueLength?: number
   queueTimeout?: number
+  protocols?: string
   onopen?: (event: Event) => void
   onclose?: (event: CloseEvent) => void
   onerror?: (event: Event) => void
@@ -17,6 +18,7 @@ type MessageListener = (e: MessageEvent) => void
 
 export default class WS {
   private url: string
+  private protocols: string | undefined
   private pingTimeout: number
   private reconnectLimit: number
   private pingMsg: string
@@ -50,13 +52,15 @@ export default class WS {
     reconnectInterval = 2000,
     connectTimeout = 30000,
     maxQueueLength = 100,
-    queueTimeout = 15000,
+    queueTimeout = 300000,
+    protocols,
     onopen,
     onclose,
     onerror,
-    onmessage,
+    onmessage
   }: WSOptions) {
     this.url = url
+    this.protocols = protocols
     this.pingTimeout = pingTimeout
     this.reconnectLimit = reconnectLimit
     this.pingMsg = pingMsg
@@ -76,7 +80,7 @@ export default class WS {
 
   private createWebSocket(reconnectMessage?: Record<string, string>) {
     try {
-      this.ws = new WebSocket(this.url)
+      this.ws = new WebSocket(this.url, this.protocols)
 
       this.ws.onopen = (event) => {
         this.resetStatus()
@@ -118,7 +122,6 @@ export default class WS {
   private sendQueue() {
     const queueToSend = [...this.pendingQueue]
     this.pendingQueue = []
-
     queueToSend.forEach(({ msg, timestamp }) => {
       if (Date.now() - timestamp <= this.queueTimeout) {
         this.ws?.send(msg)

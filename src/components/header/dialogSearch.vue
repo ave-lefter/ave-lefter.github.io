@@ -114,12 +114,11 @@ import SearchTable from './searchTable.vue'
 import WalletTable from './walletTable.vue'
 import { _getSmartTop10, _tokenSearchV3 } from '@/api/hot'
 import type {SearchWalletInfo, SearchInfo } from '@/api/types/search'
-import { useDebounceFn, useLocalStorage } from '@vueuse/core'
+import { useDebounceFn, useLocalStorage, useStorage } from '@vueuse/core'
 import { ElMessageBox, type ElInput } from 'element-plus'
 import { ProvideType } from '~/utils/constants'
 import { getHotTokens, type GetHotTokensResponse } from '@/api/token'
 import type {IPriceV2Response} from '~/api/types/ws'
-import { useStorage } from '@vueuse/core'
 import ChainTabs from './chainTabs/index.vue'
 const { hotList,dialogVisible_search,dialogSearchText:query } = storeToRefs(useGlobalStore())
 const {currentAddress} =storeToRefs(useFollowStore())
