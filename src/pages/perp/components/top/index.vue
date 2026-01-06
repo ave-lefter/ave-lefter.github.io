@@ -208,6 +208,19 @@ watch(
     }
   }
 )
+
+watch(visible, (val) => {
+  if (val) {
+    if ( document.getElementById('tv_chart_container')) {
+      document.getElementById('tv_chart_container')!.style.pointerEvents = 'none'
+    }
+  } else {
+    if ( document.getElementById('tv_chart_container')) {
+      document.getElementById('tv_chart_container')!.style.pointerEvents = 'auto'
+    }
+  }
+})
+
 onMounted(() => {
   perpWsPubStore.send({
     type: 'unsubscribe',
