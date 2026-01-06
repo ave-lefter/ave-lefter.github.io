@@ -502,7 +502,7 @@ function monitorToast(val:IMonitorWsResponse[]) {
             <TokenImg row={{logo_url:getIsBuy(item)?item.to_logo:item.from_logo,chain:'',symbol:getIsBuy(item)?item.to_symbol:item.from_symbol}} token-class="w-16px h-16px" />
             <span class='ellipsis'>{getIsBuy(item)?item.to_symbol:item.from_symbol}</span>
           </div>):(<div class='flex gap-8px items-center w-full'>
-            <TokenImg row={{logo_url:getIsBuy(item)?item.to_logo:item.from_logo,chain:item.chain,symbol:getIsBuy(item)?item.to_symbol:item.from_symbol}} token-class="w-40px h-40px" />
+            <TokenImg row={{logo_url:getIsBuy(item)?item.to_logo:item.from_logo,chain:'',symbol:getIsBuy(item)?item.to_symbol:item.from_symbol}} token-class="w-40px h-40px" />
             <div class="flex items-start justify-center flex-col gap-4px">
               <div class="flex items-center">
                 {globalStore.audioSettings.notice.monitorTh[0]&&<UserAvatar
@@ -548,8 +548,8 @@ function monitorToast(val:IMonitorWsResponse[]) {
           </div>)}
         </div>
       ),
-      duration: 0,
-      // duration: (globalStore.audioSettings.notice.time||0) * 1000,
+      // duration: 0,
+      duration: (globalStore.audioSettings.notice.time||0) * 1000,
     })
     messageQueue.add(msg)
   })
