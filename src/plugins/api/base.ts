@@ -30,7 +30,7 @@ export function onRequest({ options, request }: MyFetchContext) {
 
   if (url?.includes('/v1api/') || url.startsWith('/v2api/') || url.startsWith('/bestrouteapi/')) {
     const analogDeviceId = localStorage.getItem('analogDeviceId')
-    if (analogDeviceId && !url?.includes('/botapi')) {
+    if (analogDeviceId && !url?.includes('/botapi') && !url?.includes('/bestrouteapi/')) {
       options.headers.set('ave-udid', analogDeviceId)
     }
     if (!url.startsWith('/bestrouteapi/')) {
