@@ -1,4 +1,4 @@
-<template>
+ <template>
   <table class="pairs-table">
     <thead>
       <tr>

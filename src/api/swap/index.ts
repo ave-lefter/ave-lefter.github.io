@@ -770,7 +770,7 @@ export function getBestRouteV2(from_token: string, to_token: string, chain: stri
   to_price: number
 }>> {
   const { $api } = useNuxtApp()
-  return $api('/botapi/swap/getBestRoute', {
+  return $api('/bestrouteapi/getBestRoute', {
     method: 'get',
     query: {
       from_token,
@@ -779,6 +779,9 @@ export function getBestRouteV2(from_token: string, to_token: string, chain: stri
       max_hops,
       max_routes,
       // protocol: 'v3'
+    },
+    headers: {
+      'X-Auth': localStorage.getItem('ave_token') || ''
     }
   }).then(async res => {
     return res?.data || res || []

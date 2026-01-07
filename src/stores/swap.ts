@@ -152,7 +152,7 @@ export const useSwapStore = defineStore('swap', () => {
   const triggerPrice = ref<number | string>('')
 
 
-  function _getSwapTokenList() {
+  function _getSwapTokenList(callback?: () => void) {
     const chain = walletStore.chain || getAddressAndChainFromId(route.params.id as string).chain || ''
     getSwapTokenList().then(res => {
       tokens.value = res?.map(i => ({...i, id: i.token + '-' + i.chain, address: i.token, decimals: i.token === NATIVE_TOKEN && chain === 'solana' ? 9 : i.decimals})) || []
@@ -188,6 +188,9 @@ export const useSwapStore = defineStore('swap', () => {
         } else {
           token2.value = {...token}
         }
+      }
+      if (callback) {
+        callback()
       }
     })
   }
@@ -427,9 +430,8 @@ export const useSwapStore = defineStore('swap', () => {
   }
 
 
-  function init() {
-    const [token, chain1] = getAddressAndChainFromId(route.params?.id as string, 1)
-    console.log(token, chain1, 'init')
+  function init(routeParamsId?: string) {
+    const [token, chain1] = getAddressAndChainFromId(routeParamsId || route.params?.id as string, 1)
     const chain = walletStore.chain
     if (token && (token !== token1.value.address)) {
       token1.value = {
@@ -451,11 +453,14 @@ export const useSwapStore = defineStore('swap', () => {
         logo_url: '',
       }
     }
-    _getSwapTokenList()
+    _getSwapTokenList(() => {
+      _getToken2Info()
+    })
     getUserTokenList()
     getSwapTokenList()
     getBaseToken()
-    _getTokenDetails()
+    // _getTokenDetails()
+    _getToken1Info()
   }
 
 
