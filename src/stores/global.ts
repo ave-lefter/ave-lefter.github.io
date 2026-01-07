@@ -215,6 +215,10 @@ export const useGlobalStore = defineStore('global', () => {
 
   // 预留一个全局变量，用于控制 token 历史的显示
   const tokenHistoryVisible = true
+  const klineSettingPop = ref({
+    visible:false,
+    position:[] as number[]
+  })
   const lastVisitTokens = useStorage<{
     id: string,
     logo_url: string,
@@ -380,6 +384,7 @@ export const useGlobalStore = defineStore('global', () => {
     dialogSearchText,
     showImport,
     showBotRecord,
-    batchRemarkFormData
+    batchRemarkFormData,
+    klineSettingPop
   }
 })
