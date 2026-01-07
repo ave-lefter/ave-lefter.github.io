@@ -33,8 +33,6 @@ const props = withDefaults(defineProps<{
   size: '14px',
   buttonType: 0
 })
-console.log('quickSwap',props.row)
-
 const botStore = useBotStore()
 const loadingSwap = shallowRef(false)
 const visible = shallowRef(false)

@@ -162,6 +162,16 @@ function playAudio(settingKey: keyof typeof audioSettings.value.audio) {
   }
 }
 
+function initPumpPlatforms(){
+  const settings = audioSettings.value
+  if(Array.isArray(settings.notice.pumpChains)&&settings.notice.pumpChains.length&&JSON.stringify(settings.notice.pumpPlatforms) === '[]'){
+    // settings.notice.pumpPlatforms = []
+    platformOptions.value.map((p: any) => p.value)[0]&&settings.notice.pumpPlatforms.push(platformOptions.value.map((p: any) => p.value)[0])
+    platformOptions.value.map((p: any) => p.value)[1]&&settings.notice.pumpPlatforms.push(platformOptions.value.map((p: any) => p.value)[1])
+    console.log('settings.notice.pumpPlatforms',platformOptions.value,settings.notice.pumpChains,settings.notice.pumpPlatforms)
+  }
+}
+
 watch(dialogVisible, () => {
   if (dialogVisible.value) {
     const settings = cloneDeep(globalStore.audioSettings)
@@ -169,13 +179,16 @@ watch(dialogVisible, () => {
     if (!settings.notice.pumpNotice) {
       settings.notice.pumpNotice = false
     }
+  
     if (!settings.notice.pumpChains) {
       settings.notice.pumpChains = []
     }
     if (!settings.notice.pumpPlatforms) {
       settings.notice.pumpPlatforms = []
     }
+    console.log('initPumpPlatforms2',settings)
     audioSettings.value = settings
+    initPumpPlatforms()
   }
 })
 
@@ -233,7 +246,12 @@ function getSelectedClass(item: string) {
 }
 
 function onSave() {
-  globalStore.audioSettings = cloneDeep(audioSettings.value)
+  const data= cloneDeep(audioSettings.value)
+  console.log('onSave',data)
+  if(!data.notice.pumpPlatforms||JSON.stringify(data.notice.pumpPlatforms) === '[]'){
+    data.notice.pumpNotice = false
+  }
+  globalStore.audioSettings = data
 
   if(audioSettings.value.notice.quickBuy){
     // botSettings[botSettingChain.value]!.buy
@@ -278,12 +296,13 @@ function toggleChain(chain: string) {
         })
       }
     })
-
     audioSettings.value.notice.pumpPlatforms = audioSettings.value.notice.pumpPlatforms.filter(
       (platform: string) => remainingPlatforms.has(platform)
     )
+    console.log('toggleChain',audioSettings.value.notice.pumpChains, audioSettings.value.notice.pumpPlatforms)
   } else {
     audioSettings.value.notice.pumpChains.push(chain)
+    initPumpPlatforms()
   }
 }
 
@@ -530,7 +549,7 @@ function getEstimatedGas() {
     
                 <el-checkbox-group
                   v-model="audioSettings.notice.pumpPlatforms"
-                  class="grid grid-cols-2 gap-2px"
+                  class="grid grid-cols-2 gap-2px w-[calc(100%-10px)] grid-flow-row"
                 >
                   <el-checkbox
                     v-for="platform in platformOptions"
@@ -546,7 +565,7 @@ function getEstimatedGas() {
                         class="mr-6px w-14px h-14px rounded-2px"
                         :src="`${configStore.token_logo_url}${platform.icon?.replace('/signals/', 'signals/')}`"
                       />
-                      <span>{{ platform.label }}</span>
+                      <span class='inline-block ellipsis max-w-106px'>{{ platform.label }}</span>
                     </div>
                   </el-checkbox>
                 </el-checkbox-group>
@@ -591,7 +610,7 @@ function getEstimatedGas() {
                   <template #suffix><span class="color-[--third-text]">s</span></template>
                 </el-input>
               </div>
-              <div class="px-[4px]">
+              <div class="pl-3px pr-8px">
                 <el-slider
                   v-model="audioSettings.notice.time"
                   :min="1"
