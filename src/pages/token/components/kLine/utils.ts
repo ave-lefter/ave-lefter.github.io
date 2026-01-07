@@ -527,9 +527,6 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
     })
   }
 
-  // avgPriceEvent.on((buyAvgPrice, sellAvgPrice) => {
-  
-  // })
   const tokenStore = useTokenStore()
   watch(()=>tokenStore.token?.token,async()=>{
     if(!tokenStore.token?.token) return
@@ -1122,6 +1119,7 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
       chain: tokenStore.token?.chain||'',
       user_token: tokenStore.token?.token||''
     })
+    console.log('res',res)
     const needUpdate = +res?.[0]?.average_purchase_price_usd !== avePriceCache.buyAvgPrice || +res?.[0]?.average_sold_price_usd !== avePriceCache.sellAvgPrice
     avePriceCache.buyAvgPrice = +res?.[0]?.average_purchase_price_usd || 0
     avePriceCache.sellAvgPrice = +res?.[0]?.average_sold_price_usd || 0
@@ -1131,9 +1129,9 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
   }
   watch(()=>[tokenStore.token?.token,botStore.userInfo],async([val])=>{
     if(!val) return
-    if(!botStore.accessToken) return
+    if(![...SupportFullDataChain, 'ton', 'polygon'].includes(tokenStore.token?.chain)) return
     getAvgPrice()
-  })
+  },{immediate:true})
 
   watch(() => wsStore.wsResult[WSEventType.TGBOT],val=>{
     if(!val){
@@ -1230,3 +1228,170 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
   }
 }
 
+export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | null, getIsReady: () => boolean, showMarket: Ref<boolean>,linesChecked: RemovableRef<{
+    buy: {
+        checked: boolean;
+        color: string;
+    };
+    sell: {
+        checked: boolean;
+        color: string;
+    };
+    top100Buy: {
+        checked: boolean;
+        color: string;
+    };
+    top100Sell: {
+        checked: boolean;
+        color: string;
+    };
+    kol: {
+        checked: boolean;
+        color: string;
+    };
+}>) {
+  let avePriceMap  = {} as Record<string,{name:string,value:number,lineId:EntityId,isCreating?:boolean}>
+  // 创建 限价价格线
+  async function createAvgPriceLine() {
+    const _widget = getWidget()
+    const chart = _widget?.activeChart?.()
+    if (!_widget || !chart) return
+    Object.values(avePriceMap).forEach(async item=>{
+      let price = item.value
+      if (showMarket.value) {
+            price = new BigNumber(price).times(useTokenStore().circulation || '0')?.toNumber()
+       }
+       if(item.lineId){
+        const line = chart?.getShapeById?.(item.lineId)
+        if (line) {
+          if (!price) {
+            chart?.removeEntity?.(item.lineId)
+            item.lineId = '' as EntityId
+            return
+          }
+          line?.setPoints?.([{ price: price, time: 0 }])
+          line?.setProperties?.({
+            linecolor: linesChecked.value.kol.color,
+            textcolor: linesChecked.value.kol.color,
+          })
+          return
+        }
+       } else if(!price){
+        return
+       }
+
+       if(item.isCreating){
+        return
+       }
+       item.isCreating = true
+
+       item.lineId = await chart?.createShape?.(
+      { price: price, time: 0 }, // 水平线的起始位置
+      {
+        shape: 'horizontal_line',
+        lock: true,
+        disableSelection: true, // 允许选中
+        disableSave: true,
+        disableUndo: true,
+        text: item.name,
+        overrides: {
+          linecolor:linesChecked.value.kol.color,  // 线的颜色
+          linewidth: 1,          // 线的粗细
+          linestyle: 1        // 线的样式：0表示实线，1表示虚线 2 长虚线
+        },
+      }
+    )
+    item.isCreating = false
+    chart?.getShapeById?.(item.lineId)?.setProperties?.({
+      textcolor: linesChecked.value.kol.color,
+      showLabel: true,
+      horzLabelsAlign: 'right',
+      vertLabelsAlign: 'bottom',
+      bold: true,
+      fontSize: 12,
+      // italic: true,
+    })
+    })
+    
+  }
+
+  function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  let avgPriceToken = 0  // 表示当前有效轮询的 token
+  const MAX_RETRY = 5
+  const INTERVAL = 2000
+
+  async function createAvgPriceLinePoll() {
+    const myToken = ++avgPriceToken  // 当前调用的唯一标识
+    let retry = 0
+
+    while (retry <= MAX_RETRY) {
+      // 被后续调用覆盖，直接退出
+      if (myToken !== avgPriceToken) return
+
+      const isReady = getIsReady()
+      if (isReady) {
+        if(linesChecked.value.kol.checked){
+          createAvgPriceLine()
+        }
+        return
+      }
+
+      await sleep(INTERVAL)
+      retry++
+    }
+  }
+
+  const tokenStore = useTokenStore()
+  watch(()=>tokenStore.token?.token,async()=>{
+    if(!tokenStore.token?.token) return
+   const res = await _getHoldersList({
+      token_id: tokenStore.token?.token +'-'+tokenStore.token?.chain,
+      tag_type:KOL_KEY
+    })
+    avePriceMap = res.holderStats?.filter?.(el=>{
+      return (el.avg_purchase_price || el.avg_sale_price) && el.balance_ratio > 0.005
+    })
+    ?.reduce?.((acc,cur)=>{
+      acc[cur.holder] = {
+        name:cur.wallet_logo.name || cur.holder.slice(0,4)+'...'+cur.holder.slice(-4),
+        value:cur.avg_purchase_price,
+        lineId:'' as EntityId
+      }
+      return acc
+    },avePriceMap)
+      createAvgPriceLinePoll()
+  },{immediate:true})
+
+  const resetKOLLine = () => {
+    const _widget = getWidget()
+    const chart = _widget?.activeChart?.()
+
+    Object.values(avePriceMap).forEach(item=>{
+      if(item.lineId){
+        chart?.removeEntity?.(item.lineId)
+        item.lineId = '' as EntityId
+      }
+    })
+  }
+
+  watch(()=>linesChecked.value.kol.checked,val=>{
+    if(val){
+      createAvgPriceLine()
+    } else {
+      resetKOLLine()
+    }
+  })
+
+  watch(()=>linesChecked.value.kol.color,useDebounceFn(()=>{
+    if(linesChecked.value.kol.checked){
+      createAvgPriceLine()
+    }
+  },300))
+
+  return {
+    resetKOLLine
+  }
+}

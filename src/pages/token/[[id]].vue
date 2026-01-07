@@ -1,36 +1,41 @@
 <template>
-  <div class="flex bg-[--main-divider] gap-1px flex min-w-0 w-full" style="min-height: calc(100vh - 92px);">
+  <div
+    class="flex bg-[--main-divider] gap-1px flex min-w-0 w-full"
+    style="min-height: calc(100vh - 92px)"
+  >
     <div class="flex-1 min-w-0">
-      <TokenHistory v-if="globalStore.tokenHistoryVisible" class="mb-1px"/>
-      <Top/>
+      <TokenHistory v-if="globalStore.tokenHistoryVisible" class="mb-1px" />
+      <Top />
       <div class="flex gap-1px">
         <div class="hide-scrollbar">
           <el-scrollbar :height="scrollbarHeight">
-            <Left class="w-292px flex flex-col flex-shrink-0"/>
+            <Left class="w-292px flex flex-col flex-shrink-0" />
           </el-scrollbar>
         </div>
         <div class="flex-1 hide-scrollbar min-w-0 relative">
           <div
             v-show="globalStore.showLeft"
             class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left--11px hover:w-30px hover:left--31px hover:h-36px transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
-            @click="globalStore.$patch({showLeft:false})"
+            @click="globalStore.$patch({ showLeft: false })"
           >
-            <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px"/>
+            <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
           </div>
           <div
             v-show="!globalStore.showLeft"
             class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left-0 hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
-            @click="globalStore.$patch({showLeft:true})"
+            @click="globalStore.$patch({ showLeft: true })"
           >
-            <Icon name="material-symbols:arrow-forward-ios" class="text-12px"/>
+            <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
           </div>
-          <el-scrollbar :height="scrollbarHeight">
+          <el-scrollbar :height="scrollbarHeight" @scroll="centerScroll">
             <div
               :class="orderBookVisible ? 'grid gap-1px' : 'grid grid-cols-1 gap-1px'"
-              :style="orderBookVisible ? { gridTemplateColumns: `1fr 4px ${orderBookWidth}px` } : {}"
+              :style="
+                orderBookVisible ? { gridTemplateColumns: `1fr 4px ${orderBookWidth}px` } : {}
+              "
             >
               <div>
-                <KLine ref="klineContainer" @refresh="refresh"/>
+                <KLine ref="klineContainer" @refresh="refresh" />
               </div>
               <!-- 订单簿拖动条 -->
               <div
@@ -38,11 +43,11 @@
                 class="cursor-col-resize bg-[--d-222-l-F2F2F2] hover:bg-[--d-666-l-CCC] flex flex-col items-center justify-center gap-1px w-4px"
                 @mousedown.stop.prevent="dragOrderBook"
               >
-                <span v-for="i in 4" :key="i" class="bg-[--d-444-l-999] w-2px h-2px rounded-full"/>
+                <span v-for="i in 4" :key="i" class="bg-[--d-444-l-999] w-2px h-2px rounded-full" />
               </div>
               <OrderBook v-model="orderBookVisible" :kline-height="klineHeight + 3" />
             </div>
-            <BelowChartTable class="min-h-300px rounded-4px bg-[--d-000-l-F6F6F6]"/>
+            <BelowChartTable class="min-h-300px rounded-4px bg-[--d-000-l-F6F6F6]" />
           </el-scrollbar>
         </div>
       </div>
@@ -51,8 +56,8 @@
   </div>
 </template>
 
-<script setup lang='ts'>
-import { useStorage } from '@vueuse/core'
+<script setup lang="ts">
+import { useStorage, useThrottleFn } from '@vueuse/core'
 import { getTokenInfo, getTokenInfoExtra } from '~/api/token'
 import { useTokenStore } from '~/stores/token'
 import Top from './components/top/index.vue'
@@ -60,28 +65,28 @@ import TokenRight from './components/right/index.vue'
 import { Left } from './components/left'
 import { BelowChartTable } from './components/belowChartTable'
 import KLine from '~/pages/token/components/kLine/index.vue'
-import {OrderBook} from './components/orderBook'
-import  { getAiSummary } from '@/api/token'
+import { OrderBook } from './components/orderBook'
+import { getAiSummary } from '@/api/token'
 
 definePageMeta({
   name: 'token-id',
   key: (route) => {
-    return (route.name as string)
+    return route.name as string
   },
 })
 const route = useRoute()
 const walletStore = useWalletStore()
-const localeStore  = useLocaleStore()
+const localeStore = useLocaleStore()
 const tagStore = useTagStore()
 const tokenStore = useTokenStore()
 const scrollbarHeight = computed(() => {
   if (tokenStore.isShowWaring) {
-    if(globalStore.tokenHistoryVisible){
+    if (globalStore.tokenHistoryVisible) {
       return 'calc(100vh - 230px)'
     }
     return 'calc(100vh - 198px)'
   }
-  if(globalStore.tokenHistoryVisible){
+  if (globalStore.tokenHistoryVisible) {
     return 'calc(100vh - 190px)'
   }
   return 'calc(100vh - 158px)'
@@ -91,7 +96,7 @@ const botStore = useBotStore()
 const addresses = computed(() => {
   const result = botStore.userInfo?.addresses
   if (Array.isArray(result)) {
-    return Array.from(new Set(result.map(el => el.address)))
+    return Array.from(new Set(result.map((el) => el.address)))
   }
   return []
 })
@@ -111,7 +116,7 @@ const klineHeight = useStorage('kHeight', DefaultHeight.KLINE)
 const DEFAULT_ORDERBOOK_WIDTH = 300
 const MAX_ORDERBOOK_WIDTH = 400
 const orderBookWidth = useStorage('orderBookWidth', DEFAULT_ORDERBOOK_WIDTH)
-const aiSummary = shallowRef({summary:'', headline:''})
+const aiSummary = shallowRef({ summary: '', headline: '' })
 
 // 订单簿拖动功能（更丝滑、可控制）
 let isDraggingOrderBook = false
@@ -143,10 +148,7 @@ function dragOrderBook(e: MouseEvent) {
       const clientX = pendingX
       const delta = lastX - clientX // 向左拖变宽，向右拖变窄
       const next = orderBookWidth.value + delta
-      orderBookWidth.value = Math.min(
-        MAX_ORDERBOOK_WIDTH,
-        Math.max(DEFAULT_ORDERBOOK_WIDTH, next)
-      )
+      orderBookWidth.value = Math.min(MAX_ORDERBOOK_WIDTH, Math.max(DEFAULT_ORDERBOOK_WIDTH, next))
       lastX = clientX
       framePending = false
     })
@@ -166,7 +168,7 @@ function dragOrderBook(e: MouseEvent) {
   return false
 }
 
- function _getAiSummary() {
+function _getAiSummary() {
   const id = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
   getAiSummary(id)
     .then((res) => {
@@ -181,24 +183,26 @@ function dragOrderBook(e: MouseEvent) {
 onMounted(() => {
   _getAiSummary()
 })
-watch([() => route.params.id, () => localeStore.locale],
-  () => {
-    _getAiSummary()
-  }
-)
+watch([() => route.params.id, () => localeStore.locale], () => {
+  _getAiSummary()
+})
 //顶层提供aisummary数据，给子组件top和right使用
 provide('aiSummary', aiSummary)
 
 const documentVisible = shallowRef(true)
 provide('documentVisible', documentVisible)
 
-watch(() => addresses.value, () => {
-  if (addresses.value?.length) {
-    botStore.subBalanceChange()
+watch(
+  () => addresses.value,
+  () => {
+    if (addresses.value?.length) {
+      botStore.subBalanceChange()
+    }
+  },
+  {
+    immediate: true,
   }
-}, {
-  immediate: true
-})
+)
 
 // function subBalanceChange() {
 //   wsStore.send({
@@ -220,43 +224,45 @@ watch(() => addresses.value, () => {
 // 订阅画像
 function subscribePortrait() {
   usePublicPortraitStore().reset()
-  const {address,chain} = getAddressAndChainFromId(route.params.id as string)
+  const { address, chain } = getAddressAndChainFromId(route.params.id as string)
   wsStore.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
     params: [WSEventType.PUBLIC_PORTRAIT],
-    id:1
+    id: 1,
   })
   wsStore.send({
     jsonrpc: '2.0',
     method: 'subscribe',
     params: [WSEventType.PUBLIC_PORTRAIT, address, chain],
-    id: 1
+    id: 1,
   })
 }
 
 function _getTokenInfo() {
   const id = route.params.id as string
   tokenStore.loadingToken = true
-  return getTokenInfo(id).then(res => {
-    tokenStore.tokenInfo = res
-    tokenStore.pairAddress = res?.pairs?.[0].pair || ''
-  }).finally(() => {
-    tokenStore.loadingToken = false
-  })
+  return getTokenInfo(id)
+    .then((res) => {
+      tokenStore.tokenInfo = res
+      tokenStore.pairAddress = res?.pairs?.[0].pair || ''
+    })
+    .finally(() => {
+      tokenStore.loadingToken = false
+    })
 }
 
 function _getTokenInfoExtra() {
   const id = route.params.id as string
-  getTokenInfoExtra(id).then(res => {
+  getTokenInfoExtra(id).then((res) => {
     tokenStore.tokenInfoExtra = res
   })
 }
 
 function init(isRefresh = false) {
   tokenStore.tokenPrice = 0
-  _getTokenInfo().then(()=>{
-    if(!isRefresh){
+  _getTokenInfo().then(() => {
+    if (!isRefresh) {
       addVisit()
     }
   })
@@ -269,14 +275,17 @@ function init(isRefresh = false) {
   useCheckStore().getContractCheckResult(route.params.id as string, walletAddress.value)
 }
 
-watch(() => route.params.id, () => {
-  init()
-  subscribePortrait()
-})
+watch(
+  () => route.params.id,
+  () => {
+    init()
+    subscribePortrait()
+  }
+)
 
 function visibilitychangeFn() {
   console.log(`页面是否隐藏: ${document.hidden}`)
-  documentVisible.value = (!document.hidden || document.visibilityState === 'visible')
+  documentVisible.value = !document.hidden || document.visibilityState === 'visible'
 }
 
 onBeforeMount(() => {
@@ -290,16 +299,14 @@ onUnmounted(() => {
   wsStore.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
-    params: [
-      'asset'
-    ],
-    id: 1
+    params: ['asset'],
+    id: 1,
   })
   wsStore.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
     params: [WSEventType.PUBLIC_PORTRAIT],
-    id:1
+    id: 1,
   })
 })
 
@@ -313,15 +320,15 @@ function refresh() {
 }
 
 function addVisit() {
-  if(tokenStore.tokenInfo){
-    const {logo_url,symbol,chain,token} = tokenStore.tokenInfo.token
-    const index = globalStore.lastVisitTokens.findIndex(item => item.id === token+'-'+chain)
-    if(index === -1){
-      if(globalStore.lastVisitTokens.length >= 20){
+  if (tokenStore.tokenInfo) {
+    const { logo_url, symbol, chain, token } = tokenStore.tokenInfo.token
+    const index = globalStore.lastVisitTokens.findIndex((item) => item.id === token + '-' + chain)
+    if (index === -1) {
+      if (globalStore.lastVisitTokens.length >= 20) {
         globalStore.lastVisitTokens.pop()
       }
-        globalStore.lastVisitTokens.unshift({
-        id:token+'-'+chain,
+      globalStore.lastVisitTokens.unshift({
+        id: token + '-' + chain,
         logo_url,
         symbol,
         price_change: tokenStore.priceChange,
@@ -333,11 +340,16 @@ function addVisit() {
     usePriceV2Store().sendPriceWs()
   }
 }
+
+const klineContainerRef = useTemplateRef('klineContainer')
+const centerScroll = ({ scrollTop }: { scrollTop: number }) => {
+  klineContainerRef.value?.setScrollTop?.(scrollTop)
+}
 </script>
 
 <style scoped>
 .hide-scrollbar {
-  >.el-scrollbar {
+  > .el-scrollbar {
     .el-scrollbar__bar {
       --at-apply: hidden;
     }

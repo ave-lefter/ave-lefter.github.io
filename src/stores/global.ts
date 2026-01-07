@@ -206,9 +206,7 @@ export const useGlobalStore = defineStore('global', () => {
   const tokenHistoryVisible = true
   const klineSettingPop = ref({
     visible:false,
-    style:{
-
-    }
+    position:[] as number[]
   })
   const lastVisitTokens = useStorage<{
     id: string,

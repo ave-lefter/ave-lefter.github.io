@@ -221,3 +221,5 @@ export const holdersTooltip = (t)=>({
    25:t('dev2'),
    16:t('mouse')
 })
+
+export const KOL_KEY = '31'
