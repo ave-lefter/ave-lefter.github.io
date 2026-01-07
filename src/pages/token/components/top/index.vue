@@ -414,11 +414,15 @@
               token?.token?.replace(new RegExp('(.{4})(.+)(.{4}$)'), '$1...$3')
             }}
           </a>
-          <Icon
-            v-copy="token?.token"
-            name="bxs:copy"
-            class="ml-5px clickable"
-          />
+          <span
+            class="media-item bg-btn cursor-pointer"
+          >
+            <Icon
+              v-copy="token?.token"
+              name="bxs:copy"
+              class="ml-5px clickable"
+            />
+          </span>
           <span
             v-if="pair"
             v-tooltip="formatDate(pair?.created_at)"
@@ -576,6 +580,39 @@
             </span>
           </div>
           <top50 />
+          <el-popover width="120px" popper-class="[--el-popover-bg-color:--border] !min-w-[120px]">
+            <template #reference>
+              <span
+                class="media-item bg-btn cursor-pointer"
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path :fill="devToken?.total_tokens ? '#F6465D' : '#5A5E64'" d="M8.04273 10H1.94948C1.80865 10 1.69463 9.87378 1.69463 9.71787V8.05005H8.29757V9.71914C8.29648 9.87378 8.18246 10 8.04273 10ZM1.69463 7.43178V6.31448C0.714308 6.05962 0 5.07978 0 3.94159C0 2.59556 0.988135 1.50067 2.20322 1.50067C2.44801 1.50067 2.69172 1.54645 2.91975 1.63308C3.22493 0.669309 4.05656 1.3726e-10 4.99999 1.3726e-10C5.94342 -1.10678e-05 6.77507 0.66932 7.08025 1.63308C7.30942 1.54645 7.55198 1.50067 7.79678 1.50067C9.01187 1.50067 10 2.59556 10 3.94159C10 5.07978 9.2857 6.05842 8.30536 6.31448V7.43178H1.69463Z" />
+                </svg>
+                <span class="text-[--main-text] text-10px ml-2px mt-1px">{{devToken?.total_tokens}}</span>
+            </span>
+            </template>
+            <template #default>
+              <div class="py-4px [&&]:m--12px flex flex-col">
+                <span class="flex items-center justify-between text-12px py-4px px-8px color-[--third-text]">
+                  <span>Dev{{ $t('migrated') }}</span>
+                  <span class="text-[--main-text]">{{ devToken.total_migrated }}</span>
+                </span>
+                <span class="flex items-center justify-between text-12px py-4px px-8px color-[--third-text]">
+                  <span>Dev{{ $t('totalTokens') }}</span>
+                  <span class="text-[--main-text]">{{ devToken.total_tokens }}</span>
+                </span>
+                <div class="flex items-center justify-between text-12px py-4px px-8px color-[--third-text]">
+                  <span>{{ $t('migrationRate') }}</span>
+                  <span class="text-[--main-text]">
+                    {{ devToken?.total_tokens ? ((devToken.total_migrated ?? 0) / devToken.total_tokens * 100).toFixed(2) : 0 }}%
+                  </span>
+                </div>
+                <span class="flex items-center justify-between clickable text-12px py-4px px-8px color-[--third-text] hover:bg-[--dialog-tab-active]" @click="handleViewDevTokens">
+                  <span>{{ $t('viewDevTokens') }}</span>
+                </span>
+              </div>
+            </template>
+          </el-popover>
         </div>
       </div>
     </div>
@@ -810,7 +847,7 @@ import {
   editTokenFavRemark,
   addFavoriteGroup,
 } from '@/api/fav'
-import { _getRugPull, type ResultRugPull } from '@/api/run'
+import { _getRugPull, _getDevList, type ResultRugPull } from '@/api/run'
 import type { Token, Pair } from '@/api/types/token'
 import {
   upColor,
@@ -854,9 +891,46 @@ const rugPull = ref<ResultRugPull>({
 const loadingRun = shallowRef(false)
 const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
 favDialogEvent.on(handleFavDialogEvent)
+// 开发者代币
+const devToken = shallowRef<any>({total_tokens: 0, total_migrated: 0})
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
+const devTokensEvent = useEventBus(BusEventType.DEV_TOKENS_TAB)
+function handleViewDevTokens() {
+  devTokensEvent.emit()
+  ElMessage.success(t('devTokensDisplayed'))
+}
+async function getRugPullList() {
+  const data = {
+    token_id: id.value,
+    pageNO: 1,
+    pageSize: 1,
+  }
+  const res = await _getDevList(data)
+  devToken.value = res
+}
+
+
+watch(
+  () => showCheck.value,
+  (val) => {
+    if (val) {
+      useCheckStore().getContractCheckResult(route.params.id as string, walletAddress.value)
+    }
+  }
+)
+watch(
+  () => route.params.id,
+  () => {
+    if (route.params.id) {
+      getRugPullList()
+    }
+  }
+)
+
+
 onUnmounted(() => {
+  topEventBus.off(handleViewDevTokens)
   favDialogEvent.off(handleFavDialogEvent)
 })
 
@@ -943,7 +1017,10 @@ onMounted(() => {
     getTokenFavoriteCheck()
     getTokenUserFavoriteGroups() //获取分组数组
   }
-  useCheckStore().getContractCheckResult(id.value, evmAddress?.value)
+  if (route.params.id) {
+    getRugPullList()
+  }
+  // useCheckStore().getContractCheckResult(id.value, walletAddress.value)
   if (chain.value == 'solana') {
     getRugPull()
   }
@@ -967,7 +1044,7 @@ watch(
       getTokenFavoriteCheck()
       getTokenUserFavoriteGroups() //获取分组数组
     }
-    useCheckStore().getContractCheckResult(id.value, evmAddress.value)
+    // useCheckStore().getContractCheckResult(id.value, evmAddress.value)
     if (chain.value == 'solana') {
       getRugPull()
     }

@@ -9,7 +9,7 @@
       <!-- <img v-show="!loading" id="wc-qr-image" class="h-320px w-320px" :src="qrImgUrl" alt="qrCode"> -->
       <canvas v-show="!loading" id="wc-qr-canvas" class="rd-30px" />
     </div>
-    <div class="text-center text-14px mt-10px">Scan this QR Code with your phone</div>
+    <div class="text-center text-14px mt-10px">{{ $t('wcWalletTip') }}</div>
     <el-divider><span class="color-[--d-999-l-666]">{{ $t('download') }} App</span></el-divider>
     <div v-if="walletName === 'Binance Wallet'" class="flex items-center justify-around">
       <a class="text-center clickable" target="_blank" href="https://apps.apple.com/sg/app/binance-buy-bitcoin-crypto/id1436799971">
@@ -38,7 +38,7 @@
         </div>
         <div class="color-[--d-999-l-666]">Google Play</div>
       </a>
-       <a class="text-center clickable" target="_blank" href="https://ossaveai.com/oss/app/ave.ai.apk">
+       <a class="text-center clickable" target="_blank" href="https://www.avedownload.com/app/ave.ai.2.3.07.c.apk">
         <div class="mb-5px">
           <Icon name="material-symbols:android" class="text-20px color-#8ad04d" />
         </div>

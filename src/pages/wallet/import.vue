@@ -96,7 +96,7 @@ const handleKeydown = (e: KeyboardEvent, index: number) => {
 }
 // 处理粘贴事件
 const handlePaste = (e: KeyboardEvent, index: number) => {
-  const pasteData = e.clipboardData.getData('text').trim()
+  const pasteData = e.clipboardData.getData('text')?.trim()?.toLowerCase()
 
   const arr = pasteData?.replace(/\s+/g, ' ')?.split(' ')
   if (arr?.length == 12) {

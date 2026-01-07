@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-
-const { isDark } = storeToRefs(useThemeStore())
+import { Clock } from '@element-plus/icons-vue'
 const { advancedForm } = storeToRefs(useCopyTradeStore())
 const props = defineProps({
   boundary: {
@@ -33,6 +31,20 @@ const disabledEndHours = () => {
   const startHour = Math.floor(startSec / 3600)
   return Array.from({ length: 24 }, (_, h) => h).filter(h => h < startHour)
 }
+watch(() => advancedForm.value?.enableAt, () => {
+  if (advancedForm.value?.enableAt) {
+    filterTime.value[0] = advancedForm.value.enableAt ? advancedForm.value.enableAt + ":00" : null
+  } else {
+    filterTime.value[0] = null
+  }
+})
+watch(() => advancedForm.value?.disableAt, () => {
+  if (advancedForm.value?.disableAt) {
+    filterTime.value[1] = advancedForm.value.disableAt ? advancedForm.value.disableAt + ":00" : null
+  } else {
+    filterTime.value[1] = null
+  }
+})
 const reset = ()=>{
   filterTime.value = [null, null]
 }
@@ -40,16 +52,17 @@ defineExpose({ reset })
 </script>
 
 <template>
-  <div class="mt-5px flex items-center gap-4px text-12px">
+  <div class="mt-5px flex items-center text-12px">
     <el-time-picker
       v-model="filterTime[0]"
       :disabled-hours="disabledStartHours"
-      class="[--el-font-size-base:12px]"
+      placement="top"
+      style="width: 221px"
       type="datetime"
-      placeholder="开始时间"
+      :placeholder="$t('startTime')"
       format="HH:00"
       value-format="HH:00"
-      prefix-icon="Clock"
+      :prefix-icon="Clock"
       :teleported="false"
       @change="emit('change',filterTime)"
     />
@@ -57,12 +70,13 @@ defineExpose({ reset })
     <el-time-picker
       v-model="filterTime[1]"
       :disabled-hours="disabledEndHours"
-      class="[--el-font-size-base:12px]"
+      placement="top"
+      style="width: 221px"
       type="datetime"
-      placeholder="截止时间"
+      :placeholder="$t('endTime1')"
       format="HH:00"
       value-format="HH:00"
-      prefix-icon="Clock"
+      :prefix-icon="Clock"
       :teleported="false"
       @change="emit('change',filterTime)"
     />

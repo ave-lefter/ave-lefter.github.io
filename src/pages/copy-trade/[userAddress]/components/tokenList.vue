@@ -4,7 +4,6 @@
       ref="table_ref"
       :data="tableData"
       fit
-      style="width: 100%"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
       cell-class-name="color-[--secondary-text]"
       row-class-name="cursor-pointer"
@@ -14,7 +13,7 @@
         <AveEmpty v-if="!loading && tableData.length === 0" class="pt-[40px]" />
         <span v-else />
       </template>
-      <el-table-column :label="$t('type')" align="left" fixed="left" v-if="type === 'success' || type === 'failed'">
+      <el-table-column :label="$t('type')" fixed="left" v-if="type === 'success' || type === 'failed'">
         <template #header>
           <span>{{ $t('type') }}</span>
           <el-popover
@@ -76,15 +75,15 @@
         </template>
         <template #default="{ row }">
           <span v-if="row.swapType ==7" class="bg-[#12B8861A] color-[--up-color] px-4px rounded-2px ml-5px text-10px"
-            >买入</span
+            >{{ $t('buy') }}</span
           >
-          <span v-else class="bg-[#F6465D1A] color-[--down-color] px-4px rounded-2px ml-5px text-10px">卖出</span>
+          <span v-else class="bg-[#F6465D1A] color-[--down-color] px-4px rounded-2px ml-5px text-10px">{{ $t('sell') }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('token')" align="left">
         <template #default="{ row }">
           <NuxtLink
-            class="px-10px flex items-center h-50px cursor-pointer hover:bg-[--dialog-bg]"
+            class="px-10px flex items-center h-50px cursor-pointer"
             :to="`/token/${row.token}-${row.chain}`"
           >
             <div class="flex items-center flex-1">
@@ -141,14 +140,14 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('price')" align="right" :min-width="110" v-if="type === 'success' || type === 'token'">
+      <el-table-column :label="$t('price')" align="right" v-if="type === 'success' || type === 'token'">
         <template #default="{ row }">
           <div :class="!row?.price ? 'color-text-3' : ''">
             ${{ row?.price > 0 ? formatNumber(row?.price || row?.price || 0 ) : 0 }}
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('amount')" align="right" :min-width="110">
+      <el-table-column :label="$t('amount')" align="right">
         <template #default="{ row }">
           <div :class="!row?.amount ? 'color-text-3' : ''">
             {{ row?.amount > 0 ? formatNumber(row?.amount || 0, 2) : 0 }}

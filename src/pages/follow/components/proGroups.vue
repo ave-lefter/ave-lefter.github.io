@@ -33,7 +33,7 @@
           />
       </li>
     </template>
-    <li ref="addButtonRef" class="clickable color-[--secondary-text]! flex gap-2px bg-[--main-input-button-bg]!">
+    <li ref="addButtonRef" class="clickable color-[--secondary-text]! flex gap-2px bg-[--main-input-button-bg]!" @click.stop.prevent="proPopoverRef?.popoverRef?.show?.()">
       <Icon name="custom:add-icon" class="text-12px" />
       <span>{{ $t('newGroup') }}</span>
     </li>
@@ -112,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import ProPopover from './proPopover.vue'
+import ProPopover from '@/pages/follow/components/proPopover.vue'
 import {VueDraggableNext} from 'vue-draggable-next'
 import type { FormInstance, FormRules } from 'element-plus'
 

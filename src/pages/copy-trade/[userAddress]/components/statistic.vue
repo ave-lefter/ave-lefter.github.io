@@ -69,17 +69,25 @@
         class="item bg-[--secondary-bg] px-24px py-24px rounded-8px flex-1 flex flex-col items-center"
       >
         <span class="text-14px color-[--third-text] block mb-10px">{{ $t('realizedProfit') }}</span>
-        <span v-if="Number(copyObj?.profitRealized)>0" class="text-18px color-[--up-color]">${{ formatNumber(copyObj?.profitRealized || 0, 2) }}</span>
-        <span v-else-if="Number(copyObj?.profitRealized)<0" class="text-18px color-[--down-color]">${{ formatNumber(copyObj?.profitRealized || 0, 2) }}</span>
-        <span v-else class="text-18px color-[--secondary-text]">0</span>
+        <div>
+          <span v-if="Number(copyObj?.profitRealized)>0" class="text-18px color-[--up-color]">${{ formatNumber(copyObj?.profitRealized || 0, 2) }}</span>
+          <span v-else-if="Number(copyObj?.profitRealized)<0" class="text-18px color-[--down-color]">${{ formatNumber(copyObj?.profitRealized || 0, 2) }}</span>
+          <span v-else class="text-18px color-[--secondary-text]">0</span>
+          <span v-if="Number(copyObj?.profitRealizedRatio)>0" class="text-12px color-[--up-color]">({{ formatNumber(copyObj?.profitRealizedRatio || 0, 2) }}%)</span>
+          <span v-else-if="Number(copyObj?.profitRealizedRatio)<0" class="text-12px color-[--down-color]">({{ formatNumber(copyObj?.profitRealizedRatio || 0, 2) }}%)</span>
+        </div>
       </div>
       <div
         class="item bg-[--secondary-bg] px-24px py-24px rounded-8px flex-1 flex flex-col items-center"
       >
         <span class="text-14px color-[--third-text] block mb-10px">{{ $t('unrealizedProfit') }}</span>
-        <span v-if="Number(copyObj?.profitUnrealized)>0" class="text-18px color-[--up-color]">${{ formatNumber(copyObj?.profitUnrealized || 0, 2) }}</span>
-        <span v-else-if="Number(copyObj?.profitUnrealized)<0" class="text-18px color-[--down-color]">${{ formatNumber(copyObj?.profitUnrealized || 0, 2) }}</span>
-        <span v-else class="text-18px color-[--secondary-text]">0</span>
+        <div>
+          <span v-if="Number(copyObj?.profitUnrealized)>0" class="text-18px color-[--up-color]">${{ formatNumber(copyObj?.profitUnrealized || 0, 2) }}</span>
+          <span v-else-if="Number(copyObj?.profitUnrealized)<0" class="text-18px color-[--down-color]">${{ formatNumber(copyObj?.profitUnrealized || 0, 2) }}</span>
+          <span v-else class="text-18px color-[--secondary-text]">0</span>
+          <span v-if="Number(copyObj?.profitUnrealizedRatio)>0" class="text-12px color-[--up-color]">({{ formatNumber(copyObj?.profitUnrealizedRatio || 0, 2) }}%)</span>
+          <span v-else-if="Number(copyObj?.profitUnrealizedRatio)<0" class="text-12px color-[--down-color]">({{ formatNumber(copyObj?.profitUnrealizedRatio || 0, 2) }}%)</span>
+        </div>
       </div>
       <div
         class="item bg-[--secondary-bg] px-24px py-24px rounded-8px flex-1 flex flex-col items-center"
@@ -197,10 +205,8 @@ onMounted(async () => {
   selectChain.value = chain.value
   if (copyOrder.value?.copyList?.length == 0 || !copyOrder.value) {
     await getFollowingInfo()
-    console.log('----copyOrder.value---',copyOrder.value)
     copyObj.value = copyOrder.value?.copyList?.find((i) => i.chain === selectChain.value && i.followAddress== followAddress.value)
   }
-  console.log('--------------',copyObj.value?.id || route.query.id)
   if (copyObj.value?.id || route.query.id) {
     getFollowInfoById()
   }

@@ -9,9 +9,21 @@ const props = defineProps({
   size: {
     type: String,
     default: ''
+  },
+  showChainIcon: {
+    type: Boolean,
+    default: false
+  },
+  inputStyle:{
+    type: String,
+    default: ''
+  },
+  chain: {
+    type: String,
+    default: 'solana'
   }
 })
-
+const configStore = useConfigStore()
 const emit = defineEmits(['update:modelValue'])
 const quickBuyValue = computed({
   get() {
@@ -45,6 +57,7 @@ function handleBlurBuyValue() {
 
 <template>
   <el-input
+    :style="inputStyle"
     v-model.trim="quickBuyValue"
     :size="size"
     clearable
@@ -56,7 +69,16 @@ function handleBlurBuyValue() {
     <template
       #prefix
     >
+      <img
+        v-if="showChainIcon&&chain"
+        class="rounded-full w-14px h-14px mr-4px!"
+        :src="`${configStore.token_logo_url}chain/${chain}.png`"
+        alt=""
+        onerror="this.src='/icon-default.png'"
+        srcset=""
+      >
       <Icon
+        v-else
         name="mynaui:lightning-solid"
       />
     </template>

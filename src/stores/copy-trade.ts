@@ -31,7 +31,7 @@ export const useCopyTradeStore = defineStore('copyTrade', () => {
     isPrivate: false, //防夹
     priorityFee: '', //优先费/gas费
   })
-  const advancedForm = useLocalStorage('copy-advancedForm', {
+  const advancedForm = ref({
     minBuyValue: '',
     maxBuyValue: '',
     minMarketCap: '',
@@ -40,14 +40,10 @@ export const useCopyTradeStore = defineStore('copyTrade', () => {
     maxTokenAge: 0,
     enableAt: 0,
     disableAt: 0,
-    tokenAgeRange: {
-      startValue: null,
-      startUnit : '',
-      endValue : null,
-      endUnit : ''
-    }
   })
-  const blacklist = useLocalStorage<{ id: number; value: string }[]>('copy-blacklist', [])
+
+
+  const blacklist = ref<{ id: number; value: string }[]>([])
   const copyOrder = ref<CopyOrder | null>(null)
   const defaultCopyObj: CopyObj = {
     followName: '',

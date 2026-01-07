@@ -25,8 +25,8 @@ import type { Size, SizeObj, pumpObjColor } from '~/api/types/pump'
 import FingerprintJs from '@fingerprintjs/fingerprintjs'
 import { UniChainsV4 } from './wallet/utils/abi'
 import type { MessageHandler } from 'element-plus'
-export * from './wallet/utils/index'
 import CryptoJS from 'crypto-js'
+export * from './wallet/utils/index'
 
 export function isJSON(str: string) {
   try {
@@ -504,7 +504,10 @@ export function formatImgUrl(type: string, src: string) {
   const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
   return `${urlPrefix}${type}/${src}.png`
 }
-
+export function formatPerpIcon(src: string) {
+  const urlPrefix ='https://static.edgex.exchange/icons/coin/'
+  return src && src !== 'unknown' ? `${urlPrefix}signals/${src}.svg` : IconUnknown
+}
 export function deepMerge(target: any, source: any) {
   if (Array.isArray(target) && Array.isArray(source)) {
     // 如果是数组，直接覆盖
@@ -555,6 +558,16 @@ export function getWSMessage(e: MessageEvent) {
         data,
       }
     }
+  }
+  return null
+}
+export function getWSPerpMessage(e: MessageEvent) {
+  if (e.data === 'pong') {
+    return null
+  }
+  if (isJSON(e.data)) {
+    const result = JSON.parse(e.data || {}) || {}
+    return result
   }
   return null
 }
@@ -680,7 +693,8 @@ export function filterGas(num: number, chain?: string) {
     }
   }
 }
-export function addSign(val: number) {
+export function addSign(_val: number | string) {
+  const val = Number(_val)
   if (val > 0) {
     return '+'
   } else if (val < 0) {
@@ -774,8 +788,8 @@ export function getMCap(row: GetHotTokensResponse | SearchHot) {
   return amount.gt(0) ? amount.multipliedBy(row.current_price_usd).toString() : '0'
 }
 
-export function formatCountdown(time: ConfigType, isSecond = true) {
-  const seconds = Math.abs(dayjs(time).diff(dayjs(), 's'))
+export function formatCountdown(time: ConfigType, isSecond = true,defaultSeconds?:number) {
+  const seconds = defaultSeconds || Math.abs(dayjs(time).diff(dayjs(), 's'))
   if (seconds < 60) {
     return `${seconds}s`
   } else if (seconds < 3600) {
@@ -893,7 +907,7 @@ export function formatUnits(n: number | string, decimals = 0) {
   return new BigNumber(n).div(new BigNumber(10).pow(new BigNumber(decimals || 0))).toFixed()
 }
 
-export function parseUnits(n: number | string, decimals = 0) {
+export function parseUnits(n: number | string, decimals: number | string = 0) {
   return new BigNumber(
     new BigNumber(n).times(new BigNumber(10).pow(new BigNumber(decimals || 0))).toFixed(0)
   )
@@ -1123,7 +1137,7 @@ export function getPumpColor(platform: string): string {
   return pumpColorMap[platform as PlatformType] || '#FFA622'
 }
 
-export function requestTimeout(interval: number, callback: () => void) {
+export function requestTimeout(interval: number, callback: () => void | Promise<void>) {
   const timerId: { id: number | null } = { id: null }
   let lastCallTime = performance.now()
   const request = () => {
@@ -1166,10 +1180,10 @@ export function getLightDarkValue(cssVarName: string) {
   }
 }
 
-// 当有新消息时将数据存入队列，保证队列中只有 10 条数据，将久远的数据删除
+// 当有新消息时将数据存入队列，保证队列中只有 5 条数据，将久远的数据删除
 class MessageQueue {
   private queue: MessageHandler[] = []
-  private maxLength = 10
+  private maxLength = 5
 
   add(message: MessageHandler) {
     this.queue.push(message)
@@ -1255,7 +1269,7 @@ export function sendNotify(result: any) {
     lang: localStorage.getItem('language') || 'en',
   }
   if (window.Notification && Notification.permission === 'granted') {
-    var n = new Notification($i18n.t('alerts'), options)
+    const n = new Notification($i18n.t('alerts'), options)
     n.onclick = (event) => {
       event.preventDefault() // 阻止浏览器聚焦于 Notification 的标签页
       window.open(
@@ -1275,7 +1289,7 @@ export function sendNotify(result: any) {
 
       // 如果用户同意了
       if (status === 'granted') {
-        var n = new Notification($i18n.t('alerts'), options)
+        const n = new Notification($i18n.t('alerts'), options)
         n.onclick = (event) => {
           event.preventDefault() // 阻止浏览器聚焦于 Notification 的标签页
           window.open(
@@ -1295,4 +1309,15 @@ export function sendNotify(result: any) {
     // 我们可以让步的使用常规模态的 alert
     // alert('Hi!')
   }
+}
+
+
+// 获取小数位，分割 字符小数点
+export function getPrecision(num: number | string): number {
+  const val = Number(num);
+  if (isNaN(val)) {
+    return 0;
+  }
+  const strList = String(num).split(".");
+  return strList.length === 2 ? strList[1].length : 0;
 }

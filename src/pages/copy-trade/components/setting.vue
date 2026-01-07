@@ -1,7 +1,7 @@
 <template>
   <div >
     <el-divider class="!m-0 !mb-24px !mt-24px !border-t-[--dialog-divider]" />
-    <div class="flex-between cursor-pointer" @click="isExpanded = !isExpanded">
+    <div class="flex-between cursor-pointer" @click="toggle">
       <ul class="flex-start">
         <li class="text-12px flex-start">
           <Icon
@@ -41,56 +41,61 @@
         class="text-16px"
       />
     </div>
-    <transition name="fade" v-if="isExpanded">
-      <div>
-        <div class="flex-between mt-16px">
-          <span class="mr-auto color-[--secondary-text]">{{ $t('slippage') }}</span>
-          <Icon
-            class="text-15px color-[--icon-color] ml-5px clickable mr-auto"
-            name="material-symbols:help-rounded"
-            @click.stop="openSlippageTips"
-          />
-          <div class="flex-1"></div>
-          <div class="slippage-input">
-            <el-input
-              v-model.trim="currentSetting.slippage"
-              clearable
-              :placeholder="$t('custom')"
-              @input="(val) => onValidateInput(val, 'slippage')"
-            >
-              <template #suffix>
-                <span>%</span>
-              </template>
-            </el-input>
-          </div>
-        </div>
-        <div class="flex-between mt-16px">
-          <span class="mr-auto color-[--secondary-text]">{{ $t('protection') }}</span>
-          <el-switch
-            v-model="currentSetting.isPrivate"
-            class="ml-auto"
-            style="--el-switch-on-color: #3c6cf6; zoom: 0.9; height: 14px"
-          />
-        </div>
-        <div class="flex-between mt-16px">
-          <span class="color-[--secondary-text]">{{ chain === 'solana' ? $t('priorityFee') : $t('extraGas') }}</span>
-          <div class="flex-1"></div>
-          <div>
-            <el-input
-              v-model="currentSetting.priorityFee"
-              inputmode="decimal"
-              clearable
-              :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')"
-              @input="(val) => onValidateInput(val, 'priorityFee')"
-            >
-              <template #suffix>
-                <span>{{chain === 'solana' ? 'SOL' : 'GWEI'}}</span>
-              </template>
-            </el-input>
-          </div>
+    <div ref="expandRef" v-show="isExpanded">
+      <div class="flex-between mt-16px">
+        <span class="mr-auto color-[--secondary-text]">{{ $t('slippage') }}</span>
+        <Icon
+          class="text-15px color-[--icon-color] ml-5px clickable mr-auto"
+          name="material-symbols:help-rounded"
+          @click.stop="openSlippageTips"
+        />
+        <div class="flex-1"></div>
+        <div class="slippage-input">
+          <el-input
+            ref="input1Ref"
+            v-model.trim="currentSetting.slippage"
+            clearable
+            :placeholder="$t('custom')"
+            @input="(val) => onValidateInput(val, 'slippage')"
+            style="width: 221px"
+            @focus="onFocus1"
+          >
+            <template #suffix>
+              <span>%</span>
+            </template>
+          </el-input>
         </div>
       </div>
-    </transition>
+      <div class="flex-between mt-16px">
+        <span class="mr-auto color-[--secondary-text]">{{ $t('protection') }}</span>
+        <el-switch
+          v-model="currentSetting.isPrivate"
+          class="ml-auto"
+          style="--el-switch-on-color: #3c6cf6; zoom: 0.9; height: 14px"
+        />
+      </div>
+      <div class="flex-between mt-16px">
+        <span class="color-[--secondary-text]">{{ chain === 'solana' ? $t('priorityFee') : $t('extraGas') }}</span>
+        <div class="flex-1"></div>
+        <div>
+          <el-input
+            ref="inputRef"
+            v-model="currentSetting.priorityFee"
+            inputmode="decimal"
+            clearable
+            :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')"
+            @input="(val) => onValidateInput(val, 'priorityFee')"
+            style="width: 221px"
+            @focus="onFocus"
+          >
+            <template #suffix>
+              <span>{{chain === 'solana' ? 'SOL' : 'GWEI'}}</span>
+            </template>
+          </el-input>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 <script setup lang="ts">
@@ -104,7 +109,7 @@ const { t } = useI18n()
 const botStore = useBotStore()
 const botSwapStore = useBotSwapStore()
 const tokenStore = useTokenStore()
-const emit = defineEmits(['getEstimatedGas'])
+const emit = defineEmits(['getEstimatedGas', 'updateScroll'])
 const { settingCopyTrade, defaultCopyTradeSetting, form , type} = storeToRefs(useCopyTradeStore())
 const props = withDefaults(
   defineProps<{
@@ -116,9 +121,9 @@ const props = withDefaults(
     visible: false
   }
 )
-
+const expandRef = ref<HTMLElement | null>(null)
 const gasPrice = shallowRef(0)
-const isExpanded = shallowRef(false)
+const isExpanded = ref(false)
 const currentSetting = computed(() => {
   if (!settingCopyTrade.value) {
     settingCopyTrade.value = {}
@@ -127,7 +132,7 @@ const currentSetting = computed(() => {
   if (!settingCopyTrade.value[props.chain]) {
     settingCopyTrade.value[props.chain] = { ...defaultCopyTradeSetting.value, priorityFee: props.chain == 'solana' ? '0.04': '1' }
   }
-
+  console.log('----settingCopyTrade.value[props.chain]!---------',settingCopyTrade.value[props.chain]!)
   return settingCopyTrade.value[props.chain]!
 })
 
@@ -136,7 +141,7 @@ watch(
   (val) => {
     form.value.slippage = val
   },
-  { immediate: true }
+  { deep: true, immediate: true }
 )
 
 watch(
@@ -144,7 +149,7 @@ watch(
   (val) => {
     form.value.isPrivate = val
   },
-  { immediate: true }
+  { deep: true, immediate: true }
 )
 
 watch(
@@ -152,7 +157,7 @@ watch(
   (val) => {
     form.value.priorityFee = val
   },
-  { immediate: true }
+  { deep: true,immediate: true }
 )
 function getGasPrice() {
   const chain = props.chain
@@ -204,6 +209,17 @@ const botPriorityFee = () => {
   return priorityFee
 }
 
+const toggle = async () => {
+  isExpanded.value = !isExpanded.value
+
+  if (isExpanded.value) {
+    await nextTick()
+    expandRef.value?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
+}
 function getEstimatedGas() {
   const chain = props.chain
   let gas = '0'
@@ -249,6 +265,16 @@ const onValidateInput = (val: string, type: 'slippage' | 'priorityFee') => {
     value = '100'
   }
   currentSetting.value[type] = Number(value)
+}
+const inputRef = ref()
+
+const onFocus = () => {
+  inputRef.value?.input?.select()
+}
+const input1Ref = ref()
+
+const onFocus1 = () => {
+  input1Ref.value?.input?.select()
 }
 </script>
 <style lang="scss" scoped>

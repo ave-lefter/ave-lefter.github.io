@@ -41,8 +41,9 @@ export async function getApiDomainAndSave() {
     }
   }
 
-  const config = useRuntimeConfig()
-  const baseUrl = config?.public?.apiBase as string
+  // const config = useRuntimeConfig()
+  // const baseUrl = config?.public?.apiBase as string
+  const baseUrl = import.meta.env.VITE_API_BASE
 
   try {
     const res: { data: string } = await $fetch('/v1api/v2/helper/avedexSource/apidomainlist', {
@@ -93,8 +94,8 @@ export async function getApiDomainAndSave() {
 
 
 export function getBestApiDomain () {
-  const config = useRuntimeConfig()
-  const baseUrl = config?.public?.apiBase as string
+  // const config = useRuntimeConfig()
+  const baseUrl = import.meta.env.VITE_API_BASE
   if (baseUrl === 'https://api.test.phaetd8l.com') {
     return 'https://api.test.phaetd8l.com'
   }

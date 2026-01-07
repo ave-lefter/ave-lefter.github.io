@@ -30,7 +30,7 @@ export const useTokenStore = defineStore('token', () => {
     {}
   )
   const collected = shallowRef(false)
-
+  const loadingToken = shallowRef(false)
   const token = computed(() => tokenInfo.value?.token)
   const pairs = computed(() => tokenInfo.value?.pairs)
   const pairAddress = useSessionStorage('token_pairAddress', '')
@@ -55,7 +55,7 @@ export const useTokenStore = defineStore('token', () => {
     }, '0')
 
     const reserveU = _pairs?.reduce((pre, item) => {
-      return new BigNumber(pre || 0).plus(item.target_token === item.token0_address ? new BigNumber(item.reserve1 || 0).times(item.token1_price_usd || 0) : new BigNumber(item.reserve0 || 0).times(item.token0_price_usd || 0)).toFixed()
+      return new BigNumber(pre || 0).plus(item.target_token === item.token0_address ? new BigNumber(item.reserve1 || 0).times(item.token1_price_usd || 0).times(2) : new BigNumber(item.reserve0 || 0).times(item.token0_price_usd || 0).times(2)).toFixed()
     }, '0')
     return {
       token: token.value?.token,
@@ -329,7 +329,8 @@ export const useTokenStore = defineStore('token', () => {
     commonHeight,
     twitterType,
     collected,
-    getXType: _getXType
+    getXType: _getXType,
+    loadingToken,
   }
 })
 

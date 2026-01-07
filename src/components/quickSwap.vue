@@ -41,6 +41,7 @@ const noReminderQuickBuy = useStorage('noReminderQuickBuy', false)
 const emit = defineEmits(['submitSwap','jump'])
 
 function submitBotSwap() {
+  // return console.log('submitBotSwap')
   emit('submitSwap')
   if (!verifyLogin()) {
     return
@@ -153,7 +154,7 @@ async function submitSwap(amount: string) {
     slippage: slippage !== 'auto'
       ? Number(new BigNumber(slippage || '9').times(100).toFixed(0)) : 900,
     autoSell: botSettingStore.autoSellConfig_autoSell || false,
-    autoSellConfig: botSettingStore?.autoSellConfig,
+    autoSellConfig: botSettingStore?.selectedAutoSellConfig,
     autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
     autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
     autoSellPriorityFee: isSolana ? data.priorityFee : data.gasTip
@@ -242,7 +243,7 @@ async function getTokenBalance(chain: string) {
 
 <template>
   <template v-if="buttonType === 0">
-    <el-button
+  <el-button
     :disabled="!Number(quickBuyValue)"
     :loading="loadingSwap || loadingWalletSwap"
     :color="buttonBg"

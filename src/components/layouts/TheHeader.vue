@@ -307,6 +307,7 @@ const list = computed(() => {
     { id: 'follow', name: t('follow'), src: '/follow' },
     {id: 'smart', name: t('signal2'), src: '/smart', target: '_self'},
     {id: 'copy-trade', name: t('copyTrade'), src: '/copy-trade', target: '_self'},
+    { id: 'perp', name: t('perp'), src: '/perp' },
     {id: 'address', name: t('balances'), src: '/address', target: '_self'},
   ]
   return menues

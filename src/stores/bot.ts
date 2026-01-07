@@ -56,7 +56,7 @@ export const useBotStore = defineStore('bot', () => {
   const subscribed = ref(false)
   const bundleAvailable = ref(false)
 
-  const connectVisible = useStorage('connectVisible', false, sessionStorage)
+  const connectVisible = ref(false)
   const connectWalletTab = ref(0)
   const walletList = ref<Awaited<ReturnType<typeof bot_getWalletsAllChain>>>([])
   const botSwapStore = useBotSwapStore()
@@ -134,7 +134,7 @@ export const useBotStore = defineStore('bot', () => {
       let i = walletList.value[k]
       let _item: typeof item | string = item
       if (BotNativeTokens?.includes(item?.address || '')) {
-        _item = item.chain
+        _item = item?.chain || ''
       }
       _getUserAllChainBalance(i?.addresses || [], _item)
     }

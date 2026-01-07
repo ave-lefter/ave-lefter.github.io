@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import type { pumpBlack, pumpObjColor } from '@/api/types/pump'
 import { _getFollowsNum } from '@/api/follow'
-
+import type { MonitorChainType } from '~/utils/types'
 import type{ GetHotTokensResponse } from '@/api/token'
 import type { ILatestNotice } from '~/api/user'
 import { getUserFavoriteGroups, type GetUserFavoriteGroupsResponse } from '~/api/fav'
@@ -163,6 +163,12 @@ export const useGlobalStore = defineStore('global', () => {
     border: '',
   })
 
+  const batchRemarkFormData = useStorage('batchRemarkFormData', {
+    type: 1,
+    needAmount: true,
+    isUpdateExist: true,
+  })
+
   const hide_risk=shallowRef(1)
   const hide_small=shallowRef(0)
   const rankCommon = useStorage('rankCommon', {
@@ -176,12 +182,26 @@ export const useGlobalStore = defineStore('global', () => {
     sort: 'created_timestamp',
     sort_dir: 'DESC',
   })
-  const audioSettings = useStorage('audioSettings',{
+  const audioSettings = useStorage('audioSettings-v1',{
     active:'',
     notice:{
-      monitor:false,
+      monitor:true,
+      monitorShow:0,
+      monitorBorder:1,
+      monitorTh:[true,true,true],
+      quickBuyChain:'solana' as  MonitorChainType,
+      // monitorTh:['walletUser','walletName','MC','createTime'],
+      quickBuy:true,
+      quickBuyValue_solana:'0.01',
+      quickBuyValue_bsc:'0.01',
+      quickBuyValue_xlayer:'0.01',
+      quickBuyAction:1,
       signal:true,
-      position:'top'
+      pumpNotice:false,
+      pumpChains:['solana'] as string[],
+      pumpPlatforms:[] as string[],
+      position:'top',
+      time:3
     },
     audio:{
       signal:'Bar',
@@ -195,6 +215,10 @@ export const useGlobalStore = defineStore('global', () => {
 
   // 预留一个全局变量，用于控制 token 历史的显示
   const tokenHistoryVisible = true
+  const klineSettingPop = ref({
+    visible:false,
+    position:[] as number[]
+  })
   const lastVisitTokens = useStorage<{
     id: string,
     logo_url: string,
@@ -359,6 +383,8 @@ export const useGlobalStore = defineStore('global', () => {
     dialogVisible_search,
     dialogSearchText,
     showImport,
-    showBotRecord
+    showBotRecord,
+    batchRemarkFormData,
+    klineSettingPop
   }
 })

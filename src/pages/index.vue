@@ -5,7 +5,7 @@ import hot from './components/hotRank/hot.vue'
 import newRank from './components/newRank/new.vue'
 import inclusionRank from './components/inclusionRank/inclusion.vue'
 import gainer from './components/gainerRank/gainer.vue'
-import { getTreasureConfig, klinePreviews, type IGetTreasureConfig } from '~/api/market'
+import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
 
 import { trackRef } from '~/api/tracking'
 
@@ -14,39 +14,30 @@ const activityComponent = defineAsyncComponent(() => import('./components/activi
 const liveComponent = defineAsyncComponent(() => import('./components/live/index.vue'))
 const components = {
   new: newRank,
-  inclusion:inclusionRank,
+  inclusion: inclusionRank,
   hot,
   gainer,
-  // pump: pumpComponent,
-  // bonk_pump: pumpComponent,
-  // four: pumpComponent,
-  // bonk: pumpComponent,
-  // moonshot: pumpComponent,
-  // Studio: pumpComponent,
-  // novabits: pumpComponent,
   binance_alpha: activityComponent,
   cto: activityComponent,
   xstocks: activityComponent,
   volume: activityComponent,
-  // heaven_pump: pumpComponent,
-  // xdyorswap_pump: pumpComponent,
   pumplive: liveComponent,
-  clanker: activityComponent
+  clanker: activityComponent,
 }
 
 const walletStore = useWalletStore()
 const botStore = useBotStore()
 const globalStore = useGlobalStore()
 const activeTab = storeToRefs(globalStore).rankActiveTab
-const activeSubTab = useStorage('rankSubTab','pump_in_hot')
+const activeSubTab = useStorage('rankSubTab', 'pump_in_hot')
 const activeChain = useStorage('rankChain', 'AllChains')
 const chains = shallowRef<IGetTreasureConfig[]>([])
 const currentChainObj = computed(() => {
   return chains.value.find((el) => el.net_name === activeChain.value)
 })
-const isPump = computed(()=>{
-  if(Array.isArray(currentChainObj.value?.categories)){
-    return currentChainObj.value.categories.find(el=>el.category === activeTab.value)?.is_pump
+const isPump = computed(() => {
+  if (Array.isArray(currentChainObj.value?.categories)) {
+    return currentChainObj.value.categories.find((el) => el.category === activeTab.value)?.is_pump
   }
   return 0
 })
@@ -60,16 +51,19 @@ const walletAddress = computed(() => {
 
 onMounted(() => {
   _getTreasureConfig()
-  if(walletAddress.value){
+  if (walletAddress.value) {
     useGlobalStore().getUserFavoriteGroups(walletAddress.value)
   }
-  trackRef({category: 'view', extra: 'home(pro.ave.ai)'})
+  trackRef({ category: 'view', extra: 'home(pro.ave.ai)' })
 })
-watch(()=>walletAddress.value,(val)=>{
-  if(val){
-    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+watch(
+  () => walletAddress.value,
+  (val) => {
+    if (val) {
+      useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+    }
   }
-})
+)
 const wsStore = useWSStore()
 // 把榜单的订阅取消掉
 onUnmounted(() => {
@@ -91,22 +85,22 @@ function listMapFunction(i: Record<string, any>) {
   const time_arr = ['1m', '5m', '15m', '1h', '4h', '24h']
   const progress_obj: Record<string, any> = {}
   time_arr.forEach((t) => {
-    ;(progress_obj[`progress_buys_tx_${t}_count`] =
+    progress_obj[`progress_buys_tx_${t}_count`] =
       i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`] > 0
         ? (i[`buys_tx_${t}_count`] / (i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`])) * 100
-        : 0);
-      (progress_obj[`progress_sells_tx_${t}_count`] =
-        i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`] > 0
-          ? (i[`sells_tx_${t}_count`] / (i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`])) * 100
-          : 0);
-      (progress_obj[`progress_buy_volume_u_${t}`] =
-        i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`] > 0
-          ? (i[`buy_volume_u_${t}`] / (i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`])) * 100
-          : 0);
-      (progress_obj[`progress_sell_volume_u_${t}`] =
-        i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`] > 0
-          ? (i[`sell_volume_u_${t}`] / (i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`])) * 100
-          : 0)
+        : 0
+    progress_obj[`progress_sells_tx_${t}_count`] =
+      i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`] > 0
+        ? (i[`sells_tx_${t}_count`] / (i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`])) * 100
+        : 0
+    progress_obj[`progress_buy_volume_u_${t}`] =
+      i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`] > 0
+        ? (i[`buy_volume_u_${t}`] / (i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`])) * 100
+        : 0
+    progress_obj[`progress_sell_volume_u_${t}`] =
+      i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`] > 0
+        ? (i[`sell_volume_u_${t}`] / (i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`])) * 100
+        : 0
   })
   let signal_arr: any[] = []
   let normal_tag = []
@@ -146,11 +140,11 @@ function listMapFunction(i: Record<string, any>) {
     signal_arr?.sort((a, b) => b.timestamp - a.timestamp)
     normal_tag = tag_arr.filter((i) => !i?.startsWith('signal'))
   }
-  if (i.tag) {
-    const tag = i.tag?.split(',') || []
-    const tag1 = tag.filter((i) => i !== 'pump' && i !== 'moonshot') || []
-    normal_tag = tag1.concat(normal_tag)
-  }
+  // if (i.tag) {
+  //   const tag = i.tag?.split(',') || []
+  //   const tag1 = tag.filter((i) => i !== 'pump' && i !== 'moonshot') || []
+  //   normal_tag = tag1.concat(normal_tag)
+  // }
   normal_tag =
     normal_tag?.map((i) => ({
       tag: i,
@@ -203,7 +197,9 @@ function listMapFunction(i: Record<string, any>) {
   }
   if (i.tag_ti) {
     const tagti = i.tag_ti?.split(',') || []
-    let tag_t = tagti?.filter((i) => i !== '' && i !== 'newcommunity')
+    let tag_t = tagti?.filter(
+      (i) => i !== '' && i !== 'newcommunity' && i !== 'pump' && i !== 'moonshot'
+    )
     tag_t = tag_t?.map((i) => ({
       tag: i,
       color: 'green',
@@ -241,7 +237,7 @@ function listMapFunction(i: Record<string, any>) {
     medias: getMedias(i.appendix),
     ...progress_obj,
     normal_tag: normal_tag?.slice(0, 3) || [],
-    signal_arr: signal_arr?.slice(0, 1) || []
+    signal_arr: signal_arr?.slice(0, 1) || [],
   }
 }
 
@@ -272,7 +268,7 @@ function getMedias(appendix: string) {
 
 const height = computed(() => {
   // 有子 Tabs
-  if(isPump.value){
+  if (isPump.value) {
     return 'calc(100vh - 229px)'
   }
   return 'calc(100vh - 185px)'
@@ -281,7 +277,6 @@ const height = computed(() => {
 // const needAmmList = computed(()=>{
 //   return ['gainer', 'hot', 'new', 'inclusion','binance_alpha','xstocks', 'clanker'].includes(activeTab.value)
 // })
-
 </script>
 
 <template>
@@ -297,7 +292,7 @@ const height = computed(() => {
       />
       <KeepAlive :max="6">
         <component
-          :is="isPump?pumpComponent:_activityComponent"
+          :is="isPump ? pumpComponent : _activityComponent"
           ref="dynamicComponentRef"
           :height="height"
           :listMapFunction="listMapFunction"
@@ -311,5 +306,4 @@ const height = computed(() => {
   </div>
 </template>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

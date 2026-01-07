@@ -1,7 +1,7 @@
 <template>
   <el-drawer
     v-model="visible"
-    class="[&&]:bg-[--dialog-bg] hidden-scrollbar"
+    class="[&&]:bg-[--dialog-bg] hidden-scrollbar draw-copy"
     :size="720"
     header-class="!mb-5 [&&]:color-[--main-text]"
     append-to-body
@@ -9,8 +9,8 @@
     <template #header>
       <span class="color-[--main-text]">{{ $t('walletCopyTrade') }}</span>
     </template>
-    <el-divider class="!m-0 !mb-5 !border-t-[--dialog-divider]" />
     <div class="px-20px">
+      <el-divider class="!m-0 !mb-5 !border-t-[--dialog-divider]" />
       <el-form
         ref="formRef"
         class="mt-18px"
@@ -21,7 +21,7 @@
         label-position="left"
         @submit.prevent="createFollowOrder"
       >
-        <el-scrollbar class="filter-height hidden-scrollbar">
+        <!-- <el-scrollbar class="filter-height hidden-scrollbar" ref="scrollRef"> -->
           <div class="text-14px flex-start">
             <Icon name="custom:new-trade" class="text-12px mr-4px" />
             <span>{{ $t('noviceOrderTemplate') }}</span>
@@ -75,7 +75,7 @@
                 <span>{{ item.name || '' }}</span>
                 <Icon
                   name="majesticons:question-mark-circle-line"
-                  class="ml-4px text-10px color-[--third-text]"
+                  class="ml-4px text-12px color-[--third-text]"
                   v-tooltip="item.tip"
                 />
               </button>
@@ -339,7 +339,7 @@
                       class="bg-#3F80F71A flex items-center justify-center gap-8px rounded-8px mt-8px color-[--primary-color] px-12px py-12px cursor-pointer"
                       @click.stop.prevent="addItem"
                     >
-                      <Icon name="majesticons:plus-circle-line" />{{ $t('addBlack') }}
+                      <Icon name="majesticons:plus-circle-line"  class="text-18px"/>{{ $t('addBlack') }}
                     </div>
                   </div>
                 </div>
@@ -352,16 +352,18 @@
               <div class="color-[--third-text] text-12px leading-16px">
                 {{ $t('cancelORPauseTip') }}
               </div>
-              <span class="text-14px color-[--yellow] flex-start gap-4px mt-16px"
-                ><Icon name="majesticons:info-circle" />{{ $t('warning') }}</span
-              >
-              <div class="color-[--yellow] text-12px leading-16px">
-                {{ $t('cancelORPauseTip') }}
-              </div>
-              <Setting :chain="form.chain" :visible="visible" />
+              <template v-if="form.chain && isEvmChain(form.chain)">
+                <span class="text-14px color-[--yellow] flex-start gap-4px mt-16px"
+                  ><Icon name="majesticons:info-circle" />{{ $t('warning') }}</span
+                >
+                <div class="color-[--yellow] text-12px leading-16px">
+                  {{ $t('sellOutTip') }}
+                </div>
+              </template>
+              <Setting :chain="form.chain" :visible="visible"/>
             </div>
           </el-form-item>
-        </el-scrollbar>
+        <!-- </el-scrollbar> -->
       </el-form>
     </div>
     <template #footer>
@@ -421,8 +423,8 @@ const lowStrategy = ref({
   stopLossRatio: 50,
   minBuyValue: '300',
   minMarketCap: '300000',
-  // minTokenAge: 0,
-  // maxTokenAge: 10,
+  minTokenAge: 0,
+  maxTokenAge: 60 * 60,
 })
 //新手跟单高频策略
 const highStrategy = ref({
@@ -434,8 +436,8 @@ const highStrategy = ref({
 
   minBuyValue: '100',
   minMarketCap: '45000',
-  // minTokenAge: 0,
-  // maxTokenAge: 10,
+  minTokenAge: 0,
+  maxTokenAge: 10 * 60,
 })
 const formRef = useTemplateRef<FormInstance>('formRef')
 const loading = shallowRef(false)
@@ -445,8 +447,9 @@ const visible = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),
 })
-const strategyList = ref([
-  {
+const strategyList = computed(() => {
+  return [
+    {
     label: t('highStrategy'),
     id: 'high',
     description:t('highStrategyTip'),
@@ -455,8 +458,9 @@ const strategyList = ref([
     label: t('lowStrategy'),
     id: 'low',
     description:t('lowStrategyTip'),
-  },
-])
+  }
+]
+})
 const chain = shallowRef('solana')
 const clockTime_Ref = ref<InstanceType<typeof ClockTime> | null>(null)
 const dateTime_Ref = ref<InstanceType<typeof DateTime> | null>(null)
@@ -599,7 +603,21 @@ watch(() => visible.value, (val) => {
     const copy_setting_default = localStorage.getItem('copy_setting_add')
     if (copy_setting_default && JSON.parse(copy_setting_default)?.[form.value.chain]) {
       settingCopyTrade.value[form.value.chain] = JSON.parse(copy_setting_default)[form.value.chain]
+      form.value.slippage = settingCopyTrade.value[form.value.chain]?.slippage || 9
+      form.value.isPrivate = settingCopyTrade.value[form.value.chain]?.isPrivate || false
+      form.value.priorityFee = settingCopyTrade.value[form.value.chain]?.priorityFee || form.value.chain == 'solana' ? '0.04': '1'
     }
+    const advancedForm_default = localStorage.getItem('copy-advancedForm')
+    if (advancedForm_default && JSON.parse(advancedForm_default)) {
+      advancedForm.value = JSON.parse(advancedForm_default)
+    }
+    const blacklist_default = localStorage.getItem('copy-blacklist')
+    if (blacklist_default && JSON.parse(blacklist_default)) {
+      blacklist.value = JSON.parse(blacklist_default)
+    } else {
+      blacklist.value = []
+    }
+
   }
 })
 
@@ -608,12 +626,12 @@ function reset() {
   setTimeout(() => {
     resetLoading.value = false
     if(advancedForm.value.maxBuyValue || advancedForm.value.minBuyValue) {
-      advancedForm.value.maxBuyValue = '0'
-      advancedForm.value.minBuyValue = '0'
+      advancedForm.value.maxBuyValue = ''
+      advancedForm.value.minBuyValue = ''
     }
     if(advancedForm.value.maxMarketCap || advancedForm.value.minMarketCap) {
-      advancedForm.value.maxMarketCap = '0'
-      advancedForm.value.minMarketCap = '0'
+      advancedForm.value.maxMarketCap = ''
+      advancedForm.value.minMarketCap = ''
     }
     if(advancedForm.value.enableAt || advancedForm.value.disableAt) {
       advancedForm.value.enableAt = 0
@@ -628,6 +646,10 @@ function reset() {
     if(blacklist.value?.length > 0) {
       blacklist.value = []
     }
+
+    localStorage.removeItem('copy-blacklist')
+    localStorage.setItem('copy-advancedForm', JSON.stringify({ ...advancedForm.value }))
+
   }, 500)
 }
 
@@ -682,27 +704,9 @@ function handleBlur(props: (keyof FormType)[], val: string, index: number) {
 function createFollowOrder() {
   const filtered = Object.fromEntries(
     Object.entries(advancedForm.value).filter(
-      ([key, v]) =>  v && v !== '' && key !== 'tokenAgeRange'
+      ([key, v]) =>  v && v !== ''
     )
   )
-
-  if (advancedForm.value?.tokenAgeRange) {
-    const { startValue, startUnit, endValue, endUnit } = advancedForm.value?.tokenAgeRange
-    console.log('--------startValue--------',unitMs)
-    if (startValue || endValue) {
-      const startTime = Number(startValue || 0) * (unitMs[startUnit] || 0)
-      const endTime = Number(endValue || 0) * (unitMs[endUnit] || 0)
-      const now = Date.now()
-      if (startTime) {
-        filtered.minTokenAge = now + Number(startTime)
-      }
-      if (endTime) {
-        filtered.maxTokenAge = now + Number(endTime)
-      }
-    }
-  }
-
-  console.log('---filtered-------',filtered)
   let data = {
     ...filtered,
     tgUid: botStore?.userInfo?.tgUid || '',
@@ -719,7 +723,7 @@ function createFollowOrder() {
 
     slippage: form.value.slippage * 100, //滑点
     isPrivate: form.value.isPrivate, //防夹
-    priorityFee: form.value.priorityFee,
+    priorityFee: form.value.priorityFee || form.value?.chain == 'solana' ? '0.04': '1',
     tokenBlacklist: tokenBlacklist?.value?.filter(Boolean),
   }
   // ...(form.value?.id ? { id: form.value.id } : {}),
@@ -733,7 +737,11 @@ function createFollowOrder() {
           } else {
             ElMessage.success('创建跟单成功')
             activeCopyAddress.value[data.chain].push(data.followAddress)
-            localStorage.setItem('copy_setting_add', JSON.stringify({...settingCopyTrade.value}))
+            if (type.value == 2) {
+              localStorage.setItem('copy_setting_add', JSON.stringify({ ...settingCopyTrade.value }))
+              localStorage.setItem('copy-advancedForm', JSON.stringify({ ...advancedForm.value }))
+              localStorage.setItem('copy-blacklist', JSON.stringify({ ...blacklist.value }))
+            }
           }
           visible.value = false
           getFollowingInfo()
@@ -765,8 +773,13 @@ const onClockTimeChange = ([start, end]: string[]) => {
     advancedForm.value.disableAt = h
   }
 }
-const onDateTimeChange = ({ startValue, startUnit, endValue, endUnit }: { startValue: number | null, startUnit: string, endValue:  number | null, endUnit: string }) => {
-  advancedForm.value.tokenAgeRange = { startValue, startUnit, endValue, endUnit }
+const onDateTimeChange = ({ startTime, endTime }: { startTime: number, endTime: number}) => {
+  if (startTime) {
+    advancedForm.value.minTokenAge = startTime
+  }
+  if (endTime) {
+    advancedForm.value.maxTokenAge = endTime
+  }
 }
 function apply(type: 'low' | 'high') {
   isExpanded.value = true
@@ -779,6 +792,9 @@ function apply(type: 'low' | 'high') {
 
     advancedForm.value.minBuyValue = lowStrategy.value.minBuyValue
     advancedForm.value.minMarketCap = lowStrategy.value.minMarketCap
+
+    advancedForm.value.minTokenAge = lowStrategy.value.minTokenAge || '0'
+    advancedForm.value.maxTokenAge = lowStrategy.value.maxTokenAge
   } else {
     form.value.buyType = highStrategy.value.buyType
     form.value.buyAmount = highStrategy.value.buyAmount
@@ -788,6 +804,9 @@ function apply(type: 'low' | 'high') {
 
     advancedForm.value.minBuyValue = highStrategy.value.minBuyValue
     advancedForm.value.minMarketCap = highStrategy.value.minMarketCap
+
+    advancedForm.value.minTokenAge = highStrategy.value.minTokenAge || '0'
+    advancedForm.value.maxTokenAge = highStrategy.value.maxTokenAge
   }
 }
 </script>
@@ -805,11 +824,21 @@ function apply(type: 'low' | 'high') {
 :deep() .small .el-select__wrapper {
   background: var(--border);
   min-height: 40px;
-  width: 60px;
+  min-width: 32px;
+  padding: 4px 0px;
+
   &.is-focused{
     box-shadow: none;
   }
 
+}
+:deep() .input-number-date.el-input-number.is-without-controls .el-input__wrapper {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+:deep() .el-time-panel__content::before{
+  margin-left: 0;
+  margin-right: 0;
 }
 .tabs {
   display: flex;
@@ -824,7 +853,7 @@ function apply(type: 'low' | 'high') {
 
   button {
     border: none;
-    // font-size: 14px;
+    font-size: 14px;
     color: var(--third-text);
     letter-spacing: 0;
     font-weight: 400;
@@ -853,4 +882,5 @@ function apply(type: 'low' | 'high') {
   color: var(--secondary-text);
   padding: 0;
 }
+
 </style>

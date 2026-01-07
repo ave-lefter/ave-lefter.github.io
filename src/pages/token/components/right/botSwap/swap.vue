@@ -452,7 +452,7 @@ const isApprove = computed(() => {
   if (fromToken.value?.address === NATIVE_TOKEN) return true
 
   const decimals = fromToken.value?.decimals || 18
-  const fromAmountBN = new BigNumber(amountNative.value || 0)
+  const fromAmountBN = new BigNumber(props.activeTab === 'buy' ? amountNative.value || 0 : amountToken.value || 0 )
   const parsedAmount = new BigNumber(fromAmountBN.toFixed(decimals)).times(10 ** decimals)
   return parsedAmount.lte(allowance.value)
 })
@@ -650,14 +650,18 @@ const isBuyTab = computed(() => {
   return props.activeTab === 'buy'
 })
 
-const _getAllowance = () => getAllowance(fromToken.value?.address || '')
+const _getAllowance = () => {
+  const toToken = isBuyTab.value ? tokenStore.swap.token : tokenStore.swap.payToken
+  return getAllowance(fromToken.value?.address || '', toToken?.address || '')
+}
 
 const approve = async () => {
   loadingApprove.value = true
   bot_approve({
     batchId: Date.now().toString(),
     chain: chain.value || '',
-    tokenAddress: fromToken.value?.address || '',
+    inTokenAddress: fromToken.value?.address || '',
+    outTokenAddress: (isBuyTab.value ? tokenStore.swap.token.address : tokenStore.swap.payToken.address) || '',
     creatorAddress: [walletAddress.value || ''],
   }).then(res => {
     if (res) {
@@ -766,7 +770,7 @@ async function submitBotSwap() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })?.filter?.(i => Number(i?.inAmount) > 0) || []
+    })?.filter?.(i => Number(i?.inAmount) > 0 && i?.creatorAddress) || []
 
     const data = {
       // batchId: Date.now().toString(),
@@ -779,7 +783,7 @@ async function submitBotSwap() {
       autoSell: isBuy ? botSettingStore.autoSellConfig_autoSell || false : false,
       slippage: slippage !== 'auto' ? Number(new BigNumber(slippage).times(100).toFixed(0)) : 900,
       autoSlippage: slippage === 'auto',
-      autoSellConfig: isBuy ? botSettingStore?.autoSellConfig : [],
+      autoSellConfig: isBuy ? botSettingStore?.selectedAutoSellConfig : [],
       autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellPriorityFee: botPriorityFee
@@ -881,7 +885,7 @@ async function submitBotSwap() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })?.filter?.(i => Number(i?.inAmount) > 0) || []
+    })?.filter?.(i => Number(i?.inAmount) > 0 && i?.creatorAddress) || []
     const data = {
       // batchId: Date.now().toString(),
       chain: chain,
@@ -895,7 +899,7 @@ async function submitBotSwap() {
       autoSell: isBuy ? botSettingStore.autoSellConfig_autoSell || false : false,
       slippage: slippage !== 'auto' ? Number(new BigNumber(slippage).times(100).toFixed(0)) : 900,
       autoSlippage: slippage === 'auto',
-      autoSellConfig: isBuy ? botSettingStore?.autoSellConfig : [],
+      autoSellConfig: isBuy ? botSettingStore?.selectedAutoSellConfig : [],
       autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellPriorityFee: gasTip
@@ -909,8 +913,10 @@ async function submitBotSwap() {
     // })).catch(() => {
     //   loadingSwap.value = false
     // })
+    // return console.log('bot_createTx[chain]',data)
     await checkApproveAndApprove({
-      token: ft.address,
+      inToken: data.inTokenAddress,
+      outToken: data.outTokenAddress,
       chain: chain,
       owner: walletAddress
     }).catch(() => {
@@ -1031,7 +1037,7 @@ function submitBotLimit() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })?.filter?.(i => Number(i?.inAmount) > 0) || []
+    })?.filter?.(i => Number(i?.inAmount) > 0 && i?.creatorAddress) || []
     const data = {
       // batchId: Date.now().toString(),
       swapList: swapList,
@@ -1151,7 +1157,7 @@ function submitBotLimit() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })?.filter?.(i => Number(i?.inAmount) > 0) || []
+    })?.filter?.(i => Number(i?.inAmount) > 0 && i?.creatorAddress) || []
     const data = {
       // batchId: Date.now().toString(),
       chain: chain,

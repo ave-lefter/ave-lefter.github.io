@@ -10,9 +10,8 @@ import TokenImg from '~/components/tokenImg.vue'
 import { formatNumber } from '~/utils/formatNumber'
 import THead from './tHead.vue'
 import type { IPriceV2Response } from '~/api/types/ws'
-import { useEventBus } from '@vueuse/core'
+import { useEventBus, useLocalStorage, useStorage } from '@vueuse/core'
 import { BusEventType, type IFavDialogEventArgs } from '~/utils/constants'
-import { useLocalStorage ,useStorage} from '@vueuse/core'
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 topEventBus.on(refresh)
 const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
@@ -70,7 +69,7 @@ const editVisible = shallowRef(false)
 const loading = shallowRef(false)
 const userFavoriteGroups = shallowRef<GetUserFavoriteGroupsResponse[]>([])
 const activeTab = shallowRef(0)
-const favoriteCondition = useStorage('favoriteCondition', {currentMode:'mcap'})
+const favoriteCondition = useStorage('favoriteCondition', { currentMode: 'mcap' })
 const sort = shallowRef<{
   activeSort: number
   sortBy: 'symbol' | 'current_price_usd' | 'price_change' | null
@@ -99,8 +98,11 @@ const columns = computed(() => {
       sort: true,
     },
     {
-      label: (favoriteCondition.value.currentMode==='mcap'?t('mCap'):t('price')) + '{currentMode}/' + t('Chg'),
-      value: favoriteCondition.value.currentMode === 'mcap' ? 'pool_circulating_supply' : 'current_price_usd',
+      label:
+        (favoriteCondition.value.currentMode === 'mcap' ? t('mCap') : t('price')) +
+        '{currentMode}/' +
+        t('Chg'),
+      value: favoriteCondition.value.currentMode === 'mcap' ? 'price_change' : 'price_change',
       currentMode: favoriteCondition.value.currentMode,
       flex: 'flex-1 justify-end',
       sort: true,
@@ -159,8 +161,8 @@ async function _getUserFavoriteGroups() {
         name: t('defaultGroup'),
       },
     ].concat((res || []).filter((el) => !!el.name))
-    setTimeout(()=>{
-     arrowVisible.value = Number(tabsContainer.value?.offsetWidth) > 212
+    setTimeout(() => {
+      arrowVisible.value = Number(tabsContainer.value?.offsetWidth) > 212
     })
   } catch (e) {
     console.log('=>(favoriteTable.vue:19) e', e)
@@ -202,7 +204,8 @@ async function loadMoreFavorites() {
         .map((i) => ({
           ...i,
           id: i.token + '-' + i.chain,
-          pool_circulating_supply: (i.total - i.lock_amount - i.burn_amount - i.other_amount) * i.current_price_usd,
+          pool_circulating_supply:
+            (i.total - i.lock_amount - i.burn_amount - i.other_amount) * i.current_price_usd,
         }))
         .filter(
           (i) =>
@@ -240,9 +243,9 @@ function resetListStatus() {
   listStatus.value.pageNo = 1
 }
 function toggleMode(mode: string) {
-  if(favoriteCondition.value.currentMode === 'mcap'){
+  if (favoriteCondition.value.currentMode === 'mcap') {
     favoriteCondition.value.currentMode = 'price'
-  }else{
+  } else {
     favoriteCondition.value.currentMode = 'mcap'
   }
   console.log('toggleMode', mode)
@@ -253,31 +256,39 @@ function toggleMode(mode: string) {
   <div v-loading="listStatus.pageNo === 1 && listStatus.loading">
     <div class="flex items-center justify-between pr-15px pl-12px mt-10px">
       <div class="flex items-center min-w-0">
-        <span v-show="arrowVisible" class="w-20px h-20px rounded-2px color-[--third-text] hover:color-[--secondary-text] bg-[--secondary-bg] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,-200)">
-        <Icon name="material-symbols:arrow-back-ios-new-rounded" />
-      </span>
-      <div
-        ref="tabsContainer"
-        class="flex items-center gap-10px whitespace-nowrap overflow-x-auto overflow-y-hidden scrollbar-hide"
-      >
         <span
-          :class="`decoration-none shrink-0 text-12px lh-16px text-center px-4px py-2px rounded-4px cursor-pointer ${activeTab === 0 ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
-          @click="setActiveTab(0, 0)"
+          v-show="arrowVisible"
+          class="w-20px h-20px rounded-2px color-[--third-text] hover:color-[--secondary-text] bg-[--secondary-bg] flex items-center justify-center cursor-pointer"
+          @click="scrollElement(tabsContainer, -200)"
         >
-          {{ $t('defaultGroup') }}
+          <Icon name="material-symbols:arrow-back-ios-new-rounded" />
         </span>
+        <div
+          ref="tabsContainer"
+          class="flex items-center gap-10px whitespace-nowrap overflow-x-auto overflow-y-hidden scrollbar-hide"
+        >
+          <span
+            :class="`decoration-none shrink-0 text-12px lh-16px text-center px-4px py-2px rounded-4px cursor-pointer ${activeTab === 0 ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
+            @click="setActiveTab(0, 0)"
+          >
+            {{ $t('defaultGroup') }}
+          </span>
+          <span
+            v-for="(item, index) in userFavoriteGroups.slice(1)"
+            :key="index"
+            :class="`decoration-none shrink-0 text-12px lh-16px text-center px-4px py-2px rounded-4px cursor-pointer ${activeTab === item.group_id ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
+            @click="setActiveTab(item.group_id, index + 1)"
+          >
+            {{ item.name }}
+          </span>
+        </div>
         <span
-          v-for="(item, index) in userFavoriteGroups.slice(1)"
-          :key="index"
-          :class="`decoration-none shrink-0 text-12px lh-16px text-center px-4px py-2px rounded-4px cursor-pointer ${activeTab === item.group_id ? 'bg-[--border] color-[--main-text]' : 'color-[--third-text]'}`"
-          @click="setActiveTab(item.group_id, index + 1)"
+          v-show="arrowVisible"
+          class="mr-4px w-20px h-20px rounded-2px color-[--third-text] hover:color-[--secondary-text] bg-[--secondary-bg] flex items-center justify-center cursor-pointer"
+          @click="scrollElement(tabsContainer, 200)"
         >
-          {{ item.name }}
+          <Icon name="material-symbols:arrow-forward-ios-rounded" />
         </span>
-      </div>
-      <span v-show="arrowVisible" class="mr-4px w-20px h-20px rounded-2px color-[--third-text] hover:color-[--secondary-text] bg-[--secondary-bg] flex items-center justify-center cursor-pointer" @click="scrollElement(tabsContainer,200)">
-        <Icon name="material-symbols:arrow-forward-ios-rounded"/>
-      </span>
       </div>
       <Icon
         name="custom:remark"
@@ -285,7 +296,7 @@ function toggleMode(mode: string) {
         @click.self="onEdit"
       />
     </div>
-    <THead v-model:sort="sort" :columns="columns" :toggleMode="toggleMode"/>
+    <THead v-model:sort="sort" :columns="columns" :toggleMode="toggleMode" />
     <el-scrollbar ref="otherListArea" :height="scrollbarHeight">
       <div
         v-infinite-scroll="loadMoreFavorites"
@@ -304,10 +315,14 @@ function toggleMode(mode: string) {
             <div class="flex items-center flex-1">
               <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
                 <template #default>
-                  <TokenImg class="mr-8px" :row="row"/>
+                  <TokenImg class="mr-8px" :row="row" />
                 </template>
                 <template #content>
-                  <TokenImg :row="row" chain-class="hidden" token-class="w-240px h-240px [&&]:mr-0 rounded-16px" />
+                  <TokenImg
+                    :row="row"
+                    chain-class="hidden"
+                    token-class="w-240px h-240px [&&]:mr-0 rounded-16px"
+                  />
                 </template>
               </el-tooltip>
 
@@ -320,7 +335,7 @@ function toggleMode(mode: string) {
                     class="ml-5px w-10px h-10px rounded-full"
                     :src="formatIconTag(row.issue_platform)"
                     alt=""
-                  >
+                  />
                 </span>
                 <span
                   v-if="row.remark"
@@ -330,7 +345,9 @@ function toggleMode(mode: string) {
               </div>
             </div>
             <div class="flex-1 text-12px text-right">
-              <div v-if="favoriteCondition.currentMode!=='mcap'">${{ formatNumber(row.current_price_usd || 0, 4) }}</div>
+              <div v-if="favoriteCondition.currentMode !== 'mcap'">
+                ${{ formatNumber(row.current_price_usd || 0, 4) }}
+              </div>
               <div v-else>${{ formatNumber(row.pool_circulating_supply || 0, 2) }}</div>
               <div
                 :class="`flex-1 text-right text-12px

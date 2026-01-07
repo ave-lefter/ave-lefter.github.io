@@ -170,8 +170,9 @@ function getFollowSwapOrder() {
     form.value.takeProfitRatio = String(res?.takeProfitRatio / 100)
     form.value.stopLossRatio = String(res?.stopLossRatio / 100)
     form.value.maxBuyRatio = String(res?.maxBuyRatio / 100)
-    form.value.buyAmount = new BigNumber(form.value.buyAmount || 0).div(
-      10 ** currentUser.value?.decimals)
+    console.log('--------form.value.buyAmount----',form.value.buyAmount,currentUser.value)
+    form.value.buyAmount = currentUser.value?.decimals ? new BigNumber(form.value.buyAmount || 0).div(
+      10 ** currentUser.value?.decimals) : ''
 
     if (form.value.buyType === 2) {
       form.value.maxBuyRatio = ''
@@ -195,7 +196,6 @@ function getFollowSwapOrder() {
       maxTokenAge: res.maxTokenAge,
       enableAt: res.enableAt,
       disableAt: res.disableAt,
-      tokenAgeRange: advancedForm.value.tokenAgeRange,
     }
 
     blacklist.value = res?.tokenBlacklist?.map((i, index) => ({ id: index + 1, value: i }))

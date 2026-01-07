@@ -228,7 +228,7 @@ export function getNewDefaultColumns(t: ReturnType<typeof useI18n>['t']) {
     {
       title: 'DEX',
       key: 'dex',
-      isVisible: false,
+      isVisible: true,
       render: 'dexContent',
       minWidth:70,
       align:'center'

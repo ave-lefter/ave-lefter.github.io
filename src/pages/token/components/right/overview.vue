@@ -135,6 +135,10 @@
             >${{ formatNumber(Number(token?.total || 0) * (tokenStore?.price || 0)) }}</span
           >
         </li>
+        <li v-if="shouldShowChainInfo || active == 'col'" class="flex justify-between mb-12px">
+          <span class="color-[--third-text]">{{ $t('theChain') }}</span>
+          <span class="color-[--secondary-text]">{{ token?.chain || '-'}}</span>
+        </li>
         <!-- <li v-if="token?.total" class="flex justify-between mb-12px">
           <span class="color-[--third-text]">{{ $t('circulation') }}</span>
           <span class="color-[--secondary-text]">{{ formatNumber(tokenStore?.circulation.toFixed() || 0) }}</span>
@@ -145,6 +149,7 @@
             pair?.created_at ? formatDate(pair?.created_at) : '-'
           }}</span>
         </li>
+
         <!-- <template v-for="(item, index) in medias?.slice()" :key="index">
           <template v-if="item?.url">
             <template v-if="item?.name == 'Telegram'">
@@ -177,7 +182,7 @@
           </button>
         </div>
       </div>
-      <div class="flex-between color-[--secondary-text] text-center" v-if="supportObj[chain]">
+      <div v-if="supportObj[chain]" class="flex-between color-[--secondary-text] text-center">
         <a
           href=""
           class="bg flex-1 color-[--secondary-text] text-14px"
@@ -263,6 +268,9 @@ import { formatDate, formatExplorerUrl, isJSON } from '@/utils/index'
 import { useTokenStore } from '~/stores/token'
 import { useWindowSize } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
+import { BusEventType } from '@/utils/constants'
+import { useEventBus } from '@vueuse/core'
+
 const aiSummary = inject<Ref<{ summary: string; headline: string }>>('aiSummary')
 const props = defineProps<{
   isRank?: boolean
@@ -299,6 +307,54 @@ const supportObj: Record<string, string> = {
   solana: 'SOL',
   optimism: 'OP',
 }
+
+// 监听从 top 组件触发的查看 Dev 代币事件
+const devTokensEvent = useEventBus(BusEventType.DEV_TOKENS_TAB)
+devTokensEvent.on(() => {
+  activeTab.value = 'devBit'
+})
+
+// 计算是否应该显示所属链信息
+const shouldShowChainInfo = computed(() => {
+  if (!token.value?.chain) return false
+
+  // 计算会显示的 li 元素数量（基于实际的模板结构）
+  let visibleLiCount = 0
+
+  // 1. 姓名/符号 (总是显示) - 行29-35
+  visibleLiCount += 1
+
+  // 2. Token地址 (有条件显示) - 行37-52
+  if (token.value?.token) visibleLiCount += 1
+
+  // 3. 交易对 (有条件显示) - 行54-71
+  if (pair.value) visibleLiCount += 1
+
+  // 4. 市值 (有条件显示) - 行73-77
+  if (token.value?.total) visibleLiCount += 1
+
+  // 5. 合约创建者 (有条件显示) - 行79-100
+  if (checkStore.checkResult?.creator_address) visibleLiCount += 1
+
+  // 6. 合约所有者 (有条件显示) - 行102-117
+  if (owner.value) visibleLiCount += 1
+
+  // 7. 24小时交易量 (总是显示) - 行119-126
+  visibleLiCount += 1
+
+  // 8. 总供应量 (总是显示) - 行128-130
+  visibleLiCount += 1
+
+  // 9. FDV (总是显示) - 行132-136
+  visibleLiCount += 1
+
+  // 10. 创建时间 (有条件显示) - 行146-150
+  if (pair.value) visibleLiCount += 1
+
+  console.log('visibleLiCount:', visibleLiCount)
+  // 只有当显示的 li 元素数量小于 9 时才显示所属链信息
+  return visibleLiCount < 10
+})
 
 const route = useRoute()
 const id = computed(() => route.params.id as string)
@@ -373,8 +429,6 @@ const intro = computed(() => {
 
 const effectiveTotal = computed(() => {
   return new BigNumber(token.value?.total || 0)
-    .minus(token.value?.lock_amount_dec || 0)
-    .minus(token.value?.other_amount_dec || 0)
     .minus(token.value?.burn_amount_dec || 0).toFixed()
 })
 const exchange = computed(() => {

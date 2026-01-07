@@ -48,7 +48,6 @@
 <script setup lang="ts">
 import BigNumber from 'bignumber.js'
 import TokenList from './tokenList.vue'
-import { Interface } from 'ethers'
 import { _getFollowTokens, _getSuccessFollowTxs, _getFailFollowTxs } from '~/api/copyTrade'
 const { copyObj } = storeToRefs(useCopyTradeStore())
 const $t = getGlobalT()
@@ -168,7 +167,7 @@ const getFollowTokens = async () => {
     walletAddress: props.address,
     followAddress: props.followAddress,
     chain: props.chain,
-    id: Number(props.orderId),
+    period: 'all',
     sortBy: 'lastSwap',
     sortOrder: 'desc',
   }

@@ -355,6 +355,7 @@ export interface GetHotTokensResponse {
   is_hot: number;
   launchpad: string;
   risk_level: number
+  badges: Array<{ tag: string; icon_url: string }>;
 }
 
 export function getHotTokens(): Promise<GetHotTokensResponse[]> {

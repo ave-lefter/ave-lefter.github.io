@@ -1,5 +1,5 @@
 <template>
-  <div ref="scrollRef" className="pt-[24px] px-16px bg-[--main-bg] pb-0 overflow-y-auto w-full" style="max-height: calc(100vh - 92px);">
+  <div ref="scrollRef" className="pt-[24px] px-16px bg-[--main-bg] pb-0 w-full" >
     <Statistic
       ref="statisticRef"
       :followAddress="followAddress"
