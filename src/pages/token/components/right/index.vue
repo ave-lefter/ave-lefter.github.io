@@ -66,7 +66,8 @@ import PriceTabs from './priceTabs.vue'
 import Pairs from './pairs.vue'
 import Overview from './overview.vue'
 import BotSwap from './botSwap/index.vue'
-const Swap = defineAsyncComponent(() => import('./swap/index.vue'))
+import Swap from './swap/index.vue'
+// const Swap = defineAsyncComponent(() => import('./swap/index.vue'))
 
 const dialogVisible = shallowRef(false)
 
