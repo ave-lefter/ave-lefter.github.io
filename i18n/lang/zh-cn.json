@@ -1818,5 +1818,21 @@
   "filled": "已完成",
   "recentTrades": "最近交易",
   "coin": "代币名称",
-  "pluginWalletConnectedTips": "插件钱包已连接，请开通合约账户后进行交易"
+  "pluginWalletConnectedTips": "插件钱包已连接，请开通合约账户后进行交易",
+  "bugMC": "市值 {n}",
+  "monitorShowType": "显示模式",
+  "classic": "经典",
+  "monitorCardBorder": "卡片边框",
+  "display2": "展示",
+  "hidden": "隐藏",
+  "monitorTh": "自定义数据项",
+  "walletAvatar": "钱包头像",
+  "walletName": "钱包名称",
+  "tokenCreateTime": "代币创建时间",
+  "afterBuyAction": "买后代币详情",
+  "jump2": "跳转",
+  "noOpen": "不打开",
+  "noticeDuration": "通知展示时间",
+  "monitorThTip": "钱包头像和钱包地址至少选一个",
+  "wcWalletTip": "扫描二维码"
 }

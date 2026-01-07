@@ -579,5 +579,21 @@
   "top20Remarked": "EN İYİ 20 Kısa Açıklama",
   "deposit": "tamamlamak",
   "value1": "değer",
-  "action": "işletmek"
+  "action": "işletmek",
+  "bugMC": "{n} MC'de",
+  "monitorShowType": "ekran modu",
+  "classic": "klasik",
+  "monitorCardBorder": "Kart Çerçevesi",
+  "display2": "Görüntülemek",
+  "hidden": "Gizlenmiş",
+  "monitorTh": "Özel Ürünler",
+  "walletAvatar": "Cüzdan Avatarı",
+  "walletName": "Cüzdan Adı",
+  "tokenCreateTime": "Token CreateTime",
+  "afterBuyAction": "Satın Alma Sonrası Token Ayrıntıları",
+  "jump2": "Zıplamak",
+  "noOpen": "Açık Değil",
+  "noticeDuration": "Bildirim görüntüleme süresi",
+  "monitorThTip": "En az bir cüzdan avatarı ve cüzdan adresi seçin",
+  "wcWalletTip": "Bu QR Kodunu telefonunuzla tarayın"
 }

@@ -583,5 +583,21 @@
   "preview": "Visualização",
   "top20Remarked": "20 principais comentários rápidos",
   "deposit": "recarregar",
-  "value1": "valor"
+  "value1": "valor",
+  "bugMC": "em {n} MC",
+  "monitorShowType": "modo de exibição",
+  "classic": "clássico",
+  "monitorCardBorder": "Borda do cartão",
+  "display2": "Mostrar",
+  "hidden": "Escondido",
+  "monitorTh": "Itens personalizados",
+  "walletAvatar": "Avatar da carteira",
+  "walletName": "Nome da carteira",
+  "tokenCreateTime": "Tempo de criação de token",
+  "afterBuyAction": "Detalhes do token após a compra",
+  "jump2": "Pular",
+  "noOpen": "Não aberto",
+  "noticeDuration": "Tempo de exibição da notificação",
+  "monitorThTip": "Escolha pelo menos um avatar e endereço de carteira",
+  "wcWalletTip": "Digitalize este código QR com seu telefone"
 }

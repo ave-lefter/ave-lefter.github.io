@@ -605,5 +605,21 @@
   "preview": "Avance",
   "top20Remarked": "TOP 20 comentarios rápidos",
   "deposit": "completar",
-  "value1": "valor"
+  "value1": "valor",
+  "bugMC": "en {n} MC",
+  "monitorShowType": "modo de visualización",
+  "classic": "clásico",
+  "monitorCardBorder": "Borde de la tarjeta",
+  "display2": "Mostrar",
+  "hidden": "Oculto",
+  "monitorTh": "Artículos personalizados",
+  "walletAvatar": "Avatar de billetera",
+  "walletName": "Nombre de la billetera",
+  "tokenCreateTime": "Hora de creación del token",
+  "afterBuyAction": "Detalles del token después de la compra",
+  "jump2": "Saltar",
+  "noOpen": "No abierto",
+  "noticeDuration": "Tiempo de visualización de notificaciones",
+  "monitorThTip": "Elija al menos un avatar de billetera y una dirección de billetera",
+  "wcWalletTip": "Escanea este código QR con tu teléfono"
 }

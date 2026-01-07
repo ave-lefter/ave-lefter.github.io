@@ -1180,10 +1180,10 @@ export function getLightDarkValue(cssVarName: string) {
   }
 }
 
-// 当有新消息时将数据存入队列，保证队列中只有 10 条数据，将久远的数据删除
+// 当有新消息时将数据存入队列，保证队列中只有 5 条数据，将久远的数据删除
 class MessageQueue {
   private queue: MessageHandler[] = []
-  private maxLength = 10
+  private maxLength = 5
 
   add(message: MessageHandler) {
     this.queue.push(message)

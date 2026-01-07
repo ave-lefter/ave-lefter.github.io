@@ -828,5 +828,21 @@
   "notUpdateExistRemarkTip": "Lưu ý: Nếu không được chọn, thao tác này sẽ ghi đè mọi nhận xét hiện có trên ví. \nHãy lựa chọn cẩn thận.",
   "preview": "Xem trước",
   "top20Remarked": "TOP 20 nhận xét nhanh",
-  "value1": "giá trị"
+  "value1": "giá trị",
+  "bugMC": "tại {n} MC",
+  "monitorShowType": "chế độ hiển thị",
+  "classic": "cổ điển",
+  "monitorCardBorder": "Viền thẻ",
+  "display2": "Trưng bày",
+  "hidden": "Ẩn giấu",
+  "monitorTh": "Mục tùy chỉnh",
+  "walletAvatar": "Hình đại diện ví",
+  "walletName": "Tên ví",
+  "tokenCreateTime": "Thời gian tạo mã thông báo",
+  "afterBuyAction": "Chi tiết mã thông báo sau khi mua",
+  "jump2": "Nhảy",
+  "noOpen": "Không mở",
+  "noticeDuration": "Thời gian hiển thị thông báo",
+  "monitorThTip": "Chọn ít nhất một hình đại diện ví và địa chỉ ví",
+  "wcWalletTip": "Quét mã QR này bằng điện thoại của bạn"
 }

@@ -1806,5 +1806,21 @@
   "filled": "已完成",
   "recentTrades": "最近交易",
   "coin": "代币名称",
-  "pluginWalletConnectedTips": "插件錢包已連接，請開通合約賬戶後進行交易"
+  "pluginWalletConnectedTips": "插件錢包已連接，請開通合約賬戶後進行交易",
+  "bugMC": "買入市值 {n}",
+  "monitorShowType": "顯示模式",
+  "classic": "經典",
+  "monitorCardBorder": "卡片邊框",
+  "display2": "展示",
+  "hidden": "隱藏",
+  "monitorTh": "自定義數據項",
+  "walletAvatar": "錢包頭像",
+  "walletName": "錢包名稱",
+  "tokenCreateTime": "代币創建時間",
+  "afterBuyAction": "買後代幣詳情",
+  "jump2": "跳轉",
+  "noOpen": "不打開",
+  "noticeDuration": "通知展示時間",
+  "monitorThTip": "錢包頭像和錢包地址至少選一個",
+  "wcWalletTip": "掃描二維碼"
 }
