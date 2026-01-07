@@ -1119,7 +1119,6 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
       chain: tokenStore.token?.chain||'',
       user_token: tokenStore.token?.token||''
     })
-    console.log('res',res)
     const needUpdate = +res?.[0]?.average_purchase_price_usd !== avePriceCache.buyAvgPrice || +res?.[0]?.average_sold_price_usd !== avePriceCache.sellAvgPrice
     avePriceCache.buyAvgPrice = +res?.[0]?.average_purchase_price_usd || 0
     avePriceCache.sellAvgPrice = +res?.[0]?.average_sold_price_usd || 0
@@ -1352,7 +1351,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
       tag_type:KOL_KEY
     })
     avePriceMap = res.holderStats?.filter?.(el=>{
-      return (el.avg_purchase_price || el.avg_sale_price) && el.balance_ratio > 0.005
+      return (el.avg_purchase_price || el.avg_sale_price) && el.balance_ratio > 0.003
     })
     ?.reduce?.((acc,cur)=>{
       acc[cur.holder] = {

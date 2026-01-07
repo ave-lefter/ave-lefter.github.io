@@ -51,7 +51,14 @@
     </div>
     <div class="my-24px h-1px border-t-solid border-t-[--dialog-divider]" />
     <div class="flex flex-col gap-16px">
-      {{ $t('indicatorLine') }}
+      <div class="flex items-center gap-7px">
+        {{ $t('indicatorLine') }}
+        <Icon
+          name="custom:reset2"
+          class="cursor-pointer color-[--third-text] text-10px"
+          @click="resetIndicatorLineColor"
+        />
+      </div>
       <div class="flex justify-between">
         <el-checkbox v-model="linesChecked.buy.checked" class="[&&]:[--el-checkbox-height:16px]">{{
           $t('buyMa')
@@ -97,7 +104,14 @@
     </div>
     <div class="my-24px h-1px border-t-solid border-t-[--dialog-divider]" />
     <div class="flex flex-col gap-16px">
-      {{ $t('top100') }}
+      <div class="flex items-center gap-7px">
+        {{ $t('top100') }}
+        <Icon
+          name="custom:reset2"
+          class="cursor-pointer color-[--third-text] text-10px"
+          @click="resetTop100Color"
+        />
+      </div>
       <div class="flex justify-between">
         <el-checkbox
           v-model="linesChecked.top100Buy.checked"
@@ -1336,6 +1350,17 @@ watch(
     }
   }
 )
+
+const resetTop100Color = () => {
+  linesChecked.value.top100Buy.color = '#0D6EFD'
+  linesChecked.value.top100Sell.color = '#FD3E3E'
+}
+
+const resetIndicatorLineColor = () => {
+  linesChecked.value.buy.color = '#19d92f'
+  linesChecked.value.sell.color = '#f6465d'
+  linesChecked.value.kol.color = '#ffa622'
+}
 
 defineExpose({
   setScrollTop: (top: number) => {
