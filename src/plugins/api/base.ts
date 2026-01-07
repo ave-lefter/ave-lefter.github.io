@@ -17,7 +17,7 @@ export function onRequest({ options, request }: MyFetchContext) {
   // headers.lang = language
   options.headers.set('lang', language)
   const url = request as string
-  if (url?.includes('/v2/aveswap/')) {
+  if (url?.includes('/v2/aveswap/') || url?.includes('/bestrouteapi/')) {
     options.headers.set('lang-zone', localStorage.getItem('language') || 'en')
   }
 
@@ -28,18 +28,21 @@ export function onRequest({ options, request }: MyFetchContext) {
     options.headers.set('Authorization', authorization + date)
   }
 
-  if (url?.includes('/v1api/') || url.startsWith('/v2api/')) {
+  if (url?.includes('/v1api/') || url.startsWith('/v2api/') || url.startsWith('/bestrouteapi/')) {
     const analogDeviceId = localStorage.getItem('analogDeviceId')
     if (analogDeviceId && !url?.includes('/botapi')) {
       options.headers.set('ave-udid', analogDeviceId)
     }
-    const currentAccount = useWalletStore().address
-    if (currentAccount) {
-      const signature = useWalletStore().walletSignature?.[currentAccount] || ''
-      if (signature) {
-        options.headers.set('signature', signature)
+    if (!url.startsWith('/bestrouteapi/')) {
+      const currentAccount = useWalletStore().address
+      if (currentAccount) {
+        const signature = useWalletStore().walletSignature?.[currentAccount] || ''
+        if (signature) {
+          options.headers.set('signature', signature)
+        }
       }
     }
+
     const ave_token = localStorage.ave_token
     if (ave_token) {
       options.headers.set('X-Auth', ave_token)

@@ -49,13 +49,13 @@ const isReady = ref(false)
 let isReadyLine = false
 let isHeaderReady = false
 const dialogVisible_remind = ref(false)
-const Book = reactive({
-  title: '1111',
-  author: {
-    name:'托儿列夫'
-  },
-  year: 50
-})
+// const Book = reactive({
+//   title: '1111',
+//   author: {
+//     name:'托儿列夫'
+//   },
+//   year: 50
+// })
 
 const chain = computed(() => {
   return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
@@ -85,8 +85,8 @@ let loading = false
 
 watch(() => token.value, (val) => {
   if (!val) return
-  if (_widget?.activeChart()) {
-    _widget?.activeChart()?.removeAllShapes?.()
+  if (_widget?.activeChart?.()) {
+    _widget?.activeChart?.()?.removeAllShapes?.()
   }
 })
 
@@ -115,7 +115,7 @@ function switchTokenKline() {
     // if (preResolutions !== nextResolutions) {
     //     resetChart()
     // }
-    if (_widget) {
+    if (_widget && _widget?.activeChart?.()) {
       _widget?.resetCache?.()
       _widget?.activeChart?.()?.clearMarks?.()
       _widget?.setSymbol?.(symbol.value + '---' + token.value + val + (tokenStore.selectedToken ? '1' : '0'), resolution.value as ResolutionString, () => {
@@ -202,8 +202,8 @@ function resetChart() {
 
 
 function saveStudy() {
-  if (_widget?.activeChart) {
-    let studies = _widget?.activeChart?.().getAllStudies() || []
+  if (_widget?.activeChart?.()) {
+    let studies = _widget?.activeChart?.()?.getAllStudies?.() || []
     studies = studies.filter((item, index) => studies.findIndex(i => i.name === item.name) === index)
     localStorage.setItem(TW_STUDY, JSON.stringify(studies.filter(i => i.name !== 'Volume')))
   }
@@ -211,7 +211,7 @@ function saveStudy() {
 
 // 创建指标
 function createStudy() {
-  if (_widget?.activeChart) {
+  if (_widget?.activeChart?.()) {
     let studies: Array<{ name: string, id: string }> = JSON.parse(localStorage?.[TW_STUDY] || '[]')
     studies = studies.filter((item, index) => studies.findIndex(i => i.name === item.name) === index)
     studies.forEach(i => {
@@ -762,7 +762,7 @@ async function initChart() {
     if(performance.now() - mouseDownTime >=200){
       return
     }
-    const startTime = _widget?.activeChart().getTimeScale().coordinateToTime(e.clientX-56)
+    const startTime = _widget?.activeChart?.()?.getTimeScale?.().coordinateToTime(e.clientX-56)
     if(startTime && resolution.value){
       // 获取 tradingview 时间周期
       const dayjsParams = resolutionMap[resolution.value as keyof typeof resolutionMap] || {val:resolution.value,unit:'m'}
