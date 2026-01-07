@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import type { pumpBlack, pumpObjColor } from '@/api/types/pump'
 import { _getFollowsNum } from '@/api/follow'
-
+import type { MonitorChainType } from '~/utils/types'
 import type{ GetHotTokensResponse } from '@/api/token'
 import type { ILatestNotice } from '~/api/user'
 import { getUserFavoriteGroups, type GetUserFavoriteGroupsResponse } from '~/api/fav'
@@ -182,16 +182,19 @@ export const useGlobalStore = defineStore('global', () => {
     sort: 'created_timestamp',
     sort_dir: 'DESC',
   })
-  const audioSettings = useStorage('audioSettings-v1',{
+  const audioSettings = useStorage('audioSettings-v13',{
     active:'',
     notice:{
-      monitor:false,
-      monitorShow:1,
-      monitorBorder:0,
+      monitor:true,
+      monitorShow:0,
+      monitorBorder:1,
       monitorTh:[true,true,true],
+      quickBuyChain:'solana' as 'solana' | 'bsc' | 'xlayer' as MonitorChainType,
       // monitorTh:['walletUser','walletName','MC','createTime'],
       quickBuy:true,
-      quickBuyValue:'0.01',
+      quickBuyValue_solana:'0.01',
+      quickBuyValue_bsc:'0.01',
+      quickBuyValue_xlayer:'0.01',
       quickBuyAction:1,
       signal:true,
       pumpNotice:false,

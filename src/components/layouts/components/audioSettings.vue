@@ -7,7 +7,7 @@ import { h } from 'vue'
 import { getPumpBgColor} from '@/utils/index'
 import {formatBotGasTips} from '@/utils/bot'
 import {isEvmChain, getRpcProvider} from '@/utils'
-import type { BotChain, BotSettingKey } from '~/utils/types'
+import type { MonitorChainType, BotSettingKey } from '~/utils/types'
 import QuickBuyInput from '~/components/monitor/components/quickBuyInput.vue'
 
 const { t } = useI18n()
@@ -27,7 +27,7 @@ const visible = ref(false)
 const selected = ref<BotSettingKey>('s1')
 const btnRefs = ref<Record<string, HTMLElement | null>>({})
 const currentBtnRef = ref<HTMLElement | null>(null)
-const botSettingChain=ref<BotChain>('solana')
+// const botSettingChain=ref<BotChain>('solana')
 // 当前暂存的配置
 const botSettings = ref(cloneDeep(botSettingStore.botSettings) as typeof botSettingStore.botSettings) 
 // </notice2.0>
@@ -122,19 +122,20 @@ const monitorTh=computed(()=>{
     // {value:audioSettings.value.notice.monitorTh[3],label:t('tokenCreateTime')},
   ]
 })
+
+const quickBuyChainList = shallowRef<MonitorChainType[]>(['solana', 'bsc', 'xlayer'])
+const botSettingChain =computed(()=>{
+  return audioSettings.value.notice.quickBuyChain
+})
 const handleChangeMonitorTh=(index:number)=>{
   console.log('handleChangeMonitorTh',index)
-  if(index==1 && (!audioSettings.value.notice.monitorTh[0])){
-    if(audioSettings.value.notice.monitorTh[1]) {
-      ElMessage.warning(t('monitorThTip'))
-      return
-    }
+  if (index === 1 && !audioSettings.value.notice.monitorTh[0] && audioSettings.value.notice.monitorTh[1]) {
+    ElMessage.warning(t('monitorThTip'))
+    return
   }
-  if(index==0 && (!audioSettings.value.notice.monitorTh[1])){
-    if(audioSettings.value.notice.monitorTh[0]) {
-      ElMessage.warning(t('monitorThTip'))
-      return
-    }
+  if (index === 0 && !audioSettings.value.notice.monitorTh[1] && audioSettings.value.notice.monitorTh[0]) {
+    ElMessage.warning(t('monitorThTip'))
+    return
   }
   audioSettings.value.notice.monitorTh[index] = !audioSettings.value.notice.monitorTh[index]
 }
@@ -255,7 +256,7 @@ function onSave() {
       if (botSettingChain.value) {
         botSettingStore.botSettings = {
           ...botSettingStore.botSettings,
-          solana: { ...setting },
+          [botSettingChain.value]: { ...setting },
         }
       }
     }
@@ -397,18 +398,18 @@ function getEstimatedGas() {
               <div class="bg-[--dialog-list-hover] p-8px mb-24px rounded-[8px]">
                 <div v-if="audioSettings.notice.monitorShow===1" class="relative p-[15px_8px] flex gap-8px items-center border-[1px] border-solid border-transparent" :class="audioSettings.notice.monitorBorder&&'border-[var(--up-color)]! rounded-[8px]'">
                   <img class="" src="@/assets/images/pump/symbol.svg" width="40" alt="">
-                  <div class="flex items-start justify-center flex-col gap-4px">
+                  <div class="flex h-40px items-start justify-between flex-col gap-4px">
                     <div class="flex items-center"><img v-if="audioSettings.notice.monitorTh[0]" class="w-16px h-16px rounded-[50%] mr-4px" src="@/assets/images/pump/user.svg" /><span v-if="audioSettings.notice.monitorTh[1]">Zoe&nbsp;</span><span class="color-[--up-color]">&nbsp;{{ $t('addPosition') }}</span>&nbsp;SENTIS</div>
                     <div class="flex items-center"><img class="w-16px h-16px rounded-[50%] mr-4px" :src="`${configStore.token_logo_url}chain/bsc.png`" alt="" onerror="this.src='/icon-default.png'" srcset="" />
                       <span><span class="color-[--up-color]">0.75 BNB</span><span v-if="audioSettings.notice.monitorTh[2]">&nbsp;{{ $t('bugMC',{n:'$34.6M'}) }}</span></span>
                     </div>
                   </div>
                   <div v-if="audioSettings.notice.quickBuy" class='quickBuyBtn flex items-center h-[24px] bg-#12B8861A text-#12B886 rounded-[4px] font-normal text-[14px] leading-[16px] px-8px clickable absolute right-8px top-32px'>
-                    {{t('buy')}}
+                    0.01 BNB
                   </div>
                   <Icon name="custom:close" class="text-16px color-[--third-text] absolute right-8px top-26px" :class="audioSettings.notice.quickBuy&&'top-8px!'"/>
                 </div>
-                <div v-else class="relative flex items-center p-[15px_8px] border-[1px] border-solid border-transparent" :class="audioSettings.notice.monitorBorder&&'border-[--dialog-tab-active-bg]! rounded-[8px]'">
+                <div v-else class="relative flex items-center p-[15px_8px] border-[1px] border-solid border-transparent" :class="'border-[--dialog-tab-active-bg]! rounded-[8px]'">
                   <img class="w-16px h-16px rounded-[50%] mr-4px" src="@/assets/images/pump/user.svg" />
                   <div class="flex items-center">
                     <span><span>Zoe&nbsp;</span>{{ $t('createPosition') }}</span> 
@@ -427,7 +428,7 @@ function getEstimatedGas() {
                 </el-radio-group>
                 <!-- <el-switch v-model="audioSettings.notice.monitorShow" class="[&&]:h-20px" /> -->
               </div>
-              <div class="flex justify-between items-center mb-24px">
+              <div v-if="audioSettings.notice.monitorShow===1" class="flex justify-between items-center mb-24px">
                 <span>{{ $t('monitorCardBorder') }}</span>
                 <el-radio-group v-model="audioSettings.notice.monitorBorder" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
                   <el-radio-button :label="t('display2')" :value="1" />
@@ -440,13 +441,24 @@ function getEstimatedGas() {
                   <div v-for="({value,label},index) in monitorTh" :key="index" class="h-24px clickable rounded-[4px] bg-[--border] flex items-center justify-center px-12px" :class="value?'color-[--main-text]':'color-[--third-text]'" @click="()=>handleChangeMonitorTh(index)">{{ label }}</div>
                 </div>
               </div>
-              <div class="flex justify-between items-center mb-8px" :class="!audioSettings.notice.quickBuy&&'mb-24px!'">
-                <div class="flex items-center"><span class="inline-block w-14px h-14px bg-[--secondary-text] rounded-full flex items-center justify-center mr-5px"><Icon class="color-[--main-bg] text-10px" name="mynaui:lightning-solid"/></span>{{ $t('quick') }}</div>
+              <div v-if="audioSettings.notice.monitorShow===1" class="flex justify-between items-center mb-8px" :class="!audioSettings.notice.quickBuy&&'mb-24px!'">
+                <div class="flex items-center gap-[4px]">
+                  {{ $t('quick') }}
+                  <div class='bg-[--border] rounded-[4px] h-28px p-[2px_8px] flex items-center gap-[4px]'>
+                    <div v-for="item in quickBuyChainList" :key='item' class="w-24px h-24px items-center p-2px rounded-[4px] clickable" :class="(audioSettings.notice.quickBuyChain===item)&&'bg-[--dialog-tab-active-bg]'" @click="audioSettings.notice.quickBuyChain=item">
+                      <img 
+                          :src="`${configStore.token_logo_url}chain/${item}.png`"
+                          alt=""
+                          class="rounded-full w-20px h-20px"
+                      >
+                    </div>
+                  </div>
+                </div>
                 <el-switch v-model="audioSettings.notice.quickBuy" class="[&&]:h-20px" />
               </div>
-              <div v-if="audioSettings.notice.quickBuy" class="mb-24px flex justify-between items-center">
+              <div v-if="(audioSettings.notice.monitorShow===1)&&audioSettings.notice.quickBuy" class="mb-24px flex justify-between items-center">
                 <QuickBuyInput
-                  v-model="audioSettings.notice.quickBuyValue"
+                  v-model="(audioSettings.notice as any)[`quickBuyValue_${audioSettings.notice.quickBuyChain}`]"
                   :show-chain-icon="true"
                   :chain="botSettingChain"
                   input-style="width:192px"
@@ -469,7 +481,7 @@ function getEstimatedGas() {
                   </button>
                 </div>
               </div>
-              <div class="flex justify-between items-center mb-24px">
+              <div v-if="audioSettings.notice.monitorShow===1" class="flex justify-between items-center mb-24px">
                 <span>{{ $t('afterBuyAction') }}</span>
                 <el-radio-group v-model="audioSettings.notice.quickBuyAction" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
                   <el-radio-button :label="t('open')" :value="0" />
