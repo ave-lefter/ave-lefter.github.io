@@ -620,5 +620,6 @@
   "jump2": "Saltar",
   "noOpen": "No abierto",
   "noticeDuration": "Tiempo de visualización de notificaciones",
-  "monitorThTip": "Elija al menos un avatar de billetera y una dirección de billetera"
+  "monitorThTip": "Elija al menos un avatar de billetera y una dirección de billetera",
+  "wcWalletTip": "Escanea este código QR con tu teléfono"
 }

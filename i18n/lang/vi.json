@@ -843,5 +843,6 @@
   "jump2": "Nhảy",
   "noOpen": "Không mở",
   "noticeDuration": "Thời gian hiển thị thông báo",
-  "monitorThTip": "Chọn ít nhất một hình đại diện ví và địa chỉ ví"
+  "monitorThTip": "Chọn ít nhất một hình đại diện ví và địa chỉ ví",
+  "wcWalletTip": "Quét mã QR này bằng điện thoại của bạn"
 }

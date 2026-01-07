@@ -1821,5 +1821,6 @@
   "jump2": "跳轉",
   "noOpen": "不打開",
   "noticeDuration": "通知展示時間",
-  "monitorThTip": "錢包頭像和錢包地址至少選一個"
+  "monitorThTip": "錢包頭像和錢包地址至少選一個",
+  "wcWalletTip": "掃描二維碼"
 }

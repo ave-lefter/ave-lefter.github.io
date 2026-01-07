@@ -1833,5 +1833,6 @@
   "jump2": "Jump",
   "noOpen": "No Open",
   "noticeDuration": "Notice Duration",
-  "monitorThTip": "Choose at least one wallet avatar and wallet address"
+  "monitorThTip": "Choose at least one wallet avatar and wallet address",
+  "wcWalletTip": "Scan this QR Code with your phone"
 }

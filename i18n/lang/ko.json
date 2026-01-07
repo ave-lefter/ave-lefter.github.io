@@ -1448,5 +1448,6 @@
   "jump2": "도약",
   "noOpen": "열림 없음",
   "noticeDuration": "알림 표시 시간",
-  "monitorThTip": "하나 이상의 지갑 아바타와 지갑 주소를 선택하세요."
+  "monitorThTip": "하나 이상의 지갑 아바타와 지갑 주소를 선택하세요.",
+  "wcWalletTip": "휴대폰으로 이 QR 코드를 스캔하세요."
 }
