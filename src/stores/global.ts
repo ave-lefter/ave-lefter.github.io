@@ -189,7 +189,7 @@ export const useGlobalStore = defineStore('global', () => {
       monitorShow:0,
       monitorBorder:1,
       monitorTh:[true,true,true],
-      quickBuyChain:'solana' as 'solana' | 'bsc' | 'xlayer' as MonitorChainType,
+      quickBuyChain:'solana' as  MonitorChainType,
       // monitorTh:['walletUser','walletName','MC','createTime'],
       quickBuy:true,
       quickBuyValue_solana:'0.01',
