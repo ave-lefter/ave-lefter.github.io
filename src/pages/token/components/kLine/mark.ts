@@ -40,7 +40,7 @@ export function useKlineMarks() {
     const arr = (botStore?.evmAddress || walletStore?.address) ? [{ id: 'trade', name: t('mine') }] : []
     return arr.concat(tokenStore.totalHolders?.filter?.(i => (i?.total_address || 0) > 0 && ['16','19','25','30','31']?.includes(i.type))?.map?.((i) => ({
       id: i.type,
-      name: i?.[filterLanguage(localeStore.locale)] 
+      name: i?.[filterLanguage(localeStore.locale)]
       // + (i.type !== '31' ? `(${i?.total_address})` : '')
     })))
   })
@@ -63,8 +63,8 @@ export function useKlineMarks() {
 <script xmlns=""/></svg></div>`
     btn.onclick = (e) => {
       const rect = btn.getBoundingClientRect()
-      const x = rect.left - 320 + 44 
-      const y = rect.top + 34 
+      const x = rect.left - 320 + 44
+      const y = rect.top + 34
       globalStore.klineSettingPop.position =
       [x,y]
       globalStore.klineSettingPop.visible = !globalStore.klineSettingPop.visible
@@ -235,7 +235,6 @@ export function useKlineMarks() {
       if(el.wallet_logo?.logo && el.wallet_logo.logo.includes('.webp')){
         imageUrl = el.wallet_logo.logo
       }
-      console.log('imageUrl',imageUrl)
       let borderColor = 'transparent'
       let borderWidth = 0
       if(isKOL){

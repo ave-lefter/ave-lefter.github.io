@@ -15,7 +15,7 @@ const route = useRoute()
 
 watch([() => tokenStore.token?.token || '', () => walletStore.chain, () => walletStore.address], () => {
   swapStore.init(route.params?.id as string)
-})
+}, {immediate: true})
 
 
 

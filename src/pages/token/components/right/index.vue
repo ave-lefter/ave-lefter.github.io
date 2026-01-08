@@ -28,7 +28,7 @@
       </div> -->
         <div class="p-15px bg-[--secondary-bg] mt-1px">
           <!-- <BotSwap /> -->
-          <component :is="SwapCom" />
+          <component :is="SwapCom" :key="walletStore.address ? 'Swap' : 'BotSwap'" />
         </div>
         <div class="p-15px pb-5px bg-[--secondary-bg] mt-1px">
           <div
