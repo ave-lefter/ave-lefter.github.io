@@ -19,7 +19,7 @@
         <template v-if="dayjs(date).isSame(dayjs(selectedDate), 'month')">
           <div
             class="text-center h-full"
-            :class="[getColor(getPnl(date)).bg, getPnl(date) !== 0 ? 'cursor-pointer' : '']"
+            :class="[getColor(getPnl(date)).bg, 'cursor-pointer']"
             @click="clickDay(date, $event)"
           >
             <span class="text-12px color-[--third-text] lh-14px">{{
@@ -265,9 +265,8 @@ const updateIsChartView = (val) => {
 }
 
 const clickDay = (date, $event) => {
-  const pnl = getPnl(date)
   popVisible.value = false
-  if (pnl !== 0) {
+  if (dayjs(date).isBefore(dayjs().endOf('d'))) {
     buttonRef.value = $event.currentTarget
     popVisible.value = true
     tooltipDate.value = dayjs(date).format('YYYY-MM-DD')

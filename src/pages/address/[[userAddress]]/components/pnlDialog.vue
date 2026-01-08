@@ -199,9 +199,8 @@ const handleNextMonth = () => {
 }
 
 const clickDay = (date, $event) => {
-  const pnl = getPnl(date)
   popVisible.value = false
-  if (pnl !== 0) {
+  if (dayjs(date).isBefore(dayjs().endOf('d'))) {
     buttonRef.value = $event.currentTarget
     popVisible.value = true
     tooltipDate.value = dayjs(date).format('YYYY-MM-DD')
