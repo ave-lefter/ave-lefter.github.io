@@ -14,7 +14,7 @@
         <span class="text-10px color-[--third-text]">{{ getAddressFromChain(chain, _wallet?.addresses || [])?.address?.replace(new RegExp('(.{6})(.+)(.{4})'), '$1...$3') }}</span>
         <Icon v-copy="getAddressFromChain(chain, _wallet?.addresses || [])?.address" name="bxs:copy" class="clickable ml-5px text-12px color-[--third-text]" />
         <div class="border-l-solid border-l-1px border-l-[--icon-color] h-8px mx-8px" />
-        <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50% mr-2px" height="12" alt="" srcset="" >
+        <img :src="`${configStore.token_logo_url}token_icon/${chain}/${getChainInfo(chain)?.wmain_wrapper || ''}.png`" class="rd-50% mr-2px" height="12" alt="" srcset="" >
         <span class="text-12px color-[--main-text]">{{ formatNumber(getAddressFromChainBalance(chain, _wallet?.addresses || [], tokenStore.swap.native?.address) || 0) }}</span>
         <Icon name="prime:sort-down-fill" class="color-[--main-text] text-14px transition-all-300" :class="{ 'rotate-180': selectWalletVisible }" />
       </div>
@@ -25,7 +25,7 @@
           <el-radio-group v-model="_evmAddress">
             <div v-for="(item, index) in botStore?.walletList?.toSorted((a) => a.evmAddress === botStore.evmAddress ? -1 : 1)" :key="item.evmAddress" class="flex items-center h-50px w-100%" :class="{ 'b-b-solid b-b-1px b-b-[--border]': index !== botStore?.walletList.length - 1 }" @click.stop="_evmAddress=item.evmAddress;selectWalletVisible=false">
               <el-radio class="[&&]:[--el-checkbox-disabled-checked-icon-color:#FFF] [&&]:[--el-checkbox-disabled-checked-input-fill:#3F80F7] [&&]:[--el-checkbox-disabled-checked-input-border-color:#3F80F7] batch-checkbox" :value="item.evmAddress" />
-              <div class="flex flex-1 clickable">
+              <div class="flex justify-between flex-1 clickable">
                 <div class="text-12px lh-14px inline-block" >
                   <div class="color-[--main-text] flex">{{ item.name }}</div>
                   <div class="color-[--third-text] flex items-center" >
@@ -34,7 +34,7 @@
                   </div>
                 </div>
                 <div class="ml-auto lh-14px inline-flex items-center color-[--main-text] text-12px justify-end">
-                  <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50% mr-2px" height="12" alt="" srcset="" >
+                  <img :src="`${configStore.token_logo_url}token_icon/${chain}/${getChainInfo(chain)?.wmain_wrapper || ''}.png`" class="rd-50% mr-2px" height="12" alt="" srcset="" >
                   <span>{{ formatNumber(getAddressFromChainBalance(chain, item.addresses, tokenStore.swap.payToken?.address) || 0) }}</span>
                 </div>
               </div>
