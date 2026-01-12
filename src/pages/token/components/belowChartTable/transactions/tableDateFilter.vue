@@ -60,7 +60,7 @@ watch(()=>props.modelValue,(val:string[])=>{
     <template #reference>
       <Icon
         name="custom:filter"
-        :class="`${modelValue.length?'color-[--secondary-text]':'color-[--third-text]'} cursor-pointer text-10px`"
+        :class="`${modelValue.length?'color-[--primary-color]':'color-[--third-text]'} cursor-pointer text-10px`"
       />
     </template>
     <template #default>

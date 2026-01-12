@@ -43,7 +43,7 @@
               }"
               @click.stop.prevent="handleFilterQuery('')"
             /> -->
-            <Icon v-if="searchKeyword" name="custom:filter" class="color-[--d-FFF-l-000] cursor-pointer text-10px" @click.stop.prevent="handleFilterQuery('')" />
+            <Icon v-if="searchKeyword" name="custom:filter" class="color-[--primary-color] cursor-pointer text-10px" @click.stop.prevent="handleFilterQuery('')" />
             <el-popover
               v-else
               v-model:visible="visible"

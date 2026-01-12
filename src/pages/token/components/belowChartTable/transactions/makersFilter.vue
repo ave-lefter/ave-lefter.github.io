@@ -39,7 +39,7 @@ watch(() => props.modelValue, () => {
     <template #reference>
       <Icon
         name="custom:filter"
-        :class="`${modelValue?'color-[--secondary-text]':'color-[--third-text]'} cursor-pointer text-10px`"
+        :class="`${modelValue?'color-[--primary-color]':'color-[--third-text]'} cursor-pointer text-10px`"
       />
     </template>
     <template #default>
