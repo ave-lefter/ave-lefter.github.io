@@ -14,7 +14,7 @@
           <el-form-item :label="$t('emailAuth')" prop="verificationCode">
             <el-input
               v-model="form2.verificationCode" class="h-48px font-500 text-14px" :autocomplete="'new-verificationCode2' + Math.random()"
-              :placeholder="$t('emailAuthPlaceholder')" name="new-verificationCode2">
+              :placeholder="showEmail" name="new-verificationCode2">
               <template #suffix>
                 <el-button
                   class="countdownBtn" link :disabled="disabledCountdownBtn" :loading="loading2" type="primary" @click="sendVerificationCode">
