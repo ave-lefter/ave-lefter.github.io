@@ -1216,7 +1216,7 @@ export function getAiSummary(id: string): Promise<null |AiSummaryResponse> {
 // 开发者最佳代币
 export function getBestToken(token_id:string) {
   const { $api } = useNuxtApp()
-  return $api('/token_info/v1/token/dev/best', {
+  return $api('https://api.test.phaetd8l.com/v2api/token_info/v1/token/dev/best', {
     method: 'get',
     query: {
       token_id
