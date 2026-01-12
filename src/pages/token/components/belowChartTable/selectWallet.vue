@@ -22,7 +22,7 @@
     <template #default>
       <div class="color-[--third-text] text-12px max-h-500px overflow-y-auto">
         <div class="px-12px">
-          <el-radio-group v-model="_evmAddress">
+          <el-radio-group v-model="_evmAddress" class="w-100%">
             <div v-for="(item, index) in botStore?.walletList?.toSorted((a) => a.evmAddress === botStore.evmAddress ? -1 : 1)" :key="item.evmAddress" class="flex items-center h-50px w-100%" :class="{ 'b-b-solid b-b-1px b-b-[--border]': index !== botStore?.walletList.length - 1 }" @click.stop="_evmAddress=item.evmAddress;selectWalletVisible=false">
               <el-radio class="[&&]:[--el-checkbox-disabled-checked-icon-color:#FFF] [&&]:[--el-checkbox-disabled-checked-input-fill:#3F80F7] [&&]:[--el-checkbox-disabled-checked-input-border-color:#3F80F7] batch-checkbox" :value="item.evmAddress" />
               <div class="flex justify-between flex-1 clickable">
