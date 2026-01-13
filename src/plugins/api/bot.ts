@@ -24,10 +24,16 @@ export function botOnResponse({ response, request, options }: MyFetchContext) {
   if (!response) {
     return
   }
+  let data = response._data
+  if (typeof data === 'string' && /"status":-1000[0-1]/.test(data) && isJSON(data)) {
+    data = JSON.parse(data)
+  }
+  if (response?.status === 403 || [10000, 10001]?.includes(data?.status)) {
+    throw new Error('x-auth-error')
+  }
   if (response.status >= 400) {
     return botOnResponseError({ response, request, options })
   }
-  const data = response._data
   if (data?.status === 0) {
     const botStore = useBotStore()
     botStore.botReqCount = 0

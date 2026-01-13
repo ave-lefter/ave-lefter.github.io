@@ -71,7 +71,13 @@ export function onResponse({ response, request }: MyFetchContext) {
   if (!response) {
     return
   }
-  const data = response._data
+  let data = response._data
+  if (typeof data === 'string' && /"status":1000[0-1]/.test(data) && isJSON(data)) {
+    data = JSON.parse(data)
+  }
+  if (response?.status === 403 || [10000, 10001]?.includes(data?.status)) {
+    throw new Error('x-auth-error')
+  }
   if ((request as string)?.includes('/aveswap/v1/sui/')) {
     if (data?.status === 0) {
       response._data = data?.data || data
@@ -111,20 +117,15 @@ export function onResponse({ response, request }: MyFetchContext) {
 }
 
 export const updateAveToken = createCacheRequest(() => {
-  const w: Window & {
-    vemachine?: {
-      generateToken?: (arg: boolean) => Promise<string>
-    }
-  } = window
-  if (!w?.vemachine?.generateToken) {
+  if (!window?.vemachine?.generateToken) {
     return Promise.resolve('')
   }
-  return w?.vemachine?.generateToken?.(true)
+  return window?.vemachine?.generateToken?.(true)
 }, 3000)
 
 export function onResponseError ({ response }: MyFetchContext) {
   const status = response?.status
-  if (status === 403) {
+  if (status === 403 || response?._data?.status <= -10000) {
     updateAveToken()
   }
 }
