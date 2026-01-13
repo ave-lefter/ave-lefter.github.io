@@ -13,10 +13,10 @@
           chain: chain || '',
         }"
       />
-      <span class="font-500 text-16px color-[--main-text] mr-2px">{{ bestToken.symbol }}</span>
+      <span v-tooltip="bestToken.symbol" class="font-500 text-16px color-[--main-text] mr-2px max-w-60px truncate">{{ bestToken.symbol }}</span>
       (ATH MC
       <span class="color-[--main-text] ml-2px mr-2px"
-        >${{ formatNumber(bestToken.all_time_high, 2) }}</span
+        >${{ formatNumber(bestToken.all_time_high, 0) }}</span
       >)
     </div>
   </div>
@@ -30,11 +30,16 @@ const chain = computed(() => getAddressAndChainFromId(route.params.id || '').cha
 const _getBestToken = async () => {
   try {
     const res = await getBestToken(route.params.id || '')
-    bestToken.value = res || {}
+    console.log(res,'res')
+    bestToken.value = res?.symbol ? res : res.data
   } catch (error) {
     console.error('Error fetching best token:', error)
   }
 }
 
 _getBestToken()
+
+watch(()=>route.params.id,()=>{
+  _getBestToken()
+})
 </script>
