@@ -1751,7 +1751,7 @@
   "cross": "Cross",
   "perpBalance": "Perpetual Assets",
   "marginRatioTips": "Margin Ratio <br> Margin Ratio = Maintenance Margin / Margin Balance. Your positions will be liquidated once Margin Ratio reaches 100%.",
-  "showAllPositions": "Show All Positions",
+  "showCurrentContract": "Show Current Contract",
   "watchWalletNotSupportedPerp": "Watch wallet does not support Perpetual",
   "noevmWalletNotSupportedPerp": "Non-evm wallets do not support Perpetual functions",
   "minWithdraw": "Minimum withdrawal {amount}",

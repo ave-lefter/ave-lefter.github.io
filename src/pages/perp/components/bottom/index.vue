@@ -42,7 +42,7 @@ const searchParams = useStorage(
   Object.keys(componentsMap).reduce(
     (prev, cur) => {
       prev[cur] = {
-        filterContractIdList: 'ALL',
+        filterContractIdList: contractId.value,
       }
       return prev
     },
@@ -77,23 +77,23 @@ const filterListData = computed(() => {
   return result || []
 })
 
-const isAll = computed(()=>{
+const isCurrent = computed(()=>{
   return !!selectedCurrentObject.value?.[selectTab.value]
 })
 watch(
-  () => isAll.value,
+  () => isCurrent.value,
   (val) => {
     if (val) {
-      searchParams.value[selectTab.value].filterContractIdList = 'ALL'
-    } else {
       searchParams.value[selectTab.value].filterContractIdList = contractId.value
+    } else {
+      searchParams.value[selectTab.value].filterContractIdList = 'ALL'
     }
   }
 )
 watch(
   () => contractId.value,
   (val) => {
-    if (isAll.value) {
+    if (isCurrent.value) {
       searchParams.value[selectTab.value].filterContractIdList = 'ALL'
     } else {
       searchParams.value[selectTab.value].filterContractIdList = val
@@ -103,10 +103,10 @@ watch(
 watch(
   () => selectTab.value,
   (val) => {
-    if (isAll.value) {
-      searchParams.value[val].filterContractIdList = 'ALL'
-    } else {
+    if (isCurrent.value) {
       searchParams.value[val].filterContractIdList = contractId.value
+    } else {
+      searchParams.value[val].filterContractIdList = 'ALL'
     }
   }
 )
@@ -126,7 +126,7 @@ watch(
         >
       </div>
       <div class="flex items-center justify-end gap-12px">
-        <el-checkbox v-model="selectedCurrentObject[selectTab]" class="checkbox-sm" :label="$t('showAllPositions')" />
+        <el-checkbox v-model="selectedCurrentObject[selectTab]" class="checkbox-sm" :label="$t('showCurrentContract')" />
         <el-button v-if="selectTab == 'holding'" class="close-position"   :disabled="position?.length == 0" @click.stop.prevent="dialogVisible = true">{{ $t('closePositionAll') }}</el-button>
         <el-button
           v-else-if="selectTab == 'currentOrder'"

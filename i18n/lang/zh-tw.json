@@ -1739,7 +1739,7 @@
   "cross": "全倉模式",
   "perpBalance": "合約資產",
   "marginRatioTips": "風險率<br>風險率=所有倉位維持保證金/總資產,當風險率大於等於100%時,您的倉位將會觸發強制平倉。",
-  "showAllPositions": "顯示所有合約",
+  "showCurrentContract": "顯示當前交易對",
   "watchWalletNotSupportedPerp": "觀察者錢包不支持合約功能",
   "noevmWalletNotSupportedPerp": "非 evm 錢包不支持合約功能",
   "minWithdraw": "最少提現{amount}",
