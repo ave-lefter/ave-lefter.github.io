@@ -1,34 +1,33 @@
 <template>
-  <Draggable
-:class="{ 'left-drag': dragPumpStore.isLeftFixed, 'right-drag': dragPumpStore.isRightFixed }"
+   <Draggable
+:class="{ 'left-drag': trackerStore.isLeftFixed, 'right-drag': trackerStore.isRightFixed }"
     :shouldRenderChild="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing"
     @on-drag="drag">
     <!-- <Monitor v-bind="props2"/> -->
     <component :is="lazyComponent" v-bind="props2" />
   </Draggable>
 </template>
-
-<script setup lang="ts">
+<script setup name="trackerDragger">
 const signalStore = useSignalStore()
 const monitorStore = useMonitorStore()
 const dragPumpStore = usePumpStore()
 const trackerStore = useTrackerStore()
 const dragStore = useDragStore()
 const { t } = useI18n()
-const { placement } = storeToRefs(dragPumpStore)
+const { placement } = storeToRefs(trackerStore)
 const key = ref(0)
 
 const reload = () => {
   key.value++
 }
+
 watch(() => placement.value, () => {
   reload()
   reCreateChild()
 })
 
 onMounted(() => {
-  dragPumpStore.getPumpConfig()
-  if (dragPumpStore.visible) {
+  if (trackerStore.visible) {
     loadComponent()
   } else {
     setTimeout(() => {
@@ -38,34 +37,35 @@ onMounted(() => {
 })
 
 
-watch(() => dragPumpStore.visible, () => {
-  if (dragPumpStore.visible) {
+watch(() => trackerStore.visible, () => {
+  if (trackerStore.visible) {
     loadComponent()
   }
 })
-const lazyComponent = shallowRef<Component | null>(null)
+const lazyComponent = shallowRef(null)
 const loadComponent = async () => {
-  const component = await import('./pumpPop.vue')
+  const component = await import('./trackerPop.vue')
   lazyComponent.value = component.default
 }
+
 const dragConstant = computed(() => {
   return {
     minWidth: 480,
     minHeight: 262,
     maxWidth: 600,
-    initialHeight: dragPumpStore.winHeight - 95,
-    centerScrollHeight: dragPumpStore.boundingRect.height - 140,
-    otherScrollHeight: dragPumpStore.winHeight - 230,
+    initialHeight: trackerStore.winHeight - 95,
+    centerScrollHeight: trackerStore.boundingRect.height - 140,
+    otherScrollHeight: trackerStore.winHeight - 230,
   }
 })
 const props1 = computed(() => {
   const placementData = {
     center: {
       className: 'top-0 left-0 fixed',
-      initialWidth: dragPumpStore.boundingRect.width,
-      initialHeight: dragPumpStore.boundingRect.height,
-      x: dragPumpStore.boundingRect.x,
-      y: dragPumpStore.boundingRect.y,
+      initialWidth: trackerStore.boundingRect.width,
+      initialHeight: trackerStore.boundingRect.height,
+      x: trackerStore.boundingRect.x,
+      y: trackerStore.boundingRect.y,
       minWidth: dragConstant.value.minWidth,
       minHeight: dragConstant.value.minHeight,
       parent: true,
@@ -79,7 +79,7 @@ const props1 = computed(() => {
       x: 0,
       minWidth: dragConstant.value.minWidth,
       maxWidth: dragConstant.value.maxWidth,
-      initialWidth: dragPumpStore.fixedWidth,
+      initialWidth: trackerStore.fixedWidth,
       initialHeight: dragConstant.value.initialHeight,
       parent: true,
       handles: ['mr'],
@@ -92,7 +92,7 @@ const props1 = computed(() => {
       y: 0,
       minWidth: dragConstant.value.minWidth,
       maxWidth: dragConstant.value.maxWidth,
-      initialWidth: dragPumpStore.fixedWidth,
+      initialWidth: trackerStore.fixedWidth,
       initialHeight: dragConstant.value.initialHeight,
       parent: true,
       handles: ['ml'],
@@ -113,7 +113,7 @@ const reCreateChild = () => {
 }
 
 const props2 = computed(() => {
-  let data = {} as any
+  let data = {} 
   if (placement.value === 'center') {
     data = {
       class: 'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]',
@@ -126,7 +126,7 @@ const props2 = computed(() => {
   }
   return data
 })
-function dragStop(x: number, y: number) {
+function dragStop(x, y) {
   if(['left','right'].includes(placement.value) && Math.abs(x)<1){
     if(signalStore.signalVisible && monitorStore.visible && dragPumpStore.visible && trackerStore.visible){
       ElMessage.warning(t('popTips'))
@@ -134,23 +134,23 @@ function dragStop(x: number, y: number) {
     }
   }
   if (placement.value === 'left') {
-    dragPumpStore.onLeftDragStop(x, y)
+    trackerStore.onLeftDragStop(x, y)
   } else if (placement.value === 'right') {
-    dragPumpStore.onRightDragStop(x, y)
+    trackerStore.onRightDragStop(x, y)
   } else {
-    dragPumpStore.onDragStop(x, y)
+    trackerStore.onDragStop(x, y)
   }
 }
-function resizing(w: number, h: number) {
+function resizing(w, h) {
   if (placement.value === 'center') {
-    dragPumpStore.onResizing(w, h)
+    trackerStore.onResizing(w, h)
   } else {
-    dragPumpStore.onFixedResizing(w)
+    trackerStore.onFixedResizing(w)
   }
 }
-function drag(x: number) {
+function drag(x) {
   if (placement.value === 'center') {
-    dragPumpStore.onDrag(x)
+    trackerStore.onDrag(x)
   } else {
     return null
   }

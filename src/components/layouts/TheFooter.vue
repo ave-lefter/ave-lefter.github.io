@@ -57,7 +57,7 @@
           {{ $t('walletMonitor') }}
         </div>
       </el-badge>
-      <el-badge :is-dot="isDoted">
+      <el-badge :is-dot="isDoted" class="mr-12px">
         <div
           class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
           :class="signalStore.signalVisible?'color-[--main-text]':'color-[--secondary-text]'"
@@ -69,6 +69,18 @@
           {{ $t('signal') }}
         </div>
       </el-badge>
+      <div
+        class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
+        :class="trackerStore.visible?'color-[--main-text]':'color-[--secondary-text]'"
+        @click="trackerStore.visible=!trackerStore.visible"
+      >
+        <div class="flex items-center justify-center w-14px h-14px bg-[--main-bg] rounded-full">
+          <Icon
+          name="custom:twitter"
+        />
+        </div>
+        Tracker
+      </div>
     </div>
     <ul class="right">
       <li class="color-[--secondary-text] hover:color-[--main-text]">
@@ -156,6 +168,7 @@ import { TokenImg,QuickSwap } from '#components'
 const {t} = useI18n()
 const {visible, hasRing} = storeToRefs(useMonitorStore())
 const signalStore = useSignalStore()
+const trackerStore = useTrackerStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const dragPumpStore = usePumpStore()

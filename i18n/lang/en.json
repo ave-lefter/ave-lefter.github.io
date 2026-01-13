@@ -1842,5 +1842,6 @@
   "noOpen": "No Open",
   "noticeDuration": "Notice Duration",
   "monitorThTip": "Choose at least one wallet avatar and wallet address",
-  "wcWalletTip": "Scan this QR Code with your phone"
+  "wcWalletTip": "Scan this QR Code with your phone",
+  "popTips":"The maximum number of floating windows supported by the draggable is 3"
 }

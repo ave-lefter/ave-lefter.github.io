@@ -8,9 +8,11 @@
 import Monitor from './index.vue'
 const signalStore = useSignalStore()
 const monitorStore = useMonitorStore()
+const trackerStore = useTrackerStore()
+const dragPumpStore = usePumpStore()
 const {placement}=storeToRefs(monitorStore)
 const {lang} = storeToRefs(useGlobalStore())
-
+const { t } = useI18n()
 const props =defineProps({
   item:{
     type:String,
@@ -88,6 +90,12 @@ const props2=computed(()=>{
   return data
 })
 function dragStop(x: number, y: number) {
+  if(['left','right'].includes(placement.value) && Math.abs(x)<1){
+    if(signalStore.signalVisible && monitorStore.visible && dragPumpStore.visible && trackerStore.visible){
+      ElMessage.warning(t('popTips'))
+      return
+    }
+  }
   if(placement.value==='left'){
     monitorStore.onLeftDragStop(x,y)
   }else if(placement.value==='right'){

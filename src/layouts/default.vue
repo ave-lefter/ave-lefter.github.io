@@ -20,6 +20,7 @@
     <SignalDraggable v-if="!signalStore.shouldHide"/>
     <MonitorDragger v-show="monitorStore.visible"/>
     <DragPump v-show="dragPumpStore.visible&&!dragPumpStore.shouldHide"/>
+    <TrackerDragger v-show="trackerStore.visible"/>
     <FavAddressPop ref="favAddressPopRef" :visible="favAddressPopVisible" :button-ref="attentionTrigger || {}" width="248" :groupOptions="addressGroups" :title="$t('followAddress')" @onConfirm="handleAddAttention" @onCancel="() => favAddressPopVisible = false"/>
     <PnlTracker v-if="globalStore.pnlTrackerVisible"/>
     <Top v-if="topVisible" @click="scrollToTop"/>
@@ -34,12 +35,14 @@
   import SignalDraggable from '~/components/signal/signalDraggable.vue'
 import { useEventBus } from '@vueuse/core'
   const PnlTracker  = defineAsyncComponent(()=>import('./components/pnlTracker.vue'))
+  const TrackerDragger = defineAsyncComponent(()=>import('~/components/tracker/index.vue'))
   const botStore = useBotStore()
   const {addressGroups,attentionTrigger,favAddressPopVisible,handleAddAttention} = storeToRefs(useFollowStore())
   const signalStore = useSignalStore()
   const monitorStore = useMonitorStore()
   const globalStore = useGlobalStore()
   const dragPumpStore = usePumpStore()
+  const trackerStore = useTrackerStore()
   const route = useRoute()
 
   const _style=computed(()=>{

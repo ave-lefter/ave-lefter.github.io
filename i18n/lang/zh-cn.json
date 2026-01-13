@@ -1843,5 +1843,6 @@
   "noOpen": "不打开",
   "noticeDuration": "通知展示时间",
   "monitorThTip": "钱包头像和钱包地址至少选一个",
-  "wcWalletTip": "扫描二维码"
+  "wcWalletTip": "扫描二维码",
+  "popTips":"吸附的悬浮窗最多支持 3 个"
 }
