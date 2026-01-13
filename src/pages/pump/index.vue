@@ -917,7 +917,9 @@ function getPump(params, isFilter = false) {
     clearTimeout(Timer[params.category])
     Timer[params.category] = null
   }
-
+  if (route.name !== 'pump') {
+    return
+  }
   if ((isPausedObj.value?.[params.category] || route.name !== 'pump') && !isFilter) {
     Timer[params.category] = setTimeout(() => {
       getPump(params)
