@@ -119,6 +119,7 @@ defineExpose({
 })
 const { t } = useI18n()
 const { showImport, mode, showBotRecord } = storeToRefs(useGlobalStore())
+const { getUserInfo } =  useBotStore()
 const { theme, isDark } = storeToRefs(useThemeStore())
 const botStore = useBotStore()
 const loadingCreate = shallowRef(false)
@@ -210,7 +211,15 @@ function getWalletOperationRecord() {
   loadingRecord.value = true
   _getWalletOperationRecord()
     .then((res) => {
-      recordList.value = res
+      const result = Array.isArray(res) ? res?.map(i => ({
+        ...i,
+        updateTime: i?.updateTime !== '1970-01-01T00:00:00Z' &&
+          i?.updateTime !== '0001-01-01T00:00:00Z'
+            ? new Date(i.updateTime).getTime()
+            : 0,
+      })) : []
+      result?.sort((a, b) => (Number(b?.updateTime) - Number(a?.updateTime)))
+      recordList.value = result
       showBotRecord.value = true
     })
     .catch((err) => {
@@ -278,20 +287,32 @@ function generateWallet() {
   //   ElMessage.error(t('createTips'))
   //   return
   // }
-  loadingCreate.value = true
-  _generateWallet()
-    .then((res) => {
-      encryptedMnemonic.value = res?.Mnemonic
-      ElMessage.success(t('success'))
-      hide.value = true
-      dialogVisible.value = true
-      refresh()
+    ElMessageBox.confirm(t('createWalletTip'), t('createWallet'), {
+    type: 'warning',
+    icon: markRaw(Warning),
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
+    customClass: `${mode.value} delete_confirm`,
+  })
+    .then(() => {
+      loadingCreate.value = true
+      _generateWallet()
+        .then((res) => {
+          encryptedMnemonic.value = res?.Mnemonic
+          hide.value = true
+          dialogVisible.value = true
+          refresh()
+          getUserInfo()
+        })
+        .catch((err) => {
+          ElMessage.error(String(err))
+        })
+        .finally(() => {
+          loadingCreate.value = false
+        })
     })
     .catch((err) => {
-      ElMessage.error(String(err))
-    })
-    .finally(() => {
-      loadingCreate.value = false
+      console.log('--------err-------', err)
     })
 }
 

@@ -58,7 +58,7 @@ const tabs = computed(() => {
   const arr: Array<{ label: string, value: string }> = []
   if (Array.isArray(totalHolders.value)) {
     totalHolders.value.forEach(i => {
-      console.log(i.type)
+      // console.log(i.type)
       const num = i.total_address!
       if (num > 0) {
         arr.push({
@@ -1016,7 +1016,7 @@ const collect = async (row: any,index:number) => {
             <span>{{ $t('amountU') }}</span>
             <Icon
               name="custom:price"
-              :class="`${globalStore.isUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer`"
+              :class="`${globalStore.isUSDT ? 'color-[--third-text]' : 'color-[--primary-color]'} cursor-pointer`"
               @click.self="globalStore.isUSDT = !globalStore.isUSDT" />
             <VolFilter
               v-model:visible="tableFilterVisible.amountU" :modelValue="tableFilter.amountU"

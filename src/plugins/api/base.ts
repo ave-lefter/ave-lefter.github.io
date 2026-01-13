@@ -17,7 +17,7 @@ export function onRequest({ options, request }: MyFetchContext) {
   // headers.lang = language
   options.headers.set('lang', language)
   const url = request as string
-  if (url?.includes('/v2/aveswap/')) {
+  if (url?.includes('/v2/aveswap/') || url?.includes('/bestrouteapi/')) {
     options.headers.set('lang-zone', localStorage.getItem('language') || 'en')
   }
 
@@ -28,18 +28,21 @@ export function onRequest({ options, request }: MyFetchContext) {
     options.headers.set('Authorization', authorization + date)
   }
 
-  if (url?.includes('/v1api/') || url.startsWith('/v2api/')) {
+  if (url?.includes('/v1api/') || url.startsWith('/v2api/') || url.startsWith('/bestrouteapi/')) {
     const analogDeviceId = localStorage.getItem('analogDeviceId')
-    if (analogDeviceId && !url?.includes('/botapi')) {
+    if (analogDeviceId && !url?.includes('/botapi') && !url?.includes('/bestrouteapi/')) {
       options.headers.set('ave-udid', analogDeviceId)
     }
-    const currentAccount = useWalletStore().address
-    if (currentAccount) {
-      const signature = useWalletStore().walletSignature?.[currentAccount] || ''
-      if (signature) {
-        options.headers.set('signature', signature)
+    if (!url.startsWith('/bestrouteapi/')) {
+      const currentAccount = useWalletStore().address
+      if (currentAccount) {
+        const signature = useWalletStore().walletSignature?.[currentAccount] || ''
+        if (signature) {
+          options.headers.set('signature', signature)
+        }
       }
     }
+
     const ave_token = localStorage.ave_token
     if (ave_token) {
       options.headers.set('X-Auth', ave_token)
@@ -68,7 +71,13 @@ export function onResponse({ response, request }: MyFetchContext) {
   if (!response) {
     return
   }
-  const data = response._data
+  let data = response._data
+  if (typeof data === 'string' && /"status":1000[0-1]/.test(data) && isJSON(data)) {
+    data = JSON.parse(data)
+  }
+  if (response?.status === 403 || [10000, 10001]?.includes(data?.status)) {
+    throw new Error('x-auth-error')
+  }
   if ((request as string)?.includes('/aveswap/v1/sui/')) {
     if (data?.status === 0) {
       response._data = data?.data || data
@@ -108,20 +117,15 @@ export function onResponse({ response, request }: MyFetchContext) {
 }
 
 export const updateAveToken = createCacheRequest(() => {
-  const w: Window & {
-    vemachine?: {
-      generateToken?: (arg: boolean) => Promise<string>
-    }
-  } = window
-  if (!w?.vemachine?.generateToken) {
+  if (!window?.vemachine?.generateToken) {
     return Promise.resolve('')
   }
-  return w?.vemachine?.generateToken?.(true)
+  return window?.vemachine?.generateToken?.(true)
 }, 3000)
 
 export function onResponseError ({ response }: MyFetchContext) {
   const status = response?.status
-  if (status === 403) {
+  if (status === 403 || response?._data?.status <= -10000) {
     updateAveToken()
   }
 }

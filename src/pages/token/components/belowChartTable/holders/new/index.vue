@@ -287,7 +287,6 @@ const walletStore = useWalletStore()
 const { t } = useI18n()
 const activeTab = shallowRef<'all' | 'buy' |'sell' | 'buy24h' | 'sell24h' | '-100'>('all')
 const globalStore = useGlobalStore()
-const avgPriceEvent = useEventBus<number>('top100Price')
 
 // keyword: input value in the popover; searchKeyword: active search flag/value
 const searchKeyword = shallowRef('')
@@ -500,9 +499,6 @@ function getHoldersList(sortObj?: { sort_by: string; order: string }) {
     .then((res) => {
       holderListObj.value[activeTab.value] = res?.holderStats || []
       aggregateStatsObj.value[activeTab.value] = res?.aggregateStats || {}
-      if(activeTab.value === 'all') {
-        avgPriceEvent.emit(res?.aggregateStats?.top100PurchaseAvg || 0, res?.aggregateStats?.top100SellAvg || 0)
-      }
     })
     .catch(() => {
       holderListObj.value[activeTab.value] = []

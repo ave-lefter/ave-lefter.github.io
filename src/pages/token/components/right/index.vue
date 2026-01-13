@@ -28,7 +28,7 @@
       </div> -->
         <div class="p-15px bg-[--secondary-bg] mt-1px">
           <!-- <BotSwap /> -->
-          <component :is="SwapCom" />
+          <component :is="SwapCom" :key="walletStore.address ? 'Swap' : 'BotSwap'" />
         </div>
         <div class="p-15px pb-5px bg-[--secondary-bg] mt-1px">
           <div
@@ -66,7 +66,8 @@ import PriceTabs from './priceTabs.vue'
 import Pairs from './pairs.vue'
 import Overview from './overview.vue'
 import BotSwap from './botSwap/index.vue'
-const Swap = defineAsyncComponent(() => import('./swap/index.vue'))
+import Swap from './swap/index.vue'
+// const Swap = defineAsyncComponent(() => import('./swap/index.vue'))
 
 const dialogVisible = shallowRef(false)
 

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="['solana']?.includes(addressAndChain.chain)" class="w-lineLight h-52px w-100% px-10px border-b-1px border-b-solid border-b-[--main-divider] mb-12px" :class="isHidden && 'h-0px! border-b-0px p-0px!'">
+  <div v-if="['solana','bsc']?.includes(addressAndChain.chain)" class="w-lineLight h-52px w-100% px-10px border-b-1px border-b-solid border-b-[--main-divider] mb-12px" :class="isHidden && 'h-0px! border-b-0px p-0px!'">
     <ul v-if="!isHidden" class="flex gap-24px">
       <li class="flex gap-8px" @click.stop="popVisible = true">
         <div class="clickable">
@@ -23,6 +23,19 @@
           <div class="font-500 text-14px lh-16px tracking-0px color-[--main-text]">{{  `${formatNumber(Math.abs(Number(holdersAvg) * 100), 2)}%` }}</div>
         </div>
         <lineS  class="w-120px h-40px" :dataList="dataList2" :loading="loading2" :showSeries="[false, false]"  :showLeft="showLeft2" />
+      </li>
+      <li class="flex gap-8px"  @click.stop="popVisible = true">
+        <div class="clickable">
+          <div class="font-400 text-12px lh-16px tracking-0px color-[--third-text] mb-4px flex items-center">
+            <span class="">
+              &gt;10U
+            </span>
+            <!-- <Icon name="custom:exchange-horizontal" class="ml-4px color-[--third-text] text-10px clickable" @click.stop="dataType3++"/> -->
+            <Icon name="material-symbols:chevron-right-rounded" class="ml-4px text-14px"/>
+          </div>
+          <div class="font-500 text-14px lh-16px tracking-0px color-[--main-text]">{{  HoldersAbove10Usd }}</div>
+        </div>
+        <lineS  class="w-120px h-40px" :dataList="dataList3" :loading="loading2" :showSeries="[false, false]"  :showLeft="showLeft3" />
       </li>
       <!-- <li class="flex-1"/>
       <li class="flex-1"/>
@@ -57,15 +70,19 @@ let timer:number
 
 const popVisible=shallowRef<boolean>(false)
 const holdersNum= shallowRef<number|string>(0)
+const HoldersAbove10Usd= shallowRef<number|string>(0)
 const holdersAvg= shallowRef<number|string|undefined>(0)
 const holders1M= shallowRef<boolean>(true)
 const showLeft1= shallowRef<boolean>(false)
 const loading1= shallowRef<boolean>(false)
 const dataList1 = shallowRef<any[]>([])
 const showLeft2= shallowRef<boolean>(false)
+const showLeft3= shallowRef<boolean>(false)
 const loading2= shallowRef<boolean>(false)
 const dataList2 = shallowRef<any[]>([])
 const dataType2 = shallowRef(0)
+
+const dataList3 = shallowRef<any[]>([])
 const dataTypeArr2 = shallowRef(['100','10'])
 
 const isHidden = shallowRef(false)
@@ -87,7 +104,7 @@ const addressAndChain = computed(() => {
 const isInitialized = shallowRef(false) // 用于控制初始化
 
 function init1() {
-  if(!['solana']?.includes(addressAndChain.value?.chain)) return
+  if(!['solana','bsc']?.includes(addressAndChain.value?.chain)) return
   _getHoldersTokenCountLight()
   if(!holders1M.value){
     if(timer){
@@ -108,7 +125,9 @@ function _getHoldersTokenCountLight(){
     const arr = res?.token_count_data || []
     if(arr.length){
       replaceNegOne(arr,'holders_count')
+      replaceNegOne(arr,'HoldersAbove10Usd')
       holdersNum.value = arr[arr.length-1]?.holders_count === -1 ? 0 : arr[arr.length-1]?.holders_count
+      HoldersAbove10Usd.value = arr[arr.length-1]?.HoldersAbove10Usd === -1 ? 0 : arr[arr.length-1]?.HoldersAbove10Usd
       holders1M.value = new Date().getTime() - res.create_time * 1000 <  12 * 60 * 60 * 1000
       dataList1.value = arr.map(i=>{
         return {
@@ -116,10 +135,17 @@ function _getHoldersTokenCountLight(){
           value1: i.holders_count
         }
       })
+      dataList3.value=arr.map(i=>{
+        return {
+          ...i,
+          value1: i.HoldersAbove10Usd
+        }
+      })
     }else{
       holdersNum.value = 0
       holders1M.value = false
       dataList1.value = []
+      dataList3.value = []
     }
   }).finally(() => {
     loading1.value = false
@@ -131,7 +157,7 @@ function _getHoldersTokenCountLight(){
   })
 }
 function init2() {
-  if(!['solana']?.includes(addressAndChain.value?.chain)) return
+  if(!['solana','bsc']?.includes(addressAndChain.value?.chain)) return
   loading2.value = true
   getHoldersTokenHoldersLight(addressAndChain.value.address, addressAndChain.value.chain,topN.value).then(res => {
     // console.log('getHoldersTokenHoldersLight', res)

@@ -770,7 +770,7 @@ async function submitBotSwap() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })?.filter?.(i => Number(i?.inAmount) > 0) || []
+    })?.filter?.(i => Number(i?.inAmount) > 0 && i?.creatorAddress) || []
 
     const data = {
       // batchId: Date.now().toString(),
@@ -885,7 +885,7 @@ async function submitBotSwap() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })?.filter?.(i => Number(i?.inAmount) > 0) || []
+    })?.filter?.(i => Number(i?.inAmount) > 0 && i?.creatorAddress) || []
     const data = {
       // batchId: Date.now().toString(),
       chain: chain,
@@ -1037,7 +1037,7 @@ function submitBotLimit() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })?.filter?.(i => Number(i?.inAmount) > 0) || []
+    })?.filter?.(i => Number(i?.inAmount) > 0 && i?.creatorAddress) || []
     const data = {
       // batchId: Date.now().toString(),
       swapList: swapList,
@@ -1157,7 +1157,7 @@ function submitBotLimit() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })?.filter?.(i => Number(i?.inAmount) > 0) || []
+    })?.filter?.(i => Number(i?.inAmount) > 0 && i?.creatorAddress) || []
     const data = {
       // batchId: Date.now().toString(),
       chain: chain,

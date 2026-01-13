@@ -58,6 +58,15 @@ export const WSEventType = {
   SIMPLE_TX: 'simple_tx',
   PUMP_MIGRATED: 'pump_migrated',
 }
+// perp
+export const WSPerpHost = 'wss://quote.edgex.exchange'
+
+export const WSPerpEventType = {
+  TICKER_ALL_1S: 'ticker.all.1s',
+  KLINE: 'kline.LAST_PRICE',
+  DEPTH: 'depth',
+  TRADES: 'trades',
+}
 
 export const MAX_UINT_AMOUNT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
@@ -221,3 +230,5 @@ export const holdersTooltip = (t)=>({
    25:t('dev2'),
    16:t('mouse')
 })
+
+export const KOL_KEY = '31'

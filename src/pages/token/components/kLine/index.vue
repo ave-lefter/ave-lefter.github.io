@@ -1,5 +1,5 @@
 <template>
-  <div class="relative" :style="{height: `${isRank ? 390 : kHeight}px`}">
+  <div class="relative" :style="{ height: `${isRank ? 390 : kHeight}px` }">
     <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
     <UnknownRisk v-show="isReady" :isRank="isRank" @refresh="refresh" />
     <DialogRemind v-model="dialogVisible_remind" />
@@ -9,87 +9,214 @@
     class="w-full cursor-row-resize bg-[--border] gap-1px hover:bg-[--third-text] flex items-center justify-center h-4px"
     @mousedown.stop.prevent="drag"
   >
-    <span v-for="i in 4" :key="i" class="bg-[--icon-color] w-2px h-2px rounded-full"/>
+    <span v-for="i in 4" :key="i" class="bg-[--icon-color] w-2px h-2px rounded-full" />
   </div>
-  <div v-show="globalStore.klineSettingPop.visible" :style="globalStore.klineSettingPop.style" class="absolute p-20px bg-[--dialog-bg] rounded-8px w-320px text-14px" @click.stop>
+  <div
+    v-show="globalStore.klineSettingPop.visible"
+    :style="{
+      transform: `translate3d(${globalStore.klineSettingPop.position[0]}px,${globalStore.klineSettingPop.position[1] - scrollTop}px,0)`,
+    }"
+    class="absolute top-0 left-0 p-20px bg-[--dialog-bg] rounded-8px w-320px text-14px z-10"
+    @click.stop
+  >
     <div class="flex justify-between items-center mb-16px">
       {{ $t('chainToken') }}
-      <el-switch v-model="markVisible" class="[&&]:h-20px"/>
+      <el-switch v-model="markTabsVisible" class="[&&]:h-20px" />
     </div>
-    <template v-if="markVisible">
-      <div class="flex flex-wrap gap-row-16px">
-      <el-checkbox v-for="item in marksTabs" :key="item.id" v-model="markTabsChecked[item.id]" class="flex-basis-1/3 [&&]:mr-0 [&&]:[--el-checkbox-height:16px]">
+    <div v-show="markTabsVisible" class="flex flex-wrap gap-row-16px">
+      <el-checkbox
+        key="all"
+        class="flex-basis-1/3 [&&]:mr-0 [&&]:[--el-checkbox-height:16px]"
+        :model-value="!Object.values(markTabsChecked).some((el) => !el)"
+        @change="
+          (e) => {
+            Object.keys(markTabsChecked).forEach((key) => {
+              markTabsChecked[key] = e as boolean
+            })
+            onMarkChanged(e as boolean)
+          }
+        "
+      >
+        {{ t('all') }}
+      </el-checkbox>
+      <el-checkbox
+        v-for="item in totalHolders"
+        :key="item.id"
+        v-model="markTabsChecked[item.id]"
+        class="flex-basis-1/3 [&&]:mr-0 [&&]:[--el-checkbox-height:16px]"
+        @change="onMarkChanged"
+      >
         {{ item.name }}
       </el-checkbox>
     </div>
-    <div class="my-24px h-1px border-t-solid border-t-[--dialog-divider]"/>
+    <div class="my-24px h-1px border-t-solid border-t-[--dialog-divider]" />
     <div class="flex flex-col gap-16px">
-      指标线
-      <div class="flex justify-between">
-        <el-checkbox v-model="markLinesChecked.buy.checked" class="[&&]:[--el-checkbox-height:16px]">买均线</el-checkbox>
-        <div ref="colorPickerTrigger" class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: markLinesChecked.buy.color}" @click.stop="openColorPicker"/>
+      <div class="flex items-center gap-7px">
+        {{ $t('indicatorLine') }}
+        <Icon
+          name="custom:reset2"
+          class="cursor-pointer color-[--third-text] text-10px"
+          @click="resetIndicatorLineColor"
+        />
       </div>
       <div class="flex justify-between">
-        <el-checkbox v-model="markLinesChecked.sell.checked" class="[&&]:[--el-checkbox-height:16px]">卖均线</el-checkbox>
-        <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: markLinesChecked.sell.color}" @click.stop="openColorPicker"/>
+        <el-checkbox v-model="linesChecked.buy.checked" class="[&&]:[--el-checkbox-height:16px]">{{
+          $t('buyMa')
+        }}</el-checkbox>
+        <el-tooltip v-model:visible="colorPickerVisible.buy" trigger="click" :teleported="false">
+          <div
+            class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
+            :style="{ background: linesChecked.buy.color }"
+          />
+          <template #content>
+            <el-color-picker-panel v-model="linesChecked.buy.color" />
+          </template>
+        </el-tooltip>
+      </div>
+      <div class="flex justify-between">
+        <el-checkbox v-model="linesChecked.sell.checked" class="[&&]:[--el-checkbox-height:16px]">{{
+          $t('sellMa')
+        }}</el-checkbox>
+        <el-tooltip v-model:visible="colorPickerVisible.sell" trigger="click" :teleported="false">
+          <div
+            class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
+            :style="{ background: linesChecked.sell.color }"
+          />
+          <template #content>
+            <el-color-picker-panel v-model="linesChecked.sell.color" />
+          </template>
+        </el-tooltip>
+      </div>
+      <div class="flex justify-between">
+        <el-checkbox v-model="linesChecked.kol.checked" class="[&&]:[--el-checkbox-height:16px]">{{
+          $t('kolPosition')
+        }}</el-checkbox>
+        <el-tooltip v-model:visible="colorPickerVisible.kol" trigger="click" :teleported="false">
+          <div
+            class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
+            :style="{ background: linesChecked.kol.color }"
+          />
+          <template #content>
+            <el-color-picker-panel v-model="linesChecked.kol.color" />
+          </template>
+        </el-tooltip>
       </div>
     </div>
-    <div class="my-24px h-1px border-t-solid border-t-[--dialog-divider]"/>
+    <div class="my-24px h-1px border-t-solid border-t-[--dialog-divider]" />
     <div class="flex flex-col gap-16px">
-      {{ $t('top100') }}
-      <div class="flex justify-between">
-        <el-checkbox v-model="markLinesChecked.top100Buy.checked" class="[&&]:[--el-checkbox-height:16px]">持币大户买入均线</el-checkbox>
-        <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: markLinesChecked.top100Buy.color}" @click.stop="openColorPicker"/>
+      <div class="flex items-center gap-7px">
+        {{ $t('top100') }}
+        <Icon
+          name="custom:reset2"
+          class="cursor-pointer color-[--third-text] text-10px"
+          @click="resetTop100Color"
+        />
       </div>
       <div class="flex justify-between">
-        <el-checkbox v-model="markLinesChecked.top100Sell.checked" class="[&&]:[--el-checkbox-height:16px]">持币大户卖出均线</el-checkbox>
-        <div class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer" :style="{background: markLinesChecked.top100Sell.color}" @click.stop="openColorPicker"/>
+        <el-checkbox
+          v-model="linesChecked.top100Buy.checked"
+          class="[&&]:[--el-checkbox-height:16px]"
+          >{{ $t('whaleBuy') }}</el-checkbox
+        >
+        <el-tooltip
+          v-model:visible="colorPickerVisible.top100Buy"
+          trigger="click"
+          :teleported="false"
+        >
+          <div
+            class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
+            :style="{ background: linesChecked.top100Buy.color }"
+          />
+          <template #content>
+            <el-color-picker-panel v-model="linesChecked.top100Buy.color" />
+          </template>
+        </el-tooltip>
+      </div>
+      <div class="flex justify-between">
+        <el-checkbox
+          v-model="linesChecked.top100Sell.checked"
+          class="[&&]:[--el-checkbox-height:16px]"
+          >{{ $t('whaleSell') }}</el-checkbox
+        >
+        <el-tooltip
+          v-model:visible="colorPickerVisible.top100Sell"
+          trigger="click"
+          :teleported="false"
+        >
+          <div
+            class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
+            :style="{ background: linesChecked.top100Sell.color }"
+          />
+          <template #content>
+            <el-color-picker-panel v-model="linesChecked.top100Sell.color" />
+          </template>
+        </el-tooltip>
       </div>
     </div>
-    </template>
-    <el-tooltip
-    v-model:visible="colorPickerVisible"
-      :teleported="false"
-      placement="bottom"
-      trigger="click"
-      virtual-triggering
-      :virtual-ref="virtualRef!"
-    >
-     <template #content> 
-<el-color-picker-panel>
-  <template #append>
-    <el-button>Confirm</el-button>
-  </template>
-</el-color-picker-panel>
-     </template>
-    </el-tooltip>
     <div class="flex justify-between items-center mt-16px">
-      点击图标筛选
-      <el-switch v-model="globalStore.isClickKlineFilter" class="[&&]:h-20px"/>
+      {{ $t('clickChartFilter') }}
+      <el-switch v-model="globalStore.isClickKlineFilter" class="[&&]:h-20px" />
     </div>
   </div>
-  
 </template>
 
-<script setup lang='ts'>
-import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, VisiblePlotsSet, LanguageCode, ChartingLibraryFeatureset, SubscribeBarsCallback, LibrarySymbolInfo } from '~/types/tradingview/charting_library'
-import { getTimezone, formatDecimals, getSwapInfo, getAddressAndChainFromId, getWSMessage } from '@/utils'
+<script setup lang="ts">
+import type {
+  IChartingLibraryWidget,
+  ResolutionString,
+  Timezone,
+  SeriesFormat,
+  VisiblePlotsSet,
+  LanguageCode,
+  ChartingLibraryFeatureset,
+  SubscribeBarsCallback,
+  LibrarySymbolInfo,
+} from '~/types/tradingview/charting_library'
+import {
+  getTimezone,
+  formatDecimals,
+  getSwapInfo,
+  getAddressAndChainFromId,
+  getWSMessage,
+} from '@/utils'
 import { getKlineHistoryData, getTokenKlineHistory } from '@/api/token'
 import { formatNumber } from '@/utils/formatNumber'
-import { switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, buildOrUpdateLastBarFromTx, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark, useTop100AvgPriceLine } from './utils'
-import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
+import {
+  switchResolution,
+  formatLang,
+  supportSecChains,
+  initTradingViewIntervals,
+  updateChartBackground,
+  buildOrUpdateLastBarFromTx,
+  waitForTradingView,
+  useLimitPriceLine,
+  useAvgPriceLine,
+  useBotLimitLine,
+  setWatermark,
+  useTop100AvgPriceLine,
+  useBotAvgPriceLine,
+  useKOLAvgPriceLine,
+} from './utils'
+import {
+  useLocalStorage,
+  useElementBounding,
+  useWindowSize,
+  useEventBus,
+  useStorage,
+} from '@vueuse/core'
 import type { WSTx, KLineBar, SimpleWSTx } from './types'
 import BigNumber from 'bignumber.js'
 import { useKlineMarks } from './mark'
-import {DefaultHeight, WSSimpleTxChain} from '~/utils/constants'
+import { DefaultHeight, WSSimpleTxChain } from '~/utils/constants'
 import { TW_STUDY } from './constant'
 import UnknownRisk from './unknownRisk.vue'
 import DialogRemind from './dialogRemind.vue'
 import dayjs from 'dayjs'
 
 const props = defineProps<{
-  isRank?:boolean
+  isRank?: boolean
 }>()
+const { t } = useI18n()
 const klineDateFilter = inject<Ref<string[]>>(ProvideType.KLINE_DATE_FILTER)
 const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const botStore = useBotStore()
@@ -97,25 +224,72 @@ const tokenDetailsStore = useTokenDetailsStore()
 const globalStore = useGlobalStore()
 const route = useRoute()
 const walletStore = useWalletStore()
+const scrollTop = ref(0)
+const totalHolders = computed(() => [
+  { id: 'trade', name: t('mine') },
+  {
+    id: '16',
+    name: t('insiders'),
+  },
+  {
+    id: '19',
+    name: t('sniper2'),
+  },
+  {
+    id: '25',
+    name: t('DEV'),
+  },
+  {
+    id: '30',
+    name: t('smarter'),
+  },
+  {
+    id: '31',
+    name: 'KOL',
+  },
+])
+const linesChecked = useLocalStorage('tv_markLines', {
+  buy: {
+    checked: true,
+    color: '#12B886',
+  },
+  sell: {
+    checked: false,
+    color: '#F6465D',
+  },
+  top100Buy: {
+    checked: false,
+    color: '#0D6EFD',
+  },
+  top100Sell: {
+    checked: false,
+    color: '#FD3E3E',
+  },
+  kol: {
+    checked: false,
+    color: '#FFA622',
+  },
+})
+const colorPickerVisible = ref({} as Record<string, boolean>)
 const token = computed(() => {
-  return (props.isRank && 'klineRow' in tokenStore) ? tokenStore.klineRow?.id : route.params.id as string
+  return props.isRank && 'klineRow' in tokenStore
+    ? tokenStore.klineRow?.id
+    : (route.params.id as string)
 })
 
 const klinePair = ref('')
 
-const colorPickerVisible = ref(false)
-const virtualRef = ref<HTMLElement | null>(null)
 const isReady = ref(false)
 let isReadyLine = false
 let isHeaderReady = false
 const dialogVisible_remind = ref(false)
-const Book = reactive({
-  title: '1111',
-  author: {
-    name:'托儿列夫'
-  },
-  year: 50
-})
+// const Book = reactive({
+//   title: '1111',
+//   author: {
+//     name:'托儿列夫'
+//   },
+//   year: 50
+// })
 
 const chain = computed(() => {
   return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
@@ -126,7 +300,11 @@ const tokenAddress = computed(() => {
 })
 
 const user = computed(() => {
-  return botStore.userInfo?.addresses?.find?.(i => i.chain === chain.value)?.address || botStore?.userInfo?.evmAddress || walletStore?.address
+  return (
+    botStore.userInfo?.addresses?.find?.((i) => i.chain === chain.value)?.address ||
+    botStore?.userInfo?.evmAddress ||
+    walletStore?.address
+  )
 })
 
 const symbol = computed(() => {
@@ -143,28 +321,35 @@ const amm = computed(() => {
 
 let loading = false
 
-watch(() => token.value, (val) => {
-  if (!val) return
-  if (_widget?.activeChart()) {
-    _widget?.activeChart()?.removeAllShapes?.()
+watch(
+  () => token.value,
+  (val) => {
+    if (!val) return
+    if (_widget?.activeChart?.()) {
+      _widget?.activeChart?.()?.removeAllShapes?.()
+    }
   }
-})
-
+)
 
 watch(pair, (val) => {
   if (val === klinePair.value) return
   switchTokenKline()
 })
 
-watch(() => tokenStore.selectedToken, () => {
-  switchTokenKline()
-})
+watch(
+  () => tokenStore.selectedToken,
+  () => {
+    switchTokenKline()
+  }
+)
 
 function switchTokenKline() {
   isReadyLine = false
   resetLimitPriceLineId()
-  resetAvgPriceLineId()
+  // resetAvgPriceLineId()
   resetTop100AvgPriceLineId()
+  resetBotAvgLineId()
+  resetKOLLine()
   const val = pair.value
   if (isReady.value && route.name === 'token-id') {
     const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
@@ -175,13 +360,17 @@ function switchTokenKline() {
     // if (preResolutions !== nextResolutions) {
     //     resetChart()
     // }
-    if (_widget) {
+    if (_widget && _widget?.activeChart?.()) {
       _widget?.resetCache?.()
       _widget?.activeChart?.()?.clearMarks?.()
-      _widget?.setSymbol?.(symbol.value + '---' + token.value + val + (tokenStore.selectedToken ? '1' : '0'), resolution.value as ResolutionString, () => {
-        isReadyLine = true
-        // createHeaderButton()
-      })
+      _widget?.setSymbol?.(
+        symbol.value + '---' + token.value + val + (tokenStore.selectedToken ? '1' : '0'),
+        resolution.value as ResolutionString,
+        () => {
+          isReadyLine = true
+          // createHeaderButton()
+        }
+      )
     } else {
       initChart()
     }
@@ -222,24 +411,29 @@ let _widget: null | IChartingLibraryWidget = null
 const showMarket = useLocalStorage('tv_showMarket', false)
 
 // 切换主题
-watch(() => themeStore.theme, (val) => {
-  if (_widget) {
-    _widget?.changeTheme(val).then(() => {
-      setIframeCssVar()
-      _widget?.applyOverrides?.({
-        'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
-        'paneProperties.backgroundType': 'solid',
-        'paneProperties.background': getCssVariable('--secondary-bg'),
+watch(
+  () => themeStore.theme,
+  (val) => {
+    if (_widget) {
+      _widget?.changeTheme(val).then(() => {
+        setIframeCssVar()
+        _widget?.applyOverrides?.({
+          'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
+          'paneProperties.backgroundType': 'solid',
+          'paneProperties.background': getCssVariable('--secondary-bg'),
+        })
       })
-    })
+    }
   }
-})
+)
 
 // 切换语言
-watch(() => localeStore.locale, () => {
-  resetChart()
-})
-
+watch(
+  () => localeStore.locale,
+  () => {
+    resetChart()
+  }
+)
 
 // const documentVisible = inject<Ref<boolean>>('documentVisible') as Ref<boolean>
 
@@ -255,26 +449,32 @@ function resetChart() {
   lastBar = null
   lastPairPrice = 0
   resetLimitPriceLineId()
-  resetAvgPriceLineId()
+  resetBotAvgLineId()
+  resetKOLLine()
+  resetTop100AvgPriceLineId()
+  // resetAvgPriceLineId()
   _widget?.remove?.()
   initChart()
 }
 
-
 function saveStudy() {
-  if (_widget?.activeChart) {
-    let studies = _widget?.activeChart?.().getAllStudies() || []
-    studies = studies.filter((item, index) => studies.findIndex(i => i.name === item.name) === index)
-    localStorage.setItem(TW_STUDY, JSON.stringify(studies.filter(i => i.name !== 'Volume')))
+  if (_widget?.activeChart?.()) {
+    let studies = _widget?.activeChart?.()?.getAllStudies?.() || []
+    studies = studies.filter(
+      (item, index) => studies.findIndex((i) => i.name === item.name) === index
+    )
+    localStorage.setItem(TW_STUDY, JSON.stringify(studies.filter((i) => i.name !== 'Volume')))
   }
 }
 
 // 创建指标
 function createStudy() {
-  if (_widget?.activeChart) {
-    let studies: Array<{ name: string, id: string }> = JSON.parse(localStorage?.[TW_STUDY] || '[]')
-    studies = studies.filter((item, index) => studies.findIndex(i => i.name === item.name) === index)
-    studies.forEach(i => {
+  if (_widget?.activeChart?.()) {
+    let studies: Array<{ name: string; id: string }> = JSON.parse(localStorage?.[TW_STUDY] || '[]')
+    studies = studies.filter(
+      (item, index) => studies.findIndex((i) => i.name === item.name) === index
+    )
+    studies.forEach((i) => {
       _widget?.activeChart?.().createStudy(i.name, false, false)
     })
     // if (localStorage['tradingview.chart.favoriteLibraryIndicators']) {
@@ -289,13 +489,12 @@ function createStudy() {
   }
 }
 
-
 let headerBtns: HTMLElement[] = []
 function createHeaderButton() {
   if (!isHeaderReady) {
     return
   }
-  headerBtns.forEach(i => {
+  headerBtns.forEach((i) => {
     _widget?.removeButton?.(i)
   })
   headerBtns = []
@@ -336,7 +535,8 @@ function createTogglePriceWarningButton() {
   if (!btn) return
 
   const updateButtonContent = () => {
-    btn.innerHTML = '<div style="display: flex;align-items: center;cursor:pointer;padding: 7px 5px 7px 0;border-radius: 6px;" onMouseOver="this.style.background=\'none\'"  onMouseLeave="this.style.background=\'none\'"><img width="18" height="18" src="https://ave.s3.ap-east-1.amazonaws.com/im/alert.png" /></div>'
+    btn.innerHTML =
+      '<div style="display: flex;align-items: center;cursor:pointer;padding: 7px 5px 7px 0;border-radius: 6px;" onMouseOver="this.style.background=\'none\'"  onMouseLeave="this.style.background=\'none\'"><img width="18" height="18" src="https://ave.s3.ap-east-1.amazonaws.com/im/alert.png" /></div>'
   }
 
   btn.onclick = () => {
@@ -363,11 +563,26 @@ function createResetBtn() {
   headerBtns.push(btn)
 }
 
-
-const { getMarks, marksTabs,markTabsChecked, wsTxUpdateMarks,profilingMarksCache,createDisplayButton,markLinesChecked,markVisible } = useKlineMarks()
+const {
+  getMarks,
+  marksTabs,
+  markTabsChecked,
+  wsTxUpdateMarks,
+  profilingMarksCache,
+  createDisplayButton,
+  markTabsVisible,
+} = useKlineMarks()
 
 watch(marksTabs, () => {
   _createHeaderButton()
+})
+
+watch(markTabsVisible, (val) => {
+  if (val) {
+    _widget?.activeChart?.()?.refreshMarks?.()
+  } else {
+    _widget?.activeChart?.()?.clearMarks?.()
+  }
 })
 
 let retryCount = 0
@@ -395,7 +610,7 @@ async function initChart() {
   // console.log('widget', window.TradingView)
   const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
   // 初始化 resolutions
-  resolution.value = initTradingViewIntervals(resolution.value, chain.value,isSupportSecChains)
+  resolution.value = initTradingViewIntervals(resolution.value, chain.value, isSupportSecChains)
   const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
   const widget = await waitForTradingView()
   _widget = new widget({
@@ -420,8 +635,8 @@ async function initChart() {
       'timeframes_toolbar',
     ],
     enabled_features: [
-    'request_only_visible_range_on_reset',
-      ...(isSupportSecChains ? ['seconds_resolution' as ChartingLibraryFeatureset] : [])
+      'request_only_visible_range_on_reset',
+      ...(isSupportSecChains ? ['seconds_resolution' as ChartingLibraryFeatureset] : []),
     ],
     charts_storage_url: location.host,
     charts_storage_api_version: '1.1',
@@ -429,7 +644,7 @@ async function initChart() {
     time_frames: [],
     loading_screen: {
       backgroundColor: themeStore.isDark ? '#0B0D12' : '#F6F9FF',
-      foregroundColor: '#3F80F7'
+      foregroundColor: '#3F80F7',
     },
     custom_css_url: `${location.origin}/tv_custom_1.css`,
     // format: (showMarket.value ? 'volume' : 'price') as SeriesFormat,
@@ -440,17 +655,19 @@ async function initChart() {
             if (showMarket.value) {
               return formatNumber(price, {
                 decimals: 2,
-                locale: 'en'
+                locale: 'en',
               })
             }
-            return String(formatNumber(price, {
-              decimals: 4,
-              limit: 6,
-              locale: 'en'
-            }))
+            return String(
+              formatNumber(price, {
+                decimals: 4,
+                limit: 6,
+                locale: 'en',
+              })
+            )
           },
         }
-      }
+      },
     },
     overrides: {
       volumePaneSize: 'small',
@@ -515,17 +732,38 @@ async function initChart() {
       // 'linetoolhorzline.vertLabelsAlign': 'bottom',
     },
     datafeed: {
-      onReady: callback => {
+      onReady: (callback) => {
         // const chain = props.chain
         const isSupportSecChains = chain.value && supportSecChains.includes(chain.value)
         const configurationData = {
-          supported_resolutions: ['1S','1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[],
+          supported_resolutions: [
+            '1S',
+            '1',
+            '5',
+            '15',
+            '30',
+            '60',
+            '120',
+            '240',
+            '1D',
+            '1W',
+          ] as ResolutionString[],
           supports_marks: true,
           supports_timescale_marks: true,
-          supports_time: true
+          supports_time: true,
         }
         if (!isSupportSecChains) {
-          configurationData.supported_resolutions = ['1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[]
+          configurationData.supported_resolutions = [
+            '1',
+            '5',
+            '15',
+            '30',
+            '60',
+            '120',
+            '240',
+            '1D',
+            '1W',
+          ] as ResolutionString[]
         }
         setIframeCssVar()
 
@@ -547,9 +785,7 @@ async function initChart() {
             format: (showMarket.value ? 'volume' : 'price') as SeriesFormat,
             minmov: 1, // 最小波动
             minmove2: 0, // 格式化复杂情况下的价格 如价格增量
-            pricescale: p > 0
-              ? 10 ** formatDecimals(p).precision
-              : 10000000000,
+            pricescale: p > 0 ? 10 ** formatDecimals(p).precision : 10000000000,
             volume_precision: 2, // 小数位
             fractional: false, // 分数显示价格,1 - xx'yy（例如，133'21)或 2 - xx'yy'zz （例如，133'21'5）
             session: '24x7',
@@ -560,14 +796,35 @@ async function initChart() {
             has_daily: true,
             // has_no_volume: false, // 布尔表示商品是否拥有成交量数据
             has_weekly_and_monthly: true,
-            supported_resolutions: ['1S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
+            supported_resolutions: [
+              '1S',
+              '1',
+              '5',
+              '15',
+              '30',
+              '60',
+              '120',
+              '240',
+              '1D',
+              '1W',
+            ] as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
             data_status: 'streaming' as 'streaming' | 'endofday' | 'delayed_streaming',
             visible_plots_set: 'ohlcv' as VisiblePlotsSet,
             type: 'crypto',
-            listed_exchange: getSwapInfo?.(chain.value || '', amm.value)?.show_name || ''
+            listed_exchange: getSwapInfo?.(chain.value || '', amm.value)?.show_name || '',
           }
           if (!isSupportSecChains) {
-            symbolInfo.supported_resolutions = ['1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[]
+            symbolInfo.supported_resolutions = [
+              '1',
+              '5',
+              '15',
+              '30',
+              '60',
+              '120',
+              '240',
+              '1D',
+              '1W',
+            ] as ResolutionString[]
             symbolInfo.seconds_multipliers = []
           }
           console.log('[resolveSymbol]: Symbol resolved', symbolName)
@@ -596,9 +853,14 @@ async function initChart() {
             // pair_id: pair.value + '-' + chain.value,
             token_id: token.value,
             from,
-            to: firstDataRequest ? 0 : Math.max(to, firstBarTime || 0)
+            to: firstDataRequest ? 0 : Math.max(to, firstBarTime || 0),
           }
-          const isTokenKline = SupportTokenKlineChains?.includes?.(chain.value) && !props.isRank && 'tokenAllPair' in tokenStore && tokenStore?.tokenAllPair && tokenStore?.selectedToken
+          const isTokenKline =
+            SupportTokenKlineChains?.includes?.(chain.value) &&
+            !props.isRank &&
+            'tokenAllPair' in tokenStore &&
+            tokenStore?.tokenAllPair &&
+            tokenStore?.selectedToken
 
           console.log('[getBars] isTokenKline', isTokenKline)
           if (!isTokenKline) {
@@ -607,36 +869,47 @@ async function initChart() {
           }
           loading = true
           const getKlineFunc = isTokenKline ? getTokenKlineHistory : getKlineHistoryData
-          getKlineFunc(params).then(res => {
-            const bars1 = res?.kline_data || []
-            const bars = bars1?.map?.(i => ({
-              time: i.time * 1000,
-              open: showMarket.value ? new BigNumber(i.open || 0).times(tokenStore?.circulation || 0).toNumber() : i.open,
-              high: showMarket.value ? new BigNumber(i.high || 0).times(tokenStore?.circulation || 0).toNumber() : i.high,
-              low: showMarket.value ? new BigNumber(i.low || 0).times(tokenStore?.circulation || 0).toNumber() : i.low,
-              close: showMarket.value ? new BigNumber(i.close || 0).times(tokenStore?.circulation || 0).toNumber() : i.close,
-              volume: i.volume,
-            })) || []
-            klinePair.value = res?.pair || ''
-            if (firstDataRequest) {
-              lastBar = bars1?.[bars1?.length - 1] || null
-              lastPairPrice = Number(lastBar?.close || 0)
-              if (lastBar) {
-                lastBar.time = lastBar.time * 1000
+          getKlineFunc(params)
+            .then((res) => {
+              const bars1 = res?.kline_data || []
+              const bars =
+                bars1?.map?.((i) => ({
+                  time: i.time * 1000,
+                  open: showMarket.value
+                    ? new BigNumber(i.open || 0).times(tokenStore?.circulation || 0).toNumber()
+                    : i.open,
+                  high: showMarket.value
+                    ? new BigNumber(i.high || 0).times(tokenStore?.circulation || 0).toNumber()
+                    : i.high,
+                  low: showMarket.value
+                    ? new BigNumber(i.low || 0).times(tokenStore?.circulation || 0).toNumber()
+                    : i.low,
+                  close: showMarket.value
+                    ? new BigNumber(i.close || 0).times(tokenStore?.circulation || 0).toNumber()
+                    : i.close,
+                  volume: i.volume,
+                })) || []
+              klinePair.value = res?.pair || ''
+              if (firstDataRequest) {
+                lastBar = bars1?.[bars1?.length - 1] || null
+                lastPairPrice = Number(lastBar?.close || 0)
+                if (lastBar) {
+                  lastBar.time = lastBar.time * 1000
+                }
+                noData = bars?.length < 100
               }
-              noData = bars?.length < 100
-            }
-            if (bars1?.length > 0) {
-              firstBarTime = bars1?.[0]?.time || 0
-            }
-            onResult(bars, {noData: !bars?.length})
+              if (bars1?.length > 0) {
+                firstBarTime = bars1?.[0]?.time || 0
+              }
+              onResult(bars, { noData: !bars?.length })
 
-            setTimeout(() => {
-              useEventBus('klineDataReady').emit()
-            }, 10)
-          }).finally(() => {
-            loading = false
-          })
+              setTimeout(() => {
+                useEventBus('klineDataReady').emit()
+              }, 10)
+            })
+            .finally(() => {
+              loading = false
+            })
           // if (firstDataRequest) {
           //   getKlineHistoryData(params).then(res => {
           //     console.log('getKlineHistoryData', res)
@@ -660,38 +933,40 @@ async function initChart() {
           onError(err?.toString?.() || 'getBars err')
         }
       },
-      subscribeBars: (symbolInfo, resolution, onTick, listenerGuid, /*onResetCacheNeededCallback*/) => {
+      subscribeBars: (
+        symbolInfo,
+        resolution,
+        onTick,
+        listenerGuid /*onResetCacheNeededCallback*/
+      ) => {
         console.log('listenerGuid', listenerGuid)
         if (listenerGuidMap.has(token.value)) {
           onWsKline(resolution, onTick)
           return
         }
         const { address, chain } = getAddressAndChainFromId(token.value)
-        let params: [string, string | { tks: { ch: string, tk: string }[], rt: string }, string?] = [
-          'multi_tx',
-          address,
-          chain
-        ]
+        let params: [string, string | { tks: { ch: string; tk: string }[]; rt: string }, string?] =
+          ['multi_tx', address, chain]
         if (WSSimpleTxChain.includes(chain)) {
           params = [
-          'simple_tx',
-          {
-            tks: [
-              {
-                ch: chain,
-                tk: address
-              }
-            ],
-            rt: 'json'
-          }
-        ]
+            'simple_tx',
+            {
+              tks: [
+                {
+                  ch: chain,
+                  tk: address,
+                },
+              ],
+              rt: 'json',
+            },
+          ]
         }
 
         const data = {
           jsonrpc: '2.0',
           method: 'subscribe',
           params: params,
-          id: 1
+          id: 1,
         }
         const ws = wsStore.send(data)
         onWsKline(resolution, onTick, ws)
@@ -703,11 +978,11 @@ async function initChart() {
           if (subscribeParams?.params?.[1] === tokenAddress.value) {
             return
           }
-          listenerGuidMap.forEach(i => {
+          listenerGuidMap.forEach((i) => {
             if (i?.params?.[1] !== tokenAddress.value) {
               wsStore.send({
                 ...i,
-                method: 'unsubscribe'
+                method: 'unsubscribe',
               })
             }
           })
@@ -718,7 +993,9 @@ async function initChart() {
         console.log(userInput, exchange, symbolType, onResult)
       },
       getMarks: (symbolInfo, from, to, onDataCallback, resolution) => {
-        console.log(`[getMarks] ${symbolInfo.name} from ${from} to ${to}, resolution: ${resolution}`)
+        console.log(
+          `[getMarks] ${symbolInfo.name} from ${from} to ${to}, resolution: ${resolution}`
+        )
         const interval = switchResolution(resolution)
         getMarks({
           from,
@@ -728,7 +1005,7 @@ async function initChart() {
           token: token.value,
           chain: chain.value || '',
           user: user.value,
-          onDataCallback
+          onDataCallback,
         })
         // getUserKlineTxTags({
         //   from,
@@ -742,8 +1019,8 @@ async function initChart() {
         //   const marks = formatToMarks(res, interval)
         //   onDataCallback(marks || [])
         // })
-      }
-    }
+      },
+    },
   })
   updateChartBackground()
 
@@ -755,13 +1032,16 @@ async function initChart() {
     } else {
       _widget?.applyOverrides?.({ 'scalesProperties.textColor': '#333' })
     }
-    _widget?.activeChart?.()?.onIntervalChanged().subscribe(null, interval => {
-      if (resolution.value !== interval) {
-        resolution.value = interval
-        localStorage.setItem('tv_resolution', interval)
-        _widget?.resetCache?.()
-      }
-    })
+    _widget
+      ?.activeChart?.()
+      ?.onIntervalChanged()
+      .subscribe(null, (interval) => {
+        if (resolution.value !== interval) {
+          resolution.value = interval
+          localStorage.setItem('tv_resolution', interval)
+          _widget?.resetCache?.()
+        }
+      })
 
     setWatermark(_widget)
     subscribePriceMove()
@@ -782,66 +1062,73 @@ async function initChart() {
 
   // onMarkClick
   _widget?.subscribe('onMarkClick', (markId) => {
-    const {token,symbol,logo_url,chain} = tokenStore.tokenInfo?.token||{}
-    const {target_token,token0_address,token0_symbol,token1_symbol,pair} = tokenStore.pair || {}
+    const { token, symbol, logo_url, chain } = tokenStore.tokenInfo?.token || {}
+    const { target_token, token0_address, token0_symbol, token1_symbol, pair } =
+      tokenStore.pair || {}
 
     let user_address = user.value
-    for(const [,markArr] of profilingMarksCache){
-     const addr = markArr.find(el => el.id === markId)?.user_address
-     if(addr){
-      user_address = addr
-      break
-     }
+    for (const [, markArr] of profilingMarksCache) {
+      const addr = markArr.find((el) => el.id === markId)?.user_address
+      if (addr) {
+        user_address = addr
+        break
+      }
     }
     const $patchParams = {
-      drawerVisible:true,
-      tokenInfo:{
-        id:route.params.id as string,
+      drawerVisible: true,
+      tokenInfo: {
+        id: route.params.id as string,
         symbol,
         logo_url,
         chain,
-        address:token
+        address: token,
       },
-      pairInfo:{
+      pairInfo: {
         target_token,
         token0_address,
         token0_symbol,
         token1_symbol,
-        pairAddress:pair
+        pairAddress: pair,
       },
-      user_address
+      user_address,
     }
     tokenDetailsStore.$patch($patchParams)
   })
 
   let mouseDownTime = 0
-  _widget.subscribe('mouse_down',()=>{
+  _widget.subscribe('mouse_down', () => {
     mouseDownTime = performance.now()
   })
 
   _widget.subscribe('mouse_up', (e) => {
-    if(performance.now() - mouseDownTime >=200){
+    if (performance.now() - mouseDownTime >= 200) {
       return
     }
-    const startTime = _widget?.activeChart().getTimeScale().coordinateToTime(e.clientX-56)
-    if(startTime && resolution.value){
+    const startTime = _widget
+      ?.activeChart?.()
+      ?.getTimeScale?.()
+      .coordinateToTime(e.clientX - 56)
+    if (startTime && resolution.value) {
       // 获取 tradingview 时间周期
-      const dayjsParams = resolutionMap[resolution.value as keyof typeof resolutionMap] || {val:resolution.value,unit:'m'}
-      const endTime = dayjs(startTime*1000).add(dayjsParams.val,dayjsParams.unit).unix()
-      if(globalStore.isClickKlineFilter && klineDateFilter?.value){
-        klineDateFilter.value = [String(startTime),String(endTime)]
+      const dayjsParams = resolutionMap[resolution.value as keyof typeof resolutionMap] || {
+        val: resolution.value,
+        unit: 'm',
+      }
+      const endTime = dayjs(startTime * 1000)
+        .add(dayjsParams.val, dayjsParams.unit)
+        .unix()
+      if (globalStore.isClickKlineFilter && klineDateFilter?.value) {
+        klineDateFilter.value = [String(startTime), String(endTime)]
       }
     }
-
   })
 
   subscribeStudyEvent()
-
 }
 
 let isUnload = false
 function subscribeStudyEvent() {
-  _widget?.subscribe('study_event', (_id,  type) => {
+  _widget?.subscribe('study_event', (_id, type) => {
     if ((type === 'create' || type === 'remove') && !isUnload) {
       saveStudy()
     }
@@ -851,9 +1138,12 @@ function subscribeStudyEvent() {
   }
 }
 
-
-function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsStore.getWSInstance()) {
-  ws?.onmessage(e => {
+function onWsKline(
+  resolution: string,
+  onTick: SubscribeBarsCallback,
+  ws = wsStore.getWSInstance()
+) {
+  ws?.onmessage((e) => {
     const msg = getWSMessage(e)
     if (!msg) {
       return
@@ -867,11 +1157,18 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsSto
       if ('target' in tx) {
         target = tx.target
       } else {
-        target = ([tx.from_address, tx.to_address].find(i => i === t)) || ''
+        target = [tx.from_address, tx.to_address].find((i) => i === t) || ''
       }
       if (target === t && !loading) {
         const _pair = 'pair' in tx ? tx.pair : tx.pair_address
-        const _price = 'price_u' in tx ? Number(tx.price_u || 0) : Number(tx.from_address?.toLowerCase?.() === tokenStore.token?.token?.toLowerCase?.() ? tx.from_price_usd : tx.to_price_usd) || 0
+        const _price =
+          'price_u' in tx
+            ? Number(tx.price_u || 0)
+            : Number(
+                tx.from_address?.toLowerCase?.() === tokenStore.token?.token?.toLowerCase?.()
+                  ? tx.from_price_usd
+                  : tx.to_price_usd
+              ) || 0
         if (_pair === pair.value) {
           lastPairPrice = _price
         }
@@ -884,24 +1181,33 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = wsSto
         tokenStore.tokenPrice = _price
         const newBar1 = buildOrUpdateLastBarFromTx(tx, t, lastBar, interval)
         if (newBar1) {
-          lastBar = {...newBar1}
+          lastBar = { ...newBar1 }
         }
-        const newBar = {...newBar1} as KLineBar
+        const newBar = { ...newBar1 } as KLineBar
         if (showMarket.value && newBar) {
-          newBar.open = new BigNumber(newBar.open || 0).times(tokenStore?.circulation || 0).toNumber()
-          newBar.high = new BigNumber(newBar.high || 0).times(tokenStore?.circulation || 0).toNumber()
+          newBar.open = new BigNumber(newBar.open || 0)
+            .times(tokenStore?.circulation || 0)
+            .toNumber()
+          newBar.high = new BigNumber(newBar.high || 0)
+            .times(tokenStore?.circulation || 0)
+            .toNumber()
           newBar.low = new BigNumber(newBar.low || 0).times(tokenStore?.circulation || 0).toNumber()
-          newBar.close = new BigNumber(newBar.close || 0).times(tokenStore?.circulation || 0).toNumber()
+          newBar.close = new BigNumber(newBar.close || 0)
+            .times(tokenStore?.circulation || 0)
+            .toNumber()
         }
         if (newBar && newBar?.time) {
           onTick(newBar)
         }
       }
-      wsTxUpdateMarks({
-        tx,
-        interval: Number(interval),
-        user: user.value
-      }, _widget)
+      wsTxUpdateMarks(
+        {
+          tx,
+          interval: Number(interval),
+          user: user.value,
+        },
+        _widget
+      )
     }
   }, 'kline')
 }
@@ -920,7 +1226,7 @@ function drag(e: MouseEvent) {
   }
   const { height } = useElementBounding(dom)
   kHeight.value = height.value
-  document.onmousemove = e => {
+  document.onmousemove = (e) => {
     if (!isMask) {
       return
     }
@@ -929,9 +1235,8 @@ function drag(e: MouseEvent) {
       return
     }
     document.getElementById('tv_chart_container')!.style.pointerEvents = 'none'
-    const _kHeight = e.clientY < dy
-      ? kHeight.value - (dy - e.clientY)
-      : kHeight.value + e.clientY - dy
+    const _kHeight =
+      e.clientY < dy ? kHeight.value - (dy - e.clientY) : kHeight.value + e.clientY - dy
 
     if (_kHeight <= wHeight.value - 164) {
       kHeight.value = _kHeight
@@ -950,12 +1255,40 @@ function drag(e: MouseEvent) {
   return false
 }
 
-const { resetLimitPriceLineId, subscribePriceMove } = useLimitPriceLine(() => _widget, () => isReadyLine, showMarket)
+const { resetLimitPriceLineId, subscribePriceMove } = useLimitPriceLine(
+  () => _widget,
+  () => isReadyLine,
+  showMarket
+)
 
-const { resetAvgPriceLineId } = useAvgPriceLine(() => _widget, () => isReadyLine, showMarket)
-const { resetAvgPriceLineId: resetTop100AvgPriceLineId } = useTop100AvgPriceLine(() => _widget,() => isReadyLine, showMarket)
-useBotLimitLine(() => _widget, () => isReadyLine, showMarket)
-
+// const { resetAvgPriceLineId } = useAvgPriceLine(
+//   () => _widget,
+//   () => isReadyLine,
+//   showMarket
+// )
+const { resetAvgPriceLineId: resetTop100AvgPriceLineId } = useTop100AvgPriceLine(
+  () => _widget,
+  () => isReadyLine,
+  showMarket,
+  linesChecked
+)
+useBotLimitLine(
+  () => _widget,
+  () => isReadyLine,
+  showMarket
+)
+const { resetBotAvgLineId } = useBotAvgPriceLine(
+  () => _widget,
+  () => isReadyLine,
+  showMarket,
+  linesChecked
+)
+const { resetKOLLine } = useKOLAvgPriceLine(
+  () => _widget,
+  () => isReadyLine,
+  showMarket,
+  linesChecked
+)
 
 function setIframeCssVar() {
   const iframe = document.querySelector('#tv_chart_container iframe') as HTMLIFrameElement
@@ -968,17 +1301,9 @@ function setIframeCssVar() {
   iframeRoot.style.setProperty('--secondary-bg', getCssVariable('--secondary-bg'))
 }
 
-
 onBeforeUnmount(() => {
   isUnload = true
 })
-
-const openColorPicker = (e: MouseEvent) => {
-  virtualRef.value = e.currentTarget as unknown as HTMLElement
-  setTimeout(() => {
-    colorPickerVisible.value = true
-  }, 20)
-}
 
 const clickHandler = () => {
   globalStore.klineSettingPop.visible = false
@@ -989,11 +1314,11 @@ onMounted(() => {
     _widget?.resetCache?.()
     _widget?.activeChart?.().resetData?.()
   })
-  
-  document.addEventListener('click',clickHandler)
+
+  document.addEventListener('click', clickHandler)
 })
-onUnmounted(()=>{
-  document.removeEventListener('click',clickHandler)
+onUnmounted(() => {
+  document.removeEventListener('click', clickHandler)
 })
 const emit = defineEmits(['refresh'])
 function refresh() {
@@ -1001,6 +1326,47 @@ function refresh() {
   resetChart()
 }
 
+const onMarkChanged = (val: boolean) => {
+  if (!val) {
+    _widget?.activeChart?.()?.clearMarks?.()
+  }
+
+  setTimeout(() => {
+    _widget?.activeChart?.()?.refreshMarks?.()
+  }, 20)
+}
+
+watch(
+  () => globalStore.klineSettingPop.visible,
+  (val) => {
+    if (!val) {
+      colorPickerVisible.value = {
+        buy: false,
+        sell: false,
+        kol: false,
+        top100Buy: false,
+        top100Sell: false,
+      } as Record<string, boolean>
+    }
+  }
+)
+
+const resetTop100Color = () => {
+  linesChecked.value.top100Buy.color = '#0D6EFD'
+  linesChecked.value.top100Sell.color = '#FD3E3E'
+}
+
+const resetIndicatorLineColor = () => {
+  linesChecked.value.buy.color = '#19d92f'
+  linesChecked.value.sell.color = '#f6465d'
+  linesChecked.value.kol.color = '#ffa622'
+}
+
+defineExpose({
+  setScrollTop: (top: number) => {
+    scrollTop.value = top
+  },
+})
 </script>
 
 <style scoped lang="scss">
@@ -1015,7 +1381,7 @@ function refresh() {
     transform: translate(-50%, -50%);
     font-size: 60px;
     text-align: center;
-    color: #BCBED2;
+    color: #bcbed2;
     opacity: 0.07;
     pointer-events: none;
     font-weight: 500;

@@ -106,7 +106,7 @@ const markPoint = computed(() => {
             color: 'var(--secondary-text)',
           },
           padding: [4, 8, 4, 8],
-          confine: false,
+          confine: true,
           enterable: true,
           formatter: () => {
             return `
@@ -114,7 +114,7 @@ const markPoint = computed(() => {
             <span id="tooltipMark" class="decoration-underline decoration-dotted cursor-pointer" data-time=${y[0]} data-token=${props.token}>${y[2]}${t(props.type)}</span>${localeStore.locale === 'zh-cn' ? '' : ' '}${t('buy')} $${formatNumber(y[1], 2)}
            </div>
            <div>
-             ${formatDate(y[0], 'YYYY-MM-DD HH:mm')}
+             ${formatDate(y[0], 'YYYY-MM-DD HH:mm:ss')}
            </div>
           `
           },

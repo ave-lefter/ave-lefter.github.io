@@ -40,11 +40,12 @@ export function useKlineMarks() {
     const arr = (botStore?.evmAddress || walletStore?.address) ? [{ id: 'trade', name: t('mine') }] : []
     return arr.concat(tokenStore.totalHolders?.filter?.(i => (i?.total_address || 0) > 0 && ['16','19','25','30','31']?.includes(i.type))?.map?.((i) => ({
       id: i.type,
-      name: i?.[filterLanguage(localeStore.locale)] + (i.type !== '31' ? `(${i?.total_address})` : '')
+      name: i?.[filterLanguage(localeStore.locale)]
+      // + (i.type !== '31' ? `(${i?.total_address})` : '')
     })))
   })
 
-  const markVisible = useLocalStorage('tv_markVisible',true)
+  const markTabsVisible = useLocalStorage('tv_markTabsVisible',true)
   const markTabsChecked: RemovableRef<{ [key: string]: boolean }> = useLocalStorage('tv_markTabsChecked', {
     trade: true,
     16: false,
@@ -53,36 +54,30 @@ export function useKlineMarks() {
     30: false,
     31: true
   })
-  const markLinesChecked= useLocalStorage('tv_markLines', {
-    'buy': {
-      checked:true,
-      color:'#12B886'
-    },
-    'sell': {
-      checked:true,
-      color:'#F6465D'
-    },
-    'top100Buy': {
-      checked:false,
-      color:'#0D6EFD'
-    },
-    'top100Sell': {
-      checked:false,
-      color:'#FD3E3E'
-    },
-  })
 
   function createDisplayButton(_widget: IChartingLibraryWidget | null,headerBtns: HTMLElement[]){
     const btn = _widget?.createButton()
     if (!btn) return
-    btn.innerHTML = `<div style="cursor:pointer">${t('display')}</div>`
-    btn.onclick = () => {
+    btn.innerHTML = `<div style="cursor:pointer;display:flex;gap:8px;align-items:center">${t('display')}<svg xmlns="http://www.w3.org/2000/svg" width="9" height="6" viewBox="0 0 9 6" fill="none">
+<path d="M0.801296 0C0.123025 0 -0.2475 0.791086 0.186718 1.31215L3.47869 5.26251C3.79852 5.64631 4.388 5.64631 4.70784 5.26251L7.99981 1.31215C8.43402 0.791085 8.0635 0 7.38523 0H0.801296Z" fill="white"/>
+<script xmlns=""/></svg></div>`
+    btn.onclick = (e) => {
       const rect = btn.getBoundingClientRect()
-      globalStore.klineSettingPop.style = {
-        left: rect.left +'px',
-        top: rect.top + 34 +'px',
+      const x = rect.left - 320 + 44
+      const y = rect.top + 34
+      globalStore.klineSettingPop.position =
+      [x,y]
+      globalStore.klineSettingPop.visible = !globalStore.klineSettingPop.visible
+      let rootNode = e.target as HTMLElement
+      while(rootNode && !rootNode.classList.contains('chart-page')){
+        rootNode = rootNode.parentElement as HTMLElement
       }
-      globalStore.klineSettingPop.visible = true
+      rootNode.onclick= (rootEvent) => {
+        if(rootEvent.currentTarget !== e.currentTarget){
+          globalStore.klineSettingPop.visible = false
+          rootNode = null as any
+        }
+      }
     }
     headerBtns.push(btn)
     return btn.getBoundingClientRect()
@@ -478,8 +473,7 @@ ${formatDate(entry.time, 'YYYY-MM-DD HH:mm')}
     wsTxUpdateMarks,
     profilingMarksCache,
     createDisplayButton,
-    markLinesChecked,
-    markVisible
+    markTabsVisible
   }
 }
 

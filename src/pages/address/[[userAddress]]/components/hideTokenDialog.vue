@@ -46,7 +46,8 @@ async function confirm() {
 <template>
   <div class="hide-token">
     <el-dialog
-      v-model="hideTokenVisible"
+    v-model="hideTokenVisible"
+      append-to-body
       :title="$t('ConfirmHideToken')"
       class="dialog !w-540px text-12px"
     >
