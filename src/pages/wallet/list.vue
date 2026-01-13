@@ -6,7 +6,7 @@
       style="width: 100%"
       row-key="id"
       :tree-props="{ children: 'balancesInfo', hasChildren: 'hasChildren' }"
-      default-expand-all
+      :default-expand-all="false"
       class="table-list hidden-scrollbar bot-manage-table"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"
       :row-class-name="getRowClass"
@@ -210,7 +210,7 @@ defineProps({
 
 const parent = getCurrentInstance()?.parent
 const parentFn = parent?.exposed?.getMultiWalletsAllChain
-
+const { getUserInfo } =  useBotStore()
 const emit = defineEmits(['refresh', 'getMultiWalletsAllChain'])
 const { token_logo_url, mode } = storeToRefs(useGlobalStore())
 const { theme } = storeToRefs(useThemeStore())
@@ -259,6 +259,7 @@ function confirmRemoveWallet(item: Wallet) {
       _removeWallet(evmAddress).then(() => {
         ElMessage.success(t('success'))
         emit('refresh')
+        getUserInfo()
       })
     })
     .catch((err) => {

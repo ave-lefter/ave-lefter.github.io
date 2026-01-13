@@ -17,12 +17,25 @@
 
       <div class="part mt-24px">
         <div class="flex-between mb-5px">
-          <span>{{ $t('operation') }}</span>
+          <div class="flex gap-8px">
+            <span
+              v-for="(item, $index) in tabs"
+              :key="$index"
+              class="py-4px text-12px px-8px rounded-4px bg-[--main-input-button-bg] color-[--secondary-text] flex items-center justify-center cursor-pointer"
+              :class="{ active: activeTab == item.id }"
+              @click.stop.prevent="handleTabChange(item.id)"
+            >
+              {{ item.name }}
+            </span>
+          </div>
           <span>{{ $t('time') }}</span>
         </div>
-        <div class="flex-between py-8px" v-for="(item, $index) in tableData">
-          <div>
-            {{ getType(item.status || '') }}
+        <div class="flex-between py-8px" v-for="(item, $index) in filterData">
+          <div class="flex-start">
+            <Icon v-if="item.status == 'create'" name="majesticons:plus-circle"  class="text-12px color-[--signal-green]" />
+            <Icon v-else-if="item.status == 'delete'" name="majesticons:minus-circle"  class="text-12px color-[--signal-red]" />
+            <Icon v-else-if="item.status == 'import'" name="mingcute:new-folder-fill"class="text-12px color-[--primary-color]" />
+            <span class="ml-4px">{{ getType(item.status || '') }}</span>
             <span class="ml-9px">{{ item.name || 'Wallet '+ item.evmAddress?.slice(-4)}}</span>
             <Icon
               v-copy="item?.evmAddress"
@@ -31,7 +44,7 @@
               @click.stop
             />
           </div>
-          <span>{{ formatDate(item?.updateTime, 'MM/DD HH:mm:ss') }}</span>
+          <span>{{ formatDate(item?.updateTime, 'YYYY/MM/DD HH:mm:ss') }}</span>
         </div>
       </div>
     </div>
@@ -42,7 +55,7 @@
 import { type Records } from '@/api/botManage'
 const { showBotRecord } = storeToRefs(useGlobalStore())
 const { t } = useI18n()
-defineProps({
+const props = defineProps({
   tableData: {
     type: Array as PropType<Records[]>,
     default: () => [],
@@ -52,6 +65,21 @@ defineProps({
     default: false,
   },
 })
+ const activeTab = ref('all')
+const tabs = computed(() => ([
+  { id: 'all', name: t('all') },
+  { id: 'import', name: t('importWallet') },
+  { id: 'create', name: t('create') },
+  {id: 'delete', name: t('delete')}
+]))
+const filterData = computed(() => {
+  const list = [...props.tableData]
+  if (activeTab.value == 'all') {
+    return list
+  }
+  return list?.filter(i=> i.status == activeTab.value)
+
+})
 function getType(type: 'import' | 'create' | 'delete') {
   const obj = {
     import: t('importWallet'),
@@ -59,6 +87,9 @@ function getType(type: 'import' | 'create' | 'delete') {
     delete: t('walletRemove'),
   }
   return obj[type] || ''
+}
+function handleTabChange(id: string) {
+  activeTab.value = id
 }
 </script>
 
@@ -115,5 +146,9 @@ function getType(type: 'import' | 'create' | 'delete') {
       color: var(--secondary-text);
     }
   }
+}
+.active {
+  background: #3f80f7;
+  color: #f5f5f5;
 }
 </style>
