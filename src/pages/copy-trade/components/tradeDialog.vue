@@ -523,12 +523,16 @@ const validateRatioRule = (rule: any, value: string, callback: (arg0?: Error) =>
 }
 
 const validateBuyAmountRule = (rule: any, value: string, callback: (arg0?: Error) => void) => {
-  if (!form.value.buyAmount) {
-    callback(new Error(t('cannotBeEmpty')))
-  } else if (form.value?.buyAmount && Number(form.value?.buyAmount || 0) > Number(currentUser.value?.balance || 0)) {
-    callback(new Error(t('insufficientBalance')))
-  } else {
+  if (form.value.buyType == 1) {
     callback()
+  } else {
+    if (!form.value.buyAmount) {
+      callback(new Error(t('cannotBeEmpty')))
+    } else if (form.value?.buyAmount && Number(form.value?.buyAmount || 0) > Number(currentUser.value?.balance || 0)) {
+      callback(new Error(t('insufficientBalance')))
+    } else {
+      callback()
+    }
   }
 }
 const rules = computed(() => {
@@ -596,7 +600,7 @@ const sellTypeList = computed(() => {
   ]
 })
 const tokenBlacklist = computed(() => {
-  return blacklist?.value?.map((i) => i.value) || []
+  return blacklist?.value?.map?.((i) => i.value) || []
 })
 watch(() => visible.value, (val) => {
   if (type.value == 2) {
@@ -747,8 +751,8 @@ function createFollowOrder() {
           getFollowingInfo()
         })
         .catch((err) => {
-          console.log('创建跟单错误', err.message)
-          ElMessage.error(err.message || err)
+          console.log('创建跟单错误', err?.response?._data || err.message || err)
+          ElMessage.error(err?.response?._data || err.message || err)
         })
         .finally(() => {
           loading.value = false
@@ -763,22 +767,34 @@ function addItem() {
 function removeRow(index: number) {
   blacklist.value.splice(index, 1)
 }
+function toUtcHour(time: string) {
+  const [h, m] = time.split(':').map(Number)
+  const local = new Date()
+  local.setHours(h, m, 0, 0)
+  return local.getUTCHours() // 0–23
+}
 const onClockTimeChange = ([start, end]: string[]) => {
   if (start) {
-    const [h, m] = start.split(':').map(Number)
-    advancedForm.value.enableAt = h
+    advancedForm.value.enableAt = toUtcHour(start)
+  } else {
+    advancedForm.value.enableAt = 0
   }
   if (end) {
-    const [h, m] = end.split(':').map(Number)
-    advancedForm.value.disableAt = h
+    advancedForm.value.disableAt = toUtcHour(end)
+  } else {
+    advancedForm.value.disableAt = 0
   }
 }
 const onDateTimeChange = ({ startTime, endTime }: { startTime: number, endTime: number}) => {
   if (startTime) {
     advancedForm.value.minTokenAge = startTime
+  } else {
+    advancedForm.value.minTokenAge = 0
   }
   if (endTime) {
     advancedForm.value.maxTokenAge = endTime
+  }else {
+    advancedForm.value.maxTokenAge = 0
   }
 }
 function apply(type: 'low' | 'high') {
@@ -793,7 +809,7 @@ function apply(type: 'low' | 'high') {
     advancedForm.value.minBuyValue = lowStrategy.value.minBuyValue
     advancedForm.value.minMarketCap = lowStrategy.value.minMarketCap
 
-    advancedForm.value.minTokenAge = lowStrategy.value.minTokenAge || '0'
+    advancedForm.value.minTokenAge = lowStrategy.value.minTokenAge
     advancedForm.value.maxTokenAge = lowStrategy.value.maxTokenAge
   } else {
     form.value.buyType = highStrategy.value.buyType
@@ -805,7 +821,7 @@ function apply(type: 'low' | 'high') {
     advancedForm.value.minBuyValue = highStrategy.value.minBuyValue
     advancedForm.value.minMarketCap = highStrategy.value.minMarketCap
 
-    advancedForm.value.minTokenAge = highStrategy.value.minTokenAge || '0'
+    advancedForm.value.minTokenAge = highStrategy.value.minTokenAge
     advancedForm.value.maxTokenAge = highStrategy.value.maxTokenAge
   }
 }

@@ -665,7 +665,8 @@
                  {{ $t('copiedTrade') }}
               </a>
               <a v-else href="" class="trade" @click.stop.prevent="copyTrade(row)">
-                <img src="@/assets/images/tg1.png" alt="" :width="12">
+                <Icon v-if="botStore.evmAddress" name="custom:wallet-fill" class="mr-4px text-12px"/>
+                <img v-else src="@/assets/images/tg1.png" alt="" :width="12">
                   {{ $t('copyTrade1') }}
               </a>
             </div>
@@ -1288,7 +1289,7 @@ a.a-gray{
 }
 a.trade {
   background:  #3F80F71A;
-  padding: 1px 7px;
+  padding: 4px 8px;
   border-radius: 2px;
   font-size: 12px;
   color: var(--main-text);
@@ -1296,6 +1297,9 @@ a.trade {
   display: flex;
   align-items: center;
   justify-content: center;
+  &:hover {
+    opacity: 0.8;
+  }
   img {
     margin-right: 4px;
   }

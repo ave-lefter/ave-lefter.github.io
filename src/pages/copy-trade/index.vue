@@ -20,6 +20,7 @@ definePageMeta({
 const Version = 1
 const { t } = useI18n()
 const route = useRoute()
+const router = useRouter()
 const configStore = useConfigStore()
 const walletStore = useWalletStore()
 const botStore = useBotStore()
@@ -184,7 +185,13 @@ function handleTabChange(tab: TabId) {
   if (activeTab.value === tab) return
   setSignalSwitchFlag(tab, false)
   activeTab.value = tab
-
+  router.replace({
+    path: '/copy-trade',
+    query: {
+      ...route.query,
+      tab: tab,
+    },
+  })
   // 切换标签时清空所有搜索状态
   searchKeywords.value = {}
 
