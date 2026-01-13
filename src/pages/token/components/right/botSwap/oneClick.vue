@@ -647,6 +647,8 @@ onUnmounted(() => {
           color: #12b886;
           border: 1px solid #12b886;
           &.active {
+            position: relative;
+            z-index: 3100;
             &:nth-child(1)::after {
               content: 'Q';
             }
@@ -666,6 +668,8 @@ onUnmounted(() => {
           color: #ff646d;
           border: 1px solid #ff646d;
           &.active {
+            position: relative;
+            z-index: 3100;
             &:nth-child(1)::after {
               content: 'A';
             }
