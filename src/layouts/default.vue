@@ -61,7 +61,7 @@ const signalStore = useSignalStore()
 const monitorStore = useMonitorStore()
 const globalStore = useGlobalStore()
 const dragPumpStore = usePumpStore()
-const trackerStore = useTrackerStore()
+const trackerStore = useTwitterTrackerStore()
 const route = useRoute()
 
 const _style = computed(() => {

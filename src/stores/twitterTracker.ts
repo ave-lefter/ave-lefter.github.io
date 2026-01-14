@@ -1,6 +1,6 @@
 import {useStorage, useThrottleFn, useWindowSize} from '@vueuse/core'
 
-export const useTrackerStore = defineStore('tracker', () => {
+export const useTwitterTrackerStore = defineStore('tracker', () => {
     const visible = useStorage('trackerVisible', false)
     const boundingRect = useStorage('TrackerBoundingRect', {
         width: 360,
@@ -14,6 +14,13 @@ export const useTrackerStore = defineStore('tracker', () => {
     const isRightFixed = useStorage('isTrackerRight', false)
     const fixedWidth = useStorage('trackerFixedWidth', 360)
     const translateStyle = shallowRef(0)
+    const query = useStorage('twitterQuery',{
+      aaaaaa:[],
+      bbbbb:[],
+      keyword:''
+    })
+    const loading = ref(false)
+    const list = shallowRef([])
 
     const onDrag = useThrottleFn((x: number) => {
         if (x <= 0) {
@@ -92,5 +99,8 @@ export const useTrackerStore = defineStore('tracker', () => {
         onFixedResizing,
         placement,
         translateStyle,
+        query,
+        loading,
+        list
     }
 })

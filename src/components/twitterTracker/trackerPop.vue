@@ -49,7 +49,7 @@
           </template>
           <template #default>
             <el-checkbox-group
-              v-model="query.typeList"
+              v-model="trackerStore.query.aaaaaa"
               class="flex flex-col [--el-checkbox-height:16px] gap-12px pb-16px mb-16px border-b-solid border-b-1px border-b-[--dialog-divider]"
             >
               <el-checkbox
@@ -61,7 +61,7 @@
               </el-checkbox>
             </el-checkbox-group>
             <el-checkbox-group
-              v-model="query.fis"
+              v-model="trackerStore.query.bbbbb"
               class="flex flex-col [--el-checkbox-height:16px] gap-12px"
             >
               <el-checkbox
@@ -88,7 +88,12 @@
           @click="globalStore.audioSettings.active = 'audio'"
         />
       </div>
-      <el-input class="w-160px" size="small" :placeholder="t('searchCA')">
+      <el-input
+        v-model="trackerStore.query.keyword"
+        class="w-160px"
+        size="small"
+        :placeholder="t('searchCA')"
+      >
         <template #prefix>
           <Icon name="custom:search" />
         </template>
@@ -101,13 +106,9 @@
 <script setup name="trackerPop">
 import TwitterTrackerList from './list.vue'
 const { t } = useI18n()
-const trackerStore = useTrackerStore()
+const trackerStore = useTwitterTrackerStore()
 const globalStore = useGlobalStore()
 
-const query = ref({
-  typeList: [],
-  fis: [],
-})
 const activeTab = ref(1)
 const filterVisible = ref(false)
 const tabs = computed(() => [

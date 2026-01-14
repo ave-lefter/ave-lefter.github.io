@@ -1,8 +1,12 @@
 <template>
   <Draggable
-:class="{ 'left-drag': dragPumpStore.isLeftFixed, 'right-drag': dragPumpStore.isRightFixed }"
-    :shouldRenderChild="shouldRenderChild" v-bind="props1" @on-drag-stop="dragStop" @on-resizing="resizing"
-    @on-drag="drag">
+    :class="{ 'left-drag': dragPumpStore.isLeftFixed, 'right-drag': dragPumpStore.isRightFixed }"
+    :shouldRenderChild="shouldRenderChild"
+    v-bind="props1"
+    @on-drag-stop="dragStop"
+    @on-resizing="resizing"
+    @on-drag="drag"
+  >
     <!-- <Monitor v-bind="props2"/> -->
     <component :is="lazyComponent" v-bind="props2" />
   </Draggable>
@@ -12,7 +16,7 @@
 const signalStore = useSignalStore()
 const monitorStore = useMonitorStore()
 const dragPumpStore = usePumpStore()
-const trackerStore = useTrackerStore()
+const trackerStore = useTwitterTrackerStore()
 const dragStore = useDragStore()
 const { t } = useI18n()
 const { placement } = storeToRefs(dragPumpStore)
@@ -21,10 +25,13 @@ const key = ref(0)
 const reload = () => {
   key.value++
 }
-watch(() => placement.value, () => {
-  reload()
-  reCreateChild()
-})
+watch(
+  () => placement.value,
+  () => {
+    reload()
+    reCreateChild()
+  }
+)
 
 onMounted(() => {
   dragPumpStore.getPumpConfig()
@@ -37,12 +44,14 @@ onMounted(() => {
   }
 })
 
-
-watch(() => dragPumpStore.visible, () => {
-  if (dragPumpStore.visible) {
-    loadComponent()
+watch(
+  () => dragPumpStore.visible,
+  () => {
+    if (dragPumpStore.visible) {
+      loadComponent()
+    }
   }
-})
+)
 const lazyComponent = shallowRef<Component | null>(null)
 const loadComponent = async () => {
   const component = await import('./pumpPop.vue')
@@ -70,7 +79,7 @@ const props1 = computed(() => {
       minHeight: dragConstant.value.minHeight,
       parent: true,
       handles: ['tl', 'tm', 'tr', 'mr', 'br', 'bm', 'bl', 'ml'],
-      dragHandle: '.drag-handle'
+      dragHandle: '.drag-handle',
     },
     left: {
       className: '[&&]:relative shrink-0 left fixed! top-61px',
@@ -83,7 +92,7 @@ const props1 = computed(() => {
       initialHeight: dragConstant.value.initialHeight,
       parent: true,
       handles: ['mr'],
-      dragHandle: '.drag-handle'
+      dragHandle: '.drag-handle',
     },
     right: {
       className: '[&&]:relative shrink-0 right fixed! top-61px left-0',
@@ -96,8 +105,8 @@ const props1 = computed(() => {
       initialHeight: dragConstant.value.initialHeight,
       parent: true,
       handles: ['ml'],
-      dragHandle: '.drag-handle'
-    }
+      dragHandle: '.drag-handle',
+    },
   }
   return placementData[placement.value]
 })
@@ -116,7 +125,8 @@ const props2 = computed(() => {
   let data = {} as any
   if (placement.value === 'center') {
     data = {
-      class: 'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]',
+      class:
+        'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]',
       scrollHeight: dragConstant.value.centerScrollHeight,
     }
   } else {
@@ -127,8 +137,13 @@ const props2 = computed(() => {
   return data
 })
 function dragStop(x: number, y: number) {
-  if(['left','right'].includes(placement.value) && Math.abs(x)<1){
-    if(signalStore.signalVisible && monitorStore.visible && dragPumpStore.visible && trackerStore.visible){
+  if (['left', 'right'].includes(placement.value) && Math.abs(x) < 1) {
+    if (
+      signalStore.signalVisible &&
+      monitorStore.visible &&
+      dragPumpStore.visible &&
+      trackerStore.visible
+    ) {
       ElMessage.warning(t('popTips'))
       return
     }

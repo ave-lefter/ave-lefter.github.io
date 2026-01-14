@@ -11,7 +11,7 @@ interface IHotTwitterItem {
 
 function getHotTwitterList(query:{
     cursor_time:Date
-    cursor_tweet_id:[number,string]
+    cursor_tweet_id:number|string
 }):Promise<{list:IHotTwitterItem[]}> {
     const {$api}  = useNuxtApp()
     return $api('/v2api/twitter/v1/kol/homepage', {

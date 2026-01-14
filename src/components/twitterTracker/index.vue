@@ -15,7 +15,7 @@
 const signalStore = useSignalStore()
 const monitorStore = useMonitorStore()
 const dragPumpStore = usePumpStore()
-const trackerStore = useTrackerStore()
+const trackerStore = useTwitterTrackerStore()
 const dragStore = useDragStore()
 const { t } = useI18n()
 const { placement } = storeToRefs(trackerStore)
