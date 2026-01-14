@@ -452,7 +452,7 @@ const list1 = computed(() => {
       }
     })
   }
-  return filterList?.slice(0, 300)
+  return filterList?.slice?.(0, 100)
 })
 
 const list2 = computed(() => {
@@ -487,7 +487,7 @@ const list2 = computed(() => {
         }
       })
     }
-    return filterList?.slice(0, 300)
+    return filterList?.slice?.(0, 100)
   })
   const list3 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.graduated || []
@@ -521,7 +521,7 @@ const list2 = computed(() => {
         }
       })
     }
-    return filterList?.slice(0, 300)
+    return filterList?.slice?.(0, 100)
   })
 const scrollHeight = computed(()=>{
   return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
@@ -748,7 +748,7 @@ function wsUpdateTableList(wsList: WSPump[]) {
 
       }))
       const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address) && rTime - (i.rTime || 0) <= 15000)
-      wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,300)
+      wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,100)
       // let wsTime = this.wsTableListCache?.time || 0
       // if (wsTime < Date.now() - 15000) {
       //   this.wsTableListCache = {
@@ -983,18 +983,18 @@ function getPump(params, isFilter = false) {
           medias: getMedias(i.appendix)
         }
       })
-      fourmemeListObj[activeChain.value][params.category as CategoryKey] = list?.slice?.(0,300)
+      fourmemeListObj[activeChain.value][params.category as CategoryKey] = list?.slice?.(0,100)
       wsTableListCache.value =
         wsTableListCache?.value.filter?.(
-          (i) => !list?.some?.((j) => j?.pair === i?.pair)?.slice?.(0,300)
-      ) || []
+          (i) => !list?.some?.((j) => j?.pair === i?.pair)
+      )?.slice?.(0,100) || []
     })
     .finally(() => {
       pumpV3.value[chain][params.category]['loading'] = false
       pumpV3.value[chain][params.category].count ++
       Timer[params.category] = setTimeout(() => {
             getPump(params)
-          }, 5000)
+          }, 10000)
     })
 }
 function getMedias(appendix: string) {
