@@ -56,17 +56,34 @@ function setActiveChain(value: string) {
 
 <template>
   <div class="w-full bg-[--main-bg]">
-    <div class="p-12px flex-end">
+    <div class="p-12px flex-start">
       <div class="flex h-28px">
-        <div class="flex items-center mr-24px">
+        <div
+          class="px-8px py-2px rounded-4px gap-4px bg-[--main-input-button-bg] flex color-[--third-text]"
+        >
           <div
-            v-show="showResetBtn"
-            class="flex items-center text-12px gap-2px cursor-pointer mr-20px color-[--main-text]"
-            @click="signalContainerRef?.setFilterToken?.('')"
+            v-for="{ value } in smartChains"
+            :key="value"
+            class="flex items-center justify-center p-2px rounded-4px cursor-pointer"
+            :class="`${activeChain === value ? 'bg-[--tab-active-bg] color-[--main-text]' : ''}`"
+            @click="setActiveChain(value)"
           >
-            <Icon name="custom:reset" class="text-14px" />
-            {{ $t('reset') }}
+            <img
+              class="w-20px h-20px rounded-full opacity-60 block"
+              :src="`${configStore.token_logo_url}chain/${value}.png`"
+              alt=""
+            >
           </div>
+        </div>
+        <div class="flex items-center mr-24px">
+          <QuickSwapSet
+            v-model:quickBuyValue="quickBuyValue"
+            :chain="activeChain"
+            style="margin-left: 20px"
+            :showQuickAmount="false"
+          />
+          <AutoSellSetting class="ml-8px" :chain="activeChain" />
+
           <Filter :filter-params="signalFilter" @onReset="onReset" @onConfirm="onConfirm" />
           <el-popover
             v-model:visible="audioVisible"
@@ -127,30 +144,13 @@ function setActiveChain(value: string) {
               TG{{ $t('Subscription') }}
             </a>
           </div>
-
-          <QuickSwapSet
-            v-model:quickBuyValue="quickBuyValue"
-            :chain="activeChain"
-            style="margin-left: 20px"
-            :showQuickAmount="false"
-          />
-          <AutoSellSetting class="ml-20px" :chain="activeChain" />
-        </div>
-        <div
-          class="px-8px py-2px rounded-4px gap-4px bg-[--main-input-button-bg] flex color-[--third-text]"
-        >
           <div
-            v-for="{ value } in smartChains"
-            :key="value"
-            class="flex items-center justify-center p-2px rounded-4px cursor-pointer"
-            :class="`${activeChain === value ? 'bg-[--tab-active-bg] color-[--main-text]' : ''}`"
-            @click="setActiveChain(value)"
+            v-show="showResetBtn"
+            class="flex items-center text-12px gap-2px cursor-pointer mr-20px color-[--main-text]"
+            @click="signalContainerRef?.setFilterToken?.('')"
           >
-            <img
-              class="w-20px h-20px rounded-full opacity-60 block"
-              :src="`${configStore.token_logo_url}chain/${value}.png`"
-              alt=""
-            >
+            <Icon name="custom:reset" class="text-14px" />
+            {{ $t('reset') }}
           </div>
         </div>
       </div>

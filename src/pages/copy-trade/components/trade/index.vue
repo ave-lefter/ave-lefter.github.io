@@ -3,17 +3,29 @@
     <div class="pb-16px pt-4px px-16px flex-start gap-48px">
       <div>
         <span class="text-12px color-[--secondary-text]">{{ $t('totalPnL') }}</span>
-        <span class="ml-16px text-18px" :class="Number(copyOrder?.totalProfitRatioAll)>0 ? 'color-[--up-color]':'color-[--down-color]' ">${{ formatNumber(copyOrder?.totalProfitAll || 0, 2) }}({{ formatNumber(copyOrder?.totalProfitRatioAll || 0, 2)  }}%)
+        <span class="ml-16px text-18px" :class="Number(copyOrder?.totalProfitRatioAll)>0 ? 'color-[--up-color]':'color-[--down-color]' ">
+            <ave-data-number :value="copyOrder?.totalProfitAll" :signVisible="true">
+              {{ formatNumber(Math.abs( Number(copyOrder?.totalProfitAll ?? 0)), 2) }}
+            </ave-data-number>
+          ({{ formatNumber(copyOrder?.totalProfitRatioAll || 0, 2)  }}%)
         </span>
       </div>
       <div>
         <span class="text-12px color-[--secondary-text]">{{ $t('realizedProfit') }}</span>
-        <span class="ml-16px text-18px" :class="Number(copyOrder?.profitRealizedRatioAll)>0 ? 'color-[--up-color]':'color-[--down-color]' ">${{ formatNumber(copyOrder?.profitRealizedAll || 0, 2) }}({{ formatNumber(copyOrder?.profitRealizedRatioAll || 0, 2)  }}%)
+        <span class="ml-16px text-18px" :class="Number(copyOrder?.profitRealizedRatioAll)>0 ? 'color-[--up-color]':'color-[--down-color]' ">
+          <ave-data-number :value="copyOrder?.profitRealizedAll" :signVisible="true">
+            {{ formatNumber(Math.abs( Number(copyOrder?.profitRealizedAll ?? 0)), 2) }}
+          </ave-data-number>
+          ({{ formatNumber(copyOrder?.profitRealizedRatioAll || 0, 2)  }}%)
         </span>
       </div>
       <div>
         <span class="text-12px color-[--secondary-text]">{{ $t('unrealizedProfit') }}</span>
-        <span class="ml-16px text-18px" :class="Number(copyOrder?.profitUnrealizedRatioAll)>0 ? 'color-[--up-color]':'color-[--down-color]' ">${{ formatNumber(copyOrder?.profitUnrealizedAll || 0, 2) }}({{ formatNumber(copyOrder?.profitUnrealizedRatioAll || 0, 2)  }}%)
+        <span class="ml-16px text-18px" :class="Number(copyOrder?.profitUnrealizedRatioAll)>0 ? 'color-[--up-color]':'color-[--down-color]' ">
+          <ave-data-number :value="copyOrder?.profitUnrealizedAll" :signVisible="true">
+            {{ formatNumber(Math.abs( Number(copyOrder?.profitUnrealizedAll ?? 0)), 2) }}
+          </ave-data-number>
+          ({{ formatNumber(copyOrder?.profitUnrealizedRatioAll || 0, 2)  }}%)
         </span>
       </div>
     </div>
@@ -69,17 +81,17 @@
       </el-table-column>
       <el-table-column :label="$t('unrealizedProfit')" align="right" prop="token_profit_rate" :min-width="110">
         <template #default="{ row }">
-          <span :class="Number(row?.profitUnrealized)>0 ? 'color-[--up-color]':'color-[--down-color]' ">
-            ${{ formatNumber(row?.profitUnrealized || 0, 2) }}
-          </span>
+          <ave-data-number :value="row?.profitUnrealized" :signVisible="true">
+            {{ formatNumber(Math.abs( Number(row?.profitUnrealized ?? 0)), 2) }}
+          </ave-data-number>
         </template>
       </el-table-column>
 
       <el-table-column :label="$t('realizedProfit')" align="right" prop="token_profit_rate" :min-width="110">
         <template #default="{ row }">
-          <span :class="Number(row?.profitRealized)>0 ? 'color-[--up-color]':'color-[--down-color]' ">
-            ${{ formatNumber(row?.profitRealized || 0, 2) }}
-          </span>
+          <ave-data-number :value="row?.profitRealized" :signVisible="true">
+            {{ formatNumber(Math.abs( Number(row?.profitRealized ?? 0)), 2) }}
+          </ave-data-number>
         </template>
       </el-table-column>
       <el-table-column :label="$t('winTokenTotal')" align="right" prop="token_profit_rate" :min-width="110">

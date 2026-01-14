@@ -71,7 +71,9 @@
           <template #default="{ row }">
             <div>
               <div :class="!row?.totalProfit ? 'color-text-3' : ''">
-                ${{ row?.totalProfit > 0 ? formatNumber(row?.totalProfit || 0, 2) : 0 }}
+              <ave-data-number :value="row?.totalProfit" :signVisible="true">
+                {{ formatNumber(Math.abs(row?.totalProfit ?? 0), 2) }}
+              </ave-data-number>
               </div>
               <div class="text-12px">
                 <span v-if="row?.totalProfitRatio > 0" class="color-[--up-color]">
@@ -89,7 +91,9 @@
           <template #default="{ row }">
             <div>
               <div :class="!row?.profitUnrealized ? 'color-text-3' : ''">
-                ${{ row?.profitUnrealized > 0 ? formatNumber(row?.profitUnrealized || 0, 2) : 0 }}
+              <ave-data-number :value="row?.profitUnrealized" :signVisible="true">
+                {{ formatNumber(Math.abs(row?.profitUnrealized ?? 0), 2) }}
+              </ave-data-number>
               </div>
               <!-- <div class="text-12px">
                 <span v-if="row?.profitUnrealizedRatio > 0" class="color-[--up-color]">
@@ -107,7 +111,9 @@
           <template #default="{ row }">
             <div>
               <div :class="!row?.profitRealized ? 'color-text-3' : ''">
-                ${{ row?.profitRealized > 0 ? formatNumber(row?.profitRealized || 0, 2) : 0 }}
+                <ave-data-number :value="row?.profitRealized" :signVisible="true">
+                  {{ formatNumber(Math.abs(row?.profitRealized ?? 0), 2) }}
+                </ave-data-number>
               </div>
               <!-- <div class="text-12px">
                 <span v-if="row?.profitRealizedRatio > 0" class="color-[--up-color]">
@@ -121,13 +127,13 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('positionsValue')" align="right" prop="token_profit_rate" :min-width="110">
+        <!-- <el-table-column :label="$t('positionsValue')" align="right" prop="token_profit_rate" :min-width="110">
           <template #default="{ row }">
             <div :class="!row?.holdingUsd ? 'color-text-3' : ''">
               ${{ row?.holdingUsd > 0 ? formatNumber(row?.holdingUsd || 0, 2) : 0 }}
             </div>
           </template>
-        </el-table-column>
+        </el-table-column> -->
 
         <el-table-column :label="$t('time')" align="right" :min-width="110">
           <template #default="{ row }">

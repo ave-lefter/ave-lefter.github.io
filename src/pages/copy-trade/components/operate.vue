@@ -191,13 +191,12 @@ function getFollowSwapOrder() {
       minBuyValue: res.minBuyValue == '0'? '': res.minBuyValue,
       maxBuyValue: res.maxBuyValue == '0'? '': res.maxBuyValue,
       minMarketCap: res.minMarketCap == '0'? '': res.minMarketCap,
-      maxMarketCap: res.minMarketCap == '0' ? '' : res.maxMarketCap,
+      maxMarketCap: res.maxMarketCap == '0' ? '' : res.maxMarketCap,
       minTokenAge: res.minTokenAge,
       maxTokenAge: res.maxTokenAge,
       enableAt: res.enableAt,
       disableAt: res.disableAt,
     }
-
     blacklist.value = res?.tokenBlacklist?.map((i, index) => ({ id: index + 1, value: i }))
 
 

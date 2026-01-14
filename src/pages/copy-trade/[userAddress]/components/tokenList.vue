@@ -118,15 +118,15 @@
       <el-table-column :label="$t('totalPnL')" align="right" prop="token_profit_rate" :min-width="110" v-if="type === 'token'">
         <template #default="{ row }">
           <div>
-            <div :class="!row?.totalProfit ? 'color-text-3' : ''">
-              ${{ row?.totalProfit > 0 ? formatNumber(row?.totalProfit || 0, 2) : 0 }}
-            </div>
+            <ave-data-number :value="row?.totalProfit" :signVisible="true">
+              {{ formatNumber(Math.abs( Number(row?.totalProfit ?? 0)), 2) }}
+            </ave-data-number>
             <div class="text-12px">
               <span v-if="row?.totalProfitRatio > 0" class="color-[--up-color]">
-                {{ formatNumber(row?.totalProfitRatio || 0,2) }}%
+                {{ formatNumber(row?.totalProfitRatio * 100|| 0,2) }}%
               </span>
               <span v-else-if="row?.totalProfitRatio < 0" class="color-[--down-color]">
-                {{ formatNumber(row?.totalProfitRatio || 0,2) }}%
+                {{ formatNumber(row?.totalProfitRatio * 100|| 0,2) }}%
               </span>
               <span v-else class="color-[--third-text]">0</span>
             </div>
@@ -171,6 +171,17 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column align="right" label="TXN" v-if="type === 'success'">
+        <template #default="{ row }">
+          <a class="ml-5 a-gray font-16" href="javascript:;">
+            <Icon
+              name="custom:browser"
+              class="text-16px color-[--third-text] cursor-pointer"
+              @click.stop.self="goLink(row)"
+            />
+          </a>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -203,6 +214,7 @@ const currentHideToken = ref({})
 const injecteIsVolUSDT = shallowRef(false)
 const tokenDetailSStore = useTokenDetailsStore()
 const route = useRoute()
+const router = useRouter()
 function jumpBalance(row) {
   if (type.value == 'token') {
     tokenDetailSStore.$patch({
@@ -228,9 +240,19 @@ function jumpBalance(row) {
         useWalletStore().address,
     })
   } else {
-    const url = formatExplorerUrl(row?.chain as string, row?.followHash as string || row?.txHash as string, 'tx')
-    window.open(url)
+    tableRowClick(row)
   }
+}
+const tableRowClick = (row) => {
+  router.push({
+    name: 'token-id',
+    params: { id: row.token + '-' + row.chain },
+    query: { from: route.name },
+  })
+}
+function goLink(row) {
+    const url = formatExplorerUrl(row?.chain as string, row?.txHash as string, 'tx')
+    window.open(url)
 }
 const trendQuery = ref({
   checkAll: true,

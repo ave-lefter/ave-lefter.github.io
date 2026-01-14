@@ -616,16 +616,7 @@ export function desensitizeEmail(email: string) {
   if (match) {
     const username = match[1] // 获取用户名部分
     const domain = match[2] // 获取域名部分
-
-    let maskedUsername
-    if (username.length === 1) {
-      // 只有一个字符，保留该字符并加上 ***
-      maskedUsername = `${username}***`
-    } else if (username.length >= 2) {
-      // 大于等于两个字符，保留前两个字符并加上 ***
-      maskedUsername = `${username.slice(0, 2)}***`
-    }
-
+    const maskedUsername = `${username.slice(0, 3)}***`
     return `${maskedUsername}${domain}`
   } else {
     throw new Error('Invalid email format')

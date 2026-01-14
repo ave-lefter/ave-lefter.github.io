@@ -88,7 +88,7 @@ export interface Records {
   name: string
   evmAddress: string
   addressType: number
-  updateTime: string
+  updateTime: string | number
 }
 //bot 操作记录
 export function _getWalletOperationRecord(): Promise<Records[]> {

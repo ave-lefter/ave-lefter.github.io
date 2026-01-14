@@ -3,6 +3,9 @@ export {}
 
 declare global {
   interface Window {
+    vemachine?: {
+      generateToken?: (arg?: boolean) => Promise<string>
+    }
     TradingView: {
       widget: ChartingLibraryWidgetConstructor
     }

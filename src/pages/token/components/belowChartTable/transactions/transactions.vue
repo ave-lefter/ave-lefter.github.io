@@ -1016,7 +1016,7 @@ const collect = async (row: any,index:number) => {
             <span>{{ $t('amountU') }}</span>
             <Icon
               name="custom:price"
-              :class="`${globalStore.isUSDT ? 'color-[--third-text]' : 'color-[--secondary-text]'} cursor-pointer`"
+              :class="`${globalStore.isUSDT ? 'color-[--third-text]' : 'color-[--primary-color]'} cursor-pointer`"
               @click.self="globalStore.isUSDT = !globalStore.isUSDT" />
             <VolFilter
               v-model:visible="tableFilterVisible.amountU" :modelValue="tableFilter.amountU"

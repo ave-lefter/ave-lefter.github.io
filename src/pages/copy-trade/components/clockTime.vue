@@ -45,6 +45,18 @@ watch(() => advancedForm.value?.disableAt, () => {
     filterTime.value[1] = null
   }
 })
+onMounted(() => {
+    if (advancedForm.value?.enableAt) {
+    filterTime.value[0] = advancedForm.value.enableAt ? utcTimeToLocalTimeString(advancedForm.value.enableAt) : null
+  } else {
+    filterTime.value[0] = null
+    }
+  if (advancedForm.value?.disableAt) {
+    filterTime.value[1] = advancedForm.value.disableAt ? utcTimeToLocalTimeString(advancedForm.value.disableAt) : null
+  } else {
+    filterTime.value[1] = null
+  }
+})
 function utcTimeToLocalTimeString(time: number) {
   const d = new Date()
   d.setUTCHours(time, 0, 0, 0)
@@ -73,11 +85,9 @@ defineExpose({ reset })
     /> -->
     <el-time-select
       v-model="filterTime[0]"
-      :disabled-hours="disabledStartHours"
       start="00:00"
       end="23:00"
       step="01:00"
-      :max-time="filterTime[1]"
       format="HH:00"
       :placeholder="$t('startTime')"
       style="width: 221px"
@@ -86,12 +96,10 @@ defineExpose({ reset })
     <span class="gap px-4px">~</span>
       <el-time-select
       v-model="filterTime[1]"
-      :disabled-hours="disabledEndHours"
       start="00:00"
       end="23:00"
       step="01:00"
       format="HH:00"
-      :min-time="filterTime[0]"
       :placeholder="$t('endTime1')"
       style="width: 221px"
       @change="emit('change', filterTime)"

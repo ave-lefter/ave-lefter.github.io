@@ -3,9 +3,6 @@ import { getApiDomainAndSave, getBestApiDomain } from './getApiDomain'
 import { onRequest, onResponse, updateAveToken } from './base'
 import { botOnRequest, botOnResponse, botOnResponseError } from './bot'
 
-
-
-
 function getApi() {
   getApiDomainAndSave()
   const baseURL = getBestApiDomain()
@@ -46,7 +43,7 @@ function getApi() {
         if (isRefToken) {
           return api(request, options)
         }
-      } else if (err?.response?.status === 403 && !(request as string)?.includes('loginEmailV2')) {
+      } else if (err?.message === 'x-auth-error' || (err?.response?.status === 403 || [10000, 10001]?.includes(err?.response?._data?.status)) && !(request as string)?.includes('loginEmailV2')) {
         // onResponseError({response: err?.response} as MyFetchContext)
         const aveToken = await updateAveToken()
         if (aveToken) {

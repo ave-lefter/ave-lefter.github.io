@@ -511,7 +511,7 @@ export const bot_getChainsTokenBalance = createCacheRequest(async function(param
   walletAddress: string
 }>) {
   const { $api } = useNuxtApp()
-  let exChains = ['polygon']
+  let exChains = ['polygon', 'ton']
   let paramsChains = params?.filter((i) => !exChains.includes(i.chain)) || []
   let res1 = paramsChains?.length > 0 ? await $api('/botapi/swap/getChainsTokenBalance', {
     method: 'post',
@@ -535,6 +535,8 @@ export const bot_getChainsTokenBalance = createCacheRequest(async function(param
     if (i.chain === 'ton') {
       return {
         ...i,
+        // ...(await getTokenDetails({tokenAddress: i.token, chain: i.chain, walletAddress: i.walletAddress}).then(async res => ({...res, balance: res?.initBalance || 0})).catch(async () => ({balance: 0}))),
+        decimals: 9,
         balance: await getTonWalletBalance({token: i.token, wallet: i.walletAddress}).catch(async () => 0) || i?.balance || 0
       }
     } else if (i.chain === 'polygon') {

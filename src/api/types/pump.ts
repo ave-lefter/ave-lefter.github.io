@@ -132,20 +132,20 @@ export interface pumpObjColor {
   bg: string
 }
 export interface pumpData {
-  platforms: String[]
+  platforms: string[]
   new: {
     count: number
     loading: boolean
-    pumpFilter: {}
+    pumpFilter?: {}
   }
   soon: {
     count: number
     loading: boolean
-    pumpFilter: {}
+    pumpFilter?: {}
   }
   graduated: {
     count: number
     loading: boolean
-    pumpFilter: {}
+    pumpFilter?: {}
   }
 }

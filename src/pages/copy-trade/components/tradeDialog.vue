@@ -73,11 +73,13 @@
                 @click.stop="form.buyType = item.id"
               >
                 <span>{{ item.name || '' }}</span>
-                <Icon
-                  name="majesticons:question-mark-circle-line"
-                  class="ml-4px text-12px color-[--third-text]"
-                  v-tooltip="item.tip"
-                />
+                <el-tooltip placement="top">
+                  <template #content> <div v-html="item.tip"></div></template>
+                  <Icon
+                    name="majesticons:question-mark-circle-line"
+                    class="ml-4px text-12px color-[--third-text]"
+                  />
+                </el-tooltip>
               </button>
             </div>
           </el-form-item>
@@ -512,7 +514,16 @@ const validateRatioRule = (rule: any, value: string, callback: (arg0?: Error) =>
   if (form.value.sellType === 2) {
     if (!form.value.takeProfitRatio) {
       callback(new Error(t('cannotBeEmpty')))
-    } else if (!form.value.stopLossRatio) {
+    } else {
+      callback()
+    }
+  } else {
+    callback()
+  }
+}
+const validateRatioRule1 = (rule: any, value: string, callback: (arg0?: Error) => void) => {
+  if (form.value.sellType === 2) {
+    if (!form.value.stopLossRatio) {
       callback(new Error(t('cannotBeEmpty')))
     } else {
       callback()
@@ -539,7 +550,7 @@ const rules = computed(() => {
   return {
     followAddress: [{ validator: validateAddressRule, trigger: 'blur' }],
     takeProfitRatio: [{ validator: validateRatioRule, trigger: 'blur' }],
-    stopLossRatio: [{ validator: validateRatioRule, trigger: 'blur' }],
+    stopLossRatio: [{ validator: validateRatioRule1, trigger: 'blur' }],
     buyAmount: [{ validator: validateBuyAmountRule, trigger: 'change' }],
   }
 })
@@ -624,7 +635,12 @@ watch(() => visible.value, (val) => {
 
   }
 })
-
+watch(
+  () => form.value.chain,
+  () => {
+    formRef.value?.validateField('followAddress')
+  }
+)
 function reset() {
   resetLoading.value = true
   setTimeout(() => {
