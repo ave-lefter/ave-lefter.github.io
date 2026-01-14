@@ -1843,5 +1843,17 @@
   "noticeDuration": "Notice Duration",
   "monitorThTip": "Choose at least one wallet avatar and wallet address",
   "wcWalletTip": "Scan this QR Code with your phone",
-  "popTips":"The maximum number of floating windows supported by the draggable is 3"
+  "popTips":"The maximum number of floating windows supported by the draggable is 3",
+  "twitterTracker":"Twitter Tracker",
+  "hot2":"Hot",
+  "searchCA":"Search CA/Address",
+  "viewTranslation":"View Translation",
+  "twitterEmpty":"Your following list is empty. Go find people you're interested in!",
+  "attention":"Attention",
+  "onlyCA":"Only CA",
+  "onlyAddress":"Only Address",
+  "onlyFollowing":"Only Following",
+  "hotSub":"Hot Subscription",
+  "searchAccount":"Search Account",
+  "account":"Account"
 }

@@ -1844,5 +1844,17 @@
   "noticeDuration": "通知展示时间",
   "monitorThTip": "钱包头像和钱包地址至少选一个",
   "wcWalletTip": "扫描二维码",
-  "popTips":"吸附的悬浮窗最多支持 3 个"
+  "popTips":"吸附的悬浮窗最多支持 3 个",
+  "twitterTracker":"推特监控",
+  "hot2":"热门",
+  "searchCA":"搜索CA/地址",
+  "viewTranslation":"查看翻译",
+  "twitterEmpty":"关注列表为空，快去发现你感兴趣的人吧！",
+  "attention":"开始关注",
+  "onlyCA":"只看CA",
+  "onlyAddress":"只看地址",
+  "onlyFollowing":"只看已关注",
+  "hotSub":"热门订阅",
+  "searchAccount":"搜索账号",
+  "account":"账号"
 }
