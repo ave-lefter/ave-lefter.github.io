@@ -29,6 +29,7 @@
 import { getBestToken } from '~/api/token'
 
 const route = useRoute()
+const tokenStore = useTokenStore()
 const bestToken = ref(null)
 const chain = computed(() => getAddressAndChainFromId(route.params.id || '').chain)
 
@@ -40,7 +41,13 @@ const tokenClick = () => {
 const _getBestToken = async () => {
   try {
     const res = await getBestToken(route.params.id || '')
-    bestToken.value = res?.symbol ? res : res.data
+    const result = res?.symbol ? res : res.data
+
+    if (result.token !== tokenStore.token.token) {
+      bestToken.value = result
+    } else {
+      bestToken.value = null
+    }
   } catch (error) {
     bestToken.value = null
     console.error('Error fetching best token:', error)
@@ -50,7 +57,7 @@ const _getBestToken = async () => {
 _getBestToken()
 
 watch(
-  () => route.params.id,
+  () => tokenStore.token.token,
   () => {
     _getBestToken()
   }
