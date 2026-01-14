@@ -1856,5 +1856,6 @@
   "onlyFollowing":"只看已关注",
   "hotSub":"热门订阅",
   "searchAccount":"搜索账号",
-  "account":"账号"
+  "account":"账号",
+  "tags":"标签"
 }

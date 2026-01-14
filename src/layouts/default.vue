@@ -19,7 +19,7 @@
         ]"
         :style="{
           ..._style,
-          transform: `translateX(${signalStore.translateStyle || monitorStore.translateStyle || dragPumpStore.translateStyle}px)`,
+          transform: `translateX(${signalStore.translateStyle || monitorStore.translateStyle || dragPumpStore.translateStyle || trackerStore.translateStyle}px)`,
         }"
       >
         <slot />
@@ -74,7 +74,7 @@ const _style = computed(() => {
       paddingRight += signalStore.fixedWidth + 1
     }
   }
-  ;[monitorStore, dragPumpStore].forEach((storeItem) => {
+  ;[monitorStore, dragPumpStore, trackerStore].forEach((storeItem) => {
     // 不存在 shouldHide 属性或者 shouldHide 为 false
     if (storeItem.visible && (!('shouldHide' in storeItem) || !storeItem.shouldHide)) {
       if (storeItem.isLeftFixed) {

@@ -7,19 +7,20 @@
       name="custom:drag2"
       class="absolute top-4px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle"
     />
-    <div
-      class="flex justify-between items-center pb-14px border-b-1px border-b-solid border-b-[--border] mb-12px"
-    >
+    <div class="flex items-center pb-14px border-b-1px border-b-solid border-b-[--border] mb-12px">
       <div class="flex justify-between items-center">{{ t('twitterTracker') }}</div>
+      <div class="flex-1 drag-handle h-20px" />
       <div class="flex items-center gap-12px">
         <Icon
+          v-if="botStore.evmAddress"
           name="custom:pump-setting"
           class="color-[--secondary-text] hover:color-[--main-text] cursor-pointer text-14px"
+          @click="emits('setDrawerVisible', true)"
         />
         <Icon
           name="custom:close"
           class="text-14px shrink-0 cursor-pointer color-[--main-text]"
-          @click.self="trackerStore.visible = false"
+          @click="trackerStore.visible = false"
         />
       </div>
     </div>
@@ -99,18 +100,20 @@
         </template>
       </el-input>
     </div>
-    <TwitterTrackerList />
+    <TwitterTrackerList :activeTab="activeTab" />
   </div>
 </template>
 
 <script setup name="trackerPop">
 import TwitterTrackerList from './list.vue'
+const emits = defineEmits(['setDrawerVisible'])
 const { t } = useI18n()
 const trackerStore = useTwitterTrackerStore()
 const globalStore = useGlobalStore()
-
+const botStore = useBotStore()
 const activeTab = ref(1)
 const filterVisible = ref(false)
+
 const tabs = computed(() => [
   { label: t('hot2'), value: 1 },
   { label: t('mine'), value: 2 },

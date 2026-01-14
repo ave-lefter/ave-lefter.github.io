@@ -1,17 +1,21 @@
 <template>
-  <Draggable
-    :class="{ 'left-drag': trackerStore.isLeftFixed, 'right-drag': trackerStore.isRightFixed }"
-    :shouldRenderChild="shouldRenderChild"
-    v-bind="props1"
-    @on-drag-stop="dragStop"
-    @on-resizing="resizing"
-    @on-drag="drag"
-  >
-    <!-- <Monitor v-bind="props2"/> -->
-    <component :is="lazyComponent" v-bind="props2" />
-  </Draggable>
+  <div>
+    <Draggable
+      :class="{ 'left-drag': trackerStore.isLeftFixed, 'right-drag': trackerStore.isRightFixed }"
+      :shouldRenderChild="shouldRenderChild"
+      v-bind="props1"
+      @on-drag-stop="dragStop"
+      @on-resizing="resizing"
+      @on-drag="drag"
+    >
+      <!-- <Monitor v-bind="props2"/> -->
+      <component :is="lazyComponent" v-bind="props2" @setDrawerVisible="drawerVisible = true" />
+    </Draggable>
+    <TwitterTrackerDrawer v-model="drawerVisible" />
+  </div>
 </template>
 <script setup name="trackerDragger">
+const drawerVisible = ref(false)
 const signalStore = useSignalStore()
 const monitorStore = useMonitorStore()
 const dragPumpStore = usePumpStore()
@@ -170,4 +174,8 @@ function drag(x) {
     return null
   }
 }
+
+setTimeout(() => {
+  drawerVisible.value = true
+}, 100)
 </script>
