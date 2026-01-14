@@ -43,7 +43,7 @@ const _getBestToken = async () => {
     const res = await getBestToken(route.params.id || '')
     const result = res?.symbol ? res : res.data
 
-    if (result.token !== tokenStore.token.token) {
+    if (result.token !== tokenStore.token?.token) {
       bestToken.value = result
     } else {
       bestToken.value = null
@@ -57,7 +57,7 @@ const _getBestToken = async () => {
 _getBestToken()
 
 watch(
-  () => tokenStore.token.token,
+  () => tokenStore.token?.token,
   () => {
     _getBestToken()
   }
