@@ -42,6 +42,7 @@ const _getBestToken = async () => {
     const res = await getBestToken(route.params.id || '')
     bestToken.value = res?.symbol ? res : res.data
   } catch (error) {
+    bestToken.value = null
     console.error('Error fetching best token:', error)
   }
 }
