@@ -96,7 +96,7 @@
       </div>
     </div>
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full px-16px">
-      <el-col v-show="single('new') && pumpSetting.grid['new'].show" :span="getSpan()" :style="{order: orderNew}">
+      <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
         <div class="pump-item  rounded-4px" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px">
             <template v-if="width > 1024">
@@ -350,13 +350,13 @@ const globalStore = useGlobalStore()
 const { pumpSetting, token_logo_url, pumpBlackList } = storeToRefs(globalStore)
 
 const orderNew = computed(() => {
-  return pumpSetting.value.grid['new'].order
+  return pumpSetting.value.grid['new']?.order
 })
 const orderSoon = computed(() => {
-  return pumpSetting.value.grid['soon'].order
+  return pumpSetting.value.grid['soon']?.order
 })
 const orderGraduated= computed(() => {
-  return pumpSetting.value.grid['graduated'].order
+  return pumpSetting.value.grid['graduated']?.order
 })
 const pumpConfig = shallowRef<PumpConfig[]>()
 const isRotate = ref(false)
