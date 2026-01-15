@@ -4,7 +4,7 @@
     class="flex items-center py-11px px-8px text-12px justify-between bg-[--dialog-bg] rounded-4px mb-12px"
   >
     {{ $t('devBestToken') }}
-    <div class="flex items-center color-[--third-text] cursor-pointer" @click="tokenClick">
+    <div class="flex items-center color-[--secondary-text] cursor-pointer" @click="tokenClick">
       <TokenImg
         class="mr-4px"
         token-class="w-16px"
