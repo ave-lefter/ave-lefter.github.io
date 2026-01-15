@@ -1352,7 +1352,7 @@ onMounted(() => {
 
 </style>
 
-<style lang="scss ">
+<style lang="scss">
 .el-dialog.dialog-rebate {
   --el-bg-color: #16181D;
   .el-dialog__body {

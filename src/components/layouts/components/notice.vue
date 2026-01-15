@@ -248,7 +248,7 @@ const isBotLogin = computed(() => botStore.userInfo && botStore.userInfo.name)
 const isLatestExperienced = computed(() => {
   return !globalStore.latestNotice.time
     || globalStore.latestNotice.time <= NOTICE_FILTER_TIME
-    || String(lastExperienceTime.value) === String(globalStore.latestNotice.time)
+    || Number(lastExperienceTime.value) >= Number(globalStore.latestNotice.time)
 })
 
 const currentAddress = computed(() => {
