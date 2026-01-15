@@ -1,5 +1,5 @@
 <template>
-  <div class="referral dark flex-1">
+  <div class="referral dark flex-1 color-#FFF">
     <div class="container">
       <div v-if="referralInfo?.refCode" class="flex items-center justify-between">
         <div>
@@ -405,7 +405,7 @@
   </div>
   <el-dialog
     v-model="dialogShare"
-    class="dialog-rebate"
+    class="dialog-rebate dark"
     title=""
     width="800"
     append-to-body
@@ -1347,6 +1347,16 @@ onMounted(() => {
         background-color: #2BB1EA;
       }
     }
+  }
+}
+
+</style>
+
+<style lang="scss ">
+.el-dialog.dialog-rebate {
+  --el-bg-color: #16181D;
+  .el-dialog__body {
+    --el-text-color-regular: #F5F5F5;
   }
 }
 
