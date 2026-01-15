@@ -79,7 +79,7 @@
           <div class="pr-101px">
             <div class="text-27px font-600 mb-10px">{{ $t('inviteFriends') }}</div>
             <div class="text-14px font-400">{{ $t('inviteYourFriendsToRegister') }}</div>
-            <button class="text-14px font-400 clickable min-w-120px min-h-34px rd-17px border-none color-btn-lg mt-20px flex items-center justify-center" @click.stop="invite">{{ $t('joinNow') }}</button>
+            <button class="text-14px font-400 clickable min-w-120px min-h-34px rd-17px border-none color-btn-lg mt-20px flex items-center justify-center color-#fff" @click.stop="invite">{{ $t('joinNow') }}</button>
           </div>
           <img class="w-113px h-113px absolute right-10px top-50% translate-y--50%" src="../assets/images/referral/bg-4-1-1.png">
         </div>
@@ -87,7 +87,7 @@
           <div class="pr-101px">
             <div class="text-27px font-600 mb-10px">{{ $t('SVIPApply') }}</div>
             <div class="text-14px font-400">{{ $t('highestCommission') }}</div>
-            <button class="text-14px font-400 clickable min-w-120px min-h-34px rd-17px border-none color-btn-lg-2 mt-20px flex items-center justify-center" @click.stop="svipApplyShow=true">{{ $t('applyForActivation') }}</button>
+            <button class="text-14px font-400 clickable min-w-120px min-h-34px rd-17px border-none color-btn-lg-2 mt-20px flex items-center justify-center color-#fff" @click.stop="svipApplyShow=true">{{ $t('applyForActivation') }}</button>
           </div>
           <img class="w-113px h-113px absolute right-10px top-50% translate-y--50%" src="../assets/images/referral/bg-4-1-2.png">
         </div>
@@ -95,7 +95,7 @@
           <div class="pr-101px">
             <div class="text-27px font-600 mb-10px">Ave.ai {{ $t('partnership') }}</div>
             <div class="text-14px font-400">{{ $t('ecologicalEmpowerment') }}</div>
-            <button class="text-14px font-400 clickable min-w-120px min-h-34px rd-17px border-none color-btn-lg-3 mt-20px flex items-center justify-center" @click.stop="apply">{{ $t('learnMore') }}</button>
+            <button class="text-14px font-400 clickable min-w-120px min-h-34px rd-17px border-none color-btn-lg-3 mt-20px flex items-center justify-center color-#fff" @click.stop="apply">{{ $t('learnMore') }}</button>
           </div>
           <img class="w-115px h-115px absolute right-10px top-50% translate-y--50%" src="../assets/images/referral/bg-4-1-3.png">
         </div>
