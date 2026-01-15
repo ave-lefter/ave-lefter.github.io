@@ -87,7 +87,7 @@ const props1 = computed(() => {
     },
     left: {
       className: '[&&]:relative shrink-0 left fixed! top-61px',
-      style: `left:${dragStore.leftWidth.pump}px`,
+      style: `left:${dragStore.leftWidth.twitter}px`,
       axis: 'x',
       x: 0,
       minWidth: dragConstant.value.minWidth,
@@ -101,7 +101,7 @@ const props1 = computed(() => {
     right: {
       className: '[&&]:relative shrink-0 right fixed! top-61px left-0',
       axis: 'x',
-      x: dragStore.rightWidth.pump,
+      x: dragStore.rightWidth.twitter,
       y: 0,
       minWidth: dragConstant.value.minWidth,
       maxWidth: dragConstant.value.maxWidth,
