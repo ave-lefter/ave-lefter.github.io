@@ -725,11 +725,10 @@ function wsUpdateBaseInfo(obj: { logo_url: string, name: string, token: string, 
 function wsUpdateTableList(wsList: WSPump[]) {
       const c = ['new', 'soon', 'graduated']
       if (!wsList?.length) return
-      const rTime = Date.now()
+      // const rTime = Date.now()
       const list = wsList?.map?.(i => ({
         ...i,
         ...i.pair,
-        rTime: rTime,
         id: `${i.pair.target_token}-${i.chain}`,
         pair_id: `${i.pair.pair}-${i.chain}`,
         token: i.pair.target_token,
@@ -747,8 +746,22 @@ function wsUpdateTableList(wsList: WSPump[]) {
           : i?.pair.token1_logo_url,
 
       }))
-      const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address) && rTime - (i.rTime || 0) <= 15000)
-      wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,100)
+      // const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address) && rTime - (i.rTime || 0) <= 15000)
+      // wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,100)
+
+
+
+      const map = new Map<string, any>()
+      wsTableListCache.value.forEach(item => {
+        map.set(item.pump_pair_address, item)
+      })
+      list.forEach(item => {
+        map.set(item.pump_pair_address, item)
+      })
+      wsTableListCache.value = Array.from(map.values()).slice(0, 300)
+
+
+
       // let wsTime = this.wsTableListCache?.time || 0
       // if (wsTime < Date.now() - 15000) {
       //   this.wsTableListCache = {
