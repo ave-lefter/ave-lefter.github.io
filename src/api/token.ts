@@ -925,7 +925,7 @@ export const bot_getUserWalletTxInfo = createCacheRequest(async function(query: 
 }): Promise<Array<WalletTokenInfo>>  {
   if (query.chain === 'ton') {
     return getTonTokenList(query.user_address, query.user_token).then(async res => {
-      let item = res[0]
+      const item = res[0]
       return getTokenPnl({
         chain: query.chain,
         token: query.user_token,
@@ -960,7 +960,7 @@ export const bot_getUserWalletTxInfo = createCacheRequest(async function(query: 
     })
   } else if (query.chain === 'polygon') {
     return getUserTokenBalanceList(query.user_address, query.chain).then(async res => {
-      let item = res?.find(i => i.token === query.user_token)
+      const item = res?.find(i => i.token === query.user_token)
       return getTokenPnl({
         chain: query.chain,
         token: query.user_token,
@@ -1209,6 +1209,17 @@ export function getAiSummary(id: string): Promise<null |AiSummaryResponse> {
     query: {
       token_id: id1,
       cache_use: false
+    }
+  })
+}
+
+// 开发者最佳代币
+export function getBestToken(token_id:string) {
+  const { $api } = useNuxtApp()
+  return $api('https://api.test.phaetd8l.com/v2api/token_info/v1/token/dev/best', {
+    method: 'get',
+    query: {
+      token_id
     }
   })
 }

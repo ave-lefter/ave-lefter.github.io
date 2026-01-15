@@ -465,19 +465,19 @@
                     </div>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'sniper')"
-                      v-tooltip="$t('snipers')"
+                      v-tooltip="$t('sniper2')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                        color: Number(row?.sniper_count) > 30 ? '#F6465D' : '#12B886',
+                        color: Number(row?.sniper_balance_ratio_cur) > 30 ? '#F6465D' : '#12B886',
                       }"
                     >
                       <Icon class="iconfont icon-gun text-12px mr-4px" name="custom:gun" />
                       <span>{{
                         formatNumber(
-                          Number(row?.sniper_count) > 0.001 ? row?.sniper_count || 0 : 0,
+                          Number(row?.sniper_balance_ratio_cur) > 0.001 ? row?.sniper_balance_ratio_cur || 0 : 0,
                           2
                         )
-                      }}</span>
+                      }}%</span>
                     </div>
                     <!-- <div
                       v-show="pumpSetting?.define?.some((i) => i === 'cabal')"
