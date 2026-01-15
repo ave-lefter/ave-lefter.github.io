@@ -4,7 +4,7 @@
       <ul v-if="tableList?.length > 0" class="pump-item_list">
         <TransitionGroup name="slide-fade">
           <li
-            v-for="(row, $index) in tableList"
+            v-for="(row, $index) in tableList1"
             :id="row?.target_token + '-' + row?.chain"
             :key="row?.pair + '-' + row?.chain"
             :ref="setBtnRef"
@@ -753,6 +753,10 @@ const showPopSearch= shallowRef(false)
 const $tooltip = $createTooltip('bubble--tooltip')
 onUnmounted(() => {
   $tooltip?.hide?.()
+})
+const tableList1 = computed(() => {
+
+  return tableList.value?.sort?.((a, b) => ((Number(b.created_at) || Number(b.time)) - (Number(a.created_at) || Number(a.time))))
 })
 function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: string }) {
   if (pumpSetting.value.isRight) {
