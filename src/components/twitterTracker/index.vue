@@ -174,8 +174,4 @@ function drag(x) {
     return null
   }
 }
-
-setTimeout(() => {
-  drawerVisible.value = true
-}, 100)
 </script>

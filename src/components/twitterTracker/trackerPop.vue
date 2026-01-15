@@ -50,7 +50,7 @@
           </template>
           <template #default>
             <el-checkbox-group
-              v-model="trackerStore.query.aaaaaa"
+              v-model="query.tags"
               class="flex flex-col [--el-checkbox-height:16px] gap-12px pb-16px mb-16px border-b-solid border-b-1px border-b-[--dialog-divider]"
             >
               <el-checkbox
@@ -62,7 +62,7 @@
               </el-checkbox>
             </el-checkbox-group>
             <el-checkbox-group
-              v-model="trackerStore.query.bbbbb"
+              v-model="query.tags"
               class="flex flex-col [--el-checkbox-height:16px] gap-12px"
             >
               <el-checkbox
@@ -74,10 +74,10 @@
               </el-checkbox>
             </el-checkbox-group>
             <div class="pt-16px flex items-center">
-              <el-button>
+              <el-button class="min-w-0" @click="filterVisible = false">
                 {{ t('cancel') }}
               </el-button>
-              <el-button type="primary">
+              <el-button class="min-w-0" type="primary" @click="confirmQuery">
                 {{ t('confirm') }}
               </el-button>
             </div>
@@ -90,10 +90,11 @@
         />
       </div>
       <el-input
-        v-model="trackerStore.query.keyword"
+        v-model="query.keyword"
         class="w-160px"
         size="small"
         :placeholder="t('searchCA')"
+        @input="debouncedConfirmInput"
       >
         <template #prefix>
           <Icon name="custom:search" />
@@ -105,6 +106,7 @@
 </template>
 
 <script setup name="trackerPop">
+import { useDebounceFn } from '@vueuse/core'
 import TwitterTrackerList from './list.vue'
 const emits = defineEmits(['setDrawerVisible'])
 const { t } = useI18n()
@@ -113,6 +115,8 @@ const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const activeTab = ref(1)
 const filterVisible = ref(false)
+
+const query = ref({ ...trackerStore.query })
 
 const tabs = computed(() => [
   { label: t('hot2'), value: 1 },
@@ -133,6 +137,13 @@ const fixedCheckboxOptions = computed(() => [
 const setActiveTab = (value) => {
   activeTab.value = value
 }
+const confirmQuery = () => {
+  trackerStore.query = {
+    ...trackerStore.query,
+    ...query.value,
+  }
+}
+const debouncedConfirmInput = useDebounceFn(confirmQuery, 300)
 </script>
 
 <style scoped lang="scss"></style>

@@ -15,12 +15,12 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
     const fixedWidth = useStorage('trackerFixedWidth', 360)
     const translateStyle = shallowRef(0)
     const query = useStorage('twitterQuery',{
-      aaaaaa:[],
-      bbbbb:[],
+      tags:[],
       keyword:''
     })
     const loading = ref(false)
     const list = shallowRef([])
+    const cursor = ref(null)
 
     const onDrag = useThrottleFn((x: number) => {
         if (x <= 0) {
@@ -101,6 +101,7 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
         translateStyle,
         query,
         loading,
-        list
+        list,
+        cursor
     }
 })

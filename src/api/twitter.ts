@@ -1,29 +1,88 @@
-interface IHotTwitterItem {
-    author:     string;
-    username:   string;
-    content:    string;
-    content_en: string;
-    url:        string;
-    media:      string;
-    portrait:   string;
-    created_at: string;
+export interface IResponseHotTwitterList<T> {
+    authors: (Author & T)[];
+    cursor:  string;
+}
+
+export interface Author {
+    author_id:     number;
+    blue_verified: string;
+    chain:         string;
+    name:          string;
+    profile_pic:   string;
+    tags:          string[];
+    twitter_url:   string;
+    username:      string;
+    verified:      string;
 }
 
 function getHotTwitterList(query:{
-    cursor_time:Date
-    cursor_tweet_id:number|string
-}):Promise<{list:IHotTwitterItem[]}> {
+     cursor?:string
+    keyword?:string
+    tags?:string
+}):Promise<IResponseHotTwitterList<{following_at:  string;}>> {
     const {$api}  = useNuxtApp()
-    return $api('/v2api/twitter/v1/kol/homepage', {
+    return $api('/v2api/twitter/v1/kol/hot', {
         method: 'get',
         query
       })
 }
 
-export type {
-    IHotTwitterItem
+function getFollowList(query:{
+    cursor?:string
+    keyword?:string
+    tags?:string
+}):Promise<IResponseHotTwitterList<{follow_status:0|1}>>{
+    const {$api}  = useNuxtApp()
+    return $api('/v2api/twitter/v1/kol/follow/list', {
+        method: 'get',
+        query
+      })
+}
+
+function getTwitterList(query:{
+    cursor_time:string
+    cursor_tweet_id:string
+}) {
+   const {$api}  = useNuxtApp()
+    return $api('/v2api/twitter/v1/kol/homepage', {
+        method: 'get',
+        query
+      }) 
+}
+
+function followKol(author_id:number) {
+    const {$api}  = useNuxtApp()
+    return $api('/v2api/twitter/v1/kol/follow', {
+        method: 'post',
+        body:{
+            author_id
+        }
+      })
+}
+
+function unfollowKol(author_id:number) {
+    const {$api}  = useNuxtApp()
+    return $api('/v2api/twitter/v1/kol/unfollow', {
+        method: 'post',
+        body:{
+            author_id
+        }
+      })
+}
+
+function unfollowAll() {
+    const {$api}  = useNuxtApp()
+    return $api('/v2api/twitter/v1/kol/unfollow/all', {
+        method: 'post',
+        body:{}
+      })
 }
 
 export {
-    getHotTwitterList
+    getHotTwitterList,
+    followKol,
+    unfollowKol,
+    unfollowAll,
+    getFollowList,
+    getTwitterList
 }
