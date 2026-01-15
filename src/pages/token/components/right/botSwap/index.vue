@@ -1,6 +1,7 @@
 <template>
   <div ref="bot-swap-container" class="bot-swap-container">
     <Holding  />
+    <BestToken/>
     <div class="tabs">
       <button v-for="(item, index) in tabs" :key="index" class="tab-item" :class="{ active: item.value === activeTab, [`tab-${item.value}`]: true }" type="button" @click="activeTab = item.value">
         <span>{{ item.name }}</span>
@@ -36,6 +37,7 @@ import Bignumber from 'bignumber.js'
 import { useBotSwap } from '~/composables/botSwap'
 import Holding from './holding.vue'
 import BatchWallet from './batchWallet.vue'
+import BestToken from '../bestToken.vue'
 
 const { t } = useI18n()
 const route = useRoute()
