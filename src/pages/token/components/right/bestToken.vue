@@ -7,6 +7,8 @@
     <div class="flex items-center color-[--third-text] cursor-pointer" @click="tokenClick">
       <TokenImg
         class="mr-4px"
+        token-class="w-16px"
+        chainClass="w-8px"
         :row="{
           logo_url: bestToken.logo_url || '',
           symbol: bestToken.symbol || '',
@@ -15,7 +17,7 @@
       />
       <span
         v-tooltip="bestToken.symbol"
-        class="font-500 text-16px color-[--main-text] mr-2px max-w-60px truncate"
+        class="font-500 color-[--main-text] mr-2px max-w-60px truncate"
         >{{ bestToken.symbol }}</span
       >
       (ATH MC

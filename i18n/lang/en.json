@@ -1639,7 +1639,7 @@
   "notUpdateExistRemarkTip": "Note: If unchecked, this will overwrite any existing remarks on the wallet. Please choose carefully.",
   "preview": "Preview",
   "top20Remarked": "TOP 20 Quick Remarks",
-  "devBestToken":"Top Tokens by DEV Holdings",
+  "devBestToken":"Dev's Best Token",
   "indicatorLine": "Indicator Line",
   "buyMa": "Buy MA",
   "sellMa": "Sell MA",
