@@ -1,21 +1,22 @@
 <template>
   <div class="mt-20px mb-30px relative">
-    <el-scrollbar ref="scrollbarRef" v-loading="loading" :height="scrollHeight" @scroll="handleScroll">
-      <ul v-if="tableList?.length > 0" class="pump-item_list">
-        <TransitionGroup name="slide-fade">
+    <!-- <el-scrollbar ref="scrollbarRef" v-loading="loading" :height="scrollHeight" @scroll="handleScroll"> -->
+    <ul v-if="tableList?.length > 0" v-bind="containerProps" @scroll="handleScroll"  class="pump-item_list scroller-container" :style="{height: scrollHeight}">
+      <div v-bind="wrapperProps">
+        <!-- <TransitionGroup name="slide-fade"> -->
           <li
-            v-for="(row, $index) in tableList"
+            v-for="({data: row}, $index) in list"
             :id="row?.target_token + '-' + row?.chain"
             :key="row?.pair + '-' + row?.chain"
             :ref="setBtnRef"
-            class="pump-item_item relative"
+            class="pump-item_item relative item-row"
             @click.stop="tableRowClick(row)"
             @contextmenu="handleContextMenu($event, row)"
             @mouseenter="showPopover(row)"
             @mouseleave="hidePopover"
             :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
           >
-            <div class="w-full relative">
+            <div class="w-full relative" :class="getAnimClass(row)">
               <div class="flex-start items-start">
                 <div class="mr-12px relative">
                   <div class="black-container">
@@ -635,10 +636,11 @@
               </div>
             </div>
           </li>
-        </TransitionGroup>
-      </ul>
-      <AveEmpty v-if="tableList?.length == 0 && !loading" class="mt-200px" />
-    </el-scrollbar>
+        <!-- </TransitionGroup> -->
+      </div>
+    </ul>
+    <AveEmpty v-if="tableList?.length == 0 && !loading" class="mt-200px" />
+    <!-- </el-scrollbar> -->
     <transition name="fade">
       <span v-if="showBackTop" class="back-top text-12px flex items-center bg-[--main-bg] cursor-pointer" @click="scrollToTop">
           <Icon
@@ -699,6 +701,8 @@ import { formatNumber } from '@/utils/formatNumber'
 import { Icon } from '#components'
 import type { PumpObj } from '@/api/types/pump'
 import XIcon from '~/components/xPopup/xIcon.vue'
+import { useVirtualList } from '@vueuse/core'
+
 const props = defineProps({
   tableList: {
     type: Array<PumpObj>,
@@ -751,6 +755,14 @@ const currentRow = ref<PumpObj | null>(null)
 const showPopSearch= shallowRef(false)
 
 const $tooltip = $createTooltip('bubble--tooltip')
+
+
+const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableList, {
+  itemHeight: 110.8,
+  // 必须增加过采样，否则 translateY(-20px) 向上移动时，
+  // 顶部刚进入视口的节点会因为高度计算没到视口而无法渲染，导致动画“闪现”
+  overscan: 15,
+})
 onUnmounted(() => {
   $tooltip?.hide?.()
 })
@@ -898,18 +910,25 @@ function jump (row: { target_token: string; chain: string }) {
 }
 const scrollbarRef = ref()
 const showBackTop = ref(false)
-const handleScroll = ({ scrollTop }: { scrollTop: number }) => {
-  showBackTop.value = scrollTop > 200
+// const handleScroll = ({ scrollTop }: { scrollTop: number }) => {
+//   showBackTop.value = scrollTop > 200
+// }
+
+// 示例：监听滚动事件以实现“锁定置顶”逻辑
+const handleScroll = (e: Event) => {
+  const target = e.target as HTMLElement
+  showBackTop.value = target.scrollTop > 200
 }
 
 const scrollToTop = () => {
-  const wrap = scrollbarRef.value?.wrapRef
-  if (wrap) {
-    wrap.scrollTo({
-      top: 0,
-      behavior: 'smooth' // 平滑滚动
-    })
-  }
+  scrollTo(0)
+  // const wrap = scrollbarRef.value?.wrapRef
+  // if (wrap) {
+  //   wrap.scrollTo({
+  //     top: 0,
+  //     behavior: 'smooth' // 平滑滚动
+  //   })
+  // }
 }
 function showPopoverSearch(row: PumpObj,$index: number) {
   showPopSearch.value = true
@@ -921,10 +940,47 @@ async function handleSearchTokenName() {
   await Promise.resolve()
   dialogSearchText.value = currentRow.value?.symbol || ''
 }
+
+// 记录最近一次全局下推的时间
+const lastPushTime = ref(0)
+const newestId = ref('')
+
+// 监听原始列表数据 (假设 props.list 是 shallowRef)
+watch(() => props.tableList, (newList, oldList) => {
+  // 1. 判断是否是插入了新数据（长度增加，或第一个元素 ID 变了）
+  const new1 = newList?.[0]
+  const old1 = oldList?.[0]
+  const new1PairId = new1?.pair + '-' + new1?.chain
+  const old1PairId = old1?.pair + '-' + old1?.chain
+
+  if (new1PairId !== old1PairId) {
+    lastPushTime.value = Date.now()
+    newestId.value = new1PairId
+  }
+}, { deep: false }) // shallowRef 监听引用即可，性能最高
+
+// 动画判定函数
+const getAnimClass = (itemData: any) => {
+  const now = Date.now()
+  const duration = 300 // 动画持续 300ms
+
+  // A. 判断是否是新行入场
+  if ((itemData?.pair + '-' + itemData?.chain) === newestId.value && (now - lastPushTime.value < duration)) {
+    return 'anim-enter'
+  }
+
+  // B. 判断是否是旧行被推挤
+  if (now - lastPushTime.value < duration) {
+    return 'anim-push'
+  }
+
+  return ''
+}
 </script>
 
 <style lang="scss" scoped>
 .pump-item_list {
+  scroll-behavior: smooth;
   font-size: 12px;
   .pump-item_item {
     min-height: 100px;
@@ -1133,5 +1189,68 @@ async function handleSearchTokenName() {
 }
 .slide-fade-move {
   transition: transform 0.3s ease;
+}
+
+/* 1. 新行入场：从上方滑入并淡入 */
+.anim-enter {
+  animation: slideIn 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  z-index: 10;
+}
+
+/* 2. 旧行下推补偿：
+   数据置顶时，虚拟滚动将旧行瞬间下移了 70px。
+   我们让内层瞬间反向向上偏移 70px（回原位），然后平滑归位到 0。 */
+.anim-push {
+  animation: pushDown 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pushDown {
+  from { transform: translateY(-70px); }
+  to { transform: translateY(0); }
+}
+
+.item-inner {
+  will-change: transform;
+  transform: translateZ(0); /* 硬件加速 */
+}
+
+.scroller-container {
+  // overflow-y: auto;
+  scrollbar-width: thin;
+  /* Firefox 颜色：第一个是滑块颜色，第二个是轨道颜色 */
+  scrollbar-color: rgba(144, 147, 153, 0.3) transparent;
+}
+
+/* 1. 整体宽度保持 6px 比较精致 */
+.scroller-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* 2. 核心：调低默认透明度 (模拟 el-scrollbar 的淡色感) */
+.scroller-container::-webkit-scrollbar-thumb {
+  /* 使用 rgba 手动控制透明度，0.2 是最接近 Element 的淡色 */
+  background-color: var(--el-text-color-placeholder, rgba(144, 147, 153, 0.2));
+  border-radius: 10px;
+  /* 只有加上这一行，颜色才会变淡 */
+  opacity: 0.2;
+}
+
+/* 3. 只有鼠标移入容器时，滑块才稍微变深一点点 */
+.scroller-container:hover::-webkit-scrollbar-thumb {
+  background-color: var(--el-text-color-secondary, rgba(144, 147, 153, 0.3));
+}
+
+/* 4. 只有鼠标直接放在滑块上时，颜色才明显 */
+.scroller-container::-webkit-scrollbar-thumb:hover {
+  background-color: var(--el-text-color-secondary, rgba(144, 147, 153, 0.5)) !important;
+}
+
+.scroller-container::-webkit-scrollbar-track {
+  background-color: transparent;
 }
 </style>
