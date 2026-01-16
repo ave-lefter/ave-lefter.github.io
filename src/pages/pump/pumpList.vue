@@ -100,7 +100,30 @@
                       :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'horizontal' : 'circle'"
                       :progress="row.progress"
                     />
-                    <el-tooltip
+                    <a
+                      v-tooltip="{
+                         content: {
+                            is: ImageLarge,
+                            props: {
+                              row: row,
+                            }
+                          },
+                          props: {
+                            placement: 'bottom-start',
+                            'popper-class': 'tooltip-pd-0',
+                            'show-arrow': false
+                          }
+                      }"
+                      :href="`https://lens.google.com/uploadbyurl?url=${encodeURIComponent(
+                        getSymbolDefaultIcon(row)
+                      )}`"
+                      target="_blank"
+                      class="token-mark clickable"
+                      @click.stop
+                    >
+                      <Icon class="text-16px text-#fff" name="custom:search" />
+                    </a>
+                    <!-- <el-tooltip
                       popper-class="tooltip-pd-0"
                       placement="bottom-start"
                       :show-arrow="false"
@@ -138,7 +161,7 @@
                       >
                         <Icon class="text-16px text-#fff" name="custom:search" />
                       </a>
-                    </el-tooltip>
+                    </el-tooltip> -->
                     <el-image
                       v-if="row.amm"
                       v-tooltip="row.amm"
@@ -702,6 +725,7 @@ import { Icon } from '#components'
 import type { PumpObj } from '@/api/types/pump'
 import XIcon from '~/components/xPopup/xIcon.vue'
 import { useVirtualList } from '@vueuse/core'
+import ImageLarge from './imageLarge.vue'
 
 const props = defineProps({
   tableList: {

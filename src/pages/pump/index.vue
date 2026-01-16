@@ -343,7 +343,7 @@ const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const activeChain = useStorage<ChainKey>(
   'pump_activeChain',
   'solana',
-  sessionStorage
+  localStorage
 )
 const audioUrl = ref('')
 const globalStore = useGlobalStore()
@@ -389,9 +389,9 @@ const isPausedObj = ref({
   graduated: false,
 })
 
-const wsTableListCache = ref<PumpObj[]>([])
-const wsTableList = ref<PumpObj[]>([])
-const logoList = ref<{logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
+const wsTableListCache = shallowRef<PumpObj[]>([])
+const wsTableList = shallowRef<PumpObj[]>([])
+const logoList = shallowRef<{logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
 
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
