@@ -239,14 +239,14 @@
                   </li>
                   <Transition>
                     <li
-                      v-if="buy_tax_list_show && Number(checkResult?.tm_buy_tax_for_lp) > 0 ||
+                      v-if="buy_tax_list_show && (Number(checkResult?.tm_buy_tax_for_lp) > 0 ||
                           Number(checkResult?.tm_buy_tax_for_burn) > 0 ||
                           Number(checkResult?.tm_buy_tax_for_fund) > 0 ||
                           Number(checkResult?.tm_buy_tax_for_holders) > 0 ||
                           Number(checkResult?.tm_buy_tax_for_lp_holders) > 0 ||
                           Number(checkResult?.tm_buy_tax_for_team) > 0 ||
                           Number(checkResult?.tm_buy_tax_for_inviter) > 0 ||
-                          Number(checkResult?.tm_buy_tax_for_other) > 0" class="py-5px">
+                          Number(checkResult?.tm_buy_tax_for_other) > 0)" class="py-5px">
                       <ul class="ml-15px">
                         <li
                           v-if="Number(checkResult?.tm_buy_tax_for_lp) > 0"
@@ -402,14 +402,14 @@
                   </li>
                   <Transition>
                     <li
-                        v-if="sell_tax_list_show && Number(checkResult?.tm_sell_tax_for_lp) > 0 ||
+                        v-if="sell_tax_list_show && (Number(checkResult?.tm_sell_tax_for_lp) > 0 ||
                         Number(checkResult?.tm_sell_tax_for_burn) > 0 ||
                         Number(checkResult?.tm_sell_tax_for_fund) > 0 ||
                         Number(checkResult?.tm_sell_tax_for_holders) > 0 ||
                         Number(checkResult?.tm_sell_tax_for_lp_holders) > 0 ||
                         Number(checkResult?.tm_sell_tax_for_team) > 0 ||
                         Number(checkResult?.tm_sell_tax_for_inviter) > 0 ||
-                        Number(checkResult?.tm_sell_tax_for_other) > 0" class="py-5px">
+                        Number(checkResult?.tm_sell_tax_for_other) > 0)" class="py-5px">
                       <ul class="indent">
                         <li
                           v-if="Number(checkResult?.tm_sell_tax_for_lp) > 0"
