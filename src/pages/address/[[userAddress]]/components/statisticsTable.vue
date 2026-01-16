@@ -453,7 +453,7 @@ const _getWhaleTrendList = async () => {
 
     if (arr?.length > 0) {
       const a = [...tableData.value.trend]
-      const b = arr.filter((i) => a.every((j) => j.tx_hash !== i.tx_hash))
+      const b = arr.filter((i) => a.every((j) => j.tx_hash + j.event_id !== i.tx_hash + i.event_id))
       tableData.value.trend = [...a, ...b]
     }
     tableData.value.finished = list?.length < tableData.value.pageSize
