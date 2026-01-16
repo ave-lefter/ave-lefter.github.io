@@ -309,7 +309,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage, useWindowSize, useThrottleFn } from '@vueuse/core'
+import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility } from '@vueuse/core'
 import QuickSwapSet from '@/components/quickSwap/quickSwapSet.vue'
 import PumpList from './pumpList.vue'
 import Setting from './setting.vue'
@@ -588,12 +588,12 @@ watch(activeChain, () => {
   }, 500)
 })
 watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
-  if (Array.isArray(val)) {
+  if (Array.isArray(val) && documentVisible.value) {
     wsUpdateTableList(val)
   }
 })
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
-  if (val) {
+  if (val && documentVisible.value) {
     const rTime = Date.now()
     const obj = { ...val, rTime: rTime }
         // console.log('----obj------',obj.symbol,'--MC--',obj.market_cap, '--progress--',obj.progress,  '--top--',obj.holders_top10_ratio  )
@@ -917,7 +917,7 @@ function getPump(params, isFilter = false) {
     clearTimeout(Timer[params.category])
     Timer[params.category] = null
   }
-  if (route.name !== 'pump') {
+  if (route.name !== 'pump' || !documentVisible.value) {
     return
   }
   if ((isPausedObj.value?.[params.category] || route.name !== 'pump') && !isFilter) {
@@ -1137,6 +1137,16 @@ function switchChain(item: { chain: ChainKey }) {
   console.log('------switchChain--------',item.chain)
   activeChain.value = item.chain
 }
+
+const documentVisible = useDocumentVisibility()
+
+watch(documentVisible, (val) => {
+  if (val) {
+    if (route.name === 'pump') {
+      getPumpList()
+    }
+  }
+})
 </script>
 
 <style scoped lang="scss">
