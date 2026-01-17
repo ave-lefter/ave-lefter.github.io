@@ -482,13 +482,22 @@ const list1 = computed(() => {
       //   console.log('---------obj----------',obj)
       // }
       if (obj) {
-        return {
-          ...i,
-          ...obj,
-          insider_balance_ratio_cur: Number(obj?.rat_raio),
-          dev_balance_ratio_cur: Number(obj?.dev_ratio),
-          sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
-          holders: obj?.holder_count
+        if ('progress' in obj) {
+          console.log('-------progress-----------', obj?.progress)
+          return {
+            ...i,
+            ...obj,
+            progress: obj?.progress
+          }
+        } else {
+          return {
+            ...i,
+            ...obj,
+            insider_balance_ratio_cur: Number(obj?.rat_raio),
+            dev_balance_ratio_cur: Number(obj?.dev_ratio),
+            sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
+            holders: obj?.holder_count
+          }
         }
       } else {
         return i
@@ -683,9 +692,6 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
 })
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
   if (val && documentVisible.value) {
-    const rTime = Date.now()
-    const obj = { ...val, rTime: rTime }
-    logoList.value = logoList?.value?.filter?.(i => i.token !== obj.token && rTime - (i.rTime || 0) <= 16000)
     logoList.value.unshift(obj)
     if (logoList.value?.length > 300) {
       logoList.value = logoList.value?.slice?.(0,300)
