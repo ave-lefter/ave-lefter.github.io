@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <Draggable
+  <Draggable
       :class="{ 'left-drag': trackerStore.isLeftFixed, 'right-drag': trackerStore.isRightFixed }"
       :shouldRenderChild="shouldRenderChild"
       v-bind="props1"
@@ -11,8 +10,9 @@
       <!-- <Monitor v-bind="props2"/> -->
       <component :is="lazyComponent" v-bind="props2" @setDrawerVisible="drawerVisible = true" />
     </Draggable>
-    <TwitterTrackerDrawer v-model="drawerVisible" />
-  </div>
+    <div>
+      <TwitterTrackerDrawer v-model="drawerVisible" />
+    </div>
 </template>
 <script setup name="trackerDragger">
 const drawerVisible = ref(false)

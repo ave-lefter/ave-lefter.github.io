@@ -16,10 +16,10 @@
       {{ t('attention') }}
     </el-button>
   </div>
- <el-scrollbar v-else height="calc(100% - 100px)">
+ <el-scrollbar v-else height="calc(100% - 120px)">
   <div class="flex flex-col gap-16px">
     <div
-      v-for="item in trackerStore.list"
+      v-for="(item,index) in trackerStore.list"
       :key="item.id"
       class="border-b-1px border-b-solid border-b-[--border] pb-16px flex gap-7px"
     >
@@ -63,6 +63,7 @@
           <div class="gap-8px flex items-center">
             <div
               class="w-24px h-24px bg-[--main-list-hover] rounded-4px flex items-center justify-center cursor-pointer"
+              @click="item.author.follow_status === 1 ? _unfollowKol(item.author.author_id, index) : _followKol(item.author.author_id, index)"
             >
               <Icon
                 :name="
@@ -80,14 +81,14 @@
             </div>
           </div>
         </div>
-        <div class="text-14px lh-22px break-words">
+        <div v-show="!item.hide" class="text-14px lh-22px break-words">
           {{ item.content }}
         </div>
         <div class="justify-between items-center flex">
           <div class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]">
-            <Icon name="custom:translation"/>{{ t('viewTranslation') }}
+            <!-- <Icon name="custom:translation"/>{{ t('viewTranslation') }} -->
           </div>
-          <span class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px"><Icon name="custom:angle-down" :class="item.hide ? '' : 'rotate-180'"/>
+          <span class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px" @click="item.hide = !item.hide"><Icon name="custom:angle-down" :class="item.hide ? '' : 'rotate-180'"/>
             {{ item.hide?t('Expand') :t('Collapse') }}
           </span>
         </div>
@@ -97,6 +98,8 @@
  </el-scrollbar>
 </template>
 <script setup name="twitterTackerList">
+import { followKol, unfollowAll } from '~/api/twitter'
+
 const { t } = useI18n()
 const emits = defineEmits(['startAttention'])
 const props = defineProps({
@@ -109,6 +112,32 @@ const botStore = useBotStore()
 const trackerStore = useTwitterTrackerStore()
 const isEmpty = computed(() => trackerStore.list.length === 0)
 const isMine = computed(() => props.activeTab === 2)
+
+const _followKol = async (author_id, index) => {
+  try {
+    if(!botStore.accessToken){
+      botStore.changeConnectVisible(true)
+      return
+    }
+    await followKol(author_id)
+    ElMessage.success(t('followed'))
+    trackerStore.list[index].author.follow_status = 1
+  } catch (error) {
+    ElMessage.error(t('failed'))
+    console.error('Error following KOL:', error)
+  }
+}
+
+const _unfollowKol = async (author_id, index) => {
+  try {
+    await unfollowAll(author_id)
+    ElMessage.success(t('cancelFollowed'))
+    trackerStore.list[index].author.follow_status = 0
+  } catch (error) {
+    ElMessage.error(t('failed'))
+    console.error('Error unfollowing KOL:', error)
+  }
+}
 </script>
 <style scoped lang="scss">
   :deep(.el-scrollbar__thumb){

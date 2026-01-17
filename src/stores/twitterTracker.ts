@@ -20,7 +20,7 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
     })
     const loading = ref(false)
     const finished = ref(false)
-    const list = shallowRef([])
+    const list = ref([])
     const cursor = ref(null)
 
     const onDrag = useThrottleFn((x: number) => {
