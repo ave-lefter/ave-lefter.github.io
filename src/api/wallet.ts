@@ -19,7 +19,7 @@ export function getWhaleTokenList(params) {
 // 动态列表
 export function getWhaleTrendList(params) {
   const { $api } = useNuxtApp()
-  return $api('https://api.test.phaetd8l.com/v2api/walletinfo/v1/events', {
+  return $api('/v2api/walletinfo/v1/events', {
     method: 'get',
     query: params,
   })
@@ -118,7 +118,7 @@ export function getTxAnalysis(params: {
   }>
 }>{
   const { $api } = useNuxtApp()
-  return $api('https://api.test.phaetd8l.com/v2api/walletinfo/v2/tx_analysis_v2', {
+  return $api('/v2api/walletinfo/v2/tx_analysis_v2', {
     method: 'get',
     query: params,
   })
@@ -263,7 +263,7 @@ export function getProfitCalendar(params:{
   date:string
 }):Promise<IProfitCalendarResponse> {
   const { $api } = useNuxtApp()
-  return $api('https://api.test.phaetd8l.com/v2api/walletinfo/v2/calendar/pnl', {
+  return $api('/v2api/walletinfo/v2/calendar/pnl', {
     method: 'get',
     query: params,
   })
@@ -275,7 +275,7 @@ export function marketcap_analysis(query:{
   user_chain:string
 }) {
   const { $api } = useNuxtApp()
-  return $api('https://api.test.phaetd8l.com/v2api/walletinfo/v2/marketcap_analysis', {
+  return $api('/v2api/walletinfo/v2/marketcap_analysis', {
     method: 'get',
     query,
   })
