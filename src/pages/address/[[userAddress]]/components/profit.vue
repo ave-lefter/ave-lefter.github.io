@@ -71,7 +71,10 @@
           <span
             v-if="bestTokenFilter === BestTokenEnum.TOTAL_PROFIT"
             :class="getColorClass(item.total_profit)"
-            >+${{ formatNumber(item.total_profit, 2) }}</span
+            >+${{ formatNumber(item.total_profit, {
+              decimals:2,
+              limit:4
+            }) }}</span
           >
           <span v-else :class="getColorClass(item.total_profit_ratio)"
             >{{ Math.max(+formatNumber(item.total_profit_ratio, 1), 0.1) }}X</span
