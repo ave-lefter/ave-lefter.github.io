@@ -1,7 +1,7 @@
 <template>
   <el-drawer
     v-model="visible"
-    class="[&&]:bg-[--dialog-bg]"
+    class="[&&]:bg-[--dialog-bg] pb-20px"
     :size="500"
     header-class="!mb-5 [&&]:color-[--main-text]"
   >
@@ -43,7 +43,7 @@
           <TokenColumn
             :columnProps="{
               label: $t('walletToken'),
-              width: '158',
+              width: '178',
             }"
           />
           <el-table-column width="60" :label="$t('type')">
@@ -193,22 +193,24 @@ const onLoad = () => {
 }
 </script>
 <style lang="scss" scoped>
-:deep(.el-table.el-table){
-  --el-table-header-bg-color:transparent;
-  --el-table-bg-color:transparent;
-  --el-table-tr-bg-color:transparent;
-  .cell{
+:deep(.el-table.el-table) {
+  --el-table-header-bg-color: transparent;
+  --el-table-bg-color: transparent;
+  --el-table-tr-bg-color: transparent;
+  .cell {
     line-height: inherit;
   }
-  th:nth-child(1),td:nth-child(1){
-    .cell{
+  th:nth-child(1),
+  td:nth-child(1) {
+    .cell {
       padding-left: 20px;
     }
   }
-  th:nth-last-child,td:nth-last-child{
-     .cell{
+  th:nth-last-child,
+  td:nth-last-child {
+    .cell {
       padding-right: 20px;
-     }
+    }
   }
 }
 </style>
