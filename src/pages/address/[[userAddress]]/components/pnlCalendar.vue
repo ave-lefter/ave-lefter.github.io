@@ -110,9 +110,9 @@ const getColor = (value) => {
     }
   } else if (value > 2000) {
     return {
-      bg: 'bg-#FFA6221A',
-      color: 'color-[--yellow]',
-      cssColor: getCssVariable('--yellow'),
+      bg: 'bg-#12B8864D',
+      color: 'color-[--up-color]',
+      cssColor: getCssVariable('color-[--up-color]'),
     }
   } else {
     return {
