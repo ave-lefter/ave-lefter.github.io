@@ -594,11 +594,8 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
 })
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
   if (val && documentVisible.value) {
-    const rTime = Date.now()
-    const obj = { ...val, rTime: rTime }
-        // console.log('----obj------',obj.symbol,'--MC--',obj.market_cap, '--progress--',obj.progress,  '--top--',obj.holders_top10_ratio  )
-    logoList.value = logoList?.value?.filter?.(i => i.token !== obj.token && rTime - (i.rTime || 0) <= 16000)
-    logoList.value.unshift(obj)
+    logoList.value.unshift(val)
+    logoList.value?.slice(0, 300)
   }
 })
 
@@ -747,7 +744,7 @@ function wsUpdateTableList(wsList: WSPump[]) {
           : i?.pair.token1_logo_url,
 
       }))
-      const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address) && rTime - (i.rTime || 0) <= 15000)
+      const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
       wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,100)
       // let wsTime = this.wsTableListCache?.time || 0
       // if (wsTime < Date.now() - 15000) {
