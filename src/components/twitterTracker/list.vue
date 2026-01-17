@@ -16,7 +16,8 @@
       {{ t('attention') }}
     </el-button>
   </div>
-  <div v-else class="flex flex-col gap-16px">
+ <el-scrollbar v-else height="calc(100% - 100px)">
+  <div class="flex flex-col gap-16px">
     <div
       v-for="item in trackerStore.list"
       :key="item.id"
@@ -26,11 +27,11 @@
         icon-size="32px"
         :wallet_logo="{ logo: item.profile_pic, name: item.author.name }"
       />
-      <div class="flex flex-col gap-8px flex-1">
+      <div class="flex flex-col gap-8px flex-1 min-w-0">
         <div class="justify-between items-center flex">
           <div class="min-w-0 flex-1">
             <div class="gap-8px flex items-center min-w-0">
-              <span class="color-[--main-text] text-16px lh-20px min-w-0 flex-1 truncate">{{
+              <span v-tooltip="item.author.name" class="color-[--main-text] text-16px lh-20px min-w-0 max-w-[calc(100%-90px)] truncate">{{
                 item.author.name
               }}</span>
               <TimerCount
@@ -79,11 +80,21 @@
             </div>
           </div>
         </div>
-        <div />
-        <div />
+        <div class="text-14px lh-22px break-words">
+          {{ item.content }}
+        </div>
+        <div class="justify-between items-center flex">
+          <div class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]">
+            <Icon name="custom:translation"/>{{ t('viewTranslation') }}
+          </div>
+          <span class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px"><Icon name="custom:angle-down" :class="item.hide ? '' : 'rotate-180'"/>
+            {{ item.hide?t('Expand') :t('Collapse') }}
+          </span>
+        </div>
       </div>
     </div>
   </div>
+ </el-scrollbar>
 </template>
 <script setup name="twitterTackerList">
 const { t } = useI18n()
@@ -99,3 +110,8 @@ const trackerStore = useTwitterTrackerStore()
 const isEmpty = computed(() => trackerStore.list.length === 0)
 const isMine = computed(() => props.activeTab === 2)
 </script>
+<style scoped lang="scss">
+  :deep(.el-scrollbar__thumb){
+    display: none;
+  }
+</style>
