@@ -74,7 +74,7 @@ const _marketcap_analysis = async () => {
         maxCount = el.count
       }
     })
-    mostLikeText.value = maxText
+    mostLikeText.value = maxCount === 0 ? '--' : maxText
   } catch (error) {
     console.log('error', error)
   }

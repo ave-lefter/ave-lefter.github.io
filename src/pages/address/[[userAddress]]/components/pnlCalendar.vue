@@ -26,7 +26,7 @@
               dayjs(date).format('DD')
             }}</span>
             <div class="text-12px lh-14px mt-2px" :class="getColor(getPnl(date)).color">
-              {{ addSign(getPnl(date)) }}${{ formatNumber(Math.abs(getPnl(date)), 1) }}
+              {{ addSign(getPnl(date)) }}${{ formatNumber(Math.abs(getPnl(date)),{decimals:1,limit:4}) }}
             </div>
           </div>
         </template>
