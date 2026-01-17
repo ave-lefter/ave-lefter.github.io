@@ -17,7 +17,8 @@ export function onRequest({ options, request }: MyFetchContext) {
   // headers.lang = language
   options.headers.set('lang', language)
   const url = request as string
-  if (url?.includes('/v2/aveswap/') || url?.includes('/bestrouteapi/')) {
+  const langZoneUrls = ['/v2/aveswap/','/bestrouteapi/','/v2api/twitter']
+  if (langZoneUrls.some(el=>url.includes(el))) {
     options.headers.set('lang-zone', localStorage.getItem('language') || 'en')
   }
 
@@ -49,7 +50,7 @@ export function onRequest({ options, request }: MyFetchContext) {
     }
     options.headers.set('Ave-Platform', 'web')
   }
-  const needAuthUrl = ['/signals/v2/public/list/v3','/v2api/fav_users/', '/v2api/fav_remarks/v1/remarks_detail']
+  const needAuthUrl = ['/signals/v2/public/list/v3','/v2api/fav_users/', '/v2api/fav_remarks/v1/remarks_detail','kol/follow','kol/unfollow','/twitter/v1/kol/hot','twitter/v1/kol/homepage']
   const needAuth = needAuthUrl.some(el=>url.includes(el))
   if (needAuth) {
     const accessToken = useBotStore().accessToken

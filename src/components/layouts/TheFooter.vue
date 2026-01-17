@@ -87,16 +87,18 @@
           {{ $t('signal') }}
         </div>
       </el-badge>
-      <div
-        class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
-        :class="trackerStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
-        @click="trackerStore.visible = !trackerStore.visible"
-      >
-        <div class="flex items-center justify-center w-14px h-14px bg-[--main-bg] rounded-full">
-          <Icon name="custom:twitter" />
+      <el-badge :is-dot="isTwitterDotted">
+        <div
+          class="flex items-center gap-4px cursor-pointer hover:color-[--main-text]"
+          :class="trackerStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
+          @click="trackerStore.visible = !trackerStore.visible"
+        >
+          <div class="flex items-center justify-center w-14px h-14px bg-[--main-bg] rounded-full">
+            <Icon name="custom:twitter" />
+          </div>
+          Tracker
         </div>
-        Tracker
-      </div>
+      </el-badge>
     </div>
     <ul class="right">
       <li class="color-[--secondary-text] hover:color-[--main-text]">
@@ -248,7 +250,7 @@ const getIconByPlatform = (platform: string) => {
       ?.icon.replace('/signals/', 'signals/') || ''
   return `${configStore.token_logo_url}${icon}`
 }
-console.log('platformOptions', platformOptions.value)
+// console.log('platformOptions', platformOptions.value)
 
 const addressAndChain = computed(() => {
   const id = route.params.id as string
@@ -292,6 +294,7 @@ onMounted(() => {
     id: 1,
   })
 })
+
 const initPage = () => {
   // Initialize the page or perform any setup tasks
   getTokensPrice(ids).then((res) => {
@@ -362,14 +365,25 @@ watch(
 )
 
 const wsStore = useWSStore()
+const twitterTrackerStore = useTwitterTrackerStore()
 const isDoted = shallowRef(!signalStore.signalVisible)
 const isDoted2 = shallowRef(!visible.value)
+const isTwitterDotted = ref(!twitterTrackerStore.visible)
 // 点击信号广场，悬浮窗打开状态，小红点消失
 watch(
   () => signalStore.signalVisible,
   (val) => {
     if (val) {
       isDoted.value = false
+    }
+  }
+)
+
+watch(
+  () => twitterTrackerStore.visible,
+  (val) => {
+    if (val) {
+      isTwitterDotted.value = false
     }
   }
 )
@@ -390,7 +404,7 @@ watch(
 watch(
   () => wsStore.wsResult[WSEventType.PUMP_MIGRATED],
   (msg: GetSignalV2ListResponse) => {
-    console.log('wsStore.wsResult[WSEventType.PUMP_MIGRATED]', JSON.parse(JSON.stringify(msg)))
+    // console.log('wsStore.wsResult[WSEventType.PUMP_MIGRATED]', JSON.parse(JSON.stringify(msg)))
     if (globalStore.audioSettings.notice.pumpNotice) {
       const pumpChains = globalStore.audioSettings.notice.pumpChains
       const pumpPlatforms = globalStore.audioSettings.notice.pumpPlatforms
@@ -576,7 +590,7 @@ function monitorToast(val: IMonitorWsResponse[]) {
       icon: <div></div>,
       showClose: true,
       placement: globalStore.audioSettings.notice.position as any,
-      customClass: `w-320px p-[15px_8px] border-transparent rounded-[8px] monitorToast ${globalStore.audioSettings.notice.monitorBorder && globalStore.audioSettings.notice.monitorShow === 1 && `${getIsBuy(item) ? 'border-[--up-color]!' : 'border-[--down-color]!'}`} ${globalStore.audioSettings.notice.monitorShow === 0 && `border-[--dialog-tab-active-bg]!`} ${globalStore.audioSettings.notice.monitorShow === 1 && globalStore.audioSettings.notice.quickBuy && 'monitorToast2'}`,
+      customClass: `w-320px p-[15px_8px] border-transparent rounded-[8px] monitorToast ${globalStore.audioSettings.notice.monitorBorder && globalStore.audioSettings.notice.monitorShow === 1 && `${getIsBuy(item) ? 'border-[--up-color]!' : 'border-[--down-color]!'}`} ${globalStore.audioSettings.notice.monitorShow === 0 && 'border-[--dialog-tab-active-bg]!'} ${globalStore.audioSettings.notice.monitorShow === 1 && globalStore.audioSettings.notice.quickBuy && 'monitorToast2'}`,
       message: () => (
         <div
           class="inline-flex items-center gap-4px text-12px cursor-pointer w-full"

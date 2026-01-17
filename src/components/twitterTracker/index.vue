@@ -63,9 +63,9 @@ const loadComponent = async () => {
 
 const dragConstant = computed(() => {
   return {
-    minWidth: 480,
-    minHeight: 262,
-    maxWidth: 600,
+    minWidth: 240,
+    minHeight: 160,
+    maxWidth: 360,
     initialHeight: trackerStore.winHeight - 95,
     centerScrollHeight: trackerStore.boundingRect.height - 140,
     otherScrollHeight: trackerStore.winHeight - 230,
