@@ -56,7 +56,7 @@ export interface PumpObj {
   token1_name: string
   token0_price_usd: number
   token1_price_usd: number
-  created_at: number
+  created_at: number | string
   time: string
   target_opening_at: number | string
   state: string
@@ -74,6 +74,9 @@ export interface PumpObj {
   sellers_24h?: number
   platform: string
   is_streaming?: boolean
+  platform_id: string
+  pump_pair_address: string
+  rTime?: number
 }
 
 interface Pair {
