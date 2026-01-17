@@ -56,7 +56,10 @@ export const WSEventType = {
   SIGNALSV2_PUBLIC_MONITOR: 'signalsv2_public_monitor',
   PUBLIC_PORTRAIT: 'public_portrait',
   SIMPLE_TX: 'simple_tx',
-  PUMP_MIGRATED: 'pump_migrated',
+  PUMP_MIGRATED: 'pump_migrated'
+}
+export const WSEventV2Type = {
+  PORTRAIT_STATISTICS: 'portrait_statistics'
 }
 // perp
 export const WSPerpHost = 'wss://quote.edgex.exchange'

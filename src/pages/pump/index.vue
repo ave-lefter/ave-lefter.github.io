@@ -346,6 +346,16 @@ const activeTab = shallowRef('new')
 const route = useRoute()
 const { t } = useI18n()
 const wsStore = useWSStore()
+const wsv2Store = useV2WSStore()
+const isInitObj = ref<{
+  new: boolean,
+  soon: boolean,
+  graduated: boolean
+}>({
+  new: true,
+  soon: true,
+  graduated: true
+})
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const activeChain = useStorage<ChainKey>(
   'pump_activeChain',
@@ -394,9 +404,17 @@ const isPausedObj = ref({
   graduated: false,
 })
 
-const wsTableListCache = shallowRef<PumpObj[]>([])
-const wsTableList = shallowRef<PumpObj[]>([])
-const logoList = shallowRef<{logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
+const wsTableListCache = ref<PumpObj[]>([])
+const wsTableList = ref<PumpObj[]>([])
+const logoList = ref<{ logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
+const statisticsList = ref<{
+  chain: string
+  token: string
+  holder_count: number
+  rat_raio: string
+  dev_ratio: string
+  sniper_ratio: string
+}[]>([])
 
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
@@ -457,9 +475,28 @@ const list1 = computed(() => {
       }
     })
   }
+  if (statisticsList?.value?.length > 0 && filterList?.length > 0) {
+    filterList = filterList.map(i => {
+      const obj = statisticsList.value?.find(y => y.token == i.target_token)
+      // if (Number(obj?.rat_raio) || Number(obj?.dev_ratio) || Number(obj?.sniper_ratio)) {
+      //   console.log('---------obj----------',obj)
+      // }
+      if (obj) {
+        return {
+          ...i,
+          ...obj,
+          insider_balance_ratio_cur: Number(obj?.rat_raio),
+          dev_balance_ratio_cur: Number(obj?.dev_ratio),
+          sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
+          holders: obj?.holder_count
+        }
+      } else {
+        return i
+      }
+    })
+  }
   return filterList?.slice?.(0, 100)
 })
-
 const list2 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.soon || []
   if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
@@ -486,6 +523,26 @@ const list2 = computed(() => {
             logo_url: obj?.logo_url,
             name: obj?.name,
             symbol: obj?.symbol
+          }
+        } else {
+          return i
+        }
+      })
+    }
+    if (statisticsList?.value?.length > 0 && filterList?.length > 0) {
+      filterList = filterList.map(i => {
+        const obj = statisticsList.value?.find(y => y.token == i.target_token)
+      // if (Number(obj?.rat_raio) || Number(obj?.dev_ratio) || Number(obj?.sniper_ratio)) {
+      //   console.log('---------obj----------',obj)
+      // }
+        if (obj) {
+          return {
+            ...i,
+            ...obj,
+            insider_balance_ratio_cur: Number(obj?.rat_raio) ,
+            dev_balance_ratio_cur: Number(obj?.dev_ratio) ,
+            sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
+            holders: obj?.holder_count
           }
         } else {
           return i
@@ -526,8 +583,29 @@ const list2 = computed(() => {
         }
       })
     }
+    if (statisticsList?.value?.length > 0 && filterList?.length > 0) {
+      filterList = filterList.map(i => {
+        const obj = statisticsList.value?.find(y => y.token == i.target_token)
+        // if (Number(obj?.rat_raio) || Number(obj?.dev_ratio) || Number(obj?.sniper_ratio)) {
+        //   console.log('---------obj----------',obj)
+        // }
+        if (obj) {
+          return {
+            ...i,
+            ...obj,
+            insider_balance_ratio_cur: Number(obj?.rat_raio),
+            dev_balance_ratio_cur: Number(obj?.dev_ratio),
+            sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
+            holders: obj?.holder_count
+          }
+        } else {
+          return i
+        }
+      })
+    }
     return filterList?.slice?.(0, 100)
   })
+
 const scrollHeight = computed(()=>{
   return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
 })
@@ -595,18 +673,38 @@ watch(activeChain, () => {
 watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
   if (Array.isArray(val) && documentVisible.value) {
     wsUpdateTableList(val)
+    wsv2Store.send({
+      jsonrpc: '2.0',
+      method: 'subscribe',
+      params: ['portrait_statistics', { "tks": val?.map(i=>({ ch: i.chain, tk: i?.pair?.target_token }))}],
+      id: 1,
+    })
   }
 })
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
   if (val && documentVisible.value) {
     const rTime = Date.now()
     const obj = { ...val, rTime: rTime }
-        // console.log('----obj------',obj.symbol,'--MC--',obj.market_cap, '--progress--',obj.progress,  '--top--',obj.holders_top10_ratio  )
     logoList.value = logoList?.value?.filter?.(i => i.token !== obj.token && rTime - (i.rTime || 0) <= 16000)
     logoList.value.unshift(obj)
+    if (logoList.value?.length > 300) {
+      logoList.value = logoList.value?.slice?.(0,300)
+    }
   }
 })
 
+watch(() => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS], (val) => {
+  if ( Array.isArray(val) && val?.length >0) {
+    const map = new Map<string, any>()
+    statisticsList.value.forEach(item => {
+      map.set(item.token, item)
+    })
+    val.forEach(item => {
+      map.set(item.token, item)
+    })
+    statisticsList.value = Array.from(map.values()).slice(0, 300)
+  }
+})
 const getChangedValue = (A: string[], B: string[]): string | null => {
   for (let i = 0; i < A.length; i++) {
     if (A[i] !== B[i]) {
@@ -636,6 +734,12 @@ onMounted(() => {
       id: 1,
     })
   }, 500)
+
+  isInitObj.value = {
+    new: true,
+    soon: true,
+    graduated: true
+  }
 })
 
 onUnmounted(()=>{
@@ -653,6 +757,12 @@ onUnmounted(()=>{
       Timer[timerKey] = null
     }
   }
+  wsv2Store.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: ['portrait_statistics'],
+    id: 1,
+  })
 })
 
 const mouseInsideTxs = throttle(function (event) {
@@ -962,6 +1072,20 @@ async function getPump(rawParams: {
     wsTableListCache.value = wsTableListCache.value
       .filter(i => !newPairSet.has(i.pair))
       .slice(0, 100)
+
+    if(isInitObj.value[finalParams.category as keyof typeof isInitObj.value]) {
+      const tks = formattedList?.slice?.(0, 100)?.map?.((i) => ({ ch: i.chain, tk: i.target_token }))
+      if (tks?.length > 0) {
+        wsv2Store.send({
+          jsonrpc: '2.0',
+          method: 'subscribe',
+          params: ['portrait_statistics', { "tks": tks }],
+          id: 1,
+        })
+      } else {
+        isInitObj.value[finalParams.category as keyof typeof isInitObj.value] = false
+      }
+    }
 
   } catch (err) {
     console.error('Fetch pump list failed:', err)

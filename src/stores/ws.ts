@@ -83,7 +83,7 @@ export const useWSStore = defineStore('ws', () => {
         wsResult[event] = data?.msgs
       } else if (event === WSEventType.TOKEN_UPDATED) {
         wsResult[event] = data?.msg
-      } else if(event === WSEventType.PUBLIC_PORTRAIT){
+      } else if (event === WSEventType.PUBLIC_PORTRAIT) {
         usePublicPortraitStore().updatePublicPortrait(data?.msg || [])
       } else {
         wsResult[event] = data

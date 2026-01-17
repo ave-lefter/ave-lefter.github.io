@@ -489,19 +489,19 @@
                     </div>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'sniper')"
-                      v-tooltip="$t('snipers')"
+                      v-tooltip="$t('sniper2')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                        color: Number(row?.sniper_count) > 30 ? '#F6465D' : '#12B886',
+                        color: Number(row?.sniper_balance_ratio_cur) > 30 ? '#F6465D' : '#12B886',
                       }"
                     >
                       <Icon class="iconfont icon-gun text-12px mr-4px" name="custom:gun" />
                       <span>{{
                         formatNumber(
-                          Number(row?.sniper_count) > 0.001 ? row?.sniper_count || 0 : 0,
+                          Number(row?.sniper_balance_ratio_cur) > 0.001 ? row?.sniper_balance_ratio_cur || 0 : 0,
                           2
                         )
-                      }}</span>
+                      }}%</span>
                     </div>
                     <!-- <div
                       v-show="pumpSetting?.define?.some((i) => i === 'cabal')"
@@ -1219,18 +1219,22 @@ const getAnimClass = (itemData: any) => {
   transition: transform 0.3s ease;
 }
 
-/* 1. 新行入场：从上方滑入并淡入 */
+/* 1. 新行入场：从上方滑入并淡入
 .anim-enter {
   animation: slideIn 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   z-index: 10;
 }
 
+*/
+
 /* 2. 旧行下推补偿：
    数据置顶时，虚拟滚动将旧行瞬间下移了 70px。
-   我们让内层瞬间反向向上偏移 70px（回原位），然后平滑归位到 0。 */
+   我们让内层瞬间反向向上偏移 70px（回原位），然后平滑归位到 0。 
 .anim-push {
   animation: pushDown 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
+
+ */
 
 @keyframes slideIn {
   from { transform: translateY(-100%); opacity: 0; }
