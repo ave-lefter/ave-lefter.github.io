@@ -414,6 +414,7 @@ const statisticsList = ref<{
   rat_raio: string
   dev_ratio: string
   sniper_ratio: string
+  progress: string
 }[]>([])
 
 const platformsList = computed(() => {
@@ -475,35 +476,36 @@ const list1 = computed(() => {
       }
     })
   }
-  if (statisticsList?.value?.length > 0 && filterList?.length > 0) {
+  if (statisticsList?.value?.length && filterList?.length) {
     filterList = filterList.map(i => {
-      const obj = statisticsList.value?.find(y => y.token == i.target_token)
-      // if (Number(obj?.rat_raio) || Number(obj?.dev_ratio) || Number(obj?.sniper_ratio)) {
-      //   console.log('---------obj----------',obj)
-      // }
-      if (obj) {
-        if ('progress' in obj) {
-          console.log('-------progress-----------', obj?.progress)
-          return {
-            ...i,
-            ...obj,
-            progress: obj?.progress
-          }
-        } else {
-          return {
-            ...i,
-            ...obj,
-            insider_balance_ratio_cur: Number(obj?.rat_raio),
-            dev_balance_ratio_cur: Number(obj?.dev_ratio),
-            sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
-            holders: obj?.holder_count
-          }
-        }
-      } else {
-        return i
+      const obj = statisticsList.value.find(
+        y => y.token === i.target_token
+      )
+      if (!obj) return i
+
+      const next = { ...i }
+
+      // progress（独立）
+      if (obj.progress) {
+        next.progress = Number(obj.progress)
       }
+      // holders & ratios（独立）
+      if (obj.holder_count) {
+        next.holders = obj.holder_count
+      }
+      if (obj.rat_raio) {
+        next.insider_balance_ratio_cur = Number(obj.rat_raio)
+      }
+      if (obj.dev_ratio) {
+        next.dev_balance_ratio_cur = Number(obj.dev_ratio)
+      }
+      if (obj.sniper_ratio) {
+        next.sniper_balance_ratio_cur = Number(obj.sniper_ratio)
+      }
+      return next
     })
   }
+
   return filterList?.slice?.(0, 100)
 })
 const list2 = computed(() => {
@@ -538,24 +540,33 @@ const list2 = computed(() => {
         }
       })
     }
-    if (statisticsList?.value?.length > 0 && filterList?.length > 0) {
+    if (statisticsList?.value?.length && filterList?.length) {
       filterList = filterList.map(i => {
-        const obj = statisticsList.value?.find(y => y.token == i.target_token)
-      // if (Number(obj?.rat_raio) || Number(obj?.dev_ratio) || Number(obj?.sniper_ratio)) {
-      //   console.log('---------obj----------',obj)
-      // }
-        if (obj) {
-          return {
-            ...i,
-            ...obj,
-            insider_balance_ratio_cur: Number(obj?.rat_raio) ,
-            dev_balance_ratio_cur: Number(obj?.dev_ratio) ,
-            sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
-            holders: obj?.holder_count
-          }
-        } else {
-          return i
+        const obj = statisticsList.value.find(
+          y => y.token === i.target_token
+        )
+        if (!obj) return i
+
+        const next = { ...i }
+
+        // progress（独立）
+        if (obj.progress) {
+          next.progress = Number(obj.progress)
         }
+        // holders & ratios（独立）
+        if (obj.holder_count) {
+          next.holders = obj.holder_count
+        }
+        if (obj.rat_raio) {
+          next.insider_balance_ratio_cur = Number(obj.rat_raio)
+        }
+        if (obj.dev_ratio) {
+          next.dev_balance_ratio_cur = Number(obj.dev_ratio)
+        }
+        if (obj.sniper_ratio) {
+          next.sniper_balance_ratio_cur = Number(obj.sniper_ratio)
+        }
+        return next
       })
     }
     return filterList?.slice?.(0, 100)
@@ -592,24 +603,33 @@ const list2 = computed(() => {
         }
       })
     }
-    if (statisticsList?.value?.length > 0 && filterList?.length > 0) {
+    if (statisticsList?.value?.length && filterList?.length) {
       filterList = filterList.map(i => {
-        const obj = statisticsList.value?.find(y => y.token == i.target_token)
-        // if (Number(obj?.rat_raio) || Number(obj?.dev_ratio) || Number(obj?.sniper_ratio)) {
-        //   console.log('---------obj----------',obj)
-        // }
-        if (obj) {
-          return {
-            ...i,
-            ...obj,
-            insider_balance_ratio_cur: Number(obj?.rat_raio),
-            dev_balance_ratio_cur: Number(obj?.dev_ratio),
-            sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
-            holders: obj?.holder_count
-          }
-        } else {
-          return i
+        const obj = statisticsList.value.find(
+          y => y.token === i.target_token
+        )
+        if (!obj) return i
+
+        const next = { ...i }
+
+        // progress（独立）
+        if (obj.progress) {
+          next.progress = Number(obj.progress)
         }
+        // holders & ratios（独立）
+        if (obj.holder_count) {
+          next.holders = obj.holder_count
+        }
+        if (obj.rat_raio) {
+          next.insider_balance_ratio_cur = Number(obj.rat_raio)
+        }
+        if (obj.dev_ratio) {
+          next.dev_balance_ratio_cur = Number(obj.dev_ratio)
+        }
+        if (obj.sniper_ratio) {
+          next.sniper_balance_ratio_cur = Number(obj.sniper_ratio)
+        }
+        return next
       })
     }
     return filterList?.slice?.(0, 100)
@@ -692,25 +712,70 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
 })
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
   if (val && documentVisible.value) {
-    logoList.value.unshift(obj)
+    logoList.value.unshift(val)
     if (logoList.value?.length > 300) {
       logoList.value = logoList.value?.slice?.(0,300)
     }
   }
 })
 
-watch(() => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS], (val) => {
-  if ( Array.isArray(val) && val?.length >0) {
+
+function mergeStatistics(prev: any, next: any) {
+  const result = { ...prev }
+
+  // progress 结构
+  if (next.progress != null) {
+    result.progress = next.progress
+  }
+
+  // ratio 结构
+  if (next.holder_count != null) {
+    result.holder_count = next.holder_count
+  }
+  if (next.rat_raio != null) {
+    result.rat_raio = next.rat_raio
+  }
+  if (next.dev_ratio != null) {
+    result.dev_ratio = next.dev_ratio
+  }
+  if (next.sniper_ratio != null) {
+    result.sniper_ratio = next.sniper_ratio
+  }
+
+  // 公共字段（可选）
+  if (next.chain != null) {
+    result.chain = next.chain
+  }
+  if (next.token != null) {
+    result.token = next.token
+  }
+
+  return result
+}
+watch(
+  () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
+  (val) => {
+    if (!Array.isArray(val) || !val.length) return
     const map = new Map<string, any>()
+    // 先放旧数据
     statisticsList.value.forEach(item => {
       map.set(item.token, item)
     })
+
+    // 再 merge 新数据（⚠️ 关键）
     val.forEach(item => {
-      map.set(item.token, item)
+      const prev = map.get(item.token)
+      if (prev) {
+        map.set(item.token, mergeStatistics(prev, item))
+      } else {
+        map.set(item.token, item)
+      }
     })
+
     statisticsList.value = Array.from(map.values()).slice(0, 300)
   }
-})
+)
+
 const getChangedValue = (A: string[], B: string[]): string | null => {
   for (let i = 0; i < A.length; i++) {
     if (A[i] !== B[i]) {
@@ -816,7 +881,7 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
     id: `${i.pair.target_token}-${i.chain}`,
     pair_id: `${i.pair.pair}-${i.chain}`,
     token: i.pair.target_token,
-    progress: Number(i.pair.progress || 0),
+    progress: 0,
     symbol:
       i.pair.target_token == i.pair.token0_address
         ? i?.pair.token0_symbol
