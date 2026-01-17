@@ -309,7 +309,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage, useWindowSize, useThrottleFn } from '@vueuse/core'
+import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility } from '@vueuse/core'
 import QuickSwapSet from '@/components/quickSwap/quickSwapSet.vue'
 import PumpList from './pumpList.vue'
 import Setting from './setting.vue'
@@ -353,7 +353,7 @@ const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const activeChain = useStorage<ChainKey>(
   'pump_activeChain',
   'solana',
-  sessionStorage
+  localStorage
 )
 const audioUrl = ref('')
 const globalStore = useGlobalStore()
@@ -666,7 +666,7 @@ watch(activeChain, () => {
   }, 500)
 })
 watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
-  if (Array.isArray(val)) {
+  if (Array.isArray(val) && documentVisible.value) {
     wsUpdateTableList(val)
     wsv2Store.send({
       jsonrpc: '2.0',
@@ -677,7 +677,7 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
   }
 })
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
-  if (val) {
+  if (val && documentVisible.value) {
     const rTime = Date.now()
     const obj = { ...val, rTime: rTime }
     logoList.value = logoList?.value?.filter?.(i => i.token !== obj.token && rTime - (i.rTime || 0) <= 16000)
@@ -1040,7 +1040,7 @@ function getPump(params, isFilter = false) {
     clearTimeout(Timer[params.category])
     Timer[params.category] = null
   }
-  if (route.name !== 'pump') {
+  if (route.name !== 'pump' || !documentVisible.value) {
     return
   }
   if ((isPausedObj.value?.[params.category] || route.name !== 'pump') && !isFilter) {
@@ -1273,6 +1273,16 @@ function switchChain(item: { chain: ChainKey }) {
   console.log('------switchChain--------',item.chain)
   activeChain.value = item.chain
 }
+
+const documentVisible = useDocumentVisibility()
+
+watch(documentVisible, (val) => {
+  if (val) {
+    if (route.name === 'pump') {
+      getPumpList()
+    }
+  }
+})
 </script>
 
 <style scoped lang="scss">
