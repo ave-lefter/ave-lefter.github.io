@@ -43,7 +43,7 @@ function onBlur(index: number) {
     <template #reference>
       <Icon
         name="custom:filter"
-        :class="`${isActive?'color-[--secondary-text]':'color-[--third-text]'} cursor-pointer text-10px`"
+        :class="`${isActive?'color-[--primary-color]':'color-[--third-text]'} cursor-pointer text-10px`"
       />
     </template>
     <template #default>

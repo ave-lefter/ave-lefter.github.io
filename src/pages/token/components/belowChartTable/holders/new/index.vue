@@ -5,20 +5,52 @@
       <div
         class="flex items-center whitespace-nowrap overflow-x-auto scrollbar-hide tab-width w-100%"
       >
+      <template v-for="item in tabs"
+      :key="item.value">
         <a
-          v-for="item in tabs"
-          :key="item.value"
-          href="javascript:;"
-          :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
-         ${
-           activeTab === item.value
-             ? 'bg-[--tab-active-bg] color-[--main-text]'
-             : 'color-[--third-text]'
-         }`"
-          @click="setActiveTab(item.value as typeof activeTab)"
-        >
-          {{ item.label }}
-        </a>
+        v-if="holdersTooltip(t)[item.type]"
+          v-tooltip="holdersTooltip(t)[item.type]"
+            href="javascript:;"
+            :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
+            ${
+              activeTab === item.value
+                ? 'bg-[--tab-active-bg] color-[--main-text]'
+                : 'color-[--third-text]'
+            }`"
+            @click="setActiveTab(item.value as typeof activeTab)"
+          >
+            {{ item.label }}
+          </a>
+          <a
+            v-else
+            href="javascript:;"
+            :class="`decoration-none shrink-0 text-12px lh-16px text-center px-12px py-4px rounded-4px
+            ${
+              activeTab === item.value
+                ? 'bg-[--tab-active-bg] color-[--main-text]'
+                : 'color-[--third-text]'
+            }`"
+            @click="setActiveTab(item.value as typeof activeTab)"
+          >
+            {{ item.label }}
+          </a>
+      </template>
+      </div>
+    </div>
+    <div v-if="aggregateStats?.top100Ratio > 0 ||aggregateStats?.top100PurchaseAvg > 0 ||  aggregateStats?.top100SellAvg > 0" class="flex-start px-12px mb-12px text-12px">
+      <div>
+        <span class="color-[--third-text]">Top100:</span>
+        <span class="ml-4px">{{ formatNumber(aggregateStats?.top100Ratio * 100 || 0, 2) }}%</span>
+      </div>
+      <div class="ml-16px">
+        <span class="color-[--third-text]">{{ $t('top100PurchaseAvg') }}:</span>
+        <span class="ml-4px">${{ formatNumber(aggregateStats?.top100PurchaseAvg || 0, 2) }}</span>
+        <span v-if="Number(price) >0" class="ml-4px" :class="Number(aggregateStats?.top100PurchaseAvg) < Number(price) ? 'color-[--up-color]': 'color-[--down-color]'">({{ aggregateStats?.top100PurchaseAvg >0? formatNumber((Number(price) - Number(aggregateStats?.top100PurchaseAvg))/Number(aggregateStats?.top100PurchaseAvg) *100 || 0, 2)+'%' : 0 }})</span>
+      </div>
+      <div class="ml-16px">
+        <span class="color-[--third-text]">{{ $t('top100SellAvg') }}:</span>
+        <span class="ml-4px">${{ formatNumber(aggregateStats?.top100SellAvg || 0, 2) }}</span>
+        <span v-if="Number(price) >0" class="ml-4px" :class="Number(aggregateStats?.top100SellAvg) < Number(price) ? 'color-[--up-color]': 'color-[--down-color]'">({{aggregateStats?.top100SellAvg >0? formatNumber((Number(price) - Number(aggregateStats?.top100SellAvg))/Number(aggregateStats?.top100SellAvg) *100 || 0, 2)+'%' : 0 }})</span>
       </div>
     </div>
     <ul v-show="!['all']?.includes?.(activeTab)" class="section-4">
@@ -152,6 +184,7 @@
             @handleSortChange="handleSortChange"
             @filterAddress="filterAddress"
             @filterOriginAddress="filterOriginAddress"
+            @reLoad="reLoad"
           />
           <!-- <el-tooltip
             v-if="['solana', 'bsc']?.includes(chain) && !show_bubble"
@@ -220,7 +253,7 @@ import {
   type AggregateStats,
   type HolderStat,
 } from '@/api/holders'
-import { useLocalStorage } from '@vueuse/core'
+import { useEventBus, useLocalStorage } from '@vueuse/core'
 import List from './list.vue'
 import LineContent from './lineContent.vue'
 const holderListSortObj = useLocalStorage('holderListSortObj', {
@@ -373,6 +406,11 @@ watch(activeTab, (val) => {
   // if (searchKeyword) {
   //   this.filterAddress(this.searchKeyword)
   // }
+  reLoad(val)
+})
+
+function reLoad(val=activeTab.value) {
+  console.log('reLoad', val)
   if (val === 'buy' || val === 'sell') {
     const prop = val === 'buy' ? 'ascending' : 'descending'
     holdersRef?.value?.sort('total_profit', prop)
@@ -391,7 +429,8 @@ watch(activeTab, (val) => {
       getHoldersList()
     }
   }
-})
+}
+
 onMounted(() => {
   //getHoldersList()
 })
@@ -469,7 +508,7 @@ function getHoldersList(sortObj?: { sort_by: string; order: string }) {
     })
 }
 function handleSortChange(obj: { prop: string; order: string }) {
-  getHoldersList({ sort_by: obj.prop, order: obj.order?.replace('ending', '') })
+  getHoldersList({ sort_by: obj?.prop, order: obj?.order?.replace('ending', '') })
 }
 function filterOriginAddress(row:{ address: string, type: string }) {
   if (searchOriginKeyword.value) {

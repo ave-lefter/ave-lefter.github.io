@@ -91,3 +91,7 @@ html, body {
 .chart-markup-table.pane.pane--cursor-default:has(.tooltip-eSLcXvvL) {
   cursor: pointer;
 }
+
+.titlesWrapper-l31H9iuA {
+  pointer-events: none;
+}

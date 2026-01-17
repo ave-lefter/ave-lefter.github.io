@@ -96,7 +96,7 @@
       </div>
     </div>
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full px-16px">
-      <el-col v-show="single('new') && pumpSetting.grid['new'].show" :span="getSpan()" :style="{order: orderNew}">
+      <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
         <div class="pump-item  rounded-4px" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px">
             <template v-if="width > 1024">
@@ -309,7 +309,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage, useWindowSize, useThrottleFn } from '@vueuse/core'
+import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility } from '@vueuse/core'
 import QuickSwapSet from '@/components/quickSwap/quickSwapSet.vue'
 import PumpList from './pumpList.vue'
 import Setting from './setting.vue'
@@ -343,20 +343,20 @@ const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const activeChain = useStorage<ChainKey>(
   'pump_activeChain',
   'solana',
-  sessionStorage
+  localStorage
 )
 const audioUrl = ref('')
 const globalStore = useGlobalStore()
 const { pumpSetting, token_logo_url, pumpBlackList } = storeToRefs(globalStore)
 
 const orderNew = computed(() => {
-  return pumpSetting.value.grid['new'].order
+  return pumpSetting.value.grid['new']?.order
 })
 const orderSoon = computed(() => {
-  return pumpSetting.value.grid['soon'].order
+  return pumpSetting.value.grid['soon']?.order
 })
 const orderGraduated= computed(() => {
-  return pumpSetting.value.grid['graduated'].order
+  return pumpSetting.value.grid['graduated']?.order
 })
 const pumpConfig = shallowRef<PumpConfig[]>()
 const isRotate = ref(false)
@@ -389,9 +389,9 @@ const isPausedObj = ref({
   graduated: false,
 })
 
-const wsTableListCache = ref<PumpObj[]>([])
-const wsTableList = ref<PumpObj[]>([])
-const logoList = ref<{logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
+const wsTableListCache = shallowRef<PumpObj[]>([])
+const wsTableList = shallowRef<PumpObj[]>([])
+const logoList = shallowRef<{logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
 
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
@@ -452,7 +452,7 @@ const list1 = computed(() => {
       }
     })
   }
-  return filterList
+  return filterList?.slice?.(0, 100)
 })
 
 const list2 = computed(() => {
@@ -487,7 +487,7 @@ const list2 = computed(() => {
         }
       })
     }
-    return filterList
+    return filterList?.slice?.(0, 100)
   })
   const list3 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.graduated || []
@@ -521,7 +521,7 @@ const list2 = computed(() => {
         }
       })
     }
-    return filterList
+    return filterList?.slice?.(0, 100)
   })
 const scrollHeight = computed(()=>{
   return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
@@ -588,17 +588,14 @@ watch(activeChain, () => {
   }, 500)
 })
 watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
-  if (Array.isArray(val)) {
+  if (Array.isArray(val) && documentVisible.value) {
     wsUpdateTableList(val)
   }
 })
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
-  if (val) {
-    const rTime = Date.now()
-    const obj = { ...val, rTime: rTime }
-        // console.log('----obj------',obj.symbol,'--MC--',obj.market_cap, '--progress--',obj.progress,  '--top--',obj.holders_top10_ratio  )
-    logoList.value = logoList?.value?.filter?.(i => i.token !== obj.token && rTime - (i.rTime || 0) <= 16000)
-    logoList.value.unshift(obj)
+  if (val && documentVisible.value) {
+    logoList.value.unshift(val)
+    logoList.value?.slice(0, 300)
   }
 })
 
@@ -747,8 +744,8 @@ function wsUpdateTableList(wsList: WSPump[]) {
           : i?.pair.token1_logo_url,
 
       }))
-      const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address) && rTime - (i.rTime || 0) <= 15000)
-      wsTableListCache.value = [...list, ...(wsTableList1 || [])]
+      const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
+      wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,100)
       // let wsTime = this.wsTableListCache?.time || 0
       // if (wsTime < Date.now() - 15000) {
       //   this.wsTableListCache = {
@@ -917,7 +914,9 @@ function getPump(params, isFilter = false) {
     clearTimeout(Timer[params.category])
     Timer[params.category] = null
   }
-
+  if (route.name !== 'pump' || !documentVisible.value) {
+    return
+  }
   if ((isPausedObj.value?.[params.category] || route.name !== 'pump') && !isFilter) {
     Timer[params.category] = setTimeout(() => {
       getPump(params)
@@ -981,18 +980,18 @@ function getPump(params, isFilter = false) {
           medias: getMedias(i.appendix)
         }
       })
-      fourmemeListObj[activeChain.value][params.category as CategoryKey] = list
+      fourmemeListObj[activeChain.value][params.category as CategoryKey] = list?.slice?.(0,100)
       wsTableListCache.value =
         wsTableListCache?.value.filter?.(
           (i) => !list?.some?.((j) => j?.pair === i?.pair)
-      ) || []
+      )?.slice?.(0,100) || []
     })
     .finally(() => {
       pumpV3.value[chain][params.category]['loading'] = false
       pumpV3.value[chain][params.category].count ++
       Timer[params.category] = setTimeout(() => {
             getPump(params)
-          }, 5000)
+          }, 10000)
     })
 }
 function getMedias(appendix: string) {
@@ -1085,7 +1084,6 @@ function getFilterData(list, conditions) {
           pass = pass && i.tvl <= Number(conditions.tvl_max)
         }
         if (pumpV3.value[activeChain.value].platforms.length > 0) {
-          console.log('--------------pumpV3--------',pumpV3.value[activeChain.value].platforms.includes(i.platform_id))
           pass = pass && pumpV3.value[activeChain.value].platforms.includes(i.platform_id)
         }
         if (conditions?.holder_min) {
@@ -1136,6 +1134,16 @@ function switchChain(item: { chain: ChainKey }) {
   console.log('------switchChain--------',item.chain)
   activeChain.value = item.chain
 }
+
+const documentVisible = useDocumentVisibility()
+
+watch(documentVisible, (val) => {
+  if (val) {
+    if (route.name === 'pump') {
+      getPumpList()
+    }
+  }
+})
 </script>
 
 <style scoped lang="scss">

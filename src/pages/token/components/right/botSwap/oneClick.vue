@@ -251,7 +251,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       slippage: slippage !== 'auto' ? Number(new BigNumber(slippage || '9').times(100).toFixed(0)) : 900,
       autoSlippage: slippage === 'auto',
       autoSell: isBuy ? botSettingStore.autoSellConfig_autoSell || false : false,
-      autoSellConfig: botSettingStore?.autoSellConfig,
+      autoSellConfig: botSettingStore?.selectedAutoSellConfig,
       autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellPriorityFee: botPriorityFee
@@ -351,7 +351,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       slippage: slippage !== 'auto' ? Number(new BigNumber(slippage || '9').times(100).toFixed(0)) : 900,
       autoSlippage: slippage === 'auto',
       autoSell: isBuy ? botSettingStore.autoSellConfig_autoSell || false : false,
-      autoSellConfig: botSettingStore?.autoSellConfig,
+      autoSellConfig: botSettingStore?.selectedAutoSellConfig,
       autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellPriorityFee: gasTip
@@ -647,6 +647,8 @@ onUnmounted(() => {
           color: #12b886;
           border: 1px solid #12b886;
           &.active {
+            position: relative;
+            z-index: 3100;
             &:nth-child(1)::after {
               content: 'Q';
             }
@@ -666,6 +668,8 @@ onUnmounted(() => {
           color: #ff646d;
           border: 1px solid #ff646d;
           &.active {
+            position: relative;
+            z-index: 3100;
             &:nth-child(1)::after {
               content: 'A';
             }

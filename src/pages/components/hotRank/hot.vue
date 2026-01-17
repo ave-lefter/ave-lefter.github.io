@@ -55,7 +55,7 @@ const props = defineProps<{
   ammList: IGetTreasureConfig['swaps']
 }>()
 const aveTableRef = useTemplateRef('aveTableRef')
-const {rankConditions} = storeToRefs(globalStore)
+const { rankConditions } = storeToRefs(globalStore)
 function setSortConditions(params: { sort: string; sort_dir: string }) {
   rankConditions.value.hot.sort = params
   pageInfo.value.pageNO = 1
@@ -75,11 +75,11 @@ const filteredListData = computed(() => {
   if (globalStore.pumpSetting.isBlacklist) {
     result = result.filter((el) => !inBlackList(el))
   }
-  if(rankKlineStore.klineRow.id){
-    const index = result.findIndex(el => el.id === rankKlineStore.klineRow.id)
-    if(index !== -1){
-      result.splice(index+1,0,{
-        isKline:true
+  if (rankKlineStore.klineRow.id) {
+    const index = result.findIndex((el) => el.id === rankKlineStore.klineRow.id)
+    if (index !== -1) {
+      result.splice(index + 1, 0, {
+        isKline: true,
       })
     }
   }
@@ -100,13 +100,15 @@ const pageInfo = ref({
   total: 0,
 })
 const loading = shallowRef(false)
-const columns = useStorage('hotRanks', getHotDefaultColumns(t))
+const columns = useStorage(CategoryTabsCacheKey.hot, getHotDefaultColumns(t))
 
 function tableRowClick({ rowData }: RowEventHandlerParams) {
-  const {klineRow:{id}} = rankKlineStore
-  if(rowData.isKline){
+  const {
+    klineRow: { id },
+  } = rankKlineStore
+  if (rowData.isKline) {
     return
-  } else if(id && rowData.id !== id){
+  } else if (id && rowData.id !== id) {
     toggleKline(rankKlineStore.klineRow)
     return
   }
@@ -136,17 +138,17 @@ onActivated(() => {
       _getTreasureList()
     }
   }, 100)
-  window.addEventListener('beforeunload',resetKline)
-  if(aveTableRef.value){
+  window.addEventListener('beforeunload', resetKline)
+  if (aveTableRef.value) {
     aveTableRef.value.scrollToLeft(0)
   }
 })
 
 function resetKline() {
-  if(rankKlineStore.klineRow.id){
+  if (rankKlineStore.klineRow.id) {
     toggleKline(rankKlineStore.klineRow)
   }
-  window.removeEventListener('beforeunload',resetKline)
+  window.removeEventListener('beforeunload', resetKline)
 }
 
 onDeactivated(() => {
@@ -181,35 +183,41 @@ watch(
   }
 )
 
-watch(()=>pageInfo.value.pageNO,()=>{
-  if(aveTableRef.value){
-    setTimeout(()=>{
-      aveTableRef.value.scrollToTop(0)
-    },20)
+watch(
+  () => pageInfo.value.pageNO,
+  () => {
+    if (aveTableRef.value) {
+      setTimeout(() => {
+        aveTableRef.value.scrollToTop(0)
+      }, 20)
+    }
   }
-})
+)
 
-watch(()=>[globalStore.rankCommon.activeInterval],()=>{
-  getKlinePreviews()
-})
+watch(
+  () => [globalStore.rankCommon.activeInterval],
+  () => {
+    getKlinePreviews()
+  }
+)
 
 function getKlinePreviews() {
-  const pair_ids = listData.value.map(el=>el.pair_id).toString()
-  if(!pair_ids.length){
+  const pair_ids = listData.value.map((el) => el.pair_id).toString()
+  if (!pair_ids.length) {
     return
   }
   return klinePreviews({
-    category:'u',
-    interval:({
-      '1m':60,
-      '5m':300,
-      '15m':900,
-      '1h':3600,
-      '4h':3600,
-      '24h':3600
-    }[globalStore.rankCommon.activeInterval]),
-    pair_ids
-  }).then((res)=>{
+    category: 'u',
+    interval: {
+      '1m': 60,
+      '5m': 300,
+      '15m': 900,
+      '1h': 3600,
+      '4h': 3600,
+      '24h': 3600,
+    }[globalStore.rankCommon.activeInterval],
+    pair_ids,
+  }).then((res) => {
     klineChartsData.value = res || []
   })
 }
@@ -223,17 +231,20 @@ async function _getTreasureList(shouldLoading = true) {
     }
     if (shouldLoading) {
       loading.value = true
-      if(rankKlineStore.klineRow.id){
+      if (rankKlineStore.klineRow.id) {
         toggleKline(rankKlineStore.klineRow)
       }
     }
     const { total: _, ...rest } = pageInfo.value
-    const finalFilter = ['created_at_max','created_at_min'].reduce((prev,cur)=>{
-      if(prev[cur]){
-        prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
-      }
-      return prev
-    },{...rankConditions.value.hot.filter})
+    const finalFilter = ['created_at_max', 'created_at_min'].reduce(
+      (prev, cur) => {
+        if (prev[cur]) {
+          prev[cur] = dayjs().unix() - Number(prev[cur]) * 60
+        }
+        return prev
+      },
+      { ...rankConditions.value.hot.filter }
+    )
     const res = await getTreasureList({
       category: 'hot',
       ...rest,
@@ -265,7 +276,7 @@ watch(
     // 只有在组件激活时才处理数据
     if (!isActive.value) return
     // k 线出现的时候不处理数据
-    if(rankKlineStore.klineRow.id){
+    if (rankKlineStore.klineRow.id) {
       return
     }
 
@@ -350,7 +361,7 @@ const headerRenderer = computed(() => {
   return {
     poolPair: PoolPairHeader,
     // headline: () => t('aiSummary'),
-    trendChart:TrendChartHeader,
+    trendChart: TrendChartHeader,
     mCap: MCapHeader,
     current_price_usd: PriceHeader,
     price_change_1m: DynamicPriceChangeHeader,
@@ -373,9 +384,11 @@ const cellRenderer = computed(() => {
   return {
     poolPair: PoolPairContent,
     // headline: Headline,
-    trendChart:({row})=>{
-      const klineData = klineChartsData.value.find(el=>el.pair === row.pair && el.chain === row.chain)
-      return <TrendChart list={klineData?.kline_data || []}/>
+    trendChart: ({ row }) => {
+      const klineData = klineChartsData.value.find(
+        (el) => el.pair === row.pair && el.chain === row.chain
+      )
+      return <TrendChart list={klineData?.kline_data || []} />
     },
     mCap: MCapContent,
     current_price_usd: PriceContent,
@@ -402,58 +415,58 @@ const cellRenderer = computed(() => {
   }
 })
 const Row = ({ cells, rowData }) => {
-  if(rowData.isKline){
-    return <TokenPage/>
+  if (rowData.isKline) {
+    return <TokenPage />
   }
   return cells
 }
 
-function getRowClass({rowData}:Parameters<RowClassNameGetter<any>>[0]) {
-    const commonClass = `cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)] ${rowData.isKline ? 'h-360px [--el-table-row-hover-bg-color:transparent] overflow-visible!' : 'h-81px'}`
-    if(rankKlineStore.klineRow.id && rowData.id !== rankKlineStore.klineRow.id && !rowData.isKline){
-        return 'row-disabled '+commonClass
-    } else {
-        return commonClass
-    }
+function getRowClass({ rowData }: Parameters<RowClassNameGetter<any>>[0]) {
+  const commonClass = `cursor-pointer [&&]:[--el-table-border:1px_solid_var(--main-divider)] ${rowData.isKline ? 'h-360px [--el-table-row-hover-bg-color:transparent] overflow-visible!' : 'h-81px'}`
+  if (rankKlineStore.klineRow.id && rowData.id !== rankKlineStore.klineRow.id && !rowData.isKline) {
+    return 'row-disabled ' + commonClass
+  } else {
+    return commonClass
+  }
 }
 
-function toggleKline(row:Record<string,any>) {
-    if(rankKlineStore.klineRow.id === row.id){
-      const rowIndex = filteredListData.value.findIndex(el => el.isKline)
-      rankKlineStore.klineRow = {}
-        resetColumns(false)
-        _getTreasureList(false)
-        setTimeout(()=>{
-          if(rowIndex !== -1 && aveTableRef.value){
-            aveTableRef.value.scrollToTop((rowIndex-1)*81)
-          }
-        })
-    } else {
-      rankKlineStore.klineRow = row
-        resetColumns(true)
-        rankKlineStore.getData(row)
-        clearTimeout(timer)
-        setTimeout(()=>{
-          if(aveTableRef.value){
-            const rowIndex = filteredListData.value.findIndex(el => el.isKline)
-            if(rowIndex!==-1){
-              aveTableRef.value.scrollToTop((rowIndex-1)*81)
-            }
-          }
-        },100)
-    }
+function toggleKline(row: Record<string, any>) {
+  if (rankKlineStore.klineRow.id === row.id) {
+    const rowIndex = filteredListData.value.findIndex((el) => el.isKline)
+    rankKlineStore.klineRow = {}
+    resetColumns(false)
+    _getTreasureList(false)
+    setTimeout(() => {
+      if (rowIndex !== -1 && aveTableRef.value) {
+        aveTableRef.value.scrollToTop((rowIndex - 1) * 81)
+      }
+    })
+  } else {
+    rankKlineStore.klineRow = row
+    resetColumns(true)
+    rankKlineStore.getData(row)
+    clearTimeout(timer)
+    setTimeout(() => {
+      if (aveTableRef.value) {
+        const rowIndex = filteredListData.value.findIndex((el) => el.isKline)
+        if (rowIndex !== -1) {
+          aveTableRef.value.scrollToTop((rowIndex - 1) * 81)
+        }
+      }
+    }, 100)
+  }
 }
 
-function resetColumns(needClear:boolean) {
-  const quickIndex = columns.value.findIndex(el => el.key === 'quick')
+function resetColumns(needClear: boolean) {
+  const quickIndex = columns.value.findIndex((el) => el.key === 'quick')
   if (columns.value[quickIndex] && columns.value[0]) {
     if (needClear) {
-      columns.value[0].fixed=''
-      columns.value[quickIndex].fixed=''
+      columns.value[0].fixed = ''
+      columns.value[quickIndex].fixed = ''
     } else {
-      columns.value[0].fixed='left'
-      columns.value[quickIndex].fixed='right'
-      localStorage.setItem('hotUserTableColumns',JSON.stringify(columns.value))
+      columns.value[0].fixed = 'left'
+      columns.value[quickIndex].fixed = 'right'
+      localStorage.setItem('hotUserTableColumns', JSON.stringify(columns.value))
     }
   }
 }
@@ -505,7 +518,7 @@ function resetColumns(needClear:boolean) {
           @toggleKline="toggleKline"
         />
       </template>
-      <template #row="{style,...rowProps}">
+      <template #row="{ style, ...rowProps }">
         <Row v-bind="rowProps" />
       </template>
     </AveTable>
@@ -529,11 +542,11 @@ function resetColumns(needClear:boolean) {
 :deep(.el-table-v2__row-cell) {
   @apply px-16px;
 }
-:deep{
-  .row-disabled{
-    --el-table-border:1px solid #1A1A1A;
-    &:before{
-      --uno:content-[''] absolute top-0 left-0 w-full bottom-0 bg-black/80 z-1;
+:deep {
+  .row-disabled {
+    --el-table-border: 1px solid #1a1a1a;
+    &:before {
+      --uno: content-[ ''] absolute top-0 left-0 w-full bottom-0 bg-black/80 z-1;
     }
   }
 }

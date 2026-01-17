@@ -33,16 +33,19 @@ export function useKlineMarks() {
   const tokenStore = useTokenStore()
   const localeStore = useLocaleStore()
   const botStore = useBotStore()
-
+  const walletStore = useWalletStore()
+  const globalStore = useGlobalStore()
   // 创建打点数据
   const marksTabs = computed(() => {
-    const arr = botStore.accessToken ? [{ id: 'trade', name: t('mine') }] : []
+    const arr = (botStore?.evmAddress || walletStore?.address) ? [{ id: 'trade', name: t('mine') }] : []
     return arr.concat(tokenStore.totalHolders?.filter?.(i => (i?.total_address || 0) > 0 && ['16','19','25','30','31']?.includes(i.type))?.map?.((i) => ({
       id: i.type,
-      name: i?.[filterLanguage(localeStore.locale)] + (i.type !== '31' ? `(${i?.total_address})` : '')
+      name: i?.[filterLanguage(localeStore.locale)]
+      // + (i.type !== '31' ? `(${i?.total_address})` : '')
     })))
   })
 
+  const markTabsVisible = useLocalStorage('tv_markTabsVisible',true)
   const markTabsChecked: RemovableRef<{ [key: string]: boolean }> = useLocalStorage('tv_markTabsChecked', {
     trade: true,
     16: false,
@@ -51,6 +54,34 @@ export function useKlineMarks() {
     30: false,
     31: true
   })
+
+  function createDisplayButton(_widget: IChartingLibraryWidget | null,headerBtns: HTMLElement[]){
+    const btn = _widget?.createButton()
+    if (!btn) return
+    btn.innerHTML = `<div style="cursor:pointer;display:flex;gap:8px;align-items:center">${t('display')}<svg xmlns="http://www.w3.org/2000/svg" width="9" height="6" viewBox="0 0 9 6" fill="none">
+<path d="M0.801296 0C0.123025 0 -0.2475 0.791086 0.186718 1.31215L3.47869 5.26251C3.79852 5.64631 4.388 5.64631 4.70784 5.26251L7.99981 1.31215C8.43402 0.791085 8.0635 0 7.38523 0H0.801296Z" fill="white"/>
+<script xmlns=""/></svg></div>`
+    btn.onclick = (e) => {
+      const rect = btn.getBoundingClientRect()
+      const x = rect.left - 320 + 44
+      const y = rect.top + 34
+      globalStore.klineSettingPop.position =
+      [x,y]
+      globalStore.klineSettingPop.visible = !globalStore.klineSettingPop.visible
+      let rootNode = e.target as HTMLElement
+      while(rootNode && !rootNode.classList.contains('chart-page')){
+        rootNode = rootNode.parentElement as HTMLElement
+      }
+      rootNode.onclick= (rootEvent) => {
+        if(rootEvent.currentTarget !== e.currentTarget){
+          globalStore.klineSettingPop.visible = false
+          rootNode = null as any
+        }
+      }
+    }
+    headerBtns.push(btn)
+    return btn.getBoundingClientRect()
+  }
 
   // 创建 打点 切换按钮
   function createMarkButton(_widget: IChartingLibraryWidget | null, headerBtns: HTMLElement[]) {
@@ -440,7 +471,9 @@ ${formatDate(entry.time, 'YYYY-MM-DD HH:mm')}
     createMarkButton,
     getMarks,
     wsTxUpdateMarks,
-    profilingMarksCache
+    profilingMarksCache,
+    createDisplayButton,
+    markTabsVisible
   }
 }
 

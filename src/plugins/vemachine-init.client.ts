@@ -9,11 +9,7 @@ export default defineNuxtPlugin({
 
     await nextTick()
 
-    const vemachine = (window as typeof window & {
-      vemachine?: {
-        generateToken?: (arg?: boolean) => Promise<string>
-      }
-    }).vemachine
+    const vemachine = window?.vemachine
 
     if (!vemachine) {
       console.warn('[vemachine] not loaded')
