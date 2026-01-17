@@ -483,7 +483,6 @@ const list1 = computed(() => {
       // }
       if (obj) {
         if ('progress' in obj) {
-          console.log('-------progress-----------', obj?.progress)
           return {
             ...i,
             ...obj,
@@ -545,14 +544,22 @@ const list2 = computed(() => {
       //   console.log('---------obj----------',obj)
       // }
         if (obj) {
+        if ('progress' in obj) {
           return {
             ...i,
             ...obj,
-            insider_balance_ratio_cur: Number(obj?.rat_raio) ,
-            dev_balance_ratio_cur: Number(obj?.dev_ratio) ,
-            sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
-            holders: obj?.holder_count
+            progress: obj?.progress
           }
+        } else {
+          return {
+            ...i,
+            ...obj,
+            insider_balance_ratio_cur: Number(obj?.rat_raio),
+            dev_balance_ratio_cur: Number(obj?.dev_ratio),
+            sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
+            holders: obj?.holder_count,
+          }
+        }
         } else {
           return i
         }
@@ -598,14 +605,22 @@ const list2 = computed(() => {
         // if (Number(obj?.rat_raio) || Number(obj?.dev_ratio) || Number(obj?.sniper_ratio)) {
         //   console.log('---------obj----------',obj)
         // }
-        if (obj) {
-          return {
-            ...i,
-            ...obj,
-            insider_balance_ratio_cur: Number(obj?.rat_raio),
-            dev_balance_ratio_cur: Number(obj?.dev_ratio),
-            sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
-            holders: obj?.holder_count
+          if (obj) {
+          if ('progress' in obj) {
+            return {
+              ...i,
+              ...obj,
+              progress: obj?.progress
+            }
+          } else {
+            return {
+              ...i,
+              ...obj,
+              insider_balance_ratio_cur: Number(obj?.rat_raio),
+              dev_balance_ratio_cur: Number(obj?.dev_ratio),
+              sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
+              holders: obj?.holder_count,
+            }
           }
         } else {
           return i
@@ -692,7 +707,7 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
 })
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
   if (val && documentVisible.value) {
-    logoList.value.unshift(obj)
+    logoList.value.unshift(val)
     if (logoList.value?.length > 300) {
       logoList.value = logoList.value?.slice?.(0,300)
     }
@@ -816,7 +831,7 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
     id: `${i.pair.target_token}-${i.chain}`,
     pair_id: `${i.pair.pair}-${i.chain}`,
     token: i.pair.target_token,
-    progress: Number(i.pair.progress || 0),
+    progress: 0,
     symbol:
       i.pair.target_token == i.pair.token0_address
         ? i?.pair.token0_symbol
