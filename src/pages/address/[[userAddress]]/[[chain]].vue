@@ -4,6 +4,7 @@ import PerpAssets from '@/components/perp/perpAssets.vue'
 import { useEventBus, useStorage } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 
+const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
 const route = useRoute()
 const { t } = useI18n()
 const walletStore = useWalletStore()
@@ -15,8 +16,6 @@ const scrollToTop = () => {
     behavior: 'smooth',
   })
 }
-const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
-scrollTopEvent.on(scrollToTop)
 
 scrollTopEvent.on(() => {
   scrollToTop()
