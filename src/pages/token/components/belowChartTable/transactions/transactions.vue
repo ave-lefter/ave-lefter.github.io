@@ -461,7 +461,6 @@ function transferTxs(row: IGetSimpleTxsResponse) {
     id:row.page_token,
     // amm:row.amm,
     wallet_address:row.maker,
-    newTags:
   }
 }
 
@@ -482,37 +481,40 @@ async function _getTokenTxs() {
       listStatus.value.loadingTxs = false
       return
     }
-    const res = await getTokenTxs(getPairTxsParams)
-    realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
-    tokenTxs.value = (res || []).reverse().map(val => {
-      txCount.value[val.wallet_address] = (txCount.value[val.wallet_address] || 0) + 1
-      const { wallet_tag, topN } = getWalletTag(val)
-      return {
-        ...val,
-        wallet_tag,
-        topN,
-        count: txCount.value[val.wallet_address],
-        senderProfile: JSON.parse(val.profile || '{}'),
-        uuid: uuid()
-      }
-    }).reverse()
-    console.log('_getTokenTxs res1', res)
-    await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
-    // const res = await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
-    // console.log('=>(transactions.vue:62) res', res)
+
+    // const res = await getTokenTxs(getPairTxsParams)
     // realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
     // tokenTxs.value = (res || []).reverse().map(val => {
-    //   txCount.value[val.maker] = (txCount.value[val.maker] || 0) + 1
+    //   txCount.value[val.wallet_address] = (txCount.value[val.wallet_address] || 0) + 1
     //   const { wallet_tag, topN } = getWalletTag(val)
     //   return {
     //     ...val,
     //     wallet_tag,
     //     topN,
-    //     count: txCount.value[val.maker],
+    //     count: txCount.value[val.wallet_address],
     //     senderProfile: JSON.parse(val.profile || '{}'),
     //     uuid: uuid()
     //   }
     // }).reverse()
+    
+    // await getTokenTxs(getPairTxsParams)
+    await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
+    const res = await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
+    console.log('=>(transactions.vue:62) res', res)
+    realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
+    tokenTxs.value = (res || []).reverse().map(val => {
+      txCount.value[val.maker] = (txCount.value[val.maker] || 0) + 1
+      const { wallet_tag, topN } = getWalletTag(val)
+      return {
+        ...val,
+        wallet_tag,
+        topN,
+        count: txCount.value[val.maker],
+        senderProfile: JSON.parse(val?.profile || '{}'),
+        uuid: uuid(),
+        ...transferTxs(val)
+      }
+    }).reverse()
   } catch (e) {
     tokenTxs.value = []
     console.log('=>(transactions.vue:62) e', e)
@@ -609,10 +611,13 @@ function getRowColor(row: GetPairLiqResponse | IGetSimpleTxsResponse) {
 function getPrice(row: GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx, isShowToken = false) {
   // route.params。id 同步更改，而接口异步请求，此时更新该值变成了 0
   const tokenAddress = realAddress.value
-  if ('direction' in row && 'target' in row) {
+  if ('isSimple' in row && row.isSimple && 'target_price_u' in row) {
+    return row?.target_price_u
+  }
+  if ('direction' in row && 'target' in row && 'price_u' in row) {
     return row.price_u
   }
-  if ('from_address' in row) {
+  if ('from_address' in row ) {
     if (
       row.from_address &&
       tokenAddress.toLowerCase?.() === row.from_address?.toLowerCase?.()
@@ -645,7 +650,7 @@ function getPrice(row: GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx, 
 function getAmount(row: GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx, needPrice = false, isVolUSDT = false) {
   if ('direction' in row && 'target' in row) {
     return Number(row.target_amt || 0) * (
-        needPrice ? Number(isVolUSDT ? row.price_u : row.price_m)
+        needPrice ? Number(isVolUSDT ? row.price_u|| row.target_price_u : row.price_m||row.target_price_m)
           : 1
       )
   }
