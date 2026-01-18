@@ -450,6 +450,54 @@ export interface IGetTokenTxsResponse {
   other_amount?: number;
 }
 
+export interface IGetSimpleTxsResponse {
+  txhash: string;
+  time: number;
+  amm: string;
+  target: string;
+  direction: string;
+  target_amt: string;
+  target_price_u: string;
+  target_price_m: string;
+  target_reserve: string;
+  base_amt: string;
+  base_price_u: string;
+  base_price_m: string;
+  base_reserve: string;
+  liquidity: string;
+  maker: string;
+  maker_type: number;
+  maker_bal: string;
+  maker_eth: string;
+  page_token: string;
+  remark: string;
+}
+
+// 新版交易历史SimpleTxs
+export function getSimpleTxs(pair:string,query: {
+  token_id: string,
+  tag_type?: string,
+  maker?: string,
+  address?: string,
+  time_min?: string,
+  time_max?: string
+}): Promise<IGetSimpleTxsResponse[]> {
+  const address=localStorage.bot_evmAddress || localStorage.walletAddress
+  const {$api} = useNuxtApp()
+  const query1 = {...query}
+  if (query1.tag_type === 'all') {
+    query1.tag_type = ''
+  }
+  return $api(`/v1api/v3/pairs/${pair}/simpletxs`, {
+    method: 'get',
+    query:{
+      address,
+      ...query1,
+      history:1
+    }
+  })
+}
+
 // 新版交易历史
 export function getTokenTxs(query: {
   token_id: string,

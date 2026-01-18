@@ -11,7 +11,9 @@ import {
   getPairLiq,
   type GetPairLiqResponse,
   type IGetTokenTxsResponse,
+  type IGetSimpleTxsResponse,
   getTokenTxs,
+  getSimpleTxs,
   type Profile
 } from '~/api/token'
 import {formatDate, formatTimeFromNow, getAddressAndChainFromId, getChainInfo, uuid} from '~/utils'
@@ -124,8 +126,8 @@ const listStatus = ref({
   loadingTxs: false,
   loadingLiq: false
 })
-const tokenTxs = shallowRef<IGetTokenTxsResponse[]>([])
-const wsPairCache = shallowRef<IGetTokenTxsResponse[]>([])
+const tokenTxs = shallowRef<IGetSimpleTxsResponse[]>([])
+const wsPairCache = shallowRef<IGetSimpleTxsResponse[]>([])
 const pairLiq = shallowRef<GetPairLiqResponse[]>([])
 const wsLiqCache = shallowRef<GetPairLiqResponse[]>([])
 
@@ -149,7 +151,7 @@ const filterTableListMap = {
 }
 // 纯前端筛选
 const filterTableList = computed(() => {
-  let tableList: ((IGetTokenTxsResponse | GetPairLiqResponse) & { count?: number })[] = []
+  let tableList: ((IGetSimpleTxsResponse | GetPairLiqResponse) & { count?: number })[] = []
   if (activeTab.value in filterTableListMap) {
     tableList = filterTableListMap[activeTab.value as keyof typeof filterTableListMap]()
   } else {
@@ -205,7 +207,7 @@ const tableFilterVisible = ref({
 })
 const makerTooltip = ref()
 const markerTooltipVisible = shallowRef(false)
-const currentRow = shallowRef<IGetTokenTxsResponse & { senderProfile: Profile, maker_bal?: number }>({} as any)
+const currentRow = shallowRef<IGetSimpleTxsResponse & { senderProfile: Profile, maker_bal?: number }>({} as any)
 const isPausedTxs = computed(() => {
   return isHoverTable.value
     || tokenDetailSStore.drawerVisible
@@ -373,6 +375,7 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
     },
     newTags
   }
+  console.log('交易推送item',maker, item.maker_type)
   wsPairCache.value.unshift(item as any)
   if (!isPausedTxs.value) {
     updatePairTxs()
@@ -449,6 +452,20 @@ function confirmMakersFilter(markerAddress = '') {
   _getTokenTxs()
 }
 
+function transferTxs(row: IGetSimpleTxsResponse) {
+  const newTags = row.maker_type
+  return {
+    ...row,
+    isSimple: true,
+    chain:addressAndChain.value.chain,
+    id:row.page_token,
+    // amm:row.amm,
+    wallet_address:row.maker,
+    newTags:
+  }
+}
+
+
 async function _getTokenTxs() {
   try {
     listStatus.value.loadingTxs = true
@@ -479,6 +496,23 @@ async function _getTokenTxs() {
         uuid: uuid()
       }
     }).reverse()
+    console.log('_getTokenTxs res1', res)
+    await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
+    // const res = await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
+    // console.log('=>(transactions.vue:62) res', res)
+    // realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
+    // tokenTxs.value = (res || []).reverse().map(val => {
+    //   txCount.value[val.maker] = (txCount.value[val.maker] || 0) + 1
+    //   const { wallet_tag, topN } = getWalletTag(val)
+    //   return {
+    //     ...val,
+    //     wallet_tag,
+    //     topN,
+    //     count: txCount.value[val.maker],
+    //     senderProfile: JSON.parse(val.profile || '{}'),
+    //     uuid: uuid()
+    //   }
+    // }).reverse()
   } catch (e) {
     tokenTxs.value = []
     console.log('=>(transactions.vue:62) e', e)
@@ -499,7 +533,7 @@ function getSimpleTxTags(tag?:string) {
   }
 }
 
-function getWalletTag(val: IGetTokenTxsResponse) {
+function getWalletTag(val: IGetSimpleTxsResponse) {
   const wallet_tagStr = val.wallet_tag_v2 || ''
   let topN = ''
   let wallet_tag: string[] = []
@@ -538,7 +572,7 @@ async function _getPairLiq() {
   }
 }
 
-function isBuy(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) {
+function isBuy(row: GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx) {
   if ('direction' in row && 'target' in row) {
     return row.direction === 'buy'
   }
@@ -561,7 +595,7 @@ function isBuy(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) {
   }
 }
 
-function getRowColor(row: GetPairLiqResponse | IGetTokenTxsResponse) {
+function getRowColor(row: GetPairLiqResponse | IGetSimpleTxsResponse) {
   if ('type' in row) {
     if (row.type === 'addLiquidity') {
       return 'color-#65C4ED'
@@ -572,7 +606,7 @@ function getRowColor(row: GetPairLiqResponse | IGetTokenTxsResponse) {
   return isBuy(row) ? 'color-#12B886' : 'color-#FF646D'
 }
 
-function getPrice(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, isShowToken = false) {
+function getPrice(row: GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx, isShowToken = false) {
   // route.params。id 同步更改，而接口异步请求，此时更新该值变成了 0
   const tokenAddress = realAddress.value
   if ('direction' in row && 'target' in row) {
@@ -608,7 +642,7 @@ function getPrice(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, i
   return 0
 }
 
-function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, needPrice = false, isVolUSDT = false) {
+function getAmount(row: GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx, needPrice = false, isVolUSDT = false) {
   if ('direction' in row && 'target' in row) {
     return Number(row.target_amt || 0) * (
         needPrice ? Number(isVolUSDT ? row.price_u : row.price_m)
@@ -641,7 +675,7 @@ function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, 
   return 0
 }
 
-function hasNewAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
+function hasNewAccount(row: (GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
   if ('direction' in row && 'target' in row) {
     return row.direction === 'buy' && new BigNumber(row.maker_bal).eq(row.target_amt)
   }
@@ -657,7 +691,7 @@ function hasNewAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleW
   }
 }
 
-function hasClearedAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
+function hasClearedAccount(row: (GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
   if ('direction' in row && 'target' in row) {
     return row.direction === 'sell' && new BigNumber(row.maker_bal).eq(0)
   }
@@ -673,7 +707,7 @@ function hasClearedAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | Sim
   }
 }
 
-function bigWallet(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
+function bigWallet(row: (GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
   if ('maker_eth' in row) {
     return Number(row.maker_eth || 0) >= 50
   }
@@ -683,7 +717,7 @@ function bigWallet(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx)
   return Number(row.senderProfile?.solTotalHolding) > 50
 }
 
-function getGradient(row: IGetTokenTxsResponse) {
+function getGradient(row: IGetSimpleTxsResponse) {
   const str = `${useThemeStore().isDark}-${isBuy(row)}`
   const map = {
     'true-true': 'bg-[linear-gradient(270deg,#111_0%,#12654C_70%,#12B886_100%)]',
@@ -694,7 +728,7 @@ function getGradient(row: IGetTokenTxsResponse) {
   return map[str]
 }
 
-function openMarkerTooltip(row: IGetTokenTxsResponse & { senderProfile: Profile }, e: MouseEvent) {
+function openMarkerTooltip(row: IGetSimpleTxsResponse & { senderProfile: Profile }, e: MouseEvent) {
   if (row && SupportFullDataChain.includes(row.chain)) {
     makerTooltip.value = e.currentTarget
     if (currentRow.value?.wallet_address === row.wallet_address) {
@@ -704,7 +738,7 @@ function openMarkerTooltip(row: IGetTokenTxsResponse & { senderProfile: Profile 
   }
 }
 
-function goBrowser(row: IGetTokenTxsResponse) {
+function goBrowser(row: IGetSimpleTxsResponse) {
   window.open(
     formatExplorerUrl(row.chain, row.transaction, 'tx')
   )
