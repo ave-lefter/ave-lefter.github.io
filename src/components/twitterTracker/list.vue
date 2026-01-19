@@ -16,92 +16,25 @@
       {{ t('attention') }}
     </el-button>
   </div>
+  <div v-else-if="!props.isMine && isEmpty">
+    <AveEmpty class="pt-40px">
+      <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
+    </AveEmpty>
+  </div>
  <el-scrollbar v-else height="calc(100% - 120px)" @end-reached="onScrollEnd">
   <div class="flex flex-col gap-16px">
-    <div
-      v-for="(item,index) in trackerStore.list"
-      :key="item.id"
-      class="border-b-1px border-b-solid border-b-[--border] pb-16px flex gap-7px"
-    >
-      <UserAvatar
-      icon-size="32px"
-      class="cursor-pointer"
-        :wallet_logo="{ logo: item.author.profile_pic, name: item.author.name }"
-        @click="clickAvatar(item.author.twitter_url)"
-      />
-      <div class="flex flex-col gap-8px flex-1 min-w-0">
-        <div class="justify-between items-center flex">
-          <div class="min-w-0 flex-1">
-            <div class="gap-8px flex items-center min-w-0">
-              <span v-tooltip="item.author.name" class="color-[--main-text] text-16px lh-20px min-w-0 max-w-[calc(100%-90px)] truncate cursor-pointer" @click="clickAvatar(item.author.twitter_url)">{{
-                item.author.name
-              }}</span>
-              <TimerCount
-                v-if="item.created_at && Number(formatTimeFromNow(item.created_at, true)) < 60"
-                :key="`${item.created_at}`"
-                :timestamp="item.created_at"
-                :end-time="60"
-                class="text-12px"
-              >
-                <template #default="{ seconds }">
-                  <span class="color-[--secondary-text] text-12px">
-                    <template v-if="seconds < 60"> {{ seconds }}s </template>
-                    <template v-else>
-                      {{ formatTimeFromNow(item.created_at) }}
-                    </template>
-                  </span>
-                </template>
-              </TimerCount>
-              <span
-                v-else
-                v-tooltip="formatDate(item.created_at, 'YYYY-MM-DD HH:mm:ss')"
-                class="color-[--secondary-text] text-12px"
-              >
-                {{ formatTimeFromNow(item.created_at) }}
-              </span>
-            </div>
-            <div class="text-12px color-[--secondary-text]">@{{ item.author.username }}</div>
-          </div>
-          <div class="gap-8px flex items-center">
-            <div
-              class="w-24px h-24px bg-[--main-list-hover] rounded-4px flex items-center justify-center cursor-pointer"
-              @click="item.author.follow_status === 1 ? _unfollowKol(item.author.author_id, index) : _followKol(item.author.author_id, index)"
-            >
-              <Icon
-                :name="
-                  item.author.follow_status === 1
-                    ? 'custom:twitter-collect'
-                    : 'custom:twitter-uncollect'
-                "
-                class="text-12px"
-              />
-            </div>
-            <div
-              class="w-24px h-24px bg-[--main-list-hover] rounded-full flex items-center justify-center"
-            >
-              <Icon :name="`custom:twitter-${item.type}`" class="text-12px" />
-            </div>
-          </div>
-        </div>
-        <div v-show="!item.hide" class="text-14px lh-22px break-words">
-          {{ item.content }}
-        </div>
-        <div class="justify-between items-center flex">
-          <div class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]">
-            <!-- <Icon name="custom:translation"/>{{ t('viewTranslation') }} -->
-          </div>
-          <span class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px" @click="item.hide = !item.hide"><Icon name="custom:angle-down" :class="item.hide ? '' : 'rotate-180'"/>
-            {{ item.hide?t('Expand') :t('Collapse') }}
-          </span>
-        </div>
+    <div v-for="(item, index) in trackerStore.list" :key="item.id" class="border-b-1px border-b-solid border-b-[--border]">
+      <ListItem :item="item" :index="index" />
+      <div v-if="['2','3','4'].includes(item.type)" v-show="!item.hide" class="border-1px border-solid border-[--dialog-divider] rounded-8px px-12px pt-16px ml-40px mb-16px">
+        <ListItem :item="item.retweeted_tweet||item.quoted_tweet||item.replied_tweet" :index="-1"
+/>
       </div>
     </div>
   </div>
  </el-scrollbar>
 </template>
 <script setup name="twitterTackerList">
-import { followKol, unfollowAll } from '~/api/twitter'
-
+import ListItem from './listItem.vue'
 const { t } = useI18n()
 const emits = defineEmits(['startAttention','endReached'])
 const props = defineProps({
@@ -113,41 +46,12 @@ const botStore = useBotStore()
 const trackerStore = useTwitterTrackerStore()
 const isEmpty = computed(() => trackerStore.list.length === 0)
 
-const _followKol = async (author_id, index) => {
-  try {
-    if(!botStore.accessToken){
-      botStore.changeConnectVisible(true)
-      return
-    }
-    await followKol(author_id)
-    ElMessage.success(t('followed'))
-    trackerStore.list[index].author.follow_status = 1
-  } catch (error) {
-    ElMessage.error(t('failed'))
-    console.error('Error following KOL:', error)
-  }
-}
-
-const _unfollowKol = async (author_id, index) => {
-  try {
-    await unfollowAll(author_id)
-    ElMessage.success(t('cancelFollowed'))
-    trackerStore.list[index].author.follow_status = 0
-  } catch (error) {
-    ElMessage.error(t('failed'))
-    console.error('Error unfollowing KOL:', error)
-  }
-}
-
 const onScrollEnd = (direction) => {
   if(direction === 'bottom'){
     emits('endReached')
   }
 }
 
-const clickAvatar = (twitter_url) => {
-  window.open(twitter_url)
-}
 </script>
 <style scoped lang="scss">
   :deep(.el-scrollbar__thumb){

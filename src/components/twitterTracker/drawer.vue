@@ -59,10 +59,10 @@
                 <div class="flex items-center gap-8px">
                   <span class="color-[--main-text] text-14px lh-20px">{{ row.name }}</span>
                   <div
-                    v-if="row.tags.includes('Founder')"
                     class="w-14px h-14px bg-#000 rounded-full"
                   >
                     <img
+                      v-if="row.chain"
                       class="w-full h-full rounded-full block"
                       :src="`${configStore.token_logo_url}chain/${row.chain}.png`"
                       alt=""
@@ -161,6 +161,7 @@ const { t } = useI18n()
 const visible = defineModel('visible', {
   type: Boolean,
 })
+const trackerStore = useTwitterTrackerStore()
 const localeStore = useLocaleStore()
 const kolTags = ref([])
 const kolTagsMap = ref({})
@@ -246,12 +247,27 @@ const getList = async () => {
 }
 
 getList()
+watch(()=>visible.value,val=>{
+  if(val){
+    reset()
+    getList()
+  }
+})
+
+const updateStoreStatus = (author_id, status) => {
+  trackerStore.list.forEach(el=>{
+      if(el.author.author_id === author_id){
+        el.author.follow_status = status
+      }
+    })
+}
 
 const _followKol = async (author_id, index) => {
   try {
     await followKol(author_id)
     ElMessage.success(t('followed'))
     list.value[index].follow_status = 1
+    updateStoreStatus(author_id, 1)
   } catch (error) {
     ElMessage.error(t('failed'))
     console.error('Error following KOL:', error)
@@ -263,6 +279,7 @@ const _unfollowKol = async (author_id, index) => {
     await unfollowAll(author_id)
     ElMessage.success(t('cancelFollowed'))
     list.value[index].follow_status = 0
+    updateStoreStatus(author_id, 0)
   } catch (error) {
     ElMessage.error(t('failed'))
     console.error('Error unfollowing KOL:', error)

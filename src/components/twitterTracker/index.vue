@@ -11,8 +11,8 @@
       <!-- <Monitor v-bind="props2"/> -->
       <component :is="lazyComponent" v-bind="props2" @setDrawerVisible="drawerVisible = true" />
     </Draggable>
-    <div v-if="trackerStore.visible">
-      <TwitterTrackerDrawer v-model="drawerVisible" />
+    <div>
+      <TwitterTrackerDrawer v-model:visible="drawerVisible" />
     </div>
 </template>
 <script setup name="trackerDragger">

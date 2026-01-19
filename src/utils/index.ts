@@ -1305,10 +1305,15 @@ export function sendNotify(result: any) {
 
 // 获取小数位，分割 字符小数点
 export function getPrecision(num: number | string): number {
-  const val = Number(num);
+  const val = Number(num)
   if (isNaN(val)) {
-    return 0;
+    return 0
   }
-  const strList = String(num).split(".");
-  return strList.length === 2 ? strList[1].length : 0;
+  const strList = String(num).split('.')
+  return strList.length === 2 ? strList[1].length : 0
+}
+
+export function getAudioUrl(audio: string) {
+  return audioNameToResource[audio as keyof typeof audioNameToResource]
+  || audioNameToResource.Bar
 }

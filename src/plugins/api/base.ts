@@ -3,6 +3,7 @@ import isBase64 from 'is-base64'
 import { createCacheRequest } from '@/utils/cacheRequest'
 
 import type { MyFetchContext } from './type'
+import { botOnResponseError } from './bot'
 
 
 export function onRequest({ options, request }: MyFetchContext) {
@@ -67,7 +68,7 @@ export function onRequest({ options, request }: MyFetchContext) {
   }
 }
 
-export function onResponse({ response, request }: MyFetchContext) {
+export function onResponse({ response, request,options }: MyFetchContext) {
   // 全局响应处理
   if (!response) {
     return
@@ -78,6 +79,9 @@ export function onResponse({ response, request }: MyFetchContext) {
   }
   if (response?.status === 403 || [10000, 10001]?.includes(data?.status)) {
     throw new Error('x-auth-error')
+  }
+  if (response.status === 401) {
+    return botOnResponseError({ response, request, options })
   }
   if ((request as string)?.includes('/aveswap/v1/sui/')) {
     if (data?.status === 0) {

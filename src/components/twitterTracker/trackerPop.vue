@@ -60,9 +60,18 @@
             <Icon name="custom:filter" class="text-12px cursor-pointer" />
           </template>
           <template #default>
+            <el-checkbox
+                v-model="checkAll"
+                :indeterminate="isIndeterminate"
+                class="[--el-checkbox-height:16px] mb-12px"
+                @change="handleCheckAllChange"
+            >
+                {{t('all')}}
+            </el-checkbox>
             <el-checkbox-group
               v-model="query.types"
               class="flex flex-col [--el-checkbox-height:16px] gap-12px"
+              @change="handleCheckedChange"
             >
               <!--mb-16px border-b-solid border-b-1px border-b-[--dialog-divider] -->
               <el-checkbox
@@ -115,6 +124,11 @@
       </el-input>
     </div>
     <TwitterTrackerList :isMine="isMine || follow_only" @endReached="getList" @startAttention="emits('setDrawerVisible', true)" />
+    <audio
+      ref="twitterAudio" controls style="display: none"
+      :src="getAudioUrl(globalStore.audioSettings.audio.twitter)"
+      :volume="+globalStore.audioSettings.audio.volume/100 || 0.5"
+    />
   </div>
 </template>
 
@@ -131,17 +145,17 @@ const botStore = useBotStore()
 const activeTab = ref(1)
 const filterVisible = ref(false)
 
+const twitterAudio = useTemplateRef('twitterAudio')
 const query = ref({ ...trackerStore.query })
 const follow_only = ref(false)
-
 const tabs = computed(() => [
   { label: t('hot2'), value: 1 },
   { label: t('mine'), value: 2 },
 ])
 const checkboxOptions = computed(() => [
   { label: t('tweet'), value: 1 },
-  { label: t('retweet'), value: 2 },
-  { label: t('quote'), value: 3 },
+  { label: t('retweet'), value: 3 },
+  { label: t('quote'), value: 2 },
   { label: t('reply'), value: 4 },
 ])
 const isMine = computed(() => {
@@ -151,6 +165,17 @@ const isMine = computed(() => {
 //   { label: t('onlyCA'), value: 1 },
 //   { label: t('onlyAddress'), value: 2 },
 // ])
+const checkAll = ref(false)
+const isIndeterminate = ref(false)
+const handleCheckAllChange = () => {
+  query.value.types = checkAll.value ? checkboxOptions.value.map(i => i.value) : []
+  isIndeterminate.value = query.value.types.length > 0 && query.value.types.length < checkboxOptions.value.length
+}
+const handleCheckedChange = (val) => {
+  const checkedCount = val.length
+  checkAll.value = checkedCount === checkboxOptions.value.length
+  isIndeterminate.value = checkedCount > 0 && checkedCount < checkboxOptions.value.length
+}
 const reset = () => {
   query.value.page_token = ''
   trackerStore.finished = false
@@ -237,9 +262,12 @@ watch(
 watch(
   () => wsStore.wsResult[WSEventType.TWITTER_MONITOR],
   async(val) => {
-    if(val.TweetId){
+    if(val.TweetId && query.value.types.includes(+val.Type)){
       const res = await getTwitterById(val.TweetId)
       trackerStore.list.unshift(res)
+      if(twitterAudio.value){
+        twitterAudio.value.play()
+      }
     }
   }
 )
