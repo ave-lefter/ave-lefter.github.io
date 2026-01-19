@@ -657,7 +657,7 @@ watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
   (val) => {
-    if (!Array.isArray(val) || !val.length) return
+    if (!Array.isArray(val) || !val.length ) return
     const map = new Map<string, any>()
     // 先放旧数据
     statisticsList.value.forEach(item => {
@@ -1082,41 +1082,41 @@ function parseDate(dateStr?: string | number, toSeconds = false) {
   return toSeconds ? ms / 1000 : ms
 }
 
-// function getMedias(appendix: string) {
-//   if (!appendix) return []
-//   if (isJSON(appendix)) {
-//     const obj = JSON.parse(appendix)
-//     const arr = []
-//     if (obj?.website)
-//       arr.push({
-//         name: t('website'),
-//         icon: 'web',
-//         url: formatUrl(obj.website),
-//       })
-//     if (obj?.btok)
-//       arr.push({
-//         name: 'Btok',
-//         icon: 'btok',
-//         url: formatUrl(obj.btok),
-//       })
-//     if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
-//     if (obj?.telegram)
-//       arr.push({
-//         name: 'Telegram',
-//         icon: 'tg',
-//         url: formatUrl(obj.telegram),
-//       })
-//     if (obj?.twitter)
-//       arr.push({
-//         name: 'Twitter',
-//         icon: 'twitter',
-//         url: formatUrl(obj.twitter),
-//       })
-//     return arr
-//   }
+function getMedias(appendix: string) {
+  if (!appendix) return []
+  if (isJSON(appendix)) {
+    const obj = JSON.parse(appendix)
+    const arr = []
+    if (obj?.website)
+      arr.push({
+        name: t('website'),
+        icon: 'web',
+        url: formatUrl(obj.website),
+      })
+    if (obj?.btok)
+      arr.push({
+        name: 'Btok',
+        icon: 'btok',
+        url: formatUrl(obj.btok),
+      })
+    if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
+    if (obj?.telegram)
+      arr.push({
+        name: 'Telegram',
+        icon: 'tg',
+        url: formatUrl(obj.telegram),
+      })
+    if (obj?.twitter)
+      arr.push({
+        name: 'Twitter',
+        icon: 'twitter',
+        url: formatUrl(obj.twitter),
+      })
+    return arr
+  }
 
-//   return []
-// }
+  return []
+}
 function getFilterData(list: PumpObj[], conditions: any) {
   conditions = JSON.parse(conditions) || {}
   return list?.filter((i) => {
