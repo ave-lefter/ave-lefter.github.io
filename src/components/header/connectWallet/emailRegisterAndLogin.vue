@@ -102,11 +102,11 @@
           :disabled="!!refCode"
         />
       </el-form-item>
-      <el-form-item v-if="cType == 'login'" class="mb-10px">
+      <!-- <el-form-item v-if="cType == 'login'" class="mb-10px">
         <label
           class="el-form-item__label icon mb-0 justify-between!"
         >
-          <!-- <a
+          <a
             class="gap-8px flex items-center clickable underline! color-[--main-text]"
             @click="loginType = loginType === 'password' ? 'email' : 'password'"
           >
@@ -115,7 +115,7 @@
                 ? $t("startVcodeLogin")
                 : $t("startPwdLogin")
             }}
-          </a> -->
+          </a>
           <a
             class="gap-8px flex items-center clickable underline! color-[--main-text] ml-auto"
             @click.prevent="emit('update:c-type', 'reset')"
@@ -123,7 +123,7 @@
             {{ $t("startForgetPassword") }}
           </a>
         </label>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item class="mb-10px!">
         <div v-if="cType === 'login' && loginType === 'password'" id="captcha-element" class="mb-10px'" />
         <el-button

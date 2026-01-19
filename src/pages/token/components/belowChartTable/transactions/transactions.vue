@@ -423,13 +423,13 @@ const updatePairTxs = useThrottleFn(() => {
   tokenTxs.value = tokenTxs.value.slice(0,1000)
   wsPairCache.value.length = 0
   triggerRef(tokenTxs)
-}, 500)
+}, 100)
 
 const updateLiqList = useThrottleFn(() => {
   pairLiq.value.unshift(...wsLiqCache.value)
   wsLiqCache.value.length = 0
   triggerRef(pairLiq)
-}, 500)
+}, 100)
 
 function onTimestampConfirm(timestamp: string[] = []) {
   tableFilterVisible.value.timestamp = false

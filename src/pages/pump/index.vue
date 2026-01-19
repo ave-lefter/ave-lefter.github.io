@@ -309,7 +309,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage, useWindowSize, useThrottleFn } from '@vueuse/core'
+import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility } from '@vueuse/core'
 import QuickSwapSet from '@/components/quickSwap/quickSwapSet.vue'
 import PumpList from './pumpList.vue'
 import Setting from './setting.vue'
@@ -343,7 +343,7 @@ const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const activeChain = useStorage<ChainKey>(
   'pump_activeChain',
   'solana',
-  sessionStorage
+  localStorage
 )
 const audioUrl = ref('')
 const globalStore = useGlobalStore()
@@ -389,9 +389,9 @@ const isPausedObj = ref({
   graduated: false,
 })
 
-const wsTableListCache = ref<PumpObj[]>([])
-const wsTableList = ref<PumpObj[]>([])
-const logoList = ref<{logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
+const wsTableListCache = shallowRef<PumpObj[]>([])
+const wsTableList = shallowRef<PumpObj[]>([])
+const logoList = shallowRef<{logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
 
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
@@ -588,17 +588,14 @@ watch(activeChain, () => {
   }, 500)
 })
 watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
-  if (Array.isArray(val)) {
+  if (Array.isArray(val) && documentVisible.value) {
     wsUpdateTableList(val)
   }
 })
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
-  if (val) {
-    const rTime = Date.now()
-    const obj = { ...val, rTime: rTime }
-        // console.log('----obj------',obj.symbol,'--MC--',obj.market_cap, '--progress--',obj.progress,  '--top--',obj.holders_top10_ratio  )
-    logoList.value = logoList?.value?.filter?.(i => i.token !== obj.token && rTime - (i.rTime || 0) <= 16000)
-    logoList.value.unshift(obj)
+  if (val && documentVisible.value) {
+    logoList.value.unshift(val)
+    logoList.value?.slice(0, 300)
   }
 })
 
@@ -747,7 +744,7 @@ function wsUpdateTableList(wsList: WSPump[]) {
           : i?.pair.token1_logo_url,
 
       }))
-      const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address) && rTime - (i.rTime || 0) <= 15000)
+      const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
       wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,100)
       // let wsTime = this.wsTableListCache?.time || 0
       // if (wsTime < Date.now() - 15000) {
@@ -917,7 +914,7 @@ function getPump(params, isFilter = false) {
     clearTimeout(Timer[params.category])
     Timer[params.category] = null
   }
-  if (route.name !== 'pump') {
+  if (route.name !== 'pump' || !documentVisible.value) {
     return
   }
   if ((isPausedObj.value?.[params.category] || route.name !== 'pump') && !isFilter) {
@@ -1137,6 +1134,16 @@ function switchChain(item: { chain: ChainKey }) {
   console.log('------switchChain--------',item.chain)
   activeChain.value = item.chain
 }
+
+const documentVisible = useDocumentVisibility()
+
+watch(documentVisible, (val) => {
+  if (val) {
+    if (route.name === 'pump') {
+      getPumpList()
+    }
+  }
+})
 </script>
 
 <style scoped lang="scss">
