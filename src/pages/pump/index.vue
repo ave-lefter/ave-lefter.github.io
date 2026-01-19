@@ -410,14 +410,16 @@ const isPausedObj = ref({
 const wsTableListCache = ref<PumpObj[]>([])
 const wsTableList = ref<PumpObj[]>([])
 const logoList = ref<{ logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
-const statisticsList = ref<{
+type StatisticsItem = {
   chain: string
   token: string
   holder_count: number
   rat_raio: string
   dev_ratio: string
   sniper_ratio: string
-}[]>([])
+  progress: string
+}
+const statisticsList = ref<StatisticsItem[]>([])
 
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
@@ -478,33 +480,8 @@ const list1 = computed(() => {
       }
     })
   }
-  if (statisticsList?.value?.length > 0 && filterList?.length > 0) {
-    filterList = filterList.map(i => {
-      const obj = statisticsList.value?.find(y => y.token == i.target_token)
-      // if (Number(obj?.rat_raio) || Number(obj?.dev_ratio) || Number(obj?.sniper_ratio)) {
-      //   console.log('---------obj----------',obj)
-      // }
-      if (obj) {
-        if ('progress' in obj) {
-          return {
-            ...i,
-            ...obj,
-            progress: obj?.progress
-          }
-        } else {
-          return {
-            ...i,
-            ...obj,
-            insider_balance_ratio_cur: Number(obj?.rat_raio),
-            dev_balance_ratio_cur: Number(obj?.dev_ratio),
-            sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
-            holders: obj?.holder_count
-          }
-        }
-      } else {
-        return i
-      }
-    })
+  if (statisticsList.value?.length && filterList?.length) {
+    filterList = mergeStatisticsList(statisticsList.value, filterList)
   }
   return filterList?.slice?.(0, 100)
 })
@@ -540,33 +517,8 @@ const list2 = computed(() => {
         }
       })
     }
-    if (statisticsList?.value?.length > 0 && filterList?.length > 0) {
-      filterList = filterList.map(i => {
-        const obj = statisticsList.value?.find(y => y.token == i.target_token)
-      // if (Number(obj?.rat_raio) || Number(obj?.dev_ratio) || Number(obj?.sniper_ratio)) {
-      //   console.log('---------obj----------',obj)
-      // }
-        if (obj) {
-        if ('progress' in obj) {
-          return {
-            ...i,
-            ...obj,
-            progress: obj?.progress
-          }
-        } else {
-          return {
-            ...i,
-            ...obj,
-            insider_balance_ratio_cur: Number(obj?.rat_raio),
-            dev_balance_ratio_cur: Number(obj?.dev_ratio),
-            sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
-            holders: obj?.holder_count,
-          }
-        }
-        } else {
-          return i
-        }
-      })
+    if (statisticsList.value?.length && filterList?.length) {
+      filterList = mergeStatisticsList(statisticsList.value, filterList)
     }
     return filterList?.slice?.(0, 100)
   })
@@ -602,33 +554,8 @@ const list2 = computed(() => {
         }
       })
     }
-    if (statisticsList?.value?.length > 0 && filterList?.length > 0) {
-      filterList = filterList.map(i => {
-        const obj = statisticsList.value?.find(y => y.token == i.target_token)
-        // if (Number(obj?.rat_raio) || Number(obj?.dev_ratio) || Number(obj?.sniper_ratio)) {
-        //   console.log('---------obj----------',obj)
-        // }
-          if (obj) {
-          if ('progress' in obj) {
-            return {
-              ...i,
-              ...obj,
-              progress: obj?.progress
-            }
-          } else {
-            return {
-              ...i,
-              ...obj,
-              insider_balance_ratio_cur: Number(obj?.rat_raio),
-              dev_balance_ratio_cur: Number(obj?.dev_ratio),
-              sniper_balance_ratio_cur: Number(obj?.sniper_ratio),
-              holders: obj?.holder_count,
-            }
-          }
-        } else {
-          return i
-        }
-      })
+    if (statisticsList.value?.length && filterList?.length) {
+      filterList = mergeStatisticsList(statisticsList.value, filterList)
     }
     return filterList?.slice?.(0, 100)
   })
@@ -696,6 +623,17 @@ watch(activeChain, () => {
       id: 1,
     })
   }, 500)
+    isInitObj.value = {
+        new: true,
+        soon: true,
+        graduated: true
+    }
+    wsv2Store.send({
+      jsonrpc: '2.0',
+      method: 'unsubscribe',
+      params: ['portrait_statistics'],
+      id: 1,
+    })
 })
 watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
   if (Array.isArray(val) && documentVisible.value) {
@@ -716,19 +654,30 @@ watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
     }
   }
 })
-
-watch(() => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS], (val) => {
-  if ( Array.isArray(val) && val?.length >0) {
+watch(
+  () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
+  (val) => {
+    if (!Array.isArray(val) || !val.length) return
     const map = new Map<string, any>()
+    // 先放旧数据
     statisticsList.value.forEach(item => {
       map.set(item.token, item)
     })
+
+    // 再 merge 新数据（⚠️ 关键）
     val.forEach(item => {
-      map.set(item.token, item)
+      const prev = map.get(item.token)
+      if (prev) {
+        map.set(item.token, mergeStatistics(prev, item))
+      } else {
+        map.set(item.token, item)
+      }
     })
+
     statisticsList.value = Array.from(map.values()).slice(0, 300)
   }
-})
+)
+
 const getChangedValue = (A: string[], B: string[]): string | null => {
   for (let i = 0; i < A.length; i++) {
     if (A[i] !== B[i]) {
@@ -1012,7 +961,6 @@ function getPumpList(isFilter = false) {
   getPump(params3, isFilter)
 }
 
-
 async function getPump(rawParams: {
   category: CategoryKey
   chain: ChainKey
@@ -1100,12 +1048,12 @@ async function getPump(rawParams: {
     if(isInitObj.value[finalParams.category as keyof typeof isInitObj.value]) {
       const tks = formattedList?.slice?.(0, 100)?.map?.((i) => ({ ch: i.chain, tk: i.target_token }))
       if (tks?.length > 0) {
-        wsv2Store.send({
-          jsonrpc: '2.0',
-          method: 'subscribe',
-          params: ['portrait_statistics', { "tks": tks }],
-          id: 1,
-        })
+          wsv2Store.send({
+            jsonrpc: '2.0',
+            method: 'subscribe',
+            params: ['portrait_statistics', { "tks": tks }],
+            id: 1,
+          })
       } else {
         isInitObj.value[finalParams.category as keyof typeof isInitObj.value] = false
       }
@@ -1281,6 +1229,70 @@ watch(documentVisible, (val) => {
     }
   }
 })
+function hasValue(obj: any, key: string | number) {
+  return Object.prototype.hasOwnProperty.call(obj, key)
+    && obj[key] !== undefined
+    && obj[key] !== null
+}
+function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpObj[]) {
+  return filterList.map(i => {
+    const obj = statisticsList?.find(
+      y => y.token === i.target_token
+    )
+    if (!obj) return i
+
+    const next = { ...i }
+
+    if (hasValue(obj, 'progress')) {
+      next.progress = Number(obj.progress)
+    }
+    if (hasValue(obj, 'holder_count')) {
+      next.holders = obj.holder_count
+    }
+    if (hasValue(obj, 'rat_raio')) {
+      next.insider_balance_ratio_cur = Number(obj.rat_raio)
+    }
+    if (hasValue(obj,'dev_ratio')) {
+      next.dev_balance_ratio_cur = Number(obj.dev_ratio)
+    }
+    if (hasValue(obj, 'sniper_ratio')) {
+      next.sniper_balance_ratio_cur = Number(obj.sniper_ratio)
+    }
+    return next
+  })
+}
+function mergeStatistics(prev: any, next: any) {
+  const result = { ...prev }
+
+  // progress 结构
+  if (next.progress != null) {
+    result.progress = next.progress
+  }
+
+  // ratio 结构
+  if (next.holder_count != null) {
+    result.holder_count = next.holder_count
+  }
+  if (next.rat_raio != null) {
+    result.rat_raio = next.rat_raio
+  }
+  if (next.dev_ratio != null) {
+    result.dev_ratio = next.dev_ratio
+  }
+  if (next.sniper_ratio != null) {
+    result.sniper_ratio = next.sniper_ratio
+  }
+
+  // 公共字段（可选）
+  if (next.chain != null) {
+    result.chain = next.chain
+  }
+  if (next.token != null) {
+    result.token = next.token
+  }
+
+  return result
+}
 </script>
 
 <style scoped lang="scss">
