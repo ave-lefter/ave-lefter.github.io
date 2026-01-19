@@ -311,10 +311,10 @@
 <script setup lang="ts">
 import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility } from '@vueuse/core'
 import QuickSwapSet from '@/components/quickSwap/quickSwapSet.vue'
-import PumpList from './pumpList.vue'
-import Setting from './setting.vue'
-import BlackList from './blackList.vue'
-import PumpFilter from './pumpFilter.vue'
+import PumpList from './components/pumpList.vue'
+import Setting from './components/setting.vue'
+import BlackList from './components/blackList.vue'
+import PumpFilter from './components/pumpFilter.vue'
 import { _getPumpConfig, _getPumpList } from '@/api/pump'
 import type {
   PumpConfig,
@@ -328,7 +328,10 @@ import type {
 import { throttle } from 'lodash-es'
 import { isJSON, formatUrl, usePumpTableDataFetching } from '@/utils/index'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
-import AudioSelect from './audioSelect.vue'
+import AudioSelect from './components/audioSelect.vue'
+defineOptions({
+  name: 'pump' // 显式命名
+})
 
 type TimeoutReturnType = ReturnType<typeof setTimeout> | number | null
 const Timer: {
