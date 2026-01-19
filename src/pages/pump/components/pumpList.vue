@@ -289,7 +289,7 @@
                       "
                       class="flex text-12px"
                     >
-                      <div v-for="(item, $index) in row?.medias" :key="$index">
+                      <div v-for="(item, index) in row?.medias" :key="index">
                         <template v-if="item.url">
                           <span v-if="item.name === 'QQ'" v-tooltip="item.url" class="mr-8px">
                             <Icon
@@ -1229,7 +1229,7 @@ const getAnimClass = (itemData: any) => {
 
 /* 2. 旧行下推补偿：
    数据置顶时，虚拟滚动将旧行瞬间下移了 70px。
-   我们让内层瞬间反向向上偏移 70px（回原位），然后平滑归位到 0。 
+   我们让内层瞬间反向向上偏移 70px（回原位），然后平滑归位到 0。
 .anim-push {
   animation: pushDown 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
