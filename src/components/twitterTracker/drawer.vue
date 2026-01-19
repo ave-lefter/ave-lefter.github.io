@@ -47,7 +47,7 @@
         <el-table-column type="index" label="#" />
         <el-table-column :label="t('account')" width="240">
           <template #default="{ row }">
-            <div class="flex items-center gap-12px">
+            <div class="flex items-center gap-12px cursor-pointer" @click="clickAvatar(row)">
               <UserAvatar
                 :wallet_logo="{
                   logo: row.profile_pic,
@@ -66,7 +66,7 @@
                       class="w-full h-full rounded-full block"
                       :src="`${configStore.token_logo_url}chain/${row.chain}.png`"
                       alt=""
-                    />
+                    >
                   </div>
                 </div>
                 <div class="text-12px color-[--secondary-text] lh-14px">@{{ row.username }}</div>
@@ -287,6 +287,10 @@ _getKolFilters()
 
 const getTagsText = (tags = []) => {
   return tags.map((el) => kolTagsMap.value[el]).join(',')
+}
+
+const clickAvatar = (row) => {
+  window.open(row.twitter_url, '_blank')
 }
 </script>
 <style scoped lang="scss">

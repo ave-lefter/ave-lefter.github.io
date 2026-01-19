@@ -1,5 +1,5 @@
 <template>
-  <AveEmpty v-if="isMine && !botStore.evmAddress">
+  <AveEmpty v-if="props.isMine && !botStore.evmAddress">
     <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('noWalletTip') }}</span>
     <el-button
       type="primary"
@@ -9,14 +9,14 @@
       {{ t('connectWallet') }}
     </el-button>
   </AveEmpty>
-  <div v-else-if="isMine && isEmpty" class="flex flex-col items-center pt-60px">
+  <div v-else-if="props.isMine && isEmpty" class="flex flex-col items-center pt-60px">
     <Icon name="custom:twitter-empty" class="text-61px mb-12px" />
     <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('twitterEmpty') }}</span>
     <el-button type="primary" class="text-12px w-266px h-40px" @click="emits('startAttention')">
       {{ t('attention') }}
     </el-button>
   </div>
- <el-scrollbar v-else height="calc(100% - 120px)">
+ <el-scrollbar v-else height="calc(100% - 120px)" @end-reached="onScrollEnd">
   <div class="flex flex-col gap-16px">
     <div
       v-for="(item,index) in trackerStore.list"
@@ -24,14 +24,16 @@
       class="border-b-1px border-b-solid border-b-[--border] pb-16px flex gap-7px"
     >
       <UserAvatar
-        icon-size="32px"
-        :wallet_logo="{ logo: item.profile_pic, name: item.author.name }"
+      icon-size="32px"
+      class="cursor-pointer"
+        :wallet_logo="{ logo: item.author.profile_pic, name: item.author.name }"
+        @click="clickAvatar(item.author.twitter_url)"
       />
       <div class="flex flex-col gap-8px flex-1 min-w-0">
         <div class="justify-between items-center flex">
           <div class="min-w-0 flex-1">
             <div class="gap-8px flex items-center min-w-0">
-              <span v-tooltip="item.author.name" class="color-[--main-text] text-16px lh-20px min-w-0 max-w-[calc(100%-90px)] truncate">{{
+              <span v-tooltip="item.author.name" class="color-[--main-text] text-16px lh-20px min-w-0 max-w-[calc(100%-90px)] truncate cursor-pointer" @click="clickAvatar(item.author.twitter_url)">{{
                 item.author.name
               }}</span>
               <TimerCount
@@ -101,17 +103,15 @@
 import { followKol, unfollowAll } from '~/api/twitter'
 
 const { t } = useI18n()
-const emits = defineEmits(['startAttention'])
+const emits = defineEmits(['startAttention','endReached'])
 const props = defineProps({
-  activeTab: {
-    type: Number,
-    default: 1,
+  isMine: {
+    type: Boolean
   },
 })
 const botStore = useBotStore()
 const trackerStore = useTwitterTrackerStore()
 const isEmpty = computed(() => trackerStore.list.length === 0)
-const isMine = computed(() => props.activeTab === 2)
 
 const _followKol = async (author_id, index) => {
   try {
@@ -137,6 +137,16 @@ const _unfollowKol = async (author_id, index) => {
     ElMessage.error(t('failed'))
     console.error('Error unfollowing KOL:', error)
   }
+}
+
+const onScrollEnd = (direction) => {
+  if(direction === 'bottom'){
+    emits('endReached')
+  }
+}
+
+const clickAvatar = (twitter_url) => {
+  window.open(twitter_url)
 }
 </script>
 <style scoped lang="scss">

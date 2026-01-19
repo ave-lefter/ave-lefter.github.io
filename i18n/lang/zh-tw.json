@@ -1840,5 +1840,9 @@
    "hotSub":"热门订阅",
    "searchAccount":"搜索账号",
    "account":"账号",
-   "tags":"标签"
+   "tags":"标签",
+   "tweet":"推文",
+   "retweet":"轉發",
+   "quote":"引用",
+   "reply":"回覆"
 }

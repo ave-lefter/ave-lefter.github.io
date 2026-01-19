@@ -153,11 +153,11 @@ export default defineNuxtConfig({
     },
     $client: {
       optimizeDeps: {
-        include: ['lodash-unified',...(isProd ? [] : ['vuedraggable','@vueuse/components','swiper/vue', 'swiper', 'crypto-js/sha256','ua-parser-js', 'vue-draggable-plus, echarts, @element-plus/icons-vue'])]
+        include: ['lodash-unified']
       }
     },
     optimizeDeps: {
-      include: ['lodash-unified',...(isProd ? [] : ['vuedraggable','@vueuse/components','swiper/vue', 'swiper', 'crypto-js/sha256','ua-parser-js', 'vue-draggable-plus, echarts, @element-plus/icons-vue'])]
+      include: ['lodash-unified']
     },
     build: {
       minify: 'terser',

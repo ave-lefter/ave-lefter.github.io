@@ -29,7 +29,7 @@
     <SignalDraggable v-if="!signalStore.shouldHide" />
     <MonitorDragger v-show="monitorStore.visible" />
     <DragPump v-show="dragPumpStore.visible && !dragPumpStore.shouldHide" />
-    <TrackerDragger v-show="trackerStore.visible" />
+    <TrackerDragger/>
     <FavAddressPop
       ref="favAddressPopRef"
       :visible="favAddressPopVisible"

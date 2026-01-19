@@ -1856,5 +1856,9 @@
   "hotSub":"Hot Subscription",
   "searchAccount":"Search Account",
   "account":"Account",
-  "tags":"Tags"
+  "tags":"Tags",
+  "tweet":"Tweet",
+  "retweet":"Retweet",
+  "quote":"Quote",
+  "reply":"Reply"
 }

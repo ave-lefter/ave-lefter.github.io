@@ -39,11 +39,11 @@
         </span>
       </div>
       <el-checkbox
-        v-if="botStore.accessToken"
+        v-if="botStore.accessToken && !isMine"
         v-model="follow_only"
         size="small"
-        class="[--el-checkbox-height:16px] text-12px"
-        @change="getList"
+        class="[&.el-checkbox.el-checkbox--small]:h-16px text-12px"
+        @change="confirmQuery"
       >
         {{ t('onlyFollowing') }}
       </el-checkbox>
@@ -105,6 +105,7 @@
         v-model="query.token_keyword"
         class="w-160px"
         size="small"
+        clearable
         :placeholder="t('searchCA')"
         @input="debouncedConfirmInput"
       >
@@ -113,14 +114,14 @@
         </template>
       </el-input>
     </div>
-    <TwitterTrackerList :activeTab="activeTab" @startAttention="emits('setDrawerVisible', true)" />
+    <TwitterTrackerList :isMine="isMine || follow_only" @endReached="getList" @startAttention="emits('setDrawerVisible', true)" />
   </div>
 </template>
 
 <script setup name="trackerPop">
 import { useDebounceFn } from '@vueuse/core'
 import TwitterTrackerList from './list.vue'
-import { getTwitterList } from '~/api/twitter'
+import { getTwitterById, getTwitterList } from '~/api/twitter'
 const emits = defineEmits(['setDrawerVisible'])
 const { t } = useI18n()
 const trackerStore = useTwitterTrackerStore()
@@ -138,21 +139,39 @@ const tabs = computed(() => [
   { label: t('mine'), value: 2 },
 ])
 const checkboxOptions = computed(() => [
-  { label: '全部', value: 1 },
-  { label: '推文', value: 1 },
-  { label: '转发', value: 2 },
-  // { label: '更头像', value: 4 },
-  { label: '引用', value: 3 },
-  { label: '回复', value: 4 },
+  { label: t('tweet'), value: 1 },
+  { label: t('retweet'), value: 2 },
+  { label: t('quote'), value: 3 },
+  { label: t('reply'), value: 4 },
 ])
+const isMine = computed(() => {
+  return activeTab.value === 2
+})
 // const fixedCheckboxOptions = computed(() => [
 //   { label: t('onlyCA'), value: 1 },
 //   { label: t('onlyAddress'), value: 2 },
 // ])
+const reset = () => {
+  query.value.page_token = ''
+  trackerStore.finished = false
+  trackerStore.list = []
+}
 const setActiveTab = (value) => {
   activeTab.value = value
+  reset()
+  getList()
 }
+
+watch(()=>botStore.accessToken,val=>{
+  if(val && isMine.value){
+    reset()
+    getList()
+  }
+})
+
 const confirmQuery = () => {
+  filterVisible.value = false
+  reset()
   trackerStore.query = {
     ...trackerStore.query,
     ...query.value,
@@ -162,17 +181,21 @@ const confirmQuery = () => {
 const debouncedConfirmInput = useDebounceFn(confirmQuery, 300)
 
 const getList = async () => {
+  const _follow_only = isMine.value || follow_only.value
+  if(_follow_only && !botStore.accessToken){
+   return
+  }
   trackerStore.loading = true
   try {
     const res = await getTwitterList({
       ...query.value,
-      follow_only: activeTab.value === 2 || follow_only.value,
+      follow_only:_follow_only,
     })
     if (res) {
       query.value.page_token = res.page_token || ''
       const newList = res.list || []
       trackerStore.finished = res.page_token ? false : true
-      if (query.value.page_token || finished.value) {
+      if (query.value.page_token || trackerStore.finished) {
         trackerStore.list = [...trackerStore.list, ...newList]
       } else {
         trackerStore.list = newList
@@ -192,7 +215,7 @@ function subscribeTwitter() {
   wsStore.send({
     jsonrpc: '2.0',
     method: 'subscribe',
-    params: ['twitter_monitor', tgUid.value],
+    params: ['twitter_monitor', ...(tgUid.value ? [tgUid.value] : [])],
     id: 1,
   })
 }
@@ -210,13 +233,14 @@ watch(
     subscribeTwitter()
   }
 )
+
 watch(
   () => wsStore.wsResult[WSEventType.TWITTER_MONITOR],
-  () => {
-    console.log(
-      'wsStore.wsResult[WSEventType.TWITTER_MONITOR]',
-      wsStore.wsResult[WSEventType.TWITTER_MONITOR]
-    )
+  async(val) => {
+    if(val.TweetId){
+      const res = await getTwitterById(val.TweetId)
+      trackerStore.list.unshift(res)
+    }
   }
 )
 </script>
