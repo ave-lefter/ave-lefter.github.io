@@ -1060,7 +1060,7 @@ async function getPump(rawParams: {
           wsv2Store.send({
             jsonrpc: '2.0',
             method: 'subscribe',
-            params: ['portrait_statistics', { "tks": tks }],
+            params: ['portrait_statistics', { 'tks': tks }],
             id: 1,
           })
       } else {
@@ -1230,15 +1230,40 @@ function switchChain(item: { chain: ChainKey }) {
   activeChain.value = item.chain
 }
 
-const documentVisible = useDocumentVisibility()
+const documentVisible1 = useDocumentVisibility()
+
+const documentVisible = computed(() => {
+  return documentVisible1.value === 'visible'
+})
 
 watch(documentVisible, (val) => {
-  console.log('-------pump-------',route.name,val)
   if (route.name !== 'pump') return
   if (val) {
     getPumpList()
+    isInitObj.value = {
+      new: true,
+      soon: true,
+      graduated: true
+    }
+    wsStore.send({
+      jsonrpc: '2.0',
+      method: 'subscribe',
+      params: ['pumpstate', activeChain.value],
+      id: 1,
+    })
   } else {
-
+    wsv2Store.send({
+      jsonrpc: '2.0',
+      method: 'unsubscribe',
+      params: ['portrait_statistics'],
+      id: 1,
+    })
+    wsStore.send({
+      jsonrpc: '2.0',
+      method: 'unsubscribe',
+      params: ['pumpstate'],
+      id: 1,
+    })
   }
 })
 function hasValue(obj: any, key: string | number) {

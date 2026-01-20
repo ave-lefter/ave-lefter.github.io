@@ -81,16 +81,16 @@
                         'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '0',
                       }"
                     >
-                    <template #error>
+                      <template #error>
                         <img
-                          class="token-icon-tag h-16px"
-                          src="/icon-default.png"
+                          class="token-icon h-32px text-16px color-#fff"
+                          :src="getChainDefaultIcon(row.chain, row.symbol)"
                         >
                       </template>
                       <template #placeholder>
                         <img
-                          class="token-icon-tag h-16px"
-                          src="/icon-default.png"
+                          class="token-icon h-32px text-16px color-#fff"
+                          :src="getChainDefaultIcon(row.chain, row.symbol)"
                         >
                       </template>
                     </el-image>
