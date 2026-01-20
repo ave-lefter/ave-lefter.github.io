@@ -1621,9 +1621,9 @@
   "notUpdateExistRemarkTip": "提示：若不勾選則會覆蓋當前已備註過的錢包，請謹慎選擇",
   "preview": "預覽",
   "top20Remarked": "TOP 20快捷備註",
-  "totalPair":"总流动池",
-  "top100":"Top100均线",
-  "devBestToken":"开发者最佳代币",
+  "totalPair": "总流动池",
+  "top100": "Top100均线",
+  "devBestToken": "开发者最佳代币",
   "kolPosition": "KOL持仓",
   "sniper2": "狙击",
   "smart": "操作行为相对符合散户特征",
@@ -1855,5 +1855,8 @@
   "learnMore": "了解更多",
   "pendingRebate": "待領取佣金",
   "invitedUser": "邀請用戶",
-  "chainWallet3": "鏈錢包"
+  "chainWallet3": "鏈錢包",
+  "markersBuy": "總買入錢包數",
+  "markersSell": "總賣出錢包數",
+  "liqTip": "池子數和底池大小"
 }

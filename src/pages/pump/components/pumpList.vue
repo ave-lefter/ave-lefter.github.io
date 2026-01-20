@@ -81,16 +81,16 @@
                         'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '0',
                       }"
                     >
-                      <template #error>
+                    <template #error>
                         <img
-                          class="token-icon h-32px text-16px color-#fff"
-                          :src="getChainDefaultIcon(row.chain, row.symbol)"
+                          class="token-icon-tag h-16px"
+                          src="/icon-default.png"
                         >
                       </template>
                       <template #placeholder>
                         <img
-                          class="token-icon h-32px text-16px color-#fff"
-                          :src="getChainDefaultIcon(row.chain, row.symbol)"
+                          class="token-icon-tag h-16px"
+                          src="/icon-default.png"
                         >
                       </template>
                     </el-image>
@@ -366,7 +366,7 @@
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'markers')"
                       v-tooltip.raw="{
-                        content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('buy1')}/${$t('sell1')}: <span class='color-#12B886'>${formatNumber(row?.buyers_24h || 0, 2)}</span><span class='color-[--third-text]'>/</span><span class='color-#F6465D'>${formatNumber(row?.sellers_24h || 0, 2)}</span></div>`,
+                        content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('markersBuy')}/${$t('markersSell')}: <span class='color-#12B886'>${formatNumber(row?.buyers_24h || 0, 2)}</span><span class='color-[--third-text]'>/</span><span class='color-#F6465D'>${formatNumber(row?.sellers_24h || 0, 2)}</span></div>`,
                         props: {
                           placement: 'top-start',
                         },
@@ -529,7 +529,7 @@
                         )
                       }}</span>
                     </div> -->
-                    <div
+                    <!-- <div
                       v-show="pumpSetting?.define?.some((i) => i === 'rug')"
                       v-tooltip="$t('rug_rate_tips')"
                       class="flex mr-5px items-center bg-btn"
@@ -549,7 +549,7 @@
                           ? $t('unKnown1')
                           : formatNumber(row?.rug_rate || 0, 2) + '%'
                       }}</span>
-                    </div>
+                    </div> -->
 
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'smart')"
@@ -598,7 +598,7 @@
                       </div>
                       <span
                         :style="{ 'font-size': pumpSetting.fontSize_mc, color: getDataColor('mc',row.market_cap) }"
-                        >${{ pumpSetting.isInt ? formatNumber(row.market_cap || 0, { decimals: 0, l:4}) : formatNumber(row.market_cap || 0, 2) }}</span
+                        >${{ pumpSetting.isInt ? formatNumber(row.market_cap || 0, { decimals: 0, l: 4, locale: 'en' }) : formatNumber(row.market_cap || 0, {decimals: 2, locale: 'en' }) }}</span
                       >
                     </template>
                   </template>
@@ -622,6 +622,13 @@
                       {{ formatNumber(row?.tx_24h_count || 0, 2) }}
                     </div>
                   </template>
+                  <div v-tooltip="$t('liqTip')">
+                    <div class="mr-5px color-[--third-text] ml-5px" >Liq</div>
+                    <div class="color-[---main-text]">
+                      {{ formatNumber(row?.tvl || 0, 2) }}
+                    </div>
+                  </div>
+
                 </div>
                 <div class="btns-swap flex-end mt-15px pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }">
                   <div
