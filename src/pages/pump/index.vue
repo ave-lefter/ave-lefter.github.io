@@ -426,7 +426,8 @@ type StatisticsItem = {
   uprice: number
 }
 const statisticsList = ref<StatisticsItem[]>([])
-
+let portraitTimer: ReturnType<typeof setTimeout> | null = null
+let isPortraitSubscribed = false
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
   return (
@@ -565,7 +566,9 @@ const list2 = computed(() => {
     }
     return filterList?.slice?.(0, 100)
   })
-
+const mergedBaseList = computed(() => {
+  return [...list1.value, ...list2.value, ...list3.value]
+})
 const scrollHeight = computed(()=>{
   return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
 })
@@ -641,46 +644,51 @@ watch(activeChain, () => {
       id: 1,
     })
 })
+const pumpStateThrottled = useThrottleFn((val) => {
+    wsUpdateTableList(val)
+    subscribePortrait(val)
+}, 100)
+
 watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
   if (Array.isArray(val) && documentVisible.value) {
-    wsUpdateTableList(val)
-    wsv2Store.send({
-      jsonrpc: '2.0',
-      method: 'subscribe',
-      params: ['portrait_statistics', { "tks": val?.map(i=>({ ch: i.chain, tk: i?.pair?.target_token }))}],
-      id: 1,
-    })
+    pumpStateThrottled(val)
   }
 })
+
+const logoThrottled  = useThrottleFn((val) => {
+  logoList.value.unshift(val)
+  if (logoList.value.length > 300) {
+    logoList.value.length = 300
+  }
+}, 100)
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
   if (val && documentVisible.value) {
-    logoList.value.unshift(val)
-    if (logoList.value?.length > 300) {
-      logoList.value = logoList.value?.slice?.(0,300)
-    }
+    logoThrottled(val)
   }
 })
+const mergeStatisticsThrottled = useThrottleFn((val: any[]) => {
+  const map = new Map<string, any>()
+
+  // 先放旧数据
+  statisticsList.value.forEach(item => {
+    map.set(item.token, item)
+  })
+
+  // 再 merge 新数据
+  val.forEach(item => {
+    const prev = map.get(item.token)
+    map.set(
+      item.token,
+      prev ? mergeStatistics(prev, item) : item
+    )
+  })
+  statisticsList.value = Array.from(map.values()).slice(0, 300)
+}, 100)
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
   (val) => {
     if (!Array.isArray(val) || !val.length ) return
-    const map = new Map<string, any>()
-    // 先放旧数据
-    statisticsList.value.forEach(item => {
-      map.set(item.token, item)
-    })
-
-    // 再 merge 新数据（⚠️ 关键）
-    val.forEach(item => {
-      const prev = map.get(item.token)
-      if (prev) {
-        map.set(item.token, mergeStatistics(prev, item))
-      } else {
-        map.set(item.token, item)
-      }
-    })
-
-    statisticsList.value = Array.from(map.values()).slice(0, 300)
+    mergeStatisticsThrottled(val)
   }
 )
 
@@ -739,13 +747,55 @@ onDeactivated(()=>{
       Timer[timerKey] = null
     }
   }
+  if (portraitTimer) {
+    clearTimeout(portraitTimer)
+  }
+  unsubscribePortrait()
+})
+const startPortraitTimer = () => {
+  if (portraitTimer) {
+    clearTimeout(portraitTimer)
+  }
+  portraitTimer = setTimeout(() => {
+    if (documentVisible.value) {
+      unsubscribePortrait()
+      statisticsList.value = []
+      subscribePortrait(mergedBaseList.value)
+      startPortraitTimer()
+    }
+  }, 1 * 60 * 1000)
+}
+const subscribePortrait = (list) => {
+  if (!Array.isArray(list) || list.length === 0) return
+
+  wsv2Store.send({
+    jsonrpc: '2.0',
+    method: 'subscribe',
+    params: [
+      'portrait_statistics',
+      {
+        tks: list.map(i => ({
+          ch: i.chain,
+          tk: i?.pair?.target_token || i?.target_token
+        }))
+      }
+    ],
+    id: 1,
+  })
+
+  isPortraitSubscribed = true
+}
+
+const unsubscribePortrait = () => {
+  if (!isPortraitSubscribed) return
   wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
     params: ['portrait_statistics'],
     id: 1,
   })
-})
+  isPortraitSubscribed = false
+}
 
 const mouseInsideTxs = throttle(function (event) {
     const element1 = document.querySelector('.pump-item_list-new')
@@ -807,7 +857,7 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
 
   }))
   const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
-  wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,150)
+  wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,100)
   // let wsTime = this.wsTableListCache?.time || 0
   // if (wsTime < Date.now() - 15000) {
   //   this.wsTableListCache = {
@@ -1055,14 +1105,9 @@ async function getPump(rawParams: {
       .slice(0, 100)
 
     if(isInitObj.value[finalParams.category as keyof typeof isInitObj.value]) {
-      const tks = formattedList?.slice?.(0, 100)?.map?.((i) => ({ ch: i.chain, tk: i.target_token }))
-      if (tks?.length > 0) {
-          wsv2Store.send({
-            jsonrpc: '2.0',
-            method: 'subscribe',
-            params: ['portrait_statistics', { "tks": tks }],
-            id: 1,
-          })
+      if (formattedList?.length > 0) {
+          subscribePortrait(formattedList?.slice?.(0, 100))
+          startPortraitTimer()
       } else {
         isInitObj.value[finalParams.category as keyof typeof isInitObj.value] = false
       }
@@ -1226,19 +1271,42 @@ function getSpan() {
   }
 }
 function switchChain(item: { chain: ChainKey }) {
-  console.log('------switchChain--------',item.chain)
   activeChain.value = item.chain
 }
 
-const documentVisible = useDocumentVisibility()
+const documentVisible1 = useDocumentVisibility()
+
+const documentVisible = computed(() => {
+  return documentVisible1.value === 'visible'
+})
 
 watch(documentVisible, (val) => {
-  console.log('-------pump-------',route.name,val)
   if (route.name !== 'pump') return
   if (val) {
     getPumpList()
+    isInitObj.value = {
+      new: true,
+      soon: true,
+      graduated: true
+    }
+    wsStore.send({
+      jsonrpc: '2.0',
+      method: 'subscribe',
+      params: ['pumpstate', activeChain.value],
+      id: 1,
+    })
   } else {
-
+    if (portraitTimer) {
+      clearTimeout(portraitTimer)
+      portraitTimer = null
+    }
+    unsubscribePortrait()
+    wsStore.send({
+      jsonrpc: '2.0',
+      method: 'unsubscribe',
+      params: ['pumpstate'],
+      id: 1,
+    })
   }
 })
 function hasValue(obj: any, key: string | number) {

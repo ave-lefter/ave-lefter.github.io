@@ -81,16 +81,16 @@
                         'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '0',
                       }"
                     >
-                    <template #error>
+                      <template #error>
                         <img
-                          class="token-icon-tag h-16px"
-                          src="/icon-default.png"
+                          class="token-icon h-32px text-16px color-#fff"
+                          :src="getChainDefaultIcon(row.chain, row.symbol)"
                         >
                       </template>
                       <template #placeholder>
                         <img
-                          class="token-icon-tag h-16px"
-                          src="/icon-default.png"
+                          class="token-icon h-32px text-16px color-#fff"
+                          :src="getChainDefaultIcon(row.chain, row.symbol)"
                         >
                       </template>
                     </el-image>
@@ -610,6 +610,12 @@
                   "
                   class="flex-end text-12px pr-12px"
                 >
+                  <div class="flex-end mr-5px" v-tooltip="$t('liqTip')">
+                    <div class="mr-5px color-[--third-text] ml-5px" >Liq</div>
+                    <div class="color-[---main-text]">
+                      {{ formatNumber(row?.tvl || 0, 2) }}
+                    </div>
+                  </div>
                   <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
                     <div class="mr-5px color-[--third-text]">V</div>
                     <div class="color-[---main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h) }">
@@ -622,12 +628,7 @@
                       {{ formatNumber(row?.tx_24h_count || 0, 2) }}
                     </div>
                   </template>
-                  <div v-tooltip="$t('liqTip')">
-                    <div class="mr-5px color-[--third-text] ml-5px" >Liq</div>
-                    <div class="color-[---main-text]">
-                      {{ formatNumber(row?.tvl || 0, 2) }}
-                    </div>
-                  </div>
+
 
                 </div>
                 <div class="btns-swap flex-end mt-15px pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }">
@@ -792,7 +793,7 @@ const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableLis
   itemHeight: 110.8,
   // 必须增加过采样，否则 translateY(-20px) 向上移动时，
   // 顶部刚进入视口的节点会因为高度计算没到视口而无法渲染，导致动画“闪现”
-  overscan: 15,
+  overscan: 5,
 })
 onUnmounted(() => {
   $tooltip?.hide?.()
@@ -1047,7 +1048,7 @@ const getAnimClass = (itemData: any) => {
     .pump-right {
       // box-shadow: -2px 0px 4px 0px #00000099;
       background: var(--secondary-bg);
-      min-width: 160px;
+      min-width: 200px;
       position: absolute;
       right: 0;
       bottom: -2px;
