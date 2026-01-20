@@ -497,7 +497,6 @@ export function getSimpleTxs(pair:string,query: {
     query:{
       address,
       ...query1,
-      history:1
     }
   })
 }

@@ -125,8 +125,10 @@ const columns = computed(() => {
 })
 const listStatus = ref({
   loadingTxs: false,
-  loadingLiq: false
+  loadingLiq: false,
+  page_token:''
 })
+
 const tokenTxs = shallowRef<IGetSimpleTxsResponse[]>([])
 const wsPairCache = shallowRef<IGetSimpleTxsResponse[]>([])
 const pairLiq = shallowRef<GetPairLiqResponse[]>([])
@@ -226,6 +228,55 @@ const addressAndChain = computed(() => {
   }
 })
 
+// const _getTokenTxsImpl =
+
+const _getTokenTxs = useThrottleFn(async ()=>{
+    try {
+    listStatus.value.loadingTxs = true
+    const { tag_type } = tableFilter.value
+    const getPairTxsParams = {
+      token_id: route.params.id as string,
+      tag_type,
+      sender: tableFilter.value.markerAddress,
+      target_price_u_min:tableFilter.value.amountU[0],
+      target_price_u_max:tableFilter.value.amountU[1],
+      time_min:tableFilter.value.timestamp[0],
+      time_max:tableFilter.value.timestamp[1]
+    }
+    if (tag_type === '-100' && !followStore.currentAddress) {
+      resetTx()
+      listStatus.value.loadingTxs = false
+      return
+    }
+
+    const res = await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
+    console.log('_getTokenTxs res', res)
+    realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
+    tokenTxs.value = (res || []).reverse().map(val => {
+      txCount.value[val.maker] = (txCount.value[val.maker] || 0) + 1
+      const { wallet_tag, topN } = getWalletTag(val)
+      return {
+        ...val,
+        wallet_tag,
+        topN,
+        count: txCount.value[val.maker],
+        senderProfile: JSON.parse(val?.profile || '{}'),
+        uuid: uuid(),
+        ...transferTxs(val)
+      }
+    }).reverse()
+    // 获取tokenTxs.value 最后一项的token_id
+    listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token || ''
+  } catch (e) {
+    resetTx()
+    console.log('=>(transactions.vue) _getTokenTxs error', e)
+  } finally {
+    console.log('=>(transactions.vue) _getTokenTxs finally', tokenTxs.value)
+    listStatus.value.loadingTxs = false
+  }
+}, 500)
+
+
 watch(() => klineDateFilter?.value, (val) => {
   if (val && !orderBookVisible.value) {
     tableFilter.value.timestamp = val
@@ -297,6 +348,11 @@ function resetCache() {
   txCount.value = {}
   wsPairCache.value.length = 0
   wsLiqCache.value.length = 0
+}
+
+function resetTx() {
+  tokenTxs.value = []
+  listStatus.value.page_token = ''
 }
 
 watch(() => wsStore.wsResult[WSEventType.TX], data => {
@@ -485,66 +541,7 @@ function transferTxs(row: IGetSimpleTxsResponse) {
 }
 
 
-async function _getTokenTxs() {
-  try {
-    listStatus.value.loadingTxs = true
-    const { tag_type } = tableFilter.value
-    const getPairTxsParams = {
-      token_id: route.params.id as string,
-      tag_type,
-      sender: tableFilter.value.markerAddress,
-      target_price_u_min:tableFilter.value.amountU[0],
-      target_price_u_max:tableFilter.value.amountU[1],
-      time_min:tableFilter.value.timestamp[0],
-      time_max:tableFilter.value.timestamp[1]
-    }
-    if (tag_type === '-100' && !followStore.currentAddress) {
-      tokenTxs.value = []
-      listStatus.value.loadingTxs = false
-      return
-    }
 
-    // const res = await getTokenTxs(getPairTxsParams)
-    // realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
-    // tokenTxs.value = (res || []).reverse().map(val => {
-    //   txCount.value[val.wallet_address] = (txCount.value[val.wallet_address] || 0) + 1
-    //   const { wallet_tag, topN } = getWalletTag(val)
-    //   return {
-    //     ...val,
-    //     wallet_tag,
-    //     topN,
-    //     count: txCount.value[val.wallet_address],
-    //     senderProfile: JSON.parse(val.profile || '{}'),
-    //     uuid: uuid()
-    //   }
-    // }).reverse()
-    
-    // await getTokenTxs(getPairTxsParams)
-    // await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
-    const res = await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
-    console.log('=>(transactions.vue:62) res', res)
-    realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
-    tokenTxs.value = (res || []).reverse().map(val => {
-      txCount.value[val.maker] = (txCount.value[val.maker] || 0) + 1
-      const { wallet_tag, topN } = getWalletTag(val)
-      return {
-        ...val,
-        wallet_tag,
-        topN,
-        count: txCount.value[val.maker],
-        senderProfile: JSON.parse(val?.profile || '{}'),
-        uuid: uuid(),
-        ...transferTxs(val)
-      }
-    }).reverse()
-  } catch (e) {
-    tokenTxs.value = []
-    console.log('=>(transactions.vue:62) e', e)
-  } finally {
-    console.log('=>(transactions1111) e',tokenTxs.value)
-    listStatus.value.loadingTxs = false
-  }
-}
 
 function getSimpleTxTags(tag?:string) {
   if(tag){
@@ -593,6 +590,7 @@ async function _getPairLiq() {
   } catch (e) {
     console.log('=>(transactions.vue:155) e', e)
   } finally {
+    console.log('_getPairLiq')
     listStatus.value.loadingLiq = false
   }
 }
@@ -1121,22 +1119,21 @@ const collect = async (row: any,index:number) => {
         </template>
         <template #cell-makers="{ row , rowIndex}">
           <template v-if="['solana', 'bsc'].includes(row.chain)  && (row.senderProfile || row.maker_bal)">
-            <Icon
+            <!-- <Icon
               v-if="hasNewAccount(row)"
               v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' }}"
               name="custom:new-account"
-              class="mr-3px shrink-0"/>
-            <Icon
+              class="mr-3px shrink-0"/> -->
+            <!-- <Icon
               v-if="hasClearedAccount(row)"
               v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-              name="custom:cleared-account" class="mr-3px shrink-0"/>
+              name="custom:cleared-account" class="mr-3px shrink-0"/> -->
             <Icon
               v-if="bigWallet(row)"
               v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:big" class="mr-3px shrink-0"/>
           </template>
-          <SignalTags
-            tagClass="mr-3px" :tags="(row.newTags||[]).map((el: any)=>tagStore.matchTag(el.type)||el)"
+          <SignalTags tagClass="mr-3px" :tags="(row.newTags||[]).map((el: any)=>tagStore.matchTag(el.type)||el)"
                       :walletAddress="row.wallet_address" :chain="row.chain"/>
           <div :key="row.wallet_address" class="flex items-center gap-4px">
             <UserRemark
@@ -1188,14 +1185,14 @@ const collect = async (row: any,index:number) => {
         :addressAndChain="addressAndChain"
       >
         <template v-if="['solana', 'bsc'].includes(currentRow.chain) && (currentRow.senderProfile || currentRow.maker_bal)">
-          <Icon
+          <!-- <Icon
             v-if="hasNewAccount(currentRow)"
             v-tooltip.raw="`<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`" name="custom:new-account"
             class="mr-3px" />
           <Icon
             v-if="hasClearedAccount(currentRow)"
             v-tooltip.raw="`<span style='color: #EB2B4B'>${$t('sellAl')}</span>`" name="custom:cleared-account"
-            class="mr-3px" />
+            class="mr-3px" /> -->
           <Icon
             v-if="bigWallet(currentRow)" v-tooltip.raw="`<span style='color: #C5842B'>${$t('whales')}</span>`"
             name="custom:big" />
