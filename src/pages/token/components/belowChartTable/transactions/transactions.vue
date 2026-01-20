@@ -35,6 +35,7 @@ const $refs = ref({
 })
 
 // const MAKER_SUPPORT_CHAINS = ['solana', 'bsc']
+const {lang} = storeToRefs(useGlobalStore())
 const { t } = useI18n()
 const {totalHolders, pairAddress, token, pair, commonHeight} = storeToRefs(useTokenStore())
 const tokenDetailSStore = useTokenDetailsStore()
@@ -167,7 +168,7 @@ const filterTableList = computed(() => {
     tableList = tableList.filter(el => el.time <= Number(endTime))
   }
   if (markerAddress) {
-    tableList = tableList.filter(el => el.wallet_address === markerAddress)
+    tableList = tableList.filter(el => el?.wallet_address === markerAddress)
   }
   if (startVol) {
     tableList = tableList.filter(el => {
@@ -443,6 +444,7 @@ function onTimestampConfirm(timestamp: string[] = []) {
 function confirmVolFilter(amountU: string[] = []) {
   tableFilterVisible.value.amountU = false
   tableFilter.value.amountU = amountU
+  _getTokenTxs()
 }
 
 function confirmMakersFilter(markerAddress = '') {
@@ -453,13 +455,31 @@ function confirmMakersFilter(markerAddress = '') {
 }
 
 function transferTxs(row: IGetSimpleTxsResponse) {
-  const newTags = row.maker_type
+  const maker_types = (row.maker_type||'').split(',')
+  let lang1='en' as 'tw'|'cn'|'vi'|'tr'|'ru'|'pt'|'ko'|'ja'|'es'|'en'
+  if (lang.value === 'zh-tw') {
+    lang1 = 'tw'; // 繁体中文
+  } else if (lang.value === 'zh-cn') {
+    lang1 = 'cn'; // 简体中文
+  } 
+  const newTags=tagStore.tagArr.filter(item => maker_types.includes(item.type)).map(i=>{
+    return {
+      "type": i.type,
+      "tag_desc": i?.[lang1],
+      "icon": i.icon,
+      "color": i.color,
+      "extra_info": i.extra_info,
+      "nick_name": i.nick_name
+    }
+  })
   return {
     ...row,
+    newTags,
     isSimple: true,
     chain:addressAndChain.value.chain,
     id:row.page_token,
     // amm:row.amm,
+    transaction:row.txhash,
     wallet_address:row.maker,
   }
 }
@@ -472,7 +492,9 @@ async function _getTokenTxs() {
     const getPairTxsParams = {
       token_id: route.params.id as string,
       tag_type,
-      maker: tableFilter.value.markerAddress,
+      sender: tableFilter.value.markerAddress,
+      target_price_u_min:tableFilter.value.amountU[0],
+      target_price_u_max:tableFilter.value.amountU[1],
       time_min:tableFilter.value.timestamp[0],
       time_max:tableFilter.value.timestamp[1]
     }
@@ -498,7 +520,7 @@ async function _getTokenTxs() {
     // }).reverse()
     
     // await getTokenTxs(getPairTxsParams)
-    await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
+    // await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
     const res = await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
     console.log('=>(transactions.vue:62) res', res)
     realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
@@ -519,6 +541,7 @@ async function _getTokenTxs() {
     tokenTxs.value = []
     console.log('=>(transactions.vue:62) e', e)
   } finally {
+    console.log('=>(transactions1111) e',tokenTxs.value)
     listStatus.value.loadingTxs = false
   }
 }
@@ -964,6 +987,7 @@ const collect = async (row: any,index:number) => {
           </div>
         </template>
         <template #cell-time="{ row,rowIndex }">
+            <!-- in-{{ rowIndex }}- -->
           <TimerCount
             v-if="!tableView.isShowDate && row.time && Number(formatTimeFromNow(row.time, true)) < 60"
             :key="`${row.time}${rowIndex}`" :timestamp="row.time" :end-time="60">
@@ -1139,7 +1163,8 @@ const collect = async (row: any,index:number) => {
         </template>
         <template #cell-SOLBalance="{ row }">
           <span v-if="row.senderProfile" class="color-[--secondary-text]">
-            {{ formatNumber(row.senderProfile?.solTotalHolding || 0, 2) }}
+            {{ formatNumber(row.maker_eth || 0, 2) }}
+            <!-- {{ formatNumber(row.senderProfile?.solTotalHolding || 0, 2) }} -->
           </span>
         </template>
         <template #cell-DEX="{ row }">

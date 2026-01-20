@@ -466,7 +466,7 @@ export interface IGetSimpleTxsResponse {
   base_reserve: string;
   liquidity: string;
   maker: string;
-  maker_type: number;
+  maker_type: string;
   maker_bal: string;
   maker_eth: string;
   page_token: string;
@@ -477,17 +477,21 @@ export interface IGetSimpleTxsResponse {
 export function getSimpleTxs(pair:string,query: {
   token_id: string,
   tag_type?: string,
-  maker?: string,
+  sender?: string,
   address?: string,
   time_min?: string,
   time_max?: string
+  target_price_u_min?: string
+  target_price_u_max?: string
 }): Promise<IGetSimpleTxsResponse[]> {
   const address=localStorage.bot_evmAddress || localStorage.walletAddress
   const {$api} = useNuxtApp()
-  const query1 = {...query}
+  // const query1 = {...query}
+  const {...query1} ={...query}
   if (query1.tag_type === 'all') {
     query1.tag_type = ''
   }
+  console.log('simpletxs',query1)
   return $api(`/v1api/v3/pairs/${pair}/simpletxs`, {
     method: 'get',
     query:{
@@ -1221,8 +1225,11 @@ export interface IGetAllTagsResponse {
   tw: string;
   es: string;
   pt: string;
+  ru: string;
   tr: string;
   ja: string;
+  vi: string;
+  ko: string;
   icon: string;
   color: string;
   extra_info: any;
