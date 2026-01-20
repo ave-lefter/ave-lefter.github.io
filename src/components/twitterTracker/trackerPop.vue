@@ -176,7 +176,7 @@ const isMine = computed(() => {
 //   { label: t('onlyCA'), value: 1 },
 //   { label: t('onlyAddress'), value: 2 },
 // ])
-const checkAll = ref(false)
+const checkAll = ref(query.value.types.length === checkboxOptions.value.length)
 const isIndeterminate = ref(false)
 const handleCheckAllChange = () => {
   query.value.types = checkAll.value ? checkboxOptions.value.map(i => i.value) : []
