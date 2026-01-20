@@ -316,7 +316,7 @@ function pumpMapFunction(resItem: PumpObj) {
       resItem.target_token !== resItem.token0_address
         ? resItem.reserve0 * resItem.token0_price_usd * 2
         : resItem.reserve1 * resItem.token1_price_usd * 2,
-    medias: getMedias(resItem.appendix, t),
+    medias: getMedias(resItem.appendix),
     // normal_tag: normal_tag?.slice(0, 3) || [],
     // signal_arr: signal_arr?.slice(0, 1) || [],
     // tag_arr,
