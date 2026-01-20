@@ -418,6 +418,12 @@ type StatisticsItem = {
   dev_ratio: string
   sniper_ratio: string
   progress: string
+  top10_ratio: string,
+  tx_amount_24h:number
+  tx_count_24h:number
+  tvl:number
+  total: string
+  uprice: number
 }
 const statisticsList = ref<StatisticsItem[]>([])
 
@@ -1227,10 +1233,12 @@ function switchChain(item: { chain: ChainKey }) {
 const documentVisible = useDocumentVisibility()
 
 watch(documentVisible, (val) => {
+  console.log('-------pump-------',route.name,val)
+  if (route.name !== 'pump') return
   if (val) {
-    if (route.name === 'pump') {
-      getPumpList()
-    }
+    getPumpList()
+  } else {
+
   }
 })
 function hasValue(obj: any, key: string | number) {
@@ -1244,7 +1252,6 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
       y => y.token === i.target_token
     )
     if (!obj) return i
-
     const next = { ...i }
 
     if (hasValue(obj, 'progress')) {
@@ -1262,39 +1269,59 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'sniper_ratio')) {
       next.sniper_balance_ratio_cur = Number(obj.sniper_ratio)
     }
+    if (hasValue(obj, 'top10_ratio')) {
+      next.holders_top10_ratio = Number(obj.top10_ratio)
+    }
+    if (hasValue(obj, 'tx_amount_24h')) {
+      next.volume_u_24h = Number(obj.tx_amount_24h) * obj.uprice
+    }
+    if (hasValue(obj, 'tx_count_24h')) {
+      next.tx_24h_count = Number(obj.tx_count_24h)
+    }
+    if (hasValue(obj, 'tvl')) {
+      next.tvl = Number(obj.tvl)   //池子大小
+    }
+    if (hasValue(obj, 'uprice')) {
+      next.market_cap = next.amm =='fourmemev2'|| next.amm =='flapswap' ? Number(obj.total || 1000000000) * obj.uprice : Number(obj.total) * obj.uprice
+    }
     return next
   })
 }
 function mergeStatistics(prev: any, next: any) {
   const result = { ...prev }
-
-  // progress 结构
-  if (next.progress != null) {
+  if (hasValue(next, 'progress')) {
     result.progress = next.progress
   }
-
-  // ratio 结构
-  if (next.holder_count != null) {
+  if (hasValue(next, 'holder_count')) {
     result.holder_count = next.holder_count
   }
-  if (next.rat_raio != null) {
+  if (hasValue(next, 'rat_raio')) {
     result.rat_raio = next.rat_raio
   }
-  if (next.dev_ratio != null) {
+  if (hasValue(next, 'dev_ratio')) {
     result.dev_ratio = next.dev_ratio
   }
-  if (next.sniper_ratio != null) {
+  if (hasValue(next, 'sniper_ratio')) {
     result.sniper_ratio = next.sniper_ratio
   }
-
-  // 公共字段（可选）
-  if (next.chain != null) {
-    result.chain = next.chain
+  if (hasValue(next, 'top10_ratio')) {
+    result.top10_ratio = next.top10_ratio
   }
-  if (next.token != null) {
-    result.token = next.token
+  if (hasValue(next, 'uprice')) {
+    result.uprice = next.uprice
   }
-
+  if (hasValue(next, 'tx_amount_24h')) {
+    result.tx_amount_24h = next.tx_amount_24h
+  }
+  if (hasValue(next, 'tx_count_24h')) {
+    result.tx_count_24h = next.tx_count_24h
+  }
+  if (hasValue(next, 'tvl')) {
+    result.tvl = next.tvl
+  }
+  if (hasValue(next, 'total')) {
+    result.total = next.total
+  }
   return result
 }
 </script>

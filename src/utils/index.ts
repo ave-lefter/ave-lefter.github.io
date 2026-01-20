@@ -467,7 +467,6 @@ export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
     try {
       return 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(defaultSvg)))
     } catch (err) {
-      console.log(err, chain, text)
       return ''
     }
   }

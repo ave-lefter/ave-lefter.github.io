@@ -1639,7 +1639,7 @@
   "notUpdateExistRemarkTip": "Note: If unchecked, this will overwrite any existing remarks on the wallet. Please choose carefully.",
   "preview": "Preview",
   "top20Remarked": "TOP 20 Quick Remarks",
-  "devBestToken":"Dev's Best Token",
+  "devBestToken": "Dev's Best Token",
   "indicatorLine": "Indicator Line",
   "buyMa": "Buy MA",
   "sellMa": "Sell MA",
@@ -1871,5 +1871,9 @@
   "learnMore": "Learn More",
   "pendingRebate": "Commission",
   "chainWallet3": "Chain Wallet",
-  "invitedUser": "Invite Users"
+  "invitedUser": "Invite Users",
+  "markersBuy": "Markers Buy",
+  "markersSell": "Markers Sell",
+  "liqTip": "Number of pools and size of the bottom pool"
+
 }
