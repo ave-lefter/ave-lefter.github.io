@@ -14,7 +14,7 @@
                             }}</span>
                         <img v-if="item.verified" :width="12" src="@/assets/images/kol.svg" alt="">
                         <TimerCount v-if="item.created_at && Number(formatTimeFromNow(item.created_at, true)) < 60"
-                            :key="`${item.created_at}`" :timestamp="item.created_at" :end-time="60" class="text-12px">
+                            :key="`${item.created_at}`" :timestamp="+item.created_at" :end-time="60" class="text-12px">
                             <template #default="{ seconds }">
                                 <span class="color-[--secondary-text] text-12px">
                                     <template v-if="seconds < 60"> {{ seconds }}s </template>
@@ -44,21 +44,62 @@
                     </div>
                 </div>
             </div>
-            <div v-show="!item.hide" class="text-14px lh-22px break-words">
-                {{ item.content }}
+            <div class="relative">
+                <div 
+                    ref="contentEl"
+                    :class="[
+                        'text-14px lh-22px break-words',
+                        { 'line-11': !contentExpanded && isContentOverflow }
+                    ]">
+                    {{ item.content }}
+                </div>
+                <div 
+                    ref="measureEl"
+                    class="text-14px lh-22px break-words absolute opacity-0 pointer-events-none"
+                    style="width: 100%; top: 0; left: 0; z-index: -1;">
+                    {{ item.content }}
+                </div>
             </div>
-            <div v-for="(media, mediaIndex) in item.medias" :key="mediaIndex" class="relative">
-                <img :src="media.media_url_https" alt="" class="max-w-full rounded-8px">
+            <div v-for="(media, mediaIndex) in item.medias?.slice?.(0,1)" :key="mediaIndex" class="relative">
+                <!-- <img :src="media.media_url_https" alt="" class="max-w-full rounded-8px cursor-pointer"> -->
+                <el-tooltip 
+                    :ref="el => { if (el) tooltipRefs[`${mediaIndex}`] = el }"
+                    popper-class="tooltip-pd-0" 
+                    :show-arrow="false" 
+                    placement="right"
+                    :popper-options="{
+                        modifiers: [
+                            {
+                                name: 'eventListeners',
+                                options: {
+                                    scroll: true,
+                                    resize: true
+                                }
+                            }
+                        ]
+                    }"
+                    @show="handleTooltipShow(mediaIndex)">
+                    <template #default>
+                        <img :src="media.media_url_https" alt="" class="w-full max-h-300px rounded-8px object-cover">
+                    </template>
+                    <template #content>
+                        <img 
+                            :src="media.media_url_https" 
+                            alt="" 
+                            class="max-w-50vw max-h-50vh object-cover rounded-8px"
+                            @load="handleImageLoad(mediaIndex)">
+                    </template>
+                </el-tooltip>
                 <Icon v-if="media.type==='video'" name="custom:play-circle-line" class="absolute top-50% left-50% transform -translate-x-1/2 -translate-y-1/2 text-48px text-white cursor-pointer" @click="clickVideo(item.url)"/>
             </div>
-            <div class="justify-between items-center flex">
+            <div v-if="isContentOverflow" class="justify-between items-center flex">
                 <div class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]">
                     <!-- <Icon name="custom:translation"/>{{ t('viewTranslation') }} -->
                 </div>
                 <span class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px"
-                    @click="item.hide = !item.hide">
-                    <Icon name="custom:angle-down" :class="item.hide ? '' : 'rotate-180'" />
-                    {{ item.hide ? t('Expand') : t('Collapse') }}
+                @click="contentExpanded = !contentExpanded">
+                    <Icon name="custom:angle-down" :class="contentExpanded ? 'rotate-180' : ''" />
+                    {{ !contentExpanded ? t('Expand') : t('Collapse') }}
                 </span>
             </div>
         </div>
@@ -80,6 +121,36 @@ const props = defineProps({
         required: true
     }
 })
+
+const tooltipRefs = ref({})
+const contentEl = ref(null)
+const measureEl = ref(null)
+const contentExpanded = ref(false)
+const isContentOverflow = ref(false)
+
+const checkContentOverflow = () => {
+    nextTick(() => {
+        const el = measureEl.value || contentEl.value
+        if (!el) return
+        const lineHeight = parseFloat(getComputedStyle(el).lineHeight) || 22
+        const maxHeight = lineHeight * 11
+        isContentOverflow.value = el.scrollHeight > maxHeight + 1
+    })
+}
+
+onMounted(() => {
+    checkContentOverflow()
+    window.addEventListener('resize', checkContentOverflow)
+})
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', checkContentOverflow)
+})
+
+watch(() => props.item?.content, () => {
+    checkContentOverflow()
+}, { immediate: true })
+
 const clickAvatar = (twitter_url) => {
     window.open(twitter_url)
 }
@@ -112,5 +183,46 @@ const _unfollowKol = async (author_id, index) => {
 
 const clickVideo = (url) => {
     window.open(url)
+}
+
+const handleTooltipShow = (mediaIndex) => {
+    // Tooltip 显示时，等待图片加载完成后更新位置
+    nextTick(() => {
+        updateTooltipPosition(mediaIndex)
+    })
+}
+
+const handleImageLoad = (mediaIndex) => {
+    // 图片加载完成后更新 tooltip 位置
+    nextTick(() => {
+        updateTooltipPosition(mediaIndex)
+    })
+}
+
+const updateTooltipPosition = (mediaIndex) => {
+    const tooltipRef = tooltipRefs.value[mediaIndex]
+    if (!tooltipRef) return
+    
+    // 使用 nextTick 确保 DOM 已更新
+    nextTick(() => {
+        // 尝试多种方式更新 tooltip 位置
+        if (tooltipRef.updatePopper) {
+            tooltipRef.updatePopper()
+        } else if (tooltipRef.popperInstance) {
+            tooltipRef.popperInstance.update()
+        } else if (tooltipRef.$ && tooltipRef.$.exposed) {
+            // 尝试访问内部实例
+            const exposed = tooltipRef.$.exposed
+            if (exposed.updatePopper) {
+                exposed.updatePopper()
+            }
+        }
+        
+        // 通过触发 resize 事件来让 popper 重新计算位置
+        // 使用 requestAnimationFrame 确保在下一帧执行
+        requestAnimationFrame(() => {
+            window.dispatchEvent(new Event('resize'))
+        })
+    })
 }
 </script>

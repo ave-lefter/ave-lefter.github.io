@@ -124,7 +124,7 @@
             </div>
           </template>
           <template #default="{ row }">
-            <span class="text-[--main-text]">{{ getTagsText(row.tags) }}</span>
+            <span class="text-[--main-text]">{{ getTagsText(row.tags||[]) }}</span>
           </template>
         </el-table-column>
         <el-table-column width="40" align="right" label="">

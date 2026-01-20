@@ -57,7 +57,8 @@ export const WSEventType = {
   PUBLIC_PORTRAIT: 'public_portrait',
   SIMPLE_TX: 'simple_tx',
   PUMP_MIGRATED: 'pump_migrated',
-  TWITTER_MONITOR:'twitter_monitor'
+  TWITTER_MONITOR:'twitter_monitor',
+  PUBLIC_TWITTER:'public_twitter'
 }
 // perp
 export const WSPerpHost = 'wss://quote.edgex.exchange'

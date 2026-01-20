@@ -38,7 +38,7 @@
           {{ el.label }}
         </span>
       </div>
-      <el-checkbox
+      <!-- <el-checkbox
         v-if="botStore.accessToken && !isMine"
         v-model="follow_only"
         size="small"
@@ -46,7 +46,7 @@
         @change="confirmQuery"
       >
         {{ t('onlyFollowing') }}
-      </el-checkbox>
+      </el-checkbox> -->
     </div>
     <div class="flex justify-between items-center mb-14px">
       <div class="flex items-center gap-8px color-[--secondary-text]">
@@ -111,7 +111,8 @@
         />
       </div>
       <el-input
-        v-model="query.token_keyword"
+      v-model="query.token_keyword"
+        style="--el-input-bg-color:var(--main-list-hover);--el-input-height:26px;"
         class="w-160px"
         size="small"
         clearable
@@ -123,7 +124,7 @@
         </template>
       </el-input>
     </div>
-    <TwitterTrackerList :isMine="isMine || follow_only" @endReached="getList" @startAttention="emits('setDrawerVisible', true)" />
+    <TwitterTrackerList :isMine="isMine" @endReached="getList" @startAttention="emits('setDrawerVisible', true)" />
     <audio
       ref="twitterAudio" controls style="display: none"
       :src="getAudioUrl(globalStore.audioSettings.audio.twitter)"
@@ -147,10 +148,20 @@ const filterVisible = ref(false)
 
 const twitterAudio = useTemplateRef('twitterAudio')
 const query = ref({ ...trackerStore.query })
-const follow_only = ref(false)
+defineProps({
+  scrollHeight: {
+    type: Number,
+    default: 0,
+  },
+})
+// const follow_only = ref(false)
+const TAB_TYPE = {
+  HOT: 1,
+  MINE: 2,
+}
 const tabs = computed(() => [
-  { label: t('hot2'), value: 1 },
-  { label: t('mine'), value: 2 },
+  { label: t('hot2'), value: TAB_TYPE.HOT },
+  { label: t('mine'), value: TAB_TYPE.MINE },
 ])
 const checkboxOptions = computed(() => [
   { label: t('tweet'), value: 1 },
@@ -159,7 +170,7 @@ const checkboxOptions = computed(() => [
   { label: t('reply'), value: 4 },
 ])
 const isMine = computed(() => {
-  return activeTab.value === 2
+  return activeTab.value === TAB_TYPE.MINE
 })
 // const fixedCheckboxOptions = computed(() => [
 //   { label: t('onlyCA'), value: 1 },
@@ -206,17 +217,18 @@ const confirmQuery = () => {
 const debouncedConfirmInput = useDebounceFn(confirmQuery, 300)
 
 const getList = async () => {
-  const _follow_only = isMine.value || follow_only.value
-  if(_follow_only && !botStore.accessToken){
+  // const _follow_only = isMine.value || follow_only.value
+  const _activeTab = activeTab.value
+  if(isMine.value && !botStore.accessToken){
    return
   }
   trackerStore.loading = true
   try {
     const res = await getTwitterList({
       ...query.value,
-      follow_only:_follow_only,
+      follow_only:isMine.value,
     })
-    if (res) {
+    if (res && activeTab.value === _activeTab) {
       query.value.page_token = res.page_token || ''
       const newList = res.list || []
       trackerStore.finished = res.page_token ? false : true
@@ -236,32 +248,37 @@ const getList = async () => {
 getList()
 
 const tgUid = computed(() => botStore.userInfo?.tgUid)
-function subscribeTwitter() {
+function subscribePublicTwitter(method) {
   wsStore.send({
     jsonrpc: '2.0',
-    method: 'subscribe',
-    params: ['twitter_monitor', ...(tgUid.value ? [tgUid.value] : [])],
+    method,
+    params: ['public_twitter', 'hot'],
     id: 1,
   })
 }
 
-subscribeTwitter()
-watch(
-  () => tgUid.value,
-  () => {
-    wsStore.send({
-      jsonrpc: '2.0',
-      method: 'unsubscribe',
-      params: ['twitter_monitor'],
-      id: 1,
-    })
-    subscribeTwitter()
-  }
-)
+function subscribeTwitter(method) {
+  wsStore.send({
+    jsonrpc: '2.0',
+    method,
+    params: ['twitter_monitor',...(tgUid.value ? [tgUid.value] : [])],
+    id: 1,
+  })
+}
 
-watch(
-  () => wsStore.wsResult[WSEventType.TWITTER_MONITOR],
-  async(val) => {
+subscribePublicTwitter()
+watch(()=>activeTab.value,val=>{
+  if(val === TAB_TYPE.MINE){
+    subscribePublicTwitter('unsubscribe')
+    subscribeTwitter('subscribe')
+  } else {
+    subscribeTwitter('unsubscribe')
+    subscribePublicTwitter('subscribe')
+    
+  }
+})
+
+const twitterHandler = async(val) => {
     if(val.TweetId && query.value.types.includes(+val.Type)){
       const res = await getTwitterById(val.TweetId)
       trackerStore.list.unshift(res)
@@ -270,7 +287,11 @@ watch(
       }
     }
   }
+watch(
+  () => wsStore.wsResult[WSEventType.PUBLIC_TWITTER],
+  twitterHandler
 )
+watch(()=>wsStore.wsResult[WSEventType.TWITTER_MONITOR],twitterHandler)
 </script>
 
 <style scoped lang="scss"></style>

@@ -13,15 +13,14 @@
 </template>
 
 <script setup lang="ts">
-const signalStore = useSignalStore()
-const monitorStore = useMonitorStore()
+import { useWindowSize } from '@vueuse/core'
+
 const dragPumpStore = usePumpStore()
-const trackerStore = useTwitterTrackerStore()
 const dragStore = useDragStore()
 const { t } = useI18n()
 const { placement } = storeToRefs(dragPumpStore)
 const key = ref(0)
-
+const { width: winWidth } = useWindowSize()
 const reload = () => {
   key.value++
 }
@@ -80,6 +79,7 @@ const props1 = computed(() => {
       parent: true,
       handles: ['tl', 'tm', 'tr', 'mr', 'br', 'bm', 'bl', 'ml'],
       dragHandle: '.drag-handle',
+      z:1
     },
     left: {
       className: '[&&]:relative shrink-0 left fixed! top-61px',
@@ -137,16 +137,9 @@ const props2 = computed(() => {
   return data
 })
 function dragStop(x: number, y: number) {
-  if (['left', 'right'].includes(placement.value) && Math.abs(x) < 1) {
-    if (
-      signalStore.signalVisible &&
-      monitorStore.visible &&
-      dragPumpStore.visible &&
-      trackerStore.visible
-    ) {
-      ElMessage.warning(t('popTips'))
-      return
-    }
+  if ((Math.abs(x) < 1||x + dragPumpStore.boundingRect.width >= winWidth.value) && dragStore.fixedCount >= 3) {
+    ElMessage.warning(t('popTips'))
+    return
   }
   if (placement.value === 'left') {
     dragPumpStore.onLeftDragStop(x, y)

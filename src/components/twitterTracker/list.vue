@@ -25,7 +25,7 @@
   <div class="flex flex-col gap-16px">
     <div v-for="(item, index) in trackerStore.list" :key="item.id" class="border-b-1px border-b-solid border-b-[--border]">
       <ListItem :item="item" :index="index" />
-      <div v-if="['2','3','4'].includes(item.type)" v-show="!item.hide" class="border-1px border-solid border-[--dialog-divider] rounded-8px px-12px pt-16px ml-40px mb-16px">
+      <div v-if="['2','3','4'].includes(item.type)" class="border-1px border-solid border-[--dialog-divider] rounded-8px px-12px pt-16px ml-40px mb-16px">
         <ListItem :item="item.retweeted_tweet||item.quoted_tweet||item.replied_tweet" :index="-1"
 />
       </div>

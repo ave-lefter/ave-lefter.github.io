@@ -16,16 +16,15 @@
     </div>
 </template>
 <script setup name="trackerDragger">
+import { useWindowSize } from '@vueuse/core'
+
 const drawerVisible = ref(false)
-const signalStore = useSignalStore()
-const monitorStore = useMonitorStore()
-const dragPumpStore = usePumpStore()
 const trackerStore = useTwitterTrackerStore()
 const dragStore = useDragStore()
 const { t } = useI18n()
 const { placement } = storeToRefs(trackerStore)
 const key = ref(0)
-
+const { width: winWidth } = useWindowSize()
 const reload = () => {
   key.value++
 }
@@ -142,16 +141,9 @@ const props2 = computed(() => {
   return data
 })
 function dragStop(x, y) {
-  if (['left', 'right'].includes(placement.value) && Math.abs(x) < 1) {
-    if (
-      signalStore.signalVisible &&
-      monitorStore.visible &&
-      dragPumpStore.visible &&
-      trackerStore.visible
-    ) {
-      ElMessage.warning(t('popTips'))
-      return
-    }
+  if ((Math.abs(x) < 1||x + trackerStore.boundingRect.width >= winWidth.value) && dragStore.fixedCount >= 3) {
+    ElMessage.warning(t('popTips'))
+    return
   }
   if (placement.value === 'left') {
     trackerStore.onLeftDragStop(x, y)

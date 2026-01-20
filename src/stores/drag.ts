@@ -159,10 +159,19 @@ export const useDragStore = defineStore('drag', () => {
       twitter:monitorStore.winWidth-fixedWidth.value['twitter']-(Number(twitter)||0),
     }
   })
+
+  const fixedCount = computed(()=>{
+    let count = 0
+    if(signalStore.isLeftFixed || signalStore.isRightFixed) count++
+    if((monitorStore.isLeftFixed || monitorStore.isRightFixed)) count++
+    if((pumpStore.isLeftFixed || pumpStore.isRightFixed)) count++
+    if((twitterTrackerStore.isLeftFixed || twitterTrackerStore.isRightFixed)) count++
+    return count
+  })
   return {
     leftWidth,
-    rightWidth
-    // visible,
+    rightWidth,
+    fixedCount,
     // monitorBoundingRect,
     // isLeftFixed,
     // isRightFixed,
