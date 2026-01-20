@@ -14,7 +14,7 @@
                             }}</span>
                         <img v-if="item.verified" :width="12" src="@/assets/images/kol.svg" alt="">
                         <TimerCount v-if="item.created_at && Number(formatTimeFromNow(item.created_at, true)) < 60"
-                            :key="`${item.created_at}`" :timestamp="+item.created_at" :end-time="60" class="text-12px">
+                            :key="`${item.created_at}`" :timestamp="+item.created_at" :end-time="60">
                             <template #default="{ seconds }">
                                 <span class="color-[--secondary-text] text-12px">
                                     <template v-if="seconds < 60"> {{ seconds }}s </template>
@@ -90,7 +90,10 @@
                             @load="handleImageLoad(mediaIndex)">
                     </template>
                 </el-tooltip>
-                <Icon v-if="media.type==='video'" name="custom:play-circle-line" class="absolute top-50% left-50% transform -translate-x-1/2 -translate-y-1/2 text-48px text-white cursor-pointer" @click="clickVideo(item.url)"/>
+                <div v-if="media.type==='video'" class="absolute top-0 left-0 w-full h-full bg-black/50 rounded-8px">
+                    <Icon name="custom:play-circle-line" class="absolute top-50% left-50% transform -translate-x-1/2 -translate-y-1/2 text-48px text-white cursor-pointer" @click="clickVideo(item.url)"/>
+                </div>
+               
             </div>
             <div v-if="isContentOverflow" class="justify-between items-center flex">
                 <div class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]">

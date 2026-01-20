@@ -33,9 +33,7 @@ export const useWSStore = defineStore('ws', () => {
     [WSEventType.PRICE_EXTRA]: null,
     [WSEventType.SIMPLE_TX]: null,
     [WSEventType.PUBLIC_PORTRAIT]: null,
-    [WSEventType.PUMP_MIGRATED]: null,
-    [WSEventType.TWITTER_MONITOR]:null,
-    [WSEventType.PUBLIC_TWITTER]:null
+    [WSEventType.PUMP_MIGRATED]: null
   })
 
   // 将 createWebSocket 重命名为 init
@@ -87,11 +85,7 @@ export const useWSStore = defineStore('ws', () => {
         wsResult[event] = data?.msg
       } else if(event === WSEventType.PUBLIC_PORTRAIT){
         usePublicPortraitStore().updatePublicPortrait(data?.msg || [])
-      } else if(event === WSEventType.TWITTER_MONITOR){
-        wsResult[event] = data?.post
-      } else if(event === WSEventType.PUBLIC_TWITTER){
-        wsResult[event] = data?.post
-      } else {
+      }  else {
         wsResult[event] = data
       }
     }, 'main')

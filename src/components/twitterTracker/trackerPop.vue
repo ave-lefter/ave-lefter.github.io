@@ -137,10 +137,11 @@
 import { useDebounceFn } from '@vueuse/core'
 import TwitterTrackerList from './list.vue'
 import { getTwitterById, getTwitterList } from '~/api/twitter'
+import { useV2WSStore } from '~/stores/v2ws'
 const emits = defineEmits(['setDrawerVisible'])
 const { t } = useI18n()
 const trackerStore = useTwitterTrackerStore()
-const wsStore = useWSStore()
+const v2WsStore = useV2WSStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const activeTab = ref(1)
@@ -249,7 +250,7 @@ getList()
 
 const tgUid = computed(() => botStore.userInfo?.tgUid)
 function subscribePublicTwitter(method) {
-  wsStore.send({
+  v2WsStore.send({
     jsonrpc: '2.0',
     method,
     params: ['public_twitter', 'hot'],
@@ -258,7 +259,7 @@ function subscribePublicTwitter(method) {
 }
 
 function subscribeTwitter(method) {
-  wsStore.send({
+  v2WsStore.send({
     jsonrpc: '2.0',
     method,
     params: ['twitter_monitor',...(tgUid.value ? [tgUid.value] : [])],
@@ -288,10 +289,10 @@ const twitterHandler = async(val) => {
     }
   }
 watch(
-  () => wsStore.wsResult[WSEventType.PUBLIC_TWITTER],
+  () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],
   twitterHandler
 )
-watch(()=>wsStore.wsResult[WSEventType.TWITTER_MONITOR],twitterHandler)
+watch(()=>v2WsStore.wsResult[WSEventV2Type.TWITTER_MONITOR],twitterHandler)
 </script>
 
 <style scoped lang="scss"></style>
