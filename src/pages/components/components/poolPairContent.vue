@@ -295,8 +295,13 @@ function addTokenFavorite(row, newGroupId: number) {
           </div>
           <div v-if="row?.medias?.length > 0" class="flex items-center gap-4px">
             <template v-for="(item, index) in row?.medias" :key="index">
-              <XPopup v-if="item.icon === 'twitter'" :tokenId="((row.token + '-' + row.chain) as string)" :type="row.twitter_type">
-
+              <span v-if="item.name === 'QQ'" v-tooltip="item.url" @click.stop>
+                <Icon
+                  :name="`custom:${item.icon}`"
+                  class="text-[--third-text] h-12px"
+                />
+              </span>
+              <XPopup v-else-if="item.icon === 'twitter'" :tokenId="((row.token + '-' + row.chain) as string)" :type="row.twitter_type">
                 <a class="flex items-center" :href="item.url" target="_blank" @click.stop>
                   <XIcon
                     v-if="[1, 2, 3].includes(row.twitter_type)"

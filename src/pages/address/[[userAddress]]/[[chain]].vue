@@ -2,6 +2,7 @@
 import WalletAssets from './components/walletAssets.vue'
 import PerpAssets from '@/components/perp/perpAssets.vue'
 import { useEventBus, useStorage } from '@vueuse/core'
+import { useI18n } from 'vue-i18n'
 
 const scrollTopEvent = useEventBus(BusEventType.SCROLL_TO_TOP)
 const route = useRoute()

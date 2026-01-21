@@ -353,13 +353,13 @@ function switchTokenKline() {
   const val = pair.value
   if (isReady.value && route.name === 'token-id') {
     const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
-    // const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
-    // const preResolutions = localStorage.getItem(QUICK_KEY)
+    const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
+    const preResolutions = localStorage.getItem(QUICK_KEY)
     resolution.value = initTradingViewIntervals(resolution.value, chain.value, isSupportSecChains)
-    // const nextResolutions = localStorage.getItem(QUICK_KEY)
-    // if (preResolutions !== nextResolutions) {
-    //     resetChart()
-    // }
+    const nextResolutions = localStorage.getItem(QUICK_KEY)
+    if (preResolutions !== nextResolutions) {
+        resetChart()
+    }
     if (_widget && _widget?.activeChart?.()) {
       _widget?.resetCache?.()
       _widget?.activeChart?.()?.clearMarks?.()
@@ -736,7 +736,8 @@ async function initChart() {
         // const chain = props.chain
         const isSupportSecChains = chain.value && supportSecChains.includes(chain.value)
         const configurationData = {
-          supported_resolutions: [
+          supported_resolutions: (chain.value === 'mixmax' || chain.value === 'xlayer' || chain.value === 'base') ? ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] :
+            [
             '1S',
             '1',
             '5',
@@ -798,6 +799,9 @@ async function initChart() {
             has_weekly_and_monthly: true,
             supported_resolutions: [
               '1S',
+              '5S',
+              '15S',
+              '30S',
               '1',
               '5',
               '15',

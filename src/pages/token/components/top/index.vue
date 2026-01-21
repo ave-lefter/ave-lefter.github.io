@@ -980,23 +980,11 @@ const marketCap = computed(() => {
 const volume24 = computed(() => {
   return tokenStore.pair?.volume_u || tokenStore.tokenInfoExtra?.volume_24 || 0
 })
-const appendix = computed(() => {
-  if (token.value?.appendix && isJSON(token.value?.appendix)) {
-    return JSON.parse(token.value?.appendix)
-  }
-  return {}
-})
 const tokenInfoExtra= computed(()=>{
   return tokenStore.tokenInfoExtra
 })
 const medias = computed(() => {
-  return [
-    { name: t('website'), icon: 'web', url: appendix.value?.website },
-    { name: 'Btok', icon: 'btok', url: appendix.value?.btok },
-    { name: 'QQ', icon: 'qq', url: appendix.value?.qq },
-    { name: 'Telegram', icon: 'tg', url: appendix.value?.telegram },
-    { name: 'Twitter', icon: 'twitter', url: appendix.value?.twitter },
-  ]
+  return getMedias(token.value?.appendix)
 })
 const currentGroup = computed(() => {
   return groupId.value == 0

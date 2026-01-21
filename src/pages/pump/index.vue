@@ -594,11 +594,8 @@ watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
 })
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
   if (val && documentVisible.value) {
-    const rTime = Date.now()
-    const obj = { ...val, rTime: rTime }
-        // console.log('----obj------',obj.symbol,'--MC--',obj.market_cap, '--progress--',obj.progress,  '--top--',obj.holders_top10_ratio  )
-    logoList.value = logoList?.value?.filter?.(i => i.token !== obj.token && rTime - (i.rTime || 0) <= 16000)
-    logoList.value.unshift(obj)
+    logoList.value.unshift(val)
+    logoList.value?.slice(0, 300)
   }
 })
 
@@ -747,7 +744,7 @@ function wsUpdateTableList(wsList: WSPump[]) {
           : i?.pair.token1_logo_url,
 
       }))
-      const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address) && rTime - (i.rTime || 0) <= 15000)
+      const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
       wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,100)
       // let wsTime = this.wsTableListCache?.time || 0
       // if (wsTime < Date.now() - 15000) {
@@ -997,40 +994,40 @@ function getPump(params, isFilter = false) {
           }, 10000)
     })
 }
-function getMedias(appendix: string) {
-  if (!appendix) return []
-  if (isJSON(appendix)) {
-    const obj = JSON.parse(appendix)
-    const arr = []
-    if (obj?.website)
-      arr.push({
-        name: t('website'),
-        icon: 'web',
-        url: formatUrl(obj.website),
-      })
-    if (obj?.btok)
-      arr.push({
-        name: 'Btok',
-        icon: 'btok',
-        url: formatUrl(obj.btok),
-      })
-    if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
-    if (obj?.telegram)
-      arr.push({
-        name: 'Telegram',
-        icon: 'tg',
-        url: formatUrl(obj.telegram),
-      })
-    if (obj?.twitter)
-      arr.push({
-        name: 'Twitter',
-        icon: 'twitter',
-        url: formatUrl(obj.twitter),
-      })
-    return arr
-  }
-  return []
-}
+// function getMedias(appendix: string) {
+//   if (!appendix) return []
+//   if (isJSON(appendix)) {
+//     const obj = JSON.parse(appendix)
+//     const arr = []
+//     if (obj?.website)
+//       arr.push({
+//         name: t('website'),
+//         icon: 'web',
+//         url: formatUrl(obj.website),
+//       })
+//     if (obj?.btok)
+//       arr.push({
+//         name: 'Btok',
+//         icon: 'btok',
+//         url: formatUrl(obj.btok),
+//       })
+//     if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
+//     if (obj?.telegram)
+//       arr.push({
+//         name: 'Telegram',
+//         icon: 'tg',
+//         url: formatUrl(obj.telegram),
+//       })
+//     if (obj?.twitter)
+//       arr.push({
+//         name: 'Twitter',
+//         icon: 'twitter',
+//         url: formatUrl(obj.twitter),
+//       })
+//     return arr
+//   }
+//   return []
+// }
 function getFilterData(list, conditions) {
   conditions = JSON.parse(conditions) || {}
       return list?.filter((i) => {

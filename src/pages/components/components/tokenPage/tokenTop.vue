@@ -7,7 +7,7 @@ const themeStore = useThemeStore()
 const loadingGroupEdit = ref(false)
 const {token,pair,klineRow,twitterType,collected,editableGroup,currentGroup,selectedGroup,userFavoriteGroups,groupId,editableRemark,remark,remark2,tokenInfoExtra} = storeToRefs(useRankKlineStore())
 const medias = computed(() => {
-  return getMedias(token.value?.appendix,t)
+  return getMedias(token.value?.appendix)
 })
 
 function getTags(i: Pair) {

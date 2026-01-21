@@ -71,8 +71,30 @@ export function getTokenDetailMarks(pair, params) {
 }
 
 // 钱包基础信息
+export interface IWalletInfo {
+  x_name:                string;
+  x_logo:                string;
+  x_url:                 string;
+  x_followers:           number;
+  is_wallet_address_fav: number;
+  remark:                string;
+  wallet_logo:           WalletLogo;
+  newTags:               any[];
+  wallet_age:            string;
+  last_txn_time:         Date;
+  is_follow_kol:         number;
+  follow_id:             number;
+}
+
+export interface WalletLogo {
+  name:      string;
+  url:       string;
+  logo:      string;
+  vip_logo:  string;
+  followers: number;
+}
 //https://tsgrysq47oqo.sg.larksuite.com/wiki/NeenwruPiiJWQDkgnOClkMn9guf?fromScene=spaceOverview
-export function getWalletBasicInfo(params) {
+export function getWalletBasicInfo(params): Promise<IWalletInfo> {
   const { $api } = useNuxtApp()
   return $api('/v2api/walletinfo/v2/info', {
     method: 'get',
@@ -96,7 +118,7 @@ export function getTxAnalysis(params: {
   }>
 }>{
   const { $api } = useNuxtApp()
-  return $api('/v2api/walletinfo/v2/tx_analysis', {
+  return $api('/v2api/walletinfo/v2/tx_analysis_v2', {
     method: 'get',
     query: params,
   })
@@ -213,4 +235,48 @@ export function getUserTokenList(address:string,chain:string) {
   })
 }
 
+export interface IProfitCalendarResponse {
+  days:    Day[];
+  summary: Summary;
+}
 
+export interface Day {
+  date:             Date;
+  profit:           number;
+  total_buy_count:  number;
+  total_sell_count: number;
+  buy_volume:       number;
+  sell_volume:      number;
+}
+
+export interface Summary {
+  month_total_profit:      number;
+  month_total_buy_count:   number;
+  month_total_sell_count:  number;
+  month_total_buy_volume:  number;
+  month_total_sell_volume: number;
+}
+// 获取盈亏日历
+export function getProfitCalendar(params:{
+  user_address:string
+  user_chain:string
+  date:string
+}):Promise<IProfitCalendarResponse> {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/walletinfo/v2/calendar/pnl', {
+    method: 'get',
+    query: params,
+  })
+}
+
+// 偏好代币分析
+export function marketcap_analysis(query:{
+  user_address:string
+  user_chain:string
+}) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/walletinfo/v2/marketcap_analysis', {
+    method: 'get',
+    query,
+  })
+}

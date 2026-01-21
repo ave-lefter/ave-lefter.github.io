@@ -3,7 +3,7 @@ export const BatchQuoteAddress = {
 }
 export const QuoteAddress: Record<string, string> = {
   // bsc: '0x94B04A396236Aeea14b5a6e3De36B00C561892f9',
-  bsc: '0xbd63258dE3D03C7E741d2438bAF5c8407EDD2e0C',
+  bsc: '0xf167ad0D21211BD35a47A377a7eA60139263Bc32',
   arbitrum: '0x208522A06e4420092DF8cB05A6823E6C5b81882f',
   core: '0xC69C0465c16fdcdA8686725E21892c73B806Eb5D',
   polygon: '0x208522A06e4420092DF8cB05A6823E6C5b81882f',

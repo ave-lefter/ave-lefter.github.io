@@ -3,7 +3,7 @@
     <ul v-if="currentAddress" class="w-operate">
       <li v-if="evmAddress" class="flex items-center gap-2px">
           <el-checkbox v-model="isMonitor" :label="t('onlyPush')"  style="color:var(--secondary-text);z-index: 0;--el-checkbox-font-weight:400" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! [&&]:[--el-checkbox-input-border:1px_solid_var(--icon-color)]" size="large"/>
-          <span class="text-[var(--secondary-text)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/50` }}</span>
+          <span class="text-[var(--secondary-text)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/500` }}</span>
       </li>
       <li class="btn">
         <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>
