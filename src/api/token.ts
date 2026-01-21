@@ -482,7 +482,8 @@ export function getSimpleTxs(pair:string,query: {
   time_min?: string,
   time_max?: string
   target_price_u_min?: string
-  target_price_u_max?: string
+  target_price_u_max?: string,
+  page_token?: string,
 }): Promise<IGetSimpleTxsResponse[]> {
   const address=localStorage.bot_evmAddress || localStorage.walletAddress
   const {$api} = useNuxtApp()

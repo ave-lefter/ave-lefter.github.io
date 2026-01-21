@@ -126,7 +126,9 @@ const columns = computed(() => {
 const listStatus = ref({
   loadingTxs: false,
   loadingLiq: false,
-  page_token:''
+  finished: false,
+  page_token:'',
+  pageSize:100
 })
 
 const tokenTxs = shallowRef<IGetSimpleTxsResponse[]>([])
@@ -152,6 +154,27 @@ const filterTableListMap = {
   buy: () => tokenTxs.value.filter(el => isBuy((el))),
   sell: () => tokenTxs.value.filter(el => !isBuy(el))
 }
+
+const tableLoading = computed(() => listStatus.value.loadingTxs || listStatus.value.loadingLiq)
+// const showFooter=ref(false)
+const footText = computed(() => {
+  if(listStatus.value.finished){
+    return t('noMore')
+  }else{
+    return ''
+  }
+})
+
+
+function loadMore(remainDistance:number){
+  console.log('loadMore remainDistance', remainDistance, listStatus.value)
+  // showFooter.value=remainDistance <= 20
+  if ((remainDistance <= 20) && !(listStatus.value.loadingTxs || listStatus.value.finished)) {
+    _getTokenTxs()
+  }
+}
+
+
 // 纯前端筛选
 const filterTableList = computed(() => {
   let tableList: ((IGetSimpleTxsResponse | GetPairLiqResponse) & { count?: number })[] = []
@@ -214,7 +237,7 @@ const currentRow = shallowRef<IGetSimpleTxsResponse & { senderProfile: Profile, 
 const isPausedTxs = computed(() => {
   return isHoverTable.value
     || tokenDetailSStore.drawerVisible
-    || markerTooltipVisible.value
+    || markerTooltipVisible.value || (sortConditions.value.sort_dir ==='asc')
 })
 
 const addressAndChain = computed(() => {
@@ -227,21 +250,33 @@ const addressAndChain = computed(() => {
     chain: token.value?.chain || ''
   }
 })
+const sortConditions= ref({
+  sort: '',
+  sort_dir: '',
+})
 
-// const _getTokenTxsImpl =
 
-const _getTokenTxs = useThrottleFn(async ()=>{
-    try {
+function filterSubmit() {
+  listStatus.value.page_token = ''
+  _getTokenTxs()
+  if(aveTableRef.value) aveTableRef.value.scrollToTop(0)
+}
+
+const _getTokenTxs = useThrottleFn(async () => {
+  try {
+    if (listStatus.value.loadingTxs) return
     listStatus.value.loadingTxs = true
     const { tag_type } = tableFilter.value
     const getPairTxsParams = {
       token_id: route.params.id as string,
       tag_type,
       sender: tableFilter.value.markerAddress,
-      target_price_u_min:tableFilter.value.amountU[0],
-      target_price_u_max:tableFilter.value.amountU[1],
-      time_min:tableFilter.value.timestamp[0],
-      time_max:tableFilter.value.timestamp[1]
+      target_price_u_min: tableFilter.value.amountU[0],
+      target_price_u_max: tableFilter.value.amountU[1],
+      time_min: tableFilter.value.timestamp[0],
+      time_max: tableFilter.value.timestamp[1],
+      page_token: listStatus.value.page_token
+      //TODO: 增加排序参数
     }
     if (tag_type === '-100' && !followStore.currentAddress) {
       resetTx()
@@ -249,33 +284,59 @@ const _getTokenTxs = useThrottleFn(async ()=>{
       return
     }
 
-    const res = await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain,getPairTxsParams)
-    console.log('_getTokenTxs res', res)
+    const res = await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain, getPairTxsParams)
+    const data=res||[]
     realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
-    tokenTxs.value = (res || []).reverse().map(val => {
-      txCount.value[val.maker] = (txCount.value[val.maker] || 0) + 1
-      const { wallet_tag, topN } = getWalletTag(val)
-      return {
-        ...val,
-        wallet_tag,
-        topN,
-        count: txCount.value[val.maker],
-        senderProfile: JSON.parse(val?.profile || '{}'),
-        uuid: uuid(),
-        ...transferTxs(val)
+ 
+
+    if (Array.isArray(data) && data?.length > 0) {
+      if(!listStatus.value.page_token) {
+        tokenTxs.value = data.reverse().map(val => {
+          return transferTxsData(val)
+        }).reverse()
+        // 获取tokenTxs.value 最后一项的token_id
+        listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token || ''
+        listStatus.value.loadingTxs = false
+      }else{
+        tokenTxs.value = [...tokenTxs.value].concat(data.filter?.(i => tokenTxs.value?.every?.(j => j.txhash !== i.txhash)).reverse()
+            ?.map(i => transferTxsData(i))).reverse()
+        }
+      listStatus.value.finished = data?.length < listStatus.value.pageSize
+      if (!listStatus.value.finished) {
+        listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token || ''
       }
-    }).reverse()
-    // 获取tokenTxs.value 最后一项的token_id
-    listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token || ''
+      // if(sortConditions.value.sort_dir ==='asc'){
+      //   tokenTxs.value=[...tokenTxs.value.reverse()]
+      // }
+    }else{
+      if(!listStatus.value.page_token) {
+        tokenTxs.value = []
+      }
+      listStatus.value.finished = true
+    }
   } catch (e) {
     resetTx()
-    console.log('=>(transactions.vue) _getTokenTxs error', e)
   } finally {
-    console.log('=>(transactions.vue) _getTokenTxs finally', tokenTxs.value)
     listStatus.value.loadingTxs = false
   }
 }, 500)
 
+const defaultSort = computed(() => {
+  if (sortConditions.value.sort === 'time') {
+    return sortConditions.value.sort_dir
+  }
+  return ''
+})
+
+function sortChange(sort_dir: string) {
+  sortConditions.value={
+    sort: sort_dir ? 'time' : '',
+    sort_dir: sort_dir,
+  }
+  console.log('sortConditions.value', sort_dir)
+  if(sort_dir==='desc') return 
+  filterSubmit()
+}
 
 watch(() => klineDateFilter?.value, (val) => {
   if (val && !orderBookVisible.value) {
@@ -494,23 +555,25 @@ const updateLiqList = useThrottleFn(() => {
 function onTimestampConfirm(timestamp: string[] = []) {
   tableFilterVisible.value.timestamp = false
   tableFilter.value.timestamp = timestamp
-  _getTokenTxs()
+  filterSubmit()
 }
 
 function confirmVolFilter(amountU: string[] = []) {
   tableFilterVisible.value.amountU = false
   tableFilter.value.amountU = amountU
-  _getTokenTxs()
+  filterSubmit()
 }
 
 function confirmMakersFilter(markerAddress = '') {
   txCount.value = {}
   tableFilterVisible.value.markers = false
   tableFilter.value.markerAddress = markerAddress
-  _getTokenTxs()
+  filterSubmit()
 }
 
-function transferTxs(row: IGetSimpleTxsResponse) {
+function transferTxsData(row: IGetSimpleTxsResponse) {
+  txCount.value[row.maker] = (txCount.value[row.maker] || 0) + 1
+  const { wallet_tag, topN } = getWalletTag(row)
   const maker_types = (row.maker_type||'').split(',')
   let lang1='en' as 'tw'|'cn'|'vi'|'tr'|'ru'|'pt'|'ko'|'ja'|'es'|'en'
   if (lang.value === 'zh-tw') {
@@ -530,6 +593,11 @@ function transferTxs(row: IGetSimpleTxsResponse) {
   })
   return {
     ...row,
+    wallet_tag,
+    topN,
+    count: txCount.value[row.maker],
+    senderProfile: JSON.parse(row?.profile || '{}'),
+    uuid: uuid(),
     newTags,
     isSimple: true,
     chain:addressAndChain.value.chain,
@@ -779,7 +847,7 @@ function setActiveTab(val: string,index:number) {
   txCount.value = {}
   tableFilter.value.tag_type = val
   if (val !== 'liquidity') {
-    _getTokenTxs()
+    filterSubmit()
   } else {
     _getPairLiq()
   }
@@ -918,10 +986,10 @@ const collect = async (row: any,index:number) => {
         <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart"/></span>
       </div>
     </div>
-    <DateFilterCard v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" v-model:timestamp="tableFilter.timestamp" @update:timestamp="_getTokenTxs"/>
+    <DateFilterCard v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" v-model:timestamp="tableFilter.timestamp" @update:timestamp="filterSubmit"/>
     <template v-if="tableFilter.markerAddress">
       <div
-        v-if="listStatus.loadingTxs || listStatus.loadingLiq"
+        v-if="tableLoading"
         class="lh-20px text-13px py-6px bg-#3F80F71A text-center mb-12px">
         {{ $t('loading') }}
       </div>
@@ -945,7 +1013,7 @@ const collect = async (row: any,index:number) => {
       </template>
     </template>
     <div
-      v-loading="listStatus.loadingTxs || listStatus.loadingLiq" class="text-12px"
+      v-loading="tableLoading" class="text-12px"
       element-loading-background="transparent">
       <AveTable
         ref="aveTableRef"
@@ -953,16 +1021,22 @@ const collect = async (row: any,index:number) => {
         fixed :data="filterTableList"
         :columns="columns"
         :style="{
-          height:`${finalHeight}px`
+          height:`${finalHeight}px`,
+          '--el-table-bg-color':'transparent',
+          'overflow':'visible',
+          paddingBottom:!footText?'0px':'20px'
         }"
         row-class='cursor-pointer'
+        :showFooter="!!footText"
+        :footText="footText"
+        @endReached="loadMore"
         :rowEventHandlers="{
         onMouseenter:()=>isHoverTable=true,
         onMouseleave:()=>isHoverTable=false,
         onClick: onRowClick
       }">
         <template  #empty>
-          <div v-if="!(listStatus.loadingTxs || listStatus.loadingLiq)" class="h-full flex flex-col items-center justify-center pt-100px">
+          <div v-if="!tableLoading" class="h-full flex flex-col items-center justify-center pt-100px">
             <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
             <img v-else src="@/assets/images/empty-black.svg" alt="">
             <span
@@ -975,13 +1049,14 @@ const collect = async (row: any,index:number) => {
         </template>
         <template #header-time>
           <div class="flex items-center gap-2px">
-            <span>{{ $t('time') }}</span>
+            <span  class="cursor-pointer" @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')">{{ $t('time') }}</span>
             <Icon
               :name="`${tableView.isShowDate ? 'custom:calendar' : 'custom:countdown'}`"
               class="color-[--third-text] cursor-pointer" @click.self="tableView.isShowDate = !tableView.isShowDate" />
             <TableDateFilter
               v-model:visible="tableFilterVisible.timestamp" :modelValue="tableFilter.timestamp" :boundary="txsContainer || undefined"
               @confirm="onTimestampConfirm" />
+            <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
           </div>
         </template>
         <template #cell-time="{ row,rowIndex }">
