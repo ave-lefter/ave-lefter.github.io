@@ -12,12 +12,16 @@ import THead from './tHead.vue'
 import type { IPriceV2Response } from '~/api/types/ws'
 import { useEventBus, useLocalStorage, useStorage } from '@vueuse/core'
 import { BusEventType, type IFavDialogEventArgs } from '~/utils/constants'
+import type { ScrollbarInstance } from 'element-plus'
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 topEventBus.on(refresh)
 const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
 favDialogEvent.on(refresh)
 const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
 topAddGroupEvent.on(_getUserFavoriteGroups)
+
+const otherListArea = ref<ScrollbarInstance>()
+
 onUnmounted(() => {
   topEventBus.off(refresh)
   favDialogEvent.off(refresh)
@@ -239,6 +243,7 @@ async function loadMoreFavorites() {
 }
 
 function resetListStatus() {
+  otherListArea.value!.setScrollTop(0)
   listStatus.value.finished = false
   listStatus.value.pageNo = 1
 }

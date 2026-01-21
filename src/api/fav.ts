@@ -50,7 +50,7 @@ function getFavoriteList(group = -1, pageNO = 1, address: string): Promise<GetFa
       address: address,
       group: group,
       pageNO: pageNO,
-      pageSize: 50
+      pageSize: 150
     }
   })
 }
