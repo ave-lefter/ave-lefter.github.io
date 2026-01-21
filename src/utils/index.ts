@@ -452,19 +452,25 @@ export function getChainDefaultIconColor(chain?: string) {
 export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
   if (text) {
     const color = getChainDefaultIconColor(chain)
-    const circle = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" stroke="transparent" fill="${color}" stroke-width="0"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff">${text
-      ?.slice(0, 1)
-      ?.toUpperCase?.()}</text>
-    </svg>`
-    const rect = `<?xml version="1.0" standalone="no"?>
-    <svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg">
-      <rect width="32" height="32" fill="${color}" stroke="transparent" stroke-width="0"/>
-      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff">
-        ${text?.slice(0, 1)?.toUpperCase?.()}
-      </text>
-    </svg>`
+
+    // 兼容性获取首个字符：优先使用 Segmenter (处理组合 Emoji)，降级使用解构 (处理标准 Emoji)
+    let firstChar = ''
+    if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+      const segments = new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)
+      firstChar = segments[Symbol.iterator]().next().value?.segment || ''
+    } else {
+      firstChar = [...text][0] || ''
+    }
+    const char = firstChar.toUpperCase()
+
+    const circle = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" fill="${color}"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff" font-family="sans-serif">${char}</text></svg>`
+
+    const rect = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" fill="${color}"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff" font-family="sans-serif">${char}</text></svg>`
+
     const defaultSvg = type === 'rect' ? rect : circle
+
     try {
+      // 2026 年推荐：直接使用 Base64 编码以确保在所有标签属性中稳定显示
       return 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(defaultSvg)))
     } catch (err) {
       return ''
@@ -472,6 +478,8 @@ export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
   }
   return '/icon-default.png'
 }
+
+
 export function getSymbolDefaultIcon(
   tokenInfo:
     | {
@@ -986,26 +994,57 @@ export function setRefCodeToCookie() {
   }
 }
 
-export function getMedias(appendix: string | undefined, t: ReturnType<typeof useI18n>['t']) {
+export function getMedias(appendix: string | undefined) {
   if (!appendix) return []
+  const t = getGlobalT()
   if (isJSON(appendix)) {
     const obj = JSON.parse(appendix)
     const arr = []
-    if (obj?.website)
+    if (obj?.website) {
       arr.push({
         name: t('website'),
         icon: 'web',
         url: formatUrl(obj.website),
       })
+    }
     if (obj?.btok) arr.push({ name: 'Btok', icon: 'btok', url: formatUrl(obj.btok) })
     if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
     if (obj?.telegram) arr.push({ name: 'Telegram', icon: 'tg', url: formatUrl(obj.telegram) })
-    if (obj?.twitter)
+    if (obj?.twitter) {
       arr.push({
         name: 'Twitter',
         icon: 'twitter',
         url: formatUrl(obj.twitter),
       })
+    }
+    if (obj?.youtube) {
+      arr.push({
+        name: 'Youtube',
+        icon: 'youtube',
+        url: formatUrl(obj.youtube),
+      })
+    }
+    if (obj?.reddit) {
+      arr.push({
+        name: 'Reddit',
+        icon: 'reddit',
+        url: formatUrl(obj.reddit),
+      })
+    }
+    if (obj?.instagram) {
+      arr.push({
+        name: 'Instagram',
+        icon: 'instagram',
+        url: formatUrl(obj.instagram),
+      })
+    }
+    if (obj?.tiktok) {
+      arr.push({
+        name: 'Tiktok',
+        icon: 'tiktok',
+        url: formatUrl(obj.tiktok),
+      })
+    }
     return arr
   }
   return []

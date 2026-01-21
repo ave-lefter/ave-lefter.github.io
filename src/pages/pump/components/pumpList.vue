@@ -798,10 +798,7 @@ const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableLis
 onUnmounted(() => {
   $tooltip?.hide?.()
 })
-const tableList1 = computed(() => {
 
-  return tableList.value?.sort?.((a, b) => ((Number(b.created_at) || Number(b.time)) - (Number(a.created_at) || Number(a.time))))
-})
 function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: string }) {
   if (pumpSetting.value.isRight) {
     e.preventDefault()

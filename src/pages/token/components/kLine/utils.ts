@@ -8,7 +8,7 @@ import { bot_getUserPendingTx, bot_cancelLimitOrdersByBatch, bot_getUserWalletTx
 import { RESOLUTION_KEY, QUICK_KEY } from './constant'
 import { _getHoldersList } from '~/api/holders'
 
-export const supportSecChains = ['solana', 'bsc', 'eth', 'base', 'tron']
+export const supportSecChains = ['solana', 'bsc', 'eth', 'base', 'tron', 'mixmax', 'xlayer']
 
 export function switchResolution(resolution: string) {
   const obj: Record<string, string> = {
@@ -138,19 +138,21 @@ export function initTradingViewIntervals(currentResolution: string, chain: strin
 
     const has1S = list.includes('1S')
     const shouldHave1S = isSupportSecChains
-    if (shouldHave1S) {
+    if (shouldHave1S && chain !== 'mixmax' && chain !== 'xlayer' && chain !== 'base') {
       if (!has1S || ['5S', '15S', '30S'].some((i) => list?.includes(i))) {
         list = list?.filter?.((i) => !i?.endsWith('S')) || []
         list = ['1S'].concat(list)
         localStorage.setItem(QUICK_KEY, JSON.stringify(list))
       }
-    }
-    // else if (shouldHave1S && ['1S', '5S', '15S', '30S'].some(i => !list?.includes(i)) && chain !== 'solana') {
-    //   list = list?.filter?.((i) => !i?.endsWith('S')) || []
-    //   list = ['1S', '5S', '15S', '30S'].concat(list)
-    //   localStorage.setItem(QUICK_KEY, JSON.stringify(list))
-    // }
-    else if (!shouldHave1S && ['1S', '5S', '15S', '30S'].some((i) => list?.includes(i))) {
+    } else if (
+      shouldHave1S &&
+      ['1S', '5S', '15S', '30S'].some((i) => !list?.includes(i)) &&
+      (chain === 'mixmax' || chain === 'xlayer' || chain === 'base')
+    ) {
+      list = list?.filter?.((i) => !i?.endsWith('S')) || []
+      list = ['1S', '5S', '15S', '30S'].concat(list)
+      localStorage.setItem(QUICK_KEY, JSON.stringify(list))
+    } else if (!shouldHave1S && ['1S', '5S', '15S', '30S'].some((i) => list?.includes(i))) {
       // list = list.filter((i) => i !== '1S')
       list = list?.filter?.((i) => !i?.endsWith('S')) || []
       localStorage.setItem(QUICK_KEY, JSON.stringify(list))

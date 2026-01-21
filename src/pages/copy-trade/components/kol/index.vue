@@ -7,7 +7,7 @@
         :data="tableData"
         :header-cell-style="{ fontSize: '12px' }"
         fit
-        :style="`height:${scrollbarHeight}`"
+        :style="{height:`${scrollbarHeight}`}"
         :default-sort="{
           prop: conditions.sort,
           order: conditions.sort_dir ? conditions.sort_dir + 'ending' : null
@@ -17,7 +17,6 @@
       >
         <template #empty>
           <div v-if="!loading && tableData?.length ==0" class="table-empty">
-            <!-- <span>{{ $t('emptyNoData') }}</span> -->
             <AveEmpty />
           </div>
           <span v-else />
@@ -212,8 +211,6 @@
                         @mouseleave.stop="e => (toolTipTagVisible = false)"
                       >
                         <span class="media-item">
-                          <!-- <i class="iconfont icon-QQ text-12px"></i>
-                             -->
                           <img
                             :src="require(`@/assets/images/${item.img}.png`)"
                             :alt="item.img"
@@ -381,65 +378,6 @@
             </div>
           </template>
         </el-table-column>
-
-
-<!--
-        <el-table-column
-          align="right"
-          :label="$t('volume4')"
-          sortable="custom"
-          :sort-orders="['descending', 'ascending', null]"
-          prop="total_volume"
-          min-width="150px"
-        >
-          <template #default="{ row }">
-            <div style="padding: 0 5px">
-              <div :class="!row?.total_volume ? 'color-text-3' : ''">
-                ${{
-                  row?.total_volume > 0 ? formatNumber(row?.total_volume || 0, 2, 4, 10 ** 4) : 0
-                }}
-              </div>
-              <div class="text-12px color-text-3">
-                <span :class="row?.total_purchase > 0 ? 'green' : ''">
-                  ${{ formatNumber(row?.total_purchase || 0, 2, 4, 10 ** 4) }}
-                </span>
-                <span>/</span>
-                <span class="red" :class="row?.total_sold > 0 ? 'red' : ''">
-                  ${{ formatNumber(row?.total_sold || 0, 2, 4, 10 ** 4) }}
-                </span>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
-
-        <el-table-column
-          align="right"
-          :label="$t('txns')"
-          sortable="custom"
-          :sort-orders="['descending', 'ascending', null]"
-          prop="total_trades"
-          min-width="100px"
-        >
-          <template #default="{ row }">
-            <div style="padding: 0 5px">
-              <div :class="!row?.total_trades ? 'color-text-3' : ''">
-                {{
-                  row?.total_trades > 0 ? formatNumber(row?.total_trades || 0, 2, 4, 10 ** 4) : 0
-                }}
-              </div>
-              <div class="text-12px color-text-3">
-                <span :class="row?.buy_trades > 0 ? 'green' : ''">
-                  {{ formatNumber(row?.buy_trades || 0, 2, 4, 10 ** 4) }}
-                </span>
-                <span>/</span>
-                <span class="red" :class="row?.sell_trades > 0 ? 'red' : ''">
-                  {{ formatNumber(row?.sell_trades || 0, 2, 4, 10 ** 4) }}
-                </span>
-              </div>
-            </div>
-          </template>
-        </el-table-column> -->
-
         <el-table-column
           align="right"
           :label="$t('score')"
@@ -523,36 +461,6 @@
                                 "
                             />
                           </div>
-                            <div class="flex flex-col items-center justify-center ml-5px">
-                              <!-- <svg
-                                class="icon-svg"
-                                aria-hidden="true"
-                                :class="
-                                  filterForm['profit_percent_num'].profit_obj[key].sort_dir === 'asc'
-                                    ? 'active'
-                                    : ''
-                                "
-                                @click.stop="
-                                  handleSort(filterForm['profit_percent_num'].profit_obj[key], 'asc')
-                                "
-                              >
-                                <use xlink:href="#icon-sort-up"></use>
-                              </svg> -->
-                              <!-- <svg
-                                class="icon-svg"
-                                aria-hidden="true"
-                                :class="
-                                  filterForm['profit_percent_num'].profit_obj[key].sort_dir === 'desc'
-                                    ? 'active'
-                                    : ''
-                                "
-                                @click.stop="
-                                  handleSort(filterForm['profit_percent_num'].profit_obj[key], 'desc')
-                                "
-                              >
-                                <use xlink:href="#icon-sort-down"></use>
-                              </svg> -->
-                            </div>
                           </div>
                         </div>
                         <div class="flex mt-10px">
@@ -606,22 +514,22 @@
               <div class="mr-40px">
                 <div class="flex-end">
                   <span class="text-12px mr-4px color-[--secondary-text]">
-                    {{ filterForm['profit_percent_num'].profit_obj.profit_above_900_percent_num.name }}
+                    {{ filterForm['profit_percent_num']?.profit_obj?.profit_above_900_percent_num?.name }}
                   </span>
                   <span
                     class="color-text-3 bg-smart"
-                    :class="row?.profit_above_900_percent_num > 0 ? `bg-${filterForm['profit_percent_num'].profit_obj.profit_above_900_percent_num.color}-1` : 'bg-gray-1'"
+                    :class="row?.profit_above_900_percent_num > 0 ? `bg-${filterForm['profit_percent_num']?.profit_obj?.profit_above_900_percent_num?.color}-1` : 'bg-gray-1'"
                   >
                     {{ formatNumber(row?.profit_above_900_percent_num || 0, 2) }}
                   </span>
                 </div>
                 <div class="mt-10px flex-end">
                   <span class="text-12px mr-4px color-[--secondary-text]">
-                    {{ filterForm['profit_percent_num'].profit_obj.profit_300_900_percent_num.name }}
+                    {{ filterForm['profit_percent_num'].profit_obj?.profit_300_900_percent_num.name }}
                   </span>
                   <span
                     class="color-text-3 bg-smart"
-                    :class="row?.profit_300_900_percent_num > 0 ? `bg-${filterForm['profit_percent_num'].profit_obj.profit_300_900_percent_num.color}-1` : 'bg-gray-1'"
+                    :class="row?.profit_300_900_percent_num > 0 ? `bg-${filterForm['profit_percent_num']?.profit_obj?.profit_300_900_percent_num.color}-1` : 'bg-gray-1'"
                   >
                     {{ formatNumber(row?.profit_300_900_percent_num || 0, 2) }}
                   </span>
@@ -630,7 +538,7 @@
               <div>
                 <div class="flex-end">
                   <span class="text-12px mr-4px color-[--secondary-text]">
-                    {{ filterForm['profit_percent_num'].profit_obj.profit_100_300_percent_num.name }}
+                    {{ filterForm['profit_percent_num']?.profit_obj?.profit_100_300_percent_num?.name }}
                   </span>
                   <span
                     class="color-text-3 bg-smart"
@@ -641,31 +549,16 @@
                 </div>
                 <div class="mt-10px flex-end">
                   <span class="text-12px mr-4px color-[--secondary-text]">
-                    {{ filterForm['profit_percent_num'].profit_obj.profit_10_100_percent_num.name }}
+                    {{ filterForm['profit_percent_num']?.profit_obj?.profit_10_100_percent_num.name }}
                   </span>
                   <span
                     class="color-text-3 bg-smart"
-                    :class="row?.profit_10_100_percent_num > 0 ? `bg-${filterForm['profit_percent_num'].profit_obj.profit_10_100_percent_num.color}-1` : 'bg-gray-1'"
+                    :class="row?.profit_10_100_percent_num > 0 ? `bg-${filterForm['profit_percent_num']?.profit_obj?.profit_10_100_percent_num.color}-1` : 'bg-gray-1'"
                   >
                     {{ formatNumber(row?.profit_10_100_percent_num || 0, 2) }}
                   </span>
                 </div>
               </div>
-            <!-- <div style="padding: 0 5px 0 20px" class="flex-between">
-              <div
-                v-for="(item, key) in filterForm['profit_percent_num'].profit_obj"
-                :key="key"
-              >
-                <span
-                  class="color-text-3 bg-smart"
-                  :class="row?.[key] > 0 ? `bg-${item.color}-1` : 'bg-gray-1'"
-                >
-                  {{ formatNumber(row?.[key] || 0, 2) }}
-                </span>
-                <div class="text-12px mt-2px color-#999">
-                  {{ item.name }}
-                </div>
-              </div> -->
             </div>
           </template>
         </el-table-column>
@@ -683,8 +576,6 @@
 
                 @click.stop.prevent="goLink(item, row.chain)"
               >
-                <!-- <span class="ellipsis block">{{ item.symbol }}</span> -->
-
                 <el-image
                     v-tooltip="item.symbol"
                     class="token-icon h-24px w-24px items-center cursor-pointer rounded-100%"
@@ -760,22 +651,6 @@
                   </span>
                 </div>
               </div>
-
-              <!-- <div
-                v-for="(item, key) in filterForm['profit_percent_num_lt'].profit_obj"
-                :key="key"
-              >
-                <span class="text-12px mr-2px color-#999">
-                  {{ item.name }}
-                </span>
-                <span
-                  class="color-text-3 bg-smart"
-                  :class="row?.[key] > 0 ? `bg-${item.color}-1` : 'bg-gray-1'"
-                >
-                  {{ formatNumber(row?.[key] || 0, 2) }}
-                </span>
-              </div> -->
-
             </div>
           </template>
         </el-table-column>
@@ -784,13 +659,17 @@
             <span class="mr-7px">{{ $t('operation') }}</span>
           </template>
           <template #default="{ row }">
-            <div class="flex-end" @click.stop>
-              <a class="trade" :href="`https://t.me/AveSniperBot?start=fs-${row.chain}-${row.wallet_address}`"  target="_blank">
+           <div class="flex-end" @click.stop >
+              <a v-if="judgeIsCopyTrade(row)" href="" class="trade" @click.stop.prevent="jumpCopyTrade(row)">
                 <img src="@/assets/images/tg1.png" alt="" :width="12">
-                {{ $t('copyTrade') }}
+                 {{ $t('copiedTrade') }}
+              </a>
+              <a v-else href="" class="trade" @click.stop.prevent="copyTrade(row)">
+                <Icon v-if="botStore.evmAddress" name="custom:wallet-fill" class="mr-4px text-12px"/>
+                <img v-else src="@/assets/images/tg1.png" alt="" :width="12">
+                  {{ $t('copyTrade1') }}
               </a>
             </div>
-
           </template>
         </el-table-column>
       </el-table>
@@ -960,6 +839,7 @@ const props = defineProps({
 })
 const {activeTab,tableData,tableIndex, handleSortChange, conditions, pageNO, pageSize,isActiveFilter, handleFilterConfirm, handleSort, handleReset, filterForm, loading,openTimeList,activeInterval }= toRefs(props)
 const { t } = useI18n()
+const botStore = useBotStore()
 const router = useRouter()
 const buttonTagRef = ref<HTMLElement | null>(null)
 const toolTipTagVisible = shallowRef(false)
@@ -1106,6 +986,50 @@ function scrollToTop() {
       top: 0,
       behavior: 'smooth',
     })
+  }
+}
+const { activeCopyAddress, copyTradeVisible, form, copyOrder } = storeToRefs(useCopyTradeStore())
+
+function judgeIsCopyTrade(row:KolObj) {
+  const supportAddress = activeCopyAddress.value?.[row.chain] || []
+  return supportAddress?.some(i => i?.toLowerCase() === row.wallet_address?.toLowerCase())
+}
+function getCopyTradeId(row:KolObj) {
+  const order = copyOrder.value?.copyList?.find(i=> i?.followAddress?.toLowerCase() === row.wallet_address?.toLowerCase() && i.chain == row.chain)
+  return order?.id || ''
+}
+
+function jumpCopyTrade(row: KolObj) {
+  const id = getCopyTradeId(row)
+  const currentUser = botStore?.userInfo?.addresses?.find?.((el) => row?.chain == el.chain)
+  if (id && currentUser?.address) {
+    console.log('----currentUser--------',currentUser)
+    const routeData = router.resolve({
+      name: 'copy-trade-wallet',
+      params: {
+        userAddress: row.wallet_address,
+        chain: row.chain,
+      },
+      query: {
+        followAddress: row.wallet_address,
+        creatorAddress: currentUser?.address,
+        id: id
+      }
+    })
+    window.open(routeData.href, '_blank')
+  } else {
+    const url =`https://t.me/AveSniperBot?start=fs-${row.chain}-${row.wallet_address}`
+    window.open(url, '_blank')
+  }
+}
+function copyTrade(row: KolObj) {
+  if (botStore.evmAddress) {
+    copyTradeVisible.value = true
+    form.value.followAddress = row.wallet_address
+    form.value.chain = row.chain
+  } else {
+    const url =`https://t.me/AveSniperBot?start=fs-${row.chain}-${row.wallet_address}`
+    window.open(url, '_blank')
   }
 }
 </script>
@@ -1365,7 +1289,7 @@ a.a-gray{
 }
 a.trade {
   background:  #3F80F71A;
-  padding: 1px 7px;
+  padding: 4px 8px;
   border-radius: 2px;
   font-size: 12px;
   color: var(--main-text);
@@ -1373,6 +1297,9 @@ a.trade {
   display: flex;
   align-items: center;
   justify-content: center;
+  &:hover {
+    opacity: 0.8;
+  }
   img {
     margin-right: 4px;
   }

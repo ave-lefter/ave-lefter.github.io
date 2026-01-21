@@ -241,30 +241,30 @@ function listMapFunction(i: Record<string, any>) {
   }
 }
 
-function getMedias(appendix: string) {
-  if (!appendix) return []
-  if (isJSON(appendix)) {
-    const obj = JSON.parse(appendix)
-    const arr = []
-    if (obj?.website)
-      arr.push({
-        name: t('website'),
-        icon: 'web',
-        url: formatUrl(obj.website),
-      })
-    if (obj?.btok) arr.push({ name: 'Btok', icon: 'btok', url: formatUrl(obj.btok) })
-    if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
-    if (obj?.telegram) arr.push({ name: 'Telegram', icon: 'tg', url: formatUrl(obj.telegram) })
-    if (obj?.twitter)
-      arr.push({
-        name: 'Twitter',
-        icon: 'twitter',
-        url: formatUrl(obj.twitter),
-      })
-    return arr
-  }
-  return []
-}
+// function getMedias(appendix: string) {
+//   if (!appendix) return []
+//   if (isJSON(appendix)) {
+//     const obj = JSON.parse(appendix)
+//     const arr = []
+//     if (obj?.website)
+//       arr.push({
+//         name: t('website'),
+//         icon: 'web',
+//         url: formatUrl(obj.website),
+//       })
+//     if (obj?.btok) arr.push({ name: 'Btok', icon: 'btok', url: formatUrl(obj.btok) })
+//     if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
+//     if (obj?.telegram) arr.push({ name: 'Telegram', icon: 'tg', url: formatUrl(obj.telegram) })
+//     if (obj?.twitter)
+//       arr.push({
+//         name: 'Twitter',
+//         icon: 'twitter',
+//         url: formatUrl(obj.twitter),
+//       })
+//     return arr
+//   }
+//   return []
+// }
 
 const height = computed(() => {
   // 有子 Tabs
