@@ -22,6 +22,7 @@ topAddGroupEvent.on(_getUserFavoriteGroups)
 
 const otherListArea = ref<ScrollbarInstance>()
 
+
 onUnmounted(() => {
   topEventBus.off(refresh)
   favDialogEvent.off(refresh)
@@ -81,6 +82,14 @@ const sort = shallowRef<{
   activeSort: 0,
   sortBy: null,
 })
+
+const sortParam={
+  sort: '',
+  sort_dir: '',
+}
+
+
+
 const listStatus = ref({
   finished: false,
   loading: false,
@@ -151,12 +160,15 @@ watch(
   (val) => {
     console.log('sort changed', val)
     if(val.sortBy==="price_change"){
-        resetListStatus()
-        loadMoreFavorites({
-          sort: 'price_change',
-          sort_dir: ['asc', '', 'desc'][(val.activeSort||0)+1],
-        })
+        sortParam.sort_dir=['asc', '', 'desc'][(val.activeSort||0)+1]
+        sortParam.sort='price_change'
+       
+    }else{
+      sortParam.sort_dir=''
+      sortParam.sort=''
     }
+    resetListStatus()
+    loadMoreFavorites()
   }
 )
 watch(
@@ -211,11 +223,11 @@ function setActiveTab(groupId: number, index: number) {
   scrollTabToCenter(tabsContainer, index)
 }
 
-async function loadMoreFavorites({sort, sort_dir}: any = {}) {
+async function loadMoreFavorites() {
   try {
     listStatus.value.loading = true
     const pageNo = listStatus.value.pageNo
-    const res = await getFavoriteList(activeTab.value, pageNo, walletAddress.value,sort_dir,sort)
+    const res = await getFavoriteList(activeTab.value, pageNo, walletAddress.value,sortParam.sort_dir,sortParam.sort)
     if (Array.isArray(res)) {
       const list = res
         .map((i) => ({
