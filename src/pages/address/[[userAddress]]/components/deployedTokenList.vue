@@ -39,8 +39,8 @@
       </el-table-column>
       <el-table-column :width="80" align="right" :label="$t('migrated1')">
         <template #default="{ row }">
-          <img v-if="row.migrated" src="@/assets/images/select-box-circle-line.svg" alt="" />
-          <img v-else src="@/assets/images/close-circle-line.svg" alt="" />
+          <img v-if="row.migrated" src="@/assets/images/select-box-circle-line.svg" alt="" >
+          <img v-else src="@/assets/images/close-circle-line.svg" alt="" >
         </template>
       </el-table-column>
       <el-table-column
@@ -91,9 +91,6 @@
 <script setup lang="ts">
 import AveEmpty from '@/components/aveEmpty.vue'
 import TokenColumn from '@/components/tokenColumn.vue'
-import TotalProfitColumn from './totalProfitColumn.vue'
-// import { formatNumber2 } from '@/utils/formatNumber'
-import { dayjs, type RowEventHandlerParams } from 'element-plus'
 
 const props = defineProps({
   tableData: {
