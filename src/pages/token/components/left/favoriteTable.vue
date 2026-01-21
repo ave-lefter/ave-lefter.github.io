@@ -123,15 +123,15 @@ const sortedFavList = computed(() => {
   if (sort.value.activeSort === 0 || !sort.value.sortBy) {
     return favoritesList.value
   }
-  return favoritesList.value.toSorted((a: any, b: any) => {
-    if (sort.value.sortBy === 'symbol') {
+  if(sort.value.sortBy === 'symbol'){
+    return favoritesList.value.toSorted((a: any, b: any) => {
       const codeB = b.symbol[0].toLowerCase().charCodeAt(0) || 0
       const codeA = a.symbol[0].toLowerCase().charCodeAt(0) || 0
       return (codeB - codeA) * sort.value.activeSort
-    } else {
-      return ((b[sort.value.sortBy!] || 0) - (a[sort.value.sortBy!] || 0)) * sort.value.activeSort
-    }
-  })
+    })
+  }else{
+    return favoritesList.value
+  }
 })
 
 onMounted(() => {
@@ -144,6 +144,19 @@ watch(
   () => {
     _getUserFavoriteGroups()
     setActiveTab(0, 0)
+  }
+)
+watch(
+  () => sort.value,
+  (val) => {
+    console.log('sort changed', val)
+    if(val.sortBy==="price_change"){
+        resetListStatus()
+        loadMoreFavorites({
+          sort: 'price_change',
+          sort_dir: ['asc', '', 'desc'][(val.activeSort||0)+1],
+        })
+    }
   }
 )
 watch(
@@ -198,11 +211,11 @@ function setActiveTab(groupId: number, index: number) {
   scrollTabToCenter(tabsContainer, index)
 }
 
-async function loadMoreFavorites() {
+async function loadMoreFavorites({sort, sort_dir}: any = {}) {
   try {
     listStatus.value.loading = true
     const pageNo = listStatus.value.pageNo
-    const res = await getFavoriteList(activeTab.value, pageNo, walletAddress.value)
+    const res = await getFavoriteList(activeTab.value, pageNo, walletAddress.value,sort_dir,sort)
     if (Array.isArray(res)) {
       const list = res
         .map((i) => ({
