@@ -341,13 +341,13 @@ function sortChange(sort_dir: string) {
 watch(() => klineDateFilter?.value, (val) => {
   if (val && !orderBookVisible.value) {
     tableFilter.value.timestamp = val
-    _getTokenTxs()
+    filterSubmit()
   }
 })
 
 watch(() => pairAddress.value, (pair, oldPair) => {
   if (pairAddress.value) {
-    _getPairLiq()
+    filterSubmit()
     subscribeLiq(pair, oldPair)
   }
 }, {
@@ -358,7 +358,7 @@ watch(() => route.params.id, val => {
   if (val) {
     resetCache()
     tableFilter.value.markerAddress = ''
-    _getTokenTxs()
+    filterSubmit()
   }
 }, {
   immediate: true
@@ -366,7 +366,7 @@ watch(() => route.params.id, val => {
 
 watch(() => followStore.currentAddress, () => {
   if (activeTab.value === '-100') {
-    _getTokenTxs()
+    filterSubmit()
   }
 })
 
@@ -374,13 +374,13 @@ watch(orderBookVisible,(val,oldVal)=>{
   if(oldVal && !val){
     resetCache()
     tableFilter.value.markerAddress = ''
-    _getTokenTxs()
+    filterSubmit()
   }
 })
 
 useVisibilityChange(() => {
   resetCache()
-  _getTokenTxs()
+  filterSubmit()
   _getPairLiq()
 })
 
@@ -857,7 +857,7 @@ function setActiveTab(val: string,index:number) {
 function setMakerAddress(address: string) {
   txCount.value = {}
   tableFilter.value.markerAddress = tableFilter.value.markerAddress ? '' : address
-  _getTokenTxs()
+  filterSubmit()
 }
 
 function onRowClick({ rowData }: RowEventHandlerParams) {
@@ -895,7 +895,7 @@ function onRowClick({ rowData }: RowEventHandlerParams) {
 function resetMakerAddress() {
   txCount.value = {}
   tableFilter.value.markerAddress = ''
-  _getTokenTxs()
+  filterSubmit()
 }
 
 const collect = async (row: any,index:number) => {
