@@ -1724,9 +1724,9 @@
   "preview": "预览",
   "top20Remarked": "TOP 20快捷备注",
   "addToGroup": "添加到分组",
-  "totalPair":"总流动池",
-  "top100":"Top100均线",
-  "devBestToken":"开发者最佳代币",
+  "totalPair": "总流动池",
+  "top100": "Top100均线",
+  "devBestToken": "开发者最佳代币",
   "indicatorLine": "指标线",
   "buyMa": "买均线",
   "sellMa": "卖均线",
@@ -1945,5 +1945,8 @@
   "learnMore": "了解更多",
   "pendingRebate": "待领取佣金",
   "invitedUser": "邀请用户",
-  "chainWallet3": "链钱包"
+  "chainWallet3": "链钱包",
+  "markersBuy": "总买入钱包数",
+  "markersSell": "总卖出钱包数",
+  "liqTip": "池子数和底池大小"
 }

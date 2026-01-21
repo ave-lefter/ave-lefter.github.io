@@ -289,7 +289,7 @@
                       "
                       class="flex text-12px"
                     >
-                      <div v-for="(item, $index) in row?.medias" :key="$index">
+                      <div v-for="(item, index) in row?.medias" :key="index">
                         <template v-if="item.url">
                           <span v-if="item.name === 'QQ'" v-tooltip="item.url" class="mr-8px">
                             <Icon
@@ -366,7 +366,7 @@
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'markers')"
                       v-tooltip.raw="{
-                        content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('buy1')}/${$t('sell1')}: <span class='color-#12B886'>${formatNumber(row?.buyers_24h || 0, 2)}</span><span class='color-[--third-text]'>/</span><span class='color-#F6465D'>${formatNumber(row?.sellers_24h || 0, 2)}</span></div>`,
+                        content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('markersBuy')}/${$t('markersSell')}: <span class='color-#12B886'>${formatNumber(row?.buyers_24h || 0, 2)}</span><span class='color-[--third-text]'>/</span><span class='color-#F6465D'>${formatNumber(row?.sellers_24h || 0, 2)}</span></div>`,
                         props: {
                           placement: 'top-start',
                         },
@@ -489,19 +489,19 @@
                     </div>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'sniper')"
-                      v-tooltip="$t('snipers')"
+                      v-tooltip="$t('sniper2')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                        color: Number(row?.sniper_count) > 30 ? '#F6465D' : '#12B886',
+                        color: Number(row?.sniper_balance_ratio_cur) > 30 ? '#F6465D' : '#12B886',
                       }"
                     >
                       <Icon class="iconfont icon-gun text-12px mr-4px" name="custom:gun" />
                       <span>{{
                         formatNumber(
-                          Number(row?.sniper_count) > 0.001 ? row?.sniper_count || 0 : 0,
+                          Number(row?.sniper_balance_ratio_cur) > 0.001 ? row?.sniper_balance_ratio_cur || 0 : 0,
                           2
                         )
-                      }}</span>
+                      }}%</span>
                     </div>
                     <!-- <div
                       v-show="pumpSetting?.define?.some((i) => i === 'cabal')"
@@ -529,7 +529,7 @@
                         )
                       }}</span>
                     </div> -->
-                    <div
+                    <!-- <div
                       v-show="pumpSetting?.define?.some((i) => i === 'rug')"
                       v-tooltip="$t('rug_rate_tips')"
                       class="flex mr-5px items-center bg-btn"
@@ -549,7 +549,7 @@
                           ? $t('unKnown1')
                           : formatNumber(row?.rug_rate || 0, 2) + '%'
                       }}</span>
-                    </div>
+                    </div> -->
 
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'smart')"
@@ -598,7 +598,7 @@
                       </div>
                       <span
                         :style="{ 'font-size': pumpSetting.fontSize_mc, color: getDataColor('mc',row.market_cap) }"
-                        >${{ pumpSetting.isInt ? formatNumber(row.market_cap || 0, { decimals: 0, l:4}) : formatNumber(row.market_cap || 0, 2) }}</span
+                        >${{ pumpSetting.isInt ? formatNumber(row.market_cap || 0, { decimals: 0, l: 4, locale: 'en' }) : formatNumber(row.market_cap || 0, {decimals: 2, locale: 'en' }) }}</span
                       >
                     </template>
                   </template>
@@ -622,6 +622,13 @@
                       {{ formatNumber(row?.tx_24h_count || 0, 2) }}
                     </div>
                   </template>
+                  <div v-tooltip="$t('liqTip')">
+                    <div class="mr-5px color-[--third-text] ml-5px" >Liq</div>
+                    <div class="color-[---main-text]">
+                      {{ formatNumber(row?.tvl || 0, 2) }}
+                    </div>
+                  </div>
+
                 </div>
                 <div class="btns-swap flex-end mt-15px pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }">
                   <div
@@ -785,11 +792,12 @@ const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableLis
   itemHeight: 110.8,
   // 必须增加过采样，否则 translateY(-20px) 向上移动时，
   // 顶部刚进入视口的节点会因为高度计算没到视口而无法渲染，导致动画“闪现”
-  overscan: 15,
+  overscan: 5,
 })
 onUnmounted(() => {
   $tooltip?.hide?.()
 })
+
 function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: string }) {
   if (pumpSetting.value.isRight) {
     e.preventDefault()
@@ -1215,18 +1223,22 @@ const getAnimClass = (itemData: any) => {
   transition: transform 0.3s ease;
 }
 
-/* 1. 新行入场：从上方滑入并淡入 */
+/* 1. 新行入场：从上方滑入并淡入
 .anim-enter {
   animation: slideIn 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   z-index: 10;
 }
 
+*/
+
 /* 2. 旧行下推补偿：
    数据置顶时，虚拟滚动将旧行瞬间下移了 70px。
-   我们让内层瞬间反向向上偏移 70px（回原位），然后平滑归位到 0。 */
+   我们让内层瞬间反向向上偏移 70px（回原位），然后平滑归位到 0。
 .anim-push {
   animation: pushDown 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
+
+ */
 
 @keyframes slideIn {
   from { transform: translateY(-100%); opacity: 0; }
