@@ -201,7 +201,7 @@ import { debounce } from 'lodash-es'
 import { getAddressAndChainFromId, isEvmChain, getRpcProvider } from '@/utils'
 import { ElMessageBox } from 'element-plus'
 import { useBotSwap } from '~/composables/botSwap'
-import { bot_createSolTx, bot_createSwapEvmTx, bot_createSolLimitTx, bot_createEvmLimitTx, bot_createSwapTonTx, bot_createTonLimitSwap } from '@/api/bot'
+import { bot_createSolTx, bot_createSwapEvmTx, bot_createSolLimitTx, bot_createEvmLimitTx, bot_createSwapTonTx, bot_createTonLimitSwap, getAutoSlippage } from '@/api/bot'
 import RefreshBalance from './refreshBalance.vue'
 import { formatDec, formatNumber } from '@/utils/formatNumber'
 import { useEventBus } from '@vueuse/core'
@@ -211,6 +211,8 @@ import { recordTxV2, updateTxV2 } from '~/api/tracking'
 import BottomSetting from './bottomSetting.vue'
 import delayedNotify from '~/utils/notify'
 import { formatBotError } from '~/utils/bot'
+
+
 
 const ElNotification = (arg: any) => delayedNotify({...arg, duration: 2500})
 
@@ -358,7 +360,7 @@ const {gasPrice} = storeToRefs(tokenStore)
 // const { botSettings } = storeToRefs(botSettingStore)
 
 
-const { getTokensPrice, allowance, getAllowance, loadingAllowance, checkApproveAndApprove, bot_approve } = useBotSwap()
+const { getTokensPrice, allowance, getAllowance, loadingAllowance, bot_approve, updateBalanceFromWs } = useBotSwap()
 
 // 计算属性
 const tokenInfo = computed(() => tokenStore.token)
@@ -446,15 +448,16 @@ const swapButtonColor= computed(() => {
 })
 
 const isApprove = computed(() => {
-  const routeParams = getAddressAndChainFromId(route.params.id as string)
-  const chain = routeParams?.chain || tokenInfo.value?.chain || ''
-  if (['solana', 'ton'].includes(chain)) return true
-  if (fromToken.value?.address === NATIVE_TOKEN) return true
+  return true
+  // const routeParams = getAddressAndChainFromId(route.params.id as string)
+  // const chain = routeParams?.chain || tokenInfo.value?.chain || ''
+  // if (['solana', 'ton'].includes(chain)) return true
+  // if (fromToken.value?.address === NATIVE_TOKEN) return true
 
-  const decimals = fromToken.value?.decimals || 18
-  const fromAmountBN = new BigNumber(props.activeTab === 'buy' ? amountNative.value || 0 : amountToken.value || 0 )
-  const parsedAmount = new BigNumber(fromAmountBN.toFixed(decimals)).times(10 ** decimals)
-  return parsedAmount.lte(allowance.value)
+  // const decimals = fromToken.value?.decimals || 18
+  // const fromAmountBN = new BigNumber(props.activeTab === 'buy' ? amountNative.value || 0 : amountToken.value || 0 )
+  // const parsedAmount = new BigNumber(fromAmountBN.toFixed(decimals)).times(10 ** decimals)
+  // return parsedAmount.lte(allowance.value)
 })
 
 const submitAmount = computed(()=>{
@@ -738,7 +741,7 @@ async function submitBotSwap() {
     ton: 'TON',
   }
   const native = tokenStore.swap.payToken?.address || chainMainToken?.[chain] || NATIVE_TOKEN
-  const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
+  // const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
   const isBatchSell = botSwapStore.botSwapSelectedWallets.length > 1 && props.activeTab === 'sell'
   if (chain === 'solana' || chain === 'ton') {
     // let mev = this.botSettings?.solana?.mev
@@ -758,7 +761,7 @@ async function submitBotSwap() {
     // botPriorityFee = botPriorityFee.lt(min) ? min : botPriorityFee.toFixed(0)
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
-    const slippage = botSettingStore.botSettings?.[chain]?.[botSettingStore.botSettings?.[chain]?.selected]?.slippage || 9
+    // const slippage = botSettingStore.botSettings?.[chain]?.[botSettingStore.botSettings?.[chain]?.selected]?.slippage || 9
     const batchId = Date.now().toString()
     const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
       const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
@@ -786,7 +789,8 @@ async function submitBotSwap() {
       autoSellConfig: isBuy ? botSettingStore?.selectedAutoSellConfig : [],
       autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
-      autoSellPriorityFee: botPriorityFee
+      autoSellPriorityFee: botPriorityFee,
+      // ...slippageObj.value,
     }
     const bot_createTx = {
       solana: bot_createSolTx,
@@ -801,7 +805,7 @@ async function submitBotSwap() {
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
             // this.$store.state.bot.historyUpdate++
             // tokenStore.placeOrderUpdate++
-            ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
+            // ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
             // if (!['myBotHistory', 'myBotPosition']?.includes(this.$store.state.tabActive)) {
             //   this.$store.state.tabActive = 'myBotHistory'
             // }
@@ -902,7 +906,8 @@ async function submitBotSwap() {
       autoSellConfig: isBuy ? botSettingStore?.selectedAutoSellConfig : [],
       autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
-      autoSellPriorityFee: gasTip
+      autoSellPriorityFee: gasTip,
+      // ...slippageObj.value,
     }
     // await Promise.all(swapList.map(i => {
     //   return checkApproveAndApprove({
@@ -914,14 +919,14 @@ async function submitBotSwap() {
     //   loadingSwap.value = false
     // })
     // return console.log('bot_createTx[chain]',data)
-    await checkApproveAndApprove({
-      inToken: data.inTokenAddress,
-      outToken: data.outTokenAddress,
-      chain: chain,
-      owner: walletAddress
-    }).catch(() => {
-      loadingSwap.value = false
-    })
+    // await checkApproveAndApprove({
+    //   inToken: data.inTokenAddress,
+    //   outToken: data.outTokenAddress,
+    //   chain: chain,
+    //   owner: walletAddress
+    // }).catch(() => {
+    //   loadingSwap.value = false
+    // })
     bot_createSwapEvmTx(data).then(res => {
       if (res) {
         const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
@@ -929,7 +934,7 @@ async function submitBotSwap() {
           const walletName = botStore.walletList?.find?.(j => j?.evmAddress?.toLowerCase?.() === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
             // tokenStore.placeOrderUpdate++
-            ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
+            // ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
             loadingSwap.value = false
             amountNative.value = ''
             amountNativeOut.value = ''
@@ -969,6 +974,12 @@ async function submitBotSwap() {
               if (txInfo1?.success) {
                 ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
+                updateBalanceFromWs({
+                  chain: data.chain,
+                  inTokenAddress: data.inTokenAddress,
+                  outTokenAddress: data.outTokenAddress,
+                  ...txInfo1
+                })
               } else {
                 const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
                 handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
@@ -1249,13 +1260,73 @@ function getGasPrice() {
   })
 }
 
+// const autoSlippageObj = reactive<Record<string, number>>({})
+
+// function getAutoSlippageParams() {
+//   const routeParams = getAddressAndChainFromId(route.params.id as string)
+//   const isBuy = props.activeTab === 'buy'
+//   const chain = getChain()
+//   const token = routeParams?.address || tokenStore.swap.token?.address || tokenStore.token?.token || ''
+//   const selected = botSettingStore?.botSettings?.[chain]?.[props.activeTab]?.selected || botSettingStore?.botSettings?.[chain]?.selected || 's1'
+//   const botSettings = botSettingStore.botSettings?.[chain]?.[props.activeTab]?.[selected]
+//   const mev = botSettings?.mev
+//   const query = {
+//     chain: chain,
+//     token: token,
+//     mev: mev,
+//     isBuy
+//   }
+//   return query
+// }
+
+// const autoSlippage = computed(() => {
+//   const query = getAutoSlippageParams()
+//   const key = query.chain + '-' + query.token + '-' + query.mev + '-' + query.isBuy
+//   return autoSlippageObj[key]
+// })
+
+// const slippageObj = computed(() => {
+//   const chain = getChain()
+//   const slippage = botSettingStore.botSettings?.[chain]?.[botSettingStore.botSettings?.[chain]?.selected]?.slippage || 9
+//   if (autoSlippage.value && slippage === 'auto') {
+//     return {
+//       slippage: autoSlippage.value,
+//       autoSlippage: false
+//     }
+//   }
+//   return {
+//     slippage: slippage !== 'auto' ? Number(new BigNumber(slippage).times(100).toFixed(0)) : 900,
+//     autoSlippage: slippage === 'auto'
+//   }
+// })
+
+// let Timer_getAutoSlippage: any = null
+// function _getAutoSlippage() {
+//   const query = getAutoSlippageParams()
+//   getAutoSlippage(query).then(res => {
+//     if (res) {
+//       console.log('getAutoSlippage', res)
+//       const key = query.chain + '-' + query.token + '-' + query.mev + '-' + query.isBuy
+//       autoSlippageObj[key] = res
+//     }
+//   }).finally(() => {
+//     if (Timer_getAutoSlippage) {
+//       clearTimeout(Timer_getAutoSlippage)
+//       Timer_getAutoSlippage = null
+//     }
+//     Timer_getAutoSlippage = setTimeout(() => {
+//       _getAutoSlippage()
+//     }, 50000)
+//   })
+// }
+
 
 watch(() => tokenStore.token?.token || '', (val) => {
   if (val) {
     getGasPrice()
-    if (props.activeTab === 'sell') {
-      _getAllowance()
-    }
+    // if (props.activeTab === 'sell') {
+    //   _getAllowance()
+    // }
     amountToken.value = ''
     amountSellTokenPercent.value = ''
     amountNative.value = ''
@@ -1265,17 +1336,17 @@ watch(() => tokenStore.token?.token || '', (val) => {
   }
 })
 
-watch(() => tokenStore.swap.payToken?.address, (val) => {
-  if (val) {
-    _getAllowance()
-  }
-})
+// watch(() => tokenStore.swap.payToken?.address, (val) => {
+//   if (val) {
+//     _getAllowance()
+//   }
+// })
 
-watch(walletAddress, (val) => {
-  if (val && props.activeTab === 'sell') {
-    _getAllowance()
-  }
-})
+// watch(walletAddress, (val) => {
+//   if (val && props.activeTab === 'sell') {
+//     _getAllowance()
+//   }
+// })
 
 watch(() => props.activeTab, (val) => {
   amountToken.value = ''
@@ -1283,9 +1354,9 @@ watch(() => props.activeTab, (val) => {
   amountNative.value = ''
   amountTokenOut.value = ''
   amountNativeOut.value = ''
-  if (val === 'sell') {
-    _getAllowance()
-  }
+  // if (val === 'sell') {
+  //   _getAllowance()
+  // }
 })
 
 watch(() => tokenStore.price, (val) => {
@@ -1337,21 +1408,23 @@ watch(() => tokenStore.placeOrderSuccess, () => {
   }, 1000)
 })
 
+const editMode = ref(false)
+function handleEdit(value: Ref<Array<{value: string}>>,type: string) {
+  editMode.value = !editMode.value
+  const botSetting = (botSettingStore?.botSettings?.[chain.value]?.buy || {}) as typeof botSettingStore.botSettings.solana
+  botSettingStore.botSettings[chain.value][type][botSetting?.selected || 's1'].buyValueList = value.map(el=>el.value)
+}
+
 // 生命周期钩子
 onMounted(() => {
   initPriceLimit()
   getGasPrice()
-  if (props.activeTab === 'sell') {
-    _getAllowance()
-  }
+  // _getAutoSlippage()
+  // if (props.activeTab === 'sell') {
+  //   _getAllowance()
+  // }
 })
 
-const editMode = ref(false)
-function handleEdit(value,type) {
-  editMode.value = !editMode.value
-  const botSetting = (botSettingStore?.botSettings?.[chain.value]?.buy || {}) as typeof botSettingStore.botSettings.solana
-  botSettingStore.botSettings[chain.value][type][botSetting.selected].buyValueList = value.map(el=>el.value)
-}
 
 </script>
 <style lang="scss" scoped>

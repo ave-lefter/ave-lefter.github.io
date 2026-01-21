@@ -1042,3 +1042,18 @@ export function getTokensPnl(body: {
     body
   })
 }
+
+// aveswap 查询自动滑点
+// 功能说明：获取token的自动滑点
+export function getAutoSlippage(query: {
+  chain: string
+  token: string
+  mev?: boolean
+  isBuy?: boolean
+}): Promise<number> {
+  const {$api} = useNuxtApp()
+  return $api('/aveswap/v1/swap/getAutoSlippage', {
+    method: 'get',
+    query
+  })
+}
