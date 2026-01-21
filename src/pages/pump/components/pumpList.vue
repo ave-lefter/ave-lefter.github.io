@@ -792,15 +792,12 @@ const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableLis
   itemHeight: 110.8,
   // 必须增加过采样，否则 translateY(-20px) 向上移动时，
   // 顶部刚进入视口的节点会因为高度计算没到视口而无法渲染，导致动画“闪现”
-  overscan: 15,
+  overscan: 5,
 })
 onUnmounted(() => {
   $tooltip?.hide?.()
 })
-const tableList1 = computed(() => {
 
-  return tableList.value?.sort?.((a, b) => ((Number(b.created_at) || Number(b.time)) - (Number(a.created_at) || Number(a.time))))
-})
 function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: string }) {
   if (pumpSetting.value.isRight) {
     e.preventDefault()
