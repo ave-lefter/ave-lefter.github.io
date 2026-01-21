@@ -589,9 +589,15 @@
                     />
                   </template>
                   <template v-else>
+                    <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
+                      <div class="mr-5px color-[--third-text]">V</div>
+                      <div class="color-[---main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h) }">
+                        ${{ pumpSetting.isInt ? formatNumber(row.volume_u_24h || 0, { decimals: 0, l: 4, locale: 'en' }) : formatNumber(row.volume_u_24h || 0, {decimals: 2, locale: 'en' }) }}
+                      </div>
+                    </template>
                     <template v-if="pumpSetting?.define?.some((i) => i === 'mcap')">
                       <div
-                        class="color-[--third-text] mr-5px"
+                        class="color-[--third-text] mr-5px ml-5px"
                         :style="{ 'font-size': pumpSetting.fontSize_mc }"
                       >
                         MC
@@ -604,32 +610,29 @@
                   </template>
                 </div>
                 <div
-                  v-if="
-                    pumpSetting?.define?.some((i) => i === 'vol') ||
-                    pumpSetting?.define?.some((i) => i === 'txs')
-                  "
+                  v-if="pumpSetting?.define?.some((i) => i === 'txs')"
                   class="flex-end text-12px pr-12px"
                 >
-                  <div class="flex-end mr-5px" v-tooltip="$t('liqTip')">
-                    <div class="mr-5px color-[--third-text] ml-5px" >Liq</div>
-                    <div class="color-[---main-text]">
-                      {{ formatNumber(row?.tvl || 0, 2) }}
-                    </div>
-                  </div>
-                  <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
-                    <div class="mr-5px color-[--third-text]">V</div>
-                    <div class="color-[---main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h) }">
-                      ${{pumpSetting.isInt? formatNumber(row?.volume_u_24h || 0, { decimals: 0, l:4}) : formatNumber(row?.volume_u_24h || 0, 2) }}
-                    </div>
-                  </template>
                   <template v-if="pumpSetting?.define?.some((i) => i === 'txs')">
                     <div class="mr-5px color-[--third-text] ml-5px">Txs</div>
                     <div class="color-[---main-text]">
-                      {{ formatNumber(row?.tx_24h_count || 0, 2) }}
+                      {{ formatNumber(row.tx_24h_count || 0, { decimals: 0, l: 4, locale: 'en' })}}
                     </div>
                   </template>
 
+                  <div class="mr-5px color-[--third-text] ml-5px" v-tooltip="$t('netInflow')">N</div>
+                  <div class="color-[---main-text]">
+                    <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[---main-text]">
+                      {{ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, locale: 'en' }) }}
+                    </ave-data-number>
+                  </div>
 
+                </div>
+                <div class="flex-end pr-12px mt-5px">
+                  <div class="mr-5px color-[--third-text] ml-5px" v-tooltip="$t('liqTip')">Liq</div>
+                  <div class="color-[---main-text]">
+                    {{ formatNumber(row?.tvl || 0, { decimals: 0, l: 4, locale: 'en' }) }}
+                  </div>
                 </div>
                 <div class="btns-swap flex-end mt-15px pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }">
                   <div
@@ -1048,7 +1051,7 @@ const getAnimClass = (itemData: any) => {
       min-width: 200px;
       position: absolute;
       right: 0;
-      bottom: -2px;
+      bottom: -11px;
       padding-left: 12px;
       padding-bottom: 5px;
       border: 1px solid;

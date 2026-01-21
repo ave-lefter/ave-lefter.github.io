@@ -409,7 +409,7 @@ const isPausedObj = ref({
 
 const wsTableListCache = ref<PumpObj[]>([])
 const wsTableList = ref<PumpObj[]>([])
-const logoList = ref<{ logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
+const logoList = ref<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
 type StatisticsItem = {
   chain: string
   token: string
@@ -424,6 +424,7 @@ type StatisticsItem = {
   tvl:number
   total: string
   uprice: number
+  net_flow_vol: number
 }
 const statisticsList = ref<StatisticsItem[]>([])
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
@@ -480,7 +481,8 @@ const list1 = computed(() => {
           ...obj,
           logo_url: obj?.logo_url,
           name: obj?.name,
-          symbol: obj?.symbol
+          symbol: obj?.symbol,
+          ...(obj?.appendix ? { medias: getMedias(obj?.appendix), twitter_type: obj?.twitter_type } : {}),
         }
       } else {
         return i
@@ -517,7 +519,8 @@ const list2 = computed(() => {
             ...obj,
             logo_url: obj?.logo_url,
             name: obj?.name,
-            symbol: obj?.symbol
+            symbol: obj?.symbol,
+            ...(obj?.appendix ? { medias: getMedias(obj?.appendix), twitter_type: obj?.twitter_type } : {}),
           }
         } else {
           return i
@@ -554,7 +557,8 @@ const list2 = computed(() => {
             ...obj,
             logo_url: obj?.logo_url,
             name: obj?.name,
-            symbol: obj?.symbol
+            symbol: obj?.symbol,
+            ...(obj?.appendix ? { medias: getMedias(obj?.appendix), twitter_type: obj?.twitter_type } : {}),
           }
         } else {
           return i
@@ -644,38 +648,51 @@ watch(activeChain, () => {
       id: 1,
     })
 })
-const pumpStateThrottled = useThrottleFn((val) => {
-    wsUpdateTableList(val)
-    subscribePortrait(val)
+
+const pumpStateBuffer: any[][] = []
+const flushPumpState = useThrottleFn(() => {
+  if (!pumpStateBuffer.length) return
+  const merged: any[] = []
+  for (const arr of pumpStateBuffer) {
+    merged.push(...arr)
+  }
+  wsUpdateTableList(merged)
+  subscribePortrait(merged)
+  pumpStateBuffer.length = 0
 }, 100)
 
 watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
   if (Array.isArray(val) && documentVisible.value) {
-    pumpStateThrottled(val)
+    pumpStateBuffer.push(val)
+    flushPumpState()
   }
 })
-
+const bufferLogo: any[] = []
 const logoThrottled  = useThrottleFn((val) => {
-  logoList.value.unshift(val)
-  if (logoList.value.length > 300) {
-    logoList.value.length = 300
-  }
+  if (!bufferLogo.length) return
+  logoList.value = [
+    ...bufferLogo,
+    ...logoList.value,
+  ].slice(0, 300)
+  bufferLogo.length = 0
 }, 100)
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
   if (val && documentVisible.value) {
+    bufferLogo.unshift(val)
     logoThrottled(val)
   }
 })
-const mergeStatisticsThrottled = useThrottleFn((val: any[]) => {
+const buffer: any[][] = []
+const flushStatistics = useThrottleFn(() => {
+  if (!buffer.length) return
   const map = new Map<string, any>()
 
-  // 先放旧数据
+  // 旧数据
   statisticsList.value.forEach(item => {
     map.set(item.token, item)
   })
-
-  // 再 merge 新数据
-  val.forEach(item => {
+  // 所有 buffer 中的新数据
+  buffer.flat().forEach(item => {
     const prev = map.get(item.token)
     map.set(
       item.token,
@@ -683,15 +700,16 @@ const mergeStatisticsThrottled = useThrottleFn((val: any[]) => {
     )
   })
   statisticsList.value = Array.from(map.values()).slice(0, 300)
+  buffer.length = 0
 }, 100)
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
   (val) => {
     if (!Array.isArray(val) || !val.length ) return
-    mergeStatisticsThrottled(val)
+    buffer.push(val)
+    flushStatistics()
   }
 )
-
 const getChangedValue = (A: string[], B: string[]): string | null => {
   for (let i = 0; i < A.length; i++) {
     if (A[i] !== B[i]) {
@@ -857,7 +875,7 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
 
   }))
   const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
-  wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,100)
+  wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,300)
   // let wsTime = this.wsTableListCache?.time || 0
   // if (wsTime < Date.now() - 15000) {
   //   this.wsTableListCache = {
@@ -1132,42 +1150,6 @@ function parseDate(dateStr?: string | number, toSeconds = false) {
   const ms = new Date(dateStr).getTime()
   return toSeconds ? ms / 1000 : ms
 }
-
-// function getMedias(appendix: string) {
-//   if (!appendix) return []
-//   if (isJSON(appendix)) {
-//     const obj = JSON.parse(appendix)
-//     const arr = []
-//     if (obj?.website)
-//       arr.push({
-//         name: t('website'),
-//         icon: 'web',
-//         url: formatUrl(obj.website),
-//       })
-//     if (obj?.btok)
-//       arr.push({
-//         name: 'Btok',
-//         icon: 'btok',
-//         url: formatUrl(obj.btok),
-//       })
-//     if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
-//     if (obj?.telegram)
-//       arr.push({
-//         name: 'Telegram',
-//         icon: 'tg',
-//         url: formatUrl(obj.telegram),
-//       })
-//     if (obj?.twitter)
-//       arr.push({
-//         name: 'Twitter',
-//         icon: 'twitter',
-//         url: formatUrl(obj.twitter),
-//       })
-//     return arr
-//   }
-
-//   return []
-// }
 function getFilterData(list: PumpObj[], conditions: any) {
   conditions = JSON.parse(conditions) || {}
   return list?.filter((i) => {
@@ -1349,9 +1331,12 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'tvl')) {
       next.tvl = Number(obj.tvl)   //池子大小
     }
-    // if (hasValue(obj, 'uprice')) {
-    //   next.market_cap = next.amm =='fourmemev2'|| next.amm =='flapswap' ? Number(obj.total || 1000000000) * obj.uprice : Number(obj.total) * obj.uprice
-    // }
+    if (hasValue(obj, 'net_flow_vol')) {
+      next.net_flow_vol = obj.net_flow_vol
+    }
+    if (hasValue(obj, 'total') && hasValue(obj, 'uprice')) {
+      next.market_cap = Number(obj.total) * obj.uprice
+    }
     return next
   })
 }
@@ -1389,6 +1374,9 @@ function mergeStatistics(prev: any, next: any) {
   }
   if (hasValue(next, 'total')) {
     result.total = next.total
+  }
+  if (hasValue(next, 'net_flow_vol')) {
+    result.net_flow_vol = next.net_flow_vol
   }
   return result
 }
