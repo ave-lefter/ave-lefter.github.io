@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div
-      class="flex justify-between border-b-1px border-b-solid border-b-[--main-divider] mb-10px mt-20px"
-    >
+    <div class="flex justify-between border-b-1px border-b-solid border-b-[--main-divider] mb-10px">
       <div class="flex items-center gap-24px">
         <a
           v-for="(item, index) in tabs"
@@ -409,6 +407,9 @@ const getWhaleTrendParams = () => {
     sort: trendQuery.value.sort,
     ...(trendQuery.value.volume_min && { volume_min: trendQuery.value.volume_min }),
     ...(trendQuery.value.volume_max && { volume_max: trendQuery.value.volume_max }),
+    ...(trendQuery.value.token && { token: trendQuery.value.token }),
+    ...(trendQuery.value.amount_min && { amount_min: trendQuery.value.amount_min }),
+    ...(trendQuery.value.amount_max && { amount_max: trendQuery.value.amount_max }),
   }
 
   const trendLen = trendQuery.value.checkedTrend?.length
@@ -423,9 +424,11 @@ const getWhaleTrendParams = () => {
 
 const _getWhaleTrendList = async () => {
   tableData.value.loading = true
-  if (trendQuery.value.volume_min > trendQuery.value.volume_max) {
-    store.dispatch('showMessage', {
-      type: 'error',
+  const { volume_min, volume_max, amount_min, amount_max } = trendQuery.value
+  const volumeErr = volume_min && volume_max && volume_min > volume_max
+  const amountErr = amount_min && amount_max && amount_min > amount_max
+  if (volumeErr || amountErr) {
+    ElMessage.error({
       message: $t('maxGtMin'),
     })
     return
@@ -450,7 +453,7 @@ const _getWhaleTrendList = async () => {
 
     if (arr?.length > 0) {
       const a = [...tableData.value.trend]
-      const b = arr.filter((i) => a.every((j) => j.tx_hash !== i.tx_hash))
+      const b = arr.filter((i) => a.every((j) => j.tx_hash + j.event_id !== i.tx_hash + i.event_id))
       tableData.value.trend = [...a, ...b]
     }
     tableData.value.finished = list?.length < tableData.value.pageSize

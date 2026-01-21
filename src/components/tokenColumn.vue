@@ -1,5 +1,8 @@
 <template>
   <el-table-column v-bind="columnProps">
+    <template v-if="props.headerSlot" #header>
+      <slot name="header" />
+    </template>
     <template #default="{ row }">
       <div
         class="token-info table-item_d flex items-center whitespace-nowrap overflow-hidden text-ellipsis"
@@ -68,6 +71,10 @@ const props = defineProps({
   columnProps: {
     type: Object,
     default: () => ({}),
+  },
+  headerSlot: {
+    type: Boolean,
+    default: false,
   },
 })
 

@@ -12,8 +12,8 @@
       @row-click="jumpTokenDetail"
     >
       <template #empty>
-        <AveEmpty v-if="!loading && tableData.length===0" class="[pt-40px]"/>
-        <span v-else/>
+        <AveEmpty v-if="!loading && tableData.length === 0" class="[pt-40px]" />
+        <span v-else />
       </template>
       <TokenColumn
         :column-props="{
@@ -21,7 +21,46 @@
           width: '250',
           fixed: 'left',
         }"
-      />
+        headerSlot
+      >
+        <template #header>
+          <el-popover
+            v-model:visible="filterForm.token.visible"
+            :width="320"
+            trigger="click"
+            popper-style="--el-text-color-primary:--third-text"
+          >
+            <template #reference>
+              <div class="flex items-center">
+                <span>{{ $t('walletToken') }}</span>
+                <Icon
+                  name="custom:filter"
+                  class="cursor-pointer text-10px ml-3px"
+                  :class="
+                    props.trendQuery.token
+                      ? 'color-[--primary-color]'
+                      : 'color-[--third-text] hover:color-[--secondary-text]'
+                  "
+                />
+              </div>
+            </template>
+            <template #default>
+              <div class="text-14px font-400 mb-8px">
+                {{ $t('tokenAddress') }}
+              </div>
+              <el-input v-model="filterForm.token.value" clearable />
+              <div class="mt-10px flex">
+                <el-button
+                  class="h-30px m-l-auto min-w-70px flex-1"
+                  type="primary"
+                  @click="confirmToken"
+                  >{{ $t('confirm') }}
+                </el-button>
+              </div>
+            </template>
+          </el-popover>
+        </template>
+      </TokenColumn>
       <el-table-column :label="$t('time')">
         <template #header>
           <span>{{ $t('time') }}</span>
@@ -35,7 +74,11 @@
               <Icon
                 name="custom:filter"
                 class="cursor-pointer text-10px ml-3px"
-                :class="trendQuery.block_time_min && trendQuery.block_time_max?'color-[--primary-color]':'color-[--third-text] hover:color-[--secondary-text]'"
+                :class="
+                  props.trendQuery.block_time_min && props.trendQuery.block_time_max
+                    ? 'color-[--primary-color]'
+                    : 'color-[--third-text] hover:color-[--secondary-text]'
+                "
                 @click.stop
               />
             </template>
@@ -65,27 +108,26 @@
                     <span>{{ $t('sort') }}</span>
                     <div class="flex flex-col items-center justify-center ml-5px">
                       <i
-                          :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer ${
-                            filterForm.time.sort_dir === 'asc' ? 'border-b-[--main-text]'
-                              : 'border-b-[--third-text]'
-                          }
+                        :class="`w-0 h-0 border-solid border-4px border-transparent cursor-pointer ${
+                          filterForm.time.sort_dir === 'asc'
+                            ? 'border-b-[--main-text]'
+                            : 'border-b-[--third-text]'
+                        }
                           `"
-                          @click.stop="localSortChange('block_time', 'asc')"
+                        @click.stop="localSortChange('block_time', 'asc')"
                       />
                       <i
-                          :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer ${
-                             filterForm.time.sort_dir === 'desc' ? 'border-t-[--main-text]'
-                              : 'border-t-[--third-text]'
-                          }
+                        :class="`w-0 h-0 border-solid border-4px border-transparent mt-3px cursor-pointer ${
+                          filterForm.time.sort_dir === 'desc'
+                            ? 'border-t-[--main-text]'
+                            : 'border-t-[--third-text]'
+                        }
                             `"
-                          @click.stop="localSortChange('block_time', 'desc')"
+                        @click.stop="localSortChange('block_time', 'desc')"
                       />
                     </div>
                   </div>
-                  <el-button
-                      class="h-30px m-l-auto min-w-70px"
-                    @click.stop="resetTime"
-                  >
+                  <el-button class="h-30px m-l-auto min-w-70px" @click.stop="resetTime">
                     {{ $t('reset') }}
                   </el-button>
                   <el-button
@@ -110,7 +152,7 @@
         <template #header>
           <span>{{ $t('type') }}</span>
           <el-popover
-              v-model:visible="filterForm.type.visible"
+            v-model:visible="filterForm.type.visible"
             placement="bottom"
             :width="207"
             trigger="click"
@@ -119,7 +161,7 @@
               <Icon
                 name="custom:filter"
                 class="cursor-pointer text-10px ml-3px"
-                :class="!trendQuery.checkAll ? 'color-[--primary-color]':'color-[--third-text]'"
+                :class="!trendQuery.checkAll ? 'color-[--primary-color]' : 'color-[--third-text]'"
               />
             </template>
             <template #default>
@@ -132,8 +174,8 @@
                   {{ $t('all') }}
                 </el-checkbox>
                 <el-checkbox-group
-                    v-model="filterForm.type.checkedTrend"
-                    class="flex flex-col"
+                  v-model="filterForm.type.checkedTrend"
+                  class="flex flex-col"
                   @change="handleCheckedChange"
                 >
                   <el-checkbox
@@ -185,10 +227,62 @@
         </template>
       </el-table-column>
       <el-table-column align="right" :label="$t('amount')">
+        <template #header>
+          <el-popover
+            v-model:visible="filterForm.amount.visible"
+            :width="300"
+            trigger="click"
+            popper-style="--el-text-color-primary:--third-text"
+          >
+            <template #reference>
+              <div class="flex items-center justify-end">
+                <span>{{ $t('amount') }}</span>
+                <Icon
+                  name="custom:filter"
+                  class="cursor-pointer text-10px ml-3px"
+                  :class="
+                    props.trendQuery.amount_min || props.trendQuery.amount_max
+                      ? 'color-[--primary-color]'
+                      : 'color-[--third-text] hover:color-[--secondary-text]'
+                  "
+                />
+              </div>
+            </template>
+            <template #default>
+              <div class="text-14px font-400 mb-8px">
+                {{ $t('amount') }}
+              </div>
+              <div class="flex items-center mt-10px">
+                <el-input
+                  v-model.trim.number="filterForm.amount.amount_min"
+                  :placeholder="$t('minor')"
+                  clearable
+                />
+                <span class="ml-10px mr-10px">~</span>
+                <el-input
+                  v-model.trim.number="filterForm.amount.amount_max"
+                  :placeholder="$t('max1')"
+                  clearable
+                />
+              </div>
+              <div class="mt-10px flex">
+                <el-button class="h-30px m-l-auto min-w-70px flex-1" @click="resetAmount"
+                  >{{ $t('reset') }}
+                </el-button>
+                <el-button
+                  class="h-30px m-l-auto min-w-70px flex-1"
+                  type="primary"
+                  @click="confirmAmount"
+                  >{{ $t('confirm') }}
+                </el-button>
+              </div>
+            </template>
+          </el-popover>
+        </template>
         <template #default="{ row }">
           <div
-              v-if="row?.event_type === 'ADD_LIQUIDITY' || row?.event_type === 'REMOVE_LIQUIDITY'"
-              class="flex flex-col items-end justify-end"
+            v-if="row?.event_type === 'ADD_LIQUIDITY' || row?.event_type === 'REMOVE_LIQUIDITY'"
+            class="flex flex-col items-end justify-end"
           >
             <span class="text-10px max-w-100px whitespace-nowrap text-ellipsis overflow-hidden">
               {{ row?.amount > 0 ? formatNumber(row?.amount || 0, 2) : 0 }}
@@ -206,10 +300,8 @@
       </el-table-column>
       <el-table-column align="right" :label="$t('gas')">
         <template #default="{ row }">
-          <span v-if="row?.gas > 0">
-            ${{ formatNumber(row?.gas || 0, 2) }}
-          </span>
-          <span  v-else class="color-#959A9F">--</span>
+          <span v-if="row?.gas > 0"> ${{ formatNumber(row?.gas || 0, 2) }} </span>
+          <span v-else class="color-#959A9F">--</span>
         </template>
       </el-table-column>
       <el-table-column align="right" :label="$t('value')">
@@ -225,7 +317,11 @@
               <Icon
                 name="custom:filter"
                 class="cursor-pointer text-10px ml-3px"
-                :class="trendQuery.volume_min && trendQuery.volume_max?'color-[--primary-color]':'color-[--third-text]'"
+                :class="
+                  trendQuery.volume_min || trendQuery.volume_max
+                    ? 'color-[--primary-color]'
+                    : 'color-[--third-text]'
+                "
               />
             </template>
             <template #default>
@@ -244,13 +340,11 @@
                 />
               </div>
               <div class="mt-10px flex">
-                <el-button
-                    class="h-30px m-l-auto min-w-70px flex-1"
-                  @click="resetPrice"
+                <el-button class="h-30px m-l-auto min-w-70px flex-1" @click="resetPrice"
                   >{{ $t('reset') }}
                 </el-button>
                 <el-button
-                    class="h-30px m-l-auto min-w-70px flex-1"
+                  class="h-30px m-l-auto min-w-70px flex-1"
                   type="primary"
                   @click="confirmPrice"
                   >{{ $t('confirm') }}
@@ -280,8 +374,6 @@
 
 <script setup>
 import AveEmpty from '@/components/aveEmpty.vue'
-// import { formatNumber2 } from '@/utils/formatNumber'
-import dayjs from 'dayjs'
 import TokenColumn from '@/components/tokenColumn.vue'
 const props = defineProps({
   trendQuery: {
@@ -337,6 +429,15 @@ const filterForm = ref({
     value: [],
     sort_dir: props.trendQuery.sort_dir,
     sort: props.trendQuery.sort,
+  },
+  token: {
+    visible: false,
+    value: '',
+  },
+  amount: {
+    visible: false,
+    amount_min: '',
+    amount_max: '',
   },
 })
 
@@ -451,7 +552,10 @@ function jumpTokenDetail(row) {
       token1_symbol: row.token1_symbol,
       pairAddress: '',
     },
-    user_address: route.params.userAddress || useBotStore().getWalletAddress(row.chain) || useWalletStore().address
+    user_address:
+      route.params.userAddress ||
+      useBotStore().getWalletAddress(row.chain) ||
+      useWalletStore().address,
   })
 }
 
@@ -534,6 +638,33 @@ function localSortChange(sort, sort_dir) {
   filterForm.value.time.sort = sort
   filterForm.value.time.sort_dir = sort_dir
 }
+
+function confirmToken() {
+  emit('refreshWhaleTrendList', {
+    ...props.trendQuery,
+    token: filterForm.value.token.value,
+  })
+  filterForm.value.token.visible = false
+}
+function resetAmount() {
+  filterForm.value.amount.amount_min = ''
+  filterForm.value.amount.amount_max = ''
+  emit('refreshWhaleTrendList', {
+    ...props.trendQuery,
+    amount_min: '',
+    amount_max: '',
+  })
+  filterForm.value.amount.visible = false
+}
+
+function confirmAmount() {
+  const { amount_max, amount_min } = filterForm.value.amount
+  emit('refreshWhaleTrendList', {
+    ...props.trendQuery,
+    amount_max,
+    amount_min,
+  })
+  filterForm.value.amount.visible = false
+}
 </script>
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

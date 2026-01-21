@@ -68,7 +68,10 @@ export default defineNuxtConfig({
         prefix: 'custom',
         dir: './src/assets/icons'
       },
-    ]
+    ],
+    clientBundle: {
+      sizeLimitKb: 512
+    }
   },
   generate: {
     // routes: [
