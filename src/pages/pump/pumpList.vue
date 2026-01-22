@@ -1,7 +1,7 @@
 <template>
   <div class="mt-20px mb-30px relative">
     <!-- <el-scrollbar ref="scrollbarRef" v-loading="loading" :height="scrollHeight" @scroll="handleScroll"> -->
-    <ul v-if="tableList?.length > 0" v-bind="containerProps" @scroll="handleScroll"  class="pump-item_list scroller-container" :style="{height: scrollHeight}">
+    <ul v-if="tableList?.length > 0" v-bind="containerProps" class="pump-item_list scroller-container"  :style="{height: scrollHeight}" @scroll="handleScroll">
       <div v-bind="wrapperProps">
         <!-- <TransitionGroup name="slide-fade"> -->
           <li
@@ -10,11 +10,11 @@
             :key="row?.pair + '-' + row?.chain"
             :ref="setBtnRef"
             class="pump-item_item relative item-row"
+            :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
             @click.stop="tableRowClick(row)"
             @contextmenu="handleContextMenu($event, row)"
             @mouseenter="showPopover(row)"
             @mouseleave="hidePopover"
-            :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
           >
             <div class="w-full relative" :class="getAnimClass(row)">
               <div class="flex-start items-start">
@@ -101,24 +101,12 @@
                       :progress="row.progress"
                     />
                     <a
-                      v-tooltip="{
-                         content: {
-                            is: ImageLarge,
-                            props: {
-                              row: row,
-                            }
-                          },
-                          props: {
-                            placement: 'bottom-start',
-                            'popper-class': 'tooltip-pd-0',
-                            'show-arrow': false
-                          }
-                      }"
                       :href="`https://lens.google.com/uploadbyurl?url=${encodeURIComponent(
                         getSymbolDefaultIcon(row)
                       )}`"
                       target="_blank"
                       class="token-mark clickable"
+                      @mouseover.stop="onEnter($event,row,props.type)"
                       @click.stop
                     >
                       <Icon class="text-16px text-#fff" name="custom:search" />
@@ -339,9 +327,9 @@
                     <PumpLive v-if="row?.is_streaming" :tokenId="(row.token + '-' + row.chain) as string" />
 
                     <a
+                      :ref="(el: any) => $refs.currentBtnRef[$index] = el"
                       class="media-item h-12px block leading-12px"
                       target="_blank"
-                      :ref="(el: any) => $refs.currentBtnRef[$index] = el"
                       @mouseenter="showPopoverSearch(row, $index)"
                       @mouseleave="showPopSearch = false"
                       @click.stop.prevent
@@ -725,7 +713,7 @@ import { Icon } from '#components'
 import type { PumpObj } from '@/api/types/pump'
 import XIcon from '~/components/xPopup/xIcon.vue'
 import { useVirtualList } from '@vueuse/core'
-import ImageLarge from './imageLarge.vue'
+import { useSimilarTokenPopup } from '../utils'
 
 const props = defineProps({
   tableList: {
@@ -779,6 +767,7 @@ const currentRow = ref<PumpObj | null>(null)
 const showPopSearch= shallowRef(false)
 
 const $tooltip = $createTooltip('bubble--tooltip')
+const onEnter = useSimilarTokenPopup()
 
 
 const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableList, {

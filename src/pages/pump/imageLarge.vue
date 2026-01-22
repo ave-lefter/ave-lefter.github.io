@@ -1,33 +1,78 @@
 <template>
   <div class="rounded-4px">
-    <div class="p-12px">
-      已迁移
+    <div class="p-12px color-[--main-text] flex items-center gap-4px">
+      <template v-if="type==='new'">
+        {{ t('progress') }}: {{ formatNumber(row.progress,1) }}%
+      </template>
+      <template v-else-if="type==='soon'">
+        {{ t('soon') }}
+      </template>
+      <template v-else-if="type==='graduated'">
+        {{ t('migrated') }}
+        <div
+          v-tooltip="formatDate(row?.created_at || row?.time)"
+          class="time"
+          :style="{
+            color:
+              Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
+                ? '#FFA622'
+                : '#12B886',
+          }"
+        >
+          <template v-if="!(row?.created_at || row?.time)"> - </template>
+          <template
+            v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
+          >
+            {{
+              formatCountdown(
+                Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
+                false
+              )
+            }}
+          </template>
+          <TimerCount
+            v-else-if="
+              (row?.created_at || row?.time) &&
+              Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
+            "
+            :key="`${row.created_at}`"
+            :timestamp="row.created_at"
+            :end-time="60"
+          >
+            <template #default="{ seconds }">
+              <span class="color-#FFA622">
+                <template v-if="seconds < 60"> {{ seconds }}s </template>
+                <template v-else>
+                  {{ formatTimeFromNow(row.created_at) }}
+                </template>
+              </span>
+            </template>
+          </TimerCount>
+        </div>
+      </template>
     </div>
     <el-image class="token-icon max-w-228px max-h-228px w-200px flex items-center justify-center" style="display: flex"
-      fit="cover" :src="getSymbolDefaultIcon(row)" preview-teleported>
+      fit="cover" :src="getSymbolDefaultIcon(row,'rect')" preview-teleported>
       <template #error>
-        <img class="token-icon h-228px w-228px text-16px color-#fff" :src="getChainDefaultIcon(row.chain, row.symbol)">
-      </template>
-      <template #placeholder>
-        <img class="token-icon h-228px w-228px text-16px color-#fff" :src="getChainDefaultIcon(row.chain, row.symbol)">
+        <img class="token-icon w-200px h-200px text-16px color-#fff object-cover" :src="getChainDefaultIcon(row.chain, row.symbol,'rect')">
       </template>
     </el-image>
     <div class="p-12px">
       <div class="text-12px lh-12px color-[--secondary-text] mb-12px">{{ t('similarTokens') }}</div>
       <div class="flex flex-col gap-8px">
-        <div v-for="token in tokens" :key="token.id" class="flex items-center gap-8px">
+        <div v-for="token in tokens" :key="token.id" class="flex items-center gap-8px cursor-pointer" @click="navigateTo(`/token/${token.token}-${token.chain}`)">
           <TokenImg :row="token" />
           <div class="flex-1">
             <div class="lh-16px color-[--main-text]">{{ token.symbol }}</div>
-            <div v-tooltip="formatDate(token.last_trade_at, 'YYYY-MM-DD HH:mm:ss')"><span class="text-12px color-[--secondary-text] text-10px lh-12px">{{ t('lastTx') }}:{{ formatTimeFromNow(token.last_trade_at) }}</span>
+            <div v-tooltip="formatDate(token.last_trade_at, 'YYYY-MM-DD HH:mm:ss')" class="lh-12px"><span class="text-12px color-[--secondary-text] text-10px">{{ t('lastTx') }}:{{ formatTimeFromNow(token.last_trade_at) }}</span>
             </div>
           </div>
-          <div>
+          <div class="text-12px text-right">
               <div class="lh-16px">
                 <span>MC </span>
-                <span>${{ formatNumber(token.market_cap, 1) }}</span>
+                <span :class="token.market_cap> 1000000 ? 'color-[--yellow]' : ''">${{ formatNumber(token.market_cap, 1) }}</span>
               </div>
-              <div class="lh-12px text-right">1h30min</div>
+              <div v-tooltip="t('createdTime')+':'+formatDate(token.created_at, 'YYYY-MM-DD HH:mm:ss')" class="inline-flex justify-end lh-12px text-10px">{{formatTimeFromNow(token.created_at)}}</div>
             </div>
         </div>
       </div>
@@ -38,7 +83,6 @@
 <script setup lang='ts'>
 import { getSimilarTokens } from '~/api/token'
 const { t } = useI18n()
-const configStore = useConfigStore()
 
 const props = defineProps({
   row: {
@@ -49,6 +93,10 @@ const props = defineProps({
         symbol: ''
       }
     }
+  },
+  type: {
+    type: String,
+    default: () => '',
   }
 })
 const tokens = ref([])
@@ -58,6 +106,9 @@ async function _getSimilarToken() {
 }
 
 _getSimilarToken()
+watch(()=>props.row,()=>{
+  _getSimilarToken()
+})
 </script>
 
 <style></style>
