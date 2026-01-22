@@ -348,7 +348,6 @@ console.log('-----width-------',width)
 const activeTab = shallowRef('new')
 const route = useRoute()
 const { t } = useI18n()
-const wsStore = useWSStore()
 const wsv2Store = useV2WSStore()
 const isInitObj = ref<{
   new: boolean,
@@ -627,17 +626,17 @@ watch(activeChain, () => {
   getPumpList()
   wsTableListCache.value = []
   wsTableList.value = []
-  wsStore.send({
+  wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
-    params: ['pumpstate'],
+    params: ['pumpstatev2'],
     id: 1,
   })
   setTimeout(() => {
-    wsStore.send({
+    wsv2Store.send({
       jsonrpc: '2.0',
       method: 'subscribe',
-      params: ['pumpstate', activeChain.value],
+      params: ['pumpstatev2', activeChain.value],
       id: 1,
     })
   }, 500)
@@ -666,7 +665,7 @@ const flushPumpState = useThrottleFn(() => {
   pumpStateBuffer.length = 0
 }, 100)
 
-watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
+watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
   if (Array.isArray(val)) {
     pumpStateBuffer.push(val)
     flushPumpState()
@@ -681,7 +680,7 @@ const logoThrottled  = useThrottleFn(() => {
   ].slice(0, 300)
   bufferLogo.length = 0
 }, 100)
-watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
+watch(() => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED], (val) => {
   if (val) {
     bufferLogo.unshift(val)
     logoThrottled()
@@ -730,17 +729,17 @@ onActivated(() => {
   document.addEventListener('mousemove', mouseInsideTxs)
   getPumpConfig()
   getPumpList()
-  wsStore.send({
+  wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
-    params: ['pumpstate'],
+    params: ['pumpstatev2'],
     id: 1,
   })
   setTimeout(() => {
-    wsStore.send({
+    wsv2Store.send({
       jsonrpc: '2.0',
       method: 'subscribe',
-      params: ['pumpstate', activeChain.value],
+      params: ['pumpstatev2', activeChain.value],
       id: 1,
     })
   }, 500)
@@ -754,10 +753,10 @@ onActivated(() => {
 
 onDeactivated(()=>{
   document.removeEventListener('mousemove', mouseInsideTxs)
-  wsStore.send({
+  wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
-    params: ['pumpstate'],
+    params: ['pumpstatev2'],
     id: 1,
   })
   for (const key in Timer) {
@@ -1272,7 +1271,7 @@ const documentVisible = computed(() => {
 //       soon: true,
 //       graduated: true
 //     }
-//     wsStore.send({
+//     wsv2Store.send({
 //       jsonrpc: '2.0',
 //       method: 'subscribe',
 //       params: ['pumpstate', activeChain.value],
@@ -1285,7 +1284,7 @@ const documentVisible = computed(() => {
 //       portraitTimer = null
 //     }
 //     unsubscribePortrait()
-//     wsStore.send({
+//     wsv2Store.send({
 //       jsonrpc: '2.0',
 //       method: 'unsubscribe',
 //       params: ['pumpstate'],
