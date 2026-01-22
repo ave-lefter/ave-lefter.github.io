@@ -599,5 +599,6 @@
   "noOpen": "Não aberto",
   "noticeDuration": "Tempo de exibição da notificação",
   "monitorThTip": "Escolha pelo menos um avatar e endereço de carteira",
-  "wcWalletTip": "Digitalize este código QR com seu telefone"
+  "wcWalletTip": "Digitalize este código QR com seu telefone",
+  "monitorBotError": "O endereço do robô de monitoramento não é compatível"
 }

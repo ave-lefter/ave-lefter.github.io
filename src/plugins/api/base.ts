@@ -67,6 +67,7 @@ export function onRequest({ options, request }: MyFetchContext) {
 }
 
 export function onResponse({ response, request }: MyFetchContext) {
+  const { $i18n } = useNuxtApp()
   // 全局响应处理
   if (!response) {
     return
@@ -77,6 +78,9 @@ export function onResponse({ response, request }: MyFetchContext) {
   }
   if (response?.status === 403 || [10000, 10001]?.includes(data?.status)) {
     throw new Error('x-auth-error')
+  }
+  if (data?.status===50001) {
+    throw new Error($i18n.t('monitorBotError'))
   }
   if ((request as string)?.includes('/aveswap/v1/sui/')) {
     if (data?.status === 0) {
