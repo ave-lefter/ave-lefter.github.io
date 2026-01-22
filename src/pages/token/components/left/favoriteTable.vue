@@ -12,12 +12,17 @@ import THead from './tHead.vue'
 import type { IPriceV2Response } from '~/api/types/ws'
 import { useEventBus, useLocalStorage, useStorage } from '@vueuse/core'
 import { BusEventType, type IFavDialogEventArgs } from '~/utils/constants'
+import type { ScrollbarInstance } from 'element-plus'
 const topEventBus = useEventBus(BusEventType.TOP_FAV_CHANGE)
 topEventBus.on(refresh)
 const favDialogEvent = useEventBus<IFavDialogEventArgs>(BusEventType.FAV_DIALOG)
 favDialogEvent.on(refresh)
 const topAddGroupEvent = useEventBus(BusEventType.TOP_ADD_GROUP)
 topAddGroupEvent.on(_getUserFavoriteGroups)
+
+const otherListArea = ref<ScrollbarInstance>()
+
+
 onUnmounted(() => {
   topEventBus.off(refresh)
   favDialogEvent.off(refresh)
@@ -77,6 +82,14 @@ const sort = shallowRef<{
   activeSort: 0,
   sortBy: null,
 })
+
+const sortParam={
+  sort: '',
+  sort_dir: '',
+}
+
+
+
 const listStatus = ref({
   finished: false,
   loading: false,
@@ -119,15 +132,21 @@ const sortedFavList = computed(() => {
   if (sort.value.activeSort === 0 || !sort.value.sortBy) {
     return favoritesList.value
   }
-  return favoritesList.value.toSorted((a: any, b: any) => {
-    if (sort.value.sortBy === 'symbol') {
+  if(sort.value.sortBy === 'symbol'){
+    return favoritesList.value.toSorted((a: any, b: any) => {
       const codeB = b.symbol[0].toLowerCase().charCodeAt(0) || 0
       const codeA = a.symbol[0].toLowerCase().charCodeAt(0) || 0
       return (codeB - codeA) * sort.value.activeSort
-    } else {
+    })
+  }
+  else if(sort.value.sortBy === 'price_change'){
+    return favoritesList.value.toSorted((a: any, b: any) => {
       return ((b[sort.value.sortBy!] || 0) - (a[sort.value.sortBy!] || 0)) * sort.value.activeSort
-    }
-  })
+    })
+  }
+  else{
+    return favoritesList.value
+  }
 })
 
 onMounted(() => {
@@ -140,6 +159,22 @@ watch(
   () => {
     _getUserFavoriteGroups()
     setActiveTab(0, 0)
+  }
+)
+watch(
+  () => sort.value,
+  (val) => {
+    console.log('sort changed', val)
+    if(val.sortBy==="price_change"){
+        sortParam.sort_dir=['asc', '', 'desc'][(val.activeSort||0)+1]
+        sortParam.sort='price_change'
+       
+    }else{
+      sortParam.sort_dir=''
+      sortParam.sort=''
+    }
+    resetListStatus()
+    loadMoreFavorites()
   }
 )
 watch(
@@ -198,7 +233,7 @@ async function loadMoreFavorites() {
   try {
     listStatus.value.loading = true
     const pageNo = listStatus.value.pageNo
-    const res = await getFavoriteList(activeTab.value, pageNo, walletAddress.value)
+    const res = await getFavoriteList(activeTab.value, pageNo, walletAddress.value,sortParam.sort_dir,sortParam.sort)
     if (Array.isArray(res)) {
       const list = res
         .map((i) => ({
@@ -239,6 +274,7 @@ async function loadMoreFavorites() {
 }
 
 function resetListStatus() {
+  otherListArea.value!.setScrollTop(0)
   listStatus.value.finished = false
   listStatus.value.pageNo = 1
 }
