@@ -289,17 +289,27 @@ const _getTokenTxs = useThrottleFn(async () => {
     const data=res||[]
     realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
     const page_token= data[data.length - 1]?.page_token || ''
-
+    txCount.value={}
     if (Array.isArray(data) && data?.length > 0) {
       if(!listStatus.value.page_token) {
         tokenTxs.value = data.reverse().map(val => {
-          return transferTxsData(val)
+          txCount.value[val.maker] = (txCount.value[val.maker] || 0) + 1
+          return {
+            ...transferTxsData(val),
+            count: txCount.value[val.maker]
+          }
         }).reverse()
         // 获取tokenTxs.value 最后一项的token_id
         // listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token || ''
       }else{
-        tokenTxs.value = [...tokenTxs.value].concat(data.filter?.(i => tokenTxs.value?.every?.(j => j.txhash !== i.txhash)).reverse()
-            ?.map(i => transferTxsData(i))).reverse()
+        tokenTxs.value = [...tokenTxs.value].concat(data.filter?.(i => tokenTxs.value?.every?.(j => j.txhash !== i.txhash))
+            ?.map(i => transferTxsData(i))).reverse().map(val => {
+          txCount.value[val.maker] = (txCount.value[val.maker] || 0) + 1
+          return {
+            ...val,
+            count: txCount.value[val.maker]
+          }
+        }).reverse()
       }
       listStatus.value.finished = data?.length < listStatus.value.pageSize
       if (!listStatus.value.finished) {
@@ -359,7 +369,9 @@ watch(() => route.params.id, val => {
   if (val) {
     resetCache()
     tableFilter.value.markerAddress = ''
-    filterSubmit()
+    if (pairAddress.value) {
+      filterSubmit()
+    }
   }
 }, {
   immediate: true
@@ -575,7 +587,6 @@ function confirmMakersFilter(markerAddress = '') {
 }
 
 function transferTxsData(row: IGetSimpleTxsResponse) {
-  txCount.value[row.maker] = (txCount.value[row.maker] || 0) + 1
   const { wallet_tag, topN } = getWalletTag(row)
   const maker_types = (row.maker_type||'').split(',')
   let lang1='en' as 'tw'|'cn'|'vi'|'tr'|'ru'|'pt'|'ko'|'ja'|'es'|'en'
@@ -598,7 +609,6 @@ function transferTxsData(row: IGetSimpleTxsResponse) {
     ...row,
     wallet_tag,
     topN,
-    count: txCount.value[row.maker],
     senderProfile: JSON.parse(row?.profile || '{}'),
     uuid: uuid(),
     newTags,
