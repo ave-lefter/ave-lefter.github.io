@@ -621,5 +621,6 @@
   "noOpen": "No abierto",
   "noticeDuration": "Tiempo de visualización de notificaciones",
   "monitorThTip": "Elija al menos un avatar de billetera y una dirección de billetera",
-  "wcWalletTip": "Escanea este código QR con tu teléfono"
+  "wcWalletTip": "Escanea este código QR con tu teléfono",
+  "monitorBotError": "La dirección del robot de monitoreo no es compatible"
 }

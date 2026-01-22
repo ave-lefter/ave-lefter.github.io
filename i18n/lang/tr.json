@@ -595,5 +595,6 @@
   "noOpen": "Açık Değil",
   "noticeDuration": "Bildirim görüntüleme süresi",
   "monitorThTip": "En az bir cüzdan avatarı ve cüzdan adresi seçin",
-  "wcWalletTip": "Bu QR Kodunu telefonunuzla tarayın"
+  "wcWalletTip": "Bu QR Kodunu telefonunuzla tarayın",
+  "monitorBotError": "İzleme robotu adresi desteklenmiyor"
 }
