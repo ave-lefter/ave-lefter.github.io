@@ -410,7 +410,7 @@
                   </div>
                   <div class="color-#009EF7 min-h-15px mt-5px">
                     <a v-for="(item, index) in row?.medias?.filter(i=> i.icon === 'twitter')" :key="index" class="color-#009EF7" :href="item.url" target="_blank" @click.stop>
-                      {{ item?.url?.includes('/communities') ? '' : '@' + item.url?.replace(/^https?:\/\/(?:www\.)?(?:x|twitter)\.com\/([^\/\?]+).*/, "$1") }}
+                      {{ (item?.url?.includes('/communities') || item?.url?.includes('.com/i/')) ? '' : '@' + item.url?.replace(/^https?:\/\/(?:www\.)?(?:x|twitter)\.com\/([^\/\?]+).*/, "$1") }}
                     </a>
                   </div>
 

@@ -653,27 +653,24 @@ watch(activeChain, () => {
     })
 })
 
-const pumpStateBuffer: any[][] = []
+const pumpStateBuffer: any[] = []
 const flushPumpState = useThrottleFn(() => {
-  if (!pumpStateBuffer.length) return
-  const merged: any[] = []
-  for (const arr of pumpStateBuffer) {
-    merged.push(...arr)
-  }
-  wsUpdateTableList(merged)
-  subscribePortrait(merged)
+  if (!pumpStateBuffer.length || !documentVisible.value) return
+  wsUpdateTableList(pumpStateBuffer)
+  subscribePortrait(pumpStateBuffer)
   pumpStateBuffer.length = 0
 }, 100)
 
 watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
   if (Array.isArray(val)) {
-    pumpStateBuffer.push(val)
+    pumpStateBuffer.splice(0, 0, ...val)
+    pumpStateBuffer.splice(100)
     flushPumpState()
   }
 })
 const bufferLogo: any[] = []
 const logoThrottled  = useThrottleFn(() => {
-  if (!bufferLogo.length) return
+  if (!bufferLogo.length || !documentVisible.value) return
   logoList.value = [
     ...bufferLogo,
     ...logoList.value,
@@ -682,13 +679,15 @@ const logoThrottled  = useThrottleFn(() => {
 }, 100)
 watch(() => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED], (val) => {
   if (val) {
-    bufferLogo.unshift(val)
+    // bufferLogo.unshift(val)
+    bufferLogo.splice(0, 0, val)
+    bufferLogo.splice(100)
     logoThrottled()
   }
 })
 const buffer: any[][] = []
 const flushStatistics = useThrottleFn(() => {
-  if (!buffer.length) return
+  if (!buffer.length || !documentVisible.value) return
   const map = new Map<string, any>()
 
   // 旧数据
@@ -710,10 +709,18 @@ watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
   (val) => {
     if (!Array.isArray(val) || !val.length ) return
-    buffer.push(val)
+    // buffer.push(val)
+    buffer.splice(0, 0, val)
+    buffer.splice(100)
     flushStatistics()
   }
 )
+
+function bufRender() {
+  flushPumpState()
+  logoThrottled()
+  flushStatistics()
+}
 const getChangedValue = (A: string[], B: string[]): string | null => {
   for (let i = 0; i < A.length; i++) {
     if (A[i] !== B[i]) {
@@ -1259,6 +1266,13 @@ const documentVisible1 = useDocumentVisibility()
 
 const documentVisible = computed(() => {
   return documentVisible1.value === 'visible'
+})
+
+watch(documentVisible, (val) => {
+  if (route.name !== 'pump') return
+  if (val) {
+    bufRender()
+  }
 })
 
 // watch(documentVisible, (val) => {
