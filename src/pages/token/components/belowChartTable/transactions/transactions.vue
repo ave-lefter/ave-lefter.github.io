@@ -257,6 +257,7 @@ const sortConditions= ref({
 
 
 function filterSubmit() {
+  console.log('filterSubmit')
   listStatus.value.page_token = ''
   _getTokenTxs()
   if(aveTableRef.value) aveTableRef.value.scrollToTop(0)
@@ -287,7 +288,7 @@ const _getTokenTxs = useThrottleFn(async () => {
     const res = await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain, getPairTxsParams)
     const data=res||[]
     realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
- 
+    const page_token= data[data.length - 1]?.page_token || ''
 
     if (Array.isArray(data) && data?.length > 0) {
       if(!listStatus.value.page_token) {
@@ -295,15 +296,14 @@ const _getTokenTxs = useThrottleFn(async () => {
           return transferTxsData(val)
         }).reverse()
         // 获取tokenTxs.value 最后一项的token_id
-        listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token || ''
-        listStatus.value.loadingTxs = false
+        // listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token || ''
       }else{
         tokenTxs.value = [...tokenTxs.value].concat(data.filter?.(i => tokenTxs.value?.every?.(j => j.txhash !== i.txhash)).reverse()
             ?.map(i => transferTxsData(i))).reverse()
-        }
+      }
       listStatus.value.finished = data?.length < listStatus.value.pageSize
       if (!listStatus.value.finished) {
-        listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token || ''
+        listStatus.value.page_token = page_token
       }
       // if(sortConditions.value.sort_dir ==='asc'){
       //   tokenTxs.value=[...tokenTxs.value.reverse()]
@@ -339,6 +339,7 @@ function sortChange(sort_dir: string) {
 }
 
 watch(() => klineDateFilter?.value, (val) => {
+  console.log('klineDateFilter', val)
   if (val && !orderBookVisible.value) {
     tableFilter.value.timestamp = val
     filterSubmit()
@@ -1056,7 +1057,7 @@ const collect = async (row: any,index:number) => {
             <TableDateFilter
               v-model:visible="tableFilterVisible.timestamp" :modelValue="tableFilter.timestamp" :boundary="txsContainer || undefined"
               @confirm="onTimestampConfirm" />
-            <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
+            <!-- <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /> -->
           </div>
         </template>
         <template #cell-time="{ row,rowIndex }">
