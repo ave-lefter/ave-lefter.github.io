@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Transactions from './transactions/transactions.vue'
 import OrdersTab from './orders/index.vue'
+import DevTokens from './devTokens/index.vue'
 import OneClick from '../right/botSwap/oneClick.vue'
 import OrderBookButton from '../right/botSwap/orderBookButton.vue'
 import Bubble from './holders/new/bubble.vue'
@@ -25,6 +26,7 @@ const components = {
   Attention: defineAsyncComponent(() => import('./attention/index.vue')),
   Orders: defineAsyncComponent(() => import('./orders/index.vue')),
   MySwap: defineAsyncComponent(() => import('./mySwap/index.vue')),
+  DevTokens: defineAsyncComponent(() => import('./devTokens/index.vue')),
 }
 const tabs = computed(() => {
   return [
@@ -34,6 +36,7 @@ const tabs = computed(() => {
   { name: t('attention1') +`(${globalStore.headFollowsNum.all})`, component: 'Attention' as const },
   { name: t('orders'), component: 'Orders' as const },
   { name: t('mySwap'), component: 'MySwap' as const },
+  {name:t('devTokens'), component: 'DevTokens' as const},
   ]
 })
 const id = computed(() => {
@@ -172,6 +175,7 @@ onMounted(() => {
             ({{ pairHolders }})
              <Icon v-if="pairHolders" color="#B3920E" name="material-symbols:lock" />
           </span>
+          <span v-if="item.component === 'DevTokens'">({{ tokenStore.devTokenNum }})</span>
           <span v-if="item.component == 'Holders' && holders">
             ({{ token?.holders ? formatNumber(token?.holders || 0, {limit: 10}) : '' }})
               <template v-if="isInsiderOrSniperSupported && (tokenInfoExtra?.insiders_balance_ratio_cur??0) > 0.01">
@@ -192,7 +196,8 @@ onMounted(() => {
       <Bubble />
     </div>
     <OrdersTab v-show="activeTab === 'Orders'" :currentActiveTab="activeTab"/>
-    <KeepAlive v-show="activeTab !== 'Orders'">
+    <DevTokens v-show="activeTab === 'DevTokens'" :currentActiveTab="activeTab" />
+    <KeepAlive v-show="activeTab !== 'Orders' && activeTab !== 'DevTokens'">
       <component :is="Component" v-bind="comProps" :currentActiveTab="activeTab" />
     </KeepAlive>
   </div>

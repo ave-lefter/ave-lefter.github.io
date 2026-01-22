@@ -1946,5 +1946,13 @@
   "pendingRebate": "待领取佣金",
   "invitedUser": "邀请用户",
   "chainWallet3": "链钱包",
-  "monitorBotError": "不支持监控机器人地址"
+  "monitorBotError": "不支持监控机器人地址",
+  "markersBuy": "总买入钱包数",
+  "markersSell": "总卖出钱包数",
+  "liqTip": "池子数和底池大小",
+  "tokenStatistics": "代币统计",
+  "dev3": "开发者",
+  "highestRecord": "最高战绩",
+  "historyHighestMarketCap": "历史最高市值",
+  "latestToken": "最新代币"
 }
