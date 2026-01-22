@@ -52,6 +52,12 @@
                     </template>
                 </el-table-column>
             </el-table>
+            <div class="text-12px text-center color-[--third-text] pb-10px">
+            <span v-if="loadingRun && pageNO > 1">{{ $t('loading') }}</span>
+            <span v-if="showFinished && pageNO > 1 && tableList?.length > pageSize">{{
+              $t('noMore')
+            }}</span>
+          </div>
         </div>
         <div class="border-l-1px border-l-solid border-l-[--main-divider] p-20px box-border w-298px">
             <div class="text-16px color-[--secondary-text] lh-16px mb-16px">
@@ -61,18 +67,18 @@
                 <span class="color-[--third-text] text-12px">{{ t('dev3') }}:</span>
                 {{ tokenObj.dev_address ? tokenObj.dev_address.slice(0, 4) + '...' + tokenObj.dev_address.slice(-4) :
                     '--'
-                }}(?SOL)
+                }}({{formatNumber(balance.balance,4)}}{{balance.name}})
                 <Icon v-copy="tokenObj.dev_address" name="bxs:copy"
                     class="text-12px ml-2px cursor-pointer color-[--secondary-text]" />
                 <Icon name="custom:search" class="text-[--third-text] text-16px cursor-pointer hover:text-[--main-text]"
                     @click="handleSearchDevAddress" />
                 <Icon :name="token?.chain === 'solana' ? 'custom:sol' : 'custom:evm'"
                     class="text-[--third-text] text-16px cursor-pointer hover:text-[--main-text]"
-                    @click="formatExplorerUrl(token?.chain as string, tokenObj.dev_address || '', 'address')" />
+                    @click="jumpBrowser" />
             </div>
             <div class="justify-between flex">
                 <div>
-                    <div class="color-[--secondary-text] text-12px mb-8px">
+                    <div class="color-[--secondary-text] text-12px mb-8px mr-6px">
                         <span class="color-[--third-text] text-12px">{{ t('totalTokens') }}:</span>
                         {{ tokenObj.total_tokens ?? 0 }}
                     </div>
@@ -102,9 +108,11 @@
                 </div>
                 <div class="flex gap-4px color-[--secondary-text] text-12px mb-8px">
                     <span class="color-[--third-text] text-12px">{{ t('historyHighestMarketCap') }}:</span>
+                    ${{ formatNumber(tokenStore.bestToken?.all_time_high || 0, 2) }}
                 </div>
                 <div class="flex gap-4px color-[--secondary-text] text-12px mb-8px">
                     <span class="color-[--third-text] text-12px">{{ t('latestToken') }}:</span>
+                    <span v-tooltip="dayjs(tokenStore.bestToken?.created_at).format('YYYY-MM-DD HH:mm:ss')">{{ formatTimeFromNow(tokenStore.bestToken?.created_at) }} {{ t('ago') }}</span>
                 </div>
         </div>
     </div>
@@ -115,9 +123,9 @@ import dayjs from 'dayjs'
 import AveEmpty from '@/components/aveEmpty.vue'
 import TokenColumn from '@/components/tokenColumn.vue'
 import { useStorage } from '@vueuse/core'
+import { bot_getTokenBalance } from '~/api/bot'
 useConfigStore()
 const { t } = useI18n()
-const emits = defineEmits(['updateCount'])
 
 const tokenStore = useTokenStore()
 const tokenDetailSStore = useTokenDetailsStore()
@@ -140,6 +148,7 @@ const conditions = useStorage('conditions_dev_tokens', {
     sort: 'created_at',
     sort_dir: 'desc',
 })
+const balance = ref({})
 let finishedTimer: NodeJS.Timeout | null = null
 
 const route = useRoute()
@@ -182,8 +191,12 @@ async function getRugPullList() {
             pageSize: pageSize.value,
         }
         const res = await _getDevList(data)
-        if (pageNO.value === 1) tableList.value = []
+        
         const { dev_address, total_migrated, total_non_migrated, total_tokens } = res
+        if (pageNO.value === 1) {
+            tableList.value = []
+            _getBalance(dev_address)
+        }
         tokenObj.value = {
             dev_address,
             total_migrated,
@@ -221,6 +234,16 @@ async function getRugPullList() {
         loadingRun.value = false
     }
 }
+
+async function _getBalance(dev_address: string) {
+    const chain = tokenStore.token?.chain as string 
+    const _balance = await bot_getTokenBalance({
+        chain,
+        walletAddress: dev_address,
+        tokens: [getNativeToken(chain)]
+    })
+    balance.value = _balance[0] || {balance: 0}
+}
 getRugPullList()
 
 function onRowClick(row) {
@@ -248,9 +271,16 @@ function onRowClick(row) {
 function handleSearchDevAddress() {
     window.open(`https://x.com/search?q=${tokenObj.value.dev_address}`)
 }
+
+function jumpBrowser() {
+    window.open(formatExplorerUrl(token.value?.chain as string, tokenObj.value.dev_address || '', 'address'))
+}
 </script>
 <style scoped lang="scss">
 :deep(.el-table .caret-wrapper){
     width:18px;
+}
+:deep(.el-scrollbar__bar.is-vertical){
+    display: none;
 }
 </style>

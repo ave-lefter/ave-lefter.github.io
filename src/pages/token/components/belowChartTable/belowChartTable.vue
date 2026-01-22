@@ -161,7 +161,7 @@ onMounted(() => {
 
 <template>
   <div class="bg-[--secondary-bg] rounded-2px text-14px pt-12px flex-1">
-    <div class="flex items-center px-12px gap-20px border-b-1px border-b-solid border-b-#FFFFFF08 mb-12px">
+    <div class="flex items-center px-12px gap-20px border-b-1px border-b-solid border-b-[--main-divider] mb-12px">
       <a
         v-for="(item) in tabsList" :key="item.component" href="javascript:;"
          :class="`flex items-center decoration-none text-12px lh-20px text-center ${activeTab === item.component ? 'color-[--main-text] b-b-[--main-text] font-500' : 'b-b-transparent color-[--third-text]'}`"
