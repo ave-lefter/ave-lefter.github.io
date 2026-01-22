@@ -414,7 +414,7 @@ type StatisticsItem = {
   chain: string
   token: string
   holder_count: number
-  rat_raio: string
+  rat_ratio: string
   dev_ratio: string
   sniper_ratio: string
   progress: string
@@ -719,12 +719,9 @@ const getChangedValue = (A: string[], B: string[]): string | null => {
   return null
 }
 
-onMounted(() => {
+onActivated(() => {
   wsTableListCache.value = []
   wsTableList.value = []
-})
-
-onActivated(() => {
   document.addEventListener('mousemove', mouseInsideTxs)
   getPumpConfig()
   getPumpList()
@@ -1262,35 +1259,37 @@ const documentVisible = computed(() => {
   return documentVisible1.value === 'visible'
 })
 
-watch(documentVisible, (val) => {
-  if (route.name !== 'pump') return
-  if (val) {
-    getPumpList()
-    isInitObj.value = {
-      new: true,
-      soon: true,
-      graduated: true
-    }
-    wsStore.send({
-      jsonrpc: '2.0',
-      method: 'subscribe',
-      params: ['pumpstate', activeChain.value],
-      id: 1,
-    })
-  } else {
-    if (portraitTimer) {
-      clearTimeout(portraitTimer)
-      portraitTimer = null
-    }
-    unsubscribePortrait()
-    wsStore.send({
-      jsonrpc: '2.0',
-      method: 'unsubscribe',
-      params: ['pumpstate'],
-      id: 1,
-    })
-  }
-})
+// watch(documentVisible, (val) => {
+//   if (route.name !== 'pump') return
+//   if (val) {
+//     wsTableListCache.value = []
+//     wsTableList.value = []
+//     isInitObj.value = {
+//       new: true,
+//       soon: true,
+//       graduated: true
+//     }
+//     wsStore.send({
+//       jsonrpc: '2.0',
+//       method: 'subscribe',
+//       params: ['pumpstate', activeChain.value],
+//       id: 1,
+//     })
+//     getPumpList()
+//   } else {
+//     if (portraitTimer) {
+//       clearTimeout(portraitTimer)
+//       portraitTimer = null
+//     }
+//     unsubscribePortrait()
+//     wsStore.send({
+//       jsonrpc: '2.0',
+//       method: 'unsubscribe',
+//       params: ['pumpstate'],
+//       id: 1,
+//     })
+//   }
+// })
 function hasValue(obj: any, key: string | number) {
   return Object.prototype.hasOwnProperty.call(obj, key)
     && obj[key] !== undefined
@@ -1310,8 +1309,8 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'holder_count')) {
       next.holders = obj.holder_count
     }
-    if (hasValue(obj, 'rat_raio')) {
-      next.insider_balance_ratio_cur = Number(obj.rat_raio)
+    if (hasValue(obj, 'rat_ratio')) {
+      next.insider_balance_ratio_cur = Number(obj.rat_ratio)
     }
     if (hasValue(obj,'dev_ratio')) {
       next.dev_balance_ratio_cur = Number(obj.dev_ratio)
@@ -1348,8 +1347,8 @@ function mergeStatistics(prev: any, next: any) {
   if (hasValue(next, 'holder_count')) {
     result.holder_count = next.holder_count
   }
-  if (hasValue(next, 'rat_raio')) {
-    result.rat_raio = next.rat_raio
+  if (hasValue(next, 'rat_ratio')) {
+    result.rat_ratio = next.rat_ratio
   }
   if (hasValue(next, 'dev_ratio')) {
     result.dev_ratio = next.dev_ratio
