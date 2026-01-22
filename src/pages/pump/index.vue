@@ -428,7 +428,12 @@ type StatisticsItem = {
   tvl:number
   total: string
   uprice: number
-  net_flow_vol: number
+  net_flow_vol: number,
+  address_binding_ratio: string
+  phishing_ratio: string,
+  sells_tx_24h_count:number
+  buys_tx_24h_count:number
+
 }
 const statisticsList = ref<StatisticsItem[]>([])
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
@@ -443,6 +448,16 @@ const platformsList = computed(() => {
 })
 const platforms = computed(() => {
     return pumpV3.value?.[activeChain.value]?.platforms?.join(',')
+})
+const baseTokenMap = computed(() => {
+  const list =
+    pumpConfig?.value?.find(i => i?.chain === activeChain.value)
+      ?.base_tokens || []
+  return new Map(list.map(item => [item.hash, {
+    symbol: item.name,
+    token: item.hash,
+    logo_url: item.logo_url
+  }]))
 })
 const tabsList = computed(() => {
   return [
@@ -475,21 +490,36 @@ const list1 = computed(() => {
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
   const wsList = getFilterData(list1, pumpFilter)
   const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
-  let filterList = [...wsList1, ...list]
-  if (logoList?.value?.length > 0 && filterList?.length > 0) {
+  let filterList = [...wsList1, ...list].map(i => {
+  const baseHash =
+    i.target_token === i.token0_address
+      ? i.token1_address
+      : i.token0_address
+
+  return {
+    ...i,
+    baseToken: baseTokenMap.value.get(baseHash)
+  }
+})
+  if (logoList.value?.length && filterList?.length) {
+    const logoMap = new Map(
+      logoList.value.map(item => [item.token, item])
+    )
     filterList = filterList.map(i => {
-      const obj = logoList.value?.find(y => y.token == i.target_token)
-      if (obj) {
-        return {
-          ...i,
-          ...obj,
-          logo_url: obj?.logo_url,
-          name: obj?.name,
-          symbol: obj?.symbol,
-          ...(obj?.appendix ? { medias: getMedias(obj?.appendix), twitter_type: obj?.twitter_type } : {}),
-        }
-      } else {
-        return i
+      const obj = logoMap.get(i.target_token)
+      if (!obj) return i
+      return {
+        ...i,
+        logo_url: obj.logo_url,
+        name: obj.name,
+        symbol: obj.symbol,
+        ...(obj.appendix
+          ? {
+              medias: getMedias(obj.appendix),
+              twitter_type: obj.twitter_type
+            }
+          : {}
+        )
       }
     })
   }
@@ -513,21 +543,36 @@ const list2 = computed(() => {
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_soon`)
   const wsList = getFilterData(list1, pumpFilter)
   const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
-    let filterList = [...wsList1, ...list]
-    if (logoList?.value?.length > 0 && filterList?.length > 0) {
+  let filterList = [...wsList1, ...list].map(i => {
+    const baseHash =
+      i.target_token === i.token0_address
+        ? i.token1_address
+        : i.token0_address
+
+    return {
+      ...i,
+      baseToken: baseTokenMap.value.get(baseHash)
+    }
+  })
+    if (logoList.value?.length && filterList?.length) {
+      const logoMap = new Map(
+        logoList.value.map(item => [item.token, item])
+      )
       filterList = filterList.map(i => {
-        const obj = logoList.value?.find(y => y.token == i.target_token)
-        if (obj) {
-          return {
-            ...i,
-            ...obj,
-            logo_url: obj?.logo_url,
-            name: obj?.name,
-            symbol: obj?.symbol,
-            ...(obj?.appendix ? { medias: getMedias(obj?.appendix), twitter_type: obj?.twitter_type } : {}),
-          }
-        } else {
-          return i
+        const obj = logoMap.get(i.target_token)
+        if (!obj) return i
+        return {
+          ...i,
+          logo_url: obj.logo_url,
+          name: obj.name,
+          symbol: obj.symbol,
+          ...(obj.appendix
+            ? {
+                medias: getMedias(obj.appendix),
+                twitter_type: obj.twitter_type
+              }
+            : {}
+          )
         }
       })
     }
@@ -536,44 +581,59 @@ const list2 = computed(() => {
     }
     return filterList?.slice?.(0, 100)
   })
-  const list3 = computed(() => {
-  let list = fourmemeListObj?.[activeChain.value]?.graduated || []
-  if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
-    list = list.filter(
-      (item) =>
-        !pumpBlackList.value?.some(
-          (i) =>
-          (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
-        )
+const list3 = computed(() => {
+let list = fourmemeListObj?.[activeChain.value]?.graduated || []
+if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
+  list = list.filter(
+    (item) =>
+      !pumpBlackList.value?.some(
+        (i) =>
+        (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
+      )
+  )
+}
+  const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
+  const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
+  const wsList = getFilterData(list1, pumpFilter)
+  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
+  let filterList = [...wsList1, ...list].map(i => {
+    const baseHash =
+      i.target_token === i.token0_address
+        ? i.token1_address
+        : i.token0_address
+
+    return {
+      ...i,
+      baseToken: baseTokenMap.value.get(baseHash)
+    }
+  })
+  if (logoList.value?.length && filterList?.length) {
+    const logoMap = new Map(
+      logoList.value.map(item => [item.token, item])
     )
+    filterList = filterList.map(i => {
+      const obj = logoMap.get(i.target_token)
+      if (!obj) return i
+      return {
+        ...i,
+        logo_url: obj.logo_url,
+        name: obj.name,
+        symbol: obj.symbol,
+        ...(obj.appendix
+          ? {
+              medias: getMedias(obj.appendix),
+              twitter_type: obj.twitter_type
+            }
+          : {}
+        )
+      }
+    })
   }
-    const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
-    const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
-    const wsList = getFilterData(list1, pumpFilter)
-    const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
-    let filterList = [...wsList1, ...list]
-    if (logoList?.value?.length > 0 && filterList?.length > 0) {
-      filterList = filterList.map(i => {
-        const obj = logoList.value?.find(y => y.token == i.target_token)
-        if (obj) {
-          return {
-            ...i,
-            ...obj,
-            logo_url: obj?.logo_url,
-            name: obj?.name,
-            symbol: obj?.symbol,
-            ...(obj?.appendix ? { medias: getMedias(obj?.appendix), twitter_type: obj?.twitter_type } : {}),
-          }
-        } else {
-          return i
-        }
-      })
-    }
-    if (statisticsList.value?.length && filterList?.length) {
-      filterList = mergeStatisticsList(statisticsList.value, filterList)
-    }
-    return filterList?.slice?.(0, 100)
-  })
+  if (statisticsList.value?.length && filterList?.length) {
+    filterList = mergeStatisticsList(statisticsList.value, filterList)
+  }
+  return filterList?.slice?.(0, 100)
+})
 const mergedBaseList = computed(() => {
   return [...list1.value, ...list2.value, ...list3.value]
 })
@@ -1373,6 +1433,12 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'total') && hasValue(obj, 'uprice')) {
       next.market_cap = Number(obj.total) * obj.uprice
     }
+    if (hasValue(obj, 'sells_tx_24h_count')) {
+      next.sells_tx_24h_count = obj.sells_tx_24h_count
+    }
+    if (hasValue(obj, 'buys_tx_24h_count')) {
+      next.buys_tx_24h_count = obj.buys_tx_24h_count
+    }
     return next
   })
 }
@@ -1434,6 +1500,12 @@ function mergeStatistics(prev: any, next: any) {
   }
   if (hasValue(next, 'net_flow_vol')) {
     result.net_flow_vol = next.net_flow_vol
+  }
+  if (hasValue(next, 'sells_tx_24h_count')) {
+  result.sells_tx_24h_count = next.sells_tx_24h_count
+  }
+  if (hasValue(next, 'buys_tx_24h_count')) {
+  result.buys_tx_24h_count = next.buys_tx_24h_count
   }
   return result
 }

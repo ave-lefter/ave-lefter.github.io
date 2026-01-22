@@ -3,10 +3,16 @@ interface Platform {
   platform_show: string
   platform_icon: string
 }
+interface BaseToken {
+  hash: string
+  logo_url: string
+  name: string
+}
 export interface PumpConfig {
   chain: ChainKey
   chain_show: string
   platforms: Platform[]
+  base_tokens: BaseToken[]
 }
 
 export interface PumpObj {
@@ -78,6 +84,15 @@ export interface PumpObj {
   pump_pair_address: string
   rTime?: number
   net_flow_vol?: number
+  address_binding_ratio: string
+  phishing_ratio: string,
+  sells_tx_24h_count:number
+  buys_tx_24h_count:number
+  baseToken: {
+    symbol: string
+    logo_url: string
+    token: string
+  }
 }
 
 interface Pair {
