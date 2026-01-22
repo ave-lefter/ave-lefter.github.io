@@ -411,6 +411,9 @@ const wsTableListCache = ref<PumpObj[]>([])
 const wsTableList = ref<PumpObj[]>([])
 const logoList = ref<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
 type StatisticsItem = {
+  buyers_24h: any
+  sellers_24h: any
+  makers_24h(makers_24h: any): number
   reserve1(reserve1: any): number
   reserve0(reserve0: any): number
   chain: string
@@ -1338,8 +1341,23 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'reserve1')) {
       next.reserve1 = Number(obj.reserve1)
     }
+    if (hasValue(obj, 'makers_24h')) {
+      next.makers_24h = Number(obj.makers_24h)
+    }
+    if (hasValue(obj, 'sellers_24h')) {
+      next.sellers_24h = Number(obj.sellers_24h)
+    }
+    if (hasValue(obj, 'makers_24h')) {
+      next.buyers_24h = Number(obj.buyers_24h)
+    }
     if (hasValue(obj, 'net_flow_vol')) {
       next.net_flow_vol = obj.net_flow_vol
+    }
+    if (hasValue(obj, 'address_binding_ratio')) {
+      next.address_binding_ratio = obj.address_binding_ratio
+    }
+    if (hasValue(obj, 'phishing_ratio')) {
+      next.phishing_ratio = obj.phishing_ratio
     }
     if (hasValue(obj, 'total') && hasValue(obj, 'uprice')) {
       next.market_cap = Number(obj.total) * obj.uprice
@@ -1384,6 +1402,21 @@ function mergeStatistics(prev: any, next: any) {
   }
   if (hasValue(next, 'reserve1')) {
     result.reserve1 = next.reserve1
+  }
+  if (hasValue(next, 'makers_24h')) {
+    result.makers_24h = next.makers_24h
+  }
+  if (hasValue(next, 'sellers_24h')) {
+    result.sellers_24h = next.sellers_24h
+  }
+  if (hasValue(next, 'buyers_24h')) {
+    result.buyers_24h = next.buyers_24h
+  }
+  if (hasValue(next, 'address_binding_ratio')) {
+    result.address_binding_ratio = next.address_binding_ratio
+  }
+    if (hasValue(next, 'phishing_ratio')) {
+    result.phishing_ratio = next.phishing_ratio
   }
   if (hasValue(next, 'total')) {
     result.total = next.total
