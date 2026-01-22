@@ -450,12 +450,12 @@
                         class="iconfont icon-TOP text-12px mr-4px"
                         name="custom:dev"
                         :style="{
-                          color: Number(row?.dev_balance_ratio_cur) > 10 ? '#F6465D' : '#12B886',
+                          color: Number(row?.dev_balance_ratio_cur) > 5? '#F6465D' : '#12B886',
                         }"
                       />
                       <span
                         :style="{
-                          color: Number(row?.dev_balance_ratio_cur) > 10 ? '#F6465D' : '#12B886',
+                          color: Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
                         }"
                         >{{
                           formatNumber(
@@ -476,12 +476,12 @@
                         class="iconfont icon-laoshucang text-12px mr-4px"
                         name="custom:insiders"
                         :style="{
-                          color: Number(row?.insider_balance_ratio_cur) > 10 ? '#F6465D' : '#12B886',
+                          color: Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
                         }"
                       />
                       <span
                         :style="{
-                          color: Number(row?.insider_balance_ratio_cur) > 10 ? '#F6465D' : '#12B886',
+                          color: Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
                         }"
                         >{{
                           formatNumber(
@@ -498,13 +498,51 @@
                       v-tooltip="$t('sniper2')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                        color: Number(row?.sniper_balance_ratio_cur) > 30 ? '#F6465D' : '#12B886',
+                        color: Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
                       }"
                     >
                       <Icon class="iconfont icon-gun text-12px mr-4px" name="custom:gun" />
                       <span>{{
                         formatNumber(
                           Number(row?.sniper_balance_ratio_cur) > 0.001 ? row?.sniper_balance_ratio_cur || 0 : 0,
+                          2
+                        )
+                      }}%</span>
+                    </div>
+
+                    <div
+                      v-tooltip="$t('Bundle')"
+                      :style="{
+                        color: Number(row?.address_binding_ratio) > 5 ? '#F6465D' : '#12B886',
+                      }"
+                      class="flex mr-8px bg-btn"
+                    >
+                      <Icon class="iconfont icon-binding text-12px mr-4px" name="custom:binding"
+                      :style="{
+                        color: Number(row?.address_binding_ratio) > 5 ? '#F6465D' : '#12B886',
+                        }"/>
+                      <span>{{
+                        formatNumber(
+                          Number(row?.address_binding_ratio) > 0.001 ? row?.address_binding_ratio || 0 : 0,
+                          2
+                        )
+                      }}%</span>
+                    </div>
+
+                    <div
+                      v-tooltip="$t('phishing1')"
+                      class="flex mr-8px bg-btn"
+                      :style="{
+                        color: Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886',
+                      }"
+                    >
+                      <Icon class="iconfont icon-fish text-12px mr-4px" name="custom:fish"
+                      :style="{
+                        color: Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886',
+                        }"/>
+                      <span>{{
+                        formatNumber(
+                          Number(row?.phishing_ratio) > 0.001 ? row?.phishing_ratio || 0 : 0,
                           2
                         )
                       }}%</span>
