@@ -266,10 +266,9 @@ import { _getDevList } from '@/api/run'
 import DevTokens from './DevTokens.vue'
 import { formatDate, formatExplorerUrl, isJSON } from '@/utils/index'
 import { useTokenStore } from '~/stores/token'
-import { useWindowSize } from '@vueuse/core'
+import { useWindowSize, useEventBus  } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
 import { BusEventType } from '@/utils/constants'
-import { useEventBus } from '@vueuse/core'
 
 const aiSummary = inject<Ref<{ summary: string; headline: string }>>('aiSummary')
 const props = defineProps<{
