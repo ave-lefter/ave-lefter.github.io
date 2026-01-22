@@ -238,16 +238,16 @@
                     </TimerCount>
                   </div>
                 </div>
-                <div>
+                <div class="flex flex-col self-stretch">
                   <div class="flex-start">
-                    <span class="text-18px font-500 mr-5px symbol-ellipsis ellipsis-auto block">{{
+                    <span class="text-18px font-500 mr-5px symbol-ellipsis ellipsis-auto block" v-tooltip="row.symbol">{{
                       row.symbol
                     }}</span>
                     <span
                       v-if="pumpSetting?.define?.some((i) => i === 'name')"
                       class="name text-10px font-500 mr-5px color-[--third-text] symbol-ellipsis ellipsis-auto block"
-                      >{{ row.name }}</span
-                    >
+                      v-tooltip="row.name"
+                      >{{ row.name }}</span>
                     <a
                       v-if="
                         summaryList(
@@ -408,13 +408,13 @@
                   <span class="color-[--d-999-l-666]">0</span>
                 </div> -->
                   </div>
-                  <div  class="color-#009EF7 mt-5px" v-for="(item, $index) in row?.medias?.filter(i=> i.icon === 'twitter')" :key="$index">
-                    <a class="color-#009EF7" :href="item.url" target="_blank" @click.stop.prevent>
-                      @{{ item.url?.replace(/^https?:\/\/(?:www\.)?(?:x|twitter)\.com\/([^\/\?]+).*/, "$1") }}
+                  <div class="color-#009EF7 min-h-15px mt-5px">
+                    <a v-for="(item, index) in row?.medias?.filter(i=> i.icon === 'twitter')" :key="index" class="color-#009EF7" :href="item.url" target="_blank" @click.stop>
+                      {{ item?.url?.includes('/communities') ? '' : '@' + item.url?.replace(/^https?:\/\/(?:www\.)?(?:x|twitter)\.com\/([^\/\?]+).*/, "$1") }}
                     </a>
                   </div>
 
-                  <div class="flex-start text-12px mt-16px relative z-1">
+                  <div class="flex-start text-12px relative z-1 mt-5px">
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'top')"
                       class="flex-start mr-8px bg-btn"
@@ -609,7 +609,7 @@
                   </div>
                 </div>
               </div>
-              <div class="pump-right" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '', 'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 2px 10px 0px #12B886': '0px 2px 10px 0px var(--border)') : ''}">
+              <div class="pump-right bg-transparent" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '', 'border-color': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '#12B886': 'var(--border)') : 'transparent' ,'box-shadow': pumpSetting.border &&  pumpSetting.size_swap ==='16px'? (pumpSetting.border =='border_hight' ? '0px 2px 10px 0px #12B886': '0px 2px 10px 0px var(--border)') : ''}">
                 <div
                   v-if="
                     (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
@@ -1082,10 +1082,10 @@ const getAnimClass = (itemData: any) => {
       }
       .pump-right {
         box-shadow: none;
-        background-color: var(--main-list-hover);
+        // background-color: var(--main-list-hover);
         .btns-swap{
           visibility: visible;
-          background-color: var(--main-list-hover);
+          // background-color: var(--main-list-hover);
         }
       }
       .bg-btn {
@@ -1095,7 +1095,7 @@ const getAnimClass = (itemData: any) => {
     }
     .pump-right {
       // box-shadow: -2px 0px 4px 0px #00000099;
-      background: var(--secondary-bg);
+      // background: var(--secondary-bg);
       min-width: 200px;
       position: absolute;
       right: 0;
@@ -1105,7 +1105,7 @@ const getAnimClass = (itemData: any) => {
       border: 1px solid;
 
       .btns-swap{
-        background-color: var(--secondary-bg);
+        // background-color: var(--secondary-bg);
         position: relative;
         z-index:1;
       }
