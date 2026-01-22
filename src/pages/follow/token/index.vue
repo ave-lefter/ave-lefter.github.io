@@ -9,6 +9,7 @@ import { getNewFavoriteList, getUserFavoriteGroups, removeFavorite, removeFavori
 import { WSEventType } from '~/utils/constants'
 import type { TableInstance } from 'element-plus'
 
+let sortParam:any={}
 
 let timeoutId: any = null;
 const tableRef = ref<TableInstance | null>(null)
@@ -303,6 +304,7 @@ const tableRowClick = (row: any) => {
 
 // 处理表格排序
 const handleSortChange = ({ prop, order }: any) => {
+  sortParam={ prop, order }
   if (prop) {
     if (order === 'ascending') {
       tableList.value = tableList.value.toSorted((a, b) => a[prop] - b[prop])
@@ -364,6 +366,9 @@ const getList = async () => {
   
   // 设置价格订阅
   const tokenIds = tableData.map(item => item.id)
+  if(sortParam.prop&&sortParam.order){
+    handleSortChange(sortParam)
+  }
   priceV2Store.setMultiPriceParams('favorite', tokenIds)
   priceV2Store.sendPriceWs()
   

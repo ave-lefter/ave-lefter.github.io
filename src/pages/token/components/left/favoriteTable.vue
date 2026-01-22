@@ -138,7 +138,13 @@ const sortedFavList = computed(() => {
       const codeA = a.symbol[0].toLowerCase().charCodeAt(0) || 0
       return (codeB - codeA) * sort.value.activeSort
     })
-  }else{
+  }
+  else if(sort.value.sortBy === 'price_change'){
+    return favoritesList.value.toSorted((a: any, b: any) => {
+      return ((b[sort.value.sortBy!] || 0) - (a[sort.value.sortBy!] || 0)) * sort.value.activeSort
+    })
+  }
+  else{
     return favoritesList.value
   }
 })
