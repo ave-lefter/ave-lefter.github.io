@@ -1345,7 +1345,7 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'sellers_24h')) {
       next.sellers_24h = Number(obj.sellers_24h)
     }
-    if (hasValue(obj, 'makers_24h')) {
+    if (hasValue(obj, 'buyers_24h')) {
       next.buyers_24h = Number(obj.buyers_24h)
     }
     if (hasValue(obj, 'net_flow_vol')) {
