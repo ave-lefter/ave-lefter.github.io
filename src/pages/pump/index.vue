@@ -411,6 +411,8 @@ const wsTableListCache = ref<PumpObj[]>([])
 const wsTableList = ref<PumpObj[]>([])
 const logoList = ref<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
 type StatisticsItem = {
+  reserve1(reserve1: any): number
+  reserve0(reserve0: any): number
   chain: string
   token: string
   holder_count: number
@@ -1330,6 +1332,12 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'tvl')) {
       next.tvl = Number(obj.tvl)   //池子大小
     }
+    if (hasValue(obj, 'reserve0')) {
+      next.reserve0 = Number(obj.reserve0)
+    }
+    if (hasValue(obj, 'reserve1')) {
+      next.reserve1 = Number(obj.reserve1)
+    }
     if (hasValue(obj, 'net_flow_vol')) {
       next.net_flow_vol = obj.net_flow_vol
     }
@@ -1370,6 +1378,12 @@ function mergeStatistics(prev: any, next: any) {
   }
   if (hasValue(next, 'tvl')) {
     result.tvl = next.tvl
+  }
+  if (hasValue(next, 'reserve0')) {
+    result.reserve0 = next.reserve0
+  }
+  if (hasValue(next, 'reserve1')) {
+    result.reserve1 = next.reserve1
   }
   if (hasValue(next, 'total')) {
     result.total = next.total

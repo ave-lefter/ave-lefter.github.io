@@ -408,7 +408,12 @@
                   <span class="color-[--d-999-l-666]">0</span>
                 </div> -->
                   </div>
-                  
+                  <div  class="color-#009EF7 mt-5px" v-for="(item, $index) in row?.medias?.filter(i=> i.icon === 'twitter')" :key="$index">
+                    <a class="color-#009EF7" :href="item.url" target="_blank" @click.stop.prevent>
+                      @{{ item.url?.replace(/^https?:\/\/(?:www\.)?(?:x|twitter)\.com\/([^\/\?]+).*/, "$1") }}
+                    </a>
+                  </div>
+
                   <div class="flex-start text-12px mt-16px relative z-1">
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'top')"
@@ -614,6 +619,12 @@
                   v-if="pumpSetting?.define?.some((i) => i === 'txs')"
                   class="flex-end text-12px pr-12px"
                 >
+                  <div class="mr-5px color-[--third-text] ml-5px" v-tooltip="$t('netInflow')">N</div>
+                  <div class="color-[---main-text]">
+                    <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[---main-text]">
+                      {{ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, locale: 'en' }) }}
+                    </ave-data-number>
+                  </div>
                   <template v-if="pumpSetting?.define?.some((i) => i === 'txs')">
                     <div class="mr-5px color-[--third-text] ml-5px">Txs</div>
                     <div class="color-[---main-text]">
@@ -621,18 +632,16 @@
                     </div>
                   </template>
 
-                  <div class="mr-5px color-[--third-text] ml-5px" v-tooltip="$t('netInflow')">N</div>
-                  <div class="color-[---main-text]">
-                    <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[---main-text]">
-                      {{ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, locale: 'en' }) }}
-                    </ave-data-number>
-                  </div>
-
                 </div>
                 <div class="flex-end pr-12px mt-5px">
                   <div class="mr-5px color-[--third-text] ml-5px" v-tooltip="$t('liqTip')">Liq</div>
                   <div class="color-[---main-text]">
-                    {{ formatNumber(row?.tvl || 0, { decimals: 0, l: 4, locale: 'en' }) }}
+                    <template v-if="row.token === row.token0_address || row.target_token  === row.token0_address" >
+                      {{ formatNumber(row?.reserve1 || 0, { decimals: 0, l: 4, locale: 'en' }) }} {{ row.token1_symbol === 'WBNB' ? 'BNB' : row.token1_symbol }}
+                    </template>
+                    <template v-else>
+                      {{ formatNumber(row?.reserve0 || 0, { decimals: 0, l: 4, locale: 'en' }) }} {{ row.token0_symbol === 'WBNB' ? 'BNB' : row.token0_symbol }}
+                    </template>
                   </div>
                 </div>
                 <div class="btns-swap flex-end mt-15px pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }">
