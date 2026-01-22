@@ -554,12 +554,14 @@ const updateLiqList = useThrottleFn(() => {
 }, 100)
 
 function onTimestampConfirm(timestamp: string[] = []) {
+  txCount.value = {}
   tableFilterVisible.value.timestamp = false
   tableFilter.value.timestamp = timestamp
   filterSubmit()
 }
 
 function confirmVolFilter(amountU: string[] = []) {
+  txCount.value = {}
   tableFilterVisible.value.amountU = false
   tableFilter.value.amountU = amountU
   filterSubmit()
