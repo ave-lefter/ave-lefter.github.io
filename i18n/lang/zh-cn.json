@@ -1855,11 +1855,15 @@
   "onlyAddress":"只看地址",
   "onlyFollowing":"只看已关注",
   "hotSub":"热门订阅",
+  "mySub":"我的订阅",
   "searchAccount":"搜索账号",
   "account":"账号",
   "tags":"标签",
   "tweet":"推文",
   "retweet":"转发",
   "quote":"引用",
-  "reply":"回复"
+  "reply":"回复",
+ "deleteAll":"确认移除",
+ "deleteAllTitle":"确认移除全部关注？",
+ "deleteAllTips":"将移除当前列表中的所有账号，此操作不可撤销。"
 }

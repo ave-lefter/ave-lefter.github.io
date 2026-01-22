@@ -1854,11 +1854,15 @@
   "onlyAddress":"Only Address",
   "onlyFollowing":"Only Following",
   "hotSub":"Hot Subscription",
+  "mySub":"My Subscription",
   "searchAccount":"Search Account",
   "account":"Account",
   "tags":"Tags",
   "tweet":"Tweet",
   "retweet":"Retweet",
   "quote":"Quote",
-  "reply":"Reply"
+  "reply":"Reply",
+  "deleteAllTitle":"Confirm Remove All Followings",
+  "deleteAll":"Confirm Remove",
+  "deleteAllTips":"This action will remove all accounts in the current list. This action cannot be undone."
 }

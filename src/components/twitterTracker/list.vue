@@ -10,7 +10,7 @@
     </el-button>
   </AveEmpty>
   <div v-else-if="props.isMine && isEmpty" class="flex flex-col items-center pt-60px">
-    <Icon name="custom:twitter-empty" class="text-61px mb-12px" />
+    <Icon name="custom:twitter-empty" class="text-61px mb-12px color-[--icon-color]" />
     <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('twitterEmpty') }}</span>
     <el-button type="primary" class="text-12px w-266px h-40px" @click="emits('startAttention')">
       {{ t('attention') }}

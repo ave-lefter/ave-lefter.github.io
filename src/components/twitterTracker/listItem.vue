@@ -51,7 +51,11 @@
                         'text-14px lh-22px break-words',
                         { 'line-11': !contentExpanded && isContentOverflow }
                     ]">
-                    {{ item.content }}
+                    <div
+                        class="cursor-pointer"
+                        @click="handleContentClick"
+                        v-html="processedContent"
+                    />
                 </div>
                 <div 
                     ref="measureEl"
@@ -110,6 +114,7 @@
 </template>
 <script setup name="twitterTrackerListItem">
 import { followKol, unfollowAll } from '~/api/twitter'
+import { processTwitterText } from '~/utils'
 const trackerStore = useTwitterTrackerStore()
 const { t } = useI18n()
 const botStore = useBotStore()
@@ -130,6 +135,11 @@ const contentEl = ref(null)
 const measureEl = ref(null)
 const contentExpanded = ref(false)
 const isContentOverflow = ref(false)
+
+// 处理后的内容，包含可点击的链接
+const processedContent = computed(() => {
+    return processTwitterText(props.item?.content || '')
+})
 
 const checkContentOverflow = () => {
     nextTick(() => {
@@ -227,5 +237,20 @@ const updateTooltipPosition = (mediaIndex) => {
             window.dispatchEvent(new Event('resize'))
         })
     })
+}
+
+const clickContent = (url) => {
+    window.open(url)
+}
+
+// 处理内容点击事件，如果点击的不是链接，则打开推文
+const handleContentClick = (e) => {
+    const target = e.target
+    // 如果点击的是链接，不阻止默认行为，让浏览器处理
+    if (target.tagName === 'A') {
+        return
+    }
+    // 如果点击的是内容区域但不是链接，打开推文
+    clickContent(props.item.url)
 }
 </script>
