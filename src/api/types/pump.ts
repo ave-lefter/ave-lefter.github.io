@@ -77,6 +77,7 @@ export interface PumpObj {
   platform_id: string
   pump_pair_address: string
   rTime?: number
+  net_flow_vol?: number
 }
 
 interface Pair {
