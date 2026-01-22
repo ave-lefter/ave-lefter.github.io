@@ -46,8 +46,6 @@ export const WSEventType = {
   PRICE_NEW: 'price-new',
   PRICE_GAINER: 'price-gainer',
   PRICE_EXTRA: 'price_extra',
-  PUMPSTATE: 'pumpstate',
-  TOKEN_UPDATED: 'token_updated',
   PRICEV2: 'pricev2',
   TGBOT: 'tgbot',
   ASSET: 'asset',
@@ -59,7 +57,9 @@ export const WSEventType = {
   PUMP_MIGRATED: 'pump_migrated'
 }
 export const WSEventV2Type = {
-  PORTRAIT_STATISTICS: 'portrait_statistics'
+  PUMPSTATE: 'pumpstatev2',
+  TOKEN_UPDATED: 'token_updated',
+  PORTRAIT_STATISTICS: 'portrait_statistics',
 }
 // perp
 export const WSPerpHost = 'wss://quote.edgex.exchange'
