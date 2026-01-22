@@ -667,13 +667,13 @@ const flushPumpState = useThrottleFn(() => {
 }, 100)
 
 watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
-  if (Array.isArray(val) && documentVisible.value) {
+  if (Array.isArray(val)) {
     pumpStateBuffer.push(val)
     flushPumpState()
   }
 })
 const bufferLogo: any[] = []
-const logoThrottled  = useThrottleFn((val) => {
+const logoThrottled  = useThrottleFn(() => {
   if (!bufferLogo.length) return
   logoList.value = [
     ...bufferLogo,
@@ -682,9 +682,9 @@ const logoThrottled  = useThrottleFn((val) => {
   bufferLogo.length = 0
 }, 100)
 watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
-  if (val && documentVisible.value) {
+  if (val) {
     bufferLogo.unshift(val)
-    logoThrottled(val)
+    logoThrottled()
   }
 })
 const buffer: any[][] = []
@@ -777,12 +777,10 @@ const startPortraitTimer = () => {
     clearTimeout(portraitTimer)
   }
   portraitTimer = setTimeout(() => {
-    if (documentVisible.value) {
-      unsubscribePortrait()
-      statisticsList.value = []
-      subscribePortrait(mergedBaseList.value)
-      startPortraitTimer()
-    }
+    unsubscribePortrait()
+    statisticsList.value = []
+    subscribePortrait(mergedBaseList.value)
+    startPortraitTimer()
   }, 1 * 60 * 1000)
 }
 const subscribePortrait = (list) => {
@@ -1057,7 +1055,7 @@ async function getPump(rawParams: {
   }
 
   // 2. 状态拦截
-  const isInactive = route.name !== 'pump' || !documentVisible.value
+  const isInactive = route.name !== 'pump'
   const isPaused = isPausedObj.value?.[category] || route.name !== 'pump'
 
   if (isInactive) return
