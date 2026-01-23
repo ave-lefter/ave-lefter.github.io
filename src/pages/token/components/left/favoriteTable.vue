@@ -29,14 +29,31 @@ onUnmounted(() => {
   topAddGroupEvent.off(refresh)
 })
 
-function refresh() {
-  resetListStatus()
-  loadMoreFavorites()
+function refresh(data:any) {
+  console.log('refresh',data)
+  if(data===-1){
+    removeFavToken()
+  }else{
+    resetListStatus()
+    loadMoreFavorites()
+  }
 }
 
 const { t } = useI18n()
 const wsStore = useWSStore()
 const priceV2Store = usePriceV2Store()
+const {token} = storeToRefs(useTokenStore())
+const route = useRoute()
+const addressAndChain = computed(() => {
+  const id = route.params.id as string
+  if (id) {
+    return getAddressAndChainFromId(id)
+  }
+  return {
+    address: token.value?.token || '',
+    chain: token.value?.chain || ''
+  }
+})
 watch(
   () => wsStore.wsResult[WSEventType.PRICEV2],
   (val: IPriceV2Response) => {
@@ -53,6 +70,12 @@ watch(
       }
       return i
     })
+    // 排序
+    if(sort.value.sortBy === 'price_change'){
+      favoritesList.value.sort((a: any, b: any) => {
+        return ((b[sort.value.sortBy!] || 0) - (a[sort.value.sortBy!] || 0)) * sort.value.activeSort
+      })
+    }
     triggerRef(favoritesList)
   }
 )
@@ -222,6 +245,17 @@ const tabsContainer = ref<HTMLElement | null>(null)
 //   console.log(tabsContainer.value.offsetWidth,'xxxxx',childrenWidth,tabsContainer.value.children.length)
 //   return childrenWidth > containerWidth
 // })
+
+function removeFavToken() {
+  const tokenId=addressAndChain.value.address + '-' + addressAndChain.value.chain
+  const index = favoritesList.value.findIndex(item => item.token + '-' + item.chain === tokenId)
+  if (index !== -1) {
+    favoritesList.value.splice(index, 1)
+  }
+  triggerRef(favoritesList)
+}
+
+
 function setActiveTab(groupId: number, index: number) {
   activeTab.value = groupId
   resetListStatus()
@@ -344,24 +378,26 @@ function toggleMode(mode: string) {
         <div class="pb-20px">
           <NuxtLink
             v-for="(row, $index) in sortedFavList"
-            :key="$index"
+            :key="`${row.token}-${row.chain}`"
             class="px-10px flex items-center h-50px cursor-pointer hover:bg-[--dialog-bg]"
             :to="`/token/${row.token}-${row.chain}`"
           >
             <div class="flex items-center flex-1">
-              <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
-                <template #default>
-                  <TokenImg class="mr-8px" :row="row" />
-                </template>
-                <template #content>
-                  <TokenImg
-                    :row="row"
-                    chain-class="hidden"
-                    token-class="w-240px h-240px [&&]:mr-0 rounded-16px"
-                  />
-                </template>
-              </el-tooltip>
-
+              <TokenImg class="mr-8px" :row="row" v-tooltip="{
+                content:{
+                  is:TokenImg,
+                  props:{
+                    'row':row,
+                    'chain-class':'hidden',
+                    'token-class':'w-240px h-240px [&&]:mr-0 rounded-16px'
+                  }
+                },
+                props:{
+                  'placement':'bottom-start',
+                  'show-arrow':false,
+                  'popper-class':'tooltip-pd-0'
+                }
+              }" />
               <div class="flex flex-col items-start">
                 <span class="text-12px flex items-center">
                   {{ row.symbol }}
