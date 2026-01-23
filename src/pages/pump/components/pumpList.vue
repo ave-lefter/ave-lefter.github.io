@@ -367,7 +367,7 @@
                       class="flex mr-8px items-center ml-8px"
                     >
                       <Icon
-                        class="iconfont icon-rug mr-4px text-14px vertical-middle color-[--secondary-text]"
+                        class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--secondary-text]"
                         name="custom:holders"
                       />
                       <span class="color-[---main-text]" :style="{ color: getDataColor('holders',row.holders) }">{{
@@ -385,7 +385,7 @@
                       class="flex mr-8px items-center"
                     >
                       <Icon
-                        class="iconfont icon-rug mr-4px text-14px vertical-middle color-[--secondary-text] hover:color-#3F80F7"
+                        class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--secondary-text] hover:color-#3F80F7"
                         name="custom:wallets"
                       />
                       <span class="color-[---main-text]">{{
@@ -399,14 +399,33 @@
                       class="flex mr-8px items-center"
                     >
                       <Icon
-                        class="iconfont icon-rug mr-4px text-14px vertical-middle color-[--secondary-text]"
-                        name="custom:kol"
+                        class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--secondary-text]"
+                        name="custom:kol2"
                       />
                       <span class="color-[---main-text]">{{
                         formatNumber(row?.kol_tag_count || 0, 2)
                       }}</span>
                     </div>
 
+                    <div
+                      class="flex mr-8px items-center"
+                      v-tooltip="{
+                      content:
+                        `<div style='color:var(--secondary-text)'>${$t('devMigrated')} <span style='color:var(--main-text)'>${formatNumber(row?.migrated_count || 0, 0)}</span></div>
+                        <div style='color:var(--secondary-text)'>${$t('devLaunched')} <span style='color:var(--up-color)'>${formatNumber(row?.total_count || 0, 0)}</span></div>
+                        <div style='color:var(--secondary-text)'>${$t('migratedRatio')} <span style='color:var(--down-color)'>${formatNumber(row?.migrated_ratio || 0, 0)}%</span></div>
+                        `,
+                      props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
+                    }">
+
+                      <Icon
+                        class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--yellow]"
+                        name="custom:top2"
+                      />
+                      <span class="color-[---main-text]">{{
+                        formatNumber(row?.migrated_count || 0, 2)}}/{{formatNumber(row?.total_count || 0, 2)}}
+                      </span>
+                    </div>
                     <!-- <div
                   v-show="pumpSetting?.define?.some(i=> i=== 'migraged')"
                   v-tooltip="$t('migraged')"

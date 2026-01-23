@@ -1666,8 +1666,8 @@
   "pnlCalendar": "盈亏日历",
   "currentStreak": "当前连胜",
   "maxStreak": "最高连胜",
-  "preferedTips":"该指标展示了您常购买代币的市值分布及对应的购买频次，帮助您了解自身的交易偏好。",
-  "tokenAddress":"代幣地址",
+  "preferedTips": "该指标展示了您常购买代币的市值分布及对应的购买频次，帮助您了解自身的交易偏好。",
+  "tokenAddress": "代幣地址",
   "takeProfitAndStopLoss1": "翻倍全出",
   "takeProfitAndStopLoss2": "翻倍出本&跌半止損",
   "takeProfitAndStopLoss0": "自定義止盈止損",
@@ -1931,5 +1931,8 @@
   "chainWallet3": "鏈錢包",
   "markersBuy": "總買入錢包數",
   "markersSell": "總賣出錢包數",
-  "liqTip": "池子數和底池大小"
+  "liqTip": "池子數和底池大小",
+  "devMigrated": "Dev已遷移",
+  "devLaunched": "Dev發幣總數",
+  "migratedRatio": "迁移比例"
 }

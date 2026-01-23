@@ -1945,6 +1945,8 @@
   "invitedUser": "Invite Users",
   "markersBuy": "Markers Buy",
   "markersSell": "Markers Sell",
-  "liqTip": "Number of pools and size of the bottom pool"
-
+  "liqTip": "Number of pools and size of the bottom pool",
+  "devMigrated": "Dev Migrated",
+  "devLaunched": "Dev Launched",
+  "migratedRatio": "Migrated"
 }
