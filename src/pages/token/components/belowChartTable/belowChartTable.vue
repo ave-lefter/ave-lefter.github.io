@@ -202,7 +202,7 @@ watch(()=>!tokenStore.devTokenNum && activeTab.value === 'DevTokens',(val)=>{
       <Bubble />
     </div>
     <OrdersTab v-show="activeTab === 'Orders'" :currentActiveTab="activeTab"/>
-    <DevTokens v-show="activeTab === 'DevTokens'" :currentActiveTab="activeTab" />
+    <DevTokens v-show="activeTab === 'DevTokens'" />
     <KeepAlive v-show="activeTab !== 'Orders' && activeTab !== 'DevTokens'">
       <component :is="Component" v-bind="comProps" :currentActiveTab="activeTab" />
     </KeepAlive>

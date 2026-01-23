@@ -1,4 +1,4 @@
-import ImageLarge from './components/imageLarge.vue'
+import ImageLarge from './imageLarge.vue'
 
 export function useSimilarTokenPopup() {
     const { $createTooltip } = useNuxtApp()

@@ -3,10 +3,10 @@
         <div v-infinite-scroll="getRugPullList" class="pt-12px flex-1"
             :infinite-scroll-disabled="loadingRun || finished" :infinite-scroll-distance="20"
             :infinite-scroll-delay="200" :infinite-scroll-immediate="false">
-            <el-table ref="table_ref" :data="tableList" :default-sort="{
+            <el-table ref="table_ref" :height="tableHeight" :data="tableList" :default-sort="{
                 prop: conditions.sort,
                 order: conditions.sort_dir ? conditions.sort_dir + 'ending' : null,
-            }" fit style="width: 100%" header-row-class-name="text-12px"
+            }" fit header-row-class-name="text-12px"
                 row-class-name="cursor-pointer color-[--secondary-text] text-12px" @row-click="onRowClick"
                 @sort-change="handleSortChange">
                 <template #empty>
@@ -153,6 +153,9 @@ let finishedTimer: NodeJS.Timeout | null = null
 
 const route = useRoute()
 const id = computed(() => route.params.id as string)
+const tableHeight = computed(() => {
+  return Math.max(tokenStore.commonHeight - 260, 450)
+})
 
 const resetPageNOAndLoading = () => {
     tableList.value = []

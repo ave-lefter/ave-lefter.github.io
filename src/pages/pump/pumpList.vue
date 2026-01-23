@@ -713,7 +713,7 @@ import { Icon } from '#components'
 import type { PumpObj } from '@/api/types/pump'
 import XIcon from '~/components/xPopup/xIcon.vue'
 import { useVirtualList } from '@vueuse/core'
-import { useSimilarTokenPopup } from '../utils'
+import { useSimilarTokenPopup } from './utils'
 
 const props = defineProps({
   tableList: {
