@@ -58,21 +58,23 @@
       </template>
     </el-image>
     <div class="p-12px">
-      <div class="text-12px lh-12px color-[--secondary-text] mb-12px">{{ t('similarTokens') }}</div>
+      <div class="flex justify-between">
+        <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('similarTokens') }}</div>
+        <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('mcap') }}</div>
+      </div>
       <div class="flex flex-col gap-8px">
         <div v-for="token in tokens" :key="token.id" class="flex items-center gap-8px cursor-pointer" @click="navigateTo(`/token/${token.token}-${token.chain}`)">
           <TokenImg :row="token" />
           <div class="flex-1">
             <div class="lh-16px color-[--main-text]">{{ token.symbol }}</div>
-            <div v-tooltip="formatDate(token.last_trade_at, 'YYYY-MM-DD HH:mm:ss')" class="lh-12px"><span class="text-12px color-[--secondary-text] text-10px">{{ t('lastTx') }}:{{ formatTimeFromNow(token.last_trade_at) }}</span>
+            <div v-tooltip="formatDate(token.last_trade_at, 'YYYY-MM-DD HH:mm:ss')" class="lh-12px"><span class="text-12px color-[--third-text] text-10px">{{ t('lastTx') }}:{{ formatTimeFromNow(token.last_trade_at) }}</span>
             </div>
           </div>
           <div class="text-12px text-right">
               <div class="lh-16px">
-                <span>MC </span>
                 <span :class="token.market_cap> 1000000 ? 'color-[--yellow]' : ''">${{ formatNumber(token.market_cap, 1) }}</span>
               </div>
-              <div v-tooltip="t('createdTime')+':'+formatDate(token.created_at, 'YYYY-MM-DD HH:mm:ss')" class="inline-flex justify-end lh-12px text-10px">{{formatTimeFromNow(token.created_at)}}</div>
+              <div v-tooltip="t('createdTime')+':'+formatDate(token.created_at, 'YYYY-MM-DD HH:mm:ss')" class="inline-flex justify-end lh-12px color-[--third-text] text-10px">{{formatTimeFromNow(token.created_at)}}</div>
             </div>
         </div>
       </div>
