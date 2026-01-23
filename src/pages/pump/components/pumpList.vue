@@ -8,13 +8,24 @@
             v-for="({data: row}, $index) in list"
             :id="row?.target_token + '-' + row?.chain"
             :key="row?.pair + '-' + row?.chain"
-            :ref="setBtnRef"
             class="pump-item_item relative item-row"
             @click.stop="tableRowClick(row)"
             @contextmenu="handleContextMenu($event, row)"
-            @mouseenter="showPopover(row)"
-            @mouseleave="hidePopover"
             :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
+            v-tooltip:pump-tooltip="{
+              content: {
+                is: ProgressPop,
+                props: {
+                  isOut: isOut,
+                  selected: row
+                }
+              },
+              props: {
+                placement: 'top',
+                'popper-class': 'text-center new-popover',
+                'popper-style':'width: auto'
+              }
+            }"
           >
             <div class="w-full relative" :class="getAnimClass(row)">
               <div class="flex-start items-start">
@@ -170,7 +181,7 @@
                       </a>
                     </el-tooltip> -->
                     <div class="bg-btn bg-[--secondary-bg] absolute bottom--12px left--10px rounded-4px border border-1 border-solid border-[#1E1F23] color-[--yellow] text-9px">
-                      {{formatNumber(row?.progress || 0, 2)}}%
+                      {{(row?.progress || 0).toFixed(0)}}%
                     </div>
                     <el-image
                       v-if="row.amm"
@@ -784,22 +795,6 @@
       </span>
     </transition>
     <el-popover
-      v-model:visible="showPop"
-      :virtual-ref="currentBtnRef"
-      virtual-triggering
-      trigger="manual"
-      placement="top"
-      popper-class="text-center new-popover"
-      popper-style="width: auto"
-    >
-      <div class="color-#12B886">
-        <template v-if="isOut">
-          <span v-if="selected?.issue_platform" class="mr-5px">{{ selected?.issue_platform }}</span>{{ selected?.in_pump_interval== 0 ? '0s' : formatTime(selected?.in_pump_interval || 0) }}{{ $t('bidCleared') }}
-        </template>
-        <template v-else> {{ $t('progress') }}:{{ formatNumber(selected?.progress || 0, 2) }}% </template>
-      </div>
-    </el-popover>
-    <el-popover
       v-model:visible="showPopSearch"
       :virtual-ref="$refs.currentBtnRef[currentIndex]"
       virtual-triggering
@@ -836,6 +831,7 @@ import type { PumpObj } from '@/api/types/pump'
 import XIcon from '~/components/xPopup/xIcon.vue'
 import { useVirtualList } from '@vueuse/core'
 import ImageLarge from './imageLarge.vue'
+import ProgressPop from './progressPop.vue'
 
 const props = defineProps({
   tableList: {
@@ -870,7 +866,7 @@ const props = defineProps({
 
 const showPop = ref(false)
 const selected = ref<PumpObj | null>(null)
-const btnRefs = ref<Record<string, HTMLElement | null>>({})
+// const btnRefs = ref<Record<string, HTMLElement | null>>({})
 const currentBtnRef = ref<HTMLElement | null>(null)
 const { tableList, quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
 const router = useRouter()
@@ -937,27 +933,27 @@ function addOrRemoveBlaclList(item: { token: string }, type: 'ca' | 'dev' | 'key
   }
 }
 
-function setBtnRef(el: HTMLElement | null) {
-  if (el && el?.id) {
-    btnRefs.value[el?.id] = el
-    // console.log('-------el?.id----',el?.id)
-  }
-}
-function showPopover(item: PumpObj) {
-  // if (!isOut.value) {
-  // console.log('-----[item.id--',item.id)
-  selected.value = item
-  currentBtnRef.value = btnRefs.value[item.id] || null
-  // console.log('-----currentBtnRef.value ---',currentBtnRef.value )
-  showPop.value = true
-  isPaused.value = true
-  // }
-}
+// function setBtnRef(el: HTMLElement | null) {
+//   if (el && el?.id) {
+//     btnRefs.value[el?.id] = el
+//     // console.log('-------el?.id----',el?.id)
+//   }
+// }
+// function showPopover(item: PumpObj) {
+//   // if (!isOut.value) {
+//   // console.log('-----[item.id--',item.id)
+//   selected.value = item
+//   currentBtnRef.value = btnRefs.value[item.id] || null
+//   // console.log('-----currentBtnRef.value ---',currentBtnRef.value )
+//   showPop.value = true
+//   isPaused.value = true
+//   // }
+// }
 
-function hidePopover() {
-  showPop.value = false
-  isPaused.value = false
-}
+// function hidePopover() {
+//   showPop.value = false
+//   isPaused.value = false
+// }
 
 function summaryList(summary: string): string[] {
   return summary?.match(/\d\.[^0-9]*/g) || []
