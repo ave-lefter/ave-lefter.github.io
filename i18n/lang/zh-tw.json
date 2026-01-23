@@ -1848,5 +1848,6 @@
    "reply":"回覆",
    "deleteAll":"删除全部",
  "deleteAllTitle":"确认移除全部关注？",
-   "deleteAllTips":"将移除当前列表中的所有账号，此操作不可撤销。"
+   "deleteAllTips":"将移除当前列表中的所有账号，此操作不可撤销。",
+   "connectBotWallet":"连接Bot钱包"
 }

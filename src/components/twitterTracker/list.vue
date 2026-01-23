@@ -6,7 +6,7 @@
       class="text-12px w-266px h-40px"
       @click="botStore.changeConnectVisible(true)"
     >
-      {{ t('connectWallet') }}
+      {{ walletStore.address ? t('connectBotWallet') : t('connectWallet') }}
     </el-button>
   </AveEmpty>
   <div v-else-if="props.isMine && isEmpty" class="flex flex-col items-center pt-60px">
@@ -43,6 +43,7 @@ const props = defineProps({
   },
 })
 const botStore = useBotStore()
+const walletStore = useWalletStore()
 const trackerStore = useTwitterTrackerStore()
 const isEmpty = computed(() => trackerStore.list.length === 0)
 

@@ -217,6 +217,7 @@ const getList = async () => {
 getList()
 watch(() => visible.value, val => {
   if (val) {
+    query.value.keyword = ''
     activeTab.value = TAB_TYPE.HOT
     reset()
     getList()

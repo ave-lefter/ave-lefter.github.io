@@ -60,9 +60,8 @@
                 <div 
                     ref="measureEl"
                     class="text-14px lh-22px break-words absolute opacity-0 pointer-events-none"
-                    style="width: 100%; top: 0; left: 0; z-index: -1;">
-                    {{ item.content }}
-                </div>
+                    style="width: 100%; top: 0; left: 0; z-index: -1;"
+                    v-html="processedContent"/>
             </div>
             <div v-for="(media, mediaIndex) in item.medias?.slice?.(0,1)" :key="mediaIndex" class="relative">
                 <!-- <img :src="media.media_url_https" alt="" class="max-w-full rounded-8px cursor-pointer"> -->

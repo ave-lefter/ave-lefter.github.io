@@ -1864,5 +1864,6 @@
   "reply":"Reply",
   "deleteAllTitle":"Confirm Remove All Followings",
   "deleteAll":"Confirm Remove",
-  "deleteAllTips":"This action will remove all accounts in the current list. This action cannot be undone."
+  "deleteAllTips":"This action will remove all accounts in the current list. This action cannot be undone.",
+  "connectBotWallet":"Connect Bot Wallet"
 }
