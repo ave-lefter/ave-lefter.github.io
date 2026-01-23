@@ -426,6 +426,18 @@
                         formatNumber(row?.migrated_count || 0, 2)}}/{{formatNumber(row?.total_count || 0, 2)}}
                       </span>
                     </div>
+
+                    <div
+                      v-show="pumpSetting?.define?.some((i) => i === 'smart')"
+                      v-tooltip="$t('smarter')"
+                      class="flex mr-5px items-center bg-btn color-[--secondary-text]"
+                    >
+                      <Icon
+                        class="iconfont icon-rug mr-2px text-10px vertical-middle "
+                        name="custom:smart-plain"
+                      />
+                      <span>{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
+                    </div>
                     <!-- <div
                   v-show="pumpSetting?.define?.some(i=> i=== 'migraged')"
                   v-tooltip="$t('migraged')"
@@ -451,8 +463,8 @@
                       @mouseover.stop="(e) => showBubbleTooltip(row, e)"
                     >
                       <Icon
-                        class="iconfont icon-TOP text-12px mr-4px"
-                        name="custom:top"
+                        class="iconfont icon-TOP text-10px mr-4px"
+                        name="custom:top3"
                         :style="{
                           color: Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886',
                         }"
@@ -476,9 +488,17 @@
                       v-tooltip="$t('dev_balance_ratio_cur_tips')"
                       class="flex mr-8px bg-btn"
                     >
+                     <template v-if="row?.max_dev_ratio !==null && row?.max_dev_ratio !== undefined && Number(row?.max_dev_ratio)!== 0 && Number(row?.dev_balance_ratio_cur)== 0">
+                      <Icon
+                        class="iconfont icon-TOP text-12px mr-4px color-[--x-blue]"
+                        name="custom:dev-ds"
+                      />
+                      <span class="color-[--x-blue]">DS</span>
+                     </template>
+                     <template v-else>
                       <Icon
                         class="iconfont icon-TOP text-12px mr-4px"
-                        name="custom:dev"
+                        name="custom:dev-ds"
                         :style="{
                           color: Number(row?.dev_balance_ratio_cur) > 5? '#F6465D' : '#12B886',
                         }"
@@ -494,8 +514,10 @@
                               : 0,
                             2
                           )
-                        }}%</span
-                      >
+                        }}%
+                      </span>
+                     </template>
+
                     </div>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'insider')"
@@ -624,18 +646,6 @@
                           : formatNumber(row?.rug_rate || 0, 2) + '%'
                       }}</span>
                     </div> -->
-
-                    <div
-                      v-show="pumpSetting?.define?.some((i) => i === 'smart')"
-                      v-tooltip="$t('smarter')"
-                      class="flex mr-5px items-center bg-btn color-#12B886"
-                    >
-                      <Icon
-                        class="iconfont icon-rug mr-2px text-12px vertical-middle "
-                        name="custom:wallet"
-                      />
-                      <span>{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
-                    </div>
                   </div>
                 </div>
               </div>

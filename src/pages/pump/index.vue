@@ -1435,7 +1435,7 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
         next.market_cap = next.market_cap || 1000000000 * obj?.uprice
       }
       if (next.amm === 'flapswap') {
-        next.market_cap =  next.market_cap || 1000000000 * obj?.uprice || 49000
+        next.market_cap =  next.market_cap || 1000000000 * obj?.uprice || 4900
       }
     }
     if (hasValue(obj, 'sells_tx_24h_count')) {
@@ -1453,6 +1453,10 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'migrated_ratio')) {
       next.migrated_ratio = obj.migrated_ratio
     }
+    if (hasValue(obj, 'max_dev_ratio')) {
+      next.max_dev_ratio = obj.max_dev_ratio
+    }
+
     return next
   })
 }
@@ -1529,6 +1533,9 @@ function mergeStatistics(prev: any, next: any) {
   }
   if (hasValue(next, 'migrated_ratio')) {
     result.migrated_ratio = next.migrated_ratio
+  }
+  if (hasValue(next, 'migrated_ratio')) {
+    result.max_dev_ratio = next.max_dev_ratio
   }
   return result
 }
