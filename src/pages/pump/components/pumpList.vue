@@ -168,6 +168,9 @@
                         <Icon class="text-16px text-#fff" name="custom:search" />
                       </a>
                     </el-tooltip> -->
+                    <div class="bg-btn bg-[--secondary-bg] absolute bottom--12px left--10px rounded-4px border border-1 border-solid border-[#1E1F23] color-[--yellow] text-9px">
+                      {{formatNumber(row?.progress || 0, 2)}}%
+                    </div>
                     <el-image
                       v-if="row.amm"
                       v-tooltip="row.amm"
@@ -203,45 +206,10 @@
                     /> -->
                   </div>
                   <div
-                    v-tooltip="formatDate(row?.created_at || row?.time)"
-                    class="time"
-                    :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-20px' : 'mt-10px'"
-                    :style="{
-                      color:
-                        Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
-                          ? '#FFA622'
-                          : '#12B886',
-                    }"
-                  >
-                    <template v-if="!(row?.created_at || row?.time)"> - </template>
-                    <template
-                      v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
-                    >
-                      {{
-                        formatCountdown(
-                          Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
-                          false
-                        )
-                      }}
-                    </template>
-                    <TimerCount
-                      v-else-if="
-                        (row?.created_at || row?.time) &&
-                        Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
-                      "
-                      :key="`${row.created_at}`"
-                      :timestamp="row.created_at"
-                      :end-time="60"
-                    >
-                      <template #default="{ seconds }">
-                        <span class="color-#FFA622">
-                          <template v-if="seconds < 60"> {{ seconds }}s </template>
-                          <template v-else>
-                            {{ formatTimeFromNow(row.created_at) }}
-                          </template>
-                        </span>
-                      </template>
-                    </TimerCount>
+                      class="color-[--third-text] text-12px"
+                      :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-20px' : 'mt-10px'"
+                      v-copy="row.token">
+                      {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
                   </div>
                 </div>
                 <div class="flex flex-col self-stretch">
@@ -251,7 +219,7 @@
                     }}</span>
                     <span
                       v-if="pumpSetting?.define?.some((i) => i === 'name')"
-                      class="name text-10px font-500 mr-5px color-[--third-text] symbol-ellipsis ellipsis-auto block"
+                      class="name text-10px font-500 mr-5px color-[--secondary-text] symbol-ellipsis ellipsis-auto block"
                       v-tooltip="row.name"
                       >{{ row.name }}</span>
                     <a
@@ -279,15 +247,46 @@
                   </div>
 
                   <div class="flex-start text-12px mt-5px">
-                    <span class="color-[--third-text]">{{
-                      row.token?.slice(0, 4) + '...' + row.token?.slice(-4)
-                    }}</span>
-                    <Icon
-                      v-copy="row.token"
-                      name="bxs:copy"
-                      class="text-12px cursor-pointer color-[--third-text] ml-4px"
-                      @click.stop.prevent
-                    />
+                      <div
+                        v-tooltip="formatDate(row?.created_at || row?.time)"
+                        class="time"
+                        :style="{
+                          color:
+                            Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
+                              ? '#FFA622'
+                              : '#12B886',
+                        }"
+                      >
+                        <template v-if="!(row?.created_at || row?.time)"> - </template>
+                        <template
+                          v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
+                        >
+                          {{
+                            formatCountdown(
+                              Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
+                              false
+                            )
+                          }}
+                        </template>
+                        <TimerCount
+                          v-else-if="
+                            (row?.created_at || row?.time) &&
+                            Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
+                          "
+                          :key="`${row.created_at}`"
+                          :timestamp="row.created_at"
+                          :end-time="60"
+                        >
+                          <template #default="{ seconds }">
+                            <span class="color-#FFA622">
+                              <template v-if="seconds < 60"> {{ seconds }}s </template>
+                              <template v-else>
+                                {{ formatTimeFromNow(row.created_at) }}
+                              </template>
+                            </span>
+                          </template>
+                        </TimerCount>
+                      </div>
                       <img
                         v-if="row.baseToken"
                         v-tooltip="`${row.baseToken?.symbol} ${$t('pair')}`"
@@ -297,19 +296,18 @@
                         :width="12"
                         style="border-radius: 100%"
                       >
-                    <div class="color-[--icon-color]" style="margin: 0 8px">|</div>
                     <div
                       v-if="
                         row?.medias?.length > 0 && pumpSetting?.define?.some((i) => i === 'media')
                       "
-                      class="flex text-12px"
+                      class="flex text-12px ml-8px"
                     >
                       <div v-for="(item, index) in row?.medias" :key="index">
                         <template v-if="item.url">
                           <span v-if="item.name === 'QQ'" v-tooltip="item.url" class="mr-8px">
                             <Icon
                               :name="`custom:${item.icon}`"
-                              class="text-[--third-text] h-12px"
+                              class="text-[--secondary-text] h-12px"
                             />
                           </span>
                           <XPopup
@@ -331,7 +329,7 @@
                               <Icon
                                 v-else
                                 :name="`custom:${item.icon}`"
-                                class="text-[--third-text] text-12px"
+                                class="text-[--secondary-text] text-12px"
                               />
                             </a>
                           </XPopup>
@@ -345,7 +343,7 @@
                           >
                             <Icon
                               :name="`custom:${item.icon}`"
-                              class="text-[--third-text] h-12px"
+                              class="text-[--secondary-text] h-12px"
                             />
                           </a>
                         </template>
@@ -361,17 +359,15 @@
                       @mouseleave="showPopSearch = false"
                       @click.stop.prevent
                     >
-                      <Icon class="text-[--third-text] h-12px w-12px" name="custom:search" />
+                      <Icon class="text-[--secondary-text] h-12px w-12px ml-8px" name="custom:search" />
                     </a>
-
-                    <div class="color-[--icon-color]" style="margin: 0 8px">|</div>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'holder')"
                       v-tooltip="$t(`holders`)"
-                      class="flex mr-8px items-center"
+                      class="flex mr-8px items-center ml-8px"
                     >
                       <Icon
-                        class="iconfont icon-rug mr-4px text-14px vertical-middle color-[--third-text]"
+                        class="iconfont icon-rug mr-4px text-14px vertical-middle color-[--secondary-text]"
                         name="custom:holders"
                       />
                       <span class="color-[---main-text]" :style="{ color: getDataColor('holders',row.holders) }">{{
@@ -389,7 +385,7 @@
                       class="flex mr-8px items-center"
                     >
                       <Icon
-                        class="iconfont icon-rug mr-4px text-14px vertical-middle color-[--third-text] hover:color-#3F80F7"
+                        class="iconfont icon-rug mr-4px text-14px vertical-middle color-[--secondary-text] hover:color-#3F80F7"
                         name="custom:wallets"
                       />
                       <span class="color-[---main-text]">{{
@@ -403,7 +399,7 @@
                       class="flex mr-8px items-center"
                     >
                       <Icon
-                        class="iconfont icon-rug mr-4px text-14px vertical-middle color-[--third-text]"
+                        class="iconfont icon-rug mr-4px text-14px vertical-middle color-[--secondary-text]"
                         name="custom:kol"
                       />
                       <span class="color-[---main-text]">{{
@@ -649,14 +645,14 @@
                   </template>
                   <template v-else>
                     <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
-                      <div class="mr-5px color-[--third-text]">V</div>
+                      <div class="mr-5px color-[--secondary-text]">V</div>
                       <div class="color-[---main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h) }">
                         ${{ pumpSetting.isInt ? formatNumber(row.volume_u_24h || 0, { decimals: 0, l: 4, locale: 'en' }) : formatNumber(row.volume_u_24h || 0, {decimals: 2, locale: 'en' }) }}
                       </div>
                     </template>
                     <template v-if="pumpSetting?.define?.some((i) => i === 'mcap')">
                       <div
-                        class="color-[--third-text] mr-5px ml-5px"
+                        class="color-[--secondary-text] mr-5px ml-5px"
                         :style="{ 'font-size': pumpSetting.fontSize_mc }"
                       >
                         MC
@@ -672,13 +668,13 @@
                   v-if="pumpSetting?.define?.some((i) => i === 'txs')"
                   class="flex-end text-12px pr-12px"
                 >
-                  <div class="mr-5px color-[--third-text] ml-5px" v-tooltip="$t('netInflow')">N</div>
+                  <div class="mr-5px color-[--secondary-text] ml-5px" v-tooltip="$t('netInflow')">N</div>
                   <div class="color-[--main-text]">
                     <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[--main-text]">
                       {{ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, locale: 'en' }) }}
                     </ave-data-number>
                   </div>
-                  <div class="mr-5px color-[--third-text] ml-5px" v-tooltip="$t('liqTip')">Liq</div>
+                  <div class="mr-5px color-[--secondary-text] ml-5px" v-tooltip="$t('liqTip')">Liq</div>
                   <div class="color-[--main-text] text-12px">
                     <template v-if="row.token === row.token0_address || row.target_token  === row.token0_address" >
                       {{ formatNumber(row?.reserve1 || 0, { decimals: 0, l: 4, locale: 'en' }) }}
@@ -700,7 +696,7 @@
                         `,
                       props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                     }">
-                    <div class="mr-5px color-[--third-text] ml-5px">Txs</div>
+                    <div class="mr-5px color-[--secondary-text] ml-5px">Txs</div>
                     <div class="color-[--main-text]">
                       {{ formatNumber(row.tx_24h_count || 0, { decimals: 0, l: 4, locale: 'en' })}}
                     </div>
