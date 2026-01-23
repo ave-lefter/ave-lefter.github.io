@@ -94,14 +94,14 @@
                     </div>
                 </div>
                 <el-progress :width="120" color="var(--up-color)" :stroke-width="10" type="circle"
-                    :percentage="tokenObj.total_migrated / tokenObj.total_tokens * 100">
+                    :percentage="Number(tokenObj?.total_migrated || 0) / Number(tokenObj?.total_tokens || 0) * 100">
                     <template #default="{ percentage }">
                         <div class="font-bold text-24px lh-30px color-[--main-text] mb-4px">{{
                             formatNumber(percentage,1) }}%</div>
                         <div class="color-[--third-text] text-12px">{{ t('migrated') }}</div>
                     </template>
                 </el-progress>
-               
+
             </div>
             <div class="text-16px lh-16px color-[--secondary-text] mb-8px">
                     {{ t('highestRecord') }}
@@ -191,7 +191,7 @@ async function getRugPullList() {
             pageSize: pageSize.value,
         }
         const res = await _getDevList(data)
-        
+
         const { dev_address, total_migrated, total_non_migrated, total_tokens } = res
         if (pageNO.value === 1) {
             tableList.value = []
@@ -236,7 +236,7 @@ async function getRugPullList() {
 }
 
 async function _getBalance(dev_address: string) {
-    const chain = tokenStore.token?.chain as string 
+    const chain = tokenStore.token?.chain as string
     const _balance = await bot_getTokenBalance({
         chain,
         walletAddress: dev_address,

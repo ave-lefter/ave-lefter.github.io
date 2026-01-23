@@ -36,7 +36,7 @@ const $refs = ref({
 const { t } = useI18n()
 const {totalHolders, pairAddress, token, pair, commonHeight} = storeToRefs(useTokenStore())
 const tokenDetailSStore = useTokenDetailsStore()
-const botStore = useBotStore()
+// const botStore = useBotStore()
 const wsStore = useWSStore()
 const tagStore = useTagStore()
 const route = useRoute()
@@ -823,6 +823,19 @@ const collect = async (row: any,index:number) => {
     // loading.value = false
   })
 }
+
+onUnmounted(() => {
+  wsStore.send({
+    jsonrpc: '2.0',
+    params: ['liq', pairAddress.value],
+    id: 1,
+    method: 'unsubscribe'
+  })
+  tokenTxs.value = []
+  resetCache()
+})
+
+
 </script>
 
 <template>
