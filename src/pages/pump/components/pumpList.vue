@@ -74,7 +74,7 @@
                       :src="
                         getSymbolDefaultIcon(
                           row,
-                          pumpSetting.avatar_isCircle == 'rect' ? 'rect' : 'circle'
+                          pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect'
                         )
                       "
                       :style="{
@@ -84,13 +84,19 @@
                       <template #error>
                         <img
                           class="token-icon h-32px text-16px color-#fff"
-                          :src="getChainDefaultIcon(row.chain, row.symbol)"
+                          :style="{
+                            'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '0',
+                          }"
+                          :src="getChainDefaultIcon(row.chain, row.symbol, pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect')"
                         >
                       </template>
                       <template #placeholder>
                         <img
                           class="token-icon h-32px text-16px color-#fff"
-                          :src="getChainDefaultIcon(row.chain, row.symbol)"
+                          :style="{
+                            'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '0',
+                          }"
+                          :src="getChainDefaultIcon(row.chain, row.symbol, pumpSetting.avatar_isCircle == 'circle' ? 'circle' : 'rect')"
                         >
                       </template>
                     </el-image>
@@ -282,6 +288,15 @@
                       class="text-12px cursor-pointer color-[--third-text] ml-4px"
                       @click.stop.prevent
                     />
+                      <img
+                        v-if="row.baseToken"
+                        v-tooltip="`${row.baseToken?.symbol} ${$t('pair')}`"
+                        class="rounded-100% cursor-pointer ml-5px"
+                        :src="getSymbolDefaultIcon({ ...(row.baseToken || {}), chain: row.chain})"
+                        alt=""
+                        :width="12"
+                        style="border-radius: 100%"
+                      >
                     <div class="color-[--icon-color]" style="margin: 0 8px">|</div>
                     <div
                       v-if="
@@ -658,28 +673,47 @@
                   class="flex-end text-12px pr-12px"
                 >
                   <div class="mr-5px color-[--third-text] ml-5px" v-tooltip="$t('netInflow')">N</div>
-                  <div class="color-[---main-text]">
-                    <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[---main-text]">
+                  <div class="color-[--main-text]">
+                    <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[--main-text]">
                       {{ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, locale: 'en' }) }}
                     </ave-data-number>
                   </div>
-                  <template v-if="pumpSetting?.define?.some((i) => i === 'txs')">
-                    <div class="mr-5px color-[--third-text] ml-5px">Txs</div>
-                    <div class="color-[---main-text]">
-                      {{ formatNumber(row.tx_24h_count || 0, { decimals: 0, l: 4, locale: 'en' })}}
-                    </div>
-                  </template>
-
-                </div>
-                <div class="flex-end pr-12px mt-5px">
                   <div class="mr-5px color-[--third-text] ml-5px" v-tooltip="$t('liqTip')">Liq</div>
-                  <div class="color-[---main-text]">
+                  <div class="color-[--main-text] text-12px">
                     <template v-if="row.token === row.token0_address || row.target_token  === row.token0_address" >
-                      {{ formatNumber(row?.reserve1 || 0, { decimals: 0, l: 4, locale: 'en' }) }} {{ row.token1_symbol === 'WBNB' ? 'BNB' : row.token1_symbol }}
+                      {{ formatNumber(row?.reserve1 || 0, { decimals: 0, l: 4, locale: 'en' }) }}
+                      <span class="text-11px">{{ row.baseToken?.symbol }}</span>
                     </template>
                     <template v-else>
-                      {{ formatNumber(row?.reserve0 || 0, { decimals: 0, l: 4, locale: 'en' }) }} {{ row.token0_symbol === 'WBNB' ? 'BNB' : row.token0_symbol }}
+                      {{ formatNumber(row?.reserve0 || 0, { decimals: 0, l: 4, locale: 'en' }) }}
+                      <span class="text-11px">{{ row.baseToken?.symbol }}</span>
                     </template>
+                  </div>
+                  <div
+                    v-if="pumpSetting?.define?.some((i) => i === 'txs')"
+                    class="relative flex-end"
+                    v-tooltip="{
+                      content:
+                        `<div style='color:var(--secondary-text)'>${$t('Txs')} <span style='color:var(--main-text)'>${formatNumber(row?.tx_24h_count || 0, 0)}</span></div>
+                        <div style='color:var(--secondary-text)'>${$t('buy')} <span style='color:var(--up-color)'>${formatNumber(row?.buys_tx_24h_count || 0, 0)}</span></div>
+                        <div style='color:var(--secondary-text)'>${$t('sell')} <span style='color:var(--down-color)'>${formatNumber(row?.buys_tx_24h_count || 0, 0)}</span></div>
+                        `,
+                      props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
+                    }">
+                    <div class="mr-5px color-[--third-text] ml-5px">Txs</div>
+                    <div class="color-[--main-text]">
+                      {{ formatNumber(row.tx_24h_count || 0, { decimals: 0, l: 4, locale: 'en' })}}
+                    </div>
+                    <div class="absolute top-17px">
+                      <el-progress
+                        v-if="row.tx_24h_count > 0"
+                        class="clickable w-20px progress-bar"
+                        :percentage="((row.buys_tx_24h_count ||0) / row.tx_24h_count * 100)"
+                        :show-text="false"
+                        color="#12B886"
+                        :stroke-width="3"
+                      />
+                    </div>
                   </div>
                 </div>
                 <div class="btns-swap flex-end mt-15px pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }">
@@ -1099,7 +1133,7 @@ const getAnimClass = (itemData: any) => {
       min-width: 200px;
       position: absolute;
       right: 0;
-      bottom: -11px;
+      bottom: 0px;
       padding-left: 12px;
       padding-bottom: 5px;
       border: 1px solid;
@@ -1340,5 +1374,10 @@ const getAnimClass = (itemData: any) => {
 
 .scroller-container::-webkit-scrollbar-track {
   background-color: transparent;
+}
+.progress-bar {
+  :deep() .el-progress-bar__outer {
+    --el-border-color-lighter: var(--down-color);
+  }
 }
 </style>
