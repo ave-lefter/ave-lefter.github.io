@@ -1636,7 +1636,7 @@
   "lowStrategy": "低频稳健策略",
   "lowStrategyTip": "以低频交易锁定中长期趋势。节奏慢、容错高，更强调稳定回报与风控。适合偏好稳健、抗波动能力较低的用户。",
   "fixedAmount": "固定金额",
-  "fixedAmountTip":"每次跟单按设定的固定金额买入，与目标地址实际买入金额无关。<br/>示例：设置 5 SOL，目标地址买入 2 / 20 SOL，您均买入 5 SOL。",
+  "fixedAmountTip": "每次跟单按设定的固定金额买入，与目标地址实际买入金额无关。<br/>示例：设置 5 SOL，目标地址买入 2 / 20 SOL，您均买入 5 SOL。",
   "maxCopyTrade": "最大跟买",
   "maxCopyTradeTip": "系统会先按你设置的比例，算出「本来要跟买多少」，如果这个金额超过了你设定的最大买入金额，就只买到最大值为止，避免一次买太多。<br/>示例：目标地址买了 20 SOL，你设置跟单比例 50%，按比例本来要买 10 SOL；但你最多只想单次买 5 SOL，所以这次实际只会买 5 SOL。",
   "buyRatio": "等比例买入",
@@ -1695,8 +1695,8 @@
   "pnlCalendar": "盈亏日历",
   "currentStreak": "当前连胜",
   "maxStreak": "最高连胜",
-  "preferedTips":"该指标展示了您常购买代币的市值分布及对应的购买频次，帮助您了解自身的交易偏好。",
-  "tokenAddress":"代币地址",
+  "preferedTips": "该指标展示了您常购买代币的市值分布及对应的购买频次，帮助您了解自身的交易偏好。",
+  "tokenAddress": "代币地址",
   "takeProfitAndStopLoss1": "翻倍全出",
   "takeProfitAndStopLoss2": "翻倍出本&跌半止损",
   "takeProfitAndStopLoss0": "自定义止盈止损",
@@ -1955,5 +1955,8 @@
   "historyHighestMarketCap": "历史最高市值",
   "latestToken": "最新代币",
   "ago": "以前",
-  "similarTokens": "同名代币"
+  "similarTokens": "同名代币",
+  "devMigrated": "Dev已迁移",
+  "devLaunched": "Dev发币总数",
+  "migratedRatio": "迁移比例"
 }

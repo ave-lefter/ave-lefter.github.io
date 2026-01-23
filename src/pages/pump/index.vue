@@ -1444,6 +1444,15 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'buys_tx_24h_count')) {
       next.buys_tx_24h_count = obj.buys_tx_24h_count
     }
+    if (hasValue(obj, 'migrated_count')) {
+      next.migrated_count = obj.migrated_count
+    }
+    if (hasValue(obj, 'total_count')) {
+      next.total_count = obj.total_count
+    }
+    if (hasValue(obj, 'migrated_ratio')) {
+      next.migrated_ratio = obj.migrated_ratio
+    }
     return next
   })
 }
@@ -1507,10 +1516,19 @@ function mergeStatistics(prev: any, next: any) {
     result.net_flow_vol = next.net_flow_vol
   }
   if (hasValue(next, 'sells_tx_24h_count')) {
-  result.sells_tx_24h_count = next.sells_tx_24h_count
+    result.sells_tx_24h_count = next.sells_tx_24h_count
   }
   if (hasValue(next, 'buys_tx_24h_count')) {
-  result.buys_tx_24h_count = next.buys_tx_24h_count
+    result.buys_tx_24h_count = next.buys_tx_24h_count
+  }
+  if (hasValue(next, 'migrated_count')) {
+    result.migrated_count = next.migrated_count
+  }
+  if (hasValue(next, 'total_count')) {
+    result.total_count = next.total_count
+  }
+  if (hasValue(next, 'migrated_ratio')) {
+    result.migrated_ratio = next.migrated_ratio
   }
   return result
 }

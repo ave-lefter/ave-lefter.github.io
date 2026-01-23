@@ -16,6 +16,9 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  migrated_ratio: number
+  total_count: number
+  migrated_count: number
   id: string
   pair: string
   chain: string
