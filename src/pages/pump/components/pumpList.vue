@@ -80,7 +80,7 @@
                   </div>
                   <div class="token-logo">
                     <el-image
-                      class="token-icon"
+                      class="token-icon rd-4px!"
                       :class="{ small: pumpSetting.Progress_isCircle == 'horizontal' }"
                       fit="cover"
                       :src="
