@@ -525,8 +525,8 @@
                       class="flex mr-8px bg-btn"
                     >
                       <Icon
-                        class="iconfont icon-laoshucang text-12px mr-4px"
-                        name="custom:insiders"
+                        class="iconfont icon-laoshucang text-10px mr-4px"
+                        name="custom:insider1"
                         :style="{
                           color: Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
                         }"
@@ -553,7 +553,7 @@
                         color: Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
                       }"
                     >
-                      <Icon class="iconfont icon-gun text-12px mr-4px" name="custom:gun" />
+                      <Icon class="iconfont icon-gun text-10px mr-4px" name="custom:gun1" />
                       <span>{{
                         formatNumber(
                           Number(row?.sniper_balance_ratio_cur) > 0.001 ? row?.sniper_balance_ratio_cur || 0 : 0,
