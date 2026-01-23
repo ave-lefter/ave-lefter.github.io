@@ -110,7 +110,7 @@
           @click="globalStore.audioSettings.active = 'audio'"
         />
       </div>
-      <el-input
+      <!-- <el-input
       v-model="query.token_keyword"
         style="--el-input-bg-color:var(--main-list-hover);--el-input-height:26px;"
         class="w-160px"
@@ -122,7 +122,7 @@
         <template #prefix>
           <Icon name="custom:search" />
         </template>
-      </el-input>
+      </el-input> -->
     </div>
     <TwitterTrackerList :isMine="isMine" @endReached="getList" @startAttention="emits('setDrawerVisible', true)" />
     <audio

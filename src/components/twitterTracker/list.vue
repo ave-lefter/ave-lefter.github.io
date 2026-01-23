@@ -6,7 +6,7 @@
       class="text-12px w-266px h-40px"
       @click="botStore.changeConnectVisible(true)"
     >
-      {{ walletStore.address ? t('connectBotWallet') : t('connectWallet') }}
+      {{ t('connectBotWallet') }}
     </el-button>
   </AveEmpty>
   <div v-else-if="props.isMine && isEmpty" class="flex flex-col items-center pt-60px">
