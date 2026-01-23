@@ -1045,6 +1045,20 @@ export function getMedias(appendix: string | undefined) {
         url: formatUrl(obj.tiktok),
       })
     }
+    if (obj?.weibo) {
+      arr.push({
+        name: 'Weibo',
+        icon: 'weibo',
+        url: formatUrl(obj.weibo),
+      })
+    }
+    if (obj?.github) {
+      arr.push({
+        name: 'Github',
+        icon: 'github',
+        url: formatUrl(obj.github),
+      })
+    }
     return arr
   }
   return []
