@@ -1863,7 +1863,7 @@
   "retweet":"转发",
   "quote":"引用",
   "reply":"回复",
- "deleteAll":"确认移除",
+ "deleteAll":"删除全部",
  "deleteAllTitle":"确认移除全部关注？",
  "deleteAllTips":"将移除当前列表中的所有账号，此操作不可撤销。"
 }

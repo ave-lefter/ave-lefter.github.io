@@ -16,7 +16,7 @@
             <Icon class="text-16px" name="custom:search" />
           </template>
         </el-input>
-        <el-button v-if="activeTab === 2" @click="deleteAll">
+        <el-button v-if="activeTab === 2" :disabled="list.length === 0" @click="deleteAll">
           <div class="flex items-center gap-4px">
             <Icon name="custom:delete-all" /> {{ t('deleteAll') }}
           </div>
