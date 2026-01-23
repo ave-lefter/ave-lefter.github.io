@@ -176,7 +176,7 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
   unmounted(el, binding) {
     // 卸载时确保隐藏当前实例
     const tooltip = resolveTooltip(el, binding.arg)
-    if (tooltip && el.visible) {
+    if (tooltip) {
       tooltip.hide()
     }
 
