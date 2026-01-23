@@ -44,9 +44,7 @@
                             : 'custom:twitter-uncollect'
                             " class="text-12px" />
                     </div>
-                    <div class="w-24px h-24px bg-[--main-list-hover] rounded-4px flex items-center justify-center">
-                        <Icon :name="`custom:twitter-${item.type}`" class="text-12px" />
-                    </div>
+                    <Icon :name="`custom:twitter-${item.type}`" class="text-24px" />
                 </div>
             </div>
             <div class="relative" :class="index !== -1 ? 'pl-40px' : ''">
