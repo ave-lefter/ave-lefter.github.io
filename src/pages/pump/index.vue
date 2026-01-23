@@ -1430,6 +1430,14 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'total') && hasValue(obj, 'uprice')) {
       next.market_cap = Number(obj.total) * obj.uprice
     }
+    if (next.state == 'new') {
+      if (next.amm === 'fourmemev2') {
+        next.market_cap = next.market_cap || 1000000000 * obj?.uprice
+      }
+      if (next.amm === 'flapswap') {
+        next.market_cap =  next.market_cap || 1000000000 * obj?.uprice || 49000
+      }
+    }
     if (hasValue(obj, 'sells_tx_24h_count')) {
       next.sells_tx_24h_count = obj.sells_tx_24h_count
     }
