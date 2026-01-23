@@ -349,15 +349,11 @@ const activeTab = shallowRef('new')
 const route = useRoute()
 const { t } = useI18n()
 const wsv2Store = useV2WSStore()
-const isInitObj = ref<{
-  new: boolean,
-  soon: boolean,
-  graduated: boolean
-}>({
+let isInitObj = {
   new: true,
   soon: true,
   graduated: true
-})
+}
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const activeChain = useStorage<ChainKey>(
   'pump_activeChain',
@@ -406,9 +402,10 @@ const isPausedObj = ref({
   graduated: false,
 })
 
-const wsTableListCache = ref<PumpObj[]>([])
-const wsTableList = ref<PumpObj[]>([])
-const logoList = ref<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
+// let wsTableListCache: PumpObj[] = []
+let wsTableListCache: Record<string, PumpObj[]> = {}
+const wsTableList = shallowRef<PumpObj[]>([])
+const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
 type StatisticsItem = {
   buyers_24h: any
   sellers_24h: any
@@ -435,7 +432,7 @@ type StatisticsItem = {
   buys_tx_24h_count:number
 
 }
-const statisticsList = ref<StatisticsItem[]>([])
+const statisticsList = shallowRef<StatisticsItem[]>([])
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
 const platformsList = computed(() => {
@@ -684,7 +681,7 @@ watch(()=> pumpV3.value[activeChain.value].platforms, () => {
 })
 watch(activeChain, () => {
   getPumpList()
-  wsTableListCache.value = []
+  wsTableListCache = {}
   wsTableList.value = []
   wsv2Store.send({
     jsonrpc: '2.0',
@@ -700,10 +697,10 @@ watch(activeChain, () => {
       id: 1,
     })
   }, 500)
-    isInitObj.value = {
-        new: true,
-        soon: true,
-        graduated: true
+    isInitObj = {
+      new: true,
+      soon: true,
+      graduated: true
     }
     wsv2Store.send({
       jsonrpc: '2.0',
@@ -719,7 +716,7 @@ const flushPumpState = useThrottleFn(() => {
   wsUpdateTableList(pumpStateBuffer)
   subscribePortrait(pumpStateBuffer)
   pumpStateBuffer.length = 0
-}, 100)
+}, 150)
 
 watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
   if (Array.isArray(val)) {
@@ -764,7 +761,7 @@ const flushStatistics = useThrottleFn(() => {
   })
   statisticsList.value = Array.from(map.values()).slice(0, 300)
   buffer.length = 0
-}, 100)
+}, 150)
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
   (val) => {
@@ -791,7 +788,7 @@ const getChangedValue = (A: string[], B: string[]): string | null => {
 }
 
 onActivated(() => {
-  wsTableListCache.value = []
+  wsTableListCache = {}
   wsTableList.value = []
   document.addEventListener('mousemove', mouseInsideTxs)
   getPumpConfig()
@@ -811,7 +808,7 @@ onActivated(() => {
     })
   }, 500)
 
-  isInitObj.value = {
+  isInitObj = {
     new: true,
     soon: true,
     graduated: true
@@ -918,11 +915,11 @@ function getMouseInsideElement(event:any, element:any) {
 function wsUpdateTableList(wsList: WSPumpObj[]) {
   const c = ['new', 'soon', 'graduated'] as const
   if (!wsList?.length) return
-  const rTime = Date.now()
+  // const rTime = Date.now()
   const list = wsList?.map?.(i => ({
     ...i,
     ...(i.pair),
-    rTime: rTime,
+    // rTime: rTime,
     id: `${i.pair.target_token}-${i.chain}`,
     pair_id: `${i.pair.pair}-${i.chain}`,
     token: i.pair.target_token,
@@ -940,8 +937,10 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
       : i?.pair.token1_logo_url,
 
   }))
-  const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
-  wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,300)
+  const currentChain = activeChain.value
+  if (!wsTableListCache[currentChain]) wsTableListCache[currentChain] = []
+  const wsTableList1 = wsTableListCache[currentChain]?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
+  wsTableListCache[currentChain] = [...(list?.filter(i => i.chain === currentChain) || []), ...(wsTableList1 || [])]?.slice(0, 50)
   // let wsTime = this.wsTableListCache?.time || 0
   // if (wsTime < Date.now() - 15000) {
   //   this.wsTableListCache = {
@@ -953,8 +952,8 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
   //   this.wsTableListCache.list = [...list, ...(wsTableList || [])]
   // }
 
-  let list1 = wsTableListCache?.value?.filter(i => i.chain === activeChain.value)
-  const list2 = wsTableList?.value.filter(i => i.chain === activeChain.value)
+  let list1 = wsTableListCache[currentChain]
+  const list2 = wsTableList?.value.filter(i => i.chain === currentChain)
   if (isPausedObj?.value?.new) {
     list1 = [...(list1?.filter?.(i => i.state !== 'new') || []), ...(list2?.filter?.(i => i.state === 'new') || [])]
   }
@@ -1184,16 +1183,14 @@ async function getPump(rawParams: {
     fourmemeListObj[currentChain][category] = formattedList.slice(0, 100)
 
     const newPairSet = new Set(formattedList.map(i => i.pair))
-    wsTableListCache.value = wsTableListCache.value
-      .filter(i => !newPairSet.has(i.pair))
-      .slice(0, 100)
+    wsTableListCache[currentChain] = (wsTableListCache[currentChain] || []).filter(i => !newPairSet.has(i.pair)).slice(0, 50)
 
-    if(isInitObj.value[finalParams.category as keyof typeof isInitObj.value]) {
+    if(isInitObj[finalParams.category as keyof typeof isInitObj]) {
       if (formattedList?.length > 0) {
           subscribePortrait(formattedList?.slice?.(0, 100))
           startPortraitTimer()
       } else {
-        isInitObj.value[finalParams.category as keyof typeof isInitObj.value] = false
+        isInitObj[finalParams.category as keyof typeof isInitObj] = false
       }
     }
 
@@ -1338,7 +1335,7 @@ watch(documentVisible, (val) => {
 // watch(documentVisible, (val) => {
 //   if (route.name !== 'pump') return
 //   if (val) {
-//     wsTableListCache.value = []
+//     wsTableListCache = []
 //     wsTableList.value = []
 //     isInitObj.value = {
 //       new: true,
