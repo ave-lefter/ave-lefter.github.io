@@ -16,6 +16,10 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  age_seconds: any
+  first_transfer_in_from: any
+  smart_wallet_ratio: number
+  kol_ratio: number
   max_dev_ratio: number
   migrated_ratio: number
   total_count: number

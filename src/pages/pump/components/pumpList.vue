@@ -386,9 +386,10 @@
                         class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--secondary-text]"
                         name="custom:holders"
                       />
-                      <span class="color-[---main-text]" :style="{ color: getDataColor('holders',row.holders) }">{{
-                        formatNumber(row?.holders || 0, 2)
-                      }}</span>
+                      <span v-if="Number(row?.holders) === 0 || row?.holders == null" class="color-[--secondary-text]" >0</span>
+                      <span v-else class="color-[--main-text]" :style="{ color: getDataColor('holders',row.holders) }">
+                        {{ formatNumber(row?.holders || 0, 2) }}
+                      </span>
                     </div>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'markers')"
@@ -404,23 +405,24 @@
                         class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--secondary-text] hover:color-#3F80F7"
                         name="custom:wallets"
                       />
-                      <span class="color-[---main-text]">{{
+                      <span v-if="Number(row?.makers_24h) === 0 || row?.makers_24h == null" class="color-[--secondary-text]" >0</span>
+                      <span v-else class="color-[---main-text]">{{
                         formatNumber(row?.makers_24h || 0, 2)
                       }}</span>
                     </div>
 
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'kol')"
-                      v-tooltip="`KOL`"
+                      v-tooltip="`${$t('KOLRatio')} ${formatNumber(row?.kol_ratio || 0, 2)}%`"
                       class="flex mr-8px items-center"
                     >
                       <Icon
                         class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--secondary-text]"
                         name="custom:kol2"
                       />
-                      <span class="color-[---main-text]">{{
-                        formatNumber(row?.kol_tag_count || 0, 2)
-                      }}</span>
+                      <span v-if="Number(row?.kol_tag_count) === 0 || row?.kol_tag_count == null" class="color-[--secondary-text]" >0</span>
+                      <span v-else class="color-[---main-text]">
+                        {{ formatNumber(row?.kol_tag_count || 0, 2) }}</span>
                     </div>
 
                     <div
@@ -438,21 +440,23 @@
                         class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--yellow]"
                         name="custom:top2"
                       />
-                      <span class="color-[---main-text]">{{
+                      <span v-if="Number(row?.migrated_count) === 0 || row?.migrated_count == null" class="color-[--secondary-text]" >0</span>
+                      <span v-else class="color-[---main-text]">{{
                         formatNumber(row?.migrated_count || 0, 2)}}/{{formatNumber(row?.total_count || 0, 2)}}
                       </span>
                     </div>
 
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'smart')"
-                      v-tooltip="$t('smarter')"
+                      v-tooltip="`${$t('smarterRatio')} ${formatNumber(row?.smart_wallet_ratio || 0, 2)}%`"
                       class="flex mr-5px items-center color-[--secondary-text]"
                     >
                       <Icon
-                        class="iconfont icon-rug mr-2px text-10px vertical-middle "
+                        class="iconfont icon-rug mr-4px text-10px vertical-middle "
                         name="custom:smart-plain"
                       />
-                      <span>{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
+                      <span v-if="Number(row?.smart_wallet_tag_count) === 0 || row?.smart_wallet_tag_count == null" class="color-[--secondary-text]" >0</span>
+                      <span v-else>{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
                     </div>
                     <!-- <div
                   v-show="pumpSetting?.define?.some(i=> i=== 'migraged')"
@@ -533,6 +537,7 @@
                           }}%
                         </span>
                       </template>
+                      <span v-if="row?.age_seconds" class="ml-4px">{{ formatSeconds(Number(row?.age_seconds || 0)) }}</span>
                      </DevPop>
                     <!-- </div> -->
                     <div
@@ -691,7 +696,8 @@
                   <template v-else>
                     <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
                       <div class="mr-5px color-[--secondary-text]" :style="{ 'font-size': pumpSetting.fontSize_mc }">V</div>
-                      <div class="color-[---main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h),'font-size': pumpSetting.fontSize_mc  }">
+                      <span v-if="Number(row?.volume_u_24h) === 0 || row?.volume_u_24h == null" class="color-[--secondary-text]" >0</span>
+                      <div v-else class="color-[---main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h),'font-size': pumpSetting.fontSize_mc  }">
                         ${{ pumpSetting.isInt ? formatNumber(row.volume_u_24h || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' }) : formatNumber(row.volume_u_24h || 0, {decimals: 2, locale: 'en' }) }}
                       </div>
                     </template>
@@ -702,7 +708,9 @@
                       >
                         MC
                       </div>
+                      <span v-if="Number(row?.market_cap) === 0 || row?.market_cap == null" class="color-[--secondary-text]" >0</span>
                       <span
+                        v-else
                         :style="{ 'font-size': pumpSetting.fontSize_mc, color: getDataColor('mc',row.market_cap) }"
                         >${{ pumpSetting.isInt ? formatNumber(row.market_cap || 0, { decimals: 0, l: 4, limit: 3,  locale: 'en' }) : formatNumber(row.market_cap || 0, {decimals: 2, locale: 'en' }) }}</span
                       >
@@ -713,8 +721,9 @@
                   v-if="pumpSetting?.define?.some((i) => i === 'txs')"
                   class="flex-end text-12px pr-12px"
                 >
-                  <div v-tooltip="$t('netInflow')" class="mr-5px color-[--secondary-text] ml-5px">N</div>
-                  <div class="color-[--main-text]">
+                  <div class="mr-5px color-[--secondary-text] ml-5px" v-tooltip="$t('netInflow')">N</div>
+                  <span v-if="Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null" class="color-[--secondary-text]" >0</span>
+                  <div v-else class="color-[--main-text]">
                     <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[--main-text]">
                       {{ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, limit: 3, locale: 'en' }) }}
                     </ave-data-number>
@@ -731,12 +740,13 @@
                     }"
                     class="relative flex-end">
                     <div class="mr-5px color-[--secondary-text] ml-5px">Txs</div>
-                    <div class="color-[--main-text]">
+                    <span v-if="Number(row?.tx_24h_count) === 0 || row?.tx_24h_count == null" class="color-[--secondary-text]" >0</span>
+                    <div v-else class="color-[--main-text]">
                       {{ formatNumber(row.tx_24h_count || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' })}}
                     </div>
                     <el-progress
-                      class="clickable w-20px ml-4px progress-bar"
-                      :class="row.tx_24h_count == 0 || (row.buys_tx_24h_count == 0 && row.sells_tx_24h_count == 0)? 'disabled' : ''"
+                      class="clickable w-20px ml-4px"
+                      :class="row.tx_24h_count > 0 || (Number(row.buys_tx_24h_count) + Number(row.sells_tx_24h_count) > 0)? 'progress-bar' : 'progress-bar-disabled'"
                       :percentage="Number((row.buys_tx_24h_count ||0) / row.tx_24h_count * 100) || 0"
                       :show-text="false"
                       color="#12B886"
@@ -1415,10 +1425,10 @@ function getLiqTooltip(row: PumpObj) {
   :deep() .el-progress-bar__outer {
     --el-border-color-lighter: var(--down-color);
   }
-  &.disabled{
-    :deep() .el-progress-bar__outer {
-      --el-border-color-lighter: rgba(63, 128, 247, 0.2);
-    }
+}
+.progress-bar-disabled{
+  :deep() .el-progress-bar__outer {
+    --el-border-color-lighter: var(--secondary-text);
   }
 }
 </style>
