@@ -1384,7 +1384,7 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     const next = { ...i }
 
     if (hasValue(obj, 'progress')) {
-      next.progress = Math.max(Number(obj.progress), 100)
+      next.progress = Math.min(Number(obj.progress), 100)
     }
     if (hasValue(obj, 'holder_count')) {
       next.holders = obj.holder_count
@@ -1401,8 +1401,8 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'top10_ratio')) {
       next.holders_top10_ratio = Number(obj.top10_ratio)
     }
-    if (hasValue(obj, 'tx_amount_24h')) {
-      next.volume_u_24h = Number(obj.tx_amount_24h) * obj.uprice
+    if (hasValue(obj, 'volume_u_24h')) {
+      next.volume_u_24h = Number(obj.volume_u_24h) * obj.uprice
     }
     if (hasValue(obj, 'tx_count_24h')) {
       next.tx_24h_count = Number(obj.tx_count_24h)
@@ -1509,8 +1509,8 @@ function mergeStatistics(prev: any, next: any) {
   if (hasValue(next, 'uprice')) {
     result.uprice = next.uprice
   }
-  if (hasValue(next, 'tx_amount_24h')) {
-    result.tx_amount_24h = next.tx_amount_24h
+  if (hasValue(next, 'volume_u_24h')) {
+    result.volume_u_24h = next.volume_u_24h
   }
   if (hasValue(next, 'tx_count_24h')) {
     result.tx_count_24h = next.tx_count_24h
