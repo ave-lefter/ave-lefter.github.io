@@ -761,7 +761,7 @@ async function submitBotSwap() {
     // botPriorityFee = botPriorityFee.lt(min) ? min : botPriorityFee.toFixed(0)
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
-    // const slippage = botSettingStore.botSettings?.[chain]?.[botSettingStore.botSettings?.[chain]?.selected]?.slippage || 9
+    const slippage = botSettings?.slippage || 9
     const batchId = Date.now().toString()
     const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
       const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address

@@ -708,7 +708,7 @@ export function bot_createSwapEvmTx(params: {
   //   params.autoSell = false
   //   params.autoSellConfig = []
   // }
-  return $api('/botapi/swap/createSwapEvmTx', {
+  return $api('/botapi/swap/createSwapEvmTxV2', {
     method: 'post',
     body: {
       // batchId: Date.now().toString(),
