@@ -12,7 +12,7 @@ export const useTwitterTrackerStore = defineStore('tracker', () => {
     const {width: winWidth, height: winHeight} = useWindowSize()
     const isLeftFixed = useStorage('isTrackerLeft', false)
     const isRightFixed = useStorage('isTrackerRight', false)
-    const fixedWidth = useStorage('trackerFixedWidth', 360)
+    const fixedWidth = useStorage('trackerFixedWidth', 438)
     const translateStyle = shallowRef(0)
     const query = useStorage('twitterQuery',{
       types:[],
