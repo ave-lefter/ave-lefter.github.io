@@ -499,11 +499,11 @@
                         }}%</span
                       >
                     </div>
-                    <div
+                    <!-- <div
                       v-show="pumpSetting?.define?.some((i) => i === 'dev')"
                       class="flex mr-8px bg-btn"
-                    >
-                    <DevPop :tokenId="(row?.token || row?.target_token) + '-' + row?.chain">
+                    > -->
+                    <DevPop v-show="pumpSetting?.define?.some((i) => i === 'dev')" class="flex mr-8px bg-btn" :tokenId="(row?.token || row?.target_token) + '-' + row?.chain">
                       <template v-if="row?.max_dev_ratio !==null && row?.max_dev_ratio !== undefined && Number(row?.max_dev_ratio)!== 0 && Number(row?.dev_balance_ratio_cur)== 0">
                         <Icon
                           class="iconfont icon-TOP text-10px mr-4px color-[--x-blue]"
@@ -534,7 +534,7 @@
                         </span>
                       </template>
                      </DevPop>
-                    </div>
+                    <!-- </div> -->
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'insider')"
                       v-tooltip="$t('insider_balance_ratio_cur_tips')"
