@@ -177,13 +177,13 @@ onUnmounted(() => {
         <div v-if="item.component == 'Orders'" class="w-1px h-20px bg-[var(--custom-br-1-color)] mr-20px mb-8px"/>
         <div
           :class="`b-b-solid b-b-2px pb-8px flex-start ${activeTab === item.component ? ' b-b-[--main-text]' : 'b-b-transparent'}`">
-          <strong>{{ item.name }}</strong>
+          <strong v-if="item.component !== 'DevTokens' || tokenStore.devTokenNum">{{ item.name }}</strong>
           <span v-if="item.component === 'Orders'">({{ tokenStore.registrationNum }})</span>
           <span v-if="item.component === 'LP'" class="flex-start">
             ({{ pairHolders }})
              <Icon v-if="pairHolders" color="#B3920E" name="material-symbols:lock" />
           </span>
-          <span v-if="item.component === 'DevTokens'">({{ tokenStore.devTokenNum }})</span>
+          <span v-if="item.component === 'DevTokens' && tokenStore.devTokenNum">({{ tokenStore.devTokenNum }})</span>
           <span v-if="item.component == 'Holders' && holders">
             ({{ token?.holders ? formatNumber(token?.holders || 0, {limit: 10}) : '' }})
               <template v-if="isInsiderOrSniperSupported && (tokenInfoExtra?.insiders_balance_ratio_cur??0) > 0.01">
@@ -204,7 +204,7 @@ onUnmounted(() => {
       <Bubble />
     </div>
     <OrdersTab v-show="activeTab === 'Orders'" :currentActiveTab="activeTab"/>
-    <DevTokens v-show="activeTab === 'DevTokens'" :currentActiveTab="activeTab" />
+    <DevTokens v-show="activeTab === 'DevTokens'"/>
     <KeepAlive v-if="activeTab !== 'Orders' && activeTab !== 'DevTokens' && route.name === 'token-id'">
       <component :is="Component" v-bind="comProps" :currentActiveTab="activeTab" />
     </KeepAlive>

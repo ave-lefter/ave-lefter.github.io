@@ -13,6 +13,7 @@ export function botOnRequest({ options, request }: MyFetchContext){
   if (ave_token) {
     options.headers.set('X-Auth', ave_token)
   }
+  options.headers.set('lang-zone', localStorage.getItem('language') || 'en')
   if (url?.includes('refreshNewToken') && botStore.refreshToken) {
     options.headers.set('Authorization', `Bearer ${botStore.refreshToken}`)
   } else if (!url?.includes('login') && botStore.accessToken) {

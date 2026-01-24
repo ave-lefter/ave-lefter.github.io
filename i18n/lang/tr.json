@@ -554,13 +554,13 @@
   "searchSameAmm": "Benzer havuzları görüntüle",
   "pumpCompleted": "Pompa Tamamlandı",
   "innerDiskTime": "İç Disk Zamanı",
-  "takeProfitAndStopLoss1": "İkiye katla",
-  "takeProfitAndStopLoss2": "Sermayeyi ikiye katlamak mı&Zararı yarı yarıya durdurun",
-  "takeProfitAndStopLoss0": "Özelleştirilmiş kar alma ve zararı durdurma",
-  "takeProfitAndStopLoss3": "Hepsini ikiye katlamak mı&Yarım durdurma kaybı",
-  "takeProfitAndStopLoss4": "Sermayeyi ikiye katlamak mı&Tüm tutarı üçe katlamak mı&Kaybı yarı yarıya durdurun",
-  "takeProfitAndStopLoss6": "Yüzde 40 kar mı alıyor&Hareketli kar alma ve zararı durdurma gerilemesi %60",
-  "takeProfitAndStopLoss5": "10 kere kar alır mısın&Hareketli kar alma ve zararı durdurma gerilemesi %40",
+  "takeProfitAndStopLoss1": "All-Out on Double",
+  "takeProfitAndStopLoss2": "Break-Even on Double + 50% SL",
+  "takeProfitAndStopLoss0": "Custom TP/SL",
+  "takeProfitAndStopLoss3": "All-Out on Double + 50% SL",
+  "takeProfitAndStopLoss4": "Break-Even on Double + All-Out on Triple + 50% SL",
+  "takeProfitAndStopLoss6": "All-Out on 40% TP + Trailing TP/SL (60% Drawdown)",
+  "takeProfitAndStopLoss5": "All-Out on Tenfold + Trailing TP/SL (40% Drawdown)",
   "defaultPolicy": "Varsayılan politika",
   "takeProfitAndStopLossTips1": "Double out, pozisyon karı %100'e ulaştığında sistemin tüm pozisyonları otomatik olarak kapatması anlamına gelir.",
   "takeProfitAndStopLossTips2": "Sermayeyi ikiye katlamak, kâr %100'e ulaştığında pozisyonu kapatmak ve sermayenin %50'sini ödemek anlamına gelir; Kaybı yarıda durdurma, kayıp %50'ye ulaştığında tüm pozisyonun otomatik olarak kapatılması anlamına gelir.",
@@ -595,5 +595,6 @@
   "noOpen": "Açık Değil",
   "noticeDuration": "Bildirim görüntüleme süresi",
   "monitorThTip": "En az bir cüzdan avatarı ve cüzdan adresi seçin",
-  "wcWalletTip": "Bu QR Kodunu telefonunuzla tarayın"
+  "wcWalletTip": "Bu QR Kodunu telefonunuzla tarayın",
+  "monitorBotError": "İzleme robotu adresi desteklenmiyor"
 }

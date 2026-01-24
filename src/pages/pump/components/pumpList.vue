@@ -119,24 +119,12 @@
                       :progress="row.progress"
                     />
                     <a
-                      v-tooltip="{
-                         content: {
-                            is: ImageLarge,
-                            props: {
-                              row: row,
-                            }
-                          },
-                          props: {
-                            placement: 'bottom-start',
-                            'popper-class': 'tooltip-pd-0',
-                            'show-arrow': false
-                          }
-                      }"
                       :href="`https://lens.google.com/uploadbyurl?url=${encodeURIComponent(
                         getSymbolDefaultIcon(row)
                       )}`"
                       target="_blank"
                       class="token-mark clickable"
+                      @mouseover.stop="onEnter($event,row,props.type)"
                       @click.stop
                     >
                       <Icon class="text-16px text-#fff" name="custom:search" />
@@ -368,9 +356,9 @@
                     <PumpLive v-if="row?.is_streaming" :tokenId="(row.token + '-' + row.chain) as string" />
 
                     <a
+                      :ref="(el: any) => $refs.currentBtnRef[$index] = el"
                       class="media-item h-12px block leading-12px"
                       target="_blank"
-                      :ref="(el: any) => $refs.currentBtnRef[$index] = el"
                       @mouseenter="showPopoverSearch(row, $index)"
                       @mouseleave="showPopSearch = false"
                       @click.stop.prevent
@@ -721,7 +709,7 @@
                   v-if="pumpSetting?.define?.some((i) => i === 'txs')"
                   class="flex-end text-12px pr-12px"
                 >
-                  <div class="mr-5px color-[--secondary-text] ml-5px" v-tooltip="$t('netInflow')">N</div>
+                  <div v-tooltip="$t('netInflow')" class="mr-5px color-[--secondary-text] ml-5px">N</div>
                   <span v-if="Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null" class="color-[--secondary-text]" >0</span>
                   <div v-else class="color-[--main-text]">
                     <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[--main-text]">
@@ -842,9 +830,9 @@ import { Icon } from '#components'
 import type { PumpObj } from '@/api/types/pump'
 import XIcon from '~/components/xPopup/xIcon.vue'
 import { useVirtualList } from '@vueuse/core'
-import ImageLarge from './imageLarge.vue'
 import ProgressPop from './progressPop.vue'
 import DevPop from './devPop/index.vue'
+import { useSimilarTokenPopup } from './utils'
 
 const props = defineProps({
   tableList: {
@@ -898,6 +886,7 @@ const currentRow = ref<PumpObj | null>(null)
 const showPopSearch= shallowRef(false)
 
 const $tooltip = $createTooltip('bubble--tooltip')
+const onEnter = useSimilarTokenPopup()
 
 
 const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableList, {
