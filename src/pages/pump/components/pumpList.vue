@@ -832,7 +832,7 @@ import XIcon from '~/components/xPopup/xIcon.vue'
 import { useVirtualList } from '@vueuse/core'
 import ProgressPop from './progressPop.vue'
 import DevPop from './devPop/index.vue'
-import { useSimilarTokenPopup } from './utils'
+import { useSimilarTokenPopup } from '../utils'
 
 const props = defineProps({
   tableList: {
