@@ -93,10 +93,10 @@
           :class="trackerStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
           @click="trackerStore.visible = !trackerStore.visible"
         >
-          <div class="flex items-center justify-center w-14px h-14px bg-[--main-bg] rounded-full">
-            <Icon name="custom:twitter" />
+          <div class="flex items-center justify-center text-14px">
+            <Icon name="custom:twitter2" />
           </div>
-          Tracker
+          {{ t('twitterTracker') }}
         </div>
       </el-badge>
     </div>
@@ -115,12 +115,12 @@
       </li>
       <li>
         <a target="_blank" href="https://gopluslabs.io">
-          <img src="@/assets/images/goPlus-logo.png" alt="" height="25" lazy />
+          <img src="@/assets/images/goPlus-logo.png" alt="" height="25" lazy>
         </a>
       </li>
       <li>
         <a target="_blank" class="flex-center" href="https://www.btok.com">
-          <img src="@/assets/images/btok-logo.png" alt="" height="16" lazy />
+          <img src="@/assets/images/btok-logo.png" alt="" height="16" lazy>
         </a>
       </li>
       <li class="color-[--secondary-text] hover:color-[--main-text] flex items-center gap-2px">
