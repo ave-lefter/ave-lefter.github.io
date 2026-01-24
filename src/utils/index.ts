@@ -538,7 +538,11 @@ export function deepMerge(target: any, source: any) {
     return source
   }
 }
-
+export function formatIconPumpDev(src?: string) {
+  return src && src !== 'unknown'
+    ? `${useConfigStore().token_logo_url}cex/${src}.png`
+    : IconUnknown
+}
 export function formatIconSwap(src?: string) {
   return src && src !== 'unknown'
     ? `${useConfigStore().token_logo_url}swap/${src}.jpeg`

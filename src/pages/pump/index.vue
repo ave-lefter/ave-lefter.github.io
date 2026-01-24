@@ -404,6 +404,7 @@ let wsTableListCache: Record<string, PumpObj[]> = {}
 const wsTableList = shallowRef<PumpObj[]>([])
 const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
 type StatisticsItem = {
+  first_transfer_in_from_label: any
   volume_u_24h: number
   age_seconds: any
   first_transfer_in_from: any
@@ -1440,7 +1441,7 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     }
     if (next.state == 'new') {
       if (next.amm === 'fourmemev2') {
-        next.market_cap = next.market_cap || 1000000000 * obj?.uprice
+        next.market_cap = next.market_cap || 1000000000 * obj?.uprice || 0
       }
       if (next.amm === 'flapswap') {
         next.market_cap =  next.market_cap || 1000000000 * obj?.uprice || 4900
@@ -1476,9 +1477,11 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'smart_wallet_ratio')) {
       next.smart_wallet_ratio = obj.smart_wallet_ratio
     }
-
     if (hasValue(obj, 'first_transfer_in_from')) {
       next.first_transfer_in_from = obj.first_transfer_in_from
+    }
+    if (hasValue(obj, 'first_transfer_in_from_label')) {
+      next.first_transfer_in_from_label = obj.first_transfer_in_from_label
     }
     if (hasValue(obj, 'age_seconds')) {
       next.age_seconds = obj.age_seconds
@@ -1579,6 +1582,9 @@ function mergeStatistics(prev: any, next: any) {
   }
   if (hasValue(next, 'first_transfer_in_from')) {
     result.first_transfer_in_from = next.first_transfer_in_from
+  }
+  if (hasValue(next, 'first_transfer_in_from_label')) {
+    result.first_transfer_in_from_label = next.first_transfer_in_from_label
   }
   if (hasValue(next, 'age_seconds')) {
     result.age_seconds = next.age_seconds

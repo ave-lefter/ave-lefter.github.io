@@ -537,7 +537,13 @@
                           }}%
                         </span>
                       </template>
-                      <span v-if="row?.age_seconds" class="ml-4px">{{ formatSeconds(Number(row?.age_seconds || 0)) }}</span>
+                      <img
+                        v-if="row.first_transfer_in_from_label"
+                        class="w-12px h-12px cursor-pointer rounded-full ml-4px"
+                        :src="formatIconPumpDev(row.first_transfer_in_from_label)"
+                        alt=""
+                      >
+                      <span v-if="row?.age_seconds" class="ml-4px color-[--secondary-text]">{{ formatSeconds(Number(row?.age_seconds || 0)) }}</span>
                      </DevPop>
                     <!-- </div> -->
                     <div

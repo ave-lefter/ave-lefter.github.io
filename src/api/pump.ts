@@ -15,6 +15,7 @@ export function _getPumpConfig(): Promise<PumpConfig[]> {
 // https://api.test.phaetd8l.com/v2api/token_info/v1/token/dev/info?token_id=0xdcda006703eaa8143b2a56ff8028e73b7be24444-bsc
 
 export function _getDevInfo(token_id: string): Promise<{
+  first_transfer_in_from_label: any
   balance_radio_cur: string
   balance_usd: string
   buy_amount: string
