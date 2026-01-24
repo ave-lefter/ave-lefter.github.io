@@ -1948,5 +1948,7 @@
   "liqTip": "Number of pools and size of the bottom pool",
   "devMigrated": "Dev Migrated",
   "devLaunched": "Dev Launched",
-  "migratedRatio": "Migrated"
+  "migratedRatio": "Migrated",
+  "KOLRatio": "KOL Ratio",
+  "smarterRatio": "Smarter Ratio"
 }

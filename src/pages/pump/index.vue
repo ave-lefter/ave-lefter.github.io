@@ -407,6 +407,14 @@ let wsTableListCache: Record<string, PumpObj[]> = {}
 const wsTableList = shallowRef<PumpObj[]>([])
 const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
 type StatisticsItem = {
+  smart_wallet_ratio: any
+  smart_wallet_count: any
+  total_count: number
+  migrated_count: number
+  migrated_ratio: number
+  max_dev_ratio: number
+  kol_count: number
+  kol_ratio: any
   buyers_24h: any
   sellers_24h: any
   makers_24h(makers_24h: any): number
@@ -1456,6 +1464,25 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
     if (hasValue(obj, 'max_dev_ratio')) {
       next.max_dev_ratio = obj.max_dev_ratio
     }
+    if (hasValue(obj, 'kol_count')) {
+      next.kol_tag_count = obj.kol_count
+    }
+    if (hasValue(obj, 'kol_ratio')) {
+      next.kol_ratio = obj.kol_ratio?.toFixed(2)
+    }
+    if (hasValue(obj, 'smart_wallet_count')) {
+      next.smart_wallet_tag_count = obj.smart_wallet_count
+    }
+    if (hasValue(obj, 'smart_wallet_ratio')) {
+      next.smart_wallet_ratio = obj.smart_wallet_ratio?.toFixed(2)
+    }
+
+    if (hasValue(obj, 'first_transfer_in_from')) {
+      next.first_transfer_in_from = obj.first_transfer_in_from
+    }
+    if (hasValue(obj, 'smart_wallet_ratio')) {
+      next.age_seconds = obj.age_seconds
+    }
 
     return next
   })
@@ -1536,6 +1563,25 @@ function mergeStatistics(prev: any, next: any) {
   }
   if (hasValue(next, 'migrated_ratio')) {
     result.max_dev_ratio = next.max_dev_ratio
+  }
+  if (hasValue(next, 'kol_count')) {
+    result.kol_count = next.kol_count
+  }
+  if (hasValue(next, 'kol_ratio')) {
+    result.kol_ratio = next.kol_ratio
+  }
+
+  if (hasValue(next, 'smart_wallet_count')) {
+    result.smart_wallet_count = next.smart_wallet_count
+  }
+  if (hasValue(next, 'smart_wallet_ratio')) {
+    result.smart_wallet_ratio = next.smart_wallet_ratio
+  }
+  if (hasValue(next, 'first_transfer_in_from')) {
+    result.first_transfer_in_from = next.first_transfer_in_from
+  }
+  if (hasValue(next, 'age_seconds')) {
+    result.age_seconds = next.age_seconds
   }
   return result
 }

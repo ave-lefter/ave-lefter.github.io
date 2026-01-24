@@ -16,6 +16,8 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  smart_wallet_ratio: number
+  kol_ratio: number
   max_dev_ratio: number
   migrated_ratio: number
   total_count: number

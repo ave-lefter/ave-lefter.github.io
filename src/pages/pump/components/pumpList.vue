@@ -411,7 +411,7 @@
 
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'kol')"
-                      v-tooltip="`KOL`"
+                      v-tooltip="`${$t('KOLRatio')} ${formatNumber(row?.kol_ratio || 0, 2)}%`"
                       class="flex mr-8px items-center"
                     >
                       <Icon
@@ -445,7 +445,7 @@
 
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'smart')"
-                      v-tooltip="$t('smarter')"
+                      v-tooltip="`${$t('smarterRatio')} ${formatNumber(row?.smart_wallet_ratio || 0, 2)}%`"
                       class="flex mr-5px items-center color-[--secondary-text]"
                     >
                       <Icon
@@ -533,7 +533,7 @@
                         }}%
                       </span>
                      </template>
-
+                       {{ row?.first_transfer_in_from }}--{{ row?.age_seconds }}
                     </div>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'insider')"
