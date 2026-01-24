@@ -126,6 +126,8 @@ import { CirclePlusFilled, RemoveFilled } from '@element-plus/icons-vue'
 import type { PropType } from 'vue'
 // import { useDraggable } from 'vue-draggable-plus'
 // import { useCompressStorage } from '@/utils/utils.js'
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Njc2MTcxMTcsImlhdCI6MTc2NzYxNTMxNywiaXNzIjoiYXZlIiwicmVmU3RhcnQiOjE3NjcwMTIzMTcsInN1YiI6ImFjYyIsInVpZCI6IjY4NzYwODIxNzMifQ.dHBNrQEAMiuYcyazTGNmqKNM2CLbYY_MmCEmx9MPcxI
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzAyMDczMTcsImlhdCI6MTc2NzYxNTMxNywiaXNzIjoiYXZlIiwicmVmU3RhcnQiOjE3Njk2MDI1MTcsInN1YiI6InJlZiIsInVpZCI6IjY4NzYwODIxNzMifQ.8m-Q1NEZncJ_Mj720JwM3x5o_ew8NjjnogEJZKx_hbw
 const props = defineProps({
   modelValue: Boolean,
   favChains: {

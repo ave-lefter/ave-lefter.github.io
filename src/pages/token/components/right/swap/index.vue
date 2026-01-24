@@ -1,5 +1,6 @@
 <template>
   <div>
+    <BestToken/>
     <Tabs v-model:activeTab="swapStore.activeTab" />
     <Swap />
   </div>
@@ -8,6 +9,7 @@
 <script setup lang='ts'>
 import Tabs from './tabs.vue'
 import Swap from './swap.vue'
+import BestToken from '../bestToken.vue'
 const walletStore = useWalletStore()
 const swapStore = useSwapStore()
 const tokenStore = useTokenStore()

@@ -1410,13 +1410,13 @@
   "searchSameAmm": "類似したプールを表示",
   "pumpCompleted": "パンプ完了",
   "innerDiskTime": "内盤時間",
-  "takeProfitAndStopLoss1": "ダブルアウト",
+  "takeProfitAndStopLoss1": "All-Out on Double",
   "takeProfitAndStopLoss2": "資本金2倍&損失を半分で止める",
-  "takeProfitAndStopLoss0": "カスタマイズされたテイクプロフィットとストップロス",
-  "takeProfitAndStopLoss3": "ダブルオールアウト&半ストップロス",
-  "takeProfitAndStopLoss4": "資本を2倍にする&全額を3倍にする&損失を半分で止める",
-  "takeProfitAndStopLoss6": "40％が利益確定&テイクプロフィットとストップロスのリトレースメントを60％オールアウトで移動",
-  "takeProfitAndStopLoss5": "10回利食い&テイクプロフィットとストップロスリトレースメントを40％オールアウトで移動",
+  "takeProfitAndStopLoss0": "Custom TP/SL",
+  "takeProfitAndStopLoss3": "All-Out on Double + 50% SL",
+  "takeProfitAndStopLoss4": "Break-Even on Double + All-Out on Triple + 50% SL",
+  "takeProfitAndStopLoss6": "All-Out on 40% TP + Trailing TP/SL (60% Drawdown)",
+  "takeProfitAndStopLoss5": "All-Out on Tenfold + Trailing TP/SL (40% Drawdown)",
   "defaultPolicy": "デフォルトポリシー",
   "takeProfitAndStopLossTips1": "ダブルアウトとは、ポジションの利益が 100% に達すると、システムがすべてのポジションを自動的にクローズすることを意味します。",
   "takeProfitAndStopLossTips2": "資本の 2 倍のアウトとは、ポジションをクローズし、利益が 100% に達したときに資本の 50% を支払うことを意味します。半分のストップロスとは、損失が50%に達したときにポジション全体を自動的に閉じることを意味します。",
@@ -1449,5 +1449,6 @@
   "noOpen": "オープンなし",
   "noticeDuration": "通知表示時間",
   "monitorThTip": "少なくとも 1 つのウォレット アバターとウォレット アドレスを選択してください",
-  "wcWalletTip": "この QR コードを携帯電話でスキャンしてください"
+  "wcWalletTip": "この QR コードを携帯電話でスキャンしてください",
+  "monitorBotError": "監視ロボットのアドレスはサポートされていません"
 }

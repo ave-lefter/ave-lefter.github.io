@@ -69,6 +69,7 @@ export function onRequest({ options, request }: MyFetchContext) {
 }
 
 export function onResponse({ response, request,options }: MyFetchContext) {
+  const { $i18n } = useNuxtApp()
   // 全局响应处理
   if (!response) {
     return
@@ -82,6 +83,9 @@ export function onResponse({ response, request,options }: MyFetchContext) {
   }
   if (response.status === 401) {
     return botOnResponseError({ response, request, options })
+  }
+  if (data?.status===50001) {
+    throw new Error($i18n.t('monitorBotError'))
   }
   if ((request as string)?.includes('/aveswap/v1/sui/')) {
     if (data?.status === 0) {

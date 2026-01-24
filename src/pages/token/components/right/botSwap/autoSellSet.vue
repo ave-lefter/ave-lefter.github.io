@@ -13,7 +13,7 @@
       </div>
       <!-- <div class="flex items-center gap-5px" v-show="isAutoSellConfig" > -->
       <div class="flex items-center gap-5px">
-        <el-select popper-class="w-selectAutoSell" v-model="autoSellConfigName" :placeholder="t('defaultPolicy')" style="width: 110px" @change="changeAutoSellConfig" placement="bottom-end" :persistent="true" size="small" :disabled="!isAutoSellConfig">
+        <el-select popper-class="w-selectAutoSell" v-model="autoSellConfigName" :placeholder="t('defaultPolicy')" style="width: 110px" @change="changeAutoSellConfig" placement="bottom-end" :persistent="true" size="small" :disabled="!isAutoSellConfig" v-tooltip="autoSellConfigNameStr">
           <li class="el-select-dropdown__item text-[--third-text]!">{{ t('defaultPolicy') }}</li>
           <el-option
             v-for="item in autoSellConfigOption"
@@ -142,6 +142,18 @@ const autoSellConfig = computed<Array<{
       }
     }
   }
+})
+
+const autoSellConfigNameStr=computed(() => {
+  return {
+    '0': t('takeProfitAndStopLoss0'),
+    '1': t('takeProfitAndStopLoss1'),
+    '2': t('takeProfitAndStopLoss2'),
+    '3': t('takeProfitAndStopLoss3'),
+    '4': t('takeProfitAndStopLoss4'),
+    '5': t('takeProfitAndStopLoss5'),
+    '6': t('takeProfitAndStopLoss6')
+  }?.[autoSellConfigName.value]
 })
 
 const autoSellConfigName=computed({

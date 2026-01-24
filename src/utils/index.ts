@@ -987,26 +987,57 @@ export function setRefCodeToCookie() {
   }
 }
 
-export function getMedias(appendix: string | undefined, t: ReturnType<typeof useI18n>['t']) {
+export function getMedias(appendix: string | undefined) {
   if (!appendix) return []
+  const t = getGlobalT()
   if (isJSON(appendix)) {
     const obj = JSON.parse(appendix)
     const arr = []
-    if (obj?.website)
+    if (obj?.website) {
       arr.push({
         name: t('website'),
         icon: 'web',
         url: formatUrl(obj.website),
       })
+    }
     if (obj?.btok) arr.push({ name: 'Btok', icon: 'btok', url: formatUrl(obj.btok) })
     if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
     if (obj?.telegram) arr.push({ name: 'Telegram', icon: 'tg', url: formatUrl(obj.telegram) })
-    if (obj?.twitter)
+    if (obj?.twitter) {
       arr.push({
         name: 'Twitter',
         icon: 'twitter',
         url: formatUrl(obj.twitter),
       })
+    }
+    if (obj?.youtube) {
+      arr.push({
+        name: 'Youtube',
+        icon: 'youtube',
+        url: formatUrl(obj.youtube),
+      })
+    }
+    if (obj?.reddit) {
+      arr.push({
+        name: 'Reddit',
+        icon: 'reddit',
+        url: formatUrl(obj.reddit),
+      })
+    }
+    if (obj?.instagram) {
+      arr.push({
+        name: 'Instagram',
+        icon: 'instagram',
+        url: formatUrl(obj.instagram),
+      })
+    }
+    if (obj?.tiktok) {
+      arr.push({
+        name: 'Tiktok',
+        icon: 'tiktok',
+        url: formatUrl(obj.tiktok),
+      })
+    }
     return arr
   }
   return []

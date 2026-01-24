@@ -68,7 +68,10 @@ export default defineNuxtConfig({
         prefix: 'custom',
         dir: './src/assets/icons'
       },
-    ]
+    ],
+    clientBundle: {
+      sizeLimitKb: 512
+    }
   },
   generate: {
     // routes: [
@@ -170,7 +173,7 @@ export default defineNuxtConfig({
     }
   },
   pwa: {
-    registerType: 'autoUpdate',
+    registerType: 'prompt',
     devOptions: {
       enabled: false
     },
@@ -217,6 +220,8 @@ export default defineNuxtConfig({
       globPatterns: ['**/*.{js,css,ico,png,jpg,jpeg,svg,webp,json,woff2,otf,ttf,woff}'],
       maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 设置为 10 MiB
       cleanupOutdatedCaches: true,
+      skipWaiting: true,
+      clientsClaim: true,
       runtimeCaching: [
         {
           urlPattern: ({ request }) => request.destination === 'document',

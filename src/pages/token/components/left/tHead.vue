@@ -28,16 +28,16 @@ function getActiveClass(activeSort: number, sortBy: string, direction: string) {
 }
 
 const statusTo = {
-  0: -1,
-  1: 0,
-  '-1': 1
+  0: 1,
+  1: -1,
+  '-1': 0
 }
 
 function switchSort(sortBy: string, activeSort?: number) {
   const sort = {...props.sort}
   if (!activeSort) {
     if (sort.sortBy !== sortBy) {
-      sort.activeSort = -1
+      sort.activeSort = 1
     } else {
       sort.activeSort = statusTo[sort.activeSort as 0 | 1 | '-1']
     }
