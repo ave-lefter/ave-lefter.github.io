@@ -404,6 +404,7 @@ let wsTableListCache: Record<string, PumpObj[]> = {}
 const wsTableList = shallowRef<PumpObj[]>([])
 const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
 type StatisticsItem = {
+  volume_u_24h: number
   age_seconds: any
   first_transfer_in_from: any
   smart_wallet_ratio: any
@@ -1402,7 +1403,7 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
       next.holders_top10_ratio = Number(obj.top10_ratio)
     }
     if (hasValue(obj, 'volume_u_24h')) {
-      next.volume_u_24h = Number(obj.volume_u_24h) * obj.uprice
+      next.volume_u_24h = obj.volume_u_24h
     }
     if (hasValue(obj, 'tx_count_24h')) {
       next.tx_24h_count = Number(obj.tx_count_24h)
