@@ -501,39 +501,39 @@
                     </div>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'dev')"
-                      v-tooltip="$t('dev_balance_ratio_cur_tips')"
                       class="flex mr-8px bg-btn"
                     >
-                     <template v-if="row?.max_dev_ratio !==null && row?.max_dev_ratio !== undefined && Number(row?.max_dev_ratio)!== 0 && Number(row?.dev_balance_ratio_cur)== 0">
-                      <Icon
-                        class="iconfont icon-TOP text-10px mr-4px color-[--x-blue]"
-                        name="custom:dev-ds"
-                      />
-                      <span class="color-[--x-blue]">DS</span>
-                     </template>
-                     <template v-else>
-                      <Icon
-                        class="iconfont icon-TOP text-10px mr-4px"
-                        name="custom:dev-ds"
-                        :style="{
-                          color: Number(row?.dev_balance_ratio_cur) > 5? '#F6465D' : '#12B886',
-                        }"
-                      />
-                      <span
-                        :style="{
-                          color: Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
-                        }"
-                        >{{
-                          formatNumber(
-                            Number(row?.dev_balance_ratio_cur) > 0.001
-                              ? row?.dev_balance_ratio_cur || 0
-                              : 0,
-                            2
-                          )
-                        }}%
-                      </span>
-                     </template>
-                       {{ row?.first_transfer_in_from }}--{{ row?.age_seconds }}
+                    <DevPop :tokenId="(row?.token || row?.target_token) + '-' + row?.chain">
+                      <template v-if="row?.max_dev_ratio !==null && row?.max_dev_ratio !== undefined && Number(row?.max_dev_ratio)!== 0 && Number(row?.dev_balance_ratio_cur)== 0">
+                        <Icon
+                          class="iconfont icon-TOP text-10px mr-4px color-[--x-blue]"
+                          name="custom:dev-ds"
+                        />
+                        <span class="color-[--x-blue]">DS</span>
+                      </template>
+                      <template v-else>
+                        <Icon
+                          class="iconfont icon-TOP text-10px mr-4px"
+                          name="custom:dev-ds"
+                          :style="{
+                            color: Number(row?.dev_balance_ratio_cur) > 5? '#F6465D' : '#12B886',
+                          }"
+                        />
+                        <span
+                          :style="{
+                            color: Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
+                          }"
+                          >{{
+                            formatNumber(
+                              Number(row?.dev_balance_ratio_cur) > 0.001
+                                ? row?.dev_balance_ratio_cur || 0
+                                : 0,
+                              2
+                            )
+                          }}%
+                        </span>
+                      </template>
+                     </DevPop>
                     </div>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'insider')"
@@ -737,7 +737,7 @@
                     <el-progress
                       class="clickable w-20px ml-4px"
                       :class="row.tx_24h_count > 0 || (Number(row.buys_tx_24h_count) + Number(row.sells_tx_24h_count) > 0)? 'progress-bar' : 'progress-bar-disabled'"
-                      :percentage="((row.buys_tx_24h_count ||0) / row.tx_24h_count * 100) || 0"
+                      :percentage="Number((row.buys_tx_24h_count ||0) / row.tx_24h_count * 100) || 0"
                       :show-text="false"
                       color="#12B886"
                       :stroke-width="3"
@@ -834,6 +834,7 @@ import XIcon from '~/components/xPopup/xIcon.vue'
 import { useVirtualList } from '@vueuse/core'
 import ImageLarge from './imageLarge.vue'
 import ProgressPop from './progressPop.vue'
+import DevPop from './devPop/index.vue'
 
 const props = defineProps({
   tableList: {
