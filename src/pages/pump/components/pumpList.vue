@@ -180,7 +180,7 @@
                         <Icon class="text-16px text-#fff" name="custom:search" />
                       </a>
                     </el-tooltip> -->
-                    <div class="bg-btn bg-[--secondary-bg] absolute bottom--12px left--10px rounded-4px border border-1 border-solid border-[#1E1F23] color-[--yellow] text-9px">
+                    <div v-if="!isOut" class="bg-btn bg-[--secondary-bg] absolute bottom--8px left--10px !rounded-4px border border-1 border-solid border-[#1E1F23] color-[--yellow] text-9px">
                       {{(row?.progress || 0).toFixed(0)}}%
                     </div>
                     <el-image
@@ -218,21 +218,22 @@
                     /> -->
                   </div>
                   <div
-                      class="color-[--third-text] text-12px"
+                      class="color-[--third-text] text-12px hover:color-[--main-text]"
                       :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-20px' : 'mt-10px'"
                       v-copy="row.token">
                       {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
                   </div>
                 </div>
-                <div class="flex flex-col self-stretch">
+                <div class="flex flex-col self-stretch relative">
                   <div class="flex-start">
-                    <span class="text-18px font-500 mr-5px symbol-ellipsis ellipsis-auto block" v-tooltip="row.symbol">{{
+                    <span class="text-16px font-500 mr-5px symbol-ellipsis ellipsis-auto block" v-tooltip="row.symbol">{{
                       row.symbol
                     }}</span>
                     <span
                       v-if="pumpSetting?.define?.some((i) => i === 'name')"
-                      class="name text-10px font-500 mr-5px color-[--secondary-text] symbol-ellipsis ellipsis-auto block"
+                      class="name text-12px font-500 mr-5px color-[--secondary-text] symbol-ellipsis ellipsis-auto block"
                       v-tooltip="row.name"
+                      v-copy="row.name"
                       >{{ row.name }}</span>
                     <a
                       v-if="
@@ -301,7 +302,10 @@
                       </div>
                       <img
                         v-if="row.baseToken"
-                        v-tooltip="`${row.baseToken?.symbol} ${$t('pair')}`"
+                          v-tooltip="{
+                          content:getLiqTooltip(row),
+                          props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
+                        }"
                         class="rounded-100% cursor-pointer ml-5px"
                         :src="getSymbolDefaultIcon({ ...(row.baseToken || {}), chain: row.chain})"
                         alt=""
@@ -438,6 +442,18 @@
                         formatNumber(row?.migrated_count || 0, 2)}}/{{formatNumber(row?.total_count || 0, 2)}}
                       </span>
                     </div>
+
+                    <div
+                      v-show="pumpSetting?.define?.some((i) => i === 'smart')"
+                      v-tooltip="$t('smarter')"
+                      class="flex mr-5px items-center color-[--secondary-text]"
+                    >
+                      <Icon
+                        class="iconfont icon-rug mr-2px text-10px vertical-middle "
+                        name="custom:smart-plain"
+                      />
+                      <span>{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
+                    </div>
                     <!-- <div
                   v-show="pumpSetting?.define?.some(i=> i=== 'migraged')"
                   v-tooltip="$t('migraged')"
@@ -456,15 +472,15 @@
                     </a>
                   </div>
 
-                  <div class="flex-start text-12px relative z-1 mt-5px">
+                  <div class="flex-start text-12px absolute bottom--2px z-1 mt-5px">
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'top')"
                       class="flex-start mr-8px bg-btn"
                       @mouseover.stop="(e) => showBubbleTooltip(row, e)"
                     >
                       <Icon
-                        class="iconfont icon-TOP text-12px mr-4px"
-                        name="custom:top"
+                        class="iconfont icon-TOP text-10px mr-4px"
+                        name="custom:top3"
                         :style="{
                           color: Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886',
                         }"
@@ -488,9 +504,17 @@
                       v-tooltip="$t('dev_balance_ratio_cur_tips')"
                       class="flex mr-8px bg-btn"
                     >
+                     <template v-if="row?.max_dev_ratio !==null && row?.max_dev_ratio !== undefined && Number(row?.max_dev_ratio)!== 0 && Number(row?.dev_balance_ratio_cur)== 0">
                       <Icon
-                        class="iconfont icon-TOP text-12px mr-4px"
-                        name="custom:dev"
+                        class="iconfont icon-TOP text-10px mr-4px color-[--x-blue]"
+                        name="custom:dev-ds"
+                      />
+                      <span class="color-[--x-blue]">DS</span>
+                     </template>
+                     <template v-else>
+                      <Icon
+                        class="iconfont icon-TOP text-10px mr-4px"
+                        name="custom:dev-ds"
                         :style="{
                           color: Number(row?.dev_balance_ratio_cur) > 5? '#F6465D' : '#12B886',
                         }"
@@ -506,8 +530,10 @@
                               : 0,
                             2
                           )
-                        }}%</span
-                      >
+                        }}%
+                      </span>
+                     </template>
+
                     </div>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'insider')"
@@ -515,8 +541,8 @@
                       class="flex mr-8px bg-btn"
                     >
                       <Icon
-                        class="iconfont icon-laoshucang text-12px mr-4px"
-                        name="custom:insiders"
+                        class="iconfont icon-laoshucang text-10px mr-4px"
+                        name="custom:insider1"
                         :style="{
                           color: Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
                         }"
@@ -543,7 +569,7 @@
                         color: Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
                       }"
                     >
-                      <Icon class="iconfont icon-gun text-12px mr-4px" name="custom:gun" />
+                      <Icon class="iconfont icon-gun text-10px mr-4px" name="custom:gun1" />
                       <span>{{
                         formatNumber(
                           Number(row?.sniper_balance_ratio_cur) > 0.001 ? row?.sniper_balance_ratio_cur || 0 : 0,
@@ -636,18 +662,6 @@
                           : formatNumber(row?.rug_rate || 0, 2) + '%'
                       }}</span>
                     </div> -->
-
-                    <div
-                      v-show="pumpSetting?.define?.some((i) => i === 'smart')"
-                      v-tooltip="$t('smarter')"
-                      class="flex mr-5px items-center bg-btn color-#12B886"
-                    >
-                      <Icon
-                        class="iconfont icon-rug mr-2px text-12px vertical-middle "
-                        name="custom:wallet"
-                      />
-                      <span>{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -656,8 +670,8 @@
                   v-if="
                     (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
                   "
-                  class="flex-end text-12px mt-5px pr-12px"
-                  :class="pumpSetting.fontSize_mc =='12px'? 'mb-10px' : 'mb-5px'"
+                  class="flex-end text-12px pr-12px"
+                  :class="pumpSetting.fontSize_mc =='12px'? 'mb-6px' : 'mb-6px'"
                 >
                   <template v-if="isSoon && row.progress >= 99.99">
                     <el-image
@@ -676,9 +690,9 @@
                   </template>
                   <template v-else>
                     <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
-                      <div class="mr-5px color-[--secondary-text]">V</div>
-                      <div class="color-[---main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h) }">
-                        ${{ pumpSetting.isInt ? formatNumber(row.volume_u_24h || 0, { decimals: 0, l: 4, locale: 'en' }) : formatNumber(row.volume_u_24h || 0, {decimals: 2, locale: 'en' }) }}
+                      <div class="mr-5px color-[--secondary-text]" :style="{ 'font-size': pumpSetting.fontSize_mc }">V</div>
+                      <div class="color-[---main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h),'font-size': pumpSetting.fontSize_mc  }">
+                        ${{ pumpSetting.isInt ? formatNumber(row.volume_u_24h || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' }) : formatNumber(row.volume_u_24h || 0, {decimals: 2, locale: 'en' }) }}
                       </div>
                     </template>
                     <template v-if="pumpSetting?.define?.some((i) => i === 'mcap')">
@@ -690,7 +704,7 @@
                       </div>
                       <span
                         :style="{ 'font-size': pumpSetting.fontSize_mc, color: getDataColor('mc',row.market_cap) }"
-                        >${{ pumpSetting.isInt ? formatNumber(row.market_cap || 0, { decimals: 0, l: 4, locale: 'en' }) : formatNumber(row.market_cap || 0, {decimals: 2, locale: 'en' }) }}</span
+                        >${{ pumpSetting.isInt ? formatNumber(row.market_cap || 0, { decimals: 0, l: 4, limit: 3,  locale: 'en' }) : formatNumber(row.market_cap || 0, {decimals: 2, locale: 'en' }) }}</span
                       >
                     </template>
                   </template>
@@ -702,19 +716,8 @@
                   <div class="mr-5px color-[--secondary-text] ml-5px" v-tooltip="$t('netInflow')">N</div>
                   <div class="color-[--main-text]">
                     <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[--main-text]">
-                      {{ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, locale: 'en' }) }}
+                      {{ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, limit: 3, locale: 'en' }) }}
                     </ave-data-number>
-                  </div>
-                  <div class="mr-5px color-[--secondary-text] ml-5px" v-tooltip="$t('liqTip')">Liq</div>
-                  <div class="color-[--main-text] text-12px">
-                    <template v-if="row.token === row.token0_address || row.target_token  === row.token0_address" >
-                      {{ formatNumber(row?.reserve1 || 0, { decimals: 0, l: 4, locale: 'en' }) }}
-                      <span class="text-11px">{{ row.baseToken?.symbol }}</span>
-                    </template>
-                    <template v-else>
-                      {{ formatNumber(row?.reserve0 || 0, { decimals: 0, l: 4, locale: 'en' }) }}
-                      <span class="text-11px">{{ row.baseToken?.symbol }}</span>
-                    </template>
                   </div>
                   <div
                     v-if="pumpSetting?.define?.some((i) => i === 'txs')"
@@ -723,27 +726,25 @@
                       content:
                         `<div style='color:var(--secondary-text)'>${$t('Txs')} <span style='color:var(--main-text)'>${formatNumber(row?.tx_24h_count || 0, 0)}</span></div>
                         <div style='color:var(--secondary-text)'>${$t('buy')} <span style='color:var(--up-color)'>${formatNumber(row?.buys_tx_24h_count || 0, 0)}</span></div>
-                        <div style='color:var(--secondary-text)'>${$t('sell')} <span style='color:var(--down-color)'>${formatNumber(row?.buys_tx_24h_count || 0, 0)}</span></div>
+                        <div style='color:var(--secondary-text)'>${$t('sell')} <span style='color:var(--down-color)'>${formatNumber(row?.sells_tx_24h_count || 0, 0)}</span></div>
                         `,
                       props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                     }">
                     <div class="mr-5px color-[--secondary-text] ml-5px">Txs</div>
                     <div class="color-[--main-text]">
-                      {{ formatNumber(row.tx_24h_count || 0, { decimals: 0, l: 4, locale: 'en' })}}
+                      {{ formatNumber(row.tx_24h_count || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' })}}
                     </div>
-                    <div class="absolute top-17px">
-                      <el-progress
-                        v-if="row.tx_24h_count > 0"
-                        class="clickable w-20px progress-bar"
-                        :percentage="((row.buys_tx_24h_count ||0) / row.tx_24h_count * 100)"
-                        :show-text="false"
-                        color="#12B886"
-                        :stroke-width="3"
-                      />
-                    </div>
+                    <el-progress
+                      class="clickable w-20px ml-4px progress-bar"
+                      :class="row.tx_24h_count == 0 || (row.buys_tx_24h_count == 0 && row.sells_tx_24h_count == 0)? 'disabled' : ''"
+                      :percentage="((row.buys_tx_24h_count ||0) / row.tx_24h_count * 100)"
+                      :show-text="false"
+                      color="#12B886"
+                      :stroke-width="3"
+                    />
                   </div>
                 </div>
-                <div class="btns-swap flex-end mt-15px pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }">
+                <div class="btns-swap flex-end pr-12px" :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }">
                   <div
                     v-if="row?.state === 'migrating'"
                     style="
@@ -772,6 +773,7 @@
                     v-if="parseInt(pumpSetting?.size_swap|| '0') > 0"
                     :quickBuyValue="quickBuyValue"
                     :row="row"
+                    classNames="bg-[--up-color] color-#fff"
                     :size="pumpSetting.size_swap"
                     @jump="jump(row)"
                   />
@@ -1107,6 +1109,25 @@ const getAnimClass = (itemData: any) => {
 
   return ''
 }
+function getLiqTooltip(row: PumpObj) {
+  const isToken0 =
+    row.token === row.token0_address ||
+    row.target_token === row.token0_address
+
+  const value = isToken0 ? row.reserve1 : row.reserve0
+
+  return `
+    <div class="flex-start" style="color:var(--secondary-text)">
+      ${t('pair')}
+      <span class="color-[--main-text] text-12px ml-5px">
+        ${formatNumber(value || 0, { decimals: 0, l: 4, locale: 'en' })}
+        <span class="text-11px ml-4px">
+          ${row.baseToken?.symbol ?? ''}
+        </span>
+      </span>
+    </div>
+  `
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1146,7 +1167,7 @@ const getAnimClass = (itemData: any) => {
       min-width: 200px;
       position: absolute;
       right: 0;
-      bottom: 0px;
+      bottom: 18px;
       padding-left: 12px;
       padding-bottom: 5px;
       border: 1px solid;
@@ -1155,6 +1176,7 @@ const getAnimClass = (itemData: any) => {
         // background-color: var(--secondary-bg);
         position: relative;
         z-index:1;
+        bottom: -24px;
       }
     }
     .black-container {
@@ -1209,7 +1231,7 @@ const getAnimClass = (itemData: any) => {
         width: 72px;
         height: 2px;
         transform: translate(-50%, -50%);
-        margin-top: 10px;
+        margin-top: 15px;
       }
     }
     &:hover .token-mark {
@@ -1391,6 +1413,11 @@ const getAnimClass = (itemData: any) => {
 .progress-bar {
   :deep() .el-progress-bar__outer {
     --el-border-color-lighter: var(--down-color);
+  }
+  &.disabled{
+    :deep() .el-progress-bar__outer {
+      --el-border-color-lighter: rgba(63, 128, 247, 0.2);
+    }
   }
 }
 </style>
