@@ -16,6 +16,7 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  max_dev_ratio: number
   migrated_ratio: number
   total_count: number
   migrated_count: number

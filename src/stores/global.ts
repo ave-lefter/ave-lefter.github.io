@@ -79,8 +79,8 @@ export const useGlobalStore = defineStore('global', () => {
     >
     jump: 'close' | 'open' | 'open_jump'
     border: string
-  }>('pumpSetting6', {
-    fontSize_mc: '16px',
+  }>('pumpSetting8', {
+    fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
     avatar_isCircle: 'rect',
@@ -88,7 +88,7 @@ export const useGlobalStore = defineStore('global', () => {
     isRight: false,
     isBlacklist: true,
     show_search: true,
-    isInt: false,
+    isInt: true,
     define: [
       'name',
       'txs',
