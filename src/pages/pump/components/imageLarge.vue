@@ -112,6 +112,7 @@ async function _getSimilarToken() {
 
 _getSimilarToken()
 watch(() => props.row, () => {
+  tokens.value = []
   _getSimilarToken()
 })
 </script>
