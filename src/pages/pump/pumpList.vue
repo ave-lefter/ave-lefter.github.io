@@ -106,7 +106,7 @@
                       )}`"
                       target="_blank"
                       class="token-mark clickable"
-                      @mouseover.stop="onEnter($event,row,props.type)"
+                    @mouseover.stop="onEnter($event, row, props.type, getDataColor)"
                       @click.stop
                     >
                       <Icon class="text-16px text-#fff" name="custom:search" />
