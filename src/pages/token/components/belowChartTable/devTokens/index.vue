@@ -1,20 +1,20 @@
 <template>
-    <div class="flex mt--12px">
-        <div v-infinite-scroll="getRugPullList" class="pt-12px flex-1"
+    <div class="flex mt--12px relative">
+        <div v-infinite-scroll="getRugPullList" class="pt-12px flex-1 min-w-0"
             :infinite-scroll-disabled="loadingRun || finished" :infinite-scroll-distance="20"
             :infinite-scroll-delay="200" :infinite-scroll-immediate="false">
             <el-table ref="table_ref" :height="tableHeight" :data="tableList" :default-sort="{
                 prop: conditions.sort,
                 order: conditions.sort_dir ? conditions.sort_dir + 'ending' : null,
             }" fit header-row-class-name="text-12px"
-                row-class-name="cursor-pointer color-[--secondary-text] text-12px" @row-click="onRowClick"
+row-class-name="cursor-pointer color-[--secondary-text] text-12px"
                 @sort-change="handleSortChange">
                 <template #empty>
                     <AveEmpty v-if="!loadingRun" class="table-empty">
                         <span class="text-12px mt-10px color-[--third-text]">{{ $t('emptyNoData') }}</span>
                     </AveEmpty>
                 </template>
-                <TokenColumn :column-props="{
+                <TokenColumn subImgKey="issue_platform" :column-props="{
                     label: $t('walletToken'),
                     width: '150',
                     fixed: 'left',
@@ -59,7 +59,7 @@
             }}</span>
           </div>
         </div>
-        <div class="border-l-1px border-l-solid border-l-[--main-divider] p-20px box-border w-298px">
+        <div class="border-l-1px border-l-solid border-l-[--main-divider] p-20px box-border w-298px responsive">
             <div class="text-16px color-[--secondary-text] lh-16px mb-16px">
                 {{ t('tokenStatistics') }}
             </div>
@@ -93,7 +93,8 @@
                         {{ tokenObj.total_non_migrated ?? 0 }}
                     </div>
                 </div>
-                <el-progress :width="120" color="var(--up-color)" :stroke-width="10" type="circle"
+                <el-progress :width="120" style="--el-fill-color-light:var(--down-color)" color="var(--up-color)"
+                    :stroke-width="10" type="circle"
                     :percentage="tokenObj.total_migrated / tokenObj.total_tokens * 100">
                     <template #default="{ percentage }">
                         <div class="font-bold text-24px lh-30px color-[--main-text] mb-4px">{{
@@ -249,28 +250,6 @@ async function _getBalance(dev_address: string) {
 }
 getRugPullList()
 
-function onRowClick(row) {
-    tokenDetailSStore.$patch({
-        drawerVisible: true,
-        tokenInfo: {
-            id: row.token + '-' + row.chain,
-            symbol: row.symbol,
-            logo_url: row.logo_url,
-            chain: row.chain,
-            address: row.token,
-            remark: '',
-        },
-        pairInfo: {
-            target_token: row.token,
-            token0_address: row.token,
-            token0_symbol: row.symbol,
-            token1_symbol: '',
-            pairAddress: '',
-        },
-        user_address: route.params.userAddress as string,
-    })
-}
-
 function handleSearchDevAddress() {
     window.open(`https://x.com/search?q=${tokenObj.value.dev_address}`)
 }
@@ -286,4 +265,14 @@ function jumpBrowser() {
 :deep(.el-scrollbar__bar.is-vertical){
     display: none;
 }
+// @media screen and (max-width: 1660px) {
+//     .responsive {
+//         position: absolute;
+//         top: 0;
+//         bottom: 0;
+//         right: 0;
+//         background: var(--secondary-bg);
+//         z-index: 10;
+//     }
+// }
 </style>

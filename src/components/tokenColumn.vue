@@ -18,14 +18,13 @@
             token-class="w-8 h-8"
           />
           <el-image
-            v-if="row.amm"
-            v-tooltip="row.amm"
+v-if="row[subImgKey]" v-tooltip="row[subImgKey]"
             class="rounded-100% bg-[--d-151A22-l-E8F1FF] chain border border-[#55D592] border-solid border-[1px]"
             :style="{
               'border-color': getPumpColor(row.issue_platform),
             }"
             style="position: absolute; width: 14px; height: 14px; bottom: 0; right: 0"
-            :src="`${s3BaseUrl}swap/${row.amm}.jpeg`"
+            :src="`${s3BaseUrl}swap/${row[subImgKey]}.jpeg`"
           />
         </div>
         <div>
@@ -75,6 +74,10 @@ const props = defineProps({
   headerSlot: {
     type: Boolean,
     default: false,
+  },
+  subImgKey: {
+    type: String,
+    default: 'amm',
   },
 })
 

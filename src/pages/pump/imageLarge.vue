@@ -1,6 +1,6 @@
 <template>
   <div class="rounded-4px">
-    <div class="p-12px color-[--main-text] flex items-center gap-4px">
+    <div v-if="!isEmpty" class="p-12px color-[--main-text] flex items-center gap-4px">
       <template v-if="type==='new'">
         {{ t('progress') }}: {{ formatNumber(row.progress,1) }}%
       </template>
@@ -51,13 +51,14 @@
         </div>
       </template>
     </div>
-    <el-image class="token-icon max-w-228px max-h-228px w-200px flex items-center justify-center" style="display: flex"
+    <el-image class="token-icon w-228px h-228px flex items-center justify-center" style="display: flex"
       fit="cover" :src="getSymbolDefaultIcon(row,'rect')" preview-teleported>
       <template #error>
-        <img class="token-icon w-200px h-200px text-16px color-#fff object-cover" :src="getChainDefaultIcon(row.chain, row.symbol,'rect')">
+        <img class="token-icon w-228px h-228px text-16px color-#fff object-cover"
+          :src="getChainDefaultIcon(row.chain, row.symbol, 'rect')">
       </template>
     </el-image>
-    <div class="p-12px">
+    <div v-if="!isEmpty" class="p-12px">
       <div class="flex justify-between">
         <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('similarTokens') }}</div>
         <div class="text-12px lh-12px color-[--third-text] mb-12px">{{ t('mcap') }}</div>
@@ -72,7 +73,8 @@
           </div>
           <div class="text-12px text-right">
               <div class="lh-16px">
-                <span :class="token.market_cap> 1000000 ? 'color-[--yellow]' : ''">${{ formatNumber(token.market_cap, 1) }}</span>
+              <span :style="{ color: getDataColor('mc', token.market_cap) }">${{
+                formatNumber(token.market_cap, 1) }}</span>
               </div>
               <div v-tooltip="t('createdTime')+':'+formatDate(token.created_at, 'YYYY-MM-DD HH:mm:ss')" class="inline-flex justify-end lh-12px color-[--third-text] text-10px">{{formatTimeFromNow(token.created_at)}}</div>
             </div>
@@ -99,9 +101,16 @@ const props = defineProps({
   type: {
     type: String,
     default: () => '',
+  },
+  getDataColor: {
+    type: Function,
+    default: () => { },
   }
 })
 const tokens = ref([])
+const isEmpty = computed(() => {
+  return tokens.value.length === 0
+})
 async function _getSimilarToken() {
   const res = await getSimilarTokens(props.row.id)
   tokens.value = res.tokens || []
