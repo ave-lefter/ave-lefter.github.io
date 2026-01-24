@@ -1,17 +1,13 @@
 <template>
   <div class="mt-20px mb-30px relative">
     <!-- <el-scrollbar ref="scrollbarRef" v-loading="loading" :height="scrollHeight" @scroll="handleScroll"> -->
-    <ul  v-bind="containerProps" @scroll="handleScroll"  class="pump-item_list scroller-container" :style="{height: scrollHeight}">
+    <ul  v-bind="containerProps" class="pump-item_list scroller-container"  :style="{height: scrollHeight}" @scroll="handleScroll">
       <div v-bind="wrapperProps">
         <!-- <TransitionGroup name="slide-fade"> -->
           <li
             v-for="({data: row}, $index) in list"
             :id="row?.target_token + '-' + row?.chain"
             :key="row?.pair + '-' + row?.chain"
-            class="pump-item_item relative item-row"
-            @click.stop="tableRowClick(row)"
-            @contextmenu="handleContextMenu($event, row)"
-            :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
             v-tooltip:pump-tooltip="{
               content: {
                 is: ProgressPop,
@@ -26,6 +22,10 @@
                 'popper-style':'width: auto'
               }
             }"
+            class="pump-item_item relative item-row"
+            :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
+            @click.stop="tableRowClick(row)"
+            @contextmenu="handleContextMenu($event, row)"
           >
             <div class="w-full relative" :class="getAnimClass(row)">
               <div class="flex-start items-start">
@@ -218,22 +218,22 @@
                     /> -->
                   </div>
                   <div
+                      v-copy="row.token"
                       class="color-[--third-text] text-12px hover:color-[--main-text]"
-                      :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-20px' : 'mt-10px'"
-                      v-copy="row.token">
+                      :class="pumpSetting.Progress_isCircle == 'horizontal' ? 'mt-20px' : 'mt-10px'">
                       {{row.token?.slice(0, 4) + '...' + row.token?.slice(-4)}}
                   </div>
                 </div>
                 <div class="flex flex-col self-stretch relative">
                   <div class="flex-start">
-                    <span class="text-16px font-500 mr-5px symbol-ellipsis ellipsis-auto block" v-tooltip="row.symbol">{{
+                    <span v-tooltip="row.symbol" class="text-16px font-500 mr-5px symbol-ellipsis ellipsis-auto block">{{
                       row.symbol
                     }}</span>
                     <span
                       v-if="pumpSetting?.define?.some((i) => i === 'name')"
-                      class="name text-12px font-500 mr-5px color-[--secondary-text] symbol-ellipsis ellipsis-auto block"
                       v-tooltip="row.name"
                       v-copy="row.name"
+                      class="name text-12px font-500 mr-5px color-[--secondary-text] symbol-ellipsis ellipsis-auto block"
                       >{{ row.name }}</span>
                     <a
                       v-if="
@@ -424,15 +424,15 @@
                     </div>
 
                     <div
-                      class="flex mr-8px items-center"
                       v-tooltip="{
-                      content:
-                        `<div style='color:var(--secondary-text)'>${$t('devMigrated')} <span style='color:var(--main-text)'>${formatNumber(row?.migrated_count || 0, 0)}</span></div>
-                        <div style='color:var(--secondary-text)'>${$t('devLaunched')} <span style='color:var(--up-color)'>${formatNumber(row?.total_count || 0, 0)}</span></div>
-                        <div style='color:var(--secondary-text)'>${$t('migratedRatio')} <span style='color:var(--down-color)'>${formatNumber(row?.migrated_ratio || 0, 0)}%</span></div>
-                        `,
-                      props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
-                    }">
+                        content:
+                          `<div style='color:var(--secondary-text)'>${$t('devMigrated')} <span style='color:var(--main-text)'>${formatNumber(row?.migrated_count || 0, 0)}</span></div>
+                          <div style='color:var(--secondary-text)'>${$t('devLaunched')} <span style='color:var(--up-color)'>${formatNumber(row?.total_count || 0, 0)}</span></div>
+                          <div style='color:var(--secondary-text)'>${$t('migratedRatio')} <span style='color:var(--down-color)'>${formatNumber(row?.migrated_ratio || 0, 0)}%</span></div>
+                          `,
+                        props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
+                      }"
+                      class="flex mr-8px items-center">
 
                       <Icon
                         class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--yellow]"
@@ -713,7 +713,7 @@
                   v-if="pumpSetting?.define?.some((i) => i === 'txs')"
                   class="flex-end text-12px pr-12px"
                 >
-                  <div class="mr-5px color-[--secondary-text] ml-5px" v-tooltip="$t('netInflow')">N</div>
+                  <div v-tooltip="$t('netInflow')" class="mr-5px color-[--secondary-text] ml-5px">N</div>
                   <div class="color-[--main-text]">
                     <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[--main-text]">
                       {{ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, limit: 3, locale: 'en' }) }}
@@ -721,7 +721,6 @@
                   </div>
                   <div
                     v-if="pumpSetting?.define?.some((i) => i === 'txs')"
-                    class="relative flex-end"
                     v-tooltip="{
                       content:
                         `<div style='color:var(--secondary-text)'>${$t('Txs')} <span style='color:var(--main-text)'>${formatNumber(row?.tx_24h_count || 0, 0)}</span></div>
@@ -729,7 +728,8 @@
                         <div style='color:var(--secondary-text)'>${$t('sell')} <span style='color:var(--down-color)'>${formatNumber(row?.sells_tx_24h_count || 0, 0)}</span></div>
                         `,
                       props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
-                    }">
+                    }"
+                    class="relative flex-end">
                     <div class="mr-5px color-[--secondary-text] ml-5px">Txs</div>
                     <div class="color-[--main-text]">
                       {{ formatNumber(row.tx_24h_count || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' })}}

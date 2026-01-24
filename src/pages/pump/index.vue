@@ -321,12 +321,9 @@ import type {
   PumpObj,
   ChainKey,
   CategoryKey,
-  WSPump,
-  pumpData,
   WSPumpObj
 } from '@/api/types/pump'
 import { throttle } from 'lodash-es'
-import { isJSON, formatUrl, usePumpTableDataFetching } from '@/utils/index'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
 import AudioSelect from './components/audioSelect.vue'
 defineOptions({
@@ -940,7 +937,7 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
   const currentChain = activeChain.value
   if (!wsTableListCache[currentChain]) wsTableListCache[currentChain] = []
   const wsTableList1 = wsTableListCache[currentChain]?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
-  wsTableListCache[currentChain] = [...(list?.filter(i => i.chain === currentChain) || []), ...(wsTableList1 || [])]?.slice(0, 50)
+  wsTableListCache[currentChain] = [...(list?.filter(i => i.chain === currentChain) || []), ...(wsTableList1 || [])]?.slice(0, 100)
   // let wsTime = this.wsTableListCache?.time || 0
   // if (wsTime < Date.now() - 15000) {
   //   this.wsTableListCache = {
