@@ -16,7 +16,7 @@ row-class-name="cursor-pointer color-[--secondary-text] text-12px"
                 </template>
                 <TokenColumn subImgKey="issue_platform" :column-props="{
                     label: $t('walletToken'),
-                    width: '150',
+    width: '170',
                     fixed: 'left',
                 }" />
                 <el-table-column align="right" :width="100" sortable="custom"
