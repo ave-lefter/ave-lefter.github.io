@@ -407,6 +407,8 @@ let wsTableListCache: Record<string, PumpObj[]> = {}
 const wsTableList = shallowRef<PumpObj[]>([])
 const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
 type StatisticsItem = {
+  age_seconds: any
+  first_transfer_in_from: any
   smart_wallet_ratio: any
   smart_wallet_count: any
   total_count: number
@@ -1468,19 +1470,19 @@ function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpO
       next.kol_tag_count = obj.kol_count
     }
     if (hasValue(obj, 'kol_ratio')) {
-      next.kol_ratio = obj.kol_ratio?.toFixed(2)
+      next.kol_ratio = obj.kol_ratio
     }
     if (hasValue(obj, 'smart_wallet_count')) {
       next.smart_wallet_tag_count = obj.smart_wallet_count
     }
     if (hasValue(obj, 'smart_wallet_ratio')) {
-      next.smart_wallet_ratio = obj.smart_wallet_ratio?.toFixed(2)
+      next.smart_wallet_ratio = obj.smart_wallet_ratio
     }
 
     if (hasValue(obj, 'first_transfer_in_from')) {
       next.first_transfer_in_from = obj.first_transfer_in_from
     }
-    if (hasValue(obj, 'smart_wallet_ratio')) {
+    if (hasValue(obj, 'age_seconds')) {
       next.age_seconds = obj.age_seconds
     }
 

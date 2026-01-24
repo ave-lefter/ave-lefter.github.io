@@ -1364,3 +1364,11 @@ export function getPrecision(num: number | string): number {
   const strList = String(num).split(".");
   return strList.length === 2 ? strList[1].length : 0;
 }
+export function formatSeconds(seconds: number) {
+  const s = Math.floor(seconds)
+  if (s >= 86400) return `${Math.floor(s / 86400)}d`
+  if (s >= 3600) return `${Math.floor(s / 3600)}h`
+  if (s >= 60) return `${Math.floor(s / 60)}m`
+
+  return `${s}s`
+}
