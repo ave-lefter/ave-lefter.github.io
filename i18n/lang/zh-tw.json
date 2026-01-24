@@ -1934,5 +1934,6 @@
   "liqTip": "池子數和底池大小",
   "devMigrated": "Dev已遷移",
   "devLaunched": "Dev發幣總數",
-  "migratedRatio": "迁移比例"
+  "migratedRatio": "迁移比例",
+  "devWallet": "DEV錢包"
 }
