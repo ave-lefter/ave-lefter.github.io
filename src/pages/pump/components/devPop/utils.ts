@@ -10,9 +10,11 @@ export function useDevPop() {
 
   const contentProps = reactive<{
     info: DevInfo | null,
+    tokenId: string
     loading: boolean
   }>({
     info: null,
+    tokenId: '',
     loading: false
   })
 
@@ -49,8 +51,10 @@ export function useDevPop() {
     _getDevInfo(tokenId).then(res => {
       // contentProps.info = {...res, video_uri: `https://pump.fun/coin/${res.token}?include-nsfw=true`}
       contentProps.info = res
+      contentProps.tokenId = tokenId
     }).catch(() => {
       contentProps.info = null
+      contentProps.tokenId = ''
     }).finally(() => {
       contentProps.loading = false
     })
