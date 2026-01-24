@@ -45,7 +45,8 @@ const id = computed(() => {
 watch(id, () => {
   globalStore.getFollowsNum()
 })
-watch(() => useFollowStore().currentAddress, (val) => {
+const followStore = useFollowStore()
+watch(() => followStore.currentAddress, (val) => {
   if (val) {
     globalStore.getFollowsNum()
   } else {
@@ -157,6 +158,13 @@ const comProps = computed(() => {
 onMounted(() => {
   globalStore.getFollowsNum()
 })
+
+onUnmounted(() => {
+  globalStore.headFollowsNum = { all: 0, subAll: 0 }
+
+  // 如果有动态加载的组件，强制置空
+  activeTab.value = 'Transactions'
+})
 </script>
 
 <template>
@@ -197,7 +205,7 @@ onMounted(() => {
     </div>
     <OrdersTab v-show="activeTab === 'Orders'" :currentActiveTab="activeTab"/>
     <DevTokens v-show="activeTab === 'DevTokens'" :currentActiveTab="activeTab" />
-    <KeepAlive v-show="activeTab !== 'Orders' && activeTab !== 'DevTokens'">
+    <KeepAlive v-if="activeTab !== 'Orders' && activeTab !== 'DevTokens' && route.name === 'token-id'">
       <component :is="Component" v-bind="comProps" :currentActiveTab="activeTab" />
     </KeepAlive>
   </div>

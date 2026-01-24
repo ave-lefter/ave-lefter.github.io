@@ -94,7 +94,7 @@
                     </div>
                 </div>
                 <el-progress :width="120" color="var(--up-color)" :stroke-width="10" type="circle"
-                    :percentage="Number(tokenObj?.total_migrated || 0) / Number(tokenObj?.total_tokens || 0) * 100">
+                    :percentage="(Number(tokenObj?.total_migrated || 0) / Number(tokenObj?.total_tokens || 0) * 100) || 0">
                     <template #default="{ percentage }">
                         <div class="font-bold text-24px lh-30px color-[--main-text] mb-4px">{{
                             formatNumber(percentage,1) }}%</div>
@@ -124,7 +124,6 @@ import AveEmpty from '@/components/aveEmpty.vue'
 import TokenColumn from '@/components/tokenColumn.vue'
 import { useStorage } from '@vueuse/core'
 import { bot_getTokenBalance } from '~/api/bot'
-useConfigStore()
 const { t } = useI18n()
 
 const tokenStore = useTokenStore()
