@@ -1433,7 +1433,11 @@ function mergeStatisticsList(statisticsList: Map<string, StatisticsItem>, filter
     const next = { ...i }
 
     if (hasValue(obj, 'progress')) {
-      next.progress = Math.min(Number(obj.progress), 100)
+      if (Number(obj.progress) < 0) {
+        next.progress = 0
+      } else {
+        next.progress = Math.min(Number(obj.progress), 100)
+      }
     }
     if (hasValue(obj, 'holder_count')) {
       next.holders = obj.holder_count
@@ -1488,18 +1492,19 @@ function mergeStatisticsList(statisticsList: Map<string, StatisticsItem>, filter
     }
     if (hasValue(obj, 'total')) {
       next.total = Number(obj.total)
-      next.market_cap = Number(obj.total) * next.current_price_usd || next.total
+      next.market_cap = Number(obj.total) * next.current_price_usd
     } else {
       if (next.total) {
         next.market_cap = Number(next.total) * next.current_price_usd
       }
     }
     if (next.amm === 'fourmemev2') {
-      next.market_cap = next.market_cap || 1000000000 * obj?.uprice || 0
+      next.market_cap = next.market_cap || 1000000000 * next.current_price_usd || 0
     }
     if (next.amm === 'flapswap') {
-      next.market_cap =  next.market_cap || 1000000000 * obj?.uprice || 4900
+      next.market_cap =  next.market_cap || 1000000000 * next.current_price_usd || 4900
     }
+    // console.log('-------next-------',  next.total, next.current_price_usd, next.market_cap, next.token)
     if (hasValue(obj, 'sells_tx_24h_count')) {
       next.sells_tx_24h_count = obj.sells_tx_24h_count
     }
