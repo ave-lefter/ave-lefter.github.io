@@ -505,7 +505,8 @@
                       v-show="pumpSetting?.define?.some((i) => i === 'dev')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                          background: Number(row?.dev_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a',
+                        background: Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1)) == 0 ? '' : (Number(row?.dev_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
+                        color:Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1))==0? 'var(--secondary-text)': (Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886')
                       }"
                       :tokenId="(row?.token || row?.target_token) + '-' + row?.chain">
                       <template v-if="row?.max_dev_ratio !==null && row?.max_dev_ratio !== undefined && Number(row?.max_dev_ratio)!== 0 && Number(row?.dev_balance_ratio_cur)== 0">
@@ -519,14 +520,8 @@
                         <Icon
                           class="iconfont icon-TOP text-10px mr-4px"
                           name="custom:dev-ds"
-                          :style="{
-                            color: Number(row?.dev_balance_ratio_cur) > 5? '#F6465D' : '#12B886',
-                          }"
                         />
                         <span
-                          :style="{
-                            color: Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
-                          }"
                           >{{
                             formatNumber(
                               Number(row?.dev_balance_ratio_cur) > 0.001
@@ -551,8 +546,8 @@
                       v-tooltip="$t('sniper2')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                        color: Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
-                        background: Number(row?.sniper_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a',
+                        color: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1))==0? 'var(--secondary-text)' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
+                        background: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1))==0? '' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                     >
                       <Icon class="iconfont icon-gun text-10px mr-4px" name="custom:gun1" />
@@ -568,20 +563,15 @@
                       v-tooltip="$t('insider_balance_ratio_cur_tips')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                          background: Number(row?.insider_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a',
+                        color: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1))==0? 'var(--secondary-text)' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
+                        background: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1))==0? '' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                     >
                       <Icon
                         class="iconfont icon-laoshucang text-10px mr-4px"
                         name="custom:insider1"
-                        :style="{
-                          color: Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
-                        }"
                       />
                       <span
-                        :style="{
-                          color: Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
-                        }"
                         >{{
                           formatNumber(
                             Number(row?.insider_balance_ratio_cur) > 0.001
