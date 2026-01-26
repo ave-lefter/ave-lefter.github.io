@@ -1,14 +1,5 @@
 <template>
-  <div class="mt-20px mb-30px relative">
-    <!-- <el-scrollbar ref="scrollbarRef" v-loading="loading" :height="scrollHeight" @scroll="handleScroll"> -->
-    <ul  v-bind="containerProps" class="pump-item_list scroller-container"  :style="{height: scrollHeight}" @scroll="handleScroll">
-      <div v-bind="wrapperProps">
-        <!-- <TransitionGroup name="slide-fade"> -->
-          <li
-            v-for="({data: row}, $index) in list"
-            :id="row?.target_token + '-' + row?.chain"
-            :key="row?.pair + '-' + row?.chain"
-            v-tooltip:pump-tooltip="{
+     <!-- v-tooltip:pump-tooltip="{
               content: {
                 is: ProgressPop,
                 props: {
@@ -21,7 +12,17 @@
                 'popper-class': 'text-center new-popover',
                 'popper-style':'width: auto'
               }
-            }"
+            }" -->
+  <div class="mt-20px mb-30px relative">
+    <!-- <el-scrollbar ref="scrollbarRef" v-loading="loading" :height="scrollHeight" @scroll="handleScroll"> -->
+    <ul  v-bind="containerProps" class="pump-item_list scroller-container"  :style="{height: scrollHeight}" @scroll="handleScroll">
+      <div v-bind="wrapperProps">
+        <!-- <TransitionGroup name="slide-fade"> -->
+          <li
+            v-for="({data: row}, $index) in list"
+            :id="row?.target_token + '-' + row?.chain"
+            :key="row?.pair + '-' + row?.chain"
+         
             class="pump-item_item relative item-row"
             :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
             @click.stop="tableRowClick(row)"
@@ -180,8 +181,8 @@
                       }"
                       style="
                         position: absolute;
-                        width: 14px;
-                        height: 14px;
+                        width: 18px;
+                        height: 18px;
                         bottom: -7px;
                         right: -10px;
                       "
@@ -214,14 +215,14 @@
                 </div>
                 <div class="flex flex-col self-stretch relative">
                   <div class="flex-start">
-                    <span v-tooltip="row.symbol" class="text-16px font-500 mr-5px symbol-ellipsis ellipsis-auto block">{{
+                    <span v-tooltip="row.symbol" v-copy="row.token" class="text-16px font-500 mr-5px symbol-ellipsis ellipsis-auto block">{{
                       row.symbol
                     }}</span>
                     <span
                       v-if="pumpSetting?.define?.some((i) => i === 'name')"
                       v-tooltip="row.name"
                       v-copy="row.name"
-                      class="name text-12px font-500 mr-5px color-[--secondary-text] symbol-ellipsis ellipsis-auto block"
+                      class="name text-12px font-500 mr-5px color-[--third-text] symbol-ellipsis ellipsis-auto block"
                       >{{ row.name }}</span>
                     <a
                       v-if="
@@ -310,13 +311,13 @@
                         <template v-if="item.url">
                           <span v-if="item.name === 'QQ'" v-tooltip="item.url" class="mr-8px">
                             <Icon
-                              :name="`custom:${item.icon}`"
-                              class="text-[--secondary-text] h-12px"
+                              :name="`custom-media:${item.icon}`"
+                              class="text-[--third-text] h-12px"
                             />
                           </span>
                           <XPopup
                             v-else-if="item.icon === 'twitter'"
-                            :tokenId="(row.token + '-' + row.chain) as string"
+                            :tokenId="(row.token + '-' + row.chain)"
                             :type="row.twitter_type"
                           >
                             <a
@@ -332,8 +333,8 @@
                               />
                               <Icon
                                 v-else
-                                :name="`custom:${item.icon}`"
-                                class="text-[--secondary-text] text-12px"
+                                :name="`custom-media:${item.icon}`"
+                                class="text-[--third-text] text-12px"
                               />
                             </a>
                           </XPopup>
@@ -346,14 +347,14 @@
                             @click.stop
                           >
                             <Icon
-                              :name="`custom:${item.icon}`"
-                              class="text-[--secondary-text] h-12px"
+                              :name="`custom-media:${item.icon}`"
+                              class="text-[--third-text] h-12px"
                             />
                           </a>
                         </template>
                       </div>
                     </div>
-                    <PumpLive class="mr-4px" v-if="row?.is_streaming" :tokenId="(row.token + '-' + row.chain) as string" />
+                    <PumpLive class="mr-4px" v-if="row?.is_streaming" :tokenId="(row.token + '-' + row.chain)" />
 
                     <a
                       :ref="(el: any) => $refs.currentBtnRef[$index] = el"
@@ -363,15 +364,20 @@
                       @mouseleave="showPopSearch = false"
                       @click.stop.prevent
                     >
-                      <Icon class="text-[--secondary-text] h-12px w-12px mr-8px" name="custom:search" />
+                      <Icon class="text-[--third-text] h-12px w-12px mr-8px" name="custom:search" />
                     </a>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'holder')"
-                      v-tooltip="$t(`holders`)"
+                      v-tooltip.raw="{
+                        content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('holders')}: <span class=${ 'color-'+getDataColor('holders',row.holders)}>${formatNumber(row?.holders || 0, 2)}</span> </div>`,
+                        props: {
+                          placement: 'top-start',
+                        },
+                      }"
                       class="flex mr-8px items-center"
                     >
                       <Icon
-                        class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--secondary-text]"
+                        class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--third-text]"
                         name="custom:holders"
                       />
                       <span v-if="Number(row?.holders) === 0 || row?.holders == null" class="color-[--secondary-text]" >0</span>
@@ -390,7 +396,7 @@
                       class="flex mr-8px items-center"
                     >
                       <Icon
-                        class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--secondary-text] hover:color-#3F80F7"
+                        class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--third-text] hover:color-#3F80F7"
                         name="custom:wallets"
                       />
                       <span v-if="Number(row?.makers_24h) === 0 || row?.makers_24h == null" class="color-[--secondary-text]" >0</span>
@@ -405,7 +411,7 @@
                       class="flex mr-8px items-center"
                     >
                       <Icon
-                        class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--secondary-text]"
+                        class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--third-text]"
                         name="custom:kol2"
                       />
                       <span v-if="Number(row?.kol_tag_count) === 0 || row?.kol_tag_count == null" class="color-[--secondary-text]" >0</span>
@@ -427,7 +433,7 @@
                       <Icon
                         class="iconfont icon-rug mr-4px text-10px vertical-middle "
                         name="custom:top2"
-                        :style="{color: row?.migrated_count> 2 ?'var(--yellow)' : 'var(--secondary-text)'}"
+                        :style="{color: row?.migrated_count> 2 ?'var(--yellow)' : 'var(--third-text)'}"
                       />
                       <span v-if="Number(row?.migrated_count) === 0 || row?.migrated_count == null" class="color-[--secondary-text]" >0</span>
                       <span v-else class="color-[---main-text]">{{
@@ -438,7 +444,7 @@
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'smart')"
                       v-tooltip="`${$t('smarterRatio')} ${formatNumber(row?.smart_wallet_ratio || 0, 2)}%`"
-                      class="flex mr-5px items-center color-[--secondary-text]"
+                      class="flex mr-5px items-center color-[--third-text]"
                     >
                       <Icon
                         class="iconfont icon-rug mr-4px text-10px vertical-middle "
@@ -472,7 +478,7 @@
                       @mouseover.stop="(e) => showBubbleTooltip(row, e)"
                       :style="{
                           background:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? '': (Number(row?.holders_top10_ratio) > 30 ? '#f6465d1a' : '#12b8861a'),
-                          color:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? 'var(--secondary-text)': (Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886'),
+                          color:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? 'var(--third-text)': (Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886'),
                       }"
                     >
                       <Icon
@@ -481,7 +487,7 @@
                       />
                       <span
                         >{{
-                          formatNumber(row?.holders_top10_ratio || 0, 1)
+                         ((Number(row?.holders_top10_ratio || 0)<0.01)&&(Number(row?.holders_top10_ratio || 0)>0))? '<0.01':formatNumber(row?.holders_top10_ratio || 0, 1)
                         }}%</span
                       >
                     </div>
@@ -494,7 +500,7 @@
                       class="flex mr-8px bg-btn"
                       :style="{
                         background: Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1)) == 0 ? '' : (Number(row?.dev_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
-                        color:Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1))==0? 'var(--secondary-text)': (Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886')
+                        color:Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1))==0? 'var(--third-text)': (Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886')
                       }"
                       :tokenId="(row?.token || row?.target_token) + '-' + row?.chain">
                       <template v-if="row?.max_dev_ratio !==null && row?.max_dev_ratio !== undefined && Number(row?.max_dev_ratio)!== 0 && Number(row?.dev_balance_ratio_cur)== 0">
@@ -534,7 +540,7 @@
                       v-tooltip="$t('sniper2')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                        color: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1))==0? 'var(--secondary-text)' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
+                        color: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1))==0? 'var(--third-text)' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
                         background: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1))==0? '' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                     >
@@ -551,7 +557,7 @@
                       v-tooltip="$t('insider_balance_ratio_cur_tips')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                        color: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1))==0? 'var(--secondary-text)' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
+                        color: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1))==0? 'var(--third-text)' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
                         background: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1))==0? '' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                     >
@@ -574,13 +580,12 @@
                       v-tooltip="$t('phishing1')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                        color: Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886',
+                        color: Number(formatNumber(row?.phishing_ratio || 0, 1))==0? 'var(--third-text)' : (Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886'),
+                        background: Number(formatNumber(row?.phishing_ratio || 0, 1))==0? '' : (Number(row?.phishing_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                     >
                       <Icon class="iconfont icon-fish text-12px mr-4px" name="custom:fish"
-                      :style="{
-                        color: Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886',
-                        }"/>
+                     />
                       <span>{{
                         formatNumber(
                           Number(row?.phishing_ratio) > 0.001 ? row?.phishing_ratio || 0 : 0,
@@ -592,14 +597,13 @@
                     <div
                       v-tooltip="$t('Bundle')"
                       :style="{
-                        color: Number(row?.address_binding_ratio) > 5 ? '#F6465D' : '#12B886',
+                        color: Number(formatNumber(row?.address_binding_ratio || 0, 1))==0? 'var(--third-text)' : (Number(row?.address_binding_ratio) > 5 ? '#F6465D' : '#12B886'),
+                        background: Number(formatNumber(row?.address_binding_ratio || 0, 1))==0? '' : (Number(row?.address_binding_ratio) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                       class="flex mr-8px bg-btn"
                     >
                       <Icon class="iconfont icon-binding text-12px mr-4px" name="custom:binding"
-                      :style="{
-                        color: Number(row?.address_binding_ratio) > 5 ? '#F6465D' : '#12B886',
-                        }"/>
+                     />
                       <span>{{
                         formatNumber(
                           Number(row?.address_binding_ratio) > 0.001 ? row?.address_binding_ratio || 0 : 0,
@@ -682,7 +686,7 @@
                   </template>
                   <template v-else>
                     <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
-                      <div class="mr-5px color-[--secondary-text]" :style="{ 'font-size': pumpSetting.fontSize_mc }">V</div>
+                      <div class="mr-5px color-[--third-text]" :style="{ 'font-size': pumpSetting.fontSize_mc }">V</div>
                       <span v-if="Number(row?.volume_u_24h) === 0 || row?.volume_u_24h == null" class="color-[--secondary-text]" >0</span>
                       <div v-else class="color-[---main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h),'font-size': pumpSetting.fontSize_mc  }">
                         ${{ pumpSetting.isInt ? formatNumber(row.volume_u_24h || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' }) : formatNumber(row.volume_u_24h || 0, {decimals: 2, locale: 'en' }) }}
@@ -690,7 +694,7 @@
                     </template>
                     <template v-if="pumpSetting?.define?.some((i) => i === 'mcap')">
                       <div
-                        class="color-[--secondary-text] mr-5px ml-5px"
+                        class="color-[--third-text] mr-5px ml-5px"
                         :style="{ 'font-size': pumpSetting.fontSize_mc }"
                       >
                         MC
@@ -708,12 +712,19 @@
                   v-if="pumpSetting?.define?.some((i) => i === 'txs')"
                   class="flex-end text-12px pr-12px"
                 >
-                  <div v-tooltip="$t('netInflow')" class="mr-5px color-[--secondary-text] ml-5px">N</div>
-                  <span v-if="Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null" class="color-[--secondary-text]" >0</span>
-                  <div v-else class="color-[--main-text]">
-                    <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[--main-text]">
-                      {{ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, limit: 3, locale: 'en' }) }}
-                    </ave-data-number>
+                  <div v-tooltip.raw="{
+                        content: `<div class='max-w-[400px] color-[--secondary-text]'>${$t('netInflow')}: <span class=${ 'color-'+(Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null? '' : ((row?.net_flow_vol||0)>0?'[--up-color]':'[--down-color]'))}>${Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null? 0 : ( (row?.net_flow_vol > 0 ? '+$' : '-$')+ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, limit: 3, locale: 'en' }))}</span> </div>`,
+                        props: {
+                          placement: 'top-start',
+                        },
+                      }" class="flex-end">
+                    <div class="mr-5px color-[--third-text] ml-5px">N</div>
+                    <span v-if="Number(row?.net_flow_vol) === 0 || row?.net_flow_vol == null" class="color-[--secondary-text]" >0</span>
+                    <div v-else class="color-[--main-text]">
+                      <ave-data-number :value="row?.net_flow_vol" :signVisible="true" classZero="color-[--main-text]">
+                       {{ formatNumber(Math.abs(row?.net_flow_vol ?? 0), { decimals: 2, l: 4, limit: 3, locale: 'en' }) }}
+                      </ave-data-number>
+                    </div>
                   </div>
                   <div
                     v-if="pumpSetting?.define?.some((i) => i === 'txs')"
@@ -726,7 +737,7 @@
                       props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                     }"
                     class="relative flex-end">
-                    <div class="mr-5px color-[--secondary-text] ml-5px">Txs</div>
+                    <div class="mr-5px color-[--third-text] ml-5px">Txs</div>
                     <span v-if="Number(row?.tx_24h_count) === 0 || row?.tx_24h_count == null" class="color-[--secondary-text]" >0</span>
                     <div v-else class="color-[--main-text]">
                       {{ formatNumber(row.tx_24h_count || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' })}}
@@ -1156,8 +1167,8 @@ function getLiqTooltip(row: PumpObj) {
         }
       }
       .bg-btn {
-        border: 0.5px solid var(--main-input-button-bg);
-        background: var(--secondary-bg);
+        // border: 0.5px solid var(--main-input-button-bg);
+        // background: var(--secondary-bg);
       }
     }
     .pump-right {
@@ -1416,7 +1427,7 @@ function getLiqTooltip(row: PumpObj) {
 }
 .progress-bar-disabled{
   :deep() .el-progress-bar__outer {
-    --el-border-color-lighter: var(--secondary-text);
+    --el-border-color-lighter: var(--third-text);
   }
 }
 </style>

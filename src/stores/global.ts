@@ -163,6 +163,16 @@ export const useGlobalStore = defineStore('global', () => {
     border: '',
   })
 
+  watch(
+    () => themeStore.isDark,
+    () => {
+      pumpSetting.value.data.mc.minColor = getCssVariable('--main-text')
+      pumpSetting.value.data.vol.minColor = getCssVariable('--main-text')
+      pumpSetting.value.data.holders.minColor = getCssVariable('--main-text')
+    },
+    {immediate: true}
+  )
+
   const batchRemarkFormData = useStorage('batchRemarkFormData', {
     type: 1,
     needAmount: true,
