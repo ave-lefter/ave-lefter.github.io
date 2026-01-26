@@ -185,7 +185,7 @@
                         bottom: -7px;
                         right: -10px;
                       "
-                      :src="`${token_logo_url}swap/${row.issue_platform}.jpeg`"
+                      :src="formatIconTag(row.issue_platform)"
                     />
 
                     <!-- <el-image
