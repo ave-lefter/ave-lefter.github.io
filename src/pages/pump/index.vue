@@ -555,16 +555,16 @@ const list2 = computed(() => {
   const wsList = getFilterData(list1, pumpFilter)
   const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
-    const baseHash =
-      i.target_token === i.token0_address
-        ? i.token1_address
-        : i.token0_address
+  const baseHash =
+    i.target_token === i.token0_address
+      ? i.token1_address
+      : i.token0_address
 
-    return {
-      ...i,
-      baseToken: baseTokenMap.value.get(baseHash)
-    }
-  })
+  return {
+    ...i,
+    baseToken: baseTokenMap.value.get(baseHash)
+  }
+})
     if (logoList.value?.length && filterList?.length) {
       const logoMap = new Map(
         logoList.value.map(item => [item.token, item])
@@ -620,7 +620,7 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
   const wsList = getFilterData(list1, pumpFilter)
   const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
   let filterList = [...wsList1, ...list].map(i => {
-    const baseHash =
+  const baseHash =
       i.target_token === i.token0_address
         ? i.token1_address
         : i.token0_address
@@ -756,23 +756,36 @@ watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
     flushPumpState()
   }
 })
-const bufferLogo: any[] = []
-const logoThrottled  = useThrottleFn(() => {
-  if (!bufferLogo.length || !documentVisible.value) return
+const bufferLogoMap = new Map<string, any>()
+const logoThrottled = useThrottleFn(() => {
+  if (!bufferLogoMap.size || !documentVisible.value) return
+  const mergedList = Array.from(bufferLogoMap.values())
   logoList.value = [
-    ...bufferLogo,
+    ...mergedList,
     ...logoList.value,
   ].slice(0, 300)
-  bufferLogo.length = 0
+  bufferLogoMap.clear()
 }, 100)
-watch(() => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED], (val) => {
-  if (val) {
-    // bufferLogo.unshift(val)
-    bufferLogo.splice(0, 0, val)
-    bufferLogo.splice(100)
+
+watch(
+  () => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED],
+  (val) => {
+    if (!val?.token) return
+
+    const prev = bufferLogoMap.get(val.token)
+
+    bufferLogoMap.set(
+      val.token,
+      prev ? mergeLogo(prev, val) : val
+    )
+    // 控制 buffer 最大数量（防爆）
+    if (bufferLogoMap.size > 100) {
+      const firstKey = bufferLogoMap.keys().next().value
+      bufferLogoMap.delete(firstKey)
+    }
     logoThrottled()
   }
-})
+)
 const buffer: any[][] = []
 
 const flushStatistics = useThrottleFn(() => {
@@ -1470,17 +1483,23 @@ function mergeStatisticsList(statisticsList: Map<string, StatisticsItem>, filter
     if (hasValue(obj, 'phishing_ratio')) {
       next.phishing_ratio = obj.phishing_ratio
     }
-    if (hasValue(obj, 'total') && hasValue(obj, 'uprice')) {
-      next.market_cap = Number(obj.total) * obj.uprice
+    if (hasValue(obj, 'uprice')) {
+      next.current_price_usd = obj.uprice
     }
-
+    if (hasValue(obj, 'total')) {
+      next.total = Number(obj.total)
+      next.market_cap = Number(obj.total) * next.current_price_usd || next.total
+    } else {
+      if (next.total) {
+        next.market_cap = Number(next.total) * next.current_price_usd
+      }
+    }
     if (next.amm === 'fourmemev2') {
       next.market_cap = next.market_cap || 1000000000 * obj?.uprice || 0
     }
     if (next.amm === 'flapswap') {
       next.market_cap =  next.market_cap || 1000000000 * obj?.uprice || 4900
     }
-
     if (hasValue(obj, 'sells_tx_24h_count')) {
       next.sells_tx_24h_count = obj.sells_tx_24h_count
     }
@@ -1520,7 +1539,6 @@ function mergeStatisticsList(statisticsList: Map<string, StatisticsItem>, filter
     if (hasValue(obj, 'age_seconds')) {
       next.age_seconds = obj.age_seconds
     }
-
     return next
   })
 }
@@ -1624,6 +1642,14 @@ function mergeStatistics(prev: any, next: any) {
     result.age_seconds = next.age_seconds
   }
   return result
+}
+function mergeLogo(prev: any, next: any) {
+  return {
+    ...prev,
+    ...next,
+    logo_url: next.logo_url || prev.logo_url,
+    appendix: next.appendix || prev.appendix,
+  }
 }
 </script>
 
