@@ -172,8 +172,8 @@
                       {{(row?.progress || 0).toFixed(0)}}%
                     </div>
                     <el-image
-                      v-if="row.amm"
-                      v-tooltip="row.amm"
+                      v-if="row.issue_platform"
+                      v-tooltip="row.issue_platform"
                       class="mr-5px rounded-100% bg-[--d-151A22-l-E8F1FF] chain border border-[#55D592] border-solid border-[1px]"
                       :style="{
                         'border-color': getPumpColor(row.issue_platform),
@@ -185,7 +185,7 @@
                         bottom: -7px;
                         right: -10px;
                       "
-                      :src="`${token_logo_url}swap/${row.amm}.jpeg`"
+                      :src="`${token_logo_url}swap/${row.issue_platform}.jpeg`"
                     />
 
                     <!-- <el-image
