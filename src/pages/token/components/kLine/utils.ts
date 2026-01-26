@@ -312,10 +312,12 @@ export function buildOrUpdateLastBarFromTx(
 export function waitForTradingView(): Promise<ChartingLibraryWidgetConstructor> {
   return new Promise((resolve) => {
     if (window?.TradingView?.widget) return resolve(window.TradingView.widget)
+      const handler = () => {
+        window.removeEventListener('tradingview:ready', handler)
+        resolve(window.TradingView.widget)
+      }
     // 监听插件派发的事件
-    window.addEventListener('tradingview:ready', () => {
-      resolve(window.TradingView.widget)
-    })
+    window.addEventListener('tradingview:ready', handler)
   })
 }
 
