@@ -80,7 +80,7 @@
                   </div>
                   <div class="token-logo">
                     <el-image
-                      class="token-icon rd-4px!"
+                      class="token-icon"
                       :class="{ small: pumpSetting.Progress_isCircle == 'horizontal' }"
                       fit="cover"
                       :src="
@@ -90,7 +90,7 @@
                         )
                       "
                       :style="{
-                        'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '0',
+                        'border-radius': pumpSetting.avatar_isCircle == 'circle' ? '100%' : '4px',
                       }"
                     >
                       <template #error>
@@ -294,7 +294,7 @@
                           content:getLiqTooltip(row),
                           props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                         }"
-                        class="rounded-100% cursor-pointer ml-5px"
+                        class="rounded-100% cursor-pointer ml-8px mr-8px"
                         :src="getSymbolDefaultIcon({ ...(row.baseToken || {}), chain: row.chain})"
                         alt=""
                         :width="12"
@@ -304,7 +304,7 @@
                       v-if="
                         row?.medias?.length > 0 && pumpSetting?.define?.some((i) => i === 'media')
                       "
-                      class="flex text-12px ml-8px"
+                      class="flex text-12px"
                     >
                       <div v-for="(item, index) in row?.medias" :key="index">
                         <template v-if="item.url">
@@ -353,7 +353,7 @@
                         </template>
                       </div>
                     </div>
-                    <PumpLive v-if="row?.is_streaming" :tokenId="(row.token + '-' + row.chain) as string" />
+                    <PumpLive class="mr-4px" v-if="row?.is_streaming" :tokenId="(row.token + '-' + row.chain) as string" />
 
                     <a
                       :ref="(el: any) => $refs.currentBtnRef[$index] = el"
@@ -363,12 +363,12 @@
                       @mouseleave="showPopSearch = false"
                       @click.stop.prevent
                     >
-                      <Icon class="text-[--secondary-text] h-12px w-12px ml-8px" name="custom:search" />
+                      <Icon class="text-[--secondary-text] h-12px w-12px mr-8px" name="custom:search" />
                     </a>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'holder')"
                       v-tooltip="$t(`holders`)"
-                      class="flex mr-8px items-center ml-8px"
+                      class="flex mr-8px items-center"
                     >
                       <Icon
                         class="iconfont icon-rug mr-4px text-12px vertical-middle color-[--secondary-text]"
@@ -425,8 +425,9 @@
                       class="flex mr-8px items-center">
 
                       <Icon
-                        class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--yellow]"
+                        class="iconfont icon-rug mr-4px text-10px vertical-middle "
                         name="custom:top2"
+                        :style="{color: row?.migrated_count> 2 ?'var(--yellow)' : 'var(--secondary-text)'}"
                       />
                       <span v-if="Number(row?.migrated_count) === 0 || row?.migrated_count == null" class="color-[--secondary-text]" >0</span>
                       <span v-else class="color-[---main-text]">{{
@@ -469,25 +470,18 @@
                       v-show="pumpSetting?.define?.some((i) => i === 'top')"
                       class="flex-start mr-8px bg-btn"
                       @mouseover.stop="(e) => showBubbleTooltip(row, e)"
+                      :style="{
+                          background:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? '': (Number(row?.holders_top10_ratio) > 30 ? '#f6465d1a' : '#12b8861a'),
+                          color:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? 'var(--secondary-text)': (Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886'),
+                      }"
                     >
                       <Icon
                         class="iconfont icon-TOP text-10px mr-4px"
                         name="custom:top3"
-                        :style="{
-                          color: Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886',
-                        }"
                       />
                       <span
-                        :style="{
-                          color: Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886',
-                        }"
                         >{{
-                          formatNumber(
-                            Number(row?.holders_top10_ratio) > 0.001
-                              ? row?.holders_top10_ratio || 0
-                              : 0,
-                            1
-                          )
+                          formatNumber(row?.holders_top10_ratio || 0, 1)
                         }}%</span
                       >
                     </div>
@@ -495,7 +489,14 @@
                       v-show="pumpSetting?.define?.some((i) => i === 'dev')"
                       class="flex mr-8px bg-btn"
                     > -->
-                    <DevPop v-show="pumpSetting?.define?.some((i) => i === 'dev')" class="flex mr-8px bg-btn" :tokenId="(row?.token || row?.target_token) + '-' + row?.chain">
+                    <DevPop
+                      v-show="pumpSetting?.define?.some((i) => i === 'dev')"
+                      class="flex mr-8px bg-btn"
+                      :style="{
+                        background: Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1)) == 0 ? '' : (Number(row?.dev_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
+                        color:Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1))==0? 'var(--secondary-text)': (Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886')
+                      }"
+                      :tokenId="(row?.token || row?.target_token) + '-' + row?.chain">
                       <template v-if="row?.max_dev_ratio !==null && row?.max_dev_ratio !== undefined && Number(row?.max_dev_ratio)!== 0 && Number(row?.dev_balance_ratio_cur)== 0">
                         <Icon
                           class="iconfont icon-TOP text-10px mr-4px color-[--x-blue]"
@@ -507,66 +508,83 @@
                         <Icon
                           class="iconfont icon-TOP text-10px mr-4px"
                           name="custom:dev-ds"
-                          :style="{
-                            color: Number(row?.dev_balance_ratio_cur) > 5? '#F6465D' : '#12B886',
-                          }"
                         />
                         <span
-                          :style="{
-                            color: Number(row?.dev_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
-                          }"
                           >{{
                             formatNumber(
                               Number(row?.dev_balance_ratio_cur) > 0.001
                                 ? row?.dev_balance_ratio_cur || 0
                                 : 0,
-                              2
+                              1
                             )
                           }}%
                         </span>
                       </template>
-                      <span v-if="row?.age_seconds" class="ml-4px">{{ formatSeconds(Number(row?.age_seconds || 0)) }}</span>
+                      <img
+                        v-if="row.first_transfer_in_from_label"
+                        class="w-12px h-12px cursor-pointer rounded-full ml-4px"
+                        :src="formatIconPumpDev(row.first_transfer_in_from_label)"
+                        alt=""
+                      >
+                      <span v-if="row?.age_seconds" class="ml-4px color-[--secondary-text]">{{ formatSeconds(Number(row?.age_seconds || 0)) }}</span>
                      </DevPop>
                     <!-- </div> -->
-                    <div
-                      v-show="pumpSetting?.define?.some((i) => i === 'insider')"
-                      v-tooltip="$t('insider_balance_ratio_cur_tips')"
-                      class="flex mr-8px bg-btn"
-                    >
-                      <Icon
-                        class="iconfont icon-laoshucang text-10px mr-4px"
-                        name="custom:insider1"
-                        :style="{
-                          color: Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
-                        }"
-                      />
-                      <span
-                        :style="{
-                          color: Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
-                        }"
-                        >{{
-                          formatNumber(
-                            Number(row?.insider_balance_ratio_cur) > 0.001
-                              ? row?.insider_balance_ratio_cur || 0
-                              : 0,
-                            2
-                          )
-                        }}%</span
-                      >
-                    </div>
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'sniper')"
                       v-tooltip="$t('sniper2')"
                       class="flex mr-8px bg-btn"
                       :style="{
-                        color: Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886',
+                        color: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1))==0? 'var(--secondary-text)' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
+                        background: Number(formatNumber(row?.sniper_balance_ratio_cur || 0, 1))==0? '' : (Number(row?.sniper_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
                       }"
                     >
                       <Icon class="iconfont icon-gun text-10px mr-4px" name="custom:gun1" />
                       <span>{{
                         formatNumber(
                           Number(row?.sniper_balance_ratio_cur) > 0.001 ? row?.sniper_balance_ratio_cur || 0 : 0,
-                          2
+                          1
+                        )
+                      }}%</span>
+                    </div>
+                    <div
+                      v-show="pumpSetting?.define?.some((i) => i === 'insider')"
+                      v-tooltip="$t('insider_balance_ratio_cur_tips')"
+                      class="flex mr-8px bg-btn"
+                      :style="{
+                        color: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1))==0? 'var(--secondary-text)' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#F6465D' : '#12B886'),
+                        background: Number(formatNumber(row?.insider_balance_ratio_cur || 0, 1))==0? '' : (Number(row?.insider_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
+                      }"
+                    >
+                      <Icon
+                        class="iconfont icon-laoshucang text-10px mr-4px"
+                        name="custom:insider1"
+                      />
+                      <span
+                        >{{
+                          formatNumber(
+                            Number(row?.insider_balance_ratio_cur) > 0.001
+                              ? row?.insider_balance_ratio_cur || 0
+                              : 0,
+                            1
+                          )
+                        }}%</span
+                      >
+                    </div>
+                    <div
+                      v-tooltip="$t('phishing1')"
+                      class="flex mr-8px bg-btn"
+                      :style="{
+                        color: Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886',
+                      }"
+                    >
+                      <Icon class="iconfont icon-fish text-12px mr-4px" name="custom:fish"
+                      :style="{
+                        color: Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886',
+                        }"/>
+                      <span>{{
+                        formatNumber(
+                          Number(row?.phishing_ratio) > 0.001 ? row?.phishing_ratio || 0 : 0,
+                          1
                         )
                       }}%</span>
                     </div>
@@ -585,26 +603,7 @@
                       <span>{{
                         formatNumber(
                           Number(row?.address_binding_ratio) > 0.001 ? row?.address_binding_ratio || 0 : 0,
-                          2
-                        )
-                      }}%</span>
-                    </div>
-
-                    <div
-                      v-tooltip="$t('phishing1')"
-                      class="flex mr-8px bg-btn"
-                      :style="{
-                        color: Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886',
-                      }"
-                    >
-                      <Icon class="iconfont icon-fish text-12px mr-4px" name="custom:fish"
-                      :style="{
-                        color: Number(row?.phishing_ratio) > 5 ? '#F6465D' : '#12B886',
-                        }"/>
-                      <span>{{
-                        formatNumber(
-                          Number(row?.phishing_ratio) > 0.001 ? row?.phishing_ratio || 0 : 0,
-                          2
+                          1
                         )
                       }}%</span>
                     </div>

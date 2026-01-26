@@ -16,6 +16,7 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  first_transfer_in_from_label: string | undefined
   age_seconds: any
   first_transfer_in_from: any
   smart_wallet_ratio: number

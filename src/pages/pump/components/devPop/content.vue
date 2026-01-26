@@ -21,6 +21,14 @@
       </li>
       <li class="flex items-center justify-between mb-8px">
         <span class="color-[--secondary-text]">{{ $t('source') }}</span>
+        <span class="flex-1"></span>
+        <img
+          v-if="info.first_transfer_in_from_label"
+          v-tooltip="info.first_transfer_in_from_label"
+          class="w-12px h-12px cursor-pointer rounded-full mr-4px"
+          :src="formatIconPumpDev(info.first_transfer_in_from_label)"
+          alt=""
+        >
         <a class="color-[--main-text] visited:color-[--main-text] ml-auto clickable" :href="`/address/${info?.first_deposit_address}/${chain}`" target="_blank">{{ info?.first_deposit_address?.replace(new RegExp('(.{4})(.+)(.{4}$)'), '$1...$3') }}</a>
         <a class="ml-5px color-[--third-text] visited:color-[--third-text] clickable flex items-center" :href="formatExplorerUrl(chain, info.wallet_address, 'address')" target="_blank"><Icon name="custom:browser" /></a>
       </li>
