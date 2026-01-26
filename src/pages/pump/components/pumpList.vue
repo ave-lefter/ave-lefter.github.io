@@ -168,7 +168,7 @@
                         <Icon class="text-16px text-#fff" name="custom:search" />
                       </a>
                     </el-tooltip> -->
-                    <div v-if="!isOut" class="bg-btn bg-[--secondary-bg] absolute bottom--8px left--10px !rounded-4px border border-1 border-solid border-[#1E1F23] color-[--yellow] text-9px">
+                    <div v-if="!isOut" class="bg-btn bg-[--secondary-bg] absolute bottom--8px left--10px !rounded-4px border border-1 border-solid border-[--border] color-[--yellow] text-9px">
                       {{(row?.progress || 0).toFixed(0)}}%
                     </div>
                     <el-image
@@ -732,12 +732,12 @@
                       {{ formatNumber(row.tx_24h_count || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' })}}
                     </div>
                     <el-progress
-                      class="clickable w-20px ml-4px"
+                      class="clickable w-16px ml-4px"
                       :class="row.tx_24h_count > 0 || (Number(row.buys_tx_24h_count) + Number(row.sells_tx_24h_count) > 0)? 'progress-bar' : 'progress-bar-disabled'"
                       :percentage="Number((row.buys_tx_24h_count ||0) / row.tx_24h_count * 100) || 0"
                       :show-text="false"
                       color="#12B886"
-                      :stroke-width="3"
+                      :stroke-width="2"
                     />
                   </div>
                 </div>
