@@ -516,7 +516,12 @@ const list1 = computed(() => {
       if (!obj) return i
       return {
         ...i,
-        logo_url: obj.logo_url,
+        ...(obj.logo_url
+          ? {
+              logo_url: obj.logo_url
+            }
+          : {}
+        ),
         name: obj.name,
         symbol: obj.symbol,
         ...(obj.appendix
@@ -569,7 +574,12 @@ const list2 = computed(() => {
         if (!obj) return i
         return {
           ...i,
-          logo_url: obj.logo_url,
+          ...(obj.logo_url
+            ? {
+                logo_url: obj.logo_url
+              }
+            : {}
+          ),
           name: obj.name,
           symbol: obj.symbol,
           ...(obj.appendix
@@ -584,7 +594,14 @@ const list2 = computed(() => {
     }
     if (statisticsList.value?.length && filterList?.length) {
       filterList = mergeStatisticsList(statisticsList.value, filterList)
-    }
+  }
+    const tokenSet = new Set(
+      list3.value?.map(j => j.target_token)
+    )
+    filterList = filterList?.filter(
+      (i: { target_token: string }) =>
+        !tokenSet.has(i.target_token)
+    )
     return filterList?.slice?.(0, 100)
   })
 const list3 = computed(() => {
@@ -622,7 +639,12 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
       if (!obj) return i
       return {
         ...i,
-        logo_url: obj.logo_url,
+        ...(obj.logo_url
+          ? {
+              logo_url: obj.logo_url
+            }
+          : {}
+        ),
         name: obj.name,
         symbol: obj.symbol,
         ...(obj.appendix
