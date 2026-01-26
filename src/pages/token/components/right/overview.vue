@@ -255,9 +255,9 @@
         />
       </el-dialog>
     </div>
-    <div v-else-if="activeTab == 'devBit'">
+    <!-- <div v-else-if="activeTab == 'devBit'">
       <DevTokens />
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -290,7 +290,7 @@ const activeTab = shallowRef('info')
 const headerTabs = computed(() => {
   return [
     { id: 'info', name: t('tokenInfo') },
-    { id: 'devBit', name: t('devTokens') }
+    // { id: 'devBit', name: t('devTokens') }
   ]
 })
 const tabs = [
@@ -358,30 +358,30 @@ const shouldShowChainInfo = computed(() => {
 const route = useRoute()
 const id = computed(() => route.params.id as string)
 
-async function getRugPullList() {
-  const data = {
-    token_id: id.value,
-    pageNO: 1,
-    pageSize: 1,
-  }
-  const res = await _getDevList(data)
-  totalTokens.value = res.total_tokens
-}
+// async function getRugPullList() {
+//   const data = {
+//     token_id: id.value,
+//     pageNO: 1,
+//     pageSize: 1,
+//   }
+//   const res = await _getDevList(data)
+//   totalTokens.value = res.total_tokens
+// }
 
-watch(
-  () => route.params.id,
-  () => {
-    if (route.params.id) {
-      getRugPullList()
-    }
-  }
-)
+// watch(
+//   () => route.params.id,
+//   () => {
+//     if (route.params.id) {
+//       getRugPullList()
+//     }
+//   }
+// )
 
-onMounted(() => {
-  if (route.params.id) {
-    getRugPullList()
-  }
-})
+// onMounted(() => {
+//   if (route.params.id) {
+//     getRugPullList()
+//   }
+// })
 
 // function filterSuppportChains(chain: string) {
 //   return supportObj[chain] || ''
