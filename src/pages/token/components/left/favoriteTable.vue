@@ -137,7 +137,7 @@ const columns = computed(() => {
       label:
         (favoriteCondition.value.currentMode === 'mcap' ? t('mCap') : t('price')) +
         '{currentMode}/' +
-        t('Chg'),
+        '24h%',
       value: favoriteCondition.value.currentMode === 'mcap' ? 'price_change' : 'price_change',
       currentMode: favoriteCondition.value.currentMode,
       flex: 'flex-1 justify-end',
@@ -273,6 +273,8 @@ async function loadMoreFavorites() {
         .map((i) => ({
           ...i,
           id: i.token + '-' + i.chain,
+          //TODO price_change_v2
+          // price_change: i.price_change_v2,
           pool_circulating_supply:
             (i.total - i.lock_amount - i.burn_amount - i.other_amount) * i.current_price_usd,
         }))
@@ -379,7 +381,7 @@ function toggleMode(mode: string) {
           <NuxtLink
             v-for="(row, $index) in sortedFavList"
             :key="`${row.token}-${row.chain}`"
-            class="px-10px flex items-center h-50px cursor-pointer hover:bg-[--dialog-bg]"
+            class="px-10px flex items-center h-40px cursor-pointer hover:bg-[--dialog-bg]"
             :to="`/token/${row.token}-${row.chain}`"
           >
             <div class="flex items-center flex-1">

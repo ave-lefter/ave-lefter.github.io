@@ -62,7 +62,8 @@ const columns = computed(() => {
     flex: 'flex-1 justify-end',
     sort: true
   }, {
-    label: t('Chg') + '%',
+    label: '24h%',
+    // label: t('Chg') + '%',
     value: 'price_change',
     flex: 'flex-1 justify-end',
     sort: true
@@ -119,7 +120,7 @@ const columns = computed(() => {
       <NuxtLink
         v-for="(row,$index) in sortedHotList"
         :key="$index"
-        class="px-10px flex items-center h-50px cursor-pointer hover:bg-[--dialog-bg] text-12px"
+        class="px-10px flex items-center h-40px cursor-pointer hover:bg-[--dialog-bg] text-12px"
         :to="`/token/${row.token}-${row.chain}`"
       >
         <div class="flex-1 flex items-center">
