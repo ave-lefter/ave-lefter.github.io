@@ -441,9 +441,9 @@ type StatisticsItem = {
   buys_tx_24h_count:number
 
 }
-const statisticsList = shallowRef<StatisticsItem[]>([])
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
+const mapStatistics = shallowRef(new Map<string, any>())
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
   return (
@@ -534,8 +534,8 @@ const list1 = computed(() => {
       }
     })
   }
-  if (statisticsList.value?.length && filterList?.length) {
-    filterList = mergeStatisticsList(statisticsList.value, filterList)
+  if (filterList?.length) {
+    filterList = mergeStatisticsList(mapStatistics.value, filterList)
   }
   return filterList?.slice?.(0, 100)
 })
@@ -592,9 +592,9 @@ const list2 = computed(() => {
         }
       })
     }
-    if (statisticsList.value?.length && filterList?.length) {
-      filterList = mergeStatisticsList(statisticsList.value, filterList)
-  }
+    if (filterList?.length) {
+      filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    }
     const tokenSet = new Set(
       list3.value?.map(j => j.target_token)
     )
@@ -657,8 +657,8 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
       }
     })
   }
-  if (statisticsList.value?.length && filterList?.length) {
-    filterList = mergeStatisticsList(statisticsList.value, filterList)
+  if (filterList?.length) {
+    filterList = mergeStatisticsList(mapStatistics.value, filterList)
   }
   return filterList?.slice?.(0, 100)
 })
@@ -774,23 +774,30 @@ watch(() => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED], (val) => {
   }
 })
 const buffer: any[][] = []
+
 const flushStatistics = useThrottleFn(() => {
   if (!buffer.length || !documentVisible.value) return
-  const map = new Map<string, any>()
+  // const map = new Map<string, any>()
 
   // 旧数据
-  statisticsList.value.forEach(item => {
-    map.set(item.token, item)
-  })
+  // statisticsList.value.forEach(item => {
+  //   mapStatistics.value.set(item.token, item)
+  // })
   // 所有 buffer 中的新数据
   buffer.flat().forEach(item => {
-    const prev = map.get(item.token)
-    map.set(
+    const prev = mapStatistics.value.get(item.token)
+    mapStatistics.value.set(
       item.token,
       prev ? mergeStatistics(prev, item) : item
     )
   })
-  statisticsList.value = Array.from(map.values()).slice(0, 300)
+  if (mapStatistics.value.size > 200) {
+    const firstKey = mapStatistics.value.keys().next().value
+    if (firstKey) {
+      mapStatistics.value.delete(firstKey)
+    }
+  }
+  // statisticsList.value = Array.from(mapStatistics.values()).slice(0, 300)
   buffer.length = 0
 }, 150)
 watch(
@@ -825,6 +832,7 @@ onActivated(() => {
   isLeave = false
   wsTableListCache = {}
   wsTableList.value = []
+  mapStatistics.value.clear()
   document.addEventListener('mousemove', mouseInsideTxs)
   getPumpConfig()
   getPumpList()
@@ -877,7 +885,8 @@ const startPortraitTimer = () => {
   }
   portraitTimer = setTimeout(() => {
     unsubscribePortrait()
-    statisticsList.value = []
+    // statisticsList.value = []
+    mapStatistics.value.clear()
     subscribePortrait(mergedBaseList.value)
     startPortraitTimer()
   }, 1 * 60 * 1000)
@@ -1404,11 +1413,9 @@ function hasValue(obj: any, key: string | number) {
     && obj[key] !== undefined
     && obj[key] !== null
 }
-function mergeStatisticsList(statisticsList: StatisticsItem[], filterList: PumpObj[]) {
+function mergeStatisticsList(statisticsList: Map<string, StatisticsItem>, filterList: PumpObj[]) {
   return filterList.map(i => {
-    const obj = statisticsList?.find(
-      y => y.token === i.target_token
-    )
+    const obj = statisticsList.get(i.token)
     if (!obj) return i
     const next = { ...i }
 
