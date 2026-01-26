@@ -1487,7 +1487,12 @@ function mergeStatisticsList(statisticsList: Map<string, StatisticsItem>, filter
       next.current_price_usd = obj.uprice
     }
     if (hasValue(obj, 'total')) {
-      next.market_cap = Number(obj.total) * next.current_price_usd
+      next.total = Number(obj.total)
+      next.market_cap = Number(obj.total) * next.current_price_usd || next.total
+    } else {
+      if (next.total) {
+        next.market_cap = Number(next.total) * next.current_price_usd
+      }
     }
     if (next.amm === 'fourmemev2') {
       next.market_cap = next.market_cap || 1000000000 * obj?.uprice || 0
@@ -1534,7 +1539,6 @@ function mergeStatisticsList(statisticsList: Map<string, StatisticsItem>, filter
     if (hasValue(obj, 'age_seconds')) {
       next.age_seconds = obj.age_seconds
     }
-
     return next
   })
 }
