@@ -1330,6 +1330,8 @@ onUnmounted(() => {
     })
   })
   listenerGuidMap?.clear()
+  _widget?.remove?.()
+  _widget = null
 })
 const emit = defineEmits(['refresh'])
 function refresh() {
