@@ -532,7 +532,7 @@
                               Number(row?.dev_balance_ratio_cur) > 0.001
                                 ? row?.dev_balance_ratio_cur || 0
                                 : 0,
-                              2
+                              1
                             )
                           }}%
                         </span>
@@ -567,7 +567,7 @@
                             Number(row?.insider_balance_ratio_cur) > 0.001
                               ? row?.insider_balance_ratio_cur || 0
                               : 0,
-                            2
+                            1
                           )
                         }}%</span
                       >
@@ -584,7 +584,7 @@
                       <span>{{
                         formatNumber(
                           Number(row?.sniper_balance_ratio_cur) > 0.001 ? row?.sniper_balance_ratio_cur || 0 : 0,
-                          2
+                          1
                         )
                       }}%</span>
                     </div>
@@ -603,7 +603,7 @@
                       <span>{{
                         formatNumber(
                           Number(row?.address_binding_ratio) > 0.001 ? row?.address_binding_ratio || 0 : 0,
-                          2
+                          1
                         )
                       }}%</span>
                     </div>
@@ -622,7 +622,7 @@
                       <span>{{
                         formatNumber(
                           Number(row?.phishing_ratio) > 0.001 ? row?.phishing_ratio || 0 : 0,
-                          2
+                          1
                         )
                       }}%</span>
                     </div>
