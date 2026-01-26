@@ -710,21 +710,21 @@ pump_notice.value[activeChain.value]?.graduated
 watch(()=> pumpV3.value[activeChain.value].platforms, () => {
   getPumpList()
 })
-watch(activeChain, () => {
+watch(activeChain, (val, old) => {
   getPumpList()
   wsTableListCache = {}
   wsTableList.value = []
   wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
-    params: ['pumpstatev2'],
+    params: ['pumpstatev2', old],
     id: 1,
   })
   setTimeout(() => {
     wsv2Store.send({
       jsonrpc: '2.0',
       method: 'subscribe',
-      params: ['pumpstatev2', activeChain.value],
+      params: ['pumpstatev2', val],
       id: 1,
     })
   }, 500)
@@ -818,7 +818,11 @@ const getChangedValue = (A: string[], B: string[]): string | null => {
   return null
 }
 
+
+let isLeave = true
+
 onActivated(() => {
+  isLeave = false
   wsTableListCache = {}
   wsTableList.value = []
   document.addEventListener('mousemove', mouseInsideTxs)
@@ -827,7 +831,7 @@ onActivated(() => {
   wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
-    params: ['pumpstatev2'],
+    params: ['pumpstatev2', activeChain.value],
     id: 1,
   })
   setTimeout(() => {
@@ -847,11 +851,12 @@ onActivated(() => {
 })
 
 onDeactivated(()=>{
+  isLeave = true
   document.removeEventListener('mousemove', mouseInsideTxs)
   wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
-    params: ['pumpstatev2'],
+    params: ['pumpstatev2',  activeChain.value],
     id: 1,
   })
   for (const key in Timer) {
@@ -878,7 +883,7 @@ const startPortraitTimer = () => {
   }, 1 * 60 * 1000)
 }
 const subscribePortrait = (list) => {
-  if (!Array.isArray(list) || list.length === 0) return
+  if (!Array.isArray(list) || list.length === 0 || isLeave) return
 
   wsv2Store.send({
     jsonrpc: '2.0',
@@ -899,14 +904,14 @@ const subscribePortrait = (list) => {
 }
 
 const unsubscribePortrait = () => {
-  if (!isPortraitSubscribed) return
+  // if (!isPortraitSubscribed) return
   wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
     params: ['portrait_statistics'],
     id: 1,
   })
-  isPortraitSubscribed = false
+  // isPortraitSubscribed = false
 }
 
 const mouseInsideTxs = throttle(function (event) {
