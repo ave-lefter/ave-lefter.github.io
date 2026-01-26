@@ -71,12 +71,12 @@
             <div v-tooltip="formatDate(token.last_trade_at, 'YYYY-MM-DD HH:mm:ss')" class="lh-12px"><span class="text-12px color-[--third-text] text-10px">{{ t('lastTx') }}:{{ formatTimeFromNow(token.last_trade_at) }}</span>
             </div>
           </div>
-          <div class="text-12px text-right">
-              <div class="lh-16px">
-              <span :style="{ color: getDataColor('mc', token.market_cap) }">${{
-                formatNumber(token.market_cap, 1) }}</span>
+          <div class="text-12px text-right flex flex-col">
+            <div class="lh-16px" :style="{ color: getDataColor('mc', token.market_cap) }">${{
+              formatNumber(token.market_cap, 1) }}
               </div>
-              <div v-tooltip="t('createdTime')+':'+formatDate(token.created_at, 'YYYY-MM-DD HH:mm:ss')" class="inline-flex justify-end lh-12px color-[--third-text] text-10px">{{formatTimeFromNow(token.created_at)}}</div>
+            <div v-tooltip="t('createdTime') + ':' + formatDate(token.created_at, 'YYYY-MM-DD HH:mm:ss')"
+              class="justify-end lh-12px color-[--third-text] text-10px">{{ formatTimeFromNow(token.created_at) }}</div>
             </div>
         </div>
       </div>
