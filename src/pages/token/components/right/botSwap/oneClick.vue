@@ -558,7 +558,7 @@ onMounted(() => {
   addSpaceKeyDownEvent()
 })
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   disableDragScroll()
 })
 
