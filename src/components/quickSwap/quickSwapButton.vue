@@ -172,7 +172,7 @@ const wsStore = useWSStore()
 function handleTxSuccess(res: any, _batchId: string) {
   if (res) {
     let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
-      ElNotification({type: 'success', message: t('transactionsSubmitted')})
+      // ElNotification({type: 'success', message: t('transactionsSubmitted')})
       tokenStore.placeOrderUpdate++
       loadingSwap.value = false
     }, 500)
@@ -218,12 +218,27 @@ function handleTxSuccess(res: any, _batchId: string) {
 async function getTokenBalance(chain: string) {
   const walletAddress = botStore.getWalletAddress(chain)
   if (!walletAddress) return
+  const balance = botStore.userInfo.addresses.find(item => item.chain === chain)?.balance
+  let token: any = {
+    chain,
+    token: getNativeToken(chain),
+    address: getNativeToken(chain),
+    decimals: getChainInfo(chain)?.decimals,
+    symbol: getChainInfo(chain)?.main_name,
+  }
+  if (balance) {
+    nativeToken.value = {
+      ...token,
+      balance
+    }
+    return
+  }
   const res = await bot_getTokenBalance({
     chain,
     tokens: [getNativeToken(chain)],
     walletAddress
   })
-  const token = res?.[0] || {}
+  token = res?.[0] || {}
   nativeToken.value = {
     ...token,
     symbol: getChainInfo(chain)?.main_name,

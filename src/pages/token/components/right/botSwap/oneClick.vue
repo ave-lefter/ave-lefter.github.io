@@ -114,7 +114,7 @@ const isEnableHotkey = useLocalStorage('isEnableHotkey', false)
 const isEnablePnL = useLocalStorage('isEnablePnL', true)
 const isEnableShowsReflected = useLocalStorage('isEnableShowsReflected', false)
 
-const { getTokenBalance, checkApproveAndApprove } = useBotSwap()
+const { getTokenBalance, updateBalanceFromWs } = useBotSwap()
 
 const chain = computed(() => {
   return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as BotChain
@@ -264,7 +264,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       if (res) {
         let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
           // this.$store.state.bot.historyUpdate++
-          ElNotification({ type: 'success', message: t('transactionsSubmitted') })
+          // ElNotification({ type: 'success', message: t('transactionsSubmitted') })
           // if (!['myBotHistory', 'myBotPosition']?.includes(this.$store.state.tabActive)) {
           //   this.$store.state.tabActive = 'myBotHistory'
           // }
@@ -334,10 +334,11 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
     const settings = mev ? botSetting?.gas[0] : botSetting?.gas[1]
     const gasPrice = !settings?.customFee ? '0' : (settings?.customFee || gasTips?.[settings?.level] || '3')
     const gasTip = Number(new BigNumber(gasPrice).times(10 ** 9).toFixed(0))
+    const batchId = Date.now().toString()
     const data = {
-      batchId: Date.now().toString(),
       chain: chain,
       swapList: [{
+        batchId,
         creatorAddress: walletAddress || '',
         inAmount: new BigNumber(amount || 0).times(10 ** (fromToken?.decimals || 0)).toFixed(0),
       }],
@@ -360,7 +361,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       if (res) {
         let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
           // this.$store.state.bot.historyUpdate++
-          ElNotification({ type: 'success', message: t('transactionsSubmitted') })
+          // ElNotification({ type: 'success', message: t('transactionsSubmitted') })
           // if (!['myBotHistory', 'myBotPosition']?.includes(this.$store.state.tabActive)) {
           //   this.$store.state.tabActive = 'myBotHistory'
           // }
@@ -382,8 +383,9 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
           [txInfo?.batchId]: txInfo?.id
         }
         const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
-          const batchId = subscribeResult.batchId
-          if (batchId === data.batchId) {
+          const _batchId = subscribeResult.batchId
+           console.log('subscribeResult', subscribeResult, batchId, _batchId)
+          if (_batchId === batchId) {
             if (Timer) {
               clearTimeout(Timer)
               Timer = null
@@ -396,7 +398,13 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
                 getTokenBalance()
               }, 1000)
               const txInfo = subscribeResult?.txList?.[0]
-              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[batchId] || '')
+              updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[_batchId] || '')
+              updateBalanceFromWs({
+                chain: data.chain,
+                inTokenAddress: data.inTokenAddress,
+                outTokenAddress: data.outTokenAddress,
+                ...txInfo
+              })
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
               unwatch()
@@ -441,22 +449,22 @@ async function handleSellAmount(item: string, index: number) {
   if (loadingSwapSell.value?.some(i => i)) {
     return
   }
-  const chain = getChain()
-  const chainMainToken: Record<string, string> = {
-    solana: 'sol',
-    ton: 'TON',
-  }
-  const native = chainMainToken?.[chain] || NATIVE_TOKEN
-  const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
-  loadingSwapSell.value[index] = true
-  await checkApproveAndApprove({
-    inToken: token.address,
-    outToken: native,
-    chain: chain,
-    owner: walletAddress
-  }).finally(() => {
-    loadingSwapSell.value[index] = false
-  })
+  // const chain = getChain()
+  // const chainMainToken: Record<string, string> = {
+  //   solana: 'sol',
+  //   ton: 'TON',
+  // }
+  // const native = chainMainToken?.[chain] || NATIVE_TOKEN
+  // const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
+  // loadingSwapSell.value[index] = true
+  // await checkApproveAndApprove({
+  //   inToken: token.address,
+  //   outToken: native,
+  //   chain: chain,
+  //   owner: walletAddress
+  // }).finally(() => {
+  //   loadingSwapSell.value[index] = false
+  // })
   submitBotSwap(amount, 'sell', index)
 }
 
