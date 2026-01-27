@@ -75,6 +75,8 @@
     setRefCodeToCookie()
   }
 
+  useMemorySentinel()
+
   onBeforeMount(() => {
     init()
   })
