@@ -171,7 +171,7 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (priceData) => {
       return {
         ...token,
         current_price_usd: newPrice,
-        price_change_24h: priceUpdate.price_change,
+        price_change_24h: priceUpdate.price_change_v2,
         pool_circulating_supply: (token.total - token.lock_amount - token.burn_amount - token.other_amount) * newPrice
       }
     }
@@ -356,7 +356,8 @@ const getList = async () => {
         id: `${i.token}-${i.chain}`,
         ...i,
         price_change_24h:
-          i?.chain == 'brc20' ? i.price_change_v2 || 0 : i.price_change || 0,
+          // i?.chain == 'brc20' ? i.price_change_v2 || 0 : i.price_change || 0,
+          i?.price_change_v2 ||i?.price_change|| 0,
         pool_circulating_supply: (i.total - i.lock_amount - i.burn_amount - i.other_amount) * i.current_price_usd,
         group_id: activeTab.value,
       }))) ||

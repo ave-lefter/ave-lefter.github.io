@@ -65,7 +65,7 @@ watch(
         return {
           ...i,
           current_price_usd: item.uprice,
-          price_change: item.price_change,
+          price_change: item.price_change_v2,
         }
       }
       return i
@@ -274,7 +274,7 @@ async function loadMoreFavorites() {
           ...i,
           id: i.token + '-' + i.chain,
           //TODO price_change_v2
-          // price_change: i.price_change_v2,
+          price_change: i.price_change_v2,
           pool_circulating_supply:
             (i.total - i.lock_amount - i.burn_amount - i.other_amount) * i.current_price_usd,
         }))

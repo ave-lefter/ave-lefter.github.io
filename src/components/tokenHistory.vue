@@ -167,6 +167,7 @@ function lastTokensPriceChange(val:IPriceV2Response) {
           ...i,
           price: item.uprice,
           price_change: Number(item.price_change),
+          price_change_v2: Number(item.price_change_v2),
         }
       }
       return i
@@ -238,7 +239,7 @@ function balancePriceChange(val:IPriceV2Response) {
             <span :class="getColorClass(Number(item.total_profit_ratio))">{{+item.total_profit_ratio>0?'+':''}}{{ formatNumber(Number(+item.total_profit_ratio*100),2) }}%</span>
           </template>
           <template v-else>
-            <span :class="getColorClass(Number(item.price_change))">{{+item.price_change>0?'+':''}}{{ formatNumber(Number(item.price_change),2) }}%</span>
+            <span :class="getColorClass(Number(item.price_change_v2))">{{+item.price_change_v2>0?'+':''}}{{ formatNumber(Number(item.price_change_v2),2) }}%</span>
           </template>
           <Icon v-if="isLastVisitTab" name="custom:close" class="cursor-pointer text-16px hidden group-hover:block" @click.self.stop.prevent="onDelete(item.id)"/>
         </NuxtLink>
