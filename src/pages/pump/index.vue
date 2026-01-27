@@ -341,7 +341,6 @@ const Timer: {
   graduated: null
 }
 const { width } = useWindowSize()
-console.log('-----width-------',width)
 const activeTab = shallowRef('new')
 const route = useRoute()
 const { t } = useI18n()
@@ -711,6 +710,14 @@ watch(()=> pumpV3.value[activeChain.value].platforms, () => {
   getPumpList()
 })
 watch(activeChain, (val, old) => {
+  if (old) {
+    fourmemeListObj[old] = {
+      new: [],
+      soon: [],
+      graduated: []
+    }
+  }
+
   getPumpList()
   wsTableListCache = {}
   wsTableList.value = []
@@ -781,15 +788,15 @@ watch(
     // 控制 buffer 最大数量（防爆）
     if (bufferLogoMap.size > 100) {
       const firstKey = bufferLogoMap.keys().next().value
-      bufferLogoMap.delete(firstKey)
+      if (firstKey) bufferLogoMap.delete(firstKey)
     }
     logoThrottled()
   }
 )
-const buffer: any[][] = []
+// const buffer: any[] = []
 
 const flushStatistics = useThrottleFn(() => {
-  if (!buffer.length || !documentVisible.value) return
+  if (!mapStatistics.value.size || !documentVisible.value) return
   // const map = new Map<string, any>()
 
   // 旧数据
@@ -797,30 +804,43 @@ const flushStatistics = useThrottleFn(() => {
   //   mapStatistics.value.set(item.token, item)
   // })
   // 所有 buffer 中的新数据
-  buffer.flat().forEach(item => {
-    const prev = mapStatistics.value.get(item.token)
-    mapStatistics.value.set(
-      item.token,
-      prev ? mergeStatistics(prev, item) : item
-    )
-  })
-  if (mapStatistics.value.size > 200) {
-    const firstKey = mapStatistics.value.keys().next().value
-    if (firstKey) {
-      mapStatistics.value.delete(firstKey)
-    }
-  }
-  // statisticsList.value = Array.from(mapStatistics.values()).slice(0, 300)
+  // buffer.forEach(item => {
+  //   const prev = mapStatistics.value.get(item.token)
+  //   mapStatistics.value.set(
+  //     item.token,
+  //     prev ? mergeStatistics(prev, item) : item
+  //   )
+  // })
+  // if (mapStatistics.value.size > 200) {
+  //   const firstKey = mapStatistics.value.keys().next().value
+  //   if (firstKey) {
+  //     mapStatistics.value.delete(firstKey)
+  //   }
+  // }
   triggerRef(mapStatistics)
-  buffer.length = 0
-}, 150)
+  // statisticsList.value = Array.from(mapStatistics.values()).slice(0, 300)
+  // buffer.length = 0
+}, 300)
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
   (val) => {
     if (!Array.isArray(val) || !val.length ) return
     // buffer.push(val)
-    buffer.splice(0, 0, val)
-    buffer.splice(100)
+    // buffer.splice(0, 0, ...val)
+    // buffer.splice(100)
+    val.forEach((item: any) => {
+      const prev = mapStatistics.value.get(item.token)
+      mapStatistics.value.set(
+        item.token,
+        prev ? mergeStatistics(prev, item) : item
+      )
+    })
+    if (mapStatistics.value.size > 100) {
+      const firstKey = mapStatistics.value.keys().next().value
+      if (firstKey) {
+        mapStatistics.value.delete(firstKey)
+      }
+    }
     flushStatistics()
   }
 )

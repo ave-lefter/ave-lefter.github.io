@@ -95,14 +95,14 @@ row-class-name="cursor-pointer color-[--secondary-text] text-12px"
                 </div>
                 <el-progress :width="120" style="--el-fill-color-light:var(--down-color)" color="var(--up-color)"
                     :stroke-width="10" type="circle"
-                    :percentage="tokenObj.total_migrated / tokenObj.total_tokens * 100">
+                    :percentage="Number((tokenObj?.total_migrated || 0) / (tokenObj?.total_tokens || 1) * 100) || 0">
                     <template #default="{ percentage }">
                         <div class="font-bold text-24px lh-30px color-[--main-text] mb-4px">{{
                             formatNumber(percentage,1) }}%</div>
                         <div class="color-[--third-text] text-12px">{{ t('migrated') }}</div>
                     </template>
                 </el-progress>
-               
+
             </div>
             <div class="text-16px lh-16px color-[--secondary-text] mb-8px">
                     {{ t('highestRecord') }}
@@ -239,7 +239,7 @@ async function getRugPullList() {
 }
 
 async function _getBalance(dev_address: string) {
-    const chain = tokenStore.token?.chain as string 
+    const chain = tokenStore.token?.chain as string
     const _balance = await bot_getTokenBalance({
         chain,
         walletAddress: dev_address,

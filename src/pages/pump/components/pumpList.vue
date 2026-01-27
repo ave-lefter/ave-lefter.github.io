@@ -348,7 +348,8 @@
                           >
                             <Icon
                               :name="`custom-media:${item.icon}`"
-                              class="text-[--third-text] h-12px"
+                              :class="`h-12px ${
+                                (item.icon === 'github'|| item.icon === 'tiktok') ? 'text-[--github-color]' : 'text-[--third-text]'}`"
                             />
                           </a>
                         </template>
@@ -743,7 +744,7 @@
                       {{ formatNumber(row.tx_24h_count || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' })}}
                     </div>
                     <el-progress
-                      class="clickable w-16px ml-4px"
+                      class="clickable w-16px ml-4px border-rd-4px overflow-hidden"
                       :class="row.tx_24h_count > 0 || (Number(row.buys_tx_24h_count) + Number(row.sells_tx_24h_count) > 0)? 'progress-bar' : 'progress-bar-disabled'"
                       :percentage="Number((row.buys_tx_24h_count ||0) / row.tx_24h_count * 100) || 0"
                       :show-text="false"

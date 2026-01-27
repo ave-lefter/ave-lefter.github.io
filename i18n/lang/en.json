@@ -1959,5 +1959,6 @@
   "historyHighestMarketCap": "History Highest Market Cap",
   "latestToken": "Latest Token",
   "ago": "ago",
-  "similarTokens": "Similar Tokens"
+  "similarTokens": "Similar Tokens",
+  "top100": "Top100 moving average"
 }
