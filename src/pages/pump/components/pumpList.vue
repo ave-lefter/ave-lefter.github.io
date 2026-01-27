@@ -347,9 +347,15 @@
                             @click.stop
                           >
                             <Icon
+                              v-if="item.icon === 'tiktok'"
+                              :name="`custom-media:${isDark?'tiktok1':'tiktok2'}`"
+                              :class="`h-12px`"
+                            />
+                            <Icon
+                              v-else
                               :name="`custom-media:${item.icon}`"
                               :class="`h-12px ${
-                                (item.icon === 'github'|| item.icon === 'tiktok') ? 'text-[--github-color]' : 'text-[--third-text]'}`"
+                                (item.icon === 'github') ? 'text-[--github-color]' : 'text-[--third-text]'}`"
                             />
                           </a>
                         </template>
@@ -884,7 +890,7 @@ const { tableList, quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
 const router = useRouter()
 const { token_logo_url } = useConfigStore()
 const globalStore = useGlobalStore()
-const { pumpSetting, pumpBlackList, lang, dialogVisible_search, dialogSearchText} = storeToRefs(globalStore)
+const { pumpSetting, pumpBlackList, lang,isDark, dialogVisible_search, dialogSearchText} = storeToRefs(globalStore)
 const isPaused = defineModel<boolean>('isPaused')
 
 const { t } = useI18n()
