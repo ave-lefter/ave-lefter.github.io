@@ -259,6 +259,7 @@ function subscribePublicTwitter(method) {
 }
 
 function subscribeTwitter(method) {
+  console.log('subscribeTwitter', method)
   v2WsStore.send({
     jsonrpc: '2.0',
     method,
@@ -267,7 +268,7 @@ function subscribeTwitter(method) {
   })
 }
 
-subscribePublicTwitter()
+subscribePublicTwitter('subscribe')
 watch(()=>activeTab.value,val=>{
   if(val === TAB_TYPE.MINE){
     subscribePublicTwitter('unsubscribe')

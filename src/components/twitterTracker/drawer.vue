@@ -206,6 +206,9 @@ const getList = async () => {
       } else {
         list.value = newList
       }
+      if (!finished.value && list.value.length < 40) {
+        getList()
+      }
     }
   } catch (error) {
     console.error('Error fetching Twitter tracker list:', error)
