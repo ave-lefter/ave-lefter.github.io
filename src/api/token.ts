@@ -1225,3 +1225,14 @@ export function getBestToken(token_id:string) {
     }
   })
 }
+
+// 同名代币
+export function getSimilarTokens(token_id:string) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token/v1/token/similar', {
+    method: 'get',
+    query: {
+      token_id
+    }
+  })
+}

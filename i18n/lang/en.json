@@ -1966,5 +1966,15 @@
   "pendingRebate": "Commission",
   "chainWallet3": "Chain Wallet",
   "invitedUser": "Invite Users",
-  "monitorBotError": "Monitoring robot address not supported"
+  "monitorBotError": "Monitoring robot address not supported",
+  "markersBuy": "Markers Buy",
+  "markersSell": "Markers Sell",
+  "liqTip": "Pool count and bottom pool size",
+  "tokenStatistics": "Token Statistics",
+  "dev3": "Developer",
+  "highestRecord": "Highest Record",
+  "historyHighestMarketCap": "History Highest Market Cap",
+  "latestToken": "Latest Token",
+  "ago": "ago",
+  "similarTokens": "Similar Tokens"
 }

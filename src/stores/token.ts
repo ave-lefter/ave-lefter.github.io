@@ -29,6 +29,7 @@ export const useTokenStore = defineStore('token', () => {
     'tokenWarningNotice',
     {}
   )
+  const devTokenNum = ref(0)
   const collected = shallowRef(false)
   const loadingToken = shallowRef(false)
   const token = computed(() => tokenInfo.value?.token)
@@ -89,6 +90,7 @@ export const useTokenStore = defineStore('token', () => {
   const centerTopHeight = shallowRef(DefaultHeight.KLINE)
   const {height} = useWindowSize()
   const commonHeight = computed(() => height.value - centerTopHeight.value)
+  const bestToken = ref(null)
 
   const swap = reactive<{
     native: Token,
@@ -334,6 +336,8 @@ export const useTokenStore = defineStore('token', () => {
     collected,
     getXType: _getXType,
     loadingToken,
+    devTokenNum,
+    bestToken
   }
 })
 

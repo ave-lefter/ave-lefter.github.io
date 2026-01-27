@@ -714,7 +714,7 @@
   "recentPnl": "最近盈虧",
   "walletActivity": "活動",
   "deployedToken": "發幣記錄",
-  "migrated1": "已遷移",
+  "migrated1": "是否迁移",
   "walletMarketCap": "市值",
   "allTimeHigh": "歷史最高價",
   "Bonding Curve Progress": "綁定曲線進度",
@@ -1952,5 +1952,15 @@
   "pendingRebate": "待領取佣金",
   "invitedUser": "邀請用戶",
   "chainWallet3": "鏈錢包",
-  "monitorBotError": "不支持監控機器人地址"
+  "monitorBotError": "不支持監控機器人地址",
+  "markersBuy": "總買入錢包數",
+  "markersSell": "總賣出錢包數",
+  "liqTip": "池子数和底池大小",
+  "tokenStatistics": "代币统计",
+  "dev3": "开发者",
+  "highestRecord": "最高战绩",
+  "historyHighestMarketCap": "历史最高市值",
+  "latestToken": "最新代币",
+  "ago": "以前",
+  "similarTokens": "同名代币"
 }
