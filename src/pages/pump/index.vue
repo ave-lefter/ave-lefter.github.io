@@ -93,7 +93,7 @@
         class="mr-12px"
       />
       <AutoSellSetting :chain="activeChain" />
-    
+
     </div>
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full px-16px">
       <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
@@ -535,6 +535,7 @@ const list1 = computed(() => {
   }
   if (filterList?.length) {
     filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    fourmemeListObj[activeChain.value].new = filterList?.slice?.(0, 100) || []
   }
   return filterList?.slice?.(0, 100)
 })
@@ -601,6 +602,8 @@ const list2 = computed(() => {
       (i: { target_token: string }) =>
         !tokenSet.has(i.target_token)
     )
+
+     fourmemeListObj[activeChain.value].soon = filterList?.slice?.(0, 100) || []
     return filterList?.slice?.(0, 100)
   })
 const list3 = computed(() => {
@@ -658,6 +661,7 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
   }
   if (filterList?.length) {
     filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    fourmemeListObj[activeChain.value].graduated = filterList?.slice?.(0, 100) || []
   }
   return filterList?.slice?.(0, 100)
 })
@@ -866,7 +870,6 @@ onActivated(() => {
   isLeave = false
   wsTableListCache = {}
   wsTableList.value = []
-  mapStatistics.value.clear()
   document.addEventListener('mousemove', mouseInsideTxs)
   getPumpConfig()
   getPumpList()
@@ -1440,76 +1443,77 @@ watch(documentVisible, (val) => {
 //     })
 //   }
 // })
-function hasValue(obj: any, key: string | number) {
-  return Object.prototype.hasOwnProperty.call(obj, key)
-    && obj[key] !== undefined
-    && obj[key] !== null
-}
-function mergeStatisticsList(statisticsList: Map<string, StatisticsItem>, filterList: PumpObj[]) {
+
+const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
+  ['volume_u_24h', 'volume_u_24h'],
+  ['net_flow_vol', 'net_flow_vol'],
+  ['address_binding_ratio', 'address_binding_ratio'],
+  ['phishing_ratio', 'phishing_ratio'],
+  ['sells_tx_24h_count', 'sells_tx_24h_count'],
+  ['buys_tx_24h_count', 'buys_tx_24h_count'],
+  ['migrated_count', 'migrated_count'],
+  ['total_count', 'total_count'],
+  ['migrated_ratio', 'migrated_ratio'],
+  ['max_dev_ratio', 'max_dev_ratio'],
+  ['kol_ratio', 'kol_ratio'],
+  ['smart_wallet_ratio', 'smart_wallet_ratio'],
+  ['first_transfer_in_from', 'first_transfer_in_from'],
+  ['first_transfer_in_from_label', 'first_transfer_in_from_label'],
+  ['age_seconds', 'age_seconds'],
+]
+const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
+  ['holder_count', 'holders'],
+  ['rat_ratio', 'insider_balance_ratio_cur'],
+  ['dev_ratio', 'dev_balance_ratio_cur'],
+  ['sniper_ratio', 'sniper_balance_ratio_cur'],
+  ['top10_ratio', 'holders_top10_ratio'],
+  ['tx_count_24h', 'tx_24h_count'],
+  ['tvl', 'tvl'],
+  ['reserve0', 'reserve0'],
+  ['reserve1', 'reserve1'],
+  ['makers_24h', 'makers_24h'],
+  ['sellers_24h', 'sellers_24h'],
+  ['buyers_24h', 'buyers_24h'],
+  ['kol_count', 'kol_tag_count'],
+  ['smart_wallet_count', 'smart_wallet_tag_count'],
+]
+function mergeStatisticsList(
+  statisticsList: Map<string, StatisticsItem>,
+  filterList: PumpObj[]
+) {
   return filterList.map(i => {
     const obj = statisticsList.get(i.token)
     if (!obj) return i
+
     const next = { ...i }
 
-    if (hasValue(obj, 'progress')) {
-      if (Number(obj.progress) < 0) {
-        next.progress = 0
-      } else {
-        next.progress = Math.min(Number(obj.progress), 100)
+    /** progress（特殊处理） */
+    if (obj.progress != null) {
+      const p = Number(obj.progress)
+      next.progress = p < 0 ? 0 : Math.min(p, 100)
+    }
+
+    /** 普通映射 */
+    for (const [from, to] of DIRECT_MAP) {
+      const v = obj[from]
+      if (v != null) {
+        ;(next as any)[to] = v
       }
     }
-    if (hasValue(obj, 'holder_count')) {
-      next.holders = obj.holder_count
+
+    /** Number 映射 */
+    for (const [from, to] of NUMBER_MAP) {
+      const v = obj[from]
+      if (v != null) {
+        ;(next as any)[to] = Number(v)
+      }
     }
-    if (hasValue(obj, 'rat_ratio')) {
-      next.insider_balance_ratio_cur = Number(obj.rat_ratio)
-    }
-    if (hasValue(obj,'dev_ratio')) {
-      next.dev_balance_ratio_cur = Number(obj.dev_ratio)
-    }
-    if (hasValue(obj, 'sniper_ratio')) {
-      next.sniper_balance_ratio_cur = Number(obj.sniper_ratio)
-    }
-    if (hasValue(obj, 'top10_ratio')) {
-      next.holders_top10_ratio = Number(obj.top10_ratio)
-    }
-    if (hasValue(obj, 'volume_u_24h')) {
-      next.volume_u_24h = obj.volume_u_24h
-    }
-    if (hasValue(obj, 'tx_count_24h')) {
-      next.tx_24h_count = Number(obj.tx_count_24h)
-    }
-    if (hasValue(obj, 'tvl')) {
-      next.tvl = Number(obj.tvl)   //池子大小
-    }
-    if (hasValue(obj, 'reserve0')) {
-      next.reserve0 = Number(obj.reserve0)
-    }
-    if (hasValue(obj, 'reserve1')) {
-      next.reserve1 = Number(obj.reserve1)
-    }
-    if (hasValue(obj, 'makers_24h')) {
-      next.makers_24h = Number(obj.makers_24h)
-    }
-    if (hasValue(obj, 'sellers_24h')) {
-      next.sellers_24h = Number(obj.sellers_24h)
-    }
-    if (hasValue(obj, 'buyers_24h')) {
-      next.buyers_24h = Number(obj.buyers_24h)
-    }
-    if (hasValue(obj, 'net_flow_vol')) {
-      next.net_flow_vol = obj.net_flow_vol
-    }
-    if (hasValue(obj, 'address_binding_ratio')) {
-      next.address_binding_ratio = obj.address_binding_ratio
-    }
-    if (hasValue(obj, 'phishing_ratio')) {
-      next.phishing_ratio = obj.phishing_ratio
-    }
-    if (hasValue(obj, 'uprice')) {
+
+    /** price / total / market_cap */
+    if (obj.uprice != null) {
       next.current_price_usd = obj.uprice
     }
-    if (hasValue(obj, 'total')) {
+    if (obj.total != null) {
       next.total = Number(obj.total)
     }
     if (next.chain == 'bsc') {
@@ -1521,147 +1525,53 @@ function mergeStatisticsList(statisticsList: Map<string, StatisticsItem>, filter
     } else {
       next.market_cap = Number(next.total) * next.current_price_usd || next.market_cap
     }
-    // console.log('-------next-------',  next.total, next.current_price_usd, next.market_cap, next.token)
-    if (hasValue(obj, 'sells_tx_24h_count')) {
-      next.sells_tx_24h_count = obj.sells_tx_24h_count
-    }
-    if (hasValue(obj, 'buys_tx_24h_count')) {
-      next.buys_tx_24h_count = obj.buys_tx_24h_count
-    }
-    if (hasValue(obj, 'migrated_count')) {
-      next.migrated_count = obj.migrated_count
-    }
-    if (hasValue(obj, 'total_count')) {
-      next.total_count = obj.total_count
-    }
-    if (hasValue(obj, 'migrated_ratio')) {
-      next.migrated_ratio = obj.migrated_ratio
-    }
-    if (hasValue(obj, 'max_dev_ratio')) {
-      next.max_dev_ratio = obj.max_dev_ratio
-    }
-    if (hasValue(obj, 'kol_count')) {
-      next.kol_tag_count = obj.kol_count
-    }
-    if (hasValue(obj, 'kol_ratio')) {
-      next.kol_ratio = obj.kol_ratio
-    }
-    if (hasValue(obj, 'smart_wallet_count')) {
-      next.smart_wallet_tag_count = obj.smart_wallet_count
-    }
-    if (hasValue(obj, 'smart_wallet_ratio')) {
-      next.smart_wallet_ratio = obj.smart_wallet_ratio
-    }
-    if (hasValue(obj, 'first_transfer_in_from')) {
-      next.first_transfer_in_from = obj.first_transfer_in_from
-    }
-    if (hasValue(obj, 'first_transfer_in_from_label')) {
-      next.first_transfer_in_from_label = obj.first_transfer_in_from_label
-    }
-    if (hasValue(obj, 'age_seconds')) {
-      next.age_seconds = obj.age_seconds
-    }
     return next
   })
 }
+
+const MERGE_KEYS = [
+  'progress',
+  'holder_count',
+  'rat_ratio',
+  'dev_ratio',
+  'sniper_ratio',
+  'top10_ratio',
+  'uprice',
+  'volume_u_24h',
+  'tx_count_24h',
+  'tvl',
+  'reserve0',
+  'reserve1',
+  'makers_24h',
+  'sellers_24h',
+  'buyers_24h',
+  'address_binding_ratio',
+  'phishing_ratio',
+  'total',
+  'net_flow_vol',
+  'sells_tx_24h_count',
+  'buys_tx_24h_count',
+  'migrated_count',
+  'total_count',
+  'migrated_ratio',
+  'max_dev_ratio',
+  'kol_count',
+  'kol_ratio',
+  'smart_wallet_count',
+  'smart_wallet_ratio',
+  'first_transfer_in_from',
+  'first_transfer_in_from_label',
+  'age_seconds',
+] as const
+
 function mergeStatistics(prev: any, next: any) {
   const result = { ...prev }
-  if (hasValue(next, 'progress')) {
-    result.progress = next.progress
-  }
-  if (hasValue(next, 'holder_count')) {
-    result.holder_count = next.holder_count
-  }
-  if (hasValue(next, 'rat_ratio')) {
-    result.rat_ratio = next.rat_ratio
-  }
-  if (hasValue(next, 'dev_ratio')) {
-    result.dev_ratio = next.dev_ratio
-  }
-  if (hasValue(next, 'sniper_ratio')) {
-    result.sniper_ratio = next.sniper_ratio
-  }
-  if (hasValue(next, 'top10_ratio')) {
-    result.top10_ratio = next.top10_ratio
-  }
-  if (hasValue(next, 'uprice')) {
-    result.uprice = next.uprice
-  }
-  if (hasValue(next, 'volume_u_24h')) {
-    result.volume_u_24h = next.volume_u_24h
-  }
-  if (hasValue(next, 'tx_count_24h')) {
-    result.tx_count_24h = next.tx_count_24h
-  }
-  if (hasValue(next, 'tvl')) {
-    result.tvl = next.tvl
-  }
-  if (hasValue(next, 'reserve0')) {
-    result.reserve0 = next.reserve0
-  }
-  if (hasValue(next, 'reserve1')) {
-    result.reserve1 = next.reserve1
-  }
-  if (hasValue(next, 'makers_24h')) {
-    result.makers_24h = next.makers_24h
-  }
-  if (hasValue(next, 'sellers_24h')) {
-    result.sellers_24h = next.sellers_24h
-  }
-  if (hasValue(next, 'buyers_24h')) {
-    result.buyers_24h = next.buyers_24h
-  }
-  if (hasValue(next, 'address_binding_ratio')) {
-    result.address_binding_ratio = next.address_binding_ratio
-  }
-    if (hasValue(next, 'phishing_ratio')) {
-    result.phishing_ratio = next.phishing_ratio
-  }
-  if (hasValue(next, 'total')) {
-    result.total = next.total
-  }
-  if (hasValue(next, 'net_flow_vol')) {
-    result.net_flow_vol = next.net_flow_vol
-  }
-  if (hasValue(next, 'sells_tx_24h_count')) {
-    result.sells_tx_24h_count = next.sells_tx_24h_count
-  }
-  if (hasValue(next, 'buys_tx_24h_count')) {
-    result.buys_tx_24h_count = next.buys_tx_24h_count
-  }
-  if (hasValue(next, 'migrated_count')) {
-    result.migrated_count = next.migrated_count
-  }
-  if (hasValue(next, 'total_count')) {
-    result.total_count = next.total_count
-  }
-  if (hasValue(next, 'migrated_ratio')) {
-    result.migrated_ratio = next.migrated_ratio
-  }
-  if (hasValue(next, 'max_dev_ratio')) {
-    result.max_dev_ratio = next.max_dev_ratio
-  }
-  if (hasValue(next, 'kol_count')) {
-    result.kol_count = next.kol_count
-  }
-  if (hasValue(next, 'kol_ratio')) {
-    result.kol_ratio = next.kol_ratio
-  }
 
-  if (hasValue(next, 'smart_wallet_count')) {
-    result.smart_wallet_count = next.smart_wallet_count
-  }
-  if (hasValue(next, 'smart_wallet_ratio')) {
-    result.smart_wallet_ratio = next.smart_wallet_ratio
-  }
-  if (hasValue(next, 'first_transfer_in_from')) {
-    result.first_transfer_in_from = next.first_transfer_in_from
-  }
-  if (hasValue(next, 'first_transfer_in_from_label')) {
-    result.first_transfer_in_from_label = next.first_transfer_in_from_label
-  }
-  if (hasValue(next, 'age_seconds')) {
-    result.age_seconds = next.age_seconds
+  for (const key of MERGE_KEYS) {
+    const v = next[key]
+    if (v !== null && v !== undefined) {
+      result[key] = v
+    }
   }
   return result
 }
