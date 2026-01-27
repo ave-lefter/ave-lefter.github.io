@@ -919,8 +919,6 @@ const startPortraitTimer = () => {
   }
   portraitTimer = setTimeout(() => {
     unsubscribePortrait()
-    // statisticsList.value = []
-    mapStatistics.value.clear()
     subscribePortrait(mergedBaseList.value)
     startPortraitTimer()
   }, 1 * 60 * 1000)

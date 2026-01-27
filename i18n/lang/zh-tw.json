@@ -1945,5 +1945,7 @@
   "historyHighestMarketCap": "历史最高市值",
   "latestToken": "最新代币",
   "ago": "以前",
-  "similarTokens": "同名代币"
+  "similarTokens": "同名代币",
+  "follows": "粉絲",
+  "joined": "加入時間"
 }
