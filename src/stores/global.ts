@@ -182,7 +182,7 @@ export const useGlobalStore = defineStore('global', () => {
     sort: 'created_timestamp',
     sort_dir: 'DESC',
   })
-  const audioSettings = useStorage('audioSettings-v1',{
+  const audioSettings = useStorage('audioSettings-v2',{
     active:'',
     notice:{
       monitor:true,
@@ -209,7 +209,8 @@ export const useGlobalStore = defineStore('global', () => {
       marketBuy:'',
       marketSell:'',
       limit:'',
-      volume:50
+      volume:50,
+      twitter:'Click'
     }
   })
 

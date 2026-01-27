@@ -156,11 +156,11 @@ export default defineNuxtConfig({
     },
     $client: {
       optimizeDeps: {
-        include: ['lodash-unified'],
+        include: ['lodash-unified']
       }
     },
     optimizeDeps: {
-      include: ['lodash-unified'],
+      include: ['lodash-unified']
     },
     build: {
       minify: 'terser',

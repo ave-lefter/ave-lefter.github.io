@@ -4,9 +4,9 @@ import { cloneDeep } from 'lodash-es'
 import AudioSettingsItem from './audioSettingsItem.vue'
 import { useI18n } from 'vue-i18n'
 import { h } from 'vue'
-import { getPumpBgColor} from '@/utils/index'
-import {formatBotGasTips} from '@/utils/bot'
-import {isEvmChain, getRpcProvider} from '@/utils'
+import { getPumpBgColor } from '@/utils/index'
+import { formatBotGasTips } from '@/utils/bot'
+import { isEvmChain, getRpcProvider } from '@/utils'
 import type { MonitorChainType, BotSettingKey } from '~/utils/types'
 import QuickBuyInput from '~/components/monitor/components/quickBuyInput.vue'
 
@@ -29,7 +29,9 @@ const btnRefs = ref<Record<string, HTMLElement | null>>({})
 const currentBtnRef = ref<HTMLElement | null>(null)
 // const botSettingChain=ref<BotChain>('solana')
 // 当前暂存的配置
-const botSettings = ref(cloneDeep(botSettingStore.botSettings) as typeof botSettingStore.botSettings) 
+const botSettings = ref(
+  cloneDeep(botSettingStore.botSettings) as typeof botSettingStore.botSettings
+)
 // </notice2.0>
 
 // 当前暂存的配置
@@ -114,26 +116,34 @@ const toastPositions = [
   },
 ]
 // <notice2.0>
-const monitorTh=computed(()=>{
+const monitorTh = computed(() => {
   return [
-    {value:audioSettings.value.notice.monitorTh[0],label:t('walletAvatar')},
-    {value:audioSettings.value.notice.monitorTh[1],label:t('walletName')},
-    {value:audioSettings.value.notice.monitorTh[2],label:t('MC')},
+    { value: audioSettings.value.notice.monitorTh[0], label: t('walletAvatar') },
+    { value: audioSettings.value.notice.monitorTh[1], label: t('walletName') },
+    { value: audioSettings.value.notice.monitorTh[2], label: t('MC') },
     // {value:audioSettings.value.notice.monitorTh[3],label:t('tokenCreateTime')},
   ]
 })
 
 const quickBuyChainList = shallowRef<MonitorChainType[]>(['solana', 'bsc', 'xlayer'])
-const botSettingChain =computed(()=>{
+const botSettingChain = computed(() => {
   return audioSettings.value.notice.quickBuyChain
 })
-const handleChangeMonitorTh=(index:number)=>{
-  console.log('handleChangeMonitorTh',index)
-  if (index === 1 && !audioSettings.value.notice.monitorTh[0] && audioSettings.value.notice.monitorTh[1]) {
+const handleChangeMonitorTh = (index: number) => {
+  console.log('handleChangeMonitorTh', index)
+  if (
+    index === 1 &&
+    !audioSettings.value.notice.monitorTh[0] &&
+    audioSettings.value.notice.monitorTh[1]
+  ) {
     ElMessage.warning(t('monitorThTip'))
     return
   }
-  if (index === 0 && !audioSettings.value.notice.monitorTh[1] && audioSettings.value.notice.monitorTh[0]) {
+  if (
+    index === 0 &&
+    !audioSettings.value.notice.monitorTh[1] &&
+    audioSettings.value.notice.monitorTh[0]
+  ) {
     ElMessage.warning(t('monitorThTip'))
     return
   }
@@ -162,13 +172,24 @@ function playAudio(settingKey: keyof typeof audioSettings.value.audio) {
   }
 }
 
-function initPumpPlatforms(){
+function initPumpPlatforms() {
   const settings = audioSettings.value
-  if(Array.isArray(settings.notice.pumpChains)&&settings.notice.pumpChains.length&&JSON.stringify(settings.notice.pumpPlatforms) === '[]'){
+  if (
+    Array.isArray(settings.notice.pumpChains) &&
+    settings.notice.pumpChains.length &&
+    JSON.stringify(settings.notice.pumpPlatforms) === '[]'
+  ) {
     // settings.notice.pumpPlatforms = []
-    platformOptions.value.map((p: any) => p.value)[0]&&settings.notice.pumpPlatforms.push(platformOptions.value.map((p: any) => p.value)[0])
-    platformOptions.value.map((p: any) => p.value)[1]&&settings.notice.pumpPlatforms.push(platformOptions.value.map((p: any) => p.value)[1])
-    console.log('settings.notice.pumpPlatforms',platformOptions.value,settings.notice.pumpChains,settings.notice.pumpPlatforms)
+    platformOptions.value.map((p: any) => p.value)[0] &&
+      settings.notice.pumpPlatforms.push(platformOptions.value.map((p: any) => p.value)[0])
+    platformOptions.value.map((p: any) => p.value)[1] &&
+      settings.notice.pumpPlatforms.push(platformOptions.value.map((p: any) => p.value)[1])
+    console.log(
+      'settings.notice.pumpPlatforms',
+      platformOptions.value,
+      settings.notice.pumpChains,
+      settings.notice.pumpPlatforms
+    )
   }
 }
 
@@ -179,14 +200,14 @@ watch(dialogVisible, () => {
     if (!settings.notice.pumpNotice) {
       settings.notice.pumpNotice = false
     }
-  
+
     if (!settings.notice.pumpChains) {
       settings.notice.pumpChains = []
     }
     if (!settings.notice.pumpPlatforms) {
       settings.notice.pumpPlatforms = []
     }
-    console.log('initPumpPlatforms2',settings)
+    console.log('initPumpPlatforms2', settings)
     audioSettings.value = settings
     initPumpPlatforms()
   }
@@ -214,12 +235,12 @@ function getCheckboxBorderStyle(platform: string) {
   if (isPlatformChecked(platform)) {
     // 选中时显示完整颜色
     return {
-      borderColor: color
+      borderColor: color,
     }
   }
   // 未选中时显示淡色（30%透明度）
   return {
-    borderColor: hexToRgba(color, 0.3)
+    borderColor: hexToRgba(color, 0.3),
   }
 }
 
@@ -246,16 +267,18 @@ function getSelectedClass(item: string) {
 }
 
 function onSave() {
-  const data= cloneDeep(audioSettings.value)
-  console.log('onSave',data)
-  if(!data.notice.pumpPlatforms||JSON.stringify(data.notice.pumpPlatforms) === '[]'){
+  const data = cloneDeep(audioSettings.value)
+  console.log('onSave', data)
+  if (!data.notice.pumpPlatforms || JSON.stringify(data.notice.pumpPlatforms) === '[]') {
     data.notice.pumpNotice = false
   }
   globalStore.audioSettings = data
 
-  if(audioSettings.value.notice.quickBuy){
+  if (audioSettings.value.notice.quickBuy) {
     // botSettings[botSettingChain.value]!.buy
-    const setting = cloneDeep(botSettings.value?.[botSettingChain.value]) as typeof botSettingStore.botSettings['eth']
+    const setting = cloneDeep(
+      botSettings.value?.[botSettingChain.value]
+    ) as (typeof botSettingStore.botSettings)['eth']
     const selectedB = setting?.buy?.selected as BotSettingKey
     const slippageValueB = setting?.buy?.[selectedB].slippage
     if (setting?.buy?.[selectedB]) {
@@ -299,7 +322,11 @@ function toggleChain(chain: string) {
     audioSettings.value.notice.pumpPlatforms = audioSettings.value.notice.pumpPlatforms.filter(
       (platform: string) => remainingPlatforms.has(platform)
     )
-    console.log('toggleChain',audioSettings.value.notice.pumpChains, audioSettings.value.notice.pumpPlatforms)
+    console.log(
+      'toggleChain',
+      audioSettings.value.notice.pumpChains,
+      audioSettings.value.notice.pumpPlatforms
+    )
   } else {
     audioSettings.value.notice.pumpChains.push(chain)
     initPumpPlatforms()
@@ -328,8 +355,6 @@ function toggleAllPlatforms() {
   }
 }
 
-
-
 // <notice2.0>
 function setBtnRef(el: HTMLElement | null) {
   if (el && el?.id) {
@@ -349,11 +374,13 @@ function getGasPrice() {
   if (!isEvmChain(chain)) {
     return
   }
-  getRpcProvider(chain)?.getFeeData().then(res => {
-    if (res) {
-      gasPrice.value = new BigNumber(res.gasPrice || 0).toNumber()
-    }
-  })
+  getRpcProvider(chain)
+    ?.getFeeData()
+    .then((res) => {
+      if (res) {
+        gasPrice.value = new BigNumber(res.gasPrice || 0).toNumber()
+      }
+    })
 }
 
 const botPriorityFee = computed(() => {
@@ -364,7 +391,7 @@ const botPriorityFee = computed(() => {
   const botSettings = botSettingStore.botSettings?.[chain]?.buy?.[selected.value]
   const mev = botSettings?.mev
 
-  const {gasTip1List, gasTip2List} = formatBotGasTips(botSwapStore.gasTip, chain)
+  const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
   const gasTips = mev ? gasTip1List : gasTip2List
   const gasIndex = mev ? 0 : 1
   const settings = botSettings?.gas[gasIndex]
@@ -376,18 +403,31 @@ function getEstimatedGas() {
   if (isEvmChain(chain) && botStore?.isSupportChains?.includes(chain)) {
     const botSettings = botSettingStore.botSettings?.[chain]?.buy?.[selected.value]
     const mev = botSettings?.mev
-    const nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || tokenStore.swap.native.price || 0
-    const {gasTip1List, gasTip2List} = formatBotGasTips(botSwapStore.gasTip, chain)
+    const nativePrice =
+      botSwapStore.mainTokensPrice?.find(
+        (item) => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper
+      )?.current_price_usd ||
+      tokenStore.swap.native.price ||
+      0
+    const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
     const gasTips = mev ? gasTip1List : gasTip2List
     const settings = mev ? botSettings?.gas[0] : botSettings?.gas[1]
     const extraGasPrice = settings?.customFee || gasTips?.[settings?.level as number] || '3'
-    const gasLimit = botSwapStore.gasTip?.find?.(i => i.chain === chain && i.mev === !!mev)?.gasLimit || 200000
-    return formatNumber(new BigNumber(gasPrice.value).plus(new BigNumber(extraGasPrice).times(String(10 ** 9))).times(gasLimit).times(nativePrice).div(String(10 ** 18)).toFixed(), 2)
+    const gasLimit =
+      botSwapStore.gasTip?.find?.((i) => i.chain === chain && i.mev === !!mev)?.gasLimit || 200000
+    return formatNumber(
+      new BigNumber(gasPrice.value)
+        .plus(new BigNumber(extraGasPrice).times(String(10 ** 9)))
+        .times(gasLimit)
+        .times(nativePrice)
+        .div(String(10 ** 18))
+        .toFixed(),
+      2
+    )
   }
   return 0
 }
 // </notice2.0>
-
 </script>
 
 <template>
@@ -415,94 +455,199 @@ function getEstimatedGas() {
             </div>
             <template v-if="audioSettings.notice.monitor">
               <div class="bg-[--dialog-list-hover] p-8px mb-24px rounded-[8px]">
-                <div v-if="audioSettings.notice.monitorShow===1" class="relative p-[15px_8px] flex gap-8px items-center border-[1px] border-solid border-transparent" :class="audioSettings.notice.monitorBorder&&'border-[var(--up-color)]! rounded-[8px]'">
-                  <img class="" src="@/assets/images/pump/symbol.svg" width="40" alt="">
+                <div
+                  v-if="audioSettings.notice.monitorShow === 1"
+                  class="relative p-[15px_8px] flex gap-8px items-center border-[1px] border-solid border-transparent"
+                  :class="
+                    audioSettings.notice.monitorBorder && 'border-[var(--up-color)]! rounded-[8px]'
+                  "
+                >
+                  <img class="" src="@/assets/images/pump/symbol.svg" width="40" alt="" />
                   <div class="flex h-40px items-start justify-between flex-col gap-4px">
-                    <div class="flex items-center"><img v-if="audioSettings.notice.monitorTh[0]" class="w-16px h-16px rounded-[50%] mr-4px" src="@/assets/images/pump/user.svg" /><span v-if="audioSettings.notice.monitorTh[1]">Zoe&nbsp;</span><span class="color-[--up-color]">&nbsp;{{ $t('addPosition') }}</span>&nbsp;SENTIS</div>
-                    <div class="flex items-center"><img class="w-16px h-16px rounded-[50%] mr-4px" :src="`${configStore.token_logo_url}chain/bsc.png`" alt="" onerror="this.src='/icon-default.png'" srcset="" />
-                      <span><span class="color-[--up-color]">0.75 BNB</span><span v-if="audioSettings.notice.monitorTh[2]">&nbsp;{{ $t('bugMC',{n:'$34.6M'}) }}</span></span>
+                    <div class="flex items-center">
+                      <img
+                        v-if="audioSettings.notice.monitorTh[0]"
+                        class="w-16px h-16px rounded-[50%] mr-4px"
+                        src="@/assets/images/pump/user.svg"
+                      /><span v-if="audioSettings.notice.monitorTh[1]">Zoe&nbsp;</span
+                      ><span class="color-[--up-color]">&nbsp;{{ $t('addPosition') }}</span
+                      >&nbsp;SENTIS
+                    </div>
+                    <div class="flex items-center">
+                      <img
+                        class="w-16px h-16px rounded-[50%] mr-4px"
+                        :src="`${configStore.token_logo_url}chain/bsc.png`"
+                        alt=""
+                        onerror="this.src='/icon-default.png'"
+                        srcset=""
+                      />
+                      <span
+                        ><span class="color-[--up-color]">0.75 BNB</span
+                        ><span v-if="audioSettings.notice.monitorTh[2]"
+                          >&nbsp;{{ $t('bugMC', { n: '$34.6M' }) }}</span
+                        ></span
+                      >
                     </div>
                   </div>
-                  <div v-if="audioSettings.notice.quickBuy" class='quickBuyBtn flex items-center h-[24px] bg-#12B8861A text-#12B886 rounded-[4px] font-normal text-[14px] leading-[16px] px-8px clickable absolute right-8px top-32px'>
+                  <div
+                    v-if="audioSettings.notice.quickBuy"
+                    class="quickBuyBtn flex items-center h-[24px] bg-#12B8861A text-#12B886 rounded-[4px] font-normal text-[14px] leading-[16px] px-8px clickable absolute right-8px top-32px"
+                  >
                     0.01 BNB
                   </div>
-                  <Icon name="custom:close" class="text-16px color-[--third-text] absolute right-8px top-26px" :class="audioSettings.notice.quickBuy&&'top-8px!'"/>
+                  <Icon
+                    name="custom:close"
+                    class="text-16px color-[--third-text] absolute right-8px top-26px"
+                    :class="audioSettings.notice.quickBuy && 'top-8px!'"
+                  />
                 </div>
-                <div v-else class="relative flex items-center p-[15px_8px] border-[1px] border-solid border-transparent" :class="'border-[--dialog-tab-active-bg]! rounded-[8px]'">
-                  <img class="w-16px h-16px rounded-[50%] mr-4px" src="@/assets/images/pump/user.svg" />
+                <div
+                  v-else
+                  class="relative flex items-center p-[15px_8px] border-[1px] border-solid border-transparent"
+                  :class="'border-[--dialog-tab-active-bg]! rounded-[8px]'"
+                >
+                  <img
+                    class="w-16px h-16px rounded-[50%] mr-4px"
+                    src="@/assets/images/pump/user.svg"
+                  />
                   <div class="flex items-center">
-                    <span><span>Zoe&nbsp;</span>{{ $t('createPosition') }}</span> 
+                    <span><span>Zoe&nbsp;</span>{{ $t('createPosition') }}</span>
                     <span class="flex items-center">
-                      <span class="color-[--up-color]">&nbsp;1BNB</span><img class="w-16px h-16px rounded-[50%] mx-4px" src="@/assets/images/pump/m-symbol.svg" />{{$t('of')}}&nbsp;SENTIS
+                      <span class="color-[--up-color]">&nbsp;1BNB</span
+                      ><img
+                        class="w-16px h-16px rounded-[50%] mx-4px"
+                        src="@/assets/images/pump/m-symbol.svg"
+                      />{{ $t('of') }}&nbsp;SENTIS
                     </span>
                   </div>
-                  <Icon name="custom:close" class="text-16px color-[--third-text] absolute right-8px top-14px"/>
+                  <Icon
+                    name="custom:close"
+                    class="text-16px color-[--third-text] absolute right-8px top-14px"
+                  />
                 </div>
               </div>
               <div class="flex justify-between items-center mb-24px">
                 <span>{{ $t('monitorShowType') }}</span>
-                <el-radio-group v-model="audioSettings.notice.monitorShow" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
+                <el-radio-group
+                  v-model="audioSettings.notice.monitorShow"
+                  class="[&&]:[--el-border:none]"
+                  size="small"
+                  :fill="isDark ? '#282D35' : '#fff'"
+                  :text-color="isDark ? '#F5F5F5' : '#111'"
+                  @change="() => {}"
+                >
                   <el-radio-button :label="t('classic')" :value="0" />
                   <el-radio-button :label="t('advance')" :value="1" />
                 </el-radio-group>
                 <!-- <el-switch v-model="audioSettings.notice.monitorShow" class="[&&]:h-20px" /> -->
               </div>
-              <div v-if="audioSettings.notice.monitorShow===1" class="flex justify-between items-center mb-24px">
+              <div
+                v-if="audioSettings.notice.monitorShow === 1"
+                class="flex justify-between items-center mb-24px"
+              >
                 <span>{{ $t('monitorCardBorder') }}</span>
-                <el-radio-group v-model="audioSettings.notice.monitorBorder" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
+                <el-radio-group
+                  v-model="audioSettings.notice.monitorBorder"
+                  class="[&&]:[--el-border:none]"
+                  size="small"
+                  :fill="isDark ? '#282D35' : '#fff'"
+                  :text-color="isDark ? '#F5F5F5' : '#111'"
+                  @change="() => {}"
+                >
                   <el-radio-button :label="t('display2')" :value="1" />
                   <el-radio-button :label="t('hidden')" :value="0" />
                 </el-radio-group>
               </div>
-              <div v-if="audioSettings.notice.monitorShow===1" class="flex flex-col mb-24px flex2122 gap-[12px]">
+              <div
+                v-if="audioSettings.notice.monitorShow === 1"
+                class="flex flex-col mb-24px flex2122 gap-[12px]"
+              >
                 <span>{{ $t('monitorTh') }}</span>
                 <div class="flex items-center gap-[8px] flex-wrap">
-                  <div v-for="({value,label},index) in monitorTh" :key="index" class="h-24px clickable rounded-[4px] bg-[--border] flex items-center justify-center px-12px" :class="value?'color-[--main-text]':'color-[--third-text]'" @click="()=>handleChangeMonitorTh(index)">{{ label }}</div>
+                  <div
+                    v-for="({ value, label }, index) in monitorTh"
+                    :key="index"
+                    class="h-24px clickable rounded-[4px] bg-[--border] flex items-center justify-center px-12px"
+                    :class="value ? 'color-[--main-text]' : 'color-[--third-text]'"
+                    @click="() => handleChangeMonitorTh(index)"
+                  >
+                    {{ label }}
+                  </div>
                 </div>
               </div>
-              <div v-if="audioSettings.notice.monitorShow===1" class="flex justify-between items-center mb-8px" :class="!audioSettings.notice.quickBuy&&'mb-24px!'">
+              <div
+                v-if="audioSettings.notice.monitorShow === 1"
+                class="flex justify-between items-center mb-8px"
+                :class="!audioSettings.notice.quickBuy && 'mb-24px!'"
+              >
                 <div class="flex items-center gap-[4px]">
                   {{ $t('quick') }}
-                  <div class='bg-[--border] rounded-[4px] h-28px p-[2px_8px] flex items-center gap-[4px]'>
-                    <div v-for="item in quickBuyChainList" :key='item' class="w-24px h-24px items-center p-2px rounded-[4px] clickable" :class="(audioSettings.notice.quickBuyChain===item)&&'bg-[--dialog-tab-active-bg]'" @click="audioSettings.notice.quickBuyChain=item">
-                      <img 
-                          :src="`${configStore.token_logo_url}chain/${item}.png`"
-                          alt=""
-                          class="rounded-full w-20px h-20px"
-                      >
+                  <div
+                    class="bg-[--border] rounded-[4px] h-28px p-[2px_8px] flex items-center gap-[4px]"
+                  >
+                    <div
+                      v-for="item in quickBuyChainList"
+                      :key="item"
+                      class="w-24px h-24px items-center p-2px rounded-[4px] clickable"
+                      :class="
+                        audioSettings.notice.quickBuyChain === item && 'bg-[--dialog-tab-active-bg]'
+                      "
+                      @click="audioSettings.notice.quickBuyChain = item"
+                    >
+                      <img
+                        :src="`${configStore.token_logo_url}chain/${item}.png`"
+                        alt=""
+                        class="rounded-full w-20px h-20px"
+                      />
                     </div>
                   </div>
                 </div>
                 <el-switch v-model="audioSettings.notice.quickBuy" class="[&&]:h-20px" />
               </div>
-              <div v-if="(audioSettings.notice.monitorShow===1)&&audioSettings.notice.quickBuy" class="mb-24px flex justify-between items-center">
+              <div
+                v-if="audioSettings.notice.monitorShow === 1 && audioSettings.notice.quickBuy"
+                class="mb-24px flex justify-between items-center"
+              >
                 <QuickBuyInput
-                  v-model="(audioSettings.notice as any)[`quickBuyValue_${audioSettings.notice.quickBuyChain}`]"
+                  v-model="
+                    (audioSettings.notice as any)[
+                      `quickBuyValue_${audioSettings.notice.quickBuyChain}`
+                    ]
+                  "
                   :show-chain-icon="true"
                   :chain="botSettingChain"
                   input-style="width:192px"
                 />
-                <div class='bg-[--border] rounded-[4px] p-2px'>
+                <div class="bg-[--border] rounded-[4px] p-2px">
                   <button
                     v-for="item in BotSettingsArr"
                     :id="item.value"
                     :key="item.value"
                     :ref="setBtnRef"
                     class="cursor-pointer border-none font-400 rounded-4px min-w-36px py-5px px-10px text-center h-28px"
-                    :class="`${item.value === botSettings?.[botSettingChain]?.buy?.selected?'color-[--main-text] bg-[--dialog-tab-active-bg]':'color-[--secondary-text] bg-transparent'}`"
+                    :class="`${item.value === botSettings?.[botSettingChain]?.buy?.selected ? 'color-[--main-text] bg-[--dialog-tab-active-bg]' : 'color-[--secondary-text] bg-transparent'}`"
                     type="button"
                     @click.stop="botSettings[botSettingChain]!.buy!.selected = item.value"
                     @mouseenter="showPopover(item.value)"
                     @mouseleave="visible = false"
-          
                   >
                     {{ item.label }}
                   </button>
                 </div>
               </div>
-              <div v-if="audioSettings.notice.monitorShow===1" class="flex justify-between items-center mb-24px">
+              <div
+                v-if="audioSettings.notice.monitorShow === 1"
+                class="flex justify-between items-center mb-24px"
+              >
                 <span>{{ $t('afterBuyAction') }}</span>
-                <el-radio-group v-model="audioSettings.notice.quickBuyAction" class="[&&]:[--el-border:none]" size="small" :fill="isDark?'#282D35':'#fff'" :text-color="isDark?'#F5F5F5':'#111'" @change="()=>{}">
+                <el-radio-group
+                  v-model="audioSettings.notice.quickBuyAction"
+                  class="[&&]:[--el-border:none]"
+                  size="small"
+                  :fill="isDark ? '#282D35' : '#fff'"
+                  :text-color="isDark ? '#F5F5F5' : '#111'"
+                  @change="() => {}"
+                >
                   <el-radio-button :label="t('open')" :value="0" />
                   <el-radio-button :label="t('jump2')" :value="1" />
                   <el-radio-button :label="t('noOpen')" :value="2" />
@@ -510,7 +655,6 @@ function getEstimatedGas() {
               </div>
             </template>
 
-         
             <div class="flex justify-between items-center mb-24px">
               <span>{{ $t('signalGlobalPush') }}</span>
               <el-switch v-model="audioSettings.notice.signal" class="[&&]:h-20px" />
@@ -546,7 +690,7 @@ function getEstimatedGas() {
                 >
                   {{ $t('all') }}
                 </el-checkbox>
-    
+
                 <el-checkbox-group
                   v-model="audioSettings.notice.pumpPlatforms"
                   class="grid grid-cols-2 gap-2px w-[calc(100%-10px)] grid-flow-row"
@@ -565,13 +709,13 @@ function getEstimatedGas() {
                         class="mr-6px w-14px h-14px rounded-2px"
                         :src="`${configStore.token_logo_url}${platform.icon?.replace('/signals/', 'signals/')}`"
                       />
-                      <span class='inline-block ellipsis max-w-106px'>{{ platform.label }}</span>
+                      <span class="inline-block ellipsis max-w-106px">{{ platform.label }}</span>
                     </div>
                   </el-checkbox>
                 </el-checkbox-group>
               </div>
             </div>
-    
+
             <div class="mb-24px">
               <div class="lh-14px mb-14px">{{ $t('ToastPosition') }}</div>
               <div class="flex gap-x-8px gap-y-16px flex-wrap">
@@ -643,6 +787,11 @@ function getEstimatedGas() {
           :title="$t('followMonitor')"
           @playAudio="playAudio('monitor')"
         />
+        <AudioSettingsItem
+          v-model="audioSettings.audio.twitter"
+          :title="$t('twitterTracker')"
+          @playAudio="playAudio('twitter')"
+        />
         <div class="mb-21px text-12px">{{ $t('tradeSound') }}</div>
         <AudioSettingsItem
           v-model="audioSettings.audio.marketBuy"
@@ -703,36 +852,62 @@ function getEstimatedGas() {
   >
     <ul>
       <li class="text-14px mt-4px mb-4px flex-start">
-        <Icon v-tooltip="$t('slippage')" name="custom:slippage" class="text-14px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
+        <Icon
+          v-tooltip="$t('slippage')"
+          name="custom:slippage"
+          class="text-14px color-[--third-text] ml-0 mr-6px cursor-pointer"
+        />
         <span class="mr-4px color-[--third-text] text-14px">{{ $t('slippage') }}</span>
         <span v-if="botSettings?.[botSettingChain]?.buy?.[selected]?.slippage !== 'auto'">
-          {{
-            botSettings?.[botSettingChain || '']?.buy?.[selected]?.slippage
-          }}%</span>
+          {{ botSettings?.[botSettingChain || '']?.buy?.[selected]?.slippage }}%</span
+        >
         <span v-else>{{ $t('auto') }}</span>
       </li>
       <li v-if="isEvmChain(botSettingChain || '')" class="text-14px mt-4px mb-4px flex-start">
-        <Icon v-tooltip="$t('estimatedGas')" name="custom:gas" class="text-14px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
+        <Icon
+          v-tooltip="$t('estimatedGas')"
+          name="custom:gas"
+          class="text-14px color-[--third-text] ml-0 mr-6px cursor-pointer"
+        />
         <span class="mr-4px color-[--third-text] text-14px">{{ $t('estimatedGas') }}</span>
         ${{ getEstimatedGas() }}
       </li>
       <li v-if="botSettingChain === 'solana'" class="text-14px mt-4px mb-4px flex-start">
-        <Icon v-tooltip="$t('priorityFee')" name="custom:gas" class="text-14px color-[--third-text] mr-6px cursor-pointer ml-0"/>
-        <span class="mr-4px color-[--third-text] text-14px whitespace-nowrap block">{{ $t('priorityFee') }}</span>
+        <Icon
+          v-tooltip="$t('priorityFee')"
+          name="custom:gas"
+          class="text-14px color-[--third-text] mr-6px cursor-pointer ml-0"
+        />
+        <span class="mr-4px color-[--third-text] text-14px whitespace-nowrap block">{{
+          $t('priorityFee')
+        }}</span>
         <span class="whitespace-nowrap">{{ botPriorityFee }} SOL</span>
       </li>
       <li class="text-14px mt-4px mb-4px flex-start">
-        <Icon v-tooltip="$t('autoSellHalf')" :name="`custom:half-${globalStore.mode}`" class="text-18px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
-        <span class="mr-4px color-[--third-text] text-14px whitespace-nowrap">{{ $t('autoSellHalf') }}</span>
-        {{  botSettingStore.autoSellConfigs?.autoSell ? $t('on') : $t('off') }}
+        <Icon
+          v-tooltip="$t('autoSellHalf')"
+          :name="`custom:half-${globalStore.mode}`"
+          class="text-18px color-[--third-text] ml-0 mr-6px cursor-pointer"
+        />
+        <span class="mr-4px color-[--third-text] text-14px whitespace-nowrap">{{
+          $t('autoSellHalf')
+        }}</span>
+        {{ botSettingStore.autoSellConfigs?.autoSell ? $t('on') : $t('off') }}
       </li>
 
       <li class="text-14px mt-4px mb-4px flex-start">
-        <Icon v-tooltip="$t('mev')" name="custom:mev" class="text-16px color-[--third-text] ml-0 mr-6px cursor-pointer"/>
+        <Icon
+          v-tooltip="$t('mev')"
+          name="custom:mev"
+          class="text-16px color-[--third-text] ml-0 mr-6px cursor-pointer"
+        />
         <span class="mr-4px color-[--third-text] text-14px">{{ $t('mev') }}</span>
-        {{  botSettingStore.botSettings?.[botSettingChain]?.buy?.[selected]?.mev ? $t('on')  : $t('off') }}
+        {{
+          botSettingStore.botSettings?.[botSettingChain]?.buy?.[selected]?.mev
+            ? $t('on')
+            : $t('off')
+        }}
       </li>
-
     </ul>
   </el-popover>
 </template>
@@ -748,11 +923,11 @@ function getEstimatedGas() {
 :deep(.el-slider__marks-text) {
   margin-top: 7px;
 }
-:deep().el-radio-group{
+:deep().el-radio-group {
   padding: 2px;
   background: var(--border);
   border-radius: 4px;
-  .el-radio-button__inner{
+  .el-radio-button__inner {
     background: var(--border);
     border: none;
     color: var(--secondary-text);

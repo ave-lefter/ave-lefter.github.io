@@ -1,7 +1,24 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core'
+
 const signalStore = useSignalStore()
 const dragStore = useDragStore()
+const { t } = useI18n()
+const { width: winWidth } = useWindowSize()
 
+function dragStop(x: number, y: number) {
+  if ((Math.abs(x) < 1 || x + signalStore.signalBoundingRect.width >= winWidth.value) && dragStore.fixedCount >= 3) {
+    ElMessage.warning(t('popTips'))
+    return
+  }
+  if (signalStore.placement === 'left') {
+    signalStore.onLeftDragStop(x, y)
+  } else if (signalStore.placement === 'right') {
+    signalStore.onRightDragStop(x, y)
+  } else {
+    signalStore.onDragStop(x, y)
+  }
+}
 </script>
 <template>
     <Draggable
@@ -17,7 +34,7 @@ v-if="!signalStore.isLeftFixed && !signalStore.isRightFixed && signalStore.signa
             'bm',
             'bl',
             'ml',
-        ]" drag-cancel="#drag-disabled,#drag-settings,#custom-filter" @onDragStop="signalStore.onDragStop"
+        ]" drag-cancel="#drag-disabled,#drag-settings,#custom-filter" @onDragStop="dragStop"
         @onResizing="signalStore.onResizing" @onDrag="signalStore.onDrag">
         <Signal
 :container-width="signalStore.signalBoundingRect.width"
@@ -30,7 +47,7 @@ v-if="signalStore.isLeftFixed && signalStore.signalVisible"
         :style="`left:${dragStore.leftWidth.signal}px`"
         :initial-width="signalStore.fixedWidth" :initial-height="signalStore.winHeight - 95" :parent="true" :handles="[
             'mr',
-        ]" drag-cancel="#drag-disabled" @onDragStop="signalStore.onLeftDragStop"
+        ]" drag-cancel="#drag-disabled" @onDragStop="dragStop"
         @onResizing="signalStore.onFixedResizing">
         <Signal :container-width="signalStore.fixedWidth" :scroll-height="signalStore.winHeight - 200" />
     </Draggable>
@@ -40,7 +57,7 @@ v-if="signalStore.isRightFixed && signalStore.signalVisible"
         :x="dragStore.rightWidth.signal" :min-width="240" :parent="true" :max-width="360"
         :initial-width="signalStore.fixedWidth" :initial-height="signalStore.winHeight - 95" :handles="[
             'ml',
-        ]" drag-cancel="#drag-disabled" @onDragStop="signalStore.onRightDragStop"
+        ]" drag-cancel="#drag-disabled" @onDragStop="dragStop"
         @onResizing="signalStore.onFixedResizing">
         <Signal :container-width="signalStore.fixedWidth" :scroll-height="signalStore.winHeight - 200" />
     </Draggable>
