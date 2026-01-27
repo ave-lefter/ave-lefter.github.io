@@ -174,9 +174,17 @@ function getWalletTxDataPoll() {
 
 const isShowB = ref(false)
 
-useEventBus('klineDataReady').on(() => {
+// 保存事件总线监听器停止函数
+const klineDataReadyOff = useEventBus('klineDataReady').on(() => {
   if (avgPrice.value > 0) {
     useEventBus('updateAvgPrice').emit(avgPrice.value)
+  }
+})
+
+onUnmounted(() => {
+  // 清理事件总线监听器
+  if (klineDataReadyOff) {
+    klineDataReadyOff()
   }
 })
 

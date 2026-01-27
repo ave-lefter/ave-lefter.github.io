@@ -36,12 +36,11 @@
           <!-- <img class="mr-5px" :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" style="border-radius: 50%;" height="14"  alt="" srcset="" > -->
           <span v-if="!editMode">{{ item.name }}</span>
           <el-input
+v-else-if="tabs1Ref[index]" v-model="tabs1Ref[index].value"
             style="--el-input-inner-height:24px;--el-input-bg-color:transparent;--el-input-border-color:transparent;--el-input-hover-border-color:transparent;--el-input-focus-border-color:transparent"
             class="text-center w-full h-full"
-            size="small"
-            v-model="tabs1Ref[index].value"
+size="small"
             @blur="tabs1Ref[index].value = tabs1Ref[index].value?.replace?.(/\-|[^\d.]/g, '')"
-            v-else-if="tabs1Ref[index]"
            />
         </button>
         <button class="tab-item h-30px basis-[26px]! grow-0! shrink-0!" type="button" @click="handleEdit(tabs1Ref, 'buy')">
@@ -151,7 +150,9 @@
         <template v-else-if="!isBuyTab">
           {{ checkAmountMessage() || (isBuyTab ? $t('buy') : ($t('sell') + (Number(amountTokenOut || 0) > 0 ? `≈ ${ formatNumber(amountTokenOut || 0) } ${tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }` : ''))) }}
         </template>
-          <div class="flex items-center gap-4px" v-else>
+            <div v-else class="flex items-center gap-4px">
+
+ 
             {{$t('buy') }}
             <span>|</span>
             <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50%" height="12"  alt="" srcset="" >
@@ -281,7 +282,8 @@ watch(priceLimitRange, (val) => {
 
 let isLineChange = false
 let isPriceLimit_move = false
-useEventBus<string>('priceLimit_move').on((price) => {
+// 保存事件总线监听器停止函数
+const priceLimitMoveOff = useEventBus<string>('priceLimit_move').on((price) => {
   if (props.swapType !== 'limit' || isPriceLimit_move) return
   if (!Number.isNaN(Number(price))) {
     isLineChange = true
@@ -325,9 +327,20 @@ watch(()=>props.tabs2, (val) => {
   tabs2Ref.value = val
 })
 
-useEventBus('klineDataReady').on(() => {
+// 保存事件总线监听器停止函数
+const klineDataReadyOff = useEventBus('klineDataReady').on(() => {
   if (props.swapType !== 'limit') return
   updateStorePriceLimit()
+})
+
+onUnmounted(() => {
+  // 清理事件总线监听器
+  if (priceLimitMoveOff) {
+    priceLimitMoveOff()
+  }
+  if (klineDataReadyOff) {
+    klineDataReadyOff()
+  }
 })
 
 function updateStorePriceLimit() {

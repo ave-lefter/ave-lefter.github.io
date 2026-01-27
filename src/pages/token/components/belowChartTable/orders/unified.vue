@@ -217,9 +217,17 @@ watch([() => props.currentToken, () => props.userAddress || '', () => tokenStore
   getUserPendingTx()
 })
 
-useEventBus<string>('updateLimitOrder').on(chain => {
+// 保存事件总线监听器停止函数
+const updateLimitOrderOff = useEventBus<string>('updateLimitOrder').on(chain => {
   if (chain === props.chain) {
     getUserPendingTx()
+  }
+})
+
+onUnmounted(() => {
+  // 清理事件总线监听器
+  if (updateLimitOrderOff) {
+    updateLimitOrderOff()
   }
 })
 
