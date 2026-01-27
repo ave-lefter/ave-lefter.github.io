@@ -472,11 +472,16 @@
                   <span class="color-[--d-999-l-666]">0</span>
                 </div> -->
                   </div>
-                  <div class="color-#009EF7 min-h-15px mt-5px">
-                    <a v-for="(item, index) in row?.medias?.filter(i=> i.icon === 'twitter')" :key="index" class="color-#009EF7" :href="item.url" target="_blank" @click.stop>
-                      {{ formatXUser(item?.url) }}
-                    </a>
-                  </div>
+
+                  <PumpPop
+                      v-if="row?.medias?.some(i=> i.icon === 'twitter')"
+                      :tokenId="(row.token + '-' + row.chain)"
+                      :type="2"
+                    >
+                      <a v-for="(item, index) in row?.medias?.filter(i=> i.icon === 'twitter')" :key="index" :href="item.url" target="_blank" @click.stop class="!color-#009EF7 min-h-15px mt-5px">
+                        {{ formatXUser(item?.url) }}
+                      </a>
+                  </PumpPop>
 
                   <div class="flex-start text-12px absolute bottom--2px z-1 mt-5px">
                     <div
@@ -849,6 +854,7 @@ import XIcon from '~/components/xPopup/xIcon.vue'
 import { useVirtualList } from '@vueuse/core'
 import ProgressPop from './progressPop.vue'
 import DevPop from './devPop/index.vue'
+import PumpPop from './pumpPop/index.vue'
 import { useSimilarTokenPopup } from '../utils'
 
 const props = defineProps({

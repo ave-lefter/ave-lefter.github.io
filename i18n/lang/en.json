@@ -1960,5 +1960,7 @@
   "latestToken": "Latest Token",
   "ago": "ago",
   "similarTokens": "Similar Tokens",
-  "top100": "Top100 moving average"
+  "top100": "Top100 moving average",
+  "follows": "Follows",
+  "joined": "Joined"
 }
