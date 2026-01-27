@@ -284,7 +284,7 @@ const twitterHandler = async(val) => {
     if(val.TweetId && query.value.types.includes(+val.Type)){
       const res = await getTwitterById(val.TweetId)
       trackerStore.list.unshift(res)
-      if(twitterAudio.value){
+      if (twitterAudio.value && globalStore.audioSettings.audio.twitter) {
         twitterAudio.value.play()
       }
     }
