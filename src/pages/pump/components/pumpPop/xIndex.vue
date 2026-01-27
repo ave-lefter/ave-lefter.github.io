@@ -1,5 +1,5 @@
 <template>
-  <div class="w-200px bg-[--main-input-button-bg]">
+  <div class="min-w-200px bg-[--main-input-button-bg]">
     <component :is="Content" :info="info" :loading="loading" />
     <el-skeleton v-if="loading" :rows="5" animated style="--el-skeleton-circle-size: 32px">
       <template #template>

@@ -478,7 +478,7 @@
                       :tokenId="(row.token + '-' + row.chain)"
                       :type="2"
                     >
-                      <a v-for="(item, index) in row?.medias?.filter(i=> i.icon === 'twitter')" :key="index" :href="item.url" target="_blank" @click.stop class="!color-#009EF7 min-h-15px mt-5px">
+                      <a v-for="(item, index) in row?.medias?.filter(i=> i.icon === 'twitter')" :key="index" :href="item.url" target="_blank" @click.stop class="!color-#009EF7  mt-2px block leading-15px">
                         {{ formatXUser(item?.url) }}
                       </a>
                   </PumpPop>

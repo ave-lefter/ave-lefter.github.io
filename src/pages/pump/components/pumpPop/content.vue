@@ -2,7 +2,7 @@
   <div v-if="info?.username && !loading">
     <div class="p-16px">
       <div class="color-[--main-text]">@{{ info.username }}</div>
-      <div class="flex items-center color-[--third-text] mt-8px">
+      <div class="flex items-center color-[--third-text]">
         <span>{{ formatNumber(info.followers, {locale: 'en'}) }} {{ $t('follows') }}</span>
         <el-divider direction="vertical" />
         <span>{{ $t('joined') }} {{ dayjs(info.date_joined).locale('en').format('MMM YYYY')  }}</span>
@@ -10,7 +10,7 @@
     </div>
   </div>
   <div v-if="!loading && !info?.username"  class="p-12px w-200px  min-h-60px flex flex-col items-center justify-center">
-    <div class="text-14px font-400 color-[--third-text]">{{ $t('emptyNoData') }}</div>
+    <div class="text-12px font-400 color-[--third-text]">{{ $t('emptyNoData') }}</div>
   </div>
 </template>
 
