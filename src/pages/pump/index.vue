@@ -1,7 +1,7 @@
 <template>
   <div class="pump w-full bg-[--main-bg]">
     <div class="flex-start p-x-17px py-12px bg-[--main-bg] mb-1px mt-1px">
-      <div class="tabs">
+      <div class="tabs mr-8px">
         <div
           v-for="item in pumpConfig"
           :key="item.chain"
@@ -83,14 +83,14 @@
           </template>
         </template>
       </el-popover>
+      <div class="flex-1" />
+      <Setting :chain="activeChain" :pumpConfig="pumpConfig"/>
+      <BlackList />
       <QuickSwapSet
         v-model:quickBuyValue="quickBuyValue"
         :chain="activeChain"
         :settingsButtonVisible="true"
       />
-      <div class="flex-1" />
-      <Setting :chain="activeChain" :pumpConfig="pumpConfig"/>
-      <BlackList />
       <AutoSellSetting :chain="activeChain" />
     
     </div>
@@ -1738,6 +1738,7 @@ function mergeLogo(prev: any, next: any) {
   }
 }
 .btn {
+  height: 28px;
   border: none;
   background: var(--main-input-button-bg);
   padding: 7px 8px;
