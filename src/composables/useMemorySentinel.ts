@@ -6,7 +6,7 @@ export const useMemorySentinel = (configs: {
   if (process.server) return
 
   // 合并默认配置：1000MB 或 80% 比例
-  const { maxMB = 1000, maxRatio = 0.8 } = configs
+  const { maxMB = 1500, maxRatio = 0.8 } = configs
   const isDirty = useState('is_memory_dirty', () => false)
 
   const check = () => {
