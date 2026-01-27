@@ -110,12 +110,12 @@ async function submitSwap(amount: string) {
   const {botSettings} = botSettingStore
   const selected = botSettings?.[chain]?.buy?.selected as BotSettingKey
   const currentBotSetting = botSettings?.[chain]?.buy?.[selected]
-  if (isSolana && currentBotSetting?.mev) {
-    if (!await botStore.getBundleAvailable()) {
-      loadingSwap.value = false
-      return
-    }
-  }
+  // if (isSolana && currentBotSetting?.mev) {
+  //   if (!await botStore.getBundleAvailable()) {
+  //     loadingSwap.value = false
+  //     return
+  //   }
+  // }
   const {gasTip1List, gasTip2List} = formatBotGasTips(useBotSwapStore().gasTip, chain)
   const gasTips = currentBotSetting?.mev ? gasTip1List : gasTip2List
   const settings = currentBotSetting?.mev ? currentBotSetting?.gas[0] : currentBotSetting?.gas?.[1]
@@ -178,7 +178,7 @@ const wsStore = useWSStore()
 function handleTxSuccess(res: any, _batchId: string) {
   if (res) {
     let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
-      ElNotification({type: 'success', message: t('transactionsSubmitted')})
+      // ElNotification({type: 'success', message: t('transactionsSubmitted')})
       tokenStore.placeOrderUpdate++
       loadingSwap.value = false
     }, 500)
@@ -225,12 +225,27 @@ function handleTxSuccess(res: any, _batchId: string) {
 async function getTokenBalance(chain: string) {
   const walletAddress = botStore.getWalletAddress(chain)
   if (!walletAddress) return
+  const balance = botStore.userInfo.addresses.find(item => item.chain === chain)?.balance
+  let token: any = {
+    chain,
+    token: getNativeToken(chain),
+    address: getNativeToken(chain),
+    decimals: getChainInfo(chain)?.decimals,
+    symbol: getChainInfo(chain)?.main_name,
+  }
+  if (balance) {
+    nativeToken.value = {
+      ...token,
+      balance
+    }
+    return
+  }
   const res = await bot_getTokenBalance({
     chain,
     tokens: [getNativeToken(chain)],
     walletAddress
   })
-  const token = res?.[0] || {}
+  token = res?.[0] || {}
   nativeToken.value = {
     ...token,
     symbol: getChainInfo(chain)?.main_name,

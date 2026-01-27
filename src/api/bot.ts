@@ -708,7 +708,7 @@ export function bot_createSwapEvmTx(params: {
   //   params.autoSell = false
   //   params.autoSellConfig = []
   // }
-  return $api('/botapi/swap/createSwapEvmTx', {
+  return $api('/botapi/swap/createSwapEvmTxV2', {
     method: 'post',
     body: {
       // batchId: Date.now().toString(),
@@ -1040,5 +1040,20 @@ export function getTokensPnl(body: {
   return $api('/aveswap/v1/swap/getTokensPnl', {
     method: 'post',
     body
+  })
+}
+
+// aveswap 查询自动滑点
+// 功能说明：获取token的自动滑点
+export function getAutoSlippage(query: {
+  chain: string
+  token: string
+  mev?: boolean
+  isBuy?: boolean
+}): Promise<number> {
+  const {$api} = useNuxtApp()
+  return $api('/aveswap/v1/swap/getAutoSlippage', {
+    method: 'get',
+    query
   })
 }
