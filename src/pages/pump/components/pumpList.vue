@@ -22,7 +22,7 @@
             v-for="({data: row}, $index) in list"
             :id="row?.target_token + '-' + row?.chain"
             :key="row?.pair + '-' + row?.chain"
-         
+
             class="pump-item_item relative item-row"
             :style="{ background:  pumpSetting.bgList?.includes(row.platform)? pumpSetting?.bg?.[row.platform]?.bg : '' }"
             @click.stop="tableRowClick(row)"
@@ -435,7 +435,7 @@
                         name="custom:top2"
                         :style="{color: row?.migrated_count> 2 ?'var(--yellow)' : 'var(--third-text)'}"
                       />
-                      <span v-if="Number(row?.migrated_count) === 0 || row?.migrated_count == null" class="color-[--secondary-text]" >0</span>
+                      <span v-if="(Number(row?.migrated_count) == 0 || row?.migrated_count == null) && (Number(row?.total_count) == 0 || row?.total_count == null) " class="color-[--secondary-text]" >0</span>
                       <span v-else class="color-[---main-text]">{{
                         formatNumber(row?.migrated_count || 0, 2)}}/{{formatNumber(row?.total_count || 0, 2)}}
                       </span>
