@@ -90,6 +90,7 @@
         v-model:quickBuyValue="quickBuyValue"
         :chain="activeChain"
         :settingsButtonVisible="true"
+        class="mr-12px"
       />
       <AutoSellSetting :chain="activeChain" />
     
