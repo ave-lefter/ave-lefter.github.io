@@ -1621,7 +1621,7 @@ function mergeStatistics(prev: any, next: any) {
   if (hasValue(next, 'migrated_ratio')) {
     result.migrated_ratio = next.migrated_ratio
   }
-  if (hasValue(next, 'migrated_ratio')) {
+  if (hasValue(next, 'max_dev_ratio')) {
     result.max_dev_ratio = next.max_dev_ratio
   }
   if (hasValue(next, 'kol_count')) {
