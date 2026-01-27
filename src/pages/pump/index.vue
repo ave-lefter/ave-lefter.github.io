@@ -1,6 +1,26 @@
 <template>
   <div class="pump w-full bg-[--main-bg]">
     <div class="flex-start p-x-17px py-12px bg-[--main-bg] mb-1px mt-1px">
+      <div class="tabs">
+        <div
+          v-for="item in pumpConfig"
+          :key="item.chain"
+          :class="{ active: item.chain === activeChain }"
+          class="flex-start h-24px  w-24px clickable"
+          @click.stop="switchChain(item)"
+        >
+          <el-image
+            style="
+              width: 24px;
+              height: 24px;
+              border-radius: 4px;
+            "
+            :class="{'opacity-30': item.chain !== activeChain}"
+            :src="`${token_logo_url}chain/${item.chain}.png`"
+          />
+          <!-- <span>{{ item.chain_show || '' }}</span> -->
+        </div>
+      </div>
       <el-popover
         v-model:visible="visible_platforms"
         placement="bottom-start"
@@ -72,28 +92,7 @@
       <Setting :chain="activeChain" :pumpConfig="pumpConfig"/>
       <BlackList />
       <AutoSellSetting :chain="activeChain" />
-      <div class="tabs">
-        <button
-          v-for="item in pumpConfig"
-          :key="item.chain"
-          :class="{ active: item.chain === activeChain }"
-          class="flex-start"
-          type="button"
-          @click.stop="switchChain(item)"
-        >
-          <el-image
-            style="
-              width: 14px;
-              height: 14px;
-              border-radius: 50%;
-              margin-right: 5px;
-            "
-            :class="{'opacity-30': item.chain !== activeChain}"
-            :src="`${token_logo_url}chain/${item.chain}.png`"
-          />
-          <span>{{ item.chain_show || '' }}</span>
-        </button>
-      </div>
+    
     </div>
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full px-16px">
       <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
@@ -1683,10 +1682,11 @@ function mergeLogo(prev: any, next: any) {
   align-items: center;
   justify-content: space-between;
   background: var(--main-input-button-bg);
-  padding: 1px;
+  padding: 2px 8px;
   border-radius: 4px;
   font-size: 12px;
   height: 28px;
+  gap:4px;
   &.single {
     background: transparent;
     border-radius: 0px;
@@ -1728,8 +1728,8 @@ function mergeLogo(prev: any, next: any) {
     border-radius: 4px;
     border: none;
     background: transparent;
-    min-width: 36px;
-    padding: 5px 10px;
+    // min-width: 36px;
+    padding: 2px;
     text-align: center;
     &.active {
       color: var(--main-text);
