@@ -1510,7 +1510,7 @@ function mergeStatisticsList(
     }
 
     /** price / total / market_cap */
-    if (obj.uprice != null) {
+    if (obj.uprice != null && obj.uprice != 0) {
       next.current_price_usd = obj.uprice
     }
     if (obj.total != null) {

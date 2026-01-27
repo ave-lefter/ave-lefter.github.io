@@ -407,7 +407,7 @@
                         name="custom:wallets"
                       />
                       <span v-if="Number(row?.makers_24h) === 0 || row?.makers_24h == null" class="color-[--secondary-text]" >0</span>
-                      <span v-else class="color-[---main-text]">{{
+                      <span v-else class="color-[--main-text]">{{
                         formatNumber(row?.makers_24h || 0, 2)
                       }}</span>
                     </div>
@@ -422,7 +422,7 @@
                         name="custom:kol2"
                       />
                       <span v-if="Number(row?.kol_tag_count) === 0 || row?.kol_tag_count == null" class="color-[--secondary-text]" >0</span>
-                      <span v-else class="color-[---main-text]">
+                      <span v-else class="color-[--main-text]">
                         {{ formatNumber(row?.kol_tag_count || 0, 2) }}</span>
                     </div>
 
@@ -443,7 +443,7 @@
                         :style="{color: row?.migrated_count> 2 ?'var(--yellow)' : 'var(--third-text)'}"
                       />
                       <span v-if="(Number(row?.migrated_count) == 0 || row?.migrated_count == null) && (Number(row?.total_count) == 0 || row?.total_count == null) " class="color-[--secondary-text]" >0</span>
-                      <span v-else class="color-[---main-text]">{{
+                      <span v-else class="color-[--main-text]">{{
                         formatNumber(row?.migrated_count || 0, 2)}}/{{formatNumber(row?.total_count || 0, 2)}}
                       </span>
                     </div>
@@ -458,7 +458,7 @@
                         name="custom:smart-plain"
                       />
                       <span v-if="Number(row?.smart_wallet_tag_count) === 0 || row?.smart_wallet_tag_count == null" class="color-[--secondary-text]" >0</span>
-                      <span v-else>{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
+                      <span v-else class="color-[--main-text]">{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
                     </div>
                     <!-- <div
                   v-show="pumpSetting?.define?.some(i=> i=== 'migraged')"
@@ -700,7 +700,7 @@
                     <template v-if="pumpSetting?.define?.some((i) => i === 'vol')">
                       <div class="mr-5px color-[--third-text]" :style="{ 'font-size': pumpSetting.fontSize_mc }">V</div>
                       <span v-if="Number(row?.volume_u_24h) === 0 || row?.volume_u_24h == null" class="color-[--secondary-text]" >0</span>
-                      <div v-else class="color-[---main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h),'font-size': pumpSetting.fontSize_mc  }">
+                      <div v-else class="color-[--main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h),'font-size': pumpSetting.fontSize_mc  }">
                         ${{ pumpSetting.isInt ? formatNumber(row.volume_u_24h || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' }) : formatNumber(row.volume_u_24h || 0, {decimals: 2, locale: 'en' }) }}
                       </div>
                     </template>
