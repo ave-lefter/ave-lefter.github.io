@@ -210,7 +210,7 @@ export const useGlobalStore = defineStore('global', () => {
       marketSell:'',
       limit:'',
       volume:50,
-      twitter:'Click'
+      twitter:''
     }
   })
 
