@@ -1376,3 +1376,25 @@ export function formatSeconds(seconds: number) {
 
   return `${s}s`
 }
+export function formatXUser(url?: string) {
+  if (!url) return ''
+
+  // 排除官方路径
+  if (url.includes('/i/') || url.includes('/communities')) {
+    return ''
+  }
+
+  try {
+    const u = new URL(url)
+
+    // 只允许 x.com / twitter.com
+    if (!/(^|\.)?(x|twitter)\.com$/.test(u.hostname)) {
+      return ''
+    }
+
+    const firstSegment = u.pathname.split('/').filter(Boolean)[0]
+    return firstSegment ? `@${firstSegment}` : ''
+  } catch {
+    return ''
+  }
+}
