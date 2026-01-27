@@ -811,6 +811,7 @@ const flushStatistics = useThrottleFn(() => {
     }
   }
   // statisticsList.value = Array.from(mapStatistics.values()).slice(0, 300)
+  triggerRef(mapStatistics)
   buffer.length = 0
 }, 150)
 watch(
@@ -1492,17 +1493,15 @@ function mergeStatisticsList(statisticsList: Map<string, StatisticsItem>, filter
     }
     if (hasValue(obj, 'total')) {
       next.total = Number(obj.total)
-      next.market_cap = Number(obj.total) * next.current_price_usd
-    } else {
-      if (next.total) {
-        next.market_cap = Number(next.total) * next.current_price_usd
+    }
+    if (next.chain == 'bsc') {
+      if (next.amm === 'flapswap') {
+        next.market_cap = Number(next.total) * next.current_price_usd || 1000000000 * next.current_price_usd || next.market_cap || 4900
+      } else {
+        next.market_cap = Number(next.total) * next.current_price_usd || 1000000000 * next.current_price_usd || next.market_cap || 0
       }
-    }
-    if (next.amm === 'fourmemev2') {
-      next.market_cap = next.market_cap || 1000000000 * next.current_price_usd || 0
-    }
-    if (next.amm === 'flapswap') {
-      next.market_cap =  next.market_cap || 1000000000 * next.current_price_usd || 4900
+    } else {
+      next.market_cap = Number(next.total) * next.current_price_usd || next.market_cap
     }
     // console.log('-------next-------',  next.total, next.current_price_usd, next.market_cap, next.token)
     if (hasValue(obj, 'sells_tx_24h_count')) {
