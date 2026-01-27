@@ -472,17 +472,17 @@
                   <span class="color-[--d-999-l-666]">0</span>
                 </div> -->
                   </div>
-
-                  <PumpPop
-                      v-if="row?.medias?.some(i=> i.icon === 'twitter')"
-                      :tokenId="(row.token + '-' + row.chain)"
-                      :type="2"
-                    >
-                      <a v-for="(item, index) in row?.medias?.filter(i=> i.icon === 'twitter')" :key="index" :href="item.url" target="_blank" @click.stop class="!color-#009EF7  mt-2px block leading-15px">
-                        {{ formatXUser(item?.url) }}
-                      </a>
-                  </PumpPop>
-
+                  <div class="mt-5px">
+                    <PumpPop
+                        v-if="row?.medias?.some(i=> i.icon === 'twitter')"
+                        :tokenId="(row.token + '-' + row.chain)"
+                        :type="2"
+                      >
+                        <a v-for="(item, index) in row?.medias?.filter(i=> i.icon === 'twitter')" :key="index" :href="item.url" target="_blank" @click.stop class="!color-#009EF7">
+                          {{ formatXUser(item?.url) }}
+                        </a>
+                    </PumpPop>
+                  </div>
                   <div class="flex-start text-12px absolute bottom--2px z-1 mt-5px">
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'top')"
