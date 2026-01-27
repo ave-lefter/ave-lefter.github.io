@@ -757,7 +757,7 @@
                     <el-progress
                       class="clickable w-16px ml-4px border-rd-4px overflow-hidden"
                       :class="row.tx_24h_count > 0 || (Number(row.buys_tx_24h_count) + Number(row.sells_tx_24h_count) > 0)? 'progress-bar' : 'progress-bar-disabled'"
-                      :percentage="Number((row.buys_tx_24h_count ||0) / row.tx_24h_count * 100) || 0"
+                      :percentage="Math.min(Number((row.buys_tx_24h_count ||0) / row.tx_24h_count * 100) || 0, 100)"
                       :show-text="false"
                       color="#12B886"
                       :stroke-width="2"
