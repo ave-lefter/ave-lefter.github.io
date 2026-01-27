@@ -23,7 +23,8 @@ export const useMemorySentinel = (configs: {
 
     if (isOverLimit) {
       console.warn(`【熔断】内存过载: ${usedMB.toFixed(2)}MB / ${(ratio * 100).toFixed(1)}%`)
-      window.location.reload()
+      // window.location.reload()
+      isDirty.value = true
     } else if (isWarning) {
       isDirty.value = true
     }
@@ -33,7 +34,7 @@ export const useMemorySentinel = (configs: {
     for (const report of reports) {
       if (report.type === 'intervention') {
         isDirty.value = true
-        window.location.reload()
+        // window.location.reload()
       }
     }
   }, { types: ['intervention'], buffered: true })
