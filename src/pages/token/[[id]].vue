@@ -332,6 +332,7 @@ function addVisit() {
         logo_url,
         symbol,
         price_change: tokenStore.priceChange,
+        price_change_v2: tokenStore.priceChangeV2,
         circulation: tokenStore.circulation.toString(),
         price: tokenStore.price || 0,
       })

@@ -20,7 +20,8 @@ interface GetFavListResponse {
   symbol: string;
   current_price_usd: number;
   price_change: string;
-  price_change_v2: number;
+  // priceChange24h
+  price_change_v2: string;
   token_index: number;
   favorite_price: number;
   open_price: number;

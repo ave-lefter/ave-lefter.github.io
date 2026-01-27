@@ -334,6 +334,8 @@ export interface GetHotTokensResponse {
   holders: number;
   current_price_usd: number | string;
   price_change: string;
+  // priceChange24h
+  price_change_v2: string;
   is_adv: number;
   is_showasadv: number;
   token_index: number;

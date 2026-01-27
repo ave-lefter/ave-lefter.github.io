@@ -224,6 +224,7 @@ export const useGlobalStore = defineStore('global', () => {
     logo_url: string,
     symbol: string,
     price_change: number | undefined,
+    price_change_v2: number | undefined,
     circulation: string,
     price: number,
   }[]>('lastTokens', [])
