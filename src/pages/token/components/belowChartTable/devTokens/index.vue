@@ -125,11 +125,10 @@ import AveEmpty from '@/components/aveEmpty.vue'
 import TokenColumn from '@/components/tokenColumn.vue'
 import { useStorage } from '@vueuse/core'
 import { bot_getTokenBalance } from '~/api/bot'
-useConfigStore()
+
 const { t } = useI18n()
 
 const tokenStore = useTokenStore()
-const tokenDetailSStore = useTokenDetailsStore()
 const token = computed(() => tokenStore.token)
 
 interface TokenObj {
@@ -256,6 +255,10 @@ function handleSearchDevAddress() {
 function jumpBrowser() {
     window.open(formatExplorerUrl(token.value?.chain as string, tokenObj.value.dev_address || '', 'address'))
 }
+
+onUnmounted(() => {
+    if (finishedTimer) clearTimeout(finishedTimer)
+})
 </script>
 <style scoped lang="scss">
 :deep(.el-table .caret-wrapper){

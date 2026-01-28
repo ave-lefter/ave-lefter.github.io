@@ -24,9 +24,9 @@ const components = {
   Holders: defineAsyncComponent(() => import('./holders/index.vue')),
   LP: defineAsyncComponent(() => import('./lp/index.vue')),
   Attention: defineAsyncComponent(() => import('./attention/index.vue')),
-  Orders: defineAsyncComponent(() => import('./orders/index.vue')),
+  Orders: OrdersTab,
   MySwap: defineAsyncComponent(() => import('./mySwap/index.vue')),
-  DevTokens: defineAsyncComponent(() => import('./devTokens/index.vue')),
+  DevTokens: DevTokens,
 }
 const tabs = computed(() => {
   return [
