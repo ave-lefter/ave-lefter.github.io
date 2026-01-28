@@ -363,7 +363,7 @@ watch(() => klineDateFilter?.value, (val) => {
 
 watch(() => pairAddress.value, (pair, oldPair) => {
   if (pairAddress.value) {
-    filterSubmit()
+    _getPairLiq()
     subscribeLiq(pair, oldPair)
   }
 }, {
@@ -1030,6 +1030,7 @@ const collect = async (row: any,index:number) => {
         />
       </template>
     </template>
+    <!-- tableLoading:{{tableLoading}} -->
     <div
       v-loading="tableLoading" class="text-12px"
       element-loading-background="transparent">
