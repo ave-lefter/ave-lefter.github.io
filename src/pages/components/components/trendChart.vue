@@ -4,9 +4,9 @@ import type {  KlineDatum } from '~/api/market'
 
 const retryCount = ref(0)
 const maxCount = 3
-let timer:number
+let timer:number|null
 const chartDom = useTemplateRef('chartDom')
-const chartInstance = shallowRef<echarts.ECharts>()
+let chartInstance: echarts.ECharts | null = null
 const globalStore = useGlobalStore()
 const themeStore = useThemeStore()
 const props = defineProps<{
@@ -29,7 +29,7 @@ watch(()=>props.list,()=>{
     }
 })
 watch(()=>themeStore.isDark,()=>{
-    if(chartInstance.value){
+    if(chartInstance){
         initOrUpdateChart()
     }
 })
@@ -37,6 +37,21 @@ onMounted(()=>{
     if(chartDom.value){
         observer.observe(chartDom.value)
     }
+})
+
+onBeforeUnmount(()=>{
+    if(chartInstance){
+        chartInstance.dispose()
+        chartInstance = null
+    }
+    if (chartDom.value) {
+      observer.unobserve(chartDom.value)
+    }
+    if (timer) {
+      clearTimeout(timer)
+      timer = null
+    }
+
 })
 
 function initOrUpdateChart() {
@@ -65,15 +80,15 @@ function initOrUpdateChart() {
         const color = lineData[lineData.length -1] >= maxLineData
         ? getCssVariable('--up-color')
         : getCssVariable('--down-color')
-        if(!chartInstance.value){
+        if(!chartInstance){
             if(chartDom.value){
-                clearTimeout(timer)
-                chartInstance.value = echarts.init(chartDom.value)
+                if (timer) clearTimeout(timer)
+                chartInstance = echarts.init(chartDom.value)
             } else {
                 return retry()
             }
         }
-        chartInstance.value.setOption({
+        chartInstance.setOption({
             tooltip: false,
             grid:{
                 left:0,
@@ -129,7 +144,7 @@ function initOrUpdateChart() {
                 }
             ]
         })
-        chartInstance.value.resize()
+        chartInstance.resize()
 }
 
 function retry() {

@@ -9,7 +9,7 @@ const selectButton = ref('totalEquity')
 const selectType = ref('1W')
 const assetDetailList = ref([])
 const chartDom = useTemplateRef('chartDom')
-const chartInstance = shallowRef<echarts.ECharts>()
+let chartInstance: echarts.ECharts | null = null
 
 const buttons = computed(() => {
   return [
@@ -49,14 +49,14 @@ const findPnlRate = (snapshotTime: string) => {
 }
 
 const initOrUpdateChart = () => {
-  if (!chartInstance.value) {
-    chartInstance.value = echarts.init(chartDom.value)
+  if (!chartInstance) {
+    chartInstance = echarts.init(chartDom.value)
   }
   const xAxis = assetDetailList.value.map((item) => item.snapshotTime)
   const lineData = assetDetailList.value.map((item) => {
     return item[selectButton.value]
   })
-  chartInstance.value.setOption({
+  chartInstance.setOption({
     grid: {
       left: 0,
       right: 0,
@@ -148,6 +148,13 @@ const initOrUpdateChart = () => {
 }
 onMounted(() => {
   getAssetDetail()
+})
+
+onBeforeUnmount(() => {
+  if (chartInstance) {
+    chartInstance.dispose()
+    chartInstance = null
+  }
 })
 
 watch(

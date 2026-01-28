@@ -58,8 +58,8 @@ export function useKlineMarks() {
   function createDisplayButton(_widget: IChartingLibraryWidget | null,headerBtns: HTMLElement[]){
     const btn = _widget?.createButton()
     if (!btn) return
-    btn.innerHTML = `<div style="cursor:pointer;display:flex;gap:8px;align-items:center">${t('display')}<svg xmlns="http://www.w3.org/2000/svg" width="9" height="6" viewBox="0 0 9 6" fill="none">
-<path d="M0.801296 0C0.123025 0 -0.2475 0.791086 0.186718 1.31215L3.47869 5.26251C3.79852 5.64631 4.388 5.64631 4.70784 5.26251L7.99981 1.31215C8.43402 0.791085 8.0635 0 7.38523 0H0.801296Z" fill="white"/>
+    btn.innerHTML = `<div style="cursor:pointer;display:flex;gap:8px;align-items:center">${t('display')}<svg xmlns="http://www.w3.org/2000/svg" width="9" height="6" viewBox="0 0 9 6" fill="#C8C7D8">
+<path d="M0.801296 0C0.123025 0 -0.2475 0.791086 0.186718 1.31215L3.47869 5.26251C3.79852 5.64631 4.388 5.64631 4.70784 5.26251L7.99981 1.31215C8.43402 0.791085 8.0635 0 7.38523 0H0.801296Z" fill="#C8C7D8"/>
 <script xmlns=""/></svg></div>`
     btn.onclick = (e) => {
       const rect = btn.getBoundingClientRect()
