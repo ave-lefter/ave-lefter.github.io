@@ -4,6 +4,7 @@ export const useMemorySentinel = (configs: {
   maxRatio?: number
 } = {}) => {
   if (process.server) return
+  sessionStorage.pageLoadTime = Date.now()
 
   // 合并默认配置：1000MB 或 80% 比例
   const { maxMB = 1500, maxRatio = 0.8 } = configs
@@ -20,21 +21,22 @@ export const useMemorySentinel = (configs: {
     const isOverLimit = usedMB > maxMB || ratio > maxRatio
     // 预警逻辑：达到阈值的 70% 标记为脏环境
     const isWarning = usedMB > maxMB * 0.7 || ratio > maxRatio * 0.7
-
-    if (isOverLimit) {
+    const loadTime = Date.now() - Number(sessionStorage.pageLoadTime)
+    if (isOverLimit && loadTime > 300000) {
       console.warn(`【熔断】内存过载: ${usedMB.toFixed(2)}MB / ${(ratio * 100).toFixed(1)}%`)
-      // window.location.reload()
-      isDirty.value = true
-    } else if (isWarning) {
+      window.location.reload()
+      // isDirty.value = true
+    } else if (isWarning && loadTime > 180000) {
       isDirty.value = true
     }
   }
 
   const observer = new ReportingObserver((reports) => {
+    const loadTime = Date.now() - Number(sessionStorage.pageLoadTime)
     for (const report of reports) {
-      if (report.type === 'intervention') {
-        isDirty.value = true
-        // window.location.reload()
+      if (report.type === 'intervention' && loadTime > 180000) {
+        // isDirty.value = true
+        window.location.reload()
       }
     }
   }, { types: ['intervention'], buffered: true })
