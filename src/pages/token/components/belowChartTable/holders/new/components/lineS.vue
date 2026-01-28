@@ -281,6 +281,13 @@ watch(()=>props.showLeft, (val) => {
 onMounted(() => {
   init()
 })
+onBeforeUnmount(() => {
+  let chart = echarts.getInstanceByDom(document.getElementById(chartId.value))
+  if (chart) {
+    chart.dispose()
+    chart = null
+  }
+})
 </script>
 
 <style scoped lang="scss">

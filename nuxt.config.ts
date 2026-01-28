@@ -68,6 +68,10 @@ export default defineNuxtConfig({
         prefix: 'custom',
         dir: './src/assets/icons'
       },
+      {
+        prefix: 'custom-media',
+        dir: './src/assets/icons/media'
+      },
     ],
     clientBundle: {
       sizeLimitKb: 512

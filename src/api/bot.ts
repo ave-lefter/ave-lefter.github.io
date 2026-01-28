@@ -445,6 +445,9 @@ export const bot_getTokenBalance = createCacheRequest(async function(data: {
     }))
   }
   const { $api } = useNuxtApp()
+  if (!useBotStore().accessToken) {
+    return []
+  }
   return $api('/botapi/swap/getTokenBalance', {
     method: 'post',
     body: data

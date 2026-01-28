@@ -1323,6 +1323,15 @@ onMounted(() => {
 })
 onUnmounted(() => {
   document.removeEventListener('click', clickHandler)
+  listenerGuidMap.forEach((i) => {
+    wsStore.send({
+      ...i,
+      method: 'unsubscribe',
+    })
+  })
+  listenerGuidMap?.clear()
+  _widget?.remove?.()
+  _widget = null
 })
 const emit = defineEmits(['refresh'])
 function refresh() {

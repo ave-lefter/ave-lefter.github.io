@@ -11,8 +11,7 @@ export async function deleteAttention(body: {
     method: 'post',
     body,
   }).then(() => {
-    const {updateNum3} = storeToRefs(useFollowStore())
-    updateNum3.value++
+    useFollowStore().updateNum3++
     return Promise.resolve([])
   }).catch((err) => console.log(err))
 }

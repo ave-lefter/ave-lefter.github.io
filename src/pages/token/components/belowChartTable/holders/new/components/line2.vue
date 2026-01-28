@@ -290,6 +290,14 @@ onMounted(() => {
   init()
   console.log('mounted',series.value)
 })
+
+onBeforeUnmount(() => {
+  let chart = echarts.getInstanceByDom(document.getElementById(chartId.value))
+  if (chart) {
+    chart.dispose()
+    chart = null
+  }
+})
 </script>
 <style scoped lang="scss">
 .chart-container {

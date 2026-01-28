@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useDebounceFn, useStorage, useThrottleFn } from '@vueuse/core'
-import BlackList from '~/pages/pump/blackList.vue'
+import BlackList from '~/pages/pump/components/blackList.vue'
 import PlatformSelect from './platformSelect.vue'
-import Setting from '~/pages/pump/setting.vue'
-import PumpList from '~/pages/pump/pumpList.vue'
+import Setting from '~/pages/pump/components/setting.vue'
+import PumpList from '~/pages/pump/components/pumpList.vue'
 import type { ChainKey, PumpObj, WSPump } from '~/api/types/pump'
 import SuffixIcon from '../suffixIcon.vue'
-import PumpFilter from '~/pages/pump/pumpFilter.vue'
+import PumpFilter from '~/pages/pump/components/pumpFilter.vue'
 import { _getPumpList } from '~/api/pump'
 
 let timer: { id: number | null } = { id: null }

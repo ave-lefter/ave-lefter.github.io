@@ -46,7 +46,7 @@ const _getBestToken = async () => {
     const result = res?.symbol ? res : res.data
     tokenStore.bestToken = result
 
-    if (result.token !== tokenStore.token?.token) {
+    if (result?.token !== tokenStore.token?.token) {
       bestToken.value = result
     } else {
       bestToken.value = null

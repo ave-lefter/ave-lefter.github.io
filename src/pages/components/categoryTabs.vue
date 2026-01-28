@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ColumnsToolbar from './columnsToolbar.vue'
-import BlackList from '../pump/blackList.vue'
+import BlackList from '../pump/components/blackList.vue'
 import PumpLiveSort from './live/pumpLiveSort.vue'
 import type { CategoryElement, IGetTreasureConfig } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'

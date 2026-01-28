@@ -1,6 +1,26 @@
 <template>
   <div class="pump w-full bg-[--main-bg]">
     <div class="flex-start p-x-17px py-12px bg-[--main-bg] mb-1px mt-1px">
+      <div class="tabs mr-8px">
+        <div
+          v-for="item in pumpConfig"
+          :key="item.chain"
+          :class="{ active: item.chain === activeChain }"
+          class="flex-start h-24px  w-24px clickable"
+          @click.stop="switchChain(item)"
+        >
+          <el-image
+            style="
+              width: 24px;
+              height: 24px;
+              border-radius: 4px;
+            "
+            :class="{'opacity-30': item.chain !== activeChain}"
+            :src="`${token_logo_url}chain/${item.chain}.png`"
+          />
+          <!-- <span>{{ item.chain_show || '' }}</span> -->
+        </div>
+      </div>
       <el-popover
         v-model:visible="visible_platforms"
         placement="bottom-start"
@@ -63,37 +83,17 @@
           </template>
         </template>
       </el-popover>
+      <div class="flex-1" />
+      <Setting :chain="activeChain" :pumpConfig="pumpConfig"/>
+      <BlackList />
       <QuickSwapSet
         v-model:quickBuyValue="quickBuyValue"
         :chain="activeChain"
         :settingsButtonVisible="true"
+        class="mr-12px"
       />
-      <div class="flex-1" />
-      <Setting :chain="activeChain" :pumpConfig="pumpConfig"/>
-      <BlackList />
       <AutoSellSetting :chain="activeChain" />
-      <div class="tabs">
-        <button
-          v-for="item in pumpConfig"
-          :key="item.chain"
-          :class="{ active: item.chain === activeChain }"
-          class="flex-start"
-          type="button"
-          @click.stop="switchChain(item)"
-        >
-          <el-image
-            style="
-              width: 14px;
-              height: 14px;
-              border-radius: 50%;
-              margin-right: 5px;
-            "
-            :class="{'opacity-30': item.chain !== activeChain}"
-            :src="`${token_logo_url}chain/${item.chain}.png`"
-          />
-          <span>{{ item.chain_show || '' }}</span>
-        </button>
-      </div>
+
     </div>
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full px-16px">
       <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
@@ -311,34 +311,45 @@
 <script setup lang="ts">
 import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility } from '@vueuse/core'
 import QuickSwapSet from '@/components/quickSwap/quickSwapSet.vue'
-import PumpList from './pumpList.vue'
-import Setting from './setting.vue'
-import BlackList from './blackList.vue'
-import PumpFilter from './pumpFilter.vue'
+import PumpList from './components/pumpList.vue'
+import Setting from './components/setting.vue'
+import BlackList from './components/blackList.vue'
+import PumpFilter from './components/pumpFilter.vue'
 import { _getPumpConfig, _getPumpList } from '@/api/pump'
 import type {
   PumpConfig,
   PumpObj,
   ChainKey,
   CategoryKey,
-  WSPump,
-  pumpData
+  WSPumpObj
 } from '@/api/types/pump'
 import { throttle } from 'lodash-es'
-import { isJSON, formatUrl, usePumpTableDataFetching } from '@/utils/index'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
-import AudioSelect from './audioSelect.vue'
-const Timer = {
+import AudioSelect from './components/audioSelect.vue'
+defineOptions({
+  name: 'pump' // 显式命名
+})
+
+type TimeoutReturnType = ReturnType<typeof setTimeout> | number | null
+const Timer: {
+  new: TimeoutReturnType
+  soon: TimeoutReturnType
+  graduated: TimeoutReturnType
+} = {
   new: null,
   soon: null,
   graduated: null
 }
 const { width } = useWindowSize()
-console.log('-----width-------',width)
 const activeTab = shallowRef('new')
 const route = useRoute()
 const { t } = useI18n()
-const wsStore = useWSStore()
+const wsv2Store = useV2WSStore()
+let isInitObj = {
+  new: true,
+  soon: true,
+  graduated: true
+}
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const activeChain = useStorage<ChainKey>(
   'pump_activeChain',
@@ -363,9 +374,7 @@ const isRotate = ref(false)
 const { pump_notice, pumpV3, pumpFilterDefault } = storeToRefs(usePumpStore())
 const pumpAudio = useTemplateRef('pumpAudio')
 const visible_platforms = shallowRef(false)
-const fourmemeListObj = reactive<
-  Record<ChainKey, Record<CategoryKey, PumpObj[]>>
->({
+const fourmemeListObj = reactive<Record<ChainKey, Record<CategoryKey, PumpObj[]>>>({
   bsc: {
     new: [],
     soon: [],
@@ -389,10 +398,51 @@ const isPausedObj = ref({
   graduated: false,
 })
 
-const wsTableListCache = shallowRef<PumpObj[]>([])
+// let wsTableListCache: PumpObj[] = []
+let wsTableListCache: Record<string, PumpObj[]> = {}
 const wsTableList = shallowRef<PumpObj[]>([])
-const logoList = shallowRef<{logo_url: string, name: string, token: string, symbol: string, rTime: number }[]>([])
+const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
+type StatisticsItem = {
+  first_transfer_in_from_label: any
+  volume_u_24h: number
+  age_seconds: any
+  first_transfer_in_from: any
+  smart_wallet_ratio: any
+  smart_wallet_count: any
+  total_count: number
+  migrated_count: number
+  migrated_ratio: number
+  max_dev_ratio: number
+  kol_count: number
+  kol_ratio: any
+  buyers_24h: any
+  sellers_24h: any
+  makers_24h(makers_24h: any): number
+  reserve1(reserve1: any): number
+  reserve0(reserve0: any): number
+  chain: string
+  token: string
+  holder_count: number
+  rat_ratio: string
+  dev_ratio: string
+  sniper_ratio: string
+  progress: string
+  top10_ratio: string,
+  tx_amount_24h:number
+  tx_count_24h:number
+  tvl:number
+  total: string
+  uprice: number
+  net_flow_vol: number,
+  address_binding_ratio: string
+  phishing_ratio: string,
+  sells_tx_24h_count:number
+  buys_tx_24h_count:number
 
+}
+let portraitTimer: ReturnType<typeof setTimeout> | null = null
+let isPortraitSubscribed = false
+const mapStatistics = shallowRef(new Map<string, any>())
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
   return (
@@ -403,6 +453,16 @@ const platformsList = computed(() => {
 })
 const platforms = computed(() => {
     return pumpV3.value?.[activeChain.value]?.platforms?.join(',')
+})
+const baseTokenMap = computed(() => {
+  const list =
+    pumpConfig?.value?.find(i => i?.chain === activeChain.value)
+      ?.base_tokens || []
+  return new Map(list.map(item => [item.hash, {
+    symbol: item.name,
+    token: item.hash,
+    logo_url: item.logo_url
+  }]))
 })
 const tabsList = computed(() => {
   return [
@@ -435,26 +495,50 @@ const list1 = computed(() => {
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
   const wsList = getFilterData(list1, pumpFilter)
   const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
-  let filterList = [...wsList1, ...list]
-  if (logoList?.value?.length > 0 && filterList?.length > 0) {
+  let filterList = [...wsList1, ...list].map(i => {
+  const baseHash =
+    i.target_token === i.token0_address
+      ? i.token1_address
+      : i.token0_address
+
+  return {
+    ...i,
+    baseToken: baseTokenMap.value.get(baseHash)
+  }
+})
+  if (logoList.value?.length && filterList?.length) {
+    const logoMap = new Map(
+      logoList.value.map(item => [item.token, item])
+    )
     filterList = filterList.map(i => {
-      const obj = logoList.value?.find(y => y.token == i.target_token)
-      if (obj) {
-        return {
-          ...i,
-          ...obj,
-          logo_url: obj?.logo_url,
-          name: obj?.name,
-          symbol: obj?.symbol
-        }
-      } else {
-        return i
+      const obj = logoMap.get(i.target_token)
+      if (!obj) return i
+      return {
+        ...i,
+        ...(obj.logo_url
+          ? {
+              logo_url: obj.logo_url
+            }
+          : {}
+        ),
+        name: obj.name,
+        symbol: obj.symbol,
+        ...(obj.appendix
+          ? {
+              medias: getMedias(obj.appendix),
+              twitter_type: obj.twitter_type
+            }
+          : {}
+        )
       }
     })
   }
+  if (filterList?.length) {
+    filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    fourmemeListObj[activeChain.value].new = filterList?.slice?.(0, 100) || []
+  }
   return filterList?.slice?.(0, 100)
 })
-
 const list2 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.soon || []
   if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
@@ -470,59 +554,120 @@ const list2 = computed(() => {
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_soon`)
   const wsList = getFilterData(list1, pumpFilter)
   const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
-    let filterList = [...wsList1, ...list]
-    if (logoList?.value?.length > 0 && filterList?.length > 0) {
-      filterList = filterList.map(i => {
-        const obj = logoList.value?.find(y => y.token == i.target_token)
-        if (obj) {
-          return {
-            ...i,
-            ...obj,
-            logo_url: obj?.logo_url,
-            name: obj?.name,
-            symbol: obj?.symbol
-          }
-        } else {
-          return i
-        }
-      })
-    }
-    return filterList?.slice?.(0, 100)
-  })
-  const list3 = computed(() => {
-  let list = fourmemeListObj?.[activeChain.value]?.graduated || []
-  if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
-    list = list.filter(
-      (item) =>
-        !pumpBlackList.value?.some(
-          (i) =>
-          (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
-        )
-    )
+  let filterList = [...wsList1, ...list].map(i => {
+  const baseHash =
+    i.target_token === i.token0_address
+      ? i.token1_address
+      : i.token0_address
+
+  return {
+    ...i,
+    baseToken: baseTokenMap.value.get(baseHash)
   }
-    const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
-    const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
-    const wsList = getFilterData(list1, pumpFilter)
-    const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
-    let filterList = [...wsList1, ...list]
-    if (logoList?.value?.length > 0 && filterList?.length > 0) {
+})
+    if (logoList.value?.length && filterList?.length) {
+      const logoMap = new Map(
+        logoList.value.map(item => [item.token, item])
+      )
       filterList = filterList.map(i => {
-        const obj = logoList.value?.find(y => y.token == i.target_token)
-        if (obj) {
-          return {
-            ...i,
-            ...obj,
-            logo_url: obj?.logo_url,
-            name: obj?.name,
-            symbol: obj?.symbol
-          }
-        } else {
-          return i
+        const obj = logoMap.get(i.target_token)
+        if (!obj) return i
+        return {
+          ...i,
+          ...(obj.logo_url
+            ? {
+                logo_url: obj.logo_url
+              }
+            : {}
+          ),
+          name: obj.name,
+          symbol: obj.symbol,
+          ...(obj.appendix
+            ? {
+                medias: getMedias(obj.appendix),
+                twitter_type: obj.twitter_type
+              }
+            : {}
+          )
         }
       })
     }
+    if (filterList?.length) {
+      filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    }
+    const tokenSet = new Set(
+      list3.value?.map(j => j.target_token)
+    )
+    filterList = filterList?.filter(
+      (i: { target_token: string }) =>
+        !tokenSet.has(i.target_token)
+    )
+
+     fourmemeListObj[activeChain.value].soon = filterList?.slice?.(0, 100) || []
     return filterList?.slice?.(0, 100)
   })
+const list3 = computed(() => {
+let list = fourmemeListObj?.[activeChain.value]?.graduated || []
+if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
+  list = list.filter(
+    (item) =>
+      !pumpBlackList.value?.some(
+        (i) =>
+        (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
+      )
+  )
+}
+  const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
+  const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
+  const wsList = getFilterData(list1, pumpFilter)
+  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
+  let filterList = [...wsList1, ...list].map(i => {
+  const baseHash =
+      i.target_token === i.token0_address
+        ? i.token1_address
+        : i.token0_address
+
+    return {
+      ...i,
+      baseToken: baseTokenMap.value.get(baseHash)
+    }
+  })
+  if (logoList.value?.length && filterList?.length) {
+    const logoMap = new Map(
+      logoList.value.map(item => [item.token, item])
+    )
+    filterList = filterList.map(i => {
+      const obj = logoMap.get(i.target_token)
+      if (!obj) return i
+      return {
+        ...i,
+        ...(obj.logo_url
+          ? {
+              logo_url: obj.logo_url
+            }
+          : {}
+        ),
+        name: obj.name,
+        symbol: obj.symbol,
+        ...(obj.appendix
+          ? {
+              medias: getMedias(obj.appendix),
+              twitter_type: obj.twitter_type
+            }
+          : {}
+        )
+      }
+    })
+  }
+  if (filterList?.length) {
+    filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    fourmemeListObj[activeChain.value].graduated = filterList?.slice?.(0, 100) || []
+  }
+  return filterList?.slice?.(0, 100)
+})
+const mergedBaseList = computed(() => {
+  return [...list1.value, ...list2.value, ...list3.value]
+})
 const scrollHeight = computed(()=>{
   return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
 })
@@ -568,37 +713,147 @@ pump_notice.value[activeChain.value]?.graduated
 watch(()=> pumpV3.value[activeChain.value].platforms, () => {
   getPumpList()
 })
-watch(activeChain, () => {
+watch(activeChain, (val, old) => {
+  if (old) {
+    fourmemeListObj[old] = {
+      new: [],
+      soon: [],
+      graduated: []
+    }
+  }
+
   getPumpList()
-  wsTableListCache.value = []
+  wsTableListCache = {}
   wsTableList.value = []
-  wsStore.send({
+  wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
-    params: ['pumpstate'],
+    params: ['pumpstatev2', old],
     id: 1,
   })
   setTimeout(() => {
-    wsStore.send({
+    wsv2Store.send({
       jsonrpc: '2.0',
       method: 'subscribe',
-      params: ['pumpstate', activeChain.value],
+      params: ['pumpstatev2', val],
       id: 1,
     })
   }, 500)
-})
-watch(() => wsStore.wsResult[WSEventType.PUMPSTATE], (val) => {
-  if (Array.isArray(val) && documentVisible.value) {
-    wsUpdateTableList(val)
-  }
-})
-watch(() => wsStore.wsResult[WSEventType.TOKEN_UPDATED], (val) => {
-  if (val && documentVisible.value) {
-    logoList.value.unshift(val)
-    logoList.value?.slice(0, 300)
-  }
+    isInitObj = {
+      new: true,
+      soon: true,
+      graduated: true
+    }
+    wsv2Store.send({
+      jsonrpc: '2.0',
+      method: 'unsubscribe',
+      params: ['portrait_statistics'],
+      id: 1,
+    })
 })
 
+const pumpStateBuffer: any[] = []
+const flushPumpState = useThrottleFn(() => {
+  if (!pumpStateBuffer.length || !documentVisible.value) return
+  wsUpdateTableList(pumpStateBuffer)
+  subscribePortrait(pumpStateBuffer)
+  pumpStateBuffer.length = 0
+}, 150)
+
+watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
+  if (Array.isArray(val)) {
+    pumpStateBuffer.splice(0, 0, ...val)
+    pumpStateBuffer.splice(100)
+    flushPumpState()
+  }
+})
+const bufferLogoMap = new Map<string, any>()
+const logoThrottled = useThrottleFn(() => {
+  if (!bufferLogoMap.size || !documentVisible.value) return
+  const mergedList = Array.from(bufferLogoMap.values())
+  logoList.value = [
+    ...mergedList,
+    ...logoList.value,
+  ].slice(0, 300)
+  bufferLogoMap.clear()
+}, 100)
+
+watch(
+  () => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED],
+  (val) => {
+    if (!val?.token) return
+
+    const prev = bufferLogoMap.get(val.token)
+
+    bufferLogoMap.set(
+      val.token,
+      prev ? mergeLogo(prev, val) : val
+    )
+    // 控制 buffer 最大数量（防爆）
+    if (bufferLogoMap.size > 100) {
+      const firstKey = bufferLogoMap.keys().next().value
+      if (firstKey) bufferLogoMap.delete(firstKey)
+    }
+    logoThrottled()
+  }
+)
+// const buffer: any[] = []
+
+const flushStatistics = useThrottleFn(() => {
+  if (!mapStatistics.value.size || !documentVisible.value) return
+  // const map = new Map<string, any>()
+
+  // 旧数据
+  // statisticsList.value.forEach(item => {
+  //   mapStatistics.value.set(item.token, item)
+  // })
+  // 所有 buffer 中的新数据
+  // buffer.forEach(item => {
+  //   const prev = mapStatistics.value.get(item.token)
+  //   mapStatistics.value.set(
+  //     item.token,
+  //     prev ? mergeStatistics(prev, item) : item
+  //   )
+  // })
+  // if (mapStatistics.value.size > 200) {
+  //   const firstKey = mapStatistics.value.keys().next().value
+  //   if (firstKey) {
+  //     mapStatistics.value.delete(firstKey)
+  //   }
+  // }
+  triggerRef(mapStatistics)
+  // statisticsList.value = Array.from(mapStatistics.values()).slice(0, 300)
+  // buffer.length = 0
+}, 300)
+watch(
+  () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
+  (val) => {
+    if (!Array.isArray(val) || !val.length ) return
+    // buffer.push(val)
+    // buffer.splice(0, 0, ...val)
+    // buffer.splice(100)
+    val.forEach((item: any) => {
+      const prev = mapStatistics.value.get(item.token)
+      mapStatistics.value.set(
+        item.token,
+        prev ? mergeStatistics(prev, item) : item
+      )
+    })
+    if (mapStatistics.value.size > 100) {
+      const firstKey = mapStatistics.value.keys().next().value
+      if (firstKey) {
+        mapStatistics.value.delete(firstKey)
+      }
+    }
+    flushStatistics()
+  }
+)
+
+function bufRender() {
+  flushPumpState()
+  logoThrottled()
+  flushStatistics()
+}
 const getChangedValue = (A: string[], B: string[]): string | null => {
   for (let i = 0; i < A.length; i++) {
     if (A[i] !== B[i]) {
@@ -608,34 +863,45 @@ const getChangedValue = (A: string[], B: string[]): string | null => {
   return null
 }
 
-onMounted(() => {
+
+let isLeave = true
+
+onActivated(() => {
+  isLeave = false
+  wsTableListCache = {}
+  wsTableList.value = []
   document.addEventListener('mousemove', mouseInsideTxs)
   getPumpConfig()
   getPumpList()
-  wsTableListCache.value = []
-  wsTableList.value = []
-  wsStore.send({
+  wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
-    params: ['pumpstate'],
+    params: ['pumpstatev2', activeChain.value],
     id: 1,
   })
   setTimeout(() => {
-    wsStore.send({
+    wsv2Store.send({
       jsonrpc: '2.0',
       method: 'subscribe',
-      params: ['pumpstate', activeChain.value],
+      params: ['pumpstatev2', activeChain.value],
       id: 1,
     })
   }, 500)
+
+  isInitObj = {
+    new: true,
+    soon: true,
+    graduated: true
+  }
 })
 
-onUnmounted(()=>{
+onDeactivated(()=>{
+  isLeave = true
   document.removeEventListener('mousemove', mouseInsideTxs)
-  wsStore.send({
+  wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
-    params: ['pumpstate'],
+    params: ['pumpstatev2',  activeChain.value],
     id: 1,
   })
   for (const key in Timer) {
@@ -645,7 +911,52 @@ onUnmounted(()=>{
       Timer[timerKey] = null
     }
   }
+  if (portraitTimer) {
+    clearTimeout(portraitTimer)
+  }
+  unsubscribePortrait()
 })
+const startPortraitTimer = () => {
+  if (portraitTimer) {
+    clearTimeout(portraitTimer)
+  }
+  portraitTimer = setTimeout(() => {
+    unsubscribePortrait()
+    subscribePortrait(mergedBaseList.value)
+    startPortraitTimer()
+  }, 1 * 60 * 1000)
+}
+const subscribePortrait = (list) => {
+  if (!Array.isArray(list) || list.length === 0 || isLeave) return
+
+  wsv2Store.send({
+    jsonrpc: '2.0',
+    method: 'subscribe',
+    params: [
+      'portrait_statistics',
+      {
+        tks: list.map(i => ({
+          ch: i.chain,
+          tk: i?.pair?.target_token || i?.target_token
+        }))
+      }
+    ],
+    id: 1,
+  })
+
+  isPortraitSubscribed = true
+}
+
+const unsubscribePortrait = () => {
+  // if (!isPortraitSubscribed) return
+  wsv2Store.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: ['portrait_statistics'],
+    id: 1,
+  })
+  // isPortraitSubscribed = false
+}
 
 const mouseInsideTxs = throttle(function (event) {
     const element1 = document.querySelector('.pump-item_list-new')
@@ -664,132 +975,96 @@ const mouseInsideTxs = throttle(function (event) {
         element3
       )
     }
-
 }, 100, { leading: true, trailing: true })
+
 function getMouseInsideElement(event:any, element:any) {
-    // 获取鼠标位置
-    const mouseX = event.clientX
-    const mouseY = event.clientY
-    // 获取元素的边界矩形
-    const rect = element.getBoundingClientRect()
-    return (
-      mouseX >= rect.left &&
-      mouseX <= rect.right &&
-      mouseY >= rect.top &&
-      mouseY <= rect.bottom
-    )
+  // 获取鼠标位置
+  const mouseX = event.clientX
+  const mouseY = event.clientY
+  // 获取元素的边界矩形
+  const rect = element.getBoundingClientRect()
+  return (
+    mouseX >= rect.left &&
+    mouseX <= rect.right &&
+    mouseY >= rect.top &&
+    mouseY <= rect.bottom
+  )
 }
-function wsUpdateBaseInfo(obj: { logo_url: string, name: string, token: string, symbol: string , rTime: number}) {
-  wsTableList.value = wsTableList.value?.map(i => {
-    if (obj.token == i.target_token) {
-      return {
-        ...i,
-        logo_url: obj.logo_url,
-        name: obj.name,
-        symbol: obj.symbol
-      }
-    }
-    return i
-  })
-  wsTableListCache.value = wsTableListCache.value?.map(i => {
-    if (obj.token == i.target_token) {
-      return {
-        ...i,
-        logo_url: obj.logo_url,
-        name: obj.name,
-        symbol: obj.symbol
-      }
-    }
-    return i
-  })
-  const c = ['new', 'soon', 'graduated']
+
+
+function wsUpdateTableList(wsList: WSPumpObj[]) {
+  const c = ['new', 'soon', 'graduated'] as const
+  if (!wsList?.length) return
+  // const rTime = Date.now()
+  const list = wsList?.map?.(i => ({
+    ...i,
+    ...(i.pair),
+    // rTime: rTime,
+    id: `${i.pair.target_token}-${i.chain}`,
+    pair_id: `${i.pair.pair}-${i.chain}`,
+    token: i.pair.target_token,
+    progress: 0,
+    symbol:
+      i.pair.target_token == i.pair.token0_address
+        ? i?.pair.token0_symbol
+        : i?.pair.token1_symbol,
+    name:  i.pair.target_token == i.pair.token0_address
+          ? i.pair?.token0_name
+          : i.pair?.token1_name,
+    logo_url:
+    i.pair.target_token == i.pair.token0_address
+      ? i?.pair.token0_logo_url
+      : i?.pair.token1_logo_url,
+
+  }))
+  const currentChain = activeChain.value
+  if (!wsTableListCache[currentChain]) wsTableListCache[currentChain] = []
+  const wsTableList1 = wsTableListCache[currentChain]?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
+  wsTableListCache[currentChain] = [...(list?.filter(i => i.chain === currentChain) || []), ...(wsTableList1 || [])]?.slice(0, 100)
+  // let wsTime = this.wsTableListCache?.time || 0
+  // if (wsTime < Date.now() - 15000) {
+  //   this.wsTableListCache = {
+  //     list,
+  //     time: Date.now()
+  //   }
+  // } else {
+  //   let wsTableList = this.wsTableListCache?.list?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
+  //   this.wsTableListCache.list = [...list, ...(wsTableList || [])]
+  // }
+
+  let list1 = wsTableListCache[currentChain]
+  const list2 = wsTableList?.value.filter(i => i.chain === currentChain)
+  if (isPausedObj?.value?.new) {
+    list1 = [...(list1?.filter?.(i => i.state !== 'new') || []), ...(list2?.filter?.(i => i.state === 'new') || [])]
+  }
+  if (isPausedObj?.value?.soon) {
+    // list1 = list1?.filter?.(i => i.state !== 'soon' && i.state !== 'migrating')
+    list1 = [...(list1?.filter?.(i => i.state !== 'soon' && i.state !== 'migrating') || []), ...(list2?.filter?.(i => i.state === 'soon' || i.state === 'migrating') || [])]
+  }
+  if (isPausedObj?.value?.graduated) {
+    // list1 = list1?.filter?.(i => i.state !== 'graduated')
+    list1 = [...(list1?.filter?.(i => i.state !== 'graduated' && i.state !== 'migrated') || []), ...(list2?.filter?.(i => i.state === 'graduated' || i.state === 'migrated') || [])]
+  }
+  wsTableList.value = [...list1]
+
   c.forEach((i) => {
     fourmemeListObj[activeChain.value][i] = fourmemeListObj?.[activeChain.value][i]?.map((j) => {
-      if (obj.token == j.target_token) {
-        return {
-          ...j,
-          logo_url: obj.logo_url,
-          name: obj.name,
-          symbol: obj.symbol
+      const item = list?.find(
+        (k) => k.pump_pair_address === j.pair && k.chain === j.chain
+      )
+      let res = {}
+      if (item) {
+        res = {
+          ...item,
         }
       }
       return {
         ...j,
+        ...(res || {})
       }
     })
   })
 }
-function wsUpdateTableList(wsList: WSPump[]) {
-      const c = ['new', 'soon', 'graduated']
-      if (!wsList?.length) return
-      const rTime = Date.now()
-      const list = wsList?.map?.(i => ({
-        ...i,
-        ...i.pair,
-        rTime: rTime,
-        id: `${i.pair.target_token}-${i.chain}`,
-        pair_id: `${i.pair.pair}-${i.chain}`,
-        token: i.pair.target_token,
-        progress: Number(i.progress || 0),
-        symbol:
-          i.pair.target_token == i.pair.token0_address
-            ? i?.pair.token0_symbol
-            : i?.pair.token1_symbol,
-        name:  i.target_token == i.token0_address
-              ? i?.token0_name
-              : i?.token1_name,
-        logo_url:
-        i.target_token == i.pair.token0_address
-          ? i?.pair.token0_logo_url
-          : i?.pair.token1_logo_url,
-
-      }))
-      const wsTableList1 = wsTableListCache?.value?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
-      wsTableListCache.value = [...list, ...(wsTableList1 || [])]?.slice(0,100)
-      // let wsTime = this.wsTableListCache?.time || 0
-      // if (wsTime < Date.now() - 15000) {
-      //   this.wsTableListCache = {
-      //     list,
-      //     time: Date.now()
-      //   }
-      // } else {
-      //   let wsTableList = this.wsTableListCache?.list?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
-      //   this.wsTableListCache.list = [...list, ...(wsTableList || [])]
-      // }
-
-      let list1 = wsTableListCache?.value?.filter(i => i.chain === activeChain.value)
-      const list2 = wsTableList?.value.filter(i => i.chain === activeChain.value)
-      if (isPausedObj?.value?.new) {
-        list1 = [...list1?.filter?.(i => i.state !== 'new'), ...list2?.filter?.(i => i.state === 'new')]
-      }
-      if (isPausedObj?.value?.soon) {
-        // list1 = list1?.filter?.(i => i.state !== 'soon' && i.state !== 'migrating')
-        list1 = [...list1?.filter?.(i => i.state !== 'soon' && i.state !== 'migrating'), ...list2?.filter?.(i => i.state === 'soon' || i.state === 'migrating')]
-      }
-      if (isPausedObj?.value?.graduated) {
-        // list1 = list1?.filter?.(i => i.state !== 'graduated')
-        list1 = [...list1?.filter?.(i => i.state !== 'graduated' && i.state !== 'migrated'), ...list2?.filter?.(i => i.state === 'graduated' || i.state === 'migrated' )]
-      }
-      wsTableList.value = [...list1]
-
-      c.forEach((i) => {
-        fourmemeListObj[activeChain.value][i] = fourmemeListObj?.[activeChain.value][i]?.map((j) => {
-          const item = list?.find(
-            (k) => k.pump_pair_address === j.pair && k.chain === j.chain
-          )
-          let res = {}
-          if (item) {
-            res = {
-              ...item,
-            }
-          }
-          return {
-            ...j,
-            ...(res || {})
-          }
-        })
-      })
-    }
 function getPumpConfig() {
   _getPumpConfig().then((res) => {
     pumpConfig.value = Array.isArray(res) ? res : []
@@ -800,10 +1075,11 @@ function getPumpConfig() {
         const platforms = i.platforms?.map(y => {
           if (i.chain == 'solana') {
             if (y.platform !== 'believe') {
-              return y.platform
+              return y.platform || ''
             }
+            return ''
           } else {
-            return y.platform
+            return y.platform || ''
           }
         }) || []
         if (i.chain == 'solana') {
@@ -849,7 +1125,7 @@ function getPumpConfig() {
   })
 }
 function handlerFilterConfirm(
-  val: { progress_min: string | undefined, progress_max: string | undefined },
+  val: { progress_min?: string; progress_max?: string; chain: ChainKey; platforms: string; has_sm?: boolean},
   type: string
 ) {
 
@@ -872,7 +1148,7 @@ function handlerFilterConfirm(
     val.progress_min = undefined
     val.progress_max = undefined
   }
-  getPump({ ...params, ...val }, true)
+  getPump({ ...(params as { category: CategoryKey }), ...val }, true)
 }
 function single(type: string) {
   if (width.value < 1024) {
@@ -907,212 +1183,201 @@ function getPumpList(isFilter = false) {
   getPump(params3, isFilter)
 }
 
-function getPump(params, isFilter = false) {
-  // console.log('---getPump-111------',params)
-  const chain = activeChain.value
-  if (Timer[params.category]) {
-    clearTimeout(Timer[params.category])
-    Timer[params.category] = null
-  }
-  if (route.name !== 'pump' || !documentVisible.value) {
-    return
-  }
-  if ((isPausedObj.value?.[params.category] || route.name !== 'pump') && !isFilter) {
-    Timer[params.category] = setTimeout(() => {
-      getPump(params)
-    }, 5000)
-    return
-  }
-  params.chain = chain
-  if (pumpV3.value[chain]?.[params.category]?.count === 0) {
-    pumpV3.value[chain][params.category]['loading'] = true
+async function getPump(rawParams: {
+  category: CategoryKey
+  chain: ChainKey
+  platforms: string
+  has_sm?: boolean
+  sm_list?: string[] | string
+}, isFilter = false) {
+  const { category } = rawParams
+  const currentChain = activeChain.value
+
+  // 1. 清理定时器
+  if (Timer[category]) {
+    clearTimeout(Timer[category] as number)
+    Timer[category] = null
   }
 
-  if (pumpV3.value?.[activeChain.value]?.platforms?.length > 0) {
-    params.platforms = pumpV3.value[activeChain.value]?.platforms?.join(',')
+  // 2. 状态拦截
+  const isInactive = route.name !== 'pump'
+  const isPaused = isPausedObj.value?.[category] || route.name !== 'pump'
+
+  if (isInactive) return
+
+  if (!isFilter && isPaused) {
+    Timer[category] = setTimeout(() => getPump(rawParams), 5000)
+    return
   }
-  if (params.has_sm) {
-    params.has_sm = true
-    if (params?.sm_list?.length > 0) {
-      delete params?.sm_list
-    }
+
+  // 3. 构建参数 (浅拷贝避免污染)
+  const queryParams = { ...rawParams, chain: currentChain }
+  const platformList = pumpV3.value?.[currentChain]?.platforms
+
+  if (platformList?.length > 0) {
+    queryParams.platforms = platformList.join(',')
   }
-  if (!params.has_sm && Array.isArray(params?.sm_list) && params?.sm_list?.length > 0) {
-    params.sm_list =  params?.sm_list.join(',')
+
+  if (queryParams.has_sm) {
+    delete queryParams.sm_list
+  } else if (Array.isArray(queryParams.sm_list) && queryParams.sm_list.length > 0) {
+    queryParams.sm_list = queryParams.sm_list.join(',')
   }
-  params = Object.fromEntries(
-    Object.entries(params).filter(([_, value]) => value != null && value !== '' && Boolean(value))
+
+  // 过滤无效键值
+  const finalParams = Object.fromEntries(
+    Object.entries(queryParams).filter(([_, v]) => v != null && v !== '' && Boolean(v))
   )
-  _getPumpList(params)
-    .then((res) => {
-      const list = (res || [])?.map?.((i) => {
-        return {
-          ...i,
-          id: `${i.target_token}-${i.chain}`,
-          pair_id: `${i.pair}-${i.chain}`,
-          token: i.target_token,
-          progress: Number(i.progress || 0),
-          symbol:
-            i.target_token == i.token0_address
-              ? i?.token0_symbol
-              : i?.token1_symbol,
-          name:  i.target_token == i.token0_address
-              ? i?.token0_name
-              : i?.token1_name,
-          logo_url:
-            i.target_token == i.token0_address
-              ? i?.token0_logo_url
-              : i?.token1_logo_url,
-          target_opening_at:
-            i?.target_opening_at !== '1970-01-01T00:00:00Z' &&
-            i?.target_opening_at !== '0001-01-01T00:00:00Z'
-              ? new Date(i?.target_opening_at).getTime()
-              : 0,
-          created_at:
-            i?.created_at !== '1970-01-01T00:00:00Z' &&
-            i?.created_at !== '0001-01-01T00:00:00Z'
-              ? new Date(i?.created_at).getTime()/1000
-              : '0',
-          liq:
-            i.target_token !== i.token0_address
-              ? i.reserve0 * i.token0_price_usd * 2
-              : i.reserve1 * i.token1_price_usd * 2,
-          medias: getMedias(i.appendix)
-        }
-      })
-      fourmemeListObj[activeChain.value][params.category as CategoryKey] = list?.slice?.(0,100)
-      wsTableListCache.value =
-        wsTableListCache?.value.filter?.(
-          (i) => !list?.some?.((j) => j?.pair === i?.pair)
-      )?.slice?.(0,100) || []
+
+  // 4. Loading 状态处理
+  const state = pumpV3.value[currentChain]?.[category]
+  if (state?.count === 0) state.loading = true
+
+  try {
+    const res = await _getPumpList(finalParams)
+
+    // 5. 数据转换
+    const formattedList = (res || []).map(item => {
+      const isT0 = item.target_token === item.token0_address
+      const targetPrefix = isT0 ? 'token0' : 'token1'
+
+      return {
+        ...item,
+        id: `${item.target_token}-${item.chain}`,
+        pair_id: `${item.pair}-${item.chain}`,
+        token: item.target_token,
+        progress: Number(item.progress || 0),
+        symbol: item[`${targetPrefix}_symbol`],
+        name: item[`${targetPrefix}_name`],
+        logo_url: item[`${targetPrefix}_logo_url`],
+        target_opening_at: parseDate(item.target_opening_at),
+        created_at: parseDate(item.created_at, true),
+        liq: isT0
+          ? item.reserve1 * item.token1_price_usd * 2
+          : item.reserve0 * item.token0_price_usd * 2,
+        medias: getMedias(item.appendix)
+      }
     })
-    .finally(() => {
-      pumpV3.value[chain][params.category]['loading'] = false
-      pumpV3.value[chain][params.category].count ++
-      Timer[params.category] = setTimeout(() => {
-            getPump(params)
-          }, 10000)
-    })
+
+    // 6. 更新列表与缓存过滤 (Set 优化)
+    fourmemeListObj[currentChain][category] = formattedList.slice(0, 100)
+
+    const newPairSet = new Set(formattedList.map(i => i.pair))
+    wsTableListCache[currentChain] = (wsTableListCache[currentChain] || []).filter(i => !newPairSet.has(i.pair)).slice(0, 50)
+
+    if(isInitObj[finalParams.category as keyof typeof isInitObj]) {
+      if (formattedList?.length > 0) {
+          subscribePortrait(formattedList?.slice?.(0, 100))
+          startPortraitTimer()
+      } else {
+        isInitObj[finalParams.category as keyof typeof isInitObj] = false
+      }
+    }
+
+  } catch (err) {
+    console.error('Fetch pump list failed:', err)
+  } finally {
+    // 7. 善后与下一次轮询
+    if (state) {
+      state.loading = false
+      state.count++
+    }
+    // Timer[category] = setTimeout(() => getPump(rawParams), 10000)
+  }
 }
-// function getMedias(appendix: string) {
-//   if (!appendix) return []
-//   if (isJSON(appendix)) {
-//     const obj = JSON.parse(appendix)
-//     const arr = []
-//     if (obj?.website)
-//       arr.push({
-//         name: t('website'),
-//         icon: 'web',
-//         url: formatUrl(obj.website),
-//       })
-//     if (obj?.btok)
-//       arr.push({
-//         name: 'Btok',
-//         icon: 'btok',
-//         url: formatUrl(obj.btok),
-//       })
-//     if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
-//     if (obj?.telegram)
-//       arr.push({
-//         name: 'Telegram',
-//         icon: 'tg',
-//         url: formatUrl(obj.telegram),
-//       })
-//     if (obj?.twitter)
-//       arr.push({
-//         name: 'Twitter',
-//         icon: 'twitter',
-//         url: formatUrl(obj.twitter),
-//       })
-//     return arr
-//   }
-//   return []
-// }
-function getFilterData(list, conditions) {
+
+/** 辅助函数：统一处理后端无效时间 */
+function parseDate(dateStr?: string | number, toSeconds = false) {
+  const isInvalid = !dateStr || String(dateStr).startsWith('1970') || String(dateStr).startsWith('0001')
+  if (isInvalid) return toSeconds ? '0' : 0
+  const ms = new Date(dateStr).getTime()
+  return toSeconds ? ms / 1000 : ms
+}
+function getFilterData(list: PumpObj[], conditions: any) {
   conditions = JSON.parse(conditions) || {}
-      return list?.filter((i) => {
-        let pass = true
-        if (conditions?.q) {
-          const arr = conditions?.q.split(',')
-          pass = pass && arr?.findIndex(y=> i.target_token == y || i.name == y || i.symbol == y) !== -1
-        }
-        if (conditions?.dev_sale_out) {
-          pass = pass && !Number(i?.dev_balance_ratio_cur)
-        }
-        if (conditions?.progress_min) {
-          pass = pass && i.progress >= Number(conditions.progress_min)
-        }
-        if (conditions?.progress_max) {
-          pass = pass && i.progress <= Number(conditions.progress_max)
-        }
-        if (conditions?.lage) {
-          pass = pass && (new Date().getTime()/1000- i.time)/60 >= Number(conditions.lage)
-        }
-        if (conditions?.rage) {
-          pass = pass && (new Date().getTime()/1000- i.time)/60 <= Number(conditions.rage)
-        }
+  return list?.filter((i) => {
+    let pass = true
+    if (conditions?.q) {
+      const arr = conditions?.q.split(',')
+      pass = pass && arr?.findIndex(y=> i.target_token == y || i.name == y || i.symbol == y) !== -1
+    }
+    if (conditions?.dev_sale_out) {
+      pass = pass && !Number(i?.dev_balance_ratio_cur)
+    }
+    if (conditions?.progress_min) {
+      pass = pass && i.progress >= Number(conditions.progress_min)
+    }
+    if (conditions?.progress_max) {
+      pass = pass && i.progress <= Number(conditions.progress_max)
+    }
+    if (conditions?.lage) {
+      pass = pass && (new Date().getTime()/1000- i.time)/60 >= Number(conditions.lage)
+    }
+    if (conditions?.rage) {
+      pass = pass && (new Date().getTime()/1000- i.time)/60 <= Number(conditions.rage)
+    }
 
-        if (conditions?.progress_min) {
-          pass = pass && i.progress >= Number(conditions.progress_min)
-        }
-        if (conditions?.progress_max) {
-          pass = pass && i.progress <= Number(conditions.progress_max)
-        }
+    if (conditions?.progress_min) {
+      pass = pass && i.progress >= Number(conditions.progress_min)
+    }
+    if (conditions?.progress_max) {
+      pass = pass && i.progress <= Number(conditions.progress_max)
+    }
 
-        if (conditions?.market_cap_min) {
-          pass = pass && i.market_cap >= Number(conditions.market_cap_min)
-        }
-        if (conditions?.market_cap_max) {
-          pass = pass && i.market_cap <= Number(conditions.market_cap_max)
-        }
-        if (conditions?.dev_balance_ratio_cur_min) {
-          pass = pass && i.dev_balance_ratio_cur >= Number(conditions.dev_balance_ratio_cur_min)
-        }
-        if (conditions?.dev_balance_ratio_cur_max) {
-          pass = pass && i.dev_balance_ratio_cur <= Number(conditions.dev_balance_ratio_cur_max)
-        }
-        if (conditions?.holders_top10_ratio_min) {
-          pass = pass && i.holders_top10_ratio >= Number(conditions.holders_top10_ratio_min)
-        }
-        if (conditions?.holders_top10_ratio_max) {
-          pass = pass && i.holders_top10_ratio <= Number(conditions.holders_top10_ratio_max)
-        }
-        if (conditions?.tvl_min) {
-          pass = pass && i.tvl >= Number(conditions.tvl_min)
-        }
-        if (conditions?.tvl_max) {
-          pass = pass && i.tvl <= Number(conditions.tvl_max)
-        }
-        if (pumpV3.value[activeChain.value].platforms.length > 0) {
-          pass = pass && pumpV3.value[activeChain.value].platforms.includes(i.platform_id)
-        }
-        if (conditions?.holder_min) {
-          pass = pass && (i?.holder || 0) >= Number(conditions.holder_min)
-        }
-        if (conditions?.holder_max) {
-          pass = pass && (i?.holder || 0) <= Number(conditions.holder_max)
-        }
+    if (conditions?.market_cap_min) {
+      pass = pass && i.market_cap >= Number(conditions.market_cap_min)
+    }
+    if (conditions?.market_cap_max) {
+      pass = pass && i.market_cap <= Number(conditions.market_cap_max)
+    }
+    if (conditions?.dev_balance_ratio_cur_min) {
+      pass = pass && i.dev_balance_ratio_cur >= Number(conditions.dev_balance_ratio_cur_min)
+    }
+    if (conditions?.dev_balance_ratio_cur_max) {
+      pass = pass && i.dev_balance_ratio_cur <= Number(conditions.dev_balance_ratio_cur_max)
+    }
+    if (conditions?.holders_top10_ratio_min) {
+      pass = pass && i.holders_top10_ratio >= Number(conditions.holders_top10_ratio_min)
+    }
+    if (conditions?.holders_top10_ratio_max) {
+      pass = pass && i.holders_top10_ratio <= Number(conditions.holders_top10_ratio_max)
+    }
+    if (conditions?.tvl_min) {
+      pass = pass && i.tvl >= Number(conditions.tvl_min)
+    }
+    if (conditions?.tvl_max) {
+      pass = pass && i.tvl <= Number(conditions.tvl_max)
+    }
+    if (pumpV3.value[activeChain.value].platforms.length > 0) {
+      pass = pass && pumpV3.value[activeChain.value].platforms.includes(i.platform_id)
+    }
+    if (conditions?.holder_min) {
+      pass = pass && (i?.holder || 0) >= Number(conditions.holder_min)
+    }
+    if (conditions?.holder_max) {
+      pass = pass && (i?.holder || 0) <= Number(conditions.holder_max)
+    }
 
-        if (conditions?.volume_u_24h_min) {
-          pass = pass && i.volume_u_24h >= Number(conditions.volume_u_24h_min)
-        }
-        if (conditions?.volume_u_24h_max) {
-          pass = pass && i.volume_u_24h <= Number(conditions.volume_u_24h_max)
-        }
-        if (conditions?.tx_24h_count_min) {
-          pass = pass && i.tx_24h_count >= Number(conditions.tx_24h_count_min)
-        }
-        if (conditions?.tx_24h_count_max) {
-          pass = pass && i.tx_24h_count <= Number(conditions.tx_24h_count_max)
-        }
-        if (conditions?.smart_money_tx_count_24h_min) {
-          pass = pass && ((i.smart_money_sell_count_24h || 0) + (i?.smart_money_buy_count || 0)) >= Number(conditions.smart_money_tx_count_24h_min)
-        }
-        if (conditions?.smart_money_tx_count_24h_max) {
-          pass = pass && ((i.smart_money_sell_count_24h || 0) + (i?.smart_money_buy_count || 0)) <= Number(conditions.smart_money_tx_count_24h_max)
-        }
-        return pass
-      })
+    if (conditions?.volume_u_24h_min) {
+      pass = pass && i.volume_u_24h >= Number(conditions.volume_u_24h_min)
+    }
+    if (conditions?.volume_u_24h_max) {
+      pass = pass && i.volume_u_24h <= Number(conditions.volume_u_24h_max)
+    }
+    if (conditions?.tx_24h_count_min) {
+      pass = pass && i.tx_24h_count >= Number(conditions.tx_24h_count_min)
+    }
+    if (conditions?.tx_24h_count_max) {
+      pass = pass && i.tx_24h_count <= Number(conditions.tx_24h_count_max)
+    }
+    if (conditions?.smart_money_tx_count_24h_min) {
+      pass = pass && ((i.smart_money_sell_count_24h || 0) + (i?.smart_money_buy_count || 0)) >= Number(conditions.smart_money_tx_count_24h_min)
+    }
+    if (conditions?.smart_money_tx_count_24h_max) {
+      pass = pass && ((i.smart_money_sell_count_24h || 0) + (i?.smart_money_buy_count || 0)) <= Number(conditions.smart_money_tx_count_24h_max)
+    }
+    return pass
+  })
 }
 function getSpan() {
   const visibleList = Object.values(pumpSetting?.value.grid || {}).filter(i => i.show) || []
@@ -1131,19 +1396,193 @@ function getSpan() {
   }
 }
 function switchChain(item: { chain: ChainKey }) {
-  console.log('------switchChain--------',item.chain)
   activeChain.value = item.chain
 }
 
-const documentVisible = useDocumentVisibility()
+const documentVisible1 = useDocumentVisibility()
+
+const documentVisible = computed(() => {
+  return documentVisible1.value === 'visible'
+})
 
 watch(documentVisible, (val) => {
+  if (route.name !== 'pump') return
   if (val) {
-    if (route.name === 'pump') {
-      getPumpList()
-    }
+    bufRender()
   }
 })
+
+// watch(documentVisible, (val) => {
+//   if (route.name !== 'pump') return
+//   if (val) {
+//     wsTableListCache = []
+//     wsTableList.value = []
+//     isInitObj.value = {
+//       new: true,
+//       soon: true,
+//       graduated: true
+//     }
+//     wsv2Store.send({
+//       jsonrpc: '2.0',
+//       method: 'subscribe',
+//       params: ['pumpstate', activeChain.value],
+//       id: 1,
+//     })
+//     getPumpList()
+//   } else {
+//     if (portraitTimer) {
+//       clearTimeout(portraitTimer)
+//       portraitTimer = null
+//     }
+//     unsubscribePortrait()
+//     wsv2Store.send({
+//       jsonrpc: '2.0',
+//       method: 'unsubscribe',
+//       params: ['pumpstate'],
+//       id: 1,
+//     })
+//   }
+// })
+
+const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
+  ['volume_u_24h', 'volume_u_24h'],
+  ['net_flow_vol', 'net_flow_vol'],
+  ['address_binding_ratio', 'address_binding_ratio'],
+  ['phishing_ratio', 'phishing_ratio'],
+  ['sells_tx_24h_count', 'sells_tx_24h_count'],
+  ['buys_tx_24h_count', 'buys_tx_24h_count'],
+  ['migrated_count', 'dev_migrated_count'],
+  ['total_count', 'dev_total_count'],
+  ['migrated_ratio', 'dev_migrated_ratio'],
+  ['max_dev_ratio', 'max_dev_ratio'],
+  ['kol_ratio', 'kol_ratio'],
+  ['smart_wallet_ratio', 'smart_wallet_ratio'],
+  ['first_transfer_in_from', 'dev_first_transfer_in_from'],
+  ['first_transfer_in_from_label', 'dev_first_transfer_in_from_label'],
+  ['age_seconds', 'dev_age_seconds'],
+]
+const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
+  ['holder_count', 'holders'],//dev_holder_count
+  ['rat_ratio', 'insider_balance_ratio_cur'],
+  ['dev_ratio', 'dev_balance_ratio_cur'], //dev_ratio
+  ['sniper_ratio', 'sniper_balance_ratio_cur'],
+  ['top10_ratio', 'holders_top10_ratio'],
+  ['tx_count_24h', 'tx_24h_count'],
+  ['tvl', 'tvl'],
+  ['reserve0', 'reserve0'],
+  ['reserve1', 'reserve1'],
+  ['makers_24h', 'makers_24h'],
+  ['sellers_24h', 'sellers_24h'],
+  ['buyers_24h', 'buyers_24h'],
+  ['kol_count', 'kol_tag_count'],
+  ['smart_wallet_count', 'smart_wallet_tag_count'],
+]
+function mergeStatisticsList(
+  statisticsList: Map<string, StatisticsItem>,
+  filterList: PumpObj[]
+) {
+  return filterList.map(i => {
+    const obj = statisticsList.get(i.token)
+    if (!obj) return i
+
+    const next = { ...i }
+
+    /** progress（特殊处理） */
+    if (obj.progress != null) {
+      const p = Number(obj.progress)
+      next.progress = p < 0 ? 0 : Math.min(p, 100)
+    }
+
+    /** 普通映射 */
+    for (const [from, to] of DIRECT_MAP) {
+      const v = obj[from]
+      if (v != null) {
+        ;(next as any)[to] = v
+      }
+    }
+
+    /** Number 映射 */
+    for (const [from, to] of NUMBER_MAP) {
+      const v = obj[from]
+      if (v != null) {
+        ;(next as any)[to] = Number(v)
+      }
+    }
+
+    /** price / total / market_cap */
+    if (obj.uprice != null && obj.uprice != 0) {
+      next.current_price_usd = obj.uprice
+    }
+    if (obj.total != null) {
+      next.total = Number(obj.total)
+    }
+    if (next.chain == 'bsc') {
+      if (next.amm === 'flapswap') {
+        next.market_cap = Number(next.total) * next.current_price_usd || 1000000000 * next.current_price_usd || next.market_cap || 4900
+      } else {
+        next.market_cap = Number(next.total) * next.current_price_usd || 1000000000 * next.current_price_usd || next.market_cap || 0
+      }
+    } else {
+      next.market_cap = Number(next.total) * next.current_price_usd || next.market_cap
+    }
+    return next
+  })
+}
+
+const MERGE_KEYS = [
+  'progress',
+  'holder_count',
+  'rat_ratio',
+  'dev_ratio',
+  'sniper_ratio',
+  'top10_ratio',
+  'uprice',
+  'volume_u_24h',
+  'tx_count_24h',
+  'tvl',
+  'reserve0',
+  'reserve1',
+  'makers_24h',
+  'sellers_24h',
+  'buyers_24h',
+  'address_binding_ratio',
+  'phishing_ratio',
+  'total',
+  'net_flow_vol',
+  'sells_tx_24h_count',
+  'buys_tx_24h_count',
+  'migrated_count',
+  'total_count',
+  'migrated_ratio',
+  'max_dev_ratio',
+  'kol_count',
+  'kol_ratio',
+  'smart_wallet_count',
+  'smart_wallet_ratio',
+  'first_transfer_in_from',
+  'first_transfer_in_from_label',
+  'age_seconds',
+] as const
+
+function mergeStatistics(prev: any, next: any) {
+  const result = { ...prev }
+
+  for (const key of MERGE_KEYS) {
+    const v = next[key]
+    if (v !== null && v !== undefined) {
+      result[key] = v
+    }
+  }
+  return result
+}
+function mergeLogo(prev: any, next: any) {
+  return {
+    ...prev,
+    ...next,
+    logo_url: next.logo_url || prev.logo_url,
+    appendix: next.appendix || prev.appendix,
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -1152,10 +1591,11 @@ watch(documentVisible, (val) => {
   align-items: center;
   justify-content: space-between;
   background: var(--main-input-button-bg);
-  padding: 1px;
+  padding: 2px 8px;
   border-radius: 4px;
   font-size: 12px;
   height: 28px;
+  gap:8px;
   &.single {
     background: transparent;
     border-radius: 0px;
@@ -1197,8 +1637,8 @@ watch(documentVisible, (val) => {
     border-radius: 4px;
     border: none;
     background: transparent;
-    min-width: 36px;
-    padding: 5px 10px;
+    // min-width: 36px;
+    padding: 2px;
     text-align: center;
     &.active {
       color: var(--main-text);
@@ -1207,6 +1647,7 @@ watch(documentVisible, (val) => {
   }
 }
 .btn {
+  height: 28px;
   border: none;
   background: var(--main-input-button-bg);
   padding: 7px 8px;
