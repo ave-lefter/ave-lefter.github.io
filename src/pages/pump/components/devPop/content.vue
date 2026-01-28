@@ -1,6 +1,16 @@
 <template>
   <div v-if="!loading && info?.wallet_address" class="p-12px text-12px">
-    <div class="color-[--main-text] mb-12px">DEV {{ $t('insidersOwned') }} <span class="ml-2px" :style="{color: Number(info?.balance_radio_cur) > 5? '#F6465D' : '#12B886',}">{{ formatNumber(info?.balance_radio_cur || 0, { decimals: 2}) }}%</span></div>
+    <div class="color-[--main-text] mb-12px">DEV {{ $t('insidersOwned') }} <span class="ml-2px" :style="{color: Number(info?.balance_radio_cur) > 5? '#F6465D' : '#12B886',}">
+      <!-- {{ formatNumber( info?.balance_radio_cur || 0, { decimals: 2}) }}% -->
+      {{
+        formatNumber(
+          Number(info?.balance_radio_cur) >= 0.1
+            ? info?.balance_radio_cur || 0
+            : (Number(info?.balance_radio_cur) == 0  ? '0':'<0.1'),
+          1
+        )
+      }}%
+    </span></div>
     <ul>
       <li class="flex items-center justify-between mb-8px">
         <span class="color-[--secondary-text]">{{ $t('devWallet') }}</span>

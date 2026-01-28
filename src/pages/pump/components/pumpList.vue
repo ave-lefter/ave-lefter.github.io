@@ -420,6 +420,7 @@
                       <Icon
                         class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--third-text]"
                         name="custom:kol2"
+                        :style="{color: row?.kol_tag_count> 0 ?'var(--yellow)' : 'var(--third-text)'}"
                       />
                       <span v-if="Number(row?.kol_tag_count) === 0 || row?.kol_tag_count == null" class="color-[--secondary-text]" >0</span>
                       <span v-else class="color-[--main-text]">
@@ -429,9 +430,9 @@
                     <div
                       v-tooltip="{
                         content:
-                          `<div style='color:var(--secondary-text)'>${$t('devMigrated')} <span style='color:var(--main-text)'>${formatNumber(row?.migrated_count || 0, 0)}</span></div>
-                          <div style='color:var(--secondary-text)'>${$t('devLaunched')} <span style='color:var(--up-color)'>${formatNumber(row?.total_count || 0, 0)}</span></div>
-                          <div style='color:var(--secondary-text)'>${$t('migratedRatio')} <span style='color:var(--down-color)'>${formatNumber(row?.migrated_ratio || 0, 0)}%</span></div>
+                          `<div style='color:var(--secondary-text)'>${$t('devMigrated')} <span style='color:var(--main-text)'>${formatNumber(row?.dev_migrated_count || 0, 0)}</span></div>
+                          <div style='color:var(--secondary-text)'>${$t('devLaunched')} <span style='color:var(--up-color)'>${formatNumber(row?.dev_total_count || 0, 0)}</span></div>
+                          <div style='color:var(--secondary-text)'>${$t('migratedRatio')} <span style='color:var(--down-color)'>${formatNumber(row?.dev_migrated_ratio || 0, 0)}%</span></div>
                           `,
                         props: { 'raw-content': true, 'popper-class': 'pump-tooltip' }
                       }"
@@ -440,11 +441,11 @@
                       <Icon
                         class="iconfont icon-rug mr-4px text-10px vertical-middle "
                         name="custom:top2"
-                        :style="{color: row?.migrated_count> 2 ?'var(--yellow)' : 'var(--third-text)'}"
+                        :style="{color: row?.dev_migrated_count> 0 ?'var(--yellow)' : 'var(--third-text)'}"
                       />
-                      <span v-if="(Number(row?.migrated_count) == 0 || row?.migrated_count == null) && (Number(row?.total_count) == 0 || row?.total_count == null) " class="color-[--secondary-text]" >0</span>
-                      <span v-else class="color-[--main-text]">{{
-                        formatNumber(row?.migrated_count || 0, 2)}}/{{formatNumber(row?.total_count || 0, 2)}}
+                      <span v-if="(Number(row?.dev_migrated_count) == 0 || row?.dev_migrated_count == null) && (Number(row?.dev_total_count) == 0 || row?.dev_total_count == null) " class="color-[--secondary-text]" >0</span>
+                      <span v-else class="color-[--main-text]" >{{
+                        formatNumber(row?.dev_migrated_count || 0, 2)}}/{{formatNumber(row?.dev_total_count || 0, 2)}}
                       </span>
                     </div>
 
@@ -456,6 +457,7 @@
                       <Icon
                         class="iconfont icon-rug mr-4px text-10px vertical-middle "
                         name="custom:smart-plain"
+                        :style="{color: row?.kol_tag_count> 0 ?'var(--yellow)' : 'var(--third-text)'}"
                       />
                       <span v-if="Number(row?.smart_wallet_tag_count) === 0 || row?.smart_wallet_tag_count == null" class="color-[--secondary-text]" >0</span>
                       <span v-else class="color-[--main-text]">{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
@@ -530,21 +532,21 @@
                         <span
                           >{{
                             formatNumber(
-                              Number(row?.dev_balance_ratio_cur) > 0.001
+                              Number(row?.dev_balance_ratio_cur) >= 0.1
                                 ? row?.dev_balance_ratio_cur || 0
-                                : 0,
+                                : (Number(row?.dev_balance_ratio_cur) == 0  ? '0':'<0.1'),
                               1
                             )
                           }}%
                         </span>
                       </template>
                       <img
-                        v-if="row.first_transfer_in_from_label"
+                        v-if="row.dev_first_transfer_in_from_label"
                         class="w-12px h-12px cursor-pointer rounded-full ml-4px"
-                        :src="formatIconPumpDev(row.first_transfer_in_from_label)"
+                        :src="formatIconPumpDev(row.dev_first_transfer_in_from_label)"
                         alt=""
                       >
-                      <span v-if="row?.age_seconds" class="ml-4px color-[--secondary-text]">{{ formatSeconds(Number(row?.age_seconds || 0)) }}</span>
+                      <span v-if="row?.dev_age_seconds" class="ml-4px color-[--secondary-text]">{{ formatSeconds(Number(row?.dev_age_seconds || 0)) }}</span>
                      </DevPop>
                     <!-- </div> -->
                     <div
