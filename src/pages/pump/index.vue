@@ -1451,20 +1451,20 @@ const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['phishing_ratio', 'phishing_ratio'],
   ['sells_tx_24h_count', 'sells_tx_24h_count'],
   ['buys_tx_24h_count', 'buys_tx_24h_count'],
-  ['migrated_count', 'migrated_count'],
-  ['total_count', 'total_count'],
-  ['migrated_ratio', 'migrated_ratio'],
+  ['migrated_count', 'dev_migrated_count'],
+  ['total_count', 'dev_total_count'],
+  ['migrated_ratio', 'dev_migrated_ratio'],
   ['max_dev_ratio', 'max_dev_ratio'],
   ['kol_ratio', 'kol_ratio'],
   ['smart_wallet_ratio', 'smart_wallet_ratio'],
-  ['first_transfer_in_from', 'first_transfer_in_from'],
-  ['first_transfer_in_from_label', 'first_transfer_in_from_label'],
-  ['age_seconds', 'age_seconds'],
+  ['first_transfer_in_from', 'dev_first_transfer_in_from'],
+  ['first_transfer_in_from_label', 'dev_first_transfer_in_from_label'],
+  ['age_seconds', 'dev_age_seconds'],
 ]
 const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
-  ['holder_count', 'holders'],
+  ['holder_count', 'holders'],//dev_holder_count
   ['rat_ratio', 'insider_balance_ratio_cur'],
-  ['dev_ratio', 'dev_balance_ratio_cur'],
+  ['dev_ratio', 'dev_balance_ratio_cur'], //dev_ratio
   ['sniper_ratio', 'sniper_balance_ratio_cur'],
   ['top10_ratio', 'holders_top10_ratio'],
   ['tx_count_24h', 'tx_24h_count'],
