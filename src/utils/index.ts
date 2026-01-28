@@ -1435,6 +1435,8 @@ export function processTwitterText(text: string): string {
   })
 
   return html
+}
+
 export function formatSeconds(seconds: number) {
   const s = Math.floor(seconds)
   if (s >= 86400) return `${Math.floor(s / 86400)}d`
