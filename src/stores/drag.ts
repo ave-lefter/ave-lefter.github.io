@@ -61,7 +61,7 @@ export const useDragStore = defineStore('drag', () => {
       monitor: monitorStore.fixedWidth,
       pump: pumpStore.fixedWidth,
       signal: signalStore.fixedWidth,
-      twitter:signalStore.fixedWidth
+      twitter:twitterTrackerStore.fixedWidth
     }
   })
   const isRightFixed = computed(() => {
@@ -102,7 +102,6 @@ export const useDragStore = defineStore('drag', () => {
     const index2 =leftArr.value.findIndex(el => el === 'monitor')
     const index3 =leftArr.value.findIndex(el => el === 'pump')
     const index4 =leftArr.value.findIndex(el => el === 'twitter')
-    console.log(index4,'indx4')
     let monitor=0
     let pump=0
     let signal=0
@@ -121,6 +120,7 @@ export const useDragStore = defineStore('drag', () => {
         twitter+=(visible.value[el]&&isLeftFixed.value[el]&&!shouldHide.value[el]) ? fixedWidth.value[el]+1 :0
       }
     })
+    console.log('leftWidth', monitor, pump, signal, twitter)
     return {
       monitor,
       pump,
