@@ -1595,7 +1595,7 @@ function mergeLogo(prev: any, next: any) {
   border-radius: 4px;
   font-size: 12px;
   height: 28px;
-  gap:4px;
+  gap:8px;
   &.single {
     background: transparent;
     border-radius: 0px;
