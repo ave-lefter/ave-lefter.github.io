@@ -365,26 +365,26 @@ async function handleSellAmount(row: GetUserBalanceResponse & { index: string })
       ElNotification(({title: 'Error', type: 'error', message: t('insufficientBalance')}))
       return
     }
-    const chainMainToken = {
-      solana: 'sol',
-      ton: 'TON',
-    } as {
-      [key: string]: string
-    }
-    const native = chainMainToken[row.chain] || NATIVE_TOKEN
-    await botSwapStore.checkApproveAndApprove({
-      chain: row.chain,
-      inToken: row.token,
-      outToken: native,
-      owner: walletAddress
-    })
+    // const chainMainToken = {
+    //   solana: 'sol',
+    //   ton: 'TON',
+    // } as {
+    //   [key: string]: string
+    // }
+    // const native = chainMainToken[row.chain] || NATIVE_TOKEN
+    // await botSwapStore.checkApproveAndApprove({
+    //   chain: row.chain,
+    //   inToken: row.token,
+    //   outToken: native,
+    //   owner: walletAddress
+    // })
     beforeSubmitSwap(balance, row)
   } finally {
     loadingSwap.value[row.index] = false
   }
 }
 
-function beforeSubmitSwap(balance: number, row: GetUserBalanceResponse & { index: string }) {
+function beforeSubmitSwap(balance: number | string, row: GetUserBalanceResponse & { index: string }) {
   if (!verifyLogin()) {
     return
   }
@@ -407,12 +407,12 @@ async function submitSwap(balance: number, row: GetUserBalanceResponse & { index
   const {botSettings} = botSettingStore
   const selected = botSettings?.[row.chain as BotChain]?.sell?.selected
   const currentBotSetting = botSettings?.[row.chain as BotChain]?.sell?.[selected as BotSettingKey]
-  if (isSolana && currentBotSetting?.mev) {
-    if (!await botStore.getBundleAvailable()) {
-      loadingSwap.value[row.index] = false
-      return
-    }
-  }
+  // if (isSolana && currentBotSetting?.mev) {
+  //   if (!await botStore.getBundleAvailable()) {
+  //     loadingSwap.value[row.index] = false
+  //     return
+  //   }
+  // }
   const {gasTip1List, gasTip2List} = formatBotGasTips(useBotSwapStore().gasTip, 'solana')
   const gasTips = currentBotSetting?.mev ? gasTip1List : gasTip2List
   const settings = currentBotSetting?.mev ? currentBotSetting?.gas[0] : currentBotSetting?.gas?.[1]
@@ -473,7 +473,7 @@ async function submitSwap(balance: number, row: GetUserBalanceResponse & { index
 function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUserBalanceResponse) {
   if (res) {
     let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
-      ElNotification({type: 'success', message: t('transactionsSubmitted')})
+      // ElNotification({type: 'success', message: t('transactionsSubmitted')})
       tokenStore.placeOrderUpdate++
       loadingSwap.value[tokenId] = false
     }, 500)

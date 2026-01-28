@@ -85,7 +85,7 @@ export const useWSStore = defineStore('ws', () => {
         wsResult[event] = data?.msg
       } else if(event === WSEventType.PUBLIC_PORTRAIT){
         usePublicPortraitStore().updatePublicPortrait(data?.msg || [])
-      } else {
+      }  else {
         wsResult[event] = data
       }
     }, 'main')

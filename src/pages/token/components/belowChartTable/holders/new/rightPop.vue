@@ -266,7 +266,7 @@ function removeTokenFavorite() {
     .then(() => {
       ElMessage.success(t('cancelled1'))
       collected.value = false
-      topEventBus.emit()
+      topEventBus.emit(-1)
     })
     .catch((err) => {
       console.log(err)

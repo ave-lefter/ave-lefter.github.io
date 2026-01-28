@@ -1146,7 +1146,7 @@ function clearSort() {
     width: 100px;
     height: 3px;
     display: flex;
-    background: #222;
+    background: var(--main-divider);
     border-radius: 1.5px;
     margin-top: 4px;
     > span {

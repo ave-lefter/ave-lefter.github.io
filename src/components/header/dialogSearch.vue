@@ -335,7 +335,8 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
       return {
         ...el,
         current_price_usd: current.uprice,
-        price_change: current.price_change
+        price_change: current.price_change,
+        price_change_v2: current.price_change_v2
       }
     }
     return el
@@ -347,7 +348,13 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
 async function _getHotTokens() {
   try {
     const res = await getHotTokens()
-    hotList.value = res || []
+    const data = res || []
+    hotList.value = data.map(el => {
+      return {
+        ...el,
+        price_change_v2:el.price_change_v2
+      }
+    })
     if (hotTokens) {
       hotTokens.setVal(hotList.value)
     }

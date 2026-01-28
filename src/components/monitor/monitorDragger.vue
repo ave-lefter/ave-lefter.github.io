@@ -9,13 +9,15 @@
 </template>
 
 <script setup lang="ts">
-const signalStore = useSignalStore()
+import { useWindowSize } from '@vueuse/core'
+
+const { t } = useI18n()
 const monitorStore = useMonitorStore()
 const dragStore = useDragStore()
 const {placement}=storeToRefs(monitorStore)
 const {lang} = storeToRefs(useGlobalStore())
 const key=ref(0)
-
+const { width: winWidth } = useWindowSize()
 const reload = () => {
   key.value++
 }
@@ -122,6 +124,10 @@ const props2=computed(()=>{
   return data
 })
 function dragStop(x: number, y: number) {
+  if ((Math.abs(x) < 1||x + monitorStore.monitorBoundingRect.width >= winWidth.value) && dragStore.fixedCount >= 3) {
+    ElMessage.warning(t('popTips'))
+    return
+  }
   if(placement.value==='left'){
     monitorStore.onLeftDragStop(x,y)
   }else if(placement.value==='right'){

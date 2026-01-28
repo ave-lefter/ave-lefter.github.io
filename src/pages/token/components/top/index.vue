@@ -971,7 +971,7 @@ const price = computed(() => {
   return tokenStore.price
 })
 const priceChange = computed(() => {
-  return tokenStore.priceChange || 0
+  return tokenStore.priceChangeV2 || 0
 })
 const marketCap = computed(() => {
   return tokenStore.marketCap || 0
@@ -1090,7 +1090,7 @@ function removeTokenFavorite() {
     .then(() => {
       ElMessage.success(t('cancelled1'))
       collected.value = false
-      topEventBus.emit()
+      topEventBus.emit(-1)
     })
     .catch((err) => {
       console.log(err)

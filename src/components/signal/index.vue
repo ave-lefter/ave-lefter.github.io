@@ -406,7 +406,7 @@ function cancelHide() {
     <audio
       ref="signalAudio" controls style="display: none"
       :src="audioUrl"
-      :volume="+globalStore.audioSettings.audio.signal/100 || 0.5"
+      :volume="+globalStore.audioSettings.audio.volume/100 || 0.5"
     />
 
     <!--  actions -->

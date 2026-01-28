@@ -1449,5 +1449,6 @@
   "noOpen": "オープンなし",
   "noticeDuration": "通知表示時間",
   "monitorThTip": "少なくとも 1 つのウォレット アバターとウォレット アドレスを選択してください",
-  "wcWalletTip": "この QR コードを携帯電話でスキャンしてください"
+  "wcWalletTip": "この QR コードを携帯電話でスキャンしてください",
+  "monitorBotError": "監視ロボットのアドレスはサポートされていません"
 }
