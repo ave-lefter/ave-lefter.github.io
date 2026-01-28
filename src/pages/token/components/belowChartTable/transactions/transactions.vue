@@ -149,10 +149,10 @@ const tableFilter = ref<{
 })
 
 const filterTableListMap = {
-  all: () => [...tokenTxs.value, ...pairLiq.value].toSorted((a, b) => b.time - a.time),
-  liquidity: () => pairLiq.value,
-  buy: () => tokenTxs.value.filter(el => isBuy((el))),
-  sell: () => tokenTxs.value.filter(el => !isBuy(el))
+  all: () => [...tokenTxs.value, ...pairLiq.value].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
+  liquidity: () => [...pairLiq.value].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
+  buy: () => [...tokenTxs.value.filter(el => isBuy((el)))].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
+  sell: () =>[... tokenTxs.value.filter(el => !isBuy(el))].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
 }
 
 const tableLoading = computed(() => listStatus.value.loadingTxs || listStatus.value.loadingLiq)
@@ -259,6 +259,8 @@ const sortConditions= ref({
 function filterSubmit() {
   console.log('filterSubmit')
   listStatus.value.page_token = ''
+  listStatus.value.loadingTxs = false
+  listStatus.value.finished = false
   _getTokenTxs()
   if(aveTableRef.value) aveTableRef.value.scrollToTop(0)
 }
@@ -276,8 +278,9 @@ const _getTokenTxs = useThrottleFn(async () => {
       target_price_u_max: tableFilter.value.amountU[1],
       time_min: tableFilter.value.timestamp[0],
       time_max: tableFilter.value.timestamp[1],
-      page_token: listStatus.value.page_token
+      page_token: listStatus.value.page_token,
       //TODO: 增加排序参数
+      sort_dir:sortConditions.value.sort_dir
     }
     if (tag_type === '-100' && !followStore.currentAddress) {
       resetTx()
@@ -315,9 +318,11 @@ const _getTokenTxs = useThrottleFn(async () => {
       if (!listStatus.value.finished) {
         listStatus.value.page_token = page_token
       }
-      // if(sortConditions.value.sort_dir ==='asc'){
-      //   tokenTxs.value=[...tokenTxs.value.reverse()]
-      // }
+      if(sortConditions.value.sort_dir ==='asc'){
+        tokenTxs.value =[...tokenTxs.value].toSorted((a, b) => a.time - b.time)
+      }else{
+        tokenTxs.value =[...tokenTxs.value].toSorted((a, b) => b.time - a.time)
+      }
     }else{
       if(!listStatus.value.page_token) {
         tokenTxs.value = []
@@ -344,7 +349,7 @@ function sortChange(sort_dir: string) {
     sort_dir: sort_dir,
   }
   console.log('sortConditions.value', sort_dir)
-  if(sort_dir==='desc') return 
+  // if(sort_dir==='desc') return 
   filterSubmit()
 }
 
@@ -1069,7 +1074,7 @@ const collect = async (row: any,index:number) => {
             <TableDateFilter
               v-model:visible="tableFilterVisible.timestamp" :modelValue="tableFilter.timestamp" :boundary="txsContainer || undefined"
               @confirm="onTimestampConfirm" />
-            <!-- <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" /> -->
+            <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
           </div>
         </template>
         <template #cell-time="{ row,rowIndex }">
