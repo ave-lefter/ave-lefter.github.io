@@ -228,6 +228,7 @@ const getList = async () => {
     const res = await getTwitterList({
       ...query.value,
       follow_only:isMine.value,
+      types: query.value.types.join(','),
     })
     if (res && activeTab.value === _activeTab) {
       query.value.page_token = res.page_token || ''
