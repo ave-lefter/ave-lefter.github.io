@@ -401,7 +401,7 @@ function toggleMode(mode: string) {
                 }
               }" />
               <div class="flex flex-col items-start">
-                <span class="text-12px flex items-center">
+                <span class="text-12px flex items-center ellipsis">
                   {{ row.symbol }}
                   <img
                     v-if="row.issue_platform"
