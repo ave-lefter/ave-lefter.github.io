@@ -24,9 +24,9 @@ const components = {
   Holders: defineAsyncComponent(() => import('./holders/index.vue')),
   LP: defineAsyncComponent(() => import('./lp/index.vue')),
   Attention: defineAsyncComponent(() => import('./attention/index.vue')),
-  Orders: defineAsyncComponent(() => import('./orders/index.vue')),
+  Orders: OrdersTab,
   MySwap: defineAsyncComponent(() => import('./mySwap/index.vue')),
-  DevTokens: defineAsyncComponent(() => import('./devTokens/index.vue')),
+  DevTokens: DevTokens,
 }
 const tabs = computed(() => {
   return [
@@ -45,7 +45,8 @@ const id = computed(() => {
 watch(id, () => {
   globalStore.getFollowsNum()
 })
-watch(() => useFollowStore().currentAddress, (val) => {
+const followStore = useFollowStore()
+watch(() => followStore.currentAddress, (val) => {
   if (val) {
     globalStore.getFollowsNum()
   } else {
@@ -158,10 +159,11 @@ onMounted(() => {
   globalStore.getFollowsNum()
 })
 
-watch(()=>!tokenStore.devTokenNum && activeTab.value === 'DevTokens',(val)=>{
-  if(val){
-    activeTab.value = 'Transactions'
-  }
+onUnmounted(() => {
+  globalStore.headFollowsNum = { all: 0, subAll: 0 }
+
+  // 如果有动态加载的组件，强制置空
+  activeTab.value = 'Transactions'
 })
 </script>
 
@@ -202,8 +204,8 @@ watch(()=>!tokenStore.devTokenNum && activeTab.value === 'DevTokens',(val)=>{
       <Bubble />
     </div>
     <OrdersTab v-show="activeTab === 'Orders'" :currentActiveTab="activeTab"/>
-    <DevTokens v-show="activeTab === 'DevTokens'" />
-    <KeepAlive v-show="activeTab !== 'Orders' && activeTab !== 'DevTokens'">
+    <DevTokens v-show="activeTab === 'DevTokens'"/>
+    <KeepAlive v-if="activeTab !== 'Orders' && activeTab !== 'DevTokens' && route.name === 'token-id'">
       <component :is="Component" v-bind="comProps" :currentActiveTab="activeTab" />
     </KeepAlive>
   </div>

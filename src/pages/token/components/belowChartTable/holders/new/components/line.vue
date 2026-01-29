@@ -89,7 +89,7 @@ const series = computed(() =>
     type: 'line',
     z: 1,
     // symbol: 'none',
-    smooth: true, 
+    smooth: true,
     symbolSize: 1,
     itemStyle: {
       color: i.color
@@ -310,6 +310,12 @@ watch(()=>props.showLeft, (val) => {
 // Lifecycle
 onMounted(() => {
   init()
+})
+onBeforeUnmount(() => {
+  const chart = echarts.getInstanceByDom(document.getElementById(chartId.value))
+  if (chart) {
+    chart.dispose()
+  }
 })
 </script>
 

@@ -119,6 +119,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
               pumpFilter: pumpFilterDefault,
             },
           }
+
           if (!pump_notice.value?.[i.chain]) {
             pump_notice.value[i.chain] = {
               new: '',
@@ -126,6 +127,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
               graduated: '',
             }
           }
+          console.log('------pump_notice.value------', pump_notice.value)
         }
       })
     })
@@ -173,7 +175,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     sm_list: [],
   }
   const pumpV3: RemovableRef<Record<ChainKey, pumpData>> = useStorage(
-    'pumpV10',
+    'pumpV11',
     {
       solana: {
         platforms: [],
@@ -234,10 +236,10 @@ export const usePumpStore = defineStore('pumpStore', () => {
   )
   const activeChain = useStorage<ChainKey>(
     'pump_activeChain',
-    'solana',
+    'bsc',
     sessionStorage
   )
-  const pump_query = useStorage('pump_query1', {
+  const pump_query = useStorage('pump_query2', {
     solana: {
       new: '',
       soon: '',
@@ -253,24 +255,38 @@ export const usePumpStore = defineStore('pumpStore', () => {
       soon: '',
       graduated: '',
     },
+    monad: {
+      new: '',
+      soon: '',
+      graduated: '',
+    },
   })
-  const pump_notice = useStorage('pump_notice2', {
-    solana: {
-      new: '',
-      soon: '',
-      graduated: '',
+  const pump_notice = useStorage(
+    'pump_notice4',
+    {
+      solana: {
+        new: '',
+        soon: '',
+        graduated: '',
+      },
+      bsc: {
+        new: '',
+        soon: '',
+        graduated: '',
+      },
+      monad: {
+        new: '',
+        soon: '',
+        graduated: '',
+      },
+      xlayer: {
+        new: '',
+        soon: '',
+        graduated: '',
+      },
     },
-    bsc: {
-      new: '',
-      soon: '',
-      graduated: '',
-    },
-    // xlayer: {
-    //   new: '',
-    //   soon: '',
-    //   graduated: '',
-    // },
-  }, localStorage)
+    localStorage
+  )
   const listData = shallowRef<PumpObj[]>([])
 
   return {

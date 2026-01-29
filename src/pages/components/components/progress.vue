@@ -18,7 +18,7 @@ function getColor(score:number) {
     {{ formatNumber(row.progress || 0, 1) }}%
     <el-progress
       class="mt-5px w-50px"
-      :percentage="row?.progress"
+      :percentage="row?.progress || 0"
       :stroke-width="4"
       :color="getColor(row.progress)"
       :show-text="false"

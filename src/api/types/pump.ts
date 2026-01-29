@@ -3,13 +3,34 @@ interface Platform {
   platform_show: string
   platform_icon: string
 }
+interface BaseToken {
+  hash: string
+  logo_url: string
+  name: string
+}
 export interface PumpConfig {
   chain: ChainKey
   chain_show: string
   platforms: Platform[]
+  base_tokens: BaseToken[]
 }
 
 export interface PumpObj {
+  dev_migrated_count: number
+  dev_migrated_ratio: number
+  dev_total_count: number
+  dev_age_seconds: any
+  dev_first_transfer_in_from: string
+  dev_first_transfer_in_from_label: any
+  first_transfer_in_from_label: string | undefined
+  age_seconds: any
+  first_transfer_in_from: any
+  smart_wallet_ratio: number
+  kol_ratio: number
+  max_dev_ratio: number
+  migrated_ratio: number
+  total_count: number
+  migrated_count: number
   id: string
   pair: string
   chain: string
@@ -56,7 +77,7 @@ export interface PumpObj {
   token1_name: string
   token0_price_usd: number
   token1_price_usd: number
-  created_at: number
+  created_at: number | string
   time: string
   target_opening_at: number | string
   state: string
@@ -74,6 +95,19 @@ export interface PumpObj {
   sellers_24h?: number
   platform: string
   is_streaming?: boolean
+  platform_id: string
+  pump_pair_address: string
+  rTime?: number
+  net_flow_vol?: number
+  address_binding_ratio: string
+  phishing_ratio: string
+  sells_tx_24h_count: number
+  buys_tx_24h_count: number
+  baseToken: {
+    symbol: string
+    logo_url: string
+    token: string
+  }
 }
 
 interface Pair {
@@ -114,7 +148,7 @@ export interface WSPumpObj {
 }
 export type WSPump = WSPumpObj & Pair
 
-export type ChainKey = 'solana' | 'bsc'
+export type ChainKey = 'solana' | 'bsc' | 'xlayer' | 'monad'
 export type CategoryKey = 'new' | 'soon' | 'graduated'
 
 export type pumpBlack = {
