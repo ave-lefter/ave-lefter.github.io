@@ -145,7 +145,7 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
-            <AudioSelect activeTab="new" />
+            <AudioSelect activeTab="new" :chain="activeChain"/>
             <PumpFilter
               :key="`pumpFilter_${activeChain}_new`"
               :storage="`pumpFilter_${activeChain}_new`"
@@ -212,7 +212,7 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
-            <AudioSelect activeTab="soon" />
+            <AudioSelect activeTab="soon" :chain="activeChain"/>
             <PumpFilter
               :key="`pumpFilter_${activeChain}_soon`"
               :storage="`pumpFilter_${activeChain}_soon`"
@@ -280,7 +280,7 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
-            <AudioSelect activeTab="graduated" />
+            <AudioSelect activeTab="graduated" :chain="activeChain"/>
             <PumpFilter
               :key="`pumpFilter_${activeChain}_graduated`"
               :storage="`pumpFilter_${activeChain}_graduated`"
@@ -385,11 +385,16 @@ const fourmemeListObj = reactive<Record<ChainKey, Record<CategoryKey, PumpObj[]>
     soon: [],
     graduated: [],
   },
-  // xlayer: {
-  //   new: [],
-  //   soon: [],
-  //   graduated: [],
-  // },
+  xlayer: {
+    new: [],
+    soon: [],
+    graduated: [],
+  },
+  monad: {
+    new: [],
+    soon: [],
+    graduated: [],
+  },
 })
 
 const isPausedObj = ref({
@@ -672,7 +677,7 @@ const scrollHeight = computed(()=>{
   return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
 })
 watch(() => list1.value?.[0]?.target_token, useThrottleFn((val) => {
-  const newAudio = pump_notice.value[activeChain.value]?.new
+  const newAudio = pump_notice.value?.[activeChain.value]?.new
   if(newAudio && pumpAudio.value && val) {
     audioUrl.value = audioNameToResource[newAudio as keyof typeof audioNameToResource]
       || audioNameToResource.Beep
@@ -680,7 +685,7 @@ watch(() => list1.value?.[0]?.target_token, useThrottleFn((val) => {
   }
 },300))
 watch(() => list2.value?.[0]?.target_token, useThrottleFn((val) => {
-  const soonAudio = pump_notice.value[activeChain.value]?.soon
+  const soonAudio = pump_notice.value?.[activeChain.value]?.soon
   if(soonAudio && pumpAudio.value && val) {
     audioUrl.value = audioNameToResource[soonAudio as keyof typeof audioNameToResource]
     || audioNameToResource.Beep
@@ -688,16 +693,16 @@ watch(() => list2.value?.[0]?.target_token, useThrottleFn((val) => {
   }
 },300))
 watch(() => list3.value?.[0]?.target_token, useThrottleFn((val) => {
-  const graduatedAudio = pump_notice.value[activeChain.value]?.graduated
+  const graduatedAudio = pump_notice.value?.[activeChain.value]?.graduated
   if(graduatedAudio && pumpAudio.value && val) {
     audioUrl.value = audioNameToResource[graduatedAudio as keyof typeof audioNameToResource]
     || audioNameToResource.Beep
     pumpAudio.value.play()
   }
 },300))
-watch(() => [pump_notice.value[activeChain.value]?.new,
-pump_notice.value[activeChain.value]?.soon,
-pump_notice.value[activeChain.value]?.graduated
+watch(() => [pump_notice.value?.[activeChain.value]?.new,
+pump_notice.value?.[activeChain.value]?.soon,
+pump_notice.value?.[activeChain.value]?.graduated
 ], useThrottleFn((val, old) => {
   if(val.some(el=>!!el)){
     const url = getChangedValue(val, old)

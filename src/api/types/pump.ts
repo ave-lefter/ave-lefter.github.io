@@ -16,11 +16,11 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
-  dev_migrated_count: null
   dev_migrated_count: number
   dev_migrated_ratio: number
   dev_total_count: number
   dev_age_seconds: any
+  dev_first_transfer_in_from: string
   dev_first_transfer_in_from_label: any
   first_transfer_in_from_label: string | undefined
   age_seconds: any
@@ -100,9 +100,9 @@ export interface PumpObj {
   rTime?: number
   net_flow_vol?: number
   address_binding_ratio: string
-  phishing_ratio: string,
-  sells_tx_24h_count:number
-  buys_tx_24h_count:number
+  phishing_ratio: string
+  sells_tx_24h_count: number
+  buys_tx_24h_count: number
   baseToken: {
     symbol: string
     logo_url: string
@@ -148,7 +148,7 @@ export interface WSPumpObj {
 }
 export type WSPump = WSPumpObj & Pair
 
-export type ChainKey = 'solana' | 'bsc'
+export type ChainKey = 'solana' | 'bsc' | 'xlayer' | 'monad'
 export type CategoryKey = 'new' | 'soon' | 'graduated'
 
 export type pumpBlack = {
