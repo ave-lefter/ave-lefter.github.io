@@ -3,79 +3,81 @@
     <Icon name="ion:flash" />
     <span class="ml-5px">{{ $t('oneClick') }}</span>
   </button>
-  <div v-show="botStore.isSupportChains?.includes(chain) && visible" class="fixed-one-click">
-    <template v-if="botStore.isSupportChains?.includes(chain) && visible">
-      <div class="flex-between">
-        <div class="flex-start">
-          <!-- <span>{{ $t('oneClick') }}</span> -->
-          <Icon :key="isEnableHotkey" v-tooltip="isEnableHotkey ? $t('hotkeyTips') : $t('hotkeyTips1')" class="text-14px color-[--secondary-text] clickable" :class="{ 'color-[--primary-color]!': isEnableHotkey }" name="ri:keyboard-box-fill" @click.stop="isEnableHotkey = !isEnableHotkey" @mousedown.stop />
-          <Icon :key="isEnablePnL" v-tooltip="isEnablePnL ? $t('enablePnLTips2') : $t('enablePnLTips1')" name="bx:bxs-bar-chart-alt-2" class="text-14px color-[--secondary-text] clickable ml-5px" :class="{ 'color-[--primary-color]!': isEnablePnL }" @mousedown.stop @click.stop="isEnablePnL = !isEnablePnL" />
-          <Icon :key="isEnableShowsReflected" v-tooltip="isEnableShowsReflected ? $t('disableShowsReflected') : $t('enableShowsReflected')" name="ph:approximate-equals-bold" class="text-14px color-[--secondary-text] clickable ml-5px" :class="{ 'color-[--primary-color]!': isEnableShowsReflected }" @mousedown.stop @click.stop="isEnableShowsReflected = !isEnableShowsReflected" />
-          <!-- <div class="tabs-1 ml-5px">
-            <button
-              v-for="item in BotSettingsArr" :key="item.value"
-              :class="{ 'active': item.value === botSettings?.[chain]?.selected }" type="button" @mousedown.stop
-              @click.stop="botSettings[chain]!.selected = item.value">{{ item.label }}</button>
-          </div> -->
-          <!-- <SlippageSetMarket class="ml-5px" :chain="chain" @mousedown.stop /> -->
-        </div>
-        <SlippageSetMarket class="mr-10px ml-auto" :chain="chain" @mousedown.stop />
-        <Icon
-          class="text-14px clickable color-[--main-text] clickable" name="ri:close-large-fill"
-          @click.stop="visible = false" @mousedown.stop />
-      </div>
-      <el-divider class="b-t-color-[--dialog-divider]! mt-10px! mb-5px!" />
-      <div class="content">
-        <div class="flex-between mt-10px">
-          <span>{{ $t('buy') }}</span>
-          <div class="tabs-1 ml-5px mr-auto">
-            <button
-              v-for="item in BotSettingsArr" :key="item.value"
-              :class="{ 'active': item.value === botSettings?.[chain]?.buy?.selected }" type="button" @mousedown.stop
-              @click.stop="botSettings[chain]!.buy!.selected = item.value">{{ item.label }}</button>
+  <Teleport to="body">
+    <div v-show="botStore.isSupportChains?.includes(chain) && visible" class="fixed-one-click">
+      <template v-if="botStore.isSupportChains?.includes(chain) && visible">
+        <div class="flex-between">
+          <div class="flex-start">
+            <!-- <span>{{ $t('oneClick') }}</span> -->
+            <Icon :key="isEnableHotkey" v-tooltip="isEnableHotkey ? $t('hotkeyTips') : $t('hotkeyTips1')" class="text-14px color-[--secondary-text] clickable" :class="{ 'color-[--primary-color]!': isEnableHotkey }" name="ri:keyboard-box-fill" @click.stop="isEnableHotkey = !isEnableHotkey" @mousedown.stop />
+            <Icon :key="isEnablePnL" v-tooltip="isEnablePnL ? $t('enablePnLTips2') : $t('enablePnLTips1')" name="bx:bxs-bar-chart-alt-2" class="text-14px color-[--secondary-text] clickable ml-5px" :class="{ 'color-[--primary-color]!': isEnablePnL }" @mousedown.stop @click.stop="isEnablePnL = !isEnablePnL" />
+            <Icon :key="isEnableShowsReflected" v-tooltip="isEnableShowsReflected ? $t('disableShowsReflected') : $t('enableShowsReflected')" name="ph:approximate-equals-bold" class="text-14px color-[--secondary-text] clickable ml-5px" :class="{ 'color-[--primary-color]!': isEnableShowsReflected }" @mousedown.stop @click.stop="isEnableShowsReflected = !isEnableShowsReflected" />
+            <!-- <div class="tabs-1 ml-5px">
+              <button
+                v-for="item in BotSettingsArr" :key="item.value"
+                :class="{ 'active': item.value === botSettings?.[chain]?.selected }" type="button" @mousedown.stop
+                @click.stop="botSettings[chain]!.selected = item.value">{{ item.label }}</button>
+            </div> -->
+            <!-- <SlippageSetMarket class="ml-5px" :chain="chain" @mousedown.stop /> -->
           </div>
-          <span v-if="isEnableShowsReflected && Number(estimateBuyAmount) > 0" class="mr-5px">≈{{ formatNumber(estimateBuyAmount, 3) }} {{ tokenStore.swap.token?.symbol || tokenStore.token?.symbol || '' }}</span>
-          <span class="color-[--secondary-text]">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.native?.balance || 0)
-            }}&nbsp;{{ getChainInfo(chain)?.main_name }}</span>
-          <RefreshBalance class="color-[--secondary-text]" :type="0" @mousedown.stop />
+          <SlippageSetMarket class="mr-10px ml-auto" :chain="chain" @mousedown.stop />
+          <Icon
+            class="text-14px clickable color-[--main-text] clickable" name="ri:close-large-fill"
+            @click.stop="visible = false" @mousedown.stop />
         </div>
-        <div class="mt-10px tabs">
-          <el-button
-            v-for="(item, $index) in botSettings?.[chain]?.buy![botSettings?.[chain]?.buy?.selected || 's1']?.buyValueList"
-            :key="$index" class="one-click-button green clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :loading="loadingSwapBuy[$index]"
-            :disabled="loadingSwapBuy[$index]" @click.stop.prevent="submitBotSwap(item, 'buy', $index)" @mousedown.stop @mouseover.stop="hoverBuyAmount = item" @mouseleave.stop="hoverBuyAmount = ''">{{
-              !loadingSwapBuy[$index] ? item : '' }}</el-button>
-        </div>
-        <BottomSetting activeTab="buy" :gasPrice="tokenStore.gasPrice" @mousedown.stop />
         <el-divider class="b-t-color-[--dialog-divider]! mt-10px! mb-5px!" />
-        <div class="flex-between mt-10px">
-          <span>{{ $t('sell') }}</span>
-          <div class="tabs-1 ml-5px mr-auto">
-            <button
-              v-for="item in BotSettingsArr" :key="item.value"
-              :class="{ 'active': item.value === botSettings?.[chain]?.sell?.selected }" type="button" @mousedown.stop
-              @click.stop="botSettings[chain]!.sell!.selected = item.value">{{ item.label }}</button>
+        <div class="content">
+          <div class="flex-between mt-10px">
+            <span>{{ $t('buy') }}</span>
+            <div class="tabs-1 ml-5px mr-auto">
+              <button
+                v-for="item in BotSettingsArr" :key="item.value"
+                :class="{ 'active': item.value === botSettings?.[chain]?.buy?.selected }" type="button" @mousedown.stop
+                @click.stop="botSettings[chain]!.buy!.selected = item.value">{{ item.label }}</button>
+            </div>
+            <span v-if="isEnableShowsReflected && Number(estimateBuyAmount) > 0" class="mr-5px">≈{{ formatNumber(estimateBuyAmount, 3) }} {{ tokenStore.swap.token?.symbol || tokenStore.token?.symbol || '' }}</span>
+            <span class="color-[--secondary-text]">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.native?.balance || 0)
+              }}&nbsp;{{ getChainInfo(chain)?.main_name }}</span>
+            <RefreshBalance class="color-[--secondary-text]" :type="0" @mousedown.stop />
           </div>
-          <span v-if="isEnableShowsReflected && Number(estimateSellAmount) > 0" class="mr-5px">≈{{ formatNumber(estimateSellAmount, 3) }} {{ getChainInfo(chain)?.main_name || '' }}</span>
-          <span class="color-[--secondary-text]">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.token?.balance || 0)
-            }}&nbsp;{{ tokenStore.token?.symbol || '' }}</span>
-          <RefreshBalance class="color-[--secondary-text]" :type="1" @mousedown.stop />
+          <div class="mt-10px tabs">
+            <el-button
+              v-for="(item, $index) in botSettings?.[chain]?.buy![botSettings?.[chain]?.buy?.selected || 's1']?.buyValueList"
+              :key="$index" class="one-click-button green clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :loading="loadingSwapBuy[$index]"
+              :disabled="loadingSwapBuy[$index]" @click.stop.prevent="submitBotSwap(item, 'buy', $index)" @mousedown.stop @mouseover.stop="hoverBuyAmount = item" @mouseleave.stop="hoverBuyAmount = ''">{{
+                !loadingSwapBuy[$index] ? item : '' }}</el-button>
+          </div>
+          <BottomSetting activeTab="buy" :gasPrice="tokenStore.gasPrice" @mousedown.stop />
+          <el-divider class="b-t-color-[--dialog-divider]! mt-10px! mb-5px!" />
+          <div class="flex-between mt-10px">
+            <span>{{ $t('sell') }}</span>
+            <div class="tabs-1 ml-5px mr-auto">
+              <button
+                v-for="item in BotSettingsArr" :key="item.value"
+                :class="{ 'active': item.value === botSettings?.[chain]?.sell?.selected }" type="button" @mousedown.stop
+                @click.stop="botSettings[chain]!.sell!.selected = item.value">{{ item.label }}</button>
+            </div>
+            <span v-if="isEnableShowsReflected && Number(estimateSellAmount) > 0" class="mr-5px">≈{{ formatNumber(estimateSellAmount, 3) }} {{ getChainInfo(chain)?.main_name || '' }}</span>
+            <span class="color-[--secondary-text]">{{ $t('balance1') }}: {{ formatNumber(tokenStore.swap.token?.balance || 0)
+              }}&nbsp;{{ tokenStore.token?.symbol || '' }}</span>
+            <RefreshBalance class="color-[--secondary-text]" :type="1" @mousedown.stop />
+          </div>
+          <div class="mt-10px tabs">
+            <el-button
+              v-for="(item, $index) in botSettings?.[chain]?.sell![botSettings?.[chain]?.sell?.selected || 's1']?.sellPerList"
+              :key="$index" class="one-click-button red clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :loading="loadingSwapSell[$index]"
+              :disabled="loadingSwapSell[$index]" @click.stop.prevent="handleSellAmount(item, $index)" @mousedown.stop @mouseover.stop="hoverSellAmount = item" @mouseleave.stop="hoverSellAmount = ''">{{
+                !loadingSwapSell[$index] ? item + '%' : ''
+              }}</el-button>
+          </div>
+          <BottomSetting activeTab="sell" :gasPrice="tokenStore.gasPrice" @mousedown.stop />
         </div>
-        <div class="mt-10px tabs">
-          <el-button
-            v-for="(item, $index) in botSettings?.[chain]?.sell![botSettings?.[chain]?.sell?.selected || 's1']?.sellPerList"
-            :key="$index" class="one-click-button red clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :loading="loadingSwapSell[$index]"
-            :disabled="loadingSwapSell[$index]" @click.stop.prevent="handleSellAmount(item, $index)" @mousedown.stop @mouseover.stop="hoverSellAmount = item" @mouseleave.stop="hoverSellAmount = ''">{{
-              !loadingSwapSell[$index] ? item + '%' : ''
-            }}</el-button>
-        </div>
-        <BottomSetting activeTab="sell" :gasPrice="tokenStore.gasPrice" @mousedown.stop />
-      </div>
 
-      <Holding v-show="isEnablePnL" isForceShow class="b-t-solid b-t-1px b-color-[--dialog-divider] mt-10px rd-0! pb-0! mb-0! gap-8px bg-transparent!" />
-    </template>
+        <Holding v-show="isEnablePnL" isForceShow class="b-t-solid b-t-1px b-color-[--dialog-divider] mt-10px rd-0! pb-0! mb-0! gap-8px bg-transparent!" />
+      </template>
+    </div>
+  </Teleport>
 
-  </div>
 </template>
 
 <script setup lang='ts'>
@@ -120,10 +122,6 @@ const chain = computed(() => {
   return (getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) as BotChain
 })
 
-const selected = computed(() => {
-  return botSettingStore.botSettings?.[chain.value]?.selected || 's1'
-})
-
 
 function getChain() {
   return ((getAddressAndChainFromId(route.params?.id as string)?.chain || tokenStore.token?.chain) || '') as BotChain
@@ -163,21 +161,29 @@ function addSpaceKeyDownEvent() {
       isCanKeySwap.value = false
     }
   })
-  useEventListener(document, 'keyup', (e) => {
+  useEventListener(document, 'keydown', e => {
     if (isCanKeySwap.value && isEnableHotkey.value) {
       const index = ['q', 'w', 'e', 'r'].indexOf(e.key)
       if (index >= 0) {
-        const _selected = botSettingStore.botSettings?.[chain.value]?.buy?.selected
-        submitBotSwap(botSettings.value?.[chain.value]![_selected || selected.value]?.buyValueList[index], 'buy', index)
+        const botSettings = botSettingStore.botSettings?.[chain.value]?.buy
+        const selected = botSettings?.selected || 's1'
+        const buyValue = botSettings?.[selected]?.buyValueList[index]
+        submitBotSwap(buyValue || '', 'buy', index)
       }
       const index2 = ['a', 's', 'd', 'f'].indexOf(e.key)
       if (index2 >= 0) {
-        const _selected = botSettingStore.botSettings?.[chain.value]?.sell?.selected
-        submitBotSwap(botSettings.value?.[chain.value]![_selected || selected.value]?.sellPerList[index2], 'sell', index2)
+        const botSettings = botSettingStore.botSettings?.[chain.value]?.sell
+        const selected = botSettings?.selected || 's1'
+        const sellPer = botSettings?.[selected]?.sellPerList[index2]
+        // const tokenBalance = tokenStore.swap.token.balance || 0
+        // const sellAmount = BigNumber(tokenBalance).times(sellPer || 0).div(100).toFixed()
+        // submitBotSwap(sellAmount || '', 'sell', index2)
+        handleSellAmount(sellPer || '', index2)
       }
     }
   })
 }
+
 
 
 async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', index = 0) {
@@ -468,86 +474,82 @@ async function handleSellAmount(item: string, index: number) {
   submitBotSwap(amount, 'sell', index)
 }
 
+let mousemoveEvent: ((e: MouseEvent) => void) | null = null
+let mouseupEvent: (() => void) | null = null
+
 function enableDragScroll() {
   const label = document.querySelector('.fixed-one-click') as HTMLElement
   if (!label) return
-  label.style.position = 'fixed'
-  // 初始化位置
-  const position = JSON.parse(localStorage.getItem('fixed-one-click-position') || '{}') || { top: '180px', left: '115px' }
-  // label.style.top = '180px'
-  // label.style.left = '115px'
-  label.style.top = position.top
-  label.style.left = position.left
-  label.style.cursor = 'grab'
-  label.style.zIndex = '3014'
-  let isDragging = false
-  let startX = 0
-  let startY = 0
-  let initialLeft = 0
-  let initialTop = 0
-  // 遮罩层
-  const mask = document.createElement('div')
-  mask.style.background = 'rgba(0, 0, 0, 0)'
-  mask.classList.add('drag-mask-s')
-  mask.style.position = 'fixed'
-  mask.style.top = '0'
-  mask.style.left = '0'
-  mask.style.right = '0'
-  mask.style.bottom = '0'
-  mask.style.zIndex = '3013'
 
-  // 获取窗口宽度和高度
-  function getWindowBounds() {
-    return {
-      width: window.innerWidth,
-      height: window.innerHeight
-    }
+  // 初始化基础样式
+  label.setAttribute('tabindex', '0') // 使其可聚焦
+  Object.assign(label.style, {
+    position: 'fixed',
+    cursor: 'grab',
+    zIndex: 'auto',
+    outline: 'none',
+    willChange: 'transform' // 提示浏览器开启 [GPU 加速](https://developer.mozilla.org)
+  })
+
+  // 预创建遮罩（仅创建一次，通过 display 控制，比 appendChild 性能高）
+  const mask = document.createElement('div')
+  Object.assign(mask.style, {
+    position: 'fixed', inset: '0', zIndex: '3013',
+    cursor: 'grabbing', display: 'none', background: 'transparent'
+  })
+  document.body.appendChild(mask)
+
+  let isDragging = false
+  let startX = 0, startY = 0
+  let currentX = 0, currentY = 0
+  let rafId: number
+
+  // 核心优化：使用 [requestAnimationFrame](https://developer.mozilla.org)
+  const updateUI = () => {
+    if (!isDragging) return
+    label.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`
+    rafId = requestAnimationFrame(updateUI)
   }
 
-  // 鼠标按下事件
+  mouseupEvent = () => {
+    if (!isDragging) return
+    isDragging = false
+    cancelAnimationFrame(rafId)
+
+    mask.style.display = 'none'
+    label.style.cursor = 'grab'
+
+    // 记录最终位置
+    const rect = label.getBoundingClientRect()
+    localStorage.setItem('fixed-one-click-position', JSON.stringify({
+      top: `${rect.top}px`,
+      left: `${rect.left}px`
+    }))
+  }
+
   label.onmousedown = (e) => {
     isDragging = true
-    startX = e.clientX
-    startY = e.clientY
-    initialLeft = label.offsetLeft
-    initialTop = label.offsetTop
-    label.style.cursor = 'grabbing' // 更改鼠标样式
+    startX = e.clientX - currentX
+    startY = e.clientY - currentY
+
+    mask.style.display = 'block'
+    label.style.cursor = 'grabbing'
+    label.focus() // 强制聚焦，配合 blur 使用
+
+    rafId = requestAnimationFrame(updateUI)
     e.preventDefault()
   }
 
-  // 鼠标移动事件
-  window.onmousemove = (e) => {
+  mousemoveEvent = (e: MouseEvent) => {
     if (!isDragging) return
-    const deltaX = e.clientX - startX
-    const deltaY = e.clientY - startY
-    // 计算新的位置
-    const newLeft = initialLeft + deltaX
-    const newTop = initialTop + deltaY
-    const bounds = getWindowBounds()
-    // 防止拖动到屏幕外
-    label.style.left = `${Math.min(Math.max(newLeft, 0), bounds.width - label.offsetWidth)}px`
-    label.style.top = `${Math.min(Math.max(newTop, 0), bounds.height - label.offsetHeight)}px`
-    // 记录移动后的位置到localStorage
-    label.style.boxShadow = '0px 0px 5px rgba(0, 0, 0, 0.2)'
-    label.style.opacity = '0.9'
-    // 背面加一个遮罩层，防止鼠标移动过快导致鼠标失焦
-    document.body.appendChild(mask)
+    currentX = e.clientX - startX
+    currentY = e.clientY - startY
   }
 
-  // 鼠标松开事件
-  window.onmouseup = () => {
-    isDragging = false
-    label.style.cursor = 'grab' // 恢复鼠标样式
-    label.style.boxShadow = 'none'
-    label.style.opacity = '1'
-    // 移除遮罩层
-    mask?.remove?.()
-    // 记录移动后的位置到localStorage
-    localStorage.setItem('fixed-one-click-position', JSON.stringify({
-      top: label.style.top,
-      left: label.style.left
-    }))
-  }
+  // 监听 blur 事件：如果弹窗弹出导致 label 失去焦点，立即停止拖拽并移除遮罩
+  label.onblur = mouseupEvent
+  window.addEventListener('mousemove', mousemoveEvent)
+  window.addEventListener('mouseup', mouseupEvent)
 }
 
 function disableDragScroll() {
@@ -557,8 +559,10 @@ function disableDragScroll() {
     return
   }
   label.onmousedown = null
-  window.onmousemove = null
-  window.onmouseup = null
+  window.removeEventListener('mousemove', mouseupEvent as EventListener)
+  mouseupEvent = null
+  window.removeEventListener('mousemove', mousemoveEvent as EventListener)
+  mousemoveEvent = null
 }
 
 onMounted(() => {
