@@ -674,7 +674,8 @@ const mergedBaseList = computed(() => {
   return [...list1.value, ...list2.value, ...list3.value]
 })
 const scrollHeight = computed(()=>{
-  return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
+  return 'calc(100vh - 215px)'
+  // return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
 })
 watch(() => list1.value?.[0]?.target_token, useThrottleFn((val) => {
   const newAudio = pump_notice.value?.[activeChain.value]?.new

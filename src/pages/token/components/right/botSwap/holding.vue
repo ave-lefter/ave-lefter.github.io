@@ -90,7 +90,7 @@ async function getWalletTxData() {
     user_token: token
   }
   return bot_getUserWalletTxInfo(params).then(async res => {
-    console.log('walletTokenInfo', res)
+    // console.log('walletTokenInfo', res)
     walletTokenInfo.value = res?.[0] || null
     // const avgPrice = Number(res?.[0]?.balance_amount) > 0 ? Number(res?.[0]?.average_purchase_price_usd || 0) : 0
     // useEventBus('updateAvgPrice').emit(avgPrice)
