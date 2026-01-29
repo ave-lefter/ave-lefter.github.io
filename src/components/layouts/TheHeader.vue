@@ -18,7 +18,8 @@
     </ul> -->
      <ul class="menu ml-20px">
       <li v-for="(item, $index) in list" :key="$index">
-       <NuxtLink :to="item.src" :target="item.target" :class="{ active: routeName?.indexOf(item.id) > -1 }">
+       <NuxtLink class="relative" :to="item.src" :target="item.target" :class="{ active: routeName?.indexOf(item.id) > -1 }">
+        <Icon  v-if="item.id == 'index'" name="custom:new1" class="absolute text-8px right--8px top-0px"/>
         {{item.name }}
       </NuxtLink>
       </li>
@@ -305,9 +306,8 @@ const list = computed(() => {
   //   query = `?act=${botStore.accessToken}&ret=${botStore.refreshToken}`
   // }
   const menues = [
-    {id: 'index', name: t('markets'), src: '/', target: '_self'},
-    // {id: 'index', name: t('markets'), src: 'https://ave.ai/' + query, target: '_blank'},
-    { id: 'pump', name: t('pump1'), src: '/pump' },
+    { id: 'index', name: t('pump1'), src: '/', target: '_self' },
+    {id: 'chain', name: t('markets'), src: '/chain', target: '_self'},
     { id: 'follow', name: t('follow'), src: '/follow' },
     {id: 'smart', name: t('signal2'), src: '/smart', target: '_self'},
     {id: 'copy-trade', name: t('copyTrade'), src: '/copy-trade', target: '_self'},
