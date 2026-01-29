@@ -479,6 +479,7 @@ export interface IGetSimpleTxsResponse {
 export function getSimpleTxs(pair:string,query: {
   token_id: string,
   tag_type?: string,
+  direction?: string,
   sender?: string,
   address?: string,
   time_min?: string,

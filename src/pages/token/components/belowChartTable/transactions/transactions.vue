@@ -273,7 +273,8 @@ const _getTokenTxs = useThrottleFn(async () => {
     const { tag_type } = tableFilter.value
     const getPairTxsParams = {
       token_id: route.params.id as string,
-      tag_type,
+      tag_type:!['buy', 'sell'].includes(tag_type) ? tag_type : '',
+      direction:['buy', 'sell'].includes(tag_type) ? tag_type : '',
       sender: tableFilter.value.markerAddress,
       target_price_u_min: tableFilter.value.amountU[0],
       target_price_u_max: tableFilter.value.amountU[1],
