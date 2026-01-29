@@ -288,7 +288,7 @@ const _getTokenTxs = useThrottleFn(async () => {
       return
     }
 
-    const res = await getSimpleTxs(pairAddress.value + '-' + addressAndChain.value.chain, getPairTxsParams)
+    const res = await getSimpleTxs(tokenStore.pairAddress + '-' + addressAndChain.value.chain, getPairTxsParams)
     const data=res||[]
     realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
     const page_token= data[data.length - 1]?.page_token || ''
@@ -374,7 +374,7 @@ watch(() => route.params.id, val => {
   if (val) {
     resetCache()
     tableFilter.value.markerAddress = ''
-    if (pairAddress.value) {
+    if (tokenStore.pairAddress) {
       filterSubmit()
     }
   }
