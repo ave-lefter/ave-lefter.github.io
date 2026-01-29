@@ -622,5 +622,7 @@
   "noticeDuration": "Tiempo de visualización de notificaciones",
   "monitorThTip": "Elija al menos un avatar de billetera y una dirección de billetera",
   "wcWalletTip": "Escanea este código QR con tu teléfono",
-  "monitorBotError": "La dirección del robot de monitoreo no es compatible"
+  "monitorBotError": "La dirección del robot de monitoreo no es compatible",
+  "hideLiq": "Haga clic para ocultar la información del grupo",
+  "showLiq": "Haga clic para mostrar información de la piscina"
 }

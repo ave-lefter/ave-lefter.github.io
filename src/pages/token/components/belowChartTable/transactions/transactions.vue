@@ -149,7 +149,7 @@ const tableFilter = ref<{
 })
 
 const filterTableListMap = {
-  all: () => [...tokenTxs.value, ...pairLiq.value].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
+  all: () => (tableView.value.isShowLiq?[...tokenTxs.value, ...pairLiq.value]:[...tokenTxs.value]).toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
   liquidity: () => [...pairLiq.value].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
   buy: () => [...tokenTxs.value.filter(el => isBuy((el)))].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
   sell: () =>[... tokenTxs.value.filter(el => !isBuy(el))].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
@@ -223,6 +223,7 @@ const filterTableList = computed(() => {
 const txCount = shallowRef<{ [key: string]: number }>({})
 const tableView = ref({
   isShowDate: false,
+  isShowLiq: true,
   // isSwapPriceUSDT: true, 不常用，先删除
   // isVolUSDT: true
 })
@@ -511,7 +512,7 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
     },
     newTags
   }
-  console.log('交易推送item',maker, item.maker_type)
+  // console.log('交易推送item',maker, item.maker_type)
   wsPairCache.value.unshift(item as any)
   if (!isPausedTxs.value) {
     updatePairTxs()
@@ -1114,6 +1115,16 @@ onUnmounted(() => {
                 : formatTimeFromNow(row.time)
             }}
           </span>
+        </template>
+        <template #header-type >
+          <div class="flex items-center gap-2px" @click="()=>[ '', 'all' ].includes(activeTab) && (tableView.isShowLiq = !tableView.isShowLiq)">
+            <span  :class="[ '', 'all' ].includes(activeTab)&&'cursor-pointer'">{{ $t('type') }}</span>
+            <Icon
+              v-if="[ '', 'all' ].includes(activeTab)"
+              v-tooltip="tableView.isShowLiq ? $t('hideLiq') : $t('showLiq')"
+              name="custom:droplet"
+              :class="`cursor-pointer ${!tableView.isShowLiq ? 'color-[--third-text]' : 'color-[--primary-color]'}`" />
+          </div>
         </template>
         <template #cell-type="{ row }">
           <div :class="getRowColor(row)">
