@@ -50,19 +50,11 @@
           </NuxtLink>
         </div>
       </el-popover>
-      <div
-        class="flex items-center gap-4px mx-12px cursor-pointer hover:color-[--main-text]"
-        :class="dragPumpStore.visible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
-        @click="dragPumpStore.visible = !dragPumpStore.visible"
-      >
-        <Icon name="custom:pump-icon" />
+      <!-- <div class="flex items-center gap-4px mx-12px cursor-pointer hover:color-[--main-text]" :class="dragPumpStore.visible?'color-[--main-text]':'color-[--secondary-text]'" @click="dragPumpStore.visible=!dragPumpStore.visible">
+        <Icon name="custom:pump-icon"/>
         {{ $t('pump1') }}
-      </div>
-      <div
-        class="flex items-center mr-12px gap-4px cursor-pointer hover:color-[--main-text]"
-        :class="globalStore.pnlTrackerVisible ? 'color-[--main-text]' : 'color-[--secondary-text]'"
-        @click="globalStore.pnlTrackerVisible = !globalStore.pnlTrackerVisible"
-      >
+      </div> -->
+      <div class="flex items-center mr-12px gap-4px cursor-pointer hover:color-[--main-text]" :class="globalStore.pnlTrackerVisible?'color-[--main-text]':'color-[--secondary-text]'" @click="globalStore.pnlTrackerVisible=!globalStore.pnlTrackerVisible">
         <Icon name="custom:chart" class="text-12px" />
         {{ $t('PnlTracker') }}
       </div>
@@ -194,7 +186,7 @@
 </template>
 
 <script setup lang="tsx">
-import { cloneDeep, first, throttle } from 'lodash-es'
+import { cloneDeep, throttle } from 'lodash-es'
 import { formatDec } from '~/utils/formatNumber'
 import { getTokensPrice } from '@/api/token'
 import type { GetSignalV2ListResponse } from '~/api/signal'

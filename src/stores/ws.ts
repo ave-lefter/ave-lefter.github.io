@@ -26,8 +26,6 @@ export const useWSStore = defineStore('ws', () => {
     [WSEventType.TGBOT]: null,
     [WSEventType.ASSET]: null,
     [WSEventType.SWITCH_MAIN_PAIR_V2]: null,
-    [WSEventType.PUMPSTATE]: null,
-    [WSEventType.TOKEN_UPDATED]: null,
     [WSEventType.GOLD_SIGNAL]: null,
     [WSEventType.SIGNALSV2_PUBLIC_MONITOR]: null,
     [WSEventType.PRICE_EXTRA]: null,
@@ -79,11 +77,7 @@ export const useWSStore = defineStore('ws', () => {
       } else if (event === WSEventType.SWITCH_MAIN_PAIR_V2) {
         // 内盘转外盘更新 pair
         useTokenStore().onSwitchMainPairV2(data)
-      } else if (event === WSEventType.PUMPSTATE) {
-        wsResult[event] = data?.msgs
-      } else if (event === WSEventType.TOKEN_UPDATED) {
-        wsResult[event] = data?.msg
-      } else if(event === WSEventType.PUBLIC_PORTRAIT){
+      } else if (event === WSEventType.PUBLIC_PORTRAIT) {
         usePublicPortraitStore().updatePublicPortrait(data?.msg || [])
       }  else {
         wsResult[event] = data
