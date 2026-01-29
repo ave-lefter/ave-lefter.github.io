@@ -285,7 +285,7 @@ const localeStore = useLocaleStore()
 const { t } = useI18n()
 const showAll = ref(false)
 const totalTokens = ref(0)
-const active = shallowRef(props.isRank ? 'col' : 'grid')
+const active = shallowRef(!props.isRank ? 'col' : 'grid')
 const activeTab = shallowRef('info')
 const headerTabs = computed(() => {
   return [
@@ -294,8 +294,8 @@ const headerTabs = computed(() => {
   ]
 })
 const tabs = [
-  { id: 'grid', icon: 'grid', name: 'grid' },
   { id: 'col', icon: 'col', name: 'col' },
+  { id: 'grid', icon: 'grid', name: 'grid' },
 ]
 const globalStore = useGlobalStore()
 const { mode } = storeToRefs(globalStore)

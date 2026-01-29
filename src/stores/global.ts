@@ -12,6 +12,7 @@ export const useGlobalStore = defineStore('global', () => {
   const themeStore = useThemeStore()
   const configStore = useConfigStore()
   const showLeft = shallowRef(true)
+  const showRight = shallowRef(true)
   const isUSDT = useStorage('isUSDT', true)
   const footerTokensPrice = shallowRef([
     {
@@ -370,6 +371,7 @@ export const useGlobalStore = defineStore('global', () => {
     footerTokensPrice,
     footerTokensPriceIds,
     showLeft,
+    showRight,
     pumpSetting,
     pumpBlackList,
     holderBlackList,
