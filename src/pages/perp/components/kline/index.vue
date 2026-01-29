@@ -573,7 +573,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
         // if (onResetCacheNeededCallback) {
         //   onResetCacheNeededCallback()
         // }
-        bars.forEach(bar => onTick(bar));
+        bars.forEach(bar => onTick(bar))
       }
 
       if (data?.length > 0 && !loading && dataType === 'changed') {
@@ -687,6 +687,7 @@ function setIframeCssVar() {
 
 onBeforeUnmount(() => {
   isUnload = true
+  _widget?.remove?.()
 })
 
 onMounted(() => {

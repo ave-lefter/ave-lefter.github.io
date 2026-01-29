@@ -37,9 +37,9 @@ const $refs = ref({
 // const MAKER_SUPPORT_CHAINS = ['solana', 'bsc']
 const {lang} = storeToRefs(useGlobalStore())
 const { t } = useI18n()
-const {totalHolders, pairAddress, token, pair, commonHeight} = storeToRefs(useTokenStore())
+const tokenStore = useTokenStore()
 const tokenDetailSStore = useTokenDetailsStore()
-const botStore = useBotStore()
+// const botStore = useBotStore()
 const wsStore = useWSStore()
 const tagStore = useTagStore()
 const route = useRoute()
@@ -54,13 +54,13 @@ onActivated(() => {
   firstActivated.value = false
 })
 
-const finalHeight = computed(() => Math.max(500, commonHeight.value - 250))
+const finalHeight = computed(() => Math.max(500, tokenStore.commonHeight - 250))
 // 只在交易历史接口更新之后更新，防止 route 地址更新导致列表数据更新异常
 const realAddress = shallowRef(getAddressAndChainFromId(route.params.id as string).address)
 const tabs = computed(() => {
   const arr: Array<{ label: string, value: string }> = []
-  if (Array.isArray(totalHolders.value)) {
-    totalHolders.value.forEach(i => {
+  if (Array.isArray(tokenStore.totalHolders)) {
+    tokenStore.totalHolders.forEach(i => {
       // console.log(i.type)
       const num = i.total_address!
       if (num > 0) {
@@ -102,7 +102,7 @@ const isHoverTable = shallowRef(false)
 const isLiquidity = computed(() => activeTab.value === 'liquidity')
 const txsContainer = useTemplateRef('txs-container')
 const columns = computed(() => {
-  const visible = token.value?.chain === 'solana' && !isLiquidity.value
+  const visible = tokenStore.token?.chain === 'solana' && !isLiquidity.value
   return [{ key: 'time', dataKey: 'time', title: t('time'), minWidth: 80 },
   { key: 'type', dataKey: 'type', title: t('type'), minWidth: 80 },
   { key: 'swapPrice', dataKey: 'swapPrice', title: t('swapPrice'), minWidth: 100 },
@@ -246,8 +246,8 @@ const addressAndChain = computed(() => {
     return getAddressAndChainFromId(id)
   }
   return {
-    address: token.value?.token || '',
-    chain: token.value?.chain || ''
+    address: tokenStore.token?.token || '',
+    chain: tokenStore.token?.chain || ''
   }
 })
 const sortConditions= ref({
@@ -361,8 +361,8 @@ watch(() => klineDateFilter?.value, (val) => {
   }
 })
 
-watch(() => pairAddress.value, (pair, oldPair) => {
-  if (pairAddress.value) {
+watch(() => tokenStore.pairAddress, (pair, oldPair) => {
+  if (tokenStore.pairAddress) {
     _getPairLiq()
     subscribeLiq(pair, oldPair)
   }
@@ -559,7 +559,7 @@ function subscribeLiq(pair: string, oldPair?: string) {
 
 const updatePairTxs = useThrottleFn(() => {
   tokenTxs.value.unshift(...wsPairCache.value)
-  tokenTxs.value = tokenTxs.value.slice(0,1000)
+  tokenTxs.value = tokenTxs.value.slice(0, 300)
   wsPairCache.value.length = 0
   triggerRef(tokenTxs)
 }, 100)
@@ -664,7 +664,7 @@ function getWalletTag(val: IGetSimpleTxsResponse) {
 async function _getPairLiq() {
   try {
     listStatus.value.loadingLiq = true
-    const res = await getPairLiq(pairAddress.value + '-' + addressAndChain.value.chain)
+    const res = await getPairLiq(tokenStore.pairAddress + '-' + addressAndChain.value.chain)
     pairLiq.value = (res || []).reverse().map(val => {
       // txCount.value[val.wallet_address] = (txCount.value[val.wallet_address] || 0) + 1
       return {
@@ -879,12 +879,12 @@ function setMakerAddress(address: string) {
 }
 
 function onRowClick({ rowData }: RowEventHandlerParams) {
-  if (!token.value) {
+  if (!tokenStore.token) {
     return
   }
-  if (SupportFullDataChain.includes(token.value.chain)) {
-    const { symbol, logo_url, chain, token: _token } = token.value
-    const { target_token, token0_address, token0_symbol, token1_symbol, pair: pairAddress } = pair.value!
+  if (SupportFullDataChain.includes(tokenStore.token.chain)) {
+    const { symbol, logo_url, chain, token: _token } = tokenStore.token
+    const { target_token, token0_address, token0_symbol, token1_symbol, pair: pairAddress } = tokenStore.pair!
     tokenDetailSStore.$patch({
       drawerVisible: true,
       tokenInfo: {
@@ -905,7 +905,7 @@ function onRowClick({ rowData }: RowEventHandlerParams) {
       user_address: rowData.wallet_address
     })
   } else {
-    window.open(formatExplorerUrl(token.value.chain, rowData.transaction, 'tx'))
+    window.open(formatExplorerUrl(tokenStore.token.chain, rowData.transaction, 'tx'))
   }
 
 }
@@ -969,6 +969,19 @@ const collect = async (row: any,index:number) => {
     // loading.value = false
   })
 }
+
+onUnmounted(() => {
+  wsStore.send({
+    jsonrpc: '2.0',
+    params: ['liq', tokenStore.pairAddress],
+    id: 1,
+    method: 'unsubscribe'
+  })
+  tokenTxs.value = []
+  resetCache()
+})
+
+
 </script>
 
 <template>

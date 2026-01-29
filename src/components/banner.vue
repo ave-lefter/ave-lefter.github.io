@@ -24,11 +24,10 @@
 <script lang="ts" setup>
 import { _getBannersAll, type Banner } from '@/api/banner.js'
 import { useStorage } from '@vueuse/core'
-const globalStore = useGlobalStore()
-const { lang } = storeToRefs(globalStore)
+const localeStore = useLocaleStore()
 const bannerList = useStorage<Banner[]>('bannerList_pro', [], localStorage)
 const showBanner = useStorage('showBanner', true, localStorage)
-watch(lang, () => {
+watch(() => localeStore.locale, () => {
   getBannersAll()
 })
 onMounted(() => {

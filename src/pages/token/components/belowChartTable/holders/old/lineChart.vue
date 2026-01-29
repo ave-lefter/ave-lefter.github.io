@@ -199,6 +199,12 @@
       initChart()
     })
   })
+  onBeforeUnmount(() => {
+    if (myChart) {
+      myChart.dispose()
+      myChart = null
+    }
+  })
   watch(() => globalStore.showLeft, async () => {
     await nextTick()
     myChart?.resize()

@@ -1132,8 +1132,8 @@ const updatetokenTxs = useThrottleFn(() => {
     tokenTxs.value.unshift(...newTxs)
 
     // 限制数据量，保持性能
-    if (tokenTxs.value.length > 1000) {
-      tokenTxs.value = tokenTxs.value.slice(0, 1000)
+    if (tokenTxs.value.length > 300) {
+      tokenTxs.value = tokenTxs.value.slice(0, 300)
     }
   }
 

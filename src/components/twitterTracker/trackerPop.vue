@@ -215,7 +215,7 @@ const confirmQuery = () => {
   }
   getList()
 }
-const debouncedConfirmInput = useDebounceFn(confirmQuery, 300)
+// const debouncedConfirmInput = useDebounceFn(confirmQuery, 300)
 
 const getList = async () => {
   // const _follow_only = isMine.value || follow_only.value
@@ -285,6 +285,9 @@ const twitterHandler = async(val) => {
     if(val.TweetId && query.value.types.includes(+val.Type)){
       const res = await getTwitterById(val.TweetId)
       trackerStore.list.unshift(res)
+      if (trackerStore.list.length > 100) {
+        trackerStore.list = trackerStore.list.slice(0, 100)
+      }
       if (twitterAudio.value && globalStore.audioSettings.audio.twitter) {
         twitterAudio.value.play()
       }
