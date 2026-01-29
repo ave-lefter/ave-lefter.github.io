@@ -406,7 +406,9 @@ const isPausedObj = ref({
 // let wsTableListCache: PumpObj[] = []
 let wsTableListCache: Record<string, PumpObj[]> = {}
 const wsTableList = shallowRef<PumpObj[]>([])
-const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
+const logoList = shallowRef<{
+  progress: number, logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number
+}[]>([])
 type StatisticsItem = {
   first_transfer_in_from_label: any
   volume_u_24h: number
@@ -526,6 +528,12 @@ const list1 = computed(() => {
             }
           : {}
         ),
+        ...(obj.progress
+          ? {
+              progress: obj.progress
+            }
+          : {}
+        ),
         name: obj.name,
         symbol: obj.symbol,
         ...(obj.appendix
@@ -582,6 +590,12 @@ const list2 = computed(() => {
           ...(obj.logo_url
             ? {
                 logo_url: obj.logo_url
+              }
+            : {}
+          ),
+          ...(obj.progress
+            ? {
+                progress: obj.progress
               }
             : {}
           ),
@@ -649,6 +663,12 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
         ...(obj.logo_url
           ? {
               logo_url: obj.logo_url
+            }
+          : {}
+        ),
+        ...(obj.progress
+          ? {
+              progress: obj.progress
             }
           : {}
         ),
