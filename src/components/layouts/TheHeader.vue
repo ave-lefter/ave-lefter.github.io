@@ -18,7 +18,8 @@
     </ul> -->
      <ul class="menu ml-20px">
       <li v-for="(item, $index) in list" :key="$index">
-       <NuxtLink :to="item.src" :target="item.target" :class="{ active: routeName?.indexOf(item.id) > -1 }">
+       <NuxtLink class="relative" :to="item.src" :target="item.target" :class="{ active: routeName?.indexOf(item.id) > -1 }">
+        <Icon  v-if="item.id == 'pump'" name="custom:new1" class="absolute text-8px right--8px top-0px"/>
         {{item.name }}
       </NuxtLink>
       </li>
