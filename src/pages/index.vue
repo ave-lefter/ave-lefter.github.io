@@ -352,8 +352,8 @@ let isInitObj = {
 }
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
 const activeChain = useStorage<ChainKey>(
-  'pump_activeChain',
-  'solana',
+  'pump_activeChain2',
+  'bsc',
   localStorage
 )
 const audioUrl = ref('')
@@ -1087,10 +1087,6 @@ function getPumpConfig() {
             return y.platform || ''
           }
         }) || []
-        if (i.chain == 'solana') {
-
-          console.log('----platforms--111-----',platforms)
-        }
         pumpV3.value[i.chain] = {
           ...(pumpV3.value[i.chain] || {}),
           platforms,

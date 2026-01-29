@@ -236,7 +236,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
   )
   const activeChain = useStorage<ChainKey>(
     'pump_activeChain',
-    'solana',
+    'bsc',
     sessionStorage
   )
   const pump_query = useStorage('pump_query2', {
