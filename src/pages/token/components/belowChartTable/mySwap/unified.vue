@@ -79,7 +79,7 @@
           <div class="flex flex-row-reverse">
             <div class="flex items-center">
               <div>{{ t('type') }}</div>
-              <el-dropdown v-if="isBotWallet" trigger="click" @command="handleTypeCommand">
+              <el-dropdown v-if="isBotWallet" :persistent="false" trigger="click" @command="handleTypeCommand">
                 <Icon name="custom:filter"
                   :class="[filterConditions?.isBuy >= 0 && filterConditions?.isLimit >= 0 && 'color-#286DFF']"
                   class="color-[--third-text] cursor-pointer text-10px" />
@@ -187,7 +187,7 @@
           <div class="flex flex-row-reverse">
             <div class="flex items-center">
               <div>{{ t('status') }}</div>
-              <el-dropdown trigger="click" @command="handleStatusCommand">
+              <el-dropdown :persistent="false" trigger="click" @command="handleStatusCommand">
                 <Icon name="custom:filter" :class="[filterConditions.statusType && 'color-#286DFF']"
                   class="color-[--third-text] cursor-pointer text-10px" />
                 <template #dropdown>
