@@ -1291,7 +1291,14 @@ const { resetKOLLine } = useKOLAvgPriceLine(
   () => _widget,
   () => isReadyLine,
   showMarket,
-  linesChecked
+  linesChecked,
+  (endTime) => {
+    const params = resolutionMap[resolution.value as keyof typeof resolutionMap] || {
+      val: resolution.value,
+      unit: 'm',
+    }
+    return dayjs(endTime * 1000).subtract(params.val * 20, params.unit).unix()
+  }
 )
 
 function setIframeCssVar() {

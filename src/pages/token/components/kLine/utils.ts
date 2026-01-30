@@ -7,6 +7,7 @@ import BigNumber from 'bignumber.js'
 import { bot_getUserPendingTx, bot_cancelLimitOrdersByBatch, bot_getUserWalletTxInfo } from '~/api/token'
 import { RESOLUTION_KEY, QUICK_KEY } from './constant'
 import { _getHoldersList } from '~/api/holders'
+import dayjs from 'dayjs'
 
 export const supportSecChains = ['solana', 'bsc', 'eth', 'base', 'tron', 'mixmax', 'xlayer']
 
@@ -606,8 +607,8 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
   return {
     resetAvgPriceLineId: () => {
       const _widget = getWidget()
-      const isReady = getIsReady()
-      if (!_widget || !isReady) return
+      // const isReady = getIsReady()
+      if (!_widget) return
       const chart = _widget?.activeChart?.()
       if (!chart) return
       if (lineIdObj.buy) {
@@ -1241,8 +1242,8 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
   return {
     resetBotAvgLineId: () => {
       const _widget = getWidget()
-      const isReady = getIsReady()
-      if (!_widget || !isReady) return
+      // const isReady = getIsReady()
+      if (!_widget) return
       const chart = _widget?.activeChart?.()
       if (!chart) return
       if (lineIdObj.buy) {
@@ -1278,25 +1279,16 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     checked: boolean
     color: string
   }
-}>) {
-  /** KOL 水平线宽度：占可见时间范围的比例，0~1，默认 30%（始终在右侧） */
-  const KOL_LINE_LENGTH_RATIO = 0.1
+}>,getStartTime: (endTime: number) => number) {
   let avePriceMap = {} as Record<string, { name: string, value: number, balance_ratio: number, lineId: EntityId, isCreating?: boolean }>
   let kolVisibleRangeUnsub: (() => void) | null = null
 
-  function getKOLLineTimeRange(range: { from: number; to: number }) {
-    const span = range.to - range.from
-    const lineSpan = span * KOL_LINE_LENGTH_RATIO
-    return { timeFrom: range.to - lineSpan, timeTo: range.to }
-  }
-
   function updateKOLLinesToVisibleRange(range?: { from: number; to: number }) {
-    console.log('updateKOLLinesToVisibleRange', range)
     const chart = getWidget()?.activeChart?.()
     if (!chart) return
     const visibleRange = range ?? chart.getVisibleRange?.()
     if (!visibleRange?.from || !visibleRange?.to) return
-    const { timeFrom } = getKOLLineTimeRange(visibleRange)
+    const timeFrom = getStartTime(visibleRange.to)
     Object.values(avePriceMap).forEach(item => {
       if (!item.lineId) return
       const line = chart.getShapeById?.(item.lineId)
@@ -1316,7 +1308,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
   /** 可见范围变化时更新 KOL 线位置（拖动/缩放） */
  const onKOLLinesVisibleRangeChanged =  useThrottleFn((range: { from: number; to: number }) => {
     updateKOLLinesToVisibleRange(range)
-  }, 100)
+  }, 1000/60)
 
   function subscribe() {
     const chart = getWidget()?.activeChart?.()
@@ -1336,7 +1328,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (!_widget || !chart) return
     const range = chart.getVisibleRange?.()
     if (!range?.from || !range?.to) return
-    const { timeFrom } = getKOLLineTimeRange(range)
+    const timeFrom = getStartTime(range.to)
     Object.values(avePriceMap).forEach(async item => {
       let price = item.value
       if (showMarket.value) {
@@ -1350,25 +1342,19 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
             item.lineId = '' as EntityId
             return
           }
-          const points = line?.getPoints?.() ?? []
-          if (points.length === 1) {
-            chart?.removeEntity?.(item.lineId)
-            item.lineId = '' as EntityId
-          } else {
-            line?.setPoints?.([{ price, time: timeFrom }])
-            const leftLabel = `${item.name} ${(item.balance_ratio * 100).toFixed(2)}%`
-            line?.setProperties?.({
-              linecolor: linesChecked.value.kol.color,
-              textcolor: linesChecked.value.kol.color,
-              showLabel: true,
-              showPriceLabels: true,
-              horzLabelsAlign: 'left',
-              vertLabelsAlign: 'middle',
-              fontSize: 12,
-              text: leftLabel,
-            })
-            return
-          }
+          line?.setPoints?.([{ price, time: timeFrom }])
+          const leftLabel = `${item.name} ${(item.balance_ratio * 100).toFixed(2)}%`
+          line?.setProperties?.({
+            linecolor: linesChecked.value.kol.color,
+            textcolor: linesChecked.value.kol.color,
+            showLabel: true,
+            showPriceLabels: true,
+            horzLabelsAlign: 'left',
+            vertLabelsAlign: 'middle',
+            fontSize: 12,
+            text: leftLabel,
+          })
+          return
         }
       } else if (!price) {
         return
@@ -1465,8 +1451,8 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
 
   const resetKOLLine = () => {
     const _widget = getWidget()
-    const isReady = getIsReady()
-    if (!_widget || !isReady) return
+    // const isReady = getIsReady()
+    if (!_widget) return
     const chart = _widget?.activeChart?.()
     if (!chart) return
 
