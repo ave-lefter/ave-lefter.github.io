@@ -39,7 +39,7 @@ const botStore = useBotStore()
     >
       <div class="flex justify-between mb-4px">
         <div class="flex items-center gap-8px">
-          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
             <template #default>
               <TokenImg
                 token-class="w-32px h-32px"

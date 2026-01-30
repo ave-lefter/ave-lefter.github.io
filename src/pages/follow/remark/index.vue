@@ -280,7 +280,7 @@ v-copy="row?.user_address" name="bxs:copy" class="clickable text-[--third-text] 
       </el-table-column>
       <el-table-column :label="t('noteTime')" align="right">
         <template #default="{ row }">
-          <el-tooltip placement="right" :content="dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss')">
+          <el-tooltip placement="right" :content="dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss')" :persistent="false">
             <div class="text-[--secondary-text]">
               {{ formatTimeFromNow(row?.create_time) }}
             </div>

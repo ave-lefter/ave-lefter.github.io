@@ -325,7 +325,7 @@ function getTargetToken(row: GetHomePumpListResponse) {
         @mouseleave="setPausedStatus(false)"
       >
         <div class="flex-[2] flex items-center">
-          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
             <template #default>
               <TokenImg
                 :row="{
