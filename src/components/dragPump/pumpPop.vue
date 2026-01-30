@@ -511,7 +511,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
           :suffix-icon="SuffixIcon" class="[&&]:[--el-select-width:40px]" popper-class="small-select">
           <el-option v-for="item in BotSettingsArr" :key="item.value" :value="item.value" :label="item.label" />
         </el-select>
-        <el-popover v-model:visible="audioVisible" trigger="click" popper-class="el-select__popper">
+        <el-popover v-model:visible="audioVisible" :persistent="false" trigger="click" popper-class="el-select__popper">
           <template #reference>
               <div
               class="w-20px h-20px flex items-center justify-center bg-[--d-151A22-l-E8F1FF] rounded-4px color-[--secondary-text] cursor-pointer hover:color-[--main-text]"

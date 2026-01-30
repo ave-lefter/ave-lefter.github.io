@@ -1,6 +1,7 @@
 <template>
   <el-popover
-    v-model:visible="selectWalletVisible"
+v-model:visible="selectWalletVisible"
+:persistent="false"
     placement="bottom"
     width="305"
     trigger="click"

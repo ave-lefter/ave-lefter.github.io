@@ -70,7 +70,8 @@ function changeActiveGroupId(groupId:number) {
 </script>
 
 <template>
-    <el-popover popper-class="[&&]:[--el-popover-padding:0]" :visible="popoverVisible" trigger="click" width="248px">
+    <el-popover :persistent="false" popper-class="[&&]:[--el-popover-padding:0]" :visible="popoverVisible"
+        trigger="click" width="248px">
         <template #reference>
             <Icon
                 name="custom:star"

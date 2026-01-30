@@ -462,14 +462,15 @@ function getEstimatedGas() {
                     audioSettings.notice.monitorBorder && 'border-[var(--up-color)]! rounded-[8px]'
                   "
                 >
-                  <img class="" src="@/assets/images/pump/symbol.svg" width="40" alt="" />
+                  <img class="" src="@/assets/images/pump/symbol.svg" width="40" alt="">
                   <div class="flex h-40px items-start justify-between flex-col gap-4px">
                     <div class="flex items-center">
                       <img
                         v-if="audioSettings.notice.monitorTh[0]"
                         class="w-16px h-16px rounded-[50%] mr-4px"
                         src="@/assets/images/pump/user.svg"
-                      /><span v-if="audioSettings.notice.monitorTh[1]">Zoe&nbsp;</span
+><span
+                        v-if="audioSettings.notice.monitorTh[1]">Zoe&nbsp;</span
                       ><span class="color-[--up-color]">&nbsp;{{ $t('addPosition') }}</span
                       >&nbsp;SENTIS
                     </div>
@@ -480,7 +481,7 @@ function getEstimatedGas() {
                         alt=""
                         onerror="this.src='/icon-default.png'"
                         srcset=""
-                      />
+>
                       <span
                         ><span class="color-[--up-color]">0.75 BNB</span
                         ><span v-if="audioSettings.notice.monitorTh[2]"
@@ -509,7 +510,7 @@ function getEstimatedGas() {
                   <img
                     class="w-16px h-16px rounded-[50%] mr-4px"
                     src="@/assets/images/pump/user.svg"
-                  />
+>
                   <div class="flex items-center">
                     <span><span>Zoe&nbsp;</span>{{ $t('createPosition') }}</span>
                     <span class="flex items-center">
@@ -517,7 +518,7 @@ function getEstimatedGas() {
                       ><img
                         class="w-16px h-16px rounded-[50%] mx-4px"
                         src="@/assets/images/pump/m-symbol.svg"
-                      />{{ $t('of') }}&nbsp;SENTIS
+>{{ $t('of') }}&nbsp;SENTIS
                     </span>
                   </div>
                   <Icon
@@ -598,7 +599,7 @@ function getEstimatedGas() {
                         :src="`${configStore.token_logo_url}chain/${item}.png`"
                         alt=""
                         class="rounded-full w-20px h-20px"
-                      />
+>
                     </div>
                   </div>
                 </div>
@@ -842,7 +843,8 @@ function getEstimatedGas() {
     </template>
   </el-dialog>
   <el-popover
-    v-model:visible="visible"
+v-model:visible="visible"
+:persistent="false"
     popper-class="new-popover"
     :virtual-ref="currentBtnRef"
     virtual-triggering

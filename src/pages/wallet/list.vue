@@ -36,7 +36,7 @@
               height="24"
               :src="generateAvatarIcon(row?.name || '')"
               alt=""
-            />
+>
             {{ row.name }}
             <Remark
               :remark="row.remark"
@@ -127,7 +127,7 @@
             name="material-symbols-light:close"
             class="text-30px cursor-pointer"
             @click.stop.prevent="dialogVisible = false"
-          ></Icon>
+/>
         </div>
       </template>
       <div class="w-480px flex flex-col items-center justify-center mb-20px">
@@ -142,6 +142,7 @@
     </el-dialog>
     <el-popover
       v-model:visible="showPop"
+:persistent="false"
       :virtual-ref="$refs.currentBtnRef[currentIndex]"
       virtual-triggering
       trigger="contextmenu"
@@ -192,10 +193,9 @@ import { _removeWallet, type Wallet, type Address } from '@/api/botManage'
 import { ElMessage } from 'element-plus'
 import QrCodeWithLogo from 'qr-code-with-logo'
 import Remark from './remark.vue'
-import { getCurrentInstance } from 'vue'
+import { getCurrentInstance, markRaw } from 'vue'
 import BigNumber from 'bignumber.js'
 import { Warning } from '@element-plus/icons-vue'
-import { markRaw } from 'vue'
 
 defineProps({
   tableData: {

@@ -76,7 +76,8 @@
     </template>
 
     <el-popover
-      v-model:visible="appDownloadVisible"
+v-model:visible="appDownloadVisible"
+:persistent="false"
       placement="bottom-end"
       :width="350"
       trigger="click"
@@ -150,7 +151,7 @@
         </div>
       </div>
     </el-popover>
-    <el-popover trigger="click" placement="bottom-end">
+    <el-popover :persistent="false" trigger="click" placement="bottom-end">
       <template #reference>
         <div
           class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px flex items-center cursor-pointer hover:opacity-80"
@@ -170,6 +171,7 @@
           <Icon name="ep:arrow-right"/>
         </div>
         <el-dropdown
+:persistent="false"
           trigger="click"
           popper-class="dropdown-lang"
           class="w-full"

@@ -85,7 +85,9 @@
                 </a>
               </template>
 
-               <el-popover v-else popper-class="[--el-popover-bg-color:--border] [--el-popover-padding:4px_0!important]" popper-style="width: auto;min-width: 104px;" placement="bottom" trigger="hover">
+              <el-popover v-else :persistent="false"
+                popper-class="[--el-popover-bg-color:--border] [--el-popover-padding:4px_0!important]"
+                popper-style="width: auto;min-width: 104px;" placement="bottom" trigger="hover">
                 <!-- v-tooltip="item.amm"  -->
                  <!-- v-tooltip="item.ammName" -->
                   <template #reference>

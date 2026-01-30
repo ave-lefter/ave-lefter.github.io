@@ -1,7 +1,8 @@
 <template>
   <el-popover
-    v-if="list?.length > 0"
+v-if="list?.length > 0"
     v-model:visible="show"
+:persistent="false"
     placement="bottom"
     popper-class="chains-table-filter"
     title=""
