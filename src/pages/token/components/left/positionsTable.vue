@@ -565,7 +565,7 @@ function handleTxSuccess(res: any, _batchId: string, tokenId: string, row: GetUs
             :to="`/token/${row.index}`"
           >
             <div class="flex-[1.5] flex items-center">
-              <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+              <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
                 <template #default>
                   <TokenImg :row="row"/>
                 </template>

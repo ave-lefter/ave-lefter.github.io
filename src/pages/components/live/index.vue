@@ -45,7 +45,7 @@
             </a> -->
         </div>
         <div class="flex-between mt-12px">
-          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
             <template #default>
               <el-image
                 fit="cover"
