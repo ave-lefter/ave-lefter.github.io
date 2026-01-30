@@ -1305,12 +1305,6 @@ const documentVisible = computed(() => {
   return documentVisible1.value === 'visible'
 })
 
-// watch(documentVisible, (val) => {
-//   if (route.name !== 'index') return
-//   if (val) {
-//     bufRender()
-//   }
-// })
 
 watch(documentVisible, (val) => {
   if (route.name !== 'index') return
