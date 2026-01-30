@@ -1301,9 +1301,9 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
   }
 
   /** 缩放时更新 KOL 线位置（保持右侧比例） */
-  // function onKOLZoomChanged() {
+  // const onKOLZoomChanged = useThrottleFn(() => {
   //   updateKOLLinesToVisibleRange()
-  // }
+  // }, 1000/60)
 
   /** 可见范围变化时更新 KOL 线位置（拖动/缩放） */
  const onKOLLinesVisibleRangeChanged =  useThrottleFn((range: { from: number; to: number }) => {
@@ -1316,8 +1316,8 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (chart?.onVisibleRangeChanged) {
       chart.onVisibleRangeChanged().subscribe(null, onKOLLinesVisibleRangeChanged)
     }
-    // if (timeScale?.barSpacingChanged) {
-    //   timeScale.barSpacingChanged().subscribe(null, onKOLZoomChanged)
+    // if (chart?.getTimeScale?.().barSpacingChanged) {
+    //   chart.getTimeScale().barSpacingChanged().subscribe(null, onKOLZoomChanged)
     // }
   }
 

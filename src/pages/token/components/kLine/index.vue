@@ -267,7 +267,7 @@ const linesChecked = useLocalStorage('tv_markLines', {
   },
   kol: {
     checked: false,
-    color: '#FFA622',
+    color: '#424ADF',
   },
 })
 const colorPickerVisible = ref({} as Record<string, boolean>)
@@ -1379,7 +1379,7 @@ const resetTop100Color = () => {
 const resetIndicatorLineColor = () => {
   linesChecked.value.buy.color = '#19d92f'
   linesChecked.value.sell.color = '#f6465d'
-  linesChecked.value.kol.color = '#ffa622'
+  linesChecked.value.kol.color = '#424ADF'
 }
 
 defineExpose({
