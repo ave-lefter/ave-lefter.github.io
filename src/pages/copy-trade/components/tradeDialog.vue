@@ -73,7 +73,7 @@
                 @click.stop="form.buyType = item.id"
               >
                 <span>{{ item.name || '' }}</span>
-                <el-tooltip placement="top">
+                <el-tooltip placement="top" :persistent="false">
                   <template #content> <div v-html="item.tip"></div></template>
                   <Icon
                     name="majesticons:question-mark-circle-line"
