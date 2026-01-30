@@ -205,9 +205,14 @@ onUnmounted(() => {
     </div>
     <OrdersTab v-show="activeTab === 'Orders'" :currentActiveTab="activeTab"/>
     <DevTokens v-show="activeTab === 'DevTokens'"/>
-    <KeepAlive v-if="activeTab !== 'Orders' && activeTab !== 'DevTokens' && route.name === 'token-id'">
-      <component :is="Component" v-bind="comProps" :currentActiveTab="activeTab" />
-    </KeepAlive>
+    <!-- Removed KeepAlive: render the dynamic component directly and keep a ref to access its instance/lifecycle -->
+    <component
+      v-if="(activeTab !== 'Orders') &&(activeTab !== 'DevTokens') && route.name === 'token-id'"
+      :is="Component"
+      v-bind="comProps"
+      :currentActiveTab="activeTab"
+      ref="activeChild"
+    />
   </div>
 </template>
 

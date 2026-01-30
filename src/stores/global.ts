@@ -11,7 +11,7 @@ export const useGlobalStore = defineStore('global', () => {
   const localeStore = useLocaleStore()
   const themeStore = useThemeStore()
   const configStore = useConfigStore()
-  const showLeft = shallowRef(true)
+  const showLeft = shallowRef(false)
   const showRight = shallowRef(true)
   const isUSDT = useStorage('isUSDT', true)
   const footerTokensPrice = shallowRef([

@@ -44,7 +44,8 @@ const aveTableRef = ref<InstanceType<typeof AveTable> | null>(null)
 const firstActivated = ref(true)
 const followStore = useFollowStore()
 const themeStore = useThemeStore()
-onActivated(() => {
+
+onMounted(() => {
   if (!firstActivated.value && aveTableRef.value) {
     aveTableRef.value.scrollToTop(0)
   }
