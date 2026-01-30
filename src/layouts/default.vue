@@ -28,7 +28,7 @@
     </div>
     <SignalDraggable v-if="!signalStore.shouldHide" />
     <MonitorDragger v-show="monitorStore.visible" />
-    <DragPump v-show="dragPumpStore.visible && !dragPumpStore.shouldHide" />
+    <!-- <DragPump v-show="dragPumpStore.visible && !dragPumpStore.shouldHide" /> -->
     <TrackerDragger/>
     <FavAddressPop
       ref="favAddressPopRef"
