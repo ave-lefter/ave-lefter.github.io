@@ -89,7 +89,7 @@ export const useGlobalStore = defineStore('global', () => {
     isRight: false,
     isBlacklist: true,
     show_search: true,
-    isInt: true,
+    isInt: false,
     define: [
       'name',
       'txs',

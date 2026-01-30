@@ -5,6 +5,7 @@
     trigger="click"
     :teleported="false"
     popper-class="[--el-popover-bg-color:var(--border)]"
+    :persistent="false"
   >
     <template #reference>
       <div class="media-item cursor-pointer flex items-center text-12px absolute right-15px bg-[--dialog-bg]" @click.stop>

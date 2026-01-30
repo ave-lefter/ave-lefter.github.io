@@ -67,6 +67,7 @@
                     <el-image
                       class="token-icon"
                       :class="{ small: pumpSetting.Progress_isCircle == 'horizontal' }"
+                      lazy
                       fit="cover"
                       :src="
                         getSymbolDefaultIcon(
@@ -369,7 +370,7 @@
                       <Icon
                         class="iconfont icon-rug mr-4px text-10px vertical-middle "
                         name="custom:top2"
-                        :style="{color: row?.dev_migrated_count> 0 ?'var(--yellow)' : 'var(--third-text)'}"
+                        :style="{color: Number(row?.dev_migrated_count || 0)> 0 ?'var(--yellow)' : 'var(--third-text)'}"
                       />
                       <span v-if="(Number(row?.dev_migrated_count) == 0 || row?.dev_migrated_count == null) && (Number(row?.dev_total_count) == 0 || row?.dev_total_count == null) " class="color-[--secondary-text]" >0</span>
                       <span v-else class="color-[--main-text]" >{{
@@ -393,7 +394,7 @@
                   </div>
                   <div class="mt-5px">
                     <PumpPop
-                        v-if="row?.medias?.some(i=> i.icon === 'twitter')"
+                        v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'"
                         :tokenId="(row.token + '-' + row.chain)"
                         :type="2"
                       >
@@ -423,7 +424,7 @@
                       >
                     </div>
                     <DevPop
-                      v-show="pumpSetting?.define?.some((i) => i === 'dev')"
+                      v-if="route.name === 'index'&& pumpSetting?.define?.some((i) => i === 'dev')"
                       class="flex mr-8px bg-btn"
                       :style="{
                         background: Number(formatNumber(row?.dev_balance_ratio_cur || 0, 1)) == 0 ? '' : (Number(row?.dev_balance_ratio_cur) > 5 ? '#f6465d1a' : '#12b8861a'),
@@ -569,7 +570,7 @@
                       <div class="mr-5px color-[--third-text]" :style="{ 'font-size': pumpSetting.fontSize_mc }">V</div>
                       <span v-if="Number(row?.volume_u_24h) === 0 || row?.volume_u_24h == null" class="color-[--secondary-text]" >0</span>
                       <div v-else class="color-[--main-text]" :style="{ color: getDataColor('vol',row.volume_u_24h),'font-size': pumpSetting.fontSize_mc  }">
-                        ${{ pumpSetting.isInt ? formatNumber(row.volume_u_24h || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' }) : formatNumber(row.volume_u_24h || 0, {decimals: 2, locale: 'en' }) }}
+                        ${{ pumpSetting.isInt ? formatNumber(row.volume_u_24h || 0, { decimals: 0, l: 4, limit: 3, locale: 'en' }) : formatNumber(row.volume_u_24h || 0, {decimals: 1, l: 4, limit: 3, locale: 'en' }) }}
                       </div>
                     </template>
                     <template v-if="pumpSetting?.define?.some((i) => i === 'mcap')">
@@ -583,7 +584,7 @@
                       <span
                         v-else
                         :style="{ 'font-size': pumpSetting.fontSize_mc, color: getDataColor('mc',row.market_cap) }"
-                        >${{ pumpSetting.isInt ? formatNumber(row.market_cap || 0, { decimals: 0, l: 4, limit: 3,  locale: 'en' }) : formatNumber(row.market_cap || 0, {decimals: 2, locale: 'en' }) }}</span
+                        >${{ pumpSetting.isInt ? formatNumber(row.market_cap || 0, { decimals: 0, l: 4, limit: 3,  locale: 'en' }) : formatNumber(row.market_cap || 0, { decimals: 1, l: 4, limit: 3, locale: 'en' }) }}</span
                       >
                     </template>
                   </template>
@@ -767,6 +768,7 @@ watch(() => props.tableList, (newList) => {
   tableList.value = newList
 })
 const router = useRouter()
+const route = useRoute()
 const { token_logo_url } = useConfigStore()
 const globalStore = useGlobalStore()
 const { pumpSetting, pumpBlackList, lang,isDark, dialogVisible_search, dialogSearchText} = storeToRefs(globalStore)
@@ -789,7 +791,7 @@ const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableLis
   itemHeight: 110.8,
   // 必须增加过采样，否则 translateY(-20px) 向上移动时，
   // 顶部刚进入视口的节点会因为高度计算没到视口而无法渲染，导致动画“闪现”
-  overscan: 5,
+  overscan: 20,
 })
 onUnmounted(() => {
   $tooltip?.hide?.()
