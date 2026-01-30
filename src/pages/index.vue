@@ -768,17 +768,10 @@ onActivated(() => {
   isLeave = false
   wsTableListCache = {}
   wsTableList.value = []
-  logoList.value = []
   isInitObj = {
     new: true,
     soon: true,
     graduated: true
-  }
-  for (const chainKey in fourmemeListObj) {
-    const group = fourmemeListObj[chainKey as ChainKey]
-    group.new.length = 0
-    group.soon.length = 0
-    group.graduated.length = 0
   }
   mapStatistics.value.clear()
   pumpStateBuffer.length = 0

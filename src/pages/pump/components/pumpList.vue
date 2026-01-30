@@ -758,7 +758,14 @@ const showPop = ref(false)
 const selected = ref<PumpObj | null>(null)
 // const btnRefs = ref<Record<string, HTMLElement | null>>({})
 const currentBtnRef = ref<HTMLElement | null>(null)
-const { tableList, quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
+
+const { quickBuyValue, loading, isOut, isSoon , type} = toRefs(props)
+const tableList = shallowRef<PumpObj[]>(props.tableList || [])
+
+// 只监听数组引用变化，不深度监听对象
+watch(() => props.tableList, (newList) => {
+  tableList.value = newList
+})
 const router = useRouter()
 const { token_logo_url } = useConfigStore()
 const globalStore = useGlobalStore()
