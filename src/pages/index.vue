@@ -548,7 +548,6 @@ function useFourmemeList(
     const wsSource = (wsTableList.value || []).filter(
       i => i.state === state && i.chain === chain
     )
-
     const filter = localStorage.getItem(storageKey)
     const wsList = getFilterData(wsSource, filter)
 
@@ -559,14 +558,15 @@ function useFourmemeList(
     ]
 
     let result = applyBaseAndStats(merged)
-
     // 排除已毕业
     if (excludeTokens) {
       const set = excludeTokens()
       result = result.filter(i => !set.has(i.target_token))
     }
-
     const finalList = result.slice(0, 100)
+    if (finalList?.length > 0) {
+      patchLogo(finalList)
+    }
     fourmemeListObj[chain][cacheKey] = finalList
     return finalList
   })
@@ -579,30 +579,50 @@ const scrollHeight = computed(()=>{
   return 'calc(100vh - 215px)'
   // return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
 })
-watch(() => list1.value?.[0]?.target_token, useThrottleFn((val) => {
-  const newAudio = pump_notice.value?.[activeChain.value]?.new
-  if(newAudio && pumpAudio.value && val) {
-    audioUrl.value = audioNameToResource[newAudio as keyof typeof audioNameToResource]
-      || audioNameToResource.Beep
+const audioThrottle = useThrottleFn(
+  (type: 'new' | 'soon' | 'graduated', token?: string) => {
+    if (!token || !pumpAudio.value) return
+
+    const audioName = pump_notice.value?.[activeChain.value]?.[type]
+    if (!audioName) return
+
+    audioUrl.value =
+      audioNameToResource[audioName as keyof typeof audioNameToResource] ??
+      audioNameToResource.Beep
+
     pumpAudio.value.play()
+  },
+  300
+)
+const lastTokenMap = new Map<'new' | 'soon' | 'graduated', string>()
+watch(
+  () => [
+    list1.value?.[0]?.target_token,
+    list2.value?.[0]?.target_token,
+    list3.value?.[0]?.target_token,
+    activeChain.value
+  ],
+  ([newToken, soonToken, graduatedToken]) => {
+    if (newToken && lastTokenMap.get('new') !== newToken) {
+      lastTokenMap.set('new', newToken)
+      audioThrottle('new', newToken)
+    }
+
+    if (soonToken && lastTokenMap.get('soon') !== soonToken) {
+      lastTokenMap.set('soon', soonToken)
+      audioThrottle('soon', soonToken)
+    }
+
+    if (
+      graduatedToken &&
+      lastTokenMap.get('graduated') !== graduatedToken
+    ) {
+      lastTokenMap.set('graduated', graduatedToken)
+      audioThrottle('graduated', graduatedToken)
+    }
   }
-},300))
-watch(() => list2.value?.[0]?.target_token, useThrottleFn((val) => {
-  const soonAudio = pump_notice.value?.[activeChain.value]?.soon
-  if(soonAudio && pumpAudio.value && val) {
-    audioUrl.value = audioNameToResource[soonAudio as keyof typeof audioNameToResource]
-    || audioNameToResource.Beep
-    pumpAudio.value.play()
-  }
-},300))
-watch(() => list3.value?.[0]?.target_token, useThrottleFn((val) => {
-  const graduatedAudio = pump_notice.value?.[activeChain.value]?.graduated
-  if(graduatedAudio && pumpAudio.value && val) {
-    audioUrl.value = audioNameToResource[graduatedAudio as keyof typeof audioNameToResource]
-    || audioNameToResource.Beep
-    pumpAudio.value.play()
-  }
-},300))
+)
+
 watch(() => [pump_notice.value?.[activeChain.value]?.new,
 pump_notice.value?.[activeChain.value]?.soon,
 pump_notice.value?.[activeChain.value]?.graduated
@@ -633,6 +653,7 @@ watch(activeChain, (val, old) => {
   getPumpList()
   wsTableListCache = {}
   wsTableList.value = []
+
   wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
@@ -704,33 +725,11 @@ watch(
   }
 )
 
-// const buffer: any[] = []
 
 const flushStatistics = useThrottleFn(() => {
   if (!mapStatistics.value.size || !documentVisible.value) return
-  // const map = new Map<string, any>()
-
-  // 旧数据
-  // statisticsList.value.forEach(item => {
-  //   mapStatistics.value.set(item.token, item)
-  // })
-  // 所有 buffer 中的新数据
-  // buffer.forEach(item => {
-  //   const prev = mapStatistics.value.get(item.token)
-  //   mapStatistics.value.set(
-  //     item.token,
-  //     prev ? mergeStatistics(prev, item) : item
-  //   )
-  // })
-  // if (mapStatistics.value.size > 200) {
-  //   const firstKey = mapStatistics.value.keys().next().value
-  //   if (firstKey) {
-  //     mapStatistics.value.delete(firstKey)
-  //   }
-  // }
   triggerRef(mapStatistics)
-  // statisticsList.value = Array.from(mapStatistics.values()).slice(0, 300)
-  // buffer.length = 0
+
 }, 300)
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
@@ -753,10 +752,6 @@ watch(
   }
 )
 
-// function bufRender() {
-//   flushPumpState()
-//   flushStatistics()
-// }
 const getChangedValue = (A: string[], B: string[]): string | null => {
   for (let i = 0; i < A.length; i++) {
     if (A[i] !== B[i]) {
@@ -773,10 +768,17 @@ onActivated(() => {
   isLeave = false
   wsTableListCache = {}
   wsTableList.value = []
+  logoList.value = []
   isInitObj = {
     new: true,
     soon: true,
     graduated: true
+  }
+  for (const chainKey in fourmemeListObj) {
+    const group = fourmemeListObj[chainKey as ChainKey]
+    group.new.length = 0
+    group.soon.length = 0
+    group.graduated.length = 0
   }
   mapStatistics.value.clear()
   pumpStateBuffer.length = 0
@@ -824,6 +826,8 @@ onDeactivated(()=>{
 
   wsTableListCache = {}
   wsTableList.value = []
+  logoList.value = []
+
   isInitObj = {
     new: true,
     soon: true,
@@ -940,7 +944,7 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
   const currentChain = activeChain.value
   if (!wsTableListCache[currentChain]) wsTableListCache[currentChain] = []
   const wsTableList1 = wsTableListCache[currentChain]?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
-  wsTableListCache[currentChain] = [...(list?.filter(i => i.chain === currentChain) || []), ...(wsTableList1 || [])]?.slice(0, 100)
+  wsTableListCache[currentChain] = [...(list?.filter(i => i.chain === currentChain) || []), ...(wsTableList1 || [])]?.slice(0, 300)
 
 
   let list1 = wsTableListCache[currentChain]
@@ -954,25 +958,10 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
   if (isPausedObj?.value?.graduated) {
     list1 = [...(list1?.filter?.(i => i.state !== 'graduated' && i.state !== 'migrated') || []), ...(list2?.filter?.(i => i.state === 'graduated' || i.state === 'migrated') || [])]
   }
-  wsTableList.value = [...list1]
-
-  c.forEach((i) => {
-    fourmemeListObj[activeChain.value][i] = fourmemeListObj?.[activeChain.value][i]?.map((j) => {
-      const item = list?.find(
-        (k) => k.pump_pair_address === j.pair && k.chain === j.chain
-      )
-      let res = {}
-      if (item) {
-        res = {
-          ...item,
-        }
-      }
-      return {
-        ...j,
-        ...(res || {})
-      }
-    })
-  })
+  wsTableList.value.push(...list1)
+  if (wsTableList.value?.length > 300) {
+      wsTableList.value.length = 300
+  }
 }
 function getPumpConfig() {
   _getPumpConfig().then((res) => {
@@ -1484,6 +1473,28 @@ function mergeLogo(prev: any, next: any) {
   }
 }
 
+function patchLogo(list: PumpObj[]) {
+  if (!logoList.value?.length) return
+
+  const logoMap = new Map(
+    logoList.value.map(i => [i.token, i])
+  )
+
+  for (const item of list) {
+    const logo = logoMap.get(item.target_token)
+    if (!logo) continue
+
+    if (logo.logo_url) item.logo_url = logo.logo_url
+    if (logo.progress) item.progress = logo.progress
+    item.name = logo.name
+    item.symbol = logo.symbol
+
+    if (logo.appendix) {
+      item.medias = getMedias(logo.appendix)
+      item.twitter_type = logo.twitter_type
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">
