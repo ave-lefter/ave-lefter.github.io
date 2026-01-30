@@ -102,7 +102,7 @@
     </div>
 </template>
 <script setup name="twitterTrackerListItem">
-import { followKol, unfollowAll } from '~/api/twitter'
+import { followKol, unfollowKol } from '~/api/twitter'
 import { processTwitterText } from '~/utils'
 const trackerStore = useTwitterTrackerStore()
 const { t } = useI18n()
@@ -174,7 +174,7 @@ const _followKol = async (author_id, index) => {
 
 const _unfollowKol = async (author_id, index) => {
     try {
-        await unfollowAll(author_id)
+        await unfollowKol(author_id)
         ElMessage.success(t('cancelFollowed'))
         trackerStore.list[index].author.follow_status = 0
     } catch (error) {
