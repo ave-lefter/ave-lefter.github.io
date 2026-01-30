@@ -182,6 +182,13 @@ onMounted(() => {
   getMultiWalletsAllChain()
   if (timer) clearInterval(timer)
 })
+
+onBeforeUnmount(() => {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
+})
 // const throttledFn = useThrottleFn(() => {
 // loadingThrottledFn.value = true
 //   getMultiWalletsAllChain()

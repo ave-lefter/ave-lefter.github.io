@@ -35,7 +35,7 @@
             @click="globalStore.$patch({ showRight: false })"
           >
             <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
-            
+
           </div>
           <div
             v-show="!globalStore.showRight"
@@ -319,6 +319,8 @@ onBeforeMount(() => {
 
 onUnmounted(() => {
   tokenStore?.reset?.()
+  // 确保移除可能遗留的 WS 回调与可见性监听，防止内存泄漏
+  wsStore.getWSInstance()?.offMessage(['tx_update_token', 'kline', 'price'])
   wsStore.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
@@ -331,6 +333,7 @@ onUnmounted(() => {
     params: [WSEventType.PUBLIC_PORTRAIT],
     id: 1,
   })
+  document.removeEventListener('visibilitychange', visibilitychangeFn)
 })
 
 onBeforeRouteLeave(() => {
