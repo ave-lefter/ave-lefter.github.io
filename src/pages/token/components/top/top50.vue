@@ -45,6 +45,7 @@ v-if="list?.length > 0"
           <el-tooltip
             v-if="list[0]?.tag == 'early'"
             placement="top"
+            :persistent="false"
             popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!"
           >
             <template #content>{{ t('top50TitleTip') }}</template>
@@ -61,6 +62,7 @@ v-if="list?.length > 0"
                 v-if="filterTag(item.tag_type)"
                 placement="top"
                 :hide-after="0"
+                :persistent="false"
               >
                 <template #content>
                   {{ filterTag(item.tag_type)?.text }}

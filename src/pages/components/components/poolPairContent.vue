@@ -160,7 +160,7 @@ function addTokenFavorite(row, newGroupId: number) {
       <Collect :iconClass="`text-16px cursor-pointer ml-5px mr-12px`" :isCollected="row.is_fav" :userFavoriteGroups="globalStore.userFavoriteGroups" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
     </div>
     <div class="flex items-center gap-8px">
-      <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+      <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
         <template #default>
           <TokenImg
             :is-circle="isCircle"
@@ -234,6 +234,7 @@ function addTokenFavorite(row, newGroupId: number) {
           <el-tooltip
             v-if="row?.lp_locked_percent > 0 && row?.lp_locked_percent <= 100"
             placement="top"
+            :persistent="false"
           >
             <template #default>
               <el-progress

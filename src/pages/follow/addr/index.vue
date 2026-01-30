@@ -536,6 +536,7 @@
       placement="top"
       :popper-class="mode"
       effect="customized"
+      :persistent="false"
       :virtual-ref="buttonTagRef || undefined"
       virtual-triggering
     />
