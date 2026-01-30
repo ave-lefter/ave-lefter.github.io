@@ -180,7 +180,7 @@
               </div>
             </div>
             <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
-            <el-popover popper-class="[--el-popover-bg-color:--border]">
+            <el-popover popper-class="[--el-popover-bg-color:--border]" :persistent="false">
               <template #reference>
                 <span
                   class="media-item bg-btn cursor-pointer"

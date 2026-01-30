@@ -1095,7 +1095,7 @@ onUnmounted(() => {
               :addressClass="markerTooltipVisible && currentRow.wallet_address===row.wallet_address?'bg-#12B88633':''"
               :maxRemarkLength="8"
               :chain="row.chain"
-              :wallet_logo="row.wallet_logo" class="color-[--secondary-text]"
+              :wallet_logo="row.wallet_logo" class="color-[--secondary-text] UserRemark"
               :mouseoverAddress="e => openMarkerTooltip(row, e)"
             >
               <div v-if="row.count && row.count > 1">
@@ -1134,7 +1134,7 @@ onUnmounted(() => {
       </AveTable>
       <MarkerTooltip
         v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
-        :addressAndChain="addressAndChain"
+        :addressAndChain="addressAndChain" :key="currentRow.id"
       >
         <template v-if="['solana', 'bsc'].includes(currentRow.chain) && (currentRow.senderProfile || currentRow.maker_bal)">
           <Icon
