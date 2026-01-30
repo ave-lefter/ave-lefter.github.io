@@ -1462,7 +1462,13 @@ export function formatXUser(url?: string) {
     }
 
     const firstSegment = u.pathname.split('/').filter(Boolean)[0]
-    return firstSegment ? `@${firstSegment}` : ''
+
+    // ✅ 校验是否是合法用户名
+    if (!firstSegment || !/^[A-Za-z0-9_]{1,15}$/.test(firstSegment)) {
+      return ''
+    }
+
+    return `@${firstSegment}`
   } catch {
     return ''
   }

@@ -403,10 +403,8 @@ const isPausedObj = ref({
   graduated: false,
 })
 
-// let wsTableListCache: PumpObj[] = []
 let wsTableListCache: Record<string, PumpObj[]> = {}
 const wsTableList = shallowRef<PumpObj[]>([])
-const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
 type StatisticsItem = {
   first_transfer_in_from_label: any
   volume_u_24h: number
@@ -422,9 +420,9 @@ type StatisticsItem = {
   kol_ratio: any
   buyers_24h: any
   sellers_24h: any
-  makers_24h(makers_24h: any): number
-  reserve1(reserve1: any): number
-  reserve0(reserve0: any): number
+  makers_24h: number
+  reserve1: number
+  reserve0: number
   chain: string
   token: string
   holder_count: number
@@ -485,149 +483,40 @@ const tabsList = computed(() => {
     }
   ]
 })
-const list1 = computed(() => {
-  let list = fourmemeListObj?.[activeChain.value]?.new || []
-  if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
-    list = list.filter(
-      (item) =>
-        !pumpBlackList.value?.some(
-          (i) =>
-            (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
-        )
-    )
-  }
-  const list1 = (wsTableList.value || [])?.filter(i => i.state === 'new' && i.chain === activeChain.value)
-  const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
-  const wsList = getFilterData(list1, pumpFilter)
-  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
-  let filterList = [...wsList1, ...list].map(i => {
-  const baseHash =
-    i.target_token === i.token0_address
-      ? i.token1_address
-      : i.token0_address
 
-  return {
-    ...i,
-    baseToken: baseTokenMap.value.get(baseHash)
-  }
-})
-  if (logoList.value?.length && filterList?.length) {
-    const logoMap = new Map(
-      logoList.value.map(item => [item.token, item])
-    )
-    filterList = filterList.map(i => {
-      const obj = logoMap.get(i.target_token)
-      if (!obj) return i
-      return {
-        ...i,
-        ...(obj.logo_url
-          ? {
-              logo_url: obj.logo_url
-            }
-          : {}
-        ),
-        name: obj.name,
-        symbol: obj.symbol,
-        ...(obj.appendix
-          ? {
-              medias: getMedias(obj.appendix),
-              twitter_type: obj.twitter_type
-            }
-          : {}
-        )
-      }
-    })
-  }
-  if (filterList?.length) {
-    filterList = mergeStatisticsList(mapStatistics.value, filterList)
-    fourmemeListObj[activeChain.value].new = filterList?.slice?.(0, 100) || []
-  }
-  return filterList?.slice?.(0, 100)
-})
-const list2 = computed(() => {
-  let list = fourmemeListObj?.[activeChain.value]?.soon || []
-  if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
-    list = list.filter(
-      (item) =>
-        !pumpBlackList.value?.some(
-          (i) =>
-          (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
-        )
-    )
-  }
-  const list1 = (wsTableList.value || [])?.filter(i => (i.state === 'migrating') && i.chain === activeChain.value)
-  const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_soon`)
-  const wsList = getFilterData(list1, pumpFilter)
-  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
-  let filterList = [...wsList1, ...list].map(i => {
-  const baseHash =
-    i.target_token === i.token0_address
-      ? i.token1_address
-      : i.token0_address
+const list3 = useFourmemeList(
+  'migrated',
+  `pumpFilter_${activeChain.value}_graduated`,
+  'graduated'
+)
 
-  return {
-    ...i,
-    baseToken: baseTokenMap.value.get(baseHash)
-  }
-})
-    if (logoList.value?.length && filterList?.length) {
-      const logoMap = new Map(
-        logoList.value.map(item => [item.token, item])
-      )
-      filterList = filterList.map(i => {
-        const obj = logoMap.get(i.target_token)
-        if (!obj) return i
-        return {
-          ...i,
-          ...(obj.logo_url
-            ? {
-                logo_url: obj.logo_url
-              }
-            : {}
-          ),
-          name: obj.name,
-          symbol: obj.symbol,
-          ...(obj.appendix
-            ? {
-                medias: getMedias(obj.appendix),
-                twitter_type: obj.twitter_type
-              }
-            : {}
-          )
-        }
-      })
-    }
-    if (filterList?.length) {
-      filterList = mergeStatisticsList(mapStatistics.value, filterList)
-    }
-    const tokenSet = new Set(
-      list3.value?.map(j => j.target_token)
-    )
-    filterList = filterList?.filter(
-      (i: { target_token: string }) =>
-        !tokenSet.has(i.target_token)
-    )
+const list2 = useFourmemeList(
+  'migrating',
+  `pumpFilter_${activeChain.value}_soon`,
+  'soon',
+  () => new Set(list3.value.map(i => i.target_token))
+)
 
-     fourmemeListObj[activeChain.value].soon = filterList?.slice?.(0, 100) || []
-    return filterList?.slice?.(0, 100)
-  })
-const list3 = computed(() => {
-let list = fourmemeListObj?.[activeChain.value]?.graduated || []
-if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
-  list = list.filter(
-    (item) =>
-      !pumpBlackList.value?.some(
-        (i) =>
-        (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
-      )
+const list1 = useFourmemeList(
+  'new',
+  `pumpFilter_${activeChain.value}_new`,
+  'new'
+)
+function applyBlacklist(list: any[]) {
+  if (!pumpSetting.value.isBlacklist || !pumpBlackList.value?.length) return list
+  return list.filter(item =>
+    !pumpBlackList.value.some(i =>
+      (i.address === item.token && i.type === 'ca') ||
+      (i.address === item.symbol && i.type === 'keyword') ||
+      (i.address === item.token && i.type === 'dev')
+    )
   )
 }
-  const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
-  const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
-  const wsList = getFilterData(list1, pumpFilter)
-  const wsList1 = wsList?.filter((i: { pair: string }) => !list?.some(j => j.pair === i.pair))
-  let filterList = [...wsList1, ...list].map(i => {
-  const baseHash =
+function applyBaseAndStats(list: any[]) {
+  if (!list?.length) return list
+
+  const withBase = list.map(i => {
+    const baseHash =
       i.target_token === i.token0_address
         ? i.token1_address
         : i.token0_address
@@ -637,39 +526,51 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
       baseToken: baseTokenMap.value.get(baseHash)
     }
   })
-  if (logoList.value?.length && filterList?.length) {
-    const logoMap = new Map(
-      logoList.value.map(item => [item.token, item])
+
+  return mergeStatisticsList(mapStatistics.value, withBase)
+}
+
+function useFourmemeList(
+  state: 'new' | 'migrating' | 'migrated',
+  storageKey: string,
+  cacheKey: 'new' | 'soon' | 'graduated',
+  excludeTokens?: () => Set<string>
+) {
+  return computed(() => {
+    const chain = activeChain.value
+
+    // cache
+    let cacheList = fourmemeListObj?.[chain]?.[cacheKey] || []
+    cacheList = applyBlacklist(cacheList)
+
+    // ws source
+    const wsSource = (wsTableList.value || []).filter(
+      i => i.state === state && i.chain === chain
     )
-    filterList = filterList.map(i => {
-      const obj = logoMap.get(i.target_token)
-      if (!obj) return i
-      return {
-        ...i,
-        ...(obj.logo_url
-          ? {
-              logo_url: obj.logo_url
-            }
-          : {}
-        ),
-        name: obj.name,
-        symbol: obj.symbol,
-        ...(obj.appendix
-          ? {
-              medias: getMedias(obj.appendix),
-              twitter_type: obj.twitter_type
-            }
-          : {}
-        )
-      }
-    })
-  }
-  if (filterList?.length) {
-    filterList = mergeStatisticsList(mapStatistics.value, filterList)
-    fourmemeListObj[activeChain.value].graduated = filterList?.slice?.(0, 100) || []
-  }
-  return filterList?.slice?.(0, 100)
-})
+
+    const filter = localStorage.getItem(storageKey)
+    const wsList = getFilterData(wsSource, filter)
+
+    // 去重 pair
+    const merged = [
+      ...wsList.filter(i => !cacheList.some(j => j.pair === i.pair)),
+      ...cacheList
+    ]
+
+    let result = applyBaseAndStats(merged)
+
+    // 排除已毕业
+    if (excludeTokens) {
+      const set = excludeTokens()
+      result = result.filter(i => !set.has(i.target_token))
+    }
+
+    const finalList = result.slice(0, 100)
+    fourmemeListObj[chain][cacheKey] = finalList
+    return finalList
+  })
+}
+
 const mergedBaseList = computed(() => {
   return [...list1.value, ...list2.value, ...list3.value]
 })
@@ -773,36 +674,33 @@ watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
     flushPumpState()
   }
 })
-const bufferLogoMap = new Map<string, any>()
-const logoThrottled = useThrottleFn(() => {
-  if (!bufferLogoMap.size || !documentVisible.value) return
-  const mergedList = Array.from(bufferLogoMap.values())
-  logoList.value = [
-    ...mergedList,
-    ...logoList.value,
-  ].slice(0, 300)
-  bufferLogoMap.clear()
-}, 100)
+const wsTokenMap = computed(() => {
+  const map = new Map<string, PumpObj>()
+  const chain = activeChain.value
+  const obj = fourmemeListObj[chain]
+  ; (['new', 'soon', 'graduated'] as CategoryKey[]).forEach((key) => {
+    for (const item of obj[key]) {
+      if (item.target_token) {
+        map.set(item.target_token, item)
+      }
+    }
+  })
 
+  return map
+})
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED],
   (val) => {
     if (!val?.token) return
 
-    const prev = bufferLogoMap.get(val.token)
+    const token = val.token.slice(0, 42)
 
-    bufferLogoMap.set(
-      val.token,
-      prev ? mergeLogo(prev, val) : val
-    )
-    // 控制 buffer 最大数量（防爆）
-    if (bufferLogoMap.size > 100) {
-      const firstKey = bufferLogoMap.keys().next().value
-      if (firstKey) bufferLogoMap.delete(firstKey)
-    }
-    logoThrottled()
+    const wsItem = wsTokenMap.value.get(token)
+    if (!wsItem) return
+    mergeLogoToWsItem(wsItem, val)
   }
 )
+
 // const buffer: any[] = []
 
 const flushStatistics = useThrottleFn(() => {
@@ -835,9 +733,6 @@ watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
   (val) => {
     if (!Array.isArray(val) || !val.length ) return
-    // buffer.push(val)
-    // buffer.splice(0, 0, ...val)
-    // buffer.splice(100)
     val.forEach((item: any) => {
       const prev = mapStatistics.value.get(item.token)
       mapStatistics.value.set(
@@ -855,11 +750,10 @@ watch(
   }
 )
 
-function bufRender() {
-  flushPumpState()
-  logoThrottled()
-  flushStatistics()
-}
+// function bufRender() {
+//   flushPumpState()
+//   flushStatistics()
+// }
 const getChangedValue = (A: string[], B: string[]): string | null => {
   for (let i = 0; i < A.length; i++) {
     if (A[i] !== B[i]) {
@@ -876,6 +770,13 @@ onActivated(() => {
   isLeave = false
   wsTableListCache = {}
   wsTableList.value = []
+  isInitObj = {
+    new: true,
+    soon: true,
+    graduated: true
+  }
+  mapStatistics.value.clear()
+  pumpStateBuffer.length = 0
   document.addEventListener('mousemove', mouseInsideTxs)
   getPumpConfig()
   getPumpList()
@@ -917,6 +818,17 @@ onDeactivated(()=>{
       Timer[timerKey] = null
     }
   }
+
+  wsTableListCache = {}
+  wsTableList.value = []
+  isInitObj = {
+    new: true,
+    soon: true,
+    graduated: true
+  }
+  mapStatistics.value.clear()
+  pumpStateBuffer.length = 0
+
   if (portraitTimer) {
     clearTimeout(portraitTimer)
   }
@@ -928,6 +840,7 @@ const startPortraitTimer = () => {
   }
   portraitTimer = setTimeout(() => {
     unsubscribePortrait()
+    mapStatistics.value.clear()
     subscribePortrait(mergedBaseList.value)
     startPortraitTimer()
   }, 1 * 60 * 1000)
@@ -1001,11 +914,9 @@ function getMouseInsideElement(event:any, element:any) {
 function wsUpdateTableList(wsList: WSPumpObj[]) {
   const c = ['new', 'soon', 'graduated'] as const
   if (!wsList?.length) return
-  // const rTime = Date.now()
   const list = wsList?.map?.(i => ({
     ...i,
     ...(i.pair),
-    // rTime: rTime,
     id: `${i.pair.target_token}-${i.chain}`,
     pair_id: `${i.pair.pair}-${i.chain}`,
     token: i.pair.target_token,
@@ -1027,16 +938,7 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
   if (!wsTableListCache[currentChain]) wsTableListCache[currentChain] = []
   const wsTableList1 = wsTableListCache[currentChain]?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
   wsTableListCache[currentChain] = [...(list?.filter(i => i.chain === currentChain) || []), ...(wsTableList1 || [])]?.slice(0, 100)
-  // let wsTime = this.wsTableListCache?.time || 0
-  // if (wsTime < Date.now() - 15000) {
-  //   this.wsTableListCache = {
-  //     list,
-  //     time: Date.now()
-  //   }
-  // } else {
-  //   let wsTableList = this.wsTableListCache?.list?.filter?.(i => !list?.some?.(j => j.pump_pair_address === i.pump_pair_address))
-  //   this.wsTableListCache.list = [...list, ...(wsTableList || [])]
-  // }
+
 
   let list1 = wsTableListCache[currentChain]
   const list2 = wsTableList?.value.filter(i => i.chain === currentChain)
@@ -1044,11 +946,9 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
     list1 = [...(list1?.filter?.(i => i.state !== 'new') || []), ...(list2?.filter?.(i => i.state === 'new') || [])]
   }
   if (isPausedObj?.value?.soon) {
-    // list1 = list1?.filter?.(i => i.state !== 'soon' && i.state !== 'migrating')
     list1 = [...(list1?.filter?.(i => i.state !== 'soon' && i.state !== 'migrating') || []), ...(list2?.filter?.(i => i.state === 'soon' || i.state === 'migrating') || [])]
   }
   if (isPausedObj?.value?.graduated) {
-    // list1 = list1?.filter?.(i => i.state !== 'graduated')
     list1 = [...(list1?.filter?.(i => i.state !== 'graduated' && i.state !== 'migrated') || []), ...(list2?.filter?.(i => i.state === 'graduated' || i.state === 'migrated') || [])]
   }
   wsTableList.value = [...list1]
@@ -1074,8 +974,6 @@ function wsUpdateTableList(wsList: WSPumpObj[]) {
 function getPumpConfig() {
   _getPumpConfig().then((res) => {
     pumpConfig.value = Array.isArray(res) ? res : []
-    console.log('----pumpConfig--------', pumpConfig.value)
-    console.log('-------fourmemeListObj-----', fourmemeListObj)
     pumpConfig.value?.forEach(i => {
       if (!pumpV3.value[i.chain]?.platforms?.length) {
         const platforms = i.platforms?.map(y => {
@@ -1207,10 +1105,10 @@ async function getPump(rawParams: {
 
   if (isInactive) return
 
-  if (!isFilter && isPaused) {
-    Timer[category] = setTimeout(() => getPump(rawParams), 5000)
-    return
-  }
+  // if (!isFilter && isPaused) {
+  //   Timer[category] = setTimeout(() => getPump(rawParams), 5000)
+  //   return
+  // }
 
   // 3. 构建参数 (浅拷贝避免污染)
   const queryParams = { ...rawParams, chain: currentChain }
@@ -1407,44 +1305,47 @@ const documentVisible = computed(() => {
   return documentVisible1.value === 'visible'
 })
 
-watch(documentVisible, (val) => {
-  if (route.name !== 'index') return
-  if (val) {
-    bufRender()
-  }
-})
-
 // watch(documentVisible, (val) => {
 //   if (route.name !== 'index') return
 //   if (val) {
-//     wsTableListCache = []
-//     wsTableList.value = []
-//     isInitObj.value = {
-//       new: true,
-//       soon: true,
-//       graduated: true
-//     }
-//     wsv2Store.send({
-//       jsonrpc: '2.0',
-//       method: 'subscribe',
-//       params: ['pumpstate', activeChain.value],
-//       id: 1,
-//     })
-//     getPumpList()
-//   } else {
-//     if (portraitTimer) {
-//       clearTimeout(portraitTimer)
-//       portraitTimer = null
-//     }
-//     unsubscribePortrait()
-//     wsv2Store.send({
-//       jsonrpc: '2.0',
-//       method: 'unsubscribe',
-//       params: ['pumpstate'],
-//       id: 1,
-//     })
+//     bufRender()
 //   }
 // })
+
+watch(documentVisible, (val) => {
+  if (route.name !== 'index') return
+  if (val) {
+
+    wsv2Store.send({
+      jsonrpc: '2.0',
+      method: 'subscribe',
+      params: ['pumpstatev2', activeChain.value],
+      id: 1,
+    })
+    getPumpList()
+  } else {
+    wsTableListCache = {}
+    wsTableList.value = []
+    isInitObj = {
+      new: true,
+      soon: true,
+      graduated: true
+    }
+    mapStatistics.value.clear()
+    pumpStateBuffer.length = 0
+    if (portraitTimer) {
+      clearTimeout(portraitTimer)
+      portraitTimer = null
+    }
+    unsubscribePortrait()
+    wsv2Store.send({
+      jsonrpc: '2.0',
+      method: 'unsubscribe',
+      params: ['pumpstatev2'],
+      id: 1,
+    })
+  }
+})
 
 const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['volume_u_24h', 'volume_u_24h'],
@@ -1577,14 +1478,31 @@ function mergeStatistics(prev: any, next: any) {
   }
   return result
 }
-function mergeLogo(prev: any, next: any) {
-  return {
-    ...prev,
-    ...next,
-    logo_url: next.logo_url || prev.logo_url,
-    appendix: next.appendix || prev.appendix,
+function mergeLogoToWsItem(wsItem: any, src: any) {
+  if (!wsItem || !src) return
+  // logo
+  if (src.logo_url !== undefined) {
+    wsItem.logo_url = src.logo_url
+  }
+  // progress（0 是合法值）
+  if (src.progress !== undefined) {
+    wsItem.progress = src.progress
+  }
+
+  // name / symbol
+  if (src.name !== undefined) {
+    wsItem.name = src.name
+  }
+  if (src.symbol !== undefined) {
+    wsItem.symbol = src.symbol
+  }
+  // medias / twitter_type
+  if (src.appendix !== undefined) {
+    wsItem.medias = getMedias(src.appendix)
+    wsItem.twitter_type = src.twitter_type
   }
 }
+
 </script>
 
 <style scoped lang="scss">
