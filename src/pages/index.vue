@@ -405,6 +405,7 @@ const isPausedObj = ref({
 
 let wsTableListCache: Record<string, PumpObj[]> = {}
 const wsTableList = shallowRef<PumpObj[]>([])
+const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
 type StatisticsItem = {
   first_transfer_in_from_label: any
   volume_u_24h: number
@@ -674,30 +675,32 @@ watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
     flushPumpState()
   }
 })
-const wsTokenMap = computed(() => {
-  const map = new Map<string, PumpObj>()
-  const chain = activeChain.value
-  const obj = fourmemeListObj[chain]
-  ; (['new', 'soon', 'graduated'] as CategoryKey[]).forEach((key) => {
-    for (const item of obj[key]) {
-      if (item.target_token) {
-        map.set(item.target_token, item)
-      }
-    }
-  })
+const bufferLogoMap = new Map<string, any>()
+const logoThrottled = useThrottleFn(() => {
+  if (!bufferLogoMap.size || !documentVisible.value) return
+  const mergedList = Array.from(bufferLogoMap.values())
+  logoList.value = [
+    ...mergedList,
+    ...logoList.value,
+  ].slice(0, 300)
+  bufferLogoMap.clear()
+}, 100)
 
-  return map
-})
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED],
   (val) => {
     if (!val?.token) return
-
-    const token = val.token.slice(0, 42)
-
-    const wsItem = wsTokenMap.value.get(token)
-    if (!wsItem) return
-    mergeLogoToWsItem(wsItem, val)
+    const prev = bufferLogoMap.get(val.token)
+    bufferLogoMap.set(
+      val.token,
+      prev ? mergeLogo(prev, val) : val
+    )
+    // 控制 buffer 最大数量（防爆）
+    if (bufferLogoMap.size > 300) {
+      const firstKey = bufferLogoMap.keys().next().value
+      if (firstKey) bufferLogoMap.delete(firstKey)
+    }
+    logoThrottled()
   }
 )
 
@@ -1472,28 +1475,12 @@ function mergeStatistics(prev: any, next: any) {
   }
   return result
 }
-function mergeLogoToWsItem(wsItem: any, src: any) {
-  if (!wsItem || !src) return
-  // logo
-  if (src.logo_url !== undefined) {
-    wsItem.logo_url = src.logo_url
-  }
-  // progress（0 是合法值）
-  if (src.progress !== undefined) {
-    wsItem.progress = src.progress
-  }
-
-  // name / symbol
-  if (src.name !== undefined) {
-    wsItem.name = src.name
-  }
-  if (src.symbol !== undefined) {
-    wsItem.symbol = src.symbol
-  }
-  // medias / twitter_type
-  if (src.appendix !== undefined) {
-    wsItem.medias = getMedias(src.appendix)
-    wsItem.twitter_type = src.twitter_type
+function mergeLogo(prev: any, next: any) {
+  return {
+    ...prev,
+    ...next,
+    logo_url: next.logo_url || prev.logo_url,
+    appendix: next.appendix || prev.appendix,
   }
 }
 
