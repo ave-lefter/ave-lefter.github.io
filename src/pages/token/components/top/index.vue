@@ -294,6 +294,7 @@
                     class="select3"
                     :placeholder="$t('pleaseSelectGroup')"
                     :teleported="false"
+                    :persistent="false"
                   >
                     <el-option :label="$t('defaultGroup')" :value="0" />
                     <el-option

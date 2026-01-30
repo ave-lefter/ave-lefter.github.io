@@ -3,7 +3,7 @@
     <!-- 开始时间 -->
     <el-input-number class="flex-1 input-number-date" align="left" v-model="startValue" :min="0" :controls="false" style="width: 221px">
       <template #suffix>
-        <el-select class="small" v-model="startUnit" :suffix-icon="SuffixIcon">
+        <el-select class="small" v-model="startUnit" :suffix-icon="SuffixIcon" :persistent="false">
           <el-option
             v-for="(item, $index) in list"
             :key="$index"
@@ -16,7 +16,7 @@
     <span class="gap px-4px">~</span>
     <el-input-number class="flex-1 input-number-date" align="left" v-model="endValue" :min="0" :controls="false" style="width: 221px">
       <template #suffix>
-        <el-select class="small" v-model="endUnit" :suffix-icon="SuffixIcon" >
+        <el-select class="small" v-model="endUnit" :suffix-icon="SuffixIcon" :persistent="false">
           <el-option
             v-for="(item, $index) in list"
             :key="$index"

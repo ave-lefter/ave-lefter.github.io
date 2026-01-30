@@ -45,7 +45,7 @@
             <el-input v-model.trim="form.followAddress" clearable :placeholder="$t('enterAddress')" />
           </el-form-item>
           <el-form-item :label="$t('chain')" label-position="top">
-            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.chain">
+            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.chain" :persistent="false">
               <template #prefix>
                 <ChainToken :chain="form.chain" :width="16" />
               </template>
@@ -133,7 +133,7 @@
             </div>
           </el-form-item>
           <el-form-item :label="$t('buyType')" label-position="top">
-            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.sellType">
+            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.sellType" :persistent="false">
               <el-option
                 v-for="(item, $index) in sellTypeList"
                 :key="$index"

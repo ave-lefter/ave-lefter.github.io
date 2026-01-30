@@ -157,7 +157,7 @@
         <div class="tg-wallet-list_content pb-0px">
           <div style="padding: 15px 20px 20px">
             <el-select v-model="depositChain" class="chains-select" placeholder="Select" size="large"
-              style="width: 100%" :teleported="false" :suffix-icon="ArrowDownBold">
+              style="width: 100%" :teleported="false" :suffix-icon="ArrowDownBold" :persistent="false">
               <template #prefix>
                 <img v-if="depositChain" height="24" class="mr-5px border-rd-[50%]"
                   :src="`${token_logo_url}chain/${depositChain}.png`" style="" alt="" srcset="">
@@ -199,7 +199,7 @@
           <div style="padding: 15px 20px 20px;">
             <el-form-item :label="t('selectChain')" label-position="top">
               <el-select v-model="withdrawForm.chain" class="chains-select" placeholder="Select" size="large"
-                style="width: 100%" :teleported="false" :suffix-icon="ArrowDownBold"
+                style="width: 100%" :teleported="false" :suffix-icon="ArrowDownBold" :persistent="false"
                 @change="handleWithdrawChainChange">
                 <template #prefix>
                   <img v-if="withdrawForm.chain" height="24" class="mr-5px border-rd-[50%]"
@@ -224,6 +224,7 @@
                   size="large"
                   class="chains-select"
                   :teleported="false"
+                  :persistent="false"
                   :options="balanceList"
                   :suffix-icon="ArrowDownBold"
                   placeholder="Please select"
@@ -670,12 +671,12 @@ function preloadChainImages() {
   imageSrcList.forEach(src => {
       const existingLink = Array.from(document.head.getElementsByTagName('link')).find(link => link.href === src);
       if (!existingLink) {
-          const link = document.createElement('link'); 
-          link.rel = 'preload'; 
-          link.as = 'image'; 
-          link.href = src; 
+          const link = document.createElement('link');
+          link.rel = 'preload';
+          link.as = 'image';
+          link.href = src;
           const firstChild = document.head.firstChild;
-          document.head.insertBefore(link, firstChild); 
+          document.head.insertBefore(link, firstChild);
       }
   });
 }

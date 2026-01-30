@@ -330,6 +330,7 @@ function handleReset() {
                     v-model="selectedGroup"
                     :placeholder="$t('pleaseSelectGroup')"
                     :teleported="false"
+                    :persistent="false"
                   >
                     <el-option :label="$t('defaultGroup')" :value="0" />
                     <el-option

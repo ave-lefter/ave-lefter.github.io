@@ -533,6 +533,7 @@
                     v-model="autoSellConfigs.autoSellConfig_devsell!.priceChange"
                     placeholder="--"
                     class="input-number-limit"
+                    :persistent="false"
                     size="default"
                   >
                     <template #prefix>

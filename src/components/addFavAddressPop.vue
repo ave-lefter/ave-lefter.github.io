@@ -4,7 +4,7 @@
       <el-form-item prop="user_chain" required label-position="top" size="large" class="mb-13px!">
         <div class="flex justify-between items-center w-100%">
           <h4 class="font-500 text-12px lh-[120%] color-[--main-text]">{{ $t('addWallet') }}</h4>
-          <el-select v-model="form.user_chain" :placeholder="t('placeholderPrefix1') + t('chain')" value-key="value" size="small" style="--el-fill-color-blank:var(--border);" :suffix-icon="CaretBottom" class="w-70px!" :teleported="false" popper-class="w-103px">
+          <el-select v-model="form.user_chain" :placeholder="t('placeholderPrefix1') + t('chain')" value-key="value" size="small" style="--el-fill-color-blank:var(--border);" :suffix-icon="CaretBottom" class="w-70px!" :teleported="false" popper-class="w-103px" :persistent="false">
             <template #prefix>
               <div class="h-12px inline-flex items-center">
                 <img :src="`${token_logo_url}chain/${form.user_chain?.id}.png`" class="rd-50%" width="12" lazy alt="">
@@ -24,7 +24,7 @@
           <el-input v-model="form.remark" :placeholder="t('placeholderPrefix') + t('remark')"/>
       </el-form-item>
       <el-form-item prop="group_id" required label-position="top" size="large" class="mb-20px!">
-        <el-select v-model="form.group_id" :placeholder="t('placeholderPrefix1') + t('addrGroup')" :teleported="false" style="--el-fill-color-blank:var(--border)">
+        <el-select v-model="form.group_id" :placeholder="t('placeholderPrefix1') + t('addrGroup')" :teleported="false" style="--el-fill-color-blank:var(--border)" :persistent="false">
           <el-option :key="0" :value="0" :label="$t('defaultGroup')" />
           <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
         </el-select>
