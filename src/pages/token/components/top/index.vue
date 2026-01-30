@@ -40,7 +40,7 @@
     /> -->
     <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
     <div class="token-info ml-16px flex items-center color-[--third-text]">
-      <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" >
+      <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
         <template #content>
           <el-image
             class="token-icon  h-228px w-228px items-center"
@@ -180,7 +180,7 @@
               </div>
             </div>
             <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
-            <el-popover popper-class="[--el-popover-bg-color:--border]">
+            <el-popover popper-class="[--el-popover-bg-color:--border]" :persistent="false">
               <template #reference>
                 <span
                   class="media-item bg-btn cursor-pointer"

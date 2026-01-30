@@ -124,7 +124,7 @@ const columns = computed(() => {
         :to="`/token/${row.token}-${row.chain}`"
       >
         <div class="flex-1 flex items-center">
-          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
             <template #default>
               <TokenImg :row="row"/>
             </template>

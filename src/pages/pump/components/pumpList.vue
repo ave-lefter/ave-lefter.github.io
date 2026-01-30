@@ -822,6 +822,7 @@
       v-model:visible="showPopSearch"
       :virtual-ref="$refs.currentBtnRef[currentIndex]"
       virtual-triggering
+      :persistent="false"
       popper-class="[--el-popover-bg-color:--border]"
     >
     <div class="py-4px [&&]:m--12px flex flex-col">
