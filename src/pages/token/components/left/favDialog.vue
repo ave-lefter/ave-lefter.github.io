@@ -57,6 +57,7 @@ const Component = computed(() => {
     :title="t('editFav')"
     append-to-body
     width="800px"
+    destroy-on-close
     :class="`${theme} [--el-message-close-size:24px]`"
   >
     <div

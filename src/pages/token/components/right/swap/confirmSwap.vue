@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="show" width="446px">
+  <el-dialog v-model="show" width="446px" destroy-on-close>
     <template #header>
       <span v-if="activeShow === 1">{{ $t('swap') }}</span>
       <span v-else-if="activeShow === 2">

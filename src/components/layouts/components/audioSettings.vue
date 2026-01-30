@@ -431,7 +431,7 @@ function getEstimatedGas() {
 </script>
 
 <template>
-  <el-dialog v-model="dialogVisible" :width="360">
+  <el-dialog v-model="dialogVisible" :width="360" destroy-on-close>
     <template #header>
       <span
         :class="`text-20px font-500 mr-24px cursor-pointer ${isNotice ? 'color-[--main-text]' : 'color-[--third-text]'}`"

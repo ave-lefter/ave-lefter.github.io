@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="show" class="dialog-zixuan dialog" width="600px">
+  <el-dialog v-model="show" class="dialog-zixuan dialog" width="600px" destroy-on-close>
     <template #header>
       <span>{{ $t('selectRouter') }}</span>
     </template>

@@ -139,7 +139,7 @@ function getRandom(min: number, max: number) {
   <slot>
     <Icon name="custom:share" class="text-12px color-[--d-999-l-666] ml-6px cursor-pointer" @click.self.stop="openDialog" />
   </slot>
-  <el-dialog v-model="dialogVisible" :title="$t('share')" width="628" append-to-body>
+  <el-dialog v-model="dialogVisible" :title="$t('share')" width="628" append-to-body destroy-on-close>
     <div>
       <div ref="shareDom" class="relative p-25px z-1">
         <img class="absolute w-588px left--1px top--1px z--1 h-[101%]" :src="bgImg" alt="share">

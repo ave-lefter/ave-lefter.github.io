@@ -7,7 +7,7 @@
       <span v-else class="mr-5px">{{ slippage }}%</span>
       <Icon class="clickable" name=tdesign:setting-1 @click.stop="show = true" />
     </div>
-    <el-dialog v-model="show" width="500px" append-to-body>
+    <el-dialog v-model="show" width="500px" append-to-body destroy-on-close>
       <template #header>
         <span class="text-18px color-#fff font-400">{{ $t('setSlippage') }}</span>
       </template>

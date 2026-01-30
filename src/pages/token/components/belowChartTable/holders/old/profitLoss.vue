@@ -4,6 +4,7 @@
     width="860"
     height="600"
     header-class="p-0!"
+    destroy-on-close
     :title="$t('transactionsDetails')"
   >
     <div v-if="userAddress" class="flex-start address mt-20px">

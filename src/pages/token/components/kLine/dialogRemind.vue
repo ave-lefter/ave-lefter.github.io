@@ -4,6 +4,7 @@
     width="640px"
     class="dialog-box dialog-max dialog-remind dialog"
     @close="visible = false"
+    destroy-on-close
     append-to-body
   >
     <template #header>

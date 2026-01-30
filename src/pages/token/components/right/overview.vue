@@ -244,6 +244,7 @@
         header-class="p-0! pl-20px! p-0!"
         :title="$t('tokenAnalysis')"
         append-to-body
+        destroy-on-close
         lock-scroll
       >
         <iframe

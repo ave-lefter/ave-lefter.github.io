@@ -14,6 +14,7 @@
     class="search-dialog"
     header-class="p-0! pl-20px! p-0!"
     :title="$t('holderBubble')"
+    destroy-on-close
     @opened="openDialog"
 
   >

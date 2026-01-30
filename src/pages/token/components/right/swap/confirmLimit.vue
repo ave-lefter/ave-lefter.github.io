@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="show" width="446px">
+  <el-dialog v-model="show" width="446px" destroy-on-close>
     <template #header>
       <template v-if="activeShow === 1">
         <span v-if="limitInfo.orderType === 0">{{ limitInfo.activeTab === 0 ? $t('limitBuy') : $t('limitSell')  }}</span>

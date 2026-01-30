@@ -242,7 +242,7 @@
     </template>
     <el-dialog
       v-if="dialogVisible" v-model="dialogVisible"
-      width="480px" append-to-body class="text-[--main-text]"
+      width="480px" append-to-body class="text-[--main-text]" destroy-on-close
     >
       <template #header>
         <span class="font-500 text-20px lh-28px tracking-0px" >{{ t('resetGoogleAuthTitle') }}</span>

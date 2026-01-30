@@ -274,7 +274,7 @@ function openTokenDetail(el: IActionV3Item) {
       />
     </template>
   </el-drawer>
-  <el-dialog v-model="actionDialogVisible" :title="$t('smartMoneyAddress')" width="540px">
+  <el-dialog v-model="actionDialogVisible" :title="$t('smartMoneyAddress')" width="540px" destroy-on-close>
     <div class="flex color-[--third-text] text-12px mb-8px mt-16px">
       <div class="flex-[2]">
         {{ $t('wallet') }}

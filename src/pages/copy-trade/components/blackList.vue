@@ -7,7 +7,7 @@
     >
       查看详情
     </span>
-    <el-dialog v-model="visible" :title="t('blackManage')" width="540px" @close="closeDialog">
+    <el-dialog v-model="visible" :title="t('blackManage')" width="540px" destroy-on-close @close="closeDialog" >
       <div class="flex flex-col gap-10px pt-0">
         <el-input
           v-model="query.q"

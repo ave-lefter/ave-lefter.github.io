@@ -102,7 +102,7 @@
                     </div>
                   </template>
                   <div class="font-400 text-12px lh-16px flex flex-col gap-4px text-center">
-                    <div class="flex items-center justify-center  px-10px py-4px"> 
+                    <div class="flex items-center justify-center  px-10px py-4px">
                       <Icon v-if="item.amm === 'unknown'" name="tdesign:help-circle-filled" class="mr-5px color-#848E9C text-20px" />
                       <div v-else class="inline-flex">
                         <img
@@ -139,7 +139,7 @@
       </button>
     </div>
   </template>
-  <el-dialog v-model="visible" width="600px" :title="'LP ' + $t('holdersDetail')" append-to-body>
+  <el-dialog v-model="visible" width="600px" :title="'LP ' + $t('holdersDetail')" append-to-body destroy-on-close>
     <LPHolders />
   </el-dialog>
 

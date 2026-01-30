@@ -58,6 +58,7 @@ const Component = computed(() => {
     :show-close="true"
     align-center
     width="720px"
+    destroy-on-close
     :class="`${theme} [--el-message-close-size:24px] favDialog2`"
   >
     <!-- <div

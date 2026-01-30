@@ -7,6 +7,7 @@
     }"
     :show-close="false"
     modal-class="modal-layer"
+    destroy-on-close
     @close="startExperience"
   >
     <!--    初始弹窗  -->

@@ -119,6 +119,7 @@
       :close-on-click-modal="false"
       :popper-style="{ padding: '20px', 'border-radius': '8px' }"
       :show-close="false"
+      destroy-on-close
     >
       <template #header>
         <div class="flex-between">

@@ -102,7 +102,7 @@ function handleSelectChild(childItem, renderKey:string) {
         <span class="text-12px ml-2px shrink-0">{{ $t('custom') }}</span>
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" align-center append-to-body :title="$t('customizeScreener')" width="820">
+    <el-dialog v-model="dialogVisible" align-center append-to-body :title="$t('customizeScreener')" width="820" destroy-on-close>
       <div class="flex flex-col gap-20px pt-20px pb-20px border-t border-t-solid border-t-[--border]">
         <div class="cursor-pointer flex items-center" @click="hotSettings.avatar_isCircle = ({circle:'rect',rect:'circle'})[hotSettings.avatar_isCircle]">
           <template v-if="hotSettings.avatar_isCircle === 'circle'">

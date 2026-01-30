@@ -57,6 +57,7 @@
       append-to-body
       :close-on-click-modal="false"
       :show-close="false"
+      destroy-on-close
     >
       <template #header>
         <div class="flex-between">
