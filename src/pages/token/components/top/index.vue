@@ -272,6 +272,7 @@
             popper-class="chains-table-filter"
             title=""
             :width="200"
+            :persistent="false"
             trigger="click"
           >
             <template #reference>
@@ -346,6 +347,7 @@
             placement="bottom"
             popper-class="chains-table-filter"
             title=""
+            :persistent="false"
             :width="200"
             trigger="click"
           >
@@ -581,7 +583,7 @@
             </span>
           </div>
           <top50 />
-          <el-popover width="120px" popper-class="[--el-popover-bg-color:--border] !min-w-[120px]">
+          <el-popover width="120px" popper-class="[--el-popover-bg-color:--border] !min-w-[120px]" :persistent="false">
             <template #reference>
               <span
                 class="media-item bg-btn cursor-pointer"
@@ -827,6 +829,7 @@ import Check from './check.vue'
 import DeBox from './deBox.vue'
 import XPopup from '~/components/xPopup/index.vue'
 import XIcon from '~/components/xPopup/xIcon.vue'
+import Collect from '~/components/collect.vue'
 import {
   getSymbolDefaultIcon,
   getChainDefaultIcon,

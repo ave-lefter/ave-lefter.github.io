@@ -1405,7 +1405,7 @@ export function processTwitterText(text: string): string {
   html = html.replace(mentionRegex, (match: string, username: string, offset: number) => {
     // 检查当前位置是否在 <a> 标签内
     // 从字符串开头到当前位置
-    const beforeMatch = html.substring(0, offset)
+    const beforeMatch = html.slice(0, offset)
     const lastOpenTag = beforeMatch.lastIndexOf('<a')
     const lastCloseTag = beforeMatch.lastIndexOf('</a>')
 
@@ -1422,7 +1422,7 @@ export function processTwitterText(text: string): string {
   html = html.replace(hashtagRegex, (match: string, hashtag: string, offset: number) => {
     // 检查当前位置是否在 <a> 标签内
     // 从字符串开头到当前位置
-    const beforeMatch = html.substring(0, offset)
+    const beforeMatch = html.slice(0, offset)
     const lastOpenTag = beforeMatch.lastIndexOf('<a')
     const lastCloseTag = beforeMatch.lastIndexOf('</a>')
 

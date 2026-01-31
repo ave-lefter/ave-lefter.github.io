@@ -595,7 +595,7 @@ onMounted(() => {
   } else {
     initGoogleLogin()
   }
-  initCaptcha()
+  // initCaptcha()
 })
 
 watch(

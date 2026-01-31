@@ -260,7 +260,7 @@ function openTokenDetail(el: IActionV3Item) {
       {{ $t('loading') }}
     </div>
   </el-scrollbar>
-  <el-drawer v-model="visible" append-to-body :size="480">
+  <el-drawer v-model="visible" append-to-body :size="480" destroy-on-close>
     <template #header>
       <span class="color-[--main-text] text-20px">{{ $t('SignalDetail') }}</span>
     </template>

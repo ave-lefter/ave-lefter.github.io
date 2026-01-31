@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage, useThrottleFn } from '@vueuse/core'
+import { useStorage } from '@vueuse/core'
 import { getTokenInfo, getTokenInfoExtra } from '~/api/token'
 import { useTokenStore } from '~/stores/token'
 import Top from './components/top/index.vue'
@@ -283,13 +283,16 @@ function _getTokenInfoExtra() {
   })
 }
 
-function init(isRefresh = false) {
+function init(
+  // isRefresh = false
+) {
   tokenStore.tokenPrice = 0
-  _getTokenInfo().then(() => {
-    if (!isRefresh) {
-      addVisit()
-    }
-  })
+  _getTokenInfo()
+  // .then(() => {
+  //   if (!isRefresh) {
+  //     addVisit()
+  //   }
+  // })
   _getTokenInfoExtra()
   // wsStore.onmessageTxUpdateToken()
   tokenStore._getTotalHolders(route.params.id as string)
@@ -343,31 +346,31 @@ onBeforeRouteLeave(() => {
 })
 
 function refresh() {
-  init(true)
+  init()
 }
 
-function addVisit() {
-  if (tokenStore.tokenInfo) {
-    const { logo_url, symbol, chain, token } = tokenStore.tokenInfo.token
-    const index = globalStore.lastVisitTokens.findIndex((item) => item.id === token + '-' + chain)
-    if (index === -1) {
-      if (globalStore.lastVisitTokens.length >= 20) {
-        globalStore.lastVisitTokens.pop()
-      }
-      globalStore.lastVisitTokens.unshift({
-        id: token + '-' + chain,
-        logo_url,
-        symbol,
-        price_change: tokenStore.priceChange,
-        price_change_v2: tokenStore.priceChangeV2,
-        circulation: tokenStore.circulation.toString(),
-        price: tokenStore.price || 0,
-      })
-    }
+// function addVisit() {
+//   if (tokenStore.tokenInfo) {
+//     const { logo_url, symbol, chain, token } = tokenStore.tokenInfo.token
+//     const index = globalStore.lastVisitTokens.findIndex((item) => item.id === token + '-' + chain)
+//     if (index === -1) {
+//       if (globalStore.lastVisitTokens.length >= 20) {
+//         globalStore.lastVisitTokens.pop()
+//       }
+//       globalStore.lastVisitTokens.unshift({
+//         id: token + '-' + chain,
+//         logo_url,
+//         symbol,
+//         price_change: tokenStore.priceChange,
+//         price_change_v2: tokenStore.priceChangeV2,
+//         circulation: tokenStore.circulation.toString(),
+//         price: tokenStore.price || 0,
+//       })
+//     }
 
-    usePriceV2Store().sendPriceWs()
-  }
-}
+//     usePriceV2Store().sendPriceWs()
+//   }
+// }
 
 const klineContainerRef = useTemplateRef('klineContainer')
 const centerScroll = ({ scrollTop }: { scrollTop: number }) => {

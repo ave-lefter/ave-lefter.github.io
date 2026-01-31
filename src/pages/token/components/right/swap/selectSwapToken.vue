@@ -9,7 +9,7 @@
     <div v-else>{{ $t('pleaseSelectToken') }}</div>
     <Icon class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
   </button>
-  <el-dialog v-model="show"	 append-to-body class="new-dialog" width="420px" destroy-on-close>
+  <el-dialog v-if="show" v-model="show"	 append-to-body class="new-dialog" width="420px" destroy-on-close>
     <template #header>
       <span class="text-20px font-500">{{ t('selectToken') }}</span>
     </template>

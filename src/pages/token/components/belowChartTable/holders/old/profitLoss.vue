@@ -1,5 +1,6 @@
 <template>
   <el-dialog
+    v-if="visible"
     v-model="visible"
     width="860"
     height="600"
