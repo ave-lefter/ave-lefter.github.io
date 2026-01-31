@@ -152,7 +152,7 @@ function dragOrderBook(e: MouseEvent) {
   isDraggingOrderBook = true
 
   // 禁用图表交互，设置全局光标与禁选中，提升体验
-  const chartContainer = document.getElementById('tv_chart_container')
+  let chartContainer = document.getElementById('tv_chart_container')
   chartContainer && (chartContainer.style.pointerEvents = 'none')
   const prevCursor = document.body.style.cursor
   const prevUserSelect = document.body.style.userSelect
@@ -182,6 +182,7 @@ function dragOrderBook(e: MouseEvent) {
     window.removeEventListener('mousemove', onMove)
     window.removeEventListener('mouseup', onUp)
     chartContainer && (chartContainer.style.pointerEvents = 'auto')
+    chartContainer = null
     document.body.style.cursor = prevCursor
     document.body.style.userSelect = prevUserSelect
   }
