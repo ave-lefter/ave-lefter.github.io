@@ -1,6 +1,7 @@
 <template>
   <el-popover
     v-model:visible="selectWalletVisible"
+    :persistent="false"
     placement="bottom"
     width="305"
     trigger="click"
@@ -94,14 +95,6 @@ const allWallets = computed(() => {
 const walletList = computed(() => {
   const _walletList = botStore.walletList?.slice?.(0)
   return _walletList?.sort?.((a) => a.evmAddress === botStore.evmAddress ? -1 : 1) || []
-})
-
-watch(() => botStore.evmAddress, (val) => {
-  if (val) {
-    botSwapStore.botSwapSelectedWallets = [val || '']
-  } else {
-    botSwapStore.botSwapSelectedWallets = []
-  }
 })
 
 const totalSelectWalletBalance = computed(() => {

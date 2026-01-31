@@ -1405,7 +1405,7 @@ export function processTwitterText(text: string): string {
   html = html.replace(mentionRegex, (match: string, username: string, offset: number) => {
     // 检查当前位置是否在 <a> 标签内
     // 从字符串开头到当前位置
-    const beforeMatch = html.substring(0, offset)
+    const beforeMatch = html.slice(0, offset)
     const lastOpenTag = beforeMatch.lastIndexOf('<a')
     const lastCloseTag = beforeMatch.lastIndexOf('</a>')
 
@@ -1422,7 +1422,7 @@ export function processTwitterText(text: string): string {
   html = html.replace(hashtagRegex, (match: string, hashtag: string, offset: number) => {
     // 检查当前位置是否在 <a> 标签内
     // 从字符串开头到当前位置
-    const beforeMatch = html.substring(0, offset)
+    const beforeMatch = html.slice(0, offset)
     const lastOpenTag = beforeMatch.lastIndexOf('<a')
     const lastCloseTag = beforeMatch.lastIndexOf('</a>')
 
@@ -1462,7 +1462,13 @@ export function formatXUser(url?: string) {
     }
 
     const firstSegment = u.pathname.split('/').filter(Boolean)[0]
-    return firstSegment ? `@${firstSegment}` : ''
+
+    // ✅ 校验是否是合法用户名
+    if (!firstSegment || !/^[A-Za-z0-9_]{1,15}$/.test(firstSegment)) {
+      return ''
+    }
+
+    return `@${firstSegment}`
   } catch {
     return ''
   }

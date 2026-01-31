@@ -9,6 +9,7 @@
       placeholder="Select"
       class="mb-16px"
       size="large"
+      :persistent="false"
     >
       <template #prefix>
         <div class="color-[--third-text]">{{ $t('token') }}</div>
@@ -36,6 +37,7 @@
       placeholder="Select"
       style="width: 100%;"
       size="large"
+      :persistent="false"
     >
       <template #prefix>
         <div class="color-[--third-text]">{{ $t('chain1') }}</div>

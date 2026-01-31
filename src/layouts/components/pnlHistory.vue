@@ -13,6 +13,7 @@ defineProps<{
     align-center
     :title="$t('PnlHistory')"
     width="420px"
+    destroy-on-close
     :close-on-click-modal="false"
   >
     <div class="mx--20px border-t-1px border-t-solid border-[--dialog-divider]" />

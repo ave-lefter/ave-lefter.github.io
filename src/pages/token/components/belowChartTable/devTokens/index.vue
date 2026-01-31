@@ -205,7 +205,7 @@ async function getRugPullList() {
             total_non_migrated,
             total_tokens
         }
-        tokenStore.devTokenNum = total_tokens || 0
+        // tokenStore.devTokenNum = total_tokens || 0
         const list =
             res?.infos?.map((i: any) => ({
                 ...i,

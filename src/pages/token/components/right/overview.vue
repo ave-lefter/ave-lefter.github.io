@@ -216,6 +216,7 @@
         </div>
       </div>
       <el-dialog
+        v-if="dialog_bubble"
         v-model="dialog_bubble"
         width="50vw"
         align-center
@@ -236,6 +237,7 @@
         />
       </el-dialog>
       <el-dialog
+        v-if="dialog_analysis"
         v-model="dialog_analysis"
         width="80vw"
         align-center
@@ -244,6 +246,7 @@
         header-class="p-0! pl-20px! p-0!"
         :title="$t('tokenAnalysis')"
         append-to-body
+        destroy-on-close
         lock-scroll
       >
         <iframe

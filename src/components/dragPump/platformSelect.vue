@@ -16,7 +16,7 @@ const platformsList = computed(() => {
 </script>
 
 <template>
-  <el-popover v-model:visible="visible_platforms" placement="bottom-start" trigger="click">
+  <el-popover v-model:visible="visible_platforms" :persistent="false" placement="bottom-start" trigger="click">
     <template #reference>
       <div
         class="bg-[--d-151A22-l-E8F1FF] rounded-4px px-8px py-2px flex items-center text-12px cursor-pointer drag-cancel"

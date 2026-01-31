@@ -21,7 +21,8 @@ export const usePriceV2Store = defineStore('pricev2', () => {
           .concat(value.gainer)
           .concat(useBotSwapStore().mainTokensPriceIds)
           .concat(useGlobalStore().footerTokensPriceIds)
-          .concat(useGlobalStore().lastVisitTokens.map(i=>i.id)))
+        //   .concat(useGlobalStore().lastVisitTokens.map(i=>i.id))
+            )
         )
         wsStore.send({
             jsonrpc: '2.0',

@@ -8,12 +8,14 @@
     <Icon name="custom:bubble" class="color-[--third-text] icon-bubble" />
   </a>
   <el-dialog
+    v-if="show_bubble"
     v-model="show_bubble"
     width="860"
     height="600"
     class="search-dialog"
     header-class="p-0! pl-20px! p-0!"
     :title="$t('holderBubble')"
+    destroy-on-close
     @opened="openDialog"
 
   >

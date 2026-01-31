@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { GetUserFavoriteGroupsResponse } from '~/api/fav'
+import CollectForm from './collectForm.vue'
 
 const props = defineProps<{
     iconClass?: string
@@ -12,11 +13,9 @@ const emit = defineEmits<{
     (e: 'newGroupAndCollect',newGroupName:string): void
 }>()
 
-const activeGroupId = ref(0)
-const newGroupName = ref('')
-const inputVisible = ref(false)
-const popoverVisible = ref(false)
-const confirmLoading = ref(false)
+const { $popover } = useNuxtApp()
+const target = ref<HTMLElement | null>(null)
+
 const {t} = useI18n()
 const userFavoriteGroupsWithDefault = computed(()=>{
     return [{
@@ -25,77 +24,71 @@ const userFavoriteGroupsWithDefault = computed(()=>{
     }].concat(props.userFavoriteGroups)
 })
 
-function changeVisible(value:boolean) {
-  if (value) {
-    if(!verifyLogin()){
-        return
-    }
-    if(props.isCollected){
-        emit('collect')
-    } else {
-        popoverVisible.value = true
-    }
-  } else {
-    popoverVisible.value = false
+const popoverVisible = ref(false)
+
+const hide = () => {
+  $popover?.hide()
+}
+
+const onEnter = (e: MouseEvent) => {
+  const el = e.target as HTMLElement
+  if (target.value !== el) {
+    hide()
+    target.value = el
   }
-}
 
-// function clickStar() {
-//     if(!verifyLogin()){
-//         return
-//     }
-//     if(props.isCollected){
-//         emit('collect')
-//     } else {
-//         popoverVisible.value = true
-//     }
-// }
-
-const onConfirm = () => {
-    // 如果未关注，则关注
-    if(newGroupName.value){
-        const hasNewGroup = userFavoriteGroupsWithDefault.value.find(item => item.name === newGroupName.value)
-        if(hasNewGroup){
-            ElMessage.error(t('groupNameAlreadyExists'))
+  $popover?.show({
+    target: el,
+    content: {
+      is: CollectForm,
+      props: {
+        userFavoriteGroupsWithDefault: userFavoriteGroupsWithDefault.value,
+        onNewGroupAndCollect: (groupName: string) => {
+          emit('newGroupAndCollect', groupName)
+        },
+        onCollect: (groupId: number) => {
+          emit('collect', groupId)
+        },
+        onHide: hide
+      }
+    },
+    props: {
+      placement: 'right',
+      width: '250',
+      trigger: 'click',
+      persistent: false,
+      'popper-class': '[&&]:[--el-popover-padding:0]',
+      visible: popoverVisible.value,
+      'onUpdate:visible': (value: boolean) => {
+        if (value) {
+          if(!verifyLogin()){
             return
+          }
+          if(props.isCollected){
+            emit('collect')
+            return
+          }
         }
-        // 新建分组并关注
-        emit('newGroupAndCollect',newGroupName.value)
-    } else {
-        emit('collect',activeGroupId.value)
+      }
     }
-    hidePopover()
+  })
 }
 
-const isMounted = ref(false)
-
-onMounted(()=>{
-    isMounted.value = true
-})
-
-onUnmounted(()=>{
-    isMounted.value = false
-})
-
-function hidePopover() {
-    popoverVisible.value = false
-    newGroupName.value = ''
-    inputVisible.value = false
-}
-
-function changeActiveGroupId(groupId:number) {
-    activeGroupId.value = groupId
-    newGroupName.value = ''
-}
 </script>
 
 <template>
-    <el-popover v-if="isMounted" :visible="popoverVisible" @update:visible="e => changeVisible(e)" :teleported="true" :persistent="false" popper-class="[&&]:[--el-popover-padding:0]"
+    <Icon
+      name="custom:star"
+      :class="`${iconClass} ${isCollected ? 'color-[--yellow]' : 'color-[--icon-color]'}`"
+      @click.stop.prevent @mouseover.stop="onEnter"
+  />
+    <!-- <el-popover :persistent="false" popper-class="[&&]:[--el-popover-padding:0]" :visible="popoverVisible"
         trigger="click" width="248px">
         <template #reference>
             <Icon
                 name="custom:star"
                 :class="`${iconClass} ${isCollected ? 'color-[--yellow]' : 'color-[--icon-color]'}`"
+                @click.self.stop="clickStar"
             />
         </template>
         <template #default>
@@ -117,5 +110,5 @@ function changeActiveGroupId(groupId:number) {
                 </div>
             </div>
         </template>
-    </el-popover>
+    </el-popover> -->
 </template>

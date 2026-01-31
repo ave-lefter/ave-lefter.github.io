@@ -50,12 +50,12 @@ const activeHeight = computed(() => {
         {{ item.name }}
       </a>
     </div>
-    <KeepAlive v-if="botStore.evmAddress||walletStore.address">
+    <template v-if="botStore.evmAddress || walletStore.address">
       <component
         :is="Component"
         :height="activeHeight"
       />
-    </KeepAlive>
+    </template>
     <AveEmpty
       v-else
       :style="{height:`${props.height-50}px`}"

@@ -1,4 +1,4 @@
-// stores/theme.ts
+// stores/toke.ts
 import {useSessionStorage, useLocalStorage, useWindowSize} from '@vueuse/core'
 import { defineStore } from 'pinia'
 import type { TokenInfo, TokenInfoExtra } from '~/api/types/token'
@@ -83,7 +83,8 @@ export const useTokenStore = defineStore('token', () => {
   watch(price, val => {
     if (val) {
       if (route.fullPath?.includes?.('/token')) {
-        useHead({ title: '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave' })
+        // useHead({ title: '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave' })
+        document.title = '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave'
       }
     }
   })

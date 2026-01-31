@@ -8,7 +8,7 @@ const audioVisible = ref(false)
 const pumpStore = usePumpStore()
 </script>
 <template>
-    <el-popover v-model:visible="audioVisible" trigger="click" popper-class="el-select__popper">
+    <el-popover v-model:visible="audioVisible" trigger="click" popper-class="el-select__popper" :persistent="false">
         <template #reference>
               <div
               class="bg-[--main-input-button-bg] py-4px px-10px rounded-4px mr-4px color-[--third-text] cursor-pointer  hover:color-[--d-F5F5F5-l-333]"

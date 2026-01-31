@@ -61,7 +61,7 @@
                 :class="index !== -1 ? 'ml-40px' : ''" class="relative">
                 <!-- <img :src="media.media_url_https" alt="" class="max-w-full rounded-8px cursor-pointer"> -->
                 <el-tooltip :ref="el => { if (el) tooltipRefs[`${mediaIndex}`] = el }" popper-class="tooltip-pd-0"
-                    :show-arrow="false" placement="right" :popper-options="{
+                    :show-arrow="false" placement="right" :persistent="false" :popper-options="{
                         modifiers: [
                             {
                                 name: 'eventListeners',
@@ -147,6 +147,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     window.removeEventListener('resize', checkContentOverflow)
+    tooltipRefs.value = {}
 })
 
 watch(() => props.item?.content, () => {

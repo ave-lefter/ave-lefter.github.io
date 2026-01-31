@@ -197,17 +197,17 @@ function init() {
   init2()
   isInitialized.value = true
 }
-onActivated(() => {
-  console.log('activated')
-  init()
-})
+// onActivated(() => {
+//   console.log('activated')
+//   init()
+// })
 
-onDeactivated(() => {
-  if(timer){
-    clearTimeout(timer)
-  }
-  isInitialized.value = false
-})
+// onDeactivated(() => {
+//   if(timer){
+//     clearTimeout(timer)
+//   }
+//   isInitialized.value = false
+// })
 onUnmounted(() => {
   if(timer){
     clearTimeout(timer)
