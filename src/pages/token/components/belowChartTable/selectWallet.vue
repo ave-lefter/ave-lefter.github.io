@@ -4,6 +4,7 @@
     placement="bottom"
     width="305"
     trigger="click"
+    :persistent="false"
     popper-class="[&&]:[--el-popover-padding:0]"
     :popper-options="{ modifiers: [{ name: 'preventOverflow', options: { boundary: boundary, padding: 0 } }] }"
   >
