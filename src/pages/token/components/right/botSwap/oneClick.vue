@@ -481,11 +481,10 @@ function enableDragScroll() {
   const label = document.querySelector('.fixed-one-click') as HTMLElement
   if (!label) return
 
-  // 1. 从本地存储读取历史位置 (Persistence)
+  // 1. 读取位置
   const savedPos = localStorage.getItem('fixed-one-click-position')
   const initialOffset = savedPos ? JSON.parse(savedPos) : { x: 0, y: 0 }
 
-  // 2. 初始化坐标状态
   let currentX = initialOffset.x
   let currentY = initialOffset.y
   let startX = 0, startY = 0
@@ -500,13 +499,13 @@ function enableDragScroll() {
     zIndex: 'auto',
     outline: 'none',
     willChange: 'transform',
-    // 关键：初始化时立即应用保存的位置
     transform: `translate3d(${currentX}px, ${currentY}px, 0)`
   })
 
+  // 遮罩层
   const mask = document.createElement('div')
   Object.assign(mask.style, {
-    position: 'fixed', inset: '0', zIndex: '3013',
+    position: 'fixed', inset: '0', zIndex: '9998',
     cursor: 'grabbing', display: 'none', background: 'transparent'
   })
   document.body.appendChild(mask)
@@ -525,8 +524,6 @@ function enableDragScroll() {
     mask.style.display = 'none'
     label.style.cursor = 'grab'
 
-    // 3. 存储相对于初始位置的偏移量，而不是 getBoundingClientRect 的绝对值
-    // 这样可以避免在不同分辨率屏幕切换时位置错乱
     localStorage.setItem('fixed-one-click-position', JSON.stringify({
       x: currentX,
       y: currentY
@@ -535,7 +532,6 @@ function enableDragScroll() {
 
   label.onmousedown = (e) => {
     isDragging = true
-    // 计算点击点相对于当前元素偏移位置的差值
     startX = e.clientX - currentX
     startY = e.clientY - currentY
 
@@ -549,8 +545,25 @@ function enableDragScroll() {
 
   mousemoveEvent = (e: MouseEvent) => {
     if (!isDragging) return
-    currentX = e.clientX - startX
-    currentY = e.clientY - startY
+
+    const nextX = e.clientX - startX
+    const nextY = e.clientY - startY
+
+    // 核心：边界溢出检测
+    const rect = label.getBoundingClientRect()
+    // 获取元素不带 transform 时的原始偏移位置
+    const initialLeft = rect.left - currentX
+    const initialTop = rect.top - currentY
+
+    // 计算限制范围（视口宽高减去元素尺寸）
+    const minX = -initialLeft
+    const maxX = window.innerWidth - initialLeft - rect.width
+    const minY = -initialTop
+    const maxY = window.innerHeight - initialTop - rect.height
+
+    // 限制 currentX 和 currentY
+    currentX = Math.max(minX, Math.min(nextX, maxX))
+    currentY = Math.max(minY, Math.min(nextY, maxY))
   }
 
   label.onblur = mouseupEvent
