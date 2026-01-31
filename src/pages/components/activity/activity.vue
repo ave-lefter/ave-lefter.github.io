@@ -307,6 +307,7 @@ function initCache() {
 <template>
   <div v-loading="loading" :style="`height:${height}`">
     <AveTable
+      :key="activeTab"
       row-key="pair_id"
       :loading="loading"
       :data="filteredListData"
@@ -323,7 +324,6 @@ function initCache() {
       <template v-for="item in visibleColumns" :key="item.key" #[`header-${item.key}`]>
         <component
           :is="headerRenderer[item.key as keyof typeof headerRenderer]"
-          :key="activeTab"
           :sortConditions="rankConditions[activeTab]?.sort"
           :setSortConditions="setSortConditions"
           :setFilterForm="setFilterForm"
