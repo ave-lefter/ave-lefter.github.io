@@ -134,9 +134,9 @@
 </template>
 
 <script setup name="trackerPop">
-import { useDebounceFn } from '@vueuse/core'
+import { useStorage } from '@vueuse/core'
 import TwitterTrackerList from './list.vue'
-import { getTwitterById, getTwitterList } from '~/api/twitter'
+import { getAllFollowIds, getTwitterList } from '~/api/twitter'
 import { useV2WSStore } from '~/stores/v2ws'
 const emits = defineEmits(['setDrawerVisible'])
 const { t } = useI18n()
@@ -148,6 +148,7 @@ const activeTab = ref(1)
 const filterVisible = ref(false)
 
 const twitterAudio = useTemplateRef('twitterAudio')
+const followIds = useStorage('twFollowIds', [])
 const query = ref({ ...trackerStore.query })
 defineProps({
   scrollHeight: {
@@ -160,6 +161,9 @@ const TAB_TYPE = {
   HOT: 1,
   MINE: 2,
 }
+const followAuthorIds = computed(() => {
+  return followIds.value.map(el => el.author_id)
+})
 const tabs = computed(() => [
   { label: t('hot2'), value: TAB_TYPE.HOT },
   { label: t('mine'), value: TAB_TYPE.MINE },
@@ -199,12 +203,22 @@ const setActiveTab = (value) => {
   getList()
 }
 
+const _getAllFollowIds = async () => {
+  const res = await getAllFollowIds()
+  followIds.value = res.authors || []
+}
 watch(()=>botStore.accessToken,val=>{
   if(val && isMine.value){
     reset()
     getList()
   }
+  if (val) {
+    _getAllFollowIds()
+  }
 })
+if (botStore.accessToken) {
+  _getAllFollowIds()
+}
 
 const confirmQuery = () => {
   filterVisible.value = false
@@ -249,7 +263,6 @@ const getList = async () => {
 
 getList()
 
-const tgUid = computed(() => botStore.userInfo?.tgUid)
 function subscribePublicTwitter(method) {
   v2WsStore.send({
     jsonrpc: '2.0',
@@ -259,45 +272,27 @@ function subscribePublicTwitter(method) {
   })
 }
 
-function subscribeTwitter(method) {
-  console.log('subscribeTwitter', method)
-  v2WsStore.send({
-    jsonrpc: '2.0',
-    method,
-    params: ['twitter_monitor',...(tgUid.value ? [tgUid.value] : [])],
-    id: 1,
-  })
-}
-
 subscribePublicTwitter('subscribe')
-watch(()=>activeTab.value,val=>{
-  if(val === TAB_TYPE.MINE){
-    subscribePublicTwitter('unsubscribe')
-    subscribeTwitter('subscribe')
-  } else {
-    subscribeTwitter('unsubscribe')
-    subscribePublicTwitter('subscribe')
-    
-  }
-})
 
 const twitterHandler = async(val) => {
-    if(val.TweetId && query.value.types.includes(+val.Type)){
-      const res = await getTwitterById(val.TweetId)
-      trackerStore.list.unshift(res)
-      if (trackerStore.list.length > 100) {
-        trackerStore.list = trackerStore.list.slice(0, 100)
-      }
-      if (twitterAudio.value && globalStore.audioSettings.audio.twitter) {
-        twitterAudio.value.play()
-      }
+  if (query.value.types.includes(+val.type)) {
+    if (isMine.value && !followAuthorIds.value.includes(val.author_id)) {
+      return
+    }
+    val.follow_status = followAuthorIds.value.includes(val.author_id) ? 1 : 0
+    trackerStore.list.unshift(val)
+    if (trackerStore.list.length > 100) {
+      trackerStore.list.pop()
+    }
+    if (twitterAudio.value && globalStore.audioSettings.audio.twitter) {
+      twitterAudio.value.play()
     }
   }
+}
 watch(
   () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],
   twitterHandler
 )
-watch(()=>v2WsStore.wsResult[WSEventV2Type.TWITTER_MONITOR],twitterHandler)
 </script>
 
 <style scoped lang="scss"></style>

@@ -102,6 +102,7 @@
     </div>
 </template>
 <script setup name="twitterTrackerListItem">
+import { useStorage } from '@vueuse/core'
 import { followKol, unfollowKol } from '~/api/twitter'
 import { processTwitterText } from '~/utils'
 const trackerStore = useTwitterTrackerStore()
@@ -124,6 +125,7 @@ const contentEl = ref(null)
 const measureEl = ref(null)
 const contentExpanded = ref(false)
 const isContentOverflow = ref(false)
+const followIds = useStorage('twFollowIds', [])
 
 // 处理后的内容，包含可点击的链接
 const processedContent = computed(() => {
@@ -166,6 +168,7 @@ const _followKol = async (author_id, index) => {
         await followKol(author_id)
         ElMessage.success(t('followed'))
         trackerStore.list[index].author.follow_status = 1
+        followIds.value = followIds.value.concat({ author_id })
     } catch (error) {
         ElMessage.error(t('failed'))
         console.error('Error following KOL:', error)
@@ -177,6 +180,7 @@ const _unfollowKol = async (author_id, index) => {
         await unfollowKol(author_id)
         ElMessage.success(t('cancelFollowed'))
         trackerStore.list[index].author.follow_status = 0
+        followIds.value = followIds.value.filter(el => el.author_id !== author_id)
     } catch (error) {
         ElMessage.error(t('failed'))
         console.error('Error unfollowing KOL:', error)

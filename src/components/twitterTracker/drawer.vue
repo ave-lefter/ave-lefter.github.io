@@ -108,7 +108,7 @@
   </el-drawer>
 </template>
 <script setup name="twitterTrackerDrawer">
-import { useDebounceFn } from '@vueuse/core'
+import { useDebounceFn, useLocalStorage } from '@vueuse/core'
 import {
   followKol,
   getFollowKolList,
@@ -140,6 +140,7 @@ const loading = ref(false)
 const finished = ref(false)
 const list = ref([])
 const activeTab = ref(1)
+const followIds = useLocalStorage('twFollowIds', [])
 const TAB_TYPE = {
   HOT: 1,
   MINE: 2,
@@ -241,6 +242,7 @@ const _followKol = async (author_id, index) => {
     ElMessage.success(t('followed'))
     list.value[index].follow_status = 1
     updateStoreStatus(author_id, 1)
+    followIds.value = followIds.value.concat({ author_id })
   } catch (error) {
     ElMessage.error(t('failed'))
     console.error('Error following KOL:', error)
@@ -257,6 +259,7 @@ const _unfollowKol = async (author_id, index) => {
       list.value[index].follow_status = 0
     }
     updateStoreStatus(author_id, 0)
+    followIds.value = followIds.value.filter(el => el.author_id !== author_id)
   } catch (error) {
     ElMessage.error(t('failed'))
     console.error('Error unfollowing KOL:', error)
@@ -296,6 +299,7 @@ const deleteAll = () => {
     await unfollowAll()
     ElMessage.success(t('success'))
     list.value = []
+    followIds.value = []
   })
 }
 
