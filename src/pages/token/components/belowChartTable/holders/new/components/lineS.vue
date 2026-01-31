@@ -251,22 +251,22 @@ watch(
   }
 )
 
-// watch(() => props.loading, val => {
-//   const chart = echarts.getInstanceByDom(document.getElementById(chartId.value))
-//   console.log('-------val---------',val)
-//   if (!chart) {
-//     return
-//   }
-//   if (val) {
-//     chart.hideLoading()
-//     chart.showLoading({
-//       maskColor: 'rgba(255, 255, 255, 0)',
-//       text: ''
-//     })
-//   } else {
-//     chart.hideLoading()
-//   }
-// })
+watch(() => props.loading, val => {
+  const chart = echarts.getInstanceByDom(document.getElementById(chartId.value))
+  console.log('-------val---------',val)
+  if (!chart) {
+    return
+  }
+  if (val) {
+    chart.hideLoading()
+    chart.showLoading({
+      maskColor: 'rgba(255, 255, 255, 0)',
+      text: ''
+    })
+  } else {
+    chart.hideLoading()
+  }
+})
 
 watch(() => props.dataList, () => {
   init()
