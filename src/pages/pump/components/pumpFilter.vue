@@ -8,6 +8,7 @@
       trigger="click"
       popper-style="padding: 10px"
       append-to-body
+      :persistent="false"
     >
       <template #reference>
         <div :class="['filter-btn', { active: visible }, filterNumber > 0 ? 'hight': '']">

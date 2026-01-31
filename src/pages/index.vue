@@ -26,6 +26,7 @@
         placement="bottom-start"
         popper-class="new-popover"
         :width="'auto'"
+        :persistent="false"
         trigger="click"
       >
         <template #reference>
@@ -160,6 +161,8 @@
             :tableList="list1 || []"
             :quickBuyValue="quickBuyValue"
             :loading="pumpV3[activeChain]['new']['loading']"
+            @mouseenter="isPausedObj.new = true"
+            @mouseleave="isPausedObj.new = false"
           />
         </div>
       </el-col>
@@ -227,6 +230,8 @@
             :quickBuyValue="quickBuyValue"
             :loading="pumpV3[activeChain]['soon']['loading']"
             isSoon
+            @mouseenter="isPausedObj.soon = true"
+            @mouseleave="isPausedObj.soon = false"
           />
         </div>
       </el-col>
@@ -295,6 +300,8 @@
             :quickBuyValue="quickBuyValue"
             :loading="pumpV3[activeChain]['graduated']['loading']"
             isOut
+            @mouseenter="isPausedObj.graduated = true"
+            @mouseleave="isPausedObj.graduated = false"
           />
         </div>
       </el-col>
@@ -563,7 +570,7 @@ function useFourmemeList(
       const set = excludeTokens()
       result = result.filter(i => !set.has(i.target_token))
     }
-    const finalList = result.slice(0, 100)
+    const finalList = result.slice(0, 50)
     if (finalList?.length > 0) {
       patchLogo(finalList)
     }
@@ -687,12 +694,12 @@ const flushPumpState = useThrottleFn(() => {
   wsUpdateTableList(pumpStateBuffer)
   subscribePortrait(pumpStateBuffer)
   pumpStateBuffer.length = 0
-}, 150)
+}, 300)
 
 watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
   if (Array.isArray(val)) {
-    pumpStateBuffer.splice(0, 0, ...val)
-    pumpStateBuffer.splice(100)
+    pumpStateBuffer.push(val)
+    pumpStateBuffer.length = 100
     flushPumpState()
   }
 })
@@ -705,7 +712,7 @@ const logoThrottled = useThrottleFn(() => {
     ...logoList.value,
   ].slice(0, 300)
   bufferLogoMap.clear()
-}, 100)
+}, 300)
 
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED],
@@ -726,31 +733,46 @@ watch(
 )
 
 
+
 const flushStatistics = useThrottleFn(() => {
   if (!mapStatistics.value.size || !documentVisible.value) return
   triggerRef(mapStatistics)
-
 }, 300)
+
+const MAX_SIZE = 100
+
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
   (val) => {
-    if (!Array.isArray(val) || !val.length ) return
-    val.forEach((item: any) => {
+    if (!Array.isArray(val) || !val.length) return
+
+    // 先收集所有新 token
+    const newTokens = new Set<string>()
+    for (const item of val) {
+      newTokens.add(item.token)
       const prev = mapStatistics.value.get(item.token)
-      mapStatistics.value.set(
-        item.token,
-        prev ? mergeStatistics(prev, item) : item
-      )
-    })
-    if (mapStatistics.value.size > 100) {
-      const firstKey = mapStatistics.value.keys().next().value
-      if (firstKey) {
-        mapStatistics.value.delete(firstKey)
+      if (prev) {
+        // 更新原对象属性，避免创建新对象
+        mergeStatistics(prev, item)
+      } else {
+        mapStatistics.value.set(item.token, item)
       }
     }
+
+    // 保持 Map 大小不超过 MAX_SIZE
+    while (mapStatistics.value.size > MAX_SIZE) {
+      const firstKey = mapStatistics.value.keys().next().value
+      if (!firstKey) break
+      if (!newTokens.has(firstKey)) mapStatistics.value.delete(firstKey)
+      else break
+    }
+
     flushStatistics()
-  }
+  },
+  { deep: false }
 )
+
+
 
 const getChangedValue = (A: string[], B: string[]): string | null => {
   for (let i = 0; i < A.length; i++) {
@@ -775,7 +797,6 @@ onActivated(() => {
   }
   mapStatistics.value.clear()
   pumpStateBuffer.length = 0
-  document.addEventListener('mousemove', mouseInsideTxs)
   getPumpConfig()
   getPumpList()
   wsv2Store.send({
@@ -802,7 +823,7 @@ onActivated(() => {
 
 onDeactivated(()=>{
   isLeave = true
-  document.removeEventListener('mousemove', mouseInsideTxs)
+
   wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
@@ -819,13 +840,13 @@ onDeactivated(()=>{
 
   wsTableListCache = {}
   wsTableList.value = []
-  logoList.value = []
-
   isInitObj = {
     new: true,
     soon: true,
     graduated: true
   }
+  logoList.value = []
+  bufferLogoMap.clear()
   mapStatistics.value.clear()
   pumpStateBuffer.length = 0
 
@@ -876,40 +897,6 @@ const unsubscribePortrait = () => {
   })
   // isPortraitSubscribed = false
 }
-
-const mouseInsideTxs = throttle(function (event) {
-    const element1 = document.querySelector('.pump-item_list-new')
-    const element2 = document.querySelector('.pump-item_list-soon')
-    const element3 = document.querySelector('.pump-item_list-graduated')
-    if (!element1 && !element2 && !element3) return
-    if (element1) {
-    isPausedObj.value.new = getMouseInsideElement(event, element1)
-    }
-    if (element2) {
-      isPausedObj.value.soon = getMouseInsideElement(event, element2)
-    }
-    if (element3) {
-      isPausedObj.value.graduated = getMouseInsideElement(
-        event,
-        element3
-      )
-    }
-}, 100, { leading: true, trailing: true })
-
-function getMouseInsideElement(event:any, element:any) {
-  // 获取鼠标位置
-  const mouseX = event.clientX
-  const mouseY = event.clientY
-  // 获取元素的边界矩形
-  const rect = element.getBoundingClientRect()
-  return (
-    mouseX >= rect.left &&
-    mouseX <= rect.right &&
-    mouseY >= rect.top &&
-    mouseY <= rect.bottom
-  )
-}
-
 
 function wsUpdateTableList(wsList: WSPumpObj[]) {
   const c = ['new', 'soon', 'graduated'] as const
@@ -1292,7 +1279,7 @@ const documentVisible = computed(() => {
 
 
 watch(documentVisible, (val) => {
-  if (route.name !== 'index') return
+  // if (route.name !== 'index') return
   if (val) {
 
     wsv2Store.send({
@@ -1310,6 +1297,8 @@ watch(documentVisible, (val) => {
       soon: true,
       graduated: true
     }
+    logoList.value = []
+    bufferLogoMap.clear()
     mapStatistics.value.clear()
     pumpStateBuffer.length = 0
     if (portraitTimer) {
