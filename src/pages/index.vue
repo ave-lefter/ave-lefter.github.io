@@ -1208,10 +1208,10 @@ async function getPump(rawParams: {
 
   if (isInactive) return
 
-  if (!isFilter && isPaused) {
-    Timer[category] = setTimeout(() => getPump(rawParams), 5000)
-    return
-  }
+  // if (!isFilter && isPaused) {
+  //   Timer[category] = setTimeout(() => getPump(rawParams), 5000)
+  //   return
+  // }
 
   // 3. 构建参数 (浅拷贝避免污染)
   const queryParams = { ...rawParams, chain: currentChain }
