@@ -481,17 +481,29 @@ function enableDragScroll() {
   const label = document.querySelector('.fixed-one-click') as HTMLElement
   if (!label) return
 
-  // 初始化基础样式
-  label.setAttribute('tabindex', '0') // 使其可聚焦
+  // 1. 从本地存储读取历史位置 (Persistence)
+  const savedPos = localStorage.getItem('fixed-one-click-position')
+  const initialOffset = savedPos ? JSON.parse(savedPos) : { x: 0, y: 0 }
+
+  // 2. 初始化坐标状态
+  let currentX = initialOffset.x
+  let currentY = initialOffset.y
+  let startX = 0, startY = 0
+  let isDragging = false
+  let rafId: number
+
+  // 初始化样式
+  label.setAttribute('tabindex', '0')
   Object.assign(label.style, {
     position: 'fixed',
     cursor: 'grab',
     zIndex: 'auto',
     outline: 'none',
-    willChange: 'transform' // 提示浏览器开启 [GPU 加速](https://developer.mozilla.org)
+    willChange: 'transform',
+    // 关键：初始化时立即应用保存的位置
+    transform: `translate3d(${currentX}px, ${currentY}px, 0)`
   })
 
-  // 预创建遮罩（仅创建一次，通过 display 控制，比 appendChild 性能高）
   const mask = document.createElement('div')
   Object.assign(mask.style, {
     position: 'fixed', inset: '0', zIndex: '3013',
@@ -499,12 +511,6 @@ function enableDragScroll() {
   })
   document.body.appendChild(mask)
 
-  let isDragging = false
-  let startX = 0, startY = 0
-  let currentX = 0, currentY = 0
-  let rafId: number
-
-  // 核心优化：使用 [requestAnimationFrame](https://developer.mozilla.org)
   const updateUI = () => {
     if (!isDragging) return
     label.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`
@@ -519,22 +525,23 @@ function enableDragScroll() {
     mask.style.display = 'none'
     label.style.cursor = 'grab'
 
-    // 记录最终位置
-    const rect = label.getBoundingClientRect()
+    // 3. 存储相对于初始位置的偏移量，而不是 getBoundingClientRect 的绝对值
+    // 这样可以避免在不同分辨率屏幕切换时位置错乱
     localStorage.setItem('fixed-one-click-position', JSON.stringify({
-      top: `${rect.top}px`,
-      left: `${rect.left}px`
+      x: currentX,
+      y: currentY
     }))
   }
 
   label.onmousedown = (e) => {
     isDragging = true
+    // 计算点击点相对于当前元素偏移位置的差值
     startX = e.clientX - currentX
     startY = e.clientY - currentY
 
     mask.style.display = 'block'
     label.style.cursor = 'grabbing'
-    label.focus() // 强制聚焦，配合 blur 使用
+    label.focus()
 
     rafId = requestAnimationFrame(updateUI)
     e.preventDefault()
@@ -546,7 +553,6 @@ function enableDragScroll() {
     currentY = e.clientY - startY
   }
 
-  // 监听 blur 事件：如果弹窗弹出导致 label 失去焦点，立即停止拖拽并移除遮罩
   label.onblur = mouseupEvent
   window.addEventListener('mousemove', mousemoveEvent)
   window.addEventListener('mouseup', mouseupEvent)
