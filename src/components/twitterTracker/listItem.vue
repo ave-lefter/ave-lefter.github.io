@@ -17,7 +17,8 @@
                                 <img v-if="item.verified" :width="12" src="@/assets/images/kol.svg" alt="">
                                 <TimerCount
                                     v-if="item.created_at && Number(formatTimeFromNow(item.created_at, true)) < 60"
-                                    :key="`${item.created_at}`" :timestamp="+item.created_at" :end-time="60">
+                                    :key="`${item.created_at}`"
+                                    :timestamp="Math.min(+item.created_at, dayjs().unix() - 1)" :end-time="60">
                                     <template #default="{ seconds }">
                                         <span class="color-[--up-color] text-12px">
                                             <template v-if="seconds < 60"> {{ seconds }}s </template>
@@ -103,6 +104,7 @@
 </template>
 <script setup name="twitterTrackerListItem">
 import { useStorage } from '@vueuse/core'
+import dayjs from 'dayjs'
 import { followKol, unfollowKol } from '~/api/twitter'
 import { processTwitterText } from '~/utils'
 const trackerStore = useTwitterTrackerStore()
