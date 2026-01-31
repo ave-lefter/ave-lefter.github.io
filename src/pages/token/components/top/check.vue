@@ -1153,6 +1153,7 @@
                           effect="customized"
                           :content="$t('latestTrader')"
                           placement="top"
+                          :persistent="false"
                         >
                           <!-- <el-icon style="color: #ff9f00"><Avatar /></el-icon> -->
                           <Icon

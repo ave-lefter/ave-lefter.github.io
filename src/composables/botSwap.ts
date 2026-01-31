@@ -4,6 +4,7 @@ import { getAddressAndChainFromId, getChainInfo, isEvmChain } from '@/utils'
 import { bot_getTokenBalance, bot_getApprove, bot_approve, bot_getApproveV2, bot_approveV2 } from '@/api/bot'
 import { getTokensPrice } from '@/api/token'
 import { ElNotification } from 'element-plus'
+import BigNumber from 'bignumber.js'
 
 const chainMainToken: Record<string, string> = {
   solana: 'sol',
@@ -316,6 +317,59 @@ export function useBotSwap(type: number = 0, isBatch = false) {
       }
     })
   }
+
+  function updateBalanceFromWs(data: {fromAmount: string; outputAmount: string; inTokenAddress: string; outTokenAddress: string; chain: string}) {
+    if (!isEvmChain(data.chain)) {
+      return
+    }
+    const isSameTokenChain = data.chain === tokenStore.swap.token.chain
+    const isSamePayTokenChain = data.chain === tokenStore.swap.payToken.chain
+    const isSameNativeTokenChain = data.chain === tokenStore.swap.native.chain
+    if (isSameTokenChain && data.inTokenAddress === tokenStore.swap.token.address && data.fromAmount) {
+      const afterBalance = BigNumber(tokenStore.swap.token.balance || 0).minus(BigNumber(data.fromAmount || 0).shiftedBy((tokenStore.swap.token.decimals || 0) * -1)).toString()
+      tokenStore.swap.token.balance = afterBalance
+    }
+    if (isSamePayTokenChain && data.inTokenAddress === tokenStore.swap.payToken.address && data.fromAmount) {
+      const afterBalance = BigNumber(tokenStore.swap.payToken.balance || 0).minus(BigNumber(data.fromAmount || 0).shiftedBy((tokenStore.swap.payToken.decimals || 0) * -1)).toString()
+      tokenStore.swap.payToken.balance = afterBalance
+    }
+    if (isSameNativeTokenChain && data.inTokenAddress === tokenStore.swap.native.address && data.fromAmount) {
+      const afterBalance = BigNumber(tokenStore.swap.native.balance || 0).minus(BigNumber(data.fromAmount || 0).shiftedBy((tokenStore.swap.native.decimals || 0) * -1)).toString()
+      tokenStore.swap.native.balance = afterBalance
+    }
+    if (isSameTokenChain &&  data.outTokenAddress === tokenStore.swap.token.address && data.outputAmount) {
+      const afterBalance = BigNumber(tokenStore.swap.token.balance || 0).plus(BigNumber(data.outputAmount || 0).shiftedBy((tokenStore.swap.token.decimals || 0) * -1)).toString()
+      tokenStore.swap.token.balance = afterBalance
+    }
+    if (isSamePayTokenChain && data.outTokenAddress === tokenStore.swap.payToken.address && data.outputAmount) {
+      const afterBalance = BigNumber(tokenStore.swap.payToken.balance || 0).plus(BigNumber(data.outputAmount || 0).shiftedBy((tokenStore.swap.payToken.decimals || 0) * -1)).toString()
+      tokenStore.swap.payToken.balance = afterBalance
+    }
+    if (isSameNativeTokenChain && data.outTokenAddress === tokenStore.swap.native.address && data.outputAmount) {
+      const afterBalance = BigNumber(tokenStore.swap.native.balance || 0).plus(BigNumber(data.outputAmount || 0).shiftedBy((tokenStore.swap.native.decimals || 0) * -1)).toString()
+      tokenStore.swap.native.balance = afterBalance
+    }
+
+    botStore.walletList.forEach(item => {
+      if (item.evmAddress === botStore.evmAddress) {
+        item.addresses.forEach(address => {
+          if (address.chain === data.chain) {
+            if (data.inTokenAddress === NATIVE_TOKEN) {
+              address.balance = BigNumber(address.balance || 0).minus(BigNumber(data.fromAmount || 0).shiftedBy(-18)).toString()
+            } else if (address?.tokenBalances?.[data.inTokenAddress]) {
+              // address.tokenBalances[data.inTokenAddress] = BigNumber(address.tokenBalances[data.inTokenAddress] || 0).minus(BigNumber(data.fromAmount || 0).shiftedBy(-18)).toString()
+            }
+
+            if (data.outTokenAddress === NATIVE_TOKEN) {
+              address.balance = BigNumber(address.balance || 0).plus(BigNumber(data.outputAmount || 0).shiftedBy(-18)).toString()
+            }
+          }
+        })
+      }
+    })
+
+  }
+
   return {
     loading,
     refreshTokenBalance,
@@ -326,6 +380,7 @@ export function useBotSwap(type: number = 0, isBatch = false) {
     allowance,
     bot_approve: _bot_approve,
     checkApproveAndApprove,
-    getParsedRoute
+    getParsedRoute,
+    updateBalanceFromWs
   }
 }

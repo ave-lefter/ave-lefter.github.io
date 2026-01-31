@@ -46,8 +46,6 @@ export const WSEventType = {
   PRICE_NEW: 'price-new',
   PRICE_GAINER: 'price-gainer',
   PRICE_EXTRA: 'price_extra',
-  PUMPSTATE: 'pumpstate',
-  TOKEN_UPDATED: 'token_updated',
   PRICEV2: 'pricev2',
   TGBOT: 'tgbot',
   ASSET: 'asset',
@@ -56,7 +54,7 @@ export const WSEventType = {
   SIGNALSV2_PUBLIC_MONITOR: 'signalsv2_public_monitor',
   PUBLIC_PORTRAIT: 'public_portrait',
   SIMPLE_TX: 'simple_tx',
-  PUMP_MIGRATED: 'pump_migrated',
+  PUMP_MIGRATED: 'pump_migrated'
 }
 // perp
 export const WSPerpHost = 'wss://quote.edgex.exchange'
@@ -233,3 +231,11 @@ export const holdersTooltip = (t)=>({
 })
 
 export const KOL_KEY = '31'
+
+export const WSEventV2Type = {
+  PUMPSTATE: 'pumpstatev2',
+  TOKEN_UPDATED: 'token_updated',
+  PORTRAIT_STATISTICS:'portrait_statistics',
+  TWITTER_MONITOR:'twitter_monitor',
+  PUBLIC_TWITTER:'public_twitter'
+}

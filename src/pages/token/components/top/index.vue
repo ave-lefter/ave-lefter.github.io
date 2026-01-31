@@ -40,7 +40,7 @@
     /> -->
     <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
     <div class="token-info ml-16px flex items-center color-[--third-text]">
-      <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" >
+      <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
         <template #content>
           <el-image
             class="token-icon  h-228px w-228px items-center"
@@ -180,7 +180,7 @@
               </div>
             </div>
             <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
-            <el-popover popper-class="[--el-popover-bg-color:--border]">
+            <el-popover popper-class="[--el-popover-bg-color:--border]" :persistent="false">
               <template #reference>
                 <span
                   class="media-item bg-btn cursor-pointer"
@@ -971,7 +971,7 @@ const price = computed(() => {
   return tokenStore.price
 })
 const priceChange = computed(() => {
-  return tokenStore.priceChange || 0
+  return tokenStore.priceChangeV2 || 0
 })
 const marketCap = computed(() => {
   return tokenStore.marketCap || 0
@@ -980,23 +980,11 @@ const marketCap = computed(() => {
 const volume24 = computed(() => {
   return tokenStore.pair?.volume_u || tokenStore.tokenInfoExtra?.volume_24 || 0
 })
-const appendix = computed(() => {
-  if (token.value?.appendix && isJSON(token.value?.appendix)) {
-    return JSON.parse(token.value?.appendix)
-  }
-  return {}
-})
 const tokenInfoExtra= computed(()=>{
   return tokenStore.tokenInfoExtra
 })
 const medias = computed(() => {
-  return [
-    { name: t('website'), icon: 'web', url: appendix.value?.website },
-    { name: 'Btok', icon: 'btok', url: appendix.value?.btok },
-    { name: 'QQ', icon: 'qq', url: appendix.value?.qq },
-    { name: 'Telegram', icon: 'tg', url: appendix.value?.telegram },
-    { name: 'Twitter', icon: 'twitter', url: appendix.value?.twitter },
-  ]
+  return getMedias(token.value?.appendix)
 })
 const currentGroup = computed(() => {
   return groupId.value == 0
@@ -1102,7 +1090,7 @@ function removeTokenFavorite() {
     .then(() => {
       ElMessage.success(t('cancelled1'))
       collected.value = false
-      topEventBus.emit()
+      topEventBus.emit(-1)
     })
     .catch((err) => {
       console.log(err)

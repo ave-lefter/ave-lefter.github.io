@@ -334,6 +334,8 @@ export interface GetHotTokensResponse {
   holders: number;
   current_price_usd: number | string;
   price_change: string;
+  // priceChange24h
+  price_change_v2: string;
   is_adv: number;
   is_showasadv: number;
   token_index: number;
@@ -1217,6 +1219,17 @@ export function getAiSummary(id: string): Promise<null |AiSummaryResponse> {
 export function getBestToken(token_id:string) {
   const { $api } = useNuxtApp()
   return $api('/v2api/token_info/v1/token/dev/best', {
+    method: 'get',
+    query: {
+      token_id
+    }
+  })
+}
+
+// 同名代币
+export function getSimilarTokens(token_id:string) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token/v1/token/similar', {
     method: 'get',
     query: {
       token_id

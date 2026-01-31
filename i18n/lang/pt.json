@@ -559,13 +559,13 @@
   "searchSameAmm": "Ver pools semelhantes",
   "pumpCompleted": "Bomba concluída",
   "innerDiskTime": "Tempo do disco interno",
-  "takeProfitAndStopLoss1": "Dobrar",
-  "takeProfitAndStopLoss2": "Dobrar o capital&Pare a perda pela metade",
-  "takeProfitAndStopLoss0": "Take Profit e Stop Loss personalizados",
-  "takeProfitAndStopLoss3": "Duplicar tudo&Meio stop loss",
-  "takeProfitAndStopLoss4": "Dobrar o capital&Triplicar o valor total&Pare a perda pela metade",
-  "takeProfitAndStopLoss6": "40% realizam lucro&Movendo a retração de take-profit e stop loss de 60% no total",
-  "takeProfitAndStopLoss5": "10 vezes obter lucro&Movendo a retração de take-profit e stop loss de 40% no total",
+  "takeProfitAndStopLoss1": "All-Out on Double",
+  "takeProfitAndStopLoss2": "Break-Even on Double + 50% SL",
+  "takeProfitAndStopLoss0": "Custom TP/SL",
+  "takeProfitAndStopLoss3": "All-Out on Double + 50% SL",
+  "takeProfitAndStopLoss4": "Break-Even on Double + All-Out on Triple + 50% SL",
+  "takeProfitAndStopLoss6": "All-Out on 40% TP + Trailing TP/SL (60% Drawdown)",
+  "takeProfitAndStopLoss5": "All-Out on Tenfold + Trailing TP/SL (40% Drawdown)",
   "defaultPolicy": "Política padrão",
   "takeProfitAndStopLossTips1": "Duplicar significa que quando o lucro da posição atinge 100%, o sistema fecha automaticamente todas as posições.",
   "takeProfitAndStopLossTips2": "Duplicar o capital significa fechar a posição e pagar 50% do capital quando o lucro atingir 100%; Stop Loss pela metade significa fechar automaticamente toda a posição quando a perda atingir 50%.",
@@ -599,5 +599,6 @@
   "noOpen": "Não aberto",
   "noticeDuration": "Tempo de exibição da notificação",
   "monitorThTip": "Escolha pelo menos um avatar e endereço de carteira",
-  "wcWalletTip": "Digitalize este código QR com seu telefone"
+  "wcWalletTip": "Digitalize este código QR com seu telefone",
+  "monitorBotError": "O endereço do robô de monitoramento não é compatível"
 }

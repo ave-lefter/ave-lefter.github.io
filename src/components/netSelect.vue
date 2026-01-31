@@ -9,13 +9,11 @@ defineProps({
   }
 })
 const botStore = useBotStore()
-const {userInfo} = storeToRefs(useBotStore())
-const { address } = storeToRefs(useWalletStore())
-const {isSupportEvmChains,evmAddress} = storeToRefs(useBotStore())
+const walletStore = useWalletStore()
 const themeStore = useThemeStore()
 const visible = shallowRef(false)
 const options = computed(() => {
-  return evmAddress.value?useBotStore().isSupportChains:isSupportEvmChains.value
+  return botStore.evmAddress?useBotStore().isSupportChains:botStore.isSupportEvmChains
 })
 const selectedChains = shallowRef<string[]>([])
 
@@ -25,7 +23,7 @@ const displayChains = computed(() => {
 
 onMounted(() => {
   nextTick(() => {
-    selectedChains.value = evmAddress.value ? (botStore.isSupportChains as unknown as string[]) : ['bsc', 'base', 'eth', 'xlayer']
+    selectedChains.value = botStore.evmAddress ? (botStore.isSupportChains as unknown as string[]) : ['bsc', 'base', 'eth', 'xlayer']
   })
 })
 function getDisabled(val: string) {
@@ -33,16 +31,16 @@ function getDisabled(val: string) {
 }
 
 function onConfirm() {
-  if (userInfo.value && Array.isArray(userInfo.value.addresses)) {
+  if (botStore.userInfo && Array.isArray(botStore.userInfo.addresses)) {
     const arr: string[] = []
-    userInfo.value.addresses.map(el => {
+    botStore.userInfo.addresses.map(el => {
       if (selectedChains.value.includes(el.chain)) {
         arr.push(el.address + '-' + el.chain)
       }
     })
     emit('update:userIds', arr)
   }else{
-    const arr =selectedChains.value.map(i => address.value + '-' + i)
+    const arr =selectedChains.value.map(i => walletStore.address + '-' + i)
     emit('update:userIds', arr)
   }
   visible.value = false

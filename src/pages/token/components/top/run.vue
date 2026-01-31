@@ -31,7 +31,7 @@
                   formatNumber(rugPull?.all_tag_rate || 0, 1)
                 }}%
               </span>
-              <el-tooltip popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!" placement="top">
+              <el-tooltip popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!" placement="top" :persistent="false">
                 <template #content>{{ $t('abnormalChipsTip') }}</template>
                 <Icon
                   class="text-14px ml-5px color-[--secondary-text] cursor-pointer"
@@ -469,34 +469,34 @@ function formatUrl(url: string) {
   }
   return 'https://' + url
 }
-function getMedias(appendix: string) {
-  if (!appendix) return []
-  let obj :MediaAppendix= {}
-  if (typeof appendix === 'string' && isJSON(appendix)) {
-    obj = JSON.parse(appendix)
-  } else if (typeof appendix === 'object') {
-    obj = appendix
-  }
-  const arr = []
-  if (obj?.website)
-    arr.push({
-      name: t('website'),
-      icon: 'web',
-      url: formatUrl(obj.website),
-    })
-  if (obj?.btok)
-    arr.push({ name: 'Btok', icon: 'btok', url: formatUrl(obj.btok) })
-  if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
-  if (obj?.telegram)
-    arr.push({ name: 'Telegram', icon: 'tg', url: formatUrl(obj.telegram) })
-  if (obj?.twitter)
-    arr.push({
-      name: 'Twitter',
-      icon: 'twitter',
-      url: formatUrl(obj.twitter),
-    })
-  return arr
-}
+// function getMedias(appendix: string) {
+//   if (!appendix) return []
+//   let obj :MediaAppendix= {}
+//   if (typeof appendix === 'string' && isJSON(appendix)) {
+//     obj = JSON.parse(appendix)
+//   } else if (typeof appendix === 'object') {
+//     obj = appendix
+//   }
+//   const arr = []
+//   if (obj?.website)
+//     arr.push({
+//       name: t('website'),
+//       icon: 'web',
+//       url: formatUrl(obj.website),
+//     })
+//   if (obj?.btok)
+//     arr.push({ name: 'Btok', icon: 'btok', url: formatUrl(obj.btok) })
+//   if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
+//   if (obj?.telegram)
+//     arr.push({ name: 'Telegram', icon: 'tg', url: formatUrl(obj.telegram) })
+//   if (obj?.twitter)
+//     arr.push({
+//       name: 'Twitter',
+//       icon: 'twitter',
+//       url: formatUrl(obj.twitter),
+//     })
+//   return arr
+// }
 async function getRugPullList() {
   if(!visible.value) return
   if (loadingRun.value) return

@@ -9,6 +9,7 @@ import { getNewFavoriteList, getUserFavoriteGroups, removeFavorite, removeFavori
 import { WSEventType } from '~/utils/constants'
 import type { TableInstance } from 'element-plus'
 
+let sortParam:any={}
 
 let timeoutId: any = null;
 const tableRef = ref<TableInstance | null>(null)
@@ -63,7 +64,7 @@ const loading = ref(false)
 const pageData = ref({
   total: 0,
   page: 1,
-  pageSize: 50
+  pageSize: 100
 })
 const tableList = ref<any[]>([])
 const { mode } = storeToRefs(useGlobalStore())
@@ -170,7 +171,7 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (priceData) => {
       return {
         ...token,
         current_price_usd: newPrice,
-        price_change_24h: priceUpdate.price_change,
+        price_change_24h: priceUpdate.price_change_v2,
         pool_circulating_supply: (token.total - token.lock_amount - token.burn_amount - token.other_amount) * newPrice
       }
     }
@@ -303,6 +304,7 @@ const tableRowClick = (row: any) => {
 
 // 处理表格排序
 const handleSortChange = ({ prop, order }: any) => {
+  sortParam={ prop, order }
   if (prop) {
     if (order === 'ascending') {
       tableList.value = tableList.value.toSorted((a, b) => a[prop] - b[prop])
@@ -354,7 +356,8 @@ const getList = async () => {
         id: `${i.token}-${i.chain}`,
         ...i,
         price_change_24h:
-          i?.chain == 'brc20' ? i.price_change_v2 || 0 : i.price_change || 0,
+          // i?.chain == 'brc20' ? i.price_change_v2 || 0 : i.price_change || 0,
+          i?.price_change_v2 ||i?.price_change|| 0,
         pool_circulating_supply: (i.total - i.lock_amount - i.burn_amount - i.other_amount) * i.current_price_usd,
         group_id: activeTab.value,
       }))) ||
@@ -364,6 +367,9 @@ const getList = async () => {
   
   // 设置价格订阅
   const tokenIds = tableData.map(item => item.id)
+  if(sortParam.prop&&sortParam.order){
+    handleSortChange(sortParam)
+  }
   priceV2Store.setMultiPriceParams('favorite', tokenIds)
   priceV2Store.sendPriceWs()
   

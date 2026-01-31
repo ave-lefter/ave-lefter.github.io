@@ -1,7 +1,7 @@
 <template>
   <el-image
     class="token-icon"
-    :class="mode"
+    :class="themeStore.theme"
     :style="{
       width: `${props.width}px`,
     }"
@@ -17,10 +17,9 @@
 </template>
 
 <script setup lang="ts">
-// import {mapState} from "vuex";
 const configStore = useConfigStore()
 const s3BaseUrl = configStore.token_logo_url
-const { mode } = storeToRefs(useGlobalStore())
+const themeStore = useThemeStore()
 const props = defineProps({
   chain: {
     type: String,

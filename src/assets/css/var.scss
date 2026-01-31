@@ -2,59 +2,69 @@
   --primary-color: #3F80F7;
   --down-color: #F6465D;
   --up-color: #12B886;
-  --yellow:#FFA622;
-  --x-blue:#009EF7;
-  --pump-green:#55D592;
-  --signal-red:#E50000;
-  --signal-green:#37B270;
+  --yellow: #FFA622;
+  --x-blue: #009EF7;
+  --pump-green: #55D592;
+  --signal-red: #E50000;
+  --signal-green: #37B270;
   // 一级文字
-  --main-text:var(--d-F5F5F5-l-111);
+  --main-text: var(--d-F5F5F5-l-111);
   // 二级文字
-  --secondary-text:var(--d-9CA1A8-l-404753);
+  --secondary-text: var(--d-9CA1A8-l-404753);
   // 三级文字
-  --third-text:var(--d-5A5E64-l-A9B0BC);
+  --third-text: var(--d-5A5E64-l-A9B0BC);
   // 图标插画颜色
-  --icon-color:var(--d-3B3E44-l-CAD6EC);
+  --icon-color: var(--d-3B3E44-l-CAD6EC);
   // 主要背景
-  --main-bg:var(--d-000-l-FFF);
+  --main-bg: var(--d-000-l-FFF);
   // 次要背景
-  --secondary-bg:var(--d-101114-l-F6F9FF);
+  --secondary-bg: var(--d-101114-l-F6F9FF);
   // 主页列表标题栏背景
-  --main-list-header-bg:var(--d-1B1D21-l-ECF3FF);
+  --main-list-header-bg: var(--d-1B1D21-l-ECF3FF);
   // 主页面列表悬浮色
-  --main-list-hover:var(--d-1E2025-l-E8F1FF);
+  --main-list-hover: var(--d-1E2025-l-E8F1FF);
   // 主页面输入框&按钮背景色
-  --main-input-button-bg:var(--d-16181D-l-ECF3FF);
-    // 弹窗背景
-  --dialog-bg:var(--d-16181D-l-FFF);
+  --main-input-button-bg: var(--d-16181D-l-ECF3FF);
+  // 弹窗背景
+  --dialog-bg: var(--d-16181D-l-FFF);
   // 弹窗tab选中色
-  --dialog-tab-active-bg:var(--d-282D35-l-FFF);
+  --dialog-tab-active-bg: var(--d-282D35-l-FFF);
   // 主页面分割线
-  --main-divider:var(--d-1F242C-l-E0ECFF);
+  --main-divider: var(--d-1F242C-l-E0ECFF);
   // 弹窗分割线
-  --dialog-divider:var(--d-1F242C-l-E8F1FF);
+  --dialog-divider: var(--d-1F242C-l-E8F1FF);
   // 主页tab选中色
-  --tab-active-bg:var(--d-1F242C-l-FFF);
+  --tab-active-bg: var(--d-1F242C-l-FFF);
   // 弹窗选中色&输入框&边框
-  --border:var(--d-1F242C-l-E2EEFF);
+  --border: var(--d-1F242C-l-E2EEFF);
   // 弹窗列表悬浮色
-  --dialog-list-hover:var(--d-1F242C-l-E8F1FF);
+  --dialog-list-hover: var(--d-1F242C-l-E8F1FF);
   // 白色
-  --white:#F5F5F5;
+  --white: #F5F5F5;
   // 反色
-  --reverse-color:var(--d-111-l-F5F5F5);
+  --reverse-color: var(--d-111-l-F5F5F5);
   // 灰色按钮悬浮色
-  --gray-button-hover:var(--d-212936-l-C3D1E5);
+  --gray-button-hover: var(--d-212936-l-C3D1E5);
   // 蓝色按钮悬浮色
-  --primary-button-hover:#3973DE;
+  --primary-button-hover: #3973DE;
   // 弹窗 Tab 选中色
-  --dialog-tab-active:var(--d-383F4B-l-FFF);
+  --dialog-tab-active: var(--d-383F4B-l-FFF);
   // 主页列表标题栏背景
-  --table-title-bg:var(--d-12161D-l-ECF3FF);
+  --table-title-bg: var(--d-12161D-l-ECF3FF);
   // 主页面悬浮弹窗色
-  --tooltip:var(--d-1F242C-l-FFF);
+  --tooltip: var(--d-1F242C-l-FFF);
+
+  // 扫链背景色
+  --pump-bg: var(--d-000-l-FFF);
+
+  --pump-tooltip-text: var(--d-000-l-404753);
+
+  --github-color:var(--d-FFF-l-000);
+
+  --tiktok-color:var(--d-FFF-l-000);
   &.dark {
     // 规范：颜色相同省略为 3 位，所有都用大写
+    --d-000-l-404753: #000;
     --d-333-l-ECECEC: #333;
     --d-333-l-F5F5F5: #333;
     --d-111-l-FFF: #111;
@@ -68,7 +78,7 @@
     --d-151517-l-F6F6F6: #151517;
     --d-333-l-F2F2F2: #333;
     --d-222-l-FFF: #222;
-    --d-666-l-959A9F:#666;
+    --d-666-l-959A9F: #666;
     //--d-333-l-F2F2F2: #333;
     --d-E9E9E9-l-222: #E9E9E9;
     --d-333-l-FFF: #333;
@@ -78,18 +88,18 @@
     --d-1D2232-l-F5F5F5: #1D2232;
     --d-2D3037-l-F5F5F5: #2D3037;
     --d-131722-l-FFF: #131722;
-    --d-999-l-222:#999;
-    --d-BCBED2-l-222:#BCBED2;
+    --d-999-l-222: #999;
+    --d-BCBED2-l-222: #BCBED2;
     --d-F5F5F5-l-222: #F5F5F5;
     --d-0A0B0C-l-F5F5F5: #0A0B0C;
     --d-17191C-l-F2F2F2: #17191C;
     --d-1F242A-l-F5F5F5: #1F242A;
     --d-282e35-l-e5e5e5: #282E35;
     --d-15171C-l-F6F6F6: #15171c;
-    --d-FFF-l-000:#FFF;
+    --d-FFF-l-000: #FFF;
     --d-FFF-l-F5F5F5: #FFF;
-    --d-33353D-l-F5F5F5:#33353D;
-    --d-999-l-959A9F:#999;
+    --d-33353D-l-F5F5F5: #33353D;
+    --d-999-l-959A9F: #999;
     --d-666-l-696E7C: #666;
     --d-33353D-l-f5f5f5: #33353D;
     --d-2A2A2A-l-F2F2F2: #2A2A2A;
@@ -99,18 +109,18 @@
     --d-180F12-l-FEECEF: #180F12;
     --d-333333-l-eaecef: #333333;
     --d-eaecef-l-333333: #eaecef;
-    --d-666-l-CCC:#666;
+    --d-666-l-CCC: #666;
     --d-2D3037-l-999: #2D3037;
     --d-696E7C-l-fff: #696E7C;
     --d-222222-l-f5f5f5: #222;
     --d-222-l-f5f5f5: #222;
     --d-0a0b0d-l-fff: #0a0b0d;
-    --d-333-l-666:#333;
-    --d-F5F5F5-l-FFF:#F5F5F5;
-    --d-666-l-333:#666;
+    --d-333-l-666: #333;
+    --d-F5F5F5-l-FFF: #F5F5F5;
+    --d-666-l-333: #666;
     --d-15171c-l-f2f2f2: #15171c;
     --d-333-l-0A0B0C: #333;
-    --d-1A1A1A-l-F2F2F2:#1A1A1A;
+    --d-1A1A1A-l-F2F2F2: #1A1A1A;
     --d-333333-l-F2F2F2: #333;
     --d-333333-l-DDDDDD: #333;
     --d-666-l-FFFF: #666;
@@ -128,14 +138,14 @@
     --d-CCC-l-333: #CCC;
     --d-CCC-l-F5F5F5: #CCC;
     --d-666-l-D8D8D8: #666666;
-    --d-333333-l-F2F2F2:#333333;
+    --d-333333-l-F2F2F2: #333333;
     --d-17191C-l-FFF: #17191C;
-    --d-1A1A1A-l-fafafa:#1A1A1A;
+    --d-1A1A1A-l-fafafa: #1A1A1A;
     --d-333-l-f5f7fa: #333;
     --d-111-l-F8F8F8: #111111;
     --d-000-l-FFF: #000;
     //switch on color
-    --d-1F3156-l-D2E0F7:#1F3156;
+    --d-1F3156-l-D2E0F7: #1F3156;
     --d-F5F5F5-l-666: #F5F5F5;
     --d-222-l-F6F6F6: #222;
     --d-333-l-EEE: #333;
@@ -210,7 +220,8 @@
   }
 
   &.light {
-    --d-666-l-959A9F:#959A9F;
+    --d-000-l-404753: #404753;
+    --d-666-l-959A9F: #959A9F;
     --d-333-l-ECECEC: #ececec;
     --d-333-l-F5F5F5: #f5f5f5;
     --d-111-l-FFF: #fff;
@@ -242,8 +253,8 @@
     --d-15171C-l-F6F6F6: #F6F6F6;
     --d-FFF-l-000: #000;
     --d-FFF-l-F5F5F5: #F5F5F5;
-    --d-33353D-l-F5F5F5:#F5F5F5;
-    --d-999-l-959A9F:#959A9F;
+    --d-33353D-l-F5F5F5: #F5F5F5;
+    --d-999-l-959A9F: #959A9F;
     --d-666-l-696E7C: #696E7C;
     --d-33353D-l-f5f5f5: #F5F5F5;
     --d-2A2A2A-l-F2F2F2: #F2F2F2;
@@ -253,18 +264,18 @@
     --d-180F12-l-FEECEF: #FEECEF;
     --d-333333-l-eaecef: #eaecef;
     --d-eaecef-l-333333: #333333;
-    --d-666-l-CCC:#CCC;
+    --d-666-l-CCC: #CCC;
     --d-2D3037-l-999: #999;
     --d-696E7C-l-fff: #FFF;
     --d-222222-l-f5f5f5: #F5F5F5;
     --d-222-l-f5f5f5: #F5F5F5;
     --d-0a0b0d-l-fff: #fff;
-    --d-333-l-666:#666;
-    --d-F5F5F5-l-FFF:#FFF;
-    --d-666-l-333:#333;
+    --d-333-l-666: #666;
+    --d-F5F5F5-l-FFF: #FFF;
+    --d-666-l-333: #333;
     --d-15171c-l-f2f2f2: #f2f2f2;
     --d-333-l-0A0B0C: #0a0b0c;
-    --d-1A1A1A-l-F2F2F2:#F2F2F2;
+    --d-1A1A1A-l-F2F2F2: #F2F2F2;
     --d-333333-l-F2F2F2: #F2F2F2;
     --d-333333-l-DDDDDD: #DDD;
     --d-666-l-FFFF: #FFFF;
@@ -283,13 +294,13 @@
     --d-F2F2F2-l-333: #333;
     --d-15171C-l-F8F8F8: #F8F8F8;
     --d-666-l-D8D8D8: #d8d8d8;
-    --d-333333-l-F2F2F2:#F2F2F2;
+    --d-333333-l-F2F2F2: #F2F2F2;
     --d-17191C-l-FFF: #FFF;
-    --d-1A1A1A-l-fafafa:#fafafa;
+    --d-1A1A1A-l-fafafa: #fafafa;
     --d-333-l-f5f7fa: #f5f7fa;
     --d-111-l-F8F8F8: #F8F8F8;
     --d-000-l-FFF: #fff;
-    --d-1F3156-l-D2E0F7:#D2E0F7;
+    --d-1F3156-l-D2E0F7: #D2E0F7;
     --d-F5F5F5-l-666: #666;
     --d-222-l-F6F6F6: #F6F6F6;
     --d-333-l-EEE: #EEE;
@@ -364,5 +375,3 @@
     --d-1E2025-l-E8F1FF: #E8F1FF;
   }
 }
-
-

@@ -255,9 +255,9 @@
         />
       </el-dialog>
     </div>
-    <div v-else-if="activeTab == 'devBit'">
+    <!-- <div v-else-if="activeTab == 'devBit'">
       <DevTokens />
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -266,10 +266,9 @@ import { _getDevList } from '@/api/run'
 import DevTokens from './DevTokens.vue'
 import { formatDate, formatExplorerUrl, isJSON } from '@/utils/index'
 import { useTokenStore } from '~/stores/token'
-import { useWindowSize } from '@vueuse/core'
+import { useWindowSize, useEventBus  } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
 import { BusEventType } from '@/utils/constants'
-import { useEventBus } from '@vueuse/core'
 
 const aiSummary = inject<Ref<{ summary: string; headline: string }>>('aiSummary')
 const props = defineProps<{
@@ -286,17 +285,17 @@ const localeStore = useLocaleStore()
 const { t } = useI18n()
 const showAll = ref(false)
 const totalTokens = ref(0)
-const active = shallowRef(props.isRank ? 'col' : 'grid')
+const active = shallowRef(!props.isRank ? 'col' : 'grid')
 const activeTab = shallowRef('info')
 const headerTabs = computed(() => {
   return [
     { id: 'info', name: t('tokenInfo') },
-    { id: 'devBit', name: t('devTokens') }
+    // { id: 'devBit', name: t('devTokens') }
   ]
 })
 const tabs = [
-  { id: 'grid', icon: 'grid', name: 'grid' },
   { id: 'col', icon: 'col', name: 'col' },
+  { id: 'grid', icon: 'grid', name: 'grid' },
 ]
 const globalStore = useGlobalStore()
 const { mode } = storeToRefs(globalStore)
@@ -359,30 +358,30 @@ const shouldShowChainInfo = computed(() => {
 const route = useRoute()
 const id = computed(() => route.params.id as string)
 
-async function getRugPullList() {
-  const data = {
-    token_id: id.value,
-    pageNO: 1,
-    pageSize: 1,
-  }
-  const res = await _getDevList(data)
-  totalTokens.value = res.total_tokens
-}
+// async function getRugPullList() {
+//   const data = {
+//     token_id: id.value,
+//     pageNO: 1,
+//     pageSize: 1,
+//   }
+//   const res = await _getDevList(data)
+//   totalTokens.value = res.total_tokens
+// }
 
-watch(
-  () => route.params.id,
-  () => {
-    if (route.params.id) {
-      getRugPullList()
-    }
-  }
-)
+// watch(
+//   () => route.params.id,
+//   () => {
+//     if (route.params.id) {
+//       getRugPullList()
+//     }
+//   }
+// )
 
-onMounted(() => {
-  if (route.params.id) {
-    getRugPullList()
-  }
-})
+// onMounted(() => {
+//   if (route.params.id) {
+//     getRugPullList()
+//   }
+// })
 
 // function filterSuppportChains(chain: string) {
 //   return supportObj[chain] || ''

@@ -263,6 +263,7 @@ const collect = async () => {
             <div v-if="statistics.newTags?.length > 0" class="ml-6px">
               <el-tooltip
                 placement="top"
+                :persistent="false"
               >
                 <template #default>
                   <div

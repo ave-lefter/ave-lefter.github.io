@@ -22,10 +22,27 @@
           </div>
           <div
             v-show="!globalStore.showLeft"
-            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left-0 hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
+            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center  left-0 hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
             @click="globalStore.$patch({ showLeft: true })"
           >
             <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
+          </div>
+
+          <div
+            v-show="globalStore.showRight"
+            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center top--97px right--11px hover:w-30px hover:right--31px hover:h-36px  transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
+            :class="`${hasWarning&&'top--137px!'}`"
+            @click="globalStore.$patch({ showRight: false })"
+          >
+            <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
+            
+          </div>
+          <div
+            v-show="!globalStore.showRight"
+            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center top-0px right-0 hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
+            @click="globalStore.$patch({ showRight: true })"
+          >
+            <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
           </div>
           <el-scrollbar :height="scrollbarHeight" @scroll="centerScroll">
             <div
@@ -101,6 +118,12 @@ const addresses = computed(() => {
   return []
 })
 const wsStore = useWSStore()
+
+// 警告弹窗
+const hasWarning=computed(()=>{
+  return tokenStore.warningStatus || ((tokenStore?.token?.risk_level ?? 0) < 0)
+})
+
 
 // 订单簿显示状态 - 使用本地存储保持状态
 const orderBookVisible = useStorage('orderBookVisible', false)
@@ -332,6 +355,7 @@ function addVisit() {
         logo_url,
         symbol,
         price_change: tokenStore.priceChange,
+        price_change_v2: tokenStore.priceChangeV2,
         circulation: tokenStore.circulation.toString(),
         price: tokenStore.price || 0,
       })

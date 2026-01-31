@@ -7,7 +7,7 @@ const themeStore = useThemeStore()
 const loadingGroupEdit = ref(false)
 const {token,pair,klineRow,twitterType,collected,editableGroup,currentGroup,selectedGroup,userFavoriteGroups,groupId,editableRemark,remark,remark2,tokenInfoExtra} = storeToRefs(useRankKlineStore())
 const medias = computed(() => {
-  return getMedias(token.value?.appendix,t)
+  return getMedias(token.value?.appendix)
 })
 
 function getTags(i: Pair) {
@@ -174,7 +174,7 @@ function handleReset() {
 
 <template>
    <div class="flex items-center color-[--d-566275-l-8CA0C3] px-16px py-12px">
-    <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+    <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
         <template #default>
           <TokenImg
             chain-class="w-20px h-20px"

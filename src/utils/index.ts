@@ -452,27 +452,34 @@ export function getChainDefaultIconColor(chain?: string) {
 export function getChainDefaultIcon(chain?: string, text = '', type?: string) {
   if (text) {
     const color = getChainDefaultIconColor(chain)
-    const circle = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" stroke="transparent" fill="${color}" stroke-width="0"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff">${text
-      ?.slice(0, 1)
-      ?.toUpperCase?.()}</text>
-    </svg>`
-    const rect = `<?xml version="1.0" standalone="no"?>
-    <svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg">
-      <rect width="32" height="32" fill="${color}" stroke="transparent" stroke-width="0"/>
-      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff">
-        ${text?.slice(0, 1)?.toUpperCase?.()}
-      </text>
-    </svg>`
+
+    // 兼容性获取首个字符：优先使用 Segmenter (处理组合 Emoji)，降级使用解构 (处理标准 Emoji)
+    let firstChar = ''
+    if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+      const segments = new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)
+      firstChar = segments[Symbol.iterator]().next().value?.segment || ''
+    } else {
+      firstChar = [...text][0] || ''
+    }
+    const char = firstChar.toUpperCase()
+
+    const circle = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="50%" cy="50%" r="16" fill="${color}"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff" font-family="sans-serif">${char}</text></svg>`
+
+    const rect = `<?xml version="1.0" standalone="no"?><svg width="32" height="32" version="1.1" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" fill="${color}"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#fff" font-family="sans-serif">${char}</text></svg>`
+
     const defaultSvg = type === 'rect' ? rect : circle
+
     try {
+      // 2026 年推荐：直接使用 Base64 编码以确保在所有标签属性中稳定显示
       return 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(defaultSvg)))
     } catch (err) {
-      console.log(err, chain, text)
       return ''
     }
   }
   return '/icon-default.png'
 }
+
+
 export function getSymbolDefaultIcon(
   tokenInfo:
     | {
@@ -531,7 +538,11 @@ export function deepMerge(target: any, source: any) {
     return source
   }
 }
-
+export function formatIconPumpDev(src?: string) {
+  return src && src !== 'unknown'
+    ? `${useConfigStore().token_logo_url}cex/${src}.png`
+    : IconUnknown
+}
 export function formatIconSwap(src?: string) {
   return src && src !== 'unknown'
     ? `${useConfigStore().token_logo_url}swap/${src}.jpeg`
@@ -987,26 +998,71 @@ export function setRefCodeToCookie() {
   }
 }
 
-export function getMedias(appendix: string | undefined, t: ReturnType<typeof useI18n>['t']) {
+export function getMedias(appendix: string | undefined) {
   if (!appendix) return []
+  const t = getGlobalT()
   if (isJSON(appendix)) {
     const obj = JSON.parse(appendix)
     const arr = []
-    if (obj?.website)
+    if (obj?.website) {
       arr.push({
         name: t('website'),
         icon: 'web',
         url: formatUrl(obj.website),
       })
+    }
     if (obj?.btok) arr.push({ name: 'Btok', icon: 'btok', url: formatUrl(obj.btok) })
     if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
     if (obj?.telegram) arr.push({ name: 'Telegram', icon: 'tg', url: formatUrl(obj.telegram) })
-    if (obj?.twitter)
+    if (obj?.twitter) {
       arr.push({
         name: 'Twitter',
         icon: 'twitter',
         url: formatUrl(obj.twitter),
       })
+    }
+    if (obj?.youtube) {
+      arr.push({
+        name: 'Youtube',
+        icon: 'youtube',
+        url: formatUrl(obj.youtube),
+      })
+    }
+    if (obj?.reddit) {
+      arr.push({
+        name: 'Reddit',
+        icon: 'reddit',
+        url: formatUrl(obj.reddit),
+      })
+    }
+    if (obj?.instagram) {
+      arr.push({
+        name: 'Instagram',
+        icon: 'instagram',
+        url: formatUrl(obj.instagram),
+      })
+    }
+    if (obj?.tiktok) {
+      arr.push({
+        name: 'Tiktok',
+        icon: 'tiktok',
+        url: formatUrl(obj.tiktok),
+      })
+    }
+    if (obj?.weibo) {
+      arr.push({
+        name: 'Weibo',
+        icon: 'weibo',
+        url: formatUrl(obj.weibo),
+      })
+    }
+    if (obj?.github) {
+      arr.push({
+        name: 'Github',
+        icon: 'github',
+        url: formatUrl(obj.github),
+      })
+    }
     return arr
   }
   return []
@@ -1305,10 +1361,109 @@ export function sendNotify(result: any) {
 
 // 获取小数位，分割 字符小数点
 export function getPrecision(num: number | string): number {
-  const val = Number(num);
+  const val = Number(num)
   if (isNaN(val)) {
-    return 0;
+    return 0
   }
-  const strList = String(num).split(".");
-  return strList.length === 2 ? strList[1].length : 0;
+  const strList = String(num).split('.')
+  return strList.length === 2 ? strList[1].length : 0
+}
+
+export function getAudioUrl(audio: string) {
+  return audioNameToResource[audio as keyof typeof audioNameToResource]
+  || audioNameToResource.Bar
+}
+
+/**
+ * 处理 Twitter 文本，将 @、# 和 http 链接转换为可点击的链接
+ * @param text 原始文本
+ * @returns 处理后的 HTML 字符串
+ */
+export function processTwitterText(text: string): string {
+  if (!text) return ''
+
+  // 转义 HTML 特殊字符，防止 XSS
+  let html = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+
+  // 先处理换行符
+  html = html.replace(/\n/g, '<br>')
+
+  // 使用更精确的正则表达式，按顺序处理不同类型的链接
+  // 先处理 URL（http/https），避免与 @ 和 # 冲突
+  const urlRegex = /(https?:\/\/[^\s<>"']+)/g
+  html = html.replace(urlRegex, (url: string) => {
+    return `<a href="${url}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">${url}</a>`
+  })
+
+  // 处理 @ 提及（@username），排除已经在 <a> 标签内的内容
+  const mentionRegex = /@([a-zA-Z0-9_]+)/g
+  html = html.replace(mentionRegex, (match: string, username: string, offset: number) => {
+    // 检查当前位置是否在 <a> 标签内
+    // 从字符串开头到当前位置
+    const beforeMatch = html.substring(0, offset)
+    const lastOpenTag = beforeMatch.lastIndexOf('<a')
+    const lastCloseTag = beforeMatch.lastIndexOf('</a>')
+
+    // 如果最后一个 <a> 标签在最后一个 </a> 之后，说明在链接内
+    if (lastOpenTag > lastCloseTag) {
+      return match // 在链接内，不处理
+    }
+
+    return `<a href="https://twitter.com/${username}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">@${username}</a>`
+  })
+
+  // 处理 # 话题标签（#hashtag），排除已经在 <a> 标签内的内容
+  const hashtagRegex = /#([a-zA-Z0-9_]+)/g
+  html = html.replace(hashtagRegex, (match: string, hashtag: string, offset: number) => {
+    // 检查当前位置是否在 <a> 标签内
+    // 从字符串开头到当前位置
+    const beforeMatch = html.substring(0, offset)
+    const lastOpenTag = beforeMatch.lastIndexOf('<a')
+    const lastCloseTag = beforeMatch.lastIndexOf('</a>')
+
+    // 如果最后一个 <a> 标签在最后一个 </a> 之后，说明在链接内
+    if (lastOpenTag > lastCloseTag) {
+      return match // 在链接内，不处理
+    }
+
+    return `<a href="https://twitter.com/hashtag/${hashtag}" class="[&&]:color-[--primary-color] hover:underline" target="_blank" rel="noopener noreferrer">#${hashtag}</a>`
+  })
+
+  return html
+}
+
+export function formatSeconds(seconds: number) {
+  const s = Math.floor(seconds)
+  if (s >= 86400) return `${Math.floor(s / 86400)}d`
+  if (s >= 3600) return `${Math.floor(s / 3600)}h`
+  if (s >= 60) return `${Math.floor(s / 60)}m`
+
+  return `${s}s`
+}
+export function formatXUser(url?: string) {
+  if (!url) return ''
+
+  // 排除官方路径
+  if (url.includes('/i/') || url.includes('/communities')) {
+    return ''
+  }
+
+  try {
+    const u = new URL(url)
+
+    // 只允许 x.com / twitter.com
+    if (!/(^|\.)?(x|twitter)\.com$/.test(u.hostname)) {
+      return ''
+    }
+
+    const firstSegment = u.pathname.split('/').filter(Boolean)[0]
+    return firstSegment ? `@${firstSegment}` : ''
+  } catch {
+    return ''
+  }
 }

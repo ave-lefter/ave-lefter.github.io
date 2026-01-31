@@ -87,7 +87,7 @@
             :to="`/token/${row.token}-${row.chain}`"
           >
             <div class="flex items-center flex-1">
-              <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+              <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
                 <template #default>
                   <TokenImg class="mr-8px" :row="row" />
                 </template>

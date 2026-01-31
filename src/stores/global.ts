@@ -12,6 +12,7 @@ export const useGlobalStore = defineStore('global', () => {
   const themeStore = useThemeStore()
   const configStore = useConfigStore()
   const showLeft = shallowRef(true)
+  const showRight = shallowRef(true)
   const isUSDT = useStorage('isUSDT', true)
   const footerTokensPrice = shallowRef([
     {
@@ -79,8 +80,8 @@ export const useGlobalStore = defineStore('global', () => {
     >
     jump: 'close' | 'open' | 'open_jump'
     border: string
-  }>('pumpSetting6', {
-    fontSize_mc: '16px',
+  }>('pumpSetting8', {
+    fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
     avatar_isCircle: 'rect',
@@ -88,7 +89,7 @@ export const useGlobalStore = defineStore('global', () => {
     isRight: false,
     isBlacklist: true,
     show_search: true,
-    isInt: false,
+    isInt: true,
     define: [
       'name',
       'txs',
@@ -163,6 +164,16 @@ export const useGlobalStore = defineStore('global', () => {
     border: '',
   })
 
+  watch(
+    () => themeStore.isDark,
+    () => {
+      pumpSetting.value.data.mc.minColor = getCssVariable('--main-text')
+      pumpSetting.value.data.vol.minColor = getCssVariable('--main-text')
+      pumpSetting.value.data.holders.minColor = getCssVariable('--main-text')
+    },
+    {immediate: true}
+  )
+
   const batchRemarkFormData = useStorage('batchRemarkFormData', {
     type: 1,
     needAmount: true,
@@ -182,7 +193,7 @@ export const useGlobalStore = defineStore('global', () => {
     sort: 'created_timestamp',
     sort_dir: 'DESC',
   })
-  const audioSettings = useStorage('audioSettings-v1',{
+  const audioSettings = useStorage('audioSettings-v2',{
     active:'',
     notice:{
       monitor:true,
@@ -209,7 +220,8 @@ export const useGlobalStore = defineStore('global', () => {
       marketBuy:'',
       marketSell:'',
       limit:'',
-      volume:50
+      volume:50,
+      twitter:''
     }
   })
 
@@ -224,6 +236,7 @@ export const useGlobalStore = defineStore('global', () => {
     logo_url: string,
     symbol: string,
     price_change: number | undefined,
+    price_change_v2: number | undefined,
     circulation: string,
     price: number,
   }[]>('lastTokens', [])
@@ -358,6 +371,7 @@ export const useGlobalStore = defineStore('global', () => {
     footerTokensPrice,
     footerTokensPriceIds,
     showLeft,
+    showRight,
     pumpSetting,
     pumpBlackList,
     holderBlackList,

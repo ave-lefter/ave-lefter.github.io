@@ -160,7 +160,7 @@ function addTokenFavorite(row, newGroupId: number) {
       <Collect :iconClass="`text-16px cursor-pointer ml-5px mr-12px`" :isCollected="row.is_fav" :userFavoriteGroups="globalStore.userFavoriteGroups" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
     </div>
     <div class="flex items-center gap-8px">
-      <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+      <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
         <template #default>
           <TokenImg
             :is-circle="isCircle"
@@ -234,6 +234,7 @@ function addTokenFavorite(row, newGroupId: number) {
           <el-tooltip
             v-if="row?.lp_locked_percent > 0 && row?.lp_locked_percent <= 100"
             placement="top"
+            :persistent="false"
           >
             <template #default>
               <el-progress
@@ -295,8 +296,13 @@ function addTokenFavorite(row, newGroupId: number) {
           </div>
           <div v-if="row?.medias?.length > 0" class="flex items-center gap-4px">
             <template v-for="(item, index) in row?.medias" :key="index">
-              <XPopup v-if="item.icon === 'twitter'" :tokenId="((row.token + '-' + row.chain) as string)" :type="row.twitter_type">
-
+              <span v-if="item.name === 'QQ'" v-tooltip="item.url" @click.stop>
+                <Icon
+                  :name="`custom:${item.icon}`"
+                  class="text-[--third-text] h-12px"
+                />
+              </span>
+              <XPopup v-else-if="item.icon === 'twitter'" :tokenId="((row.token + '-' + row.chain) as string)" :type="row.twitter_type">
                 <a class="flex items-center" :href="item.url" target="_blank" @click.stop>
                   <XIcon
                     v-if="[1, 2, 3].includes(row.twitter_type)"

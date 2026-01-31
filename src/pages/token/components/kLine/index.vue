@@ -63,7 +63,7 @@
         <el-checkbox v-model="linesChecked.buy.checked" class="[&&]:[--el-checkbox-height:16px]">{{
           $t('buyMa')
         }}</el-checkbox>
-        <el-tooltip v-model:visible="colorPickerVisible.buy" trigger="click" :teleported="false">
+        <el-tooltip v-model:visible="colorPickerVisible.buy" trigger="click" :teleported="false" :persistent="false">
           <div
             class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
             :style="{ background: linesChecked.buy.color }"
@@ -77,7 +77,7 @@
         <el-checkbox v-model="linesChecked.sell.checked" class="[&&]:[--el-checkbox-height:16px]">{{
           $t('sellMa')
         }}</el-checkbox>
-        <el-tooltip v-model:visible="colorPickerVisible.sell" trigger="click" :teleported="false">
+        <el-tooltip v-model:visible="colorPickerVisible.sell" trigger="click" :teleported="false" :persistent="false">
           <div
             class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
             :style="{ background: linesChecked.sell.color }"
@@ -91,7 +91,7 @@
         <el-checkbox v-model="linesChecked.kol.checked" class="[&&]:[--el-checkbox-height:16px]">{{
           $t('kolPosition')
         }}</el-checkbox>
-        <el-tooltip v-model:visible="colorPickerVisible.kol" trigger="click" :teleported="false">
+        <el-tooltip v-model:visible="colorPickerVisible.kol" trigger="click" :teleported="false" :persistent="false">
           <div
             class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
             :style="{ background: linesChecked.kol.color }"
@@ -122,6 +122,7 @@
           v-model:visible="colorPickerVisible.top100Buy"
           trigger="click"
           :teleported="false"
+          :persistent="false"
         >
           <div
             class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
@@ -142,6 +143,7 @@
           v-model:visible="colorPickerVisible.top100Sell"
           trigger="click"
           :teleported="false"
+          :persistent="false"
         >
           <div
             class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
@@ -1270,6 +1272,15 @@ onMounted(() => {
 })
 onUnmounted(() => {
   document.removeEventListener('click', clickHandler)
+  listenerGuidMap.forEach((i) => {
+    wsStore.send({
+      ...i,
+      method: 'unsubscribe',
+    })
+  })
+  listenerGuidMap?.clear()
+  _widget?.remove?.()
+  _widget = null
 })
 const emit = defineEmits(['refresh'])
 function refresh() {
