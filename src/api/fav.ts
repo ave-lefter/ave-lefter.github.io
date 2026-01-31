@@ -20,7 +20,8 @@ interface GetFavListResponse {
   symbol: string;
   current_price_usd: number;
   price_change: string;
-  price_change_v2: number;
+  // priceChange24h
+  price_change_v2: string;
   token_index: number;
   favorite_price: number;
   open_price: number;
@@ -42,7 +43,7 @@ interface GetFavListResponse {
 }
 
 // Get user favorite tokens
-function getFavoriteList(group = -1, pageNO = 1, address: string): Promise<GetFavListResponse[]> {
+function getFavoriteList(group = -1, pageNO = 1, address: string,sort_dir = '',sort = ''): Promise<GetFavListResponse[]> {
   const { $api } = useNuxtApp()
   return $api('/v1api/v4/tokens/favorite', {
     method: 'get',
@@ -50,7 +51,9 @@ function getFavoriteList(group = -1, pageNO = 1, address: string): Promise<GetFa
       address: address,
       group: group,
       pageNO: pageNO,
-      pageSize: 50
+      pageSize: 100,
+      sort_dir,
+      sort:sort_dir&&sort
     }
   })
 }

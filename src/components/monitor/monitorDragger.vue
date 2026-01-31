@@ -9,13 +9,15 @@
 </template>
 
 <script setup lang="ts">
-const signalStore = useSignalStore()
+import { useWindowSize } from '@vueuse/core'
+
+const { t } = useI18n()
 const monitorStore = useMonitorStore()
 const dragStore = useDragStore()
 const {placement}=storeToRefs(monitorStore)
 const {lang} = storeToRefs(useGlobalStore())
 const key=ref(0)
-
+const { width: winWidth } = useWindowSize()
 const reload = () => {
   key.value++
 }
@@ -110,18 +112,22 @@ const props2=computed(()=>{
   let data={} as any
   if(placement.value==='center'){
     data={
-      class:'rounded-8px shadow-[0_5px_10px_0_#0000001A]',
+      class:'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]',
       scrollHeight:monitorStore.monitorBoundingRect.height-40, 
       isLarge:monitorStore.monitorBoundingRect.width>720
     }
   }else{
-     data={
+    data={
       scrollHeight:monitorStore.winHeight-160,
     }
   }
   return data
 })
 function dragStop(x: number, y: number) {
+  if ((Math.abs(x) < 1||x + monitorStore.monitorBoundingRect.width >= winWidth.value) && dragStore.fixedCount >= 3) {
+    ElMessage.warning(t('popTips'))
+    return
+  }
   if(placement.value==='left'){
     monitorStore.onLeftDragStop(x,y)
   }else if(placement.value==='right'){

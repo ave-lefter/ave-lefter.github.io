@@ -10,6 +10,7 @@ import { TronContract, confirmTronTx } from '~/utils/wallet/utils/tronContract'
 import { getFeeIn } from '~/utils'
 import { getTonTokenBalance, getTonTokenList } from '~/utils/wallet/ton'
 import { getTonTokenInfo } from './ton'
+import { getTokensPnl } from '../bot'
 
 export * from './sui'
 
@@ -43,8 +44,10 @@ export const getUserBalance = createCacheRequest(async function(
     hide_small = 0
   }): Promise<GetUserBalanceResponseResult> {
   let tonAddressId = user_ids.find((i: string) => i?.endsWith?.('-ton'))
-  let otherUserIds = user_ids?.filter((i: string) => !i?.endsWith?.('-ton'))
+  let polygonAddressId = user_ids.find((i: string) => i?.endsWith?.('-polygon'))
+  let otherUserIds = user_ids?.filter((i: string) => !i?.endsWith?.('-ton') && !i?.endsWith?.('-polygon'))
   let tonTokenList: any[] = []
+  let polygonTokenList: any[] = []
   let _tokens: any = {
     data: [],
     total: tonTokenList?.length || 0,
@@ -53,12 +56,20 @@ export const getUserBalance = createCacheRequest(async function(
   }
   return Promise.all([(async () => {
     if (tonAddressId && pageNO === 1) {
-      tonTokenList = await getTonTokenList(getAddressAndChainFromId(tonAddressId)?.address).catch(async () => [])
-      tonTokenList = tonTokenList?.map(i => ({...i, total_profit: '0', total_profit_ratio: '--', average_purchase_price_usd: '--' }))?.filter(i => {
+      tonTokenList = await getTonTokenList(getAddressAndChainFromId(tonAddressId)?.address, 'all', true).catch(async () => [])
+      tonTokenList = tonTokenList?.map(i => ({...i, total_profit: i.total_profit || '0', total_profit_ratio: i.total_profit_ratio || '--', average_purchase_price_usd: i.average_purchase_price_usd || '--' }))?.filter(i => {
          return new BigNumber(i?.balance_usd || 0).gte(hide_small || 0)
       })
     }
     return tonTokenList
+  })(),(async () => {
+    if (polygonAddressId && pageNO === 1) {
+      polygonTokenList = await getUserTokenBalanceList(getAddressAndChainFromId(polygonAddressId)?.address, 'polygon', true).catch(async () => [])
+      polygonTokenList = polygonTokenList?.map(i => ({...i, total_profit: i.total_profit || '0', total_profit_ratio: i.total_profit_ratio || '--', average_purchase_price_usd: i.average_purchase_price_usd || '--' }))?.filter(i => {
+        return new BigNumber(i?.balance_usd || 0).gte(hide_small || 0)
+      })
+    }
+    return polygonTokenList
   })(), (async () => {
     const { $api } = useNuxtApp()
     if (otherUserIds?.length > 0) {
@@ -77,15 +88,13 @@ export const getUserBalance = createCacheRequest(async function(
     }
     return _tokens
   })()]).then(async (res) => {
-    console.log('tonTokenList', tonTokenList, res)
-    console.log('_tokens', _tokens)
-    if (tonTokenList?.length > 0) {
+    if (tonTokenList?.length > 0 || polygonTokenList?.length > 0) {
       return {
         ..._tokens,
-        data: [...(_tokens.data || []), ...tonTokenList].sort((a, b) => {
+        data: [...(_tokens.data || []), ...tonTokenList, ...polygonTokenList].sort((a, b) => {
           return (b[sort] - a[sort]) * (sort_dir === 'desc' ? 1 : 1)
         }),
-        total: _tokens.total + tonTokenList?.length
+        total: _tokens.total + tonTokenList?.length + polygonTokenList?.length
       }
     } else {
       return _tokens
@@ -213,10 +222,11 @@ export const getTokenDetails= createCacheRequest(async function (data1: {
   tokenAddress: string
   chain: string
   spender?: string
+  walletAddress?: string
 }) {
   const { tokenAddress, chain, spender } = data1
   const canSwapChain = isEvmChain(chain) || chain === 'solana' || chain === 'tron' || chain === 'sui' || chain === 'ton'
-  const account = useWalletStore().address
+  const account = data1.walletAddress || useWalletStore().address
   if (!chain || !tokenAddress || !canSwapChain) {
     return {
       symbol: '',
@@ -653,6 +663,81 @@ export async function getBalanceList(tokenArr: string[], chain = useWalletStore(
   return balanceList.map(i => (i !== null && i) ? i.toString() : '0')
 }
 
+export const getUserTokenBalanceList = createCacheRequest(async function(address:string, chain:string, isGetPnL = false) {
+  if (!address || !chain) {
+    return []
+  }
+  let userBalanceTokens: any[] = []
+  return getUserSwapTokenList(address, chain).then(res => {
+    userBalanceTokens = res?.map?.(i => ({...i, price: i?.current_price_usd || 0}))
+    if (userBalanceTokens.length > 0 && (/^0x[0-9a-zA-Z]{40}$/.test(address) || isValidAddress(address, 'tron'))) {
+      return getBalanceList(userBalanceTokens.map(i => i.token || ''), chain, address).then(async res1 => {
+        userBalanceTokens = userBalanceTokens?.map?.((i, k) => {
+          let _value = formatUnits(res1[k], i?.decimals || 0)
+          let _value_usd = new BigNumber(_value).times(i?.price || 0).toFixed()
+          return {...i, value: _value, value_usd: _value_usd, balance: _value, balance_usd: _value_usd}
+        })?.filter(j => !!Number(j.value))
+        if (isGetPnL) {
+          try {
+            let _tokens = userBalanceTokens.map(i => {
+              return {
+                token: i.token || i.address,
+                balance: i.value || '0'
+              }
+            })
+            let nativeIndex = _tokens.findIndex(i => i.token === NATIVE_TOKEN)
+            if (nativeIndex >= 0) {
+              _tokens.splice(nativeIndex, 1)
+            }
+            let pnls = await getTokensPnl({
+              tokens: _tokens,
+              chain,
+              walletAddress: address,
+              days: 30
+            })
+            if (nativeIndex >= 0) {
+              pnls.splice(nativeIndex, 0, {
+                ...userBalanceTokens[nativeIndex],
+                token: NATIVE_TOKEN,
+                balance: userBalanceTokens[nativeIndex]?.value || '0',
+              } as any)
+            }
+            pnls = pnls?.map?.((res, k) => {
+              let item = userBalanceTokens[k]
+              return {
+                ...res,
+                total_profit: res?.profit || '--',
+                unrealized_profit: res?.profitUnrealized || '0',
+                realized_profit: res?.profitRealized || '0',
+                balance_amount: item?.balance || item?.value || '0',
+                balance_usd: item?.balance_usd || '0',
+                total_profit_ratio: res?.profitRatio || '--',
+                unrealized_ratio: res?.unrealizedRatio || '0',
+                realized_ratio: res?.realizeRatio || '0',
+                total_purchase_usd: res?.totalBuyUsd || '0',
+                total_sold_usd: res?.totalSellUsd || '0',
+                balance_ratio: res?.balanceRatio || '0',
+                average_purchase_price_usd: res?.avgBuyPrice || '--',
+                average_sold_price_usd: res?.avgSellPrice || '0',
+                total_purchase: res?.totalBuyAmount || '0',
+                bought: res?.totalBuyAmount || '0',
+                total_sold: res?.totalSellAmount || '0',
+                sold: res?.totalSellAmount || '0',
+              }
+            })
+            userBalanceTokens = userBalanceTokens?.map?.((i, k) => ({...i, ...(pnls[k] || {})}))
+          } catch (err) {
+            console.log(err)
+          }
+        }
+        return userBalanceTokens
+      })
+    } else {
+      return userBalanceTokens
+    }
+  })
+}, 2000)
+
 // query swap token
 export function getBestRouteV2(from_token: string, to_token: string, chain: string, max_hops = 3, max_routes = 6): Promise<Array<{
   pair_path: Array<{
@@ -685,7 +770,7 @@ export function getBestRouteV2(from_token: string, to_token: string, chain: stri
   to_price: number
 }>> {
   const { $api } = useNuxtApp()
-  return $api('/botapi/swap/getBestRoute', {
+  return $api('/bestrouteapi/getBestRoute', {
     method: 'get',
     query: {
       from_token,
@@ -694,6 +779,9 @@ export function getBestRouteV2(from_token: string, to_token: string, chain: stri
       max_hops,
       max_routes,
       // protocol: 'v3'
+    },
+    headers: {
+      'X-Auth': localStorage.getItem('ave_token') || ''
     }
   }).then(async res => {
     return res?.data || res || []

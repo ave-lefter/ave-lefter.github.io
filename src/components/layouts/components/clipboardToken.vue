@@ -81,7 +81,7 @@ const botStore = useBotStore()
 let Timer: null | ReturnType<typeof setTimeout> = null
 async function checkClipboardText() {
   try {
-    const text = await navigator.clipboard.readText()
+    const text = await navigator?.clipboard?.readText()
     console.log('clipboard.readText', text)
     const isValid  = text && ['eth', 'solana'].some(i => isValidAddress(text, i))
     if (!isValid) {

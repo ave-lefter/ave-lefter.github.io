@@ -46,8 +46,6 @@ export const WSEventType = {
   PRICE_NEW: 'price-new',
   PRICE_GAINER: 'price-gainer',
   PRICE_EXTRA: 'price_extra',
-  PUMPSTATE: 'pumpstate',
-  TOKEN_UPDATED: 'token_updated',
   PRICEV2: 'pricev2',
   TGBOT: 'tgbot',
   ASSET: 'asset',
@@ -55,7 +53,17 @@ export const WSEventType = {
   GOLD_SIGNAL: 'gold_signal',
   SIGNALSV2_PUBLIC_MONITOR: 'signalsv2_public_monitor',
   PUBLIC_PORTRAIT: 'public_portrait',
-  SIMPLE_TX: 'simple_tx'
+  SIMPLE_TX: 'simple_tx',
+  PUMP_MIGRATED: 'pump_migrated'
+}
+// perp
+export const WSPerpHost = 'wss://quote.edgex.exchange'
+
+export const WSPerpEventType = {
+  TICKER_ALL_1S: 'ticker.all.1s',
+  KLINE: 'kline.LAST_PRICE',
+  DEPTH: 'depth',
+  TRADES: 'trades',
 }
 
 export const MAX_UINT_AMOUNT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
@@ -108,6 +116,7 @@ export const BusEventType = {
   // LEFT_DRAG: 'left-drag',
   SCROLL_TO_TOP: 'scroll-to-top',
   TOP_ADD_GROUP: 'top-add-group',
+  DEV_TOKENS_TAB: 'dev-tokens-tab',
 }
 
 export const ProvideType = {
@@ -118,6 +127,7 @@ export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer','fsc'
 export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
 
 export const SupportTokenKlineChains = ['juchain', 'arbitrum', 'optimism']
+export const SupportCopyTradeChain = ['solana', 'bsc', 'eth', 'base']
 
 export const defaultPaginationParams = {
   pageNO: 1,
@@ -197,7 +207,7 @@ export const SwapType = {
   LIMIT_SELL: 6,
 }
 
-export const CategroyTabsCacheKey = {
+export const CategoryTabsCacheKey = {
   hot:'hotRanks',
   new:'newRanks',
   gainer:'gainerRanks',
@@ -206,4 +216,26 @@ export const CategroyTabsCacheKey = {
   binance_alpha:'binance_alphaRanks',
   xstocks:'xstocksRanks',
   volume:'volumeRanks',
+}
+
+export const holdersTooltip = (t)=>({
+  30:t('smart'),
+   31:t('kol2'),
+   39:t('whale2'),
+   19:t('shot'),
+   35:t('bad'),
+   36:t('bindAddress'),
+   34:t('fishing'),
+   25:t('dev2'),
+   16:t('mouse')
+})
+
+export const KOL_KEY = '31'
+
+export const WSEventV2Type = {
+  PUMPSTATE: 'pumpstatev2',
+  TOKEN_UPDATED: 'token_updated',
+  PORTRAIT_STATISTICS:'portrait_statistics',
+  TWITTER_MONITOR:'twitter_monitor',
+  PUBLIC_TWITTER:'public_twitter'
 }

@@ -3,7 +3,7 @@ export const BatchQuoteAddress = {
 }
 export const QuoteAddress: Record<string, string> = {
   // bsc: '0x94B04A396236Aeea14b5a6e3De36B00C561892f9',
-  bsc: '0xbd63258dE3D03C7E741d2438bAF5c8407EDD2e0C',
+  bsc: '0xf167ad0D21211BD35a47A377a7eA60139263Bc32',
   arbitrum: '0x208522A06e4420092DF8cB05A6823E6C5b81882f',
   core: '0xC69C0465c16fdcdA8686725E21892c73B806Eb5D',
   polygon: '0x208522A06e4420092DF8cB05A6823E6C5b81882f',
@@ -40,6 +40,8 @@ export const QuoteAddress: Record<string, string> = {
   popchain: '0x4d28d137d5edc40d7c93Bf9DA82171F7f330B03A',
   plasma: '0xd669b935419ea11f5a691bff056a269170c166e8',
   gatelayer: '0xD669b935419eA11f5a691Bff056a269170C166E8',
+  chiliz: '0xD669b935419eA11f5a691Bff056a269170C166E8',
+  monad: '0x679c2E7eE14DfA0B752fF28d93cF22C1E47f70f5'
 }
 
 
@@ -108,6 +110,8 @@ export const SwapContracts: Record<string, string> = {
   popchain: '0x679c2E7eE14DfA0B752fF28d93cF22C1E47f70f5',
   plasma: '0xC2402C8453F39e97113F094E3402fbBdD7E0eDe3',
   gatelayer: '0xC2402C8453F39e97113F094E3402fbBdD7E0eDe3',
+  chiliz: '0xC2402C8453F39e97113F094E3402fbBdD7E0eDe3',
+  monad: '0xC2402C8453F39e97113F094E3402fbBdD7E0eDe3'
 }
 
 export const FeeAddress = '0x69aaaff7419fd2ce58079f05ff06b2ff66d446d2'

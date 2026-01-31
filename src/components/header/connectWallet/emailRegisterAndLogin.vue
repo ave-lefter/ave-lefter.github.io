@@ -102,7 +102,7 @@
           :disabled="!!refCode"
         />
       </el-form-item>
-      <el-form-item v-if="cType == 'login'" class="mb-10px">
+      <!-- <el-form-item v-if="cType == 'login'" class="mb-10px">
         <label
           class="el-form-item__label icon mb-0 justify-between!"
         >
@@ -115,18 +115,15 @@
                 ? $t("startVcodeLogin")
                 : $t("startPwdLogin")
             }}
-            <!-- <el-icon class="h-11.33px w-13.33px">
-              <Switch />
-            </el-icon> -->
           </a>
           <a
-            class="gap-8px flex items-center clickable underline! color-[--main-text]"
+            class="gap-8px flex items-center clickable underline! color-[--main-text] ml-auto"
             @click.prevent="emit('update:c-type', 'reset')"
           >
             {{ $t("startForgetPassword") }}
           </a>
         </label>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item class="mb-10px!">
         <div v-if="cType === 'login' && loginType === 'password'" id="captcha-element" class="mb-10px'" />
         <el-button
@@ -266,7 +263,7 @@ const loading3 = ref(false)
 const loading4 = ref(true)
 const disabled4 = ref(true)
 const timer = ref<ReturnType<typeof setInterval> | undefined>(undefined)
-const loginType = ref('password')
+const loginType = ref('email')
 const showRefCode = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
 

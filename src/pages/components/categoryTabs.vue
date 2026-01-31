@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import ColumnsToolbar from './columnsToolbar.vue'
-import BlackList from '../pump/blackList.vue'
+import BlackList from '../pump/components/blackList.vue'
 import PumpLiveSort from './live/pumpLiveSort.vue'
 import type { CategoryElement, IGetTreasureConfig } from '~/api/market'
 import { getHotDefaultColumns, getHotOptions } from './hotRank/columnRender/hotColumusService'
 import { getNewDefaultColumns, getNewOptions } from './newRank/columnRender/newColumnsService'
-import { getInclusionDefaultColumns, getInclusionOptions } from './inclusionRank/columnRender/inclusionColumnsService'
+import {
+  getInclusionDefaultColumns,
+  getInclusionOptions,
+} from './inclusionRank/columnRender/inclusionColumnsService'
 import { getGainDefaultColumns, getGainOptions } from './gainerRank/columnRender/gainColumnsService'
 import ChainsSelect from './chainsSelect.vue'
 import { getPumpDefault, getPumpOptions } from './pump/columnRender/pumpColumnsService'
@@ -44,8 +47,8 @@ const isPump = computed(() => props.activeTab === 'pump')
 const isNew = computed(() => props.activeTab === 'new')
 const isInclusion = computed(() => props.activeTab === 'inclusion')
 const configMap = computed(() => {
-  const pumpMaps = props.categories.reduce((prev,cur)=>{
-    if(cur.is_pump && cur.category !== 'pump'){
+  const pumpMaps = props.categories.reduce((prev, cur) => {
+    if (cur.is_pump && cur.category !== 'pump') {
       prev[cur.category] = {
         icon: '',
         storageKey: `${cur.category}Ranks`,
@@ -54,94 +57,99 @@ const configMap = computed(() => {
       }
     }
     return prev
-  },{} as any)
+  }, {} as any)
   return {
     hot: {
       icon: 'custom:hot',
-      storageKey: CategroyTabsCacheKey.hot,
+      storageKey: CategoryTabsCacheKey.hot,
       getDefaultColumns: getHotDefaultColumns,
       getOptions: getHotOptions,
       class: isHot.value ? 'color-[--yellow]' : '',
     },
     new: {
       icon: 'custom:new',
-      storageKey: CategroyTabsCacheKey.new,
+      storageKey: CategoryTabsCacheKey.new,
       getDefaultColumns: getNewDefaultColumns,
       getOptions: getNewOptions,
       class: isNew.value ? 'color-#85E12F' : '',
     },
     gainer: {
       icon: 'custom:gainer',
-      storageKey: CategroyTabsCacheKey.gainer,
+      storageKey: CategoryTabsCacheKey.gainer,
       getDefaultColumns: getGainDefaultColumns,
       getOptions: getGainOptions,
       class: props.activeTab === 'gainer' ? 'color-#22C55E' : '',
     },
     pump: {
       icon: getPumpIcon(isPump.value),
-      storageKey: CategroyTabsCacheKey.pump,
+      storageKey: CategoryTabsCacheKey.pump,
       getDefaultColumns: getPumpDefault,
       getOptions: getPumpOptions,
       class: '',
     },
     inclusion: {
       icon: 'custom:inclusion',
-      storageKey: CategroyTabsCacheKey.inclusion,
+      storageKey: CategoryTabsCacheKey.inclusion,
       getDefaultColumns: getInclusionDefaultColumns,
       getOptions: getInclusionOptions,
       class: isInclusion.value ? 'color-#B43BFF' : '',
     },
     binance_alpha: {
       icon: '',
-      storageKey: CategroyTabsCacheKey.binance_alpha,
+      storageKey: CategoryTabsCacheKey.binance_alpha,
       getDefaultColumns: getActivityDefaultColumns,
       getOptions: getActivityOptions,
       class: '',
     },
     xstocks: {
       icon: '',
-      storageKey: CategroyTabsCacheKey.xstocks,
+      storageKey: CategoryTabsCacheKey.xstocks,
       getDefaultColumns: getActivityDefaultColumns,
       getOptions: getActivityOptions,
       class: '',
     },
-    volume:{
-      icon:'',
-      storageKey:CategroyTabsCacheKey.volume,
-      getDefaultColumns:getActivityDefaultColumns,
-      getOptions:getActivityOptions,
-      class:''
+    volume: {
+      icon: '',
+      storageKey: CategoryTabsCacheKey.volume,
+      getDefaultColumns: getActivityDefaultColumns,
+      getOptions: getActivityOptions,
+      class: '',
     },
-    pumplive:{
+    pumplive: {
       icon: 'custom:video',
       storageKey: '',
-      getDefaultColumns: () => { },
-      getOptions: () => { },
-      class:''
+      getDefaultColumns: () => {},
+      getOptions: () => {},
+      class: '',
     },
-    ...pumpMaps
+    ...pumpMaps,
   }
 })
 
-
-
-watch(()=>props.activeChain, () => {
-  const index=props.categories.findIndex((i) => {
-    return i.category === props.activeTab
-  })
-  if(index>-1){
-    if(props.categories[index] && props.categories[index].sub_category && props.categories[index].sub_category.length > 0){
-      const index2=props.categories?.[index]?.sub_category?.findIndex((i) => {
-        return i.category === props.activeSubTab
-      })
-      if(index2<=-1){
-        emit('update:activeTab','hot')
+watch(
+  () => props.activeChain,
+  () => {
+    const index = props.categories.findIndex((i) => {
+      return i.category === props.activeTab
+    })
+    if (index > -1) {
+      if (
+        props.categories[index] &&
+        props.categories[index].sub_category &&
+        props.categories[index].sub_category.length > 0
+      ) {
+        const index2 = props.categories?.[index]?.sub_category?.findIndex((i) => {
+          return i.category === props.activeSubTab
+        })
+        if (index2 <= -1) {
+          emit('update:activeTab', 'hot')
+        }
       }
+    } else {
+      emit('update:activeTab', 'hot')
     }
-  }else{
-    emit('update:activeTab','hot')
   }
-})
+)
 function getPumpIcon(isPump: boolean) {
   if (isPump) {
     return themeStore.isDark ? 'custom:pump-active' : 'custom:pump-white'
@@ -187,12 +195,12 @@ const sub_category_list = computed(() => {
   )
 })
 const categoryRef = useTemplateRef('categoryRef')
-function updateCategory(category: string, sub_category: CategoryElement[],index:number) {
+function updateCategory(category: string, sub_category: CategoryElement[], index: number) {
   emit('update:activeTab', category)
   if (!sub_category.some((el) => el.category === props.activeSubTab)) {
     emit('update:activeSubTab', sub_category[0]?.category || '')
   }
-  scrollTabToCenter(categoryRef,index)
+  scrollTabToCenter(categoryRef, index)
 }
 function updateSubCategory(category: string) {
   emit('update:activeSubTab', category)
@@ -203,19 +211,22 @@ function updateActiveChain(chain: string) {
 }
 const botStore = useBotStore()
 const walletStore = useWalletStore()
-const isSupportedChain = computed(()=>{
-  return (props.activeChain==='AllChains' || botStore.isSupportChains.includes(props.activeChain))
+const isSupportedChain = computed(() => {
+  return props.activeChain === 'AllChains' || botStore.isSupportChains.includes(props.activeChain)
 })
-watch(()=>props.categories,()=>{
-  setTimeout(()=>{
-    const index = props.categories.findIndex((el) => {
-      return el.category === props.activeTab
-    })
-    if (index > -1) {
-      scrollTabToCenter(categoryRef, index)
-    }
-  },20)
-})
+watch(
+  () => props.categories,
+  () => {
+    setTimeout(() => {
+      const index = props.categories.findIndex((el) => {
+        return el.category === props.activeTab
+      })
+      if (index > -1) {
+        scrollTabToCenter(categoryRef, index)
+      }
+    }, 20)
+  }
+)
 </script>
 
 <template>
@@ -236,7 +247,7 @@ watch(()=>props.categories,()=>{
               ? 'color-[--white] bg-[--primary-color]'
               : 'bg-[--main-input-button-bg] color-[--secondary-text]'
           "
-          @click="updateCategory(item.category, item.sub_category || [],index)"
+          @click="updateCategory(item.category, item.sub_category || [], index)"
         >
           <Icon
             v-if="configMap[item.category as keyof typeof configMap]?.icon"
@@ -245,12 +256,24 @@ watch(()=>props.categories,()=>{
             :class="configMap[item.category as keyof typeof configMap].class"
           />
           {{ (item as any)[`name_${localeStore.locale.replace('cn', 'ch').replace('-', '_')}`] }}
-          <img v-if="item.is_hot === 1" class="absolute right-0px top-0px" src="@/assets/images/hot.svg" alt="" :height="10">
-          <img v-else-if="item.is_hot === 2" class="absolute right-0px top-0px" src="@/assets/images/new.svg" alt="" :height="10">
+          <img
+            v-if="item.is_hot === 1"
+            class="absolute right-0px top-0px"
+            src="@/assets/images/hot.svg"
+            alt=""
+            :height="10"
+          />
+          <img
+            v-else-if="item.is_hot === 2"
+            class="absolute right-0px top-0px"
+            src="@/assets/images/new.svg"
+            alt=""
+            :height="10"
+          />
         </span>
       </div>
       <div class="flex gap-12px items-center text-12px">
-        <PumpLiveSort v-if="props.activeTab =='pumplive'"/>
+        <PumpLiveSort v-if="props.activeTab == 'pumplive'" />
         <div v-else class="p-1 rounded-1 bg-[--main-input-button-bg]">
           <button
             v-for="(item, index) in intervals"
@@ -267,17 +290,26 @@ watch(()=>props.categories,()=>{
           </button>
         </div>
         <div class="flex items-center">
-          <RankFilter v-if="activeTab==='hot'" :storageKey="configMap[activeTab as keyof typeof configMap]?.storageKey"  :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns" :ammList="ammList"/>
-          <el-switch v-if="isSupportedChain" v-model="globalStore.rankCommon.quickVisible" class="mr-2" />
+          <RankFilter
+            v-if="activeTab === 'hot'"
+            :storageKey="configMap[activeTab as keyof typeof configMap]?.storageKey"
+            :getDefaultColumns="configMap[activeTab as keyof typeof configMap].getDefaultColumns"
+            :ammList="ammList"
+          />
+          <el-switch
+            v-if="isSupportedChain"
+            v-model="globalStore.rankCommon.quickVisible"
+            class="mr-2"
+          />
           <QuickSwapSet
-            v-if="globalStore.rankCommon.quickVisible&&isSupportedChain"
+            v-if="globalStore.rankCommon.quickVisible && isSupportedChain"
             v-model:quickBuyValue="globalStore.rankCommon.quickBuyValue"
-            :class=" props.activeTab =='pumplive'? '': 'mr-12px'"
+            :class="props.activeTab == 'pumplive' ? '' : 'mr-12px'"
             :settingsButtonVisible="false"
             :quickTextVisible="false"
-            :chain="(activeChain==='AllChains'?'':activeChain)"
+            :chain="activeChain === 'AllChains' ? '' : activeChain"
           />
-          <BlackList  v-if="props.activeTab !=='pumplive'"/>
+          <BlackList v-if="props.activeTab !== 'pumplive'" />
           <ColumnsToolbar
             v-if="configMap[activeTab as keyof typeof configMap]"
             class="ml-4px"
@@ -300,8 +332,8 @@ watch(()=>props.categories,()=>{
       class="p-2 lh-16px cursor-pointer rounded-1 flex items-center"
       :class="
         activeSubTab === item.category
-           ? 'color-[--white] bg-[--primary-color]'
-              : 'bg-[--main-input-button-bg] color-[--secondary-text]'
+          ? 'color-[--white] bg-[--primary-color]'
+          : 'bg-[--main-input-button-bg] color-[--secondary-text]'
       "
       @click="updateSubCategory(item.category)"
     >

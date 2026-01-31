@@ -18,7 +18,8 @@
     </ul> -->
      <ul class="menu ml-20px">
       <li v-for="(item, $index) in list" :key="$index">
-       <NuxtLink :to="item.src" :target="item.target" :class="{ active: String(route?.name)?.indexOf(item.id) > -1 }">
+       <NuxtLink class="relative" :to="item.src" :target="item.target" :class="{ active: routeName?.indexOf(item.id) > -1 }">
+        <Icon  v-if="item.id == 'index'" name="custom:new1" class="absolute text-8px right--8px top-0px"/>
         {{item.name }}
       </NuxtLink>
       </li>
@@ -295,17 +296,22 @@ const botTipDialogRef = useTemplateRef('botTipDialogRef')
 const openPasteAddress = useStorage('openPasteAddress', true, localStorage)
 const openPasteText = useStorage('openPasteText', false, localStorage)
 
+const routeName = computed(() => {
+  return route.name || ''
+})
+
 const list = computed(() => {
   // let query = ''
   // if (botStore.accessToken && botStore.refreshToken) {
   //   query = `?act=${botStore.accessToken}&ret=${botStore.refreshToken}`
   // }
   const menues = [
-    {id: 'index', name: t('markets'), src: '/', target: '_self'},
-    // {id: 'index', name: t('markets'), src: 'https://ave.ai/' + query, target: '_blank'},
-    { id: 'pump', name: t('pump1'), src: '/pump' },
+    { id: 'index', name: t('pump1'), src: '/', target: '_self' },
+    {id: 'chain', name: t('markets'), src: '/chain', target: '_self'},
     { id: 'follow', name: t('follow'), src: '/follow' },
-    {id: 'smart', name: t('smarter2'), src: '/smart', target: '_self'},
+    {id: 'smart', name: t('signal2'), src: '/smart', target: '_self'},
+    {id: 'copy-trade', name: t('copyTrade'), src: '/copy-trade', target: '_self'},
+    { id: 'perp', name: t('perp'), src: '/perp' },
     {id: 'address', name: t('balances'), src: '/address', target: '_self'},
   ]
   return menues
@@ -392,7 +398,7 @@ header {
       text-align: center;
       padding: 4px 8px;
       border-radius: 8px;
-      color: var(--third-text);
+      color: var(--main-text);
       margin-right: 8px;
       text-decoration: none;
 

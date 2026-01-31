@@ -5,6 +5,7 @@ const props = defineProps({
       chain: string;
       logo_url: string;
       symbol?: string;
+      issue_platform?: string;
     }>,
     default: () => ({
       chain: '',
@@ -52,8 +53,11 @@ const tokenLogoUrl = computed(() => {
         <img class="w-full block" src="@/assets/images/icon-default.png" alt="">
       </template>
     </el-image>
+
+    <img v-if="row.issue_platform" v-tooltip="row.issue_platform" :src="formatIconTag(row.issue_platform)"
+      :class="`rounded-full absolute right-0 bottom-0 block ${chainClass}`" alt="">
     <img
-      v-if="row.chain"
+v-else-if="row.chain"
       :class="`rounded-full absolute right-0 bottom-0 block ${chainClass}`"
       :src="`${token_logo_url}chain/${row.chain}.png`"
       alt=""

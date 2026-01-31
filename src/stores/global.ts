@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import type { pumpBlack, pumpObjColor } from '@/api/types/pump'
 import { _getFollowsNum } from '@/api/follow'
-
+import type { MonitorChainType } from '~/utils/types'
 import type{ GetHotTokensResponse } from '@/api/token'
 import type { ILatestNotice } from '~/api/user'
 import { getUserFavoriteGroups, type GetUserFavoriteGroupsResponse } from '~/api/fav'
@@ -12,6 +12,7 @@ export const useGlobalStore = defineStore('global', () => {
   const themeStore = useThemeStore()
   const configStore = useConfigStore()
   const showLeft = shallowRef(true)
+  const showRight = shallowRef(true)
   const isUSDT = useStorage('isUSDT', true)
   const footerTokensPrice = shallowRef([
     {
@@ -79,8 +80,8 @@ export const useGlobalStore = defineStore('global', () => {
     >
     jump: 'close' | 'open' | 'open_jump'
     border: string
-  }>('pumpSetting6', {
-    fontSize_mc: '16px',
+  }>('pumpSetting8', {
+    fontSize_mc: '12px',
     size_swap: '12px',
     Progress_isCircle: 'circle',
     avatar_isCircle: 'rect',
@@ -88,7 +89,7 @@ export const useGlobalStore = defineStore('global', () => {
     isRight: false,
     isBlacklist: true,
     show_search: true,
-    isInt: false,
+    isInt: true,
     define: [
       'name',
       'txs',
@@ -163,6 +164,22 @@ export const useGlobalStore = defineStore('global', () => {
     border: '',
   })
 
+  watch(
+    () => themeStore.isDark,
+    () => {
+      pumpSetting.value.data.mc.minColor = getCssVariable('--main-text')
+      pumpSetting.value.data.vol.minColor = getCssVariable('--main-text')
+      pumpSetting.value.data.holders.minColor = getCssVariable('--main-text')
+    },
+    {immediate: true}
+  )
+
+  const batchRemarkFormData = useStorage('batchRemarkFormData', {
+    type: 1,
+    needAmount: true,
+    isUpdateExist: true,
+  })
+
   const hide_risk=shallowRef(1)
   const hide_small=shallowRef(0)
   const rankCommon = useStorage('rankCommon', {
@@ -176,12 +193,26 @@ export const useGlobalStore = defineStore('global', () => {
     sort: 'created_timestamp',
     sort_dir: 'DESC',
   })
-  const audioSettings = useStorage('audioSettings',{
+  const audioSettings = useStorage('audioSettings-v2',{
     active:'',
     notice:{
-      monitor:false,
+      monitor:true,
+      monitorShow:0,
+      monitorBorder:1,
+      monitorTh:[true,true,true],
+      quickBuyChain:'solana' as  MonitorChainType,
+      // monitorTh:['walletUser','walletName','MC','createTime'],
+      quickBuy:true,
+      quickBuyValue_solana:'0.01',
+      quickBuyValue_bsc:'0.01',
+      quickBuyValue_xlayer:'0.01',
+      quickBuyAction:1,
       signal:true,
-      position:'top'
+      pumpNotice:false,
+      pumpChains:['solana'] as string[],
+      pumpPlatforms:[] as string[],
+      position:'top',
+      time:3
     },
     audio:{
       signal:'Bar',
@@ -189,17 +220,23 @@ export const useGlobalStore = defineStore('global', () => {
       marketBuy:'',
       marketSell:'',
       limit:'',
-      volume:50
+      volume:50,
+      twitter:''
     }
   })
 
   // 预留一个全局变量，用于控制 token 历史的显示
   const tokenHistoryVisible = true
+  const klineSettingPop = ref({
+    visible:false,
+    position:[] as number[]
+  })
   const lastVisitTokens = useStorage<{
     id: string,
     logo_url: string,
     symbol: string,
     price_change: number | undefined,
+    price_change_v2: number | undefined,
     circulation: string,
     price: number,
   }[]>('lastTokens', [])
@@ -334,6 +371,7 @@ export const useGlobalStore = defineStore('global', () => {
     footerTokensPrice,
     footerTokensPriceIds,
     showLeft,
+    showRight,
     pumpSetting,
     pumpBlackList,
     holderBlackList,
@@ -359,6 +397,8 @@ export const useGlobalStore = defineStore('global', () => {
     dialogVisible_search,
     dialogSearchText,
     showImport,
-    showBotRecord
+    showBotRecord,
+    batchRemarkFormData,
+    klineSettingPop
   }
 })

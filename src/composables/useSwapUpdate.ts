@@ -10,11 +10,12 @@ export const useSwapUpdate = (walletTokenInfo: Ref<WalletTokenInfo | undefined |
          const tokenId = el.token +'-' + el.chain
          if(tokenId === route.params.id && walletTokenInfo.value){
            const balance_amount = Number((walletTokenInfo.value.balance_amount || 0))
+           if (!balance_amount) return
            const newBalance = el.uprice * balance_amount
            const _unrealizedProfit = (el.uprice - Number(walletTokenInfo.value.average_purchase_price_usd || 0)) * balance_amount
            const _totalProfit = _unrealizedProfit + Number((walletTokenInfo.value.realized_profit || 0))
            const unrealized_ratio = el.uprice / Number(walletTokenInfo.value.average_purchase_price_usd || 0) - 1
-     
+
            walletTokenInfo.value.balance_usd = String(newBalance)
            walletTokenInfo.value.unrealized_profit = String(_unrealizedProfit)
            walletTokenInfo.value.unrealized_ratio = String(unrealized_ratio)

@@ -36,13 +36,7 @@
       </div>
       <div v-if="tabActive === 0" class="import part">
         <p>{{ $t('bulkDesc1') }}</p>
-        <div class="example">
-          <!-- <div class="mr-5px">{{ $t('bulkExample') }}:</div> -->
-          <!-- <div>
-            <div>5meiN***8vGB:{{ $t('remark') }}1,</div>
-            <div>G8oaP***eLgf:{{ $t('remark') }}2</div>
-          </div> -->
-        </div>
+
         <el-select
           v-model="activeChain"
           class="chains-select [&&]:[--el-fill-color-blank:--border]"
@@ -51,6 +45,7 @@
           style="width: 100%"
           :teleported="false"
           :suffix-icon="SuffixIcon"
+          @change="validateInput"
         >
           <template #prefix>
             <img
@@ -104,7 +99,39 @@
           "
           @input="validateInput"
         />
-        <div class="error-message"><span v-if="!isValid">{{ errorMessage }}</span></div>
+        <div v-if="!isValid" class="error-message mt-2"><span v-html="errorMessage"></span></div>
+        <div class="flex mt-10px mb-4px justify-between">
+          <div class="text-14px">{{ $t('addToGroup') }}
+          </div>
+          <el-switch v-model="showGroup" size="small" />
+        </div>
+        <div v-if="showGroup" class="mb-40px">
+          <el-select
+            v-model="selectedGroupId"
+            size="large"
+            class="chains-select !text-14px !mb-5px [&&]:[--el-fill-color-blank:--border]"
+            @click.stop
+          >
+            <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
+            <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" />
+          </el-select>
+          <div ref="addButtonRef" class="button black mt-5px !h-40px !leading-40px">
+            <Icon name="custom:add-icon" class="text-12px" />
+            {{ $t('newGroup') }}
+          </div>
+          <ProPopover
+            ref="proPopoverRef"
+            v-model="addGroupName"
+            :button-ref="addButtonRef || {}"
+            width="410px"
+            :label="$t('newGroup')"
+            :placeholder="$t('enterGroupName')"
+            prop="name"
+            :title="$t('newGroup')"
+            @onConfirm="handleAddGroup"
+          />
+        </div>
+
         <div class="button black" @click="getClipboardContent">{{ $t('paste') }}</div>
         <el-button
           class="width100 button"
@@ -160,10 +187,20 @@
           </el-option>
         </el-select>
         <textarea v-model="exportStr" class="textarea" disabled />
-        <div class="button copy" @click="copyToClipboard">
+        <el-button
+          class="width100 button mt-30px"
+          block
+          size="large"
+          type="primary"
+          @click="copyToClipboard"
+        >
           {{ $t('copy') }}
           <span v-if="exportNumber > 0">({{ exportNumber }})</span>
-        </div>
+        </el-button>
+        <!-- <div class="button copy" @click="copyToClipboard">
+          {{ $t('copy') }}
+          <span v-if="exportNumber > 0">({{ exportNumber }})</span>
+        </div> -->
       </div>
       <div v-else-if="tabActive === 2" class="delete part">
         <p>{{ $t('bulkDeleteDesc') }}</p>
@@ -213,6 +250,7 @@
           class="width100 button mt-30px"
           block
           size="large"
+          type="primary"
           color="#3F80F7"
           :loading="loadingDelete"
           @click.stop="confirmBulkDelete"
@@ -224,27 +262,30 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   batchDeleteAddresses,
+  changeFavoriteGroupName2,
   bulkExportAttention,
   bulkImportAttention,
   getZeroBalanceAddresses,
+  getAttentionPageList,
+  getUserFavoriteGroups2,
+  addFavoriteGroup2
 } from '~/api/attention'
-import { ElMessage } from 'element-plus'
-import { generateAvatarIcon, getChainInfo, isValidAddress, evm_utils as utils } from '@/utils'
-import { ArrowDownBold } from '@element-plus/icons-vue'
-import SuffixIcon from './suffixIcon.vue'
-import { getAttentionPageList, getUserFavoriteGroups2} from '~/api/attention'
-const { mode, token_logo_url } = storeToRefs(useGlobalStore())
-const { currentAddress, showBatchAddressDetails } = storeToRefs(useFollowStore())
+import ProPopover from '@/pages/follow/components/proPopover.vue'
 
-const { updateNum3 } = storeToRefs(useFollowStore())
+import { ElMessage } from 'element-plus'
+import { getChainInfo, isValidAddress } from '@/utils'
+import SuffixIcon from './suffixIcon.vue'
+const configStore = useConfigStore()
+const token_logo_url = computed(() => configStore.token_logo_url || 'https://www.iconaves.com/')
+const { addressGroups, currentAddress, updateNum3, showBatchAddressDetails } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
+const followStore = useFollowStore()
 const { t } = useI18n()
 const tabActive = ref(0)
 const favTotal = ref(0)
-const favGroups = ref([])
 const importStr = ref('')
 const exportStr = ref('')
 const isValid = ref(true)
@@ -254,12 +295,46 @@ const loading = ref(false)
 const loadingDelete = ref(false)
 const zeroBalanceAddresses = ref('')
 const zeroBalanceList = ref([])
+const showGroup = ref(false)
+const proPopoverRef = ref()
+const addGroupName = ref('')
+const addButtonRef = ref()
+const selectedGroupId = ref(0)
 
 const emit = defineEmits(['refresh'])
 const exportNumber = computed(() => {
-  const entries = JSON.parse(exportStr.value)
+  let entries = []
+  try {
+    entries = JSON.parse(exportStr.value)
+  } catch (e) {
+    entries=[]
+  }
+  // const entries = JSON.parse(exportStr.value)
   return entries.length || 0
 })
+
+
+// function handleConfirmEdit(currentEditGroup: number, remark:string) {
+//   changeFavoriteGroupName2(remark, currentEditGroup).then(() => {
+//     ElMessage.success(t('success'))
+//     followStore.getUserFavoriteGroups2()
+//   }).catch((e) => {
+//      ElMessage.error(String(e))
+//   })
+// }
+
+function handleAddGroup(name:string) {
+   if(followStore.addressGroups.map(i=>i.name).includes(name)){
+    ElMessage.error(t('groupExistT'))
+  }else{
+    addFavoriteGroup2(name).then(() => {
+     ElMessage.success(t('success'))
+     followStore.getUserFavoriteGroups2()
+   }).catch((e) => {
+      ElMessage.error(String(e))
+   })
+  }
+}
 
 watch(()=>showBatchAddressDetails.value, (val) => {
   if (!val) {
@@ -269,6 +344,7 @@ watch(()=>showBatchAddressDetails.value, (val) => {
     zeroBalanceAddresses.value = ''
     zeroBalanceList.value = []
     favTotal.value = 0;
+    errorMessage.value = ''
   } else {
     getfavGroupsTotal();
   }
@@ -304,8 +380,7 @@ const getfavGroupsTotal = async () => {
 
 const getTotal = async (group) => {
   try {
-    const { total } = await getAttentionPageList({ address:currentAddress.value, pageSize:500, user_chain:activeChain.value, group });
-
+    const { total } = await getAttentionPageList({ address:currentAddress.value, pageSize:500, user_chain:'AllChains', group });
     return total;
   } catch (err) {
     // console.error('copy failed:', err)
@@ -346,8 +421,15 @@ const validateInput = () => {
   errorMessage.value = ''
   if (isJSON(importStr.value)) {
     const entries = JSON.parse(importStr.value)
+    console.log('favTotal.value', favTotal.value);
+    console.log('entries.length', entries.length);
     if (entries.length + favTotal.value > 500) {
-      errorMessage.value = t('batchErrorMsg3', { n: 500 })
+      errorMessage.value = '<span class="text-yellow-500">'
+      + t('batchErrorMsg3').split(':')[0]
+      + ', </span>'
+      + '<span class="text-[var(--main-text)]">'
+      + t('batchErrorMsg3', { n: 500, m: favTotal.value, h: entries.length, t: favTotal.value + entries.length }).split(':')[1].trim()
+      + '</span>'
       isValid.value = false
       return
     }
@@ -366,9 +448,13 @@ const validateInput = () => {
     }
   } else {
     const entries = importStr.value.split(/\s*,\s*|\n/).filter(Boolean)
-
     if (entries.length + favTotal.value > 500) {
-      errorMessage.value = t('batchErrorMsg3', { n: 500 })
+      errorMessage.value = '<span class="text-yellow-500">'
+      + t('batchErrorMsg3').split(':')[0]
+      + ', </span>'
+      + '<span class="text-[var(--main-text)]">'
+      + t('batchErrorMsg3', { n: 500, m: favTotal.value, h: entries.length, t: favTotal.value + entries.length }).split(':')[1].trim()
+      + '</span>'
       isValid.value = false
       return
     }
@@ -403,7 +489,7 @@ const handleBulkImportAttention = () => {
     return
   }
   loading.value = true
-  bulkImportAttention(arr)
+  bulkImportAttention(arr, undefined ,selectedGroupId.value)
     .then((res) => {
       console.log(res)
       ElMessage.success(t('success'))
@@ -642,8 +728,8 @@ const confirmBulkDelete = () => {
       .textarea {
         outline: none;
         width: 100%;
-        height: 328px;
-        padding: 16px 12px;
+        height: 280px;
+        padding: 12px;
         color: var(--third-text);
         border: 1px solid var(--dialog-divider);
         border-radius: 8px;
@@ -665,7 +751,7 @@ const confirmBulkDelete = () => {
         height: 48px;
         /* background-color: var(--d-FFF-l-222);
         color: var(--d-222-l-FAFAFA); */
-        font-size: 16px;
+        font-size: 14px;
         border-radius: 8px;
         text-align: center;
         &.black {

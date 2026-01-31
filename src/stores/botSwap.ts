@@ -52,7 +52,14 @@ export const useBotSwapStore = defineStore('botSwap', () => {
       id: 'So11111111111111111111111111111111111111112-solana',
       current_price_usd: 0,
       price_change: 0
-    }
+    },
+    {
+      token: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
+      chain: 'polygon',
+      id: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270-polygon',
+      current_price_usd: 0,
+      price_change: 0
+    },
   ])
 
   const botSwapBaseTokens = ref({

@@ -31,7 +31,8 @@ const disabledStartDate = (date:Date)=>{
 }
 const disabledEndDate = (date:Date)=>{
   if(filterTime.value[0]){
-    return dayjs(date).isBefore(dayjs(filterTime.value[0]*1000))
+    const filterTime0 = dayjs(filterTime.value[0]*1000)
+    return dayjs(date).isBefore(filterTime0) && !dayjs(date).isSame(filterTime0, 'day')
   }
   return false
 }
@@ -60,7 +61,7 @@ watch(()=>props.modelValue,(val:string[])=>{
     <template #reference>
       <Icon
         name="custom:filter"
-        :class="`${modelValue.length?'color-[--secondary-text]':'color-[--third-text]'} cursor-pointer text-10px`"
+        :class="`${modelValue.length?'color-[--primary-color]':'color-[--third-text]'} cursor-pointer text-10px`"
       />
     </template>
     <template #default>

@@ -6,13 +6,14 @@
 <script setup lang='ts'>
 import TypesTabs from './typeTabs.vue'
 import Market from './market.vue'
+import Limit from './limit.vue'
 import { useSwapStore } from '~/stores/swap'
 const swapStore = useSwapStore()
-const LimitComponent = defineAsyncComponent(() => import('./limit.vue'))
+// const LimitComponent = defineAsyncComponent(() => import('./limit.vue'))
 
 const Comp = computed(() => {
   if (swapStore.swapType === 0 || swapStore.swapType === 1) {
-    return LimitComponent
+    return Limit
   } else {
     return Market
   }

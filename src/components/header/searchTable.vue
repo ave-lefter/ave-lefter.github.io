@@ -211,6 +211,18 @@
                     alt=""
                     :width="10"
                   >
+                  <template v-if="row.badges?.length >0">
+                    <img
+                      v-for="(i, $index) in row.badges"
+                      :key="$index"
+                      v-tooltip="$t(`${i.tag}`)"
+                      class="ml-5px rd-50%"
+                      :src="formatIconTag(i.tag)"
+                      alt=""
+                      :width="10"
+                      onerror="this.src='/icon-default.png'"
+                    >
+                  </template>
                 </div>
                 <div class="text-12px mt-3px flex-start color-[--third-text]">
                   <div v-if="row.opening_at" class="mr-5px" >

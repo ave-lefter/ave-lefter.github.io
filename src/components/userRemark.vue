@@ -1,5 +1,5 @@
 <template>
-  <div ref="target" class="remark-com" >
+  <div class="remark-com" >
     <UserAvatar
       v-if="showIcon"
       :class="avatarClass"
@@ -32,7 +32,7 @@
 
     <slot v-bind="{remark: walletRemark, address, chain}" />
 
-    <template v-if="canEdit && targetIsVisible">
+    <template v-if="canEdit">
       <EditRemarkPopover
         v-if="botStore?.userInfo?.evmAddress || walletStore?.address"
         :address="address"
@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useIntersectionObserver } from '@vueuse/core'
+// import { useIntersectionObserver } from '@vueuse/core'
 import { updateWhaleRemark } from '~/api/remark'
 import EditRemarkPopover from './remark/editRemarkPopover.vue'
 import UserAvatar from './userAvatar.vue'
@@ -103,27 +103,27 @@ const remarksStore = useRemarksStore()
 const walletStore = useWalletStore()
 
 // Refs
-const target = useTemplateRef<HTMLElement | null>('target')
-const targetIsVisible = shallowRef(false)
+// const target = useTemplateRef<HTMLElement | null>('target')
+// const targetIsVisible = shallowRef(true)
 const loadingEdit = ref(false)
 
 // Intersection Observer
-let stop: () => void
+// let stop: () => void
 
 onMounted(() => {
-  if (target.value) {
-    const observer = useIntersectionObserver(
-      target,
-      ([entry]) => {
-        targetIsVisible.value = entry.isIntersecting
-      }
-    )
-    stop = observer.stop
-  }
+  // if (target.value) {
+  //   const observer = useIntersectionObserver(
+  //     target,
+  //     ([entry]) => {
+  //       targetIsVisible.value = entry.isIntersecting
+  //     }
+  //   )
+  //   stop = observer.stop
+  // }
 })
 
 onBeforeUnmount(() => {
-  if (stop) stop()
+  // if (stop) stop()
 })
 
 const walletRemark = computed(() => {

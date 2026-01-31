@@ -29,8 +29,9 @@ export const useTokenStore = defineStore('token', () => {
     'tokenWarningNotice',
     {}
   )
+  const devTokenNum = ref(0)
   const collected = shallowRef(false)
-
+  const loadingToken = shallowRef(false)
   const token = computed(() => tokenInfo.value?.token)
   const pairs = computed(() => tokenInfo.value?.pairs)
   const pairAddress = useSessionStorage('token_pairAddress', '')
@@ -55,7 +56,7 @@ export const useTokenStore = defineStore('token', () => {
     }, '0')
 
     const reserveU = _pairs?.reduce((pre, item) => {
-      return new BigNumber(pre || 0).plus(item.target_token === item.token0_address ? new BigNumber(item.reserve1 || 0).times(item.token1_price_usd || 0) : new BigNumber(item.reserve0 || 0).times(item.token0_price_usd || 0)).toFixed()
+      return new BigNumber(pre || 0).plus(item.target_token === item.token0_address ? new BigNumber(item.reserve1 || 0).times(item.token1_price_usd || 0).times(2) : new BigNumber(item.reserve0 || 0).times(item.token0_price_usd || 0).times(2)).toFixed()
     }, '0')
     return {
       token: token.value?.token,
@@ -72,6 +73,8 @@ export const useTokenStore = defineStore('token', () => {
   const totalHolders = shallowRef<GetTotalHoldersResponse[]>([])
   const price = computed(() => tokenPrice.value || token.value?.current_price_usd)
   const priceChange = computed(() => tokenPriceChange.value || pair.value?.price_change || token.value?.price_change)
+  const priceChangeV2 = computed(() => tokenPriceChange.value || pair.value?.price_change_24h || token.value?.price_change_v2)
+
   const gasPrice = ref(0)
 
   const placeOrderUpdate = ref(0)
@@ -87,6 +90,7 @@ export const useTokenStore = defineStore('token', () => {
   const centerTopHeight = shallowRef(DefaultHeight.KLINE)
   const {height} = useWindowSize()
   const commonHeight = computed(() => height.value - centerTopHeight.value)
+  const bestToken = ref(null)
 
   const swap = reactive<{
     native: Token,
@@ -309,6 +313,7 @@ export const useTokenStore = defineStore('token', () => {
     pair,
     price,
     priceChange,
+    priceChangeV2,
     tokenPrice,
     circulation,
     marketCap,
@@ -329,7 +334,10 @@ export const useTokenStore = defineStore('token', () => {
     commonHeight,
     twitterType,
     collected,
-    getXType: _getXType
+    getXType: _getXType,
+    loadingToken,
+    devTokenNum,
+    bestToken
   }
 })
 

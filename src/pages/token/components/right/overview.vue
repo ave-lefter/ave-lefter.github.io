@@ -135,6 +135,10 @@
             >${{ formatNumber(Number(token?.total || 0) * (tokenStore?.price || 0)) }}</span
           >
         </li>
+        <li v-if="shouldShowChainInfo || active == 'col'" class="flex justify-between mb-12px">
+          <span class="color-[--third-text]">{{ $t('theChain') }}</span>
+          <span class="color-[--secondary-text]">{{ token?.chain || '-'}}</span>
+        </li>
         <!-- <li v-if="token?.total" class="flex justify-between mb-12px">
           <span class="color-[--third-text]">{{ $t('circulation') }}</span>
           <span class="color-[--secondary-text]">{{ formatNumber(tokenStore?.circulation.toFixed() || 0) }}</span>
@@ -145,6 +149,7 @@
             pair?.created_at ? formatDate(pair?.created_at) : '-'
           }}</span>
         </li>
+
         <!-- <template v-for="(item, index) in medias?.slice()" :key="index">
           <template v-if="item?.url">
             <template v-if="item?.name == 'Telegram'">
@@ -177,7 +182,7 @@
           </button>
         </div>
       </div>
-      <div class="flex-between color-[--secondary-text] text-center" v-if="supportObj[chain]">
+      <div v-if="supportObj[chain]" class="flex-between color-[--secondary-text] text-center">
         <a
           href=""
           class="bg flex-1 color-[--secondary-text] text-14px"
@@ -226,7 +231,7 @@
           class="mt-20px"
           style="width: 50vw; border: none"
           :style="{ height: height - 350 + 'px' }"
-          :src="`https://apptest.creditlink.info/tokenScore?chain=${supportObj[chain]}&address=${tokenAddress}&model=${mode}&platform=ave.ai`"
+          :src="`https://app.creditlink.info/tokenScore?chain=${supportObj[chain]}&address=${tokenAddress}&model=${mode}&platform=ave.ai`"
           allow="clipboard-write"
         />
       </el-dialog>
@@ -245,14 +250,14 @@
           class="mt-20px"
           style="width: 80vw; border: none"
           :style="{ height: height - 350 + 'px' }"
-          :src="`https://apptest.creditlink.info/tokenAnalyse?chain=${supportObj[chain]}&address=${tokenAddress}&model=${mode}&platform=ave.ai`"
+          :src="`https://app.creditlink.info/tokenAnalyse?chain=${supportObj[chain]}&address=${tokenAddress}&model=${mode}&platform=ave.ai`"
           allow="clipboard-write"
         />
       </el-dialog>
     </div>
-    <div v-else-if="activeTab == 'devBit'">
+    <!-- <div v-else-if="activeTab == 'devBit'">
       <DevTokens />
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -261,8 +266,10 @@ import { _getDevList } from '@/api/run'
 import DevTokens from './DevTokens.vue'
 import { formatDate, formatExplorerUrl, isJSON } from '@/utils/index'
 import { useTokenStore } from '~/stores/token'
-import { useWindowSize } from '@vueuse/core'
+import { useWindowSize, useEventBus  } from '@vueuse/core'
 import BigNumber from 'bignumber.js'
+import { BusEventType } from '@/utils/constants'
+
 const aiSummary = inject<Ref<{ summary: string; headline: string }>>('aiSummary')
 const props = defineProps<{
   isRank?: boolean
@@ -278,15 +285,17 @@ const localeStore = useLocaleStore()
 const { t } = useI18n()
 const showAll = ref(false)
 const totalTokens = ref(0)
-const active = shallowRef(props.isRank ? 'col' : 'grid')
+const active = shallowRef(!props.isRank ? 'col' : 'grid')
 const activeTab = shallowRef('info')
-const headerTabs = [
-  { id: 'info', name: t('tokenInfo') },
-  { id: 'devBit', name: t('devTokens') },
-]
+const headerTabs = computed(() => {
+  return [
+    { id: 'info', name: t('tokenInfo') },
+    // { id: 'devBit', name: t('devTokens') }
+  ]
+})
 const tabs = [
-  { id: 'grid', icon: 'grid', name: 'grid' },
   { id: 'col', icon: 'col', name: 'col' },
+  { id: 'grid', icon: 'grid', name: 'grid' },
 ]
 const globalStore = useGlobalStore()
 const { mode } = storeToRefs(globalStore)
@@ -298,33 +307,81 @@ const supportObj: Record<string, string> = {
   optimism: 'OP',
 }
 
+// 监听从 top 组件触发的查看 Dev 代币事件
+const devTokensEvent = useEventBus(BusEventType.DEV_TOKENS_TAB)
+devTokensEvent.on(() => {
+  activeTab.value = 'devBit'
+})
+
+// 计算是否应该显示所属链信息
+const shouldShowChainInfo = computed(() => {
+  if (!token.value?.chain) return false
+
+  // 计算会显示的 li 元素数量（基于实际的模板结构）
+  let visibleLiCount = 0
+
+  // 1. 姓名/符号 (总是显示) - 行29-35
+  visibleLiCount += 1
+
+  // 2. Token地址 (有条件显示) - 行37-52
+  if (token.value?.token) visibleLiCount += 1
+
+  // 3. 交易对 (有条件显示) - 行54-71
+  if (pair.value) visibleLiCount += 1
+
+  // 4. 市值 (有条件显示) - 行73-77
+  if (token.value?.total) visibleLiCount += 1
+
+  // 5. 合约创建者 (有条件显示) - 行79-100
+  if (checkStore.checkResult?.creator_address) visibleLiCount += 1
+
+  // 6. 合约所有者 (有条件显示) - 行102-117
+  if (owner.value) visibleLiCount += 1
+
+  // 7. 24小时交易量 (总是显示) - 行119-126
+  visibleLiCount += 1
+
+  // 8. 总供应量 (总是显示) - 行128-130
+  visibleLiCount += 1
+
+  // 9. FDV (总是显示) - 行132-136
+  visibleLiCount += 1
+
+  // 10. 创建时间 (有条件显示) - 行146-150
+  if (pair.value) visibleLiCount += 1
+
+  console.log('visibleLiCount:', visibleLiCount)
+  // 只有当显示的 li 元素数量小于 9 时才显示所属链信息
+  return visibleLiCount < 10
+})
+
 const route = useRoute()
 const id = computed(() => route.params.id as string)
 
-async function getRugPullList() {
-  const data = {
-    token_id: id.value,
-    pageNO: 1,
-    pageSize: 1,
-  }
-  const res = await _getDevList(data)
-  totalTokens.value = res.total_tokens
-}
+// async function getRugPullList() {
+//   const data = {
+//     token_id: id.value,
+//     pageNO: 1,
+//     pageSize: 1,
+//   }
+//   const res = await _getDevList(data)
+//   totalTokens.value = res.total_tokens
+// }
 
-watch(
-  () => route.params.id,
-  () => {
-    if (route.params.id) {
-      getRugPullList()
-    }
-  }
-)
+// watch(
+//   () => route.params.id,
+//   () => {
+//     if (route.params.id) {
+//       getRugPullList()
+//     }
+//   }
+// )
 
-onMounted(() => {
-  if (route.params.id) {
-    getRugPullList()
-  }
-})
+// onMounted(() => {
+//   if (route.params.id) {
+//     getRugPullList()
+//   }
+// })
 
 // function filterSuppportChains(chain: string) {
 //   return supportObj[chain] || ''
@@ -370,7 +427,8 @@ const intro = computed(() => {
 })
 
 const effectiveTotal = computed(() => {
-  return new BigNumber(token.value?.total || 0).minus(token.value?.burn_amount_dec || 0).toFixed()
+  return new BigNumber(token.value?.total || 0)
+    .minus(token.value?.burn_amount_dec || 0).toFixed()
 })
 const exchange = computed(() => {
   return (

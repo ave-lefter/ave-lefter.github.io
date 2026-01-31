@@ -28,7 +28,7 @@
 
 .el-table {
   &.el-table {
-    --el-table-header-bg-color: var(--table-title-bg);
+    --el-table-header-bg-color: var(--main-list-header-bg);
     --el-table-border: 0 none;
     --el-table-text-color: var(--secondary-text);
     --el-table-header-text-color: var(--third-text);
@@ -225,6 +225,11 @@
   --el-popover-border-color: transparent;
   --el-border-color-light: transparent;
 }
+
+.el-dropdown__popper.el-popper{
+  --el-dropdown-menuItem-hover-color: inherit;
+  --el-dropdown-menuItem-hover-fill:var(--dialog-tab-active-bg);
+}
 // .new-popover.el-popover.el-popover {
 //   --el-popover-bg-color: var(--d-151A22-l-FFF);
 //   --el-bg-color-overlay: var(--d-151A22-l-FFF);
@@ -306,4 +311,15 @@
 }
 .el-input .el-input__count .el-input__count-inner{
   --el-fill-color-blank: transparent;
+}
+
+.el-drawer-popover {
+  &.el-popover{
+    --el-popover-bg-color: var(--dialog-list-hover);
+  --el-bg-color-overlay: var(--dialog-list-hover);
+  }
+  .el-checkbox{
+     --el-text-color-regular: var(--secondary-text);
+  --el-checkbox-input-border: 1px solid var(--secondary-text);
+  }
 }

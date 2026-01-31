@@ -36,4 +36,18 @@ export default defineNuxtRouteMiddleware((to) => {
       return navigateTo(`/token/${mainUrl}-${chain}`, {replace: true})
     }
   }
+
+  const isDirty = useState('is_memory_dirty')
+
+  // 如果環境已污染，則攔截 SPA 跳轉，改用物理跳轉
+  if (isDirty.value === true) {
+    console.warn('【跳轉清理】正在物理重載跳轉至新路由...')
+
+    isDirty.value = false
+
+    // 強制瀏覽器重置所有上下文、Worker 和 VNode
+    window.location.href = to.fullPath
+
+    return abortNavigation()
+  }
 })

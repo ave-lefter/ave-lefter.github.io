@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex justify-between border-b-1px border-b-solid border-b-[--main-divider] mb-10px mt-20px">
+    <div class="flex justify-between border-b-1px border-b-solid border-b-[--main-divider] mb-10px">
       <div class="flex items-center gap-24px">
         <a
           v-for="(item, index) in tabs"
@@ -65,6 +65,27 @@
         </el-checkbox>
       </div>
     </div>
+    <div v-if="activeTab === 'deployedToken'" class="my-16px flex items-center gap-16px">
+      <span class="flex items-center color-[--third-text] text-12px gap-4px">
+        {{ $t('dev') }}
+        <span class="flex items-center color-[--main-text]"
+          >{{ props.address.slice(0, 4) }}...{{ props.address.slice(-4) }}({{ props.chain }})<Icon
+            v-copy="props.address"
+            name="bxs:copy"
+            class="ml-4px color-[--third-text] cursor-pointer"
+        /></span>
+      </span>
+      <span class="flex items-center color-[--third-text] text-12px gap-4px"
+        >{{ $t('totalTokens') }}:<span class="color-[--main-text]">{{
+          deployedTokenNum[0]
+        }}</span></span
+      >
+      <span class="flex items-center color-[--third-text] text-12px gap-4px"
+        >{{ $t('migrated') }}:<span class="color-[--up-color]"
+          >{{ deployedTokenNum[1] }}({{ percent }}%)</span
+        ></span
+      >
+    </div>
     <div ref="listArea" class="mb-[35px]">
       <div
         v-infinite-scroll="onLoad"
@@ -109,9 +130,7 @@
           :loading="tableData.loading"
           :tableData="filterTableList"
         />
-        <div
-          class="mt-[2px] mb-[5px] py-[10px] text-[12px] text-center color-[--third-text]"
-        >
+        <div class="mt-[2px] mb-[5px] py-[10px] text-[12px] text-center color-[--third-text]">
           <span v-if="tableData.loading && tableData.pageNO > 1">{{ $t('loading') }}</span>
         </div>
       </div>
@@ -120,13 +139,15 @@
 </template>
 
 <script setup>
+// https://api.test.phaetd8l.com/v2api/token_info/v1/token/dev?&pageNO=1&pageSize=50&address_id=6mWEJG9LoRdto8TwTdZxmnJpkXpTsEerizcGiCNZvzXd-solana&sort=&sort_dir=
 import TokenList from './tokenList.vue'
 import RecentPnl from './recentPnl.vue'
 import TrendList from './trendList.vue'
 import DeployedTokenList from './deployedTokenList.vue'
 import BlackList from './blackList.vue'
 import { getDeployedTokens, getWhaleTokenList, getWhaleTrendList } from '@/api/wallet'
-import {useStorage} from '@vueuse/core'
+import { useStorage } from '@vueuse/core'
+import { _getDevList } from '~/api/run'
 const $t = getGlobalT()
 const props = defineProps({
   chain: {
@@ -158,8 +179,8 @@ const max_event_id = ref(0)
 const conditions_wallet = useStorage('conditions_wallet', {
   hide_sold: 1,
   hide_small: 1,
-  hide_risk:1,
-  hide_noswap:1,
+  hide_risk: 1,
+  hide_noswap: 1,
   sort: 'last_txn_time',
   sort_dir: 'desc',
 })
@@ -175,14 +196,15 @@ const trendQuery = ref({
   sort: 'block_time',
 })
 const deployedTokenQuery = ref({
-  sort: 'market_cap',
+  sort: 'created_at',
   sort_dir: 'desc',
 })
-const deployedTokenNum = ref(0)
+const deployedTokenNum = ref([0, 0, 0])
+const deployedTokenListTotal = ref(0)
 const listArea = ref(null)
 const trendList = ref(null)
 const themeStore = useThemeStore()
-const {updateHolderNum}= storeToRefs(useUserStore())
+const { updateHolderNum } = storeToRefs(useUserStore())
 const mode = computed(() => {
   return themeStore.isDark ? 'dark' : 'light'
 })
@@ -192,13 +214,17 @@ const tabs = computed(() => {
     { title: $t('walletActivity'), id: 'trend' },
     { title: $t('holding'), id: 'token' },
   ]
-  if (deployedTokenNum.value > 0) {
+  if (deployedTokenListTotal.value > 0) {
     commonTabs.push({
-      title: `${$t('deployedToken')}(${deployedTokenNum.value})`,
+      title: `${$t('deployedToken')}(${deployedTokenListTotal.value})`,
       id: 'deployedToken',
     })
   }
   return commonTabs
+})
+
+const percent = computed(() => {
+  return ((deployedTokenNum.value[1] / deployedTokenNum.value[0]) * 100).toFixed(2)
 })
 
 const isRecentPnl = computed(() => activeTab.value === 'pnl')
@@ -206,7 +232,7 @@ const isToken = computed(() => activeTab.value === 'token')
 const isTrend = computed(() => activeTab.value === 'trend')
 const chainAddress = computed(() => [props.chain, props.address])
 const filterTableList = computed(() => {
-  if(isRecentPnl.value){
+  if (isRecentPnl.value) {
     const temp = [...tableData.value.pnl].filter(
       (i) => NATIVE_TOKENS.findIndex((y) => y?.toLowerCase() === i.token?.toLowerCase()) === -1
     )
@@ -230,12 +256,14 @@ const filterTableList = computed(() => {
   }
 })
 
-watch(()=>updateHolderNum.value, () => {
-  if(isToken.value){
-    refreshTokenList()
+watch(
+  () => updateHolderNum.value,
+  () => {
+    if (isToken.value) {
+      refreshTokenList()
+    }
   }
-})
-
+)
 
 // Methods
 const onConditionChange = () => {
@@ -258,7 +286,7 @@ const switchTab = (item) => {
 const handleSortChange = ({ prop, order }) => {
   resetPageNOAndLoading()
   const sort_dir = order?.replace?.('ending', '')
-  if (isToken.value|| isRecentPnl.value) {
+  if (isToken.value || isRecentPnl.value) {
     conditions_wallet.value.sort = prop
     conditions_wallet.value.sort_dir = sort_dir
   } else if (isTrend.value) {
@@ -379,6 +407,9 @@ const getWhaleTrendParams = () => {
     sort: trendQuery.value.sort,
     ...(trendQuery.value.volume_min && { volume_min: trendQuery.value.volume_min }),
     ...(trendQuery.value.volume_max && { volume_max: trendQuery.value.volume_max }),
+    ...(trendQuery.value.token && { token: trendQuery.value.token }),
+    ...(trendQuery.value.amount_min && { amount_min: trendQuery.value.amount_min }),
+    ...(trendQuery.value.amount_max && { amount_max: trendQuery.value.amount_max }),
   }
 
   const trendLen = trendQuery.value.checkedTrend?.length
@@ -393,9 +424,11 @@ const getWhaleTrendParams = () => {
 
 const _getWhaleTrendList = async () => {
   tableData.value.loading = true
-  if (trendQuery.value.volume_min > trendQuery.value.volume_max) {
-    store.dispatch('showMessage', {
-      type: 'error',
+  const { volume_min, volume_max, amount_min, amount_max } = trendQuery.value
+  const volumeErr = volume_min && volume_max && volume_min > volume_max
+  const amountErr = amount_min && amount_max && amount_min > amount_max
+  if (volumeErr || amountErr) {
+    ElMessage.error({
       message: $t('maxGtMin'),
     })
     return
@@ -420,7 +453,7 @@ const _getWhaleTrendList = async () => {
 
     if (arr?.length > 0) {
       const a = [...tableData.value.trend]
-      const b = arr.filter((i) => a.every((j) => j.tx_hash !== i.tx_hash))
+      const b = arr.filter((i) => a.every((j) => j.tx_hash + j.event_id !== i.tx_hash + i.event_id))
       tableData.value.trend = [...a, ...b]
     }
     tableData.value.finished = list?.length < tableData.value.pageSize
@@ -458,13 +491,26 @@ const onRouteChange = () => {
 const _getDeployedTokens = async () => {
   tableData.value.loading = true
   const params = {
-    user_address: props.address,
-    user_chain: props.chain,
+    address_id: props.address + '-' + props.chain,
+    pageNO: tableData.value.pageNO,
+    pageSize: tableData.value.pageSize,
     ...deployedTokenQuery.value,
   }
   try {
-    const res = await getDeployedTokens(params)
-    tableData.value.deployedToken = res
+    const res = await _getDevList(params)
+    let newList = (res?.infos || []).map((el) => {
+      return {
+        ...el,
+        chain: props.chain,
+      }
+    })
+    if (tableData.value.pageNO > 1) {
+      newList = tableData.value.deployedToken.concat(newList)
+    }
+    tableData.value.deployedToken = newList
+    tableData.value.finished = newList.length >= res?.total_tokens
+    console.log('tableData.value.finished', newList.length >= res?.total_tokens)
+    tableData.value.pageNO++
   } catch (err) {
     tableData.value.deployedToken = []
     tableData.value.error = true
@@ -475,13 +521,17 @@ const _getDeployedTokens = async () => {
 
 const getDeployedTokenNum = async () => {
   const params = {
-    user_address: props.address,
-    user_chain: props.chain,
+    address_id: props.address + '-' + props.chain,
     ...deployedTokenQuery.value,
   }
   try {
-    const res = await getDeployedTokens(params)
-    deployedTokenNum.value = res?.length || 0
+    const res = await _getDevList(params)
+    deployedTokenListTotal.value = res?.total_tokens || 0
+    deployedTokenNum.value = [
+      res?.tokens?.length || 0,
+      res?.total_migrated || 0,
+      res?.total_non_migrated || 0,
+    ]
   } catch (err) {
     console.log('error', err)
   }
@@ -511,5 +561,4 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

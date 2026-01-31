@@ -12,7 +12,7 @@ import type {GetTokenDetailMarksResponse} from '~/api/token'
 
 import add_liquidity from 'assets/images/mark/add_liquidity.png'
 import burn from 'assets/images/mark/burn.png'
-import buy from 'assets/images/mark/buy.png'
+import buy from 'assets/images/mark/buy2.png'
 import remove_liquidity from 'assets/images/mark/remove_liquidity.png'
 import sell from 'assets/images/mark/sell.png'
 import T_Trading from 'assets/images/mark/T_Trading.png'
@@ -63,7 +63,7 @@ const localeStore = useLocaleStore()
 const themeStore = useThemeStore()
 const {t} = useI18n()
 const lineChartRef = useTemplateRef('lineChartRef')
-const myChart = shallowRef()
+let myChart: any = null
 const language = computed(() => localeStore.locale)
 const format = computed(() => {
   return props.activeTime == 14400 || props.activeTime == 86400
@@ -248,13 +248,20 @@ onMounted(() => {
   init()
 })
 
+onBeforeUnmount(() => {
+  if (myChart) {
+    myChart.dispose()
+    myChart = null
+  }
+})
+
 watch(() => [props.marks, props.dataList, language.value, themeStore.isDark], () => {
   init()
 })
 
 function init() {
-  if (!myChart.value) {
-    myChart.value = echarts.init(lineChartRef.value)
+  if (!myChart) {
+    myChart = echarts.init(lineChartRef.value)
   }
   const option = {
     legend: {
@@ -331,7 +338,7 @@ function init() {
     },
     series: series.value
   }
-  myChart.value.setOption(option)
+  myChart.setOption(option)
 }
 </script>
 

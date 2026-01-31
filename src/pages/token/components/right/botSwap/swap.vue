@@ -16,7 +16,7 @@
               <el-dropdown-menu>
                 <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)" :key="item.address" @click.stop="tokenStore.swap.payToken = item;$emit('getTokenBalance');amountNative='';amountNativeOut=''">
                   <img :src="`${configStore.token_logo_url}${item.logo_url}`" class="rd-50% mr-8px" height="16"  alt="" srcset="" >
-                  <span class="text-12px font-400">{{ item.symbol }}</span>
+                  <span class="text-12px font-400">{{ item?.symbol }}</span>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -33,8 +33,18 @@
       </div>
       <div class="tabs mt-10px">
         <button v-for="(item, index) in tabs1" :key="index" class="tab-item" type="button"  @click.stop="handleAmount(item, 'buy')">
-          <img class="mr-5px" :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" style="border-radius: 50%;" height="14"  alt="" srcset="" >
-          <span>{{ item.name }}</span>
+          <!-- <img class="mr-5px" :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" style="border-radius: 50%;" height="14"  alt="" srcset="" > -->
+          <span v-if="!editMode">{{ item.name }}</span>
+          <el-input
+v-else-if="tabs1Ref[index]" v-model="tabs1Ref[index].value"
+            style="--el-input-inner-height:24px;--el-input-bg-color:transparent;--el-input-border-color:transparent;--el-input-hover-border-color:transparent;--el-input-focus-border-color:transparent"
+            class="text-center w-full h-full"
+size="small"
+            @blur="tabs1Ref[index].value = tabs1Ref[index].value?.replace?.(/\-|[^\d.]/g, '')"
+           />
+        </button>
+        <button class="tab-item h-30px basis-[26px]! grow-0! shrink-0!" type="button" @click="handleEdit(tabs1Ref, 'buy')">
+          <Icon :name="editMode ? 'custom:select' : 'custom:remark'"/>
         </button>
       </div>
     </template>
@@ -66,7 +76,7 @@
               <el-dropdown-menu>
                 <el-dropdown-item v-for="item in (botSwapStore?.botSwapBaseTokens?.[chain || ''] || [])?.filter(item => item?.address !== tokenStore.swap.payToken?.address)" :key="item?.address" @click.stop="tokenStore.swap.payToken = item;$emit('getTokenBalance');amountToken='';amountTokenOut='';amountSellTokenPercent = ''">
                   <img :src="`${configStore.token_logo_url}${item.logo_url}`" class="rd-50% mr-8px" height="16"  alt="" srcset="" >
-                  <span class="text-12px font-400">{{ item.symbol }}</span>
+                  <span class="text-12px font-400">{{ item?.symbol }}</span>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -115,7 +125,7 @@
       <el-button v-if="!isApprove" :color="swapButtonColor" class="submit-btn" native-type="button" :loading="loadingApprove || loadingSwap || loadingAllowance" :disabled="Number(fromToken.balance) < Number(fromAmount)" @click.stop="approve">{{ Number(fromToken.balance) === 0 || Number(fromToken.balance) < Number(fromAmount) ? (checkAmountMessage() || $t('approve')) : $t('approve') }}</el-button>
 
       <el-button
-        v-else-if="activeTab === 'buy' && (Number(fromToken.balance) === 0 || Number(fromToken.balance) < Number(fromAmount))"
+        v-else-if="activeTab === 'buy' && (Number(fromToken?.balance) === 0 || Number(fromToken?.balance) < Number(fromAmount))"
         class="submit-btn"
         :color="swapButtonColor"
         native-type="button"
@@ -134,7 +144,27 @@
         native-type="button"
         @click.stop="submitBotSwap"
       >
-        {{ checkAmountMessage() || (activeTab === 'buy' ? $t('buy') : ($t('sell') + (Number(amountTokenOut || 0) > 0 ? `≈ ${ formatNumber(amountTokenOut || 0) } ${tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }` : ''))) }}
+      <template v-if="checkAmountMessage()">
+            {{ checkAmountMessage() }}
+          </template>
+        <template v-else-if="!isBuyTab">
+          {{ checkAmountMessage() || (isBuyTab ? $t('buy') : ($t('sell') + (Number(amountTokenOut || 0) > 0 ? `≈ ${ formatNumber(amountTokenOut || 0) } ${tokenStore.swap.payToken?.symbol || getChainInfo(chain || '')?.main_name }` : ''))) }}
+        </template>
+            <div v-else class="flex items-center gap-4px">
+
+ 
+            {{$t('buy') }}
+            <span>|</span>
+            <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50%" height="12"  alt="" srcset="" >
+            <span>{{ submitAmount }}
+              <template v-if="!isUsdcUsdt">
+                (${{submitAmountUsd}})
+              </template>
+            </span>
+            <span>|</span>
+            <span>{{formatNumber(amountNativeOut || 0)}}
+            </span>
+          </div>
       </el-button>
       <BottomSetting :activeTab="activeTab" :swapType="swapType" :gasPrice="gasPrice" />
     </template>
@@ -172,7 +202,7 @@ import { debounce } from 'lodash-es'
 import { getAddressAndChainFromId, isEvmChain, getRpcProvider } from '@/utils'
 import { ElMessageBox } from 'element-plus'
 import { useBotSwap } from '~/composables/botSwap'
-import { bot_createSolTx, bot_createSwapEvmTx, bot_createSolLimitTx, bot_createEvmLimitTx, bot_createSwapTonTx, bot_createTonLimitSwap } from '@/api/bot'
+import { bot_createSolTx, bot_createSwapEvmTx, bot_createSolLimitTx, bot_createEvmLimitTx, bot_createSwapTonTx, bot_createTonLimitSwap, getAutoSlippage } from '@/api/bot'
 import RefreshBalance from './refreshBalance.vue'
 import { formatDec, formatNumber } from '@/utils/formatNumber'
 import { useEventBus } from '@vueuse/core'
@@ -182,6 +212,8 @@ import { recordTxV2, updateTxV2 } from '~/api/tracking'
 import BottomSetting from './bottomSetting.vue'
 import delayedNotify from '~/utils/notify'
 import { formatBotError } from '~/utils/bot'
+
+
 
 const ElNotification = (arg: any) => delayedNotify({...arg, duration: 2500})
 
@@ -204,6 +236,8 @@ const props = defineProps<{
   tabs2: Array<{ name: string; value: string }>
 }>()
 
+const tabs1Ref = ref(props.tabs1)
+const tabs2Ref = ref(props.tabs2)
 const emit = defineEmits(['getTokenBalance', 'update:botSettings'])
 
 const { t } = useI18n()
@@ -250,7 +284,8 @@ watch(priceLimitRange, (val) => {
 
 let isLineChange = false
 let isPriceLimit_move = false
-useEventBus<string>('priceLimit_move').on((price) => {
+// 保存事件总线监听器停止函数
+const priceLimitMoveOff = useEventBus<string>('priceLimit_move').on((price) => {
   if (props.swapType !== 'limit' || isPriceLimit_move) return
   if (!Number.isNaN(Number(price))) {
     isLineChange = true
@@ -287,9 +322,27 @@ watch(isPriceLimit, (val) => {
   }
 })
 
-useEventBus('klineDataReady').on(() => {
+watch(()=>props.tabs1, (val) => {
+  tabs1Ref.value = val
+})
+watch(()=>props.tabs2, (val) => {
+  tabs2Ref.value = val
+})
+
+// 保存事件总线监听器停止函数
+const klineDataReadyOff = useEventBus('klineDataReady').on(() => {
   if (props.swapType !== 'limit') return
   updateStorePriceLimit()
+})
+
+onUnmounted(() => {
+  // 清理事件总线监听器
+  if (priceLimitMoveOff) {
+    priceLimitMoveOff()
+  }
+  if (klineDataReadyOff) {
+    klineDataReadyOff()
+  }
 })
 
 function updateStorePriceLimit() {
@@ -320,7 +373,7 @@ const {gasPrice} = storeToRefs(tokenStore)
 // const { botSettings } = storeToRefs(botSettingStore)
 
 
-const { getTokensPrice, allowance, getAllowance, loadingAllowance, checkApproveAndApprove, bot_approve } = useBotSwap()
+const { getTokensPrice, allowance, getAllowance, loadingAllowance, bot_approve, updateBalanceFromWs } = useBotSwap()
 
 // 计算属性
 const tokenInfo = computed(() => tokenStore.token)
@@ -384,7 +437,7 @@ const totalSelectWalletBalance1 = computed(() => {
   // 去重 并去除 undefined 空字符
   const uniqueAddresses = Array.from(new Set(addresses?.filter(Boolean)))
   let balance = '0'
-  const token = tokenStore.swap.token
+  const token = tokenStore.swap?.token
   botStore.walletList?.forEach(i => {
     if (uniqueAddresses.includes(i.evmAddress)) {
       balance = new BigNumber(balance).plus(getAddressFromChainBalance(chain, i?.addresses, token?.address) || 0).toFixed()
@@ -408,15 +461,30 @@ const swapButtonColor= computed(() => {
 })
 
 const isApprove = computed(() => {
-  const routeParams = getAddressAndChainFromId(route.params.id as string)
-  const chain = routeParams?.chain || tokenInfo.value?.chain || ''
-  if (['solana', 'ton'].includes(chain)) return true
-  if (fromToken.value?.address === NATIVE_TOKEN) return true
+  return true
+  // const routeParams = getAddressAndChainFromId(route.params.id as string)
+  // const chain = routeParams?.chain || tokenInfo.value?.chain || ''
+  // if (['solana', 'ton'].includes(chain)) return true
+  // if (fromToken.value?.address === NATIVE_TOKEN) return true
 
-  const decimals = fromToken.value.decimals || 18
-  const fromAmountBN = new BigNumber(amountNative.value || 0)
-  const parsedAmount = new BigNumber(fromAmountBN.toFixed(decimals)).times(10 ** decimals)
-  return parsedAmount.lte(allowance.value)
+  // const decimals = fromToken.value?.decimals || 18
+  // const fromAmountBN = new BigNumber(props.activeTab === 'buy' ? amountNative.value || 0 : amountToken.value || 0 )
+  // const parsedAmount = new BigNumber(fromAmountBN.toFixed(decimals)).times(10 ** decimals)
+  // return parsedAmount.lte(allowance.value)
+})
+
+const submitAmount = computed(()=>{
+  return formatNumber(amountNative.value,{limit:20})
+})
+
+const submitAmountUsd = computed(()=>{
+  if(!amountNative.value) return '0'
+  const result =  new BigNumber(amountNative.value).times(tokenStore.swap.payToken?.price || '0')
+  return formatNumber(result.toString())
+})
+
+const isUsdcUsdt = computed(()=>{
+  return tokenStore.swap.payToken?.symbol?.toUpperCase?.() === 'USDC' || tokenStore.swap.payToken?.symbol?.toUpperCase?.() === 'USDT'
 })
 
 
@@ -424,13 +492,13 @@ const isApprove = computed(() => {
 const handleMax = (balance: string | number, type: 'buy' | 'sell') => {
   if (botSwapStore.botSwapSelectedWallets?.length > 1) return
   const min = MIN_BALANCE[chain.value as 'bsc' | 'solana' | 'base' | 'eth'] || 0.01
-  const decimals = fromToken.value.decimals || 18
+  const decimals = fromToken.value?.decimals || 18
   const fromAmount = balance || 0
   const nativeTokens = ['sol', 'ton', NATIVE_TOKEN]
   if (type === 'buy') {
     if (nativeTokens.includes(fromToken.value?.address || '')) {
       if (new BigNumber(balance).lt(min)) {
-        ElMessageBox.alert(t('balanceNotEnough', {n: min, s: fromToken.value.symbol}), t('tips'), {
+        ElMessageBox.alert(t('balanceNotEnough', {n: min, s: fromToken.value?.symbol}), t('tips'), {
           confirmButtonText: t('okay')
         })
         return
@@ -446,17 +514,18 @@ const handleMax = (balance: string | number, type: 'buy' | 'sell') => {
 }
 
 function handleAmount(item: { name: string; value: string }, type: 'buy' | 'sell') {
+  if(editMode.value) return
   if (type === 'buy') {
     amountNative.value = item.value
   } else if (type === 'sell') {
     const p = item.value
-    let a = tokenStore.swap.token.balance || 0
+    let a = tokenStore.swap.token?.balance || 0
     if (botSwapStore.botSwapSelectedWallets?.length > 1) {
       amountSellTokenPercent.value = new BigNumber(p).times(100).toFixed(0)
       a = totalSelectWalletBalance1.value
     }
     if (p) {
-      const decimals = tokenStore.swap.payToken.decimals || 0
+      const decimals = tokenStore.swap.payToken?.decimals || 0
       a = new BigNumber(a).times(p).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals}})?`))?.[0] || 0
       if (Number(a) === 0) {
         a = ''
@@ -471,12 +540,12 @@ function handleAmount(item: { name: string; value: string }, type: 'buy' | 'sell
 
 function setAmountToken() {
   const p = amountSellTokenPercent.value
-  let a = tokenStore.swap.token.balance || 0
+  let a = tokenStore.swap.token?.balance || 0
   if (botSwapStore.botSwapSelectedWallets?.length > 1) {
     a = totalSelectWalletBalance1.value
   }
   if (p) {
-    const decimals = tokenStore.swap.payToken.decimals || 0
+    const decimals = tokenStore.swap.payToken?.decimals || 0
     a = new BigNumber(a).times(p).div(100).toFixed().match(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals}})?`))?.[0] || 0
     if (Number(a) === 0) {
       a = ''
@@ -593,14 +662,22 @@ const isSupportSwap = computed(() => {
   return botStore.accessToken && botStore?.isSupportChains?.includes?.(chain)
 })
 
-const _getAllowance = () => getAllowance(fromToken.value?.address || '')
+const isBuyTab = computed(() => {
+  return props.activeTab === 'buy'
+})
+
+const _getAllowance = () => {
+  const toToken = isBuyTab.value ? tokenStore.swap.token : tokenStore.swap.payToken
+  return getAllowance(fromToken.value?.address || '', toToken?.address || '')
+}
 
 const approve = async () => {
   loadingApprove.value = true
   bot_approve({
     batchId: Date.now().toString(),
     chain: chain.value || '',
-    tokenAddress: fromToken.value?.address || '',
+    inTokenAddress: fromToken.value?.address || '',
+    outTokenAddress: (isBuyTab.value ? tokenStore.swap.token.address : tokenStore.swap.payToken.address) || '',
     creatorAddress: [walletAddress.value || ''],
   }).then(res => {
     if (res) {
@@ -626,7 +703,7 @@ const approve = async () => {
 }
 
 function checkAmount() {
-  const fromTokenBalance = fromToken.value.balance || 0
+  const fromTokenBalance = fromToken.value?.balance || 0
   const isBatchSell = botSwapStore.botSwapSelectedWallets.length > 1 && props.activeTab === 'sell'
   return !(
     ((Number(fromTokenBalance) < Number(fromAmount.value) && !isBatchSell) || (isBatchSell && Number(amountSellTokenPercent.value || 0) > 100)) ||
@@ -643,7 +720,7 @@ function checkAmountMessage() {
   } else if (loadingApprove.value) {
     return t('approve')
   }
-  const fromTokenBalance = fromToken.value.balance || 0
+  const fromTokenBalance = fromToken.value?.balance || 0
   if (botSwapStore.botSwapSelectedWallets.length > 1 && props.activeTab === 'sell' ) {
     if (Number(amountSellTokenPercent.value || 0) > 100) {
       return t('insufficientBalance')
@@ -677,7 +754,7 @@ async function submitBotSwap() {
     ton: 'TON',
   }
   const native = tokenStore.swap.payToken?.address || chainMainToken?.[chain] || NATIVE_TOKEN
-  const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
+  // const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address || ''
   const isBatchSell = botSwapStore.botSwapSelectedWallets.length > 1 && props.activeTab === 'sell'
   if (chain === 'solana' || chain === 'ton') {
     // let mev = this.botSettings?.solana?.mev
@@ -697,7 +774,7 @@ async function submitBotSwap() {
     // botPriorityFee = botPriorityFee.lt(min) ? min : botPriorityFee.toFixed(0)
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
-    const slippage = botSettingStore.botSettings?.[chain]?.[botSettingStore.botSettings?.[chain]?.selected]?.slippage || 9
+    const slippage = botSettings?.slippage || 9
     const batchId = Date.now().toString()
     const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
       const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
@@ -709,7 +786,7 @@ async function submitBotSwap() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })?.filter?.(i => Number(i?.inAmount) > 0) || []
+    })?.filter?.(i => Number(i?.inAmount) > 0 && i?.creatorAddress) || []
 
     const data = {
       // batchId: Date.now().toString(),
@@ -722,10 +799,11 @@ async function submitBotSwap() {
       autoSell: isBuy ? botSettingStore.autoSellConfig_autoSell || false : false,
       slippage: slippage !== 'auto' ? Number(new BigNumber(slippage).times(100).toFixed(0)) : 900,
       autoSlippage: slippage === 'auto',
-      autoSellConfig: isBuy ? botSettingStore?.autoSellConfig : [],
+      autoSellConfig: isBuy ? botSettingStore?.selectedAutoSellConfig : [],
       autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
-      autoSellPriorityFee: botPriorityFee
+      autoSellPriorityFee: botPriorityFee,
+      // ...slippageObj.value,
     }
     const bot_createTx = {
       solana: bot_createSolTx,
@@ -740,7 +818,7 @@ async function submitBotSwap() {
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
             // this.$store.state.bot.historyUpdate++
             // tokenStore.placeOrderUpdate++
-            ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
+            // ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
             // if (!['myBotHistory', 'myBotPosition']?.includes(this.$store.state.tabActive)) {
             //   this.$store.state.tabActive = 'myBotHistory'
             // }
@@ -824,7 +902,7 @@ async function submitBotSwap() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })?.filter?.(i => Number(i?.inAmount) > 0) || []
+    })?.filter?.(i => Number(i?.inAmount) > 0 && i?.creatorAddress) || []
     const data = {
       // batchId: Date.now().toString(),
       chain: chain,
@@ -838,10 +916,11 @@ async function submitBotSwap() {
       autoSell: isBuy ? botSettingStore.autoSellConfig_autoSell || false : false,
       slippage: slippage !== 'auto' ? Number(new BigNumber(slippage).times(100).toFixed(0)) : 900,
       autoSlippage: slippage === 'auto',
-      autoSellConfig: isBuy ? botSettingStore?.autoSellConfig : [],
+      autoSellConfig: isBuy ? botSettingStore?.selectedAutoSellConfig : [],
       autoGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
       autoSellGas: (settings?.customFee ? 0 : ((settings?.level || 0) + 1)) as 0 | 1 | 2 | 3, // 0 ->不使用， 1 -> Low, 2 -> AVG, 3 -> High
-      autoSellPriorityFee: gasTip
+      autoSellPriorityFee: gasTip,
+      // ...slippageObj.value,
     }
     // await Promise.all(swapList.map(i => {
     //   return checkApproveAndApprove({
@@ -852,13 +931,15 @@ async function submitBotSwap() {
     // })).catch(() => {
     //   loadingSwap.value = false
     // })
-    await checkApproveAndApprove({
-      token: ft.address,
-      chain: chain,
-      owner: walletAddress
-    }).catch(() => {
-      loadingSwap.value = false
-    })
+    // return console.log('bot_createTx[chain]',data)
+    // await checkApproveAndApprove({
+    //   inToken: data.inTokenAddress,
+    //   outToken: data.outTokenAddress,
+    //   chain: chain,
+    //   owner: walletAddress
+    // }).catch(() => {
+    //   loadingSwap.value = false
+    // })
     bot_createSwapEvmTx(data).then(res => {
       if (res) {
         const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
@@ -866,7 +947,7 @@ async function submitBotSwap() {
           const walletName = botStore.walletList?.find?.(j => j?.evmAddress?.toLowerCase?.() === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
             // tokenStore.placeOrderUpdate++
-            ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
+            // ElNotification({ type: 'success', message: walletName + ' ' + t('transactionsSubmitted') })
             loadingSwap.value = false
             amountNative.value = ''
             amountNativeOut.value = ''
@@ -906,6 +987,12 @@ async function submitBotSwap() {
               if (txInfo1?.success) {
                 ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
+                updateBalanceFromWs({
+                  chain: data.chain,
+                  inTokenAddress: data.inTokenAddress,
+                  outTokenAddress: data.outTokenAddress,
+                  ...txInfo1
+                })
               } else {
                 const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
                 handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
@@ -974,7 +1061,7 @@ function submitBotLimit() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })?.filter?.(i => Number(i?.inAmount) > 0) || []
+    })?.filter?.(i => Number(i?.inAmount) > 0 && i?.creatorAddress) || []
     const data = {
       // batchId: Date.now().toString(),
       swapList: swapList,
@@ -1094,7 +1181,7 @@ function submitBotLimit() {
         creatorAddress: addr || '',
         inAmount: inAmount,
       }
-    })?.filter?.(i => Number(i?.inAmount) > 0) || []
+    })?.filter?.(i => Number(i?.inAmount) > 0 && i?.creatorAddress) || []
     const data = {
       // batchId: Date.now().toString(),
       chain: chain,
@@ -1186,13 +1273,73 @@ function getGasPrice() {
   })
 }
 
+// const autoSlippageObj = reactive<Record<string, number>>({})
+
+// function getAutoSlippageParams() {
+//   const routeParams = getAddressAndChainFromId(route.params.id as string)
+//   const isBuy = props.activeTab === 'buy'
+//   const chain = getChain()
+//   const token = routeParams?.address || tokenStore.swap.token?.address || tokenStore.token?.token || ''
+//   const selected = botSettingStore?.botSettings?.[chain]?.[props.activeTab]?.selected || botSettingStore?.botSettings?.[chain]?.selected || 's1'
+//   const botSettings = botSettingStore.botSettings?.[chain]?.[props.activeTab]?.[selected]
+//   const mev = botSettings?.mev
+//   const query = {
+//     chain: chain,
+//     token: token,
+//     mev: mev,
+//     isBuy
+//   }
+//   return query
+// }
+
+// const autoSlippage = computed(() => {
+//   const query = getAutoSlippageParams()
+//   const key = query.chain + '-' + query.token + '-' + query.mev + '-' + query.isBuy
+//   return autoSlippageObj[key]
+// })
+
+// const slippageObj = computed(() => {
+//   const chain = getChain()
+//   const slippage = botSettingStore.botSettings?.[chain]?.[botSettingStore.botSettings?.[chain]?.selected]?.slippage || 9
+//   if (autoSlippage.value && slippage === 'auto') {
+//     return {
+//       slippage: autoSlippage.value,
+//       autoSlippage: false
+//     }
+//   }
+//   return {
+//     slippage: slippage !== 'auto' ? Number(new BigNumber(slippage).times(100).toFixed(0)) : 900,
+//     autoSlippage: slippage === 'auto'
+//   }
+// })
+
+// let Timer_getAutoSlippage: any = null
+// function _getAutoSlippage() {
+//   const query = getAutoSlippageParams()
+//   getAutoSlippage(query).then(res => {
+//     if (res) {
+//       console.log('getAutoSlippage', res)
+//       const key = query.chain + '-' + query.token + '-' + query.mev + '-' + query.isBuy
+//       autoSlippageObj[key] = res
+//     }
+//   }).finally(() => {
+//     if (Timer_getAutoSlippage) {
+//       clearTimeout(Timer_getAutoSlippage)
+//       Timer_getAutoSlippage = null
+//     }
+//     Timer_getAutoSlippage = setTimeout(() => {
+//       _getAutoSlippage()
+//     }, 50000)
+//   })
+// }
+
 
 watch(() => tokenStore.token?.token || '', (val) => {
   if (val) {
     getGasPrice()
-    if (props.activeTab === 'sell') {
-      _getAllowance()
-    }
+    // if (props.activeTab === 'sell') {
+    //   _getAllowance()
+    // }
     amountToken.value = ''
     amountSellTokenPercent.value = ''
     amountNative.value = ''
@@ -1202,17 +1349,17 @@ watch(() => tokenStore.token?.token || '', (val) => {
   }
 })
 
-watch(() => tokenStore.swap.payToken?.address, (val) => {
-  if (val) {
-    _getAllowance()
-  }
-})
+// watch(() => tokenStore.swap.payToken?.address, (val) => {
+//   if (val) {
+//     _getAllowance()
+//   }
+// })
 
-watch(walletAddress, (val) => {
-  if (val && props.activeTab === 'sell') {
-    _getAllowance()
-  }
-})
+// watch(walletAddress, (val) => {
+//   if (val && props.activeTab === 'sell') {
+//     _getAllowance()
+//   }
+// })
 
 watch(() => props.activeTab, (val) => {
   amountToken.value = ''
@@ -1220,9 +1367,9 @@ watch(() => props.activeTab, (val) => {
   amountNative.value = ''
   amountTokenOut.value = ''
   amountNativeOut.value = ''
-  if (val === 'sell') {
-    _getAllowance()
-  }
+  // if (val === 'sell') {
+  //   _getAllowance()
+  // }
 })
 
 watch(() => tokenStore.price, (val) => {
@@ -1274,14 +1421,23 @@ watch(() => tokenStore.placeOrderSuccess, () => {
   }, 1000)
 })
 
+const editMode = ref(false)
+function handleEdit(value: Ref<Array<{value: string}>>,type: string) {
+  editMode.value = !editMode.value
+  const botSetting = (botSettingStore?.botSettings?.[chain.value]?.buy || {}) as typeof botSettingStore.botSettings.solana
+  botSettingStore.botSettings[chain.value][type][botSetting?.selected || 's1'].buyValueList = value.map(el=>el.value)
+}
+
 // 生命周期钩子
 onMounted(() => {
   initPriceLimit()
   getGasPrice()
-  if (props.activeTab === 'sell') {
-    _getAllowance()
-  }
+  // _getAutoSlippage()
+  // if (props.activeTab === 'sell') {
+  //   _getAllowance()
+  // }
 })
+
 
 </script>
 <style lang="scss" scoped>
@@ -1295,7 +1451,8 @@ onMounted(() => {
     .tab-item {
       border: 1px solid transparent;
       display: flex;
-      padding: 7px 0;
+      // padding: 7px 0;
+      line-height: 26px;
       justify-content: center;
       align-items: center;
       flex: 1;
@@ -1304,7 +1461,7 @@ onMounted(() => {
       cursor: pointer;
       color: var(--secondary-text);
       & + .tab-item {
-        margin-left: 10px;
+        margin-left: 1px;
       }
       &.active {
         border-color: transparent;

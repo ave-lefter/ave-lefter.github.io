@@ -26,13 +26,12 @@ export const useWSStore = defineStore('ws', () => {
     [WSEventType.TGBOT]: null,
     [WSEventType.ASSET]: null,
     [WSEventType.SWITCH_MAIN_PAIR_V2]: null,
-    [WSEventType.PUMPSTATE]: null,
-    [WSEventType.TOKEN_UPDATED]: null,
     [WSEventType.GOLD_SIGNAL]: null,
     [WSEventType.SIGNALSV2_PUBLIC_MONITOR]: null,
     [WSEventType.PRICE_EXTRA]: null,
     [WSEventType.SIMPLE_TX]: null,
-    [WSEventType.PUBLIC_PORTRAIT]:null
+    [WSEventType.PUBLIC_PORTRAIT]: null,
+    [WSEventType.PUMP_MIGRATED]: null
   })
 
   // 将 createWebSocket 重命名为 init
@@ -53,11 +52,14 @@ export const useWSStore = defineStore('ws', () => {
       const { event, data } = msg
       if (event === WSEventType.TGBOT) {
         wsResult[event] = data?.msg
-      }else if (event === WSEventType.ASSET) {
+      } else if (event === WSEventType.ASSET) {
         wsResult[event] = data
         botStore.updateBalance(data)
-      }else if (event === WSEventType.MONITOR) {
+      } else if (event === WSEventType.MONITOR) {
         wsResult[event] = data?.msg
+      } else if (event === WSEventType.PUMP_MIGRATED) {
+        //内外盘提示
+        wsResult[event] = data?.msgs[0]
       } else if (event === WSEventType.TX) {
         const tx: WSTx = data?.tx
         // 更新价格 交易数和交易额
@@ -75,13 +77,9 @@ export const useWSStore = defineStore('ws', () => {
       } else if (event === WSEventType.SWITCH_MAIN_PAIR_V2) {
         // 内盘转外盘更新 pair
         useTokenStore().onSwitchMainPairV2(data)
-      } else if (event === WSEventType.PUMPSTATE) {
-        wsResult[event] = data?.msgs
-      } else if (event === WSEventType.TOKEN_UPDATED) {
-        wsResult[event] = data?.msg
-      } else if(event === WSEventType.PUBLIC_PORTRAIT){
+      } else if (event === WSEventType.PUBLIC_PORTRAIT) {
         usePublicPortraitStore().updatePublicPortrait(data?.msg || [])
-      } else {
+      }  else {
         wsResult[event] = data
       }
     }, 'main')

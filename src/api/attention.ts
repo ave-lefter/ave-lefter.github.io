@@ -11,8 +11,7 @@ export async function deleteAttention(body: {
     method: 'post',
     body,
   }).then(() => {
-    const {updateNum3} = storeToRefs(useFollowStore())
-    updateNum3.value++
+    useFollowStore().updateNum3++
     return Promise.resolve([])
   }).catch((err) => console.log(err))
 }
@@ -41,7 +40,7 @@ interface IAddAttention2 {
   sell?: number
 }
 
-export function deleteMonitor(body:{ uid: string, address: string  }){ 
+export function deleteMonitor(body:{ uid: string, address: string  }){
   const { $api } = useNuxtApp()
   return $api('/v2api/fav_users/v1/user/deleteMonitor',{
     method: 'post',
@@ -307,6 +306,19 @@ export function updateWhaleRemark(body: any) {
   })
 }
 
+// update remark
+export function batchUpdateWhaleRemark(body: any) {
+  const { $api } = useNuxtApp()
+  const { initRemarks } = useRemarksStore()
+  return $api('/v1api/v3/users/remark/batch/set', {
+    method: 'post',
+    body,
+  }).then(async res => {
+    initRemarks()
+    return res
+  })
+}
+
 // delete group
 export function changeIndexFavoriteGroup2(group: number[], address = localStorage.bot_evmAddress || localStorage.walletAddress) {
   if (!address || address === 'undefined') {
@@ -397,7 +409,8 @@ interface BulkImportAttentionItem {
 
 export async function bulkImportAttention(
   addressArr: BulkImportAttentionItem[],
-  address: string = localStorage.bot_evmAddress || localStorage.walletAddress
+  address: string = localStorage.bot_evmAddress || localStorage.walletAddress,
+  group: number | undefined,
 ): Promise<any> {
   const arr: Array<{
     address: string
@@ -409,7 +422,8 @@ export async function bulkImportAttention(
       address: address,
       remark: i.remark,
       user_address: i.user_address,
-      user_chain: i.user_chain
+      user_chain: i.user_chain,
+      group_id: group
     }
   })
   const { $api } = useNuxtApp()

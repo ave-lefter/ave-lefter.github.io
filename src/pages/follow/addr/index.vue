@@ -3,7 +3,7 @@
     <ul v-if="currentAddress" class="w-operate">
       <li v-if="evmAddress" class="flex items-center gap-2px">
           <el-checkbox v-model="isMonitor" :label="t('onlyPush')"  style="color:var(--secondary-text);z-index: 0;--el-checkbox-font-weight:400" class="[--el-checkbox-checked-text-color:var(--d-F5F5F5-l-333)]! [&&]:[--el-checkbox-input-border:1px_solid_var(--icon-color)]" size="large"/>
-          <span class="text-[var(--secondary-text)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/50` }}</span>
+          <span class="text-[var(--secondary-text)] text-14px" :class="{'text-[var(--d-F5F5F5-l-333)]!':isMonitor}">{{ `${monitorNum}/500` }}</span>
       </li>
       <li class="btn">
         <span @click="followStore.showBatchAddressDetails=true">{{ $t('bulkProcess') }}</span>
@@ -14,6 +14,8 @@
           <el-radio-button label="30D" :value="'30d'" />
         </el-radio-group>
       </li>
+      <!-- <li :class="`btn btn1 ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</li> -->
+      <!-- checkedList -->
     </ul>
     <div v-if="currentAddress" class="m-header flex-between px-16px items-start">
       <pro-groups v-if="!isMonitor" v-model="conditions.group" :options="addressGroups" @onConfirm="handleConfirmEdit" @onDelete="handleDelGroup" @onAdd="handleAddGroup" @onChangeIndex="handleChangeIndex"/>
@@ -21,8 +23,8 @@
     </div>
     <div class="m-table w-100% mt-12px flex-1 overflow-hidden bg-[--secondary-bg]">
       <el-table
-      ref="tableRef" v-loading="loading" class='' :data="filterDataSource" table-layout="fixed" row-class-name="group" height="calc(100% - 72px)"
-      :default-sort="defaultSort" @sort-change="handleSortChange" @row-click="tableRowClick">
+      ref="tableRef" v-loading="loading" class='' :data="filterDataSource" table-layout="fixed" row-class-name="group" :height="((pageData.total > 50) && shouldRenderChild && currentAddress) ? 'calc(100% - 72px)' : '100%'"
+      :default-sort="defaultSort" @sort-change="handleSortChange" @row-click="tableRowClick"  @selection-change="handleSelectionChange" :row-key="(row:any)=>`${row?.user_address}-${row?.user_chain}`">
         <template #empty>
           <div v-if="!loading && followStore.currentAddress" class="flex flex-col items-center justify-center py-30px">
             <img v-if="mode === 'light'" src="@/assets/images/empty-white.svg">
@@ -47,8 +49,10 @@
           </AveEmpty>
           <span v-else />
         </template>
-        <el-table-column :label="$t('wallet2')" width="215" fixed="left">
+        <el-table-column v-if="!isMonitor && (favHover||checkedList.length)" type="selection" width="22" fixed="left" reserve-selection/>
+        <el-table-column :label="$t('wallet2')" width="215" :fixed="!isMonitor?false:'left'">
           <template #header>
+            <div v-if="favHover||checkedList.length" :class="`batchDel mr-8px ${(checkedList.length&&'warning')}`" @click="batchDelete">{{ $t('batchDelete') }}{{checkedList.length?`(${checkedList.length})`:''}}</div>
             <span class="text-10px" style="opacity: 0">0</span>
             <span>{{ $t('wallet2') }}</span>
               <Icon
@@ -132,6 +136,7 @@
                       ?'color-#f45469'
                       :'color-[--d-666-l-696E7C]'} text-12px hover:color-#f45469`"
                 @click.self.stop="handleDeleteAttention(row)"
+                @mouseover="handlerMouseoverFavHover" @mouseout="handlerMouseoutFavHover"
               />
                <UserAvatar :key="`${row.user_address}-${row.user_chain}`" class="mr-8px" :wallet_logo="row.wallet_logo" :address="row.user_address" :chain="row.user_chain" iconSize="32px" />
               <div class="flex flex-col justify-between h-32px">
@@ -545,9 +550,8 @@ import {
   formatIconTag, getTagTooltip
 } from '@/utils/index'
 import { throttle } from 'lodash-es'
-import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor,deleteMonitor} from '~/api/attention'
+import { getAttentionPageList, changeFavoriteGroupName2, addFavoriteGroup2, removeFavoriteGroup2, moveFavoriteGroup2, deleteAttention ,changeIndexFavoriteGroup2 ,monitorAddresses,addAddressMonitor,favUsersResumeMonitor,favUsersPauseMonitor,deleteMonitor,batchDeleteAddresses} from '~/api/attention'
 import type { TableInstance } from 'element-plus'
-
 const { mode, isDark } = storeToRefs(useGlobalStore())
 const followStore = useFollowStore()
 const $router = useRouter()
@@ -582,6 +586,7 @@ const reCreateChild = () => {
     shouldRenderChild.value = true
   })
 }
+
 const monitorNum=ref(0)
 
 const pageData1 = ref({
@@ -629,6 +634,89 @@ const dataSource2 = ref([] as Array<any>)
 
 const filterDataSource=computed(() => {
   return isMonitor.value?dataSource2.value:dataSource.value
+})
+
+
+// const checkAll=shallowRef(false)
+// const isIndeterminate = ref(true)
+// const handleCheckAllChange = (val: CheckboxValueType) => {
+//   checkedList.value = val ? filterDataSource.value.map(i => i?.user_address+'-' + i?.user_chain  ) : []
+//   isIndeterminate.value = false
+// }
+
+// watch([checkedList,filterDataSource], (val) => {
+//   console.log('checkedList,favoritesList', val,checkedList.value, filterDataSource.value)
+//   const newVal1=val[0]
+//   const newVal2=val[1]
+//   newVal1.length === newVal2.length && newVal2.length>0
+//     ? (checkAll.value = true)
+//     : (checkAll.value = false)
+//   isIndeterminate.value = newVal1.length > 0 && newVal1.length < newVal2.length
+// })
+
+// 12-16 批量取消
+const favHover=ref(false)
+let timeoutId: any = null;
+const checkedList=ref(<any[]>[])
+const handleSelectionChange = (val: any[]) => {
+  console.log('handleSelectionChange', val)
+  checkedList.value=val.map(i => {
+    return {
+      address:currentAddress.value,
+      user_chain:i.user_chain,
+      user_address:i.user_address,
+    }
+  })
+  // checkedList.value=val.map(i => i?.user_address+'-' + i?.user_chain)
+}
+const handlerMouseoverFavHover=()=>{
+  favHover.value=true
+  clearTimeout(timeoutId);
+}
+
+const handlerMouseoutFavHover=()=>{
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+  timeoutId = setTimeout(() => {
+    favHover.value = false; // 3 秒后将 favHover 设置为 false
+    console.log('favHover set to false');
+  }, 3000);
+}
+const batchDelete=async ()=>{
+  await ElMessageBox.confirm(t('removeTokenTips'), t('tips'), {
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
+    customClass:'w-320px p-16px inputPop',
+    cancelButtonClass:'w-140px h-30px',
+    confirmButtonClass:'w-140px h-30px ml-8px!',
+    dangerouslyUseHTMLString: true,
+  })
+  console.log('batchDelete', checkedList.value)
+  batchDeleteAddresses(checkedList.value).then(() => {
+    ElMessage.success(t('success'))
+    init()
+    tableRef.value!.clearSelection()
+    checkedList.value = []
+  }).catch((e) => {
+     ElMessage.error(String(e))
+  })
+}
+onActivated(() => {
+  console.log('onDeactivated2')
+  favHover.value = false;
+  checkedList.value = []
+  tableRef.value!.clearSelection()
+  clearTimeout(timeoutId);
+})
+
+watch(() => conditions.value.group, (val) => {
+  checkedList.value = []
+  tableRef.value!.clearSelection()
+})
+watch(() => isMonitor.value, (val) => {
+  checkedList.value = []
+  tableRef.value!.clearSelection()
 })
 
 onMounted(async () => {
@@ -849,6 +937,10 @@ function handleDeleteAttention(item:any) {
     ElMessage.success(t('success'))
     getTableList()
     updateNum1.value++
+    // const newList = checkedList.value.filter((i) => !(i.user_address === item.user_address && i.user_chain === item.user_chain))
+    // checkedList.value = newList
+    tableRef.value?.toggleRowSelection(item,false)
+    console.log('checkedList.value', checkedList.value)
   }).catch((e) => {
     ElMessage.error(String(e))
   })
@@ -976,7 +1068,14 @@ function handleSort(val:any, dir='',sort:string) {
     align-items: center;
     color: var(--secondary-text);
     border-radius: 4px;
-
+    &.btn1{
+      height: 28px;
+      line-height: 28px;
+    }
+    &.warning{
+      background-color: #F6465D1A;
+      color: var(--down-color);
+    }
     &.active {
       color: #f5f5f5;
       background-color: var(--d-333-l-0A0B0C);
@@ -1359,6 +1458,25 @@ a.trade {
     .sort-caret{
       border-width: 4px;
     }
+  }
+}
+
+.batchDel{
+  display: inline-block;
+  padding: 0 8px;
+  height: 24px;
+  line-height: 24px;
+  cursor: pointer;
+  background-color: var(--main-input-button-bg);
+  justify-content: center;
+  align-items: center;
+  color: var(--secondary-text);
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 12px;
+  &.warning{
+    background-color: #F6465D1A;
+    color: var(--down-color);
   }
 }
 </style>

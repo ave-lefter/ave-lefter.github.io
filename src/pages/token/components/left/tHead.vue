@@ -1,12 +1,16 @@
 <script setup lang="ts">
 const props = defineProps({
   columns: {
-    type: Array<{ label: string, value: string, flex: string, sort: boolean }>,
+    type: Array<{ label: string, value: string, flex: string, sort: boolean,currentMode?: string }>,
     default: () => []
   },
   sort: {
     type: Object,
     default: () => ({})
+  },
+  toggleMode: {
+    type: Function,
+    default: () => {}
   }
 })
 const emit = defineEmits(['update:sort'])
@@ -24,16 +28,16 @@ function getActiveClass(activeSort: number, sortBy: string, direction: string) {
 }
 
 const statusTo = {
-  0: -1,
-  1: 0,
-  '-1': 1
+  0: 1,
+  1: -1,
+  '-1': 0
 }
 
 function switchSort(sortBy: string, activeSort?: number) {
   const sort = {...props.sort}
   if (!activeSort) {
     if (sort.sortBy !== sortBy) {
-      sort.activeSort = -1
+      sort.activeSort = 1
     } else {
       sort.activeSort = statusTo[sort.activeSort as 0 | 1 | '-1']
     }
@@ -55,7 +59,16 @@ function switchSort(sortBy: string, activeSort?: number) {
       :class="`flex items-center cursor-pointer ${column.flex}`"
       @click.stop="switchSort(column.value)">
       <template v-if="column.label">
-        {{ column.label }}
+        <template v-if="!column.currentMode">
+          {{ column.label }}
+        </template>
+        <template v-else>
+          <div v-for="(c, i) in column.label.split(`{currentMode}`)" class="flex items-center" :key="i">
+            <span v-if="i===0" @click.stop="toggleMode(column.currentMode)">{{ c }}</span> 
+            <span v-else>{{ c }}</span> 
+            <Icon name="custom:arrow-switch" class="text-16px" v-if="i === 0" @click.stop="toggleMode(column.currentMode)" />
+          </div>
+        </template>
       </template>
       <slot v-else :name="column.value"/>
       <div v-if="column.sort" class="flex flex-col items-center justify-center ml-5px">

@@ -35,7 +35,7 @@ export const useBotStore = defineStore('bot', () => {
   const walletStore = useWalletStore()
   const configStore = useConfigStore()
   const tokenStore = useTokenStore()
-  const isSupportChains = ['eth', 'bsc', 'solana', 'base', 'xlayer', 'ton'] as const
+  const isSupportChains = ['eth', 'bsc', 'solana', 'base', 'xlayer', 'polygon', 'ton'] as const
   const isSupportEvmChains = computed(() => {
     const chainConfig = configStore.chainConfig
     const isEvmChainWallet = getChainInfo(walletStore.chain)?.vm_type === 'evm'
@@ -56,7 +56,7 @@ export const useBotStore = defineStore('bot', () => {
   const subscribed = ref(false)
   const bundleAvailable = ref(false)
 
-  const connectVisible = useStorage('connectVisible', false, sessionStorage)
+  const connectVisible = ref(false)
   const connectWalletTab = ref(0)
   const walletList = ref<Awaited<ReturnType<typeof bot_getWalletsAllChain>>>([])
   const botSwapStore = useBotSwapStore()
@@ -134,7 +134,7 @@ export const useBotStore = defineStore('bot', () => {
       let i = walletList.value[k]
       let _item: typeof item | string = item
       if (BotNativeTokens?.includes(item?.address || '')) {
-        _item = item.chain
+        _item = item?.chain || ''
       }
       _getUserAllChainBalance(i?.addresses || [], _item)
     }
@@ -226,7 +226,7 @@ export const useBotStore = defineStore('bot', () => {
         if (!groups[chain]) groups[chain] = []
         groups[chain].push(item)
         return groups
-      }, {} as Record<string, Array<{ address: string; chain: string }>>)
+      }, {} as Record<string, Array<{ address: string; chain: string; token?: string }>>)
 
       // 逐个链处理
       for (const [chain, chainItems] of Object.entries(chainGroups)) {
@@ -235,26 +235,46 @@ export const useBotStore = defineStore('bot', () => {
           .filter(addr => addr.chain === chain)
           .map(addr => ({
             chain: addr.chain,
-            tokens: chainItems.map(item => item.address), // 合并当前链的所有token
+            tokens: chainItems.map(item => (item.address || item.token)), // 合并当前链的所有token
             walletAddress: addr.address
           }))
 
         if (balanceParams.length > 0) {
-          const balanceRes = await getChainsTokenBalance(balanceParams);
-          (balanceRes || []).forEach((resItem: any) => {
-            walletList.value?.forEach(wallet => {
-              wallet.addresses.forEach(addr => {
-                if (addr.address === resItem.walletAddress && addr.chain === resItem.chain) {
-                  if (!addr.tokenBalances) addr.tokenBalances = {}
-                  addr.tokenBalances[resItem.token] = {
-                    chain: resItem.chain,
-                    address: resItem.token,
-                    balance: resItem.balance
+          // 每次调用 5 个
+          for(let i = 0; i < balanceParams.length; i += 7) {
+            const params = balanceParams.slice(i, i + 7)
+            const balanceRes = await getChainsTokenBalance(params);
+            (balanceRes || []).forEach((resItem: any) => {
+              walletList.value?.forEach(wallet => {
+                wallet.addresses.forEach(addr => {
+                  if (addr.address === resItem.walletAddress && addr.chain === resItem.chain) {
+                    if (!addr.tokenBalances) addr.tokenBalances = {}
+                    addr.tokenBalances[resItem.token] = {
+                      chain: resItem.chain,
+                      address: resItem.token,
+                      balance: resItem.balance
+                    }
                   }
-                }
+                })
               })
             })
-          })
+          }
+
+          // const balanceRes = await getChainsTokenBalance(balanceParams);
+          // (balanceRes || []).forEach((resItem: any) => {
+          //   walletList.value?.forEach(wallet => {
+          //     wallet.addresses.forEach(addr => {
+          //       if (addr.address === resItem.walletAddress && addr.chain === resItem.chain) {
+          //         if (!addr.tokenBalances) addr.tokenBalances = {}
+          //         addr.tokenBalances[resItem.token] = {
+          //           chain: resItem.chain,
+          //           address: resItem.token,
+          //           balance: resItem.balance
+          //         }
+          //       }
+          //     })
+          //   })
+          // })
         }
 
         // 2. 批量获取价格
@@ -303,21 +323,37 @@ export const useBotStore = defineStore('bot', () => {
         balanceParams = balanceParams?.filter?.(i => i.chain === item) || []
       }
 
-      // 获取主代币余额
-      const balanceRes = await getChainsTokenBalance(balanceParams);
-      (balanceRes || []).forEach((resItem: any) => {
-        // const addr = addresses[index]
-        const addresses = walletList.value.find(i => i.addresses?.some(a => a.address === resItem.walletAddress && a.chain === resItem.chain))?.addresses
-        const addr = addresses?.find?.(a => a.address === resItem.walletAddress && a.chain === resItem.chain)
-        walletList.value?.forEach(wallet => {
-          wallet.addresses.forEach(addr => {
-            if (addr.address === resItem.walletAddress && addr.chain === resItem.chain) {
-              addr.balance = resItem?.balance || 0
-              addr.decimals = resItem.decimals || resItem.decimal
-            }
+      if (balanceParams?.length > 0) {
+        for(let i = 0; i < balanceParams.length; i += 7) {
+          const params = balanceParams.slice(i, i + 7)
+          const balanceRes = await getChainsTokenBalance(params);
+          (balanceRes || []).forEach((resItem: any) => {
+            walletList.value?.forEach(wallet => {
+              wallet.addresses.forEach(addr => {
+                if (addr.address === resItem.walletAddress && addr.chain === resItem.chain) {
+                  addr.balance = resItem?.balance || 0
+                  addr.decimals = resItem.decimals || resItem.decimal
+                }
+              })
+            })
           })
-        })
-      })
+        }
+      }
+      // 获取主代币余额
+      // const balanceRes = await getChainsTokenBalance(balanceParams);
+      // (balanceRes || []).forEach((resItem: any) => {
+      //   // const addr = addresses[index]
+      //   const addresses = walletList.value.find(i => i.addresses?.some(a => a.address === resItem.walletAddress && a.chain === resItem.chain))?.addresses
+      //   const addr = addresses?.find?.(a => a.address === resItem.walletAddress && a.chain === resItem.chain)
+      //   walletList.value?.forEach(wallet => {
+      //     wallet.addresses.forEach(addr => {
+      //       if (addr.address === resItem.walletAddress && addr.chain === resItem.chain) {
+      //         addr.balance = resItem?.balance || 0
+      //         addr.decimals = resItem.decimals || resItem.decimal
+      //       }
+      //     })
+      //   })
+      // })
 
       // 获取主代币价格
       const chainMainToken1: Record<string, string> = {

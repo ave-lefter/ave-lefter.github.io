@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js'
 export { Provider as MultiProvider } from 'ethcall'
 
 
-export function getProvider(chain: string) {
+export function getProvider(chain: string, rpc = '') {
   const chainInfo = getChainInfo(chain)
   if (chainInfo?.vm_type !== 'evm') {
     return {
@@ -34,7 +34,7 @@ export function getProvider(chain: string) {
     _provider = new BrowserProvider((walletStore.provider || (window as any)?.ethereum) as Eip1193Provider)
   } else {
     const rpcUrl = chainInfo?.rpc_url || ''
-    _provider = new JsonRpcProvider(rpcUrl, chainId)
+    _provider = new JsonRpcProvider(rpcUrl, Number(chainId))
   }
   return {_provider, chainInfo}
 }
@@ -239,7 +239,7 @@ export function handleError(err: any, type = '') {
         confirmButtonText: $i18n.t('okay')
       })
     } else {
-      ElMessage.error(unknownError)
+      ElMessage.error(err?.message || unknownError)
     }
   } else if (err?.code) {
     console.log(err?.message)

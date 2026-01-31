@@ -132,6 +132,7 @@ export interface Token {
   dev_balance_ratio_cur: number
   launchpad: string
   is_streaming?: boolean
+  main_pair_tvl:number
 }
 
 export interface Volume {

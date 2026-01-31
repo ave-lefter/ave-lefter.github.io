@@ -1,0 +1,309 @@
+<script setup lang="ts">
+import { useStorage } from '@vueuse/core'
+import CategoryTabs from './components/categoryTabs.vue'
+import hot from './components/hotRank/hot.vue'
+import newRank from './components/newRank/new.vue'
+import inclusionRank from './components/inclusionRank/inclusion.vue'
+import gainer from './components/gainerRank/gainer.vue'
+import { getTreasureConfig, type IGetTreasureConfig } from '~/api/market'
+
+import { trackRef } from '~/api/tracking'
+
+const pumpComponent = defineAsyncComponent(() => import('./components/pump/pump.vue'))
+const activityComponent = defineAsyncComponent(() => import('./components/activity/activity.vue'))
+const liveComponent = defineAsyncComponent(() => import('./components/live/index.vue'))
+const components = {
+  new: newRank,
+  inclusion: inclusionRank,
+  hot,
+  gainer,
+  binance_alpha: activityComponent,
+  cto: activityComponent,
+  xstocks: activityComponent,
+  volume: activityComponent,
+  pumplive: liveComponent,
+  clanker: activityComponent,
+}
+
+const walletStore = useWalletStore()
+const botStore = useBotStore()
+const globalStore = useGlobalStore()
+const activeTab = storeToRefs(globalStore).rankActiveTab
+const activeSubTab = useStorage('rankSubTab', 'pump_in_hot')
+const activeChain = useStorage('rankChain', 'AllChains')
+const chains = shallowRef<IGetTreasureConfig[]>([])
+const currentChainObj = computed(() => {
+  return chains.value.find((el) => el.net_name === activeChain.value)
+})
+const isPump = computed(() => {
+  if (Array.isArray(currentChainObj.value?.categories)) {
+    return currentChainObj.value.categories.find((el) => el.category === activeTab.value)?.is_pump
+  }
+  return 0
+})
+
+const _activityComponent = computed(() => {
+  return components?.[activeTab.value as keyof typeof components] || activityComponent
+})
+const walletAddress = computed(() => {
+  return botStore.evmAddress || walletStore.address
+})
+
+onMounted(() => {
+  _getTreasureConfig()
+  if (walletAddress.value) {
+    useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+  }
+  trackRef({ category: 'view', extra: 'home(pro.ave.ai)' })
+})
+watch(
+  () => walletAddress.value,
+  (val) => {
+    if (val) {
+      useGlobalStore().getUserFavoriteGroups(walletAddress.value)
+    }
+  }
+)
+const wsStore = useWSStore()
+// 把榜单的订阅取消掉
+onUnmounted(() => {
+  wsStore.send({
+    jsonrpc: '2.0',
+    method: 'unsubscribe',
+    params: ['price_extra'],
+    id: 1,
+  })
+})
+
+async function _getTreasureConfig() {
+  const res = await getTreasureConfig()
+  chains.value = res || []
+}
+
+const { t } = useI18n()
+function listMapFunction(i: Record<string, any>) {
+  const time_arr = ['1m', '5m', '15m', '1h', '4h', '24h']
+  const progress_obj: Record<string, any> = {}
+  time_arr.forEach((t) => {
+    progress_obj[`progress_buys_tx_${t}_count`] =
+      i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`] > 0
+        ? (i[`buys_tx_${t}_count`] / (i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`])) * 100
+        : 0
+    progress_obj[`progress_sells_tx_${t}_count`] =
+      i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`] > 0
+        ? (i[`sells_tx_${t}_count`] / (i[`sells_tx_${t}_count`] + i[`buys_tx_${t}_count`])) * 100
+        : 0
+    progress_obj[`progress_buy_volume_u_${t}`] =
+      i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`] > 0
+        ? (i[`buy_volume_u_${t}`] / (i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`])) * 100
+        : 0
+    progress_obj[`progress_sell_volume_u_${t}`] =
+      i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`] > 0
+        ? (i[`sell_volume_u_${t}`] / (i[`buy_volume_u_${t}`] + i[`sell_volume_u_${t}`])) * 100
+        : 0
+  })
+  let signal_arr: any[] = []
+  let normal_tag = []
+  if (i.dynamic_tag) {
+    const tag_arr = JSON.parse(i.dynamic_tag) || []
+    signal_arr = tag_arr?.filter((i) => i?.startsWith('signal'))
+    signal_arr = signal_arr?.map((y) => ({
+      tag:
+        y?.split('-')[5] && (y?.split('-')[1] == 'whale_sell' || y?.split('-')[1] == 'whale_buy')
+          ? `${y?.split('-')[1]}_trump`
+          : y?.split('-')[1],
+      color: y?.split('-')[2],
+      n: y?.split('-')[3],
+      timestamp: y?.split('-')[4],
+    }))
+    signal_arr?.sort((a, b) => b.timestamp - a.timestamp)
+    const kol_arr = signal_arr.filter(
+      (item, index) =>
+        signal_arr.findIndex((el) => new RegExp('^kol_.*$', 'gi').test(el.tag)) == index
+    )
+    const dev_arr = signal_arr.filter(
+      (item, index) =>
+        signal_arr.findIndex((el) => new RegExp('^dev_.*$', 'gi').test(el.tag)) == index
+    )
+    const smarter_arr = signal_arr.filter(
+      (item, index) =>
+        signal_arr.findIndex((el) => new RegExp('^smarter_.*$', 'gi').test(el?.tag)) == index
+    )
+    const whale_arr = signal_arr.filter(
+      (item, index) =>
+        signal_arr.findIndex((el) => new RegExp('^whale_.*$', 'gi').test(el.tag)) == index
+    )
+    const other_arr = signal_arr?.filter(
+      (el) => !new RegExp('^dev_|kol_|smarter_|whale_.*$', 'gi').test(el.tag)
+    )
+    signal_arr = kol_arr?.concat(dev_arr)?.concat(smarter_arr)?.concat(whale_arr)?.concat(other_arr)
+    signal_arr?.sort((a, b) => b.timestamp - a.timestamp)
+    normal_tag = tag_arr.filter((i) => !i?.startsWith('signal'))
+  }
+  // if (i.tag) {
+  //   const tag = i.tag?.split(',') || []
+  //   const tag1 = tag.filter((i) => i !== 'pump' && i !== 'moonshot') || []
+  //   normal_tag = tag1.concat(normal_tag)
+  // }
+  normal_tag =
+    normal_tag?.map((i) => ({
+      tag: i,
+      color: 'green',
+      showText: false,
+    })) || []
+  const is_rug_pull =
+    signal_arr?.some((i) => new RegExp('rug_pull', 'gi').test(i?.tag)) ||
+    normal_tag?.some((i) => new RegExp('rug_pull', 'gi').test(i?.tag))
+  const is_shit_coins =
+    signal_arr?.some((i) => new RegExp('shitcoin', 'gi').test(i?.tag)) ||
+    normal_tag?.some((i) => new RegExp('shitcoin', 'gi').test(i.tag))
+  if (i.risk_score >= 100 && i.chain == 'solana') {
+    i.lp_locked_percent = 0
+    signal_arr = []
+    normal_tag = [
+      {
+        tag: 'flag_dangerous',
+        color: 'red',
+        showText: true,
+      },
+    ]
+  } else if (is_rug_pull) {
+    i.lp_locked_percent = 0
+    signal_arr = []
+    normal_tag = [
+      {
+        tag: 'flag_rug_pull',
+        color: 'red',
+        showText: true,
+      },
+    ]
+  } else if (is_shit_coins) {
+    i.lp_locked_percent = 0
+    signal_arr = []
+    normal_tag = [
+      {
+        tag: 'flag_shit_coins',
+        color: 'red',
+        showText: true,
+      },
+    ]
+  }
+  if (i.cto_flag == 1) {
+    normal_tag.unshift({
+      tag: 'cto_flag',
+      color: 'green',
+      showText: false,
+    })
+  }
+  if (i.tag_ti) {
+    const tagti = i.tag_ti?.split(',') || []
+    let tag_t = tagti?.filter(
+      (i) => i !== '' && i !== 'newcommunity' && i !== 'pump' && i !== 'moonshot'
+    )
+    tag_t = tag_t?.map((i) => ({
+      tag: i,
+      color: 'green',
+      showText: false,
+    }))
+    normal_tag = tag_t.concat(normal_tag)
+  }
+  return {
+    ...i,
+    id: `${i.target_token}-${i.chain}`,
+    pair_id: `${i.pair}-${i.chain}`,
+    token: i.target_token,
+    progress: Number(i.progress || 0),
+    reply_count: i.reply_count || 0,
+    logo_url: i.target_token == i.token0_address ? i?.token0_logo_url : i?.token1_logo_url,
+    target_opening_at:
+      i?.target_opening_at !== '1970-01-01T00:00:00Z' &&
+      i?.target_opening_at !== '0001-01-01T00:00:00Z'
+        ? new Date(i?.target_opening_at).getTime()
+        : 0,
+    created_at:
+      i?.created_at !== '1970-01-01T00:00:00Z' && i?.created_at !== '0001-01-01T00:00:00Z'
+        ? i?.created_at
+        : 0,
+    liq:
+      i.target_token !== i.token0_address
+        ? i.reserve0 * i.token0_price_usd * 2
+        : i.reserve1 * i.token1_price_usd * 2,
+    lp_locked_percent:
+      Number(i.lp_locked_percent * 100 || 0) < 1 ? 0 : Number(i.lp_locked_percent * 100 || 0),
+    lp_locked_to:
+      i?.lp_locked_to !== '1970-01-01T00:00:00Z' && i?.lp_locked_to !== '0001-01-01T00:00:00Z'
+        ? new Date(i?.lp_locked_to).getTime()
+        : 0,
+    medias: getMedias(i.appendix),
+    ...progress_obj,
+    normal_tag: normal_tag?.slice(0, 3) || [],
+    signal_arr: signal_arr?.slice(0, 1) || [],
+  }
+}
+
+// function getMedias(appendix: string) {
+//   if (!appendix) return []
+//   if (isJSON(appendix)) {
+//     const obj = JSON.parse(appendix)
+//     const arr = []
+//     if (obj?.website)
+//       arr.push({
+//         name: t('website'),
+//         icon: 'web',
+//         url: formatUrl(obj.website),
+//       })
+//     if (obj?.btok) arr.push({ name: 'Btok', icon: 'btok', url: formatUrl(obj.btok) })
+//     if (obj?.qq) arr.push({ name: 'QQ', icon: 'qq', url: obj.qq })
+//     if (obj?.telegram) arr.push({ name: 'Telegram', icon: 'tg', url: formatUrl(obj.telegram) })
+//     if (obj?.twitter)
+//       arr.push({
+//         name: 'Twitter',
+//         icon: 'twitter',
+//         url: formatUrl(obj.twitter),
+//       })
+//     return arr
+//   }
+//   return []
+// }
+
+const height = computed(() => {
+  // 有子 Tabs
+  if (isPump.value) {
+    return 'calc(100vh - 265px)'
+  }
+  return 'calc(100vh - 221px)'
+})
+
+// const needAmmList = computed(()=>{
+//   return ['gainer', 'hot', 'new', 'inclusion','binance_alpha','xstocks', 'clanker'].includes(activeTab.value)
+// })
+</script>
+
+<template>
+  <div class="w-full bg-[--main-bg]">
+    <div class="[&&]:max-w-1920px mx-auto">
+      <CategoryTabs
+        v-model:activeSubTab="activeSubTab"
+        v-model:activeTab="activeTab"
+        v-model:activeChain="activeChain"
+        :categories="currentChainObj?.categories || []"
+        :ammList="currentChainObj?.swaps || []"
+        :chains="chains"
+      />
+      <KeepAlive :max="6">
+        <component
+          :is="isPump ? pumpComponent : _activityComponent"
+          ref="dynamicComponentRef"
+          :height="height"
+          :listMapFunction="listMapFunction"
+          :activeChain="activeChain"
+          :activeTab="activeTab"
+          :activeSubTab="activeSubTab"
+          v-bind="!isPump ? { ammList: currentChainObj?.swaps || [] } : {}"
+        />
+      </KeepAlive>
+    </div>
+  </div>
+</template>
+
+<style scoped lang="scss"></style>

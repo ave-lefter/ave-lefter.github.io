@@ -1,9 +1,10 @@
 import { debounce } from 'lodash-es'
 import { NATIVE_TOKEN, MAX_UINT_AMOUNT } from '@/utils/constants'
 import { getAddressAndChainFromId, getChainInfo, isEvmChain } from '@/utils'
-import { bot_getTokenBalance, bot_getApprove, bot_approve } from '@/api/bot'
+import { bot_getTokenBalance, bot_getApprove, bot_approve, bot_getApproveV2, bot_approveV2 } from '@/api/bot'
 import { getTokensPrice } from '@/api/token'
 import { ElNotification } from 'element-plus'
+import BigNumber from 'bignumber.js'
 
 const chainMainToken: Record<string, string> = {
   solana: 'sol',
@@ -52,7 +53,7 @@ export function useBotSwap(type: number = 0, isBatch = false) {
     }
     let payToken = tokenStore.swap.payToken
     let token1 = chainMainToken[chain] || NATIVE_TOKEN
-    let payTokenAddress = payToken.chain !== chain ? token1 : (payToken?.address || NATIVE_TOKEN)
+    let payTokenAddress = payToken?.chain !== chain ? token1 : (payToken?.address || NATIVE_TOKEN)
     bot_getTokenBalance({
       chain: chain,
       tokens: [address, token1, payTokenAddress],
@@ -63,7 +64,7 @@ export function useBotSwap(type: number = 0, isBatch = false) {
       const t3 = tokens[2]
       tokenStore.swap.token = {...tokenStore.token, ...t1, address: (t1.token || t1.address), chain: chain}
       tokenStore.swap.native = {...t2, symbol: getChainInfo(chain)?.main_name, chain: chain, address: t2.token || t2.address, decimals: t2?.decimals || t2?.decimal}
-      tokenStore.swap.payToken = {...tokenStore.swap.payToken, ...t3}
+      tokenStore.swap.payToken = {...tokenStore.swap.payToken, ...t3, address: (t3.token || t3.address)}
       _getTokensPrice(true)
       botStore?.getUserAllChainBalance(tokenStore.swap.payToken as {address: string, chain: string})
       botStore?.getUserAllChainBalance(tokenStore.swap.token as {address: string, chain: string})
@@ -175,7 +176,7 @@ export function useBotSwap(type: number = 0, isBatch = false) {
       walletAddress: walletAddress
     }).then(tokens => {
       const t3 = tokens[0]
-      tokenStore.swap.payToken = {...payToken, ...t3}
+      tokenStore.swap.payToken = {...payToken, ...t3, address: (t3.token || t3.address)}
     }).finally(() => {
       loading.value = false
     })
@@ -190,8 +191,8 @@ export function useBotSwap(type: number = 0, isBatch = false) {
   const loadingAllowance = ref(false)
   const allowance = ref<number | string>(0)
 
-  async function getAllowance(token: string, chain: string = getChain()) {
-    if (getChainInfo(chain)?.vm_type !== 'evm' || token === NATIVE_TOKEN ) {
+  async function getAllowance(inToken: string, outToken: string, chain: string = getChain()) {
+    if (getChainInfo(chain)?.vm_type !== 'evm' || inToken === NATIVE_TOKEN ) {
       allowance.value = MAX_UINT_AMOUNT
       return MAX_UINT_AMOUNT
     }
@@ -201,12 +202,17 @@ export function useBotSwap(type: number = 0, isBatch = false) {
     }
     const walletAddress = botStore.userInfo?.addresses?.find?.(i => i?.chain === chain)?.address
     loadingAllowance.value = true
-    return bot_getApprove({
-      token,
+    return bot_getApproveV2({
+      inToken,
+      outToken,
       chain,
       owner: walletAddress || ''
     }).then(async res => {
-      allowance.value = res
+      if (res === 1) {
+        allowance.value = MAX_UINT_AMOUNT
+      } else {
+        allowance.value = res
+      }
       return res
     }).finally(() => {
       loadingAllowance.value = false
@@ -226,13 +232,14 @@ export function useBotSwap(type: number = 0, isBatch = false) {
   }
 
   function _bot_approve(data: {
-    tokenAddress: string
+    inTokenAddress: string
+    outTokenAddress: string
     batchId: string
     chain: string
     creatorAddress: string[]
   }) {
     const d = {...data, tgUid: botStore?.userInfo?.tgUid}
-    return bot_approve(d).then(res => {
+    return bot_approveV2(d).then(res => {
       return {
         result: res,
         wait: () => {
@@ -245,7 +252,7 @@ export function useBotSwap(type: number = 0, isBatch = false) {
                 if (isFinish) {
                   return
                 }
-                getAllowance(d.tokenAddress, d.chain).then(res => {
+                getAllowance(d.inTokenAddress, d.outTokenAddress, d.chain).then(res => {
                   if (res === '0') {
                     fuc(resolve, reject)
                   } else {
@@ -277,18 +284,19 @@ export function useBotSwap(type: number = 0, isBatch = false) {
     })
   }
 
-  function checkApproveAndApprove (data: { chain?: string, token?: string, owner?: string } = {}) {
+  function checkApproveAndApprove (data: { chain?: string, inToken?: string, outToken?: string, owner?: string } = {}) {
     const chain = data?.chain
     if (!(chain && isEvmChain(chain))) {
       return Promise.resolve(MAX_UINT_AMOUNT)
     }
-    return getAllowance(data.token || '', chain).then(res => {
-      if (res === '0') {
+    return getAllowance(data.inToken || '', data.outToken || '', chain).then(res => {
+      if (Number(res) === 0) {
         const walletAddress = data.owner || botStore?.userInfo?.evmAddress || ''
         const d = {
           batchId: Date.now().toString(),
           chain: data.chain || '',
-          tokenAddress: data.token || '',
+          inTokenAddress: data.inToken || '',
+          outTokenAddress: data.outToken || '',
           creatorAddress: [walletAddress],
         }
         let notifyDom: null | ReturnType<typeof ElNotification> = null
@@ -309,6 +317,59 @@ export function useBotSwap(type: number = 0, isBatch = false) {
       }
     })
   }
+
+  function updateBalanceFromWs(data: {fromAmount: string; outputAmount: string; inTokenAddress: string; outTokenAddress: string; chain: string}) {
+    if (!isEvmChain(data.chain)) {
+      return
+    }
+    const isSameTokenChain = data.chain === tokenStore.swap.token.chain
+    const isSamePayTokenChain = data.chain === tokenStore.swap.payToken.chain
+    const isSameNativeTokenChain = data.chain === tokenStore.swap.native.chain
+    if (isSameTokenChain && data.inTokenAddress === tokenStore.swap.token.address && data.fromAmount) {
+      const afterBalance = BigNumber(tokenStore.swap.token.balance || 0).minus(BigNumber(data.fromAmount || 0).shiftedBy((tokenStore.swap.token.decimals || 0) * -1)).toString()
+      tokenStore.swap.token.balance = afterBalance
+    }
+    if (isSamePayTokenChain && data.inTokenAddress === tokenStore.swap.payToken.address && data.fromAmount) {
+      const afterBalance = BigNumber(tokenStore.swap.payToken.balance || 0).minus(BigNumber(data.fromAmount || 0).shiftedBy((tokenStore.swap.payToken.decimals || 0) * -1)).toString()
+      tokenStore.swap.payToken.balance = afterBalance
+    }
+    if (isSameNativeTokenChain && data.inTokenAddress === tokenStore.swap.native.address && data.fromAmount) {
+      const afterBalance = BigNumber(tokenStore.swap.native.balance || 0).minus(BigNumber(data.fromAmount || 0).shiftedBy((tokenStore.swap.native.decimals || 0) * -1)).toString()
+      tokenStore.swap.native.balance = afterBalance
+    }
+    if (isSameTokenChain &&  data.outTokenAddress === tokenStore.swap.token.address && data.outputAmount) {
+      const afterBalance = BigNumber(tokenStore.swap.token.balance || 0).plus(BigNumber(data.outputAmount || 0).shiftedBy((tokenStore.swap.token.decimals || 0) * -1)).toString()
+      tokenStore.swap.token.balance = afterBalance
+    }
+    if (isSamePayTokenChain && data.outTokenAddress === tokenStore.swap.payToken.address && data.outputAmount) {
+      const afterBalance = BigNumber(tokenStore.swap.payToken.balance || 0).plus(BigNumber(data.outputAmount || 0).shiftedBy((tokenStore.swap.payToken.decimals || 0) * -1)).toString()
+      tokenStore.swap.payToken.balance = afterBalance
+    }
+    if (isSameNativeTokenChain && data.outTokenAddress === tokenStore.swap.native.address && data.outputAmount) {
+      const afterBalance = BigNumber(tokenStore.swap.native.balance || 0).plus(BigNumber(data.outputAmount || 0).shiftedBy((tokenStore.swap.native.decimals || 0) * -1)).toString()
+      tokenStore.swap.native.balance = afterBalance
+    }
+
+    botStore.walletList.forEach(item => {
+      if (item.evmAddress === botStore.evmAddress) {
+        item.addresses.forEach(address => {
+          if (address.chain === data.chain) {
+            if (data.inTokenAddress === NATIVE_TOKEN) {
+              address.balance = BigNumber(address.balance || 0).minus(BigNumber(data.fromAmount || 0).shiftedBy(-18)).toString()
+            } else if (address?.tokenBalances?.[data.inTokenAddress]) {
+              // address.tokenBalances[data.inTokenAddress] = BigNumber(address.tokenBalances[data.inTokenAddress] || 0).minus(BigNumber(data.fromAmount || 0).shiftedBy(-18)).toString()
+            }
+
+            if (data.outTokenAddress === NATIVE_TOKEN) {
+              address.balance = BigNumber(address.balance || 0).plus(BigNumber(data.outputAmount || 0).shiftedBy(-18)).toString()
+            }
+          }
+        })
+      }
+    })
+
+  }
+
   return {
     loading,
     refreshTokenBalance,
@@ -319,6 +380,7 @@ export function useBotSwap(type: number = 0, isBatch = false) {
     allowance,
     bot_approve: _bot_approve,
     checkApproveAndApprove,
-    getParsedRoute
+    getParsedRoute,
+    updateBalanceFromWs
   }
 }

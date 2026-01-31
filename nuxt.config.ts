@@ -24,7 +24,7 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE,
+      // apiBase: process.env.NUXT_PUBLIC_API_BASE,
       ga: process.env.NUXT_PUBLIC_GA
     }
   },
@@ -68,7 +68,14 @@ export default defineNuxtConfig({
         prefix: 'custom',
         dir: './src/assets/icons'
       },
-    ]
+      {
+        prefix: 'custom-media',
+        dir: './src/assets/icons/media'
+      },
+    ],
+    clientBundle: {
+      sizeLimitKb: 512
+    }
   },
   generate: {
     // routes: [
@@ -153,11 +160,11 @@ export default defineNuxtConfig({
     },
     $client: {
       optimizeDeps: {
-        include: ['lodash-unified'],
+        include: ['lodash-unified']
       }
     },
     optimizeDeps: {
-      include: ['lodash-unified'],
+      include: ['lodash-unified']
     },
     build: {
       minify: 'terser',
@@ -170,7 +177,7 @@ export default defineNuxtConfig({
     }
   },
   pwa: {
-    registerType: 'autoUpdate',
+    registerType: 'prompt',
     devOptions: {
       enabled: false
     },
@@ -215,8 +222,10 @@ export default defineNuxtConfig({
     workbox: {
       navigateFallback: null,
       globPatterns: ['**/*.{js,css,ico,png,jpg,jpeg,svg,webp,json,woff2,otf,ttf,woff}'],
-      maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 设置为 3 MiB
+      maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 设置为 10 MiB
       cleanupOutdatedCaches: true,
+      skipWaiting: true,
+      clientsClaim: true,
       runtimeCaching: [
         {
           urlPattern: ({ request }) => request.destination === 'document',

@@ -114,12 +114,11 @@ import SearchTable from './searchTable.vue'
 import WalletTable from './walletTable.vue'
 import { _getSmartTop10, _tokenSearchV3 } from '@/api/hot'
 import type {SearchWalletInfo, SearchInfo } from '@/api/types/search'
-import { useDebounceFn, useLocalStorage } from '@vueuse/core'
+import { useDebounceFn, useLocalStorage, useStorage } from '@vueuse/core'
 import { ElMessageBox, type ElInput } from 'element-plus'
 import { ProvideType } from '~/utils/constants'
 import { getHotTokens, type GetHotTokensResponse } from '@/api/token'
 import type {IPriceV2Response} from '~/api/types/ws'
-import { useStorage } from '@vueuse/core'
 import ChainTabs from './chainTabs/index.vue'
 const { hotList,dialogVisible_search,dialogSearchText:query } = storeToRefs(useGlobalStore())
 const {currentAddress} =storeToRefs(useFollowStore())
@@ -336,7 +335,8 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
       return {
         ...el,
         current_price_usd: current.uprice,
-        price_change: current.price_change
+        price_change: current.price_change,
+        price_change_v2: current.price_change_v2
       }
     }
     return el
@@ -348,7 +348,13 @@ watch(() => wsStore.wsResult[WSEventType.PRICEV2], (val: IPriceV2Response) => {
 async function _getHotTokens() {
   try {
     const res = await getHotTokens()
-    hotList.value = res || []
+    const data = res || []
+    hotList.value = data.map(el => {
+      return {
+        ...el,
+        price_change_v2:el.price_change_v2
+      }
+    })
     if (hotTokens) {
       hotTokens.setVal(hotList.value)
     }

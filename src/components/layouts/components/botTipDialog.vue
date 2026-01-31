@@ -165,7 +165,7 @@ const { latestNotice, isDark } = storeToRefs(globalStore)
 const isLatestExperienced = computed(() => {
   return (
     (latestNotice.value?.time ?? 0) <= NOTICE_FILTER_TIME ||
-    String(lastExperienceTime.value) === String(latestNotice.value?.time)
+    Number(lastExperienceTime.value) >= Number(latestNotice.value?.time)
   )
 })
 

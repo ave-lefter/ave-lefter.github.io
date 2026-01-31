@@ -1,65 +1,22 @@
 <template>
-  <div class="referral dark flex-1">
+  <div class="referral dark flex-1 color-#FFF">
     <div class="container">
-      <div class="referral-top">
-        <div class="left">
-          <div :style="{ fontSize: localeStore.locale?.includes?.('zh-') ? '72px' : '50px' }">
-            {{ $t('referralS1') }}
+      <div v-if="referralInfo?.refCode" class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center">
+            <img :src="generateAvatarIcon(walletName)" class="w-60px h-60px rd-50% mr-19px" alt="" srcset="">
+            <div class="text-16px">
+              <div class="color-#fff font-500 flex items-center">
+                <span>{{ walletName }}</span>
+                <div class="h-20px px-10px text-10px flex items-center rd-2px ml-10px" style="background: linear-gradient(76.98deg, #2BAEEA 3.79%, #2561F6 102.2%);">{{ referralInfo?.refCode ? referralInfo?.vip?.toUpperCase() || $t('ordinary') : $t('viewAfterLogin') }}</div>
+              </div>
+              <div class="text-14px color-#697F95 mt-8px">{{ botStore.userInfo?.name }}</div>
+            </div>
           </div>
-          <div
-            :style="{ fontSize: localeStore.locale?.includes?.('zh-') ? '30px' : '20px' }"
-            v-html="$t('referralS2')"
-          />
-          <!-- 最高可获得<span>60%</span>返佣 -->
-        </div>
-        <div class="right">
-          <div class="right-top">
-            <table>
-              <thead>
-                <tr>
-                  <th>{{ $t('yourLevel') }}</th>
-                  <th>{{ $t('yourRebateRate') }}</th>
-                  <!-- <th>{{ $t('yourChannelRebateRate') }}</th> -->
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td
-                    class="font-700 color-#FFC94E pt-10px"
-                    :style="{ fontSize: referralInfo?.refCode ? '24px' : '14px' }"
-                  >
-                    {{
-                      referralInfo?.refCode
-                        ? referralInfo?.vip || $t('ordinary')
-                        : $t('viewAfterLogin')
-                    }}
-                  </td>
-                  <td
-                    class="font-700 color-#FFF pt-10px"
-                    :style="{ fontSize: referralInfo?.refCode ? '24px' : '14px' }"
-                  >
-                    {{
-                      referralInfo?.refCode
-                        ? Math.round((referralInfo?.refRatio || 0) / 100) + '%'
-                        : $t('viewAfterLogin')
-                    }}
-                  </td>
-                  <!-- <td>{{ referralInfo?.channelRefRatio ? Math.round((referralInfo?.channelRefRatio || 0) / 100) + '%' : '--' }}</td> -->
-                </tr>
-              </tbody>
-            </table>
-            <img
-              class="right-top-img"
-              height="180"
-              width="180"
-              src="~@/assets/images/referral/vip.png"
-              alt=""
-            >
-          </div>
-          <div class="right-bottom">
-            <div class="right-bottom-li">
-              <span style="margin-right: auto">{{ $t('referralLink') }}</span>
-              <span>{{ refCode ? shareLink : '--' }}</span>
+          <div class="bg-#FFFFFF0D p-20px font-400 rd-8px mt-20px min-w-450px" style="border: 1px solid #FFFFFF17;">
+            <div class="text-14px color-#697F95 flex">
+              <span class="mr-auto">{{ $t('referralLink') }}</span>
+              <span class="color-#fff ml-10px">{{ refCode ? shareLink : '--' }}</span>
               <img
                 v-if="refCode"
                 v-copy="shareLink"
@@ -72,9 +29,9 @@
                 srcset=""
               >
             </div>
-            <div class="right-bottom-li" style="margin-top: 24px">
-              <span style="margin-right: auto">{{ $t('referralCode') }}</span>
-              <span>{{ refCode || '--' }}</span>
+            <div class="text-14px color-#697F95 mt-20px flex">
+              <span class="mr-auto">{{ $t('referralCode') }}</span>
+              <span class="color-#fff ml-10px">{{ refCode || '--' }}</span>
               <img
                 v-if="refCode"
                 v-copy="refCode"
@@ -87,436 +44,466 @@
                 srcset=""
               >
             </div>
-            <button class="right-bottom-btn clickable" @click.stop="invite">
-              {{
-                !(botStore.evmAddress && botStore.accessToken) && !walletStore.address
-                  ? $t('loginNow')
-                  : $t('invite')
-              }}
-            </button>
           </div>
-        </div>
-      </div>
-      <div class="text-center text-60px font-700 mt-80px color-#FFF">
-        Ave.ai {{ $t('partnership') }}
-      </div>
-      <div class="flex justify-between mt-60px">
-        <div class="note-li">
-          <div class="note-li_title flex items-center">
-            <img
-              class="mr-10px"
-              height="60"
-              width="60"
-              src="@/assets/images/referral/d.svg"
-              alt=""
-              srcset=""
-            >
-            <span>{{ $t('maximumRebate') }}</span>
-          </div>
-          <ul class="note-li_content">
-            <li>{{ $t('referralS11') }}</li>
-            <li>{{ $t('referralS12') }}</li>
-            <li>{{ $t('referralS13') }}</li>
-          </ul>
-        </div>
-        <div class="note-li">
-          <div class="note-li_title flex items-center">
-            <img
-              class="mr-10px"
-              height="60"
-              width="60"
-              src="@/assets/images/referral/p.svg"
-              alt=""
-              srcset=""
-            >
-            <span>{{ $t('referralTitle') }}</span>
-          </div>
-          <ul class="note-li_content">
-            <li>{{ $t('referralS21') }}</li>
-            <li>{{ $t('referralS22') }}</li>
-          </ul>
-        </div>
-      </div>
-      <div class="flex-center mt-60px">
-        <button class="apply-btn clickable" @click.stop="apply">{{ $t('apply') }}</button>
-      </div>
-      <div class="section-title mt-80px">
-        <img width="28" height="28" src="@/assets/images/referral/data.svg" alt="" srcset="" >
-        <span>{{ $t('dataOverview') }}</span>
-      </div>
-      <ul class="data-list">
-        <li class="data-card">
-          <div>
-            <div class="data-card_label">{{ $t('withdrawable') }}</div>
-            <div class="text-20px lh-26px">
-              ${{ formatNumber(referralInfo?.totalWithdrawableAmount || 0) }}
-            </div>
-            <div class="data-card_label mt-24px">{{ $t('withdrawn') }}</div>
-            <div class="text-20px lh-26px">
-              ${{
-                formatNumber(
-                  (referralInfo?.totalIncomeAmount || 0) -
-                    (referralInfo?.totalWithdrawableAmount || 0)
-                )
-              }}
-            </div>
-          </div>
-          <!-- <button class="w-btn clickable" v-if="referralInfo?.canWithdraw" >提现</button> -->
-          <el-button
-            v-if="referralInfo?.canWithdraw"
-            :loading="loading"
-            type="primary"
-            size="large"
-            @click.stop="createWithdrawIncomeOrder"
-            >{{ $t('withdraw') }}</el-button
-          >
-        </li>
-        <li class="data-card">
-          <div>
-            <div class="data-card_label">{{ $t('totalRebateAmount') }}</div>
-            <div class="text-20px lh-26px">
-              $ {{ formatNumber(referralInfo?.totalIncomeAmount || 0) }}
-            </div>
-            <div v-show="(referralInfo?.channelRefRatio || 0) > 0" class="data-card_label mt-24px">
-              {{ $t('totalChannelRebate') }}
-            </div>
-            <div v-show="(referralInfo?.channelRefRatio || 0) > 0" class="text-20px lh-26px">
-              $ {{ formatNumber(referralInfo?.channelReferralIncomeAmount || 0) }}
-            </div>
-          </div>
-        </li>
-        <li class="data-card">
-          <div>
-            <div class="data-card_label">{{ $t('totalInvitees') }}</div>
-            <div class="text-20px lh-26px">{{ invitees || 0 }}</div>
-            <div class="data-card_label mt-24px">{{ $t('swapInvitees24H') }}</div>
-            <div class="text-20px lh-26px">{{ referralInfo?.swapInvitees24H || 0 }}</div>
-          </div>
-        </li>
-      </ul>
 
-      <div class="section-title mt-60px">
-        <img width="28" height="28" src="@/assets/images/referral/f.svg" alt="" srcset="" >
-        <span>{{ $t('friends') }}</span>
-      </div>
-      <el-table
-        :data="inviteeList"
-        row-class-name="[--el-table-border:1px_solid_#1F242A]"
-        :header-row-style="{ fontSize: '12px' }"
-        style="width: 100%"
-        class="table-list"
-      >
-        <el-table-column :width="550" prop="time" :label="$t('registerTime')">
-          <template #default="{ row }">
-            {{ formatDate(row.bindRefTime) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="name" :label="$t('friendName')">
-          <template #default="{ row }">
-            {{ row?.username }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="level" :label="$t('vipLevel')" align="right">
-          <template #default="{ row }">
-            {{ row?.vip || $t('ordinary') }}
-          </template>
-        </el-table-column>
-        <template #empty>
-          <div class="flex items-center justify-center flex-col pt-20px">
-            <img src="@/assets/images/empty-black.svg" alt="" >
-            {{ $t('emptyNoData') }}
-          </div>
-        </template>
-      </el-table>
-      <div class="pagination-container">
-        <el-pagination
-          v-model:current-page="currentPage"
-          mode="dark"
-          :page-size="pageSize"
-          layout="total, prev, pager, next"
-          :total="total || 0"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-      <div class="section-title mt-60px">
-        <img width="28" height="28" src="@/assets/images/referral/w.svg" alt="" srcset="" >
-        <span>{{ $t('withdrawingList') }}</span
-        ><span
-          v-if="referralInfo?.startTime || referralInfo?.endTime"
-          style="font-size: 14px; font-weight: 400; color: #999; margin-left: 5px"
-          >({{ $t('statisticalPeriod') }}:
-          {{ referralInfo.startTime ? formatDate(referralInfo.startTime, 'YYYY.MM.DD') : '' }}-{{
-            referralInfo.endTime ? formatDate(referralInfo.endTime, 'YYYY.MM.DD') : ''
-          }})</span
-        >
-      </div>
-      <el-table
-        :data="withdrawableListPage"
-        row-class-name="[--el-table-border:1px_solid_#1F242A]"
-        :header-row-style="{ fontSize: '12px' }"
-        style="width: 100%"
-        class="table-list"
-      >
-        <el-table-column prop="time" :label="$t('swapToken')">
-          <template #default="{ row }">
-            <div class="flex-start items-center">
-              <div class="token-box position-relative">
-                <img
-                  class="icon-logo"
-                  :src="`${globalConfig.token_logo_url}${row.logoUrl}`"
-                  alt=""
-                  :onerror="`this.src='${getSymbolDefaultIcon(row.chain, row.symbol)}'`"
-                >
-                <img
-                  class="icon-chain"
-                  :src="`${globalConfig.token_logo_url}chain/${row.chain}.png`"
-                  alt=""
-                  srcset=""
-                >
+          <template v-if="getNextVip(referralInfo?.vip || '')">
+            <template v-if="getNextVip(referralInfo?.vip || '') === 'SVIP'">
+              <div class="mt-20px text-12px color-#697F95">{{ $t('SVIPApplyTips') }} <span class="color-#27BDFD underline clickable" @click.stop="show4=true">{{ $t('applySvip') }}</span></div>
+            </template>
+            <template v-else>
+              <div class="mt-20px text-14px color-#2BB1EA">{{ $t('upgradeTips') }} {{ getNextVip(referralInfo?.vip || '') }}</div>
+              <div class="flex items-center color-#697F95 text-14px mt-16px">
+                <span class="mr-auto">{{ $t('invitees1') }}</span>
+                <span class="color-#fff">{{ referralInfo?.totalInvitees || 0 }}</span><span>/{{ (referralInfo?.nextLevelInvitees || 0) }}</span>
               </div>
-              <span class="ml-5px">{{ row.symbol }}</span>
-            </div>
+            </template>
           </template>
-        </el-table-column>
-        <el-table-column prop="name" :label="$t('amount')">
-          <template #default="{ row }">
-            <div style="line-height: 1">
-              {{ formatNumber(formatAmount(row.value || 0, row.decimals || 0)) }} {{ row.symbol }}
-            </div>
-            <div
-              style="
-                font-size: 12px;
-                color: #999;
-                line-height: 1;
-                margin-top: 3px;
-                font-weight: 400;
-              "
-            >
-              ≈${{
-                formatNumber(
-                  Number(formatAmount(row.value || 0, row.decimals || 0)) * Number(row.price || 0)
-                )
-              }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="level" :label="$t('status')" align="right">
-          <template #default="{ row }">
-            <span :style="{ color: row.canWithdraw ? '#ffffff' : '#666' }">{{
-              row.canWithdraw ? $t('canWithdraw') : $t('nonWithdrawable')
-            }}</span>
-          </template>
-        </el-table-column>
-        <template #empty>
-          <div class="flex items-center justify-center flex-col pt-20px">
-            <img src="@/assets/images/empty-black.svg" alt="" >
-            {{ $t('emptyNoData') }}
-          </div>
-        </template>
-      </el-table>
-      <div class="pagination-container">
-        <el-pagination
-          v-model:current-page="currentPage1"
-          :page-size="pageSize"
-          layout="total, prev, pager, next"
-          :total="withdrawableList?.length || 0"
-          @current-change="handleCurrentChange1"
-        />
+        </div>
+        <VIP :referralInfo="referralInfo" :vip="referralInfo?.vip" />
       </div>
-      <div class="section-title mt-60px">
-        <img width="28" height="28" src="@/assets/images/referral/wd.svg" alt="" srcset="" >
-        <span>{{ $t('withdrawalRecord') }}</span>
+      <div v-else class="flex items-center justify-between">
+        <div>
+          <div :class="localeStore.locale?.includes('zh') ? 'text-48px' : 'text-27px op-70'">{{ $t('inviteYourFriends') }}</div>
+          <div class="font-700 mt-20px mb-40px" :class="localeStore.locale?.includes('zh') ? 'text-56px' : 'text-46px'" v-html="$t('shareAndEarn')"/>
+          <el-button size="large" color="#298AF0" class="min-h-50px min-w-250px rd-25px" @click.stop="invite">
+            <img class="mr-5px h-25px" src="../assets/images/referral/gift.svg" alt="" srcset="">
+            <span class="text-18px font-600">{{ $t('loginForInvite') }}</span>
+          </el-button>
+        </div>
+        <img class="h-350px" src="../assets/images/referral/bg-3.png" alt="" srcset="">
       </div>
-      <el-table
-        :data="withdrawRecordListPage"
-        row-class-name="[--el-table-border:1px_solid_#1F242A]"
-        :header-row-style="{ fontSize: '12px' }"
-        style="width: 100%"
-        class="table-list"
-      >
-        <el-table-column prop="time" :label="$t('date')">
-          <template #default="{ row }">
-            {{ formatDate(row.createTime) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="name" :label="$t('token')">
-          <template #default="{ row }">
-            <div
-              v-for="(j, k) in row.list || []"
-              :key="k"
-              style="line-height: 24px; height: 24px; width: 24px"
-              class="token-box position-relative t-l"
-            >
-              <img
-                class="icon-logo"
-                style="height: 24px; width: 24px"
-                :src="`${globalConfig.token_logo_url}${j.tokenLogoUrl}`"
-                alt=""
-                :onerror="`this.src='${getSymbolDefaultIcon(j.chain, j.tokenSymbol)}'`"
-              >
-              <img
-                class="icon-chain"
-                :src="`${globalConfig.token_logo_url}chain/${j.chain}.png`"
-                alt=""
-                srcset=""
-              >
-              <span class="ml-5"> {{ j.tokenSymbol }}</span>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="name" :label="$t('amount')">
-          <template #default="{ row }">
-            <div v-for="(j, k) in row.list || []" :key="k" style="line-height: 24px" class="t-l">
-              {{ formatNumber(formatAmount(j.withdrawValue || 0, j.tokenDecimals || 0)) }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="level" :label="$t('withdrawalStatus')" align="left">
-          <template #default="{ row }">
-            <div v-for="(j, k) in row.list || []" :key="k" style="line-height: 24px" class="t-l">
-              <span
-                class="clickable color-#959A9F"
-                :style="{ color: ['generated', 'pending']?.includes(j.status) ? '#ffffff' : '' }"
-                @click.stop="goLink(j)"
-                >{{ formatStatus(j.status) }}</span
-              >
-              <!-- <van-icon v-if="j.errorLog" class="ml-5 clickable" style="color: #aaa;" name="warning-o" @click.stop="$messageBox.alert(j.errorLog)" /> -->
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="level"
-          :label="$t('totalStatus')"
-          align="center"
-          :width="localeStore.locale.includes('zh') ? 100 : 120"
-        >
-          <template #default="{ row }">
-            <div
-              style="
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-              "
-            >
-              <img
-                v-show="row.status === 'inprogress'"
-                height="16"
-                width="16"
-                src="@/assets/images/referral/pending.svg"
-                alt=""
-                srcset=""
-              >
-              <img
-                v-show="row.status === 'finished'"
-                height="16"
-                width="16"
-                src="@/assets/images/referral/finished.svg"
-                alt=""
-                srcset=""
-              >
-              <span style="margin-top: 1px">{{ formatStatus(row.status) }}</span>
-            </div>
-          </template>
-        </el-table-column>
-        <template #empty>
-          <div class="flex items-center justify-center flex-col pt-20px">
-            <img src="@/assets/images/empty-black.svg" alt="" >
-            {{ $t('emptyNoData') }}
+
+      <div class="text-24px mb-20px mt-100px">{{ $t('inviteActivity') }}</div>
+      <div class="flex items-center gap-30px">
+        <div class="flex justify-between items-center p-28px pr-10px rd-8px min-w-380px h-180px relative bg-1">
+          <div class="pr-101px">
+            <div class="text-27px font-600 mb-10px">{{ $t('inviteFriends') }}</div>
+            <div class="text-14px font-400">{{ $t('inviteYourFriendsToRegister') }}</div>
+            <button class="text-14px font-400 clickable min-w-120px min-h-34px rd-17px border-none color-btn-lg mt-20px flex items-center justify-center color-#fff" @click.stop="invite">{{ $t('joinNow') }}</button>
           </div>
-        </template>
-      </el-table>
-      <div class="pagination-container">
-        <el-pagination
-          v-model:current-page="currentPage2"
-          :page-size="pageSize"
-          layout="total, prev, pager, next"
-          :total="withdrawRecordList?.length || 0"
-          @current-change="handleCurrentChange2"
-        />
+          <img class="w-113px h-113px absolute right-10px top-50% translate-y--50%" src="../assets/images/referral/bg-4-1-1.png">
+        </div>
+        <div class="flex justify-between items-center p-28px pr-10px rd-8px min-w-380px h-180px relative bg-2">
+          <div class="pr-101px">
+            <div class="text-27px font-600 mb-10px">{{ $t('SVIPApply') }}</div>
+            <div class="text-14px font-400">{{ $t('highestCommission') }}</div>
+            <button class="text-14px font-400 clickable min-w-120px min-h-34px rd-17px border-none color-btn-lg-2 mt-20px flex items-center justify-center color-#fff" @click.stop="svipApplyShow=true">{{ $t('applyForActivation') }}</button>
+          </div>
+          <img class="w-113px h-113px absolute right-10px top-50% translate-y--50%" src="../assets/images/referral/bg-4-1-2.png">
+        </div>
+        <div class="flex justify-between items-center p-28px pr-10px rd-8px min-w-380px h-180px relative bg-3">
+          <div class="pr-101px">
+            <div class="text-27px font-600 mb-10px">Ave.ai {{ $t('partnership') }}</div>
+            <div class="text-14px font-400">{{ $t('ecologicalEmpowerment') }}</div>
+            <button class="text-14px font-400 clickable min-w-120px min-h-34px rd-17px border-none color-btn-lg-3 mt-20px flex items-center justify-center color-#fff" @click.stop="apply">{{ $t('learnMore') }}</button>
+          </div>
+          <img class="w-115px h-115px absolute right-10px top-50% translate-y--50%" src="../assets/images/referral/bg-4-1-3.png">
+        </div>
       </div>
-      <el-dialog
-        v-model="dialogShare"
-        class="dialog-rebate"
-        :title="$t('inviteFriends')"
-        width="460"
-        append-to-body
-      >
-        <div class="content">
-          <div v-if="dialogShare" class="share-card-rebate">
-            <img
-              v-if="localeStore.locale.includes('zh-')"
-              class="share-bg-img"
-              width="400"
-              src="@/assets/images/refer-bg/rebate-cn.png"
-              alt=""
-              srcset=""
+
+      <template v-if="referralInfo?.refCode">
+        <div class="section-title mt-80px">
+          <!-- <img width="28" height="28" src="@/assets/images/referral/data.svg" alt="" srcset="" > -->
+          <span>{{ $t('dataOverview') }}</span>
+        </div>
+        <ul class="data-list">
+          <li class="data-card">
+            <div>
+              <div class="data-card_label">{{ $t('withdrawable') }}</div>
+              <div class="text-20px lh-26px">
+                ${{ formatNumber(referralInfo?.totalWithdrawableIncome || referralInfo?.totalWithdrawableAmount || 0) }}
+              </div>
+              <div class="data-card_label mt-24px">{{ $t('withdrawn') }}</div>
+              <div class="text-20px lh-26px">
+                ${{
+                  formatNumber(
+                    (referralInfo?.totalIncomeAmount || 0) -
+                      (referralInfo?.totalWithdrawableIncome || referralInfo?.totalWithdrawableAmount || 0)
+                  )
+                }}
+              </div>
+            </div>
+            <!-- <button class="w-btn clickable" v-if="referralInfo?.canWithdraw" >提现</button> -->
+            <el-button
+              v-if="referralInfo?.canWithdraw"
+              :loading="loading"
+              type="primary"
+              size="large"
+              @click.stop="createWithdrawIncomeOrder"
+              >{{ $t('withdraw') }}</el-button
             >
-            <img
-              v-else
-              class="share-bg-img"
-              src="@/assets/images/refer-bg/rebate-en.png"
-              width="400"
-              alt=""
-              srcset=""
-            >
-            <img class="img-qr" :src="qrCodeUrl" width="100" alt="" >
+          </li>
+          <li class="data-card">
+            <div>
+              <div class="data-card_label">{{ $t('totalRebateAmount') }}</div>
+              <div class="text-20px lh-26px">
+                $ {{ formatNumber(referralInfo?.totalIncomeAmount || 0) }}
+              </div>
+              <div v-show="(referralInfo?.botChannelRefRatio || referralInfo?.channelRefRatio || 0) > 0" class="data-card_label mt-24px">
+                {{ $t('totalChannelRebate') }}
+              </div>
+              <div v-show="(referralInfo?.botChannelRefRatio || referralInfo?.channelRefRatio || 0) > 0" class="text-20px lh-26px">
+                $ {{ formatNumber(referralInfo?.botSwapChannelIncome || referralInfo?.channelReferralIncomeAmount || 0) }}
+              </div>
+            </div>
+          </li>
+          <li class="data-card">
+            <div>
+              <div class="data-card_label">{{ $t('totalInvitees') }}</div>
+              <div class="text-20px lh-26px">{{ referralInfo?.totalInvitees || 0 }}</div>
+              <div class="data-card_label mt-24px">{{ $t('swapInvitees24H') }}</div>
+              <div class="text-20px lh-26px">{{ referralInfo?.swapInvitees24H || 0 }}</div>
+            </div>
+          </li>
+        </ul>
+        <div class="section-title mt-80px">
+          <!-- <img width="28" height="28" src="@/assets/images/referral/data.svg" alt="" srcset="" > -->
+          <span>{{ $t('myRecord') }}</span>
+        </div>
+        <div class="mt-20px">
+          <div class="tabs mb-20px">
+            <button v-for="item in tabs" :key="item.value" class="tab-item" :class="{ active: activeTab === item.value }" @click.stop="activeTab = item.value">{{ item.label }}</button>
           </div>
-          <div
-            class="flex items-center justify-between mt-24pxpx text-12px"
-            style="width: 300px; color: #999"
-          >
-            <div class="flex-col flex-center clickable" @click.stop="downloadSharePoster">
-              <img src="@/assets/images/share/download.svg" height="48" alt="" srcset="" >
-              <span class="mt-8px">{{ $t('download') }}</span>
+          <div v-if="activeTab === 1">
+            <div v-if="referralInfo?.startTime || referralInfo?.endTime" class="text-right text-12px color-#697F95">({{ $t('statisticalPeriod') }}:
+            {{ referralInfo.startTime ? formatDate(referralInfo.startTime, 'YYYY.MM.DD') : '' }}-{{
+              referralInfo.endTime ? formatDate(referralInfo.endTime, 'YYYY.MM.DD') : ''
+            }})</div>
+            <el-table
+              :data="withdrawableListPage"
+              row-class-name="[--el-table-border:1px_solid_#1F242A]"
+              :header-row-style="{ fontSize: '12px', color: '#697F95' }"
+              style="width: 100%"
+              class="table-list"
+            >
+              <el-table-column prop="time" :label="$t('swapToken')">
+                <template #default="{ row }">
+                  <div class="flex-start items-center">
+                    <div class="token-box position-relative">
+                      <img
+                        class="icon-logo"
+                        :src="`${globalConfig.token_logo_url}${row.logoUrl}`"
+                        alt=""
+                        :onerror="`this.src='${getSymbolDefaultIcon(row.chain, row.symbol)}'`"
+                      >
+                      <img
+                        class="icon-chain"
+                        :src="`${globalConfig.token_logo_url}chain/${row.chain}.png`"
+                        alt=""
+                        srcset=""
+                      >
+                    </div>
+                    <span class="ml-5px">{{ row.symbol }}</span>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column prop="source" :label="$t('source')">
+                <template #default="{ row }">
+                  {{ formatRewardType(row.rewardType) }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="name" :label="$t('amount')">
+                <template #default="{ row }">
+                  <div style="line-height: 1">
+                    {{ formatNumber(formatAmount(row.amount || row.value || 0, row.decimals || 0)) }} {{ row.symbol }}
+                  </div>
+                  <div
+                    style="
+                      font-size: 12px;
+                      color: #697F95;
+                      line-height: 1;
+                      margin-top: 3px;
+                      font-weight: 400;
+                    "
+                  >
+                    ≈${{
+                      formatNumber(row.amountUSD ||
+                        Number(formatAmount(row.value || 0, row.decimals || 0)) * Number(row.price || 0)
+                      )
+                    }}
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column prop="level" :label="$t('status')" align="right">
+                <template #default="{ row }">
+                  <span :style="{ color: row.canWithdraw ? '#ffffff' : '#666' }">{{
+                    row.canWithdraw ? $t('canWithdraw') : $t('nonWithdrawable')
+                  }}</span>
+                </template>
+              </el-table-column>
+              <template #empty>
+                <div class="flex items-center justify-center flex-col pt-20px">
+                  <img src="@/assets/images/empty-black.svg" alt="" >
+                  {{ $t('emptyNoData') }}
+                </div>
+              </template>
+            </el-table>
+            <div class="pagination-container">
+              <el-pagination
+                v-model:current-page="currentPage1"
+                :page-size="pageSize"
+                layout="total, prev, pager, next"
+                :total="withdrawableList?.length || 0"
+                @current-change="handleCurrentChange1"
+              />
             </div>
-            <div v-copy="shareLink" class="flex-col flex-center clickable">
-              <img src="@/assets/images/share/copy.svg" height="48" alt="" srcset="" >
-              <span class="mt-8px">{{ $t('copy') }}</span>
+          </div>
+          <div v-else-if="activeTab === 2">
+            <el-table
+              :data="inviteeList"
+              row-class-name="[--el-table-border:1px_solid_#1F242A]"
+              :header-row-style="{ fontSize: '12px', color: '#697F95' }"
+              style="width: 100%"
+              class="table-list"
+            >
+              <el-table-column :width="550" prop="time" :label="$t('registerTime')">
+                <template #default="{ row }">
+                  {{ formatDate(row.bindRefTime) }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="name" :label="$t('friendName')">
+                <template #default="{ row }">
+                  {{ row?.username }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="level" :label="$t('vipLevel')" align="right">
+                <template #default="{ row }">
+                  {{ row?.vip || $t('ordinary') }}
+                </template>
+              </el-table-column>
+              <template #empty>
+                <div class="flex items-center justify-center flex-col pt-20px">
+                  <img src="@/assets/images/empty-black.svg" alt="" >
+                  {{ $t('emptyNoData') }}
+                </div>
+              </template>
+            </el-table>
+            <div class="pagination-container">
+              <el-pagination
+                v-model:current-page="currentPage"
+                mode="dark"
+                :page-size="pageSize"
+                layout="total, prev, pager, next"
+                :total="total || 0"
+                @current-change="handleCurrentChange"
+              />
             </div>
-            <div class="flex-col flex-center clickable" @click.stop="jumpX()">
-              <img src="@/assets/images/share/twitter.svg" height="48" alt="" srcset="" >
-              <span class="mt-8px">Twitter</span>
-            </div>
-            <div class="flex-col flex-center clickable" @click.stop="jumpTg()">
-              <img src="@/assets/images/share/tg.svg" height="48" alt="" srcset="" >
-              <span class="mt-8px">Telegram</span>
+          </div>
+          <div v-else-if="activeTab === 3">
+            <el-table
+              :data="withdrawRecordListPage"
+              row-class-name="[--el-table-border:1px_solid_#1F242A]"
+              :header-row-style="{ fontSize: '12px', color: '#697F95' }"
+              style="width: 100%"
+              class="table-list"
+            >
+              <el-table-column prop="time" :label="$t('date')">
+                <template #default="{ row }">
+                  {{ formatDate(row.createTime) }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="name" :label="$t('token')">
+                <template #default="{ row }">
+                  <div
+                    v-for="(j, k) in row.list || []"
+                    :key="k"
+                    style="line-height: 24px; height: 24px; width: 24px"
+                    class="token-box position-relative t-l"
+                  >
+                    <img
+                      class="icon-logo"
+                      style="height: 24px; width: 24px"
+                      :src="`${globalConfig.token_logo_url}${j.tokenLogoUrl}`"
+                      alt=""
+                      :onerror="`this.src='${getSymbolDefaultIcon(j.chain, j.tokenSymbol)}'`"
+                    >
+                    <img
+                      class="icon-chain"
+                      :src="`${globalConfig.token_logo_url}chain/${j.chain}.png`"
+                      alt=""
+                      srcset=""
+                    >
+                    <span class="ml-5px"> {{ j.tokenSymbol }}</span>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column prop="name" :label="$t('amount')">
+                <template #default="{ row }">
+                  <div v-for="(j, k) in row.list || []" :key="k" style="line-height: 24px" class="t-l">
+                    {{ formatNumber(formatAmount(j.withdrawValue || 0, j.tokenDecimals || 0)) }}
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column prop="level" :label="$t('withdrawalStatus')" align="left">
+                <template #default="{ row }">
+                  <div v-for="(j, k) in row.list || []" :key="k" style="line-height: 24px" class="t-l">
+                    <span
+                      class="clickable"
+                      :style="{ color: formatStatusColor(j.status) }"
+                      @click.stop="goLink(j)"
+                      >{{ formatStatus(j.status) }}</span
+                    >
+                    <!-- <van-icon v-if="j.errorLog" class="ml-5 clickable" style="color: #aaa;" name="warning-o" @click.stop="$messageBox.alert(j.errorLog)" /> -->
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="level"
+                :label="$t('totalStatus')"
+                align="center"
+                :width="localeStore.locale.includes('zh') ? 100 : 120"
+              >
+                <template #default="{ row }">
+                  <div
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: center;
+                      align-items: center;
+                    "
+                  >
+                    <img
+                      v-show="row.status === 'inprogress'"
+                      height="16"
+                      width="16"
+                      src="@/assets/images/referral/pending.svg"
+                      alt=""
+                      srcset=""
+                    >
+                    <img
+                      v-show="row.status === 'finished'"
+                      height="16"
+                      width="16"
+                      src="@/assets/images/referral/finished.svg"
+                      alt=""
+                      srcset=""
+                    >
+                    <span style="margin-top: 1px" :style="{ color: formatStatusColor(row.status) }">{{ formatStatus(row.status) }}</span>
+                  </div>
+                </template>
+              </el-table-column>
+              <template #empty>
+                <div class="flex items-center justify-center flex-col pt-20px">
+                  <img src="@/assets/images/empty-black.svg" alt="" >
+                  {{ $t('emptyNoData') }}
+                </div>
+              </template>
+            </el-table>
+            <div class="pagination-container">
+              <el-pagination
+                v-model:current-page="currentPage2"
+                :page-size="pageSize"
+                layout="total, prev, pager, next"
+                :total="withdrawRecordList?.length || 0"
+                @current-change="handleCurrentChange2"
+              />
             </div>
           </div>
         </div>
-      </el-dialog>
-      <el-dialog v-model="dialogConnect" class="dialog-rebate" width="460" append-to-body>
-        <template #header>
-          <div class="flex-start">
-            <img width="24" height="24" src="@/assets/images/referral/n.svg" alt="" srcset="" >
-            <span style="margin-left: 8px; font-size: 24px; color: #f5f5f5">{{
-              $t('inviteCodeUpdate')
-            }}</span>
-          </div>
-        </template>
-        <div style="border-top: 1px solid #333; width: calc(100% + 80px); margin-left: -40px" />
-        <div
-          style="
-            font-size: 16px;
-            font-weight: 400;
-            color: #ffffff;
-            line-height: 24px;
-            padding-top: 20px;
-          "
-          v-html="$t('chainWalletNotRefer')"
-        />
-        <el-button
-          style="width: 100%; margin-top: 40px"
-          block
-          :loading="loading"
-          type="primary"
-          size="large"
-          @click.stop="dialogConnect = false"
-          >{{ $t('getIt') }}</el-button
-        >
-      </el-dialog>
+      </template>
     </div>
   </div>
+  <el-dialog
+    v-model="dialogShare"
+    class="dialog-rebate dark"
+    title=""
+    width="800"
+    append-to-body
+  >
+      <div class="flex items-center justify-between pt-20px pb-30px">
+        <div>
+          <div class="text-18px">{{ $t('inviteYourFriends') }}</div>
+          <div class="text-33px font-700 mt-20px mb-40px" v-html="$t('shareAndEarn')"/>
+          <div class="bg-#FFFFFF0D p-20px font-400 rd-8px mt-50px min-w-450px" style="border: 1px solid #FFFFFF17;">
+            <div class="text-14px color-#697F95 flex">
+              <span class="mr-auto">{{ $t('referralLink') }}</span>
+              <span class="color-#fff ml-10px">{{ refCode ? shareLink : '--' }}</span>
+              <img
+                v-if="refCode"
+                v-copy="shareLink"
+                class="clickable"
+                style="margin-left: 8px"
+                height="14"
+                width="14"
+                src="~@/assets/images/referral/copy.svg"
+                alt=""
+                srcset=""
+              >
+            </div>
+            <div class="text-14px color-#697F95 mt-20px flex">
+              <span class="mr-auto">{{ $t('referralCode') }}</span>
+              <span class="color-#fff ml-10px">{{ refCode || '--' }}</span>
+              <img
+                v-if="refCode"
+                v-copy="refCode"
+                class="clickable"
+                style="margin-left: 8px"
+                height="14"
+                width="14"
+                src="~@/assets/images/referral/copy.svg"
+                alt=""
+                srcset=""
+              >
+            </div>
+          </div>
+        </div>
+        <img class="h-200px" src="../assets/images/referral/bg-3.png" alt="" srcset="">
+      </div>
+  </el-dialog>
+  <el-dialog
+    v-model="svipApplyShow"
+    class="dialog-rebate"
+    title=""
+    width="700"
+    append-to-body
+  >
+    <div class="dialog-content color-#fff px-15px pt-20px pb-40px">
+      <div class="text-center text-27px font-600 color-#E0A252">{{ $t('SVIPApply') }}</div>
+      <div class="text-center">
+        <img class="w-200px" src="../assets/images/referral/v.png" alt="" srcset="">
+      </div>
+      <div class="text-14px color-#fff lh-28px text-center mb-25px">
+          {{ $t('applyingToBecomeSVIP') }}<br>
+          <div class="color-#E0A252">{{ $t('pleaseContactEmail') }}: <button v-copy="`andy@ave.ai`" href="mailto:andy@ave.ai" class="clickable bg-transparent border-none color-#E0A252" >andy@ave.ai</button><br>
+          Telegram: <a href="https://t.me/AndyMong917" target="_blank" class="clickable" >https://t.me/AndyMong917</a></div>
+          {{ $t('lookForwardToWorkingWithYou') }}
+      </div>
+      <div class="flex items-center justify-center">
+        <el-button class="max-h-40px min-w-350px" color="#E0A252" block round @click.stop="svipApplyShow=false">{{ $t('IGetIt') }}</el-button>
+      </div>
+
+    </div>
+  </el-dialog>
+  <el-dialog v-model="dialogConnect" class="dialog-rebate" width="460" append-to-body>
+    <template #header>
+      <div class="flex-start">
+        <img width="24" height="24" src="@/assets/images/referral/n.svg" alt="" srcset="" >
+        <span style="margin-left: 8px; font-size: 24px; color: #f5f5f5">{{
+          $t('inviteCodeUpdate')
+        }}</span>
+      </div>
+    </template>
+    <div style="border-top: 1px solid #333; width: calc(100% + 80px); margin-left: -40px" />
+    <div
+      style="
+        font-size: 16px;
+        font-weight: 400;
+        color: #ffffff;
+        line-height: 24px;
+        padding-top: 20px;
+      "
+      v-html="$t('chainWalletNotRefer')"
+    />
+    <el-button
+      style="width: 100%; margin-top: 40px"
+      block
+      :loading="loading"
+      type="primary"
+      size="large"
+      @click.stop="dialogConnect = false"
+      >{{ $t('getIt') }}</el-button
+    >
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -530,11 +517,12 @@ import { formatExplorerUrl } from '~/utils'
 import BigNumber from 'bignumber.js'
 import QRCode from 'qrcode'
 import html2canvas from 'html2canvas'
+import VIP from '../components/vip.vue'
 
 // 类型定义
 interface ReferralInfo {
   refCode?: string
-  vip?: string
+  vip?: 'vip1' | 'vip2' | 'vip3' | 'svip' | ''
   refRatio?: number
   channelRefRatio?: number
   totalWithdrawableAmount?: number
@@ -548,6 +536,13 @@ interface ReferralInfo {
   withdrawableList?: WithdrawableItem[]
   startTime?: string
   endTime?: string
+  botRefRatio?: number
+  botChannelRefRatio?: number
+  botSwapChannelIncome?: number
+  totalInvitees?: number
+  totalWithdrawableIncome?: number
+  username?: string
+  nextLevelInvitees?: number
 }
 
 interface InviteeItem {
@@ -622,6 +617,9 @@ const qrCodeUrl = ref('')
 const currentPage3 = ref(1)
 const dialogConnect = ref(false)
 
+const show4 = ref(false)
+const svipApplyShow = ref(false)
+
 // Store
 const botStore = useBotStore()
 const globalStore = useGlobalStore()
@@ -629,9 +627,32 @@ const { t } = useI18n()
 const localeStore = useLocaleStore()
 const walletStore = useWalletStore()
 
+const activeTab = ref(1)
+
+const tabs = computed(() => {
+  return [
+    {
+      label: t('pendingRebate'),
+      value: 1,
+    },
+    {
+      label: t('invitedUser'),
+      value: 2,
+    },
+    {
+      label: t('withdrawalRecord'),
+      value: 3,
+    },
+  ]
+})
+
 // 计算属性
 const refCode = computed(() => {
   return referralInfo.value.refCode || ''
+})
+
+const walletName = computed(() => {
+  return referralInfo.value?.username || ''
 })
 
 const invitees = computed(() => {
@@ -759,6 +780,41 @@ const formatStatus = (status: WithdrawStatus) => {
     timeout_error: t('timeout_error'),
   }
   return statusObj?.[status] || status || ''
+}
+
+  function formatStatusColor(status: string) : string {
+    if (status === 'error' || status === 'timeout_error' || status === 'rejected') {
+      return '#F63030'
+    }
+    if (status === 'confirmed') {
+      return '#2BB1EA'
+    }
+    if (status === 'finished') {
+      return 'var(--up-color)'
+    }
+    return ['generated', 'pending', 'inprogress']?.includes(status) ? '#697F95' : ''
+  }
+
+function getNextVip(vip: string) {
+  const vipObj: {
+    [key: string]: string
+  } = {
+    vip1: 'VIP2',
+    vip2: 'VIP3',
+    vip3: 'SVIP'
+  }
+  if (vip === '') {
+    return 'VIP1'
+  }
+  return vipObj?.[vip] || ''
+}
+
+function formatRewardType(type: 'bot_swap' | 'chain_swap') : string {
+  const typeObj = {
+    bot_swap: t('botWallet'),
+    chain_swap: t('chainWallet3')
+  } as const
+  return typeObj?.[type] || type || ''
 }
 
 const createWithdrawIncomeOrder = async () => {
@@ -905,7 +961,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .referral {
   background-color: #0a0b0d;
-  background-image: url('@/assets/images/referral/bg.jpg');
+  background-image: url('@/assets/images/referral/bg.png');
   background-size: 100% auto;
   background-repeat: no-repeat;
   background-position: top left;
@@ -1072,7 +1128,7 @@ onMounted(() => {
     padding: 22px 20px;
     display: flex;
     justify-content: space-between;
-    background-color: #222222;
+    background-color: #FFFFFF12;
     border-radius: 8px;
     background-size: auto 100%;
     background-repeat: no-repeat;
@@ -1096,7 +1152,7 @@ onMounted(() => {
     }
     flex: 1;
     .data-card_label {
-      color: #999999;
+      color: #697F95;
       font-size: 14px;
       line-height: 21px;
       font-weight: 500;
@@ -1148,6 +1204,14 @@ onMounted(() => {
   --el-fill-color-blank: transparent;
   --d-222-l-F2F2F2: transparent;
   --d-111-l-FFF: transparent;
+  :deep(.el-pagination) {
+    margin-top: 0;
+    border-top: 1px solid transparent;
+    background-color: transparent;
+    --el-text-color-regular: #5A5E64;
+    --el-pagination-button-color: #5A5E64;
+    --el-pagination-bg-color: transparent;
+  }
 }
 
 .token-box {
@@ -1236,4 +1300,64 @@ onMounted(() => {
     }
   }
 }
+.bg-1 {
+  background: url(../assets/images/referral/bg-4-1.png);background-size: 100% auto; background-position: center center;
+}
+.bg-2 {
+  background: url(../assets/images/referral/bg-4-2.png);background-size: 100% auto; background-position: center center;
+}
+.bg-3 {
+  background: url(../assets/images/referral/bg-4-3.png);background-size: 100% auto; background-position: center center;
+}
+.color-btn-lg {
+  background: linear-gradient(90deg, #2BB1EA 0%, #2561F6 100%);
+}
+.color-btn-lg-2 {
+  background: linear-gradient(90deg, #E0A252 0%, #E6BA28 100%);
+}
+.color-btn-lg-3 {
+  background: linear-gradient(90deg, #2BB1EA 0%, #2561F6 100%);
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+  .tab-item {
+    color: #697F95;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    & + .tab-item {
+      margin-left: 60px;
+    }
+    &.active {
+      position: relative;
+      color: #2BB1EA;
+      &::after {
+        content: '';
+        display: block;
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 15px;
+        height: 3px;
+        border-radius: 1px;
+        background-color: #2BB1EA;
+      }
+    }
+  }
+}
+
+</style>
+
+<style lang="scss">
+.el-dialog.dialog-rebate {
+  --el-bg-color: #16181D;
+  .el-dialog__body {
+    --el-text-color-regular: #F5F5F5;
+  }
+}
+
 </style>
