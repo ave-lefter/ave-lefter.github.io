@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="visible" class="[--el-dialog-bg-color:--dialog-bg]" :title="t('twitterTracker')" :size="440">
+  <el-drawer v-model="visible" class="[--el-dialog-bg-color:--dialog-bg]" :title="t('twitterTracker')" :size="540">
     <div class="px-20px pb-10px">
       <div class="flex gap-16px mb-20px">
         <span v-for="el in tabs" :key="el.value" :class="[
@@ -23,7 +23,7 @@
         </el-button>
       </div>
       <el-table v-infinite-scroll="getList" :data="list" header-cell-class-name="text-12px" style="width: 100%"
-        :infinite-scroll-disabled="finished || loading" :infinite-scroll-distance="20" :infinite-scroll-delay="200">
+        :infinite-scroll-disabled="finished || loading" :infinite-scroll-distance="20" :infinite-scroll-delay="200" fit>
         <template #empty>
           <div v-if="isMine" class="flex flex-col items-center pt-60px">
             <Icon name="custom:twitter-empty" class="text-61px mb-12px color-[--icon-color]" />
@@ -36,29 +36,37 @@
             <span class="text-[--third-text] text-12px">{{ t('emptyNoData') }}</span>
           </AveEmpty>
         </template>
-        <el-table-column type="index" label="#" />
-        <el-table-column :label="t('account')">
-          <template #default="{ row }">
-            <div class="flex items-center gap-12px cursor-pointer" @click="clickAvatar(row)">
-              <UserAvatar :wallet_logo="{
-                logo: row.profile_pic,
-                name: row.name,
-              }" icon-size="32px" />
-              <div>
-                <div class="flex items-center gap-8px">
-                  <span v-tooltip="row.name" class="color-[--main-text] text-14px lh-20px truncate max-w-150px">{{ row.name }}</span>
-                  <div v-if="row.chain" class="w-14px h-14px bg-#000 rounded-full">
-                    <img  class="w-full h-full rounded-full block"
-                      :src="`${configStore.token_logo_url}chain/${row.chain}.png`" alt=""
-                      onerror="this.src='/icon-default.png'" srcset="">
+        <el-table-column label="#">
+          <template #default="{ row, $index }">
+            <div class="flex items-center gap-12px">
+              <span :style="{ width: getIndexWidth() }" class="text-[--third-text]">{{ $index + 1 }}</span>
+              <div class="flex items-center gap-12px cursor-pointer shrink-0" @click="clickAvatar(row)">
+                <UserAvatar :wallet_logo="{
+                  logo: row.profile_pic,
+                  name: row.name,
+                }" icon-size="32px" />
+                <div>
+                  <div class="flex items-center gap-8px">
+                    <span v-tooltip="row.name" class="color-[--main-text] text-14px lh-20px truncate max-w-150px">{{
+                      row.name }}</span>
+                    <div v-if="row.chain" class="w-14px h-14px bg-#000 rounded-full">
+                      <img class="w-full h-full rounded-full block"
+                        :src="`${configStore.token_logo_url}chain/${row.chain}.png`" alt=""
+                        onerror="this.src='/icon-default.png'" srcset="">
+                    </div>
                   </div>
+                  <div class="text-12px color-[--secondary-text] lh-14px">@{{ row.username }}</div>
                 </div>
-                <div class="text-12px color-[--secondary-text] lh-14px">@{{ row.username }}</div>
               </div>
             </div>
           </template>
         </el-table-column>
-        <el-table-column width="75" align="right" :label="t('tags')">
+        <el-table-column prop="subCount" align="right" width="90">
+          <template #header>
+            <span v-tooltip="t('subCountTips')" class="underline underline-dotted">{{ t('subCount') }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column width="90" align="right" :label="t('tags')">
           <template #header>
             <div class="flex justify-end items-center gap-4px text-12px">
               <span>{{ $t('tags') }}</span>
@@ -308,16 +316,28 @@ const clickToHot = () => {
   reset()
   getList()
 }
+
+const getIndexWidth = () => {
+  if (list.value.length > 99) {
+    return '24px'
+  } else if (list.value.length > 9) {
+    return '16px'
+  } else {
+    return '8px'
+  }
+}
 </script>
 <style scoped lang="scss">
 :deep(.el-table.el-table) {
   --el-table-header-bg-color: transparent;
   --el-table-tr-bg-color: transparent;
   --el-table-bg-color: transparent;
-  .el-table__empty-text{
-    width:100%;
+
+  .el-table__empty-text {
+    width: 100%;
   }
-  .cell{
+
+  .cell {
     padding: 0 10px;
   }
 }

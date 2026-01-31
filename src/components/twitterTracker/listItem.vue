@@ -60,8 +60,8 @@
             <div v-for="(media, mediaIndex) in item.medias?.slice?.(0, 1)" :key="mediaIndex"
                 :class="index !== -1 ? 'ml-40px' : ''" class="relative">
                 <!-- <img :src="media.media_url_https" alt="" class="max-w-full rounded-8px cursor-pointer"> -->
-                <el-tooltip :ref="el => { if (el) tooltipRefs[`${mediaIndex}`] = el }" popper-class="tooltip-pd-0"
-                    :show-arrow="false" placement="right" :popper-options="{
+                <el-tooltip v-if="media.type !== 'video'" :ref="el => { if (el) tooltipRefs[`${mediaIndex}`] = el }"
+                    popper-class="tooltip-pd-0" :show-arrow="false" placement="right" :popper-options="{
                         modifiers: [
                             {
                                 name: 'eventListeners',
@@ -71,7 +71,7 @@
                                 }
                             }
                         ]
-}" @show="handleTooltipShow(mediaIndex)">
+                    }" @show="handleTooltipShow(mediaIndex)">
                     <template #default>
                         <img :src="media.media_url_https" alt="" class="w-full max-h-300px rounded-8px object-cover">
                     </template>
@@ -80,11 +80,14 @@
                             @load="handleImageLoad(mediaIndex)">
                     </template>
                 </el-tooltip>
-                <div v-if="media.type === 'video'" class="absolute top-0 left-0 w-full h-full bg-black/50 rounded-8px">
+                <div v-else class="h-full">
+                    <video :poster="media.media_url_https" :src="findMediaUrl(media)" class="w-full h-full object-cover" controls />
+                </div>
+                <!-- <div v-if="media.type === 'video'" class="absolute top-0 left-0 w-full h-full bg-black/50 rounded-8px">
                     <Icon name="custom:play-circle-line"
                         class="absolute top-50% left-50% transform -translate-x-1/2 -translate-y-1/2 text-48px text-white cursor-pointer"
                         @click="clickVideo(item.url)" />
-                </div>
+                </div> -->
 
             </div>
             <div v-if="isContentOverflow" :class="index !== -1 ? 'ml-40px' : ''"
@@ -157,6 +160,22 @@ watch(() => props.item?.content, () => {
 
 const clickAvatar = (twitter_url) => {
     window.open(twitter_url)
+}
+
+/**
+ * 
+ * @param {{
+    video_info: {
+        variants: {
+            content_type: 'video/mp4';
+            url: string;
+            bitrate?: number;
+        }
+    }
+}} media 
+ */
+const findMediaUrl = (media) => {
+    return media.video_info?.variants?.find?.(v => v.content_type === 'video/mp4')?.url
 }
 
 const _followKol = async (author_id, index) => {

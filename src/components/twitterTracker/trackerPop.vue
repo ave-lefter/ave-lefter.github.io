@@ -106,11 +106,16 @@
         </el-popover>
         <Icon
           :name="globalStore.audioSettings.audio.twitter ? 'custom:ad' : 'custom:admute'"
-          class="mr-4px cursor-pointer"
+          class="cursor-pointer"
           @click="globalStore.audioSettings.active = 'audio'"
         />
+        <el-popover :persistent="false" trigger="click">
+          <template #reference>
+            <Icon name="material-symbols:language"/>
+          </template>
+        </el-popover>
       </div>
-      <!-- <el-input
+      <el-input
       v-model="query.token_keyword"
         style="--el-input-bg-color:var(--main-list-hover);--el-input-height:26px;"
         class="w-160px"
@@ -122,7 +127,7 @@
         <template #prefix>
           <Icon name="custom:search" />
         </template>
-      </el-input> -->
+      </el-input>
     </div>
     <TwitterTrackerList :isMine="isMine" @endReached="getList" @startAttention="emits('setDrawerVisible', true)" />
     <audio
@@ -293,6 +298,12 @@ watch(
   () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],
   twitterHandler
 )
+
+watch(()=>followAuthorIds.value,()=>{
+  if(isMine.value){
+    trackerStore.list = trackerStore.list.filter(el=>followAuthorIds.value.includes(el.author_id))
+  }
+})
 </script>
 
 <style scoped lang="scss"></style>
