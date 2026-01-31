@@ -2,6 +2,7 @@
 import dayjs from 'dayjs'
 import { addFavorite, addFavoriteGroup, removeFavorite } from '~/api/fav'
 import XIcon from '~/components/xPopup/xIcon.vue'
+import Collect from '~/components/collect.vue'
 
 const emit = defineEmits(['toggleKline'])
 const rankKlineStore = useRankKlineStore()

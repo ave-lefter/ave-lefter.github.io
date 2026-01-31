@@ -216,6 +216,7 @@
         </div>
       </div>
       <el-dialog
+        v-if="dialog_bubble"
         v-model="dialog_bubble"
         width="50vw"
         align-center
@@ -236,6 +237,7 @@
         />
       </el-dialog>
       <el-dialog
+        v-if="dialog_analysis"
         v-model="dialog_analysis"
         width="80vw"
         align-center

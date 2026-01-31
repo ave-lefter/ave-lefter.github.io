@@ -8,7 +8,7 @@
         />
       </slot>
     </span>
-    <el-dialog v-model="show" class="new-dialog" width="500px" append-to-body destroy-on-close>
+    <el-dialog v-if="show" v-model="show" class="new-dialog" width="500px" append-to-body destroy-on-close>
       <template #header>
         <div class="text-20px mb-4px font-400">
           <button

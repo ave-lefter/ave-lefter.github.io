@@ -8,6 +8,7 @@
     <Icon name="custom:bubble" class="color-[--third-text] icon-bubble" />
   </a>
   <el-dialog
+    v-if="show_bubble"
     v-model="show_bubble"
     width="860"
     height="600"

@@ -1,5 +1,5 @@
 <template>
-  <el-drawer  v-model="visible" class="bg-[--dialog-bg]! rounded-tl-10px rounded-bl-10px border-none" :size="480" append-to-body :with-header="false">
+  <el-drawer  v-model="visible" class="bg-[--dialog-bg]! rounded-tl-10px rounded-bl-10px border-none" :size="480" append-to-body :with-header="false" destroy-on-close>
     <div class="h-70px flex items-center px-20px font-500 text-20px lh-30px tracking-0% color-[--main-text] border-b-1px border-b-solid border-b-[--border]">
       {{ $t('holdersAnalysis') }}
     </div>

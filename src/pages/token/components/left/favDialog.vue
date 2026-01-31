@@ -53,6 +53,7 @@ const Component = computed(() => {
 
 <template>
   <el-dialog
+    v-if="show"
     v-model="show"
     :title="t('editFav')"
     append-to-body

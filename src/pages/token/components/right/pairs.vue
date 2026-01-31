@@ -139,7 +139,7 @@
       </button>
     </div>
   </template>
-  <el-dialog v-model="visible" width="600px" :title="'LP ' + $t('holdersDetail')" append-to-body destroy-on-close>
+  <el-dialog v-if="visible" v-model="visible" width="600px" :title="'LP ' + $t('holdersDetail')" append-to-body destroy-on-close>
     <LPHolders />
   </el-dialog>
 
