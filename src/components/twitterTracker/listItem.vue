@@ -167,6 +167,10 @@ const _followKol = async (author_id, index) => {
             botStore.changeConnectVisible(true)
             return
         }
+        if (followIds.value.length >= 50) {
+            ElMessage.error(t('twitterMax'))
+            return
+        }
         await followKol(author_id)
         ElMessage.success(t('followed'))
         trackerStore.list[index].author.follow_status = 1

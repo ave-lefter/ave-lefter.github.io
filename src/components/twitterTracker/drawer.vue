@@ -25,7 +25,7 @@
       <el-table v-infinite-scroll="getList" :data="list" header-cell-class-name="text-12px" style="width: 100%"
         :infinite-scroll-disabled="finished || loading" :infinite-scroll-distance="20" :infinite-scroll-delay="200">
         <template #empty>
-          <div v-if="isMine" class="flex flex-col items-center pt-60px">
+          <div v-if="isMine && query.keyword" class="flex flex-col items-center pt-60px">
             <Icon name="custom:twitter-empty" class="text-61px mb-12px color-[--icon-color]" />
             <span class="color-[--third-text] text-12px mb-20px mt-4px lh-12px">{{ t('twitterEmpty') }}</span>
             <el-button type="primary" class="text-12px w-266px h-40px" @click="clickToHot">
@@ -238,6 +238,10 @@ const updateStoreStatus = (author_id, status) => {
 
 const _followKol = async (author_id, index) => {
   try {
+    if (followIds.value.length >= 50) {
+      ElMessage.error(t('twitterMax'))
+      return
+    }
     await followKol(author_id)
     ElMessage.success(t('followed'))
     list.value[index].follow_status = 1

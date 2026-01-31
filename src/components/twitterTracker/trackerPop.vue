@@ -293,6 +293,20 @@ watch(
   () => v2WsStore.wsResult[WSEventV2Type.PUBLIC_TWITTER],
   twitterHandler
 )
+
+watch(()=>followAuthorIds.value,()=>{
+  if(isMine.value){
+    trackerStore.list = trackerStore.list.filter(el=>{
+      return followAuthorIds.value.includes(el.author.author_id)
+    })
+  }
+})
+
+useVisibilityChange(()=>{
+  trackerStore.list = []
+  query.value.page_token = ''
+  getList()
+})
 </script>
 
 <style scoped lang="scss"></style>
