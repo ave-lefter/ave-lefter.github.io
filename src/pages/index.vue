@@ -707,24 +707,28 @@ const bufferLogoMap = new Map<string, any>()
 const logoThrottled = useThrottleFn(() => {
   if (!bufferLogoMap.size || !documentVisible.value) return
   const mergedList = Array.from(bufferLogoMap.values())
+  if (mergedList.length) {
   logoList.value = [
     ...mergedList,
     ...logoList.value,
   ].slice(0, 300)
   bufferLogoMap.clear()
+}
 }, 200)
 
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED],
   (val) => {
     if (!val?.token) return
+
     const prev = bufferLogoMap.get(val.token)
+
     bufferLogoMap.set(
       val.token,
       prev ? mergeLogo(prev, val) : val
     )
     // 控制 buffer 最大数量（防爆）
-    if (bufferLogoMap.size > 300) {
+    if (bufferLogoMap.size > 100) {
       const firstKey = bufferLogoMap.keys().next().value
       if (firstKey) bufferLogoMap.delete(firstKey)
     }
@@ -732,46 +736,66 @@ watch(
   }
 )
 
-
-
 const flushStatistics = useThrottleFn(() => {
   if (!mapStatistics.value.size || !documentVisible.value) return
   triggerRef(mapStatistics)
 }, 300)
 
-const MAX_SIZE = 100
+// const MAX_SIZE = 100
+
+// watch(
+//   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
+//   (val) => {
+//     if (!Array.isArray(val) || !val.length) return
+
+//     // 先收集所有新 token
+//     const newTokens = new Set<string>()
+//     for (const item of val) {
+//       newTokens.add(item.token)
+//       const prev = mapStatistics.value.get(item.token)
+//       if (prev) {
+//         // 更新原对象属性，避免创建新对象
+//         mergeStatistics(prev, item)
+//       } else {
+//         mapStatistics.value.set(item.token, item)
+//       }
+//     }
+
+//     // 保持 Map 大小不超过 MAX_SIZE
+//     while (mapStatistics.value.size > MAX_SIZE) {
+//       const firstKey = mapStatistics.value.keys().next().value
+//       if (!firstKey) break
+//       if (!newTokens.has(firstKey)) mapStatistics.value.delete(firstKey)
+//       else break
+//     }
+
+//     flushStatistics()
+//   }
+// )
 
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
   (val) => {
-    if (!Array.isArray(val) || !val.length) return
-
-    // 先收集所有新 token
-    const newTokens = new Set<string>()
-    for (const item of val) {
-      newTokens.add(item.token)
+    if (!Array.isArray(val) || !val.length ) return
+    // buffer.push(val)
+    // buffer.splice(0, 0, ...val)
+    // buffer.splice(100)
+    val.forEach((item: any) => {
       const prev = mapStatistics.value.get(item.token)
-      if (prev) {
-        // 更新原对象属性，避免创建新对象
-        mergeStatistics(prev, item)
-      } else {
-        mapStatistics.value.set(item.token, item)
+      mapStatistics.value.set(
+        item.token,
+        prev ? mergeStatistics(prev, item) : item
+      )
+    })
+    if (mapStatistics.value.size > 100) {
+      const firstKey = mapStatistics.value.keys().next().value
+      if (firstKey) {
+        mapStatistics.value.delete(firstKey)
       }
     }
-
-    // 保持 Map 大小不超过 MAX_SIZE
-    while (mapStatistics.value.size > MAX_SIZE) {
-      const firstKey = mapStatistics.value.keys().next().value
-      if (!firstKey) break
-      if (!newTokens.has(firstKey)) mapStatistics.value.delete(firstKey)
-      else break
-    }
-
     flushStatistics()
-  },
-  { deep: false }
+  }
 )
-
 
 
 const getChangedValue = (A: string[], B: string[]): string | null => {
@@ -1271,49 +1295,58 @@ function switchChain(item: { chain: ChainKey }) {
   activeChain.value = item.chain
 }
 
+function bufRender() {
+  flushPumpState()
+  logoThrottled()
+  flushStatistics()
+}
 const documentVisible1 = useDocumentVisibility()
 
 const documentVisible = computed(() => {
   return documentVisible1.value === 'visible'
 })
-
-
 watch(documentVisible, (val) => {
-  // if (route.name !== 'index') return
+  if (route.name !== 'index') return
   if (val) {
-
-    wsv2Store.send({
-      jsonrpc: '2.0',
-      method: 'subscribe',
-      params: ['pumpstatev2', activeChain.value],
-      id: 1,
-    })
-    getPumpList()
-  } else {
-    wsTableListCache = {}
-    wsTableList.value = []
-    isInitObj = {
-      new: true,
-      soon: true,
-      graduated: true
-    }
-    logoList.value = []
-    bufferLogoMap.clear()
-    mapStatistics.value.clear()
-    pumpStateBuffer.length = 0
-    if (portraitTimer) {
-      clearTimeout(portraitTimer)
-      portraitTimer = null
-    }
-    unsubscribePortrait()
-    wsv2Store.send({
-      jsonrpc: '2.0',
-      method: 'unsubscribe',
-      params: ['pumpstatev2'],
-      id: 1,
-    })
+    bufRender()
   }
 })
+
+// watch(documentVisible, (val) => {
+//   if (val) {
+
+//     wsv2Store.send({
+//       jsonrpc: '2.0',
+//       method: 'subscribe',
+//       params: ['pumpstatev2', activeChain.value],
+//       id: 1,
+//     })
+//     getPumpList()
+//   } else {
+//     wsTableListCache = {}
+//     wsTableList.value = []
+//     isInitObj = {
+//       new: true,
+//       soon: true,
+//       graduated: true
+//     }
+//     logoList.value = []
+//     bufferLogoMap.clear()
+//     mapStatistics.value.clear()
+//     pumpStateBuffer.length = 0
+//     if (portraitTimer) {
+//       clearTimeout(portraitTimer)
+//       portraitTimer = null
+//     }
+//     unsubscribePortrait()
+//     wsv2Store.send({
+//       jsonrpc: '2.0',
+//       method: 'unsubscribe',
+//       params: ['pumpstatev2'],
+//       id: 1,
+//     })
+//   }
+// })
 
 const DIRECT_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['volume_u_24h', 'volume_u_24h'],
