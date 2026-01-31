@@ -1,5 +1,5 @@
 <template>
-  <div class="pump w-full bg-[--main-bg]">
+  <div class="pump w-full bg-[--main-bg]" v-if="route.name=='index'">
     <div class="flex-start p-x-17px py-12px bg-[--main-bg] mb-1px mt-1px">
       <div class="tabs mr-8px">
         <div
@@ -570,7 +570,7 @@ function useFourmemeList(
       const set = excludeTokens()
       result = result.filter(i => !set.has(i.target_token))
     }
-    const finalList = result.slice(0, 50)
+    const finalList = result.slice(0, 100)
     if (finalList?.length > 0) {
       patchLogo(finalList)
     }
@@ -694,7 +694,7 @@ const flushPumpState = useThrottleFn(() => {
   wsUpdateTableList(pumpStateBuffer)
   subscribePortrait(pumpStateBuffer)
   pumpStateBuffer.length = 0
-}, 300)
+}, 150)
 
 watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
   if (Array.isArray(val)) {
@@ -712,7 +712,7 @@ const logoThrottled = useThrottleFn(() => {
     ...logoList.value,
   ].slice(0, 300)
   bufferLogoMap.clear()
-}, 300)
+}, 200)
 
 watch(
   () => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED],
