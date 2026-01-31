@@ -324,7 +324,7 @@ import type {
   CategoryKey,
   WSPumpObj
 } from '@/api/types/pump'
-import { throttle } from 'lodash-es'
+import { isEqual, throttle } from 'lodash-es'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
 import AudioSelect from './pump/components/audioSelect.vue'
 defineOptions({
@@ -717,7 +717,8 @@ pump_notice.value?.[activeChain.value]?.graduated
   }
 },300))
 
-watch(()=> pumpV3.value[activeChain.value].platforms, () => {
+watch(()=> pumpV3.value[activeChain.value].platforms, (val, oldValue) => {
+  if (isEqual(val, oldValue)) return
   getPumpList()
 })
 watch(activeChain, (val, old) => {
@@ -1234,7 +1235,9 @@ async function getPump(rawParams: {
 
   // 4. Loading 状态处理
   const state = pumpV3.value[currentChain]?.[category]
+  if (state.loading) return
   if (state?.count === 0) state.loading = true
+
 
   try {
     const res = await _getPumpList(finalParams)
