@@ -290,7 +290,7 @@
                         </template>
                       </div>
                     </div>
-                    <PumpLive class="mr-4px" v-if="row?.is_streaming" :tokenId="(row.token + '-' + row.chain)" />
+                  <PumpLive v-if="row?.is_streaming" class="mr-4px" :tokenId="(row.token + '-' + row.chain)" />
 
                     <a
                       :ref="(el: any) => $refs.currentBtnRef[$index] = el"
@@ -398,7 +398,8 @@
                         :tokenId="(row.token + '-' + row.chain)"
                         :type="2"
                       >
-                        <a v-for="(item, index) in row?.medias?.filter(i=> i.icon === 'twitter')" :key="index" :href="item.url" target="_blank" @click.stop class="!color-#009EF7">
+                    <a v-for="(item, index) in row?.medias?.filter(i => i.icon === 'twitter')" :key="index"
+                      :href="item.url" target="_blank" class="!color-#009EF7" @click.stop>
                           {{ formatXUser(item?.url) }}
                         </a>
                     </PumpPop>
@@ -406,12 +407,12 @@
                   <div class="flex-start text-12px absolute bottom--2px z-1 mt-5px">
                     <div
                       v-show="pumpSetting?.define?.some((i) => i === 'top')"
-                      class="flex-start mr-8px bg-btn"
-                      @mouseover.stop="(e) => showBubbleTooltip(row, e)"
+class="flex-start mr-8px bg-btn"
                       :style="{
                           background:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? '': (Number(row?.holders_top10_ratio) > 30 ? '#f6465d1a' : '#12b8861a'),
                           color:Number(formatNumber(row?.holders_top10_ratio || 0, 1))==0? 'var(--third-text)': (Number(row?.holders_top10_ratio) > 30 ? '#F6465D' : '#12B886'),
                       }"
+@mouseover.stop="(e) => showBubbleTooltip(row, e)"
                     >
                       <Icon
                         class="iconfont icon-TOP text-10px mr-4px"
@@ -784,7 +785,7 @@ const currentRow = ref<PumpObj | null>(null)
 const showPopSearch= shallowRef(false)
 
 const $tooltip = $createTooltip('bubble--tooltip')
-const onEnter = useSimilarTokenPopup()
+const { onEnter, hide: similarHide } = useSimilarTokenPopup()
 
 
 const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableList, {
@@ -793,8 +794,10 @@ const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableLis
   // 顶部刚进入视口的节点会因为高度计算没到视口而无法渲染，导致动画“闪现”
   overscan: 20,
 })
-onUnmounted(() => {
+
+onDeactivated(() => {
   $tooltip?.hide?.()
+  similarHide?.()
 })
 
 function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: string }) {
