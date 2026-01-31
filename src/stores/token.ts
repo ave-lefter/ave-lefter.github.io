@@ -296,8 +296,10 @@ export const useTokenStore = defineStore('token', () => {
 
   function _getXType(id?: string) {
     getXType(id || route.params.id as string).then(res => {
-      twitterType.value = res.type || 0
-      console.log('twitterType', twitterType.value)
+      if (typeof res.type === 'number') {
+        twitterType.value = res.type
+      }
+      console.log('twitterType',res,twitterType.value)
     }).catch(() => {
       twitterType.value = 0
     })
