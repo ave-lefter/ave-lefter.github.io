@@ -638,7 +638,7 @@ async function initChart() {
     ],
     enabled_features: [
       'request_only_visible_range_on_reset',
-      ...(isSupportSecChains ? ['seconds_resolution' as ChartingLibraryFeatureset] : []),
+      'seconds_resolution' as ChartingLibraryFeatureset
     ],
     charts_storage_url: location.host,
     charts_storage_api_version: '1.1',
@@ -738,35 +738,10 @@ async function initChart() {
         // const chain = props.chain
         const isSupportSecChains = chain.value && supportSecChains.includes(chain.value)
         const configurationData = {
-          supported_resolutions: (chain.value === 'mixmax' || chain.value === 'xlayer' || chain.value === 'base') ? ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] :
-            [
-            '1S',
-            '1',
-            '5',
-            '15',
-            '30',
-            '60',
-            '120',
-            '240',
-            '1D',
-            '1W',
-          ] as ResolutionString[],
+          supported_resolutions: isSupportSecChains ?  ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[]:['1S','5S','1', '5', '15', '30', '60', '120', '240', '1D', '1W']as ResolutionString[],
           supports_marks: true,
           supports_timescale_marks: true,
           supports_time: true,
-        }
-        if (!isSupportSecChains) {
-          configurationData.supported_resolutions = [
-            '1',
-            '5',
-            '15',
-            '30',
-            '60',
-            '120',
-            '240',
-            '1D',
-            '1W',
-          ] as ResolutionString[]
         }
         setIframeCssVar()
 
@@ -794,44 +769,16 @@ async function initChart() {
             session: '24x7',
             has_intraday: true, // 显示商品是否具有日内（分钟）历史数据
             intraday_multipliers: ['1', '5', '15', '30', '60', '120', '240'] as ResolutionString[],
-            has_seconds: isSupportSecChains,
+            has_seconds: true,
             seconds_multipliers: ['1', '5', '15', '30'],
             has_daily: true,
             // has_no_volume: false, // 布尔表示商品是否拥有成交量数据
             has_weekly_and_monthly: true,
-            supported_resolutions: [
-              '1S',
-              '5S',
-              '15S',
-              '30S',
-              '1',
-              '5',
-              '15',
-              '30',
-              '60',
-              '120',
-              '240',
-              '1D',
-              '1W',
-            ] as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
+            supported_resolutions: isSupportSecChains ?  ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[]:['1S','5S','1', '5', '15', '30', '60', '120', '240', '1D', '1W']as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
             data_status: 'streaming' as 'streaming' | 'endofday' | 'delayed_streaming',
             visible_plots_set: 'ohlcv' as VisiblePlotsSet,
             type: 'crypto',
             listed_exchange: getSwapInfo?.(chain.value || '', amm.value)?.show_name || '',
-          }
-          if (!isSupportSecChains) {
-            symbolInfo.supported_resolutions = [
-              '1',
-              '5',
-              '15',
-              '30',
-              '60',
-              '120',
-              '240',
-              '1D',
-              '1W',
-            ] as ResolutionString[]
-            symbolInfo.seconds_multipliers = []
           }
           console.log('[resolveSymbol]: Symbol resolved', symbolName)
           setTimeout(() => onResolve(symbolInfo), 0)
