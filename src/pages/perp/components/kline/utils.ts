@@ -363,10 +363,10 @@ export function updatePerpLastBar(
 export function waitForTradingView (): Promise<ChartingLibraryWidgetConstructor> {
   return new Promise((resolve) => {
     if (window?.TradingView?.widget) return resolve(window.TradingView.widget)
-    // 监听插件派发的事件
+    // 监听插件派发的事件（使用 once 确保处理完成后自动移除）
     window.addEventListener('tradingview:ready', () => {
       resolve(window.TradingView.widget)
-    })
+    }, { once: true })
   })
 }
 

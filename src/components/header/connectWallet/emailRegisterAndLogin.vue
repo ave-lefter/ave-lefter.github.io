@@ -385,24 +385,24 @@ function sendVerificationCode() {
   startCountdown()
 }
 
-const captchaVerifyParam = ref('')
-const { initCaptcha, SceneId } = useAliyunCaptcha({
-  element: '#captcha-element',
-  button: '#captcha-button',
-  slideStyle: {
-    width: 460,
-    height: 48
-  },
-  success: (captchaVerifyParams) => {
-    captchaVerifyParam.value = captchaVerifyParams
-    _login()
-  },
-  fail: (error) => {
-    console.log(error)
-    initCaptcha()
-    loading.value = false
-  }
-})
+// const captchaVerifyParam = ref('')
+// const { initCaptcha, SceneId } = useAliyunCaptcha({
+//   element: '#captcha-element',
+//   button: '#captcha-button',
+//   slideStyle: {
+//     width: 460,
+//     height: 48
+//   },
+//   success: (captchaVerifyParams) => {
+//     captchaVerifyParam.value = captchaVerifyParams
+//     _login()
+//   },
+//   fail: (error) => {
+//     console.log(error)
+//     initCaptcha()
+//     loading.value = false
+//   }
+// })
 
 function login() {
   formRef?.value?.validate((valid) => {
@@ -423,15 +423,16 @@ function login() {
 function _login() {
   loading.value = true
   const req =
-    loginType.value === 'password'
-      ? userStore.loginEmail({
-          email: form.email,
-          password: sha256(form.password).toString(),
-          // language: lang == "zh-cn" || lang == "zh-tw" ? "cn" : "en",
-          captchaScene: SceneId,
-          captchaParam: captchaVerifyParam.value
-        })
-      : userStore.emailCodeLogin({
+    // loginType.value === 'password'
+    //   ? userStore.loginEmail({
+    //       email: form.email,
+    //       password: sha256(form.password).toString(),
+    //       // language: lang == "zh-cn" || lang == "zh-tw" ? "cn" : "en",
+    //       captchaScene: SceneId,
+    //       captchaParam: captchaVerifyParam.value
+    //     })
+    //   :
+      userStore.emailCodeLogin({
           email: form.email,
           code: form.verificationCode,
           refCode: form.refCode || refCode.value,
@@ -451,7 +452,7 @@ function _login() {
     })
     .finally(() => {
       loading.value = false
-      initCaptcha()
+      // initCaptcha()
     })
 }
 
@@ -594,7 +595,7 @@ onMounted(() => {
   } else {
     initGoogleLogin()
   }
-  initCaptcha()
+  // initCaptcha()
 })
 
 watch(

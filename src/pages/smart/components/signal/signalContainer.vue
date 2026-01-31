@@ -49,8 +49,8 @@ const signalLeftList = useTemplateRef<InstanceType<typeof SignalLeftList>>('sign
 const signalRightList = useTemplateRef<InstanceType<typeof SignalRightList>>('signalRightList')
 
 const scrollbarHeight = computed(() => {
-  const tokenHistoryHeight = globalStore.tokenHistoryVisible ? 32 : 0
-  return height.value - 226 - tokenHistoryHeight
+  // const tokenHistoryHeight = globalStore.tokenHistoryVisible ? 32 : 0
+  return height.value - 226 
 })
 
 onMounted(() => {

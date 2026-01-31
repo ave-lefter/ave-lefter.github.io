@@ -43,7 +43,7 @@
         <div class="bg-[--secondary-bg] flex-1" />
       </div>
     </el-scrollbar>
-    <el-dialog v-model="dialogVisible" :title="searchAmm" width="480">
+    <el-dialog v-model="dialogVisible" :title="searchAmm" width="480" destroy-on-close>
       <Pairs :search="searchAmm" :isInModal="true" />
       <template #footer>
         <el-button

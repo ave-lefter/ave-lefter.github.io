@@ -121,6 +121,7 @@ const filteredSearchParams = (key: keyof typeof searchParams.value) => {
           class="[&&]:[--el-select-width:110px]"
           popper-class="[--el-font-size-base:12px]"
           :suffix-icon="SuffixIcon"
+          :persistent="false"
         >
           <template #prefix>
             <span>{{ t('markets1') }}</span>

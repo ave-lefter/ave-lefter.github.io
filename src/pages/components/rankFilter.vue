@@ -121,7 +121,7 @@ function handleBlur(props2: string[], val: string, index: number) {
         <span class="text-14px block border pb-10px">{{ $t('FilterSetting') }}</span>
         <div v-if="dexVisible" class="flex items-center justify-between text-12px mb-16px">
           <span class="color-[--secondary-text]">{{ $t('dexSelect') }}</span>
-          <el-select v-model="tempFilter.amm" :teleported="false" class="[&&]:w-206px" :suffix-icon="SuffixIcon">
+          <el-select v-model="tempFilter.amm" :teleported="false" class="[&&]:w-206px" :suffix-icon="SuffixIcon" :persistent="false">
             <template #label="{label,value}">
              <div class="flex items-center gap-4px">
               <img v-if="value!==' '" class="w-16px h-16px rounded-full" :src="`${globalStore.token_logo_url}swap/${value}.jpeg`" alt="">

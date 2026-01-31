@@ -232,7 +232,7 @@
       <SignalTags tagClass="mr-3px" :tags="currentRow.newTags" :walletAddress="currentRow.wallet_address"
         :chain="currentRow.chain" />
     </MarkerTooltip>
-    <el-dialog v-model="filterDialogVisible" :width="440" :title="$t('markerAddressFilter')">
+    <el-dialog v-if="filterDialogVisible" v-model="filterDialogVisible" :width="440" :title="$t('markerAddressFilter')" destroy-on-close>
       <div class="mx--16px h-1px bg-[--border] mb-20px"/>
       <div class="mb-10px">
         <label for="markerAddress">

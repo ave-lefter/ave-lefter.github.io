@@ -147,6 +147,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     window.removeEventListener('resize', checkContentOverflow)
+    tooltipRefs.value = {}
 })
 
 watch(() => props.item?.content, () => {

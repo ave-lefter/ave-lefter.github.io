@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="flex justify-between items-center gap-8px h-54px">
-      <el-select v-model="selectGroupId" style="--el-fill-color-blank:var(--dialog-list-hover)"  :mode="mode" @click.stop @change="(val) => filterGroup(val)">
+      <el-select v-model="selectGroupId" style="--el-fill-color-blank:var(--dialog-list-hover)" :persistent="false" :mode="mode" @click.stop @change="(val) => filterGroup(val)">
         <el-option :key="0" :value="0" :label="$t('defaultGroup')" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
         <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id"  class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
       </el-select>
@@ -55,7 +55,7 @@
             <span>{{ $t('addrGroup') }}</span>
           </template>
           <template #cell-group="{ row }">
-             <el-select v-model="row.group_id" size="small" :suffix-icon="SuffixIcon" filterable popper-class="w-addrGroup" class="[&&]:[--el-text-color-regular:--main-text] [&&]:[--el-fill-color-blank:--dialog-list-hover]" @click.stop @change="(val) => getRowGroupChange(val, row)">
+             <el-select v-model="row.group_id" size="small" :suffix-icon="SuffixIcon" :persistent="false" filterable popper-class="w-addrGroup" class="[&&]:[--el-text-color-regular:--main-text] [&&]:[--el-fill-color-blank:--dialog-list-hover]" @click.stop @change="(val) => getRowGroupChange(val, row)">
               <el-option :key="0" :value="0" :label="$t('defaultGroup')" filterable class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
               <el-option v-for="item in addressGroups" :key="item.group_id" :label="item.name" :value="item.group_id" class="[&&]:h-20px [&&]:lh-20px [&&]:text-12px"/>
             </el-select>

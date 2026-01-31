@@ -117,6 +117,9 @@ function createTooltipInstance(appContext: App['_context'], id: string): Tooltip
     },
     hide() {
       visible.value = false
+      nextTick(() => {
+        this.destroy()
+      })
     },
     destroy() {
       if (vnode && container) {
@@ -125,7 +128,7 @@ function createTooltipInstance(appContext: App['_context'], id: string): Tooltip
       if (container && container.parentNode) {
         container.parentNode.removeChild(container)
       }
-      console.log(`[Tooltip ${id}] Instance destroyed`)
+      // console.log(`[Tooltip ${id}] Instance destroyed`)
       mounted = false
       container = null
       vnode = null

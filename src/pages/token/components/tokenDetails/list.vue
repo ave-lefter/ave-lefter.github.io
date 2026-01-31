@@ -145,7 +145,8 @@ function goToExplorer() {
       <div class="flex items-center w-70px text-right gap-3px">
         <span>{{ $t('type') }}</span>
         <el-popover
-          v-model:visible="visible"
+v-model:visible="visible"
+:persistent="false"
           placement="bottom"
           :width="200"
           trigger="click"

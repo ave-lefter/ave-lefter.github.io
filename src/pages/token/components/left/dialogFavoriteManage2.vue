@@ -220,7 +220,7 @@ function handleChangeIndex(groupIds: number[]) {
   // visible.value = false
   // 处理修改排序逻辑
   // return console.log('修改分组排序', groupIds)
-  
+
   getGroupChangeIndex({
       address: walletAddress.value,
       group: groupIds
@@ -344,7 +344,7 @@ function removeTokenFavorite(row:any) {
         type: 'delete',
       })
       resetAndGet()
-      // TODO: 
+      // TODO:
       ElMessage.success(t('cancelled1'))
       props.getData()
     })
@@ -415,7 +415,7 @@ function removeTokenFavorite(row:any) {
       <el-table
         id="table_fav"
         ref="table_ref"
-    
+
         :data="favoritesList"
         height="280px"
         class="w-full table-container [&&]:text-12px"
@@ -450,6 +450,7 @@ function removeTokenFavorite(row:any) {
               v-model="row.activeGroup"
               class="[&&]:[--el-fill-color-blank:--border]"
               :placeholder="$t('pleaseSelectGroup')"
+              :persistent="false"
               @change="confirmSwitchGroup(row, $event)"
             >
               <el-option
@@ -533,7 +534,7 @@ function removeTokenFavorite(row:any) {
             >
               {{ $t('down') }}
             </el-button> -->
-          
+
             <!-- <span
               class="cursor-pointer color-[--main-text]"
               @click.stop.prevent="handleEditRemark(row)">
@@ -560,7 +561,7 @@ function removeTokenFavorite(row:any) {
         class="flex justify-center items-center py-15px text-12px">
         <span>{{ $t('loading') }}</span>
       </div> -->
-    
+
       <div class="flex-between h-80px px-20px">
         <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate"
     @change="handleCheckAllChange" :label="t('selectAll')" size="large" />

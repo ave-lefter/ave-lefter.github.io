@@ -7,7 +7,7 @@
     :width="320"
     trigger="click"
     :teleported="false"
-    persistent
+    :persistent="false"
   >
     <template #reference>
       <slot :visible="visible">

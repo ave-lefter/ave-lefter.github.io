@@ -44,7 +44,8 @@ const aveTableRef = ref<InstanceType<typeof AveTable> | null>(null)
 const firstActivated = ref(true)
 const followStore = useFollowStore()
 const themeStore = useThemeStore()
-onActivated(() => {
+
+onMounted(() => {
   if (!firstActivated.value && aveTableRef.value) {
     aveTableRef.value.scrollToTop(0)
   }
@@ -419,15 +420,23 @@ function subscribeLiq(pair: string, oldPair?: string) {
 }
 
 const updatePairTxs = useThrottleFn(() => {
+  if (wsPairCache.value.length === 0) return
   tokenTxs.value.unshift(...wsPairCache.value)
+  // 限制主列表长度，防止无限增长
   tokenTxs.value = tokenTxs.value.slice(0, 300)
   wsPairCache.value.length = 0
+
+  // 裁剪 txCount 防止 map 无界增长
+  pruneTxCount(TXCOUNT_MAX_ENTRIES)
+  // 触发响应
   triggerRef(tokenTxs)
 }, 100)
 
 const updateLiqList = useThrottleFn(() => {
+  if (wsLiqCache.value.length === 0) return
   pairLiq.value.unshift(...wsLiqCache.value)
   wsLiqCache.value.length = 0
+  if (pairLiq.value.length > 300) pairLiq.value.length = 300
   triggerRef(pairLiq)
 }, 100)
 
@@ -449,6 +458,7 @@ function confirmMakersFilter(markerAddress = '') {
   _getTokenTxs()
 }
 
+// 获取并处理历史 tx（示例）
 async function _getTokenTxs() {
   try {
     listStatus.value.loadingTxs = true
@@ -457,8 +467,8 @@ async function _getTokenTxs() {
       token_id: route.params.id as string,
       tag_type,
       maker: tableFilter.value.markerAddress,
-      time_min:tableFilter.value.timestamp[0],
-      time_max:tableFilter.value.timestamp[1]
+      time_min: tableFilter.value.timestamp?.[0],
+      time_max: tableFilter.value.timestamp?.[1]
     }
     if (tag_type === '-100' && !followStore.currentAddress) {
       tokenTxs.value = []
@@ -467,21 +477,29 @@ async function _getTokenTxs() {
     }
     const res = await getTokenTxs(getPairTxsParams)
     realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
-    tokenTxs.value = (res || []).reverse().map(val => {
-      txCount.value[val.wallet_address] = (txCount.value[val.wallet_address] || 0) + 1
+
+    // 原代码：res.reverse().map(...).reverse()，优化为从旧到新处理并保持顺序
+    const mapped = (res || []).reverse().map(val => {
+      // 更新 txCount（可能会被 prune）
+      const addr = val.wallet_address as string
+      txCount.value[addr] = (txCount.value[addr] || 0) + 1
       const { wallet_tag, topN } = getWalletTag(val)
       return {
         ...val,
         wallet_tag,
         topN,
-        count: txCount.value[val.wallet_address],
+        count: txCount.value[addr],
         senderProfile: JSON.parse(val.profile || '{}'),
         uuid: uuid()
       }
     }).reverse()
+    // 保持原展示顺序（如果原来是 reverse-reverse，保持一致）
+    tokenTxs.value = mapped.slice(-300) // 仅保留最近 300
+    // 裁剪 txCount
+    pruneTxCount(TXCOUNT_MAX_ENTRIES)
   } catch (e) {
     tokenTxs.value = []
-    console.log('=>(transactions.vue:62) e', e)
+    console.log('=>(transactions.vue) e', e)
   } finally {
     listStatus.value.loadingTxs = false
   }
@@ -823,16 +841,117 @@ const collect = async (row: any,index:number) => {
     // loading.value = false
   })
 }
+const localTimers: number[] = []
+;(window as any)._transactions_local_timers = (window as any)._transactions_local_timers || []
+// ------------------- 内存/订阅 管理常量与函数 -------------------
+const TXCOUNT_MAX_ENTRIES = 300 // 保留的 maker 最大数量（按需调整）
+
+/**
+ * 裁剪 txCount，避免 key 无限增长。
+ * 优先保留 tokenTxs 中最近出现的地址，然后从原 map 补齐。
+ */
+function pruneTxCount(maxEntries = TXCOUNT_MAX_ENTRIES) {
+  try {
+    const map = txCount.value || {}
+    const keys = Object.keys(map)
+    if (keys.length <= maxEntries) return
+
+    const keep = new Set<string>()
+    // 从最近的 tokenTxs 中收集地址
+    for (let i = (tokenTxs.value?.length || 0) - 1; i >= 0 && keep.size < maxEntries; i--) {
+      const el = tokenTxs.value[i] as any
+      const addr = (el?.wallet_address as string) || (el?.maker as string) || ''
+      if (addr) keep.add(addr)
+    }
+
+    // 若仍不足，则从现有 map keys 末尾补齐（保守策略）
+    if (keep.size < maxEntries) {
+      for (let i = keys.length - 1; i >= 0 && keep.size < maxEntries; i--) {
+        keep.add(keys[i])
+      }
+    }
+
+    const newMap: Record<string, number> = {}
+    for (const k of keys) {
+      if (keep.has(k)) newMap[k] = map[k]
+    }
+    txCount.value = newMap
+  } catch (err) {
+    console.warn('pruneTxCount err', err)
+  }
+}
+
+/**
+ * 统一清理函数：取消订阅、清空缓存、清除 timers、重置 txCount
+ * 在 onDeactivated / onUnmounted 中复用
+ */
+function cleanupSubscriptions() {
+  try {
+    // ��消 liq 订阅（若有其它订阅在此补齐取消）
+    try {
+      wsStore.send({
+        jsonrpc: '2.0',
+        params: ['liq', tokenStore.pairAddress || tokenStore.pair?.pair || pairAddress.value || ''],
+        id: 1,
+        method: 'unsubscribe'
+      })
+    } catch (e) {
+      console.warn('cleanup unsubscribe liq', e)
+    }
+
+    // 如有 tx 订阅或其它，请在此添加对应的 unsubscribe
+  } catch (e) {
+    console.warn('cleanupSubscriptions ws unsubscribe err', e)
+  }
+
+  try {
+    // 清空数据结构
+    tokenTxs.value = []
+    wsPairCache.value.length = 0
+    wsLiqCache.value.length = 0
+    pairLiq.value.length = 0
+    txCount.value = {}
+
+    // 清理本地 timers（模块局部 + window 备选）
+    localTimers.forEach(id => {
+      try { clearTimeout(id) } catch (_) {}
+      try { clearInterval(id) } catch (_) {}
+    })
+    localTimers.length = 0
+
+    const globalTrackers = (window as any)._transactions_local_timers as Array<number> | undefined
+    if (Array.isArray(globalTrackers)) {
+      globalTrackers.forEach(id => {
+        try { clearTimeout(id) } catch (_) {}
+        try { clearInterval(id) } catch (_) {}
+      })
+      ;(window as any)._transactions_local_timers = []
+    }
+
+    // 如果文件中定义了 resetCache()，调用它（原文件片段中有 resetCache）
+    try {
+      if (typeof (resetCache as any) === 'function') {
+        ;(resetCache as any)()
+      }
+    } catch (_) {
+      // ignore
+    }
+  } catch (e) {
+    console.warn('cleanupSubscriptions err', e)
+  }
+}
+
 
 onUnmounted(() => {
-  wsStore.send({
-    jsonrpc: '2.0',
-    params: ['liq', tokenStore.pairAddress],
-    id: 1,
-    method: 'unsubscribe'
-  })
-  tokenTxs.value = []
-  resetCache()
+  cleanupSubscriptions()
+  // wsStore.send({
+  //   jsonrpc: '2.0',
+  //   params: ['liq', tokenStore.pairAddress],
+  //   id: 1,
+  //   method: 'unsubscribe'
+  // })
+  // tokenTxs.value = []
+  // resetCache()
 })
 
 

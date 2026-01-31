@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" class="dialog-position" :title="$t('myPosition1')" width="680" append-to-body>
+  <el-dialog v-model="dialogVisible" class="dialog-position" :title="$t('myPosition1')" width="680" append-to-body destroy-on-close>
     <slot/>
     <el-table
       class="table-position w-100%" :data="dataSource" :height="400" @row-click="tableRowClick" row-class-name="group">

@@ -539,6 +539,10 @@ watch(() => userStore.email, (newVal) => {
 onMounted(() => {
   // Initialization code if needed
 })
+
+onBeforeUnmount(() => {
+  resetCountdown()
+})
 </script>
 
 <style scoped lang='scss'>

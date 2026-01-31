@@ -150,7 +150,7 @@ const handleBeforeEnter=()=>{
   console.log('previewList2',previewList.value,props.modelValue)
 }
 const changeAutoSellConfig=(value:any)=>{
-  
+
 }
 
 // watch(() => form[props.prop], (newValue) => {

@@ -1,6 +1,6 @@
 
 <template>
-<el-dropdown trigger="click" popper-class="w-filterType">
+  <el-dropdown :persistent="false" trigger="click" popper-class="w-filterType">
     <Icon
       id="custom-filter"
       name="custom:filter"

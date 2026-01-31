@@ -408,6 +408,7 @@
     class="dialog-rebate dark"
     title=""
     width="800"
+    destroy-on-close
     append-to-body
   >
       <div class="flex items-center justify-between pt-20px pb-30px">
@@ -455,6 +456,7 @@
     class="dialog-rebate"
     title=""
     width="700"
+    destroy-on-close
     append-to-body
   >
     <div class="dialog-content color-#fff px-15px pt-20px pb-40px">
@@ -474,7 +476,7 @@
 
     </div>
   </el-dialog>
-  <el-dialog v-model="dialogConnect" class="dialog-rebate" width="460" append-to-body>
+  <el-dialog v-model="dialogConnect" class="dialog-rebate" width="460" append-to-body destroy-on-close>
     <template #header>
       <div class="flex-start">
         <img width="24" height="24" src="@/assets/images/referral/n.svg" alt="" srcset="" >
