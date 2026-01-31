@@ -698,7 +698,7 @@ const flushPumpState = useThrottleFn(() => {
 
 watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
   if (Array.isArray(val)) {
-    pumpStateBuffer.push(val)
+    pumpStateBuffer.push(...val)
     pumpStateBuffer.length = 100
     flushPumpState()
   }
