@@ -31,7 +31,7 @@
                   formatNumber(rugPull?.all_tag_rate || 0, 1)
                 }}%
               </span>
-              <el-tooltip popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!" placement="top">
+              <el-tooltip popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!" placement="top" :persistent="false">
                 <template #content>{{ $t('abnormalChipsTip') }}</template>
                 <Icon
                   class="text-14px ml-5px color-[--secondary-text] cursor-pointer"

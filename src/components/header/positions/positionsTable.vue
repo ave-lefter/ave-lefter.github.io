@@ -17,7 +17,7 @@
         <template #header="{ column }">
           <div v-if="column.property == 'total_profit_ratio'" class="flex items-center text-right justify-end">
             <span>{{ column.label }}</span>
-            <el-tooltip :effect="mode" placement="top-end" :content="$t('PnLTips')" popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!" persistent>
+            <el-tooltip :effect="mode" placement="top-end" :content="$t('PnLTips')" popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!" :persistent="false">
               <el-icon style="cursor: pointer; font-size: 14px; margin-left: 2px;">
                 <QuestionFilled />
               </el-icon>
