@@ -18,6 +18,7 @@ export function useSimilarTokenPopup() {
         target: e.target,
         props: {
           showArrow: false,
+          transition:'',
           trigger: 'hover',
           placement:'right',
           'popper-class': 'similar-tooltip scrollbar-hide',
@@ -29,5 +30,5 @@ export function useSimilarTokenPopup() {
       })
     }
   
-    return onEnter
+    return {onEnter,hide:()=>$tooltip.hide()}
   }

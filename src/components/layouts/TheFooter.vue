@@ -19,6 +19,7 @@
         }}</span>
       </NuxtLink>
       <el-popover
+:persistent="false"
         popper-style="padding: 12px;min-width: 132px"
         width="132"
         placement="top"
@@ -119,6 +120,7 @@
         <a target="_blank" href="https://cloud.ave.ai">API</a>
       </li>
       <el-popover
+:persistent="false"
         popper-style="padding: 12px;min-width: 50px;width:auto"
         placement="top"
         :teleported="false"

@@ -160,6 +160,7 @@ async function _getTokenDetailMarks(type: string) {
     append-to-body
     :with-header="false"
     size="480"
+    destroy-on-close
     style="--el-drawer-bg-color:transparent"
   >
     <div

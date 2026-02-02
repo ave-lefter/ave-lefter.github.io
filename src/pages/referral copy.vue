@@ -440,6 +440,7 @@
         class="dialog-rebate"
         :title="$t('inviteFriends')"
         width="460"
+        destroy-on-close
         append-to-body
       >
         <div class="content">
@@ -485,7 +486,7 @@
           </div>
         </div>
       </el-dialog>
-      <el-dialog v-model="dialogConnect" class="dialog-rebate" width="460" append-to-body>
+      <el-dialog v-model="dialogConnect" class="dialog-rebate" width="460" append-to-body destroy-on-close>
         <template #header>
           <div class="flex-start">
             <img width="24" height="24" src="@/assets/images/referral/n.svg" alt="" srcset="" >

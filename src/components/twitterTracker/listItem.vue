@@ -47,7 +47,7 @@
                     <Icon :name="`custom:twitter-${item.type}`" class="text-24px" />
                 </div>
             </div>
-            <div class="relative" :class="index !== -1 ? 'pl-40px' : ''">
+            <div class="relative" :class="index !== -1 ? 'ml-40px' : ''">
                 <div ref="contentEl" :class="[
                     'text-14px lh-22px break-words',
                     { 'line-11': !contentExpanded && isContentOverflow }
@@ -58,10 +58,10 @@
                     style="width: 100%; top: 0; left: 0; z-index: -1;" v-html="processedContent" />
             </div>
             <div v-for="(media, mediaIndex) in item.medias?.slice?.(0, 1)" :key="mediaIndex"
-                :class="index !== -1 ? 'pl-40px' : ''" class="relative">
+                :class="index !== -1 ? 'ml-40px' : ''" class="relative">
                 <!-- <img :src="media.media_url_https" alt="" class="max-w-full rounded-8px cursor-pointer"> -->
                 <el-tooltip :ref="el => { if (el) tooltipRefs[`${mediaIndex}`] = el }" popper-class="tooltip-pd-0"
-                    :show-arrow="false" placement="right" :popper-options="{
+                    :show-arrow="false" placement="right" :persistent="false" :popper-options="{
                         modifiers: [
                             {
                                 name: 'eventListeners',
@@ -87,7 +87,7 @@
                 </div>
 
             </div>
-            <div v-if="isContentOverflow" :class="index !== -1 ? 'pl-40px' : ''"
+            <div v-if="isContentOverflow" :class="index !== -1 ? 'ml-40px' : ''"
                 class="justify-between items-center flex">
                 <div class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]">
                     <!-- <Icon name="custom:translation"/>{{ t('viewTranslation') }} -->
@@ -102,7 +102,7 @@
     </div>
 </template>
 <script setup name="twitterTrackerListItem">
-import { followKol, unfollowAll } from '~/api/twitter'
+import { followKol, unfollowKol } from '~/api/twitter'
 import { processTwitterText } from '~/utils'
 const trackerStore = useTwitterTrackerStore()
 const { t } = useI18n()
@@ -147,6 +147,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     window.removeEventListener('resize', checkContentOverflow)
+    tooltipRefs.value = {}
 })
 
 watch(() => props.item?.content, () => {
@@ -174,7 +175,7 @@ const _followKol = async (author_id, index) => {
 
 const _unfollowKol = async (author_id, index) => {
     try {
-        await unfollowAll(author_id)
+        await unfollowKol(author_id)
         ElMessage.success(t('cancelFollowed'))
         trackerStore.list[index].author.follow_status = 0
     } catch (error) {

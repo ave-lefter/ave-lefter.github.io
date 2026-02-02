@@ -24,7 +24,7 @@ import { DeBoxChatWidget } from '@debox-pro/chat-widget-html'
 import { _getConversationId } from '@/api/debox'
 import { getAddressAndChainFromId } from '@/utils'
 import { useLocalStorage, useStorage } from '@vueuse/core'
-const deboxConversation = useStorage<Record<string, string>>('deboxCoversation', {}, sessionStorage)
+// const deboxConversation = useStorage<Record<string, string>>('deboxCoversation', {}, sessionStorage)
 const route = useRoute()
 const conversationId = shallowRef('')
 const supportChain: Record<string, number> = {

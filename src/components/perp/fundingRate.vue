@@ -121,6 +121,7 @@ const reset = () => {
       class="[&&]:[--el-select-width:110px]"
       popper-class="[--el-font-size-base:12px]"
       :suffix-icon="SuffixIcon"
+      :persistent="false"
       @change="reset"
     >
       <template #prefix>

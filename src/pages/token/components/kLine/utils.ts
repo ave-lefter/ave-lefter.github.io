@@ -8,7 +8,7 @@ import { bot_getUserPendingTx, bot_cancelLimitOrdersByBatch, bot_getUserWalletTx
 import { RESOLUTION_KEY, QUICK_KEY } from './constant'
 import { _getHoldersList } from '~/api/holders'
 
-export const supportSecChains = ['solana', 'bsc', 'eth', 'base', 'tron', 'mixmax', 'xlayer']
+export const supportSecChains = [ 'bsc', 'base', 'mixmax', 'xlayer']
 
 export function switchResolution(resolution: string) {
   const obj: Record<string, string> = {
@@ -122,39 +122,21 @@ export function formatToMarks(
 export function initTradingViewIntervals(currentResolution: string, chain: string, isSupportSecChains: boolean): string {
   // const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
   // const RESOLUTION_KEY = 'tv_resolution'
-  const DEFAULT_LIST = ['1', '5', '15', '60', '240', '1D', '1W']
-  const SEC_LIST = ['1S', '5S', '15S', '30S', ...DEFAULT_LIST]
-  const Sol_LIST = ['1S', ...DEFAULT_LIST]
-
+  const DEFAULT_LIST = ['1S', '5S', '1', '5', '15', '60', '240', '1D', '1W']
+  const SUPPORT_LIST = ['1S', '5S', '15S', '30S', '5S', '1', '5', '15', '60', '240', '1D', '1W']
   let list: string[]
-
   const stored = localStorage.getItem(QUICK_KEY)
   if (!stored) {
-    list = isSupportSecChains ? (chain === 'solana' ? Sol_LIST : SEC_LIST) : DEFAULT_LIST
+    list = isSupportSecChains ? SUPPORT_LIST : DEFAULT_LIST
     localStorage.setItem(QUICK_KEY, JSON.stringify(list))
     localStorage.setItem('tradingViewIntervalSet', 'true')
   } else {
     list = JSON.parse(stored)
-
-    const has1S = list.includes('1S')
-    const shouldHave1S = isSupportSecChains
-    if (shouldHave1S && chain !== 'mixmax' && chain !== 'xlayer' && chain !== 'base') {
-      if (!has1S || ['5S', '15S', '30S'].some((i) => list?.includes(i))) {
-        list = list?.filter?.((i) => !i?.endsWith('S')) || []
-        list = ['1S'].concat(list)
-        localStorage.setItem(QUICK_KEY, JSON.stringify(list))
-      }
-    } else if (
-      shouldHave1S &&
-      ['1S', '5S', '15S', '30S'].some((i) => !list?.includes(i)) &&
-      (chain === 'mixmax' || chain === 'xlayer' || chain === 'base')
-    ) {
-      list = list?.filter?.((i) => !i?.endsWith('S')) || []
-      list = ['1S', '5S', '15S', '30S'].concat(list)
+    if (isSupportSecChains && ['1S', '5S', '15S', '30S'].some((i) => !list?.includes(i))) {
+      list = SUPPORT_LIST
       localStorage.setItem(QUICK_KEY, JSON.stringify(list))
-    } else if (!shouldHave1S && ['1S', '5S', '15S', '30S'].some((i) => list?.includes(i))) {
-      // list = list.filter((i) => i !== '1S')
-      list = list?.filter?.((i) => !i?.endsWith('S')) || []
+    } else if (!isSupportSecChains) {
+      list = DEFAULT_LIST
       localStorage.setItem(QUICK_KEY, JSON.stringify(list))
     }
   }

@@ -13,7 +13,7 @@
       </div>
       <!-- <div class="flex items-center gap-5px" v-show="isAutoSellConfig" > -->
       <div class="flex items-center gap-5px">
-        <el-select popper-class="w-selectAutoSell" v-model="autoSellConfigName" :placeholder="t('defaultPolicy')" style="width: 110px" @change="changeAutoSellConfig" placement="bottom-end" :persistent="true" size="small" :disabled="!isAutoSellConfig" v-tooltip="autoSellConfigNameStr">
+        <el-select popper-class="w-selectAutoSell" v-model="autoSellConfigName" :placeholder="t('defaultPolicy')" style="width: 110px" @change="changeAutoSellConfig" placement="bottom-end" :persistent="false" size="small" :disabled="!isAutoSellConfig" v-tooltip="autoSellConfigNameStr">
           <li class="el-select-dropdown__item text-[--third-text]!">{{ t('defaultPolicy') }}</li>
           <el-option
             v-for="item in autoSellConfigOption"
@@ -278,7 +278,7 @@ function triggerAutoSellConfig() {
   }
 }
 :deep() .el-select--small .el-select__wrapper.el-select__wrapper{
-  padding: 5px 8px !important; 
+  padding: 5px 8px !important;
   font-weight: 500;
   font-size: 10px;
   line-height: 14px;
@@ -299,6 +299,6 @@ function triggerAutoSellConfig() {
     line-height: 24px;
     height: 24px;
   }
-  
+
 }
 </style>
