@@ -301,8 +301,16 @@ watch(
 
 watch(()=>followAuthorIds.value,()=>{
   if(isMine.value){
-    trackerStore.list = trackerStore.list.filter(el=>followAuthorIds.value.includes(el.author_id))
+    trackerStore.list = trackerStore.list.filter(el=>{
+      return followAuthorIds.value.includes(el.author.author_id)
+    })
   }
+})
+
+useVisibilityChange(()=>{
+  trackerStore.list = []
+  query.value.page_token = ''
+  getList()
 })
 </script>
 

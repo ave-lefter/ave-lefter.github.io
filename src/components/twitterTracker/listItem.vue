@@ -17,7 +17,8 @@
                                 <img v-if="item.verified" :width="12" src="@/assets/images/kol.svg" alt="">
                                 <TimerCount
                                     v-if="item.created_at && Number(formatTimeFromNow(item.created_at, true)) < 60"
-                                    :key="`${item.created_at}`" :timestamp="+item.created_at" :end-time="60">
+                                    :key="`${item.created_at}`"
+                                    :timestamp="Math.min(+item.created_at, dayjs().unix() - 1)" :end-time="60">
                                     <template #default="{ seconds }">
                                         <span class="color-[--up-color] text-12px">
                                             <template v-if="seconds < 60"> {{ seconds }}s </template>
@@ -73,10 +74,10 @@
                         ]
                     }" @show="handleTooltipShow(mediaIndex)">
                     <template #default>
-                        <img :src="media.media_url_https" alt="" class="w-full max-h-300px rounded-8px object-cover">
+                        <img :src="media.media_url_https||media.url" alt="" class="w-full max-h-300px rounded-8px object-cover">
                     </template>
                     <template #content>
-                        <img :src="media.media_url_https" alt="" class="max-w-50vw max-h-50vh object-cover rounded-8px"
+                        <img :src="media.media_url_https||media.url" alt="" class="max-w-50vw max-h-50vh object-cover rounded-8px"
                             @load="handleImageLoad(mediaIndex)">
                     </template>
                 </el-tooltip>
@@ -106,8 +107,10 @@
 </template>
 <script setup name="twitterTrackerListItem">
 import { useStorage } from '@vueuse/core'
+import dayjs from 'dayjs'
 import { followKol, unfollowKol } from '~/api/twitter'
 import { processTwitterText } from '~/utils'
+const emits = defineEmits(['measureElement'])
 const trackerStore = useTwitterTrackerStore()
 const { t } = useI18n()
 const botStore = useBotStore()
@@ -184,6 +187,10 @@ const _followKol = async (author_id, index) => {
             botStore.changeConnectVisible(true)
             return
         }
+        if (followIds.value.length >= 50) {
+            ElMessage.error(t('twitterMax'))
+            return
+        }
         await followKol(author_id)
         ElMessage.success(t('followed'))
         trackerStore.list[index].author.follow_status = 1
@@ -218,6 +225,7 @@ const handleTooltipShow = (mediaIndex) => {
 }
 
 const handleImageLoad = (mediaIndex) => {
+    emits('measureElement')
     // 图片加载完成后更新 tooltip 位置
     nextTick(() => {
         updateTooltipPosition(mediaIndex)
