@@ -3,7 +3,7 @@
     <el-calendar
       v-show="!isChartView"
       :model-value="new Date()"
-      class="[&&]:[--el-calendar-cell-width:44px]"
+      class="[&&]:[--el-calendar-cell-width:44px] [&&]:[--el-fill-color-blank:transparent]"
     >
       <template #header>
         <PnlCalendarHeader
