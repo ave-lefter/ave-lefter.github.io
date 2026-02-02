@@ -43,7 +43,6 @@ const props = defineProps({
   },
 })
 const botStore = useBotStore()
-const walletStore = useWalletStore()
 const trackerStore = useTwitterTrackerStore()
 const isEmpty = computed(() => trackerStore.list.length === 0)
 
