@@ -1032,14 +1032,9 @@ async function initChart() {
     },
   })
   if (isUnload) {
-    if (import.meta.dev) console.log('[MEM_DEBUG] KLine widget created but isUnload, removing')
     w.remove()
     return
   }
-  // #region agent log
-  debugLog({ hypothesisId: 'C', location: 'KLine:widget_assigned', message: 'widget created', data: { chartContainerId: chartContainerId.value, mountCounter } })
-  // #endregion
-  if (import.meta.dev) console.log('[MEM_DEBUG] KLine widget assigned _widget')
   _widget = w
   updateChartBackground()
 
@@ -1348,16 +1343,8 @@ function setIframeCssVar() {
 onBeforeUnmount(() => {
   isUnload = true
   cleanupWidgetSubscriptions()
-  try {
-    performance.clearMeasures()
-    performance.clearMarks()
-  } catch (_) {}
-  const el = document.getElementById(chartContainerId.value)
-  capturedContainerEl = el || null
-  capturedIframe = el?.querySelector('iframe') || null
   _widget?.remove?.()
   _widget = null
-  if (import.meta.dev) console.log('[MEM_DEBUG] KLine onBeforeUnmount, isUnload=true')
 })
 
 const clickHandler = () => {
@@ -1400,31 +1387,18 @@ onUnmounted(() => {
     })
   })
   listenerGuidMap?.clear()
-  const containerEl = capturedContainerEl || document.getElementById(chartContainerId.value)
-  // #region agent log
-  debugLog({ hypothesisId: 'D', location: 'KLine:onUnmounted_before_remove', message: 'DOM state', data: { hasContainer: !!containerEl, hasCaptured: !!capturedContainerEl, hasParent: !!containerEl?.parentNode, chartContainerId: chartContainerId.value } })
-  // #endregion
-  if (capturedIframe) {
-    try {
-      capturedIframe.src = 'about:blank'
-    } catch (_) {}
-  }
+  const containerEl = document.getElementById(chartContainerId.value)
   if (containerEl) {
     const iframe = containerEl.querySelector('iframe')
-    if (iframe && !capturedIframe) {
+    if (iframe) {
       try {
         iframe.src = 'about:blank'
-      } catch (_) {}
+      } catch {
+        console.warn('iframe src about:blank failed')
+      }
     }
+    if (containerEl?.parentNode) containerEl.parentNode.removeChild(containerEl)
   }
-  if (containerEl?.parentNode) containerEl.parentNode.removeChild(containerEl)
-  capturedContainerEl = null
-  capturedIframe = null
-  // #region agent log
-  const stillInDom = !!document.getElementById(chartContainerId.value)
-  debugLog({ hypothesisId: 'D', location: 'KLine:onUnmounted_after_remove', message: 'DOM state', data: { containerGone: !stillInDom, chartContainerId: chartContainerId.value } })
-  debugLog({ hypothesisId: 'C', location: 'KLine:onUnmounted', message: 'widget removed', data: { chartContainerId: chartContainerId.value } })
-  // #endregion
 })
 const emit = defineEmits(['refresh'])
 function refresh() {
