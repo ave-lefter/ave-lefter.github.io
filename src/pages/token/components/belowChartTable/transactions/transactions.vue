@@ -363,25 +363,29 @@ watch(() => klineDateFilter?.value, (val) => {
 })
 
 watch(() => tokenStore.pairAddress, (pair, oldPair) => {
+  console.log('watch pair', pair, oldPair)
   if (tokenStore.pairAddress) {
+    resetCache()
     _getPairLiq()
     subscribeLiq(pair, oldPair)
+    tableFilter.value.markerAddress = ''
+    filterSubmit()
   }
 }, {
   immediate: true
 })
 
-watch(() => route.params.id, val => {
-  if (val) {
-    resetCache()
-    tableFilter.value.markerAddress = ''
-    if (tokenStore.pairAddress) {
-      filterSubmit()
-    }
-  }
-}, {
-  immediate: true
-})
+// watch(() => route.params.id, val => {
+//   if (val) {
+//     resetCache()
+//     tableFilter.value.markerAddress = ''
+//     if (tokenStore.pairAddress) {
+//       filterSubmit()
+//     }
+//   }
+// }, {
+//   immediate: true
+// })
 
 watch(() => followStore.currentAddress, () => {
   if (activeTab.value === '-100') {
@@ -560,7 +564,7 @@ function subscribeLiq(pair: string, oldPair?: string) {
 
 const updatePairTxs = useThrottleFn(() => {
   tokenTxs.value.unshift(...wsPairCache.value)
-  // tokenTxs.value = tokenTxs.value.slice(0, 300)
+  tokenTxs.value = tokenTxs.value.slice(0, 300)
   wsPairCache.value.length = 0
   triggerRef(tokenTxs)
 }, 100)
@@ -987,6 +991,7 @@ onUnmounted(() => {
 
 <template>
   <div ref="txs-container" class="transactions">
+    <!-- isPausedTxs:{{ isPausedTxs }} -->
     <div class="px-12px mb-10px flex justify-between">
       <div
         ref="tabsContainer"
