@@ -74,10 +74,10 @@
                         ]
 }" @show="handleTooltipShow(mediaIndex)">
                     <template #default>
-                        <img :src="media.media_url_https" alt="" class="w-full max-h-300px rounded-8px object-cover">
+                        <img :src="media.media_url_https||media.url" alt="" class="w-full max-h-300px rounded-8px object-cover">
                     </template>
                     <template #content>
-                        <img :src="media.media_url_https" alt="" class="max-w-50vw max-h-50vh object-cover rounded-8px"
+                        <img :src="media.media_url_https||media.url" alt="" class="max-w-50vw max-h-50vh object-cover rounded-8px"
                             @load="handleImageLoad(mediaIndex)">
                     </template>
                 </el-tooltip>
@@ -107,6 +107,7 @@ import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { followKol, unfollowKol } from '~/api/twitter'
 import { processTwitterText } from '~/utils'
+const emits = defineEmits(['measureElement'])
 const trackerStore = useTwitterTrackerStore()
 const { t } = useI18n()
 const botStore = useBotStore()
@@ -205,6 +206,7 @@ const handleTooltipShow = (mediaIndex) => {
 }
 
 const handleImageLoad = (mediaIndex) => {
+    emits('measureElement')
     // 图片加载完成后更新 tooltip 位置
     nextTick(() => {
         updateTooltipPosition(mediaIndex)
