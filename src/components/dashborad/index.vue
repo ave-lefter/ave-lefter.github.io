@@ -152,7 +152,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 const configStore = useConfigStore()
 const timeTabs = ['5m', '1h', '6h', '24h']
-const activeTime = ref('5m')
+const activeTime = ref('24h')
 const currentTimeData = ref<DashboardStatItem | null>(null)
 const dashboardData = ref<DashboardDataResponse | null>(null)
 const platforms = ref([])
@@ -254,12 +254,16 @@ onMounted(() => {
 
 // 监听时间选项变化
 watch(() => activeTime.value, () => {
-  updateCurrentTimeData()
+  _getDashboardData().then(() => {
+    updateCurrentTimeData()
+  })
 })
 
 // 监听钱包链变化
 const walletStore = useWalletStore()
 watch(() => walletStore.chain, () => {
-  updateCurrentTimeData()
+  _getDashboardData().then(() => {
+    updateCurrentTimeData()
+  })
 })
 </script>
