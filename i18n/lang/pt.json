@@ -600,5 +600,12 @@
   "noticeDuration": "Tempo de exibição da notificação",
   "monitorThTip": "Escolha pelo menos um avatar e endereço de carteira",
   "wcWalletTip": "Digitalize este código QR com seu telefone",
-  "monitorBotError": "O endereço do robô de monitoramento não é compatível"
+  "monitorBotError": "O endereço do robô de monitoramento não é compatível",
+  "marketNavigation": "Navegação de Mercado",
+  "totalTransactions": "Transações Totais",
+  "traderCount": "Contagem de Traders",
+  "24hVolume": "Volume 24h",
+  "tokenStats": "Estatísticas de Token",
+  "created": "Criado",
+  "topPlatforms": "Principais Plataformas"
 }

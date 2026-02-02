@@ -1450,5 +1450,12 @@
   "noticeDuration": "알림 표시 시간",
   "monitorThTip": "하나 이상의 지갑 아바타와 지갑 주소를 선택하세요.",
   "wcWalletTip": "휴대폰으로 이 QR 코드를 스캔하세요.",
-  "monitorBotError": "모니터링 로봇 주소는 지원되지 않습니다."
+  "monitorBotError": "모니터링 로봇 주소는 지원되지 않습니다.",
+  "marketNavigation": "시장 탐색",
+  "totalTransactions": "총 거래 수",
+  "traderCount": "거래자 수",
+  "24hVolume": "24시간 거래량",
+  "tokenStats": "토큰 통계",
+  "created": "생성됨",
+  "topPlatforms": "톱 플랫폼"
 }

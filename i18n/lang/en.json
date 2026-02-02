@@ -1986,5 +1986,12 @@
   "similarTokens": "Similar Tokens",
   "top100": "Top100 moving average",
   "follows": "Follows",
-  "joined": "Joined"
+  "joined": "Joined",
+  "marketNavigation": "Market Navigation",
+  "totalTransactions": "Total Transactions",
+  "traderCount": "Trader Count",
+  "24hVolume": "24h Volume",
+  "tokenStats": "Token Stats",
+  "created": "Created",
+  "topPlatforms": "Top Platforms"
 }

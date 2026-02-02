@@ -596,5 +596,12 @@
   "noticeDuration": "Bildirim görüntüleme süresi",
   "monitorThTip": "En az bir cüzdan avatarı ve cüzdan adresi seçin",
   "wcWalletTip": "Bu QR Kodunu telefonunuzla tarayın",
-  "monitorBotError": "İzleme robotu adresi desteklenmiyor"
+  "monitorBotError": "İzleme robotu adresi desteklenmiyor",
+  "marketNavigation": "Pazar Gezinimi",
+  "totalTransactions": "Toplam İşlem",
+  "traderCount": "İşlemci Sayısı",
+  "24hVolume": "24 Saat Hacim",
+  "tokenStats": "Token İstatistikleri",
+  "created": "Oluşturuldu",
+  "topPlatforms": "En İyi Platformlar"
 }

@@ -1450,5 +1450,12 @@
   "noticeDuration": "通知表示時間",
   "monitorThTip": "少なくとも 1 つのウォレット アバターとウォレット アドレスを選択してください",
   "wcWalletTip": "この QR コードを携帯電話でスキャンしてください",
-  "monitorBotError": "監視ロボットのアドレスはサポートされていません"
+  "monitorBotError": "監視ロボットのアドレスはサポートされていません",
+  "marketNavigation": "市場ナビゲーション",
+  "totalTransactions": "総取引数",
+  "traderCount": "トレーダー数",
+  "24hVolume": "24時間ボリューム",
+  "tokenStats": "トークン統計",
+  "created": "作成",
+  "topPlatforms": "トッププラットフォーム"
 }

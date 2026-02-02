@@ -18,6 +18,7 @@
           '$' + formatDec(showPrice?.current_price_usd || 0, 2)
         }}</span>
       </NuxtLink>
+
       <el-popover
         popper-style="padding: 12px;min-width: 132px"
         width="132"
@@ -91,6 +92,19 @@
           {{ t('twitterTracker') }}
         </div>
       </el-badge>
+
+      <el-popover popper-style="padding: 0;border-radius: 8px;" width="auto" placement="top" :teleported="false" trigger="hover">
+        <template #reference>
+          <div
+            class="flex items-center gap-4px cursor-pointer hover:color-[--main-text] ml-12px"
+            :class="'color-[--secondary-text]'"
+          >
+            <Icon name="mdi:compass" class="text-14px" />
+            {{ $t('marketNav') }}
+          </div>
+        </template>
+        <Dashborad />
+      </el-popover>
     </div>
     <ul class="right">
       <li class="color-[--secondary-text] hover:color-[--main-text]">
