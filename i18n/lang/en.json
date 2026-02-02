@@ -1976,6 +1976,7 @@
   "smarterRatio": "Smarter Ratio",
   "devWallet": "DEV Wallet",
   "monitorBotError": "Monitoring robot address not supported",
+  "twitterMax":"You can monitor up to 50 Twitter accounts",
   "tokenStatistics": "Token Statistics",
   "dev3": "Developer",
   "highestRecord": "Highest Record",

@@ -620,7 +620,7 @@ watch(() => visible.value, (val) => {
       settingCopyTrade.value[form.value.chain] = JSON.parse(copy_setting_default)[form.value.chain]
       form.value.slippage = settingCopyTrade.value[form.value.chain]?.slippage || 9
       form.value.isPrivate = settingCopyTrade.value[form.value.chain]?.isPrivate || false
-      form.value.priorityFee = settingCopyTrade.value[form.value.chain]?.priorityFee || form.value.chain == 'solana' ? '0.04': '1'
+      form.value.priorityFee = settingCopyTrade.value[form.value.chain]?.priorityFee || form.value.chain == 'solana' ? '0.001' : '0.05'
     }
     const advancedForm_default = localStorage.getItem('copy-advancedForm')
     if (advancedForm_default && JSON.parse(advancedForm_default)) {
@@ -727,6 +727,7 @@ function createFollowOrder() {
       ([key, v]) =>  v && v !== ''
     )
   )
+  const priorityFee = form.value.priorityFee || form.value?.chain == 'solana' ? '0.001' : '0.05'
   let data = {
     ...filtered,
     tgUid: botStore?.userInfo?.tgUid || '',
@@ -741,9 +742,9 @@ function createFollowOrder() {
     stopLossRatio: Number(form.value.stopLossRatio) * 100,
     ignoreHeld: form.value.ignoreHeld,
 
-    slippage: form.value.slippage * 100, //滑点
+    slippage: (form.value.slippage || 9) * 100, //滑点
     isPrivate: form.value.isPrivate, //防夹
-    priorityFee: form.value.priorityFee || form.value?.chain == 'solana' ? '0.04': '1',
+    priorityFee: new BigNumber(priorityFee || 0).multipliedBy(10 ** currentUser.value?.decimals!),
     tokenBlacklist: tokenBlacklist?.value?.filter(Boolean),
   }
   // ...(form.value?.id ? { id: form.value.id } : {}),

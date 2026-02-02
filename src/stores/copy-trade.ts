@@ -72,12 +72,13 @@ export const useCopyTradeStore = defineStore('copyTrade', () => {
   //   'copy_setting',
   //   {}
   // )
+
   const settingCopyTrade = ref<Partial<Record<CopyTradeChain, CopyTradeSetting>>>({})
   SupportCopyTradeChain.forEach((chain) => {
     if (!settingCopyTrade.value[chain]) {
       settingCopyTrade.value[chain] = {
         ...defaultCopyTradeSetting,
-        priorityFee: chain == 'solana' ? '0.04' : '1',
+        priorityFee: chain == 'solana' ? '0.001' : '0.05',
       }
     }
   })

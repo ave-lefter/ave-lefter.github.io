@@ -24,6 +24,7 @@
     "@mysten/wallet-standard": "^0.16.3",
     "@solana/spl-token": "^0.4.13",
     "@solana/web3.js": "^1.98.2",
+    "@tanstack/vue-virtual": "^3.13.18",
     "@tonconnect/ui": "^2.3.1",
     "@tronweb3/tronwallet-adapters": "^1.2.9",
     "@vueuse/components": "^13.9.0",
