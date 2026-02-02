@@ -891,7 +891,7 @@ function cleanupSubscriptions() {
     try {
       wsStore.send({
         jsonrpc: '2.0',
-        params: ['liq', tokenStore.pairAddress || tokenStore.pair?.pair || pairAddress.value || ''],
+        params: ['liq', tokenStore.pairAddress || tokenStore.pair?.pair],
         id: 1,
         method: 'unsubscribe'
       })

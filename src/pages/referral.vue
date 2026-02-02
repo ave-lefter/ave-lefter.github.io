@@ -1240,7 +1240,7 @@ onMounted(() => {
 .t-l + .t-l {
   margin-top: 5px;
 }
-:deep {
+:deep() {
   .el-table.el-table thead .el-table__cell {
     height: 40px;
   }
