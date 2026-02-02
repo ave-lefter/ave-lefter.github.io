@@ -309,7 +309,7 @@ const list = computed(() => {
   // }
   const menues = [
     { id: 'index', name: t('pump1'), src: '/', target: '_self' },
-    {id: 'chain', name: t('markets'), src: '/chain', target: '_self'},
+    {id: 'markets', name: t('markets'), src: '/markets', target: '_self'},
     { id: 'follow', name: t('follow'), src: '/follow' },
     {id: 'smart', name: t('signal2'), src: '/smart', target: '_self'},
     {id: 'copy-trade', name: t('copyTrade'), src: '/copy-trade', target: '_self'},
