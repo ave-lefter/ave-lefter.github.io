@@ -47,7 +47,7 @@ const aveTableRef = ref<InstanceType<typeof AveTable> | null>(null)
 const firstActivated = ref(true)
 const followStore = useFollowStore()
 const themeStore = useThemeStore()
-onActivated(() => {
+onMounted(() => {
   if (!firstActivated.value && aveTableRef.value) {
     aveTableRef.value.scrollToTop(0)
   }
@@ -316,7 +316,6 @@ const _getTokenTxs = useThrottleFn(async () => {
           }
         }).reverse()
       }
-      listStatus.value.finished = data?.length < listStatus.value.pageSize
       if (!listStatus.value.finished) {
         listStatus.value.page_token = page_token
       }
@@ -561,7 +560,7 @@ function subscribeLiq(pair: string, oldPair?: string) {
 
 const updatePairTxs = useThrottleFn(() => {
   tokenTxs.value.unshift(...wsPairCache.value)
-  tokenTxs.value = tokenTxs.value.slice(0, 300)
+  // tokenTxs.value = tokenTxs.value.slice(0, 300)
   wsPairCache.value.length = 0
   triggerRef(tokenTxs)
 }, 100)
