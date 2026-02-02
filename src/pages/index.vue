@@ -1522,7 +1522,7 @@ function mergeStatisticsList(
     if (obj.total != null) {
       next.total = Number(obj.total)
     }
-    if (next.chain == 'bsc') {
+    if (next.chain == 'bsc' || next.chain == 'solana') {
       if (next.amm === 'flapswap') {
         next.market_cap = Number(next.total) * next.current_price_usd || 1000000000 * next.current_price_usd || next.market_cap || 4900
       } else {
