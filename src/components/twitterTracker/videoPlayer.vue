@@ -16,14 +16,17 @@ const videoPlayer = ref(null)
 let player = null
 
 onMounted(() => {
-    console.log('props.sources',props.sources)
   // Initialize the Video.js player once the component is mounted (client-side)
+  const sources = props.sources?.map?.(el=>({
+    src:el.url,
+    type:el.content_type
+  }))
   player = videojs(videoPlayer.value, {
     autoplay: false,
     controls: true,
     responsive: true,
     fluid: true,
-    sources: props.sources
+    sources
 }, () => {
     // Player is ready
   })

@@ -83,7 +83,10 @@
                 </el-tooltip>
                 <div v-else class="h-full">
                     <!-- <video ref="videoPlayer" :poster="media.media_url_https" :src="findMediaUrl(media)" class="w-full h-full object-cover video-js vjs-default-skin" controls /> -->
-                     <VideoPlayer :sources="media.video_info?.variants"/>
+                     <iframe :srcdoc="`
+                     <meta name=&quot;referrer&quot; content=&quot;no-referrer&quot; />
+                      <video poster=${media.media_url_https} src=${findMediaUrl(media)} controls />
+                     `" frameborder="0"/>
                 </div>
                 <!-- <div v-if="media.type === 'video'" class="absolute top-0 left-0 w-full h-full bg-black/50 rounded-8px">
                     <Icon name="custom:play-circle-line"
@@ -111,7 +114,7 @@ import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { followKol, unfollowKol } from '~/api/twitter'
 import { processTwitterText } from '~/utils'
-import VideoPlayer from './videoPlayer.vue'
+
 const emits = defineEmits(['measureElement'])
 const trackerStore = useTwitterTrackerStore()
 const { t } = useI18n()
