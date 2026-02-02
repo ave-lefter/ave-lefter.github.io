@@ -104,16 +104,20 @@
             </div>
           </template>
         </el-popover>
-        <Icon
-          :name="globalStore.audioSettings.audio.twitter ? 'custom:ad' : 'custom:admute'"
-          class="cursor-pointer"
-          @click="globalStore.audioSettings.active = 'audio'"
-        />
-        <el-popover :persistent="false" trigger="click">
-          <template #reference>
-            <Icon name="material-symbols:language"/>
-          </template>
-        </el-popover>
+         <Icon
+            class="cursor-pointer"
+            :name="globalStore.audioSettings.audio.twitter ? 'custom:ad' : 'custom:admute'"
+            @click="globalStore.audioSettings.active = 'audio'"
+          />
+        <!-- <el-dropdown :persistent="false" trigger="click">
+            <div class="w-24px h-24px bg-[--main-list-hover] flex items-center justify-center rounded-4px cursor-pointer"><Icon name="material-symbols:language"/></div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                      <el-dropdown-item>Action 1</el-dropdown-item>
+                      <el-dropdown-item>Action 2</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+        </el-dropdown> -->
       </div>
       <el-input
       v-model="query.token_keyword"
@@ -139,7 +143,7 @@
 </template>
 
 <script setup name="trackerPop">
-import { useStorage } from '@vueuse/core'
+import { useDebounceFn, useStorage } from '@vueuse/core'
 import TwitterTrackerList from './list.vue'
 import { getAllFollowIds, getTwitterList } from '~/api/twitter'
 import { useV2WSStore } from '~/stores/v2ws'
@@ -234,7 +238,7 @@ const confirmQuery = () => {
   }
   getList()
 }
-// const debouncedConfirmInput = useDebounceFn(confirmQuery, 300)
+const debouncedConfirmInput = useDebounceFn(confirmQuery, 300)
 
 const getList = async () => {
   // const _follow_only = isMine.value || follow_only.value
