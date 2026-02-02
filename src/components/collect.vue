@@ -25,7 +25,8 @@ const userFavoriteGroupsWithDefault = computed(()=>{
     }].concat(props.userFavoriteGroups)
 })
 
-function clickStar() {
+function changeVisible(value:boolean) {
+  if (value) {
     if(!verifyLogin()){
         return
     }
@@ -34,7 +35,21 @@ function clickStar() {
     } else {
         popoverVisible.value = true
     }
+  } else {
+    popoverVisible.value = false
+  }
 }
+
+// function clickStar() {
+//     if(!verifyLogin()){
+//         return
+//     }
+//     if(props.isCollected){
+//         emit('collect')
+//     } else {
+//         popoverVisible.value = true
+//     }
+// }
 
 const onConfirm = () => {
     // 如果未关注，则关注
@@ -52,9 +67,14 @@ const onConfirm = () => {
     hidePopover()
 }
 
-document.addEventListener('click',hidePopover)
+const isMounted = ref(false)
+
+onMounted(()=>{
+    isMounted.value = true
+})
+
 onUnmounted(()=>{
-   document.removeEventListener('click',hidePopover)
+    isMounted.value = false
 })
 
 function hidePopover() {
@@ -70,12 +90,12 @@ function changeActiveGroupId(groupId:number) {
 </script>
 
 <template>
-    <el-popover popper-class="[&&]:[--el-popover-padding:0]" :visible="popoverVisible" trigger="click" width="248px">
+    <el-popover v-if="isMounted" :visible="popoverVisible" @update:visible="e => changeVisible(e)" :teleported="true" :persistent="false" popper-class="[&&]:[--el-popover-padding:0]"
+        trigger="click" width="248px">
         <template #reference>
             <Icon
                 name="custom:star"
                 :class="`${iconClass} ${isCollected ? 'color-[--yellow]' : 'color-[--icon-color]'}`"
-                @click.self.stop="clickStar"
             />
         </template>
         <template #default>

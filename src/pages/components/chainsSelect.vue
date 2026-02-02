@@ -47,6 +47,7 @@ const currentChain = computed(() => {
   <el-select
     v-model="_activeChain"
     :suffix-icon="SuffixIcon"
+    :persistent="false"
     class="[&&]:[--el-select-width:auto] shrink-0"
   >
     <template #header>

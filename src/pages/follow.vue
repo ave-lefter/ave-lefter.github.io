@@ -15,7 +15,8 @@ const { t } = useI18n()
 const defaultPath=ref('/follow/token')
 const globalStore = useGlobalStore()
 const height = computed(()=>{
-  return globalStore.tokenHistoryVisible ? 'calc(100vh - 125px)':'calc(100vh - 92px)'
+  return 'calc(100vh - 92px)'
+  // return globalStore.tokenHistoryVisible ? 'calc(100vh - 125px)':'calc(100vh - 92px)'
 })
 const tabData=computed(()=>[
   {

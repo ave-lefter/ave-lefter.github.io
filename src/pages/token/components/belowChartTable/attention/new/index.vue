@@ -67,7 +67,7 @@ watch(() => useFollowStore().currentAddress, (val) => {
     attentionList.value = []
   }
 })
-onActivated(() => {
+onMounted(() => {
   if (props.currentActiveTab == 'Attention') {
     getAttentionList()
   }

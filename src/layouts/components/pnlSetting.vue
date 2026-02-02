@@ -60,6 +60,7 @@ function resetBg() {
     align-center
     :title="$t('PnlSetting')"
     width="360px"
+    destroy-on-close
     :close-on-click-modal="false"
     class="pnl-setting-dialog"
   >

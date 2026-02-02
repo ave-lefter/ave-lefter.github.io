@@ -62,7 +62,8 @@ const columns = computed(() => {
     flex: 'flex-1 justify-end',
     sort: true
   }, {
-    label: t('Chg') + '%',
+    label: '24h%',
+    // label: t('Chg') + '%',
     value: 'price_change',
     flex: 'flex-1 justify-end',
     sort: true
@@ -119,11 +120,11 @@ const columns = computed(() => {
       <NuxtLink
         v-for="(row,$index) in sortedHotList"
         :key="$index"
-        class="px-10px flex items-center h-50px cursor-pointer hover:bg-[--dialog-bg] text-12px"
+        class="px-10px flex items-center h-40px cursor-pointer hover:bg-[--dialog-bg] text-12px"
         :to="`/token/${row.token}-${row.chain}`"
       >
         <div class="flex-1 flex items-center">
-          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+          <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
             <template #default>
               <TokenImg :row="row"/>
             </template>
@@ -177,13 +178,13 @@ const columns = computed(() => {
               ${{ formatNumber(row.current_price_usd, 4) }}
             </template>
           </div>
-          <div :class="getColorClass(row.price_change)">
-            <template v-if="Number(row.price_change) === 0">0</template>
-            <template v-else-if="row.price_change === '--'">--</template>
+          <div :class="getColorClass(row.price_change_v2)">
+            <template v-if="Number(row.price_change_v2) === 0">0</template>
+            <template v-else-if="row.price_change_v2 === '--'">--</template>
             <template v-else>
               {{
-                Number(row.price_change) > 0 ? '+' : '-'
-              }}{{ formatNumber(Math.abs(Number(row.price_change)), 2) }}%
+                Number(row.price_change_v2) > 0 ? '+' : '-'
+              }}{{ formatNumber(Math.abs(Number(row.price_change_v2)), 2) }}%
             </template>
           </div>
         </div>

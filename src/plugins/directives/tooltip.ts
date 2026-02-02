@@ -3,12 +3,16 @@ import type { ElTooltipProps } from 'element-plus'
 
 interface HTMLElementDirective extends HTMLElement {
   __tooltipHandlers?: {
-    onMouseEnter: (e: MouseEvent) => void
-    onMouseLeave: (e: MouseEvent) => void
-    showTooltip: () => void
-  }
-  __lastTooltipValue?: TooltipValue
+    onMouseEnter: null | ((e: MouseEvent) => void)
+    onMouseLeave: null | ((e: MouseEvent) => void)
+    showTooltip: (() => void) | null
+  } | null
+  __tooltipContext?: {
+    binding: DirectiveBinding<TooltipValue> | null
+  } | null
+  __lastTooltipValue?: TooltipValue | null
   visible?: boolean
+  _tooltipInstance?: TooltipController | null
 }
 
 type TooltipValue =
@@ -37,10 +41,19 @@ interface TooltipController {
   hide: () => void
 }
 
-function resolveTooltip(el: HTMLElementDirective): TooltipController | undefined {
-  const { $tooltip } = useNuxtApp()
-  const instance = (el as any).__vueParentComponent?.proxy
-  return $tooltip || instance?.$tooltip || (el as any).__app?.config?.globalProperties?.$tooltip
+/**
+ * 修改点：根据指令参数绑定对应的 Tooltip 实例
+ */
+function resolveTooltip(el: HTMLElementDirective, arg?: string): TooltipController | undefined {
+  const { $tooltip, $createTooltip } = useNuxtApp()
+
+  // 如果使用了 v-tooltip:customId，则通过 $createTooltip(id) 获取或创建指定实例
+  if (arg && typeof $createTooltip === 'function') {
+    return $createTooltip(arg)
+  }
+
+  // 否则返回默认单例
+  return ($tooltip as TooltipController)
 }
 
 function isTooltipConfig(val: unknown): val is { content: any; props?: any } {
@@ -52,35 +65,37 @@ function isTooltipConfig(val: unknown): val is { content: any; props?: any } {
     typeof val !== 'function'
 }
 
-
-
 const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
   mounted(el, binding: DirectiveBinding<TooltipValue>) {
-    const tooltip = resolveTooltip(el)
+    // 1. 获取指定实例
+    const tooltip = resolveTooltip(el, binding.arg)
     if (!tooltip) {
-      console.warn('Tooltip instance not found')
+      console.warn('[Tooltip Directive] Instance not found')
       return
     }
+    el._tooltipInstance = tooltip // 缓存实例
 
-    if (el.__tooltipHandlers) return // 避免重复绑定
+    if (el.__tooltipHandlers) return
 
-    const raw = binding.modifiers?.raw ?? false
-    const value = binding.value
+    // 2. 存储当前 binding 到上下文，方便 updated 时动态读取最新值而不需要重新绑定事件
+    el.__tooltipContext = { binding }
 
     el.__tooltipHandlers = {
       showTooltip: () => {
+        const { value, modifiers } = el.__tooltipContext!.binding as DirectiveBinding
         let content: any = value
         let props: Partial<ElTooltipProps> & {
           'raw-content'?: boolean
           'popper-class'?: string
         } = {}
 
-        if (isTooltipConfig(binding.value)) {
-          content = (value as any)?.content
-          props = (value as any)?.props || {}
+        if (isTooltipConfig(value)) {
+          content = value.content
+          props = value.props || {}
         }
 
-        if (raw) {
+        // 处理修饰符 v-tooltip.raw
+        if (modifiers?.raw) {
           props['raw-content'] = true
         }
 
@@ -105,72 +120,58 @@ const tooltipDirective: Directive<HTMLElementDirective, TooltipValue> = {
         el.visible = false
       }
     }
-    el.onmouseenter = el.__tooltipHandlers.onMouseEnter
-    el.onmouseleave = el.__tooltipHandlers.onMouseLeave
+    if (el.__tooltipHandlers.onMouseEnter && el.__tooltipHandlers.onMouseLeave) {
+      el.addEventListener('mouseenter', el.__tooltipHandlers.onMouseEnter)
+      el.addEventListener('mouseleave', el.__tooltipHandlers.onMouseLeave)
+    }
     el.__lastTooltipValue = binding.value
   },
 
   updated(el, binding) {
-    const tooltip = resolveTooltip(el)
+    const tooltip = resolveTooltip(el, binding.arg)
     if (!tooltip) return
-
     // 只有值变了才更新 tooltip
     if (binding.value !== el.__lastTooltipValue) {
-      el.__lastTooltipValue = binding.value
-
-      let content: any = binding.value
-
-     el.__tooltipHandlers = {
-        showTooltip: () => {
-          let props: Partial<ElTooltipProps> & {
-            'raw-content'?: boolean
-            'popper-class'?: string
-          } = {}
-
-          if (isTooltipConfig(binding.value)) {
-            content = binding.value.content
-            props = binding.value.props || {}
-          }
-
-          if (binding.modifiers?.raw) {
-            props['raw-content'] = true
-          }
-          tooltip.show({
-            content,
-            target: el,
-            props: {
-              placement: 'top',
-              'popper-class': props['popper-class'] ?? '',
-              ...props,
-            },
-          })
-          el.visible = true
-        },
-        onMouseEnter: (e: MouseEvent) => {
-          e.stopPropagation()
-          el?.__tooltipHandlers?.showTooltip?.()
-        },
-        onMouseLeave: (e: MouseEvent) => {
-          e.stopPropagation()
-          tooltip.hide()
-          el.visible = false
-        }
+      if (el.__tooltipContext) {
+        el.__tooltipContext.binding = binding
       }
-      el.onmouseenter = el.__tooltipHandlers.onMouseEnter
-      el.onmouseleave = el.__tooltipHandlers.onMouseLeave
     }
   },
 
-  unmounted(el) {
-    const tooltip = resolveTooltip(el)
-    if (tooltip && el.visible) {
-      tooltip.hide()
+  unmounted(el, binding) {
+    // 卸载时确保隐藏当前实例
+    // const tooltip = resolveTooltip(el, binding.arg)
+    // unmounted 中
+    if (el._tooltipInstance) {
+      el._tooltipInstance.hide()
+      el._tooltipInstance = null // 清理引用
     }
-    const { onMouseEnter, onMouseLeave } = el.__tooltipHandlers || {}
-    if (onMouseEnter) el?.removeEventListener?.('mouseenter', onMouseEnter)
-    if (onMouseLeave) el?.removeEventListener?.('mouseleave', onMouseLeave)
+
+     // 2. 移除标准监听器 (核心步骤)
+    if (el.__tooltipHandlers) {
+      const { onMouseEnter, onMouseLeave } = el.__tooltipHandlers
+      if (onMouseEnter) el.removeEventListener('mouseenter', onMouseEnter)
+      if (onMouseLeave) el.removeEventListener('mouseleave', onMouseLeave)
+    }
+    if (el.__tooltipHandlers) {
+      el.__tooltipHandlers.onMouseEnter = null
+      el.__tooltipHandlers.onMouseLeave = null
+      el.__tooltipHandlers.showTooltip = null
+    }
+
+    if (el.__tooltipContext) {
+      el.__tooltipContext.binding = null
+    }
+
+    if (el.__lastTooltipValue) {
+      el.__lastTooltipValue = null
+    }
+    el.__tooltipContext = null
+    el.__tooltipHandlers = null
+    el.__lastTooltipValue = null
 
     delete el.__tooltipHandlers
+    delete el.__tooltipContext
     delete el.__lastTooltipValue
   },
 }

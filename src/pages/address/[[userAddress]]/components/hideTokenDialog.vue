@@ -49,6 +49,7 @@ async function confirm() {
     v-model="hideTokenVisible"
       append-to-body
       :title="$t('ConfirmHideToken')"
+      destroy-on-close
       class="dialog !w-540px text-12px"
     >
       <div>

@@ -46,7 +46,7 @@ const cancelOrder = async (id?: string) => {
 </script>
 
 <template>
-  <el-dialog v-model="visible" append-to-body :title="t('stopLimit')" width="800px">
+  <el-dialog v-model="visible" append-to-body :title="t('stopLimit')" width="800px" destroy-on-close>
     <el-table
       :data="orderList?.toSorted((a,b)=> (b?.createdTime || 0) - (a?.createdTime || 0))"
       header-row-class-name="text-12px sticky top-0 z-10 font-500"

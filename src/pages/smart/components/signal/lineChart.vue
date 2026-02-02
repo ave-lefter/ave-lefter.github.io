@@ -50,7 +50,7 @@ const localeStore = useLocaleStore()
 const themeStore = useThemeStore()
 const { t } = useI18n()
 const lineChartRef = useTemplateRef('lineChartRef')
-const myChart = shallowRef()
+let myChart: echarts.ECharts | null = null
 const language = computed(() => localeStore.locale)
 // const dataX = computed(() => props.dataList?.map?.((i) => formatDate(i[0], 'MM-DD HH:mm')))
 const sortedData = computed(() => props.dataList?.toSorted?.((a, b) => a[0] - b[0]) ?? [])
@@ -158,6 +158,13 @@ onMounted(() => {
   init()
 })
 
+onBeforeUnmount(() => {
+  if (myChart) {
+    myChart.dispose()
+    myChart = null
+  }
+})
+
 watch(
   () => [props.marks, props.dataList, language.value, themeStore.isDark],
   () => {
@@ -166,8 +173,8 @@ watch(
 )
 
 function init() {
-  if (!myChart.value) {
-    myChart.value = echarts.init(lineChartRef.value)
+  if (!myChart) {
+    myChart = echarts.init(lineChartRef.value)
   }
   const firstTime = sortedData.value?.[0]?.[0]
   const lastTime = sortedData.value?.[sortedData.value.length - 1]?.[0]
@@ -316,8 +323,8 @@ function init() {
     series: series.value,
   }
   // 先 setOption 让 ECharts 生成 ticks，再从 ticks 中挑选最接近 4 个目标点的 tick 来显示
-  myChart.value.clear()
-  myChart.value.setOption(option, { notMerge: true })
+  myChart.clear()
+  myChart.setOption(option, { notMerge: true })
   if (
     typeof minTime === 'number' &&
     typeof maxTime === 'number' &&
@@ -326,7 +333,7 @@ function init() {
   ) {
     const targets = [minTime, minTime + span / 3, minTime + (2 * span) / 3, maxTime]
     try {
-      const axisModel: any = myChart.value.getModel().getComponent('xAxis', 0)
+      const axisModel: any = myChart.getModel().getComponent('xAxis', 0)
       const ticks: any[] = axisModel?.axis?.scale?.getTicks?.() ?? []
       const tickValues: number[] = ticks
         .map((t) => (typeof t === 'number' ? t : t?.value))
@@ -334,11 +341,11 @@ function init() {
       const picked = pickClosestTicks(tickValues, targets)
       // 只有在确实挑出了 4 个（或至少 2 个）时才启用 tickSet；否则继续用 fallback
       if (picked.length >= 2) labelTickSet = new Set<number>(picked)
-      myChart.value.setOption(option, { notMerge: true })
+      myChart.setOption(option, { notMerge: true })
     } catch {
       // 如果内部 API 取 ticks 失败，继续走 fallback（slot 去重）
       labelTickSet = new Set<number>()
-      myChart.value.setOption(option, { notMerge: true })
+      myChart.setOption(option, { notMerge: true })
     }
   }
   // if (series.value.markPoint.data.length > 0) {

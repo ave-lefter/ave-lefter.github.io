@@ -272,7 +272,7 @@ function _createSlOrder() {
 </script>
 
 <template>
-  <el-dialog v-model="visible" append-to-body :title="t('takeProfitStopLoss2')" width="500px">
+  <el-dialog v-model="visible" append-to-body :title="t('takeProfitStopLoss2')" width="500px" destroy-on-close>
     <div class="overflow-y-auto scrollbar-hide mx--16px px-16px">
       <div class="mb-19px flex items-center gap-8px text-14px font-bold color-[--main-text]">
         {{ typeDict[props.row?.contractId || ''] }}

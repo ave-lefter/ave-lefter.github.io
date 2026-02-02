@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-show="globalStore.showRight">
     <el-scrollbar height="calc(100vh - 92px)">
       <div class="flex flex-col h-[calc(100vh-94px)] overflow-visible">
         <div class="p-15px bg-[--secondary-bg]">
@@ -43,7 +43,7 @@
         <div class="bg-[--secondary-bg] flex-1" />
       </div>
     </el-scrollbar>
-    <el-dialog v-model="dialogVisible" :title="searchAmm" width="480">
+    <el-dialog v-model="dialogVisible" :title="searchAmm" width="480" destroy-on-close>
       <Pairs :search="searchAmm" :isInModal="true" />
       <template #footer>
         <el-button
@@ -70,7 +70,7 @@ import Swap from './swap/index.vue'
 // const Swap = defineAsyncComponent(() => import('./swap/index.vue'))
 
 const dialogVisible = shallowRef(false)
-
+const globalStore = useGlobalStore()
 const searchAmm = shallowRef('')
 const walletStore = useWalletStore()
 const tokenStore = useTokenStore()

@@ -148,6 +148,7 @@ function getColorClass(val: string) {
     v-model="dialogVisible"
     :title="$t('share')"
     width="700"
+    destroy-on-close
     append-to-body
   >
     <div>

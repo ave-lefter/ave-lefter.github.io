@@ -84,6 +84,7 @@
       trigger="contextmenu"
       placement="bottom"
       popper-style="min-width: auto; width: auto;"
+      :persistent="false"
     >
       <ul>
         <li class="text-14px mt-4px mb-4px flex-start">

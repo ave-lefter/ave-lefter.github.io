@@ -40,7 +40,7 @@
     /> -->
     <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
     <div class="token-info ml-16px flex items-center color-[--third-text]">
-      <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" >
+      <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
         <template #content>
           <el-image
             class="token-icon  h-228px w-228px items-center"
@@ -180,7 +180,7 @@
               </div>
             </div>
             <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
-            <el-popover popper-class="[--el-popover-bg-color:--border]">
+            <el-popover popper-class="[--el-popover-bg-color:--border]" :persistent="false">
               <template #reference>
                 <span
                   class="media-item bg-btn cursor-pointer"
@@ -272,6 +272,7 @@
             popper-class="chains-table-filter"
             title=""
             :width="200"
+            :persistent="false"
             trigger="click"
           >
             <template #reference>
@@ -294,6 +295,7 @@
                     class="select3"
                     :placeholder="$t('pleaseSelectGroup')"
                     :teleported="false"
+                    :persistent="false"
                   >
                     <el-option :label="$t('defaultGroup')" :value="0" />
                     <el-option
@@ -345,6 +347,7 @@
             placement="bottom"
             popper-class="chains-table-filter"
             title=""
+            :persistent="false"
             :width="200"
             trigger="click"
           >
@@ -580,7 +583,7 @@
             </span>
           </div>
           <top50 />
-          <el-popover width="120px" popper-class="[--el-popover-bg-color:--border] !min-w-[120px]">
+          <el-popover width="120px" popper-class="[--el-popover-bg-color:--border] !min-w-[120px]" :persistent="false">
             <template #reference>
               <span
                 class="media-item bg-btn cursor-pointer"
@@ -826,6 +829,7 @@ import Check from './check.vue'
 import DeBox from './deBox.vue'
 import XPopup from '~/components/xPopup/index.vue'
 import XIcon from '~/components/xPopup/xIcon.vue'
+import Collect from '~/components/collect.vue'
 import {
   getSymbolDefaultIcon,
   getChainDefaultIcon,
@@ -971,7 +975,7 @@ const price = computed(() => {
   return tokenStore.price
 })
 const priceChange = computed(() => {
-  return tokenStore.priceChange || 0
+  return tokenStore.priceChangeV2 || 0
 })
 const marketCap = computed(() => {
   return tokenStore.marketCap || 0

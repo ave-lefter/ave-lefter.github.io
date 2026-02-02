@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" class="dialog-position" :title="$t('myPosition1')" width="680" append-to-body>
+  <el-dialog v-model="dialogVisible" class="dialog-position" :title="$t('myPosition1')" width="680" append-to-body destroy-on-close>
     <slot/>
     <el-table
       class="table-position w-100%" :data="dataSource" :height="400" @row-click="tableRowClick" row-class-name="group">
@@ -17,7 +17,7 @@
         <template #header="{ column }">
           <div v-if="column.property == 'total_profit_ratio'" class="flex items-center text-right justify-end">
             <span>{{ column.label }}</span>
-            <el-tooltip :effect="mode" placement="top-end" :content="$t('PnLTips')" popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!" persistent>
+            <el-tooltip :effect="mode" placement="top-end" :content="$t('PnLTips')" popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!" :persistent="false">
               <el-icon style="cursor: pointer; font-size: 14px; margin-left: 2px;">
                 <QuestionFilled />
               </el-icon>

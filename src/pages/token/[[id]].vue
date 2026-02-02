@@ -4,7 +4,7 @@
     style="min-height: calc(100vh - 92px)"
   >
     <div class="flex-1 min-w-0">
-      <TokenHistory v-if="globalStore.tokenHistoryVisible" class="mb-1px" />
+      <!-- <TokenHistory v-if="globalStore.tokenHistoryVisible" class="mb-1px" /> -->
       <Top />
       <div class="flex gap-1px">
         <div class="hide-scrollbar">
@@ -22,10 +22,27 @@
           </div>
           <div
             v-show="!globalStore.showLeft"
-            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center left-0 hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
+            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center  left-0 hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
             @click="globalStore.$patch({ showLeft: true })"
           >
             <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
+          </div>
+
+          <div
+            v-show="globalStore.showRight"
+            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center top--97px right--11px hover:w-30px hover:right--31px hover:h-36px  transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
+            :class="`${hasWarning&&'top--137px!'}`"
+            @click="globalStore.$patch({ showRight: false })"
+          >
+            <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
+
+          </div>
+          <div
+            v-show="!globalStore.showRight"
+            class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center top-0px right-0 hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
+            @click="globalStore.$patch({ showRight: true })"
+          >
+            <Icon name="material-symbols:arrow-back-ios-new-rounded" class="text-12px" />
           </div>
           <el-scrollbar :height="scrollbarHeight" @scroll="centerScroll">
             <div
@@ -57,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage, useThrottleFn } from '@vueuse/core'
+import { useStorage } from '@vueuse/core'
 import { getTokenInfo, getTokenInfoExtra } from '~/api/token'
 import { useTokenStore } from '~/stores/token'
 import Top from './components/top/index.vue'
@@ -81,14 +98,14 @@ const tagStore = useTagStore()
 const tokenStore = useTokenStore()
 const scrollbarHeight = computed(() => {
   if (tokenStore.isShowWaring) {
-    if (globalStore.tokenHistoryVisible) {
-      return 'calc(100vh - 230px)'
-    }
+    // if (globalStore.tokenHistoryVisible) {
+    //   return 'calc(100vh - 230px)'
+    // }
     return 'calc(100vh - 198px)'
   }
-  if (globalStore.tokenHistoryVisible) {
-    return 'calc(100vh - 190px)'
-  }
+  // if (globalStore.tokenHistoryVisible) {
+  //   return 'calc(100vh - 190px)'
+  // }
   return 'calc(100vh - 158px)'
 })
 const globalStore = useGlobalStore()
@@ -101,6 +118,12 @@ const addresses = computed(() => {
   return []
 })
 const wsStore = useWSStore()
+
+// 警告弹窗
+const hasWarning=computed(()=>{
+  return tokenStore.warningStatus || ((tokenStore?.token?.risk_level ?? 0) < 0)
+})
+
 
 // 订单簿显示状态 - 使用本地存储保持状态
 const orderBookVisible = useStorage('orderBookVisible', false)
@@ -129,7 +152,7 @@ function dragOrderBook(e: MouseEvent) {
   isDraggingOrderBook = true
 
   // 禁用图表交互，设置全局光标与禁选中，提升体验
-  const chartContainer = document.getElementById('tv_chart_container')
+  let chartContainer = document.getElementById('tv_chart_container')
   chartContainer && (chartContainer.style.pointerEvents = 'none')
   const prevCursor = document.body.style.cursor
   const prevUserSelect = document.body.style.userSelect
@@ -159,6 +182,7 @@ function dragOrderBook(e: MouseEvent) {
     window.removeEventListener('mousemove', onMove)
     window.removeEventListener('mouseup', onUp)
     chartContainer && (chartContainer.style.pointerEvents = 'auto')
+    chartContainer = null
     document.body.style.cursor = prevCursor
     document.body.style.userSelect = prevUserSelect
   }
@@ -259,13 +283,16 @@ function _getTokenInfoExtra() {
   })
 }
 
-function init(isRefresh = false) {
+function init(
+  // isRefresh = false
+) {
   tokenStore.tokenPrice = 0
-  _getTokenInfo().then(() => {
-    if (!isRefresh) {
-      addVisit()
-    }
-  })
+  _getTokenInfo()
+  // .then(() => {
+  //   if (!isRefresh) {
+  //     addVisit()
+  //   }
+  // })
   _getTokenInfoExtra()
   // wsStore.onmessageTxUpdateToken()
   tokenStore._getTotalHolders(route.params.id as string)
@@ -296,6 +323,8 @@ onBeforeMount(() => {
 
 onUnmounted(() => {
   tokenStore?.reset?.()
+  // 确保移除可能遗留的 WS 回调与可见性监听，防止内存泄漏
+  wsStore.getWSInstance()?.offMessage(['tx_update_token', 'kline', 'price'])
   wsStore.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
@@ -308,6 +337,7 @@ onUnmounted(() => {
     params: [WSEventType.PUBLIC_PORTRAIT],
     id: 1,
   })
+  document.removeEventListener('visibilitychange', visibilitychangeFn)
 })
 
 onBeforeRouteLeave(() => {
@@ -316,30 +346,31 @@ onBeforeRouteLeave(() => {
 })
 
 function refresh() {
-  init(true)
+  init()
 }
 
-function addVisit() {
-  if (tokenStore.tokenInfo) {
-    const { logo_url, symbol, chain, token } = tokenStore.tokenInfo.token
-    const index = globalStore.lastVisitTokens.findIndex((item) => item.id === token + '-' + chain)
-    if (index === -1) {
-      if (globalStore.lastVisitTokens.length >= 20) {
-        globalStore.lastVisitTokens.pop()
-      }
-      globalStore.lastVisitTokens.unshift({
-        id: token + '-' + chain,
-        logo_url,
-        symbol,
-        price_change: tokenStore.priceChange,
-        circulation: tokenStore.circulation.toString(),
-        price: tokenStore.price || 0,
-      })
-    }
+// function addVisit() {
+//   if (tokenStore.tokenInfo) {
+//     const { logo_url, symbol, chain, token } = tokenStore.tokenInfo.token
+//     const index = globalStore.lastVisitTokens.findIndex((item) => item.id === token + '-' + chain)
+//     if (index === -1) {
+//       if (globalStore.lastVisitTokens.length >= 20) {
+//         globalStore.lastVisitTokens.pop()
+//       }
+//       globalStore.lastVisitTokens.unshift({
+//         id: token + '-' + chain,
+//         logo_url,
+//         symbol,
+//         price_change: tokenStore.priceChange,
+//         price_change_v2: tokenStore.priceChangeV2,
+//         circulation: tokenStore.circulation.toString(),
+//         price: tokenStore.price || 0,
+//       })
+//     }
 
-    usePriceV2Store().sendPriceWs()
-  }
-}
+//     usePriceV2Store().sendPriceWs()
+//   }
+// }
 
 const klineContainerRef = useTemplateRef('klineContainer')
 const centerScroll = ({ scrollTop }: { scrollTop: number }) => {

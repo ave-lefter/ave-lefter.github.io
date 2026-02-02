@@ -51,6 +51,7 @@ watch(()=>props.modelValue,(val:string[])=>{
   <el-popover
     v-model:visible="computedVisible"
     placement="bottom"
+    :persistent="false"
     :width="420"
     trigger="click"
     teleported

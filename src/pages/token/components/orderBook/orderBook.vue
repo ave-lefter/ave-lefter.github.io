@@ -232,7 +232,7 @@
       <SignalTags tagClass="mr-3px" :tags="currentRow.newTags" :walletAddress="currentRow.wallet_address"
         :chain="currentRow.chain" />
     </MarkerTooltip>
-    <el-dialog v-model="filterDialogVisible" :width="440" :title="$t('markerAddressFilter')">
+    <el-dialog v-if="filterDialogVisible" v-model="filterDialogVisible" :width="440" :title="$t('markerAddressFilter')" destroy-on-close>
       <div class="mx--16px h-1px bg-[--border] mb-20px"/>
       <div class="mb-10px">
         <label for="markerAddress">
@@ -1132,8 +1132,8 @@ const updatetokenTxs = useThrottleFn(() => {
     tokenTxs.value.unshift(...newTxs)
 
     // 限制数据量，保持性能
-    if (tokenTxs.value.length > 1000) {
-      tokenTxs.value = tokenTxs.value.slice(0, 1000)
+    if (tokenTxs.value.length > 300) {
+      tokenTxs.value = tokenTxs.value.slice(0, 300)
     }
   }
 

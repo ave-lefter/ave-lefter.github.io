@@ -235,10 +235,28 @@ const handlerResize = () => {
   },100)
 }
 // Watchers
+watch(
+  () => props.loading,
+  async (val) => {
+    await nextTick()
+    const dom = document.getElementById(chartId.value)
+    if (!dom) return
+
+    const chart = echarts.getInstanceByDom(dom)
+    if (!chart) return
+
+    val
+      ? chart.showLoading({ maskColor: 'rgba(255,255,255,0)', text: '' })
+      : chart.hideLoading()
+  }
+)
+
 watch(() => props.loading, val => {
   const chart = echarts.getInstanceByDom(document.getElementById(chartId.value))
-  if (!chart) return
-
+  console.log('-------val---------',val)
+  if (!chart) {
+    return
+  }
   if (val) {
     chart.hideLoading()
     chart.showLoading({
@@ -280,6 +298,13 @@ watch(()=>props.showLeft, (val) => {
 // Lifecycle
 onMounted(() => {
   init()
+})
+onBeforeUnmount(() => {
+  let chart = echarts.getInstanceByDom(document.getElementById(chartId.value))
+  if (chart) {
+    chart.dispose()
+    chart = null
+  }
 })
 </script>
 

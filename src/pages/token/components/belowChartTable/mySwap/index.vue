@@ -213,9 +213,9 @@ onMounted(() => {
   getWalletTxData()
 })
 
-onActivated(() => {
-   refreshData()
-})
+// onActivated(() => {
+//    refreshData()
+// })
 
 </script>
 

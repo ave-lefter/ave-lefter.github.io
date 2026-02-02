@@ -304,6 +304,7 @@ function cancelHide() {
           size="small"
           placeholder=""
           :suffix-icon="SelectIcon"
+          :persistent="false"
           @change="setActiveChain"
         >
           <template #prefix>

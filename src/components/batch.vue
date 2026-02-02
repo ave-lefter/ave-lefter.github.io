@@ -45,6 +45,7 @@
           style="width: 100%"
           :teleported="false"
           :suffix-icon="SuffixIcon"
+          :persistent="false"
           @change="validateInput"
         >
           <template #prefix>
@@ -110,6 +111,7 @@
             v-model="selectedGroupId"
             size="large"
             class="chains-select !text-14px !mb-5px [&&]:[--el-fill-color-blank:--border]"
+            :persistent="false"
             @click.stop
           >
             <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
@@ -153,6 +155,7 @@
           size="large"
           style="width: 100%"
           :teleported="false"
+          :persistent="false"
           :suffix-icon="SuffixIcon"
         >
           <template #prefix>
@@ -212,6 +215,7 @@
           size="large"
           style="width: 100%"
           :teleported="false"
+          :persistent="false"
           :suffix-icon="SuffixIcon"
         >
           <template #prefix>
@@ -276,17 +280,16 @@ import {
 import ProPopover from '@/pages/follow/components/proPopover.vue'
 
 import { ElMessage } from 'element-plus'
-import { generateAvatarIcon, getChainInfo, isValidAddress, evm_utils as utils } from '@/utils'
-import { ArrowDownBold } from '@element-plus/icons-vue'
+import { getChainInfo, isValidAddress } from '@/utils'
 import SuffixIcon from './suffixIcon.vue'
-const { mode, token_logo_url } = storeToRefs(useGlobalStore())
+const configStore = useConfigStore()
+const token_logo_url = computed(() => configStore.token_logo_url || 'https://www.iconaves.com/')
 const { addressGroups, currentAddress, updateNum3, showBatchAddressDetails } = storeToRefs(useFollowStore())
 const botStore = useBotStore()
 const followStore = useFollowStore()
 const { t } = useI18n()
 const tabActive = ref(0)
 const favTotal = ref(0)
-const favGroups = ref([])
 const importStr = ref('')
 const exportStr = ref('')
 const isValid = ref(true)
@@ -315,17 +318,16 @@ const exportNumber = computed(() => {
 })
 
 
-function handleConfirmEdit(currentEditGroup: number, remark:string) {
-  changeFavoriteGroupName2(remark, currentEditGroup).then(() => {
-    ElMessage.success(t('success'))
-    followStore.getUserFavoriteGroups2()
-  }).catch((e) => {
-     ElMessage.error(String(e))
-  })
-}
+// function handleConfirmEdit(currentEditGroup: number, remark:string) {
+//   changeFavoriteGroupName2(remark, currentEditGroup).then(() => {
+//     ElMessage.success(t('success'))
+//     followStore.getUserFavoriteGroups2()
+//   }).catch((e) => {
+//      ElMessage.error(String(e))
+//   })
+// }
 
 function handleAddGroup(name:string) {
-  debugger;
    if(followStore.addressGroups.map(i=>i.name).includes(name)){
     ElMessage.error(t('groupExistT'))
   }else{

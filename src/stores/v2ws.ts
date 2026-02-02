@@ -15,7 +15,10 @@ export const useV2WSStore = defineStore('v2ws', () => {
 
   const wsResult = reactive<Record<(typeof WSEventV2Type)[keyof typeof WSEventV2Type], any>>({
     [WSEventV2Type.PORTRAIT_STATISTICS]: null,
-    [WSEventV2Type.PUBLIC_TWITTER]:null
+    [WSEventV2Type.PUBLIC_TWITTER]:null,
+    [WSEventV2Type.PUBLIC_TWITTER]:null,
+    [WSEventV2Type.PUMPSTATE]: null,
+    [WSEventV2Type.TOKEN_UPDATED]: null
   })
 
   // 将 createWebSocket 重命名为 init
@@ -36,8 +39,12 @@ export const useV2WSStore = defineStore('v2ws', () => {
       const { event, data } = msg
       if (event === WSEventV2Type.PORTRAIT_STATISTICS) {
         wsResult[event] = data?.updates
-      }else if(event === WSEventV2Type.PUBLIC_TWITTER){
+      } else if(event === WSEventV2Type.PUBLIC_TWITTER){
         wsResult[event] = data?.post
+      } else if (event === WSEventV2Type.PUMPSTATE) {
+        wsResult[event] = data?.msgs
+      } else if (event === WSEventV2Type.TOKEN_UPDATED) {
+        wsResult[event] = data?.msg
       } else {
         wsResult[event] = data
       }
