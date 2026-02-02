@@ -125,6 +125,8 @@ const columns = computed(() => {
 })
 const listStatus = ref({
   loadingTxs: false,
+  // 切换token
+  loadingTxs1: false,
   loadingLiq: false,
   finished: false,
   page_token:'',
@@ -155,20 +157,21 @@ const filterTableListMap = {
   sell: () =>[... tokenTxs.value.filter(el => !isBuy(el))].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
 }
 
-const tableLoading = computed(() => listStatus.value.loadingTxs || listStatus.value.loadingLiq)
-// const showFooter=ref(false)
+const tableLoading = computed(() => listStatus.value.loadingTxs1 || listStatus.value.loadingLiq)
+const showFooter=ref(false)
 const footText = computed(() => {
-  if(listStatus.value.finished){
+  if(listStatus.value.loadingTxs){
+    return t('loading')
+  }else if(listStatus.value.finished){
     return t('noMore')
   }else{
     return ''
   }
 })
 
-
 function loadMore(remainDistance:number){
   console.log('loadMore remainDistance', remainDistance, listStatus.value)
-  // showFooter.value=remainDistance <= 20
+  showFooter.value=remainDistance <= 20
   if ((remainDistance <= 20) && !(listStatus.value.loadingTxs || listStatus.value.finished)) {
     _getTokenTxs()
   }
@@ -333,6 +336,8 @@ const _getTokenTxs = useThrottleFn(async () => {
   } catch (e) {
     resetTx()
   } finally {
+    listStatus.value.loadingTxs1 = false
+    showFooter.value = false
     listStatus.value.loadingTxs = false
   }
 }, 500)
@@ -365,6 +370,7 @@ watch(() => klineDateFilter?.value, (val) => {
 watch(() => tokenStore.pairAddress, (pair, oldPair) => {
   console.log('watch pair', pair, oldPair)
   if (tokenStore.pairAddress) {
+    listStatus.value.loadingTxs1 = true
     resetCache()
     _getPairLiq()
     subscribeLiq(pair, oldPair)
@@ -537,7 +543,7 @@ watch(() => wsStore.wsResult[WSEventType.LIQ], data => {
   if (!isPausedTxs.value) {
     updateLiqList()
   }
-  if (pairLiq.value.length > 300) {
+  if (pairLiq.value.length > 1500) {
     pairLiq.value.pop()
   }
 })
@@ -564,7 +570,7 @@ function subscribeLiq(pair: string, oldPair?: string) {
 
 const updatePairTxs = useThrottleFn(() => {
   tokenTxs.value.unshift(...wsPairCache.value)
-  tokenTxs.value = tokenTxs.value.slice(0, 300)
+  tokenTxs.value = tokenTxs.value.slice(0, 1500)
   wsPairCache.value.length = 0
   triggerRef(tokenTxs)
 }, 100)
@@ -1053,6 +1059,7 @@ onUnmounted(() => {
     <div
       v-loading="tableLoading" class="text-12px"
       element-loading-background="transparent">
+    <!-- <div class="text-12px"> -->
       <AveTable
         ref="aveTableRef"
         rowKey="uuid"
@@ -1062,10 +1069,10 @@ onUnmounted(() => {
           height:`${finalHeight}px`,
           '--el-table-bg-color':'transparent',
           'overflow':'visible',
-          paddingBottom:!footText?'0px':'20px'
+          paddingBottom:!showFooter?'0px':'20px'
         }"
         row-class='cursor-pointer'
-        :showFooter="!!footText"
+        :showFooter="showFooter"
         :footText="footText"
         @endReached="loadMore"
         :rowEventHandlers="{
