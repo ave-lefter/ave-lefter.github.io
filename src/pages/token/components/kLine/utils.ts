@@ -329,6 +329,8 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
   let priceLimitLineId = '' as EntityId
   let isCreating = false
   const { t } = useI18n()
+  let drawingEventHandler: ((id: EntityId, type: DrawingEventType) => void) | null = null
+  let drawingEventWidget: IChartingLibraryWidget | null = null
   // 创建 限价价格线
   async function createLimitPriceLine(price: number) {
     const _widget = getWidget()
@@ -392,11 +394,13 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
 
   function subscribePriceMove() {
     const _widget = getWidget()
-    const chart = _widget?.activeChart?.()
-    if (_widget) {
-      _widget?.subscribe('drawing_event', (id, type) => {
+    if (!_widget) return
+    if (!drawingEventHandler) {
+      drawingEventHandler = (id, type) => {
         if (id === priceLimitLineId && type === 'points_changed') {
           nextTick(() => {
+            const widget = getWidget()
+            const chart = widget?.activeChart?.()
             const line = chart?.getShapeById?.(id)
             if (!line) return
             const points = line.getPoints?.()
@@ -407,7 +411,15 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
             useEventBus<string>('priceLimit_move').emit(formatDec(Number(price1), 4))
           })
         }
-      })
+      }
+    }
+    if (drawingEventWidget && drawingEventWidget !== _widget && drawingEventHandler) {
+      drawingEventWidget.unsubscribe('drawing_event', drawingEventHandler)
+    }
+    if (drawingEventHandler) {
+      _widget.unsubscribe('drawing_event', drawingEventHandler)
+      _widget.subscribe('drawing_event', drawingEventHandler)
+      drawingEventWidget = _widget
     }
   }
 
@@ -415,6 +427,11 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
     if (stop) {
       stop()
     }
+    if (drawingEventWidget && drawingEventHandler) {
+      drawingEventWidget.unsubscribe('drawing_event', drawingEventHandler)
+    }
+    drawingEventWidget = null
+    drawingEventHandler = null
   })
 
   return {
@@ -996,6 +1013,10 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
     if (updateKlineLimitLineOff) {
       updateKlineLimitLineOff()
     }
+    const _widget = getWidget()
+    if (_widget) {
+      _widget.unsubscribe('drawing_event', handlerLimitPriceLineRemove)
+    }
     // 清理定时器
     if (Timer) {
       clearTimeout(Timer)
@@ -1235,6 +1256,13 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     }
     if (linesChecked.value.sell.checked && avePriceCache.sellAvgPrice) {
       createAvgPriceLine(avePriceCache.sellAvgPrice, false)
+    }
+  })
+  
+  onUnmounted(() => {
+    if (timer) {
+      clearInterval(timer)
+      timer = null
     }
   })
 

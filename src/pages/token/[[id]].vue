@@ -323,6 +323,7 @@ onBeforeMount(() => {
 
 onUnmounted(() => {
   tokenStore?.reset?.()
+  wsStore.clearTokenRelatedResult?.()
   // 确保移除可能遗留的 WS 回调与可见性监听，防止内存泄漏
   wsStore.getWSInstance()?.offMessage(['tx_update_token', 'kline', 'price'])
   wsStore.send({

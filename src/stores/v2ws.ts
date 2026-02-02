@@ -5,6 +5,9 @@ import { getBestApiDomain } from '@/plugins/api/getApiDomain'
 import { getWSMessage } from '@/utils'
 import { WSEventV2Type } from '~/utils/constants'
 
+/** 模块级单例：路由/Store 重初始化时复用同一 WS */
+let globalV2WsSingleton: WS | null = null
+
 export const useV2WSStore = defineStore('v2ws', () => {
   // 使用 shallowRef 代替 ref，WebSocket 本身是非响应式的
   const wsInstance = shallowRef<WS | null>(null)
@@ -24,8 +27,18 @@ export const useV2WSStore = defineStore('v2ws', () => {
   // 将 createWebSocket 重命名为 init
   const init = (options?: WSOptions) => {
     if (wsInstance.value) return  // 防止重复创建 WebSocket 实例
+    if (globalV2WsSingleton) {
+      wsInstance.value = globalV2WsSingleton
+      return
+    }
     const url = `${(getBestApiDomain() || location.origin).replace('http', 'ws')}/v2ws`
-    wsInstance.value = new WS({url, ...(options || {})})
+    const newWs = new WS({ url, ...(options || {}) })
+    if (wsInstance.value || globalV2WsSingleton) {
+      newWs.close()
+      return
+    }
+    globalV2WsSingleton = newWs
+    wsInstance.value = newWs
 
     wsInstance.value.onopen(() => {
       isConnected.value = true
@@ -76,6 +89,7 @@ export const useV2WSStore = defineStore('v2ws', () => {
     isConnected.value = false
     wsInstance.value?.close()
     wsInstance.value = null
+    globalV2WsSingleton = null
   }
 
   return {

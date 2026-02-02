@@ -161,7 +161,11 @@ watch(() => tokenStore.placeOrderSuccess, () => {
 // })
 
 let time = 0
+let pollTimer: ReturnType<typeof setTimeout> | null = null
+let isUnmounted = false
+
 function getWalletTxDataPoll() {
+  if (isUnmounted) return
   if (time > 10) {
     time = 0
     return
@@ -169,7 +173,7 @@ function getWalletTxDataPoll() {
   getWalletTxData()
   _bot_getAddressAllBalances()
   time++
-  setTimeout(getWalletTxDataPoll, 5000)
+  pollTimer = setTimeout(getWalletTxDataPoll, 5000)
 }
 
 const isShowB = ref(false)
@@ -182,6 +186,11 @@ const klineDataReadyOff = useEventBus('klineDataReady').on(() => {
 })
 
 onUnmounted(() => {
+  isUnmounted = true
+  if (pollTimer) {
+    clearTimeout(pollTimer)
+    pollTimer = null
+  }
   // 清理事件总线监听器
   if (klineDataReadyOff) {
     klineDataReadyOff()

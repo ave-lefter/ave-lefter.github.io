@@ -290,7 +290,7 @@ const height = computed(() => {
         :ammList="currentChainObj?.swaps || []"
         :chains="chains"
       />
-      <KeepAlive :max="6">
+      <KeepAlive :max="2">
         <component
           :is="isPump ? pumpComponent : _activityComponent"
           ref="dynamicComponentRef"

@@ -977,15 +977,27 @@ onMounted(() => {
   }
 })
 
+// 保存 watch 监听器的 unwatch 函数，用于组件卸载时清理
+let watchTxUnwatch: (() => void) | null = null
+let watchSimpleTxUnwatch: (() => void) | null = null
+
 onUnmounted(() => {
+  // 清理 watch 监听器，防止内存泄漏
+  watchTxUnwatch?.()
+  watchSimpleTxUnwatch?.()
+  watchTxUnwatch = null
+  watchSimpleTxUnwatch = null
+  
   wsStore.getWSInstance()?.offMessage('tx_history')
-  // 组件卸载时取消订阅
   if (pairAddress.value) {
     unsubscribeFromTxs()
   }
+  tokenTxs.value = []
+  wsPairCache.value = []
+  txCount.value = {}
 })
 
-watch(() => wsStore.wsResult[WSEventType.TX], data => {
+watchTxUnwatch = watch(() => wsStore.wsResult[WSEventType.TX], data => {
   if (!data || listStatus.value.loadingTxs) {
     return
   }
@@ -1031,7 +1043,7 @@ watch(() => wsStore.wsResult[WSEventType.TX], data => {
   }
 })
 
-watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
+watchSimpleTxUnwatch = watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
   if (!data || listStatus.value.loadingTxs) {
     return
   }

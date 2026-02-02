@@ -768,7 +768,12 @@ const flushPumpState = useThrottleFn(() => {
   pumpStateBuffer.length = 0
 }, 150)
 
-watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
+// 保存 watch 监听器的 unwatch 函数，用于组件卸载时清理
+let watchPumpStateUnwatch: (() => void) | null = null
+let watchTokenUpdatedUnwatch: (() => void) | null = null
+let watchPortraitStatsUnwatch: (() => void) | null = null
+
+watchPumpStateUnwatch = watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
   if (Array.isArray(val)) {
     pumpStateBuffer.splice(0, 0, ...val)
     pumpStateBuffer.splice(100)
@@ -786,7 +791,7 @@ const logoThrottled = useThrottleFn(() => {
   bufferLogoMap.clear()
 }, 100)
 
-watch(
+watchTokenUpdatedUnwatch = watch(
   () => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED],
   (val) => {
     if (!val?.token) return
@@ -833,7 +838,11 @@ const flushStatistics = useThrottleFn(() => {
   // statisticsList.value = Array.from(mapStatistics.values()).slice(0, 300)
   // buffer.length = 0
 }, 300)
-watch(
+// watch(
+
+// const MAX_SIZE = 100
+
+watchPortraitStatsUnwatch = watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
   (val) => {
     if (!Array.isArray(val) || !val.length ) return
@@ -904,7 +913,21 @@ onActivated(() => {
 })
 
 onDeactivated(()=>{
+  // 清理 watch 监听器，防止内存泄漏
+  watchPumpStateUnwatch?.()
+  watchTokenUpdatedUnwatch?.()
+  watchPortraitStatsUnwatch?.()
+  watchPumpStateUnwatch = null
+  watchTokenUpdatedUnwatch = null
+  watchPortraitStatsUnwatch = null
+  
   isLeave = true
+  pumpStateBuffer.length = 0
+  bufferLogoMap.clear()
+  mapStatistics.value.clear()
+  logoList.value = []
+  wsTableListCache = {}
+  wsTableList.value = []
   document.removeEventListener('mousemove', mouseInsideTxs)
   wsv2Store.send({
     jsonrpc: '2.0',
