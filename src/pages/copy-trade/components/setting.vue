@@ -1,140 +1,172 @@
 <template>
-  <div >
+  <div>
     <el-divider class="!m-0 !mb-24px !mt-24px !border-t-[--dialog-divider]" />
+
     <div class="flex-between cursor-pointer" @click="toggle">
       <ul class="flex-start">
         <li class="text-12px flex-start">
           <Icon
             v-tooltip="$t('slippage')"
             name="custom:slippage"
-            class="text-14px color-[--third-text] ml-0 mr-6px cursor-pointer"
+            class="text-14px color-[--third-text] mr-6px"
           />
-          <span>{{ settingCopyTrade?.[props.chain]?.slippage }}%</span>
+          <span>{{ currentSetting.slippage || 9}}%</span>
         </li>
+
         <li class="text-12px flex-start ml-24px">
           <Icon
             v-tooltip="$t('mev')"
             name="custom:mev"
-            class="text-16px color-[--third-text] ml-0 mr-6px cursor-pointer"
+            class="text-16px color-[--third-text] mr-6px"
           />
-          {{ settingCopyTrade?.[props.chain]?.isPrivate ? $t('on') : $t('off') }}
+          {{ currentSetting.isPrivate ? $t('on') : $t('off') }}
         </li>
-        <li v-if="isEvmChain(chain || '')" class="text-12px flex-start ml-24px">
+
+        <li v-if="isEvmChain(props.chain)" class="text-12px flex-start ml-24px">
           <Icon
             v-tooltip="$t('estimatedGas')"
             name="custom:gas"
-            class="text-14px color-[--third-text] ml-0 mr-6px cursor-pointer"
+            class="text-14px color-[--third-text] mr-6px"
           />
-          ${{ getEstimatedGas() }}
+          ${{ estimatedGas }}
         </li>
-        <li v-if="chain === 'solana'" class="text-12px flex-start ml-24px">
+
+        <li v-if="props.chain === 'solana'" class="text-12px flex-start ml-24px">
           <Icon
             v-tooltip="$t('priorityFee')"
             name="custom:gas"
-            class="text-14px color-[--third-text] mr-6px cursor-pointer ml-0"
+            class="text-14px color-[--third-text] mr-6px"
           />
-          <span class="whitespace-nowrap">{{ botPriorityFee() }} SOL</span>
+          <span>{{ displayPriorityFee }} SOL</span>
         </li>
       </ul>
+
       <Icon
         :name="isExpanded ? 'radix-icons:triangle-up' : 'radix-icons:triangle-down'"
         class="text-16px"
       />
     </div>
+
     <div ref="expandRef" v-show="isExpanded">
+      <!-- slippage -->
       <div class="flex-between mt-16px">
-        <span class="mr-auto color-[--secondary-text]">{{ $t('slippage') }}</span>
-        <Icon
-          class="text-15px color-[--icon-color] ml-5px clickable mr-auto"
-          name="material-symbols:help-rounded"
-          @click.stop="openSlippageTips"
-        />
-        <div class="flex-1"></div>
-        <div class="slippage-input">
-          <el-input
-            ref="input1Ref"
-            v-model.trim="currentSetting.slippage"
-            clearable
-            :placeholder="$t('custom')"
-            @input="(val) => onValidateInput(val, 'slippage')"
-            style="width: 221px"
-            @focus="onFocus1"
-          >
-            <template #suffix>
-              <span>%</span>
-            </template>
-          </el-input>
-        </div>
+        <span class="color-[--secondary-text]">{{ $t('slippage') }}</span>
+
+        <el-input
+          v-model.trim="currentSetting.slippage"
+          style="width: 221px"
+        >
+          <template #suffix>%</template>
+        </el-input>
       </div>
+
+      <!-- protection -->
       <div class="flex-between mt-16px">
-        <span class="mr-auto color-[--secondary-text]">{{ $t('protection') }}</span>
-        <el-switch
-          v-model="currentSetting.isPrivate"
-          class="ml-auto"
-          style="--el-switch-on-color: #3c6cf6; zoom: 0.9; height: 14px"
-        />
+        <span class="color-[--secondary-text]">{{ $t('protection') }}</span>
+        <el-switch v-model="currentSetting.isPrivate" />
       </div>
+
+      <!-- priority fee -->
       <div class="flex-between mt-16px">
-        <span class="color-[--secondary-text]">{{ chain === 'solana' ? $t('priorityFee') : $t('extraGas') }}</span>
-        <div class="flex-1"></div>
-        <div>
-          <el-input
-            ref="inputRef"
-            v-model="currentSetting.priorityFee"
-            inputmode="decimal"
-            clearable
-            :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')"
-            @input="(val) => onValidateInput(val, 'priorityFee')"
-            style="width: 221px"
-            @focus="onFocus"
-          >
-            <template #suffix>
-              <span>{{chain === 'solana' ? 'SOL' : 'GWEI'}}</span>
-            </template>
-          </el-input>
-        </div>
+        <span class="color-[--secondary-text]">
+          {{ props.chain === 'solana' ? $t('priorityFee') : $t('extraGas') }}
+        </span>
+        <el-input
+          :model-value="currentSetting.priorityFee"
+          @update:model-value="onPriorityFeeInput"
+          clearable
+          style="width: 221px"
+        >
+          <template #suffix>
+            {{ props.chain === 'solana' ? 'SOL' : 'GWEI' }}
+          </template>
+        </el-input>
       </div>
     </div>
-
   </div>
 </template>
+
 <script setup lang="ts">
 import BigNumber from 'bignumber.js'
-import { formatBotGasTips } from '@/utils/bot'
 import { isEvmChain, getRpcProvider } from '@/utils'
-import type { BotChain, BotSettingKey } from '~/utils/types'
+import { formatBotGasTips } from '@/utils/bot'
+import type { BotChain } from '~/utils/types'
 
-import { ElMessageBox } from 'element-plus'
+/* props —— 完全保持不变 */
+const props = withDefaults(
+  defineProps<{ chain: BotChain; visible?: boolean }>(),
+  { chain: 'bsc', visible: false }
+)
+
 const { t } = useI18n()
 const botStore = useBotStore()
 const botSwapStore = useBotSwapStore()
 const tokenStore = useTokenStore()
-const emit = defineEmits(['getEstimatedGas', 'updateScroll'])
-const { settingCopyTrade, defaultCopyTradeSetting, form , type} = storeToRefs(useCopyTradeStore())
-const props = withDefaults(
-  defineProps<{
-    chain: BotChain
-    visible?: boolean,
-  }>(),
-  {
-    chain: 'bsc',
-    visible: false
-  }
-)
+const { settingCopyTrade, defaultCopyTradeSetting, form} =
+  storeToRefs(useCopyTradeStore())
+
+/* local state */
+const isExpanded = ref(false)
 const expandRef = ref<HTMLElement | null>(null)
 const gasPrice = shallowRef(0)
-const isExpanded = ref(false)
-const currentSetting = computed(() => {
-  if (!settingCopyTrade.value) {
-    settingCopyTrade.value = {}
-  }
 
-  if (!settingCopyTrade.value[props.chain]) {
-    settingCopyTrade.value[props.chain] = { ...defaultCopyTradeSetting.value, priorityFee: props.chain == 'solana' ? '0.04': '1' }
+/* current setting（只在这里初始化） */
+const currentSetting = computed(() => {
+  settingCopyTrade.value ||= {}
+  settingCopyTrade.value[props.chain] ||= {
+    ...defaultCopyTradeSetting.value,
+    priorityFee: ''
   }
-  console.log('----settingCopyTrade.value[props.chain]!---------',settingCopyTrade.value[props.chain]!)
-  return settingCopyTrade.value[props.chain]!
+  return settingCopyTrade.value[props.chain]
 })
+
+/* 只读：priorityFee 展示兜底 */
+const displayPriorityFee = computed(() => {
+  const raw = currentSetting.value.priorityFee
+  if (raw !== '' && raw !== '0') return raw
+
+  const mev = currentSetting.value.isPrivate
+  const { gasTip1List, gasTip2List } =
+    formatBotGasTips(botSwapStore.gasTip, props.chain)
+
+  return (mev ? gasTip1List : gasTip2List)?.[1]?.toString() || '0'
+})
+
+/* 纯计算：estimatedGas */
+const estimatedGas = computed(() => {
+  if (!isEvmChain(props.chain)) return '0'
+  if (!botStore.isSupportChains.includes(props.chain)) return '0'
+
+  const mev = currentSetting.value.isPrivate
+  const nativePrice =
+    botSwapStore.mainTokensPrice?.find(
+      i => i.chain === props.chain
+    )?.current_price_usd || tokenStore.swap.native.price || 0
+
+  const gasLimit =
+    botSwapStore.gasTip?.find(i => i.chain === props.chain && i.mev === !!mev)
+      ?.gasLimit || 200000
+
+  return new BigNumber(gasPrice.value)
+    .plus(new BigNumber(displayPriorityFee.value).times(1e9))
+    .times(gasLimit)
+    .times(nativePrice)
+    .div(1e18)
+    .toFixed(2)
+})
+
+/* effects（只在明确时机） */
+watch(
+  () => props.visible,
+  v => {
+    if (v && isEvmChain(props.chain)) {
+      getRpcProvider(props.chain)
+        ?.getFeeData()
+        .then(r => (gasPrice.value = Number(r?.gasPrice || 0)))
+    }
+  },
+  { immediate: true }
+)
 
 watch(
   () => currentSetting.value.slippage,
@@ -143,7 +175,6 @@ watch(
   },
   { deep: true, immediate: true }
 )
-
 watch(
   () => currentSetting.value.isPrivate,
   (val) => {
@@ -159,129 +190,23 @@ watch(
   },
   { deep: true,immediate: true }
 )
-function getGasPrice() {
-  const chain = props.chain
-  if (!isEvmChain(chain)) {
-    return
-  }
-  getRpcProvider(chain)
-    ?.getFeeData()
-    .then((res) => {
-      if (res) {
-        gasPrice.value = new BigNumber(res.gasPrice || 0).toNumber()
-      }
-    })
-}
-watch(() => props.visible, (newVal) => {
-  if (newVal) {
-    if (isEvmChain(props.chain)) {
-      getGasPrice()
-    }
-    if(props.chain=='solana'){
-      botPriorityFee()
-    }
-  }
-})
-watch(() => props.chain, (newVal) => {
-  currentSetting.value.priorityFee = props.chain == 'solana' ? '0.04': '1'
-  if (newVal) {
-    if (isEvmChain(props.chain)) {
-      getGasPrice()
-    }
-    if (props.chain == 'solana') {
-      botPriorityFee()
-    }
-  }
-})
-const botPriorityFee = () => {
-  const chain = props.chain
-  if (!botStore.isSupportChains.includes(chain)) {
-    return ''
-  }
-  const mev = currentSetting.value?.isPrivate
-  const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
-  const gasTips = mev ? gasTip1List : gasTip2List
-  if (currentSetting.value?.priorityFee == '0' || currentSetting.value?.priorityFee == '') {
-    currentSetting.value.priorityFee = gasTips?.[1]?.toString()
-  }
-  const priorityFee = currentSetting.value?.priorityFee
-  emit('getEstimatedGas', priorityFee)
-  return priorityFee
+
+/* handlers */
+const onPriorityFeeInput = (val: string) => {
+  currentSetting.value.priorityFee = val
 }
 
 const toggle = async () => {
   isExpanded.value = !isExpanded.value
-
   if (isExpanded.value) {
     await nextTick()
-    expandRef.value?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
+    expandRef.value?.scrollIntoView({ behavior: 'smooth' })
   }
-}
-function getEstimatedGas() {
-  const chain = props.chain
-  let gas = '0'
-  // debugger
-  if (isEvmChain(chain) && botStore?.isSupportChains?.includes(chain)) {
-    const mev = currentSetting.value?.isPrivate || false
-    const nativePrice = botSwapStore.mainTokensPrice?.find(item => item.chain === chain && item.token === getChainInfo(chain)?.wmain_wrapper)?.current_price_usd || tokenStore.swap.native.price || 0
-    const { gasTip1List, gasTip2List } = formatBotGasTips(botSwapStore.gasTip, chain)
-    const gasTips = mev ? gasTip1List : gasTip2List
-    if (currentSetting.value?.priorityFee == '0' || currentSetting.value?.priorityFee == '') {
-      currentSetting.value.priorityFee = gasTips?.[1]?.toString()
-    }
-    const extraGasPrice = currentSetting.value?.priorityFee || gasTips?.[1]
-    const gasLimit = botSwapStore.gasTip?.find?.(i => i.chain === chain && i.mev === !!mev)?.gasLimit || 200000
-    gas = formatNumber(new BigNumber(gasPrice.value).plus(new BigNumber(extraGasPrice || 0).times(String(10 ** 9))).times(gasLimit).times(nativePrice).div(String(10 ** 18)).toFixed(), 2)
-  }
-  emit('getEstimatedGas', gas)
-  return gas
-}
-
-function openSlippageTips() {
-  // 提示逻辑，可扩展
-  ElMessageBox.alert(t('slippageTips'), {
-    title: t('slippage'),
-    confirmButtonText: t('iKnown'),
-  }).then(() => {
-    // on close
-  })
-}
-const onValidateInput = (val: string, type: 'slippage' | 'priorityFee') => {
-  // 1️⃣ 只允许数字和 .
-  let value = val.replace(/[^\d.]/g, '')
-  // 2️⃣ 只允许一个小数点
-  const parts = value.split('.')
-  if (parts.length > 2) {
-    value = parts[0] + '.' + parts.slice(1).join('')
-  }
-  // 3️⃣ 小数点不能放在第一位（可选）
-  if (value.startsWith('.')) {
-    value = '0' + value
-  }
-  if ( Number(value) >100) {
-    value = '100'
-  }
-  currentSetting.value[type] = Number(value)
-}
-const inputRef = ref()
-
-const onFocus = () => {
-  inputRef.value?.input?.select()
-}
-const input1Ref = ref()
-
-const onFocus1 = () => {
-  input1Ref.value?.input?.select()
 }
 </script>
-<style lang="scss" scoped>
-:deep().el-input__wrapper {
+
+<style scoped lang="scss">
+:deep(.el-input__wrapper) {
   background: var(--border);
-  padding: 0 12px;
-  -el-input-inner-height: 48px;
-  --el-input-inner-height: 48px;
 }
 </style>
