@@ -1253,7 +1253,7 @@ onUnmounted(() => {
       </AveTable>
       <MarkerTooltip
         v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
-        :addressAndChain="addressAndChain" :key="currentRow.id"
+        :addressAndChain="addressAndChain"
       >
         <template v-if="['solana', 'bsc'].includes(currentRow.chain) && (currentRow.senderProfile || currentRow.maker_bal)">
           <Icon
