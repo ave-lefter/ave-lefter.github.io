@@ -51,10 +51,16 @@
       <!-- slippage -->
       <div class="flex-between mt-16px">
         <span class="color-[--secondary-text]">{{ $t('slippage') }}</span>
-
+        <Icon
+          class="text-15px color-[--icon-color] ml-5px clickable mr-auto"
+          name="material-symbols:help-rounded"
+          @click.stop="openSlippageTips"
+        />
+        <div class="flex-1"></div>
         <el-input
           v-model.trim="currentSetting.slippage"
           style="width: 221px"
+          @input="(val) => onValidateInput(val,'slippage')"
         >
           <template #suffix>%</template>
         </el-input>
@@ -74,8 +80,10 @@
         <el-input
           :model-value="currentSetting.priorityFee"
           @update:model-value="onPriorityFeeInput"
+          :placeholder="chain === 'solana' ? $t('customFee1') : $t('customEvmFee1')"
           clearable
           style="width: 221px"
+          @input="(val) => onValidateInput(val,'priorityFee')"
         >
           <template #suffix>
             {{ props.chain === 'solana' ? 'SOL' : 'GWEI' }}
@@ -203,10 +211,39 @@ const toggle = async () => {
     expandRef.value?.scrollIntoView({ behavior: 'smooth' })
   }
 }
+function openSlippageTips() {
+  // 提示逻辑，可扩展
+  ElMessageBox.alert(t('slippageTips'), {
+    title: t('slippage'),
+    confirmButtonText: t('iKnown'),
+  }).then(() => {
+    // on close
+  })
+}
+const onValidateInput = (val: string, type: 'slippage' | 'priorityFee') => {
+  // 1️⃣ 只允许数字和 .
+  let value = val.replace(/[^\d.]/g, '')
+  // 2️⃣ 只允许一个小数点
+  const parts = value.split('.')
+  if (parts.length > 2) {
+    value = parts[0] + '.' + parts.slice(1).join('')
+  }
+  // 3️⃣ 小数点不能放在第一位（可选）
+  if (value.startsWith('.')) {
+    value = '0' + value
+  }
+  if ( Number(value) >100) {
+    value = '100'
+  }
+  currentSetting.value[type] = value || ''
+}
 </script>
 
 <style scoped lang="scss">
 :deep(.el-input__wrapper) {
   background: var(--border);
+  padding: 0 12px;
+  -el-input-inner-height: 48px;
+  --el-input-inner-height: 48px;
 }
 </style>
