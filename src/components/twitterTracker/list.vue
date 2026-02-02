@@ -17,7 +17,7 @@
       <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
     </AveEmpty>
   </div>
-  <div v-else ref="parentRef" class="overflow-y-auto" style="height:calc(100% - 120px)" @end-reached="onScrollEnd">
+  <div v-else ref="parentRef" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 120px)">
     <div :style="{
       height: `${totalSize}px`,
       width: '100%',
@@ -45,6 +45,8 @@
 <script setup name="twitterTackerList">
 import ListItem from './listItem.vue'
 import { useVirtualizer } from '@tanstack/vue-virtual'
+import { useInfiniteScroll } from '@vueuse/core'
+
 const parentRef = ref(null)
 const { t } = useI18n()
 const emits = defineEmits(['startAttention', 'endReached'])
@@ -72,11 +74,10 @@ const isEmpty = computed(() => trackerStore.list.length === 0)
 const getItem = (virtualRow) => {
   return trackerStore.list[virtualRow.index] || {}
 }
-const onScrollEnd = (direction) => {
-  if (direction === 'bottom') {
-    emits('endReached')
-  }
-}
+
+useInfiniteScroll(parentRef, ()=>{
+  emits('endReached')
+}, { distance: 100 })
 
 </script>
 <style scoped lang="scss">
