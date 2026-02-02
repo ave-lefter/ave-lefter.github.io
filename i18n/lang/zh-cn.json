@@ -1988,5 +1988,12 @@
   "smarterRatio": "聪明钱占比",
   "devWallet": "DEV钱包",
   "follows": "粉丝",
-  "joined": "加入时间"
+  "joined": "加入时间",
+  "marketNavigation": "市场导航",
+  "totalTransactions": "总交易数",
+  "traderCount": "交易人数",
+  "24hVolume": "24h成交额",
+  "tokenStats": "代币统计",
+  "created": "创建",
+  "topPlatforms": "顶级发射平台"
 }
