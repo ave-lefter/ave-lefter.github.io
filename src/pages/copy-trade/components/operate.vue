@@ -181,7 +181,7 @@ function getFollowSwapOrder() {
   form.value.isPrivate = res.isPrivate
   // form.value.priorityFee = res?.priorityFee
   form.value.priorityFee = currentUser.value?.decimals ? new BigNumber(res?.priorityFee || 0).div(
-      10 ** currentUser.value?.decimals) : ''
+      10 ** 9) : ''
   settingCopyTrade.value[res.chain] = {
     slippage: form.value.slippage,
     isPrivate: form.value.isPrivate,

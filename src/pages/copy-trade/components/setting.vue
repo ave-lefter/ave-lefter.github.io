@@ -195,6 +195,7 @@ watch(
   () => currentSetting.value.priorityFee,
   (val) => {
     form.value.priorityFee = val
+
   },
   { deep: true,immediate: true }
 )
