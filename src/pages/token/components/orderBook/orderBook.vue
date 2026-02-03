@@ -30,13 +30,16 @@
 
     <!-- 表格 -->
     <div class="px-12px">
-      <DateFilterCard v-if="tableFilter.timestamp.length" v-model:timestamp="tableFilter.timestamp" @update:timestamp="_getTokenTxs"/>
-      <div v-loading="listStatus.loadingTxs" class="text-12px">
+      <DateFilterCard v-if="tableFilter.timestamp.length" v-model:timestamp="tableFilter.timestamp" @update:timestamp="filterSubmit"/>
+      <div v-loading="tableLoading" class="text-12px">
         <!-- 表格头部 -->
         <div
           class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px mt-8px mb-4px text-12px color-[--d-5A5E64-l-A9B0BC]">
           <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px">
-            <div class="min-w-0 text-left">{{ t('time') }}</div>
+            <div class="min-w-0 text-left cursor-pointer">
+              <span @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')">{{ t('time') }}</span>
+              <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
+            </div>
             <div class="text-right text-nowrap min-w-0">
               <div class="flex items-center justify-end gap-2px">
                 <span>{{ t('amountU').slice(0, 3) }}</span>
@@ -82,7 +85,7 @@
         </div>
 
         <!-- 表格内容 -->
-        <UseVirtualList v-if="filterTableList.length > 0" :key="klineHeight" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 75}px`">
+        <UseVirtualList v-if="filterTableList.length > 0" :key="klineHeight" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 75}px`"  @endReached="loadMore">
           <!-- <div v-for="(row, index) in filterTableList" :key="index"
             class="relative overflow-hidden cursor-pointer mt-1px first:mt-0" @mouseenter="isPausedTxs = true"
             @mouseleave="isPausedTxs = false" @click="onRowClick({ rowData: row } as any)"> -->
@@ -90,111 +93,111 @@
             <!-- 表格内容 -->
              <template #default="{data:row,index}">
                 <div
-                class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
-                @mouseenter="isPausedTxs = true"
-                @mouseleave="isPausedTxs = false"
-                @click="onRowClick({ rowData: row } as any)"
-                >
-                <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
-                  <!-- 整行渐变背景 -->
-                  <div class="absolute inset-0 pointer-events-none"
-                    :style="{ backgroundColor: getFullRowGradient(row), transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'right' }" />
+                  class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
+                  @mouseenter="isPausedTxs = true"
+                  @mouseleave="isPausedTxs = false"
+                  @click="onRowClick({ rowData: row } as any)"
+                  >
+                  <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
+                    <!-- 整行渐变背景 -->
+                    <div class="absolute inset-0 pointer-events-none"
+                      :style="{ backgroundColor: getFullRowGradient(row), transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'right' }" />
 
-                  <!-- Time -->
-                  <div class="text-left min-w-0">
-                    <div class="color-[--d-5A5E64-l-A9B0BC]">
-                      <TimerCount v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
-                        :key="`${row.time}${index}`" :timestamp="row.time" :end-time="60">
-                        <template #default="{ seconds }">
-                          <span class="color-[--d-5A5E64-l-A9B0BC]">
-                            <template v-if="seconds < 60">
-                              {{ seconds }}s
-                            </template>
-                            <template v-else>
-                              {{ formatTimeFromNow(row.time) }}
-                            </template>
+                    <!-- Time -->
+                    <div class="text-left min-w-0">
+                      <div class="color-[--d-5A5E64-l-A9B0BC]">
+                        <TimerCount v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
+                          :key="`${row.time}${index}`" :timestamp="row.time" :end-time="60">
+                          <template #default="{ seconds }">
+                            <span class="color-[--d-5A5E64-l-A9B0BC]">
+                              <template v-if="seconds < 60">
+                                {{ seconds }}s
+                              </template>
+                              <template v-else>
+                                {{ formatTimeFromNow(row.time) }}
+                              </template>
+                            </span>
+                          </template>
+                        </TimerCount>
+                        <span v-else class="color-[--d-5A5E64-l-A9B0BC]">
+                          {{ formatTimeFromNow(row.time) }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Amount -->
+                    <div class="text-right text-nowrap min-w-0">
+                      <div :class="getRowColor(row)" class="font-medium truncate">
+                        <template v-if="globalStore.isUSDT">
+                          <span>
+                            ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
                           </span>
                         </template>
-                      </TimerCount>
-                      <span v-else class="color-[--d-5A5E64-l-A9B0BC]">
-                        {{ formatTimeFromNow(row.time) }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Amount -->
-                  <div class="text-right text-nowrap min-w-0">
-                    <div :class="getRowColor(row)" class="font-medium truncate">
-                      <template v-if="globalStore.isUSDT">
-                        <span>
-                          ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
-                        </span>
-                      </template>
-                      <template v-else>
-                        <span>
-                          ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
-                          <span class="color-[--d-5A5E64-l-A9B0BC] hidden sm:inline">
-                            {{ getChainInfo(row.chain)?.main_name }}
+                        <template v-else>
+                          <span>
+                            ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
+                            <span class="color-[--d-5A5E64-l-A9B0BC] hidden sm:inline">
+                              {{ getChainInfo(row.chain)?.main_name }}
+                            </span>
                           </span>
-                        </span>
-                      </template>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px">
-                  <!-- Price -->
-                  <div class="text-right text-nowrap min-w-0 overflow-visible">
-                    <div class="color-[--secondary-text]">
-                      <template v-if="tableView.isAmount">
-                        <span>
-                          ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
-                        </span>
-                      </template>
-                      <template v-else>
-                        <span>
-                          ${{ formatNumber(getMcPrice(row), { decimals: 2 }) }}
-                        </span>
-                      </template>
+                        </template>
+                      </div>
                     </div>
                   </div>
 
-                  <!-- Trader -->
-                  <div class="text-right overflow-hidden min-w-0">
-                    <div class="flex items-center justify-end min-w-0">
-                      <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(row.chain) && row.senderProfile">
-                        <Icon v-if="hasNewAccount(row)"
-                          v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                          name="custom:new-account" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                        <Icon v-if="hasClearedAccount(row)"
-                          v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                          name="custom:cleared-account"
-                          class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                        <Icon v-if="bigWallet(row)"
-                          v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                          name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                      </template>
-                      <SignalTags v-if="windowWidth >= 480" tagClass="mr-3px"
-                        :tags="(row.newTags || []).map((el: any) => tagStore.matchTag(el.type)||el)"
-                        :walletAddress="row.wallet_address" :chain="row.chain" />
+                  <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px">
+                    <!-- Price -->
+                    <div class="text-right text-nowrap min-w-0 overflow-visible">
+                      <div class="color-[--secondary-text]">
+                        <template v-if="tableView.isAmount">
+                          <span>
+                            ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
+                          </span>
+                        </template>
+                        <template v-else>
+                          <span>
+                            ${{ formatNumber(getMcPrice(row), { decimals: 2 }) }}
+                          </span>
+                        </template>
+                      </div>
+                    </div>
 
-                      <UserRemark :remark="row.remark" :address="row.wallet_address"
-                        :show-address="!(row?.newTags?.length > 1)" :chain="row.chain" :wallet_logo="row.wallet_logo"
-                        :addressClass="`inline-block truncate max-w-full ${
-                          markerTooltipVisible && currentRow.wallet_address===row.wallet_address?'bg-#12B88633':''
-                        }`"
-                        :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
-                        class="color-[--secondary-text] truncate min-w-0 !text-12px"
-                        :mouseoverAddress="e => openMarkerTooltip(row, e)" :canEdit="false"
-                        @update-remark="updateRemark" />
-                      <div v-if="row.count && row.count > 1"
-                        class="color-[--secondary-text] !text-12px ml-2px whitespace-nowrap">
-                        ({{ row.count }})
+                    <!-- Trader -->
+                    <div class="text-right overflow-hidden min-w-0">
+                      <div class="flex items-center justify-end min-w-0">
+                        <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(row.chain) && row.senderProfile">
+                          <!-- <Icon v-if="hasNewAccount(row)"
+                            v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                            name="custom:new-account" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                          <Icon v-if="hasClearedAccount(row)"
+                            v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                            name="custom:cleared-account"
+                            class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" /> -->
+                          <Icon v-if="bigWallet(row)"
+                            v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                            name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                        </template>
+                        <SignalTags v-if="windowWidth >= 480" tagClass="mr-3px"
+                          :tags="(row.newTags || []).map((el: any) => tagStore.matchTag(el.type)||el)"
+                          :walletAddress="row.wallet_address" :chain="row.chain" />
+
+                        <UserRemark :remark="row.remark" :address="row.wallet_address"
+                          :show-address="!(row?.newTags?.length > 1)" :chain="row.chain" :wallet_logo="row.wallet_logo"
+                          :addressClass="`inline-block truncate max-w-full ${
+                            markerTooltipVisible && currentRow.wallet_address===row.wallet_address?'bg-#12B88633':''
+                          }`"
+                          :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
+                          class="color-[--secondary-text] truncate min-w-0 !text-12px"
+                          :mouseoverAddress="e => openMarkerTooltip(row, e)" :canEdit="false"
+                          @update-remark="updateRemark" />
+                        <div v-if="row.count && row.count > 1"
+                          class="color-[--secondary-text] !text-12px ml-2px whitespace-nowrap">
+                          ({{ row.count }})
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
              </template>
           <!-- </div> -->
         </UseVirtualList>
@@ -290,7 +293,7 @@ import { storeToRefs } from 'pinia'
 import { useTokenStore } from '~/stores/token'
 import { useWSStore } from '~/stores/ws'
 import { getAddressAndChainFromId, formatTimeFromNow, uuid, getChainInfo } from '~/utils'
-import { getTokenTxs, type GetPairLiqResponse, type IGetTokenTxsResponse } from '~/api/token'
+import { getTokenTxs, getSimpleTxs,type GetPairLiqResponse, type IGetTokenTxsResponse, type IGetSimpleTxsResponse, } from '~/api/token'
 import { useRoute } from 'vue-router'
 import { filterLanguage } from '~/pages/token/components/kLine/utils'
 import { WSEventType } from '~/utils/constants'
@@ -308,7 +311,7 @@ const themeStore = useThemeStore()
 const MAKER_SUPPORT_CHAINS = ['solana', 'bsc']
 
 // 扩展的交易数据类型
-type ExtendedTxResponse = (IGetTokenTxsResponse | SimpleWSTx) & {
+type ExtendedTxResponse = (IGetSimpleTxsResponse | SimpleWSTx) & {
   count?: number
   senderProfile?: any
   wallet_tag?: string[]
@@ -326,6 +329,7 @@ defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
 
+const {lang} = storeToRefs(useGlobalStore())
 const { t } = useI18n()
 const route = useRoute()
 const { totalHolders, pairAddress, pair, token, } = storeToRefs(useTokenStore())
@@ -343,7 +347,12 @@ const isPausedTxs = shallowRef(false)
 const markerTooltipVisible = shallowRef(false)
 // const isMeActive = ref(false)
 const listStatus = ref({
-  loadingTxs: false
+  loadingTxs: false,
+   // 切换token
+  loadingTxs1: false,
+  finished: false,
+  page_token:'',
+  pageSize:100
 })
 
 const tokenTxs = shallowRef<ExtendedTxResponse[]>([])
@@ -423,14 +432,67 @@ const addressAndChain = computed(() => {
   }
 })
 
+const defaultSort = computed(() => {
+  if (sortConditions.value.sort === 'time') {
+    return sortConditions.value.sort_dir
+  }
+  return ''
+})
+
+const sortConditions= ref({
+  sort: '',
+  sort_dir: '',
+})
+
+function sortChange(sort_dir: string) {
+  sortConditions.value={
+    sort: sort_dir ? 'time' : '',
+    sort_dir: sort_dir,
+  }
+  console.log('sortConditions.value', sort_dir)
+  // if(sort_dir==='desc') return 
+  filterSubmit()
+}
+
+function filterSubmit() {
+  console.log('filterSubmit')
+  listStatus.value.page_token = ''
+  listStatus.value.loadingTxs = false
+  listStatus.value.finished = false
+  //TODO
+  _getTokenTxs()
+  // if(aveTableRef.value) aveTableRef.value.scrollToTop(0)
+}
+
+const tableLoading = computed(() => listStatus.value.loadingTxs1 )
+const showFooter=ref(false)
+const footText = computed(() => {
+  if(listStatus.value.loadingTxs){
+    return t('loading')
+  }else if(listStatus.value.finished){
+    return t('noMore')
+  }else{
+    return ''
+  }
+})
+
+function loadMore(remainDistance:number){
+  console.log('loadMore remainDistance', remainDistance, listStatus.value)
+  showFooter.value=remainDistance <= 20
+  if ((remainDistance <= 20) && !(listStatus.value.loadingTxs || listStatus.value.finished)) {
+    _getTokenTxs()
+  }
+}
+
+
 const isMeActive = computed(()=>{
   return tableFilter.value.markerAddress === botStore.getWalletAddress(addressAndChain.value.chain)!
 })
 
 const filterTableListMap = {
-  all: () => [...tokenTxs.value].toSorted((a, b) => b.time - a.time),
-  buy: () => tokenTxs.value.filter(el => isBuy((el))),
-  sell: () => tokenTxs.value.filter(el => !isBuy(el))
+  all: () => [...tokenTxs.value].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
+  buy: () => tokenTxs.value.filter(el => isBuy((el))).toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
+  sell: () => tokenTxs.value.filter(el => !isBuy(el)).toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time)
 }
 
 const filterTableList = computed(() => {
@@ -471,7 +533,7 @@ const filterTableList = computed(() => {
 watch(() => klineDateFilter?.value, (val) => {
   if (val && props.modelValue) {
     tableFilter.value.timestamp = val
-    _getTokenTxs()
+    filterSubmit()
   }
 })
 
@@ -479,6 +541,8 @@ watch(() => klineDateFilter?.value, (val) => {
 watch(() => pairAddress.value, () => {
   if (pairAddress.value && props.modelValue) {
     console.log('🔄 Token切换，清空订单薄数据')
+    listStatus.value.loadingTxs1 = true
+    resetCache()
     // 立即清空旧数据，避免显示错误的数据
     tokenTxs.value = []
     wsPairCache.value = []
@@ -490,6 +554,8 @@ watch(() => pairAddress.value, () => {
     // 重新获取数据
     _getTokenTxs()
     subscribeToTxs()
+
+    filterSubmit()
   }
 })
 
@@ -498,19 +564,24 @@ watch(() => props.modelValue, (isOpen) => {
   console.log('🔄 订单薄状态变化:', isOpen ? '打开' : '关闭')
   if (isOpen && pairAddress.value) {
     // orderBook 打开时，清空旧数据并获取新数据
-    tokenTxs.value = []
-    wsPairCache.value = []
-    txCount.value = {}
+    listStatus.value.loadingTxs1 = true
+    resetCache()
     _getTokenTxs()
     subscribeToTxs()
+
+    filterSubmit()
   } else if (!isOpen) {
     // orderBook 关闭时，取消订阅并清空数据
     unsubscribeFromTxs()
-    tokenTxs.value = []
-    wsPairCache.value = []
-    txCount.value = {}
+    resetCache()
   }
 })
+
+function resetCache() {
+  tokenTxs.value = []
+  wsPairCache.value = []
+  txCount.value = {}
+}
 
 // WebSocket 订阅
 function subscribeToTxs() {
@@ -542,45 +613,153 @@ function unsubscribeFromTxs() {
   })
 }
 
-async function _getTokenTxs() {
-  try {
-    listStatus.value.loadingTxs = true
-    const { tag_type } = tableFilter.value
-    const getTokenTxsParams = {
-      token_id: route.params.id as string,
-      tag_type,
-      maker: tableFilter.value.markerAddress,
-      time_min:tableFilter.value.timestamp?.[0],
-      time_max:tableFilter.value.timestamp?.[1]
+function transferTxsData(row: IGetSimpleTxsResponse) {
+  const { wallet_tag, topN } = getWalletTag(row)
+  const maker_types = (row.maker_type||'').split(',')
+  let lang1='en' as 'tw'|'cn'|'vi'|'tr'|'ru'|'pt'|'ko'|'ja'|'es'|'en'
+  if (lang.value === 'zh-tw') {
+    lang1 = 'tw'; // 繁体中文
+  } else if (lang.value === 'zh-cn') {
+    lang1 = 'cn'; // 简体中文
+  } 
+  const newTags=tagStore.tagArr.filter(item => maker_types.includes(item.type)).map(i=>{
+    return {
+      "type": i.type,
+      "tag_desc": i?.[lang1],
+      "icon": i.icon,
+      "color": i.color,
+      "extra_info": i.extra_info,
+      "nick_name": i.nick_name
     }
-    const res = await getTokenTxs(getTokenTxsParams)
-
-    realAddress.value = getAddressAndChainFromId(getTokenTxsParams.token_id).address
-
-    tokenTxs.value = (res || []).reverse().map(val => {
-      txCount.value[val.wallet_address] = (txCount.value[val.wallet_address] || 0) + 1
-      const { wallet_tag, topN } = getWalletTag(val)
-      return {
-        ...val,
-        wallet_tag,
-        topN,
-        count: txCount.value[val.wallet_address],
-        senderProfile: JSON.parse(val.profile || '{}'),
-        uuid: uuid()
-      }
-    }).reverse()
-  } catch (e) {
-    // 只有在没有现有数据时才清空，避免网络错误导致数据丢失
-    // if (tokenTxs.value.length === 0) {
-      tokenTxs.value = []
-    // }
-    console.log('🚨 订单薄数据获取失败:', e)
-  } finally {
-    listStatus.value.loadingTxs = false
+  })
+  return {
+    ...row,
+    wallet_tag,
+    topN,
+    senderProfile: JSON.parse(row?.profile || '{}'),
+    uuid: uuid(),
+    newTags,
+    isSimple: true,
+    chain:addressAndChain.value.chain,
+    id:row.page_token,
+    // amm:row.amm,
+    transaction:row.txhash,
+    wallet_address:row.maker,
   }
 }
 
-function getWalletTag(val: IGetTokenTxsResponse) {
+function resetTx() {
+  tokenTxs.value = []
+  listStatus.value.page_token = ''
+}
+
+const _getTokenTxs = useThrottleFn(async () => {
+  try {
+    if (listStatus.value.loadingTxs) return
+    listStatus.value.loadingTxs = true
+    const { tag_type } = tableFilter.value
+    const getPairTxsParams = {
+      token_id: route.params.id as string,
+      tag_type:!['buy', 'sell'].includes(tag_type) ? tag_type : '',
+      direction:['buy', 'sell'].includes(tag_type) ? tag_type : '',
+      sender: tableFilter.value.markerAddress,
+      target_price_u_min: tableFilter.value.minVol[0],
+      target_price_u_max: tableFilter.value.maxVol[1],
+      time_min: tableFilter.value.timestamp[0],
+      time_max: tableFilter.value.timestamp[1],
+      page_token: listStatus.value.page_token,
+      //TODO: 增加排序参数
+      sort_dir:sortConditions.value.sort_dir
+    }
+
+    const res = await getSimpleTxs(tokenStore.pairAddress + '-' + addressAndChain.value.chain, getPairTxsParams)
+    const data=res||[]
+    realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
+    const page_token= data[data.length - 1]?.page_token || ''
+    txCount.value={}
+    if (Array.isArray(data) && data?.length > 0) {
+      if(!listStatus.value.page_token) {
+        tokenTxs.value = data.reverse().map(val => {
+          txCount.value[val.maker] = (txCount.value[val.maker] || 0) + 1
+          return {
+            ...transferTxsData(val),
+            count: txCount.value[val.maker]
+          }
+        }).reverse()
+        // 获取tokenTxs.value 最后一项的token_id
+        // listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token || ''
+      }else{
+        tokenTxs.value = [...tokenTxs.value].concat(data.filter?.(i => tokenTxs.value?.every?.(j => j.txhash !== i.txhash))
+            ?.map(i => transferTxsData(i))).reverse().map(val => {
+          txCount.value[val.maker] = (txCount.value[val.maker] || 0) + 1
+          return {
+            ...val,
+            count: txCount.value[val.maker]
+          }
+        }).reverse()
+      }
+      if (!listStatus.value.finished) {
+        listStatus.value.page_token = page_token
+      }
+      if(sortConditions.value.sort_dir ==='asc'){
+        tokenTxs.value =[...tokenTxs.value].toSorted((a, b) => a.time - b.time)
+      }else{
+        tokenTxs.value =[...tokenTxs.value].toSorted((a, b) => b.time - a.time)
+      }
+    }else{
+      if(!listStatus.value.page_token) {
+        tokenTxs.value = []
+      }
+      listStatus.value.finished = true
+    }
+  } catch (e) {
+    resetTx()
+  } finally {
+    listStatus.value.loadingTxs1 = false
+    showFooter.value = false
+    listStatus.value.loadingTxs = false
+  }
+}, 500)
+
+// async function _getTokenTxs() {
+//   try {
+//     listStatus.value.loadingTxs = true
+//     const { tag_type } = tableFilter.value
+//     const getTokenTxsParams = {
+//       token_id: route.params.id as string,
+//       tag_type,
+//       maker: tableFilter.value.markerAddress,
+//       time_min:tableFilter.value.timestamp?.[0],
+//       time_max:tableFilter.value.timestamp?.[1]
+//     }
+//     const res = await getTokenTxs(getTokenTxsParams)
+
+//     realAddress.value = getAddressAndChainFromId(getTokenTxsParams.token_id).address
+
+//     tokenTxs.value = (res || []).reverse().map(val => {
+//       txCount.value[val.wallet_address] = (txCount.value[val.wallet_address] || 0) + 1
+//       const { wallet_tag, topN } = getWalletTag(val)
+//       return {
+//         ...val,
+//         wallet_tag,
+//         topN,
+//         count: txCount.value[val.wallet_address],
+//         senderProfile: JSON.parse(val.profile || '{}'),
+//         uuid: uuid()
+//       }
+//     }).reverse()
+//   } catch (e) {
+//     // 只有在没有现有数据时才清空，避免网络错误导致数据丢失
+//     // if (tokenTxs.value.length === 0) {
+//       tokenTxs.value = []
+//     // }
+//     console.log('🚨 订单薄数据获取失败:', e)
+//   } finally {
+//     listStatus.value.loadingTxs = false
+//   }
+// }
+
+function getWalletTag(val: IGetSimpleTxsResponse) {
   const wallet_tagStr = val.wallet_tag_v2 || ''
   let topN = ''
   let wallet_tag: string[] = []
@@ -600,7 +779,7 @@ function getWalletTag(val: IGetTokenTxsResponse) {
   }
 }
 
-function isBuy(row: IGetTokenTxsResponse | SimpleWSTx) {
+function isBuy(row: IGetSimpleTxsResponse | SimpleWSTx) {
   const tokenAddress = realAddress.value || addressAndChain.value.address
 
   if (!tokenAddress || !row) {
@@ -630,7 +809,7 @@ function isBuy(row: IGetTokenTxsResponse | SimpleWSTx) {
   }
 }
 
-function getRowColor(row: IGetTokenTxsResponse) {
+function getRowColor(row: IGetSimpleTxsResponse) {
   if ('type' in row) {
     if (row.type === 'addLiquidity') {
       return 'color-#65C4ED'
@@ -642,7 +821,7 @@ function getRowColor(row: IGetTokenTxsResponse) {
 }
 
 
-function getMcPrice(row: IGetTokenTxsResponse | SimpleWSTx) {
+function getMcPrice(row: IGetSimpleTxsResponse | SimpleWSTx) {
 
   // 获取total总数
   const total = tokenStore.circulation
@@ -650,7 +829,9 @@ function getMcPrice(row: IGetTokenTxsResponse | SimpleWSTx) {
   // 根据买/卖方向获取对应的USD价格（成交价）
   let currentPriceUsd = 0
   const tokenAddress = realAddress.value || addressAndChain.value.address
-  if ('direction' in row && 'target' in row) {
+  if ('isSimple' in row && row.isSimple && 'target_price_u' in row) {
+    currentPriceUsd = Number(row?.target_price_u)
+  }else if ('direction' in row && 'target' in row) {
     currentPriceUsd = Number(row.price_u)
   } else {
     if (row.from_address && tokenAddress.toLowerCase?.() === row.from_address?.toLowerCase?.()) {
@@ -683,7 +864,7 @@ function getMcPrice(row: IGetTokenTxsResponse | SimpleWSTx) {
 
   return marketCap
 }
-function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, needPrice = false, isVolUSDT = false) {
+function getAmount(row: GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx, needPrice = false, isVolUSDT = false) {
   // 使用 realAddress 确保地址匹配的准确性
   const tokenAddress = realAddress.value || addressAndChain.value.address
 
@@ -692,13 +873,13 @@ function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, 
     console.warn('🚨 getAmount: 缺少必要参数', { tokenAddress, row })
     return 0
   }
-
   if ('direction' in row && 'target' in row) {
     return Number(row.target_amt || 0) * (
-      needPrice ? Number(isVolUSDT ? row.price_u : row.price_m)
-        : 1
-    )
+        needPrice ? Number(isVolUSDT ? row.price_u || row.target_price_u : row.price_m||row.target_price_m)
+          : 1
+      )
   }
+ 
   if ('from_address' in row) {
     if (
       row.from_address &&
@@ -782,7 +963,7 @@ onUnmounted(() => {
 })
 
 // 新增函数：获取成交价格
-function getTransactionPrice(row: IGetTokenTxsResponse | SimpleWSTx, isVolUSDT = false) {
+function getTransactionPrice(row: IGetSimpleTxsResponse | SimpleWSTx, isVolUSDT = false) {
   // 使用 realAddress 确保地址匹配的准确性
   const tokenAddress = realAddress.value || addressAndChain.value.address
 
@@ -792,8 +973,9 @@ function getTransactionPrice(row: IGetTokenTxsResponse | SimpleWSTx, isVolUSDT =
     return 0
   }
 
+
   if ('direction' in row && 'target' in row) {
-    return Number(isVolUSDT ? row.price_u : row.price_m) || 0
+    return Number(isVolUSDT ? row.price_u || row.target_price_u : row.price_m||row.target_price_m) || 0
   }
 
   if (row.from_address &&
@@ -817,7 +999,7 @@ function setActiveTab(val: string, index: number) {
   resetData(val)
   // isMeActive.value = false
   tableFilter.value.markerAddress = ''
-  _getTokenTxs()
+  filterSubmit()
 
   // 滚动到 tab 中心位置
   if (tabsContainer.value) {
@@ -864,7 +1046,7 @@ function toggleClickMe() {
     dialogFilter.value.markerAddress = walletAddress
   }
   wsPairCache.value.length = 0  // 清空缓存
-  _getTokenTxs()
+  filterSubmit()
 }
 
 function resetData(val:string) {
@@ -1132,8 +1314,8 @@ const updatetokenTxs = useThrottleFn(() => {
     tokenTxs.value.unshift(...newTxs)
 
     // 限制数据量，保持性能
-    if (tokenTxs.value.length > 300) {
-      tokenTxs.value = tokenTxs.value.slice(0, 300)
+    if (tokenTxs.value.length > 1500) {
+      tokenTxs.value = tokenTxs.value.slice(0, 1500)
     }
   }
 
