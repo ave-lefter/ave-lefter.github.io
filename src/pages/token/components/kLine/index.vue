@@ -578,6 +578,10 @@ function createToggleButton() {
     _widget?.resetCache?.()
 
     _widget?.activeChart?.()?.resetData?.()
+    setTimeout(() => {
+      _widget?.activeChart?.()?.executeActionById?.('chartReset')
+    }, 300)
+
   }
   updateButtonContent()
   headerBtns.push(btn)
