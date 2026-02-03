@@ -47,7 +47,7 @@ function formatColor(val, activeInterval = lowerCaseInterval.value) {
       class="flex justify-end lh-18px mb-2px decorate decoration-dotted"
       :class="formatColor(row[volPrefix])"
     >
-      <el-popover :width="240">
+      <el-popover :width="240" :persistent="false">
         <template #reference> ${{ formatNumber(row[volPrefix] || 0, 1) }} </template>
         <template #default>
           <div class="flex justify-between color-[--third-text] text-12px lh-16px mb-8px">

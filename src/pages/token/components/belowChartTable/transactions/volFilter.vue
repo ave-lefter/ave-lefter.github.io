@@ -39,6 +39,7 @@ function onBlur(index: number) {
     placement="bottom"
     :width="350"
     trigger="click"
+    :persistent="false"
   >
     <template #reference>
       <Icon

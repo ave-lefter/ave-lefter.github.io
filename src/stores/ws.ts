@@ -7,6 +7,9 @@ import { updatePriceFromTx } from '@/utils/txUpdate'
 import type { SimpleWSTx, WSTx } from '~/pages/token/components/kLine/types'
 import { WSEventType } from '~/utils/constants'
 
+/** 模块级单例：路由/Store 重初始化时复用同一 WS，避免重复创建导致内存泄漏 */
+let globalWsSingleton: WS | null = null
+
 export const useWSStore = defineStore('ws', () => {
   // 使用 shallowRef 代替 ref，WebSocket 本身是非响应式的
   const wsInstance = shallowRef<WS | null>(null)
@@ -37,8 +40,20 @@ export const useWSStore = defineStore('ws', () => {
   // 将 createWebSocket 重命名为 init
   const init = (options?: WSOptions) => {
     if (wsInstance.value) return  // 防止重复创建 WebSocket 实例
+    // 路由/Store 重初始化时复用全局单例，避免重复创建 WS 导致泄漏
+    if (globalWsSingleton) {
+      wsInstance.value = globalWsSingleton
+      return
+    }
     const url = `${(getBestApiDomain() || location.origin).replace('http', 'ws')}/ws`
-    wsInstance.value = new WS({url, ...(options || {})})
+    const newWs = new WS({ url, ...(options || {}) })
+    // 防止竞态：若在 new WS() 期间其他调用已赋值，则关闭本次创建的实例避免泄漏
+    if (wsInstance.value || globalWsSingleton) {
+      newWs.close()
+      return
+    }
+    globalWsSingleton = newWs
+    wsInstance.value = newWs
 
     wsInstance.value.onopen(() => {
       isConnected.value = true
@@ -110,6 +125,14 @@ export const useWSStore = defineStore('ws', () => {
     isConnected.value = false
     wsInstance.value?.close()
     wsInstance.value = null
+    globalWsSingleton = null
+  }
+
+  /** 离开 token 页时释放 K 线/交易等大对象引用，便于 GC */
+  const clearTokenRelatedResult = () => {
+    wsResult[WSEventType.KLINE] = null
+    wsResult[WSEventType.TX] = null
+    wsResult[WSEventType.SIMPLE_TX] = null
   }
 
   return {
@@ -118,6 +141,7 @@ export const useWSStore = defineStore('ws', () => {
     init,
     send,
     close,
+    clearTokenRelatedResult,
     wsResult
   }
 })

@@ -542,7 +542,7 @@ function resetColumns(needClear: boolean) {
 :deep(.el-table-v2__row-cell) {
   @apply px-16px;
 }
-:deep {
+:deep() {
   .row-disabled {
     --el-table-border: 1px solid #1a1a1a;
     &:before {

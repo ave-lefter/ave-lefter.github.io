@@ -17,12 +17,12 @@ const scrollToTop = () => {
   })
 }
 
-scrollTopEvent.on(() => {
-  scrollToTop()
-})
+const scrollTopOff = scrollTopEvent.on(scrollToTop)
 
 onUnmounted(() => {
-  scrollTopEvent.off(scrollToTop)
+  if (scrollTopOff) {
+    scrollTopOff()
+  }
 })
 
 onMounted(() => {

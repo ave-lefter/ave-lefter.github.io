@@ -121,7 +121,7 @@ function getRugColor(val) {
       >
       {{ $t('safe') }}
     </div>
-    <el-popover v-if="runPullVisible" :width="247">
+    <el-popover v-if="runPullVisible" :width="247" :persistent="false">
       <template #reference>
         <div
           class="flex items-center justify-end h-20px gap-4px mt-10px"

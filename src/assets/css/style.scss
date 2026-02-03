@@ -416,3 +416,30 @@ debox-chat-widget {
   color:#12b8861a;
   color:#f6465d1a;
 }
+
+
+.v-scroller-container {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  /* Firefox 颜色：第一个是滑块颜色，第二个是轨道颜色 */
+  scrollbar-color: rgba(144, 147, 153, 0.3) transparent;
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    /* 使用 rgba 手动控制透明度，0.2 是最接近 Element 的淡色 */
+    background-color: var(--el-text-color-placeholder, rgba(144, 147, 153, 0.2));
+    border-radius: 10px;
+    /* 只有加上这一行，颜色才会变淡 */
+    opacity: 0.2;
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: var(--el-text-color-secondary, rgba(144, 147, 153, 0.3));
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--el-text-color-secondary, rgba(144, 147, 153, 0.5)) !important;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}

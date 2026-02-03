@@ -418,12 +418,17 @@ const tgWalletVisible = ref(false)
 const showVisible = ref(0)
 const depositChain = ref('solana')
 
-useEventBus<string>('botTopUp').on((val) => {
+const botTopUpOff = useEventBus<string>('botTopUp').on((val) => {
   tgWalletVisible.value = true
   nextTick(() => {
     showVisible.value = 2
     depositChain.value = val
   })
+})
+onUnmounted(() => {
+  if (botTopUpOff) {
+    botTopUpOff()
+  }
 })
 interface WithdrawFormData {
   amount: string

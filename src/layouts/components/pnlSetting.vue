@@ -241,7 +241,7 @@ function resetBg() {
 </template>
 <style lang="scss" scoped>
 .upload {
-  :deep {
+  :deep() {
     .el-upload {
       --el-upload-dragger-padding-horizontal: 0;
       --el-upload-dragger-padding-vertical: 0;
@@ -251,7 +251,7 @@ function resetBg() {
     }
   }
 }
-:deep {
+:deep() {
   .el-slider__stop {
     height: 4px;
     top: -1px;

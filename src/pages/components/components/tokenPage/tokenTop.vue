@@ -310,6 +310,7 @@ function handleReset() {
             title=""
             :width="200"
             trigger="click"
+            :persistent="false"
           >
             <template #reference>
               <a class="flex-start bg-btn" href="" @click.stop.prevent>
@@ -382,6 +383,7 @@ function handleReset() {
             title=""
             :width="200"
             trigger="click"
+            :persistent="false"
           >
             <template #reference>
               <a class="w-zu flex-start bg-btn" href="" @click.stop.prevent>

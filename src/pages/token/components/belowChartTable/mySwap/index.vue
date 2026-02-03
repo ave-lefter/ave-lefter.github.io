@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, nextTick, onActivated } from 'vue'
+import { computed, ref, nextTick, onActivated, onUnmounted } from 'vue'
 import { useBotStore } from '@/stores/bot'
 import { getChainInfo } from '@/utils'
 import unified from './unified.vue'
@@ -211,6 +211,13 @@ onMounted(() => {
     activeTab.value = chain
   }
   getWalletTxData()
+})
+
+onUnmounted(() => {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
 })
 
 // onActivated(() => {
