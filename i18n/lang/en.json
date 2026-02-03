@@ -990,6 +990,7 @@
   "router": "Route",
   "selectRouter": "Select Router",
   "viewTransition": "View Transaction",
+  "viewOrigin": "View Origin",
   "plsViewBlockChainExplorer": "View transactions in the blockchain browser",
   "plsConfirmWallet": "Please confirm this transaction in your wallet",
   "waitForConfirming": "Waiting for confirmation",

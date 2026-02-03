@@ -17,7 +17,7 @@
       <span class="color-[--third-text] text-12px mb-20px mt-4px">{{ t('emptyNoData') }}</span>
     </AveEmpty>
   </div>
-  <div v-else ref="parentRef" class="overflow-y-auto" style="height:calc(100% - 120px)" @end-reached="onScrollEnd">
+  <div v-else ref="parentRef" class="overflow-y-auto" style="height:calc(100% - 120px)" @mouseenter="emits('stop',true)" @mouseleave="emits('stop',false)" @end-reached="onScrollEnd">
     <div :style="{
       height: `${totalSize}px`,
       width: '100%',
@@ -47,7 +47,7 @@ import ListItem from './listItem.vue'
 import { useVirtualizer } from '@tanstack/vue-virtual'
 const parentRef = ref(null)
 const { t } = useI18n()
-const emits = defineEmits(['startAttention', 'endReached'])
+const emits = defineEmits(['startAttention', 'endReached','stop'])
 const props = defineProps({
   isMine: {
     type: Boolean

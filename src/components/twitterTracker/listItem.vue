@@ -81,26 +81,41 @@
                             @load="handleImageLoad(mediaIndex)">
                     </template>
                 </el-tooltip>
-                <div v-else class="h-full">
+                <div v-else>
                     <!-- <video ref="videoPlayer" :poster="media.media_url_https" :src="findMediaUrl(media)" class="w-full h-full object-cover video-js vjs-default-skin" controls /> -->
-                     <iframe :srcdoc="`
-                     <meta name=&quot;referrer&quot; content=&quot;no-referrer&quot; />
-                      <video poster=${media.media_url_https} src=${findMediaUrl(media)} controls />
-                     `" frameborder="0"/>
+                     <iframe class="w-full" style="border: none; cursor: pointer;height: auto; aspect-ratio: 16 / 9; max-height: 320px;" :srcdoc="`
+                     <html>
+                        <style>
+                            video {
+                                width: 100%;
+                                height: auto;
+                                aspect-ratio: 16 / 9;
+                                max-height: 320px;
+                            }
+                            html, body {
+                                margin: 0;
+                                padding: 0;
+                                overflow:hidden;
+                            }
+                        </style>
+                        <meta name=&quot;referrer&quot; content=&quot;no-referrer&quot; />
+                        <video poster=${media.media_url_https} src=${findMediaUrl(media)} controls 
+                        />
+                     </html>
+                     `" frameborder="0" allowfullscreen="" referrerpolicy="no-referrer"/>
                 </div>
                 <!-- <div v-if="media.type === 'video'" class="absolute top-0 left-0 w-full h-full bg-black/50 rounded-8px">
                     <Icon name="custom:play-circle-line"
                         class="absolute top-50% left-50% transform -translate-x-1/2 -translate-y-1/2 text-48px text-white cursor-pointer"
                         @click="clickVideo(item.url)" />
                 </div> -->
-
             </div>
-            <div v-if="isContentOverflow" :class="index !== -1 ? 'ml-40px' : ''"
+            <div :class="index !== -1 ? 'ml-40px' : ''"
                 class="justify-between items-center flex">
-                <div class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]">
-                    <!-- <Icon name="custom:translation"/>{{ t('viewTranslation') }} -->
+                <div class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]" @click="translationVisible=!translationVisible">
+                    <Icon name="custom:translation" />{{ t(translationVisible ? 'viewOrigin':'viewTranslation') }}
                 </div>
-                <span class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px"
+                <span v-if="isContentOverflow" class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px"
                     @click="contentExpanded = !contentExpanded">
                     <Icon name="custom:angle-down" :class="contentExpanded ? 'rotate-180' : ''" />
                     {{ !contentExpanded ? t('Expand') : t('Collapse') }}
@@ -137,10 +152,17 @@ const measureEl = ref(null)
 const contentExpanded = ref(false)
 const isContentOverflow = ref(false)
 const followIds = useStorage('twFollowIds', [])
+const translationVisible = ref(false)
 
 // 处理后的内容，包含可点击的链接
 const processedContent = computed(() => {
-    return processTwitterText(props.item?.content || '')
+    const {lang} = props.item || {}
+    let key = `content_${lang}`
+    if(translationVisible.value){
+        key = lang === 'en' ? 'content_zh' : 'content_en'
+    }
+    const content = props.item?.[key]
+    return processTwitterText(content || '')
 })
 
 const checkContentOverflow = () => {
@@ -162,7 +184,7 @@ onBeforeUnmount(() => {
     window.removeEventListener('resize', checkContentOverflow)
 })
 
-watch(() => props.item?.content, () => {
+watch(() => [props.item?.content,translationVisible.value], () => {
     checkContentOverflow()
 }, { immediate: true })
 
