@@ -166,13 +166,13 @@
                   <div class="text-right overflow-hidden min-w-0">
                     <div class="flex items-center justify-end min-w-0">
                       <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(row.chain) && row.senderProfile">
-                        <!-- <Icon v-if="hasNewAccount(row)"
+                        <Icon v-if="hasNewAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('47'))"
                           v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
                           name="custom:new-account" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                        <Icon v-if="hasClearedAccount(row)"
+                        <Icon v-if="hasClearedAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('46'))"
                           v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
                           name="custom:cleared-account"
-                          class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" /> -->
+                          class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
                         <Icon v-if="bigWallet(row)"
                           v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
                           name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
@@ -229,10 +229,10 @@
     <MarkerTooltip v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
       :addressAndChain="addressAndChain">
       <template v-if="currentRow.senderProfile">
-        <Icon v-if="hasNewAccount(currentRow)"
+        <Icon v-if="hasNewAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('47'))"
           v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
           name="custom:new-account" class="icon-hover" />
-        <Icon v-if="hasClearedAccount(currentRow)"
+        <Icon v-if="hasClearedAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('46'))"
           v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'orderbook-icon-tooltip' } }"
           name="custom:cleared-account" class="icon-hover" />
         <Icon v-if="bigWallet(currentRow)"

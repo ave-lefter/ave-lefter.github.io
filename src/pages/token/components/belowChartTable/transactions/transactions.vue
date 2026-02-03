@@ -1252,15 +1252,15 @@ onUnmounted(() => {
         </template>
         <template #cell-makers="{ row , rowIndex}">
           <template v-if="['solana', 'bsc'].includes(row.chain)  && (row.senderProfile || row.maker_bal)">
-            <!-- <Icon
-              v-if="hasNewAccount(row)"
+            <Icon
+              v-if="hasNewAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('47'))"
               v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' }}"
               name="custom:new-account"
-              class="mr-3px shrink-0"/> -->
-            <!-- <Icon
-              v-if="hasClearedAccount(row)"
+              class="mr-3px shrink-0"/>
+            <Icon
+              v-if="hasClearedAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('46'))"
               v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-              name="custom:cleared-account" class="mr-3px shrink-0"/> -->
+              name="custom:cleared-account" class="mr-3px shrink-0"/>
             <Icon
               v-if="bigWallet(row)"
               v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
@@ -1318,14 +1318,14 @@ onUnmounted(() => {
         :addressAndChain="addressAndChain"
       >
         <template v-if="['solana', 'bsc'].includes(currentRow.chain) && (currentRow.senderProfile || currentRow.maker_bal)">
-          <!-- <Icon
-            v-if="hasNewAccount(currentRow)"
+          <Icon
+            v-if="hasNewAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('47'))"
             v-tooltip.raw="`<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`" name="custom:new-account"
             class="mr-3px" />
           <Icon
-            v-if="hasClearedAccount(currentRow)"
+            v-if="hasClearedAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('46'))"
             v-tooltip.raw="`<span style='color: #EB2B4B'>${$t('sellAl')}</span>`" name="custom:cleared-account"
-            class="mr-3px" /> -->
+            class="mr-3px" />
           <Icon
             v-if="bigWallet(currentRow)" v-tooltip.raw="`<span style='color: #C5842B'>${$t('whales')}</span>`"
             name="custom:big" />
