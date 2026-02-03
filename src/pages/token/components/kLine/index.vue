@@ -1292,12 +1292,12 @@ const { resetKOLLine } = useKOLAvgPriceLine(
   () => isReadyLine,
   showMarket,
   linesChecked,
-  (endTime) => {
+  (endTime,scaleRatio = 20) => {
     const params = resolutionMap[resolution.value as keyof typeof resolutionMap] || {
       val: resolution.value,
       unit: 'm',
     }
-    return dayjs(endTime * 1000).subtract(params.val * 20, params.unit).unix()
+    return dayjs(endTime * 1000).subtract(params.val * scaleRatio, params.unit).unix()
   }
 )
 

@@ -1279,7 +1279,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     checked: boolean
     color: string
   }
-}>,getStartTime: (endTime: number) => number) {
+}>,getStartTime: (endTime: number,scaleRatio?:number) => number) {
   let avePriceMap = {} as Record<string, { name: string, value: number, balance_ratio: number, lineId: EntityId, isCreating?: boolean }>
   let kolVisibleRangeUnsub: (() => void) | null = null
 
@@ -1288,7 +1288,8 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (!chart) return
     const visibleRange = range ?? chart.getVisibleRange?.()
     if (!visibleRange?.from || !visibleRange?.to) return
-    const timeFrom = getStartTime(visibleRange.to)
+    const spacing = getWidget()?.activeChart?.().getTimeScale?.().barSpacing?.()
+    const timeFrom = getStartTime(visibleRange.to, spacing ? 240/spacing : undefined)
     Object.values(avePriceMap).forEach(item => {
       if (!item.lineId) return
       const line = chart.getShapeById?.(item.lineId)
@@ -1301,9 +1302,9 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
   }
 
   /** 缩放时更新 KOL 线位置（保持右侧比例） */
-  // const onKOLZoomChanged = useThrottleFn(() => {
-  //   updateKOLLinesToVisibleRange()
-  // }, 1000/60)
+  const onKOLZoomChanged = useThrottleFn(() => {
+    updateKOLLinesToVisibleRange()
+  }, 1000/60)
 
   /** 可见范围变化时更新 KOL 线位置（拖动/缩放） */
  const onKOLLinesVisibleRangeChanged =  useThrottleFn((range: { from: number; to: number }) => {
@@ -1316,9 +1317,9 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (chart?.onVisibleRangeChanged) {
       chart.onVisibleRangeChanged().subscribe(null, onKOLLinesVisibleRangeChanged)
     }
-    // if (chart?.getTimeScale?.().barSpacingChanged) {
-    //   chart.getTimeScale().barSpacingChanged().subscribe(null, onKOLZoomChanged)
-    // }
+    if (chart?.getTimeScale?.().barSpacingChanged) {
+      chart.getTimeScale().barSpacingChanged().subscribe(null, onKOLZoomChanged)
+    }
   }
 
   // 创建持单价格线：用 trend_line 实现自定义宽度（右侧 30%），左侧「名称 + 持仓%」，右侧价格标签
@@ -1328,7 +1329,8 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (!_widget || !chart) return
     const range = chart.getVisibleRange?.()
     if (!range?.from || !range?.to) return
-    const timeFrom = getStartTime(range.to)
+    const spacing = getWidget()?.activeChart?.().getTimeScale?.().barSpacing?.()
+    const timeFrom = getStartTime(range.to,spacing ? 240/spacing : undefined)
     Object.values(avePriceMap).forEach(async item => {
       let price = item.value
       if (showMarket.value) {
