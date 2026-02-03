@@ -570,7 +570,10 @@ function subscribeLiq(pair: string, oldPair?: string) {
 
 const updatePairTxs = useThrottleFn(() => {
   tokenTxs.value.unshift(...wsPairCache.value)
-  tokenTxs.value = tokenTxs.value.slice(0, 1500)
+  if(tokenTxs.value.length > 1500) {
+    tokenTxs.value = tokenTxs.value.slice(0, 1500)
+    listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token||''
+  }
   wsPairCache.value.length = 0
   triggerRef(tokenTxs)
 }, 100)
