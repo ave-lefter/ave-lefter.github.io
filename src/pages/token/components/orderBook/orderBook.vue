@@ -218,12 +218,12 @@
     <!-- status -->
     <div
       class="z-10 absolute bottom-0 h-24px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
-    
+
       <div v-show="isPausedTxs1" class="flex items-center gap-x-7px">
         <Icon name="custom:stop" class="text-14px" />
         <span class="text-xs">{{ t('paused') }}</span>
       </div>
-    
+
     </div>
     <!-- MarkerTooltip -->
     <MarkerTooltip v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
@@ -480,7 +480,7 @@ function sortChange(sort_dir: string) {
     sort_dir: sort_dir,
   }
   console.log('sortConditions.value', sort_dir)
-  // if(sort_dir==='desc') return 
+  // if(sort_dir==='desc') return
   filterSubmit()
 }
 
@@ -649,7 +649,7 @@ function transferTxsData(row: IGetSimpleTxsResponse) {
     lang1 = 'tw'; // 繁体中文
   } else if (lang.value === 'zh-cn') {
     lang1 = 'cn'; // 简体中文
-  } 
+  }
   const newTags=tagStore.tagArr.filter(item => maker_types.includes(item.type)).map(i=>{
     return {
       "type": i.type,
@@ -908,7 +908,7 @@ function getAmount(row: GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx,
           : 1
       )
   }
- 
+
   if ('from_address' in row) {
     if (
       row.from_address &&
@@ -1182,16 +1182,25 @@ onMounted(() => {
   window.addEventListener('resize', updateWidth)
 })
 
+// 保存 watch 监听器的 unwatch 函数，用于组件卸载时清理
+let watchTxUnwatch: (() => void) | null = null
+let watchSimpleTxUnwatch: (() => void) | null = null
+
 onUnmounted(() => {
+  // 清理 watch 监听器，防止内存泄漏
+  watchTxUnwatch?.()
+  watchSimpleTxUnwatch?.()
+  watchTxUnwatch = null
+  watchSimpleTxUnwatch = null
+
   wsStore.getWSInstance()?.offMessage('tx_history')
-  // 组件卸载时取消订阅
   if (pairAddress.value) {
     unsubscribeFromTxs()
   }
   window.removeEventListener('resize', updateWidth)
 })
 
-watch(() => wsStore.wsResult[WSEventType.TX], data => {
+watchTxUnwatch = watch(() => wsStore.wsResult[WSEventType.TX], data => {
   if (!data || listStatus.value.loadingTxs) {
     return
   }
@@ -1237,7 +1246,7 @@ watch(() => wsStore.wsResult[WSEventType.TX], data => {
   }
 })
 
-watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
+watchSimpleTxUnwatch = watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
   if (!data || listStatus.value.loadingTxs) {
     return
   }

@@ -71,6 +71,7 @@ function onSelect(item: { text: string; value: string }) {
     title=""
     :width="width"
     trigger="click"
+    :persistent="false"
   >
     <template #reference>
       <Icon

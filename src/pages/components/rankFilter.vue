@@ -105,6 +105,7 @@ function handleBlur(props2: string[], val: string, index: number) {
       trigger="click"
       popper-style="padding: 10px"
       append-to-body
+      :persistent="false"
     >
     <template #reference>
         <div :class="['filter-btn mr-2 hight', { active: visible }, filterNumber > 0 ? 'hight': '']">

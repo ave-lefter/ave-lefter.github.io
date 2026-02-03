@@ -5,7 +5,7 @@
       :key="item.id"
       class="tab-button clickable-btn"
       :class="{ active: modelValue === item.id }"
-      @click="$emit('update:modelValue', item.id)"
+      @click.stop="$emit('update:modelValue', item.id)"
     >
       <div class="name">{{ item.name }}</div>
       <div class="value" :style="{ color: getColor(item.id) }">

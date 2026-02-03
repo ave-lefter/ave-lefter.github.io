@@ -496,7 +496,7 @@ function enableDragScroll() {
   Object.assign(label.style, {
     position: 'fixed',
     cursor: 'grab',
-    zIndex: 'auto',
+    zIndex: '33',
     outline: 'none',
     willChange: 'transform',
     transform: `translate3d(${currentX}px, ${currentY}px, 0)`

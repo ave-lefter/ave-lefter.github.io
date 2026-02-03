@@ -914,7 +914,7 @@ v-model:visible="visible"
   </el-popover>
 </template>
 <style scoped lang="scss">
-:deep {
+:deep() {
   .el-select__wrapper {
     background-color: transparent;
     box-shadow: none;

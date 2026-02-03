@@ -355,7 +355,7 @@ function sortChange(sort_dir: string) {
     sort_dir: sort_dir,
   }
   console.log('sortConditions.value', sort_dir)
-  // if(sort_dir==='desc') return 
+  // if(sort_dir==='desc') return
   filterSubmit()
 }
 
@@ -610,18 +610,18 @@ function transferTxsData(row: IGetSimpleTxsResponse) {
   const maker_types = (row.maker_type||'').split(',')
   let lang1='en' as 'tw'|'cn'|'vi'|'tr'|'ru'|'pt'|'ko'|'ja'|'es'|'en'
   if (lang.value === 'zh-tw') {
-    lang1 = 'tw'; // 繁体中文
+    lang1 = 'tw' // 繁体中文
   } else if (lang.value === 'zh-cn') {
-    lang1 = 'cn'; // 简体中文
-  } 
+    lang1 = 'cn' // 简体中文
+  }
   const newTags=tagStore.tagArr.filter(item => maker_types.includes(item.type)).map(i=>{
     return {
-      "type": i.type,
-      "tag_desc": i?.[lang1],
-      "icon": i.icon,
-      "color": i.color,
-      "extra_info": i.extra_info,
-      "nick_name": i.nick_name
+      'type': i.type,
+      'tag_desc': i?.[lang1],
+      'icon': i.icon,
+      'color': i.color,
+      'extra_info': i.extra_info,
+      'nick_name': i.nick_name
     }
   })
   return {
@@ -1077,12 +1077,12 @@ onUnmounted(() => {
         row-class='cursor-pointer'
         :showFooter="showFooter"
         :footText="footText"
-        @endReached="loadMore"
         :rowEventHandlers="{
         onMouseenter:()=>isHoverTable=true,
         onMouseleave:()=>isHoverTable=false,
         onClick: onRowClick
-      }">
+      }"
+        @endReached="loadMore">
         <template  #empty>
           <div v-if="!tableLoading" class="h-full flex flex-col items-center justify-center pt-100px">
             <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">

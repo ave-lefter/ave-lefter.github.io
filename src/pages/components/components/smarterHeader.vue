@@ -97,6 +97,7 @@ function reset() {
       title=""
       :width="225"
       trigger="click"
+      :persistent="false"
     >
       <template #reference>
         <Icon
