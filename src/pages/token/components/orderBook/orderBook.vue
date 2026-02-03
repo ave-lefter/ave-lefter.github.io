@@ -36,7 +36,7 @@
         <div
           class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px mt-8px mb-4px text-12px color-[--d-5A5E64-l-A9B0BC]">
           <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px">
-            <div class="min-w-0 text-left cursor-pointer">
+            <div class="min-w-0 text-left cursor-pointer flex items-center">
               <span @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')">{{ t('time') }}</span>
               <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
             </div>
@@ -85,122 +85,128 @@
         </div>
 
         <!-- 表格内容 -->
-        <UseVirtualList v-if="filterTableList.length > 0" :key="klineHeight" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 75}px`"  @endReached="loadMore">
+        <UseVirtualList v-if="filterTableList.length > 0" :key="klineHeight" :list="filterTableList" :options="{itemHeight:24}" style="margin-right: -12px;padding-right: 12px;" class="scrollbar-hide" :height="`${(klineHeight ?? 200) - 75}px`" ref="scroller">
           <!-- <div v-for="(row, index) in filterTableList" :key="index"
             class="relative overflow-hidden cursor-pointer mt-1px first:mt-0" @mouseenter="isPausedTxs = true"
             @mouseleave="isPausedTxs = false" @click="onRowClick({ rowData: row } as any)"> -->
 
             <!-- 表格内容 -->
-             <template #default="{data:row,index}">
-                <div
-                  class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
-                  @mouseenter="isPausedTxs = true"
-                  @mouseleave="isPausedTxs = false"
-                  @click="onRowClick({ rowData: row } as any)"
-                  >
-                  <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
-                    <!-- 整行渐变背景 -->
-                    <div class="absolute inset-0 pointer-events-none"
-                      :style="{ backgroundColor: getFullRowGradient(row), transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'right' }" />
+            <template #default="{data:row,index}">
+              <div
+                class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px hover:bg-[rgba(255,255,255,.02)] relative z-10 overflow-hidden cursor-pointer mt-1px first:mt-0"
+                @mouseenter="isPausedTxs = true"
+                @mouseleave="isPausedTxs = false"
+                @click="onRowClick({ rowData: row } as any)"
+                >
+                <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] items-center gap-15px relative h-24px px-2px">
+                  <!-- 整行渐变背景 -->
+                  <div class="absolute inset-0 pointer-events-none"
+                    :style="{ backgroundColor: getFullRowGradient(row), transform: `scaleX(${getAmountBarWidthPercent(row)})`, transformOrigin: 'right' }" />
 
-                    <!-- Time -->
-                    <div class="text-left min-w-0">
-                      <div class="color-[--d-5A5E64-l-A9B0BC]">
-                        <TimerCount v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
-                          :key="`${row.time}${index}`" :timestamp="row.time" :end-time="60">
-                          <template #default="{ seconds }">
-                            <span class="color-[--d-5A5E64-l-A9B0BC]">
-                              <template v-if="seconds < 60">
-                                {{ seconds }}s
-                              </template>
-                              <template v-else>
-                                {{ formatTimeFromNow(row.time) }}
-                              </template>
-                            </span>
-                          </template>
-                        </TimerCount>
-                        <span v-else class="color-[--d-5A5E64-l-A9B0BC]">
-                          {{ formatTimeFromNow(row.time) }}
-                        </span>
-                      </div>
-                    </div>
-
-                    <!-- Amount -->
-                    <div class="text-right text-nowrap min-w-0">
-                      <div :class="getRowColor(row)" class="font-medium truncate">
-                        <template v-if="globalStore.isUSDT">
-                          <span>
-                            ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
+                  <!-- Time -->
+                  <div class="text-left min-w-0">
+                    <div class="color-[--d-5A5E64-l-A9B0BC]">
+                      <TimerCount v-if="row.time && Number(formatTimeFromNow(row.time, true)) < 60"
+                        :key="`${row.time}${index}`" :timestamp="row.time" :end-time="60">
+                        <template #default="{ seconds }">
+                          <span class="color-[--d-5A5E64-l-A9B0BC]">
+                            <template v-if="seconds < 60">
+                              {{ seconds }}s
+                            </template>
+                            <template v-else>
+                              {{ formatTimeFromNow(row.time) }}
+                            </template>
                           </span>
                         </template>
-                        <template v-else>
-                          <span>
-                            ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
-                            <span class="color-[--d-5A5E64-l-A9B0BC] hidden sm:inline">
-                              {{ getChainInfo(row.chain)?.main_name }}
-                            </span>
-                          </span>
-                        </template>
-                      </div>
+                      </TimerCount>
+                      <span v-else class="color-[--d-5A5E64-l-A9B0BC]">
+                        {{ formatTimeFromNow(row.time) }}
+                      </span>
                     </div>
                   </div>
 
-                  <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px">
-                    <!-- Price -->
-                    <div class="text-right text-nowrap min-w-0 overflow-visible">
-                      <div class="color-[--secondary-text]">
-                        <template v-if="tableView.isAmount">
-                          <span>
-                            ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
+                  <!-- Amount -->
+                  <div class="text-right text-nowrap min-w-0">
+                    <div :class="getRowColor(row)" class="font-medium truncate">
+                      <template v-if="globalStore.isUSDT">
+                        <span>
+                          ${{ formatFixedDecimals(getAmount(row, true, true), 2) }}
+                        </span>
+                      </template>
+                      <template v-else>
+                        <span>
+                          ${{ formatFixedDecimals(getAmount(row, true, false), 3) }}
+                          <span class="color-[--d-5A5E64-l-A9B0BC] hidden sm:inline">
+                            {{ getChainInfo(row.chain)?.main_name }}
                           </span>
-                        </template>
-                        <template v-else>
-                          <span>
-                            ${{ formatNumber(getMcPrice(row), { decimals: 2 }) }}
-                          </span>
-                        </template>
-                      </div>
+                        </span>
+                      </template>
                     </div>
+                  </div>
+                </div>
 
-                    <!-- Trader -->
-                    <div class="text-right overflow-hidden min-w-0">
-                      <div class="flex items-center justify-end min-w-0">
-                        <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(row.chain) && row.senderProfile">
-                          <!-- <Icon v-if="hasNewAccount(row)"
-                            v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                            name="custom:new-account" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                          <Icon v-if="hasClearedAccount(row)"
-                            v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                            name="custom:cleared-account"
-                            class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" /> -->
-                          <Icon v-if="bigWallet(row)"
-                            v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
-                            name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
-                        </template>
-                        <SignalTags v-if="windowWidth >= 480" tagClass="mr-3px"
-                          :tags="(row.newTags || []).map((el: any) => tagStore.matchTag(el.type)||el)"
-                          :walletAddress="row.wallet_address" :chain="row.chain" />
+                <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-15px h-24px">
+                  <!-- Price -->
+                  <div class="text-right text-nowrap min-w-0 overflow-visible">
+                    <div class="color-[--secondary-text]">
+                      <template v-if="tableView.isAmount">
+                        <span>
+                          ${{ formatNumber(getTransactionPrice(row, true), { decimals: 3 }) }}
+                        </span>
+                      </template>
+                      <template v-else>
+                        <span>
+                          ${{ formatNumber(getMcPrice(row), { decimals: 2 }) }}
+                        </span>
+                      </template>
+                    </div>
+                  </div>
 
-                        <UserRemark :remark="row.remark" :address="row.wallet_address"
-                          :show-address="!(row?.newTags?.length > 1)" :chain="row.chain" :wallet_logo="row.wallet_logo"
-                          :addressClass="`inline-block truncate max-w-full ${
-                            markerTooltipVisible && currentRow.wallet_address===row.wallet_address?'bg-#12B88633':''
-                          }`"
-                          :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
-                          class="color-[--secondary-text] truncate min-w-0 !text-12px"
-                          :mouseoverAddress="e => openMarkerTooltip(row, e)" :canEdit="false"
-                          @update-remark="updateRemark" />
-                        <div v-if="row.count && row.count > 1"
-                          class="color-[--secondary-text] !text-12px ml-2px whitespace-nowrap">
-                          ({{ row.count }})
-                        </div>
+                  <!-- Trader -->
+                  <div class="text-right overflow-hidden min-w-0">
+                    <div class="flex items-center justify-end min-w-0">
+                      <template v-if="windowWidth >= 480 && ['solana', 'bsc'].includes(row.chain) && row.senderProfile">
+                        <!-- <Icon v-if="hasNewAccount(row)"
+                          v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                          name="custom:new-account" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                        <Icon v-if="hasClearedAccount(row)"
+                          v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                          name="custom:cleared-account"
+                          class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" /> -->
+                        <Icon v-if="bigWallet(row)"
+                          v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
+                          name="custom:big" class="w-12px h-12px mr-2px shrink-0 icon-hover hidden sm:block" />
+                      </template>
+                      <SignalTags v-if="windowWidth >= 480" tagClass="mr-3px"
+                        :tags="(row.newTags || []).map((el: any) => tagStore.matchTag(el.type)||el)"
+                        :walletAddress="row.wallet_address" :chain="row.chain" />
+
+                      <UserRemark :remark="row.remark" :address="row.wallet_address"
+                        :show-address="!(row?.newTags?.length > 1)" :chain="row.chain" :wallet_logo="row.wallet_logo"
+                        :addressClass="`inline-block truncate max-w-full ${
+                          markerTooltipVisible && currentRow.wallet_address===row.wallet_address?'bg-#12B88633':''
+                        }`"
+                        :format-address="(address: string) => windowWidth < 480 ? address?.slice(-3) : '*' + address?.slice(-4)"
+                        class="color-[--secondary-text] truncate min-w-0 !text-12px"
+                        :mouseoverAddress="e => openMarkerTooltip(row, e)" :canEdit="false"
+                        @update-remark="updateRemark" />
+                      <div v-if="row.count && row.count > 1"
+                        class="color-[--secondary-text] !text-12px ml-2px whitespace-nowrap">
+                        ({{ row.count }})
                       </div>
                     </div>
                   </div>
                 </div>
-             </template>
+              </div>
+              <div ref="sentinel" style="height: 1px;"></div>
+            </template>
           <!-- </div> -->
         </UseVirtualList>
+        <!-- <template v-if="filterTableList.length >0 && showFooter">
+          <div class="flex items-center gap-x-7px">
+            {{ footText || t('loading') }}
+          </div>
+        </template> -->
         <template v-if="filterTableList.length === 0 && !listStatus.loadingTxs">
           <div class="h-full flex flex-col items-center justify-center "
             :style="{ height: `${(klineHeight ?? 200) - 105}px` }">
@@ -212,11 +218,12 @@
     <!-- status -->
     <div
       class="z-10 absolute bottom-0 h-24px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
-
+    
       <div v-show="isPausedTxs" class="flex items-center gap-x-7px">
         <Icon name="custom:stop" class="text-14px" />
         <span class="text-xs">{{ t('paused') }}</span>
       </div>
+    
     </div>
     <!-- MarkerTooltip -->
     <MarkerTooltip v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
@@ -297,7 +304,7 @@ import { getTokenTxs, getSimpleTxs,type GetPairLiqResponse, type IGetTokenTxsRes
 import { useRoute } from 'vue-router'
 import { filterLanguage } from '~/pages/token/components/kLine/utils'
 import { WSEventType } from '~/utils/constants'
-import { useThrottleFn } from '@vueuse/core'
+import { useThrottleFn,useIntersectionObserver } from '@vueuse/core'
 import { UseVirtualList } from '@vueuse/components'
 import UserRemark from '~/components/userRemark.vue'
 import MarkerTooltip from '../belowChartTable/transactions/markerTooltip.vue'
@@ -354,6 +361,26 @@ const listStatus = ref({
   page_token:'',
   pageSize:100
 })
+
+// 虚拟列表相关 refs
+const scroller = ref(null)
+const sentinel = ref(null)
+
+// 用 IntersectionObserver 监听 sentinel。
+// 特别重要：把 root 指定为虚拟列表的滚动容器 scroller.value
+useIntersectionObserver(
+  sentinel,
+  ([{ isIntersecting }]) => {
+    if (isIntersecting && !listStatus.value.loadingTxs1 && !listStatus.value.finished) {
+      showFooter.value=true
+      _getTokenTxs()
+    }
+  },
+  {
+    root: scroller, // 注意传 ref（@vueuse/core 会处理）
+    threshold: 0.1,
+  }
+)
 
 const tokenTxs = shallowRef<ExtendedTxResponse[]>([])
 const wsPairCache = shallowRef<ExtendedTxResponse[]>([])
@@ -478,7 +505,7 @@ const footText = computed(() => {
 
 function loadMore(remainDistance:number){
   console.log('loadMore remainDistance', remainDistance, listStatus.value)
-  showFooter.value=remainDistance <= 20
+  showFooter.value=true
   if ((remainDistance <= 20) && !(listStatus.value.loadingTxs || listStatus.value.finished)) {
     _getTokenTxs()
   }
@@ -552,10 +579,9 @@ watch(() => pairAddress.value, () => {
     tableFilter.value.tag_type = 'all'
 
     // 重新获取数据
-    _getTokenTxs()
+    filterSubmit()
     subscribeToTxs()
 
-    filterSubmit()
   }
 })
 
@@ -566,10 +592,9 @@ watch(() => props.modelValue, (isOpen) => {
     // orderBook 打开时，清空旧数据并获取新数据
     listStatus.value.loadingTxs1 = true
     resetCache()
-    _getTokenTxs()
+    filterSubmit()
     subscribeToTxs()
 
-    filterSubmit()
   } else if (!isOpen) {
     // orderBook 关闭时，取消订阅并清空数据
     unsubscribeFromTxs()
@@ -654,6 +679,7 @@ function resetTx() {
 }
 
 const _getTokenTxs = useThrottleFn(async () => {
+  console.log('getTokenTxs',tableFilter.value)
   try {
     if (listStatus.value.loadingTxs) return
     listStatus.value.loadingTxs = true
@@ -663,8 +689,8 @@ const _getTokenTxs = useThrottleFn(async () => {
       tag_type:!['buy', 'sell'].includes(tag_type) ? tag_type : '',
       direction:['buy', 'sell'].includes(tag_type) ? tag_type : '',
       sender: tableFilter.value.markerAddress,
-      target_price_u_min: tableFilter.value.minVol[0],
-      target_price_u_max: tableFilter.value.maxVol[1],
+      target_price_u_min: tableFilter.value.minVol,
+      target_price_u_max: tableFilter.value.maxVol,
       time_min: tableFilter.value.timestamp[0],
       time_max: tableFilter.value.timestamp[1],
       page_token: listStatus.value.page_token,
@@ -1154,7 +1180,7 @@ onMounted(() => {
   // onTxsLiqMessage()
   // 如果组件挂载时 orderBook 已经打开，则获取数据
   if (props.modelValue && pairAddress.value) {
-    _getTokenTxs()
+    filterSubmit()
     subscribeToTxs()
   }
 })
@@ -1332,7 +1358,7 @@ function confirmDialogFilter() {
     activeTab.value = 'all'
   }
 
-  _getTokenTxs()
+  filterSubmit()
   filterDialogVisible.value = false
 }
 
