@@ -1,8 +1,6 @@
 <template>
   <div class="relative" :style="{ height: `${isRank ? 390 : kHeight}px` }">
-    <div ref="kline" :style="{ width: '100%', height: '100%' }">
-      <div :id="chartContainerId" style="width: 100%; height: 100%" />
-    </div>
+    <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
     <UnknownRisk v-show="isReady" :isRank="isRank" @refresh="refresh" />
     <DialogRemind v-model="dialogVisible_remind" />
   </div>
@@ -167,7 +165,6 @@
 <script setup lang="ts">
 import type {
   IChartingLibraryWidget,
-  ISubscription,
   ResolutionString,
   Timezone,
   SeriesFormat,
@@ -176,7 +173,6 @@ import type {
   ChartingLibraryFeatureset,
   SubscribeBarsCallback,
   LibrarySymbolInfo,
-  SubscribeEventsMap,
 } from '~/types/tradingview/charting_library'
 import {
   getTimezone,
@@ -283,10 +279,9 @@ const token = computed(() => {
     : (route.params.id as string)
 })
 
-const klinePair = ref('')
+const klineLineSave = useKlineLineSave(() => token.value)
 
-/** 每次挂载唯一 id，避免 TradingView 内部按 container id 缓存导致旧 widget/iframe 无法释放 */
-const chartContainerId = ref(`tv_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`)
+const klinePair = ref('')
 
 const isReady = ref(false)
 let isReadyLine = false
@@ -336,6 +331,14 @@ watch(
     if (!val) return
     if (_widget?.activeChart?.()) {
       _widget?.activeChart?.()?.removeAllShapes?.()
+      const chart = _widget?.activeChart?.()
+      // 移除旧指标（保留 Volume）
+      const allStudies = chart.getAllStudies()
+      allStudies.forEach(study => {
+        if (!study.name.includes('Volume')) {
+          chart.removeEntity(study.id)
+        }
+      })
     }
   }
 )
@@ -378,6 +381,7 @@ function switchTokenKline() {
         () => {
           isReadyLine = true
           // createHeaderButton()
+          klineLineSave.loadKlineLine(_widget)
         }
       )
     } else {
@@ -416,50 +420,8 @@ const listenerGuidMap = new Map()
 const resolution = shallowRef(localStorage.getItem('tv_resolution') || '15')
 const themeStore = useThemeStore()
 let _widget: null | IChartingLibraryWidget = null
-let intervalChangedSubscription: ISubscription<
-  (interval: ResolutionString, timeFrameParameters: { timeframe?: unknown }) => void
-> | null = null
-let handleIntervalChanged:
-  | ((interval: ResolutionString, timeFrameParameters: { timeframe?: unknown }) => void)
-  | null = null
-let handleMarkClick: SubscribeEventsMap['onMarkClick'] | null = null
-let handleMouseDown: SubscribeEventsMap['mouse_down'] | null = null
-let handleMouseUp: SubscribeEventsMap['mouse_up'] | null = null
-let handleStudyEvent: SubscribeEventsMap['study_event'] | null = null
-let handleBeforeUnload: (() => void) | null = null
 
 const showMarket = useLocalStorage('tv_showMarket', false)
-
-const cleanupWidgetSubscriptions = () => {
-  if (_widget) {
-    if (handleMarkClick) _widget.unsubscribe('onMarkClick', handleMarkClick)
-    if (handleMouseDown) _widget.unsubscribe('mouse_down', handleMouseDown)
-    if (handleMouseUp) _widget.unsubscribe('mouse_up', handleMouseUp)
-    if (handleStudyEvent) _widget.unsubscribe('study_event', handleStudyEvent)
-  }
-  if (intervalChangedSubscription && handleIntervalChanged) {
-    intervalChangedSubscription.unsubscribe(null, handleIntervalChanged)
-  }
-  if (handleBeforeUnload && typeof window !== 'undefined' && window.onbeforeunload === handleBeforeUnload) {
-    window.onbeforeunload = null
-  }
-  if (headerBtns.length) {
-    if (_widget?.removeButton) {
-      headerBtns.forEach((btn) => {
-        btn.onclick = null
-        _widget.removeButton?.(btn)
-      })
-    }
-    headerBtns = []
-  }
-  intervalChangedSubscription = null
-  handleIntervalChanged = null
-  handleMarkClick = null
-  handleMouseDown = null
-  handleMouseUp = null
-  handleStudyEvent = null
-  handleBeforeUnload = null
-}
 
 // 切换主题
 watch(
@@ -504,7 +466,6 @@ function resetChart() {
   resetKOLLine()
   resetTop100AvgPriceLineId()
   // resetAvgPriceLineId()
-  cleanupWidgetSubscriptions()
   _widget?.remove?.()
   initChart()
 }
@@ -669,16 +630,15 @@ async function initChart() {
   // 初始化 resolutions
   resolution.value = initTradingViewIntervals(resolution.value, chain.value, isSupportSecChains)
   const urlPrefix = useConfigStore().globalConfig?.token_logo_url || 'https://www.iconaves.com/'
-  const WidgetCtor = await waitForTradingView()
-  if (isUnload) return
-  const w = new WidgetCtor({
+  const widget = await waitForTradingView()
+  _widget = new widget({
     symbol: symbolUp.replace('<', '＜') || ' ',
     debug: false,
     width: '100%' as any,
     height: '100%' as any,
     interval: resolution.value as any,
     theme: themeStore.theme,
-    container: chartContainerId.value,
+    container: 'tv_chart_container',
     library_path: `${urlPrefix}charting_library-29.4.0/charting_library/`,
     locale: formatLang(localeStore.locale) as LanguageCode,
     disabled_features: [
@@ -694,8 +654,10 @@ async function initChart() {
     ],
     enabled_features: [
       'request_only_visible_range_on_reset',
-      'seconds_resolution' as ChartingLibraryFeatureset
+      'seconds_resolution' as ChartingLibraryFeatureset,
+      'saveload_separate_drawings_storage'
     ],
+    auto_save_delay: 1,
     charts_storage_url: location.host,
     charts_storage_api_version: '1.1',
     timezone: getTimezone() as Timezone,
@@ -843,7 +805,6 @@ async function initChart() {
         }
       },
       getBars: (symbolInfo, resolution, periodParams, onResult, onError) => {
-        // #endregion
         const { from, to, firstDataRequest } = periodParams
         // console.log('[getBars]: Method call', symbolInfo, resolution, from, to, firstDataRequest)
         try {
@@ -1032,11 +993,6 @@ async function initChart() {
       },
     },
   })
-  if (isUnload) {
-    w.remove()
-    return
-  }
-  _widget = w
   updateChartBackground()
 
   _widget.onChartReady(() => {
@@ -1047,27 +1003,29 @@ async function initChart() {
     } else {
       _widget?.applyOverrides?.({ 'scalesProperties.textColor': '#333' })
     }
-    intervalChangedSubscription = _widget?.activeChart?.()?.onIntervalChanged?.() || null
-    handleIntervalChanged = (interval, _timeFrameParameters) => {
-      if (resolution.value !== interval) {
-        resolution.value = interval
-        localStorage.setItem('tv_resolution', interval)
-        _widget?.resetCache?.()
-      }
-    }
-    if (intervalChangedSubscription && handleIntervalChanged) {
-      intervalChangedSubscription.subscribe(null, handleIntervalChanged)
-    }
+    _widget
+      ?.activeChart?.()
+      ?.onIntervalChanged()
+      .subscribe(null, (interval) => {
+        if (resolution.value !== interval) {
+          resolution.value = interval
+          localStorage.setItem('tv_resolution', interval)
+          _widget?.resetCache?.()
+        }
+      })
 
     setWatermark(_widget)
     subscribePriceMove()
     // 从缓存中读取数据并创建指标
-    createStudy()
+    // createStudy()
     _widget?.applyOverrides?.({
       'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
       'paneProperties.backgroundType': 'solid',
       'paneProperties.background': getCssVariable('--secondary-bg'),
     })
+
+    klineLineSave.loadKlineLine(_widget)
+    klineLineSave.saveKlineState(_widget)
   })
 
   _widget?.headerReady().then(() => {
@@ -1077,7 +1035,7 @@ async function initChart() {
   })
 
   // onMarkClick
-  handleMarkClick = (markId) => {
+  _widget?.subscribe('onMarkClick', (markId) => {
     const { token, symbol, logo_url, chain } = tokenStore.tokenInfo?.token || {}
     const { target_token, token0_address, token0_symbol, token1_symbol, pair } =
       tokenStore.pair || {}
@@ -1109,20 +1067,14 @@ async function initChart() {
       user_address,
     }
     tokenDetailsStore.$patch($patchParams)
-  }
-  if (handleMarkClick) {
-    _widget?.subscribe('onMarkClick', handleMarkClick)
-  }
+  })
 
   let mouseDownTime = 0
-  handleMouseDown = (_params) => {
+  _widget.subscribe('mouse_down', () => {
     mouseDownTime = performance.now()
-  }
-  if (handleMouseDown) {
-    _widget.subscribe('mouse_down', handleMouseDown)
-  }
+  })
 
-  handleMouseUp = (e) => {
+  _widget.subscribe('mouse_up', (e) => {
     if (performance.now() - mouseDownTime >= 200) {
       return
     }
@@ -1143,36 +1095,21 @@ async function initChart() {
         klineDateFilter.value = [String(startTime), String(endTime)]
       }
     }
-  }
-  if (handleMouseUp) {
-    _widget.subscribe('mouse_up', handleMouseUp)
-  }
+  })
 
   subscribeStudyEvent()
 }
 
 let isUnload = false
-// #region agent log (memory leak hypotheses)
-const DEBUG_INGEST = 'http://127.0.0.1:7244/ingest/db07d059-623b-4b81-89c7-98a4eb4d1274'
-let lastUnmountedContainerId: string | null = null
-let lastUnmountedTime = 0
-let mountCounter = 0
-/** 在 onBeforeUnmount 时捕获，因 onUnmounted 时 DOM 已被 Vue 移除 */
-let capturedContainerEl: HTMLElement | null = null
-let capturedIframe: HTMLIFrameElement | null = null
-// #endregion
 function subscribeStudyEvent() {
-  if (!_widget) return
-  handleStudyEvent = (_id, type) => {
+  _widget?.subscribe('study_event', (_id, type) => {
     if ((type === 'create' || type === 'remove') && !isUnload) {
       saveStudy()
     }
-  }
-  _widget.subscribe('study_event', handleStudyEvent)
-  handleBeforeUnload = () => {
+  })
+  window.onbeforeunload = () => {
     isUnload = true
   }
-  window.onbeforeunload = handleBeforeUnload
 }
 
 function onWsKline(
@@ -1271,7 +1208,7 @@ function drag(e: MouseEvent) {
       isMask = false
       return
     }
-    document.getElementById(chartContainerId.value)!.style.pointerEvents = 'none'
+    document.getElementById('tv_chart_container')!.style.pointerEvents = 'none'
     const _kHeight =
       e.clientY < dy ? kHeight.value - (dy - e.clientY) : kHeight.value + e.clientY - dy
 
@@ -1281,7 +1218,7 @@ function drag(e: MouseEvent) {
     dy = e.clientY
   }
   document.onmouseup = () => {
-    document.getElementById(chartContainerId.value)!.style.pointerEvents = 'auto'
+    document.getElementById('tv_chart_container')!.style.pointerEvents = 'auto'
     isMask = false
     document.onmousemove = null
     document.onmouseup = null
@@ -1330,7 +1267,7 @@ const { resetKOLLine } = useKOLAvgPriceLine(
 )
 
 function setIframeCssVar() {
-  const iframe = document.querySelector(`#${chartContainerId.value} iframe`) as HTMLIFrameElement
+  const iframe = document.querySelector('#tv_chart_container iframe') as HTMLIFrameElement
   const iframeRoot = iframe?.contentWindow?.document.documentElement
   if (!iframeRoot) {
     console.error('无法获取 iframe 内部的根元素')
@@ -1342,16 +1279,12 @@ function setIframeCssVar() {
 
 onBeforeUnmount(() => {
   isUnload = true
-  cleanupWidgetSubscriptions()
-  _widget?.remove?.()
-  _widget = null
 })
 
 const clickHandler = () => {
   globalStore.klineSettingPop.visible = false
 }
 onMounted(() => {
-  mountCounter += 1
   initChart()
   useVisibilityChange(() => {
     _widget?.resetCache?.()
@@ -1361,8 +1294,6 @@ onMounted(() => {
   document.addEventListener('click', clickHandler)
 })
 onUnmounted(() => {
-  lastUnmountedContainerId = chartContainerId.value
-  lastUnmountedTime = Date.now()
   document.removeEventListener('click', clickHandler)
   listenerGuidMap.forEach((i) => {
     wsStore.send({
@@ -1371,18 +1302,8 @@ onUnmounted(() => {
     })
   })
   listenerGuidMap?.clear()
-  const containerEl = document.getElementById(chartContainerId.value)
-  if (containerEl) {
-    const iframe = containerEl.querySelector('iframe')
-    if (iframe) {
-      try {
-        iframe.src = 'about:blank'
-      } catch {
-        console.warn('iframe src about:blank failed')
-      }
-    }
-    if (containerEl?.parentNode) containerEl.parentNode.removeChild(containerEl)
-  }
+  _widget?.remove?.()
+  _widget = null
 })
 const emit = defineEmits(['refresh'])
 function refresh() {

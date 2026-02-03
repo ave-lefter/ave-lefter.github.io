@@ -1,6 +1,6 @@
 <template>
   <div class="relative" :style="{height: `${kHeight}px`}">
-    <div id="tv_chart_container" ref="kline" :style="{ width: '100%', height: '100%' }" />
+    <div id="tv_chart_container_p" ref="kline" :style="{ width: '100%', height: '100%' }" />
   </div>
   <div
     v-if="!isRank"
@@ -21,7 +21,7 @@ import type { KLineBar } from './types'
 import {DefaultHeight, WSPerpEventType} from '~/utils/constants'
 import { TW_STUDY } from './constant'
 import dayjs from 'dayjs'
-import { _getPerpKline, type KlineInfo } from '@/api/perp/index'
+import { _getPerpKline } from '@/api/perp/index'
 import { usePerpStore } from '@/stores/perp'
 import { usePerpWsPubStore } from '@/stores/perp/wsPub'
 const { contractId, contractName, resolution, perp } = storeToRefs(usePerpStore())
@@ -31,22 +31,14 @@ const props = defineProps<{
 }>()
 const klineDateFilter = inject<Ref<string[]>>(ProvideType.KLINE_DATE_FILTER)
 const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
-const botStore = useBotStore()
 const globalStore = useGlobalStore()
 const route = useRoute()
-const token = computed(() => {
-  return (props.isRank && 'klineRow' in tokenStore) ? tokenStore.klineRow?.id : route.params.id as string
-})
 const isReady = ref(false)
 let isReadyLine = false
-const snapshotCache = ref<Record<string, KlineInfo[]>>({})
 const isCatch = shallowRef(false)
-const chain = computed(() => {
-  return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
-})
-const user = computed(() => {
-  return botStore.userInfo?.addresses?.find?.(i => i.chain === chain.value)?.address || botStore?.userInfo?.evmAddress
-})
+
+
+const klineLineSave = useKlineLineSave(() => contractId.value, 'perp_')
 
 const symbol = computed(() => {
   return contractName.value || '-'
@@ -54,11 +46,19 @@ const symbol = computed(() => {
 
 let loading = false
 
-watch(() => contractId.value, (val,old) => {
+watch(() => contractId.value, (val) => {
   if (!val) return
   isCatch.value = false
   if (_widget?.activeChart()) {
     _widget?.activeChart()?.removeAllShapes?.()
+    const chart = _widget?.activeChart?.()
+    // 移除旧指标（保留 Volume）
+    const allStudies = chart.getAllStudies()
+    allStudies.forEach(study => {
+      if (!study.name.includes('Volume')) {
+        chart.removeEntity(study.id)
+      }
+    })
     _widget?.resetCache?.()
     switchTokenKline()
   }
@@ -73,6 +73,7 @@ function switchTokenKline() {
       _widget?.activeChart?.()?.clearMarks?.()
       _widget?.setSymbol?.(symbol.value, resolution.value as ResolutionString, () => {
         isReadyLine = true
+        klineLineSave.loadKlineLine(_widget)
       })
     } else {
       initChart()
@@ -192,7 +193,7 @@ async function initChart() {
     height: '100%' as any,
     interval: resolution.value as any,
     theme: themeStore.theme,
-    container: 'tv_chart_container',
+    container: 'tv_chart_container_p',
     library_path: `${urlPrefix}charting_library-29.4.0/charting_library/`,
     locale: formatLang(localeStore.locale) as LanguageCode,
     disabled_features: [
@@ -207,8 +208,10 @@ async function initChart() {
       'timeframes_toolbar',
     ],
     enabled_features: [
-    'request_only_visible_range_on_reset'
+      'request_only_visible_range_on_reset',
+      'saveload_separate_drawings_storage'
     ],
+    auto_save_delay: 1,
     charts_storage_url: location.host,
     charts_storage_api_version: '1.1',
     timezone: getTimezone() as Timezone,
@@ -500,12 +503,14 @@ async function initChart() {
     setWatermark(_widget)
     subscribePriceMove()
     // 从缓存中读取数据并创建指标
-    createStudy()
+    // createStudy()
     _widget?.applyOverrides?.({
       'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
       'paneProperties.backgroundType': 'solid',
       'paneProperties.background': getCssVariable('--secondary-bg'),
     })
+    klineLineSave.loadKlineLine(_widget)
+    klineLineSave.saveKlineState(_widget)
   })
   let mouseDownTime = 0
   _widget.subscribe('mouse_down',()=>{
@@ -645,7 +650,7 @@ function drag(e: MouseEvent) {
       isMask = false
       return
     }
-    document.getElementById('tv_chart_container')!.style.pointerEvents = 'none'
+    document.getElementById('tv_chart_container_p')!.style.pointerEvents = 'none'
     const _kHeight = e.clientY < dy
       ? kHeight.value - (dy - e.clientY)
       : kHeight.value + e.clientY - dy
@@ -656,7 +661,7 @@ function drag(e: MouseEvent) {
     dy = e.clientY
   }
   document.onmouseup = () => {
-    document.getElementById('tv_chart_container')!.style.pointerEvents = 'auto'
+    document.getElementById('tv_chart_container_p')!.style.pointerEvents = 'auto'
     isMask = false
     document.onmousemove = null
     document.onmouseup = null
@@ -674,7 +679,7 @@ useBotLimitLine(() => _widget, () => isReadyLine, showMarket)
 
 
 function setIframeCssVar() {
-  const iframe = document.querySelector('#tv_chart_container iframe') as HTMLIFrameElement
+  const iframe = document.querySelector('#tv_chart_container_p iframe') as HTMLIFrameElement
   const iframeRoot = iframe?.contentWindow?.document.documentElement
   if (!iframeRoot) {
     console.error('无法获取 iframe 内部的根元素')
