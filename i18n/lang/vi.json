@@ -847,5 +847,7 @@
   "wcWalletTip": "Quét mã QR này bằng điện thoại của bạn",
   "createWithdrawIncomeOrder": "Yêu cầu rút tiền đã được gửi",
   "applyForActivation": "",
-  "monitorBotError": "Địa chỉ robot giám sát không được hỗ trợ"
+  "monitorBotError": "Địa chỉ robot giám sát không được hỗ trợ",
+  "hideLiq": "Bấm để ẩn thông tin nhóm",
+  "showLiq": "Bấm để hiển thị thông tin nhóm"
 }
