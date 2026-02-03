@@ -219,7 +219,7 @@
     <div
       class="z-10 absolute bottom-0 h-24px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
     
-      <div v-show="isPausedTxs" class="flex items-center gap-x-7px">
+      <div v-show="isPausedTxs1" class="flex items-center gap-x-7px">
         <Icon name="custom:stop" class="text-14px" />
         <span class="text-xs">{{ t('paused') }}</span>
       </div>
@@ -351,6 +351,9 @@ const tokenDetailSStore = useTokenDetailsStore()
 const tabsContainer = ref<HTMLElement | null>(null)
 const activeTab = shallowRef('all')
 const isPausedTxs = shallowRef(false)
+const isPausedTxs1 = computed(() => {
+  return isPausedTxs.value ||(sortConditions.value.sort_dir ==='asc')
+})
 const markerTooltipVisible = shallowRef(false)
 // const isMeActive = ref(false)
 const listStatus = ref({
@@ -1229,7 +1232,7 @@ watch(() => wsStore.wsResult[WSEventType.TX], data => {
     uuid: uuid()
   }
   wsPairCache.value.unshift(item)
-  if (!isPausedTxs.value) {
+  if (!isPausedTxs1.value) {
     updatetokenTxs()
   }
 })
@@ -1270,7 +1273,7 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
     }
   }
   wsPairCache.value.unshift(item as any)
-  if (!isPausedTxs.value) {
+  if (!isPausedTxs1.value) {
     updatetokenTxs()
   }
 })
