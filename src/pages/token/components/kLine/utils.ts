@@ -585,6 +585,15 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
     }
   }, 300))
 
+  watch(()=>showMarket.value,()=>{
+      if (linesChecked.value.top100Buy.checked && avePriceCache.buyAvgPrice) {
+      createAvgPriceLine(avePriceCache.buyAvgPrice, true)
+    }
+     if (linesChecked.value.top100Sell.checked && avePriceCache.sellAvgPrice) {
+      createAvgPriceLine(avePriceCache.sellAvgPrice, false)
+    }
+  })
+
   return {
     resetAvgPriceLineId: () => {
       const _widget = getWidget()
@@ -1220,6 +1229,15 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     }
   }, 300))
 
+  watch(()=>showMarket.value,()=>{
+    if (linesChecked.value.buy.checked && avePriceCache.buyAvgPrice) {
+      createAvgPriceLine(avePriceCache.buyAvgPrice, true)
+    }
+    if (linesChecked.value.sell.checked && avePriceCache.sellAvgPrice) {
+      createAvgPriceLine(avePriceCache.sellAvgPrice, false)
+    }
+  })
+
   return {
     resetBotAvgLineId: () => {
       const _widget = getWidget()
@@ -1404,6 +1422,12 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
       createAvgPriceLine()
     }
   }, 300))
+
+  watch(()=>showMarket.value,()=>{
+    if (linesChecked.value.kol.checked) {
+      createAvgPriceLine()
+    }
+  })
 
   return {
     resetKOLLine
