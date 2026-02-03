@@ -170,6 +170,18 @@ export const resolutionMap  = {
   }, '1W':{
     val:1,
     unit:'w'
+  },
+  '5S':{
+    val:5,
+    unit:'s'
+  },
+  '15S':{
+    val:15,
+    unit:'s'
+  },
+  '30S':{
+    val:30,
+    unit:'s'
   }
 } as const
 export const audioList = [
