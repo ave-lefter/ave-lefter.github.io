@@ -839,9 +839,6 @@ async function initChart() {
         }
       },
       getBars: (symbolInfo, resolution, periodParams, onResult, onError) => {
-        // #region agent log
-        const afterUnmount = lastUnmountedContainerId === chartContainerId.value && Date.now() > lastUnmountedTime
-        debugLog({ hypothesisId: 'B', location: 'KLine:datafeed.getBars', message: 'getBars called', data: { chartContainerId: chartContainerId.value, afterUnmount, firstDataRequest: periodParams.firstDataRequest } })
         // #endregion
         const { from, to, firstDataRequest } = periodParams
         // console.log('[getBars]: Method call', symbolInfo, resolution, from, to, firstDataRequest)
@@ -1159,9 +1156,6 @@ let mountCounter = 0
 /** 在 onBeforeUnmount 时捕获，因 onUnmounted 时 DOM 已被 Vue 移除 */
 let capturedContainerEl: HTMLElement | null = null
 let capturedIframe: HTMLIFrameElement | null = null
-function debugLog(p: { hypothesisId: string; location: string; message: string; data?: Record<string, unknown> }) {
-  fetch(DEBUG_INGEST, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...p, timestamp: Date.now(), sessionId: 'debug-session' }) }).catch(() => {})
-}
 // #endregion
 function subscribeStudyEvent() {
   if (!_widget) return
@@ -1287,7 +1281,9 @@ function drag(e: MouseEvent) {
     isMask = false
     document.onmousemove = null
     document.onmouseup = null
-    tokenStore.centerTopHeight = kHeight.value
+    if (tokenStore?.centerTopHeight) {
+      tokenStore.centerTopHeight = kHeight.value
+    }
   }
   // e.stopPropagation()
   // e.preventDefault()
@@ -1352,14 +1348,6 @@ const clickHandler = () => {
 }
 onMounted(() => {
   mountCounter += 1
-  // #region agent log
-  try {
-    const measures = performance.getEntriesByType('measure').length
-    const marks = performance.getEntriesByType('mark').length
-    debugLog({ hypothesisId: 'A', location: 'KLine:onMounted', message: 'performance entries', data: { measures, marks, mountCounter, chartContainerId: chartContainerId.value } })
-  } catch (_) {}
-  // #endregion
-  if (import.meta.dev) console.log('[MEM_DEBUG] KLine onMounted, initChart start')
   initChart()
   useVisibilityChange(() => {
     _widget?.resetCache?.()
@@ -1371,14 +1359,6 @@ onMounted(() => {
 onUnmounted(() => {
   lastUnmountedContainerId = chartContainerId.value
   lastUnmountedTime = Date.now()
-  // #region agent log
-  try {
-    const measures = performance.getEntriesByType('measure').length
-    const marks = performance.getEntriesByType('mark').length
-    debugLog({ hypothesisId: 'A', location: 'KLine:onUnmounted', message: 'performance entries', data: { measures, marks, chartContainerId: chartContainerId.value } })
-  } catch (_) {}
-  // #endregion
-  if (import.meta.dev) console.log('[MEM_DEBUG] KLine onUnmounted, removing widget and clearing container')
   document.removeEventListener('click', clickHandler)
   listenerGuidMap.forEach((i) => {
     wsStore.send({
