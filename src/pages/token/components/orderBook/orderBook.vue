@@ -980,13 +980,6 @@ const updateWidth = () => {
   windowWidth.value = window.innerWidth
 }
 
-onMounted(() => {
-  window.addEventListener('resize', updateWidth)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', updateWidth)
-})
 
 // 新增函数：获取成交价格
 function getTransactionPrice(row: IGetSimpleTxsResponse | SimpleWSTx, isVolUSDT = false) {
@@ -1024,7 +1017,7 @@ function setActiveTab(val: string, index: number) {
   console.log('🔄 切换订单薄标签:', val)
   resetData(val)
   // isMeActive.value = false
-  tableFilter.value.markerAddress = ''
+  // tableFilter.value.markerAddress = ''
   filterSubmit()
 
   // 滚动到 tab 中心位置
@@ -1183,6 +1176,7 @@ onMounted(() => {
     filterSubmit()
     subscribeToTxs()
   }
+  window.addEventListener('resize', updateWidth)
 })
 
 onUnmounted(() => {
@@ -1191,6 +1185,7 @@ onUnmounted(() => {
   if (pairAddress.value) {
     unsubscribeFromTxs()
   }
+  window.removeEventListener('resize', updateWidth)
 })
 
 watch(() => wsStore.wsResult[WSEventType.TX], data => {
@@ -1342,6 +1337,7 @@ const updatetokenTxs = useThrottleFn(() => {
     // 限制数据量，保持性能
     if (tokenTxs.value.length > 1500) {
       tokenTxs.value = tokenTxs.value.slice(0, 1500)
+      listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token||''
     }
   }
 
@@ -1356,6 +1352,7 @@ function confirmDialogFilter() {
   })
   if(!dialogFilter.value.markerAddress){
     activeTab.value = 'all'
+    tableFilter.value.tag_type = 'all'
   }
 
   filterSubmit()
@@ -1364,7 +1361,7 @@ function confirmDialogFilter() {
 
 function resetDialogFilter() {
   dialogFilter.value = {
- ...defaultDialogFilter
+    ...defaultDialogFilter
   }
 
   confirmDialogFilter()

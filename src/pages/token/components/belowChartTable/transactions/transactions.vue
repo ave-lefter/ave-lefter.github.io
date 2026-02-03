@@ -1282,9 +1282,9 @@ onUnmounted(() => {
                 ({{ row.count }})
               </div>
             </UserRemark>
-            <Icon
+            <!-- <Icon
               :ref="(el: any) => $refs.buttonRefs[rowIndex] = el" name="custom:attention"
-              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--third-text]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--third-text]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" /> -->
             <Icon
               name="custom:filter"
               :class="`${tableFilter.markerAddress ? 'color-[--secondary-text]' : 'color-[--third-text]'} cursor-pointer text-10px shrink-0`"
