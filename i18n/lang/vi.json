@@ -172,7 +172,7 @@
   "setOneClickBuyAmount": "Đặt số lượng mua một chạm",
   "customFee1": "Phí ưu tiên tùy chỉnh",
   "customEvmFee1": "Giá gas thêm tùy chỉnh",
-  "slippageTips": "Trượt giá tối đa là 49.99%",
+  "slippageTips": "Trượt giá tối đa là 99.99%",
   "iKnown": "Tôi biết rồi",
   "setOneClickSellAmount": "Đặt số lượng bán một chạm",
   "balanceNotEnough": "Không đủ số dư {s}",
