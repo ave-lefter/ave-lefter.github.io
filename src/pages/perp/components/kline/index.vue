@@ -13,9 +13,9 @@
 
 <script setup lang='ts'>
 import type { IChartingLibraryWidget, ResolutionString, Timezone, SeriesFormat, VisiblePlotsSet, LanguageCode, ChartingLibraryFeatureset, SubscribeBarsCallback, LibrarySymbolInfo } from '~/types/tradingview/charting_library'
-import { getTimezone, formatDecimals, getAddressAndChainFromId, getWSPerpMessage } from '@/utils'
+import { getTimezone, formatDecimals, getWSPerpMessage } from '@/utils'
 import { formatNumber } from '@/utils/formatNumber'
-import { switchPerpResolution,switchResolution, formatLang, supportSecChains, initTradingViewIntervals, updateChartBackground, updatePerpLastBar, waitForTradingView, useLimitPriceLine, useAvgPriceLine, useBotLimitLine, setWatermark } from './utils'
+import { switchPerpResolution, formatLang, initTradingViewIntervals, updateChartBackground, waitForTradingView,  setWatermark } from './utils'
 import {useLocalStorage, useElementBounding, useWindowSize, useEventBus, useStorage} from '@vueuse/core'
 import type { KLineBar } from './types'
 import {DefaultHeight, WSPerpEventType} from '~/utils/constants'
@@ -38,7 +38,7 @@ let isReadyLine = false
 const isCatch = shallowRef(false)
 
 
-const klineLineSave = useKlineLineSave(() => contractId.value, 'perp_')
+const klineLineSave = useKlineLineSave(() => contractId.value, 'perp_tv_charts_storage')
 
 const symbol = computed(() => {
   return contractName.value || '-'
@@ -51,22 +51,20 @@ watch(() => contractId.value, (val) => {
   isCatch.value = false
   if (_widget?.activeChart()) {
     _widget?.activeChart()?.removeAllShapes?.()
-    const chart = _widget?.activeChart?.()
-    // 移除旧指标（保留 Volume）
-    const allStudies = chart.getAllStudies()
-    allStudies.forEach(study => {
-      if (!study.name.includes('Volume')) {
-        chart.removeEntity(study.id)
-      }
-    })
+    // const chart = _widget?.activeChart?.()
+    // // 移除旧指标（保留 Volume）
+    // const allStudies = chart.getAllStudies()
+    // allStudies.forEach(study => {
+    //   if (!study.name.includes('Volume')) {
+    //     chart.removeEntity(study.id)
+    //   }
+    // })
     _widget?.resetCache?.()
     switchTokenKline()
   }
 })
 function switchTokenKline() {
   isReadyLine = false
-  resetLimitPriceLineId()
-  resetAvgPriceLineId()
   if (isReady.value && route.name === 'perp-id') {
     if (_widget) {
       _widget?.resetCache?.()
@@ -87,17 +85,6 @@ const localeStore = useLocaleStore()
 
 // const marks = shallowRef([{ id: 'trade', name: '我的' }])
 
-let lastBar: null | {
-  close: number
-  high: number
-  low: number
-  open: number
-  time: number
-  volume: number
-} = null
-
-let lastPairPrice = 0
-
 // const LLJEFFY_#_240
 const listenerGuidMap = new Map()
 
@@ -105,7 +92,6 @@ const listenerGuidMap = new Map()
 const themeStore = useThemeStore()
 let _widget: null | IChartingLibraryWidget = null
 
-const showMarket = useLocalStorage('tv_showMarket', false)
 
 // 切换主题
 watch(() => themeStore.theme, (val) => {
@@ -137,10 +123,6 @@ watch(() => localeStore.locale, () => {
 // })
 function resetChart() {
   isReadyLine = false
-  lastBar = null
-  lastPairPrice = 0
-  resetLimitPriceLineId()
-  resetAvgPriceLineId()
   _widget?.remove?.()
   initChart()
 }
@@ -154,25 +136,6 @@ function saveStudy() {
   }
 }
 
-// 创建指标
-function createStudy() {
-  if (_widget?.activeChart) {
-    let studies: Array<{ name: string, id: string }> = JSON.parse(localStorage?.[TW_STUDY] || '[]')
-    studies = studies.filter((item, index) => studies.findIndex(i => i.name === item.name) === index)
-    studies.forEach(i => {
-      _widget?.activeChart?.().createStudy(i.name, false, false)
-    })
-    // if (localStorage['tradingview.chart.favoriteLibraryIndicators']) {
-    //   let indicators: Array<string> = JSON.parse(localStorage['tradingview.chart.favoriteLibraryIndicators'])
-    //   indicators = indicators.filter((item) => !studies.some?.(i => i.name === item))
-    //   indicators.forEach(i => {
-    //     _widget?.activeChart?.().createStudy(i, false, false)
-    //   })
-    // }
-    // this.createPositionPriceLine()
-    // this.createMigratePriceLine()
-  }
-}
 // 提前拦截 K线 数据 没有更多
 let noData = false
 let firstBarTime = 0
@@ -226,12 +189,6 @@ async function initChart() {
       priceFormatterFactory: () => {
         return {
           format: (price) => {
-            if (showMarket.value) {
-              return formatNumber(price, {
-                decimals: 2,
-                locale: 'en'
-              })
-            }
             return String(formatNumber(price, {
               decimals: 4,
               limit: 6,
@@ -359,8 +316,6 @@ async function initChart() {
         try {
           if (firstDataRequest) {
             noData = false
-            lastBar = null
-            lastPairPrice = 0
           } else {
             if (noData) {
               onResult([], { noData: true })
@@ -401,21 +356,16 @@ async function initChart() {
             })) || []
              console.log('------res-1--------',bars)
             if (firstDataRequest) {
-              lastBar = bars1?.[bars1?.length - 1] || null
-              lastPairPrice = Number(lastBar?.close || 0)
-              if (lastBar) {
-                lastBar.time = lastBar.time
-              }
               noData = bars?.length < 1
             }
             if (bars1?.length > 0) {
               firstBarTime = bars1?.[0]?.time || 0
             }
             onResult(bars, {noData: !bars?.length})
-
             setTimeout(() => {
-              useEventBus('klineDataReady').emit()
-            }, 10)
+              isReadyLine = true
+            }, 100)
+
           }).catch((err) => {
             isCatch.value = true
             // const key = `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`
@@ -501,7 +451,6 @@ async function initChart() {
     })
 
     setWatermark(_widget)
-    subscribePriceMove()
     // 从缓存中读取数据并创建指标
     // createStudy()
     _widget?.applyOverrides?.({
@@ -558,7 +507,7 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
     if (!msg) {
       return
     }
-    const { channel, content: { data, dataType } = {}, type } = msg || {}
+    const { channel, content: { data, dataType } = {} } = msg || {}
     const interval = switchPerpResolution(resolution)
     if(channel == `${WSPerpEventType.KLINE}.${contractId.value}.${interval}`){
       // console.log('--------msg-----------',msg)
@@ -582,46 +531,19 @@ function onWsKline(resolution: string, onTick: SubscribeBarsCallback, ws = perpW
       }
 
       if (data?.length > 0 && !loading && dataType === 'changed') {
-        // const _pair = 'pair' in tx ? tx.pair : tx.pair_address
-        // const _price = 'price_u' in tx ? Number(tx.price_u || 0) : Number(tx.from_address?.toLowerCase?.() === tokenStore.token?.token?.toLowerCase?.() ? tx.from_price_usd : tx.to_price_usd) || 0
-        // if (_pair === pair.value) {
-        //   lastPairPrice = _price
-        // }
-        // if (_pair !== pair.value) {
-        //   const price = _price
-        //   if (!lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
-        //     return
-        //   }
-        // }
-        // tokenStore.tokenPrice = _price
-        // const newBar1 = updatePerpLastBar(tx, t, lastBar, interval)
-        // if (newBar1) {
-        //   lastBar = {...newBar1}
-        // }
-        // const newBar = {...newBar1} as KLineBar
-        // if (showMarket.value && newBar) {
-        //   newBar.open = new BigNumber(newBar.open || 0).times(tokenStore?.circulation || 0).toNumber()
-        //   newBar.high = new BigNumber(newBar.high || 0).times(tokenStore?.circulation || 0).toNumber()
-        //   newBar.low = new BigNumber(newBar.low || 0).times(tokenStore?.circulation || 0).toNumber()
-        //   newBar.close = new BigNumber(newBar.close || 0).times(tokenStore?.circulation || 0).toNumber()
-        // }
-        // if (newBar && newBar?.time) {
-        //   onTick(newBar)
-        // }
-
-      const wsData = data?.map(i => ({
-        ...i,
-        time: Number(i.klineTime),
-        open: i.open,
-        high: i.high,
-        low: i.low,
-        close: i.close,
-        volume: Number(i.value || 0),
-        type: i.close > i.open ? 'buy': 'sell'
-      }))[0]
-      const bar = wsData as KLineBar
-      // const msInterval = switchResolution(resolution)
-      // const bar = updatePerpLastBar(wsData, contractId.value, lastBar, msInterval) as KLineBar
+        const wsData = data?.map(i => ({
+          ...i,
+          time: Number(i.klineTime),
+          open: i.open,
+          high: i.high,
+          low: i.low,
+          close: i.close,
+          volume: Number(i.value || 0),
+          type: i.close > i.open ? 'buy': 'sell'
+        }))[0]
+        const bar = wsData as KLineBar
+        // const msInterval = switchResolution(resolution)
+        // const bar = updatePerpLastBar(wsData, contractId.value, lastBar, msInterval) as KLineBar
         onTick(bar)
       }
     }
@@ -665,17 +587,12 @@ function drag(e: MouseEvent) {
     isMask = false
     document.onmousemove = null
     document.onmouseup = null
-    tokenStore.centerTopHeight = kHeight.value
   }
   // e.stopPropagation()
   // e.preventDefault()
   return false
 }
 
-const { resetLimitPriceLineId, subscribePriceMove } = useLimitPriceLine(() => _widget, () => isReadyLine, showMarket)
-
-const { resetAvgPriceLineId } = useAvgPriceLine(() => _widget, () => isReadyLine, showMarket)
-useBotLimitLine(() => _widget, () => isReadyLine, showMarket)
 
 
 function setIframeCssVar() {

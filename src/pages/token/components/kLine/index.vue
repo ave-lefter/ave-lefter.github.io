@@ -331,14 +331,14 @@ watch(
     if (!val) return
     if (_widget?.activeChart?.()) {
       _widget?.activeChart?.()?.removeAllShapes?.()
-      const chart = _widget?.activeChart?.()
-      // 移除旧指标（保留 Volume）
-      const allStudies = chart.getAllStudies()
-      allStudies.forEach(study => {
-        if (!study.name.includes('Volume')) {
-          chart.removeEntity(study.id)
-        }
-      })
+      // const chart = _widget?.activeChart?.()
+      // // 移除旧指标（保留 Volume）
+      // const allStudies = chart.getAllStudies()
+      // allStudies.forEach(study => {
+      //   if (!study.name.includes('Volume')) {
+      //     chart.removeEntity(study.id)
+      //   }
+      // })
     }
   }
 )
@@ -379,9 +379,11 @@ function switchTokenKline() {
         symbol.value + '---' + token.value + val + (tokenStore.selectedToken ? '1' : '0'),
         resolution.value as ResolutionString,
         () => {
-          isReadyLine = true
           // createHeaderButton()
           klineLineSave.loadKlineLine(_widget)
+          setTimeout(() => {
+            isReadyLine = true
+          }, 100)
         }
       )
     } else {

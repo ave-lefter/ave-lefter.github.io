@@ -1,94 +1,82 @@
-import localforage from 'localforage'
+import * as Comlink from 'comlink'
+// @ts-ignore
+import ChartWorker from '@/workers/chartState.worker?worker'
 
-const STORAGE_ROOT_KEY = 'tv_charts_storage'
-const MAX_STORAGE_COUNT = 100
+const workerInstance = new ChartWorker()
+const chartApi = Comlink.wrap<any>(workerInstance)
 
-export function useKlineLineSave(getKey?: () => string, prefix = 'tv_lineTool') {
+export function useKlineLineSave(getKey: () => string, rootKey: string = 'tv_charts_storage') {
 
-  async function getFullStorage() {
-    const data = await localforage.getItem<Record<string, any>>(STORAGE_ROOT_KEY)
-    return data || {}
+  /**
+   * 内部同步当前的 Storage Key 到 Worker
+   */
+  async function syncKey() {
+    await chartApi.setStorageKey(rootKey)
   }
 
-  function loadKlineLine(widget: any) {
-    const subKey = prefix + (getKey ? getKey() : 'default')
-    getFullStorage().then((allStates) => {
-      const savedState = allStates[subKey]
-      if (savedState && widget) {
-        try {
-          widget.load?.(savedState)
-          console.log(`[TV-Storage] 加载成功: ${subKey}`)
-        } catch (e) {
-          console.error('[TV-Storage] 加载失败:', e)
-        }
+  async function loadKlineLine(widget: any) {
+    await syncKey()
+    const subKey = getKey ? getKey() : 'default'
+
+    const allStates: any = await chartApi.getFullStorage()
+
+    // 加载画图工具数据
+    if (allStates[subKey] && widget) {
+      widget.load?.(allStates[subKey])
+    }
+
+    // 加载指标
+    let allStudies: Array<string> = allStates['allStudies'] || []
+    if (allStudies.length > 0 && widget?.activeChart?.()) {
+      // 如果有画图工具数据，延迟加载指标以防渲染冲突
+      const delay = allStates[subKey] ? 500 : 0
+      setTimeout(() => {
+        addStudy(allStudies, widget?.activeChart?.())
+      }, delay)
+    }
+  }
+
+  function addStudy(allStudies: Array<string>, chart: any) {
+    const currentStudies = chart.getAllStudies()
+    // 过滤掉已经在图表上的指标，避免重复创建
+    const newStudies = allStudies?.filter(s => !currentStudies.some((cs: any) => cs.name === s))
+    const removeStudies: Array<{name: string; id: string}> = currentStudies?.filter((cs: any) => !allStudies.includes(cs.name) && cs.name !== 'Volume')
+    // 先移除不需要的指标
+    removeStudies.forEach(study => {
+      if (!study.name.includes('Volume')) {
+        chart.removeEntity(study.id)
       }
+    })
+    newStudies.forEach(s => {
+      chart.createStudy(s, false, false)
     })
   }
 
   function saveKlineState(widget: any) {
     widget?.subscribe?.('onAutoSaveNeeded', () => {
-      if (!widget) return
-
-      widget.save(async (chartObj: any) => {
-        const subKey = prefix + (getKey ? getKey() : 'default')
-        try {
-          // --- 判定逻辑：检查是否存在“除 Volume 以外”的有效内容 ---
-          let hasValuableContent = false
-
-          chartObj.charts.forEach((chart: any) => {
-            chart.panes.forEach((pane: any) => {
-              pane.sources.forEach((source: any) => {
-                console.log('source type:', source.type)
-                // 1. 判定划线
-                if (source.type?.includes('LineTool')) {
-                  hasValuableContent = true
-                }
-                // 2. 判定非 Volume 指标
-                if (new RegExp('study', 'i').test(source.type) && !new RegExp('volume', 'i').test(source.type)) {
-                  hasValuableContent = true
-                }
-              })
-            })
-          })
-
-          const allStates = await getFullStorage()
-
-          // --- 准入检查 ---
-          if (!hasValuableContent) {
-            // 如果原本存过，但现在变“干净”了，则从大对象中移除该 Key
-            if (allStates[subKey]) {
-              delete allStates[subKey]
-              await localforage.setItem(STORAGE_ROOT_KEY, allStates)
-              console.log(`[TV-Storage] 无有效内容，已清理记录: ${subKey}`)
-            }
-            return
-          }
-
-          // 3. 完整保存（不进行任何过滤，保持原始 chartObj 结构）
-          allStates[subKey] = {
-            ...chartObj,
-            _lastModified: Date.now()
-          }
-
-          // 4. LRU 自动清理过期记录
-          const keys = Object.keys(allStates)
-          if (keys.length > MAX_STORAGE_COUNT) {
-            const oldestKey = keys.reduce((a, b) =>
-              (allStates[a]._lastModified || 0) < (allStates[b]._lastModified || 0) ? a : b
-            )
-            delete allStates[oldestKey]
-          }
-
-          await localforage.setItem(STORAGE_ROOT_KEY, allStates)
-          console.log(`[TV-Storage] 成功存入有效配置: ${subKey}`)
-        } catch (err) {
-          console.error('[TV-Storage] 保存异常:', err)
-        }
+      widget?.save(async (chartObj: any) => {
+        await syncKey()
+        const subKey = getKey ? getKey() : 'default'
+        const result = await chartApi.saveChart(subKey, chartObj)
+        console.log(`[Chart-Storage] ${result.status}: ${subKey} (Root: ${rootKey})`)
       })
     })
   }
 
-  const clearAllCharts = () => localforage.removeItem(STORAGE_ROOT_KEY)
+  async function removeCurrentChart() {
+    await syncKey()
+    const subKey = getKey ? getKey() : 'default'
+    const success = await chartApi.removeChart(subKey)
+    if (success) console.log(`[Chart-Storage] 已删除: ${subKey} @ ${rootKey}`)
+  }
 
-  return { loadKlineLine, saveKlineState, clearAllCharts }
+  return {
+    loadKlineLine,
+    saveKlineState,
+    removeCurrentChart,
+    clearAllCharts: async () => {
+      await syncKey()
+      return chartApi.clearAll()
+    }
+  }
 }
