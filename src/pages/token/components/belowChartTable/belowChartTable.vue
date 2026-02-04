@@ -23,8 +23,9 @@ const components = {
   Holders: defineAsyncComponent(() => import('./holders/index.vue')),
   LP: defineAsyncComponent(() => import('./lp/index.vue')),
   Attention: defineAsyncComponent(() => import('./attention/index.vue')),
-  Orders: defineAsyncComponent(() => import('./orders/index.vue')),
+  Orders: OrdersTab,
   MySwap: defineAsyncComponent(() => import('./mySwap/index.vue')),
+  DevTokens: defineAsyncComponent(() => import('./devTokens/index.vue')),
 }
 const tabs = computed(() => {
   return [
@@ -34,6 +35,7 @@ const tabs = computed(() => {
   { name: t('attention1') +`(${globalStore.headFollowsNum.all})`, component: 'Attention' as const },
   { name: t('orders'), component: 'Orders' as const },
   { name: t('mySwap'), component: 'MySwap' as const },
+  {name:t('devTokens'), component: 'DevTokens' as const},
   ]
 })
 const id = computed(() => {
@@ -42,7 +44,8 @@ const id = computed(() => {
 watch(id, () => {
   globalStore.getFollowsNum()
 })
-watch(() => useFollowStore().currentAddress, (val) => {
+const followStore = useFollowStore()
+watch(() => followStore.currentAddress, (val) => {
   if (val) {
     globalStore.getFollowsNum()
   } else {
@@ -154,11 +157,18 @@ const comProps = computed(() => {
 onMounted(() => {
   globalStore.getFollowsNum()
 })
+
+onUnmounted(() => {
+  globalStore.headFollowsNum = { all: 0, subAll: 0 }
+
+  // 如果有动态加载的组件，强制置空
+  activeTab.value = 'Transactions'
+})
 </script>
 
 <template>
   <div class="bg-[--secondary-bg] rounded-2px text-14px pt-12px flex-1">
-    <div class="flex items-center px-12px gap-20px border-b-1px border-b-solid border-b-#FFFFFF08 mb-12px">
+    <div class="flex items-center px-12px gap-20px border-b-1px border-b-solid border-b-[--main-divider] mb-12px">
       <a
         v-for="(item) in tabsList" :key="item.component" href="javascript:;"
          :class="`flex items-center decoration-none text-12px lh-20px text-center ${activeTab === item.component ? 'color-[--main-text] b-b-[--main-text] font-500' : 'b-b-transparent color-[--third-text]'}`"
@@ -166,12 +176,15 @@ onMounted(() => {
         <div v-if="item.component == 'Orders'" class="w-1px h-20px bg-[var(--custom-br-1-color)] mr-20px mb-8px"/>
         <div
           :class="`b-b-solid b-b-2px pb-8px flex-start ${activeTab === item.component ? ' b-b-[--main-text]' : 'b-b-transparent'}`">
-          <strong>{{ item.name }}</strong>
+          <strong v-if="item.component !== 'DevTokens' || tokenStore.tokenInfoExtra?.dev_count">{{ item.name }}</strong>
           <span v-if="item.component === 'Orders'">({{ tokenStore.registrationNum }})</span>
           <span v-if="item.component === 'LP'" class="flex-start">
             ({{ pairHolders }})
              <Icon v-if="pairHolders" color="#B3920E" name="material-symbols:lock" />
           </span>
+          <span v-if="item.component === 'DevTokens' && tokenStore.tokenInfoExtra?.dev_count">({{
+            tokenStore.tokenInfoExtra?.dev_count
+          }})</span>
           <span v-if="item.component == 'Holders' && holders">
             ({{ token?.holders ? formatNumber(token?.holders || 0, {limit: 10}) : '' }})
               <template v-if="isInsiderOrSniperSupported && (tokenInfoExtra?.insiders_balance_ratio_cur??0) > 0.01">
@@ -192,9 +205,15 @@ onMounted(() => {
       <Bubble />
     </div>
     <OrdersTab v-show="activeTab === 'Orders'" :currentActiveTab="activeTab"/>
-    <KeepAlive v-show="activeTab !== 'Orders'">
-      <component :is="Component" v-bind="comProps" :currentActiveTab="activeTab" />
-    </KeepAlive>
+    <!-- <DevTokens v-show="activeTab === 'DevTokens'"/> -->
+    <!-- Removed KeepAlive: render the dynamic component directly and keep a ref to access its instance/lifecycle -->
+    <component
+      :is="Component"
+v-if="(activeTab !== 'Orders') && route.name === 'token-id'"
+      v-bind="comProps"
+      ref="activeChild"
+:currentActiveTab="activeTab"
+    />
   </div>
 </template>
 

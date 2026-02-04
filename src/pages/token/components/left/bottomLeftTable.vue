@@ -45,13 +45,13 @@ const Component = computed(() => {
         {{ item.name }}
       </a>
     </div>
-    <KeepAlive>
+    <!-- <KeepAlive> -->
       <component
         :is="Component"
         class="flex-1 relative"
         :finalHeight="finalHeight"
       />
-    </KeepAlive>
+    <!-- </KeepAlive> -->
   </div>
 </template>
 

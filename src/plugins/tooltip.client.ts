@@ -55,6 +55,7 @@ function createTooltipInstance(appContext: App['_context'], id: string): Tooltip
               virtualRef: triggerRef.value as Measurable | undefined,
               virtualTriggering: true,
               ...tooltipProps.value,
+              persistent: false,
               'data-tooltip-id': id // 添加ID标识用于调试
             },
             {
@@ -116,6 +117,9 @@ function createTooltipInstance(appContext: App['_context'], id: string): Tooltip
     },
     hide() {
       visible.value = false
+      nextTick(() => {
+        this.destroy()
+      })
     },
     destroy() {
       if (vnode && container) {
@@ -124,7 +128,7 @@ function createTooltipInstance(appContext: App['_context'], id: string): Tooltip
       if (container && container.parentNode) {
         container.parentNode.removeChild(container)
       }
-      console.log(`[Tooltip ${id}] Instance destroyed`)
+      // console.log(`[Tooltip ${id}] Instance destroyed`)
       mounted = false
       container = null
       vnode = null

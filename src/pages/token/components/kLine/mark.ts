@@ -54,14 +54,22 @@ export function useKlineMarks() {
     30: false,
     31: true
   })
+  let rootNodeEl: HTMLElement | null = null
+  const clearRootNodeHandler = () => {
+    if (rootNodeEl) {
+      rootNodeEl.onclick = null
+      rootNodeEl = null
+    }
+  }
 
   function createDisplayButton(_widget: IChartingLibraryWidget | null,headerBtns: HTMLElement[]){
     const btn = _widget?.createButton()
     if (!btn) return
-    btn.innerHTML = `<div style="cursor:pointer;display:flex;gap:8px;align-items:center">${t('display')}<svg xmlns="http://www.w3.org/2000/svg" width="9" height="6" viewBox="0 0 9 6" fill="none">
-<path d="M0.801296 0C0.123025 0 -0.2475 0.791086 0.186718 1.31215L3.47869 5.26251C3.79852 5.64631 4.388 5.64631 4.70784 5.26251L7.99981 1.31215C8.43402 0.791085 8.0635 0 7.38523 0H0.801296Z" fill="white"/>
+    btn.innerHTML = `<div style="cursor:pointer;display:flex;gap:8px;align-items:center">${t('display')}<svg xmlns="http://www.w3.org/2000/svg" width="9" height="6" viewBox="0 0 9 6" fill="#C8C7D8">
+<path d="M0.801296 0C0.123025 0 -0.2475 0.791086 0.186718 1.31215L3.47869 5.26251C3.79852 5.64631 4.388 5.64631 4.70784 5.26251L7.99981 1.31215C8.43402 0.791085 8.0635 0 7.38523 0H0.801296Z" fill="#C8C7D8"/>
 <script xmlns=""/></svg></div>`
     btn.onclick = (e) => {
+      clearRootNodeHandler()
       const rect = btn.getBoundingClientRect()
       const x = rect.left - 320 + 44
       const y = rect.top + 34
@@ -72,10 +80,12 @@ export function useKlineMarks() {
       while(rootNode && !rootNode.classList.contains('chart-page')){
         rootNode = rootNode.parentElement as HTMLElement
       }
-      rootNode.onclick= (rootEvent) => {
+      if (!rootNode) return
+      rootNodeEl = rootNode
+      rootNodeEl.onclick= (rootEvent) => {
         if(rootEvent.currentTarget !== e.currentTarget){
           globalStore.klineSettingPop.visible = false
-          rootNode = null as any
+          clearRootNodeHandler()
         }
       }
     }
@@ -120,10 +130,32 @@ export function useKlineMarks() {
   const marksMap: Map<string, TradeData[]> = new Map()
   // 画像打点
   const profilingMarksCache: Map<string, Mark[]> = new Map()
+  const MAX_CACHE_SIZE = 50
+
+  const touchCache = <T>(map: Map<string, T>, key: string): T | undefined => {
+    if (!map.has(key)) return undefined
+    const value = map.get(key)
+    map.delete(key)
+    map.set(key, value as T)
+    return value
+  }
+
+  const setCache = <T>(map: Map<string, T>, key: string, value: T) => {
+    if (map.has(key)) map.delete(key)
+    map.set(key, value)
+    if (map.size > MAX_CACHE_SIZE) {
+      const oldestKey = map.keys().next().value
+      if (oldestKey) map.delete(oldestKey)
+    }
+  }
 
   watch(() => tokenStore.token?.token, () => {
     marksMap.clear()
     profilingMarksCache.clear()
+  })
+
+  onUnmounted(() => {
+    clearRootNodeHandler()
   })
 
 
@@ -140,13 +172,13 @@ export function useKlineMarks() {
     marksTabs.value.forEach((v) => {
       const id = pair + '-' + chain + '-' + user  + '-' + interval + '-' + v.id + '-' + from + '-' + to
       if (marksMap.has(id) && markTabsChecked.value?.[v.id]) {
-        const res = marksMap.get(id)
+        const res = touchCache(marksMap, id)
         const marks = formatToMarks(res || [], interval, v.id, v.name)
         onDataCallback(marks || [])
         return
       }
       if(profilingMarksCache.has(id) && markTabsChecked.value?.[v.id]) {
-        const marks = profilingMarksCache.get(id)!
+        const marks = touchCache(profilingMarksCache, id) || []
         onDataCallback(marks)
         return
       }
@@ -160,7 +192,7 @@ export function useKlineMarks() {
           user_address: user
         }).then(res => {
           const marks = formatToMarks(res, interval, v.id, v.name)
-          marksMap.set(id, res || [])
+          setCache(marksMap, id, res || [])
           onDataCallback(marks || [])
         })
       } else if (markTabsChecked.value?.[v.id]) {
@@ -173,7 +205,7 @@ export function useKlineMarks() {
         }).then(res => {
           if(Array.isArray(res)){
             const marks = formatProfilingToMarks(res || [], interval, v.id, v.name)
-            profilingMarksCache.set(id, marks)
+            setCache(profilingMarksCache, id, marks)
             onDataCallback(marks || [])
           }
         })
@@ -476,6 +508,4 @@ ${formatDate(entry.time, 'YYYY-MM-DD HH:mm')}
     markTabsVisible
   }
 }
-
-
 

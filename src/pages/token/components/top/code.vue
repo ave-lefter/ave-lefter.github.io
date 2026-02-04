@@ -3,9 +3,6 @@ import { onMounted, ref, watch, nextTick } from 'vue'
 import hljs from 'highlight.js/lib/core'
 import hljsDefineSolidity from 'highlightjs-solidity'
 import 'highlight.js/styles/github.css'
-// import 'highlight.js/styles/github-dark.css'
-const globalStore = useGlobalStore()
-const { isDark } = storeToRefs(globalStore)
 
 hljsDefineSolidity(hljs)
 

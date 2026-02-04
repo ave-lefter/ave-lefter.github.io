@@ -40,6 +40,7 @@ function onSelect(item: { text: string; value: string }) {
 <template>
   <el-popover
     v-model:visible="popoverVisible"
+:persistent="false"
     placement="bottom"
     title=""
     :width="width"

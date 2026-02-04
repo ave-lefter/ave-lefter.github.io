@@ -20,7 +20,7 @@ defineProps<{
             <el-select
 v-model="modelValue" class="new-select"
                 popper-class="[--el-font-size-base:12px] new-select-popper" :suffix-icon="SuffixIcon"
-                :empty-values="[null, undefined]">
+                :empty-values="[null, undefined]" :persistent="false">
                 <el-option v-for="item in audioList" :key="item" :label="item ? item : $t('close')" :value="item" />
             </el-select>
             <div class="w-1px h-8px bg-[--icon-color] mx-4px shrink-0" />

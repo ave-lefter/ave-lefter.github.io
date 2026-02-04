@@ -174,7 +174,7 @@ function handleReset() {
 
 <template>
    <div class="flex items-center color-[--d-566275-l-8CA0C3] px-16px py-12px">
-    <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false">
+    <el-tooltip popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
         <template #default>
           <TokenImg
             chain-class="w-20px h-20px"
@@ -310,6 +310,7 @@ function handleReset() {
             title=""
             :width="200"
             trigger="click"
+            :persistent="false"
           >
             <template #reference>
               <a class="flex-start bg-btn" href="" @click.stop.prevent>
@@ -330,6 +331,7 @@ function handleReset() {
                     v-model="selectedGroup"
                     :placeholder="$t('pleaseSelectGroup')"
                     :teleported="false"
+                    :persistent="false"
                   >
                     <el-option :label="$t('defaultGroup')" :value="0" />
                     <el-option
@@ -381,6 +383,7 @@ function handleReset() {
             title=""
             :width="200"
             trigger="click"
+            :persistent="false"
           >
             <template #reference>
               <a class="w-zu flex-start bg-btn" href="" @click.stop.prevent>

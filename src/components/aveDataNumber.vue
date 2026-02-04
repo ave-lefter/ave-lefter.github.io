@@ -8,7 +8,7 @@
   >
     {{value > 0 ? '+' : ''}}{{value < 0 ? '-' : ''}}{{signVisible ? '$' : ''}}<slot/>
   </span>
-  <span v-else class="color-[--third-text]">0</span>
+  <span v-else :class="classZero? classZero : 'color-[--third-text]'">0</span>
 </template>
 
 <script setup>
@@ -17,6 +17,7 @@ defineProps({
     type: [String, Number],
     default: 0
   },
+  classZero: String,
   signVisible: Boolean
 })
 </script>

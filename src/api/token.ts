@@ -334,6 +334,8 @@ export interface GetHotTokensResponse {
   holders: number;
   current_price_usd: number | string;
   price_change: string;
+  // priceChange24h
+  price_change_v2: string;
   is_adv: number;
   is_showasadv: number;
   token_index: number;
@@ -448,6 +450,60 @@ export interface IGetTokenTxsResponse {
   burn_amount?: number;
   lock_amount?: number;
   other_amount?: number;
+}
+
+export interface IGetSimpleTxsResponse {
+  txhash: string;
+  time: number;
+  amm: string;
+  target: string;
+  direction: string;
+  target_amt: string;
+  target_price_u: string;
+  target_price_m: string;
+  target_reserve: string;
+  base_amt: string;
+  base_price_u: string;
+  base_price_m: string;
+  base_reserve: string;
+  liquidity: string;
+  maker: string;
+  maker_type: string;
+  maker_bal: string;
+  maker_eth: string;
+  page_token: string;
+  remark: string;
+}
+
+// 新版交易历史SimpleTxs
+export function getSimpleTxs(pair:string,query: {
+  token_id: string,
+  tag_type?: string,
+  direction?: string,
+  sender?: string,
+  address?: string,
+  time_min?: string,
+  time_max?: string
+  target_price_u_min?: string
+  target_price_u_max?: string,
+  page_token?: string,
+  sort_dir?: string,
+}): Promise<IGetSimpleTxsResponse[]> {
+  const address=localStorage.bot_evmAddress || localStorage.walletAddress
+  const {$api} = useNuxtApp()
+  // const query1 = {...query}
+  const {...query1} ={...query}
+  if (query1.tag_type === 'all') {
+    query1.tag_type = ''
+  }
+  console.log('simpletxs',query1)
+  return $api(`/v1api/v3/pairs/${pair}/simpletxs`, {
+    method: 'get',
+    query:{
+      address,
+      ...query1,
+    }
+  })
 }
 
 // 新版交易历史
@@ -1173,8 +1229,11 @@ export interface IGetAllTagsResponse {
   tw: string;
   es: string;
   pt: string;
+  ru: string;
   tr: string;
   ja: string;
+  vi: string;
+  ko: string;
   icon: string;
   color: string;
   extra_info: any;
@@ -1217,6 +1276,17 @@ export function getAiSummary(id: string): Promise<null |AiSummaryResponse> {
 export function getBestToken(token_id:string) {
   const { $api } = useNuxtApp()
   return $api('/v2api/token_info/v1/token/dev/best', {
+    method: 'get',
+    query: {
+      token_id
+    }
+  })
+}
+
+// 同名代币
+export function getSimilarTokens(token_id:string) {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/token/v1/token/similar', {
     method: 'get',
     query: {
       token_id

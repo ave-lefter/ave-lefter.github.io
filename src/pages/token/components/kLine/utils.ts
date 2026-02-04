@@ -8,7 +8,7 @@ import { bot_getUserPendingTx, bot_cancelLimitOrdersByBatch, bot_getUserWalletTx
 import { RESOLUTION_KEY, QUICK_KEY } from './constant'
 import { _getHoldersList } from '~/api/holders'
 
-export const supportSecChains = ['solana', 'bsc', 'eth', 'base', 'tron', 'mixmax', 'xlayer']
+export const supportSecChains = [ 'bsc', 'base', 'mixmax', 'xlayer']
 
 export function switchResolution(resolution: string) {
   const obj: Record<string, string> = {
@@ -122,39 +122,21 @@ export function formatToMarks(
 export function initTradingViewIntervals(currentResolution: string, chain: string, isSupportSecChains: boolean): string {
   // const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
   // const RESOLUTION_KEY = 'tv_resolution'
-  const DEFAULT_LIST = ['1', '5', '15', '60', '240', '1D', '1W']
-  const SEC_LIST = ['1S', '5S', '15S', '30S', ...DEFAULT_LIST]
-  const Sol_LIST = ['1S', ...DEFAULT_LIST]
-
+  const DEFAULT_LIST = ['1S', '5S', '1', '5', '15', '60', '240', '1D', '1W']
+  const SUPPORT_LIST = ['1S', '5S', '15S', '30S', '5S', '1', '5', '15', '60', '240', '1D', '1W']
   let list: string[]
-
   const stored = localStorage.getItem(QUICK_KEY)
   if (!stored) {
-    list = isSupportSecChains ? (chain === 'solana' ? Sol_LIST : SEC_LIST) : DEFAULT_LIST
+    list = isSupportSecChains ? SUPPORT_LIST : DEFAULT_LIST
     localStorage.setItem(QUICK_KEY, JSON.stringify(list))
     localStorage.setItem('tradingViewIntervalSet', 'true')
   } else {
     list = JSON.parse(stored)
-
-    const has1S = list.includes('1S')
-    const shouldHave1S = isSupportSecChains
-    if (shouldHave1S && chain !== 'mixmax' && chain !== 'xlayer' && chain !== 'base') {
-      if (!has1S || ['5S', '15S', '30S'].some((i) => list?.includes(i))) {
-        list = list?.filter?.((i) => !i?.endsWith('S')) || []
-        list = ['1S'].concat(list)
-        localStorage.setItem(QUICK_KEY, JSON.stringify(list))
-      }
-    } else if (
-      shouldHave1S &&
-      ['1S', '5S', '15S', '30S'].some((i) => !list?.includes(i)) &&
-      (chain === 'mixmax' || chain === 'xlayer' || chain === 'base')
-    ) {
-      list = list?.filter?.((i) => !i?.endsWith('S')) || []
-      list = ['1S', '5S', '15S', '30S'].concat(list)
+    if (isSupportSecChains && ['1S', '5S', '15S', '30S'].some((i) => !list?.includes(i))) {
+      list = SUPPORT_LIST
       localStorage.setItem(QUICK_KEY, JSON.stringify(list))
-    } else if (!shouldHave1S && ['1S', '5S', '15S', '30S'].some((i) => list?.includes(i))) {
-      // list = list.filter((i) => i !== '1S')
-      list = list?.filter?.((i) => !i?.endsWith('S')) || []
+    } else if (!isSupportSecChains) {
+      list = DEFAULT_LIST
       localStorage.setItem(QUICK_KEY, JSON.stringify(list))
     }
   }
@@ -312,10 +294,12 @@ export function buildOrUpdateLastBarFromTx(
 export function waitForTradingView(): Promise<ChartingLibraryWidgetConstructor> {
   return new Promise((resolve) => {
     if (window?.TradingView?.widget) return resolve(window.TradingView.widget)
+      const handler = () => {
+        window.removeEventListener('tradingview:ready', handler)
+        resolve(window.TradingView.widget)
+      }
     // 监听插件派发的事件
-    window.addEventListener('tradingview:ready', () => {
-      resolve(window.TradingView.widget)
-    })
+    window.addEventListener('tradingview:ready', handler)
   })
 }
 
@@ -345,6 +329,18 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
   let priceLimitLineId = '' as EntityId
   let isCreating = false
   const { t } = useI18n()
+  let drawingEventHandler: ((id: EntityId, type: DrawingEventType) => void) | null = null
+  let drawingEventWidget: IChartingLibraryWidget | null = null
+  let isDrawingSubscribed = false
+  const safeUnsubscribe = (widget: IChartingLibraryWidget) => {
+    if (!drawingEventHandler || !isDrawingSubscribed) return
+    try {
+      widget?.unsubscribe?.('drawing_event', drawingEventHandler)
+    } catch (err) {
+      console.warn('tv unsubscribe drawing_event failed', err)
+    }
+    isDrawingSubscribed = false
+  }
   // 创建 限价价格线
   async function createLimitPriceLine(price: number) {
     const _widget = getWidget()
@@ -408,11 +404,13 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
 
   function subscribePriceMove() {
     const _widget = getWidget()
-    const chart = _widget?.activeChart?.()
-    if (_widget) {
-      _widget?.subscribe('drawing_event', (id, type) => {
+    if (!_widget) return
+    if (!drawingEventHandler) {
+      drawingEventHandler = (id, type) => {
         if (id === priceLimitLineId && type === 'points_changed') {
           nextTick(() => {
+            const widget = getWidget()
+            const chart = widget?.activeChart?.()
             const line = chart?.getShapeById?.(id)
             if (!line) return
             const points = line.getPoints?.()
@@ -423,7 +421,18 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
             useEventBus<string>('priceLimit_move').emit(formatDec(Number(price1), 4))
           })
         }
-      })
+      }
+    }
+    if (drawingEventWidget && drawingEventWidget !== _widget) {
+      safeUnsubscribe(drawingEventWidget)
+    }
+    if (drawingEventHandler) {
+      if (drawingEventWidget === _widget && isDrawingSubscribed) {
+        return
+      }
+      _widget?.subscribe('drawing_event', drawingEventHandler)
+      drawingEventWidget = _widget
+      isDrawingSubscribed = true
     }
   }
 
@@ -431,6 +440,11 @@ export function useLimitPriceLine(getWidget: () => IChartingLibraryWidget | null
     if (stop) {
       stop()
     }
+    if (drawingEventWidget) {
+      safeUnsubscribe(drawingEventWidget)
+    }
+    drawingEventWidget = null
+    drawingEventHandler = null
   })
 
   return {
@@ -601,6 +615,15 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
     }
   }, 300))
 
+  watch(()=>showMarket.value,()=>{
+      if (linesChecked.value.top100Buy.checked && avePriceCache.buyAvgPrice) {
+      createAvgPriceLine(avePriceCache.buyAvgPrice, true)
+    }
+     if (linesChecked.value.top100Sell.checked && avePriceCache.sellAvgPrice) {
+      createAvgPriceLine(avePriceCache.sellAvgPrice, false)
+    }
+  })
+
   return {
     resetAvgPriceLineId: () => {
       const _widget = getWidget()
@@ -680,7 +703,8 @@ export function useAvgPriceLine(getWidget: () => IChartingLibraryWidget | null, 
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  useEventBus<number>('updateAvgPrice').on(createAvgPriceLinePoll)
+  // 保存事件总线监听器停止函数
+  const updateAvgPriceOff = useEventBus<number>('updateAvgPrice').on(createAvgPriceLinePoll)
 
   let avgPriceToken = 0  // 表示当前有效轮询的 token
   const MAX_RETRY = 5
@@ -704,6 +728,13 @@ export function useAvgPriceLine(getWidget: () => IChartingLibraryWidget | null, 
       retry++
     }
   }
+
+  onUnmounted(() => {
+    // 清理事件总线监听器
+    if (updateAvgPriceOff) {
+      updateAvgPriceOff()
+    }
+  })
 
   return {
     resetAvgPriceLineId: () => {
@@ -757,6 +788,17 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
   type GetUserPendingTxRes = Awaited<ReturnType<typeof bot_getUserPendingTx>>
   const limitTxs = ref<GetUserPendingTxRes>([])
   const textShapeMap: Map<EntityId, GetUserPendingTxRes[number]> = new Map()
+  let drawingEventWidget: IChartingLibraryWidget | null = null
+  let isDrawingSubscribed = false
+  const safeUnsubscribe = (widget: IChartingLibraryWidget) => {
+    if (!isDrawingSubscribed) return
+    try {
+      widget?.unsubscribe?.('drawing_event', handlerLimitPriceLineRemove)
+    } catch (err) {
+      console.warn('tv unsubscribe drawing_event failed', err)
+    }
+    isDrawingSubscribed = false
+  }
 
   function getData(isFirst = true) {
     if (!chain.value || !tokenAddress.value || !botStore.accessToken) return
@@ -930,8 +972,15 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
   function subscribeLimitPriceLineRemove() {
     const _widget = getWidget()
     if (!_widget) return
-    _widget.unsubscribe('drawing_event', handlerLimitPriceLineRemove)
+    if (drawingEventWidget && drawingEventWidget !== _widget) {
+      safeUnsubscribe(drawingEventWidget)
+    }
+    if (drawingEventWidget === _widget && isDrawingSubscribed) {
+      return
+    }
     _widget.subscribe('drawing_event', handlerLimitPriceLineRemove)
+    drawingEventWidget = _widget
+    isDrawingSubscribed = true
   }
 
   function handlerLimitPriceLineRemove(id: EntityId, type: DrawingEventType) {
@@ -960,7 +1009,8 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
       }).catch(() => { })
   }
 
-  useEventBus<string>('updateKlineLimitLine').on(() => {
+  // 保存事件总线监听器停止函数
+  const updateKlineLimitLineOff = useEventBus<string>('updateKlineLimitLine').on(() => {
     getData()
   })
 
@@ -987,6 +1037,22 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
 
   onMounted(() => {
     getData()
+  })
+
+  onUnmounted(() => {
+    // 清理事件总线监听器
+    if (updateKlineLimitLineOff) {
+      updateKlineLimitLineOff()
+    }
+    if (drawingEventWidget) {
+      safeUnsubscribe(drawingEventWidget)
+      drawingEventWidget = null
+    }
+    // 清理定时器
+    if (Timer) {
+      clearTimeout(Timer)
+      Timer = null
+    }
   })
 
   return {
@@ -1215,6 +1281,22 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     }
   }, 300))
 
+  watch(()=>showMarket.value,()=>{
+    if (linesChecked.value.buy.checked && avePriceCache.buyAvgPrice) {
+      createAvgPriceLine(avePriceCache.buyAvgPrice, true)
+    }
+    if (linesChecked.value.sell.checked && avePriceCache.sellAvgPrice) {
+      createAvgPriceLine(avePriceCache.sellAvgPrice, false)
+    }
+  })
+  
+  onUnmounted(() => {
+    if (timer) {
+      clearInterval(timer)
+      timer = null
+    }
+  })
+
   return {
     resetBotAvgLineId: () => {
       const _widget = getWidget()
@@ -1399,6 +1481,12 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
       createAvgPriceLine()
     }
   }, 300))
+
+  watch(()=>showMarket.value,()=>{
+    if (linesChecked.value.kol.checked) {
+      createAvgPriceLine()
+    }
+  })
 
   return {
     resetKOLLine

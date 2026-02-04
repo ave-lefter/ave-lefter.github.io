@@ -3,7 +3,7 @@
     v-model="dialogVisible_chain"
     width="856px"
     class="dialog-box dialog-filterChain"
-
+    destroy-on-close
     append-to-body
   >
     <template #header>

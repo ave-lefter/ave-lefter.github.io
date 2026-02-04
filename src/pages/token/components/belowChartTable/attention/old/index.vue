@@ -105,7 +105,7 @@ watch(() => useFollowStore().currentAddress, (val) => {
   }
 })
 
-onActivated(() => {
+onMounted(() => {
   if (props.currentActiveTab == 'Attention') {
     getAttentionListOld()
   }

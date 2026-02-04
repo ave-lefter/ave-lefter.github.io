@@ -199,10 +199,19 @@
       initChart()
     })
   })
+  onBeforeUnmount(() => {
+    if (myChart) {
+      myChart.dispose()
+      myChart = null
+    }
+  })
   watch(() => globalStore.showLeft, async () => {
     await nextTick()
     myChart?.resize()
-
+  })
+  watch(() => globalStore.showRight, async () => {
+    await nextTick()
+    myChart?.resize()
   })
   // Watchers
   watch(() => props.dataList, () => initChart())

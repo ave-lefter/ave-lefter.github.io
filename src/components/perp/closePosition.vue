@@ -109,7 +109,7 @@ function _createOrder() {
 </script>
 
 <template>
-  <el-dialog v-model="visible" append-to-body :title="title" width="450px">
+  <el-dialog v-model="visible" append-to-body :title="title" width="450px" destroy-on-close>
     <div class="flex items-center font-bold h-21px mb-16px">
       {{ props.token }} · {{ t('all2')
       }}<span class="ml-4px font-normal" :class="getColorClass(props.row.openValue)">

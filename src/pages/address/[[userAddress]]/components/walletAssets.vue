@@ -97,6 +97,7 @@
           :style="{ width: '120px' }"
           :suffix-icon="SuffixIcon"
           :model-value="chain"
+          :persistent="false"
           @update:model-value="updateModelChain"
         >
           <template #prefix>

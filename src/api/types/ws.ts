@@ -12,6 +12,7 @@ export interface IPriceV2Response {
     reserve1: string;
     tvl: number;
     price_change: string;
+    price_change_v2: string;
     volume_24_u: number;
     direction: string;
     time: number;

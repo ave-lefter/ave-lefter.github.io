@@ -8,7 +8,7 @@
         />
       </slot>
     </span>
-    <el-dialog v-model="show" class="new-dialog" width="500px" append-to-body>
+    <el-dialog v-if="show" v-model="show" class="new-dialog" width="500px" append-to-body destroy-on-close>
       <template #header>
         <div class="text-20px mb-4px font-400">
           <button
@@ -533,6 +533,7 @@
                     v-model="autoSellConfigs.autoSellConfig_devsell!.priceChange"
                     placeholder="--"
                     class="input-number-limit"
+                    :persistent="false"
                     size="default"
                   >
                     <template #prefix>

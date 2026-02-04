@@ -90,7 +90,7 @@ async function getWalletTxData() {
     user_token: token
   }
   return bot_getUserWalletTxInfo(params).then(async res => {
-    console.log('walletTokenInfo', res)
+    // console.log('walletTokenInfo', res)
     walletTokenInfo.value = res?.[0] || null
     // const avgPrice = Number(res?.[0]?.balance_amount) > 0 ? Number(res?.[0]?.average_purchase_price_usd || 0) : 0
     // useEventBus('updateAvgPrice').emit(avgPrice)
@@ -161,7 +161,11 @@ watch(() => tokenStore.placeOrderSuccess, () => {
 // })
 
 let time = 0
+let pollTimer: ReturnType<typeof setTimeout> | null = null
+let isUnmounted = false
+
 function getWalletTxDataPoll() {
+  if (isUnmounted) return
   if (time > 10) {
     time = 0
     return
@@ -169,14 +173,27 @@ function getWalletTxDataPoll() {
   getWalletTxData()
   _bot_getAddressAllBalances()
   time++
-  setTimeout(getWalletTxDataPoll, 5000)
+  pollTimer = setTimeout(getWalletTxDataPoll, 5000)
 }
 
 const isShowB = ref(false)
 
-useEventBus('klineDataReady').on(() => {
+// 保存事件总线监听器停止函数
+const klineDataReadyOff = useEventBus('klineDataReady').on(() => {
   if (avgPrice.value > 0) {
     useEventBus('updateAvgPrice').emit(avgPrice.value)
+  }
+})
+
+onUnmounted(() => {
+  isUnmounted = true
+  if (pollTimer) {
+    clearTimeout(pollTimer)
+    pollTimer = null
+  }
+  // 清理事件总线监听器
+  if (klineDataReadyOff) {
+    klineDataReadyOff()
   }
 })
 

@@ -9,6 +9,7 @@
       v-model="expiredTime1"
       placeholder="Select"
       size="small"
+      :persistent="false"
       style="width: 80px;opacity: 0;position: absolute;right: 0;top: 50%; transform: translateY(-50%);"
     >
       <el-option

@@ -76,6 +76,7 @@ async function _getTxsUserBrief() {
     virtual-triggering
     trigger="hover"
     raw-content
+    :persistent="false"
     popper-class="[&&]:p-12px [&&]:[--el-text-color-primary:--dialog-bg]!"
     style="--el-text-color-primary:var(--d-222-l-FFF)"
   >

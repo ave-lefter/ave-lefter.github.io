@@ -363,10 +363,10 @@ export function updatePerpLastBar(
 export function waitForTradingView (): Promise<ChartingLibraryWidgetConstructor> {
   return new Promise((resolve) => {
     if (window?.TradingView?.widget) return resolve(window.TradingView.widget)
-    // 监听插件派发的事件
+    // 监听插件派发的事件（使用 once 确保处理完成后自动移除）
     window.addEventListener('tradingview:ready', () => {
       resolve(window.TradingView.widget)
-    })
+    }, { once: true })
   })
 }
 
@@ -553,7 +553,7 @@ export function useAvgPriceLine(getWidget: () => IChartingLibraryWidget | null, 
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  useEventBus<number>('updateAvgPrice').on(createAvgPriceLinePoll)
+  const updateAvgPriceOff = useEventBus<number>('updateAvgPrice').on(createAvgPriceLinePoll)
 
   let avgPriceToken = 0  // 表示当前有效轮询的 token
   const MAX_RETRY = 5
@@ -577,6 +577,12 @@ export function useAvgPriceLine(getWidget: () => IChartingLibraryWidget | null, 
       retry++
     }
   }
+
+  onUnmounted(() => {
+    if (updateAvgPriceOff) {
+      updateAvgPriceOff()
+    }
+  })
 
   return {
     resetAvgPriceLineId: () => {
@@ -833,7 +839,7 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
       }).catch(() => { })
   }
 
-  useEventBus<string>('updateKlineLimitLine').on(() => {
+  const updateKlineLimitLineOff = useEventBus<string>('updateKlineLimitLine').on(() => {
     getData()
   })
 
@@ -860,6 +866,16 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
 
   onMounted(() => {
     getData()
+  })
+
+  onUnmounted(() => {
+    if (Timer) {
+      clearTimeout(Timer)
+      Timer = null
+    }
+    if (updateKlineLimitLineOff) {
+      updateKlineLimitLineOff()
+    }
   })
 
   return {
@@ -894,4 +910,3 @@ export function setWatermark(_widget: IChartingLibraryWidget | null) {
   })
   _watermark?.visibility().setValue(true)
 }
-

@@ -3,7 +3,7 @@
     <el-calendar
       v-show="!isChartView"
       :model-value="new Date()"
-      class="[&&]:[--el-calendar-cell-width:44px]"
+      class="[&&]:[--el-calendar-cell-width:44px] [&&]:[--el-fill-color-blank:transparent]"
     >
       <template #header>
         <PnlCalendarHeader
@@ -279,7 +279,7 @@ watch(
     initOrUpdateChart()
   }
 )
-_getProfitCalendar()
+
 
 const onClickOutside = (event) => {
   if (buttonRef.value && !buttonRef.value.contains(event.target)) {
@@ -288,7 +288,14 @@ const onClickOutside = (event) => {
 }
 
 onMounted(() => {
+  _getProfitCalendar()
   document.addEventListener('click', onClickOutside)
+})
+onBeforeUnmount(() => {
+  if (chartInstance) {
+    chartInstance.dispose()
+    chartInstance = null
+  }
 })
 onUnmounted(() => {
   document.removeEventListener('click', onClickOutside)
