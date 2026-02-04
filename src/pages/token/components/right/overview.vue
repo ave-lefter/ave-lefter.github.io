@@ -312,8 +312,14 @@ const supportObj: Record<string, string> = {
 
 // 监听从 top 组件触发的查看 Dev 代币事件
 const devTokensEvent = useEventBus(BusEventType.DEV_TOKENS_TAB)
-devTokensEvent.on(() => {
+const handleDevTokensTab = () => {
   activeTab.value = 'devBit'
+}
+const devTokensOff = devTokensEvent.on(handleDevTokensTab)
+onUnmounted(() => {
+  if (devTokensOff) {
+    devTokensOff()
+  }
 })
 
 // 计算是否应该显示所属链信息

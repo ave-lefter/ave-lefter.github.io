@@ -577,7 +577,7 @@ name="custom:close" class="text-14px shrink-0 cursor-pointer color-[--main-text]
 </template>
 
 <style scoped lang="scss">
-:deep {
+:deep() {
   .el-select--small .el-select__wrapper {
     padding: 2px 4px;
     min-height: 20px;

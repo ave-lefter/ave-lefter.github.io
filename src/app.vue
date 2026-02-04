@@ -2,7 +2,7 @@
   <NuxtPwaAssets />
   <el-config-provider :locale="elementLocale">
     <NuxtLayout>
-      <NuxtPage :keepalive="{include: 'pump'}" />
+      <NuxtPage :keepalive="{include: 'pump'}" :page-key="routeName" />
     </NuxtLayout>
   </el-config-provider>
   <TokenDetails/>
@@ -29,6 +29,12 @@
   provide(ProvideType.HOT_TOKENS, {
     value: hotTokens,
     setVal: (val: GetHotTokensResponse[]) => hotTokens.value = val
+  })
+
+  const route = useRoute()
+
+  const routeName = computed(() => {
+    return (route.name || '') as string
   })
 
   watch(() => useLocaleStore().locale, async (val) => {

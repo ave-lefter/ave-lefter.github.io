@@ -376,7 +376,7 @@ function resetPnl() {
 </template>
 <style scoped lang="scss">
 .draggable {
-  :deep {
+  :deep() {
     .handle-br {
       opacity: 0;
     }

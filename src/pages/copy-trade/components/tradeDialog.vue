@@ -727,7 +727,7 @@ function createFollowOrder() {
       ([key, v]) =>  v && v !== ''
     )
   )
-  const priorityFee = form.value.priorityFee || form.value?.chain == 'solana' ? '0.001' : '0.05'
+  const priorityFee = form.value.priorityFee !== null ?form.value.priorityFee : form.value?.chain == 'solana' ? '0.001' : '0.05'
   let data = {
     ...filtered,
     tgUid: botStore?.userInfo?.tgUid || '',
@@ -744,7 +744,7 @@ function createFollowOrder() {
 
     slippage: (form.value.slippage || 9) * 100, //滑点
     isPrivate: form.value.isPrivate, //防夹
-    priorityFee: new BigNumber(priorityFee || 0).multipliedBy(10 ** currentUser.value?.decimals!),
+    priorityFee: new BigNumber(priorityFee || 0).multipliedBy(10 ** 9!),
     tokenBlacklist: tokenBlacklist?.value?.filter(Boolean),
   }
   // ...(form.value?.id ? { id: form.value.id } : {}),

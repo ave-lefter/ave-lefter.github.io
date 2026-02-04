@@ -35,6 +35,7 @@ watch(() => props.modelValue, () => {
     placement="bottom"
     :width="215"
     trigger="click"
+    :persistent="false"
   >
     <template #reference>
       <Icon

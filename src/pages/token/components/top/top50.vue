@@ -1,8 +1,8 @@
 <template>
   <el-popover
-v-if="list?.length > 0"
+    v-if="list?.length > 0"
     v-model:visible="show"
-:persistent="false"
+    :persistent="false"
     placement="bottom"
     popper-class="chains-table-filter"
     title=""
@@ -42,32 +42,29 @@ v-if="list?.length > 0"
           <span class="font_18 title">{{
             list[0]?.tag == 'early' ? t('top50TitleHold') : t('top50TitleEarly')
           }}</span>
-          <el-tooltip
-            v-if="list[0]?.tag == 'early'"
-            placement="top"
-            :persistent="false"
-            popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!"
-          >
-            <template #content>{{ t('top50TitleTip') }}</template>
-            <Icon
-              class="text-14px ml-5px mt-2px color-[--third-text] cursor-pointer"
-              name="mi:circle-warning"
-            />
-          </el-tooltip>
+          <Icon v-if="list[0]?.tag == 'early'" v-tooltip="{
+              content: t('top50TitleTip'),
+              props: {
+                placement: 'top',
+                persistent: false,
+                'popper-class': '[&&]:[--el-text-color-primary:--dialog-list-hover]!'
+              }
+            }"
+            class="text-14px ml-5px mt-2px color-[--third-text] cursor-pointer"
+            name="mi:circle-warning"
+          />
         </div>
         <div class="border mt-20px">
           <div class="holder">
             <div v-for="(item, $index) in list" :key="$index">
-              <el-tooltip
-                v-if="filterTag(item.tag_type)"
-                placement="top"
-                :hide-after="0"
-                :persistent="false"
-              >
-                <template #content>
-                  {{ filterTag(item.tag_type)?.text }}
-                </template>
-              <NuxtLink :to="`/address/${item.account_address}/${chain}`">
+              <NuxtLink v-if="filterTag(item.tag_type)" v-tooltip="{
+                content: filterTag(item.tag_type)?.text,
+                props: {
+                  placement: 'top',
+                  hideAfter: 0,
+                  persistent: false
+                }
+              }" :to="`/address/${item.account_address}/${chain}`">
                 <div class="item">
                   <Icon
                     class="dot iconfont font-10 mr-5px color-red-6"
@@ -83,7 +80,6 @@ v-if="list?.length > 0"
                   >
                 </div>
               </NuxtLink>
-              </el-tooltip>
             </div>
           </div>
           <div class="flex-between mt-10px">
@@ -154,6 +150,7 @@ v-if="list?.length > 0"
 <script setup lang="ts">
 import { _getEarlyholders, type EarlyHolders } from '@/api/top50'
 import { formatNewTags, getAddressAndChainFromId } from '@/utils/index'
+import type { content } from 'html2canvas/dist/types/css/property-descriptors/content'
 const { t } = useI18n()
 const route = useRoute()
 // const router = useRouter()

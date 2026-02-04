@@ -9,6 +9,12 @@ export default defineNuxtConfig({
   devtools: {
     enabled: false
   },
+  app: {
+    // 禁用页面切换动画
+    pageTransition: false,
+    // 禁用布局切换动画
+    layoutTransition: false
+  },
   modules: [
     '@nuxt/eslint',
     // '@nuxt/fonts',
