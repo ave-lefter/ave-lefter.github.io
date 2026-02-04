@@ -26,7 +26,7 @@
                                 @click="clickAvatar(profile.author_id)">{{
                                     profile.name
                                 }}</span>
-                            <img v-if="profile.verified" :width="12" src="@/assets/images/kol.svg" alt="">
+                            <img v-if="profile.blue_verified" :width="12" src="@/assets/images/kol.svg" alt="">
                         </div>
                         <div class="text-12px color-[--secondary-text]">@{{ profile.username }}</div>
                     </div>
@@ -35,9 +35,12 @@
                     <Icon name="custom:twitter" />
                 </div>
             </div>
+            <div v-if="profile.bio" class="text-14px lh-20px color-[--main-text] mt-16px">
+                {{ profile.bio }}
+            </div>
         </div>
-        <div class="my-16px h-1px bg-[--dialog]" />
-        <div ref="parent" class="overflow-y-auto" style="height:calc(100% - 120px)">
+        <div class="my-16px h-1px bg-[--dialog-divider]" />
+        <div ref="parent" class="overflow-y-auto scrollbar-hide" style="height:calc(100% - 120px)">
             <div :style="{
                 height: `${totalSize}px`,
                 width: '100%',
@@ -70,6 +73,7 @@
 import { useVirtualizer } from '@tanstack/vue-virtual'
 import { getKolProfile, getTwitterByAuthor } from '~/api/twitter'
 import ListItem from './listItem.vue'
+import { useDebounceFn, useInfiniteScroll } from '@vueuse/core'
 
 const { t } = useI18n()
 const trackerStore = useTwitterTrackerStore()
@@ -94,6 +98,10 @@ const virtualizer = useVirtualizer(
 const virtualItems = computed(() => virtualizer.value.getVirtualItems())
 const totalSize = computed(() => virtualizer.value.getTotalSize())
 
+useInfiniteScroll(parentRef, useDebounceFn(()=>{
+  getList()
+},100), { distance: 100 })
+
 const getItem = (virtualRow) => {
     return list.value[virtualRow.index] || {}
 }
@@ -105,6 +113,7 @@ async function kolProfile() {
 kolProfile()
 
 const getList = async () => {
+    if(listStatus.value.loading || listStatus.value.finished) return
     listStatus.value.loading = true
     try {
         const res = await getTwitterByAuthor(twitter_author_id.value,listStatus.value.page_token)

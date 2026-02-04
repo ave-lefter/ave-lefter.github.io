@@ -24,9 +24,10 @@ const trackerStore = useTwitterTrackerStore()
 const dragStore = useDragStore()
 const { t } = useI18n()
 const { placement } = storeToRefs(trackerStore)
+const v2WsStore = useV2WSStore()
 const key = ref(0)
 const { width: winWidth } = useWindowSize()
-const author_id = ref('274334177')
+const author_id = ref(null)
 provide('twitter_author_id', author_id)
 
 const reload = () => {
@@ -171,4 +172,18 @@ function drag(x) {
     return null
   }
 }
+
+function subscribePublicTwitter(method) {
+  v2WsStore.send({
+    jsonrpc: '2.0',
+    method,
+    params: ['public_twitter', 'hot'],
+    id: 1,
+  })
+}
+
+subscribePublicTwitter('subscribe')
+onUnmounted(() => {
+  subscribePublicTwitter('unsubscribe')
+})
 </script>

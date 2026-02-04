@@ -107,7 +107,7 @@
         </template>
       </el-input>
     </div>
-    <TwitterTrackerList :isMine="isMine" @stop="val => isPaused = val" @endReached="getList" @startAttention="emits('setDrawerVisible', true)" />
+    <TwitterTrackerList :isMine="isMine" @stop="val => isPaused = val" @endReached="debouncedGetList" @startAttention="emits('setDrawerVisible', true)" />
     <audio ref="twitterAudio" controls style="display: none" :src="getAudioUrl(globalStore.audioSettings.audio.twitter)"
       :volume="+globalStore.audioSettings.audio.volume / 100 || 0.5" />
   </div>
@@ -216,6 +216,7 @@ const getList = async () => {
   if (isMine.value && !botStore.accessToken) {
     return
   }
+  if(trackerStore.loading || trackerStore.finished) return
   trackerStore.loading = true
   try {
     const res = await getTwitterList({
@@ -240,18 +241,9 @@ const getList = async () => {
   }
 }
 
+const debouncedGetList = useDebounceFn(getList, 100)
+
 getList()
-
-function subscribePublicTwitter(method) {
-  v2WsStore.send({
-    jsonrpc: '2.0',
-    method,
-    params: ['public_twitter', 'hot'],
-    id: 1,
-  })
-}
-
-subscribePublicTwitter('subscribe')
 
 const twitterHandler = async (val) => {
   if (query.value.types.includes(+val.type)) {

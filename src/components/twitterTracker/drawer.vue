@@ -47,7 +47,7 @@
                 }" icon-size="32px" />
                 <div>
                   <div class="flex items-center gap-8px">
-                    <span v-tooltip="row.name" class="color-[--main-text] text-14px lh-20px truncate max-w-150px">{{
+                    <span v-tooltip="row.name" class="color-[--main-text] text-14px lh-20px truncate max-w-140px">{{
                       row.name }}</span>
                     <div v-if="row.chain" class="w-14px h-14px bg-#000 rounded-full">
                       <img class="w-full h-full rounded-full block"
@@ -61,12 +61,15 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="subCount" align="right" width="90">
+        <el-table-column prop="ave_follower_count" align="right" width="90">
           <template #header>
             <span v-tooltip="t('subCountTips')" class="underline underline-dotted">{{ t('subCount') }}</span>
           </template>
+          <template #default="{ row }">
+            <span class="text-[--main-text]">{{ row.ave_follower_count }}</span>
+          </template>
         </el-table-column>
-        <el-table-column width="90" align="right" :label="t('tags')">
+        <el-table-column width="110" align="right" :label="t('tags')">
           <template #header>
             <div class="flex justify-end items-center gap-4px text-12px">
               <span>{{ $t('tags') }}</span>
@@ -255,6 +258,8 @@ const _followKol = async (author_id, index) => {
     list.value[index].follow_status = 1
     updateStoreStatus(author_id, 1)
     followIds.value = followIds.value.concat({ author_id })
+    // 订阅人数更新
+    list.value[index].ave_follower_count++
   } catch (error) {
     ElMessage.error(t('failed'))
     console.error('Error following KOL:', error)
@@ -272,6 +277,7 @@ const _unfollowKol = async (author_id, index) => {
     }
     updateStoreStatus(author_id, 0)
     followIds.value = followIds.value.filter(el => el.author_id !== author_id)
+    list.value[index].ave_follower_count--
   } catch (error) {
     ElMessage.error(t('failed'))
     console.error('Error unfollowing KOL:', error)
