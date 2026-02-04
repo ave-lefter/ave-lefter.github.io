@@ -1384,6 +1384,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
             extendLeft: false,
             extendRight: false,
           },
+          zOrder:'top'
         }
       )
       item.isCreating = false
@@ -1472,7 +1473,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
       kolVisibleRangeUnsub = () => {
         const c = getWidget()?.activeChart?.()
         c?.onVisibleRangeChanged?.().unsubscribe(null, onKOLLinesVisibleRangeChanged)
-        // c?.getTimeScale?.().barSpacingChanged?.().unsubscribe(null, onKOLZoomChanged)
+        c?.getTimeScale?.().barSpacingChanged?.().unsubscribe(null, onKOLZoomChanged)
         kolVisibleRangeUnsub = null
       }
     } else {
