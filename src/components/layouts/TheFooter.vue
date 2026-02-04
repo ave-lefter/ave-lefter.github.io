@@ -42,7 +42,7 @@
           {{ t('twitterTracker') }}
         </div>
       </el-badge>
-      <div class="flex items-center gap-16px ml-12px whitespace-nowrap">
+      <div class="flex items-center gap-8px ml-12px whitespace-nowrap">
         <NuxtLink
           v-for="item in mainCoins"
           :key="item.symbol || item.logo_url"

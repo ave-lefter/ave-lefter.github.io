@@ -6,7 +6,8 @@
     </NuxtLayout>
   </el-config-provider>
   <TokenDetails/>
-  <TransactionPromptSlot />
+  <!-- 交易提示暂隐藏，仅展示底部币价 -->
+  <!-- <TransactionPromptSlot /> -->
   <!-- 手动引入 custom:checked -->
   <Icon style="display: none;" name="custom:checked" />
 
@@ -14,7 +15,7 @@
 
 <script setup lang='ts'>
   import TokenDetails from '~/pages/token/components/tokenDetails/index.vue'
-  import TransactionPromptSlot from '~/components/TransactionPrompt/TransactionPromptSlot.vue'
+  // import TransactionPromptSlot from '~/components/TransactionPrompt/TransactionPromptSlot.vue'
   import { useRemarksStore } from '@/stores/remarks'
   import en from 'element-plus/es/locale/lang/en'
   import type {GetHotTokensResponse} from '~/api/token'

@@ -192,11 +192,11 @@ import { sui_signAndExecuteTransactionBlock } from '@/utils/wallet/sui'
 import { getSolanaSwapQuoteTransaction, sendSolanaSwapTransaction } from '@/utils/wallet/solana'
 import { getTonSwap } from '~/api/swap/ton'
 import { getTonTokenTransferMsg, sendTonTransaction } from '~/utils/wallet/ton'
-import { useTransactionPrompt } from '@/composables/useTransactionPrompt'
-
+// 交易提示暂隐藏，仅展示底部币价
+// import { useTransactionPrompt } from '@/composables/useTransactionPrompt'
 
 const { t } = useI18n()
-const { showExecuting, showSuccess, closeExecuting, updateExecutingSeconds } = useTransactionPrompt()
+// const { showExecuting, showSuccess, closeExecuting, updateExecutingSeconds } = useTransactionPrompt()
 const configStore = useConfigStore()
 
 const initSlippage = '2'
@@ -2022,11 +2022,6 @@ async function submitSwap(_swapSubmitInfo = swapSubmitInfo.value) {
     // let tx = {}
     activeShow.value = 2
     let submittedHash = ''
-    const startTime = Date.now()
-    showExecuting()
-    const executingTimer = setInterval(() => {
-      updateExecutingSeconds(Math.floor((Date.now() - startTime) / 1000))
-    }, 1000)
     swapSubmitInfo.value.swap().then((res: { hash: any; wait: () => any }) => {
       console.log('---confirm transaction---', res)
       submittedHash = resolveTxHash(res)
@@ -2082,21 +2077,7 @@ async function submitSwap(_swapSubmitInfo = swapSubmitInfo.value) {
       return typeof res?.wait === 'function' ? res.wait() : res
     }).then((res: { hash: string, to: string }) => {
       console.log('----transaction---', res)
-      clearInterval(executingTimer)
-      closeExecuting()
       const txHash = resolveTxHash(res, submittedHash)
-      const elapsedSec = (Date.now() - startTime) / 1000
-      const isBuy = swapStore.activeTab === 0
-      showSuccess({
-        chain: chain.value,
-        txHash,
-        elapsedSec,
-        isBuy,
-        fromSymbol: txInfo.from_symbol,
-        fromAmount: txInfo.from_amount,
-        toSymbol: txInfo.to_symbol,
-        toAmount: txInfo.to_amount,
-      })
       updateTransaction({
         chain: chain.value,
         tx_hash: txHash,
@@ -2133,8 +2114,6 @@ async function submitSwap(_swapSubmitInfo = swapSubmitInfo.value) {
       return res
     }).catch((err: any) => {
       activeShow.value = 1
-      clearInterval(executingTimer)
-      closeExecuting()
       console.log('swap err', err)
       resetCountdown()
       loadingSwap.value = false
@@ -2183,11 +2162,6 @@ async function submitSolanaSwap() {
       }
     }, 6000)
     let submittedHash = ''
-    const startTime = Date.now()
-    showExecuting()
-    const executingTimer = setInterval(() => {
-      updateExecutingSeconds(Math.floor((Date.now() - startTime) / 1000))
-    }, 1000)
     sendSolanaSwapTransaction(solanaQuoteResponse).then((res: { hash: string | undefined; wait: () => any }) => {
       console.log('---confirm transaction---', res)
       submittedHash = resolveTxHash(res)
@@ -2241,21 +2215,7 @@ async function submitSolanaSwap() {
     }).then((res: { transaction: { signatures: any[] }; blockTime: any; transactionHash: any }) => {
       console.log('----transaction---', res)
       if (res) {
-        clearInterval(executingTimer)
-        closeExecuting()
-        const elapsedSec = (Date.now() - startTime) / 1000
-        const isBuy = swapStore.activeTab === 0
         const txHash = resolveTxHash(res, submittedHash)
-        showSuccess({
-          chain: 'solana',
-          txHash,
-          elapsedSec,
-          isBuy,
-          fromSymbol: txInfo.from_symbol,
-          fromAmount: txInfo.from_amount,
-          toSymbol: txInfo.to_symbol,
-          toAmount: txInfo.to_amount,
-        })
         updateTransaction({
           chain: 'solana',
           tx_hash: txHash,
@@ -2289,8 +2249,6 @@ async function submitSolanaSwap() {
       }
       return res
     }).catch((err: any) => {
-      clearInterval(executingTimer)
-      closeExecuting()
       if ((err || err?.message) === 'Timeout') {
         ElNotification({ type: 'error', message: t('timeout_error') })
       } else if ((err || err?.message) === 'Swap fail') {
@@ -2345,11 +2303,6 @@ async function submitSuiSwap() {
       }
     }, 6000)
     let submittedHash = ''
-    const startTime = Date.now()
-    showExecuting()
-    const executingTimer = setInterval(() => {
-      updateExecutingSeconds(Math.floor((Date.now() - startTime) / 1000))
-    }, 1000)
     const isSwap = true
     buildSuiTx({
       quoteResponse: suiQuoteResponse,
@@ -2428,20 +2381,6 @@ async function submitSuiSwap() {
       console.log('res', res)
       const txHash = resolveTxHash(res, submittedHash)
       if (txHash) {
-        clearInterval(executingTimer)
-        closeExecuting()
-        const elapsedSec = (Date.now() - startTime) / 1000
-        const isBuy = swapStore.activeTab === 0
-        showSuccess({
-          chain: 'sui',
-          txHash,
-          elapsedSec,
-          isBuy,
-          fromSymbol: txInfo.from_symbol,
-          fromAmount: txInfo.from_amount,
-          toSymbol: txInfo.to_symbol,
-          toAmount: txInfo.to_amount,
-        })
         updateTransaction({
           chain: 'sui',
           tx_hash: txHash,
@@ -2462,8 +2401,6 @@ async function submitSuiSwap() {
           //   return i
           // })
         } else {
-          clearInterval(executingTimer)
-          closeExecuting()
           updateTransaction({
             chain: 'sui',
             tx_hash: txHash,
@@ -2477,8 +2414,6 @@ async function submitSuiSwap() {
           return res
         }
     }).catch(err => {
-      clearInterval(executingTimer)
-      closeExecuting()
       // if (/'Timeout'/i.test(err || err?.message || '')) {
       //   this.suiTxs = this.suiTxs.map(i => {
       //     if (i.transaction === txInfo.transaction) {
@@ -2555,11 +2490,6 @@ async function submitTonSwap() {
       transaction.push(feeMsg)
     }
     let submittedHash = ''
-    const startTime = Date.now()
-    showExecuting()
-    const executingTimer = setInterval(() => {
-      updateExecutingSeconds(Math.floor((Date.now() - startTime) / 1000))
-    }, 1000)
     sendTonTransaction(transaction).then(res => {
       console.log('---confirm transaction---', res)
       submittedHash = resolveTxHash(res)
@@ -2613,21 +2543,7 @@ async function submitTonSwap() {
     }).then(async res => {
       console.log('----transaction---', res)
       if (res) {
-        clearInterval(executingTimer)
-        closeExecuting()
-        const elapsedSec = (Date.now() - startTime) / 1000
-        const isBuy = swapStore.activeTab === 0
         const txHash = resolveTxHash(res, submittedHash)
-        showSuccess({
-          chain: 'ton',
-          txHash,
-          elapsedSec,
-          isBuy,
-          fromSymbol: txInfo.from_symbol,
-          fromAmount: txInfo.from_amount,
-          toSymbol: txInfo.to_symbol,
-          toAmount: txInfo.to_amount,
-        })
         updateTransaction({
           chain: 'ton',
           tx_hash: txHash,
@@ -2660,8 +2576,6 @@ async function submitTonSwap() {
       }
       return res
     }).catch((err) => {
-      clearInterval(executingTimer)
-      closeExecuting()
       console.warn('ton error', err)
       if ((err || err?.message) === 'Timeout') {
         ElNotification({ type: 'error', message: t('timeout_error') })
