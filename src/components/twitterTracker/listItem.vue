@@ -6,12 +6,12 @@
                     <div class="min-w-0 flex-1 flex items-center gap-7px">
                         <UserAvatar icon-size="32px" class="cursor-pointer"
                             :wallet_logo="{ logo: item.author.profile_pic, name: item.author.name }"
-                            @click="clickAvatar(item.author.twitter_url)" />
+                            @click="clickAvatar(item.author.author_id)" />
                         <div class="flex-1 min-w-0">
                             <div class="gap-8px flex items-center min-w-0">
                                 <span v-tooltip="item.author.name"
                                     class="color-[--main-text] text-16px lh-20px min-w-0 max-w-[calc(100%-80px)] truncate cursor-pointer"
-                                    @click="clickAvatar(item.author.twitter_url)">{{
+                                    @click="clickAvatar(item.author.author_id)">{{
                                         item.author.name
                                     }}</span>
                                 <img v-if="item.verified" :width="12" src="@/assets/images/kol.svg" alt="">
@@ -45,7 +45,12 @@
                             : 'custom:twitter-uncollect'
                             " class="text-12px" />
                     </div>
-                    <Icon :name="`custom:twitter-${item.type}`" class="text-24px" />
+                    <div class="flex items-center gap-4px py-6px px-4px rounded-4px text-12px"
+                    :style="{background: map[item.type]?.bg, color: map[item.type]?.color}"
+                    >
+                        <Icon :name="`custom:twitter-${item.type}`" class="text-13px" />
+                        {{ map[item.type]?.label }}
+                    </div>
                 </div>
             </div>
             <div class="relative" :class="index !== -1 ? 'ml-40px' : ''">
@@ -129,9 +134,11 @@ import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { followKol, unfollowKol } from '~/api/twitter'
 import { processTwitterText } from '~/utils'
+import { useTrackerTypes } from './constants'
 
 const emits = defineEmits(['measureElement'])
 const trackerStore = useTwitterTrackerStore()
+const {map} = useTrackerTypes()
 const { t } = useI18n()
 const botStore = useBotStore()
 
@@ -188,8 +195,9 @@ watch(() => [props.item?.content,translationVisible.value], () => {
     checkContentOverflow()
 }, { immediate: true })
 
-const clickAvatar = (twitter_url) => {
-    window.open(twitter_url)
+const twitter_author_id = inject('twitter_author_id')
+const clickAvatar = (author_id) => {
+    twitter_author_id.value = author_id
 }
 
 /**

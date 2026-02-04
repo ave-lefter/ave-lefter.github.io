@@ -9,7 +9,7 @@
       @on-drag="drag"
     >
       <!-- <Monitor v-bind="props2"/> -->
-      <component :is="lazyComponent" v-bind="props2" @setDrawerVisible="drawerVisible = true" />
+      <component :is="author_id? AuthorIndex:lazyComponent" v-bind="props2" @setDrawerVisible="drawerVisible = true" />
     </Draggable>
     <div>
       <TwitterTrackerDrawer v-model:visible="drawerVisible" />
@@ -18,6 +18,7 @@
 <script setup name="trackerDragger">
 import { useWindowSize } from '@vueuse/core'
 
+const AuthorIndex = defineAsyncComponent(() => import('./authorIndex.vue'))
 const drawerVisible = ref(false)
 const trackerStore = useTwitterTrackerStore()
 const dragStore = useDragStore()
@@ -25,6 +26,9 @@ const { t } = useI18n()
 const { placement } = storeToRefs(trackerStore)
 const key = ref(0)
 const { width: winWidth } = useWindowSize()
+const author_id = ref('274334177')
+provide('twitter_author_id', author_id)
+
 const reload = () => {
   key.value++
 }
@@ -131,11 +135,11 @@ const props2 = computed(() => {
     data = {
       class:
         'border-1px border-solid border-[--d-1A1A1A-l-F2F2F2] shadow-[0_5px_10px_0_var(--d-FFFFFF14-l-00000014)]',
-      scrollHeight: dragConstant.value.centerScrollHeight,
+      // scrollHeight: dragConstant.value.centerScrollHeight,
     }
   } else {
     data = {
-      scrollHeight: dragConstant.value.otherScrollHeight,
+      // scrollHeight: dragConstant.value.otherScrollHeight,
     }
   }
   return data

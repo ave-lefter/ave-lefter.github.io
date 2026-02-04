@@ -1955,5 +1955,6 @@
   "chainWallet3": "鏈錢包",
   "monitorBotError": "不支持監控機器人地址",
   "subCount":"訂閱人數",
-  "subCountTips":"正在追蹤該賬號的錢包用戶數"
+  "subCountTips":"正在追蹤該賬號的錢包用戶數",
+  "home": "主頁"
 }

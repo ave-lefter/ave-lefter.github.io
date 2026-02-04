@@ -126,6 +126,45 @@ function getAllFollowIds(){
      })
 }
 
+// 获取作者详细资料
+export interface ITwitterProfile {
+    author_id:          string;
+    ave_follower_count: number;
+    bio:                string;
+    blue_verified:      string;
+    chain:              string;
+    follow_status:      number;
+    follower_count:     string;
+    following_count:    string;
+    name:               string;
+    profile_pic:        string;
+    source:             string;
+    tags:               string[];
+    twitter_url:        string;
+    username:           string;
+    verified:           string;
+}
+function getKolProfile(author_id:number):Promise<ITwitterProfile>{
+     const {$api}  = useNuxtApp()
+   return $api('/v2api/twitter/v1/kol/profile', {
+       method: 'get',
+       query:{
+        author_id
+       }
+     })
+}  
+
+function getTwitterByAuthor(author_id:number,page_token?:number) {
+    const {$api}  = useNuxtApp()
+    return $api('/v2api/twitter/v1/kol/profile/tweets', {
+        method: 'get',
+        query:{
+            author_id,
+            page_token
+        }
+      })
+}
+
 export {
     getHotKolList,
     followKol,
@@ -135,5 +174,7 @@ export {
     getTwitterList,
     getKolFilters,
     getTwitterById,
-    getAllFollowIds
+    getAllFollowIds,
+    getKolProfile,
+    getTwitterByAuthor
 }

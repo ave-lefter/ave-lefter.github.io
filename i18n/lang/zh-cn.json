@@ -1973,5 +1973,6 @@
   "monitorBotError": "不支持监控机器人地址",
   "subCount":"订阅人数",
   "subCountTips":"正在追踪该账号的钱包用户数",
-  "twitterMax":"推特监控账号数量上限为 50 个"
+  "twitterMax":"推特监控账号数量上限为 50 个",
+  "home": "主页"
 }

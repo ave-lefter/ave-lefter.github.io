@@ -14,10 +14,26 @@ export const useTrackerTypes = ()=>{
             { label: t('reply'), value: typeEnum.reply },
         ]),
         map: computed(()=>({
-            [typeEnum.tweet]: t('tweet'),
-            [typeEnum.retweet]: t('retweet'),
-            [typeEnum.quote]: t('quote'),
-            [typeEnum.reply]: t('reply'),
+            [typeEnum.tweet]: {
+                label: t('tweet'),
+                bg:'#13C2C21A',
+                color:'#13C2C2'
+            },
+            [typeEnum.retweet]: {
+                label:t('retweet'),
+                bg:'rgba(255, 166, 34, 0.10)',
+                color:'#FFA622'
+            },
+            [typeEnum.quote]: {
+                label:t('quote'),
+                bg:'rgba(129, 64, 241, 0.10)',
+                color:'#8140F1'
+            },
+            [typeEnum.reply]: {
+                label:t('reply'),
+                bg:'rgba(0, 197, 128, 0.10)',
+                color:'#00C580'
+            },
         }))
     }
 }

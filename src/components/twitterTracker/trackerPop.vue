@@ -134,12 +134,12 @@ const wsCacheArr = shallowRef([])
 const twitterAudio = useTemplateRef('twitterAudio')
 const followIds = useStorage('twFollowIds', [])
 const query = ref({ ...trackerStore.query })
-defineProps({
-  scrollHeight: {
-    type: Number,
-    default: 0,
-  },
-})
+// defineProps({
+//   scrollHeight: {
+//     type: Number,
+//     default: 0,
+//   },
+// })
 // const follow_only = ref(false)
 const TAB_TYPE = {
   HOT: 1,

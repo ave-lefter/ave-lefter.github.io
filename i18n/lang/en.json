@@ -1970,5 +1970,6 @@
   "monitorBotError": "Monitoring robot address not supported",
   "subCount":"Sub Count",
   "subCountTips":"The number of wallet users tracking this account",
-  "twitterMax":"You can monitor up to 50 Twitter accounts"
+  "twitterMax":"You can monitor up to 50 Twitter accounts",
+  "home": "Home"
 }
