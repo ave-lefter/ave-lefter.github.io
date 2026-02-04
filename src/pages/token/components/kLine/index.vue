@@ -273,7 +273,7 @@ const linesChecked = useLocalStorage('tv_markLines', {
   },
   kol: {
     checked: false,
-    color: '#FFA622',
+    color: '#424ADF',
   },
 })
 const colorPickerVisible = ref({} as Record<string, boolean>)
@@ -1326,7 +1326,14 @@ const { resetKOLLine } = useKOLAvgPriceLine(
   () => _widget,
   () => isReadyLine,
   showMarket,
-  linesChecked
+  linesChecked,
+  (endTime,scaleRatio = 20) => {
+    const params = resolutionMap[resolution.value as keyof typeof resolutionMap] || {
+      val: resolution.value,
+      unit: 'm',
+    }
+    return dayjs(endTime * 1000).subtract(params.val * scaleRatio, params.unit).unix()
+  }
 )
 
 function setIframeCssVar() {
@@ -1423,7 +1430,7 @@ const resetTop100Color = () => {
 const resetIndicatorLineColor = () => {
   linesChecked.value.buy.color = '#19d92f'
   linesChecked.value.sell.color = '#f6465d'
-  linesChecked.value.kol.color = '#ffa622'
+  linesChecked.value.kol.color = '#424ADF'
 }
 
 defineExpose({
