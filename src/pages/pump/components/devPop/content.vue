@@ -48,7 +48,7 @@
       </li>
       <li class="flex items-center justify-between mb-8px">
         <span class="color-[--secondary-text]">{{ $t('time') }}</span>
-        <span class="color-[--main-text]">{{ formatDate(info?.first_deposit_at || 0) }}</span>
+        <span class="color-[--main-text]">{{info?.first_deposit_at ? formatDate(info?.first_deposit_at || 0) : '--' }}</span>
       </li>
     </ul>
   </div>

@@ -16,6 +16,8 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  buy_tax: any
+  sell_tax: any
   dev_migrated_count?: number
   dev_migrated_ratio?: number
   dev_total_count?: number
@@ -148,7 +150,7 @@ export interface WSPumpObj {
 }
 export type WSPump = WSPumpObj & Pair
 
-export type ChainKey = 'solana' | 'bsc' | 'xlayer' | 'monad'
+export type ChainKey = 'solana' | 'bsc' | 'xlayer' | 'monad' | 'base'
 export type CategoryKey = 'new' | 'soon' | 'graduated'
 
 export type pumpBlack = {

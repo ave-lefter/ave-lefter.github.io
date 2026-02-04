@@ -161,6 +161,8 @@
             :tableList="list1 || []"
             :quickBuyValue="quickBuyValue"
             :loading="pumpV3[activeChain]['new']['loading']"
+            @mouseover="isPausedObj.new = true"
+            @mouseleave="isPausedObj.new = false"
           />
         </div>
       </el-col>
@@ -228,6 +230,8 @@
             :quickBuyValue="quickBuyValue"
             :loading="pumpV3[activeChain]['soon']['loading']"
             isSoon
+            @mouseover="isPausedObj.soon = true"
+            @mouseleave="isPausedObj.soon = false"
           />
         </div>
       </el-col>
@@ -296,6 +300,8 @@
             :quickBuyValue="quickBuyValue"
             :loading="pumpV3[activeChain]['graduated']['loading']"
             isOut
+            @mouseover="isPausedObj.graduated = true"
+            @mouseleave="isPausedObj.graduated = false"
           />
         </div>
       </el-col>
@@ -396,6 +402,11 @@ const fourmemeListObj = reactive<Record<ChainKey, Record<CategoryKey, PumpObj[]>
     soon: [],
     graduated: [],
   },
+  base: {
+    new: [],
+    soon: [],
+    graduated: [],
+  },
 })
 
 const isPausedObj = ref({
@@ -407,7 +418,7 @@ const isPausedObj = ref({
 // let wsTableListCache: PumpObj[] = []
 let wsTableListCache: Record<string, PumpObj[]> = {}
 const wsTableList = shallowRef<PumpObj[]>([])
-const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
+const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number, buy_tax: number, sell_tax: number }[]>([])
 type StatisticsItem = {
   first_transfer_in_from_label: any
   volume_u_24h: number
@@ -423,9 +434,9 @@ type StatisticsItem = {
   kol_ratio: any
   buyers_24h: any
   sellers_24h: any
-  makers_24h(makers_24h: any): number
-  reserve1(reserve1: any): number
-  reserve0(reserve0: any): number
+  makers_24h: number
+  reserve1: number
+  reserve0: number
   chain: string
   token: string
   holder_count: number
@@ -443,12 +454,11 @@ type StatisticsItem = {
   address_binding_ratio: string
   phishing_ratio: string,
   sells_tx_24h_count:number
-  buys_tx_24h_count:number
-
+  buys_tx_24h_count: number
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
-const mapStatistics = shallowRef(new Map<string, any>())
+const mapStatistics = shallowRef(new Map<string, StatisticsItem>())
 const platformsList = computed(() => {
   const list = pumpConfig?.value?.filter((i) => i?.chain === activeChain.value)
   return (
@@ -527,6 +537,18 @@ const list1 = computed(() => {
             }
           : {}
         ),
+        ...(obj.buy_tax
+          ? {
+              buy_tax: obj.buy_tax
+            }
+          : {}
+        ),
+        ...(obj.sell_tax
+          ? {
+              sell_tax: obj.sell_tax
+            }
+          : {}
+        ),
         name: obj.name,
         symbol: obj.symbol,
         ...(obj.appendix
@@ -583,6 +605,18 @@ const list2 = computed(() => {
           ...(obj.logo_url
             ? {
                 logo_url: obj.logo_url
+              }
+            : {}
+          ),
+          ...(obj.buy_tax
+            ? {
+                buy_tax: obj.buy_tax
+              }
+            : {}
+          ),
+          ...(obj.sell_tax
+            ? {
+                sell_tax: obj.sell_tax
               }
             : {}
           ),
@@ -653,6 +687,18 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
             }
           : {}
         ),
+        ...(obj.buy_tax
+          ? {
+              buy_tax: obj.buy_tax
+            }
+          : {}
+        ),
+        ...(obj.sell_tax
+          ? {
+              sell_tax: obj.sell_tax
+            }
+          : {}
+        ),
         name: obj.name,
         symbol: obj.symbol,
         ...(obj.appendix
@@ -678,30 +724,68 @@ const scrollHeight = computed(()=>{
   return 'calc(100vh - 215px)'
   // return globalStore.tokenHistoryVisible ? 'calc(100vh - 248px)':'calc(100vh - 215px)'
 })
-watch(() => list1.value?.[0]?.target_token, useThrottleFn((val) => {
+
+
+// 🔧 FIX: 外置 throttled handlers（只创建一次）
+const playNewAudio = useThrottleFn((val) => {
   const newAudio = pump_notice.value?.[activeChain.value]?.new
-  if(newAudio && pumpAudio.value && val) {
-    audioUrl.value = audioNameToResource[newAudio as keyof typeof audioNameToResource]
-      || audioNameToResource.Beep
-    pumpAudio.value.play()
+  if (newAudio && pumpAudio.value && val) {
+    audioUrl.value =
+      audioNameToResource[newAudio as keyof typeof audioNameToResource] ||
+      audioNameToResource.Beep
+    pumpAudio.value.play().catch(() => {})
   }
-},300))
-watch(() => list2.value?.[0]?.target_token, useThrottleFn((val) => {
+}, 300)
+
+const playSoonAudio = useThrottleFn((val) => {
   const soonAudio = pump_notice.value?.[activeChain.value]?.soon
-  if(soonAudio && pumpAudio.value && val) {
-    audioUrl.value = audioNameToResource[soonAudio as keyof typeof audioNameToResource]
-    || audioNameToResource.Beep
-    pumpAudio.value.play()
+  if (soonAudio && pumpAudio.value && val) {
+    audioUrl.value =
+      audioNameToResource[soonAudio as keyof typeof audioNameToResource] ||
+      audioNameToResource.Beep
+    pumpAudio.value.play().catch(() => {})
   }
-},300))
-watch(() => list3.value?.[0]?.target_token, useThrottleFn((val) => {
+}, 300)
+
+const playGraduatedAudio = useThrottleFn((val) => {
   const graduatedAudio = pump_notice.value?.[activeChain.value]?.graduated
-  if(graduatedAudio && pumpAudio.value && val) {
-    audioUrl.value = audioNameToResource[graduatedAudio as keyof typeof audioNameToResource]
-    || audioNameToResource.Beep
-    pumpAudio.value.play()
+  if (graduatedAudio && pumpAudio.value && val) {
+    audioUrl.value =
+      audioNameToResource[graduatedAudio as keyof typeof audioNameToResource] ||
+      audioNameToResource.Beep
+    pumpAudio.value.play().catch(() => {})
   }
-},300))
+}, 300)
+const stopWatchList1 = watch(
+  () => list1.value?.[0]?.target_token,
+  playNewAudio
+)
+const stopWatchList2 = watch(
+  () => list2.value?.[0]?.target_token,
+  playSoonAudio
+)
+const stopWatchList3 = watch(
+  () => list3.value?.[0]?.target_token,
+  playGraduatedAudio
+)
+
+let onCanPlayHandler: (() => void) | null = null
+
+function bindAudioCanPlay() {
+  if (!pumpAudio.value || onCanPlayHandler) return
+  onCanPlayHandler = () => {
+    pumpAudio.value?.play().catch(() => {})
+  }
+  pumpAudio.value.addEventListener('canplay', onCanPlayHandler)
+}
+
+function unbindAudioCanPlay() {
+  if (pumpAudio.value && onCanPlayHandler) {
+    pumpAudio.value.removeEventListener('canplay', onCanPlayHandler)
+    onCanPlayHandler = null
+  }
+}
+
 watch(() => [pump_notice.value?.[activeChain.value]?.new,
 pump_notice.value?.[activeChain.value]?.soon,
 pump_notice.value?.[activeChain.value]?.graduated
@@ -775,8 +859,10 @@ let watchPortraitStatsUnwatch: (() => void) | null = null
 
 watchPumpStateUnwatch = watch(() => wsv2Store.wsResult[WSEventV2Type.PUMPSTATE], (val) => {
   if (Array.isArray(val)) {
-    pumpStateBuffer.splice(0, 0, ...val)
-    pumpStateBuffer.splice(100)
+    pumpStateBuffer.push(...val)
+    if (pumpStateBuffer.length > 300) {
+      pumpStateBuffer.splice(0, pumpStateBuffer.length - 300)
+    }
     flushPumpState()
   }
 })
@@ -795,48 +881,32 @@ watchTokenUpdatedUnwatch = watch(
   () => wsv2Store.wsResult[WSEventV2Type.TOKEN_UPDATED],
   (val) => {
     if (!val?.token) return
-
     const prev = bufferLogoMap.get(val.token)
-
-    bufferLogoMap.set(
+    setLRU(
+      bufferLogoMap,
       val.token,
-      prev ? mergeLogo(prev, val) : val
+      prev ? mergeLogo(prev, val) : val,
+      100
     )
-    // 控制 buffer 最大数量（防爆）
-    if (bufferLogoMap.size > 100) {
-      const firstKey = bufferLogoMap.keys().next().value
-      if (firstKey) bufferLogoMap.delete(firstKey)
-    }
     logoThrottled()
   }
 )
-// const buffer: any[] = []
+function setLRU(map: Map<string, any>, key: string, value: any, limit = 100) {
+  if (map.has(key)) {
+    map.delete(key) // 刷新顺序
+  }
+  map.set(key, value)
+  if (map.size > limit) {
+    const oldestKey = map.keys().next().value
+    if (oldestKey) {
+      map.delete(oldestKey)
+    }
+  }
+}
 
 const flushStatistics = useThrottleFn(() => {
   if (!mapStatistics.value.size || !documentVisible.value) return
-  // const map = new Map<string, any>()
-
-  // 旧数据
-  // statisticsList.value.forEach(item => {
-  //   mapStatistics.value.set(item.token, item)
-  // })
-  // 所有 buffer 中的新数据
-  // buffer.forEach(item => {
-  //   const prev = mapStatistics.value.get(item.token)
-  //   mapStatistics.value.set(
-  //     item.token,
-  //     prev ? mergeStatistics(prev, item) : item
-  //   )
-  // })
-  // if (mapStatistics.value.size > 200) {
-  //   const firstKey = mapStatistics.value.keys().next().value
-  //   if (firstKey) {
-  //     mapStatistics.value.delete(firstKey)
-  //   }
-  // }
   triggerRef(mapStatistics)
-  // statisticsList.value = Array.from(mapStatistics.values()).slice(0, 300)
-  // buffer.length = 0
 }, 300)
 // watch(
 
@@ -846,25 +916,29 @@ watchPortraitStatsUnwatch = watch(
   () => wsv2Store.wsResult[WSEventV2Type.PORTRAIT_STATISTICS],
   (val) => {
     if (!Array.isArray(val) || !val.length ) return
-    // buffer.push(val)
-    // buffer.splice(0, 0, ...val)
-    // buffer.splice(100)
-    val.forEach((item: any) => {
-      const prev = mapStatistics.value.get(item.token)
-      mapStatistics.value.set(
-        item.token,
-        prev ? mergeStatistics(prev, item) : item
-      )
+    val.forEach((item) => {
+      setLRUStatistics(mapStatistics.value, item.token, item, 100)
     })
-    if (mapStatistics.value.size > 100) {
-      const firstKey = mapStatistics.value.keys().next().value
-      if (firstKey) {
-        mapStatistics.value.delete(firstKey)
-      }
-    }
     flushStatistics()
   }
 )
+
+function setLRUStatistics(
+  map: Map<string, StatisticsItem>,
+  key: string,
+  source: StatisticsItem,
+  limit = 100
+) {
+  const prev = map.get(key)
+  map.set(key, prev ? mergeStatistics(prev, source) : source)
+  if (map.size > limit) {
+    const old = map.keys().next().value
+    if (old !==undefined) {
+      map.delete(old)
+    }
+  }
+}
+
 
 function bufRender() {
   flushPumpState()
@@ -884,10 +958,10 @@ const getChangedValue = (A: string[], B: string[]): string | null => {
 let isLeave = true
 
 onActivated(() => {
+  bindAudioCanPlay()
   isLeave = false
   wsTableListCache = {}
   wsTableList.value = []
-  document.addEventListener('mousemove', mouseInsideTxs)
   getPumpConfig()
   getPumpList()
   wsv2Store.send({
@@ -914,13 +988,18 @@ onActivated(() => {
 
 onDeactivated(()=>{
   // 清理 watch 监听器，防止内存泄漏
-  watchPumpStateUnwatch?.()
-  watchTokenUpdatedUnwatch?.()
-  watchPortraitStatsUnwatch?.()
-  watchPumpStateUnwatch = null
-  watchTokenUpdatedUnwatch = null
-  watchPortraitStatsUnwatch = null
-  
+  // watchPumpStateUnwatch?.()
+  // watchTokenUpdatedUnwatch?.()
+  // watchPortraitStatsUnwatch?.()
+  // watchPumpStateUnwatch = null
+  // watchTokenUpdatedUnwatch = null
+  // watchPortraitStatsUnwatch = null
+
+  // stopWatchList1()
+  // stopWatchList2()
+  // stopWatchList3()
+  unbindAudioCanPlay()
+
   isLeave = true
   pumpStateBuffer.length = 0
   bufferLogoMap.clear()
@@ -928,7 +1007,7 @@ onDeactivated(()=>{
   logoList.value = []
   wsTableListCache = {}
   wsTableList.value = []
-  document.removeEventListener('mousemove', mouseInsideTxs)
+
   wsv2Store.send({
     jsonrpc: '2.0',
     method: 'unsubscribe',
@@ -988,40 +1067,6 @@ const unsubscribePortrait = () => {
   })
   // isPortraitSubscribed = false
 }
-
-const mouseInsideTxs = throttle(function (event) {
-    const element1 = document.querySelector('.pump-item_list-new')
-    const element2 = document.querySelector('.pump-item_list-soon')
-    const element3 = document.querySelector('.pump-item_list-graduated')
-    if (!element1 && !element2 && !element3) return
-    if (element1) {
-    isPausedObj.value.new = getMouseInsideElement(event, element1)
-    }
-    if (element2) {
-      isPausedObj.value.soon = getMouseInsideElement(event, element2)
-    }
-    if (element3) {
-      isPausedObj.value.graduated = getMouseInsideElement(
-        event,
-        element3
-      )
-    }
-}, 100, { leading: true, trailing: true })
-
-function getMouseInsideElement(event:any, element:any) {
-  // 获取鼠标位置
-  const mouseX = event.clientX
-  const mouseY = event.clientY
-  // 获取元素的边界矩形
-  const rect = element.getBoundingClientRect()
-  return (
-    mouseX >= rect.left &&
-    mouseX <= rect.right &&
-    mouseY >= rect.top &&
-    mouseY <= rect.bottom
-  )
-}
-
 
 function wsUpdateTableList(wsList: WSPumpObj[]) {
   const c = ['new', 'soon', 'graduated'] as const
@@ -1504,7 +1549,7 @@ const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['sellers_24h', 'sellers_24h'],
   ['buyers_24h', 'buyers_24h'],
   ['kol_count', 'kol_tag_count'],
-  ['smart_wallet_count', 'smart_wallet_tag_count'],
+  ['smart_wallet_count', 'smart_wallet_tag_count']
 ]
 function mergeStatisticsList(
   statisticsList: Map<string, StatisticsItem>,
@@ -1512,8 +1557,21 @@ function mergeStatisticsList(
 ) {
   return filterList.map(i => {
     const obj = statisticsList.get(i.token)
-    if (!obj) return i
 
+    if (!obj) {
+      if (i.chain == 'bsc' || i.chain == 'solana') {
+        if (i.amm === 'flapswap') {
+          i.market_cap = i.market_cap || 4900
+        } else {
+          i.market_cap =  i.market_cap || 0
+        }
+      } else if (i.chain == 'base') {
+          i.market_cap = i.market_cap || 22500
+      } else {
+          i.market_cap =  i.market_cap
+      }
+      return i
+    }
     const next = { ...i }
 
     /** progress（特殊处理） */
@@ -1551,6 +1609,8 @@ function mergeStatisticsList(
       } else {
         next.market_cap = Number(next.total) * next.current_price_usd || 1000000000 * next.current_price_usd || next.market_cap || 0
       }
+    } else if (next.chain == 'base') {
+       next.market_cap = Number(next.total) * next.current_price_usd || 100000000000 * next.current_price_usd || next.market_cap || 22500
     } else {
       next.market_cap = Number(next.total) * next.current_price_usd || next.market_cap
     }
@@ -1590,7 +1650,7 @@ const MERGE_KEYS = [
   'smart_wallet_ratio',
   'first_transfer_in_from',
   'first_transfer_in_from_label',
-  'age_seconds',
+  'age_seconds'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {
