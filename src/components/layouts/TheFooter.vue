@@ -1,7 +1,6 @@
 <template>
   <footer class="h-32px bg-[--main-list-hover] w-full px-12px py-16px footer fixed bottom-0 z-33">
     <div class="left relative">
-<<<<<<< HEAD
       <NuxtLink
         v-if="showPrice"
         class="flex items-center gap-5px mr-4px"
@@ -52,8 +51,6 @@
           </NuxtLink>
         </div>
       </el-popover>
-=======
->>>>>>> master
       <!-- <div class="flex items-center gap-4px mx-12px cursor-pointer hover:color-[--main-text]" :class="dragPumpStore.visible?'color-[--main-text]':'color-[--secondary-text]'" @click="dragPumpStore.visible=!dragPumpStore.visible">
         <Icon name="custom:pump-icon"/>
         {{ $t('pump1') }}
