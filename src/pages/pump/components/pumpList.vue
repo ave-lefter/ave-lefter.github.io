@@ -392,17 +392,53 @@
                       <span v-else class="color-[--main-text]">{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
                     </div>
                   </div>
-                  <div class="mt-5px">
+                  <div class="mt-5px flex-start">
                     <PumpPop
                         v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'"
                         :tokenId="(row.token + '-' + row.chain)"
                         :type="2"
                       >
                     <a v-for="(item, index) in row?.medias?.filter(i => i.icon === 'twitter')" :key="index"
-                      :href="item.url" target="_blank" class="!color-#009EF7" @click.stop>
+                      :href="item.url" target="_blank" class="!color-#009EF7 mr-5px" @click.stop>
                           {{ formatXUser(item?.url) }}
                         </a>
                     </PumpPop>
+                    <template
+                      v-if="row.buy_tax && row.sell_tax"
+                    >
+                      <span
+                        v-if="row.buy_tax == row.sell_tax"
+                        :style="{
+                              color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--third-text)'),
+                          }"
+                      >
+                        Tax {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                      </span>
+                      <span
+                        v-else
+                          :style="{
+                              color: (Number(row?.sell_tax) > 5 || Number(row?.buy_tax) > 5  ? '#F6465D' :'var(--third-text)'),
+                          }"
+                      >
+                      B {{ formatNumber(row?.buy_tax || 0, 2) }}%&nbsp;&nbsp;S {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                      </span>
+                    </template>
+                    <span
+                      v-else-if="row.buy_tax"
+                      :style="{
+                            color:(Number(row?.buy_tax) > 5 ? '#F6465D' : 'var(--third-text)'),
+                        }"
+                    >
+                      B {{ formatNumber(row?.buy_tax || 0, 2) }}%
+                    </span>
+                    <span
+                      v-else-if="row.sell_tax"
+                        :style="{
+                            color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--third-text)'),
+                        }"
+                    >
+                      S {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                    </span>
                   </div>
                   <div class="flex-start text-12px absolute bottom--2px z-1 mt-5px">
                     <div

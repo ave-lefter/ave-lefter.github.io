@@ -418,7 +418,7 @@ const isPausedObj = ref({
 // let wsTableListCache: PumpObj[] = []
 let wsTableListCache: Record<string, PumpObj[]> = {}
 const wsTableList = shallowRef<PumpObj[]>([])
-const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number }[]>([])
+const logoList = shallowRef<{ logo_url: string, name: string, token: string, symbol: string, rTime: number, appendix: string, twitter_type: number, buy_tax: number, sell_tax: number }[]>([])
 type StatisticsItem = {
   first_transfer_in_from_label: any
   volume_u_24h: number
@@ -454,8 +454,7 @@ type StatisticsItem = {
   address_binding_ratio: string
   phishing_ratio: string,
   sells_tx_24h_count:number
-  buys_tx_24h_count:number
-
+  buys_tx_24h_count: number
 }
 let portraitTimer: ReturnType<typeof setTimeout> | null = null
 let isPortraitSubscribed = false
@@ -538,6 +537,18 @@ const list1 = computed(() => {
             }
           : {}
         ),
+        ...(obj.buy_tax
+          ? {
+              buy_tax: obj.buy_tax
+            }
+          : {}
+        ),
+        ...(obj.sell_tax
+          ? {
+              sell_tax: obj.sell_tax
+            }
+          : {}
+        ),
         name: obj.name,
         symbol: obj.symbol,
         ...(obj.appendix
@@ -594,6 +605,18 @@ const list2 = computed(() => {
           ...(obj.logo_url
             ? {
                 logo_url: obj.logo_url
+              }
+            : {}
+          ),
+          ...(obj.buy_tax
+            ? {
+                buy_tax: obj.buy_tax
+              }
+            : {}
+          ),
+          ...(obj.sell_tax
+            ? {
+                sell_tax: obj.sell_tax
               }
             : {}
           ),
@@ -661,6 +684,18 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
         ...(obj.logo_url
           ? {
               logo_url: obj.logo_url
+            }
+          : {}
+        ),
+        ...(obj.buy_tax
+          ? {
+              buy_tax: obj.buy_tax
+            }
+          : {}
+        ),
+        ...(obj.sell_tax
+          ? {
+              sell_tax: obj.sell_tax
             }
           : {}
         ),
@@ -953,16 +988,16 @@ onActivated(() => {
 
 onDeactivated(()=>{
   // 清理 watch 监听器，防止内存泄漏
-  watchPumpStateUnwatch?.()
-  watchTokenUpdatedUnwatch?.()
-  watchPortraitStatsUnwatch?.()
-  watchPumpStateUnwatch = null
-  watchTokenUpdatedUnwatch = null
-  watchPortraitStatsUnwatch = null
+  // watchPumpStateUnwatch?.()
+  // watchTokenUpdatedUnwatch?.()
+  // watchPortraitStatsUnwatch?.()
+  // watchPumpStateUnwatch = null
+  // watchTokenUpdatedUnwatch = null
+  // watchPortraitStatsUnwatch = null
 
-  stopWatchList1()
-  stopWatchList2()
-  stopWatchList3()
+  // stopWatchList1()
+  // stopWatchList2()
+  // stopWatchList3()
   unbindAudioCanPlay()
 
   isLeave = true
@@ -1514,7 +1549,7 @@ const NUMBER_MAP: [keyof StatisticsItem, keyof PumpObj][] = [
   ['sellers_24h', 'sellers_24h'],
   ['buyers_24h', 'buyers_24h'],
   ['kol_count', 'kol_tag_count'],
-  ['smart_wallet_count', 'smart_wallet_tag_count'],
+  ['smart_wallet_count', 'smart_wallet_tag_count']
 ]
 function mergeStatisticsList(
   statisticsList: Map<string, StatisticsItem>,
@@ -1522,8 +1557,21 @@ function mergeStatisticsList(
 ) {
   return filterList.map(i => {
     const obj = statisticsList.get(i.token)
-    if (!obj) return i
 
+    if (!obj) {
+      if (i.chain == 'bsc' || i.chain == 'solana') {
+        if (i.amm === 'flapswap') {
+          i.market_cap = i.market_cap || 4900
+        } else {
+          i.market_cap =  i.market_cap || 0
+        }
+      } else if (i.chain == 'base') {
+          i.market_cap = i.market_cap || 22500
+      } else {
+          i.market_cap =  i.market_cap
+      }
+      return i
+    }
     const next = { ...i }
 
     /** progress（特殊处理） */
@@ -1562,7 +1610,7 @@ function mergeStatisticsList(
         next.market_cap = Number(next.total) * next.current_price_usd || 1000000000 * next.current_price_usd || next.market_cap || 0
       }
     } else if (next.chain == 'base') {
-       next.market_cap = Number(next.total) * next.current_price_usd || 10000000000 * next.current_price_usd || next.market_cap
+       next.market_cap = Number(next.total) * next.current_price_usd || 100000000000 * next.current_price_usd || next.market_cap || 22500
     } else {
       next.market_cap = Number(next.total) * next.current_price_usd || next.market_cap
     }
@@ -1602,7 +1650,7 @@ const MERGE_KEYS = [
   'smart_wallet_ratio',
   'first_transfer_in_from',
   'first_transfer_in_from_label',
-  'age_seconds',
+  'age_seconds'
 ] as const
 
 function mergeStatistics(prev: any, next: any) {

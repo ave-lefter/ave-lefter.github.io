@@ -16,6 +16,8 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
+  buy_tax: any
+  sell_tax: any
   dev_migrated_count?: number
   dev_migrated_ratio?: number
   dev_total_count?: number
