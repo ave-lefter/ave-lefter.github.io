@@ -74,6 +74,7 @@
       virtual-triggering
       popper-class="tooltip-pd-0"
       placement="right"
+      :persistent="false"
       :show-arrow="false"
     >
       <template #content>

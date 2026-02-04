@@ -19,6 +19,9 @@ function getWSMessage(e: MessageEvent): {
   return null
 }
 
+/** 模块级单例：路由/Store 重初始化时复用同一 WS */
+let globalPerpWsSingleton: WS | null = null
+
 export const usePerpWsPubStore = defineStore('perpWsPub', () => {
   // 使用 shallowRef 代替 ref，WebSocket 本身是非响应式的
   const wsInstance = shallowRef<WS | null>(null)
@@ -38,9 +41,18 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
   // 将 createWebSocket 重命名为 init
   const init = (options?: WSOptions) => {
     if (wsInstance.value) return  // 防止重复创建 WebSocket 实例
-    // ?timestamp=${Date.now()}
+    if (globalPerpWsSingleton) {
+      wsInstance.value = globalPerpWsSingleton
+      return
+    }
     const WS_URL = `${WSPerpHost}/api/v1/public/ws?timestamp=${Date.now()}`
-    wsInstance.value = new WS({url: WS_URL, pingMsg: `{"type":"ping","time":"${Date.now()}"}`, ...(options || {})})
+    const newWs = new WS({ url: WS_URL, pingMsg: `{"type":"ping","time":"${Date.now()}"}`, ...(options || {}) })
+    if (wsInstance.value || globalPerpWsSingleton) {
+      newWs.close()
+      return
+    }
+    globalPerpWsSingleton = newWs
+    wsInstance.value = newWs
 
     wsInstance.value.onopen(() => {
       isConnected.value = true
@@ -106,6 +118,7 @@ export const usePerpWsPubStore = defineStore('perpWsPub', () => {
     isConnected.value = false
     wsInstance.value?.close()
     wsInstance.value = null
+    globalPerpWsSingleton = null
   }
 
   function saveDepthData(val: {

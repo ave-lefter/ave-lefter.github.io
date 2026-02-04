@@ -17,7 +17,8 @@
                                 <img v-if="item.verified" :width="12" src="@/assets/images/kol.svg" alt="">
                                 <TimerCount
                                     v-if="item.created_at && Number(formatTimeFromNow(item.created_at, true)) < 60"
-                                    :key="`${item.created_at}`" :timestamp="+item.created_at" :end-time="60">
+                                    :key="`${item.created_at}`"
+                                    :timestamp="Math.min(+item.created_at, dayjs().unix() - 1)" :end-time="60">
                                     <template #default="{ seconds }">
                                         <span class="color-[--up-color] text-12px">
                                             <template v-if="seconds < 60"> {{ seconds }}s </template>
@@ -61,7 +62,7 @@
                 :class="index !== -1 ? 'ml-40px' : ''" class="relative">
                 <!-- <img :src="media.media_url_https" alt="" class="max-w-full rounded-8px cursor-pointer"> -->
                 <el-tooltip :ref="el => { if (el) tooltipRefs[`${mediaIndex}`] = el }" popper-class="tooltip-pd-0"
-                    :show-arrow="false" placement="right" :popper-options="{
+                    :show-arrow="false" placement="right" :persistent="false" :popper-options="{
                         modifiers: [
                             {
                                 name: 'eventListeners',
@@ -73,10 +74,10 @@
                         ]
 }" @show="handleTooltipShow(mediaIndex)">
                     <template #default>
-                        <img :src="media.media_url_https" alt="" class="w-full max-h-300px rounded-8px object-cover">
+                        <img :src="media.media_url_https||media.url" alt="" class="w-full max-h-300px rounded-8px object-cover">
                     </template>
                     <template #content>
-                        <img :src="media.media_url_https" alt="" class="max-w-50vw max-h-50vh object-cover rounded-8px"
+                        <img :src="media.media_url_https||media.url" alt="" class="max-w-50vw max-h-50vh object-cover rounded-8px"
                             @load="handleImageLoad(mediaIndex)">
                     </template>
                 </el-tooltip>
@@ -102,8 +103,11 @@
     </div>
 </template>
 <script setup name="twitterTrackerListItem">
+import { useStorage } from '@vueuse/core'
+import dayjs from 'dayjs'
 import { followKol, unfollowKol } from '~/api/twitter'
 import { processTwitterText } from '~/utils'
+const emits = defineEmits(['measureElement'])
 const trackerStore = useTwitterTrackerStore()
 const { t } = useI18n()
 const botStore = useBotStore()
@@ -124,6 +128,7 @@ const contentEl = ref(null)
 const measureEl = ref(null)
 const contentExpanded = ref(false)
 const isContentOverflow = ref(false)
+const followIds = useStorage('twFollowIds', [])
 
 // 处理后的内容，包含可点击的链接
 const processedContent = computed(() => {
@@ -147,6 +152,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     window.removeEventListener('resize', checkContentOverflow)
+    tooltipRefs.value = {}
 })
 
 watch(() => props.item?.content, () => {
@@ -163,9 +169,14 @@ const _followKol = async (author_id, index) => {
             botStore.changeConnectVisible(true)
             return
         }
+        if (followIds.value.length >= 50) {
+            ElMessage.error(t('twitterMax'))
+            return
+        }
         await followKol(author_id)
         ElMessage.success(t('followed'))
         trackerStore.list[index].author.follow_status = 1
+        followIds.value = followIds.value.concat({ author_id })
     } catch (error) {
         ElMessage.error(t('failed'))
         console.error('Error following KOL:', error)
@@ -177,6 +188,7 @@ const _unfollowKol = async (author_id, index) => {
         await unfollowKol(author_id)
         ElMessage.success(t('cancelFollowed'))
         trackerStore.list[index].author.follow_status = 0
+        followIds.value = followIds.value.filter(el => el.author_id !== author_id)
     } catch (error) {
         ElMessage.error(t('failed'))
         console.error('Error unfollowing KOL:', error)
@@ -195,6 +207,7 @@ const handleTooltipShow = (mediaIndex) => {
 }
 
 const handleImageLoad = (mediaIndex) => {
+    emits('measureElement')
     // 图片加载完成后更新 tooltip 位置
     nextTick(() => {
         updateTooltipPosition(mediaIndex)

@@ -607,5 +607,7 @@
   "24hVolume": "Volume 24h",
   "tokenStats": "Estatísticas de Token",
   "created": "Criado",
-  "topPlatforms": "Principais Plataformas"
+  "topPlatforms": "Principais Plataformas",
+  "hideLiq": "Clique para ocultar informações do pool",
+  "showLiq": "Clique para exibir informações do pool"
 }

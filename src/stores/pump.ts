@@ -175,7 +175,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     sm_list: [],
   }
   const pumpV3: RemovableRef<Record<ChainKey, pumpData>> = useStorage(
-    'pumpV11',
+    'pumpV14',
     {
       solana: {
         platforms: [],
@@ -213,24 +213,60 @@ export const usePumpStore = defineStore('pumpStore', () => {
           // pumpFilter: pumpFilterDefault,
         },
       },
-      // xlayer: {
-      //   platforms: [],
-      //   new: {
-      //     count: 0,
-      //     loading: false,
-      //     pumpFilter: pumpFilterDefault,
-      //   },
-      //   soon: {
-      //     count: 0,
-      //     loading: false,
-      //     pumpFilter: pumpFilterDefault,
-      //   },
-      //   graduated: {
-      //     count: 0,
-      //     loading: false,
-      //     pumpFilter: pumpFilterDefault,
-      //   },
-      // },
+      xlayer: {
+        platforms: [],
+        new: {
+          count: 0,
+          loading: false,
+          pumpFilter: pumpFilterDefault,
+        },
+        soon: {
+          count: 0,
+          loading: false,
+          pumpFilter: pumpFilterDefault,
+        },
+        graduated: {
+          count: 0,
+          loading: false,
+          pumpFilter: pumpFilterDefault,
+        },
+      },
+      monad: {
+        platforms: [],
+        new: {
+          count: 0,
+          loading: false,
+          pumpFilter: pumpFilterDefault,
+        },
+        soon: {
+          count: 0,
+          loading: false,
+          pumpFilter: pumpFilterDefault,
+        },
+        graduated: {
+          count: 0,
+          loading: false,
+          pumpFilter: pumpFilterDefault,
+        },
+      },
+      base: {
+        platforms: [],
+        new: {
+          count: 0,
+          loading: false,
+          pumpFilter: pumpFilterDefault,
+        },
+        soon: {
+          count: 0,
+          loading: false,
+          pumpFilter: pumpFilterDefault,
+        },
+        graduated: {
+          count: 0,
+          loading: false,
+          pumpFilter: pumpFilterDefault,
+        },
+      },
     },
     localStorage
   )
@@ -239,7 +275,7 @@ export const usePumpStore = defineStore('pumpStore', () => {
     'bsc',
     sessionStorage
   )
-  const pump_query = useStorage('pump_query2', {
+  const pump_query = useStorage('pump_query3', {
     solana: {
       new: '',
       soon: '',
@@ -260,9 +296,14 @@ export const usePumpStore = defineStore('pumpStore', () => {
       soon: '',
       graduated: '',
     },
+    base: {
+      new: '',
+      soon: '',
+      graduated: '',
+    },
   })
   const pump_notice = useStorage(
-    'pump_notice4',
+    'pump_notice5',
     {
       solana: {
         new: '',
@@ -280,6 +321,11 @@ export const usePumpStore = defineStore('pumpStore', () => {
         graduated: '',
       },
       xlayer: {
+        new: '',
+        soon: '',
+        graduated: '',
+      },
+      base: {
         new: '',
         soon: '',
         graduated: '',

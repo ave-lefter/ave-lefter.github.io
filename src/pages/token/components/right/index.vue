@@ -1,7 +1,6 @@
 <template>
   <div v-show="globalStore.showRight">
-    <el-scrollbar height="calc(100vh - 92px)">
-      <div class="flex flex-col h-[calc(100vh-94px)] overflow-visible">
+      <div class="flex flex-col h-[calc(100vh-94px)] v-scroller-container">
         <div class="p-15px bg-[--secondary-bg]">
           <PriceTabs v-model="tabActive" :tabs="tabs" />
           <template v-for="item in tabs" :key="item.id">
@@ -42,8 +41,8 @@
         <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg] mt-1px" />
         <div class="bg-[--secondary-bg] flex-1" />
       </div>
-    </el-scrollbar>
-    <el-dialog v-model="dialogVisible" :title="searchAmm" width="480">
+
+    <el-dialog v-if="dialogVisible" v-model="dialogVisible" :title="searchAmm" width="480" destroy-on-close>
       <Pairs :search="searchAmm" :isInModal="true" />
       <template #footer>
         <el-button

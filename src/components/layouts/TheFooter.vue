@@ -1,6 +1,7 @@
 <template>
   <footer class="h-32px bg-[--main-list-hover] w-full px-12px py-16px footer fixed bottom-0 z-33">
     <div class="left relative">
+<<<<<<< HEAD
       <NuxtLink
         v-if="showPrice"
         class="flex items-center gap-5px mr-4px"
@@ -51,6 +52,8 @@
           </NuxtLink>
         </div>
       </el-popover>
+=======
+>>>>>>> master
       <!-- <div class="flex items-center gap-4px mx-12px cursor-pointer hover:color-[--main-text]" :class="dragPumpStore.visible?'color-[--main-text]':'color-[--secondary-text]'" @click="dragPumpStore.visible=!dragPumpStore.visible">
         <Icon name="custom:pump-icon"/>
         {{ $t('pump1') }}
@@ -92,7 +95,6 @@
           {{ t('twitterTracker') }}
         </div>
       </el-badge>
-
       <el-popover popper-style="padding: 0;border-radius: 8px;" width="auto" placement="top" :teleported="false" trigger="hover">
         <template #reference>
           <div
@@ -105,6 +107,25 @@
         </template>
         <Dashborad />
       </el-popover>
+      <div class="flex items-center gap-8px ml-12px whitespace-nowrap">
+        <NuxtLink
+          v-for="item in mainCoins"
+          :key="item.symbol || item.logo_url"
+          class="flex items-center gap-6px"
+          :to="`/token/${item.id}`"
+        >
+          <TokenImg
+            :row="{
+              logo_url: item.logo_url,
+              chain: '',
+            }"
+            token-class="w-16px h-16px [&&]:mr-0"
+          />
+          <span :class="item.isUp ? 'color-[--up-color]' : 'color-[--down-color]'">{{
+            '$' + formatDec(item?.current_price_usd || 0, 2)
+          }}</span>
+        </NuxtLink>
+      </div>
     </div>
     <ul class="right">
       <li class="color-[--secondary-text] hover:color-[--main-text]">
@@ -133,6 +154,7 @@
         <a target="_blank" href="https://cloud.ave.ai">API</a>
       </li>
       <el-popover
+:persistent="false"
         popper-style="padding: 12px;min-width: 50px;width:auto"
         placement="top"
         :teleported="false"
@@ -200,7 +222,7 @@
 </template>
 
 <script setup lang="tsx">
-import { cloneDeep, throttle } from 'lodash-es'
+import { throttle } from 'lodash-es'
 import { formatDec } from '~/utils/formatNumber'
 import { getTokensPrice } from '@/api/token'
 import type { GetSignalV2ListResponse } from '~/api/signal'
@@ -221,8 +243,6 @@ const dragPumpStore = usePumpStore()
 const configStore = useConfigStore()
 const audioElement = ref<HTMLAudioElement | null>(null)
 const { lang } = storeToRefs(globalStore)
-const { token } = storeToRefs(useTokenStore())
-const route = useRoute()
 const isEn = computed(() => {
   return lang.value === 'en'
 })
@@ -258,16 +278,6 @@ const getIconByPlatform = (platform: string) => {
 }
 // console.log('platformOptions', platformOptions.value)
 
-const addressAndChain = computed(() => {
-  const id = route.params.id as string
-  if (id) {
-    return getAddressAndChainFromId(id)
-  }
-  return {
-    address: token.value?.token || '',
-    chain: token.value?.chain || '',
-  }
-})
 const ids = [
   '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c-bsc',
   '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2-eth',
@@ -324,34 +334,7 @@ const initPage = () => {
   })
 }
 
-const showPrice = computed(() => {
-  if (addressAndChain.value.chain === 'bsc') {
-    return data.value[2]
-  } else if (addressAndChain.value.chain === 'solana') {
-    return data.value[3]
-  } else if (addressAndChain.value.chain === 'eth' || addressAndChain.value.chain === 'base') {
-    return data.value[1]
-  } else {
-    return data.value[3]
-  }
-})
-
-const showPrice2 = computed(() => {
-  const val = cloneDeep(data.value)
-  if (addressAndChain.value.chain === 'bsc') {
-    val.splice(2, 1)
-    return val
-  } else if (addressAndChain.value.chain === 'solana') {
-    val.splice(3, 1)
-    return val
-  } else if (addressAndChain.value.chain === 'eth' || addressAndChain.value.chain === 'base') {
-    val.splice(1, 1)
-    return val
-  } else {
-    val.splice(3, 1)
-    return val
-  }
-})
+const mainCoins = computed(() => data.value.filter(Boolean))
 
 watch(
   () => globalStore.footerTokensPrice,
@@ -596,7 +579,7 @@ function monitorToast(val: IMonitorWsResponse[]) {
       icon: <div></div>,
       showClose: true,
       placement: globalStore.audioSettings.notice.position as any,
-      customClass: `w-320px p-[15px_8px] border-transparent rounded-[8px] monitorToast ${globalStore.audioSettings.notice.monitorBorder && globalStore.audioSettings.notice.monitorShow === 1 && `${getIsBuy(item) ? 'border-[--up-color]!' : 'border-[--down-color]!'}`} ${globalStore.audioSettings.notice.monitorShow === 0 && 'border-[--dialog-tab-active-bg]!'} ${globalStore.audioSettings.notice.monitorShow === 1 && globalStore.audioSettings.notice.quickBuy && 'monitorToast2'}`,
+      customClass: `toast-card border-transparent monitorToast ${globalStore.audioSettings.notice.monitorBorder && globalStore.audioSettings.notice.monitorShow === 1 && `${getIsBuy(item) ? 'border-[--up-color]!' : 'border-[--down-color]!'}`} ${globalStore.audioSettings.notice.monitorShow === 0 && 'border-[--dialog-tab-active-bg]!'} ${globalStore.audioSettings.notice.monitorShow === 1 && globalStore.audioSettings.notice.quickBuy && 'monitorToast2'}`,
       message: () => (
         <div
           class="inline-flex items-center gap-4px text-12px cursor-pointer w-full"
@@ -771,6 +754,21 @@ const audioUrl = computed(() => {
 }
 </style>
 <style lang="scss">
+/* 与 KOL/监控 提示共用的卡片外壳，TransactionPromptSlot 与 monitorToast 复用 */
+.toast-card {
+  width: 320px;
+  padding: 15px 8px;
+  border-radius: 8px;
+}
+.toast-card--executing {
+  border-left: 3px solid var(--secondary-text, #80838b);
+}
+.toast-card--buy {
+  border-left: 3px solid var(--up-color, #12b886);
+}
+.toast-card--sell {
+  border-left: 3px solid var(--down-color, #f6465d);
+}
 .monitorToast2 {
   .el-icon.el-message__closeBtn {
     position: relative;

@@ -35,13 +35,14 @@ export function useAliyunCaptcha(config: {
   async function getInitAliyunCaptcha(): Promise<typeof window.initAliyunCaptcha> {
     if (window.initAliyunCaptcha) {
       return window.initAliyunCaptcha
-    } else {
-      return new Promise((resolve) => {
-        window.addEventListener('aliyunCaptcha:ready', () => {
-          resolve(window.initAliyunCaptcha)
-        })
-      })
     }
+    return new Promise((resolve) => {
+      const handler = () => {
+        window.removeEventListener('aliyunCaptcha:ready', handler)
+        resolve(window.initAliyunCaptcha)
+      }
+      window.addEventListener('aliyunCaptcha:ready', handler)
+    })
   }
 
   async function initCaptcha() {

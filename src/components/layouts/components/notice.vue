@@ -1,6 +1,7 @@
 <template>
   <el-popover
-    v-model:visible="visible"
+v-model:visible="visible"
+:persistent="false"
     placement="bottom-end"
     :width="450"
     trigger="click"
@@ -47,7 +48,7 @@
         >
          {{ $t('alerts') }}
         </a>
-        <div class="flex-1"></div>
+        <div class="flex-1" />
           <a
           v-if="activeTab == 'remind'"
           href="javascript:;"
@@ -131,8 +132,8 @@
             <div class="color-[--third-text] text-12px">{{ formatDate((item?.updateTime) || item?.createTime) }}</div>
           </li>
         </ul>
-        <div class="min-h-400px" v-if="activeTab == 'remind'">
-          <div class="item" v-for="(item, $index) in remindHistoryList" :keys="$index">
+        <div v-if="activeTab == 'remind'" class="min-h-400px">
+          <div v-for="(item, $index) in remindHistoryList" class="item" :keys="$index">
             <div class="flex-between items-center parent cursor-pointer">
               <NuxtLink
                 :to="`/token/${item.token_address}-${item.chain}`"
@@ -156,9 +157,9 @@
               <span class="color-[--down-color] ml-4px text-14px"
                 >({{ item.is_repeatable == 1 ? $t('duplicate'): $t('once')}})</span
               >
-              <div class="flex-1"></div>
+              <div class="flex-1" />
               <!-- <span class="color-[--third-text] text-12px">{{ formatTimeFromNow(item.create_time) }}</span> -->
-              <span class="color-[--third-text] text-12px"v-if="!(item?.create_time)"> - </span>
+              <span v-if="!(item?.create_time)" class="color-[--third-text] text-12px"> - </span>
               <TimerCount
                 v-else-if="
                   Number(formatTimeFromNow(item?.create_time, true)) < 60
@@ -177,8 +178,8 @@
                 </template>
               </TimerCount>
               <span
-                class="color-[--third-text] text-12px"
-                v-else
+v-else
+class="color-[--third-text] text-12px"
               >
                 {{
                   formatTimeFromNow(
@@ -258,7 +259,7 @@ watch(remindCount, (val) => {
   if (val && activeTab.value == 'remind') {
     setTimeout(() => {
       getNotifyHistoryList()
-    }, 500);
+    }, 500)
   }
 })
 watch(

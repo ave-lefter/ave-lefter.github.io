@@ -63,7 +63,7 @@
         <el-checkbox v-model="linesChecked.buy.checked" class="[&&]:[--el-checkbox-height:16px]">{{
           $t('buyMa')
         }}</el-checkbox>
-        <el-tooltip v-model:visible="colorPickerVisible.buy" trigger="click" :teleported="false">
+        <el-tooltip v-model:visible="colorPickerVisible.buy" trigger="click" :teleported="false" :persistent="false">
           <div
             class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
             :style="{ background: linesChecked.buy.color }"
@@ -77,7 +77,7 @@
         <el-checkbox v-model="linesChecked.sell.checked" class="[&&]:[--el-checkbox-height:16px]">{{
           $t('sellMa')
         }}</el-checkbox>
-        <el-tooltip v-model:visible="colorPickerVisible.sell" trigger="click" :teleported="false">
+        <el-tooltip v-model:visible="colorPickerVisible.sell" trigger="click" :teleported="false" :persistent="false">
           <div
             class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
             :style="{ background: linesChecked.sell.color }"
@@ -91,7 +91,7 @@
         <el-checkbox v-model="linesChecked.kol.checked" class="[&&]:[--el-checkbox-height:16px]">{{
           $t('kolPosition')
         }}</el-checkbox>
-        <el-tooltip v-model:visible="colorPickerVisible.kol" trigger="click" :teleported="false">
+        <el-tooltip v-model:visible="colorPickerVisible.kol" trigger="click" :teleported="false" :persistent="false">
           <div
             class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
             :style="{ background: linesChecked.kol.color }"
@@ -122,6 +122,7 @@
           v-model:visible="colorPickerVisible.top100Buy"
           trigger="click"
           :teleported="false"
+          :persistent="false"
         >
           <div
             class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
@@ -142,6 +143,7 @@
           v-model:visible="colorPickerVisible.top100Sell"
           trigger="click"
           :teleported="false"
+          :persistent="false"
         >
           <div
             class="w-14px h-14px rounded-2px border-solid border-[--border] cursor-pointer"
@@ -267,7 +269,7 @@ const linesChecked = useLocalStorage('tv_markLines', {
   },
   kol: {
     checked: false,
-    color: '#FFA622',
+    color: '#424ADF',
   },
 })
 const colorPickerVisible = ref({} as Record<string, boolean>)
@@ -276,6 +278,8 @@ const token = computed(() => {
     ? tokenStore.klineRow?.id
     : (route.params.id as string)
 })
+
+const klineLineSave = useKlineLineSave(() => token.value)
 
 const klinePair = ref('')
 
@@ -327,6 +331,14 @@ watch(
     if (!val) return
     if (_widget?.activeChart?.()) {
       _widget?.activeChart?.()?.removeAllShapes?.()
+      // const chart = _widget?.activeChart?.()
+      // // 移除旧指标（保留 Volume）
+      // const allStudies = chart.getAllStudies()
+      // allStudies.forEach(study => {
+      //   if (!study.name.includes('Volume')) {
+      //     chart.removeEntity(study.id)
+      //   }
+      // })
     }
   }
 )
@@ -367,8 +379,11 @@ function switchTokenKline() {
         symbol.value + '---' + token.value + val + (tokenStore.selectedToken ? '1' : '0'),
         resolution.value as ResolutionString,
         () => {
-          isReadyLine = true
           // createHeaderButton()
+          klineLineSave.loadKlineLine(_widget)
+          setTimeout(() => {
+            isReadyLine = true
+          }, 100)
         }
       )
     } else {
@@ -524,7 +539,12 @@ function createToggleButton() {
     updateButtonContent()
     // resetChart()
     _widget?.resetCache?.()
-    _widget?.activeChart?.().resetData?.()
+
+    _widget?.activeChart?.()?.resetData?.()
+    setTimeout(() => {
+      _widget?.activeChart?.()?.executeActionById?.('chartReset')
+    }, 300)
+
   }
   updateButtonContent()
   headerBtns.push(btn)
@@ -636,8 +656,10 @@ async function initChart() {
     ],
     enabled_features: [
       'request_only_visible_range_on_reset',
-      ...(isSupportSecChains ? ['seconds_resolution' as ChartingLibraryFeatureset] : []),
+      'seconds_resolution' as ChartingLibraryFeatureset,
+      'saveload_separate_drawings_storage'
     ],
+    auto_save_delay: 1,
     charts_storage_url: location.host,
     charts_storage_api_version: '1.1',
     timezone: getTimezone() as Timezone,
@@ -736,35 +758,10 @@ async function initChart() {
         // const chain = props.chain
         const isSupportSecChains = chain.value && supportSecChains.includes(chain.value)
         const configurationData = {
-          supported_resolutions: (chain.value === 'mixmax' || chain.value === 'xlayer' || chain.value === 'base') ? ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] :
-            [
-            '1S',
-            '1',
-            '5',
-            '15',
-            '30',
-            '60',
-            '120',
-            '240',
-            '1D',
-            '1W',
-          ] as ResolutionString[],
+          supported_resolutions: isSupportSecChains ?  ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[]:['1S','5S','1', '5', '15', '30', '60', '120', '240', '1D', '1W']as ResolutionString[],
           supports_marks: true,
           supports_timescale_marks: true,
           supports_time: true,
-        }
-        if (!isSupportSecChains) {
-          configurationData.supported_resolutions = [
-            '1',
-            '5',
-            '15',
-            '30',
-            '60',
-            '120',
-            '240',
-            '1D',
-            '1W',
-          ] as ResolutionString[]
         }
         setIframeCssVar()
 
@@ -792,44 +789,16 @@ async function initChart() {
             session: '24x7',
             has_intraday: true, // 显示商品是否具有日内（分钟）历史数据
             intraday_multipliers: ['1', '5', '15', '30', '60', '120', '240'] as ResolutionString[],
-            has_seconds: isSupportSecChains,
+            has_seconds: true,
             seconds_multipliers: ['1', '5', '15', '30'],
             has_daily: true,
             // has_no_volume: false, // 布尔表示商品是否拥有成交量数据
             has_weekly_and_monthly: true,
-            supported_resolutions: [
-              '1S',
-              '5S',
-              '15S',
-              '30S',
-              '1',
-              '5',
-              '15',
-              '30',
-              '60',
-              '120',
-              '240',
-              '1D',
-              '1W',
-            ] as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
+            supported_resolutions: isSupportSecChains ?  ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[]:['1S','5S','1', '5', '15', '30', '60', '120', '240', '1D', '1W']as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
             data_status: 'streaming' as 'streaming' | 'endofday' | 'delayed_streaming',
             visible_plots_set: 'ohlcv' as VisiblePlotsSet,
             type: 'crypto',
             listed_exchange: getSwapInfo?.(chain.value || '', amm.value)?.show_name || '',
-          }
-          if (!isSupportSecChains) {
-            symbolInfo.supported_resolutions = [
-              '1',
-              '5',
-              '15',
-              '30',
-              '60',
-              '120',
-              '240',
-              '1D',
-              '1W',
-            ] as ResolutionString[]
-            symbolInfo.seconds_multipliers = []
           }
           console.log('[resolveSymbol]: Symbol resolved', symbolName)
           setTimeout(() => onResolve(symbolInfo), 0)
@@ -1050,12 +1019,15 @@ async function initChart() {
     setWatermark(_widget)
     subscribePriceMove()
     // 从缓存中读取数据并创建指标
-    createStudy()
+    // createStudy()
     _widget?.applyOverrides?.({
       'scalesProperties.textColor': themeStore.isDark ? '#d5d5d5' : '#333',
       'paneProperties.backgroundType': 'solid',
       'paneProperties.background': getCssVariable('--secondary-bg'),
     })
+
+    klineLineSave.loadKlineLine(_widget)
+    klineLineSave.saveKlineState(_widget)
   })
 
   _widget?.headerReady().then(() => {
@@ -1252,7 +1224,9 @@ function drag(e: MouseEvent) {
     isMask = false
     document.onmousemove = null
     document.onmouseup = null
-    tokenStore.centerTopHeight = kHeight.value
+    if (tokenStore?.centerTopHeight) {
+      tokenStore.centerTopHeight = kHeight.value
+    }
   }
   // e.stopPropagation()
   // e.preventDefault()
@@ -1291,7 +1265,14 @@ const { resetKOLLine } = useKOLAvgPriceLine(
   () => _widget,
   () => isReadyLine,
   showMarket,
-  linesChecked
+  linesChecked,
+  (endTime,scaleRatio = 20) => {
+    const params = resolutionMap[resolution.value as keyof typeof resolutionMap] || {
+      val: resolution.value,
+      unit: 'm',
+    }
+    return dayjs(endTime * 1000).subtract(params.val * scaleRatio, params.unit).unix()
+  }
 )
 
 function setIframeCssVar() {
@@ -1372,7 +1353,7 @@ const resetTop100Color = () => {
 const resetIndicatorLineColor = () => {
   linesChecked.value.buy.color = '#19d92f'
   linesChecked.value.sell.color = '#f6465d'
-  linesChecked.value.kol.color = '#ffa622'
+  linesChecked.value.kol.color = '#424ADF'
 }
 
 defineExpose({

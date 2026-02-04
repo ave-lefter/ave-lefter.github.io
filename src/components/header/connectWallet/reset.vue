@@ -142,9 +142,10 @@ watch(()=>botStore.connectVisible, () => {
 onMounted(() => {
     console.log('reset')
 })
-onUnmounted(() => {
+onBeforeUnmount(() => {
   if (timer.value) {
     clearInterval(timer.value)
+    timer.value = null
   }
 })
 

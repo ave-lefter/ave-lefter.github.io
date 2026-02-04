@@ -49,7 +49,8 @@
           <span class="text-12px color-[--secondary-text]">{{ isValue ? $t('value1') :  $t('amount') }}</span>
         </template> -->
         <template #suffix>
-          <el-dropdown placement="bottom" trigger="click" @visible-change="visible => show = visible">
+          <el-dropdown :persistent="false" placement="bottom" trigger="click"
+            @visible-change="visible => show = visible">
             <div class="inline-flex items-center clickable">
               <span>{{  perpStore.unit?.coinName || ''  }}</span>
               <Icon class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />

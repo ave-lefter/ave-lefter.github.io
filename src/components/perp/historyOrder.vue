@@ -246,7 +246,7 @@ watch(
       <span v-if="listStatus.loading && offsetData">{{ t('loading') }}</span>
     </div>
   </div>
-  <el-dialog v-model="detailVisible" :title="detailData.title" width="700" append-to-body>
+  <el-dialog v-model="detailVisible" :title="detailData.title" width="700" append-to-body destroy-on-close>
     <el-table
       fit
       header-row-class-name="text-12px sticky top-0 z-10 font-500"

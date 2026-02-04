@@ -269,9 +269,9 @@ function listMapFunction(i: Record<string, any>) {
 const height = computed(() => {
   // 有子 Tabs
   if (isPump.value) {
-    return 'calc(100vh - 265px)'
+    return 'calc(100vh - 233px)'
   }
-  return 'calc(100vh - 221px)'
+  return 'calc(100vh - 189px)'
 })
 
 // const needAmmList = computed(()=>{
@@ -290,7 +290,7 @@ const height = computed(() => {
         :ammList="currentChainObj?.swaps || []"
         :chains="chains"
       />
-      <KeepAlive :max="6">
+      <KeepAlive :max="2">
         <component
           :is="isPump ? pumpComponent : _activityComponent"
           ref="dynamicComponentRef"

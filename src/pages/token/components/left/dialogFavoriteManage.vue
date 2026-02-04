@@ -231,6 +231,7 @@ async function confirmEditRemark(remark: string, tokenId: string, item: GetFavLi
             v-model="row.activeGroup"
             class="[&&]:[--el-fill-color-blank:--border]"
             :placeholder="$t('pleaseSelectGroup')"
+            :persistent="false"
             @change="confirmSwitchGroup(row, $event)"
           >
             <el-option

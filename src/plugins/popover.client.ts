@@ -11,6 +11,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const popoverProps = shallowRef<Record<string, any>>({})
 
   let container: HTMLDivElement | null = null
+  let vnode: ReturnType<typeof h> | null = null
 
   function mountPopover(app: App) {
     if (mounted) return
@@ -48,7 +49,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     container = document.createElement('div')
     document.body.appendChild(container)
 
-    const vnode = h(PopoverWrapper)
+    vnode = h(PopoverWrapper)
     vnode.appContext = app._context
     render(vnode, container)
 
@@ -89,7 +90,21 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     hide() {
       visible.value = false
-    }
+      nextTick(() => {
+        this.destroy()
+      })
+    },
+    destroy() {
+      if (vnode && container) {
+        render(null, container)
+      }
+      if (container && container.parentNode) {
+        container.parentNode.removeChild(container)
+      }
+      mounted = false
+      container = null
+      vnode = null
+    },
   }
 
   return {

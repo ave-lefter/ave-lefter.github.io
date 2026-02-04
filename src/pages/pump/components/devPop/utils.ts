@@ -5,6 +5,7 @@ type DevInfo = Awaited<ReturnType<typeof _getDevInfo>>
 
 export function useDevPop() {
   const { $createTooltip } = useNuxtApp()
+  const router = useRouter()
 
   const $tooltip = $createTooltip('x--tooltip')
 
@@ -17,6 +18,12 @@ export function useDevPop() {
     tokenId: '',
     loading: false
   })
+  watch(
+    () => router.currentRoute.value.fullPath,
+    () => {
+      $tooltip.hide()
+    }
+  )
 
   function onEnter(tokenId: string, e: { target: any }, isGetData = true) {
     if (isGetData) {
@@ -50,7 +57,14 @@ export function useDevPop() {
     contentProps.loading = true
     _getDevInfo(tokenId).then(res => {
       // contentProps.info = {...res, video_uri: `https://pump.fun/coin/${res.token}?include-nsfw=true`}
-      contentProps.info = res
+      contentProps.info = {
+        ...res,
+        first_deposit_at:
+          res?.first_deposit_at !== '1970-01-01T00:00:00Z' &&
+          res?.first_deposit_at !== '0001-01-01T00:00:00Z'
+            ? res?.first_deposit_at
+            : '0',
+      }
       contentProps.tokenId = tokenId
     }).catch(() => {
       contentProps.info = null

@@ -1,9 +1,11 @@
 <template>
   <el-drawer
+    v-if="visible"
     v-model="visible"
     append-to-body
     :with-header="false"
     :size="480"
+    destroy-on-close
     class="draw-right"
   >
     <div class="check-container bg-[--dialog-bg] color-[--main-text]">
@@ -1153,6 +1155,7 @@
                           effect="customized"
                           :content="$t('latestTrader')"
                           placement="top"
+                          :persistent="false"
                         >
                           <!-- <el-icon style="color: #ff9f00"><Avatar /></el-icon> -->
                           <Icon

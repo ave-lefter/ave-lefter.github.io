@@ -251,7 +251,7 @@
   "slippage": "슬리피지 허용",
   "autoSlippage": "자동 슬리피지",
   "enterSlippage": "슬리피지 허용 입력",
-  "slippageMaxTip": "최대 슬리피지 49.99% 초과",
+  "slippageMaxTip": "최대 슬리피지 99.99% 초과",
   "slippageTip1": "슬리피지 허용이 낮은 거래는 시장 변동으로 인해 실패할 수 있습니다.",
   "autoSellHalf": "반반 판매",
   "protection": "방탄",
@@ -261,7 +261,7 @@
   "setOneClickBuyAmount": "한 번 클릭으로 구매 수량 설정",
   "customFee1": "사용자 정의 우선 순위 수수료",
   "customEvmFee1": "추가 사용자 정의 가스",
-  "slippageTips": "슬리피지 최대 49.99%입니다. 거래 가격이 이 비율을 초과하면 거래가 취소됩니다. 슬리피지는 실제 거래 수수료가 아니며, 실제 거래 수수료는 계약 슬리피지를 따릅니다.",
+  "slippageTips": "슬리피지 최대 99.99%입니다. 거래 가격이 이 비율을 초과하면 거래가 취소됩니다. 슬리피지는 실제 거래 수수료가 아니며, 실제 거래 수수료는 계약 슬리피지를 따릅니다.",
   "iKnown": "알겠습니다",
   "setOneClickSellAmount": "한 번 클릭으로 판매 수량 설정",
   "balanceNotEnough": "{s} 잔액 부족, 최소 {n} {s} 예비 잔액 필요",
@@ -1457,5 +1457,7 @@
   "24hVolume": "24시간 거래량",
   "tokenStats": "토큰 통계",
   "created": "생성됨",
-  "topPlatforms": "톱 플랫폼"
+  "topPlatforms": "톱 플랫폼",
+  "hideLiq": "풀 정보를 숨기려면 클릭하세요.",
+  "showLiq": "풀 정보를 표시하려면 클릭하세요."
 }

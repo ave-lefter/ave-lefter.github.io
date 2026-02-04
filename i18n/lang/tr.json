@@ -603,5 +603,7 @@
   "24hVolume": "24 Saat Hacim",
   "tokenStats": "Token İstatistikleri",
   "created": "Oluşturuldu",
-  "topPlatforms": "En İyi Platformlar"
+  "topPlatforms": "En İyi Platformlar",
+  "hideLiq": "Havuz bilgilerini gizlemek için tıklayın",
+  "showLiq": "Havuz bilgilerini görüntülemek için tıklayın"
 }

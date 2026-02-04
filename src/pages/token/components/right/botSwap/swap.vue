@@ -7,7 +7,8 @@
         </template>
         <template #append>
           <!-- <img :src="tokenStore.swap.native?.logo_url || `${configStore.token_logo_url}token_icon/${chain}/${getChainInfo(chain || '').wmain_wrapper || ''}.png`" class="rd-50%" height="20"  alt="" srcset="" > -->
-          <el-dropdown placement="bottom" trigger="click" @visible-change="visible => show = visible">
+          <el-dropdown :persistent="false" placement="bottom" trigger="click"
+            @visible-change="visible => show = visible">
             <div class="inline-flex items-center clickable">
               <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50%" height="20"  alt="" srcset="" >
               <Icon v-if="swapBaseTokens?.length > 1" class="arrow-up" :class="{ active: show === true }" name="solar:alt-arrow-down-bold" />
@@ -152,7 +153,6 @@ size="small"
         </template>
             <div v-else class="flex items-center gap-4px">
 
- 
             {{$t('buy') }}
             <span>|</span>
             <img :src="`${configStore.token_logo_url}${tokenStore.swap.payToken?.logo_url}`" class="rd-50%" height="12"  alt="" srcset="" >
@@ -892,6 +892,7 @@ async function submitBotSwap() {
     const ft = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
     const tt = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
     const batchId = Date.now().toString()
+    console.log('-----botSwapSelectedWallets-----', botSwapStore?.botSwapSelectedWallets)
     const swapList = (botSwapStore?.botSwapSelectedWallets || [])?.map((i, k) => {
       const addr = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses?.find?.(k => k?.chain === chain)?.address
       const addresses = botStore.walletList?.find?.(j => j.evmAddress === i)?.addresses || []

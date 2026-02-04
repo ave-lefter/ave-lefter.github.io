@@ -11,7 +11,9 @@ import {
   getPairLiq,
   type GetPairLiqResponse,
   type IGetTokenTxsResponse,
+  type IGetSimpleTxsResponse,
   getTokenTxs,
+  getSimpleTxs,
   type Profile
 } from '~/api/token'
 import {formatDate, formatTimeFromNow, getAddressAndChainFromId, getChainInfo, uuid} from '~/utils'
@@ -33,6 +35,7 @@ const $refs = ref({
 })
 
 // const MAKER_SUPPORT_CHAINS = ['solana', 'bsc']
+const {lang} = storeToRefs(useGlobalStore())
 const { t } = useI18n()
 const tokenStore = useTokenStore()
 const tokenDetailSStore = useTokenDetailsStore()
@@ -44,7 +47,7 @@ const aveTableRef = ref<InstanceType<typeof AveTable> | null>(null)
 const firstActivated = ref(true)
 const followStore = useFollowStore()
 const themeStore = useThemeStore()
-onActivated(() => {
+onMounted(() => {
   if (!firstActivated.value && aveTableRef.value) {
     aveTableRef.value.scrollToTop(0)
   }
@@ -122,10 +125,16 @@ const columns = computed(() => {
 })
 const listStatus = ref({
   loadingTxs: false,
-  loadingLiq: false
+  // 切换token
+  loadingTxs1: false,
+  loadingLiq: false,
+  finished: false,
+  page_token:'',
+  pageSize:100
 })
-const tokenTxs = shallowRef<IGetTokenTxsResponse[]>([])
-const wsPairCache = shallowRef<IGetTokenTxsResponse[]>([])
+
+const tokenTxs = shallowRef<IGetSimpleTxsResponse[]>([])
+const wsPairCache = shallowRef<IGetSimpleTxsResponse[]>([])
 const pairLiq = shallowRef<GetPairLiqResponse[]>([])
 const wsLiqCache = shallowRef<GetPairLiqResponse[]>([])
 
@@ -142,14 +151,36 @@ const tableFilter = ref<{
 })
 
 const filterTableListMap = {
-  all: () => [...tokenTxs.value, ...pairLiq.value].toSorted((a, b) => b.time - a.time),
-  liquidity: () => pairLiq.value,
-  buy: () => tokenTxs.value.filter(el => isBuy((el))),
-  sell: () => tokenTxs.value.filter(el => !isBuy(el))
+  all: () => (tableView.value.isShowLiq?[...tokenTxs.value, ...pairLiq.value]:[...tokenTxs.value]).toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
+  liquidity: () => [...pairLiq.value].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
+  buy: () => [...tokenTxs.value.filter(el => isBuy((el)))].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
+  sell: () =>[... tokenTxs.value.filter(el => !isBuy(el))].toSorted((a, b) => sortConditions.value.sort_dir ==='asc' ? a.time - b.time : b.time - a.time),
 }
+
+const tableLoading = computed(() => listStatus.value.loadingTxs1 || listStatus.value.loadingLiq)
+const showFooter=ref(false)
+const footText = computed(() => {
+  if(listStatus.value.loadingTxs){
+    return t('loading')
+  }else if(listStatus.value.finished){
+    return t('noMore')
+  }else{
+    return ''
+  }
+})
+
+function loadMore(remainDistance:number){
+  console.log('loadMore remainDistance', remainDistance, listStatus.value)
+  showFooter.value=remainDistance <= 20
+  if ((remainDistance <= 20) && !(listStatus.value.loadingTxs || listStatus.value.finished)) {
+    _getTokenTxs()
+  }
+}
+
+
 // 纯前端筛选
 const filterTableList = computed(() => {
-  let tableList: ((IGetTokenTxsResponse | GetPairLiqResponse) & { count?: number })[] = []
+  let tableList: ((IGetSimpleTxsResponse | GetPairLiqResponse) & { count?: number })[] = []
   if (activeTab.value in filterTableListMap) {
     tableList = filterTableListMap[activeTab.value as keyof typeof filterTableListMap]()
   } else {
@@ -165,7 +196,7 @@ const filterTableList = computed(() => {
     tableList = tableList.filter(el => el.time <= Number(endTime))
   }
   if (markerAddress) {
-    tableList = tableList.filter(el => el.wallet_address === markerAddress)
+    tableList = tableList.filter(el => el?.wallet_address === markerAddress)
   }
   if (startVol) {
     tableList = tableList.filter(el => {
@@ -195,6 +226,7 @@ const filterTableList = computed(() => {
 const txCount = shallowRef<{ [key: string]: number }>({})
 const tableView = ref({
   isShowDate: false,
+  isShowLiq: true,
   // isSwapPriceUSDT: true, 不常用，先删除
   // isVolUSDT: true
 })
@@ -205,11 +237,11 @@ const tableFilterVisible = ref({
 })
 const makerTooltip = ref()
 const markerTooltipVisible = shallowRef(false)
-const currentRow = shallowRef<IGetTokenTxsResponse & { senderProfile: Profile, maker_bal?: number }>({} as any)
+const currentRow = shallowRef<IGetSimpleTxsResponse & { senderProfile: Profile, maker_bal?: number }>({} as any)
 const isPausedTxs = computed(() => {
   return isHoverTable.value
     || tokenDetailSStore.drawerVisible
-    || markerTooltipVisible.value
+    || markerTooltipVisible.value || (sortConditions.value.sort_dir ==='asc')
 })
 
 const addressAndChain = computed(() => {
@@ -222,36 +254,148 @@ const addressAndChain = computed(() => {
     chain: tokenStore.token?.chain || ''
   }
 })
+const sortConditions= ref({
+  sort: '',
+  sort_dir: '',
+})
+
+
+function filterSubmit() {
+  console.log('filterSubmit')
+  listStatus.value.page_token = ''
+  listStatus.value.loadingTxs = false
+  listStatus.value.finished = false
+  _getTokenTxs()
+  if(aveTableRef.value) aveTableRef.value.scrollToTop(0)
+}
+
+const _getTokenTxs = useThrottleFn(async () => {
+  try {
+    if (listStatus.value.loadingTxs) return
+    listStatus.value.loadingTxs = true
+    const { tag_type } = tableFilter.value
+    const getPairTxsParams = {
+      token_id: route.params.id as string,
+      tag_type:!['buy', 'sell'].includes(tag_type) ? tag_type : '',
+      direction:['buy', 'sell'].includes(tag_type) ? tag_type : '',
+      sender: tableFilter.value.markerAddress,
+      target_price_u_min: tableFilter.value.amountU[0],
+      target_price_u_max: tableFilter.value.amountU[1],
+      time_min: tableFilter.value.timestamp[0],
+      time_max: tableFilter.value.timestamp[1],
+      page_token: listStatus.value.page_token,
+      //TODO: 增加排序参数
+      sort_dir:sortConditions.value.sort_dir
+    }
+    if (tag_type === '-100' && !followStore.currentAddress) {
+      resetTx()
+      listStatus.value.loadingTxs = false
+      return
+    }
+
+    const res = await getSimpleTxs(tokenStore.pairAddress + '-' + addressAndChain.value.chain, getPairTxsParams)
+    const data=res||[]
+    realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
+    const page_token= data[data.length - 1]?.page_token || ''
+    txCount.value={}
+    if (Array.isArray(data) && data?.length > 0) {
+      if(!listStatus.value.page_token) {
+        tokenTxs.value = data.reverse().map(val => {
+          txCount.value[val.maker] = (txCount.value[val.maker] || 0) + 1
+          return {
+            ...transferTxsData(val),
+            count: txCount.value[val.maker]
+          }
+        }).reverse()
+        // 获取tokenTxs.value 最后一项的token_id
+        // listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token || ''
+      }else{
+        tokenTxs.value = [...tokenTxs.value].concat(data.filter?.(i => tokenTxs.value?.every?.(j => j.txhash !== i.txhash))
+            ?.map(i => transferTxsData(i))).reverse().map(val => {
+          txCount.value[val.maker] = (txCount.value[val.maker] || 0) + 1
+          return {
+            ...val,
+            count: txCount.value[val.maker]
+          }
+        }).reverse()
+      }
+      if (!listStatus.value.finished) {
+        listStatus.value.page_token = page_token
+      }
+      if(sortConditions.value.sort_dir ==='asc'){
+        tokenTxs.value =[...tokenTxs.value].toSorted((a, b) => a.time - b.time)
+      }else{
+        tokenTxs.value =[...tokenTxs.value].toSorted((a, b) => b.time - a.time)
+      }
+    }else{
+      if(!listStatus.value.page_token) {
+        tokenTxs.value = []
+      }
+      listStatus.value.finished = true
+    }
+  } catch (e) {
+    resetTx()
+  } finally {
+    listStatus.value.loadingTxs1 = false
+    showFooter.value = false
+    listStatus.value.loadingTxs = false
+  }
+}, 500)
+
+const defaultSort = computed(() => {
+  if (sortConditions.value.sort === 'time') {
+    return sortConditions.value.sort_dir
+  }
+  return ''
+})
+
+function sortChange(sort_dir: string) {
+  sortConditions.value={
+    sort: sort_dir ? 'time' : '',
+    sort_dir: sort_dir,
+  }
+  console.log('sortConditions.value', sort_dir)
+  // if(sort_dir==='desc') return
+  filterSubmit()
+}
 
 watch(() => klineDateFilter?.value, (val) => {
+  console.log('klineDateFilter', val)
   if (val && !orderBookVisible.value) {
     tableFilter.value.timestamp = val
-    _getTokenTxs()
+    filterSubmit()
   }
 })
 
 watch(() => tokenStore.pairAddress, (pair, oldPair) => {
+  console.log('watch pair', pair, oldPair)
   if (tokenStore.pairAddress) {
+    listStatus.value.loadingTxs1 = true
+    resetCache()
     _getPairLiq()
     subscribeLiq(pair, oldPair)
+    tableFilter.value.markerAddress = ''
+    filterSubmit()
   }
 }, {
   immediate: true
 })
 
-watch(() => route.params.id, val => {
-  if (val) {
-    resetCache()
-    tableFilter.value.markerAddress = ''
-    _getTokenTxs()
-  }
-}, {
-  immediate: true
-})
+// watch(() => route.params.id, val => {
+//   if (val) {
+//     resetCache()
+//     tableFilter.value.markerAddress = ''
+//     if (tokenStore.pairAddress) {
+//       filterSubmit()
+//     }
+//   }
+// }, {
+//   immediate: true
+// })
 
 watch(() => followStore.currentAddress, () => {
   if (activeTab.value === '-100') {
-    _getTokenTxs()
+    filterSubmit()
   }
 })
 
@@ -259,13 +403,13 @@ watch(orderBookVisible,(val,oldVal)=>{
   if(oldVal && !val){
     resetCache()
     tableFilter.value.markerAddress = ''
-    _getTokenTxs()
+    filterSubmit()
   }
 })
 
 useVisibilityChange(() => {
   resetCache()
-  _getTokenTxs()
+  filterSubmit()
   _getPairLiq()
 })
 
@@ -294,6 +438,11 @@ function resetCache() {
   txCount.value = {}
   wsPairCache.value.length = 0
   wsLiqCache.value.length = 0
+}
+
+function resetTx() {
+  tokenTxs.value = []
+  listStatus.value.page_token = ''
 }
 
 watch(() => wsStore.wsResult[WSEventType.TX], data => {
@@ -373,6 +522,7 @@ watch(() => wsStore.wsResult[WSEventType.SIMPLE_TX], data => {
     },
     newTags
   }
+  // console.log('交易推送item',maker, item.maker_type)
   wsPairCache.value.unshift(item as any)
   if (!isPausedTxs.value) {
     updatePairTxs()
@@ -393,7 +543,7 @@ watch(() => wsStore.wsResult[WSEventType.LIQ], data => {
   if (!isPausedTxs.value) {
     updateLiqList()
   }
-  if (pairLiq.value.length > 300) {
+  if (pairLiq.value.length > 1500) {
     pairLiq.value.pop()
   }
 })
@@ -420,7 +570,10 @@ function subscribeLiq(pair: string, oldPair?: string) {
 
 const updatePairTxs = useThrottleFn(() => {
   tokenTxs.value.unshift(...wsPairCache.value)
-  tokenTxs.value = tokenTxs.value.slice(0, 300)
+  if(tokenTxs.value.length > 1500) {
+    tokenTxs.value = tokenTxs.value.slice(0, 1500)
+    listStatus.value.page_token = tokenTxs.value[tokenTxs.value.length - 1]?.page_token||''
+  }
   wsPairCache.value.length = 0
   triggerRef(tokenTxs)
 }, 100)
@@ -432,60 +585,63 @@ const updateLiqList = useThrottleFn(() => {
 }, 100)
 
 function onTimestampConfirm(timestamp: string[] = []) {
+  txCount.value = {}
   tableFilterVisible.value.timestamp = false
   tableFilter.value.timestamp = timestamp
-  _getTokenTxs()
+  filterSubmit()
 }
 
 function confirmVolFilter(amountU: string[] = []) {
+  txCount.value = {}
   tableFilterVisible.value.amountU = false
   tableFilter.value.amountU = amountU
+  filterSubmit()
 }
 
 function confirmMakersFilter(markerAddress = '') {
   txCount.value = {}
   tableFilterVisible.value.markers = false
   tableFilter.value.markerAddress = markerAddress
-  _getTokenTxs()
+  filterSubmit()
 }
 
-async function _getTokenTxs() {
-  try {
-    listStatus.value.loadingTxs = true
-    const { tag_type } = tableFilter.value
-    const getPairTxsParams = {
-      token_id: route.params.id as string,
-      tag_type,
-      maker: tableFilter.value.markerAddress,
-      time_min:tableFilter.value.timestamp[0],
-      time_max:tableFilter.value.timestamp[1]
+function transferTxsData(row: IGetSimpleTxsResponse) {
+  const { wallet_tag, topN } = getWalletTag(row)
+  const maker_types = (row.maker_type||'').split(',')
+  let lang1='en' as 'tw'|'cn'|'vi'|'tr'|'ru'|'pt'|'ko'|'ja'|'es'|'en'
+  if (lang.value === 'zh-tw') {
+    lang1 = 'tw' // 繁体中文
+  } else if (lang.value === 'zh-cn') {
+    lang1 = 'cn' // 简体中文
+  }
+  const newTags=tagStore.tagArr.filter(item => maker_types.includes(item.type)).map(i=>{
+    return {
+      'type': i.type,
+      'tag_desc': i?.[lang1],
+      'icon': i.icon,
+      'color': i.color,
+      'extra_info': i.extra_info,
+      'nick_name': i.nick_name
     }
-    if (tag_type === '-100' && !followStore.currentAddress) {
-      tokenTxs.value = []
-      listStatus.value.loadingTxs = false
-      return
-    }
-    const res = await getTokenTxs(getPairTxsParams)
-    realAddress.value = getAddressAndChainFromId(getPairTxsParams.token_id).address
-    tokenTxs.value = (res || []).reverse().map(val => {
-      txCount.value[val.wallet_address] = (txCount.value[val.wallet_address] || 0) + 1
-      const { wallet_tag, topN } = getWalletTag(val)
-      return {
-        ...val,
-        wallet_tag,
-        topN,
-        count: txCount.value[val.wallet_address],
-        senderProfile: JSON.parse(val.profile || '{}'),
-        uuid: uuid()
-      }
-    }).reverse()
-  } catch (e) {
-    tokenTxs.value = []
-    console.log('=>(transactions.vue:62) e', e)
-  } finally {
-    listStatus.value.loadingTxs = false
+  })
+  return {
+    ...row,
+    wallet_tag,
+    topN,
+    senderProfile: JSON.parse(row?.profile || '{}'),
+    uuid: uuid(),
+    newTags,
+    isSimple: true,
+    chain:addressAndChain.value.chain,
+    id:row.page_token,
+    // amm:row.amm,
+    transaction:row.txhash,
+    wallet_address:row.maker,
   }
 }
+
+
+
 
 function getSimpleTxTags(tag?:string) {
   if(tag){
@@ -499,7 +655,7 @@ function getSimpleTxTags(tag?:string) {
   }
 }
 
-function getWalletTag(val: IGetTokenTxsResponse) {
+function getWalletTag(val: IGetSimpleTxsResponse) {
   const wallet_tagStr = val.wallet_tag_v2 || ''
   let topN = ''
   let wallet_tag: string[] = []
@@ -534,11 +690,12 @@ async function _getPairLiq() {
   } catch (e) {
     console.log('=>(transactions.vue:155) e', e)
   } finally {
+    console.log('_getPairLiq')
     listStatus.value.loadingLiq = false
   }
 }
 
-function isBuy(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) {
+function isBuy(row: GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx) {
   if ('direction' in row && 'target' in row) {
     return row.direction === 'buy'
   }
@@ -561,7 +718,7 @@ function isBuy(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) {
   }
 }
 
-function getRowColor(row: GetPairLiqResponse | IGetTokenTxsResponse) {
+function getRowColor(row: GetPairLiqResponse | IGetSimpleTxsResponse) {
   if ('type' in row) {
     if (row.type === 'addLiquidity') {
       return 'color-#65C4ED'
@@ -572,13 +729,16 @@ function getRowColor(row: GetPairLiqResponse | IGetTokenTxsResponse) {
   return isBuy(row) ? 'color-#12B886' : 'color-#FF646D'
 }
 
-function getPrice(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, isShowToken = false) {
+function getPrice(row: GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx, isShowToken = false) {
   // route.params。id 同步更改，而接口异步请求，此时更新该值变成了 0
   const tokenAddress = realAddress.value
-  if ('direction' in row && 'target' in row) {
+  if ('isSimple' in row && row.isSimple && 'target_price_u' in row) {
+    return row?.target_price_u
+  }
+  if ('direction' in row && 'target' in row && 'price_u' in row) {
     return row.price_u
   }
-  if ('from_address' in row) {
+  if ('from_address' in row ) {
     if (
       row.from_address &&
       tokenAddress.toLowerCase?.() === row.from_address?.toLowerCase?.()
@@ -608,10 +768,10 @@ function getPrice(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, i
   return 0
 }
 
-function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, needPrice = false, isVolUSDT = false) {
+function getAmount(row: GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx, needPrice = false, isVolUSDT = false) {
   if ('direction' in row && 'target' in row) {
     return Number(row.target_amt || 0) * (
-        needPrice ? Number(isVolUSDT ? row.price_u : row.price_m)
+        needPrice ? Number(isVolUSDT ? row.price_u|| row.target_price_u : row.price_m||row.target_price_m)
           : 1
       )
   }
@@ -641,7 +801,7 @@ function getAmount(row: GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx, 
   return 0
 }
 
-function hasNewAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
+function hasNewAccount(row: (GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
   if ('direction' in row && 'target' in row) {
     return row.direction === 'buy' && new BigNumber(row.maker_bal).eq(row.target_amt)
   }
@@ -657,7 +817,7 @@ function hasNewAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleW
   }
 }
 
-function hasClearedAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
+function hasClearedAccount(row: (GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
   if ('direction' in row && 'target' in row) {
     return row.direction === 'sell' && new BigNumber(row.maker_bal).eq(0)
   }
@@ -673,7 +833,7 @@ function hasClearedAccount(row: (GetPairLiqResponse | IGetTokenTxsResponse | Sim
   }
 }
 
-function bigWallet(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
+function bigWallet(row: (GetPairLiqResponse | IGetSimpleTxsResponse | SimpleWSTx) & { senderProfile?: Profile }) {
   if ('maker_eth' in row) {
     return Number(row.maker_eth || 0) >= 50
   }
@@ -683,7 +843,7 @@ function bigWallet(row: (GetPairLiqResponse | IGetTokenTxsResponse | SimpleWSTx)
   return Number(row.senderProfile?.solTotalHolding) > 50
 }
 
-function getGradient(row: IGetTokenTxsResponse) {
+function getGradient(row: IGetSimpleTxsResponse) {
   const str = `${useThemeStore().isDark}-${isBuy(row)}`
   const map = {
     'true-true': 'bg-[linear-gradient(270deg,#111_0%,#12654C_70%,#12B886_100%)]',
@@ -694,7 +854,7 @@ function getGradient(row: IGetTokenTxsResponse) {
   return map[str]
 }
 
-function openMarkerTooltip(row: IGetTokenTxsResponse & { senderProfile: Profile }, e: MouseEvent) {
+function openMarkerTooltip(row: IGetSimpleTxsResponse & { senderProfile: Profile }, e: MouseEvent) {
   if (row && SupportFullDataChain.includes(row.chain)) {
     makerTooltip.value = e.currentTarget
     if (currentRow.value?.wallet_address === row.wallet_address) {
@@ -704,7 +864,7 @@ function openMarkerTooltip(row: IGetTokenTxsResponse & { senderProfile: Profile 
   }
 }
 
-function goBrowser(row: IGetTokenTxsResponse) {
+function goBrowser(row: IGetSimpleTxsResponse) {
   window.open(
     formatExplorerUrl(row.chain, row.transaction, 'tx')
   )
@@ -719,7 +879,7 @@ function setActiveTab(val: string,index:number) {
   txCount.value = {}
   tableFilter.value.tag_type = val
   if (val !== 'liquidity') {
-    _getTokenTxs()
+    filterSubmit()
   } else {
     _getPairLiq()
   }
@@ -729,7 +889,7 @@ function setActiveTab(val: string,index:number) {
 function setMakerAddress(address: string) {
   txCount.value = {}
   tableFilter.value.markerAddress = tableFilter.value.markerAddress ? '' : address
-  _getTokenTxs()
+  filterSubmit()
 }
 
 function onRowClick({ rowData }: RowEventHandlerParams) {
@@ -767,7 +927,7 @@ function onRowClick({ rowData }: RowEventHandlerParams) {
 function resetMakerAddress() {
   txCount.value = {}
   tableFilter.value.markerAddress = ''
-  _getTokenTxs()
+  filterSubmit()
 }
 
 const collect = async (row: any,index:number) => {
@@ -840,6 +1000,7 @@ onUnmounted(() => {
 
 <template>
   <div ref="txs-container" class="transactions">
+    <!-- isPausedTxs:{{ isPausedTxs }} -->
     <div class="px-12px mb-10px flex justify-between">
       <div
         ref="tabsContainer"
@@ -871,10 +1032,10 @@ onUnmounted(() => {
         <span v-tooltip="$t(globalStore.isClickKlineFilter?'clickChartHideFilter':'clickChartFilter')" class="flex items-center justify-center w-12px h-12px rounded-2px color-[--reverse-color] text-10px cursor-pointer" :class="globalStore.isClickKlineFilter?'bg-[--primary-color]':'bg-[--third-text] hover:bg-[--secondary-text]'" @click="globalStore.isClickKlineFilter=!globalStore.isClickKlineFilter"><Icon name="custom:chart"/></span>
       </div>
     </div>
-    <DateFilterCard v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" v-model:timestamp="tableFilter.timestamp" @update:timestamp="_getTokenTxs"/>
+    <DateFilterCard v-if="tableFilter.timestamp.length&&tableFilter.timestamp[0]&&tableFilter.timestamp[1]" v-model:timestamp="tableFilter.timestamp" @update:timestamp="filterSubmit"/>
     <template v-if="tableFilter.markerAddress">
       <div
-        v-if="listStatus.loadingTxs || listStatus.loadingLiq"
+        v-if="tableLoading"
         class="lh-20px text-13px py-6px bg-#3F80F71A text-center mb-12px">
         {{ $t('loading') }}
       </div>
@@ -897,25 +1058,33 @@ onUnmounted(() => {
         />
       </template>
     </template>
+    <!-- tableLoading:{{tableLoading}} -->
     <div
-      v-loading="listStatus.loadingTxs || listStatus.loadingLiq" class="text-12px"
+      v-loading="tableLoading" class="text-12px"
       element-loading-background="transparent">
+    <!-- <div class="text-12px"> -->
       <AveTable
         ref="aveTableRef"
         rowKey="uuid"
         fixed :data="filterTableList"
         :columns="columns"
         :style="{
-          height:`${finalHeight}px`
+          height:`${finalHeight}px`,
+          '--el-table-bg-color':'transparent',
+          'overflow':'visible',
+          paddingBottom:!showFooter?'0px':'20px'
         }"
         row-class='cursor-pointer'
+        :showFooter="showFooter"
+        :footText="footText"
         :rowEventHandlers="{
         onMouseenter:()=>isHoverTable=true,
         onMouseleave:()=>isHoverTable=false,
         onClick: onRowClick
-      }">
+      }"
+        @endReached="loadMore">
         <template  #empty>
-          <div v-if="!(listStatus.loadingTxs || listStatus.loadingLiq)" class="h-full flex flex-col items-center justify-center pt-100px">
+          <div v-if="!tableLoading" class="h-full flex flex-col items-center justify-center pt-100px">
             <img v-if="themeStore.theme==='light'" src="@/assets/images/empty-white.svg" alt="">
             <img v-else src="@/assets/images/empty-black.svg" alt="">
             <span
@@ -928,16 +1097,18 @@ onUnmounted(() => {
         </template>
         <template #header-time>
           <div class="flex items-center gap-2px">
-            <span>{{ $t('time') }}</span>
+            <span  class="cursor-pointer" @click="sortChange({ asc: '', desc: 'asc', '': 'desc' }[defaultSort] || '')">{{ $t('time') }}</span>
             <Icon
               :name="`${tableView.isShowDate ? 'custom:calendar' : 'custom:countdown'}`"
               class="color-[--third-text] cursor-pointer" @click.self="tableView.isShowDate = !tableView.isShowDate" />
             <TableDateFilter
               v-model:visible="tableFilterVisible.timestamp" :modelValue="tableFilter.timestamp" :boundary="txsContainer || undefined"
               @confirm="onTimestampConfirm" />
+            <HeadSort :defaultSort="defaultSort" @sort-change="sortChange" />
           </div>
         </template>
         <template #cell-time="{ row,rowIndex }">
+            <!-- in-{{ rowIndex }}- -->
           <TimerCount
             v-if="!tableView.isShowDate && row.time && Number(formatTimeFromNow(row.time, true)) < 60"
             :key="`${row.time}${rowIndex}`" :timestamp="row.time" :end-time="60">
@@ -959,6 +1130,16 @@ onUnmounted(() => {
                 : formatTimeFromNow(row.time)
             }}
           </span>
+        </template>
+        <template #header-type >
+          <div class="flex items-center gap-2px" @click="()=>[ '', 'all' ].includes(activeTab) && (tableView.isShowLiq = !tableView.isShowLiq)">
+            <span  :class="[ '', 'all' ].includes(activeTab)&&'cursor-pointer'">{{ $t('type') }}</span>
+            <Icon
+              v-if="[ '', 'all' ].includes(activeTab)"
+              v-tooltip="tableView.isShowLiq ? $t('hideLiq') : $t('showLiq')"
+              name="custom:droplet"
+              :class="`cursor-pointer ${!tableView.isShowLiq ? 'color-[--third-text]' : 'color-[--primary-color]'}`" />
+          </div>
         </template>
         <template #cell-type="{ row }">
           <div :class="getRowColor(row)">
@@ -1072,12 +1253,12 @@ onUnmounted(() => {
         <template #cell-makers="{ row , rowIndex}">
           <template v-if="['solana', 'bsc'].includes(row.chain)  && (row.senderProfile || row.maker_bal)">
             <Icon
-              v-if="hasNewAccount(row)"
+              v-if="hasNewAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('47'))"
               v-tooltip="{ content: `<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' }}"
               name="custom:new-account"
               class="mr-3px shrink-0"/>
             <Icon
-              v-if="hasClearedAccount(row)"
+              v-if="hasClearedAccount(row) && (!(row.newTags||[]).map((i:any)=>i.type).includes('46'))"
               v-tooltip="{ content: `<span style='color: #EB2B4B'>${$t('sellAl')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:cleared-account" class="mr-3px shrink-0"/>
             <Icon
@@ -1085,8 +1266,7 @@ onUnmounted(() => {
               v-tooltip="{ content: `<span style='color: #ccc'>${$t('whales')}</span>`, props: { 'raw-content': true, 'popper-class': 'signal-tags-tooltip' } }"
               name="custom:big" class="mr-3px shrink-0"/>
           </template>
-          <SignalTags
-            tagClass="mr-3px" :tags="(row.newTags||[]).map((el: any)=>tagStore.matchTag(el.type)||el)"
+          <SignalTags tagClass="mr-3px" :tags="(row.newTags||[]).map((el: any)=>tagStore.matchTag(el.type)||el)"
                       :walletAddress="row.wallet_address" :chain="row.chain"/>
           <div :key="row.wallet_address" class="flex items-center gap-4px">
             <UserRemark
@@ -1102,9 +1282,9 @@ onUnmounted(() => {
                 ({{ row.count }})
               </div>
             </UserRemark>
-            <Icon
+            <!-- <Icon
               :ref="(el: any) => $refs.buttonRefs[rowIndex] = el" name="custom:attention"
-              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--third-text]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" />
+              :class="row.is_wallet_address_fav === 1 ? 'color-[#F45469]' : 'color-[--third-text]'" class="h-16px w-16px clickable shrink-0" @click.stop.prevent="collect(row,rowIndex)" /> -->
             <Icon
               name="custom:filter"
               :class="`${tableFilter.markerAddress ? 'color-[--secondary-text]' : 'color-[--third-text]'} cursor-pointer text-10px shrink-0`"
@@ -1113,7 +1293,8 @@ onUnmounted(() => {
         </template>
         <template #cell-SOLBalance="{ row }">
           <span v-if="row.senderProfile" class="color-[--secondary-text]">
-            {{ formatNumber(row.senderProfile?.solTotalHolding || 0, 2) }}
+            {{ formatNumber(row.maker_eth || 0, 2) }}
+            <!-- {{ formatNumber(row.senderProfile?.solTotalHolding || 0, 2) }} -->
           </span>
         </template>
         <template #cell-DEX="{ row }">
@@ -1138,11 +1319,11 @@ onUnmounted(() => {
       >
         <template v-if="['solana', 'bsc'].includes(currentRow.chain) && (currentRow.senderProfile || currentRow.maker_bal)">
           <Icon
-            v-if="hasNewAccount(currentRow)"
+            v-if="hasNewAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('47'))"
             v-tooltip.raw="`<span style='color: #85E12F'>${$t('newTokenAccount')}</span>`" name="custom:new-account"
             class="mr-3px" />
           <Icon
-            v-if="hasClearedAccount(currentRow)"
+            v-if="hasClearedAccount(currentRow) && (!(currentRow.newTags||[]).map((i:any)=>i.type).includes('46'))"
             v-tooltip.raw="`<span style='color: #EB2B4B'>${$t('sellAl')}</span>`" name="custom:cleared-account"
             class="mr-3px" />
           <Icon

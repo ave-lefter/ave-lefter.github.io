@@ -48,7 +48,7 @@
           <div class="flex flex-row-reverse">
             <div class="flex items-center">
               <div>{{ t('type') }}</div>
-              <el-dropdown trigger="click" @command="handleTypeCommand">
+              <el-dropdown :persistent="false" trigger="click" @command="handleTypeCommand">
                 <Icon name="custom:filter" :class="[filterConditions.swapType?.length === 1 && 'color-#286DFF']" class="color-[--third-text] cursor-pointer text-10px" />
                 <template #dropdown>
                   <el-dropdown-menu>

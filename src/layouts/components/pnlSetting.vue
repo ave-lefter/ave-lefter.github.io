@@ -60,6 +60,7 @@ function resetBg() {
     align-center
     :title="$t('PnlSetting')"
     width="360px"
+    destroy-on-close
     :close-on-click-modal="false"
     class="pnl-setting-dialog"
   >
@@ -240,7 +241,7 @@ function resetBg() {
 </template>
 <style lang="scss" scoped>
 .upload {
-  :deep {
+  :deep() {
     .el-upload {
       --el-upload-dragger-padding-horizontal: 0;
       --el-upload-dragger-padding-vertical: 0;
@@ -250,7 +251,7 @@ function resetBg() {
     }
   }
 }
-:deep {
+:deep() {
   .el-slider__stop {
     height: 4px;
     top: -1px;

@@ -281,7 +281,7 @@ async function getTokenBalance(chain: string) {
   </el-button>
   <el-dialog
     v-if="visible" v-model="visible" :title="$t('buy')"
-    width="400px" :append-to="appendTo"
+    width="400px" :append-to="appendTo" destroy-on-close
   >
     <template #header>
       <span class="text-20px">{{ $t('buy') }}</span>

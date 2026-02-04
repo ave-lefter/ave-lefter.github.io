@@ -4,7 +4,7 @@
     <span class="ml-5px">{{ $t('oneClick') }}</span>
   </button>
   <Teleport to="body">
-    <div v-show="botStore.isSupportChains?.includes(chain) && visible" class="fixed-one-click">
+    <div v-show="botStore.isSupportChains?.includes(chain) && visible && isMounted" class="fixed-one-click">
       <template v-if="botStore.isSupportChains?.includes(chain) && visible">
         <div class="flex-between">
           <div class="flex-start">
@@ -476,35 +476,44 @@ async function handleSellAmount(item: string, index: number) {
 
 let mousemoveEvent: ((e: MouseEvent) => void) | null = null
 let mouseupEvent: (() => void) | null = null
+let maskElement: HTMLDivElement | null = null // 存为全局引用以便清理
+const isMounted = ref(false)
 
 function enableDragScroll() {
   const label = document.querySelector('.fixed-one-click') as HTMLElement
   if (!label) return
 
-  // 初始化基础样式
-  label.setAttribute('tabindex', '0') // 使其可聚焦
+  const savedPos = localStorage.getItem('fixed-one-click-position')
+  const initialOffset = savedPos ? JSON.parse(savedPos) : { x: 0, y: 0 }
+
+  let currentX = initialOffset.x
+  let currentY = initialOffset.y
+  let startX = 0, startY = 0
+  let isDragging = false
+  let rafId: number
+
+  // 1. 立即初始化位置，避免跳动
   Object.assign(label.style, {
     position: 'fixed',
     cursor: 'grab',
-    zIndex: 'auto',
+    zIndex: '33',
     outline: 'none',
-    willChange: 'transform' // 提示浏览器开启 [GPU 加速](https://developer.mozilla.org)
+    willChange: 'transform',
+    transform: `translate3d(${currentX}px, ${currentY}px, 0)`
   })
+  label.setAttribute('tabindex', '0')
 
-  // 预创建遮罩（仅创建一次，通过 display 控制，比 appendChild 性能高）
-  const mask = document.createElement('div')
-  Object.assign(mask.style, {
-    position: 'fixed', inset: '0', zIndex: '3013',
-    cursor: 'grabbing', display: 'none', background: 'transparent'
-  })
-  document.body.appendChild(mask)
+  // 2. 遮罩层管理（单例防止重复创建）
+  if (!maskElement) {
+    maskElement = document.createElement('div')
+    Object.assign(maskElement.style, {
+      position: 'fixed', inset: '0', zIndex: '9998',
+      cursor: 'grabbing', display: 'none', background: 'transparent'
+    })
+    document.body.appendChild(maskElement)
+  }
+  const mask = maskElement
 
-  let isDragging = false
-  let startX = 0, startY = 0
-  let currentX = 0, currentY = 0
-  let rafId: number
-
-  // 核心优化：使用 [requestAnimationFrame](https://developer.mozilla.org)
   const updateUI = () => {
     if (!isDragging) return
     label.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`
@@ -515,16 +524,9 @@ function enableDragScroll() {
     if (!isDragging) return
     isDragging = false
     cancelAnimationFrame(rafId)
-
     mask.style.display = 'none'
     label.style.cursor = 'grab'
-
-    // 记录最终位置
-    const rect = label.getBoundingClientRect()
-    localStorage.setItem('fixed-one-click-position', JSON.stringify({
-      top: `${rect.top}px`,
-      left: `${rect.left}px`
-    }))
+    localStorage.setItem('fixed-one-click-position', JSON.stringify({ x: currentX, y: currentY }))
   }
 
   label.onmousedown = (e) => {
@@ -534,7 +536,7 @@ function enableDragScroll() {
 
     mask.style.display = 'block'
     label.style.cursor = 'grabbing'
-    label.focus() // 强制聚焦，配合 blur 使用
+    label.focus()
 
     rafId = requestAnimationFrame(updateUI)
     e.preventDefault()
@@ -542,36 +544,64 @@ function enableDragScroll() {
 
   mousemoveEvent = (e: MouseEvent) => {
     if (!isDragging) return
-    currentX = e.clientX - startX
-    currentY = e.clientY - startY
+
+    const nextX = e.clientX - startX
+    const nextY = e.clientY - startY
+
+    // 3. 改进边界算法：使用 offsetLeft/Top（无视 transform）
+    // 视口宽高 - 元素自身宽高 - 元素初始位置 = 可移动的最大范围
+    const rect = label.getBoundingClientRect()
+    const width = rect.width
+    const height = rect.height
+
+    // 计算相对于窗口的初始偏移（不含 transform）
+    const origLeft = label.offsetLeft
+    const origTop = label.offsetTop
+
+    const minX = -origLeft
+    const maxX = window.innerWidth - origLeft - width
+    const minY = -origTop
+    const maxY = window.innerHeight - origTop - height
+
+    currentX = Math.max(minX, Math.min(nextX, maxX))
+    currentY = Math.max(minY, Math.min(nextY, maxY))
   }
 
-  // 监听 blur 事件：如果弹窗弹出导致 label 失去焦点，立即停止拖拽并移除遮罩
   label.onblur = mouseupEvent
   window.addEventListener('mousemove', mousemoveEvent)
   window.addEventListener('mouseup', mouseupEvent)
 }
 
 function disableDragScroll() {
-  // 移除事件
   const label = document.querySelector('.fixed-one-click') as HTMLElement
-  if (!label) {
-    return
+  if (label) {
+    label.onmousedown = null
+    label.onblur = null
   }
-  label.onmousedown = null
-  window.removeEventListener('mousemove', mouseupEvent as EventListener)
-  mouseupEvent = null
-  window.removeEventListener('mousemove', mousemoveEvent as EventListener)
+  // 修正：移除正确的事件监听器
+  if (mousemoveEvent) window.removeEventListener('mousemove', mousemoveEvent)
+  if (mouseupEvent) window.removeEventListener('mouseup', mouseupEvent)
+
   mousemoveEvent = null
+  mouseupEvent = null
+
+  if (maskElement) {
+    maskElement.remove()
+    maskElement = null
+  }
 }
 
 onMounted(() => {
   enableDragScroll()
   addSpaceKeyDownEvent()
+  nextTick(() => {
+    isMounted.value = true
+  })
 })
 
 onBeforeUnmount(() => {
   disableDragScroll()
+  isMounted.value = false
 })
 
 </script>

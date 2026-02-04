@@ -431,10 +431,10 @@ function reLoad(val=activeTab.value) {
   }
 }
 
+// onMounted(() => {
+//   //getHoldersList()
+// })
 onMounted(() => {
-  //getHoldersList()
-})
-onActivated(() => {
   if(activeTab.value === '-100' && !selfAddress.value) {
      // 没有登录不调用已关注接口
      resetFollowedData()

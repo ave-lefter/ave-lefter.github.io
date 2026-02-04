@@ -9,6 +9,12 @@ export default defineNuxtConfig({
   devtools: {
     enabled: false
   },
+  app: {
+    // 禁用页面切换动画
+    pageTransition: false,
+    // 禁用布局切换动画
+    layoutTransition: false
+  },
   modules: [
     '@nuxt/eslint',
     // '@nuxt/fonts',
@@ -59,7 +65,7 @@ export default defineNuxtConfig({
     // 可根据情况配置：
     // mode: 'auto' | 'local' | 'cdn'
     // 推荐用 'auto' 或 'cdn' 来避免本地构建限制
-    mode: 'auto',
+    mode: 'local',
     // 配置自定义图标集合
     // 自定义icon 放在 ./src/assets/icons 文件夹下 svg, 单色图标 需要将 svg 里 fill 改成 currentColor 这样可以修改颜色
     // 使用方式  <Icon name="custom:dark" class="text-20px color-green" />
@@ -116,6 +122,7 @@ export default defineNuxtConfig({
     '@/plugins/popover.client.ts',
     '@/plugins/dialog.client.ts',
     '@/plugins/aliyun-captcha.client.ts',
+    '@/plugins/performance-clean.client.ts',
   ],
   // unocss: {
   //   nuxtLayers: true,

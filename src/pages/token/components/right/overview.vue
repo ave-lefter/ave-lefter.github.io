@@ -216,6 +216,7 @@
         </div>
       </div>
       <el-dialog
+        v-if="dialog_bubble"
         v-model="dialog_bubble"
         width="50vw"
         align-center
@@ -236,6 +237,7 @@
         />
       </el-dialog>
       <el-dialog
+        v-if="dialog_analysis"
         v-model="dialog_analysis"
         width="80vw"
         align-center
@@ -244,6 +246,7 @@
         header-class="p-0! pl-20px! p-0!"
         :title="$t('tokenAnalysis')"
         append-to-body
+        destroy-on-close
         lock-scroll
       >
         <iframe
@@ -309,8 +312,14 @@ const supportObj: Record<string, string> = {
 
 // 监听从 top 组件触发的查看 Dev 代币事件
 const devTokensEvent = useEventBus(BusEventType.DEV_TOKENS_TAB)
-devTokensEvent.on(() => {
+const handleDevTokensTab = () => {
   activeTab.value = 'devBit'
+}
+const devTokensOff = devTokensEvent.on(handleDevTokensTab)
+onUnmounted(() => {
+  if (devTokensOff) {
+    devTokensOff()
+  }
 })
 
 // 计算是否应该显示所属链信息

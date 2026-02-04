@@ -112,9 +112,9 @@
   "slippage": "Deslizamiento",
   "autoSlippage": "Deslizamiento automático",
   "enterSlippage": "Ingrese el deslizamiento",
-  "slippageMaxTip": "Excedió el deslizamiento máximo del 49.99%",
+  "slippageMaxTip": "Excedió el deslizamiento máximo del 99.99%",
   "slippageTip1": "Operar con límite de deslizamiento muy bajo puede fallar por fluctuaciones del mercado.",
-  "slippageTips": "\"El deslizamiento máximo es 49.99%, si el precio de la transacción fluctúa más de este porcentaje, la transacción será devuelta.El deslizamiento no representa la tasa de transacción real, y la transacción real está sujeta al deslizamiento del contrato.\"",
+  "slippageTips": "\"El deslizamiento máximo es 99.99%, si el precio de la transacción fluctúa más de este porcentaje, la transacción será devuelta.El deslizamiento no representa la tasa de transacción real, y la transacción real está sujeta al deslizamiento del contrato.\"",
   "iKnown": "Lo sé",
   "balanceNotEnough": "Saldo de {s} insuficiente, por favor reserva al menos {n} {s}",
   "okay": "De acuerdo",
@@ -629,5 +629,7 @@
   "24hVolume": "Volumen 24h",
   "tokenStats": "Estadísticas de Tokens",
   "created": "Creado",
-  "topPlatforms": "Plataformas Principales"
+  "topPlatforms": "Plataformas Principales",
+  "hideLiq": "Haga clic para ocultar la información del grupo",
+  "showLiq": "Haga clic para mostrar información de la piscina"
 }

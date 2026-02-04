@@ -59,6 +59,7 @@ function onCancel() {
     <el-popover
       ref="popoverRef"
       v-model:visible="visible"
+:persistent="false"
       placement="bottom"
       trigger="click"
       :popper-style="{ padding: '15px',width: 'auto', minWidth: '164px' }"

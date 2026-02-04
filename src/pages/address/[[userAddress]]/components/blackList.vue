@@ -13,6 +13,7 @@
       :title="t('blackManage')"
       width="540px"
       append-to-body
+      destroy-on-close
       @close="closeDialog"
 
     >

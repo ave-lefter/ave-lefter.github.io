@@ -13,6 +13,7 @@
         placeholder="Select"
         style="width: 100%;height: 48px;"
         size="large"
+        :persistent="false"
         :filter-method="chainFilterMethod"
       >
         <template #prefix>

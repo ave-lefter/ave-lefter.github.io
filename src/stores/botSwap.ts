@@ -225,6 +225,14 @@ export const useBotSwapStore = defineStore('botSwap', () => {
 
   const botSwapSelectedWallets = useSessionStorage<string[]>('botSwapSelectedWallets', wallets)
 
+  watch(() => botStore.evmAddress, (val) => {
+    if (val) {
+      botSwapSelectedWallets.value = [val || '']
+    } else {
+      botSwapSelectedWallets.value = []
+    }
+  })
+
   function _bot_getGasTip() {
     if (botStore.accessToken && botStore.userInfo?.tgUid) {
       return bot_getGasTip().then(async res => {
