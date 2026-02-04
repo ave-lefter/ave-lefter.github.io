@@ -192,9 +192,11 @@ import { sui_signAndExecuteTransactionBlock } from '@/utils/wallet/sui'
 import { getSolanaSwapQuoteTransaction, sendSolanaSwapTransaction } from '@/utils/wallet/solana'
 import { getTonSwap } from '~/api/swap/ton'
 import { getTonTokenTransferMsg, sendTonTransaction } from '~/utils/wallet/ton'
-
+// 交易提示暂隐藏，仅展示底部币价
+// import { useTransactionPrompt } from '@/composables/useTransactionPrompt'
 
 const { t } = useI18n()
+// const { showExecuting, showSuccess, closeExecuting, updateExecutingSeconds } = useTransactionPrompt()
 const configStore = useConfigStore()
 
 const initSlippage = '2'
@@ -1972,6 +1974,18 @@ function getSelectedRouter (index: number) {
   selectedRouter()
 }
 
+function resolveTxHash(payload: any, fallback = ''): string {
+  return (
+    payload?.hash ||
+    payload?.transactionHash ||
+    payload?.digest ||
+    payload?.txHash ||
+    payload?.transaction?.signatures?.[0] ||
+    fallback ||
+    ''
+  )
+}
+
 // 提交交易
 async function submitSwap(_swapSubmitInfo = swapSubmitInfo.value) {
   try {
@@ -2007,15 +2021,17 @@ async function submitSwap(_swapSubmitInfo = swapSubmitInfo.value) {
     }
     // let tx = {}
     activeShow.value = 2
+    let submittedHash = ''
     swapSubmitInfo.value.swap().then((res: { hash: any; wait: () => any }) => {
       console.log('---confirm transaction---', res)
-      swapInfo.value.transaction = res.hash
+      submittedHash = resolveTxHash(res)
+      swapInfo.value.transaction = submittedHash
       // 记录交易
       recordTransaction({
         chain: chain.value,
         destination: 'wallet rpc',
         type: 10,
-        tx_hash: res.hash,
+        tx_hash: submittedHash,
         status: 1,
         wallet: walletStore.address,
         out_token: txInfo.to_address,
@@ -2058,12 +2074,13 @@ async function submitSwap(_swapSubmitInfo = swapSubmitInfo.value) {
       percentStepRef.value?.handleClick?.(0)
       // this.dialogVisibleSwap = false
       activeShow.value = 3
-      return res.wait()
+      return typeof res?.wait === 'function' ? res.wait() : res
     }).then((res: { hash: string, to: string }) => {
       console.log('----transaction---', res)
+      const txHash = resolveTxHash(res, submittedHash)
       updateTransaction({
         chain: chain.value,
-        tx_hash: res.hash,
+        tx_hash: txHash,
         status: 100,
         to: res?.to?.toLowerCase?.() || '',
       })
@@ -2144,15 +2161,16 @@ async function submitSolanaSwap() {
         loadingConfirmSwap.value = false
       }
     }, 6000)
-    // const isSwap = true
+    let submittedHash = ''
     sendSolanaSwapTransaction(solanaQuoteResponse).then((res: { hash: string | undefined; wait: () => any }) => {
       console.log('---confirm transaction---', res)
-      swapInfo.value.transaction = res.hash
+      submittedHash = resolveTxHash(res)
+      swapInfo.value.transaction = submittedHash
       recordTransaction({
         chain: 'solana',
         destination: localStorage.solanaProtection === 'true' ? 'v1/blxrsol/sendSolTx' : '/ave_nodes/rpc/solana/sendFastSwapTx',
         type: 10,
-        tx_hash: res.hash,
+        tx_hash: submittedHash,
         status: 1,
         wallet: walletStore.address,
         out_token: txInfo.to_address,
@@ -2193,13 +2211,14 @@ async function submitSolanaSwap() {
       // this.$refs?.percentStep?.handleClick?.(0)
       percentStepRef.value?.handleClick?.(0)
       activeShow.value = 3
-      return res.wait()
+      return typeof res?.wait === 'function' ? res.wait() : res
     }).then((res: { transaction: { signatures: any[] }; blockTime: any; transactionHash: any }) => {
       console.log('----transaction---', res)
       if (res) {
+        const txHash = resolveTxHash(res, submittedHash)
         updateTransaction({
           chain: 'solana',
-          tx_hash: res?.transaction?.signatures[0],
+          tx_hash: txHash,
           status: 100
         })
         // const [fromAmount, toAmount] = getTransactionTokenChange(res, _swapInfo.fromToken.address, _swapInfo.toToken.address)
@@ -2283,6 +2302,7 @@ async function submitSuiSwap() {
         loadingConfirmSwap.value = false
       }
     }, 6000)
+    let submittedHash = ''
     const isSwap = true
     buildSuiTx({
       quoteResponse: suiQuoteResponse,
@@ -2307,14 +2327,15 @@ async function submitSuiSwap() {
       if (!res?.digest) {
         return Promise.reject('Swap fail')
       } else {
-        swapInfo.value.transaction = res.digest
+        submittedHash = resolveTxHash(res)
+        swapInfo.value.transaction = submittedHash
         if (isSwap) {
-          txInfo.transaction = res.digest
+          txInfo.transaction = submittedHash
           recordTransaction({
             chain: 'sui',
             destination: 'wallet rpc',
             type: 10,
-            tx_hash: res.digest,
+            tx_hash: submittedHash,
             status: 1,
             wallet: walletStore.address,
             out_token: txInfo.to_address,
@@ -2354,17 +2375,17 @@ async function submitSuiSwap() {
         percentStepRef.value?.handleClick?.(0)
         // dialogVisibleSwap.value = false
         activeShow.value = 3
-        return res.wait()
+        return typeof res?.wait === 'function' ? res.wait() : res
       }
     }).then(res => {
       console.log('res', res)
-      if (res.digest) {
+      const txHash = resolveTxHash(res, submittedHash)
+      if (txHash) {
         updateTransaction({
           chain: 'sui',
-          tx_hash: res?.digest,
+          tx_hash: txHash,
           status: 100
         })
-        ElNotification({ type: 'success', message: t('tradeSuccess') })
         swapStore.getTokenDetails()
         swapStore.getUserTokenList()
         // const amountChange = sui_getBalanceChanges({ txInfo, balanceChanges: res?.balanceChanges || [] })
@@ -2382,7 +2403,7 @@ async function submitSuiSwap() {
         } else {
           updateTransaction({
             chain: 'sui',
-            tx_hash: res?.digest,
+            tx_hash: txHash,
             status: -100
           })
           ElNotification({ type: 'error', message: t('tradeFail') }) // this.$n({ type: 'danger', message: this.$t('tradeFail') })
@@ -2468,14 +2489,16 @@ async function submitTonSwap() {
     if (feeMsg) {
       transaction.push(feeMsg)
     }
+    let submittedHash = ''
     sendTonTransaction(transaction).then(res => {
       console.log('---confirm transaction---', res)
-      swapInfo.value.transaction = res.hash
+      submittedHash = resolveTxHash(res)
+      swapInfo.value.transaction = submittedHash
       recordTransaction({
         chain: 'ton',
         destination: 'wallet rpc',
         type: 10,
-        tx_hash: res.hash,
+        tx_hash: submittedHash,
         status: 1,
         wallet: walletStore.address,
         out_token: txInfo.to_address,
@@ -2484,7 +2507,7 @@ async function submitTonSwap() {
         in_amount: swapInfo.value.fromAmount
       })
       if (isSwap) {
-        txInfo.transaction = res.hash
+        txInfo.transaction = submittedHash
         // tx = {
         //   time: parseInt(Date.now() / 1000),
         //   id: txInfo.transaction,
@@ -2516,16 +2539,16 @@ async function submitTonSwap() {
       percentStepRef.value?.handleClick?.(0)
       // dialogVisibleSwap.value = false
       activeShow.value = 3
-      return res.wait()
+      return typeof res?.wait === 'function' ? res.wait() : res
     }).then(async res => {
       console.log('----transaction---', res)
       if (res) {
+        const txHash = resolveTxHash(res, submittedHash)
         updateTransaction({
           chain: 'ton',
-          tx_hash: res?.hash,
+          tx_hash: txHash,
           status: 100
         })
-        ElNotification({ type: 'success', message: t('tradeSuccess') })
         swapStore.getTokenDetails()
         swapStore.getUserTokenList()
         // let amountChange = await getTonTransactionTokenChange(res)
