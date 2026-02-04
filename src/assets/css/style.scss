@@ -416,3 +416,80 @@ debox-chat-widget {
   color:#12b8861a;
   color:#f6465d1a;
 }
+
+/* 交易提示 Message（ElMessage 轻量提示，顶部居中） */
+.transaction-prompt-message {
+  min-width: 200px;
+  max-width: 360px;
+  padding: 12px 16px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 8px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  background: var(--dialog-bg, #1a1a1a);
+
+  &.transaction-prompt-executing {
+    border-left: 3px solid var(--secondary-text, #80838b);
+  }
+
+  &.transaction-prompt-buy {
+    border-left: 3px solid var(--up-color, #12b886);
+  }
+
+  &.transaction-prompt-sell {
+    border-left: 3px solid var(--down-color, #f6465d);
+  }
+
+  &.transaction-prompt-order {
+    border-left: 3px solid var(--primary-color, #286dff);
+  }
+
+  .transaction-prompt {
+    min-width: 0;
+  }
+
+  .transaction-prompt__row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .transaction-prompt__label {
+    color: var(--secondary-text, #80838b);
+  }
+
+  .transaction-prompt__value {
+    color: var(--primary-text, #fff);
+  }
+
+  .transaction-prompt__success-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .transaction-prompt__link-wrap {
+    margin-top: 6px;
+  }
+
+  .transaction-prompt__link {
+    color: var(--primary-color, #286dff);
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .transaction-prompt__order-title {
+    margin-bottom: 4px;
+    color: var(--secondary-text, #80838b);
+  }
+
+  .transaction-prompt__order-detail {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .transaction-prompt__arrow {
+    color: var(--secondary-text, #80838b);
+  }
+}

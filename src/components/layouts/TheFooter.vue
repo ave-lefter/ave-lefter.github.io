@@ -516,7 +516,7 @@ function monitorToast(val: IMonitorWsResponse[]) {
       icon: <div></div>,
       showClose: true,
       placement: globalStore.audioSettings.notice.position as any,
-      customClass: `w-320px p-[15px_8px] border-transparent rounded-[8px] monitorToast ${globalStore.audioSettings.notice.monitorBorder && globalStore.audioSettings.notice.monitorShow === 1 && `${getIsBuy(item) ? 'border-[--up-color]!' : 'border-[--down-color]!'}`} ${globalStore.audioSettings.notice.monitorShow === 0 && 'border-[--dialog-tab-active-bg]!'} ${globalStore.audioSettings.notice.monitorShow === 1 && globalStore.audioSettings.notice.quickBuy && 'monitorToast2'}`,
+      customClass: `toast-card border-transparent monitorToast ${globalStore.audioSettings.notice.monitorBorder && globalStore.audioSettings.notice.monitorShow === 1 && `${getIsBuy(item) ? 'border-[--up-color]!' : 'border-[--down-color]!'}`} ${globalStore.audioSettings.notice.monitorShow === 0 && 'border-[--dialog-tab-active-bg]!'} ${globalStore.audioSettings.notice.monitorShow === 1 && globalStore.audioSettings.notice.quickBuy && 'monitorToast2'}`,
       message: () => (
         <div
           class="inline-flex items-center gap-4px text-12px cursor-pointer w-full"
@@ -691,6 +691,21 @@ const audioUrl = computed(() => {
 }
 </style>
 <style lang="scss">
+/* 与 KOL/监控 提示共用的卡片外壳，TransactionPromptSlot 与 monitorToast 复用 */
+.toast-card {
+  width: 320px;
+  padding: 15px 8px;
+  border-radius: 8px;
+}
+.toast-card--executing {
+  border-left: 3px solid var(--secondary-text, #80838b);
+}
+.toast-card--buy {
+  border-left: 3px solid var(--up-color, #12b886);
+}
+.toast-card--sell {
+  border-left: 3px solid var(--down-color, #f6465d);
+}
 .monitorToast2 {
   .el-icon.el-message__closeBtn {
     position: relative;
