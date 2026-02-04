@@ -45,7 +45,7 @@
             <el-input v-model.trim="form.followAddress" clearable :placeholder="$t('enterAddress')" />
           </el-form-item>
           <el-form-item :label="$t('chain')" label-position="top">
-            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.chain">
+            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.chain" :persistent="false">
               <template #prefix>
                 <ChainToken :chain="form.chain" :width="16" />
               </template>
@@ -73,7 +73,7 @@
                 @click.stop="form.buyType = item.id"
               >
                 <span>{{ item.name || '' }}</span>
-                <el-tooltip placement="top">
+                <el-tooltip placement="top" :persistent="false">
                   <template #content> <div v-html="item.tip"></div></template>
                   <Icon
                     name="majesticons:question-mark-circle-line"
@@ -133,7 +133,7 @@
             </div>
           </el-form-item>
           <el-form-item :label="$t('buyType')" label-position="top">
-            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.sellType">
+            <el-select style="width: 100%" :suffix-icon="SuffixIcon" v-model="form.sellType" :persistent="false">
               <el-option
                 v-for="(item, $index) in sellTypeList"
                 :key="$index"
@@ -620,7 +620,7 @@ watch(() => visible.value, (val) => {
       settingCopyTrade.value[form.value.chain] = JSON.parse(copy_setting_default)[form.value.chain]
       form.value.slippage = settingCopyTrade.value[form.value.chain]?.slippage || 9
       form.value.isPrivate = settingCopyTrade.value[form.value.chain]?.isPrivate || false
-      form.value.priorityFee = settingCopyTrade.value[form.value.chain]?.priorityFee || form.value.chain == 'solana' ? '0.04': '1'
+      form.value.priorityFee = settingCopyTrade.value[form.value.chain]?.priorityFee || form.value.chain == 'solana' ? '0.001' : '0.05'
     }
     const advancedForm_default = localStorage.getItem('copy-advancedForm')
     if (advancedForm_default && JSON.parse(advancedForm_default)) {
@@ -727,6 +727,7 @@ function createFollowOrder() {
       ([key, v]) =>  v && v !== ''
     )
   )
+  const priorityFee = form.value.priorityFee !== null ?form.value.priorityFee : form.value?.chain == 'solana' ? '0.001' : '0.05'
   let data = {
     ...filtered,
     tgUid: botStore?.userInfo?.tgUid || '',
@@ -741,9 +742,9 @@ function createFollowOrder() {
     stopLossRatio: Number(form.value.stopLossRatio) * 100,
     ignoreHeld: form.value.ignoreHeld,
 
-    slippage: form.value.slippage * 100, //滑点
+    slippage: (form.value.slippage || 9) * 100, //滑点
     isPrivate: form.value.isPrivate, //防夹
-    priorityFee: form.value.priorityFee || form.value?.chain == 'solana' ? '0.04': '1',
+    priorityFee: new BigNumber(priorityFee || 0).multipliedBy(10 ** 9!),
     tokenBlacklist: tokenBlacklist?.value?.filter(Boolean),
   }
   // ...(form.value?.id ? { id: form.value.id } : {}),

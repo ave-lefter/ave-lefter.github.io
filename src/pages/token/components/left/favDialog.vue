@@ -53,10 +53,12 @@ const Component = computed(() => {
 
 <template>
   <el-dialog
+    v-if="show"
     v-model="show"
     :title="t('editFav')"
     append-to-body
     width="800px"
+    destroy-on-close
     :class="`${theme} [--el-message-close-size:24px]`"
   >
     <div

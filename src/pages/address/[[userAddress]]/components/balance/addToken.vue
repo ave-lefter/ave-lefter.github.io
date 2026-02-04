@@ -92,8 +92,7 @@
           >
             {{ $t('remove') }}
           </a>
-          &nbsp;&nbsp;
-          <a type="primary" @click.stop="addCoin(row)" v-else>
+          <a v-else type="primary" @click.stop="addCoin(row)">
             {{ $t('add') }}
           </a>
         </template>
@@ -104,7 +103,7 @@
 <script>
 import { setUserTokenStatus } from '@/api'
 export default {
-  name: 'Table',
+  name: 'AddToken',
   data() {
     return {
       loading: false
@@ -112,7 +111,7 @@ export default {
   },
   computed: {
     userTokenListInit() {
-      let userTokenList = this.$store.state.userTokenList || []
+      const userTokenList = this.$store.state.userTokenList || []
       return userTokenList?.filter(i => i.amount > 0)
     }
   },

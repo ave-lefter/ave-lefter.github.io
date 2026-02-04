@@ -25,7 +25,7 @@
       <el-table v-infinite-scroll="getList" :data="list" header-cell-class-name="text-12px" style="width: 100%"
         :infinite-scroll-disabled="finished || loading" :infinite-scroll-distance="20" :infinite-scroll-delay="200">
         <template #empty>
-          <div v-if="isMine" class="flex flex-col items-center pt-60px">
+          <div v-if="isMine && query.keyword" class="flex flex-col items-center pt-60px">
             <Icon name="custom:twitter-empty" class="text-61px mb-12px color-[--icon-color]" />
             <span class="color-[--third-text] text-12px mb-20px mt-4px lh-12px">{{ t('twitterEmpty') }}</span>
             <el-button type="primary" class="text-12px w-266px h-40px" @click="clickToHot">
@@ -108,7 +108,7 @@
   </el-drawer>
 </template>
 <script setup name="twitterTrackerDrawer">
-import { useDebounceFn } from '@vueuse/core'
+import { useDebounceFn, useLocalStorage } from '@vueuse/core'
 import {
   followKol,
   getFollowKolList,
@@ -140,6 +140,7 @@ const loading = ref(false)
 const finished = ref(false)
 const list = ref([])
 const activeTab = ref(1)
+const followIds = useLocalStorage('twFollowIds', [])
 const TAB_TYPE = {
   HOT: 1,
   MINE: 2,
@@ -237,10 +238,15 @@ const updateStoreStatus = (author_id, status) => {
 
 const _followKol = async (author_id, index) => {
   try {
+    if (followIds.value.length >= 50) {
+      ElMessage.error(t('twitterMax'))
+      return
+    }
     await followKol(author_id)
     ElMessage.success(t('followed'))
     list.value[index].follow_status = 1
     updateStoreStatus(author_id, 1)
+    followIds.value = followIds.value.concat({ author_id })
   } catch (error) {
     ElMessage.error(t('failed'))
     console.error('Error following KOL:', error)
@@ -257,6 +263,7 @@ const _unfollowKol = async (author_id, index) => {
       list.value[index].follow_status = 0
     }
     updateStoreStatus(author_id, 0)
+    followIds.value = followIds.value.filter(el => el.author_id !== author_id)
   } catch (error) {
     ElMessage.error(t('failed'))
     console.error('Error unfollowing KOL:', error)
@@ -296,6 +303,7 @@ const deleteAll = () => {
     await unfollowAll()
     ElMessage.success(t('success'))
     list.value = []
+    followIds.value = []
   })
 }
 

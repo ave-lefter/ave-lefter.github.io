@@ -56,7 +56,7 @@ watch(popoverVisible,()=>{
 <template>
   <div class="flex items-center gap-2px">
     DEX
-    <el-popover v-model:visible="popoverVisible" trigger="click" :width="250" popper-class="[&&]:[--el-popover-padding:0]">
+    <el-popover v-model:visible="popoverVisible" trigger="click" :width="250" popper-class="[&&]:[--el-popover-padding:0]" :persistent="false">
         <template #reference>
             <Icon name="custom:filter" class="text-10px cursor-pointer"  :class="isFilterHighlight ? 'color-[--primary-color]' : ''"/>
         </template>

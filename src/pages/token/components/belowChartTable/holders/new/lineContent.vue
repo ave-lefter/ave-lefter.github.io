@@ -35,7 +35,7 @@
           </div>
           <div class="font-500 text-14px lh-16px tracking-0px color-[--main-text]">{{  HoldersAbove10Usd }}</div>
         </div>
-        <lineS  class="w-120px h-40px" :dataList="dataList3" :loading="loading2" :showSeries="[false, false]"  :showLeft="showLeft3" />
+        <lineS  class="w-120px h-40px" :dataList="dataList3" :loading="loading1" :showSeries="[false, false]"  :showLeft="showLeft3" />
       </li>
       <!-- <li class="flex-1"/>
       <li class="flex-1"/>
@@ -197,17 +197,17 @@ function init() {
   init2()
   isInitialized.value = true
 }
-onActivated(() => {
-  console.log('activated')
-  init()
-})
+// onActivated(() => {
+//   console.log('activated')
+//   init()
+// })
 
-onDeactivated(() => {
-  if(timer){
-    clearTimeout(timer)
-  }
-  isInitialized.value = false
-})
+// onDeactivated(() => {
+//   if(timer){
+//     clearTimeout(timer)
+//   }
+//   isInitialized.value = false
+// })
 onUnmounted(() => {
   if(timer){
     clearTimeout(timer)

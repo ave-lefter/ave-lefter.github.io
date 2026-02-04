@@ -119,6 +119,13 @@ function getTwitterById(tweet_id:string){
      })
 }
 
+function getAllFollowIds(){
+    const {$api}  = useNuxtApp()
+   return $api('/v2api/twitter/v1/kol/follow/ids', {
+       method: 'get',
+     })
+}
+
 export {
     getHotKolList,
     followKol,
@@ -127,5 +134,6 @@ export {
     getFollowKolList,
     getTwitterList,
     getKolFilters,
-    getTwitterById
+    getTwitterById,
+    getAllFollowIds
 }

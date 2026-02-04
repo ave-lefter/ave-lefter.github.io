@@ -45,6 +45,7 @@
           style="width: 100%"
           :teleported="false"
           :suffix-icon="SuffixIcon"
+          :persistent="false"
           @change="validateInput"
         >
           <template #prefix>
@@ -110,6 +111,7 @@
             v-model="selectedGroupId"
             size="large"
             class="chains-select !text-14px !mb-5px [&&]:[--el-fill-color-blank:--border]"
+            :persistent="false"
             @click.stop
           >
             <el-option :key="0" :value="0" :label="$t('defaultGroup')"/>
@@ -153,6 +155,7 @@
           size="large"
           style="width: 100%"
           :teleported="false"
+          :persistent="false"
           :suffix-icon="SuffixIcon"
         >
           <template #prefix>
@@ -212,6 +215,7 @@
           size="large"
           style="width: 100%"
           :teleported="false"
+          :persistent="false"
           :suffix-icon="SuffixIcon"
         >
           <template #prefix>

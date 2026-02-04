@@ -1,4 +1,4 @@
-// stores/theme.ts
+// stores/toke.ts
 import {useSessionStorage, useLocalStorage, useWindowSize} from '@vueuse/core'
 import { defineStore } from 'pinia'
 import type { TokenInfo, TokenInfoExtra } from '~/api/types/token'
@@ -83,7 +83,8 @@ export const useTokenStore = defineStore('token', () => {
   watch(price, val => {
     if (val) {
       if (route.fullPath?.includes?.('/token')) {
-        useHead({ title: '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave' })
+        // useHead({ title: '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave' })
+        document.title = '$' + formatNumber(val, 4) + ' ' + token.value?.symbol + ' | Ave'
       }
     }
   })
@@ -295,8 +296,10 @@ export const useTokenStore = defineStore('token', () => {
 
   function _getXType(id?: string) {
     getXType(id || route.params.id as string).then(res => {
-      twitterType.value = res.type || 0
-      console.log('twitterType', twitterType.value)
+      if (typeof res.type === 'number') {
+        twitterType.value = res.type
+      }
+      console.log('twitterType',res,twitterType.value)
     }).catch(() => {
       twitterType.value = 0
     })

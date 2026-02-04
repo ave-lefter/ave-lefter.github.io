@@ -16,15 +16,17 @@ export interface PumpConfig {
 }
 
 export interface PumpObj {
-  dev_migrated_count: number
-  dev_migrated_ratio: number
-  dev_total_count: number
-  dev_age_seconds: any
-  dev_first_transfer_in_from: string
-  dev_first_transfer_in_from_label: any
-  first_transfer_in_from_label: string | undefined
-  age_seconds: any
-  first_transfer_in_from: any
+  buy_tax: any
+  sell_tax: any
+  dev_migrated_count?: number
+  dev_migrated_ratio?: number
+  dev_total_count?: number
+  dev_age_seconds?: any
+  dev_first_transfer_in_from?: string
+  dev_first_transfer_in_from_label?: any
+  first_transfer_in_from_label?: string | undefined
+  age_seconds?: any
+  first_transfer_in_from?: any
   smart_wallet_ratio: number
   kol_ratio: number
   max_dev_ratio: number
@@ -148,7 +150,7 @@ export interface WSPumpObj {
 }
 export type WSPump = WSPumpObj & Pair
 
-export type ChainKey = 'solana' | 'bsc' | 'xlayer' | 'monad'
+export type ChainKey = 'solana' | 'bsc' | 'xlayer' | 'monad' | 'base'
 export type CategoryKey = 'new' | 'soon' | 'graduated'
 
 export type pumpBlack = {

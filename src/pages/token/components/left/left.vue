@@ -40,7 +40,7 @@ function drag(e: MouseEvent) {
 </script>
 
 <template>
-  <div v-show="globalStore.showLeft">
+  <div v-if="globalStore.showLeft">
     <div class="relative">
       <TopLeftTable :height="topLeftHeight"/>
       <div

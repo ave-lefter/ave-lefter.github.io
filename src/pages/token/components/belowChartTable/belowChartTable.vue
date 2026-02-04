@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Transactions from './transactions/transactions.vue'
 import OrdersTab from './orders/index.vue'
-import DevTokens from './devTokens/index.vue'
 import OneClick from '../right/botSwap/oneClick.vue'
 import OrderBookButton from '../right/botSwap/orderBookButton.vue'
 import Bubble from './holders/new/bubble.vue'
@@ -26,7 +25,7 @@ const components = {
   Attention: defineAsyncComponent(() => import('./attention/index.vue')),
   Orders: OrdersTab,
   MySwap: defineAsyncComponent(() => import('./mySwap/index.vue')),
-  DevTokens: DevTokens,
+  DevTokens: defineAsyncComponent(() => import('./devTokens/index.vue')),
 }
 const tabs = computed(() => {
   return [
@@ -177,13 +176,15 @@ onUnmounted(() => {
         <div v-if="item.component == 'Orders'" class="w-1px h-20px bg-[var(--custom-br-1-color)] mr-20px mb-8px"/>
         <div
           :class="`b-b-solid b-b-2px pb-8px flex-start ${activeTab === item.component ? ' b-b-[--main-text]' : 'b-b-transparent'}`">
-          <strong v-if="item.component !== 'DevTokens' || tokenStore.devTokenNum">{{ item.name }}</strong>
+          <strong v-if="item.component !== 'DevTokens' || tokenStore.tokenInfoExtra?.dev_count">{{ item.name }}</strong>
           <span v-if="item.component === 'Orders'">({{ tokenStore.registrationNum }})</span>
           <span v-if="item.component === 'LP'" class="flex-start">
             ({{ pairHolders }})
              <Icon v-if="pairHolders" color="#B3920E" name="material-symbols:lock" />
           </span>
-          <span v-if="item.component === 'DevTokens' && tokenStore.devTokenNum">({{ tokenStore.devTokenNum }})</span>
+          <span v-if="item.component === 'DevTokens' && tokenStore.tokenInfoExtra?.dev_count">({{
+            tokenStore.tokenInfoExtra?.dev_count
+          }})</span>
           <span v-if="item.component == 'Holders' && holders">
             ({{ token?.holders ? formatNumber(token?.holders || 0, {limit: 10}) : '' }})
               <template v-if="isInsiderOrSniperSupported && (tokenInfoExtra?.insiders_balance_ratio_cur??0) > 0.01">
@@ -204,10 +205,15 @@ onUnmounted(() => {
       <Bubble />
     </div>
     <OrdersTab v-show="activeTab === 'Orders'" :currentActiveTab="activeTab"/>
-    <DevTokens v-show="activeTab === 'DevTokens'"/>
-    <KeepAlive v-if="activeTab !== 'Orders' && activeTab !== 'DevTokens' && route.name === 'token-id'">
-      <component :is="Component" v-bind="comProps" :currentActiveTab="activeTab" />
-    </KeepAlive>
+    <!-- <DevTokens v-show="activeTab === 'DevTokens'"/> -->
+    <!-- Removed KeepAlive: render the dynamic component directly and keep a ref to access its instance/lifecycle -->
+    <component
+      :is="Component"
+v-if="(activeTab !== 'Orders') && route.name === 'token-id'"
+      v-bind="comProps"
+      ref="activeChild"
+:currentActiveTab="activeTab"
+    />
   </div>
 </template>
 

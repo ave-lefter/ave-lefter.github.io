@@ -3,6 +3,7 @@ import { getXType, getXContent } from '@/api/x'
 
 export function useXPopup() {
   const { $createTooltip } = useNuxtApp()
+  const router = useRouter()
 
   const $tooltip = $createTooltip('x--tooltip')
 
@@ -16,6 +17,12 @@ export function useXPopup() {
     loading: false
   })
 
+  watch(
+    () => router.currentRoute.value.fullPath,
+    () => {
+      $tooltip.hide()
+    }
+  )
   function onEnter(tokenId: string, e: { target: any }, type?: 1 | 2 | 3, isGetData = true) {
     if (isGetData) {
       getXData(tokenId, type)

@@ -12,6 +12,7 @@
       v-model="visible"
       :title="t('blackManage')"
       width="540px"
+      destroy-on-close
       @close="closeDialog"
 
     >

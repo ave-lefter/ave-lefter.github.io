@@ -45,6 +45,7 @@
         :style="{ width: '120px' }"
         :suffix-icon="SuffixIcon"
         v-model="selectChain"
+        :persistent="false"
         @change="change"
       >
         <template #prefix>

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="visible" append-to-body width="722px">
+  <el-dialog v-model="visible" append-to-body width="722px" destroy-on-close>
     <template #header>
       <div class="text-14px lh-20px color-[--main-text]">
         {{ t('pnlCalendar') }}

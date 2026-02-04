@@ -1,9 +1,11 @@
 <template>
   <el-drawer
+    v-if="visible"
     v-model="visible"
     append-to-body
     :with-header="false"
     :size="480"
+    destroy-on-close
     class="draw-right"
   >
     <div class="pop-right bg-[--dialog-bg] color-[--main-text] h-100vh px-20px">
@@ -31,7 +33,7 @@
                   formatNumber(rugPull?.all_tag_rate || 0, 1)
                 }}%
               </span>
-              <el-tooltip popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!" placement="top">
+              <el-tooltip popper-class="[&&]:[--el-text-color-primary:--dialog-list-hover]!" placement="top" :persistent="false">
                 <template #content>{{ $t('abnormalChipsTip') }}</template>
                 <Icon
                   class="text-14px ml-5px color-[--secondary-text] cursor-pointer"

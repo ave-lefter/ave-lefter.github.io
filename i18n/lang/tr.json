@@ -596,5 +596,7 @@
   "noticeDuration": "Bildirim görüntüleme süresi",
   "monitorThTip": "En az bir cüzdan avatarı ve cüzdan adresi seçin",
   "wcWalletTip": "Bu QR Kodunu telefonunuzla tarayın",
-  "monitorBotError": "İzleme robotu adresi desteklenmiyor"
+  "monitorBotError": "İzleme robotu adresi desteklenmiyor",
+  "hideLiq": "Havuz bilgilerini gizlemek için tıklayın",
+  "showLiq": "Havuz bilgilerini görüntülemek için tıklayın"
 }

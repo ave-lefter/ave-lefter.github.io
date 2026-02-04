@@ -682,6 +682,7 @@
         :popper-class="mode"
         effect="customized"
         :virtual-ref="buttonTagRef"
+        :persistent="false"
         virtual-triggering
       />
     <el-popover

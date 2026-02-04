@@ -159,13 +159,13 @@ watch(() => walletStore.address, (newVal) => {
 // 监听 WebSocket 价格更新
 watch(() => wsStore.wsResult[WSEventType.PRICEV2], (priceData) => {
   if (!priceData?.prices || !tableList.value.length) return
-  
+
   // 更新表格数据中的价格信息
   tableList.value = tableList.value.map(token => {
-    const priceUpdate = priceData.prices.find((p: any) => 
+    const priceUpdate = priceData.prices.find((p: any) =>
       p.token === token.token && p.chain === token.chain
     )
-    
+
     if (priceUpdate) {
       const newPrice = priceUpdate.uprice
       return {
@@ -364,7 +364,7 @@ const getList = async () => {
     []
   pageData.value.total = res.total
   tableList.value = tableData
-  
+
   // 设置价格订阅
   const tokenIds = tableData.map(item => item.id)
   if(sortParam.prop&&sortParam.order){
@@ -372,7 +372,7 @@ const getList = async () => {
   }
   priceV2Store.setMultiPriceParams('favorite', tokenIds)
   priceV2Store.sendPriceWs()
-  
+
   loading.value = false
 }
 
@@ -666,7 +666,7 @@ onBeforeUnmount(() => {
         <el-table-column :label="t('tokenGroup')" align="right" width="170">
           <template #default="{ row }">
             <el-select v-model="row.group_id" placement="bottom-end" style="width: 100px;"
-              popper-class="follow-select-popper" filterable class="[&&]:[--el-text-color-regular:var(--secondary-text)] [&&]:[--el-input-icon-color:var(--secondary-text)]"
+              popper-class="follow-select-popper" filterable :persistent="false" class="[&&]:[--el-text-color-regular:var(--secondary-text)] [&&]:[--el-input-icon-color:var(--secondary-text)]"
               @click.stop @change="(val) => getRowGroupChange(val, row)">
               <el-option v-for="item in allTabsGroup" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>

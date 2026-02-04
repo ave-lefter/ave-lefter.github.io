@@ -402,7 +402,7 @@ function toggleMode(mode: string) {
               }" />
               <div class="flex flex-col items-start">
                 <span class="text-12px flex items-center">
-                  {{ row.symbol }}
+                  <span class="ellipsis">{{ row.symbol }}</span>
                   <img
                     v-if="row.issue_platform"
                     v-tooltip="row.issue_platform"

@@ -96,7 +96,7 @@ async function beforeSubmitSwap() {
     loadingSwap.value = false
     return
   }
-  if (new BigNumber(amount || 0).gt(fromToken?.balance || 0)) {
+  if (new BigNumber(amount || 0).gt(fromToken?.balance || 0) && fromToken?.balance !== undefined) {
     ElNotification({title: 'Error', type: 'error', message: t('insufficientBalance')})
     loadingSwap.value = false
     return
@@ -240,18 +240,20 @@ async function getTokenBalance(chain: string) {
     }
     return
   }
-  const res = await bot_getTokenBalance({
-    chain,
-    tokens: [getNativeToken(chain)],
-    walletAddress
-  })
-  token = res?.[0] || {}
-  nativeToken.value = {
-    ...token,
-    symbol: getChainInfo(chain)?.main_name,
-    chain,
-    address: token.token || token.address,
-    decimals: token.decimals || token.decimal
+  if (walletStore.address && !botStore.evmAddress) {
+    const res = await bot_getTokenBalance({
+      chain,
+      tokens: [getNativeToken(chain)],
+      walletAddress
+    })
+    token = res?.[0] || {}
+    nativeToken.value = {
+      ...token,
+      symbol: getChainInfo(chain)?.main_name,
+      chain,
+      address: token.token || token.address,
+      decimals: token.decimals || token.decimal
+    }
   }
 }
 </script>
@@ -279,7 +281,7 @@ async function getTokenBalance(chain: string) {
   </el-button>
   <el-dialog
     v-if="visible" v-model="visible" :title="$t('buy')"
-    width="400px" :append-to="appendTo"
+    width="400px" :append-to="appendTo" destroy-on-close
   >
     <template #header>
       <span class="text-20px">{{ $t('buy') }}</span>

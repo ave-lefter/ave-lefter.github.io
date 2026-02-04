@@ -57,6 +57,7 @@
       append-to-body
       :close-on-click-modal="false"
       :show-close="false"
+      destroy-on-close
     >
       <template #header>
         <div class="flex-between">
@@ -180,6 +181,13 @@ watch(
 onMounted(() => {
   getMultiWalletsAllChain()
   if (timer) clearInterval(timer)
+})
+
+onBeforeUnmount(() => {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
 })
 // const throttledFn = useThrottleFn(() => {
 // loadingThrottledFn.value = true

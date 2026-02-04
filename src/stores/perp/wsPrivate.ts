@@ -24,6 +24,10 @@ function getWSMessage(e: MessageEvent): {
 
 const UPDATE_EVENTS = ['ORDER_UPDATE', 'WITHDRAW_UPDATE', 'DEPOSIT_UPDATE', 'TRANSFER_IN_UPDATE', 'TRANSFER_OUT_UPDATE', 'ACCOUNT_UPDATE']
 
+/** 模块级单例：同一 accountId 复用同一 WS，避免路由/Store 重初始化时重复创建 */
+let globalPerpWsPrivateSingleton: WS | null = null
+let globalPerpWsPrivateAccountId: string | null = null
+
 export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
   // 使用 shallowRef 代替 ref，WebSocket 本身是非响应式的
   const wsInstance = shallowRef<WS | null>(null)
@@ -70,13 +74,23 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
   // 将 createWebSocket 重命名为 init
   const init = (options?: WSOptions) => {
     if (wsInstance.value) return  // 防止重复创建 WebSocket 实例
-    // ?timestamp=${Date.now()}
-    if (!perpStore.userInfo?.id) {
+    const accountId = perpStore.userInfo?.id || ''
+    if (!accountId) return
+    if (globalPerpWsPrivateSingleton && globalPerpWsPrivateAccountId === accountId) {
+      wsInstance.value = globalPerpWsPrivateSingleton
       return
     }
-    wsInstance.value = new WS({...getWSURLAndHeaders(), pingMsg: `{"type":"ping","time":"${Date.now()}"}`, ...(options || {})})
+    if (globalPerpWsPrivateSingleton) {
+      globalPerpWsPrivateSingleton.close()
+      globalPerpWsPrivateSingleton = null
+      globalPerpWsPrivateAccountId = null
+    }
+    const newWs = new WS({...getWSURLAndHeaders(), pingMsg: `{"type":"ping","time":"${Date.now()}"}`, ...(options || {})})
+    globalPerpWsPrivateSingleton = newWs
+    globalPerpWsPrivateAccountId = accountId
+    wsInstance.value = newWs
 
-    wsInstance.value.onopen(() => {
+    newWs.onopen(() => {
       isConnected.value = true
     }).onclose(() => {
       isConnected.value = false
@@ -221,6 +235,10 @@ export const usePerpWsPrivateStore = defineStore('perpWsPrivate', () => {
     isConnected.value = false
     wsInstance.value?.close()
     wsInstance.value = null
+    if (globalPerpWsPrivateSingleton) {
+      globalPerpWsPrivateSingleton = null
+      globalPerpWsPrivateAccountId = null
+    }
   }
 
   function updateCollateralInfo(collateral: Collateral[]) {

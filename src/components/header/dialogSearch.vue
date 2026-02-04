@@ -61,7 +61,7 @@
           :key="item.id"
           class="tab-button clickable-btn px-0 mr-24px"
           :class="{ active: tabActive === item.id }"
-          @click="tabActive = item.id"
+          @click.stop="tabActive = item.id"
         >
           {{ item.name }}
         </button>
