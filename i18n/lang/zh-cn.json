@@ -1461,6 +1461,8 @@
   "tweetSearchContractAddress": "推特搜索合约地址",
   "tweetSearchContractAddress2": "推特搜索代币名称",
   "tweetSearchContractAddress3": "推特搜索名称及合约",
+  "TikTokSearchName": "Tik Tok搜索名称",
+  "GoogleSearchName": "谷歌搜索名称",
   "trendChart": "走势图",
   "dexSelect": "Dex选择",
   "intervalSelect": "时间选择",
