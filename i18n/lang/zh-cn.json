@@ -1976,7 +1976,7 @@
   "invitedUser": "邀请用户",
   "chainWallet3": "链钱包",
   "monitorBotError": "不支持监控机器人地址",
-  "twitterMax":"推特监控账号数量上限为 50 个",
+  "twitterMax": "推特监控账号数量上限为 50 个",
   "markersBuy": "总买入钱包数",
   "markersSell": "总卖出钱包数",
   "liqTip": "池子数和底池大小",
@@ -1996,5 +1996,6 @@
   "follows": "粉丝",
   "joined": "加入时间",
   "hideLiq": "点击隐藏池子信息",
-  "showLiq": "点击显示池子信息"
+  "showLiq": "点击显示池子信息",
+  "commission": "分佣"
 }
