@@ -9,7 +9,7 @@
       >
         <!-- 左侧头像 -->
         <div class="transaction-prompt-slot__avatar">
-          <UserAvatar :address="walletStore.address" :chain="walletStore.chain" iconSize="22px" />
+          <UserAvatar :address="state.avatarAddress || walletStore.address" :chain="state.avatarChain || walletStore.chain" iconSize="22px" />
         </div>
         <!-- 中间主文案 -->
         <div class="transaction-prompt-slot__body">
