@@ -266,11 +266,11 @@
                   {{ row?.username }}
                 </template>
               </el-table-column>
-              <el-table-column prop="name" :label="$t('commission')">
+              <!-- <el-table-column prop="name" :label="$t('commission')">
                 <template #default="{ row }">
                   ${{ formatNumber(row?.refFee || '0', 2) }}
                 </template>
-              </el-table-column>
+              </el-table-column> -->
               <el-table-column prop="level" :label="$t('vipLevel')" align="right">
                 <template #default="{ row }">
                   {{ row?.vip || $t('ordinary') }}
