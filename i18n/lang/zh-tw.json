@@ -1965,7 +1965,7 @@
   "smarterRatio": "聰明錢占比",
   "devWallet": "DEV錢包",
   "monitorBotError": "不支持監控機器人地址",
-  "twitterMax":"推特監控帳號數量上限為 50 個",
+  "twitterMax": "推特監控帳號數量上限為 50 個",
   "markersBuy": "總買入錢包數",
   "markersSell": "總賣出錢包數",
   "liqTip": "池子数和底池大小",
@@ -1979,5 +1979,6 @@
   "follows": "粉絲",
   "joined": "加入時間",
   "hideLiq": "點擊隱藏池子信息",
-  "showLiq": "點擊顯示池子信息"
+  "showLiq": "點擊顯示池子信息",
+  "commission": "分傭"
 }

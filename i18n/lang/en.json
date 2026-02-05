@@ -1995,5 +1995,6 @@
   "joined": "Joined",
   "hideLiq": "Click to hide pool information",
   "showLiq": "Click to display pool information",
-  "filter": "Filter"
+  "filter": "Filter",
+  "commission": "Commission"
 }
