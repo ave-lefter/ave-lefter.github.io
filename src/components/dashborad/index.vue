@@ -79,7 +79,7 @@
           </span>
         </div>
       </div>
-      <div class="progress-bar relative h-8px rounded-4px overflow-hidden bg-[--main-bg]">
+      <div class="progress-bar relative h-4px rounded-4px overflow-hidden bg-[--main-bg]">
         <div class="absolute left-0 top-0 h-full bg-[--up-color]" :style="`width: ${getBuySellRatio().buyWidth}%`">
         </div>
         <div class="absolute right-0 top-0 h-full bg-[--down-color]" :style="`width: ${getBuySellRatio().sellWidth}%`">
