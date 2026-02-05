@@ -115,6 +115,7 @@
       v-model="dialogVisible"
       width="500"
       :class="[theme]"
+      :centered="true"
       append-to-body
       :close-on-click-modal="false"
       :popper-style="{ padding: '20px', 'border-radius': '8px' }"
@@ -128,7 +129,7 @@
             name="material-symbols-light:close"
             class="text-30px cursor-pointer"
             @click.stop.prevent="dialogVisible = false"
-/>
+        />
         </div>
       </template>
       <div class="w-480px flex flex-col items-center justify-center mb-20px">
@@ -141,9 +142,52 @@
         <span class="mt-26px color-[--main-text] text-14px block">{{ currentObj?.address }}</span>
       </div>
     </el-dialog>
+    <!-- 谷歌验证码对话框 -->
+    <el-dialog
+      v-model="googleAuthVisible"
+      width="480"
+      align-center
+      :close-on-click-modal="false"
+      :show-close="false"
+      destroy-on-close
+      append-to-body
+    >
+      <template #header>
+        <div class="flex-between">
+          <span class="text-20px font-500">{{ $t('DbCheckTitle2') }}</span>
+          <Icon
+            name="material-symbols-light:close"
+            class="text-30px cursor-pointer"
+            @click.stop.prevent="googleAuthVisible = false"
+          />
+        </div>
+      </template>
+      <div class="flex flex-col items-start">
+        <div class="text-14px color-[--secondary-text] mb-16px">
+          {{ $t('authCode') }}
+        </div>
+        <el-input
+          v-model="googleAuthCode"
+          :placeholder="$t('authCodeError')"
+          autofocus
+          maxlength="6"
+          class="mb-24px"
+          size="large"
+          @keyup.enter="submitGoogleAuth"
+        />
+        <el-button
+          type="primary"
+          size="large"
+          class="w-full"
+          @click="submitGoogleAuth"
+        >
+          {{ $t('confirm') }}
+        </el-button>
+      </div>
+    </el-dialog>
     <el-popover
       v-model:visible="showPop"
-:persistent="false"
+      :persistent="false"
       :virtual-ref="$refs.currentBtnRef[currentIndex]"
       virtual-triggering
       trigger="contextmenu"
@@ -219,6 +263,9 @@ const { t } = useI18n()
 const router = useRouter()
 const { evmAddress } = storeToRefs(useBotStore())
 const dialogVisible = shallowRef(false)
+const googleAuthVisible = ref(false)
+const googleAuthCode = ref('')
+const currentWallet = ref<Wallet | null>(null)
 const currentObj = ref<Address | null>(null)
 const showPop = shallowRef(false)
 const currentIndex = shallowRef(0)
@@ -256,16 +303,36 @@ function confirmRemoveWallet(item: Wallet) {
     customClass: `${mode.value} delete_confirm`,
   })
     .then(() => {
-      const evmAddress = item.balancesInfo?.filter((i) => i.chain == 'bsc')?.[0]?.address || ''
-      _removeWallet(evmAddress).then(() => {
-        ElMessage.success(t('success'))
-        emit('refresh')
-        getUserInfo()
-      })
+      // 显示谷歌验证码输入对话框
+      showGoogleAuthDialog(item)
     })
     .catch((err) => {
       console.log('--------err-------', err)
     })
+}
+
+function showGoogleAuthDialog(item: Wallet) {
+  googleAuthVisible.value = true
+  googleAuthCode.value = ''
+  currentWallet.value = item
+}
+
+function submitGoogleAuth() {
+  if (!googleAuthCode.value || googleAuthCode.value.length !== 6) {
+    ElMessage.error(t('authCodeError'))
+    return
+  }
+
+  const evmAddress = currentWallet.value?.balancesInfo?.filter((i) => i.chain == 'bsc')?.[0]?.address || ''
+  _removeWallet(evmAddress, googleAuthCode.value).then(() => {
+    ElMessage.success(t('success'))
+    googleAuthVisible.value = false
+    googleAuthCode.value = ''
+    emit('refresh')
+    getUserInfo()
+  }).catch((err) => {
+    ElMessage.error(err?.message || t('fail'))
+  })
 }
 
 function deposit(item: Address) {
