@@ -370,6 +370,8 @@ watch(() => klineDateFilter?.value, (val) => {
 watch(() => tokenStore.pairAddress, (pair, oldPair) => {
   console.log('watch pair', pair, oldPair)
   if (tokenStore.pairAddress) {
+    tableFilter.value.tag_type = 'all'
+    activeTab.value = 'all'
     listStatus.value.loadingTxs1 = true
     resetCache()
     _getPairLiq()
@@ -872,15 +874,17 @@ function goBrowser(row: IGetSimpleTxsResponse) {
 
 const tabsContainer = ref<HTMLElement | null>(null)
 function setActiveTab(val: string,index:number) {
+  if(val===activeTab.value) return 
   activeTab.value = val
   // if (val === '-100' && !followStore.currentAddress) {
   //   return
   // }
-  txCount.value = {}
   tableFilter.value.tag_type = val
   if (val !== 'liquidity') {
+    listStatus.value.loadingTxs1 = true
     filterSubmit()
   } else {
+    listStatus.value.loadingLiq = true
     _getPairLiq()
   }
   scrollTabToCenter(tabsContainer,index)
