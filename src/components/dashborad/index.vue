@@ -32,11 +32,11 @@
             <svg width="12" height="14" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M0 6H2.4V11.4H0V6ZM8.4 3.6H10.8V11.4H8.4V3.6ZM4.2 0H6.6V11.4H4.2V0Z" fill="var(--main-text)" />
             </svg>
-            <span class="text-18px font-600 color-[--main-text]">
+            <span class="text-16px font-600 color-[--main-text]">
               {{ currentTimeData ? formatNumberS(currentTimeData.order_cnt || '0') : '0' }}
             </span>
           </div>
-          <span v-if="currentTimeData" class="text-12px"
+          <span v-if="currentTimeData" class="text-14px"
             :class="getChangeClass(currentTimeData.order_cnt_period || '0')">
             {{ getChangeText(currentTimeData.order_cnt_period || '0') }}
           </span>
@@ -51,11 +51,11 @@
                 d="M5.59998 3.8H7.39998V9.2H5.59998V11H4.39998V9.2H2.59998V3.8H4.39998V2H5.59998V3.8ZM11.6 6.8H13.4V12.2H11.6V14H10.4V12.2H8.59998V6.8H10.4V5H11.6V6.8Z"
                 fill="var(--main-text)" />
             </svg>
-            <span class="text-18px font-600 color-[--main-text]">
+            <span class="text-16px font-600 color-[--main-text]">
               {{ currentTimeData ? formatNumberS(currentTimeData.trader_cnt || '0') : '0' }}
             </span>
           </div>
-          <span v-if="currentTimeData" class="text-12px"
+          <span v-if="currentTimeData" class="text-14px"
             :class="getChangeClass(currentTimeData.trader_cnt_period || '0')">
             {{ getChangeText(currentTimeData.trader_cnt_period || '0') }}
           </span>
@@ -67,25 +67,25 @@
     <div class="volume-bar mb-14px">
       <div class="flex items-center justify-between mb-8px text-12px">
         <span class="color-[--secondary-text]">{{ t('24hVolume') }}</span>
-        <div class="flex items-center gap-4px">
-          <span class="color-[--main-text] font-600">
+        <div class="flex items-center gap-4px text-[14px] ">
+          <span class="color-[--main-text] text-14px font-600">
             {{ currentTimeData ? formatNumberS((parseFloat(currentTimeData.buy_volume || '0') +
               parseFloat(currentTimeData.sell_volume || '0')).toString()) : '$0' }}
           </span>
-          <span v-if="currentTimeData" class="text-12px"
+          <span v-if="currentTimeData" class="text-14px"
             :class="getChangeClass(getAverageChange(currentTimeData.buy_volume_period || '0', currentTimeData.sell_volume_period || '0'))">
             {{ getChangeText(getAverageChange(currentTimeData.buy_volume_period || '0',
               currentTimeData.sell_volume_period || '0')) }}
           </span>
         </div>
       </div>
-      <div class="progress-bar relative h-4px rounded-4px overflow-hidden bg-[--main-bg]">
+      <div class="progress-bar relative h-4px rounded-4px overflow-hidden bg-[--main-bg] text-[14px] ">
         <div class="absolute left-0 top-0 h-full bg-[--up-color]" :style="`width: ${getBuySellRatio().buyWidth}%`">
         </div>
         <div class="absolute right-0 top-0 h-full bg-[--down-color]" :style="`width: ${getBuySellRatio().sellWidth}%`">
         </div>
       </div>
-      <div class="flex items-center justify-between mt-4px text-12px">
+      <div class="flex items-center justify-between mt-4px text-14px">
         <span class="color-[--up-color]">
           {{ currentTimeData ? formatNumberS(currentTimeData.buy_cnt || '0') + ' / ' +
             formatNumberS(currentTimeData.buy_volume || '0', 2) : '0 / $0' }}
@@ -113,11 +113,11 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-4px">
               <Icon name="mdi:rocket-launch" class="text-16px color-[--main-text]" />
-              <span class="text-16px font-600 color-[--main-text]">
+              <span class="text-14px font-600 color-[--main-text]">
                 {{ currentTimeData ? formatNumberS(currentTimeData.new_pair || '0') : '0' }}
               </span>
             </div>
-            <span v-if="currentTimeData" class="text-12px"
+            <span v-if="currentTimeData" class="text-14px"
               :class="getChangeClass(currentTimeData.new_pair_period || '0')">
               {{ getChangeText(currentTimeData.new_pair_period || '0') }}
             </span>
