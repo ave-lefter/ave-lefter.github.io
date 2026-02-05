@@ -101,7 +101,7 @@ export const useCopyTradeStore = defineStore('copyTrade', () => {
       }
     } catch (err) {
       console.log('_getFollowingInfo', err)
-      throw err // 👈 需要外层感知失败就保留
+     // throw err // 👈 需要外层感知失败就保留
     } finally {
       copyOrderLoading.value = false
     }
