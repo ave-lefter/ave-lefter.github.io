@@ -199,8 +199,14 @@
                   <a :href="`https://x.com/search?q=$${token?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
                     {{ $t('tweetSearchContractAddress2') }}
                   </a>
-                  <a :href="`https://www.google.com/search?q=${token?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                  <!-- <a :href="`https://www.google.com/search?q=${token?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
                     {{ $t('tweetSearchContractAddress3') }}
+                  </a> -->
+                  <a :href="`https://www.tiktok.com/search?q=${token?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                    {{ $t('TikTokSearchName') }}
+                  </a>
+                  <a :href="`https://www.google.com/search?q=${token?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                    {{ $t('GoogleSearchName') }}
                   </a>
                   <span class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer" @click="handleSearchTokenName">{{ $t('tweetSearchContractAddress4') }}</span>
                 </div>

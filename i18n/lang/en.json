@@ -1462,6 +1462,8 @@
   "tweetSearchContractAddress": "Search contract address",
   "tweetSearchContractAddress2": "Search token name",
   "tweetSearchContractAddress3": "Search name and contract",
+  "TikTokSearchName": "Search Tik Tok name",
+  "GoogleSearchName": "Search google name",
   "trendChart": "Trend Chart",
   "dexSelect": "Dex Select",
   "intervalSelect": "Interval Select",
