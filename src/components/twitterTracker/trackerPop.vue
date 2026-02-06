@@ -246,7 +246,7 @@ const debouncedGetList = useDebounceFn(getList, 100)
 getList()
 
 const twitterHandler = async (val) => {
-  if (query.value.types.includes(+val.type)) {
+  if (query.value.types.includes(+val.type) && !query.value.token_keyword) {
     if (isMine.value && !followAuthorIds.value.includes(val.author_id)) {
       return
     }

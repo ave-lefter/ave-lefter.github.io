@@ -53,7 +53,7 @@
                     </div>
                 </div>
             </div>
-            <div class="relative" :class="index !== -1 ? 'ml-40px' : ''">
+            <div v-show="+props.item.type!==typeEnum.retweet" class="relative" :class="index !== -1 ? 'ml-40px' : ''">
                 <div ref="contentEl" :class="[
                     'text-14px lh-22px break-words',
                     { 'line-11': !contentExpanded && isContentOverflow }
@@ -116,10 +116,12 @@
                         @click="clickVideo(item.url)" />
                 </div> -->
             </div>
-            <div :class="index !== -1 ? 'ml-40px' : ''"
+            <div v-if="+props.item.type!==typeEnum.retweet" :class="index !== -1 ? 'ml-40px' : ''"
                 class="justify-between items-center flex">
-                <div class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]" @click="translationVisible=!translationVisible">
-                    <Icon name="custom:translation" />{{ t(translationVisible ? 'viewOrigin':'viewTranslation') }}
+                <div v-show="showTranslation" class="flex items-center gap-4px cursor-pointer text-12px color-[--secondary-text]" @click="translationVisible=!translationVisible">
+                    <template v-if="props.item.content">
+                        <Icon name="custom:translation" />{{ t(translationVisible ? 'viewOrigin':'viewTranslation') }}
+                    </template>
                 </div>
                 <span v-if="isContentOverflow" class="flex items-center gap-4px cursor-pointer color-[--primary-color] text-12px"
                     @click="contentExpanded = !contentExpanded">
@@ -135,7 +137,7 @@ import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { followKol, unfollowKol } from '~/api/twitter'
 import { processTwitterText } from '~/utils'
-import { useTrackerTypes } from './constants'
+import { typeEnum, useTrackerTypes } from './constants'
 
 const emits = defineEmits(['measureElement'])
 const trackerStore = useTwitterTrackerStore()
@@ -162,6 +164,12 @@ const isContentOverflow = ref(false)
 const followIds = useStorage('twFollowIds', [])
 const translationVisible = ref(false)
 
+const showTranslation = computed(() => {
+    const {lang} = props.item || {}
+    const key = lang === 'en' ? 'content_zh' : 'content_en'
+    return props.item?.[key] && 
+        props.item?.[key] !== props.item.content
+})
 // 处理后的内容，包含可点击的链接
 const processedContent = computed(() => {
     const {lang} = props.item || {}
@@ -170,7 +178,7 @@ const processedContent = computed(() => {
         key = lang === 'en' ? 'content_zh' : 'content_en'
     }
     const content = props.item?.[key]
-    return processTwitterText(content || '')
+    return processTwitterText(content || props.item.content)
 })
 
 const checkContentOverflow = () => {
@@ -248,10 +256,6 @@ const _unfollowKol = async (author_id, index) => {
         ElMessage.error(t('failed'))
         console.error('Error unfollowing KOL:', error)
     }
-}
-
-const clickVideo = (url) => {
-    window.open(url)
 }
 
 const handleTooltipShow = (mediaIndex) => {

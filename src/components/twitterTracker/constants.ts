@@ -1,4 +1,4 @@
-const typeEnum={
+export const typeEnum={
     tweet: 1,
     retweet: 3,
     quote: 2,
