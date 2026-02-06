@@ -42,6 +42,18 @@
           {{ t('twitterTracker') }}
         </div>
       </el-badge>
+      <el-popover popper-style="padding: 0;border-radius: 8px;" width="auto" placement="top" :teleported="false" trigger="hover">
+        <template #reference>
+          <div
+            class="flex items-center gap-4px cursor-pointer hover:color-[--main-text] ml-12px"
+            :class="'color-[--secondary-text]'"
+          >
+            <Icon name="mdi:compass" class="text-14px" />
+            {{ $t('marketNav') }}
+          </div>
+        </template>
+        <Dashborad />
+      </el-popover>
       <div class="flex items-center gap-8px ml-12px whitespace-nowrap">
         <NuxtLink
           v-for="item in mainCoins"
@@ -178,8 +190,6 @@ const dragPumpStore = usePumpStore()
 const configStore = useConfigStore()
 const audioElement = ref<HTMLAudioElement | null>(null)
 const { lang } = storeToRefs(globalStore)
-const { token } = storeToRefs(useTokenStore())
-const route = useRoute()
 const isEn = computed(() => {
   return lang.value === 'en'
 })

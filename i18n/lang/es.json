@@ -623,6 +623,13 @@
   "monitorThTip": "Elija al menos un avatar de billetera y una dirección de billetera",
   "wcWalletTip": "Escanea este código QR con tu teléfono",
   "monitorBotError": "La dirección del robot de monitoreo no es compatible",
+  "marketNavigation": "Navegación del Mercado",
+  "totalTransactions": "Transacciones Totales",
+  "traderCount": "Conteo de Traders",
+  "24hVolume": "Volumen 24h",
+  "tokenStats": "Estadísticas de Tokens",
+  "created": "Creado",
+  "topPlatforms": "Plataformas Principales",
   "hideLiq": "Haga clic para ocultar la información del grupo",
   "showLiq": "Haga clic para mostrar información de la piscina"
 }

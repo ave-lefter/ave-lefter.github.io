@@ -69,7 +69,7 @@
       <!-- protection -->
       <div class="flex-between mt-16px">
         <span class="color-[--secondary-text]">{{ $t('protection') }}</span>
-        <el-switch v-model="currentSetting.isPrivate" />
+        <el-switch v-model="currentSetting.isPrivate" :disabled="chain ==='base'"/>
       </div>
 
       <!-- priority fee -->

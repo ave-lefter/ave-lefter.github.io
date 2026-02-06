@@ -133,13 +133,13 @@ export function initTradingViewIntervals(currentResolution: string, chain: strin
     localStorage.setItem('tradingViewIntervalSet', 'true')
   } else {
     list = JSON.parse(stored)
-    if (isSupportSecChains && ['1S', '5S', '15S', '30S'].some((i) => !list?.includes(i))) {
-      list = SUPPORT_LIST
-      localStorage.setItem(QUICK_KEY, JSON.stringify(list))
-    } else if (!isSupportSecChains) {
-      list = DEFAULT_LIST
-      localStorage.setItem(QUICK_KEY, JSON.stringify(list))
-    }
+    // if (isSupportSecChains && ['1S', '5S', '15S', '30S'].some((i) => !list?.includes(i))) {
+    //   list = SUPPORT_LIST
+    //   localStorage.setItem(QUICK_KEY, JSON.stringify(list))
+    // } else if (!isSupportSecChains) {
+    //   list = DEFAULT_LIST
+    //   localStorage.setItem(QUICK_KEY, JSON.stringify(list))
+    // }
   }
 
   if (!list.includes(currentResolution)) {
@@ -1290,7 +1290,7 @@ export function useBotAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
       createAvgPriceLine(avePriceCache.sellAvgPrice, false)
     }
   })
-  
+
   onUnmounted(() => {
     if (timer) {
       clearInterval(timer)

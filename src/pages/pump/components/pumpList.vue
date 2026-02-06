@@ -67,7 +67,6 @@
                     <el-image
                       class="token-icon"
                       :class="{ small: pumpSetting.Progress_isCircle == 'horizontal' }"
-                      lazy
                       fit="cover"
                       :src="
                         getSymbolDefaultIcon(
@@ -737,8 +736,14 @@ class="flex-start mr-8px bg-btn"
       <a :href="`https://x.com/search?q=$${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
         {{ $t('tweetSearchContractAddress2') }}
       </a>
-      <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+      <!-- <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
         {{ $t('tweetSearchContractAddress3') }}
+      </a> -->
+      <a :href="`https://www.tiktok.com/search?q=${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+        {{ $t('TikTokSearchName') }}
+      </a>
+      <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+        {{ $t('GoogleSearchName') }}
       </a>
       <span class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer" @click="handleSearchTokenName">{{ $t('tweetSearchContractAddress4') }}</span>
     </div>
@@ -1070,7 +1075,7 @@ function getLiqTooltip(row: PumpObj) {
     <div class="flex-start" style="color:var(--secondary-text)">
       ${t('pair')}
       <span class="color-[--main-text] text-12px ml-5px">
-        ${formatNumber(value || 0, { decimals: 0, l: 4, locale: 'en' })}
+        ${formatNumber(value || 0, { decimals: 2, l: 4, locale: 'en' })}
         <span class="text-11px ml-4px">
           ${row.baseToken?.symbol ?? ''}
         </span>
