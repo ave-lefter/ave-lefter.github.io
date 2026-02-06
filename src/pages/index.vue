@@ -13,7 +13,7 @@
             style="
               width: 24px;
               height: 24px;
-              border-radius: 4px;
+              border-radius: 50%;
             "
             :class="{'opacity-30': item.chain !== activeChain}"
             :src="`${token_logo_url}chain/${item.chain}.png`"
@@ -93,10 +93,9 @@
         :settingsButtonVisible="true"
         class="mr-12px"
       />
-      <AutoSellSetting :chain="activeChain" />
-
+      <AutoSellSetting :chain="activeChain" root-class="mr-0"/>
     </div>
-    <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full px-16px">
+    <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full pl-16px" :class="pumpSetting.isGutter? 'pr-6px': 'pr-14px'">
       <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
         <div class="pump-item  rounded-4px" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px">
@@ -549,8 +548,18 @@ const list1 = computed(() => {
             }
           : {}
         ),
-        name: obj.name,
-        symbol: obj.symbol,
+        ...(obj.name
+          ? {
+              name: obj.name
+            }
+          : {}
+        ),
+        ...(obj.symbol
+          ? {
+              symbol: obj.symbol
+            }
+          : {}
+        ),
         ...(obj.appendix
           ? {
               medias: getMedias(obj.appendix),
@@ -620,8 +629,18 @@ const list2 = computed(() => {
               }
             : {}
           ),
-          name: obj.name,
-          symbol: obj.symbol,
+          ...(obj.name
+            ? {
+                name: obj.name
+              }
+            : {}
+          ),
+          ...(obj.symbol
+            ? {
+                symbol: obj.symbol
+              }
+            : {}
+          ),
           ...(obj.appendix
             ? {
                 medias: getMedias(obj.appendix),
@@ -699,8 +718,18 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
             }
           : {}
         ),
-        name: obj.name,
-        symbol: obj.symbol,
+        ...(obj.name
+          ? {
+              name: obj.name
+            }
+          : {}
+        ),
+        ...(obj.symbol
+          ? {
+              symbol: obj.symbol
+            }
+          : {}
+        ),
         ...(obj.appendix
           ? {
               medias: getMedias(obj.appendix),
@@ -850,7 +879,7 @@ const flushPumpState = useThrottleFn(() => {
   wsUpdateTableList(pumpStateBuffer)
   subscribePortrait(pumpStateBuffer)
   pumpStateBuffer.length = 0
-}, 150)
+}, 100)
 
 // 保存 watch 监听器的 unwatch 函数，用于组件卸载时清理
 let watchPumpStateUnwatch: (() => void) | null = null
@@ -1563,12 +1592,18 @@ function mergeStatisticsList(
     if (!obj) {
       if (i.chain == 'bsc' || i.chain == 'solana') {
         if (i.amm === 'flapswap') {
-          i.market_cap = i.market_cap || 4900
+          i.market_cap = 1000000000 * i.current_price_usd || i.market_cap || 4900
         } else {
-          i.market_cap =  i.market_cap || 0
+          i.market_cap = 1000000000 * i.current_price_usd || i.market_cap || 0
         }
       } else if (i.chain == 'base') {
-          i.market_cap = i.market_cap || 22500
+        if (i.platform == 'clanker' || i.platform_id == 'clanker') {
+          i.market_cap = 100000000000 * i.current_price_usd || i.market_cap || 22500
+        } else if (i.platform == 'bankr' || i.platform_id == 'bankr') {
+          i.market_cap = 100000000000 * i.current_price_usd || i.market_cap || 0
+        } else {
+          i.market_cap = 1000000000 * i.current_price_usd || i.market_cap || 0
+        }
       } else {
           i.market_cap =  i.market_cap
       }
@@ -1612,7 +1647,13 @@ function mergeStatisticsList(
         next.market_cap = Number(next.total) * next.current_price_usd || 1000000000 * next.current_price_usd || next.market_cap || 0
       }
     } else if (next.chain == 'base') {
-       next.market_cap = Number(next.total) * next.current_price_usd || 100000000000 * next.current_price_usd || next.market_cap || 22500
+      if (next.platform == 'clanker' || next.platform_id == 'clanker') {
+        next.market_cap = Number(next.total) * next.current_price_usd || 100000000000 * next.current_price_usd || next.market_cap || 22500
+      } else if (next.platform == 'bankr' || next.platform_id == 'bankr') {
+        next.market_cap = Number(next.total) * next.current_price_usd || 100000000000 * next.current_price_usd || next.market_cap || 0
+      } else {
+        next.market_cap = Number(next.total) * next.current_price_usd || 1000000000 * next.current_price_usd || next.market_cap || 0
+      }
     } else {
       next.market_cap = Number(next.total) * next.current_price_usd || next.market_cap
     }
@@ -1807,7 +1848,7 @@ function mergeLogo(prev: any, next: any) {
   color: var(--main-text);
 }
 .pump-item{
-  background: var(--secondary-bg);
+  background: var(--main-bg);
   border: 1px solid var(--main-input-button-bg);
   border-radius: 4px;
 }
