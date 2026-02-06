@@ -1,6 +1,56 @@
 <template>
   <footer class="h-32px bg-[--main-list-hover] w-full px-12px py-16px footer fixed bottom-0 z-33">
     <div class="left relative">
+      <NuxtLink
+        v-if="showPrice"
+        class="flex items-center gap-5px mr-4px"
+        :to="`/token/${showPrice.id}`"
+      >
+        <TokenImg
+          :row="{
+            logo_url: showPrice.logo_url,
+            chain: '',
+          }"
+          token-class="w-16px h-16px [&&]:mr-0"
+        />
+        <span class="color-[--secondary-text]">{{ showPrice.symbol }}</span>
+        <span :class="`${showPrice.isUp ? 'color-[--up-color]' : 'color-[--down-color]'}`">{{
+          '$' + formatDec(showPrice?.current_price_usd || 0, 2)
+        }}</span>
+      </NuxtLink>
+
+      <el-popover
+        popper-style="padding: 12px;min-width: 132px"
+        width="132"
+        placement="top"
+        :teleported="false"
+      >
+        <template #reference>
+          <Icon name="custom:set-up" class="text-12px ml-2px color-[--main-text]" />
+        </template>
+        <div class="flex items-start justify-center flex-col text-12px gap-16px">
+          <NuxtLink
+            v-for="item in showPrice2"
+            :key="item.symbol || item.logo_url"
+            class="flex items-center gap-5px h-16px"
+            style="display: flex"
+            :to="`/token/${item.id}`"
+          >
+            <TokenImg
+              class="flex"
+              :row="{
+                logo_url: item.logo_url,
+                chain: '',
+              }"
+              token-class="w-16px h-16px [&&]:mr-0"
+            />
+            <span class="color-[--secondary-text]">{{ item.symbol }}</span>
+            <span :class="`${item.isUp ? 'color-[--up-color]' : 'color-[--down-color]'}`">{{
+              '$' + formatDec(item?.current_price_usd || 0, 2)
+            }}</span>
+          </NuxtLink>
+        </div>
+      </el-popover>
       <!-- <div class="flex items-center gap-4px mx-12px cursor-pointer hover:color-[--main-text]" :class="dragPumpStore.visible?'color-[--main-text]':'color-[--secondary-text]'" @click="dragPumpStore.visible=!dragPumpStore.visible">
         <Icon name="custom:pump-icon"/>
         {{ $t('pump1') }}
@@ -42,6 +92,18 @@
           {{ t('twitterTracker') }}
         </div>
       </el-badge>
+      <el-popover popper-style="padding: 0;border-radius: 8px;" width="auto" placement="top" :teleported="false" trigger="hover">
+        <template #reference>
+          <div
+            class="flex items-center gap-4px cursor-pointer hover:color-[--main-text] ml-12px"
+            :class="'color-[--secondary-text]'"
+          >
+            <Icon name="mdi:compass" class="text-14px" />
+            {{ $t('marketNav') }}
+          </div>
+        </template>
+        <Dashborad />
+      </el-popover>
       <div class="flex items-center gap-8px ml-12px whitespace-nowrap">
         <NuxtLink
           v-for="item in mainCoins"
@@ -178,8 +240,6 @@ const dragPumpStore = usePumpStore()
 const configStore = useConfigStore()
 const audioElement = ref<HTMLAudioElement | null>(null)
 const { lang } = storeToRefs(globalStore)
-const { token } = storeToRefs(useTokenStore())
-const route = useRoute()
 const isEn = computed(() => {
   return lang.value === 'en'
 })
