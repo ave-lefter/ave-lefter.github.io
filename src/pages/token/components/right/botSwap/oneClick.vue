@@ -747,6 +747,9 @@ const isEdit = ref(false)
 watch(visible, (val) => {
   if (!val) {
     isEdit.value = false
+    // localStorage.removeItem('fixed-one-click-height')
+    // localStorage.removeItem('fixed-one-click-width')
+    // localStorage.removeItem('fixed-one-click-position')
   }
 })
 
@@ -1008,10 +1011,10 @@ onBeforeUnmount(() => {
       //   margin-right: 0;
       // }
 
-      &.active:after {
+      &.active:nth-child(-n+4):after {
         content: '';
         position: absolute;
-        top: calc(100% + 5px);
+        bottom: calc(100% + 5px);
         left: 50%;
         transform: translateX(-50%);
         background-color: var(--dialog-list-hover);
