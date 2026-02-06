@@ -1,5 +1,5 @@
 <template>
-  <div class="pump w-full bg-[--main-bg]" v-if="route.name=='index'">
+  <div v-if="route.name=='index'" class="pump w-full bg-[--main-bg]">
     <div class="flex-start p-x-17px py-12px bg-[--main-bg] mb-1px mt-1px">
       <div class="tabs mr-8px">
         <div
@@ -145,12 +145,13 @@
             <span  v-show="isPausedObj?.new" class=" mr-auto bg-#FFA6221A px-4px py-4px rounded-4px ml-8px flex items-center justify-center w-26px h-26px">
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
-            <span class="flex-1" />
+           <span class="flex-1" />
             <AudioSelect activeTab="new" :chain="activeChain"/>
-            <PumpFilter
-              :key="`pumpFilter_${activeChain}_new`"
+            <PumpFilterButton
+              :key="`pumpFilterButton_${activeChain}_new`"
               :storage="`pumpFilter_${activeChain}_new`"
-              @update:filterData="handlerFilterConfirm"
+              :visible="filterVisible && activeFilterType === 'new'"
+              @update:visible="(val) => handleFilterVisibleChange(val, 'new')"
             />
           </div>
 
@@ -216,10 +217,11 @@
             </span>
             <span class="flex-1" />
             <AudioSelect activeTab="soon" :chain="activeChain"/>
-            <PumpFilter
-              :key="`pumpFilter_${activeChain}_soon`"
+            <PumpFilterButton
+              :key="`pumpFilterButton_${activeChain}_soon`"
               :storage="`pumpFilter_${activeChain}_soon`"
-              @update:filterData="handlerFilterConfirm"
+              :visible="filterVisible && activeFilterType === 'soon'"
+              @update:visible="(val) => handleFilterVisibleChange(val, 'soon')"
             />
           </div>
           <PumpList
@@ -286,10 +288,11 @@
             </span>
             <span class="flex-1" />
             <AudioSelect activeTab="graduated" :chain="activeChain"/>
-            <PumpFilter
-              :key="`pumpFilter_${activeChain}_graduated`"
+            <PumpFilterButton
+              :key="`pumpFilterButton_${activeChain}_graduated`"
               :storage="`pumpFilter_${activeChain}_graduated`"
-              @update:filterData="handlerFilterConfirm"
+              :visible="filterVisible && activeFilterType === 'graduated'"
+              @update:visible="(val) => handleFilterVisibleChange(val, 'graduated')"
             />
           </div>
           <PumpList
@@ -307,6 +310,16 @@
       </el-col>
     </el-row>
 
+    <!-- 统一的 Filter 对话框 -->
+    <PumpFilter
+      :key="`pumpFilter_${activeChain}_${activeFilterType}`"
+      v-model:visible="filterVisible"
+      :activeChain="activeChain"
+      :activeFilterType="activeFilterType"
+      :platformsList="platformsList"
+      @update:filterData="handlerFilterConfirm"
+    />
+
     <audio
       ref="pumpAudio" controls style="display: none"
       :src="audioUrl"
@@ -322,6 +335,7 @@ import PumpList from './pump/components/pumpList.vue'
 import Setting from './pump/components/setting.vue'
 import BlackList from './pump/components/blackList.vue'
 import PumpFilter from './pump/components/pumpFilter.vue'
+import PumpFilterButton from './pump/components/pumpFilterButton.vue'
 import { _getPumpConfig, _getPumpList } from '@/api/pump'
 import type {
   PumpConfig,
@@ -414,6 +428,9 @@ const isPausedObj = ref({
   soon: false,
   graduated: false,
 })
+
+const filterVisible = ref(false)
+const activeFilterType = ref<'new' | 'soon' | 'graduated'>('new')
 
 // let wsTableListCache: PumpObj[] = []
 let wsTableListCache: Record<string, PumpObj[]> = {}
@@ -1196,6 +1213,13 @@ function getPumpConfig() {
     })
   })
 }
+function handleFilterVisibleChange(visible: boolean, type: 'new' | 'soon' | 'graduated') {
+  if (visible) {
+    activeFilterType.value = type
+  }
+  filterVisible.value = visible
+}
+
 function handlerFilterConfirm(
   val: { progress_min?: string; progress_max?: string; chain: ChainKey; platforms: string; has_sm?: boolean},
   type: string

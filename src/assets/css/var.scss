@@ -62,6 +62,8 @@
   --github-color:var(--d-FFF-l-000);
 
   --tiktok-color:var(--d-FFF-l-000);
+  // 扫链筛选框背景色
+  --pump-filter-bg: var(--d-16181D-l-F6F9FF);
   &.dark {
     // 规范：颜色相同省略为 3 位，所有都用大写
     --d-000-l-404753: #000;
@@ -217,6 +219,7 @@
     --d-3B3E44-l-CAD6EC: #3B3E44;
     --d-151A22-l-E8F1FF: #151A22;
     --d-1E2025-l-E8F1FF: #1E2025;
+    --d-16181D-l-F6F9FF: #16181D;
   }
 
   &.light {
@@ -373,5 +376,6 @@
     --d-3B3E44-l-CAD6EC: #CAD6EC;
     --d-151A22-l-E8F1FF: #E8F1FF;
     --d-1E2025-l-E8F1FF: #E8F1FF;
+    --d-16181D-l-F6F9FF: #F6F9FF;
   }
 }

@@ -1995,5 +1995,15 @@
   "joined": "Joined",
   "hideLiq": "Click to hide pool information",
   "showLiq": "Click to display pool information",
-  "filter": "Filter"
+  "filter": "Filter",
+  "indicator":"Indicator",
+  "socialMedia": "Social Media",
+  "devClose": "DEV Close",
+  "devNotClose": "DEV Not Close",
+  "noRepeatAvatar": "No Repeat Avatar",
+  "noRepeatSocialMedia": "No Repeat Social Media",
+  "DEVBurn": "DEV Burn",
+  "filterBot": "Filter Bot",
+  "filterDevBot": "Filter Dev Bot",
+  "filterMouse": "Filter Mouse"
 }

@@ -1,135 +1,92 @@
 <template>
-  <el-popover
-      v-model:visible="visible"
-      placement="bottom"
-      popper-class="w-pumpFilter popper new-popover"
-      title=""
-      :width="398"
-      trigger="click"
-      popper-style="padding: 10px"
-      append-to-body
-      :persistent="false"
-    >
-      <template #reference>
-        <div :class="['filter-btn', { active: visible }, filterNumber > 0 ? 'hight': '']">
-          <Icon
-            id="custom-filter"
-            name="custom:filter"
-            class="text-10px cursor-pointer"
-            :class="!hideReferenceText?'mr-3px':''"
-          />
-          <span v-if="!hideReferenceText">{{ $t('filter') }}</span>
-          <span v-if="filterNumber > 0" class="filter-number">{{ filterNumber }}</span>
+  <el-dialog v-model="localVisible" header-class="hidden"
+    class="[--el-bg-color:--pump-bg] border-1px border-solid border-[--main-divider] dialog" title="" :width="488"
+    style="padding: 0" append-to-body :persistent="false" :show-close="false">
+    <template #default>
+      <div
+        class="text-14px py-14px px-16px flex items-center justify-between border-b-1px border-b-solid border-b-[--main-divider] font-500">
+        {{ $t('FilterSetting') }}
+        <Icon class="text-16px cursor-pointer" name="custom:close" @click="localVisible = false" />
+      </div>
+      <div class="flex items-center px-16px gap-16px border-b-1px border-b-solid border-b-[--main-divider] mb-16px">
+        <div v-for="(item) in topTabs" :key="item.value" class="flex items-center gap-4px">
+          <span
+            :class="`flex items-center decoration-none text-12px lh-39px text-center b-b-solid b-b-2px cursor-pointer ${activeTab === item.value ? 'color-[--main-text] b-b-[--main-text] font-500' : 'b-b-transparent color-[--secondary-text]'}`"
+            @click="activeTab = item.value">
+            {{ item.name }}
+          </span>
+          <span v-show="getItemFilterNumber(item.value)" class="w-16px h-16px lh-16px bg-[--primary-color] rounded-4px color-#fff text-12px text-center">
+            {{ getItemFilterNumber(item.value) }}
+          </span>
         </div>
-      </template>
-
-      <template #default>
-        <span class="text-14px block border pb-10px">{{ $t('FilterSetting') }}</span>
-        <el-form
-          ref="formRef"
-          class="hide-scrollbar"
-          :model="form"
-          label-width="auto"
-          autocomplete="off"
-          label-position="left"
-          size="small"
-          @submit.prevent
-        >
+      </div>
+      <el-form ref="formRef" class="scrollbar-hide w-pumpFilter" :model="form" label-width="auto" autocomplete="off"
+        label-position="left" size="small" @submit.prevent>
         <el-scrollbar view-class="filter-height">
-          <el-form-item
-              :label="$t('searchTip')"
-              :prop="form.q"
-              class="border pb-20px pt-20px"
-            >
+          <div class="px-16px border pb-12px">
+            <div class="flex justify-between items-center w-full mb-16px">
+              <span class="text-12px">{{ $t('platform') }}</span>
+              <span class="text-12px w-48px lh-24px rounded-4px bg-[--pump-filter-bg] text-center cursor-pointer"
+                @click="form.platforms = platformsList.map(platform => platform.platform).join(',')">{{ $t('all1')
+                }}</span>
+            </div>
+            <el-checkbox-group size="default" @change="(val) => form.platforms = val.join(',')"
+              :model-value="form.platforms.split(',')" class="grid grid-cols-2 gap-12px flex-1">
+              <el-checkbox v-for="platform in platformsList" :key="platform.platform" :label="platform.platform"
+                class="[&&]:mr-0 [&&]:[--el-checkbox-height:28px]">
+                <span
+                  class="flex items-center gap-8px rounded-30px py-6px px-12px border-1px border-solid color-[--main-text]"
+                  :style="{ borderColor: PlatformColors[platform.platform] }">
+                  <el-image class="rounded w-14px" :src="`${configStore.token_logo_url}${platform.platform_icon?.replace(
+                    '/signals/',
+                    'signals/'
+                  )}`" />
+                  {{ platform.platform }}
+                </span>
+              </el-checkbox>
+            </el-checkbox-group>
+          </div>
+          <el-form-item label-position="top" :label="$t('searchTip')" :prop="form.q"
+            class="border px-16px py-12px w-full">
             <div class="formItem inputRange">
-              <el-input v-model.trim="form.q" class="search-input1"  clearable placeholder="abc,abc,abc" @input="(val) => form.q = val.replace(/\s/g, '')" />
+              <el-input size="large" v-model.trim="form.q" class="search-input1" clearable placeholder="abc,abc,abc"
+                @input="(val) => form.q = val.replace(/\s/g, '')" />
             </div>
 
           </el-form-item>
-          <el-form-item
-              :label="$t('dev_sold_out')"
-              :prop="form.q"
-            >
-            <div class="formItem checkbox">
-              <el-checkbox v-model="form.dev_sale_out" :true-value="1" :false-value="0"/>
+          <div class="mx-16px p-2px border-1px border-solid border-[--main-divider] flex items-center rounded-6px">
+            <div class="flex-1 rounded-6px text-center lh-28px cursor-pointer" v-for="item in tabs2"
+              :class="tabs2Active === item.id ? 'bg-[--pump-filter-bg] color-[--main-text]' : 'color-[--secondary-text]'"
+              :key="item.id" @click="tabs2Active = item.id">
+              {{ item.name }}
             </div>
-          </el-form-item>
-
-          <el-form-item
-              v-if="!props.storage?.includes('_graduated')"
-              :label="`${t('progress')}(%)`"
-              class="border pb-20px"
-            >
-
-            <div class="formItem inputRange">
-                  <el-input
-                    v-model.trim.number="form.progress_min"
-                    :placeholder="$t('minor')"
-                    clearable
-                    @blur="(val) => handleBlur(['progress_min', 'progress_max'], val, 0)"
-                    @input="(val) => handleInput(['progress_min', 'progress_max'], val, 0)"
-                  >
-                    <template #suffix>
-                      <span>%</span>
-                    </template>
-                  </el-input>
-                  <span class="gap">~</span>
-                  <el-input
-                    v-model.trim.number="form.progress_max"
-                    :placeholder="$t('max1')"
-                    clearable
-                    @blur="(val) => handleBlur(['progress_min', 'progress_max'], val, 1)"
-                    @input="(val) => handleInput(['progress_min', 'progress_max'], val, 1)"
-                  >
-                    <template #suffix>
-                      <span>%</span>
-                    </template>
-                  </el-input>
-                </div>
-          </el-form-item>
-
-        <div class="tabs">
-          <button
-            v-for="item in tabs"
-            :key="item.id"
-            :class="{ active: item.id === active }"
-            class="flex-start"
-            type="button"
-            @click.stop="active = item.id"
-          >
-            <span>{{ item.name || '' }}</span>
-          </button>
-        </div>
-
+          </div>
+          <div v-show="tabs2Active === Tabs2Enum.indicator"
+            class="grid grid-cols-2 gap-12px flex-1 px-16px py-12px border">
+            <el-checkbox size="default" v-model="form[indicate.value]" v-for="indicate in indicatorArr" :key="indicate.value"
+              :label="indicate.label" class="[&&]:mr-0 [&&]:[--el-checkbox-height:16px]">
+              <span class="color-[--secondary-text]">
+                {{ indicate.label }}
+              </span>
+            </el-checkbox>
+          </div>
           <template v-for="(column) in columns" :key="column.label">
-            <el-form-item
-              v-if="active== column.tab"
-              class="mt-20px px-10px"
-              :label="column.tab !== 'media' ?column.label : ''"
-              :prop="isArray(column.prop) ? '' : isString(column.prop) ? column.prop : ''"
-            >
+            <el-form-item v-if="tabs2Active == column.tab" class="mt-20px px-16px"
+              :label="column.tab !== 'media' ? column.label : ''"
+              :prop="isArray(column.prop) ? '' : isString(column.prop) ? column.prop : ''">
               <template v-if="column.type === 'inputRange'">
                 <div :class="['formItem', column.type]">
-                  <el-input
-                    v-model.trim.number="form[column.prop[0]]"
-                    :placeholder="column?.placeholder && column?.placeholder[0]"
-                    clearable
-                    @blur="(val) => handleBlur(column.prop, val, 0)"
-                    @input="(val) => handleInput(column.prop, val, 0)"
-                  >
-                    <template  v-if="column.suffix" #suffix>
+                  <el-input v-model.trim.number="form[column.prop[0]]"
+                    :placeholder="column?.placeholder && column?.placeholder[0]" clearable
+                    @blur="(val) => handleBlur(column.prop, val, 0)" @input="(val) => handleInput(column.prop, val, 0)">
+                    <template v-if="column.suffix" #suffix>
                       <span>{{ column.suffix }}</span>
                     </template>
                   </el-input>
                   <span class="gap">~</span>
-                  <el-input
-                    v-model.trim.number="form[column.prop[1]]"
-                    :placeholder="column?.placeholder && column?.placeholder[1]"
-                    clearable
-                    @blur="(val) => handleBlur(column.prop, val, 1)"
-                    @input="(val) => handleInput(column.prop, val, 1)"
-
-                  >
+                  <el-input v-model.trim.number="form[column.prop[1]]"
+                    :placeholder="column?.placeholder && column?.placeholder[1]" clearable
+                    @blur="(val) => handleBlur(column.prop, val, 1)" @input="(val) => handleInput(column.prop, val, 1)">
                     <template v-if="column.suffix" #suffix>
                       <span>{{ column.suffix }}</span>
                     </template>
@@ -137,19 +94,15 @@
                 </div>
               </template>
               <template v-else-if="column.type === 'media'">
-                <div :class="['formItem', column.type]">
-                  <el-checkbox-group
-                  v-model="form[column.prop]"
-                  :disabled="form.has_sm ==1"
-                    >
-                      <el-checkbox v-for="(item,$index) in column.list" :key="$index" class="mt-20px" :value="item.url">
-                        {{ item.name }}
-                      </el-checkbox>
-                  </el-checkbox-group>
-                </div>
+                <el-checkbox-group size="default" class="grid grid-cols-2 gap-12px flex-1" v-model="form[column.prop]" :disabled="form.has_sm == 1">
+                  <el-checkbox v-for="(item, $index) in column.list" :key="$index" class="[&&]:mr-0 [&&]:[--el-checkbox-height:16px]" :value="item.url">
+                    {{ item.name }}
+                  </el-checkbox>
+                </el-checkbox-group>
               </template>
               <template v-else-if="column.type === 'checkbox'">
-                  <el-checkbox v-model="form[column.prop]" :true-value="1" :false-value="0">{{ column.label}}</el-checkbox>
+                <el-checkbox v-model="form[column.prop]" :true-value="1" :false-value="0">{{
+                  column.label }}</el-checkbox>
               </template>
 
               <template v-else>
@@ -163,50 +116,93 @@
               </template>
             </el-form-item>
           </template>
+          <!-- <el-form-item v-if="!storage.value?.includes('_graduated')" :label="`${t('progress')}(%)`"
+            class="border pb-20px">
+
+            <div class="formItem inputRange">
+              <el-input v-model.trim.number="form.progress_min" :placeholder="$t('minor')" clearable
+                @blur="(val) => handleBlur(['progress_min', 'progress_max'], val, 0)"
+                @input="(val) => handleInput(['progress_min', 'progress_max'], val, 0)">
+                <template #suffix>
+                  <span>%</span>
+                </template>
+              </el-input>
+              <span class="gap">~</span>
+              <el-input v-model.trim.number="form.progress_max" :placeholder="$t('max1')" clearable
+                @blur="(val) => handleBlur(['progress_min', 'progress_max'], val, 1)"
+                @input="(val) => handleInput(['progress_min', 'progress_max'], val, 1)">
+                <template #suffix>
+                  <span>%</span>
+                </template>
+              </el-input>
+            </div>
+          </el-form-item> -->
+
+          <!-- <div class="tabs">
+            <button v-for="item in tabs" :key="item.id" :class="{ active: item.id === active }" class="flex-start"
+              type="button" @click.stop="active = item.id">
+              <span>{{ item.name || '' }}</span>
+            </button>
+          </div> -->
         </el-scrollbar>
 
-          <el-form-item>
-            <div style="display: flex; width: 100%" class="mt-30px">
-              <el-button
-                class="flex-1"
-                style="height: 30px; min-width: 60px; --el-button-font-weight: 400; background: var(--border); border: none;color: var(--main-text)"
-                @click="reset"
-              >
-                {{ $t('reset') }}
-              </el-button>
-              <el-button
-                style="height: 30px; min-width: 60px; --el-button-font-weight: 400; background:#3F80F7; color: #f5f5f5"
-                type="primary"
-                class="flex-1"
-                @click="handleConfirm"
-              >
-                {{ $t('confirm') }}
-              </el-button>
-            </div>
-          </el-form-item>
-        </el-form>
-      </template>
-    </el-popover>
-  </template>
+        <el-form-item>
+          <div style="display: flex; width: 100%" class="mt-30px px-16px">
+            <el-button class="flex-1 rounded-8px"
+              style="height: 36px; min-width: 60px; --el-button-font-weight: 400; background: var(--border); border: none;color: var(--main-text)"
+              @click="reset">
+              {{ $t('reset') }}
+            </el-button>
+            <el-button
+              style="height: 36px; min-width: 60px; --el-button-font-weight: 400; background:#3F80F7; color: #f5f5f5"
+              type="primary" class="flex-1 rounded-8px" @click="handleConfirm">
+              {{ $t('confirm') }}
+            </el-button>
+          </div>
+        </el-form-item>
+      </el-form>
+    </template>
+  </el-dialog>
+</template>
 
-  <script setup lang="ts">
-  import { handleError } from 'vue'
+<script setup lang="ts">
+import { handleError } from 'vue'
 import { usePumpTableDataFetching, _isArray, _isString } from '@/utils/index.js'
+import { getFilterNumber } from '../utils'
+
 const props = defineProps({
-    storage: {
-      type: String,
-      default: 'pumpFilter_bsc_new'
-    },
-    hideReferenceText:{
-      type:Boolean
-    }
+  activeChain: {
+    type: String,
+    default: 'bsc'
+  },
+  visible: {
+    type: Boolean,
+    default: false
+  },
+  activeFilterType: {
+    type: String,
+    default: 'new'
+  },
+  platformsList: {
+    type: Array<any>,
+    default: () => []
+  },
 })
-const emit = defineEmits(['update:filterData'])
+const storage = computed(() => `pumpFilter_${props.activeChain}_${props.activeFilterType}`)
+const emit = defineEmits(['update:filterData', 'update:visible'])
 const globalStore = useGlobalStore()
+const configStore = useConfigStore()
 const { isDark } = storeToRefs(globalStore)
 const { t } = useI18n()
-
-  const limitData = {
+const activeTab = ref(props.activeFilterType)
+const topTabs = computed(() => {
+  return [
+    { name: t('new1'), value: 'new' },
+    { name: t('soon'), value: 'soon' },
+    { name: t('graduated'), value: 'graduated' },
+  ]
+})
+const limitData = {
   q: '',
   dev_sale_out: 0,
   platforms: 'pump,moonshot',
@@ -232,14 +228,14 @@ const { t } = useI18n()
   lkol: '',  //KOL交易人数
   rkol: '',
   lrug: '', //跑路概率
-  rrug:'',
+  rrug: '',
 
   market_cap_min: 0, // 市值
   market_cap_max: 10000000,
   volume_u_24h_min: 0, //交易额
   volume_u_24h_max: 10000000,
 
-  lbtx: '' ,//买入交易数
+  lbtx: '',//买入交易数
   rbtx: '',
   lstx: '', //卖出交易数
   rstx: '',
@@ -248,7 +244,7 @@ const { t } = useI18n()
   sm_list: [],
   has_sm: 0
 }
-  const initForm = {
+const initForm = {
   q: '',
   dev_sale_out: 0,
   platforms: 'pump,moonshot',
@@ -274,13 +270,13 @@ const { t } = useI18n()
   lkol: '',  //KOL交易人数
   rkol: '',
   lrug: '', //跑路概率
-  rrug:'',
+  rrug: '',
 
   market_cap_min: '', // 市值
   market_cap_max: '',
   volume_u_24h_min: '', //交易额
   volume_u_24h_max: '',
-  lbtx: '' ,//买入交易数
+  lbtx: '',//买入交易数
   rbtx: '',
   lstx: '', //卖出交易数
   rstx: '',
@@ -296,404 +292,364 @@ const { t } = useI18n()
   // tx_24h_count_max: '',
 
 }
-const visible = ref(false)
+// 用 platform 作为 key 构建一个对象，这个对象值为边框色
+const PlatformColors = {
+  pump: '#88d693',
+  bonk: '#e78c19',
+  moonshot: '#ff88fe',
+  raydium: '#ff3bb8',
+  jupstudio: '#69d0b2',
+  moon_new: '#dfff18',
+  cookingcity: '#6C416F',
+  bags: '#00d62b',
+  heaven: '#e5e5e6',
+  fourmeme: '#7ce660',
+  web3binance: '#7ce660',
+  flapsh: '#967aff',
+  dyorswap: '#32C9FF',
+  flap: '#967aff',
+  "clanker.world": '#8a63d2',
+  "bankr.bot": '#9472ff',
+  "base.app": '#3679ff',
+  "zoracreator": '#5a81f1',
+  "zoracontent": '#5a81f1'
+}
+const localVisible = computed({
+  get: () => props.visible,
+  set: (val) => emit('update:visible', val)
+})
 const formRef = ref()
 type FormType = typeof initForm
 const form = ref<FormType>(initForm)
-const tableFilter = usePumpTableDataFetching(props.storage)
-const active = shallowRef('tag')
-const tabs = computed(() => {
+const tableFilter = usePumpTableDataFetching(storage.value)
+
+const tabs2Active = ref('indicator')
+const Tabs2Enum = {
+  indicator: 'indicator',
+  media: 'media'
+}
+const tabs2 = computed(() => {
   return [
-    { name: t('chainToken'), id: 'tag' },
-    { name: t('marketIndices'), id: 'market' },
-    { name: t('media'), id: 'media' }
+    { name: t('indicator'), id: Tabs2Enum.indicator },
+    { name: t('socialMedia'), id: Tabs2Enum.media },
   ]
 })
-  watch(visible, (val) => {
-    if (val) {
-      const platformsArr = (tableFilter?.value?.platforms || 'pump,moonshot')?.split?.(',') || []
-      form.value = {...tableFilter.value, platforms_pump: platformsArr.includes('pump'), platforms_moonshot: platformsArr.includes('moonshot')}
-    }
-  })
-    // watch(() => props.storage, (val) => {
-    //     tableFilter.value = usePumpTableDataFetching(val)
-    // })
+const indicatorArr = computed(() => {
+  return [
+    { label: t('devClose'), value: 'dev_sale_out' },
+    { label: t('devNotClose'), value: 'dev_not_close' },
+    // { label: t('noRepeatAvatar'), value: 'no_repeat_avatar' },
+    { label: t('noRepeatSocialMedia'), value: 'no_repeat_social_media' },
+    // { label: t('DEVBurn'), value: 'dev_burn' },
+    // { label: t('filterBot'), value: 'filter_bot' },
+    // { label: t('filterDevBot'), value: 'filter_dev_bot' },
+    // { label: t('filterMouse'), value: 'filter_mouse' }
+  ]
+})
+watch(() => props.visible, (val) => {
+  if (val) {
+    const platformsArr = (tableFilter?.value?.platforms || 'pump,moonshot')?.split?.(',') || []
+    form.value = { ...tableFilter.value, platforms_pump: platformsArr.includes('pump'), platforms_moonshot: platformsArr.includes('moonshot') }
+  }
+})
+// watch(() => storage.value, (val) => {
+//     tableFilter.value = usePumpTableDataFetching(val)
+// })
 
-  const columns = computed(() => {
-    const c = [
-        {
-          label: `${t('tokenDuration')}`,
-          prop: ['lage', 'rage'],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          suffix: 'm',
-          tab: 'tag'
-        },
-        {
-          label: `Dev ${t('positions')}(%)`,
-          prop: ['dev_balance_ratio_cur_min', 'dev_balance_ratio_cur_max'],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          suffix: '%',
-          tab: 'tag'
-        },
-        {
-          label: `${t('tokenHolders')}`,
-          prop: ['holder_min', 'holder_max'],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          tab: 'tag'
-        },
-        {
-          label: `Top10 ${t('positions')}(%)`,
-          prop: ['holders_top10_ratio_min', 'holders_top10_ratio_max'],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          suffix: '%',
-          tab: 'tag'
-        },
+const columns = computed(() => {
+  const c = [
+    {
+      label: `${t('tokenDuration')}`,
+      prop: ['lage', 'rage'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: 'm',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `Dev ${t('positions')}(%)`,
+      prop: ['dev_balance_ratio_cur_min', 'dev_balance_ratio_cur_max'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '%',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('tokenHolders')}`,
+      prop: ['holder_min', 'holder_max'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `Top10 ${t('positions')}(%)`,
+      prop: ['holders_top10_ratio_min', 'holders_top10_ratio_max'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '%',
+      tab: Tabs2Enum.indicator
+    },
 
-        {
-          label: t('snipers'),
-          prop: ['lsnip', 'rsnip'],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          tab: 'tag'
-        },
-        {
-          label: t('smarterTxs'),
-          prop: [
-            'smart_money_tx_count_24h_min',
-            'smart_money_tx_count_24h_max'
-          ],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          suffix: '',
-          tab: 'tag'
-        },
+    {
+      label: t('snipers'),
+      prop: ['lsnip', 'rsnip'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: t('smarterTxs'),
+      prop: [
+        'smart_money_tx_count_24h_min',
+        'smart_money_tx_count_24h_max'
+      ],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '',
+      tab: Tabs2Enum.indicator
+    },
 
+    {
+      label: t('insiders'),
+      prop: [
+        'lins',
+        'rins'
+      ],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '%',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: t('KOLTraders'),
+      prop: [
+        'lkol',
+        'rkol'
+      ],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('runPullRatio')}`,
+      prop: [
+        'lrug',
+        'rrug'
+      ],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '%',
+      tab: Tabs2Enum.indicator
+    },
+
+    {
+      label: `${t('MC')}($)`,
+      prop: ['market_cap_min', 'market_cap_max'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '$',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('24Volume')}($)`,
+      prop: ['volume_u_24h_min', 'volume_u_24h_max'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      suffix: '$',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('buyTxs')}`,
+      prop: ['lbtx', 'rbtx'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('sellTxs')}`,
+      prop: ['lstx', 'rstx'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: `${t('24hMarkers')}`,
+      prop: ['lmks', 'rmks'],
+      placeholder: [t('minor'), t('max1')],
+      type: 'inputRange',
+      tab: Tabs2Enum.indicator
+    },
+    {
+      label: 'media',
+      prop: 'sm_list',
+      type: 'media',
+      list: [
         {
-          label: t('insiders'),
-          prop: [
-            'lins',
-            'rins'
-          ],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          suffix: '%',
-          tab: 'tag'
+          name: 'Website',
+          url: 'website'
         },
         {
-          label: t('KOLTraders'),
-          prop: [
-            'lkol',
-            'rkol'
-          ],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          tab: 'tag'
+          name: 'Twitter',
+          url: 'twitter'
         },
         {
-          label: `${t('runPullRatio')}`,
-          prop: [
-            'lrug',
-            'rrug'
-          ],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          suffix: '%',
-          tab: 'tag'
-        },
-
-        {
-          label: `${t('MC')}($)`,
-          prop: ['market_cap_min', 'market_cap_max'],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          suffix: '$',
-          tab: 'market'
+          name: 'Telegram',
+          url: 'telegram'
         },
         {
-          label: `${t('24Volume')}($)`,
-          prop: ['volume_u_24h_min', 'volume_u_24h_max'],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          suffix: '$',
-          tab: 'market'
+          name: 'Tiktok',
+          url: 'tiktok'
         },
         {
-          label: `${t('buyTxs')}`,
-          prop: ['lbtx', 'rbtx'],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          tab: 'market'
-        },
-        {
-          label: `${t('sellTxs')}`,
-          prop: ['lstx', 'rstx'],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          tab: 'market'
-        },
-        {
-          label: `${t('24hMarkers')}`,
-          prop: ['lmks', 'rmks'],
-          placeholder: [t('minor'), t('max1')],
-          type: 'inputRange',
-          tab: 'market'
-        },
-        {
-          label: 'media',
-          prop: 'sm_list',
-          type: 'media',
-          list: [
-                  {
-                    name: 'Website',
-                    url: 'website'
-                  },
-                  {
-                    name: 'Twitter',
-                    url: 'twitter'
-                  },
-                  {
-                    name: 'Telegram',
-                    url: 'telegram'
-                  },
-                  {
-                    name: 'Tiktok',
-                    url: 'tiktok'
-                  },
-                  {
-                    name: 'Instagram',
-                    url: 'instagram'
-                  }
-          ],
-          tab: 'media'
-        },
-        {
-          label: `${t('oneOfficial')}`,
-          prop: 'has_sm',
-          type: 'checkbox',
-          tab: 'media'
-        },
-        // {
-        //   label: `${t('liquidity')}($)`,
-        //   prop: ['tvl_min', 'tvl_max'],
-        //   placeholder: [t('minor'), t('max1')],
-        //   type: 'inputRange',
-        //   suffix: '$'
-        // },
-        // {
-        //   label: t('Txs'),
-        //   prop: ['tx_24h_count_min', 'tx_24h_count_max'],
-        //   placeholder: [t('minor'), t('max1')],
-        //   type: 'inputRange'
-        // },
-      ]
-    return c || []
-  })
+          name: 'Instagram',
+          url: 'instagram'
+        }
+      ],
+      tab: Tabs2Enum.media
+    },
+    {
+      label: `${t('oneOfficial')}`,
+      prop: 'has_sm',
+      type: 'checkbox',
+      tab: Tabs2Enum.media
+    },
+    // {
+    //   label: `${t('liquidity')}($)`,
+    //   prop: ['tvl_min', 'tvl_max'],
+    //   placeholder: [t('minor'), t('max1')],
+    //   type: 'inputRange',
+    //   suffix: '$'
+    // },
+    // {
+    //   label: t('Txs'),
+    //   prop: ['tx_24h_count_min', 'tx_24h_count_max'],
+    //   placeholder: [t('minor'), t('max1')],
+    //   type: 'inputRange'
+    // },
+  ]
+  return c || []
+})
 
-  const filterNumber = computed(() => {
-    const form = tableFilter.value
-    let filterList = Object.keys(form).filter((key) => form[key] !== null && form[key] !== undefined && form[key] !== '' && form[key] !== 0 && (form[key]?.length >0 || form[key] ==1))
-    filterList = Array.from(new Set(filterList.map(key => key.replace(/_min|_max$/g, ''))))
-    if (filterList.includes('has_sm') && filterList.includes('sm_list')) {
-      // 任选其一删除，这里以删除 'lage' 为例
-      const index = filterList.indexOf('sm_list')
-      if (index !== -1) {
-        filterList.splice(index, 1)
-      }
-    }
-
-    if (filterList.includes('lage') && filterList.includes('rage')) {
-      // 任选其一删除，这里以删除 'lage' 为例
-      const index = filterList.indexOf('rage')
-      if (index !== -1) {
-        filterList.splice(index, 1)
-      }
-    }
-
-    if (filterList.includes('lsnip') && filterList.includes('rsnip')) {
-      // 任选其一删除，这里以删除 'lage' 为例
-      const index = filterList.indexOf('rsnip')
-      if (index !== -1) {
-        filterList.splice(index, 1)
-      }
-    }
-
-    if (filterList.includes('lins') && filterList.includes('rins')) {
-      // 任选其一删除，这里以删除 'lage' 为例
-      const index = filterList.indexOf('rins')
-      if (index !== -1) {
-        filterList.splice(index, 1)
-      }
-    }
-
-    if (filterList.includes('lkol') && filterList.includes('rkol')) {
-      // 任选其一删除，这里以删除 'lage' 为例
-      const index = filterList.indexOf('rkol')
-      if (index !== -1) {
-        filterList.splice(index, 1)
-      }
-    }
-    if (filterList.includes('lbtx') && filterList.includes('rbtx')) {
-      // 任选其一删除，这里以删除 'lage' 为例
-      const index = filterList.indexOf('lbtx')
-      if (index !== -1) {
-        filterList.splice(index, 1)
-      }
-    }
-    if (filterList.includes('lstx') && filterList.includes('rstx')) {
-      // 任选其一删除，这里以删除 'lage' 为例
-      const index = filterList.indexOf('rstx')
-      if (index !== -1) {
-        filterList.splice(index, 1)
-      }
-    }
-    if (filterList.includes('lmks') && filterList.includes('rmks')) {
-      // 任选其一删除，这里以删除 'lage' 为例
-      const index = filterList.indexOf('lmks')
-      if (index !== -1) {
-        filterList.splice(index, 1)
-      }
-    }
-
-    if (filterList.includes('lrug') && filterList.includes('rrug')) {
-      // 任选其一删除，这里以删除 'lage' 为例
-      const index = filterList.indexOf('rrug')
-      if (index !== -1) {
-        filterList.splice(index, 1)
-      }
-    }
-
-
-      filterList = filterList?.filter(i => i !== 'platforms' )
-    return filterList?.length || 0
-  })
-
-  function handleConfirm() {
-    visible.value = false
+function handleConfirm() {
+  localVisible.value = false
   // 使用 ref 来访问表单实例，并进行验证
   formRef.value?.validate((valid: boolean) => {
     if (valid) {
       const form1 = switchForm(form.value)
       tableFilter.value = { ...form1 }
-      console.log('----------form1-------------',form1)
-      emit('update:filterData', { ...form1},props.storage)
+      console.log('----------form1-------------', form1)
+      emit('update:filterData', { ...form1 }, storage.value)
     } else {
       handleError('error')
       return false
     }
   })
-  }
+}
 
-  function reset() {
-    visible.value = false  // 隐藏视图
-    if (formRef.value) {
-      formRef.value.resetFields()  // 重置表单字段
+function reset() {
+  localVisible.value = false  // 隐藏视图
+  if (formRef.value) {
+    formRef.value.resetFields()  // 重置表单字段
+  }
+  const form = switchForm(initForm)
+  tableFilter.value = { ...form }  // 更新过滤器数据
+  // 触发更新事件
+  emit('update:filterData', { ...form }, storage.value)
+}
+
+function handleInput(props: string[], val: string, index: number) {
+  const key = props[index] || ''
+  form.value[key] = val.replace(/-|[^\d.]/g, '')
+}
+
+function handleBlur(props: string[], val: string, index: number) {
+  const key = props[index] || ''
+  const defaultRange = props
+    ? [limitData[props[0]], limitData[props[1]]]
+    : []
+  // form.value[a]=Number(b)
+  // form.value[key]=val.replace(/\-|[^\d.]/g, '')
+  if (form.value[key]) {
+    if (defaultRange[0] && Number.parseFloat(form.value[key]) <= defaultRange[0])
+      form.value[key] = defaultRange[0]
+
+
+    if (defaultRange[1] && Number.parseFloat(form.value[key]) >= defaultRange[1])
+      form.value[key] = defaultRange[1]
+    if (index == 1) {
+      if (!form.value[props[0]]) return
+      if (
+        Number.parseFloat(form.value[key]) <=
+        Number.parseFloat(form.value[props[0]])
+      ) {
+        form.value[key] = form.value[props[0]]
+      }
+    } else {
+      if (!form.value[props[1]]) return
+      if (
+        Number.parseFloat(form.value[key]) >=
+        Number.parseFloat(form.value[props[1]])
+      ) {
+        // if (this.form[key] >= this.form[props[1]]) {
+        form.value[key] = form.value[props[1]]
+      }
     }
-    const form = switchForm(initForm)
-    tableFilter.value = { ...form }  // 更新过滤器数据
-    // 触发更新事件
-    emit('update:filterData', { ...form },props.storage)
+
+
+
+  }
+}
+
+function switchForm(f: any) {
+  const form = { ...f }
+  const platforms = []
+  if (form.platforms_pump) platforms.push('pump')
+  if (form.platforms_moonshot) platforms.push('moonshot')
+  form.platforms = platforms.join(',')
+  delete form.platforms_pump
+  delete form.platforms_moonshot
+  return form
+}
+
+const isArray = _isArray
+const isString = _isString
+const getItemFilterNumber = value=>{
+  if(value === activeTab.value) return getFilterNumber(form.value)
+  const itemStorage = localStorage.getItem(`pumpFilter_${props.activeChain}_${value}`)
+  return itemStorage ? getFilterNumber(JSON.parse(itemStorage)) : 0
+}
+</script>
+
+<style scoped lang="scss">
+.w-pumpFilter {
+  .formItem {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
   }
 
-  function handleInput(props: string[], val: string, index: number) {
-    const key = props[index] || ''
-    form.value[key] = val.replace(/-|[^\d.]/g, '')
-  }
+  .inputRange {
+    display: flex;
 
-  function handleBlur(props: string[], val: string, index: number) {
-    const key = props[index] || ''
-      const defaultRange = props
-        ? [limitData[props[0]], limitData[props[1]]]
-        : []
-      // form.value[a]=Number(b)
-    // form.value[key]=val.replace(/\-|[^\d.]/g, '')
-    if (form.value[key]) {
-        if (defaultRange[0] && Number.parseFloat(form.value[key]) <= defaultRange[0])
-          form.value[key] = defaultRange[0]
+    .gap {
+      display: inline-block;
+      position: relative;
+      margin: 0 8px;
+    }
 
-
-        if (defaultRange[1] && Number.parseFloat(form.value[key]) >= defaultRange[1])
-          form.value[key] = defaultRange[1]
-          if (index == 1) {
-          if (!form.value[props[0]]) return
-          if (
-            Number.parseFloat(form.value[key]) <=
-            Number.parseFloat(form.value[props[0]])
-          ) {
-            form.value[key] = form.value[props[0]]
-          }
-        } else {
-          if (!form.value[props[1]]) return
-          if (
-            Number.parseFloat(form.value[key]) >=
-            Number.parseFloat(form.value[props[1]])
-          ) {
-            // if (this.form[key] >= this.form[props[1]]) {
-            form.value[key] = form.value[props[1]]
-          }
-        }
-
-
-
-      }
-  }
-
-  function switchForm(f: any) {
-    const form = { ...f }
-    const platforms = []
-    if (form.platforms_pump) platforms.push('pump')
-    if (form.platforms_moonshot) platforms.push('moonshot')
-    form.platforms = platforms.join(',')
-    delete form.platforms_pump
-    delete form.platforms_moonshot
-    return form
-  }
-
-  const isArray = _isArray
-  const isString = _isString
-  </script>
-
-<style lang="scss">
-.w-pumpFilter.el-popover.el-popper {
-  padding: 30px 20px;
-
-  .el-form {
-    .el-form-item {
-      .formItem {
-        display: flex;
-        justify-content: flex-end;
-        width: 100%;
-      }
-
-      .inputRange {
-        display: flex;
-
-        .gap {
-          display: inline-block;
-          position: relative;
-          margin: 0 8px;
-        }
-
-        /* .el-input:first-child::after{
+    /* .el-input:first-child::after{
                     display: inline-block;
                     position: relative;
                     content: '～';
                     margin: 0 8px;
                 } */
-        /* .el-input{
+    /* .el-input{
                     width: 48%;
                 } */
-      }
-    }
   }
 }
-</style>
-<style scoped lang="scss">
-/* Add your component styles here */
 
+/* Add your component styles here */
 .filter-btn {
   display: flex;
   align-items: center;
@@ -710,7 +666,8 @@ const tabs = computed(() => {
   box-sizing: border-box;
   height: 26px;
   position: relative;
-  &.hight{
+
+  &.hight {
     color: var(--main-text)
   }
 
@@ -734,6 +691,7 @@ const tabs = computed(() => {
   &:hover {
     cursor: pointer;
     color: var(--main-text);
+
     .iconify {
       color: var(--main-text);
     }
@@ -744,6 +702,7 @@ const tabs = computed(() => {
         background: var(--a-bg-active-color);
     } */
 }
+
 .tabs {
   display: flex;
   align-items: center;
@@ -771,54 +730,72 @@ const tabs = computed(() => {
     display: flex;
     align-items: center;
     justify-content: center;
+
     &.active {
       color: var(--main-text);
       background: var(--dialog-tab-active-bg);
     }
   }
 }
-.border{
+
+.border {
   border: none;
   border-bottom: 1px solid var(--dialog-divider);
 }
-:deep().el-form-item__label{
+
+:deep().el-form-item__label {
   color: var(--secondary-text);
 
 }
-:deep().el-checkbox__inner{
+
+:deep().el-checkbox__inner {
+--el-checkbox-input-width:16px;
+--el-checkbox-input-height:16px;
   border-color: var(--border);
+  border-radius: 4px;
 
 }
-:deep().el-checkbox__label{
+
+:deep().el-checkbox__label {
+  padding-left: 20px;
   color: var(--third-text);
 }
+
 :deep().el-input.el-input {
   --el-input-bg-color: var(--border);
   --el-input-border-color: var(--border);
   --el-input-border-radius: 4px;
   color: var(--main-text);
-  .el-checkbox__inner{
-      border-color: var(--border);
-    }
+
+  .el-checkbox__inner {
+    border-color: var(--border);
+  }
+
   .el-input__wrapper {
-    background: transparent;
+    border: 0 none;
+    background: var(--pump-filter-bg);
+
     &:hover {
       box-shadow: 0 0 0 1px #3F80F7 inset;
     }
+
     &.is-focus {
-      border-color: #3F80F7; /* 蓝色 */
+      border-color: #3F80F7;
+      /* 蓝色 */
       box-shadow: 0 0 0 1px #3F80F7 inset;
     }
-    .el-input__suffix{
+
+    .el-input__suffix {
       color: var(--third-text)
     }
-    .el-input__inner{
+
+    .el-input__inner {
       color: var(--main-text);
+
       &::placeholder {
         color: var(--third-text);
       }
     }
   }
 }
-
 </style>
