@@ -106,7 +106,7 @@ const { botSettings } = storeToRefs(botSettingStore)
 const wsStore = useWSStore()
 const route = useRoute()
 const { t } = useI18n()
-const { showExecuting, showSuccess, closeExecuting, updateExecutingSeconds } = useTransactionPrompt()
+const { executing } = useTransactionPrompt()
 const loadingSwapBuy = ref([false, false, false, false, false])
 const loadingSwapSell = ref([false, false, false, false, false])
 
@@ -241,12 +241,16 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       promptAutoCloseTimer = null
     }
   }
+  const promptHandle = executing({
+    avatarAddress: promptCreatorAddress,
+    avatarChain: chain,
+  })
   const finishPromptFail = () => {
     if (promptDone) return
     promptDone = true
     clearPromptTimer()
     clearPromptAutoCloseTimer()
-    closeExecuting()
+    promptHandle.close()
   }
   const finishPromptSuccess = (txInfo1: any) => {
     if (promptDone) return
@@ -256,7 +260,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
     const elapsedSec = (Date.now() - promptStartTime) / 1000
     const fromAmountDisplay = txInfo1?.fromAmount ? formatUnits(txInfo1.fromAmount, fromToken?.decimals || 0) : amount
     const toAmountDisplay = txInfo1?.outputAmount ? formatUnits(txInfo1.outputAmount, toToken?.decimals || 0) : ''
-    showSuccess({
+    promptHandle.success({
       chain: chain,
       txHash: txInfo1?.txHash || txInfo1?.hash || '',
       elapsedSec,
@@ -269,17 +273,13 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       avatarChain: chain,
     })
   }
-  showExecuting({
-    avatarAddress: promptCreatorAddress,
-    avatarChain: chain,
-  })
   promptTimer = setInterval(() => {
-    updateExecutingSeconds(Math.floor((Date.now() - promptStartTime) / 1000))
-  }, 1000)
+    promptHandle.update(Date.now() - promptStartTime)
+  }, 100)
   promptAutoCloseTimer = setTimeout(() => {
     if (promptDone) return
     clearPromptTimer()
-    closeExecuting()
+    promptHandle.close()
     promptAutoCloseTimer = null
   }, 120000)
   const chainMainToken: Record<string, string> = {

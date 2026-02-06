@@ -242,7 +242,7 @@ const tabs2Ref = ref(props.tabs2)
 const emit = defineEmits(['getTokenBalance', 'update:botSettings'])
 
 const { t } = useI18n()
-const { showExecuting, showSuccess, closeExecuting, updateExecutingSeconds } = useTransactionPrompt()
+const { executing } = useTransactionPrompt()
 
 const show = ref(false)
 
@@ -790,12 +790,17 @@ async function submitBotSwap() {
       promptAutoCloseTimer = null
     }
   }
+  promptStartTime = Date.now()
+  const promptHandle = executing({
+    avatarAddress: promptAvatarAddress,
+    avatarChain: chain,
+  })
   const finishPromptFail = () => {
     if (promptDone) return
     promptDone = true
     clearPromptTimer()
     clearPromptAutoCloseTimer()
-    closeExecuting()
+    promptHandle.close()
   }
   const finishPromptSuccess = (txInfo1: any) => {
     if (promptDone) return
@@ -805,7 +810,7 @@ async function submitBotSwap() {
     const elapsedSec = (Date.now() - promptStartTime) / 1000
     const fromAmountDisplay = txInfo1?.fromAmount ? formatUnits(txInfo1.fromAmount, promptFromToken?.decimals || 0) : fromAmount.value
     const toAmountDisplay = txInfo1?.outputAmount ? formatUnits(txInfo1.outputAmount, promptToToken?.decimals || 0) : toAmount.value
-    showSuccess({
+    promptHandle.success({
       chain: chain,
       txHash: txInfo1?.txHash || txInfo1?.hash || '',
       elapsedSec,
@@ -818,18 +823,13 @@ async function submitBotSwap() {
       avatarChain: chain,
     })
   }
-  promptStartTime = Date.now()
-  showExecuting({
-    avatarAddress: promptAvatarAddress,
-    avatarChain: chain,
-  })
   promptTimer = setInterval(() => {
-    updateExecutingSeconds(Math.floor((Date.now() - promptStartTime) / 1000))
-  }, 1000)
+    promptHandle.update(Date.now() - promptStartTime)
+  }, 100)
   promptAutoCloseTimer = setTimeout(() => {
     if (promptDone) return
     clearPromptTimer()
-    closeExecuting()
+    promptHandle.close()
     promptAutoCloseTimer = null
   }, 120000)
   const chainMainToken: Record<string, string> = {
