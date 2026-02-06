@@ -252,11 +252,12 @@ const twitterHandler = async (val) => {
     }
     // 判断是否已经存在该推特
     const index = trackerStore.list.findIndex(el => el.tweet_id === val.tweet_id)
+    val.follow_status = followAuthorIds.value.includes(val.author_id) ? 1 : 0
     if (index!==-1) {
       trackerStore.list[index] = val
       return
     }
-    val.follow_status = followAuthorIds.value.includes(val.author_id) ? 1 : 0
+    
     if(isPaused.value){
       wsCacheArr.value.unshift(val)
       wsCacheArr.value = wsCacheArr.value.slice(0,100)
