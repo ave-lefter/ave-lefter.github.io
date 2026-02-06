@@ -279,7 +279,19 @@
             </div>
             <div v-if="showQuickAmount" class="mt-20px">
               <div class="mb-10px" style="color: #12b886">{{ $t('setOneClickBuyAmount') }}</div>
-              <el-row :gutter="10">
+              <ul class="flex gap-10px flex-wrap">
+                <li v-for="(item, index) in botSetting.buy[selectedS].buyValueList" :key="index" class="w-[calc((100%-30px)/4)] click-setting">
+                  <el-input
+                    v-model="botSetting.buy[selectedB].buyValueList[index]"
+                    class="input-number"
+                    inputmode="decimal"
+                    placeholder="0.0"
+                    @input="(value) => handleBuyValue(value, index)"
+                    @blur="handleBlurBuyValue(index)"
+                  />
+                </li>
+              </ul>
+              <!-- <el-row :gutter="10">
                 <el-col
                   v-for="(item, index) in botSetting.buy[selectedB].buyValueList"
                   :key="index"
@@ -295,7 +307,7 @@
                     @blur="handleBlurBuyValue(index)"
                   />
                 </el-col>
-              </el-row>
+              </el-row> -->
             </div>
           </template>
           <template v-if="swapType === 'sell'">
@@ -465,7 +477,22 @@
             </div>
             <div v-if="showQuickAmount" class="mt-20px">
               <div class="mb-10px" style="color: #f6465d">{{ $t('setOneClickSellAmount') }}</div>
-              <el-row :gutter="10">
+              <ul class="flex gap-10px flex-wrap">
+                <li v-for="(item, index) in botSetting.sell[selectedS].sellPerList" :key="index" class="w-[calc((100%-30px)/4)] click-setting">
+                  <el-input
+                    v-model="botSetting.sell[selectedS].sellPerList[index]"
+                    class="input-number"
+                    inputmode="decimal"
+                    placeholder="0"
+                    @input="(value) => handlePer(value, index)"
+                  >
+                    <template #suffix>
+                      <span class="color-text-1">%</span>
+                    </template>
+                  </el-input>
+                </li>
+              </ul>
+              <!-- <el-row :gutter="10">
                 <el-col
                   v-for="(item, index) in botSetting.sell[selectedS].sellPerList"
                   :key="index"
@@ -484,7 +511,7 @@
                     </template>
                   </el-input>
                 </el-col>
-              </el-row>
+              </el-row> -->
             </div>
           </template>
         </div>
@@ -1078,8 +1105,8 @@ function handlePer(value: string, index: number) {
   } else if (Number(v) < 0) {
     v = '0'
   }
-  const selected = botSetting.value.selected
-  botSetting.value[selected].sellPerList[index] = v
+   const selected = botSetting.value?.sell?.selected
+  botSetting.value.sell[selected].sellPerList[index] = v
 }
 
 function openSlippageTips() {

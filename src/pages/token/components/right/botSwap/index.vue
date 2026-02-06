@@ -66,7 +66,7 @@ const tabs = computed<Array<{ value: 'buy' | 'sell', name: string }>>(() => {
 
 const tabs1 = computed(() => {
   const botSetting = (botSettingStore?.botSettings?.[chain.value]?.buy || {}) as typeof botSettingStore.botSettings.solana
-  const list = botSetting?.[botSetting.selected]?.buyValueList || ['0.02', '0.05', '0.1', '0.5']
+  const list = botSetting?.[botSetting.selected]?.buyValueList || ['0.01', '0.02', '0.5', '1', '0.1', '0.25', '2', '5']
   return list.map(i => {
     return {
       name: i,
@@ -77,7 +77,7 @@ const tabs1 = computed(() => {
 
 const tabs2 = computed(() => {
   const botSetting = (botSettingStore?.botSettings?.[chain.value]?.sell || {}) as typeof botSettingStore.botSettings.solana
-  const list = botSetting?.[botSetting.selected]?.sellPerList || ['25', '50', '75', '100']
+  const list = botSetting?.[botSetting.selected]?.sellPerList || ['25', '50', '75', '100', '0', '0', '0', '0']
   return list.map(i => {
     return {
       name: i + '%',
