@@ -198,6 +198,8 @@ import {
   useTop100AvgPriceLine,
   useBotAvgPriceLine,
   useKOLAvgPriceLine,
+  DEFAULT_LIST,
+  SUPPORT_LIST
 } from './utils'
 import {
   useLocalStorage,
@@ -370,7 +372,7 @@ function switchTokenKline() {
     resolution.value = initTradingViewIntervals(resolution.value, chain.value, isSupportSecChains)
     const nextResolutions = localStorage.getItem(QUICK_KEY)
     if (preResolutions !== nextResolutions) {
-        resetChart()
+      // resetChart()
     }
     if (_widget && _widget?.activeChart?.()) {
       _widget?.resetCache?.()
@@ -756,14 +758,16 @@ async function initChart() {
     datafeed: {
       onReady: (callback) => {
         // const chain = props.chain
-        const isSupportSecChains = chain.value && supportSecChains.includes(chain.value)
+        // const isSupportSecChains = chain.value && supportSecChains.includes(chain.value)
         const configurationData = {
-          supported_resolutions: isSupportSecChains ?  ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[]:['1S','5S','1', '5', '15', '30', '60', '120', '240', '1D', '1W']as ResolutionString[],
+          // supported_resolutions: isSupportSecChains ? SUPPORT_LIST as ResolutionString[]: DEFAULT_LIST as ResolutionString[],
+          supported_resolutions: SUPPORT_LIST as ResolutionString[],
           supports_marks: true,
           supports_timescale_marks: true,
           supports_time: true,
         }
         setIframeCssVar()
+
 
         setTimeout(() => callback(configurationData), 50)
       },
@@ -794,13 +798,13 @@ async function initChart() {
             has_daily: true,
             // has_no_volume: false, // 布尔表示商品是否拥有成交量数据
             has_weekly_and_monthly: true,
-            supported_resolutions: isSupportSecChains ?  ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W'] as ResolutionString[]:['1S','5S','1', '5', '15', '30', '60', '120', '240', '1D', '1W']as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
+            supported_resolutions: isSupportSecChains ? SUPPORT_LIST as ResolutionString[]: DEFAULT_LIST as ResolutionString[], // 在这个商品的周期选择器中启用一个周期数组。 数组的每个项目都是字符串。
             data_status: 'streaming' as 'streaming' | 'endofday' | 'delayed_streaming',
             visible_plots_set: 'ohlcv' as VisiblePlotsSet,
             type: 'crypto',
             listed_exchange: getSwapInfo?.(chain.value || '', amm.value)?.show_name || '',
           }
-          console.log('[resolveSymbol]: Symbol resolved', symbolName)
+          console.log('[resolveSymbol]: Symbol resolved', symbolInfo)
           setTimeout(() => onResolve(symbolInfo), 0)
         } catch (err) {
           onError(err?.toString?.() || 'resolveSymbol err')
