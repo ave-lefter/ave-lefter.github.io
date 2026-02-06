@@ -7,7 +7,7 @@
           <template v-if="msg.type === 'executing'">
             <div class="transaction-prompt-slot__body">
               <div class="transaction-prompt-slot__line">
-                <el-icon :size="12" class="transaction-prompt-slot__icon-spin">
+                <el-icon :size="16" class="transaction-prompt-slot__icon-spin">
                   <Loading />
                 </el-icon>
                 <span class="transaction-prompt-slot__status-text">{{ $t('transactionExecuting') }}</span>
@@ -65,7 +65,7 @@
               <Icon name="custom:mag-chart" class="transaction-prompt-slot__icon" />
             </a>
             <button type="button" class="transaction-prompt-slot__close" aria-label="close" @click="closeById(msg.id)">
-              <el-icon :size="14">
+              <el-icon :size="16" class="transaction-prompt-slot__icon-close">
                 <Close />
               </el-icon>
             </button>
@@ -132,7 +132,8 @@ function formatAmount(val: string | number | undefined): string {
   font-size: 12px;
   line-height: 1.4;
   border-radius: 12px;
-  background: var(--dialog-list-hover, #1F242C);
+  border: 1px solid var(--main-divider, #1F242C);
+  background: var(--main-bg, #1F242C);
   backdrop-filter: blur(6px);
   color: var(--main-text, #fff);
 
@@ -186,7 +187,7 @@ function formatAmount(val: string | number | undefined): string {
   }
 
   &__from-order {
-    color: var(--secondary-text, #80838b);
+    // color: var(--secondary-text, #80838b);
     font-weight: 400;
   }
 
@@ -194,7 +195,12 @@ function formatAmount(val: string | number | undefined): string {
     color: var(--secondary-text, #80838b);
   }
 
+  &__icon-close {
+    color: var(--third-text, #5A5E64) !important;
+  }
+
   &__icon-spin {
+    color: var(--third-text, #5A5E64) !important;
     animation: transaction-prompt-spin 1s linear infinite;
   }
 
