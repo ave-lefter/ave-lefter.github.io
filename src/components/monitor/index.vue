@@ -85,63 +85,34 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                 <span>{{ $t('time') }}</span>
               </template>
               <template #cell-time="{ row }">
-                <!-- <TimerCount
-                    v-if="row?.time && Number(formatTimeFromNow(row?.time, true)) < 60"
-                    :key="row?.time" :timestamp="row?.time" :end-time="60">
+                <div
+                  v-tooltip="formatDate(row?.created_at || row?.time)"
+                  class="time"
+                  :style="{
+                    color:
+                      Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
+                        ? '#FFA622'
+                        : '#12B886',
+                  }"
+                >
+                  <template v-if="!(row?.created_at || row?.time)"><span>-</span></template>
+                  <TimerCount
+                    v-else-if="(row.created_at || row?.time) && Number(formatTimeFromNow(row.created_at || row?.time, true)) < 60"
+                    :key="`${row.created_at|| row?.time}`"
+                    :timestamp="Math.min(+(row.created_at|| row?.time), dayjs().unix() - 1)" :end-time="60">
                     <template #default="{ seconds }">
-                  <span v-if="seconds < 60" class="color-[--yellow] text-12px">
-                    {{ seconds }}s
-                  </span>
-                      <span v-else class="color-[--third-text] text-12px">
-                    {{ formatTimeFromNow(row?.time) }}
-                  </span>
-                    </template>
-                  </TimerCount>
-                  <div v-else class="color-[--third-text] text-12px">
-                    {{ formatTimeFromNow(row?.time) }}
-                  </div> -->
-                   <div
-                      v-tooltip="formatDate(row?.created_at || row?.time)"
-                      class="time"
-                      :style="{
-                        color:
-                          Number(formatTimeFromNow(row?.created_at || row?.time, true)) <= 600
-                            ? '#FFA622'
-                            : '#12B886',
-                      }"
-                    >
-                      <template v-if="!(row?.created_at || row?.time)"><span>-</span></template>
-                      <template
-                        v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
-                      >
-                      <span>
-                        {{
-                          formatCountdown(
-                            Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
-                            false
-                          )
-                        }}
-                      </span>
-                      </template>
-                      <TimerCount
-                        v-else-if="
-                          (row?.created_at || row?.time) &&
-                          Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
-                        "
-                        :key="`${row.created_at}`"
-                        :timestamp="row.created_at"
-                        :end-time="60"
-                      >
-                        <template #default="{ seconds }">
-                          <span class="color-#FFA622">
+                        <span class="color-#FFA622 text-12px">
                             <template v-if="seconds < 60"> {{ seconds }}s </template>
                             <template v-else>
-                              {{ formatTimeFromNow(row.created_at) }}
+                                {{ formatTimeFromNow(row.created_at|| row?.time) }}
                             </template>
-                          </span>
-                        </template>
-                      </TimerCount>
-                  </div>
+                        </span>
+                    </template>
+                  </TimerCount>
+                  <span v-else class="text-12px">
+                      {{ formatTimeFromNow(row.created_at|| row?.time) }}
+                  </span>
+                </div>
               </template>
               <template #header-symbol>
                 <span>{{ $t('token') }}</span>
@@ -234,36 +205,23 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                           }"
                         >
                           <template v-if="!(row?.created_at || row?.time)"><span>-</span></template>
-                          <template
-                            v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
-                          >
-                          <span>
-                            {{
-                              formatCountdown(
-                                Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
-                                false
-                              )
-                            }}
-                          </span>
-                          </template>
                           <TimerCount
-                            v-else-if="
-                              (row?.created_at || row?.time) &&
-                              Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
-                            "
-                            :key="`${row.created_at}`"
-                            :timestamp="row.created_at"
-                            :end-time="60"
-                          >
-                            <template #default="{ seconds }">
-                              <span class="color-#FFA622">
-                                <template v-if="seconds < 60"> {{ seconds }}s </template>
-                                <template v-else>
-                                  {{ formatTimeFromNow(row.created_at) }}
-                                </template>
-                              </span>
-                            </template>
+                              v-else-if="(row.created_at || row?.time) && Number(formatTimeFromNow(row.created_at || row?.time, true)) < 60"
+                              :key="`${row.created_at|| row?.time}`"
+                              :timestamp="Math.min(+(row.created_at|| row?.time), dayjs().unix() - 1)" :end-time="60">
+                              <template #default="{ seconds }">
+                                  <span class="color-#FFA622 text-12px">
+                                      <template v-if="seconds < 60"> {{ seconds }}s </template>
+                                      <template v-else>
+                                          {{ formatTimeFromNow(row.created_at|| row?.time) }}
+                                      </template>
+                                  </span>
+                              </template>
                           </TimerCount>
+                          <span v-else v-tooltip="formatDate(row.created_at|| row?.time, 'YYYY-MM-DD HH:mm:ss')"
+                              class="text-12px">
+                              {{ formatTimeFromNow(row.created_at|| row?.time) }}
+                          </span>
                       </div>
                   </div>
                   <div class="flex-between">
@@ -372,6 +330,7 @@ import FilterType from './components/filterType.vue'
 import { downColor, upColor } from '@/utils/constants'
 import type {AveTable} from '#components'
 import type { PopoverInstance } from 'element-plus'
+import dayjs from 'dayjs'
 const { t } = useI18n()
 
 const { hasRing ,monitorList2:dataSourceCache,visible,activeName,txType,isLeftFixed,isRightFixed} = storeToRefs(useMonitorStore())
