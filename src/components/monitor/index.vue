@@ -183,7 +183,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
               :style="{
                 height:props.scrollHeight+'px',
                 // height:'500px',
-                '--el-table-border':'1px solid #333'
+                '--el-table-border':'1px solid var(--main-divider)'
               }"
               row-class='cursor-pointer group'
               :rowEventHandlers="{
@@ -279,7 +279,6 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                         }" token-class="w-16px h-16px [&&]:mr-4px" />
                           <span class="color-[--main-text]">{{ row?._target_Token?.symbol }}</span>
                           <img v-if="row?.amm=='pump'"  src="https://www.iconaves.com/signals/pump_king.png" style="width:12px;height:12px">
-                 
                     </div>
                     <div class="flex-end gap-4px">
                       <span class="color-[--third-text]">{{ toggleMc? $t('price') : $t('mcap') }}</span>

@@ -273,11 +273,11 @@ async function getTokenBalance(chain: string) {
     <Icon
     v-if="!(loadingSwap || loadingWalletSwap)"
     :style="{ 'font-size': size }"
-      class="mr-4px"
+      class="mr-4px color-#12B886"
       name="mynaui:lightning-solid"
     />
-    {{ quickBuyValue || 0 }}
-    <span v-if="mainNameVisible" class="ml-5px" >{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+    <span class="color-#12B886">{{ quickBuyValue || 0 }}</span>
+    <span v-if="mainNameVisible" class="ml-5px color-#12B886" >{{ getChainInfo(row.chain)?.main_name || '' }}</span>
   </el-button>
   <el-dialog
     v-if="visible" v-model="visible" :title="$t('buy')"
