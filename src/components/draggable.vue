@@ -130,6 +130,8 @@ function onDrag(x: number, y: number) {
   height: calc(100% - 40px);
   user-select: none;
   cursor: col-resize;
+  background-color: var(--dialog-divider) !important;
+  width: 3px !important;
 }
 .left-drag .handle-mr,.right-drag .handle-ml{
   display: flex!important;

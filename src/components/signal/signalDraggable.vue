@@ -19,12 +19,17 @@ function dragStop(x: number, y: number) {
     signalStore.onDragStop(x, y)
   }
 }
+
+const initialWidth = computed(() => Math.min(signalStore.signalBoundingRect.width, signalStore.winWidth))
+
+const initialHeight = computed(() => Math.min(signalStore.signalBoundingRect.height, signalStore.winHeight - 60))
+
 </script>
 <template>
     <Draggable
 v-if="!signalStore.isLeftFixed && !signalStore.isRightFixed && signalStore.signalVisible"
-        class-name="top-0 left-0 fixed" :z="3" :initialWidth="signalStore.signalBoundingRect.width"
-        :initial-height="signalStore.signalBoundingRect.height" :x="signalStore.signalBoundingRect.x"
+        class-name="top-0 left-0 fixed overflow-hidden" :z="3" :initialWidth="initialWidth"
+        :initial-height="initialHeight" :x="signalStore.signalBoundingRect.x"
         :y="signalStore.signalBoundingRect.y" :min-width="240" :min-height="160" :parent="true" :handles="[
             'tl',
             'tm',

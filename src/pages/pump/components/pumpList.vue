@@ -67,7 +67,6 @@
                     <el-image
                       class="token-icon"
                       :class="{ small: pumpSetting.Progress_isCircle == 'horizontal' }"
-                      lazy
                       fit="cover"
                       :src="
                         getSymbolDefaultIcon(
@@ -392,7 +391,47 @@
                       <span v-else class="color-[--main-text]">{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
                     </div>
                   </div>
-                  <div class="mt-5px">
+                  <div class="mt-5px flex-start text-11px">
+                    <template
+                      v-if="row.buy_tax && row.sell_tax"
+                    >
+                      <span
+                        v-if="row.buy_tax == row.sell_tax"
+                        class="mr-5px"
+                        :style="{
+                              color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
+                          }"
+                      >
+                        Tax {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                      </span>
+                      <span
+                        v-else
+                        class="mr-5px"
+                          :style="{
+                              color: (Number(row?.sell_tax) > 5 || Number(row?.buy_tax) > 5  ? '#F6465D' :'var(--secondary-text)'),
+                          }"
+                      >
+                      B {{ formatNumber(row?.buy_tax || 0, 2) }}%&nbsp;&nbsp;S {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                      </span>
+                    </template>
+                    <span
+                      v-else-if="row.buy_tax"
+                      class="mr-5px"
+                      :style="{
+                            color:(Number(row?.buy_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
+                        }"
+                    >
+                      B {{ formatNumber(row?.buy_tax || 0, 2) }}%
+                    </span>
+                    <span
+                      v-else-if="row.sell_tax"
+                      class="mr-5px"
+                        :style="{
+                            color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
+                        }"
+                    >
+                      S {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                    </span>
                     <PumpPop
                         v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'"
                         :tokenId="(row.token + '-' + row.chain)"
@@ -697,8 +736,14 @@ class="flex-start mr-8px bg-btn"
       <a :href="`https://x.com/search?q=$${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
         {{ $t('tweetSearchContractAddress2') }}
       </a>
-      <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+      <!-- <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
         {{ $t('tweetSearchContractAddress3') }}
+      </a> -->
+      <a :href="`https://www.tiktok.com/search?q=${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+        {{ $t('TikTokSearchName') }}
+      </a>
+      <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+        {{ $t('GoogleSearchName') }}
       </a>
       <span class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer" @click="handleSearchTokenName">{{ $t('tweetSearchContractAddress4') }}</span>
     </div>
@@ -1030,7 +1075,7 @@ function getLiqTooltip(row: PumpObj) {
     <div class="flex-start" style="color:var(--secondary-text)">
       ${t('pair')}
       <span class="color-[--main-text] text-12px ml-5px">
-        ${formatNumber(value || 0, { decimals: 0, l: 4, locale: 'en' })}
+        ${formatNumber(value || 0, { decimals: 2, l: 4, locale: 'en' })}
         <span class="text-11px ml-4px">
           ${row.baseToken?.symbol ?? ''}
         </span>

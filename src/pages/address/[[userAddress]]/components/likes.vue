@@ -18,7 +18,7 @@
         <div class="color-[--secondary-text] text-14px w-108px lh-20px">{{ item.label }}</div>
         <el-progress
           class="flex-1 [&&]:[--el-border-color-lighter:#12B8860D]"
-          :percentage="item.percent"
+          :percentage="item.percent||0"
           :show-text="false"
           :color="getCssVariable('--up-color')"
         />

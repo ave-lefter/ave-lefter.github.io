@@ -31,19 +31,26 @@ export const useMemorySentinel = (configs: {
     }
   }
 
-  const observer = new ReportingObserver((reports) => {
-    const loadTime = Date.now() - Number(sessionStorage.pageLoadTime)
-    for (const report of reports) {
-      if (report.type === 'intervention' && loadTime > 180000) {
-        // isDirty.value = true
-        window.location.reload()
+  let observer: any = null
+  if (window.ReportingObserver) {
+      observer = new ReportingObserver((reports) => {
+      const loadTime = Date.now() - Number(sessionStorage.pageLoadTime)
+      for (const report of reports) {
+        if (report.type === 'intervention' && loadTime > 180000) {
+          // isDirty.value = true
+          window.location.reload()
+        }
       }
-    }
-  }, { types: ['intervention'], buffered: true })
+    }, { types: ['intervention'], buffered: true })
+  }
+
+
 
   let timer: any
   onMounted(() => {
-    observer.observe()
+    if (observer) {
+      observer?.observe?.()
+    }
     timer = setInterval(check, 3000)
   })
 
