@@ -1,4 +1,28 @@
 import { createCacheRequest } from '#imports'
+
+// Dashboard 数据统计项接口
+export interface DashboardStatItem {
+  buy_cnt: string;
+  buy_cnt_period: string;
+  buy_volume: string;
+  buy_volume_period: string;
+  new_pair: string;
+  new_pair_period: string;
+  order_cnt: string;
+  order_cnt_period: string;
+  sell_cnt: string;
+  sell_cnt_period: string;
+  sell_volume: string;
+  sell_volume_period: string;
+  trader_cnt: string;
+  trader_cnt_period: string;
+}
+
+// Dashboard 数据返回接口
+export interface DashboardDataResponse {
+  [key: string]: DashboardStatItem;
+}
+
 export interface IGetTreasureConfig {
   chain_id: string;
   name: string;
@@ -89,5 +113,15 @@ export function klinePreviews(query:{
   return $api('/v2api/token_info/v1/kline/previews', {
     method: 'get',
     query
+  })
+}
+
+// 同名代币
+export function getDashboardData(): Promise<DashboardDataResponse> {
+  const { $api } = useNuxtApp()
+  return $api('/v2api/pump/v1/dashboard', {
+    method: 'get',
+    query: {
+    }
   })
 }

@@ -999,7 +999,9 @@ onDeactivated(()=>{
   // stopWatchList2()
   // stopWatchList3()
   unbindAudioCanPlay()
-
+  isPausedObj.value.new = false
+  isPausedObj.value.soon = false
+  isPausedObj.value.graduated = false
   isLeave = true
   pumpStateBuffer.length = 0
   bufferLogoMap.clear()

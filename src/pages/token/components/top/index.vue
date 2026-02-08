@@ -1,872 +1,889 @@
 <!-- eslint-disable vue/no-parsing-error -->
 <template>
-  <el-alert
-    v-if="(tokenStore?.token?.risk_level ?? 0) < 0"
-    class="myTxs-notice"
-    type="warning"
-    :title="$t('riskWarning') + ': ' + $t('riskWarningContent1')"
-    show-icon
-    :style="{
-      backgroundColor: mode === 'light' ? '#ffa94d0d' : '#36131C',
-      color: '#f00',
-      border: 'none',
-      fontSize: '12px'
-    }"
-    :closable="false"
-  />
-  <el-alert
-    v-else-if="tokenStore.warningStatus"
-    class="myTxs-notice"
-    type="warning"
-    :title="t('alertNotice')"
-    show-icon
-    closable
-    :style="{
-      backgroundColor: mode === 'light' ? '#ffa94d0d' : '#3b1e0c',
-      color: '#ED6A0C',
-      border: 'none',
-      fontSize: '12px'
-    }"
-    @close="handleNoticeClose"
-  />
-  <div
-    class="info flex items-center bg-[--secondary-bg] mb-1px h-64px p-x-16px text-12px color-[--third-text]"
-  >
-    <!-- <Icon
-      name="material-symbols:kid-star"
-      class="h-16px w-16px clickable"
-      :class="collected ? 'color-#ffbb19' : 'color-[--icon-color]'"
-      @click="collect"
-    /> -->
-    <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
-    <div class="token-info ml-16px flex items-center color-[--third-text]">
-      <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
-        <template #content>
-          <el-image
-            class="token-icon  h-228px w-228px items-center"
-            :src="getSymbolDefaultIcon(token)"
-            lazy
-          >
-            <template #error>
-              <img
-                class="token-icon h-228px w-228px"
-                :src="getChainDefaultIcon(token?.chain, token?.symbol)"
-              >
-            </template>
-            <template #placeholder>
-              <img
-                class="token-icon h-228px w-228px"
-                :src="getChainDefaultIcon(token?.chain, token?.symbol)"
-              >
-            </template>
-          </el-image>
-        </template>
-          <div
-            v-if="getSymbolDefaultIcon(token)"
-            class="icon-token-container relative"
-          >
-          <el-image
-              class="token-icon rounded-100%"
+  <div class="relative">
+    <el-alert
+      v-if="(tokenStore?.token?.risk_level ?? 0) < 0"
+      class="myTxs-notice"
+      type="warning"
+      :title="$t('riskWarning') + ': ' + $t('riskWarningContent1')"
+      show-icon
+      :style="{
+        backgroundColor: mode === 'light' ? '#ffa94d0d' : '#36131C',
+        color: '#f00',
+        border: 'none',
+        fontSize: '12px'
+      }"
+      :closable="false"
+    />
+    <el-alert
+      v-else-if="tokenStore.warningStatus"
+      class="myTxs-notice"
+      type="warning"
+      :title="t('alertNotice')"
+      show-icon
+      closable
+      :style="{
+        backgroundColor: mode === 'light' ? '#ffa94d0d' : '#3b1e0c',
+        color: '#ED6A0C',
+        border: 'none',
+        fontSize: '12px'
+      }"
+      @close="handleNoticeClose"
+    />
+    <div
+      class="info flex items-center bg-[--secondary-bg] mb-1px h-64px p-x-16px text-12px color-[--third-text]"
+    >
+      <!-- <Icon
+        name="material-symbols:kid-star"
+        class="h-16px w-16px clickable"
+        :class="collected ? 'color-#ffbb19' : 'color-[--icon-color]'"
+        @click="collect"
+      /> -->
+      <Collect iconClass="text-16px cursor-pointer" :isCollected="collected" :userFavoriteGroups="userFavoriteGroups" @confirmSwitchGroup="confirmSwitchGroup" @collect="collect" @newGroupAndCollect="newGroupAndCollect"/>
+      <div class="token-info ml-16px flex items-center color-[--third-text]">
+        <el-tooltip  v-if="getSymbolDefaultIcon(token)" popper-class="tooltip-pd-0" placement="bottom-start" :show-arrow="false" :persistent="false">
+          <template #content>
+            <el-image
+              class="token-icon  h-228px w-228px items-center"
               :src="getSymbolDefaultIcon(token)"
               lazy
             >
               <template #error>
                 <img
-                  class="token-icon"
+                  class="token-icon h-228px w-228px"
                   :src="getChainDefaultIcon(token?.chain, token?.symbol)"
                 >
               </template>
               <template #placeholder>
                 <img
-                  class="token-icon"
+                  class="token-icon h-228px w-228px"
                   :src="getChainDefaultIcon(token?.chain, token?.symbol)"
                 >
               </template>
             </el-image>
-            <img
-              v-if="token?.chain"
-              class="icon-symbol rounded-100%"
-              :src="`${token_logo_url}chain/${token?.chain}.png`"
+          </template>
+            <div
+              v-if="getSymbolDefaultIcon(token)"
+              class="icon-token-container relative"
             >
-          </div>
-      </el-tooltip>
-      <div class="ml-8px">
-        <div class="flex items-center">
-          <span
-            class="text-16px leading-[1.25] color-[--main-text] font-500"
-            >{{ token?.symbol }}</span
-          >
-          <span class="ml-8px text-12px font-500 mr-8px">{{
-            token?.name
-          }}</span>
-          <div class="flex items-center justify-start">
-            <img v-if="(token?.risk_level??0) < 0" class="bg-btn" src="@/assets/images/fengxian.png" :width="12">
-            <!-- <div v-if="medias?.length > 0" class="flex text-20px">
-              <div v-for="(item, index) in medias" :key="index" class="tag-btn">
-                <template v-if="item.url">
-                  <span
-                    v-if="item.name === 'QQ'"
-                    v-tooltip="item.url"
-                    class="bg-btn"
+            <el-image
+                class="token-icon rounded-100%"
+                :src="getSymbolDefaultIcon(token)"
+                lazy
+              >
+                <template #error>
+                  <img
+                    class="token-icon"
+                    :src="getChainDefaultIcon(token?.chain, token?.symbol)"
                   >
-                    <Icon
-                      :name="`custom:${item.icon}`"
-                      class="text-[--third-text] text-12px"
-                    />
-                  </span>
-                  <a
-                    v-else
-                    v-tooltip="item.url"
-                    :href="item.url"
-                    target="_blank"
-                    class="bg-btn"
-                    @click.stop
-                  >
-                    <Icon
-                      :name="`custom:${item.icon}`"
-                      class="text-[--third-text] text-12px"
-                    />
-                  </a>
                 </template>
-              </div>
-            </div> -->
-            <div v-if="medias?.length > 0" class="flex text-20px">
-              <div v-for="(item, index) in medias" :key="index" class="tag-btn">
-                <template v-if="item.url">
-                  <span
-                    v-if="item.name === 'QQ'"
-                    v-tooltip="item.url"
-                    class="bg-btn"
+                <template #placeholder>
+                  <img
+                    class="token-icon"
+                    :src="getChainDefaultIcon(token?.chain, token?.symbol)"
                   >
-                    <Icon
-                      :name="`custom:${item.icon}`"
-                      class="text-[--third-text] text-12px"
-                    />
-                  </span>
-                  <XPopup v-else-if="item.icon === 'twitter'" :tokenId="(route.params.id as string)" :type="tokenStore.twitterType">
+                </template>
+              </el-image>
+              <img
+                v-if="token?.chain"
+                class="icon-symbol rounded-100%"
+                :src="`${token_logo_url}chain/${token?.chain}.png`"
+              >
+            </div>
+        </el-tooltip>
+        <div class="ml-8px">
+          <div class="flex items-center">
+            <span
+              class="text-16px leading-[1.25] color-[--main-text] font-500"
+              >{{ token?.symbol }}</span
+            >
+            <span class="ml-8px text-12px font-500 mr-8px">{{
+              token?.name
+            }}</span>
+            <div class="flex items-center justify-start">
+              <img v-if="(token?.risk_level??0) < 0" class="bg-btn" src="@/assets/images/fengxian.png" :width="12">
+              <!-- <div v-if="medias?.length > 0" class="flex text-20px">
+                <div v-for="(item, index) in medias" :key="index" class="tag-btn">
+                  <template v-if="item.url">
+                    <span
+                      v-if="item.name === 'QQ'"
+                      v-tooltip="item.url"
+                      class="bg-btn"
+                    >
+                      <Icon
+                        :name="`custom:${item.icon}`"
+                        class="text-[--third-text] text-12px"
+                      />
+                    </span>
                     <a
+                      v-else
+                      v-tooltip="item.url"
                       :href="item.url"
                       target="_blank"
                       class="bg-btn"
                       @click.stop
                     >
-                      <XIcon
-                        v-if="[1, 2, 3].includes(tokenStore.twitterType)"
-                        :type="tokenStore.twitterType"
-                        class="text-12px"
-                      />
                       <Icon
-                        v-else
                         :name="`custom:${item.icon}`"
                         class="text-[--third-text] text-12px"
                       />
                     </a>
-                  </XPopup>
+                  </template>
+                </div>
+              </div> -->
+              <div v-if="medias?.length > 0" class="flex text-20px">
+                <div v-for="(item, index) in medias" :key="index" class="tag-btn">
+                  <template v-if="item.url">
+                    <span
+                      v-if="item.name === 'QQ'"
+                      v-tooltip="item.url"
+                      class="bg-btn"
+                    >
+                      <Icon
+                        :name="`custom:${item.icon}`"
+                        class="text-[--third-text] text-12px"
+                      />
+                    </span>
+                    <XPopup v-else-if="item.icon === 'twitter'" :tokenId="(route.params.id as string)" :type="tokenStore.twitterType">
+                      <a
+                        :href="item.url"
+                        target="_blank"
+                        class="bg-btn"
+                        @click.stop
+                      >
+                        <XIcon
+                          v-if="[1, 2, 3].includes(tokenStore.twitterType)"
+                          :type="tokenStore.twitterType"
+                          class="text-12px"
+                        />
+                        <Icon
+                          v-else
+                          :name="`custom:${item.icon}`"
+                          class="text-[--third-text] text-12px"
+                        />
+                      </a>
+                    </XPopup>
 
-                  <a
-                    v-else
-                    v-tooltip="item.url"
-                    :href="item.url"
-                    target="_blank"
-                    class="bg-btn"
-                    @click.stop
+                    <a
+                      v-else
+                      v-tooltip="item.url"
+                      :href="item.url"
+                      target="_blank"
+                      class="bg-btn"
+                      @click.stop
+                    >
+                      <Icon
+                        :name="`custom:${item.icon}`"
+                        class="text-[--third-text] text-12px"
+                      />
+                    </a>
+                  </template>
+                </div>
+              </div>
+              <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
+              <el-popover popper-class="[--el-popover-bg-color:--border]" :persistent="false">
+                <template #reference>
+                  <span
+                    class="media-item bg-btn cursor-pointer"
                   >
                     <Icon
-                      :name="`custom:${item.icon}`"
-                      class="text-[--third-text] text-12px"
+                      class="text-[--third-text] h-16px w-10px"
+                      name="custom:search"
                     />
-                  </a>
+                </span>
                 </template>
-              </div>
-            </div>
-            <PumpLive v-if="token?.is_streaming" :tokenId="(route.params.id as string)" />
-            <el-popover popper-class="[--el-popover-bg-color:--border]" :persistent="false">
-              <template #reference>
-                <span
-                  class="media-item bg-btn cursor-pointer"
+                <template #default>
+                  <div class="py-4px [&&]:m--12px flex flex-col">
+                    <a :href="`https://x.com/search?q=${token?.token}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                      {{ $t('tweetSearchContractAddress') }}
+                    </a>
+                    <a :href="`https://x.com/search?q=$${token?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                      {{ $t('tweetSearchContractAddress2') }}
+                    </a>
+                    <!-- <a :href="`https://www.google.com/search?q=${token?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                      {{ $t('tweetSearchContractAddress3') }}
+                    </a> -->
+                    <a :href="`https://www.tiktok.com/search?q=${token?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                      {{ $t('TikTokSearchName') }}
+                    </a>
+                    <a :href="`https://www.google.com/search?q=${token?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+                      {{ $t('GoogleSearchName') }}
+                    </a>
+                    <span class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer" @click="handleSearchTokenName">{{ $t('tweetSearchContractAddress4') }}</span>
+                  </div>
+                </template>
+              </el-popover>
+
+              <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
+                <div
+                  v-for="(i, index) in getTags(pair)?.normal_tag"
+                  :key="index"
+                  class="bg-btn flex h-16px tag-btn"
                 >
+                  <el-image
+                    v-tooltip="$t(`${i.tag}`)"
+                    class="token-icon-tag cursor-pointer h-100% max-w-16px"
+                    :src="formatIconTag(i.tag)"
+                    lazy
+                  >
+                    <template #error>
+                      <img
+                        class="token-icon-tag h-16px"
+                        src="/icon-default.png"
+                      >
+                    </template>
+                    <template #placeholder>
+                      <img
+                        class="token-icon-tag h-16px"
+                        src="/icon-default.png"
+                      >
+                    </template>
+                  </el-image>
+                  <span
+                    v-if="i?.showText"
+                    :style="{
+                      color: i?.color == 'green' ? upColor[0] : downColor[0],
+                    }"
+                    class="text-10px mr-4px"
+                  >
+                    {{ $t(i?.tag) }}
+                  </span>
+                </div>
+              </template>
+              <img
+                v-if="token?.launchpad"
+                v-tooltip="token.launchpad"
+                class="rounded-100% bg-btn cursor-pointer"
+                :src="formatIconTag(token.launchpad)"
+                alt=""
+                :width="12"
+                style="border-radius: 100%"
+              >
+              <a
+                v-if="aiSummary?.headline || aiSummary?.summary"
+                v-tooltip.raw="{
+                  content: `<div class='max-w-[400px]'>${aiSummary.headline || aiSummary.summary}</div>`,
+                  props:{
+                    placement:'top-start'
+                  }
+                }"
+                class="media-item bg-btn clickable">
+                <Icon name="custom:ai" class="text-14px"/>
+              </a>
+            </div>
+            <DeBox/>
+            <el-popover
+              v-if="collected"
+              v-model:visible="editableGroup"
+              placement="bottom"
+              popper-class="chains-table-filter"
+              title=""
+              :width="200"
+              :persistent="false"
+              trigger="click"
+            >
+              <template #reference>
+                <a class="w-zu flex-start bg-btn" href="" @click.stop.prevent>
                   <Icon
-                    class="text-[--third-text] h-16px w-10px"
-                    name="custom:search"
+                    class="text-[--third-text] text-12px"
+                    name="custom:groups"
                   />
-              </span>
+                  <span class="ml-2px ellipsis block" style="max-width: 140px">
+                    {{ currentGroup }}
+                  </span>
+                </a>
               </template>
               <template #default>
-                <div class="py-4px [&&]:m--12px flex flex-col">
-                  <a :href="`https://x.com/search?q=${token?.token}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
-                    {{ $t('tweetSearchContractAddress') }}
-                  </a>
-                  <a :href="`https://x.com/search?q=$${token?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
-                    {{ $t('tweetSearchContractAddress2') }}
-                  </a>
-                  <a :href="`https://www.google.com/search?q=${token?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
-                    {{ $t('tweetSearchContractAddress3') }}
-                  </a>
-                  <span class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer" @click="handleSearchTokenName">{{ $t('tweetSearchContractAddress4') }}</span>
+                <div class="filter-box">
+                  <span>{{ $t('editGroup') }}</span>
+                  <div class="flex mt-10px">
+                    <el-select
+                      v-model="selectedGroup"
+                      class="select3"
+                      :placeholder="$t('pleaseSelectGroup')"
+                      :teleported="false"
+                      :persistent="false"
+                    >
+                      <el-option :label="$t('defaultGroup')" :value="0" />
+                      <el-option
+                        v-for="item in userFavoriteGroups"
+                        :key="item.group_id"
+                        :label="item.name"
+                        :value="item.group_id"
+                      />
+                    </el-select>
+                  </div>
+                  <div class="mt-20px flex-center">
+                    <el-button
+                      :key="themeStore.theme"
+                      class="flex-1"
+                      size="default"
+                      style="
+                        height: 30px;
+                        min-width: 70px;
+                        --el-button-font-weight: 400;
+                      "
+                      color="var(--border)"
+                      @click.stop="handleReset()"
+                    >
+                      {{ $t('cancel') }}
+                    </el-button>
+                    <el-button
+                      v-loading="loadingGroupEdit"
+                      class="flex-1"
+                      size="default"
+                      style="
+                        height: 30px;
+                        min-width: 70px;
+                        --el-button-font-weight: 400;
+                      "
+                      type="primary"
+                      @click.stop="
+                        confirmSwitchGroup(selectedGroup)
+                      "
+                    >
+                      {{ $t('confirm') }}
+                    </el-button>
+                  </div>
                 </div>
               </template>
             </el-popover>
-
-            <template v-if="pair && getTags(pair)?.normal_tag?.length > 0">
+            <el-popover
+              v-if="collected"
+              v-model:visible="editableRemark"
+              placement="bottom"
+              popper-class="chains-table-filter"
+              title=""
+              :persistent="false"
+              :width="200"
+              trigger="click"
+            >
+              <template #reference>
+                <a class="w-zu flex-start bg-btn" href="" @click.stop.prevent>
+                  <Icon
+                    class="text-[--third-text] text-12px"
+                    name="custom:remark"
+                  />
+                  <span class="ml-2px ellipsis block" style="max-width: 140px">{{
+                    remark
+                  }}</span>
+                </a>
+              </template>
+              <template #default>
+                <div class="filter-box">
+                  <span>{{ $t('editRemark') }}</span>
+                  <div class="flex mt-10px">
+                    <el-input
+                      v-model.trim="remark2"
+                      :placeholder="remark"
+                      clearable
+                    />
+                  </div>
+                  <div class="mt-20px flex-center">
+                    <el-button
+                      :key="themeStore.theme"
+                      class="flex-1"
+                      size="default"
+                      style="
+                        height: 30px;
+                        min-width: 70px;
+                        margin-left: auto;
+                        --el-button-font-weight: 400;
+                      "
+                     color="var(--border)"
+                      @click.stop="handleReset()"
+                    >
+                      {{ $t('cancel') }}
+                    </el-button>
+                    <el-button
+                      class="flex-1"
+                      size="default"
+                      type="primary"
+                      style="
+                        height: 30px;
+                        min-width: 70px;
+                        --el-button-font-weight: 400;
+                      "
+                      @click.stop="confirmEditRemark(id, remark2)"
+                    >
+                      {{ $t('confirm') }}
+                    </el-button>
+                  </div>
+                </div>
+              </template>
+            </el-popover>
+          </div>
+          <div class="text-12px flex items-center mt-4px">
+            <a
+              v-if="token?.token !== '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'"
+              class="hover:color-[--main-text] leading-12px font-500"
+              :href="formatExplorerUrl(token?.chain as string, token?.token as string)"
+              target="_blank"
+            >
+              {{
+                token?.token?.replace(new RegExp('(.{4})(.+)(.{4}$)'), '$1...$3')
+              }}
+            </a>
+            <span
+              class="media-item bg-btn cursor-pointer"
+            >
+              <Icon
+                v-copy="token?.token"
+                name="bxs:copy"
+                class="ml-5px clickable"
+              />
+            </span>
+            <span
+              v-if="pair"
+              v-tooltip="formatDate(pair?.created_at)"
+              class="ml-5px hover:color-[--main-text] leading-12px font-400 mr-8px"
+              >
+              {{ formatTimeFromNow(pair?.created_at, false, true) }}
+              </span>
+            <div
+              v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0"
+              class="flex-start bg-btn"
+            >
+              <span>{{ $t('tax') }}:</span>
+              <span
+              v-if="(tokenInfoExtra?.buy_tax??0) > 0"
+                class="text-12px tax-text"
+                :style="{ color: upColor[0] }"
+              >
+                {{ formatNumber(tokenInfoExtra?.buy_tax ||0, 1) }}%
+              </span>
+              <span
+                v-if="(tokenInfoExtra?.sell_tax??0) > 0"
+                class="text-12px tax-text ml-4px"
+                :style="{ color: downColor[0] }"
+              >
+                {{ formatNumber(tokenInfoExtra?.sell_tax ||0, 1) }}%
+              </span>
+            </div>
+            <template v-if="pair && getTags(pair)?.signal_arr?.length > 0">
               <div
-                v-for="(i, index) in getTags(pair)?.normal_tag"
+                v-for="(i, index) in getTags(pair)?.signal_arr?.slice(0, 3)"
                 :key="index"
-                class="bg-btn flex h-16px tag-btn"
+                v-tooltip="
+                  getTagTooltip(i) +
+                  (i.tag == 'smarter_buy' || i.tag == 'smarter_sell'
+                    ? `（${$t('amountU')}>$10)`
+                    : '')
+                "
+                class="flex bg-btn signal pointer mr-4px text-10px"
               >
                 <el-image
-                  v-tooltip="$t(`${i.tag}`)"
-                  class="token-icon-tag cursor-pointer h-100% max-w-16px"
+                  class="token-icon-signal-tag h-10px"
                   :src="formatIconTag(i.tag)"
                   lazy
                 >
                   <template #error>
                     <img
-                      class="token-icon-tag h-16px"
+                      class="token-icon-signal-tag h-16px"
                       src="/icon-default.png"
                     >
                   </template>
                   <template #placeholder>
                     <img
-                      class="token-icon-tag h-16px"
+                      class="token-icon-signal-tag h-16px"
                       src="/icon-default.png"
                     >
                   </template>
                 </el-image>
-                <span
-                  v-if="i?.showText"
-                  :style="{
-                    color: i?.color == 'green' ? upColor[0] : downColor[0],
-                  }"
-                  class="text-10px mr-4px"
+                <div
+                  v-if="
+                    (i?.tag == 'smarter_buy' || i?.tag == 'smarter_sell') &&
+                    ((pair?.smart_money_buy_count_24h ?? 0) > 0 ||
+                      (pair?.smart_money_sell_count_24h ?? 0 > 0))
+                  "
+                  class="ml-2px"
+                  style="color: #959a9f"
                 >
-                  {{ $t(i?.tag) }}
-                </span>
-              </div>
-            </template>
-            <img
-              v-if="token?.launchpad"
-              v-tooltip="token.launchpad"
-              class="rounded-100% bg-btn cursor-pointer"
-              :src="formatIconTag(token.launchpad)"
-              alt=""
-              :width="12"
-              style="border-radius: 100%"
-            >
-            <a
-              v-if="aiSummary?.headline || aiSummary?.summary"
-              v-tooltip.raw="{
-                content: `<div class='max-w-[400px]'>${aiSummary.headline || aiSummary.summary}</div>`,
-                props:{
-                  placement:'top-start'
-                }
-              }"
-              class="media-item bg-btn clickable">
-              <Icon name="custom:ai" class="text-14px"/>
-            </a>
-          </div>
-          <DeBox/>
-          <el-popover
-            v-if="collected"
-            v-model:visible="editableGroup"
-            placement="bottom"
-            popper-class="chains-table-filter"
-            title=""
-            :width="200"
-            :persistent="false"
-            trigger="click"
-          >
-            <template #reference>
-              <a class="w-zu flex-start bg-btn" href="" @click.stop.prevent>
-                <Icon
-                  class="text-[--third-text] text-12px"
-                  name="custom:groups"
-                />
-                <span class="ml-2px ellipsis block" style="max-width: 140px">
-                  {{ currentGroup }}
-                </span>
-              </a>
-            </template>
-            <template #default>
-              <div class="filter-box">
-                <span>{{ $t('editGroup') }}</span>
-                <div class="flex mt-10px">
-                  <el-select
-                    v-model="selectedGroup"
-                    class="select3"
-                    :placeholder="$t('pleaseSelectGroup')"
-                    :teleported="false"
-                    :persistent="false"
+                  <span
+                    :style="{
+                      color:
+                        (pair?.smart_money_buy_count_24h ?? 0) > 0
+                          ? upColor[0]
+                          : '',
+                    }"
                   >
-                    <el-option :label="$t('defaultGroup')" :value="0" />
-                    <el-option
-                      v-for="item in userFavoriteGroups"
-                      :key="item.group_id"
-                      :label="item.name"
-                      :value="item.group_id"
-                    />
-                  </el-select>
-                </div>
-                <div class="mt-20px flex-center">
-                  <el-button
-                    :key="themeStore.theme"
-                    class="flex-1"
-                    size="default"
-                    style="
-                      height: 30px;
-                      min-width: 70px;
-                      --el-button-font-weight: 400;
-                    "
-                    color="var(--border)"
-                    @click.stop="handleReset()"
+                    {{
+                      formatNumber(pair?.smart_money_buy_count_24h || 0, 0)
+                    }} </span
+                  >/<span
+                    :style="{
+                      color:
+                        (pair?.smart_money_sell_count_24h ?? 0) > 0
+                          ? downColor[0]
+                          : '',
+                    }"
                   >
-                    {{ $t('cancel') }}
-                  </el-button>
-                  <el-button
-                    v-loading="loadingGroupEdit"
-                    class="flex-1"
-                    size="default"
-                    style="
-                      height: 30px;
-                      min-width: 70px;
-                      --el-button-font-weight: 400;
-                    "
-                    type="primary"
-                    @click.stop="
-                      confirmSwitchGroup(selectedGroup)
-                    "
-                  >
-                    {{ $t('confirm') }}
-                  </el-button>
-                </div>
-              </div>
-            </template>
-          </el-popover>
-          <el-popover
-            v-if="collected"
-            v-model:visible="editableRemark"
-            placement="bottom"
-            popper-class="chains-table-filter"
-            title=""
-            :persistent="false"
-            :width="200"
-            trigger="click"
-          >
-            <template #reference>
-              <a class="w-zu flex-start bg-btn" href="" @click.stop.prevent>
-                <Icon
-                  class="text-[--third-text] text-12px"
-                  name="custom:remark"
-                />
-                <span class="ml-2px ellipsis block" style="max-width: 140px">{{
-                  remark
-                }}</span>
-              </a>
-            </template>
-            <template #default>
-              <div class="filter-box">
-                <span>{{ $t('editRemark') }}</span>
-                <div class="flex mt-10px">
-                  <el-input
-                    v-model.trim="remark2"
-                    :placeholder="remark"
-                    clearable
-                  />
-                </div>
-                <div class="mt-20px flex-center">
-                  <el-button
-                    :key="themeStore.theme"
-                    class="flex-1"
-                    size="default"
-                    style="
-                      height: 30px;
-                      min-width: 70px;
-                      margin-left: auto;
-                      --el-button-font-weight: 400;
-                    "
-                   color="var(--border)"
-                    @click.stop="handleReset()"
-                  >
-                    {{ $t('cancel') }}
-                  </el-button>
-                  <el-button
-                    class="flex-1"
-                    size="default"
-                    type="primary"
-                    style="
-                      height: 30px;
-                      min-width: 70px;
-                      --el-button-font-weight: 400;
-                    "
-                    @click.stop="confirmEditRemark(id, remark2)"
-                  >
-                    {{ $t('confirm') }}
-                  </el-button>
-                </div>
-              </div>
-            </template>
-          </el-popover>
-        </div>
-        <div class="text-12px flex items-center mt-4px">
-          <a
-            v-if="token?.token !== '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'"
-            class="hover:color-[--main-text] leading-12px font-500"
-            :href="formatExplorerUrl(token?.chain as string, token?.token as string)"
-            target="_blank"
-          >
-            {{
-              token?.token?.replace(new RegExp('(.{4})(.+)(.{4}$)'), '$1...$3')
-            }}
-          </a>
-          <span
-            class="media-item bg-btn cursor-pointer"
-          >
-            <Icon
-              v-copy="token?.token"
-              name="bxs:copy"
-              class="ml-5px clickable"
-            />
-          </span>
-          <span
-            v-if="pair"
-            v-tooltip="formatDate(pair?.created_at)"
-            class="ml-5px hover:color-[--main-text] leading-12px font-400 mr-8px"
-            >
-            {{ formatTimeFromNow(pair?.created_at, false, true) }}
-            </span>
-          <div
-            v-if="(tokenInfoExtra?.buy_tax??0) > 0 || (tokenInfoExtra?.sell_tax??0) > 0"
-            class="flex-start bg-btn"
-          >
-            <span>{{ $t('tax') }}:</span>
-            <span
-            v-if="(tokenInfoExtra?.buy_tax??0) > 0"
-              class="text-12px tax-text"
-              :style="{ color: upColor[0] }"
-            >
-              {{ formatNumber(tokenInfoExtra?.buy_tax ||0, 1) }}%
-            </span>
-            <span
-              v-if="(tokenInfoExtra?.sell_tax??0) > 0"
-              class="text-12px tax-text ml-4px"
-              :style="{ color: downColor[0] }"
-            >
-              {{ formatNumber(tokenInfoExtra?.sell_tax ||0, 1) }}%
-            </span>
-          </div>
-          <template v-if="pair && getTags(pair)?.signal_arr?.length > 0">
-            <div
-              v-for="(i, index) in getTags(pair)?.signal_arr?.slice(0, 3)"
-              :key="index"
-              v-tooltip="
-                getTagTooltip(i) +
-                (i.tag == 'smarter_buy' || i.tag == 'smarter_sell'
-                  ? `（${$t('amountU')}>$10)`
-                  : '')
-              "
-              class="flex bg-btn signal pointer mr-4px text-10px"
-            >
-              <el-image
-                class="token-icon-signal-tag h-10px"
-                :src="formatIconTag(i.tag)"
-                lazy
-              >
-                <template #error>
-                  <img
-                    class="token-icon-signal-tag h-16px"
-                    src="/icon-default.png"
-                  >
-                </template>
-                <template #placeholder>
-                  <img
-                    class="token-icon-signal-tag h-16px"
-                    src="/icon-default.png"
-                  >
-                </template>
-              </el-image>
-              <div
-                v-if="
-                  (i?.tag == 'smarter_buy' || i?.tag == 'smarter_sell') &&
-                  ((pair?.smart_money_buy_count_24h ?? 0) > 0 ||
-                    (pair?.smart_money_sell_count_24h ?? 0 > 0))
-                "
-                class="ml-2px"
-                style="color: #959a9f"
-              >
-                <span
-                  :style="{
-                    color:
-                      (pair?.smart_money_buy_count_24h ?? 0) > 0
-                        ? upColor[0]
-                        : '',
-                  }"
-                >
-                  {{
-                    formatNumber(pair?.smart_money_buy_count_24h || 0, 0)
-                  }} </span
-                >/<span
-                  :style="{
-                    color:
-                      (pair?.smart_money_sell_count_24h ?? 0) > 0
-                        ? downColor[0]
-                        : '',
-                  }"
-                >
-                  {{ formatNumber(pair?.smart_money_sell_count_24h || 0, 0) }}
-                </span>
-              </div>
-              <span
-                class="ml-2px"
-                :style="{
-                  color: i.color == 'green' ? upColor[0] : downColor[0],
-                }"
-              >
-                <template v-if="i.tag">
-                  <template v-if="new RegExp('_buy.*$', 'gi').test(i.tag)">
-                    {{ $t('buy') }}
-                  </template>
-                  <template
-                    v-else-if="new RegExp('_sell.*$', 'gi').test(i.tag)"
-                  >
-                    {{ $t('sell') }}
-                  </template>
-                  <template v-else>
-                    {{ $t(i.tag) }}
-                  </template>
-                </template>
-              </span>
-            </div>
-          </template>
-          <div
-            v-if="
-              pair &&
-              getTags(pair)?.signal_arr?.findIndex(
-                (i) => i?.tag === 'smarter_buy'
-              ) == -1 &&
-              getTags(pair)?.signal_arr?.findIndex(
-                (i) => i?.tag == 'smarter_sell'
-              ) == -1 &&
-              ((pair?.smart_money_buy_count_24h ?? 0) > 0 ||
-                (pair?.smart_money_sell_count_24h ?? 0) > 0)
-            "
-            v-tooltip="
-              getTagTooltip({
-                smart_money_buy_count_24h: pair?.smart_money_buy_count_24h || 0,
-                smart_money_sell_count_24h:
-                  pair?.smart_money_sell_count_24h || 0,
-              })
-            "
-            class="minor flex-end color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px"
-          >
-            <Icon
-              class="text-[--third-text] h-12px w-12px mr-2px"
-              name="custom:smart"
-            />
-            <span class="mr-2px text-10px">{{ $t('smarter') }}</span>
-            <span
-              :style="{
-                color:
-                  (pair?.smart_money_buy_count_24h ?? 0) > 0
-                    ? upColor[0]
-                    : 'var(--custom-text-3-color)',
-              }"
-            >
-              {{ formatNumber(pair?.smart_money_buy_count_24h || 0, 0) }} </span
-            >/<span
-              :style="{
-                color:
-                  (pair?.smart_money_sell_count_24h ?? 0) > 0
-                    ? downColor[0]
-                    : 'var(--custom-text-3-color)',
-              }"
-            >
-              {{ formatNumber(pair?.smart_money_sell_count_24h || 0, 0) }}
-            </span>
-          </div>
-          <top50 />
-          <el-popover width="120px" popper-class="[--el-popover-bg-color:--border] !min-w-[120px]" :persistent="false">
-            <template #reference>
-              <span
-                class="media-item bg-btn cursor-pointer"
-              >
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path :fill="devToken?.total_tokens ? '#F6465D' : '#5A5E64'" d="M8.04273 10H1.94948C1.80865 10 1.69463 9.87378 1.69463 9.71787V8.05005H8.29757V9.71914C8.29648 9.87378 8.18246 10 8.04273 10ZM1.69463 7.43178V6.31448C0.714308 6.05962 0 5.07978 0 3.94159C0 2.59556 0.988135 1.50067 2.20322 1.50067C2.44801 1.50067 2.69172 1.54645 2.91975 1.63308C3.22493 0.669309 4.05656 1.3726e-10 4.99999 1.3726e-10C5.94342 -1.10678e-05 6.77507 0.66932 7.08025 1.63308C7.30942 1.54645 7.55198 1.50067 7.79678 1.50067C9.01187 1.50067 10 2.59556 10 3.94159C10 5.07978 9.2857 6.05842 8.30536 6.31448V7.43178H1.69463Z" />
-                </svg>
-                <span class="text-[--main-text] text-10px ml-2px mt-1px">{{devToken?.total_tokens}}</span>
-            </span>
-            </template>
-            <template #default>
-              <div class="py-4px [&&]:m--12px flex flex-col">
-                <span class="flex items-center justify-between text-12px py-4px px-8px color-[--third-text]">
-                  <span>Dev{{ $t('migrated') }}</span>
-                  <span class="text-[--main-text]">{{ devToken.total_migrated }}</span>
-                </span>
-                <span class="flex items-center justify-between text-12px py-4px px-8px color-[--third-text]">
-                  <span>Dev{{ $t('totalTokens') }}</span>
-                  <span class="text-[--main-text]">{{ devToken.total_tokens }}</span>
-                </span>
-                <div class="flex items-center justify-between text-12px py-4px px-8px color-[--third-text]">
-                  <span>{{ $t('migrationRate') }}</span>
-                  <span class="text-[--main-text]">
-                    {{ devToken?.total_tokens ? ((devToken.total_migrated ?? 0) / devToken.total_tokens * 100).toFixed(2) : 0 }}%
+                    {{ formatNumber(pair?.smart_money_sell_count_24h || 0, 0) }}
                   </span>
                 </div>
-                <span class="flex items-center justify-between clickable text-12px py-4px px-8px color-[--third-text] hover:bg-[--dialog-tab-active]" @click="handleViewDevTokens">
-                  <span>{{ $t('viewDevTokens') }}</span>
+                <span
+                  class="ml-2px"
+                  :style="{
+                    color: i.color == 'green' ? upColor[0] : downColor[0],
+                  }"
+                >
+                  <template v-if="i.tag">
+                    <template v-if="new RegExp('_buy.*$', 'gi').test(i.tag)">
+                      {{ $t('buy') }}
+                    </template>
+                    <template
+                      v-else-if="new RegExp('_sell.*$', 'gi').test(i.tag)"
+                    >
+                      {{ $t('sell') }}
+                    </template>
+                    <template v-else>
+                      {{ $t(i.tag) }}
+                    </template>
+                  </template>
                 </span>
               </div>
             </template>
-          </el-popover>
-        </div>
-      </div>
-    </div>
-    <div class="flex-1" />
-    <!-- <div
-      v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100"
-      class="item"
-    >
-      <div class="flex items-center min-w-90px justify-between">
-        <span>{{ $t('progress') }}</span
-        ><span class="ml-5px">{{ formatNumber(pair?.progress || 0, 2) }}%</span>
-        <Icon
-          v-if="pair?.amm === 'unknown'"
-          v-tooltip="pair?.amm"
-          name="tdesign:help-circle-filled"
-          class="ml-5px"
-        />
-        <a
-          v-else
-          v-tooltip="
-            getSwapInfo(pair?.chain || '', pair?.amm || '')?.show_name ||
-            pair?.amm ||
-            ''
-          "
-          :href="pair?.swap_url || '' + pair?.target_token || ''"
-          target="_blank"
-          class="ml-5px"
-        >
-          <img
-            class="rd-50% h-16px w-16px"
-            :src="formatIconSwap(pair?.amm)"
-            onerror="this.src='/icon-default.png'"
-            height="16"
-          >
-        </a>
-      </div>
-      <el-progress
-        class="mt-10px"
-        :percentage="pair?.progress"
-        :stroke-width="4"
-        color="#1CC982"
-        :show-text="false"
-        style="width: 90px"
-      />
-    </div> -->
-    <div class="item ml-24px items-end!">
-      <span class="text-20px color-[--main-text]">
-        ${{ formatNumber(price || 0, { decimals: 4, limit: 6 }) }}</span
-      >
-      <span
-        class="block mt-4px"
-        :class="
-          priceChange > 0 ? `color-${upColor[0]}` : `color-${downColor[0]}`
-        "
-        >{{ priceChange > 0 ? '+' : ''
-        }}{{ formatNumber(priceChange, {
-          decimals: 2,
-          limit: 10,
-        }) }}%</span
-      >
-    </div>
-    <el-popover popper-style="padding: 0;border-radius: 8px;" width="250" placement="top" :teleported="false" trigger="hover">
-      <template #reference>
-        <div class="item ml-24px cursor-pointer">
-          <span>{{ $t('liquidity3') }}</span>
-          <span class="block mt-8px color-[--main-text]">
-            ${{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
-          </span>
-        </div>
-      </template>
-      <div class="bg-[--secondary-bg]">
-        <div
-          class="flex p-10px justify-between pb-8px text-12px"
-        >
-          <span class="text-12px color-[--third-text]""> {{ $t('availableLiquidity') }}</span>
-          {{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
-        </div>
-        <div class="max-h-300px px-10px overflow-auto v-scroller-container">
-          <div
-            v-for="(item, index) in pairs"
-            :key="item.pair"
-            class="flex justify-between mb-4px cursor-pointer"
-            @click.stop="tokenStore.switchPair(item.pair)"
-          >
-            <div class="flex justify-between">
-              <div class="flex items-center">
-                <Icon v-if="item.amm === 'unknown'" v-tooltip="item.amm" name="tdesign:help-circle-filled" class="mr-5px color-#848E9C text-24px" />
-                <a v-else v-tooltip="item.ammName" :href="item.swap_url + item.target_token" target="_blank" class="inline-flex">
-                  <img
-                    class="rounded-50% mr-5px h-30px w-30px"
-                    :src="formatIconSwap(item.amm)"
-                    onerror="this.src='/icon-default.png'"
-                  >
-                </a>
-              </div>
-              <div>
-                <div class="mb-[-5px]">{{item.amm}}</div>
-                <span class="token-address text-[10px] color-[--third-text]">
-                  {{ $t('poolPair') }}: {{parseToken(item)?.tokenShow}}
-                  <Icon v-copy="parseToken(item)?.token" name="bxs:copy" class="text-2.5 clickable" />
-                </span>
-              </div>
+            <div
+              v-if="
+                pair &&
+                getTags(pair)?.signal_arr?.findIndex(
+                  (i) => i?.tag === 'smarter_buy'
+                ) == -1 &&
+                getTags(pair)?.signal_arr?.findIndex(
+                  (i) => i?.tag == 'smarter_sell'
+                ) == -1 &&
+                ((pair?.smart_money_buy_count_24h ?? 0) > 0 ||
+                  (pair?.smart_money_sell_count_24h ?? 0) > 0)
+              "
+              v-tooltip="
+                getTagTooltip({
+                  smart_money_buy_count_24h: pair?.smart_money_buy_count_24h || 0,
+                  smart_money_sell_count_24h:
+                    pair?.smart_money_sell_count_24h || 0,
+                })
+              "
+              class="minor flex-end color-text-2 tag-btn signal cursor-pointer mr-4px bg-btn text-10px"
+            >
+              <Icon
+                class="text-[--third-text] h-12px w-12px mr-2px"
+                name="custom:smart"
+              />
+              <span class="mr-2px text-10px">{{ $t('smarter') }}</span>
+              <span
+                :style="{
+                  color:
+                    (pair?.smart_money_buy_count_24h ?? 0) > 0
+                      ? upColor[0]
+                      : 'var(--custom-text-3-color)',
+                }"
+              >
+                {{ formatNumber(pair?.smart_money_buy_count_24h || 0, 0) }} </span
+              >/<span
+                :style="{
+                  color:
+                    (pair?.smart_money_sell_count_24h ?? 0) > 0
+                      ? downColor[0]
+                      : 'var(--custom-text-3-color)',
+                }"
+              >
+                {{ formatNumber(pair?.smart_money_sell_count_24h || 0, 0) }}
+              </span>
             </div>
-            <div class="flex items-center text-12px">
-              <span v-if="item.target_token === item.token0_address" class="main">${{formatNumber(item.reserve1 * item.token1_price_usd * 2 || 0, 2)}}</span>
-              <span v-else class="main">${{formatNumber(item.reserve0 * item.token0_price_usd * 2 || 0, 2)}}</span>
-            </div>
+            <top50 />
+            <el-popover width="120px" popper-class="[--el-popover-bg-color:--border] !min-w-[120px]" :persistent="false">
+              <template #reference>
+                <span
+                  class="media-item bg-btn cursor-pointer"
+                >
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path :fill="devToken?.total_tokens ? '#F6465D' : '#5A5E64'" d="M8.04273 10H1.94948C1.80865 10 1.69463 9.87378 1.69463 9.71787V8.05005H8.29757V9.71914C8.29648 9.87378 8.18246 10 8.04273 10ZM1.69463 7.43178V6.31448C0.714308 6.05962 0 5.07978 0 3.94159C0 2.59556 0.988135 1.50067 2.20322 1.50067C2.44801 1.50067 2.69172 1.54645 2.91975 1.63308C3.22493 0.669309 4.05656 1.3726e-10 4.99999 1.3726e-10C5.94342 -1.10678e-05 6.77507 0.66932 7.08025 1.63308C7.30942 1.54645 7.55198 1.50067 7.79678 1.50067C9.01187 1.50067 10 2.59556 10 3.94159C10 5.07978 9.2857 6.05842 8.30536 6.31448V7.43178H1.69463Z" />
+                  </svg>
+                  <span class="text-[--main-text] text-10px ml-2px mt-1px">{{devToken?.total_tokens}}</span>
+              </span>
+              </template>
+              <template #default>
+                <div class="py-4px [&&]:m--12px flex flex-col">
+                  <span class="flex items-center justify-between text-12px py-4px px-8px color-[--third-text]">
+                    <span>Dev{{ $t('migrated') }}</span>
+                    <span class="text-[--main-text]">{{ devToken.total_migrated }}</span>
+                  </span>
+                  <span class="flex items-center justify-between text-12px py-4px px-8px color-[--third-text]">
+                    <span>Dev{{ $t('totalTokens') }}</span>
+                    <span class="text-[--main-text]">{{ devToken.total_tokens }}</span>
+                  </span>
+                  <div class="flex items-center justify-between text-12px py-4px px-8px color-[--third-text]">
+                    <span>{{ $t('migrationRate') }}</span>
+                    <span class="text-[--main-text]">
+                      {{ devToken?.total_tokens ? ((devToken.total_migrated ?? 0) / devToken.total_tokens * 100).toFixed(2) : 0 }}%
+                    </span>
+                  </div>
+                  <span class="flex items-center justify-between clickable text-12px py-4px px-8px color-[--third-text] hover:bg-[--dialog-tab-active]" @click="handleViewDevTokens">
+                    <span>{{ $t('viewDevTokens') }}</span>
+                  </span>
+                </div>
+              </template>
+            </el-popover>
           </div>
         </div>
       </div>
-    </el-popover>
-    <div v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100" class="item ml-24px">
-      <span>{{ $t('progress') }}</span>
-      <span class="block mt-8px color-[--main-text]"
-        >{{ formatNumber(pair?.progress || 0, 2) }}%</span
-      >
-    </div>
-    <div class="item ml-24px ">
-      <span>{{ $t('mcap') }}</span>
-      <span class="block mt-8px color-[--main-text]"
-        >${{ formatNumber(marketCap, 2) }}</span
-      >
-    </div>
-    <div class="item ml-24px">
-      <span>{{ $t('24Volume') }}</span>
-      <span class="block mt-8px color-[--main-text]"
-        >${{ formatNumber(volume24, 2) }}</span
-      >
-    </div>
-    <div class="item ml-24px">
-      <span>{{ $t('holders') }}</span>
-      <span class="block mt-8px color-[--main-text]">{{
-        formatNumber(token?.holders || 0, { limit: 10 })
-      }}</span>
-    </div>
-    <div class="item ml-24px">
-      <span>DEV</span>
-      <span
-        class="block mt-8px color-[--main-text]"
-        :style="{
-          color:
-            Number(token?.dev_balance_ratio_cur || 0) * 100 < 0.1
-              ? 'var(--third-text)'
-              : (token?.dev_balance_ratio_cur ?? 0) * 100 > 10
-              ? '#FFA622'
-              : '',
-        }"
-        >{{
-          (token?.dev_balance_ratio_cur ?? 0) > 0 &&
-          (token?.dev_balance_ratio_cur ?? 0) * 100 < 0.1
-            ? '<0.1'
-            : formatNumber((token?.dev_balance_ratio_cur ?? 0) * 100, 2)
-        }}%</span
-      >
-    </div>
-    <div class="item ml-24px cursor-pointer" @click="showCheck = !showCheck">
-      <span class="flex-start">
-        {{ $t('audit1') }}
-        <Icon
-          name="material-symbols:arrow-forward-ios-rounded"
-          class="text-12px"
-        />
-      </span>
-      <div class="color-text-1 mt-8px font-500 text-14px flex-start">
-        <img
-          v-if="
-            token?.risk_level == -1 ||
-            (token?.risk_score ?? 0) >= 60 ||
-            statistics_risk_store > 0
-          "
-          :width="12"
-          class="icon-svg1"
-          src="@/assets/images/risk-gaoliang.svg"
-        >
-        <img
-          v-else-if="statistics_warning_store > 0"
-          :width="12"
-          class="icon-svg1"
-          src="@/assets/images/yichang1-gaoliang.svg"
-        >
-        <img
-          v-else-if="
-            !statistics_risk_store &&
-            !statistics_warning_store &&
-            !statistics_unknown_store
-          "
-          :width="12"
-          class="icon-svg1"
-          src="@/assets/images/安全.svg"
-        >
 
-        <img
-          v-else
-          class="icon-svg1"
-          :width="12"
-          src="@/assets/images/zhuyi1.svg"
+      <div class="flex-1" />
+      <!-- <div
+        v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100"
+        class="item"
+      >
+        <div class="flex items-center min-w-90px justify-between">
+          <span>{{ $t('progress') }}</span
+          ><span class="ml-5px">{{ formatNumber(pair?.progress || 0, 2) }}%</span>
+          <Icon
+            v-if="pair?.amm === 'unknown'"
+            v-tooltip="pair?.amm"
+            name="tdesign:help-circle-filled"
+            class="ml-5px"
+          />
+          <a
+            v-else
+            v-tooltip="
+              getSwapInfo(pair?.chain || '', pair?.amm || '')?.show_name ||
+              pair?.amm ||
+              ''
+            "
+            :href="pair?.swap_url || '' + pair?.target_token || ''"
+            target="_blank"
+            class="ml-5px"
+          >
+            <img
+              class="rd-50% h-16px w-16px"
+              :src="formatIconSwap(pair?.amm)"
+              onerror="this.src='/icon-default.png'"
+              height="16"
+            >
+          </a>
+        </div>
+        <el-progress
+          class="mt-10px"
+          :percentage="pair?.progress"
+          :stroke-width="4"
+          color="#1CC982"
+          :show-text="false"
+          style="width: 90px"
+        />
+      </div> -->
+      <div class="item ml-24px items-end!">
+        <span class="text-20px color-[--main-text]">
+          ${{ formatNumber(price || 0, { decimals: 4, limit: 6 }) }}</span
         >
         <span
-          v-if="
-            statistics_risk_store ||
-            statistics_warning_store ||
-            statistics_unknown_store
+          class="block mt-4px"
+          :class="
+            priceChange > 0 ? `color-${upColor[0]}` : `color-${downColor[0]}`
           "
-          class="ml-5px"
-          style="font-weight: 600"
-          :style="{ color: getRiskColor(token) }"
+          >{{ priceChange > 0 ? '+' : ''
+          }}{{ formatNumber(priceChange, {
+            decimals: 2,
+            limit: 10,
+          }) }}%</span
         >
-          {{
-            statistics_risk_store ||
-            statistics_warning_store ||
-            statistics_unknown_store ||
-            ''
-          }}
+      </div>
+      <el-popover popper-style="padding: 0;border-radius: 8px;" width="250" placement="top" :teleported="false" trigger="hover">
+        <template #reference>
+          <div class="item ml-24px cursor-pointer">
+            <span>{{ $t('liquidity3') }}</span>
+            <span class="block mt-8px color-[--main-text]">
+              ${{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
+            </span>
+          </div>
+        </template>
+        <div class="bg-[--secondary-bg]">
+          <div
+            class="flex p-10px justify-between pb-8px text-12px"
+          >
+            <span class="text-12px color-[--third-text]""> {{ $t('availableLiquidity') }}</span>
+            {{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
+          </div>
+          <div class="max-h-300px px-10px overflow-auto v-scroller-container">
+            <div
+              v-for="(item, index) in pairs"
+              :key="item.pair"
+              class="flex justify-between mb-4px cursor-pointer"
+              @click.stop="tokenStore.switchPair(item.pair)"
+            >
+              <div class="flex justify-between">
+                <div class="flex items-center">
+                  <Icon v-if="item.amm === 'unknown'" v-tooltip="item.amm" name="tdesign:help-circle-filled" class="mr-5px color-#848E9C text-24px" />
+                  <a v-else v-tooltip="item.ammName" :href="item.swap_url + item.target_token" target="_blank" class="inline-flex">
+                    <img
+                      class="rounded-50% mr-5px h-30px w-30px"
+                      :src="formatIconSwap(item.amm)"
+                      onerror="this.src='/icon-default.png'"
+                    >
+                  </a>
+                </div>
+                <div>
+                  <div class="mb-[-5px]">{{item.amm}}</div>
+                  <span class="token-address text-[10px] color-[--third-text]">
+                    {{ $t('poolPair') }}: {{parseToken(item)?.tokenShow}}
+                    <Icon v-copy="parseToken(item)?.token" name="bxs:copy" class="text-2.5 clickable" />
+                  </span>
+                </div>
+              </div>
+              <div class="flex items-center text-12px">
+                <span v-if="item.target_token === item.token0_address" class="main">${{formatNumber(item.reserve1 * item.token1_price_usd * 2 || 0, 2)}}</span>
+                <span v-else class="main">${{formatNumber(item.reserve0 * item.token0_price_usd * 2 || 0, 2)}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </el-popover>
+
+      <div v-if="(pair?.progress ?? 0) > 0 && (pair?.progress ?? 0) < 100" class="item ml-24px">
+        <span>{{ $t('progress') }}</span>
+        <span class="block mt-8px color-[--main-text]"
+          >{{ formatNumber(pair?.progress || 0, 2) }}%</span
+        >
+      </div>
+      <div class="item ml-24px ">
+        <span>{{ $t('mcap') }}</span>
+        <span class="block mt-8px color-[--main-text]"
+          >${{ formatNumber(marketCap, 2) }}</span
+        >
+      </div>
+      <div class="item ml-24px">
+        <span>{{ $t('24Volume') }}</span>
+        <span class="block mt-8px color-[--main-text]"
+          >${{ formatNumber(volume24, 2) }}</span
+        >
+      </div>
+      <div class="item ml-24px">
+        <span>{{ $t('holders') }}</span>
+        <span class="block mt-8px color-[--main-text]">{{
+          formatNumber(token?.holders || 0, { limit: 10 })
+        }}</span>
+      </div>
+      <div class="item ml-24px">
+        <span>DEV</span>
+        <span
+          class="block mt-8px color-[--main-text]"
+          :style="{
+            color:
+              Number(token?.dev_balance_ratio_cur || 0) * 100 < 0.1
+                ? 'var(--third-text)'
+                : (token?.dev_balance_ratio_cur ?? 0) * 100 > 10
+                ? '#FFA622'
+                : '',
+          }"
+          >{{
+            (token?.dev_balance_ratio_cur ?? 0) > 0 &&
+            (token?.dev_balance_ratio_cur ?? 0) * 100 < 0.1
+              ? '<0.1'
+              : formatNumber((token?.dev_balance_ratio_cur ?? 0) * 100, 2)
+          }}%</span
+        >
+      </div>
+      <div class="item ml-24px cursor-pointer" @click="showCheck = !showCheck">
+        <span class="flex-start">
+          {{ $t('audit1') }}
+          <Icon
+            name="material-symbols:arrow-forward-ios-rounded"
+            class="text-12px"
+          />
         </span>
+        <div class="color-text-1 mt-8px font-500 text-14px flex-start">
+          <img
+            v-if="
+              token?.risk_level == -1 ||
+              (token?.risk_score ?? 0) >= 60 ||
+              statistics_risk_store > 0
+            "
+            :width="12"
+            class="icon-svg1"
+            src="@/assets/images/risk-gaoliang.svg"
+          >
+          <img
+            v-else-if="statistics_warning_store > 0"
+            :width="12"
+            class="icon-svg1"
+            src="@/assets/images/yichang1-gaoliang.svg"
+          >
+          <img
+            v-else-if="
+              !statistics_risk_store &&
+              !statistics_warning_store &&
+              !statistics_unknown_store
+            "
+            :width="12"
+            class="icon-svg1"
+            src="@/assets/images/安全.svg"
+          >
+
+          <img
+            v-else
+            class="icon-svg1"
+            :width="12"
+            src="@/assets/images/zhuyi1.svg"
+          >
+          <span
+            v-if="
+              statistics_risk_store ||
+              statistics_warning_store ||
+              statistics_unknown_store
+            "
+            class="ml-5px"
+            style="font-weight: 600"
+            :style="{ color: getRiskColor(token) }"
+          >
+            {{
+              statistics_risk_store ||
+              statistics_warning_store ||
+              statistics_unknown_store ||
+              ''
+            }}
+          </span>
+        </div>
+        <Check v-model="showCheck" />
       </div>
-      <Check v-model="showCheck" />
-    </div>
-    <!-- <div
-      v-if="chain === 'solana'"
-      class="item ml-24px cursor-pointer"
-      @click="showRun = !showRun"
-    >
-      <span class="flex-start"
-        >{{ t('flag_rug_pull') }}
-        <Icon
-          v-if="
-            (rugPull?.rates?.rugged_rate ?? 0) > 0 ||
-            (rugPull?.rates?.rugged_rate ?? 0) == -1
-          "
-          name="material-symbols:arrow-forward-ios-rounded"
-          class="text-12px"
-        />
-      </span>
-      <div
-        class="mt-8px font-500 flex-start text-12px"
-        :style="{
-          color:
-            (rugPull?.rates?.rugged_rate ?? 0) > 60
-              ? '#F6465D'
-              : 'var(--third-text)',
-        }"
+      <!-- <div
+        v-if="chain === 'solana'"
+        class="item ml-24px cursor-pointer"
+        @click="showRun = !showRun"
       >
-        <Icon name="custom:rug" class="text-12px mr-2px" />
-        {{
-          rugPull?.rates?.rugged_rate == -1
-            ? t('unKnown1')
-            : formatNumber(rugPull?.rates?.rugged_rate || 0, 2) + '%'
-        }}
-      </div>
-      <Run v-model="showRun" :obj="rugPull" />
-    </div> -->
+        <span class="flex-start"
+          >{{ t('flag_rug_pull') }}
+          <Icon
+            v-if="
+              (rugPull?.rates?.rugged_rate ?? 0) > 0 ||
+              (rugPull?.rates?.rugged_rate ?? 0) == -1
+            "
+            name="material-symbols:arrow-forward-ios-rounded"
+            class="text-12px"
+          />
+        </span>
+        <div
+          class="mt-8px font-500 flex-start text-12px"
+          :style="{
+            color:
+              (rugPull?.rates?.rugged_rate ?? 0) > 60
+                ? '#F6465D'
+                : 'var(--third-text)',
+          }"
+        >
+          <Icon name="custom:rug" class="text-12px mr-2px" />
+          {{
+            rugPull?.rates?.rugged_rate == -1
+              ? t('unKnown1')
+              : formatNumber(rugPull?.rates?.rugged_rate || 0, 2) + '%'
+          }}
+        </div>
+        <Run v-model="showRun" :obj="rugPull" />
+      </div> -->
+    </div>
+    <div
+      v-show="globalStore.showRight"
+      class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center top-0px right--11px hover:w-30px hover:right--31px hover:h-36px  transition-all rounded-tl-4px rounded-bl-4px color-[--third-text] hover:color-[--main-text]"
+      @click="globalStore.$patch({ showRight: false })"
+    >
+      <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
+    </div>
   </div>
 </template>
 
@@ -914,6 +931,7 @@ import { useEventBus } from '@vueuse/core'
 import { verifyLogin } from '@/utils'
 const { token_logo_url } = useConfigStore()
 const tokenStore = useTokenStore()
+const globalStore = useGlobalStore()
 const {collected} = storeToRefs(useTokenStore())
 const { evmAddress } = storeToRefs(useBotStore())
 const themeStore = useThemeStore()
@@ -975,11 +993,11 @@ const parseToken = (item) => {
 }
 
 const pairs = computed(() => {
-  return tokenStore.pairs?.map(i => ({
+  return tokenStore.pairs?.map((i:any) => ({
     ...i,
     ammName: i.amm === 'unknown' ? i.amm : getSwapInfo(i.chain, i.amm)?.show_name || i.amm,
     isUp: i.target_token === i.token0_address ? new BigNumber(i.reserve1).gt(i.init_reserve1) : new BigNumber(i.reserve0).gt(i.init_reserve0),
-  })).filter(i => {
+  })).filter((i) => {
     return true
   })
 })
