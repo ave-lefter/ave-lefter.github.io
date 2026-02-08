@@ -685,7 +685,7 @@
           }) }}%</span
         >
       </div>
-      <el-popover popper-style="padding: 0;border-radius: 8px;" width="250" placement="top" :teleported="false" trigger="hover">
+      <el-popover popper-style="padding: 0;border-radius: 8px;" :visible="true" width="250" placement="top" :teleported="false" trigger="hover">
         <template #reference>
           <div class="item ml-24px cursor-pointer">
             <span>{{ $t('liquidity3') }}</span>
@@ -701,23 +701,31 @@
             <span class="text-12px color-[--third-text]""> {{ $t('availableLiquidity') }}</span>
             {{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
           </div>
+          <!--流动性-->
           <div class="max-h-300px px-10px overflow-auto v-scroller-container">
             <div
-              v-for="(item, index) in pairs"
+              v-for="item in pairs"
               :key="item.pair"
               class="flex justify-between mb-4px cursor-pointer"
               @click.stop="tokenStore.switchPair(item.pair)"
             >
               <div class="flex justify-between">
                 <div class="flex items-center">
-                  <Icon v-if="item.amm === 'unknown'" v-tooltip="item.amm" name="tdesign:help-circle-filled" class="mr-5px color-#848E9C text-24px" />
-                  <a v-else v-tooltip="item.ammName" :href="item.swap_url + item.target_token" target="_blank" class="inline-flex">
+                  <div class="relative">
+                    <Icon v-if="item.amm === 'unknown'" v-tooltip="item.amm" name="tdesign:help-circle-filled" class="mr-5px color-#848E9C text-24px" />
+                    <a v-else v-tooltip="item.ammName" :href="item.swap_url + item.target_token" target="_blank" class="inline-flex">
+                      <img
+                        class="rounded-50% mr-5px h-30px w-30px"
+                        :src="formatIconSwap(item.amm)"
+                        onerror="this.src='/icon-default.png'"
+                      >
+                    </a>
                     <img
-                      class="rounded-50% mr-5px h-30px w-30px"
-                      :src="formatIconSwap(item.amm)"
+                      class="rounded-50% absolute right-6px bottom-6px h-10px w-10px"
+                      :src="`${token_logo_url}chain/${item.chain}.png`"
                       onerror="this.src='/icon-default.png'"
                     >
-                  </a>
+                  </div>
                 </div>
                 <div>
                   <div class="mb-[-5px]">{{item.amm}}</div>
@@ -951,7 +959,7 @@ const remark = shallowRef('')
 const aiSummary = inject<{summary: string, headline: string }>('aiSummary')
 const remark2 = shallowRef('')
 const showCheck = shallowRef(false)
-const showRun = shallowRef(false)
+
 const rugPull = ref<ResultRugPull>({
   all_tag_rate: 0,
   rates: {
@@ -1058,6 +1066,7 @@ const token = computed(() => {
 const pair = computed(() => {
   return tokenStore.pair
 })
+
 const price = computed(() => {
   return tokenStore.price
 })
