@@ -685,7 +685,7 @@
           }) }}%</span
         >
       </div>
-      <el-popover popper-style="padding: 0;border-radius: 8px;" :visible="true" width="250" placement="top" :teleported="false" trigger="hover">
+      <el-popover popper-style="padding: 0;border-radius: 8px;" width="250" placement="top" :teleported="false" trigger="hover">
         <template #reference>
           <div class="item ml-24px cursor-pointer">
             <span>{{ $t('liquidity3') }}</span>
