@@ -114,6 +114,7 @@
   "follow": "フォロー",
   "followed": "フォロー中",
   "liquidity2": "流動性",
+  "liquidity3": "流動性",
   "time": "時間",
   "type": "タイプ",
   "swapPrice": "取引価格",
@@ -1452,5 +1453,7 @@
   "wcWalletTip": "この QR コードを携帯電話でスキャンしてください",
   "monitorBotError": "監視ロボットのアドレスはサポートされていません",
   "hideLiq": "クリックしてプール情報を非表示にします",
-  "showLiq": "クリックするとプール情報が表示されます"
+  "showLiq": "クリックするとプール情報が表示されます",
+  "availableLiquidity": "利用可能な流動性",
+  "poolPair": "取引ペア"
 }

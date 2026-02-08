@@ -114,6 +114,7 @@
   "follow": "팔로워",
   "followed": "주목 완료",
   "liquidity2": "풀",
+  "liquidity3": "풀",
   "time": "시간",
   "type": "유형",
   "swapPrice": "거래 가격",
@@ -1452,5 +1453,7 @@
   "wcWalletTip": "휴대폰으로 이 QR 코드를 스캔하세요.",
   "monitorBotError": "모니터링 로봇 주소는 지원되지 않습니다.",
   "hideLiq": "풀 정보를 숨기려면 클릭하세요.",
-  "showLiq": "풀 정보를 표시하려면 클릭하세요."
+  "showLiq": "풀 정보를 표시하려면 클릭하세요.",
+  "availableLiquidity": "사용 가능한 유동성",
+  "poolPair": "거래 쌍"
 }

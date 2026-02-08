@@ -107,6 +107,7 @@
   "sell3": "Sell",
   "followed": "Followed",
   "liquidity2": "Liquidity",
+  "liquidity3": "Liquidity",
   "time": "Time",
   "type": "Type",
   "swapPrice": "Price",
@@ -1995,5 +1996,7 @@
   "joined": "Joined",
   "hideLiq": "Click to hide pool information",
   "showLiq": "Click to display pool information",
-  "filter": "Filter"
+  "filter": "Filter",
+  "availableLiquidity": "Available Liquidity",
+  "poolPair": "Pair"
 }

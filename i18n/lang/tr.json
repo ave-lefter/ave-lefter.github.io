@@ -76,6 +76,7 @@
   "buy3": "Al",
   "sell3": "Sat",
   "liquidity2": "Likidite",
+  "liquidity3": "Likidite",
   "time": "Zaman",
   "type": "Tür",
   "swapPrice": "Fiyat",
@@ -598,5 +599,7 @@
   "wcWalletTip": "Bu QR Kodunu telefonunuzla tarayın",
   "monitorBotError": "İzleme robotu adresi desteklenmiyor",
   "hideLiq": "Havuz bilgilerini gizlemek için tıklayın",
-  "showLiq": "Havuz bilgilerini görüntülemek için tıklayın"
+  "showLiq": "Havuz bilgilerini görüntülemek için tıklayın",
+  "availableLiquidity": "Mevcut likidite",
+  "poolPair": "İşlem çifti"
 }

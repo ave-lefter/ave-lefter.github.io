@@ -87,6 +87,7 @@
   "buy3": "Mua",
   "sell3": "Bán",
   "liquidity2": "Thanh khoản",
+  "liquidity3": "Thanh khoản",
   "time": "Thời gian",
   "type": "Loại",
   "swapPrice": "Giá",
@@ -849,5 +850,7 @@
   "applyForActivation": "",
   "monitorBotError": "Địa chỉ robot giám sát không được hỗ trợ",
   "hideLiq": "Bấm để ẩn thông tin nhóm",
-  "showLiq": "Bấm để hiển thị thông tin nhóm"
+  "showLiq": "Bấm để hiển thị thông tin nhóm",
+  "availableLiquidity": "Thanh khoản khả dụng",
+  "poolPair": "Cặp giao dịch"
 }

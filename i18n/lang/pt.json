@@ -76,6 +76,7 @@
   "buy3": "Comprar",
   "sell3": "Vender",
   "liquidity2": "Liquidez",
+  "liquidity3": "Liquidity",
   "time": "Hora",
   "type": "Tipo",
   "swapPrice": "Preço",
@@ -602,5 +603,7 @@
   "wcWalletTip": "Digitalize este código QR com seu telefone",
   "monitorBotError": "O endereço do robô de monitoramento não é compatível",
   "hideLiq": "Clique para ocultar informações do pool",
-  "showLiq": "Clique para exibir informações do pool"
+  "showLiq": "Clique para exibir informações do pool",
+  "availableLiquidity": "Liquidez disponível",
+  "poolPair": "Negociação"
 }

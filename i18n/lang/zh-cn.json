@@ -112,6 +112,7 @@
   "follow": "关注",
   "followed": "已关注",
   "liquidity2": "池子",
+  "liquidity3": "流动性",
   "time": "时间",
   "type": "类型",
   "swapPrice": "成交价",
@@ -1996,5 +1997,7 @@
   "follows": "粉丝",
   "joined": "加入时间",
   "hideLiq": "点击隐藏池子信息",
-  "showLiq": "点击显示池子信息"
+  "showLiq": "点击显示池子信息",
+  "availableLiquidity": "可用流动性",
+  "poolPair": "交易对"
 }
