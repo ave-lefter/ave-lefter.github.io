@@ -1,0 +1,1 @@
+import{bd as o}from"#entry";function i(i,r,d){return void 0===d&&(d=r,r=void 0),void 0!==d&&(d=(d=o(d))==d?d:0),void 0!==r&&(r=(r=o(r))==r?r:0),function(o,i,r){return o==o&&(void 0!==r&&(o=o<=r?o:r),void 0!==i&&(o=o>=i?o:i)),o}(o(i),r,d)}export{i as c};
