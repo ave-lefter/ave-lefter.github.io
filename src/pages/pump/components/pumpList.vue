@@ -187,35 +187,27 @@
                               : '#12B886',
                         }"
                       >
-                        <template v-if="!(row?.created_at || row?.time)"> - </template>
-                        <template
-                          v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
-                        >
-                          {{
-                            formatCountdown(
-                              Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
-                              false
-                            )
-                          }}
-                        </template>
-                        <TimerCount
-                          v-else-if="
-                            (row?.created_at || row?.time) &&
-                            Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
-                          "
-                          :key="`${row.created_at}`"
-                          :timestamp="row.created_at"
-                          :end-time="60"
-                        >
-                          <template #default="{ seconds }">
-                            <span class="color-#FFA622">
-                              <template v-if="seconds < 60"> {{ seconds }}s </template>
-                              <template v-else>
-                                {{ formatTimeFromNow(row.created_at) }}
-                              </template>
-                            </span>
+                          <TimerCount
+                            v-if="row?.created_at || row?.time"
+                            :key="row.pair + '-' + row.chain"
+                            :timestamp="row.created_at || row.time"
+                            :end-time="60"
+                          >
+                            <template #default="{ seconds }">
+                              <span>
+                                <span v-if="seconds < 60"  class="color-#FFA622">
+                                  {{ seconds }}s
+                                </span>
+                                <template v-else>
+                                  {{ formatTimeFromNow(row.created_at || row.time) }}
+                                </template>
+                              </span>
+                            </template>
+                          </TimerCount>
+
+                          <template v-else>
+                            -
                           </template>
-                        </TimerCount>
                       </div>
                       <img
                         v-if="row.baseToken"
@@ -837,7 +829,7 @@ const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableLis
   itemHeight: 110.8,
   // 必须增加过采样，否则 translateY(-20px) 向上移动时，
   // 顶部刚进入视口的节点会因为高度计算没到视口而无法渲染，导致动画“闪现”
-  overscan: 5,
+  overscan: 20,
 })
 
 onDeactivated(() => {
