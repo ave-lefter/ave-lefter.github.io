@@ -359,13 +359,13 @@ watch(
 
 function switchTokenKline() {
   isReadyLine = false
-  resetLimitPriceLineId()
-  // resetAvgPriceLineId()
-  resetTop100AvgPriceLineId()
-  resetBotAvgLineId()
-  resetKOLLine()
   const val = pair.value
   if (isReady.value && route.name === 'token-id') {
+    resetLimitPriceLineId()
+    // resetAvgPriceLineId()
+    resetTop100AvgPriceLineId()
+    resetBotAvgLineId()
+    resetKOLLine()
     const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
     const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
     const preResolutions = localStorage.getItem(QUICK_KEY)
