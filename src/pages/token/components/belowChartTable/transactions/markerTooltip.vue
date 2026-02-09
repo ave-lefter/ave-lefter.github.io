@@ -31,7 +31,7 @@ const visible = computed({
 })
 const isLoading = shallowRef(false)
 const userBriefData = ref()
-watch(() => props.currentRow, () => {
+watch(() => props.currentRow?.wallet_address||'', () => {
   if (props.currentRow) {
     _getTxsUserBrief()
   }
