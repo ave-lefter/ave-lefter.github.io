@@ -1,5 +1,5 @@
 <template>
-  <div v-if="clipboardTokenInfo?.token" class="flex items-center color-[--main-text] bg-[--main-input-button-bg] h-32px px-8px clipboard-token-container rd-4px ml-10px">
+  <div v-if="clipboardTokenInfo?.token" class="flex items-center color-[--main-text] bg-[--main-input-button-bg] h-32px px-8px clipboard-token-container rd-4px ml-8px">
     <NuxtLink :to="`/token/${clipboardTokenInfo.token}-${clipboardTokenInfo.chain}`" class="flex items-center mr-8px">
       <TokenImg :row="clipboardTokenInfo" tokenClass="w-16px h-16px" chainClass="w-8px h-8px bottom--2px! right--2px!" class="w-16px h-16px" />
       <span class="text-12px ml-4px">{{ clipboardTokenInfo.symbol || '' }}</span>
