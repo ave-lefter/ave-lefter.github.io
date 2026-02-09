@@ -549,12 +549,15 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
   const tokenStore = useTokenStore()
   watch(() => tokenStore.token?.token, async () => {
     if (!tokenStore.token?.token) return
-    const res = await _getHoldersList({
+    _getHoldersList({
       token_id: tokenStore.token?.token + '-' + tokenStore.token?.chain
+    }).then(res => {
+      avePriceCache.buyAvgPrice = res.aggregateStats?.top100PurchaseAvg
+      avePriceCache.sellAvgPrice = res.aggregateStats?.top100SellAvg
+      createAvgPriceLinePoll(avePriceCache.buyAvgPrice, avePriceCache.sellAvgPrice)
+    }).catch((err) => {
+      console.log(err)
     })
-    avePriceCache.buyAvgPrice = res.aggregateStats?.top100PurchaseAvg
-    avePriceCache.sellAvgPrice = res.aggregateStats?.top100SellAvg
-    createAvgPriceLinePoll(avePriceCache.buyAvgPrice, avePriceCache.sellAvgPrice)
   }, { immediate: true })
 
   function sleep(ms: number) {
@@ -1494,23 +1497,25 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
   const tokenStore = useTokenStore()
   watch(() => tokenStore.token?.token, async () => {
     if (!tokenStore.token?.token) return
-    const res = await _getHoldersList({
+    _getHoldersList({
       token_id: tokenStore.token?.token + '-' + tokenStore.token?.chain,
       tag_type: KOL_KEY
+    }).then(res => {
+      avePriceMap = res.holderStats?.filter?.(el => {
+        return (el.avg_purchase_price || el.avg_sale_price) && el.balance_ratio > 0.003
+      })?.reduce?.((acc, cur) => {
+          acc[cur.holder] = {
+            name: cur.wallet_logo.name || cur.holder.slice(0, 4) + '...' + cur.holder.slice(-4),
+            value: cur.avg_purchase_price,
+            balance_ratio: cur.balance_ratio ?? 0,
+            lineId: '' as EntityId
+          }
+          return acc
+        }, avePriceMap)
+      createAvgPriceLinePoll()
+    }).catch((err) => {
+      console.log(err)
     })
-    avePriceMap = res.holderStats?.filter?.(el => {
-      return (el.avg_purchase_price || el.avg_sale_price) && el.balance_ratio > 0.003
-    })
-      ?.reduce?.((acc, cur) => {
-        acc[cur.holder] = {
-          name: cur.wallet_logo.name || cur.holder.slice(0, 4) + '...' + cur.holder.slice(-4),
-          value: cur.avg_purchase_price,
-          balance_ratio: cur.balance_ratio ?? 0,
-          lineId: '' as EntityId
-        }
-        return acc
-      }, avePriceMap)
-    createAvgPriceLinePoll()
   }, { immediate: true })
 
   const resetKOLLine = () => {
