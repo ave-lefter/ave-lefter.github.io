@@ -951,18 +951,28 @@ async function submitBotSwap() {
               tokenStore.placeOrderSuccess++
                if (txInfo1?.success) {
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
+                if (isPromptTx) {
+                  finishPromptSuccess(txInfo1)
+                }
               } else {
                 const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
                 handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
+                if (isPromptTx) {
+                  finishPromptFail()
+                }
               }
               unwatch()
               loadingSwap.value = false
             }
           })
         })
+      } else {
+        finishPromptFail()
+        loadingSwap.value = false
       }
     }).catch(err => {
       handleBotError(err || 'swap error', ElNotification)
+      finishPromptFail()
       loadingSwap.value = false
     })
   } else if (isEvmChain(chain)) {
