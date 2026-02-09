@@ -369,7 +369,11 @@ export function formatExplorerUrl(
   }
   const keyUrl = (type + '_url') as 'token_url' | 'address_url' | 'tx_url'
   const url = chainInfo?.[keyUrl]
+
   if (url) {
+    if((chain === 'bitnetwork') && (type === 'tx')) {
+      return url+address
+    }
     return url.replace(`{${type}}`, address)
   }
   const n = chainInfo ? chainInfo.block_explorer_url : ''
