@@ -20,9 +20,9 @@
       :style="(chainStyle as any)"
     >
     <img
-      v-else-if="chain && !wallet_logo?.vip_logo"
+      v-else-if="props.chain && !wallet_logo?.vip_logo"
       class="icon-chain"
-      :src="`${configStore?.token_logo_url}chain/${chain}.png`"
+      :src="`${configStore?.token_logo_url}chain/${props.chain}.png`"
       alt=""
       :style="(chainStyle as any)"
     >
@@ -50,7 +50,7 @@ const props = defineProps<{
 const {
   // wallet_logo = {logo: '', name: '', url: ''},
   // address = '',
-  chain = '',
+  // chain = '',
   iconSize = '16px',
   iconChainSize = ''
 } = props

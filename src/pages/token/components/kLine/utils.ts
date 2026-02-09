@@ -11,6 +11,9 @@ import dayjs from 'dayjs'
 
 export const supportSecChains = [ 'bsc', 'base', 'mixmax', 'xlayer']
 
+export const DEFAULT_LIST = ['1S','5S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W']
+export const SUPPORT_LIST = ['1S','5S', '15S', '30S', '1', '5', '15', '30', '60', '120', '240', '1D', '1W']
+
 export function switchResolution(resolution: string) {
   const obj: Record<string, string> = {
     '1D': '1440',
@@ -123,23 +126,22 @@ export function formatToMarks(
 export function initTradingViewIntervals(currentResolution: string, chain: string, isSupportSecChains: boolean): string {
   // const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
   // const RESOLUTION_KEY = 'tv_resolution'
-  const DEFAULT_LIST = ['1S', '5S', '1', '5', '15', '60', '240', '1D', '1W']
-  const SUPPORT_LIST = ['1S', '5S', '15S', '30S', '5S', '1', '5', '15', '60', '240', '1D', '1W']
   let list: string[]
   const stored = localStorage.getItem(QUICK_KEY)
   if (!stored) {
     list = isSupportSecChains ? SUPPORT_LIST : DEFAULT_LIST
-    localStorage.setItem(QUICK_KEY, JSON.stringify(list))
+    localStorage.setItem(QUICK_KEY, JSON.stringify(SUPPORT_LIST))
     localStorage.setItem('tradingViewIntervalSet', 'true')
   } else {
     list = JSON.parse(stored)
-    // if (isSupportSecChains && ['1S', '5S', '15S', '30S'].some((i) => !list?.includes(i))) {
-    //   list = SUPPORT_LIST
-    //   localStorage.setItem(QUICK_KEY, JSON.stringify(list))
-    // } else if (!isSupportSecChains) {
-    //   list = DEFAULT_LIST
-    //   localStorage.setItem(QUICK_KEY, JSON.stringify(list))
-    // }
+    if (isSupportSecChains && ['1S', '5S', '15S', '30S'].some((i) => !list?.includes(i))) {
+      list = SUPPORT_LIST
+      // localStorage.setItem(QUICK_KEY, JSON.stringify(list))
+    } else if (!isSupportSecChains) {
+      list = DEFAULT_LIST
+      // localStorage.setItem(QUICK_KEY, JSON.stringify(list))
+    }
+    // localStorage.setItem(QUICK_KEY, JSON.stringify(SUPPORT_LIST))
   }
 
   if (!list.includes(currentResolution)) {
