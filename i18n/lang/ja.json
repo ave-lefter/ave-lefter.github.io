@@ -1462,5 +1462,7 @@
   "hideLiq": "クリックしてプール情報を非表示にします",
   "showLiq": "クリックするとプール情報が表示されます",
   "availableLiquidity": "利用可能な流動性",
-  "poolPair": "取引ペア"
+  "poolPair": "取引ペア",
+  "googleAuthNotBoundTip": "Google認証システムがバインドされていません。アカウントのセキュリティを保護するため、ウォレットアドレスを削除する前にGoogle認証システムをバインドしてください。",
+  "goToBind": "バインドへ"
 }

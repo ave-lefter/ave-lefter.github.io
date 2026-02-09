@@ -2009,5 +2009,7 @@
   "hideLiq": "点击隐藏池子信息",
   "showLiq": "点击显示池子信息",
   "availableLiquidity": "可用流动性",
-  "commission": "分佣"
+  "commission": "分佣",
+  "googleAuthNotBoundTip": "检测到您尚未绑定谷歌验证器。为保障账户安全,删除钱包地址前,需先完成谷歌验证器绑定。",
+  "goToBind": "前往绑定"
 }

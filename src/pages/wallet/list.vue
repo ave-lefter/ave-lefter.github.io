@@ -18,7 +18,7 @@
         </div>
         <span v-else />
       </template>
-      <el-table-column prop="name" label="钱包" :min-width="200">
+      <el-table-column prop="name" :label="$t('wallet')" :min-width="200">
         <template #default="{ row }">
           <template v-if="row.isChildren">
             {{ row.name?.replace?.(new RegExp('(.{6})(.+)(.{4})'), '$1...$3') }}
@@ -270,6 +270,7 @@ const currentObj = ref<Address | null>(null)
 const showPop = shallowRef(false)
 const currentIndex = shallowRef(0)
 const currentRow = ref<Wallet | Address | null>(null)
+const { authInfo } = storeToRefs(useUserStore())
 const $refs = ref({
   buttonRefs: {} as Record<number, any>,
   currentBtnRef: {} as Record<number, any>,
@@ -301,14 +302,25 @@ function confirmRemoveWallet(item: Wallet) {
     confirmButtonText: t('confirm'),
     cancelButtonText: t('cancel'),
     customClass: `${mode.value} delete_confirm`,
-  })
-    .then(() => {
-      // 显示谷歌验证码输入对话框
+  }).then(() => {
+    // 显示谷歌验证码输入对话框
+    if(0 && authInfo.value?.authSetting && authInfo.value?.emailAddress){
       showGoogleAuthDialog(item)
-    })
-    .catch((err) => {
-      console.log('--------err-------', err)
-    })
+    } else {
+      ElMessageBox.confirm(t('googleAuthNotBoundTip'),t('bindGoogleAuth'), {
+        type: 'warning',
+        icon: markRaw(Warning),
+        confirmButtonText: t('goToBind'),
+        cancelButtonText: t('cancel'),
+        customClass: `${mode.value} delete_confirm`,
+      }).then(() => {
+        router.push('/safe')
+      })
+    }
+  })
+  .catch((err) => {
+    console.log('--------err-------', err)
+  })
 }
 
 function showGoogleAuthDialog(item: Wallet) {

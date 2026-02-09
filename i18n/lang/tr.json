@@ -608,5 +608,7 @@
   "hideLiq": "Havuz bilgilerini gizlemek için tıklayın",
   "showLiq": "Havuz bilgilerini görüntülemek için tıklayın",
   "availableLiquidity": "Mevcut likidite",
-  "poolPair": "İşlem çifti"
+  "poolPair": "İşlem çifti",
+  "googleAuthNotBoundTip": "Google Authenticator bağlı değil. Hesabınızı korumak için cüzdan adresini silmeden önce Google Authenticator'ı bağlayın.",
+  "goToBind": "Bağlamaya git"
 }

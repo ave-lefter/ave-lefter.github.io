@@ -634,5 +634,7 @@
   "hideLiq": "Haga clic para ocultar la información del grupo",
   "showLiq": "Haga clic para mostrar información de la piscina",
   "availableLiquidity": "Liquidez disponible",
-  "poolPair": "Negociación"
+  "poolPair": "Negociación",
+  "googleAuthNotBoundTip": "Google Authenticator no está vinculado. Para proteger su cuenta, vincule Google Authenticator antes de eliminar la dirección de la billetera.",
+  "goToBind": "Ir a vincular"
 }

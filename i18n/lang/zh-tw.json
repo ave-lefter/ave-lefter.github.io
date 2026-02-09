@@ -1985,5 +1985,7 @@
   "showLiq": "點擊顯示池子信息",
   "availableLiquidity": "可用流動性",
   "poolPair": "交易對",
-  "commission": "分傭"
+  "commission": "分傭",
+  "googleAuthNotBoundTip": "檢測到您尚未綁定Google驗證器。為保障帳戶安全,刪除錢包位址前,需先完成Google驗證器綁定。",
+  "goToBind": "前往綁定"
 }

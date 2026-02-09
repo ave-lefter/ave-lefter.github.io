@@ -2008,5 +2008,7 @@
   "showLiq": "Click to display pool information",
   "filter": "Filter",
   "availableLiquidity": "Available Liquidity",
-  "commission": "Commission"
+  "commission": "Commission",
+  "googleAuthNotBoundTip": "Google Authenticator not detected. To protect your account, please bind Google Authenticator before deleting wallet address.",
+  "goToBind": "Go to Bind"
 }
