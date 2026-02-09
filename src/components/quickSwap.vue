@@ -327,7 +327,7 @@ async function getTokenBalance(chain: string) {
       class="mr-4px text-12px"
       name="mynaui:lightning-solid"
     />
-    <div class="mt--2px">
+    <div>
       {{ Number(quickBuyValue) ? (quickBuyValue || 0) : $t('buy') }}
       <span v-if="mainNameVisible && Number(quickBuyValue)" class="ml-5px" >{{ getChainInfo(row.chain)?.main_name || '' }}</span>
     </div>
