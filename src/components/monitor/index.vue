@@ -133,7 +133,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                 <QuickSwap
                   :quickBuyValue="quickBuyValue"
                   :row="{...row,...{target_token:row?.target_address,token0_address:row?.from_address,token1_address:row?.to_address,symbol:row?._target_Token?.symbol}}"
-                  classNames="min-w-70px h-24px!"
+                  classNames="min-w-70px h-24px! w-quickSwap"
                   mainNameVisible
                 />
               </template>
@@ -190,7 +190,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
                       <QuickSwap
                         :quickBuyValue="quickBuyValue"
                         :row="{...row,...{target_token:row?.target_address,token0_address:row?.from_address,token1_address:row?.to_address,symbol:row?._target_Token?.symbol}}"
-                        classNames="min-w-70px h-24px!  hidden! group-hover:block!"
+                        classNames="min-w-70px h-24px!  hidden! group-hover:block! w-quickSwap"
                         mainNameVisible
                       />
                       <div
@@ -760,5 +760,8 @@ function jumpToken({ e,rowData }: { e: Event; rowData: any }) {
 :deep() .el-button--small{
   padding-left: 8px !important;
   padding-right: 8px !important;
+}
+:deep() .w-quickSwap .m-text{
+  margin-top: -2px;
 }
 </style>
