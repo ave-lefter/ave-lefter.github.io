@@ -212,7 +212,7 @@ import type { BotChain } from '~/utils/types'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
 import BottomSetting from './bottomSetting.vue'
 import delayedNotify from '~/utils/notify'
-import { formatBotError } from '~/utils/bot'
+import { formatBotError, hasCreateTxError, getCreateTxErrorMsg } from '~/utils/bot'
 
 
 
@@ -1029,7 +1029,7 @@ async function submitBotSwap() {
     // })
     bot_createSwapEvmTx(data).then(res => {
       if (res) {
-        const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
+        const isError = res?.every?.((i: any) => hasCreateTxError(i))
         res?.forEach?.((txInfo: any) => {
           const isPromptTx = !promptCreatorAddress || isSameAddress(txInfo?.creatorAddress, promptCreatorAddress, chain)
           const walletName = botStore.walletList?.find?.(j => j?.evmAddress?.toLowerCase?.() === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
@@ -1044,12 +1044,12 @@ async function submitBotSwap() {
             amountTokenOut.value = ''
             // this.dialogVisibleSwap = false
           }, 500)
-          if (txInfo?.errorLog) {
+          if (hasCreateTxError(txInfo)) {
             if (Timer) {
               clearTimeout(Timer)
               Timer = null
             }
-            handleBotError(walletName + ' ' + txInfo?.errorLog, ElNotification)
+            handleBotError(walletName + ' ' + getCreateTxErrorMsg(txInfo), ElNotification)
             if (isPromptTx) {
               finishPromptFail()
             }
@@ -1302,7 +1302,7 @@ function submitBotLimit() {
     }
     bot_createEvmLimitTx(data).then(res => {
       if (res) {
-        const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
+        const isError = res?.every?.((i: any) => hasCreateTxError(i))
         res?.forEach?.((txInfo: any) => {
           const walletName = botStore.walletList?.find?.(j => j?.addresses?.find?.(k => k?.chain === chain)?.address === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
@@ -1318,12 +1318,12 @@ function submitBotLimit() {
           amountTokenOut.value = ''
           amountNativeOut.value = ''
         }, 500)
-        if (txInfo?.errorLog) {
+        if (hasCreateTxError(txInfo)) {
           if (Timer) {
             clearTimeout(Timer)
             Timer = null
           }
-          handleBotError(walletName + ' ' + txInfo?.errorLog, ElNotification)
+          handleBotError(walletName + ' ' + getCreateTxErrorMsg(txInfo), ElNotification)
           if (isError) {
             loadingSwap.value = false
             return
