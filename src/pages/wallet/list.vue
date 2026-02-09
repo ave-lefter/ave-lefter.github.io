@@ -304,7 +304,7 @@ function confirmRemoveWallet(item: Wallet) {
     customClass: `${mode.value} delete_confirm`,
   }).then(() => {
     // 显示谷歌验证码输入对话框
-    if(0 && authInfo.value?.authSetting && authInfo.value?.emailAddress){
+    if(authInfo.value?.authSetting && authInfo.value?.emailAddress){
       showGoogleAuthDialog(item)
     } else {
       ElMessageBox.confirm(t('googleAuthNotBoundTip'),t('bindGoogleAuth'), {
