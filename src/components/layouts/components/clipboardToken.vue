@@ -54,6 +54,7 @@
       :row="{...clipboardTokenInfo, chain: clipboardTokenInfo.chain as BotChain}"
       classNames="min-w-48px h-20px!"
       :buttonType="1"
+      size="12px"
       mainNameVisible
     />
   </div>

@@ -361,8 +361,8 @@ type Setting = {
   }>
   slippage: string
   autoSell: boolean
-  buyValueList: [string, string, string, string]
-  sellPerList: [string, string, string, string]
+  buyValueList: [string, string, string, string, string, string, string, string]
+  sellPerList: [string, string, string, string, string, string, string, string]
 }
 
 type Chains = 'bsc' | 'base' | 'solana' | 'eth'

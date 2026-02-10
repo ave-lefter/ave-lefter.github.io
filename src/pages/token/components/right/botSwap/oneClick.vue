@@ -4,7 +4,7 @@
     <span class="ml-5px">{{ $t('oneClick') }}</span>
   </button>
   <Teleport to="body">
-    <div v-show="botStore.isSupportChains?.includes(chain) && visible && isMounted" class="fixed-one-click">
+    <div v-show="botStore.isSupportChains?.includes(chain) && visible && isMounted" class="fixed-one-click flex flex-col" :style="fixedOneClickStyle">
       <template v-if="botStore.isSupportChains?.includes(chain) && visible">
         <div class="flex-between">
           <div class="flex-start">
@@ -12,13 +12,8 @@
             <Icon :key="isEnableHotkey" v-tooltip="isEnableHotkey ? $t('hotkeyTips') : $t('hotkeyTips1')" class="text-14px color-[--secondary-text] clickable" :class="{ 'color-[--primary-color]!': isEnableHotkey }" name="ri:keyboard-box-fill" @click.stop="isEnableHotkey = !isEnableHotkey" @mousedown.stop />
             <Icon :key="isEnablePnL" v-tooltip="isEnablePnL ? $t('enablePnLTips2') : $t('enablePnLTips1')" name="bx:bxs-bar-chart-alt-2" class="text-14px color-[--secondary-text] clickable ml-5px" :class="{ 'color-[--primary-color]!': isEnablePnL }" @mousedown.stop @click.stop="isEnablePnL = !isEnablePnL" />
             <Icon :key="isEnableShowsReflected" v-tooltip="isEnableShowsReflected ? $t('disableShowsReflected') : $t('enableShowsReflected')" name="ph:approximate-equals-bold" class="text-14px color-[--secondary-text] clickable ml-5px" :class="{ 'color-[--primary-color]!': isEnableShowsReflected }" @mousedown.stop @click.stop="isEnableShowsReflected = !isEnableShowsReflected" />
-            <!-- <div class="tabs-1 ml-5px">
-              <button
-                v-for="item in BotSettingsArr" :key="item.value"
-                :class="{ 'active': item.value === botSettings?.[chain]?.selected }" type="button" @mousedown.stop
-                @click.stop="botSettings[chain]!.selected = item.value">{{ item.label }}</button>
-            </div> -->
-            <!-- <SlippageSetMarket class="ml-5px" :chain="chain" @mousedown.stop /> -->
+            <Icon v-if="!isEdit" name="fe:edit" class="text-14px color-[--secondary-text] clickable ml-5px" @click.stop="isEdit=true" @mousedown.stop />
+            <Icon v-else name="ic:baseline-check" class="text-14px color-[--secondary-text] clickable ml-5px" @click.stop="isEdit=false" @mousedown.stop />
           </div>
           <SlippageSetMarket class="mr-10px ml-auto" :chain="chain" @mousedown.stop />
           <Icon
@@ -26,7 +21,7 @@
             @click.stop="visible = false" @mousedown.stop />
         </div>
         <el-divider class="b-t-color-[--dialog-divider]! mt-10px! mb-5px!" />
-        <div class="content">
+        <div class="content flex-1 flex flex-col">
           <div class="flex-between mt-10px">
             <span>{{ $t('buy') }}</span>
             <div class="tabs-1 ml-5px mr-auto">
@@ -40,13 +35,25 @@
               }}&nbsp;{{ getChainInfo(chain)?.main_name }}</span>
             <RefreshBalance class="color-[--secondary-text]" :type="0" @mousedown.stop />
           </div>
-          <div class="mt-10px tabs">
+          <div v-if="!isEdit" class="mt-10px tabs flex-1 flex-wrap" @mousedown.stop>
             <el-button
-              v-for="(item, $index) in botSettings?.[chain]?.buy![botSettings?.[chain]?.buy?.selected || 's1']?.buyValueList"
-              :key="$index" class="one-click-button green clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :loading="loadingSwapBuy[$index]"
-              :disabled="loadingSwapBuy[$index]" @click.stop.prevent="submitBotSwap(item, 'buy', $index)" @mousedown.stop @mouseover.stop="hoverBuyAmount = item" @mouseleave.stop="hoverBuyAmount = ''">{{
-                !loadingSwapBuy[$index] ? item : '' }}</el-button>
+              v-for="(item, $index) in buyValueList"
+              :key="$index" class="one-click-button green clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :style="{height: isShow8 ? 'calc(50% - 4px)' : '100%'}" :loading="loadingSwapBuy[$index]"
+              :disabled="loadingSwapBuy[$index]" @click.stop.prevent="submitBotSwap(item, 'buy', $index)" @mousedown.stop @mouseover.stop="hoverBuyAmount = item" @mouseleave.stop="hoverBuyAmount = ''"
+            >{{ !loadingSwapBuy[$index] ? item : '' }}</el-button>
           </div>
+          <ul v-else class="mt-10px tabs flex-1 flex-wrap" @mousedown.stop>
+            <li v-for="(item, index) in buyValueList" :key="index" class="w-[calc((100%-30px)/4)]"  :style="{height: isShow8 ? 'calc(50% - 4px)' : '100%'}">
+              <el-input
+                v-model="botSettings![chain]!.buy![botSettings?.[chain]?.buy.selected || 's1'].buyValueList[index]"
+                class="input-number h-full"
+                inputmode="decimal"
+                placeholder="0.0"
+                @input="(value) => handleBuyValue(value, index)"
+                @blur="handleBlurBuyValue(index)"
+              />
+            </li>
+          </ul>
           <BottomSetting activeTab="buy" :gasPrice="tokenStore.gasPrice" @mousedown.stop />
           <el-divider class="b-t-color-[--dialog-divider]! mt-10px! mb-5px!" />
           <div class="flex-between mt-10px">
@@ -62,18 +69,42 @@
               }}&nbsp;{{ tokenStore.token?.symbol || '' }}</span>
             <RefreshBalance class="color-[--secondary-text]" :type="1" @mousedown.stop />
           </div>
-          <div class="mt-10px tabs">
+          <div v-if="!isEdit" class="mt-10px tabs flex-1 flex-wrap">
             <el-button
-              v-for="(item, $index) in botSettings?.[chain]?.sell![botSettings?.[chain]?.sell?.selected || 's1']?.sellPerList"
-              :key="$index" class="one-click-button red clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :loading="loadingSwapSell[$index]"
-              :disabled="loadingSwapSell[$index]" @click.stop.prevent="handleSellAmount(item, $index)" @mousedown.stop @mouseover.stop="hoverSellAmount = item" @mouseleave.stop="hoverSellAmount = ''">{{
-                !loadingSwapSell[$index] ? item + '%' : ''
-              }}</el-button>
+              v-for="(item, $index) in sellPerList"
+              :key="$index" class="one-click-button red clickable" :class="{ 'active': isCanKeySwap && isEnableHotkey }" :loading="loadingSwapSell[$index]" :style="{height: isShow8 ? 'calc(50% - 4px)' : '100%'}"
+              :disabled="loadingSwapSell[$index]" @click.stop.prevent="handleSellAmount(item, $index)" @mousedown.stop @mouseover.stop="hoverSellAmount = item" @mouseleave.stop="hoverSellAmount = ''"
+            >{{ !loadingSwapSell[$index] ? item + '%' : '' }}</el-button>
           </div>
+          <ul v-else class="mt-10px tabs flex-1 flex-wrap" @mousedown.stop>
+            <li v-for="(item, index) in buyValueList" :key="index" class="w-[calc((100%-30px)/4)]"  :style="{height: isShow8 ? 'calc(50% - 4px)' : '100%'}">
+              <el-input
+                v-model="botSettings[chain].sell[botSettings?.[chain]?.sell.selected || 's1'].sellPerList[index]"
+                class="input-number h-full"
+                inputmode="decimal"
+                placeholder="0"
+                @input="(value) => handlePer(value, index)"
+              >
+                <template #suffix>
+                  <span class="color-text-1">%</span>
+                </template>
+              </el-input>
+            </li>
+          </ul>
+
           <BottomSetting activeTab="sell" :gasPrice="tokenStore.gasPrice" @mousedown.stop />
         </div>
 
         <Holding v-show="isEnablePnL" isForceShow class="b-t-solid b-t-1px b-color-[--dialog-divider] mt-10px rd-0! pb-0! mb-0! gap-8px bg-transparent!" />
+        <!-- 拖拽放大手柄：下、右、上、左、四角斜向 -->
+        <div class="resize-handle resize-handle-b" @mousedown.stop="e => onResizeMouseDown(e, 'b')"/>
+        <div class="resize-handle resize-handle-r" @mousedown.stop="e => onResizeMouseDown(e, 'r')"/>
+        <div class="resize-handle resize-handle-t" @mousedown.stop="e => onResizeMouseDown(e, 't')"/>
+        <div class="resize-handle resize-handle-l" @mousedown.stop="e => onResizeMouseDown(e, 'l')"/>
+        <div class="resize-handle resize-handle-tl" @mousedown.stop="e => onResizeMouseDown(e, 'tl')"/>
+        <div class="resize-handle resize-handle-tr" @mousedown.stop="e => onResizeMouseDown(e, 'tr')"/>
+        <div class="resize-handle resize-handle-bl" @mousedown.stop="e => onResizeMouseDown(e, 'bl')"/>
+        <div class="resize-handle resize-handle-br" @mousedown.stop="e => onResizeMouseDown(e, 'br')"/>
       </template>
     </div>
   </Teleport>
@@ -146,7 +177,7 @@ const estimateBuyAmount = computed(() => {
 })
 
 const estimateSellAmount = computed(() => {
-  return new BigNumber(hoverSellAmount.value || 0).times(tokenPrice.value).div(nativePrice.value).toFixed()
+  return new BigNumber(hoverSellAmount.value || 0).times(tokenStore.swap.token?.balance || 0).times(tokenPrice.value).div(nativePrice.value).div(100).toFixed()
 })
 
 
@@ -477,7 +508,124 @@ async function handleSellAmount(item: string, index: number) {
 let mousemoveEvent: ((e: MouseEvent) => void) | null = null
 let mouseupEvent: (() => void) | null = null
 let maskElement: HTMLDivElement | null = null // 存为全局引用以便清理
+
 const isMounted = ref(false)
+// 拖拽放大相关
+const minHeight = 327
+const maxHeight = 800
+const minWidth = 360
+const maxWidth = 900
+const defaultHeight = 327
+const defaultWidth = 360
+const dialogHeight = ref<number>(Number(localStorage.getItem('fixed-one-click-height')) || defaultHeight)
+const dialogWidth = ref<number>(Number(localStorage.getItem('fixed-one-click-width')) || defaultWidth)
+const fixedOneClickStyle = computed(() => ({
+  height: dialogHeight.value + 'px',
+  width: dialogWidth.value + 'px',
+}))
+
+const isShow8 = computed(() => {
+  return dialogHeight.value >= 420
+})
+
+const buyValueList = computed(() => {
+  const chain = getChain()
+  const botSettings = botSettingStore.botSettings
+  const _buyValueList = botSettings?.[chain]?.buy![botSettings?.[chain]?.buy?.selected || 's1']?.buyValueList
+  return isShow8.value ? _buyValueList : _buyValueList?.slice(0, 4) || []
+})
+
+const sellPerList = computed(() => {
+  const chain = getChain()
+  const botSettings = botSettingStore.botSettings
+  const _sellPerList = botSettings?.[chain]?.sell![botSettings?.[chain]?.sell?.selected || 's1']?.sellPerList
+  return isShow8.value ? _sellPerList : _sellPerList?.slice(0, 4) || []
+})
+
+// 拖拽放大事件，direction: 'b'下, 'r'右, 't'上, 'l'左, 'tl'左上, 'tr'右上, 'bl'左下, 'br'右下
+function onResizeMouseDown(e: MouseEvent, direction: 'b'|'r'|'t'|'l'|'tl'|'tr'|'bl'|'br') {
+  e.preventDefault()
+
+  const startY = e.clientY
+  const startX = e.clientX
+  const startHeight = dialogHeight.value
+  const startWidth = dialogWidth.value
+  const el = document.querySelector('.fixed-one-click') as HTMLElement
+  const startTop = parseInt(el?.style.top || '210', 10)
+  const startLeft = parseInt(el?.style.left || '350', 10)
+
+  // 1. 用于 rAF 节流的变量
+  let rafId: number | null = null
+
+  function onMouseMove(ev: MouseEvent) {
+    // 如果已经在等待下一帧，则不再触发
+    if (rafId) return
+
+    rafId = requestAnimationFrame(() => {
+      rafId = null // 执行后重置
+
+      if (document.getElementById('tv_chart_container')) {
+        document.getElementById('tv_chart_container')!.style.pointerEvents = 'none'
+      }
+
+      const deltaX = ev.clientX - startX
+      const deltaY = ev.clientY - startY
+
+      let newWidth = startWidth
+      let newHeight = startHeight
+      let newTop = startTop
+      let newLeft = startLeft
+
+      // --- 计算逻辑 ---
+      if (direction.includes('r')) {
+        newWidth = Math.max(minWidth, Math.min(maxWidth, startWidth + deltaX))
+      }
+      if (direction.includes('l')) {
+        newWidth = Math.max(minWidth, Math.min(maxWidth, startWidth - deltaX))
+        // 修正：只有当宽度未达到极限时才允许移动坐标，或者使用计算后的 width 反推 left
+        newLeft = startLeft + (startWidth - newWidth)
+      }
+      if (direction.includes('b')) {
+        newHeight = Math.max(minHeight, Math.min(maxHeight, startHeight + deltaY))
+      }
+      if (direction.includes('t')) {
+        newHeight = Math.max(minHeight, Math.min(maxHeight, startHeight - deltaY))
+        newTop = startTop + (startHeight - newHeight)
+      }
+
+      // --- 统一更新 DOM 和 状态 ---
+      if (newWidth !== dialogWidth.value) {
+        dialogWidth.value = newWidth
+        if (direction.includes('l') && el) el.style.left = `${newLeft}px`
+      }
+      if (newHeight !== dialogHeight.value) {
+        dialogHeight.value = newHeight
+        if (direction.includes('t') && el) el.style.top = `${newTop}px`
+      }
+    })
+  }
+
+  function onMouseUp() {
+    // 2. 清理：取消可能存在的未执行任务
+    if (rafId) {
+      cancelAnimationFrame(rafId)
+      rafId = null
+    }
+
+    if (document.getElementById('tv_chart_container')) {
+      document.getElementById('tv_chart_container')!.style.pointerEvents = 'auto'
+    }
+
+    window.removeEventListener('mousemove', onMouseMove)
+    window.removeEventListener('mouseup', onMouseUp)
+
+    localStorage.setItem('fixed-one-click-height', String(dialogHeight.value))
+    localStorage.setItem('fixed-one-click-width', String(dialogWidth.value))
+  }
+
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+}
 
 function enableDragScroll() {
   const label = document.querySelector('.fixed-one-click') as HTMLElement
@@ -530,6 +678,9 @@ function enableDragScroll() {
   }
 
   label.onmousedown = (e) => {
+    // 只允许在非resize-handle区域拖动
+    const target = e.target as HTMLElement
+    if (target.closest('.resize-handle')) return
     isDragging = true
     startX = e.clientX - currentX
     startY = e.clientY - currentY
@@ -591,6 +742,60 @@ function disableDragScroll() {
   }
 }
 
+const isEdit = ref(false)
+
+watch(visible, (val) => {
+  if (!val) {
+    isEdit.value = false
+    // localStorage.removeItem('fixed-one-click-height')
+    // localStorage.removeItem('fixed-one-click-width')
+    // localStorage.removeItem('fixed-one-click-position')
+  }
+})
+
+function handleBuyValue(value: string, index: number) {
+  const v = value.replace(/-|[^\d.]/g, '')
+  const chain = getChain()
+  const botSetting = botSettingStore.botSettings?.[chain]
+  const selected = botSetting?.buy?.selected || 's1'
+  botSetting!.buy![selected].buyValueList[index] = v
+}
+
+function handleBlurBuyValue(index: number) {
+  const chain = getChain()
+  const botSetting = botSettingStore.botSettings?.[chain]
+  // 限制合法性，可添加逻辑
+  const decimals = 4
+  const selected = botSetting?.buy?.selected || 's1'
+  const v = botSetting?.buy?.[selected]?.buyValueList?.[index]
+  const v1 = new BigNumber(v || 0)
+    .toFixed()
+    ?.match?.(new RegExp(`[0-9]*(\\.[0-9]{0,${decimals || 18}})?`))?.[0]
+  if (String(v) !== String(v1) && botSetting?.buy) {
+    if (Number(v1) === 0) {
+      botSetting.buy[selected].buyValueList[index] = '0'
+    } else {
+      botSetting.buy[selected].buyValueList[index] = v1 || '0'
+    }
+  }
+}
+
+function handlePer(value: string, index: number) {
+  let v = value.replace(/-|[^\d.]/g, '')
+  if (Number(v) > 100) {
+    v = '100'
+  } else if (Number(v) < 0) {
+    v = '0'
+  }
+  const chain = getChain()
+  const botSetting = botSettingStore.botSettings?.[chain]
+  const selected = botSetting?.sell?.selected || 's1'
+  if (botSetting?.sell) {
+    botSetting.sell[selected].sellPerList[index] = v || '0'
+  }
+}
+
+
 onMounted(() => {
   enableDragScroll()
   addSpaceKeyDownEvent()
@@ -631,6 +836,7 @@ onBeforeUnmount(() => {
   }
 }
 
+
 .fixed-one-click {
   position: fixed;
   z-index: 3;
@@ -639,97 +845,229 @@ onBeforeUnmount(() => {
   background: var(--dialog-bg);
   border-radius: 8px;
   min-width: 360px;
+  min-height: 327px;
+  max-width: 900px;
+  max-height: 800px;
   padding: 12px;
   top: 210px;
   left: 350px;
-
-  .icon-shezhi {
-    color: #696E7C;
-    font-size: 12px;
+  // box-sizing: border-box;
+  // overflow: hidden;
+  border: 1px solid var(--border);
+  /* 四个方向的resize-handle */
+  .resize-handle {
+    position: absolute;
+    z-index: 10000;
+    background: transparent;
+    user-select: none;
   }
+  .resize-handle-b {
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 12px;
+    cursor: row-resize;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    // &::after {
+    //   content: '';
+    //   display: block;
+    //   width: 36px;
+    //   height: 4px;
+    //   margin-bottom: 3px;
+    //   border-radius: 2px;
+    //   background: #bfc8e2;
+    //   opacity: 0.5;
+    // }
+  }
+  .resize-handle-r {
+    top: 0;
+    right: -6px;
+    width: 12px;
+    height: 100%;
+    cursor: col-resize;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    // &::after {
+    //   content: '';
+    //   display: block;
+    //   width: 4px;
+    //   height: 36px;
+    //   margin-right: 3px;
+    //   border-radius: 2px;
+    //   background: #bfc8e2;
+    //   opacity: 0.5;
+    // }
+  }
+  .resize-handle-t {
+    left: 0;
+    top: -6px;
+    width: 100%;
+    height: 12px;
+    cursor: row-resize;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    // &::after {
+    //   content: '';
+    //   display: block;
+    //   width: 36px;
+    //   height: 4px;
+    //   margin-top: 3px;
+    //   border-radius: 2px;
+    //   background: #bfc8e2;
+    //   opacity: 0.5;
+    // }
+  }
+  .resize-handle-l {
+    top: 0;
+    left: -6px;
+    width: 12px;
+    height: 100%;
+    cursor: col-resize;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    // &::after {
+    //   content: '';
+    //   display: block;
+    //   width: 4px;
+    //   height: 36px;
+    //   margin-left: 3px;
+    //   border-radius: 2px;
+    //   background: #bfc8e2;
+    //   opacity: 0.5;
+    // }
+  }
+  /* 四角斜向缩放手柄样式 */
+  .resize-handle-tl, .resize-handle-tr, .resize-handle-bl, .resize-handle-br {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    z-index: 10001;
+    background: transparent;
+    user-select: none;
+    // &::after {
+    //   content: '';
+    //   display: block;
+    //   width: 12px;
+    //   height: 12px;
+    //   border-radius: 3px;
+    //   background: #bfc8e2;
+    //   opacity: 0.7;
+    //   border: 2px solid transparent;
+    // }
+  }
+  .resize-handle-tl {
+    top: -4px;
+    left: -4px;
+    cursor: nwse-resize;
+  }
+  .resize-handle-tr {
+    top: -4px;
+    right: -4px;
+    cursor: nesw-resize;
+  }
+  .resize-handle-bl {
+    bottom: -4px;
+    left: -4px;
+    cursor: nesw-resize;
+  }
+  .resize-handle-br {
+    bottom: -4px;
+    right: -4px;
+    cursor: nwse-resize;
+  }
+}
 
-  .content {
-    .tabs {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+.icon-shezhi {
+  color: #696E7C;
+  font-size: 12px;
+}
 
-      .one-click-button {
+.content {
+  .tabs {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    .one-click-button {
+      font-size: 14px;
+      min-width: 48px;
+      /* 高度由内联style动态控制 */
+      padding: 3px 8px;
+      margin: 0;
+      // margin-right: 8px;
+      // flex: 1;
+      width: calc((100% - 24px) / 4);
+      text-align: center;
+      background: transparent;
+      position: relative;
+
+      // &:last-child {
+      //   margin-right: 0;
+      // }
+
+      &.active:nth-child(-n+4):after {
+        content: '';
+        position: absolute;
+        bottom: calc(100% + 5px);
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--dialog-list-hover);
+        min-width: 20px;
+        padding: 3px 0;
+        color: var(--main-text);
         font-size: 14px;
-        min-width: 48px;
-        height: 32px;
-        padding: 3px 8px;
-        margin: 0;
-        // margin-right: 8px;
-        flex: 1;
-        text-align: center;
-        background: transparent;
-        position: relative;
+        border-radius: 4px;
+      }
 
-        // &:last-child {
-        //   margin-right: 0;
-        // }
-
-        &.active:after {
-          content: '';
-          position: absolute;
-          top: calc(100% + 5px);
-          left: 50%;
-          transform: translateX(-50%);
-          background-color: var(--dialog-list-hover);
-          min-width: 20px;
-          padding: 3px 0;
-          color: var(--main-text);
-          font-size: 14px;
-          border-radius: 4px;
-        }
-
-        &.green {
-          color: #12b886;
-          border: 1px solid #12b886;
-          &.active {
-            position: relative;
-            z-index: 3100;
-            &:nth-child(1)::after {
-              content: 'Q';
-            }
-            &:nth-child(2)::after {
-              content: 'W';
-            }
-            &:nth-child(3)::after {
-              content: 'E';
-            }
-            &:nth-child(4)::after {
-              content: 'R';
-            }
+      &.green {
+        color: #12b886;
+        border: 1px solid #12b886;
+        &.active {
+          position: relative;
+          z-index: 3100;
+          &:nth-child(1)::after {
+            content: 'Q';
+          }
+          &:nth-child(2)::after {
+            content: 'W';
+          }
+          &:nth-child(3)::after {
+            content: 'E';
+          }
+          &:nth-child(4)::after {
+            content: 'R';
           }
         }
+      }
 
-        &.red {
-          color: #ff646d;
-          border: 1px solid #ff646d;
-          &.active {
-            position: relative;
-            z-index: 3100;
-            &:nth-child(1)::after {
-              content: 'A';
-            }
-            &:nth-child(2)::after {
-              content: 'S';
-            }
-            &:nth-child(3)::after {
-              content: 'D';
-            }
-            &:nth-child(4)::after {
-              content: 'F';
-            }
+      &.red {
+        color: #ff646d;
+        border: 1px solid #ff646d;
+        &.active {
+          position: relative;
+          z-index: 3100;
+          &:nth-child(1)::after {
+            content: 'A';
+          }
+          &:nth-child(2)::after {
+            content: 'S';
+          }
+          &:nth-child(3)::after {
+            content: 'D';
+          }
+          &:nth-child(4)::after {
+            content: 'F';
           }
         }
       }
     }
   }
-
   .tabs-1 {
     display: flex;
     align-items: center;
@@ -759,4 +1097,19 @@ onBeforeUnmount(() => {
     }
   }
 }
+
+.input-number {
+  flex: 1;
+  background: var(--border);
+  --el-input-bg-color: var(--border);
+  --el-input-border-color: var(--border);
+  border-radius: 4px;
+  :deep().el-input__inner {
+    text-align: center;
+    color: var(--main-text);
+    height: 100%;
+  }
+}
+
+
 </style>

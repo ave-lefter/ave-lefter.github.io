@@ -655,6 +655,8 @@ async function initChart() {
       'header_settings',
       'header_saveload',
       'timeframes_toolbar',
+      'symbol_search_hot_key',
+      'show_interval_dialog_on_key_press'
     ],
     enabled_features: [
       'request_only_visible_range_on_reset',
