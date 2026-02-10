@@ -100,6 +100,6 @@ export function useSimilarTokenPopup() {
         }
       }
     
-      filterList = filterList?.filter(i => i !== 'platforms')
+      // filterList = filterList?.filter(i => i !== 'platforms')
       return filterList?.length || 0
   }

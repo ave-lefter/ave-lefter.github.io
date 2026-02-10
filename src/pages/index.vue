@@ -818,10 +818,10 @@ pump_notice.value?.[activeChain.value]?.graduated
   }
 },300))
 
-watch(()=> pumpV3.value[activeChain.value].platforms, (val, oldValue) => {
-  if (isEqual(val, oldValue)) return
-  getPumpList()
-})
+// watch(()=> pumpV3.value[activeChain.value].platforms, (val, oldValue) => {
+//   if (isEqual(val, oldValue)) return
+//   getPumpList()
+// })
 watch(activeChain, (val, old) => {
   if (old) {
     fourmemeListObj[old] = {
@@ -1311,7 +1311,7 @@ async function getPump(rawParams: {
   const platformList = pumpV3.value?.[currentChain]?.platforms
 
   if (platformList?.length > 0) {
-    queryParams.platforms = platformList.join(',')
+    queryParams.platforms = rawParams.platforms
   }
 
   if (queryParams.has_sm) {
@@ -1446,9 +1446,10 @@ function getFilterData(list: PumpObj[], conditions: any) {
     if (conditions?.tvl_max) {
       pass = pass && i.tvl <= Number(conditions.tvl_max)
     }
-    if (pumpV3.value[activeChain.value].platforms.length > 0) {
-      pass = pass && pumpV3.value[activeChain.value].platforms.includes(i.platform_id)
+    if (conditions?.platforms) {
+      pass = pass && conditions?.platforms?.includes?.(i.platform_id)
     }
+    // console.log('conditions', conditions.platforms)
     if (conditions?.holder_min) {
       pass = pass && (i?.holder || 0) >= Number(conditions.holder_min)
     }
