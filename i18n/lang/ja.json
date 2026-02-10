@@ -1459,5 +1459,6 @@
   "created": "作成",
   "topPlatforms": "トッププラットフォーム",
   "hideLiq": "クリックしてプール情報を非表示にします",
-  "showLiq": "クリックするとプール情報が表示されます"
+  "showLiq": "クリックするとプール情報が表示されます",
+  "monitored1": "Wallet Activity"
 }

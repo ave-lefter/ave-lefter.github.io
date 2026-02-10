@@ -849,5 +849,6 @@
   "applyForActivation": "",
   "monitorBotError": "Địa chỉ robot giám sát không được hỗ trợ",
   "hideLiq": "Bấm để ẩn thông tin nhóm",
-  "showLiq": "Bấm để hiển thị thông tin nhóm"
+  "showLiq": "Bấm để hiển thị thông tin nhóm",
+  "monitored1": "Hoạt động trên ví"
 }
