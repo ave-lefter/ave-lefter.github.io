@@ -327,7 +327,8 @@ import type {
   PumpObj,
   ChainKey,
   CategoryKey,
-  WSPumpObj
+  WSPumpObj,
+  pumpBlack
 } from '@/api/types/pump'
 import { isEqual, throttle } from 'lodash-es'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
@@ -497,15 +498,6 @@ const tabsList = computed(() => {
 })
 const list1 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.new || []
-  if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
-    list = list.filter(
-      (item) =>
-        !pumpBlackList.value?.some(
-          (i) =>
-            (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
-        )
-    )
-  }
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'new' && i.chain === activeChain.value)
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_new`)
   const wsList = getFilterData(list1, pumpFilter)
@@ -572,21 +564,17 @@ const list1 = computed(() => {
   }
   if (filterList?.length) {
     filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
+        filterList = filterList.filter(
+        item => !pumpBlackList.value.some(black => hitBlacklist(item, black))
+      )
+    }
     fourmemeListObj[activeChain.value].new = filterList?.slice?.(0, 100) || []
   }
   return filterList?.slice?.(0, 100)
 })
 const list2 = computed(() => {
   let list = fourmemeListObj?.[activeChain.value]?.soon || []
-  if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
-    list = list.filter(
-      (item) =>
-        !pumpBlackList.value?.some(
-          (i) =>
-          (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
-        )
-    )
-  }
   const list1 = (wsTableList.value || [])?.filter(i => (i.state === 'migrating') && i.chain === activeChain.value)
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_soon`)
   const wsList = getFilterData(list1, pumpFilter)
@@ -662,20 +650,16 @@ const list2 = computed(() => {
         !tokenSet.has(i.target_token)
     )
 
+    if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
+        filterList = filterList.filter(
+        item => !pumpBlackList.value.some(black => hitBlacklist(item, black))
+      )
+    }
      fourmemeListObj[activeChain.value].soon = filterList?.slice?.(0, 100) || []
     return filterList?.slice?.(0, 100)
   })
 const list3 = computed(() => {
 let list = fourmemeListObj?.[activeChain.value]?.graduated || []
-if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
-  list = list.filter(
-    (item) =>
-      !pumpBlackList.value?.some(
-        (i) =>
-        (i.address == item.token  && i.type=='ca' || i.address == item.symbol && i.type=='keyword' || i.address == item.token  && i.type=='dev')
-      )
-  )
-}
   const list1 = (wsTableList.value || [])?.filter(i => i.state === 'migrated' && i.chain === activeChain.value)
   const pumpFilter = localStorage.getItem(`pumpFilter_${activeChain.value}_graduated`)
   const wsList = getFilterData(list1, pumpFilter)
@@ -742,6 +726,11 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
   }
   if (filterList?.length) {
     filterList = mergeStatisticsList(mapStatistics.value, filterList)
+    if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length) {
+        filterList = filterList.filter(
+        item => !pumpBlackList.value.some(black => hitBlacklist(item, black))
+      )
+    }
     fourmemeListObj[activeChain.value].graduated = filterList?.slice?.(0, 100) || []
   }
   return filterList?.slice?.(0, 100)
@@ -1714,6 +1703,22 @@ function mergeLogo(prev: any, next: any) {
     logo_url: next.logo_url || prev.logo_url,
     appendix: next.appendix || prev.appendix,
   }
+}
+function hitBlacklist(item:PumpObj, black: pumpBlack) {
+  if (black.type === 'twitter') {
+    const address = black.address?.replace('@', '')
+    return item.medias?.some(m => m.url?.includes(address))
+  }
+
+  if (black.type === 'keyword') {
+    return black.address === item.symbol
+  }
+
+  if (black.type === 'ca' || black.type === 'dev') {
+    return black.address === item.token
+  }
+
+  return false
 }
 </script>
 

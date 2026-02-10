@@ -18,7 +18,7 @@
                   <div class="black-container">
                     <span
                       v-tooltip="$t('BlackListToken')"
-                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text] block hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
+                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text] block rounded-2px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
                         v-if="
@@ -42,7 +42,7 @@
                     </span>
                     <span
                       v-tooltip="$t('BlackListDev')"
-                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text] block mt-5px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
+                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
                     >
                       <Icon
                         v-if="
@@ -60,6 +60,28 @@
                         name="custom:dev-invisible"
                         class="text-12px"
                         @click.stop="addOrRemoveBlaclList(row, 'dev')"
+                      />
+                    </span>
+                    <span
+                      v-if="row?.medias?.filter?.(i => i.icon === 'twitter')?.length > 0 && row?.medias?.filter?.(i => i.icon === 'twitter')?.[0] && formatXUser(row?.medias?.filter?.(i => i.icon === 'twitter')?.[0]?.url)"
+                      v-tooltip="$t('BlackListTwitter')"
+                      class="bg-[--d-000-l-FFF] px-2px py-2px color-[--third-text] block rounded-2px mt-4px hover:color-[--secondary-text] w-16px h-16px flex items-center justify-center"
+                    >
+                      <Icon
+                        v-if="
+                          pumpBlackList?.findIndex(
+                            (i) => i.address == row.token && i.type == 'twitter'
+                          ) !== -1
+                        "
+                        name="custom:twitter-visible"
+                        class="text-12px"
+                        @click.stop="addOrRemoveBlaclList(row, 'twitter')"
+                      />
+                      <Icon
+                        v-else
+                        name="custom:twitter-visible"
+                        class="text-12px"
+                        @click.stop="addOrRemoveBlaclList(row, 'twitter')"
                       />
                     </span>
                   </div>
@@ -331,21 +353,24 @@
                         formatNumber(row?.makers_24h || 0, 2)
                       }}</span>
                     </div>
-
-                    <div
-                      v-show="pumpSetting?.define?.some((i) => i === 'kol')"
-                      v-tooltip="`${$t('KOLRatio')} ${formatNumber(row?.kol_ratio || 0, 2)}%`"
-                      class="flex mr-8px items-center"
+                    <HolderRank
+                    v-if="route.name === 'index' && pumpSetting?.define?.some((i) => i === 'kol')"
+                    class="flex mr-8px bg-btn"
+                    :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
+                    type="kol"
+                    :ratio="row?.kol_ratio"
                     >
-                      <Icon
-                        class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--third-text]"
-                        name="custom:kol2"
-                        :style="{color: row?.kol_tag_count> 0 ?'var(--yellow)' : 'var(--third-text)'}"
-                      />
-                      <span v-if="Number(row?.kol_tag_count) === 0 || row?.kol_tag_count == null" class="color-[--secondary-text]" >0</span>
-                      <span v-else class="color-[--main-text]">
-                        {{ formatNumber(row?.kol_tag_count || 0, 2) }}</span>
-                    </div>
+                      <div class="flex items-center">
+                        <Icon
+                          class="iconfont icon-rug mr-4px text-10px vertical-middle color-[--third-text]"
+                          name="custom:kol2"
+                          :style="{color: row?.kol_tag_count> 0 ?'var(--yellow)' : 'var(--third-text)'}"
+                        />
+                        <span v-if="Number(row?.kol_tag_count) === 0 || row?.kol_tag_count == null" class="color-[--secondary-text]" >0</span>
+                        <span v-else class="color-[--main-text]">
+                          {{ formatNumber(row?.kol_tag_count || 0, 2) }}</span>
+                      </div>
+                    </HolderRank>
 
                     <div
                       v-tooltip="{
@@ -368,20 +393,41 @@
                         formatNumber(row?.dev_migrated_count || 0, 2)}}/{{formatNumber(row?.dev_total_count || 0, 2)}}
                       </span>
                     </div>
-
-                    <div
-                      v-show="pumpSetting?.define?.some((i) => i === 'smart')"
-                      v-tooltip="`${$t('smarterRatio')} ${formatNumber(row?.smart_wallet_ratio || 0, 2)}%`"
-                      class="flex mr-5px items-center color-[--third-text]"
-                    >
-                      <Icon
-                        class="iconfont icon-rug mr-4px text-10px vertical-middle "
-                        name="custom:smart-plain"
-                        :style="{color: row?.kol_tag_count> 0 ?'var(--yellow)' : 'var(--third-text)'}"
-                      />
-                      <span v-if="Number(row?.smart_wallet_tag_count) === 0 || row?.smart_wallet_tag_count == null" class="color-[--secondary-text]" >0</span>
-                      <span v-else class="color-[--main-text]">{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
-                    </div>
+                    <HolderRank
+                      v-if="route.name === 'index' && pumpSetting?.define?.some((i) => i === 'smart')"
+                      class="flex mr-8px bg-btn"
+                      :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
+                      type="smart"
+                      :ratio="row?.smart_wallet_ratio"
+                      >
+                      <div class="flex items-center color-[--third-text]">
+                          <Icon
+                            class="iconfont icon-rug mr-4px text-10px vertical-middle "
+                            name="custom:smart-plain"
+                            :style="{color: Number(formatNumber(row?.smart_wallet_tag_count || 0, 2) || 0) > 0 ?'var(--yellow)' : 'var(--third-text)'}"
+                          />
+                          <span v-if="Number(row?.smart_wallet_tag_count) === 0 || row?.smart_wallet_tag_count == null" class="color-[--secondary-text]" >0</span>
+                          <span v-else class="color-[--main-text]">{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
+                        </div>
+                    </HolderRank>
+                    <HolderRank
+                      v-if="route.name === 'index'"
+                      class="flex mr-8px bg-btn"
+                      :tokenId="(row?.token || row?.target_token) + '-' + row?.chain"
+                      type="rank"
+                      >
+                        <div class="flex items-center">
+                          <Icon
+                            class="iconfont icon-rug mr-4px text-10px vertical-middle "
+                            name="custom:holder-rank"
+                            :style="{color: Number(row?.co_holders_count || 0)> 0 ?'var(--yellow)' : 'var(--third-text)'}"
+                          />
+                          <span v-if="(Number(row?.co_holders_count) == 0 || row?.co_holders_count == null) && (Number(row?.co_holders_count) == 0 || row?.co_holders_count == null) " class="color-[--secondary-text]" >0</span>
+                          <span v-else class="color-[--main-text]" >{{
+                            formatNumber(row?.co_holders_count || 0, 2)}}
+                          </span>
+                        </div>
+                    </HolderRank>
                   </div>
                   <div class="mt-5px flex-start text-11px">
                     <template
@@ -622,7 +668,7 @@ class="flex-start mr-8px bg-btn"
                   </template>
                 </div>
                 <div
-                  v-if="pumpSetting?.define?.some((i) => i === 'txs')"
+                  v-show="pumpSetting?.define?.some((i) => i === 'txs')"
                   class="flex-end text-12px pr-12px"
                 >
                   <div v-tooltip.raw="{
@@ -760,6 +806,7 @@ import { useVirtualList } from '@vueuse/core'
 import ProgressPop from './progressPop.vue'
 import DevPop from './devPop/index.vue'
 import PumpPop from './pumpPop/index.vue'
+import HolderRank from './holderRank/index.vue'
 import { useSimilarTokenPopup } from '../utils'
 
 const props = defineProps({
@@ -863,20 +910,36 @@ function tableRowClick(row: { target_token: string; chain: string }) {
     params: { id: row.target_token + '-' + row.chain },
   })
 }
-function addOrRemoveBlaclList(item: { token: string }, type: 'ca' | 'dev' | 'keyword') {
+function addOrRemoveBlaclList(item: { token: string , medias: any[]}, type: 'ca' | 'dev' | 'keyword'| 'twitter') {
   if (pumpBlackList.value?.length > 499) {
     ElMessage.error(t('blacklistLimit'))
     return
   }
   if (pumpBlackList.value) {
-    const findIndex = pumpBlackList.value?.findIndex(
-      (i) => item.token == i.address && i.type == type
-    )
-    if (findIndex !== -1) {
-      pumpBlackList.value.splice(findIndex, 1)
+    if (type == 'twitter') {
+      const twitter = item?.medias?.filter?.(i => i.icon === 'twitter')?.[0]
+      const twitterAccount = formatXUser(twitter?.url)
+      if (twitterAccount) {
+        const findIndex = pumpBlackList.value?.findIndex(
+        (i) => twitterAccount == i.address && i.type == type
+        )
+        if (findIndex !== -1) {
+          pumpBlackList.value.splice(findIndex, 1)
+        } else {
+          pumpBlackList.value.push({ address: twitterAccount, type: type })
+        }
+      }
     } else {
-      pumpBlackList.value.push({ address: item.token, type: type })
+      const findIndex = pumpBlackList.value?.findIndex(
+        (i) => item.token == i.address && i.type == type
+      )
+      if (findIndex !== -1) {
+        pumpBlackList.value.splice(findIndex, 1)
+      } else {
+        pumpBlackList.value.push({ address: item.token, type: type })
+      }
     }
+
   } else {
     pumpBlackList.value = [{ address: item.token, type: type }]
   }
@@ -1114,7 +1177,7 @@ function getLiqTooltip(row: PumpObj) {
       min-width: 200px;
       position: absolute;
       right: 0;
-      bottom: 18px;
+      top: 0;
       padding-left: 12px;
       padding-bottom: 5px;
       border: 1px solid;
