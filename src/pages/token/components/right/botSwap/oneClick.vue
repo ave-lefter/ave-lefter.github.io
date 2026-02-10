@@ -113,7 +113,7 @@
 
 <script setup lang='ts'>
 import { formatNumber } from '@/utils/formatNumber'
-import { getChainInfo, isEvmChain } from '@/utils'
+import { getChainInfo, isEvmChain, formatUnits } from '@/utils'
 import { useLocalStorage, useEventListener } from '@vueuse/core'
 import { ElNotification } from 'element-plus'
 import BigNumber from 'bignumber.js'
@@ -127,6 +127,7 @@ import type { BotChain, BotSettingKey } from '~/utils/types'
 import { recordTxV2, updateTxV2 } from '~/api/tracking'
 import Holding from './holding.vue'
 import BottomSetting from './bottomSetting.vue'
+import { useTransactionPrompt } from '@/composables/useTransactionPrompt'
 
 const botStore = useBotStore()
 const tokenStore = useTokenStore()
@@ -136,6 +137,7 @@ const { botSettings } = storeToRefs(botSettingStore)
 const wsStore = useWSStore()
 const route = useRoute()
 const { t } = useI18n()
+const { executing } = useTransactionPrompt()
 const loadingSwapBuy = ref([false, false, false, false, false])
 const loadingSwapSell = ref([false, false, false, false, false])
 
@@ -253,6 +255,64 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
     loadingSwapSell.value[index] = true
   }
   const chain = getChain()
+  const promptCreatorAddress = botStore.getWalletAddress?.(chain) || botStore.evmAddress || ''
+  let promptStartTime = Date.now()
+  let promptTimer: ReturnType<typeof setInterval> | null = null
+  let promptAutoCloseTimer: ReturnType<typeof setTimeout> | null = null
+  let promptDone = false
+  const clearPromptTimer = () => {
+    if (promptTimer) {
+      clearInterval(promptTimer)
+      promptTimer = null
+    }
+  }
+  const clearPromptAutoCloseTimer = () => {
+    if (promptAutoCloseTimer) {
+      clearTimeout(promptAutoCloseTimer)
+      promptAutoCloseTimer = null
+    }
+  }
+  const promptHandle = executing({
+    avatarAddress: promptCreatorAddress,
+    avatarChain: chain,
+  })
+  const finishPromptFail = () => {
+    if (promptDone) return
+    promptDone = true
+    clearPromptTimer()
+    clearPromptAutoCloseTimer()
+    promptHandle.close()
+  }
+  const finishPromptSuccess = (txInfo1: any) => {
+    if (promptDone) return
+    promptDone = true
+    clearPromptTimer()
+    clearPromptAutoCloseTimer()
+    const elapsedSec = (Date.now() - promptStartTime) / 1000
+    const fromAmountDisplay = txInfo1?.fromAmount ? formatUnits(txInfo1.fromAmount, fromToken?.decimals || 0) : amount
+    const toAmountDisplay = txInfo1?.outputAmount ? formatUnits(txInfo1.outputAmount, toToken?.decimals || 0) : ''
+    promptHandle.success({
+      chain: chain,
+      txHash: txInfo1?.txHash || txInfo1?.hash || '',
+      elapsedSec,
+      isBuy,
+      fromSymbol: fromToken?.symbol || '',
+      fromAmount: fromAmountDisplay,
+      toSymbol: toToken?.symbol || '',
+      toAmount: toAmountDisplay,
+      avatarAddress: promptCreatorAddress,
+      avatarChain: chain,
+    })
+  }
+  promptTimer = setInterval(() => {
+    promptHandle.update(Date.now() - promptStartTime)
+  }, 100)
+  promptAutoCloseTimer = setTimeout(() => {
+    if (promptDone) return
+    clearPromptTimer()
+    promptHandle.close()
+    promptAutoCloseTimer = null
+  }, 120000)
   const chainMainToken: Record<string, string> = {
     solana: 'sol',
     ton: 'TON',
@@ -334,11 +394,12 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             }
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
-              ElNotification({ type: 'success', message: t('tradeSuccess') })
               const txInfo = subscribeResult?.txList?.[0]
               updateTxV2({...txInfo, chain: subscribeResult?.chain}, batchIdObj?.[_batchId] || '')
+              finishPromptSuccess(txInfo)
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
+              finishPromptFail()
             }
             unwatch()
             if (isBuy) {
@@ -354,6 +415,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       }
     }).catch(err => {
       handleBotError(err || 'swap error')
+      finishPromptFail()
       if (isBuy) {
         loadingSwapBuy.value[index] = false
       } else {
@@ -429,7 +491,6 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
             }
             tokenStore.placeOrderSuccess++
             if (subscribeResult?.txList?.[0]?.success) {
-              ElNotification({ type: 'success', message: t('tradeSuccess') })
               unwatch()
               setTimeout(() => {
                 getTokenBalance()
@@ -442,9 +503,11 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
                 outTokenAddress: data.outTokenAddress,
                 ...txInfo
               })
+              finishPromptSuccess(txInfo)
             } else {
               handleBotError(subscribeResult?.txList?.[0]?.failMessage || 'swap error')
               unwatch()
+              finishPromptFail()
             }
             if (isBuy) {
               loadingSwapBuy.value[index] = false
@@ -456,6 +519,7 @@ async function submitBotSwap(amount1: string | number, type: 'buy' | 'sell', ind
       }
     }).catch(err => {
       handleBotError(err || 'swap error')
+      finishPromptFail()
       if (isBuy) {
         loadingSwapBuy.value[index] = false
       } else {
