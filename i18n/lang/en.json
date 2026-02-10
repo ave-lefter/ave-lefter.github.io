@@ -2006,5 +2006,6 @@
   "hideLiq": "Click to hide pool information",
   "showLiq": "Click to display pool information",
   "filter": "Filter",
-  "commission": "Commission"
+  "commission": "Commission",
+  "monitored1": "Wallet Activity"
 }

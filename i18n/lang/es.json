@@ -631,5 +631,6 @@
   "created": "Creado",
   "topPlatforms": "Plataformas Principales",
   "hideLiq": "Haga clic para ocultar la información del grupo",
-  "showLiq": "Haga clic para mostrar información de la piscina"
+  "showLiq": "Haga clic para mostrar información de la piscina",
+  "monitored1": "Wallet Activity"
 }

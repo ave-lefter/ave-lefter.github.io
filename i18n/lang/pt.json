@@ -609,5 +609,6 @@
   "created": "Criado",
   "topPlatforms": "Principais Plataformas",
   "hideLiq": "Clique para ocultar informações do pool",
-  "showLiq": "Clique para exibir informações do pool"
+  "showLiq": "Clique para exibir informações do pool",
+  "monitored1": "Wallet Activity"
 }

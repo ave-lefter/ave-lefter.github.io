@@ -2007,5 +2007,6 @@
   "topPlatforms": "顶级发射平台",
   "hideLiq": "点击隐藏池子信息",
   "showLiq": "点击显示池子信息",
-  "commission": "分佣"
+  "commission": "分佣",
+  "monitored1": "钱包动态"
 }
