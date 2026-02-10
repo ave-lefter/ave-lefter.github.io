@@ -177,7 +177,7 @@ const estimateBuyAmount = computed(() => {
 })
 
 const estimateSellAmount = computed(() => {
-  return new BigNumber(hoverSellAmount.value || 0).times(tokenPrice.value).div(nativePrice.value).toFixed()
+  return new BigNumber(hoverSellAmount.value || 0).times(tokenStore.swap.token?.balance || 0).times(tokenPrice.value).div(nativePrice.value).div(100).toFixed()
 })
 
 
