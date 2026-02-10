@@ -4,6 +4,7 @@ import { useLocalStorage, type RemovableRef } from '@vueuse/core'
 import type { IChartingLibraryWidget, Mark } from '~/types/tradingview/charting_library'
 import { getUserKlineTxTags, getKlineProfilingTagsV2, type IGetKlineProfilingTagsV2Item,  type HolderBuy, type WalletLogo } from '@/api/token'
 import type { SimpleWSTx, WSTx } from './types'
+import { isJSDocNonNullableType } from 'typescript'
 
 type TradeSide = {
   amount: number
@@ -35,6 +36,7 @@ export function useKlineMarks() {
   const botStore = useBotStore()
   const walletStore = useWalletStore()
   const globalStore = useGlobalStore()
+  const wsStore = useWSStore()
   // 创建打点数据
   const marksTabs = computed(() => {
     const arr = (botStore?.evmAddress || walletStore?.address) ? [{ id: 'trade', name: t('mine') }] : []
@@ -129,7 +131,7 @@ export function useKlineMarks() {
   // “我的”
   const marksMap: Map<string, TradeData[]> = new Map()
   // 画像打点
-  const profilingMarksCache: Map<string, Mark[]> = new Map()
+  const profilingMarksCache: Map<string, any[]> = new Map()
   const MAX_CACHE_SIZE = 50
 
   const touchCache = <T>(map: Map<string, T>, key: string): T | undefined => {
@@ -171,6 +173,7 @@ export function useKlineMarks() {
   }) {
     marksTabs.value.forEach((v) => {
       const id = pair + '-' + chain + '-' + user  + '-' + interval + '-' + v.id + '-' + from + '-' + to
+      
       if (marksMap.has(id) && markTabsChecked.value?.[v.id]) {
         const res = touchCache(marksMap, id)
         const marks = formatToMarks(res || [], interval, v.id, v.name)
@@ -178,7 +181,8 @@ export function useKlineMarks() {
         return
       }
       if(profilingMarksCache.has(id) && markTabsChecked.value?.[v.id]) {
-        const marks = touchCache(profilingMarksCache, id) || []
+        const res = touchCache(profilingMarksCache, id) || []
+        const marks = formatProfilingToMarks(res, interval, v.id, v.name)
         onDataCallback(marks)
         return
       }
@@ -205,7 +209,7 @@ export function useKlineMarks() {
         }).then(res => {
           if(Array.isArray(res)){
             const marks = formatProfilingToMarks(res || [], interval, v.id, v.name)
-            setCache(profilingMarksCache, id, marks)
+            setCache(profilingMarksCache, id, res||[])
             onDataCallback(marks || [])
           }
         })
@@ -264,7 +268,7 @@ export function useKlineMarks() {
       let imageUrl = isBuy
       ? `${urlPrefix}signals/marks/mark-buy-${type}.png`
       : `${urlPrefix}signals/marks/mark-sell-${type}.png`
-      if(el.wallet_logo?.logo && el.wallet_logo.logo.includes('.webp')){
+      if(el.wallet_logo?.logo && ['.png', '.jpg', '.jpeg', '.gif', '.webp'].some((ext) => el.wallet_logo.logo.includes(ext))){
         imageUrl = el.wallet_logo.logo
       }
       let borderColor = 'transparent'
@@ -497,6 +501,49 @@ ${formatDate(entry.time, 'YYYY-MM-DD HH:mm')}
     _widget?.activeChart?.()?.refreshMarks?.()
   }
 
+  // 定义枚举优先级 dev > kol > 聪明钱 > 狙击 > 老鼠仓
+const priorityOrder = ['25','31','30','19','16']
+
+  function wsPublicPortraitUpdateMarks(val:any[],_widget: IChartingLibraryWidget | null,{interval,user}:any){
+    if(Array.isArray(val)){
+          const chain = tokenStore?.token?.chain
+          const pair = tokenStore?.pairAddress
+          const addMarks:any[]=[]
+          marksTabs.value.toSorted((a, b) => priorityOrder.indexOf(a.id) - priorityOrder.indexOf(b.id)).forEach(v=>{
+            val.forEach(item=>{
+              if(item.maker_type.includes(v.id)){
+                const holderData = {
+                      amount: item.amount,
+                      tx_time: item.time,
+                      txns: 1,
+                      volume: item.volume
+                }
+                const markData = {
+                  time: item.time,
+                  holders:[{
+                    buy: item.direction === 'buy' ? holderData : null,
+                    remark:         item.remark,
+                    sell: item.direction === 'sell' ? holderData : null,
+                    wallet_address: item.wallet_address,
+                    wallet_logo:    item.wallet_logo || {}
+                  }]
+                }
+                addMarks.push(markData)
+              }
+            })
+            profilingMarksCache.forEach((item,key)=>{
+              if(key.startsWith(pair + '-' + chain + '-' + user  + '-' + interval + '-' + v.id)){
+                item.push(...addMarks)
+              }
+            })
+            addMarks.length = 0
+        })
+        if(_widget){
+          _widget.activeChart?.()?.refreshMarks?.()
+        }
+    }
+  }
+
   return {
     marksTabs,
     markTabsChecked,
@@ -505,7 +552,8 @@ ${formatDate(entry.time, 'YYYY-MM-DD HH:mm')}
     wsTxUpdateMarks,
     profilingMarksCache,
     createDisplayButton,
-    markTabsVisible
+    markTabsVisible,
+    wsPublicPortraitUpdateMarks
   }
 }
 

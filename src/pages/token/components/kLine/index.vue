@@ -226,6 +226,7 @@ const tokenStore = props.isRank ? useRankKlineStore() : useTokenStore()
 const botStore = useBotStore()
 const tokenDetailsStore = useTokenDetailsStore()
 const globalStore = useGlobalStore()
+const localeStore = useLocaleStore()
 const route = useRoute()
 const walletStore = useWalletStore()
 const scrollTop = ref(0)
@@ -401,9 +402,16 @@ watch(user, () => {
   }
 })
 
+watch(()=>localeStore.locale,()=>{
+  if (isReady.value && route.name === 'token-id') {
+    console.log('localeStore.locale', localeStore.locale)
+    _widget?.activeChart?.()?.clearMarks?.()
+    _widget?.activeChart?.()?.refreshMarks?.()
+  }
+})
+
 const price = 0
 const wsStore = useWSStore()
-const localeStore = useLocaleStore()
 
 // const marks = shallowRef([{ id: 'trade', name: '我的' }])
 
@@ -593,6 +601,7 @@ const {
   profilingMarksCache,
   createDisplayButton,
   markTabsVisible,
+  wsPublicPortraitUpdateMarks
 } = useKlineMarks()
 
 watch(marksTabs, () => {
@@ -1041,19 +1050,20 @@ async function initChart() {
   })
 
   // onMarkClick
-  _widget?.subscribe('onMarkClick', (markId) => {
+  _widget?.subscribe('onMarkClick', () => {
     const { token, symbol, logo_url, chain } = tokenStore.tokenInfo?.token || {}
     const { target_token, token0_address, token0_symbol, token1_symbol, pair } =
       tokenStore.pair || {}
 
     let user_address = user.value
     for (const [, markArr] of profilingMarksCache) {
-      const addr = markArr.find((el) => el.id === markId)?.user_address
+      const addr = markArr?.[0]?.holders?.[0]?.wallet_address
       if (addr) {
         user_address = addr
         break
       }
     }
+    
     const $patchParams = {
       drawerVisible: true,
       tokenInfo: {
@@ -1188,6 +1198,19 @@ function onWsKline(
         },
         _widget
       )
+    } else if (event === WSEventType.PUBLIC_PORTRAIT) {
+      const marksTabsIds = marksTabs.value.map((v) => v.id)
+      const msgArr = (data?.msg || [])?.filter?.(el=>{
+        return marksTabsIds.some(id=> el.maker_type.includes(id))
+      })
+      if(msgArr.length === 0){
+        return
+      }
+       const interval = switchResolution(resolution)
+      wsPublicPortraitUpdateMarks(msgArr,_widget,{
+        interval: Number(interval),
+        user: user.value
+      })
     }
   }, 'kline')
 }
