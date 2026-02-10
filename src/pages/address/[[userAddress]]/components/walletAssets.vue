@@ -322,6 +322,7 @@ const getDuring = (time) => {
 }
 const wallet_age = computed(() => {
   const _wallet_age = statistics.value?.wallet_age || ''
+  
   return ['--', '0'].includes(_wallet_age)
     ? { value: '--', unit: '' }
     : getDuring(_wallet_age ? (Number(_wallet_age) || 0) * 1000 : undefined)

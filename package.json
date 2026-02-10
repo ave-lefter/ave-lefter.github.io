@@ -36,6 +36,7 @@
     "arc-progress": "^1.0.0",
     "bignumber.js": "^9.3.0",
     "bs58": "^6.0.0",
+    "comlink": "^4.4.2",
     "core-js": "^3.43.0",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",

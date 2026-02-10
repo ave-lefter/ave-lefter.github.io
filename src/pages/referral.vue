@@ -256,7 +256,7 @@
               style="width: 100%"
               class="table-list"
             >
-              <el-table-column :width="550" prop="time" :label="$t('registerTime')">
+              <el-table-column prop="time" :label="$t('registerTime')">
                 <template #default="{ row }">
                   {{ formatDate(row.bindRefTime) }}
                 </template>
@@ -264,6 +264,11 @@
               <el-table-column prop="name" :label="$t('friendName')">
                 <template #default="{ row }">
                   {{ row?.username }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="name" :label="$t('commission')">
+                <template #default="{ row }">
+                  ${{ formatNumber(row?.refFee || '0', 2) }}
                 </template>
               </el-table-column>
               <el-table-column prop="level" :label="$t('vipLevel')" align="right">
