@@ -252,7 +252,7 @@ const totalHolders = computed(() => [
     name: 'KOL',
   },
 ])
-const linesChecked = useLocalStorage('tv_markLines', {
+const linesChecked = useLocalStorage('tv_markLines1', {
   buy: {
     checked: true,
     color: '#12B886',
@@ -271,7 +271,7 @@ const linesChecked = useLocalStorage('tv_markLines', {
   },
   kol: {
     checked: false,
-    color: '#424ADF',
+    color: '#9CA1A8',
   },
 })
 const colorPickerVisible = ref({} as Record<string, boolean>)

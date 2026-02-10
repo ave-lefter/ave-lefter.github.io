@@ -878,10 +878,10 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
           disableUndo: true,
           text: getSwapTypeLabel(item.swapType as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) || t('limitSell1'),
           overrides: {
-            linecolor: '#FF6838',  // 线的颜色
+            linecolor: '#FFBE3C',  // 线的颜色
             linewidth: 1,          // 线的粗细
             linestyle: 2,     // 线的样式：0表示实线，1表示虚线 2 长虚线
-            textcolor: '#FF6838',
+            textcolor: '#FFBE3C',
             showLabel: true,
             horzLabelsAlign: 'right',
             vertLabelsAlign: 'bottom',
@@ -894,7 +894,7 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
       const line = chart?.getShapeById?.(priceLimitLineId)
       if (!line) return
       // line?.setProperties?.({
-      //   textcolor: '#FF6838',
+      //   textcolor: '#FFBE3C',
       //   showLabel: true,
       //   horzLabelsAlign: 'right',
       //   vertLabelsAlign: 'bottom',
