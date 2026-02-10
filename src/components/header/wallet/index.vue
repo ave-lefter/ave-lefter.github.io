@@ -97,7 +97,7 @@
             </div>
             <div class="color-[--secondary-text] flex items-center gap-4px">
               <span class="font-500 text-12px flex items-center color-#FFBE3C gap-8px">
-                <template v-if="authInfo?.authSetting">
+                <template v-if="authInfo?.emailAddress && authInfo?.authSetting">
                   <Icon name="mingcute:check-circle-fill" class="text-17px color-#12B886 mt-1px" />
                   <span class="color-#12B886">{{ t('bounded') }}</span>
                 </template>
