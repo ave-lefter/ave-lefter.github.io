@@ -127,6 +127,7 @@ export const SupportFullDataChain = ['solana', 'bsc','eth','base','xlayer','fsc'
 export const SupportMonitorChain = ['solana', 'bsc', 'xlayer']
 
 export const SupportTokenKlineChains = ['juchain', 'arbitrum', 'optimism']
+export const SupportTokenKlineLaunchpad = ['bsc-four.meme']
 export const SupportCopyTradeChain = ['solana', 'bsc', 'eth', 'base']
 
 export const defaultPaginationParams = {

@@ -44,7 +44,8 @@ export const useTokenStore = defineStore('token', () => {
   })
 
   const tokenAllPair = computed(() => {
-    if (!SupportTokenKlineChains?.includes?.(token.value?.chain || '')) {
+    const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(token.value?.chain + '-' + (token.value?.launchpad || ''))
+    if (!(SupportTokenKlineChains?.includes?.(token.value?.chain || '') || isSupportTokenKlineLaunchpad)) {
       return null
     }
     const _pairs = tokenInfo.value?.pairs

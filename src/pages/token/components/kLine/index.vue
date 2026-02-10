@@ -834,8 +834,9 @@ async function initChart() {
             from,
             to: firstDataRequest ? 0 : Math.max(to, firstBarTime || 0),
           }
+          const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(chain.value + '-' + (tokenStore?.token?.launchpad || ''))
           const isTokenKline =
-            SupportTokenKlineChains?.includes?.(chain.value) &&
+            (SupportTokenKlineChains?.includes?.(chain.value) || isSupportTokenKlineLaunchpad) &&
             !props.isRank &&
             'tokenAllPair' in tokenStore &&
             tokenStore?.tokenAllPair &&
