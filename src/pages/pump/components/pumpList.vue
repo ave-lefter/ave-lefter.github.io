@@ -693,6 +693,7 @@ class="flex-start mr-8px bg-btn"
                   <QuickSwap
                     v-if="parseInt(pumpSetting?.size_swap|| '0') > 0"
                     :quickBuyValue="quickBuyValue"
+                    :swapSetSelected="props.swapSetSelected"
                     :row="row"
                     classNames="bg-[--up-color] color-#fff"
                     :size="pumpSetting.size_swap"
@@ -770,6 +771,10 @@ const props = defineProps({
   quickBuyValue: {
     type: String,
     default: () => '',
+  },
+  swapSetSelected: {
+    type: String as PropType<'s1' | 's2' | 's3'>,
+    default: '',
   },
   loading: {
     type: Boolean,
