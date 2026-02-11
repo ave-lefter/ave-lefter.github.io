@@ -114,6 +114,7 @@
   "follow": "フォロー",
   "followed": "フォロー中",
   "liquidity2": "流動性",
+  "liquidity3": "流動性",
   "time": "時間",
   "type": "タイプ",
   "swapPrice": "取引価格",
@@ -1460,5 +1461,8 @@
   "topPlatforms": "トッププラットフォーム",
   "hideLiq": "クリックしてプール情報を非表示にします",
   "showLiq": "クリックするとプール情報が表示されます",
-  "monitored1": "Wallet Activity"
+  "monitored1": "Wallet Activity",
+  "availableLiquidity": "利用可能な流動性",
+  "googleAuthNotBoundTip": "Google認証システムがバインドされていません。アカウントのセキュリティを保護するため、ウォレットアドレスを削除する前にGoogle認証システムをバインドしてください。",
+  "goToBind": "バインドへ"
 }

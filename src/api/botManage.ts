@@ -63,13 +63,14 @@ export function _importWallet(encryptedMnemonic: string): Promise<Wallet[]> {
 }
 
 // 删除
-export function _removeWallet(evmAddress: string): Promise<Wallet[]> {
+export function _removeWallet(evmAddress: string, authCode?: string): Promise<Wallet[]> {
   const { $api } = useNuxtApp()
-  return $api('/botapi/user/removeWallet', {
+  return $api('/botapi/user/removeWalletV2', {
     method: 'POST',
     body: {
       source: 'web',
       evmAddress: evmAddress,
+      authCode: authCode || '',
     },
   })
 }
