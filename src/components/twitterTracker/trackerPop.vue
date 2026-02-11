@@ -105,9 +105,9 @@
           </template>
         </el-popover>
         <Icon
+          ref="audioButtonRef"
           :name="globalStore.audioSettings.audio.twitter ? 'custom:ad' : 'custom:admute'"
           class="mr-4px cursor-pointer"
-          @click="globalStore.audioSettings.active = 'audio'"
         />
       </div>
       <!-- <el-input
@@ -124,6 +124,7 @@
         </template>
       </el-input> -->
     </div>
+    <AudioPopover v-if="audioButtonRef" :buttonRef="audioButtonRef" type="twitter"/>
     <TwitterTrackerList :isMine="isMine" @endReached="getList" @startAttention="emits('setDrawerVisible', true)" />
     <audio
       ref="twitterAudio" controls style="display: none"
@@ -150,6 +151,7 @@ const filterVisible = ref(false)
 const twitterAudio = useTemplateRef('twitterAudio')
 const followIds = useStorage('twFollowIds', [])
 const query = ref({ ...trackerStore.query })
+const audioButtonRef = ref()
 defineProps({
   scrollHeight: {
     type: Number,
