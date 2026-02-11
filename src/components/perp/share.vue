@@ -59,16 +59,16 @@
         </div>
       </div>
       <div>
-        <div v-if="props.statistics.entryPrice" class="flex items-center">
+        <div v-if="props.statistics.entryPrice" class="flex items-center lh-22px mb-3px">
           <span
             ><span class="text-[--third-text]">{{ t('openPrice2') }}: </span
-            >{{ props.statistics.entryPrice }}</span
+            >${{ props.statistics.entryPrice }}</span
           >
         </div>
-        <div v-if="props.statistics.closePrice" class="flex items-center">
+        <div v-if="props.statistics.closePrice" class="flex items-center lh-22px">
           <span
             ><span class="text-[--third-text]">{{ t('closePrice2') }}: </span
-            >{{ props.statistics.closePrice }}</span
+            >${{ props.statistics.closePrice }}</span
           >
         </div>
       </div>

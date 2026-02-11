@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { getPositionTermPage } from '~/api/perp'
 import { usePerpStore } from '~/stores/perp'
 import BigNumber from 'bignumber.js'
+import Share from "./share.vue";
 // import { PositionFactory, SymbolEntity } from '~/utils/perp/domain'
 // import type { IContract } from '~/utils/perp/types'
 
@@ -217,13 +218,25 @@ watch(
           <div class="lh-18px" :class="getColorClass(getPnl(row).toString())">
             {{ formatNumber(getPnl(row).toString()) }}
           </div>
-          <div class="lh-18px" :class="getColorClass(getPnlRatio(row).toString())">
+          <div class="lh-18px flex items-center justify-end gap-4px" :class="getColorClass(getPnlRatio(row).toString())">
             {{
               formatNumber(getPnlRatio(row).toString(), {
                 limit: 20,
                 decimals: 2,
               })
             }}%
+             <Share
+                :statistics="{
+                  leverage: getLeverageFromContractId(row.contractId) || row.maxLeverage,
+                  openValue: row.cumOpenValue,
+                  entryPrice: formatNumber(row.cumOpenValue / row.cumOpenSize,2),
+                  unrealizedPnl: getPnl(row).toString(),
+                  unrealizedPnlRate: getPnlRatio(row).toString(),
+                  name: typeDict[row.contractId]?.replace?.('USD', ''),
+                  logo_url: perpStore.contractList.find((item) => item.contractId === row.contractId)?.baseCoinIcon,
+                  closePrice: formatNumber(row.cumCloseValue / row.cumCloseSize,2),
+                }"
+              />
           </div>
         </template>
       </el-table-column>
