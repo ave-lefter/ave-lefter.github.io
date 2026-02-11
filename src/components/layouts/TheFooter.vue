@@ -101,7 +101,7 @@
         <a target="_blank" href="https://cloud.ave.ai">API</a>
       </li>
       <el-popover
-:persistent="false"
+        :persistent="false"
         popper-style="padding: 12px;min-width: 50px;width:auto"
         placement="top"
         :teleported="false"
