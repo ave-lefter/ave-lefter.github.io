@@ -78,13 +78,14 @@
         v-for="option in checkedOptions"
         :key="option.value"
         :class="[
-          'flex-1 h-32px cursor-pointer rounded-8px text-center lh-30px border-1px border-solid',
+          'flex-1 h-32px cursor-pointer items-center rounded-8px text-center lh-30px border-1px border-solid',
           option.checked
             ? 'color-[--main-text] border-[--main-text]'
             : 'color-[--secondary-text] bg-[--border] border-transparent',
         ]"
         @click="option.checked = !option.checked"
       >
+        <Icon v-if="option.icon" class="text-12px" :name="`custom:${option.icon}`"/>
         {{ option.label }}
       </span>
     </div>
@@ -131,10 +132,11 @@ const checkedOptions = ref([
     },
     value: 'unrealizedPnl',
     checked: true,
+    icon:'perp-share1'
   },
   {
     get label() {
-      return t('RIO')
+      return '% '+ t('RIO')
     },
     value: 'unrealizedPnlRate',
     checked: true,
@@ -145,6 +147,7 @@ const checkedOptions = ref([
     },
     value: 'leverage',
     checked: true,
+    icon:'perp-share3'
   },
   {
     get label() {
@@ -152,6 +155,7 @@ const checkedOptions = ref([
     },
     value: 'time',
     checked: true,
+    icon:'perp-share4'
   },
 ])
 const bgImg = computed(() => {

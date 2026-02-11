@@ -2011,5 +2011,17 @@
   "monitored1": "Wallet Activity",
   "availableLiquidity": "Available Liquidity",
   "googleAuthNotBoundTip": "Google Authenticator not detected. To protect your account, please bind Google Authenticator before deleting wallet address.",
-  "goToBind": "Go to Bind"
+  "goToBind": "Go to Bind",
+  "rememberMe": "Remember Me",
+  "last": "Last",
+  "index": "Index",
+  "leverage": "leverage",
+  "profit6": "profit",
+  "openPrice2": "Open Price",
+  "closePrice2": "Close Price",
+  "orderPnl": "Order P&L",
+  "realPnl": "Actual P&L",
+  "remeberMeTips": "Only use 'Remember Me' if you are using a secure device that you own. Selecting this option can expose your keys and information to others if you are on a public or non-secured device.",
+  "copySuccess2": "Image has been successfully copied to the clipboard!",
+  "sharePosition": "Share Position"
 }
