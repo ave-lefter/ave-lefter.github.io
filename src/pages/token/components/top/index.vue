@@ -687,8 +687,8 @@
       </div>
       <el-popover popper-style="padding: 0;border-radius: 8px;" width="250" placement="top" :teleported="false" trigger="hover">
         <template #reference>
-          <div class="item ml-24px cursor-pointer">
-            <span>{{ $t('liquidity3') }}</span>
+          <div class="ml-24px cursor-pointer">
+            <span class="border-dotted border-0 border-b-1 inline-block leading-none">{{ $t('liquidity3') }}</span>
             <span class="block mt-8px color-[--main-text]">
               ${{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
             </span>
@@ -698,8 +698,8 @@
           <div
             class="flex p-10px justify-between pb-8px text-12px"
           >
-            <span class="text-12px color-[--third-text]""> {{ $t('availableLiquidity') }}</span>
-            {{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
+            <span class="text-12px color-[--third-text]">{{ $t('availableLiquidity') }}</span>
+            <span class="color-[--main-text]"">{{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}</span>
           </div>
           <!--流动性-->
           <div class="max-h-300px px-10px overflow-auto v-scroller-container">
@@ -731,13 +731,13 @@
                   <div class="mb-[-5px]">{{item.amm}}</div>
                   <span class="token-address text-[10px] color-[--third-text]">
                     {{ $t('poolPair') }}: {{parseToken(item)?.tokenShow}}
-                    <Icon v-copy="parseToken(item)?.token" name="bxs:copy" class="text-2.5 clickable" />
+                    <Icon v-copy="parseToken(item)?.token" name="bxs:copy" class="text-2.5 color-[--third-text] clickable" />
                   </span>
                 </div>
               </div>
               <div class="flex items-center text-12px">
-                <span v-if="item.target_token === item.token0_address" class="main">${{formatNumber(item.reserve1 * item.token1_price_usd * 2 || 0, 2)}}</span>
-                <span v-else class="main">${{formatNumber(item.reserve0 * item.token0_price_usd * 2 || 0, 2)}}</span>
+                <span class="color-[--secondary-text]" v-if="item.target_token === item.token0_address">${{formatNumber(item.reserve1 * item.token1_price_usd * 2 || 0, 2)}}</span>
+                <span class="color-[--secondary-text]" v-else>${{formatNumber(item.reserve0 * item.token0_price_usd * 2 || 0, 2)}}</span>
               </div>
             </div>
           </div>
@@ -991,7 +991,7 @@ async function getRugPullList() {
 }
 
 const parseToken = (item) => {
-  const row  = item.target_token === item.token0_address ? item.token1_address : item.token0_addres
+  const row = item.target_token === item.token0_address ? item.token1_address : item.token0_address
   if (row) {
     return {
       tokenShow: row.slice(0, 4) + '...' + row.slice(-6),
@@ -1001,13 +1001,15 @@ const parseToken = (item) => {
 }
 
 const pairs = computed(() => {
-  return tokenStore.pairs?.map((i:any) => ({
+  const list = tokenStore.pairs?.map((i:any) => ({
     ...i,
     ammName: i.amm === 'unknown' ? i.amm : getSwapInfo(i.chain, i.amm)?.show_name || i.amm,
     isUp: i.target_token === i.token0_address ? new BigNumber(i.reserve1).gt(i.init_reserve1) : new BigNumber(i.reserve0).gt(i.init_reserve0),
   })).filter((i) => {
     return true
   })
+  // console.log('pairslist=>', list)
+  return list
 })
 
 watch(
