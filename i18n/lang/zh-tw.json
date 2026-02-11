@@ -1988,5 +1988,9 @@
   "availableLiquidity": "可用流動性",
   "poolPair": "交易對",
   "googleAuthNotBoundTip": "檢測到您尚未綁定Google驗證器。為保障帳戶安全,刪除錢包位址前,需先完成Google驗證器綁定。",
-  "goToBind": "前往綁定"
+  "goToBind": "前往綁定",
+  "migratedTo": "遷移到外盤",
+  "migratedPrice": "遷移價格",
+  "migratedAt": "遷移時間",
+  "migratedMCap": "遷移市值"
 }

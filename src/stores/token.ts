@@ -291,7 +291,14 @@ export const useTokenStore = defineStore('token', () => {
         }
       })
       tokenInfo.value?.pairs.unshift(newPair)
-      switchPair(newPair.pair)
+
+
+    const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(token.value?.chain + '-' + (token.value?.launchpad || ''))
+      if (SupportTokenKlineChains?.includes?.(token.value?.chain || '') || isSupportTokenKlineLaunchpad) {
+        switchPair(true)
+      } else {
+        switchPair(newPair.pair)
+      }
     }
   }
 

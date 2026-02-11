@@ -229,6 +229,7 @@ const globalStore = useGlobalStore()
 const route = useRoute()
 const walletStore = useWalletStore()
 const scrollTop = ref(0)
+const wsStore = useWSStore()
 const totalHolders = computed(() => [
   { id: 'trade', name: t('mine') },
   {
@@ -297,6 +298,12 @@ const dialogVisible_remind = ref(false)
 //   year: 50
 // })
 
+const migrated = ref( null as null | {
+  migrate_time: number
+  migrate_uprice: string
+  showMarket: boolean
+  mcap: number
+})
 const chain = computed(() => {
   return getAddressAndChainFromId(token.value)?.chain || tokenStore?.token?.chain || ''
 })
@@ -348,7 +355,40 @@ watch(
 watch([pair, () => tokenStore.selectedToken], () => {
   switchTokenKline()
 })
+watch(
+  () => wsStore.wsResult[WSEventType.SWITCH_MAIN_PAIR_V2],
+  (val) => {
 
+    if (isReady.value && route.name === 'token-id' && val) {
+      console.log('------WSEventType.SWITCH_MAIN_PAIR_V2----------------',val)
+      const new_main_pair_data = val.new_main_pair_data
+        if(new_main_pair_data.target_token == tokenAddress.value){
+          const migrate_uprice = new_main_pair_data.target_token == new_main_pair_data.token0_address ? new_main_pair_data?.token1_price_usd : new_main_pair_data?.token1_price_usd
+          if (new_main_pair_data?.blocktime && migrate_uprice) {
+            migrated.value = {
+              migrate_time: new_main_pair_data?.blocktime,
+              migrate_uprice: migrate_uprice,
+              showMarket: showMarket.value,
+              mcap: new BigNumber(migrate_uprice || 0).times(tokenStore?.token?.total || 0).toNumber(),
+            }
+            setTimeout(() => {
+              onMarkChanged(true)
+            }, 500)
+          } else {
+            migrated.value = {
+              migrate_time: 0,
+              migrate_uprice: '0',
+              showMarket: false,
+              mcap: 0,
+            }
+            setTimeout(() => {
+              onMarkChanged(false)
+            }, 500)
+          }
+        }
+    }
+  }
+)
 // watch(
 //   () => tokenStore.selectedToken,
 //   () => {
@@ -401,7 +441,6 @@ watch(user, () => {
 })
 
 const price = 0
-const wsStore = useWSStore()
 const localeStore = useLocaleStore()
 
 // const marks = shallowRef([{ id: 'trade', name: '我的' }])
@@ -850,6 +889,21 @@ async function initChart() {
           const getKlineFunc = isTokenKline ? getTokenKlineHistory : getKlineHistoryData
           getKlineFunc(params)
             .then((res) => {
+              if (res?.extra_data?.migrate_time && res?.extra_data?.migrate_uprice) {
+                migrated.value = {
+                  migrate_time: new Date(res.extra_data.migrate_time).getTime() / 1000,
+                  migrate_uprice: res.extra_data.migrate_uprice,
+                  showMarket: showMarket.value,
+                  mcap: new BigNumber(res.extra_data.migrate_uprice || 0).times(tokenStore?.token?.total || 0).toNumber(),
+                }
+              } else {
+                migrated.value = {
+                  migrate_time: 0,
+                  migrate_uprice: '0',
+                  showMarket: false,
+                  mcap: 0,
+                }
+              }
               const bars1 = res?.kline_data || []
               const bars =
                 bars1?.map?.((i) => ({
@@ -985,6 +1039,7 @@ async function initChart() {
           chain: chain.value || '',
           user: user.value,
           onDataCallback,
+          migrated: migrated.value,
         })
         // getUserKlineTxTags({
         //   from,

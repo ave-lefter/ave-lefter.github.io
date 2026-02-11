@@ -116,7 +116,11 @@ export function getKlineHistoryData(data: {
     time: number
     volume: number
   }>
- pair: string
+  pair: string
+  extra_data?: {
+    migrate_time?: number
+    migrate_uprice: string
+  }
 }> {
   const [pair, chain1] = getAddressAndChainFromId(data?.pair_id || '', 1)
   const [token, chain2] = getAddressAndChainFromId(data?.token_id || '', 1)
@@ -149,7 +153,8 @@ export function getKlineHistoryData(data: {
         volume: i.vol,
         tag: i.tag
       })),
-      pair: res?.pair || pair || ''
+      pair: res?.pair || pair || '',
+      extra_data: res?.extra_data
     }
   }).catch(async () => {
     return {
@@ -176,11 +181,15 @@ export function getTokenKlineHistory(data: {
     volume: number
   }>
   pair?: string
+  extra_data?: {
+    migrate_time?: number
+    migrate_uprice: string
+  }
 }> {
   const [token, chain] = getAddressAndChainFromId(data?.token_id || '', 1)
   if (!token || !chain) {
     return Promise.resolve({
-      kline_data: []
+      kline_data: [],
     })
   }
   const { $api } = useNuxtApp()
@@ -193,27 +202,40 @@ export function getTokenKlineHistory(data: {
       from: data.from,
       to: data.to,
       category: 'u',
-      limit_count: 300
-    }
-  }).then(async(res) => {
-    return {
-      kline_data: (res?.kline_data || []).map((i: { t: number; o: number; h: number; l: number; c: number; vol: number; tag: string }) => ({
-        time: i.t,
-        open: i.o,
-        high: i.h,
-        low: i.l,
-        close: i.c,
-        volume: i.vol,
-        tag: i.tag
-      })),
-      pair: res?.pair || ''
-    }
-  }).catch(async () => {
-    return {
-      kline_data: [],
-      pair: ''
-    }
+      limit_count: 300,
+    },
   })
+    .then(async (res) => {
+      return {
+        kline_data: (res?.kline_data || []).map(
+          (i: {
+            t: number
+            o: number
+            h: number
+            l: number
+            c: number
+            vol: number
+            tag: string
+          }) => ({
+            time: i.t,
+            open: i.o,
+            high: i.h,
+            low: i.l,
+            close: i.c,
+            volume: i.vol,
+            tag: i.tag,
+          })
+        ),
+        pair: res?.pair || '',
+        extra_data: res?.extra_data,
+      }
+    })
+    .catch(async () => {
+      return {
+        kline_data: [],
+        pair: '',
+      }
+    })
 }
 
 // 画像描点接口 用户交易
