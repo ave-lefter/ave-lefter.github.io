@@ -345,17 +345,16 @@ watch(
   }
 )
 
-watch(pair, (val) => {
-  if (val === klinePair.value) return
+watch([pair, () => tokenStore.selectedToken], () => {
   switchTokenKline()
 })
 
-watch(
-  () => tokenStore.selectedToken,
-  () => {
-    switchTokenKline()
-  }
-)
+// watch(
+//   () => tokenStore.selectedToken,
+//   () => {
+//     switchTokenKline()
+//   }
+// )
 
 function switchTokenKline() {
   isReadyLine = false

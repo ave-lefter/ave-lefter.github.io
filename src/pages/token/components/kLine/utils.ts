@@ -1354,6 +1354,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (!visibleRange?.from || !visibleRange?.to) return
     const spacing = getWidget()?.activeChart?.().getTimeScale?.().barSpacing?.()
     const timeFrom = getStartTime(visibleRange.to, spacing ? 240/spacing : undefined)
+    if (!avePriceMap) return
     Object.values(avePriceMap).forEach(item => {
       if (!item.lineId) return
       const line = chart.getShapeById?.(item.lineId)
@@ -1395,6 +1396,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (!range?.from || !range?.to) return
     const spacing = getWidget()?.activeChart?.().getTimeScale?.().barSpacing?.()
     const timeFrom = getStartTime(range.to,spacing ? 240/spacing : undefined)
+    if (!avePriceMap) return
     Object.values(avePriceMap).forEach(async item => {
       let price = item.value
       if (showMarket.value) {
@@ -1524,6 +1526,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (!_widget) return
     const chart = _widget?.activeChart?.()
     if (!chart) return
+    if (!avePriceMap) return
 
     Object.values(avePriceMap).forEach(item => {
       if (item.lineId) {
