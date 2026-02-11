@@ -4,7 +4,6 @@ import { useLocalStorage, type RemovableRef } from '@vueuse/core'
 import type { IChartingLibraryWidget, Mark } from '~/types/tradingview/charting_library'
 import { getUserKlineTxTags, getKlineProfilingTagsV2, type IGetKlineProfilingTagsV2Item,  type HolderBuy, type WalletLogo } from '@/api/token'
 import type { SimpleWSTx, WSTx } from './types'
-import { isJSDocNonNullableType } from 'typescript'
 
 type TradeSide = {
   amount: number
