@@ -76,6 +76,7 @@
   "buy3": "Al",
   "sell3": "Sat",
   "liquidity2": "Likidite",
+  "liquidity3": "Likidite",
   "time": "Zaman",
   "type": "Tür",
   "swapPrice": "Fiyat",
@@ -605,5 +606,10 @@
   "created": "Oluşturuldu",
   "topPlatforms": "En İyi Platformlar",
   "hideLiq": "Havuz bilgilerini gizlemek için tıklayın",
-  "showLiq": "Havuz bilgilerini görüntülemek için tıklayın"
+  "showLiq": "Havuz bilgilerini görüntülemek için tıklayın",
+  "monitored1": "Cüzdan Etkinliği",
+  "availableLiquidity": "Mevcut likidite",
+  "poolPair": "İşlem çifti",
+  "googleAuthNotBoundTip": "Google Authenticator bağlı değil. Hesabınızı korumak için cüzdan adresini silmeden önce Google Authenticator'ı bağlayın.",
+  "goToBind": "Bağlamaya git"
 }

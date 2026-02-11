@@ -53,6 +53,8 @@
   --table-title-bg: var(--d-12161D-l-ECF3FF);
   // 主页面悬浮弹窗色
   --tooltip: var(--d-1F242C-l-FFF);
+  // 通知背景色
+  --notification-bg: var(--d-222222-l-f2f2f2);
 
   // 扫链背景色
   --pump-bg: var(--d-000-l-FFF);
@@ -217,6 +219,7 @@
     --d-3B3E44-l-CAD6EC: #3B3E44;
     --d-151A22-l-E8F1FF: #151A22;
     --d-1E2025-l-E8F1FF: #1E2025;
+    --d-222222-l-f2f2f2: #222222;
   }
 
   &.light {
@@ -373,5 +376,6 @@
     --d-3B3E44-l-CAD6EC: #CAD6EC;
     --d-151A22-l-E8F1FF: #E8F1FF;
     --d-1E2025-l-E8F1FF: #E8F1FF;
+    --d-222222-l-f2f2f2: #f2f2f2;
   }
 }

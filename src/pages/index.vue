@@ -87,12 +87,13 @@
       <div class="flex-1" />
       <Setting :chain="activeChain" :pumpConfig="pumpConfig"/>
       <BlackList />
-      <QuickSwapSet
+      <!-- <QuickSwapSet
         v-model:quickBuyValue="quickBuyValue"
         :chain="activeChain"
         :settingsButtonVisible="true"
         class="mr-12px"
-      />
+      /> -->
+      <SlippageSetMarket class="mr-10px ml-auto" :chain="activeChain" @mousedown.stop />
       <AutoSellSetting :chain="activeChain" root-class="mr-0"/>
     </div>
     <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full pl-16px" :class="pumpSetting.isGutter? 'pr-6px': 'pr-14px'">
@@ -145,10 +146,17 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <QuickSwapSetCustom
+              v-model:quickBuyValue="quickBuyValue1"
+              v-model:customSelected="swapSetSelected1"
+              :chain="activeChain"
+              class="mr-8px"
+            />
             <AudioSelect activeTab="new" :chain="activeChain"/>
             <PumpFilter
               :key="`pumpFilter_${activeChain}_new`"
               :storage="`pumpFilter_${activeChain}_new`"
+              hideReferenceText
               @update:filterData="handlerFilterConfirm"
             />
           </div>
@@ -158,7 +166,8 @@
             :scrollHeight="scrollHeight"
             type="new"
             :tableList="list1 || []"
-            :quickBuyValue="quickBuyValue"
+            :quickBuyValue="quickBuyValue1"
+            :swapSetSelected="swapSetSelected1"
             :loading="pumpV3[activeChain]['new']['loading']"
             @mouseover="isPausedObj.new = true"
             @mouseleave="isPausedObj.new = false"
@@ -214,10 +223,17 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <QuickSwapSetCustom
+              v-model:quickBuyValue="quickBuyValue2"
+              v-model:customSelected="swapSetSelected2"
+              :chain="activeChain"
+              class="mr-8px"
+            />
             <AudioSelect activeTab="soon" :chain="activeChain"/>
             <PumpFilter
               :key="`pumpFilter_${activeChain}_soon`"
               :storage="`pumpFilter_${activeChain}_soon`"
+              hideReferenceText
               @update:filterData="handlerFilterConfirm"
             />
           </div>
@@ -226,7 +242,8 @@
             :scrollHeight="scrollHeight"
             type="soon"
             :tableList="list2 || []"
-            :quickBuyValue="quickBuyValue"
+            :quickBuyValue="quickBuyValue2"
+            :swapSetSelected="swapSetSelected2"
             :loading="pumpV3[activeChain]['soon']['loading']"
             isSoon
             @mouseover="isPausedObj.soon = true"
@@ -284,10 +301,17 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <QuickSwapSetCustom
+              v-model:quickBuyValue="quickBuyValue3"
+              v-model:customSelected="swapSetSelected3"
+              :chain="activeChain"
+              class="mr-8px"
+            />
             <AudioSelect activeTab="graduated" :chain="activeChain"/>
             <PumpFilter
               :key="`pumpFilter_${activeChain}_graduated`"
               :storage="`pumpFilter_${activeChain}_graduated`"
+              hideReferenceText
               @update:filterData="handlerFilterConfirm"
             />
           </div>
@@ -296,7 +320,8 @@
             :scrollHeight="scrollHeight"
             :tableList="list3 || []"
             type="graduated"
-            :quickBuyValue="quickBuyValue"
+            :quickBuyValue="quickBuyValue3"
+            :swapSetSelected="swapSetSelected3"
             :loading="pumpV3[activeChain]['graduated']['loading']"
             isOut
             @mouseover="isPausedObj.graduated = true"
@@ -316,7 +341,6 @@
 
 <script setup lang="ts">
 import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility } from '@vueuse/core'
-import QuickSwapSet from '@/components/quickSwap/quickSwapSet.vue'
 import PumpList from './pump/components/pumpList.vue'
 import Setting from './pump/components/setting.vue'
 import BlackList from './pump/components/blackList.vue'
@@ -332,6 +356,8 @@ import type {
 import { isEqual, throttle } from 'lodash-es'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
 import AudioSelect from './pump/components/audioSelect.vue'
+import SlippageSetMarket from './token/components/right/botSwap/slippageSetMarket.vue'
+import QuickSwapSetCustom from '@/components/quickSwap/quickSwapSetCustom.vue'
 defineOptions({
   name: 'pump' // 显式命名
 })
@@ -357,6 +383,12 @@ let isInitObj = {
   graduated: true
 }
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
+const quickBuyValue1 = useStorage('quickBuyValue1', '0.01')
+const quickBuyValue2 = useStorage('quickBuyValue2', '0.01')
+const quickBuyValue3 = useStorage('quickBuyValue3', '0.01')
+const swapSetSelected1 = useStorage<BotSettingKey>('swapSetSelected1', 's1')
+const swapSetSelected2 = useStorage<BotSettingKey>('swapSetSelected2', 's1')
+const swapSetSelected3 = useStorage<BotSettingKey>('swapSetSelected3', 's1')
 const activeChain = useStorage<ChainKey>(
   'pump_activeChain2',
   'bsc',
