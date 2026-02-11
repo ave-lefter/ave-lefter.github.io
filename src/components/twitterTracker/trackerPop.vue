@@ -247,12 +247,12 @@ getList()
 
 const twitterHandler = async (val) => {
   if (query.value.types.includes(+val.type) && !query.value.token_keyword) {
-    if (isMine.value && !followAuthorIds.value.includes(val.author_id)) {
+    if (isMine.value && !followAuthorIds.value.includes(val.author?.author_id)) {
       return
     }
     // 判断是否已经存在该推特
     const index = trackerStore.list.findIndex(el => el.tweet_id === val.tweet_id)
-    val.follow_status = followAuthorIds.value.includes(val.author_id) ? 1 : 0
+    val.follow_status = followAuthorIds.value.includes(val.author?.author_id) ? 1 : 0
     if (index!==-1) {
       trackerStore.list[index] = val
       return
