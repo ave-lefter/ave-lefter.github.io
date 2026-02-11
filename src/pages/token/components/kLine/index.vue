@@ -1155,6 +1155,9 @@ function onWsKline(
         if (_pair === pair1) {
           lastPairPrice = _price
         }
+        if (tx?.tag === 'PairNoiseTx' || tx?.tag === 'TokenNoiseTx') {
+          return
+        }
         if (_pair !== pair1) {
           const price = _price
           if (!lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
