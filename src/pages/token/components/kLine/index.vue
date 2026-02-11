@@ -1143,6 +1143,7 @@ function onWsKline(
       }
       if (target === t && !loading) {
         const _pair = 'pair' in tx ? tx.pair : tx.pair_address
+        const pair1 = tokenStore.selectedToken ? tokenStore.tokenInfo?.pairs?.[0]?.pair : tokenStore?.pairAddress
         const _price =
           'price_u' in tx
             ? Number(tx.price_u || 0)
@@ -1151,10 +1152,10 @@ function onWsKline(
                   ? tx.from_price_usd
                   : tx.to_price_usd
               ) || 0
-        if (_pair === pair.value) {
+        if (_pair === pair1) {
           lastPairPrice = _price
         }
-        if (_pair !== pair.value) {
+        if (_pair !== pair1) {
           const price = _price
           if (!lastPairPrice && Math.abs(price - lastPairPrice) > lastPairPrice * 0.35) {
             return

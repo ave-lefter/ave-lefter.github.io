@@ -28,7 +28,7 @@
             <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
           </div>
 
-        
+
           <div
             v-show="!globalStore.showRight"
             class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center top-0px right-0 hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
@@ -258,6 +258,11 @@ function _getTokenInfo() {
     .then((res) => {
       tokenStore.tokenInfo = res
       tokenStore.pairAddress = res?.pairs?.[0].pair || ''
+      const isSupportTokenKlineLaunchpad = SupportTokenKlineLaunchpad?.includes?.(res?.token.chain + '-' + (res?.token?.launchpad || ''))
+      const isTokenKline = (SupportTokenKlineChains?.includes?.(res?.token.chain || '') || isSupportTokenKlineLaunchpad)
+      if (isTokenKline) {
+        tokenStore.selectedToken = true
+      }
     })
     .finally(() => {
       tokenStore.loadingToken = false
