@@ -43,6 +43,7 @@ const tokenClick = () => {
 const _getBestToken = async () => {
   try {
     const res = await getBestToken(route.params.id || '')
+    console.log('-------res-----------', res)
     const result = res?.symbol ? res : res.data
     tokenStore.bestToken = result
 
@@ -53,7 +54,7 @@ const _getBestToken = async () => {
     }
   } catch (error) {
     bestToken.value = null
-    console.error('Error fetching best token:', error)
+    console.log('Error fetching best token:', error)
   }
 }
 
