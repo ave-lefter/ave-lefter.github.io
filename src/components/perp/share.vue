@@ -91,7 +91,7 @@
         ]"
         @click="clickOption(option)"
       >
-        <Icon v-if="option.icon" class="text-12px" :name="`custom:${option.icon}`"/>
+        <Icon v-if="option.icon" class="text-12px color-[--main-text]" :name="`custom:${option.icon}`"/>
         {{ option.label }}
       </span>
     </div>
