@@ -95,7 +95,7 @@ const tabs = computed(() => {
 })
 const activeTab = shallowRef('all')
 const ignoreWs = computed(() => {
-  return ['liquidity'].includes(activeTab.value)
+  return !['all', 'buy', 'sell'].includes(activeTab.value)
 })
 const isHoverTable = shallowRef(false)
 
@@ -181,8 +181,7 @@ function loadMore(remainDistance:number){
 // 纯前端筛选
 const filterTableList = computed(() => {
   let tableList: ((IGetSimpleTxsResponse | GetPairLiqResponse) & { count?: number })[] = []
-  const hasFilterKey = activeTab.value in filterTableListMap
-  if (hasFilterKey) {
+  if (activeTab.value in filterTableListMap) {
     tableList = filterTableListMap[activeTab.value as keyof typeof filterTableListMap]()
   } else {
     tableList = tokenTxs.value
@@ -190,9 +189,6 @@ const filterTableList = computed(() => {
   const { timestamp, amountU, markerAddress } = tableFilter.value
   const [startTime, endTime] = timestamp || []
   const [startVol, endVol] = amountU || []
-  if(!hasFilterKey){
-    tableList = tableList.filter(el => el.maker_type?.includes?.(activeTab.value))
-  }
   if (startTime) {
     tableList = tableList.filter(el => el.time >= Number(startTime))
   }
@@ -224,6 +220,7 @@ const filterTableList = computed(() => {
       }
     })
   }
+  console.log('filterTableList', tableList)
   return tableList
 })
 
@@ -1067,6 +1064,7 @@ onUnmounted(() => {
         />
       </template>
     </template>
+    {{console.log('filterTableList', tokenTxs)}}
     <!-- tableLoading:{{tableLoading}} -->
     <div
       v-loading="tableLoading" class="text-12px"
