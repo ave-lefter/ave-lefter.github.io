@@ -2012,5 +2012,7 @@
   "monitored1": "钱包动态",
   "availableLiquidity": "可用流动性",
   "googleAuthNotBoundTip": "检测到您尚未绑定谷歌验证器。为保障账户安全,删除钱包地址前,需先完成谷歌验证器绑定。",
-  "goToBind": "前往绑定"
+  "goToBind": "前往绑定",
+  "past24h": "近24小时",
+  "priceChangeZoonSetting": "涨跌幅时区设置"
 }

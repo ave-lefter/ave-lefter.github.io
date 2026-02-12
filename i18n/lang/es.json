@@ -637,5 +637,7 @@
   "availableLiquidity": "Liquidez disponible",
   "poolPair": "Negociación",
   "googleAuthNotBoundTip": "Google Authenticator no está vinculado. Para proteger su cuenta, vincule Google Authenticator antes de eliminar la dirección de la billetera.",
-  "goToBind": "Ir a vincular"
+  "goToBind": "Ir a vincular",
+  "past24h": "En las últimas 24 horas",
+  "priceChangeZoonSetting": "Price Change Time Zone Setting"
 }

@@ -611,5 +611,7 @@
   "availableLiquidity": "Mevcut likidite",
   "poolPair": "İşlem çifti",
   "googleAuthNotBoundTip": "Google Authenticator bağlı değil. Hesabınızı korumak için cüzdan adresini silmeden önce Google Authenticator'ı bağlayın.",
-  "goToBind": "Bağlamaya git"
+  "goToBind": "Bağlamaya git",
+  "past24h": "Son 24 saat içinde",
+  "priceChangeZoonSetting": "Fiyat Değişimi Saat Dilimi Ayarı"
 }

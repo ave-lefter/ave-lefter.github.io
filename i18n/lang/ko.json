@@ -1464,5 +1464,7 @@
   "monitored1": "지갑 활동",
   "availableLiquidity": "사용 가능한 유동성",
   "googleAuthNotBoundTip": "Google 인증기가 바인드되지 않았습니다. 계정 보호를 위해 지갑 주소를 삭제하기 전에 Google 인증기를 바인드하십시오.",
-  "goToBind": "바인드하러 가기"
+  "goToBind": "바인드하러 가기",
+  "past24h": "지난 24시간 동안",
+  "priceChangeZoonSetting": "가격 변동 시간대 설정"
 }
