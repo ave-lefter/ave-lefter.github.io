@@ -45,11 +45,12 @@
       <el-popover popper-style="padding: 0;border-radius: 8px;" width="auto" placement="top" :teleported="false" trigger="hover">
         <template #reference>
           <div
-            class="flex items-center gap-4px cursor-pointer hover:color-[--main-text] ml-12px"
-            :class="'color-[--secondary-text]'"
+            class="group flex items-center cursor-pointer ml-12px relative"
           >
-            <Icon name="mdi:compass" class="text-14px" />
-            {{ $t('marketNav') }}
+            <div class="relative w-44px h-24px flex-shrink-0 flex items-center justify-center">
+              <img :src="navIcon" alt="market nav" class="w-full h-full object-contain absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity">
+              <img :src="navHoverIcon" alt="market nav hover" class="w-full h-full object-contain absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
           </div>
         </template>
         <Dashborad />
@@ -185,6 +186,8 @@ import btcIcon from '@/assets/icons/footer/btc.svg?url'
 import ethIcon from '@/assets/icons/footer/eth.svg?url'
 import bscIcon from '@/assets/icons/footer/bsc.svg?url'
 import solIcon from '@/assets/icons/footer/sol.svg?url'
+import navIcon from '@/assets/icons/footer/nav.svg?url'
+import navHoverIcon from '@/assets/icons/footer/nav-hover.svg?url'
 import { TokenImg, QuickSwap } from '#components'
 // import QuickSwap from '../quickSwapTsx.vue'
 
