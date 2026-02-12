@@ -43,7 +43,6 @@ const tokenClick = () => {
 const _getBestToken = async () => {
   try {
     const res = await getBestToken(route.params.id || '')
-    console.log('-------res-----------', res)
     const result = res?.symbol ? res : res.data
     tokenStore.bestToken = result
 
