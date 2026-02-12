@@ -28,7 +28,7 @@
             <Icon name="material-symbols:arrow-forward-ios" class="text-12px" />
           </div>
 
-        
+
           <div
             v-show="!globalStore.showRight"
             class="absolute bg-[--main-list-hover] w-10px h-32px z-1 cursor-pointer flex items-center justify-center top-0px right-0 hover:w-30px hover:h-36px transition-all rounded-tr-4px rounded-br-4px color-[--third-text] hover:color-[--main-text]"
@@ -304,12 +304,14 @@ function visibilitychangeFn() {
 }
 
 onBeforeMount(() => {
+    console.log('----------2222222------')
   init()
   subscribePortrait()
   document.addEventListener('visibilitychange', visibilitychangeFn)
 })
 
 onUnmounted(() => {
+  console.log('----------11111111-------')
   tokenStore?.reset?.()
   wsStore.clearTokenRelatedResult?.()
   // 确保移除可能遗留的 WS 回调与可见性监听，防止内存泄漏
@@ -330,6 +332,7 @@ onUnmounted(() => {
 })
 
 onBeforeRouteLeave(() => {
+   console.log('----------33333333------')
   wsStore.getWSInstance()?.offMessage(['tx_update_token', 'kline', 'price'])
   document.removeEventListener('visibilitychange', visibilitychangeFn)
 })
