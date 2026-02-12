@@ -980,14 +980,30 @@ function handleViewDevTokens() {
   devTokensEvent.emit()
   ElMessage.success(t('devTokensDisplayed'))
 }
+// async function getRugPullList() {
+//   const data = {
+//     token_id: id.value,
+//     pageNO: 1,
+//     pageSize: 1,
+//   }
+//   const res = await _getDevList(data)
+//   devToken.value = res
+// }
+
 async function getRugPullList() {
-  const data = {
-    token_id: id.value,
-    pageNO: 1,
-    pageSize: 1,
+  try {
+    const data = {
+      token_id: id.value,
+      pageNO: 1,
+      pageSize: 1,
+    }
+
+    const res = await _getDevList(data)
+    devToken.value = res ?? []
+  } catch (err) {
+    console.log('-------_getDevList-------', err)
+    devToken.value = []
   }
-  const res = await _getDevList(data)
-  devToken.value = res
 }
 
 const parseToken = (item) => {
