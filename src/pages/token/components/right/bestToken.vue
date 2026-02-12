@@ -53,7 +53,7 @@ const _getBestToken = async () => {
     }
   } catch (error) {
     bestToken.value = null
-    console.error('Error fetching best token:', error)
+    console.log('Error fetching best token:', error)
   }
 }
 
