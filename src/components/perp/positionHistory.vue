@@ -229,12 +229,18 @@ watch(
                 :statistics="{
                   leverage: getLeverageFromContractId(row.contractId) || row.maxLeverage,
                   openValue: row.cumOpenValue,
-                  entryPrice: formatNumber(row.cumOpenValue / row.cumOpenSize,2),
+                  entryPrice: formatNumber(row.cumOpenValue / row.cumOpenSize, {
+                    decimals: 2,
+                    limit: 20,
+                  }),
                   unrealizedPnl: getPnl(row).toString(),
                   unrealizedPnlRate: getPnlRatio(row).toString(),
                   name: typeDict[row.contractId]?.replace?.('USD', ''),
                   logo_url: perpStore.contractList.find((item) => item.contractId === row.contractId)?.baseCoinIcon,
-                  closePrice: formatNumber(row.cumCloseValue / row.cumCloseSize,2),
+                  closePrice: formatNumber(row.cumCloseValue / row.cumCloseSize, {
+                    decimals: 2,
+                    limit: 20,
+                  }),
                 }"
               />
           </div>

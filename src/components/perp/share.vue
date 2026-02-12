@@ -44,7 +44,10 @@
           class="text-24px font-bold text-60px font-800 lh-72px"
         >
           {{ addSign(props.statistics.unrealizedPnl) }}${{
-            formatNumber(Math.abs(props.statistics.unrealizedPnl), 2)
+            formatNumber(Math.abs(props.statistics.unrealizedPnl), {
+              decimals: 2,
+              limit:20
+            })
           }}
         </div>
         <div
@@ -82,31 +85,34 @@
           option.checked
             ? 'color-[--main-text] border-[--main-text]'
             : 'color-[--secondary-text] bg-[--border] border-transparent',
+            option.disabled
+              ? 'cursor-not-allowed'
+              : 'cursor-pointer',
         ]"
-        @click="option.checked = !option.checked"
+        @click="clickOption(option)"
       >
         <Icon v-if="option.icon" class="text-12px" :name="`custom:${option.icon}`"/>
         {{ option.label }}
       </span>
     </div>
-    <div class="flex justify-between mx-auto mt-24px text-12px color-[--third-text]">
+    <!-- <div class="flex justify-between mx-auto mt-24px text-12px color-[--third-text]">
       <div class="flex-col flex items-center cursor-pointer" @click.stop="downloadSharePoster">
         <img src="@/assets/images/share/download.svg" height="48" alt="" srcset="" />
         <span class="mt-8px">{{ t('save') }}</span>
       </div>
-      <!-- <div class="flex-col flex items-center cursor-pointer" @click.stop="jumpX">
+      <div class="flex-col flex items-center cursor-pointer" @click.stop="jumpX">
         <img src="@/assets/images/share/twitter.svg" height="48" alt="" srcset="" />
         <span class="mt-8px">Twitter</span>
       </div>
       <div class="flex-col flex items-center cursor-pointer" @click.stop="jumpTg">
         <img src="@/assets/images/share/tg.svg" height="48" alt="" srcset="" />
         <span class="mt-8px">Telegram</span>
-      </div> -->
+      </div>
       <div class="flex-col flex items-center cursor-pointer" @click.stop="copySharePoster">
         <img src="@/assets/images/share/copy.svg" height="48" alt="" srcset="" />
         <span class="mt-8px">{{ t('copy') }}</span>
       </div>
-    </div>
+    </div> -->
   </el-dialog>
 </template>
 <script setup>
@@ -132,7 +138,10 @@ const checkedOptions = ref([
     },
     value: 'unrealizedPnl',
     checked: true,
-    icon:'perp-share1'
+    icon:'perp-share1',
+    get disabled(){
+      return !checkedOptions.value.find(item=>item.value==='unrealizedPnlRate')?.checked
+    }
   },
   {
     get label() {
@@ -140,6 +149,9 @@ const checkedOptions = ref([
     },
     value: 'unrealizedPnlRate',
     checked: true,
+    get disabled(){
+      return !checkedOptions.value.find(item=>item.value==='unrealizedPnl')?.checked
+    }
   },
   {
     get label() {
@@ -166,23 +178,9 @@ const bgImg = computed(() => {
   }
 })
 
-let raf = null
-const startTimer = () => {
-  raf = requestTimeout(1000, () => {
-    dateStr.value = dayjs().format('YYYY/MM/DD HH:mm:ss')
-    startTimer()
-  })
-}
-
 const getValue = (key) => {
   return checkedOptions.value.find((item) => item.value === key)?.checked
 }
-
-onUnmounted(() => {
-  cancelAnimationFrame(raf.id)
-})
-
-startTimer()
 
 function downloadSharePoster() {
   if (shareDom.value) {
@@ -244,6 +242,13 @@ function downloadFile(blob, filename) {
   a.download = filename
   a.click()
   window.URL.revokeObjectURL(url)
+}
+
+const clickOption = (option) => {
+  if(option.disabled){
+    return
+  }
+  option.checked = !option.checked
 }
 </script>
 <style lang="scss">
