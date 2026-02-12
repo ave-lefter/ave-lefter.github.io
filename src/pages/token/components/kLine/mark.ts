@@ -208,7 +208,13 @@ export function useKlineMarks() {
         }).then(res => {
           if(Array.isArray(res)){
             const marks = formatProfilingToMarks(res || [], interval, v.id, v.name)
-            setCache(profilingMarksCache, id, res||[])
+            const cacheArr = (res||[]).map(el=>{
+              return {
+                ...el,
+                type:v.id
+              }
+            })
+            setCache(profilingMarksCache, id, cacheArr)
             onDataCallback(marks || [])
           }
         })
@@ -518,7 +524,7 @@ const priorityOrder = ['25','31','30','19','16']
                       volume: item.volume
                 }
                 const markData = {
-                  time: item.time,
+                  type: v.id,
                   holders:[{
                     buy: item.direction === 'buy' ? holderData : null,
                     remark:         item.remark,

@@ -1052,17 +1052,27 @@ async function initChart() {
   })
 
   // onMarkClick
-  _widget?.subscribe('onMarkClick', () => {
+  _widget?.subscribe('onMarkClick', (markId) => {
     const { token, symbol, logo_url, chain } = tokenStore.tokenInfo?.token || {}
     const { target_token, token0_address, token0_symbol, token1_symbol, pair } =
       tokenStore.pair || {}
 
     let user_address = user.value
     for (const [, markArr] of profilingMarksCache) {
-      const addr = markArr?.[0]?.holders?.[0]?.wallet_address
-      if (addr) {
-        user_address = addr
-        break
+      const flag = markArr.some(({type,holders})=>{
+        return holders.some(hol=>{
+          if(hol.buy && markId === `${hol.buy.tx_time}-buy-${type}`){
+            user_address = hol.wallet_address
+            return true
+          }
+          if(hol.sell && markId === `${hol.sell.tx_time}-sell-${type}`){
+            user_address = hol.wallet_address
+            return true
+          }
+        })
+      })
+      if(flag){
+        break;
       }
     }
     
