@@ -95,7 +95,7 @@ const tabs = computed(() => {
 })
 const activeTab = shallowRef('all')
 const ignoreWs = computed(() => {
-  return !['all', 'buy', 'sell'].includes(activeTab.value)
+  return ['liquidity'].includes(activeTab.value)
 })
 const isHoverTable = shallowRef(false)
 
@@ -181,7 +181,8 @@ function loadMore(remainDistance:number){
 // 纯前端筛选
 const filterTableList = computed(() => {
   let tableList: ((IGetSimpleTxsResponse | GetPairLiqResponse) & { count?: number })[] = []
-  if (activeTab.value in filterTableListMap) {
+  const hasFilterKey = activeTab.value in filterTableListMap
+  if (hasFilterKey) {
     tableList = filterTableListMap[activeTab.value as keyof typeof filterTableListMap]()
   } else {
     tableList = tokenTxs.value
@@ -189,6 +190,9 @@ const filterTableList = computed(() => {
   const { timestamp, amountU, markerAddress } = tableFilter.value
   const [startTime, endTime] = timestamp || []
   const [startVol, endVol] = amountU || []
+  if(!hasFilterKey){
+    tableList = tableList.filter(el => el.maker_type?.includes?.(activeTab.value))
+  }
   if (startTime) {
     tableList = tableList.filter(el => el.time >= Number(startTime))
   }
