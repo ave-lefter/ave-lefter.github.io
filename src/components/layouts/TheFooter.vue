@@ -54,21 +54,25 @@
         </template>
         <Dashborad />
       </el-popover>
-      <div class="flex items-center gap-8px ml-12px whitespace-nowrap">
+      <div class="flex items-center gap-12px ml-12px whitespace-nowrap footer-main-coins">
         <NuxtLink
           v-for="item in mainCoins"
           :key="item.symbol || item.logo_url"
-          class="flex items-center gap-6px"
+          class="flex items-center gap-4px text-12px"
           :to="`/token/${item.id}`"
         >
+          <img
+            v-if="mainCoinLogos[item.symbol]"
+            :src="mainCoinLogos[item.symbol]"
+            :alt="item.symbol"
+            class="w-16px h-16px flex-shrink-0 block rounded-full"
+          >
           <TokenImg
-            :row="{
-              logo_url: item.logo_url,
-              chain: '',
-            }"
+            v-else
+            :row="{ logo_url: item.logo_url, chain: '' }"
             token-class="w-16px h-16px [&&]:mr-0"
           />
-          <span :class="item.isUp ? 'color-[--up-color]' : 'color-[--down-color]'">{{
+          <span class="footer-coin-price" :style="{ color: mainCoinColors[item.symbol] }">{{
             '$' + formatDec(item?.current_price_usd || 0, 2)
           }}</span>
         </NuxtLink>
@@ -177,6 +181,10 @@ import UserAvatar from '../userAvatar.vue'
 import type { IMonitorWsResponse } from '~/api/types/ws'
 import bellImg from '@/assets/images/bell.svg'
 import bellImg3 from '@/assets/images/bell3.svg'
+import btcIcon from '@/assets/icons/footer/btc.svg?url'
+import ethIcon from '@/assets/icons/footer/eth.svg?url'
+import bscIcon from '@/assets/icons/footer/bsc.svg?url'
+import solIcon from '@/assets/icons/footer/sol.svg?url'
 import { TokenImg, QuickSwap } from '#components'
 // import QuickSwap from '../quickSwapTsx.vue'
 
@@ -224,6 +232,22 @@ const getIconByPlatform = (platform: string) => {
   return `${configStore.token_logo_url}${icon}`
 }
 // console.log('platformOptions', platformOptions.value)
+
+// 底部主币价格颜色：BTC / ETH / BSC(BNB) / SOL
+const mainCoinColors: Record<string, string> = {
+  BTC: '#F7931A',
+  ETH: '#5571FF',
+  BNB: '#D29F00',
+  SOL: '#42BCBE',
+}
+
+// 底部主币 Logo：使用本地 assets/icons/footer 下的 SVG
+const mainCoinLogos: Record<string, string> = {
+  BTC: btcIcon,
+  ETH: ethIcon,
+  BNB: bscIcon,
+  SOL: solIcon,
+}
 
 const ids = [
   '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c-bsc',
@@ -732,5 +756,13 @@ const audioUrl = computed(() => {
   .el-icon.el-message__icon {
     display: none;
   }
+}
+
+/* 底部主币：价格颜色由 mainCoinColors 控制，不被链接样式覆盖 */
+.footer-main-coins a {
+  text-decoration: none;
+}
+.footer-main-coins .footer-coin-price {
+  font-size: 12px;
 }
 </style>
