@@ -1,9 +1,10 @@
 <template>
-  <div class="tabs">
+  <div class="bg-[--secondary-bg]">
+    <div class="tabs pt-11px pb-10px px-15px">
     <button
       v-for="item in tabs"
       :key="item.id"
-      class="tab-button clickable-btn"
+      class="tab-button clickable-btn bg-[--secondary-bg]"
       :class="{ active: modelValue === item.id }"
       @click.stop="$emit('update:modelValue', item.id)"
     >
@@ -12,6 +13,7 @@
         {{!!tokenStore.pair ? formatNumber(tokenStore.pair?.[`price_change_${item?.id}`], 2) : '--' }}%
       </div>
     </button>
+   </div>
   </div>
 </template>
 
@@ -39,7 +41,7 @@ const getColor = (id: string) => {
   .tabs {
     display: flex;
     align-items: center;
-     background: var(--main-list-hover);
+    //  background: var(--main-list-hover);
     .tab-button {
       display: flex;
       flex-direction: column;
@@ -47,7 +49,7 @@ const getColor = (id: string) => {
       justify-content: center;
       cursor: pointer;
       border: none;
-      background: var(--main-list-hover);
+      // background: var(--main-list-hover);
       color: var(--main-text);
       flex: 1;
       min-height: 44px;
@@ -65,7 +67,7 @@ const getColor = (id: string) => {
         margin-top: 2px;
       }
       &.active {
-        background: var(--tab-active-bg);
+        background: var(--main-list-hover);
       }
     }
   }

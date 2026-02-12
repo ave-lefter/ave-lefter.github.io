@@ -1,7 +1,7 @@
 <template>
   <div v-show="globalStore.showRight">
       <div class="flex flex-col h-[calc(100vh-94px)] v-scroller-container">
-        <div class="p-15px bg-[--secondary-bg]">
+        <!-- <div class="p-15px bg-[--secondary-bg]">
           <PriceTabs v-model="tabActive" :tabs="tabs" />
           <template v-for="item in tabs" :key="item.id">
             <VolumeStats
@@ -10,7 +10,8 @@
               :tabActiveName="item.name"
             />
           </template>
-        </div>
+        </div> -->
+        <PriceTabs v-model="tabActive" :tabs="tabs" />
         <!-- <div class="flex items-center justify-around color-[--main-text] p-15px bg-[--secondary-bg] mt-4px">
         <div class="text-center">
           <div class="text-14px mb-5px">${{ formatNumber(token?.open_price || 0, 3) }}</div>
