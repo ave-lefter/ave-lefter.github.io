@@ -204,15 +204,14 @@
         </template>
       </div>
     </div>
-    <!-- status -->
+    <!-- status：仅在有暂停状态（hover 或 升序排序）时展示底部条，避免未暂停时仍显示黑条 -->
     <div
+      v-show="isPausedTxs1"
       class="z-10 absolute bottom-0 h-24px w-100% flex items-center justify-center bg-[--main-input-button-bg] color-[#FFA622]">
-
-      <div v-show="isPausedTxs1" class="flex items-center gap-x-7px">
+      <div class="flex items-center gap-x-7px">
         <Icon name="custom:stop" class="text-14px" />
         <span class="text-xs">{{ t('paused') }}</span>
       </div>
-
     </div>
     <!-- MarkerTooltip -->
     <MarkerTooltip v-model="markerTooltipVisible" :virtual-ref="makerTooltip" :currentRow="currentRow"
