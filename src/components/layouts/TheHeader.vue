@@ -183,7 +183,7 @@
             <div class="flex flex-1 items-center justify-between mb-16px cursor-pointer relative">
                 <div class="flex items-center gap-8px ">
                   <Icon name="material-symbols:language" class="text-16px"/>
-                  {{locales.find(i=>i.code === langStore.locale)?.name}}
+                  <span class="mt--2px">{{locales.find(i=>i.code === langStore.locale)?.name}}</span>
                 </div>
                 <Icon name="ep:arrow-right"/>
               </div>
@@ -211,7 +211,7 @@
             <div class="flex flex-1 items-center justify-between mb-16px cursor-pointer  gap-24px">
                 <div class="flex items-center gap-8px">
                   <Icon name="ri:wallet-fill" class="text-16px"/>
-                  {{ $t('priceChangeZoonSetting') }}
+                  <span class="mt--2px">{{ $t('priceChangeZoonSetting') }}</span>
                 </div>
                 <div class="flex gap-4px items-center">
                   <span class="font-400 text-12px text-[--third-text]">{{zoonName}}</span>
