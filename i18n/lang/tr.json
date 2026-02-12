@@ -615,5 +615,6 @@
   "past24h": "Son 24 saat içinde",
   "priceChangeZoonSetting": "Fiyat Değişimi Saat Dilimi Ayarı",
   "group": "Grup",
-  "manage": "Üstesinden gelmek"
+  "manage": "Üstesinden gelmek",
+  "priceChangeZoonSettingTip": "<div>24 saatlik biçim: Fiyat artışı veya düşüşü, dünün aynı saatindeki fiyatla karşılaştırıldığında 24 saatlik yuvarlanma esasına göre hesaplanır<br/>\nPekin saati 0:00 (UTC 8 00:00): Fiyat artışı veya düşüşü, Pekin saatiyle 0:00'daki açılış fiyatı temel alınarak hesaplanır</div>"
 }

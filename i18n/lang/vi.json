@@ -859,5 +859,6 @@
   "past24h": "Trong 24 giờ qua",
   "priceChangeZoonSetting": "Cài đặt múi giờ thay đổi giá",
   "group": "Nhóm",
-  "manage": "Quản lý"
+  "manage": "Quản lý",
+  "priceChangeZoonSettingTip": "<div>Đồng hồ 24 giờ: Giá tăng hoặc giảm được tính theo chu kỳ luân phiên 24 giờ, so với giá cùng thời điểm ngày hôm qua<br/>\n0:00 giờ Bắc Kinh (UTC 8 00:00): Giá tăng hoặc giảm được tính dựa trên giá mở cửa lúc 0:00 giờ Bắc Kinh</div>"
 }

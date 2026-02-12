@@ -1468,5 +1468,6 @@
   "past24h": "지난 24시간 동안",
   "priceChangeZoonSetting": "가격 변동 시간대 설정",
   "group": "그룹",
-  "manage": "관리하다"
+  "manage": "관리하다",
+  "priceChangeZoonSettingTip": "<div>24시간제: 어제 같은 시간의 가격과 비교하여 24시간 단위로 가격 증가 또는 감소를 계산합니다.<br/>\n베이징 시간 0시(UTC 8 00:00): 베이징 시간 0시 시가를 기준으로 가격 상승 또는 하락을 계산합니다.</div>"
 }

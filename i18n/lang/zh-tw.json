@@ -1992,5 +1992,6 @@
   "past24h": "近24小時",
   "priceChangeZoonSetting": "漲跌幅時區設置",
   "group": "分組",
-  "manage": "管理"
+  "manage": "管理",
+  "priceChangeZoonSettingTip": "<div>24 小時制：漲跌幅按24小時滾動計算，與昨日同一時刻價格對比<br/>\n北京時間 0 點(UTC 8 00:00)：漲跌幅按北京時間0點開盤價計算</div>"
 }

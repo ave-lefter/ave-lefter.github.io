@@ -211,7 +211,15 @@
             <div class="flex flex-1 items-center justify-between mb-16px cursor-pointer  gap-24px">
                 <div class="flex items-center gap-8px">
                   <Icon name="ri:wallet-fill" class="text-16px"/>
-                  <span class="mt--2px">{{ $t('priceChangeZoonSetting') }}</span>
+                  <span class="mt--2px flex items-center gap-2px">
+                    {{ $t('priceChangeZoonSetting') }}
+                    <el-tooltip
+                      placement="bottom-start"  :persistent="false"
+                    > 
+                      <template #content> <div v-html="$t('priceChangeZoonSettingTip')" class="max-w-224px"></div></template>
+                      <Icon name="ri:error-warning-line" class='rotate-180 text-16px text-[--third-text]' />
+                    </el-tooltip>
+                  </span>
                 </div>
                 <div class="flex gap-4px items-center">
                   <span class="font-400 text-12px text-[--third-text]">{{zoonName}}</span>

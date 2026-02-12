@@ -619,5 +619,6 @@
   "past24h": "Nas últimas 24 horas",
   "priceChangeZoonSetting": "Price Change Time Zone Setting",
   "group": "Grupo",
-  "manage": "Gerenciar"
+  "manage": "Gerenciar",
+  "priceChangeZoonSettingTip": "<div>Relógio de 24 horas: o aumento ou diminuição do preço é calculado em uma base contínua de 24 horas, em comparação com o preço no mesmo horário de ontem<br/>\n0:00 horário de Pequim (UTC 8 00:00): O aumento ou diminuição do preço é calculado com base no preço de abertura às 00:00 horário de Pequim</div>"
 }
