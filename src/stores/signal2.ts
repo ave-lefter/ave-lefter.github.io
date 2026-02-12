@@ -12,7 +12,7 @@ export const useMonitorStore = defineStore('monitor', () => {
   const {width: winWidth, height: winHeight} = useWindowSize()
   const isLeftFixed = useStorage('isMonitorLeft', false)
   const isRightFixed = useStorage('isMonitorRight', false)
-  const fixedWidth = useStorage('monitorFixedWidth', 360)
+  const fixedWidth = useStorage('monitorFixedWidth', 340)
   const hasRing=useStorage('hasRing', false)
   const monitorList1=shallowRef([] as any[])
   const monitorList2=shallowRef([] as any[])

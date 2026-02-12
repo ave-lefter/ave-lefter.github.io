@@ -114,6 +114,7 @@
   "follow": "フォロー",
   "followed": "フォロー中",
   "liquidity2": "流動性",
+  "liquidity3": "流動性",
   "time": "時間",
   "type": "タイプ",
   "swapPrice": "取引価格",
@@ -1451,6 +1452,17 @@
   "monitorThTip": "少なくとも 1 つのウォレット アバターとウォレット アドレスを選択してください",
   "wcWalletTip": "この QR コードを携帯電話でスキャンしてください",
   "monitorBotError": "監視ロボットのアドレスはサポートされていません",
+  "marketNavigation": "市場ナビゲーション",
+  "totalTransactions": "総取引数",
+  "traderCount": "トレーダー数",
+  "24hVolume": "24時間ボリューム",
+  "tokenStats": "トークン統計",
+  "created": "作成",
+  "topPlatforms": "トッププラットフォーム",
   "hideLiq": "クリックしてプール情報を非表示にします",
-  "showLiq": "クリックするとプール情報が表示されます"
+  "showLiq": "クリックするとプール情報が表示されます",
+  "monitored1": "Wallet Activity",
+  "availableLiquidity": "利用可能な流動性",
+  "googleAuthNotBoundTip": "Google認証システムがバインドされていません。アカウントのセキュリティを保護するため、ウォレットアドレスを削除する前にGoogle認証システムをバインドしてください。",
+  "goToBind": "バインドへ"
 }

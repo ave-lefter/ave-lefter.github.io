@@ -370,6 +370,8 @@ watch(() => klineDateFilter?.value, (val) => {
 watch(() => tokenStore.pairAddress, (pair, oldPair) => {
   console.log('watch pair', pair, oldPair)
   if (tokenStore.pairAddress) {
+    tableFilter.value.tag_type = 'all'
+    activeTab.value = 'all'
     listStatus.value.loadingTxs1 = true
     resetCache()
     _getPairLiq()
@@ -616,6 +618,7 @@ function transferTxsData(row: IGetSimpleTxsResponse) {
   }
   const newTags=tagStore.tagArr.filter(item => maker_types.includes(item.type)).map(i=>{
     return {
+      ...i,
       'type': i.type,
       'tag_desc': i?.[lang1],
       'icon': i.icon,
@@ -857,9 +860,9 @@ function getGradient(row: IGetSimpleTxsResponse) {
 function openMarkerTooltip(row: IGetSimpleTxsResponse & { senderProfile: Profile }, e: MouseEvent) {
   if (row && SupportFullDataChain.includes(row.chain)) {
     makerTooltip.value = e.currentTarget
-    if (currentRow.value?.wallet_address === row.wallet_address) {
-      return
-    }
+    // if (currentRow.value?.wallet_address === row.wallet_address) {
+    //   return
+    // }
     currentRow.value = row
   }
 }
@@ -872,15 +875,17 @@ function goBrowser(row: IGetSimpleTxsResponse) {
 
 const tabsContainer = ref<HTMLElement | null>(null)
 function setActiveTab(val: string,index:number) {
+  if(val===activeTab.value) return 
   activeTab.value = val
   // if (val === '-100' && !followStore.currentAddress) {
   //   return
   // }
-  txCount.value = {}
   tableFilter.value.tag_type = val
   if (val !== 'liquidity') {
+    listStatus.value.loadingTxs1 = true
     filterSubmit()
   } else {
+    listStatus.value.loadingLiq = true
     _getPairLiq()
   }
   scrollTabToCenter(tabsContainer,index)

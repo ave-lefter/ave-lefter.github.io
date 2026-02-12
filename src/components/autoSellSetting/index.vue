@@ -14,10 +14,11 @@
         'popper-class': 'new-popover',
       }
     }"
-    class="autoSellSetting-btn border-none cursor-pointer mr-8px"
-    :class="{
-      'active': isAutoSellConfig
-    }"
+    class="autoSellSetting-btn border-none cursor-pointer"
+    :class="[
+      rootClass? rootClass : 'mr-8px',
+      { active: isAutoSellConfig },
+    ]"
     >
     <span>{{ $t('autoSell') }}</span>
     <SlippageSet
@@ -42,6 +43,7 @@ import { useAutoSellSettingContent } from './utils'
 
 const props = defineProps({
   chain: { type: String as PropType<BotChain>, default: '' },
+  rootClass: { type: String, default: '' }
 })
 
 const walletStore = useWalletStore()

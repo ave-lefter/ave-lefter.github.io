@@ -76,6 +76,7 @@
   "buy3": "Comprar",
   "sell3": "Vender",
   "liquidity2": "Liquidez",
+  "liquidity3": "Liquidez",
   "time": "Tiempo",
   "type": "Tipo",
   "swapPrice": "Precio",
@@ -623,6 +624,18 @@
   "monitorThTip": "Elija al menos un avatar de billetera y una dirección de billetera",
   "wcWalletTip": "Escanea este código QR con tu teléfono",
   "monitorBotError": "La dirección del robot de monitoreo no es compatible",
+  "marketNavigation": "Navegación del Mercado",
+  "totalTransactions": "Transacciones Totales",
+  "traderCount": "Conteo de Traders",
+  "24hVolume": "Volumen 24h",
+  "tokenStats": "Estadísticas de Tokens",
+  "created": "Creado",
+  "topPlatforms": "Plataformas Principales",
   "hideLiq": "Haga clic para ocultar la información del grupo",
-  "showLiq": "Haga clic para mostrar información de la piscina"
+  "showLiq": "Haga clic para mostrar información de la piscina",
+  "monitored1": "Wallet Activity",
+  "availableLiquidity": "Liquidez disponible",
+  "poolPair": "Negociación",
+  "googleAuthNotBoundTip": "Google Authenticator no está vinculado. Para proteger su cuenta, vincule Google Authenticator antes de eliminar la dirección de la billetera.",
+  "goToBind": "Ir a vincular"
 }

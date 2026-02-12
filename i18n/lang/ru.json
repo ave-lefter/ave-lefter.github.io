@@ -87,6 +87,7 @@
   "buy3": "Покупка",
   "sell3": "Продажа",
   "liquidity2": "Ликвидность",
+  "liquidity3": "Ликвидность",
   "time": "Время",
   "type": "Тип",
   "swapPrice": "Цена",
@@ -846,6 +847,18 @@
   "wcWalletTip": "Отсканируйте этот QR-код своим телефоном",
   "createWithdrawIncomeOrder": "Запрос на вывод отправлен",
   "monitorBotError": "Адрес робота-монитора не поддерживается",
+  "marketNavigation": "Навигация по рынку",
+  "totalTransactions": "Всего транзакций",
+  "traderCount": "Количество трейдеров",
+  "24hVolume": "Объем за 24ч",
+  "tokenStats": "Статистика токенов",
+  "created": "Создано",
+  "topPlatforms": "Лучшие платформы",
   "hideLiq": "Нажмите, чтобы скрыть информацию о пуле",
-  "showLiq": "Нажмите, чтобы отобразить информацию о пуле"
+  "showLiq": "Нажмите, чтобы отобразить информацию о пуле",
+  "monitored1": "Активность кошелька",
+  "availableLiquidity": "Доступная ликвидность",
+  "poolPair": "Торговая пара",
+  "googleAuthNotBoundTip": "Google Authenticator не привязан. Для защиты вашей учетной записи привяжите Google Authenticator перед удалением адреса кошелька.",
+  "goToBind": "Перейти к привязке"
 }

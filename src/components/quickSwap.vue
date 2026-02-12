@@ -12,6 +12,7 @@ const { walletSwap, loadingWalletSwap } = useWalletSwap()
 const {t} = useI18n()
 const props = withDefaults(defineProps<{
   quickBuyValue: string
+  swapSetSelected?: 's1' | 's2' | 's3'
   row: {
     chain: BotChain
     symbol?: string
@@ -31,7 +32,8 @@ const props = withDefaults(defineProps<{
   buttonBg: 'rgba(18, 184, 134, 0.15)',
   classNames: '',
   size: '14px',
-  buttonType: 0
+  buttonType: 0,
+  swapSetSelected: undefined
 })
 const botStore = useBotStore()
 const loadingSwap = shallowRef(false)
@@ -108,7 +110,7 @@ async function submitSwap(amount: string) {
   const {chain} = props.row
   const isSolana = chain === 'solana'
   const {botSettings} = botSettingStore
-  const selected = botSettings?.[chain]?.buy?.selected as BotSettingKey
+  const selected = props.swapSetSelected || botSettings?.[chain]?.buy?.selected as BotSettingKey
   const currentBotSetting = botSettings?.[chain]?.buy?.[selected]
   // if (isSolana && currentBotSetting?.mev) {
   //   if (!await botStore.getBundleAvailable()) {
@@ -276,8 +278,10 @@ async function getTokenBalance(chain: string) {
       class="mr-4px"
       name="mynaui:lightning-solid"
     />
-    {{ quickBuyValue || 0 }}
-    <span v-if="mainNameVisible" class="ml-5px" >{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+    <div class="m-text">
+      <span>{{ quickBuyValue || 0 }}</span>
+      <span v-if="mainNameVisible" class="ml-5px" >{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+    </div>
   </el-button>
   <el-dialog
     v-if="visible" v-model="visible" :title="$t('buy')"
@@ -325,8 +329,10 @@ async function getTokenBalance(chain: string) {
       class="mr-4px text-12px"
       name="mynaui:lightning-solid"
     />
-    {{ Number(quickBuyValue) ? (quickBuyValue || 0) : $t('buy') }}
-    <span v-if="mainNameVisible && Number(quickBuyValue)" class="ml-5px" >{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+    <div class="m-text">
+      {{ Number(quickBuyValue) ? (quickBuyValue || 0) : $t('buy') }}
+      <span v-if="mainNameVisible && Number(quickBuyValue)" class="ml-5px" >{{ getChainInfo(row.chain)?.main_name || '' }}</span>
+    </div>
   </el-button>
 
 </template>

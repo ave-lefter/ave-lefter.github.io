@@ -67,7 +67,6 @@
                     <el-image
                       class="token-icon"
                       :class="{ small: pumpSetting.Progress_isCircle == 'horizontal' }"
-                      lazy
                       fit="cover"
                       :src="
                         getSymbolDefaultIcon(
@@ -188,35 +187,27 @@
                               : '#12B886',
                         }"
                       >
-                        <template v-if="!(row?.created_at || row?.time)"> - </template>
-                        <template
-                          v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
-                        >
-                          {{
-                            formatCountdown(
-                              Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
-                              false
-                            )
-                          }}
-                        </template>
-                        <TimerCount
-                          v-else-if="
-                            (row?.created_at || row?.time) &&
-                            Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
-                          "
-                          :key="`${row.created_at}`"
-                          :timestamp="row.created_at"
-                          :end-time="60"
-                        >
-                          <template #default="{ seconds }">
-                            <span class="color-#FFA622">
-                              <template v-if="seconds < 60"> {{ seconds }}s </template>
-                              <template v-else>
-                                {{ formatTimeFromNow(row.created_at) }}
-                              </template>
-                            </span>
+                          <TimerCount
+                            v-if="row?.created_at || row?.time"
+                            :key="row.pair + '-' + row.chain"
+                            :timestamp="row.created_at || row.time"
+                            :end-time="60"
+                          >
+                            <template #default="{ seconds }">
+                              <span>
+                                <span v-if="seconds < 60"  class="color-#FFA622">
+                                  {{ seconds }}s
+                                </span>
+                                <template v-else>
+                                  {{ formatTimeFromNow(row.created_at || row.time) }}
+                                </template>
+                              </span>
+                            </template>
+                          </TimerCount>
+
+                          <template v-else>
+                            -
                           </template>
-                        </TimerCount>
                       </div>
                       <img
                         v-if="row.baseToken"
@@ -392,7 +383,47 @@
                       <span v-else class="color-[--main-text]">{{ formatNumber(row?.smart_wallet_tag_count || 0, 2) }}</span>
                     </div>
                   </div>
-                  <div class="mt-5px">
+                  <div class="mt-5px flex-start text-11px">
+                    <template
+                      v-if="row.buy_tax && row.sell_tax"
+                    >
+                      <span
+                        v-if="row.buy_tax == row.sell_tax"
+                        class="mr-5px"
+                        :style="{
+                              color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
+                          }"
+                      >
+                        Tax {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                      </span>
+                      <span
+                        v-else
+                        class="mr-5px"
+                          :style="{
+                              color: (Number(row?.sell_tax) > 5 || Number(row?.buy_tax) > 5  ? '#F6465D' :'var(--secondary-text)'),
+                          }"
+                      >
+                      B {{ formatNumber(row?.buy_tax || 0, 2) }}%&nbsp;&nbsp;S {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                      </span>
+                    </template>
+                    <span
+                      v-else-if="row.buy_tax"
+                      class="mr-5px"
+                      :style="{
+                            color:(Number(row?.buy_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
+                        }"
+                    >
+                      B {{ formatNumber(row?.buy_tax || 0, 2) }}%
+                    </span>
+                    <span
+                      v-else-if="row.sell_tax"
+                      class="mr-5px"
+                        :style="{
+                            color:(Number(row?.sell_tax) > 5 ? '#F6465D' : 'var(--secondary-text)'),
+                        }"
+                    >
+                      S {{ formatNumber(row?.sell_tax || 0, 2) }}%
+                    </span>
                     <PumpPop
                         v-if="row?.medias?.some(i=> i.icon === 'twitter') && route.name === 'index'"
                         :tokenId="(row.token + '-' + row.chain)"
@@ -662,6 +693,7 @@ class="flex-start mr-8px bg-btn"
                   <QuickSwap
                     v-if="parseInt(pumpSetting?.size_swap|| '0') > 0"
                     :quickBuyValue="quickBuyValue"
+                    :swapSetSelected="props.swapSetSelected"
                     :row="row"
                     classNames="bg-[--up-color] color-#fff"
                     :size="pumpSetting.size_swap"
@@ -697,8 +729,14 @@ class="flex-start mr-8px bg-btn"
       <a :href="`https://x.com/search?q=$${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
         {{ $t('tweetSearchContractAddress2') }}
       </a>
-      <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+      <!-- <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
         {{ $t('tweetSearchContractAddress3') }}
+      </a> -->
+      <a :href="`https://www.tiktok.com/search?q=${currentRow?.symbol}`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+        {{ $t('TikTokSearchName') }}
+      </a>
+      <a :href="`https://www.google.com/search?q=${currentRow?.symbol}&tbm=nws`" target="_blank" class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active]">
+        {{ $t('GoogleSearchName') }}
       </a>
       <span class="text-12px py-4px px-8px color-[--main-text] hover:bg-[--dialog-tab-active] cursor-pointer" @click="handleSearchTokenName">{{ $t('tweetSearchContractAddress4') }}</span>
     </div>
@@ -733,6 +771,10 @@ const props = defineProps({
   quickBuyValue: {
     type: String,
     default: () => '',
+  },
+  swapSetSelected: {
+    type: String as PropType<'s1' | 's2' | 's3'>,
+    default: '',
   },
   loading: {
     type: Boolean,
@@ -792,7 +834,7 @@ const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableLis
   itemHeight: 110.8,
   // 必须增加过采样，否则 translateY(-20px) 向上移动时，
   // 顶部刚进入视口的节点会因为高度计算没到视口而无法渲染，导致动画“闪现”
-  overscan: 5,
+  overscan: 20,
 })
 
 onDeactivated(() => {
@@ -1030,7 +1072,7 @@ function getLiqTooltip(row: PumpObj) {
     <div class="flex-start" style="color:var(--secondary-text)">
       ${t('pair')}
       <span class="color-[--main-text] text-12px ml-5px">
-        ${formatNumber(value || 0, { decimals: 0, l: 4, locale: 'en' })}
+        ${formatNumber(value || 0, { decimals: 2, l: 4, locale: 'en' })}
         <span class="text-11px ml-4px">
           ${row.baseToken?.symbol ?? ''}
         </span>

@@ -76,6 +76,7 @@
   "buy3": "Comprar",
   "sell3": "Vender",
   "liquidity2": "Liquidez",
+  "liquidity3": "Liquidity",
   "time": "Hora",
   "type": "Tipo",
   "swapPrice": "Preço",
@@ -601,6 +602,18 @@
   "monitorThTip": "Escolha pelo menos um avatar e endereço de carteira",
   "wcWalletTip": "Digitalize este código QR com seu telefone",
   "monitorBotError": "O endereço do robô de monitoramento não é compatível",
+  "marketNavigation": "Navegação de Mercado",
+  "totalTransactions": "Transações Totais",
+  "traderCount": "Contagem de Traders",
+  "24hVolume": "Volume 24h",
+  "tokenStats": "Estatísticas de Token",
+  "created": "Criado",
+  "topPlatforms": "Principais Plataformas",
   "hideLiq": "Clique para ocultar informações do pool",
-  "showLiq": "Clique para exibir informações do pool"
+  "showLiq": "Clique para exibir informações do pool",
+  "monitored1": "Wallet Activity",
+  "availableLiquidity": "Liquidez disponível",
+  "poolPair": "Negociação",
+  "googleAuthNotBoundTip": "Google Authenticator não está vinculado. Para proteger sua conta, vincule o Google Authenticator antes de excluir o endereço da carteira.",
+  "goToBind": "Ir para vincular"
 }
