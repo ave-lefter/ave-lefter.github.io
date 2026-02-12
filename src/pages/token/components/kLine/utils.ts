@@ -878,10 +878,10 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
           disableUndo: true,
           text: getSwapTypeLabel(item.swapType as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) || t('limitSell1'),
           overrides: {
-            linecolor: '#FF6838',  // 线的颜色
+            linecolor: '#FFBE3C',  // 线的颜色
             linewidth: 1,          // 线的粗细
             linestyle: 2,     // 线的样式：0表示实线，1表示虚线 2 长虚线
-            textcolor: '#FF6838',
+            textcolor: '#FFBE3C',
             showLabel: true,
             horzLabelsAlign: 'right',
             vertLabelsAlign: 'bottom',
@@ -894,7 +894,7 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
       const line = chart?.getShapeById?.(priceLimitLineId)
       if (!line) return
       // line?.setProperties?.({
-      //   textcolor: '#FF6838',
+      //   textcolor: '#FFBE3C',
       //   showLabel: true,
       //   horzLabelsAlign: 'right',
       //   vertLabelsAlign: 'bottom',
@@ -1354,6 +1354,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (!visibleRange?.from || !visibleRange?.to) return
     const spacing = getWidget()?.activeChart?.().getTimeScale?.().barSpacing?.()
     const timeFrom = getStartTime(visibleRange.to, spacing ? 240/spacing : undefined)
+    if (!avePriceMap) return
     Object.values(avePriceMap).forEach(item => {
       if (!item.lineId) return
       const line = chart.getShapeById?.(item.lineId)
@@ -1395,6 +1396,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (!range?.from || !range?.to) return
     const spacing = getWidget()?.activeChart?.().getTimeScale?.().barSpacing?.()
     const timeFrom = getStartTime(range.to,spacing ? 240/spacing : undefined)
+    if (!avePriceMap) return
     Object.values(avePriceMap).forEach(async item => {
       let price = item.value
       if (showMarket.value) {
@@ -1524,7 +1526,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (!_widget) return
     const chart = _widget?.activeChart?.()
     if (!chart) return
-
+    if (!avePriceMap) return
     Object.values(avePriceMap).forEach(item => {
       if (item.lineId) {
         chart?.removeEntity?.(item.lineId)

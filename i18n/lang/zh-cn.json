@@ -112,6 +112,7 @@
   "follow": "关注",
   "followed": "已关注",
   "liquidity2": "池子",
+  "liquidity3": "流动性",
   "time": "时间",
   "type": "类型",
   "swapPrice": "成交价",
@@ -2007,5 +2008,9 @@
   "topPlatforms": "顶级发射平台",
   "hideLiq": "点击隐藏池子信息",
   "showLiq": "点击显示池子信息",
-  "commission": "分佣"
+  "commission": "分佣",
+  "monitored1": "钱包动态",
+  "availableLiquidity": "可用流动性",
+  "googleAuthNotBoundTip": "检测到您尚未绑定谷歌验证器。为保障账户安全,删除钱包地址前,需先完成谷歌验证器绑定。",
+  "goToBind": "前往绑定"
 }

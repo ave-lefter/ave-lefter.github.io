@@ -199,9 +199,10 @@ import { useI18n } from 'vue-i18n'
 import { NATIVE_TOKEN, MIN_BALANCE } from '@/utils/constants'
 import BigNumber from 'bignumber.js'
 import { debounce } from 'lodash-es'
-import { getAddressAndChainFromId, isEvmChain, getRpcProvider } from '@/utils'
+import { getAddressAndChainFromId, isEvmChain, getRpcProvider, formatUnits } from '@/utils'
 import { ElMessageBox } from 'element-plus'
 import { useBotSwap } from '~/composables/botSwap'
+import { useTransactionPrompt } from '@/composables/useTransactionPrompt'
 import { bot_createSolTx, bot_createSwapEvmTx, bot_createSolLimitTx, bot_createEvmLimitTx, bot_createSwapTonTx, bot_createTonLimitSwap, getAutoSlippage } from '@/api/bot'
 import RefreshBalance from './refreshBalance.vue'
 import { formatDec, formatNumber } from '@/utils/formatNumber'
@@ -241,6 +242,7 @@ const tabs2Ref = ref(props.tabs2)
 const emit = defineEmits(['getTokenBalance', 'update:botSettings'])
 
 const { t } = useI18n()
+const { executing } = useTransactionPrompt()
 
 const show = ref(false)
 
@@ -657,6 +659,25 @@ function getChain() {
   return chain as BotChain
 }
 
+function getPromptMainEvmAddress() {
+  return botStore.evmAddress || botSwapStore.botSwapSelectedWallets?.[0] || ''
+}
+
+function getPromptChainAddress(chain: BotChain) {
+  const evmAddress = getPromptMainEvmAddress()
+  const wallet = botStore.walletList?.find?.(item => item.evmAddress === evmAddress)
+  const chainAddress = wallet?.addresses?.find?.(item => item?.chain === chain)?.address
+  return chainAddress || botStore.userInfo?.addresses?.find?.(item => item?.chain === chain)?.address || ''
+}
+
+function isSameAddress(a?: string, b?: string, chain?: BotChain) {
+  if (!a || !b) return false
+  if (chain && isEvmChain(chain)) {
+    return a.toLowerCase() === b.toLowerCase()
+  }
+  return a === b
+}
+
 const isSupportSwap = computed(() => {
   const chain = getChain()
   return botStore.accessToken && botStore?.isSupportChains?.includes?.(chain)
@@ -749,6 +770,68 @@ async function submitBotSwap() {
   loadingSwap.value = true
   const isBuy = props.activeTab === 'buy'
   const chain = getChain()
+  const promptCreatorAddress = getPromptChainAddress(chain)
+  const promptAvatarAddress = promptCreatorAddress || getPromptMainEvmAddress()
+  const promptFromToken = isBuy ? tokenStore.swap.payToken : tokenStore.swap.token
+  const promptToToken = isBuy ? tokenStore.swap.token : tokenStore.swap.payToken
+  let promptStartTime = 0
+  let promptTimer: ReturnType<typeof setInterval> | null = null
+  let promptAutoCloseTimer: ReturnType<typeof setTimeout> | null = null
+  let promptDone = false
+  const clearPromptTimer = () => {
+    if (promptTimer) {
+      clearInterval(promptTimer)
+      promptTimer = null
+    }
+  }
+  const clearPromptAutoCloseTimer = () => {
+    if (promptAutoCloseTimer) {
+      clearTimeout(promptAutoCloseTimer)
+      promptAutoCloseTimer = null
+    }
+  }
+  promptStartTime = Date.now()
+  const promptHandle = executing({
+    avatarAddress: promptAvatarAddress,
+    avatarChain: chain,
+  })
+  const finishPromptFail = () => {
+    if (promptDone) return
+    promptDone = true
+    clearPromptTimer()
+    clearPromptAutoCloseTimer()
+    promptHandle.close()
+  }
+  const finishPromptSuccess = (txInfo1: any) => {
+    if (promptDone) return
+    promptDone = true
+    clearPromptTimer()
+    clearPromptAutoCloseTimer()
+    const elapsedSec = (Date.now() - promptStartTime) / 1000
+    const fromAmountDisplay = txInfo1?.fromAmount ? formatUnits(txInfo1.fromAmount, promptFromToken?.decimals || 0) : fromAmount.value
+    const toAmountDisplay = txInfo1?.outputAmount ? formatUnits(txInfo1.outputAmount, promptToToken?.decimals || 0) : toAmount.value
+    promptHandle.success({
+      chain: chain,
+      txHash: txInfo1?.txHash || txInfo1?.hash || '',
+      elapsedSec,
+      isBuy,
+      fromSymbol: promptFromToken?.symbol || '',
+      fromAmount: fromAmountDisplay,
+      toSymbol: promptToToken?.symbol || '',
+      toAmount: toAmountDisplay,
+      avatarAddress: promptAvatarAddress,
+      avatarChain: chain,
+    })
+  }
+  promptTimer = setInterval(() => {
+    promptHandle.update(Date.now() - promptStartTime)
+  }, 100)
+  promptAutoCloseTimer = setTimeout(() => {
+    if (promptDone) return
+    clearPromptTimer()
+    promptHandle.close()
+    promptAutoCloseTimer = null
+  }, 120000)
   const chainMainToken: Record<string, string> = {
     solana: 'sol',
     ton: 'TON',
@@ -814,6 +897,7 @@ async function submitBotSwap() {
         // const chain = 'solana'
         const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
         res?.forEach?.((txInfo: any) => {
+          const isPromptTx = !promptCreatorAddress || isSameAddress(txInfo?.creatorAddress, promptCreatorAddress, chain)
           const walletName = botStore.walletList?.find?.(j => j?.addresses?.find?.(k => k?.chain === chain)?.address === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
             // this.$store.state.bot.historyUpdate++
@@ -836,6 +920,9 @@ async function submitBotSwap() {
               Timer = null
             }
             handleBotError(walletName + ' ' + txInfo?.errorLog, ElNotification)
+            if (isPromptTx) {
+              finishPromptFail()
+            }
             if (isError) {
               loadingSwap.value = false
               return
@@ -856,27 +943,36 @@ async function submitBotSwap() {
           const unwatch = watch(() => wsStore?.wsResult.tgbot, (subscribeResult) => {
             const _batchId = subscribeResult.batchId
             const txInfo1 = subscribeResult?.txList?.[0]
-            if (_batchId?.includes(batchId) && txInfo.creatorAddress === txInfo1?.walletAddress) {
+            if (_batchId?.includes(batchId) && isSameAddress(txInfo.creatorAddress, txInfo1?.walletAddress, chain)) {
               if (Timer) {
                 clearTimeout(Timer)
                 Timer = null
               }
               tokenStore.placeOrderSuccess++
                if (txInfo1?.success) {
-                ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
+                if (isPromptTx) {
+                  finishPromptSuccess(txInfo1)
+                }
               } else {
                 const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
                 handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
+                if (isPromptTx) {
+                  finishPromptFail()
+                }
               }
               unwatch()
               loadingSwap.value = false
             }
           })
         })
+      } else {
+        finishPromptFail()
+        loadingSwap.value = false
       }
     }).catch(err => {
       handleBotError(err || 'swap error', ElNotification)
+      finishPromptFail()
       loadingSwap.value = false
     })
   } else if (isEvmChain(chain)) {
@@ -945,6 +1041,7 @@ async function submitBotSwap() {
       if (res) {
         const isError = res?.every?.((i: { errorLog: string }) => i?.errorLog)
         res?.forEach?.((txInfo: any) => {
+          const isPromptTx = !promptCreatorAddress || isSameAddress(txInfo?.creatorAddress, promptCreatorAddress, chain)
           const walletName = botStore.walletList?.find?.(j => j?.evmAddress?.toLowerCase?.() === txInfo?.creatorAddress?.toLowerCase?.())?.name || ''
           let Timer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
             // tokenStore.placeOrderUpdate++
@@ -963,6 +1060,9 @@ async function submitBotSwap() {
               Timer = null
             }
             handleBotError(walletName + ' ' + txInfo?.errorLog, ElNotification)
+            if (isPromptTx) {
+              finishPromptFail()
+            }
             if (isError) {
               loadingSwap.value = false
               return
@@ -979,14 +1079,13 @@ async function submitBotSwap() {
             const txInfo1 = subscribeResult?.txList?.[0]
             console.log('txInfo1', txInfo1)
             console.log('txInfo', txInfo, _batchId?.includes?.(batchId) && txInfo.creatorAddress === txInfo1?.walletAddress)
-            if (_batchId?.includes?.(batchId) && txInfo.creatorAddress === txInfo1?.walletAddress) {
+            if (_batchId?.includes?.(batchId) && isSameAddress(txInfo.creatorAddress, txInfo1?.walletAddress, chain)) {
               if (Timer) {
                 clearTimeout(Timer)
                 Timer = null
               }
               tokenStore.placeOrderSuccess++
               if (txInfo1?.success) {
-                ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
                 updateBalanceFromWs({
                   chain: data.chain,
@@ -994,9 +1093,15 @@ async function submitBotSwap() {
                   outTokenAddress: data.outTokenAddress,
                   ...txInfo1
                 })
+                if (isPromptTx) {
+                  finishPromptSuccess(txInfo1)
+                }
               } else {
                 const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
                 handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
+                if (isPromptTx) {
+                  finishPromptFail()
+                }
               }
               unwatch()
               loadingSwap.value = false
@@ -1006,6 +1111,7 @@ async function submitBotSwap() {
       }
     }).catch(err => {
       handleBotError(err || 'swap error', ElNotification)
+      finishPromptFail()
       loadingSwap.value = false
     })
   }
@@ -1144,9 +1250,15 @@ function submitBotLimit() {
               if (txInfo1?.success) {
                 ElNotification({ type: 'success', message: txInfo1?.walletName + ' ' + t('tradeSuccess') })
                 updateTxV2({...txInfo1, chain: subscribeResult?.chain}, txInfo?.id || '')
+                if (isPromptTx) {
+                  finishPromptSuccess(txInfo1)
+                }
               } else {
                 const msg = formatBotError(txInfo1?.failMessage) || 'swap error'
                 handleBotError(txInfo1?.walletName + ' ' + msg, ElNotification)
+                if (isPromptTx) {
+                  finishPromptFail()
+                }
               }
               unwatch()
               loadingSwap.value = false
@@ -1156,6 +1268,7 @@ function submitBotLimit() {
       }
     }).catch(err => {
       handleBotError(err || 'swap error', ElNotification)
+      finishPromptFail()
       loadingSwap.value = false
     })
   } else if (isEvmChain(chain)) {

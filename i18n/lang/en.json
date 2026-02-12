@@ -107,6 +107,7 @@
   "sell3": "Sell",
   "followed": "Followed",
   "liquidity2": "Liquidity",
+  "liquidity3": "Liquidity",
   "time": "Time",
   "type": "Type",
   "swapPrice": "Price",
@@ -2006,5 +2007,9 @@
   "hideLiq": "Click to hide pool information",
   "showLiq": "Click to display pool information",
   "filter": "Filter",
-  "commission": "Commission"
+  "commission": "Commission",
+  "monitored1": "Wallet Activity",
+  "availableLiquidity": "Available Liquidity",
+  "googleAuthNotBoundTip": "Google Authenticator not detected. To protect your account, please bind Google Authenticator before deleting wallet address.",
+  "goToBind": "Go to Bind"
 }
