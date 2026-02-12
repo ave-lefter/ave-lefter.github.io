@@ -857,5 +857,7 @@
   "googleAuthNotBoundTip": "Google Authenticator chưa được liên kết. Để bảo vệ tài khoản của bạn, vui lòng liên kết Google Authenticator trước khi xóa địa chỉ ví.",
   "goToBind": "Đi đến liên kết",
   "past24h": "Trong 24 giờ qua",
-  "priceChangeZoonSetting": "Cài đặt múi giờ thay đổi giá"
+  "priceChangeZoonSetting": "Cài đặt múi giờ thay đổi giá",
+  "group": "Nhóm",
+  "manage": "Quản lý"
 }

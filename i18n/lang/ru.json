@@ -862,5 +862,7 @@
   "googleAuthNotBoundTip": "Google Authenticator не привязан. Для защиты вашей учетной записи привяжите Google Authenticator перед удалением адреса кошелька.",
   "goToBind": "Перейти к привязке",
   "past24h": "За последние 24 часа",
-  "priceChangeZoonSetting": "Price Change Time Zone Setting"
+  "priceChangeZoonSetting": "Price Change Time Zone Setting",
+  "group": "Группа",
+  "manage": "Управлять"
 }

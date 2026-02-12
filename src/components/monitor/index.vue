@@ -9,7 +9,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
         class="absolute top-3px left-50% ml--6px text-6px bg-[--dialog-list-hover] drag-handle"
     />
     <el-tabs v-model="activeName" style="" class="m-tabs" @tab-change="handleClick">
-      <el-tab-pane :label="$t('monitored1')" :name="0" lazy>
+      <el-tab-pane :label="$t('insidersActivity')" :name="0" lazy>
         <template v-if="botStore.evmAddress" >
           <div
             v-if="props.isLarge"
@@ -245,7 +245,7 @@ class="w-monitor bg-[--secondary-bg] w-100% h-100% pl-12px pr-6px relative overf
           </el-button>
         </AveEmpty>
       </el-tab-pane>
-      <el-tab-pane :label="$t('walletManage')" :name="1" lazy>
+      <el-tab-pane :label="$t('manage')" :name="1" lazy>
         <WalletManage v-if="botStore.evmAddress" v-bind="walletManageProps" :isLarge="props.isLarge"/>
         <AveEmpty
           v-else

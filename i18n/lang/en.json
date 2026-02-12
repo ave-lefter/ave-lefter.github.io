@@ -2013,5 +2013,7 @@
   "googleAuthNotBoundTip": "Google Authenticator not detected. To protect your account, please bind Google Authenticator before deleting wallet address.",
   "goToBind": "Go to Bind",
   "past24h": "In the past 24 hours",
-  "priceChangeZoonSetting": "Price Change Time Zone Setting"
+  "priceChangeZoonSetting": "Price Change Time Zone Setting",
+  "group": "Group",
+  "manage": "Manage"
 }

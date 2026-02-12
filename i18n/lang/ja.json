@@ -1466,5 +1466,7 @@
   "googleAuthNotBoundTip": "Google認証システムがバインドされていません。アカウントのセキュリティを保護するため、ウォレットアドレスを削除する前にGoogle認証システムをバインドしてください。",
   "goToBind": "バインドへ",
   "past24h": "過去 24 時間以内",
-  "priceChangeZoonSetting": "価格変更タイムゾーン設定"
+  "priceChangeZoonSetting": "価格変更タイムゾーン設定",
+  "group": "グループ",
+  "manage": "管理"
 }

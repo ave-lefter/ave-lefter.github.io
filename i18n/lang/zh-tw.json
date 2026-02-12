@@ -1990,5 +1990,7 @@
   "googleAuthNotBoundTip": "檢測到您尚未綁定Google驗證器。為保障帳戶安全,刪除錢包位址前,需先完成Google驗證器綁定。",
   "goToBind": "前往綁定",
   "past24h": "近24小時",
-  "priceChangeZoonSetting": "漲跌幅時區設置"
+  "priceChangeZoonSetting": "漲跌幅時區設置",
+  "group": "分組",
+  "manage": "管理"
 }
