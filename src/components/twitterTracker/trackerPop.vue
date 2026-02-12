@@ -14,26 +14,14 @@
       </div>
     </div>
     <div class="flex justify-between mb-12px items-center">
-      <div class="flex gap-16px">
+      <div class="flex items-center gap-16px">
         <span v-for="el in tabs" :key="el.value" :class="[
           'text-14px cursor-pointer',
           activeTab === el.value ? 'color-[--main-text]' : 'color-[--secondary-text]',
         ]" @click="setActiveTab(el.value)">
           {{ el.label }}
         </span>
-      </div>
-      <!-- <el-checkbox
-        v-if="botStore.accessToken && !isMine"
-        v-model="follow_only"
-        size="small"
-        class="[&.el-checkbox.el-checkbox--small]:h-16px text-12px"
-        @change="confirmQuery"
-      >
-        {{ t('onlyFollowing') }}
-      </el-checkbox> -->
-    </div>
-    <div class="flex justify-between items-center mb-14px">
-      <div class="flex items-center gap-8px color-[--secondary-text]">
+         <div class="flex items-center gap-8px color-[--secondary-text]">
         <el-popover v-model:visible="filterVisible" placement="bottom-end" trigger="click" :width="164"
           :persistent="false">
           <template #reference>
@@ -99,6 +87,7 @@
               </el-dropdown-menu>
             </template>
         </el-dropdown> -->
+      </div>
       </div>
       <el-input v-model="query.token_keyword" style="--el-input-bg-color:var(--main-list-hover);--el-input-height:26px;"
         class="w-160px" size="small" clearable :placeholder="t('searchCA')" @input="debouncedConfirmInput">

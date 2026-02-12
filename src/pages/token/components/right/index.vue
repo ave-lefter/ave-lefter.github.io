@@ -31,12 +31,12 @@
           <component :is="SwapCom" :key="walletStore.address ? 'Swap' : 'BotSwap'" />
         </div>
         <div class="p-15px pb-5px bg-[--secondary-bg] mt-1px">
-          <div
+          <!-- <div
             class="flex justify-between border-b-1px border-b-solid border-b-[--main-divider] pb-8px mb-8px text-12px"
           >
             <span class="text-12px color-[--main-text]">{{ $t('totalPair') }}</span>
             {{ formatNumber(tokenStore.token?.main_pair_tvl || 0, 1) }}
-          </div>
+          </div> -->
           <Pairs @openFilterModal="openFilterModal" />
         </div>
         <Overview class="px-15px pb-10px pr-0 bg-[--secondary-bg] mt-1px" />
@@ -82,7 +82,6 @@ const SwapCom = computed(() => {
     return BotSwap
   }
 })
-const VolumeStats = defineAsyncComponent(() => import('./volumeStats.vue'))
 const tabs: { id: '5m' | '1h' | '4h' | '24h'; name: string }[] = [
   { id: '5m', name: '5M' },
   { id: '1h', name: '1H' },

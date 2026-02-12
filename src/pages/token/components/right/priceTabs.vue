@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[--secondary-bg]">
+  <div class="bg-[--secondary-bg]" @mouseleave="mouseLeave" v-if="!volumeVisible">
     <div class="tabs pt-11px pb-10px px-15px">
     <button
       v-for="item in tabs"
@@ -15,15 +15,27 @@
     </button>
    </div>
   </div>
+  <div v-else @mouseenter="volumeVisible=false;console.log('mouseEnter')" class="bg-[--secondary-bg] py-8px px-15px">
+    <template v-for="item in tabs" :key="item.id">
+      <VolumeStats
+        v-if="modelValue === item.id"
+        :tabActive="item.id"
+        :tabActiveName="item.name"
+      />
+    </template>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { formatNumber } from '@/utils/formatNumber'
+
+const VolumeStats = defineAsyncComponent(() => import('./volumeStats.vue'))
 defineProps<{
   modelValue: string
   tabs: { id: '5m' | '1h' | '4h' | '24h'; name: string }[]
 }>()
 
+const volumeVisible = ref(true)
 const $emit = defineEmits(['update:modelValue'])
 const tokenStore = useTokenStore()
 const getColor = (id: string) => {
@@ -32,6 +44,11 @@ const getColor = (id: string) => {
   if (val > 0) return '#12B886'
   if (val < 0) return '#F6465D'
   return '#999'
+}
+const mouseLeave = () => {
+  setTimeout(() => {
+    volumeVisible.value = true
+  }, 16.7)
 }
 
 
