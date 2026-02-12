@@ -220,7 +220,6 @@ const filterTableList = computed(() => {
       }
     })
   }
-  console.log('filterTableList', tableList)
   return tableList
 })
 
@@ -1064,7 +1063,6 @@ onUnmounted(() => {
         />
       </template>
     </template>
-    {{console.log('filterTableList', tokenTxs)}}
     <!-- tableLoading:{{tableLoading}} -->
     <div
       v-loading="tableLoading" class="text-12px"
