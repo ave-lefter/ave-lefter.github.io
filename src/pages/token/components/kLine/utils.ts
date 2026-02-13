@@ -1513,7 +1513,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
             lineId: '' as EntityId
           }
           return acc
-        }, avePriceMap)
+        }, avePriceMap) || {}
       createAvgPriceLinePoll()
     }).catch((err) => {
       console.log(err)

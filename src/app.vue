@@ -31,11 +31,11 @@
     setVal: (val: GetHotTokensResponse[]) => hotTokens.value = val
   })
 
-  const route = useRoute()
+  // const route = useRoute()
 
-  const routeName = computed(() => {
-    return (route.name || '') as string
-  })
+  // const routeName = computed(() => {
+  //   return (route.name || '') as string
+  // })
 
   watch(() => useLocaleStore().locale, async (val) => {
     if (!val) return
