@@ -13,7 +13,7 @@
             @contextmenu="handleContextMenu($event, row)"
           >
             <div class="w-full relative" :class="getAnimClass(row)">
-              <div class="flex-start items-start">
+              <div class="flex-start items-start relative z-2">
                 <div class="mr-12px relative">
                   <div class="black-container">
                     <span
@@ -621,8 +621,8 @@ class="flex-start mr-8px bg-btn"
                   v-if="
                     (isSoon && row.progress > 99) || pumpSetting?.define?.some((i) => i === 'mcap')
                   "
-                  class="flex-end text-12px pr-12px"
-                  :class="pumpSetting.fontSize_mc =='12px'? 'mb-6px' : 'mb-6px'"
+                  class="flex-end text-12px pr-12px mb-10px"
+                  :class="pumpSetting.fontSize_mc =='12px'? 'mb-11px' : 'mb-11px'"
                 >
                   <template v-if="isSoon && row.progress >= 99.99">
                     <el-image
@@ -806,6 +806,7 @@ import DevPop from './devPop/index.vue'
 import PumpPop from './pumpPop/index.vue'
 import HolderRank from './holderRank/index.vue'
 import { useSimilarTokenPopup } from '../utils'
+import { windowEndpoint } from 'comlink'
 
 const props = defineProps({
   tableList: {
