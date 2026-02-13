@@ -716,6 +716,7 @@ class="flex-start mr-8px bg-btn"
       </span>
     </transition>
     <el-popover
+      v-if="showPopSearch"
       v-model:visible="showPopSearch"
       :virtual-ref="$refs.currentBtnRef[currentIndex]"
       virtual-triggering
@@ -845,10 +846,10 @@ onDeactivated(() => {
 onUnmounted(() => {
   $tooltip?.hide?.()
   similarHide?.()
-  Object.keys($refs.value.currentBtnRef).forEach((key) => {
-    delete $refs.value.currentBtnRef[key]
-  })
-  $refs.value.currentBtnRef = {}
+  // Object.keys($refs.value.currentBtnRef).forEach((key) => {
+  //   delete $refs.value.currentBtnRef[key]
+  // })
+  // $refs.value.currentBtnRef = {}
 })
 
 function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: string }) {
@@ -863,6 +864,13 @@ function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: st
 }
 
 function tableRowClick(row: { target_token: string; chain: string }) {
+    if ($tooltip) {
+    $tooltip.hide?.()
+    $tooltip.destroy?.()
+  }
+  similarHide?.()
+  showPopSearch.value = false
+
   router.push({
     name: 'token-id',
     params: { id: row.target_token + '-' + row.chain },
