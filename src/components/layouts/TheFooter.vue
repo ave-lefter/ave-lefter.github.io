@@ -48,8 +48,8 @@
             class="group flex items-center cursor-pointer ml-12px relative"
           >
             <div class="relative w-44px h-24px flex-shrink-0 flex items-center justify-center">
-              <img :src="navIcon" alt="market nav" class="w-full h-full object-contain absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity">
-              <img :src="navHoverIcon" alt="market nav hover" class="w-full h-full object-contain absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+              <img :src="marketNavIcon" alt="market nav" class="w-full h-full object-contain absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity">
+              <img :src="marketNavHoverIcon" alt="market nav hover" class="w-full h-full object-contain absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
             </div>
           </div>
         </template>
@@ -188,6 +188,8 @@ import bscIcon from '@/assets/icons/footer/bsc.svg?url'
 import solIcon from '@/assets/icons/footer/sol.svg?url'
 import navIcon from '@/assets/icons/footer/nav.svg?url'
 import navHoverIcon from '@/assets/icons/footer/nav-hover.svg?url'
+import navWhiteIcon from '@/assets/icons/footer/nav-white.svg?url'
+import navWhiteHoverIcon from '@/assets/icons/footer/nav-white-hover.svg?url'
 import { TokenImg, QuickSwap } from '#components'
 // import QuickSwap from '../quickSwapTsx.vue'
 
@@ -195,6 +197,7 @@ const { t } = useI18n()
 const { visible, hasRing } = storeToRefs(useMonitorStore())
 const signalStore = useSignalStore()
 const trackerStore = useTwitterTrackerStore()
+const themeStore = useThemeStore()
 const globalStore = useGlobalStore()
 const botStore = useBotStore()
 const dragPumpStore = usePumpStore()
@@ -204,6 +207,10 @@ const { lang } = storeToRefs(globalStore)
 const isEn = computed(() => {
   return lang.value === 'en'
 })
+
+// 市场导航图标：深色主题用 nav，白色主题用 nav-white
+const marketNavIcon = computed(() => (themeStore.isDark ? navIcon : navWhiteIcon))
+const marketNavHoverIcon = computed(() => (themeStore.isDark ? navHoverIcon : navWhiteHoverIcon))
 
 // 获取pump配置
 const pumpConfig = computed(() => dragPumpStore.pumpConfig)
