@@ -304,14 +304,12 @@ function visibilitychangeFn() {
 }
 
 onBeforeMount(() => {
-    console.log('----------2222222------')
   init()
   subscribePortrait()
   document.addEventListener('visibilitychange', visibilitychangeFn)
 })
 
 onUnmounted(() => {
-  console.log('----------11111111-------')
   tokenStore?.reset?.()
   wsStore.clearTokenRelatedResult?.()
   // 确保移除可能遗留的 WS 回调与可见性监听，防止内存泄漏
@@ -332,7 +330,6 @@ onUnmounted(() => {
 })
 
 onBeforeRouteLeave(() => {
-   console.log('----------33333333------')
   wsStore.getWSInstance()?.offMessage(['tx_update_token', 'kline', 'price'])
   document.removeEventListener('visibilitychange', visibilitychangeFn)
 })
