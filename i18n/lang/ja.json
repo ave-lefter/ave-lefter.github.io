@@ -1464,5 +1464,10 @@
   "monitored1": "Wallet Activity",
   "availableLiquidity": "利用可能な流動性",
   "googleAuthNotBoundTip": "Google認証システムがバインドされていません。アカウントのセキュリティを保護するため、ウォレットアドレスを削除する前にGoogle認証システムをバインドしてください。",
-  "goToBind": "バインドへ"
+  "goToBind": "バインドへ",
+  "past24h": "過去 24 時間以内",
+  "priceChangeZoonSetting": "価格変更タイムゾーン設定",
+  "group": "グループ",
+  "manage": "管理",
+  "priceChangeZoonSettingTip": "<div>24 時間制: 価格の増減は、昨日の同時刻の価格と比較して、24 時間ローリング ベースで計算されます。<br/>\n0:00 (UTC 8 00:00): 価格の増減は北京時間 0:00 の始値に基づいて計算されます</div>"
 }

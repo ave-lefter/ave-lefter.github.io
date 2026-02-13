@@ -52,7 +52,7 @@
             </div>
          </template>
          <template #header-group>
-            <span>{{ $t('addrGroup') }}</span>
+            <span>{{ $t('group') }}</span>
           </template>
           <template #cell-group="{ row }">
              <el-select v-model="row.group_id" size="small" :suffix-icon="SuffixIcon" :persistent="false" filterable popper-class="w-addrGroup" class="[&&]:[--el-text-color-regular:--main-text] [&&]:[--el-fill-color-blank:--dialog-list-hover]" @click.stop @change="(val) => getRowGroupChange(val, row)">
