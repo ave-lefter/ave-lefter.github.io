@@ -549,12 +549,15 @@ export function useTop100AvgPriceLine(getWidget: () => IChartingLibraryWidget | 
   const tokenStore = useTokenStore()
   watch(() => tokenStore.token?.token, async () => {
     if (!tokenStore.token?.token) return
-    const res = await _getHoldersList({
+    _getHoldersList({
       token_id: tokenStore.token?.token + '-' + tokenStore.token?.chain
+    }).then(res => {
+      avePriceCache.buyAvgPrice = res.aggregateStats?.top100PurchaseAvg
+      avePriceCache.sellAvgPrice = res.aggregateStats?.top100SellAvg
+      createAvgPriceLinePoll(avePriceCache.buyAvgPrice, avePriceCache.sellAvgPrice)
+    }).catch((err) => {
+      console.log(err)
     })
-    avePriceCache.buyAvgPrice = res.aggregateStats?.top100PurchaseAvg
-    avePriceCache.sellAvgPrice = res.aggregateStats?.top100SellAvg
-    createAvgPriceLinePoll(avePriceCache.buyAvgPrice, avePriceCache.sellAvgPrice)
   }, { immediate: true })
 
   function sleep(ms: number) {
@@ -875,10 +878,10 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
           disableUndo: true,
           text: getSwapTypeLabel(item.swapType as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 12 | 13 | 14) || t('limitSell1'),
           overrides: {
-            linecolor: '#FF6838',  // 线的颜色
+            linecolor: '#FFBE3C',  // 线的颜色
             linewidth: 1,          // 线的粗细
             linestyle: 2,     // 线的样式：0表示实线，1表示虚线 2 长虚线
-            textcolor: '#FF6838',
+            textcolor: '#FFBE3C',
             showLabel: true,
             horzLabelsAlign: 'right',
             vertLabelsAlign: 'bottom',
@@ -891,7 +894,7 @@ export function useBotLimitLine(getWidget: () => IChartingLibraryWidget | null, 
       const line = chart?.getShapeById?.(priceLimitLineId)
       if (!line) return
       // line?.setProperties?.({
-      //   textcolor: '#FF6838',
+      //   textcolor: '#FFBE3C',
       //   showLabel: true,
       //   horzLabelsAlign: 'right',
       //   vertLabelsAlign: 'bottom',
@@ -1351,6 +1354,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (!visibleRange?.from || !visibleRange?.to) return
     const spacing = getWidget()?.activeChart?.().getTimeScale?.().barSpacing?.()
     const timeFrom = getStartTime(visibleRange.to, spacing ? 240/spacing : undefined)
+    if (!avePriceMap) return
     Object.values(avePriceMap).forEach(item => {
       if (!item.lineId) return
       const line = chart.getShapeById?.(item.lineId)
@@ -1392,6 +1396,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (!range?.from || !range?.to) return
     const spacing = getWidget()?.activeChart?.().getTimeScale?.().barSpacing?.()
     const timeFrom = getStartTime(range.to,spacing ? 240/spacing : undefined)
+    if (!avePriceMap) return
     Object.values(avePriceMap).forEach(async item => {
       let price = item.value
       if (showMarket.value) {
@@ -1494,23 +1499,25 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
   const tokenStore = useTokenStore()
   watch(() => tokenStore.token?.token, async () => {
     if (!tokenStore.token?.token) return
-    const res = await _getHoldersList({
+    _getHoldersList({
       token_id: tokenStore.token?.token + '-' + tokenStore.token?.chain,
       tag_type: KOL_KEY
+    }).then(res => {
+      avePriceMap = res.holderStats?.filter?.(el => {
+        return (el.avg_purchase_price || el.avg_sale_price) && el.balance_ratio > 0.003
+      })?.reduce?.((acc, cur) => {
+          acc[cur.holder] = {
+            name: cur.wallet_logo.name || cur.holder.slice(0, 4) + '...' + cur.holder.slice(-4),
+            value: cur.avg_purchase_price,
+            balance_ratio: cur.balance_ratio ?? 0,
+            lineId: '' as EntityId
+          }
+          return acc
+        }, avePriceMap)
+      createAvgPriceLinePoll()
+    }).catch((err) => {
+      console.log(err)
     })
-    avePriceMap = res.holderStats?.filter?.(el => {
-      return (el.avg_purchase_price || el.avg_sale_price) && el.balance_ratio > 0.003
-    })
-      ?.reduce?.((acc, cur) => {
-        acc[cur.holder] = {
-          name: cur.wallet_logo.name || cur.holder.slice(0, 4) + '...' + cur.holder.slice(-4),
-          value: cur.avg_purchase_price,
-          balance_ratio: cur.balance_ratio ?? 0,
-          lineId: '' as EntityId
-        }
-        return acc
-      }, avePriceMap)
-    createAvgPriceLinePoll()
   }, { immediate: true })
 
   const resetKOLLine = () => {
@@ -1519,7 +1526,7 @@ export function useKOLAvgPriceLine(getWidget: () => IChartingLibraryWidget | nul
     if (!_widget) return
     const chart = _widget?.activeChart?.()
     if (!chart) return
-
+    if (!avePriceMap) return
     Object.values(avePriceMap).forEach(item => {
       if (item.lineId) {
         chart?.removeEntity?.(item.lineId)

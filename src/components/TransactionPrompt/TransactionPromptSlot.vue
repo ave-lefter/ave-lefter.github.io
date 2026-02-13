@@ -133,7 +133,7 @@ function formatAmount(val: string | number | undefined): string {
   line-height: 1.4;
   border-radius: 12px;
   border: 1px solid var(--main-divider, #1F242C);
-  background: var(--main-bg, #1F242C);
+  background: var(--notification-bg, #222222);
   backdrop-filter: blur(6px);
   color: var(--main-text, #fff);
 

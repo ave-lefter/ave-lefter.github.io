@@ -187,35 +187,27 @@
                               : '#12B886',
                         }"
                       >
-                        <template v-if="!(row?.created_at || row?.time)"> - </template>
-                        <template
-                          v-else-if="Number(formatTimeFromNow(row?.created_at || row?.time, true)) >= 60"
-                        >
-                          {{
-                            formatCountdown(
-                              Number(row?.created_at) * 1000 || Number(row?.time) * 1000,
-                              false
-                            )
-                          }}
-                        </template>
-                        <TimerCount
-                          v-else-if="
-                            (row?.created_at || row?.time) &&
-                            Number(formatTimeFromNow(row?.created_at || row?.time, true)) < 60
-                          "
-                          :key="`${row.created_at}`"
-                          :timestamp="row.created_at"
-                          :end-time="60"
-                        >
-                          <template #default="{ seconds }">
-                            <span class="color-#FFA622">
-                              <template v-if="seconds < 60"> {{ seconds }}s </template>
-                              <template v-else>
-                                {{ formatTimeFromNow(row.created_at) }}
-                              </template>
-                            </span>
+                          <TimerCount
+                            v-if="row?.created_at || row?.time"
+                            :key="row.pair + '-' + row.chain"
+                            :timestamp="row.created_at || row.time"
+                            :end-time="60"
+                          >
+                            <template #default="{ seconds }">
+                              <span>
+                                <span v-if="seconds < 60"  class="color-#FFA622">
+                                  {{ seconds }}s
+                                </span>
+                                <template v-else>
+                                  {{ formatTimeFromNow(row.created_at || row.time) }}
+                                </template>
+                              </span>
+                            </template>
+                          </TimerCount>
+
+                          <template v-else>
+                            -
                           </template>
-                        </TimerCount>
                       </div>
                       <img
                         v-if="row.baseToken"
@@ -701,6 +693,7 @@ class="flex-start mr-8px bg-btn"
                   <QuickSwap
                     v-if="parseInt(pumpSetting?.size_swap|| '0') > 0"
                     :quickBuyValue="quickBuyValue"
+                    :swapSetSelected="props.swapSetSelected"
                     :row="row"
                     classNames="bg-[--up-color] color-#fff"
                     :size="pumpSetting.size_swap"
@@ -723,6 +716,7 @@ class="flex-start mr-8px bg-btn"
       </span>
     </transition>
     <el-popover
+      v-if="showPopSearch"
       v-model:visible="showPopSearch"
       :virtual-ref="$refs.currentBtnRef[currentIndex]"
       virtual-triggering
@@ -778,6 +772,10 @@ const props = defineProps({
   quickBuyValue: {
     type: String,
     default: () => '',
+  },
+  swapSetSelected: {
+    type: String as PropType<'s1' | 's2' | 's3'>,
+    default: '',
   },
   loading: {
     type: Boolean,
@@ -837,7 +835,7 @@ const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(tableLis
   itemHeight: 110.8,
   // 必须增加过采样，否则 translateY(-20px) 向上移动时，
   // 顶部刚进入视口的节点会因为高度计算没到视口而无法渲染，导致动画“闪现”
-  overscan: 5,
+  overscan: 20,
 })
 
 onDeactivated(() => {
@@ -848,10 +846,10 @@ onDeactivated(() => {
 onUnmounted(() => {
   $tooltip?.hide?.()
   similarHide?.()
-  Object.keys($refs.value.currentBtnRef).forEach((key) => {
-    delete $refs.value.currentBtnRef[key]
-  })
-  $refs.value.currentBtnRef = {}
+  // Object.keys($refs.value.currentBtnRef).forEach((key) => {
+  //   delete $refs.value.currentBtnRef[key]
+  // })
+  // $refs.value.currentBtnRef = {}
 })
 
 function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: string }) {
@@ -866,6 +864,13 @@ function handleContextMenu(e: MouseEvent, row: { target_token: string; chain: st
 }
 
 function tableRowClick(row: { target_token: string; chain: string }) {
+    if ($tooltip) {
+    $tooltip.hide?.()
+    $tooltip.destroy?.()
+  }
+  similarHide?.()
+  showPopSearch.value = false
+
   router.push({
     name: 'token-id',
     params: { id: row.target_token + '-' + row.chain },

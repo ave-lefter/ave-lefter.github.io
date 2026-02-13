@@ -16,17 +16,18 @@
         </a>
       </li>
     </ul> -->
-     <ul class="menu ml-20px">
-      <li v-for="(item, $index) in list" :key="$index">
-       <NuxtLink class="relative" :to="item.src" :target="item.target" :class="{ active: routeName?.indexOf(item.id) > -1 }">
-        <Icon  v-if="item.id == 'index'" name="custom:new1" class="absolute text-8px right--8px top-0px"/>
-        {{item.name }}
-      </NuxtLink>
-      </li>
-    </ul>
+    <div class="no-scrollbar overflow-x-auto">
+      <div class="menu ml-20px min-w-320px">
+        <NuxtLink v-for="(item, $index) in list" :key="$index" class="relative break-keep" :to="item.src" :target="item.target" :class="{ active: routeName?.includes(item.id)}">
+          <Icon v-if="item.id == 'index'" name="custom:new1" class="absolute text-8px right--8px top-0px z-2"/>
+          {{item.name }}
+        </NuxtLink>
+      </div>
+    </div>
+
     <div class="flex-1" />
     <a
-      class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px w-320px flex items-center no-underline"
+      class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px w-280px flex items-center no-underline"
       href=""
       @click.stop.prevent="showDialog"
     >
@@ -40,7 +41,7 @@
     </a>
     <div class="flex-1" />
     <div
-    class="ml-10px bg-[--main-input-button-bg] rounded-4px p-8px h-32px flex items-center text-14px cursor-pointer hover:opacity-80"
+    class="ml-8px bg-[--main-input-button-bg] rounded-4px p-8px h-32px flex items-center text-12px cursor-pointer hover:opacity-80"
       @click="toReferrer"
     >
       <img v-show="showAnimation" src="@/assets/images/refer.gif" height="20" alt="">
@@ -50,7 +51,7 @@
     <ClipboardToken />
     <el-button
       v-if="!botStore.evmAddress && !walletStore.address"
-      class="ml-10px bg-[--main-input-button-bg] rounded-4px text-[--main-text]!  btn"
+      class="ml-8px! bg-[--main-input-button-bg] rounded-4px text-[--main-text]!  btn text-12px!"
       @click="openConnect"
     >
       {{ $t('connectWallet') }}
@@ -76,8 +77,8 @@
     </template>
 
     <el-popover
-v-model:visible="appDownloadVisible"
-:persistent="false"
+      v-model:visible="appDownloadVisible"
+      :persistent="false"
       placement="bottom-end"
       :width="350"
       trigger="click"
@@ -85,7 +86,7 @@ v-model:visible="appDownloadVisible"
     >
       <template #reference>
         <el-button
-          class="bg-[--main-input-button-bg] border-0! ml-10px  rounded-4px text-[--main-text]! cursor-pointer btn">
+          class="bg-[--main-input-button-bg] border-0! ml-8px!  rounded-4px text-[--main-text]! cursor-pointer btn text-12px!">
           <span>APP</span>
         </el-button>
       </template>
@@ -154,7 +155,7 @@ v-model:visible="appDownloadVisible"
     <el-popover :persistent="false" trigger="click" placement="bottom-end">
       <template #reference>
         <div
-          class="bg-[--main-input-button-bg] rounded-4px p-8px ml-8px h-32px flex items-center cursor-pointer hover:opacity-80"
+          class="bg-[--main-input-button-bg] rounded-4px p-8px px-10px ml-8px h-32px flex items-center cursor-pointer hover:opacity-80"
         >
           <Icon
             class="text-16px color-[--secondary-text]"
@@ -299,7 +300,7 @@ const openPasteAddress = useStorage('openPasteAddress', true, localStorage)
 const openPasteText = useStorage('openPasteText', false, localStorage)
 
 const routeName = computed(() => {
-  return route.name || ''
+  return (route.name || '') as string
 })
 
 const list = computed(() => {
@@ -390,9 +391,9 @@ async function showDialog() {
 </script>
 <style lang="scss" scoped>
 header {
-  ul {
+  div {
     display: flex;
-    li a {
+    a {
       font-weight: 500;
       font-size: 14px;
       line-height: 20px;
@@ -401,7 +402,7 @@ header {
       padding: 4px 8px;
       border-radius: 8px;
       color: var(--main-text);
-      margin-right: 8px;
+      // margin-right: 8px;
       text-decoration: none;
 
       &.active {
@@ -419,4 +420,9 @@ header {
     }
   }
 }
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
 </style>

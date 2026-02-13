@@ -6,7 +6,7 @@ import { useBotStore } from './bot'
 import type { BotSettingKey } from '~/utils/types'
 
 export const useBotSettingStore = defineStore('botSetting', () => {
-   const defaultSettings = {
+  const defaultSettings = {
     mev: false,
     gas: [
       {
@@ -24,8 +24,8 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     ],
     slippage: '9',
     autoSell: false,
-    buyValueList: ['0.1', '0.5', '1', '5'],
-    sellPerList: ['25', '50', '75', '100'],
+    buyValueList: ['0.01', '0.02', '0.5', '1', '0.1', '0.25', '2', '5'],
+    sellPerList: ['25', '50', '75', '100', '0', '0', '0', '0'],
     isAutoSellConfig: false,
     isAutoSellConfig1: false,
     isAutoSellConfig2: false,
@@ -33,7 +33,6 @@ export const useBotSettingStore = defineStore('botSetting', () => {
     isAutoSellConfig4: false,
     isAutoSellConfig5: false,
     isAutoSellConfig6: false,
-
   }
   const chains = useBotStore().isSupportChains
   type Setting = typeof defaultSettings
@@ -56,13 +55,12 @@ export const useBotSettingStore = defineStore('botSetting', () => {
         s3: Setting
       }
     }
-  } = {
-  }
+  } = {}
   chains.forEach(chain => {
     const s = { ...defaultSettings }
-    if (chain === 'base') {
-      s.buyValueList = ['0.01', '0.02', '0.5', '1']
-    }
+    // if (chain === 'base') {
+    //   s.buyValueList = ['0.01', '0.02', '0.5', '1']
+    // }
     settings[chain] = {
       selected: 's1',
       s1: s,
@@ -82,7 +80,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
       },
     }
   })
-  const botSettings = useLocalStorage('bot_settings_v3', settings, { mergeDefaults: (storageValue, defaults) => deepMerge(defaults, storageValue) })
+  const botSettings = useLocalStorage('bot_settings_v4', settings, { mergeDefaults: (storageValue, defaults) => deepMerge(defaults, storageValue) })
   chains.forEach(chain => {
     if (botSettings.value[chain]) {
       const settings = botSettings.value[chain]
@@ -93,6 +91,17 @@ export const useBotSettingStore = defineStore('botSetting', () => {
           s2: settings.s2,
           s3: settings.s3,
         }
+      } else {
+        // 兼容旧数据
+        const buySettings = botSettings.value[chain].buy!;
+        (['s1', 's2', 's3'] as BotSettingKey[]).forEach(sKey => {
+          if (buySettings?.[sKey]?.buyValueList?.length === 4) {
+            buySettings[sKey].buyValueList.push('0.1', '0.25', '2', '5')
+          }
+          if (buySettings?.[sKey]?.buyValueList?.length > 8) {
+            buySettings[sKey].buyValueList = defaultSettings.buyValueList
+          }
+        })
       }
       if (!botSettings.value[chain].sell) {
         botSettings.value[chain].sell = {
@@ -101,6 +110,14 @@ export const useBotSettingStore = defineStore('botSetting', () => {
           s2: settings.s2,
           s3: settings.s3,
         }
+      } else {
+        // 兼容旧数据
+        const sellSettings = botSettings.value[chain].sell!;
+        (['s1', 's2', 's3'] as BotSettingKey[]).forEach(sKey => {
+          if (sellSettings?.[sKey]?.sellPerList?.length === 4) {
+           sellSettings[sKey].sellPerList.push('', '', '', '')
+          }
+        })
       }
     }
   })
@@ -305,7 +322,7 @@ export const useBotSettingStore = defineStore('botSetting', () => {
       autoSellConfigCurrent = autoSellConfig6.value
     }
     return autoSellConfigCurrent
-  } 
+  }
 
   const selectedAutoSellConfig = computed(getAutoSellConfigCurrent)
 

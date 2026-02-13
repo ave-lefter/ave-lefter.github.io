@@ -13,7 +13,7 @@
             style="
               width: 24px;
               height: 24px;
-              border-radius: 4px;
+              border-radius: 50%;
             "
             :class="{'opacity-30': item.chain !== activeChain}"
             :src="`${token_logo_url}chain/${item.chain}.png`"
@@ -87,16 +87,16 @@
       <div class="flex-1" />
       <Setting :chain="activeChain" :pumpConfig="pumpConfig"/>
       <BlackList />
-      <QuickSwapSet
+      <!-- <QuickSwapSet
         v-model:quickBuyValue="quickBuyValue"
         :chain="activeChain"
         :settingsButtonVisible="true"
         class="mr-12px"
-      />
-      <AutoSellSetting :chain="activeChain" />
-
+      /> -->
+      <SlippageSetMarket class="mr-10px ml-auto" :chain="activeChain" @mousedown.stop />
+      <AutoSellSetting :chain="activeChain" root-class="mr-0"/>
     </div>
-    <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full px-16px">
+    <el-row type="flex" :gutter="pumpSetting.isGutter ? 10 : 2" class="w-full pl-16px" :class="pumpSetting.isGutter? 'pr-6px': 'pr-14px'">
       <el-col v-show="single('new') && pumpSetting.grid['new']?.show" :span="getSpan()" :style="{order: orderNew}">
         <div class="pump-item  rounded-4px" style="padding-top: 15px;">
           <div class="pump-item_header flex-start px-12px">
@@ -146,10 +146,17 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <QuickSwapSetCustom
+              v-model:quickBuyValue="quickBuyValue1"
+              v-model:customSelected="swapSetSelected1"
+              :chain="activeChain"
+              class="mr-8px"
+            />
             <AudioSelect activeTab="new" :chain="activeChain"/>
             <PumpFilter
               :key="`pumpFilter_${activeChain}_new`"
               :storage="`pumpFilter_${activeChain}_new`"
+              hideReferenceText
               @update:filterData="handlerFilterConfirm"
             />
           </div>
@@ -159,7 +166,8 @@
             :scrollHeight="scrollHeight"
             type="new"
             :tableList="list1 || []"
-            :quickBuyValue="quickBuyValue"
+            :quickBuyValue="quickBuyValue1"
+            :swapSetSelected="swapSetSelected1"
             :loading="pumpV3[activeChain]['new']['loading']"
             @mouseover="isPausedObj.new = true"
             @mouseleave="isPausedObj.new = false"
@@ -215,10 +223,17 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <QuickSwapSetCustom
+              v-model:quickBuyValue="quickBuyValue2"
+              v-model:customSelected="swapSetSelected2"
+              :chain="activeChain"
+              class="mr-8px"
+            />
             <AudioSelect activeTab="soon" :chain="activeChain"/>
             <PumpFilter
               :key="`pumpFilter_${activeChain}_soon`"
               :storage="`pumpFilter_${activeChain}_soon`"
+              hideReferenceText
               @update:filterData="handlerFilterConfirm"
             />
           </div>
@@ -227,7 +242,8 @@
             :scrollHeight="scrollHeight"
             type="soon"
             :tableList="list2 || []"
-            :quickBuyValue="quickBuyValue"
+            :quickBuyValue="quickBuyValue2"
+            :swapSetSelected="swapSetSelected2"
             :loading="pumpV3[activeChain]['soon']['loading']"
             isSoon
             @mouseover="isPausedObj.soon = true"
@@ -285,10 +301,17 @@
               <Icon name="custom:stop" class="color-#FFA622 text-16px"/>
             </span>
             <span class="flex-1" />
+            <QuickSwapSetCustom
+              v-model:quickBuyValue="quickBuyValue3"
+              v-model:customSelected="swapSetSelected3"
+              :chain="activeChain"
+              class="mr-8px"
+            />
             <AudioSelect activeTab="graduated" :chain="activeChain"/>
             <PumpFilter
               :key="`pumpFilter_${activeChain}_graduated`"
               :storage="`pumpFilter_${activeChain}_graduated`"
+              hideReferenceText
               @update:filterData="handlerFilterConfirm"
             />
           </div>
@@ -297,7 +320,8 @@
             :scrollHeight="scrollHeight"
             :tableList="list3 || []"
             type="graduated"
-            :quickBuyValue="quickBuyValue"
+            :quickBuyValue="quickBuyValue3"
+            :swapSetSelected="swapSetSelected3"
             :loading="pumpV3[activeChain]['graduated']['loading']"
             isOut
             @mouseover="isPausedObj.graduated = true"
@@ -317,7 +341,6 @@
 
 <script setup lang="ts">
 import { useStorage, useWindowSize, useThrottleFn, useDocumentVisibility } from '@vueuse/core'
-import QuickSwapSet from '@/components/quickSwap/quickSwapSet.vue'
 import PumpList from './pump/components/pumpList.vue'
 import Setting from './pump/components/setting.vue'
 import BlackList from './pump/components/blackList.vue'
@@ -333,6 +356,8 @@ import type {
 import { isEqual, throttle } from 'lodash-es'
 import AutoSellSetting from '@/components/autoSellSetting/index.vue'
 import AudioSelect from './pump/components/audioSelect.vue'
+import SlippageSetMarket from './token/components/right/botSwap/slippageSetMarket.vue'
+import QuickSwapSetCustom from '@/components/quickSwap/quickSwapSetCustom.vue'
 defineOptions({
   name: 'pump' // 显式命名
 })
@@ -358,6 +383,12 @@ let isInitObj = {
   graduated: true
 }
 const quickBuyValue = useStorage('quickBuyValue', '0.01')
+const quickBuyValue1 = useStorage('quickBuyValue1', '0.01')
+const quickBuyValue2 = useStorage('quickBuyValue2', '0.01')
+const quickBuyValue3 = useStorage('quickBuyValue3', '0.01')
+const swapSetSelected1 = useStorage<BotSettingKey>('swapSetSelected1', 's1')
+const swapSetSelected2 = useStorage<BotSettingKey>('swapSetSelected2', 's1')
+const swapSetSelected3 = useStorage<BotSettingKey>('swapSetSelected3', 's1')
 const activeChain = useStorage<ChainKey>(
   'pump_activeChain2',
   'bsc',
@@ -549,8 +580,18 @@ const list1 = computed(() => {
             }
           : {}
         ),
-        name: obj.name,
-        symbol: obj.symbol,
+        ...(obj.name
+          ? {
+              name: obj.name
+            }
+          : {}
+        ),
+        ...(obj.symbol
+          ? {
+              symbol: obj.symbol
+            }
+          : {}
+        ),
         ...(obj.appendix
           ? {
               medias: getMedias(obj.appendix),
@@ -620,8 +661,18 @@ const list2 = computed(() => {
               }
             : {}
           ),
-          name: obj.name,
-          symbol: obj.symbol,
+          ...(obj.name
+            ? {
+                name: obj.name
+              }
+            : {}
+          ),
+          ...(obj.symbol
+            ? {
+                symbol: obj.symbol
+              }
+            : {}
+          ),
           ...(obj.appendix
             ? {
                 medias: getMedias(obj.appendix),
@@ -699,8 +750,18 @@ if (pumpSetting.value.isBlacklist && pumpBlackList.value?.length > 0) {
             }
           : {}
         ),
-        name: obj.name,
-        symbol: obj.symbol,
+        ...(obj.name
+          ? {
+              name: obj.name
+            }
+          : {}
+        ),
+        ...(obj.symbol
+          ? {
+              symbol: obj.symbol
+            }
+          : {}
+        ),
         ...(obj.appendix
           ? {
               medias: getMedias(obj.appendix),
@@ -850,7 +911,7 @@ const flushPumpState = useThrottleFn(() => {
   wsUpdateTableList(pumpStateBuffer)
   subscribePortrait(pumpStateBuffer)
   pumpStateBuffer.length = 0
-}, 150)
+}, 100)
 
 // 保存 watch 监听器的 unwatch 函数，用于组件卸载时清理
 let watchPumpStateUnwatch: (() => void) | null = null
@@ -957,7 +1018,7 @@ const getChangedValue = (A: string[], B: string[]): string | null => {
 
 let isLeave = true
 
-onActivated(() => {
+onMounted(() => {
   bindAudioCanPlay()
   isLeave = false
   wsTableListCache = {}
@@ -986,7 +1047,7 @@ onActivated(() => {
   }
 })
 
-onDeactivated(()=>{
+onUnmounted(()=>{
   // 清理 watch 监听器，防止内存泄漏
   // watchPumpStateUnwatch?.()
   // watchTokenUpdatedUnwatch?.()
@@ -1563,12 +1624,18 @@ function mergeStatisticsList(
     if (!obj) {
       if (i.chain == 'bsc' || i.chain == 'solana') {
         if (i.amm === 'flapswap') {
-          i.market_cap = i.market_cap || 4900
+          i.market_cap = 1000000000 * i.current_price_usd || i.market_cap || 4900
         } else {
-          i.market_cap =  i.market_cap || 0
+          i.market_cap = 1000000000 * i.current_price_usd || i.market_cap || 0
         }
       } else if (i.chain == 'base') {
-          i.market_cap = i.market_cap || 22500
+        if (i.platform == 'clanker' || i.platform_id == 'clanker') {
+          i.market_cap = 100000000000 * i.current_price_usd || i.market_cap || 22500
+        } else if (i.platform == 'bankr' || i.platform_id == 'bankr') {
+          i.market_cap = 100000000000 * i.current_price_usd || i.market_cap || 0
+        } else {
+          i.market_cap = 1000000000 * i.current_price_usd || i.market_cap || 0
+        }
       } else {
           i.market_cap =  i.market_cap
       }
@@ -1612,7 +1679,13 @@ function mergeStatisticsList(
         next.market_cap = Number(next.total) * next.current_price_usd || 1000000000 * next.current_price_usd || next.market_cap || 0
       }
     } else if (next.chain == 'base') {
-       next.market_cap = Number(next.total) * next.current_price_usd || 100000000000 * next.current_price_usd || next.market_cap || 22500
+      if (next.platform == 'clanker' || next.platform_id == 'clanker') {
+        next.market_cap = Number(next.total) * next.current_price_usd || 100000000000 * next.current_price_usd || next.market_cap || 22500
+      } else if (next.platform == 'bankr' || next.platform_id == 'bankr') {
+        next.market_cap = Number(next.total) * next.current_price_usd || 100000000000 * next.current_price_usd || next.market_cap || 0
+      } else {
+        next.market_cap = Number(next.total) * next.current_price_usd || 1000000000 * next.current_price_usd || next.market_cap || 0
+      }
     } else {
       next.market_cap = Number(next.total) * next.current_price_usd || next.market_cap
     }
@@ -1807,7 +1880,7 @@ function mergeLogo(prev: any, next: any) {
   color: var(--main-text);
 }
 .pump-item{
-  background: var(--secondary-bg);
+  background: var(--main-bg);
   border: 1px solid var(--main-input-button-bg);
   border-radius: 4px;
 }

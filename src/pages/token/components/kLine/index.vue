@@ -252,7 +252,7 @@ const totalHolders = computed(() => [
     name: 'KOL',
   },
 ])
-const linesChecked = useLocalStorage('tv_markLines', {
+const linesChecked = useLocalStorage('tv_markLines1', {
   buy: {
     checked: true,
     color: '#12B886',
@@ -271,7 +271,7 @@ const linesChecked = useLocalStorage('tv_markLines', {
   },
   kol: {
     checked: false,
-    color: '#424ADF',
+    color: '#9CA1A8',
   },
 })
 const colorPickerVisible = ref({} as Record<string, boolean>)
@@ -359,13 +359,13 @@ watch(
 
 function switchTokenKline() {
   isReadyLine = false
-  resetLimitPriceLineId()
-  // resetAvgPriceLineId()
-  resetTop100AvgPriceLineId()
-  resetBotAvgLineId()
-  resetKOLLine()
   const val = pair.value
   if (isReady.value && route.name === 'token-id') {
+    resetLimitPriceLineId()
+    // resetAvgPriceLineId()
+    resetTop100AvgPriceLineId()
+    resetBotAvgLineId()
+    resetKOLLine()
     const isSupportSecChains = (chain.value && supportSecChains.includes(chain.value)) || false
     const QUICK_KEY = 'tradingview.IntervalWidget.quicks'
     const preResolutions = localStorage.getItem(QUICK_KEY)
@@ -655,6 +655,8 @@ async function initChart() {
       'header_settings',
       'header_saveload',
       'timeframes_toolbar',
+      'symbol_search_hot_key',
+      'show_interval_dialog_on_key_press'
     ],
     enabled_features: [
       'request_only_visible_range_on_reset',

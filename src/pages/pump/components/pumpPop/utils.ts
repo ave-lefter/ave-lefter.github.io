@@ -16,13 +16,9 @@ export function useXPopup() {
     info: null,
     loading: false
   })
-
-  watch(
-    () => router.currentRoute.value.fullPath,
-    () => {
-      $tooltip.hide()
-    }
-  )
+  onBeforeRouteLeave(() => {
+    $tooltip.hide()
+  })
   function onEnter(tokenId: string, e: { target: any }, type?: 1 | 2 | 3, isGetData = true) {
     if (isGetData) {
       getXData(tokenId, type)
