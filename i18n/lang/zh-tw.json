@@ -1992,5 +1992,17 @@
   "availableLiquidity": "可用流動性",
   "poolPair": "交易對",
   "googleAuthNotBoundTip": "檢測到您尚未綁定Google驗證器。為保障帳戶安全,刪除錢包位址前,需先完成Google驗證器綁定。",
-  "goToBind": "前往綁定"
+  "goToBind": "前往綁定",
+  "rememberMe": "記住我",
+  "last": "最新",
+  "index": "指數",
+  "leverage": "杠杆",
+  "profit6": "收益",
+  "openPrice2": "开仓价格",
+  "closePrice2": "平仓价格",
+  "orderPnl": "订单盈亏",
+  "realPnl": "实际盈亏",
+  "remeberMeTips": "僅當您使用自己的安全設備時才使用'記住我' 。\n如果您使用的是公共或非安全設備，選擇此選項可能會將您的密鑰和信息暴露給他人。",
+  "copySuccess2": "圖片已成功複製到剪貼板！",
+  "sharePosition": "分享持仓"
 }

@@ -2016,5 +2016,17 @@
   "monitored1": "钱包动态",
   "availableLiquidity": "可用流动性",
   "googleAuthNotBoundTip": "检测到您尚未绑定谷歌验证器。为保障账户安全,删除钱包地址前,需先完成谷歌验证器绑定。",
-  "goToBind": "前往绑定"
+  "goToBind": "前往绑定",
+  "rememberMe": "记住我",
+  "last": "最新",
+  "index": "指数",
+  "leverage": "杠杆",
+  "profit6": "收益",
+  "openPrice2": "开仓价格",
+  "closePrice2": "平仓价格",
+  "orderPnl": "订单盈亏",
+  "realPnl": "实际盈亏",
+  "remeberMeTips": "仅当您使用自己的安全设备时才使用'记住我' 。如果您使用的是公共或非安全设备，选择此选项可能会将您的密钥和信息暴露给他人。",
+  "copySuccess2": "图片已成功复制到剪贴板！",
+  "sharePosition": "持仓分享"
 }
